@@ -55,33 +55,12 @@
 
 const Type ElementType_Type = "ElementType";
 
-ElementType* _ElementType_New( 
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*				_construct,
-		Stg_Component_BuildFunction*					_build,
-		Stg_Component_InitialiseFunction*				_initialise,
-		Stg_Component_ExecuteFunction*					_execute,
-		Stg_Component_DestroyFunction*					_destroy,
-		Name								name,
-		Bool								initFlag,
-		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
-		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
-		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
-		ElementType_SurfaceNormalFunction*				_surfaceNormal,
-		Index								nodeCount )
-{
-	ElementType*		self;
+ElementType* _ElementType_New( ELEMENTTYPE_DEFARGS ) {
+	ElementType* self;
 	
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(ElementType) );
-	self = (ElementType*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor, _construct, _build, 
-			_initialise, _execute, _destroy, name, NON_GLOBAL );
+	assert( sizeOfSelf >= sizeof(ElementType) );
+	self = (ElementType*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
 	
 	/* General info */
 	
@@ -94,14 +73,6 @@ ElementType* _ElementType_New(
 	self->_surfaceNormal = _surfaceNormal;
 	
 	/* ElementType info */
-	
-	_Stg_Class_Init( (Stg_Class*)self );
-	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-	_Stg_Component_Init( (Stg_Component*)self );
-
-	if( initFlag ){
-		_ElementType_Init( self, nodeCount );
-	}
 	
 	return self;
 }

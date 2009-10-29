@@ -58,9 +58,9 @@ P1* P1_New( Name name ) {
 			_P1_Build, 
 			_P1_Initialise, 
 			_P1_Execute, 
-			_P1_Destroy, 
+			NULL, 
 			name, 
-			True, 
+			NON_GLOBAL,
 			P1_EvalBasis, 
 			P1_EvalLocalDerivs, 
 			NULL/*P1_CoordGlobalToLocal*/, 
@@ -73,7 +73,7 @@ P1* _P1_New( P1_DEFARGS ) {
 	P1*	self;
 
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(P1) );
+	assert( sizeOfSelf >= sizeof(P1) );
 	self = (P1*)_ElementType_New( ELEMENTTYPE_PASSARGS );
 
 	/* Virtual info */

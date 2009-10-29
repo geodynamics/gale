@@ -65,6 +65,11 @@
 
 	struct LinearTriangleElementType { __LinearTriangleElementType };
 	
+	#define LINEARTRIANGLEELEMENTTYPE_DEFARGS \
+    	ELEMENTTYPE_DEFARGS
+
+	#define LINEARTRIANGLEELEMENTTYPE_PASSARGS \
+    	ELEMENTTYPE_PASSARGS
 	
 	/* Create a new LinearTriangleElementType and initialise */
 	void* LinearTriangleElementType_DefaultNew( Name name );
@@ -72,26 +77,7 @@
 	LinearTriangleElementType* LinearTriangleElementType_New( Name name );
 	
 	/* Creation implementation / Virtual constructor */
-	LinearTriangleElementType* _LinearTriangleElementType_New(
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*				_construct,
-		Stg_Component_BuildFunction*					_build,
-		Stg_Component_InitialiseFunction*				_initialise,
-		Stg_Component_ExecuteFunction*					_execute,
-		Stg_Component_DestroyFunction*					_destroy,
-		Name								name,
-		Bool								initFlag,
-		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
-		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
-		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
-		ElementType_SurfaceNormalFunction*				_surfaceNormal,
-		Index								nodeCount );			
+	LinearTriangleElementType* _LinearTriangleElementType_New( LINEARTRIANGLEELEMENTTYPE_DEFARGS );			
 	
 	/* Initialise implementation */
 	void _LinearTriangleElementType_Init( LinearTriangleElementType* self );

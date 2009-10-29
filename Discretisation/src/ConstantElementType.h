@@ -64,6 +64,13 @@
 		\
 		/* ConstantElementType info */
 	struct ConstantElementType { __ConstantElementType };
+
+	#define CONSTANTELEMENTTYPE_DEFARGS \
+    	ELEMENTTYPE_DEFARGS
+
+	#define CONSTANTELEMENTTYPE_PASSARGS \
+    	ELEMENTTYPE_PASSARGS
+
 	
 	void* ConstantElementType_DefaultNew( Name name );
 
@@ -71,26 +78,7 @@
 	ConstantElementType* ConstantElementType_New( Name name );
 	
 	/* Creation implementation / Virtual constructor */
-	ConstantElementType* _ConstantElementType_New(
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*				_construct,
-		Stg_Component_BuildFunction*					_build,
-		Stg_Component_InitialiseFunction*				_initialise,
-		Stg_Component_ExecuteFunction*					_execute,
-		Stg_Component_DestroyFunction*					_destroy,
-		Name								name,
-		Bool								initFlag,
-		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
-		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
-		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
-		ElementType_SurfaceNormalFunction*				_surfaceNormal,
-		Index								nodeCount );
+	ConstantElementType* _ConstantElementType_New( CONSTANTELEMENTTYPE_DEFARGS );
 	
 	/* Initialise a ConstantElementType construct */
 	void _ConstantElementType_Init( ConstantElementType* self );

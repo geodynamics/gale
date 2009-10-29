@@ -70,9 +70,9 @@ void* BilinearInnerElType_DefaultNew( Name name ) {
 			_BilinearInnerElType_Build,
 			_BilinearInnerElType_Initialise,
 			_BilinearInnerElType_Execute,
-			_BilinearInnerElType_Destroy, 
-			name, 
-			False,
+			NULL, 
+			name,
+			NON_GLOBAL, 
 			_BilinearInnerElType_SF_allNodes,
 			_BilinearInnerElType_SF_allLocalDerivs_allNodes,
 			_ElementType_ConvertGlobalCoordToElLocal,
@@ -82,52 +82,25 @@ void* BilinearInnerElType_DefaultNew( Name name ) {
 }
 
 BilinearInnerElType* BilinearInnerElType_New( Name name ) {
-	return _BilinearInnerElType_New( sizeof(BilinearInnerElType), BilinearInnerElType_Type, _BilinearInnerElType_Delete,
-		_BilinearInnerElType_Print, NULL, BilinearInnerElType_DefaultNew, _BilinearInnerElType_Construct, _BilinearInnerElType_Build,
-		_BilinearInnerElType_Initialise, _BilinearInnerElType_Execute, _BilinearInnerElType_Destroy, name, True, _BilinearInnerElType_SF_allNodes, 
-		_BilinearInnerElType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
-		_BilinearInnerElType_SurfaceNormal, _BilinearInnerElType_NodeCount );
+	BilinearInnerElType* self = BilinearInnerElType_DefaultNew( name );
+
+	self->isConstructed = True;	
+	_BilinearInnerElType_Init( self );
+
+	return self;
 }
 
 
-BilinearInnerElType* _BilinearInnerElType_New( 
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*				_construct,
-		Stg_Component_BuildFunction*					_build,
-		Stg_Component_InitialiseFunction*				_initialise,
-		Stg_Component_ExecuteFunction*					_execute,
-		Stg_Component_DestroyFunction*					_destroy,
-		Name								name,
-		Bool								initFlag,
-		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
-		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
-		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
-		ElementType_SurfaceNormalFunction*				_surfaceNormal,
-		Index								nodeCount )
-{
+BilinearInnerElType* _BilinearInnerElType_New( BILINEARINNERELTYPE_DEFARGS  ) {
 	BilinearInnerElType*		self;
 	
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(BilinearInnerElType) );
-	self = (BilinearInnerElType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-		_construct, _build, _initialise, _execute, _destroy, name, initFlag,
-		_evaluateShapeFunctionsAt, _evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal,
-		_jacobianDeterminantSurface, _surfaceNormal, nodeCount );
+	assert( sizeOfSelf >= sizeof(BilinearInnerElType) );
+	self = (BilinearInnerElType*)_ElementType_New( ELEMENTTYPE_PASSARGS );
 	
 	/* General info */
 	
 	/* Virtual functions */
-	
-	/* BilinearInnerElType info */
-	if( initFlag ){
-		_BilinearInnerElType_Init( self );
-	}
 	
 	return self;
 }

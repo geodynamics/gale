@@ -173,7 +173,7 @@ void _DivergenceMatrixTerm_Execute( void* matrixTerm, void* data ) {
 }
 
 void _DivergenceMatrixTerm_Destroy( void* matrixTerm, void* data ) {
-	DivergenceMatrixTerm* self = (DivergenceMatrixTerm*) matrixTerm;'
+	DivergenceMatrixTerm* self = (DivergenceMatrixTerm*) matrixTerm;
 
 	_StiffnessMatrixTerm_Destroy( matrixTerm, data );
 }

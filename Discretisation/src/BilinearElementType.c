@@ -59,21 +59,21 @@ const Type BilinearElementType_Type = "BilinearElementType";
 
 #define _BilinearElementType_NodeCount 4
 
-void* BilinearElementType_DefaultNew( Name name ) {
+void* _BilinearElementType_DefaultNew( Name name ) {
 	return _BilinearElementType_New(
 			sizeof(BilinearElementType), 
 			BilinearElementType_Type,
 			_BilinearElementType_Delete,
 			_BilinearElementType_Print,
 			NULL, 
-			BilinearElementType_DefaultNew,
+			_BilinearElementType_DefaultNew,
 			_BilinearElementType_Construct,
 			_BilinearElementType_Build,
 			_BilinearElementType_Initialise,
 			_BilinearElementType_Execute,
-			_BilinearElementType_Destroy, 
-			name, 
-			False,
+			NULL, 
+			name,
+			NON_GLOBAL, 
 			_BilinearElementType_SF_allNodes,
 			_BilinearElementType_SF_allLocalDerivs_allNodes,
 			_ElementType_ConvertGlobalCoordToElLocal,
@@ -83,51 +83,24 @@ void* BilinearElementType_DefaultNew( Name name ) {
 }
 
 BilinearElementType* BilinearElementType_New( Name name ) {
-	return _BilinearElementType_New( sizeof(BilinearElementType), BilinearElementType_Type, _BilinearElementType_Delete,
-		_BilinearElementType_Print, NULL, BilinearElementType_DefaultNew, _BilinearElementType_Construct, _BilinearElementType_Build,
-		_BilinearElementType_Initialise, _BilinearElementType_Execute, _BilinearElementType_Destroy, name, True, _BilinearElementType_SF_allNodes, 
-		_BilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal, _BilinearElementType_JacobianDeterminantSurface,
-		_ElementType_SurfaceNormal, _BilinearElementType_NodeCount );
+	BilinearElementType* self = _BilinearElementType_DefaultNew( name );
+
+	self->isConstructed = True;
+	 _BilinearElementType_Init( self );
+
+	return self;
 }
 
-BilinearElementType* _BilinearElementType_New( 
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*				_construct,
-		Stg_Component_BuildFunction*					_build,
-		Stg_Component_InitialiseFunction*				_initialise,
-		Stg_Component_ExecuteFunction*					_execute,
-		Stg_Component_DestroyFunction*					_destroy,
-		Name								name,
-		Bool								initFlag,
-		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
-		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
-		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
-		ElementType_SurfaceNormalFunction*				_surfaceNormal,
-		Index								nodeCount )
-{
+BilinearElementType* _BilinearElementType_New( BILINEARELEMENTTYPE_DEFARGS ) {
 	BilinearElementType*		self;
 	
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(BilinearElementType) );
-	self = (BilinearElementType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-		_construct, _build, _initialise, _execute, _destroy, name, initFlag,
-		_evaluateShapeFunctionsAt, _evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal,
-		_jacobianDeterminantSurface, _surfaceNormal, nodeCount );
+	assert( sizeOfSelf >= sizeof(BilinearElementType) );
+	self = (BilinearElementType*)_ElementType_New( ELEMENTTYPE_PASSARGS );
 	
 	/* General info */
 	
 	/* Virtual functions */
-	
-	/* BilinearElementType info */
-	if( initFlag ){
-		_BilinearElementType_Init( self );
-	}
 	
 	return self;
 }
@@ -136,9 +109,6 @@ void _BilinearElementType_Init( BilinearElementType* self ) {
 	Dimension_Index dim, dim_I=0;
 	/* General and Virtual info should already be set */
 	
-	/* BilinearElementType info */
-	self->isConstructed = True;
-
 	/* set the dimensionality of the element */
 	dim = self->dim = 2;
 
@@ -157,6 +127,10 @@ void _BilinearElementType_Delete( void* elementType ) {
 	BilinearElementType* self = (BilinearElementType*)elementType;
 
 	FreeArray( self->triInds );
+
+	Memory_Free( self->faceNodes );	
+	Memory_Free( self->evaluatedShapeFunc );
+	Memory_Free( self->GNi );
 	
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 	/* Stg_Class_Delete parent*/
@@ -213,10 +187,6 @@ void _BilinearElementType_Execute( void* elementType, void *data ){
 	
 void _BilinearElementType_Destroy( void* elementType, void *data ){
 	BilinearElementType*	self	= (BilinearElementType*) elementType;
-
-	Memory_Free( self->faceNodes );	
-	Memory_Free( self->evaluatedShapeFunc );
-	Memory_Free( self->GNi );
 
 	_ElementType_Destroy( self, data );
 }

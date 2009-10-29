@@ -69,33 +69,21 @@
 		unsigned**		triInds; \
 		
 	struct BilinearElementType { __BilinearElementType };
+
+	#define BILINEARELEMENTTYPE_DEFARGS \
+    	ELEMENTTYPE_DEFARGS
+
+	#define BILINEARELEMENTTYPE_PASSARGS \
+    	ELEMENTTYPE_PASSARGS
+
 	
 	/* Create a new BilinearElementType and initialise */
-	void* BilinearElementType_DefaultNew( Name name );
+	void* _BilinearElementType_DefaultNew( Name name );
 	
 	BilinearElementType* BilinearElementType_New( Name name );
 	
 	/* Creation implementation / Virtual constructor */
-	BilinearElementType* _BilinearElementType_New(
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*				_construct,
-		Stg_Component_BuildFunction*					_build,
-		Stg_Component_InitialiseFunction*				_initialise,
-		Stg_Component_ExecuteFunction*					_execute,
-		Stg_Component_DestroyFunction*					_destroy,
-		Name								name,
-		Bool								initFlag,
-		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
-		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
-		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
-		ElementType_SurfaceNormalFunction*				_surfaceNormal,
-		Index								nodeCount );
+	BilinearElementType* _BilinearElementType_New( BILINEARELEMENTTYPE_DEFARGS );
 	
 	/* Initialise implementation */
 	void _BilinearElementType_Init( BilinearElementType* self );

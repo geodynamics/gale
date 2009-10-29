@@ -58,60 +58,34 @@ const Type TrilinearElementType_Type = "TrilinearElementType";
 void* TrilinearElementType_DefaultNew( Name name ) {
 	return _TrilinearElementType_New( sizeof(TrilinearElementType), TrilinearElementType_Type, _TrilinearElementType_Delete,
 		_TrilinearElementType_Print, NULL, TrilinearElementType_DefaultNew, _TrilinearElementType_Construct,
-		_TrilinearElementType_Build, _TrilinearElementType_Initialise, _TrilinearElementType_Execute, _TrilinearElementType_Destroy,
-		name, False, _TrilinearElementType_SF_allNodes, 
+		_TrilinearElementType_Build, _TrilinearElementType_Initialise, _TrilinearElementType_Execute, NULL,
+		name, NON_GLOBAL, _TrilinearElementType_SF_allNodes, 
 		_TrilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
 		_TrilinearElementType_JacobianDeterminantSurface, _ElementType_SurfaceNormal, _TrilinearElementType_NodeCount );
 }
 
 TrilinearElementType* TrilinearElementType_New( Name name ) {
-	return _TrilinearElementType_New( sizeof(TrilinearElementType), TrilinearElementType_Type, _TrilinearElementType_Delete,
-		_TrilinearElementType_Print, NULL, TrilinearElementType_DefaultNew, _TrilinearElementType_Construct,
-		_TrilinearElementType_Build, _TrilinearElementType_Initialise, _TrilinearElementType_Execute, _TrilinearElementType_Destroy,
-		name, True, _TrilinearElementType_SF_allNodes, 
-		_TrilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
-		_TrilinearElementType_JacobianDeterminantSurface, _ElementType_SurfaceNormal, _TrilinearElementType_NodeCount );
+	TrilinearElementType* self = TrilinearElementType_DefaultNew( name );
+
+	self->isConstructed = True;
+	_TrilinearElementType_Init( self );
+
+	return self;	
 }
 
 
-TrilinearElementType* _TrilinearElementType_New( 
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*				_construct,
-		Stg_Component_BuildFunction*					_build,
-		Stg_Component_InitialiseFunction*				_initialise,
-		Stg_Component_ExecuteFunction*					_execute,
-		Stg_Component_DestroyFunction*					_destroy,
-		Name								name,
-		Bool								initFlag,
-		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
-		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
-		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
-		ElementType_SurfaceNormalFunction*				_surfaceNormal,
-		Index								nodeCount )
-{
+TrilinearElementType* _TrilinearElementType_New( TRILINEARELEMENTTYPE_DEFARGS ) {
 	TrilinearElementType*		self;
 	
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(TrilinearElementType) );
-	self = (TrilinearElementType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-		_construct, _build, _initialise, _execute, _destroy, name, initFlag, _evaluateShapeFunctionsAt,
-		_evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal, _jacobianDeterminantSurface, 
-		_surfaceNormal, nodeCount );
+	assert( sizeOfSelf >= sizeof(TrilinearElementType) );
+	self = (TrilinearElementType*)_ElementType_New( ELEMENTTYPE_PASSARGS );
 	
 	/* General info */
 	
 	/* Virtual functions */
 	
 	/* TrilinearElementType info */
-	if( initFlag ){
-		_TrilinearElementType_Init( self );
-	}
 	
 	return self;
 }
@@ -124,7 +98,6 @@ void _TrilinearElementType_Init( TrilinearElementType* self ) {
 	/* General and Virtual info should already be set */
 	
 	/* TrilinearElementType info */
-	self->isConstructed = True;
 	dim = self->dim = 3;
 	for ( dim_I = 0; dim_I < dim; dim_I++ ) {
 		self->minElLocalCoord[dim_I] = -1;

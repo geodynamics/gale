@@ -68,7 +68,7 @@ void* ConstantElementType_DefaultNew( Name name ) {
 			_ConstantElementType_Execute,
 			_ConstantElementType_Destroy, 
 			name,
-			False,
+			NON_GLOBAL,
 			_ConstantElementType_SF_allNodes,
 			_ConstantElementType_SF_allLocalDerivs_allNodes,
 			_ConstantElementType_ConvertGlobalCoordToElLocal,
@@ -78,75 +78,33 @@ void* ConstantElementType_DefaultNew( Name name ) {
 }
 
 ConstantElementType* ConstantElementType_New( Name name ) {
-	return _ConstantElementType_New( 
-			sizeof(ConstantElementType),
-			ConstantElementType_Type,
-			_ConstantElementType_Delete,
-			_ConstantElementType_Print, 
-			NULL, 
-			ConstantElementType_DefaultNew,
-			_ConstantElementType_Construct,
-			_ConstantElementType_Build,
-			_ConstantElementType_Initialise,
-			_ConstantElementType_Execute,
-			_ConstantElementType_Destroy,
-			name, 
-			True,
-			_ConstantElementType_SF_allNodes,
-			_ConstantElementType_SF_allLocalDerivs_allNodes,
-			_ConstantElementType_ConvertGlobalCoordToElLocal,
-			_ElementType_JacobianDeterminantSurface,
-			_ConstantElementType_SurfaceNormal,
-			_ConstantElementType_NodeCount );
+	ConstantElementType* self = ConstantElementType_DefaultNew( name );
+
+	self->isConstructed = True;	
+	_ConstantElementType_Init( self );	
+
+	return self;
 }
 
 
-ConstantElementType* _ConstantElementType_New( 
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*				_construct,
-		Stg_Component_BuildFunction*					_build,
-		Stg_Component_InitialiseFunction*				_initialise,
-		Stg_Component_ExecuteFunction*					_execute,
-		Stg_Component_DestroyFunction*					_destroy,
-		Name								name,
-		Bool								initFlag,
-		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
-		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
-		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
-		ElementType_SurfaceNormalFunction*				_surfaceNormal,
-		Index								nodeCount )
-{
+ConstantElementType* _ConstantElementType_New( CONSTANTELEMENTTYPE_DEFARGS ) {
 	ConstantElementType*		self;
 	
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(ConstantElementType) );
-	self = (ConstantElementType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy,
-		_defaultConstructor, _construct, _build, _initialise, _execute, _destroy, name, initFlag,
-		_evaluateShapeFunctionsAt, _evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal,
-		_jacobianDeterminantSurface, _surfaceNormal, nodeCount );
+	assert( sizeOfSelf >= sizeof(ConstantElementType) );
+	self = (ConstantElementType*)_ElementType_New( ELEMENTTYPE_PASSARGS );
 	
 	/* General info */
 	
 	/* Virtual functions */
 	
 	/* ConstantElementType info */
-	if( initFlag ){
-		_ConstantElementType_Init( self );
-	}
-	
 	return self;
 }
 
 
 void _ConstantElementType_Init( ConstantElementType* self ) {
 	/* General and Virtual info should already be set */
-	self->isConstructed = True;
 	/* ConstantElementType info */
 }
 

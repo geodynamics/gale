@@ -49,31 +49,31 @@ const Type RegularBilinear_Type = "RegularBilinear";
 
 RegularBilinear* RegularBilinear_New( Name name ) {
 	return _RegularBilinear_New( sizeof(RegularBilinear), 
-				     RegularBilinear_Type, 
-				     _RegularBilinear_Delete, 
-				     _RegularBilinear_Print, 
-				     NULL, 
-				     (void* (*)(Name))_RegularBilinear_New, 
-				     _RegularBilinear_Construct, 
-				     _RegularBilinear_Build, 
-				     _RegularBilinear_Initialise, 
-				     _RegularBilinear_Execute, 
-				     _RegularBilinear_Destroy, 
-				     name, 
-				     True, 
-				     _BilinearElementType_SF_allNodes, 
-				     _BilinearElementType_SF_allLocalDerivs_allNodes, 
-				     _ElementType_ConvertGlobalCoordToElLocal, 
-				     _BilinearElementType_JacobianDeterminantSurface,
-				     _ElementType_SurfaceNormal,
-				     4 );
+			RegularBilinear_Type, 
+			_RegularBilinear_Delete, 
+			_RegularBilinear_Print, 
+			NULL, 
+			(void* (*)(Name))_RegularBilinear_New, 
+			_RegularBilinear_Construct, 
+			_RegularBilinear_Build, 
+			_RegularBilinear_Initialise, 
+			_RegularBilinear_Execute, 
+			NULL, 
+			name, 
+			NON_GLOBAL, 
+			_BilinearElementType_SF_allNodes, 
+			_BilinearElementType_SF_allLocalDerivs_allNodes, 
+			_ElementType_ConvertGlobalCoordToElLocal, 
+			_BilinearElementType_JacobianDeterminantSurface,
+			_ElementType_SurfaceNormal,
+			4 );
 }
 
 RegularBilinear* _RegularBilinear_New( REGULARTRILINEAR_DEFARGS ) {
 	RegularBilinear*	self;
 
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(RegularBilinear) );
+	assert( sizeOfSelf >= sizeof(RegularBilinear) );
 	self = (RegularBilinear*)_BilinearElementType_New( ELEMENTTYPE_PASSARGS );
 
 	/* Virtual info */

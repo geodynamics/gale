@@ -58,62 +58,32 @@ const Type TrilinearInnerElType_Type = "TrilinearInnerElType";
 void* TrilinearInnerElType_DefaultNew( Name name ) {
 	return _TrilinearInnerElType_New( sizeof(TrilinearInnerElType), TrilinearInnerElType_Type, _TrilinearInnerElType_Delete,
 		_TrilinearInnerElType_Print, NULL, TrilinearInnerElType_DefaultNew, _TrilinearInnerElType_Construct,
-		_TrilinearInnerElType_Build, _TrilinearInnerElType_Initialise, _TrilinearInnerElType_Execute, _TrilinearInnerElType_Destroy,
-		name, False, _TrilinearInnerElType_SF_allNodes, 
+		_TrilinearInnerElType_Build, _TrilinearInnerElType_Initialise, _TrilinearInnerElType_Execute, NULL,
+		name, NON_GLOBAL, _TrilinearInnerElType_SF_allNodes, 
 		_TrilinearInnerElType_SF_allLocalDerivs_allNodes,
 		_ElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
 		_TrilinearInnerElType_SurfaceNormal, _TrilinearInnerElType_NodeCount );
 }
 
 TrilinearInnerElType* TrilinearInnerElType_New( Name name ) {
-	return _TrilinearInnerElType_New( sizeof(TrilinearInnerElType), TrilinearInnerElType_Type, _TrilinearInnerElType_Delete,
-		_TrilinearInnerElType_Print, NULL, TrilinearInnerElType_DefaultNew, _TrilinearInnerElType_Construct,
-		_TrilinearInnerElType_Build, _TrilinearInnerElType_Initialise, _TrilinearInnerElType_Execute, _TrilinearInnerElType_Destroy,
-		name, True, _TrilinearInnerElType_SF_allNodes, 
-		_TrilinearInnerElType_SF_allLocalDerivs_allNodes,
-		_ElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
-		_TrilinearInnerElType_SurfaceNormal, _TrilinearInnerElType_NodeCount );
+	TrilinearInnerElType* self = TrilinearInnerElType_DefaultNew( self );
+
+	self->isConstructed = True;
+	_TrilinearInnerElType_Init( self );
 }
 
-
-TrilinearInnerElType* _TrilinearInnerElType_New( 
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*				_construct,
-		Stg_Component_BuildFunction*					_build,
-		Stg_Component_InitialiseFunction*				_initialise,
-		Stg_Component_ExecuteFunction*					_execute,
-		Stg_Component_DestroyFunction*					_destroy,
-		Name								name,
-		Bool								initFlag,
-		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
-		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
-		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
-		ElementType_SurfaceNormalFunction*				_surfaceNormal,
-		Index								nodeCount )
-{
+TrilinearInnerElType* _TrilinearInnerElType_New( TRILINEARINNERELTYPE_DEFARGS ) {
 	TrilinearInnerElType*		self;
 	
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(TrilinearInnerElType) );
-	self = (TrilinearInnerElType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-		_construct, _build, _initialise, _execute, _destroy, name, initFlag, _evaluateShapeFunctionsAt,
-		_evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal, _jacobianDeterminantSurface, 
-		_surfaceNormal, nodeCount );
+	assert( sizeOfSelf >= sizeof(TrilinearInnerElType) );
+	self = (TrilinearInnerElType*)_ElementType_New( ELEMENTTYPE_PASSARGS );
 	
 	/* General info */
 	
 	/* Virtual functions */
 	
 	/* TrilinearInnerElType info */
-	if( initFlag ){
-		_TrilinearInnerElType_Init( self );
-	}
 	
 	return self;
 }
@@ -126,7 +96,6 @@ void _TrilinearInnerElType_Init( TrilinearInnerElType* self ) {
 	/* General and Virtual info should already be set */
 	
 	/* TriInnerEllementType info */
-	self->isConstructed = True;
 	for ( dim_I = 0; dim_I < 3; dim_I++ ) {
 		self->minElLocalCoord[dim_I] = -1;
 		self->maxElLocalCoord[dim_I] = 1;

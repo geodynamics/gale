@@ -68,6 +68,12 @@
 		unsigned**	tetInds;
 		
 	struct TrilinearElementType { __TrilinearElementType };
+
+	#define TRILINEARELEMENTTYPE_DEFARGS \
+    	ELEMENTTYPE_DEFARGS
+
+	#define TRILINEARELEMENTTYPE_PASSARGS \
+    	ELEMENTTYPE_PASSARGS
 	
 	
 	/* Create a new TrilinearElementType and initialise */
@@ -76,26 +82,7 @@
 	TrilinearElementType* TrilinearElementType_New( Name name );
 	
 	/* Creation implementation / Virtual constructor */
-	TrilinearElementType* _TrilinearElementType_New(
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*				_construct,
-		Stg_Component_BuildFunction*					_build,
-		Stg_Component_InitialiseFunction*				_initialise,
-		Stg_Component_ExecuteFunction*					_execute,
-		Stg_Component_DestroyFunction*					_destroy,
-		Name								name,
-		Bool								initFlag,
-		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
-		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
-		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
-		ElementType_SurfaceNormalFunction*				_surfaceNormal,
-		Index								nodeCount );
+	TrilinearElementType* _TrilinearElementType_New( TRILINEARELEMENTTYPE_DEFARGS );
 	
 	/* Initialise implementation */
 	void _TrilinearElementType_Init( TrilinearElementType* self );
