@@ -174,7 +174,7 @@ void* _lucColourBar_DefaultNew( Name name ) {
 		_lucColourBar_Print,
 		NULL,
 		_lucColourBar_DefaultNew,
-		_lucColourBar_Construct,
+		_lucColourBar_AssignFromXML,
 		_lucColourBar_Build,
 		_lucColourBar_Initialise,
 		_lucColourBar_Execute,
@@ -185,7 +185,7 @@ void* _lucColourBar_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucColourBar_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucColourBar_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucColourBar*   self = (lucColourBar*)drawingObject;
 	lucColourMap*   colourMap;
     unsigned int    i, defaultTicks, ticks;
@@ -193,7 +193,7 @@ void _lucColourBar_Construct( void* drawingObject, Stg_ComponentFactory* cf, voi
     char            tickLabel[10];
 
 	/* Construct Parent */
-	_lucDrawingObject_Construct( self, cf, data );
+	_lucDrawingObject_AssignFromXML( self, cf, data );
 
 	colourMap     =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "ColourMap", lucColourMap, True, data ) ;
 

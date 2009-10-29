@@ -94,7 +94,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucSDLWindow_DefaultNew( Name name ) ;
-	void _lucSDLWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data );
+	void _lucSDLWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data );
 	void _lucSDLWindow_Build( void* window, void* data ) ;
 	void _lucSDLWindow_Initialise( void* window, void* data ) ;
 	void _lucSDLWindow_Execute( void* window, void* data );

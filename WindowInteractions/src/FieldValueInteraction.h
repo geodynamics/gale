@@ -85,7 +85,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucFieldValueInteraction_DefaultNew( Name name ) ;
-	void _lucFieldValueInteraction_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
+	void _lucFieldValueInteraction_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
 	void _lucFieldValueInteraction_Build( void* renderingEngine, void* data ) ;
 	void _lucFieldValueInteraction_Initialise( void* renderingEngine, void* data ) ;
 	void _lucFieldValueInteraction_Execute( void* renderingEngine, void* data );

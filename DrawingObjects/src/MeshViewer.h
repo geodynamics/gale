@@ -106,7 +106,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucMeshViewer_DefaultNew( Name name ) ;
-	void _lucMeshViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucMeshViewer_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucMeshViewer_Build( void* drawingObject, void* data ) ;
 	void _lucMeshViewer_Initialise( void* drawingObject, void* data ) ;
 	void _lucMeshViewer_Execute( void* drawingObject, void* data );

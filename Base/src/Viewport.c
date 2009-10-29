@@ -255,7 +255,7 @@ void* _lucViewport_DefaultNew( Name name ) {
 			_lucViewport_Print,
 			_lucViewport_Copy,
 			_lucViewport_DefaultNew,
-			_lucViewport_Construct,
+			_lucViewport_AssignFromXML,
 			_lucViewport_Build,
 			_lucViewport_Initialise,
 			_lucViewport_Execute,
@@ -263,7 +263,7 @@ void* _lucViewport_DefaultNew( Name name ) {
 			name );
 }
 
-void _lucViewport_Construct( void* viewport, Stg_ComponentFactory* cf, void* data ) {
+void _lucViewport_AssignFromXML( void* viewport, Stg_ComponentFactory* cf, void* data ) {
 	lucViewport*        self               = (lucViewport*) viewport;
 	DrawingObject_Index drawingObjectCount;
 	lucDrawingObject**  drawingObjectList;

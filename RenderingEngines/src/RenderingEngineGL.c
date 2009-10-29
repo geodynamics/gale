@@ -149,7 +149,7 @@ void* _lucRenderingEngineGL_DefaultNew( Name name ) {
 		_lucRenderingEngineGL_Print,
 		NULL,
 		_lucRenderingEngineGL_DefaultNew,
-		_lucRenderingEngineGL_Construct,
+		_lucRenderingEngineGL_AssignFromXML,
 		_lucRenderingEngineGL_Build,
 		_lucRenderingEngineGL_Initialise,
 		_lucRenderingEngineGL_Execute,
@@ -161,11 +161,11 @@ void* _lucRenderingEngineGL_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucRenderingEngineGL_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data ){
+void _lucRenderingEngineGL_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data ){
 	lucRenderingEngineGL*  self = (lucRenderingEngineGL*)renderingEngine;
 
 	/* Construct Parent */
-	_lucRenderingEngine_Construct( self, cf, data );
+	_lucRenderingEngine_AssignFromXML( self, cf, data );
 	
 	_lucRenderingEngineGL_Init( self );
 }

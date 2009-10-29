@@ -105,7 +105,7 @@
 	#define lucTitle_Copy( self ) \
 		(lucTitle*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	void* _lucTitle_DefaultNew( Name name ) ;
-void _lucTitle_Construct( void* title, Stg_ComponentFactory* cf, void* data ) ;
+void _lucTitle_AssignFromXML( void* title, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucTitle_Build( void* title, void* data );
 	void _lucTitle_Initialise( void* title, void* data );
 	void _lucTitle_Execute( void* title, void* data );

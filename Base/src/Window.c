@@ -245,7 +245,7 @@ void* _lucWindow_DefaultNew( Name name ) {
 			_lucWindow_Print,
 			_lucWindow_Copy,
 			_lucWindow_DefaultNew,
-			_lucWindow_Construct,
+			_lucWindow_AssignFromXML,
 			_lucWindow_Build,
 			_lucWindow_Initialise,
 			_lucWindow_Execute,
@@ -257,7 +257,7 @@ void* _lucWindow_DefaultNew( Name name ) {
 			name );
 }
 
-void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) {
+void _lucWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data ) {
 	lucWindow*               self        = window;
 	lucViewportInfo*         viewportInfoList;
 	Viewport_Index           viewportCount;

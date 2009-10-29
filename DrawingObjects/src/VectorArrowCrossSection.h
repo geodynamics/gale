@@ -94,7 +94,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucVectorArrowCrossSection_DefaultNew( Name name ) ;
-	void _lucVectorArrowCrossSection_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucVectorArrowCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucVectorArrowCrossSection_Build( void* drawingObject, void* data ) ;
 	void _lucVectorArrowCrossSection_Initialise( void* drawingObject, void* data ) ;
 	void _lucVectorArrowCrossSection_Execute( void* drawingObject, void* data );

@@ -145,11 +145,11 @@ void* _lucOpenGLDrawingObject_Copy( void* drawingObject, void* dest, Bool deep, 
 
 
 
-void _lucOpenGLDrawingObject_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucOpenGLDrawingObject_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucOpenGLDrawingObject*         self               = (lucOpenGLDrawingObject*)drawingObject;
 
 	/* Construct Parent */
-	_lucDrawingObject_Construct( self, cf, data );
+	_lucDrawingObject_AssignFromXML( self, cf, data );
 
 	_lucOpenGLDrawingObject_Init( self );
 }

@@ -84,7 +84,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucInputPPM_DefaultNew( Name name ) ;
-	void _lucInputPPM_Construct( void* InputFormat, Stg_ComponentFactory* cf, void* data );
+	void _lucInputPPM_AssignFromXML( void* InputFormat, Stg_ComponentFactory* cf, void* data );
 	void _lucInputPPM_Build( void* InputFormat, void* data ) ;
 	void _lucInputPPM_Initialise(void* InputFormat, void* data ) ;
 	void _lucInputPPM_Execute( void* InputFormat, void* data );

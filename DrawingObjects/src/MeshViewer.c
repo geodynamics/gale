@@ -174,7 +174,7 @@ void* _lucMeshViewer_DefaultNew( Name name ) {
 		_lucMeshViewer_Print,
 		NULL,
 		_lucMeshViewer_DefaultNew,
-		_lucMeshViewer_Construct,
+		_lucMeshViewer_AssignFromXML,
 		_lucMeshViewer_Build,
 		_lucMeshViewer_Initialise,
 		_lucMeshViewer_Execute,
@@ -186,12 +186,12 @@ void* _lucMeshViewer_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucMeshViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucMeshViewer_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucMeshViewer*         self = (lucMeshViewer*)drawingObject;
 	Mesh*                  mesh;
 	
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 	
 	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", Mesh, True, data );
 

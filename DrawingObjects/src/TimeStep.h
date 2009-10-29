@@ -105,7 +105,7 @@
 	#define lucTimeStep_Copy( self ) \
 		(lucTimeStep*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	void* _lucTimeStep_DefaultNew( Name name ) ;
-void _lucTimeStep_Construct( void* timeStep, Stg_ComponentFactory* cf, void* data ) ;
+void _lucTimeStep_AssignFromXML( void* timeStep, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucTimeStep_Build( void* timeStep, void* data );
 	void _lucTimeStep_Initialise( void* timeStep, void* data );
 	void _lucTimeStep_Execute( void* timeStep, void* data );

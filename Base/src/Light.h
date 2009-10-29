@@ -112,7 +112,7 @@
 	#define lucLight_Copy( self ) \
 		(lucLight*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	void* _lucLight_DefaultNew( Name name ) ;
-	void _lucLight_Construct( void* light, Stg_ComponentFactory* cf, void* data ) ;
+	void _lucLight_AssignFromXML( void* light, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucLight_Build( void* light, void* data );
 	void _lucLight_Initialise( void* light, void* data );
 	void _lucLight_Execute( void* light, void* data );

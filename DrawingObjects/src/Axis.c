@@ -197,7 +197,7 @@ void* _lucAxis_DefaultNew( Name name ) {
 			_lucAxis_Print,
 			_lucAxis_Copy,
 			_lucAxis_DefaultNew,
-			_lucAxis_Construct,
+			_lucAxis_AssignFromXML,
 			_lucAxis_Build,
 			_lucAxis_Initialise,
 			_lucAxis_Execute,
@@ -209,7 +209,7 @@ void* _lucAxis_DefaultNew( Name name ) {
 			name );
 }
 
-void _lucAxis_Construct( void* axis, Stg_ComponentFactory* cf, void* data ) {
+void _lucAxis_AssignFromXML( void* axis, Stg_ComponentFactory* cf, void* data ) {
 	lucAxis*             self               = (lucAxis*) axis;
         Name colourNameX;
 	Name colourNameY;	
@@ -219,7 +219,7 @@ void _lucAxis_Construct( void* axis, Stg_ComponentFactory* cf, void* data ) {
 	
 	/* Get Stereo Type */
          /* Construct Parent */
-	_lucDrawingObject_Construct( self, cf, data );
+	_lucDrawingObject_AssignFromXML( self, cf, data );
 
 	colourNameX  = Stg_ComponentFactory_GetString( cf, self->name, "colourX", "Red") ;
 	colourNameY  = Stg_ComponentFactory_GetString( cf, self->name, "colourY", "Green") ;

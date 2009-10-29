@@ -96,7 +96,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucEncoderLibfame_DefaultNew( Name name ) ;
-	void _lucEncoderLibfame_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data );
+	void _lucEncoderLibfame_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data );
 	void _lucEncoderLibfame_Build( void* outputFormat, void* data ) ;
 	void _lucEncoderLibfame_Initialise( void* outputFormat, void* data ) ;
 	void _lucEncoderLibfame_Execute( void* outputFormat, void* data );

@@ -147,7 +147,7 @@ void* _lucLightInteraction_DefaultNew( Name name ) {
 		_lucLightInteraction_Print,
 		NULL,
 		_lucLightInteraction_DefaultNew,
-		_lucLightInteraction_Construct,
+		_lucLightInteraction_AssignFromXML,
 		_lucLightInteraction_Build,
 		_lucLightInteraction_Initialise,
 		_lucLightInteraction_Execute,
@@ -160,11 +160,11 @@ void* _lucLightInteraction_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucLightInteraction_Construct( void* LightInteraction, Stg_ComponentFactory* cf, void* data ){
+void _lucLightInteraction_AssignFromXML( void* LightInteraction, Stg_ComponentFactory* cf, void* data ){
 	lucLightInteraction*  self = LightInteraction;
 
 	/* Construct Parent */
-	_lucWindowInteraction_Construct(self, cf, data );
+	_lucWindowInteraction_AssignFromXML(self, cf, data );
 	
 	_lucLightInteraction_Init( self );
 }

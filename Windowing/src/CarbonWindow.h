@@ -97,7 +97,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucCarbonWindow_DefaultNew( Name name ) ;
-	void _lucCarbonWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data );
+	void _lucCarbonWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data );
 	void _lucCarbonWindow_Build( void* window, void* data ) ;
 	void _lucCarbonWindow_Initialise( void* window, void* data ) ;
 	void _lucCarbonWindow_Execute( void* window, void* data );

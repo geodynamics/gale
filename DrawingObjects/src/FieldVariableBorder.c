@@ -156,7 +156,7 @@ void* _lucFieldVariableBorder_DefaultNew( Name name ) {
 		_lucFieldVariableBorder_Print,
 		NULL,
 		_lucFieldVariableBorder_DefaultNew,
-		_lucFieldVariableBorder_Construct,
+		_lucFieldVariableBorder_AssignFromXML,
 		_lucFieldVariableBorder_Build,
 		_lucFieldVariableBorder_Initialise,
 		_lucFieldVariableBorder_Execute,
@@ -168,12 +168,12 @@ void* _lucFieldVariableBorder_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucFieldVariableBorder_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucFieldVariableBorder_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucFieldVariableBorder*  self = (lucFieldVariableBorder*)drawingObject;
 	FieldVariable*           fieldVariable;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
 	fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "FieldVariable", FieldVariable, True, data );
 	

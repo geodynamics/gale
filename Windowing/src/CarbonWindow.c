@@ -153,7 +153,7 @@ void* _lucCarbonWindow_DefaultNew( Name name ) {
 		_lucCarbonWindow_Print,
 		NULL,
 		_lucCarbonWindow_DefaultNew,
-		_lucCarbonWindow_Construct,
+		_lucCarbonWindow_AssignFromXML,
 		_lucCarbonWindow_Build,
 		_lucCarbonWindow_Initialise,
 		_lucCarbonWindow_Execute,
@@ -165,11 +165,11 @@ void* _lucCarbonWindow_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucCarbonWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ){
+void _lucCarbonWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data ){
 	lucCarbonWindow*  self = (lucCarbonWindow*)window;
 
 	/* Construct Parent */
-	_lucWindow_Construct( self, cf , data);
+	_lucWindow_AssignFromXML( self, cf , data);
 	
 	_lucCarbonWindow_Init( 
 			self,

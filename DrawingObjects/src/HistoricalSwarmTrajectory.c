@@ -165,7 +165,7 @@ void* _lucHistoricalSwarmTrajectory_DefaultNew( Name name ) {
 		_lucHistoricalSwarmTrajectory_Print,
 		NULL,
 		_lucHistoricalSwarmTrajectory_DefaultNew,
-		_lucHistoricalSwarmTrajectory_Construct,
+		_lucHistoricalSwarmTrajectory_AssignFromXML,
 		_lucHistoricalSwarmTrajectory_Build,
 		_lucHistoricalSwarmTrajectory_Initialise,
 		_lucHistoricalSwarmTrajectory_Execute,
@@ -177,7 +177,7 @@ void* _lucHistoricalSwarmTrajectory_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucHistoricalSwarmTrajectory_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucHistoricalSwarmTrajectory_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucHistoricalSwarmTrajectory*   self	= (lucHistoricalSwarmTrajectory*)drawingObject;
 	lucColourMap*           	colourMap;
 	Swarm*                  	swarm;
@@ -185,7 +185,7 @@ void _lucHistoricalSwarmTrajectory_Construct( void* drawingObject, Stg_Component
 	double 				historyTime;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
 	swarm         =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",     Swarm,        True,  data );
 	colourMap     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap", lucColourMap, False, data );

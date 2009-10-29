@@ -140,7 +140,7 @@ void* _lucOSMesaWindow_DefaultNew( Name name ) {
 		_lucOSMesaWindow_Print,
 		NULL,
 		_lucOSMesaWindow_DefaultNew,
-		_lucOSMesaWindow_Construct,
+		_lucOSMesaWindow_AssignFromXML,
 		_lucOSMesaWindow_Build,
 		_lucOSMesaWindow_Initialise,
 		_lucOSMesaWindow_Execute,
@@ -152,11 +152,11 @@ void* _lucOSMesaWindow_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucOSMesaWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ){
+void _lucOSMesaWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data ){
 	lucOSMesaWindow*  self = (lucOSMesaWindow*)window;
 
 	/* Construct Parent */
-	_lucWindow_Construct( self, cf, data );
+	_lucWindow_AssignFromXML( self, cf, data );
 	
 	_lucOSMesaWindow_Init( self );
 }

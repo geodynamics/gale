@@ -190,7 +190,7 @@ void* _lucTitle_DefaultNew( Name name ) {
 			_lucTitle_Print,
 			_lucTitle_Copy,
 			_lucTitle_DefaultNew,
-			_lucTitle_Construct,
+			_lucTitle_AssignFromXML,
 			_lucTitle_Build,
 			_lucTitle_Initialise,
 			_lucTitle_Execute,
@@ -202,13 +202,13 @@ void* _lucTitle_DefaultNew( Name name ) {
 			name );
 }
 
-void _lucTitle_Construct( void* title, Stg_ComponentFactory* cf, void* data ) {
+void _lucTitle_AssignFromXML( void* title, Stg_ComponentFactory* cf, void* data ) {
 	lucTitle*             self               = (lucTitle*) title;
         Name colourName;
 	
 	/* Get Stereo Type */
          /* Construct Parent */
-	_lucDrawingObject_Construct( self, cf, data );
+	_lucDrawingObject_AssignFromXML( self, cf, data );
 
 	colourName  = Stg_ComponentFactory_GetString( cf, self->name, "colour", "Black") ;
 	

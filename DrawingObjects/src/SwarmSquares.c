@@ -163,7 +163,7 @@ void* _lucSwarmSquares_DefaultNew( Name name ) {
 		_lucSwarmSquares_Print,
 		NULL,
 		_lucSwarmSquares_DefaultNew,
-		_lucSwarmSquares_Construct,
+		_lucSwarmSquares_AssignFromXML,
 		_lucSwarmSquares_Build,
 		_lucSwarmSquares_Initialise,
 		_lucSwarmSquares_Execute,
@@ -177,13 +177,13 @@ void* _lucSwarmSquares_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucSwarmSquares_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucSwarmSquares_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucSwarmSquares*  self = (lucSwarmSquares*)drawingObject;
 	lucColourMap*           colourMap;
 	Name                    colourVariableName;
 	
 	/* Construct Parent */
-	_lucSwarmViewerBase_Construct( self, cf, data );
+	_lucSwarmViewerBase_AssignFromXML( self, cf, data );
 	
 	colourMap     =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "ColourMap", lucColourMap,      False, data  ) ;
 	colourVariableName = Stg_ComponentFactory_GetString( cf, self->name, "ColourVariable", "" );

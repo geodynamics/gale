@@ -105,7 +105,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucX11Window_DefaultNew( Name name ) ;
-	void _lucX11Window_Construct( void* window, Stg_ComponentFactory* cf, void* data );
+	void _lucX11Window_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data );
 	void _lucX11Window_Build( void* window, void* data ) ;
 	void _lucX11Window_Initialise( void* window, void* data ) ;
 	void _lucX11Window_Execute( void* window, void* data );

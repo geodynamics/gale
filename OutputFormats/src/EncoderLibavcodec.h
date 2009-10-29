@@ -88,7 +88,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucEncoderLibavcodec_DefaultNew( Name name ) ;
-	void _lucEncoderLibavcodec_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data );
+	void _lucEncoderLibavcodec_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data );
 	void _lucEncoderLibavcodec_Build( void* outputFormat, void* data ) ;
 	void _lucEncoderLibavcodec_Initialise( void* outputFormat, void* data ) ;
 	void _lucEncoderLibavcodec_Execute( void* outputFormat, void* data );

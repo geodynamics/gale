@@ -203,17 +203,17 @@ typedef struct {
 	__Codelet
 } lucTestCameras;
 
-void _lucTestCameras_Construct( void* components, Stg_ComponentFactory* cf, void* data ) {
+void _lucTestCameras_AssignFromXML( void* components, Stg_ComponentFactory* cf, void* data ) {
 	AbstractContext* context;
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
-	ContextEP_Append( context, AbstractContext_EP_ConstructExtensions, lucTestAllCameras );
+	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, lucTestAllCameras );
 }
 
 void* _lucTestCameras_DefaultNew( Name name ) {
 	return Codelet_New(
 		lucTestCameras_Type,
 		_lucTestCameras_DefaultNew,
-		_lucTestCameras_Construct,
+		_lucTestCameras_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,

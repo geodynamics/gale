@@ -90,7 +90,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucFeVariableSurface_DefaultNew( Name name ) ;
-	void _lucFeVariableSurface_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucFeVariableSurface_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucFeVariableSurface_Build( void* drawingObject, void* data ) ;
 	void _lucFeVariableSurface_Initialise( void* drawingObject, void* data ) ;
 	void _lucFeVariableSurface_Execute( void* drawingObject, void* data );

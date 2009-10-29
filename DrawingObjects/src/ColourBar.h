@@ -94,7 +94,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucColourBar_DefaultNew( Name name ) ;
-	void _lucColourBar_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucColourBar_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucColourBar_Build( void* drawingObject, void* data ) ;
 	void _lucColourBar_Initialise( void* drawingObject, void* data ) ;
 	void _lucColourBar_Execute( void* drawingObject, void* data );

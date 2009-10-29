@@ -139,7 +139,7 @@ void* _lucOutputTIFF_DefaultNew( Name name ) {
 		_lucOutputTIFF_Print,
 		NULL,
 		_lucOutputTIFF_DefaultNew,
-		_lucOutputTIFF_Construct,
+		_lucOutputTIFF_AssignFromXML,
 		_lucOutputTIFF_Build,
 		_lucOutputTIFF_Initialise,
 		_lucOutputTIFF_Execute,
@@ -148,7 +148,7 @@ void* _lucOutputTIFF_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucOutputTIFF_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
+void _lucOutputTIFF_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
 	lucOutputTIFF*  self = (lucOutputTIFF*)outputFormat;
 
 	/* Construct Parent */

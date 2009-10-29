@@ -81,7 +81,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucOutputTIFF_DefaultNew( Name name ) ;
-	void _lucOutputTIFF_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data );
+	void _lucOutputTIFF_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data );
 	void _lucOutputTIFF_Build( void* outputFormat, void* data ) ;
 	void _lucOutputTIFF_Initialise( void* outputFormat, void* data ) ;
 	void _lucOutputTIFF_Execute( void* outputFormat, void* data );

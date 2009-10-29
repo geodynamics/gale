@@ -105,7 +105,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucEigenvectorsCrossSection_DefaultNew( Name name ) ;
-	void _lucEigenvectorsCrossSection_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucEigenvectorsCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucEigenvectorsCrossSection_Build( void* drawingObject, void* data ) ;
 	void _lucEigenvectorsCrossSection_Initialise( void* drawingObject, void* data ) ;
 	void _lucEigenvectorsCrossSection_Execute( void* drawingObject, void* data );

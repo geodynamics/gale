@@ -227,7 +227,7 @@ void* _lucLight_DefaultNew( Name name ) {
 			_lucLight_Print,
 			_lucLight_Copy,
 			_lucLight_DefaultNew,
-			_lucLight_Construct,
+			_lucLight_AssignFromXML,
 			_lucLight_Build,
 			_lucLight_Initialise,
 			_lucLight_Execute,
@@ -235,7 +235,7 @@ void* _lucLight_DefaultNew( Name name ) {
 			name );
 }
 
-void _lucLight_Construct( void* light, Stg_ComponentFactory* cf, void* data ) {
+void _lucLight_AssignFromXML( void* light, Stg_ComponentFactory* cf, void* data ) {
 	lucLight*             	self               = (lucLight*) light;
 	Light_Index             index;
 	int 			model;

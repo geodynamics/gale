@@ -95,7 +95,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucSwarmVectors_DefaultNew( Name name ) ;
-	void _lucSwarmVectors_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucSwarmVectors_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucSwarmVectors_Build( void* drawingObject, void* data ) ;
 	void _lucSwarmVectors_Initialise( void* drawingObject, void* data ) ;
 	void _lucSwarmVectors_Execute( void* drawingObject, void* data );

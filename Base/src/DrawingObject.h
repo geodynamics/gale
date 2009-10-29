@@ -95,7 +95,7 @@
 	void _lucDrawingObject_Print( void* drawingObject, Stream* stream ) ;
 	void* _lucDrawingObject_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 
-void _lucDrawingObject_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ) ;
+void _lucDrawingObject_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucDrawingObject_Build( void* camera, void* data );
 	void _lucDrawingObject_Initialise( void* camera, void* data );
 	void _lucDrawingObject_Execute( void* camera, void* data );

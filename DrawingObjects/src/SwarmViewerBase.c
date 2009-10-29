@@ -181,7 +181,7 @@ void* _lucSwarmViewerBase_Copy( void* drawingObject, void* dest, Bool deep, Name
 	return (void*) newDrawingObject;
 }
 
-void _lucSwarmViewerBase_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucSwarmViewerBase_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucSwarmViewerBase*     self = (lucSwarmViewerBase*)drawingObject;
 	Swarm*                  swarm;	
 	Name                    colourVariableName;
@@ -197,7 +197,7 @@ void _lucSwarmViewerBase_Construct( void* drawingObject, Stg_ComponentFactory* c
 	lucDrawingObjectMask    mask;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
 	swarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", Swarm, True, data ) ;
 	

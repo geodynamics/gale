@@ -84,7 +84,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucRenderingEngineTest_DefaultNew( Name name ) ;
-	void _lucRenderingEngineTest_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
+	void _lucRenderingEngineTest_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
 	void _lucRenderingEngineTest_Build( void* renderingEngine, void* data ) ;
 	void _lucRenderingEngineTest_Initialise( void* renderingEngine, void* data ) ;
 	void _lucRenderingEngineTest_Execute( void* renderingEngine, void* data );

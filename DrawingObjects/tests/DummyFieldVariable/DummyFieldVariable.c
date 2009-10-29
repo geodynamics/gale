@@ -112,7 +112,7 @@ void DummyFieldVariable_GetMinAndMaxGlobalCoords( void* fieldVariable, Coord min
 	max[2] = 2.0;
 }
 
-void _DummyFieldVariable_Construct( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) {
+void _DummyFieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) {
 	FieldVariable* self = (FieldVariable*) fieldVariable;
 
 	self->fieldComponentCount = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "fieldComponentCount", 1 );
@@ -128,7 +128,7 @@ void* _DummyFieldVariable_DefaultNew( Name name ) {
 		_FieldVariable_Print,
 		_FieldVariable_Copy,
 		_DummyFieldVariable_DefaultNew,
-		_DummyFieldVariable_Construct,
+		_DummyFieldVariable_AssignFromXML,
 		_FieldVariable_Build,
 		_FieldVariable_Initialise,
 		_FieldVariable_Execute,

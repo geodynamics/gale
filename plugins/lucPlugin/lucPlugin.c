@@ -199,7 +199,7 @@ void lucPlugin_VisualOnlyRun( Context* _context ) {
 }
 
 
-void _lucPlugin_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _lucPlugin_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	Codelet*	self		= (Codelet*)component;
 	Dictionary*	pluginDict	= Codelet_GetPluginDictionary( component, cf->rootDict );
 
@@ -259,7 +259,7 @@ void* _lucPlugin_DefaultNew( Name name ) {
 			_Codelet_Print,
 			_Codelet_Copy,
 			_lucPlugin_DefaultNew,
-			_lucPlugin_Construct,
+			_lucPlugin_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

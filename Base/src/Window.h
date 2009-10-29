@@ -116,7 +116,7 @@
 
 	/* Stg_Component Virtual Functions */
 	void* _lucWindow_DefaultNew( Name name ) ;
-	void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) ;
+	void _lucWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucWindow_Build( void* window, void* data ) ;
 	void _lucWindow_Initialise( void* window, void* data ) ;
 	void _lucWindow_Execute( void* window, void* data ) ;

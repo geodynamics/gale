@@ -85,7 +85,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucColourBarInteraction_DefaultNew( Name name ) ;
-	void _lucColourBarInteraction_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
+	void _lucColourBarInteraction_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
 	void _lucColourBarInteraction_Build( void* renderingEngine, void* data ) ;
 	void _lucColourBarInteraction_Initialise( void* renderingEngine, void* data ) ;
 	void _lucColourBarInteraction_Execute( void* renderingEngine, void* data );

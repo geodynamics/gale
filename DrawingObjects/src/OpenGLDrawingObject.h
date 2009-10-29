@@ -87,7 +87,7 @@
 	void* _lucOpenGLDrawingObject_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) ;
 
 	/* 'Stg_Component' implementations */
-	void _lucOpenGLDrawingObject_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucOpenGLDrawingObject_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucOpenGLDrawingObject_Build( void* drawingObject, void* data ) ;
 	void _lucOpenGLDrawingObject_Initialise( void* drawingObject, void* data ) ;
 	void _lucOpenGLDrawingObject_Execute( void* drawingObject, void* data );

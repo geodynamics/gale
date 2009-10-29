@@ -91,7 +91,7 @@ int main( int argc, char* argv[] ) {
 
 	/* Construction phase -----------------------------------------------------------------------------------------------*/
 	context = DomainContext_New( "context", 0, 0, CommWorld, dictionary );
-	Stg_Component_Construct( context, 0 /* dummy */, &context, True	);
+	Stg_Component_AssignFromXML( context, 0 /* dummy */, &context, True	);
 
 	if( rank == 0 ) 
 		Context_PrintConcise( context, context->verbose );

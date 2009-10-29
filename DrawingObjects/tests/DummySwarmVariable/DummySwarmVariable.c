@@ -110,7 +110,7 @@ void DummySwarmVariable_Init( SwarmVariable* self, Swarm* swarm, Variable* varia
 }
 
 
-void _DummySwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) {
+void _DummySwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) {
 	SwarmVariable*	        self         = (SwarmVariable*)swarmVariable;
 	Swarm*                  swarm;
 	Variable*               variable;
@@ -139,7 +139,7 @@ void* _DummySwarmVariable_DefaultNew( Name name ) {
 		_SwarmVariable_Print,
 		_SwarmVariable_Copy,
 		_DummySwarmVariable_DefaultNew,
-		_DummySwarmVariable_Construct,
+		_DummySwarmVariable_AssignFromXML,
 		_SwarmVariable_Build,
 		_SwarmVariable_Initialise,
 		_SwarmVariable_Execute,

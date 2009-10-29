@@ -93,7 +93,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucTextureMap_DefaultNew( Name name ) ;
-	void _lucTextureMap_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucTextureMap_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucTextureMap_Build( void* drawingObject, void* data ) ;
 	void _lucTextureMap_Initialise( void* drawingObject, void* data ) ;
 	void _lucTextureMap_Execute( void* drawingObject, void* data );

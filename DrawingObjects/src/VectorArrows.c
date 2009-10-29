@@ -144,7 +144,7 @@ void* _lucVectorArrows_DefaultNew( Name name ) {
 		_lucVectorArrows_Print,
 		NULL,
 		_lucVectorArrows_DefaultNew,
-		_lucVectorArrows_Construct,
+		_lucVectorArrows_AssignFromXML,
 		_lucVectorArrows_Build,
 		_lucVectorArrows_Initialise,
 		_lucVectorArrows_Execute,
@@ -156,11 +156,11 @@ void* _lucVectorArrows_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucVectorArrows_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucVectorArrows_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucVectorArrows* self = (lucVectorArrows*)drawingObject;
 
 	/* Construct Parent */
-	_lucVectorArrowCrossSection_Construct( self, cf, data );
+	_lucVectorArrowCrossSection_AssignFromXML( self, cf, data );
 	
 	_lucVectorArrows_Init( self );
 }

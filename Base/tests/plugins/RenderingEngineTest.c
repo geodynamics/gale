@@ -139,7 +139,7 @@ void* _lucRenderingEngineTest_DefaultNew( Name name ) {
 		_lucRenderingEngineTest_Print,
 		NULL,
 		_lucRenderingEngineTest_DefaultNew,
-		_lucRenderingEngineTest_Construct,
+		_lucRenderingEngineTest_AssignFromXML,
 		_lucRenderingEngineTest_Build,
 		_lucRenderingEngineTest_Initialise,
 		_lucRenderingEngineTest_Execute,
@@ -150,11 +150,11 @@ void* _lucRenderingEngineTest_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucRenderingEngineTest_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data ){
+void _lucRenderingEngineTest_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data ){
 	lucRenderingEngineTest*  self = (lucRenderingEngineTest*)renderingEngine;
 
 	/* Construct Parent */
-	_lucRenderingEngine_Construct( self, cf, data );
+	_lucRenderingEngine_AssignFromXML( self, cf, data );
 	
 	_lucRenderingEngineTest_Init( self );
 }

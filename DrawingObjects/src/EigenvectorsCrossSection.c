@@ -206,7 +206,7 @@ void* _lucEigenvectorsCrossSection_DefaultNew( Name name ) {
 		_lucEigenvectorsCrossSection_Print,
 		NULL,
 		_lucEigenvectorsCrossSection_DefaultNew,
-		_lucEigenvectorsCrossSection_Construct,
+		_lucEigenvectorsCrossSection_AssignFromXML,
 		_lucEigenvectorsCrossSection_Build,
 		_lucEigenvectorsCrossSection_Initialise,
 		_lucEigenvectorsCrossSection_Execute,
@@ -218,7 +218,7 @@ void* _lucEigenvectorsCrossSection_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucEigenvectorsCrossSection_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucEigenvectorsCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucEigenvectorsCrossSection* self = (lucEigenvectorsCrossSection*)drawingObject;
 	FieldVariable*   tensorField;
 	Index            defaultResolution;
@@ -229,7 +229,7 @@ void _lucEigenvectorsCrossSection_Construct( void* drawingObject, Stg_ComponentF
 	Name             crossSectionName;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
 	tensorField =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "TensorField", FieldVariable, True, data );
 

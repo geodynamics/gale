@@ -145,7 +145,7 @@ void* _lucColourBarInteraction_DefaultNew( Name name ) {
 		_lucColourBarInteraction_Print,
 		NULL,
 		_lucColourBarInteraction_DefaultNew,
-		_lucColourBarInteraction_Construct,
+		_lucColourBarInteraction_AssignFromXML,
 		_lucColourBarInteraction_Build,
 		_lucColourBarInteraction_Initialise,
 		_lucColourBarInteraction_Execute,
@@ -158,11 +158,11 @@ void* _lucColourBarInteraction_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucColourBarInteraction_Construct( void* ColourBarInteraction, Stg_ComponentFactory* cf, void* data ){
+void _lucColourBarInteraction_AssignFromXML( void* ColourBarInteraction, Stg_ComponentFactory* cf, void* data ){
 	lucColourBarInteraction*  self = (lucColourBarInteraction*)ColourBarInteraction;
 
 	/* Construct Parent */
-	_lucWindowInteraction_Construct( self, cf, data );
+	_lucWindowInteraction_AssignFromXML( self, cf, data );
 	
 	_lucColourBarInteraction_Init( self );
 }

@@ -70,17 +70,17 @@ typedef struct {
 	__Codelet
 } lucTestColourMaps;
 
-void _lucTestColourMaps_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _lucTestColourMaps_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	AbstractContext* context;
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
-	ContextEP_Append( context, AbstractContext_EP_ConstructExtensions, lucTestColourMaps_Function );
+	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, lucTestColourMaps_Function );
 }
 
 void* _lucTestColourMaps_DefaultNew( Name name ) {
 	return Codelet_New(
 		lucTestColourMaps_Type,
 		_lucTestColourMaps_DefaultNew,
-		_lucTestColourMaps_Construct,
+		_lucTestColourMaps_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,

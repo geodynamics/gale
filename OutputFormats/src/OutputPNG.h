@@ -82,7 +82,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucOutputPNG_DefaultNew( Name name ) ;
-	void _lucOutputPNG_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data );
+	void _lucOutputPNG_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data );
 	void _lucOutputPNG_Build( void* outputFormat, void* data ) ;
 	void _lucOutputPNG_Initialise( void* outputFormat, void* data ) ;
 	void _lucOutputPNG_Execute( void* outputFormat, void* data );

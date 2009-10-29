@@ -160,7 +160,7 @@ void* _lucFeVariableSurface_DefaultNew( Name name ) {
 		_lucFeVariableSurface_Print,
 		NULL,
 		_lucFeVariableSurface_DefaultNew,
-		_lucFeVariableSurface_Construct,
+		_lucFeVariableSurface_AssignFromXML,
 		_lucFeVariableSurface_Build,
 		_lucFeVariableSurface_Initialise,
 		_lucFeVariableSurface_Execute,
@@ -172,13 +172,13 @@ void* _lucFeVariableSurface_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucFeVariableSurface_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucFeVariableSurface_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucFeVariableSurface*  self = (lucFeVariableSurface*)drawingObject;
 	FieldVariable*         feVariable;
 	lucColourMap*          colourMap;
 
 	/* Construct Parent */
-	_lucDrawingObject_Construct( self, cf, data );
+	_lucDrawingObject_AssignFromXML( self, cf, data );
 
 	feVariable    =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeVariable", FieldVariable, True,  data );
 	colourMap     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap",  lucColourMap,  False, data );

@@ -115,7 +115,7 @@
 	#define lucCamera_Copy( self ) \
 		(lucCamera*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	void* _lucCamera_DefaultNew( Name name ) ;
-void _lucCamera_Construct( void* camera, Stg_ComponentFactory* cf, void* data ) ;
+void _lucCamera_AssignFromXML( void* camera, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucCamera_Build( void* camera, void* data );
 	void _lucCamera_Initialise( void* camera, void* data );
 	void _lucCamera_Execute( void* camera, void* data );

@@ -174,7 +174,7 @@ void* _lucOutputVECTOR_DefaultNew( Name name ) {
 		_lucOutputVECTOR_Print,
 		NULL,
 		_lucOutputVECTOR_DefaultNew,
-		_lucOutputVECTOR_Construct,
+		_lucOutputVECTOR_AssignFromXML,
 		_lucOutputVECTOR_Build,
 		_lucOutputVECTOR_Initialise,
 		_lucOutputVECTOR_Execute,
@@ -183,7 +183,7 @@ void* _lucOutputVECTOR_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucOutputVECTOR_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
+void _lucOutputVECTOR_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
 	lucOutputVECTOR*  self = (lucOutputVECTOR*)outputFormat;
 	AbstractContext* context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ) ;
 	

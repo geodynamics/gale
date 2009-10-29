@@ -99,7 +99,7 @@
 
 	/* Stg_Component Virtual Function Implementations */
 	void* _lucWindowInteraction_DefaultNew( Name name ) ;
-	void _lucWindowInteraction_Construct( void* windowInteraction, Stg_ComponentFactory* cf, void* data ) ;
+	void _lucWindowInteraction_AssignFromXML( void* windowInteraction, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucWindowInteraction_Build( void* windowInteraction, void* data ) ;
 	void _lucWindowInteraction_Initialise( void* windowInteraction, void* data ) ;
 	void _lucWindowInteraction_Execute( void* windowInteraction, void* data ) ;

@@ -94,7 +94,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucSwarmRGBColourViewer_DefaultNew( Name name ) ;
-	void _lucSwarmRGBColourViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucSwarmRGBColourViewer_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucSwarmRGBColourViewer_Build( void* drawingObject, void* data ) ;
 	void _lucSwarmRGBColourViewer_Initialise( void* drawingObject, void* data ) ;
 	void _lucSwarmRGBColourViewer_Execute( void* drawingObject, void* data );

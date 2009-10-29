@@ -248,7 +248,7 @@ void* _lucEncoderLibfame_DefaultNew( Name name ) {
 		_lucEncoderLibfame_Print,
 		NULL,
 		_lucEncoderLibfame_DefaultNew,
-		_lucEncoderLibfame_Construct,
+		_lucEncoderLibfame_AssignFromXML,
 		_lucEncoderLibfame_Build,
 		_lucEncoderLibfame_Initialise,
 		_lucEncoderLibfame_Execute,
@@ -257,7 +257,7 @@ void* _lucEncoderLibfame_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucEncoderLibfame_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
+void _lucEncoderLibfame_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
 	lucEncoderLibfame*  self = (lucEncoderLibfame*)outputFormat;
 	lucWindow*          window;
 	AbstractContext*    context;

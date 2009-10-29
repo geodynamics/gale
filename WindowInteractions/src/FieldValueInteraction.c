@@ -145,7 +145,7 @@ void* _lucFieldValueInteraction_DefaultNew( Name name ) {
 		_lucFieldValueInteraction_Print,
 		NULL,
 		_lucFieldValueInteraction_DefaultNew,
-		_lucFieldValueInteraction_Construct,
+		_lucFieldValueInteraction_AssignFromXML,
 		_lucFieldValueInteraction_Build,
 		_lucFieldValueInteraction_Initialise,
 		_lucFieldValueInteraction_Execute,
@@ -158,11 +158,11 @@ void* _lucFieldValueInteraction_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucFieldValueInteraction_Construct( void* FieldValueInteraction, Stg_ComponentFactory* cf, void* data ){
+void _lucFieldValueInteraction_AssignFromXML( void* FieldValueInteraction, Stg_ComponentFactory* cf, void* data ){
 	lucFieldValueInteraction*  self = (lucFieldValueInteraction*)FieldValueInteraction;
 
 	/* Construct Parent */
-	_lucWindowInteraction_Construct( self, cf, data );
+	_lucWindowInteraction_AssignFromXML( self, cf, data );
 	
 	_lucFieldValueInteraction_Init( self );
 }

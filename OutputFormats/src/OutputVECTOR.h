@@ -84,7 +84,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucOutputVECTOR_DefaultNew( Name name ) ;
-	void _lucOutputVECTOR_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data );
+	void _lucOutputVECTOR_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data );
 	void _lucOutputVECTOR_Build( void* outputFormat, void* data ) ;
 	void _lucOutputVECTOR_Initialise( void* outputFormat, void* data ) ;
 	void _lucOutputVECTOR_Execute( void* outputFormat, void* data );

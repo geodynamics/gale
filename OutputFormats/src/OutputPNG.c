@@ -137,7 +137,7 @@ void* _lucOutputPNG_DefaultNew( Name name ) {
 		_lucOutputPNG_Print,
 		NULL,
 		_lucOutputPNG_DefaultNew,
-		_lucOutputPNG_Construct,
+		_lucOutputPNG_AssignFromXML,
 		_lucOutputPNG_Build,
 		_lucOutputPNG_Initialise,
 		_lucOutputPNG_Execute,
@@ -146,7 +146,7 @@ void* _lucOutputPNG_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucOutputPNG_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
+void _lucOutputPNG_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
 	lucOutputPNG*  self = (lucOutputPNG*)outputFormat;
 
 	/* Construct Parent */

@@ -140,7 +140,7 @@ void* _lucInputTIFF_DefaultNew( Name name ) {
 		_lucInputTIFF_Print,
 		NULL,
 		_lucInputTIFF_DefaultNew,
-		_lucInputTIFF_Construct,
+		_lucInputTIFF_AssignFromXML,
 		_lucInputTIFF_Build,
 		_lucInputTIFF_Initialise,
 		_lucInputTIFF_Execute,
@@ -149,7 +149,7 @@ void* _lucInputTIFF_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucInputTIFF_Construct( void* InputFormat, Stg_ComponentFactory* cf, void* data ){
+void _lucInputTIFF_AssignFromXML( void* InputFormat, Stg_ComponentFactory* cf, void* data ){
 	lucInputTIFF*  self = (lucInputTIFF*)InputFormat;
 
 	/* Construct Parent */

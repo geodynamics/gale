@@ -150,7 +150,7 @@ void* _lucScalarFieldOnMesh_DefaultNew( Name name ) {
 		_lucScalarFieldOnMesh_Print,
 		NULL,
 		_lucScalarFieldOnMesh_DefaultNew,
-		_lucScalarFieldOnMesh_Construct,
+		_lucScalarFieldOnMesh_AssignFromXML,
 		_lucScalarFieldOnMesh_Build,
 		_lucScalarFieldOnMesh_Initialise,
 		_lucScalarFieldOnMesh_Execute,
@@ -162,11 +162,11 @@ void* _lucScalarFieldOnMesh_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucScalarFieldOnMesh_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucScalarFieldOnMesh_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucScalarFieldOnMesh*  self = (lucScalarFieldOnMesh*)drawingObject;
 
 	/* Construct Parent */
-	_lucScalarFieldOnMeshCrossSection_Construct( self, cf, data );
+	_lucScalarFieldOnMeshCrossSection_AssignFromXML( self, cf, data );
 
 	_lucScalarFieldOnMesh_Init( 
 			self, 

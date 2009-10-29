@@ -85,7 +85,7 @@
 	void* _lucOutputFormat_Copy( void* outputFormat, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 
 	void* _lucOutputFormat_DefaultNew( Name name ) ;
-void _lucOutputFormat_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data ) ;
+void _lucOutputFormat_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucOutputFormat_Build( void* outputFormat, void* data );
 	void _lucOutputFormat_Initialise( void* outputFormat, void* data );
 	void _lucOutputFormat_Execute( void* outputFormat, void* data );

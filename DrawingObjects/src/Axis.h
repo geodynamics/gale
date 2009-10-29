@@ -113,7 +113,7 @@
 	#define lucAxis_Copy( self ) \
 		(lucAxis*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	void* _lucAxis_DefaultNew( Name name ) ;
-void _lucAxis_Construct( void* axis, Stg_ComponentFactory* cf, void* data ) ;
+void _lucAxis_AssignFromXML( void* axis, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucAxis_Build( void* axis, void* data );
 	void _lucAxis_Initialise( void* axis, void* data );
 	void _lucAxis_Execute( void* axis, void* data );

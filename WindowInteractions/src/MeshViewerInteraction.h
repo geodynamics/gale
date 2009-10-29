@@ -85,7 +85,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucMeshViewerInteraction_DefaultNew( Name name ) ;
-	void _lucMeshViewerInteraction_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
+	void _lucMeshViewerInteraction_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
 	void _lucMeshViewerInteraction_Build( void* renderingEngine, void* data ) ;
 	void _lucMeshViewerInteraction_Initialise( void* renderingEngine, void* data ) ;
 	void _lucMeshViewerInteraction_Execute( void* renderingEngine, void* data );

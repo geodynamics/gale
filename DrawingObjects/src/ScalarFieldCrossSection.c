@@ -162,7 +162,7 @@ void* _lucScalarFieldCrossSection_DefaultNew( Name name ) {
 		_lucScalarFieldCrossSection_Print,
 		NULL,
 		_lucScalarFieldCrossSection_DefaultNew,
-		_lucScalarFieldCrossSection_Construct,
+		_lucScalarFieldCrossSection_AssignFromXML,
 		_lucScalarFieldCrossSection_Build,
 		_lucScalarFieldCrossSection_Initialise,
 		_lucScalarFieldCrossSection_Execute,
@@ -174,7 +174,7 @@ void* _lucScalarFieldCrossSection_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucScalarFieldCrossSection_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucScalarFieldCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucScalarFieldCrossSection*     self = (lucScalarFieldCrossSection*)drawingObject;
 	lucColourMap*    colourMap;
 	Index            defaultResolution;
@@ -188,7 +188,7 @@ void _lucScalarFieldCrossSection_Construct( void* drawingObject, Stg_ComponentFa
 	XYZ              maxCropValues;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
 	fieldVariableName = Stg_ComponentFactory_GetString( cf, self->name, "FieldVariable", "defaultName" );
 

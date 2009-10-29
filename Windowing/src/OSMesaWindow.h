@@ -85,7 +85,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucOSMesaWindow_DefaultNew( Name name ) ;
-	void _lucOSMesaWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data );
+	void _lucOSMesaWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data );
 	void _lucOSMesaWindow_Build( void* window, void* data ) ;
 	void _lucOSMesaWindow_Initialise( void* window, void* data ) ;
 	void _lucOSMesaWindow_Execute( void* window, void* data );

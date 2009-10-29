@@ -79,7 +79,7 @@ void glucifer_lucTestInputFormat( DomainContext* context ) {
 	Memory_Free( pixelData );
 }
 
-void _lucTestInputFormat_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _lucTestInputFormat_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	DomainContext* context;
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data ); 
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Initialise, glucifer_lucTestInputFormat );
@@ -94,7 +94,7 @@ void* _lucTestInputFormat_DefaultNew( Name name ) {
 			_Codelet_Print,
 			_Codelet_Copy,
 			_lucTestInputFormat_DefaultNew,
-			_lucTestInputFormat_Construct,
+			_lucTestInputFormat_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

@@ -85,7 +85,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucLightInteraction_DefaultNew( Name name ) ;
-	void _lucLightInteraction_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
+	void _lucLightInteraction_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
 	void _lucLightInteraction_Build( void* renderingEngine, void* data ) ;
 	void _lucLightInteraction_Initialise( void* renderingEngine, void* data ) ;
 	void _lucLightInteraction_Execute( void* renderingEngine, void* data );

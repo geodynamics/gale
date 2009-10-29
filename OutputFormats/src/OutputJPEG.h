@@ -83,7 +83,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucOutputJPEG_DefaultNew( Name name ) ;
-	void _lucOutputJPEG_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data );
+	void _lucOutputJPEG_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data );
 	void _lucOutputJPEG_Build( void* outputFormat, void* data ) ;
 	void _lucOutputJPEG_Initialise( void* outputFormat, void* data ) ;
 	void _lucOutputJPEG_Execute( void* outputFormat, void* data );

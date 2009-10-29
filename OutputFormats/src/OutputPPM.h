@@ -82,7 +82,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucOutputPPM_DefaultNew( Name name ) ;
-	void _lucOutputPPM_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data );
+	void _lucOutputPPM_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data );
 	void _lucOutputPPM_Build( void* outputFormat, void* data ) ;
 	void _lucOutputPPM_Initialise( void* outputFormat, void* data ) ;
 	void _lucOutputPPM_Execute( void* outputFormat, void* data );

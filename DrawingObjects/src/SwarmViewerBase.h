@@ -110,7 +110,7 @@
 	void* _lucSwarmViewerBase_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) ;
 
 	/* 'Stg_Component' implementations */
-	void _lucSwarmViewerBase_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucSwarmViewerBase_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucSwarmViewerBase_Build( void* drawingObject, void* data ) ;
 	void _lucSwarmViewerBase_Initialise( void* drawingObject, void* data ) ;
 	void _lucSwarmViewerBase_Execute( void* drawingObject, void* data );

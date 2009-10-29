@@ -90,7 +90,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucSwarmViewer_DefaultNew( Name name ) ;
-	void _lucSwarmViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucSwarmViewer_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucSwarmViewer_Build( void* drawingObject, void* data ) ;
 	void _lucSwarmViewer_Initialise( void* drawingObject, void* data ) ;
 	void _lucSwarmViewer_Execute( void* drawingObject, void* data );

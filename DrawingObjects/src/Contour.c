@@ -163,7 +163,7 @@ void* _lucContour_DefaultNew( Name name ) {
 		_lucContour_Print,
 		NULL,
 		_lucContour_DefaultNew,
-		_lucContour_Construct,
+		_lucContour_AssignFromXML,
 		_lucContour_Build,
 		_lucContour_Initialise,
 		_lucContour_Execute,
@@ -175,7 +175,7 @@ void* _lucContour_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucContour_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucContour_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucContour*      self = (lucContour*)drawingObject;
 	Index            defaultResolution;
 	FieldVariable*   fieldVariable;
@@ -184,7 +184,7 @@ void _lucContour_Construct( void* drawingObject, Stg_ComponentFactory* cf, void*
 	Bool             showValues;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
 	fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "FieldVariable", FieldVariable, True,  data );
 	colourMap     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap",     lucColourMap,  False, data );

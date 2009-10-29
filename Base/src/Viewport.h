@@ -110,7 +110,7 @@
 	void* _lucViewport_Copy( void* viewport, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 
 	void* _lucViewport_DefaultNew( Name name ) ;
-void _lucViewport_Construct( void* viewport, Stg_ComponentFactory* cf, void* data ) ;
+void _lucViewport_AssignFromXML( void* viewport, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucViewport_Build( void* viewport, void* data );
 	void _lucViewport_Initialise( void* viewport, void* data );
 	void _lucViewport_Execute( void* viewport, void* data );

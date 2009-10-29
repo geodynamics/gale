@@ -85,7 +85,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucSwarmViewerInteraction_DefaultNew( Name name ) ;
-	void _lucSwarmViewerInteraction_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
+	void _lucSwarmViewerInteraction_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
 	void _lucSwarmViewerInteraction_Build( void* renderingEngine, void* data ) ;
 	void _lucSwarmViewerInteraction_Initialise( void* renderingEngine, void* data ) ;
 	void _lucSwarmViewerInteraction_Execute( void* renderingEngine, void* data );

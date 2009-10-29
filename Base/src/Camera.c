@@ -239,7 +239,7 @@ void* _lucCamera_DefaultNew( Name name ) {
 			_lucCamera_Print,
 			_lucCamera_Copy,
 			_lucCamera_DefaultNew,
-			_lucCamera_Construct,
+			_lucCamera_AssignFromXML,
 			_lucCamera_Build,
 			_lucCamera_Initialise,
 			_lucCamera_Execute,
@@ -247,7 +247,7 @@ void* _lucCamera_DefaultNew( Name name ) {
 			name );
 }
 
-void _lucCamera_Construct( void* camera, Stg_ComponentFactory* cf, void* data ) {
+void _lucCamera_AssignFromXML( void* camera, Stg_ComponentFactory* cf, void* data ) {
 	lucCamera*             self               = (lucCamera*) camera;
 	Coord                  coord;
 	Coord                  focalPoint;

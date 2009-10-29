@@ -224,7 +224,7 @@ void* _lucTextureMap_DefaultNew( Name name ) {
 		_lucTextureMap_Print,
 		NULL,
 		_lucTextureMap_DefaultNew,
-		_lucTextureMap_Construct,
+		_lucTextureMap_AssignFromXML,
 		_lucTextureMap_Build,
 		_lucTextureMap_Initialise,
 		_lucTextureMap_Execute,
@@ -238,11 +238,11 @@ void* _lucTextureMap_DefaultNew( Name name ) {
 		
 }
 
-void _lucTextureMap_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucTextureMap_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucTextureMap*  self = (lucTextureMap*)drawingObject;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
 	_lucTextureMap_Init( 
 			self, 

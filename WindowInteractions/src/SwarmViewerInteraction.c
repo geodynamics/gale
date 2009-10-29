@@ -146,7 +146,7 @@ void* _lucSwarmViewerInteraction_DefaultNew( Name name ) {
 		_lucSwarmViewerInteraction_Print,
 		NULL,
 		_lucSwarmViewerInteraction_DefaultNew,
-		_lucSwarmViewerInteraction_Construct,
+		_lucSwarmViewerInteraction_AssignFromXML,
 		_lucSwarmViewerInteraction_Build,
 		_lucSwarmViewerInteraction_Initialise,
 		_lucSwarmViewerInteraction_Execute,
@@ -159,11 +159,11 @@ void* _lucSwarmViewerInteraction_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucSwarmViewerInteraction_Construct( void* SwarmViewerInteraction, Stg_ComponentFactory* cf, void* data ){
+void _lucSwarmViewerInteraction_AssignFromXML( void* SwarmViewerInteraction, Stg_ComponentFactory* cf, void* data ){
 	lucSwarmViewerInteraction*  self = (lucSwarmViewerInteraction*)SwarmViewerInteraction;
 
 	/* Construct Parent */
-	_lucWindowInteraction_Construct( self, cf, data );
+	_lucWindowInteraction_AssignFromXML( self, cf, data );
 	
 	_lucSwarmViewerInteraction_Init( self );
 }

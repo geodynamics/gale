@@ -83,7 +83,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucInputTIFF_DefaultNew( Name name ) ;
-	void _lucInputTIFF_Construct( void* InputFormat, Stg_ComponentFactory* cf, void* data );
+	void _lucInputTIFF_AssignFromXML( void* InputFormat, Stg_ComponentFactory* cf, void* data );
 	void _lucInputTIFF_Build( void* InputFormat, void* data ) ;
 	void _lucInputTIFF_Initialise( void* InputFormat, void* data ) ;
 	void _lucInputTIFF_Execute( void* InputFormat, void* data );

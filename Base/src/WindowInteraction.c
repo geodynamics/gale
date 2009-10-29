@@ -175,7 +175,7 @@ void* _lucWindowInteraction_DefaultNew( Name name ) {
 			_lucWindowInteraction_Print,
 			_lucWindowInteraction_Copy,
 			_lucWindowInteraction_DefaultNew,
-			_lucWindowInteraction_Construct,
+			_lucWindowInteraction_AssignFromXML,
 			_lucWindowInteraction_Build,
 			_lucWindowInteraction_Initialise,
 			_lucWindowInteraction_Execute,
@@ -188,7 +188,7 @@ void* _lucWindowInteraction_DefaultNew( Name name ) {
 			name );
 }
 
-void _lucWindowInteraction_Construct( void* windowInteractor, Stg_ComponentFactory* cf, void* data ) {
+void _lucWindowInteraction_AssignFromXML( void* windowInteractor, Stg_ComponentFactory* cf, void* data ) {
 	lucWindowInteraction*          self        = windowInteractor;
 	
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );

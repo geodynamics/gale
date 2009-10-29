@@ -250,7 +250,7 @@ void* _lucEncoderLibavcodec_DefaultNew( Name name ) {
 		_lucEncoderLibavcodec_Print,
 		NULL,
 		_lucEncoderLibavcodec_DefaultNew,
-		_lucEncoderLibavcodec_Construct,
+		_lucEncoderLibavcodec_AssignFromXML,
 		_lucEncoderLibavcodec_Build,
 		_lucEncoderLibavcodec_Initialise,
 		_lucEncoderLibavcodec_Execute,
@@ -259,7 +259,7 @@ void* _lucEncoderLibavcodec_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucEncoderLibavcodec_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
+void _lucEncoderLibavcodec_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
 	lucEncoderLibavcodec*  self = (lucEncoderLibavcodec*)outputFormat;
 	lucWindow*          window;
 	AbstractContext*    context;

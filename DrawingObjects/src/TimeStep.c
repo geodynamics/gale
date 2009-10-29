@@ -186,7 +186,7 @@ void* _lucTimeStep_DefaultNew( Name name ) {
 			_lucTimeStep_Print,
 			_lucTimeStep_Copy,
 			_lucTimeStep_DefaultNew,
-			_lucTimeStep_Construct,
+			_lucTimeStep_AssignFromXML,
 			_lucTimeStep_Build,
 			_lucTimeStep_Initialise,
 			_lucTimeStep_Execute,
@@ -198,7 +198,7 @@ void* _lucTimeStep_DefaultNew( Name name ) {
 			name );
 }
 
-void _lucTimeStep_Construct( void* timeStep, Stg_ComponentFactory* cf, void* data ) {
+void _lucTimeStep_AssignFromXML( void* timeStep, Stg_ComponentFactory* cf, void* data ) {
 	lucTimeStep*             self               = (lucTimeStep*) timeStep;
         Name colourName;
 	Bool frame;

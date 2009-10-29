@@ -159,7 +159,7 @@ void* _lucX11Window_DefaultNew( Name name ) {
 		_lucX11Window_Print,
 		NULL,
 		_lucX11Window_DefaultNew,
-		_lucX11Window_Construct,
+		_lucX11Window_AssignFromXML,
 		_lucX11Window_Build,
 		_lucX11Window_Initialise,
 		_lucX11Window_Execute,
@@ -171,11 +171,11 @@ void* _lucX11Window_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucX11Window_Construct( void* window, Stg_ComponentFactory* cf, void* data ){
+void _lucX11Window_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data ){
 	lucX11Window*  self = (lucX11Window*)window;
 
 	/* Construct Parent */
-	_lucWindow_Construct( self, cf, data ); 
+	_lucWindow_AssignFromXML( self, cf, data ); 
 				
 	_lucX11Window_Init( 
 			self,

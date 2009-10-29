@@ -157,7 +157,7 @@ void* _lucSwarmRGBColourViewer_DefaultNew( Name name ) {
 		_lucSwarmRGBColourViewer_Print,
 		NULL,
 		_lucSwarmRGBColourViewer_DefaultNew,
-		_lucSwarmRGBColourViewer_Construct,
+		_lucSwarmRGBColourViewer_AssignFromXML,
 		_lucSwarmRGBColourViewer_Build,
 		_lucSwarmRGBColourViewer_Initialise,
 		_lucSwarmRGBColourViewer_Execute,
@@ -171,14 +171,14 @@ void* _lucSwarmRGBColourViewer_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucSwarmRGBColourViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucSwarmRGBColourViewer_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucSwarmRGBColourViewer* self = (lucSwarmRGBColourViewer*)drawingObject;
 	Name                     colourRedVariableName;
 	Name                     colourGreenVariableName;
 	Name                     colourBlueVariableName;
 
 	/* Construct Parent */
-	_lucSwarmViewer_Construct( self, cf, data );
+	_lucSwarmViewer_AssignFromXML( self, cf, data );
 
 	colourRedVariableName   = Stg_ComponentFactory_GetString( cf, self->name, "ColourRedVariable", "" );
 	colourGreenVariableName = Stg_ComponentFactory_GetString( cf, self->name, "ColourGreenVariable", "" );

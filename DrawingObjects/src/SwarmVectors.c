@@ -168,7 +168,7 @@ void* _lucSwarmVectors_DefaultNew( Name name ) {
 		_lucSwarmVectors_Print,
 		NULL,
 		_lucSwarmVectors_DefaultNew,
-		_lucSwarmVectors_Construct,
+		_lucSwarmVectors_AssignFromXML,
 		_lucSwarmVectors_Build,
 		_lucSwarmVectors_Initialise,
 		_lucSwarmVectors_Execute,
@@ -182,11 +182,11 @@ void* _lucSwarmVectors_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucSwarmVectors_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucSwarmVectors_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucSwarmVectors*  self = (lucSwarmVectors*)drawingObject;
 
 	/* Construct Parent */
-	_lucSwarmViewerBase_Construct( self, cf, data );
+	_lucSwarmViewerBase_AssignFromXML( self, cf, data );
 
 	_lucSwarmVectors_Init( 
 			self,

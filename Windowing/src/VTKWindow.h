@@ -102,7 +102,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucVTKWindow_DefaultNew( Name name ) ;
-	void _lucVTKWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data );
+	void _lucVTKWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data );
 	void _lucVTKWindow_Build( void* window, void* data ) ;
 	void _lucVTKWindow_Initialise( void* window, void* data ) ;
 	void _lucVTKWindow_Execute( void* window, void* data );

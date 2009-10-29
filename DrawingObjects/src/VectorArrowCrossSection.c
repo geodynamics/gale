@@ -177,7 +177,7 @@ void* _lucVectorArrowCrossSection_DefaultNew( Name name ) {
 		_lucVectorArrowCrossSection_Print,
 		NULL,
 		_lucVectorArrowCrossSection_DefaultNew,
-		_lucVectorArrowCrossSection_Construct,
+		_lucVectorArrowCrossSection_AssignFromXML,
 		_lucVectorArrowCrossSection_Build,
 		_lucVectorArrowCrossSection_Initialise,
 		_lucVectorArrowCrossSection_Execute,
@@ -189,7 +189,7 @@ void* _lucVectorArrowCrossSection_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucVectorArrowCrossSection_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucVectorArrowCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucVectorArrowCrossSection* self = (lucVectorArrowCrossSection*)drawingObject;
 	FieldVariable*   vectorVariable;
 	Index            defaultResolution;
@@ -200,7 +200,7 @@ void _lucVectorArrowCrossSection_Construct( void* drawingObject, Stg_ComponentFa
 	Name             crossSectionName;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
 	vectorVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "VectorVariable", FieldVariable, True, data );
 

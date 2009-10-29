@@ -159,7 +159,7 @@ void* _lucSwarmViewer_DefaultNew( Name name ) {
 		_lucSwarmViewer_Print,
 		NULL,
 		_lucSwarmViewer_DefaultNew,
-		_lucSwarmViewer_Construct,
+		_lucSwarmViewer_AssignFromXML,
 		_lucSwarmViewer_Build,
 		_lucSwarmViewer_Initialise,
 		_lucSwarmViewer_Execute,
@@ -173,11 +173,11 @@ void* _lucSwarmViewer_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucSwarmViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucSwarmViewer_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucSwarmViewer*         self = (lucSwarmViewer*)drawingObject;
 
 	/* Construct Parent */
-	_lucSwarmViewerBase_Construct( self, cf, data );
+	_lucSwarmViewerBase_AssignFromXML( self, cf, data );
 	
 	_lucSwarmViewer_Init( 
 		self, 

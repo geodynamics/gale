@@ -101,7 +101,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucHistoricalSwarmTrajectory_DefaultNew( Name name ) ;
-	void _lucHistoricalSwarmTrajectory_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucHistoricalSwarmTrajectory_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucHistoricalSwarmTrajectory_Build( void* drawingObject, void* data ) ;
 	void _lucHistoricalSwarmTrajectory_Initialise( void* drawingObject, void* data ) ;
 	void _lucHistoricalSwarmTrajectory_Execute( void* drawingObject, void* data );

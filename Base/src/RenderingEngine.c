@@ -143,7 +143,7 @@ void* _lucRenderingEngine_Copy( void* renderingEngine, void* dest, Bool deep, Na
 	return (void*) newRenderingEngine;
 }
 
-void _lucRenderingEngine_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data ) {
+void _lucRenderingEngine_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data ) {
 	lucRenderingEngine*        self            = (lucRenderingEngine*) renderingEngine ;
 
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );

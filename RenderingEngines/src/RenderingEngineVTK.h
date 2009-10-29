@@ -88,7 +88,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucRenderingEngineVTK_DefaultNew( Name name ) ;
-	void _lucRenderingEngineVTK_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
+	void _lucRenderingEngineVTK_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
 	void _lucRenderingEngineVTK_Build( void* renderingEngine, void* data ) ;
 	void _lucRenderingEngineVTK_Initialise( void* renderingEngine, void* data ) ;
 	void _lucRenderingEngineVTK_Execute( void* renderingEngine, void* data );

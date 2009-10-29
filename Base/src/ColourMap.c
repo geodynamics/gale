@@ -270,7 +270,7 @@ void* _lucColourMap_DefaultNew( Name name ) {
 			_lucColourMap_Print,
 			_lucColourMap_Copy,
 			_lucColourMap_DefaultNew,
-			_lucColourMap_Construct,
+			_lucColourMap_AssignFromXML,
 			_lucColourMap_Build,
 			_lucColourMap_Initialise,
 			_lucColourMap_Execute,
@@ -278,7 +278,7 @@ void* _lucColourMap_DefaultNew( Name name ) {
 			name );
 }
 
-void _lucColourMap_Construct( void* colourMap, Stg_ComponentFactory* cf, void* data ) {
+void _lucColourMap_AssignFromXML( void* colourMap, Stg_ComponentFactory* cf, void* data ) {
 	lucColourMap* self             = (lucColourMap*) colourMap;
 
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );

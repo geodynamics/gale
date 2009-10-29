@@ -87,7 +87,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucFieldVariableBorder_DefaultNew( Name name ) ;
-	void _lucFieldVariableBorder_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucFieldVariableBorder_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucFieldVariableBorder_Build( void* drawingObject, void* data ) ;
 	void _lucFieldVariableBorder_Initialise( void* drawingObject, void* data ) ;
 	void _lucFieldVariableBorder_Execute( void* drawingObject, void* data );

@@ -179,7 +179,7 @@ void* _lucIsosurface_DefaultNew( Name name ) {
 		_lucIsosurface_Print,
 		NULL,
 		_lucIsosurface_DefaultNew,
-		_lucIsosurface_Construct,
+		_lucIsosurface_AssignFromXML,
 		_lucIsosurface_Build,
 		_lucIsosurface_Initialise,
 		_lucIsosurface_Execute,
@@ -191,7 +191,7 @@ void* _lucIsosurface_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucIsosurface_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucIsosurface_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucIsosurface*         self               = (lucIsosurface*)drawingObject;
 	FieldVariable*         isosurfaceField;
 	FieldVariable*         colourField;
@@ -203,7 +203,7 @@ void _lucIsosurface_Construct( void* drawingObject, Stg_ComponentFactory* cf, vo
 	lucDrawingObjectMask   mask;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
 	isosurfaceField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IsosurfaceField", FieldVariable, True,  data );
 	colourMap       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap",       lucColourMap,  False, data );

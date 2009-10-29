@@ -92,7 +92,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucRenderingEngineGL_DefaultNew( Name name ) ;
-	void _lucRenderingEngineGL_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
+	void _lucRenderingEngineGL_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
 	void _lucRenderingEngineGL_Build( void* renderingEngine, void* data ) ;
 	void _lucRenderingEngineGL_Initialise( void* renderingEngine, void* data ) ;
 	void _lucRenderingEngineGL_Execute( void* renderingEngine, void* data );

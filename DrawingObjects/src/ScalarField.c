@@ -153,7 +153,7 @@ void* _lucScalarField_DefaultNew( Name name ) {
 		_lucScalarField_Print,
 		NULL,
 		_lucScalarField_DefaultNew,
-		_lucScalarField_Construct,
+		_lucScalarField_AssignFromXML,
 		_lucScalarField_Build,
 		_lucScalarField_Initialise,
 		_lucScalarField_Execute,
@@ -165,11 +165,11 @@ void* _lucScalarField_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucScalarField_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucScalarField_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucScalarField*  self = (lucScalarField*)drawingObject;
 
 	/* Construct Parent */
-	_lucScalarFieldCrossSection_Construct( self, cf, data );
+	_lucScalarFieldCrossSection_AssignFromXML( self, cf, data );
 
 	_lucScalarField_Init( 
 			self, 

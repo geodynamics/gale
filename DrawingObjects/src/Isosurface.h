@@ -113,7 +113,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucIsosurface_DefaultNew( Name name ) ;
-	void _lucIsosurface_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucIsosurface_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucIsosurface_Build( void* drawingObject, void* data ) ;
 	void _lucIsosurface_Initialise( void* drawingObject, void* data ) ;
 	void _lucIsosurface_Execute( void* drawingObject, void* data );

@@ -92,7 +92,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucContour_DefaultNew( Name name ) ;
-	void _lucContour_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucContour_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucContour_Build( void* drawingObject, void* data ) ;
 	void _lucContour_Initialise( void* drawingObject, void* data ) ;
 	void _lucContour_Execute( void* drawingObject, void* data );

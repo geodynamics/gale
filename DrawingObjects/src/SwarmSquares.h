@@ -94,7 +94,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucSwarmSquares_DefaultNew( Name name ) ;
-	void _lucSwarmSquares_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucSwarmSquares_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucSwarmSquares_Build( void* drawingObject, void* data ) ;
 	void _lucSwarmSquares_Initialise( void* drawingObject, void* data ) ;
 	void _lucSwarmSquares_Execute( void* drawingObject, void* data );

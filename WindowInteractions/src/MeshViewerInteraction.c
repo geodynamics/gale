@@ -146,7 +146,7 @@ void* _lucMeshViewerInteraction_DefaultNew( Name name ) {
 		_lucMeshViewerInteraction_Print,
 		NULL,
 		_lucMeshViewerInteraction_DefaultNew,
-		_lucMeshViewerInteraction_Construct,
+		_lucMeshViewerInteraction_AssignFromXML,
 		_lucMeshViewerInteraction_Build,
 		_lucMeshViewerInteraction_Initialise,
 		_lucMeshViewerInteraction_Execute,
@@ -159,11 +159,11 @@ void* _lucMeshViewerInteraction_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucMeshViewerInteraction_Construct( void* MeshViewerInteraction, Stg_ComponentFactory* cf, void* data ){
+void _lucMeshViewerInteraction_AssignFromXML( void* MeshViewerInteraction, Stg_ComponentFactory* cf, void* data ){
 	lucMeshViewerInteraction*  self = (lucMeshViewerInteraction*)MeshViewerInteraction;
 
 	/* Construct Parent */
-	_lucWindowInteraction_Construct( self, cf, data );
+	_lucWindowInteraction_AssignFromXML( self, cf, data );
 	
 	_lucMeshViewerInteraction_Init( self );
 }

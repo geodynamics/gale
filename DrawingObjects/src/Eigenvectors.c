@@ -144,7 +144,7 @@ void* _lucEigenvectors_DefaultNew( Name name ) {
 		_lucEigenvectors_Print,
 		NULL,
 		_lucEigenvectors_DefaultNew,
-		_lucEigenvectors_Construct,
+		_lucEigenvectors_AssignFromXML,
 		_lucEigenvectors_Build,
 		_lucEigenvectors_Initialise,
 		_lucEigenvectors_Execute,
@@ -156,11 +156,11 @@ void* _lucEigenvectors_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucEigenvectors_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucEigenvectors_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucEigenvectors* self = (lucEigenvectors*)drawingObject;
 
 	/* Construct Parent */
-	_lucEigenvectorsCrossSection_Construct( self, cf, data );
+	_lucEigenvectorsCrossSection_AssignFromXML( self, cf, data );
 	
 	_lucEigenvectors_Init( self );
 }

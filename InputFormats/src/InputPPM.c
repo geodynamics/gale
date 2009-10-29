@@ -135,7 +135,7 @@ void* _lucInputPPM_DefaultNew( Name name ) {
 		_lucInputPPM_Print,
 		NULL,
 		_lucInputPPM_DefaultNew,
-		_lucInputPPM_Construct,
+		_lucInputPPM_AssignFromXML,
 		_lucInputPPM_Build,
 		_lucInputPPM_Initialise,
 		_lucInputPPM_Execute,
@@ -144,7 +144,7 @@ void* _lucInputPPM_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucInputPPM_Construct( void* InputFormat, Stg_ComponentFactory* cf, void* data ){
+void _lucInputPPM_AssignFromXML( void* InputFormat, Stg_ComponentFactory* cf, void* data ){
 	lucInputPPM*  self = (lucInputPPM*)InputFormat;
 
 	/* Construct Parent */

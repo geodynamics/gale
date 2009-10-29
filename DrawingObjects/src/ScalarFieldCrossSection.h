@@ -92,7 +92,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucScalarFieldCrossSection_DefaultNew( Name name ) ;
-	void _lucScalarFieldCrossSection_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucScalarFieldCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucScalarFieldCrossSection_Build( void* drawingObject, void* data ) ;
 	void _lucScalarFieldCrossSection_Initialise( void* drawingObject, void* data ) ;
 	void _lucScalarFieldCrossSection_Execute( void* drawingObject, void* data );

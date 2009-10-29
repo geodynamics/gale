@@ -147,7 +147,7 @@ void* _lucSDLWindow_DefaultNew( Name name ) {
 		_lucSDLWindow_Print,
 		NULL,
 		_lucSDLWindow_DefaultNew,
-		_lucSDLWindow_Construct,
+		_lucSDLWindow_AssignFromXML,
 		_lucSDLWindow_Build,
 		_lucSDLWindow_Initialise,
 		_lucSDLWindow_Execute,
@@ -159,11 +159,11 @@ void* _lucSDLWindow_DefaultNew( Name name ) {
 		name );
 }
 
-void _lucSDLWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) {
+void _lucSDLWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data ) {
 	lucSDLWindow*  self = (lucSDLWindow*)window;
 
 	/* Construct Parent */
-	_lucWindow_Construct( self, cf, data );
+	_lucWindow_AssignFromXML( self, cf, data );
 } 
 
 void _lucSDLWindow_Build( void* window, void* data ) {
