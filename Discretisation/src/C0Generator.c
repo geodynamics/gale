@@ -54,7 +54,7 @@ C0Generator* C0Generator_New( Name name ) {
 				 _C0Generator_Print, 
 				 NULL, 
 				 (void* (*)(Name))_C0Generator_New, 
-				 _C0Generator_Construct, 
+				 _C0Generator_AssignFromXML, 
 				 _C0Generator_Build, 
 				 _C0Generator_Initialise, 
 				 _C0Generator_Execute, 
@@ -110,14 +110,14 @@ void _C0Generator_Print( void* generator, Stream* stream ) {
 	_MeshGenerator_Print( self, stream );
 }
 
-void _C0Generator_Construct( void* generator, Stg_ComponentFactory* cf, void* data ) {
+void _C0Generator_AssignFromXML( void* generator, Stg_ComponentFactory* cf, void* data ) {
 	C0Generator*	self = (C0Generator*)generator;
 	Mesh*		elMesh;
 
 	assert( self );
 	assert( cf );
 
-	_MeshGenerator_Construct( self, cf, data );
+	_MeshGenerator_AssignFromXML( self, cf, data );
 
 	elMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "elementMesh", Mesh, True, data );
 	C0Generator_SetElementMesh( self, elMesh );

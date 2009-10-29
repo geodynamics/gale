@@ -158,7 +158,7 @@
 	void _FieldTest_Build( void* fieldTest, void* data );
 	
 	/* Construct implementation */
-	void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data );
+	void _FieldTest_AssignFromXML( void* fieldTest, Stg_ComponentFactory* cf, void* data );
 	
 	/* Initialisation implementation */
 	void _FieldTest_Initialise( void* fieldTest, void* data );

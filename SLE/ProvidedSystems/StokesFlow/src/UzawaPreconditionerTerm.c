@@ -137,7 +137,7 @@ void* _UzawaPreconditionerTerm_DefaultNew( Name name ) {
 		_UzawaPreconditionerTerm_Print,
 		NULL,
 		_UzawaPreconditionerTerm_DefaultNew,
-		_UzawaPreconditionerTerm_Construct,
+		_UzawaPreconditionerTerm_AssignFromXML,
 		_UzawaPreconditionerTerm_Build,
 		_UzawaPreconditionerTerm_Initialise,
 		_UzawaPreconditionerTerm_Execute,
@@ -146,11 +146,11 @@ void* _UzawaPreconditionerTerm_DefaultNew( Name name ) {
 		name );
 }
 
-void _UzawaPreconditionerTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
+void _UzawaPreconditionerTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
 	UzawaPreconditionerTerm*            self             = (UzawaPreconditionerTerm*)matrixTerm;
 
 	/* Construct Parent */
-	_StiffnessMatrixTerm_Construct( self, cf, data );
+	_StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
 	_UzawaPreconditionerTerm_Init( self );
 }

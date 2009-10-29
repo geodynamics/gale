@@ -84,7 +84,7 @@
 
 	void _SROpGenerator_Delete( void* srOpGenerator );
 	void _SROpGenerator_Print( void* srOpGenerator, Stream* stream );
-	void _SROpGenerator_Construct( void* srOpGenerator, Stg_ComponentFactory* cf, void* data );
+	void _SROpGenerator_AssignFromXML( void* srOpGenerator, Stg_ComponentFactory* cf, void* data );
 	void _SROpGenerator_Build( void* srOpGenerator, void* data );
 	void _SROpGenerator_Initialise( void* srOpGenerator, void* data );
 	void _SROpGenerator_Execute( void* srOpGenerator, void* data );

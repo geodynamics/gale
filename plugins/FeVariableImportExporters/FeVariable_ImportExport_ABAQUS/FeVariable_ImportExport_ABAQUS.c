@@ -210,7 +210,7 @@ void FeVariable_SaveNodalValuesToFile_ABAQUS( void* _feVariable, const char* pre
 }
 
 
-void _StgFEM_FeVariable_ImportExport_ABAQUS_Construct( void* componment, Stg_ComponentFactory* cf, void* data ) {
+void _StgFEM_FeVariable_ImportExport_ABAQUS_AssignFromXML( void* componment, Stg_ComponentFactory* cf, void* data ) {
 	AbstractContext* context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
@@ -225,7 +225,7 @@ void* _StgFEM_FeVariable_ImportExport_ABAQUS_DefaultNew( Name name ) {
 			_Codelet_Print,
 			_Codelet_Copy,
 			_StgFEM_FeVariable_ImportExport_ABAQUS_DefaultNew,
-			_StgFEM_FeVariable_ImportExport_ABAQUS_Construct,
+			_StgFEM_FeVariable_ImportExport_ABAQUS_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

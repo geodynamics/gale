@@ -193,7 +193,7 @@ void* _ForceTerm_DefaultNew( Name name ) {
 			_ForceTerm_Print,
 			_ForceTerm_Copy,
 			_ForceTerm_DefaultNew, 
-			_ForceTerm_Construct,
+			_ForceTerm_AssignFromXML,
 			_ForceTerm_Build, 
 			_ForceTerm_Initialise,
 			_ForceTerm_Execute, 
@@ -202,7 +202,7 @@ void* _ForceTerm_DefaultNew( Name name ) {
 			name );
 }
 
-void _ForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
+void _ForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
 	ForceTerm*      self               = (ForceTerm*)forceTerm;
 	Swarm*          swarm              = NULL;
 	Stg_Component*  extraInfo;

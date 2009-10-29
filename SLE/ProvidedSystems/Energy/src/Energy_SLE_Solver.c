@@ -63,7 +63,7 @@ void* Energy_SLE_Solver_DefaultNew( Name name ) {
 		_Energy_SLE_Solver_Print, 
 		_Energy_SLE_Solver_Copy,
 		Energy_SLE_Solver_DefaultNew,
-		_Energy_SLE_Solver_Construct,
+		_Energy_SLE_Solver_AssignFromXML,
 		_Energy_SLE_Solver_Build, 
 		_Energy_SLE_Solver_Initialise,
 		_SLE_Solver_Execute,
@@ -175,13 +175,13 @@ void* _Energy_SLE_Solver_Copy( void* standardSleSolver, void* dest, Bool deep, N
 	return (void*)newEnergySleSolver;
 }
 
-void _Energy_SLE_Solver_Construct( void* sleSolver, Stg_ComponentFactory* cf, void* data ) {
+void _Energy_SLE_Solver_AssignFromXML( void* sleSolver, Stg_ComponentFactory* cf, void* data ) {
 	Energy_SLE_Solver	*self = (Energy_SLE_Solver*)sleSolver;
 
 	assert( self && Stg_CheckType( self, Energy_SLE_Solver ) );
 	assert( cf && Stg_CheckType( cf, Stg_ComponentFactory ) );
 
-	_SLE_Solver_Construct( self, cf, data );
+	_SLE_Solver_AssignFromXML( self, cf, data );
 }
 
 /* Build */

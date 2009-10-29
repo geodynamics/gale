@@ -68,7 +68,7 @@ void StgFEM_PeakMemory_PrintMemoryInfo( AbstractContext* context ) {
 	StgFEM_FrequentOutput_PrintValue( context, ave );
 }
 
-void _StgFEM_PeakMemory_Construct( void* componment, Stg_ComponentFactory* cf, void* data ) {
+void _StgFEM_PeakMemory_AssignFromXML( void* componment, Stg_ComponentFactory* cf, void* data ) {
 	AbstractContext* context;
 
 	/* Turn on the magical petsc logging */
@@ -99,7 +99,7 @@ void* _StgFEM_PeakMemory_DefaultNew( Name name ) {
 			_Codelet_Print,
 			_Codelet_Copy,
 			_StgFEM_PeakMemory_DefaultNew,
-			_StgFEM_PeakMemory_Construct,
+			_StgFEM_PeakMemory_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

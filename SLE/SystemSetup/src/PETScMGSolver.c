@@ -56,7 +56,7 @@ PETScMGSolver* PETScMGSolver_New( Name name ) {
 				   _PETScMGSolver_Print, 
 				   NULL, 
 				   (void* (*)(Name))_PETScMGSolver_New, 
-				   _PETScMGSolver_Construct, 
+				   _PETScMGSolver_AssignFromXML, 
 				   _PETScMGSolver_Build, 
 				   _PETScMGSolver_Initialise, 
 				   _PETScMGSolver_Execute, 
@@ -166,7 +166,7 @@ void _PETScMGSolver_Print( void* matrixSolver, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void _PETScMGSolver_Construct( void* matrixSolver, Stg_ComponentFactory* cf, void* data ) {
+void _PETScMGSolver_AssignFromXML( void* matrixSolver, Stg_ComponentFactory* cf, void* data ) {
 	PETScMGSolver*	self = (PETScMGSolver*)matrixSolver;
 	Bool		pure;
 	unsigned	nLevels;
@@ -176,7 +176,7 @@ void _PETScMGSolver_Construct( void* matrixSolver, Stg_ComponentFactory* cf, voi
 	assert( self && Stg_CheckType( self, PETScMGSolver ) );
 	assert( cf );
 
-	//_PETScMatrixSolver_Construct( self, cf, data );
+	//_PETScMatrixSolver_AssignFromXML( self, cf, data );
 
 	pure = Stg_ComponentFactory_GetBool( cf, self->name, "pure", False );
 	nLevels = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "levels", 1 );

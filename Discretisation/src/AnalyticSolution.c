@@ -65,7 +65,7 @@ void* _AnalyticSolution_DefaultNew( Name name ) {
 		_AnalyticSolution_Print,
 		_AnalyticSolution_Copy,
 		_AnalyticSolution_DefaultNew,
-		_AnalyticSolution_Construct,
+		_AnalyticSolution_AssignFromXML,
 		_AnalyticSolution_Build,
 		_AnalyticSolution_Initialise,
 		_AnalyticSolution_Execute, 
@@ -173,7 +173,7 @@ void* _AnalyticSolution_Copy( void* analyticSolution, void* dest, Bool deep, Nam
 	return NULL;
 }
 
-void _AnalyticSolution_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) 
+void _AnalyticSolution_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) 
 {
 	AnalyticSolution* self = (AnalyticSolution*)analyticSolution;
 	AbstractContext*  context;

@@ -122,7 +122,7 @@
 	
 	/* 'Stg_Component' Virtual Functions */
 	void* _ForceVector_DefaultNew( Name name );
-	void _ForceVector_Construct( void* forceVector, Stg_ComponentFactory* cf, void* data );
+	void _ForceVector_AssignFromXML( void* forceVector, Stg_ComponentFactory* cf, void* data );
 	void _ForceVector_Build( void* forceVector, void* data );
 	void _ForceVector_Initialise( void* forceVector, void* data );
 	void _ForceVector_Execute( void* forceVector, void* data );

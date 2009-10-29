@@ -52,7 +52,7 @@
 
 const Type StgFEM_SwarmVariableList_Type = "StgFEM_SwarmVariableList";
 
-void _StgFEM_SwarmVariableList_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _StgFEM_SwarmVariableList_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
         StgFEM_SwarmVariableList* self         = (StgFEM_SwarmVariableList*) component;
         AbstractContext*                context;
         Dictionary*                     dictionary;
@@ -101,7 +101,7 @@ void* _StgFEM_SwarmVariableList_DefaultNew( Name name ) {
                         _Codelet_Print,
                         _Codelet_Copy,
                         _StgFEM_SwarmVariableList_DefaultNew,
-                        _StgFEM_SwarmVariableList_Construct,
+                        _StgFEM_SwarmVariableList_AssignFromXML,
                         _Codelet_Build,
                         _Codelet_Initialise,
                         _Codelet_Execute,

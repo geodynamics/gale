@@ -91,7 +91,7 @@
 	
 	/** Constant element type build implementation */
 	
-	void _ConstantElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data );
+	void _ConstantElementType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data );
 	
 	void _ConstantElementType_Build( void* elementType, void *data );
 	

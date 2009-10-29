@@ -56,10 +56,10 @@ void LinearTemperatureField_TemperatureFunction( void* analyticSolution, FeVaria
 }
 
 
-void _LinearTemperatureField_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _LinearTemperatureField_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	LinearTemperatureField *self = (LinearTemperatureField*)analyticSolution;
 
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
 
@@ -80,7 +80,7 @@ void* _LinearTemperatureField_DefaultNew( Name name ) {
 			_AnalyticSolution_Print,
 			_AnalyticSolution_Copy,
 			_LinearTemperatureField_DefaultNew,
-			_LinearTemperatureField_Construct,
+			_LinearTemperatureField_AssignFromXML,
 			_LinearTemperatureField_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,

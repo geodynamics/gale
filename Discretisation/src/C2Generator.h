@@ -77,7 +77,7 @@
 
 	void _C2Generator_Delete( void* meshGenerator );
 	void _C2Generator_Print( void* meshGenerator, Stream* stream );
-	void _C2Generator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, void* data );
+	void _C2Generator_AssignFromXML( void* meshGenerator, Stg_ComponentFactory* cf, void* data );
 	void _C2Generator_Build( void* meshGenerator, void* data );
 	void _C2Generator_Initialise( void* meshGenerator, void* data );
 	void _C2Generator_Execute( void* meshGenerator, void* data );

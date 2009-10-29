@@ -77,7 +77,7 @@ void* _ForceVector_DefaultNew( Name name ) {
 		_ForceVector_Print,
 		_ForceVector_Copy,
 		_ForceVector_DefaultNew, 
-		_ForceVector_Construct,
+		_ForceVector_AssignFromXML,
 		_ForceVector_Build, 
 		_ForceVector_Initialise,
 		_ForceVector_Execute, 
@@ -105,7 +105,7 @@ ForceVector* ForceVector_New(
 		_ForceVector_Print,
 		_ForceVector_Copy,
 		_ForceVector_DefaultNew, 
-		_ForceVector_Construct,
+		_ForceVector_AssignFromXML,
 		_ForceVector_Build, 
 		_ForceVector_Initialise,
 		_ForceVector_Execute, 
@@ -288,12 +288,12 @@ void* _ForceVector_Copy( void* forceVector, void* dest, Bool deep, Name nameExt,
 }
 
 
-void _ForceVector_Construct( void* forceVector, Stg_ComponentFactory* cf, void* data ) {
+void _ForceVector_AssignFromXML( void* forceVector, Stg_ComponentFactory* cf, void* data ) {
 	ForceVector*    self               = (ForceVector*)forceVector;
 	Dimension_Index dim                = 0;
 	void*           entryPointRegister = NULL;
 
-	_SolutionVector_Construct( self, cf, data );
+	_SolutionVector_AssignFromXML( self, cf, data );
 	
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 

@@ -95,7 +95,7 @@
 	void _AdvDiffMulticorrector_Print( void* solver, Stream* stream );
 
 	void* _AdvDiffMulticorrector_DefaultNew( Name name ) ;
-	void _AdvDiffMulticorrector_Construct( void* solver, Stg_ComponentFactory* cf, void* data ) ;
+	void _AdvDiffMulticorrector_AssignFromXML( void* solver, Stg_ComponentFactory* cf, void* data ) ;
 	void _AdvDiffMulticorrector_Build( void* solver, void* data ) ;
 	void _AdvDiffMulticorrector_Initialise( void* solver, void* data ) ;
 	void _AdvDiffMulticorrector_Execute( void* solver, void* data ) ;

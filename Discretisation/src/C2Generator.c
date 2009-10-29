@@ -54,7 +54,7 @@ C2Generator* C2Generator_New( Name name ) {
 				 _C2Generator_Print, 
 				 NULL, 
 				 (void* (*)(Name))_C2Generator_New, 
-				 _C2Generator_Construct, 
+				 _C2Generator_AssignFromXML, 
 				 _C2Generator_Build, 
 				 _C2Generator_Initialise, 
 				 _C2Generator_Execute, 
@@ -122,8 +122,8 @@ void _C2Generator_Print( void* meshGenerator, Stream* stream ) {
 	_CartesianGenerator_Print( self, stream );
 }
 
-void _C2Generator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, void* data ) {
-	_CartesianGenerator_Construct( meshGenerator, cf, data );
+void _C2Generator_AssignFromXML( void* meshGenerator, Stg_ComponentFactory* cf, void* data ) {
+	_CartesianGenerator_AssignFromXML( meshGenerator, cf, data );
 }
 
 void _C2Generator_Build( void* meshGenerator, void* data ) {

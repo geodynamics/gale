@@ -79,7 +79,7 @@ void* FeVariable_DefaultNew( Name name )
 		_FeVariable_Print,
 		_FeVariable_Copy,
 		(Stg_Component_DefaultConstructorFunction*)FeVariable_DefaultNew,
-		_FeVariable_Construct,
+		_FeVariable_AssignFromXML,
 		_FeVariable_Build, 
 		_FeVariable_Initialise,
 		_FeVariable_Execute,
@@ -203,7 +203,7 @@ FeVariable* FeVariable_New_Full(
 		_FeVariable_Print,
 		_FeVariable_Copy,
 		(Stg_Component_DefaultConstructorFunction*)FeVariable_DefaultNew,
-		_FeVariable_Construct,
+		_FeVariable_AssignFromXML,
 		_FeVariable_Build, 
 		_FeVariable_Initialise,
 		_FeVariable_Execute,
@@ -564,7 +564,7 @@ void _FeVariable_Build( void* variable, void* data ) {
 	}
 }
 
-void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data ) 
+void _FeVariable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data ) 
 {
 	FeVariable*         self          	= (FeVariable*)variable;
 	FeMesh*             feMesh        	= NULL;
@@ -576,7 +576,7 @@ void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data
 	Bool                isReferenceSolution = False;
 	Bool                loadReferenceEachTimestep = False;
 
-	_FieldVariable_Construct( self, cf, data );
+	_FieldVariable_AssignFromXML( self, cf, data );
 
 	feMesh        = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FEMesh",        FeMesh, True, data );
 	geometryMesh  = Stg_ComponentFactory_ConstructByKey( cf, self->name, "GeometryMesh",  FeMesh, False, data );

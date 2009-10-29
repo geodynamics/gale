@@ -228,7 +228,7 @@
 	
 	/* +++ Virtual Functions +++ */
 	void* _SystemLinearEquations_DefaultNew( Name name ) ;
-	void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void* data );
+	void _SystemLinearEquations_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data );
 	void _SystemLinearEquations_Build( void* sle, void* data );
 	void _SystemLinearEquations_Initialise( void* sle, void* data );
 

@@ -144,7 +144,7 @@ void* _ThermalBuoyancyForceTerm_DefaultNew( Name name ) {
 		_ThermalBuoyancyForceTerm_Print,
 		NULL,
 		_ThermalBuoyancyForceTerm_DefaultNew,
-		_ThermalBuoyancyForceTerm_Construct,
+		_ThermalBuoyancyForceTerm_AssignFromXML,
 		_ThermalBuoyancyForceTerm_Build,
 		_ThermalBuoyancyForceTerm_Initialise,
 		_ThermalBuoyancyForceTerm_Execute,
@@ -153,13 +153,13 @@ void* _ThermalBuoyancyForceTerm_DefaultNew( Name name ) {
 		name );
 }
 
-void _ThermalBuoyancyForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
+void _ThermalBuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
 	ThermalBuoyancyForceTerm*            self             = (ThermalBuoyancyForceTerm*)forceTerm;
 	FeVariable*                 temperatureField;
 	double                      rayleighNumber;
 
 	/* Construct Parent */
-	_ForceTerm_Construct( self, cf, data );
+	_ForceTerm_AssignFromXML( self, cf, data );
 
 	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TemperatureField", FeVariable, True, data ) ;
 	rayleighNumber   = Stg_ComponentFactory_GetDouble( cf, self->name, "Ra", 0.0 );

@@ -78,7 +78,7 @@
 
 	void _C0Generator_Delete( void* generator );
 	void _C0Generator_Print( void* generator, Stream* stream );
-	void _C0Generator_Construct( void* generator, Stg_ComponentFactory* cf, void* data );
+	void _C0Generator_AssignFromXML( void* generator, Stg_ComponentFactory* cf, void* data );
 	void _C0Generator_Build( void* generator, void* data );
 	void _C0Generator_Initialise( void* generator, void* data );
 	void _C0Generator_Execute( void* generator, void* data );

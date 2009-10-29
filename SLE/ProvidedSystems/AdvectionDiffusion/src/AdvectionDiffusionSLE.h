@@ -140,7 +140,7 @@
 
 	/** Virtual Functions from "Stg_Component" Class */
 	void* _AdvectionDiffusionSLE_DefaultNew( Name name ) ;
-	void _AdvectionDiffusionSLE_Construct( void* sle, Stg_ComponentFactory* cf, void* data ) ;
+	void _AdvectionDiffusionSLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data ) ;
 	void _AdvectionDiffusionSLE_Build( void* sle, void* data ) ;
 	void _AdvectionDiffusionSLE_Initialise( void* sle, void* data ) ;
 	void _AdvectionDiffusionSLE_Execute( void* sle, void* _context ) ;

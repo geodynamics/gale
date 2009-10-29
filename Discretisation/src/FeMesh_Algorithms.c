@@ -54,7 +54,7 @@ FeMesh_Algorithms* FeMesh_Algorithms_New( Name name ) {
 				     _FeMesh_Algorithms_Print, 
 				     NULL, 
 				     (void* (*)(Name))_FeMesh_Algorithms_New, 
-				     _FeMesh_Algorithms_Construct, 
+				     _FeMesh_Algorithms_AssignFromXML, 
 				     _FeMesh_Algorithms_Build, 
 				     _FeMesh_Algorithms_Initialise, 
 				     _FeMesh_Algorithms_Execute, 
@@ -115,7 +115,7 @@ void _FeMesh_Algorithms_Print( void* algorithms, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void _FeMesh_Algorithms_Construct( void* algorithms, Stg_ComponentFactory* cf, void* data ) {
+void _FeMesh_Algorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void _FeMesh_Algorithms_Build( void* algorithms, void* data ) {

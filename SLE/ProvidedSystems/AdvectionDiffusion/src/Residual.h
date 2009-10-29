@@ -105,7 +105,7 @@
 	void _AdvDiffResidualForceTerm_Print( void* residual, Stream* stream );
 
 	void* _AdvDiffResidualForceTerm_DefaultNew( Name name ) ;
-void _AdvDiffResidualForceTerm_Construct( void* residual, Stg_ComponentFactory* cf, void* data ) ;
+void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFactory* cf, void* data ) ;
 	void _AdvDiffResidualForceTerm_Build( void* residual, void* data ) ;
 	void _AdvDiffResidualForceTerm_Initialise( void* residual, void* data ) ;
 	void _AdvDiffResidualForceTerm_Execute( void* residual, void* data ) ;

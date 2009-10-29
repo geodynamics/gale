@@ -48,14 +48,14 @@
 
 const Type StgFEM_Toolbox_Type = "StgFEM_Toolbox";
 
-void _StgFEM_Toolbox_Construct( void* component, Stg_ComponentFactory* cf, void* data )  {
+void _StgFEM_Toolbox_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data )  {
 }
 
 void* _StgFEM_Toolbox_DefaultNew( Name name ) {
 	return Codelet_New(
 			StgFEM_Toolbox_Type,
 			_StgFEM_Toolbox_DefaultNew,
-			_StgFEM_Toolbox_Construct,
+			_StgFEM_Toolbox_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

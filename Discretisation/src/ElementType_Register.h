@@ -110,7 +110,7 @@
 	/* Print implementation */
 	void _ElementType_Register_Print( void* elementType_Register, Stream* stream );
 	
-	void _ElementType_Register_Construct( void* elementType_Register, Stg_ComponentFactory *cf, void* data );
+	void _ElementType_Register_AssignFromXML( void* elementType_Register, Stg_ComponentFactory *cf, void* data );
 	
 	void _ElementType_Register_Build( void* elementType_Register, void *data );
 	

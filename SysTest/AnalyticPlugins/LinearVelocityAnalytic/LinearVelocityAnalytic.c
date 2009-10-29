@@ -319,10 +319,10 @@ void LinearVelocityAnalytic_StrainRateInvFunction( void* analyticSolution, doubl
 	*strainRateInv = SymmetricTensor_2ndInvariant( strainRate, dim );
 }
 
-void _LinearVelocityAnalytic_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _LinearVelocityAnalytic_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	LinearVelocityAnalytic *self = (LinearVelocityAnalytic*)analyticSolution;
 
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
 }
@@ -358,7 +358,7 @@ void* _LinearVelocityAnalytic_DefaultNew( Name name ) {
 			_FieldTest_Print,
 			_FieldTest_Copy,
 			_LinearVelocityAnalytic_DefaultNew,
-			_LinearVelocityAnalytic_Construct,
+			_LinearVelocityAnalytic_AssignFromXML,
 			_LinearVelocityAnalytic_Build,
 			_LinearVelocityAnalytic_Initialise,
 			_FieldTest_Execute,

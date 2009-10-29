@@ -124,10 +124,10 @@ void LidDrivenIsoviscousAnalytic_PressureFunction( void* analyticSolution, doubl
 	*pressure = - 2.0 * n * M_PI * cos( n * M_PI * x ) * ( C * exp( n * M_PI * y ) + D * exp( - n * M_PI * y ) );
 }
 
-void _LidDrivenIsoviscousAnalytic_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _LidDrivenIsoviscousAnalytic_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)analyticSolution;
 
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	/* Set constants */
 	self->wavenumber = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "sinusoidalLidWavenumber", 1 );
@@ -154,7 +154,7 @@ void* _LidDrivenIsoviscousAnalytic_DefaultNew( Name name ) {
 			_FieldTest_Print,
 			_FieldTest_Copy,
 			_LidDrivenIsoviscousAnalytic_DefaultNew,
-			_LidDrivenIsoviscousAnalytic_Construct,
+			_LidDrivenIsoviscousAnalytic_AssignFromXML,
 			_LidDrivenIsoviscousAnalytic_Build, 
 			_FieldTest_Initialise,
 			_FieldTest_Execute,

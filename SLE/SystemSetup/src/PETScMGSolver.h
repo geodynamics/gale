@@ -114,7 +114,7 @@
 
 	void _PETScMGSolver_Delete( void* matrixSolver );
 	void _PETScMGSolver_Print( void* matrixSolver, Stream* stream );
-	void _PETScMGSolver_Construct( void* matrixSolver, Stg_ComponentFactory* cf, void* data );
+	void _PETScMGSolver_AssignFromXML( void* matrixSolver, Stg_ComponentFactory* cf, void* data );
 	void _PETScMGSolver_Build( void* matrixSolver, void* data );
 	void _PETScMGSolver_Initialise( void* matrixSolver, void* data );
 	void _PETScMGSolver_Execute( void* matrixSolver, void* data );

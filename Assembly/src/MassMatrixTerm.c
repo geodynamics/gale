@@ -136,7 +136,7 @@ void* _MassMatrixTerm_DefaultNew( Name name ) {
 	_MassMatrixTerm_Print,
 	NULL,
 	_MassMatrixTerm_DefaultNew,
-	_MassMatrixTerm_Construct,
+	_MassMatrixTerm_AssignFromXML,
 	_MassMatrixTerm_Build,
 	_MassMatrixTerm_Initialise,
 	_MassMatrixTerm_Execute,
@@ -145,12 +145,12 @@ void* _MassMatrixTerm_DefaultNew( Name name ) {
 	name );
 }
 
-void _MassMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
+void _MassMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
     MassMatrixTerm*            self             = (MassMatrixTerm*)matrixTerm;
     FeVariable*                field;
 
     /* Construct Parent */
-    _StiffnessMatrixTerm_Construct( self, cf, data );
+    _StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
     field = Stg_ComponentFactory_ConstructByKey( cf, self->name, "field", FeVariable, True, data ) ;
 

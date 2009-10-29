@@ -113,7 +113,7 @@
 
 	void _MultigridSolver_Delete( void* matrixSolver );
 	void _MultigridSolver_Print( void* matrixSolver, Stream* stream );
-	void _MultigridSolver_Construct( void* matrixSolver, Stg_ComponentFactory* cf, void* data );
+	void _MultigridSolver_AssignFromXML( void* matrixSolver, Stg_ComponentFactory* cf, void* data );
 	void _MultigridSolver_Build( void* matrixSolver, void* data );
 	void _MultigridSolver_Initialise( void* matrixSolver, void* data );
 	void _MultigridSolver_Execute( void* matrixSolver, void* data );

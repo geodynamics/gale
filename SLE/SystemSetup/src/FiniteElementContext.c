@@ -78,7 +78,7 @@ void* FiniteElementContext_DefaultNew( Name name )
 		_FiniteElementContext_Print,
 		NULL,
 		FiniteElementContext_DefaultNew,
-		_FiniteElementContext_Construct,
+		_FiniteElementContext_AssignFromXML,
 		_AbstractContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
@@ -106,7 +106,7 @@ FiniteElementContext*				FiniteElementContext_New(
 		_FiniteElementContext_Print,
 		NULL,
 		FiniteElementContext_DefaultNew,
-		_FiniteElementContext_Construct,
+		_FiniteElementContext_AssignFromXML,
 		_AbstractContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
@@ -320,11 +320,11 @@ SystemLinearEquations* FiniteElementContext_GetSLE_Func( void* context, Name sle
 
 /* EntryPoint Hooks --------------------------------------------------------------------------------------------------------------*/
 
-void _FiniteElementContext_Construct( void* context, Stg_ComponentFactory* cf, void* data ){
+void _FiniteElementContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data ){
 	FiniteElementContext *self = (FiniteElementContext*) context;
 	Stream*  errorStream = Journal_Register( Error_Type, self->type );
 
-	_DomainContext_Construct( context, cf, data );
+	_DomainContext_AssignFromXML( context, cf, data );
 	_FiniteElementContext_Init( self );
 
 	self->dictionary = cf->rootDict;
@@ -471,7 +471,7 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 
     /* Save the variables that have had their "isCheckpointedAndReloaded" flag enabled - 
 	 *  default is true, but the user may restrict the list by specifying the "FieldVariablesToCheckpoint"
-	 *  flag in their constructor - see _FeVariable_Construct().
+	 *  flag in their constructor - see _FeVariable_AssignFromXML().
 	 */ 	
 	for ( var_I = 0; var_I < self->fieldVariable_Register->objects->count; var_I++ ) {
 		fieldVar = FieldVariable_Register_GetByIndex( self->fieldVariable_Register, var_I );

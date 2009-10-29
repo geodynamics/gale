@@ -123,7 +123,7 @@ void _MGOpGenerator_Print( void* mgOpGenerator, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void _MGOpGenerator_Construct( void* mgOpGenerator, Stg_ComponentFactory* cf, void* data ) {
+void _MGOpGenerator_AssignFromXML( void* mgOpGenerator, Stg_ComponentFactory* cf, void* data ) {
 	MGOpGenerator*		self = (MGOpGenerator*)mgOpGenerator;
 
 	assert( self && Stg_CheckType( self, MGOpGenerator ) );

@@ -57,7 +57,7 @@ MultigridSolver* MultigridSolver_New( Name name ) {
 				     _MultigridSolver_Print, 
 				     NULL, 
 				     (void* (*)(Name))_MultigridSolver_New, 
-				     _MultigridSolver_Construct, 
+				     _MultigridSolver_AssignFromXML, 
 				     _MultigridSolver_Build, 
 				     _MultigridSolver_Initialise, 
 				     _MultigridSolver_Execute, 
@@ -179,7 +179,7 @@ void _MultigridSolver_Print( void* matrixSolver, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void _MultigridSolver_Construct( void* matrixSolver, Stg_ComponentFactory* cf, void* data ) {
+void _MultigridSolver_AssignFromXML( void* matrixSolver, Stg_ComponentFactory* cf, void* data ) {
 	MultigridSolver*	self = (MultigridSolver*)matrixSolver;
 	unsigned		nLevels;
 

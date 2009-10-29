@@ -55,7 +55,7 @@ void StgFEM_CPUTime_PrintTimeInfo( AbstractContext* context ) {
 	StgFEM_FrequentOutput_PrintValue( context, MPI_Wtime() - self->initialTime );
 }
 
-void _StgFEM_CPUTime_Construct( void* componment, Stg_ComponentFactory* cf, void* data ) {
+void _StgFEM_CPUTime_AssignFromXML( void* componment, Stg_ComponentFactory* cf, void* data ) {
 	StgFEM_CPUTime* self 		= (StgFEM_CPUTime*)componment;
 	Dictionary*	pluginDict	= Codelet_GetPluginDictionary( self, cf->rootDict );
 
@@ -80,7 +80,7 @@ void* _StgFEM_CPUTime_DefaultNew( Name name ) {
 			_Codelet_Print,
 			_Codelet_Copy,
 			_StgFEM_CPUTime_DefaultNew,
-			_StgFEM_CPUTime_Construct,
+			_StgFEM_CPUTime_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

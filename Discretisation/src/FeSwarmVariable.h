@@ -88,7 +88,7 @@
 	
 	/* 'Stg_Component' Virtual Implementations */
 	void* _FeSwarmVariable_DefaultNew( Name name );
-void _FeSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
+void _FeSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
 	void _FeSwarmVariable_Build( void* swarmVariable, void* data ) ;
 	void _FeSwarmVariable_Execute( void* variable, void* data ) ;
 	void _FeSwarmVariable_Destroy( void* variable, void* data ) ;

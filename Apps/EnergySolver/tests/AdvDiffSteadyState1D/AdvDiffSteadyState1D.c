@@ -124,12 +124,12 @@ void _AdvDiffSteadyState1D_Build( void* analyticSolution, void* data ) {
 	}
 }
 
-void _AdvDiffSteadyState1D_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _AdvDiffSteadyState1D_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	AdvDiffSteadyState1D*  self = (AdvDiffSteadyState1D*)analyticSolution;
 	AbstractContext*       context;
 	ConditionFunction*     condFunc;
 
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data );
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->temperatureField, AdvDiffSteadyState1D_TemperatureFunction );
@@ -155,7 +155,7 @@ void* _AdvDiffSteadyState1D_DefaultNew( Name name ) {
 			_AnalyticSolution_Print,
 			_AnalyticSolution_Copy,
 			_AdvDiffSteadyState1D_DefaultNew,
-			_AdvDiffSteadyState1D_Construct,
+			_AdvDiffSteadyState1D_AssignFromXML,
 			_AdvDiffSteadyState1D_Build,
 			_AnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,

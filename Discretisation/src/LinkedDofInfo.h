@@ -121,7 +121,7 @@
 	/** Print implementation */
 	void _LinkedDofInfo_Print( void* linkedDofInfo, Stream* stream );
 	
-	void _LinkedDofInfo_Construct( void* linkedDofInfo, Stg_ComponentFactory *cf, void* data );
+	void _LinkedDofInfo_AssignFromXML( void* linkedDofInfo, Stg_ComponentFactory *cf, void* data );
 	
 	void _LinkedDofInfo_Execute( void* linkedDofInfo, void *data );
 	

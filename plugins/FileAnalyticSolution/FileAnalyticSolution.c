@@ -58,14 +58,14 @@ void FileAnalyticSolution_DummyFunction( void* analyticSolution, FeVariable* ana
 
 
 
-void _FileAnalyticSolution_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _FileAnalyticSolution_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	FileAnalyticSolution *   self = (FileAnalyticSolution*)analyticSolution;
 	Dictionary_Entry_Value*  varList;
 	Index                    var_I;
 	char*                    varName;
 	FeVariable*              feVarToTest;
 
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 	varList = Dictionary_Get( cf->rootDict, self->name );
 	Journal_Firewall( varList != NULL, Journal_Register( Error_Type, self->type ), 
 		"Error- in %s(): Can't find list in XML '%s'\n", __func__, self->name );
@@ -112,7 +112,7 @@ void* _FileAnalyticSolution_DefaultNew( Name name ) {
 			_AnalyticSolution_Print,
 			_AnalyticSolution_Copy,
 			_FileAnalyticSolution_DefaultNew,
-			_FileAnalyticSolution_Construct,
+			_FileAnalyticSolution_AssignFromXML,
 			_AnalyticSolution_Build, 
 			_FileAnalyticSolution_Initialise,
 			_AnalyticSolution_Execute,

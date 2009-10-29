@@ -77,7 +77,7 @@
 
 	void _RegularBilinear_Delete( void* elementType );
 	void _RegularBilinear_Print( void* elementType, Stream* stream );
-	void _RegularBilinear_Construct( void* elementType, Stg_ComponentFactory* cf, void* data );
+	void _RegularBilinear_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data );
 	void _RegularBilinear_Build( void* elementType, void* data );
 	void _RegularBilinear_Initialise( void* elementType, void* data );
 	void _RegularBilinear_Execute( void* elementType, void* data );

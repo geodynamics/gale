@@ -387,7 +387,7 @@ void* _SystemLinearEquations_DefaultNew( Name name ) {
 		_SystemLinearEquations_Print,
 		_SystemLinearEquations_Copy,
 		_SystemLinearEquations_DefaultNew,
-		_SystemLinearEquations_Construct,
+		_SystemLinearEquations_AssignFromXML,
 		_SystemLinearEquations_Build,
 		_SystemLinearEquations_Initialise,
 		_SystemLinearEquations_Execute,
@@ -400,7 +400,7 @@ void* _SystemLinearEquations_DefaultNew( Name name ) {
 		name );
 }
 
-void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void* data ){
+void _SystemLinearEquations_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data ){
 	SystemLinearEquations*  self                     = (SystemLinearEquations*)sle;
 	SLE_Solver*             solver                   = NULL;
 	void*                   entryPointRegister       = NULL;

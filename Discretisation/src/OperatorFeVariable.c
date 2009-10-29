@@ -136,7 +136,7 @@ void* OperatorFeVariable_DefaultNew( Name name ) {
 			_OperatorFeVariable_Print,
 			_OperatorFeVariable_Copy, 
 			(Stg_Component_DefaultConstructorFunction*)OperatorFeVariable_DefaultNew,
-			_OperatorFeVariable_Construct,
+			_OperatorFeVariable_AssignFromXML,
 			_OperatorFeVariable_Build, 
 			_OperatorFeVariable_Initialise, 
 			_OperatorFeVariable_Execute,
@@ -183,7 +183,7 @@ OperatorFeVariable* OperatorFeVariable_New(
 			_OperatorFeVariable_Print,
 			_OperatorFeVariable_Copy, 
 			(Stg_Component_DefaultConstructorFunction*)OperatorFeVariable_DefaultNew,
-			_OperatorFeVariable_Construct,
+			_OperatorFeVariable_AssignFromXML,
 			_OperatorFeVariable_Build, 
 			_OperatorFeVariable_Initialise, 
 			_OperatorFeVariable_Execute,
@@ -230,7 +230,7 @@ OperatorFeVariable* OperatorFeVariable_New2(
 			_OperatorFeVariable_Print,
 			_OperatorFeVariable_Copy, 
 			(Stg_Component_DefaultConstructorFunction*)OperatorFeVariable_DefaultNew,
-			_OperatorFeVariable_Construct,
+			_OperatorFeVariable_AssignFromXML,
 			_OperatorFeVariable_Build, 
 			_OperatorFeVariable_Initialise, 
 			_OperatorFeVariable_Execute,
@@ -403,7 +403,7 @@ void* _OperatorFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name na
 	return (void*)newOperatorFeVariable;
 }
 
-void _OperatorFeVariable_Construct( void* feVariable, Stg_ComponentFactory* cf, void* data ) {
+void _OperatorFeVariable_AssignFromXML( void* feVariable, Stg_ComponentFactory* cf, void* data ) {
 	OperatorFeVariable*     self       = (OperatorFeVariable*) feVariable;
 	Dictionary*             dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 	Dictionary_Entry_Value* list;
@@ -415,7 +415,7 @@ void _OperatorFeVariable_Construct( void* feVariable, Stg_ComponentFactory* cf, 
 	FeVariable**            feVariableList;
 	
 	/* Construct Parent */
-	_FieldVariable_Construct( self, cf, data );
+	_FieldVariable_AssignFromXML( self, cf, data );
 
 	fV_Register = self->context->fieldVariable_Register;
 

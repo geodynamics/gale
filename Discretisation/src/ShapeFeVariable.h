@@ -103,7 +103,7 @@
 	void* _ShapeFeVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 	
 	/* 'Stg_Component' Virtual Implementations */
-	void _ShapeFeVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
+	void _ShapeFeVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
 	void _ShapeFeVariable_Build( void* swarmVariable, void* data ) ;
 	void _ShapeFeVariable_Execute( void* variable, void* data ) ;
 	void _ShapeFeVariable_Destroy( void* variable, void* data ) ;

@@ -53,7 +53,7 @@ FeMesh* FeMesh_New( Name name ) {
 		_FeMesh_Print, 
 		NULL, 
 		(void* (*)(Name))_FeMesh_New, 
-		_FeMesh_Construct, 
+		_FeMesh_AssignFromXML, 
 		_FeMesh_Build, 
 		_FeMesh_Initialise, 
 		_FeMesh_Execute, 
@@ -128,13 +128,13 @@ void _FeMesh_Print( void* feMesh, Stream* stream ) {
 	_Mesh_Print( self, stream );
 }
 
-void _FeMesh_Construct( void* feMesh, Stg_ComponentFactory* cf, void* data ) {
+void _FeMesh_AssignFromXML( void* feMesh, Stg_ComponentFactory* cf, void* data ) {
 	FeMesh*	self = (FeMesh*)feMesh;
 	char*		family;
 
 	assert( self );
 
-	_Mesh_Construct( self, cf, data );
+	_Mesh_AssignFromXML( self, cf, data );
 
 	_FeMesh_Init( self, NULL, Stg_ComponentFactory_GetString( cf, self->name, "elementType", "linear" ), 
 		Stg_ComponentFactory_GetBool( cf, self->name, "isElementMesh", False ) );

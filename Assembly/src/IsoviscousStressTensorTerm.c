@@ -137,7 +137,7 @@ void* _IsoviscousStressTensorTerm_DefaultNew( Name name ) {
 		_IsoviscousStressTensorTerm_Print,
 		NULL,
 		_IsoviscousStressTensorTerm_DefaultNew,
-		_IsoviscousStressTensorTerm_Construct,
+		_IsoviscousStressTensorTerm_AssignFromXML,
 		_IsoviscousStressTensorTerm_Build,
 		_IsoviscousStressTensorTerm_Initialise,
 		_IsoviscousStressTensorTerm_Execute,
@@ -146,11 +146,11 @@ void* _IsoviscousStressTensorTerm_DefaultNew( Name name ) {
 		name );
 }
 
-void _IsoviscousStressTensorTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
+void _IsoviscousStressTensorTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
 	IsoviscousStressTensorTerm*            self             = (IsoviscousStressTensorTerm*)matrixTerm;
 
 	/* Construct Parent */
-	_StiffnessMatrixTerm_Construct( self, cf, data );
+	_StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
 	_IsoviscousStressTensorTerm_Init( self, Stg_ComponentFactory_GetDouble( cf, self->name, "viscosity", 1.0 ) );
 }

@@ -79,7 +79,7 @@
 	void _LaplacianStiffnessMatrixTerm_Print( void* matrixTerm, Stream* stream );
 
 	void* _LaplacianStiffnessMatrixTerm_DefaultNew( Name name ) ;
-void _LaplacianStiffnessMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
+void _LaplacianStiffnessMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
 	void _LaplacianStiffnessMatrixTerm_Build( void* matrixTerm, void* data ) ;
 	void _LaplacianStiffnessMatrixTerm_Initialise( void* matrixTerm, void* data ) ;
 	void _LaplacianStiffnessMatrixTerm_Execute( void* matrixTerm, void* data ) ;

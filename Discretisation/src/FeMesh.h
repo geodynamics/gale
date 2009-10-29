@@ -84,7 +84,7 @@
 
 	void _FeMesh_Delete( void* feMesh );
 	void _FeMesh_Print( void* feMesh, Stream* stream );
-	void _FeMesh_Construct( void* feMesh, Stg_ComponentFactory* cf, void* data );
+	void _FeMesh_AssignFromXML( void* feMesh, Stg_ComponentFactory* cf, void* data );
 	void _FeMesh_Build( void* feMesh, void* data );
 	void _FeMesh_Initialise( void* feMesh, void* data );
 	void _FeMesh_Execute( void* feMesh, void* data );

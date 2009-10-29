@@ -152,7 +152,7 @@ void Stokes_SLE_InitAll(
 	void _Stokes_SLE_Print( void* stokesSleSolver, Stream* stream );
 
 	void* _Stokes_SLE_DefaultNew( Name name ) ;
-void _Stokes_SLE_Construct( void* sle, Stg_ComponentFactory* cf, void* data ) ;
+void _Stokes_SLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data ) ;
 	
 	void _Stokes_SLE_MG_SelectStiffMats( void* _sle, unsigned* nSMs, StiffnessMatrix*** sms );
 	

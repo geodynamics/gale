@@ -77,7 +77,7 @@
 
 	void _Triquadratic_Delete( void* elementType );
 	void _Triquadratic_Print( void* elementType, Stream* stream );
-	void _Triquadratic_Construct( void* elementType, Stg_ComponentFactory* cf, void* data );
+	void _Triquadratic_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data );
 	void _Triquadratic_Build( void* elementType, void* data );
 	void _Triquadratic_Initialise( void* elementType, void* data );
 	void _Triquadratic_Execute( void* elementType, void* data );

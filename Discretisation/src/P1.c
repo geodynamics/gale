@@ -54,7 +54,7 @@ P1* P1_New( Name name ) {
 			_P1_Print, 
 			NULL, 
 			(void* (*)(Name))_P1_New, 
-			_P1_Construct, 
+			_P1_AssignFromXML, 
 			_P1_Build, 
 			_P1_Initialise, 
 			_P1_Execute, 
@@ -112,7 +112,7 @@ void _P1_Print( void* elementType, Stream* stream ) {
 	_ElementType_Print( self, stream );
 }
 
-void _P1_Construct( void* elementType, Stg_ComponentFactory* cf, void* data ) {
+void _P1_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void _P1_Build( void* elementType, void* data ) {

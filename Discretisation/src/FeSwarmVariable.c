@@ -136,7 +136,7 @@ void* _FeSwarmVariable_DefaultNew( Name name ) {
 			_FeSwarmVariable_Print,
 			_FeSwarmVariable_Copy, 
 			_FeSwarmVariable_DefaultNew,
-			_FeSwarmVariable_Construct,
+			_FeSwarmVariable_AssignFromXML,
 			_FeSwarmVariable_Build, 
 			_FeSwarmVariable_Initialise, 
 			_FeSwarmVariable_Execute,
@@ -147,10 +147,10 @@ void* _FeSwarmVariable_DefaultNew( Name name ) {
 			name );
 }
 
-void _FeSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) {
+void _FeSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) {
 	FeSwarmVariable*        self       = (FeSwarmVariable*) swarmVariable;
 
-	_SwarmVariable_Construct( self, cf, data );
+	_SwarmVariable_AssignFromXML( self, cf, data );
 
 	_FeSwarmVariable_Init( 
 		self, 

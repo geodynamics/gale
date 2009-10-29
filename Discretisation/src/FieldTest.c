@@ -66,7 +66,7 @@ void* _FieldTest_DefaultNew( Name name ) {
 		_FieldTest_Print,
 		_FieldTest_Copy,
 		_FieldTest_DefaultNew,
-		_FieldTest_Construct,
+		_FieldTest_AssignFromXML,
 		_FieldTest_Build,
 		_FieldTest_Initialise,
 		_FieldTest_Execute, 
@@ -161,7 +161,7 @@ void* _FieldTest_Copy( void* fieldTest, void* dest, Bool deep, Name nameExt, Ptr
 	return NULL;
 }
 
-void _FieldTest_Construct( void* fieldTest, Stg_ComponentFactory* cf, void* data ) {
+void _FieldTest_AssignFromXML( void* fieldTest, Stg_ComponentFactory* cf, void* data ) {
 	FieldTest* 			self 			= (FieldTest*)fieldTest;
 	Dictionary*			dict			= cf->rootDict;
 	Dictionary_Entry_Value*		dictEntryVal		= Dictionary_Get( dict, "pluginData" );

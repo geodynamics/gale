@@ -197,7 +197,7 @@ void* _StiffnessMatrixTerm_DefaultNew( Name name ) {
 			_StiffnessMatrixTerm_Print,
 			_StiffnessMatrixTerm_Copy,
 			_StiffnessMatrixTerm_DefaultNew, 
-			_StiffnessMatrixTerm_Construct,
+			_StiffnessMatrixTerm_AssignFromXML,
 			_StiffnessMatrixTerm_Build, 
 			_StiffnessMatrixTerm_Initialise,
 			_StiffnessMatrixTerm_Execute, 
@@ -206,7 +206,7 @@ void* _StiffnessMatrixTerm_DefaultNew( Name name ) {
 			name );
 }
 
-void _StiffnessMatrixTerm_Construct( void* stiffnessMatrixTerm, Stg_ComponentFactory* cf, void* data ) {
+void _StiffnessMatrixTerm_AssignFromXML( void* stiffnessMatrixTerm, Stg_ComponentFactory* cf, void* data ) {
 	StiffnessMatrixTerm*       self               = (StiffnessMatrixTerm*)stiffnessMatrixTerm;
 	Swarm*                     swarm              = NULL;
 	Stg_Component*             extraInfo;

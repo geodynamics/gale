@@ -93,7 +93,7 @@
 
 	void _MGOpGenerator_Delete( void* mgOpGenerator );
 	void _MGOpGenerator_Print( void* mgOpGenerator, Stream* stream );
-	void _MGOpGenerator_Construct( void* mgOpGenerator, Stg_ComponentFactory* cf, void* data );
+	void _MGOpGenerator_AssignFromXML( void* mgOpGenerator, Stg_ComponentFactory* cf, void* data );
 	void _MGOpGenerator_Build( void* mgOpGenerator, void* data );
 	void _MGOpGenerator_Initialise( void* mgOpGenerator, void* data );
 	void _MGOpGenerator_Execute( void* mgOpGenerator, void* data );

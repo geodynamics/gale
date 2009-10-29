@@ -218,7 +218,7 @@ void* _AdvDiffResidualForceTerm_DefaultNew( Name name ) {
 		_AdvDiffResidualForceTerm_Print,
 		NULL,
 		_AdvDiffResidualForceTerm_DefaultNew,
-		_AdvDiffResidualForceTerm_Construct,
+		_AdvDiffResidualForceTerm_AssignFromXML,
 		_AdvDiffResidualForceTerm_Build,
 		_AdvDiffResidualForceTerm_Initialise,
 		_AdvDiffResidualForceTerm_Execute,
@@ -228,7 +228,7 @@ void* _AdvDiffResidualForceTerm_DefaultNew( Name name ) {
 		name );
 }
 
-void _AdvDiffResidualForceTerm_Construct( void* residual, Stg_ComponentFactory* cf, void* data ) {
+void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFactory* cf, void* data ) {
 	AdvDiffResidualForceTerm*            self             = (AdvDiffResidualForceTerm*)residual;
 	FeVariable*                          velocityField;
 	Variable*                            diffusivityVariable;
@@ -237,7 +237,7 @@ void _AdvDiffResidualForceTerm_Construct( void* residual, Stg_ComponentFactory* 
 	AdvDiffResidualForceTerm_UpwindParamFuncType  upwindFuncType       = 0;
 
 	/* Construct Parent */
-	_ForceTerm_Construct( self, cf, data );
+	_ForceTerm_AssignFromXML( self, cf, data );
 
 	velocityField       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField",       FeVariable, True,  data );
 	diffusivityVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, "DiffusivityVariable", Variable,   False, data );

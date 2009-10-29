@@ -75,7 +75,7 @@ typedef struct {
 } CompareFeVariableAgainstReferenceSolution;
 
 
-void _CompareFeVariableAgainstReferenceSolution_Construct( void* compareFeVariable, Stg_ComponentFactory* cf, void* data ) {
+void _CompareFeVariableAgainstReferenceSolution_AssignFromXML( void* compareFeVariable, Stg_ComponentFactory* cf, void* data ) {
 	CompareFeVariableAgainstReferenceSolution* self = (CompareFeVariableAgainstReferenceSolution*) compareFeVariable;
 
 	AbstractContext*         context;
@@ -186,7 +186,7 @@ void* _CompareFeVariableAgainstReferenceSolution_DefaultNew( Name name ) {
 			_Codelet_Print,
 			_Codelet_Copy,
 			_CompareFeVariableAgainstReferenceSolution_DefaultNew,
-			_CompareFeVariableAgainstReferenceSolution_Construct,
+			_CompareFeVariableAgainstReferenceSolution_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

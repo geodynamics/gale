@@ -49,7 +49,7 @@
 
 const Type StgFEM_StandardConditionFunctions_Type = "StgFEM_StandardConditionFunctions";
 
-void _StgFEM_StandardConditionFunctions_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	Codelet*		self		= (Codelet*)component;
 	AbstractContext*        context;
 	ConditionFunction*      condFunc;
@@ -182,7 +182,7 @@ void* _StgFEM_StandardConditionFunctions_DefaultNew( Name name ) {
 	return Codelet_New(
 		StgFEM_StandardConditionFunctions_Type,
 		_StgFEM_StandardConditionFunctions_DefaultNew,
-		_StgFEM_StandardConditionFunctions_Construct,
+		_StgFEM_StandardConditionFunctions_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,

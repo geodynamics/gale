@@ -79,7 +79,7 @@
 	void _UzawaPreconditionerTerm_Print( void* matrixTerm, Stream* stream );
 
 	void* _UzawaPreconditionerTerm_DefaultNew( Name name ) ;
-void _UzawaPreconditionerTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
+void _UzawaPreconditionerTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
 	void _UzawaPreconditionerTerm_Build( void* matrixTerm, void* data ) ;
 	void _UzawaPreconditionerTerm_Initialise( void* matrixTerm, void* data ) ;
 	void _UzawaPreconditionerTerm_Execute( void* matrixTerm, void* data ) ;

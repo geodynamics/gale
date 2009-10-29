@@ -77,7 +77,7 @@
 
 	void _P1_Delete( void* elementType );
 	void _P1_Print( void* elementType, Stream* stream );
-	void _P1_Construct( void* elementType, Stg_ComponentFactory* cf, void* data );
+	void _P1_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data );
 	void _P1_Build( void* elementType, void* data );
 	void _P1_Initialise( void* elementType, void* data );
 	void _P1_Execute( void* elementType, void* data );

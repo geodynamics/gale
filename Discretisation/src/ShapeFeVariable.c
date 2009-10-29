@@ -62,7 +62,7 @@ void* ShapeFeVariable_DefaultNew( Name name ) {
 			_ShapeFeVariable_Print,
 			_ShapeFeVariable_Copy,
 			(Stg_Component_DefaultConstructorFunction*)ShapeFeVariable_DefaultNew,
-			_ShapeFeVariable_Construct,
+			_ShapeFeVariable_AssignFromXML,
 			_ShapeFeVariable_Build,
 			_ShapeFeVariable_Initialise,
 			_ShapeFeVariable_Execute,
@@ -194,10 +194,10 @@ void* _ShapeFeVariable_Copy( void* shapeFeVariable, void* dest, Bool deep, Name 
 	return (void*)newShapeFeVariable;
 }
 
-void _ShapeFeVariable_Construct( void* shapeFeVariable, Stg_ComponentFactory* cf, void* data ) {
+void _ShapeFeVariable_AssignFromXML( void* shapeFeVariable, Stg_ComponentFactory* cf, void* data ) {
 	ShapeFeVariable*        self       = (ShapeFeVariable*) shapeFeVariable;
 
-	_FeVariable_Construct( self, cf, data );
+	_FeVariable_AssignFromXML( self, cf, data );
 
 	_ShapeFeVariable_Init( 
 		self, 

@@ -206,7 +206,7 @@ void* _Energy_SLE_DefaultNew( Name name ) {
 		_Energy_SLE_Print,
 		_SystemLinearEquations_Copy, 
 		_Energy_SLE_DefaultNew,
-		_Energy_SLE_Construct,
+		_Energy_SLE_AssignFromXML,
 		_SystemLinearEquations_Build,
 		_SystemLinearEquations_Initialise,
 		_SystemLinearEquations_Execute,
@@ -219,14 +219,14 @@ void* _Energy_SLE_DefaultNew( Name name ) {
 		name );
 }
 
-void _Energy_SLE_Construct( void* sle, Stg_ComponentFactory* cf, void* data ){
+void _Energy_SLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data ){
 	Energy_SLE*      self = (Energy_SLE*)sle;
 	StiffnessMatrix* stiffMat;
 	SolutionVector*  solutionVec;
 	ForceVector*     fVector;
 
 	/* Construct Parent */
-	_SystemLinearEquations_Construct( self, cf, data );
+	_SystemLinearEquations_AssignFromXML( self, cf, data );
 
 	stiffMat    =  Stg_ComponentFactory_ConstructByKey( cf, self->name, StiffnessMatrix_Type, StiffnessMatrix, True, data  ) ;
 	solutionVec =  Stg_ComponentFactory_ConstructByKey( cf, self->name, SolutionVector_Type,  SolutionVector,  True, data  ) ;

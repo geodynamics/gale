@@ -88,7 +88,7 @@
 	/* Print the contents of an LinearTriangleElementType construct */
 	void _LinearTriangleElementType_Print( void* elementType, Stream* stream );
 	
-	void _LinearTriangleElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data );
+	void _LinearTriangleElementType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data );
 	
 	/* LinearTriangle element type build implementation */
 	void _LinearTriangleElementType_Build( void* elementType, void *data );

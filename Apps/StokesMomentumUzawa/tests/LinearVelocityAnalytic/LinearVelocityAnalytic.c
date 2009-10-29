@@ -319,13 +319,13 @@ void LinearVelocityAnalytic_StrainRateInvFunction( void* analyticSolution, FeVar
 	*strainRateInv = SymmetricTensor_2ndInvariant( strainRate, dim );
 }
 
-void _LinearVelocityAnalytic_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _LinearVelocityAnalytic_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	LinearVelocityAnalytic *self = (LinearVelocityAnalytic*)analyticSolution;
 	FeVariable*       pressureField;
 	FeVariable*       strainRateField;
 	FeVariable*       strainRateInvField;
 
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->velocityField, LinearVelocityAnalytic_VelocityFunction );
@@ -359,7 +359,7 @@ void* _LinearVelocityAnalytic_DefaultNew( Name name ) {
 			_AnalyticSolution_Print,
 			_AnalyticSolution_Copy,
 			_LinearVelocityAnalytic_DefaultNew,
-			_LinearVelocityAnalytic_Construct,
+			_LinearVelocityAnalytic_AssignFromXML,
 			_AnalyticSolution_Build,
 			_LinearVelocityAnalytic_Initialise,
 			_AnalyticSolution_Execute,

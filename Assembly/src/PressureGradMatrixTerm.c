@@ -150,7 +150,7 @@ void* _PressureGradMatrixTerm_DefaultNew( Name name ) {
 		_PressureGradMatrixTerm_Print,
 		NULL,
 		_PressureGradMatrixTerm_DefaultNew,
-		_PressureGradMatrixTerm_Construct,
+		_PressureGradMatrixTerm_AssignFromXML,
 		_PressureGradMatrixTerm_Build,
 		_PressureGradMatrixTerm_Initialise,
 		_PressureGradMatrixTerm_Execute,
@@ -159,12 +159,12 @@ void* _PressureGradMatrixTerm_DefaultNew( Name name ) {
 		name );
 }
 
-void _PressureGradMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
+void _PressureGradMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
 	PressureGradMatrixTerm*	self = (PressureGradMatrixTerm*)matrixTerm;
 	FeVariable*					gradField;
 
 	/* Construct Parent */
-	_StiffnessMatrixTerm_Construct( self, cf, data );
+	_StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
 	gradField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureGradField", FeVariable, True, data ) ;
 
