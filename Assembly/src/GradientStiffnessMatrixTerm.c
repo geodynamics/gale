@@ -120,6 +120,8 @@ void _GradientStiffnessMatrixTerm_Delete( void* matrixTerm ) {
 	GradientStiffnessMatrixTerm* self = (GradientStiffnessMatrixTerm*)matrixTerm;
 
 	_StiffnessMatrixTerm_Delete( self );
+
+	Memory_Free( self->Ni_col );
 }
 
 void _GradientStiffnessMatrixTerm_Print( void* matrixTerm, Stream* stream ) {
@@ -176,10 +178,7 @@ void _GradientStiffnessMatrixTerm_Destroy( void* matrixTerm, void* data ) {
 	GradientStiffnessMatrixTerm* self = (GradientStiffnessMatrixTerm*)matrixTerm;
 
 	_StiffnessMatrixTerm_Destroy( matrixTerm, data );
-
-	Memory_Free( self->Ni_col );
 }
-
 
 void _GradientStiffnessMatrixTerm_AssembleElement( 
 		void*                                              matrixTerm,

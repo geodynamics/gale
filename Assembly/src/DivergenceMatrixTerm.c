@@ -118,6 +118,8 @@ void _DivergenceMatrixTerm_Delete( void* matrixTerm ) {
    DivergenceMatrixTerm* self = (DivergenceMatrixTerm*)matrixTerm;
 
    _StiffnessMatrixTerm_Delete( self );
+	
+	Memory_Free( self->Ni_col );
 }
 
 void _DivergenceMatrixTerm_Print( void* matrixTerm, Stream* stream ) {
@@ -171,10 +173,9 @@ void _DivergenceMatrixTerm_Execute( void* matrixTerm, void* data ) {
 }
 
 void _DivergenceMatrixTerm_Destroy( void* matrixTerm, void* data ) {
-	DivergenceMatrixTerm* self = (DivergenceMatrixTerm*) matrixTerm;
-	_StiffnessMatrixTerm_Destroy( matrixTerm, data );
+	DivergenceMatrixTerm* self = (DivergenceMatrixTerm*) matrixTerm;'
 
-	Memory_Free( self->Ni_col );
+	_StiffnessMatrixTerm_Destroy( matrixTerm, data );
 }
 
 void _DivergenceMatrixTerm_AssembleElement( 
