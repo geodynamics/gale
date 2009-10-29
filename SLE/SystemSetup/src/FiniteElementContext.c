@@ -265,14 +265,21 @@ void _FiniteElementContext_Delete( void* context ) {
 	Stream_IndentBranch( StgFEM_Debug );
 	Journal_DPrintfL( self->debug, 2, "Deleting the element type register (and hence all element types).\n" );
 	Journal_DPrintfL( self->debug, 2, "Deleting all SLEs and the SLE list.\n" );
+	/* Disabling the next 2 lines as the slEquations and its object lists are 
+	deleted later on from the LiveComponentRegister (via LiveComponentRegister_DeleteAll) 
 	Stg_ObjectList_DeleteAllObjects( self->slEquations ); 
-	Stg_Class_Delete( self->slEquations ); 
+	Stg_Class_Delete( self->slEquations ); */
 	Stream_UnIndentBranch( StgFEM_Debug );
 
 	/* Stg_Class_Delete parent */
 	_DomainContext_Delete( self );
 }
 
+void _FiniteElementContext_Destroy( void* context ) {
+	FiniteElementContext* self = (FiniteElementContext*)context;
+	
+	_DomainContext_Destroy( self );
+}
 
 void _FiniteElementContext_Print( void* context, Stream* stream ) {
 	FiniteElementContext* self = (FiniteElementContext*)context;

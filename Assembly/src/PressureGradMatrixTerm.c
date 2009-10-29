@@ -56,17 +56,15 @@ const Type PressureGradMatrixTerm_Type = "PressureGradMatrixTerm";
 
 PressureGradMatrixTerm* PressureGradMatrixTerm_New( 
 		Name                                                name,
-		StiffnessMatrix*                                    stiffMat,
+		StiffnessMatrix*                                    stiffnessMatrix,
 		Swarm*                                              integrationSwarm,
 		FeVariable*                                         gradField )
 {
 	PressureGradMatrixTerm* self = (PressureGradMatrixTerm*) _PressureGradMatrixTerm_DefaultNew( name );
 
-	PressureGradMatrixTerm_InitAll( 
-			self,
-			stiffMat,
-			integrationSwarm,
-			gradField );
+	self->isConstructed = True;
+	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, integrationSwarm, NULL );
+	_PressureGradMatrixTerm_Init( self, gradField );
 
 	return self;
 }
@@ -124,21 +122,9 @@ void _PressureGradMatrixTerm_Init(
 		(Assembler_CallbackType*)PressureGradMatrixTerm_ColCB, 
 		self );
 	self->gradField = gradField;
-	self->stiffMat = NULL;
+	self->stiffnessMatrix = NULL;
 	self->elStiffMat = NULL;
 	self->factor = 0.0;
-}
-
-void PressureGradMatrixTerm_InitAll( 
-		void*					matrixTerm,
-		StiffnessMatrix*	stiffMat,
-		Swarm*				integrationSwarm,
-		FeVariable*			gradField )
-{
-	PressureGradMatrixTerm* self = (PressureGradMatrixTerm*) matrixTerm;
-
-	StiffnessMatrixTerm_InitAll( self, stiffMat, integrationSwarm, NULL );
-	_PressureGradMatrixTerm_Init( self, gradField );
 }
 
 void _PressureGradMatrixTerm_Delete( void* matrixTerm ) {
@@ -211,7 +197,7 @@ void _PressureGradMatrixTerm_Destroy( void* matrixTerm, void* data ) {
 
 void _PressureGradMatrixTerm_AssembleElement(
 	 void*						matrixTerm,
-	StiffnessMatrix*			stiffMat, 
+	StiffnessMatrix*			stiffnessMatrix, 
 	Element_LocalIndex		lElement_I, 
 	SystemLinearEquations*	 sle, 
 	FiniteElementContext*	context, 
@@ -221,7 +207,7 @@ void _PressureGradMatrixTerm_AssembleElement(
 
 	assert( self );
 
-	self->stiffMat = stiffMat;
+	self->stiffnessMatrix = stiffnessMatrix;
 	self->elStiffMat = elStiffMat;
 	Assembler_IntegrateMatrixElement( self->assm, lElement_I );
 }

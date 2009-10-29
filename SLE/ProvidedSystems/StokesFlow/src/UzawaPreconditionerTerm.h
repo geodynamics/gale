@@ -75,11 +75,6 @@
 		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
 		Name                                                name );
 	
-	void UzawaPreconditionerTerm_InitAll( 
-		void*                                               matrixTerm,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm );
-
 	void _UzawaPreconditionerTerm_Delete( void* matrixTerm );
 	void _UzawaPreconditionerTerm_Print( void* matrixTerm, Stream* stream );
 

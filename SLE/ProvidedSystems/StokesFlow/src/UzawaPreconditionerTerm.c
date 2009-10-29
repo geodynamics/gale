@@ -63,10 +63,9 @@ UzawaPreconditionerTerm* UzawaPreconditionerTerm_New(
 {
 	UzawaPreconditionerTerm* self = (UzawaPreconditionerTerm*) _UzawaPreconditionerTerm_DefaultNew( name );
 
-	UzawaPreconditionerTerm_InitAll( 
-			self,
-			stiffnessMatrix,
-			integrationSwarm );
+	self->isConstructed = True;
+	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, integrationSwarm, NULL );
+	_UzawaPreconditionerTerm_Init( self );
 
 	return self;
 }
@@ -114,17 +113,6 @@ UzawaPreconditionerTerm* _UzawaPreconditionerTerm_New(
 void _UzawaPreconditionerTerm_Init( 
 		UzawaPreconditionerTerm*                                    self )
 {
-}
-
-void UzawaPreconditionerTerm_InitAll( 
-		void*                                               matrixTerm,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm )
-{
-	UzawaPreconditionerTerm* self = (UzawaPreconditionerTerm*) matrixTerm;
-
-	StiffnessMatrixTerm_InitAll( self, stiffnessMatrix, integrationSwarm, NULL );
-	_UzawaPreconditionerTerm_Init( self );
 }
 
 void _UzawaPreconditionerTerm_Delete( void* matrixTerm ) {

@@ -77,12 +77,6 @@
 		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
 		Name                                                name );
 	
-	void IsoviscousStressTensorTerm_InitAll( 
-		void*                                               matrixTerm,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm,
-		double                                              viscosity );
-
 	void _IsoviscousStressTensorTerm_Delete( void* matrixTerm );
 	void _IsoviscousStressTensorTerm_Print( void* matrixTerm, Stream* stream );
 

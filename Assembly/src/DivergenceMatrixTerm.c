@@ -61,7 +61,10 @@ DivergenceMatrixTerm* DivergenceMatrixTerm_New(
 	Swarm*				integrationSwarm )
 {
 	DivergenceMatrixTerm* self = (DivergenceMatrixTerm*) _DivergenceMatrixTerm_DefaultNew( name );
-	DivergenceMatrixTerm_InitAll( self, stiffnessMatrix, integrationSwarm );
+	
+	self->isConstructed = True;
+	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, integrationSwarm, NULL );
+   _DivergenceMatrixTerm_Init( self );
 
    return self;
 }
@@ -109,13 +112,6 @@ DivergenceMatrixTerm* _DivergenceMatrixTerm_New(
 void _DivergenceMatrixTerm_Init( DivergenceMatrixTerm* self ) {
 	self->max_nElNodes_col = 0;
 	self->Ni_col = NULL;
-}
-
-void DivergenceMatrixTerm_InitAll( void* matrixTerm, StiffnessMatrix* stiffnessMatrix, Swarm* integrationSwarm ) {
-   DivergenceMatrixTerm* self = (DivergenceMatrixTerm*) matrixTerm;
-
-   StiffnessMatrixTerm_InitAll( self, stiffnessMatrix, integrationSwarm, NULL );
-   _DivergenceMatrixTerm_Init( self );
 }
 
 void _DivergenceMatrixTerm_Delete( void* matrixTerm ) {

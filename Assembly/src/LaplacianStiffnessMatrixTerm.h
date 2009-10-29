@@ -75,11 +75,6 @@
 		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
 		Name                                                name );
 	
-	void LaplacianStiffnessMatrixTerm_InitAll( 
-		void*                                               matrixTerm,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm );
-
 	void _LaplacianStiffnessMatrixTerm_Delete( void* matrixTerm );
 	void _LaplacianStiffnessMatrixTerm_Print( void* matrixTerm, Stream* stream );
 

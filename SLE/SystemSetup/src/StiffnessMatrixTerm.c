@@ -69,7 +69,7 @@ StiffnessMatrixTerm* StiffnessMatrixTerm_New(
 {
 	StiffnessMatrixTerm* self = (StiffnessMatrixTerm*) _StiffnessMatrixTerm_DefaultNew( name );
 
-	StiffnessMatrixTerm_InitAll( self, stiffnessMatrix, integrationSwarm, extraInfo );
+	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, integrationSwarm, extraInfo );
 
 	return self;
 }
@@ -135,17 +135,6 @@ void _StiffnessMatrixTerm_Init(
 
 	StiffnessMatrix_AddStiffnessMatrixTerm( stiffnessMatrix, self );
 }
-
-void StiffnessMatrixTerm_InitAll(
-		void*                                                stiffnessMatrixTerm,
-		StiffnessMatrix*                                     stiffnessMatrix,
-		Swarm*                                               integrationSwarm,
-		Stg_Component*                                       extraInfo )
-{
-	StiffnessMatrixTerm* self = (StiffnessMatrixTerm*)stiffnessMatrixTerm;
-	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, integrationSwarm, extraInfo );
-}
-
 
 void _StiffnessMatrixTerm_Delete( void* stiffnessMatrixTerm ) {
 	StiffnessMatrixTerm* self = (StiffnessMatrixTerm*)stiffnessMatrixTerm;

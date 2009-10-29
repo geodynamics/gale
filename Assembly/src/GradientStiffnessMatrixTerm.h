@@ -75,11 +75,6 @@
 		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
 		Name                                                name );
 	
-	void GradientStiffnessMatrixTerm_InitAll( 
-		void*                                               matrixTerm,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm );
-
 	void _GradientStiffnessMatrixTerm_Delete( void* matrixTerm );
 	void _GradientStiffnessMatrixTerm_Print( void* matrixTerm, Stream* stream );
 

@@ -117,6 +117,9 @@
 	/* Stg_Class_Delete implementation */
 	void _FiniteElementContext_Delete( void* context );
 	
+	/* Destroy implementation */
+	void _FiniteElementContext_Destroy( void* context );
+
 	/* Print implementation */
 	void _FiniteElementContext_Print( void* context, Stream* stream );
 

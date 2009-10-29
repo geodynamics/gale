@@ -62,10 +62,9 @@ GradientStiffnessMatrixTerm* GradientStiffnessMatrixTerm_New(
 {
 	GradientStiffnessMatrixTerm* self = (GradientStiffnessMatrixTerm*) _GradientStiffnessMatrixTerm_DefaultNew( name );
 
-	GradientStiffnessMatrixTerm_InitAll( 
-			self,
-			stiffnessMatrix,
-			integrationSwarm );
+	self->isConstructed = True;
+	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, integrationSwarm, NULL );
+	_GradientStiffnessMatrixTerm_Init( self );
 
 	return self;
 }
@@ -115,17 +114,6 @@ void _GradientStiffnessMatrixTerm_Init(
 {
 	self->max_nElNodes_col = 0;
 	self->Ni_col = NULL;
-}
-
-void GradientStiffnessMatrixTerm_InitAll( 
-		void*                                               matrixTerm,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm )
-{
-	GradientStiffnessMatrixTerm* self = (GradientStiffnessMatrixTerm*) matrixTerm;
-
-	StiffnessMatrixTerm_InitAll( self, stiffnessMatrix, integrationSwarm, NULL );
-	_GradientStiffnessMatrixTerm_Init( self );
 }
 
 void _GradientStiffnessMatrixTerm_Delete( void* matrixTerm ) {

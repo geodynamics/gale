@@ -81,12 +81,6 @@
 		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement, 
 		Name                                                name );
 	
-	void PressureGradMatrixTerm_InitAll( 
-		void*                                               matrixTerm,
-		StiffnessMatrix*                                    stiffMat,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         gradField );
-
 	void _PressureGradMatrixTerm_Delete( void* matrixTerm );
 	void _PressureGradMatrixTerm_Print( void* matrixTerm, Stream* stream );
 

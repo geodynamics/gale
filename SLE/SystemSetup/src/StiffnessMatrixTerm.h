@@ -105,12 +105,6 @@
 		StiffnessMatrixTerm_AssembleElementFunction*         _assembleElement,
 		Name                                                 name );
 	
-	void StiffnessMatrixTerm_InitAll(
-		void*                                                stiffnessMatrixTerm,
-		StiffnessMatrix*                                     stiffnessMatrix,
-		Swarm*                                               integrationSwarm,
-		Stg_Component*                                       extraInfo );
-	
 	/* 'Stg_Class' Virtual Functions */
 	void _StiffnessMatrixTerm_Delete( void* stiffnessMatrixTerm );
 	void _StiffnessMatrixTerm_Print( void* stiffnessMatrixTerm, Stream* stream );

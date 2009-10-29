@@ -77,12 +77,6 @@
 		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement, 
 		Name                                                name );
 	
-	void MassMatrixTerm_InitAll( 
-		void*                                               matrixTerm,
-		StiffnessMatrix*                                    stiffMat,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         gradField );
-
 	void _MassMatrixTerm_Delete( void* matrixTerm );
 	void _MassMatrixTerm_Print( void* matrixTerm, Stream* stream );
 

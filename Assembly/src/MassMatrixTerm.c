@@ -56,13 +56,15 @@ const Type MassMatrixTerm_Type = "MassMatrixTerm";
 
 MassMatrixTerm* MassMatrixTerm_New( 
     Name                                                name,
-    StiffnessMatrix*                                    stiffMat,
+    StiffnessMatrix*                                    stiffnessMatrix,
     Swarm*                                              integrationSwarm,
     FeVariable*                                         field )
 {
     MassMatrixTerm* self = (MassMatrixTerm*) _MassMatrixTerm_DefaultNew( name );
 
-    MassMatrixTerm_InitAll( self, stiffMat, integrationSwarm, field );
+	self->isConstructed = True;
+	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, integrationSwarm, NULL );
+	_MassMatrixTerm_Init( self, field );
 
     return self;
 }
@@ -109,18 +111,6 @@ MassMatrixTerm* _MassMatrixTerm_New(
 
 void _MassMatrixTerm_Init( MassMatrixTerm* self, FeVariable* field ) {
     self->field = field;
-}
-
-void MassMatrixTerm_InitAll( 
-	void*					matrixTerm,
-	StiffnessMatrix*	stiffMat,
-	Swarm*				integrationSwarm,
-	FeVariable*			field )
-{
-	MassMatrixTerm* self = (MassMatrixTerm*) matrixTerm;
-
-	StiffnessMatrixTerm_InitAll( self, stiffMat, integrationSwarm, NULL );
-	_MassMatrixTerm_Init( self, field );
 }
 
 void _MassMatrixTerm_Delete( void* matrixTerm ) {
@@ -199,7 +189,7 @@ void _MassMatrixTerm_AssembleElement(
 	double**						elStiffMat )
 {
 	MassMatrixTerm*       self         = Stg_CheckType( matrixTerm, MassMatrixTerm );
-	StiffnessMatrix *stiffnessMatrix = self->stiffnessMatrix;
+	StiffnessMatrix			*stiffnessMatrix = self->stiffnessMatrix;
 	Swarm*                              swarm        = self->integrationSwarm;
 	FeVariable*                         variable1    = stiffnessMatrix->rowVariable;
 	Dimension_Index                     dim          = stiffnessMatrix->dim;

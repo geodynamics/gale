@@ -76,11 +76,6 @@ DivergenceMatrixTerm* _DivergenceMatrixTerm_New(
    StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
    Name                                                name );
 	
-void DivergenceMatrixTerm_InitAll( 
-   void*                                               matrixTerm,
-   StiffnessMatrix*                                    stiffnessMatrix,
-   Swarm*                                              integrationSwarm );
-
 void _DivergenceMatrixTerm_Delete( void* matrixTerm );
 void _DivergenceMatrixTerm_Print( void* matrixTerm, Stream* stream );
 

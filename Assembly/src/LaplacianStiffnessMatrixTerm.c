@@ -62,10 +62,9 @@ LaplacianStiffnessMatrixTerm* LaplacianStiffnessMatrixTerm_New(
 {
 	LaplacianStiffnessMatrixTerm* self = (LaplacianStiffnessMatrixTerm*) _LaplacianStiffnessMatrixTerm_DefaultNew( name );
 
-	LaplacianStiffnessMatrixTerm_InitAll( 
-			self,
-			stiffnessMatrix,
-			integrationSwarm );
+	self->isConstructed = False;	
+	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, integrationSwarm, NULL );
+	_LaplacianStiffnessMatrixTerm_Init( self );
 
 	return self;
 }
@@ -111,17 +110,6 @@ LaplacianStiffnessMatrixTerm* _LaplacianStiffnessMatrixTerm_New(
 }
 
 void _LaplacianStiffnessMatrixTerm_Init( LaplacianStiffnessMatrixTerm* self ) {
-}
-
-void LaplacianStiffnessMatrixTerm_InitAll( 
-		void*                                               matrixTerm,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm )
-{
-	LaplacianStiffnessMatrixTerm* self = (LaplacianStiffnessMatrixTerm*) matrixTerm;
-
-	StiffnessMatrixTerm_InitAll( self, stiffnessMatrix, integrationSwarm, NULL );
-	_LaplacianStiffnessMatrixTerm_Init( self );
 }
 
 void _LaplacianStiffnessMatrixTerm_Delete( void* matrixTerm ) {
