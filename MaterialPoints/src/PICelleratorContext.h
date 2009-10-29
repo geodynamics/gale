@@ -113,7 +113,10 @@
 	
 	/* Stg_Class_Delete implementation */
 	void _PICelleratorContext_Delete( void* context );
-	
+
+	/* Destroy implementation */	
+	void _PICelleratorContext_Destroy( void* context );
+
 	/* Print implementation */
 	void _PICelleratorContext_Print( void* context, Stream* stream );
 	

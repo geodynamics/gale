@@ -189,6 +189,11 @@ void _PICelleratorContext_Delete( void* context ) {
 	_FiniteElementContext_Delete( self );
 }
 
+void _PICelleratorContext_Destroy( void* context ) {
+	PICelleratorContext* self = (PICelleratorContext*)context;
+	
+	_FiniteElementContext_Destroy( self );
+}
 
 void _PICelleratorContext_Print( void* context, Stream* stream ) {
 	PICelleratorContext* self = (PICelleratorContext*)context;

@@ -84,11 +84,6 @@ DiffusionSMT* _DiffusionSMT_New(
     StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
     Name                                                name );
 	
-void DiffusionSMT_InitAll( 
-    void*                                               matrixTerm,
-    StiffnessMatrix*                                    stiffnessMatrix,
-    Swarm*                                              integrationSwarm );
-
 void _DiffusionSMT_Delete( void* matrixTerm );
 void _DiffusionSMT_Print( void* matrixTerm, Stream* stream );
 

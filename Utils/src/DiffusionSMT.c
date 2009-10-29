@@ -64,12 +64,11 @@ DiffusionSMT* DiffusionSMT_New(
 {
     DiffusionSMT* self = (DiffusionSMT*) _DiffusionSMT_DefaultNew( name );
 
-    DiffusionSMT_InitAll( 
-	self,
-	stiffnessMatrix,
-	integrationSwarm );
+	self->isConstructed = True;
+	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, integrationSwarm, NULL );
+	_DiffusionSMT_Init( self );
 
-    return self;
+	return self;
 }
 
 /* Creation implementation / Virtual constructor */
@@ -112,20 +111,7 @@ DiffusionSMT* _DiffusionSMT_New(
     return self;
 }
 
-void _DiffusionSMT_Init( 
-    DiffusionSMT*                                    self )
-{
-}
-
-void DiffusionSMT_InitAll( 
-    void*                                               matrixTerm,
-    StiffnessMatrix*                                    stiffnessMatrix,
-    Swarm*                                              integrationSwarm )
-{
-    DiffusionSMT* self = (DiffusionSMT*) matrixTerm;
-
-    StiffnessMatrixTerm_InitAll( self, stiffnessMatrix, integrationSwarm, NULL );
-    _DiffusionSMT_Init( self );
+void _DiffusionSMT_Init( DiffusionSMT* self ) {
 }
 
 void _DiffusionSMT_Delete( void* matrixTerm ) {

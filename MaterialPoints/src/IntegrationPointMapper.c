@@ -161,12 +161,16 @@ void _IntegrationPointMapper_Construct( void* mapper, Stg_ComponentFactory* cf, 
 	
     _IntegrationPointMapper_Init( self, integrationSwarm );
 }
+
 void _IntegrationPointMapper_Build( void* mapper, void* data ) {
 }
+
 void _IntegrationPointMapper_Initialise( void* mapper, void* data ) {
 }
+
 void _IntegrationPointMapper_Execute( void* mapper, void* data ) {
 }
+
 void _IntegrationPointMapper_Destroy( void* mapper, void* data ) {
 }
 
