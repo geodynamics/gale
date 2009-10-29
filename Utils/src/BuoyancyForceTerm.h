@@ -104,15 +104,6 @@
 		BuoyancyForceTerm_CalcGravityFunction*              _calcGravity,
 		Name                                                name );
 	
-	void BuoyancyForceTerm_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         temperatureField,
-		double                                              gravity,
-		Bool                                                adjust,
-		Materials_Register*                                 materials_Register );
-
 	void _BuoyancyForceTerm_Delete( void* forceTerm );
 	void _BuoyancyForceTerm_Print( void* forceTerm, Stream* stream );
 

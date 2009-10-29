@@ -72,14 +72,9 @@ BuoyancyForceTerm* BuoyancyForceTerm_New(
 {
 	BuoyancyForceTerm* self = (BuoyancyForceTerm*) _BuoyancyForceTerm_DefaultNew( name );
 
-	BuoyancyForceTerm_InitAll( 
-			self,
-			forceVector,
-			integrationSwarm,
-			temperatureField,
-			gravity,
-			adjust,
-			materials_Register );
+	self->isConstructed = True;
+	_ForceTerm_Init( self, forceVector, integrationSwarm, NULL );
+	_BuoyancyForceTerm_Init( self, temperatureField, gravity, adjust, materials_Register );
 
 	return self;
 }
@@ -138,21 +133,6 @@ void _BuoyancyForceTerm_Init(
 	self->gHat		  = NULL;
 	self->adjust              = adjust;
 	self->materials_Register  = materials_Register;
-}
-
-void BuoyancyForceTerm_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         temperatureField,
-		double                                              gravity,
-		Bool                                                adjust,
-		Materials_Register*                                 materials_Register )
-{
-	BuoyancyForceTerm* self = (BuoyancyForceTerm*) forceTerm;
-
-	ForceTerm_InitAll( self, forceVector, integrationSwarm, NULL );
-	_BuoyancyForceTerm_Init( self, temperatureField, gravity, adjust, materials_Register );
 }
 
 void _BuoyancyForceTerm_Delete( void* forceTerm ) {

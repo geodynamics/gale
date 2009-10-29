@@ -73,15 +73,9 @@ BuoyancyForceTermThermoChem* BuoyancyForceTermThermoChem_New(
 {
 	BuoyancyForceTermThermoChem* self = (BuoyancyForceTermThermoChem*) _BuoyancyForceTermThermoChem_DefaultNew( name );
 
-	BuoyancyForceTermThermoChem_InitAll( 
-			self,
-			forceVector,
-			integrationSwarm,
-			temperatureField,
-			RaT,
-			RaC,
-			adjust,
-			materials_Register );
+	self->isConstructed = True;
+	_ForceTerm_Init( self, forceVector, integrationSwarm, NULL );
+	_BuoyancyForceTermThermoChem_Init( self, temperatureField, RaT, RaC, adjust, materials_Register );
 
 	return self;
 }
@@ -144,22 +138,6 @@ void _BuoyancyForceTermThermoChem_Init(
 	self->adjust              = adjust;
 	self->materials_Register  = materials_Register;
 
-}
-
-void BuoyancyForceTermThermoChem_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         temperatureField,
-		double                                              RaT,
-		double                                              RaC,
-		Bool                                                adjust,
-		Materials_Register*                                 materials_Register )
-{
-	BuoyancyForceTermThermoChem* self = (BuoyancyForceTermThermoChem*) forceTerm;
-
-	ForceTerm_InitAll( self, forceVector, integrationSwarm, NULL );
-	_BuoyancyForceTermThermoChem_Init( self, temperatureField, RaT, RaC, adjust, materials_Register );
 }
 
 void _BuoyancyForceTermThermoChem_Delete( void* forceTerm ) {

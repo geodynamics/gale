@@ -112,16 +112,6 @@
 		BuoyancyForceTermThermoChem_CalcRaCFunction*              _calcRaC,
 		Name                                                name );
 	
-	void BuoyancyForceTermThermoChem_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         temperatureField,
-		double                                              RaT,
-		double                                              RaC,
-		Bool                                                adjust,
-		Materials_Register*                                 materials_Register );
-
 	void _BuoyancyForceTermThermoChem_Delete( void* forceTerm );
 	void _BuoyancyForceTermThermoChem_Print( void* forceTerm, Stream* stream );
 
