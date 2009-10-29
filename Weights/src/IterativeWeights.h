@@ -89,7 +89,6 @@ IterativeWeights* _IterativeWeights_New(
     Stg_Component_DestroyFunction*        _destroy,		
     WeightsCalculator_CalculateFunction*  _calculate,
     Name                                  name,
-    Bool                                  initFlag,
     int                                   dim,
     WeightsCalculator*                    initialWeights,
     Iteration_Index                       maxIterations,

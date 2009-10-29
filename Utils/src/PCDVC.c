@@ -127,24 +127,14 @@ PCDVC* PCDVC_New( Name name, Dimension_Index dim, int* res,
                   Bool deleteInInterfaceCells, Bool Inflow, double CentPosRatio,
                   int ParticlesPerCell, double Threshold )
 {
-    return (void*) _PCDVC_New(
-        sizeof(PCDVC),
-        PCDVC_Type,
-        _PCDVC_Delete,
-        _PCDVC_Print,
-        _PCDVC_Copy,
-        _PCDVC_DefaultNew,
-        _PCDVC_Construct,
-        _PCDVC_Build,
-        _PCDVC_Initialise,
-        _PCDVC_Execute,
-        _PCDVC_Destroy,
-        _PCDVC_Calculate,
-        name,
-        True,
-        dim, res, mps, upT, lowT, maxDeletions, maxSplits,
-        splitInInterfaceCells, deleteInInterfaceCells,
-        Inflow, CentPosRatio, ParticlesPerCell, Threshold );
+    PCDVC *self = _PCDVC_DefaultNew( name );
+
+    self->isConstructed = True;
+    _WeightsCalculator_Init( self, dim );
+    _DVCWeights_Init( self, res );
+    _PCDVC_Init( self, mps, upT, lowT, maxDeletions, maxSplits,
+                 splitInInterfaceCells, deleteInInterfaceCells,
+                 Inflow, CentPosRatio, ParticlesPerCell, Threshold );
 }
 
 PCDVC* _PCDVC_New(
@@ -161,7 +151,6 @@ PCDVC* _PCDVC_New(
     Stg_Component_DestroyFunction*        _destroy,		
     WeightsCalculator_CalculateFunction*  _calculate,
     Name                                  name,
-    Bool                                  initFlag,
     int                                   dim,
     int*                                  res,
     MaterialPointsSwarm*                  mps,
@@ -196,18 +185,11 @@ PCDVC* _PCDVC_New(
         _destroy,		
         _calculate,
         name,
-        initFlag,
         dim, res );
 	
     /* General info */
 
     /* Virtual Info */
-
-    if( initFlag ) {
-        _PCDVC_Init( self, mps, upT, lowT, maxDeletions, maxSplits,
-                     splitInInterfaceCells, deleteInInterfaceCells,
-                     Inflow, CentPosRatio, ParticlesPerCell, Threshold );
-    }
 
     return self;
 }
@@ -274,7 +256,6 @@ void* _PCDVC_DefaultNew( Name name ) {
         _PCDVC_Destroy,
         _PCDVC_Calculate,
         name,
-        False,
         0, NULL, NULL, 0.0, 0.0, 0, 0, False, False, False,
         0.0, 0, 0.0 );
 }

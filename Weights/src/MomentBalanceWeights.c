@@ -65,22 +65,11 @@ const Type MomentBalanceWeights_Type = "MomentBalanceWeights";
 */
 
 MomentBalanceWeights* MomentBalanceWeights_New( Name name, Dimension_Index dim, WeightsCalculator* backupWeights ) {
-    return _MomentBalanceWeights_New(
-        sizeof(MomentBalanceWeights),
-        MomentBalanceWeights_Type,
-        _MomentBalanceWeights_Delete,
-        _MomentBalanceWeights_Print,
-        _MomentBalanceWeights_Copy,
-        _MomentBalanceWeights_DefaultNew,
-        _MomentBalanceWeights_Construct,
-        _MomentBalanceWeights_Build,
-        _MomentBalanceWeights_Initialise,
-        _MomentBalanceWeights_Execute,
-        _MomentBalanceWeights_Destroy,
-        _MomentBalanceWeights_Calculate,
-        name,
-        True,
-        dim, backupWeights );
+    MomentBalanceWeights* self = _MomentBalanceWeights_DefaultNew( name );
+
+    self->isConstructed = True;
+    _WeightsCalculator_Init( self, dim );
+    _MomentBalanceWeights_Init( self, backupWeights );
 }
 
 MomentBalanceWeights* _MomentBalanceWeights_New(
@@ -94,10 +83,9 @@ MomentBalanceWeights* _MomentBalanceWeights_New(
     Stg_Component_BuildFunction*          _build,
     Stg_Component_InitialiseFunction*     _initialise,
     Stg_Component_ExecuteFunction*        _execute,
-    Stg_Component_DestroyFunction*        _destroy,		
+    Stg_Component_DestroyFunction*        _destroy,
     WeightsCalculator_CalculateFunction*  _calculate,
     Name                                  name,
-    Bool                                  initFlag,
     int                                   dim,
     WeightsCalculator*                    backupWeights )
 {
@@ -119,15 +107,11 @@ MomentBalanceWeights* _MomentBalanceWeights_New(
         _destroy,		
         _calculate,
         name,
-        initFlag,
         dim );
 
     /* General info */
 
     /* Virtual Info */
-
-    if(initFlag)
-        _MomentBalanceWeights_Init( self, backupWeights );
 
     return self;
 }
@@ -196,7 +180,6 @@ void* _MomentBalanceWeights_DefaultNew( Name name ) {
         _MomentBalanceWeights_Destroy,
         _MomentBalanceWeights_Calculate,
         name,
-        False,
         0, NULL );
 }
 

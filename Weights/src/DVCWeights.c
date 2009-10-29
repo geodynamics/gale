@@ -80,22 +80,11 @@ const Type DVCWeights_Type = "DVCWeights";
 ** Constructors
 */
 DVCWeights* DVCWeights_New( Name name, Dimension_Index dim, int *res ) {
-    return (void*) _DVCWeights_New(
-        sizeof(DVCWeights),
-        DVCWeights_Type,
-        _DVCWeights_Delete,
-        _DVCWeights_Print,
-        _DVCWeights_Copy,
-        _DVCWeights_DefaultNew,
-        _DVCWeights_Construct,
-        _DVCWeights_Build,
-        _DVCWeights_Initialise,
-        _DVCWeights_Execute,
-        _DVCWeights_Destroy,
-        _DVCWeights_Calculate,
-        name,
-        True,
-        dim, res );
+    DVCWeights *self = _DVCWeights_DefaultNew( name );
+
+    self->isConstructed = True;
+    _WeightsCalculator_Init( self, dim );
+    _DVCWeights_Init( self, res );
 }
 
 DVCWeights* _DVCWeights_New(
@@ -112,7 +101,6 @@ DVCWeights* _DVCWeights_New(
     Stg_Component_DestroyFunction*        _destroy,		
     WeightsCalculator_CalculateFunction*  _calculate,
     Name                                  name,
-    Bool                                  initFlag,
     int                                   dim,
     int*                                  res )
 {
@@ -131,18 +119,14 @@ DVCWeights* _DVCWeights_New(
         _build,
         _initialise,
         _execute,
-        _destroy,		
+        _destroy,
         _calculate,
         name,
-        initFlag,
         dim );
 	
     /* General info */
 
     /* Virtual Info */
-
-    if(initFlag)
-        _DVCWeights_Init( self, res );
 
     return self;
 }
@@ -198,7 +182,6 @@ void* _DVCWeights_DefaultNew( Name name ) {
         _DVCWeights_Destroy,
         _DVCWeights_Calculate,
         name,
-        False,
         0, NULL );
 }
 
