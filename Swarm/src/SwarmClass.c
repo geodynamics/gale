@@ -168,18 +168,20 @@ Swarm* _Swarm_New(
 	self->owningCellVariable = NULL;
 
 	/* Swarm info */
-	if( initFlag )
-		_Swarm_Init( 
-				self,
-				cellLayout,
-				particleLayout,
-				dim,
-				cellParticleTblDelta,
-				extraParticlesFactor,
-				extensionMgr_Register,
-				variable_Register,
-				comm, 
-				ics );
+	if( initFlag ) {
+            self->isConstructed = True;
+            _Swarm_Init( 
+                self,
+                cellLayout,
+                particleLayout,
+                dim,
+                cellParticleTblDelta,
+                extraParticlesFactor,
+                extensionMgr_Register,
+                variable_Register,
+                comm, 
+                ics );
+        }
 	
 	return self;
 }
@@ -199,7 +201,6 @@ void _Swarm_Init(
 	StandardParticle   particle;
 	Stream*            errorStream = Journal_Register( Error_Type, self->type );
 	
-	self->isConstructed = True;
 	self->debug = Stream_RegisterChild( Swarm_Debug, self->type );
 	self->dim   = dim;
 	self->comm = comm;
