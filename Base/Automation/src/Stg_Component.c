@@ -368,7 +368,8 @@ void Stg_Component_Destroy( void* component, void* data, Bool force ) {
 			Stg_CallGraph_Push( stgCallGraph, self->_destroy, self->destroyType );
 		#endif
 		
-		self->_destroy( self, data );
+                if( self->_destroy )
+                        self->_destroy( self, data );
 		self->isDestroyed = True;
 		
 		#ifdef USE_PROFILE

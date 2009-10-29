@@ -96,7 +96,7 @@
 
 	#define STG_COMPONENT_PASSARGS						\
 		STG_CLASS_PASSARGS, _defaultConstructor, _construct, 		\
-		_build, _initialise, _execute, _destroy, 			\
+		_build, _initialise, _execute, NULL,                            \
 		name, nameAllocationType
 	
 	/* No Stg_Component_New or Stg_Component_Init as this is an abstract class */
