@@ -43,22 +43,11 @@ const Type VolumeWeights_Type = "VolumeWeights";
 ** Constructors
 */
 VolumeWeights* VolumeWeights_New( Name name, Dimension_Index dim, Stg_Shape* shape, FeMesh* mesh ) {
-    return (void*) _VolumeWeights_New(
-        sizeof(VolumeWeights),
-        VolumeWeights_Type,
-        _VolumeWeights_Delete,
-        _VolumeWeights_Print,
-        _VolumeWeights_Copy,
-        _VolumeWeights_DefaultNew,
-        _VolumeWeights_Construct,
-        _VolumeWeights_Build,
-        _VolumeWeights_Initialise,
-        _VolumeWeights_Execute,
-        _VolumeWeights_Destroy,
-        _VolumeWeights_Calculate,
-        name,
-        True,
-        dim, shape, mesh );
+    VolumeWeights *self = _VolumeWeights_DefaultNew( name );
+
+    self->isConstructed = True;
+    _WeightsCalculator_Init( self, dim );
+    _VolumeWeights_Init( self, shape, mesh );
 }
 
 VolumeWeights* _VolumeWeights_New(
@@ -75,7 +64,6 @@ VolumeWeights* _VolumeWeights_New(
     Stg_Component_DestroyFunction*        _destroy,		
     WeightsCalculator_CalculateFunction*  _calculate,
     Name                                  name,
-    Bool initFlag,
     int dim,
     Stg_Shape* shape, 
     FeMesh* mesh )
@@ -98,7 +86,6 @@ VolumeWeights* _VolumeWeights_New(
         _destroy,		
         _calculate,
         name,
-        initFlag,
         dim );
 
 	
@@ -106,9 +93,6 @@ VolumeWeights* _VolumeWeights_New(
 
     /* Virtual Info */
 
-    if( initFlag )
-        _VolumeWeights_Init( self, shape, mesh );
-	
     return self;
 }
 
@@ -165,7 +149,6 @@ void* _VolumeWeights_DefaultNew( Name name ) {
         _VolumeWeights_Destroy,
         _VolumeWeights_Calculate,
         name,
-        False, 
         0, NULL, NULL );
 }
 

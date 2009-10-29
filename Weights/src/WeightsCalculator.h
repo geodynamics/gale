@@ -92,7 +92,6 @@ WeightsCalculator* _WeightsCalculator_New(
     Stg_Component_DestroyFunction*        _destroy,
     WeightsCalculator_CalculateFunction*  _calculate,
     Name                                  name,
-    Bool                                  initFlag,
     int                                   dim );
 
 void _WeightsCalculator_Init( void* self , int dim );

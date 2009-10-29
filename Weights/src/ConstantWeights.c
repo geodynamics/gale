@@ -64,22 +64,11 @@ const Type ConstantWeights_Type = "ConstantWeights";
 */
 
 ConstantWeights* ConstantWeights_New( Name name, int dim ) {
-    return _ConstantWeights_New(
-        sizeof(ConstantWeights),
-        ConstantWeights_Type,
-        _ConstantWeights_Delete,
-        _ConstantWeights_Print,
-        _ConstantWeights_Copy,
-        _ConstantWeights_DefaultNew,
-        _ConstantWeights_Construct,
-        _ConstantWeights_Build,
-        _ConstantWeights_Initialise,
-        _ConstantWeights_Execute,
-        _ConstantWeights_Destroy,
-        _ConstantWeights_Calculate,
-        name,
-        True,
-        dim );
+    ConstantWeights *self = _ConstantWeights_DefaultNew( name );
+
+    self->isConstructed = True;
+    _WeightsCalculator_Init( self, dim );
+    _ConstantWeights_Init( self );
 }
 
 ConstantWeights* _ConstantWeights_New(
@@ -96,7 +85,6 @@ ConstantWeights* _ConstantWeights_New(
     Stg_Component_DestroyFunction*        _destroy,		
     WeightsCalculator_CalculateFunction*  _calculate,
     Name                                  name,
-    Bool                                  initFlag,
     int                                   dim )
 {
     ConstantWeights* self;
@@ -117,16 +105,11 @@ ConstantWeights* _ConstantWeights_New(
         _destroy,		
         _calculate,
         name,
-        initFlag,
         dim );
 
-	
     /* General info */
 
     /* Virtual Info */
-
-    if(initFlag)
-        _ConstantWeights_Init( self );
 
     return self;
 }
@@ -181,7 +164,6 @@ void* _ConstantWeights_DefaultNew( Name name ) {
         _ConstantWeights_Destroy,
         _ConstantWeights_Calculate,
         name,
-        False,
         0 );
 }
 

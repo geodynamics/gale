@@ -242,7 +242,6 @@ DVCWeights* _DVCWeights_New(
     Stg_Component_DestroyFunction*        _destroy,		
     WeightsCalculator_CalculateFunction*  _calculate,
     Name                                  name,
-    Bool                                  initFlag,
     int                                   dim,
     int*                                  res );
 

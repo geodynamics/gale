@@ -80,7 +80,6 @@ IterativeWeights* _IterativeWeights_New(
     Stg_Component_DestroyFunction*        _destroy,		
     WeightsCalculator_CalculateFunction*  _calculate,
     Name                                  name,
-    Bool                                  initFlag,
     int                                   dim,
     WeightsCalculator*                    initialWeights,
     Iteration_Index                       maxIterations,
@@ -105,16 +104,12 @@ IterativeWeights* _IterativeWeights_New(
         _destroy,		
         _calculate,
         name,
-        initFlag,
         dim );
 
 	
     /* General info */
 
     /* Virtual Info */
-
-    if(initFlag)
-        _IterativeWeights_Init( self, initialWeights, maxIterations, tolerance, alpha );
 	
     return self;
 }
@@ -190,7 +185,6 @@ void* _IterativeWeights_DefaultNew( Name name ) {
         _IterativeWeights_Destroy,
         _IterativeWeights_Calculate,
         name,
-        False,
         0, NULL, 0, 0.0, 0.0);
 }
 

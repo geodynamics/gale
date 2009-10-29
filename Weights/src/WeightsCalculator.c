@@ -76,7 +76,6 @@ WeightsCalculator* _WeightsCalculator_New(
     Stg_Component_DestroyFunction*        _destroy,
     WeightsCalculator_CalculateFunction*  _calculate,
     Name                                  name,
-    Bool                                  initFlag,
     int                                   dim )
 {
     WeightsCalculator* self;
@@ -94,19 +93,14 @@ WeightsCalculator* _WeightsCalculator_New(
         _build,
         _initialise,
         _execute,
-        _destroy,		
+        _destroy,
         name,
         NON_GLOBAL );
-	
+
     /* General info */
 
     /* Virtual Info */
     self->_calculate = _calculate;
-
-    if( initFlag ) {
-        self->isConstructed = True;
-        _WeightsCalculator_Init( self, dim );
-    }
 
     return self;
 }
