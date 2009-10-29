@@ -51,13 +51,6 @@
 		ForceTerm_AssembleElementFunction*                  _assembleElement,		
 		Name                                                name );
 	
-	void RadiogenicHeatingTerm_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		AbstractContext*                                    context,
-		Materials_Register*                                 materials_Register );
-
 	void _RadiogenicHeatingTerm_Delete( void* forceTerm );
 	void _RadiogenicHeatingTerm_Print( void* forceTerm, Stream* stream );
 

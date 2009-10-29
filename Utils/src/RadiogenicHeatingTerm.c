@@ -26,12 +26,9 @@ RadiogenicHeatingTerm* RadiogenicHeatingTerm_New(
 {
 	RadiogenicHeatingTerm* self = (RadiogenicHeatingTerm*) _RadiogenicHeatingTerm_DefaultNew( name );
 
-	RadiogenicHeatingTerm_InitAll( 
-			self,
-			forceVector,
-			integrationSwarm,
-			context,
-			materials_Register );
+	self->isConstructed = True;
+	_ForceTerm_Init( self, forceVector, integrationSwarm, NULL );
+	_RadiogenicHeatingTerm_Init( self, context, materials_Register );
 
 	return self;
 }
@@ -83,19 +80,6 @@ void _RadiogenicHeatingTerm_Init(
 {
 	self->context             = context;
 	self->materials_Register  = materials_Register;
-}
-
-void RadiogenicHeatingTerm_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		AbstractContext*                                    context,
-		Materials_Register*                                 materials_Register )
-{
-	RadiogenicHeatingTerm* self = (RadiogenicHeatingTerm*) forceTerm;
-
-	ForceTerm_InitAll( self, forceVector, integrationSwarm, NULL );
-	_RadiogenicHeatingTerm_Init( self, context, materials_Register );
 }
 
 void _RadiogenicHeatingTerm_Delete( void* forceTerm ) {
