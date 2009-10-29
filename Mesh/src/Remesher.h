@@ -77,7 +77,7 @@ void _Remesher_Init( Remesher* self );
 void _Remesher_Delete( void* remesher );
 void _Remesher_Print( void* remesher, Stream* stream );
 Remesher* _Remesher_DefaultNew( Name name );
-void _Remesher_Construct( void* remesher, Stg_ComponentFactory* cf, void* data );
+void _Remesher_AssignFromXML( void* remesher, Stg_ComponentFactory* cf, void* data );
 void _Remesher_Build( void* remesher, void* data );
 void _Remesher_Initialise( void* remesher, void* data );
 void _Remesher_Execute( void* remesher, void* data );

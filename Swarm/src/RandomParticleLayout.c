@@ -174,7 +174,7 @@ void* _RandomParticleLayout_DefaultNew( Name name ) {
 			_RandomParticleLayout_Print, 
 			_RandomParticleLayout_Copy,
 			_RandomParticleLayout_DefaultNew,
-			_RandomParticleLayout_Construct,
+			_RandomParticleLayout_AssignFromXML,
 			_RandomParticleLayout_Build,
 			_RandomParticleLayout_Initialise,
 			_RandomParticleLayout_Execute,
@@ -189,7 +189,7 @@ void* _RandomParticleLayout_DefaultNew( Name name ) {
 			0  /* seed */ );
 }
 
-void _RandomParticleLayout_Construct( void* randomParticleLayout, Stg_ComponentFactory* cf, void* data ) {
+void _RandomParticleLayout_AssignFromXML( void* randomParticleLayout, Stg_ComponentFactory* cf, void* data ) {
 	RandomParticleLayout*       self = (RandomParticleLayout*)randomParticleLayout;
 	Particle_InCellIndex        cellParticleCount;
 	unsigned int                seed;

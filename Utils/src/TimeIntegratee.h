@@ -109,7 +109,7 @@
 	
 	/* 'Stg_Component' Virtual Functions */
 	void* _TimeIntegratee_DefaultNew( Name name ) ;
-	void _TimeIntegratee_Construct( void* timeIntegratee, Stg_ComponentFactory* cf, void* data ) ;
+	void _TimeIntegratee_AssignFromXML( void* timeIntegratee, Stg_ComponentFactory* cf, void* data ) ;
 	void _TimeIntegratee_Build( void* timeIntegrator, void* data );
 	void _TimeIntegratee_Initialise( void* timeIntegrator, void* data );
 	void _TimeIntegratee_Execute( void* timeIntegrator, void* data );

@@ -158,7 +158,7 @@
 	** Virtual functions
 	*/
 	
-	void				_AllNodesVC_Construct( void* allNodesVC, Stg_ComponentFactory* cf, void* data ) ;
+	void				_AllNodesVC_AssignFromXML( void* allNodesVC, Stg_ComponentFactory* cf, void* data ) ;
 	
 	void				_AllNodesVC_BuildSelf( void* allNodesVC, void* data );
 	

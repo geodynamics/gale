@@ -81,7 +81,7 @@ CornerVC*	CornerVC_DefaultNew( Name name )
 		_CornerVC_Print, 
 		_CornerVC_Copy,
 		(Stg_Component_DefaultConstructorFunction*)CornerVC_DefaultNew,
-		_CornerVC_Construct,	
+		_CornerVC_AssignFromXML,	
 		_CornerVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
@@ -120,7 +120,7 @@ CornerVC*	CornerVC_New(
 		_CornerVC_Print, 
 		_CornerVC_Copy,
 		(Stg_Component_DefaultConstructorFunction*)CornerVC_DefaultNew,
-		_CornerVC_Construct,	
+		_CornerVC_AssignFromXML,	
 		_CornerVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
@@ -164,7 +164,7 @@ void CornerVC_Init(
 	self->_print =               _CornerVC_Print;
 	self->_copy =                _CornerVC_Copy;
 	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)CornerVC_DefaultNew;
-	self->_construct =           _CornerVC_Construct;
+	self->_construct =           _CornerVC_AssignFromXML;
 	self->_build =               _CornerVC_Build;
 	self->_initialise =          _VariableCondition_Initialise;
 	self->_execute =             _VariableCondition_Execute;
@@ -581,7 +581,7 @@ void _CornerVC_Build(  void* cornerVC, void* data ) {
 ** Virtual functions
 */
 
-void _CornerVC_Construct( void* cornerVC, Stg_ComponentFactory* cf, void* data )
+void _CornerVC_AssignFromXML( void* cornerVC, Stg_ComponentFactory* cf, void* data )
 {
 	
 }

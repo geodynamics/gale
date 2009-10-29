@@ -148,7 +148,7 @@
 	** Virtual functions
 	*/
 	
-	void				_ContactVC_Construct( void* wallVC, Stg_ComponentFactory* cf, void* data );
+	void				_ContactVC_AssignFromXML( void* wallVC, Stg_ComponentFactory* cf, void* data );
 	
 	void				_ContactVC_ReadDictionary( void* variableCondition, void* dictionary );
 	

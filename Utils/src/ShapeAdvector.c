@@ -171,7 +171,7 @@ void* _ShapeAdvector_DefaultNew( Name name ) {
 			_ShapeAdvector_Print,
 			_ShapeAdvector_Copy,
 			_ShapeAdvector_DefaultNew,
-			_ShapeAdvector_Construct,
+			_ShapeAdvector_AssignFromXML,
 			_ShapeAdvector_Build,
 			_ShapeAdvector_Initialise,
 			_ShapeAdvector_Execute,
@@ -180,7 +180,7 @@ void* _ShapeAdvector_DefaultNew( Name name ) {
 }
 
 
-void _ShapeAdvector_Construct( void* shapeAdvector, Stg_ComponentFactory* cf, void* data ) {
+void _ShapeAdvector_AssignFromXML( void* shapeAdvector, Stg_ComponentFactory* cf, void* data ) {
 	ShapeAdvector*	            self          = (ShapeAdvector*) shapeAdvector;
 	FieldVariable*              velocityField;
 	Stg_Shape*                  shape;

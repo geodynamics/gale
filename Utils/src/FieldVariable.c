@@ -61,7 +61,7 @@ FieldVariable* FieldVariable_DefaultNew( Name name )
 			_FieldVariable_Print,
 			_FieldVariable_Copy, 
 			(Stg_Component_DefaultConstructorFunction*)FieldVariable_DefaultNew,
-			_FieldVariable_Construct,
+			_FieldVariable_AssignFromXML,
 			_FieldVariable_Build, 
 			_FieldVariable_Initialise, 
 			_FieldVariable_Execute, 
@@ -100,7 +100,7 @@ FieldVariable* FieldVariable_New(
 			_FieldVariable_Print,
 			_FieldVariable_Copy, 
 			(Stg_Component_DefaultConstructorFunction*)FieldVariable_DefaultNew,
-			_FieldVariable_Construct,
+			_FieldVariable_AssignFromXML,
 			_FieldVariable_Build, 
 			_FieldVariable_Initialise, 
 			_FieldVariable_Execute, 
@@ -262,7 +262,7 @@ void* _FieldVariable_Copy( void* fieldVariable, void* dest, Bool deep, Name name
 	return (void*)newFieldVariable;
 }
 
-void _FieldVariable_Construct( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) {
+void _FieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) {
 	FieldVariable*	        self         = (FieldVariable*)fieldVariable;
 	FieldVariable_Register* fV_Register;
 	Dimension_Index         dim;

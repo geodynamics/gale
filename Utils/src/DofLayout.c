@@ -72,7 +72,7 @@ DofLayout* DofLayout_DefaultNew( Name name )
 			_DofLayout_Print, 
 			_DofLayout_Copy,
 			(Stg_Component_DefaultConstructorFunction*)DofLayout_DefaultNew,
-			_DofLayout_Construct,
+			_DofLayout_AssignFromXML,
 			_DofLayout_Build, 
 			_DofLayout_Initialise, 
 			_DofLayout_Execute, 
@@ -93,7 +93,7 @@ DofLayout* DofLayout_New( Name name, Variable_Register* variableRegister, Index 
 			_DofLayout_Print, 
 			_DofLayout_Copy,
 			(Stg_Component_DefaultConstructorFunction*)DofLayout_DefaultNew,
-			_DofLayout_Construct,
+			_DofLayout_AssignFromXML,
 			_DofLayout_Build, 
 			_DofLayout_Initialise, 
 			_DofLayout_Execute, 
@@ -118,7 +118,7 @@ void DofLayout_Init(DofLayout* self, Name name, Variable_Register* variableRegis
 	self->_print = _Variable_Print;
 	self->_copy = _DofLayout_Copy;
 	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)DofLayout_DefaultNew;
-	self->_construct = _DofLayout_Construct;
+	self->_construct = _DofLayout_AssignFromXML;
 	self->_build = _DofLayout_Build;
 	self->_execute = _DofLayout_Execute;
 	self->_destroy = _DofLayout_Destroy;
@@ -285,7 +285,7 @@ void* _DofLayout_Copy( void* dofLayout, void* dest, Bool deep, Name nameExt, Ptr
 	return (void*)newDofLayout;
 }
 
-void _DofLayout_Construct( void* dofLayout, Stg_ComponentFactory* cf, void* data ) 
+void _DofLayout_AssignFromXML( void* dofLayout, Stg_ComponentFactory* cf, void* data ) 
 {
 	DofLayout *             self              = (DofLayout*)dofLayout;
 	Dictionary*             thisComponentDict = NULL;

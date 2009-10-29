@@ -109,7 +109,7 @@
 	
 	/* 'Stg_Component' Stuff */
 	void* _FileParticleLayout_DefaultNew( Name name ) ;
-	void _FileParticleLayout_Construct( void* particleLayout, Stg_ComponentFactory *cf, void* data );
+	void _FileParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data );
 	void _FileParticleLayout_Build( void* particleLayout, void* data );
 	void _FileParticleLayout_Initialise( void* particleLayout, void* data );
 	void _FileParticleLayout_Execute( void* particleLayout, void* data );

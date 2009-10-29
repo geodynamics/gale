@@ -124,7 +124,7 @@
 
 
 	void* _OperatorSwarmVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
-	void _OperatorSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
+	void _OperatorSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
 	void _OperatorSwarmVariable_Build( void* swarmVariable, void* data ) ;
 	void _OperatorSwarmVariable_Execute( void* variable, void* data ) ;
 	void _OperatorSwarmVariable_Destroy( void* variable, void* data ) ;

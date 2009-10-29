@@ -159,7 +159,7 @@
 	
 	void _FieldVariable_Delete( void* fieldVariable ) ;
 	void _FieldVariable_Print( void* _fieldVariable, Stream* stream ) ;
-	void _FieldVariable_Construct( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) ;
+	void _FieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) ;
 	void _FieldVariable_Build( void* fieldVariable, void* data ) ;
 	void _FieldVariable_Execute( void* fieldVariable, void* data ) ;
 	void _FieldVariable_Destroy( void* fieldVariable, void* data ) ;

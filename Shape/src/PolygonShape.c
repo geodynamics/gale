@@ -205,7 +205,7 @@ void* _PolygonShape_DefaultNew( Name name ) {
 			_PolygonShape_Print,
 			_PolygonShape_Copy,
 			_PolygonShape_DefaultNew,
-			_PolygonShape_Construct,
+			_PolygonShape_AssignFromXML,
 			_PolygonShape_Build,
 			_PolygonShape_Initialise,
 			_PolygonShape_Execute,
@@ -217,7 +217,7 @@ void* _PolygonShape_DefaultNew( Name name ) {
 }
 
 
-void _PolygonShape_Construct( void* polygon, Stg_ComponentFactory* cf, void* data ) {
+void _PolygonShape_AssignFromXML( void* polygon, Stg_ComponentFactory* cf, void* data ) {
 	PolygonShape*           self       = (PolygonShape*)polygon;
 	Index                   vertexCount;
 	Index                   vertex_I;
@@ -233,7 +233,7 @@ void _PolygonShape_Construct( void* polygon, Stg_ComponentFactory* cf, void* dat
 	Stream*                 stream      = cf->infoStream;
 	Stream*                 errorStream = Journal_Register( Error_Type, self->type );
 	
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	start[I_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, "startX", 0.0 );
 	end[I_AXIS]   = Stg_ComponentFactory_GetDouble( cf, self->name, "endX",   0.0 );

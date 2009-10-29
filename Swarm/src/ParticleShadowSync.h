@@ -85,7 +85,7 @@
 	/** Stg_Class_Print() implementation */
 	void _ParticleShadowSync_Print( void* pCommsHandler, Stream* stream );
 	
-	void _ParticleShadowSync_Construct( void* pCommsHandler, Stg_ComponentFactory* cf, void* data );
+	void _ParticleShadowSync_AssignFromXML( void* pCommsHandler, Stg_ComponentFactory* cf, void* data );
 	
 	void _ParticleShadowSync_Build( void* pCommsHandler, void *data );
 	

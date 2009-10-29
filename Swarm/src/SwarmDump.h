@@ -94,7 +94,7 @@
 		(SwarmDump*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
 	void* _SwarmDump_DefaultNew( Name name );
-	void _SwarmDump_Construct( void* swarmDump, Stg_ComponentFactory* cf, void* data ) ;
+	void _SwarmDump_AssignFromXML( void* swarmDump, Stg_ComponentFactory* cf, void* data ) ;
 	void _SwarmDump_Build( void* swarmDump, void* data ) ;
 	void _SwarmDump_Initialise( void* swarmDump, void* data ) ;
 	void _SwarmDump_Execute( void* swarmDump, void* data ) ;

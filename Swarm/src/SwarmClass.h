@@ -242,7 +242,7 @@
 	void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Swarm_DefaultNew( Name name );
-	void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data );
+	void _Swarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, void* data );
 	void _Swarm_Build( void* swarm, void* data );
 	#define _Swarm_Initialize _Swarm_Initialise
 	void _Swarm_Initialise( void* swarm, void* data );

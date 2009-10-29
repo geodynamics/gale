@@ -63,7 +63,7 @@ const Type RegularRemesherCmpt_Type = "RegularRemesherCmpt";
       _RegularRemesherCmpt_Print,			\
       NULL,						\
       (void*(*)(Name))_RegularRemesherCmpt_DefaultNew,	\
-      _RegularRemesherCmpt_Construct,			\
+      _RegularRemesherCmpt_AssignFromXML,			\
       _RegularRemesherCmpt_Build,			\
       _RegularRemesherCmpt_Initialise,			\
       _RegularRemesherCmpt_Execute,			\
@@ -156,7 +156,7 @@ RegularRemesherCmpt* _RegularRemesherCmpt_DefaultNew( Name name ) {
 }
 
 
-void _RegularRemesherCmpt_Construct( void* remesher, Stg_ComponentFactory* cf, void* data ) {
+void _RegularRemesherCmpt_AssignFromXML( void* remesher, Stg_ComponentFactory* cf, void* data ) {
    RegularRemesherCmpt* self = (RegularRemesherCmpt*)remesher;
    Dictionary* dict;
    Dictionary_Entry_Value* list;

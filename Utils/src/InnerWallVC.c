@@ -78,7 +78,7 @@ InnerWallVC*	InnerWallVC_DefaultNew( Name name )
 		_InnerWallVC_Print, 
 		_InnerWallVC_Copy,
 		(Stg_Component_DefaultConstructorFunction*)InnerWallVC_DefaultNew,
-		_InnerWallVC_Construct,	
+		_InnerWallVC_AssignFromXML,	
 		_InnerWallVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
@@ -117,7 +117,7 @@ InnerWallVC*	InnerWallVC_New(
 		_InnerWallVC_Print, 
 		_InnerWallVC_Copy,
 		(Stg_Component_DefaultConstructorFunction*)InnerWallVC_DefaultNew,
-		_InnerWallVC_Construct,	
+		_InnerWallVC_AssignFromXML,	
 		_InnerWallVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
@@ -161,7 +161,7 @@ void InnerWallVC_Init(
 	self->_print = _InnerWallVC_Print;
 	self->_copy = _InnerWallVC_Copy;
 	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)InnerWallVC_DefaultNew;
-	self->_construct = _InnerWallVC_Construct;
+	self->_construct = _InnerWallVC_AssignFromXML;
 	self->_build = _InnerWallVC_Build;
 	self->_initialise = _VariableCondition_Initialise;
 	self->_execute = _VariableCondition_Execute;
@@ -569,7 +569,7 @@ void _InnerWallVC_Build(  void* innerWallVC, void* data ) {
 ** Virtual functions
 */
 
-void _InnerWallVC_Construct( void* innerWallVC, Stg_ComponentFactory* cf, void* data )
+void _InnerWallVC_AssignFromXML( void* innerWallVC, Stg_ComponentFactory* cf, void* data )
 {
 	
 }

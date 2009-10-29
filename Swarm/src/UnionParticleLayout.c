@@ -164,7 +164,7 @@ void* _UnionParticleLayout_DefaultNew( Name name ) {
 			_UnionParticleLayout_Print,
 			_UnionParticleLayout_Copy,
 			_UnionParticleLayout_DefaultNew,
-			_UnionParticleLayout_Construct,
+			_UnionParticleLayout_AssignFromXML,
 			_UnionParticleLayout_Build,
 			_UnionParticleLayout_Initialise,
 			_UnionParticleLayout_Execute,
@@ -179,7 +179,7 @@ void* _UnionParticleLayout_DefaultNew( Name name ) {
 }
 
 
-void _UnionParticleLayout_Construct( void* unionParticleLayout, Stg_ComponentFactory *cf, void* data ) {
+void _UnionParticleLayout_AssignFromXML( void* unionParticleLayout, Stg_ComponentFactory *cf, void* data ) {
 	UnionParticleLayout*   self = (UnionParticleLayout*) unionParticleLayout;
 	GlobalParticleLayout** particleLayoutList;
 	Index                  particleLayoutCount;

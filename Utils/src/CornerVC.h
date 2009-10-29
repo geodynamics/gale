@@ -160,7 +160,7 @@
 	** Virtual functions
 	*/
 	
-	void				_CornerVC_Construct( void* cornerVC, Stg_ComponentFactory* cf, void* data );
+	void				_CornerVC_AssignFromXML( void* cornerVC, Stg_ComponentFactory* cf, void* data );
 	
 	void				_CornerVC_BuildSelf( void* cornerVC, void* data );
 	

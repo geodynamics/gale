@@ -124,7 +124,7 @@
 	/* Stg_Component Virtual Functions */
 	void* _MeshShapeVC_DefaultNew( Name name );
 	void _MeshShapeVC_Build(  void* shapeVC, void* data );
-	void _MeshShapeVC_Construct( void* shapeVC, Stg_ComponentFactory* cf, void* data );
+	void _MeshShapeVC_AssignFromXML( void* shapeVC, Stg_ComponentFactory* cf, void* data );
 	
 	/* VariableCondition Virtual Functions */
 	void _MeshShapeVC_BuildSelf( void* shapeVC, void* data );

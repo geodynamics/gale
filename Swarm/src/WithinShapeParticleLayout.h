@@ -106,7 +106,7 @@
 	
 	/* 'Stg_Component' Stuff */
 	void* _WithinShapeParticleLayout_DefaultNew( Name name ) ;
-	void _WithinShapeParticleLayout_Construct( void* withinShapeParticleLayout, Stg_ComponentFactory *cf, void* data );
+	void _WithinShapeParticleLayout_AssignFromXML( void* withinShapeParticleLayout, Stg_ComponentFactory *cf, void* data );
 	void _WithinShapeParticleLayout_Build( void* withinShapeParticleLayout, void* data );
 	void _WithinShapeParticleLayout_Initialise( void* withinShapeParticleLayout, void* data );
 	void _WithinShapeParticleLayout_Execute( void* withinShapeParticleLayout, void* data );

@@ -99,7 +99,7 @@ OperatorFieldVariable* OperatorFieldVariable_DefaultNew( Name name )
 			_OperatorFieldVariable_Print,
 			_OperatorFieldVariable_Copy, 
 			(Stg_Component_DefaultConstructorFunction*)OperatorFieldVariable_DefaultNew,
-			_OperatorFieldVariable_Construct,
+			_OperatorFieldVariable_AssignFromXML,
 			_OperatorFieldVariable_Build, 
 			_OperatorFieldVariable_Initialise, 
 			_OperatorFieldVariable_Execute,
@@ -139,7 +139,7 @@ OperatorFieldVariable* OperatorFieldVariable_New(
 			_OperatorFieldVariable_Print,
 			_OperatorFieldVariable_Copy, 
 			(Stg_Component_DefaultConstructorFunction*)OperatorFieldVariable_DefaultNew,
-			_OperatorFieldVariable_Construct,
+			_OperatorFieldVariable_AssignFromXML,
 			_OperatorFieldVariable_Build, 
 			_OperatorFieldVariable_Initialise, 
 			_OperatorFieldVariable_Execute,
@@ -292,14 +292,14 @@ void* _OperatorFieldVariable_Copy( void* fieldVariable, void* dest, Bool deep, N
 	return (void*)newOperatorFieldVariable;
 }
 
-void _OperatorFieldVariable_Construct( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) {
+void _OperatorFieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) {
 	OperatorFieldVariable*     self       = (OperatorFieldVariable*) fieldVariable;
 	Index                      fieldVariableCount = 0;
 	Name                       operatorName;
 	FieldVariable**            fieldVariableList;
 	
 	/* Construct Parent */
-	_FieldVariable_Construct( self, cf, data );
+	_FieldVariable_AssignFromXML( self, cf, data );
 
 	operatorName = Stg_ComponentFactory_GetString( cf, self->name, "Operator", "" );
 

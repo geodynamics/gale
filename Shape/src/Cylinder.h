@@ -110,7 +110,7 @@
 	void* _Cylinder_Copy( void* cylinder, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Cylinder_DefaultNew( Name name ) ;
-	void _Cylinder_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _Cylinder_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _Cylinder_Build( void* cylinder, void* data ) ;
 	void _Cylinder_Initialise( void* cylinder, void* data ) ;
 	void _Cylinder_Execute( void* cylinder, void* data );

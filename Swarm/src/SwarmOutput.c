@@ -197,7 +197,7 @@ void* _SwarmOutput_DefaultNew( Name name ) {
 			_SwarmOutput_Print,
 			_SwarmOutput_Copy, 
 			_SwarmOutput_DefaultNew,
-			_SwarmOutput_Construct,
+			_SwarmOutput_AssignFromXML,
 			_SwarmOutput_Build, 
 			_SwarmOutput_Initialise, 
 			_SwarmOutput_Execute, 
@@ -206,7 +206,7 @@ void* _SwarmOutput_DefaultNew( Name name ) {
 			_SwarmOutput_PrintData,
 			name );
 }
-void _SwarmOutput_Construct( void* swarmOutput, Stg_ComponentFactory* cf, void* data ) {
+void _SwarmOutput_AssignFromXML( void* swarmOutput, Stg_ComponentFactory* cf, void* data ) {
 	SwarmOutput*	        self         = (SwarmOutput*)swarmOutput;
 	Swarm*                  swarm;
 	Name                    baseFilename;

@@ -59,7 +59,7 @@ void *ParticleMovementHandler_DefaultNew( Name name )
 	return _ParticleMovementHandler_New( sizeof(ParticleMovementHandler), ParticleMovementHandler_Type,
 		_ParticleMovementHandler_Delete, _ParticleMovementHandler_Print, _ParticleMovementHandler_CopyFunc,
 		(Stg_Component_DefaultConstructorFunction*)ParticleMovementHandler_DefaultNew,
-		_ParticleMovementHandler_Construct, _ParticleMovementHandler_Build, _ParticleMovementHandler_Initialise,
+		_ParticleMovementHandler_AssignFromXML, _ParticleMovementHandler_Build, _ParticleMovementHandler_Initialise,
 		_ParticleMovementHandler_Execute, _ParticleMovementHandler_Destroy, name, False, False );
 }
 
@@ -72,7 +72,7 @@ ParticleMovementHandler* ParticleMovementHandler_New(
 	return _ParticleMovementHandler_New( sizeof(ParticleMovementHandler), ParticleMovementHandler_Type,
 		_ParticleMovementHandler_Delete, _ParticleMovementHandler_Print, _ParticleMovementHandler_CopyFunc,
 		(Stg_Component_DefaultConstructorFunction*)ParticleMovementHandler_DefaultNew,
-		_ParticleMovementHandler_Construct, _ParticleMovementHandler_Build, _ParticleMovementHandler_Initialise,
+		_ParticleMovementHandler_AssignFromXML, _ParticleMovementHandler_Build, _ParticleMovementHandler_Initialise,
 		_ParticleMovementHandler_Execute, _ParticleMovementHandler_Destroy, name, True,
 		useGlobalFallbackCommStrategy );
 }
@@ -169,7 +169,7 @@ void* _ParticleMovementHandler_CopyFunc( void* particleMovementHandler, void* de
 		   nameExt, ptrMap );
 }
 
-void _ParticleMovementHandler_Construct( void* pCommsHandler, Stg_ComponentFactory* cf, void* data ){
+void _ParticleMovementHandler_AssignFromXML( void* pCommsHandler, Stg_ComponentFactory* cf, void* data ){
 	ParticleMovementHandler *self = (ParticleMovementHandler*)pCommsHandler;
 
 	self->isConstructed = True;

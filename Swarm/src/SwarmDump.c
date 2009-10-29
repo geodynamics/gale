@@ -179,14 +179,14 @@ void* _SwarmDump_DefaultNew( Name name ) {
                         _SwarmDump_Print,
                         _SwarmDump_Copy, 
                         _SwarmDump_DefaultNew,
-                        _SwarmDump_Construct,
+                        _SwarmDump_AssignFromXML,
                         _SwarmDump_Build, 
                         _SwarmDump_Initialise, 
                         _SwarmDump_Execute, 
                         _SwarmDump_Destroy, 
                         name );
 }
-void _SwarmDump_Construct( void* swarmDump, Stg_ComponentFactory* cf, void* data ) {
+void _SwarmDump_AssignFromXML( void* swarmDump, Stg_ComponentFactory* cf, void* data ) {
         SwarmDump*                  self         = (SwarmDump*)swarmDump;
         Swarm**                 swarmList;
         Bool                    newFileEachTime;

@@ -192,7 +192,7 @@ void* _Superellipsoid_DefaultNew( Name name ) {
 			_Superellipsoid_Print,
 			_Superellipsoid_Copy,
 			_Superellipsoid_DefaultNew,
-			_Superellipsoid_Construct,
+			_Superellipsoid_AssignFromXML,
 			_Superellipsoid_Build,
 			_Superellipsoid_Initialise,
 			_Superellipsoid_Execute,
@@ -204,13 +204,13 @@ void* _Superellipsoid_DefaultNew( Name name ) {
 }
 
 
-void _Superellipsoid_Construct( void* superellipsoid, Stg_ComponentFactory* cf, void* data ) {
+void _Superellipsoid_AssignFromXML( void* superellipsoid, Stg_ComponentFactory* cf, void* data ) {
 	Superellipsoid*	self      = (Superellipsoid*) superellipsoid;
 	XYZ             radius;
 	double          epsilon1;
 	double          epsilon2;
 
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	radius[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "radiusX", 1.0 );
 	radius[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "radiusY", 1.0 );

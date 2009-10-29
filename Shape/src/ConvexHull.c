@@ -245,7 +245,7 @@ void* _ConvexHull_DefaultNew( Name name ) {
 			_ConvexHull_Print,
 			_ConvexHull_Copy,
 			_ConvexHull_DefaultNew,
-			_ConvexHull_Construct,
+			_ConvexHull_AssignFromXML,
 			_ConvexHull_Build,
 			_ConvexHull_Initialise,
 			_ConvexHull_Execute,
@@ -257,7 +257,7 @@ void* _ConvexHull_DefaultNew( Name name ) {
 }
 
 
-void _ConvexHull_Construct( void* convexHull, Stg_ComponentFactory* cf, void* data ) {
+void _ConvexHull_AssignFromXML( void* convexHull, Stg_ComponentFactory* cf, void* data ) {
 	ConvexHull*             self       = (ConvexHull*)convexHull;
 	Index                   vertexCount;
 	Index                   vertex_I;
@@ -269,7 +269,7 @@ void _ConvexHull_Construct( void* convexHull, Stg_ComponentFactory* cf, void* da
 	Stream*                 stream     = cf->infoStream;
 
 	
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	optionsList = Dictionary_Get( dictionary, "verticies" );
 	Journal_Firewall( optionsList != NULL, 

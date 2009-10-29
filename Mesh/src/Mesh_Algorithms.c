@@ -54,7 +54,7 @@ Mesh_Algorithms* Mesh_Algorithms_New( Name name ) {
 				     _Mesh_Algorithms_Print, 
 				     NULL, 
 				     (void* (*)(Name))_Mesh_Algorithms_New, 
-				     _Mesh_Algorithms_Construct, 
+				     _Mesh_Algorithms_AssignFromXML, 
 				     _Mesh_Algorithms_Build, 
 				     _Mesh_Algorithms_Initialise, 
 				     _Mesh_Algorithms_Execute, 
@@ -131,7 +131,7 @@ void _Mesh_Algorithms_Print( void* algorithms, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void _Mesh_Algorithms_Construct( void* algorithms, Stg_ComponentFactory* cf, void* data ) {
+void _Mesh_Algorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf, void* data ) {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
 
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );

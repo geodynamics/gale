@@ -104,7 +104,7 @@ FieldVariable* OperatorFieldVariableSuite_GenerateVelocityField( OperatorFieldVa
 		_FieldVariable_Print,
 		_FieldVariable_Copy,
 		(Stg_Component_DefaultConstructorFunction*)FieldVariable_DefaultNew,
-		_FieldVariable_Construct,
+		_FieldVariable_AssignFromXML,
 		_FieldVariable_Build,
 		_FieldVariable_Initialise,
 		_FieldVariable_Execute,

@@ -165,7 +165,7 @@ void* _Everywhere_DefaultNew( Name name ) {
 			_Everywhere_Print,
 			_Everywhere_Copy,
 			_Everywhere_DefaultNew,
-			_Everywhere_Construct,
+			_Everywhere_AssignFromXML,
 			_Everywhere_Build,
 			_Everywhere_Initialise,
 			_Everywhere_Execute,
@@ -177,10 +177,10 @@ void* _Everywhere_DefaultNew( Name name ) {
 }
 
 
-void _Everywhere_Construct( void* everywhere, Stg_ComponentFactory* cf, void* data ) {
+void _Everywhere_AssignFromXML( void* everywhere, Stg_ComponentFactory* cf, void* data ) {
 	Everywhere*	self          = (Everywhere*) everywhere;
 
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 	_Everywhere_Init( self );
 }
 

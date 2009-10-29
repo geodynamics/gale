@@ -59,7 +59,7 @@ MeshBoundaryShape* MeshBoundaryShape_New( Name name ) {
       _Stg_Shape_Print,
       _Stg_Shape_Copy,
       (void*(*)(Name))MeshBoundaryShape_New,
-      _MeshBoundaryShape_Construct,
+      _MeshBoundaryShape_AssignFromXML,
       _MeshBoundaryShape_Build,
       _MeshBoundaryShape_Initialise,
       _Stg_Shape_Execute,
@@ -99,12 +99,12 @@ void _MeshBoundaryShape_Delete( void* _self ) {
    _Stg_Shape_Delete( self );
 }
 
-void _MeshBoundaryShape_Construct( void* _self, Stg_ComponentFactory* cf, void* data ) {
+void _MeshBoundaryShape_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data ) {
    MeshBoundaryShape* self = (MeshBoundaryShape*)_self;
    Dictionary_Entry_Value* wallList;
    int ii;
 
-   _Stg_Shape_Construct( self, cf, data );
+   _Stg_Shape_AssignFromXML( self, cf, data );
    _MeshBoundaryShape_Init( self );
 
    /* Need a mesh with a cartesian generator. */

@@ -127,7 +127,7 @@
 	/* added to call porosity distribution functions standard condition functions plugin */
 	void _SwarmShapeVC_Initialise(  void* shapeVC, void* data );
 	void _SwarmShapeVC_Build(  void* shapeVC, void* data );
-	void _SwarmShapeVC_Construct( void* shapeVC, Stg_ComponentFactory* cf, void* data );
+	void _SwarmShapeVC_AssignFromXML( void* shapeVC, Stg_ComponentFactory* cf, void* data );
 	
 	/* VariableCondition Virtual Functions */
 	void _SwarmShapeVC_BuildSelf( void* shapeVC, void* data );

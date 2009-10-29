@@ -160,7 +160,7 @@
 	** Virtual functions
 	*/
 	
-	void				_InnerWallVC_Construct( void* innerWallVC, Stg_ComponentFactory* cf, void* data );
+	void				_InnerWallVC_AssignFromXML( void* innerWallVC, Stg_ComponentFactory* cf, void* data );
 	
 	void				_InnerWallVC_BuildSelf( void* innerWallVC, void* data );
 	

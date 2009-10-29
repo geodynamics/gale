@@ -104,7 +104,7 @@
 	void* _PythonShape_Copy( void* pythonShape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _PythonShape_DefaultNew( Name name ) ;
-	void _PythonShape_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _PythonShape_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _PythonShape_Build( void* pythonShape, void* data ) ;
 	void _PythonShape_Initialise( void* pythonShape, void* data ) ;
 	void _PythonShape_Execute( void* pythonShape, void* data );

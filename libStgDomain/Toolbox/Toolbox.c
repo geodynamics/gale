@@ -49,7 +49,7 @@
 
 const Type StgDomain_Toolbox_Type = "StgDomain_Toolbox";
 
-void _StgDomain_Toolbox_Construct( void* component, Stg_ComponentFactory* cf, void* data )  {
+void _StgDomain_Toolbox_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data )  {
 }
 
 
@@ -57,7 +57,7 @@ void* _StgDomain_Toolbox_DefaultNew( Name name ) {
 	return Codelet_New(
 			StgDomain_Toolbox_Type,
 			_StgDomain_Toolbox_DefaultNew,
-			_StgDomain_Toolbox_Construct,
+			_StgDomain_Toolbox_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

@@ -169,7 +169,7 @@ void* _GaussParticleLayout_DefaultNew( Name name ) {
 			_GaussParticleLayout_Print, 
 			_GaussParticleLayout_Copy, 
 			_GaussParticleLayout_DefaultNew,
-			_GaussParticleLayout_Construct,
+			_GaussParticleLayout_AssignFromXML,
 			_GaussParticleLayout_Build, 
 			_GaussParticleLayout_Initialise,
 			_GaussParticleLayout_Execute,
@@ -184,7 +184,7 @@ void* _GaussParticleLayout_DefaultNew( Name name ) {
 			NULL    /* particlesPerDim */ );
 }
 
-void _GaussParticleLayout_Construct( void* gaussParticleLayout, Stg_ComponentFactory* cf, void* data ) {
+void _GaussParticleLayout_AssignFromXML( void* gaussParticleLayout, Stg_ComponentFactory* cf, void* data ) {
 	GaussParticleLayout*   self = (GaussParticleLayout*)gaussParticleLayout;
 	Particle_InCellIndex   particlesPerDim[3];
 	Particle_InCellIndex   defaultVal;

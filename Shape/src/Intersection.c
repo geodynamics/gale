@@ -203,7 +203,7 @@ void* _Intersection_DefaultNew( Name name ) {
 			_Intersection_Print,
 			_Intersection_Copy,
 			_Intersection_DefaultNew,
-			_Intersection_Construct,
+			_Intersection_AssignFromXML,
 			_Intersection_Build,
 			_Intersection_Initialise,
 			_Intersection_Execute,
@@ -215,7 +215,7 @@ void* _Intersection_DefaultNew( Name name ) {
 }
 
 
-void _Intersection_Construct( void* intersection, Stg_ComponentFactory* cf, void* data ) {
+void _Intersection_AssignFromXML( void* intersection, Stg_ComponentFactory* cf, void* data ) {
 	Intersection*	        self       = (Intersection*)intersection;
 	Index                   shapeCount;
 	Stg_Shape**             shapeList;
@@ -226,7 +226,7 @@ void _Intersection_Construct( void* intersection, Stg_ComponentFactory* cf, void
 	char*                   nameShape;
 	Stream*                 stream     = Journal_Register( Info_Type, CURR_MODULE_NAME );
 	
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	optionsList = Dictionary_Get( dictionary, "shapes" );
 /*	Journal_Firewall( vertexList != NULL, 

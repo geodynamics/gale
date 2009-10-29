@@ -202,7 +202,7 @@ void* _BelowCosinePlane_DefaultNew( Name name ) {
 			_BelowCosinePlane_Print,
 			_BelowCosinePlane_Copy,
 			_BelowCosinePlane_DefaultNew,
-			_BelowCosinePlane_Construct,
+			_BelowCosinePlane_AssignFromXML,
 			_BelowCosinePlane_Build,
 			_BelowCosinePlane_Initialise,
 			_BelowCosinePlane_Execute,
@@ -214,13 +214,13 @@ void* _BelowCosinePlane_DefaultNew( Name name ) {
 }
 
 
-void _BelowCosinePlane_Construct( void* belowPlane, Stg_ComponentFactory* cf, void* data ) {
+void _BelowCosinePlane_AssignFromXML( void* belowPlane, Stg_ComponentFactory* cf, void* data ) {
 	BelowCosinePlane*            self          = (BelowCosinePlane*) belowPlane;
 	double                       amplitude;
 	double                       wavelength;
 	double                       phase;
 
-	_BelowPlane_Construct( self, cf, data );
+	_BelowPlane_AssignFromXML( self, cf, data );
 
 	amplitude = Stg_ComponentFactory_GetDouble( cf, self->name, "amplitude", 0.1 );
 	wavelength = Stg_ComponentFactory_GetDouble( cf, self->name, "wavelength", 2*M_PI );

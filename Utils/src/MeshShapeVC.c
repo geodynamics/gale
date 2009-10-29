@@ -296,7 +296,7 @@ void* _MeshShapeVC_DefaultNew( Name name ) {
 		_MeshShapeVC_Print, 
 		_MeshShapeVC_Copy,
 		_MeshShapeVC_DefaultNew,
-		_MeshShapeVC_Construct,	
+		_MeshShapeVC_AssignFromXML,	
 		_MeshShapeVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
@@ -314,7 +314,7 @@ void* _MeshShapeVC_DefaultNew( Name name ) {
 		name );
 }
 
-void _MeshShapeVC_Construct( void* variableCondition, Stg_ComponentFactory* cf, void* data ) {
+void _MeshShapeVC_AssignFromXML( void* variableCondition, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void _MeshShapeVC_Build(  void* variableCondition, void* data ) {

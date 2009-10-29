@@ -177,7 +177,7 @@ void* _MeshParticleLayout_DefaultNew( Name name ) {
 			_MeshParticleLayout_Print, 
 			_MeshParticleLayout_Copy,
 			_MeshParticleLayout_DefaultNew,
-			_MeshParticleLayout_Construct,
+			_MeshParticleLayout_AssignFromXML,
 			_MeshParticleLayout_Build,
 			_MeshParticleLayout_Initialise,
 			_MeshParticleLayout_Execute,
@@ -192,7 +192,7 @@ void* _MeshParticleLayout_DefaultNew( Name name ) {
 			0  /* seed */ );
 }
 
-void _MeshParticleLayout_Construct( void* meshParticleLayout, Stg_ComponentFactory* cf, void* data ) {
+void _MeshParticleLayout_AssignFromXML( void* meshParticleLayout, Stg_ComponentFactory* cf, void* data ) {
 	MeshParticleLayout*       self = (MeshParticleLayout*)meshParticleLayout;
 	Particle_InCellIndex        cellParticleCount;
 	unsigned int                seed;

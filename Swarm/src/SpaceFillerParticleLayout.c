@@ -200,7 +200,7 @@ void* _SpaceFillerParticleLayout_DefaultNew( Name name ) {
 			_SpaceFillerParticleLayout_Print,
 			_SpaceFillerParticleLayout_Copy,
 			_SpaceFillerParticleLayout_DefaultNew,
-			_SpaceFillerParticleLayout_Construct,
+			_SpaceFillerParticleLayout_AssignFromXML,
 			_SpaceFillerParticleLayout_Build,
 			_SpaceFillerParticleLayout_Initialise,
 			_SpaceFillerParticleLayout_Execute,
@@ -216,7 +216,7 @@ void* _SpaceFillerParticleLayout_DefaultNew( Name name ) {
 }
 
 
-void _SpaceFillerParticleLayout_Construct( void* spaceFillerParticleLayout, Stg_ComponentFactory *cf, void* data ) {
+void _SpaceFillerParticleLayout_AssignFromXML( void* spaceFillerParticleLayout, Stg_ComponentFactory *cf, void* data ) {
 	SpaceFillerParticleLayout* self = (SpaceFillerParticleLayout*) spaceFillerParticleLayout;
 	Dimension_Index            dim;
 	Particle_Index             totalInitialParticles;

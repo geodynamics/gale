@@ -63,7 +63,7 @@ void* ParticleShadowSync_DefaultNew( Name name )
 	return _ParticleShadowSync_New( sizeof(ParticleShadowSync), ParticleShadowSync_Type,
 		_ParticleShadowSync_Delete, _ParticleShadowSync_Print, _ParticleShadowSync_CopyFunc,
 		(Stg_Component_DefaultConstructorFunction*)ParticleShadowSync_DefaultNew,
-		_ParticleShadowSync_Construct, _ParticleShadowSync_Build, _ParticleShadowSync_Initialise,
+		_ParticleShadowSync_AssignFromXML, _ParticleShadowSync_Build, _ParticleShadowSync_Initialise,
 		_ParticleShadowSync_Execute, _ParticleShadowSync_Destroy, name, False );
 }
 
@@ -76,7 +76,7 @@ ParticleShadowSync* ParticleShadowSync_New(
 		return _ParticleShadowSync_New( sizeof(ParticleShadowSync), ParticleShadowSync_Type,
 		_ParticleShadowSync_Delete, _ParticleShadowSync_Print, _ParticleShadowSync_CopyFunc,
 		(Stg_Component_DefaultConstructorFunction*)ParticleShadowSync_DefaultNew,
-		_ParticleShadowSync_Construct, _ParticleShadowSync_Build, _ParticleShadowSync_Initialise,
+		_ParticleShadowSync_AssignFromXML, _ParticleShadowSync_Build, _ParticleShadowSync_Initialise,
 		_ParticleShadowSync_Execute, _ParticleShadowSync_Destroy, name, True );
 }
 
@@ -104,7 +104,7 @@ ParticleShadowSync* _ParticleShadowSync_New(
 	self = (ParticleShadowSync*)_ParticleCommHandler_New( sizeof(ParticleShadowSync), ParticleShadowSync_Type,
 		_ParticleShadowSync_Delete, _ParticleShadowSync_Print, _ParticleShadowSync_CopyFunc,
 		(Stg_Component_DefaultConstructorFunction*)ParticleShadowSync_DefaultNew,
-		_ParticleShadowSync_Construct, _ParticleShadowSync_Build, _ParticleShadowSync_Initialise,
+		_ParticleShadowSync_AssignFromXML, _ParticleShadowSync_Build, _ParticleShadowSync_Initialise,
 		_ParticleShadowSync_Execute, _ParticleShadowSync_Destroy, name, initFlag,
 		_ParticleCommHandler_AllocateOutgoingCountArrays,
 		NULL,
@@ -167,7 +167,7 @@ void* _ParticleShadowSync_CopyFunc( void* particleMovementHandler, void* dest, B
 		   nameExt, ptrMap );
 }
 
-void _ParticleShadowSync_Construct( void* pCommsHandler, Stg_ComponentFactory* cf, void* data ){
+void _ParticleShadowSync_AssignFromXML( void* pCommsHandler, Stg_ComponentFactory* cf, void* data ){
 	ParticleShadowSync *self = (ParticleShadowSync*)pCommsHandler;
 
 	self->isConstructed = True;

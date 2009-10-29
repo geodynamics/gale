@@ -174,7 +174,7 @@ void* _TimeIntegratee_DefaultNew( Name name ) {
 		_TimeIntegratee_Print, 
 		_TimeIntegratee_Copy, 
 		_TimeIntegratee_DefaultNew, 
-		_TimeIntegratee_Construct, 
+		_TimeIntegratee_AssignFromXML, 
 		_TimeIntegratee_Build, 
 		_TimeIntegratee_Initialise,
 		_TimeIntegratee_Execute,
@@ -184,7 +184,7 @@ void* _TimeIntegratee_DefaultNew( Name name ) {
 		name );
 }
 
-void _TimeIntegratee_Construct( void* timeIntegratee, Stg_ComponentFactory* cf, void* data ) {
+void _TimeIntegratee_AssignFromXML( void* timeIntegratee, Stg_ComponentFactory* cf, void* data ) {
 	TimeIntegratee*         self                    = (TimeIntegratee*)timeIntegratee;
 	Index                   dataCount               = 0;
 	Stg_Component**         initData                = NULL;

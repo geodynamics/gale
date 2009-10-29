@@ -103,7 +103,7 @@
 	
 	void _SwarmVariable_Delete( void* swarmVariable ) ;
 	void _SwarmVariable_Print( void* _swarmVariable, Stream* stream ) ;
-	void _SwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
+	void _SwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
 	void _SwarmVariable_Build( void* swarmVariable, void* data ) ;
 	void _SwarmVariable_Execute( void* swarmVariable, void* data ) ;
 	void _SwarmVariable_Destroy( void* swarmVariable, void* data ) ;

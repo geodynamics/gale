@@ -154,7 +154,7 @@
 	
 	void *_Delaunay_Copy( void* delaunay, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-	void _Delaunay_Construct( void* delaunay, Stg_ComponentFactory* cf, void* data );
+	void _Delaunay_AssignFromXML( void* delaunay, Stg_ComponentFactory* cf, void* data );
 	
 	void _Delaunay_Build( void* delaunay, void* data );
 	

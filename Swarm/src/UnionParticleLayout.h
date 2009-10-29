@@ -97,7 +97,7 @@
 	
 	/* 'Stg_Component' Stuff */
 	void* _UnionParticleLayout_DefaultNew( Name name ) ;
-	void _UnionParticleLayout_Construct( void* unionParticleLayout, Stg_ComponentFactory *cf, void* data );
+	void _UnionParticleLayout_AssignFromXML( void* unionParticleLayout, Stg_ComponentFactory *cf, void* data );
 	void _UnionParticleLayout_Build( void* unionParticleLayout, void* data );
 	void _UnionParticleLayout_Initialise( void* unionParticleLayout, void* data );
 	void _UnionParticleLayout_Execute( void* unionParticleLayout, void* data );

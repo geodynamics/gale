@@ -113,7 +113,7 @@ given mesh layout.
 	
 	void* _TriSingleCellLayout_Copy( void* triSingleCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _TriSingleCellLayout_Construct( void *triSingleCellLayout, Stg_ComponentFactory *cf, void* data );
+	void _TriSingleCellLayout_AssignFromXML( void *triSingleCellLayout, Stg_ComponentFactory *cf, void* data );
 	
 	void _TriSingleCellLayout_Build( void* triSingleCellLayout, void* data );
 	

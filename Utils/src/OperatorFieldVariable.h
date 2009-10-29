@@ -138,7 +138,7 @@
 
 
 	void* _OperatorFieldVariable_Copy( void* fieldVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
-	void _OperatorFieldVariable_Construct( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) ;
+	void _OperatorFieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) ;
 	void _OperatorFieldVariable_Build( void* fieldVariable, void* data ) ;
 	void _OperatorFieldVariable_Execute( void* variable, void* data ) ;
 	void _OperatorFieldVariable_Destroy( void* variable, void* data ) ;

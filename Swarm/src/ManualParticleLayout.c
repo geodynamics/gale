@@ -169,7 +169,7 @@ void* _ManualParticleLayout_DefaultNew( Name name ) {
 			_ManualParticleLayout_Print,
 			_ManualParticleLayout_Copy,
 			_ManualParticleLayout_DefaultNew,
-			_ManualParticleLayout_Construct,
+			_ManualParticleLayout_AssignFromXML,
 			_ManualParticleLayout_Build,
 			_ManualParticleLayout_Initialise,
 			_ManualParticleLayout_Execute,
@@ -182,7 +182,7 @@ void* _ManualParticleLayout_DefaultNew( Name name ) {
 			NULL /* dictionary */ );
 }
 
-void _ManualParticleLayout_Construct( void* manualParticleLayout, Stg_ComponentFactory *cf, void* data ) {
+void _ManualParticleLayout_AssignFromXML( void* manualParticleLayout, Stg_ComponentFactory *cf, void* data ) {
 	ManualParticleLayout*      self       = (ManualParticleLayout*) manualParticleLayout;
 	Dictionary*                dictionary;
 	

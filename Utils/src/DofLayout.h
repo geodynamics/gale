@@ -137,8 +137,8 @@
 	
 	void* _DofLayout_Copy( void* dofLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-	/** Stg_Component_Construct() implementation */
-	void _DofLayout_Construct( void* dofLayout, Stg_ComponentFactory* cf, void* data );
+	/** Stg_Component_AssignFromXML() implementation */
+	void _DofLayout_AssignFromXML( void* dofLayout, Stg_ComponentFactory* cf, void* data );
 	
 	/** Stg_Component_Build() implementation */
 	void _DofLayout_Build( void* dofLayout, void* data );

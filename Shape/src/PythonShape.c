@@ -188,7 +188,7 @@ void* _PythonShape_DefaultNew( Name name ) {
 			_PythonShape_Print,
 			_PythonShape_Copy,
 			_PythonShape_DefaultNew,
-			_PythonShape_Construct,
+			_PythonShape_AssignFromXML,
 			_PythonShape_Build,
 			_PythonShape_Initialise,
 			_PythonShape_Execute,
@@ -200,11 +200,11 @@ void* _PythonShape_DefaultNew( Name name ) {
 }
 
 
-void _PythonShape_Construct( void* pythonShape, Stg_ComponentFactory* cf, void* data ) {
+void _PythonShape_AssignFromXML( void* pythonShape, Stg_ComponentFactory* cf, void* data ) {
 	PythonShape*	self      = (PythonShape*) pythonShape;
 	char*           conditionFunction;
 
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	conditionFunction = Stg_ComponentFactory_GetString( cf, self->name, "Function", "0" );
 

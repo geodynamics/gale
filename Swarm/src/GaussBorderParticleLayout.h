@@ -95,7 +95,7 @@
 	void* _GaussBorderParticleLayout_Copy( void* gaussBorderParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _GaussBorderParticleLayout_DefaultNew( Name name );
-	void  _GaussBorderParticleLayout_Construct( void* gaussBorderParticleLayout, Stg_ComponentFactory* cf, void* data );
+	void  _GaussBorderParticleLayout_AssignFromXML( void* gaussBorderParticleLayout, Stg_ComponentFactory* cf, void* data );
 	void  _GaussBorderParticleLayout_Build( void* gaussBorderParticleLayout, void* data );
 	void  _GaussBorderParticleLayout_Initialise( void* gaussBorderParticleLayout, void* data );
 	void  _GaussBorderParticleLayout_Execute( void* gaussBorderParticleLayout, void* data );

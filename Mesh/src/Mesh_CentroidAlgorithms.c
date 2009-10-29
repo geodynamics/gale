@@ -54,7 +54,7 @@ Mesh_CentroidAlgorithms* Mesh_CentroidAlgorithms_New( Name name ) {
 					     _Mesh_CentroidAlgorithms_Print, 
 					     NULL, 
 					     (void* (*)(Name))_Mesh_CentroidAlgorithms_New, 
-					     _Mesh_CentroidAlgorithms_Construct, 
+					     _Mesh_CentroidAlgorithms_AssignFromXML, 
 					     _Mesh_CentroidAlgorithms_Build, 
 					     _Mesh_CentroidAlgorithms_Initialise, 
 					     _Mesh_CentroidAlgorithms_Execute, 
@@ -118,11 +118,11 @@ void _Mesh_CentroidAlgorithms_Print( void* _centroidAlgorithms, Stream* stream )
 	_Mesh_Algorithms_Print( centroid_Algorithms, stream );
 }
 
-void _Mesh_CentroidAlgorithms_Construct( void* _centroidAlgorithms, Stg_ComponentFactory* cf, void* data ) {
+void _Mesh_CentroidAlgorithms_AssignFromXML( void* _centroidAlgorithms, Stg_ComponentFactory* cf, void* data ) {
     
     Mesh_CentroidAlgorithms*      centroidAlgorithms = (Mesh_CentroidAlgorithms*)_centroidAlgorithms;
     
-    _Mesh_Algorithms_Construct( centroidAlgorithms, cf, data );
+    _Mesh_Algorithms_AssignFromXML( centroidAlgorithms, cf, data );
 }
 
 void _Mesh_CentroidAlgorithms_Build( void* _centroidAlgorithms, void* data ) {

@@ -180,7 +180,7 @@ void* _FileParticleLayout_DefaultNew( Name name ) {
          _FileParticleLayout_Print,
          _FileParticleLayout_Copy,
          _FileParticleLayout_DefaultNew,
-         _FileParticleLayout_Construct,
+         _FileParticleLayout_AssignFromXML,
          _FileParticleLayout_Build,
          _FileParticleLayout_Initialise,
          _FileParticleLayout_Execute,
@@ -194,7 +194,7 @@ void* _FileParticleLayout_DefaultNew( Name name ) {
          NULL /* filename */ );
 }
 
-void _FileParticleLayout_Construct( void* particleLayout, Stg_ComponentFactory *cf, void* data ) {
+void _FileParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data ) {
    FileParticleLayout* self     = (FileParticleLayout*) particleLayout;
    Name                filename;
    Index               checkpointnfiles;

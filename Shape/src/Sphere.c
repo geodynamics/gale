@@ -181,7 +181,7 @@ void* _Sphere_DefaultNew( Name name ) {
 			_Sphere_Print,
 			_Sphere_Copy,
 			_Sphere_DefaultNew,
-			_Sphere_Construct,
+			_Sphere_AssignFromXML,
 			_Sphere_Build,
 			_Sphere_Initialise,
 			_Sphere_Execute,
@@ -193,11 +193,11 @@ void* _Sphere_DefaultNew( Name name ) {
 }
 
 
-void _Sphere_Construct( void* sphere, Stg_ComponentFactory* cf, void* data ) {
+void _Sphere_AssignFromXML( void* sphere, Stg_ComponentFactory* cf, void* data ) {
 	Sphere*	self      = (Sphere*) sphere;
 	double             radius;
 
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	radius = Stg_ComponentFactory_GetDouble( cf, self->name, "radius", 0.0 );
 

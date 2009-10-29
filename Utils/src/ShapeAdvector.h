@@ -98,7 +98,7 @@
 	void* _ShapeAdvector_Copy( void* materialPoints, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _ShapeAdvector_DefaultNew( Name name ) ;
-	void _ShapeAdvector_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _ShapeAdvector_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _ShapeAdvector_Build( void* materialPoints, void* data ) ;
 	void _ShapeAdvector_Initialise( void* materialPoints, void* data ) ;
 	void _ShapeAdvector_Execute( void* materialPoints, void* data );

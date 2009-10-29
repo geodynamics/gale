@@ -99,7 +99,7 @@
 	void* _BelowPlane_Copy( void* belowPlane, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _BelowPlane_DefaultNew( Name name ) ;
-	void _BelowPlane_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _BelowPlane_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _BelowPlane_Build( void* belowPlane, void* data ) ;
 	void _BelowPlane_Initialise( void* belowPlane, void* data ) ;
 	void _BelowPlane_Execute( void* belowPlane, void* data );

@@ -106,7 +106,7 @@ void _MeshGenerator_Print( void* meshGenerator, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void _MeshGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, void* data ) {
+void _MeshGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactory* cf, void* data ) {
 	MeshGenerator*		self = (MeshGenerator*)meshGenerator;
 	Dictionary*		dict;
 	unsigned		nDims;

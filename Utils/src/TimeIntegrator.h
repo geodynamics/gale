@@ -104,7 +104,7 @@
 	
 	/* 'Stg_Component' Virtual Functions */
 	void* _TimeIntegrator_DefaultNew( Name name ) ;
-	void _TimeIntegrator_Construct( void* timeIntegrator, Stg_ComponentFactory* cf, void* data ) ;
+	void _TimeIntegrator_AssignFromXML( void* timeIntegrator, Stg_ComponentFactory* cf, void* data ) ;
 	void _TimeIntegrator_Build( void* timeIntegrator, void* data );
 	void _TimeIntegrator_Initialise( void* timeIntegrator, void* data );
 	void _TimeIntegrator_Execute( void* timeIntegrator, void* data );

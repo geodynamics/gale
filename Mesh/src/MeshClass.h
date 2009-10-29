@@ -120,7 +120,7 @@
 
 	void _Mesh_Delete( void* mesh );
 	void _Mesh_Print( void* mesh, Stream* stream );
-	void _Mesh_Construct( void* mesh, Stg_ComponentFactory* cf, void* data );
+	void _Mesh_AssignFromXML( void* mesh, Stg_ComponentFactory* cf, void* data );
 	void _Mesh_Build( void* mesh, void* data );
 	void _Mesh_Initialise( void* mesh, void* data );
 	void _Mesh_Execute( void* mesh, void* data );

@@ -157,7 +157,7 @@
 	/** Stg_Class_Print() implementation */
 	void _ParticleCommHandler_Print( void* pCommsHandler, Stream* stream );
 	
-	void _ParticleCommHandler_Construct( void* pCommsHandler, Stg_ComponentFactory* cf, void* data );
+	void _ParticleCommHandler_AssignFromXML( void* pCommsHandler, Stg_ComponentFactory* cf, void* data );
 	
 	void _ParticleCommHandler_Build( void* pCommsHandler, void *data );
 	

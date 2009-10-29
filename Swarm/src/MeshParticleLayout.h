@@ -97,7 +97,7 @@
 	
 	/* 'Stg_Component' Stuff */
 	void* _MeshParticleLayout_DefaultNew( Name name ) ;
-	void _MeshParticleLayout_Construct( void* meshParticleLayout, Stg_ComponentFactory* cf, void* data );
+	void _MeshParticleLayout_AssignFromXML( void* meshParticleLayout, Stg_ComponentFactory* cf, void* data );
 	void _MeshParticleLayout_Build( void* meshParticleLayout, void* data );
 	void _MeshParticleLayout_Initialise( void* meshParticleLayout, void* data );
 	void _MeshParticleLayout_Execute( void* meshParticleLayout, void* data );

@@ -103,7 +103,7 @@
 	
 	/* 'Stg_Component' Stuff */
 	void* _SpaceFillerParticleLayout_DefaultNew( Name name ) ;
-	void _SpaceFillerParticleLayout_Construct( void* spaceFillerParticleLayout, Stg_ComponentFactory *cf, void* data );
+	void _SpaceFillerParticleLayout_AssignFromXML( void* spaceFillerParticleLayout, Stg_ComponentFactory *cf, void* data );
 	void _SpaceFillerParticleLayout_Build( void* spaceFillerParticleLayout, void* data );
 	void _SpaceFillerParticleLayout_Initialise( void* spaceFillerParticleLayout, void* data );
 	void _SpaceFillerParticleLayout_Execute( void* spaceFillerParticleLayout, void* data );

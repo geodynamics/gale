@@ -72,7 +72,7 @@ CompressionAdaptor* CompressionAdaptor_New( Name name ) {
 				    _CompressionAdaptor_Print, 
 				    NULL, 
 				    (void* (*)(Name))_CompressionAdaptor_New, 
-				    _CompressionAdaptor_Construct, 
+				    _CompressionAdaptor_AssignFromXML, 
 				    _CompressionAdaptor_Build, 
 				    _CompressionAdaptor_Initialise, 
 				    _CompressionAdaptor_Execute, 
@@ -126,14 +126,14 @@ void _CompressionAdaptor_Print( void* adaptor, Stream* stream ) {
 	_MeshGenerator_Print( self, stream );
 }
 
-void _CompressionAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
+void _CompressionAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
 	CompressionAdaptor*	self = (CompressionAdaptor*)adaptor;
 
 	assert( self );
 	assert( cf );
 
 	/* Call parent construct. */
-	_MeshAdaptor_Construct( self, cf, data );
+	_MeshAdaptor_AssignFromXML( self, cf, data );
 
 	self->compressionfactor = Stg_ComponentFactory_GetDouble( cf, self->name, "compressionfactor", 0.0 );
 	if(self->compressionfactor == 0.0){

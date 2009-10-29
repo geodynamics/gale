@@ -101,7 +101,7 @@
 	void* _BelowCosinePlane_Copy( void* belowPlane, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _BelowCosinePlane_DefaultNew( Name name ) ;
-	void _BelowCosinePlane_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _BelowCosinePlane_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _BelowCosinePlane_Build( void* belowPlane, void* data ) ;
 	void _BelowCosinePlane_Initialise( void* belowPlane, void* data ) ;
 	void _BelowCosinePlane_Execute( void* belowPlane, void* data );

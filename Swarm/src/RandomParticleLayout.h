@@ -96,7 +96,7 @@
 	
 	/* 'Stg_Component' Stuff */
 	void* _RandomParticleLayout_DefaultNew( Name name ) ;
-	void _RandomParticleLayout_Construct( void* randomParticleLayout, Stg_ComponentFactory* cf, void* data );
+	void _RandomParticleLayout_AssignFromXML( void* randomParticleLayout, Stg_ComponentFactory* cf, void* data );
 	void _RandomParticleLayout_Build( void* randomParticleLayout, void* data );
 	void _RandomParticleLayout_Initialise( void* randomParticleLayout, void* data );
 	void _RandomParticleLayout_Execute( void* randomParticleLayout, void* data );

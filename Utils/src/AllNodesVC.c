@@ -70,7 +70,7 @@ AllNodesVC* AllNodesVC_DefaultNew( Name name )
 		_AllNodesVC_Print, 
 		_AllNodesVC_Copy, 
 		(Stg_Component_DefaultConstructorFunction*)AllNodesVC_DefaultNew,
-		_AllNodesVC_Construct,
+		_AllNodesVC_AssignFromXML,
 		_AllNodesVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
@@ -109,7 +109,7 @@ AllNodesVC*	AllNodesVC_New(
 		_AllNodesVC_Print, 
 		_AllNodesVC_Copy, 
 		(Stg_Component_DefaultConstructorFunction*)AllNodesVC_DefaultNew,
-		_AllNodesVC_Construct,
+		_AllNodesVC_AssignFromXML,
 		_AllNodesVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
@@ -153,7 +153,7 @@ void AllNodesVC_Init(
 	self->_print = _AllNodesVC_Print;
 	self->_copy = _AllNodesVC_Copy;
 	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)AllNodesVC_DefaultNew,
-	self->_construct = _AllNodesVC_Construct,
+	self->_construct = _AllNodesVC_AssignFromXML,
 	self->_build = _VariableCondition_Build;
 	self->_initialise = _VariableCondition_Initialise;
 	self->_execute = _VariableCondition_Execute;
@@ -526,7 +526,7 @@ void _AllNodesVC_Build( void* allNodesVC, void* data ) {
 ** Virtual functions
 */
 
-void _AllNodesVC_Construct( void* allNodesVC, Stg_ComponentFactory* cf, void* data ) 
+void _AllNodesVC_AssignFromXML( void* allNodesVC, Stg_ComponentFactory* cf, void* data ) 
 {
 
 }

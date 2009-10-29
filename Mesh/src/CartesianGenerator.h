@@ -147,7 +147,7 @@
 
 	void _CartesianGenerator_Delete( void* meshGenerator );
 	void _CartesianGenerator_Print( void* meshGenerator, Stream* stream );
-	void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, void* data );
+	void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactory* cf, void* data );
 	void _CartesianGenerator_Build( void* meshGenerator, void* data );
 	void _CartesianGenerator_Initialise( void* meshGenerator, void* data );
 	void _CartesianGenerator_Execute( void* meshGenerator, void* data );

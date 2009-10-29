@@ -137,7 +137,7 @@
 	
 	void *_ParallelDelaunay_Copy( void* pd, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-	void _ParallelDelaunay_Construct( void* pd, Stg_ComponentFactory* cf, void* data );
+	void _ParallelDelaunay_AssignFromXML( void* pd, Stg_ComponentFactory* cf, void* data );
 	
 	void _ParallelDelaunay_Build( void* pd, void* data );
 	

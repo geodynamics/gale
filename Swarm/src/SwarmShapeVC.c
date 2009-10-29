@@ -297,7 +297,7 @@ void* _SwarmShapeVC_DefaultNew( Name name ) {
 		_SwarmShapeVC_Print, 
 		_SwarmShapeVC_Copy,
 		_SwarmShapeVC_DefaultNew,
-		_SwarmShapeVC_Construct,	
+		_SwarmShapeVC_AssignFromXML,	
 		_SwarmShapeVC_Build,
 		/*_VariableCondition_Initialise,*/
 		_SwarmShapeVC_Initialise,
@@ -316,7 +316,7 @@ void* _SwarmShapeVC_DefaultNew( Name name ) {
 		name );
 }
 
-void _SwarmShapeVC_Construct( void* variableCondition, Stg_ComponentFactory* cf, void* data ) {
+void _SwarmShapeVC_AssignFromXML( void* variableCondition, Stg_ComponentFactory* cf, void* data ) {
 	SwarmShapeVC*		self    		= (SwarmShapeVC*)variableCondition;
 	void*			conFunc_Register 	= NULL;
 	void*			variable_Register 	= NULL;

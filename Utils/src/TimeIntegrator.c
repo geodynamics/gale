@@ -189,7 +189,7 @@ void* _TimeIntegrator_DefaultNew( Name name ) {
 		_TimeIntegrator_Print, 
 		_TimeIntegrator_Copy, 
 		_TimeIntegrator_DefaultNew, 
-		_TimeIntegrator_Construct, 
+		_TimeIntegrator_AssignFromXML, 
 		_TimeIntegrator_Build, 
 		_TimeIntegrator_Initialise,
 		_TimeIntegrator_Execute,
@@ -197,7 +197,7 @@ void* _TimeIntegrator_DefaultNew( Name name ) {
 		name );
 }
 
-void _TimeIntegrator_Construct( void* timeIntegrator, Stg_ComponentFactory* cf, void* data ) {
+void _TimeIntegrator_AssignFromXML( void* timeIntegrator, Stg_ComponentFactory* cf, void* data ) {
 	TimeIntegrator*          self        = (TimeIntegrator*)timeIntegrator;
 	unsigned int             order;
 	Bool                     simultaneous;

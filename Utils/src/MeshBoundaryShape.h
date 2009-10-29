@@ -68,7 +68,7 @@ MeshBoundaryShape* _MeshBoundaryShape_New( MESHBOUNDARYSHAPE_ARGS );
 void _MeshBoundaryShape_Init( MeshBoundaryShape* _self );
 
 void _MeshBoundaryShape_Delete( void* _self );
-void _MeshBoundaryShape_Construct( void* _self, Stg_ComponentFactory* cf, void* data );
+void _MeshBoundaryShape_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data );
 void _MeshBoundaryShape_Build( void* _self, void* data );
 void _MeshBoundaryShape_Initialise( void* _self, void* data );
 

@@ -191,7 +191,7 @@ void* _Cylinder_DefaultNew( Name name ) {
 			_Cylinder_Print,
 			_Cylinder_Copy,
 			_Cylinder_DefaultNew,
-			_Cylinder_Construct,
+			_Cylinder_AssignFromXML,
 			_Cylinder_Build,
 			_Cylinder_Initialise,
 			_Cylinder_Execute,
@@ -204,7 +204,7 @@ void* _Cylinder_DefaultNew( Name name ) {
 
 #define BIG 1.0e99
 
-void _Cylinder_Construct( void* cylinder, Stg_ComponentFactory* cf, void* data ) {
+void _Cylinder_AssignFromXML( void* cylinder, Stg_ComponentFactory* cf, void* data ) {
 	Cylinder*            self                     = (Cylinder*) cylinder;
 	XYZ                  start                    = { -BIG, -BIG, -BIG }; 
 	XYZ                  end                      = {  BIG,  BIG,  BIG };
@@ -212,7 +212,7 @@ void _Cylinder_Construct( void* cylinder, Stg_ComponentFactory* cf, void* data )
 	Axis                 alongAxis        = I_AXIS;
 	char*                perpendicularAxisName    = NULL;
 
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 	
 	radius = Stg_ComponentFactory_GetDouble( cf, self->name, "radius", 0.0 );
 

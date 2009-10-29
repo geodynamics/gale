@@ -115,7 +115,7 @@
 	void* _PolygonShape_Copy( void* polygon, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _PolygonShape_DefaultNew( Name name ) ;
-	void _PolygonShape_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _PolygonShape_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _PolygonShape_Build( void* polygon, void* data ) ;
 	void _PolygonShape_Initialise( void* polygon, void* data ) ;
 	void _PolygonShape_Execute( void* polygon, void* data );

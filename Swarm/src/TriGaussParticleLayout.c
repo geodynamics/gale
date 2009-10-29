@@ -170,7 +170,7 @@ void* _TriGaussParticleLayout_DefaultNew( Name name ) {
 			_TriGaussParticleLayout_Print,
 			_TriGaussParticleLayout_Copy,
 			_TriGaussParticleLayout_DefaultNew,
-			_TriGaussParticleLayout_Construct,
+			_TriGaussParticleLayout_AssignFromXML,
 			_TriGaussParticleLayout_Build,
 			_TriGaussParticleLayout_Initialise,
 			_TriGaussParticleLayout_Execute,
@@ -185,7 +185,7 @@ void* _TriGaussParticleLayout_DefaultNew( Name name ) {
 			0 );
 }
 
-void _TriGaussParticleLayout_Construct( void* triGaussParticleLayout, Stg_ComponentFactory* cf, void* data ){
+void _TriGaussParticleLayout_AssignFromXML( void* triGaussParticleLayout, Stg_ComponentFactory* cf, void* data ){
 	TriGaussParticleLayout *self = (TriGaussParticleLayout*)triGaussParticleLayout;
 	unsigned int dim;
 	unsigned int particlesPerCell;

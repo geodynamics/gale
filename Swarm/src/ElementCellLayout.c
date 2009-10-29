@@ -55,7 +55,7 @@ void* _ElementCellLayout_DefaultNew( Name name ){
 			_ElementCellLayout_Print,
 			_ElementCellLayout_Copy, 
 			_ElementCellLayout_DefaultNew,
-			_ElementCellLayout_Construct,
+			_ElementCellLayout_AssignFromXML,
 			_ElementCellLayout_Build,
 			_ElementCellLayout_Initialise,
 			_ElementCellLayout_Execute,
@@ -79,7 +79,7 @@ ElementCellLayout* ElementCellLayout_New(
 { 
 	return _ElementCellLayout_New( sizeof(ElementCellLayout), ElementCellLayout_Type, _ElementCellLayout_Delete,
 		_ElementCellLayout_Print, _ElementCellLayout_Copy, _ElementCellLayout_DefaultNew,
-		_ElementCellLayout_Construct, _ElementCellLayout_Build, _ElementCellLayout_Initialise,
+		_ElementCellLayout_AssignFromXML, _ElementCellLayout_Build, _ElementCellLayout_Initialise,
 		_ElementCellLayout_Execute, _ElementCellLayout_Destroy, name, True,
 		_ElementCellLayout_CellLocalCount, _ElementCellLayout_CellShadowCount,
 		_ElementCellLayout_PointCount, _ElementCellLayout_InitialisePoints, 
@@ -102,7 +102,7 @@ void ElementCellLayout_Init(
 	self->_print = _ElementCellLayout_Print;
 	self->_copy = _ElementCellLayout_Copy;
 	self->_defaultConstructor = _ElementCellLayout_DefaultNew;
-	self->_construct = _ElementCellLayout_Construct;
+	self->_construct = _ElementCellLayout_AssignFromXML;
 	self->_build = _ElementCellLayout_Build;
 	self->_initialise = _ElementCellLayout_Initialise;
 	self->_execute = _ElementCellLayout_Execute;
@@ -251,7 +251,7 @@ void* _ElementCellLayout_Copy( void* elementCellLayout, void* dest, Bool deep, N
 	return (void*)newElementCellLayout;
 }
 
-void _ElementCellLayout_Construct( void* elementCellLayout, Stg_ComponentFactory *cf, void* data ){
+void _ElementCellLayout_AssignFromXML( void* elementCellLayout, Stg_ComponentFactory *cf, void* data ){
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
 	Mesh*              mesh;
 

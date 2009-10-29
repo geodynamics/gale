@@ -177,7 +177,7 @@ void* _ParticleCommHandler_Copy( void* particleCommHandler, void* dest, Bool dee
 
 }
 
-void _ParticleCommHandler_Construct( void* pCommHandler, Stg_ComponentFactory* cf, void* data ){
+void _ParticleCommHandler_AssignFromXML( void* pCommHandler, Stg_ComponentFactory* cf, void* data ){
 	ParticleCommHandler*	self	= (ParticleCommHandler*)pCommHandler;
 
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );

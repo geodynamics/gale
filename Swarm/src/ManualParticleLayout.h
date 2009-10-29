@@ -91,7 +91,7 @@
 	
 	/* 'Stg_Component' Stuff */
 	void* _ManualParticleLayout_DefaultNew( Name name ) ;
-	void _ManualParticleLayout_Construct( void* manualParticleLayout, Stg_ComponentFactory *cf, void* data );
+	void _ManualParticleLayout_AssignFromXML( void* manualParticleLayout, Stg_ComponentFactory *cf, void* data );
 	void _ManualParticleLayout_Build( void* manualParticleLayout, void* data );
 	void _ManualParticleLayout_Initialise( void* manualParticleLayout, void* data );
 	void _ManualParticleLayout_Execute( void* manualParticleLayout, void* data );

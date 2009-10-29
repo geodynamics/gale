@@ -122,7 +122,7 @@
 
 	void _Mesh_Algorithms_Delete( void* algorithms );
 	void _Mesh_Algorithms_Print( void* algorithms, Stream* stream );
-	void _Mesh_Algorithms_Construct( void* algorithms, Stg_ComponentFactory* cf, void* data );
+	void _Mesh_Algorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf, void* data );
 	void _Mesh_Algorithms_Build( void* algorithms, void* data );
 	void _Mesh_Algorithms_Initialise( void* algorithms, void* data );
 	void _Mesh_Algorithms_Execute( void* algorithms, void* data );

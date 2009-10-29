@@ -134,7 +134,7 @@
 	** General virtual functions
 	*/
 	
-	void				_AllElementsVC_Construct( void* allElementsVC, Stg_ComponentFactory *cf, void* data );
+	void				_AllElementsVC_AssignFromXML( void* allElementsVC, Stg_ComponentFactory *cf, void* data );
 	
 	void				_AllElementsVC_Delete( void* allElementsVC );
 	

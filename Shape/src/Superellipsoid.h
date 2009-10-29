@@ -108,7 +108,7 @@
 	void* _Superellipsoid_Copy( void* superellipsoid, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Superellipsoid_DefaultNew( Name name ) ;
-	void _Superellipsoid_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _Superellipsoid_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _Superellipsoid_Build( void* superellipsoid, void* data ) ;
 	void _Superellipsoid_Initialise( void* superellipsoid, void* data ) ;
 	void _Superellipsoid_Execute( void* superellipsoid, void* data );

@@ -164,7 +164,7 @@ void* _Stg_Shape_Copy( void* shape, void* dest, Bool deep, Name nameExt, PtrMap*
 	return (void*)newStg_Shape;
 }
 
-void _Stg_Shape_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) {
+void _Stg_Shape_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) {
 	Stg_Shape*	    self      = (Stg_Shape*) shape;
 	Dimension_Index dim;
 	Coord           centre;

@@ -89,7 +89,7 @@
 
 	/* Virtual Functions ------------------------------------------------------------------------------------------------*/
 
-	void						_DomainContext_Construct( void* context, Stg_ComponentFactory* cf, void* data );
+	void						_DomainContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data );
 	
 	/* Stg_Class_Delete implementation */
 	void						_DomainContext_Delete( void* context );

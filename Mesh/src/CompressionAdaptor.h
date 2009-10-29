@@ -76,7 +76,7 @@
 
 	void _CompressionAdaptor_Delete( void* adaptor );
 	void _CompressionAdaptor_Print( void* adaptor, Stream* stream );
-	void _CompressionAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data );
+	void _CompressionAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data );
 	void _CompressionAdaptor_Build( void* adaptor, void* data );
 	void _CompressionAdaptor_Initialise( void* adaptor, void* data );
 	void _CompressionAdaptor_Execute( void* adaptor, void* data );

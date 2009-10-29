@@ -98,7 +98,7 @@
 	void* _TriGaussParticleLayout_Copy( void* triGaussParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void* _TriGaussParticleLayout_DefaultNew( Name name );
-	void  _TriGaussParticleLayout_Construct( void* triGaussParticleLayout, Stg_ComponentFactory* cf, void* data );
+	void  _TriGaussParticleLayout_AssignFromXML( void* triGaussParticleLayout, Stg_ComponentFactory* cf, void* data );
 	void  _TriGaussParticleLayout_Build( void* triGaussParticleLayout, void* data );
 	void  _TriGaussParticleLayout_Initialise( void* triGaussParticleLayout, void* data );
 	void  _TriGaussParticleLayout_Execute( void* triGaussParticleLayout, void* data );

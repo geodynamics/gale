@@ -77,7 +77,7 @@ ParallelDelaunay* ParallelDelaunay_DefaultNew( Name name )
 			_ParallelDelaunay_Print,
 			_ParallelDelaunay_Copy,
 			(Stg_Component_DefaultConstructorFunction*)ParallelDelaunay_DefaultNew,
-			_ParallelDelaunay_Construct,
+			_ParallelDelaunay_AssignFromXML,
 			_ParallelDelaunay_Build,
 			_ParallelDelaunay_Initialise,
 			_ParallelDelaunay_Execute,
@@ -112,7 +112,7 @@ ParallelDelaunay* ParallelDelaunay_New(
 			_ParallelDelaunay_Print,
 			_ParallelDelaunay_Copy,
 			(Stg_Component_DefaultConstructorFunction*)ParallelDelaunay_DefaultNew,
-			_ParallelDelaunay_Construct,
+			_ParallelDelaunay_AssignFromXML,
 			_ParallelDelaunay_Build,
 			_ParallelDelaunay_Initialise,
 			_ParallelDelaunay_Execute,
@@ -153,7 +153,7 @@ void ParallelDelaunay_Init(
 	self->_print = _ParallelDelaunay_Print;
 	self->_copy = _ParallelDelaunay_Copy;
 	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)ParallelDelaunay_DefaultNew;
-	self->_construct = _ParallelDelaunay_Construct;
+	self->_construct = _ParallelDelaunay_AssignFromXML;
 	self->_build = _ParallelDelaunay_Build;
 	self->_initialise = _ParallelDelaunay_Initialise;
 	self->_execute = _ParallelDelaunay_Execute;
@@ -307,7 +307,7 @@ void *_ParallelDelaunay_Copy( void* pd, void* dest, Bool deep, Name nameExt, Ptr
 	return NULL;
 }
 
-void _ParallelDelaunay_Construct( void* pd, Stg_ComponentFactory* cf, void* data )
+void _ParallelDelaunay_AssignFromXML( void* pd, Stg_ComponentFactory* cf, void* data )
 {
 	
 }

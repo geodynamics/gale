@@ -185,7 +185,7 @@ void* _WithinShapeParticleLayout_DefaultNew( Name name ) {
 			_WithinShapeParticleLayout_Print,
 			_WithinShapeParticleLayout_Copy,
 			_WithinShapeParticleLayout_DefaultNew,
-			_WithinShapeParticleLayout_Construct,
+			_WithinShapeParticleLayout_AssignFromXML,
 			_WithinShapeParticleLayout_Build,
 			_WithinShapeParticleLayout_Initialise,
 			_WithinShapeParticleLayout_Execute,
@@ -201,11 +201,11 @@ void* _WithinShapeParticleLayout_DefaultNew( Name name ) {
 			NULL /* shape */ );
 }
 
-void _WithinShapeParticleLayout_Construct( void* withinShapeParticleLayout, Stg_ComponentFactory *cf, void* data ) {
+void _WithinShapeParticleLayout_AssignFromXML( void* withinShapeParticleLayout, Stg_ComponentFactory *cf, void* data ) {
 	WithinShapeParticleLayout* self = (WithinShapeParticleLayout*) withinShapeParticleLayout;
 	Stg_Shape*      shape;
 	
-	_SpaceFillerParticleLayout_Construct( self, cf, data );
+	_SpaceFillerParticleLayout_AssignFromXML( self, cf, data );
 
 	shape = Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "shape", Stg_Shape,  True, data ) ;
 

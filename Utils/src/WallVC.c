@@ -79,7 +79,7 @@ WallVC*	WallVC_DefaultNew( Name name )
 		_WallVC_Print, 
 		_WallVC_Copy,
 		(Stg_Component_DefaultConstructorFunction*)WallVC_DefaultNew,
-		_WallVC_Construct,	
+		_WallVC_AssignFromXML,	
 		_WallVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
@@ -118,7 +118,7 @@ WallVC*	WallVC_New(
 		_WallVC_Print, 
 		_WallVC_Copy,
 		(Stg_Component_DefaultConstructorFunction*)WallVC_DefaultNew,
-		_WallVC_Construct,	
+		_WallVC_AssignFromXML,	
 		_WallVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
@@ -162,7 +162,7 @@ void WallVC_Init(
 	self->_print = _WallVC_Print;
 	self->_copy = _WallVC_Copy;
 	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)WallVC_DefaultNew;
-	self->_construct = _WallVC_Construct;
+	self->_construct = _WallVC_AssignFromXML;
 	self->_build = _WallVC_Build;
 	self->_initialise = _VariableCondition_Initialise;
 	self->_execute = _VariableCondition_Execute;
@@ -574,7 +574,7 @@ void _WallVC_Build(  void* wallVC, void* data ) {
 ** Virtual functions
 */
 
-void _WallVC_Construct( void* wallVC, Stg_ComponentFactory* cf, void* data ) {
+void _WallVC_AssignFromXML( void* wallVC, Stg_ComponentFactory* cf, void* data ) {
 	WallVC*			self = (WallVC*)wallVC;
 
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );	

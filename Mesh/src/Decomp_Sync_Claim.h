@@ -89,7 +89,7 @@
 		(Mesh*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	void* _Decomp_Sync_Claim_Copy( void* claim, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _Decomp_Sync_Claim_Construct( void* claim, Stg_ComponentFactory* cf, void* data );
+	void _Decomp_Sync_Claim_AssignFromXML( void* claim, Stg_ComponentFactory* cf, void* data );
 	void _Decomp_Sync_Claim_Build( void* claim, void* data );
 	void _Decomp_Sync_Claim_Initialise( void* claim, void* data );
 	void _Decomp_Sync_Claim_Execute( void* claim, void* data );

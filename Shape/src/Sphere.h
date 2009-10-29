@@ -103,7 +103,7 @@
 	void* _Sphere_Copy( void* sphere, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Sphere_DefaultNew( Name name ) ;
-	void _Sphere_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _Sphere_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _Sphere_Build( void* sphere, void* data ) ;
 	void _Sphere_Initialise( void* sphere, void* data ) ;
 	void _Sphere_Execute( void* sphere, void* data );

@@ -102,7 +102,7 @@
 	
 	/* 'Stg_Component' Stuff */
 	void* _LineParticleLayout_DefaultNew( Name name ) ;
-	void _LineParticleLayout_Construct( void* particleLayout, Stg_ComponentFactory *cf, void* data );
+	void _LineParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data );
 	void _LineParticleLayout_Build( void* particleLayout, void* data );
 	void _LineParticleLayout_Initialise( void* particleLayout, void* data );
 	void _LineParticleLayout_Execute( void* particleLayout, void* data );

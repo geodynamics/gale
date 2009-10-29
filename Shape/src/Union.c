@@ -202,7 +202,7 @@ void* _Union_DefaultNew( Name name ) {
 			_Union_Print,
 			_Union_Copy,
 			_Union_DefaultNew,
-			_Union_Construct,
+			_Union_AssignFromXML,
 			_Union_Build,
 			_Union_Initialise,
 			_Union_Execute,
@@ -214,7 +214,7 @@ void* _Union_DefaultNew( Name name ) {
 }
 
 
-void _Union_Construct( void* combination, Stg_ComponentFactory* cf, void* data ) {
+void _Union_AssignFromXML( void* combination, Stg_ComponentFactory* cf, void* data ) {
 	Union*                  self       = (Union*)combination;
 	Index                   shapeCount;
 	Stg_Shape**             shapeList;
@@ -225,7 +225,7 @@ void _Union_Construct( void* combination, Stg_ComponentFactory* cf, void* data )
 	char*                   nameShape;
 	Stream*                 stream     = Journal_Register( Info_Type, CURR_MODULE_NAME );
 	
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	optionsList = Dictionary_Get( dictionary, "shapes" );
 

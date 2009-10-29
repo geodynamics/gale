@@ -62,7 +62,7 @@ DomainContext* DomainContext_New(
 			_DomainContext_Print,
 			NULL,
 			NULL,
-			_DomainContext_Construct,
+			_DomainContext_AssignFromXML,
 			_AbstractContext_Build,
 			_AbstractContext_Initialise,
 			_AbstractContext_Execute,
@@ -84,7 +84,7 @@ DomainContext* DomainContext_DefaultNew( Name name ) {
 			_DomainContext_Print,
 			NULL,
 			NULL,
-			_DomainContext_Construct,
+			_DomainContext_AssignFromXML,
 			_AbstractContext_Build,
 			_AbstractContext_Initialise,
 			_AbstractContext_Execute,
@@ -162,7 +162,7 @@ void _DomainContext_Init( DomainContext* self ) {
 
 /* Virtual Functions -------------------------------------------------------------------------------------------------------------*/
 
-void _DomainContext_Construct( void* context, Stg_ComponentFactory* cf, void* data ) {
+void _DomainContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data ) {
 	DomainContext* self = (DomainContext*)context;
 
 	/* Check if we have been provided a constant to multiply our calculated dt values by. */
@@ -171,7 +171,7 @@ void _DomainContext_Construct( void* context, Stg_ComponentFactory* cf, void* da
 	self->dim = Dictionary_GetUnsignedInt_WithDefault( self->dictionary, "dim", 2 );
 
 	_DomainContext_Init( self );
-	_AbstractContext_Construct( context, cf, data );
+	_AbstractContext_AssignFromXML( context, cf, data );
 }
 
 void _DomainContext_Delete( void* context ) {

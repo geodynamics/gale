@@ -106,11 +106,11 @@ void _Remesher_Print( void* remesher, Stream* stream ) {
 Remesher* _Remesher_DefaultNew( Name name ) {
    return _Remesher_New( sizeof(Remesher), Remesher_Type, _Remesher_Delete,
                          _Remesher_Print, NULL, (void*(*)(Name))_Remesher_DefaultNew,
-                         _Remesher_Construct, _Remesher_Build, _Remesher_Initialise,
+                         _Remesher_AssignFromXML, _Remesher_Build, _Remesher_Initialise,
                          _Remesher_Execute, _Remesher_Destroy, name, False, NULL );
 }
 
-void _Remesher_Construct( void* remesher, Stg_ComponentFactory* cf, void* data ) {
+void _Remesher_AssignFromXML( void* remesher, Stg_ComponentFactory* cf, void* data ) {
    Remesher*	self = (Remesher*)remesher;
    char*		meshName;
 

@@ -78,7 +78,7 @@
 
 	void _MeshAdaptor_Delete( void* adaptor );
 	void _MeshAdaptor_Print( void* adaptor, Stream* stream );
-	void _MeshAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data );
+	void _MeshAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data );
 	void _MeshAdaptor_Build( void* adaptor, void* data );
 	void _MeshAdaptor_Initialise( void* adaptor, void* data );
 	void _MeshAdaptor_Execute( void* adaptor, void* data );

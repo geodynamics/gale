@@ -109,7 +109,7 @@
 	void* _Union_Copy( void* combination, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Union_DefaultNew( Name name ) ;
-	void _Union_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _Union_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _Union_Build( void* combination, void* data ) ;
 	void _Union_Initialise( void* combination, void* data ) ;
 	void _Union_Execute( void* combination, void* data );

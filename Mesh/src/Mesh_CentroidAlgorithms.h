@@ -78,7 +78,7 @@
 
 	void _Mesh_CentroidAlgorithms_Delete( void* centroidAlgorithms );
 	void _Mesh_CentroidAlgorithms_Print( void* centroidAlgorithms, Stream* stream );
-	void _Mesh_CentroidAlgorithms_Construct( void* centroidAlgorithms, Stg_ComponentFactory* cf, void* data );
+	void _Mesh_CentroidAlgorithms_AssignFromXML( void* centroidAlgorithms, Stg_ComponentFactory* cf, void* data );
 	void _Mesh_CentroidAlgorithms_Build( void* centroidAlgorithms, void* data );
 	void _Mesh_CentroidAlgorithms_Initialise( void* centroidAlgorithms, void* data );
 	void _Mesh_CentroidAlgorithms_Execute( void* centroidAlgorithms, void* data );

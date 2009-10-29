@@ -50,7 +50,7 @@ TriSingleCellLayout* TriSingleCellLayout_DefaultNew( Name name )
 {
 	return (TriSingleCellLayout*)_TriSingleCellLayout_New( sizeof(TriSingleCellLayout), TriSingleCellLayout_Type,
 		_TriSingleCellLayout_Delete, _TriSingleCellLayout_Print, _TriSingleCellLayout_Copy,
-		(Stg_Component_DefaultConstructorFunction*)TriSingleCellLayout_DefaultNew, _TriSingleCellLayout_Construct,
+		(Stg_Component_DefaultConstructorFunction*)TriSingleCellLayout_DefaultNew, _TriSingleCellLayout_AssignFromXML,
 		_TriSingleCellLayout_Build, _TriSingleCellLayout_Initialise, _TriSingleCellLayout_Execute,
 		_TriSingleCellLayout_Destroy, name, False,
 		_TriSingleCellLayout_CellLocalCount, _TriSingleCellLayout_CellShadowCount,
@@ -63,7 +63,7 @@ TriSingleCellLayout* TriSingleCellLayout_DefaultNew( Name name )
 TriSingleCellLayout* TriSingleCellLayout_New( Name name, int dim, Dictionary* dictionary ) { 
 	return _TriSingleCellLayout_New( sizeof(TriSingleCellLayout), TriSingleCellLayout_Type, _TriSingleCellLayout_Delete,
 		_TriSingleCellLayout_Print, _TriSingleCellLayout_Copy,
-		(Stg_Component_DefaultConstructorFunction*)TriSingleCellLayout_DefaultNew, _TriSingleCellLayout_Construct,
+		(Stg_Component_DefaultConstructorFunction*)TriSingleCellLayout_DefaultNew, _TriSingleCellLayout_AssignFromXML,
 		_TriSingleCellLayout_Build, _TriSingleCellLayout_Initialise, _TriSingleCellLayout_Execute,
 		_TriSingleCellLayout_Destroy, name, True,
 		_TriSingleCellLayout_CellLocalCount, _TriSingleCellLayout_CellShadowCount,
@@ -84,7 +84,7 @@ void TriSingleCellLayout_Init( TriSingleCellLayout* self, Name name, int dim, Di
 	self->_print = _TriSingleCellLayout_Print;
 	self->_copy = _TriSingleCellLayout_Copy;
 	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*) TriSingleCellLayout_DefaultNew;
-	self->_construct = _TriSingleCellLayout_Construct;
+	self->_construct = _TriSingleCellLayout_AssignFromXML;
 	self->_build = _TriSingleCellLayout_Build;
 	self->_initialise = _TriSingleCellLayout_Initialise;
 	self->_execute = _TriSingleCellLayout_Execute;
@@ -217,7 +217,7 @@ void* _TriSingleCellLayout_Copy( void* triSingleCellLayout, void* dest, Bool dee
 	return (void*)newTriSingleCellLayout;
 }
 	
-void _TriSingleCellLayout_Construct( void *triSingleCellLayout, Stg_ComponentFactory *cf, void* data ){
+void _TriSingleCellLayout_AssignFromXML( void *triSingleCellLayout, Stg_ComponentFactory *cf, void* data ){
 	TriSingleCellLayout *self = (TriSingleCellLayout*)triSingleCellLayout;
 	Dimension_Index dim = 0;
 

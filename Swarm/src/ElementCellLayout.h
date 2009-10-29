@@ -118,7 +118,7 @@
 	
 	void* _ElementCellLayout_Copy( void* elementCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _ElementCellLayout_Construct( void *elementCellLayout, Stg_ComponentFactory *cf, void* data );
+	void _ElementCellLayout_AssignFromXML( void *elementCellLayout, Stg_ComponentFactory *cf, void* data );
 	
 	void _ElementCellLayout_Build( void *elementCellLayout, void *data );
 	

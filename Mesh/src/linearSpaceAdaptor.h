@@ -91,7 +91,7 @@
 
 	void _LinearSpaceAdaptor_Delete( void* adaptor );
 	void _LinearSpaceAdaptor_Print( void* adaptor, Stream* stream );
-	void _LinearSpaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data );
+	void _LinearSpaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data );
 	void _LinearSpaceAdaptor_Build( void* adaptor, void* data );
 	void _LinearSpaceAdaptor_Initialise( void* adaptor, void* data );
 	void _LinearSpaceAdaptor_Execute( void* adaptor, void* data );

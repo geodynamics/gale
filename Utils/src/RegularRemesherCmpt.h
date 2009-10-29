@@ -85,7 +85,7 @@ void _RegularRemesherCmpt_Init( RegularRemesherCmpt* self );
 void _RegularRemesherCmpt_Delete( void* remesher );
 void _RegularRemesherCmpt_Print( void* remesher, Stream* stream );
 RegularRemesherCmpt* _RegularRemesherCmpt_DefaultNew( Name name );
-void _RegularRemesherCmpt_Construct( void* remesher, Stg_ComponentFactory* cf, void* data );
+void _RegularRemesherCmpt_AssignFromXML( void* remesher, Stg_ComponentFactory* cf, void* data );
 void _RegularRemesherCmpt_Build( void* remesher, void* data );
 void _RegularRemesherCmpt_Initialise( void* remesher, void* data );
 void _RegularRemesherCmpt_Execute( void* remesher, void* data );

@@ -55,7 +55,7 @@ Mesh* Mesh_New( Name name ) {
 			  _Mesh_Print, 
 			  NULL, 
 			  (void* (*)(Name))_Mesh_New, 
-			  _Mesh_Construct, 
+			  _Mesh_AssignFromXML, 
 			  _Mesh_Build, 
 			  _Mesh_Initialise, 
 			  _Mesh_Execute, 
@@ -144,7 +144,7 @@ void _Mesh_Print( void* mesh, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void _Mesh_Construct( void* mesh, Stg_ComponentFactory* cf, void* data ) {
+void _Mesh_AssignFromXML( void* mesh, Stg_ComponentFactory* cf, void* data ) {
 	Mesh*			self = (Mesh*)mesh;
 
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );

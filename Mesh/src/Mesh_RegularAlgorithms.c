@@ -54,7 +54,7 @@ Mesh_RegularAlgorithms* Mesh_RegularAlgorithms_New( Name name ) {
 					    _Mesh_RegularAlgorithms_Print, 
 					    NULL, 
 					    (void* (*)(Name))_Mesh_RegularAlgorithms_New, 
-					    _Mesh_RegularAlgorithms_Construct, 
+					    _Mesh_RegularAlgorithms_AssignFromXML, 
 					    _Mesh_RegularAlgorithms_Build, 
 					    _Mesh_RegularAlgorithms_Initialise, 
 					    _Mesh_RegularAlgorithms_Execute, 
@@ -119,8 +119,8 @@ void _Mesh_RegularAlgorithms_Print( void* algorithms, Stream* stream ) {
 	_Mesh_Algorithms_Print( self, stream );
 }
 
-void _Mesh_RegularAlgorithms_Construct( void* algorithms, Stg_ComponentFactory* cf, void* data ) {
-	_Mesh_Algorithms_Construct( algorithms, cf, data );
+void _Mesh_RegularAlgorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf, void* data ) {
+	_Mesh_Algorithms_AssignFromXML( algorithms, cf, data );
 }
 
 void _Mesh_RegularAlgorithms_Build( void* algorithms, void* data ) {

@@ -71,7 +71,7 @@ ContactVC*	ContactVC_DefaultNew( Name name )
       _WallVC_Print, 
       _WallVC_Copy,
       (Stg_Component_DefaultConstructorFunction*)ContactVC_DefaultNew,
-      _ContactVC_Construct,	
+      _ContactVC_AssignFromXML,	
       _ContactVC_Build,
       _VariableCondition_Initialise,
       _VariableCondition_Execute,
@@ -110,7 +110,7 @@ ContactVC*	ContactVC_New(
       _WallVC_Print, 
       _WallVC_Copy,
       (Stg_Component_DefaultConstructorFunction*)ContactVC_DefaultNew,
-      _ContactVC_Construct,	
+      _ContactVC_AssignFromXML,	
       _ContactVC_Build,
       _VariableCondition_Initialise,
       _VariableCondition_Execute,
@@ -275,7 +275,7 @@ void _ContactVC_Build(  void* wallVC, void* data ) {
 ** Virtual functions
 */
 
-void _ContactVC_Construct( void* wallVC, Stg_ComponentFactory* cf, void* data )
+void _ContactVC_AssignFromXML( void* wallVC, Stg_ComponentFactory* cf, void* data )
 {
 	
 }

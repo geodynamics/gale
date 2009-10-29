@@ -146,7 +146,7 @@ void* _PlaneParticleLayout_DefaultNew( Name name ) {
 			_PlaneParticleLayout_Print,
 			_PlaneParticleLayout_Copy,
 			_PlaneParticleLayout_DefaultNew,
-			_PlaneParticleLayout_Construct,
+			_PlaneParticleLayout_AssignFromXML,
 			_PlaneParticleLayout_Build,
 			_PlaneParticleLayout_Initialise,
 			_PlaneParticleLayout_Execute,
@@ -207,13 +207,13 @@ void* _PlaneParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Na
 }
 
 
-void _PlaneParticleLayout_Construct( void* particleLayout, Stg_ComponentFactory *cf, void* data ){
+void _PlaneParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data ){
 	PlaneParticleLayout* self = (PlaneParticleLayout*) particleLayout;
 	Axis   planeAxis;
 	double planeCoord;
 	char*  planeAxisString;
 	
-	_SpaceFillerParticleLayout_Construct( self, cf, data );
+	_SpaceFillerParticleLayout_AssignFromXML( self, cf, data );
 
 	planeAxisString = Stg_ComponentFactory_GetString( cf, self->name, "planeAxis", "" );
 	planeCoord = Stg_ComponentFactory_GetDouble( cf, self->name, "planeCoord", 0.0 );

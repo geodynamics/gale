@@ -193,7 +193,7 @@ void* _SwarmVariable_DefaultNew( Name name ) {
 			_SwarmVariable_Print,
 			_SwarmVariable_Copy, 
 			_SwarmVariable_DefaultNew,
-			_SwarmVariable_Construct,
+			_SwarmVariable_AssignFromXML,
 			_SwarmVariable_Build, 
 			_SwarmVariable_Initialise, 
 			_SwarmVariable_Execute, 
@@ -204,7 +204,7 @@ void* _SwarmVariable_DefaultNew( Name name ) {
 			name );
 }
 
-void _SwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) {
+void _SwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) {
 	SwarmVariable*	        self         = (SwarmVariable*)swarmVariable;
 	Swarm*                  swarm;
 	Variable*               variable;

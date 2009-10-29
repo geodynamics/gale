@@ -106,7 +106,7 @@
 	void* _ConvexHull_Copy( void* convexHull, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _ConvexHull_DefaultNew( Name name ) ;
-	void _ConvexHull_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _ConvexHull_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _ConvexHull_Build( void* convexHull, void* data ) ;
 	void _ConvexHull_Initialise( void* convexHull, void* data ) ;
 	void _ConvexHull_Execute( void* convexHull, void* data );

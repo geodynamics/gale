@@ -160,7 +160,7 @@
 	** Virtual functions
 	*/
 	
-	void				_WallVC_Construct( void* wallVC, Stg_ComponentFactory* cf, void* data );
+	void				_WallVC_AssignFromXML( void* wallVC, Stg_ComponentFactory* cf, void* data );
 	
 	void				_WallVC_BuildSelf( void* wallVC, void* data );
 	

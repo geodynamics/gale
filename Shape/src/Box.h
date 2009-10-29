@@ -102,7 +102,7 @@
 	void* _Box_Copy( void* box, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Box_DefaultNew( Name name ) ;
-	void _Box_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _Box_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _Box_Build( void* box, void* data ) ;
 	void _Box_Initialise( void* box, void* data ) ;
 	void _Box_Execute( void* box, void* data );

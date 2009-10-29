@@ -191,7 +191,7 @@ void* _BelowPlane_DefaultNew( Name name ) {
 			_BelowPlane_Print,
 			_BelowPlane_Copy,
 			_BelowPlane_DefaultNew,
-			_BelowPlane_Construct,
+			_BelowPlane_AssignFromXML,
 			_BelowPlane_Build,
 			_BelowPlane_Initialise,
 			_BelowPlane_Execute,
@@ -203,14 +203,14 @@ void* _BelowPlane_DefaultNew( Name name ) {
 }
 
 
-void _BelowPlane_Construct( void* belowPlane, Stg_ComponentFactory* cf, void* data ) {
+void _BelowPlane_AssignFromXML( void* belowPlane, Stg_ComponentFactory* cf, void* data ) {
 	BelowPlane*	             self          = (BelowPlane*) belowPlane;
 	double                       offset;
 	XYZ                          minValue;
 	XYZ                          maxValue;
 	XYZ                          width;
 
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	offset = Stg_ComponentFactory_GetDouble( cf, self->name, "offset", 0.5 );
 

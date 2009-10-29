@@ -94,7 +94,7 @@ void StGermain_SingleAttractor_UpdatePositions( DomainContext* context ) {
 }
 
 
-void _StGermain_SingleAttractor_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _StGermain_SingleAttractor_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	DomainContext*   context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
@@ -110,7 +110,7 @@ void* _StGermain_SingleAttractor_DefaultNew( Name name ) {
 	return Codelet_New(
 			StGermain_SingleAttractor_Type,
 			_StGermain_SingleAttractor_DefaultNew,
-			_StGermain_SingleAttractor_Construct,
+			_StGermain_SingleAttractor_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,

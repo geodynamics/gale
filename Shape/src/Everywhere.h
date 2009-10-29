@@ -95,7 +95,7 @@
 	void* _Everywhere_Copy( void* everywhere, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Everywhere_DefaultNew( Name name ) ;
-	void _Everywhere_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _Everywhere_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _Everywhere_Build( void* everywhere, void* data ) ;
 	void _Everywhere_Initialise( void* everywhere, void* data ) ;
 	void _Everywhere_Execute( void* everywhere, void* data );

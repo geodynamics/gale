@@ -253,7 +253,7 @@ void* _SingleCellLayout_DefaultNew( Name name ) {
 			_SingleCellLayout_Print,
 			_SingleCellLayout_Copy,
 			_SingleCellLayout_DefaultNew,
-			_SingleCellLayout_Construct,
+			_SingleCellLayout_AssignFromXML,
 			_SingleCellLayout_Build,
 			_SingleCellLayout_Initialise,
 			_SingleCellLayout_Execute,
@@ -273,7 +273,7 @@ void* _SingleCellLayout_DefaultNew( Name name ) {
 			NULL);
 }
 
-void _SingleCellLayout_Construct( void* singleCellLayout, Stg_ComponentFactory* cf, void* data ){
+void _SingleCellLayout_AssignFromXML( void* singleCellLayout, Stg_ComponentFactory* cf, void* data ){
 	SingleCellLayout* self              = (SingleCellLayout*)singleCellLayout;
 	Bool              dimExists[]       = { False, False, False };
 	Dimension_Index   dim;

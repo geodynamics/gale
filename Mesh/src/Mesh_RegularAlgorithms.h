@@ -80,7 +80,7 @@
 
 	void _Mesh_RegularAlgorithms_Delete( void* algorithms );
 	void _Mesh_RegularAlgorithms_Print( void* algorithms, Stream* stream );
-	void _Mesh_RegularAlgorithms_Construct( void* algorithms, Stg_ComponentFactory* cf, void* data );
+	void _Mesh_RegularAlgorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf, void* data );
 	void _Mesh_RegularAlgorithms_Build( void* algorithms, void* data );
 	void _Mesh_RegularAlgorithms_Initialise( void* algorithms, void* data );
 	void _Mesh_RegularAlgorithms_Execute( void* algorithms, void* data );

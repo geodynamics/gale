@@ -74,7 +74,7 @@ CartesianGenerator* CartesianGenerator_New( Name name ) {
 					_CartesianGenerator_Print, 
 					NULL, 
 					(void* (*)(Name))_CartesianGenerator_New, 
-					_CartesianGenerator_Construct, 
+					_CartesianGenerator_AssignFromXML, 
 					_CartesianGenerator_Build, 
 					_CartesianGenerator_Initialise, 
 					_CartesianGenerator_Execute, 
@@ -182,7 +182,7 @@ void _CartesianGenerator_Print( void* meshGenerator, Stream* stream ) {
 	_MeshGenerator_Print( self, stream );
 }
 
-void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, void* data ) {
+void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactory* cf, void* data ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	Dictionary*		dict;
 	Dictionary_Entry_Value*	tmp;
@@ -215,7 +215,7 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
    context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ) ;
 
 	/* Call parent construct. */
-	_MeshGenerator_Construct( self, cf, data );
+	_MeshGenerator_AssignFromXML( self, cf, data );
 
 	/* Rip out the components structure as a dictionary. */
 	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );

@@ -55,7 +55,7 @@ MeshVariable* MeshVariable_New( Name name ) {
 				  _MeshVariable_Print, 
 				  NULL, 
 				  (void* (*)(Name))_MeshVariable_New, 
-				  _MeshVariable_Construct, 
+				  _MeshVariable_AssignFromXML, 
 				  _MeshVariable_Build, 
 				  _MeshVariable_Initialise, 
 				  _MeshVariable_Execute, 
@@ -121,7 +121,7 @@ void _MeshVariable_Print( void* meshVariable, Stream* stream ) {
 	_Variable_Print( self, stream );
 }
 
-void _MeshVariable_Construct( void* meshVariable, Stg_ComponentFactory* cf, void* data ) {
+void _MeshVariable_AssignFromXML( void* meshVariable, Stg_ComponentFactory* cf, void* data ) {
 	MeshVariable*		self = (MeshVariable*)meshVariable;
 	SizeT			    dataOffsets[]     = { 0 };
 	Variable_DataType	dataTypes[]       = { 0 };		/* Init value later */

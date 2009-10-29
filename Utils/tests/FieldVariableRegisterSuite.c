@@ -83,7 +83,7 @@ void FieldVariableRegisterSuite_TestGetByIndex( FieldVariableRegisterSuiteData* 
 
       for( ii=0; ii < 3; ii++ ) {
          testFVs[ii] = _FieldVariable_New( sizeof(FieldVariable), FieldVariable_Type, _Stg_Component_Delete,
-                        _Stg_Component_Print, NULL, (Stg_Component_DefaultConstructorFunction*)FieldVariable_DefaultNew, _Variable_Construct, _Variable_Build,
+                        _Stg_Component_Print, NULL, (Stg_Component_DefaultConstructorFunction*)FieldVariable_DefaultNew, _Variable_AssignFromXML, _Variable_Build,
                         _Variable_Initialise, _Variable_Execute, _Variable_Destroy, fvNames[ii], True,
                         FieldVariableRegisterSuite_dummyInterpolateValueAt,
                         FieldVariableRegisterSuite_dummyGetMinGlobalValue, FieldVariableRegisterSuite_dummyGetMaxGlobalValue,
@@ -120,7 +120,7 @@ void FieldVariableRegisterSuite_TestGetByName( FieldVariableRegisterSuiteData* d
 
       for( ii=0; ii < 3; ii++ ) {
          testFVs[ii] = _FieldVariable_New( sizeof(FieldVariable), FieldVariable_Type, _Stg_Component_Delete,
-                        _Stg_Component_Print, NULL, (Stg_Component_DefaultConstructorFunction*)FieldVariable_DefaultNew, _Variable_Construct, _Variable_Build,
+                        _Stg_Component_Print, NULL, (Stg_Component_DefaultConstructorFunction*)FieldVariable_DefaultNew, _Variable_AssignFromXML, _Variable_Build,
                         _Variable_Initialise, _Variable_Execute, _Variable_Destroy, fvNames[ii], True,
                         FieldVariableRegisterSuite_dummyInterpolateValueAt,
                         FieldVariableRegisterSuite_dummyGetMinGlobalValue, FieldVariableRegisterSuite_dummyGetMaxGlobalValue,

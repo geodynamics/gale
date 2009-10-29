@@ -175,7 +175,7 @@ void* _GaussBorderParticleLayout_DefaultNew( Name name ) {
 			_GaussBorderParticleLayout_Print, 
 			_GaussBorderParticleLayout_Copy, 
 			_GaussBorderParticleLayout_DefaultNew,
-			_GaussBorderParticleLayout_Construct,
+			_GaussBorderParticleLayout_AssignFromXML,
 			_GaussBorderParticleLayout_Build, 
 			_GaussBorderParticleLayout_Initialise,
 			_GaussBorderParticleLayout_Execute,
@@ -190,7 +190,7 @@ void* _GaussBorderParticleLayout_DefaultNew( Name name ) {
 			NULL    /* particlesPerDim */ );
 }
 
-void _GaussBorderParticleLayout_Construct( void* gaussBorderParticleLayout, Stg_ComponentFactory* cf, void* data ) {
+void _GaussBorderParticleLayout_AssignFromXML( void* gaussBorderParticleLayout, Stg_ComponentFactory* cf, void* data ) {
 	GaussBorderParticleLayout*   self = (GaussBorderParticleLayout*)gaussBorderParticleLayout;
 	Particle_InCellIndex   particlesPerDim[3];
 	Particle_InCellIndex   defaultVal;

@@ -99,7 +99,7 @@ Swarm* Swarm_New(
 			_Swarm_Print,
 			_Swarm_Copy,
 			_Swarm_DefaultNew,
-			_Swarm_Construct,
+			_Swarm_AssignFromXML,
 			_Swarm_Build,
 			_Swarm_Initialise,
 			_Swarm_Execute,
@@ -639,7 +639,7 @@ void* _Swarm_DefaultNew( Name name ) {
 			_Swarm_Print,
 			_Swarm_Copy,
 			_Swarm_DefaultNew,
-			_Swarm_Construct,
+			_Swarm_AssignFromXML,
 			_Swarm_Build, 
 			_Swarm_Initialise,
 			_Swarm_Execute,
@@ -658,7 +658,7 @@ void* _Swarm_DefaultNew( Name name ) {
 		        NULL );			    /* ics */
 }
 
-void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
+void _Swarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	Swarm*                  self                     = (Swarm*)swarm;
 	CellLayout*             cellLayout               = NULL;
 	ParticleLayout*         particleLayout           = NULL;

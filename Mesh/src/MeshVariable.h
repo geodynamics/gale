@@ -80,7 +80,7 @@
 
 	void _MeshVariable_Delete( void* meshVariable );
 	void _MeshVariable_Print( void* meshVariable, Stream* stream );
-	void _MeshVariable_Construct( void* meshVariable, Stg_ComponentFactory* cf, void* data );
+	void _MeshVariable_AssignFromXML( void* meshVariable, Stg_ComponentFactory* cf, void* data );
 	void _MeshVariable_Build( void* meshVariable, void* data );
 	void _MeshVariable_Initialise( void* meshVariable, void* data );
 	void _MeshVariable_Execute( void* meshVariable, void* data );

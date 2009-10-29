@@ -73,7 +73,7 @@ SurfaceAdaptor* SurfaceAdaptor_New( Name name ) {
 				    _SurfaceAdaptor_Print, 
 				    NULL, 
 				    (void* (*)(Name))_SurfaceAdaptor_New, 
-				    _SurfaceAdaptor_Construct, 
+				    _SurfaceAdaptor_AssignFromXML, 
 				    _SurfaceAdaptor_Build, 
 				    _SurfaceAdaptor_Initialise, 
 				    _SurfaceAdaptor_Execute, 
@@ -128,7 +128,7 @@ void _SurfaceAdaptor_Print( void* adaptor, Stream* stream ) {
 	_MeshGenerator_Print( self, stream );
 }
 
-void _SurfaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
+void _SurfaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
 	SurfaceAdaptor*	self = (SurfaceAdaptor*)adaptor;
 	Dictionary*	dict;
 	char*		surfaceType;
@@ -137,7 +137,7 @@ void _SurfaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* d
 	assert( cf );
 
 	/* Call parent construct. */
-	_MeshAdaptor_Construct( self, cf, data );
+	_MeshAdaptor_AssignFromXML( self, cf, data );
 
 	/* Rip out the components structure as a dictionary. */
 	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );

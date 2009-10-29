@@ -157,7 +157,7 @@ void* _LineParticleLayout_DefaultNew( Name name ) {
 			_LineParticleLayout_Print,
 			_LineParticleLayout_Copy,
 			_LineParticleLayout_DefaultNew,
-			_LineParticleLayout_Construct,
+			_LineParticleLayout_AssignFromXML,
 			_LineParticleLayout_Build,
 			_LineParticleLayout_Initialise,
 			_LineParticleLayout_Execute,
@@ -210,7 +210,7 @@ void* _LineParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Nam
 }
 
 
-void _LineParticleLayout_Construct( void* particleLayout, Stg_ComponentFactory *cf, void* data ){
+void _LineParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data ){
 	LineParticleLayout*     self                    = (LineParticleLayout*) particleLayout;
 	Particle_Index          totalInitialParticles;
 	Dimension_Index         dim;

@@ -180,7 +180,7 @@ void* _Box_DefaultNew( Name name ) {
 			_Box_Print,
 			_Box_Copy,
 			_Box_DefaultNew,
-			_Box_Construct,
+			_Box_AssignFromXML,
 			_Box_Build,
 			_Box_Initialise,
 			_Box_Execute,
@@ -192,7 +192,7 @@ void* _Box_DefaultNew( Name name ) {
 }
 
 
-void _Box_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) {
+void _Box_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) {
 	Box*	             self          = (Box*) shape;
 	Dictionary*          dictionary    = Dictionary_GetDictionary( cf->componentDict, self->name );
 	XYZ                  width;
@@ -206,7 +206,7 @@ void _Box_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) {
 	char                 axisLetters[] = {'X','Y','Z'};
 	Dimension_Index      dim_I;
 
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	for ( dim_I = 0 ; dim_I < 3 ; dim_I++ ) {
 		*startCharPtr = axisLetters[ dim_I ];

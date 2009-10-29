@@ -79,7 +79,7 @@ Delaunay* Delaunay_DefaultNew( Name name )
 			_Delaunay_Print,
 			_Delaunay_Copy,
 			(Stg_Component_DefaultConstructorFunction*)Delaunay_DefaultNew,
-			_Delaunay_Construct,
+			_Delaunay_AssignFromXML,
 			_Delaunay_Build,
 			_Delaunay_Initialise,
 			_Delaunay_Execute,
@@ -110,7 +110,7 @@ Delaunay* Delaunay_New(
 			_Delaunay_Print,
 			_Delaunay_Copy,
 			(Stg_Component_DefaultConstructorFunction*)Delaunay_DefaultNew,
-			_Delaunay_Construct,
+			_Delaunay_AssignFromXML,
 			_Delaunay_Build,
 			_Delaunay_Initialise,
 			_Delaunay_Execute,
@@ -147,7 +147,7 @@ void Delaunay_Init(
 	self->_print = _Delaunay_Print;
 	self->_copy = _Delaunay_Copy;
 	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)Delaunay_DefaultNew;
-	self->_construct = _Delaunay_Construct;
+	self->_construct = _Delaunay_AssignFromXML;
 	self->_build = _Delaunay_Build;
 	self->_initialise = _Delaunay_Initialise;
 	self->_execute = _Delaunay_Execute;
@@ -364,7 +364,7 @@ void *_Delaunay_Copy( void* delaunay, void* dest, Bool deep, Name nameExt, PtrMa
 	return NULL;
 }
 
-void _Delaunay_Construct( void* delaunay, Stg_ComponentFactory* cf, void* data )
+void _Delaunay_AssignFromXML( void* delaunay, Stg_ComponentFactory* cf, void* data )
 {
 	Delaunay *self = NULL;
 	Stg_ObjectList* pointerRegister;

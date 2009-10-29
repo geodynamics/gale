@@ -78,7 +78,7 @@ LinearSpaceAdaptor* LinearSpaceAdaptor_New( Name name ) {
 				    _LinearSpaceAdaptor_Print, 
 				    NULL, 
 				    (void* (*)(Name))_LinearSpaceAdaptor_New, 
-				    _LinearSpaceAdaptor_Construct, 
+				    _LinearSpaceAdaptor_AssignFromXML, 
 				    _LinearSpaceAdaptor_Build, 
 				    _LinearSpaceAdaptor_Initialise, 
 				    _LinearSpaceAdaptor_Execute, 
@@ -134,7 +134,7 @@ void _LinearSpaceAdaptor_Print( void* adaptor, Stream* stream ) {
 	_MeshGenerator_Print( self, stream );
 }
 
-void _LinearSpaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
+void _LinearSpaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
 	LinearSpaceAdaptor*	self = (LinearSpaceAdaptor*)adaptor;
 	Dictionary_Entry_Value* optionsList;
 	Dictionary_Entry_Value* optionSet;
@@ -156,7 +156,7 @@ void _LinearSpaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, voi
 	  return;
 
 	/* Call parent construct. */
-	_MeshAdaptor_Construct( self, cf, data );
+	_MeshAdaptor_AssignFromXML( self, cf, data );
 
 	self->minX = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, "minX" ) );
 	self->maxX = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, "maxX" ) );

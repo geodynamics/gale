@@ -54,7 +54,7 @@ Mesh_HexAlgorithms* Mesh_HexAlgorithms_New( Name name ) {
 					_Mesh_HexAlgorithms_Print, 
 					NULL, 
 					(void* (*)(Name))_Mesh_HexAlgorithms_New, 
-					_Mesh_HexAlgorithms_Construct, 
+					_Mesh_HexAlgorithms_AssignFromXML, 
 					_Mesh_HexAlgorithms_Build, 
 					_Mesh_HexAlgorithms_Initialise, 
 					_Mesh_HexAlgorithms_Execute, 
@@ -114,10 +114,10 @@ void _Mesh_HexAlgorithms_Print( void* hexAlgorithms, Stream* stream ) {
 	_Mesh_Algorithms_Print( self, stream );
 }
 
-void _Mesh_HexAlgorithms_Construct( void* hexAlgorithms, Stg_ComponentFactory* cf, void* data ) {
+void _Mesh_HexAlgorithms_AssignFromXML( void* hexAlgorithms, Stg_ComponentFactory* cf, void* data ) {
 
 	Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
-	_Mesh_Algorithms_Construct( self, cf, data );
+	_Mesh_Algorithms_AssignFromXML( self, cf, data );
 }
 
 void _Mesh_HexAlgorithms_Build( void* hexAlgorithms, void* data ) {

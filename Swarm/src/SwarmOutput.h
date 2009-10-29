@@ -109,7 +109,7 @@
 		(SwarmOutput*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
 	void* _SwarmOutput_DefaultNew( Name name );
-	void _SwarmOutput_Construct( void* swarmOutput, Stg_ComponentFactory* cf, void* data ) ;
+	void _SwarmOutput_AssignFromXML( void* swarmOutput, Stg_ComponentFactory* cf, void* data ) ;
 	void _SwarmOutput_Build( void* swarmOutput, void* data ) ;
 	void _SwarmOutput_Initialise( void* swarmOutput, void* data ) ;
 	void _SwarmOutput_Execute( void* swarmOutput, void* data ) ;

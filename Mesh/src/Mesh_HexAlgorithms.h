@@ -77,7 +77,7 @@
 
 	void _Mesh_HexAlgorithms_Delete( void* hexAlgorithms );
 	void _Mesh_HexAlgorithms_Print( void* hexAlgorithms, Stream* stream );
-	void _Mesh_HexAlgorithms_Construct( void* hexAlgorithms, Stg_ComponentFactory* cf, void* data );
+	void _Mesh_HexAlgorithms_AssignFromXML( void* hexAlgorithms, Stg_ComponentFactory* cf, void* data );
 	void _Mesh_HexAlgorithms_Build( void* hexAlgorithms, void* data );
 	void _Mesh_HexAlgorithms_Initialise( void* hexAlgorithms, void* data );
 	void _Mesh_HexAlgorithms_Execute( void* hexAlgorithms, void* data );

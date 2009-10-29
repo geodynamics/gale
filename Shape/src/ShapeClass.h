@@ -117,7 +117,7 @@ Stg_Shape* _Stg_Shape_New( STG_SHAPE_ARGS );
 	void* _Stg_Shape_Copy( void* shape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	/* 'Stg_Component' Virtual Function Implementations */
-	void _Stg_Shape_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _Stg_Shape_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _Stg_Shape_Build( void* shape, void* data ) ;
 	void _Stg_Shape_Initialise( void* shape, void* data ) ;
 	void _Stg_Shape_Execute( void* shape, void* data ) ;

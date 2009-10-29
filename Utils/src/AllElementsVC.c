@@ -69,7 +69,7 @@ AllElementsVC* AllElementsVC_DefaultNew( Name name )
 		_AllElementsVC_Print, 
 		_AllElementsVC_Copy,
 		(Stg_Component_DefaultConstructorFunction*)AllElementsVC_DefaultNew,
-		_AllElementsVC_Construct,
+		_AllElementsVC_AssignFromXML,
 		_AllElementsVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
@@ -108,7 +108,7 @@ AllElementsVC*	AllElementsVC_New(
 		_AllElementsVC_Print, 
 		_AllElementsVC_Copy,
 		(Stg_Component_DefaultConstructorFunction*)AllElementsVC_DefaultNew,
-		_AllElementsVC_Construct,
+		_AllElementsVC_AssignFromXML,
 		_AllElementsVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
@@ -152,7 +152,7 @@ void AllElementsVC_Init(
 	self->_print = _AllElementsVC_Print;
 	self->_copy = _AllElementsVC_Copy;
 	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)AllElementsVC_DefaultNew;
-	self->_construct = _AllElementsVC_Construct,
+	self->_construct = _AllElementsVC_AssignFromXML,
 	self->_build = _AllElementsVC_Build;
 	self->_initialise = _VariableCondition_Initialise;
 	self->_execute = _VariableCondition_Execute;
@@ -267,7 +267,7 @@ void _AllElementsVC_Init(
 /*--------------------------------------------------------------------------------------------------------------------------
 ** General virtual functions
 */
-void _AllElementsVC_Construct( void* allElementsVC, Stg_ComponentFactory *cf, void* data )
+void _AllElementsVC_AssignFromXML( void* allElementsVC, Stg_ComponentFactory *cf, void* data )
 {
 	
 }

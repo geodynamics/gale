@@ -94,7 +94,7 @@ void* _OperatorSwarmVariable_DefaultNew( Name name )
 			_OperatorSwarmVariable_Print,
 			_OperatorSwarmVariable_Copy, 
 			_OperatorSwarmVariable_DefaultNew,
-			_OperatorSwarmVariable_Construct,
+			_OperatorSwarmVariable_AssignFromXML,
 			_OperatorSwarmVariable_Build, 
 			_OperatorSwarmVariable_Initialise, 
 			_OperatorSwarmVariable_Execute,
@@ -121,7 +121,7 @@ OperatorSwarmVariable* OperatorSwarmVariable_New(
 			_OperatorSwarmVariable_Print,
 			_OperatorSwarmVariable_Copy, 
 			_OperatorSwarmVariable_DefaultNew,
-			_OperatorSwarmVariable_Construct,
+			_OperatorSwarmVariable_AssignFromXML,
 			_OperatorSwarmVariable_Build, 
 			_OperatorSwarmVariable_Initialise, 
 			_OperatorSwarmVariable_Execute,
@@ -249,7 +249,7 @@ void* _OperatorSwarmVariable_Copy( void* swarmVariable, void* dest, Bool deep, N
 	return (void*)newOperatorSwarmVariable;
 }
 
-void _OperatorSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) {
+void _OperatorSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) {
 	OperatorSwarmVariable*  self       = (OperatorSwarmVariable*) swarmVariable;
 	Dictionary*             dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 	Dictionary_Entry_Value* list;
@@ -261,7 +261,7 @@ void _OperatorSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory
 	SwarmVariable_Register* swarmVariable_Register;
 
 	/* Call parent's construct function */
-	_SwarmVariable_Construct( self, cf, data );
+	_SwarmVariable_AssignFromXML( self, cf, data );
 	swarmVariable_Register = self->swarm->swarmVariable_Register;
 
 	operatorName = Stg_ComponentFactory_GetString( cf, self->name, "Operator", "" );
@@ -287,7 +287,7 @@ void _OperatorSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory
 				Stg_ComponentFactory_ConstructByName( cf, swarmVariableName, SwarmVariable, True, data );
 	}
 
-	_SwarmVariable_Construct( self, cf, data );
+	_SwarmVariable_AssignFromXML( self, cf, data );
 	_OperatorSwarmVariable_Init( self, operatorName, swarmVariableCount, swarmVariableList );
 
 	Memory_Free( swarmVariableList );

@@ -99,10 +99,10 @@ void _MeshAdaptor_Print( void* adaptor, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void _MeshAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
+void _MeshAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
 	MeshAdaptor*	self = (MeshAdaptor*)adaptor;
 
-	_MeshGenerator_Construct( self, cf, data );
+	_MeshGenerator_AssignFromXML( self, cf, data );
 
 	/* There could be either a generator or a mesh to use as a template.  Prefer the mesh. */
 	self->srcMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "sourceMesh", Mesh, False, data );

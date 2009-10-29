@@ -109,7 +109,7 @@
 	void* _Intersection_Copy( void* intersection, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Intersection_DefaultNew( Name name ) ;
-	void _Intersection_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _Intersection_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _Intersection_Build( void* intersection, void* data ) ;
 	void _Intersection_Initialise( void* intersection, void* data ) ;
 	void _Intersection_Execute( void* intersection, void* data );

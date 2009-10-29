@@ -106,7 +106,7 @@
 
 	void _SurfaceAdaptor_Delete( void* adaptor );
 	void _SurfaceAdaptor_Print( void* adaptor, Stream* stream );
-	void _SurfaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data );
+	void _SurfaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data );
 	void _SurfaceAdaptor_Build( void* adaptor, void* data );
 	void _SurfaceAdaptor_Initialise( void* adaptor, void* data );
 	void _SurfaceAdaptor_Execute( void* adaptor, void* data );

@@ -107,7 +107,7 @@
 	
 	/* 'Stg_Component' Class Info */
 	void* _SingleCellLayout_DefaultNew( Name name );
-	void _SingleCellLayout_Construct( void* singleCellLayout, Stg_ComponentFactory* cf, void* data );
+	void _SingleCellLayout_AssignFromXML( void* singleCellLayout, Stg_ComponentFactory* cf, void* data );
 	void _SingleCellLayout_Build( void* singleCellLayout, void* data );
 	void _SingleCellLayout_Initialise( void* singleCellLayout, void* data );
 	void _SingleCellLayout_Execute( void* singleCellLayout, void* data );
