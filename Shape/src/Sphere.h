@@ -84,14 +84,6 @@
 		Name                                  name );
 	
 	void _Sphere_Init( void* sphere, double radius ) ;
-	void Sphere_InitAll( 
-		void*                                 sphere, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                radius) ;
 
 	/* Stg_Class_Delete Sphere implementation */
 	void _Sphere_Delete( void* sphere );
