@@ -59,14 +59,9 @@ Sphere* Sphere_New(
 {
 	Sphere* self = (Sphere*) _Sphere_DefaultNew( name );
 
-	Sphere_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		radius) ;
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma );
+	_Sphere_Init( self, radius );
+
 	return self;
 }
 
@@ -124,22 +119,6 @@ void _Sphere_Init( void* sphere, double radius ) {
 	self->radiusSquared = radius * radius;
 }
 
-
-void Sphere_InitAll( 
-		void*                                 sphere, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                radius)
-{
-	Sphere* self = (Sphere*)sphere;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma );
-	_Sphere_Init( self, radius );
-}
-	
 
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
@@ -200,7 +179,6 @@ void _Sphere_AssignFromXML( void* sphere, Stg_ComponentFactory* cf, void* data )
 	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	radius = Stg_ComponentFactory_GetDouble( cf, self->name, "radius", 0.0 );
-
 
 	_Sphere_Init( self, radius );
 }
