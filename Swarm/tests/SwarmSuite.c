@@ -192,7 +192,7 @@ void SwarmSuite_TestParticleCoords( SwarmSuiteData* data ) {
 	
 		pcu_filename_expected( "testSwarmOutput.expected", expected_file );
 		pcu_check_fileEq( "testParticleCoords.dat", expected_file );
-		remove( "testPparticleCoords.dat" );
+		remove( "testParticleCoords.dat" );
 	}
 }
 
