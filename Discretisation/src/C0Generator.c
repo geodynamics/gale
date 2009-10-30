@@ -58,7 +58,7 @@ C0Generator* C0Generator_New( Name name ) {
 				 _C0Generator_Build, 
 				 _C0Generator_Initialise, 
 				 _C0Generator_Execute, 
-				 _C0Generator_Destroy, 
+				 NULL, 
 				 name, 
 				 NON_GLOBAL, 
 				 _MeshGenerator_SetDimSize, 

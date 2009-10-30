@@ -58,7 +58,7 @@ Inner2DGenerator* Inner2DGenerator_New( Name name ) {
 				 _Inner2DGenerator_Build, 
 				 _Inner2DGenerator_Initialise, 
 				 _Inner2DGenerator_Execute, 
-				 _Inner2DGenerator_Destroy, 
+				 NULL, 
 				 name, 
 				 NON_GLOBAL, 
 				 _MeshGenerator_SetDimSize, 

@@ -54,7 +54,7 @@ RegularBilinear* RegularBilinear_New( Name name ) {
 			_RegularBilinear_Print, 
 			NULL, 
 			(void* (*)(Name))_RegularBilinear_New, 
-			_RegularBilinear_Construct, 
+			_RegularBilinear_AssignFromXML, 
 			_RegularBilinear_Build, 
 			_RegularBilinear_Initialise, 
 			_RegularBilinear_Execute, 
@@ -112,7 +112,7 @@ void _RegularBilinear_Print( void* elementType, Stream* stream ) {
 	_BilinearElementType_Print( self, stream );
 }
 
-void _RegularBilinear_Construct( void* elementType, Stg_ComponentFactory* cf, void* data ) {
+void _RegularBilinear_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void _RegularBilinear_Build( void* elementType, void* data ) {

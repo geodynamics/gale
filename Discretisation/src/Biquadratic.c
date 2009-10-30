@@ -56,7 +56,7 @@ Biquadratic* Biquadratic_New( Name name ) {
 			_Biquadratic_Print, 
 			NULL, 
 			(void* (*)(Name))_Biquadratic_New, 
-			_Biquadratic_Construct, 
+			_Biquadratic_AssignFromXML, 
 			_Biquadratic_Build, 
 			_Biquadratic_Initialise, 
 			_Biquadratic_Execute, 
@@ -120,7 +120,7 @@ void _Biquadratic_Print( void* elementType, Stream* stream ) {
 	_ElementType_Print( self, stream );
 }
 
-void _Biquadratic_Construct( void* elementType, Stg_ComponentFactory* cf, void* data ) {
+void _Biquadratic_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void _Biquadratic_Build( void* elementType, void* data ) {

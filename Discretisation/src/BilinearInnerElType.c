@@ -66,7 +66,7 @@ void* BilinearInnerElType_DefaultNew( Name name ) {
 			_BilinearInnerElType_Print,
 			NULL, 
 			BilinearInnerElType_DefaultNew,
-			_BilinearInnerElType_Construct,
+			_BilinearInnerElType_AssignFromXML,
 			_BilinearInnerElType_Build,
 			_BilinearInnerElType_Initialise,
 			_BilinearInnerElType_Execute,
@@ -163,7 +163,7 @@ void _BilinearInnerElType_Print( void* elementType, Stream* stream ) {
 	Journal_Printf( stream, ")\n", self );
 }
 
-void _BilinearInnerElType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data ){
+void _BilinearInnerElType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data ){
 	
 }
 	

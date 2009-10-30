@@ -62,11 +62,11 @@ void* ConstantElementType_DefaultNew( Name name ) {
 			_ConstantElementType_Print,
 			NULL, 
 			ConstantElementType_DefaultNew,
-			_ConstantElementType_Construct,
+			_ConstantElementType_AssignFromXML,
 			_ConstantElementType_Build,
 			_ConstantElementType_Initialise,
 			_ConstantElementType_Execute,
-			_ConstantElementType_Destroy, 
+			NULL, 
 			name,
 			NON_GLOBAL,
 			_ConstantElementType_SF_allNodes,
@@ -133,7 +133,7 @@ void _ConstantElementType_Print( void* elementType, Stream* stream ) {
 	/* ConstantElementType info */
 }
 
-void _ConstantElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data ){
+void _ConstantElementType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data ){
 	ConstantElementType* self = (ConstantElementType*)elementType;
 	self->dim = 0;
 }

@@ -67,7 +67,7 @@ void* _BilinearElementType_DefaultNew( Name name ) {
 			_BilinearElementType_Print,
 			NULL, 
 			_BilinearElementType_DefaultNew,
-			_BilinearElementType_Construct,
+			_BilinearElementType_AssignFromXML,
 			_BilinearElementType_Build,
 			_BilinearElementType_Initialise,
 			_BilinearElementType_Execute,
@@ -168,7 +168,7 @@ void _BilinearElementType_Print( void* elementType, Stream* stream ) {
 	Journal_Printf( stream, ")\n", self );
 }
 
-void _BilinearElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data ) {
+void _BilinearElementType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data ) {
 }
 	
 void _BilinearElementType_Initialise( void* elementType, void *data ){

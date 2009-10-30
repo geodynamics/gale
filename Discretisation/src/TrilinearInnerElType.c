@@ -57,7 +57,7 @@ const Type TrilinearInnerElType_Type = "TrilinearInnerElType";
 
 void* TrilinearInnerElType_DefaultNew( Name name ) {
 	return _TrilinearInnerElType_New( sizeof(TrilinearInnerElType), TrilinearInnerElType_Type, _TrilinearInnerElType_Delete,
-		_TrilinearInnerElType_Print, NULL, TrilinearInnerElType_DefaultNew, _TrilinearInnerElType_Construct,
+		_TrilinearInnerElType_Print, NULL, TrilinearInnerElType_DefaultNew, _TrilinearInnerElType_AssignFromXML,
 		_TrilinearInnerElType_Build, _TrilinearInnerElType_Initialise, _TrilinearInnerElType_Execute, NULL,
 		name, NON_GLOBAL, _TrilinearInnerElType_SF_allNodes, 
 		_TrilinearInnerElType_SF_allLocalDerivs_allNodes,
@@ -66,7 +66,7 @@ void* TrilinearInnerElType_DefaultNew( Name name ) {
 }
 
 TrilinearInnerElType* TrilinearInnerElType_New( Name name ) {
-	TrilinearInnerElType* self = TrilinearInnerElType_DefaultNew( self );
+	TrilinearInnerElType* self = TrilinearInnerElType_DefaultNew( name );
 
 	self->isConstructed = True;
 	_TrilinearInnerElType_Init( self );
@@ -143,7 +143,7 @@ void _TrilinearInnerElType_Print( void* elementType, Stream* stream ) {
 	/* TrilinearInnerElType info */
 }
 
-void _TrilinearInnerElType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data ){
+void _TrilinearInnerElType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data ){
 	
 }
 	

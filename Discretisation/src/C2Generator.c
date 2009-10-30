@@ -58,7 +58,7 @@ C2Generator* C2Generator_New( Name name ) {
 				 _C2Generator_Build, 
 				 _C2Generator_Initialise, 
 				 _C2Generator_Execute, 
-				 _C2Generator_Destroy, 
+				 NULL, 
 				 name, 
 				 NON_GLOBAL, 
 				 CartesianGenerator_SetDimSize, 

@@ -57,7 +57,7 @@ const Type LinearTriangleElementType_Type = "LinearTriangleElementType";
 void* LinearTriangleElementType_DefaultNew( Name name ) {
 	return _LinearTriangleElementType_New( sizeof(LinearTriangleElementType), LinearTriangleElementType_Type,
 		_LinearTriangleElementType_Delete, _LinearTriangleElementType_Print, NULL, LinearTriangleElementType_DefaultNew,
-		_LinearTriangleElementType_Construct, _LinearTriangleElementType_Build, _LinearTriangleElementType_Initialise,
+		_LinearTriangleElementType_AssignFromXML, _LinearTriangleElementType_Build, _LinearTriangleElementType_Initialise,
 		_LinearTriangleElementType_Execute, NULL, name, NON_GLOBAL,
 		_LinearTriangleElementType_SF_allNodes, 
 		_LinearTriangleElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
@@ -120,7 +120,7 @@ void _LinearTriangleElementType_Print( void* elementType, Stream* stream ) {
 	/* LinearTriangleElementType info */
 }
 
-void _LinearTriangleElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data ){
+void _LinearTriangleElementType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data ){
 	LinearTriangleElementType* self = (LinearTriangleElementType*)elementType;
 	self->dim = 1;
 }
