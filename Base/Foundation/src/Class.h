@@ -57,7 +57,8 @@
 	#define __Stg_Class \
 		/* General info */ 					\
 		SizeT				_sizeOfSelf;		/**< Size of the final class type */ \
-		Bool				_deleteSelf;		/**< True it is to be deallocated in Delete */ \
+		Bool				_deleteSelf;		/**< True it is to be deallocated in Delete TODO: get rid of this */ \
+		Bool				_isDeleted;		/** is the class deleted yet */ \
 		Type				type;			/**< Global const char* to string of class' name */ \
 		unsigned			nRefs;			/* Reference counting. */ \
 									\

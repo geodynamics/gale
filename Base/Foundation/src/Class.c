@@ -86,16 +86,24 @@ void _Stg_Class_Init( Stg_Class* self ) {
 	
 	/* Stg_Class info */
 	self->nRefs = 0;
+   self->_isDeleted=False; 
 }
 
 void Stg_Class_Delete( void* _class ) {
 	Stg_Class* self = (Stg_Class*)_class;
-	self->_delete( _class );
+
+   //if( self ) self->_delete( _class );
+   if( self->_isDeleted == False ) self->_delete( _class );
 }
 
 void _Stg_Class_Delete( void* _class ) {
 	Stg_Class* self = (Stg_Class*)_class;
 	
+   /* Not 100% sure if it's safe to set the flag here.
+      I'm assuming the _Stg_Class_Delete function is only called once for each Stg_Class 
+      */
+   self->_isDeleted = True;
+
 	if( self->_deleteSelf ) {
 		Memory_CountDec( self );
 
@@ -217,7 +225,8 @@ Type Stg_Class_GetTypeFunc( void* _class ) {
 }
 
 
-void Stg_Class_AddRef( void* _class ) {
+/** Increment the reference counter on the class */
+void Stg_Class_IncRef( void* _class ) {
 	Stg_Class*	self = (Stg_Class*)_class;
 
 	assert( self );
@@ -225,11 +234,13 @@ void Stg_Class_AddRef( void* _class ) {
 	self->nRefs++;
 }
 
-void Stg_Class_RemoveRef( void* _class ) {
+/** Decrement the reference counter on the class */
+void Stg_Class_DecRef( void* _class ) {
 	Stg_Class*	self = (Stg_Class*)_class;
 
 	assert( self );
 
-	if( !(--self->nRefs) )
+	if( !(--self->nRefs) ) {
 		Stg_Class_Delete( self );
+   }
 }
