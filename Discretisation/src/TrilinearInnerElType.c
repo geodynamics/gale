@@ -69,6 +69,7 @@ TrilinearInnerElType* TrilinearInnerElType_New( Name name ) {
 	TrilinearInnerElType* self = TrilinearInnerElType_DefaultNew( name );
 
 	self->isConstructed = True;
+	_ElementType_Init( self, _TrilinearInnerElType_NodeCount );
 	_TrilinearInnerElType_Init( self );
 }
 

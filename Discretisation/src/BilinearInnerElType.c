@@ -85,6 +85,7 @@ BilinearInnerElType* BilinearInnerElType_New( Name name ) {
 	BilinearInnerElType* self = BilinearInnerElType_DefaultNew( name );
 
 	self->isConstructed = True;	
+	_ElementType_Init( self, _BilinearInnerElType_NodeCount );
 	_BilinearInnerElType_Init( self );
 
 	return self;

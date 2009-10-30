@@ -162,92 +162,39 @@ static Bool _FeEquationNumber_IHaveCritPoint(
 /*###### Function Definitions ######*/
 
 /** Public constructor */
-void* FeEquationNumber_DefaultNew( Name name )
-{
+void* FeEquationNumber_DefaultNew( Name name ) {
    return _FeEquationNumber_New( sizeof(FeEquationNumber), FeEquationNumber_Type, _FeEquationNumber_Delete,
-                                 _FeEquationNumber_Print, _FeEquationNumber_Copy,
-                                 (Stg_Component_DefaultConstructorFunction*)FeEquationNumber_DefaultNew,
-                                 _FeEquationNumber_AssignFromXML, (Stg_Component_BuildFunction*)_FeEquationNumber_Build, 
-                                 (Stg_Component_InitialiseFunction*)_FeEquationNumber_Initialise,
-                                 _FeEquationNumber_Execute, _FeEquationNumber_Destroy, name, False, NULL, NULL, NULL, NULL );
+		_FeEquationNumber_Print, _FeEquationNumber_Copy,
+		(Stg_Component_DefaultConstructorFunction*)FeEquationNumber_DefaultNew,
+ 		_FeEquationNumber_AssignFromXML, (Stg_Component_BuildFunction*)_FeEquationNumber_Build, 
+		(Stg_Component_InitialiseFunction*)_FeEquationNumber_Initialise,
+		_FeEquationNumber_Execute, NULL, name, NON_GLOBAL, NULL, NULL, NULL, NULL );
 }
 
 FeEquationNumber* FeEquationNumber_New(
    Name						name,
-   void* 						mesh,
-   DofLayout*					dofLayout,
-   VariableCondition*				bcs,
-   LinkedDofInfo*					linkedDofInfo )
+   void*						mesh,
+   DofLayout*				dofLayout,
+   VariableCondition*	bcs,
+   LinkedDofInfo*			linkedDofInfo )
 {
-   return _FeEquationNumber_New( sizeof(FeEquationNumber), FeEquationNumber_Type, _FeEquationNumber_Delete,
-                                 _FeEquationNumber_Print, _FeEquationNumber_Copy, 
-                                 (Stg_Component_DefaultConstructorFunction*)FeEquationNumber_DefaultNew,
-                                 _FeEquationNumber_AssignFromXML, (Stg_Component_BuildFunction*)_FeEquationNumber_Build, 
-                                 (Stg_Component_InitialiseFunction*)_FeEquationNumber_Initialise,
-                                 _FeEquationNumber_Execute, _FeEquationNumber_Destroy, name, True, mesh, dofLayout, bcs, linkedDofInfo );
-}
+  
+   FeEquationNumber* self = FeEquationNumber_DefaultNew( name );
 
+	self->isConstructed = True;
+	_FeEquationNumber_Init( self, mesh, dofLayout, bcs, linkedDofInfo );
 
-/** Constructor for when the FeEquationNumber is already allocated. */
-void FeEquationNumber_Init(
-   FeEquationNumber*				self, 
-   Name						name,
-   void* 						mesh,
-   DofLayout*					dofLayout,
-   VariableCondition*				bcs,
-   LinkedDofInfo*					linkedDofInfo )
-{
-   /* General info */
-   self->type = FeEquationNumber_Type;
-   self->_sizeOfSelf = sizeof(FeEquationNumber);
-   self->_deleteSelf = False;
-	
-   /* Virtual info */
-   self->_delete = _FeEquationNumber_Delete;
-   self->_print = _FeEquationNumber_Print;
-   self->_copy = _FeEquationNumber_Copy;
-   self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)FeEquationNumber_DefaultNew;
-   self->_construct = _FeEquationNumber_AssignFromXML;
-   self->_build = (Stg_Component_BuildFunction*)_FeEquationNumber_Build;
-   self->_initialise = (Stg_Component_InitialiseFunction*)_FeEquationNumber_Initialise;
-   self->_execute = _FeEquationNumber_Execute;
-   self->_destroy = _FeEquationNumber_Destroy;
-	
-   _Stg_Class_Init( (Stg_Class*)self );
-   _Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-   _Stg_Component_Init( (Stg_Component*)self );
-	
-   /* FeEquationNumber info */
-   _FeEquationNumber_Init( self, mesh, dofLayout, bcs, linkedDofInfo );
+	return self;
 }
 
 
 /** Constructor implementation. */
-FeEquationNumber* _FeEquationNumber_New(
-   SizeT						_sizeOfSelf, 
-   Type						type,
-   Stg_Class_DeleteFunction*				_delete,
-   Stg_Class_PrintFunction*				_print, 
-   Stg_Class_CopyFunction*				_copy, 
-   Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-   Stg_Component_ConstructFunction*			_construct,
-   Stg_Component_BuildFunction*		_build,
-   Stg_Component_InitialiseFunction*		_initialise,
-   Stg_Component_ExecuteFunction*		_execute,
-   Stg_Component_DestroyFunction*		_destroy,
-   Name							name,
-   Bool						initFlag,
-   void*						mesh,
-   DofLayout*					dofLayout,
-   VariableCondition*				bcs,
-   LinkedDofInfo*					linkedDofInfo )
-{
+FeEquationNumber* _FeEquationNumber_New( FEEQUATIONNUMBER_DEFARGS ){
    FeEquationNumber* self;
 	
    /* Allocate memory */
-   assert( _sizeOfSelf >= sizeof(FeEquationNumber) );
-   self = (FeEquationNumber*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor, _construct, _build, 
-                                                 _initialise, _execute, _destroy, name, NON_GLOBAL );
+   assert( sizeOfSelf >= sizeof(FeEquationNumber) );
+   self = (FeEquationNumber*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
 	
    /* General info */
 	
@@ -256,9 +203,6 @@ FeEquationNumber* _FeEquationNumber_New(
    self->_initialise = _initialise;
 	
    /* Mesh info */
-   if( initFlag ){
-      _FeEquationNumber_Init( self, mesh, dofLayout, bcs, linkedDofInfo );
-   }
 	
    return self;
 }

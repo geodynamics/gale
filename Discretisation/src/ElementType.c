@@ -77,12 +77,8 @@ ElementType* _ElementType_New( ELEMENTTYPE_DEFARGS ) {
 	return self;
 }
 
-void _ElementType_Init(
-		ElementType*				self,
-		Index					nodeCount )
-{
+void _ElementType_Init( ElementType* self, Index nodeCount ) {
 	/* General and Virtual info should already be set */
-	
 	self->dim = 0;
 	/* ElementType info */
 	self->isConstructed = True;

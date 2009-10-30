@@ -76,7 +76,6 @@
 	#define BILINEARELEMENTTYPE_PASSARGS \
     	ELEMENTTYPE_PASSARGS
 
-	
 	/* Create a new BilinearElementType and initialise */
 	void* _BilinearElementType_DefaultNew( Name name );
 	

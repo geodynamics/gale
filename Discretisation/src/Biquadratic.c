@@ -81,6 +81,7 @@ Biquadratic* _Biquadratic_New( BIQUADRATIC_DEFARGS ) {
 	/* Virtual info */
 
 	/* Biquadratic info */
+	_ElementType_Init( self, BIQUADRATICNODECOUNT );
 	_Biquadratic_Init( self );
 
 	return self;

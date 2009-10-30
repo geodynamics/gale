@@ -85,43 +85,27 @@ void* SolutionVector_DefaultNew( Name name ) {
 		_SolutionVector_Build, 
 		_SolutionVector_Initialise, 
 		_SolutionVector_Execute, 
-		_SolutionVector_Destroy,
+		NULL,
 		name,
-		False,
+		NON_GLOBAL,
 		MPI_COMM_WORLD, 
 		NULL );
 }
 
-SolutionVector* SolutionVector_New(
-		Name 						name,
-		MPI_Comm					comm,
-		FeVariable*					feVariable )
-{
-	return _SolutionVector_New( 
-		sizeof(SolutionVector), 
-		SolutionVector_Type, 
-		_SolutionVector_Delete,
-		_SolutionVector_Print, 
-		_SolutionVector_Copy,
-		SolutionVector_DefaultNew,
-		_SolutionVector_AssignFromXML,
-		_SolutionVector_Build, 
-		_SolutionVector_Initialise, 
-		_SolutionVector_Execute, 
-		_SolutionVector_Destroy, 
-		name,
-		True,
-		comm, 
-		feVariable );
+SolutionVector* SolutionVector_New( Name name, MPI_Comm comm, FeVariable* feVariable ) {
+	SolutionVector* self = SolutionVector_DefaultNew( name );
+
+	self->isConstructed = True;
+	_SolutionVector_Init( self, comm, feVariable );
 }
 
-
-void SolutionVector_Init(
-		SolutionVector*					self,
-		Name 						name,
-		MPI_Comm					comm,
-		FeVariable*					feVariable )
-{
+SolutionVector* _SolutionVector_New( SOLUTIONVECTOR_DEFARGS ) {
+	SolutionVector* self;
+	
+	/* Allocate memory */
+	assert( sizeOfSelf >= sizeof(SolutionVector) );
+	self = (SolutionVector*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	
 	/* General info */
 	self->type = SolutionVector_Type;
 	self->_sizeOfSelf = sizeof(SolutionVector);
@@ -132,46 +116,6 @@ void SolutionVector_Init(
 	self->_print = _SolutionVector_Print;
 	self->_copy = _SolutionVector_Copy;
 	self->_build = _SolutionVector_Build;
-
-	_Stg_Class_Init( (Stg_Class*)self );
-	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-	_Stg_Component_Init( (Stg_Component*)self );
-
-	_SolutionVector_Init( self, comm, feVariable );
-}
-
-
-SolutionVector* _SolutionVector_New( 
-		SizeT						_sizeOfSelf,
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*		_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name 						name, 
-		Bool						initFlag,
-		MPI_Comm					comm,
-		FeVariable*					feVariable )
-{
-	SolutionVector*		self;
-	
-	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(SolutionVector) );
-	self = (SolutionVector*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor, _construct,
-			_build, _initialise, _execute, _destroy, name, NON_GLOBAL );
-	
-	/* General info */
-	
-	/* Virtual functions */
-	
-	if( initFlag ){
-		_SolutionVector_Init( self, comm, feVariable );
-	}
 	
 	return self;
 }
@@ -184,7 +128,6 @@ void _SolutionVector_Init(
 	/* General and Virtual info should already be set */
 	
 	/* SolutionVector info */
-	self->isConstructed = True;
 	self->debug = Stream_RegisterChild( StgFEM_SLE_SystemSetup_Debug, self->type );
 	self->comm = comm;
 	self->feVariable = feVariable;

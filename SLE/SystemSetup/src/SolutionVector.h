@@ -69,58 +69,34 @@
 		FeVariable*				feVariable; /** need to get # of global unconstrained dofs */\
 
 	struct SolutionVector { __SolutionVector };
+
+	#define SOLUTIONVECTOR_DEFARGS	\
+		STG_COMPONENT_DEFARGS,	\
+		MPI_Comm		comm, \
+		FeVariable*	feVariable
+
+	#define SOLUTIONVECTOR_PASSARGS  \
+      STG_COMPONENT_PASSARGS,    \
+		com, \
+		feVariable
 	
 	/* Creation implementation / Virtual constructor */
 	void* SolutionVector_DefaultNew( Name name );
 
 	SolutionVector* SolutionVector_New(
-		Name						name,
-		MPI_Comm					comm,
-		FeVariable*					feVariable );
+		Name			name,
+		MPI_Comm		comm,
+		FeVariable*	feVariable );
 
-	SolutionVector* SolutionVector_New_FromArray(
-		Name						name,
-		MPI_Comm					comm,
-		FeVariable*					feVariable );
-
-	void SolutionVector_Init(
-		SolutionVector*					self,
-		Name						name,
-		MPI_Comm					comm,
-		FeVariable*					feVariable );
-
-	void SolutionVector_Init_FromArray(
-		SolutionVector*					self,
-		Name						name,
-		MPI_Comm					comm,
-		FeVariable*					feVariable );
-
-
-	SolutionVector* _SolutionVector_New(
-		SizeT						_sizeOfSelf,
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*		_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name						name,
-		Bool						initFlag,
-		MPI_Comm					comm,
-		FeVariable*					feVariable );
+	SolutionVector* _SolutionVector_New( SOLUTIONVECTOR_DEFARGS );
 		
 	void SolutionVector_LoadFromDict( void* solutionVector, Dictionary* subDict, Dictionary* dictionary, Stg_ObjectList* objList );
 
 	/* Initialise implementation */
 	void _SolutionVector_Init( 
-		SolutionVector*					self,
-		MPI_Comm					comm,
-		FeVariable*					feVariable );
-	
+		SolutionVector*	self,
+		MPI_Comm				comm,
+		FeVariable*			feVariable );
 	
 	/* Stg_Class_Delete a ElementType construst */
 	void _SolutionVector_Delete( void* solutionVector );

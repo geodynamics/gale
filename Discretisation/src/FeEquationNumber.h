@@ -138,6 +138,20 @@
 		STree*  			  	bcEqNums;
 
 	struct FeEquationNumber { __FeEquationNumber };
+
+	#define FEEQUATIONNUMBER_DEFARGS	\
+		STG_COMPONENT_DEFARGS,	\
+			void* feMesh,	\
+			DofLayout* dofLayout,	\
+			VariableCondition* bcs, \
+			LinkedDofInfo* linkedDofInfo 	
+
+	#define FEEQUATIONNUMBER_PASSARGS	\
+		STG_COMPONENT_PASSARGS,		\
+			feMesh,	\
+			dofLayout,	\
+			bcs, \
+			linkedDofInfo 	
 	
 	/* +++ Constructors / Destructors +++ */
 	
@@ -152,34 +166,7 @@
 		LinkedDofInfo*					linkedDofInfo );
 	
 	/** Creation implementation */
-	FeEquationNumber* _FeEquationNumber_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool						initFlag,
-		void*						feMesh,
-		DofLayout*					dofLayout,
-		VariableCondition*				bcs,
-		LinkedDofInfo*					linkedDofInfo );
-	
-	
-	/** Initialise a feMesh */
-	void FeEquationNumber_Init( 
-		FeEquationNumber*				self, 
-		Name						name,
-		void*						feMesh,
-		DofLayout*					dofLayout,
-		VariableCondition*				bcs,
-		LinkedDofInfo*					linkedDofInfo );
+	FeEquationNumber* _FeEquationNumber_New( FEEQUATIONNUMBER_DEFARGS );
 	
 	/** Initialisation implementation functions */
 	void _FeEquationNumber_Init( FeEquationNumber* self, 

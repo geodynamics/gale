@@ -68,6 +68,7 @@ LinearTriangleElementType* LinearTriangleElementType_New( Name name ) {
 	LinearTriangleElementType* self = LinearTriangleElementType_DefaultNew( name );\
 
 	self->isConstructed = True;
+	_ElementType_Init( self, _LinearTriangleElementType_NodeCount );
 	_LinearTriangleElementType_Init( self );
 
 	return self;

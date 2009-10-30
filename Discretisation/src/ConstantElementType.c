@@ -81,6 +81,7 @@ ConstantElementType* ConstantElementType_New( Name name ) {
 	ConstantElementType* self = ConstantElementType_DefaultNew( name );
 
 	self->isConstructed = True;	
+	_ElementType_Init( self, _ConstantElementType_NodeCount );
 	_ConstantElementType_Init( self );	
 
 	return self;

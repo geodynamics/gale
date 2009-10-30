@@ -86,7 +86,8 @@ BilinearElementType* BilinearElementType_New( Name name ) {
 	BilinearElementType* self = _BilinearElementType_DefaultNew( name );
 
 	self->isConstructed = True;
-	 _BilinearElementType_Init( self );
+	_ElementType_Init( self, _BilinearElementType_NodeCount );
+	_BilinearElementType_Init( self );
 
 	return self;
 }

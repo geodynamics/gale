@@ -82,6 +82,7 @@ Triquadratic* _Triquadratic_New( TRIQUADRATIC_DEFARGS ) {
 	/* Virtual info */
 
 	/* Triquadratic info */
+	_ElementType_Init( self, TRIQUADRATICNODECOUNT );
 	_Triquadratic_Init( self );
 
 	return self;
