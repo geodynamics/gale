@@ -153,12 +153,20 @@ Index Swarm_Register_Add( Swarm_Register* self, void* swarm )
 
 void Swarm_Register_RemoveIndex( Swarm_Register* self, unsigned int index )
 {
+   int swarm_i = 0;
 	assert( self );
 	/* The third argument controls if the Delete phase is run or not in this function
 	 * KEEP = Don't run delete
 	 * DELETE = Run delete
 	 */
 	_Stg_ObjectList_RemoveByIndex( self->swarmList, index, KEEP );
+
+   /* decrement each swarms own index of where it is in swarm register,
+   this is done because the function _Stg_ObjectList_RemoveByIndex() memmoves
+   the block of memory in the list, with out altering the values within the memory */
+   for( swarm_i = index ; swarm_i < self->swarmList->count ; swarm_i++ ) {
+      ((Swarm*)self->swarmList->data[swarm_i])->swarmReg_I--;
+   }
 }
 	
 Swarm* Swarm_Register_Get( Swarm_Register* self, Name name )
