@@ -124,7 +124,7 @@ void* _AlignmentSwarmVariable_DefaultNew( Name name ) {
 		_SwarmVariable_Copy,
 		_AlignmentSwarmVariable_DefaultNew,
 		_AlignmentSwarmVariable_AssignFromXML,
-		_SwarmVariable_Build,
+		_AlignmentSwarmVariable_Build,
 		_AlignmentSwarmVariable_Initialise,
 		_SwarmVariable_Execute,
 		_SwarmVariable_Destroy,
