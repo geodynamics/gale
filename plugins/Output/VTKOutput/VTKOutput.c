@@ -94,8 +94,8 @@ void VTKOutput( void* _context ) {
         int myRank, nprocs;
         MPI_Comm comm;
 
-	if(context->picIntegrationPoints)
-	    comm = Comm_GetMPIComm( Mesh_GetCommTopology( context->picIntegrationPoints->mesh, MT_VERTEX ) );
+	if(picIntegrationPoints)
+	    comm = Comm_GetMPIComm( Mesh_GetCommTopology( picIntegrationPoints->mesh, MT_VERTEX ) );
 	else
 	    comm = MPI_COMM_WORLD;
 
@@ -108,8 +108,8 @@ void VTKOutput( void* _context ) {
 	
         /* Write the particles and then all of the fields. */
 
-	if(context->picIntegrationPoints) {
-	    VTKOutput_particles(context->picIntegrationPoints,
+	if(picIntegrationPoints) {
+	    VTKOutput_particles(picIntegrationPoints,
 				Dictionary_GetDouble_WithDefault
 				(dictionary,"defaultDiffusivity",1.0),
 				Dictionary_GetInt_WithDefault
