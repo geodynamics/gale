@@ -75,6 +75,8 @@ UnderworldContext* UnderworldContext_New(
 	_FiniteElementContext_Init( self );
 	_PICelleratorContext_Init( self );
 	_UnderworldContext_Init( self );
+
+	return self;
 }	
 
 void* _UnderworldContext_DefaultNew( Name name ) {
