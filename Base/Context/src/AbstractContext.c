@@ -58,66 +58,43 @@
 #endif
 
 /* AbstractContext entry point names */
-Type AbstractContext_EP_AssignFromXML =		        "Context_Construct";
+Type AbstractContext_EP_AssignFromXML =				"Context_Construct";
 Type AbstractContext_EP_AssignFromXMLExtensions = 	"Context_ConstructExtensions";
-Type AbstractContext_EP_Build = 		        "Context_Build";
-Type AbstractContext_EP_Initialise =	     	"Context_Initialise";
-Type AbstractContext_EP_Execute =		        "Context_Execute";
-Type AbstractContext_EP_Destroy =	         	"Context_Destroy";
-Type AbstractContext_EP_DestroyExtensions = 	"Context_DestroyExtensions";
+Type AbstractContext_EP_Build = 							"Context_Build";
+Type AbstractContext_EP_Initialise =					"Context_Initialise";
+Type AbstractContext_EP_Execute =						"Context_Execute";
+Type AbstractContext_EP_Destroy =						"Context_Destroy";
+Type AbstractContext_EP_DestroyExtensions = 			"Context_DestroyExtensions";
 
-Type AbstractContext_EP_Dt =			        "Context_Dt";
-Type AbstractContext_EP_Step =			        "Context_Step";
-Type AbstractContext_EP_UpdateClass =		    "Context_UpdateClass";
-Type AbstractContext_EP_Solve =			        "Context_Solve";
-Type AbstractContext_EP_PostSolvePreUpdate =    "Context_PostSolvePreUpdate";
-Type AbstractContext_EP_Sync =			        "Context_Sync";
-Type AbstractContext_EP_FrequentOutput = 	    "Context_FrequentOutput";
-Type AbstractContext_EP_Dump =			        "Context_Dump";
-Type AbstractContext_EP_DumpClass =		        "Context_DumpClass";
-Type AbstractContext_EP_Save =			        "Context_Save";
-Type AbstractContext_EP_SaveClass =		        "Context_SaveClass";
-Type AbstractContext_EP_DataSave =			     "Context_DataSave";
-Type AbstractContext_EP_DataSaveClass =		  "Context_DataSaveClass";
-
+Type AbstractContext_EP_Dt =								"Context_Dt";
+Type AbstractContext_EP_Step =							"Context_Step";
+Type AbstractContext_EP_UpdateClass =					"Context_UpdateClass";
+Type AbstractContext_EP_Solve =							"Context_Solve";
+Type AbstractContext_EP_PostSolvePreUpdate = 		"Context_PostSolvePreUpdate";
+Type AbstractContext_EP_Sync =							"Context_Sync";
+Type AbstractContext_EP_FrequentOutput = 				"Context_FrequentOutput";
+Type AbstractContext_EP_Dump =							"Context_Dump";
+Type AbstractContext_EP_DumpClass =						"Context_DumpClass";
+Type AbstractContext_EP_Save =							"Context_Save";
+Type AbstractContext_EP_SaveClass =						"Context_SaveClass";
+Type AbstractContext_EP_DataSave =						"Context_DataSave";
+Type AbstractContext_EP_DataSaveClass =				"Context_DataSaveClass";
 
 /* Dictionary entry names */
 const Type AbstractContext_Dict_Components =	"components";
 
-
 /* Class stuff ********************************************************************************************************************/
-
 
 /* Textual name of this class */
 const Type AbstractContext_Type = "Context";
 const Type AbstractContext_Type_Verbose = "Context-verbose";
 
-AbstractContext* _AbstractContext_New(
-		SizeT						_sizeOfSelf,
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*		_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name						name,
-		Bool						initFlag,
-		AbstractContext_SetDt*				_setDt,
-		double						startTime,
-		double						stopTime,
-		MPI_Comm					communicator,
-		Dictionary*					dictionary )
-{
+AbstractContext* _AbstractContext_New( ABSTRACTCONTEXT_DEFARGS ) {
 	AbstractContext* self;
 	
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(AbstractContext) );
-	self = (AbstractContext*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor, _construct, 
-			_build, _initialise, _execute, _destroy, name, NON_GLOBAL );
+	assert( sizeOfSelf >= sizeof(AbstractContext) );
+	self = (AbstractContext*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
 	
 	/* General info */
 	self->dictionary = dictionary;
@@ -128,8 +105,6 @@ AbstractContext* _AbstractContext_New(
 	self->startTime = startTime;
 	self->stopTime = stopTime;
 	self->communicator = communicator;
-	
-	_AbstractContext_Init( self );
 	
 	return self;
 }

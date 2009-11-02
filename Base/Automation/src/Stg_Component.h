@@ -41,21 +41,18 @@
 #define __Base_Automation_Stg_Component_h__
 	
 	/* Templates of virtual functions */
-	typedef void*				(Stg_Component_DefaultConstructorFunction)	( Name name );
-	typedef void				(Stg_Component_ConstructFunction)		( void* component, 
-												  Stg_ComponentFactory* cf,
-												  void* data );
-	typedef void				(Stg_Component_BuildFunction)			( void* component, void* data );
-	typedef void				(Stg_Component_InitialiseFunction)		( void* component, void* data );
-	typedef void				(Stg_Component_ExecuteFunction)			( void* component, void* data );
-	typedef void				(Stg_Component_DestroyFunction)			( void* component, void* data );
+	typedef void* (Stg_Component_DefaultConstructorFunction) ( Name name );
+	typedef void (Stg_Component_ConstructFunction) ( void* component, Stg_ComponentFactory* cf, void* data );
+	typedef void (Stg_Component_BuildFunction) ( void* component, void* data );
+	typedef void (Stg_Component_InitialiseFunction) ( void* component, void* data );
+	typedef void (Stg_Component_ExecuteFunction) ( void* component, void* data );
+	typedef void (Stg_Component_DestroyFunction) ( void* component, void* data );
 
 	/* Prototypes from auto generated meta file functions */ 
 	typedef Dictionary* (Stg_Component_MetaAsDictionaryFunction) ( void );
 	
 	/* Textual name of this class */
 	extern const Type Stg_Component_Type;
-	
 	
 	/* Stg_Component information */
 	#define __Stg_Component \
@@ -64,62 +61,53 @@
 		\
 		/* Virtual info */ \
 		Stg_Component_DefaultConstructorFunction*	_defaultConstructor; \
-		Stg_Component_ConstructFunction*		_construct; \
-		Stg_Component_BuildFunction*			_build; \
-		Stg_Component_InitialiseFunction*		_initialise; \
-		Stg_Component_ExecuteFunction*			_execute; \
-		Stg_Component_DestroyFunction*			_destroy; \
+		Stg_Component_ConstructFunction*				_construct; \
+		Stg_Component_BuildFunction*					_build; \
+		Stg_Component_InitialiseFunction*			_initialise; \
+		Stg_Component_ExecuteFunction*				_execute; \
+		Stg_Component_DestroyFunction*				_destroy; \
 		\
 		/* Stg_Component info */ \
-		Bool					isConstructed; \
-		Bool					isBuilt; \
-		Bool					isInitialised; \
-		Bool					hasExecuted; \
-		Bool					isDestroyed; \
-		Type					constructType; \
-		Type					buildType; \
-		Type					initialiseType; \
-		Type					executeType; \
-		Type					destroyType;
+		Bool	isConstructed; \
+		Bool	isBuilt; \
+		Bool	isInitialised; \
+		Bool	hasExecuted; \
+		Bool	isDestroyed; \
+		Type	constructType; \
+		Type	buildType; \
+		Type	initialiseType; \
+		Type	executeType; \
+		Type	destroyType;
 	struct Stg_Component { __Stg_Component };
 
-	#define STG_COMPONENT_DEFARGS							\
-		STG_CLASS_DEFARGS,							\
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor, 	\
-		Stg_Component_ConstructFunction*		_construct, 		\
-		Stg_Component_BuildFunction*			_build, 		\
-		Stg_Component_InitialiseFunction*		_initialise, 		\
-		Stg_Component_ExecuteFunction*			_execute, 		\
-		Stg_Component_DestroyFunction*			_destroy, 		\
-		Name						name, 			\
-		AllocationType					nameAllocationType
+	#define STG_COMPONENT_DEFARGS \
+		STG_CLASS_DEFARGS, \
+			Stg_Component_DefaultConstructorFunction*	_defaultConstructor, \
+			Stg_Component_ConstructFunction*		_construct, \
+			Stg_Component_BuildFunction*			_build, \
+			Stg_Component_InitialiseFunction*	_initialise, \
+			Stg_Component_ExecuteFunction*		_execute, \
+			Stg_Component_DestroyFunction*		_destroy, \
+			Name											name, \
+			AllocationType								nameAllocationType
 
-	#define STG_COMPONENT_PASSARGS						\
-		STG_CLASS_PASSARGS, _defaultConstructor, _construct, 		\
-		_build, _initialise, _execute, NULL,                            \
-		name, nameAllocationType
+	#define STG_COMPONENT_PASSARGS \
+		STG_CLASS_PASSARGS, \
+			_defaultConstructor, \
+			_construct, \
+			_build, \
+			_initialise, \
+			_execute, \
+			 NULL, \
+			name, \
+			nameAllocationType
 	
 	/* No Stg_Component_New or Stg_Component_Init as this is an abstract class */
 	
 	/* Creation implementation */
-	Stg_Component* _Stg_Component_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*		_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name						name,
-		AllocationType					nameAllocationType );
-	
+	Stg_Component* _Stg_Component_New( STG_COMPONENT_DEFARGS );
 	
 	/* Class Administration members ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-	
 	
 	/* Initialisation implementation */
 	void _Stg_Component_Init( Stg_Component* self );
