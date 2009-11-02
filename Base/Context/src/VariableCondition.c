@@ -51,40 +51,12 @@ const Type VariableCondition_Type = "VariableCondition";
 ** Constructor
 */
 
-VariableCondition* _VariableCondition_New( 
-			SizeT						_sizeOfSelf, 
-			Type						type,
-			Stg_Class_DeleteFunction*				_delete,
-			Stg_Class_PrintFunction*				_print, 
-			Stg_Class_CopyFunction*				_copy, 
-			Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-			Stg_Component_ConstructFunction*		_construct,
-			Stg_Component_BuildFunction*			_build,
-			Stg_Component_InitialiseFunction*			_initialise,
-			Stg_Component_ExecuteFunction*			_execute,
-			Stg_Component_DestroyFunction*		_destroy,
-			Name							name,
-			Bool							initFlag,
-			VariableCondition_BuildSelfFunc*		_buildSelf, 
-			VariableCondition_PrintConciseFunc*		_printConcise,
-			VariableCondition_ReadDictionaryFunc*		_readDictionary,
-			VariableCondition_GetSetFunc*			_getSet,
-			VariableCondition_GetVariableCountFunc		_getVariableCount,
-			VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-			VariableCondition_GetValueIndexFunc*		_getValueIndex,
-			VariableCondition_GetValueCountFunc*		_getValueCount,
-			VariableCondition_GetValueFunc*			_getValue,
-			VariableCondition_ApplyFunc*			_apply, 
-			Variable_Register*				variable_Register,
-			ConditionFunction_Register*			conFunc_Register,
-			Dictionary*					dictionary )
-{
+VariableCondition* _VariableCondition_New( VARIABLECONDITION_DEFARGS ) {
 	VariableCondition*	self;
 	
 	/* Allocate memory/General info */
-	assert(_sizeOfSelf >= sizeof(VariableCondition));
-	self = (VariableCondition*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy,  _defaultConstructor, 
-						       _construct, _build, _initialise, _execute, _destroy, name, NON_GLOBAL );
+	assert( sizeOfSelf >= sizeof(VariableCondition) );
+	self = (VariableCondition*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
 	
 	/* Virtual info */
 	self->_buildSelf = _buildSelf;
@@ -99,19 +71,16 @@ VariableCondition* _VariableCondition_New(
 	self->_apply = _apply;
 	
 	/* Stg_Class info */
-	if( initFlag ){
-		_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
-	}
 	
 	return self;
 }
 
 
 void _VariableCondition_Init(
-		void*				variableCondition, 
-		Variable_Register*		variable_Register, 
-		ConditionFunction_Register*	conFunc_Register,
-		Dictionary*			dictionary )
+	void*									variableCondition, 
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register,
+	Dictionary*							dictionary )
 {
 	VariableCondition*	self = (VariableCondition*)variableCondition;
 	
@@ -128,7 +97,6 @@ void _VariableCondition_Init(
 	self->valueTbl = NULL;
 	self->mapping = NULL;
 }
-
 
 /*--------------------------------------------------------------------------------------------------------------------------
 ** General virtual functions

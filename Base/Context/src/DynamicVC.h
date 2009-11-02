@@ -51,129 +51,103 @@ extern const Type DynamicVC_Type;
 
 	struct DynamicVC { __DynamicVC };
 
-/*--------------------------------------------------------------------------------------------------------------------------
-** Constructor
-*/
+	#define DYNAMICVC_DEFARGS \
+    	VARIABLECONDITION_DEFARGS
 
-VariableCondition* DynamicVC_Factory( Variable_Register* varReg, 
-				      ConditionFunction_Register* conFuncReg, 
-				      Dictionary* dict, 
-				      void* data );
+	#define DYNAMICVC_PASSARGS \
+    	VARIABLECONDITION_PASSARGS
 
-DynamicVC* DynamicVC_New( Name name,
-			  Variable_Register* varReg, 
-			  ConditionFunction_Register* conFuncReg, 
-			  Dictionary* dict );
+	/*--------------------------------------------------------------------------------------------------------------------------
+	** Constructor
+	*/
 
-DynamicVC* DynamicVC_DefaultNew( Name name );
+	VariableCondition* DynamicVC_Factory( Variable_Register* varReg, 
+		ConditionFunction_Register*	conFuncReg, 
+		Dictionary*							dict, 
+		void*									data );
 
-void DynamicVC_Init( DynamicVC* self,
-		     Name name,
-		     Variable_Register* varReg, 
-		     ConditionFunction_Register* conFuncReg, 
-		     Dictionary* dict );
+	DynamicVC* DynamicVC_New( Name name,
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register,
+		Dictionary*							dict );
+
+	DynamicVC* DynamicVC_DefaultNew( Name name );
+
+	DynamicVC* _DynamicVC_New( DYNAMICVC_DEFARGS );
+
+	void _DynamicVC_Init( void* vc );
+
+	/*--------------------------------------------------------------------------------------------------------------------------
+	** General virtual functions
+	*/
 	
-DynamicVC* _DynamicVC_New( SizeT _sizeOfSelf, 
-			   Type type,
-			   Stg_Class_DeleteFunction* _delete,
-			   Stg_Class_PrintFunction* _print,
-			   Stg_Class_CopyFunction* _copy, 
-			   Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-			   Stg_Component_ConstructFunction* _construct,
-			   Stg_Component_BuildFunction* _build,
-			   Stg_Component_InitialiseFunction* _initialise,
-			   Stg_Component_ExecuteFunction* _execute,
-			   Stg_Component_DestroyFunction* _destroy,
-			   Name name,
-			   Bool initFlag,
-			   VariableCondition_BuildSelfFunc* _buildSelf, 
-			   VariableCondition_PrintConciseFunc* _printConcise,
-			   VariableCondition_ReadDictionaryFunc* _readDictionary,
-			   VariableCondition_GetSetFunc* _getSet,
-			   VariableCondition_GetVariableCountFunc* _getVariableCount,
-			   VariableCondition_GetVariableIndexFunc* _getVariableIndex,
-			   VariableCondition_GetValueIndexFunc* _getValueIndex,
-			   VariableCondition_GetValueCountFunc* _getValueCount,
-			   VariableCondition_GetValueFunc* _getValue,
-			   VariableCondition_ApplyFunc* _apply, 
-			   Variable_Register* varReg, 
-			   ConditionFunction_Register* conFuncReg, 
-			   Dictionary* dict );
+	void _DynamicVC_Delete( void* vc );
+	void _DynamicVC_Print( void* vc, Stream* stream );
 
-void _DynamicVC_Init( void* vc );
+	/* Copy */
+	#define DynamicVC_Copy( self )						\
+		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
+	#define DynamicVC_Copy( self )						\
+		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 
-/*--------------------------------------------------------------------------------------------------------------------------
-** General virtual functions
-*/
-	
-void _DynamicVC_Delete( void* vc );
-void _DynamicVC_Print( void* vc, Stream* stream );
+	void* _DynamicVC_Copy( void* vc, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 
-/* Copy */
-#define DynamicVC_Copy( self )						\
-	(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
-#define DynamicVC_Copy( self )						\
-	(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
+	void _DynamicVC_AssignFromXML( void* vc, Stg_ComponentFactory* cf, void* data );
 
-void* _DynamicVC_Copy( void* vc, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void _DynamicVC_Build( void* vc, void* data );
 
-void _DynamicVC_AssignFromXML( void* vc, Stg_ComponentFactory* cf, void* data );
+	void _DynamicVC_Initialise( void* vc, void* data );
 
-void _DynamicVC_Build( void* vc, void* data );
+	void _DynamicVC_Execute( void* vc, void* data );
 
-void _DynamicVC_Initialise( void* vc, void* data );
+	void _DynamicVC_Destroy( void* vc, void* data );
 
-void _DynamicVC_Execute( void* vc, void* data );
+	void _DynamicVC_ReadDictionary( void* vc, void* dict );
 
-void _DynamicVC_Destroy( void* vc, void* data );
+	/*--------------------------------------------------------------------------------------------------------------------------
+	** Macros
+	*/
 
-void _DynamicVC_ReadDictionary( void* vc, void* dict );
+	/*--------------------------------------------------------------------------------------------------------------------------
+	** Virtual functions
+	*/
 
-/*--------------------------------------------------------------------------------------------------------------------------
-** Macros
-*/
+	void _DynamicVC_ReadDictionary( void* vc, void* dict );
 
-/*--------------------------------------------------------------------------------------------------------------------------
-** Virtual functions
-*/
+	IndexSet* _DynamicVC_GetSet( void* vc );
 
-void _DynamicVC_ReadDictionary( void* vc, void* dict );
+	VariableCondition_VariableIndex _DynamicVC_GetVariableCount( void* vc, Index globalIndex );
 
-IndexSet* _DynamicVC_GetSet( void* vc );
+	Variable_Index _DynamicVC_GetVariableIndex( void* vc,
+		Index globalIndex, 
+		VariableCondition_VariableIndex varIndex );
 
-VariableCondition_VariableIndex _DynamicVC_GetVariableCount( void* vc, Index globalIndex );
+	VariableCondition_ValueIndex _DynamicVC_GetValueIndex( void* vc, 
+		Index globalIndex, 
+		VariableCondition_VariableIndex varIndex );
 
-Variable_Index _DynamicVC_GetVariableIndex( void* vc,
-					    Index globalIndex, 
-					    VariableCondition_VariableIndex varIndex );
+	VariableCondition_ValueIndex _DynamicVC_GetValueCount( void* vc );
 
-VariableCondition_ValueIndex _DynamicVC_GetValueIndex( void* vc, 
-						       Index globalIndex, 
-						       VariableCondition_VariableIndex varIndex );
+	VariableCondition_Value _DynamicVC_GetValue( void* vc, VariableCondition_ValueIndex valIndex );
 
-VariableCondition_ValueIndex _DynamicVC_GetValueCount( void* vc );
+	void _DynamicVC_PrintConcise( void* vc, Stream* stream );
 
-VariableCondition_Value _DynamicVC_GetValue( void* vc, VariableCondition_ValueIndex valIndex );
+	void DynamicVC_Apply( void* vc, void* ctx );
 
-void _DynamicVC_PrintConcise( void* vc, Stream* stream );
+	/*--------------------------------------------------------------------------------------------------------------------------
+	** Build functions
+	*/
 
-void DynamicVC_Apply( void* vc, void* ctx );
+	/*--------------------------------------------------------------------------------------------------------------------------
+	** Functions
+	*/
 
-/*--------------------------------------------------------------------------------------------------------------------------
-** Build functions
-*/
-
-/*--------------------------------------------------------------------------------------------------------------------------
-** Functions
-*/
-
-void DynamicVC_SetVariable( void* vc, Variable* var );
-void DynamicVC_SetMaxEntries( void* vc, int maxEntries );
-int DynamicVC_GetMaxEntries( void* vc );
-void DynamicVC_SetValues( void* vc, int nVals, VariableCondition_Value* vals );
-void DynamicVC_Insert( void* vc, int index, int valIndex );
-void DynamicVC_Remove( void* vc, int index );
-Bool DynamicVC_Has( void* _self, int index );
-
+	void DynamicVC_SetVariable( void* vc, Variable* var );
+	void DynamicVC_SetMaxEntries( void* vc, int maxEntries );
+	int DynamicVC_GetMaxEntries( void* vc );
+	void DynamicVC_SetValues( void* vc, int nVals, VariableCondition_Value* vals );
+	void DynamicVC_Insert( void* vc, int index, int valIndex );
+	void DynamicVC_Remove( void* vc, int index );
+	Bool DynamicVC_Has( void* _self, int index );
 
 #endif /* __Base_Automation_DynamicVC_h__ */

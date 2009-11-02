@@ -38,9 +38,7 @@
 #ifndef __Base_Automation_CompositeVC_h__
 #define __Base_Automation_CompositeVC_h__
 	
-	
 	extern const Type CompositeVC_Type;
-	
 	
 	#define __CompositeVC \
 		/* General info */ \
@@ -49,88 +47,65 @@
 		/* Virtual info */ \
 		\
 		/* Stg_Class info */ \
-		CompositeVC_ItemIndex		itemCount; \
+		CompositeVC_ItemIndex	itemCount; \
 		VariableCondition**		itemTbl; \
-                int nIndepItems;                         \
-                VariableCondition** indepItems;          \
-		Bool*				iOwnTbl; \
-		SizeT				_size; \
-		SizeT				_delta; \
-		void*				data; \
-		IndexSet**			attachedSets; \
-		Bool				hasReadDictionary;
+		int							nIndepItems;	\
+   	VariableCondition**		indepItems; \
+		Bool*							iOwnTbl; \
+		SizeT							_size; \
+		SizeT							_delta; \
+		void*							data; \
+		IndexSet**					attachedSets; \
+		Bool							hasReadDictionary;
 	
 	struct _CompositeVC { __CompositeVC };
 	
-	
+	#define COMPOSITEVC_DEFARGS \
+    	VARIABLECONDITION_DEFARGS
+
+	#define COMPOSITEVC_PASSARGS \
+    	VARIABLECONDITION_PASSARGS
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
-	VariableCondition*		CompositeVC_Factory(
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register,
-						Dictionary*					dictionary,
-						void*						data );
+	VariableCondition* CompositeVC_Factory(
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register,
+		Dictionary*							dictionary,
+		void*									data );
 	
-	CompositeVC*			CompositeVC_New(
-						Name						name,
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register,
-						Dictionary*					dictionary,
-						void*						data );
+	CompositeVC* CompositeVC_New(
+		Name									name,
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register,
+		Dictionary*							dictionary,
+		void*									data );
 	
-	CompositeVC*			CompositeVC_DefaultNew( Name name );
+	CompositeVC* CompositeVC_DefaultNew( Name name );
 	
-	void				CompositeVC_Init(
-						CompositeVC*					self, 
-						Name						name,
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register,
-						Dictionary*					dictionary,
-						void*						data );
+	void CompositeVC_Init(
+		CompositeVC*						self, 
+		Name									name,
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register,
+		Dictionary*							dictionary,
+		void*									data );
 	
-	CompositeVC*			_CompositeVC_New( 
-						SizeT						_sizeOfSelf, 
-						Type						type,
-						Stg_Class_DeleteFunction*			_delete,
-						Stg_Class_PrintFunction*			_print,
-						Stg_Class_CopyFunction*				_copy, 
-						Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-						Stg_Component_ConstructFunction*		_construct,
-						Stg_Component_BuildFunction*			_build,
-						Stg_Component_InitialiseFunction*		_initialise,
-						Stg_Component_ExecuteFunction*			_execute,
-						Stg_Component_DestroyFunction*			_destroy,
-						Name						name,
-						Bool						initFlag,
-						VariableCondition_BuildSelfFunc*		_buildSelf, 
-						VariableCondition_PrintConciseFunc*		_printConcise,
-						VariableCondition_ReadDictionaryFunc*		_readDictionary,
-						VariableCondition_GetSetFunc*			_getSet,
-						VariableCondition_GetVariableCountFunc		_getVariableCount,
-						VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-						VariableCondition_GetValueIndexFunc*		_getValueIndex,
-						VariableCondition_GetValueCountFunc*		_getValueCount,
-						VariableCondition_GetValueFunc*			_getValue,
-						VariableCondition_ApplyFunc*			_apply, 
-						Variable_Register*				variable_Register,
-						ConditionFunction_Register*			conFunc_Register,
-						Dictionary*					dictionary,
-						void*						data );
+	CompositeVC* _CompositeVC_New( COMPOSITEVC_DEFARGS );
 	
-	void				_CompositeVC_Init(
-						void*						compositeVC,
-						void*						data );
-	
+	void _CompositeVC_Init(
+		void* compositeVC,
+		void* data );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** General virtual functions
 	*/
 	
-	void				_CompositeVC_Delete( void* compositeVC );
+	void _CompositeVC_Delete( void* compositeVC );
 	
-	void				_CompositeVC_Print( void* compositeVC, Stream* stream );
+	void _CompositeVC_Print( void* compositeVC, Stream* stream );
 	
 	/* Copy */
 	#define CompositeVC_Copy( self ) \
@@ -140,48 +115,45 @@
 	
 	void* _CompositeVC_Copy( void* compositeVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
-	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Macros
 	*/
-	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
 	*/
 	
-	void				_CompositeVC_Build( void* compositeVC, void* data );
+	void _CompositeVC_Build( void* compositeVC, void* data );
 	
-	void				_CompositeVC_AssignFromXML( void* compositeVC, Stg_ComponentFactory* cf, void* data );
+	void _CompositeVC_AssignFromXML( void* compositeVC, Stg_ComponentFactory* cf, void* data );
 	
-	void				_CompositeVC_ReadDictionary( void* compositeVC, void* dictionary );
+	void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary );
 	
-	IndexSet*			_CompositeVC_GetSet( void* compositeVC );
+	IndexSet* _CompositeVC_GetSet( void* compositeVC );
 	
 	VariableCondition_VariableIndex	_CompositeVC_GetVariableCount( void* compositeVC, Index globalIndex );
 	
-	Variable_Index			_CompositeVC_GetVariableIndex(
-						void*				compositeVC, 
-						Index				globalIndex, 
-						VariableCondition_VariableIndex	varIndex );
+	Variable_Index _CompositeVC_GetVariableIndex(
+		void*										compositeVC, 
+		Index										globalIndex, 
+		VariableCondition_VariableIndex	varIndex );
 	
-	VariableCondition_ValueIndex	_CompositeVC_GetValueIndex(
-						void*				compositeVC, 
-						Index				globalIndex, 
-						VariableCondition_VariableIndex	varIndex );
+	VariableCondition_ValueIndex _CompositeVC_GetValueIndex(
+		void*										compositeVC, 
+		Index										globalIndex, 
+		VariableCondition_VariableIndex	varIndex );
 	
 	VariableCondition_ValueIndex	_CompositeVC_GetValueCount( void* compositeVC );
 	
-	VariableCondition_Value		_CompositeVC_GetValue( void* compositeVC, VariableCondition_ValueIndex valIndex );
+	VariableCondition_Value _CompositeVC_GetValue( void* compositeVC, VariableCondition_ValueIndex valIndex );
 	
-	void				_CompositeVC_PrintConcise( void* variableCondition, Stream* stream );
+	void _CompositeVC_PrintConcise( void* variableCondition, Stream* stream );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Build functions
 	*/
 	
-	CompositeVC_ItemIndex		CompositeVC_Add( void* compositeVC, void* variableCondition, Bool iOwn );
-	
+	CompositeVC_ItemIndex CompositeVC_Add( void* compositeVC, void* variableCondition, Bool iOwn );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Functions

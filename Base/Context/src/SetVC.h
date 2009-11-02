@@ -37,16 +37,13 @@
 #ifndef __Base_Automation_SetVC_h__
 #define __Base_Automation_SetVC_h__
 	
-
 	extern const Type SetVC_Type;
 	
-	
 	#define __SetVC_Entry \
-		Name				varName; \
-		VariableCondition_Value		value; \
+		Name							varName; \
+		VariableCondition_Value	value; \
 		
 	struct _SetVC_Entry { __SetVC_Entry };
-	
 	
 	#define __SetVC \
 		/* General info */ \
@@ -55,80 +52,51 @@
 		/* Virtual info */ \
 		\
 		/* Stg_Class info */ \
-		Name				_dictionaryEntryName; \
-		SetVC_Entry_Index		_entryCount; \
-		SetVC_Entry*			_entryTbl; \
+		Name					_dictionaryEntryName; \
+		SetVC_Entry_Index	_entryCount; \
+		SetVC_Entry*		_entryTbl; \
 		IndexSet*			_vcset;
 
 	struct _SetVC { __SetVC };
-	
+
+	#define SETVC_DEFARGS \
+    	VARIABLECONDITION_DEFARGS, \
+			Name _dictionaryEntryName 
+
+	#define SETVC_PASSARGS \
+    	VARIABLECONDITION_PASSARGS, \
+			_dictionaryEntryName
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
-	VariableCondition*		SetVC_Factory(
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register, 
-						Dictionary*					dictionary,
-						void*						data );
+	VariableCondition* SetVC_Factory(
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register, 
+		Dictionary*							dictionary,
+		void*									data );
 	
-	SetVC*				SetVC_New(
-						Name						name,
-						Name						_dictionaryEntryName, 
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register,
-						Dictionary*					dictionary );
+	SetVC* SetVC_New(
+		Name									name,
+		Name									_dictionaryEntryName, 
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register,
+		Dictionary*							dictionary );
 	
-	SetVC*				SetVC_DefaultNew( Name name );
+	SetVC* SetVC_DefaultNew( Name name );
 	
-	void				SetVC_Init(
-						SetVC*						self,
-						Name						name,
-						Name						_dictionaryEntryName, 
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register,
-						Dictionary*					dictionary );
+	SetVC* _SetVC_New( SETVC_DEFARGS );
 	
-	SetVC*				_SetVC_New( 
-						SizeT						_sizeOfSelf, 
-						Type						type,
-						Stg_Class_DeleteFunction*				_delete,
-						Stg_Class_PrintFunction*				_print,
-						Stg_Class_CopyFunction*				_copy, 
-						Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-						Stg_Component_ConstructFunction*		_construct,
-						Stg_Component_BuildFunction*			_build,
-						Stg_Component_InitialiseFunction*			_initialise,
-						Stg_Component_ExecuteFunction*			_execute,
-						Stg_Component_DestroyFunction*		_destroy,
-						Name							name,
-						Bool							initFlag,
-						VariableCondition_BuildSelfFunc*		_buildSelf, 
-						VariableCondition_PrintConciseFunc*		_printConcise,
-						VariableCondition_ReadDictionaryFunc*		_readDictionary,
-						VariableCondition_GetSetFunc*			_getSet,
-						VariableCondition_GetVariableCountFunc*		_getVariableCount,
-						VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-						VariableCondition_GetValueIndexFunc*		_getValueIndex,
-						VariableCondition_GetValueCountFunc*		_getValueCount,
-						VariableCondition_GetValueFunc*			_getValue,
-						VariableCondition_ApplyFunc*			_apply, 
-						Name						_dictionaryEntryName, 
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register,
-						Dictionary*					dictionary );
-	
-	void				_SetVC_Init( void* setVC, Name _dictionaryEntryName );
-	
+	void _SetVC_Init( void* setVC, Name _dictionaryEntryName );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** General virtual functions
 	*/
 	
-	void				_SetVC_Delete( void* setVC );
+	void _SetVC_Delete( void* setVC );
 	
-	void				_SetVC_Print( void* setVC, Stream* stream );
+	void _SetVC_Print( void* setVC, Stream* stream );
 	
 	/* Copy */
 	#define SetVC_Copy( self ) \
@@ -138,46 +106,42 @@
 	
 	void* _SetVC_Copy( void* setVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
-	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Macros
 	*/
-	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
 	*/
 	
-	void				_SetVC_ReadDictionary( void* setVC, void* dictionary );
+	void _SetVC_ReadDictionary( void* setVC, void* dictionary );
 	
-	IndexSet*			_SetVC_GetSet( void* variableCondition );
+	IndexSet* _SetVC_GetSet( void* variableCondition );
 	
-	VariableCondition_VariableIndex	_SetVC_GetVariableCount( void* variableCondition, Index globalIndex );
+	VariableCondition_VariableIndex _SetVC_GetVariableCount( void* variableCondition, Index globalIndex );
 	
-	Variable_Index			_SetVC_GetVariableIndex(
-						void*				variableCondition,
-						Index				globalIndex, 
-						VariableCondition_VariableIndex	varIndex);
+	Variable_Index _SetVC_GetVariableIndex(
+		void*										variableCondition,
+		Index										globalIndex, 
+		VariableCondition_VariableIndex	varIndex);
 						
-	VariableCondition_ValueIndex	_SetVC_GetValueIndex(
-						void*				variableCondition, 
-						Index				globalIndex, 
-						VariableCondition_VariableIndex	varIndex);
+	VariableCondition_ValueIndex _SetVC_GetValueIndex(
+		void*										variableCondition, 
+		Index										globalIndex, 
+		VariableCondition_VariableIndex	varIndex);
 						
-	VariableCondition_ValueIndex	_SetVC_GetValueCount( void* variableCondition );
+	VariableCondition_ValueIndex _SetVC_GetValueCount( void* variableCondition );
 	
-	VariableCondition_Value		_SetVC_GetValue( void* variableCondition, VariableCondition_ValueIndex valIndex );
+	VariableCondition_Value _SetVC_GetValue( void* variableCondition, VariableCondition_ValueIndex valIndex );
 	
-	void				_SetVC_PrintConcise( void* variableCondition, Stream* stream );
+	void _SetVC_PrintConcise( void* variableCondition, Stream* stream );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Build functions
 	*/
 	
-	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Functions
 	*/
 
-	
 #endif /* __Base_Automation_SetVC_h__ */

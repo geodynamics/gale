@@ -58,54 +58,29 @@ const Name defaultCompositeVCName = "defaultCompositeVCName";
 */
 
 VariableCondition* CompositeVC_Factory(
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						data )
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register,
+	Dictionary*							dictionary,
+	void*									data )
 {
 	return (VariableCondition*)CompositeVC_New( defaultCompositeVCName, variable_Register, conFunc_Register, dictionary, data );
 }
 
-
 CompositeVC* CompositeVC_New(
-		Name						name,
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						data )
+	Name									name,
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register,
+	Dictionary*							dictionary,
+	void*									data )
 {
-	return _CompositeVC_New(
-		sizeof(CompositeVC), 
-		CompositeVC_Type, 
-		_CompositeVC_Delete, 
-		_CompositeVC_Print,
-		_CompositeVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)CompositeVC_DefaultNew,
-		_CompositeVC_AssignFromXML,
-		_CompositeVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
-		name,
-		True,
-		NULL,
-		_CompositeVC_PrintConcise,
-		_CompositeVC_ReadDictionary,
-		_CompositeVC_GetSet, 
-		_CompositeVC_GetVariableCount, 
-		_CompositeVC_GetVariableIndex, 
-		_CompositeVC_GetValueIndex, 
-		_CompositeVC_GetValueCount, 
-		_CompositeVC_GetValue, 
-		_CompositeVC_Apply, 
-		variable_Register, 
-		conFunc_Register, 
-		dictionary, 
-		data );
+	CompositeVC* self = CompositeVC_DefaultNew( name );
+
+	self->isConstructed = True;
+	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
+	_CompositeVC_Init( self, data );
 }
 
-CompositeVC* CompositeVC_DefaultNew( Name name )
-{
+CompositeVC* CompositeVC_DefaultNew( Name name ) {
 	return (CompositeVC*)_CompositeVC_New(
 		sizeof(CompositeVC), 
 		CompositeVC_Type, 
@@ -117,9 +92,9 @@ CompositeVC* CompositeVC_DefaultNew( Name name )
 		_CompositeVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
+		NULL,
 		name,
-		False,
+		NON_GLOBAL,
 		NULL,
 		_CompositeVC_PrintConcise,
 		_CompositeVC_ReadDictionary,
@@ -132,133 +107,31 @@ CompositeVC* CompositeVC_DefaultNew( Name name )
 		_CompositeVC_Apply, 
 		NULL/*variable_Register*/, 
 		NULL/*conFunc_Register*/,
-		NULL,
 		NULL );
 }
 
-void CompositeVC_Init(
-		CompositeVC*					self, 
-		Name						name,
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						data )
-{
-	/* General info */
-	self->type = CompositeVC_Type;
-	self->_sizeOfSelf = sizeof(CompositeVC);
-	self->_deleteSelf = False;
-	
-	/* Virtual info */
-	self->_delete = _CompositeVC_Delete;
-	self->_print = _CompositeVC_Print;
-	self->_copy = _CompositeVC_Copy;
-	self->_build = _CompositeVC_Build;
-	self->_initialise = _VariableCondition_Initialise;
-	self->_execute = _VariableCondition_Execute;
-	self->_buildSelf = NULL;
-	self->_printConcise = _CompositeVC_PrintConcise;
-	self->_readDictionary = _CompositeVC_ReadDictionary;
-	self->_getSet = _CompositeVC_GetSet;
-	self->_getVariableCount = _CompositeVC_GetVariableCount;
-	self->_getVariableIndex = _CompositeVC_GetVariableIndex;
-	self->_getValueIndex = _CompositeVC_GetValueIndex;
-	self->_getValueCount = _CompositeVC_GetValueCount;
-	self->_getValue = _CompositeVC_GetValue;
-	self->_apply = _VariableCondition_Apply;
-	
-	_Stg_Class_Init( (Stg_Class*)self );
-	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-	_Stg_Component_Init( (Stg_Component*)self );
-	_VariableCondition_Init( (VariableCondition*)self, variable_Register, conFunc_Register, dictionary );
-	
-	/* Stg_Class info */
-	_CompositeVC_Init( self, data );
-}
-
-
-CompositeVC* _CompositeVC_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*		_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*			_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
-		VariableCondition_BuildSelfFunc*		_buildSelf, 
-		VariableCondition_PrintConciseFunc*		_printConcise,
-		VariableCondition_ReadDictionaryFunc*		_readDictionary,
-		VariableCondition_GetSetFunc*			_getSet,
-		VariableCondition_GetVariableCountFunc		_getVariableCount,
-		VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-		VariableCondition_GetValueIndexFunc*		_getValueIndex,
-		VariableCondition_GetValueCountFunc*		_getValueCount,
-		VariableCondition_GetValueFunc*			_getValue,
-		VariableCondition_ApplyFunc*			_apply, 
-		Variable_Register*				variable_Register,
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						data)
-{
-	CompositeVC*	self;
+CompositeVC* _CompositeVC_New( COMPOSITEVC_DEFARGS ) {
+	CompositeVC* self;
 	
 	/* Allocate memory/General info */
-	assert(_sizeOfSelf >= sizeof(CompositeVC));
-	self = (CompositeVC*)_VariableCondition_New(
-		_sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		initFlag,
-		_buildSelf, 
-		_printConcise,
-		_readDictionary,
-		_getSet, 
-		_getVariableCount,
-		_getVariableIndex, 
-		_getValueIndex, 
-		_getValueCount, 
-		_getValue, 
-		_apply, 
-		variable_Register, 
-		conFunc_Register,
-		dictionary );
+	assert (sizeOfSelf >= sizeof(CompositeVC) );
+	self = (CompositeVC*)_VariableCondition_New( VARIABLECONDITION_PASSARGS );
 	
 	/* Virtual info */
 	
 	/* Stg_Class info */
-	if( initFlag ){
-		_CompositeVC_Init( self, data );
-	}
 	
 	return self;
 }
 
 
-void _CompositeVC_Init(
-		void*						compositeVC, 
-		void*						data )
-{
+void _CompositeVC_Init( void* compositeVC, void* data ) {
 	CompositeVC*	self = (CompositeVC*)compositeVC;
 	
 	self->isConstructed = True;
 	self->itemCount = 0;
-        self->nIndepItems = 0;
-        self->indepItems = NULL;
+	self->nIndepItems = 0;
+	self->indepItems = NULL;
 	self->_size = 8;
 	self->_delta = 8;
 	self->itemTbl = Memory_Alloc_Array( VariableCondition*, self->_size, "CompositeCV->itemTbl" );
