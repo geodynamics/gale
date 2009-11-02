@@ -74,6 +74,12 @@
 		EntryPoint*                         calcDtEP;                 \
 		
 	struct FiniteElementContext { __FiniteElementContext };
+
+	#define FINITEELEMENTCONTEXT_DEFARGS \
+		DOMAINCONTEXT_DEFARGS
+
+	#define FINITEELEMENTCONTEXT_PASSARGS \
+		DOMAINCONTEXT_PASSARGS
 	
 	/* Constructors ----------------------------------------------------------------------------------------------------------*/
 	
@@ -81,33 +87,14 @@
 	void* FiniteElementContext_DefaultNew( Name name );
 
 	FiniteElementContext* FiniteElementContext_New( 
-		Name                                            name,
-		double						start,
-		double						stop,
-		MPI_Comm					communicator,
-		Dictionary*					dictionary );
-
+		Name			name,
+		double		start,
+		double		stop,
+		MPI_Comm		communicator,
+		Dictionary*	dictionary );
 	
 	/** Creation implementation / Virtual constructor */
-	FiniteElementContext* _FiniteElementContext_New( 
-		SizeT						sizeOfSelf,
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction* 		_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction* 			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name 						name,
-		Bool						initFlag,
-		AbstractContext_SetDt*				_setDt,
-		double						start,
-		double						stop,
-		MPI_Comm					communicator,
-		Dictionary*					dictionary );
+	FiniteElementContext* _FiniteElementContext_New( FINITEELEMENTCONTEXT_DEFARGS );
 	
 	/** Initialisation implementation */
 	void  _FiniteElementContext_Init( FiniteElementContext* self );

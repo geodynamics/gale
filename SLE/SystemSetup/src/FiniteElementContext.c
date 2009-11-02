@@ -66,11 +66,27 @@ const Type FiniteElementContext_Type = "FiniteElementContext";
 const Name defaultFiniteElementContextETypeRegisterName = "finiteElementContext";
 const Name FiniteElementContext_EP_CalcDt = "FiniteElementContext_EP_CalcDt";
 
-
 /* Constructors ------------------------------------------------------------------------------------------------------------------*/
 
-void* FiniteElementContext_DefaultNew( Name name )
+FiniteElementContext* FiniteElementContext_New(
+	Name			name,
+	double		start,
+	double		stop,
+	MPI_Comm		communicator,
+	Dictionary*	dictionary )
 {
+	FiniteElementContext* self = FiniteElementContext_DefaultNew( name );
+
+	self->isConstructed = True;
+
+	_AbstractContext_Init( self );
+	_DomainContext_Init( self );	
+	_FiniteElementContext_Init( self );
+
+	return self;
+}
+	
+void* FiniteElementContext_DefaultNew( Name name ) {
 	return _FiniteElementContext_New(
 		sizeof(FiniteElementContext),
 		FiniteElementContext_Type,
@@ -82,9 +98,9 @@ void* FiniteElementContext_DefaultNew( Name name )
 		_AbstractContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
-		_AbstractContext_Destroy,
+		NULL,
 		name,
-		False,
+		NON_GLOBAL,
 		_FiniteElementContext_SetDt,
 		0,
 		0,
@@ -92,89 +108,18 @@ void* FiniteElementContext_DefaultNew( Name name )
 		NULL );
 }
 
-FiniteElementContext*				FiniteElementContext_New(
-		Name						name,
-		double						start,
-		double						stop,
-		MPI_Comm					communicator,
-		Dictionary*					dictionary )
-{
-	return _FiniteElementContext_New(
-		sizeof(FiniteElementContext),
-		FiniteElementContext_Type,
-		_FiniteElementContext_Delete,
-		_FiniteElementContext_Print,
-		NULL,
-		FiniteElementContext_DefaultNew,
-		_FiniteElementContext_AssignFromXML,
-		_AbstractContext_Build,
-		_AbstractContext_Initialise,
-		_AbstractContext_Execute,
-		_AbstractContext_Destroy,
-		name,
-		True,
-		_FiniteElementContext_SetDt,
-		start,
-		stop,
-		communicator,
-		dictionary );
-}	
-
-
-FiniteElementContext* _FiniteElementContext_New( 
-		SizeT						sizeOfSelf,
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
-		Stg_Component_ConstructFunction*_construct,
-		Stg_Component_BuildFunction*    _build,
-		Stg_Component_InitialiseFunction*   _initialise,
-		Stg_Component_ExecuteFunction*  _execute,
-		Stg_Component_DestroyFunction*  _destroy,
-		Name 							name,
-		Bool							initFlag,
-		AbstractContext_SetDt*				_setDt,
-		double						start,
-		double						stop,
-		MPI_Comm					communicator,
-		Dictionary*					dictionary )
-{
+FiniteElementContext* _FiniteElementContext_New( FINITEELEMENTCONTEXT_DEFARGS ) {
 	FiniteElementContext* self;
 	
 	/* Allocate memory */
-	self = (FiniteElementContext*)_DomainContext_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy, 
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		initFlag,
-		_setDt, 
-		start, 
-		stop, 
-		communicator, 
-		dictionary );
+	self = (FiniteElementContext*)_DomainContext_New( DOMAINCONTEXT_PASSARGS );
 	
 	/* General info */
 	
 	/* Virtual info */
 	
-	if( initFlag ){
-		_FiniteElementContext_Init( self );
-	}
-	
 	return self;
 }
-
 
 void _FiniteElementContext_Init( FiniteElementContext* self ) {
 	Stream*  errorStream = Journal_Register( Error_Type, self->type );
@@ -184,7 +129,6 @@ void _FiniteElementContext_Init( FiniteElementContext* self ) {
 
 	/* register this current stream (the context) as a child of the FE stream */
 	/* TODO: Want to be able to recombine this with the Abs context's debug stream at some stage */
-	self->isConstructed = True;
 	self->debug = Stream_RegisterChild( StgFEM_Debug, FiniteElementContext_Type );
 	
 	/* set up s.l.e list */
