@@ -59,6 +59,24 @@
 const Type UnderworldContext_Type = "UnderworldContext";
 
 /* Constructors ------------------------------------------------------------------------------------------------*/
+
+UnderworldContext* UnderworldContext_New( 
+	Name			name,
+	double		start,
+	double		stop,
+	MPI_Comm		communicator,
+	Dictionary*	dictionary )
+{
+	UnderworldContext* self = _UnderworldContext_DefaultNew( name );
+
+	self->isConstructed = True;
+	_AbstractContext_Init( self );
+	_DomainContext_Init( self );	
+	_FiniteElementContext_Init( self );
+	_PICelleratorContext_Init( self );
+	_UnderworldContext_Init( self );
+}	
+
 void* _UnderworldContext_DefaultNew( Name name ) {
 	return (void*) _UnderworldContext_New(
 		sizeof(UnderworldContext),
@@ -71,95 +89,26 @@ void* _UnderworldContext_DefaultNew( Name name ) {
 		_UnderworldContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
-		_AbstractContext_Destroy,
-		_UnderworldContext_SetDt,
+		NULL,
 		name,
-		False,
+		NON_GLOBAL,
+		_UnderworldContext_SetDt,
 		0,
 		0,
 		MPI_COMM_WORLD,
 		NULL );
 }
 
-UnderworldContext* UnderworldContext_New( 
-		Name                    name,
-		double			start,
-		double			stop,
-		MPI_Comm		communicator,
-		Dictionary*		dictionary )
-{
-	return _UnderworldContext_New(
-		sizeof(UnderworldContext),
-		UnderworldContext_Type,
-		_UnderworldContext_Delete,
-		_UnderworldContext_Print,
-		NULL, 
-		_UnderworldContext_DefaultNew,
-		_UnderworldContext_AssignFromXML,
-		_UnderworldContext_Build,
-		_AbstractContext_Initialise,
-		_AbstractContext_Execute,
-		_AbstractContext_Destroy,
-		_UnderworldContext_SetDt,
-		name,
-		True,
-		start,
-		stop,
-		communicator,
-		dictionary );
-}	
-
-
-UnderworldContext* _UnderworldContext_New( 
-		SizeT                                  sizeOfSelf,
-		Type                                   type,
-		Stg_Class_DeleteFunction*              _delete,
-		Stg_Class_PrintFunction*               _print,
-		Stg_Class_CopyFunction*                _copy, 
-		Stg_Component_DefaultConstructorFunction*  _defaultConstructor,
-		Stg_Component_ConstructFunction*       _construct,
-		Stg_Component_BuildFunction*           _build,
-		Stg_Component_InitialiseFunction*      _initialise,
-		Stg_Component_ExecuteFunction*         _execute,
-		Stg_Component_DestroyFunction*         _destroy,
-		AbstractContext_SetDt*                 _setDt,
-		Name                                   name,
-		Bool                                   initFlag,
-		double                                 start,
-		double                                 stop,
-		MPI_Comm                               communicator,
-		Dictionary*                            dictionary )		
-{
+UnderworldContext* _UnderworldContext_New( UNDERWORLDCONTEXT_DEFARGS ) {
 	UnderworldContext* self;
 	
-	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	self = (UnderworldContext*)_PICelleratorContext_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		_setDt, 
-		name,
-		initFlag,
-		start, 
-		stop, 
-		communicator, 
-		dictionary );
+	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. 
+		At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
+	self = (UnderworldContext*)_PICelleratorContext_New( PICELLERATORCONTEXT_PASSARGS );
 	
 	/* General info */
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
-	
-	if( initFlag ){
-		_UnderworldContext_Init( self );
-	}
 	
 	return self;
 }
@@ -168,9 +117,9 @@ void _UnderworldContext_Init( UnderworldContext* self ) {
 	self->isConstructed = True;
 	self->Vrms = 0.0;
 	EntryPoint_Append_AlwaysLast( Context_GetEntryPoint( self, AbstractContext_EP_AssignFromXML ),
-			   "Underworld App Assign Pointers",
-			   UnderworldContext_AssignPointers,
-			   "Underworld_App_Construct" );
+		"Underworld App Assign Pointers",
+		UnderworldContext_AssignPointers,
+		"Underworld_App_Construct" );
 }
 
 /* Virtual Functions -------------------------------------------------------------------------------------------------------------*/

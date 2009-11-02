@@ -56,15 +56,21 @@
 		/* Virtual functions go here */ \
 		\
 		/* UnderworldContext info */ \
-		TimeIntegrator*                timeIntegrator;                \
+		TimeIntegrator*			timeIntegrator; \
 		/* SLE Stuff */ \
-		Stokes_SLE*                    stokesSLE;                     \
-		AdvectionDiffusionSLE*         energySLE;                     \
-		AdvectionDiffusionSLE*         compositionSLE;                \
-		ConstitutiveMatrix*            constitutiveMatrix;            \
-		double						   Vrms;      \
+		Stokes_SLE*					stokesSLE; \
+		AdvectionDiffusionSLE*	energySLE; \
+		AdvectionDiffusionSLE*	compositionSLE; \
+		ConstitutiveMatrix*		constitutiveMatrix; \
+		double						Vrms; \
 		
 	struct UnderworldContext { __UnderworldContext };
+
+	#define UNDERWORLDCONTEXT_DEFARGS \
+		PICELLERATORCONTEXT_DEFARGS
+
+	#define UNDERWORLDCONTEXT_PASSARGS \
+		PICELLERATORCONTEXT_PASSARGS
 	
 	/* Constructors ----------------------------------------------------------------------------------------------------*/
 	
@@ -72,33 +78,15 @@
 	void* _UnderworldContext_DefaultNew( Name name );
 	
 	UnderworldContext* UnderworldContext_New( 
-		Name			    name,
-		double                      start,
-		double                      stop,
-		MPI_Comm                    communicator,
-		Dictionary*                 dictionary );
+		Name			name,
+		double		start,
+		double		stop,
+		MPI_Comm		communicator,
+		Dictionary*	dictionary );
 
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	UnderworldContext* _UnderworldContext_New( 
-		SizeT                                  sizeOfSelf,
-		Type                                   type,
-		Stg_Class_DeleteFunction*              _delete,
-		Stg_Class_PrintFunction*               _print,
-		Stg_Class_CopyFunction*                _copy, 
-		Stg_Component_DefaultConstructorFunction*  _defaultConstructor,
-		Stg_Component_ConstructFunction*       _construct,
-		Stg_Component_BuildFunction*           _build,
-		Stg_Component_InitialiseFunction*      _initialise,
-		Stg_Component_ExecuteFunction*         _execute,
-		Stg_Component_DestroyFunction*         _destroy,
-		AbstractContext_SetDt*                 _setDt,
-		Name                                   name,
-		Bool                                   initFlag,
-		double                                 start,
-		double                                 stop,
-		MPI_Comm                               communicator,
-		Dictionary*                            dictionary );
+	UnderworldContext* _UnderworldContext_New( UNDERWORLDCONTEXT_DEFARGS );
 	
 	/** Initialisation implementation */
 	void _UnderworldContext_Init( UnderworldContext* self );
