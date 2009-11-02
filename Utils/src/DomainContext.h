@@ -49,54 +49,42 @@
 		/* Virtual info */ \
 		\
 		/* DomainContext info */ \
-		FieldVariable_Register*             fieldVariable_Register; \
-		Dimension_Index	                    dim;		    \
+		FieldVariable_Register*	fieldVariable_Register; \
+		Dimension_Index			dim;		    \
 		
 	struct DomainContext { __DomainContext };
+
+	#define DOMAINCONTEXT_DEFARGS \
+		ABSTRACTCONTEXT_DEFARGS 
+
+	#define DOMAINCONTEXT_PASSARGS \
+		ABSTRACTCONTEXT_PASSARGS
 
 	DomainContext* DomainContext_DefaultNew( Name name );
 	
 	DomainContext* DomainContext_New( 
-		Name                                        name,
-		double                                      start,
-		double                                      stop,
-		MPI_Comm                                    communicator,
-		Dictionary*                                 dictionary );
+		Name 			name,
+		double		start,
+		double		stop,
+		MPI_Comm		communicator,
+		Dictionary*	dictionary );
 	
 	/** Creation implementation / Virtual constructor */
-	DomainContext* _DomainContext_New( 
-		SizeT                                       sizeOfSelf,
-		Type                                        type,
-		Stg_Class_DeleteFunction*                   _delete,
-		Stg_Class_PrintFunction*                    _print,
-		Stg_Class_CopyFunction*                     _copy, 
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*            _construct,
-		Stg_Component_BuildFunction*                _build,
-		Stg_Component_InitialiseFunction*           _initialise,
-		Stg_Component_ExecuteFunction*              _execute,
-		Stg_Component_DestroyFunction*              _destroy,
-		Name                                        name,
-		Bool                                        initFlag,
-		AbstractContext_SetDt*                      _setDt,
-		double                                      start,
-		double                                      stop,
-		MPI_Comm                                    communicator,
-		Dictionary*                                 dictionary );
+	DomainContext* _DomainContext_New( DOMAINCONTEXT_DEFARGS );
 	
 	/** Initialisation implementation */
-	void 						_DomainContext_Init( DomainContext* self );
+	void	_DomainContext_Init( DomainContext* self );
 
 	/* Virtual Functions ------------------------------------------------------------------------------------------------*/
 
-	void						_DomainContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data );
+	void	_DomainContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data );
 	
 	/* Stg_Class_Delete implementation */
-	void						_DomainContext_Delete( void* context );
-	void						_DomainContext_Destroy( void* context );
+	void	_DomainContext_Delete( void* context );
+	void	_DomainContext_Destroy( void* context );
 	
 	/* Print implementation */
-	void						_DomainContext_Print( void* context, Stream* stream );
+	void	_DomainContext_Print( void* context, Stream* stream );
 	
 	void _DomainContext_SetDt( void* context, double dt ) ;
 

@@ -49,113 +49,58 @@
 const Type DomainContext_Type = "DomainContext";
 
 DomainContext* DomainContext_New( 
-		Name                                        name,
-		double                                      start,
-		double                                      stop,
-		MPI_Comm                                    communicator,
-		Dictionary*                                 dictionary )
+	Name			name,
+	double		start,
+	double		stop,
+	MPI_Comm		communicator,
+	Dictionary*	dictionary )
 {
-		return _DomainContext_New(
-			sizeof(DomainContext),
-			DomainContext_Type,
-			_DomainContext_Delete,
-			_DomainContext_Print,
-			NULL,
-			NULL,
-			_DomainContext_AssignFromXML,
-			_AbstractContext_Build,
-			_AbstractContext_Initialise,
-			_AbstractContext_Execute,
-			_AbstractContext_Destroy,
-			name,
-			True,
-			_DomainContext_SetDt,
-			start,
-			stop,
-			MPI_COMM_WORLD,
-			dictionary );
+	DomainContext* self = DomainContext_DefaultNew( name );
+
+	self->isConstructed = True;
+	_AbstractContext_Init( self );
+	_DomainContext_Init( self );
+
+	return self;
 }
 
 DomainContext* DomainContext_DefaultNew( Name name ) {
-		return _DomainContext_New(
-			sizeof(DomainContext),
-			DomainContext_Type,
-			_DomainContext_Delete,
-			_DomainContext_Print,
-			NULL,
-			NULL,
-			_DomainContext_AssignFromXML,
-			_AbstractContext_Build,
-			_AbstractContext_Initialise,
-			_AbstractContext_Execute,
-			_AbstractContext_Destroy,
-			name,
-			False,
-			_DomainContext_SetDt,
-			0,
-			0,
-			MPI_COMM_WORLD,
-			NULL );
+	return _DomainContext_New(
+		sizeof(DomainContext),
+		DomainContext_Type,
+		_DomainContext_Delete,
+		_DomainContext_Print,
+		NULL,
+		NULL,
+		_DomainContext_AssignFromXML,
+		_AbstractContext_Build,
+		_AbstractContext_Initialise,
+		_AbstractContext_Execute,
+		NULL,
+		name,
+		NON_GLOBAL,
+		_DomainContext_SetDt,
+		0,
+		0,
+		MPI_COMM_WORLD,
+		NULL );
 }
 
-DomainContext* _DomainContext_New( 
-		SizeT                                       sizeOfSelf,
-		Type                                        type,
-		Stg_Class_DeleteFunction*                   _delete,
-		Stg_Class_PrintFunction*                    _print,
-		Stg_Class_CopyFunction*                     _copy, 
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*            _construct,
-		Stg_Component_BuildFunction*                _build,
-		Stg_Component_InitialiseFunction*           _initialise,
-		Stg_Component_ExecuteFunction*              _execute,
-		Stg_Component_DestroyFunction*              _destroy,
-		Name                                        name,
-		Bool                                        initFlag,
-		AbstractContext_SetDt*                      _setDt,
-		double                                      start,
-		double                                      stop,
-		MPI_Comm                                    communicator,
-		Dictionary*                                 dictionary )
-{
+DomainContext* _DomainContext_New( DOMAINCONTEXT_DEFARGS ) {
 	DomainContext* self;
 	
 	/* Allocate memory */
-	self = (DomainContext*)_AbstractContext_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		initFlag,
-		_setDt, 
-		start, 
-		stop, 
-		communicator, 
-		dictionary );
+	self = (DomainContext*)_AbstractContext_New( ABSTRACTCONTEXT_PASSARGS );
 	
 	/* General info */
 
 	/* Virtual info */
 	
-	if( initFlag ){
-		_DomainContext_Init( self );
-	}
-	
 	return self;
 }
 
-
 void _DomainContext_Init( DomainContext* self ) {
 
-	self->isConstructed = True;
 	self->fieldVariable_Register = FieldVariable_Register_New();
 }
 
