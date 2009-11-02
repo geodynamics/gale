@@ -56,6 +56,38 @@
 const Type PICelleratorContext_Type = "PICelleratorContext";
 
 /* Constructors ------------------------------------------------------------------------------------------------*/
+
+PICelleratorContext* PICelleratorContext_New( 
+	Name			name,
+	double		start,
+	double		stop,
+	MPI_Comm		communicator,
+	Dictionary*	dictionary )
+{
+	PICelleratorContext* self = _PICelleratorContext_DefaultNew( name );
+
+	self->isConstructed = True;
+	_AbstractContext_Init( self );
+	_DomainContext_Init( self );	
+	_FiniteElementContext_Init( self );
+	_PICelleratorContext_Init( self );
+
+	return self;
+}	
+
+PICelleratorContext* _PICelleratorContext_New( PICELLERATORCONTEXT_DEFARGS ) {
+	PICelleratorContext* self;
+	
+	/* Allocate memory */
+	self = (PICelleratorContext*)_FiniteElementContext_New( FINITEELEMENTCONTEXT_PASSARGS );
+	
+	/* General info */
+	
+	/* Virtual info */
+	
+	return self;
+}
+
 void* _PICelleratorContext_DefaultNew( Name name ) {
 	return (void*) _PICelleratorContext_New(
 		sizeof(PICelleratorContext),
@@ -68,99 +100,15 @@ void* _PICelleratorContext_DefaultNew( Name name ) {
 		_AbstractContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
-		_AbstractContext_Destroy,
-		_PICelleratorContext_SetDt,
+		NULL,
 		name,
-		False,
+		NON_GLOBAL,
+		_PICelleratorContext_SetDt,
 		0,
 		0,
 		MPI_COMM_WORLD,
 		NULL );
 }
-
-PICelleratorContext* PICelleratorContext_New( 
-		Name                                            name,
-		double                                          start,
-		double                                          stop,
-		MPI_Comm                                        communicator,
-		Dictionary*                                     dictionary )
-{
-	return _PICelleratorContext_New(
-		sizeof(PICelleratorContext),
-		PICelleratorContext_Type,
-		_PICelleratorContext_Delete,
-		_PICelleratorContext_Print,
-		NULL, 
-		_PICelleratorContext_DefaultNew,
-		_PICelleratorContext_AssignFromXML,
-		_AbstractContext_Build,
-		_AbstractContext_Initialise,
-		_AbstractContext_Execute,
-		_AbstractContext_Destroy,
-		_PICelleratorContext_SetDt,
-		name,
-		True,
-		start,
-		stop,
-		communicator,
-		dictionary );
-}	
-
-
-PICelleratorContext* _PICelleratorContext_New( 
-		SizeT                                           sizeOfSelf,
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy,
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,
-		AbstractContext_SetDt*                          _setDt,
-		Name                                            name,
-		Bool                                            initFlag,
-		double                                          start,
-		double                                          stop,
-		MPI_Comm                                        communicator,
-		Dictionary*                                     dictionary )
-{
-	PICelleratorContext* self;
-	
-	/* Allocate memory */
-	self = (PICelleratorContext*)_FiniteElementContext_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		initFlag,
-		_setDt, 
-		start, 
-		stop, 
-		communicator, 
-		dictionary );
-	
-	/* General info */
-	
-	/* Virtual info */
-	
-	if( initFlag ){
-		_PICelleratorContext_Init( self );
-	}
-	
-	return self;
-}
-
 
 void _PICelleratorContext_Init( void* context ) {
 	PICelleratorContext* self = (PICelleratorContext*)context;

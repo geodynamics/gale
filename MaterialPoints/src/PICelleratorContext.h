@@ -64,11 +64,15 @@
 		/* Virtual info */ \
 		\
 		/* PICelleratorContext info */ \
-		Materials_Register*                        materials_Register;
+		Materials_Register*	materials_Register;
 
-
-		
 	struct PICelleratorContext { __PICelleratorContext };
+
+	#define PICELLERATORCONTEXT_DEFARGS \
+		FINITEELEMENTCONTEXT_DEFARGS
+
+	#define PICELLERATORCONTEXT_PASSARGS \
+		FINITEELEMENTCONTEXT_PASSARGS
 	
 	/* Constructors ----------------------------------------------------------------------------------------------------*/
 	
@@ -76,33 +80,14 @@
 	void* _PICelleratorContext_DefaultNew( Name name );
 	
 	PICelleratorContext* PICelleratorContext_New( 
-		Name                                            name,
-		double                                          start,
-		double                                          stop,
-		MPI_Comm                                        communicator,
-		Dictionary*                                     dictionary );
-
+		Name			name,
+		double		start,
+		double		stop,
+		MPI_Comm		communicator,
+		Dictionary*	dictionary );
 	
 	/** Creation implementation / Virtual constructor */
-	PICelleratorContext* _PICelleratorContext_New( 
-		SizeT                                           sizeOfSelf,
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy, 
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,
-		AbstractContext_SetDt*                          _setDt,
-		Name                                            name,
-		Bool                                            initFlag,
-		double                                          start,
-		double                                          stop,
-		MPI_Comm                                        communicator,
-		Dictionary*                                     dictionary );
+	PICelleratorContext* _PICelleratorContext_New( PICELLERATORCONTEXT_DEFARGS );
 	
 	/** Initialisation implementation */
 	void _PICelleratorContext_Init( void* context );
