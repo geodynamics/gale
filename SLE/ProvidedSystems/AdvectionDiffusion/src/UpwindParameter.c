@@ -155,7 +155,7 @@ double AdvDiffResidualForceTerm_UpwindDiffusivity(
 
 
 /** AdvectionDiffusion_UpwindXiExact - Brooks, Hughes 1982 equation 2.4.2
- * \bar \xi = coth( \alpha ) - \frac{1}{\alpha} */
+ *\f$ \bar \xi = coth( \alpha ) - \frac{1}{\alpha} \f$ */
 double AdvDiffResidualForceTerm_UpwindXiExact( void* residual, double pecletNumber ) {
 	if (fabs(pecletNumber) < 1.0e-8 )
 		return 0.33333333333333 * pecletNumber;
@@ -168,11 +168,15 @@ double AdvDiffResidualForceTerm_UpwindXiExact( void* residual, double pecletNumb
 }
 
 /** AdvectionDiffusion_UpwindXiDoublyAsymptoticAssumption - Brooks, Hughes 1982 equation 3.3.1
- * Simplification of \bar \xi = coth( \alpha ) - \frac{1}{\alpha} from Brooks, Hughes 1982 equation 2.4.2
- * 
- *            { -1               for \alpha <= -3
- * \bar \xi ~ { \frac{/alpha}{3} for -3 < \alpha <= 3
- *            { +1               for \alpha > +3 */
+ * Simplification of \f$ \bar \xi = coth( \alpha ) - \frac{1}{\alpha} \f$ from Brooks, Hughes 1982 equation 2.4.2
+ * \f[
+\bar \xi \sim \left\{ \begin{array}{rl} 
+             -1                 &for \quad \alpha <= -3 \\
+             \frac{\alpha}{3}   &for \quad -3 < \alpha <= 3 \\
+             +1                 &for \quad \alpha > +3
+             \end{array} \right.  
+           
+\f]*/
 double AdvDiffResidualForceTerm_UpwindXiDoublyAsymptoticAssumption( void* residual, double pecletNumber ) {
 	if (pecletNumber <= -3.0)
 		return -1;
@@ -183,11 +187,14 @@ double AdvDiffResidualForceTerm_UpwindXiDoublyAsymptoticAssumption( void* residu
 }
 	
 /** AdvectionDiffusion_UpwindXiCriticalAssumption - Brooks, Hughes 1982 equation 3.3.2
- * Simplification of \bar \xi = coth( \alpha ) - \frac{1}{\alpha} from Brooks, Hughes 1982 equation 2.4.2
- * 
- *            { -1 - \frac{1}{\alpha}   for \alpha <= -1
- * \bar \xi ~ { 0                       for -1 < \alpha <= +1
- *            { +1 - \frac{1}{\alpha}   for \alpha > +1             */
+ * Simplification of \f$ \bar \xi = coth( \alpha ) - \frac{1}{\alpha} \f$ from Brooks, Hughes 1982 equation 2.4.2
+ * \f[
+  \bar \xi \sim \left\{ \begin{array}{rl}
+              -1 - \frac{1}{\alpha}   &for \quad \alpha <= -1 \\
+               0                      &for \quad -1 < \alpha <= +1 \\
+              +1 - \frac{1}{\alpha}   &for \quad \alpha > +1          
+              \end{array} \right.              
+\f]    */
 
 double AdvDiffResidualForceTerm_UpwindXiCriticalAssumption( void* residual, double pecletNumber ) {
 	if (pecletNumber <= -1.0)
