@@ -77,13 +77,6 @@
 		Name                                  name );
 	
 	void _Everywhere_Init( void* everywhere ) ;
-	void Everywhere_InitAll( 
-		void*                                 everywhere, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma );
 
 	/* Stg_Class_Delete Everywhere implementation */
 	void _Everywhere_Delete( void* everywhere );

@@ -65,20 +65,10 @@ BelowCosinePlane* BelowCosinePlane_New(
 {
 	BelowCosinePlane* self = (BelowCosinePlane*) _BelowCosinePlane_DefaultNew( name );
 
-	BelowCosinePlane_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		offset,
-		width,
-		minValue,
-		maxValue,
-		amplitude,
-		wavelength,
-		phase ) ;
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma );
+   _BelowPlane_Init( self, offset, width, minValue, maxValue );
+   _BelowCosinePlane_Init( self, width, amplitude, wavelength, phase );
+
 	return self;
 }
 
@@ -103,7 +93,7 @@ BelowCosinePlane* _BelowCosinePlane_New(
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(BelowCosinePlane) );
-	self = (BelowCosinePlane*)_Stg_Shape_New( 
+	self = (BelowCosinePlane*)_BelowPlane_New( 
 			_sizeOfSelf,
 			type,
 			_delete,
@@ -121,11 +111,6 @@ BelowCosinePlane* _BelowCosinePlane_New(
 			name );
 	
 	/* General info */
-
-	/* Virtual Info */
-	self->_isCoordInside = _isCoordInside;
-	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
-	
 	return self;
 }
 
@@ -138,28 +123,6 @@ void _BelowCosinePlane_Init( void* belowPlane, XYZ width, double amplitude, doub
 }
 
 
-void BelowCosinePlane_InitAll( 
-		void*                                 belowPlane, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                offset, 
-		XYZ                                   width,
-		XYZ                                   minValue,
-		XYZ                                   maxValue,
-		double                                amplitude,
-		double                                wavelength,
-		double                                phase )
-{
-	BelowCosinePlane* self = (BelowCosinePlane*)belowPlane;
-
-	BelowPlane_InitAll( self, dim, centre, alpha, beta, gamma, offset, width, minValue, maxValue );
-	_BelowCosinePlane_Init( self, width, amplitude, wavelength, phase );
-}
-	
-
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */
@@ -168,7 +131,7 @@ void _BelowCosinePlane_Delete( void* belowPlane ) {
 	BelowCosinePlane* self = (BelowCosinePlane*)belowPlane;
 	
 	/* Delete parent */
-	_Stg_Shape_Delete( self );
+	_BelowPlane_Delete( self );
 }
 
 
@@ -178,8 +141,6 @@ void _BelowCosinePlane_Print( void* belowPlane, Stream* stream ) {
 	/* Print parent */
 	_Stg_Shape_Print( self, stream );
 }
-
-
 
 void* _BelowCosinePlane_Copy( void* belowPlane, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	BelowCosinePlane*	self = (BelowCosinePlane*)belowPlane;
@@ -232,22 +193,22 @@ void _BelowCosinePlane_AssignFromXML( void* belowPlane, Stg_ComponentFactory* cf
 void _BelowCosinePlane_Build( void* belowPlane, void* data ) {
 	BelowCosinePlane*	self = (BelowCosinePlane*)belowPlane;
 
-	_Stg_Shape_Build( self, data );
+	_BelowPlane_Build( self, data );
 }
 void _BelowCosinePlane_Initialise( void* belowPlane, void* data ) {
 	BelowCosinePlane*	self = (BelowCosinePlane*)belowPlane;
 	
-	_Stg_Shape_Initialise( self, data );
+	_BelowPlane_Initialise( self, data );
 }
 void _BelowCosinePlane_Execute( void* belowPlane, void* data ) {
 	BelowCosinePlane*	self = (BelowCosinePlane*)belowPlane;
 	
-	_Stg_Shape_Execute( self, data );
+	_BelowPlane_Execute( self, data );
 }
 void _BelowCosinePlane_Destroy( void* belowPlane, void* data ) {
 	BelowCosinePlane*	self = (BelowCosinePlane*)belowPlane;
     
-	_Stg_Shape_Destroy( self, data );
+	_BelowPlane_Destroy( self, data );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------

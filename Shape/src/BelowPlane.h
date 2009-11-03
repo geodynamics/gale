@@ -77,17 +77,6 @@
 		Name                                  name );
 	
 	void _BelowPlane_Init( void* belowPlane, double offset, XYZ width, XYZ minValue, XYZ maxValue ) ;
-	void BelowPlane_InitAll( 
-		void*                                 belowPlane, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                offset,
-		XYZ                                   width,
-		XYZ                                   minValue,
-		XYZ                                   maxValue );
 
 	/* Stg_Class_Delete BelowPlane implementation */
 	void _BelowPlane_Delete( void* belowPlane );

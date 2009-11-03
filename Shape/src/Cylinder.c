@@ -61,17 +61,9 @@ Cylinder* Cylinder_New(
 {
 	Cylinder* self = (Cylinder*) _Cylinder_DefaultNew( name );
 
-	Cylinder_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		radius,
-		start,
-		end,
-		alongAxis ) ;
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma );
+	_Cylinder_Init( self, radius, start, end, alongAxis );
+
 	return self;
 }
 
@@ -127,26 +119,6 @@ void _Cylinder_Init( Cylinder* self, double radius, XYZ start, XYZ end, Axis alo
 	self->radius = radius;
 }
 
-
-void Cylinder_InitAll( 
-		void*                                 cylinder, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                radius, 
-		XYZ                                   start, 
-		XYZ                                   end, 
-		Axis                                  alongAxis )
-{
-	Cylinder* self = (Cylinder*)cylinder;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma );
-	_Cylinder_Init( self, radius, start, end, alongAxis );
-}
-	
-
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */
@@ -158,15 +130,12 @@ void _Cylinder_Delete( void* cylinder ) {
 	_Stg_Shape_Delete( self );
 }
 
-
 void _Cylinder_Print( void* cylinder, Stream* stream ) {
 	Cylinder* self = (Cylinder*)cylinder;
 	
 	/* Print parent */
 	_Stg_Shape_Print( self, stream );
 }
-
-
 
 void* _Cylinder_Copy( void* cylinder, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Cylinder*	self = (Cylinder*)cylinder;

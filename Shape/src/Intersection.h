@@ -87,17 +87,6 @@
 		Name                                  name );
 	
 	void _Intersection_Init( void* intersection, Stg_Shape** shapeList, Index shapeCount, Bool* isComplement ) ;
-	void Intersection_InitAll( 
-		void*                                 intersection, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		Stg_Shape**                           shapeList,
-		Index                                 shapeCount,
-		Bool*                                 isComplement
-		) ;
 		
 	/* Stg_Class_Delete Intersection implementation */
 	void _Intersection_Delete( void* intersection );

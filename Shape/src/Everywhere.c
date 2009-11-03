@@ -54,13 +54,9 @@ Everywhere* Everywhere_New(
 	Everywhere* self = (Everywhere*) _Everywhere_DefaultNew( name );
 	XYZ         centre = { 0.0,0.0,0.0 };
 
-	Everywhere_InitAll( 
-		self, 
-		dim,
-		centre,
-		0.0,
-		0.0,
-		0.0 );
+	_Stg_Shape_Init( self, dim, centre, False, 0.0, 0.0, 0.0 );
+	_Everywhere_Init( self );
+
 	return self;
 }
 
@@ -104,31 +100,12 @@ Everywhere* _Everywhere_New(
 	
 	/* General info */
 
-	/* Virtual Info */
-	self->_isCoordInside = _isCoordInside;
-	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
-	
 	return self;
 }
 
 void _Everywhere_Init( void* everywhere ) {
 }
 
-
-void Everywhere_InitAll( 
-		void*                                 everywhere, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma )
-{
-	Everywhere* self = (Everywhere*)everywhere;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma );
-	_Everywhere_Init( self );
-}
-	
 
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
@@ -198,7 +175,6 @@ void _Everywhere_Execute( void* everywhere, void* data ) {
 }
 void _Everywhere_Destroy( void* everywhere, void* data ) {
 	Everywhere*	self = (Everywhere*)everywhere;
-    
 	_Stg_Shape_Destroy( self, data );
 }
 
