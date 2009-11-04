@@ -152,10 +152,9 @@ void stgMainLoop( Stg_ComponentFactory* cf ) {
 }
 
 void stgMainDestroy( Stg_ComponentFactory* cf ) {
-	/* Destruct phase ---------------------------------------------------------------------------------------------------*/
-	Stg_ComponentFactory_DestroyComponents( cf, NULL );
-	Stg_Class_Delete( cf->LCRegister );
-	_Stg_Class_Delete( cf );
+   /* Destruct phase ---------------------------------------------------------------------------------------------------*/
+   LiveComponentRegister_DestroyAll( cf->LCRegister );
+   Stg_Class_Delete( cf ); /* this will call the LCRegister Delete func */
 }
 
 void stgImportToolbox( Dictionary* dictionary, char* toolboxName ) {
