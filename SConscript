@@ -96,6 +96,7 @@ dirs = ['libUnderworld/Toolbox',
         'plugins/Output/BoundaryLayers',
         'plugins/Output/AverageTemperature',
         'plugins/ScalingChecks/Ra_Scaling',
+        'plugins/Output/VTKOutput',
         'SysTest/AnalyticPlugins/VelicIC',
 	'SysTest/AnalyticPlugins/DepthDependentAnalytic3D',
 	'SysTest/AnalyticPlugins/NonNewtonianShearSolution',
@@ -106,7 +107,6 @@ dirs = ['libUnderworld/Toolbox',
         'SysTest/AnalyticPlugins/Velic_solHA',
         'SysTest/AnalyticPlugins/Velic_solKz',
         'SysTest/AnalyticPlugins/Velic_solS']
-#'plugins/Output/VTKOutput',
 
 pl_objs = []
 pl_regs = []
