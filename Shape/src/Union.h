@@ -87,17 +87,6 @@
 		Name                                  name );
 	
 	void _Union_Init( void* combination, Stg_Shape** shapeList, Index shapeCount, Bool* isComplement ) ;
-	void Union_InitAll( 
-		void*                                 combination, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		Stg_Shape**                           shapeList,
-		Index                                 shapeCount,
-		Bool*                                 isComplement
-		) ;
 		
 	/* Stg_Class_Delete Union implementation */
 	void _Union_Delete( void* combination );

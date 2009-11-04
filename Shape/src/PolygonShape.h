@@ -91,19 +91,6 @@
 		Name                                  name );
 	
 	void _PolygonShape_Init( void* polygon, Coord_List vertexList, Index vertexCount, XYZ start, XYZ end, Axis perpendicular ) ;
-	void PolygonShape_InitAll( 
-		void*                                 polygon, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		Coord_List                            vertexList,
-		Index                                 vertexCount,
-		XYZ                                   start,
-		XYZ                                   end,
-		Axis                                  perpendicularAxis
-		) ;
 		
 	/* Stg_Class_Delete PolygonShape implementation */
 	void _PolygonShape_Delete( void* polygon );

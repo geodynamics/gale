@@ -61,16 +61,9 @@ Superellipsoid* Superellipsoid_New(
 {
 	Superellipsoid* self = (Superellipsoid*) _Superellipsoid_DefaultNew( name );
 
-	Superellipsoid_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		epsilon1, 
-		epsilon2,
-		radius) ;
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma );
+   _Superellipsoid_Init( self, epsilon1, epsilon2, radius );
+
 	return self;
 }
 
@@ -114,10 +107,6 @@ Superellipsoid* _Superellipsoid_New(
 	
 	/* General info */
 
-	/* Virtual Info */
-	self->_isCoordInside = _isCoordInside;
-	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
-	
 	return self;
 }
 
@@ -131,23 +120,6 @@ void _Superellipsoid_Init( void* superellipsoid, double epsilon1, double epsilon
 }
 
 
-void Superellipsoid_InitAll( 
-		void*                                 superellipsoid, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                epsilon1, 
-		double                                epsilon2,
-		XYZ                                   radius)
-{
-	Superellipsoid* self = (Superellipsoid*)superellipsoid;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma );
-	_Superellipsoid_Init( self, epsilon1, epsilon2, radius );
-}
-	
 
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions

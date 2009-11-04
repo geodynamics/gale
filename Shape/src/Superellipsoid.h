@@ -87,16 +87,6 @@
 		Name                                  name );
 	
 	void _Superellipsoid_Init( void* superellipsoid, double epsilon1, double epsilon2, XYZ radius ) ;
-	void Superellipsoid_InitAll( 
-		void*                                 superellipsoid, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                epsilon1, 
-		double                                epsilon2,
-		XYZ                                   radius) ;
 
 	/* Stg_Class_Delete Superellipsoid implementation */
 	void _Superellipsoid_Delete( void* superellipsoid );

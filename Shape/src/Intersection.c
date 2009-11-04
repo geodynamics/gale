@@ -61,16 +61,8 @@ Intersection* Intersection_New(
 {
 	Intersection* self = (Intersection*)_Intersection_DefaultNew( name );
 
-	Intersection_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		shapeList,
-		shapeCount,
-		isComplement);
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma);
+	_Intersection_Init( self, shapeList, shapeCount, isComplement );
 	return self;
 }
 
@@ -114,10 +106,6 @@ Intersection* _Intersection_New(
 	
 	/* General info */
 
-	/* Virtual Info */
-	self->_isCoordInside = _isCoordInside;
-	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
-	
 	return self;
 }
 
@@ -131,26 +119,6 @@ void _Intersection_Init( void* intersection,  Stg_Shape** shapeList, Index shape
 	memcpy( self->isComplement , isComplement, sizeof(Bool) * shapeCount );
 	self->shapeCount = shapeCount;
 }
-
-
-void Intersection_InitAll( 
-		void*                                 intersection, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		Stg_Shape**                           shapeList,
-		Index                                 shapeCount,
-		Bool*                                 isComplement
-		)
-{
-	Intersection* self = (Intersection*)intersection;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma);
-	_Intersection_Init( self, shapeList, shapeCount, isComplement );
-}
-	
 
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions

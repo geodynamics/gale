@@ -61,17 +61,9 @@ BelowPlane* BelowPlane_New(
 {
 	BelowPlane* self = (BelowPlane*) _BelowPlane_DefaultNew( name );
 
-	BelowPlane_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		offset,
-		width,
-		minValue,
-		maxValue );
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma );
+	_BelowPlane_Init( self, offset, width, minValue, maxValue );
+
 	return self;
 }
 
@@ -114,10 +106,6 @@ BelowPlane* _BelowPlane_New(
 			name );
 	
 	/* General info */
-
-	/* Virtual Info */
-	self->_isCoordInside = _isCoordInside;
-	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
 	return self;
 }
 
@@ -131,30 +119,9 @@ void _BelowPlane_Init( void* belowPlane, double offset, XYZ width, XYZ minValue,
 	memcpy( self->maxValue, maxValue, sizeof(XYZ) );
 }
 
-
-void BelowPlane_InitAll( 
-		void*                                 belowPlane, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                offest,
-		XYZ                                   width,
-		XYZ                                   minValue,
-		XYZ                                   maxValue)
-{
-	BelowPlane* self = (BelowPlane*)belowPlane;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma );
-	_BelowPlane_Init( self, offest, width, minValue, maxValue );
-}
-	
-
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */
-
 void _BelowPlane_Delete( void* belowPlane ) {
 	BelowPlane* self = (BelowPlane*)belowPlane;
 	
@@ -162,15 +129,12 @@ void _BelowPlane_Delete( void* belowPlane ) {
 	_Stg_Shape_Delete( self );
 }
 
-
 void _BelowPlane_Print( void* belowPlane, Stream* stream ) {
 	BelowPlane* self = (BelowPlane*)belowPlane;
 	
 	/* Print parent */
 	_Stg_Shape_Print( self, stream );
 }
-
-
 
 void* _BelowPlane_Copy( void* belowPlane, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	BelowPlane*	self = (BelowPlane*)belowPlane;

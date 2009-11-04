@@ -58,6 +58,21 @@
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Constructors
 	*/
+
+   BelowCosinePlane* BelowCosinePlane_New(
+		Name                                  name,
+		Dimension_Index                       dim,
+		XYZ                                   centre, 
+		double                                alpha,
+		double                                beta,
+		double                                gamma,
+		double                                offset,
+		XYZ                                   width,
+		XYZ                                   minValue,
+		XYZ                                   maxValue,
+		double                                amplitude,
+		double                                wavelength,
+		double                                phase );
 	BelowCosinePlane* _BelowCosinePlane_New(
 		SizeT                                 _sizeOfSelf, 
 		Type                                  type,
@@ -76,20 +91,6 @@
 		Name                                  name );
 	
 	void _BelowCosinePlane_Init( void* belowPlane, XYZ width, double amplitude, double wavelength, double phase ) ;
-	void BelowCosinePlane_InitAll( 
-		void*                                 belowPlane, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                offset,
-		XYZ                                   width,
-		XYZ                                   minValue,
-		XYZ                                   maxValue,
-		double                                amplitude,
-		double                                wavelength,
-		double                                phase );
 
 	/* Stg_Class_Delete BelowCosinePlane implementation */
 	void _BelowCosinePlane_Delete( void* belowPlane );

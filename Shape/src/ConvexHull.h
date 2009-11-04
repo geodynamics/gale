@@ -86,15 +86,6 @@
 		Name                                  name );
 	
 	void _ConvexHull_Init( void* convexHull, Coord_List vertexList, Index vertexCount);
-	void ConvexHull_InitAll( 
-		void*                                 convexHull, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		Coord_List                            vertexList,
-		Index                                 vertexCount) ;
 		
 	/* Stg_Class_Delete ConvexHull implementation */
 	void _ConvexHull_Delete( void* convexHull );

@@ -61,16 +61,8 @@ Union* Union_New(
 {
 	Union* self = (Union*)_Union_DefaultNew( name );
 
-	Union_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		shapeList,
-		shapeCount,
-		isComplement);
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma);
+	_Union_Init( self, shapeList, shapeCount, isComplement );
 	return self;
 }
 
@@ -113,9 +105,6 @@ Union* _Union_New(
 			name );
 	
 	/* General info */
-
-	/* Virtual Info */
-	self->_isCoordInside = _isCoordInside;
 	
 	return self;
 }
@@ -132,24 +121,6 @@ void _Union_Init( void* combination,  Stg_Shape** shapeList, Index shapeCount, B
 }
 
 
-void Union_InitAll( 
-		void*                                 combination, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		Stg_Shape**                           shapeList,
-		Index                                 shapeCount,
-		Bool*                                 isComplement
-		)
-{
-	Union* self = (Union*)combination;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma);
-	_Union_Init( self, shapeList, shapeCount, isComplement );
-}
-	
 
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
@@ -172,8 +143,6 @@ void _Union_Print( void* combination, Stream* stream ) {
 	/* Print parent */
 	_Stg_Shape_Print( self, stream );
 }
-
-
 
 void* _Union_Copy( void* combination, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Union*	self = (Union*)combination;

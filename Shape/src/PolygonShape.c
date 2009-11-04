@@ -58,22 +58,12 @@ PolygonShape* PolygonShape_New(
 		Index                                 vertexCount,
 		XYZ                                   start,
 		XYZ                                   end,
-	        Axis                                  perpendicularAxis	)
+	   Axis                                  perpendicularAxis	)
 { 
 	PolygonShape* self = (PolygonShape*)_PolygonShape_DefaultNew( name );
 
-	PolygonShape_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		vertexList,
-		vertexCount,
-		start,
-		end,
-		perpendicularAxis);
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma);
+   _PolygonShape_Init( self, vertexList, vertexCount, start, end, perpendicularAxis );
 	return self;
 }
 
@@ -116,11 +106,6 @@ PolygonShape* _PolygonShape_New(
 			name );
 	
 	/* General info */
-
-	/* Virtual Info */
-	self->_isCoordInside = _isCoordInside;
-	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
-	
 	return self;
 }
 
@@ -134,27 +119,7 @@ void _PolygonShape_Init( void* polygon, Coord_List vertexList, Index vertexCount
 	memcpy( self->end , end, sizeof(XYZ) );
 	self->perpendicularAxis = perpendicularAxis;
 }
-
-
-void PolygonShape_InitAll( 
-		void*                                 polygon, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		Coord_List                            vertexList,
-		Index                                 vertexCount,
-		XYZ                                   start,
-		XYZ                                   end,
-		Axis                                  perpendicularAxis	)
-{
-	PolygonShape* self = (PolygonShape*)polygon;
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma);
-	_PolygonShape_Init( self, vertexList, vertexCount, start, end, perpendicularAxis );
-}
 	
-
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */

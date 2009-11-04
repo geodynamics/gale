@@ -58,14 +58,8 @@ Box* Box_New(
 {
 	Box* self = (Box*) _Box_DefaultNew( name );
 
-	Box_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		width) ;
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma );
+	_Box_Init( self, width );
 	return self;
 }
 
@@ -109,11 +103,6 @@ Box* _Box_New(
 	
 	/* General info */
 
-	/* Virtual Info */
-	self->_isCoordInside = _isCoordInside;
-	self->_calculateVolume = _calculateVolume;
-	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
-	
 	return self;
 }
 
@@ -123,22 +112,6 @@ void _Box_Init( void* shape, XYZ width ) {
 	memcpy( self->width, width, sizeof(XYZ));
 }
 
-
-void Box_InitAll( 
-		void*                                 shape, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		XYZ                                   width) 
-{
-	Box* self = (Box*)shape;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma );
-	_Box_Init( self, width );
-}
-	
 
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
@@ -158,8 +131,6 @@ void _Box_Print( void* shape, Stream* stream ) {
 	/* Print parent */
 	_Stg_Shape_Print( self, stream );
 }
-
-
 
 void* _Box_Copy( void* shape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Box*	self = (Box*)shape;

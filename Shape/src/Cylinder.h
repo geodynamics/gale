@@ -88,17 +88,6 @@
 		Name                                  name );
 	
 	void _Cylinder_Init( Cylinder* self, double radius, XYZ start, XYZ end, Axis perpendicularAxis ) ;
-	void Cylinder_InitAll( 
-		void*                                 cylinder, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                radius, 
-		XYZ                                   start, 
-		XYZ                                   end, 
-		Axis                                  perpendicularAxis );
 
 	/* Stg_Class_Delete Cylinder implementation */
 	void _Cylinder_Delete( void* cylinder );

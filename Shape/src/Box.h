@@ -83,14 +83,6 @@
 		Name                                  name );
 	
 	void _Box_Init( void* box, XYZ width ) ;
-	void Box_InitAll( 
-		void*                                 box, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		XYZ                                   width) ;
 
 	/* Stg_Class_Delete Box implementation */
 	void _Box_Delete( void* box );

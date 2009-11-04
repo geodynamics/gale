@@ -60,15 +60,9 @@ ConvexHull* ConvexHull_New(
 {
 	ConvexHull* self = (ConvexHull*)_ConvexHull_DefaultNew( name );
 
-	ConvexHull_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		vertexList,
-		vertexCount);
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma);
+   _ConvexHull_Init( self, vertexList, vertexCount);
+
 	return self;
 }
 
@@ -112,8 +106,6 @@ ConvexHull* _ConvexHull_New(
 	
 	/* General info */
 
-	/* Virtual Info */
-	
 	return self;
 }
 
@@ -173,24 +165,6 @@ void _ConvexHull_Init( void* convexHull, Coord_List vertexList, Index vertexCoun
 	}
 }
 	
-void ConvexHull_InitAll( 
-		void*                                 convexHull, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		Coord_List                            vertexList,
-		Index                                 vertexCount
-		)
-{
-	ConvexHull* self = (ConvexHull*)convexHull;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma);
-	_ConvexHull_Init( self, vertexList, vertexCount);
-}
-	
-
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */
@@ -199,7 +173,6 @@ void _ConvexHull_Delete( void* convexHull ) {
 	ConvexHull*       self       = (ConvexHull*)convexHull;
 	Coord_List        vertexList = self->vertexList;
 	XYZ*              facesList  = self->facesList;
-	
 
 	Memory_Free( vertexList );
 	Memory_Free( facesList );
@@ -215,8 +188,6 @@ void _ConvexHull_Print( void* convexHull, Stream* stream ) {
 	/* Print parent */
 	_Stg_Shape_Print( self, stream );
 }
-
-
 
 void* _ConvexHull_Copy( void* convexHull, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	ConvexHull*	self = (ConvexHull*)convexHull;
