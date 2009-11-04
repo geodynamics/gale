@@ -241,7 +241,7 @@ void LiveComponentRegister_DestroyAll( void* lcReg ) {
       code from running the _Destroy function again */
 	for ( index = 0 ; index < LiveComponentRegister_GetCount( self ) ; index++ ) {
 		component = LiveComponentRegister_At( self, index );
-		Stg_Component_Destroy( component, NULL, True );
+		Stg_Component_Destroy( component, NULL, False );
 	}
 
 }
