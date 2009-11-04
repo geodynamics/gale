@@ -388,14 +388,12 @@ void _VariableCondition_Initialise( void* variableCondition, void* data ) {
 }
 
 void _VariableCondition_Execute( void* variableCondition, void* data ) {
-	VariableCondition*		self = (VariableCondition*)variableCondition;
+	VariableCondition* self = (VariableCondition*)variableCondition;
 	
 	VariableCondition_Apply( self, data );
 }
 
-void _VariableCondition_Destroy( void* variableCondition, void* data )
-{
-	
+void _VariableCondition_Destroy( void* variableCondition, void* data ) {
 }
 
 void _VariableCondition_Apply( void* variableCondition, void* context ) {

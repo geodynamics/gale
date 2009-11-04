@@ -64,7 +64,6 @@ VariableCondition* SetVC_Factory(
 	return (VariableCondition*)SetVC_New( defaultSetVCName, NULL, variable_Register, conFunc_Register, dictionary );
 }
 
-
 SetVC* SetVC_New(
 	Name									name,
 	Name									_dictionaryEntryName, 
@@ -244,9 +243,8 @@ void _SetVC_ReadDictionary( void* setVC, void* dictionary ) {
 	}
 }
 
-void _SetVC_Delete(void* setVC)
-{
-	SetVC*	self = (SetVC*)setVC;
+void _SetVC_Delete(void* setVC) {
+	SetVC* self = (SetVC*)setVC;
 	
 	if (self->_entryTbl) Memory_Free( self->_entryTbl );
 	
@@ -255,11 +253,10 @@ void _SetVC_Delete(void* setVC)
 }
 
 
-void _SetVC_Print(void* setVC, Stream* stream)
-{
+void _SetVC_Print(void* setVC, Stream* stream) {
 	SetVC*				self = (SetVC*)setVC;
-	SetVC_Entry_Index		entry_I;
-	Index				i;
+	SetVC_Entry_Index	entry_I;
+	Index					i;
 	
 	/* Set the Journal for printing informations */
 	Stream* info = stream;
@@ -335,9 +332,9 @@ void _SetVC_Print(void* setVC, Stream* stream)
 
 
 void* _SetVC_Copy( void* setVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
-	SetVC*		self = (SetVC*)setVC;
-	SetVC*		newSetVC;
-	PtrMap*		map = ptrMap;
+	SetVC*	self = (SetVC*)setVC;
+	SetVC*	newSetVC;
+	PtrMap*	map = ptrMap;
 	Bool		ownMap = False;
 	
 	if( !map ) {
@@ -402,11 +399,7 @@ Variable_Index _SetVC_GetVariableIndex( void* variableCondition, Index globalInd
 }
 
 
-VariableCondition_ValueIndex _SetVC_GetValueIndex(
-		void*				variableCondition, 
-		Index				globalIndex, 
-		VariableCondition_VariableIndex	varIndex )
-{
+VariableCondition_ValueIndex _SetVC_GetValueIndex( void* variableCondition, Index globalIndex, VariableCondition_VariableIndex varIndex ) {
 	return varIndex;
 }
 

@@ -57,86 +57,54 @@
 		/* Virtual info */ \
 		\
 		/* Stg_Class info */ \
-		Name				_dictionaryEntryName; \
+		Name								_dictionaryEntryName; \
 		VariableAllVC_Entry_Index	_entryCount; \
-		VariableAllVC_Entry*		_entryTbl; \
-		void*				data;
+		VariableAllVC_Entry*			_entryTbl; \
+		void*								data;
 
 	struct _VariableAllVC { __VariableAllVC };
 	
-	
+	#define VARIABLEALLVC_DEFARGS \
+		VARIABLECONDITION_DEFARGS, \
+         Name	_dictionaryEntryName, \
+			void*	mesh 
+
+   #define VARIABLEALLVC_PASSARGS \
+      VARIABLECONDITION_PASSARGS, \
+         _dictionaryEntryName, \
+			mesh 
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
-	VariableCondition*		VariableAllVC_Factory(
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register, 
-						Dictionary*					dictionary,
-						void*						data );
+	VariableCondition* VariableAllVC_Factory(
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register, 
+		Dictionary*							dictionary,
+		void*									data );
 	
-	VariableAllVC*			VariableAllVC_New(
-						Name						name,
-						Name						_dictionaryEntryName, 
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register,
-						Dictionary*					dictionary,
-						void*						mesh );
+	VariableAllVC* VariableAllVC_New(
+		Name									name,
+		Name									_dictionaryEntryName, 
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register,
+		Dictionary*							dictionary,
+		void*									mesh );
 	
-	void				VariableAllVC_Init(
-						Name						name,
-						Name						_dictionaryEntryName, 
-						VariableAllVC*					self,
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register,
-						Dictionary*					dictionary,
-						void*						mesh );
+	VariableAllVC* VariableAllVC_DefaultNew( Name name );
 	
-	VariableAllVC*			VariableAllVC_DefaultNew( Name name );
+	VariableAllVC* _VariableAllVC_New( VARIABLEALLVC_DEFARGS );
 	
-	VariableAllVC*			_VariableAllVC_New( 
-						SizeT						_sizeOfSelf, 
-						Type						type,
-						Stg_Class_DeleteFunction*				_delete,
-						Stg_Class_PrintFunction*				_print,
-						Stg_Class_CopyFunction*				_copy, 
-						Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-						Stg_Component_ConstructFunction*		_construct,
-						Stg_Component_BuildFunction*			_build,
-						Stg_Component_InitialiseFunction*			_initialise,
-						Stg_Component_ExecuteFunction*			_execute,
-						Stg_Component_DestroyFunction*		_destroy,
-						Name						name,
-						Bool						initFlag,
-						VariableCondition_BuildSelfFunc*		_buildSelf, 
-						VariableCondition_PrintConciseFunc*		_printConcise,
-						VariableCondition_ReadDictionaryFunc*		_readDictionary,
-						VariableCondition_GetSetFunc*			_getSet,
-						VariableCondition_GetVariableCountFunc*		_getVariableCount,
-						VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-						VariableCondition_GetValueIndexFunc*		_getValueIndex,
-						VariableCondition_GetValueCountFunc*		_getValueCount,
-						VariableCondition_GetValueFunc*			_getValue,
-						VariableCondition_ApplyFunc*			_apply, 
-						Name						_dictionaryEntryName, 
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register,
-						Dictionary*					dictionary,
-						void*						mesh );
-	
-	void				_VariableAllVC_Init(
-						void*						allElementsVC, 
-						Name						_dictionaryEntryName, 
-						void*						mesh );
-	
+	void _VariableAllVC_Init( void* allElementsVC, Name _dictionaryEntryName, void* mesh );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** General virtual functions
 	*/
 	
-	void				_VariableAllVC_Delete( void* allElementsVC );
+	void _VariableAllVC_Delete( void* allElementsVC );
 	
-	void				_VariableAllVC_Print( void* allElementsVC, Stream* stream );
+	void _VariableAllVC_Print( void* allElementsVC, Stream* stream );
 	
 	/* Copy */
 	#define VariableAllVC_Copy( self ) \
@@ -146,7 +114,7 @@
 	
 	void* _VariableAllVC_Copy( void* allElementsVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
-	void				_VariableAllVC_Build( void* allElementsVC, void* data );
+	void _VariableAllVC_Build( void* allElementsVC, void* data );
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -158,29 +126,23 @@
 	** Virtual functions
 	*/
 	
-	void				_VariableAllVC_BuildSelf( void* allElementsVC, void* data );
+	void _VariableAllVC_BuildSelf( void* allElementsVC, void* data );
 	
-	void				_VariableAllVC_ReadDictionary( void* variableCondition, void* dictionary );
+	void _VariableAllVC_ReadDictionary( void* variableCondition, void* dictionary );
 	
-	IndexSet*			_VariableAllVC_GetSet( void* variableCondition );
+	IndexSet* _VariableAllVC_GetSet( void* variableCondition );
 	
 	VariableCondition_VariableIndex	_VariableAllVC_GetVariableCount( void* variableCondition, Index globalIndex );
 	
-	Variable_Index			_VariableAllVC_GetVariableIndex(
-						void*					variableCondition,
-						Index					globalIndex, 
-						VariableCondition_VariableIndex		varIndex );
+	Variable_Index _VariableAllVC_GetVariableIndex( void* variableCondition, Index globalIndex, VariableCondition_VariableIndex varIndex );
 						
-	VariableCondition_ValueIndex	_VariableAllVC_GetValueIndex(
-						void*					variableCondition, 
-						Index					globalIndex, 
-						VariableCondition_VariableIndex		varIndex );
+	VariableCondition_ValueIndex	_VariableAllVC_GetValueIndex( void* variableCondition, Index globalIndex, VariableCondition_VariableIndex varIndex );
 						
 	VariableCondition_ValueIndex	_VariableAllVC_GetValueCount( void* variableCondition );
 	
-	VariableCondition_Value		_VariableAllVC_GetValue( void* variableCondition, VariableCondition_ValueIndex valIndex );
+	VariableCondition_Value _VariableAllVC_GetValue( void* variableCondition, VariableCondition_ValueIndex valIndex );
 	
-	void				_VariableAllVC_PrintConcise( void* variableCondition, Stream* stream );
+	void _VariableAllVC_PrintConcise( void* variableCondition, Stream* stream );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Build functions
