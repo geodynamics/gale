@@ -1,10 +1,29 @@
-#!/usr/bin/env python
+#!/usr/bin/python
+# The following documentation is designed to sit at the top of the main doxygen page!
+## \mainpage 
+## Documentation in these Doxygen pages is designed for developers.
+## There are the following sections: Classes, Files and Directories
+## \section Classes
+## Extracted from C and python documentation, this has details on all classes defined in
+## the code, including 'pseudo-classes' based on macros.
+## \section Files
+## Contains the extracted *.c, *.h and *.py files.
+## \section Directories
+## Contains a listing of all directories in the code base.
+## \section Namespaces
+## This is where functions
+## not contained in a class but referenced by file name will appear.
+## \section Related Pages
+## Contains the Todo page - a list of extracted Todo's from all the code base; 
+## and The Deprecated List, which contains deprecated classes, functions and files. 
+
 import createDocs
 import createHTMLDocuments, createDocument
 import sys, os.path, os, string, subprocess, shutil
 from createDocument import createDocuments
 from createDocs import createListDictionary
 from createDocs import createDoxygen
+
 ## Function for specific help statement for running Doxygen ONLY
 def printHelpStatement(dictionary):
 
