@@ -1308,11 +1308,6 @@ void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_Local
 	nInc = IArray_GetSize( self->inc );
 	inc = IArray_GetPtr( self->inc );
 
-        if(!strcmp(self->name, "GravitationalPerturbationField")) {
-          printf("Hi\n");
-        }
-          //printf("%s, %g, %g\n", self->name, value[0], value[1]);
-
 	for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
 		/** Interpolate derivative from nodes */
 		for ( elLocalNode_I = 0 ; elLocalNode_I < nInc ; elLocalNode_I++) {
