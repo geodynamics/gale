@@ -50,6 +50,7 @@ const Type TimeIntegratee_Type = "TimeIntegratee";
 
 TimeIntegratee* TimeIntegratee_New( 
 		Name                                       name,
+		DomainContext*                             context,
 		TimeIntegrator*                            timeIntegrator, 
 		Variable*                                  variable,
 		Index                                      dataCount, 
@@ -59,7 +60,7 @@ TimeIntegratee* TimeIntegratee_New(
 	TimeIntegratee*	self;
 
 	self = (TimeIntegratee*) _TimeIntegratee_DefaultNew( name );
-	_TimeIntegratee_Init( self, timeIntegrator, variable, dataCount, data, allowFallbackToFirstOrder );
+	_TimeIntegratee_Init( self, context, timeIntegrator, variable, dataCount, data, allowFallbackToFirstOrder );
 	return self;
 }
 
@@ -107,7 +108,8 @@ TimeIntegratee* _TimeIntegratee_New(
 }
 
 void _TimeIntegratee_Init( 
-		void*                                      timeIntegratee, 
+		void*                                      timeIntegratee,
+		DomainContext*                             context,
 		TimeIntegrator*                            timeIntegrator, 
 		Variable*                                  variable, 
 		Index                                      dataCount, 
@@ -115,7 +117,8 @@ void _TimeIntegratee_Init(
 		Bool                                       allowFallbackToFirstOrder )
 {
 	TimeIntegratee* self = (TimeIntegratee*)timeIntegratee;
-	
+
+   self->context        = context;
 	self->debug          = Journal_Register( Debug_Type, self->type );
 	self->variable       = variable;
 	self->dataCount      = dataCount;
@@ -189,10 +192,11 @@ void _TimeIntegratee_AssignFromXML( void* timeIntegratee, Stg_ComponentFactory* 
 	Variable*               variable                = NULL;
 	TimeIntegrator*         timeIntegrator          = NULL;
 	Bool                    allowFallbackToFirstOrder = False;
+	DomainContext*          context;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
 	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 	
 	variable       =  Stg_ComponentFactory_ConstructByKey( cf, self->name, Variable_Type,       Variable,       False, data ) ;
 	timeIntegrator =  Stg_ComponentFactory_ConstructByKey( cf, self->name, TimeIntegrator_Type, TimeIntegrator, True, data ) ;
@@ -207,7 +211,7 @@ void _TimeIntegratee_AssignFromXML( void* timeIntegratee, Stg_ComponentFactory* 
 		data );
 	allowFallbackToFirstOrder = Stg_ComponentFactory_GetBool( cf, self->name, "allowFallbackToFirstOrder", False );	
 
-	_TimeIntegratee_Init( self, timeIntegrator, variable, dataCount, initData, allowFallbackToFirstOrder );
+	_TimeIntegratee_Init( self, context, timeIntegrator, variable, dataCount, initData, allowFallbackToFirstOrder );
 
 	if( initData != NULL )
 		Memory_Free( initData );
