@@ -48,7 +48,7 @@ const Type Mesh_RegularAlgorithms_Type = "Mesh_RegularAlgorithms";
 */
 
 Mesh_RegularAlgorithms* Mesh_RegularAlgorithms_New( Name name ) {
-	return _Mesh_RegularAlgorithms_New( sizeof(Mesh_RegularAlgorithms), 
+	Mesh_RegularAlgorithms* self = _Mesh_RegularAlgorithms_New( sizeof(Mesh_RegularAlgorithms), 
 					    Mesh_RegularAlgorithms_Type, 
 					    _Mesh_RegularAlgorithms_Delete, 
 					    _Mesh_RegularAlgorithms_Print, 
@@ -70,6 +70,11 @@ Mesh_RegularAlgorithms* Mesh_RegularAlgorithms_New( Name name ) {
 					    _Mesh_Algorithms_GetLocalCoordRange, 
 					    _Mesh_Algorithms_GetDomainCoordRange, 
 					    _Mesh_Algorithms_GetGlobalCoordRange );
+
+	/* Mesh_RegularAlgorithms info */
+	_Mesh_RegularAlgorithms_Init( self );
+
+   return self;
 }
 
 Mesh_RegularAlgorithms* _Mesh_RegularAlgorithms_New( MESH_REGULARALGORITHMS_DEFARGS ) {
@@ -78,11 +83,6 @@ Mesh_RegularAlgorithms* _Mesh_RegularAlgorithms_New( MESH_REGULARALGORITHMS_DEFA
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(Mesh_RegularAlgorithms) );
 	self = (Mesh_RegularAlgorithms*)_Mesh_Algorithms_New( MESH_ALGORITHMS_PASSARGS );
-
-	/* Virtual info */
-
-	/* Mesh_RegularAlgorithms info */
-	_Mesh_RegularAlgorithms_Init( self );
 
 	return self;
 }
@@ -100,8 +100,6 @@ void _Mesh_RegularAlgorithms_Init( Mesh_RegularAlgorithms* self ) {
 
 void _Mesh_RegularAlgorithms_Delete( void* algorithms ) {
 	Mesh_RegularAlgorithms*	self = (Mesh_RegularAlgorithms*)algorithms;
-
-	Mesh_RegularAlgorithms_Destruct( self );
 
 	/* Delete the parent. */
 	_Mesh_Algorithms_Delete( self );
@@ -136,7 +134,11 @@ void _Mesh_RegularAlgorithms_Execute( void* algorithms, void* data ) {
 }
 
 void _Mesh_RegularAlgorithms_Destroy( void* algorithms, void* data ) {
-    _Mesh_Algorithms_Destroy( algorithms, data );
+	Mesh_RegularAlgorithms*	self = (Mesh_RegularAlgorithms*)algorithms;
+
+	Mesh_RegularAlgorithms_Destruct( self );
+
+   _Mesh_Algorithms_Destroy( algorithms, data );
 }
 
 void Mesh_RegularAlgorithms_SetMesh( void* algorithms, void* mesh ) {

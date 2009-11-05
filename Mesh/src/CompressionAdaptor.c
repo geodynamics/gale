@@ -93,7 +93,7 @@ CompressionAdaptor* _CompressionAdaptor_New( COMPRESSIONADAPTOR_DEFARGS ) {
 	
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(CompressionAdaptor) );
-	self = (CompressionAdaptor*)_MeshGenerator_New( MESHADAPTOR_PASSARGS );
+	self = (CompressionAdaptor*)_MeshAdaptor_New( MESHADAPTOR_PASSARGS );
 
 	/* Virtual info */
 	return self;
