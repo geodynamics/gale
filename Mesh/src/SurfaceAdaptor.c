@@ -93,7 +93,7 @@ SurfaceAdaptor* _SurfaceAdaptor_New( SURFACEADAPTOR_DEFARGS ) {
 	
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(SurfaceAdaptor) );
-	self = (SurfaceAdaptor*)_MeshAdaptop_New( MESHADAPTOR_PASSARGS );
+	self = (SurfaceAdaptor*)_MeshAdaptor_New( MESHADAPTOR_PASSARGS );
 
 	/* Virtual info */
 	return self;
@@ -113,7 +113,7 @@ void _SurfaceAdaptor_Delete( void* adaptor ) {
 	SurfaceAdaptor*	self = (SurfaceAdaptor*)adaptor;
 
 	/* Delete the parent. */
-	_MeshAdaptop_Delete( self );
+	_MeshAdaptor_Delete( self );
 }
 
 void _SurfaceAdaptor_Print( void* adaptor, Stream* stream ) {
@@ -125,7 +125,7 @@ void _SurfaceAdaptor_Print( void* adaptor, Stream* stream ) {
 
 	/* Print parent */
 	Journal_Printf( stream, "SurfaceAdaptor (ptr): (%p)\n", self );
-	_MeshAdaptop_Print( self, stream );
+	_MeshAdaptor_Print( self, stream );
 }
 
 void _SurfaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data ) {

@@ -248,7 +248,7 @@ void _LinearSpaceAdaptor_Destroy( void* adaptor, void* data ) {
    Memory_Free( self->tabley );
    Memory_Free( self->tablez );
 
-   _MeshAdaptop_Destroy( self, data );
+   _MeshAdaptor_Destroy( self, data );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------
