@@ -135,8 +135,7 @@ void _TimeIntegratee_Delete( void* timeIntegratee ) {
 	
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
 
-	/* Stg_Class_Delete parent*/
-	Stg_Class_Delete( self );
+	_Stg_Component_Delete( self );
 }
 
 void _TimeIntegratee_Print( void* timeIntegratee, Stream* stream ) {
