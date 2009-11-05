@@ -117,8 +117,6 @@ void _IntegrationPointMapper_Init( void* mapper, IntegrationPointsSwarm* integra
 void _IntegrationPointMapper_Delete( void* mapper ) {
     IntegrationPointMapper* self = (IntegrationPointMapper*)mapper;
 
-    Stg_Class_Delete( self->integrationSwarm );
-
     _Stg_Component_Delete( self );
 }
 void _IntegrationPointMapper_Print( void* mapper, Stream* stream ) {
@@ -172,6 +170,9 @@ void _IntegrationPointMapper_Execute( void* mapper, void* data ) {
 }
 
 void _IntegrationPointMapper_Destroy( void* mapper, void* data ) {
+   IntegrationPointMapper* self = (IntegrationPointMapper*)mapper;
+
+   Stg_Component_Destroy( self->integrationSwarm, data, False );
 }
 
 void IntegrationPointMapper_Map( void* mapper ) {
