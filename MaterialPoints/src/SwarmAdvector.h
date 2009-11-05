@@ -73,6 +73,7 @@
 	*/
 	SwarmAdvector* SwarmAdvector_New(
 		Name                                       name,
+		DomainContext*                             context,
 		TimeIntegrator*                            timeIntegrator,
 		FeVariable*                                velocityField,
 		Bool                                       allowFallbackToFirstOrder,
