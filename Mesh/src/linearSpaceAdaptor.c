@@ -72,7 +72,7 @@ double LinearSpaceAdaptor_MapPoint( segment* table, unsigned size, double x );
 */
 
 LinearSpaceAdaptor* LinearSpaceAdaptor_New( Name name ) {
-	return _LinearSpaceAdaptor_New( sizeof(LinearSpaceAdaptor), 
+   LinearSpaceAdaptor* self = _LinearSpaceAdaptor_New( sizeof(LinearSpaceAdaptor), 
 				    LinearSpaceAdaptor_Type, 
 				    _LinearSpaceAdaptor_Delete, 
 				    _LinearSpaceAdaptor_Print, 
@@ -87,6 +87,11 @@ LinearSpaceAdaptor* LinearSpaceAdaptor_New( Name name ) {
 				    NON_GLOBAL, 
 				    _MeshGenerator_SetDimSize, 
 				    LinearSpaceAdaptor_Generate );
+
+	/* LinearSpaceAdaptor init */
+	_LinearSpaceAdaptor_Init( self );
+
+   return self;
 }
 
 LinearSpaceAdaptor* _LinearSpaceAdaptor_New( COMPRESSIONADAPTOR_DEFARGS ) {
@@ -97,10 +102,6 @@ LinearSpaceAdaptor* _LinearSpaceAdaptor_New( COMPRESSIONADAPTOR_DEFARGS ) {
 	self = (LinearSpaceAdaptor*)_MeshGenerator_New( MESHADAPTOR_PASSARGS );
 
 	/* Virtual info */
-
-	/* LinearSpaceAdaptor info */
-	_LinearSpaceAdaptor_Init( self );
-
 	return self;
 }
 
@@ -113,10 +114,6 @@ void _LinearSpaceAdaptor_Init( LinearSpaceAdaptor* self ) {}
 
 void _LinearSpaceAdaptor_Delete( void* adaptor ) {
 	LinearSpaceAdaptor*	self = (LinearSpaceAdaptor*)adaptor;
-
-	Memory_Free( self->tablex );
-	Memory_Free( self->tabley );
-	Memory_Free( self->tablez );
 
 	/* Delete the parent. */
 	_MeshGenerator_Delete( self );
@@ -229,6 +226,8 @@ void _LinearSpaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf,
 	} else {
  	  self->nSegmentsz = 0;
 	}
+
+	_LinearSpaceAdaptor_Init( self );
 }
 
 void _LinearSpaceAdaptor_Build( void* adaptor, void* data ) {
@@ -243,6 +242,13 @@ void _LinearSpaceAdaptor_Execute( void* adaptor, void* data ) {
 }
 
 void _LinearSpaceAdaptor_Destroy( void* adaptor, void* data ) {
+   LinearSpaceAdaptor*		self = (LinearSpaceAdaptor*)adaptor;
+
+   Memory_Free( self->tablex );
+   Memory_Free( self->tabley );
+   Memory_Free( self->tablez );
+
+   _MeshAdaptop_Destroy( self, data );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------

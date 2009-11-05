@@ -48,7 +48,7 @@ const Type Mesh_Algorithms_Type = "Mesh_Algorithms";
 */
 
 Mesh_Algorithms* Mesh_Algorithms_New( Name name ) {
-	return _Mesh_Algorithms_New( sizeof(Mesh_Algorithms), 
+	Mesh_Algorithms* self = _Mesh_Algorithms_New( sizeof(Mesh_Algorithms), 
 				     Mesh_Algorithms_Type, 
 				     _Mesh_Algorithms_Delete, 
 				     _Mesh_Algorithms_Print, 
@@ -70,6 +70,10 @@ Mesh_Algorithms* Mesh_Algorithms_New( Name name ) {
 				     _Mesh_Algorithms_GetLocalCoordRange, 
 				     _Mesh_Algorithms_GetDomainCoordRange, 
 				     _Mesh_Algorithms_GetGlobalCoordRange );
+
+	_Mesh_Algorithms_Init( self );
+   return self;
+
 }
 
 Mesh_Algorithms* _Mesh_Algorithms_New( MESH_ALGORITHMS_DEFARGS ) {
@@ -90,9 +94,6 @@ Mesh_Algorithms* _Mesh_Algorithms_New( MESH_ALGORITHMS_DEFARGS ) {
 	self->getDomainCoordRangeFunc = getDomainCoordRangeFunc;
 	self->getGlobalCoordRangeFunc = getGlobalCoordRangeFunc;
 
-	/* Mesh_Algorithms info */
-	_Mesh_Algorithms_Init( self );
-
 	return self;
 }
 
@@ -112,8 +113,6 @@ void _Mesh_Algorithms_Init( Mesh_Algorithms* self ) {
 
 void _Mesh_Algorithms_Delete( void* algorithms ) {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
-
-	NewClass_Delete( self->incArray );
 
 	/* Delete the parent. */
 	_Stg_Component_Delete( self );
@@ -141,14 +140,14 @@ void _Mesh_Algorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf,
 
 void _Mesh_Algorithms_Build( void* algorithms, void* data ) {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
-    Stg_Component_Build( self->mesh, data, False );
-    Stg_Component_Build( self->tree, data, False );
+   Stg_Component_Build( self->mesh, data, False );
+   Stg_Component_Build( self->tree, data, False );
 }
 
 void _Mesh_Algorithms_Initialise( void* algorithms, void* data ) {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
-    Stg_Component_Initialise( self->mesh, data, False );
-    Stg_Component_Initialise( self->tree, data, False );
+   Stg_Component_Initialise( self->mesh, data, False );
+   Stg_Component_Initialise( self->tree, data, False );
 }
 
 void _Mesh_Algorithms_Execute( void* algorithms, void* data ) {
@@ -156,8 +155,10 @@ void _Mesh_Algorithms_Execute( void* algorithms, void* data ) {
 
 void _Mesh_Algorithms_Destroy( void* algorithms, void* data ) {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
-    Stg_Component_Destroy( self->mesh, data, False );
-    Stg_Component_Destroy( self->tree, data, False );
+	NewClass_Delete( self->incArray );
+   Stg_Component_Destroy( self->mesh, data, False );
+   Stg_Component_Destroy( self->tree, data, False );
+
 }
 
 void _Mesh_Algorithms_SetMesh( void* algorithms, void* mesh ) {

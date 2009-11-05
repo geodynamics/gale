@@ -88,9 +88,6 @@ void _MeshGenerator_Init( MeshGenerator* self ) {
 void _MeshGenerator_Delete( void* meshGenerator ) {
 	MeshGenerator*	self = (MeshGenerator*)meshGenerator;
 
-	MeshGenerator_Destruct( self );
-
-	/* Delete the parent. */
 	_Stg_Component_Delete( self );
 }
 
@@ -220,6 +217,9 @@ void _MeshGenerator_Execute( void* meshGenerator, void* data ) {
 }
 
 void _MeshGenerator_Destroy( void* meshGenerator, void* data ) {
+   MeshGenerator* self = (MeshGenerator*)meshGenerator;
+
+   MeshGenerator_Destruct( self );
 }
 
 void MeshGenerator_SetFullIncidence( void* meshGenerator ) {

@@ -48,7 +48,7 @@ const Type Mesh_CentroidAlgorithms_Type = "Mesh_CentroidAlgorithms";
 */
 
 Mesh_CentroidAlgorithms* Mesh_CentroidAlgorithms_New( Name name ) {
-	return _Mesh_CentroidAlgorithms_New( sizeof(Mesh_CentroidAlgorithms), 
+   Mesh_CentroidAlgorithms* self = _Mesh_CentroidAlgorithms_New( sizeof(Mesh_CentroidAlgorithms), 
 					     Mesh_CentroidAlgorithms_Type, 
 					     _Mesh_CentroidAlgorithms_Delete, 
 					     _Mesh_CentroidAlgorithms_Print, 
@@ -70,6 +70,10 @@ Mesh_CentroidAlgorithms* Mesh_CentroidAlgorithms_New( Name name ) {
 					     Mesh_CentroidAlgorithms_GetLocalCoordRange, 
 					     Mesh_CentroidAlgorithms_GetDomainCoordRange, 
 					     Mesh_CentroidAlgorithms_GetGlobalCoordRange );
+
+	_Mesh_CentroidAlgorithms_Init( self );
+   return self;
+
 }
 
 Mesh_CentroidAlgorithms* _Mesh_CentroidAlgorithms_New( MESH_HEXALGORITHMS_DEFARGS ) {
@@ -78,11 +82,6 @@ Mesh_CentroidAlgorithms* _Mesh_CentroidAlgorithms_New( MESH_HEXALGORITHMS_DEFARG
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(Mesh_CentroidAlgorithms) );
 	self = (Mesh_CentroidAlgorithms*)_Mesh_Algorithms_New( MESH_ALGORITHMS_PASSARGS );
-
-	/* Virtual info */
-
-	/* Mesh_CentroidAlgorithms info */
-	_Mesh_CentroidAlgorithms_Init( self );
 
 	return self;
 }
@@ -129,31 +128,31 @@ void _Mesh_CentroidAlgorithms_Build( void* _centroidAlgorithms, void* data ) {
     
     Mesh_CentroidAlgorithms*      centroidAlgorithms = (Mesh_CentroidAlgorithms*)_centroidAlgorithms;
     
-    _Mesh_Algorithms_Build( centroidAlgorithms, data );
     Stg_Component_Build( centroidAlgorithms->elMesh, data, False );  
+    _Mesh_Algorithms_Build( centroidAlgorithms, data );
 }
 
 void _Mesh_CentroidAlgorithms_Initialise( void* _centroidAlgorithms, void* data ) {
     Mesh_CentroidAlgorithms*      centroidAlgorithms = (Mesh_CentroidAlgorithms*)_centroidAlgorithms;
     
-    _Mesh_Algorithms_Initialise( centroidAlgorithms, data );
     Stg_Component_Initialise( centroidAlgorithms->elMesh, data, False );  
+    _Mesh_Algorithms_Initialise( centroidAlgorithms, data );
 }
 
 void _Mesh_CentroidAlgorithms_Execute( void* _centroidAlgorithms, void* data ) {
     
     Mesh_CentroidAlgorithms*      centroidAlgorithms = (Mesh_CentroidAlgorithms*)_centroidAlgorithms;
     
-    _Mesh_Algorithms_Initialise( centroidAlgorithms, data );
     Stg_Component_Initialise( centroidAlgorithms->elMesh, data, False );  
+    _Mesh_Algorithms_Initialise( centroidAlgorithms, data );
 }
 
 void _Mesh_CentroidAlgorithms_Destroy( void* _centroidAlgorithms, void* data ) {
     
     Mesh_CentroidAlgorithms*      centroidAlgorithms = (Mesh_CentroidAlgorithms*)_centroidAlgorithms;
     
-    _Mesh_Algorithms_Destroy( centroidAlgorithms, data );
     Stg_Component_Destroy( centroidAlgorithms->elMesh, data, False );  
+    _Mesh_Algorithms_Destroy( centroidAlgorithms, data );
 }
 
 void Mesh_CentroidAlgorithms_Update( void* centroidAlgorithms ) {
