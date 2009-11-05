@@ -49,7 +49,7 @@ const Type Mesh_Type = "Mesh";
 */
 
 Mesh* Mesh_New( Name name ) {
-	return _Mesh_New( sizeof(Mesh), 
+	Mesh* self = _Mesh_New( sizeof(Mesh), 
 			  Mesh_Type, 
 			  _Mesh_Delete, 
 			  _Mesh_Print, 
@@ -62,6 +62,9 @@ Mesh* Mesh_New( Name name ) {
 			  _Mesh_Destroy, 
 			  name, 
 			  NON_GLOBAL );
+
+	_Mesh_Init( self );
+   return self;
 }
 
 Mesh* _Mesh_New( MESH_DEFARGS ) {
@@ -71,16 +74,11 @@ Mesh* _Mesh_New( MESH_DEFARGS ) {
 	assert( sizeOfSelf >= sizeof(Mesh) );
 	self = (Mesh*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
 
-	/* Virtual info */
-
-	/* Mesh info */
-	_Mesh_Init( self );
-
 	return self;
 }
 
 void _Mesh_Init( Mesh* self ) {
-	self->topo = IGraph_New( "" );
+	self->topo = (MeshTopology*)IGraph_New( "" );
 	self->verts = NULL;
 
 	self->vars = List_New();
@@ -121,13 +119,6 @@ void _Mesh_Init( Mesh* self ) {
 void _Mesh_Delete( void* mesh ) {
 	Mesh*	self = (Mesh*)mesh;
 
-	Mesh_Destruct( self );
-	KillObject( self->algorithms );
-	NewClass_Delete( self->topo );
-	KillObject( self->info );
-	KillObject( self->vars );
-	KillObject( self->topoDataSizes );
-
 	/* Delete the parent. */
 	_Stg_Component_Delete( self );
 }
@@ -150,6 +141,8 @@ void _Mesh_AssignFromXML( void* mesh, Stg_ComponentFactory* cf, void* data ) {
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
 	if( !self->context )
 		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
+	_Mesh_Init( self );
 }
 
 void _Mesh_Build( void* mesh, void* data ) {
@@ -210,6 +203,14 @@ void _Mesh_Execute( void* mesh, void* data ) {
 }
 
 void _Mesh_Destroy( void* mesh, void* data ) {
+   Mesh*			self = (Mesh*)mesh;
+
+   Mesh_Destruct( self );
+   Stg_Class_Delete( self->algorithms );
+   NewClass_Delete( self->topo );
+   Stg_Class_Delete( self->info );
+   Stg_Class_Delete( self->vars );
+   Stg_Class_Delete( self->topoDataSizes );
 }
 
 
@@ -623,7 +624,7 @@ void Mesh_Destruct( Mesh* self ) {
 	unsigned	et_i, v_i;
 
 	for( et_i = 0; et_i < self->nElTypes; et_i++ )
-		FreeObject( self->elTypes[et_i] );
+		Stg_Class_Delete( self->elTypes[et_i] );
 	KillArray( self->elTypes );
 	KillArray( self->elTypeMap );
 	self->nElTypes = 0;

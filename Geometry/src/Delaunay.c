@@ -295,50 +295,6 @@ void _Delaunay_Delete( void* delaunay )
 	
 	assert( self );
 
-	if( self->sites ){
-		Memory_Free( self->sites );
-	}
-	
-	if( self->qp ){
-		Stg_Class_Delete( self->qp );
-	}
-
-	if( self->vp ){
-		Stg_Class_Delete( self->vp );
-	}
-
-	if( self->triangleIndices ){
-		Memory_Free( self->triangleIndices[0] );
-		Memory_Free( self->triangleIndices );
-	}
-
-	if( self->triangleNeighbours ){
-		Memory_Free( self->triangleNeighbours[0] );
-		Memory_Free( self->triangleNeighbours );
-	}
-
-	if( self->numNeighbours ){
-		Memory_Free( self->numNeighbours );
-	}
-	
-	if( self->neighbours ){
-		Memory_Free( self->neighbours[0] );
-		Memory_Free( self->neighbours );
-	}
-
-	if( self->voronoiSides ){
-		Memory_Free( self->voronoiSides[0] );
-		Memory_Free( self->voronoiSides );
-	}
-
-	if( self->voronoiArea ){
-		Memory_Free( self->voronoiArea );
-	}
-
-	if( self->hull ){
-		Memory_Free( self->hull );
-	}
-
 	_Stg_Component_Delete( self );
 }
 
@@ -437,6 +393,53 @@ void _Delaunay_Execute( void* delaunay, void* data ) {
 }
 
 void _Delaunay_Destroy( void* delaunay, void* data ) {
+   Delaunay *self = (Delaunay*)delaunay;
+	
+	assert( self );
+
+	if( self->sites ){
+		Memory_Free( self->sites );
+	}
+	
+	if( self->qp ){
+		Stg_Class_Delete( self->qp );
+	}
+
+	if( self->vp ){
+		Stg_Class_Delete( self->vp );
+	}
+
+	if( self->triangleIndices ){
+		Memory_Free( self->triangleIndices[0] );
+		Memory_Free( self->triangleIndices );
+	}
+
+	if( self->triangleNeighbours ){
+		Memory_Free( self->triangleNeighbours[0] );
+		Memory_Free( self->triangleNeighbours );
+	}
+
+	if( self->numNeighbours ){
+		Memory_Free( self->numNeighbours );
+	}
+	
+	if( self->neighbours ){
+		Memory_Free( self->neighbours[0] );
+		Memory_Free( self->neighbours );
+	}
+
+	if( self->voronoiSides ){
+		Memory_Free( self->voronoiSides[0] );
+		Memory_Free( self->voronoiSides );
+	}
+
+	if( self->voronoiArea ){
+		Memory_Free( self->voronoiArea );
+	}
+
+	if( self->hull ){
+		Memory_Free( self->hull );
+	}
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------
