@@ -544,6 +544,8 @@ void _FeVariable_Build( void* variable, void* data ) {
 
 		dim = Mesh_GetDimSize(self->feMesh);
 		/** allocate GNx here */
+#if 0
+/* WTF? This is NOT the way to do this!!!! */
 		if( !strcmp( self->feMesh->name, "linearMesh" ) ) {
 			numNodes = ( dim == 2 ) ? 4 : 8;
 		}
@@ -551,6 +553,11 @@ void _FeVariable_Build( void* variable, void* data ) {
 			numNodes = ( dim == 2 ) ? 9 : 27;
 		} 
 		else { numNodes = 0; } /** for constantMesh type */
+#endif
+                /* At least this will work for meshes with names other
+                   than those listed above. I spent three hours finding
+                   this out. Fuck. */
+                numNodes = FeMesh_GetElementNodeSize(self->feMesh, 0);
 
 		self->GNx = Memory_Alloc_2DArray( double, dim, numNodes, "Global Shape Function Derivatives" );
 		
@@ -1300,6 +1307,11 @@ void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_Local
 	FeMesh_GetElementNodes( self->feMesh, lElement_I, self->inc );
 	nInc = IArray_GetSize( self->inc );
 	inc = IArray_GetPtr( self->inc );
+
+        if(!strcmp(self->name, "GravitationalPerturbationField")) {
+          printf("Hi\n");
+        }
+          //printf("%s, %g, %g\n", self->name, value[0], value[1]);
 
 	for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
 		/** Interpolate derivative from nodes */
