@@ -160,7 +160,7 @@
 	} while( 0 )
 
 #define FreeObject( obj ) \
-	if( obj ) Stg_Class_Delete( obj )
+	if( obj ) (Stg_Class_Delete( obj ), (obj) = NULL)
 
 #define KillObject( obj ) \
 	if( obj ) (Stg_Class_Delete( obj ), (obj) = NULL)
