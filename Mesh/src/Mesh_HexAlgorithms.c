@@ -71,6 +71,7 @@ Mesh_HexAlgorithms* Mesh_HexAlgorithms_New( Name name ) {
 					_Mesh_Algorithms_GetDomainCoordRange, 
 					_Mesh_Algorithms_GetGlobalCoordRange );
 	/* Mesh_HexAlgorithms info */
+	_Mesh_Algorithms_Init( self );
 	_Mesh_HexAlgorithms_Init( self );
 
    return self;
