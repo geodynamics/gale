@@ -80,11 +80,13 @@
 	/** Shortcut constructors */
 	OperatorSwarmVariable* OperatorSwarmVariable_NewUnary(
 		Name                                               name,
+		AbstractContext*                                   context,
 		void*                                              _swarmVariable,
 		Name                                               operatorName );
 
 	OperatorSwarmVariable* OperatorSwarmVariable_NewBinary(
 		Name                                               name,
+		AbstractContext*                                   context,
 		void*                                              _swarmVariable1,
 		void*                                              _swarmVariable2,
 		Name                                               operatorName );
@@ -94,6 +96,7 @@
 
 	OperatorSwarmVariable* OperatorSwarmVariable_New( 
 		Name                                               name,
+		AbstractContext*                                   context,
 		SwarmVariable_ValueAtFunction*                     valueAt,
 		Name                                               operatorName,
 		Index                                              swarmVariableCount,

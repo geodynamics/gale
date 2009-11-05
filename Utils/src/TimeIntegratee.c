@@ -131,11 +131,9 @@ void _TimeIntegratee_Delete( void* timeIntegratee ) {
 	TimeIntegratee* self = (TimeIntegratee*)timeIntegratee;
 	
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
-	
-	Memory_Free( self->data );
 
 	/* Stg_Class_Delete parent*/
-	_Stg_Component_Delete( self );
+	Stg_Class_Delete( self );
 }
 
 void _TimeIntegratee_Print( void* timeIntegratee, Stream* stream ) {
@@ -237,6 +235,10 @@ void _TimeIntegratee_Execute( void* timeIntegratee, void* data ) {
 }
 	
 void _TimeIntegratee_Destroy( void* timeIntegratee, void* data ) {
+	TimeIntegratee*	self = (TimeIntegratee*)timeIntegratee;
+   	
+	Memory_Free( self->data );
+
 }
 
 /* +++ Virtual Functions +++ */
