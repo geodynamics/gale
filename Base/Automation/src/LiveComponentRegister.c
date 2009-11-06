@@ -232,3 +232,16 @@ void LiveComponentRegister_PrintSimilar( void* liveComponentRegister, Name name,
 	Stg_ObjectList_PrintSimilar( self->componentList, name, stream, number );
 }
 
+void LiveComponentRegister_DestroyAll( void* lcReg ) {
+   LiveComponentRegister* self = (LiveComponentRegister *) lcReg;
+	Stg_Component* component;
+	unsigned index;
+	
+	/* Note, if a Component is already Destroyed the, isDestroyed flag should protect the
+      code from running the _Destroy function again */
+	for ( index = 0 ; index < LiveComponentRegister_GetCount( self ) ; index++ ) {
+		component = LiveComponentRegister_At( self, index );
+		Stg_Component_Destroy( component, NULL, False );
+	}
+
+}
