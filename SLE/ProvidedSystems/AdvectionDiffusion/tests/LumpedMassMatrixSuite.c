@@ -76,13 +76,13 @@ FeMesh* LumpedMassMatrixSuite_buildFeMesh( unsigned nDims, unsigned* size, doubl
 	FeMesh*					feMesh;
 	unsigned					maxDecomp[3] = {0, 1, 1};
 
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	gen->shadowDepth = 0;
 	CartesianGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, maxDecomp );
 	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
 
-	feMesh = FeMesh_New( "" );
+	feMesh = FeMesh_New( "", NULL );
 	Mesh_SetExtensionManagerRegister( feMesh, emReg );
 	Mesh_SetGenerator( feMesh, gen );
 	FeMesh_SetElementFamily( feMesh, "linear" );

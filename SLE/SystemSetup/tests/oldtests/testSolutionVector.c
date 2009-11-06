@@ -69,14 +69,14 @@ FeVariable* buildFeVar() {
    minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
    maxCrd[0] = maxCrd[1] = maxCrd[2] = (double)nRanks;
 
-   gen = CartesianGenerator_New( "" );
+   gen = CartesianGenerator_New( "", NULL );
    CartesianGenerator_SetDimSize( gen, 2 );
    CartesianGenerator_SetTopologyParams( gen, (unsigned*)sizes, 0, 
 					 NULL, (unsigned*)maxDecomp );
    CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
    CartesianGenerator_SetShadowDepth( gen, 0 );
 
-   feMesh = FeMesh_New( "" );
+   feMesh = FeMesh_New( "", NULL );
    Mesh_SetGenerator( feMesh, gen );
    FeMesh_SetElementFamily( feMesh, "linear" );
    Stg_Component_Build( feMesh, NULL, False );

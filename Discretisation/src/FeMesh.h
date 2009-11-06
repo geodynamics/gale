@@ -74,7 +74,7 @@
 	#define FEMESH_PASSARGS	\
 		MESH_PASSARGS
 
-	FeMesh* FeMesh_New( Name name );
+	FeMesh* FeMesh_New( Name name, AbstractContext* context );
 	FeMesh* _FeMesh_New( FEMESH_DEFARGS );
 	void _FeMesh_Init( FeMesh* self, ElementType* elType, const char* family, Bool elementMesh );
 

@@ -47,8 +47,8 @@ const Type C2Generator_Type = "C2Generator";
 ** Constructors
 */
 
-C2Generator* C2Generator_New( Name name ) {
-	return _C2Generator_New( sizeof(C2Generator), 
+C2Generator* C2Generator_New( Name name, AbstractContext* context ) {
+	C2Generator* self = _C2Generator_New( sizeof(C2Generator), 
 				 C2Generator_Type, 
 				 _C2Generator_Delete, 
 				 _C2Generator_Print, 
@@ -75,6 +75,11 @@ C2Generator* C2Generator_New( Name name ) {
 				 _CartesianGenerator_GenFaceEdgeInc, 
 				 C2Generator_GenEdgeVertexInc, 
 				 C2Generator_GenElementTypes );
+
+   _MeshGenerator_Init( self, context );
+   _CartesianGenerator_Init( self );
+   _C2Generator_Init( self );
+   return self;
 }
 
 C2Generator* _C2Generator_New( C2GENERATOR_DEFARGS ) {
@@ -84,10 +89,7 @@ C2Generator* _C2Generator_New( C2GENERATOR_DEFARGS ) {
 	assert( sizeOfSelf >= sizeof(C2Generator) );
 	self = (C2Generator*)_CartesianGenerator_New( CARTESIANGENERATOR_PASSARGS );
 
-	/* Virtual info */
 
-	/* C2Generator info */
-	_C2Generator_Init( self );
 
 	return self;
 }

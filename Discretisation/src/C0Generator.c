@@ -47,8 +47,8 @@ const Type C0Generator_Type = "C0Generator";
 ** Constructors
 */
 
-C0Generator* C0Generator_New( Name name ) {
-	return _C0Generator_New( sizeof(C0Generator), 
+C0Generator* C0Generator_New( Name name, AbstractContext* context ) {
+	C0Generator* self = _C0Generator_New( sizeof(C0Generator), 
 				 C0Generator_Type, 
 				 _C0Generator_Delete, 
 				 _C0Generator_Print, 
@@ -63,6 +63,11 @@ C0Generator* C0Generator_New( Name name ) {
 				 NON_GLOBAL, 
 				 _MeshGenerator_SetDimSize, 
 				 C0Generator_Generate );
+   
+   _MeshGenerator_Init( self, context );
+	_C0Generator_Init( self );
+
+   return self;
 }
 
 C0Generator* _C0Generator_New( C0GENERATOR_DEFARGS ) {
@@ -74,8 +79,6 @@ C0Generator* _C0Generator_New( C0GENERATOR_DEFARGS ) {
 
 	/* Virtual info */
 
-	/* C0Generator info */
-	_C0Generator_Init( self );
 
 	return self;
 }

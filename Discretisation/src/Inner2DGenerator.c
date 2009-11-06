@@ -47,8 +47,8 @@ const Type Inner2DGenerator_Type = "Inner2DGenerator";
 ** Constructors
 */
 
-Inner2DGenerator* Inner2DGenerator_New( Name name ) {
-	return _Inner2DGenerator_New( sizeof(Inner2DGenerator), 
+Inner2DGenerator* Inner2DGenerator_New( Name name, AbstractContext* context ) {
+	Inner2DGenerator* self = _Inner2DGenerator_New( sizeof(Inner2DGenerator), 
 				 Inner2DGenerator_Type, 
 				 _Inner2DGenerator_Delete, 
 				 _Inner2DGenerator_Print, 
@@ -63,6 +63,10 @@ Inner2DGenerator* Inner2DGenerator_New( Name name ) {
 				 NON_GLOBAL, 
 				 _MeshGenerator_SetDimSize, 
 				 Inner2DGenerator_Generate );
+
+   _MeshGenerator_Init( self, context );
+   _Inner2DGenerator_Init( self );
+   return self;
 }
 
 Inner2DGenerator* _Inner2DGenerator_New( Inner2DGENERATOR_DEFARGS ) {
@@ -71,11 +75,6 @@ Inner2DGenerator* _Inner2DGenerator_New( Inner2DGENERATOR_DEFARGS ) {
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(Inner2DGenerator) );
 	self = (Inner2DGenerator*)_MeshGenerator_New( MESHGENERATOR_PASSARGS );
-
-	/* Virtual info */
-
-	/* Inner2DGenerator info */
-	_Inner2DGenerator_Init( self );
 
 	return self;
 }
@@ -135,6 +134,10 @@ void _Inner2DGenerator_Execute( void* generator, void* data ) {
 }
 
 void _Inner2DGenerator_Destroy( void* generator, void* data ) {
+	Inner2DGenerator*	self = (Inner2DGenerator*)generator;
+
+   Stg_Component_Destroy( self->elMesh, data, False );
+   _MeshGenerator_Destroy( self, data );
 }
 
 void Inner2DGenerator_Generate( void* generator, void* _mesh ) {

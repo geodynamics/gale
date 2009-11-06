@@ -46,8 +46,8 @@ const Type FeMesh_Type = "FeMesh";
 ** Constructors
 */
 
-FeMesh* FeMesh_New( Name name ) {
-	return _FeMesh_New( sizeof(FeMesh), 
+FeMesh* FeMesh_New( Name name, AbstractContext* context ) {
+	FeMesh* self = _FeMesh_New( sizeof(FeMesh), 
 		FeMesh_Type, 
 		_FeMesh_Delete, 
 		_FeMesh_Print, 
@@ -63,6 +63,11 @@ FeMesh* FeMesh_New( Name name ) {
 		NULL,
 		NULL,
 		False);
+
+   _Mesh_Init( self, context );
+	/* FeMesh info */
+	_FeMesh_Init( self, NULL, NULL, False ); /* this is a useless Init() */
+   return self;
 }
 
 FeMesh* _FeMesh_New( FEMESH_DEFARGS ) {
@@ -71,11 +76,6 @@ FeMesh* _FeMesh_New( FEMESH_DEFARGS ) {
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(FeMesh) );
 	self = (FeMesh*)_Mesh_New( MESH_PASSARGS );
-
-	/* Virtual info */
-
-	/* FeMesh info */
-	_FeMesh_Init( self, elType, family, elementMesh );
 
 	return self;
 }
@@ -108,10 +108,6 @@ void _FeMesh_Init( FeMesh* self, ElementType* elType, const char* family, Bool e
 
 void _FeMesh_Delete( void* feMesh ) {
 	FeMesh*	self = (FeMesh*)feMesh;
-
-	FeMesh_Destruct( self );
-	NewClass_Delete( self->inc );
-
 	/* Delete the parent. */
 	_Mesh_Delete( self );
 }
@@ -248,6 +244,11 @@ void _FeMesh_Execute( void* feMesh, void* data ) {
 }
 
 void _FeMesh_Destroy( void* feMesh, void* data ) {
+	FeMesh*	self = (FeMesh*)feMesh;
+   
+	FeMesh_Destruct( self );
+	NewClass_Delete( self->inc );
+   _Mesh_Destroy( self, data );
 }
 
 

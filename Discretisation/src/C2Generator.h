@@ -67,7 +67,7 @@
 	#define C2GENERATOR_PASSARGS \
 		CARTESIANGENERATOR_PASSARGS
 
-	C2Generator* C2Generator_New( Name name );
+	C2Generator* C2Generator_New( Name name, AbstractContext* context );
 	C2Generator* _C2Generator_New( C2GENERATOR_DEFARGS );
 	void _C2Generator_Init( C2Generator* self );
 

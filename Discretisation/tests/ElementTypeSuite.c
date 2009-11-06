@@ -52,13 +52,13 @@ FeMesh* BuildMeshLinear( unsigned nDims, unsigned* sizes, double* minCrd, double
 	FeMesh*			feMesh;
 	unsigned		maxDecomp[3] = {0, 1, 1};
 
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	CartesianGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, maxDecomp );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 	CartesianGenerator_SetShadowDepth( gen, 0 );
 
-	feMesh = FeMesh_New( "" );
+	feMesh = FeMesh_New( "", NULL );
 	Mesh_SetGenerator( feMesh, gen );
 	FeMesh_SetElementFamily( feMesh, "linear" );
 	Stg_Component_Build( feMesh, NULL, False );
@@ -72,13 +72,13 @@ FeMesh* BuildMeshQuadratic( unsigned nDims, unsigned* sizes, double* minCrd, dou
 	FeMesh*			feMesh;
 	unsigned		maxDecomp[3] = {0, 1, 1};
 
-	gen = C2Generator_New( "" );
+	gen = C2Generator_New( "", NULL );
 	CartesianGenerator_SetDimSize( gen, nDims );
 	C2Generator_SetTopologyParams( gen, sizes, 0, NULL, maxDecomp );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 	CartesianGenerator_SetShadowDepth( gen, 0 );
 
-	feMesh = FeMesh_New( "" );
+	feMesh = FeMesh_New( "", NULL );
 	Mesh_SetGenerator( feMesh, gen );
 	FeMesh_SetElementFamily( feMesh, "quadratic" );
 	Stg_Component_Build( feMesh, NULL, False );

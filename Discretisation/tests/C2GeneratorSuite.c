@@ -57,13 +57,13 @@ void C2GeneratorSuite_Setup( C2GeneratorSuiteData* data ) {
 	minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
 	maxCrd[0] = minCrd[1] = minCrd[2] = (double)nRanks;
 
-	gen = C2Generator_New( "" );
+	gen = C2Generator_New( "", NULL );
 	MeshGenerator_SetDimSize( gen, 3 );
 	CartesianGenerator_SetShadowDepth( gen, 1 );
 	C2Generator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 
-	data->mesh = Mesh_New( "" );
+	data->mesh = Mesh_New( "", NULL );
 	CartesianGenerator_Generate( gen, data->mesh, NULL );
 }
 

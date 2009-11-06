@@ -56,13 +56,13 @@ FeMesh* buildMesh() {
    minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
    maxCrd[0] = minCrd[1] = minCrd[2] = (double)nRanks;
 
-   gen = CartesianGenerator_New( "" );
+   gen = CartesianGenerator_New( "", NULL );
    MeshGenerator_SetDimSize( gen, 3 );
    CartesianGenerator_SetShadowDepth( gen, 1 );
    CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
    CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 
-   mesh = FeMesh_New( "" );
+   mesh = FeMesh_New( "", NULL );
    Mesh_SetGenerator( mesh, gen );
    FeMesh_SetElementFamily( mesh, "linear" );
    Stg_Component_Build( mesh, NULL, False );
