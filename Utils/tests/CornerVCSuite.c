@@ -63,13 +63,13 @@ Mesh* CornerVCSuite_buildMesh( unsigned nDims, unsigned* size, double* minCrds, 
 	CartesianGenerator*	gen;
 	Mesh*						mesh;
 
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	gen->shadowDepth = 0;
 	CartesianGenerator_SetDimSize( gen, nDims ); 
 	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
 
-	mesh = Mesh_New( "" );
+	mesh = Mesh_New( "", NULL );
 	Mesh_SetExtensionManagerRegister( mesh, emReg );
 	Mesh_SetGenerator( mesh, gen );
 

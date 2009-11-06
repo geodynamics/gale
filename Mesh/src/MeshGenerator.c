@@ -65,13 +65,11 @@ MeshGenerator* _MeshGenerator_New( MESHGENERATOR_DEFARGS ) {
 	self->setDimSizeFunc = setDimSizeFunc;
 	self->generateFunc = generateFunc;
 
-	/* MeshGenerator info */
-	_MeshGenerator_Init( self );
-
 	return self;
 }
 
-void _MeshGenerator_Init( MeshGenerator* self ) {
+void _MeshGenerator_Init( MeshGenerator* self, AbstractContext* context ) {
+   self->context = context;
 	self->mpiComm = MPI_COMM_WORLD;
 	self->nMeshes = 0;
 	self->meshes = NULL;

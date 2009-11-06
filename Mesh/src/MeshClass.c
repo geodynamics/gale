@@ -48,7 +48,7 @@ const Type Mesh_Type = "Mesh";
 ** Constructors
 */
 
-Mesh* Mesh_New( Name name ) {
+Mesh* Mesh_New( Name name, AbstractContext* context ) {
 	Mesh* self = _Mesh_New( sizeof(Mesh), 
 			  Mesh_Type, 
 			  _Mesh_Delete, 
@@ -63,7 +63,7 @@ Mesh* Mesh_New( Name name ) {
 			  name, 
 			  NON_GLOBAL );
 
-	_Mesh_Init( self );
+	_Mesh_Init( self, context );
    return self;
 }
 
@@ -77,7 +77,8 @@ Mesh* _Mesh_New( MESH_DEFARGS ) {
 	return self;
 }
 
-void _Mesh_Init( Mesh* self ) {
+void _Mesh_Init( Mesh* self, AbstractContext* context ) {
+   self->context = context;
 	self->topo = (MeshTopology*)IGraph_New( "" );
 	self->verts = NULL;
 
@@ -137,12 +138,13 @@ void _Mesh_Print( void* mesh, Stream* stream ) {
 
 void _Mesh_AssignFromXML( void* mesh, Stg_ComponentFactory* cf, void* data ) {
 	Mesh*			self = (Mesh*)mesh;
+   AbstractContext* context = NULL;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 
-	_Mesh_Init( self );
+	_Mesh_Init( self, context );
 }
 
 void _Mesh_Build( void* mesh, void* data ) {

@@ -110,9 +110,9 @@
 	#define MESH_PASSARGS		\
 		STG_COMPONENT_PASSARGS
 
-	Mesh* Mesh_New( Name name );
+	Mesh* Mesh_New( Name name, AbstractContext* context );
 	Mesh* _Mesh_New( MESH_DEFARGS );
-	void _Mesh_Init( Mesh* self );
+	void _Mesh_Init( Mesh* self, AbstractContext* context );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions

@@ -64,9 +64,6 @@ MeshAdaptor* _MeshAdaptor_New( MESHADAPTOR_DEFARGS ) {
 
 	/* Virtual info */
 
-	/* MeshAdaptor info */
-	_MeshAdaptor_Init( self );
-
 	return self;
 }
 

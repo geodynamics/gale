@@ -137,7 +137,7 @@
 		genEdgeVertexIncFunc,		\
 		genElementTypesFunc
 
-	CartesianGenerator* CartesianGenerator_New( Name name );
+	CartesianGenerator* CartesianGenerator_New( Name name, AbstractContext* context );
 	CartesianGenerator* _CartesianGenerator_New( CARTESIANGENERATOR_DEFARGS );
 	void _CartesianGenerator_Init( CartesianGenerator* self );
 

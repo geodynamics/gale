@@ -72,6 +72,7 @@ Mesh_RegularAlgorithms* Mesh_RegularAlgorithms_New( Name name ) {
 					    _Mesh_Algorithms_GetGlobalCoordRange );
 
 	/* Mesh_RegularAlgorithms info */
+	_Mesh_Algorithms_Init( self );
 	_Mesh_RegularAlgorithms_Init( self );
 
    return self;

@@ -65,7 +65,7 @@ const Type CompressionAdaptor_Type = "CompressionAdaptor";
 ** Constructors
 */
 
-CompressionAdaptor* CompressionAdaptor_New( Name name ) {
+CompressionAdaptor* CompressionAdaptor_New( Name name, AbstractContext* context ) {
 	CompressionAdaptor* self = _CompressionAdaptor_New( sizeof(CompressionAdaptor), 
 				    CompressionAdaptor_Type, 
 				    _CompressionAdaptor_Delete, 
@@ -82,6 +82,8 @@ CompressionAdaptor* CompressionAdaptor_New( Name name ) {
 				    _MeshGenerator_SetDimSize, 
 				    CompressionAdaptor_Generate );
    
+   _MeshGenerator_Init( self, context );
+   _MeshAdaptor_Init( self );
 	/* CompressionAdaptor info */
 	_CompressionAdaptor_Init( self );
 
