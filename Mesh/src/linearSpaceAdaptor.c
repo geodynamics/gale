@@ -71,7 +71,7 @@ double LinearSpaceAdaptor_MapPoint( segment* table, unsigned size, double x );
 ** Constructors
 */
 
-LinearSpaceAdaptor* LinearSpaceAdaptor_New( Name name ) {
+LinearSpaceAdaptor* LinearSpaceAdaptor_New( Name name, AbstractContext* context ) {
    LinearSpaceAdaptor* self = _LinearSpaceAdaptor_New( sizeof(LinearSpaceAdaptor), 
 				    LinearSpaceAdaptor_Type, 
 				    _LinearSpaceAdaptor_Delete, 
@@ -88,7 +88,8 @@ LinearSpaceAdaptor* LinearSpaceAdaptor_New( Name name ) {
 				    _MeshGenerator_SetDimSize, 
 				    LinearSpaceAdaptor_Generate );
 
-	/* LinearSpaceAdaptor init */
+   _MeshGenerator_Init( self, context );
+   _MeshAdaptor_Init( self );
 	_LinearSpaceAdaptor_Init( self );
 
    return self;
@@ -99,7 +100,7 @@ LinearSpaceAdaptor* _LinearSpaceAdaptor_New( COMPRESSIONADAPTOR_DEFARGS ) {
 	
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(LinearSpaceAdaptor) );
-	self = (LinearSpaceAdaptor*)_MeshGenerator_New( MESHADAPTOR_PASSARGS );
+	self = (LinearSpaceAdaptor*)_MeshAdaptor_New( MESHADAPTOR_PASSARGS );
 
 	/* Virtual info */
 	return self;
@@ -116,7 +117,7 @@ void _LinearSpaceAdaptor_Delete( void* adaptor ) {
 	LinearSpaceAdaptor*	self = (LinearSpaceAdaptor*)adaptor;
 
 	/* Delete the parent. */
-	_MeshGenerator_Delete( self );
+	_MeshAdaptor_Delete( self );
 }
 
 void _LinearSpaceAdaptor_Print( void* adaptor, Stream* stream ) {
@@ -128,7 +129,7 @@ void _LinearSpaceAdaptor_Print( void* adaptor, Stream* stream ) {
 
 	/* Print parent */
 	Journal_Printf( stream, "LinearSpaceAdaptor (ptr): (%p)\n", self );
-	_MeshGenerator_Print( self, stream );
+	_MeshAdaptor_Print( self, stream );
 }
 
 void _LinearSpaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data ) {

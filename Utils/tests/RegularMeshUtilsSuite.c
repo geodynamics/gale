@@ -55,12 +55,12 @@ Mesh* RegularMeshUtilsSuite_buildMesh( unsigned nDims, unsigned* size, double* m
 	Mesh*						mesh;
 	unsigned					maxDecomp[3] = {0, 1, 1};
 
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	CartesianGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, maxDecomp );
 	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
 
-	mesh = Mesh_New( "" );
+	mesh = Mesh_New( "", NULL );
 	Mesh_SetExtensionManagerRegister( mesh, emReg );
 	Mesh_SetGenerator( mesh, gen );
 

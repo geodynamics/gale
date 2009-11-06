@@ -99,13 +99,13 @@ void MeshSuite_TestMeshNearVert1D( MeshSuiteData* data ) {
 	maxCrd[0] = maxCrd[1] = maxCrd[2] = (double)data->nProcs;
 
 	nDims = 1;
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	MeshGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetShadowDepth( gen, 1 );
 	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 
-	mesh = Mesh_New( "" );
+	mesh = Mesh_New( "", NULL );
 	Mesh_SetGenerator( mesh, gen );
 	Stg_Component_Build( mesh, NULL, False );
 	incArray = IArray_New();
@@ -144,13 +144,13 @@ void MeshSuite_TestMeshNearVert2D( MeshSuiteData* data ) {
 	maxCrd[0] = maxCrd[1] = maxCrd[2] = (double)data->nProcs;
 
 	nDims = 2;
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	MeshGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetShadowDepth( gen, 1 );
 	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 
-	mesh = Mesh_New( "" );
+	mesh = Mesh_New( "", NULL );
 	Mesh_SetGenerator( mesh, gen );
 	Stg_Component_Build( mesh, NULL, False );
 	incArray = IArray_New();
@@ -189,13 +189,13 @@ void MeshSuite_TestMeshNearVert3D( MeshSuiteData* data ) {
 	maxCrd[0] = maxCrd[1] = maxCrd[2] = (double)data->nProcs;
 
 	nDims = 3;
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	MeshGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetShadowDepth( gen, 1 );
 	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 	
-	mesh = Mesh_New( "" );
+	mesh = Mesh_New( "", NULL );
 	Mesh_SetGenerator( mesh, gen );
 	Stg_Component_Build( mesh, NULL, False );
 	incArray = IArray_New();
@@ -232,12 +232,12 @@ void MeshSuite_TestMeshSearch( MeshSuiteData* data ) {
 	maxCrd[0] = maxCrd[1] = maxCrd[2] = (double)data->nProcs;
 
 	nDims = 3;
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	MeshGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetShadowDepth( gen, 1 );
 	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
-	mesh = Mesh_New( "" );
+	mesh = Mesh_New( "", NULL );
 	Mesh_SetGenerator( mesh, gen );
 	Stg_Component_Build( mesh, NULL, False );
 

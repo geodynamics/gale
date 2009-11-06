@@ -67,13 +67,13 @@ Mesh* SwarmSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, dou
 	CartesianGenerator*	gen;
 	Mesh*						mesh;
 
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	CartesianGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
 	MeshGenerator_SetIncidenceState( gen, nDims, nDims, True );
 
-	mesh = Mesh_New( "" );
+	mesh = Mesh_New( "", NULL );
 	Mesh_SetExtensionManagerRegister( mesh, emReg );
 	Mesh_SetGenerator( mesh, gen );
 

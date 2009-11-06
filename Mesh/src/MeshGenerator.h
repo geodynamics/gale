@@ -84,7 +84,7 @@
 		generateFunc
 
 	MeshGenerator* _MeshGenerator_New( MESHGENERATOR_DEFARGS );
-	void _MeshGenerator_Init( MeshGenerator* self );
+	void _MeshGenerator_Init( MeshGenerator* self, AbstractContext* context );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions

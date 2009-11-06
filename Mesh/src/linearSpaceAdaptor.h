@@ -81,7 +81,7 @@
 	#define COMPRESSIONADAPTOR_PASSARGS \
 		MESHADAPTOR_PASSARGS
 
-	LinearSpaceAdaptor* LinearSpaceAdaptor_New( Name name );
+	LinearSpaceAdaptor* LinearSpaceAdaptor_New( Name name, AbstractContext* context );
 	LinearSpaceAdaptor* _LinearSpaceAdaptor_New( COMPRESSIONADAPTOR_DEFARGS );
 	void _LinearSpaceAdaptor_Init( LinearSpaceAdaptor* self );
 

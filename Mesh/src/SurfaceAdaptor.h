@@ -96,7 +96,7 @@
 	#define SURFACEADAPTOR_PASSARGS	\
 		MESHADAPTOR_PASSARGS
 
-	SurfaceAdaptor* SurfaceAdaptor_New( Name name );
+	SurfaceAdaptor* SurfaceAdaptor_New( Name name, AbstractContext* context );
 	SurfaceAdaptor* _SurfaceAdaptor_New( SURFACEADAPTOR_DEFARGS );
 	void _SurfaceAdaptor_Init( SurfaceAdaptor* self );
 

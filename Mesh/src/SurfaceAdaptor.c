@@ -66,7 +66,7 @@ const Type SurfaceAdaptor_Type = "SurfaceAdaptor";
 ** Constructors
 */
 
-SurfaceAdaptor* SurfaceAdaptor_New( Name name ) {
+SurfaceAdaptor* SurfaceAdaptor_New( Name name, AbstractContext* context ) {
 	SurfaceAdaptor* self = _SurfaceAdaptor_New( sizeof(SurfaceAdaptor), 
 				    SurfaceAdaptor_Type, 
 				    _SurfaceAdaptor_Delete, 
@@ -83,6 +83,8 @@ SurfaceAdaptor* SurfaceAdaptor_New( Name name ) {
 				    _MeshGenerator_SetDimSize, 
 				    SurfaceAdaptor_Generate );
 
+   _MeshGenerator_Init( self, context );
+   _MeshAdaptor_Init( self );
 	_SurfaceAdaptor_Init( self );
 
    return self;

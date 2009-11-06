@@ -67,7 +67,7 @@ const Type CartesianGenerator_Type = "CartesianGenerator";
 ** Constructors
 */
 
-CartesianGenerator* CartesianGenerator_New( Name name ) {
+CartesianGenerator* CartesianGenerator_New( Name name, AbstractContext* context ) {
 	CartesianGenerator* self = _CartesianGenerator_New( sizeof(CartesianGenerator), 
 					CartesianGenerator_Type, 
 					_CartesianGenerator_Delete, 
@@ -96,7 +96,7 @@ CartesianGenerator* CartesianGenerator_New( Name name ) {
 					_CartesianGenerator_GenEdgeVertexInc, 
 					_CartesianGenerator_GenElementTypes );
 	/* CartesianGenerator info */
-   _MeshGenerator_Init( self );
+   _MeshGenerator_Init( self, context );
 	_CartesianGenerator_Init( self );
    return self;
 }

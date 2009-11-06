@@ -66,7 +66,7 @@
 	#define COMPRESSIONADAPTOR_PASSARGS \
 		MESHADAPTOR_PASSARGS
 
-	CompressionAdaptor* CompressionAdaptor_New( Name name );
+	CompressionAdaptor* CompressionAdaptor_New( Name name, AbstractContext* context );
 	CompressionAdaptor* _CompressionAdaptor_New( COMPRESSIONADAPTOR_DEFARGS );
 	void _CompressionAdaptor_Init( CompressionAdaptor* self );
 
