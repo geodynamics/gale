@@ -76,6 +76,8 @@ SetVC* SetVC_New(
 	self->isConstructed = True;
 	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
 	_SetVC_Init( self,  _dictionaryEntryName );
+
+	return self;
 }
 
 SetVC* SetVC_DefaultNew( Name name ) {
@@ -90,7 +92,7 @@ SetVC* SetVC_DefaultNew( Name name ) {
 		_VariableCondition_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
-		NULL,
+		_VariableCondition_Destroy,
 		name, 
 		NON_GLOBAL,
 		NULL,
