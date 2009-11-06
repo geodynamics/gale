@@ -55,6 +55,8 @@
 /* Textual name of this class */
 const Type Energy_SLE_Solver_Type = "Energy_SLE_Solver";
 
+PetscTruth Energy_SLE_HasNullSpace( Mat A );
+
 void* Energy_SLE_Solver_DefaultNew( Name name ) {
 	return _Energy_SLE_Solver_New( 
 		sizeof(Energy_SLE_Solver), 
@@ -241,6 +243,8 @@ void _Energy_SLE_Solver_Solve( void* sleSolver, void* standardSLE ) {
 	Energy_SLE_Solver*     self       = (Energy_SLE_Solver*)sleSolver;
 	SystemLinearEquations* sle        = (SystemLinearEquations*) standardSLE;
 	Iteration_Index        iterations;
+        PetscTruth isNull;
+        MatNullSpace nsp;
 
 	
 	Journal_DPrintf( self->debug, "In %s - for standard SLE solver\n", __func__ );
@@ -259,6 +263,12 @@ void _Energy_SLE_Solver_Solve( void* sleSolver, void* standardSLE ) {
 			" solution vectors.\n" );
 	}
 
+        isNull = Energy_SLE_HasNullSpace(((StiffnessMatrix**)sle->stiffnessMatrices->data)[0]->matrix);
+        if(isNull) {
+            MatNullSpaceCreate(PETSC_COMM_WORLD, PETSC_TRUE, 0, PETSC_NULL, &nsp);
+            KSPSetNullSpace(self->matrixSolver, nsp);
+        }
+
 	KSPSolve( self->matrixSolver,
 		    ((ForceVector*) sle->forceVectors->data[0])->vector, 
 		    ((SolutionVector*) sle->solutionVectors->data[0])->vector );
@@ -273,6 +283,9 @@ void _Energy_SLE_Solver_Solve( void* sleSolver, void* standardSLE ) {
 		 ((SolutionVector**)sle->solutionVectors->data)[0]->vector, 
 		 self->residual );
 	VecAYPX( self->residual, -1.0, ((ForceVector**)sle->forceVectors->data)[0]->vector );
+
+        if(isNull)
+            MatNullSpaceDestroy(nsp);
 }
 
 
@@ -280,4 +293,31 @@ Vec _Energy_SLE_GetResidual( void* sleSolver, Index fv_I ) {
 	Energy_SLE_Solver*	self = (Energy_SLE_Solver*)sleSolver;
 
 	return self->residual;
+}
+
+PetscTruth Energy_SLE_HasNullSpace( Mat A ) {
+    PetscInt N;
+    PetscScalar sum;
+    PetscReal nrm;
+    PetscTruth isNull;
+    Vec r, l;
+
+    MatGetVecs(A, &r, &l); /* l = A r */
+
+    VecGetSize(r, &N);
+    sum = 1.0/(PetscScalar)N;
+    VecSet(r, sum);
+
+    MatMult(A, r, l); /* {l} = [A] {r} */
+
+    VecNorm(l, NORM_2, &nrm);
+    if(nrm < 1.e-7)
+	isNull = PETSC_TRUE;
+    else
+	isNull = PETSC_FALSE;
+
+    VecDestroy(l);
+    VecDestroy(r);
+
+    return isNull;
 }
