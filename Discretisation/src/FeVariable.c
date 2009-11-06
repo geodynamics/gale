@@ -2693,7 +2693,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    H5Fclose( file );
 
    /** create a cartesian mesh generator which will be required for the fevariable creation */
-   gen = CartesianGenerator_New( "" );
+   gen = CartesianGenerator_New( "", NULL );
    /** use the feVariable dimension size for mesh generator */
    CartesianGenerator_SetDimSize( gen, self->dim );
    /** use the element size read in from the checkpoint file for the new mesh generator */
@@ -2704,7 +2704,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
               explicitly do this after we build the feMesh using the provided mesh checkpoint file */
    gen->readFromFile = False;
    /** create a feMesh */
-   feMesh = FeMesh_New( "" );
+   feMesh = FeMesh_New( "", NULL );
    /** set feMesh to use generator we just created  */
    Mesh_SetGenerator( feMesh, gen );
    /** set the feMesh family to be the same as that of the feVariable we are initialising/interpolating ie constant, linear, etc 
@@ -2733,11 +2733,11 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    if (!strcmp(self->feMesh->generator->type, C0Generator_Type)){
       elementMesh = feMesh;
       /** create the C0 generator */
-      C0gen = C0Generator_New( "" );
+      C0gen = C0Generator_New( "", self->context );
       /** set it's element mesh to the feMesh create just above */
       C0Generator_SetElementMesh( C0gen, (void*) elementMesh );
       /** create a new feMesh */
-      C0feMesh = FeMesh_New( "" );
+      C0feMesh = FeMesh_New( "", NULL );
       /** set feMesh to use generator we just created, and set its type to constant mesh  */
       Mesh_SetGenerator( C0feMesh, C0gen );
       FeMesh_SetElementFamily( C0feMesh, self->feMesh->feElFamily );

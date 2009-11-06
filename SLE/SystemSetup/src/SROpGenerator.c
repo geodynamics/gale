@@ -255,7 +255,7 @@ void SROpGenerator_GenLevelMesh( SROpGenerator* self, unsigned level ) {
 			  "****************************************************************\n" \
 			  "\n" );
 
-	cGen = CartesianGenerator_New( "" );
+	cGen = CartesianGenerator_New( "", NULL );
 	CartesianGenerator_SetDimSize( cGen, nDims );
 	cSize = AllocArray( unsigned, nDims );
 	for( d_i = 0; d_i < nDims; d_i++ )
@@ -266,7 +266,7 @@ void SROpGenerator_GenLevelMesh( SROpGenerator* self, unsigned level ) {
 	CartesianGenerator_SetShadowDepth( cGen, 0 );
 	FreeArray( cSize );
 
-	cMesh = (Mesh*)FeMesh_New( "" );
+	cMesh = (Mesh*)FeMesh_New( "", NULL );
 	Mesh_SetGenerator( cMesh, cGen );
 	FeMesh_SetElementFamily( cMesh, ((FeMesh*)fMesh)->feElFamily );
 	Stg_Component_Build( cMesh, NULL, False );

@@ -68,7 +68,7 @@
 	#define Inner2DGENERATOR_PASSARGS	\
 		MESHGENERATOR_PASSARGS
 
-	Inner2DGenerator* Inner2DGenerator_New( Name name );
+	Inner2DGenerator* Inner2DGenerator_New( Name name, AbstractContext* context );
 	Inner2DGenerator* _Inner2DGenerator_New( Inner2DGENERATOR_DEFARGS );
 	void _Inner2DGenerator_Init( Inner2DGenerator* self );
 

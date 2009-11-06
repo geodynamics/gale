@@ -68,7 +68,7 @@
 	#define C0GENERATOR_PASSARGS	\
 		MESHGENERATOR_PASSARGS
 
-	C0Generator* C0Generator_New( Name name );
+	C0Generator* C0Generator_New( Name name, AbstractContext* context );
 	C0Generator* _C0Generator_New( C0GENERATOR_DEFARGS );
 	void _C0Generator_Init( C0Generator* self );
 
