@@ -214,7 +214,7 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 
 		tiData[0] = (Stg_Component*)sys->velField;
 		tiData[1] = (Stg_Component*)&sys->mesh->verts;
-		crdAdvector = TimeIntegratee_New( "EulerDeform_Velocity", 
+		crdAdvector = TimeIntegratee_New( "EulerDeform_Velocity", uwCtx,
 						  uwCtx->timeIntegrator, 
 						  crdVar, 
 						  2, 
