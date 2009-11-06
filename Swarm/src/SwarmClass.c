@@ -1441,7 +1441,7 @@ SwarmVariable* Swarm_NewScalarVariable(
 		(void**)&self->particles,
 		variable_Register );
 
-	swarmVariable = SwarmVariable_New( name, self, variable, 1 );
+	swarmVariable = SwarmVariable_New( name, self->context, self, variable, 1 );
    /* set variable to be checkpointed */
 	swarmVariable->isCheckpointedAndReloaded = True;
 
@@ -1510,7 +1510,7 @@ SwarmVariable* Swarm_NewVectorVariable(
 	for( vector_I = 0; vector_I < dataTypeCount; vector_I++ ) {
 		if ( swarmVariable_Register && variable_Register ) {
 			swarmVariable = SwarmVariable_New( 
-					dataNames[ vector_I ],
+					dataNames[ vector_I ], self->context, 
 					self, 
 					Variable_Register_GetByName( variable_Register, dataNames[ vector_I ] ),
 					1 );
@@ -1519,7 +1519,7 @@ SwarmVariable* Swarm_NewVectorVariable(
 		}
 		Memory_Free( dataNames[ vector_I ] );
 	}
-	swarmVariable = SwarmVariable_New( name, self, variable, dataTypeCount );
+	swarmVariable = SwarmVariable_New( name, self->context, self, variable, dataTypeCount );
    /* set variable to be checkpointed */
    swarmVariable->isCheckpointedAndReloaded = True;
 

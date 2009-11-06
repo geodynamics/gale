@@ -68,7 +68,7 @@ const Type CartesianGenerator_Type = "CartesianGenerator";
 */
 
 CartesianGenerator* CartesianGenerator_New( Name name ) {
-	return _CartesianGenerator_New( sizeof(CartesianGenerator), 
+	CartesianGenerator* self = _CartesianGenerator_New( sizeof(CartesianGenerator), 
 					CartesianGenerator_Type, 
 					_CartesianGenerator_Delete, 
 					_CartesianGenerator_Print, 
@@ -95,6 +95,10 @@ CartesianGenerator* CartesianGenerator_New( Name name ) {
 					_CartesianGenerator_GenFaceEdgeInc, 
 					_CartesianGenerator_GenEdgeVertexInc, 
 					_CartesianGenerator_GenElementTypes );
+	/* CartesianGenerator info */
+   _MeshGenerator_Init( self );
+	_CartesianGenerator_Init( self );
+   return self;
 }
 
 CartesianGenerator* _CartesianGenerator_New( CARTESIANGENERATOR_DEFARGS ) {
@@ -118,8 +122,6 @@ CartesianGenerator* _CartesianGenerator_New( CARTESIANGENERATOR_DEFARGS ) {
 	self->genEdgeVertexIncFunc = genEdgeVertexIncFunc;
 	self->genElementTypesFunc = genElementTypesFunc;
 
-	/* CartesianGenerator info */
-	_CartesianGenerator_Init( self );
 
 	return self;
 }
@@ -161,9 +163,6 @@ void _CartesianGenerator_Init( CartesianGenerator* self ) {
 
 void _CartesianGenerator_Delete( void* meshGenerator ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-
-	CartesianGenerator_Destruct( self );
-
 	/* Delete the parent. */
 	_MeshGenerator_Delete( self );
 }
@@ -506,6 +505,11 @@ void _CartesianGenerator_Execute( void* meshGenerator, void* data ) {
 }
 
 void _CartesianGenerator_Destroy( void* meshGenerator, void* data ) {
+   CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
+   CartesianGenerator_Destruct( self );
+
+   /* Destroy Parent */
+   _MeshGenerator_Destroy( self, data );
 }
 
 void CartesianGenerator_SetDimSize( void* meshGenerator, unsigned nDims ) {
@@ -2236,9 +2240,9 @@ void CartesianGenerator_DestructTopology( CartesianGenerator* self ) {
 	self->maxDecompDims = 0;
 	memset( self->minDecomp, 0, self->nDims * sizeof(unsigned) );
 	memset( self->maxDecomp, 0, self->nDims * sizeof(unsigned) );
-	KillObject( self->vertGrid );
-	KillObject( self->elGrid );
-	KillObject( self->procGrid );
+	FreeObject( self->vertGrid );
+	FreeObject( self->elGrid );
+	FreeObject( self->procGrid );
 	KillArray( self->origin );
 	KillArray( self->range );
 	KillArray( self->vertOrigin );

@@ -275,18 +275,6 @@ void _ParallelDelaunay_Delete( void* pd )
 	
 	assert( self );
 
-	Memory_Free( self->localPoints );
-	if( self->mappingTable[0] ) Memory_Free( self->mappingTable[0] );
-	if( self->mappingTable[1] ) Memory_Free( self->mappingTable[1] );
-	Memory_Free( self->mapGlobalToLocal );
-	if( self->processor ) Memory_Free( self->processor );
-	if( self->initialOrder ) Memory_Free( self->initialOrder );
-	Memory_Free( self->processorLoad );
-	Memory_Free( self->attributes );
-
-	Stg_Class_Delete( self->localTriangulation );
-	Stg_Class_Delete( self->sitePool );
-	Stg_Class_Delete( self->coordPool );
 	_Delaunay_Delete( self );
 }
 
@@ -509,6 +497,21 @@ void _ParallelDelaunay_Execute( void* pd, void* data )
 }
 
 void _ParallelDelaunay_Destroy( void* pd, void* data ) { 
+   ParallelDelaunay *self = (ParallelDelaunay*)pd;
+	
+	assert( self );
+   Memory_Free( self->localPoints );
+	if( self->mappingTable[0] ) Memory_Free( self->mappingTable[0] );
+	if( self->mappingTable[1] ) Memory_Free( self->mappingTable[1] );
+	Memory_Free( self->mapGlobalToLocal );
+	if( self->processor ) Memory_Free( self->processor );
+	if( self->initialOrder ) Memory_Free( self->initialOrder );
+	Memory_Free( self->processorLoad );
+	Memory_Free( self->attributes );
+
+	Stg_Class_Delete( self->localTriangulation );
+	Stg_Class_Delete( self->sitePool );
+	Stg_Class_Delete( self->coordPool );
 }
 
 #define onCurrentProc( pd, id ) ( id < (pd->processorLoad[pd->rank]+pd->localTriangulation->idOffset) )

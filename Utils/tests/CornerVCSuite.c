@@ -76,7 +76,7 @@ Mesh* CornerVCSuite_buildMesh( unsigned nDims, unsigned* size, double* minCrds, 
 	Stg_Component_Build( mesh, NULL, False );
 	Stg_Component_Initialise( mesh, NULL, False );
 
-	KillObject( mesh->generator );
+	FreeObject( mesh->generator );
 
 	return mesh;
 }

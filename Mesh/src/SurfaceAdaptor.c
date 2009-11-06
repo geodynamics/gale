@@ -67,7 +67,7 @@ const Type SurfaceAdaptor_Type = "SurfaceAdaptor";
 */
 
 SurfaceAdaptor* SurfaceAdaptor_New( Name name ) {
-	return _SurfaceAdaptor_New( sizeof(SurfaceAdaptor), 
+	SurfaceAdaptor* self = _SurfaceAdaptor_New( sizeof(SurfaceAdaptor), 
 				    SurfaceAdaptor_Type, 
 				    _SurfaceAdaptor_Delete, 
 				    _SurfaceAdaptor_Print, 
@@ -82,6 +82,10 @@ SurfaceAdaptor* SurfaceAdaptor_New( Name name ) {
 				    NON_GLOBAL, 
 				    _MeshGenerator_SetDimSize, 
 				    SurfaceAdaptor_Generate );
+
+	_SurfaceAdaptor_Init( self );
+
+   return self;
 }
 
 SurfaceAdaptor* _SurfaceAdaptor_New( SURFACEADAPTOR_DEFARGS ) {
@@ -89,13 +93,9 @@ SurfaceAdaptor* _SurfaceAdaptor_New( SURFACEADAPTOR_DEFARGS ) {
 	
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(SurfaceAdaptor) );
-	self = (SurfaceAdaptor*)_MeshGenerator_New( MESHADAPTOR_PASSARGS );
+	self = (SurfaceAdaptor*)_MeshAdaptor_New( MESHADAPTOR_PASSARGS );
 
 	/* Virtual info */
-
-	/* SurfaceAdaptor info */
-	_SurfaceAdaptor_Init( self );
-
 	return self;
 }
 
@@ -113,7 +113,7 @@ void _SurfaceAdaptor_Delete( void* adaptor ) {
 	SurfaceAdaptor*	self = (SurfaceAdaptor*)adaptor;
 
 	/* Delete the parent. */
-	_MeshGenerator_Delete( self );
+	_MeshAdaptor_Delete( self );
 }
 
 void _SurfaceAdaptor_Print( void* adaptor, Stream* stream ) {
@@ -125,7 +125,7 @@ void _SurfaceAdaptor_Print( void* adaptor, Stream* stream ) {
 
 	/* Print parent */
 	Journal_Printf( stream, "SurfaceAdaptor (ptr): (%p)\n", self );
-	_MeshGenerator_Print( self, stream );
+	_MeshAdaptor_Print( self, stream );
 }
 
 void _SurfaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data ) {

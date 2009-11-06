@@ -67,7 +67,8 @@
 	
 	/* Creation implementation / Virtual constructor */
 	TimeIntegratee* TimeIntegratee_New( 
-		Name                                   name, 
+		Name                                   name,
+		DomainContext*                         context,
 		TimeIntegrator*                        timeIntegrator, 
 		Variable*                              variable, 
 		Index                                  dataCount, 
@@ -90,8 +91,9 @@
 		TimeIntegratee_IntermediateFunction*       _intermediate,
 		Name                                       name );
 
-	void _TimeIntegratee_Init( 
-		void*                                      timeIntegratee, 
+void _TimeIntegratee_Init( 
+		void*                                      timeIntegratee,
+		DomainContext*                             context,
 		TimeIntegrator*                            timeIntegrator, 
 		Variable*                                  variable, 
 		Index                                      dataCount, 

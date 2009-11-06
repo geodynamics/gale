@@ -50,6 +50,7 @@ const Name defaultOperatorSwarmVariableName = "defaultOperatorSwarmVariableName"
 
 OperatorSwarmVariable* OperatorSwarmVariable_NewUnary( 
 		Name                                               name,
+		AbstractContext*                                   context,
 		void*                                              _swarmVariable,
 		Name                                               operatorName )
 {
@@ -58,6 +59,7 @@ OperatorSwarmVariable* OperatorSwarmVariable_NewUnary(
        	
 	operatorSwarmVariable = OperatorSwarmVariable_New( 
 			name,
+			context,
 			_OperatorSwarmVariable_UnaryValueAt, 
 			operatorName,
 			1,
@@ -68,6 +70,7 @@ OperatorSwarmVariable* OperatorSwarmVariable_NewUnary(
 
 OperatorSwarmVariable* OperatorSwarmVariable_NewBinary( 
 		Name                                               name,
+		AbstractContext*                                   context,
 		void*                                              _swarmVariable1,
 		void*                                              _swarmVariable2,
 		Name                                               operatorName )
@@ -79,6 +82,7 @@ OperatorSwarmVariable* OperatorSwarmVariable_NewBinary(
 	
 	return OperatorSwarmVariable_New( 
 			name,
+			context,
 			_OperatorSwarmVariable_BinaryValueAt, 
 			operatorName,
 			2, 
@@ -107,14 +111,15 @@ void* _OperatorSwarmVariable_DefaultNew( Name name )
 
 OperatorSwarmVariable* OperatorSwarmVariable_New( 
 		Name                                               name,
+		AbstractContext*                                   context,
 		SwarmVariable_ValueAtFunction*                     _valueAt,
 		Name                                               operatorName,
 		Index                                              swarmVariableCount,
 		SwarmVariable**                                    swarmVariableList )
 {
-	OperatorSwarmVariable*  operatorSwarmVariable;
+	OperatorSwarmVariable*  self;
 
-	operatorSwarmVariable = _OperatorSwarmVariable_New( 
+	self = _OperatorSwarmVariable_New( 
 			sizeof(OperatorSwarmVariable), 
 			OperatorSwarmVariable_Type, 
 			_SwarmVariable_Delete, 
@@ -133,10 +138,10 @@ OperatorSwarmVariable* OperatorSwarmVariable_New(
 
 	/* Following Rob's inheritance approach for this file, until we do the big fix-up */
 	/* Can pass in 0 for the dofs since this will be updated in the next func */
-	SwarmVariable_InitAll( operatorSwarmVariable, swarmVariableList[0]->swarm, NULL, 0 );
-	_OperatorSwarmVariable_Init( operatorSwarmVariable, operatorName, swarmVariableCount, swarmVariableList );
+	_SwarmVariable_Init( self, context, swarmVariableList[0]->swarm, NULL, 0 );
+	_OperatorSwarmVariable_Init( self, operatorName, swarmVariableCount, swarmVariableList );
 
-	return operatorSwarmVariable;
+	return self;
 }
 
 OperatorSwarmVariable* _OperatorSwarmVariable_New(

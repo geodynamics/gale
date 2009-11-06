@@ -76,6 +76,7 @@
 
 	SwarmVariable* SwarmVariable_New(		
 		Name                                               name,
+		AbstractContext*                                   context,
 		Swarm*                                             swarm,
 		Variable*                                          variable,
 		Index                                              dofCount );
@@ -100,6 +101,7 @@
 
 	/** Member initialisation implementation */
 	void SwarmVariable_InitAll( void* swarmVariable, Swarm* swarm, Variable* variable, Index dofCount ) ;
+   void _SwarmVariable_Init( SwarmVariable* self, AbstractContext* context, Swarm* swarm, Variable* variable, Index dofCount ) ;
 	
 	void _SwarmVariable_Delete( void* swarmVariable ) ;
 	void _SwarmVariable_Print( void* _swarmVariable, Stream* stream ) ;

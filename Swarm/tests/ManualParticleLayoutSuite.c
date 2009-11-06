@@ -70,7 +70,7 @@ Mesh* ManualParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, doubl
 	Stg_Component_Build( mesh, NULL, False );
 	Stg_Component_Initialise( mesh, NULL, False );
 
-	KillObject( mesh->generator );
+	FreeObject( mesh->generator );
 
 	return mesh;
 }

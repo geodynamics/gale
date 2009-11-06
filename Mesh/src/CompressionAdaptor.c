@@ -66,7 +66,7 @@ const Type CompressionAdaptor_Type = "CompressionAdaptor";
 */
 
 CompressionAdaptor* CompressionAdaptor_New( Name name ) {
-	return _CompressionAdaptor_New( sizeof(CompressionAdaptor), 
+	CompressionAdaptor* self = _CompressionAdaptor_New( sizeof(CompressionAdaptor), 
 				    CompressionAdaptor_Type, 
 				    _CompressionAdaptor_Delete, 
 				    _CompressionAdaptor_Print, 
@@ -81,6 +81,11 @@ CompressionAdaptor* CompressionAdaptor_New( Name name ) {
 				    NON_GLOBAL, 
 				    _MeshGenerator_SetDimSize, 
 				    CompressionAdaptor_Generate );
+   
+	/* CompressionAdaptor info */
+	_CompressionAdaptor_Init( self );
+
+   return self;
 }
 
 CompressionAdaptor* _CompressionAdaptor_New( COMPRESSIONADAPTOR_DEFARGS ) {
@@ -88,13 +93,9 @@ CompressionAdaptor* _CompressionAdaptor_New( COMPRESSIONADAPTOR_DEFARGS ) {
 	
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(CompressionAdaptor) );
-	self = (CompressionAdaptor*)_MeshGenerator_New( MESHADAPTOR_PASSARGS );
+	self = (CompressionAdaptor*)_MeshAdaptor_New( MESHADAPTOR_PASSARGS );
 
 	/* Virtual info */
-
-	/* CompressionAdaptor info */
-	_CompressionAdaptor_Init( self );
-
 	return self;
 }
 
@@ -111,7 +112,7 @@ void _CompressionAdaptor_Delete( void* adaptor ) {
 	CompressionAdaptor*	self = (CompressionAdaptor*)adaptor;
 
 	/* Delete the parent. */
-	_MeshGenerator_Delete( self );
+	_MeshAdaptor_Delete( self );
 }
 
 void _CompressionAdaptor_Print( void* adaptor, Stream* stream ) {
@@ -123,7 +124,7 @@ void _CompressionAdaptor_Print( void* adaptor, Stream* stream ) {
 
 	/* Print parent */
 	Journal_Printf( stream, "CompressionAdaptor (ptr): (%p)\n", self );
-	_MeshGenerator_Print( self, stream );
+	_MeshAdaptor_Print( self, stream );
 }
 
 void _CompressionAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data ) {

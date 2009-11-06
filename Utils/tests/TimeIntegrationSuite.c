@@ -193,10 +193,8 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	variableList[1]			= Variable_NewVector( "testVariable2", Variable_DataType_Double, 2, &size1, NULL, (void**)&array2, NULL );
 	timeIntegrator				= TimeIntegrator_New( "testTimeIntegrator", order, simultaneous, NULL, NULL );
 	timeIntegrator->context	= context;
-	timeIntegrateeList[0]	= TimeIntegratee_New( "testTimeIntegratee0", timeIntegrator, variableList[0], 0, NULL, True );
-	timeIntegrateeList[1]	= TimeIntegratee_New( "testTimeIntegratee1", timeIntegrator, variableList[1], 0, NULL, True );
-	timeIntegrateeList[0]->context = context;
-	timeIntegrateeList[1]->context = context;
+	timeIntegrateeList[0]	= TimeIntegratee_New( "testTimeIntegratee0", context, timeIntegrator, variableList[0], 0, NULL, True );
+	timeIntegrateeList[1]	= TimeIntegratee_New( "testTimeIntegratee1", context, timeIntegrator, variableList[1], 0, NULL, True );
 
 	derivName = Dictionary_GetString( dictionary, "DerivName0" );
 	timeIntegrateeList[0]->_calculateTimeDeriv = TimeIntegrationSuite_GetFunctionPtr( derivName );

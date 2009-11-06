@@ -48,13 +48,14 @@ const Type SwarmVariable_Type = "SwarmVariable";
 
 SwarmVariable* SwarmVariable_New(		
 		Name                                               name,
+		AbstractContext*                                   context,
 		Swarm*                                             swarm,
 		Variable*                                          variable,
 		Index                                              dofCount )
 {
 	SwarmVariable* self = (SwarmVariable*) _SwarmVariable_DefaultNew( name );
 
-	SwarmVariable_InitAll( self, swarm, variable, dofCount );
+	_SwarmVariable_Init( self, context, swarm, variable, dofCount );
 
 	return self;
 }
@@ -103,10 +104,11 @@ SwarmVariable* _SwarmVariable_New(
 	return self;
 }
 
-void _SwarmVariable_Init( SwarmVariable* self, Swarm* swarm, Variable* variable, Index dofCount ) {
+void _SwarmVariable_Init( SwarmVariable* self, AbstractContext* context, Swarm* swarm, Variable* variable, Index dofCount ) {
 	/* Add ourselves to the register for later retrieval by clients */
 	self->isConstructed = True;
 
+	self->context                   = context;
 	self->swarm                     = swarm;
 	self->variable                  = variable;
 	self->dofCount                  = dofCount;
@@ -120,20 +122,10 @@ void _SwarmVariable_Init( SwarmVariable* self, Swarm* swarm, Variable* variable,
 		SwarmVariable_Register_Add( self->swarmVariable_Register, self );
 }
 
-void SwarmVariable_InitAll( void* swarmVariable, Swarm* swarm, Variable* variable, Index dofCount ) {
-	SwarmVariable* self = (SwarmVariable*) swarmVariable;
-
-	/* Should be calling InitAll of parent here */
-
-	/* Call my Init function */
-	_SwarmVariable_Init( self, swarm, variable, dofCount );
-}
-
 void _SwarmVariable_Delete( void* swarmVariable ) {
 	SwarmVariable* self = (SwarmVariable*) swarmVariable;
 
-   if( self->variable ) _Variable_Delete(self->variable);
-	_Stg_Component_Delete( self );
+	_Stg_Class_Delete( self );
 }
 
 void _SwarmVariable_Print( void* _swarmVariable, Stream* stream ) {
@@ -210,16 +202,17 @@ void _SwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf
 	Swarm*                  swarm;
 	Variable*               variable;
 	Index                   dofCount;
+	AbstractContext*        context;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 
 	swarm    =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Swarm", Swarm, True, data  ) ;
 	variable =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Variable", Variable,  False, data  ) ;
 	dofCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "dofCount", 0 );
 
-	_SwarmVariable_Init( self, swarm, variable, dofCount );
+	_SwarmVariable_Init( self, context, swarm, variable, dofCount );
 	
 }
 
@@ -243,6 +236,10 @@ void _SwarmVariable_Execute( void* swarmVariable, void* data ) {
 }
 
 void _SwarmVariable_Destroy( void* swarmVariable, void* data ) {
+	SwarmVariable*	        self         = (SwarmVariable*)swarmVariable;
+   
+   if( self->variable ) Stg_Component_Destroy(self->variable, data, False);
+
 }
 
 double SwarmVariable_GetMinGlobalMagnitude( void* swarmVariable ) {

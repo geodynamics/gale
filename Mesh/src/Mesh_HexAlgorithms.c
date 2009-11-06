@@ -48,7 +48,7 @@ const Type Mesh_HexAlgorithms_Type = "Mesh_HexAlgorithms";
 */
 
 Mesh_HexAlgorithms* Mesh_HexAlgorithms_New( Name name ) {
-	return _Mesh_HexAlgorithms_New( sizeof(Mesh_HexAlgorithms), 
+   Mesh_HexAlgorithms* self = _Mesh_HexAlgorithms_New( sizeof(Mesh_HexAlgorithms), 
 					Mesh_HexAlgorithms_Type, 
 					_Mesh_HexAlgorithms_Delete, 
 					_Mesh_HexAlgorithms_Print, 
@@ -70,6 +70,11 @@ Mesh_HexAlgorithms* Mesh_HexAlgorithms_New( Name name ) {
 					_Mesh_Algorithms_GetLocalCoordRange, 
 					_Mesh_Algorithms_GetDomainCoordRange, 
 					_Mesh_Algorithms_GetGlobalCoordRange );
+	/* Mesh_HexAlgorithms info */
+	_Mesh_HexAlgorithms_Init( self );
+
+   return self;
+
 }
 
 Mesh_HexAlgorithms* _Mesh_HexAlgorithms_New( MESH_HEXALGORITHMS_DEFARGS ) {
@@ -78,11 +83,6 @@ Mesh_HexAlgorithms* _Mesh_HexAlgorithms_New( MESH_HEXALGORITHMS_DEFARGS ) {
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(Mesh_HexAlgorithms) );
 	self = (Mesh_HexAlgorithms*)_Mesh_Algorithms_New( MESH_ALGORITHMS_PASSARGS );
-
-	/* Virtual info */
-
-	/* Mesh_HexAlgorithms info */
-	_Mesh_HexAlgorithms_Init( self );
 
 	return self;
 }
