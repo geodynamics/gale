@@ -98,7 +98,7 @@
 			_build, \
 			_initialise, \
 			_execute, \
-			 NULL, \
+			_destroy, \
 			name, \
 			nameAllocationType
 	

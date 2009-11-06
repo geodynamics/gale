@@ -44,13 +44,12 @@
 	
 
 	/* Templates of virtual functions */
-	typedef void		(AbstractContext_SetDt)				( void* self, double dt );
-	
+	typedef void (AbstractContext_SetDt) ( void* self, double dt );
 	
 	/* Context_CallInfo info */
 	#define __Base_Context_CallInfo \
-		void*					functionPointer; \
-		void*					entryPoint;
+		void* functionPointer; \
+		void* entryPoint;
 	struct Context_CallInfo { __Base_Context_CallInfo };
 	
 	typedef enum CheckpointFileFormat {
