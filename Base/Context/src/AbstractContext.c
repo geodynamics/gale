@@ -536,7 +536,6 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 	if ( True == Dictionary_GetBool_WithDefault( self->dictionary, "showJournalStatus", False ) ) {
 		Journal_PrintConcise();	
 	}	
-	self->isConstructed = True;
 }
 
 
