@@ -163,6 +163,8 @@ void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
 
    /* Create CompositeVC */
    cvc = CompositeVC_New( "CompositeVC", variable_Register, conFunc_Register, dictionary, mesh );
+	_VariableCondition_Init( cvc, variable_Register, conFunc_Register, dictionary );
+   _CompositeVC_Init( cvc, 0 );
 
 	for (i = 0; i < 6; i++) {
 		vc = WallVC_New( vcKeyName[i], vcKey[i], variable_Register, conFunc_Register, dictionary, mesh );

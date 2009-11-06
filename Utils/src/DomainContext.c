@@ -76,7 +76,7 @@ DomainContext* DomainContext_DefaultNew( Name name ) {
 		_AbstractContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
-		NULL,
+		_AbstractContext_Destroy,	
 		name,
 		NON_GLOBAL,
 		_DomainContext_SetDt,

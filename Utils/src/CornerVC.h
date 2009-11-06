@@ -45,8 +45,8 @@
 	extern const char* CornerVC_CornerEnumToStr[CornerVC_Corner_Size];
 	
 	#define __CornerVC_Entry \
-		Name				varName; \
-		VariableCondition_Value		value; \
+		Name							varName; \
+		VariableCondition_Value	value; \
 		
 	struct _CornerVC_Entry { __CornerVC_Entry };
 	
@@ -58,87 +58,56 @@
 		/* Virtual info */ \
 		\
 		/* Stg_Class info */ \
-		Name				_dictionaryEntryName; \
-		CornerVC_Corner			_corner; \
-		CornerVC_Entry_Index		_entryCount; \
-		CornerVC_Entry*			_entryTbl; \
-		Mesh*				_mesh;
+		Name						_dictionaryEntryName; \
+		CornerVC_Corner		_corner; \
+		CornerVC_Entry_Index	_entryCount; \
+		CornerVC_Entry*		_entryTbl; \
+		Mesh*						_mesh;
 
 	struct _CornerVC { __CornerVC };
-	
-	
+
+	#define CORNERVC_DEFARGS \
+      VARIABLECONDITION_DEFARGS, \
+         Name  _dictionaryEntryName, \
+			void* _mesh 
+
+	#define CORNERVC_PASSARGS \
+      VARIABLECONDITION_PASSARGS, \
+         _dictionaryEntryName, \
+         _mesh 
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
-	VariableCondition*	CornerVC_Factory(
-							Variable_Register*                  variable_Register, 
-							ConditionFunction_Register*         conFunc_Register, 
-							Dictionary*                         dictionary,
-							void*                               data );
+	VariableCondition* CornerVC_Factory(
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register, 
+		Dictionary*							dictionary,
+		void*									data );
 	
-	CornerVC*			CornerVC_DefaultNew( Name name );
+	CornerVC* CornerVC_DefaultNew( Name name );
 
-	CornerVC*			CornerVC_New(
-							Name                                name,
-							Name                                _dictionaryEntryName, 
-							Variable_Register*                  variable_Register, 
-							ConditionFunction_Register*         conFunc_Register, 
-							Dictionary*                         dictionary,
-							void*                               _mesh );
+	CornerVC* CornerVC_New(
+		Name									name,
+		Name									_dictionaryEntryName, 
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register, 
+		Dictionary*							dictionary,
+		void*									_mesh );
 	
-	void				CornerVC_Init(
-							CornerVC*                           self,
-							Name                                name,
-							Name                                _dictionaryEntryName, 
-							Variable_Register*                  variable_Register, 
-							ConditionFunction_Register*         conFunc_Register, 
-							Dictionary*                         dictionary,
-							void*                               _mesh );
+	CornerVC* _CornerVC_New( CORNERVC_DEFARGS );
 	
-	CornerVC*			_CornerVC_New( 
-							SizeT                                       _sizeOfSelf, 
-							Type                                        type,
-							Stg_Class_DeleteFunction*                   _delete,
-							Stg_Class_PrintFunction*                    _print,
-							Stg_Class_CopyFunction*                     _copy,
-							Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-							Stg_Component_ConstructFunction*            _construct,
-							Stg_Component_BuildFunction*                _build,
-							Stg_Component_InitialiseFunction*           _initialise,
-							Stg_Component_ExecuteFunction*              _execute,
-							Stg_Component_DestroyFunction*              _destroy,
-							Name                                        name, 
-							Bool                                        initFlag,
-							VariableCondition_BuildSelfFunc*            _buildSelf, 
-							VariableCondition_PrintConciseFunc*         _printConcise,
-							VariableCondition_ReadDictionaryFunc*       _readDictionary,
-							VariableCondition_GetSetFunc*               _getSet,
-							VariableCondition_GetVariableCountFunc*     _getVariableCount,
-							VariableCondition_GetVariableIndexFunc*     _getVariableIndex,
-							VariableCondition_GetValueIndexFunc*        _getValueIndex,
-							VariableCondition_GetValueCountFunc*        _getValueCount,
-							VariableCondition_GetValueFunc*             _getValue,
-							VariableCondition_ApplyFunc*			_apply, 
-							Name                                        _dictionaryEntryName, 
-							Variable_Register*                          variable_Register, 
-							ConditionFunction_Register*                 conFunc_Register, 
-							Dictionary*                                 dictionary,
-							void*                                       _mesh );
-	
-	void				_CornerVC_Init(
-							void*                       cornerVC, 
-							Name                        _dictionaryEntryName, 
-							void*                       _mesh );
+	void _CornerVC_Init( void* cornerVC, Name _dictionaryEntryName, void* _mesh );
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** General virtual functions
 	*/
 	
-	void				_CornerVC_Delete( void* cornerVC );
+	void _CornerVC_Delete( void* cornerVC );
 	
-	void				_CornerVC_Print( void* cornerVC, Stream* stream );
+	void _CornerVC_Print( void* cornerVC, Stream* stream );
 	
 	/* Copy */
 	#define CornerVC_Copy( self ) \
@@ -148,7 +117,7 @@
 	
 	void* _CornerVC_Copy( void* cornerVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
-	void				_CornerVC_Build(  void* cornerVC, void* data );
+	void _CornerVC_Build(  void* cornerVC, void* data );
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -160,31 +129,25 @@
 	** Virtual functions
 	*/
 	
-	void				_CornerVC_AssignFromXML( void* cornerVC, Stg_ComponentFactory* cf, void* data );
+	void _CornerVC_AssignFromXML( void* cornerVC, Stg_ComponentFactory* cf, void* data );
 	
-	void				_CornerVC_BuildSelf( void* cornerVC, void* data );
+	void _CornerVC_BuildSelf( void* cornerVC, void* data );
 	
-	void				_CornerVC_ReadDictionary( void* variableCondition, void* dictionary );
+	void _CornerVC_ReadDictionary( void* variableCondition, void* dictionary );
 	
-	IndexSet*			_CornerVC_GetSet( void* variableCondition );
+	IndexSet* _CornerVC_GetSet( void* variableCondition );
 	
-	VariableCondition_VariableIndex	_CornerVC_GetVariableCount( void* variableCondition, Index globalIndex );
+	VariableCondition_VariableIndex _CornerVC_GetVariableCount( void* variableCondition, Index globalIndex );
 	
-	Variable_Index		_CornerVC_GetVariableIndex(
-							void*                           variableCondition,
-							Index                           globalIndex, 
-							VariableCondition_VariableIndex varIndex );
+	Variable_Index _CornerVC_GetVariableIndex( void* variableCondition, Index globalIndex, VariableCondition_VariableIndex varIndex );
 						
-	VariableCondition_ValueIndex	_CornerVC_GetValueIndex(
-							void*                           variableCondition, 
-							Index                           globalIndex, 
-							VariableCondition_VariableIndex varIndex );
+	VariableCondition_ValueIndex _CornerVC_GetValueIndex( void* variableCondition, Index globalIndex, VariableCondition_VariableIndex varIndex );
 						
-	VariableCondition_ValueIndex	_CornerVC_GetValueCount( void* variableCondition );
+	VariableCondition_ValueIndex _CornerVC_GetValueCount( void* variableCondition );
 	
-	VariableCondition_Value         _CornerVC_GetValue( void* variableCondition, VariableCondition_ValueIndex valIndex );
+	VariableCondition_Value _CornerVC_GetValue( void* variableCondition, VariableCondition_ValueIndex valIndex );
 	
-	void				_CornerVC_PrintConcise( void* variableCondition, Stream* stream );
+	void _CornerVC_PrintConcise( void* variableCondition, Stream* stream );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Build functions
