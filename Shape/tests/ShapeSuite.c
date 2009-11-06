@@ -33,8 +33,11 @@ void ShapeSuite_GeneratePoints( ShapeSuiteData* data, Dimension_Index dim, char*
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
 	stgMainBuildAndInitialise( cf );
 	context = LiveComponentRegister_Get( cf->LCRegister, "context" ); 
-	//context = DomainContext_DefaultNew( "context" );
-	//cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, context );
+
+	/* This is another of loading from XML. we create a default context
+		and assign it to the acquired componect factory .*/	
+	/*context = DomainContext_DefaultNew( "context" );
+	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, context );*/
 
 	dictionary = context->dictionary;
 	outputPath = Dictionary_GetString( dictionary, "outputPath" );
