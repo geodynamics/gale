@@ -91,13 +91,13 @@ FeMesh* buildFeMesh( unsigned nDims, unsigned* size,
    CartesianGenerator*   gen;
    FeMesh*         feMesh;
 
-   gen = CartesianGenerator_New( "" );
+   gen = CartesianGenerator_New( "", NULL );
    CartesianGenerator_SetDimSize( gen, nDims );
    CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, NULL );
    CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
    MeshGenerator_SetIncidenceState( gen, nDims, nDims, True );
 
-   feMesh = FeMesh_New( "" );
+   feMesh = FeMesh_New( "", NULL );
    Mesh_SetExtensionManagerRegister( feMesh, emReg );
    Mesh_SetGenerator( feMesh, gen );
    FeMesh_SetElementFamily( feMesh, "linear" );
