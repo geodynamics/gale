@@ -73,6 +73,8 @@ DynamicVC* DynamicVC_New(
 	self->isConstructed = True;
 	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
 	_DynamicVC_Init( self );	
+
+	return self;
 }
 
 DynamicVC* DynamicVC_DefaultNew( Name name ) {
@@ -86,7 +88,7 @@ DynamicVC* DynamicVC_DefaultNew( Name name ) {
 		_VariableCondition_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
-		NULL,
+		_VariableCondition_Destroy,
 		name, 
 		NON_GLOBAL,
 		NULL,

@@ -78,6 +78,8 @@ CompositeVC* CompositeVC_New(
 	self->isConstructed = True;
 	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
 	_CompositeVC_Init( self, data );
+
+	return self;
 }
 
 CompositeVC* CompositeVC_DefaultNew( Name name ) {
@@ -92,7 +94,7 @@ CompositeVC* CompositeVC_DefaultNew( Name name ) {
 		_CompositeVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
-		NULL,
+		_VariableCondition_Destroy,	
 		name,
 		NON_GLOBAL,
 		NULL,
