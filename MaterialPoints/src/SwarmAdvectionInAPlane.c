@@ -71,6 +71,7 @@ const Type SwarmAdvectionInAPlane_Type = "SwarmAdvectionInAPlane";
 */
 SwarmAdvectionInAPlane* SwarmAdvectionInAPlane_New(
 		Name                                       name,
+		DomainContext*                             context,
 		TimeIntegrator*                            timeIntegrator,
 		FeVariable*                                velocityField,
 		Bool                                       allowFallbackToFirstOrder,
@@ -81,7 +82,7 @@ SwarmAdvectionInAPlane* SwarmAdvectionInAPlane_New(
 	int whichaxis;
 	
 	/* 	SwarmAdvectionInAPlane_InitAll */
-	_TimeIntegratee_Init( self, timeIntegrator, swarm->particleCoordVariable->variable, 0, NULL,
+	_TimeIntegratee_Init( self, context, timeIntegrator, swarm->particleCoordVariable->variable, 0, NULL,
 		allowFallbackToFirstOrder );
 	_SwarmAdvector_Init( (SwarmAdvector*)self, velocityField, swarm, periodicBCsManager);
 	_SwarmAdvectionInAPlane_Init( self, whichaxis );

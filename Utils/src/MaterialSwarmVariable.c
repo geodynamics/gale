@@ -62,6 +62,7 @@ const Type MaterialSwarmVariable_Type = "MaterialSwarmVariable";
 
 MaterialSwarmVariable* MaterialSwarmVariable_New( 
 		Name                                                name,
+		AbstractContext*                                    context,
 		MaterialPointsSwarm*                                swarm,
 		Index                                               dofCount,
 		Materials_Register*                                 materials_Register,
@@ -72,6 +73,7 @@ MaterialSwarmVariable* MaterialSwarmVariable_New(
 
 	MaterialSwarmVariable_InitAll( 
 			self,
+			context,
 			swarm,
 			dofCount,
 			materials_Register,
@@ -140,6 +142,7 @@ void _MaterialSwarmVariable_Init(
 
 void MaterialSwarmVariable_InitAll( 
 		void*                                               swarmVariable,
+		AbstractContext*                                    context,
 		MaterialPointsSwarm*                                swarm,
 		Index                                               dofCount,
 		Materials_Register*                                 materials_Register,
@@ -148,7 +151,7 @@ void MaterialSwarmVariable_InitAll(
 {
 	MaterialSwarmVariable* self = (MaterialSwarmVariable*) swarmVariable;
 
-	SwarmVariable_InitAll( self, (Swarm*)swarm, NULL, dofCount );
+	_SwarmVariable_Init( self, context, (Swarm*)swarm, NULL, dofCount );
 	_MaterialSwarmVariable_Init( self, materials_Register, materialExtensionHandle, offset );
 }
 

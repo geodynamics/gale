@@ -242,7 +242,8 @@ void _BuoyancyForceTermThermoChem_Build( void* forceTerm, void* data ) {
 	for ( materialSwarm_I = 0; materialSwarm_I < self->materialSwarmCount; ++materialSwarm_I ) {
 		name = Stg_Object_AppendSuffix( materialSwarms[materialSwarm_I], "Density" );
 		self->densitySwarmVariables[materialSwarm_I] = MaterialSwarmVariable_New( 
-				name, 
+				name,
+				self->context,
 				materialSwarms[materialSwarm_I], 
 				1, 
 				self->materials_Register, 

@@ -61,6 +61,7 @@
 
 	MaterialSwarmVariable* MaterialSwarmVariable_New( 
 		Name                                                name,
+		AbstractContext*                                    context,
 		MaterialPointsSwarm*                                swarm,
 		Index                                               dofCount,
 		Materials_Register*                                 materials_Register,
@@ -86,6 +87,7 @@
 	
 	void MaterialSwarmVariable_InitAll( 
 		void*                                               swarmVariable,
+		AbstractContext*                                    context,
 		MaterialPointsSwarm*                                swarm,
 		Index                                               dofCount,
 		Materials_Register*                                 materials_Register,

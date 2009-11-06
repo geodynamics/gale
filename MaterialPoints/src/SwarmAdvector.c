@@ -68,6 +68,7 @@ const Type SwarmAdvector_Type = "SwarmAdvector";
 */
 SwarmAdvector* SwarmAdvector_New(
 		Name                                       name,
+		DomainContext*                             context,
 		TimeIntegrator*                            timeIntegrator,
 		FeVariable*                                velocityField,
 		Bool                                       allowFallbackToFirstOrder,
@@ -77,7 +78,7 @@ SwarmAdvector* SwarmAdvector_New(
 	SwarmAdvector* self = (SwarmAdvector*) _SwarmAdvector_DefaultNew( name );
 
 	/* 	SwarmAdvector_InitAll */
-	_TimeIntegratee_Init( self, timeIntegrator, swarm->particleCoordVariable->variable, 0, NULL,
+	_TimeIntegratee_Init( self, context, timeIntegrator, swarm->particleCoordVariable->variable, 0, NULL,
 		allowFallbackToFirstOrder );
 	_SwarmAdvector_Init( self, velocityField, swarm, periodicBCsManager );
 
