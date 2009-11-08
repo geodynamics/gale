@@ -51,17 +51,32 @@ const Name defaultAllElementsVCName = "defaultAllElementsVCName";
 */
 
 VariableCondition* AllElementsVC_Factory(
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register, 
-		Dictionary*					dictionary,
-		void*						data )
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register, 
+	Dictionary*							dictionary,
+	void*									data )
 {
 	return (VariableCondition*)AllElementsVC_New( defaultAllElementsVCName, NULL, variable_Register, conFunc_Register, dictionary, data );
 }
 
-
-AllElementsVC* AllElementsVC_DefaultNew( Name name )
+AllElementsVC*	AllElementsVC_New(
+	Name									name,
+	Name									_dictionaryEntryName, 
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register,
+	Dictionary*							dictionary,
+	void*									mesh )
 {
+	AllElementsVC*	self = AllElementsVC_DefaultNew( name );
+	
+	self->isConstructed = True;
+	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
+	_AllElementsVC_Init( self, _dictionaryEntryName, mesh );
+
+	return self;
+}
+
+AllElementsVC* AllElementsVC_DefaultNew( Name name ) {
 	return _AllElementsVC_New(
 		sizeof(AllElementsVC), 
 		AllElementsVC_Type, 
@@ -75,7 +90,7 @@ AllElementsVC* AllElementsVC_DefaultNew( Name name )
 		_VariableCondition_Execute,
 		_VariableCondition_Destroy,
 		name,
-		False,
+		NON_GLOBAL,
 		_AllElementsVC_BuildSelf, 
 		_AllElementsVC_PrintConcise,
 		_AllElementsVC_ReadDictionary,
@@ -93,159 +108,17 @@ AllElementsVC* AllElementsVC_DefaultNew( Name name )
 		NULL );
 }
 
-AllElementsVC*	AllElementsVC_New(
-		Name						name,
-		Name						_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						mesh )
-{
-	return _AllElementsVC_New(
-		sizeof(AllElementsVC), 
-		AllElementsVC_Type, 
-		_AllElementsVC_Delete, 
-		_AllElementsVC_Print, 
-		_AllElementsVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)AllElementsVC_DefaultNew,
-		_AllElementsVC_AssignFromXML,
-		_AllElementsVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
-		name,
-		True,
-		_AllElementsVC_BuildSelf, 
-		_AllElementsVC_PrintConcise,
-		_AllElementsVC_ReadDictionary,
-		_AllElementsVC_GetSet, 
-		_AllElementsVC_GetVariableCount, 
-		_AllElementsVC_GetVariableIndex, 
-		_AllElementsVC_GetValueIndex, 
-		_AllElementsVC_GetValueCount, 
-		_AllElementsVC_GetValue,
-		_VariableCondition_Apply, 
-		_dictionaryEntryName,
-		variable_Register, 
-		conFunc_Register, 
-		dictionary, 
-		mesh );
-}
 
-
-void AllElementsVC_Init(
-		AllElementsVC*					self,
-		Name						name,
-		Name						_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						mesh )
-{
-	/* General info */
-	self->type = AllElementsVC_Type;
-	self->_sizeOfSelf = sizeof(AllElementsVC);
-	self->_deleteSelf = False;
-	
-	/* Virtual info */
-	self->_delete = _AllElementsVC_Delete;
-	self->_print = _AllElementsVC_Print;
-	self->_copy = _AllElementsVC_Copy;
-	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)AllElementsVC_DefaultNew;
-	self->_construct = _AllElementsVC_AssignFromXML,
-	self->_build = _AllElementsVC_Build;
-	self->_initialise = _VariableCondition_Initialise;
-	self->_execute = _VariableCondition_Execute;
-	self->_destroy = _VariableCondition_Destroy;
-	self->_buildSelf = _AllElementsVC_BuildSelf;
-	self->_printConcise = _AllElementsVC_PrintConcise;
-	self->_readDictionary = _AllElementsVC_ReadDictionary;
-	self->_getSet = _AllElementsVC_GetSet;
-	self->_getVariableCount = _AllElementsVC_GetVariableCount;
-	self->_getVariableIndex = _AllElementsVC_GetVariableIndex;
-	self->_getValueIndex = _AllElementsVC_GetValueIndex;
-	self->_getValueCount = _AllElementsVC_GetValueCount;
-	self->_getValue = _AllElementsVC_GetValue;
-	self->_apply = _VariableCondition_Apply;
-	
-	_Stg_Class_Init( (Stg_Class*)self );
-	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-	_Stg_Component_Init( (Stg_Component*)self );
-	_VariableCondition_Init( (VariableCondition*)self, variable_Register, conFunc_Register, dictionary );
-	
-	/* Stg_Class info */
-	_AllElementsVC_Init( self, _dictionaryEntryName, mesh );
-}
-
-
-AllElementsVC* _AllElementsVC_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print,
-		Stg_Class_CopyFunction*				_copy,
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*	_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*			_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name								name,
-		Bool								initFlag,
-		VariableCondition_BuildSelfFunc*		_buildSelf, 
-		VariableCondition_PrintConciseFunc*		_printConcise,
-		VariableCondition_ReadDictionaryFunc*		_readDictionary,
-		VariableCondition_GetSetFunc*			_getSet,
-		VariableCondition_GetVariableCountFunc*		_getVariableCount,
-		VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-		VariableCondition_GetValueIndexFunc*		_getValueIndex,
-		VariableCondition_GetValueCountFunc*		_getValueCount,
-		VariableCondition_GetValueFunc*			_getValue,
-		VariableCondition_ApplyFunc*			_apply, 
-		Name									_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						mesh)
-{
+AllElementsVC* _AllElementsVC_New( ALLELEMENTSVC_DEFARGS ) {
 	AllElementsVC*	self;
 	
 	/* Allocate memory/General info */
-	assert(_sizeOfSelf >= sizeof(AllElementsVC));
-	self = (AllElementsVC*)_VariableCondition_New(
-		_sizeOfSelf, 
-		type, 
-		_delete, 
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,	
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		initFlag,
-		_buildSelf, 
-		_printConcise,
-		_readDictionary,
-		_getSet, 
-		_getVariableCount, 
-		_getVariableIndex, 
-		_getValueIndex, 
-		_getValueCount, 
-		_getValue, 
-		_apply, 
-		variable_Register, 
-		conFunc_Register,
-		dictionary );
+	assert( sizeOfSelf >= sizeof(AllElementsVC) );
+	self = (AllElementsVC*)_VariableCondition_New( VARIABLECONDITION_PASSARGS );
 	
 	/* Virtual info */
 	
 	/* Stg_Class info */
-	if( initFlag ){
-		_AllElementsVC_Init( self, _dictionaryEntryName, mesh );
-	}
 	
 	return self;
 }

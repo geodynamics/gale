@@ -84,6 +84,8 @@ CornerVC* CornerVC_New(
 	self->isConstructed = True;
 	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
 	_CornerVC_Init( self, _dictionaryEntryName, _mesh );
+
+	return self;
 }
 
 CornerVC* CornerVC_DefaultNew( Name name ) {

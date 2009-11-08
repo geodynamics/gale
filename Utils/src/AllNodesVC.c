@@ -52,17 +52,33 @@ const Name defaultAllNodesVCName = "defaultAllNodesVCName";
 */
 
 VariableCondition* AllNodesVC_Factory(
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register, 
-		Dictionary*					dictionary,
-		void*						data )
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register, 
+	Dictionary*							dictionary,
+	void*									data )
 {
 	return (VariableCondition*)AllNodesVC_New( defaultAllNodesVCName, NULL, variable_Register, conFunc_Register, dictionary, data );
 }
 
 
-AllNodesVC* AllNodesVC_DefaultNew( Name name )
+AllNodesVC*	AllNodesVC_New(
+	Name									name,
+	Name									_dictionaryEntryName, 
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register,
+	Dictionary*							dictionary,
+	void*									mesh )
 {
+	AllNodesVC* self = AllNodesVC_DefaultNew( name );
+
+	self->isConstructed = True;
+	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );	
+	_AllNodesVC_Init( self, _dictionaryEntryName, mesh );
+
+	return self;
+}
+
+AllNodesVC* AllNodesVC_DefaultNew( Name name ) {
 	return _AllNodesVC_New(
 		sizeof(AllNodesVC), 
 		AllNodesVC_Type, 
@@ -76,7 +92,7 @@ AllNodesVC* AllNodesVC_DefaultNew( Name name )
 		_VariableCondition_Execute,
 		_VariableCondition_Destroy,
 		name,
-		False,
+		NON_GLOBAL,
 		_AllNodesVC_BuildSelf, 
 		_AllNodesVC_PrintConcise,
 		_AllNodesVC_ReadDictionary,
@@ -94,176 +110,31 @@ AllNodesVC* AllNodesVC_DefaultNew( Name name )
 		NULL );
 }
 
-AllNodesVC*	AllNodesVC_New(
-		Name						name,
-		Name						_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						mesh )
-{
-	return _AllNodesVC_New(
-		sizeof(AllNodesVC), 
-		AllNodesVC_Type, 
-		_AllNodesVC_Delete, 
-		_AllNodesVC_Print, 
-		_AllNodesVC_Copy, 
-		(Stg_Component_DefaultConstructorFunction*)AllNodesVC_DefaultNew,
-		_AllNodesVC_AssignFromXML,
-		_AllNodesVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
-		name,
-		True,
-		_AllNodesVC_BuildSelf, 
-		_AllNodesVC_PrintConcise,
-		_AllNodesVC_ReadDictionary,
-		_AllNodesVC_GetSet, 
-		_AllNodesVC_GetVariableCount, 
-		_AllNodesVC_GetVariableIndex, 
-		_AllNodesVC_GetValueIndex, 
-		_AllNodesVC_GetValueCount, 
-		_AllNodesVC_GetValue,
-		_VariableCondition_Apply, 
-		_dictionaryEntryName,
-		variable_Register, 
-		conFunc_Register, 
-		dictionary, 
-		mesh );
-}
-
-
-void AllNodesVC_Init(
-		AllNodesVC*					self,
-		Name						name,
-		Name						_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						mesh )
-{
-	/* General info */
-	self->type = AllNodesVC_Type;
-	self->_sizeOfSelf = sizeof(AllNodesVC);
-	self->_deleteSelf = False;
-	
-	/* Virtual info */
-	self->_delete = _AllNodesVC_Delete;
-	self->_print = _AllNodesVC_Print;
-	self->_copy = _AllNodesVC_Copy;
-	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)AllNodesVC_DefaultNew,
-	self->_construct = _AllNodesVC_AssignFromXML,
-	self->_build = _VariableCondition_Build;
-	self->_initialise = _VariableCondition_Initialise;
-	self->_execute = _VariableCondition_Execute;
-	self->_destroy = _VariableCondition_Destroy;
-	self->_buildSelf = _AllNodesVC_BuildSelf;
-	self->_printConcise = _AllNodesVC_PrintConcise;
-	self->_readDictionary = _AllNodesVC_ReadDictionary;
-	self->_getSet = _AllNodesVC_GetSet;
-	self->_getVariableCount = _AllNodesVC_GetVariableCount;
-	self->_getVariableIndex = _AllNodesVC_GetVariableIndex;
-	self->_getValueIndex = _AllNodesVC_GetValueIndex;
-	self->_getValueCount = _AllNodesVC_GetValueCount;
-	self->_getValue = _AllNodesVC_GetValue;
-	self->_apply = _VariableCondition_Apply;
-	
-	_Stg_Class_Init( (Stg_Class*)self );
-	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-	_Stg_Component_Init( (Stg_Component*)self );
-	_VariableCondition_Init( (VariableCondition*)self, variable_Register, conFunc_Register, dictionary );
-	
-	/* Stg_Class info */
-	_AllNodesVC_Init( self, _dictionaryEntryName, mesh );
-}
-
-
-AllNodesVC* _AllNodesVC_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*		_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*			_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name								name, 
-		Bool								initFlag,
-		VariableCondition_BuildSelfFunc*		_buildSelf, 
-		VariableCondition_PrintConciseFunc*		_printConcise,
-		VariableCondition_ReadDictionaryFunc*		_readDictionary,
-		VariableCondition_GetSetFunc*			_getSet,
-		VariableCondition_GetVariableCountFunc*		_getVariableCount,
-		VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-		VariableCondition_GetValueIndexFunc*		_getValueIndex,
-		VariableCondition_GetValueCountFunc*		_getValueCount,
-		VariableCondition_GetValueFunc*			_getValue,
-		VariableCondition_ApplyFunc*			_apply, 
-		Name							_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						mesh )
-{
+AllNodesVC* _AllNodesVC_New( ALLNODESVC_DEFARGS ) {
 	AllNodesVC*	self;
 	
 	/* Allocate memory/General info */
-	assert(_sizeOfSelf >= sizeof(AllNodesVC));
-	self = (AllNodesVC*)_VariableCondition_New(
-		_sizeOfSelf, 
-		type, 
-		_delete, 
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		initFlag,
-		_buildSelf, 
-		_printConcise,
-		_readDictionary,
-		_getSet, 
-		_getVariableCount, 
-		_getVariableIndex, 
-		_getValueIndex, 
-		_getValueCount, 
-		_getValue, 
-		_apply, 
-		variable_Register, 
-		conFunc_Register,
-		dictionary );
+	assert( sizeOfSelf >= sizeof(AllNodesVC) );
+	self = (AllNodesVC*)_VariableCondition_New( VARIABLECONDITION_PASSARGS );
 	
 	/* Virtual info */
 	
 	/* Stg_Class info */
-	if( initFlag ){
-		_AllNodesVC_Init( self, _dictionaryEntryName, mesh );
-	}
 	
 	return self;
 }
 
-
 void _AllNodesVC_Init(
-		void*						allNodesVC, 
-		Name						_dictionaryEntryName, 
-		void*						mesh )
+	void*	allNodesVC, 
+	Name	_dictionaryEntryName, 
+	void*	mesh )
 {
-	AllNodesVC*			self = (AllNodesVC*)allNodesVC;
+	AllNodesVC* self = (AllNodesVC*)allNodesVC;
 	
 	self->isConstructed = True;
 	self->_dictionaryEntryName = _dictionaryEntryName;
 	self->mesh = (Mesh*)mesh;
 }
-
 
 /*--------------------------------------------------------------------------------------------------------------------------
 ** General virtual functions
