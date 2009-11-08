@@ -135,14 +135,9 @@ CornerVC* _CornerVC_New( CORNERVC_DEFARGS ) {
 }
 
 
-void _CornerVC_Init(
-   void*	cornerVC, 
-   Name	_dictionaryEntryName, 
-   void*	_mesh )
-{
+void _CornerVC_Init( void*	cornerVC, Name	_dictionaryEntryName, void* _mesh ) {
    CornerVC* self = (CornerVC*)cornerVC;
 
-   self->isConstructed =         True;
    self->_dictionaryEntryName =  _dictionaryEntryName;
    self->_mesh =                 (Mesh*)_mesh;
    self->_corner =               CornerVC_Corner_Size;

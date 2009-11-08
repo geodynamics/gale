@@ -133,7 +133,6 @@ WallVC* _WallVC_New( WALLVC_DEFARGS ) {
 void _WallVC_Init( void* wallVC, Name _dictionaryEntryName, void* _mesh ) {
 	WallVC* self = (WallVC*)wallVC;
 
-	self->isConstructed = True;
 	self->_dictionaryEntryName = _dictionaryEntryName;
 	self->_mesh = (Mesh*)_mesh;
 	self->_wall = WallVC_Wall_Size;

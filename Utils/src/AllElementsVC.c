@@ -125,13 +125,12 @@ AllElementsVC* _AllElementsVC_New( ALLELEMENTSVC_DEFARGS ) {
 
 
 void _AllElementsVC_Init(
-		void* 						allElementsVC,
-		Name						_dictionaryEntryName, 
-		void*						mesh )
+	void*	allElementsVC,
+	Name	_dictionaryEntryName, 
+	void*	mesh )
 {
 	AllElementsVC*			self = (AllElementsVC*)allElementsVC;
 
-	self->isConstructed = True;
 	self->_dictionaryEntryName = _dictionaryEntryName;
 	self->mesh = (Mesh*)mesh;
 }
