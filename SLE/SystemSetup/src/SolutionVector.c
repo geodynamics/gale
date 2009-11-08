@@ -73,6 +73,14 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 	double*			localSolnVecValues );
 
 
+SolutionVector* SolutionVector_New( Name name, MPI_Comm comm, FeVariable* feVariable ) {
+	SolutionVector* self = SolutionVector_DefaultNew( name );
+
+	self->isConstructed = True;
+	_SolutionVector_Init( self, comm, feVariable );
+
+	return self;
+}
 void* SolutionVector_DefaultNew( Name name ) {
 	return _SolutionVector_New( 
 		sizeof(SolutionVector), 
@@ -92,12 +100,6 @@ void* SolutionVector_DefaultNew( Name name ) {
 		NULL );
 }
 
-SolutionVector* SolutionVector_New( Name name, MPI_Comm comm, FeVariable* feVariable ) {
-	SolutionVector* self = SolutionVector_DefaultNew( name );
-
-	self->isConstructed = True;
-	_SolutionVector_Init( self, comm, feVariable );
-}
 
 SolutionVector* _SolutionVector_New( SOLUTIONVECTOR_DEFARGS ) {
 	SolutionVector* self;
@@ -120,11 +122,7 @@ SolutionVector* _SolutionVector_New( SOLUTIONVECTOR_DEFARGS ) {
 	return self;
 }
 
-void _SolutionVector_Init(
-		SolutionVector*					self,
-		MPI_Comm					comm,
-		FeVariable*					feVariable )
-{
+void _SolutionVector_Init( SolutionVector* self, MPI_Comm comm, FeVariable* feVariable ) {
 	/* General and Virtual info should already be set */
 	
 	/* SolutionVector info */
