@@ -57,7 +57,7 @@ Bool StgFEM_Discretisation_Finalise( void ) {
 	
 	Stream_IndentBranch( StgFEM_Debug );
 
-	Stg_Class_Delete( elementType_Register );	
+	Stg_Class_Delete( elementType_Register );
 
 	PetscFinalize();
 	

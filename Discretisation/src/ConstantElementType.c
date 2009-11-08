@@ -54,29 +54,6 @@
 const Type ConstantElementType_Type = "ConstantElementType";
 #define _ConstantElementType_NodeCount 1
 
-void* ConstantElementType_DefaultNew( Name name ) {
-	return _ConstantElementType_New( 
-			sizeof(ConstantElementType),
-			ConstantElementType_Type,
-			_ConstantElementType_Delete,
-			_ConstantElementType_Print,
-			NULL, 
-			ConstantElementType_DefaultNew,
-			_ConstantElementType_AssignFromXML,
-			_ConstantElementType_Build,
-			_ConstantElementType_Initialise,
-			_ConstantElementType_Execute,
-			NULL, 
-			name,
-			NON_GLOBAL,
-			_ConstantElementType_SF_allNodes,
-			_ConstantElementType_SF_allLocalDerivs_allNodes,
-			_ConstantElementType_ConvertGlobalCoordToElLocal,
-			_ElementType_JacobianDeterminantSurface,
-			_ConstantElementType_SurfaceNormal,
-			_ConstantElementType_NodeCount );
-}
-
 ConstantElementType* ConstantElementType_New( Name name ) {
 	ConstantElementType* self = ConstantElementType_DefaultNew( name );
 
@@ -87,6 +64,28 @@ ConstantElementType* ConstantElementType_New( Name name ) {
 	return self;
 }
 
+void* ConstantElementType_DefaultNew( Name name ) {
+	return _ConstantElementType_New( 
+		sizeof(ConstantElementType),
+		ConstantElementType_Type,
+		_ConstantElementType_Delete,
+		_ConstantElementType_Print,
+		NULL, 
+		ConstantElementType_DefaultNew,
+		_ConstantElementType_AssignFromXML,
+		_ConstantElementType_Build,
+		_ConstantElementType_Initialise,
+		_ConstantElementType_Execute,
+		_ConstantElementType_Destroy, 
+		name,
+		NON_GLOBAL,
+		_ConstantElementType_SF_allNodes,
+		_ConstantElementType_SF_allLocalDerivs_allNodes,
+		_ConstantElementType_ConvertGlobalCoordToElLocal,
+		_ElementType_JacobianDeterminantSurface,
+		_ConstantElementType_SurfaceNormal,
+		_ConstantElementType_NodeCount );
+}
 
 ConstantElementType* _ConstantElementType_New( CONSTANTELEMENTTYPE_DEFARGS ) {
 	ConstantElementType*		self;
@@ -100,6 +99,7 @@ ConstantElementType* _ConstantElementType_New( CONSTANTELEMENTTYPE_DEFARGS ) {
 	/* Virtual functions */
 	
 	/* ConstantElementType info */
+
 	return self;
 }
 

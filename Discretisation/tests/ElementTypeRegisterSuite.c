@@ -47,6 +47,8 @@ typedef struct {
 void ElementTypeRegisterSuite_Setup( ElementTypeRegisterSuiteData* data ) {
 	data->etReg = ElementType_Register_New( "elementType_Register" );
 
+	_ElementType_Register_Init( data->etReg );
+
 	ElementType_Register_Add( data->etReg, (ElementType*)ConstantElementType_New( "constant" ) );
 	ElementType_Register_Add( data->etReg, (ElementType*)BilinearElementType_New( "bilinear" ) );
 	ElementType_Register_Add( data->etReg, (ElementType*)TrilinearElementType_New( "trilinear" ) );
@@ -55,77 +57,80 @@ void ElementTypeRegisterSuite_Setup( ElementTypeRegisterSuiteData* data ) {
 }
 
 void ElementTypeRegisterSuite_Teardown( ElementTypeRegisterSuiteData* data ) {
-	Stg_Class_Delete( data->etReg );
+	/*Stg_Class_Delete( data->etReg );*/
 }
 
 void ElementTypeRegisterSuite_Test( ElementTypeRegisterSuiteData* data ) {
-	ElementType*	elType;
+	ElementType* elType;
 	unsigned	numTypes	= data->etReg->count;
 	unsigned	newIndex;
 	unsigned	testIndex;
 	
 	/* manually create extra types to test the list re-sizing */
 	newIndex = ElementType_Register_Add( data->etReg, _ElementType_New( sizeof(ConstantElementType), 
-								 "TestElementType_0",
-				                                 _ConstantElementType_Delete, 
-								 _ConstantElementType_Print,
-								 NULL, 
-								 ConstantElementType_DefaultNew,
-								 _ConstantElementType_AssignFromXML,
-								 _ConstantElementType_Build,
-								 _ConstantElementType_Initialise,
-								 _ConstantElementType_Execute,
-								 _ConstantElementType_Destroy,
-								 "TestElementType_0_Name",
-								 True,
-								 _ConstantElementType_SF_allNodes,
-								 _ConstantElementType_SF_allLocalDerivs_allNodes,
-								 _ConstantElementType_ConvertGlobalCoordToElLocal,
-								 _ElementType_JacobianDeterminantSurface,
-								 _ElementType_SurfaceNormal,
-								 1 ) );
+		"TestElementType_0",
+		_ConstantElementType_Delete, 
+		_ConstantElementType_Print,
+		NULL, 
+		ConstantElementType_DefaultNew,
+		_ConstantElementType_AssignFromXML,
+		_ConstantElementType_Build,
+		_ConstantElementType_Initialise,
+		_ConstantElementType_Execute,
+		_ConstantElementType_Destroy,
+		"TestElementType_0_Name",
+		NON_GLOBAL,
+		_ConstantElementType_SF_allNodes,
+		_ConstantElementType_SF_allLocalDerivs_allNodes,
+		_ConstantElementType_ConvertGlobalCoordToElLocal,
+		_ElementType_JacobianDeterminantSurface,
+		_ElementType_SurfaceNormal,
+		1 ) );
+
 	pcu_check_true( newIndex == data->etReg->count - 1 );
 
 	newIndex = ElementType_Register_Add( data->etReg, _ElementType_New( sizeof(ConstantElementType), 
-								 "TestElementType_1",
-				                                 _ConstantElementType_Delete, 
-								 _ConstantElementType_Print,
-								 NULL, 
-								 ConstantElementType_DefaultNew,
-								 _ConstantElementType_AssignFromXML,
-								 _ConstantElementType_Build,
-								 _ConstantElementType_Initialise,
-								 _ConstantElementType_Execute,
-								 _ConstantElementType_Destroy,
-								 "TestElementType_1_Name",
-								 True,
-								 _ConstantElementType_SF_allNodes,
-								 _ConstantElementType_SF_allLocalDerivs_allNodes,
-								 _ConstantElementType_ConvertGlobalCoordToElLocal,
-								 _ElementType_JacobianDeterminantSurface,
-								 _ElementType_SurfaceNormal,
-								 1 ) );
+		"TestElementType_1",
+		_ConstantElementType_Delete, 
+		_ConstantElementType_Print,
+		NULL, 
+		ConstantElementType_DefaultNew,
+		_ConstantElementType_AssignFromXML,
+		_ConstantElementType_Build,
+		_ConstantElementType_Initialise,
+		_ConstantElementType_Execute,
+		_ConstantElementType_Destroy,
+		"TestElementType_1_Name",
+		NON_GLOBAL,
+		_ConstantElementType_SF_allNodes,
+		_ConstantElementType_SF_allLocalDerivs_allNodes,
+		_ConstantElementType_ConvertGlobalCoordToElLocal,
+		_ElementType_JacobianDeterminantSurface,
+		_ElementType_SurfaceNormal,
+		1 ) );
+
 	pcu_check_true( newIndex == data->etReg->count - 1 );
 
 	newIndex = ElementType_Register_Add( data->etReg, _ElementType_New( sizeof(ConstantElementType), 
-								 "TestElementType_2",
-				                                 _ConstantElementType_Delete, 
-								 _ConstantElementType_Print,
-								 NULL, 
-								 ConstantElementType_DefaultNew,
-								 _ConstantElementType_AssignFromXML,
-								 _ConstantElementType_Build,
-								 _ConstantElementType_Initialise,
-								 _ConstantElementType_Execute,
-								 _ConstantElementType_Destroy,
-								 "TestElementType_2_Name",
-								 True,
-								 _ConstantElementType_SF_allNodes,
-								 _ConstantElementType_SF_allLocalDerivs_allNodes,
-								 _ConstantElementType_ConvertGlobalCoordToElLocal,
-								 _ElementType_JacobianDeterminantSurface,
-								 _ElementType_SurfaceNormal,
-								 1 ) );
+		"TestElementType_2",
+		_ConstantElementType_Delete, 
+		_ConstantElementType_Print,
+		NULL, 
+		ConstantElementType_DefaultNew,
+		_ConstantElementType_AssignFromXML,
+		_ConstantElementType_Build,
+		_ConstantElementType_Initialise,
+		_ConstantElementType_Execute,
+		_ConstantElementType_Destroy,
+		"TestElementType_2_Name",
+		NON_GLOBAL,
+		_ConstantElementType_SF_allNodes,
+		_ConstantElementType_SF_allLocalDerivs_allNodes,
+		_ConstantElementType_ConvertGlobalCoordToElLocal,
+		_ElementType_JacobianDeterminantSurface,
+		_ElementType_SurfaceNormal,
+		1 ) );
+
 	pcu_check_true( newIndex == data->etReg->count - 1 );
 
 	testIndex = ElementType_Register_GetIndex( data->etReg, ConstantElementType_Type );

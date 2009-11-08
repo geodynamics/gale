@@ -57,93 +57,42 @@ const Type ElementType_Register_Type = "ElementType_Register";
 
 ElementType_Register* elementType_Register = 0;
 
+ElementType_Register* ElementType_Register_New( Name name ) {
+	ElementType_Register* self = ElementType_Register_DefaultNew( name );
+
+	self->isConstructed = True;
+	_ElementType_Register_Init( self );
+
+	return self;
+}
+
 void* ElementType_Register_DefaultNew( Name name ) {
 	return (void*) _ElementType_Register_New( 
-			sizeof(ElementType_Register), 
-			ElementType_Register_Type,
-			_ElementType_Register_Delete, 
-			_ElementType_Register_Print, 
-			NULL,
-			ElementType_Register_DefaultNew,
-			_ElementType_Register_AssignFromXML,
-			_ElementType_Register_Build,
-			_ElementType_Register_Initialise,
-			_ElementType_Register_Execute,
-			_ElementType_Register_Destroy,
-			name,
-			False);
+		sizeof(ElementType_Register), 
+		ElementType_Register_Type,
+		_ElementType_Register_Delete, 
+		_ElementType_Register_Print, 
+		NULL,
+		ElementType_Register_DefaultNew,
+		_ElementType_Register_AssignFromXML,
+		_ElementType_Register_Build,
+		_ElementType_Register_Initialise,
+		_ElementType_Register_Execute,
+		_ElementType_Register_Destroy,
+		name,
+		NON_GLOBAL );
 }
 
-ElementType_Register* ElementType_Register_New( Name name ) {
-	return _ElementType_Register_New( sizeof(ElementType_Register), ElementType_Register_Type,
-			_ElementType_Register_Delete, _ElementType_Register_Print, NULL,
-			ElementType_Register_DefaultNew,
-			_ElementType_Register_AssignFromXML,
-			_ElementType_Register_Build,
-			_ElementType_Register_Initialise,
-			_ElementType_Register_Execute,
-			_ElementType_Register_Destroy,
-			name,
-			True
-			);
-}
-
-void ElementType_Register_Init( void* elementType_Register, Name name ) {
-	ElementType_Register* self = (ElementType_Register*)elementType_Register;
-	
-	/* General info */
-	self->type = ElementType_Register_Type;
-	self->_sizeOfSelf = sizeof(ElementType_Register);
-	self->_deleteSelf = False;
-	
-	/* Virtual info */
-	self->_delete = _ElementType_Register_Delete;
-	self->_print = _ElementType_Register_Print;
-	self->_copy = NULL;
-	self->_defaultConstructor = ElementType_Register_DefaultNew;
-	self->_construct = _ElementType_Register_AssignFromXML;
-	self->_build = _ElementType_Register_Build;
-	self->_initialise = _ElementType_Register_Initialise;
-	self->_execute = _ElementType_Register_Execute;
-	self->_destroy = _ElementType_Register_Destroy;
-
-	_Stg_Class_Init( (Stg_Class*)self );
-	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-	_Stg_Component_Init( (Stg_Component*)self );
-	
-	/* ElementType_Register info */
-	_ElementType_Register_Init( self );
-}
-
-ElementType_Register* _ElementType_Register_New(
-		SizeT				_sizeOfSelf,
-		Type				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy,
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag )
-{
+ElementType_Register* _ElementType_Register_New( ELEMENTTYPEREGISTER_DEFARGS ) {
 	ElementType_Register* self;
 	
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(ElementType_Register) );
-	self = (ElementType_Register*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor, _construct, _build, 
-			_initialise, _execute, _destroy, name, NON_GLOBAL );
+	assert( sizeOfSelf >= sizeof(ElementType_Register) );
+	self = (ElementType_Register*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
 	
 	/* General info */
 	
 	/* Virtual info */
-	
-	if( initFlag ){
-		_ElementType_Register_Init( self );
-	}
 	
 	return self;
 }
@@ -154,7 +103,6 @@ void _ElementType_Register_Init( void* elementType_Register ) {
 	/* General and Virtual info should already be set */
 	
 	/* ElementType_Register info */
-	self->isConstructed = True;
 	self->count = 0;
 	self->_size = 8;
 	self->_delta = 8;
@@ -174,8 +122,10 @@ void _ElementType_Register_Delete( void* elementType_Register ) {
 		ElementType_Index elementType_I;
 		
 		for( elementType_I = 0; elementType_I < self->count; elementType_I++ ) {
-      self->elementType[elementType_I]->_destroy( self->elementType[elementType_I], NULL );
-      self->elementType[elementType_I]->_delete( self->elementType[elementType_I] );
+			/* Disabling ElementType_Register to delete its ElementType components.
+				The components will be deleted via _DeleteAll() later on.
+			self->elementType[elementType_I]->_destroy( self->elementType[elementType_I], NULL );
+			self->elementType[elementType_I]->_delete( self->elementType[elementType_I] ); */
 		}
 		
 		Memory_Free( self->elementType );
