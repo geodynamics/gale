@@ -156,9 +156,8 @@ void _Mesh_Algorithms_Execute( void* algorithms, void* data ) {
 void _Mesh_Algorithms_Destroy( void* algorithms, void* data ) {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
 	NewClass_Delete( self->incArray );
-   Stg_Component_Destroy( self->mesh, data, False );
-   Stg_Component_Destroy( self->tree, data, False );
-
+   if(self->mesh) Stg_Component_Destroy( self->mesh, data, False );
+   if(self->tree) Stg_Component_Destroy( self->tree, data, False );
 }
 
 void _Mesh_Algorithms_SetMesh( void* algorithms, void* mesh ) {
