@@ -57,6 +57,7 @@
 
 	LaplacianStiffnessMatrixTerm* LaplacianStiffnessMatrixTerm_New( 
 		Name                                                name,
+		FiniteElementContext*				                   context,
 		StiffnessMatrix*                                    stiffnessMatrix,
 		Swarm*                                              integrationSwarm );
 

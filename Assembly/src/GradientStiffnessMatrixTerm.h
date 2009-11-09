@@ -57,6 +57,7 @@
 
 	GradientStiffnessMatrixTerm* GradientStiffnessMatrixTerm_New( 
 		Name                                                name,
+		FiniteElementContext*				                   context,
 		StiffnessMatrix*                                    stiffnessMatrix,
 		Swarm*                                              integrationSwarm );
 

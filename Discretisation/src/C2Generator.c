@@ -485,7 +485,7 @@ void C2Generator_GenElementTypes( void* meshGenerator, Mesh* mesh ) {
 		mesh->elTypeMap[e_i] = 0;
 
 	if( self->regular )
-		Mesh_SetAlgorithms( mesh, Mesh_RegularAlgorithms_New( "" ) );
+		Mesh_SetAlgorithms( mesh, Mesh_RegularAlgorithms_New( "", NULL ) );
 
 	MPI_Barrier( self->mpiComm );
 	Journal_Printf( stream, "... element types are '%s',\n", mesh->elTypes[0]->type );

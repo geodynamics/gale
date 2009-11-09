@@ -56,6 +56,7 @@ const Type MassMatrixTerm_Type = "MassMatrixTerm";
 
 MassMatrixTerm* MassMatrixTerm_New( 
     Name                                                name,
+    FiniteElementContext*				                    context,
     StiffnessMatrix*                                    stiffnessMatrix,
     Swarm*                                              integrationSwarm,
     FeVariable*                                         field )
@@ -63,7 +64,7 @@ MassMatrixTerm* MassMatrixTerm_New(
     MassMatrixTerm* self = (MassMatrixTerm*) _MassMatrixTerm_DefaultNew( name );
 
 	self->isConstructed = True;
-	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, integrationSwarm, NULL );
+	_StiffnessMatrixTerm_Init( self, context, stiffnessMatrix, integrationSwarm, NULL );
 	_MassMatrixTerm_Init( self, field );
 
     return self;

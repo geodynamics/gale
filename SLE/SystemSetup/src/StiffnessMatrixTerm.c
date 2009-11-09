@@ -63,13 +63,14 @@ const Type StiffnessMatrixTerm_Type = "StiffnessMatrixTerm";
 
 StiffnessMatrixTerm* StiffnessMatrixTerm_New(
 		Name                                                 name,
+		FiniteElementContext*                                context,
 		StiffnessMatrix*                                     stiffnessMatrix,
 		Swarm*                                               integrationSwarm,
 		Stg_Component*                                       extraInfo )		
 {
 	StiffnessMatrixTerm* self = (StiffnessMatrixTerm*) _StiffnessMatrixTerm_DefaultNew( name );
 
-	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, integrationSwarm, extraInfo );
+	_StiffnessMatrixTerm_Init( self, context, stiffnessMatrix, integrationSwarm, extraInfo );
 
 	return self;
 }
@@ -116,6 +117,7 @@ StiffnessMatrixTerm* _StiffnessMatrixTerm_New(
 
 void _StiffnessMatrixTerm_Init(
 		void*                                                stiffnessMatrixTerm,
+		FiniteElementContext*				                    context,
 		StiffnessMatrix*                                     stiffnessMatrix,
 		Swarm*                                               integrationSwarm,
 		Stg_Component*                                       extraInfo )
@@ -211,16 +213,17 @@ void _StiffnessMatrixTerm_AssignFromXML( void* stiffnessMatrixTerm, Stg_Componen
 	Swarm*                     swarm              = NULL;
 	Stg_Component*             extraInfo;
 	StiffnessMatrix*           stiffnessMatrix;
-
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+   FiniteElementContext*      context;
+   
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
 
 	stiffnessMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "StiffnessMatrix", StiffnessMatrix, True,  data ) ;
 	swarm           = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",           Swarm,           True,  data ) ;
 	extraInfo       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ExtraInfo",       Stg_Component,   False, data );
 
-	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, swarm, extraInfo );
+	_StiffnessMatrixTerm_Init( self, context, stiffnessMatrix, swarm, extraInfo );
 }
 
 void _StiffnessMatrixTerm_Build( void* stiffnessMatrixTerm, void* data ) {
