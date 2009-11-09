@@ -55,14 +55,29 @@ TimeIntegrator* TimeIntegrator_New(
 		EntryPoint_Register*                       entryPoint_Register,
 		AbstractContext*                           context )
 {
-	TimeIntegrator* self;
+	TimeIntegrator* self = _TimeIntegrator_DefaultNew( name );
 
-	self = _TimeIntegrator_DefaultNew( name );
+	self->isConstructed = True;
 	_TimeIntegrator_Init( self, order, simultaneous, entryPoint_Register, context );
 
 	return self;
 }
 
+void* _TimeIntegrator_DefaultNew( Name name ) {
+	return (void*) _TimeIntegrator_New( 
+		sizeof(TimeIntegrator), 
+		TimeIntegrator_Type, 
+		_TimeIntegrator_Delete,
+		_TimeIntegrator_Print, 
+		_TimeIntegrator_Copy, 
+		_TimeIntegrator_DefaultNew, 
+		_TimeIntegrator_AssignFromXML, 
+		_TimeIntegrator_Build, 
+		_TimeIntegrator_Initialise,
+		_TimeIntegrator_Execute,
+		_TimeIntegrator_Destroy, 
+		name );
+}
 
 TimeIntegrator* _TimeIntegrator_New( 
 		SizeT                                     _sizeOfSelf,
@@ -132,8 +147,7 @@ void _TimeIntegrator_Init(
 	self->finishData = Stg_ObjectList_New();
 
 	if ( context ) {
-		EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ), 
-				TimeIntegrator_UpdateClass, self );
+		EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ), TimeIntegrator_UpdateClass, self );
 	}
 }
 
@@ -180,22 +194,6 @@ void* _TimeIntegrator_Copy( void* timeIntegrator, void* dest, Bool deep, Name na
 	return (void*)newTimeIntegrator;
 }
 
-
-void* _TimeIntegrator_DefaultNew( Name name ) {
-	return (void*) _TimeIntegrator_New( 
-		sizeof(TimeIntegrator), 
-		TimeIntegrator_Type, 
-		_TimeIntegrator_Delete,
-		_TimeIntegrator_Print, 
-		_TimeIntegrator_Copy, 
-		_TimeIntegrator_DefaultNew, 
-		_TimeIntegrator_AssignFromXML, 
-		_TimeIntegrator_Build, 
-		_TimeIntegrator_Initialise,
-		_TimeIntegrator_Execute,
-		_TimeIntegrator_Destroy, 
-		name );
-}
 
 void _TimeIntegrator_AssignFromXML( void* timeIntegrator, Stg_ComponentFactory* cf, void* data ) {
 	TimeIntegrator*          self        = (TimeIntegrator*)timeIntegrator;
