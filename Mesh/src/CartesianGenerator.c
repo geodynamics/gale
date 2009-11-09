@@ -96,7 +96,7 @@ CartesianGenerator* CartesianGenerator_New( Name name, AbstractContext* context 
 					_CartesianGenerator_GenEdgeVertexInc, 
 					_CartesianGenerator_GenElementTypes );
 	/* CartesianGenerator info */
-   _MeshGenerator_Init( self, context );
+   _MeshGenerator_Init( (MeshGenerator*)self, context );
 	_CartesianGenerator_Init( self );
    return self;
 }
@@ -599,7 +599,7 @@ void CartesianGenerator_Generate( void* meshGenerator, void* _mesh, void* data )
 	memcpy( localRange, self->range, Mesh_GetDimSize( mesh ) * sizeof(unsigned) );
 
 	ExtensionManager_AddArray( mesh->info, "periodic", sizeof(Bool), 3 );
-	periodic = (int*)ExtensionManager_Get(
+	periodic = (Bool*)ExtensionManager_Get(
 		mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "periodic" )
 		);
 	memcpy( periodic, self->periodic, 3 * sizeof(Bool) );
@@ -1295,13 +1295,13 @@ void _CartesianGenerator_GenFaceEdgeInc( void* meshGenerator, IGraph* topo, Grid
 }
 
 void _CartesianGenerator_GenEdgeVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
-	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-	Stream*			stream = Journal_Register( Info_Type, self->type );
-	unsigned		nIncEls;
-	unsigned*		incEls;
-	unsigned*		dimInds;
-	Sync*			sync;
-	unsigned		e_i;
+   CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
+   Stream*			stream = Journal_Register( Info_Type, self->type );
+   unsigned		nIncEls;
+   unsigned*		incEls;
+   unsigned*		dimInds;
+   const Sync* sync;
+   unsigned		e_i;
 
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
 	assert( topo );
@@ -1386,7 +1386,7 @@ void _CartesianGenerator_GenElementTypes( void* meshGenerator, Mesh* mesh ) {
 		mesh->elTypeMap[e_i] = 0;
 
 	if( self->regular )
-		Mesh_SetAlgorithms( mesh, Mesh_RegularAlgorithms_New( "" ) );
+		Mesh_SetAlgorithms( mesh, Mesh_RegularAlgorithms_New( "", NULL ) );
 
 	MPI_Barrier( self->mpiComm );
 	Journal_Printf( stream, "... element types are '%s',\n", mesh->elTypes[0]->type );
@@ -1635,7 +1635,7 @@ void CartesianGenerator_RecurseDecomps( CartesianGenerator* self,
 
 void CartesianGenerator_GenTopo( CartesianGenerator* self, IGraph* topo ) {
 	Grid***		grids;
-	Comm*		comm;
+	const Comm* comm;
 	unsigned	d_i, d_j;
 
 	assert( self );
@@ -2002,14 +2002,14 @@ void CartesianGenerator_GenBndVerts( CartesianGenerator* self, IGraph* topo, Gri
 }
 
 void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGraph* topo, Grid*** grids ) {
-	Stream*		stream = Journal_Register( Info_Type, self->type );
-	Sync*		sync;
-	unsigned	nDims;
-	unsigned	nVerts;
-	unsigned*	inds;
-	unsigned	*nNbrs, **nbrs;
-	unsigned	domain, global;
-	unsigned	v_i;
+   Stream*		stream = Journal_Register( Info_Type, self->type );
+   const Sync* sync;
+   unsigned	nDims;
+   unsigned	nVerts;
+   unsigned*	inds;
+   unsigned	*nNbrs, **nbrs;
+   unsigned	domain, global;
+   unsigned	v_i;
 
 	assert( self );
 	assert( topo );

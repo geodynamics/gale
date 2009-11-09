@@ -47,7 +47,7 @@ const Type Mesh_RegularAlgorithms_Type = "Mesh_RegularAlgorithms";
 ** Constructors
 */
 
-Mesh_RegularAlgorithms* Mesh_RegularAlgorithms_New( Name name ) {
+Mesh_RegularAlgorithms* Mesh_RegularAlgorithms_New( Name name, AbstractContext* context ) {
 	Mesh_RegularAlgorithms* self = _Mesh_RegularAlgorithms_New( sizeof(Mesh_RegularAlgorithms), 
 					    Mesh_RegularAlgorithms_Type, 
 					    _Mesh_RegularAlgorithms_Delete, 
@@ -72,7 +72,7 @@ Mesh_RegularAlgorithms* Mesh_RegularAlgorithms_New( Name name ) {
 					    _Mesh_Algorithms_GetGlobalCoordRange );
 
 	/* Mesh_RegularAlgorithms info */
-	_Mesh_Algorithms_Init( self );
+	_Mesh_Algorithms_Init( self, context );
 	_Mesh_RegularAlgorithms_Init( self );
 
    return self;
@@ -120,6 +120,7 @@ void _Mesh_RegularAlgorithms_Print( void* algorithms, Stream* stream ) {
 
 void _Mesh_RegularAlgorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf, void* data ) {
 	_Mesh_Algorithms_AssignFromXML( algorithms, cf, data );
+   _Mesh_RegularAlgorithms_Init( algorithms );
 }
 
 void _Mesh_RegularAlgorithms_Build( void* algorithms, void* data ) {

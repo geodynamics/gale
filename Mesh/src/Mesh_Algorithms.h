@@ -112,9 +112,9 @@
 		getDomainCoordRangeFunc, 	\
 		getGlobalCoordRangeFunc
 
-	Mesh_Algorithms* Mesh_Algorithms_New( Name name );
+	Mesh_Algorithms* Mesh_Algorithms_New( Name name, AbstractContext* context );
 	Mesh_Algorithms* _Mesh_Algorithms_New( MESH_ALGORITHMS_DEFARGS );
-	void _Mesh_Algorithms_Init( Mesh_Algorithms* self );
+	void _Mesh_Algorithms_Init( Mesh_Algorithms* self, AbstractContext* context );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
