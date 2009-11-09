@@ -101,8 +101,9 @@ PressureGradForceTerm* _PressureGradForceTerm_New(
 		_initialise,
 		_execute,
 		_destroy,
-		_assembleElement,
-		name );
+		name,
+		NON_GLOBAL,
+		_assembleElement );
 	
 	/* Virtual info */
 	

@@ -59,26 +59,26 @@
 		/* General info */ \
 		__Stg_Component \
 		\
-		FiniteElementContext*			context; \
+		FiniteElementContext*	context; \
 		/* Virtual info */ \
 		\
 		/* StiffnessMatrix info */ \
-		Stream*					debug; \
-		Vec    					vector; \
-		MPI_Comm				comm; \
-		FeVariable*				feVariable; /** need to get # of global unconstrained dofs */\
+		Stream*						debug; \
+		Vec							vector; \
+		MPI_Comm						comm; \
+		FeVariable*					feVariable; /** need to get # of global unconstrained dofs */\
 
 	struct SolutionVector { __SolutionVector };
 
 	#define SOLUTIONVECTOR_DEFARGS	\
 		STG_COMPONENT_DEFARGS,	\
-		MPI_Comm		comm, \
-		FeVariable*	feVariable
+			MPI_Comm		comm, \
+			FeVariable*	feVariable
 
 	#define SOLUTIONVECTOR_PASSARGS  \
       STG_COMPONENT_PASSARGS,    \
-		com, \
-		feVariable
+			comm, \
+			feVariable
 	
 	/* Creation implementation / Virtual constructor */
 	void* SolutionVector_DefaultNew( Name name );

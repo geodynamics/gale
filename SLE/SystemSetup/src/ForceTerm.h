@@ -65,44 +65,39 @@
 		/* General info */ \
 		__Stg_Component \
 		\
-		FiniteElementContext*			  context;		  \
+		FiniteElementContext*					context; \
 		/* Virtual info */ \
-		ForceTerm_AssembleElementFunction*         _assembleElement;         \
+		ForceTerm_AssembleElementFunction*	_assembleElement; \
 		\
 		/* General info */ \
-		Stream*                                   debug;                   \
-		Swarm*                                    integrationSwarm;        \
-		Stg_Component*                            extraInfo;
+		Stream*										debug; \
+		Swarm*										integrationSwarm; \
+		Stg_Component*								extraInfo;
 	
 	struct ForceTerm { __ForceTerm };
+
+	#define FORCETERM_DEFARGS \
+		STG_COMPONENT_DEFARGS, \
+			ForceTerm_AssembleElementFunction* _assembleElement
+
+	#define FORCETERM_PASSARGS \
+		STG_COMPONENT_PASSARGS, \
+			_assembleElement			
 	
 	/* Creation implementation / Virtual constructor */
 	ForceTerm* ForceTerm_New(
-		Name                                      name,
-		ForceVector*                              forceVector,
-		Swarm*                                    integrationSwarm,
-		Stg_Component*                            extraInfo );
+		Name				name,
+		ForceVector*	forceVector,
+		Swarm*			integrationSwarm,
+		Stg_Component*	extraInfo );
 
-	ForceTerm* _ForceTerm_New( 
-		SizeT                                     _sizeOfSelf,
-		Type                                      type,
-		Stg_Class_DeleteFunction*                 _delete,
-		Stg_Class_PrintFunction*                  _print,
-		Stg_Class_CopyFunction*                   _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*          _construct,
-		Stg_Component_BuildFunction*              _build,
-		Stg_Component_InitialiseFunction*         _initialise,
-		Stg_Component_ExecuteFunction*            _execute,
-		Stg_Component_DestroyFunction*            _destroy,
-		ForceTerm_AssembleElementFunction*         _assembleElement,
-		Name                                      name );
+	ForceTerm* _ForceTerm_New( FORCETERM_DEFARGS );
 	
 	void _ForceTerm_Init(
-		void*                                     forceTerm,
-		ForceVector*                              forceVector,
-		Swarm*                                    integrationSwarm,
-		Stg_Component*                            extraInfo );
+		void*				forceTerm,
+		ForceVector*	forceVector,
+		Swarm*			integrationSwarm,
+		Stg_Component*	extraInfo );
 
 	/* 'Stg_Class' Virtual Functions */
 	void _ForceTerm_Delete( void* forceTerm );
@@ -122,16 +117,16 @@
 	void _ForceTerm_Destroy( void* forceTerm, void* data );
 	
 	void ForceTerm_AssembleElement( 
-			void*                             forceTerm, 
-			ForceVector*                      forceVector, 
-			Element_LocalIndex                lElement_I,
-			double*                           elForceVecToAdd );
+			void*						forceTerm, 
+			ForceVector*			forceVector, 
+			Element_LocalIndex	lElement_I,
+			double*					elForceVecToAdd );
 
 	void _ForceTerm_AssembleElement( 
-			void*                             forceTerm, 
-			ForceVector*                      forceVector, 
-			Element_LocalIndex                lElement_I,
-			double*                           elForceVecToAdd ) ;
+			void*						forceTerm, 
+			ForceVector*			forceVector, 
+			Element_LocalIndex	lElement_I,
+			double*					elForceVecToAdd ) ;
 
 	void ForceTerm_SetAssembleElementFunction( void* forceTerm, ForceTerm_AssembleElementFunction* assembleElementFunction ) ;
 

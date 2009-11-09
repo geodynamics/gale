@@ -62,51 +62,43 @@
 const Type ForceTerm_Type = "ForceTerm";
 
 ForceTerm* ForceTerm_New(
-		Name                                      name,
-		ForceVector*                              forceVector,
-		Swarm*                                    integrationSwarm,
-		Stg_Component*                            extraInfo )		
+	Name				name,
+	ForceVector*	forceVector,
+	Swarm*			integrationSwarm,
+	Stg_Component*	extraInfo )		
 {
 	ForceTerm* self = (ForceTerm*) _ForceTerm_DefaultNew( name );
 
+	self->isConstructed = True;
 	_ForceTerm_Init( self, forceVector, integrationSwarm, extraInfo );
 
 	return self;
 }
 
-ForceTerm* _ForceTerm_New( 
-		SizeT                                     _sizeOfSelf,
-		Type                                      type,
-		Stg_Class_DeleteFunction*                 _delete,
-		Stg_Class_PrintFunction*                  _print,
-		Stg_Class_CopyFunction*                   _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*          _construct,
-		Stg_Component_BuildFunction*              _build,
-		Stg_Component_InitialiseFunction*         _initialise,
-		Stg_Component_ExecuteFunction*            _execute,
-		Stg_Component_DestroyFunction*            _destroy,
-		ForceTerm_AssembleElementFunction*         _assembleElement,
-		Name                                      name )
-{
-	ForceTerm*		self;
+void* _ForceTerm_DefaultNew( Name name ) {
+	return _ForceTerm_New( 
+		sizeof(ForceTerm), 
+		ForceTerm_Type, 
+		_ForceTerm_Delete,
+		_ForceTerm_Print,
+		_ForceTerm_Copy,
+		_ForceTerm_DefaultNew, 
+		_ForceTerm_AssignFromXML,
+		_ForceTerm_Build, 
+		_ForceTerm_Initialise,
+		_ForceTerm_Execute, 
+		_ForceTerm_Destroy,
+		name,
+		NON_GLOBAL,
+		_ForceTerm_AssembleElement );
+}
+
+ForceTerm* _ForceTerm_New( FORCETERM_DEFARGS ) {
+	ForceTerm* self;
 	
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(ForceTerm) );
-	self = (ForceTerm*)_Stg_Component_New( 
-			_sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name,
-			NON_GLOBAL );
+	assert( sizeOfSelf >= sizeof(ForceTerm) );
+	self = (ForceTerm*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
 
 	self->_assembleElement = _assembleElement;
 	
@@ -115,15 +107,13 @@ ForceTerm* _ForceTerm_New(
 
 
 void _ForceTerm_Init(
-		void*                                     forceTerm,
-		ForceVector*                              forceVector,
-		Swarm*                                    integrationSwarm,
-		Stg_Component*                            extraInfo )
+	void*				forceTerm,
+	ForceVector*	forceVector,
+	Swarm*			integrationSwarm,
+	Stg_Component*	extraInfo )
 {
 	ForceTerm* self = (ForceTerm*)  forceTerm;
 	
-	self->isConstructed    = True;
-
 	self->debug            = Stream_RegisterChild( StgFEM_SLE_SystemSetup_Debug, self->type );
 	self->extraInfo        = extraInfo;
 	self->integrationSwarm = integrationSwarm;	
@@ -183,23 +173,6 @@ void* _ForceTerm_Copy( void* forceTerm, void* dest, Bool deep, Name nameExt, Ptr
 	}
 	
 	return (void*)newForceTerm;
-}
-
-void* _ForceTerm_DefaultNew( Name name ) {
-	return _ForceTerm_New( 
-			sizeof(ForceTerm), 
-			ForceTerm_Type, 
-			_ForceTerm_Delete,
-			_ForceTerm_Print,
-			_ForceTerm_Copy,
-			_ForceTerm_DefaultNew, 
-			_ForceTerm_AssignFromXML,
-			_ForceTerm_Build, 
-			_ForceTerm_Initialise,
-			_ForceTerm_Execute, 
-			_ForceTerm_Destroy,
-			_ForceTerm_AssembleElement,
-			name );
 }
 
 void _ForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {

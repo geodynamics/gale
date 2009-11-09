@@ -158,8 +158,9 @@ AdvDiffResidualForceTerm* _AdvDiffResidualForceTerm_New(
 		_initialise,
 		_execute,
 		_destroy,
-		_assembleElement,
-		name );
+		name,
+		NON_GLOBAL,
+		_assembleElement );
 	
 	/* Virtual info */
 	self->_upwindParam = _upwindParam;

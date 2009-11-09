@@ -166,6 +166,7 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 
 	/* Create Context */
 	context = FiniteElementContext_New( "context", 0,0, data->comm, dictionary );
+
 	dim = context->dim = Dictionary_GetUnsignedInt_WithDefault( dictionary, "dim", 2 );
 	Journal_Enable_TypedStream( DebugStream_Type, True );
 	Stream_SetLevelBranch( StgFEM_Debug, 3 );

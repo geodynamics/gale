@@ -64,52 +64,45 @@
 		/* Virtual info */ \
 		\
 		/* StiffnessMatrix info */ \
-		Index				localSize;  \
+		Index							localSize;  \
 		Dimension_Index			dim;  \
 		EntryPoint_Register*		entryPoint_Register;  \
-		FeEntryPoint*			assembleForceVector;  \
-		Name				_assembleForceVectorEPName;  \
+		FeEntryPoint*				assembleForceVector;  \
+		Name							_assembleForceVectorEPName;  \
 		Stg_ObjectList*			forceTermList;  \
-		Stg_Component*			applicationDepExtraInfo; /**< Default is NULL: passed to elForceVec during assembly */\
-		Assembler*			bcAsm;  \
-		IArray*				inc;  \
-                int nModifyCBs;                       \
-                Callback* modifyCBs;
+		Stg_Component*				applicationDepExtraInfo; /**< Default is NULL: passed to elForceVec during assembly */\
+		Assembler*					bcAsm;  \
+		IArray*						inc;  \
+		int							nModifyCBs;                       \
+		Callback*					modifyCBs;
 	
 	struct ForceVector { __ForceVector };
+
+	#define FORCEVECTOR_DEFARGS \
+		SOLUTIONVECTOR_DEFARGS, \
+			Dimension_Index	dim, \
+			void*					entryPoint_Register
+
+	#define FORCEVECTOR_PASSARGS \
+		SOLUTIONVECTOR_PASSARGS, \
+			dim, \
+			entryPoint_Register
 	
 	/* Creation implementation / Virtual constructor */
 	
 	ForceVector* ForceVector_New(
-		Name                                      name,
-		FeVariable*                               feVariable,
-		Dimension_Index                           dim,
-		void*                                     entryPoint_Register,
-		MPI_Comm                                  comm );
+		Name					name,
+		FeVariable*			feVariable,
+		Dimension_Index	dim,
+		void*					entryPoint_Register,
+		MPI_Comm				comm );
 
-	ForceVector* _ForceVector_New( 
-		SizeT                                     _sizeOfSelf,
-		Type                                      type,
-		Stg_Class_DeleteFunction*                 _delete,
-		Stg_Class_PrintFunction*                  _print,
-		Stg_Class_CopyFunction*                   _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*          _construct,
-		Stg_Component_BuildFunction*              _build,
-		Stg_Component_InitialiseFunction*         _initialise,
-		Stg_Component_ExecuteFunction*            _execute,
-		Stg_Component_DestroyFunction*            _destroy,
-		Name                                      name,
-		Bool                                      initFlag,
-		FeVariable*                               feVariable,
-		Dimension_Index                           dim,
-		void*                                     entryPoint_Register,
-		MPI_Comm                                  comm );
-	
+	ForceVector* _ForceVector_New( FORCEVECTOR_DEFARGS ); 
+
 	void _ForceVector_Init(
-		void*                                     forceVector,
-		Dimension_Index                           dim,
-		EntryPoint_Register*                      entryPoint_Register );
+		void*						forceVector,
+		Dimension_Index		dim,
+		EntryPoint_Register*	entryPoint_Register );
 	
 	/* 'Stg_Class' Virtual Functions */
 	void _ForceVector_Delete( void* forceVector );
