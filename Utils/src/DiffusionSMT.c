@@ -59,13 +59,14 @@ const Type DiffusionSMT_Type = "DiffusionSMT";
 
 DiffusionSMT* DiffusionSMT_New( 
     Name                                                name,
+    FiniteElementContext*				                    context,
     StiffnessMatrix*                                    stiffnessMatrix,
     Swarm*                                              integrationSwarm )
 {
     DiffusionSMT* self = (DiffusionSMT*) _DiffusionSMT_DefaultNew( name );
 
 	self->isConstructed = True;
-	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, integrationSwarm, NULL );
+	_StiffnessMatrixTerm_Init( self, context, stiffnessMatrix, integrationSwarm, NULL );
 	_DiffusionSMT_Init( self );
 
 	return self;
