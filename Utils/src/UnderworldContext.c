@@ -91,7 +91,7 @@ void* _UnderworldContext_DefaultNew( Name name ) {
 		_UnderworldContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
-		NULL,
+		_AbstractContext_Destroy,
 		name,
 		NON_GLOBAL,
 		_UnderworldContext_SetDt,
@@ -129,7 +129,6 @@ void _UnderworldContext_Init( UnderworldContext* self ) {
 void _UnderworldContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* self = (UnderworldContext*)context;
 
-	_UnderworldContext_Init( self );
 	_PICelleratorContext_AssignFromXML( context, cf, data );
 
 	/* always generate XDMF files when we generate HDF5 checkpoints */
@@ -139,6 +138,7 @@ void _UnderworldContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, 
 		ContextEP_Append( self, AbstractContext_EP_DataSave, XDMFGenerator_GenerateAll );
 	}
 #endif
+	_UnderworldContext_Init( self );
 }
 
 void _UnderworldContext_Build( void* context, void* data ) {
