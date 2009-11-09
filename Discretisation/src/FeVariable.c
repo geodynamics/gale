@@ -1297,23 +1297,29 @@ void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_Local
 	double                  nodeValue;
 	unsigned		nInc, *inc;
 	Dimension_Index         dim         = self->dim;
+        double* tmpVal;
 
 	/** Gets number of degrees of freedom - assuming it is the same throughout the mesh */
 	dofCount = self->dofLayout->dofCounts[0];
 
 	/** Initialise */
 	memset( value, 0, sizeof( double ) * dofCount * dim );
+        tmpVal = (double*)malloc( dim*dofCount*sizeof(double) );
 
 	FeMesh_GetElementNodes( self->feMesh, lElement_I, self->inc );
 	nInc = IArray_GetSize( self->inc );
 	inc = IArray_GetPtr( self->inc );
 
-	for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
 		/** Interpolate derivative from nodes */
-		for ( elLocalNode_I = 0 ; elLocalNode_I < nInc ; elLocalNode_I++) {
-			lNode_I      = inc[ elLocalNode_I ];
-			dofVariable  = DofLayout_GetVariable( self->dofLayout, lNode_I, dof_I );
-			nodeValue    = Variable_GetValueDouble( dofVariable, lNode_I );
+        for ( elLocalNode_I = 0 ; elLocalNode_I < nInc ; elLocalNode_I++) {
+
+                lNode_I      = inc[ elLocalNode_I ];
+                FeVariable_GetValueAtNode( self, lNode_I, tmpVal );
+                /*dofVariable  = DofLayout_GetVariable( self->dofLayout, lNode_I, dof_I );*/
+                /*nodeValue    = Variable_GetValueDouble( dofVariable, lNode_I );*/
+
+                for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
+                        nodeValue = tmpVal[dof_I];
 			
 			value[dof_I*dim + 0] += GNx[0][elLocalNode_I] * nodeValue;
 			value[dof_I*dim + 1] += GNx[1][elLocalNode_I] * nodeValue;
@@ -1321,6 +1327,8 @@ void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_Local
 				value[dof_I*dim + 2] += GNx[2][elLocalNode_I] * nodeValue;	
 		}
 	}
+
+        free( tmpVal );
 }
 
 void FeVariable_InterpolateValue_WithNi( void* _feVariable, Element_LocalIndex lElement_I, double* Ni, double* value ) {
@@ -1719,19 +1727,20 @@ void _FeVariable_PrintLocalOrDomainValues( void* variable, Index localOrDomainCo
 	}
 }
 
-void FeVariable_InterpolateFromMeshLocalCoord( void* feVariable, FeMesh* mesh, Element_DomainIndex dElement_I, double* localCoord, double* value ) {
+InterpolationResult FeVariable_InterpolateFromMeshLocalCoord( void* feVariable, FeMesh* mesh, Element_DomainIndex dElement_I, double* localCoord, double* value ) {
 	FeVariable*          self               = (FeVariable*)         feVariable;
 
 	if ( mesh == self->feMesh ) {
 		/** If the meshes are identical - then we can just interpolate within the elements because the elements are the same */
 		FeVariable_InterpolateWithinElement( self, dElement_I, localCoord, value );
+                return LOCAL;
 	}
 	else {
 		Coord               globalCoord;
 
 		/** If the meshes are different - then we must find the global coordinates and interpolate to that */
 		FeMesh_CoordLocalToGlobal( mesh, dElement_I, localCoord, globalCoord );
-		FieldVariable_InterpolateValueAt( feVariable, globalCoord, value );
+		return FieldVariable_InterpolateValueAt( feVariable, globalCoord, value );
 	}
 	
 }
