@@ -246,8 +246,7 @@ void _Director_AssignFromXML( void* director, Stg_ComponentFactory* cf, void* da
 			Stg_ComponentFactory_GetDouble( cf, self->name, "initialDirectionZ",    DIRECTOR_DEFAULT_DIR_Z ),
 			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "randomInitialDirectionSeed",  1 ),
 			Stg_ComponentFactory_GetBool( cf, self->name, "dontUpdate", False ) );
-			
-			
+
 }
 
 void _Director_Build( void* director, void* data ) {

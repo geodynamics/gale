@@ -123,7 +123,9 @@ void _FaultingMoresiMuhlhaus2006_Init(
 		double                                             frictionCoefficientAfterSoftening,
 		double                                             minimumYieldStress,
 		Bool                                               ignoreOldOrientation,
-		Bool                                               updateOrientationAtMaxSoftness)
+		Bool                                               updateOrientationAtMaxSoftness,
+		Bool                                               updateOrientations,
+		Bool                                               isotropicCorrection)
 {
 	FaultingMoresiMuhlhaus2006_Particle* particleExt;
 	StandardParticle                    materialPoint;
@@ -220,6 +222,9 @@ void _FaultingMoresiMuhlhaus2006_Init(
 			(ArithPointer) &particleExt->fullySoftened - (ArithPointer) &materialPoint,
 			Variable_DataType_Char );
 	
+	self->updateOrientations  = updateOrientations;
+	self->isotropicCorrection = isotropicCorrection;
+	
 }
 
 void* _FaultingMoresiMuhlhaus2006_DefaultNew( Name name ) {
@@ -269,9 +274,6 @@ void _FaultingMoresiMuhlhaus2006_AssignFromXML( void* rheology, Stg_ComponentFac
 	velocityGradientsField = Stg_ComponentFactory_ConstructByKey( cf, self->name,
 			"VelocityGradientsField", FeVariable, True, data );
 	director               =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Director", Director, True, data );
-
-        self->updateOrientations = Stg_ComponentFactory_GetBool( cf, self->name, "updateOrientations", True );
-        self->isotropicCorrection = Stg_ComponentFactory_GetBool( cf, self->name, "isotropicCorrection", False );
 	
 	_FaultingMoresiMuhlhaus2006_Init( 
 			self,
@@ -286,7 +288,9 @@ void _FaultingMoresiMuhlhaus2006_AssignFromXML( void* rheology, Stg_ComponentFac
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficientAfterSoftening", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ),
 			Stg_ComponentFactory_GetBool(   cf, self->name, "ignoreOldOrientation", False ),
-			Stg_ComponentFactory_GetBool(   cf, self->name, "updateOrientationAtMaxSoftness", True ) );
+			Stg_ComponentFactory_GetBool(   cf, self->name, "updateOrientationAtMaxSoftness", True ),
+			Stg_ComponentFactory_GetBool( cf, self->name, "updateOrientations", True ),
+         Stg_ComponentFactory_GetBool( cf, self->name, "isotropicCorrection", False ));
 }
 
 void _FaultingMoresiMuhlhaus2006_Build( void* rheology, void* data ) {

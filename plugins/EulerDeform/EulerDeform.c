@@ -213,11 +213,12 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 		Stg_Component_Build( crdVar, data, False );
 
 		tiData[0] = (Stg_Component*)sys->velField;
-		tiData[1] = (Stg_Component*)&sys->mesh->verts;
-		crdAdvector = TimeIntegratee_New( "EulerDeform_Velocity", uwCtx,
+		//tiData[1] = (Stg_Component*)&sys->mesh->verts;
+		crdAdvector = TimeIntegratee_New( "EulerDeform_Velocity",
+                    uwCtx,
 						  uwCtx->timeIntegrator, 
 						  crdVar, 
-						  2, 
+						  1, 
 						  tiData,
 						  True /* Presume we need to allow fallback on edges of
 							  stretching mesh - PatrickSunter, 7 June 2006 */ );

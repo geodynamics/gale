@@ -89,6 +89,22 @@
 		long int                               randomSeed;
 				
 	struct StrainWeakening { __StrainWeakening };
+
+	/** Public Constructor */
+	StrainWeakening* StrainWeakening_New(
+		Name                                               name,
+		MaterialPointsSwarm*                               swarm,
+		double                                             healingRate,
+		double                                             softeningStrain,
+		double                                             initialDamageFraction,
+		double                                             initialDamageWavenumber,
+		double                                             initialDamageWavenumberSinI,
+		double                                             initialDamageWavenumberCosI,
+		double                                             initialDamageWavenumberSinK,
+		double                                             initialDamageWavenumberCosK,
+		double                                             initialDamageFactor,
+		long int                                           randomSeed,
+		Stg_Shape*                                         initialStrainShape );
  
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	StrainWeakening* _StrainWeakening_New( 

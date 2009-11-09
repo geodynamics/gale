@@ -175,9 +175,8 @@ typedef struct {
 void _Underworld_MaterialThermalDiffusivity_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext								context;
 	Underworld_MaterialThermalDiffusivity*	self = (Underworld_MaterialThermalDiffusivity*)component;
-	Dictionary*										pluginDict = Codelet_GetPluginDictionary( component, cf->rootDict );
 
-	self->context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), UnderworldContext, True, data ); 
+	self->context = Stg_ComponentFactory_PluginConstructByKey( cf, self, "Context", UnderworldContext, True, data );
 
 	/* Add functions to entry points */
 	ContextEP_Append( self->context, AbstractContext_EP_Build,      Underworld_MaterialThermalDiffusivity_Setup );

@@ -40,7 +40,8 @@ struct NodalPressureField { __NodalPressureField };
 
 NodalPressureField* _NodalPressureField_New( NODALPRESSUREFIELD_ARGS );
 void _NodalPressureField_Init( NodalPressureField* self,
-			       Variable_Register* variable_Register );
+			       Variable_Register* variable_Register,
+			       FeVariable* pressureField );
 void* _NodalPressureField_DefaultNew( Name name );
 void _NodalPressureField_Delete( void* _self );
 

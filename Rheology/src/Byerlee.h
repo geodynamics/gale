@@ -60,6 +60,21 @@
 	
 	struct Byerlee { __Byerlee };
 
+	/* Public Constructor */
+	Byerlee* Byerlee_New(
+      Name                  name,
+      AbstractContext*      context,
+      StrainWeakening*      strainWeakening, 
+      MaterialPointsSwarm*  materialPointsSwarm, 
+      double                minVisc, 
+      FeVariable*           strainRateField,
+      SwarmVariable*        swarmStrainRate,
+      double                cohesion,
+      double                cohesionAfterSoftening,
+      Bool                  strainRateSoftening,
+      FeMesh*               mesh,
+      double                depthCoefficient );
+
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	Byerlee* _Byerlee_New( 
 		SizeT                                              sizeOfSelf,
@@ -82,8 +97,9 @@
 
 	/* 'Stg_Component' implementations */
 	void* _Byerlee_DefaultNew( Name name ) ;
-	void _Byerlee_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
-
+	void _Byerlee_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ) ;
+   void _Byerlee_Init( Byerlee* self, FeMesh* mesh, double depthCoefficient ) ;
+   void _Byerlee_Destroy( void* rheology, void* data ) ;   
 	/* 'YieldRheology' implementations */
 	double _Byerlee_GetYieldCriterion( 
 		void*                            rheology,

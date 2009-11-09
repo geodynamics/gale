@@ -128,6 +128,7 @@
 	void _YieldRheology_Initialise( void* rheology, void* data );
 	void _YieldRheology_Execute( void* rheology, void* data );
 	void _YieldRheology_Destroy( void* rheology, void* data );
+	void _YieldRheology_Init( YieldRheology* self, StrainWeakening* strainWeakening, MaterialPointsSwarm* materialPointsSwarm, double minVisc );
 	
 	void _YieldRheology_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 

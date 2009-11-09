@@ -64,6 +64,42 @@
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type BuiterStrainWeakening_Type = "BuiterStrainWeakening";
 
+/* Public Constructor */
+BuiterStrainWeakening* BuiterStrainWeakening_New(
+      Name                                               name,
+		MaterialPointsSwarm*                               swarm,
+		double                                             healingRate,
+		double                                             softeningStrain,
+		double                                             initialDamageFraction,
+		double                                             initialDamageWavenumber,
+		double                                             initialDamageWavenumberSinI,
+		double                                             initialDamageWavenumberCosI,
+		double                                             initialDamageWavenumberSinJ,
+		double                                             initialDamageWavenumberCosJ,
+		double                                             initialDamageFactor,
+		long int                                           randomSeed,
+		Stg_Shape*                                         initialStrainShape  )
+{
+   BuiterStrainWeakening* self = (BuiterStrainWeakening*) _BuiterStrainWeakening_DefaultNew( name );
+
+   _BuiterStrainWeakening_Init(
+	       self,
+	       swarm,
+	       healingRate,
+	       softeningStrain,
+	       initialDamageFraction,
+	       initialDamageWavenumber,
+	       initialDamageWavenumberSinI,
+	       initialDamageWavenumberCosI,
+	       initialDamageWavenumberSinJ,
+	       initialDamageWavenumberCosJ,
+	       initialDamageFactor,
+	       randomSeed,
+	       initialStrainShape  );
+
+   return self;
+}
+
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
 BuiterStrainWeakening* _BuiterStrainWeakening_New( 
 		SizeT                                              sizeOfSelf,
@@ -144,9 +180,9 @@ void* _BuiterStrainWeakening_DefaultNew( Name name ) {
 		_TimeIntegratee_Print,
 		_TimeIntegratee_Copy,
 		_BuiterStrainWeakening_DefaultNew,
-		_BuiterStrainWeakening_AssignFromXML,
-		_BuiterStrainWeakening_Build,
-		_BuiterStrainWeakening_Initialise,
+		_StrainWeakening_AssignFromXML,
+		_StrainWeakening_Build,
+		_StrainWeakening_Initialise,
 		_TimeIntegratee_Execute,
 		_TimeIntegratee_Destroy,
 		_StrainWeakening_TimeDerivative,
@@ -155,23 +191,3 @@ void* _BuiterStrainWeakening_DefaultNew( Name name ) {
 		name );
 }
 
-void _BuiterStrainWeakening_AssignFromXML( void* strainWeakening, Stg_ComponentFactory* cf, void* data ){
-	BuiterStrainWeakening*        self           = (BuiterStrainWeakening*) strainWeakening;
-
-	/* Construct Parent */
-	_StrainWeakening_AssignFromXML( self, cf, data );
-}
-
-void _BuiterStrainWeakening_Build( void* strainWeakening, void* data ) {
-	BuiterStrainWeakening*                       self               = (BuiterStrainWeakening*) strainWeakening;
-
-	/* Build parent */
-	_StrainWeakening_Build( self, data );
-}
-
-void _BuiterStrainWeakening_Initialise( void* strainWeakening, void* data ) {
-	BuiterStrainWeakening*                       self               = (BuiterStrainWeakening*) strainWeakening;
-	
-	/* Initialise Parent */
-	_StrainWeakening_Initialise( self, data );
-}

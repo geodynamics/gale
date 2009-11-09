@@ -214,7 +214,12 @@ void _MultiRheologyMaterial_AssignFromXML( void* material, Stg_ComponentFactory*
 	        Stg_ComponentFactory_GetBool( cf, self->name, "isCompressible", False ) );
 
 	multiRheologyList = Dictionary_Get( currDictionary, "MultiRheologies" );
-	assert( multiRheologyList );
+	Journal_Firewall(
+		multiRheologyList != NULL,
+		Journal_Register( Error_Type, self->type ),
+		"Error in func '%s' for %s '%s': MultiRheologyMaterial rheology needs a rheology list.\n", 
+		__func__, self->type, self->name );
+	
 	rheologyListCount = Dictionary_Entry_Value_GetCount( multiRheologyList );
 
 	rheologyCountList = Memory_Alloc_Array( Rheology_Index, rheologyListCount, "rheologyCountList" );

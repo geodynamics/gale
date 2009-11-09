@@ -108,17 +108,18 @@ MohrCoulomb* _MohrCoulomb_New(
 	return self;
 }
 
-void _MohrCoulomb_Init(
-		MohrCoulomb*                        self,
-		FeVariable*                                        pressureField,
-		FeVariable*                                        strainRateField,
-		MaterialPointsSwarm*                               materialPointsSwarm,
-		double                                             cohesion,
-		double                                             cohesionAfterSoftening,
-		double                                             frictionCoefficient,
-		double                                             frictionCoefficientAfterSoftening,
-		double                                             minimumYieldStress)
-{
+void _MohrCoulomb_Init(    
+		MohrCoulomb*          self,
+		FeVariable*           pressureField,
+		FeVariable*           strainRateField,
+		SwarmVariable*        swarmStrainRate,
+		MaterialPointsSwarm*  materialPointsSwarm,
+		double                cohesion,
+		double                cohesionAfterSoftening,
+		double                frictionCoefficient,
+		double                frictionCoefficientAfterSoftening,
+		double                minimumYieldStress)
+{                                                       
 	self->materialPointsSwarm     = materialPointsSwarm;
 	self->pressureField           = pressureField;
 	self->strainRateField  = strainRateField;
@@ -159,10 +160,11 @@ void* _MohrCoulomb_DefaultNew( Name name ) {
 
 void _MohrCoulomb_AssignFromXML( void* rheology, Stg_ComponentFactory* cf,
                              void *data ){
-	MohrCoulomb*   self           = (MohrCoulomb*)rheology;
-	FeVariable*                   pressureField;
-	MaterialPointsSwarm*          materialPointsSwarm;
-	FeVariable*                   strainRateField;
+	MohrCoulomb*           self = (MohrCoulomb*)rheology;
+	FeVariable*            pressureField;
+	MaterialPointsSwarm*   materialPointsSwarm;
+	FeVariable*            strainRateField;
+	SwarmVariable*         swarmStrainRate;
 	
 	/* Construct Parent */
 	_YieldRheology_AssignFromXML( self, cf, data );
@@ -180,20 +182,21 @@ void _MohrCoulomb_AssignFromXML( void* rheology, Stg_ComponentFactory* cf,
 			"PressureField", FeVariable, True, data );
 	strainRateField = Stg_ComponentFactory_ConstructByKey( cf, self->name,
 			"StrainRateField", FeVariable, True, data );
+
+	swarmStrainRate = Stg_ComponentFactory_ConstructByKey(
+	   cf, self->name, "swarmStrainRate", SwarmVariable, False, data );
 	
 	_MohrCoulomb_Init( 
 			self,
 			pressureField,
 			strainRateField,
+			swarmStrainRate,
 			materialPointsSwarm, 
 			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesion", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesionAfterSoftening", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficient", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficientAfterSoftening", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ) );
-
-	self->swarmStrainRate = Stg_ComponentFactory_ConstructByKey(
-	   cf, self->name, "swarmStrainRate", SwarmVariable, False, data );
 }
 
 void _MohrCoulomb_Build( void* rheology, void* data ) {

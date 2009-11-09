@@ -74,7 +74,7 @@
 		Stg_Component_ExecuteFunction*                     _execute,
 		Stg_Component_DestroyFunction*                     _destroy,
 		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name );
+		Name                                               name ) ;
 
 	/* 'Stg_Component' implementations */
 	void* _Anisotropic_DefaultNew( Name name ) ;
@@ -86,6 +86,18 @@
 		MaterialPointsSwarm*                               swarm,
 		Element_LocalIndex                                 lElement_I,
 		MaterialPoint*                                     materialPoint,
-		Coord                                              xi );
+		Coord                                              xi ) ;
+
+	Anisotropic* Anisotropic_New( 
+      Name                                               name,
+      AbstractContext*                                   context,
+		Director*                                          director,
+      double                                             viscosityRatio ) ;
+   
+	void _Anisotropic_Delete( void* _self );
+	void _Anisotropic_Destroy( void* _self, void* data );
+	void _Anisotropic_Build( void* _self, void* data );
+	void _Anisotropic_Initialise( void* _self, void* data );
+	void _Anisotropic_Init( Anisotropic* self, Director* director, double viscosityRatio );
 
 #endif
