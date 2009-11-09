@@ -110,6 +110,7 @@ void _Stg_ComponentRegister_Delete( void* componentRegister )
 	self = (Stg_ComponentRegister*) componentRegister;
 	assert( self );
 
+   Stg_ObjectList_DeleteAllObjects( self->constructors );
 	Stg_Class_Delete( self->constructors );
 	_Stg_Class_Delete( self );
 }
@@ -269,8 +270,8 @@ void _Stg_ComponentRegisterElement_Delete( void* self )
 		if (element->componentType) Memory_Free( element->componentType );
 		if (element->version) Memory_Free( element->version );
 		if (element->name) Memory_Free( element->name);
+      _Stg_Class_Delete( element ); /* element's parent is a class so delete it */
 	}
-   
 }
 Stg_ComponentRegisterElement* Stg_ComponentRegister_GetByIndex( void* componentRegister, int index ) {
 	Stg_ComponentRegister* self = (Stg_ComponentRegister*)componentRegister;

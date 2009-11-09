@@ -111,6 +111,9 @@ void _Stg_Component_Init( Stg_Component* self ) {
 void _Stg_Component_Delete( void* component ) {
 	Stg_Component* self = (Stg_Component*)component;
 	
+   /* just make sure the component is destroyed */
+   Stg_Component_Destroy( self, NULL, False );
+
 	Memory_Free( self->destroyType );
 	Memory_Free( self->executeType );
 	Memory_Free( self->initialiseType );
@@ -351,7 +354,7 @@ void Stg_Component_Execute( void* component, void* data, Bool force ) {
 
 void Stg_Component_Destroy( void* component, void* data, Bool force ) {
 	Stg_Component* self = (Stg_Component*)component;
-	if( force || !self->isDestroyed ) {
+	if( /* force TODO: remove this comment after pcu_rejig period|| */ !self->isDestroyed ) {
 		/*Stg_TimeMonitor* tm;
 		Stg_MemMonitor*  mm;
 		char*            buf;
@@ -368,9 +371,9 @@ void Stg_Component_Destroy( void* component, void* data, Bool force ) {
 			Stg_CallGraph_Push( stgCallGraph, self->_destroy, self->destroyType );
 		#endif
 		
-                if( self->_destroy )
-                        self->_destroy( self, data );
 		self->isDestroyed = True;
+      if( self->_destroy )
+         self->_destroy( self, data );
 		
 		#ifdef USE_PROFILE
 			Stg_CallGraph_Pop( stgCallGraph );
