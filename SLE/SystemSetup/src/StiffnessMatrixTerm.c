@@ -124,16 +124,14 @@ void _StiffnessMatrixTerm_Init(
 {
 	StiffnessMatrixTerm* self = (StiffnessMatrixTerm*)  stiffnessMatrixTerm;
 	
-	self->isConstructed    = True;
-
-	self->debug            = Journal_MyStream( Debug_Type, self );
-	self->extraInfo        = extraInfo;	
-	self->integrationSwarm = integrationSwarm;	
-	self->stiffnessMatrix  = stiffnessMatrix;
-	self->max_nElNodes = 0; /* initialise to zero, in assembly routine it will change value */
-	self->GNx = NULL;
-
-
+	self->isConstructed		= True;
+	self->context				= context;
+	self->debug					= Journal_MyStream( Debug_Type, self );
+	self->extraInfo			= extraInfo;	
+	self->integrationSwarm	= integrationSwarm;	
+	self->stiffnessMatrix	= stiffnessMatrix;
+	self->max_nElNodes		= 0; /* initialise to zero, in assembly routine it will change value */
+	self->GNx					= NULL;
 
 	StiffnessMatrix_AddStiffnessMatrixTerm( stiffnessMatrix, self );
 }

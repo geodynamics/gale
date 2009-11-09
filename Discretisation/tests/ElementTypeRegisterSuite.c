@@ -57,7 +57,7 @@ void ElementTypeRegisterSuite_Setup( ElementTypeRegisterSuiteData* data ) {
 }
 
 void ElementTypeRegisterSuite_Teardown( ElementTypeRegisterSuiteData* data ) {
-	/*Stg_Class_Delete( data->etReg );*/
+	Stg_Class_Delete( data->etReg );
 }
 
 void ElementTypeRegisterSuite_Test( ElementTypeRegisterSuiteData* data ) {
