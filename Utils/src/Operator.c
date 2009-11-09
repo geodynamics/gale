@@ -253,6 +253,16 @@ void Operator_Tensor_GetNegAverageTrace( void* operator, double* operand0, doubl
 
 	*result = -1.0 * (*result) / self->dim ;
 }
+
+
+void Operator_Scalar_Negative( void* operator, double* operand0, double* result ) {
+	Operator* self = (Operator*) operator;
+	
+	Operator_FirewallUnary( self );
+	Operator_FirewallResultDofs( self, 1 );
+	
+	*result = -1.0 * (*operand0);
+}
 	
 
 void Operator_TakeFirstComponent( void* operator, double* operand0, double* result ) {
@@ -512,6 +522,11 @@ Operator* Operator_NewFromName(
 		resultDofs = 1;
 		numberOfOperands = 1;
 		_carryOut = Operator_SymmetricTensor_GetNegAverageTrace;
+	}
+	else if ( ! strcasecmp( name, "Scalar_Negative" ) ){ 
+		resultDofs = 1;
+		numberOfOperands = 1;
+		_carryOut = Operator_Scalar_Negative;
 	}
 	else if ( ! strcasecmp( name, "Tensor_NegAverageTrace" ) ){ 
 		resultDofs = 1;
