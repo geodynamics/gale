@@ -574,7 +574,7 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 		/* If we have regular mesh algorithms specified, set the algorithms temporarily to
 		   an irregular method. */
 		if( !strcmp( sys->mesh->algorithms->type, "Mesh_RegularAlgorithms" ) && sys->remesher ) {
-			tmpAlgs = Mesh_Algorithms_New( "" );
+			tmpAlgs = Mesh_Algorithms_New( "", NULL );
 			oldAlgs = sys->mesh->algorithms;
 			sys->mesh->algorithms = NULL;
 			Mesh_SetAlgorithms( sys->mesh, tmpAlgs );
