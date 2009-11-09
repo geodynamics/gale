@@ -114,8 +114,9 @@ BuoyancyForceTermThermoChem* _BuoyancyForceTermThermoChem_New(
 		_initialise,
 		_execute,
 		_destroy,
-		_assembleElement,
-		name );
+		name,
+		NON_GLOBAL,
+		_assembleElement );
 	
 	/* Virtual info */
 	self->_calcRaT = _calcRaT;
