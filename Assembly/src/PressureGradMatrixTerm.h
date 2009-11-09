@@ -62,6 +62,7 @@
 
 	PressureGradMatrixTerm* PressureGradMatrixTerm_New( 
 		Name                                                name,
+		FiniteElementContext*				                   context,
 		StiffnessMatrix*                                    stiffMat,
 		Swarm*                                              integrationSwarm,
 		FeVariable*                                         gradField );

@@ -58,6 +58,7 @@ struct DivergenceMatrixTerm { __DivergenceMatrixTerm };
 
 DivergenceMatrixTerm* DivergenceMatrixTerm_New( 
    Name                                                name,
+   FiniteElementContext*				                   context,
    StiffnessMatrix*                                    stiffnessMatrix,
    Swarm*                                              integrationSwarm );
 

@@ -56,14 +56,15 @@
 const Type DivergenceMatrixTerm_Type = "DivergenceMatrixTerm";
 
 DivergenceMatrixTerm* DivergenceMatrixTerm_New( 
-	Name					name,
-	StiffnessMatrix*	stiffnessMatrix,
-	Swarm*				integrationSwarm )
+	Name					     name,
+	FiniteElementContext*  context,
+	StiffnessMatrix*	     stiffnessMatrix,
+	Swarm*				     integrationSwarm )
 {
 	DivergenceMatrixTerm* self = (DivergenceMatrixTerm*) _DivergenceMatrixTerm_DefaultNew( name );
 	
 	self->isConstructed = True;
-	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, integrationSwarm, NULL );
+	_StiffnessMatrixTerm_Init( self, context, stiffnessMatrix, integrationSwarm, NULL );
    _DivergenceMatrixTerm_Init( self );
 
    return self;
