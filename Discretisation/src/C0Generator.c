@@ -262,7 +262,7 @@ void C0Generator_BuildElementTypes( C0Generator* self, FeMesh* mesh ) {
 	for( e_i = 0; e_i < nDomainEls; e_i++ )
 		mesh->elTypeMap[e_i] = 0;
 
-	algs = Mesh_CentroidAlgorithms_New( "" );
+	algs = Mesh_CentroidAlgorithms_New( "", NULL );
 	Mesh_CentroidAlgorithms_SetElementMesh( algs, self->elMesh );
 	Mesh_SetAlgorithms( mesh, algs );
 }

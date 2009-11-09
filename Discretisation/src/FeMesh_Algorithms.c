@@ -47,29 +47,33 @@ const Type FeMesh_Algorithms_Type = "FeMesh_Algorithms";
 ** Constructors
 */
 
-FeMesh_Algorithms* FeMesh_Algorithms_New( Name name ) {
-	return _FeMesh_Algorithms_New( sizeof(FeMesh_Algorithms), 
-				     FeMesh_Algorithms_Type, 
-				     _FeMesh_Algorithms_Delete, 
-				     _FeMesh_Algorithms_Print, 
-				     NULL, 
-				     (void* (*)(Name))_FeMesh_Algorithms_New, 
-				     _FeMesh_Algorithms_AssignFromXML, 
-				     _FeMesh_Algorithms_Build, 
-				     _FeMesh_Algorithms_Initialise, 
-				     _FeMesh_Algorithms_Execute, 
-				     _FeMesh_Algorithms_Destroy, 
-				     name, 
-				     NON_GLOBAL, 
-				     _Mesh_Algorithms_SetMesh, 
-				     _Mesh_Algorithms_Update, 
-				     _Mesh_Algorithms_NearestVertex, 
-				     _FeMesh_Algorithms_Search, 
-				     _FeMesh_Algorithms_SearchElements, 
-				     _Mesh_Algorithms_GetMinimumSeparation, 
-				     _Mesh_Algorithms_GetLocalCoordRange, 
-				     _Mesh_Algorithms_GetDomainCoordRange, 
-				     _Mesh_Algorithms_GetGlobalCoordRange );
+FeMesh_Algorithms* FeMesh_Algorithms_New( Name name, AbstractContext* context ) {
+   FeMesh_Algorithms* self =  _FeMesh_Algorithms_New( sizeof(FeMesh_Algorithms), 
+         FeMesh_Algorithms_Type, 
+         _FeMesh_Algorithms_Delete, 
+         _FeMesh_Algorithms_Print, 
+         NULL, 
+         (void* (*)(Name))_FeMesh_Algorithms_New, 
+         _FeMesh_Algorithms_AssignFromXML, 
+         _FeMesh_Algorithms_Build, 
+         _FeMesh_Algorithms_Initialise, 
+         _FeMesh_Algorithms_Execute, 
+         _FeMesh_Algorithms_Destroy, 
+         name, 
+         NON_GLOBAL, 
+         _Mesh_Algorithms_SetMesh, 
+         _Mesh_Algorithms_Update, 
+         _Mesh_Algorithms_NearestVertex, 
+         _FeMesh_Algorithms_Search, 
+         _FeMesh_Algorithms_SearchElements, 
+         _Mesh_Algorithms_GetMinimumSeparation, 
+         _Mesh_Algorithms_GetLocalCoordRange, 
+         _Mesh_Algorithms_GetDomainCoordRange, 
+         _Mesh_Algorithms_GetGlobalCoordRange );
+
+   _Mesh_Algorithms_Init( (Mesh_Algorithms*)self, context );
+	_FeMesh_Algorithms_Init( self );
+   return self;
 }
 
 FeMesh_Algorithms* _FeMesh_Algorithms_New( FEMESH_ALGORITHMS_DEFARGS ) {
@@ -79,16 +83,10 @@ FeMesh_Algorithms* _FeMesh_Algorithms_New( FEMESH_ALGORITHMS_DEFARGS ) {
 	assert( sizeOfSelf >= sizeof(FeMesh_Algorithms) );
 	self = (FeMesh_Algorithms*)_Mesh_Algorithms_New( MESH_ALGORITHMS_PASSARGS );
 
-	/* Virtual info */
-
-	/* FeMesh_Algorithms info */
-	_FeMesh_Algorithms_Init( self );
-
 	return self;
 }
 
 void _FeMesh_Algorithms_Init( FeMesh_Algorithms* self ) {
-	_Mesh_Algorithms_Init( self );
 }
 
 
@@ -116,6 +114,7 @@ void _FeMesh_Algorithms_Print( void* algorithms, Stream* stream ) {
 }
 
 void _FeMesh_Algorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf, void* data ) {
+   _FeMesh_Algorithms_Init( algorithms );
 }
 
 void _FeMesh_Algorithms_Build( void* algorithms, void* data ) {
@@ -158,10 +157,10 @@ Bool _FeMesh_Algorithms_SearchElements( void* algorithms, double* point,
 Bool FeMesh_Algorithms_SearchWithTree( void* _self, double* pnt, unsigned* dim, unsigned* el ) {
    FeMesh_Algorithms* self = (FeMesh_Algorithms*)_self;
    int nEls, *els;
-   int curDim, curRank, curEl;
+   int curRank, ii;
+   unsigned curDim, curEl;
    int nLocals, owner;
-   FeMesh_ElementType* elType;
-   int ii;
+   Mesh_ElementType* elType;
 
    *dim = Mesh_GetDimSize( self->mesh );
    MPI_Comm_size( MPI_COMM_WORLD, &curRank );
@@ -173,18 +172,17 @@ Bool FeMesh_Algorithms_SearchWithTree( void* _self, double* pnt, unsigned* dim, 
    elType = Mesh_GetElementType( self->mesh, 0 );
    for( ii = 0; ii < nEls; ii++ ) {
       if( FeMesh_ElementType_ElementHasPoint( elType, els[ii], pnt, &curDim, &curEl ) ) {
-	 if( curEl >= nLocals ) {
-	    owner = Mesh_GetOwner( self->mesh, curDim, curEl - nLocals );
-	    owner = Comm_RankLocalToGlobal( self->mesh->topo->comm, owner );
-	    if( owner <= curRank ) {
-	       curRank = owner;
-	       *el = curEl;
-	    }
-	 }
-	 else if( self->rank <= curRank && curEl < *el ) {
-	    curRank = self->rank;
-	    *el = curEl;
-	 }
+         if( curEl >= nLocals ) {
+            owner = Mesh_GetOwner( self->mesh, curDim, curEl - nLocals );
+            owner = Comm_RankLocalToGlobal( self->mesh->topo->comm, owner );
+            if( owner <= curRank ) {
+               curRank = owner;
+               *el = curEl;
+            }
+         } else if( self->rank <= curRank && curEl < *el ) {
+            curRank = self->rank;
+            *el = curEl;
+         }
       }
    }
 
