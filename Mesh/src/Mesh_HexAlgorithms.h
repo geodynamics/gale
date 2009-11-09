@@ -67,7 +67,7 @@
 	#define MESH_HEXALGORITHMS_PASSARGS \
 		MESH_ALGORITHMS_PASSARGS
 
-	Mesh_HexAlgorithms* Mesh_HexAlgorithms_New( Name name );
+	Mesh_HexAlgorithms* Mesh_HexAlgorithms_New( Name name, AbstractContext* context );
 	Mesh_HexAlgorithms* _Mesh_HexAlgorithms_New( MESH_HEXALGORITHMS_DEFARGS );
 	void _Mesh_HexAlgorithms_Init( Mesh_HexAlgorithms* self );
 

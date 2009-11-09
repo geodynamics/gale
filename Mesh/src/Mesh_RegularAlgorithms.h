@@ -70,7 +70,7 @@
 	#define MESH_REGULARALGORITHMS_PASSARGS \
 		MESH_ALGORITHMS_PASSARGS
 
-	Mesh_RegularAlgorithms* Mesh_RegularAlgorithms_New( Name name );
+	Mesh_RegularAlgorithms* Mesh_RegularAlgorithms_New( Name name, AbstractContext* context );
 	Mesh_RegularAlgorithms* _Mesh_RegularAlgorithms_New( MESH_REGULARALGORITHMS_DEFARGS );
 	void _Mesh_RegularAlgorithms_Init( Mesh_RegularAlgorithms* self );
 
