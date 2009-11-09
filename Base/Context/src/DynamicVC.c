@@ -47,186 +47,75 @@
 #include <string.h>
 #include <assert.h>
 
-
 const Type DynamicVC_Type = "DynamicVC";
 const Name defaultDynamicVCName = "defaultDynamicVCName";
-
 
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Constructor
 */
 
 VariableCondition* DynamicVC_Factory( Variable_Register* varReg, 
-				      ConditionFunction_Register* conFuncReg, 
-				      Dictionary* dict, 
-				      void* data )
+	ConditionFunction_Register* conFuncReg, 
+	Dictionary* dict, 
+	void* data )
 {
 	return (VariableCondition*)DynamicVC_New( defaultDynamicVCName, varReg, conFuncReg, dict );
 }
 
-DynamicVC* DynamicVC_New( Name name,
-			  Variable_Register* varReg, 
-			  ConditionFunction_Register* conFuncReg, 
-			  Dictionary* dict )
+DynamicVC* DynamicVC_New(
+	Name									name,
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register, 
+	Dictionary*							dictionary )
 {
-	return _DynamicVC_New( sizeof(DynamicVC), 
-			       DynamicVC_Type, 
-			       _DynamicVC_Delete, 
-			       _DynamicVC_Print, 
-			       _DynamicVC_Copy,
-			       (Stg_Component_DefaultConstructorFunction*)DynamicVC_DefaultNew,
-			       _DynamicVC_AssignFromXML,
-			       _DynamicVC_Build,
-			       _DynamicVC_Initialise,
-			       _DynamicVC_Execute,
-			       _DynamicVC_Destroy,
-			       name,
-			       True,	
-			       NULL,
-			       _DynamicVC_PrintConcise,
-			       _DynamicVC_ReadDictionary,
-			       _DynamicVC_GetSet, 
-			       _DynamicVC_GetVariableCount, 
-			       _DynamicVC_GetVariableIndex, 
-			       _DynamicVC_GetValueIndex, 
-			       _DynamicVC_GetValueCount, 
-			       _DynamicVC_GetValue,
-			       DynamicVC_Apply, 
-			       varReg, 
-			       conFuncReg, 
-			       dict );
+	DynamicVC* self = DynamicVC_DefaultNew( name );
+
+	self->isConstructed = True;
+	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
+	_DynamicVC_Init( self );	
+
+	return self;
 }
 
 DynamicVC* DynamicVC_DefaultNew( Name name ) {
 	return (DynamicVC*)_DynamicVC_New( sizeof(DynamicVC), 
-					   DynamicVC_Type, 
-					   _DynamicVC_Delete, 
-					   _DynamicVC_Print, 
-					   _DynamicVC_Copy,
-					   (Stg_Component_DefaultConstructorFunction*)DynamicVC_DefaultNew,
-					   _VariableCondition_AssignFromXML,
-					   _VariableCondition_Build,
-					   _VariableCondition_Initialise,
-					   _VariableCondition_Execute,
-					   _VariableCondition_Destroy,
-					   name, 
-					   False,
-					   NULL,
-					   _DynamicVC_PrintConcise,
-					   _DynamicVC_ReadDictionary,
-					   _DynamicVC_GetSet, 
-					   _DynamicVC_GetVariableCount, 
-					   _DynamicVC_GetVariableIndex, 
-					   _DynamicVC_GetValueIndex, 
-					   _DynamicVC_GetValueCount, 
-					   _DynamicVC_GetValue,
-					   DynamicVC_Apply, 
-					   NULL, 
-					   NULL, 
-					   NULL );
+		DynamicVC_Type, 
+		_DynamicVC_Delete, 
+	   _DynamicVC_Print, 
+		_DynamicVC_Copy,
+		(Stg_Component_DefaultConstructorFunction*)DynamicVC_DefaultNew,
+		_VariableCondition_AssignFromXML,
+		_VariableCondition_Build,
+		_VariableCondition_Initialise,
+		_VariableCondition_Execute,
+		_VariableCondition_Destroy,
+		name, 
+		NON_GLOBAL,
+		NULL,
+		_DynamicVC_PrintConcise,
+		_DynamicVC_ReadDictionary,
+		_DynamicVC_GetSet, 
+		_DynamicVC_GetVariableCount, 
+		_DynamicVC_GetVariableIndex, 
+		_DynamicVC_GetValueIndex, 
+		_DynamicVC_GetValueCount, 
+		_DynamicVC_GetValue,
+		DynamicVC_Apply, 
+		NULL, 
+		NULL, 
+		NULL );
 }
 
-void DynamicVC_Init( DynamicVC* self,
-		     Name name,
-		     Variable_Register* varReg, 
-		     ConditionFunction_Register* conFuncReg, 
-		     Dictionary* dict )
-{
-	/* General info */
-	self->type = DynamicVC_Type;
-	self->_sizeOfSelf = sizeof(DynamicVC);
-	self->_deleteSelf = False;
-	
-	/* Virtual info */
-	self->_delete = _DynamicVC_Delete;
-	self->_print = _DynamicVC_Print;
-	self->_copy = _DynamicVC_Copy;
-	self->_build = _VariableCondition_Build;
-	self->_initialise = _VariableCondition_Initialise;
-	self->_execute = _VariableCondition_Execute;
-	self->_buildSelf = NULL;
-	self->_printConcise = _DynamicVC_PrintConcise;
-	self->_readDictionary = _DynamicVC_ReadDictionary;
-	self->_getSet = _DynamicVC_GetSet;
-	self->_getVariableCount = _DynamicVC_GetVariableCount;
-	self->_getVariableIndex = _DynamicVC_GetVariableIndex;
-	self->_getValueIndex = _DynamicVC_GetValueIndex;
-	self->_getValueCount = _DynamicVC_GetValueCount;
-	self->_getValue = _DynamicVC_GetValue;
-	self->_apply = DynamicVC_Apply;
-	
-	_Stg_Class_Init( (Stg_Class*)self );
-	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-	_Stg_Component_Init( (Stg_Component*)self );
-	_VariableCondition_Init( (VariableCondition*)self, varReg, conFuncReg, dict );
-
-	/* Stg_Class info */
-	_DynamicVC_Init( self );
-}
-
-DynamicVC* _DynamicVC_New( SizeT _sizeOfSelf, 
-			   Type type,
-			   Stg_Class_DeleteFunction* _delete,
-			   Stg_Class_PrintFunction* _print,
-			   Stg_Class_CopyFunction* _copy, 
-			   Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-			   Stg_Component_ConstructFunction* _construct,
-			   Stg_Component_BuildFunction* _build,
-			   Stg_Component_InitialiseFunction* _initialise,
-			   Stg_Component_ExecuteFunction* _execute,
-			   Stg_Component_DestroyFunction* _destroy,
-			   Name name,
-			   Bool initFlag,
-			   VariableCondition_BuildSelfFunc* _buildSelf, 
-			   VariableCondition_PrintConciseFunc* _printConcise,
-			   VariableCondition_ReadDictionaryFunc* _readDictionary,
-			   VariableCondition_GetSetFunc* _getSet,
-			   VariableCondition_GetVariableCountFunc* _getVariableCount,
-			   VariableCondition_GetVariableIndexFunc* _getVariableIndex,
-			   VariableCondition_GetValueIndexFunc* _getValueIndex,
-			   VariableCondition_GetValueCountFunc* _getValueCount,
-			   VariableCondition_GetValueFunc* _getValue,
-			   VariableCondition_ApplyFunc* _apply, 
-			   Variable_Register* varReg, 
-			   ConditionFunction_Register* conFuncReg, 
-			   Dictionary* dict )
-{
+DynamicVC* _DynamicVC_New( DYNAMICVC_DEFARGS ) {
 	DynamicVC* self;
 
 	/* Allocate memory/General info */
-	assert(_sizeOfSelf >= sizeof(DynamicVC));
-	self = (DynamicVC*)_VariableCondition_New( _sizeOfSelf, 
-						   type, 
-						   _delete, 
-						   _print, 
-						   _copy, 
-						   _defaultConstructor,
-						   _construct,
-						   _build,
-						   _initialise,
-						   _execute,
-						   _destroy,
-						   name,
-						   initFlag,
-						   _buildSelf, 
-						   _printConcise,
-						   _readDictionary,
-						   _getSet, 
-						   _getVariableCount, 
-						   _getVariableIndex, 
-						   _getValueIndex, 
-						   _getValueCount, 
-						   _getValue,
-						   _apply, 
-						   varReg, 
-						   conFuncReg, 
-						   dict );
+	assert( sizeOfSelf >= sizeof(DynamicVC) );
+	self = (DynamicVC*)_VariableCondition_New( VARIABLECONDITION_PASSARGS );
 	
 	/* Virtual info */
 	
 	/* Stg_Class info */
-	if( initFlag )
-		_DynamicVC_Init( self );
 	
 	return self;
 }

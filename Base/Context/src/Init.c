@@ -79,17 +79,17 @@ Bool BaseContext_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), DynamicVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)DynamicVC_DefaultNew );
 
 	/** Register Parents for All Classes */
-	RegisterParent( Variable_Type,                   Stg_Component_Type );
+	RegisterParent( Variable_Type, Stg_Component_Type );
 	RegisterParent( VariableCondition_Register_Type, Stg_Class_Type );
-	RegisterParent( VariableDumpStream_Type,         CStream_Type );
-	RegisterParent( Variable_Register_Type,          Stg_Class_Type );
-	RegisterParent( VariableCondition_Type,          Stg_Component_Type );
-	RegisterParent( ConditionFunction_Type,          Stg_Class_Type );
+	RegisterParent( VariableDumpStream_Type, CStream_Type );
+	RegisterParent( Variable_Register_Type, Stg_Class_Type );
+	RegisterParent( VariableCondition_Type, Stg_Component_Type );
+	RegisterParent( ConditionFunction_Type, Stg_Class_Type );
 	RegisterParent( ConditionFunction_Register_Type, Stg_Class_Type );
-	RegisterParent( CompositeVC_Type,                VariableCondition_Type );
-	RegisterParent( DynamicVC_Type,                VariableCondition_Type );
-	RegisterParent( VariableAllVC_Type,              VariableCondition_Type );
-	RegisterParent( AbstractContext_Type,   Stg_Component_Type );
+	RegisterParent( CompositeVC_Type, VariableCondition_Type );
+	RegisterParent( DynamicVC_Type, VariableCondition_Type );
+	RegisterParent( VariableAllVC_Type, VariableCondition_Type );
+	RegisterParent( AbstractContext_Type, Stg_Component_Type );
 	RegisterParent( ContextEntryPoint_Type, EntryPoint_Type );
 	
 	return True;

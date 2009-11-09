@@ -49,17 +49,17 @@
 Stream* stream;
 
 #define __TestContext \
-        __AbstractContext \
-        unsigned int       buildHookCalled; \
-        unsigned int       icHookCalled; \
-        unsigned int       dtHookCalled; \
-        unsigned int       solveHookCalled; \
-        unsigned int       solve2HookCalled; \
-        unsigned int       syncHookCalled; \
-        unsigned int       outputHookCalled; \
-        unsigned int       dumpHookCalled; \
-        unsigned int       checkpointHookCalled; \
-        double             computedValue; 
+	__AbstractContext \
+	unsigned int	buildHookCalled; \
+	unsigned int	icHookCalled; \
+	unsigned int	dtHookCalled; \
+	unsigned int	solveHookCalled; \
+	unsigned int	solve2HookCalled; \
+	unsigned int	syncHookCalled; \
+	unsigned int	outputHookCalled; \
+	unsigned int	dumpHookCalled; \
+	unsigned int	checkpointHookCalled; \
+	double			computedValue; 
 struct TestContext { __TestContext };
 typedef struct TestContext TestContext;
 
@@ -73,19 +73,19 @@ void TestSetDt( void* context, double _dt ) {
 
 
 typedef struct {
-   TestContext*      ctx;
-   Dictionary*       dict;
+   TestContext*	ctx;
+   Dictionary*		dict;
 } AbstractContextSuiteData;
 
 
 TestContext* TestContext_New(
-      Name                       name,
-      double                     startTime,
-      double                     stopTime,
-      MPI_Comm                   communicator,
-      Dictionary*                dictionary ) 
+	Name			name,
+	double		startTime,
+	double		stopTime,
+	MPI_Comm		communicator,
+	Dictionary*	dictionary ) 
 {
-   TestContext*   ctx;
+   TestContext* ctx;
 
    ctx = (TestContext*)_AbstractContext_New( 
       sizeof(TestContext), 
@@ -100,7 +100,7 @@ TestContext* TestContext_New(
       _AbstractContext_Execute, 
       _AbstractContext_Destroy, 
       name, 
-      True, 
+      NON_GLOBAL, 
       TestSetDt, 
       startTime, 
       stopTime, 
@@ -202,6 +202,8 @@ void AbstractContextSuite_Setup( AbstractContextSuiteData* data ) {
       0, 
       CommWorld, 
       data->dict );
+
+	_AbstractContext_Init( data->ctx );
    _AbstractContext_AssignFromXML( data->ctx, cf, NULL );
 
    Stream_Enable( data->ctx->info, False );
@@ -333,7 +335,10 @@ void AbstractContextSuite_TestRestartFromCheckpoint( AbstractContextSuiteData* d
       0, 
       CommWorld, 
       data->dict );
+
+	 _AbstractContext_Init( data->ctx );
    _AbstractContext_AssignFromXML( data->ctx, cf, NULL );
+
    Stream_Enable( data->ctx->info, False );
 
    /* add hooks to existing entry points */

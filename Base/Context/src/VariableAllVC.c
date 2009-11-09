@@ -29,7 +29,7 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <mpi.h>
-
+	
 #include "Base/Foundation/Foundation.h"
 #include "Base/IO/IO.h"
 #include "Base/Container/Container.h"
@@ -55,56 +55,33 @@ const Name defaultVariableAllVCName = "defaultVariableAllVCName";
 */
 
 VariableCondition* VariableAllVC_Factory(
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register, 
-		Dictionary*					dictionary,
-		void*						data )
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register, 
+	Dictionary*							dictionary,
+	void*									data )
 {
 	return (VariableCondition*)VariableAllVC_New( defaultVariableAllVCName, NULL, variable_Register, conFunc_Register, dictionary, data );
 }
 
 
 VariableAllVC*	VariableAllVC_New(
-		Name						name,
-		Name						_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						data )
+	Name									name,
+	Name									_dictionaryEntryName, 
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register,
+	Dictionary*							dictionary,
+	void*									data )
 {
-	return _VariableAllVC_New(
-		sizeof(VariableAllVC), 
-		VariableAllVC_Type, 
-		_VariableAllVC_Delete, 
-		_VariableAllVC_Print, 
-		_VariableAllVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)VariableAllVC_DefaultNew,
-		_VariableCondition_AssignFromXML,
-		_VariableAllVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
-		name, 
-		True,
-		_VariableAllVC_BuildSelf, 
-		_VariableAllVC_PrintConcise,
-		_VariableAllVC_ReadDictionary,
-		_VariableAllVC_GetSet, 
-		_VariableAllVC_GetVariableCount, 
-		_VariableAllVC_GetVariableIndex, 
-		_VariableAllVC_GetValueIndex, 
-		_VariableAllVC_GetValueCount, 
-		_VariableAllVC_GetValue,
-		_VariableCondition_Apply, 
-		_dictionaryEntryName,
-		variable_Register, 
-		conFunc_Register, 
-		dictionary, 
-		data );
+	VariableAllVC*	self = VariableAllVC_DefaultNew( name );
+
+	self->isConstructed = True;
+	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
+	_VariableAllVC_Init( self, _dictionaryEntryName, data );
+
+	return self;
 }
 
-VariableAllVC*	VariableAllVC_DefaultNew( Name name )
-{
+VariableAllVC*	VariableAllVC_DefaultNew( Name name ) {
 	return (VariableAllVC*)_VariableAllVC_New(
 		sizeof(VariableAllVC), 
 		VariableAllVC_Type, 
@@ -118,7 +95,7 @@ VariableAllVC*	VariableAllVC_DefaultNew( Name name )
 		_VariableCondition_Execute,
 		_VariableCondition_Destroy,
 		name,
-		False,
+		NON_GLOBAL,
 		_VariableAllVC_BuildSelf, 
 		_VariableAllVC_PrintConcise,
 		_VariableAllVC_ReadDictionary,
@@ -130,131 +107,30 @@ VariableAllVC*	VariableAllVC_DefaultNew( Name name )
 		_VariableAllVC_GetValue,
 		_VariableCondition_Apply, 
 		NULL,
-		NULL/*variable_Register*/, 
-		NULL/*conFunc_Register*/, 
+		NULL, 
+		NULL, 
 		NULL,
 		NULL );
 }
 
-void VariableAllVC_Init(
-		Name						name,
-		Name						_dictionaryEntryName, 
-		VariableAllVC*					self,
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						data )
-{
-	/* General info */
-	self->type = VariableAllVC_Type;
-	self->_sizeOfSelf = sizeof(VariableAllVC);
-	self->_deleteSelf = False;
-	
-	/* Virtual info */
-	self->_delete = _VariableAllVC_Delete;
-	self->_print = _VariableAllVC_Print;
-	self->_copy = _VariableAllVC_Copy;
-	self->_build = _VariableAllVC_Build;
-	self->_initialise = _VariableCondition_Initialise;
-	self->_execute = _VariableCondition_Execute;
-	self->_buildSelf = _VariableAllVC_BuildSelf;
-	self->_printConcise = _VariableAllVC_PrintConcise;
-	self->_readDictionary = _VariableAllVC_ReadDictionary;
-	self->_getSet = _VariableAllVC_GetSet;
-	self->_getVariableCount = _VariableAllVC_GetVariableCount;
-	self->_getVariableIndex = _VariableAllVC_GetVariableIndex;
-	self->_getValueIndex = _VariableAllVC_GetValueIndex;
-	self->_getValueCount = _VariableAllVC_GetValueCount;
-	self->_getValue = _VariableAllVC_GetValue;
-	self->_apply = _VariableCondition_Apply;
-	
-	_Stg_Class_Init( (Stg_Class*)self );
-	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-	_Stg_Component_Init( (Stg_Component*)self );
-	_VariableCondition_Init( (VariableCondition*)self, variable_Register, conFunc_Register, dictionary );
-	
-	/* Stg_Class info */
-	_VariableAllVC_Init( self, _dictionaryEntryName, data );
-}
-
-
-VariableAllVC* _VariableAllVC_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*		_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*			_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name						name, 
-		Bool						initFlag,
-		VariableCondition_BuildSelfFunc*		_buildSelf, 
-		VariableCondition_PrintConciseFunc*		_printConcise,
-		VariableCondition_ReadDictionaryFunc*		_readDictionary,
-		VariableCondition_GetSetFunc*			_getSet,
-		VariableCondition_GetVariableCountFunc*		_getVariableCount,
-		VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-		VariableCondition_GetValueIndexFunc*		_getValueIndex,
-		VariableCondition_GetValueCountFunc*		_getValueCount,
-		VariableCondition_GetValueFunc*			_getValue,
-		VariableCondition_ApplyFunc*			_apply, 
-		Name									_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						data)
-{
+VariableAllVC* _VariableAllVC_New( VARIABLEALLVC_DEFARGS ) {
 	VariableAllVC*	self;
 	
 	/* Allocate memory/General info */
-	assert(_sizeOfSelf >= sizeof(VariableAllVC));
-	self = (VariableAllVC*)_VariableCondition_New(
-		_sizeOfSelf, 
-		type, 
-		_delete, 
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		initFlag,
-		_buildSelf, 
-		_printConcise,
-		_readDictionary,
-		_getSet, 
-		_getVariableCount, 
-		_getVariableIndex, 
-		_getValueIndex, 
-		_getValueCount, 
-		_getValue,
-		_apply, 
-		variable_Register, 
-		conFunc_Register,
-		dictionary );
+	assert( sizeOfSelf >= sizeof(VariableAllVC) );
+	self = (VariableAllVC*)_VariableCondition_New( VARIABLECONDITION_PASSARGS );
 	
 	/* Virtual info */
 	
 	/* Stg_Class info */
-	if( initFlag ){
-		_VariableAllVC_Init( self, _dictionaryEntryName, data );
-	}
 	
 	return self;
 }
 
-
 void _VariableAllVC_Init(
-		void* 						allElementsVC,
-		Name						_dictionaryEntryName, 
-		void*						data )
+	void*	allElementsVC,
+	Name	_dictionaryEntryName, 
+	void*	data )
 {
 	VariableAllVC*			self = (VariableAllVC*)allElementsVC;
 
