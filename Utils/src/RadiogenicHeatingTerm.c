@@ -65,8 +65,9 @@ RadiogenicHeatingTerm* _RadiogenicHeatingTerm_New(
 		_initialise,
 		_execute,
 		_destroy,
-		_assembleElement,
-		name );
+		name,
+		NON_GLOBAL,
+		_assembleElement );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	
