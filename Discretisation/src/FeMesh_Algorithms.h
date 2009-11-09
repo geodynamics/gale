@@ -67,7 +67,7 @@
 	#define FEMESH_ALGORITHMS_PASSARGS	\
 		MESH_ALGORITHMS_PASSARGS
 
-	FeMesh_Algorithms* FeMesh_Algorithms_New( Name name );
+	FeMesh_Algorithms* FeMesh_Algorithms_New( Name name, AbstractContext* context );
 	FeMesh_Algorithms* _FeMesh_Algorithms_New( FEMESH_ALGORITHMS_DEFARGS );
 	void _FeMesh_Algorithms_Init( FeMesh_Algorithms* self );
 
