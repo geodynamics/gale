@@ -66,6 +66,7 @@ struct DiffusionSMT { __DiffusionSMT };
 
 DiffusionSMT* DiffusionSMT_New( 
     Name                                                name,
+    FiniteElementContext*				                    context,
     StiffnessMatrix*                                    stiffnessMatrix,
     Swarm*                                              integrationSwarm );
 
