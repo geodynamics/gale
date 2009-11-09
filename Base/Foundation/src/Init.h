@@ -44,5 +44,5 @@
 #define __Base_BaseFoundation_Init_h__
 
 	Bool BaseFoundation_Init( int* argc, char** argv[] );
-	
+
 #endif /* __Base_BaseFoundation_Init_h__ */

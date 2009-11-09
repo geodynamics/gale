@@ -195,6 +195,7 @@ Memory* Memory_Init()
 
 	result->stgCurrentMemory = 0;
 	result->stgPeakMemory = 0;
+   stgMemory = result;
 	
 	return result;
 }
@@ -216,6 +217,7 @@ void Memory_Delete()
 	if( stgMemory->pointers != NULL){
 		BTree_Delete( stgMemory->pointers );
 	}
+   free( stgMemory );
 }
 
 
