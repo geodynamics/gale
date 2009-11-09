@@ -199,7 +199,6 @@ void _lucVectorArrowCrossSection_Construct( void* drawingObject, Stg_ComponentFa
 	_lucOpenGLDrawingObject_Construct( self, cf, data );
 
 	vectorVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "VectorVariable", FieldVariable, True, data );
-
 	defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolution", 8 );
 	resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionX", defaultResolution );
 	resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionY", defaultResolution );
@@ -216,6 +215,8 @@ void _lucVectorArrowCrossSection_Construct( void* drawingObject, Stg_ComponentFa
 			Stg_ComponentFactory_GetDouble( cf, self->name, "lengthScale", 0.3 ),
 			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 1.0 ),
 			lucCrossSection_Read(cf, self->name));
+
+
 }
 
 void _lucVectorArrowCrossSection_Build( void* drawingObject, void* data ) {}
@@ -263,9 +264,15 @@ void _lucVectorArrowCrossSection_DrawCrossSection( void* drawingObject, Dimensio
 	Coord             localMax;
 	double            dA, dB;
 	double            scaleValue;
+	Stream*           errorStream = Journal_Register( Error_Type, self->type );
 	
 	Journal_DPrintf( self->debugStream, "In %s():\n", __func__ );
 	Stream_Indent( self->debugStream );
+
+	Journal_Firewall( vectorVariable->fieldComponentCount == vectorVariable->dim, errorStream,
+		"Error - in %s(): provided FieldVariable \"%s\" has %u components - but %s Component "
+		"can only visualse FieldVariables with %d components.\n", __func__, vectorVariable->name,
+		vectorVariable->fieldComponentCount, self->type, vectorVariable->dim );
 
 	lucOpenGLDrawingObject_SyncShadowValues( self, vectorVariable );
 
@@ -297,7 +304,6 @@ void _lucVectorArrowCrossSection_DrawCrossSection( void* drawingObject, Dimensio
 	
 	pos[axis] = lucCrossSection_GetValue(crossSection, globalMin[axis], globalMax[axis]);
 	Journal_DPrintf( self->debugStream, "-- Drawing cross section on axis %d at value %lf\n", axis, pos[axis]);
-	fprintf( stderr, "-- Drawing cross section on axis %d at value %lf\n", axis, pos[axis]);
 
 	for ( pos[ aAxis ] = globalMin[ aAxis ] + dA * 0.5 ; pos[ aAxis ] < globalMax[ aAxis ] ; pos[ aAxis ] += dA ) {
 		for ( pos[ bAxis ] = globalMin[ bAxis ] + dB * 0.5 ; pos[ bAxis ] < globalMax[ bAxis ] ; pos[ bAxis ] += dB ) {

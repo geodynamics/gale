@@ -270,8 +270,8 @@ void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, lucCrossS
    Axis           axis = crossSection->axis;
 	Axis           aAxis;
 	Axis           bAxis;
-	Coord          min;
-	Coord          max;
+	Coord          min, globalMin;
+	Coord          max, globalMax;
 	Coord          pos;
 	Coord          interpolationCoord;
 	float          normal[3];
@@ -294,6 +294,7 @@ void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, lucCrossS
 	aResolution = self->resolution[ aAxis ];
 	bResolution = self->resolution[ bAxis ];
 	
+	FieldVariable_GetMinAndMaxGlobalCoords( fieldVariable, globalMin, globalMax );
 	FieldVariable_GetMinAndMaxLocalCoords( fieldVariable, min, max );
 
 	/* Crop the size of the cros-section that you wish to draw */
@@ -303,7 +304,7 @@ void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, lucCrossS
 	}
 
 	/* Find position of cross section */
-	pos[axis] = lucCrossSection_GetValue(crossSection, min[axis], max[axis]);
+	pos[axis] = lucCrossSection_GetValue(crossSection, globalMin[axis], globalMax[axis]);
 	Journal_DPrintfL( self->debugStream, 2, 
 			"%s called on field %s, with res[A] as %u, res[B] as %u, axis of cross section as %d, crossSection value as %g\n",
 			__func__, fieldVariable->name, aResolution, bResolution, axis, pos[axis]);
