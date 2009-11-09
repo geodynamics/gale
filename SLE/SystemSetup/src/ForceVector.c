@@ -120,7 +120,6 @@ void _ForceVector_Init( void* forceVector, Dimension_Index dim, EntryPoint_Regis
 	ForceVector* self = (ForceVector*)  forceVector;
 	
 	/* ForceVector info */
-	self->isConstructed = True;
 	self->dim = dim;
 	self->entryPoint_Register = entryPoint_Register;
 	

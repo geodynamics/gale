@@ -93,7 +93,7 @@ void* SolutionVector_DefaultNew( Name name ) {
 		_SolutionVector_Build, 
 		_SolutionVector_Initialise, 
 		_SolutionVector_Execute, 
-		NULL,
+		_SolutionVector_Destroy,
 		name,
 		NON_GLOBAL,
 		MPI_COMM_WORLD, 
@@ -109,15 +109,8 @@ SolutionVector* _SolutionVector_New( SOLUTIONVECTOR_DEFARGS ) {
 	self = (SolutionVector*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
 	
 	/* General info */
-	self->type = SolutionVector_Type;
-	self->_sizeOfSelf = sizeof(SolutionVector);
-	self->_deleteSelf = False;
 	
 	/* Virtual info */
-	self->_delete = _SolutionVector_Delete;
-	self->_print = _SolutionVector_Print;
-	self->_copy = _SolutionVector_Copy;
-	self->_build = _SolutionVector_Build;
 	
 	return self;
 }
