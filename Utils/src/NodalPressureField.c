@@ -39,10 +39,12 @@ NodalPressureField* _NodalPressureField_New( NODALPRESSUREFIELD_ARGS ) {
 }
 
 void _NodalPressureField_Init( NodalPressureField* self,
-			       Variable_Register* variable_Register )
+			       Variable_Register* variable_Register,
+			       FeVariable* pressureField)
 {
    self->variable_Register = variable_Register;
    self->fieldComponentCount = 1;
+   self->pressureField = pressureField;
 }
 
 void* _NodalPressureField_DefaultNew( Name name ) {
@@ -108,17 +110,17 @@ void _NodalPressureField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, v
    NodalPressureField* self = (NodalPressureField*) _self;
    Variable_Register* variable_Register;
    SystemLinearEquations* sle;
-
+   FeVariable* pressureField;
    /* Construct Parent */
    _ParticleFeVariable_AssignFromXML( self, cf, data );
 
    variable_Register = self->variable_Register; 
    assert( variable_Register );
 
-   self->pressureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField",
+   pressureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField",
 							      FeVariable, True, data );
 
-   _NodalPressureField_Init( self, variable_Register );
+   _NodalPressureField_Init( self, variable_Register, pressureField );
 
    /*
    ** If we're using this field for non-linear feedback, we'll need to update it in between

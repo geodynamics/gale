@@ -99,18 +99,20 @@ Rheology* _Rheology_New(
 	return self;
 }
 
-void _Rheology_Init(
-		void*                                              rheology )
+void _Rheology_Init( void* rheology, PICelleratorContext* context )
 {
 	Rheology* self = (Rheology*)rheology;
 
+	self->context = context;
 	self->debug = Journal_Register( Debug_Type, self->type ); /* TODO make child of Underworld_Debug */
 }
 
 void _Rheology_Delete( void* rheology ) {
 	Rheology*					self = (Rheology*)rheology;
-	_Stg_Component_Delete( self );
+
+	Stg_Class_Delete( self );
 }
+
 void _Rheology_Print( void* rheology, Stream* stream ) {}
 
 void* _Rheology_Copy( void* rheology, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
@@ -121,13 +123,14 @@ void* _Rheology_Copy( void* rheology, void* dest, Bool deep, Name nameExt, PtrMa
 }
 
 void _Rheology_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
-	Rheology*           self                 = (Rheology*)rheology;
+	Rheology*            self = (Rheology*)rheology;
+	PICelleratorContext* context;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", PICelleratorContext, False, data );
-	if( !self->context ) 
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", PICelleratorContext, False, data );
+	if( !context ) 
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
 
-	_Rheology_Init( self );
+	_Rheology_Init( self, context );
 }
 
 void _Rheology_Build( void* rheology, void* data ) {}

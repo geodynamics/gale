@@ -39,11 +39,16 @@ SmoothVelGradField* _SmoothVelGradField_New( SMOOTHVELGRADFIELD_ARGS ) {
 }
 
 void _SmoothVelGradField_Init( SmoothVelGradField* self,
-			       Variable_Register* variable_Register )
+			       Variable_Register* variable_Register,
+			       FeVariable* velField,
+			       SystemLinearEquations* sle)
 {
    self->variable_Register = variable_Register;
    self->fieldComponentCount = 1;
    self->useDeriv = True;
+   self->velField = velField;
+   if( sle )
+      SystemLinearEquations_AddPostNonLinearEP( sle, SmoothVelGradField_Type, SmoothVelGradField_NonLinearUpdate );
 }
 
 void* _SmoothVelGradField_DefaultNew( Name name ) {
@@ -109,6 +114,7 @@ void _SmoothVelGradField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, v
    SmoothVelGradField* self = (SmoothVelGradField*) _self;
    Variable_Register* variable_Register;
    SystemLinearEquations* sle;
+   FeVariable* velField;
 
    /* Construct Parent */
    _ParticleFeVariable_AssignFromXML( self, cf, data );
@@ -116,17 +122,16 @@ void _SmoothVelGradField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, v
    variable_Register = self->context->variable_Register;
    assert( variable_Register );
 
-   self->velField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField",
+   velField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField",
 							 FeVariable, True, data );
 
-   _SmoothVelGradField_Init( self, variable_Register );
-
-   /*
+	/*
    ** If we're using this field for non-linear feedback, we'll need to update it in between
    ** non-linear iterations. */
    sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, "SLE", SystemLinearEquations, False, data );
-   if( sle )
-      SystemLinearEquations_AddPostNonLinearEP( sle, SmoothVelGradField_Type, SmoothVelGradField_NonLinearUpdate );
+
+   _SmoothVelGradField_Init( self, variable_Register, velField, sle );
+
 }
 
 void _SmoothVelGradField_Build( void* _self, void* data ) {

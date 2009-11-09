@@ -87,6 +87,11 @@
 	void _Compressible_Initialise( void* compressible, void* data );
 	void _Compressible_Execute( void* compressible, void* data );
 	void _Compressible_Destroy( void* compressible, void* data );
+   void _Compressible_Init(
+         Compressible*        self,
+         FeMesh*              geometryMesh,
+         Materials_Register*  materials_Register,
+         double               oneOnLambda );
 
 	void _Compressible_AssembleElement(
 		void*                                              compressible,

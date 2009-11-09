@@ -91,7 +91,8 @@
 		Name                                               name );
 
 	void _Rheology_Init(
-		void*                                              rheology );
+		void*                                              rheology,
+		PICelleratorContext*                               context );
 
 	void Rheology_InitAll( 
 		void*                                              rheology );

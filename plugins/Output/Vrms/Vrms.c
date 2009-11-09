@@ -56,11 +56,10 @@ const Type Underworld_Vrms_Type = "Underworld_Vrms";
 
 void _Underworld_Vrms_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	Underworld_Vrms*	self 		= (Underworld_Vrms*)component;
-	Dictionary*		pluginDict	= Codelet_GetPluginDictionary( component, cf->rootDict );
 
-	self->context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), UnderworldContext, True, data );
-	self->gaussSwarm = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "GaussSwarm" ), Swarm, True, data );
-	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "VelocityField" ), FeVariable, True, data );
+	self->context       = Stg_ComponentFactory_PluginConstructByKey( cf, self, "Context", UnderworldContext, True, data );
+	self->gaussSwarm    = Stg_ComponentFactory_PluginConstructByKey( cf, self, "GaussSwarm", Swarm, True, data );
+	self->velocityField = Stg_ComponentFactory_PluginConstructByKey( cf, self, "VelocityField", FeVariable, True, data );
 
 	/* Create new Field Variable */
 	self->velocitySquaredField = OperatorFeVariable_NewUnary( "VelocitySquaredField", self->velocityField, "VectorSquare" );

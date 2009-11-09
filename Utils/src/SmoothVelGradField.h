@@ -41,10 +41,12 @@ struct SmoothVelGradField { __SmoothVelGradField };
 
 SmoothVelGradField* _SmoothVelGradField_New( SMOOTHVELGRADFIELD_ARGS );
 void _SmoothVelGradField_Init( SmoothVelGradField* self,
-			       Variable_Register* variable_Register );
+			       Variable_Register* variable_Register,
+			       FeVariable* velField,
+			       SystemLinearEquations* sle );
 void* _SmoothVelGradField_DefaultNew( Name name );
 void _SmoothVelGradField_Delete( void* _self );
-
+void SmoothVelGradField_NonLinearUpdate( void* _sle, void* _ctx );
 /*
 ** Methods.
 */

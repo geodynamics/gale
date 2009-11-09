@@ -64,6 +64,19 @@
                 double                                              stressInv;
 
 	struct VonMises { __VonMises };
+
+   /* Public Constructor */
+	VonMises* VonMises_New(
+      Name                  name,
+      AbstractContext*      context,
+      StrainWeakening*      strainWeakening, 
+      MaterialPointsSwarm*  materialPointsSwarm, 
+      double                minVisc, 
+      FeVariable*           strainRateField,
+      SwarmVariable*        swarmStrainRate,
+      double                cohesion,
+      double                cohesionAfterSoftening,
+      Bool                  strainRateSoftening );
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	VonMises* _VonMises_New( 
@@ -87,7 +100,10 @@
 	/* 'Stg_Component' implementations */
 	void* _VonMises_DefaultNew( Name name ) ;
 	void _VonMises_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
-
+	void _VonMises_Init( VonMises* self, FeVariable* strainRateField, SwarmVariable* swarmStrainRate, double cohesion, double cohesionAfterSoftening, Bool strainRateSoftening );
+   void _VonMises_Destroy( void* rheology, void* data );
+   void _VonMises_Build( void* rheology, void* data );
+   void _VonMises_Initialise( void* rheology, void* data );
 	/* 'YieldRheology' implementations */
 	double _VonMises_GetYieldCriterion( 
 		void*                            vonMises,

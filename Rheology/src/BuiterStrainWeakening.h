@@ -60,6 +60,22 @@
 				
 	struct BuiterStrainWeakening { __BuiterStrainWeakening };
 
+	/** Public Constructor */
+	BuiterStrainWeakening* BuiterStrainWeakening_New(
+                Name                                               name,
+		MaterialPointsSwarm*                               swarm,
+		double                                             healingRate,
+		double                                             softeningStrain,
+		double                                             initialDamageFraction,
+		double                                             initialDamageWavenumber,
+		double                                             initialDamageWavenumberSinI,
+		double                                             initialDamageWavenumberCosI,
+		double                                             initialDamageWavenumberSinJ,
+		double                                             initialDamageWavenumberCosJ,
+		double                                             initialDamageFactor,
+		long int                                           randomSeed,
+		Stg_Shape*                                         initialStrainShape  );
+
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	BuiterStrainWeakening* _BuiterStrainWeakening_New( 
 		SizeT                                              sizeOfSelf,
@@ -83,5 +99,19 @@
 	void _BuiterStrainWeakening_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 	void _BuiterStrainWeakening_Build( void* strainWeakening, void* data ) ;
 	void _BuiterStrainWeakening_Initialise( void* strainWeakening, void* data ) ;
+	void _BuiterStrainWeakening_Init(
+		BuiterStrainWeakening*                             self,
+		MaterialPointsSwarm*                               swarm,
+		double                                             healingRate,
+		double                                             softeningStrain,
+		double                                             initialDamageFraction,
+		double                                             initialDamageWavenumber,
+		double                                             initialDamageWavenumberSinI,
+		double                                             initialDamageWavenumberCosI,
+		double                                             initialDamageWavenumberSinJ,
+		double                                             initialDamageWavenumberCosJ,
+		double                                             initialDamageFactor,
+		long int                                           randomSeed,
+		Stg_Shape*                                         initialStrainShape  );
 
 #endif

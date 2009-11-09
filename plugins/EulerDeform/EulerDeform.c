@@ -213,11 +213,12 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 		Stg_Component_Build( crdVar, data, False );
 
 		tiData[0] = (Stg_Component*)sys->velField;
-		tiData[1] = (Stg_Component*)&sys->mesh->verts;
-		crdAdvector = TimeIntegratee_New( "EulerDeform_Velocity", uwCtx,
+		//tiData[1] = (Stg_Component*)&sys->mesh->verts;
+		crdAdvector = TimeIntegratee_New( "EulerDeform_Velocity",
+                    uwCtx,
 						  uwCtx->timeIntegrator, 
 						  crdVar, 
-						  2, 
+						  1, 
 						  tiData,
 						  True /* Presume we need to allow fallback on edges of
 							  stretching mesh - PatrickSunter, 7 June 2006 */ );
@@ -574,7 +575,7 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 		/* If we have regular mesh algorithms specified, set the algorithms temporarily to
 		   an irregular method. */
 		if( !strcmp( sys->mesh->algorithms->type, "Mesh_RegularAlgorithms" ) && sys->remesher ) {
-			tmpAlgs = Mesh_Algorithms_New( "" );
+			tmpAlgs = Mesh_Algorithms_New( "", NULL );
 			oldAlgs = sys->mesh->algorithms;
 			sys->mesh->algorithms = NULL;
 			Mesh_SetAlgorithms( sys->mesh, tmpAlgs );

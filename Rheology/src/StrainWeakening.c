@@ -62,6 +62,42 @@
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type StrainWeakening_Type = "StrainWeakening";
 
+/* Public Constructor */
+StrainWeakening* StrainWeakening_New(
+      Name                                               name,
+		MaterialPointsSwarm*                               swarm,
+		double                                             healingRate,
+		double                                             softeningStrain,
+		double                                             initialDamageFraction,
+		double                                             initialDamageWavenumber,
+		double                                             initialDamageWavenumberSinI,
+		double                                             initialDamageWavenumberCosI,
+		double                                             initialDamageWavenumberSinK,
+		double                                             initialDamageWavenumberCosK,
+		double                                             initialDamageFactor,
+		long int                                           randomSeed,
+		Stg_Shape*                                         initialStrainShape )
+{
+   StrainWeakening* self = (StrainWeakening*) _StrainWeakening_DefaultNew( name );
+
+   _StrainWeakening_Init(
+	    self,
+	    swarm,
+	    healingRate,
+	    softeningStrain,
+	    initialDamageFraction,
+	    initialDamageWavenumber,
+	    initialDamageWavenumberSinI,
+	    initialDamageWavenumberCosI,
+	    initialDamageWavenumberSinK,
+	    initialDamageWavenumberCosK,
+	    initialDamageFactor,
+	    randomSeed,
+	    initialStrainShape );
+
+   return self;
+}
+
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
 StrainWeakening* _StrainWeakening_New( 
 		SizeT                                              sizeOfSelf,
@@ -122,18 +158,18 @@ void _StrainWeakening_Init(
 		Stg_Shape*                                         initialStrainShape )
 {
 	/* Assign Values */
-	self->swarm                    = swarm;
-	self->healingRate              = healingRate;
-	self->softeningStrain          = softeningStrain;
-	self->initialDamageFraction    = initialDamageFraction;
-	self->initialDamageWavenumber  = initialDamageWavenumber;
+	self->swarm                       = swarm;
+	self->healingRate                 = healingRate;
+	self->softeningStrain             = softeningStrain;
+	self->initialDamageFraction       = initialDamageFraction;
+	self->initialDamageWavenumber     = initialDamageWavenumber;
 	self->initialDamageWavenumberSinI = initialDamageWavenumberSinI;
 	self->initialDamageWavenumberCosI = initialDamageWavenumberCosI;
 	self->initialDamageWavenumberSinK = initialDamageWavenumberSinK;
 	self->initialDamageWavenumberCosK = initialDamageWavenumberCosK;
-	self->initialDamageFactor      = initialDamageFactor;
-	self->randomSeed               = randomSeed;
-	self->initialStrainShape       = initialStrainShape;
+	self->initialDamageFactor         = initialDamageFactor;
+	self->randomSeed                  = randomSeed;
+	self->initialStrainShape          = initialStrainShape;
 	
 	/****** Setup Variables *****/
 
@@ -239,17 +275,17 @@ void _StrainWeakening_AssignFromXML( void* strainWeakening, Stg_ComponentFactory
 		True,
 		data );
 
-	healingRate              = Stg_ComponentFactory_GetDouble( cf, self->name, "healingRate",              0.0 );
-	softeningStrain          = Stg_ComponentFactory_GetDouble( cf, self->name, "softeningStrain",          HUGE_VAL );
-	initialDamageFraction    = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageFraction",    0.0 );
-	initialDamageWavenumber  = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumber",  -1.0 );
+	healingRate                 = Stg_ComponentFactory_GetDouble( cf, self->name, "healingRate",              0.0 );
+	softeningStrain             = Stg_ComponentFactory_GetDouble( cf, self->name, "softeningStrain",          HUGE_VAL );
+	initialDamageFraction       = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageFraction",    0.0 );
+	initialDamageWavenumber     = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumber",  -1.0 );
 	initialDamageWavenumberSinI = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberSinI", -1.0 );
 	initialDamageWavenumberCosI = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberCosI", -1.0 );
 	initialDamageWavenumberSinK = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberSinK", -1.0 );
 	initialDamageWavenumberCosK = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberCosK", -1.0 );
-	initialDamageFactor      = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageFactor",       1.0 );
-	randomSeed               = (long int) Stg_ComponentFactory_GetInt( cf, self->name, "randomSeed",        0 );
-	initialStrainShape       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "initialStrainShape", Stg_Shape, False, data );
+	initialDamageFactor         = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageFactor",       1.0 );
+	randomSeed                  = (long int) Stg_ComponentFactory_GetInt( cf, self->name, "randomSeed",        0 );
+	initialStrainShape          = Stg_ComponentFactory_ConstructByKey( cf, self->name, "initialStrainShape", Stg_Shape, False, data );
 
 	_StrainWeakening_Init(
 			self, 
@@ -277,6 +313,24 @@ void _StrainWeakening_Build( void* strainWeakening, void* data ) {
 	/* The postFailureWeakening doesn't need to be built here because it has already been
 	 * built in the TimeIntegratee class
 	 * (self->variable = self->postFailureWeakening->variable in _StrainWeakening_Init function) */
+}
+
+void _StrainWeakening_Delete( void* _self ) {
+	StrainWeakening* self = (StrainWeakening*) _self;
+
+   Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
+
+	/* Delete Class */
+	Stg_Class_Delete( self );   
+
+}
+	
+void _StrainWeakening_Destroy( void* _self, void* data ) {
+	StrainWeakening* self = (StrainWeakening*) _self;
+	
+	/* Destroy Parent */
+	_TimeIntegratee_Destroy( self, data );   
+
 }
 
 void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
