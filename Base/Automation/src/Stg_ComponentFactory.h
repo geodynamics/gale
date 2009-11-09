@@ -253,6 +253,17 @@
 		Bool			isEssential,
 		void*			data ) ;
 
+	#define Stg_ComponentFactory_PluginConstructByKey( cf, codelet, componentKey, type, isEssential, data ) \
+		(type*) _Stg_ComponentFactory_PluginConstructByKey( \
+			cf, codelet, componentKey, type ## _Type, isEssential, data )
+	Stg_Component* _Stg_ComponentFactory_PluginConstructByKey( 
+		void*			cf, 
+		void*			codelet, 
+		Dictionary_Entry_Key	componentKey, 
+		Type			type, 
+		Bool			isEssential,
+		void*			data ) ;
+
 	#define Stg_ComponentFactory_ConstructByNameWithKeyFallback( \
 		cf, parentComponentName, componentTrialName, componentFallbackKey, type, isEssential, data ) \
 		(type*) ( (Stg_ComponentFactory*) cf )->constructByNameWithKeyFallback( \

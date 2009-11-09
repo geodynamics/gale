@@ -743,6 +743,57 @@ Stg_Component* _Stg_ComponentFactory_ConstructByKey(
 	return self->constructByName( self, componentName, type, isEssential, data );
 }
 
+Stg_Component* _Stg_ComponentFactory_PluginConstructByKey( 
+		void*			cf, 
+		void*       codelet, 
+		Dictionary_Entry_Key	componentKey,
+		Type			type, 
+		Bool 			isEssential,
+		void* 			data ) 
+{
+	Stg_ComponentFactory*    self           = (Stg_ComponentFactory*)cf;
+	Stg_Component*	          plugin	       = (Stg_Component*)codelet;
+	Dictionary*		          thisPluginDict = NULL;
+	Dictionary*		          pluginDict     = Dictionary_Get( self->rootDict, "plugins" );
+	Name			             componentName, redirect, pluginType;
+	Dictionary_Entry_Value*	 componentEntryVal;
+	Index		pluginIndex;	
+	Stream*			errorStream       = Journal_Register( Error_Type, self->type );
+
+	Journal_Firewall( self != NULL, errorStream, "In func %s: Stg_Component is NULL.\n", __func__ );
+
+	/* Get this plugins Dictionary */
+	for( pluginIndex = 0; pluginIndex < Dictionary_Entry_Value_GetCount( pluginDict ); pluginIndex++ ) {
+		thisPluginDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetElement( pluginDict, pluginIndex ) );
+		pluginType = StG_Strdup( Dictionary_GetString( thisPluginDict, "Type" ) );
+		if( !strcmp( plugin->type, pluginType ) ){
+		   Memory_Free( pluginType );
+			break;
+		}
+      Memory_Free( pluginType );
+	}
+	
+	/* Get Dependency's Name */
+	componentEntryVal = Dictionary_Get( thisPluginDict, componentKey );
+	if ( componentEntryVal == NULL ) {
+		Journal_Firewall( !isEssential, errorStream,
+				"plugin '%s' cannot find essential component with key '%s'.\n", plugin->type, componentKey );
+		Journal_PrintfL( self->infoStream, 2, "plugin '%s' cannot find non-essential component with key '%s'.\n", plugin->type, componentKey );
+		return NULL;
+	}
+		
+	componentName = Dictionary_Entry_Value_AsString( componentEntryVal );
+
+	/* If we can find the component's name in the root dictionary, use that value instead. */
+	if( self->rootDict ) {
+		redirect = Dictionary_GetString_WithDefault( self->rootDict, componentName, "" );
+		if( strcmp( redirect, "" ) )
+			componentName = redirect;
+	}
+
+	return self->constructByName( self, componentName, type, isEssential, data );
+}
+
 Stg_Component* _Stg_ComponentFactory_ConstructByNameWithKeyFallback( 
 		void*			cf, 
 		Name 			parentComponentName, 
