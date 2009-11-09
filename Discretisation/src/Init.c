@@ -100,10 +100,10 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	RegisterParent( ElementType_Type,                  Stg_Component_Type );
 	RegisterParent( BilinearElementType_Type,          ElementType_Type );
 	RegisterParent( TrilinearElementType_Type,         ElementType_Type );
-	RegisterParent( Biquadratic_Type, 		Biquadratic_Type );
-	RegisterParent( Triquadratic_Type,		Triquadratic_Type );
-	RegisterParent( P1_Type, 			P1_Type );
-	RegisterParent( RegularTrilinear_Type,			TrilinearElementType_Type );
+	RegisterParent( Biquadratic_Type,               ElementType_Type );
+	RegisterParent( Triquadratic_Type,              ElementType_Type );
+	RegisterParent( P1_Type,                        ElementType_Type );
+	RegisterParent( RegularTrilinear_Type,    TrilinearElementType_Type );
 	RegisterParent( ConstantElementType_Type,          ElementType_Type );
 	RegisterParent( LinearTriangleElementType_Type,    ElementType_Type );
 	RegisterParent( ElementType_Register_Type,         Stg_Component_Type );
