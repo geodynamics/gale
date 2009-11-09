@@ -68,7 +68,7 @@
 	#define MESH_HEXALGORITHMS_PASSARGS \
 		MESH_ALGORITHMS_PASSARGS
 
-	Mesh_CentroidAlgorithms* Mesh_CentroidAlgorithms_New( Name name );
+	Mesh_CentroidAlgorithms* Mesh_CentroidAlgorithms_New( Name name, AbstractContext* context );
 	Mesh_CentroidAlgorithms* _Mesh_CentroidAlgorithms_New( MESH_HEXALGORITHMS_DEFARGS );
 	void _Mesh_CentroidAlgorithms_Init( Mesh_CentroidAlgorithms* self );
 

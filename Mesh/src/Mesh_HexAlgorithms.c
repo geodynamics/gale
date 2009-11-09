@@ -47,7 +47,7 @@ const Type Mesh_HexAlgorithms_Type = "Mesh_HexAlgorithms";
 ** Constructors
 */
 
-Mesh_HexAlgorithms* Mesh_HexAlgorithms_New( Name name ) {
+Mesh_HexAlgorithms* Mesh_HexAlgorithms_New( Name name, AbstractContext* context) {
    Mesh_HexAlgorithms* self = _Mesh_HexAlgorithms_New( sizeof(Mesh_HexAlgorithms), 
 					Mesh_HexAlgorithms_Type, 
 					_Mesh_HexAlgorithms_Delete, 
@@ -71,7 +71,7 @@ Mesh_HexAlgorithms* Mesh_HexAlgorithms_New( Name name ) {
 					_Mesh_Algorithms_GetDomainCoordRange, 
 					_Mesh_Algorithms_GetGlobalCoordRange );
 	/* Mesh_HexAlgorithms info */
-	_Mesh_Algorithms_Init( self );
+	_Mesh_Algorithms_Init( self, context );
 	_Mesh_HexAlgorithms_Init( self );
 
    return self;
@@ -117,8 +117,9 @@ void _Mesh_HexAlgorithms_Print( void* hexAlgorithms, Stream* stream ) {
 
 void _Mesh_HexAlgorithms_AssignFromXML( void* hexAlgorithms, Stg_ComponentFactory* cf, void* data ) {
 
-	Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
-	_Mesh_Algorithms_AssignFromXML( self, cf, data );
+   Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
+   _Mesh_Algorithms_AssignFromXML( self, cf, data );
+   _Mesh_HexAlgorithms_Init( self );
 }
 
 void _Mesh_HexAlgorithms_Build( void* hexAlgorithms, void* data ) {

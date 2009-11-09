@@ -94,7 +94,7 @@ void _Mesh_Init( Mesh* self, AbstractContext* context ) {
 	self->minGlobalCrd = NULL;
 	self->maxGlobalCrd = NULL;
 
-	self->algorithms = Mesh_Algorithms_New( "" );
+	self->algorithms = Mesh_Algorithms_New( "", NULL );
 	Mesh_Algorithms_SetMesh( self->algorithms, self );
 	self->nElTypes = 0;
 	self->elTypes = NULL;
@@ -264,7 +264,7 @@ void Mesh_SetAlgorithms( void* mesh, void* algorithms ) {
 		self->algorithms = algorithms;
 	}
 	else
-		self->algorithms = Mesh_Algorithms_New( "" );
+		self->algorithms = Mesh_Algorithms_New( "", NULL );
 	Mesh_Algorithms_SetMesh( self->algorithms, self );
 }
 

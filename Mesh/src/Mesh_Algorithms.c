@@ -47,7 +47,7 @@ const Type Mesh_Algorithms_Type = "Mesh_Algorithms";
 ** Constructors
 */
 
-Mesh_Algorithms* Mesh_Algorithms_New( Name name ) {
+Mesh_Algorithms* Mesh_Algorithms_New( Name name, AbstractContext* context ) {
 	Mesh_Algorithms* self = _Mesh_Algorithms_New( sizeof(Mesh_Algorithms), 
 				     Mesh_Algorithms_Type, 
 				     _Mesh_Algorithms_Delete, 
@@ -71,7 +71,7 @@ Mesh_Algorithms* Mesh_Algorithms_New( Name name ) {
 				     _Mesh_Algorithms_GetDomainCoordRange, 
 				     _Mesh_Algorithms_GetGlobalCoordRange );
 
-	_Mesh_Algorithms_Init( self );
+	_Mesh_Algorithms_Init( self, context);
    return self;
 
 }
@@ -97,7 +97,8 @@ Mesh_Algorithms* _Mesh_Algorithms_New( MESH_ALGORITHMS_DEFARGS ) {
 	return self;
 }
 
-void _Mesh_Algorithms_Init( Mesh_Algorithms* self ) {
+void _Mesh_Algorithms_Init( Mesh_Algorithms* self, AbstractContext* context ) {
+   self->context = context;
 	self->nearestVertex = NULL;
 	self->search = NULL;
 	self->mesh = NULL;
@@ -132,10 +133,12 @@ void _Mesh_Algorithms_Print( void* algorithms, Stream* stream ) {
 
 void _Mesh_Algorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf, void* data ) {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
+   AbstractContext* context = NULL;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+   _Mesh_Algorithms_Init( self, context );
 }
 
 void _Mesh_Algorithms_Build( void* algorithms, void* data ) {
