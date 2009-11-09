@@ -57,13 +57,14 @@ const Type GradientStiffnessMatrixTerm_Type = "GradientStiffnessMatrixTerm";
 
 GradientStiffnessMatrixTerm* GradientStiffnessMatrixTerm_New( 
 		Name                                                name,
+		FiniteElementContext*				                   context,
 		StiffnessMatrix*                                    stiffnessMatrix,
 		Swarm*                                              integrationSwarm )
 {
 	GradientStiffnessMatrixTerm* self = (GradientStiffnessMatrixTerm*) _GradientStiffnessMatrixTerm_DefaultNew( name );
 
 	self->isConstructed = True;
-	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, integrationSwarm, NULL );
+	_StiffnessMatrixTerm_Init( self, context, stiffnessMatrix, integrationSwarm, NULL );
 	_GradientStiffnessMatrixTerm_Init( self );
 
 	return self;

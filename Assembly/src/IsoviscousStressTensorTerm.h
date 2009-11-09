@@ -58,6 +58,7 @@
 
 	IsoviscousStressTensorTerm* IsoviscousStressTensorTerm_New( 
 		Name                                                name,
+		FiniteElementContext*				                   context,
 		StiffnessMatrix*                                    stiffnessMatrix,
 		Swarm*                                              integrationSwarm,
 		double                                              viscosity );

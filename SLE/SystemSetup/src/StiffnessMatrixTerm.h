@@ -86,6 +86,7 @@
 	/* Creation implementation / Virtual constructor */
 	StiffnessMatrixTerm* StiffnessMatrixTerm_New(
 		Name                                                 name,
+		FiniteElementContext*				                    context,
 		StiffnessMatrix*                                     stiffnessMatrix,
 		Swarm*                                               integrationSwarm,
 		Stg_Component*                                       extraInfo );
@@ -121,6 +122,13 @@
 	void _StiffnessMatrixTerm_Initialise( void* stiffnessMatrixTerm, void* data );
 	void _StiffnessMatrixTerm_Execute( void* stiffnessMatrixTerm, void* data );
 	void _StiffnessMatrixTerm_Destroy( void* stiffnessMatrixTerm, void* data );
+
+	void _StiffnessMatrixTerm_Init(
+		void*                                                stiffnessMatrixTerm,
+		FiniteElementContext*				                    context,
+		StiffnessMatrix*                                     stiffnessMatrix,
+		Swarm*                                               integrationSwarm,
+		Stg_Component*                                       extraInfo );
 	
 	void StiffnessMatrixTerm_AssembleElement( 
 			void*                             stiffnessMatrixTerm, 
