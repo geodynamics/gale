@@ -447,6 +447,18 @@ void _OperatorFeVariable_AssignFromXML( void* feVariable, Stg_ComponentFactory* 
 	_OperatorFeVariable_Init( self, operatorName, feVariableCount, feVariableList, NULL );
 
 	Memory_Free( feVariableList );
+
+
+        {
+          int dim;
+          int numNodes;
+
+          Stg_Component_Build(self->feMesh, NULL, False);
+
+          dim = Mesh_GetDimSize(self->feMesh);
+          numNodes = FeMesh_GetElementNodeSize(self->feMesh, 0);
+          self->GNx = Memory_Alloc_2DArray( double, dim, numNodes, "Global Shape Function Derivatives" );
+        }
 }
 
 void _OperatorFeVariable_Build( void* feVariable, void* data ) {
