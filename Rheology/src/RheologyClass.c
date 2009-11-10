@@ -110,7 +110,7 @@ void _Rheology_Init( void* rheology, PICelleratorContext* context )
 void _Rheology_Delete( void* rheology ) {
 	Rheology*					self = (Rheology*)rheology;
 
-	Stg_Class_Delete( self );
+	_Stg_Class_Delete( self );
 }
 
 void _Rheology_Print( void* rheology, Stream* stream ) {}
