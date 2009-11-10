@@ -226,7 +226,7 @@ void _YieldRheology_Execute( void* rheology, void* data ) {}
 void _YieldRheology_Destroy( void* rheology, void* data ) {
    YieldRheology* self = (YieldRheology*) rheology;
    
-   Stg_Component_Destroy( self->strainWeakening, data, False );
+   if( self->strainWeakening ) Stg_Component_Destroy( self->strainWeakening, data, False );
    
    _Rheology_Destroy( self, data ); 
 }
