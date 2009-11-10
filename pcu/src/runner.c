@@ -84,7 +84,8 @@ PCU_Runner_Status pcu_runner_run( pcu_listener_t* lsnr ) {
 
    if ( pcu_nsuites >= 1 ) {
       printf( "-----------------------------------------------------------\n" );
-      printf( "[PCU] Total passes: %d/%d\n", totalPasses, totalTests );
+      printf( "[PCU] Total Passes: (%d/%d)\n", totalPasses, totalTests );
+      printf( "-----------------------------------------------------------\n" );
    }
 
    if ( totalPasses == totalTests ) {
@@ -97,10 +98,7 @@ PCU_Runner_Status pcu_runner_run( pcu_listener_t* lsnr ) {
    return returnStatus;
 }
 
-void _pcu_runner_addSuite( const char* name, 
-			   void (initfunc)( pcu_suite_t* ),
-            const char* moduleDir )
-{
+void _pcu_runner_addSuite( const char* name, void (initfunc)( pcu_suite_t* ), const char* moduleDir ) {
    pcu_suite_t* suite;
 
    assert( initfunc );

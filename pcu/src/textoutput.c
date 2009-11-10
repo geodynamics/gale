@@ -35,15 +35,17 @@ typedef struct {
 	int rank;
 } textoutputdata_t;
 
-void printstatus( pcu_listener_t* lsnr, pcu_suite_t* suite, int final );
+void printsuitestatus( pcu_listener_t* lsnr, pcu_suite_t* suite, int final );
+void printteststatus( pcu_listener_t* lsnr, pcu_suite_t* suite, char* testname, int final );
 void printsources( pcu_listener_t* lsnr, pcu_suite_t* suite );
 
 void pcu_textoutput_suitebegin( pcu_listener_t* lsnr, pcu_suite_t* suite ) {
+	printsuitestatus( lsnr, suite, 0 );
    /*printstatus( lsnr, suite, 0 );*/
 }
 
 void pcu_textoutput_suiteend( pcu_listener_t* lsnr, pcu_suite_t* suite ) {
-   /*printstatus( lsnr, suite, 1 );*/
+   printsuitestatus( lsnr, suite, 1 );
    printsources( lsnr, suite );
 }
 
@@ -51,7 +53,7 @@ void pcu_textoutput_testbegin( pcu_listener_t* lsnr, pcu_test_t* test ) {
 }
 
 void pcu_textoutput_testend( pcu_listener_t* lsnr, pcu_test_t* test ) {
-   printstatus( lsnr, test->suite, 0 );
+   printteststatus( lsnr, test->suite, test->name, 0 );
 }
 
 void pcu_textoutput_checkdone( pcu_listener_t* lsnr, pcu_source_t* src ) {
@@ -69,8 +71,7 @@ pcu_listener_t* pcu_textoutput_create( int printdocs ) {
    lsnr->data = malloc( sizeof(textoutputdata_t) );
    assert( printdocs == 1 || printdocs == 0 );
    lsnr->printdocs = printdocs;
-   MPI_Comm_rank( MPI_COMM_WORLD, 
-        &((textoutputdata_t*)lsnr->data)->rank );
+   MPI_Comm_rank( MPI_COMM_WORLD, &((textoutputdata_t*)lsnr->data)->rank );
 
    return lsnr;
 }
@@ -81,11 +82,24 @@ void pcu_textoutput_destroy( pcu_listener_t* lsnr ) {
    free( lsnr );
 }
 
-void printstatus( pcu_listener_t* lsnr, pcu_suite_t* suite, int final ) {
+void printsuitestatus( pcu_listener_t* lsnr, pcu_suite_t* suite, int final ) { 
    if( ((textoutputdata_t*)lsnr->data)->rank )
       return;
 
-   printf( "[PCU] Running suite '%s', passes: %d/%d%s", suite->name, suite->npassed, suite->ntests, "\n" );
+	if( final ) {
+		printf( "[PCU] Status: %s\n", suite->npassed == suite->ntests ? "PASSED" : "FAILED" ); 
+	}
+	else {
+		printf( "------------------------------------------------------------------------\n" );
+		printf( "[PCU] Testing '%s':\n", suite->name );  
+	}
+}
+
+void printteststatus( pcu_listener_t* lsnr, pcu_suite_t* suite, char* testname, int final ) {
+   if( ((textoutputdata_t*)lsnr->data)->rank )
+      return;
+
+	printf( "[PCU]     Test Case: '%s', Passes: (%d/%d)\n", testname, suite->npassed, suite->ntests );
 }
 
 void printsources( pcu_listener_t* lsnr, pcu_suite_t* suite ) {

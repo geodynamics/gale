@@ -112,13 +112,7 @@ void _Stg_Component_Delete( void* component ) {
 	Stg_Component* self = (Stg_Component*)component;
 	
    /* just make sure the component is destroyed */
-   Stg_Component_Destroy( self, NULL, False );
-
-	Memory_Free( self->destroyType );
-	Memory_Free( self->executeType );
-	Memory_Free( self->initialiseType );
-	Memory_Free( self->buildType );
-	Memory_Free( self->constructType );
+ 	Stg_Component_Destroy( self, NULL, False );
 	
 	/* Stg_Class_Delete parent class */
 	_Stg_Object_Delete( self );
@@ -137,7 +131,7 @@ void _Stg_Component_Print( void* component, Stream* stream ) {
 	/* Virtual info */
 	Journal_Printf( (void*) stream, "\t_defaultConstructor (func ptr): %p\n", self->_defaultConstructor );
 	Journal_Printf( (void*) stream, "\t_construct (func ptr): %p\n", self->_construct );
-	Journal_Printf( (void*) stream, "\t_build (func ptr): %p\n", self->_build );
+	
 	Journal_Printf( (void*) stream, "\t_initialise (func ptr): %p\n", self->_initialise );
 	Journal_Printf( (void*) stream, "\t_execute (func ptr): %p\n", self->_execute );
 	Journal_Printf( (void*) stream, "\t_destroy (func ptr): %p\n", self->_destroy );
@@ -354,10 +348,11 @@ void Stg_Component_Execute( void* component, void* data, Bool force ) {
 
 void Stg_Component_Destroy( void* component, void* data, Bool force ) {
 	Stg_Component* self = (Stg_Component*)component;
+
 	if( /* force TODO: remove this comment after pcu_rejig period|| */ !self->isDestroyed ) {
-		/*Stg_TimeMonitor* tm;
-		Stg_MemMonitor*  mm;
-		char*            buf;
+		/*Stg_TimeMonitor*	tm;
+		Stg_MemMonitor*		mm;
+		char*						buf;
 		
 		buf = Stg_Object_AppendSuffix( self, "Destroy" );
 		
@@ -372,9 +367,16 @@ void Stg_Component_Destroy( void* component, void* data, Bool force ) {
 		#endif
 		
 		self->isDestroyed = True;
+
       if( self->_destroy )
          self->_destroy( self, data );
-		
+
+		Memory_Free( self->destroyType );
+		Memory_Free( self->executeType );
+		Memory_Free( self->initialiseType );
+		Memory_Free( self->buildType );
+		Memory_Free( self->constructType );
+
 		#ifdef USE_PROFILE
 			Stg_CallGraph_Pop( stgCallGraph );
 		#endif
@@ -387,7 +389,6 @@ void Stg_Component_Destroy( void* component, void* data, Bool force ) {
 		Memory_Free( buf );*/
 	}
 }
-
 
 /* TODO: UPT TO HERE */
 
