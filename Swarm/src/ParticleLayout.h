@@ -64,35 +64,38 @@ struct ParticleLayout { __ParticleLayout };
 	
 /* Creation implementation / Virtual constructor */
 ParticleLayout* _ParticleLayout_New( 
-    SizeT                                       _sizeOfSelf,
-    Type                                        type,
-    Stg_Class_DeleteFunction*                   _delete,
-    Stg_Class_PrintFunction*                    _print,
-    Stg_Class_CopyFunction*                     _copy,
-    Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-    Stg_Component_ConstructFunction*            _construct,
-    Stg_Component_BuildFunction*                _build,
-    Stg_Component_InitialiseFunction*           _initialise,
-    Stg_Component_ExecuteFunction*              _execute,
-    Stg_Component_DestroyFunction*              _destroy,
-    ParticleLayout_SetInitialCountsFunction*    _setInitialCounts,
-    ParticleLayout_InitialiseParticlesFunction* _initialiseParticles,
-    Name                                        name,
-    Bool                                        initFlag,
-    CoordSystem                                 coordSystem,
-    Bool                                        weightsInitialisedAtStartup );
+   SizeT                                       _sizeOfSelf,
+   Type                                        type,
+   Stg_Class_DeleteFunction*                   _delete,
+   Stg_Class_PrintFunction*                    _print,
+   Stg_Class_CopyFunction*                     _copy,
+   Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
+   Stg_Component_ConstructFunction*            _construct,
+   Stg_Component_BuildFunction*                _build,
+   Stg_Component_InitialiseFunction*           _initialise,
+   Stg_Component_ExecuteFunction*              _execute,
+   Stg_Component_DestroyFunction*              _destroy,
+   Name                                        name,
+   AllocationType                              nameAllocationType,
+   ParticleLayout_SetInitialCountsFunction*    _setInitialCounts,
+   ParticleLayout_InitialiseParticlesFunction* _initialiseParticles,
+   CoordSystem                                 coordSystem,
+   Bool                                        weightsInitialisedAtStartup );
 
 /* Initialise implementation */
 void _ParticleLayout_Init( 
-    void*                                       particleLayout,
-    CoordSystem                                 coordSystem,
-    Bool                                        weightsInitialisedAtStartup );
+      void*                     particleLayout,
+      AbstractContext*          context,
+      CoordSystem               coordSystem,
+      Bool                      weightsInitialisedAtStartup );
 	
 /* Stg_Class_Delete a ParticleLayout construct */
 void _ParticleLayout_Delete( void* particleLayout );
 	
 /* Print a ParticleLayout construct */
 void _ParticleLayout_Print( void* particleLayout, Stream* stream );
+
+void _ParticleLayout_Destroy( void* particleLayout, void* data );
 	
 /* Copy */
 #define ParticleLayout_Copy( self )                                     \
@@ -101,6 +104,7 @@ void _ParticleLayout_Print( void* particleLayout, Stream* stream );
     (ParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
 void* _ParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+void _ParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data );
 	
 /** Setup the particle tables in a Swarm Class, both local and shadow values.
  *  Must setup cellParticleCountTbl, cellParticleSizeTbl, cellParticleTbl */

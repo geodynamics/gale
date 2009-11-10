@@ -45,69 +45,71 @@
 const Type ParticleLayout_Type = "ParticleLayout";
 
 ParticleLayout* _ParticleLayout_New( 
-    SizeT                                       _sizeOfSelf,
-    Type                                        type,
-    Stg_Class_DeleteFunction*                   _delete,
-    Stg_Class_PrintFunction*                    _print,
-    Stg_Class_CopyFunction*                     _copy,
-    Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-    Stg_Component_ConstructFunction*            _construct,
-    Stg_Component_BuildFunction*                _build,
-    Stg_Component_InitialiseFunction*           _initialise,
-    Stg_Component_ExecuteFunction*              _execute,
-    Stg_Component_DestroyFunction*              _destroy,
-    ParticleLayout_SetInitialCountsFunction*    _setInitialCounts,
-    ParticleLayout_InitialiseParticlesFunction* _initialiseParticles,
-    Name                                        name,
-    Bool                                        initFlag,
-    CoordSystem                                 coordSystem,
-    Bool                                        weightsInitialisedAtStartup )
+   SizeT                                       _sizeOfSelf,
+   Type                                        type,
+   Stg_Class_DeleteFunction*                   _delete,
+   Stg_Class_PrintFunction*                    _print,
+   Stg_Class_CopyFunction*                     _copy,
+   Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
+   Stg_Component_ConstructFunction*            _construct,
+   Stg_Component_BuildFunction*                _build,
+   Stg_Component_InitialiseFunction*           _initialise,
+   Stg_Component_ExecuteFunction*              _execute,
+   Stg_Component_DestroyFunction*              _destroy,
+   Name                                        name,
+   AllocationType                              nameAllocationType,
+   ParticleLayout_SetInitialCountsFunction*    _setInitialCounts,
+   ParticleLayout_InitialiseParticlesFunction* _initialiseParticles,
+   CoordSystem                                 coordSystem,
+   Bool                                        weightsInitialisedAtStartup )
 {
-    ParticleLayout*		self;
+   ParticleLayout*		self;
 	
-    /* Allocate memory */
-    assert( _sizeOfSelf >= sizeof(ParticleLayout) );
-    self = (ParticleLayout*)_Stg_Component_New( 
-        _sizeOfSelf, 
-        type, 
-        _delete, 
-        _print, 
-        _copy, 
-        _defaultConstructor,
-        _construct, 
-        _build, 
-        _initialise, 
-        _execute, 
-        _destroy, 
-        name, 
-        NON_GLOBAL );
+   /* hard-wire this var */
+   nameAllocationType = NON_GLOBAL;
+
+   /* Allocate memory */
+   assert( _sizeOfSelf >= sizeof(ParticleLayout) );
+   self = (ParticleLayout*)_Stg_Component_New( 
+      _sizeOfSelf, 
+      type, 
+      _delete, 
+      _print, 
+      _copy, 
+      _defaultConstructor,
+      _construct, 
+      _build, 
+      _initialise, 
+      _execute, 
+      _destroy, 
+      name, 
+      nameAllocationType );
 	
-    /* General info */
-	
-    /* Virtual functions */
-    self->_setInitialCounts = _setInitialCounts;
-    self->_initialiseParticles = _initialiseParticles;
-	
-    if( initFlag ){
-        self->isConstructed = True;
-        _ParticleLayout_Init( self, coordSystem, weightsInitialisedAtStartup );
-    }
+   /* General info */
+   self->coordSystem = coordSystem;	
+   self->weightsInitialisedAtStartup = weightsInitialisedAtStartup;	
+
+   /* Virtual functions */
+   self->_setInitialCounts = _setInitialCounts;
+   self->_initialiseParticles = _initialiseParticles;
 	
     return self;
 }
 
 
 void _ParticleLayout_Init( 
-    void*           particleLayout, 
-    CoordSystem     coordSystem,
-    Bool            weightsInitialisedAtStartup ) 
+   void*           particleLayout, 
+   AbstractContext* context,
+   CoordSystem     coordSystem,
+   Bool            weightsInitialisedAtStartup ) 
 { 
-    ParticleLayout* self = (ParticleLayout*)particleLayout;
+   ParticleLayout* self = (ParticleLayout*)particleLayout;
 
-    self->debug = Stream_RegisterChild( Swarm_Debug, self->type );
+   self->context = context;
+   self->debug = Stream_RegisterChild( Swarm_Debug, self->type );
 
-    self->coordSystem = coordSystem;
-    self->weightsInitialisedAtStartup = weightsInitialisedAtStartup;
+   self->coordSystem = coordSystem;
+   self->weightsInitialisedAtStartup = weightsInitialisedAtStartup;
 }
 
 void _ParticleLayout_Delete( void* particleLayout ) {
@@ -156,6 +158,19 @@ void* _ParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name na
     return (void*)newParticleLayout;
 }
 
+void _ParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data ) {
+   ParticleLayout* self = (ParticleLayout*) particleLayout;
+   AbstractContext* context=NULL;
+
+   context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+   if( !context )
+      context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
+   _ParticleLayout_Init( self, context, GlobalCoordSystem, False );
+
+}
+
+void _ParticleLayout_Destroy( void* particleLayout, void* data ) {}
 
 void ParticleLayout_InitialiseParticles( void* particleLayout, void* swarm ) {
     ParticleLayout* self = (ParticleLayout*)particleLayout;

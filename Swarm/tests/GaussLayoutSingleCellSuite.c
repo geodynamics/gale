@@ -100,7 +100,8 @@ void GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D( GaussLayoutSingleCellSui
 		singleCellLayout = SingleCellLayout_New( "singleCellLayout", dimExists, NULL, NULL );
 	
 		/* Configure the gauss-particle-layout */
-		gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", nDims , particlesPerDim );
+		gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", NULL,
+           LocalCoordSystem, True, nDims, particlesPerDim );
 
 		/* Configure the swarm */
 		swarm = Swarm_New( "testGaussSwarmSingleCell", singleCellLayout, gaussParticleLayout, nDims,
@@ -167,7 +168,8 @@ void GaussLayoutSingleCellSuite_Test2ParticlesPerDim_3D( GaussLayoutSingleCellSu
 		singleCellLayout = SingleCellLayout_New( "singleCellLayout", dimExists, NULL, NULL );
 	
 		/* Configure the gauss-particle-layout */
-		gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", nDims , particlesPerDim );
+		gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", NULL,
+           LocalCoordSystem, True, nDims, particlesPerDim );
 		
 		/* Configure the swarm */
 		swarm = Swarm_New( "testGaussSwarmSingleCell", singleCellLayout, gaussParticleLayout, nDims,
@@ -233,7 +235,8 @@ void GaussLayoutSingleCellSuite_Test3ParticlesPerDim_3D( GaussLayoutSingleCellSu
 		singleCellLayout = SingleCellLayout_New( "singleCellLayout", dimExists, NULL, NULL );
 	
 		/* Configure the gauss-particle-layout */
-		gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", nDims , particlesPerDim );
+		gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", NULL,
+           LocalCoordSystem, True, nDims, particlesPerDim );
 	
 		/* Configure the swarm */
 		swarm = Swarm_New( "testGaussSwarmSingleCell", singleCellLayout, gaussParticleLayout, nDims,

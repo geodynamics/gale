@@ -59,35 +59,45 @@
 	
 	/* Create a new LineParticleLayout and initialise */
 	LineParticleLayout* LineParticleLayout_New(
-		Name                                             name,
+		Name             name,
+      AbstractContext* context,
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int     totalInitialParticles,
+      double           averageInitialParticlesPerCell,
+		Dimension_Index  dim,
+		Index            vertexCount,
+		Coord*           vertexList );
+
+	/* Creation implementation / Virtual constructor */
+   LineParticleLayout* _LineParticleLayout_New( 
+      SizeT                                            _sizeOfSelf,
+      Type                                             type,
+      Stg_Class_DeleteFunction*                        _delete,
+      Stg_Class_PrintFunction*                         _print,
+      Stg_Class_CopyFunction*                          _copy, 
+      Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
+      Stg_Component_ConstructFunction*                 _construct,
+      Stg_Component_BuildFunction*                     _build,
+      Stg_Component_InitialiseFunction*                _initialise,
+      Stg_Component_ExecuteFunction*                   _execute,
+      Stg_Component_DestroyFunction*                   _destroy,
+      Name                                             name,
+      AllocationType                                   nameAllocationType,
+      ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
+      ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
+      CoordSystem                                      coordSystem,
+      Bool                                             weightsInitialisedAtStartup,
+      GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
+      Particle_Index                                   totalInitialParticles,
+      double                                           averageInitialParticlesPerCell,
 		Dimension_Index                                  dim,
-		Particle_Index                                   totalInitialParticles,
 		Index                                            vertexCount,
 		Coord*                                           vertexList );
 
-	/* Creation implementation / Virtual constructor */
-	LineParticleLayout* _LineParticleLayout_New( 
-		SizeT                                            _sizeOfSelf,
-		Type                                             type,
-		Stg_Class_DeleteFunction*                        _delete,
-		Stg_Class_PrintFunction*                         _print,
-		Stg_Class_CopyFunction*                          _copy, 
-		Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-		Stg_Component_ConstructFunction*                 _construct,
-		Stg_Component_BuildFunction*                     _build,
-		Stg_Component_InitialiseFunction*                _initialise,
-		Stg_Component_ExecuteFunction*                   _execute,
-		Stg_Component_DestroyFunction*                   _destroy,
-		ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-		Name                                             name,
-		Bool                                             initFlag );
-	
 	void _LineParticleLayout_Init( 
 		void*                                            particleLayout,
 		Dimension_Index                                  dim,
-		Particle_Index                                   totalInitialParticles,
 		Index                                            vertexCount,
 		Coord*                                           vertexList );
 	

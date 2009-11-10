@@ -56,60 +56,71 @@ const Type ManualParticleLayout_Type = "ManualParticleLayout";
 
 const Index ManualParticleLayout_Invalid = (Index)0;
 
-ManualParticleLayout* ManualParticleLayout_New( Name name, Dictionary* dictionary ) 
+ManualParticleLayout* ManualParticleLayout_New( Name name,
+      AbstractContext* context, 
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int     totalInitialParticles, 
+      double           averageInitialParticlesPerCell,
+      Dictionary*      dictionary ) 
 {
 	ManualParticleLayout* self = (ManualParticleLayout*) _ManualParticleLayout_DefaultNew( name );
+
+   _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
+   _GlobalParticleLayout_Init( self, totalInitialParticles, averageInitialParticlesPerCell );
 	_ManualParticleLayout_Init( self, dictionary );
 	return self;
 }
 
 ManualParticleLayout* _ManualParticleLayout_New( 
-		SizeT                                            _sizeOfSelf,
-		Type                                             type,
-		Stg_Class_DeleteFunction*                        _delete,
-		Stg_Class_PrintFunction*                         _print,
-		Stg_Class_CopyFunction*                          _copy,
-		Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-		Stg_Component_ConstructFunction*                 _construct,
-		Stg_Component_BuildFunction*                     _build,
-		Stg_Component_InitialiseFunction*                _initialise,
-		Stg_Component_ExecuteFunction*                   _execute,
-		Stg_Component_DestroyFunction*                   _destroy,
-		ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-		Name                                             name,
-		Bool                                             initFlag,
-		Dictionary*                                      dictionary )
+      SizeT                                            _sizeOfSelf,
+      Type                                             type,
+      Stg_Class_DeleteFunction*                        _delete,
+      Stg_Class_PrintFunction*                         _print,
+      Stg_Class_CopyFunction*                          _copy, 
+      Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
+      Stg_Component_ConstructFunction*                 _construct,
+      Stg_Component_BuildFunction*                     _build,
+      Stg_Component_InitialiseFunction*                _initialise,
+      Stg_Component_ExecuteFunction*                   _execute,
+      Stg_Component_DestroyFunction*                   _destroy,
+      Name                                             name,
+      AllocationType                                   nameAllocationType,
+      ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
+      ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
+      CoordSystem                                      coordSystem,
+      Bool                                             weightsInitialisedAtStartup,
+      GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
+      Particle_Index                                   totalInitialParticles,
+      double                                           averageInitialParticlesPerCell,
+      Dictionary*                                      dictionary )
 {
 	ManualParticleLayout* self;
 	
 	/* Allocate memory */
 	self = (ManualParticleLayout*)_GlobalParticleLayout_New( 
-		_sizeOfSelf, 
-		type,
-		_delete,
-		_print,
-		_copy, 
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		_setInitialCounts,
-		_initialiseParticles,
-		_initialiseParticle,
-		name,
-		initFlag,
-		GlobalCoordSystem,
-		False,
-		0,
-		0.0 );
+         _sizeOfSelf, 
+         type,
+         _delete,
+         _print,
+         _copy, 
+         _defaultConstructor,
+         _construct,
+         _build,
+         _initialise,
+         _execute,
+         _destroy,
+         name,
+         nameAllocationType,
+         _setInitialCounts,
+         _initialiseParticles,
+         coordSystem,
+         weightsInitialisedAtStartup,
+         _initialiseParticle,
+         totalInitialParticles,
+         averageInitialParticlesPerCell );
 
-	if ( initFlag ) {
-		_ManualParticleLayout_Init( self, dictionary );
-	}
+   self->dictionary = dictionary;
 
 	return self;
 }
@@ -118,17 +129,13 @@ void _ManualParticleLayout_Init( void* manualParticleLayout, Dictionary* diction
 {
 	ManualParticleLayout*	self                            = (ManualParticleLayout*)manualParticleLayout;
 	Dictionary_Entry_Value* manualParticlePositions         = NULL;
-	Particle_Index          totalInitialParticles;
-	double                  averageInitialParticlesPerCell;
 
 	self->isConstructed = True;
 	self->dictionary    = dictionary;
 
 	manualParticlePositions = Dictionary_Get( self->dictionary, "manualParticlePositions" );
-	totalInitialParticles = Dictionary_Entry_Value_GetCount( manualParticlePositions );
-	averageInitialParticlesPerCell = 0;
-	
-	_GlobalParticleLayout_Init( self, GlobalCoordSystem, False, totalInitialParticles, averageInitialParticlesPerCell );
+	self->totalInitialParticles = Dictionary_Entry_Value_GetCount( manualParticlePositions );
+	self->averageInitialParticlesPerCell = 0;
 }
 
 void _ManualParticleLayout_Delete( void* manualParticleLayout ) {
@@ -174,11 +181,12 @@ void* _ManualParticleLayout_DefaultNew( Name name ) {
 			_ManualParticleLayout_Initialise,
 			_ManualParticleLayout_Execute,
 			_ManualParticleLayout_Destroy,
+         name, NON_GLOBAL, 
 			_GlobalParticleLayout_SetInitialCounts,
 			_GlobalParticleLayout_InitialiseParticles,
+         GlobalCoordSystem, False,
 			_ManualParticleLayout_InitialiseParticle,
-			name,
-			False,
+         0, 0.0,
 			NULL /* dictionary */ );
 }
 
@@ -186,13 +194,11 @@ void _ManualParticleLayout_AssignFromXML( void* manualParticleLayout, Stg_Compon
 	ManualParticleLayout*      self       = (ManualParticleLayout*) manualParticleLayout;
 	Dictionary*                dictionary;
 	
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+   _GlobalParticleLayout_AssignFromXML( self, cf, data );
 
-	dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
+   dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 
-	_ManualParticleLayout_Init( self, dictionary );
+   _ManualParticleLayout_Init( self, dictionary );
 }
 	
 void _ManualParticleLayout_Build( void* manualParticleLayout, void* data ) {
@@ -202,6 +208,9 @@ void _ManualParticleLayout_Initialise( void* manualParticleLayout, void* data ) 
 void _ManualParticleLayout_Execute( void* manualParticleLayout, void* data ) {
 }
 void _ManualParticleLayout_Destroy( void* manualParticleLayout, void* data ) {
+	ManualParticleLayout* self = (ManualParticleLayout*)manualParticleLayout;
+
+   _GlobalParticleLayout_Destroy( self, data );
 }
 
 void _ManualParticleLayout_InitialiseParticle( 

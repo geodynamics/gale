@@ -50,31 +50,38 @@
 
 const Type GlobalParticleLayout_Type = "GlobalParticleLayout";
 
+const Index GlobalParticleLayout_Invalid = (Index) 0;
+
 GlobalParticleLayout* _GlobalParticleLayout_New( 
-		SizeT                                               _sizeOfSelf,
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy,
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		ParticleLayout_SetInitialCountsFunction*            _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*         _initialiseParticles,
-		GlobalParticleLayout_InitialiseParticleFunction*    _initialiseParticle,
-		Name                                                name,
-		Bool                                                initFlag,
-		CoordSystem                                         coordSystem,
-		Bool                                                weightsInitialisedAtStartup,
-		Particle_Index                                      totalInitialParticles,
-		double                                              averageInitialParticlesPerCell )
+      SizeT                                               _sizeOfSelf,
+      Type                                                type,
+      Stg_Class_DeleteFunction*                           _delete,
+      Stg_Class_PrintFunction*                            _print,
+      Stg_Class_CopyFunction*                             _copy,
+      Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
+      Stg_Component_ConstructFunction*                    _construct,
+      Stg_Component_BuildFunction*                        _build,
+      Stg_Component_InitialiseFunction*                   _initialise,
+      Stg_Component_ExecuteFunction*                      _execute,
+      Stg_Component_DestroyFunction*                      _destroy,
+      Name                                                name,
+      AllocationType                                      nameAllocationType,
+      ParticleLayout_SetInitialCountsFunction*            _setInitialCounts,
+      ParticleLayout_InitialiseParticlesFunction*         _initialiseParticles,
+      CoordSystem                                         coordSystem,
+      Bool                                                weightsInitialisedAtStartup,
+      GlobalParticleLayout_InitialiseParticleFunction*    _initialiseParticle,
+      Particle_Index                                      totalInitialParticles,
+      double                                              averageInitialParticlesPerCell )
 {
-	GlobalParticleLayout*		self;
+	GlobalParticleLayout* self;
 	
 	assert( _sizeOfSelf >= sizeof(GlobalParticleLayout) );
+
+   /* hard-wire class attributes */
+   coordSystem = GlobalCoordSystem;
+   weightsInitialisedAtStartup = False;
+
 	self = (GlobalParticleLayout*)_ParticleLayout_New( 
 			_sizeOfSelf, 
 			type, 
@@ -87,47 +94,36 @@ GlobalParticleLayout* _GlobalParticleLayout_New(
 			_initialise, 
 			_execute, 
 			_destroy, 
+			name, 
+         NON_GLOBAL,
 			_setInitialCounts,
 			_initialiseParticles, 
-			name, 
-			initFlag, 
 			coordSystem,
 			weightsInitialisedAtStartup );
 	
+   /* attributes */
+   self->totalInitialParticles = totalInitialParticles; 
+   self->averageInitialParticlesPerCell = averageInitialParticlesPerCell; 
+   /* virtual function */
 	self->_initialiseParticle = _initialiseParticle;
-	
-	if( initFlag ){
-		_GlobalParticleLayout_Init( 
-				self, 
-				coordSystem, 
-				weightsInitialisedAtStartup, 
-				totalInitialParticles, 
-				averageInitialParticlesPerCell );
-	}
 	
 	return self;
 }
 
 
 void _GlobalParticleLayout_Init(
-		void*                                               particleLayout,
-		CoordSystem                                         coordSystem,
-		Bool                                                weightsInitialisedAtStartup,
-		Particle_Index                                      totalInitialParticles,
-		double                                              averageInitialParticlesPerCell )
+      void*                                               particleLayout,
+      Particle_Index                                      totalInitialParticles,
+      double                                              averageInitialParticlesPerCell )
 {
-	GlobalParticleLayout* self = (GlobalParticleLayout*)particleLayout;
+   GlobalParticleLayout* self = (GlobalParticleLayout*)particleLayout;
 
-	self->isConstructed = True;
+   /* Note the total and average particles per cell need to be set in child
+   classes, as they may be worked out differently (eg the ManualParticleLayout
+   specifies the particles directly, so the total is implicit) */
 
-	/* Note the total and average particles per cell need to be set in child
-	classes, as they may be worked out differently (eg the ManualParticleLayout
-	specifies the particles directly, so the total is implicit) */
-
-	self->totalInitialParticles = totalInitialParticles;
-	self->averageInitialParticlesPerCell = averageInitialParticlesPerCell;
-
-	_ParticleLayout_Init( self, coordSystem, weightsInitialisedAtStartup );
+   self->totalInitialParticles = totalInitialParticles;
+   self->averageInitialParticlesPerCell = averageInitialParticlesPerCell;
 }
 
 void _GlobalParticleLayout_Delete( void* particleLayout ) {
@@ -135,7 +131,33 @@ void _GlobalParticleLayout_Delete( void* particleLayout ) {
 	
 	_ParticleLayout_Delete( self );
 }
+void _GlobalParticleLayout_Destroy( void* particleLayout, void* data ) {
+	GlobalParticleLayout* self = (GlobalParticleLayout*)particleLayout;
+	
+	_ParticleLayout_Destroy( self, data );
+}
 
+void  _GlobalParticleLayout_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data )  {
+   GlobalParticleLayout*	self = (GlobalParticleLayout*)component;
+   unsigned int totalInitialParticles;
+   double averageInitialParticlesPerCell;
+
+   _ParticleLayout_AssignFromXML( self, cf, data );
+
+   totalInitialParticles = Stg_ComponentFactory_GetUnsignedInt( 
+                  cf, 
+                  self->name, 
+                  "totalInitialParticles", 
+                  GlobalParticleLayout_Invalid );
+
+   averageInitialParticlesPerCell = (double)Stg_ComponentFactory_GetUnsignedInt( 
+                  cf, 
+                  self->name, 
+                  "averageInitialParticlesPerCell", 
+                  GlobalParticleLayout_Invalid );
+
+   _GlobalParticleLayout_Init( component, totalInitialParticles, averageInitialParticlesPerCell );
+}
 void _GlobalParticleLayout_Print( void* particleLayout, Stream* stream ) {
 	GlobalParticleLayout* self = (GlobalParticleLayout*)particleLayout;
 	

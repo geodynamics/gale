@@ -55,39 +55,51 @@ const Type MeshParticleLayout_Type = "MeshParticleLayout";
 
 
 MeshParticleLayout* MeshParticleLayout_New( 
-		Name                 name, 
-		Particle_InCellIndex cellParticleCount, 
-		unsigned int         seed ) 
+   Name                 name, 
+   AbstractContext* context,
+   CoordSystem      coordSystem,
+   Bool             weightsInitialisedAtStartup,
+   Mesh*            mesh,
+   Particle_InCellIndex cellParticleCount, 
+   unsigned int         seed ) 
 {
 	MeshParticleLayout* self = (MeshParticleLayout*) _MeshParticleLayout_DefaultNew( name );
-	_MeshParticleLayout_Init( self, cellParticleCount, seed );
+
+   _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
+   _PerCellParticleLayout_Init( self );
+	_MeshParticleLayout_Init( self, mesh, cellParticleCount, seed );
 
 	return self;
 }
 
 MeshParticleLayout* _MeshParticleLayout_New( 
-		SizeT                                                       _sizeOfSelf,
-		Type                                                        type,
-		Stg_Class_DeleteFunction*                                   _delete,
-		Stg_Class_PrintFunction*                                    _print,
-		Stg_Class_CopyFunction*                                     _copy,
-		Stg_Component_DefaultConstructorFunction*                   _defaultConstructor,
-		Stg_Component_ConstructFunction*                            _construct,
-		Stg_Component_BuildFunction*                                _build,
-		Stg_Component_InitialiseFunction*                           _initialise,
-		Stg_Component_ExecuteFunction*                              _execute,
-		Stg_Component_DestroyFunction*                              _destroy,
-		ParticleLayout_SetInitialCountsFunction*                    _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles,
-		PerCellParticleLayout_InitialCountFunction*                 _initialCount,
-		PerCellParticleLayout_InitialiseParticlesOfCellFunction*    _initialiseParticlesOfCell,
-		Name                                                        name,
-		Bool                                                         initFlag,
-		Particle_InCellIndex                                        cellParticleCount,
-		unsigned int                                                seed )
+      SizeT                                        _sizeOfSelf,
+      Type                                         type,
+      Stg_Class_DeleteFunction*                    _delete,
+      Stg_Class_PrintFunction*                     _print,
+      Stg_Class_CopyFunction*                      _copy,
+      Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
+      Stg_Component_ConstructFunction*             _construct,
+      Stg_Component_BuildFunction*                 _build,
+      Stg_Component_InitialiseFunction*            _initialise,
+      Stg_Component_ExecuteFunction*               _execute,
+      Stg_Component_DestroyFunction*               _destroy,
+      Name                                         name,
+      AllocationType                               nameAllocationType,
+      ParticleLayout_SetInitialCountsFunction*     _setInitialCounts,
+      ParticleLayout_InitialiseParticlesFunction*  _initialiseParticles,
+      CoordSystem                                  coordSystem,
+      Bool                                         weightsInitialisedAtStartup,
+      PerCellParticleLayout_InitialCountFunction*  _initialCount,
+      PerCellParticleLayout_InitialiseParticlesOfCellFunction* _initialiseParticlesOfCell,
+      Mesh*                                        mesh,
+		Particle_InCellIndex                         cellParticleCount,
+		unsigned int                                 seed )
 {
 	MeshParticleLayout* self;
-	
+
+   coordSystem = GlobalCoordSystem;   
+   weightsInitialisedAtStartup = False;
 	/* Allocate memory */
 	self = (MeshParticleLayout*)_PerCellParticleLayout_New( 
 		_sizeOfSelf, 
@@ -101,33 +113,27 @@ MeshParticleLayout* _MeshParticleLayout_New(
 		_initialise,
 		_execute,
 		_destroy,
-		_setInitialCounts,
-		_initialiseParticles,
-		_initialCount,
-		_initialiseParticlesOfCell,
-		name,
-		initFlag,
-		GlobalCoordSystem,
-		False );
+      name, nameAllocationType,
+		_setInitialCounts, _initialiseParticles,
+      coordSystem, weightsInitialisedAtStartup,
+		_initialCount, _initialiseParticlesOfCell );
 
-	if ( initFlag ) {
-		_MeshParticleLayout_Init( self, cellParticleCount, seed );
-	}
-	
+   self->mesh = mesh;
+   self->cellParticleCount = cellParticleCount;
+   self->seed = seed;
+
 	return self;
 }
 
-void _MeshParticleLayout_Init( void* meshParticleLayout, Particle_InCellIndex cellParticleCount, unsigned int seed ) {
+void _MeshParticleLayout_Init( void* meshParticleLayout, Mesh* mesh, Particle_InCellIndex cellParticleCount, unsigned int seed ) {
 	MeshParticleLayout* self = (MeshParticleLayout*)meshParticleLayout;
 
-	self->mesh = NULL;
+	self->mesh = mesh;
 	self->isConstructed     = True;
 	self->cellParticleCount = cellParticleCount;
 	self->seed              = seed;
 	
 	Swarm_Random_Seed( self->seed );
-
-	_PerCellParticleLayout_Init( meshParticleLayout, GlobalCoordSystem, False );
 }
 
 
@@ -182,12 +188,11 @@ void* _MeshParticleLayout_DefaultNew( Name name ) {
 			_MeshParticleLayout_Initialise,
 			_MeshParticleLayout_Execute,
 			_MeshParticleLayout_Destroy,
-			_PerCellParticleLayout_SetInitialCounts,
-			_PerCellParticleLayout_InitialiseParticles,
-			_MeshParticleLayout_InitialCount,
-			_MeshParticleLayout_InitialiseParticlesOfCell, 
-			name,
-			False,
+         name, NON_GLOBAL,
+			_PerCellParticleLayout_SetInitialCounts, _PerCellParticleLayout_InitialiseParticles,
+         LocalCoordSystem, True,
+         _MeshParticleLayout_InitialCount, _MeshParticleLayout_InitialiseParticlesOfCell,
+         NULL, /* mesh */
 			0, /* cellParticleCount */
 			0  /* seed */ );
 }
@@ -196,13 +201,16 @@ void _MeshParticleLayout_AssignFromXML( void* meshParticleLayout, Stg_ComponentF
 	MeshParticleLayout*       self = (MeshParticleLayout*)meshParticleLayout;
 	Particle_InCellIndex        cellParticleCount;
 	unsigned int                seed;
+   Mesh* mesh = NULL;
+
+   _PerCellParticleLayout_AssignFromXML( self, cf, data );
 
 	cellParticleCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "cellParticleCount", 0 );
 	seed = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "seed", 13 );
-	
-	_MeshParticleLayout_Init( self, cellParticleCount, seed );
+	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
 
-	self->mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
+	_MeshParticleLayout_Init( self, mesh, cellParticleCount, seed );
+
 }
 	
 void _MeshParticleLayout_Build( void* meshParticleLayout, void* data ) {
@@ -226,7 +234,10 @@ void _MeshParticleLayout_Execute( void* meshParticleLayout, void* data ) {
 }
 	
 void _MeshParticleLayout_Destroy( void* meshParticleLayout, void* data ) {
-	
+   MeshParticleLayout* self = (MeshParticleLayout*)meshParticleLayout;
+   Stg_Component_Destroy( self->mesh, NULL, False );
+
+   _PerCellParticleLayout_Destroy( self, data );
 }
 
 

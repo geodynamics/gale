@@ -54,13 +54,21 @@ const Type WithinShapeParticleLayout_Type = "WithinShapeParticleLayout";
 const Index WithinShapeParticleLayout_Invalid = (Index) 0;
 
 WithinShapeParticleLayout* WithinShapeParticleLayout_New(
-		Name                    name,
-		Dimension_Index         dim,
-		Particle_Index          totalInitialParticles,
-		Stg_Shape*              shape )
+      Name             name,
+      AbstractContext* context, 
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int     totalInitialParticles, 
+      double           averageInitialParticlesPerCell,
+      Dimension_Index  dim,
+		Stg_Shape*       shape )
 {
 	WithinShapeParticleLayout* self = (WithinShapeParticleLayout*) _WithinShapeParticleLayout_DefaultNew( name );
-	_WithinShapeParticleLayout_Init( self, dim, totalInitialParticles, 0.0, shape );
+
+   _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
+   _GlobalParticleLayout_Init( self, totalInitialParticles, averageInitialParticlesPerCell );
+	_SpaceFillerParticleLayout_Init( self, dim );
+	_WithinShapeParticleLayout_Init( self, shape );
 
 	return self;
 }
@@ -80,11 +88,13 @@ WithinShapeParticleLayout* _WithinShapeParticleLayout_New(
 		ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
 		ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
 		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-		Name                                             name,
-		Bool                                             initFlag,
-		Dimension_Index                                  dim,
-		Particle_Index                                   totalInitialParticles,
-		double                                           averageInitialParticlesPerCell,
+      Name                                             name,
+      AllocationType                                   nameAllocationType,
+      CoordSystem                                      coordSystem,
+      Bool                                             weightsInitialisedAtStartup,
+      Particle_Index                                   totalInitialParticles,
+      double                                           averageInitialParticlesPerCell,
+      Dimension_Index                                  dim,
 		Stg_Shape*                                       shape )
 {
 	WithinShapeParticleLayout* self;
@@ -102,35 +112,27 @@ WithinShapeParticleLayout* _WithinShapeParticleLayout_New(
 		_initialise,
 		_execute,
 		_destroy,
+      name, nameAllocationType,
 		_setInitialCounts,
 		_initialiseParticles,
+      coordSystem, weightsInitialisedAtStartup,
 		_initialiseParticle,
-		name,
-		initFlag,
-		dim,
-		totalInitialParticles,
-		averageInitialParticlesPerCell );
+      totalInitialParticles, averageInitialParticlesPerCell,
+      dim );  /* dim */
 
-	if ( initFlag ) {
-		_WithinShapeParticleLayout_Init( self, dim, totalInitialParticles, averageInitialParticlesPerCell, shape );
-	}
+   self->shape = shape;
 
 	return self;
 }
 
 void _WithinShapeParticleLayout_Init(
 		void*                   withinShapeParticleLayout,
-		Dimension_Index         dim,
-		Particle_Index          totalInitialParticles,
-		double                  averageInitialParticlesPerCell,
 		Stg_Shape*              shape )
 {
 	WithinShapeParticleLayout*	self = (WithinShapeParticleLayout*) withinShapeParticleLayout;
 
 	self->isConstructed = True;
 	self->shape         = shape;
-
-	_SpaceFillerParticleLayout_Init( self, dim, totalInitialParticles, averageInitialParticlesPerCell );
 }
 
 
@@ -178,27 +180,26 @@ void* _WithinShapeParticleLayout_Copy( void* withinShapeParticleLayout, void* de
 }
 
 void* _WithinShapeParticleLayout_DefaultNew( Name name ) {
-	return (void*)_WithinShapeParticleLayout_New( 
-			sizeof(WithinShapeParticleLayout),
-			WithinShapeParticleLayout_Type,
-			_WithinShapeParticleLayout_Delete,
-			_WithinShapeParticleLayout_Print,
-			_WithinShapeParticleLayout_Copy,
-			_WithinShapeParticleLayout_DefaultNew,
-			_WithinShapeParticleLayout_AssignFromXML,
-			_WithinShapeParticleLayout_Build,
-			_WithinShapeParticleLayout_Initialise,
-			_WithinShapeParticleLayout_Execute,
-			_WithinShapeParticleLayout_Destroy,
-			_GlobalParticleLayout_SetInitialCounts,
-			_WithinShapeParticleLayout_InitialiseParticles,
-			_SpaceFillerParticleLayout_InitialiseParticle,
-			name,
-			False,
-			0,   /* dim */
-			0,   /* totalInitialParticles */
-			0.0, /* averageInitialParticlesPerCell */
-			NULL /* shape */ );
+   return (void*)_WithinShapeParticleLayout_New( 
+      sizeof(WithinShapeParticleLayout),
+      WithinShapeParticleLayout_Type,
+      _WithinShapeParticleLayout_Delete,
+      _WithinShapeParticleLayout_Print,
+      _WithinShapeParticleLayout_Copy,
+      _WithinShapeParticleLayout_DefaultNew,
+      _WithinShapeParticleLayout_AssignFromXML,
+      _WithinShapeParticleLayout_Build,
+      _WithinShapeParticleLayout_Initialise,
+      _WithinShapeParticleLayout_Execute,
+      _WithinShapeParticleLayout_Destroy,
+      _GlobalParticleLayout_SetInitialCounts,
+      _WithinShapeParticleLayout_InitialiseParticles,
+      _SpaceFillerParticleLayout_InitialiseParticle,
+      name, NON_GLOBAL, 
+      GlobalCoordSystem, False,
+      0, 0.0,
+      0,  /* dim */
+      NULL /* shape */ );
 }
 
 void _WithinShapeParticleLayout_AssignFromXML( void* withinShapeParticleLayout, Stg_ComponentFactory *cf, void* data ) {
@@ -209,12 +210,7 @@ void _WithinShapeParticleLayout_AssignFromXML( void* withinShapeParticleLayout, 
 
 	shape = Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "shape", Stg_Shape,  True, data ) ;
 
-	_WithinShapeParticleLayout_Init( 
-			self, 
-			self->dim, 
-			self->totalInitialParticles, 
-			self->averageInitialParticlesPerCell, 
-			shape );
+	_WithinShapeParticleLayout_Init( self, shape );
 }
 	
 void _WithinShapeParticleLayout_Build( void* withinShapeParticleLayout, void* data ) {
@@ -224,6 +220,11 @@ void _WithinShapeParticleLayout_Initialise( void* withinShapeParticleLayout, voi
 void _WithinShapeParticleLayout_Execute( void* withinShapeParticleLayout, void* data ) {
 }
 void _WithinShapeParticleLayout_Destroy( void* withinShapeParticleLayout, void* data ) {
+   WithinShapeParticleLayout* self = (WithinShapeParticleLayout*) withinShapeParticleLayout;
+
+   Stg_Component_Destroy( self->shape, data, False );
+
+   _SpaceFillerParticleLayout_Destroy( self, data );
 }
 
 void _WithinShapeParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm )

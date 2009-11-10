@@ -49,35 +49,42 @@
 		__PerCellParticleLayout \
 		\
 		unsigned int dim;              /**< The number of dimensions to use */ \
-	        unsigned int particlesPerCell; /**< The number of points to use per cell */
+	   unsigned int particlesPerCell; /**< The number of points to use per cell */
 
 	struct TriGaussParticleLayout { __TriGaussParticleLayout };
 	
 	/* Create a new TriGaussParticleLayout and initialise */
-	TriGaussParticleLayout* TriGaussParticleLayout_New( Name name, unsigned int dim, unsigned int particlesPerCell );
+   TriGaussParticleLayout* TriGaussParticleLayout_New( 
+      Name name, 
+      AbstractContext* context,
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int dim, unsigned int particlesPerCell );
 	
 	/* Creation implementation / Virtual constructor */
-	TriGaussParticleLayout* _TriGaussParticleLayout_New( 
-		SizeT                                                       _sizeOfSelf,
-		Type                                                        type,
-		Stg_Class_DeleteFunction*                                   _delete,
-		Stg_Class_PrintFunction*                                    _print,
-		Stg_Class_CopyFunction*                                     _copy,
-		Stg_Component_DefaultConstructorFunction*                   _defaultConstructor,
-		Stg_Component_ConstructFunction*                            _construct,
-		Stg_Component_BuildFunction*                                _build,
-		Stg_Component_InitialiseFunction*                           _initialise,
-		Stg_Component_ExecuteFunction*                              _execute,
-		Stg_Component_DestroyFunction*                              _destroy,
-		ParticleLayout_SetInitialCountsFunction*                    _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles,
-		PerCellParticleLayout_InitialCountFunction*                 _initialCount,
-		PerCellParticleLayout_InitialiseParticlesOfCellFunction*    _initialiseParticlesOfCell,
-		Name                                                        name,
-		Bool                                                        initFlag,
-		unsigned int                                                dim,
-		unsigned int                                                particlesPerCell );
-	
+   TriGaussParticleLayout* _TriGaussParticleLayout_New( 
+      SizeT                                        _sizeOfSelf,
+      Type                                         type,
+      Stg_Class_DeleteFunction*                    _delete,
+      Stg_Class_PrintFunction*                     _print,
+      Stg_Class_CopyFunction*                      _copy,
+      Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
+      Stg_Component_ConstructFunction*             _construct,
+      Stg_Component_BuildFunction*                 _build,
+      Stg_Component_InitialiseFunction*            _initialise,
+      Stg_Component_ExecuteFunction*               _execute,
+      Stg_Component_DestroyFunction*               _destroy,
+      Name                                         name,
+      AllocationType                               nameAllocationType,
+      ParticleLayout_SetInitialCountsFunction*     _setInitialCounts,
+      ParticleLayout_InitialiseParticlesFunction*  _initialiseParticles,
+      CoordSystem                                  coordSystem,
+      Bool                                         weightsInitialisedAtStartup,
+      PerCellParticleLayout_InitialCountFunction*  _initialCount,
+      PerCellParticleLayout_InitialiseParticlesOfCellFunction* _initialiseParticlesOfCell,
+      unsigned int                                 dim,
+      unsigned int                                 particlesPerCell );
+
 	/* Initialise implementation */
 	void _TriGaussParticleLayout_Init( 
 			TriGaussParticleLayout* self, 

@@ -54,40 +54,53 @@
 
 const Type TriGaussParticleLayout_Type = "TriGaussParticleLayout";
 
-TriGaussParticleLayout* TriGaussParticleLayout_New( Name name, unsigned int dim, unsigned int particlesPerCell ) {
+TriGaussParticleLayout* TriGaussParticleLayout_New( 
+   Name name, 
+   AbstractContext* context,
+   CoordSystem      coordSystem,
+   Bool             weightsInitialisedAtStartup,
+   unsigned int dim, unsigned int particlesPerCell ) 
+{
 	TriGaussParticleLayout* self = (TriGaussParticleLayout*)_TriGaussParticleLayout_DefaultNew( name );
 
+   _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
+   _PerCellParticleLayout_Init( self );
 	_TriGaussParticleLayout_Init( self, dim, particlesPerCell );
 
 	return self;
 }
 
 TriGaussParticleLayout* _TriGaussParticleLayout_New( 
-                SizeT                                                       _sizeOfSelf,
-                Type                                                        type,
-                Stg_Class_DeleteFunction*                                   _delete,
-                Stg_Class_PrintFunction*                                    _print,
-                Stg_Class_CopyFunction*                                     _copy,
-                Stg_Component_DefaultConstructorFunction*                   _defaultConstructor,
-                Stg_Component_ConstructFunction*                            _construct,
-                Stg_Component_BuildFunction*                                _build,
-                Stg_Component_InitialiseFunction*                           _initialise,
-                Stg_Component_ExecuteFunction*                              _execute,
-                Stg_Component_DestroyFunction*                              _destroy,
-                ParticleLayout_SetInitialCountsFunction*                    _setInitialCounts,
-                ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles,
-                PerCellParticleLayout_InitialCountFunction*                 _initialCount,
-                PerCellParticleLayout_InitialiseParticlesOfCellFunction*    _initialiseParticlesOfCell,
-                Name                                                        name,
-                Bool                                                        initFlag,
-                unsigned int                                                dim,
-                unsigned int                                                particlesPerCell )
+      SizeT                                        _sizeOfSelf,
+      Type                                         type,
+      Stg_Class_DeleteFunction*                    _delete,
+      Stg_Class_PrintFunction*                     _print,
+      Stg_Class_CopyFunction*                      _copy,
+      Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
+      Stg_Component_ConstructFunction*             _construct,
+      Stg_Component_BuildFunction*                 _build,
+      Stg_Component_InitialiseFunction*            _initialise,
+      Stg_Component_ExecuteFunction*               _execute,
+      Stg_Component_DestroyFunction*               _destroy,
+      Name                                         name,
+      AllocationType                               nameAllocationType,
+      ParticleLayout_SetInitialCountsFunction*     _setInitialCounts,
+      ParticleLayout_InitialiseParticlesFunction*  _initialiseParticles,
+      CoordSystem                                  coordSystem,
+      Bool                                         weightsInitialisedAtStartup,
+      PerCellParticleLayout_InitialCountFunction*  _initialCount,
+      PerCellParticleLayout_InitialiseParticlesOfCellFunction* _initialiseParticlesOfCell,
+      unsigned int                                 dim,
+      unsigned int                                 particlesPerCell )
 {
 	TriGaussParticleLayout* self;
 	
+   /* hard-wire here */
+   coordSystem = LocalCoordSystem;
+   weightsInitialisedAtStartup = True;
 	/* Allocate memory */
 	self = (TriGaussParticleLayout*)_PerCellParticleLayout_New( 
-		_sizeOfSelf, 
+      _sizeOfSelf, 
 		type,
 		_delete,
 		_print,
@@ -98,18 +111,10 @@ TriGaussParticleLayout* _TriGaussParticleLayout_New(
 		_initialise,
 		_execute,
 		_destroy,
-		_setInitialCounts,
-		_initialiseParticles,
-		_initialCount,
-		_initialiseParticlesOfCell,
-		name,
-		initFlag,
-		LocalCoordSystem,
-		True );
-	
-	if( initFlag ){
-		_TriGaussParticleLayout_Init( self, dim, particlesPerCell );
-	}
+      name, nameAllocationType,
+		_setInitialCounts, _initialiseParticles,
+      coordSystem, weightsInitialisedAtStartup,
+		_initialCount, _initialiseParticlesOfCell );
 	
 	return self;
 }
@@ -123,8 +128,6 @@ void _TriGaussParticleLayout_Init(
 	self->isConstructed    = True;
 	self->dim              = dim;
 	self->particlesPerCell = particlesPerCell;
-	
-	_PerCellParticleLayout_Init( self, LocalCoordSystem, True );
 }
 
 void _TriGaussParticleLayout_Delete( void* triGaussParticleLayout ) {
@@ -175,12 +178,10 @@ void* _TriGaussParticleLayout_DefaultNew( Name name ) {
 			_TriGaussParticleLayout_Initialise,
 			_TriGaussParticleLayout_Execute,
 			_TriGaussParticleLayout_Destroy,
-			_PerCellParticleLayout_SetInitialCounts,
-			_PerCellParticleLayout_InitialiseParticles,
-			_TriGaussParticleLayout_InitialCount,
-			_TriGaussParticleLayout_InitialiseParticlesOfCell,
-			name,
-			False,
+         name, NON_GLOBAL,
+         _PerCellParticleLayout_SetInitialCounts, _PerCellParticleLayout_InitialiseParticles,
+         LocalCoordSystem, True,
+			_TriGaussParticleLayout_InitialCount, _TriGaussParticleLayout_InitialiseParticlesOfCell,
 			0,
 			0 );
 }
@@ -190,6 +191,7 @@ void _TriGaussParticleLayout_AssignFromXML( void* triGaussParticleLayout, Stg_Co
 	unsigned int dim;
 	unsigned int particlesPerCell;
 
+   _PerCellParticleLayout_AssignFromXML( self, cf, data );
 	dim = Dictionary_Entry_Value_AsUnsignedInt(
 		Dictionary_GetDefault( cf->rootDict, "dim", Dictionary_Entry_Value_FromUnsignedInt( 3 ) ) );
 
@@ -209,6 +211,8 @@ void _TriGaussParticleLayout_Execute( void* triGaussParticleLayout, void* data )
 }
 	
 void _TriGaussParticleLayout_Destroy( void* triGaussParticleLayout, void* data ) {
+   TriGaussParticleLayout* self = (TriGaussParticleLayout*)triGaussParticleLayout;
+   _PerCellParticleLayout_Destroy( self, data );
 }
 
 Particle_InCellIndex _TriGaussParticleLayout_InitialCount( void* triGaussParticleLayout, void* celllayout, Cell_Index cell_I )

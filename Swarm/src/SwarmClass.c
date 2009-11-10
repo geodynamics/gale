@@ -1637,7 +1637,7 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 	char*                name = NULL;
 	char*                swarmFileName     = NULL;
 	char*                swarmFileNamePart = NULL;
-	Index                checkpointnfiles;
+	Index                checkpointfiles;
 
 	Stg_asprintf( &name, "%s-fileParticleLayout", self->name );
 
@@ -1666,13 +1666,13 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 	Stg_Class_Delete( self->particleLayout );
 	/* find out how many files fileparticlelayout is stored across.. currently for this function we assume we are reading from checkpoints.. TODO generalise */
 	/* set to one incase reading ascii */
-	checkpointnfiles = 1;
+	checkpointfiles = 1;
 	/* now check if using hdf5 */ 
 	#ifdef READ_HDF5
-	checkpointnfiles = _FileParticleLayout_GetFileCountFromTimeInfoFile( context );
+	checkpointfiles = _FileParticleLayout_GetFileCountFromTimeInfoFile( context );
 	#endif
 
-	self->particleLayout = (ParticleLayout*)FileParticleLayout_New( name, swarmFileName, checkpointnfiles );
+	self->particleLayout = (ParticleLayout*)FileParticleLayout_New( name, NULL, GlobalCoordSystem, False, 0, 0.0, swarmFileName, checkpointfiles );
 
    Memory_Free( name );
    Memory_Free( swarmFileName );

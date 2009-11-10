@@ -57,74 +57,78 @@ const Type SpaceFillerParticleLayout_Type = "SpaceFillerParticleLayout";
 const Index SpaceFillerParticleLayout_Invalid = (Index) 0;
 
 SpaceFillerParticleLayout* SpaceFillerParticleLayout_New( 
-		Name                    name,
-		Dimension_Index         dim,
-		Particle_Index          totalInitialParticles,
-		double                  averageInitialParticlesPerCell )
+		Name             name,
+      AbstractContext* context, 
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int     totalInitialParticles, 
+      double           averageInitialParticlesPerCell,
+		Dimension_Index  dim )
 {
 	SpaceFillerParticleLayout* self = (SpaceFillerParticleLayout*) _SpaceFillerParticleLayout_DefaultNew( name );
-	_SpaceFillerParticleLayout_Init( self, dim, totalInitialParticles, averageInitialParticlesPerCell );
+
+   _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
+   _GlobalParticleLayout_Init( self, totalInitialParticles, averageInitialParticlesPerCell );
+	_SpaceFillerParticleLayout_Init( self, dim );
 	return self;
 }
 
 SpaceFillerParticleLayout* _SpaceFillerParticleLayout_New( 
-                SizeT                                            _sizeOfSelf,
-                Type                                             type,
-                Stg_Class_DeleteFunction*                        _delete,
-                Stg_Class_PrintFunction*                         _print,
-                Stg_Class_CopyFunction*                          _copy,
-                Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-                Stg_Component_ConstructFunction*                 _construct,
-                Stg_Component_BuildFunction*                     _build,
-                Stg_Component_InitialiseFunction*                _initialise,
-                Stg_Component_ExecuteFunction*                   _execute,
-                Stg_Component_DestroyFunction*                   _destroy,
-                ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-                ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-                GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-                Name                                             name,
-		Bool                                             initFlag,
-                Dimension_Index                                  dim,
-		Particle_Index                                   totalInitialParticles,
-		double                                           averageInitialParticlesPerCell )
+      SizeT                                            _sizeOfSelf,
+      Type                                             type,
+      Stg_Class_DeleteFunction*                        _delete,
+      Stg_Class_PrintFunction*                         _print,
+      Stg_Class_CopyFunction*                          _copy,
+      Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
+      Stg_Component_ConstructFunction*                 _construct,
+      Stg_Component_BuildFunction*                     _build,
+      Stg_Component_InitialiseFunction*                _initialise,
+      Stg_Component_ExecuteFunction*                   _execute,
+      Stg_Component_DestroyFunction*                   _destroy,
+      Name                                             name,
+      AllocationType                                   nameAllocationType,
+      ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
+      ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
+      CoordSystem                                      coordSystem,
+      Bool                                             weightsInitialisedAtStartup,
+      GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
+      Particle_Index                                   totalInitialParticles,
+      double                                           averageInitialParticlesPerCell,
+      Dimension_Index                                  dim )
 {
-	SpaceFillerParticleLayout* self;
-	
-	/* Allocate memory */
-	self = (SpaceFillerParticleLayout*)_GlobalParticleLayout_New( 
-		_sizeOfSelf, 
-		type,
-		_delete,
-		_print,
-		_copy, 
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		_setInitialCounts,
-		_initialiseParticles,
-		_initialiseParticle,
-		name,
-		initFlag,
-		GlobalCoordSystem,
-		False,
-		totalInitialParticles,
-		averageInitialParticlesPerCell );
+   SpaceFillerParticleLayout* self;
 
-	if ( initFlag ) {
-		_SpaceFillerParticleLayout_Init( self, dim, totalInitialParticles, averageInitialParticlesPerCell );
-	}
+   /* Allocate memory */
+   self = (SpaceFillerParticleLayout*)_GlobalParticleLayout_New( 
+      _sizeOfSelf, 
+      type,
+      _delete,
+      _print,
+      _copy, 
+      _defaultConstructor,
+      _construct,
+      _build,
+      _initialise,
+      _execute,
+      _destroy,
+      name,
+      nameAllocationType,
+      _setInitialCounts,
+      _initialiseParticles,
+      coordSystem,
+      weightsInitialisedAtStartup,
+      _initialiseParticle,
+      totalInitialParticles,
+      averageInitialParticlesPerCell );
+
+   self->dim = dim;
 
 	return self;
 }
 
 void _SpaceFillerParticleLayout_Init( 
 		void*                   spaceFillerParticleLayout,
-		Dimension_Index         dim,
-		Particle_Index          totalInitialParticles,
-		double                  averageInitialParticlesPerCell )
+		Dimension_Index         dim )
 {
 	SpaceFillerParticleLayout*	self = (SpaceFillerParticleLayout*) spaceFillerParticleLayout;
 
@@ -138,19 +142,15 @@ void _SpaceFillerParticleLayout_Init(
 
 	/* Must set one or the other. Fail if both set, or none */
 	Journal_Firewall( 
-		(totalInitialParticles == SpaceFillerParticleLayout_Invalid)
-			^ ((Index)averageInitialParticlesPerCell == SpaceFillerParticleLayout_Invalid),
+		(self->totalInitialParticles == SpaceFillerParticleLayout_Invalid)
+			^ ((Index)self->averageInitialParticlesPerCell == SpaceFillerParticleLayout_Invalid),
 		Journal_MyStream( Error_Type, self ),
 		"Error in func %s for %s '%s' - Both averageInitialParticlesPerCell and totalInitialParticles%sspecified.\n",
 		__func__, 
 		self->type, 
 		self->name,
-		(totalInitialParticles == SpaceFillerParticleLayout_Invalid) ? " not " : " " );
+		(self->totalInitialParticles == SpaceFillerParticleLayout_Invalid) ? " not " : " " );
 	
-	self->totalInitialParticles = totalInitialParticles;
-	self->averageInitialParticlesPerCell = averageInitialParticlesPerCell;
-
-	_GlobalParticleLayout_Init( self, GlobalCoordSystem, False, totalInitialParticles, averageInitialParticlesPerCell );
 }
 
 
@@ -158,9 +158,6 @@ void _SpaceFillerParticleLayout_Init(
 void _SpaceFillerParticleLayout_Delete( void* spaceFillerParticleLayout ) {
 	SpaceFillerParticleLayout* self = (SpaceFillerParticleLayout*)spaceFillerParticleLayout;
 	Dimension_Index            dim_I;
-
-	for ( dim_I = 0 ; dim_I < self->dim ; dim_I++ ) 
-		Stg_Class_Delete( self->sobolGenerator[ dim_I ] );
 
 	_GlobalParticleLayout_Delete( self );
 }
@@ -205,41 +202,25 @@ void* _SpaceFillerParticleLayout_DefaultNew( Name name ) {
 			_SpaceFillerParticleLayout_Initialise,
 			_SpaceFillerParticleLayout_Execute,
 			_SpaceFillerParticleLayout_Destroy,
+         name, NON_GLOBAL, 
 			_GlobalParticleLayout_SetInitialCounts,
 			_SpaceFillerParticleLayout_InitialiseParticles,
+         GlobalCoordSystem, False,
 			_SpaceFillerParticleLayout_InitialiseParticle,
-			name,
-			False,
-			0,  /* dim */
-			0,  /* totalInitialParticles */
-			0.0 /* averageInitialParticlesPerCell */);
+         0, 0.0,
+			0  /* dim */ );
 }
 
 
 void _SpaceFillerParticleLayout_AssignFromXML( void* spaceFillerParticleLayout, Stg_ComponentFactory *cf, void* data ) {
-	SpaceFillerParticleLayout* self = (SpaceFillerParticleLayout*) spaceFillerParticleLayout;
-	Dimension_Index            dim;
-	Particle_Index             totalInitialParticles;
-	double                     averageInitialParticlesPerCell;
-	
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+   SpaceFillerParticleLayout* self = (SpaceFillerParticleLayout*) spaceFillerParticleLayout;
+   Dimension_Index            dim;
 
-	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
+   _GlobalParticleLayout_AssignFromXML( self, cf, data );
 
-	totalInitialParticles = Stg_ComponentFactory_GetUnsignedInt( 
-			cf, 
-			self->name, 
-			"totalInitialParticles", 
-			SpaceFillerParticleLayout_Invalid );
-	averageInitialParticlesPerCell = (double)Stg_ComponentFactory_GetUnsignedInt( 
-			cf, 
-			self->name, 
-			"averageInitialParticlesPerCell", 
-			SpaceFillerParticleLayout_Invalid );
+   dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 
-	_SpaceFillerParticleLayout_Init( self, dim, totalInitialParticles, averageInitialParticlesPerCell );
+   _SpaceFillerParticleLayout_Init( self, dim );
 }
 	
 void _SpaceFillerParticleLayout_Build( void* spaceFillerParticleLayout, void* data ) {
@@ -249,6 +230,13 @@ void _SpaceFillerParticleLayout_Initialise( void* spaceFillerParticleLayout, voi
 void _SpaceFillerParticleLayout_Execute( void* spaceFillerParticleLayout, void* data ) {	
 }
 void _SpaceFillerParticleLayout_Destroy( void* spaceFillerParticleLayout, void* data ) {	
+   SpaceFillerParticleLayout* self = (SpaceFillerParticleLayout*)spaceFillerParticleLayout;
+   int dim_I;
+   
+   for ( dim_I = 0 ; dim_I < self->dim ; dim_I++ ) 
+      Stg_Class_Delete( self->sobolGenerator[ dim_I ] );
+
+   _GlobalParticleLayout_Destroy( self, data );
 }
 
 void _SpaceFillerParticleLayout_InitialiseParticles( void* spaceFillerParticleLayout, void* swarm ) {

@@ -132,7 +132,7 @@ void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data
    sprintf( output_file, "%s/%s.%05d.dat", context->outputPath, swarm->name, context->timeStep );
 #endif
    /* create a fileParticleLayout to load files from file */
-   fileParticleLayout = FileParticleLayout_New( "fileParticleLayout", output_file, data->nProcs );
+   fileParticleLayout = FileParticleLayout_New( "fileParticleLayout", NULL, GlobalCoordSystem, False, 0, 0.0, output_file, data->nProcs );
    Stg_Component_AssignFromXML( fileParticleLayout, cf, 0, False );
    
    newSwarm = Swarm_New( "testSwarm2", (ElementCellLayout*) LiveComponentRegister_Get( context->CF->LCRegister, "elementCellLayout" ),

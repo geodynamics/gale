@@ -54,14 +54,19 @@
 
 	struct UnionParticleLayout { __UnionParticleLayout };
 	
-	/* Create a new UnionParticleLayout and initialise */
-	UnionParticleLayout* UnionParticleLayout_New( 
-		Name                                             name, 
-		GlobalParticleLayout**                           particleLayoutList,
-		Index                                            particleLayoutCount );
+   /* Create a new UnionParticleLayout and initialise */
+   UnionParticleLayout* UnionParticleLayout_New(
+		Name             name, 
+      AbstractContext* context, 
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int     totalInitialParticles, 
+      double           averageInitialParticlesPerCell,
+		GlobalParticleLayout** particleLayoutList,
+		Index                  particleLayoutCount );
 	
-	/* Creation implementation / Virtual constructor */
-	UnionParticleLayout* _UnionParticleLayout_New( 
+   /* Creation implementation / Virtual constructor */
+   UnionParticleLayout* _UnionParticleLayout_New( 
 		SizeT                                            _sizeOfSelf,
 		Type                                             type,
 		Stg_Class_DeleteFunction*                        _delete,
@@ -73,14 +78,18 @@
 		Stg_Component_InitialiseFunction*                _initialise,
 		Stg_Component_ExecuteFunction*                   _execute,
 		Stg_Component_DestroyFunction*                   _destroy,
+		Name                                             name,
+      AllocationType                                   nameAllocationType,
 		ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
 		ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
+      CoordSystem                                      coordSystem,
+      Bool                                             weightsInitialisedAtStartup,
 		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-		Name                                             name,
-		Bool                                             initFlag,
+      Particle_Index                                   totalInitialParticles,
+      double                                           averageInitialParticlesPerCell,
 		GlobalParticleLayout**                           particleLayoutList,
 		Index                                            particleLayoutCount );
-	
+
 	void _UnionParticleLayout_Init( 
 		void*                                            unionParticleLayout, 
 		GlobalParticleLayout**                           particleLayoutList,

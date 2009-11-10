@@ -136,7 +136,9 @@ void SwarmSuite_Setup( SwarmSuiteData* data ) {
 	data->mesh = SwarmSuite_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, data->extensionMgr_Register );
 	
 	/* Configure the random-particle-layout */
-	data->randomParticleLayout = RandomParticleLayout_New( "randomParticleCellLayout", 4, 13 );
+	data->randomParticleLayout = RandomParticleLayout_New( "randomParticleCellLayout", NULL, 
+         GlobalCoordSystem, False, 
+         4, 13 );
 	
 	/* Configure the element-cell-layout */
 	data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", data->mesh );

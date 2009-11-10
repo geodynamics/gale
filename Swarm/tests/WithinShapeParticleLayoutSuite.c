@@ -127,7 +127,8 @@ void WithinShapeParticleLayoutSuite_TestWithinShapeSphere( WithinShapeParticleLa
 		shape = (Stg_Shape*)Sphere_New( "testSphere", nDims, centre, 0, 0, 0, 0.05 );
 
 		/* Configure the gauss-particle-layout */
-		particleLayout = WithinShapeParticleLayout_New( "withinShapeParticleLayoutSphere", nDims, particleCount, shape );
+		particleLayout = WithinShapeParticleLayout_New( "withinShapeParticleLayoutSphere", NULL, 
+            GlobalCoordSystem, False, particleCount, 0.0, nDims, shape );
 	
 		/* Configure the swarm */
 		swarm = Swarm_New( "testSwarm", elementCellLayout, particleLayout, nDims, sizeof(Particle),

@@ -55,40 +55,52 @@
 
 const Type GaussBorderParticleLayout_Type = "GaussBorderParticleLayout";
 
-GaussBorderParticleLayout* GaussBorderParticleLayout_New( Name name, Dimension_Index dim, Particle_InCellIndex* particlesPerDim ) {
+GaussBorderParticleLayout* GaussBorderParticleLayout_New( 
+   Name name,
+   AbstractContext* context,
+   CoordSystem      coordSystem,
+   Bool             weightsInitialisedAtStartup,
+   Dimension_Index dim, 
+   Particle_InCellIndex* particlesPerDim ) {
+
 	GaussBorderParticleLayout* self = _GaussBorderParticleLayout_DefaultNew( name );
 
-	_GaussBorderParticleLayout_Init( self, dim, particlesPerDim );
+   _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
+   _PerCellParticleLayout_Init( self );
+   _GaussParticleLayout_Init( self, dim, particlesPerDim );
+	_GaussBorderParticleLayout_Init( self );
 
 	return self;
 }
 
 GaussBorderParticleLayout* _GaussBorderParticleLayout_New( 
-		SizeT                                                       _sizeOfSelf,
-		Type                                                        type,
-		Stg_Class_DeleteFunction*                                   _delete,
-		Stg_Class_PrintFunction*                                    _print,
-		Stg_Class_CopyFunction*                                     _copy,
-		Stg_Component_DefaultConstructorFunction*                   _defaultConstructor,
-		Stg_Component_ConstructFunction*                            _construct,
-		Stg_Component_BuildFunction*                                _build,
-		Stg_Component_InitialiseFunction*                           _initialise,
-		Stg_Component_ExecuteFunction*                              _execute,
-		Stg_Component_DestroyFunction*                              _destroy,
-		ParticleLayout_SetInitialCountsFunction*                    _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles,
-		PerCellParticleLayout_InitialCountFunction*                 _initialCount,
-		PerCellParticleLayout_InitialiseParticlesOfCellFunction*    _initialiseParticlesOfCell,
-		Name                                                        name,
-		Bool                                                        initFlag,
-		Dimension_Index                                             dim,
-		Particle_InCellIndex*                                       particlesPerDim )
+      SizeT                                        _sizeOfSelf,
+		Type                                         type,
+		Stg_Class_DeleteFunction*                    _delete,
+		Stg_Class_PrintFunction*                     _print,
+		Stg_Class_CopyFunction*                      _copy,
+		Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
+		Stg_Component_ConstructFunction*             _construct,
+		Stg_Component_BuildFunction*                 _build,
+		Stg_Component_InitialiseFunction*            _initialise,
+		Stg_Component_ExecuteFunction*               _execute,
+		Stg_Component_DestroyFunction*               _destroy,
+      Name                                         name,
+      AllocationType                               nameAllocationType,
+      ParticleLayout_SetInitialCountsFunction*     _setInitialCounts,
+      ParticleLayout_InitialiseParticlesFunction*  _initialiseParticles,
+      CoordSystem                                  coordSystem,
+      Bool                                         weightsInitialisedAtStartup,
+      PerCellParticleLayout_InitialCountFunction*  _initialCount,
+      PerCellParticleLayout_InitialiseParticlesOfCellFunction* _initialiseParticlesOfCell,
+		Dimension_Index                              dim,
+		Particle_InCellIndex*                        particlesPerDim )
 {
 	GaussBorderParticleLayout* self;
 	
 	/* Allocate memory */
 	self = (GaussBorderParticleLayout*)_GaussParticleLayout_New( 
-		_sizeOfSelf, 
+      _sizeOfSelf, 
 		type,
 		_delete,
 		_print,
@@ -99,37 +111,27 @@ GaussBorderParticleLayout* _GaussBorderParticleLayout_New(
 		_initialise,
 		_execute,
 		_destroy,
-		_setInitialCounts,
-		_initialiseParticles,
-		_initialCount,
-		_initialiseParticlesOfCell,
-		name,
-		initFlag,
-		LocalCoordSystem,
-		True );
+      name, nameAllocationType,
+		_setInitialCounts, _initialiseParticles,
+      coordSystem, weightsInitialisedAtStartup,
+		_initialCount, _initialiseParticlesOfCell,
+     0, NULL );
 
-	self->particlesPerFace = Memory_Alloc_Array_Unnamed( Particle_InCellIndex, 6); // up to 6 faces (3d case)
-	
-	if( initFlag ) {
-		_GaussBorderParticleLayout_Init( self, dim, particlesPerDim );
-	}
 	
 	return self;
 }
 
 
-void _GaussBorderParticleLayout_Init( void* gaussBorderParticleLayout, Dimension_Index dim, Particle_InCellIndex* particlesPerDim ) {
+void _GaussBorderParticleLayout_Init( void* gaussBorderParticleLayout ) {
 	GaussBorderParticleLayout* self = (GaussBorderParticleLayout*)gaussBorderParticleLayout;
 
-	_GaussParticleLayout_Init( self, dim, particlesPerDim );
-
+	self->particlesPerFace = Memory_Alloc_Array_Unnamed( Particle_InCellIndex, 6); // up to 6 faces (3d case)
 	_GaussBorderParticleLayout_InitialiseParticlesPerFace( self );
 }
 
 void _GaussBorderParticleLayout_Delete( void* gaussBorderParticleLayout ) {
 	GaussBorderParticleLayout* self = (GaussBorderParticleLayout*)gaussBorderParticleLayout;
 	
-	Memory_Free( self->particlesPerFace );
 	_GaussParticleLayout_Delete( self );
 }
 
@@ -180,34 +182,20 @@ void* _GaussBorderParticleLayout_DefaultNew( Name name ) {
 			_GaussBorderParticleLayout_Initialise,
 			_GaussBorderParticleLayout_Execute,
 			_GaussBorderParticleLayout_Destroy, 
-			_PerCellParticleLayout_SetInitialCounts,
-			_PerCellParticleLayout_InitialiseParticles,
-			_GaussBorderParticleLayout_InitialCount,
-			_GaussBorderParticleLayout_InitialiseParticlesOfCell,
-			name, 
-			False,    
+         name, NON_GLOBAL,
+			_PerCellParticleLayout_SetInitialCounts, _PerCellParticleLayout_InitialiseParticles,
+         LocalCoordSystem, True,
+         _GaussParticleLayout_InitialCount, _GaussParticleLayout_InitialiseParticlesOfCell,
 			0       /* dim */,
 			NULL    /* particlesPerDim */ );
 }
 
 void _GaussBorderParticleLayout_AssignFromXML( void* gaussBorderParticleLayout, Stg_ComponentFactory* cf, void* data ) {
 	GaussBorderParticleLayout*   self = (GaussBorderParticleLayout*)gaussBorderParticleLayout;
-	Particle_InCellIndex   particlesPerDim[3];
-	Particle_InCellIndex   defaultVal;
-	Dimension_Index        dim;
 
-	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
+   _GaussParticleLayout_AssignFromXML( self, cf, data );
 
-	defaultVal = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "gaussParticles", 2 );
-
-	particlesPerDim[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "gaussParticlesX", defaultVal );
-	particlesPerDim[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "gaussParticlesY", defaultVal );
-	if ( dim == 3 )
-		particlesPerDim[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "gaussParticlesZ", defaultVal );
-	else
-		particlesPerDim[ K_AXIS ] = 1;	
-
-	_GaussBorderParticleLayout_Init( self, dim, particlesPerDim );
+	_GaussBorderParticleLayout_Init( self );
 }
 	
 void _GaussBorderParticleLayout_Build( void* gaussBorderParticleLayout, void* data ) {
@@ -220,6 +208,10 @@ void _GaussBorderParticleLayout_Execute( void* gaussBorderParticleLayout, void* 
 }
 
 void _GaussBorderParticleLayout_Destroy( void* gaussBorderParticleLayout, void* data ) {
+   GaussBorderParticleLayout* self   = (GaussBorderParticleLayout*)gaussBorderParticleLayout;
+
+   Memory_Free( self->particlesPerFace );
+   _GaussBorderParticleLayout_Destroy( self, data );
 }
 
 Particle_InCellIndex _GaussBorderParticleLayout_InitialCount( void* gaussBorderParticleLayout, void* celllayout, Cell_Index cell_I )

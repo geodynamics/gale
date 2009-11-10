@@ -53,42 +53,54 @@ const Type RandomParticleLayout_Type = "RandomParticleLayout";
 
 
 RandomParticleLayout* RandomParticleLayout_New( 
-		Name                 name, 
-		Particle_InCellIndex cellParticleCount, 
-		unsigned int         seed ) 
+   Name name, 
+   AbstractContext* context,
+   CoordSystem      coordSystem,
+   Bool             weightsInitialisedAtStartup,
+   Particle_InCellIndex cellParticleCount, 
+   unsigned int         seed ) 
 {
 	RandomParticleLayout* self = (RandomParticleLayout*) _RandomParticleLayout_DefaultNew( name );
+   _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
+   _PerCellParticleLayout_Init( self );
 	_RandomParticleLayout_Init( self, cellParticleCount, seed );
 
 	return self;
 }
 
 RandomParticleLayout* _RandomParticleLayout_New( 
-		SizeT                                                       _sizeOfSelf,
-		Type                                                        type,
-		Stg_Class_DeleteFunction*                                   _delete,
-		Stg_Class_PrintFunction*                                    _print,
-		Stg_Class_CopyFunction*                                     _copy,
-		Stg_Component_DefaultConstructorFunction*                   _defaultConstructor,
-		Stg_Component_ConstructFunction*                            _construct,
-		Stg_Component_BuildFunction*                                _build,
-		Stg_Component_InitialiseFunction*                           _initialise,
-		Stg_Component_ExecuteFunction*                              _execute,
-		Stg_Component_DestroyFunction*                              _destroy,
-		ParticleLayout_SetInitialCountsFunction*                    _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles,
-		PerCellParticleLayout_InitialCountFunction*                 _initialCount,
-		PerCellParticleLayout_InitialiseParticlesOfCellFunction*    _initialiseParticlesOfCell,
-		Name                                                        name,
-		Bool                                                         initFlag,
-		Particle_InCellIndex                                        cellParticleCount,
-		unsigned int                                                seed )
+      SizeT                                        _sizeOfSelf,
+      Type                                         type,
+      Stg_Class_DeleteFunction*                    _delete,
+      Stg_Class_PrintFunction*                     _print,
+      Stg_Class_CopyFunction*                      _copy,
+      Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
+      Stg_Component_ConstructFunction*             _construct,
+      Stg_Component_BuildFunction*                 _build,
+      Stg_Component_InitialiseFunction*            _initialise,
+      Stg_Component_ExecuteFunction*               _execute,
+      Stg_Component_DestroyFunction*               _destroy,
+      Name                                         name,
+      AllocationType                               nameAllocationType,
+      ParticleLayout_SetInitialCountsFunction*     _setInitialCounts,
+      ParticleLayout_InitialiseParticlesFunction*  _initialiseParticles,
+      CoordSystem                                  coordSystem,
+      Bool                                         weightsInitialisedAtStartup,
+      PerCellParticleLayout_InitialCountFunction*  _initialCount,
+      PerCellParticleLayout_InitialiseParticlesOfCellFunction* _initialiseParticlesOfCell,
+		Particle_InCellIndex                         cellParticleCount,
+		unsigned int                                 seed )
 {
 	RandomParticleLayout* self;
 	
+   /* hard-wire these */
+   coordSystem = GlobalCoordSystem;
+   weightsInitialisedAtStartup = False;
+   nameAllocationType = NON_GLOBAL;
+
 	/* Allocate memory */
 	self = (RandomParticleLayout*)_PerCellParticleLayout_New( 
-		_sizeOfSelf, 
+      _sizeOfSelf, 
 		type,
 		_delete,
 		_print,
@@ -99,19 +111,11 @@ RandomParticleLayout* _RandomParticleLayout_New(
 		_initialise,
 		_execute,
 		_destroy,
-		_setInitialCounts,
-		_initialiseParticles,
-		_initialCount,
-		_initialiseParticlesOfCell,
-		name,
-		initFlag,
-		GlobalCoordSystem,
-		False );
+      name, nameAllocationType,
+		_setInitialCounts, _initialiseParticles,
+      coordSystem, weightsInitialisedAtStartup,
+		_initialCount, _initialiseParticlesOfCell );
 
-	if ( initFlag ) {
-		_RandomParticleLayout_Init( self, cellParticleCount, seed );
-	}
-	
 	return self;
 }
 
@@ -123,8 +127,6 @@ void _RandomParticleLayout_Init( void* randomParticleLayout, Particle_InCellInde
 	self->seed              = seed;
 	
 	Swarm_Random_Seed( self->seed );
-
-	_PerCellParticleLayout_Init( randomParticleLayout, GlobalCoordSystem, False );
 }
 
 
@@ -179,12 +181,10 @@ void* _RandomParticleLayout_DefaultNew( Name name ) {
 			_RandomParticleLayout_Initialise,
 			_RandomParticleLayout_Execute,
 			_RandomParticleLayout_Destroy,
-			_PerCellParticleLayout_SetInitialCounts,
-			_PerCellParticleLayout_InitialiseParticles,
-			_RandomParticleLayout_InitialCount,
-			_RandomParticleLayout_InitialiseParticlesOfCell, 
-			name,
-			False,
+         name, NON_GLOBAL,
+			_PerCellParticleLayout_SetInitialCounts, _PerCellParticleLayout_InitialiseParticles,
+         GlobalCoordSystem, False,
+			_RandomParticleLayout_InitialCount, _RandomParticleLayout_InitialiseParticlesOfCell, 
 			0, /* cellParticleCount */
 			0  /* seed */ );
 }
@@ -193,6 +193,8 @@ void _RandomParticleLayout_AssignFromXML( void* randomParticleLayout, Stg_Compon
 	RandomParticleLayout*       self = (RandomParticleLayout*)randomParticleLayout;
 	Particle_InCellIndex        cellParticleCount;
 	unsigned int                seed;
+
+   _PerCellParticleLayout_AssignFromXML( self, cf, data );
 
 	cellParticleCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "cellParticleCount", 0 );
 	seed = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "seed", 13 );
@@ -213,7 +215,9 @@ void _RandomParticleLayout_Execute( void* randomParticleLayout, void* data ) {
 }
 	
 void _RandomParticleLayout_Destroy( void* randomParticleLayout, void* data ) {
-	
+   RandomParticleLayout* self = (RandomParticleLayout*)randomParticleLayout;
+
+   _PerCellParticleLayout_Destroy( self, data );
 }
 
 

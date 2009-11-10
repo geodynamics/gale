@@ -58,20 +58,23 @@
 	struct WithinShapeParticleLayout { __WithinShapeParticleLayout };
 	
 	/* Create a new WithinShapeParticleLayout and initialise */
-	
-	WithinShapeParticleLayout* WithinShapeParticleLayout_New( 
-			Name                    name, 
-			Dimension_Index         dim, 
-			Particle_Index          totalInitialParticles, 
-			Stg_Shape*              shape );
-	
+WithinShapeParticleLayout* WithinShapeParticleLayout_New(
+      Name             name,
+      AbstractContext* context, 
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int     totalInitialParticles, 
+      double           averageInitialParticlesPerCell,
+      Dimension_Index  dim,
+		Stg_Shape*       shape ); 
+
 	/* Creation implementation / Virtual constructor */
-	WithinShapeParticleLayout* _WithinShapeParticleLayout_New( 
+WithinShapeParticleLayout* _WithinShapeParticleLayout_New( 
 		SizeT                                            _sizeOfSelf,
 		Type                                             type,
 		Stg_Class_DeleteFunction*                        _delete,
 		Stg_Class_PrintFunction*                         _print,
-		Stg_Class_CopyFunction*                          _copy, 
+		Stg_Class_CopyFunction*                          _copy,
 		Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
 		Stg_Component_ConstructFunction*                 _construct,
 		Stg_Component_BuildFunction*                     _build,
@@ -81,18 +84,17 @@
 		ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
 		ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
 		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-		Name                                             name,
-		Bool                                             initFlag,
-		Dimension_Index                                  dim, 
-		Particle_Index                                   totalInitialParticles, 
-		double                                           averageInitialParticlesPerCell,
+      Name                                             name,
+      AllocationType                                   nameAllocationType,
+      CoordSystem                                      coordSystem,
+      Bool                                             weightsInitialisedAtStartup,
+      Particle_Index                                   totalInitialParticles,
+      double                                           averageInitialParticlesPerCell,
+      Dimension_Index                                  dim,
 		Stg_Shape*                                       shape );
 	
 	void _WithinShapeParticleLayout_Init( 
 			void*                   withinShapeParticleLayout, 
-			Dimension_Index         dim, 
-			Particle_Index          totalInitialParticles, 
-			double                  averageInitialParticlesPerCell,
 			Stg_Shape*              shape );
 
 	/* 'Stg_Class' Stuff */

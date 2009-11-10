@@ -54,37 +54,52 @@
 
 const Type GaussParticleLayout_Type = "GaussParticleLayout";
 
-GaussParticleLayout* GaussParticleLayout_New( Name name, Dimension_Index dim, Particle_InCellIndex* particlesPerDim ) {
-	GaussParticleLayout* self = _GaussParticleLayout_DefaultNew( name );
+GaussParticleLayout* GaussParticleLayout_New( 
+   Name name, 
+   AbstractContext* context,
+   CoordSystem      coordSystem,
+   Bool             weightsInitialisedAtStartup,
+   Dimension_Index dim, 
+   Particle_InCellIndex* particlesPerDim ) {
 
-	_GaussParticleLayout_Init( self, dim, particlesPerDim );
+   GaussParticleLayout* self = _GaussParticleLayout_DefaultNew( name );
+   _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
+   _PerCellParticleLayout_Init( self );
+   _GaussParticleLayout_Init( self, dim, particlesPerDim );
 
-	return self;
+   return self;
 }
 
 GaussParticleLayout* _GaussParticleLayout_New( 
-		SizeT                                                       _sizeOfSelf,
-		Type                                                        type,
-		Stg_Class_DeleteFunction*                                   _delete,
-		Stg_Class_PrintFunction*                                    _print,
-		Stg_Class_CopyFunction*                                     _copy,
-		Stg_Component_DefaultConstructorFunction*                   _defaultConstructor,
-		Stg_Component_ConstructFunction*                            _construct,
-		Stg_Component_BuildFunction*                                _build,
-		Stg_Component_InitialiseFunction*                           _initialise,
-		Stg_Component_ExecuteFunction*                              _execute,
-		Stg_Component_DestroyFunction*                              _destroy,
-		ParticleLayout_SetInitialCountsFunction*                    _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles,
-		PerCellParticleLayout_InitialCountFunction*                 _initialCount,
-		PerCellParticleLayout_InitialiseParticlesOfCellFunction*    _initialiseParticlesOfCell,
-		Name                                                        name,
-		Bool                                                        initFlag,
-		Dimension_Index                                             dim,
-		Particle_InCellIndex*                                       particlesPerDim )
+      SizeT                                        _sizeOfSelf,
+      Type                                         type,
+      Stg_Class_DeleteFunction*                    _delete,
+      Stg_Class_PrintFunction*                     _print,
+      Stg_Class_CopyFunction*                      _copy,
+      Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
+      Stg_Component_ConstructFunction*             _construct,
+      Stg_Component_BuildFunction*                 _build,
+      Stg_Component_InitialiseFunction*            _initialise,
+      Stg_Component_ExecuteFunction*               _execute,
+      Stg_Component_DestroyFunction*               _destroy,
+      Name                                         name,
+      AllocationType                               nameAllocationType,
+      ParticleLayout_SetInitialCountsFunction*     _setInitialCounts,
+      ParticleLayout_InitialiseParticlesFunction*  _initialiseParticles,
+      CoordSystem                                  coordSystem,
+      Bool                                         weightsInitialisedAtStartup,
+      PerCellParticleLayout_InitialCountFunction*  _initialCount,
+      PerCellParticleLayout_InitialiseParticlesOfCellFunction* _initialiseParticlesOfCell,
+      Dimension_Index                              dim,
+      Particle_InCellIndex*                        particlesPerDim )
 {
 	GaussParticleLayout* self;
 	
+   /* hard-wire these */
+   coordSystem = LocalCoordSystem;
+   weightsInitialisedAtStartup = True;
+   nameAllocationType = NON_GLOBAL;
+
 	/* Allocate memory */
 	self = (GaussParticleLayout*)_PerCellParticleLayout_New( 
 		_sizeOfSelf, 
@@ -98,18 +113,14 @@ GaussParticleLayout* _GaussParticleLayout_New(
 		_initialise,
 		_execute,
 		_destroy,
-		_setInitialCounts,
-		_initialiseParticles,
-		_initialCount,
-		_initialiseParticlesOfCell,
-		name,
-		initFlag,
-		LocalCoordSystem,
-		True );
-	
-	if( initFlag ) {
-		_GaussParticleLayout_Init( self, dim, particlesPerDim );
-	}
+      name, nameAllocationType,
+		_setInitialCounts, _initialiseParticles,
+      coordSystem, weightsInitialisedAtStartup,
+		_initialCount, _initialiseParticlesOfCell );
+
+   self->dim = dim;
+   if( particlesPerDim )
+     memcpy( self->particlesPerDim, particlesPerDim, 3 * sizeof(Particle_InCellIndex) );
 	
 	return self;
 }
@@ -120,8 +131,6 @@ void _GaussParticleLayout_Init( void* gaussParticleLayout, Dimension_Index dim, 
 	self->isConstructed       = True;
 	self->dim                 = dim;
 	memcpy( self->particlesPerDim, particlesPerDim, 3 * sizeof(Particle_InCellIndex) );
-
-	_PerCellParticleLayout_Init( self, LocalCoordSystem, True );
 }
 
 void _GaussParticleLayout_Delete( void* gaussParticleLayout ) {
@@ -174,13 +183,11 @@ void* _GaussParticleLayout_DefaultNew( Name name ) {
 			_GaussParticleLayout_Initialise,
 			_GaussParticleLayout_Execute,
 			_GaussParticleLayout_Destroy, 
-			_PerCellParticleLayout_SetInitialCounts,
-			_PerCellParticleLayout_InitialiseParticles,
-			_GaussParticleLayout_InitialCount,
-			_GaussParticleLayout_InitialiseParticlesOfCell,
-			name, 
-			False,    
-			0       /* dim */,
+         name, NON_GLOBAL,
+			_PerCellParticleLayout_SetInitialCounts, _PerCellParticleLayout_InitialiseParticles,
+         LocalCoordSystem, True,
+         _GaussParticleLayout_InitialCount, _GaussParticleLayout_InitialiseParticlesOfCell,
+			0,     /*dim */
 			NULL    /* particlesPerDim */ );
 }
 
@@ -190,9 +197,7 @@ void _GaussParticleLayout_AssignFromXML( void* gaussParticleLayout, Stg_Componen
 	Particle_InCellIndex   defaultVal;
 	Dimension_Index        dim;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+   _PerCellParticleLayout_AssignFromXML( self, cf, data );
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 

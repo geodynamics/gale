@@ -49,11 +49,19 @@
 const Type UnionParticleLayout_Type = "UnionParticleLayout";
 
 UnionParticleLayout* UnionParticleLayout_New(
-		Name                                             name, 
-		GlobalParticleLayout**                           particleLayoutList,
-		Index                                            particleLayoutCount )
+		Name             name, 
+      AbstractContext* context, 
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int     totalInitialParticles, 
+      double           averageInitialParticlesPerCell,
+		GlobalParticleLayout** particleLayoutList,
+		Index                  particleLayoutCount )
 {
 	UnionParticleLayout* self = (UnionParticleLayout*) _UnionParticleLayout_DefaultNew( name );
+
+   _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
+   _GlobalParticleLayout_Init( self, totalInitialParticles, averageInitialParticlesPerCell );
 	_UnionParticleLayout_Init( self, particleLayoutList, particleLayoutCount );
 	return self;
 }
@@ -70,11 +78,15 @@ UnionParticleLayout* _UnionParticleLayout_New(
 		Stg_Component_InitialiseFunction*                _initialise,
 		Stg_Component_ExecuteFunction*                   _execute,
 		Stg_Component_DestroyFunction*                   _destroy,
+		Name                                             name,
+      AllocationType                                   nameAllocationType,
 		ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
 		ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
+      CoordSystem                                      coordSystem,
+      Bool                                             weightsInitialisedAtStartup,
 		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-		Name                                             name,
-		Bool                                             initFlag,
+      Particle_Index                                   totalInitialParticles,
+      double                                           averageInitialParticlesPerCell,
 		GlobalParticleLayout**                           particleLayoutList,
 		Index                                            particleLayoutCount )
 {
@@ -93,19 +105,18 @@ UnionParticleLayout* _UnionParticleLayout_New(
 		_initialise,
 		_execute,
 		_destroy,
+		name,
+      nameAllocationType,
 		_setInitialCounts,
 		_initialiseParticles,
+      coordSystem,
+      weightsInitialisedAtStartup,
 		_initialiseParticle,
-		name,
-		initFlag,
-		GlobalCoordSystem,
-		False,
-		0,
-		0 );
+      totalInitialParticles,
+      averageInitialParticlesPerCell );
 
-	if ( initFlag ) {
-		_UnionParticleLayout_Init( self, particleLayoutList, particleLayoutCount );
-	}
+   self->particleLayoutList = particleLayoutList;
+   self->particleLayoutCount = particleLayoutCount;
 
 	return self;
 }
@@ -120,8 +131,6 @@ void _UnionParticleLayout_Init(
 	
 	self->particleLayoutList = particleLayoutList;
 	self->particleLayoutCount = particleLayoutCount;
-
-	_GlobalParticleLayout_Init( self, GlobalCoordSystem, False, 0, 0 );
 }
 
 
@@ -169,13 +178,13 @@ void* _UnionParticleLayout_DefaultNew( Name name ) {
 			_UnionParticleLayout_Initialise,
 			_UnionParticleLayout_Execute,
 			_UnionParticleLayout_Destroy,
+         name, NON_GLOBAL, 
 			_UnionParticleLayout_SetInitialCounts,
 			_UnionParticleLayout_InitialiseParticles,
+         GlobalCoordSystem, False,
 			_UnionParticleLayout_InitialiseParticle,
-			name,
-			False,
-			NULL,
-			0 );
+         0, 0.0,
+         NULL, 0 );
 }
 
 
@@ -184,10 +193,8 @@ void _UnionParticleLayout_AssignFromXML( void* unionParticleLayout, Stg_Componen
 	GlobalParticleLayout** particleLayoutList;
 	Index                  particleLayoutCount;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
-
+   _GlobalParticleLayout_AssignFromXML( self, cf, data );
+	
 	particleLayoutList = Stg_ComponentFactory_ConstructByList( 
 		cf, 
 		self->name, 
@@ -208,6 +215,9 @@ void _UnionParticleLayout_Initialise( void* unionParticleLayout, void* data ) {
 void _UnionParticleLayout_Execute( void* unionParticleLayout, void* data ) {	
 }
 void _UnionParticleLayout_Destroy( void* unionParticleLayout, void* data ) {	
+	UnionParticleLayout* self     = (UnionParticleLayout*)unionParticleLayout;
+
+   _GlobalParticleLayout_Destroy( self, data );
 }
 
 void _UnionParticleLayout_SetInitialCounts( void* unionParticleLayout, void* _swarm ) {

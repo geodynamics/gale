@@ -148,7 +148,8 @@ void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData
 		Stg_Component_Initialise( mesh, 0, False );
 	
 		/* Configure the gauss-particle-layout */
-		particleLayout = ManualParticleLayout_New( "manualParticleLayout", dictionary );
+		particleLayout = ManualParticleLayout_New( "manualParticleLayout", NULL, GlobalCoordSystem, False,
+         0, 0.0, dictionary );
 	
 		swarm = Swarm_New( "manualParticleSwarm", elementCellLayout, particleLayout, dim, sizeof(Particle),
 			extensionMgr_Register, NULL, data->comm, NULL );
