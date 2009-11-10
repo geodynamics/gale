@@ -94,6 +94,9 @@ void _Underworld_EulerDeform_AssignFromXML( void* component, Stg_ComponentFactor
 	memset( edCtx, 0, sizeof(EulerDeform_Context) );
 	edCtx->ctx = (AbstractContext*)uwCtx;
 
+        /* Get the time integrator. */
+        uwCtx->timeIntegrator = Stg_ComponentFactory_ConstructByName( cf, "timeIntegrator", TimeIntegrator, True, data );
+
 	/* Grab the ArtDisplacementField from the dictionary */
 	edCtx->artDField = Stg_ComponentFactory_ConstructByName( cf, "ArtDisplacementField", FeVariable, False, data );
 }
@@ -213,12 +216,12 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 		Stg_Component_Build( crdVar, data, False );
 
 		tiData[0] = (Stg_Component*)sys->velField;
-		//tiData[1] = (Stg_Component*)&sys->mesh->verts;
+		tiData[1] = (Stg_Component*)&sys->mesh->verts;
 		crdAdvector = TimeIntegratee_New( "EulerDeform_Velocity",
-                    uwCtx,
+                                                  uwCtx,
 						  uwCtx->timeIntegrator, 
 						  crdVar, 
-						  1, 
+						  2,
 						  tiData,
 						  True /* Presume we need to allow fallback on edges of
 							  stretching mesh - PatrickSunter, 7 June 2006 */ );
