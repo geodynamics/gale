@@ -120,8 +120,8 @@ FieldTest* _FieldTest_New(
 void _FieldTest_Delete( void* fieldTest ) {
 	FieldTest* 	self 	= (FieldTest*)fieldTest;
 	
-	if( self->integrationSwarm ) Stg_Class_Delete( self->integrationSwarm );
-
+	/*if( self->integrationSwarm ) Stg_Class_Delete( self->integrationSwarm );*/
+        /*
 	if( self->fieldCount ) {
 		Memory_Free( self->gAnalyticSq );
 		Memory_Free( self->gErrorSq    );
@@ -143,6 +143,7 @@ void _FieldTest_Delete( void* fieldTest ) {
 	Memory_Free( self->expectedFileName );
 	Memory_Free( self->expectedFilePath );
 	Memory_Free( self->dumpExpectedFileName );
+        */
 	
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
