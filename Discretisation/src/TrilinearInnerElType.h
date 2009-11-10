@@ -77,7 +77,7 @@
 	
 	
 	/* Create a new TrilinearInnerElType and initialise */
-	void* TrilinearInnerElTypea_DefaultNew( Name name );
+	void* _TrilinearInnerElTypea_DefaultNew( Name name );
 
 	TrilinearInnerElType* TrilinearInnerElType_New( Name name );
 	

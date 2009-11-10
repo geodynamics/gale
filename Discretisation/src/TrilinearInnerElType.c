@@ -42,39 +42,57 @@
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
+
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
 #include "ElementType.h"
 #include "TrilinearInnerElType.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 
 const Type TrilinearInnerElType_Type = "TrilinearInnerElType";
+
 #define _TrilinearInnerElType_NodeCount 4
 
-void* TrilinearInnerElType_DefaultNew( Name name ) {
-	return _TrilinearInnerElType_New( sizeof(TrilinearInnerElType), TrilinearInnerElType_Type, _TrilinearInnerElType_Delete,
-		_TrilinearInnerElType_Print, NULL, TrilinearInnerElType_DefaultNew, _TrilinearInnerElType_AssignFromXML,
-		_TrilinearInnerElType_Build, _TrilinearInnerElType_Initialise, _TrilinearInnerElType_Execute, NULL,
-		name, NON_GLOBAL, _TrilinearInnerElType_SF_allNodes, 
+void* _TrilinearInnerElType_DefaultNew( Name name ) {
+	return _TrilinearInnerElType_New(
+		sizeof(TrilinearInnerElType),
+		TrilinearInnerElType_Type,
+		_TrilinearInnerElType_Delete,
+		_TrilinearInnerElType_Print,
+		NULL,
+		_TrilinearInnerElType_DefaultNew,
+		_TrilinearInnerElType_AssignFromXML,
+		_TrilinearInnerElType_Build,
+		_TrilinearInnerElType_Initialise,
+		_TrilinearInnerElType_Execute,
+		_TrilinearInnerElType_Destroy,
+		name,
+		NON_GLOBAL,
+		_TrilinearInnerElType_SF_allNodes, 
 		_TrilinearInnerElType_SF_allLocalDerivs_allNodes,
-		_ElementType_ConvertGlobalCoordToElLocal, _ElementType_JacobianDeterminantSurface,
-		_TrilinearInnerElType_SurfaceNormal, _TrilinearInnerElType_NodeCount );
+		_ElementType_ConvertGlobalCoordToElLocal,
+		_ElementType_JacobianDeterminantSurface,
+		_TrilinearInnerElType_SurfaceNormal,
+		_TrilinearInnerElType_NodeCount );
 }
 
 TrilinearInnerElType* TrilinearInnerElType_New( Name name ) {
-	TrilinearInnerElType* self = TrilinearInnerElType_DefaultNew( name );
+	TrilinearInnerElType* self = _TrilinearInnerElType_DefaultNew( name );
 
 	self->isConstructed = True;
-	_ElementType_Init( self, _TrilinearInnerElType_NodeCount );
+	_ElementType_Init( (ElementType*)self, _TrilinearInnerElType_NodeCount );
 	_TrilinearInnerElType_Init( self );
+
+	return self;
 }
 
 TrilinearInnerElType* _TrilinearInnerElType_New( TRILINEARINNERELTYPE_DEFARGS ) {
-	TrilinearInnerElType*		self;
+	TrilinearInnerElType* self;
 	
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(TrilinearInnerElType) );
@@ -88,8 +106,6 @@ TrilinearInnerElType* _TrilinearInnerElType_New( TRILINEARINNERELTYPE_DEFARGS ) 
 	
 	return self;
 }
-
-
 
 void _TrilinearInnerElType_Init( TrilinearInnerElType* self ) {
 	Dimension_Index dim_I=0;
@@ -121,7 +137,11 @@ void _TrilinearInnerElType_Delete( void* elementType ) {
 	TrilinearInnerElType* self = (TrilinearInnerElType*)elementType;
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 
-	FreeArray( self->tetInds );
+	/* Check if this object is already destroyed; if not
+		it calls its own destroy function. */
+	if( !self->isDestroyed ) {
+		_TrilinearInnerElType_Destroy( self, NULL );
+	}
 	
 	/* Stg_Class_Delete parent*/
 	_ElementType_Delete( self );
@@ -157,7 +177,11 @@ void _TrilinearInnerElType_Execute( void* elementType, void *data ){
 }
 	
 void _TrilinearInnerElType_Destroy( void* elementType, void *data ){
+	TrilinearInnerElType* self = (TrilinearInnerElType*)elementType;
 	
+	FreeArray( self->tetInds );
+
+	_ElementType_Destroy( self, NULL );
 }
 
 void _TrilinearInnerElType_Build( void* elementType, void *data ) {

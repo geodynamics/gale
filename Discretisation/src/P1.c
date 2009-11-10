@@ -49,28 +49,28 @@ const Type P1_Type = "P1";
 
 P1* P1_New( Name name ) {
 	return _P1_New( sizeof(P1), 
-			P1_Type, 
-			_P1_Delete, 
-			_P1_Print, 
-			NULL, 
-			(void* (*)(Name))_P1_New, 
-			_P1_AssignFromXML, 
-			_P1_Build, 
-			_P1_Initialise, 
-			_P1_Execute, 
-			NULL, 
-			name, 
-			NON_GLOBAL,
-			P1_EvalBasis, 
-			P1_EvalLocalDerivs, 
-			NULL/*P1_CoordGlobalToLocal*/, 
-			_ElementType_JacobianDeterminantSurface,
-			_P1_SurfaceNormal,
-			3 );
+		P1_Type, 
+		_P1_Delete, 
+		_P1_Print, 
+		NULL, 
+		(void* (*)(Name))_P1_New, 
+		_P1_AssignFromXML, 
+		_P1_Build, 
+		_P1_Initialise, 
+		_P1_Execute, 
+		_P1_Destroy, 
+		name, 
+		NON_GLOBAL,
+		P1_EvalBasis, 
+		P1_EvalLocalDerivs, 
+		NULL/*P1_CoordGlobalToLocal*/, 
+		_ElementType_JacobianDeterminantSurface,
+		_P1_SurfaceNormal,
+		3 );
 }
 
 P1* _P1_New( P1_DEFARGS ) {
-	P1*	self;
+	P1* self;
 
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(P1) );
@@ -79,6 +79,8 @@ P1* _P1_New( P1_DEFARGS ) {
 	/* Virtual info */
 
 	/* P1 info */
+	self->isConstructed = True;
+	_ElementType_Init( (ElementType*)self, nodeCount );
 	_P1_Init( self );
 
 	return self;
@@ -94,7 +96,13 @@ void _P1_Init( P1* self ) {
 */
 
 void _P1_Delete( void* elementType ) {
-	P1*	self = (P1*)elementType;
+	P1* self = (P1*)elementType;
+
+	/* check if this object is already destroyed; if not
+		it calls its own destroy function */
+	if( !self->isDestroyed ) {
+		_P1_Destroy( self, NULL );
+	}
 
 	/* Delete the parent. */
 	_ElementType_Delete( self );
@@ -125,6 +133,9 @@ void _P1_Execute( void* elementType, void* data ) {
 }
 
 void _P1_Destroy( void* elementType, void* data ) {
+	P1* self = (P1*)elementType;
+
+	_ElementType_Destroy( self, data );	
 }
 
 

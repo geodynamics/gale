@@ -440,5 +440,7 @@ void FeMesh_EvalGlobalDerivs( void* feMesh, unsigned element, double* localCoord
 
 void FeMesh_Destruct( FeMesh* self ) {
 	self->feElFamily = NULL;
-	KillObject( self->feElType );
+	/* Disabling the killing of this object from within this
+	component as this will be destroyed by the LiveComponentRegister_DestroyAll function 101109 */
+	/*KillObject( self->feElType );*/ 
 }

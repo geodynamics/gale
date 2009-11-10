@@ -52,31 +52,44 @@
 #include <assert.h>
 
 const Type LinearTriangleElementType_Type = "LinearTriangleElementType";
+
 #define _LinearTriangleElementType_NodeCount 3
 
-void* LinearTriangleElementType_DefaultNew( Name name ) {
-	return _LinearTriangleElementType_New( sizeof(LinearTriangleElementType), LinearTriangleElementType_Type,
-		_LinearTriangleElementType_Delete, _LinearTriangleElementType_Print, NULL, LinearTriangleElementType_DefaultNew,
-		_LinearTriangleElementType_AssignFromXML, _LinearTriangleElementType_Build, _LinearTriangleElementType_Initialise,
-		_LinearTriangleElementType_Execute, NULL, name, NON_GLOBAL,
-		_LinearTriangleElementType_SF_allNodes, 
-		_LinearTriangleElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
-		_ElementType_JacobianDeterminantSurface, _LinearTriangularElementType_SurfaceNormal, _LinearTriangleElementType_NodeCount );
-}
-
 LinearTriangleElementType* LinearTriangleElementType_New( Name name ) {
-	LinearTriangleElementType* self = LinearTriangleElementType_DefaultNew( name );\
+	LinearTriangleElementType* self = _LinearTriangleElementType_DefaultNew( name );
 
 	self->isConstructed = True;
-	_ElementType_Init( self, _LinearTriangleElementType_NodeCount );
+	_ElementType_Init( (ElementType*)self, _LinearTriangleElementType_NodeCount );
 	_LinearTriangleElementType_Init( self );
 
 	return self;
 }
 
+void* _LinearTriangleElementType_DefaultNew( Name name ) {
+	return _LinearTriangleElementType_New(
+		sizeof(LinearTriangleElementType),
+		LinearTriangleElementType_Type,
+		_LinearTriangleElementType_Delete,
+		_LinearTriangleElementType_Print,
+		NULL,
+		_LinearTriangleElementType_DefaultNew,
+		_LinearTriangleElementType_AssignFromXML,
+		_LinearTriangleElementType_Build,
+		_LinearTriangleElementType_Initialise,
+		_LinearTriangleElementType_Execute,
+		_LinearTriangleElementType_Destroy,
+		name,
+		NON_GLOBAL,
+		_LinearTriangleElementType_SF_allNodes, 
+		_LinearTriangleElementType_SF_allLocalDerivs_allNodes,
+		_ElementType_ConvertGlobalCoordToElLocal,
+		_ElementType_JacobianDeterminantSurface,
+		_LinearTriangularElementType_SurfaceNormal,
+		_LinearTriangleElementType_NodeCount );
+}
 
 LinearTriangleElementType* _LinearTriangleElementType_New( LINEARTRIANGLEELEMENTTYPE_DEFARGS ) {
-	LinearTriangleElementType*		self;
+	LinearTriangleElementType* self;
 	
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(LinearTriangleElementType) );
@@ -92,12 +105,17 @@ LinearTriangleElementType* _LinearTriangleElementType_New( LINEARTRIANGLEELEMENT
 }
 
 void _LinearTriangleElementType_Init( LinearTriangleElementType* self ) {
-	/* General and Virtual info should already be set */
-	/* LinearTriangleElementType info */
+	self->dim = 1;
 }
 
 void _LinearTriangleElementType_Delete( void* elementType ) {
 	LinearTriangleElementType* self = (LinearTriangleElementType*)elementType;
+
+	/* Check if this object is already destroyed; if not
+		it calls its own destroy function. */
+	if( !self->isDestroyed ) {
+		_LinearTriangleElementType_Destroy( self, NULL );
+	}
 	
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 	/* Stg_Class_Delete parent*/
@@ -123,7 +141,8 @@ void _LinearTriangleElementType_Print( void* elementType, Stream* stream ) {
 
 void _LinearTriangleElementType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data ){
 	LinearTriangleElementType* self = (LinearTriangleElementType*)elementType;
-	self->dim = 1;
+
+	_LinearTriangleElementType_Init( self );
 }
 	
 void _LinearTriangleElementType_Build( void* elementType, void *data ){
@@ -131,18 +150,15 @@ void _LinearTriangleElementType_Build( void* elementType, void *data ){
 }
 	
 void _LinearTriangleElementType_Initialise( void* elementType, void *data ){
-	
 }
 	
 void _LinearTriangleElementType_Execute( void* elementType, void *data ){
-	
 }
 	
 void _LinearTriangleElementType_Destroy( void* elementType, void *data ){
 	LinearTriangleElementType* self = (LinearTriangleElementType*)elementType;
 
 	_ElementType_Destroy( self, data );
-	
 }
 	
 /*

@@ -59,41 +59,41 @@ const Type BilinearElementType_Type = "BilinearElementType";
 
 #define _BilinearElementType_NodeCount 4
 
-void* _BilinearElementType_DefaultNew( Name name ) {
-	return _BilinearElementType_New(
-			sizeof(BilinearElementType), 
-			BilinearElementType_Type,
-			_BilinearElementType_Delete,
-			_BilinearElementType_Print,
-			NULL, 
-			_BilinearElementType_DefaultNew,
-			_BilinearElementType_AssignFromXML,
-			_BilinearElementType_Build,
-			_BilinearElementType_Initialise,
-			_BilinearElementType_Execute,
-			NULL, 
-			name,
-			NON_GLOBAL, 
-			_BilinearElementType_SF_allNodes,
-			_BilinearElementType_SF_allLocalDerivs_allNodes,
-			_ElementType_ConvertGlobalCoordToElLocal,
-			_BilinearElementType_JacobianDeterminantSurface,
-			_ElementType_SurfaceNormal,
-			_BilinearElementType_NodeCount );
-}
-
 BilinearElementType* BilinearElementType_New( Name name ) {
 	BilinearElementType* self = _BilinearElementType_DefaultNew( name );
 
 	self->isConstructed = True;
-	_ElementType_Init( self, _BilinearElementType_NodeCount );
+	_ElementType_Init( (ElementType*)self, _BilinearElementType_NodeCount );
 	_BilinearElementType_Init( self );
 
 	return self;
 }
 
+void* _BilinearElementType_DefaultNew( Name name ) {
+	return _BilinearElementType_New(
+		sizeof(BilinearElementType), 
+		BilinearElementType_Type,
+		_BilinearElementType_Delete,
+		_BilinearElementType_Print,
+		NULL, 
+		_BilinearElementType_DefaultNew,
+		_BilinearElementType_AssignFromXML,
+		_BilinearElementType_Build,
+		_BilinearElementType_Initialise,
+		_BilinearElementType_Execute,
+		_BilinearElementType_Destroy, 
+		name,
+		NON_GLOBAL, 
+		_BilinearElementType_SF_allNodes,
+		_BilinearElementType_SF_allLocalDerivs_allNodes,
+		_ElementType_ConvertGlobalCoordToElLocal,
+		_BilinearElementType_JacobianDeterminantSurface,
+		_ElementType_SurfaceNormal,
+		_BilinearElementType_NodeCount );
+}
+
 BilinearElementType* _BilinearElementType_New( BILINEARELEMENTTYPE_DEFARGS ) {
-	BilinearElementType*		self;
+	BilinearElementType* self;
 	
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(BilinearElementType) );
@@ -126,18 +126,17 @@ void _BilinearElementType_Init( BilinearElementType* self ) {
 
 void _BilinearElementType_Delete( void* elementType ) {
 	BilinearElementType* self = (BilinearElementType*)elementType;
-
-	FreeArray( self->triInds );
-
-	Memory_Free( self->faceNodes );	
-	Memory_Free( self->evaluatedShapeFunc );
-	Memory_Free( self->GNi );
-	
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
-	/* Stg_Class_Delete parent*/
+
+	/* Check if this object is already destroyed; if not,
+		it calls its own destroy function. */
+	if( !self->isDestroyed ) {
+		_BilinearElementType_Destroy( self, NULL );
+	}
+
+	/* Stg_Class_Delete parent */
 	_ElementType_Delete( self );
 }
-
 
 void _BilinearElementType_Print( void* elementType, Stream* stream ) {
 	BilinearElementType* self = (BilinearElementType*)elementType;
@@ -189,6 +188,12 @@ void _BilinearElementType_Execute( void* elementType, void *data ){
 void _BilinearElementType_Destroy( void* elementType, void *data ){
 	BilinearElementType*	self	= (BilinearElementType*) elementType;
 
+	FreeArray( self->triInds );
+
+	Memory_Free( self->faceNodes );	
+	Memory_Free( self->evaluatedShapeFunc );
+	Memory_Free( self->GNi );
+	
 	_ElementType_Destroy( self, data );
 }
 

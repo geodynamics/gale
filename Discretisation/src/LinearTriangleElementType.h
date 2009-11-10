@@ -72,7 +72,7 @@
     	ELEMENTTYPE_PASSARGS
 	
 	/* Create a new LinearTriangleElementType and initialise */
-	void* LinearTriangleElementType_DefaultNew( Name name );
+	void* _LinearTriangleElementType_DefaultNew( Name name );
 
 	LinearTriangleElementType* LinearTriangleElementType_New( Name name );
 	

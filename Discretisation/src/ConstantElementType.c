@@ -58,7 +58,7 @@ ConstantElementType* ConstantElementType_New( Name name ) {
 	ConstantElementType* self = ConstantElementType_DefaultNew( name );
 
 	self->isConstructed = True;	
-	_ElementType_Init( self, _ConstantElementType_NodeCount );
+	_ElementType_Init( (ElementType*)self, _ConstantElementType_NodeCount );
 	_ConstantElementType_Init( self );	
 
 	return self;
@@ -103,15 +103,19 @@ ConstantElementType* _ConstantElementType_New( CONSTANTELEMENTTYPE_DEFARGS ) {
 	return self;
 }
 
-
 void _ConstantElementType_Init( ConstantElementType* self ) {
-	/* General and Virtual info should already be set */
-	/* ConstantElementType info */
+	self->dim = 0;
 }
 
 void _ConstantElementType_Delete( void* elementType ) {
 	ConstantElementType* self = (ConstantElementType*)elementType;
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
+
+	/* Check if this object is already destroyed; if not
+		it calls its own destroy function. */
+	if( !self->isDestroyed ) {
+		_ElementType_Destroy( self, NULL );
+	}
 
 	/* Stg_Class_Delete parent*/
 	_ElementType_Delete( self );
@@ -136,19 +140,20 @@ void _ConstantElementType_Print( void* elementType, Stream* stream ) {
 
 void _ConstantElementType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data ){
 	ConstantElementType* self = (ConstantElementType*)elementType;
-	self->dim = 0;
+
+	_ConstantElementType_Init( self );
 }
 	
 void _ConstantElementType_Initialise( void* elementType, void *data ){
-	
 }
 	
 void _ConstantElementType_Execute( void* elementType, void *data ){
-	
 }
 	
 void _ConstantElementType_Destroy( void* elementType, void *data ){
 	ConstantElementType* self = (ConstantElementType*)elementType;
+
+	_ElementType_Destroy( self, data );
 }
 
 void _ConstantElementType_Build( void* elementType, void *data ) {

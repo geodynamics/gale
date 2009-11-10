@@ -42,38 +42,53 @@
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
+
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
 #include "ElementType.h"
 #include "TrilinearElementType.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 
 const Type TrilinearElementType_Type = "TrilinearElementType";
+
 #define _TrilinearElementType_NodeCount 8
 
-void* TrilinearElementType_DefaultNew( Name name ) {
-	return _TrilinearElementType_New( sizeof(TrilinearElementType), TrilinearElementType_Type, _TrilinearElementType_Delete,
-		_TrilinearElementType_Print, NULL, TrilinearElementType_DefaultNew, _TrilinearElementType_AssignFromXML,
-		_TrilinearElementType_Build, _TrilinearElementType_Initialise, _TrilinearElementType_Execute, NULL,
-		name, NON_GLOBAL, _TrilinearElementType_SF_allNodes, 
-		_TrilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
-		_TrilinearElementType_JacobianDeterminantSurface, _ElementType_SurfaceNormal, _TrilinearElementType_NodeCount );
+void* _TrilinearElementType_DefaultNew( Name name ) {
+	return _TrilinearElementType_New( sizeof(TrilinearElementType),
+		TrilinearElementType_Type,
+		_TrilinearElementType_Delete,
+		_TrilinearElementType_Print,
+		NULL,
+		_TrilinearElementType_DefaultNew,
+		_TrilinearElementType_AssignFromXML,
+		_TrilinearElementType_Build,
+		_TrilinearElementType_Initialise,
+		_TrilinearElementType_Execute,
+		_TrilinearElementType_Destroy,
+		name,
+		NON_GLOBAL,
+		_TrilinearElementType_SF_allNodes, 
+		_TrilinearElementType_SF_allLocalDerivs_allNodes,
+		_ElementType_ConvertGlobalCoordToElLocal,
+		_TrilinearElementType_JacobianDeterminantSurface,
+		_ElementType_SurfaceNormal,
+		_TrilinearElementType_NodeCount );
 }
 
 TrilinearElementType* TrilinearElementType_New( Name name ) {
-	TrilinearElementType* self = TrilinearElementType_DefaultNew( name );
+	TrilinearElementType* self = _TrilinearElementType_DefaultNew( name );
 
 	self->isConstructed = True;
-	_ElementType_Init( self, _TrilinearElementType_NodeCount );
+	_ElementType_Init( (ElementType*)self, _TrilinearElementType_NodeCount );
 	_TrilinearElementType_Init( self );
 
 	return self;	
 }
-
 
 TrilinearElementType* _TrilinearElementType_New( TRILINEARELEMENTTYPE_DEFARGS ) {
 	TrilinearElementType*		self;
@@ -90,8 +105,6 @@ TrilinearElementType* _TrilinearElementType_New( TRILINEARELEMENTTYPE_DEFARGS ) 
 	
 	return self;
 }
-
-
 
 void _TrilinearElementType_Init( TrilinearElementType* self ) {
 	Dimension_Index dim, dim_I=0;
@@ -124,7 +137,11 @@ void _TrilinearElementType_Delete( void* elementType ) {
 	TrilinearElementType* self = (TrilinearElementType*)elementType;
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 
-	FreeArray( self->tetInds );
+	/* check if this object is already destroyed; if not,
+		it calls its own destroy function. */
+	if( !self->isDestroyed ) {
+		_TrilinearElementType_Destroy( self, NULL );
+	}
 	
 	/* Stg_Class_Delete parent*/
 	_ElementType_Delete( self );
@@ -182,6 +199,8 @@ void _TrilinearElementType_Destroy( void* elementType, void *data ){
 	Memory_Free( self->faceNodes );
 	Memory_Free( self->evaluatedShapeFunc );
 	Memory_Free( self->GNi );
+	FreeArray( self->tetInds );
+
 	_ElementType_Destroy( self, data );
 }
 

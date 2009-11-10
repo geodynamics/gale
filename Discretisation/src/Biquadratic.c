@@ -51,24 +51,24 @@ const Type Biquadratic_Type = "Biquadratic";
 
 Biquadratic* Biquadratic_New( Name name ) {
 	return _Biquadratic_New( sizeof(Biquadratic), 
-			Biquadratic_Type, 
-			_Biquadratic_Delete, 
-			_Biquadratic_Print, 
-			NULL, 
-			(void* (*)(Name))_Biquadratic_New, 
-			_Biquadratic_AssignFromXML, 
-			_Biquadratic_Build, 
-			_Biquadratic_Initialise, 
-			_Biquadratic_Execute, 
-			NULL, 
-			name,
-			NON_GLOBAL,
-			Biquadratic_EvalBasis, 
-			Biquadratic_EvalLocalDerivs, 
-			_ElementType_ConvertGlobalCoordToElLocal, 
-			Biquadratic_JacobianDeterminantSurface,
-			_ElementType_SurfaceNormal,
-			BIQUADRATICNODECOUNT );
+		Biquadratic_Type, 
+		_Biquadratic_Delete, 
+		_Biquadratic_Print, 
+		NULL, 
+		(void* (*)(Name))_Biquadratic_New, 
+		_Biquadratic_AssignFromXML, 
+		_Biquadratic_Build, 
+		_Biquadratic_Initialise, 
+		_Biquadratic_Execute, 
+		_Biquadratic_Destroy, 
+		name,
+		NON_GLOBAL,
+		Biquadratic_EvalBasis, 
+		Biquadratic_EvalLocalDerivs, 
+		_ElementType_ConvertGlobalCoordToElLocal, 
+		Biquadratic_JacobianDeterminantSurface,
+		_ElementType_SurfaceNormal,
+		BIQUADRATICNODECOUNT );
 }
 
 Biquadratic* _Biquadratic_New( BIQUADRATIC_DEFARGS ) {
@@ -81,7 +81,8 @@ Biquadratic* _Biquadratic_New( BIQUADRATIC_DEFARGS ) {
 	/* Virtual info */
 
 	/* Biquadratic info */
-	_ElementType_Init( self, BIQUADRATICNODECOUNT );
+	self->isConstructed = True;
+	_ElementType_Init( (ElementType*)self, BIQUADRATICNODECOUNT );
 	_Biquadratic_Init( self );
 
 	return self;
@@ -99,18 +100,20 @@ void _Biquadratic_Init( Biquadratic* self ) {
 */
 
 void _Biquadratic_Delete( void* elementType ) {
-	Biquadratic*	self = (Biquadratic*)elementType;
+	Biquadratic* self = (Biquadratic*)elementType;
 
-	Memory_Free( self->faceNodes );
-	Memory_Free( self->evaluatedShapeFunc );
-	Memory_Free( self->GNi );
+	/* Check if this object is already destroyed; if not,
+		it calls its own destroy function. */ 
+	if( !self->isDestroyed ) {
+		_Biquadratic_Destroy( self, NULL );
+	}
 
 	/* Delete the parent. */
 	_ElementType_Delete( self );
 }
 
 void _Biquadratic_Print( void* elementType, Stream* stream ) {
-	Biquadratic*	self = (Biquadratic*)elementType;
+	Biquadratic* self = (Biquadratic*)elementType;
 	
 	/* Set the Journal for printing informations */
 	Stream* elementTypeStream;
@@ -145,7 +148,11 @@ void _Biquadratic_Execute( void* elementType, void* data ) {
 }
 
 void _Biquadratic_Destroy( void* elementType, void* data ) {
-	Biquadratic*	self = (Biquadratic*)elementType;
+	Biquadratic* self = (Biquadratic*)elementType;
+
+	Memory_Free( self->faceNodes );
+	Memory_Free( self->evaluatedShapeFunc );
+	Memory_Free( self->GNi );
 
 	_ElementType_Destroy( elementType, data );
 }

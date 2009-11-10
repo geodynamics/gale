@@ -58,39 +58,38 @@ const Type BilinearInnerElType_Type = "BilinearInnerElType";
 
 #define _BilinearInnerElType_NodeCount 3
 
-void* BilinearInnerElType_DefaultNew( Name name ) {
-	return _BilinearInnerElType_New(
-			sizeof(BilinearInnerElType), 
-			BilinearInnerElType_Type,
-			_BilinearInnerElType_Delete,
-			_BilinearInnerElType_Print,
-			NULL, 
-			BilinearInnerElType_DefaultNew,
-			_BilinearInnerElType_AssignFromXML,
-			_BilinearInnerElType_Build,
-			_BilinearInnerElType_Initialise,
-			_BilinearInnerElType_Execute,
-			NULL, 
-			name,
-			NON_GLOBAL, 
-			_BilinearInnerElType_SF_allNodes,
-			_BilinearInnerElType_SF_allLocalDerivs_allNodes,
-			_ElementType_ConvertGlobalCoordToElLocal,
-			_ElementType_JacobianDeterminantSurface,
-			_BilinearInnerElType_SurfaceNormal,
-			_BilinearInnerElType_NodeCount );
-}
-
 BilinearInnerElType* BilinearInnerElType_New( Name name ) {
 	BilinearInnerElType* self = BilinearInnerElType_DefaultNew( name );
 
 	self->isConstructed = True;	
-	_ElementType_Init( self, _BilinearInnerElType_NodeCount );
+	_ElementType_Init( (ElementType*)self, _BilinearInnerElType_NodeCount );
 	_BilinearInnerElType_Init( self );
 
 	return self;
 }
 
+void* BilinearInnerElType_DefaultNew( Name name ) {
+	return _BilinearInnerElType_New(
+		sizeof(BilinearInnerElType), 
+		BilinearInnerElType_Type,
+		_BilinearInnerElType_Delete,
+		_BilinearInnerElType_Print,
+		NULL, 
+		BilinearInnerElType_DefaultNew,
+		_BilinearInnerElType_AssignFromXML,
+		_BilinearInnerElType_Build,
+		_BilinearInnerElType_Initialise,
+		_BilinearInnerElType_Execute,
+		_BilinearInnerElType_Destroy, 
+		name,
+		NON_GLOBAL, 
+		_BilinearInnerElType_SF_allNodes,
+		_BilinearInnerElType_SF_allLocalDerivs_allNodes,
+		_ElementType_ConvertGlobalCoordToElLocal,
+		_ElementType_JacobianDeterminantSurface,
+		_BilinearInnerElType_SurfaceNormal,
+		_BilinearInnerElType_NodeCount );
+}
 
 BilinearInnerElType* _BilinearInnerElType_New( BILINEARINNERELTYPE_DEFARGS  ) {
 	BilinearInnerElType*		self;
@@ -125,14 +124,17 @@ void _BilinearInnerElType_Init( BilinearInnerElType* self ) {
 
 void _BilinearInnerElType_Delete( void* elementType ) {
 	BilinearInnerElType* self = (BilinearInnerElType*)elementType;
-
-	FreeArray( self->triInds );
-	
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
-	/* Stg_Class_Delete parent*/
+
+	/* Check if this object is already destroyed; if not,
+		it calls its own destroy function. */
+	if( !self->isDestroyed ) {
+		_BilinearInnerElType_Destroy( self, NULL );
+	}
+
+	/* Stg_Class_Delete parent */
 	_ElementType_Delete( self );
 }
-
 
 void _BilinearInnerElType_Print( void* elementType, Stream* stream ) {
 	BilinearInnerElType* self = (BilinearInnerElType*)elementType;
@@ -165,23 +167,23 @@ void _BilinearInnerElType_Print( void* elementType, Stream* stream ) {
 }
 
 void _BilinearInnerElType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data ){
-	
 }
 	
 void _BilinearInnerElType_Initialise( void* elementType, void *data ){
-	
 }
 	
 void _BilinearInnerElType_Execute( void* elementType, void *data ){
-	
 }
 	
 void _BilinearInnerElType_Destroy( void* elementType, void *data ){
-	
+	BilinearInnerElType* self = (BilinearInnerElType*)elementType;
+
+	FreeArray( self->triInds );
+
+	_ElementType_Destroy( self, data );
 }
 
 void _BilinearInnerElType_Build( void* elementType, void *data ) {
-
 }
 
 /*

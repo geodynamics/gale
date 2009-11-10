@@ -75,9 +75,8 @@
 	#define TRILINEARELEMENTTYPE_PASSARGS \
     	ELEMENTTYPE_PASSARGS
 	
-	
 	/* Create a new TrilinearElementType and initialise */
-	void* TrilinearElementTypea_DefaultNew( Name name );
+	void* _TrilinearElementTypea_DefaultNew( Name name );
 
 	TrilinearElementType* TrilinearElementType_New( Name name );
 	
