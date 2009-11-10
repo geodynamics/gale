@@ -114,6 +114,12 @@ void _Stg_Component_Delete( void* component ) {
    /* just make sure the component is destroyed */
  	Stg_Component_Destroy( self, NULL, False );
 	
+	Memory_Free( self->destroyType );
+	Memory_Free( self->executeType );
+	Memory_Free( self->initialiseType );
+	Memory_Free( self->buildType );
+	Memory_Free( self->constructType );
+
 	/* Stg_Class_Delete parent class */
 	_Stg_Object_Delete( self );
 }
@@ -370,12 +376,6 @@ void Stg_Component_Destroy( void* component, void* data, Bool force ) {
 
       if( self->_destroy )
          self->_destroy( self, data );
-
-		Memory_Free( self->destroyType );
-		Memory_Free( self->executeType );
-		Memory_Free( self->initialiseType );
-		Memory_Free( self->buildType );
-		Memory_Free( self->constructType );
 
 		#ifdef USE_PROFILE
 			Stg_CallGraph_Pop( stgCallGraph );
