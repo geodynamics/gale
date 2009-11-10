@@ -145,8 +145,8 @@ void _BuoyancyForceTerm_Delete( void* forceTerm ) {
 		Stg_Class_Delete( self->densitySwarmVariables[i] );
 		Stg_Class_Delete( self->alphaSwarmVariables[i] );
 	}
-	Stg_Class_Delete( self->densitySwarmVariables );
-	Stg_Class_Delete( self->alphaSwarmVariables );
+	MemFree( self->densitySwarmVariables );
+	MemFree( self->alphaSwarmVariables );
 
 	_ForceTerm_Delete( self );
 }
