@@ -111,12 +111,6 @@ void _LinearTriangleElementType_Init( LinearTriangleElementType* self ) {
 void _LinearTriangleElementType_Delete( void* elementType ) {
 	LinearTriangleElementType* self = (LinearTriangleElementType*)elementType;
 
-	/* Check if this object is already destroyed; if not
-		it calls its own destroy function. */
-	if( !self->isDestroyed ) {
-		_LinearTriangleElementType_Destroy( self, NULL );
-	}
-	
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 	/* Stg_Class_Delete parent*/
 	_ElementType_Delete( self );

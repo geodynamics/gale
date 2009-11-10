@@ -98,12 +98,6 @@ void _P1_Init( P1* self ) {
 void _P1_Delete( void* elementType ) {
 	P1* self = (P1*)elementType;
 
-	/* check if this object is already destroyed; if not
-		it calls its own destroy function */
-	if( !self->isDestroyed ) {
-		_P1_Destroy( self, NULL );
-	}
-
 	/* Delete the parent. */
 	_ElementType_Delete( self );
 }

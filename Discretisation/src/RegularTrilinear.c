@@ -49,24 +49,24 @@ const Type RegularTrilinear_Type = "RegularTrilinear";
 
 RegularTrilinear* RegularTrilinear_New( Name name ) {
 	return _RegularTrilinear_New( sizeof(RegularTrilinear), 
-	      RegularTrilinear_Type, 
-	      _RegularTrilinear_Delete, 
-	      _RegularTrilinear_Print, 
-	      NULL, 
-	      (void* (*)(Name))_RegularTrilinear_New, 
-	      _RegularTrilinear_AssignFromXML, 
-	      _RegularTrilinear_Build, 
-	      _RegularTrilinear_Initialise, 
-	      _RegularTrilinear_Execute, 
-	      NULL, 
-	      name, 
-	      NON_GLOBAL, 
-	      _TrilinearElementType_SF_allNodes, 
-	      _TrilinearElementType_SF_allLocalDerivs_allNodes, 
-	      _ElementType_ConvertGlobalCoordToElLocal, 
-	      _TrilinearElementType_JacobianDeterminantSurface,
-	      _ElementType_SurfaceNormal,
-	      8 );
+		RegularTrilinear_Type, 
+		_RegularTrilinear_Delete, 
+		_RegularTrilinear_Print, 
+		NULL, 
+		(void* (*)(Name))_RegularTrilinear_New, 
+		_RegularTrilinear_AssignFromXML, 
+		_RegularTrilinear_Build, 
+		_RegularTrilinear_Initialise, 
+		_RegularTrilinear_Execute, 
+		_RegularTrilinear_Destroy, 
+		name, 
+		NON_GLOBAL, 
+		_TrilinearElementType_SF_allNodes, 
+		_TrilinearElementType_SF_allLocalDerivs_allNodes, 
+		_ElementType_ConvertGlobalCoordToElLocal, 
+		_TrilinearElementType_JacobianDeterminantSurface,
+		_ElementType_SurfaceNormal,
+		8 );
 }
 
 RegularTrilinear* _RegularTrilinear_New( REGULARTRILINEAR_DEFARGS ) {
@@ -79,6 +79,9 @@ RegularTrilinear* _RegularTrilinear_New( REGULARTRILINEAR_DEFARGS ) {
 	/* Virtual info */
 
 	/* RegularTrilinear info */
+	self->isConstructed = True;
+	_ElementType_Init( (ElementType*)self, nodeCount );
+   _TrilinearElementType_Init( self );
 	_RegularTrilinear_Init( self );
 
 	return self;

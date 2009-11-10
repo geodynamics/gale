@@ -102,12 +102,6 @@ void _Biquadratic_Init( Biquadratic* self ) {
 void _Biquadratic_Delete( void* elementType ) {
 	Biquadratic* self = (Biquadratic*)elementType;
 
-	/* Check if this object is already destroyed; if not,
-		it calls its own destroy function. */ 
-	if( !self->isDestroyed ) {
-		_Biquadratic_Destroy( self, NULL );
-	}
-
 	/* Delete the parent. */
 	_ElementType_Delete( self );
 }

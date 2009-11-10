@@ -136,12 +136,6 @@ void _TrilinearElementType_Init( TrilinearElementType* self ) {
 void _TrilinearElementType_Delete( void* elementType ) {
 	TrilinearElementType* self = (TrilinearElementType*)elementType;
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
-
-	/* check if this object is already destroyed; if not,
-		it calls its own destroy function. */
-	if( !self->isDestroyed ) {
-		_TrilinearElementType_Destroy( self, NULL );
-	}
 	
 	/* Stg_Class_Delete parent*/
 	_ElementType_Delete( self );

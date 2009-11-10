@@ -128,12 +128,6 @@ void _BilinearElementType_Delete( void* elementType ) {
 	BilinearElementType* self = (BilinearElementType*)elementType;
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 
-	/* Check if this object is already destroyed; if not,
-		it calls its own destroy function. */
-	if( !self->isDestroyed ) {
-		_BilinearElementType_Destroy( self, NULL );
-	}
-
 	/* Stg_Class_Delete parent */
 	_ElementType_Delete( self );
 }

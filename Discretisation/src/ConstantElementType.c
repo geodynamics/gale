@@ -111,12 +111,6 @@ void _ConstantElementType_Delete( void* elementType ) {
 	ConstantElementType* self = (ConstantElementType*)elementType;
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 
-	/* Check if this object is already destroyed; if not
-		it calls its own destroy function. */
-	if( !self->isDestroyed ) {
-		_ElementType_Destroy( self, NULL );
-	}
-
 	/* Stg_Class_Delete parent*/
 	_ElementType_Delete( self );
 }

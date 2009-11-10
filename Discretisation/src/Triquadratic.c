@@ -52,24 +52,24 @@ const Type Triquadratic_Type = "Triquadratic";
 
 Triquadratic* Triquadratic_New( Name name ) {
 	return _Triquadratic_New( sizeof(Triquadratic),
-			Triquadratic_Type,
-			_Triquadratic_Delete,
-			_Triquadratic_Print,
-			NULL,
-			(void* (*)(Name))_Triquadratic_New,
-			_Triquadratic_AssignFromXML,
-			_Triquadratic_Build,
-			_Triquadratic_Initialise,
-			_Triquadratic_Execute,
-			NULL,
-			name,
-			NON_GLOBAL,
-			Triquadratic_EvalBasis,
-			Triquadratic_EvalLocalDerivs,
-			_ElementType_ConvertGlobalCoordToElLocal,
-			Triquadratic_JacobianDeterminantSurface,
-			_ElementType_SurfaceNormal,
-			TRIQUADRATICNODECOUNT );
+		Triquadratic_Type,
+		_Triquadratic_Delete,
+		_Triquadratic_Print,
+		NULL,
+		(void* (*)(Name))_Triquadratic_New,
+		_Triquadratic_AssignFromXML,
+		_Triquadratic_Build,
+		_Triquadratic_Initialise,
+		_Triquadratic_Execute,
+		_Triquadratic_Destroy,
+		name,
+		NON_GLOBAL,
+		Triquadratic_EvalBasis,
+		Triquadratic_EvalLocalDerivs,
+		_ElementType_ConvertGlobalCoordToElLocal,
+		Triquadratic_JacobianDeterminantSurface,
+		_ElementType_SurfaceNormal,
+		TRIQUADRATICNODECOUNT );
 }
 
 Triquadratic* _Triquadratic_New( TRIQUADRATIC_DEFARGS ) {
@@ -82,7 +82,8 @@ Triquadratic* _Triquadratic_New( TRIQUADRATIC_DEFARGS ) {
 	/* Virtual info */
 
 	/* Triquadratic info */
-	_ElementType_Init( self, TRIQUADRATICNODECOUNT );
+	self->isConstructed = True;
+	_ElementType_Init( (ElementType*)self, TRIQUADRATICNODECOUNT );
 	_Triquadratic_Init( self );
 
 	return self;

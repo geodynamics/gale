@@ -42,31 +42,30 @@
 /* Textual name of this class */
 const Type RegularBilinear_Type = "RegularBilinear";
 
-
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
 
 RegularBilinear* RegularBilinear_New( Name name ) {
 	return _RegularBilinear_New( sizeof(RegularBilinear), 
-			RegularBilinear_Type, 
-			_RegularBilinear_Delete, 
-			_RegularBilinear_Print, 
-			NULL, 
-			(void* (*)(Name))_RegularBilinear_New, 
-			_RegularBilinear_AssignFromXML, 
-			_RegularBilinear_Build, 
-			_RegularBilinear_Initialise, 
-			_RegularBilinear_Execute, 
-			NULL, 
-			name, 
-			NON_GLOBAL, 
-			_BilinearElementType_SF_allNodes, 
-			_BilinearElementType_SF_allLocalDerivs_allNodes, 
-			_ElementType_ConvertGlobalCoordToElLocal, 
-			_BilinearElementType_JacobianDeterminantSurface,
-			_ElementType_SurfaceNormal,
-			4 );
+		RegularBilinear_Type, 
+		_RegularBilinear_Delete, 
+		_RegularBilinear_Print, 
+		NULL, 
+		(void* (*)(Name))_RegularBilinear_New, 
+		_RegularBilinear_AssignFromXML, 
+		_RegularBilinear_Build, 
+		_RegularBilinear_Initialise, 
+		_RegularBilinear_Execute, 
+		_RegularBilinear_Destroy, 
+		name, 
+		NON_GLOBAL, 
+		_BilinearElementType_SF_allNodes, 
+		_BilinearElementType_SF_allLocalDerivs_allNodes, 
+		_ElementType_ConvertGlobalCoordToElLocal, 
+		_BilinearElementType_JacobianDeterminantSurface,
+		_ElementType_SurfaceNormal,
+		4 );
 }
 
 RegularBilinear* _RegularBilinear_New( REGULARTRILINEAR_DEFARGS ) {
@@ -79,6 +78,9 @@ RegularBilinear* _RegularBilinear_New( REGULARTRILINEAR_DEFARGS ) {
 	/* Virtual info */
 
 	/* RegularBilinear info */
+	self->isConstructed = True;
+	_ElementType_Init( (ElementType*)self, nodeCount );
+   _BilinearElementType_Init( self );
 	_RegularBilinear_Init( self );
 
 	return self;
@@ -94,7 +96,7 @@ void _RegularBilinear_Init( RegularBilinear* self ) {
 */
 
 void _RegularBilinear_Delete( void* elementType ) {
-	RegularBilinear*	self = (RegularBilinear*)elementType;
+	RegularBilinear* self = (RegularBilinear*)elementType;
 
 	/* Delete the parent. */
 	_BilinearElementType_Delete( self );
@@ -127,6 +129,9 @@ void _RegularBilinear_Execute( void* elementType, void* data ) {
 }
 
 void _RegularBilinear_Destroy( void* elementType, void* data ) {
+	RegularBilinear* self = (RegularBilinear*)elementType;
+
+	_BilinearElementType_Destroy( self, NULL );
 }
 
 
