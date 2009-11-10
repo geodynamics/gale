@@ -80,7 +80,7 @@ Bool BaseExtensibility_Init( int* argc, char** argv[] ) {
 
 	RegisterParent( Module_Type,                    Stg_Object_Type );
 	RegisterParent( Plugin_Type,                    Module_Type );
-	RegisterParent( Toolbox_Type,                   Toolbox_Type );
+	RegisterParent( Toolbox_Type,                   Module_Type );
 	RegisterParent( ModulesManager_Type,            Stg_Class_Type );
 	RegisterParent( PluginsManager_Type,            ModulesManager_Type );
 	RegisterParent( ToolboxesManager_Type,          ModulesManager_Type );
