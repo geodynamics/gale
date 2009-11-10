@@ -103,7 +103,7 @@ void VTKOutput( void* _context ) {
         MPI_Comm_size( comm, (int*)&nprocs );
 
         /* Only dump if at the right time step. */
-        if(context->timeStep % context->dumpEvery != 0)
+        if(!context->dumpEvery || context->timeStep % context->dumpEvery != 0)
           return;
 	
         /* Write the particles and then all of the fields. */
