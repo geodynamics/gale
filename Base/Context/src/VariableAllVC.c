@@ -93,7 +93,7 @@ VariableAllVC*	VariableAllVC_DefaultNew( Name name ) {
 		_VariableAllVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
+		_VariableAllVC_Destroy,
 		name,
 		NON_GLOBAL,
 		_VariableAllVC_BuildSelf, 
@@ -242,19 +242,24 @@ void _VariableAllVC_ReadDictionary( void* variableCondition, void* dictionary ) 
 
 
 void _VariableAllVC_Delete( void* allElementsVC ) {
-	VariableAllVC*				self = (VariableAllVC*)allElementsVC;
-	
-	if (self->_entryTbl) Memory_Free(self->_entryTbl);
+	VariableAllVC* self = (VariableAllVC*)allElementsVC;
 	
 	/* Stg_Class_Delete parent */
-	_VariableCondition_Delete(self);
+	_VariableCondition_Delete( self );
 }
 
+void _VariableAllVC_Destroy( void* allElementsVC, void* data ) {
+	VariableAllVC* self = (VariableAllVC*)allElementsVC;
+
+	if (self->_entryTbl) Memory_Free(self->_entryTbl);
+
+	_VariableCondition_Destroy( self, data );	
+}
 
 void _VariableAllVC_Print( void* allElementsVC, Stream* stream ) {
-	VariableAllVC*				self = (VariableAllVC*)allElementsVC;
-	VariableAllVC_Entry_Index		entry_I;
-	Index					i;
+	VariableAllVC*					self = (VariableAllVC*)allElementsVC;
+	VariableAllVC_Entry_Index	entry_I;
+	Index								i;
 	
 	/* Set the Journal for printing informations */
 	Stream* info = stream;

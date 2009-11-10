@@ -97,6 +97,8 @@
 	void _SetVC_Delete( void* setVC );
 	
 	void _SetVC_Print( void* setVC, Stream* stream );
+
+	void _SetVC_Destroy( void* setVC, void* data );
 	
 	/* Copy */
 	#define SetVC_Copy( self ) \

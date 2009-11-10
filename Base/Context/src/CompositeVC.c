@@ -94,7 +94,7 @@ CompositeVC* CompositeVC_DefaultNew( Name name ) {
 		_CompositeVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
-		_VariableCondition_Destroy,	
+		_CompositeVC_Destroy,	
 		name,
 		NON_GLOBAL,
 		NULL,
@@ -158,13 +158,14 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
 		Dictionary_Entry_Value*	vcList;
 		
 		vcList = Dictionary_Get( dictionary, "independentVCList" );
+
 		if( vcList ) {
 			Index	count;
 			Index	entry_I;
 			
 			count = Dictionary_Entry_Value_GetCount(vcList);
-			for (entry_I = 0; entry_I < count; entry_I++)
-			{
+
+			for (entry_I = 0; entry_I < count; entry_I++) {
 				Dictionary_Entry_Value*	vcEntry;
 				Type			type;
 				Dictionary*		dictionary;
@@ -175,19 +176,17 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
 				dictionary = Dictionary_Entry_Value_AsDictionary(vcEntry);
 				vc = VariableCondition_Register_CreateNew(variableCondition_Register, self->variable_Register, 
 					self->conFunc_Register, type, dictionary, self->data );
-                                vc->cf = self->cf;
+				vc->cf = self->cf;
 				vc->_readDictionary( vc, dictionary );
 
-                                self->nIndepItems++;
-                                self->indepItems = ReallocArray(
-                                   self->indepItems, VariableCondition*, self->nIndepItems );
-                                self->indepItems[self->nIndepItems - 1] = vc;
+				self->nIndepItems++;
+				self->indepItems = ReallocArray( self->indepItems, VariableCondition*, self->nIndepItems );
+				self->indepItems[self->nIndepItems - 1] = vc;
 
-                                /* Don't add so we can modify the matrix later.
+				/* Don't add so we can modify the matrix later.
 				CompositeVC_Add(self, vc, True);
-                                */
+				*/
 			}
-			
 		}
 		vcList = Dictionary_Get( dictionary, "vcList" );
 		if( vcList ) {
@@ -195,8 +194,8 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
 			Index	entry_I;
 			
 			count = Dictionary_Entry_Value_GetCount(vcList);
-			for (entry_I = 0; entry_I < count; entry_I++)
-			{
+
+			for (entry_I = 0; entry_I < count; entry_I++) {
 				Dictionary_Entry_Value*	vcEntry;
 				Type			type;
 				Dictionary*		dictionary;
@@ -210,7 +209,6 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
 				vc->_readDictionary( vc, dictionary );
 				CompositeVC_Add(self, vc, True);
 			}
-			
 		}
 		self->hasReadDictionary = True;
 	}
@@ -226,9 +224,9 @@ void _CompositeVC_AssignFromXML( void* compositeVC, Stg_ComponentFactory* cf, vo
 	
 	self->dictionary = cf->rootDict;
 
-        /* Need to store this so we can get at components
-           later on when using the fucked up 'ReadDictionary' function. */
-        self->cf = cf;
+	/* Need to store this so we can get at components
+		later on when using the fucked up 'ReadDictionary' function. */
+	self->cf = cf;
 
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
 	if( !self->context )
@@ -253,17 +251,27 @@ void _CompositeVC_AssignFromXML( void* compositeVC, Stg_ComponentFactory* cf, vo
 	_CompositeVC_Init( self, initData );
 }
 
-void _CompositeVC_Delete(void* compositeVC)
-{
-	CompositeVC*	self = (CompositeVC*)compositeVC;
-        int ii;
+void _CompositeVC_Delete(void* compositeVC) {
+	CompositeVC* self = (CompositeVC*)compositeVC;
+	int ii;
 	
-	if (self->itemTbl)
-	{
+	if( self->indepItems ) {
+		for( ii = 0; ii < self->nIndepItems; ii++ )
+			Stg_Class_Delete( self->indepItems[ii] );
+		FreeArray( self->indepItems );
+	}
+	
+	/* Stg_Class_Delete parent */
+	_VariableCondition_Delete(self);
+}
+
+void _CompositeVC_Destroy(void* compositeVC, void* data) {
+	CompositeVC* self = (CompositeVC*)compositeVC;
+
+	if (self->itemTbl) {
 		VariableCondition_Index	entry_I;
 		
-		for (entry_I = 0; entry_I < self->itemCount; entry_I++)
-		{
+		for (entry_I = 0; entry_I < self->itemCount; entry_I++) {
 			if (self->iOwnTbl[entry_I] && self->itemTbl[entry_I])
 				Memory_Free(self->itemTbl[entry_I]);
 		}
@@ -275,16 +283,8 @@ void _CompositeVC_Delete(void* compositeVC)
 		Memory_Free( self->attachedSets );
 	}
 
-        if( self->indepItems ) {
-           for( ii = 0; ii < self->nIndepItems; ii++ )
-              Stg_Class_Delete( self->indepItems[ii] );
-           FreeArray( self->indepItems );
-        }
-	
-	/* Stg_Class_Delete parent */
-	_VariableCondition_Delete(self);
+	_VariableCondition_Destroy( self, data );
 }
-
 
 void _CompositeVC_Print(void* compositeVC, Stream* stream)
 {

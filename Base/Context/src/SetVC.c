@@ -92,7 +92,7 @@ SetVC* SetVC_DefaultNew( Name name ) {
 		_VariableCondition_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
+		_SetVC_Destroy,
 		name, 
 		NON_GLOBAL,
 		NULL,
@@ -146,14 +146,12 @@ void _SetVC_ReadDictionary( void* setVC, void* dictionary ) {
 	/* Find dictionary entry */
 	if (self->_dictionaryEntryName)
 		vcDictVal = Dictionary_Get( dictionary, self->_dictionaryEntryName );
-	else
-	{
+	else {
 		vcDictVal = &_vcDictVal;
 		Dictionary_Entry_Value_InitFromStruct( vcDictVal, dictionary );
 	}
 	
-	if (vcDictVal)
-	{
+	if (vcDictVal) {
 		Dictionary_Entry_Value*		setVal = Dictionary_Entry_Value_GetMember( vcDictVal, "indices" );
 		Index				indexCnt = Dictionary_Entry_Value_AsUnsignedInt( 
 							Dictionary_Entry_Value_GetMember( vcDictVal, "indexCount" ) );
@@ -161,6 +159,7 @@ void _SetVC_ReadDictionary( void* setVC, void* dictionary ) {
 		
 		self->_vcset = IndexSet_New( indexCnt );
 		cnt = Dictionary_Entry_Value_GetCount( setVal );
+
 		for( i = 0; i < cnt; i++ )
 			IndexSet_Add( self->_vcset, Dictionary_Entry_Value_AsUnsignedInt( 
 				Dictionary_Entry_Value_GetElement( setVal, i ) ) );
@@ -170,9 +169,8 @@ void _SetVC_ReadDictionary( void* setVC, void* dictionary ) {
 		self->_entryCount = Dictionary_Entry_Value_GetCount( varsVal );
 		self->_entryTbl = Memory_Alloc_Array( SetVC_Entry, self->_entryCount, "SetVC->_entryTbl");
 		
-		for (entry_I = 0; entry_I < self->_entryCount; entry_I++)
-		{
-			char*			valType;
+		for (entry_I = 0; entry_I < self->_entryCount; entry_I++) {
+			char* valType;
 			Dictionary_Entry_Value*	valueEntry;
 			Dictionary_Entry_Value*	varDictListVal;
 			
@@ -183,16 +181,15 @@ void _SetVC_ReadDictionary( void* setVC, void* dictionary ) {
 				Dictionary_Entry_Value_GetMember(varDictListVal, "name"));
 				
 			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(varDictListVal, "type"));
-			if (!strcasecmp(valType, "func"))
-			{
+
+			if (!strcasecmp(valType, "func")) {
 				char*	funcName = Dictionary_Entry_Value_AsString(valueEntry);
 				
 				self->_entryTbl[entry_I].value.type = VC_ValueType_CFIndex;
 				self->_entryTbl[entry_I].value.as.typeCFIndex = ConditionFunction_Register_GetIndex(
 					self->conFunc_Register, funcName);
 			}
-			else if (!strcasecmp(valType, "array"))
-			{
+			else if (!strcasecmp(valType, "array")) {
 				Dictionary_Entry_Value*	valueElement;
 				Index			i;
 
@@ -201,8 +198,7 @@ void _SetVC_ReadDictionary( void* setVC, void* dictionary ) {
 				self->_entryTbl[entry_I].value.as.typeArray.array = Memory_Alloc_Array( double,
 					self->_entryTbl[entry_I].value.as.typeArray.size, "SetVC->_entryTbl[].value.as.typeArray.array" );
 					
-				for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
-				{
+				for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++) {
 					valueElement = Dictionary_Entry_Value_GetElement(valueEntry, i);
 					self->_entryTbl[entry_I].value.as.typeArray.array[i] = 
 						Dictionary_Entry_Value_AsDouble(valueElement);
@@ -230,16 +226,14 @@ void _SetVC_ReadDictionary( void* setVC, void* dictionary ) {
 			}
 			else {
 				/* Assume double */
-				Journal_DPrintf( 
-					Journal_Register( InfoStream_Type, "myStream" ), 
+				Journal_DPrintf( Journal_Register( InfoStream_Type, "myStream" ), 
 					"Type to variable on variable condition not given, assuming double\n" );
 				self->_entryTbl[entry_I].value.type = VC_ValueType_Double;
 				self->_entryTbl[entry_I].value.as.typeDouble = Dictionary_Entry_Value_AsDouble( valueEntry );
 			}
 		}
 	}
-	else
-	{
+	else {
 		self->_entryCount = 0;
 		self->_entryTbl = NULL;
 	}
@@ -248,12 +242,17 @@ void _SetVC_ReadDictionary( void* setVC, void* dictionary ) {
 void _SetVC_Delete(void* setVC) {
 	SetVC* self = (SetVC*)setVC;
 	
-	if (self->_entryTbl) Memory_Free( self->_entryTbl );
-	
 	/* Stg_Class_Delete parent */
 	_VariableCondition_Delete(self);
 }
 
+void _SetVC_Destroy(void* setVC, void* data) {
+	SetVC* self = (SetVC*)setVC;
+		
+	if (self->_entryTbl) Memory_Free( self->_entryTbl );
+
+	_VariableCondition_Destroy( self, data );
+}
 
 void _SetVC_Print(void* setVC, Stream* stream) {
 	SetVC*				self = (SetVC*)setVC;

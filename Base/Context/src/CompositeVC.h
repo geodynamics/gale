@@ -107,6 +107,8 @@
 	
 	void _CompositeVC_Print( void* compositeVC, Stream* stream );
 	
+	void _CompositeVC_Destroy( void* compositeVC, void* data );
+
 	/* Copy */
 	#define CompositeVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
