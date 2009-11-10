@@ -47,24 +47,35 @@
 
 const Type BackgroundParticleLayout_Type = "BackgroundParticleLayout";
 
+BackgroundParticleLayout* BackgroundParticleLayout_New( Name name,
+   AbstractContext* context, 
+   CoordSystem      coordSystem, 
+   Bool             weightsInitialisedAtStartup ) {
+
+   BackgroundParticleLayout* self = _BackgroundParticleLayout_DefaultNew( name );
+
+   _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
+   _BackgroundParticleLayout_Init( self );
+   self->isConstructed = True;
+}
 BackgroundParticleLayout* _BackgroundParticleLayout_New( 
-    SizeT                                                       _sizeOfSelf,
-    Type                                                        type,
-    Stg_Class_DeleteFunction*                                   _delete,
-    Stg_Class_PrintFunction*                                    _print,
-    Stg_Class_CopyFunction*                                     _copy,
-    Stg_Component_DefaultConstructorFunction*                   _defaultConstructor,
-    Stg_Component_ConstructFunction*                            _construct,
-    Stg_Component_BuildFunction*                                _build,
-    Stg_Component_InitialiseFunction*                           _initialise,
-    Stg_Component_ExecuteFunction*                              _execute,
-    Stg_Component_DestroyFunction*                              _destroy,
-    ParticleLayout_SetInitialCountsFunction*                    _setInitialCounts,
-    ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles,
-    Name                                                        name,
-    Bool                                                        initFlag,
-    CoordSystem                                                 coordSystem,
-    Bool                                                        weightsInitialisedAtStartup )
+      SizeT                                       _sizeOfSelf,
+      Type                                        type,
+      Stg_Class_DeleteFunction*                   _delete,
+      Stg_Class_PrintFunction*                    _print,
+      Stg_Class_CopyFunction*                     _copy,
+      Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
+      Stg_Component_ConstructFunction*            _construct,
+      Stg_Component_BuildFunction*                _build,
+      Stg_Component_InitialiseFunction*           _initialise,
+      Stg_Component_ExecuteFunction*              _execute,
+      Stg_Component_DestroyFunction*              _destroy,
+      Name                                        name,
+      AllocationType                              nameAllocationType,
+      ParticleLayout_SetInitialCountsFunction*    _setInitialCounts,
+      ParticleLayout_InitialiseParticlesFunction* _initialiseParticles,
+      CoordSystem                                 coordSystem,
+      Bool                                        weightsInitialisedAtStartup )
 {
     BackgroundParticleLayout*		self;
 	
@@ -82,16 +93,12 @@ BackgroundParticleLayout* _BackgroundParticleLayout_New(
         _initialise, 
         _execute, 
         _destroy, 
+        name, 
+        nameAllocationType,
         _setInitialCounts, 
         _initialiseParticles, 
-        name, 
-        initFlag,
         coordSystem,
         weightsInitialisedAtStartup );
-	
-    if( initFlag ){
-        _BackgroundParticleLayout_Init( self );
-    }
 	
     return self;
 }
@@ -142,21 +149,17 @@ void* _BackgroundParticleLayout_DefaultNew( Name name ) {
         _BackgroundParticleLayout_Initialise,
         _BackgroundParticleLayout_Execute,
         _BackgroundParticleLayout_Destroy,
+        name, NON_GLOBAL,
         _BackgroundParticleLayout_SetInitialCounts,
         _BackgroundParticleLayout_InitialiseParticles,
-        name,
-        False,
-        GlobalCoordSystem,
-        False );
+        GlobalCoordSystem, False );
 }
 void  _BackgroundParticleLayout_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data )  {
-    BackgroundParticleLayout*	self = (BackgroundParticleLayout*)component;
+   BackgroundParticleLayout*	self = (BackgroundParticleLayout*)component;
 
-    self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
-    if( !self->context )
-        self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+   _ParticleLayout_AssignFromXML( self, cf, data );
 
-    _BackgroundParticleLayout_Init( component );
+   _BackgroundParticleLayout_Init( component );
 }
 
 void  _BackgroundParticleLayout_Build( void* component, void* data ) {}

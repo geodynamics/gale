@@ -158,7 +158,9 @@ void MaterialComponentsSuite_Setup( MaterialComponentsSuiteData* data ) {
    data->feMesh = buildFeMesh( dim, meshSize, minCrds, maxCrds, data->eRegister );
 
    data->cellLayout = (CellLayout*)ElementCellLayout_New( "elementCellLayout", data->feMesh );
-   data->particleLayout = (ParticleLayout*)RandomParticleLayout_New( "randomParticleCellLayout", 20, 13 );
+   data->particleLayout = (ParticleLayout*)RandomParticleLayout_New( "randomParticleCellLayout", NULL, 
+         GlobalCoordSystem, False, 
+         20, 13 );
 
    data->mpSwarm = MaterialPointsSwarm_New(
       "testSwarm",
