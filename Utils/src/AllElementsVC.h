@@ -82,7 +82,7 @@
 		Dictionary*							dictionary,
 		void*									data );
 	
-	AllElementsVC*	AllElementsVC_DefaultNew( Name name );
+	AllElementsVC*	_AllElementsVC_DefaultNew( Name name );
 	
 	AllElementsVC* AllElementsVC_New(
 		Name									name,

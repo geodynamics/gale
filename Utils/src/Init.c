@@ -50,80 +50,58 @@ Bool StgDomainUtils_Init( int* argc, char** argv[] ) {
 	VariableCondition_Register_Add( variableCondition_Register, InnerWallVC_Type, InnerWallVC_Factory );
 	VariableCondition_Register_Add( variableCondition_Register, MeshShapeVC_Type, MeshShapeVC_Factory );
 	
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), DomainContext_Type, 
-				   "0", (void* (*)(Name))DomainContext_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), AllElementsVC_Type, 
-				   "0", (void* (*)(Name))AllElementsVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), AllNodesVC_Type, 
-				   "0", (void* (*)(Name))AllNodesVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), DofLayout_Type, 
-				   "0", (void* (*)(Name))DofLayout_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), FieldVariable_Type, "0", 
-				   (void* (*)(Name))FieldVariable_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), OperatorFieldVariable_Type, 
-				   "0", (void* (*)(Name))OperatorFieldVariable_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), WallVC_Type, 
-				   "0", (void* (*)(Name))WallVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ContactVC_Type, 
-				   "0", (void* (*)(Name))ContactVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), CornerVC_Type, 
-				   "0", (void* (*)(Name))CornerVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), InnerWallVC_Type, 
-				   "0", (void* (*)(Name))InnerWallVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), MeshShapeVC_Type, 
-				   "0", (void*  (*)(Name))_MeshShapeVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), MeshBoundaryShape_Type, 
-				   "0", (void*  (*)(Name))MeshBoundaryShape_New );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), DomainContext_Type, "0", (void* (*)(Name))_DomainContext_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), AllElementsVC_Type, "0", (void* (*)(Name))_AllElementsVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), AllNodesVC_Type, "0", (void* (*)(Name))_AllNodesVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), DofLayout_Type, "0", (void* (*)(Name))_DofLayout_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), FieldVariable_Type, "0", (void* (*)(Name))_FieldVariable_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), OperatorFieldVariable_Type, "0", (void* (*)(Name))_OperatorFieldVariable_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), WallVC_Type, "0", (void* (*)(Name))_WallVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ContactVC_Type, "0", (void* (*)(Name))_ContactVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), CornerVC_Type, "0", (void* (*)(Name))_CornerVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), InnerWallVC_Type, "0", (void* (*)(Name))_InnerWallVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), MeshShapeVC_Type, "0", (void*  (*)(Name))_MeshShapeVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), MeshBoundaryShape_Type, "0", (void*  (*)(Name))MeshBoundaryShape_New );
 #ifdef HAVE_PETSC
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   RegularRemesherCmpt_Type, 
-				   "0", (void* (*)(Name))_RegularRemesherCmpt_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), RegularRemesherCmpt_Type, "0", (void* (*)(Name))_RegularRemesherCmpt_DefaultNew );
 #endif
 /*
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Remesher_Type, 
-				   "0", (void* (*)(Name))_Remesher_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), StripRemesher_Type, 
-				   "0", (void* (*)(Name))_StripRemesher_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), CellRemesher_Type, 
-				   "0", (void* (*)(Name))_CellRemesher_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Remesher_Type, "0", (void* (*)(Name))_Remesher_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), StripRemesher_Type, "0", (void* (*)(Name))_StripRemesher_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), CellRemesher_Type, "0", (void* (*)(Name))_CellRemesher_DefaultNew );
 */
 
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), TimeIntegrator_Type, 
-				   "0", (void*  (*)(Name))_TimeIntegrator_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), TimeIntegratee_Type, 
-				   "0", (void*  (*)(Name))_TimeIntegratee_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ShapeAdvector_Type, 
-				   "0", (void*  (*)(Name))_ShapeAdvector_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), TimeIntegrator_Type, "0", (void*  (*)(Name))_TimeIntegrator_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), TimeIntegratee_Type, "0", (void*  (*)(Name))_TimeIntegratee_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ShapeAdvector_Type, "0", (void*  (*)(Name))_ShapeAdvector_DefaultNew );
 
-	RegisterParent( DomainContext_Type,    AbstractContext_Type );
-	RegisterParent( Operator_Type,                 Stg_Object_Type );
-	RegisterParent( AllElementsVC_Type,            VariableCondition_Type );
-	RegisterParent( AllNodesVC_Type,               VariableCondition_Type );
-	RegisterParent( WallVC_Type,                   VariableCondition_Type );
-	RegisterParent( ContactVC_Type,                   WallVC_Type );
-	RegisterParent( CornerVC_Type,		       VariableCondition_Type );
-	RegisterParent( InnerWallVC_Type,	       VariableCondition_Type );
-	RegisterParent( MeshShapeVC_Type,                  VariableCondition_Type );
-	RegisterParent( MeshBoundaryShape_Type,        Stg_Shape_Type );
-	RegisterParent( DofLayout_Type,                Stg_Component_Type );
+	RegisterParent( DomainContext_Type, AbstractContext_Type );
+	RegisterParent( Operator_Type, Stg_Object_Type );
+	RegisterParent( AllElementsVC_Type, VariableCondition_Type );
+	RegisterParent( AllNodesVC_Type, VariableCondition_Type );
+	RegisterParent( WallVC_Type, VariableCondition_Type );
+	RegisterParent( ContactVC_Type, WallVC_Type );
+	RegisterParent( CornerVC_Type, VariableCondition_Type );
+	RegisterParent( InnerWallVC_Type, VariableCondition_Type );
+	RegisterParent( MeshShapeVC_Type, VariableCondition_Type );
+	RegisterParent( MeshBoundaryShape_Type, Stg_Shape_Type );
+	RegisterParent( DofLayout_Type, Stg_Component_Type );
 #ifdef HAVE_PETSC
-	RegisterParent( RegularRemesherCmpt_Type,      Remesher_Type );
+	RegisterParent( RegularRemesherCmpt_Type, Remesher_Type );
 #endif
 /*
-	RegisterParent( Remesher_Type,                 Stg_Component_Type );
-	RegisterParent( StripRemesher_Type,            Remesher_Type );
-	RegisterParent( CellRemesher_Type,            Remesher_Type );
+	RegisterParent( Remesher_Type, Stg_Component_Type );
+	RegisterParent( StripRemesher_Type, Remesher_Type );
+	RegisterParent( CellRemesher_Type, Remesher_Type );
 */
 
-	RegisterParent( FieldVariable_Type,            Stg_Component_Type );
-	RegisterParent( OperatorFieldVariable_Type,    FieldVariable_Type );
-	RegisterParent( FieldVariable_Register_Type,   NamedObject_Register_Type );
-
-	RegisterParent( LinearRegression_Type,         Stg_Class_Type );
-	
-	RegisterParent( TimeIntegratee_Type,           Stg_Component_Type );
-	RegisterParent( TimeIntegrator_Type,           Stg_Component_Type );
-	RegisterParent( ShapeAdvector_Type,            Stg_Component_Type );
+	RegisterParent( FieldVariable_Type, Stg_Component_Type );
+	RegisterParent( OperatorFieldVariable_Type, FieldVariable_Type );
+	RegisterParent( FieldVariable_Register_Type, NamedObject_Register_Type );
+	RegisterParent( LinearRegression_Type, Stg_Class_Type );
+	RegisterParent( TimeIntegratee_Type, Stg_Component_Type );
+	RegisterParent( TimeIntegrator_Type, Stg_Component_Type );
+	RegisterParent( ShapeAdvector_Type, Stg_Component_Type );
 	
 	return True;
 }

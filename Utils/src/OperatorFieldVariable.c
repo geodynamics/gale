@@ -90,7 +90,7 @@ OperatorFieldVariable* OperatorFieldVariable_NewBinary(
 			fieldVariableList[0]->fieldVariable_Register );
 }
 
-OperatorFieldVariable* OperatorFieldVariable_DefaultNew( Name name )
+OperatorFieldVariable* _OperatorFieldVariable_DefaultNew( Name name )
 {
 		return _OperatorFieldVariable_New( 
 			sizeof(OperatorFieldVariable), 
@@ -98,7 +98,7 @@ OperatorFieldVariable* OperatorFieldVariable_DefaultNew( Name name )
 			_FieldVariable_Delete, 
 			_OperatorFieldVariable_Print,
 			_OperatorFieldVariable_Copy, 
-			(Stg_Component_DefaultConstructorFunction*)OperatorFieldVariable_DefaultNew,
+			(Stg_Component_DefaultConstructorFunction*)_OperatorFieldVariable_DefaultNew,
 			_OperatorFieldVariable_AssignFromXML,
 			_OperatorFieldVariable_Build, 
 			_OperatorFieldVariable_Initialise, 
@@ -138,7 +138,7 @@ OperatorFieldVariable* OperatorFieldVariable_New(
 			_FieldVariable_Delete, 
 			_OperatorFieldVariable_Print,
 			_OperatorFieldVariable_Copy, 
-			(Stg_Component_DefaultConstructorFunction*)OperatorFieldVariable_DefaultNew,
+			(Stg_Component_DefaultConstructorFunction*)_OperatorFieldVariable_DefaultNew,
 			_OperatorFieldVariable_AssignFromXML,
 			_OperatorFieldVariable_Build, 
 			_OperatorFieldVariable_Initialise, 

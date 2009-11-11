@@ -90,7 +90,7 @@
 		Name                                               operatorName );
 	
 	/* Public Constructor */
-	OperatorFieldVariable* OperatorFieldVariable_DefaultNew();
+	OperatorFieldVariable* _OperatorFieldVariable_DefaultNew();
 
 	OperatorFieldVariable* OperatorFieldVariable_New( 
 		Name                                               name,

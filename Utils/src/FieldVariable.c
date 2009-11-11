@@ -52,7 +52,7 @@ const char* InterpolationResultToStringMap[4] = {
 	"OUTSIDE_GLOBAL"
 	};
 
-FieldVariable* FieldVariable_DefaultNew( Name name )
+FieldVariable* _FieldVariable_DefaultNew( Name name )
 {
 		return _FieldVariable_New( 
 			sizeof(FieldVariable), 
@@ -60,7 +60,7 @@ FieldVariable* FieldVariable_DefaultNew( Name name )
 			_FieldVariable_Delete, 
 			_FieldVariable_Print,
 			_FieldVariable_Copy, 
-			(Stg_Component_DefaultConstructorFunction*)FieldVariable_DefaultNew,
+			(Stg_Component_DefaultConstructorFunction*)_FieldVariable_DefaultNew,
 			_FieldVariable_AssignFromXML,
 			_FieldVariable_Build, 
 			_FieldVariable_Initialise, 
@@ -99,7 +99,7 @@ FieldVariable* FieldVariable_New(
 			_FieldVariable_Delete,
 			_FieldVariable_Print,
 			_FieldVariable_Copy, 
-			(Stg_Component_DefaultConstructorFunction*)FieldVariable_DefaultNew,
+			(Stg_Component_DefaultConstructorFunction*)_FieldVariable_DefaultNew,
 			_FieldVariable_AssignFromXML,
 			_FieldVariable_Build, 
 			_FieldVariable_Initialise, 

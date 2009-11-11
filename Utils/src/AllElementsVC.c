@@ -67,7 +67,7 @@ AllElementsVC*	AllElementsVC_New(
 	Dictionary*							dictionary,
 	void*									mesh )
 {
-	AllElementsVC*	self = AllElementsVC_DefaultNew( name );
+	AllElementsVC*	self = _AllElementsVC_DefaultNew( name );
 	
 	self->isConstructed = True;
 	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
@@ -76,14 +76,14 @@ AllElementsVC*	AllElementsVC_New(
 	return self;
 }
 
-AllElementsVC* AllElementsVC_DefaultNew( Name name ) {
+AllElementsVC* _AllElementsVC_DefaultNew( Name name ) {
 	return _AllElementsVC_New(
 		sizeof(AllElementsVC), 
 		AllElementsVC_Type, 
 		_AllElementsVC_Delete, 
 		_AllElementsVC_Print, 
 		_AllElementsVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)AllElementsVC_DefaultNew,
+		(Stg_Component_DefaultConstructorFunction*)_AllElementsVC_DefaultNew,
 		_AllElementsVC_AssignFromXML,
 		_AllElementsVC_Build,
 		_VariableCondition_Initialise,

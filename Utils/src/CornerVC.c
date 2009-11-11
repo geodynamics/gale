@@ -79,7 +79,7 @@ CornerVC* CornerVC_New(
    Dictionary*							dictionary,
    void*									_mesh )
 {
-   CornerVC* self = CornerVC_DefaultNew( name );
+   CornerVC* self = _CornerVC_DefaultNew( name );
 
 	self->isConstructed = True;
 	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
@@ -88,14 +88,14 @@ CornerVC* CornerVC_New(
 	return self;
 }
 
-CornerVC* CornerVC_DefaultNew( Name name ) {
+CornerVC* _CornerVC_DefaultNew( Name name ) {
 	return _CornerVC_New(
 		sizeof(CornerVC), 
 		CornerVC_Type, 
 		_CornerVC_Delete, 
 		_CornerVC_Print, 
 		_CornerVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)CornerVC_DefaultNew,
+		(Stg_Component_DefaultConstructorFunction*)_CornerVC_DefaultNew,
 		_CornerVC_AssignFromXML,	
 		_CornerVC_Build,
 		_VariableCondition_Initialise,

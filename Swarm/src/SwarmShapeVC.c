@@ -49,86 +49,70 @@ const Name defaultSwarmShapeVCName = "defaultSwarmShapeVCName";
 ** Constructor
 */
 VariableCondition* SwarmShapeVC_Factory(
-		Variable_Register*                          variable_Register, 
-		ConditionFunction_Register*                 conFunc_Register, 
-		Dictionary*                                 dictionary,
-		void*                                       data )
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register, 
+	Dictionary*							dictionary,
+	void*									data )
 {
-	return (VariableCondition*) 
-		SwarmShapeVC_New( defaultSwarmShapeVCName, NULL, variable_Register, conFunc_Register, dictionary, (Swarm*)data );
+	return (VariableCondition*) SwarmShapeVC_New( defaultSwarmShapeVCName, NULL, variable_Register, conFunc_Register, dictionary, (Swarm*)data );
 }
 
 SwarmShapeVC* SwarmShapeVC_New(
-		Name                                        name,
-		Name                                        _dictionaryEntryName, 
-		Variable_Register*                          variable_Register, 
-		ConditionFunction_Register*                 conFunc_Register, 
-		Dictionary*	                                dictionary,
-		void*                                       _swarm )
+	Name									name,
+	Name									_dictionaryEntryName, 
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register, 
+	Dictionary*							dictionary,
+	void*									_swarm )
 {
 	SwarmShapeVC* self = (SwarmShapeVC*) _SwarmShapeVC_DefaultNew( name );
 
+	self->isConstructed = True;
 	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
 	_SwarmShapeVC_Init( self, _dictionaryEntryName, _swarm );
 
 	return self;
 }
 
-SwarmShapeVC* _SwarmShapeVC_New( 
-		SizeT                                       _sizeOfSelf, 
-		Type                                        type,
-		Stg_Class_DeleteFunction*                   _delete,
-		Stg_Class_PrintFunction*                    _print,
-		Stg_Class_CopyFunction*                     _copy,
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*            _construct,
-		Stg_Component_BuildFunction*                _build,
-		Stg_Component_InitialiseFunction*           _initialise,
-		Stg_Component_ExecuteFunction*              _execute,
-		Stg_Component_DestroyFunction*              _destroy,
-		VariableCondition_BuildSelfFunc*            _buildSelf, 
-		VariableCondition_PrintConciseFunc*         _printConcise,
-		VariableCondition_ReadDictionaryFunc*       _readDictionary,
-		VariableCondition_GetSetFunc*               _getSet,
-		VariableCondition_GetVariableCountFunc*     _getVariableCount,
-		VariableCondition_GetVariableIndexFunc*     _getVariableIndex,
-		VariableCondition_GetValueIndexFunc*        _getValueIndex,
-		VariableCondition_GetValueCountFunc*        _getValueCount,
-		VariableCondition_GetValueFunc*             _getValue,
-		VariableCondition_ApplyFunc*	  	    _apply, 
-		Name                                        name  )
-{
-	SwarmShapeVC*	self;
-	
-	/* Allocate memory/General info */
-	assert(_sizeOfSelf >= sizeof(SwarmShapeVC));
-	self = (SwarmShapeVC*)_VariableCondition_New(
-		_sizeOfSelf, 
-		type, 
-		_delete, 
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,	
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
+void* _SwarmShapeVC_DefaultNew( Name name ) {
+	return (void*) _SwarmShapeVC_New(
+		sizeof(SwarmShapeVC), 
+		SwarmShapeVC_Type, 
+		_SwarmShapeVC_Delete, 
+		_SwarmShapeVC_Print, 
+		_SwarmShapeVC_Copy,
+		_SwarmShapeVC_DefaultNew,
+		_SwarmShapeVC_AssignFromXML,	
+		_SwarmShapeVC_Build,
+		/*_VariableCondition_Initialise,*/
+		_SwarmShapeVC_Initialise,
+		_VariableCondition_Execute,
+		_VariableCondition_Destroy,
 		name,
-		False,
-		_buildSelf, 
-		_printConcise,	
-		_readDictionary,
-		_getSet, 
-		_getVariableCount, 
-		_getVariableIndex, 
-		_getValueIndex, 
-		_getValueCount, 
-		_getValue, 
-		_apply, 
-		NULL, 
+		NON_GLOBAL,
+		_SwarmShapeVC_BuildSelf, 
+		_SwarmShapeVC_PrintConcise,
+		_SwarmShapeVC_ReadDictionary,
+		_SwarmShapeVC_GetSet, 
+		_SwarmShapeVC_GetVariableCount, 
+		_SwarmShapeVC_GetVariableIndex, 
+		_SwarmShapeVC_GetValueIndex, 
+		_SwarmShapeVC_GetValueCount, 
+		_SwarmShapeVC_GetValue,
+		_VariableCondition_Apply, 
+		NULL,
+		NULL,
+		NULL,
 		NULL,
 		NULL );
+}
+
+SwarmShapeVC* _SwarmShapeVC_New( SWARMSHAPEVC_DEFARGS ) {
+	SwarmShapeVC* self;
+	
+	/* Allocate memory/General info */
+	assert( sizeOfSelf >= sizeof(SwarmShapeVC) );
+	self = (SwarmShapeVC*)_VariableCondition_New( VARIABLECONDITION_PASSARGS );
 	
 	/* Virtual info */
 	
@@ -136,14 +120,9 @@ SwarmShapeVC* _SwarmShapeVC_New(
 }
 
 
-void _SwarmShapeVC_Init(
-		void*                                       variableCondition, 
-		Name                                        _dictionaryEntryName, 
-		void*                                       _swarm )
-{
-	SwarmShapeVC*			self = (SwarmShapeVC*) variableCondition;
+void _SwarmShapeVC_Init( void* variableCondition, Name _dictionaryEntryName, void* _swarm ) {
+	SwarmShapeVC* self = (SwarmShapeVC*) variableCondition;
 
-	self->isConstructed        = True;
 	self->_dictionaryEntryName = _dictionaryEntryName;
 	self->_swarm                = (Swarm*)_swarm;
 	self->_entryTbl            = 0;
@@ -158,7 +137,14 @@ void _SwarmShapeVC_Init(
 */
 
 
-void _SwarmShapeVC_Delete(void* variableCondition) {
+void _SwarmShapeVC_Delete( void* variableCondition ) {
+	SwarmShapeVC* self = (SwarmShapeVC*)variableCondition;
+	
+	/* Stg_Class_Delete parent */
+	_VariableCondition_Delete(self);
+}
+
+void _SwarmShapeVC_Destroy( void* variableCondition, void* data ) {
 	SwarmShapeVC*	self = (SwarmShapeVC*)variableCondition;
 	
 	if ( self->_entryTbl ) 
@@ -168,9 +154,8 @@ void _SwarmShapeVC_Delete(void* variableCondition) {
 		Memory_Free( self->shapeName );
 	
 	/* Stg_Class_Delete parent */
-	_VariableCondition_Delete(self);
+	_VariableCondition_Destroy( self, data );
 }
-
 
 void _SwarmShapeVC_Print(void* variableCondition, Stream* stream) {
 	SwarmShapeVC*                self = (SwarmShapeVC*)variableCondition;
@@ -289,33 +274,6 @@ void* _SwarmShapeVC_Copy( void* variableCondition, void* dest, Bool deep, Name n
 }
 	
 /****************** Stg_Component Virtual Functions ******************/
-void* _SwarmShapeVC_DefaultNew( Name name ) {
-	return (void*) _SwarmShapeVC_New(
-		sizeof(SwarmShapeVC), 
-		SwarmShapeVC_Type, 
-		_SwarmShapeVC_Delete, 
-		_SwarmShapeVC_Print, 
-		_SwarmShapeVC_Copy,
-		_SwarmShapeVC_DefaultNew,
-		_SwarmShapeVC_AssignFromXML,	
-		_SwarmShapeVC_Build,
-		/*_VariableCondition_Initialise,*/
-		_SwarmShapeVC_Initialise,
-		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
-		_SwarmShapeVC_BuildSelf, 
-		_SwarmShapeVC_PrintConcise,
-		_SwarmShapeVC_ReadDictionary,
-		_SwarmShapeVC_GetSet, 
-		_SwarmShapeVC_GetVariableCount, 
-		_SwarmShapeVC_GetVariableIndex, 
-		_SwarmShapeVC_GetValueIndex, 
-		_SwarmShapeVC_GetValueCount, 
-		_SwarmShapeVC_GetValue,
-		_VariableCondition_Apply, 
-		name );
-}
-
 void _SwarmShapeVC_AssignFromXML( void* variableCondition, Stg_ComponentFactory* cf, void* data ) {
 	SwarmShapeVC*		self    		= (SwarmShapeVC*)variableCondition;
 	void*			conFunc_Register 	= NULL;

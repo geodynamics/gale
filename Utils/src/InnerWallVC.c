@@ -77,7 +77,7 @@ InnerWallVC* InnerWallVC_New(
 	Dictionary*							dictionary,
 	void*									_mesh )
 {
-	InnerWallVC* self = InnerWallVC_DefaultNew( name );
+	InnerWallVC* self = _InnerWallVC_DefaultNew( name );
 
 	self->isConstructed = True;
 	_VariableCondition_Init( (VariableCondition*)self, variable_Register, conFunc_Register, dictionary );
@@ -85,14 +85,14 @@ InnerWallVC* InnerWallVC_New(
 
 	return self;
 }
-InnerWallVC* InnerWallVC_DefaultNew( Name name ) {
+InnerWallVC* _InnerWallVC_DefaultNew( Name name ) {
 	return _InnerWallVC_New(
 		sizeof(InnerWallVC), 
 		InnerWallVC_Type, 
 		_InnerWallVC_Delete, 
 		_InnerWallVC_Print, 
 		_InnerWallVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)InnerWallVC_DefaultNew,
+		(Stg_Component_DefaultConstructorFunction*)_InnerWallVC_DefaultNew,
 		_InnerWallVC_AssignFromXML,	
 		_InnerWallVC_Build,
 		_VariableCondition_Initialise,

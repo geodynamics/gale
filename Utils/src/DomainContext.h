@@ -60,7 +60,7 @@
 	#define DOMAINCONTEXT_PASSARGS \
 		ABSTRACTCONTEXT_PASSARGS
 
-	DomainContext* DomainContext_DefaultNew( Name name );
+	DomainContext* _DomainContext_DefaultNew( Name name );
 	
 	DomainContext* DomainContext_New( 
 		Name 			name,

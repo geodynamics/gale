@@ -77,7 +77,7 @@ WallVC*	WallVC_New(
 	Dictionary*							dictionary,
 	void*									_mesh )
 {
-	WallVC* self = WallVC_DefaultNew( name );
+	WallVC* self = _WallVC_DefaultNew( name );
 
 	self->isConstructed = True;
 	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
@@ -86,14 +86,14 @@ WallVC*	WallVC_New(
 	return self;
 }
 
-WallVC*	WallVC_DefaultNew( Name name ) {
+WallVC* _WallVC_DefaultNew( Name name ) {
 	return _WallVC_New(
 		sizeof(WallVC), 
 		WallVC_Type, 
 		_WallVC_Delete, 
 		_WallVC_Print, 
 		_WallVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)WallVC_DefaultNew,
+		(Stg_Component_DefaultConstructorFunction*)_WallVC_DefaultNew,
 		_WallVC_AssignFromXML,	
 		_WallVC_Build,
 		_VariableCondition_Initialise,

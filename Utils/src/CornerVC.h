@@ -86,7 +86,7 @@
 		Dictionary*							dictionary,
 		void*									data );
 	
-	CornerVC* CornerVC_DefaultNew( Name name );
+	CornerVC* _CornerVC_DefaultNew( Name name );
 
 	CornerVC* CornerVC_New(
 		Name									name,

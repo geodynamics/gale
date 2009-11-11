@@ -82,7 +82,7 @@
 		Dictionary*							dictionary,
 		void*									data );
 	
-	AllNodesVC* AllNodesVC_DefaultNew( Name name );
+	AllNodesVC* _AllNodesVC_DefaultNew( Name name );
 
 	AllNodesVC* AllNodesVC_New(
 		Name									name,

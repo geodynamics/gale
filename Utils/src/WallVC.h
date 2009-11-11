@@ -85,7 +85,7 @@
 		Dictionary*							dictionary,
 		void*									data );
 	
-	WallVC* WallVC_DefaultNew( Name name );
+	WallVC* _WallVC_DefaultNew( Name name );
 
 	WallVC* WallVC_New(
 		Name									name,

@@ -86,7 +86,7 @@
 		Dictionary*							dictionary,
 		void*									data );
 	
-	InnerWallVC* InnerWallVC_DefaultNew( Name name );
+	InnerWallVC* _InnerWallVC_DefaultNew( Name name );
 
 	InnerWallVC* InnerWallVC_New(
 		Name									name,

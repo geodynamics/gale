@@ -69,7 +69,7 @@ AllNodesVC*	AllNodesVC_New(
 	Dictionary*							dictionary,
 	void*									mesh )
 {
-	AllNodesVC* self = AllNodesVC_DefaultNew( name );
+	AllNodesVC* self = _AllNodesVC_DefaultNew( name );
 
 	self->isConstructed = True;
 	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );	
@@ -78,14 +78,14 @@ AllNodesVC*	AllNodesVC_New(
 	return self;
 }
 
-AllNodesVC* AllNodesVC_DefaultNew( Name name ) {
+AllNodesVC* _AllNodesVC_DefaultNew( Name name ) {
 	return _AllNodesVC_New(
 		sizeof(AllNodesVC), 
 		AllNodesVC_Type, 
 		_AllNodesVC_Delete, 
 		_AllNodesVC_Print, 
 		_AllNodesVC_Copy, 
-		(Stg_Component_DefaultConstructorFunction*)AllNodesVC_DefaultNew,
+		(Stg_Component_DefaultConstructorFunction*)_AllNodesVC_DefaultNew,
 		_AllNodesVC_AssignFromXML,
 		_AllNodesVC_Build,
 		_VariableCondition_Initialise,

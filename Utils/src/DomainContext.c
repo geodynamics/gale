@@ -55,7 +55,7 @@ DomainContext* DomainContext_New(
 	MPI_Comm		communicator,
 	Dictionary*	dictionary )
 {
-	DomainContext* self = DomainContext_DefaultNew( name );
+	DomainContext* self = _DomainContext_DefaultNew( name );
 
 	self->isConstructed = True;
 	_AbstractContext_Init( self );
@@ -64,7 +64,7 @@ DomainContext* DomainContext_New(
 	return self;
 }
 
-DomainContext* DomainContext_DefaultNew( Name name ) {
+DomainContext* _DomainContext_DefaultNew( Name name ) {
 	return _DomainContext_New(
 		sizeof(DomainContext),
 		DomainContext_Type,

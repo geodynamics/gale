@@ -53,31 +53,46 @@ const Name defaultContactVCName = "defaultContactVCName";
 */
 
 VariableCondition* ContactVC_Factory(
-   Variable_Register*				variable_Register, 
-   ConditionFunction_Register*			conFunc_Register, 
-   Dictionary*					dictionary,
-   void*						data )
+	Variable_Register*				variable_Register, 
+   ConditionFunction_Register*	conFunc_Register, 
+   Dictionary*							dictionary,
+   void*									data )
 {
    return (VariableCondition*)ContactVC_New( defaultContactVCName, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
 }
 
-
-ContactVC*	ContactVC_DefaultNew( Name name )
+ContactVC*	ContactVC_New(
+   Name									name,
+   Name									_dictionaryEntryName, 
+   Variable_Register*				variable_Register, 
+   ConditionFunction_Register*	conFunc_Register, 
+   Dictionary*							dictionary,
+   void*									_mesh )
 {
+   ContactVC* self = _ContactVC_DefaultNew( name );
+	
+	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
+   _WallVC_Init( self, _dictionaryEntryName, _mesh );
+	_ContactVC_Init( self, _dictionaryEntryName, _mesh );
+
+	return self;
+}
+
+ContactVC* _ContactVC_DefaultNew( Name name ) {
    return _ContactVC_New(
       sizeof(ContactVC), 
       ContactVC_Type, 
       _ContactVC_Delete, 
       _WallVC_Print, 
       _WallVC_Copy,
-      (Stg_Component_DefaultConstructorFunction*)ContactVC_DefaultNew,
+      (Stg_Component_DefaultConstructorFunction*)_ContactVC_DefaultNew,
       _ContactVC_AssignFromXML,	
       _ContactVC_Build,
       _VariableCondition_Initialise,
       _VariableCondition_Execute,
       _VariableCondition_Destroy,
       name,
-      False,
+      NON_GLOBAL,
       _WallVC_BuildSelf, 
       _WallVC_PrintConcise,
       _ContactVC_ReadDictionary,
@@ -95,127 +110,23 @@ ContactVC*	ContactVC_DefaultNew( Name name )
       NULL);
 }
 
-ContactVC*	ContactVC_New(
-   Name						name,
-   Name						_dictionaryEntryName, 
-   Variable_Register*				variable_Register, 
-   ConditionFunction_Register*			conFunc_Register, 
-   Dictionary*					dictionary,
-   void*						_mesh )
-{
-   return _ContactVC_New(
-      sizeof(ContactVC), 
-      ContactVC_Type, 
-      _ContactVC_Delete, 
-      _WallVC_Print, 
-      _WallVC_Copy,
-      (Stg_Component_DefaultConstructorFunction*)ContactVC_DefaultNew,
-      _ContactVC_AssignFromXML,	
-      _ContactVC_Build,
-      _VariableCondition_Initialise,
-      _VariableCondition_Execute,
-      _VariableCondition_Destroy,
-      name,
-      True,
-      _WallVC_BuildSelf, 
-      _WallVC_PrintConcise,
-      _ContactVC_ReadDictionary,
-      _ContactVC_GetSet, 
-      _WallVC_GetVariableCount, 
-      _WallVC_GetVariableIndex, 
-      _WallVC_GetValueIndex, 
-      _WallVC_GetValueCount, 
-      _WallVC_GetValue,
-      _VariableCondition_Apply, 
-      _dictionaryEntryName,
-      variable_Register, 
-      conFunc_Register, 
-      dictionary, 
-      _mesh );
-}
-
-
-ContactVC* _ContactVC_New( 
-   SizeT						_sizeOfSelf, 
-   Type						type,
-   Stg_Class_DeleteFunction*				_delete,
-   Stg_Class_PrintFunction*				_print,
-   Stg_Class_CopyFunction*				_copy, 
-   Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-   Stg_Component_ConstructFunction*			_construct,
-   Stg_Component_BuildFunction*			_build,
-   Stg_Component_InitialiseFunction*			_initialise,
-   Stg_Component_ExecuteFunction*			_execute,
-   Stg_Component_DestroyFunction*			_destroy,
-   Name								name, 
-   Bool								initFlag,
-   VariableCondition_BuildSelfFunc*		_buildSelf, 
-   VariableCondition_PrintConciseFunc*		_printConcise,
-   VariableCondition_ReadDictionaryFunc*		_readDictionary,
-   VariableCondition_GetSetFunc*			_getSet,
-   VariableCondition_GetVariableCountFunc*		_getVariableCount,
-   VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-   VariableCondition_GetValueIndexFunc*		_getValueIndex,
-   VariableCondition_GetValueCountFunc*		_getValueCount,
-   VariableCondition_GetValueFunc*			_getValue,
-   VariableCondition_ApplyFunc*			_apply, 
-   Name						_dictionaryEntryName, 
-   Variable_Register*				variable_Register, 
-   ConditionFunction_Register*			conFunc_Register, 
-   Dictionary*					dictionary,
-   void*						_mesh)
-{
-   ContactVC*	self;
+ContactVC* _ContactVC_New( CONTACTVC_DEFARGS ) {
+   ContactVC* self;
 	
    /* Allocate memory/General info */
-   assert(_sizeOfSelf >= sizeof(ContactVC));
-   self = (ContactVC*)_WallVC_New(
-      _sizeOfSelf, 
-      type, 
-      _delete, 
-      _print,
-      _copy,
-      _defaultConstructor,
-      _construct,	
-      _build,
-      _initialise,
-      _execute,
-      _destroy,
-      name,
-      initFlag,
-      _buildSelf, 
-      _printConcise,	
-      _readDictionary,
-      _getSet, 
-      _getVariableCount, 
-      _getVariableIndex, 
-      _getValueIndex, 
-      _getValueCount, 
-      _getValue, 
-      _apply, 
-      _dictionaryEntryName,
-      variable_Register, 
-      conFunc_Register,
-      dictionary,
-      _mesh );
+   assert( sizeOfSelf >= sizeof(ContactVC) );
+   self = (ContactVC*)_WallVC_New( WALLVC_PASSARGS );
 	
    /* Virtual info */
 	
    /* Stg_Class info */
-   if( initFlag ){
-      _ContactVC_Init( self, _dictionaryEntryName, _mesh );
-   }
 	
    return self;
 }
 
 
-void _ContactVC_Init(
-   void*						wallVC, 
-   Name						_dictionaryEntryName, 
-   void*						_mesh )
-{
-   ContactVC*			self = (ContactVC*)wallVC;
+void _ContactVC_Init( void* wallVC, Name _dictionaryEntryName, void* _mesh ) {
+   ContactVC* self = (ContactVC*)wallVC;
 
    self->deep = False;
 }

@@ -92,7 +92,7 @@
 	** Constructor
 	*/
 	
-	DofLayout*	DofLayout_DefaultNew( Name name );
+	DofLayout*	_DofLayout_DefaultNew( Name name );
 	
 	DofLayout*	DofLayout_New( Name name, Variable_Register* variableRegister, Index numItemsInLayout, void* mesh );
 	

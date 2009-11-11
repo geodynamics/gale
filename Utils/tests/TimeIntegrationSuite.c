@@ -179,7 +179,7 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	Dictionary_Add(dictionary, "DerivName0", Dictionary_Entry_Value_FromString(_DerivName0));
 	Dictionary_Add(dictionary, "DerivName1", Dictionary_Entry_Value_FromString(_DerivName1));
 
-	context = DomainContext_DefaultNew( "context" );
+	context = DomainContext_New( "context", 0, 0, MPI_COMM_WORLD, NULL );
 	cf = stgMainConstruct( dictionary, data->comm, context );
 	stgMainBuildAndInitialise( cf );
       

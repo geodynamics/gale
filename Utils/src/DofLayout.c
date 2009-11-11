@@ -63,7 +63,7 @@ Dof_Index	_DofLayout_AddVariable_ByName(void* dofLayout, Name varName);
 ** Constructor
 */
 
-DofLayout* DofLayout_DefaultNew( Name name )
+DofLayout* _DofLayout_DefaultNew( Name name )
 {
 	return _DofLayout_New(
 			sizeof(DofLayout), 
@@ -71,7 +71,7 @@ DofLayout* DofLayout_DefaultNew( Name name )
 			_DofLayout_Delete, 
 			_DofLayout_Print, 
 			_DofLayout_Copy,
-			(Stg_Component_DefaultConstructorFunction*)DofLayout_DefaultNew,
+			(Stg_Component_DefaultConstructorFunction*)_DofLayout_DefaultNew,
 			_DofLayout_AssignFromXML,
 			_DofLayout_Build, 
 			_DofLayout_Initialise, 
@@ -92,7 +92,7 @@ DofLayout* DofLayout_New( Name name, Variable_Register* variableRegister, Index 
 			_DofLayout_Delete, 
 			_DofLayout_Print, 
 			_DofLayout_Copy,
-			(Stg_Component_DefaultConstructorFunction*)DofLayout_DefaultNew,
+			(Stg_Component_DefaultConstructorFunction*)_DofLayout_DefaultNew,
 			_DofLayout_AssignFromXML,
 			_DofLayout_Build, 
 			_DofLayout_Initialise, 
@@ -117,7 +117,7 @@ void DofLayout_Init(DofLayout* self, Name name, Variable_Register* variableRegis
 	self->_delete = _Variable_Delete;
 	self->_print = _Variable_Print;
 	self->_copy = _DofLayout_Copy;
-	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)DofLayout_DefaultNew;
+	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_DofLayout_DefaultNew;
 	self->_construct = _DofLayout_AssignFromXML;
 	self->_build = _DofLayout_Build;
 	self->_execute = _DofLayout_Execute;
@@ -151,7 +151,7 @@ DofLayout* _DofLayout_New(
 	
 	/* Allocate memory/General info */
 	assert(_sizeOfSelf >= sizeof(DofLayout));
-	self = (DofLayout*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, (Stg_Component_DefaultConstructorFunction*)DofLayout_DefaultNew,
+	self = (DofLayout*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, (Stg_Component_DefaultConstructorFunction*)_DofLayout_DefaultNew,
 			_construct, _build, _initialise, _execute, _destroy, name, NON_GLOBAL );
 	
 	/* Virtual info */

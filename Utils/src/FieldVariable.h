@@ -108,7 +108,7 @@
 		(FieldVariable*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 
 	/** Creation implementation */
-	FieldVariable* FieldVariable_DefaultNew( Name name );
+	FieldVariable* _FieldVariable_DefaultNew( Name name );
 
 	FieldVariable* FieldVariable_New(		
 		Name                                               name,
