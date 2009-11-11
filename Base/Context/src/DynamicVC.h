@@ -71,7 +71,7 @@ extern const Type DynamicVC_Type;
 		ConditionFunction_Register*	conFunc_Register,
 		Dictionary*							dict );
 
-	DynamicVC* DynamicVC_DefaultNew( Name name );
+	DynamicVC* _DynamicVC_DefaultNew( Name name );
 
 	DynamicVC* _DynamicVC_New( DYNAMICVC_DEFARGS );
 

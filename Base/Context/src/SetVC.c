@@ -71,7 +71,7 @@ SetVC* SetVC_New(
 	ConditionFunction_Register*	conFunc_Register,
 	Dictionary*							dictionary )
 {
-	SetVC* self = SetVC_DefaultNew( name );
+	SetVC* self = _SetVC_DefaultNew( name );
 
 	self->isConstructed = True;
 	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
@@ -80,14 +80,14 @@ SetVC* SetVC_New(
 	return self;
 }
 
-SetVC* SetVC_DefaultNew( Name name ) {
+SetVC* _SetVC_DefaultNew( Name name ) {
 	return (SetVC*)_SetVC_New( 
 		sizeof(SetVC), 
 		SetVC_Type, 
 		_SetVC_Delete, 
 		_SetVC_Print, 
 		_SetVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)SetVC_DefaultNew,
+		(Stg_Component_DefaultConstructorFunction*)_SetVC_DefaultNew,
 		_VariableCondition_AssignFromXML,
 		_VariableCondition_Build,
 		_VariableCondition_Initialise,

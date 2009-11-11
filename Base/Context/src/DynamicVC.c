@@ -68,7 +68,7 @@ DynamicVC* DynamicVC_New(
 	ConditionFunction_Register*	conFunc_Register, 
 	Dictionary*							dictionary )
 {
-	DynamicVC* self = DynamicVC_DefaultNew( name );
+	DynamicVC* self = _DynamicVC_DefaultNew( name );
 
 	self->isConstructed = True;
 	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
@@ -77,13 +77,13 @@ DynamicVC* DynamicVC_New(
 	return self;
 }
 
-DynamicVC* DynamicVC_DefaultNew( Name name ) {
+DynamicVC* _DynamicVC_DefaultNew( Name name ) {
 	return (DynamicVC*)_DynamicVC_New( sizeof(DynamicVC), 
 		DynamicVC_Type, 
 		_DynamicVC_Delete, 
 	   _DynamicVC_Print, 
 		_DynamicVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)DynamicVC_DefaultNew,
+		(Stg_Component_DefaultConstructorFunction*)_DynamicVC_DefaultNew,
 		_VariableCondition_AssignFromXML,
 		_VariableCondition_Build,
 		_VariableCondition_Initialise,

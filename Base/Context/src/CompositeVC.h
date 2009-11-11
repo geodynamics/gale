@@ -83,7 +83,7 @@
 		Dictionary*							dictionary,
 		void*									data );
 	
-	CompositeVC* CompositeVC_DefaultNew( Name name );
+	CompositeVC* _CompositeVC_DefaultNew( Name name );
 	
 	void CompositeVC_Init(
 		CompositeVC*						self, 

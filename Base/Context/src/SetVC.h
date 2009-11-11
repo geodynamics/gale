@@ -84,7 +84,7 @@
 		ConditionFunction_Register*	conFunc_Register,
 		Dictionary*							dictionary );
 	
-	SetVC* SetVC_DefaultNew( Name name );
+	SetVC* _SetVC_DefaultNew( Name name );
 	
 	SetVC* _SetVC_New( SETVC_DEFARGS );
 	

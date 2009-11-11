@@ -92,7 +92,7 @@
 		Dictionary*							dictionary,
 		void*									mesh );
 	
-	VariableAllVC* VariableAllVC_DefaultNew( Name name );
+	VariableAllVC* _VariableAllVC_DefaultNew( Name name );
 	
 	VariableAllVC* _VariableAllVC_New( VARIABLEALLVC_DEFARGS );
 	

@@ -73,7 +73,7 @@ CompositeVC* CompositeVC_New(
 	Dictionary*							dictionary,
 	void*									data )
 {
-	CompositeVC* self = CompositeVC_DefaultNew( name );
+	CompositeVC* self = _CompositeVC_DefaultNew( name );
 
 	self->isConstructed = True;
 	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
@@ -82,14 +82,14 @@ CompositeVC* CompositeVC_New(
 	return self;
 }
 
-CompositeVC* CompositeVC_DefaultNew( Name name ) {
+CompositeVC* _CompositeVC_DefaultNew( Name name ) {
 	return (CompositeVC*)_CompositeVC_New(
 		sizeof(CompositeVC), 
 		CompositeVC_Type, 
 		_CompositeVC_Delete, 
 		_CompositeVC_Print,
 		_CompositeVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)CompositeVC_DefaultNew,
+		(Stg_Component_DefaultConstructorFunction*)_CompositeVC_DefaultNew,
 		_CompositeVC_AssignFromXML,
 		_CompositeVC_Build,
 		_VariableCondition_Initialise,

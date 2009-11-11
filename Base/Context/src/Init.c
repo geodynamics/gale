@@ -73,10 +73,10 @@ Bool BaseContext_Init( int* argc, char** argv[] ) {
 	
 	/** Adding default constructors of various components to the Stg_ComponentRegister */
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Variable_Type, "0", (Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), CompositeVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)CompositeVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SetVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)SetVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), VariableAllVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)VariableAllVC_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), DynamicVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)DynamicVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), CompositeVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)_CompositeVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SetVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)_SetVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), VariableAllVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)_VariableAllVC_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), DynamicVC_Type, "0", (Stg_Component_DefaultConstructorFunction*)_DynamicVC_DefaultNew );
 
 	/** Register Parents for All Classes */
 	RegisterParent( Variable_Type, Stg_Component_Type );

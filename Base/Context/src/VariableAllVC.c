@@ -72,7 +72,7 @@ VariableAllVC*	VariableAllVC_New(
 	Dictionary*							dictionary,
 	void*									data )
 {
-	VariableAllVC*	self = VariableAllVC_DefaultNew( name );
+	VariableAllVC*	self = _VariableAllVC_DefaultNew( name );
 
 	self->isConstructed = True;
 	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
@@ -81,14 +81,14 @@ VariableAllVC*	VariableAllVC_New(
 	return self;
 }
 
-VariableAllVC*	VariableAllVC_DefaultNew( Name name ) {
+VariableAllVC*	_VariableAllVC_DefaultNew( Name name ) {
 	return (VariableAllVC*)_VariableAllVC_New(
 		sizeof(VariableAllVC), 
 		VariableAllVC_Type, 
 		_VariableAllVC_Delete, 
 		_VariableAllVC_Print, 
 		_VariableAllVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)VariableAllVC_DefaultNew,
+		(Stg_Component_DefaultConstructorFunction*)_VariableAllVC_DefaultNew,
 		_VariableCondition_AssignFromXML,
 		_VariableAllVC_Build,
 		_VariableCondition_Initialise,
