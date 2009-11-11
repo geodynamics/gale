@@ -350,10 +350,6 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 
 	_Swarm_Initialise( self, data );
 
-	for( var_I = 0 ; var_I < self->nSwarmVars ; var_I++ ) {
-		Stg_Component_Initialise( self->swarmVars[var_I], data , False );
-	}
-
 	/* Now setup the material properties */
    if(  False == context->loadFromCheckPoint ) {
 
@@ -375,6 +371,9 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 		}
 	}
 
+	for( var_I = 0 ; var_I < self->nSwarmVars ; var_I++ ) {
+		Stg_Component_Initialise( self->swarmVars[var_I], data , False );
+	}
 
 	/** if loading from checkpoint, particle materials etc have already been loaded in Swarm_Build() - */ 
 	/** possibly need to check for empty cells (and populate) if performing a interpolation restart */
