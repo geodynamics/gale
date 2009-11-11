@@ -111,6 +111,8 @@
 	
 	void _WallVC_Print( void* wallVC, Stream* stream );
 	
+	void _WallVC_Destroy( void* wallVC, void* data );
+
 	/* Copy */
 	#define WallVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )

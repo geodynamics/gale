@@ -88,7 +88,7 @@ AllElementsVC* AllElementsVC_DefaultNew( Name name ) {
 		_AllElementsVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
+		_AllElementsVC_Destroy,
 		name,
 		NON_GLOBAL,
 		_AllElementsVC_BuildSelf, 
@@ -108,7 +108,6 @@ AllElementsVC* AllElementsVC_DefaultNew( Name name ) {
 		NULL );
 }
 
-
 AllElementsVC* _AllElementsVC_New( ALLELEMENTSVC_DEFARGS ) {
 	AllElementsVC*	self;
 	
@@ -124,11 +123,7 @@ AllElementsVC* _AllElementsVC_New( ALLELEMENTSVC_DEFARGS ) {
 }
 
 
-void _AllElementsVC_Init(
-	void*	allElementsVC,
-	Name	_dictionaryEntryName, 
-	void*	mesh )
-{
+void _AllElementsVC_Init( void* allElementsVC, Name _dictionaryEntryName, void* mesh ) {
 	AllElementsVC*			self = (AllElementsVC*)allElementsVC;
 
 	self->_dictionaryEntryName = _dictionaryEntryName;
@@ -256,21 +251,25 @@ void _AllElementsVC_ReadDictionary( void* variableCondition, void* dictionary ) 
 	}
 }
 
-
 void _AllElementsVC_Delete( void* allElementsVC ) {
-	AllElementsVC*				self = (AllElementsVC*)allElementsVC;
-	
-	if (self->_entryTbl) Memory_Free(self->_entryTbl);
+	AllElementsVC* self = (AllElementsVC*)allElementsVC;
 	
 	/* Stg_Class_Delete parent */
 	_VariableCondition_Delete(self);
 }
 
+void _AllElementsVC_Destroy( void* allElementsVC, void* data ) {
+	AllElementsVC* self = (AllElementsVC*)allElementsVC;
+
+	if (self->_entryTbl) Memory_Free(self->_entryTbl);
+	
+	_VariableCondition_Destroy( self, data );
+}
 
 void _AllElementsVC_Print( void* allElementsVC, Stream* stream ) {
-	AllElementsVC*				self = (AllElementsVC*)allElementsVC;
-	AllElementsVC_Entry_Index		entry_I;
-	Index					i;
+	AllElementsVC*					self = (AllElementsVC*)allElementsVC;
+	AllElementsVC_Entry_Index	entry_I;
+	Index								i;
 	
 	/* Set the Journal for printing informations */
 	Stream* info = stream;

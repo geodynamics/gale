@@ -106,6 +106,8 @@
 	
 	void _AllElementsVC_Print( void* allElementsVC, Stream* stream );
 	
+	void _AllElementsVC_Destroy( void* allElementsVC, void* data );
+
 	/* Copy */
 	#define AllElementsVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )

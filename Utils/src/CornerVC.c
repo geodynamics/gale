@@ -100,7 +100,7 @@ CornerVC* CornerVC_DefaultNew( Name name ) {
 		_CornerVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
+		_CornerVC_Destroy,
 		name,
 		NON_GLOBAL,
 		_CornerVC_BuildSelf, 
@@ -294,16 +294,20 @@ void _CornerVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 }
 
 
-void _CornerVC_Delete(void* cornerVC)
-{
-   CornerVC*	self = (CornerVC*)cornerVC;
-	
-   if (self->_entryTbl) Memory_Free(self->_entryTbl);
+void _CornerVC_Delete(void* cornerVC) {
+   CornerVC* self = (CornerVC*)cornerVC;
 	
    /* Stg_Class_Delete parent */
    _VariableCondition_Delete(self);
 }
 
+void _CornerVC_Destroy(void* cornerVC, void* data) {
+   CornerVC* self = (CornerVC*)cornerVC;
+
+   if (self->_entryTbl) Memory_Free(self->_entryTbl);
+
+   _VariableCondition_Destroy(self, data);
+}
 
 void _CornerVC_Print(void* cornerVC, Stream* stream)
 {

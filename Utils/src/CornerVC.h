@@ -109,6 +109,8 @@
 	
 	void _CornerVC_Print( void* cornerVC, Stream* stream );
 	
+	void _CornerVC_Destroy( void* cornerVC, void* data );
+	
 	/* Copy */
 	#define CornerVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )

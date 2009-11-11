@@ -90,7 +90,7 @@ AllNodesVC* AllNodesVC_DefaultNew( Name name ) {
 		_AllNodesVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
+		_AllNodesVC_Destroy,
 		name,
 		NON_GLOBAL,
 		_AllNodesVC_BuildSelf, 
@@ -252,16 +252,20 @@ void _AllNodesVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 	}
 }
 
-
 void _AllNodesVC_Delete( void* allNodesVC ) {
-	AllNodesVC*			self = (AllNodesVC*)allNodesVC;
-	
-	if (self->_entryTbl) Memory_Free(self->_entryTbl);
+	AllNodesVC* self = (AllNodesVC*)allNodesVC;
 	
 	/* Stg_Class_Delete parent */
 	_VariableCondition_Delete(self);
 }
 
+void _AllNodesVC_Destroy( void* allNodesVC, void* data ) {
+	AllNodesVC* self = (AllNodesVC*)allNodesVC;
+
+	if (self->_entryTbl) Memory_Free(self->_entryTbl);
+
+	_VariableCondition_Destroy( self, data );
+}
 
 void _AllNodesVC_Print( void* allNodesVC, Stream* stream ) {
 	AllNodesVC*			self = (AllNodesVC*)allNodesVC;
@@ -279,20 +283,23 @@ void _AllNodesVC_Print( void* allNodesVC, Stream* stream ) {
 	/* Stg_Class info */
 	Journal_Printf( info, "\tdictionary (ptr): %p\n", self->dictionary);
 	Journal_Printf( info, "\t_dictionaryEntryName (ptr): %p\n", self->_dictionaryEntryName);
+
 	if (self->_dictionaryEntryName)
 		Journal_Printf( info, "\t\t_dictionaryEntryName: %s\n", self->_dictionaryEntryName);
+
 	Journal_Printf( info, "\t_entryCount: %u\n", self->_entryCount);
 	Journal_Printf( info, "\t_entryTbl (ptr): %p\n", self->_entryTbl);
+
 	if (self->_entryTbl)
-		for (entry_I = 0; entry_I < self->_entryCount; entry_I++)
-		{
+		for (entry_I = 0; entry_I < self->_entryCount; entry_I++) {
 			Journal_Printf( info, "\t\t_entryTbl[%u]:\n", entry_I);
 			Journal_Printf( info, "\t\t\tvarName (ptr): %p\n", self->_entryTbl[entry_I].varName);
+
 			if (self->_entryTbl[entry_I].varName)
 				Journal_Printf( info, "\t\t\t\tvarName: %s\n", self->_entryTbl[entry_I].varName);
 			Journal_Printf( info, "\t\t\tvalue:\n");
-			switch (self->_entryTbl[entry_I].value.type)
-			{
+
+			switch (self->_entryTbl[entry_I].value.type) {
 				case VC_ValueType_Double:
 					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Double\n" );
 					Journal_Printf( info, "\t\t\t\tasDouble: %g\n", self->_entryTbl[entry_I].value.as.typeDouble );
@@ -321,8 +328,8 @@ void _AllNodesVC_Print( void* allNodesVC, Stream* stream ) {
 				case VC_ValueType_DoubleArray:
 					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_DoubleArray\n");
 					Journal_Printf( info, "\t\t\t\tarraySize: %u\n", self->_entryTbl[entry_I].value.as.typeArray.size);
-					Journal_Printf( info, "\t\t\t\tasDoubleArray (ptr): %p\n", 
-						self->_entryTbl[entry_I].value.as.typeArray.array);
+					Journal_Printf( info, "\t\t\t\tasDoubleArray (ptr): %p\n", self->_entryTbl[entry_I].value.as.typeArray.array);
+
 					if (self->_entryTbl[entry_I].value.as.typeArray.array)
 						for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
 							Journal_Printf( info, "\t\t\t\tasDoubleArray[%u]: %g\n", i,

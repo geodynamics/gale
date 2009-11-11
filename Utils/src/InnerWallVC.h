@@ -58,88 +58,58 @@
 		/* Virtual info */ \
 		\
 		/* Stg_Class info */ \
-		Name				_dictionaryEntryName; \
-		InnerWallVC_InnerWall			_innerWall; \
-		InnerWallVC_Entry_Index		_entryCount; \
-		InnerWallVC_Entry*			_entryTbl; \
-		Mesh*				_mesh;
+		Name							_dictionaryEntryName; \
+		InnerWallVC_InnerWall	_innerWall; \
+		InnerWallVC_Entry_Index	_entryCount; \
+		InnerWallVC_Entry*		_entryTbl; \
+		Mesh*							_mesh;
 
 	struct _InnerWallVC { __InnerWallVC };
 	
+	#define INNERVALUEVC_DEFARGS \
+      VARIABLECONDITION_DEFARGS, \
+         Name  _dictionaryEntryName, \
+         void* _mesh 
+
+   #define INNERVALUEVC_PASSARGS \
+      VARIABLECONDITION_PASSARGS, \
+         _dictionaryEntryName, \
+         _mesh 
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
-	VariableCondition*	InnerWallVC_Factory(
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register, 
-						Dictionary*					dictionary,
-						void*						data );
+	VariableCondition* InnerWallVC_Factory(
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register, 
+		Dictionary*							dictionary,
+		void*									data );
 	
-	InnerWallVC*				InnerWallVC_DefaultNew( Name name );
+	InnerWallVC* InnerWallVC_DefaultNew( Name name );
 
-	InnerWallVC*				InnerWallVC_New(
-						Name						name,
-						Name						_dictionaryEntryName, 
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register, 
-						Dictionary*					dictionary,
-						void*						_mesh );
+	InnerWallVC* InnerWallVC_New(
+		Name									name,
+		Name									_dictionaryEntryName, 
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register, 
+		Dictionary*							dictionary,
+		void*									_mesh );
 	
-	void				InnerWallVC_Init(
-						InnerWallVC*						self,
-						Name						name,
-						Name						_dictionaryEntryName, 
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register, 
-						Dictionary*					dictionary,
-						void*						_mesh );
+	InnerWallVC* _InnerWallVC_New( INNERVALUEVC_DEFARGS );
 	
-	InnerWallVC*				_InnerWallVC_New( 
-						SizeT						_sizeOfSelf, 
-						Type						type,
-						Stg_Class_DeleteFunction*				_delete,
-						Stg_Class_PrintFunction*				_print,
-						Stg_Class_CopyFunction*				_copy,
-						Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-						Stg_Component_ConstructFunction*			_construct,
-						Stg_Component_BuildFunction*			_build,
-						Stg_Component_InitialiseFunction*			_initialise,
-						Stg_Component_ExecuteFunction*			_execute,
-						Stg_Component_DestroyFunction*			_destroy,
-						Name						name, 
-						Bool						initFlag,
-						VariableCondition_BuildSelfFunc*		_buildSelf, 
-						VariableCondition_PrintConciseFunc*		_printConcise,
-						VariableCondition_ReadDictionaryFunc*		_readDictionary,
-						VariableCondition_GetSetFunc*			_getSet,
-						VariableCondition_GetVariableCountFunc*		_getVariableCount,
-						VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-						VariableCondition_GetValueIndexFunc*		_getValueIndex,
-						VariableCondition_GetValueCountFunc*		_getValueCount,
-						VariableCondition_GetValueFunc*			_getValue,
-						VariableCondition_ApplyFunc*			_apply, 
-						Name						_dictionaryEntryName, 
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register, 
-						Dictionary*					dictionary,
-						void*						_mesh );
-	
-	void				_InnerWallVC_Init(
-						void*						innerWallVC, 
-						Name						_dictionaryEntryName, 
-						void*						_mesh );
-	
+	void	_InnerWallVC_Init( void* innerWallVC, Name _dictionaryEntryName, void* _mesh );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** General virtual functions
 	*/
 	
-	void				_InnerWallVC_Delete( void* innerWallVC );
+	void _InnerWallVC_Delete( void* innerWallVC );
 	
-	void				_InnerWallVC_Print( void* innerWallVC, Stream* stream );
+	void _InnerWallVC_Print( void* innerWallVC, Stream* stream );
 	
+	void _InnerWallVC_Destroy( void* innerWallVC, void* data );
+
 	/* Copy */
 	#define InnerWallVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
@@ -148,7 +118,7 @@
 	
 	void* _InnerWallVC_Copy( void* innerWallVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
-	void				_InnerWallVC_Build(  void* innerWallVC, void* data );
+	void _InnerWallVC_Build(  void* innerWallVC, void* data );
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -160,31 +130,25 @@
 	** Virtual functions
 	*/
 	
-	void				_InnerWallVC_AssignFromXML( void* innerWallVC, Stg_ComponentFactory* cf, void* data );
+	void _InnerWallVC_AssignFromXML( void* innerWallVC, Stg_ComponentFactory* cf, void* data );
 	
-	void				_InnerWallVC_BuildSelf( void* innerWallVC, void* data );
+	void _InnerWallVC_BuildSelf( void* innerWallVC, void* data );
 	
-	void				_InnerWallVC_ReadDictionary( void* variableCondition, void* dictionary );
+	void _InnerWallVC_ReadDictionary( void* variableCondition, void* dictionary );
 	
-	IndexSet*			_InnerWallVC_GetSet( void* variableCondition );
+	IndexSet* _InnerWallVC_GetSet( void* variableCondition );
 	
-	VariableCondition_VariableIndex	_InnerWallVC_GetVariableCount( void* variableCondition, Index globalIndex );
+	VariableCondition_VariableIndex _InnerWallVC_GetVariableCount( void* variableCondition, Index globalIndex );
 	
-	Variable_Index			_InnerWallVC_GetVariableIndex(
-						void*				variableCondition,
-						Index				globalIndex, 
-						VariableCondition_VariableIndex	varIndex );
+	Variable_Index _InnerWallVC_GetVariableIndex( void* variableCondition, Index globalIndex, VariableCondition_VariableIndex varIndex );
 						
-	VariableCondition_ValueIndex	_InnerWallVC_GetValueIndex(
-						void*				variableCondition, 
-						Index				globalIndex, 
-						VariableCondition_VariableIndex	varIndex );
+	VariableCondition_ValueIndex _InnerWallVC_GetValueIndex( void* variableCondition, Index globalIndex, VariableCondition_VariableIndex varIndex );
 						
-	VariableCondition_ValueIndex	_InnerWallVC_GetValueCount( void* variableCondition );
+	VariableCondition_ValueIndex _InnerWallVC_GetValueCount( void* variableCondition );
 	
-	VariableCondition_Value		_InnerWallVC_GetValue( void* variableCondition, VariableCondition_ValueIndex valIndex );
+	VariableCondition_Value _InnerWallVC_GetValue( void* variableCondition, VariableCondition_ValueIndex valIndex );
 	
-	void				_InnerWallVC_PrintConcise( void* variableCondition, Stream* stream );
+	void _InnerWallVC_PrintConcise( void* variableCondition, Stream* stream );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Build functions
@@ -195,5 +159,4 @@
 	** Functions
 	*/
 
-	
 #endif /* __Domain_Utils_InnerWallVC_h__ */

@@ -82,6 +82,8 @@ WallVC*	WallVC_New(
 	self->isConstructed = True;
 	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
 	_WallVC_Init( self, _dictionaryEntryName, _mesh );
+
+	return self;
 }
 
 WallVC*	WallVC_DefaultNew( Name name ) {
@@ -96,7 +98,7 @@ WallVC*	WallVC_DefaultNew( Name name ) {
 		_WallVC_Build,
 		_VariableCondition_Initialise,
 		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
+		_WallVC_Destroy,
 		name,
 		NON_GLOBAL,
 		_WallVC_BuildSelf, 
@@ -155,14 +157,12 @@ void _WallVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 	/* Find dictionary entry */
 	if (self->_dictionaryEntryName)
 		vcDictVal = Dictionary_Get(dictionary, self->_dictionaryEntryName);
-	else
-	{
+	else {
 		vcDictVal = &_vcDictVal;
 		Dictionary_Entry_Value_InitFromStruct(vcDictVal, dictionary);
 	}
 	
-	if (vcDictVal)
-	{
+	if (vcDictVal) {
 		char*	wallStr;
 		
 		/* Obtain which wall */
@@ -193,8 +193,7 @@ void _WallVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 		self->_entryTbl = Memory_Alloc_Array( WallVC_Entry, self->_entryCount, "WallVC->_entryTbl" );
 		varsVal = Dictionary_Entry_Value_GetMember(vcDictVal, "variables");
 		
-		for (entry_I = 0; entry_I < self->_entryCount; entry_I++)
-		{
+		for (entry_I = 0; entry_I < self->_entryCount; entry_I++) {
 			char*			valType;
 			Dictionary_Entry_Value*	valueEntry;
 			Dictionary_Entry_Value*	varDictListVal;
@@ -286,16 +285,21 @@ void _WallVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 }
 
 
-void _WallVC_Delete(void* wallVC)
-{
-	WallVC*	self = (WallVC*)wallVC;
-	
-	if (self->_entryTbl) Memory_Free(self->_entryTbl);
+void _WallVC_Delete( void* wallVC ) {
+	WallVC* self = (WallVC*)wallVC;
 	
 	/* Stg_Class_Delete parent */
 	_VariableCondition_Delete(self);
 }
 
+void _WallVC_Destroy( void* wallVC, void* data ) {
+	WallVC* self = (WallVC*)wallVC;
+	
+	if (self->_entryTbl) Memory_Free(self->_entryTbl);
+	
+	/* Stg_Class_Delete parent */
+	_VariableCondition_Destroy( self, data );
+}
 
 void _WallVC_Print(void* wallVC, Stream* stream)
 {

@@ -104,6 +104,8 @@
 	
 	void _AllNodesVC_Print( void* allNodesVC, Stream* stream );
 	
+	void _AllNodesVC_Destroy( void* allNodesVC, void* data );
+
 	/* Copy */
 	#define AllNodesVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
