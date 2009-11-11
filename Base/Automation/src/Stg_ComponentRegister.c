@@ -260,7 +260,8 @@ Stg_ComponentRegisterElement* Stg_ComponentRegisterElement_New(
    self->componentType = StG_Strdup(componentType);
    self->defaultConstructor = defaultConstructor;
    self->metadata = metadata;
-   self->version = StG_Strdup(version); 
+   self->version = StG_Strdup(version);
+   return self;   /* How in the hell this worked previously without returning anything I have no idea */ 
 }
 
 void _Stg_ComponentRegisterElement_Delete( void* self )
