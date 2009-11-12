@@ -125,7 +125,7 @@ void GaussLayoutSuite_TestDriver( GaussLayoutSuiteData* data, char* name,  char*
 		gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", NULL, LocalCoordSystem, True, data->nDims, particlesPerDim );
 
 		/* Configure the swarm */
-		swarm = Swarm_New( "testGaussSwarm", elementCellLayout, gaussParticleLayout, data->nDims, sizeof(Particle), extensionMgr_Register, NULL, data->comm, NULL );
+		swarm = Swarm_New( "testGaussSwarm", NULL, elementCellLayout, gaussParticleLayout, data->nDims, sizeof(Particle), extensionMgr_Register, NULL, data->comm, NULL );
 		
 		/* Build the swarm */
 		Stg_Component_Build( swarm, 0, False );

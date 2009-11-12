@@ -117,7 +117,7 @@ void SpaceFillerParticleLayoutSuite_TestSpaceFillerParticle( SpaceFillerParticle
 		elementCellLayout = ElementCellLayout_New( "spaceFillerParticlElementCellLayout", mesh );
 		particleLayout = SpaceFillerParticleLayout_New( "spaceFillerParticleLayout", NULL, GlobalCoordSystem, False, SpaceFillerParticleLayout_Invalid, 20, nDims );
 	
-		swarm = Swarm_New( "testSpaceFIllerParticle", elementCellLayout, particleLayout, dim, sizeof(Particle),
+		swarm = Swarm_New( "testSpaceFIllerParticle", NULL, elementCellLayout, particleLayout, dim, sizeof(Particle),
 			extensionMgr_Register, NULL, data->comm, NULL );
  
 		Stg_Component_Build( swarm, 0, False );
