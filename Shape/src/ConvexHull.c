@@ -171,12 +171,7 @@ void _ConvexHull_Init( void* convexHull, Coord_List vertexList, Index vertexCoun
 
 void _ConvexHull_Delete( void* convexHull ) {
 	ConvexHull*       self       = (ConvexHull*)convexHull;
-	Coord_List        vertexList = self->vertexList;
-	XYZ*              facesList  = self->facesList;
 
-	Memory_Free( vertexList );
-	Memory_Free( facesList );
-	
 	/* Delete parent */
 	_Stg_Shape_Delete( self );
 }
@@ -292,7 +287,12 @@ void _ConvexHull_Execute( void* convexHull, void* data ) {
 }
 void _ConvexHull_Destroy( void* convexHull, void* data ) {
 	ConvexHull*	self = (ConvexHull*)convexHull;
-    
+   Coord_List        vertexList = self->vertexList;
+	XYZ*              facesList  = self->facesList;
+
+	Memory_Free( vertexList );
+	Memory_Free( facesList );
+	 
 	_Stg_Shape_Destroy( self, data );
 }
 

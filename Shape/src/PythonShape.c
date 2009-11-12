@@ -157,7 +157,6 @@ void _PythonShape_Delete( void* pythonShape ) {
 	/* Delete parent */
 	_Stg_Shape_Delete( self );
 
-	Memory_Free( self->testCondition );
 }
 
 
@@ -229,6 +228,7 @@ void _PythonShape_Execute( void* pythonShape, void* data ) {
 void _PythonShape_Destroy( void* pythonShape, void* data ) {
 	PythonShape*	self = (PythonShape*)pythonShape;
 
+   Memory_Free( self->testCondition );
 	_Stg_Shape_Destroy( self, data );
 }
 
