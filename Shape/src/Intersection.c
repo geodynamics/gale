@@ -127,9 +127,6 @@ void _Intersection_Init( void* intersection,  Stg_Shape** shapeList, Index shape
 void _Intersection_Delete( void* intersection ) {
 	Intersection*       self = (Intersection*)intersection;
 
-	Memory_Free( self->shapeList );
-	Memory_Free( self->isComplement );
-
 	/* Delete parent */
 	_Stg_Shape_Delete( self );
 }
@@ -257,6 +254,8 @@ void _Intersection_Execute( void* intersection, void* data ) {
 void _Intersection_Destroy( void* intersection, void* data ) {
 	Intersection*	self = (Intersection*)intersection;
     
+	Memory_Free( self->shapeList );
+	Memory_Free( self->isComplement );
 	_Stg_Shape_Destroy( self, data );
 }
 

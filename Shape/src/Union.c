@@ -129,9 +129,6 @@ void _Union_Init( void* combination,  Stg_Shape** shapeList, Index shapeCount, B
 void _Union_Delete( void* combination ) {
 	Union*       self = (Union*)combination;
 
-	Memory_Free( self->shapeList );
-	Memory_Free( self->isComplement );
-
 	/* Delete parent */
 	_Stg_Shape_Delete( self );
 }
@@ -247,6 +244,9 @@ void _Union_Execute( void* combination, void* data ) {
 void _Union_Destroy( void* combination, void* data ) {
 	Union*	self = (Union*)combination;
 	
+	Memory_Free( self->shapeList );
+	Memory_Free( self->isComplement );
+
 	_Stg_Shape_Destroy( self, data );
 }
 

@@ -104,7 +104,7 @@ void GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D( GaussLayoutSingleCellSui
            LocalCoordSystem, True, nDims, particlesPerDim );
 
 		/* Configure the swarm */
-		swarm = Swarm_New( "testGaussSwarmSingleCell", singleCellLayout, gaussParticleLayout, nDims,
+		swarm = Swarm_New( "testGaussSwarmSingleCell", NULL, singleCellLayout, gaussParticleLayout, nDims,
 			sizeof(Particle), extensionMgr_Register, NULL, data->comm, NULL );
 		
 		/* Build the swarm */
@@ -172,7 +172,7 @@ void GaussLayoutSingleCellSuite_Test2ParticlesPerDim_3D( GaussLayoutSingleCellSu
            LocalCoordSystem, True, nDims, particlesPerDim );
 		
 		/* Configure the swarm */
-		swarm = Swarm_New( "testGaussSwarmSingleCell", singleCellLayout, gaussParticleLayout, nDims,
+		swarm = Swarm_New( "testGaussSwarmSingleCell", NULL, singleCellLayout, gaussParticleLayout, nDims,
 			sizeof(Particle), extensionMgr_Register, NULL, data->comm, NULL );
 		
 		/* Build the swarm */
@@ -239,7 +239,7 @@ void GaussLayoutSingleCellSuite_Test3ParticlesPerDim_3D( GaussLayoutSingleCellSu
            LocalCoordSystem, True, nDims, particlesPerDim );
 	
 		/* Configure the swarm */
-		swarm = Swarm_New( "testGaussSwarmSingleCell", singleCellLayout, gaussParticleLayout, nDims,
+		swarm = Swarm_New( "testGaussSwarmSingleCell", NULL, singleCellLayout, gaussParticleLayout, nDims,
 			sizeof(Particle), extensionMgr_Register, NULL, data->comm, NULL );
 		
 		/* Build the swarm */

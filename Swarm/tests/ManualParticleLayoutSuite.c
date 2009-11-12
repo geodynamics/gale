@@ -151,7 +151,7 @@ void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData
 		particleLayout = ManualParticleLayout_New( "manualParticleLayout", NULL, GlobalCoordSystem, False,
          0, 0.0, dictionary );
 	
-		swarm = Swarm_New( "manualParticleSwarm", elementCellLayout, particleLayout, dim, sizeof(Particle),
+		swarm = Swarm_New( "manualParticleSwarm", NULL, elementCellLayout, particleLayout, dim, sizeof(Particle),
 			extensionMgr_Register, NULL, data->comm, NULL );
 	
 		/* Build the swarm */

@@ -142,17 +142,18 @@
 	/* Create a new Swarm and initialise */
 	Swarm* Swarm_DefaultNew( Name name );
 
-	Swarm* Swarm_New( 
-		Name                                  name,
-		void*                                 cellLayout,
-		void*                                 particleLayout,
-		Dimension_Index                       dim,
-		SizeT                                 particleSize,
-		ExtensionManager_Register*            extensionMgr_Register,
-		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm,
-	        /* modified the constructor function to take in initial conditions */	
-	        void*				      ics ) ;
+   Swarm* Swarm_New( 
+      Name                                  name,
+      AbstractContext*                      context,
+      void*                                 cellLayout,
+      void*                                 particleLayout,
+      Dimension_Index                       dim,
+      SizeT                                 particleSize,
+      ExtensionManager_Register*            extensionMgr_Register,
+      Variable_Register*                    variable_Register,
+      MPI_Comm                              comm,
+      /* modified the constructor function to take in initial conditions */	
+      void*				                       ics );
 	
 	/* Creation implementation / Virtual constructor */
 	Swarm* _Swarm_New(
@@ -168,7 +169,6 @@
 		Stg_Component_ExecuteFunction*        _execute,
 		Stg_Component_DestroyFunction*        _destroy,
 		Name                                  name,
-		Bool                                  initFlag,
 		CellLayout*                           cellLayout,
 		ParticleLayout*                       particleLayout,
 		Dimension_Index                       dim,
@@ -181,18 +181,20 @@
 	        /* modified the constructor function to take in initial conditions */	
 		void*				      ics );
 
-	void _Swarm_Init( 
-		Swarm*                                self, 
-		void*                                 cellLayout,
-		void*                                 particleLayout,
-		Dimension_Index                       dim,
-		Particle_InCellIndex                  cellParticleTblDelta, 
-		double                                extraParticlesFactor,
-		ExtensionManager_Register*            extensionMgr_Register,
-		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm,
-	        /* modified the init function to take in initial conditions */	
-		void*				      ics );
+   void _Swarm_Init( 
+      Swarm*                                self, 
+      AbstractContext*                      context,
+      void*                                 cellLayout,
+      void*                                 particleLayout,
+      Dimension_Index                       dim,
+      SizeT                                 particleSize,
+      Particle_InCellIndex                  cellParticleTblDelta, 
+      double                                extraParticlesFactor,
+      ExtensionManager_Register*            extensionMgr_Register,
+      Variable_Register*                    variable_Register,
+      MPI_Comm                              comm,
+      /* modified the init function to take in initial conditions */	
+      void*				      ics );
 	
 	/* For use when Particle is not yet a complete type */
 	#define Swarm_ParticleInElementAt( self, dElement_I, cParticle_I ) \

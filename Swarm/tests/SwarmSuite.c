@@ -144,7 +144,7 @@ void SwarmSuite_Setup( SwarmSuiteData* data ) {
 	data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", data->mesh );
 	
 	/* Configure the swarm */
-	data->swarm = Swarm_New( "testSwarm", data->elementCellLayout, data->randomParticleLayout, 3, sizeof(Particle),
+	data->swarm = Swarm_New( "testSwarm", NULL, data->elementCellLayout, data->randomParticleLayout, 3, sizeof(Particle),
 		data->extensionMgr_Register, NULL, MPI_COMM_WORLD, NULL );
 	
 	/* Build the swarm */

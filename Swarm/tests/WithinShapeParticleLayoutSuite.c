@@ -131,7 +131,7 @@ void WithinShapeParticleLayoutSuite_TestWithinShapeSphere( WithinShapeParticleLa
             GlobalCoordSystem, False, particleCount, 0.0, nDims, shape );
 	
 		/* Configure the swarm */
-		swarm = Swarm_New( "testSwarm", elementCellLayout, particleLayout, nDims, sizeof(Particle),
+		swarm = Swarm_New( "testSwarm", NULL, elementCellLayout, particleLayout, nDims, sizeof(Particle),
 		extensionMgr_Register, NULL, data->comm, NULL );
 	
 		/* Build the swarm */

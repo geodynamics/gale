@@ -7,13 +7,14 @@
 #include "StgDomain/StgDomain.h"
 
 typedef struct {
-	DomainContext* context;
+	Stg_ComponentFactory* cf;
 } ShapeSuiteData;
 
 void ShapeSuite_Setup( ShapeSuiteData* data ) { 
 }
 
 void ShapeSuite_Teardown( ShapeSuiteData* data ) {
+   stgMainDestroy( data->cf );
 }
 
 void ShapeSuite_GeneratePoints( ShapeSuiteData* data, Dimension_Index dim, char* inputFileName ) {
@@ -30,14 +31,10 @@ void ShapeSuite_GeneratePoints( ShapeSuiteData* data, Dimension_Index dim, char*
 
 	/* read in the xml input file */
 	pcu_filename_input( inputFileName, xml_input );
-	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
+	data->cf = cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
 	stgMainBuildAndInitialise( cf );
-	context = LiveComponentRegister_Get( cf->LCRegister, "context" ); 
+	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, "context" ); 
 
-	/* This is another of loading from XML. we create a default context
-		and assign it to the acquired componect factory .*/	
-	/*context = DomainContext_DefaultNew( "context" );
-	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, context );*/
 
 	dictionary = context->dictionary;
 	outputPath = Dictionary_GetString( dictionary, "outputPath" );

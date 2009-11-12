@@ -126,10 +126,6 @@ void _PolygonShape_Init( void* polygon, Coord_List vertexList, Index vertexCount
 
 void _PolygonShape_Delete( void* polygon ) {
 	PolygonShape*       self = (PolygonShape*)polygon;
-	Coord_List     vertexList = self->vertexList;
-
-	Memory_Free( vertexList );
-
 	
 	/* Delete parent */
 	_Stg_Shape_Delete( self );
@@ -277,7 +273,10 @@ void _PolygonShape_Execute( void* polygon, void* data ) {
 }
 void _PolygonShape_Destroy( void* polygon, void* data ) {
 	PolygonShape*	self = (PolygonShape*)polygon;
-    
+
+	Coord_List     vertexList = self->vertexList;
+	Memory_Free( vertexList );
+
 	_Stg_Shape_Destroy( self, data );
 }
 
