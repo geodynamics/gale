@@ -51,10 +51,10 @@
 #define __StgFEM_SLE_SystemSetup_ForceTerm_h__
 
 	typedef void (ForceTerm_AssembleElementFunction)	(
-			void*                             forceTerm, 
-			ForceVector*                      forceVector, 
-			Element_LocalIndex                lElement_I,
-			double*                           elForceVecToAdd );
+		void*						forceTerm, 
+		ForceVector*			forceVector, 
+		Element_LocalIndex	lElement_I,
+		double*					elForceVecToAdd );
 	
 	
 	/* Textual name of this class */
@@ -86,47 +86,57 @@
 	
 	/* Creation implementation / Virtual constructor */
 	ForceTerm* ForceTerm_New(
-		Name				name,
-		ForceVector*	forceVector,
-		Swarm*			integrationSwarm,
-		Stg_Component*	extraInfo );
+		Name							name,
+		FiniteElementContext*	context,
+		ForceVector*				forceVector,
+		Swarm*						integrationSwarm,
+		Stg_Component*				extraInfo );
 
 	ForceTerm* _ForceTerm_New( FORCETERM_DEFARGS );
 	
 	void _ForceTerm_Init(
-		void*				forceTerm,
-		ForceVector*	forceVector,
-		Swarm*			integrationSwarm,
-		Stg_Component*	extraInfo );
+		void*							forceTerm,
+		FiniteElementContext*	context,
+		ForceVector*				forceVector,
+		Swarm*						integrationSwarm,
+		Stg_Component*				extraInfo );
 
 	/* 'Stg_Class' Virtual Functions */
 	void _ForceTerm_Delete( void* forceTerm );
+
 	void _ForceTerm_Print( void* forceTerm, Stream* stream );
+
 	#define ForceTerm_Copy( self ) \
 		(ForceTerm*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define ForceTerm_DeepCopy( self ) \
 		(ForceTerm*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
+
 	void* _ForceTerm_Copy( void* forceTerm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Functions */
 	void* _ForceTerm_DefaultNew( Name name );
+
 	void _ForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data );
+
 	void _ForceTerm_Build( void* forceTerm, void* data );
+
 	void _ForceTerm_Initialise( void* forceTerm, void* data );
+
 	void _ForceTerm_Execute( void* forceTerm, void* data );
+
 	void _ForceTerm_Destroy( void* forceTerm, void* data );
 	
 	void ForceTerm_AssembleElement( 
-			void*						forceTerm, 
-			ForceVector*			forceVector, 
-			Element_LocalIndex	lElement_I,
-			double*					elForceVecToAdd );
+		void*						forceTerm, 
+		ForceVector*			forceVector, 
+		Element_LocalIndex	lElement_I,
+		double*					elForceVecToAdd );
 
 	void _ForceTerm_AssembleElement( 
-			void*						forceTerm, 
-			ForceVector*			forceVector, 
-			Element_LocalIndex	lElement_I,
-			double*					elForceVecToAdd ) ;
+		void*						forceTerm, 
+		ForceVector*			forceVector, 
+		Element_LocalIndex	lElement_I,
+		double*					elForceVecToAdd ) ;
 
 	void ForceTerm_SetAssembleElementFunction( void* forceTerm, ForceTerm_AssembleElementFunction* assembleElementFunction ) ;
 

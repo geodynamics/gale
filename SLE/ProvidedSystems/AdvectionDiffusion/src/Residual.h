@@ -56,34 +56,36 @@
 		__ForceTerm \
 		\
 		/* Virtual info */ \
-		AdvDiffResidualForceTerm_UpwindParamFunction*       _upwindParam;                   \
-		AdvDiffResidualForceTerm_GetDiffusivityFromIntPoint* _getDiffusivityFromIntPoint;  \
-                double*                                             phiGrad; \
-                double** GNx; \
-                double* Ni; \
-                double* SUPGNi; \
-                IArray *incarray; \
-                \
+		AdvDiffResidualForceTerm_UpwindParamFunction*			_upwindParam; \
+		AdvDiffResidualForceTerm_GetDiffusivityFromIntPoint*	_getDiffusivityFromIntPoint; \
+		double*																phiGrad; \
+		double**																GNx; \
+		double*																Ni; \
+		double*																SUPGNi; \
+		IArray																*incarray; \
+		\
 		/* AdvDiffResidualForceTerm info */ \
-		FeVariable*                                         velocityField;                  \
-		double                                              defaultDiffusivity;             \
-		Variable*                                           diffusivityVariable;            \
-		AdvDiffResidualForceTerm_UpwindParamFuncType        upwindParamType;
+		FeVariable*															velocityField; \
+		double																defaultDiffusivity; \
+		Variable*															diffusivityVariable; \
+		AdvDiffResidualForceTerm_UpwindParamFuncType				upwindParamType;
 
 	struct AdvDiffResidualForceTerm { __AdvDiffResidualForceTerm };	
 
-        void __AdvDiffResidualForceTerm_UpdateLocalMemory( AdvectionDiffusionSLE* sle );
-        void __AdvDiffResidualForceTerm_FreeLocalMemory( AdvectionDiffusionSLE* sle );
+	void __AdvDiffResidualForceTerm_UpdateLocalMemory( AdvectionDiffusionSLE* sle );
+
+	void __AdvDiffResidualForceTerm_FreeLocalMemory( AdvectionDiffusionSLE* sle );
 
 	AdvDiffResidualForceTerm* AdvDiffResidualForceTerm_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		Stg_Component*                                      sle, 
-		FeVariable*                                         velocityField,
-		Variable*                                           diffusivityVariable,
-		double                                              defaultDiffusivity,
-		AdvDiffResidualForceTerm_UpwindParamFuncType        upwindFuncType );
+		Name															name,
+		FiniteElementContext*									context,
+		ForceVector*												forceVector,
+		Swarm*														integrationSwarm,
+		Stg_Component*												sle, 
+		FeVariable*													velocityField,
+		Variable*													diffusivityVariable,
+		double														defaultDiffusivity,
+		AdvDiffResidualForceTerm_UpwindParamFuncType		upwindFuncType );
 
 	AdvDiffResidualForceTerm* _AdvDiffResidualForceTerm_New( 
 		SizeT                                               sizeOfSelf,  
@@ -102,19 +104,27 @@
 		Name                                                name );
 	
 	void _AdvDiffResidualForceTerm_Delete( void* residual );
+
 	void _AdvDiffResidualForceTerm_Print( void* residual, Stream* stream );
 
-	void* _AdvDiffResidualForceTerm_DefaultNew( Name name ) ;
-void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFactory* cf, void* data ) ;
-	void _AdvDiffResidualForceTerm_Build( void* residual, void* data ) ;
-	void _AdvDiffResidualForceTerm_Initialise( void* residual, void* data ) ;
-	void _AdvDiffResidualForceTerm_Execute( void* residual, void* data ) ;
-	void _AdvDiffResidualForceTerm_Destroy( void* residual, void* data ) ;
+	void* _AdvDiffResidualForceTerm_DefaultNew( Name name );
 
-	void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elementResidual ) ;
+	void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFactory* cf, void* data );
+
+	void _AdvDiffResidualForceTerm_Build( void* residual, void* data );
+
+	void _AdvDiffResidualForceTerm_Initialise( void* residual, void* data );
+
+	void _AdvDiffResidualForceTerm_Execute( void* residual, void* data );
+
+	void _AdvDiffResidualForceTerm_Destroy( void* residual, void* data );
+
+	void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elementResidual );
+
 	/** Virtual Function Implementations */
 	#define AdvDiffResidualForceTerm_UpwindParam( residual, pecletNumber ) \
 		( ((AdvDiffResidualForceTerm*) residual)->_upwindParam( residual, pecletNumber ) )
+
 	double _AdvDiffResidualForceTerm_UpwindParam( void* residual, double pecletNumber ) ;
 
 #endif

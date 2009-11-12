@@ -208,7 +208,7 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 	
 	/* Lumping of Mass Matrix */
 	massMatrix = ForceVector_New( "MassMatrix", feVariable, dim, context->entryPoint_Register, MPI_COMM_WORLD );
-	massMatrixForceTerm = LumpedMassMatrixForceTerm_New( "forceTerm", massMatrix, swarm );
+	massMatrixForceTerm = LumpedMassMatrixForceTerm_New( "forceTerm", context, massMatrix, swarm );
 	EP_ReplaceAll( massMatrix->assembleForceVector, ForceVector_GlobalAssembly_General );
 	ForceTerm_SetAssembleElementFunction( massMatrixForceTerm, _LumpedMassMatrixForceTerm_AssembleElement_General );
 

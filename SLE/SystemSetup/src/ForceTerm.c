@@ -62,15 +62,16 @@
 const Type ForceTerm_Type = "ForceTerm";
 
 ForceTerm* ForceTerm_New(
-	Name				name,
-	ForceVector*	forceVector,
-	Swarm*			integrationSwarm,
-	Stg_Component*	extraInfo )		
+	Name							name,
+	FiniteElementContext*	context,
+	ForceVector*				forceVector,
+	Swarm*						integrationSwarm,
+	Stg_Component*				extraInfo )		
 {
 	ForceTerm* self = (ForceTerm*) _ForceTerm_DefaultNew( name );
 
 	self->isConstructed = True;
-	_ForceTerm_Init( self, forceVector, integrationSwarm, extraInfo );
+	_ForceTerm_Init( self, context, forceVector, integrationSwarm, extraInfo );
 
 	return self;
 }
@@ -107,16 +108,17 @@ ForceTerm* _ForceTerm_New( FORCETERM_DEFARGS ) {
 
 
 void _ForceTerm_Init(
-	void*				forceTerm,
-	ForceVector*	forceVector,
-	Swarm*			integrationSwarm,
-	Stg_Component*	extraInfo )
+	void*							forceTerm,
+	FiniteElementContext*	context,
+	ForceVector*				forceVector,
+	Swarm*						integrationSwarm,
+	Stg_Component*				extraInfo )
 {
-	ForceTerm* self = (ForceTerm*)  forceTerm;
-	
-	self->debug            = Stream_RegisterChild( StgFEM_SLE_SystemSetup_Debug, self->type );
-	self->extraInfo        = extraInfo;
-	self->integrationSwarm = integrationSwarm;	
+	ForceTerm* self			= (ForceTerm*) forceTerm;
+	self->context 				= context;	
+	self->debug					= Stream_RegisterChild( StgFEM_SLE_SystemSetup_Debug, self->type );
+	self->extraInfo			= extraInfo;
+	self->integrationSwarm	= integrationSwarm;	
 
 	ForceVector_AddForceTerm( forceVector, self );
 }
@@ -151,7 +153,7 @@ void* _ForceTerm_Copy( void* forceTerm, void* dest, Bool deep, Name nameExt, Ptr
 	ForceTerm*	self = (ForceTerm*)forceTerm;
 	ForceTerm*	newForceTerm;
 	PtrMap*		map = ptrMap;
-	Bool		ownMap = False;
+	Bool			ownMap = False;
 	
 	if( !map ) {
 		map = PtrMap_New( 10 );
@@ -176,20 +178,22 @@ void* _ForceTerm_Copy( void* forceTerm, void* dest, Bool deep, Name nameExt, Ptr
 }
 
 void _ForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
-	ForceTerm*      self               = (ForceTerm*)forceTerm;
-	Swarm*          swarm              = NULL;
-	Stg_Component*  extraInfo;
-	ForceVector*    forceVector;
+	FiniteElementContext*	context;
+	ForceTerm*					self = (ForceTerm*)forceTerm;
+	Swarm*						swarm = NULL;
+	Stg_Component*				extraInfo;
+	ForceVector*				forceVector;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
 
-	forceVector =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ForceVector", ForceVector,   True,  data ) ;
-	swarm       =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",       Swarm,         True,  data ) ;
-	extraInfo   =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ExtraInfo",   Stg_Component, False, data ) ;
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
 
-	_ForceTerm_Init( self, forceVector, swarm, extraInfo );
+	forceVector = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ForceVector", ForceVector,   True,  data ) ;
+	swarm       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",       Swarm,         True,  data ) ;
+	extraInfo   = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ExtraInfo",   Stg_Component, False, data ) ;
+
+	_ForceTerm_Init( self, context, forceVector, swarm, extraInfo );
 }
 
 void _ForceTerm_Build( void* forceTerm, void* data ) {

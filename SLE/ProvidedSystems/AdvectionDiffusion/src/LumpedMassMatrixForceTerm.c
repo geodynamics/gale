@@ -56,14 +56,15 @@
 const Type LumpedMassMatrixForceTerm_Type = "LumpedMassMatrixForceTerm";
 
 LumpedMassMatrixForceTerm* LumpedMassMatrixForceTerm_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm )
+	Name							name,
+	FiniteElementContext*	context,
+	ForceVector*				forceVector,
+	Swarm*						integrationSwarm )
 {
 	LumpedMassMatrixForceTerm* self = (LumpedMassMatrixForceTerm*) _LumpedMassMatrixForceTerm_DefaultNew( name );
 
 	self->isConstructed = True;
-	_ForceTerm_Init( self, forceVector, integrationSwarm, NULL );
+	_ForceTerm_Init( self, context, forceVector, integrationSwarm, NULL );
 	_LumpedMassMatrixForceTerm_Init( self );
 
 	return self;

@@ -52,17 +52,18 @@
 		/* Virtual info */ \
 		\
 		/* ThermalBuoyancyForceTerm info */ \
-		FeVariable*                                         temperatureField;                  \
-		double                                              rayleighNumber;
+		FeVariable*	temperatureField; \
+		double		rayleighNumber;
 
 	struct ThermalBuoyancyForceTerm { __ThermalBuoyancyForceTerm };
 
 	ThermalBuoyancyForceTerm* ThermalBuoyancyForceTerm_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         temperatureField,
-		double                                              rayleighNumber );
+		Name							name,
+		FiniteElementContext*	context,
+		ForceVector*				forceVector,
+		Swarm*						integrationSwarm,
+		FeVariable*					temperatureField,
+		double						rayleighNumber );
 
 	ThermalBuoyancyForceTerm* _ThermalBuoyancyForceTerm_New( 
 		SizeT                                               sizeOfSelf,  
@@ -80,13 +81,19 @@
 		Name                                                name );
 	
 	void _ThermalBuoyancyForceTerm_Delete( void* residual );
+
 	void _ThermalBuoyancyForceTerm_Print( void* residual, Stream* stream );
 
 	void* _ThermalBuoyancyForceTerm_DefaultNew( Name name ) ;
-void _ThermalBuoyancyForceTerm_AssignFromXML( void* residual, Stg_ComponentFactory* cf, void* data ) ;
+
+	void _ThermalBuoyancyForceTerm_AssignFromXML( void* residual, Stg_ComponentFactory* cf, void* data ) ;
+
 	void _ThermalBuoyancyForceTerm_Build( void* residual, void* data ) ;
+
 	void _ThermalBuoyancyForceTerm_Initialise( void* residual, void* data ) ;
+
 	void _ThermalBuoyancyForceTerm_Execute( void* residual, void* data ) ;
+
 	void _ThermalBuoyancyForceTerm_Destroy( void* residual, void* data ) ;
 
 	void _ThermalBuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) ;

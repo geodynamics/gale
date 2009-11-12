@@ -55,17 +55,19 @@
 const Type PressureGradForceTerm_Type = "PressureGradForceTerm";
 
 PressureGradForceTerm* PressureGradForceTerm_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*					    gradField, 
-		FeVariable*                                         pressureField )
+	Name							name,
+	FiniteElementContext*	context,
+	ForceVector*				forceVector,
+	Swarm*						integrationSwarm,
+	FeVariable*					gradField, 
+	FeVariable*					pressureField )
 {
 	PressureGradForceTerm* self = (PressureGradForceTerm*) _PressureGradForceTerm_DefaultNew( name );
 
 	self->isConstructed = True;
-	_ForceTerm_Init( self, forceVector, integrationSwarm, NULL );
+	_ForceTerm_Init( self, context, forceVector, integrationSwarm, NULL );
 	_PressureGradForceTerm_Init( self, pressureField, gradField );
+
 	return self;
 }
 

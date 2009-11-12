@@ -57,72 +57,42 @@
 /* Textual name of this class */
 const Type AdvDiffResidualForceTerm_Type = "AdvDiffResidualForceTerm";
 
-/*******************************************************************************
-  The following function scans all the elements of the mesh associated with
-  the residual forceterm phi to find the element with the most nodes.
-  Once the maximum number of nodes is found we then may allocate memory for
-  GNx etc that now live on the AdvDiffResidualForceTerm struct. This way we 
-  do not reallocate memory for these arrays for every element.
- *******************************************************************************/
-void __AdvDiffResidualForceTerm_UpdateLocalMemory( AdvectionDiffusionSLE* sle ){
-       FeVariable* phiField = sle->phiField;
-       FeMesh* phiMesh = phiField->feMesh;
-       Dimension_Index  dim = phiField->dim;
-       Element_LocalIndex e, n_elements;
-       Node_Index max_elementNodeCount;
-
-       n_elements = FeMesh_GetElementLocalSize(phiMesh);//returns number of elements in a mesh
-
-       /* Scan all elements in Mesh to get max node count */
-       max_elementNodeCount = 0;
-       for(e=0;e<n_elements;e++){
-	 ElementType *elementType = FeMesh_GetElementType( phiMesh, e );
-	 Node_Index elementNodeCount = elementType->nodeCount;
-	 if( elementNodeCount > max_elementNodeCount){
-	   max_elementNodeCount = elementNodeCount;
-	 }
-	 
-       }
-       
-       sle->advDiffResidualForceTerm->GNx = Memory_Alloc_2DArray(double, dim, max_elementNodeCount, "(SUPG): Global Shape Function Derivatives");
-       sle->advDiffResidualForceTerm->phiGrad = Memory_Alloc_Array(double, dim, "(SUPG): Gradient of the Advected Scalar");
-       sle->advDiffResidualForceTerm->Ni = Memory_Alloc_Array(double, max_elementNodeCount, "(SUPG): Gradient of the Advected Scalar");
-
-       sle->advDiffResidualForceTerm->SUPGNi = Memory_Alloc_Array(double, max_elementNodeCount, "(SUPG): Upwinded Shape Function");
-       
-       sle->advDiffResidualForceTerm->incarray=IArray_New();
-  
-
-}
-
-void __AdvDiffResidualForceTerm_FreeLocalMemory( AdvectionDiffusionSLE* sle ){
-
-  Memory_Free(sle->advDiffResidualForceTerm->GNx);
-  Memory_Free(sle->advDiffResidualForceTerm->phiGrad);
-  Memory_Free(sle->advDiffResidualForceTerm->Ni);
-  Memory_Free(sle->advDiffResidualForceTerm->SUPGNi);
-  
-  NewClass_Delete(sle->advDiffResidualForceTerm->incarray);
-
-}
-
 AdvDiffResidualForceTerm* AdvDiffResidualForceTerm_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		Stg_Component*                                      sle, 
-		FeVariable*                                         velocityField,
-		Variable*                                           diffusivityVariable,
-		double                                              defaultDiffusivity,
-		AdvDiffResidualForceTerm_UpwindParamFuncType        upwindFuncType )
+	Name							name,
+	FiniteElementContext*	context,
+	ForceVector*				forceVector,
+	Swarm*						integrationSwarm,
+	Stg_Component*				sle, 
+	FeVariable*					velocityField,
+	Variable*					diffusivityVariable,
+	double						defaultDiffusivity,
+	AdvDiffResidualForceTerm_UpwindParamFuncType upwindFuncType )
 {
 	AdvDiffResidualForceTerm* self = (AdvDiffResidualForceTerm*) _AdvDiffResidualForceTerm_DefaultNew( name );
 
 	self->isConstructed = True;
-	_ForceTerm_Init( self, forceVector, integrationSwarm, sle );
+	_ForceTerm_Init( self, context, forceVector, integrationSwarm, sle );
 	_AdvDiffResidualForceTerm_Init( self, velocityField, diffusivityVariable, defaultDiffusivity, upwindFuncType );
 
 	return self;
+}
+
+void* _AdvDiffResidualForceTerm_DefaultNew( Name name ) {
+	return (void*)_AdvDiffResidualForceTerm_New( 
+		sizeof(AdvDiffResidualForceTerm), 
+		AdvDiffResidualForceTerm_Type,
+		_AdvDiffResidualForceTerm_Delete,
+		_AdvDiffResidualForceTerm_Print,
+		NULL,
+		_AdvDiffResidualForceTerm_DefaultNew,
+		_AdvDiffResidualForceTerm_AssignFromXML,
+		_AdvDiffResidualForceTerm_Build,
+		_AdvDiffResidualForceTerm_Initialise,
+		_AdvDiffResidualForceTerm_Execute,
+		_AdvDiffResidualForceTerm_Destroy,
+		_AdvDiffResidualForceTerm_AssembleElement,
+		_AdvDiffResidualForceTerm_UpwindParam,
+		name );
 }
 
 /* Creation implementation / Virtual constructor */
@@ -168,12 +138,56 @@ AdvDiffResidualForceTerm* _AdvDiffResidualForceTerm_New(
 	return self;
 }
 
+/*******************************************************************************
+  The following function scans all the elements of the mesh associated with
+  the residual forceterm phi to find the element with the most nodes.
+  Once the maximum number of nodes is found we then may allocate memory for
+  GNx etc that now live on the AdvDiffResidualForceTerm struct. This way we 
+  do not reallocate memory for these arrays for every element.
+ *******************************************************************************/
+void __AdvDiffResidualForceTerm_UpdateLocalMemory( AdvectionDiffusionSLE* sle ){
+	FeVariable*				phiField = sle->phiField;
+	FeMesh*					phiMesh = phiField->feMesh;
+	Dimension_Index 		dim = phiField->dim;
+	Element_LocalIndex	e, n_elements;
+	Node_Index				max_elementNodeCount;
+
+	n_elements = FeMesh_GetElementLocalSize(phiMesh);//returns number of elements in a mesh
+
+	/* Scan all elements in Mesh to get max node count */
+	max_elementNodeCount = 0;
+
+	for(e=0;e<n_elements;e++){
+		ElementType *elementType = FeMesh_GetElementType( phiMesh, e );
+		Node_Index elementNodeCount = elementType->nodeCount;
+	
+		if( elementNodeCount > max_elementNodeCount){
+			max_elementNodeCount = elementNodeCount;
+		}
+	}
+       
+	sle->advDiffResidualForceTerm->GNx = Memory_Alloc_2DArray(double, dim, max_elementNodeCount, "(SUPG): Global Shape Function Derivatives");
+	sle->advDiffResidualForceTerm->phiGrad = Memory_Alloc_Array(double, dim, "(SUPG): Gradient of the Advected Scalar");
+	sle->advDiffResidualForceTerm->Ni = Memory_Alloc_Array(double, max_elementNodeCount, "(SUPG): Gradient of the Advected Scalar");
+	sle->advDiffResidualForceTerm->SUPGNi = Memory_Alloc_Array(double, max_elementNodeCount, "(SUPG): Upwinded Shape Function");
+	sle->advDiffResidualForceTerm->incarray=IArray_New();
+}
+
+void __AdvDiffResidualForceTerm_FreeLocalMemory( AdvectionDiffusionSLE* sle ){
+	Memory_Free(sle->advDiffResidualForceTerm->GNx);
+	Memory_Free(sle->advDiffResidualForceTerm->phiGrad);
+	Memory_Free(sle->advDiffResidualForceTerm->Ni);
+	Memory_Free(sle->advDiffResidualForceTerm->SUPGNi);
+  
+	NewClass_Delete(sle->advDiffResidualForceTerm->incarray);
+}
+
 void _AdvDiffResidualForceTerm_Init( 
-		AdvDiffResidualForceTerm*                           self, 
-		FeVariable*                                         velocityField,
-		Variable*                                           diffusivityVariable,
-		double                                              defaultDiffusivity,
-		AdvDiffResidualForceTerm_UpwindParamFuncType        upwindFuncType ) //WHY IS THIS LINE HERE???
+	AdvDiffResidualForceTerm*								self, 
+	FeVariable*													velocityField,
+	Variable*													diffusivityVariable,
+	double														defaultDiffusivity,
+	AdvDiffResidualForceTerm_UpwindParamFuncType		upwindFuncType ) //WHY IS THIS LINE HERE???
 {
 	self->velocityField       = velocityField;
 	self->diffusivityVariable = diffusivityVariable;
@@ -193,40 +207,22 @@ void _AdvDiffResidualForceTerm_Print( void* residual, Stream* stream ) {
 	_ForceTerm_Print( self, stream );
 
 	Journal_Printf( stream, "self->calculateUpwindParam = %s\n", 
-			self->_upwindParam == AdvDiffResidualForceTerm_UpwindXiExact ? 
-				"AdvDiffResidualForceTerm_UpwindXiExact" :
-			self->_upwindParam == AdvDiffResidualForceTerm_UpwindXiDoublyAsymptoticAssumption ? 
-				"AdvDiffResidualForceTerm_UpwindXiDoublyAsymptoticAssumption" :
-			self->_upwindParam == AdvDiffResidualForceTerm_UpwindXiCriticalAssumption ? 
-				"AdvDiffResidualForceTerm_UpwindXiCriticalAssumption" : "Unknown"  );
+		self->_upwindParam == AdvDiffResidualForceTerm_UpwindXiExact ? 
+			"AdvDiffResidualForceTerm_UpwindXiExact" :
+		self->_upwindParam == AdvDiffResidualForceTerm_UpwindXiDoublyAsymptoticAssumption ? 
+			"AdvDiffResidualForceTerm_UpwindXiDoublyAsymptoticAssumption" :
+		self->_upwindParam == AdvDiffResidualForceTerm_UpwindXiCriticalAssumption ? 
+		"AdvDiffResidualForceTerm_UpwindXiCriticalAssumption" : "Unknown"  );
 
 	/* General info */
 	Journal_PrintPointer( stream, self->velocityField );
 	Journal_PrintDouble( stream, self->defaultDiffusivity );
 	Journal_Printf( stream, "self->diffusivityVariable = ");
+
 	if ( self->diffusivityVariable )
 		Journal_Printf( stream, "%s\n", self->diffusivityVariable->name );
 	else
 		Journal_Printf( stream, "<Unused>\n");
-
-}
-
-void* _AdvDiffResidualForceTerm_DefaultNew( Name name ) {
-	return (void*)_AdvDiffResidualForceTerm_New( 
-		sizeof(AdvDiffResidualForceTerm), 
-		AdvDiffResidualForceTerm_Type,
-		_AdvDiffResidualForceTerm_Delete,
-		_AdvDiffResidualForceTerm_Print,
-		NULL,
-		_AdvDiffResidualForceTerm_DefaultNew,
-		_AdvDiffResidualForceTerm_AssignFromXML,
-		_AdvDiffResidualForceTerm_Build,
-		_AdvDiffResidualForceTerm_Initialise,
-		_AdvDiffResidualForceTerm_Execute,
-		_AdvDiffResidualForceTerm_Destroy,
-		_AdvDiffResidualForceTerm_AssembleElement,
-		_AdvDiffResidualForceTerm_UpwindParam,
-		name );
 }
 
 void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFactory* cf, void* data ) {
@@ -242,7 +238,6 @@ void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFacto
 
 	velocityField       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField",       FeVariable, True,  data );
 	diffusivityVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, "DiffusivityVariable", Variable,   False, data );
-
 
 	upwindParamFuncName = Stg_ComponentFactory_GetString( cf, self->name, "UpwindXiFunction", "Exact" );
 	if ( strcasecmp( upwindParamFuncName, "DoublyAsymptoticAssumption" ) == 0 )
@@ -261,21 +256,23 @@ void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFacto
 }
 
 void _AdvDiffResidualForceTerm_Build( void* residual, void* data ) {
-	AdvDiffResidualForceTerm*             self             = (AdvDiffResidualForceTerm*)residual;
+	AdvDiffResidualForceTerm* self = (AdvDiffResidualForceTerm*)residual;
 
 	_ForceTerm_Build( self, data );
 
 	Stg_Component_Build( self->velocityField, data, False );
+
 	if ( self->diffusivityVariable )
 		Stg_Component_Build( self->diffusivityVariable, data, False );
 }
 
 void _AdvDiffResidualForceTerm_Initialise( void* residual, void* data ) {
-	AdvDiffResidualForceTerm*             self             = (AdvDiffResidualForceTerm*)residual;
+	AdvDiffResidualForceTerm* self = (AdvDiffResidualForceTerm*)residual;
 
 	_ForceTerm_Initialise( self, data );
 
 	Stg_Component_Initialise( self->velocityField, data, False );
+
 	if ( self->diffusivityVariable )
 		Stg_Component_Initialise( self->diffusivityVariable, data, False );
 }
@@ -404,10 +401,9 @@ void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 	
 }
 
-
 /* Virtual Function Implementations */
 double _AdvDiffResidualForceTerm_UpwindParam( void* residual, double pecletNumber ) {
-	AdvDiffResidualForceTerm*             self             = (AdvDiffResidualForceTerm*)residual;
+	AdvDiffResidualForceTerm* self = (AdvDiffResidualForceTerm*)residual;
 
 	switch ( self->upwindParamType ) {
 		case Exact:

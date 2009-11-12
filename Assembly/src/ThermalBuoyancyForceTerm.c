@@ -56,16 +56,18 @@
 const Type ThermalBuoyancyForceTerm_Type = "ThermalBuoyancyForceTerm";
 
 ThermalBuoyancyForceTerm* ThermalBuoyancyForceTerm_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         temperatureField,
-		double                                              rayleighNumber )
+	Name							name,
+	FiniteElementContext*	context,
+	ForceVector*				forceVector,
+	Swarm*						integrationSwarm,
+	FeVariable*					temperatureField,
+	double						rayleighNumber )
 {
 	ThermalBuoyancyForceTerm* self = (ThermalBuoyancyForceTerm*) _ThermalBuoyancyForceTerm_DefaultNew( name );
 
 	self->isConstructed = True;
-	_ForceTerm_Init( self, forceVector, integrationSwarm, NULL );
+
+	_ForceTerm_Init( self, context, forceVector, integrationSwarm, NULL );
 	_ThermalBuoyancyForceTerm_Init( self, temperatureField, rayleighNumber );
 
 	return self;
