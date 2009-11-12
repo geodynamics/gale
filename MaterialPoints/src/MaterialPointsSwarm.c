@@ -61,20 +61,22 @@
 const Type MaterialPointsSwarm_Type = "MaterialPointsSwarm";
 
 MaterialPointsSwarm* MaterialPointsSwarm_New(
-		Name                                  name,
-		void*                                 cellLayout,
-		void*                                 particleLayout,
-		Dimension_Index                       dim,
-		SizeT                                 particleSize,
-		FeMesh*                               mesh,
-		EscapedRoutine*                       escapedRoutine, 
-		Material*                             material,
-		Variable_Register*                    swarmVariable_Register,
-		ExtensionManager_Register*            extensionMgr_Register,
-		Materials_Register*                   materials_Register,		
-		MPI_Comm                              comm) 
+      Name                                  name,
+      AbstractContext*                      context,
+      void*                                 cellLayout,
+      void*                                 particleLayout,
+      Dimension_Index                       dim,
+      SizeT                                 particleSize,
+      FeMesh*                               mesh,
+      EscapedRoutine*                       escapedRoutine, 
+      Material*                             material,
+      Variable_Register*                    swarmVariable_Register,
+      ExtensionManager_Register*            extensionMgr_Register,
+      Materials_Register*                   materials_Register,		
+      MPI_Comm                              comm,
+      void*                                 ics ) 
 {
-  return _MaterialPointsSwarm_New(
+  MaterialPointsSwarm* self = _MaterialPointsSwarm_New(
       sizeof(MaterialPointsSwarm),
       MaterialPointsSwarm_Type,
       _MaterialPointsSwarm_Delete,
@@ -87,7 +89,6 @@ MaterialPointsSwarm* MaterialPointsSwarm_New(
       _MaterialPointsSwarm_Execute,
       _MaterialPointsSwarm_Destroy,
       name,
-      True,
       cellLayout,			/* cellLayout */
       particleLayout,                   /* particleLayout */
       dim,                      /* dim */
@@ -102,6 +103,28 @@ MaterialPointsSwarm* MaterialPointsSwarm_New(
       materials_Register,                   /* materials_Register */
       comm                       /* comm */
       );
+
+   _Swarm_Init( 
+         (Swarm*)self, context,
+         cellLayout,
+         particleLayout,
+         dim,
+         particleSize,
+         DEFAULT_CELL_PARTICLE_TBL_DELTA,
+         DEFAULT_EXTRA_PARTICLES_FACTOR,
+         extensionMgr_Register,
+         swarmVariable_Register,
+         comm, 
+         ics );
+
+   _MaterialPointsSwarm_Init( 
+      self, 
+      mesh,
+      escapedRoutine, 
+      material,
+      materials_Register );
+
+   return self;
 }
 
 
@@ -118,7 +141,6 @@ MaterialPointsSwarm* _MaterialPointsSwarm_New(
 		Stg_Component_ExecuteFunction*                  _execute,
 		Stg_Component_DestroyFunction*                  _destroy,
 		Name                                            name,
-		Bool                                            initFlag,
 		CellLayout*                                     cellLayout,
 		ParticleLayout*                                 particleLayout,
 		Dimension_Index                                 dim,
@@ -150,7 +172,6 @@ MaterialPointsSwarm* _MaterialPointsSwarm_New(
 			_execute,
 			_destroy,		
 			name,
-			initFlag,
 			cellLayout,
 			particleLayout,
 			dim,
@@ -161,15 +182,6 @@ MaterialPointsSwarm* _MaterialPointsSwarm_New(
 			swarmVariable_Register,
 			comm,
 		        NULL	);
-
-	if (initFlag) {
-	 	_MaterialPointsSwarm_Init( 
-			self,
-			mesh,
-			escapedRoutine, 
-			material,
-			materials_Register );
-	}	
 
 	return self;
 }
@@ -264,7 +276,6 @@ void* _MaterialPointsSwarm_DefaultNew( Name name ) {
 			_MaterialPointsSwarm_Execute,
 			_MaterialPointsSwarm_Destroy,
 			name,
-			False,
 			NULL,			/* cellLayout */
 			NULL,                   /* particleLayout */
 			0,                      /* dim */

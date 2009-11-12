@@ -163,18 +163,19 @@ void MaterialComponentsSuite_Setup( MaterialComponentsSuiteData* data ) {
          20, 13 );
 
    data->mpSwarm = MaterialPointsSwarm_New(
-      "testSwarm",
-      data->cellLayout,
-      data->particleLayout,
-      dim,                      /* dim */
-      sizeof(Particle),
-      data->feMesh,
-      NULL,                   /* escapedRoutine*/
-      NULL,                   /* material */
-      data->svRegister,
-      data->eRegister,
-      data->mRegister,
-      MPI_COMM_WORLD );
+         "testSwarm", NULL,
+         data->cellLayout,
+         data->particleLayout,
+         dim,                      /* dim */
+         sizeof(Particle),
+         data->feMesh,
+         NULL,                   /* escapedRoutine*/
+         NULL,                   /* material */
+         data->svRegister,
+         data->eRegister,
+         data->mRegister,
+         MPI_COMM_WORLD,
+         NULL );
 
    data->shape1 = (Stg_Shape*)Box_New( "boxShape", dim, boxCentre, 0, 0, 0, boxWidth );
    data->shape2 = (Stg_Shape*)Sphere_New( "sphereShape", dim, sphereCentre, 0, 0, 0, sphereRadius );
