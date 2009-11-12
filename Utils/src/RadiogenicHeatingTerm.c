@@ -18,16 +18,16 @@
 const Type RadiogenicHeatingTerm_Type = "RadiogenicHeatingTerm";
 
 RadiogenicHeatingTerm* RadiogenicHeatingTerm_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		AbstractContext*                                    context,
-		Materials_Register*                                 materials_Register )
+	Name							name,
+	FiniteElementContext*	context,
+	ForceVector*				forceVector,
+	Swarm*						integrationSwarm,
+	Materials_Register*		materials_Register )
 {
 	RadiogenicHeatingTerm* self = (RadiogenicHeatingTerm*) _RadiogenicHeatingTerm_DefaultNew( name );
 
 	self->isConstructed = True;
-	_ForceTerm_Init( self, forceVector, integrationSwarm, NULL );
+	_ForceTerm_Init( self, context, forceVector, integrationSwarm, NULL );
 	_RadiogenicHeatingTerm_Init( self, context, materials_Register );
 
 	return self;

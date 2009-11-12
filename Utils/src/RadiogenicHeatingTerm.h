@@ -30,11 +30,11 @@
 	struct RadiogenicHeatingTerm { __RadiogenicHeatingTerm };
 
 	RadiogenicHeatingTerm* RadiogenicHeatingTerm_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		AbstractContext*                                    context,
-		Materials_Register*                                 materials_Register );
+		Name							name,
+		FiniteElementContext*	context,
+		ForceVector*				forceVector,
+		Swarm*						integrationSwarm,
+		Materials_Register*		materials_Register );
 
 	RadiogenicHeatingTerm* _RadiogenicHeatingTerm_New( 
 		SizeT                                               sizeOfSelf,  
@@ -52,13 +52,19 @@
 		Name                                                name );
 	
 	void _RadiogenicHeatingTerm_Delete( void* forceTerm );
+
 	void _RadiogenicHeatingTerm_Print( void* forceTerm, Stream* stream );
 
 	void* _RadiogenicHeatingTerm_DefaultNew( Name name ) ;
-void _RadiogenicHeatingTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
+
+	void _RadiogenicHeatingTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
+
 	void _RadiogenicHeatingTerm_Build( void* forceTerm, void* data ) ;
+
 	void _RadiogenicHeatingTerm_Initialise( void* forceTerm, void* data ) ;
+
 	void _RadiogenicHeatingTerm_Execute( void* forceTerm, void* data ) ;
+
 	void _RadiogenicHeatingTerm_Destroy( void* forceTerm, void* data ) ;
 
 	void _RadiogenicHeatingTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) ;
