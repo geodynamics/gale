@@ -64,6 +64,7 @@ const Type IntegrationPointsSwarm_Type = "IntegrationPointsSwarm";
 
 IntegrationPointsSwarm* IntegrationPointsSwarm_New(
 		Name                                  name,
+      AbstractContext*                      context,
 		void*                                 cellLayout,
 		void*                                 particleLayout,
 		Dimension_Index                       dim,
@@ -78,9 +79,10 @@ IntegrationPointsSwarm* IntegrationPointsSwarm_New(
 		ExtensionManager_Register*            extensionMgr_Register,
 		Variable_Register*                    swarmVariable_Register,
 		Materials_Register*                   materials_Register,
-		MPI_Comm                              comm)
+		MPI_Comm                              comm,
+      void*                                 ics)
 {
-    return _IntegrationPointsSwarm_New(
+    IntegrationPointsSwarm* self = _IntegrationPointsSwarm_New(
 			sizeof(IntegrationPointsSwarm),
 			IntegrationPointsSwarm_Type,
 			_IntegrationPointsSwarm_Delete,
@@ -93,7 +95,6 @@ IntegrationPointsSwarm* IntegrationPointsSwarm_New(
 			_IntegrationPointsSwarm_Execute,
 			_IntegrationPointsSwarm_Destroy,
 			name,
-			True,
 			cellLayout,
 			particleLayout,
 			dim,
@@ -110,6 +111,27 @@ IntegrationPointsSwarm* IntegrationPointsSwarm_New(
 			materials_Register,
 			comm
 			);
+
+    _Swarm_Init( 
+         (Swarm*)self, context,
+         cellLayout,
+         particleLayout,
+         dim,
+         particleSize,
+         cellParticleTblDelta,
+         extraParticlesFactor,
+         extensionMgr_Register,
+         swarmVariable_Register,
+         comm, 
+         ics );
+   _IntegrationPointsSwarm_Init( 
+      self,
+      mesh, 
+      timeIntegrator,
+      weights,
+      mapper,
+      materials_Register,
+      recalculateWeights );
 }
 
 
@@ -127,7 +149,6 @@ void* _IntegrationPointsSwarm_DefaultNew( Name name ) {
 			_IntegrationPointsSwarm_Execute,
 			_IntegrationPointsSwarm_Destroy,
 			name,
-			False,
 			NULL,                           /* cellLayout */
 			NULL,                           /* particleLayout */
 			0,                              /* dim */
@@ -160,7 +181,6 @@ IntegrationPointsSwarm* _IntegrationPointsSwarm_New(
 		Stg_Component_ExecuteFunction*                  _execute,
 		Stg_Component_DestroyFunction*                  _destroy,
 		Name                                            name,
-		Bool                                            initFlag,
 		CellLayout*                                     cellLayout,
 		ParticleLayout*                                 particleLayout,
 		Dimension_Index                                 dim,
@@ -194,7 +214,6 @@ IntegrationPointsSwarm* _IntegrationPointsSwarm_New(
 		_execute,
 		_destroy,		
 		name,
-		initFlag,
 		cellLayout,
 		particleLayout,
 		dim,
@@ -206,17 +225,6 @@ IntegrationPointsSwarm* _IntegrationPointsSwarm_New(
 		comm,
 	        NULL	);
 
-	if (initFlag) {
-		_IntegrationPointsSwarm_Init( 
-			self,
-			mesh, 
-			timeIntegrator,
-			weights,
-			mapper,
-			materials_Register,
-			recalculateWeights );
-	}
-		
 	return self;
 }
 

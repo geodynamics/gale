@@ -80,15 +80,16 @@
 	*/
 
 	/** Classic C++-style constructor */
-	IntegrationPointsSwarm* IntegrationPointsSwarm_New(
+   IntegrationPointsSwarm* IntegrationPointsSwarm_New(
 		Name                                  name,
+      AbstractContext*                      context,
 		void*                                 cellLayout,
 		void*                                 particleLayout,
 		Dimension_Index                       dim,
 		SizeT                                 particleSize,
 		Particle_InCellIndex                  cellParticleTblDelta,
 		double                                extraParticlesFactor,
-		FeMesh*				      mesh, 
+		FeMesh*                   	           mesh,
 		TimeIntegrator*                       timeIntegrator,
 		WeightsCalculator*                    weights,
 		IntegrationPointMapper*               mapper,
@@ -96,7 +97,8 @@
 		ExtensionManager_Register*            extensionMgr_Register,
 		Variable_Register*                    swarmVariable_Register,
 		Materials_Register*                   materials_Register,
-		MPI_Comm                              comm);
+		MPI_Comm                              comm,
+      void*                                 ics);
 	
 	void* _IntegrationPointsSwarm_DefaultNew( Name name ) ;
 
@@ -114,7 +116,6 @@
 		Stg_Component_ExecuteFunction*                  _execute,
 		Stg_Component_DestroyFunction*                  _destroy,
 		Name                                            name,
-		Bool                                            initFlag,
 		CellLayout*                                     cellLayout,
 		ParticleLayout*                                 particleLayout,
 		Dimension_Index                                 dim,

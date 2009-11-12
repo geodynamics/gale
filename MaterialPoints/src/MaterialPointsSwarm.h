@@ -78,19 +78,21 @@
 	** Constructors
 	*/
 	
-	MaterialPointsSwarm* MaterialPointsSwarm_New(
-		Name                                            name,
-		void*                                           cellLayout,
-		void*                                           particleLayout,
-		Dimension_Index                                 dim,
-		SizeT                                           particleSize,
-		FeMesh*                   	                     mesh,
-		EscapedRoutine*                                 escapedRoutine, 
-		Material*                                       material,
-		Variable_Register*                              swarmVariable_Register,
-		ExtensionManager_Register*                      extensionMgr_Register,
-		Materials_Register*                             materials_Register,		
-		MPI_Comm                                        comm);
+   MaterialPointsSwarm* MaterialPointsSwarm_New(
+      Name                                  name,
+      AbstractContext*                      context,
+      void*                                 cellLayout,
+      void*                                 particleLayout,
+      Dimension_Index                       dim,
+      SizeT                                 particleSize,
+      FeMesh*                               mesh,
+      EscapedRoutine*                       escapedRoutine, 
+      Material*                             material,
+      Variable_Register*                    swarmVariable_Register,
+      ExtensionManager_Register*            extensionMgr_Register,
+      Materials_Register*                   materials_Register,		
+      MPI_Comm                              comm,
+      void*                                 ics );
 		
 	MaterialPointsSwarm* _MaterialPointsSwarm_New(
 		SizeT                                           _sizeOfSelf, 
@@ -105,7 +107,6 @@
 		Stg_Component_ExecuteFunction*                  _execute,
 		Stg_Component_DestroyFunction*                  _destroy,		
 		Name                                            name,
-		Bool                                            initFlag,
 		CellLayout*                                     cellLayout,
 		ParticleLayout*                                 particleLayout,
 		Dimension_Index                                 dim,
