@@ -69,7 +69,7 @@ VariableCondition* WallVC_Factory(
 	return (VariableCondition*)WallVC_New( defaultWallVCName, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
 }
 
-WallVC*	WallVC_New(
+WallVC* WallVC_New(
 	Name									name,
 	Name									_dictionaryEntryName, 
 	Variable_Register*				variable_Register, 

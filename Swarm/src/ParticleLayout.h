@@ -49,16 +49,16 @@ typedef void (ParticleLayout_InitialiseParticlesFunction) ( void* particleLayout
 extern const Type ParticleLayout_Type;
 	
 /* ParticleLayout information */
-#define __ParticleLayout                                                \
-    __Stg_Component                                                     \
-    AbstractContext*				context;                \
-    /* virtual information */                                           \
-    ParticleLayout_SetInitialCountsFunction*	_setInitialCounts;      \
-    ParticleLayout_InitialiseParticlesFunction*	_initialiseParticles;   \
-    /* member data */                                                   \
-    Stream*         debug;                          /**< For sending log messages to */ \
-    CoordSystem     coordSystem;                    /**< Set once by subclass init */ \
-    Bool		weightsInitialisedAtStartup;    /**< Set once by subclass init */
+#define __ParticleLayout \
+    __Stg_Component \
+    AbstractContext*										context; \
+    /* virtual information */ \
+    ParticleLayout_SetInitialCountsFunction*		_setInitialCounts; \
+    ParticleLayout_InitialiseParticlesFunction*	_initialiseParticles; \
+    /* member data */ \
+    Stream*													debug; /**< For sending log messages to */ \
+    CoordSystem											coordSystem; /**< Set once by subclass init */ \
+    Bool														weightsInitialisedAtStartup; /**< Set once by subclass init */
 
 struct ParticleLayout { __ParticleLayout };
 	

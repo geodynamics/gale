@@ -174,8 +174,8 @@ void _FileParticleLayout_Print( void* particleLayout, Stream* stream ) {
 
 
 void* _FileParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-   FileParticleLayout*     self                    = (FileParticleLayout*)particleLayout;
-   FileParticleLayout*     newFileParticleLayout;
+   FileParticleLayout*	self = (FileParticleLayout*)particleLayout;
+   FileParticleLayout*	newFileParticleLayout;
    
    newFileParticleLayout = (FileParticleLayout*)_GlobalParticleLayout_Copy( self, dest, deep, nameExt, ptrMap );
    
@@ -213,18 +213,19 @@ void _FileParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFacto
 
    _GlobalParticleLayout_AssignFromXML( self, cf, data );
 
-   filename         = Stg_ComponentFactory_GetString( cf, self->name, "filename", "Swarm" );
-   
+   filename = Stg_ComponentFactory_GetString( cf, self->name, "filename", "Swarm" );
    checkpointfiles = Stg_ComponentFactory_GetInt( cf, self->name, "checkpointfiles", 1 );
+
 #ifdef READ_HDF5
    /* if doing checkpoint restart, grab number of particles swarmdump previously stored against */
    if( self->context->loadFromCheckPoint ) checkpointfiles = _FileParticleLayout_GetFileCountFromTimeInfoFile( self->context );
+
    Journal_Firewall( checkpointfiles > 0, self->errorStream,
-              "Error in %s for %s '%s' - determined number of fileParticleLayout checkpoint files (%d) for reload is not valid.\n",
-              __func__,
-              self->type,
-              self->name,
-              checkpointfiles );
+		"Error in %s for %s '%s' - determined number of fileParticleLayout checkpoint files (%d) for reload is not valid.\n",
+		__func__,
+		self->type,
+		self->name,
+		checkpointfiles );
 #endif
 
    _FileParticleLayout_Init( self, filename, checkpointfiles );
@@ -232,10 +233,13 @@ void _FileParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFacto
    
 void _FileParticleLayout_Build( void* particleLayout, void* data ) {
 }
+
 void _FileParticleLayout_Initialise( void* particleLayout, void* data ) {
 }
+
 void _FileParticleLayout_Execute( void* particleLayout, void* data ) {
 }
+
 void _FileParticleLayout_Destroy( void* particleLayout, void* data ) {
    FileParticleLayout*  self = (FileParticleLayout*)particleLayout;
    Memory_Free( self->filename );
