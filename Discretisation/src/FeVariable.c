@@ -2021,7 +2021,7 @@ double FeVariable_IntegratePlane( void* feVariable, Axis planeAxis, double plane
 	particlesPerDim[ planeAxis ] = 1;
 	gaussParticleLayout = GaussParticleLayout_New( "particleLayout", NULL, LocalCoordSystem, True, self->dim - 1, particlesPerDim );
 	tmpSwarm = Swarm_New( 
-			"tmpgaussSwarm",
+			"tmpgaussSwarm", NULL,
 			singleCellLayout, 
 			gaussParticleLayout,
 			self->dim,
@@ -2644,7 +2644,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    #endif
    /** if this attribute does not exist (attrib_id < 0) then we assume MeshCHECKPOINT_V1 which is not supported  */
    if(attrib_id < 0)
-      Journal_Firewall(NULL, errorStr,"\nError in %s for %s '%s' \n\n Interpolation restart not supported for Version 1 Checkpoint files \n\n", __func__, self->type, self->name );
+      Journal_Firewall( 0, errorStr,"\nError in %s for %s '%s' \n\n Interpolation restart not supported for Version 1 Checkpoint files \n\n", __func__, self->type, self->name );
 
    /** check for known checkpointing version type */
 
@@ -2732,7 +2732,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
       gen->periodic[1] = ((CartesianGenerator*)((C0Generator*)self->feMesh->generator)->elMesh)->periodic[1];
       gen->periodic[2] = ((CartesianGenerator*)((C0Generator*)self->feMesh->generator)->elMesh)->periodic[2];
    } else
-      Journal_Firewall(NULL, errorStr,"\nError in %s for %s '%s' \n\n Interpolation restart not supported for this mesh type \n\n", __func__, self->type, self->name );
+      Journal_Firewall( 0, errorStr,"\nError in %s for %s '%s' \n\n Interpolation restart not supported for this mesh type \n\n", __func__, self->type, self->name );
 
    /** now build the mesh, then read in the required coordinates from the given file */
    Stg_Component_Build( feMesh, NULL, False );
@@ -2742,7 +2742,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    if (!strcmp(self->feMesh->generator->type, C0Generator_Type)){
       elementMesh = feMesh;
       /** create the C0 generator */
-      C0gen = C0Generator_New( "", self->context );
+      C0gen = C0Generator_New( "", (AbstractContext*)self->context );
       /** set it's element mesh to the feMesh create just above */
       C0Generator_SetElementMesh( C0gen, (void*) elementMesh );
       /** create a new feMesh */
