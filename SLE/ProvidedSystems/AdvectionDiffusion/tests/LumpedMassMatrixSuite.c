@@ -204,7 +204,7 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 		dimExists[K_AXIS] = True;
 	singleCellLayout    = (CellLayout*)SingleCellLayout_New( "SingleCellLayout", dimExists, NULL, NULL );
 	gaussParticleLayout = (ParticleLayout*)GaussParticleLayout_New( "GaussParticleLayout", NULL, LocalCoordSystem, True, dim, particlesPerDim );
-	swarm = Swarm_New( "gaussSwarm", singleCellLayout, gaussParticleLayout, dim, sizeof(IntegrationPoint), extensionMgr_Register, context->variable_Register, MPI_COMM_WORLD, NULL );
+	swarm = Swarm_New( "gaussSwarm", context, singleCellLayout, gaussParticleLayout, dim, sizeof(IntegrationPoint), extensionMgr_Register, context->variable_Register, MPI_COMM_WORLD, NULL );
 	
 	/* Lumping of Mass Matrix */
 	massMatrix = ForceVector_New( "MassMatrix", feVariable, dim, context->entryPoint_Register, MPI_COMM_WORLD );
