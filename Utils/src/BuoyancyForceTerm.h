@@ -44,11 +44,7 @@
 #ifndef __PICellerator_Utils_BuoyancyForceTerm_h__
 #define __PICellerator_Utils_BuoyancyForceTerm_h__
 
-	typedef double (BuoyancyForceTerm_CalcGravityFunction) (
-				void* forceTerm, 
-				Swarm* swarm, 
-				Element_LocalIndex lElement_I, 
-				void* particle );
+	typedef double (BuoyancyForceTerm_CalcGravityFunction) ( void* forceTerm, Swarm* swarm, Element_LocalIndex lElement_I, void* particle );
 
 	/** Textual name of this class */
 	extern const Type BuoyancyForceTerm_Type;
@@ -64,29 +60,30 @@
 		__ForceTerm \
 		\
 		/* Virtual info */ \
-		BuoyancyForceTerm_CalcGravityFunction*              _calcGravity;                          \
+		BuoyancyForceTerm_CalcGravityFunction*	_calcGravity; \
 		\
 		/* BuoyancyForceTerm info */ \
-		FeVariable*                                         temperatureField;                  \
-		double                                              gravity;                           \
-		double*						    gHat;			       \
-		Bool                                                adjust;                            \
-		Materials_Register*                                 materials_Register;                \
-		ExtensionInfo_Index                                 materialExtHandle;                 \
-		MaterialSwarmVariable**                             densitySwarmVariables;             \
-		MaterialSwarmVariable**                             alphaSwarmVariables;               \
-		Index                                               materialSwarmCount;
+		FeVariable*										temperatureField; \
+		double											gravity; \
+		double*											gHat; \
+		Bool												adjust; \
+		Materials_Register*							materials_Register; \
+		ExtensionInfo_Index							materialExtHandle; \
+		MaterialSwarmVariable**						densitySwarmVariables; \
+		MaterialSwarmVariable**						alphaSwarmVariables; \
+		Index												materialSwarmCount;
 
 	struct BuoyancyForceTerm { __BuoyancyForceTerm };
 
 	BuoyancyForceTerm* BuoyancyForceTerm_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         temperatureField,
-		double                                              gravity,
-		Bool                                                adjust,
-		Materials_Register*                                 materials_Register );
+		Name							name,
+		FiniteElementContext*	context,
+		ForceVector*				forceVector,
+		Swarm*						integrationSwarm,
+		FeVariable*					temperatureField,
+		double						gravity,
+		Bool							adjust,
+		Materials_Register*		materials_Register );
 
 	BuoyancyForceTerm* _BuoyancyForceTerm_New( 
 		SizeT                                               sizeOfSelf,  
@@ -105,19 +102,26 @@
 		Name                                                name );
 	
 	void _BuoyancyForceTerm_Delete( void* forceTerm );
+
 	void _BuoyancyForceTerm_Print( void* forceTerm, Stream* stream );
 
 	void* _BuoyancyForceTerm_DefaultNew( Name name ) ;
-void _BuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
+
+	void _BuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
+
 	void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) ;
+
 	void _BuoyancyForceTerm_Initialise( void* forceTerm, void* data ) ;
+
 	void _BuoyancyForceTerm_Execute( void* forceTerm, void* data ) ;
+
 	void _BuoyancyForceTerm_Destroy( void* forceTerm, void* data ) ;
 
 	void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) ;
+
 	double _BuoyancyForceTerm_CalcGravity( void* forceTerm, Swarm* swarm, Element_LocalIndex lElement_I, void* particle ) ;
 
-	#define BuoyancyForceTerm_CalcGravity( forceTerm, swarm, lElement_I, particle )\
+	#define BuoyancyForceTerm_CalcGravity( forceTerm, swarm, lElement_I, particle ) \
 		(( (BuoyancyForceTerm*) forceTerm )->_calcGravity( forceTerm, swarm, lElement_I, particle ) )
 
 #endif

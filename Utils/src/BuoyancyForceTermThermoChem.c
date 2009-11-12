@@ -62,22 +62,42 @@
 const Type BuoyancyForceTermThermoChem_Type = "BuoyancyForceTermThermoChem";
 
 BuoyancyForceTermThermoChem* BuoyancyForceTermThermoChem_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         temperatureField,
-		double                                              RaT,
-		double                                              RaC,
-		Bool                                                adjust,
-		Materials_Register*                                 materials_Register )
+	Name							name,
+	FiniteElementContext*	context,
+	ForceVector*				forceVector,
+	Swarm*						integrationSwarm,
+	FeVariable*					temperatureField,
+	double						RaT,
+	double						RaC,
+	Bool							adjust,
+	Materials_Register*		materials_Register )
 {
 	BuoyancyForceTermThermoChem* self = (BuoyancyForceTermThermoChem*) _BuoyancyForceTermThermoChem_DefaultNew( name );
 
 	self->isConstructed = True;
-	_ForceTerm_Init( self, forceVector, integrationSwarm, NULL );
+	_ForceTerm_Init( self, context, forceVector, integrationSwarm, NULL );
 	_BuoyancyForceTermThermoChem_Init( self, temperatureField, RaT, RaC, adjust, materials_Register );
 
 	return self;
+}
+
+void* _BuoyancyForceTermThermoChem_DefaultNew( Name name ) {
+	return (void*)_BuoyancyForceTermThermoChem_New( 
+		sizeof(BuoyancyForceTermThermoChem), 
+		BuoyancyForceTermThermoChem_Type,
+		_BuoyancyForceTermThermoChem_Delete,
+		_BuoyancyForceTermThermoChem_Print,
+		NULL,
+		_BuoyancyForceTermThermoChem_DefaultNew,
+		_BuoyancyForceTermThermoChem_AssignFromXML,
+		_BuoyancyForceTermThermoChem_Build,
+		_BuoyancyForceTermThermoChem_Initialise,
+		_BuoyancyForceTermThermoChem_Execute,
+		_BuoyancyForceTermThermoChem_Destroy,
+		_BuoyancyForceTermThermoChem_AssembleElement,
+		_BuoyancyForceTermThermoChem_CalcRaT,
+		_BuoyancyForceTermThermoChem_CalcRaC,
+		name );
 }
 
 /* Creation implementation / Virtual constructor */
@@ -126,19 +146,18 @@ BuoyancyForceTermThermoChem* _BuoyancyForceTermThermoChem_New(
 }
 
 void _BuoyancyForceTermThermoChem_Init( 
-		BuoyancyForceTermThermoChem*                                  self, 
-		FeVariable*                                         temperatureField,
-		double                                              RaT,
-		double                                              RaC,
-		Bool                                                adjust,
-		Materials_Register*                                 materials_Register )
+	BuoyancyForceTermThermoChem*	self, 
+	FeVariable*							temperatureField,
+	double								RaT,
+	double								RaC,
+	Bool									adjust,
+	Materials_Register*				materials_Register )
 {
 	self->temperatureField    = temperatureField;
 	self->RaT                 = RaT;
 	self->RaC                 = RaC;
 	self->adjust              = adjust;
 	self->materials_Register  = materials_Register;
-
 }
 
 void _BuoyancyForceTermThermoChem_Delete( void* forceTerm ) {
@@ -162,25 +181,6 @@ void _BuoyancyForceTermThermoChem_Print( void* forceTerm, Stream* stream ) {
 	Journal_PrintPointer( stream, self->temperatureField );
 	Journal_PrintDouble( stream, self->RaT );
 	Journal_PrintDouble( stream, self->RaC );
-}
-
-void* _BuoyancyForceTermThermoChem_DefaultNew( Name name ) {
-	return (void*)_BuoyancyForceTermThermoChem_New( 
-		sizeof(BuoyancyForceTermThermoChem), 
-		BuoyancyForceTermThermoChem_Type,
-		_BuoyancyForceTermThermoChem_Delete,
-		_BuoyancyForceTermThermoChem_Print,
-		NULL,
-		_BuoyancyForceTermThermoChem_DefaultNew,
-		_BuoyancyForceTermThermoChem_AssignFromXML,
-		_BuoyancyForceTermThermoChem_Build,
-		_BuoyancyForceTermThermoChem_Initialise,
-		_BuoyancyForceTermThermoChem_Execute,
-		_BuoyancyForceTermThermoChem_Destroy,
-		_BuoyancyForceTermThermoChem_AssembleElement,
-		_BuoyancyForceTermThermoChem_CalcRaT,
-		_BuoyancyForceTermThermoChem_CalcRaC,
-		name );
 }
 
 void _BuoyancyForceTermThermoChem_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {

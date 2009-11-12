@@ -62,18 +62,19 @@
 const Type BuoyancyForceTerm_Type = "BuoyancyForceTerm";
 
 BuoyancyForceTerm* BuoyancyForceTerm_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         temperatureField,
-		double                                              gravity,
-		Bool                                                adjust,
-		Materials_Register*                                 materials_Register )
+	Name							name,
+	FiniteElementContext*	context,
+	ForceVector*				forceVector,
+	Swarm*						integrationSwarm,
+	FeVariable*					temperatureField,
+	double						gravity,
+	Bool							adjust,
+	Materials_Register*		materials_Register )
 {
 	BuoyancyForceTerm* self = (BuoyancyForceTerm*) _BuoyancyForceTerm_DefaultNew( name );
 
 	self->isConstructed = True;
-	_ForceTerm_Init( self, forceVector, integrationSwarm, NULL );
+	_ForceTerm_Init( self, context, forceVector, integrationSwarm, NULL );
 	_BuoyancyForceTerm_Init( self, temperatureField, gravity, adjust, materials_Register );
 
 	return self;
@@ -123,11 +124,11 @@ BuoyancyForceTerm* _BuoyancyForceTerm_New(
 }
 
 void _BuoyancyForceTerm_Init( 
-		BuoyancyForceTerm*                                  self, 
-		FeVariable*                                         temperatureField,
-		double                                              gravity,
-		Bool                                                adjust,
-		Materials_Register*                                 materials_Register )
+	BuoyancyForceTerm*	self, 
+	FeVariable*				temperatureField,
+	double					gravity,
+	Bool						adjust,
+	Materials_Register*	materials_Register )
 {
 	self->temperatureField    = temperatureField;
 	self->gravity             = gravity;
@@ -140,13 +141,10 @@ void _BuoyancyForceTerm_Delete( void* forceTerm ) {
 	BuoyancyForceTerm* self = (BuoyancyForceTerm*)forceTerm;
 	Index i;
 
-	FreeArray( self->gHat );
 	for ( i = 0; i < self->materialSwarmCount; ++i ) {
 		Stg_Class_Delete( self->densitySwarmVariables[i] );
 		Stg_Class_Delete( self->alphaSwarmVariables[i] );
 	}
-	MemFree( self->densitySwarmVariables );
-	MemFree( self->alphaSwarmVariables );
 
 	_ForceTerm_Delete( self );
 }
@@ -180,19 +178,19 @@ void* _BuoyancyForceTerm_DefaultNew( Name name ) {
 }
 
 void _BuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
-	BuoyancyForceTerm*          self             = (BuoyancyForceTerm*)forceTerm;
-	Dictionary*		dict;
+	BuoyancyForceTerm*		self = (BuoyancyForceTerm*)forceTerm;
+	Dictionary*					dict;
 	Dictionary_Entry_Value*	tmp;
-	char*			rootKey;
-	FeVariable*                 temperatureField;
-	double                      gravity;
-	Bool                        adjust;
-	Materials_Register*         materials_Register;
-	unsigned		    nDims;
-	Dictionary_Entry_Value*	    direcList;
-	double*			    direc;
-	unsigned		    d_i;
-	PICelleratorContext*	    context;
+	char*							rootKey;
+	FeVariable*					temperatureField;
+	double						gravity;
+	Bool							adjust;
+	Materials_Register*		materials_Register;
+	unsigned						nDims;
+	Dictionary_Entry_Value*	direcList;
+	double*						direc;
+	unsigned						d_i;
+	PICelleratorContext*		context;
 
 	/* Construct Parent */
 	_ForceTerm_AssignFromXML( self, cf, data );
@@ -317,6 +315,12 @@ void _BuoyancyForceTerm_Execute( void* forceTerm, void* data ) {
 }
 
 void _BuoyancyForceTerm_Destroy( void* forceTerm, void* data ) {
+	BuoyancyForceTerm* self = (BuoyancyForceTerm*)forceTerm;
+
+	FreeArray( self->gHat );
+	MemFree( self->densitySwarmVariables );
+	MemFree( self->alphaSwarmVariables );
+
 	_ForceTerm_Destroy( forceTerm, data );
 }
 

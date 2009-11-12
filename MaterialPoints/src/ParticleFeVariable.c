@@ -130,8 +130,7 @@ ParticleFeVariable* _ParticleFeVariable_New(
 	return self;
 }
 
-void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm* swarm, FiniteElementContext* context ) 
-{
+void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm* swarm, FiniteElementContext* context ) {
 	/* Create Vector */
 	self->assemblyVectorName = Stg_Object_AppendSuffix( self, "assemblyVector" );
 	self->assemblyVector = 
@@ -141,7 +140,7 @@ void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm*
 			self->dim, 
 			context->entryPoint_Register, 
 			self->communicator );
-	self->assemblyTerm = ForceTerm_New( "assemblyTerm", self->assemblyVector, (Swarm*)swarm, (Stg_Component*) self );
+	self->assemblyTerm = ForceTerm_New( "assemblyTerm", self->context, self->assemblyVector, (Swarm*)swarm, (Stg_Component*) self );
 
 	self->massMatrixName = Stg_Object_AppendSuffix( self, "massMatrix" );
 	self->massMatrix = 
@@ -151,8 +150,7 @@ void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm*
 			self->dim, 
 			context->entryPoint_Register, 
 			self->communicator );
-	self->massMatrixForceTerm = 
-		ForceTerm_New( "massMatrixForceTerm", self->massMatrix, (Swarm*)swarm, (Stg_Component*) self );
+	self->massMatrixForceTerm = ForceTerm_New( "massMatrixForceTerm", self->context, self->massMatrix, (Swarm*)swarm, (Stg_Component*) self );
 	ForceTerm_SetAssembleElementFunction( self->massMatrixForceTerm, ParticleFeVariable_AssembleElementShapeFunc );
 	
    
