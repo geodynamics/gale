@@ -253,21 +253,21 @@ void _CompositeVC_AssignFromXML( void* compositeVC, Stg_ComponentFactory* cf, vo
 
 void _CompositeVC_Delete(void* compositeVC) {
 	CompositeVC* self = (CompositeVC*)compositeVC;
-	int ii;
-	
-	if( self->indepItems ) {
-		for( ii = 0; ii < self->nIndepItems; ii++ )
-			Stg_Class_Delete( self->indepItems[ii] );
-		FreeArray( self->indepItems );
-	}
 	
 	/* Stg_Class_Delete parent */
 	_VariableCondition_Delete(self);
 }
 
 void _CompositeVC_Destroy(void* compositeVC, void* data) {
-	CompositeVC* self = (CompositeVC*)compositeVC;
+	CompositeVC*	self = (CompositeVC*)compositeVC;
+	int				ii;
 
+	if( self->indepItems ) {
+		for( ii = 0; ii < self->nIndepItems; ii++ )
+			Stg_Class_Delete( self->indepItems[ii] );
+		FreeArray( self->indepItems );
+	}
+	
 	if (self->itemTbl) {
 		VariableCondition_Index	entry_I;
 		
@@ -275,7 +275,6 @@ void _CompositeVC_Destroy(void* compositeVC, void* data) {
 			if (self->iOwnTbl[entry_I] && self->itemTbl[entry_I])
 				Memory_Free(self->itemTbl[entry_I]);
 		}
-		
 		Memory_Free(self->itemTbl);
 	}
 	

@@ -144,6 +144,11 @@ void _DynamicVC_Execute( void* vc, void* data ) {
 }
 
 void _DynamicVC_Destroy( void* vc, void* data ) {
+	DynamicVC* self = (DynamicVC*)vc;
+
+	NewClass_Delete( self->vcMap );
+
+	__VariableCondition( self, data );
 }
 
 void _DynamicVC_ReadDictionary( void* vc, void* dict ) {
@@ -152,10 +157,8 @@ void _DynamicVC_ReadDictionary( void* vc, void* dict ) {
 void _DynamicVC_Delete( void* vc ) {
 	DynamicVC* self = (DynamicVC*)vc;
 
-	NewClass_Delete( self->vcMap );
-
 	/* Stg_Class_Delete parent */
-	_VariableCondition_Delete(self);
+	_VariableCondition_Delete( self );
 }
 
 void _DynamicVC_Print( void* vc, Stream* stream ) {
