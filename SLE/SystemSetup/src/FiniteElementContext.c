@@ -95,10 +95,10 @@ void* FiniteElementContext_DefaultNew( Name name ) {
 		NULL,
 		FiniteElementContext_DefaultNew,
 		_FiniteElementContext_AssignFromXML,
-		_AbstractContext_Build,
-		_AbstractContext_Initialise,
+		_FiniteElementContext_Build,
+		_FiniteElementContext_Initialise,
 		_AbstractContext_Execute,
-		NULL,
+		_FiniteElementContext_Destroy,
 		name,
 		NON_GLOBAL,
 		_FiniteElementContext_SetDt,
@@ -141,39 +141,39 @@ void _FiniteElementContext_Init( FiniteElementContext* self ) {
 	/* Add hooks to existing entry points... use name "default" so that plugin, etc can exert same behaviour on other contexts*/
 	EntryPoint_Prepend( 
 		Context_GetEntryPoint( self, AbstractContext_EP_Build ),
-		"default", 
+		"_FiniteElementContext_Build", 
 		_FiniteElementContext_Build, 
 		FiniteElementContext_Type );
 	EntryPoint_Prepend( 
 		Context_GetEntryPoint( self, AbstractContext_EP_Initialise ),
-		"default", 
+		"_FiniteElementContext_Initialise", 
 		_FiniteElementContext_Initialise, 
 		FiniteElementContext_Type );
 	EntryPoint_Append( 
 		Context_GetEntryPoint( self, AbstractContext_EP_Solve ),
-		"default", 
+		"_FiniteElementContext_Solve", 
 		_FiniteElementContext_Solve, 
 		FiniteElementContext_Type );
 	EntryPoint_Append( 
 		Context_GetEntryPoint( self, AbstractContext_EP_Solve ),
-		"postSolve", 
+		"_FiniteElementContext_PostSolve", 
 		_FiniteElementContext_PostSolve, 
 		FiniteElementContext_Type );
 	EntryPoint_Append( 
 		Context_GetEntryPoint( self, AbstractContext_EP_Dt ),
-		"default", 
+		"_FiniteElementContext_GetDt", 
 		_FiniteElementContext_GetDt, 
 		FiniteElementContext_Type );
 
 	EntryPoint_Append(
 		Context_GetEntryPoint( self, AbstractContext_EP_Save ),
-		"saveFeVariables",
+		"_FiniteElementContext_SaveFeVariables",
 		_FiniteElementContext_SaveFeVariables,
 		FiniteElementContext_Type );
 
 	EntryPoint_Append(
 		Context_GetEntryPoint( self, AbstractContext_EP_DataSave ),
-		"saveFeVariables",
+		"_FiniteElementContext_SaveFeVariables",
 		_FiniteElementContext_SaveFeVariables,
 		FiniteElementContext_Type );
 	/* The FEM context needs to save gauss swarms so they can be re-loaded for restart later.
@@ -181,19 +181,19 @@ void _FiniteElementContext_Init( FiniteElementContext* self ) {
 	 */
 	EntryPoint_Append(
 		Context_GetEntryPoint( self, AbstractContext_EP_Save ),
-		"saveSwarms",
+		"_FiniteElementContext_SaveSwarms",
 		_FiniteElementContext_SaveSwarms,
 		FiniteElementContext_Type );
 
 	EntryPoint_Append(
 		Context_GetEntryPoint( self, AbstractContext_EP_Save ),
-		"saveMesh",
+		"_FiniteElementContext_SaveMesh",
 		_FiniteElementContext_SaveMesh,
 		FiniteElementContext_Type );
 
 	EntryPoint_Append(
 		Context_GetEntryPoint( self, AbstractContext_EP_DataSave ),
-		"saveMesh",
+		"_FiniteElementContext_SaveMesh",
 		_FiniteElementContext_SaveMesh,
 		FiniteElementContext_Type );
 }
@@ -222,6 +222,7 @@ void _FiniteElementContext_Delete( void* context ) {
 void _FiniteElementContext_Destroy( void* context ) {
 	FiniteElementContext* self = (FiniteElementContext*)context;
 	
+   Stg_Class_Delete( self->slEquations );
 	_DomainContext_Destroy( self );
 }
 
@@ -269,7 +270,6 @@ void _FiniteElementContext_AssignFromXML( void* context, Stg_ComponentFactory* c
 	Stream*  errorStream = Journal_Register( Error_Type, self->type );
 
 	_DomainContext_AssignFromXML( context, cf, data );
-	_FiniteElementContext_Init( self );
 
 	self->dictionary = cf->rootDict;
 
@@ -283,6 +283,8 @@ void _FiniteElementContext_AssignFromXML( void* context, Stg_ComponentFactory* c
 
         self->maxTimeStepSize = Dictionary_GetDouble_WithDefault(
            self->dictionary, "maxTimeStepSize", 0.0 );
+
+	_FiniteElementContext_Init( self );
 }
 
 void _FiniteElementContext_Build( void* context ) {
