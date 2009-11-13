@@ -88,10 +88,10 @@ void* _UnderworldContext_DefaultNew( Name name ) {
 		NULL, 
 		_UnderworldContext_DefaultNew,
 		_UnderworldContext_AssignFromXML,
-		_UnderworldContext_Build,
-		_AbstractContext_Initialise,
+		_FiniteElementContext_Build,
+		_FiniteElementContext_Initialise,
 		_AbstractContext_Execute,
-		_AbstractContext_Destroy,
+		_UnderworldContext_Destroy,
 		name,
 		NON_GLOBAL,
 		_UnderworldContext_SetDt,
@@ -118,10 +118,17 @@ UnderworldContext* _UnderworldContext_New( UNDERWORLDCONTEXT_DEFARGS ) {
 void _UnderworldContext_Init( UnderworldContext* self ) {
 	self->isConstructed = True;
 	self->Vrms = 0.0;
+   self->timeIntegrator = NULL;
+   self->stokesSLE = NULL;
+   self->energySLE = NULL;
+   self->compositionSLE = NULL;
+   self->constitutiveMatrix = NULL;
+   /* turn off because the context no longer holds things
 	EntryPoint_Append_AlwaysLast( Context_GetEntryPoint( self, AbstractContext_EP_AssignFromXML ),
 		"Underworld App Assign Pointers",
 		UnderworldContext_AssignPointers,
 		"Underworld_App_Construct" );
+      */
 }
 
 /* Virtual Functions -------------------------------------------------------------------------------------------------------------*/
@@ -139,12 +146,6 @@ void _UnderworldContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, 
 	}
 #endif
 	_UnderworldContext_Init( self );
-}
-
-void _UnderworldContext_Build( void* context, void* data ) {
-	UnderworldContext* self = (UnderworldContext*)context;
-
-	_AbstractContext_Build( context, data );
 }
 
 void _UnderworldContext_Delete( void* context ) {
