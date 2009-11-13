@@ -90,13 +90,14 @@ void _ElementType_Init( ElementType* self, Index nodeCount ) {
 
 void _ElementType_Destroy( void* elementType, void* data ){
 	ElementType* self = (ElementType*)elementType;
+
+	NewClass_Delete( self->inc );
+
+	Stg_Component_Destroy( self, data, False );
 }
 
 void _ElementType_Delete( void* elementType ) {
 	ElementType* self = (ElementType*)elementType;
-	Journal_DPrintf( self->debug, "In %s\n", __func__ );
-
-	NewClass_Delete( self->inc );
 
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );

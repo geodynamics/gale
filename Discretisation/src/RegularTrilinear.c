@@ -130,6 +130,9 @@ void _RegularTrilinear_Execute( void* elementType, void* data ) {
 }
 
 void _RegularTrilinear_Destroy( void* elementType, void* data ) {
+	RegularTrilinear*	self = (RegularTrilinear*)elementType;
+
+	_TrilinearElementType_Destroy( self, data );
 }
 
 

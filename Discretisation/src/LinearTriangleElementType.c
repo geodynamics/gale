@@ -111,7 +111,6 @@ void _LinearTriangleElementType_Init( LinearTriangleElementType* self ) {
 void _LinearTriangleElementType_Delete( void* elementType ) {
 	LinearTriangleElementType* self = (LinearTriangleElementType*)elementType;
 
-	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 	/* Stg_Class_Delete parent*/
 	_ElementType_Delete( self );
 }

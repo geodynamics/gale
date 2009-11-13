@@ -126,7 +126,6 @@ void _BilinearElementType_Init( BilinearElementType* self ) {
 
 void _BilinearElementType_Delete( void* elementType ) {
 	BilinearElementType* self = (BilinearElementType*)elementType;
-	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 
 	/* Stg_Class_Delete parent */
 	_ElementType_Delete( self );

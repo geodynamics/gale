@@ -124,7 +124,6 @@ void _BilinearInnerElType_Init( BilinearInnerElType* self ) {
 
 void _BilinearInnerElType_Delete( void* elementType ) {
 	BilinearInnerElType* self = (BilinearInnerElType*)elementType;
-	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 
 	/* Stg_Class_Delete parent */
 	_ElementType_Delete( self );

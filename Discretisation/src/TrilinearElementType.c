@@ -135,7 +135,6 @@ void _TrilinearElementType_Init( TrilinearElementType* self ) {
 
 void _TrilinearElementType_Delete( void* elementType ) {
 	TrilinearElementType* self = (TrilinearElementType*)elementType;
-	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 	
 	/* Stg_Class_Delete parent*/
 	_ElementType_Delete( self );
@@ -193,6 +192,7 @@ void _TrilinearElementType_Destroy( void* elementType, void *data ){
 	Memory_Free( self->faceNodes );
 	Memory_Free( self->evaluatedShapeFunc );
 	Memory_Free( self->GNi );
+
 	FreeArray( self->tetInds );
 
 	_ElementType_Destroy( self, data );

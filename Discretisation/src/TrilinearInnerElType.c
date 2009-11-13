@@ -135,7 +135,6 @@ void _TrilinearInnerElType_Init( TrilinearInnerElType* self ) {
 
 void _TrilinearInnerElType_Delete( void* elementType ) {
 	TrilinearInnerElType* self = (TrilinearInnerElType*)elementType;
-	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 
 	/* Stg_Class_Delete parent*/
 	_ElementType_Delete( self );
@@ -175,7 +174,7 @@ void _TrilinearInnerElType_Destroy( void* elementType, void *data ){
 	
 	FreeArray( self->tetInds );
 
-	_ElementType_Destroy( self, NULL );
+	_ElementType_Destroy( self, data );
 }
 
 void _TrilinearInnerElType_Build( void* elementType, void *data ) {

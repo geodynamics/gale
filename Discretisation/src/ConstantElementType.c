@@ -109,7 +109,6 @@ void _ConstantElementType_Init( ConstantElementType* self ) {
 
 void _ConstantElementType_Delete( void* elementType ) {
 	ConstantElementType* self = (ConstantElementType*)elementType;
-	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 
 	/* Stg_Class_Delete parent*/
 	_ElementType_Delete( self );

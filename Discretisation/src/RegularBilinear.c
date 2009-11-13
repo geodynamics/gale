@@ -131,7 +131,7 @@ void _RegularBilinear_Execute( void* elementType, void* data ) {
 void _RegularBilinear_Destroy( void* elementType, void* data ) {
 	RegularBilinear* self = (RegularBilinear*)elementType;
 
-	_BilinearElementType_Destroy( self, NULL );
+	_BilinearElementType_Destroy( self, data );
 }
 
 
