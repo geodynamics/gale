@@ -47,35 +47,12 @@
 /* Textual name of this class */
 const Type CellLayout_Type = "CellLayout";
 
-CellLayout* _CellLayout_New( 
-		SizeT					_sizeOfSelf, 
-		Type					type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print, 
-		Stg_Class_CopyFunction*			_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
-		CellLayout_CellCountFunction*		_cellLocalCount,
-		CellLayout_CellCountFunction*		_cellShadowCount,
-		CellLayout_PointCountFunction*		_pointCount,
-		CellLayout_InitialisePointsFunction*	_initialisePoints,
-		CellLayout_MapElementIdToCellIdFunction*	_mapElementIdToCellId,
-		CellLayout_IsInCellFunction*		_isInCell, 
-		CellLayout_CellOfFunction*		_cellOf,
-		CellLayout_GetShadowInfoFunction*	_getShadowInfo )
-{
+CellLayout* _CellLayout_New( CELLLAYOUT_DEFARGS ) {
 	CellLayout* self;
 	
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(CellLayout) );
-	self = (CellLayout*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-		   _construct, _build, _initialise, _execute, _destroy, name, NON_GLOBAL );
+	assert( sizeOfSelf >= sizeof(CellLayout) );
+	self = (CellLayout*)_Stg_Component_New( STG_COMPONENT_PASSARGS  );
 	
 	/* General info */
 	
@@ -89,21 +66,14 @@ CellLayout* _CellLayout_New(
 	self->_cellOf = _cellOf;
 	self->_getShadowInfo = _getShadowInfo;
 	
-	/* CellLayout info */
-	if( initFlag ){
-		_CellLayout_Init( self );
-	}
-	
 	return self;
 }
 
-void _CellLayout_Init( CellLayout* self ) {
+void _CellLayout_Init( CellLayout* self, AbstractContext* context ) {
 	/* General and Virtual info should already be set */
-	
-	self->isConstructed = True;
-	/* CellLayout info */
-}
 
+	self->context = context;	
+}
 
 void _CellLayout_Delete( void* cellLayout ) {
 	CellLayout* self = (CellLayout*)cellLayout;
@@ -137,6 +107,8 @@ void _CellLayout_Print( void* cellLayout, Stream* stream ) {
 	/* CellLayout info */
 }
 
+void _CellLayout_Destroy( void* cellLayout, void* data ) {
+}
 
 void* _CellLayout_Copy( void* cellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	CellLayout*	self = (CellLayout*)cellLayout;
@@ -157,6 +129,16 @@ void* _CellLayout_Copy( void* cellLayout, void* dest, Bool deep, Name nameExt, P
 	return (void*)newCellLayout;
 }
 
+void _CellLayout_AssignFromXML( void* cellLayout, Stg_ComponentFactory *cf, void* data ) {
+	CellLayout*			self = (CellLayout*)cellLayout;
+	AbstractContext*	context;
+
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+   if( !context )
+      context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
+	_CellLayout_Init( self, context );
+}
 
 Cell_Index CellLayout_CellDomainCount( void* cellLayout ) {
 	CellLayout* self = (CellLayout*)cellLayout;

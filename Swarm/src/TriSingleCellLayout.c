@@ -46,115 +46,49 @@
 
 const Type TriSingleCellLayout_Type = "TriSingleCellLayout";
 
-TriSingleCellLayout* TriSingleCellLayout_DefaultNew( Name name )
-{
-	return (TriSingleCellLayout*)_TriSingleCellLayout_New( sizeof(TriSingleCellLayout), TriSingleCellLayout_Type,
-		_TriSingleCellLayout_Delete, _TriSingleCellLayout_Print, _TriSingleCellLayout_Copy,
-		(Stg_Component_DefaultConstructorFunction*)TriSingleCellLayout_DefaultNew, _TriSingleCellLayout_AssignFromXML,
-		_TriSingleCellLayout_Build, _TriSingleCellLayout_Initialise, _TriSingleCellLayout_Execute,
-		_TriSingleCellLayout_Destroy, name, False,
-		_TriSingleCellLayout_CellLocalCount, _TriSingleCellLayout_CellShadowCount,
-		_TriSingleCellLayout_PointCount, _TriSingleCellLayout_InitialisePoints,
-		_TriSingleCellLayout_MapElementIdToCellId, _TriSingleCellLayout_IsInCell,
-		_TriSingleCellLayout_CellOf, _TriSingleCellLayout_GetShadowInfo,
-		0, NULL );
+
+TriSingleCellLayout* TriSingleCellLayout_New( Name name, AbstractContext* context, int dim, Dictionary* dictionary ) { 
+	TriSingleCellLayout* self = _TriSingleCellLayout_DefaultNew( name );
+
+	self->isConstructed = True;
+	_CellLayout_Init( (CellLayout*)self, context );
+	_TriSingleCellLayout_Init( self, dictionary, dim );
+
+	return self;
 }
 
-TriSingleCellLayout* TriSingleCellLayout_New( Name name, int dim, Dictionary* dictionary ) { 
-	return _TriSingleCellLayout_New( sizeof(TriSingleCellLayout), TriSingleCellLayout_Type, _TriSingleCellLayout_Delete,
-		_TriSingleCellLayout_Print, _TriSingleCellLayout_Copy,
-		(Stg_Component_DefaultConstructorFunction*)TriSingleCellLayout_DefaultNew, _TriSingleCellLayout_AssignFromXML,
-		_TriSingleCellLayout_Build, _TriSingleCellLayout_Initialise, _TriSingleCellLayout_Execute,
-		_TriSingleCellLayout_Destroy, name, True,
-		_TriSingleCellLayout_CellLocalCount, _TriSingleCellLayout_CellShadowCount,
-		_TriSingleCellLayout_PointCount, _TriSingleCellLayout_InitialisePoints,
-		_TriSingleCellLayout_MapElementIdToCellId, _TriSingleCellLayout_IsInCell,
-		_TriSingleCellLayout_CellOf, _TriSingleCellLayout_GetShadowInfo, dim, dictionary );
+TriSingleCellLayout* _TriSingleCellLayout_DefaultNew( Name name ) {
+	return (TriSingleCellLayout*)_TriSingleCellLayout_New(
+		sizeof(TriSingleCellLayout),
+		TriSingleCellLayout_Type,
+		_TriSingleCellLayout_Delete,
+		_TriSingleCellLayout_Print,
+		_TriSingleCellLayout_Copy,
+		(Stg_Component_DefaultConstructorFunction*)_TriSingleCellLayout_DefaultNew,
+		_TriSingleCellLayout_AssignFromXML,
+		_TriSingleCellLayout_Build,
+		_TriSingleCellLayout_Initialise,
+		_TriSingleCellLayout_Execute,
+		_TriSingleCellLayout_Destroy,
+		name,
+		NON_GLOBAL,
+		_TriSingleCellLayout_CellLocalCount,
+		_TriSingleCellLayout_CellShadowCount,
+		_TriSingleCellLayout_PointCount,
+		_TriSingleCellLayout_InitialisePoints,
+		_TriSingleCellLayout_MapElementIdToCellId,
+		_TriSingleCellLayout_IsInCell,
+		_TriSingleCellLayout_CellOf,
+		_TriSingleCellLayout_GetShadowInfo,
+		0,
+		NULL );
 }
 
-void TriSingleCellLayout_Init( TriSingleCellLayout* self, Name name, int dim, Dictionary* dictionary ) { 
-	/* General info */
-	self->type = TriSingleCellLayout_Type;
-	self->_sizeOfSelf = sizeof(TriSingleCellLayout);
-	self->_deleteSelf = False;
-	self->dictionary = dictionary;
-	
-	/* Virtual info */
-	self->_delete = _TriSingleCellLayout_Delete;
-	self->_print = _TriSingleCellLayout_Print;
-	self->_copy = _TriSingleCellLayout_Copy;
-	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*) TriSingleCellLayout_DefaultNew;
-	self->_construct = _TriSingleCellLayout_AssignFromXML;
-	self->_build = _TriSingleCellLayout_Build;
-	self->_initialise = _TriSingleCellLayout_Initialise;
-	self->_execute = _TriSingleCellLayout_Execute;
-	self->_destroy = _TriSingleCellLayout_Destroy;
-	self->_cellLocalCount = _TriSingleCellLayout_CellLocalCount,
-	self->_cellShadowCount = _TriSingleCellLayout_CellShadowCount,
-	self->_pointCount = _TriSingleCellLayout_PointCount,
-	self->_initialisePoints = _TriSingleCellLayout_InitialisePoints,
-	self->_mapElementIdToCellId = _TriSingleCellLayout_MapElementIdToCellId;
-	self->_isInCell = _TriSingleCellLayout_IsInCell,
-	self->_cellOf = _TriSingleCellLayout_CellOf,
-	self->_getShadowInfo = _TriSingleCellLayout_GetShadowInfo;
-
-	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-	_CellLayout_Init( (CellLayout*)self );
-	
-	/* TriSingleCellLayout info */
-	_TriSingleCellLayout_Init( self, dim );
-}
-
-TriSingleCellLayout* _TriSingleCellLayout_New( 
-		SizeT					_sizeOfSelf,
-		Type					type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print,
-		Stg_Class_CopyFunction*			_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
-		CellLayout_CellCountFunction*		_cellLocalCount,
-		CellLayout_CellCountFunction*		_cellShadowCount,
-		CellLayout_PointCountFunction*		_pointCount,
-		CellLayout_InitialisePointsFunction*	_initialisePoints,
-		CellLayout_MapElementIdToCellIdFunction*	_mapElementIdToCellId,		
-		CellLayout_IsInCellFunction*		_isInCell, 
-		CellLayout_CellOfFunction*		_cellOf,
-		CellLayout_GetShadowInfoFunction*	_getShadowInfo,		
-		int					dim, 
-		Dictionary*				dictionary )
-{
+TriSingleCellLayout* _TriSingleCellLayout_New( TRISINGLECELLLAYOUT_DEFARGS ) {
 	TriSingleCellLayout* self;
 	
 	/* Allocate memory */
-	self = (TriSingleCellLayout*)_CellLayout_New( 
-		_sizeOfSelf, 
-		type,
-		_delete,
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		initFlag,
-		_cellLocalCount,
-		_cellShadowCount,
-		_pointCount,
-		_initialisePoints,
-		_mapElementIdToCellId,
-		_isInCell,
-		_cellOf,
-		_getShadowInfo );
+	self = (TriSingleCellLayout*)_CellLayout_New( CELLLAYOUT_PASSARGS );
 	
 	/* General info */
 	self->dictionary = dictionary;
@@ -162,22 +96,17 @@ TriSingleCellLayout* _TriSingleCellLayout_New(
 	/* Virtual info */
 	
 	/* TriSingleCellLayout info */
-	if( initFlag ){
-		_TriSingleCellLayout_Init( self, dim );
-	}
 	
 	return self;
 }
 
-
-void _TriSingleCellLayout_Init( TriSingleCellLayout* self, int dim ) { 
+void _TriSingleCellLayout_Init( TriSingleCellLayout* self, Dictionary* dictionary, int dim ) { 
 	/* General and Virtual info should already be set */
 	
 	/* SingleCellInfo info */
-	self->isConstructed = True;
+	self->dictionary = dictionary;
 	self->dim = dim;
 }
-
 
 void _TriSingleCellLayout_Delete( void* triSingleCellLayout ) {
 	TriSingleCellLayout* self = (TriSingleCellLayout*)triSingleCellLayout;
@@ -218,20 +147,15 @@ void* _TriSingleCellLayout_Copy( void* triSingleCellLayout, void* dest, Bool dee
 }
 	
 void _TriSingleCellLayout_AssignFromXML( void *triSingleCellLayout, Stg_ComponentFactory *cf, void* data ){
-	TriSingleCellLayout *self = (TriSingleCellLayout*)triSingleCellLayout;
-	Dimension_Index dim = 0;
+	TriSingleCellLayout	*self = (TriSingleCellLayout*)triSingleCellLayout;
+	Dimension_Index		dim = 0;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	_CellLayout_AssignFromXML( self, cf, data );
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 	assert( dim );
 
-	self->dictionary = cf->rootDict;
-	
-	_CellLayout_Init( (CellLayout*)self );
-	_TriSingleCellLayout_Init( (TriSingleCellLayout*)self, dim );
+	_TriSingleCellLayout_Init( (TriSingleCellLayout*)self, cf->rootDict, dim );
 }
 	
 void _TriSingleCellLayout_Build( void* triSingleCellLayout, void* data ){
@@ -247,7 +171,9 @@ void _TriSingleCellLayout_Execute( void* triSingleCellLayout, void* data ){
 }
 	
 void _TriSingleCellLayout_Destroy( void* triSingleCellLayout, void* data ){
-	
+	TriSingleCellLayout	*self = (TriSingleCellLayout*)triSingleCellLayout;
+
+	_CellLayout_Destroy( self, data );	
 }
 
 Cell_Index _TriSingleCellLayout_CellLocalCount( void* triSingleCellLayout ) {

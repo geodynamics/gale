@@ -102,7 +102,7 @@ void ElementCellLayoutSuite_Setup( ElementCellLayoutSuiteData* data ) {
 	data->mesh = ElementCellLayout_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, data->extensionMgr_Register );
 	
 	/* Configure the element-cell-layout */
-	data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", data->mesh );
+	data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", NULL, data->mesh );
 }
 
 void ElementCellLayoutSuite_Teardown( ElementCellLayoutSuiteData* data ) {

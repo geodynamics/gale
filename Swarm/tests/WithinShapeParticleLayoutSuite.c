@@ -117,7 +117,7 @@ void WithinShapeParticleLayoutSuite_TestWithinShapeSphere( WithinShapeParticleLa
 		mesh = WithinShapeParticleLayoutSuite_buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
 
 		/* Configure the element-cell-layout */
-		elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
+		elementCellLayout = ElementCellLayout_New( "elementCellLayout", NULL, mesh );
 
 		/* Build the mesh */
 		Stg_Component_Build( mesh, 0, False );
@@ -128,8 +128,8 @@ void WithinShapeParticleLayoutSuite_TestWithinShapeSphere( WithinShapeParticleLa
 
 		/* Configure the gauss-particle-layout */
 		particleLayout = WithinShapeParticleLayout_New( "withinShapeParticleLayoutSphere", NULL, 
-            GlobalCoordSystem, False, particleCount, 0.0, nDims, shape );
-	
+			GlobalCoordSystem, False, particleCount, 0.0, nDims, shape );
+
 		/* Configure the swarm */
 		swarm = Swarm_New( "testSwarm", NULL, elementCellLayout, particleLayout, nDims, sizeof(Particle),
 		extensionMgr_Register, NULL, data->comm, NULL );

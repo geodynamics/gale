@@ -61,44 +61,34 @@
 		Cell_PointIndex pointCount;	     /** Count of points in single cell */\
 
 	struct SingleCellLayout { __SingleCellLayout };
+
+	#define SINGLECELLLAYOUT_DEFARGS \
+		CELLLAYOUT_DEFARGS, \
+			const Bool	dimExists[3], \
+			const XYZ	min, \
+			const XYZ	max 
+
+	#define SINGLECELLLAYOUT_PASSARGS \
+		CELLLAYOUT_PASSARGS, \
+			dimExists[3], \
+			min, \
+			max 
 	
 	/* Create a new SingleCellLayout and initialise */
 	
-	SingleCellLayout* SingleCellLayout_New( Name name, const Bool dimExists[3], const XYZ min, const XYZ max ) ;
+	SingleCellLayout* SingleCellLayout_New( Name name, AbstractContext* context,  const Bool dimExists[3], const XYZ min, const XYZ max ) ;
 
 	/* Creation implementation / Virtual constructor */
-	SingleCellLayout* _SingleCellLayout_New( 
-		SizeT                                     _sizeOfSelf,
-		Type                                      type,
-		Stg_Class_DeleteFunction*                 _delete,
-		Stg_Class_PrintFunction*                  _print,
-		Stg_Class_CopyFunction*                   _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*          _construct,
-		Stg_Component_BuildFunction*              _build,
-		Stg_Component_InitialiseFunction*         _initialise,
-		Stg_Component_ExecuteFunction*            _execute,
-		Stg_Component_DestroyFunction*            _destroy,
-		CellLayout_CellCountFunction*             _cellLocalCount,
-		CellLayout_CellCountFunction*             _cellShadowCount,
-		CellLayout_PointCountFunction*            _pointCount,
-		CellLayout_InitialisePointsFunction*      _initialisePoints,
-		CellLayout_MapElementIdToCellIdFunction*  _mapElementIdToCellId,
-		CellLayout_IsInCellFunction*              _isInCell, 
-		CellLayout_CellOfFunction*                _cellOf,
-		CellLayout_GetShadowInfoFunction*         _getShadowInfo,		
-		Name                                      name,
-		Bool                                      initFlag,
-		const Bool                                dimExists[3],
-		const XYZ                                 min,
-		const XYZ                                 max );
+	SingleCellLayout* _SingleCellLayout_New( SINGLECELLLAYOUT_DEFARGS );
 
 	/* Initialise implementation */
 	void _SingleCellLayout_Init( void* cellLayout, const Bool dimExists[3], const XYZ min, const XYZ max );
 	
 	/* Stg_Class_Delete implementation */
 	void _SingleCellLayout_Delete( void* singleCellLayout );
+
 	void _SingleCellLayout_Print( void* singleCellLayout, Stream* stream );
+
 	#define SingleCellLayout_Copy( self ) \
 		(SingleCellLayout*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define SingleCellLayout_DeepCopy( self ) \
@@ -107,10 +97,15 @@
 	
 	/* 'Stg_Component' Class Info */
 	void* _SingleCellLayout_DefaultNew( Name name );
+
 	void _SingleCellLayout_AssignFromXML( void* singleCellLayout, Stg_ComponentFactory* cf, void* data );
+
 	void _SingleCellLayout_Build( void* singleCellLayout, void* data );
+
 	void _SingleCellLayout_Initialise( void* singleCellLayout, void* data );
+
 	void _SingleCellLayout_Execute( void* singleCellLayout, void* data );
+
 	void _SingleCellLayout_Destroy( void* singleCellLayout, void* data );
 	
 	/** Returns the number of local cells in this cellLayout */
@@ -123,8 +118,7 @@
 	Cell_PointIndex _SingleCellLayout_PointCount( void* singleCellLayout, Cell_Index cellIndex );
 	
 	/** Returns the cell point array... this is the cellLayout's single node array */
-	void _SingleCellLayout_InitialisePoints( void* singleCellLayout, Cell_Index cellIndex, Cell_PointIndex pointCount, 
-		Cell_Points points );
+	void _SingleCellLayout_InitialisePoints( void* singleCellLayout, Cell_Index cellIndex, Cell_PointIndex pointCount, Cell_Points points );
 	
 	/** Implements CellLayout_MapElementIdToCellId(): always return 0, since all elements correspond to the same cell */
 	Cell_Index _SingleCellLayout_MapElementIdToCellId( void* cellLayout, unsigned element_dI );

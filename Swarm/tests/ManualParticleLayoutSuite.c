@@ -141,7 +141,7 @@ void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData
 		mesh = ManualParticleLayoutSuite_BuildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
 	
 		/* Configure the element-cell-layout */
-		elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
+		elementCellLayout = ElementCellLayout_New( "elementCellLayout", NULL, mesh );
 	
 		/* Build the mesh */
 		Stg_Component_Build( mesh, 0, False );

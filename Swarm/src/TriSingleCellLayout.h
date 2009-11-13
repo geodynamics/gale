@@ -56,48 +56,34 @@ given mesh layout.
 		/* Virtual info */ \
 		\
 		/* TriSingleCellLayout info */ \
-		Dictionary*			dictionary; \
-		int				dim;
+		Dictionary*	dictionary; \
+		int			dim;
 
 	struct TriSingleCellLayout { __TriSingleCellLayout };
-	
+
+	#define TRISINGLECELLLAYOUT_DEFARGS \
+		CELLLAYOUT_DEFARGS, \
+			int			dim, \
+			Dictionary*	dictionary
+
+	#define TRISINGLECELLLAYOUT_PASSARGS \
+		CELLAYOUT_PASSARGS, \
+			dim, \
+			dictionary
 	
 	/* Create a new TriSingleCellLayout and initialise */
-	TriSingleCellLayout* TriSingleCellLayout_DefaultNew( Name name );
+	TriSingleCellLayout* _TriSingleCellLayout_DefaultNew( Name name );
 	
-	TriSingleCellLayout* TriSingleCellLayout_New( Name name, int dim, Dictionary* dictionary );
+	TriSingleCellLayout* TriSingleCellLayout_New( Name name, AbstractContext* context, int dim, Dictionary* dictionary );
 	
 	/* Initialise a TriSingleCellLayout construct */
 	void TriSingleCellLayout_Init( TriSingleCellLayout* self, Name name, int dim, Dictionary* dictionary );
 	
 	/* Creation implementation / Virtual constructor */
-	TriSingleCellLayout* _TriSingleCellLayout_New( 
-		SizeT					_sizeOfSelf,
-		Type					type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print,
-		Stg_Class_CopyFunction*			_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
-		CellLayout_CellCountFunction*		_cellLocalCount,
-		CellLayout_CellCountFunction*		_cellShadowCount,
-		CellLayout_PointCountFunction*		_pointCount,
-		CellLayout_InitialisePointsFunction*	_initialisePoints,
-		CellLayout_MapElementIdToCellIdFunction*	_mapElementIdToCellId,
-		CellLayout_IsInCellFunction*		_isInCell, 
-		CellLayout_CellOfFunction*		_cellOf,
-		CellLayout_GetShadowInfoFunction*	_getShadowInfo,		
-		int					dim,
-		Dictionary* dictionary );
+	TriSingleCellLayout* _TriSingleCellLayout_New( TRISINGLECELLLAYOUT_DEFARGS );
 	
 	/* Initialise implementation */
-	void _TriSingleCellLayout_Init( TriSingleCellLayout* self, int dim );
+	void _TriSingleCellLayout_Init( TriSingleCellLayout* self, Dictionary* dictionary, int dim );
 	
 	/* Stg_Class_Delete implementation */
 	void _TriSingleCellLayout_Delete( void* triSingleCellLayout );

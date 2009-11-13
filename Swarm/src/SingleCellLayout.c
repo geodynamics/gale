@@ -48,72 +48,53 @@
 const Type SingleCellLayout_Type = "SingleCellLayout";
 
 
-SingleCellLayout* SingleCellLayout_New( Name name, const Bool dimExists[3], const XYZ min, const XYZ max ) { 
+SingleCellLayout* SingleCellLayout_New( Name name, AbstractContext* context, const Bool dimExists[3], const XYZ min, const XYZ max ) { 
 	SingleCellLayout* self = (SingleCellLayout*) _SingleCellLayout_DefaultNew( name );
 
-	_CellLayout_Init( (CellLayout*)self );
+	self->isConstructed = True;
+	_CellLayout_Init( (CellLayout*)self, context );
 	_SingleCellLayout_Init( self, dimExists, min, max );
+
 	return self;
 }
 
-SingleCellLayout* _SingleCellLayout_New( 
-		SizeT                                     _sizeOfSelf,
-		Type                                      type,
-		Stg_Class_DeleteFunction*                 _delete,
-		Stg_Class_PrintFunction*                  _print,
-		Stg_Class_CopyFunction*                   _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*          _construct,
-		Stg_Component_BuildFunction*              _build,
-		Stg_Component_InitialiseFunction*         _initialise,
-		Stg_Component_ExecuteFunction*            _execute,
-		Stg_Component_DestroyFunction*            _destroy,
-		CellLayout_CellCountFunction*             _cellLocalCount,
-		CellLayout_CellCountFunction*             _cellShadowCount,
-		CellLayout_PointCountFunction*            _pointCount,
-		CellLayout_InitialisePointsFunction*      _initialisePoints,
-		CellLayout_MapElementIdToCellIdFunction*  _mapElementIdToCellId,
-		CellLayout_IsInCellFunction*              _isInCell, 
-		CellLayout_CellOfFunction*                _cellOf,
-		CellLayout_GetShadowInfoFunction*         _getShadowInfo,		
-		Name                                      name,
-		Bool                                      initFlag,
-		const Bool                                dimExists[3],
-		const XYZ                                 min,
-		const XYZ                                 max )
-{
+void* _SingleCellLayout_DefaultNew( Name name ) {
+	return (void*)_SingleCellLayout_New( 
+		sizeof(SingleCellLayout), 
+		SingleCellLayout_Type,
+		_SingleCellLayout_Delete,
+		_SingleCellLayout_Print,
+		_SingleCellLayout_Copy,
+		_SingleCellLayout_DefaultNew,
+		_SingleCellLayout_AssignFromXML,
+		_SingleCellLayout_Build,
+		_SingleCellLayout_Initialise,
+		_SingleCellLayout_Execute,
+		_SingleCellLayout_Destroy,
+		name,
+		NON_GLOBAL,
+		_SingleCellLayout_CellLocalCount,
+		_SingleCellLayout_CellShadowCount,
+		_SingleCellLayout_PointCount,
+		_SingleCellLayout_InitialisePoints,
+		_SingleCellLayout_MapElementIdToCellId, 
+		_SingleCellLayout_IsInCell,
+		_SingleCellLayout_CellOf,
+		_SingleCellLayout_GetShadowInfo,
+		NULL, 
+		NULL,
+		NULL);
+}
+
+SingleCellLayout* _SingleCellLayout_New( SINGLECELLLAYOUT_DEFARGS ) {
 	SingleCellLayout* self;
 	
 	/* Allocate memory */
-	self = (SingleCellLayout*)_CellLayout_New( 
-		_sizeOfSelf, 
-		type,
-		_delete,
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		initFlag,
-		_cellLocalCount,
-		_cellShadowCount,
-		_pointCount,
-		_initialisePoints,
-		_mapElementIdToCellId,
-		_isInCell,
-		_cellOf,
-		_getShadowInfo );
+	self = (SingleCellLayout*)_CellLayout_New( CELLLAYOUT_PASSARGS );
 	
 	/* Virtual info */
 	
 	/* SingleCellLayout info */
-	if( initFlag ){
-		_SingleCellLayout_Init( self, dimExists, min, max );
-	}
 	
 	return self;
 }
@@ -157,8 +138,6 @@ void _SingleCellLayout_Init( void* cellLayout, const Bool dimExists[3], const XY
 void _SingleCellLayout_Delete( void* singleCellLayout ) {
 	SingleCellLayout* self = (SingleCellLayout*)singleCellLayout;
 	
-	Memory_Free( self->cellPointCoords );
-
 	/* Stg_Class_Delete parent class */
 	_CellLayout_Delete( self );
 }
@@ -245,34 +224,6 @@ void* _SingleCellLayout_Copy( void* singleCellLayout, void* dest, Bool deep, Nam
 	return (void*)newSingleCellLayout;
 }
 
-void* _SingleCellLayout_DefaultNew( Name name ) {
-	return (void*)_SingleCellLayout_New( 
-			sizeof(SingleCellLayout), 
-			SingleCellLayout_Type,
-			_SingleCellLayout_Delete,
-			_SingleCellLayout_Print,
-			_SingleCellLayout_Copy,
-			_SingleCellLayout_DefaultNew,
-			_SingleCellLayout_AssignFromXML,
-			_SingleCellLayout_Build,
-			_SingleCellLayout_Initialise,
-			_SingleCellLayout_Execute,
-			_SingleCellLayout_Destroy,
-			_SingleCellLayout_CellLocalCount,
-			_SingleCellLayout_CellShadowCount,
-			_SingleCellLayout_PointCount,
-			_SingleCellLayout_InitialisePoints,
-			_SingleCellLayout_MapElementIdToCellId, 
-			_SingleCellLayout_IsInCell,
-			_SingleCellLayout_CellOf,
-			_SingleCellLayout_GetShadowInfo,
-			name,
-			False,
-			NULL, 
-			NULL,
-			NULL);
-}
-
 void _SingleCellLayout_AssignFromXML( void* singleCellLayout, Stg_ComponentFactory* cf, void* data ){
 	SingleCellLayout* self              = (SingleCellLayout*)singleCellLayout;
 	Bool              dimExists[]       = { False, False, False };
@@ -280,9 +231,7 @@ void _SingleCellLayout_AssignFromXML( void* singleCellLayout, Stg_ComponentFacto
 	XYZ               min;
 	XYZ               max;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	_CellLayout_AssignFromXML( self, cf, data );
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 
@@ -298,7 +247,6 @@ void _SingleCellLayout_AssignFromXML( void* singleCellLayout, Stg_ComponentFacto
 	max[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxY", 1.0 );
 	max[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxZ", 1.0 );
 
-	_CellLayout_Init( (CellLayout*)self );
 	_SingleCellLayout_Init( self, dimExists, min, max );
 }
 	
@@ -315,7 +263,11 @@ void _SingleCellLayout_Execute( void* singleCellLayout, void* data ){
 }
 	
 void _SingleCellLayout_Destroy( void* singleCellLayout, void* data ){
-	
+	SingleCellLayout* self = (SingleCellLayout*)singleCellLayout;
+
+	Memory_Free( self->cellPointCoords );
+
+	_CellLayout_Destroy( self, data );
 }
 
 Cell_Index _SingleCellLayout_CellLocalCount( void* singleCellLayout ) {

@@ -121,7 +121,7 @@ void GaussLayoutSuite_TestDriver( GaussLayoutSuiteData* data, char* name,  char*
 		mesh = GaussLayoutSuite_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, extensionMgr_Register );
 	
 		/* Configure the element-cell-layout */
-		elementCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
+		elementCellLayout = ElementCellLayout_New( "elementCellLayout", NULL, mesh );
 		gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", NULL, LocalCoordSystem, True, data->nDims, particlesPerDim );
 
 		/* Configure the swarm */

@@ -97,7 +97,7 @@ void GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D( GaussLayoutSingleCellSui
 		extensionMgr_Register = ExtensionManager_Register_New();
 
 		/* Configure the element-cell-layout */
-		singleCellLayout = SingleCellLayout_New( "singleCellLayout", dimExists, NULL, NULL );
+		singleCellLayout = SingleCellLayout_New( "singleCellLayout", NULL, dimExists, NULL, NULL );
 	
 		/* Configure the gauss-particle-layout */
 		gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", NULL,
@@ -165,7 +165,7 @@ void GaussLayoutSingleCellSuite_Test2ParticlesPerDim_3D( GaussLayoutSingleCellSu
 		extensionMgr_Register = ExtensionManager_Register_New();
 
 		/* Configure the element-cell-layout */
-		singleCellLayout = SingleCellLayout_New( "singleCellLayout", dimExists, NULL, NULL );
+		singleCellLayout = SingleCellLayout_New( "singleCellLayout", NULL, dimExists, NULL, NULL );
 	
 		/* Configure the gauss-particle-layout */
 		gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", NULL,
@@ -232,7 +232,7 @@ void GaussLayoutSingleCellSuite_Test3ParticlesPerDim_3D( GaussLayoutSingleCellSu
 		extensionMgr_Register = ExtensionManager_Register_New();
 
 		/* Configure the element-cell-layout */
-		singleCellLayout = SingleCellLayout_New( "singleCellLayout", dimExists, NULL, NULL );
+		singleCellLayout = SingleCellLayout_New( "singleCellLayout", NULL, dimExists, NULL, NULL );
 	
 		/* Configure the gauss-particle-layout */
 		gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", NULL,
