@@ -188,34 +188,36 @@ void _AbstractContext_Init( AbstractContext* self ) {
 	self->dataSaveClassK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_DataSaveClass, EntryPoint_Class_VoidPtr_CastType ) );
 	
 	/* add initial hooks */
+   /* don't need now Stg_ComponentFactory_ConstructComponents, 13Nov09 JG, plan to rejig the context
+   post upcoming release */
 	EntryPoint_Append(
 		AbstractContext_GetEntryPoint( self, AbstractContext_EP_AssignFromXML ),
-		"default",
+		"_AbstractContext_Construct_Hook",
 		(Func_Ptr)_AbstractContext_Construct_Hook,
 		AbstractContext_Type );
 	EntryPoint_Append( 
 		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Execute ),
-		"default", 
+		"_AbstractContext_Execute_Hook", 
 		(Func_Ptr)_AbstractContext_Execute_Hook, 
 		AbstractContext_Type );
 	EntryPoint_Append( 
 		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Step ),
-		"default", 
+		"_AbstractContext_Step", 
 		(Func_Ptr)_AbstractContext_Step, 
 		AbstractContext_Type );
 	EntryPoint_Append( 
 		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Save ),
-		"SaveTimeInfo", 
+		"_AbstractContext_SaveTimeInfo", 
 		(Func_Ptr)_AbstractContext_SaveTimeInfo, 
 		AbstractContext_Type );
 	EntryPoint_Prepend_AlwaysFirst( 
 		AbstractContext_GetEntryPoint( self, AbstractContext_EP_Save ),
-		"CreateCheckpointDirectory", 
+		"_AbstractContext_CreateCheckpointDirectory", 
 		(Func_Ptr)_AbstractContext_CreateCheckpointDirectory, 
 		AbstractContext_Type );
 	EntryPoint_Prepend_AlwaysFirst( 
 		AbstractContext_GetEntryPoint( self, AbstractContext_EP_DataSave ),
-		"CreateCheckpointDirectory", 
+		"_AbstractContext_CreateCheckpointDirectory", 
 		(Func_Ptr)_AbstractContext_CreateCheckpointDirectory, 
 		AbstractContext_Type );
 }
@@ -224,13 +226,7 @@ void _AbstractContext_Delete( void* abstractContext ) {
 	AbstractContext* self = (AbstractContext*)abstractContext;
 
 	Stg_Class_Delete( self->variable_Register );
-	Stg_Class_Delete( self->entryPoint_Register );
-
-	Memory_Free( self->experimentName );
-	Memory_Free( self->outputPath );
-	Memory_Free( self->checkpointReadPath );
-	Memory_Free( self->checkpointWritePath );
-
+	
 	/* Temporarily disabling this line as the Underworld PCU test fails 
 	when this line is called. Need to look for an alternative way to delete this. */	
 	/*Stg_Class_Delete( self->plugins );*/
@@ -373,15 +369,19 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 	self->outputPath = StG_Strdup( Dictionary_Entry_Value_AsString( 
 		Dictionary_GetDefault( self->dictionary, "outputPath", Dictionary_Entry_Value_FromString( "./" ) ) ) );
 	
-	self->checkpointReadPath = StG_Strdup( Dictionary_Entry_Value_AsString( 
-		Dictionary_GetDefault( self->dictionary, "checkpointPath", Dictionary_Entry_Value_FromString( self->outputPath ) ) ) );
-	self->checkpointReadPath = StG_Strdup( Dictionary_Entry_Value_AsString( 
-		Dictionary_GetDefault( self->dictionary, "checkpointReadPath", Dictionary_Entry_Value_FromString( self->checkpointReadPath ) ) ) );
+   if( Dictionary_Get( self->dictionary, "checkpointReadPath" ) ) {
+      self->checkpointReadPath = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( self->dictionary, "checkpointReadPath" ) ) );
+   }
+   else {
+      self->checkpointReadPath = StG_Strdup( self->outputPath );
+   }
+   if( Dictionary_Get( self->dictionary, "checkpointWritePath" ) ) {
+      self->checkpointWritePath = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( self->dictionary, "checkpointWritePath" ) ) );
+   }
+   else {
+      self->checkpointWritePath = StG_Strdup( self->outputPath );
+   }
 
-	self->checkpointWritePath = StG_Strdup( Dictionary_Entry_Value_AsString( 
-		Dictionary_GetDefault( self->dictionary, "checkpointPath", Dictionary_Entry_Value_FromString( self->outputPath ) ) ) );
-	self->checkpointWritePath = StG_Strdup( Dictionary_Entry_Value_AsString( 
-		Dictionary_GetDefault( self->dictionary, "checkpointWritePath", Dictionary_Entry_Value_FromString( self->checkpointWritePath ) ) ) );
 	self->checkpointAppendStep = Dictionary_Entry_Value_AsBool( 
 		Dictionary_GetDefault( self->dictionary, "checkpointAppendStep", Dictionary_Entry_Value_FromBool( False ) ) ) ;
 	self->interpolateRestart = Dictionary_Entry_Value_AsBool( 
@@ -519,6 +519,10 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 	/* Check if we have been provided a constant to multiply our calculated dt values by. */
 	self->dtFactor = Dictionary_GetDouble_WithDefault( self->dictionary, "timestepFactor", 1.0 );
 
+   /* this defines all the entryPoints, eg, self->constructK, etc...
+      so it must go before we start KeyCall */
+   _AbstractContext_Init( self );
+
 	/* construct entry point */
 	KeyCall( self, self->constructK, EntryPoint_2VoidPtr_CallCast* )( KeyHandle( self, self->constructK ), self, self );
 
@@ -601,18 +605,27 @@ void _AbstractContext_Execute( void* context, void* data ) {
 
 void _AbstractContext_Destroy( void* context, void* data ) {
 	AbstractContext*	self = (AbstractContext*)context;
-	Bool			isDestroyed;
 	
 	Journal_Printf( self->debug, "In: %s\n", __func__ );
 
 	/* Pre-mark the phase as complete as a default hook will attempt to initialise all live components (including this again) */
    PluginsManager_RemoveAllFromComponentRegister( self->plugins ); 
 
- 	isDestroyed = self->isDestroyed;
-  	self->isDestroyed = True;
   	KeyCall( self, self->destroyExtensionsK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->destroyExtensionsK), self );
   	KeyCall( self, self->destroyK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->destroyK), self );
-  	self->isDestroyed = isDestroyed;
+
+   Stg_Class_Delete( self->entryPoint_Register );
+   Stg_ObjectList_DeleteAllObjects( self->pointer_Register );
+   Stg_Class_Delete( self->pointer_Register );
+
+   /* remove the self->extensionMgr of this context from the extensionMgr_Register */
+	ExtensionManager_Register_Remove( extensionMgr_Register, self->extensionMgr );
+   Stg_Class_Delete( self->extensionMgr );
+
+	Memory_Free( self->experimentName );
+	Memory_Free( self->outputPath );
+	Memory_Free( self->checkpointReadPath );
+	Memory_Free( self->checkpointWritePath );
 
    /*_AbstractContext_Delete( context );*/
 }

@@ -220,7 +220,7 @@ void AbstractContextSuite_TestDefaultEPs( AbstractContextSuiteData* data ) {
    /* Assert that default EPs are set up correctly, eg for saving */
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_Construct" );
    pcu_check_true( contextEP->hooks->count == 1 );
-   pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "default" );
+   pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "_AbstractContext_Construct_Hook" );
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_ConstructExtensions" );
    pcu_check_true( contextEP->hooks->count == 0 );
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_Build" );
@@ -231,7 +231,7 @@ void AbstractContextSuite_TestDefaultEPs( AbstractContextSuiteData* data ) {
    //pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "InitialiseAllLiveComponents" );
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_Execute" );
    pcu_check_true( contextEP->hooks->count == 1 );
-   pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "default" );
+   pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "_AbstractContext_Execute_Hook" );
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_Destroy" );
    pcu_check_true( contextEP->hooks->count == 0 );
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_DestroyExtensions" );
@@ -240,7 +240,7 @@ void AbstractContextSuite_TestDefaultEPs( AbstractContextSuiteData* data ) {
    pcu_check_true( contextEP->hooks->count == 0 );
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_Step" );
    pcu_check_true( contextEP->hooks->count == 1 );
-   pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "default" );
+   pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "_AbstractContext_Step" );
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_Solve" );
    pcu_check_true( contextEP->hooks->count == 0 );
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_UpdateClass" );
@@ -255,8 +255,8 @@ void AbstractContextSuite_TestDefaultEPs( AbstractContextSuiteData* data ) {
    pcu_check_true( contextEP->hooks->count == 0 );
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_Save" );
    pcu_check_true( contextEP->hooks->count == 2 );
-   pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "CreateCheckpointDirectory" );
-   pcu_check_streq( ((Hook*)contextEP->hooks->data[1])->name, "SaveTimeInfo" );
+   pcu_check_streq( ((Hook*)contextEP->hooks->data[0])->name, "_AbstractContext_CreateCheckpointDirectory" );
+   pcu_check_streq( ((Hook*)contextEP->hooks->data[1])->name, "_AbstractContext_SaveTimeInfo" );
    contextEP = (ContextEntryPoint*)AbstractContext_GetEntryPoint( data->ctx, "Context_SaveClass" );
    pcu_check_true( contextEP->hooks->count == 0 );
 }
