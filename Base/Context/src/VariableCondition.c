@@ -102,14 +102,8 @@ void _VariableCondition_Init(
 ** General virtual functions
 */
 
-void _VariableCondition_Delete(void* variableCondition)
-{
+void _VariableCondition_Delete(void* variableCondition) {
 	VariableCondition*	self = (VariableCondition*)variableCondition;
-	
-	if (self->_set) Stg_Class_Delete(self->_set);
-	if (self->indexTbl) Memory_Free(self->indexTbl);
-	if (self->vcVarCountTbl) Memory_Free(self->vcVarCountTbl);
-	if (self->valueTbl) Memory_Free(self->valueTbl);
 	
 	/* Stg_Class_Delete parent */
 	_Stg_Component_Delete( self );
@@ -394,6 +388,12 @@ void _VariableCondition_Execute( void* variableCondition, void* data ) {
 }
 
 void _VariableCondition_Destroy( void* variableCondition, void* data ) {
+	VariableCondition*	self = (VariableCondition*)variableCondition;
+
+	if (self->_set) Stg_Class_Delete(self->_set);
+	if (self->indexTbl) Memory_Free(self->indexTbl);
+	if (self->vcVarCountTbl) Memory_Free(self->vcVarCountTbl);
+	if (self->valueTbl) Memory_Free(self->valueTbl);
 }
 
 void _VariableCondition_Apply( void* variableCondition, void* context ) {
