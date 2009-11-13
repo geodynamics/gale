@@ -230,6 +230,8 @@ void _ForceTerm_Execute( void* forceTerm, void* data ) {
 
 void _ForceTerm_Destroy( void* forceTerm, void* data ) {
 	ForceTerm* self = (ForceTerm*)forceTerm;
+
+	Stg_Component_Destroy( self, data, False );
 }
 
 void ForceTerm_AssembleElement( 
