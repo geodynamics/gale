@@ -136,6 +136,12 @@ ExtensionManager_Index ExtensionManager_Register_Add( void* extensionManager_Reg
 	return Stg_ObjectList_Append( self->extensions, extension );
 }
 
+ExtensionManager_Index ExtensionManager_Register_Remove( void* extensionManager_Register, void* extension ) {
+	ExtensionManager_Register*	self = (ExtensionManager_Register*)extensionManager_Register;
+	
+	return Stg_ObjectList_Remove( self->extensions, ((ExtensionManager*)extension)->name, KEEP );
+}
+
 ExtensionManager_Index ExtensionManager_Register_GetExtensionHandle( void* extensionManager_Register, Name toGet ) {
 	ExtensionManager_Register*	self = (ExtensionManager_Register*)extensionManager_Register;
 	

@@ -89,6 +89,9 @@
 	
 	/** Add a new Extension to the register. */
 	ExtensionManager_Index ExtensionManager_Register_Add( void* extension_Register, void* extension );
+
+   /** Removes an Extension from the register */
+   ExtensionManager_Index ExtensionManager_Register_Remove( void* extensionManager_Register, void* extension );
 	
 	/** Get the handle of an extension in the register. */
 	ExtensionManager_Index ExtensionManager_Register_GetExtensionHandle( void* extension_Register, Name toGet );
