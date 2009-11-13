@@ -76,7 +76,7 @@ DomainContext* _DomainContext_DefaultNew( Name name ) {
 		_AbstractContext_Build,
 		_AbstractContext_Initialise,
 		_AbstractContext_Execute,
-		_AbstractContext_Destroy,	
+		_DomainContext_Destroy,	
 		name,
 		NON_GLOBAL,
 		_DomainContext_SetDt,
@@ -110,13 +110,12 @@ void _DomainContext_Init( DomainContext* self ) {
 void _DomainContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data ) {
 	DomainContext* self = (DomainContext*)context;
 
+	_AbstractContext_AssignFromXML( context, cf, data );
 	/* Check if we have been provided a constant to multiply our calculated dt values by. */
 	self->dtFactor = Dictionary_GetDouble_WithDefault( self->dictionary, "timestepFactor", 1.0 );
 	self->dim = Dictionary_GetUnsignedInt_WithDefault( self->dictionary, "dim", 2 );
 
-	_AbstractContext_Init( self );
 	_DomainContext_Init( self );
-	_AbstractContext_AssignFromXML( context, cf, data );
 }
 
 void _DomainContext_Delete( void* context ) {
@@ -125,7 +124,6 @@ void _DomainContext_Delete( void* context ) {
 	Journal_DPrintf( self->debug, "In: %s()\n", __func__ );
 
 	Journal_DPrintfL( self->debug, 2, "Deleting the FieldVariable register (and hence all FieldVariables).\n" );
-	Stg_Class_Delete( self->fieldVariable_Register ); 
 
 	/* Stg_Class_Delete parent */
 	_AbstractContext_Delete( self );
@@ -134,6 +132,7 @@ void _DomainContext_Delete( void* context ) {
 void _DomainContext_Destroy( void* context ) {
 	DomainContext* self = (DomainContext*)context;
 	
+	Stg_Class_Delete( self->fieldVariable_Register ); 
 	_AbstractContext_Destroy( self, 0 );
 }
 
