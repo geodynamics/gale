@@ -111,8 +111,6 @@ void _ElementCellLayout_Init( ElementCellLayout* self, void* mesh ) {
 void _ElementCellLayout_Delete( void* elementCellLayout ) {
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
 
-	NewClass_Delete( self->incArray );
-	
 	/* Stg_Class_Delete parent class */
 	_CellLayout_Delete( self );
 }
@@ -200,6 +198,8 @@ void _ElementCellLayout_Execute( void *elementCellLayout, void *data ){
 void _ElementCellLayout_Destroy( void *elementCellLayout, void *data ){
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
 		
+	NewClass_Delete( self->incArray );
+	
 	_CellLayout_Destroy( self, data );
 }
 
