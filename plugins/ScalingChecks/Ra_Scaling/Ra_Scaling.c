@@ -103,21 +103,16 @@ void _Ra_CheckScalings_Func( void* context, void* ptrToContext ) {
 }
 
 void _Underworld_Ra_Scaling_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
-	UnderworldContext* context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
-	
-	Bool checkScaling = Stg_ComponentFactory_GetRootDictBool( cf, "Ra_ScalingCheck", True ); 
+   UnderworldContext* context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 
-	Journal_DFirewall( 
-		(Bool)context->energySLE, 
-		Journal_Register( Error_Type, Underworld_Ra_Scaling_Type ), 
-		"The required energy SLE component has not been created or placed on the context.\n");	
-	
-  if ( checkScaling ) {
-    EntryPoint_Append( Context_GetEntryPoint( context, AbstractContext_EP_Build ),
+   Bool checkScaling = Stg_ComponentFactory_GetRootDictBool( cf, "Ra_ScalingCheck", True ); 
+
+   if ( checkScaling ) {
+      EntryPoint_Append( Context_GetEntryPoint( context, AbstractContext_EP_Build ),
       "Underworld CheckScalings",
       _Ra_CheckScalings_Func,
       Underworld_Ra_Scaling_Type );
-  }
+   }
 }
 
 /* This function will provide StGermain the abilty to instantiate (create) this codelet on demand. */
