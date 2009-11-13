@@ -2017,7 +2017,7 @@ double FeVariable_IntegratePlane( void* feVariable, Axis planeAxis, double plane
 	if (self->dim == 3)
 		dimExists[ bAxis ] = True;
 	
-	singleCellLayout = SingleCellLayout_New( "cellLayout", dimExists, NULL, NULL );
+	singleCellLayout = SingleCellLayout_New( "cellLayout", self->context, dimExists, NULL, NULL );
 	particlesPerDim[ planeAxis ] = 1;
 	gaussParticleLayout = GaussParticleLayout_New( "particleLayout", NULL, LocalCoordSystem, True, self->dim - 1, particlesPerDim );
 	tmpSwarm = Swarm_New( 

@@ -200,7 +200,7 @@ Swarm* BuildSwarm( FeMesh* mesh ) {
 	unsigned			partPerDim[3]	= { 2, 2, 2 };
 	
 	extMgr_Reg = ExtensionManager_Register_New();
-	elCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
+	elCellLayout = ElementCellLayout_New( "elementCellLayout", NULL, mesh );
 	gaussLayout = GaussParticleLayout_New( "gaussParticleLayout", NULL, LocalCoordSystem, True, dim, partPerDim );
 	swarm = Swarm_New( "gaussSwarm", NULL, elCellLayout, gaussLayout, dim, sizeof(Particle), extMgr_Reg, NULL, MPI_COMM_WORLD, NULL );
 
