@@ -79,6 +79,9 @@
 	
 	/* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	
+   /* Deletes all elements from register and then
+      deletes the register */
+   void NamedObject_Register_DeleteAll( void* reg );
 	
 	#define NamedObject_Register_Add( self, nameObject ) \
 		( Stg_ObjectList_Append( (self)->objects, nameObject ) )

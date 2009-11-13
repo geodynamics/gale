@@ -100,6 +100,16 @@ void _NamedObject_Register_Delete( void* namedObjectRegister ) {
 	_Stg_Class_Delete( self );
 }
 	
+void NamedObject_Register_DeleteAll( void* reg ) {
+   /* Deletes all elements from register and then
+      deletes the register */
+   NamedObject_Register* self = (NamedObject_Register*)reg;
+
+   Stg_ObjectList_DeleteAllObjects( self->objects );
+
+   /* Stg_Class_Delete parent */
+   Stg_Class_Delete( self );
+}
 void _NamedObject_Register_Print( void* namedObjectRegister, struct Stream* stream ) {
 	NamedObject_Register*	self = (NamedObject_Register*)namedObjectRegister;
 
