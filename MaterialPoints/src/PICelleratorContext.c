@@ -97,10 +97,10 @@ void* _PICelleratorContext_DefaultNew( Name name ) {
 		NULL, 
 		_PICelleratorContext_DefaultNew,
 		_PICelleratorContext_AssignFromXML,
-		_AbstractContext_Build,
-		_AbstractContext_Initialise,
+		_FiniteElementContext_Build,
+		_FiniteElementContext_Initialise,
 		_AbstractContext_Execute,
-		NULL,
+		_PICelleratorContext_Destroy,
 		name,
 		NON_GLOBAL,
 		_PICelleratorContext_SetDt,
@@ -131,8 +131,6 @@ void _PICelleratorContext_Delete( void* context ) {
 	
 	Journal_DPrintf( self->debug, "In: %s()\n", __func__ );
 
-	Stg_Class_Delete( self->materials_Register );
-
 	/* Stg_Class_Delete parent */
 	_FiniteElementContext_Delete( self );
 }
@@ -140,6 +138,8 @@ void _PICelleratorContext_Delete( void* context ) {
 void _PICelleratorContext_Destroy( void* context ) {
 	PICelleratorContext* self = (PICelleratorContext*)context;
 	
+	Stg_Class_Delete( self->materials_Register );
+
 	_FiniteElementContext_Destroy( self );
 }
 
