@@ -139,12 +139,6 @@ void _BuoyancyForceTerm_Init(
 
 void _BuoyancyForceTerm_Delete( void* forceTerm ) {
 	BuoyancyForceTerm* self = (BuoyancyForceTerm*)forceTerm;
-	Index i;
-
-	for ( i = 0; i < self->materialSwarmCount; ++i ) {
-		Stg_Class_Delete( self->densitySwarmVariables[i] );
-		Stg_Class_Delete( self->alphaSwarmVariables[i] );
-	}
 
 	_ForceTerm_Delete( self );
 }
@@ -316,8 +310,15 @@ void _BuoyancyForceTerm_Execute( void* forceTerm, void* data ) {
 
 void _BuoyancyForceTerm_Destroy( void* forceTerm, void* data ) {
 	BuoyancyForceTerm* self = (BuoyancyForceTerm*)forceTerm;
+	Index i;
+
+	for ( i = 0; i < self->materialSwarmCount; ++i ) {
+		Stg_Class_Delete( self->densitySwarmVariables[i] );
+		Stg_Class_Delete( self->alphaSwarmVariables[i] );
+	}
 
 	FreeArray( self->gHat );
+
 	MemFree( self->densitySwarmVariables );
 	MemFree( self->alphaSwarmVariables );
 

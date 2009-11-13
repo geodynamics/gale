@@ -162,12 +162,6 @@ void _BuoyancyForceTermThermoChem_Init(
 
 void _BuoyancyForceTermThermoChem_Delete( void* forceTerm ) {
 	BuoyancyForceTermThermoChem* self = (BuoyancyForceTermThermoChem*)forceTerm;
-	Index i;
-
-	for ( i = 0; i < self->materialSwarmCount; ++i ) {
-		Stg_Class_Delete( self->densitySwarmVariables[i] );
-	}
-	Stg_Class_Delete( self->densitySwarmVariables );
 
 	_ForceTerm_Delete( self );
 }
@@ -278,7 +272,15 @@ void _BuoyancyForceTermThermoChem_Execute( void* forceTerm, void* data ) {
 }
 
 void _BuoyancyForceTermThermoChem_Destroy( void* forceTerm, void* data ) {
-	_ForceTerm_Destroy( forceTerm, data );
+	BuoyancyForceTermThermoChem* self = (BuoyancyForceTermThermoChem*)forceTerm;
+	Index i;
+
+	for ( i = 0; i < self->materialSwarmCount; ++i ) {
+		Stg_Class_Delete( self->densitySwarmVariables[i] );
+	}
+	Stg_Class_Delete( self->densitySwarmVariables );
+
+	_ForceTerm_Destroy( self, data );
 }
 
 
