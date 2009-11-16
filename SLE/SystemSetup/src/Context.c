@@ -701,8 +701,8 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
          group_id  = H5Gopen(file, "/");
          attrib_id = H5Acreate(group_id, "checkpoint file version", H5T_STD_I32BE, attribData_id, H5P_DEFAULT);
       #else
-         group_id  = H5Gopen(file, "/", H5P_DEFAULT);
-         attrib_id = H5Acreate(group_id, "checkpoint file version", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
+         group_id  = H5Gopen2(file, "/", H5P_DEFAULT);
+         attrib_id = H5Acreate2(group_id, "checkpoint file version", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
       #endif
       H5Awrite(attrib_id, H5T_NATIVE_INT, &attribData);
       H5Aclose(attrib_id);
@@ -717,8 +717,8 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
          group_id  = H5Gopen(file, "/");
          attrib_id = H5Acreate(group_id, "dimensions", H5T_STD_I32BE, attribData_id, H5P_DEFAULT);
       #else
-         group_id  = H5Gopen(file, "/", H5P_DEFAULT);
-         attrib_id = H5Acreate(group_id, "dimensions", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
+         group_id  = H5Gopen2(file, "/", H5P_DEFAULT);
+         attrib_id = H5Acreate2(group_id, "dimensions", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
       #endif
       H5Awrite(attrib_id, H5T_NATIVE_INT, &attribData);
       H5Aclose(attrib_id);
@@ -735,8 +735,8 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
          group_id  = H5Gopen(file, "/");
          attrib_id = H5Acreate(group_id, "mesh resolution", H5T_STD_I32BE, attribData_id, H5P_DEFAULT);
       #else
-         group_id  = H5Gopen(file, "/", H5P_DEFAULT);
-         attrib_id = H5Acreate(group_id, "mesh resolution", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
+         group_id  = H5Gopen2(file, "/", H5P_DEFAULT);
+         attrib_id = H5Acreate2(group_id, "mesh resolution", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
       #endif
       H5Awrite(attrib_id, H5T_NATIVE_INT, sizes);
       H5Aclose(attrib_id);
@@ -749,7 +749,7 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
       #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
       fileData = H5Dcreate( file, "/min", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
       #else
-      fileData = H5Dcreate( file, "/min", H5T_NATIVE_DOUBLE, fileSpace,
+      fileData = H5Dcreate2( file, "/min", H5T_NATIVE_DOUBLE, fileSpace,
                                H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
       #endif
                   
@@ -761,7 +761,7 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
       #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
       fileData = H5Dcreate( file, "/max", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
       #else
-      fileData = H5Dcreate( file, "/max", H5T_NATIVE_DOUBLE, fileSpace,
+      fileData = H5Dcreate2( file, "/max", H5T_NATIVE_DOUBLE, fileSpace,
                                H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
       #endif
             
@@ -779,7 +779,7 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
       #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
       fileData = H5Dcreate( file, "/vertices", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
       #else
-      fileData = H5Dcreate( file, "/vertices", H5T_NATIVE_DOUBLE, fileSpace,
+      fileData = H5Dcreate2( file, "/vertices", H5T_NATIVE_DOUBLE, fileSpace,
                             H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
       #endif
 
@@ -803,7 +803,7 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
       #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
       fileData2 = H5Dcreate( file, "/connectivity", H5T_NATIVE_INT, fileSpace2, H5P_DEFAULT );
       #else
-      fileData2 = H5Dcreate( file, "/connectivity", H5T_NATIVE_INT, fileSpace2,
+      fileData2 = H5Dcreate2( file, "/connectivity", H5T_NATIVE_INT, fileSpace2,
                             H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
       #endif
 
@@ -823,7 +823,7 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
       #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
       fileData  = H5Dopen( file, "/vertices" );
       #else
-      fileData  = H5Dopen( file, "/vertices", H5P_DEFAULT );
+      fileData  = H5Dopen2( file, "/vertices", H5P_DEFAULT );
       #endif
       /* get the filespace handle */
       fileSpace = H5Dget_space(fileData);
@@ -832,7 +832,7 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
       #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
       fileData2  = H5Dopen( file, "/connectivity" );
       #else
-      fileData2  = H5Dopen( file, "/connectivity", H5P_DEFAULT );
+      fileData2  = H5Dopen2( file, "/connectivity", H5P_DEFAULT );
       #endif
       /* get the filespace handle */
       fileSpace2 = H5Dget_space(fileData2);
