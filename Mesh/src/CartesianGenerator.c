@@ -345,7 +345,7 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
          #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	         fileData = H5Dopen( file, "/min" );
          #else
-	         fileData = H5Dopen( file, "/min", H5P_DEFAULT );
+	         fileData = H5Dopen2( file, "/min", H5P_DEFAULT );
          #endif
 	         H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, crdMin );
 	         H5Dclose( fileData );
@@ -354,7 +354,7 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
          #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	         fileData = H5Dopen( file, "/max" );
          #else
-	         fileData = H5Dopen( file, "/max", H5P_DEFAULT );
+	         fileData = H5Dopen2( file, "/max", H5P_DEFAULT );
          #endif
 	         H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, crdMax );
 	         H5Dclose( fileData );
@@ -364,7 +364,7 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
             group_id  = H5Gopen(file, "/");
             attrib_id = H5Aopen_name(group_id, "checkpoint file version");
          #else
-            group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+            group_id  = H5Gopen2(file, "/", H5P_DEFAULT);
             attrib_id = H5Aopen(group_id, "checkpoint file version", H5P_DEFAULT);
          #endif
 
@@ -2277,7 +2277,7 @@ void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, cha
       group_id  = H5Gopen(file, "/");
       attrib_id = H5Aopen_name(group_id, "checkpoint file version");
    #else
-      group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+      group_id  = H5Gopen2(file, "/", H5P_DEFAULT);
       attrib_id = H5Aopen(group_id, "checkpoint file version", H5P_DEFAULT);
    #endif
    /** if this attribute does not exist (attrib_id < 0) then we assume MeshCHECKPOINT_V1 and continue without checking attributes */
@@ -2370,7 +2370,7 @@ void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, cha
    #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
    fileData = H5Dopen( file, verticeName );
    #else
-   fileData = H5Dopen( file, verticeName, H5P_DEFAULT );
+   fileData = H5Dopen2( file, verticeName, H5P_DEFAULT );
    #endif
    fileSpace = H5Dget_space( fileData );
    Memory_Free( verticeName );

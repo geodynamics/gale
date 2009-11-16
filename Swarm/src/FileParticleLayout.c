@@ -260,7 +260,7 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
          group_id  = H5Gopen(file, "/");
          attrib_id = H5Aopen_name(group_id, "Swarm Particle Count");
       #else
-         group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+         group_id  = H5Gopen2(file, "/", H5P_DEFAULT);
          attrib_id = H5Aopen(group_id, "Swarm Particle Count", H5P_DEFAULT);
       #endif
       status = H5Aread(attrib_id, H5T_NATIVE_INT, &nParticles);
@@ -277,7 +277,7 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
          #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
          fileData = H5Dopen( file, dataSpaceName );
          #else
-         fileData = H5Dopen( file, dataSpaceName, H5P_DEFAULT );
+         fileData = H5Dopen2( file, dataSpaceName, H5P_DEFAULT );
          #endif
          fileSpace = H5Dget_space( fileData );
          
@@ -395,7 +395,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
          group_id  = H5Gopen(file[ii-1], "/");
          attrib_id = H5Aopen_name(group_id, "Swarm Particle Count");
       #else
-         group_id  = H5Gopen(file[ii-1], "/", H5P_DEFAULT);
+         group_id  = H5Gopen2(file[ii-1], "/", H5P_DEFAULT);
          attrib_id = H5Aopen(group_id, "Swarm Particle Count", H5P_DEFAULT);
       #endif
       status = H5Aread(attrib_id, H5T_NATIVE_INT, &nParticles);
@@ -414,7 +414,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
                #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
                   self->fileData[swarmVar_I][ii-1]  = H5Dopen( file[ii-1], dataSpaceName );
                #else
-                  self->fileData[swarmVar_I][ii-1]  = H5Dopen( file[ii-1], dataSpaceName, H5P_DEFAULT );
+                  self->fileData[swarmVar_I][ii-1]  = H5Dopen2( file[ii-1], dataSpaceName, H5P_DEFAULT );
                #endif
                   self->fileSpace[swarmVar_I][ii-1] = H5Dget_space( self->fileData[swarmVar_I][ii-1] );
                
