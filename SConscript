@@ -4,7 +4,7 @@ Import('env')
 #
 # Need to make a copy because SCons uses the environment
 # at it's final state, so StGermain ends up depending on
-# StgDomain, etc.
+# StgDomain, etc..
 #
 
 env = env.Clone()
