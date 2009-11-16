@@ -182,5 +182,6 @@ void _PICelleratorContext_AssignFromXML( void* context, Stg_ComponentFactory *cf
 	PICelleratorContext* self = (PICelleratorContext*) context;
 	
 	_FiniteElementContext_AssignFromXML( context, cf, data );
+
 	_PICelleratorContext_Init( self );
 }
