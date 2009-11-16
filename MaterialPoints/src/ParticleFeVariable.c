@@ -61,69 +61,68 @@ int ParticleFeVariable_nNames = 0;
 int ParticleFeVariable_curName = 0;
 
 ParticleFeVariable* _ParticleFeVariable_New(
- 		SizeT                                             _sizeOfSelf,
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-		Name                                              name )
+	SizeT                                             _sizeOfSelf,
+	Type                                              type,
+	Stg_Class_DeleteFunction*                         _delete,
+	Stg_Class_PrintFunction*                          _print,
+	Stg_Class_CopyFunction*                           _copy, 
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
+	Stg_Component_ConstructFunction*                  _construct,
+	Stg_Component_BuildFunction*                      _build,
+	Stg_Component_InitialiseFunction*                 _initialise,
+	Stg_Component_ExecuteFunction*                    _execute,
+	Stg_Component_DestroyFunction*                    _destroy,
+	FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
+	FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
+	FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
+	FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
+	FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
+	FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
+	FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
+	ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
+	Name                                              name )
 {
-	ParticleFeVariable*		self;
+	ParticleFeVariable* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ParticleFeVariable) );
-	self = (ParticleFeVariable*)
-		_FeVariable_New(
-			_sizeOfSelf, 
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute, 
-			_destroy,
-			name,
-			False,
-			_interpolateValueAt,
-			_getMinGlobalFeMagnitude, 
-			_getMaxGlobalFeMagnitude,
-			_getMinAndMaxLocalCoords, 
-			_getMinAndMaxGlobalCoords,
-			_interpolateWithinElement,
-			_getValueAtNode,
-			_FeVariable_SyncShadowValues, 
-			NULL,
-			NULL,
-			NULL,
-			NULL,   /* bcs */
-			NULL,   /* ics */
-			NULL,   /* linkedDofInfo */
-			NULL,   /* templateFeVariable */
-			0,      /* fieldComponentCount */
-			0,	/* dim */
-			True, /* isCheckpointedAndReloaded */
-			False,  /* use a reference solution from file */
-			False,  /* load the reference solution at each time step */
-			0,	/* communicator */
-			NULL	/* fv_Register */
-			);
+	self = (ParticleFeVariable*) _FeVariable_New(
+		_sizeOfSelf, 
+		type, 
+		_delete,
+		_print,
+		_copy,
+		_defaultConstructor,
+		_construct,
+		_build,
+		_initialise,
+		_execute, 
+		_destroy,
+		name,
+		NON_GLOBAL,
+		_interpolateValueAt,
+		_getMinGlobalFeMagnitude, 
+		_getMaxGlobalFeMagnitude,
+		_getMinAndMaxLocalCoords, 
+		_getMinAndMaxGlobalCoords,
+		0, /* fieldComponentCount */
+		0, /* dim */
+		True, /* isCheckpointedAndReloaded */
+		0, /* communicator */
+		NULL, /* fv_Register */
+		_interpolateWithinElement,
+		_getValueAtNode,
+		_FeVariable_SyncShadowValues, 
+		NULL, 
+		NULL, 
+		NULL, /* bcs */
+		NULL,	/* ics */	
+		NULL,	/* linkedDofInfo */	
+		NULL,	/* templateFeVariable */	
+		NULL,		
+		False, /* use a reference solution from file */
+		False /* load the reference solution at each time step */
+	);
 
 	self->_valueAtParticle = _valueAtParticle;
 	
@@ -133,26 +132,23 @@ ParticleFeVariable* _ParticleFeVariable_New(
 void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm* swarm, FiniteElementContext* context ) {
 	/* Create Vector */
 	self->assemblyVectorName = Stg_Object_AppendSuffix( self, "assemblyVector" );
-	self->assemblyVector = 
-		ForceVector_New( 
-			self->assemblyVectorName,
-			(FeVariable*) self, 
-			self->dim, 
-			context->entryPoint_Register, 
-			self->communicator );
-	self->assemblyTerm = ForceTerm_New( "assemblyTerm", self->context, self->assemblyVector, (Swarm*)swarm, (Stg_Component*) self );
+	self->assemblyVector = ForceVector_New( 
+		self->assemblyVectorName,
+		(FeVariable*) self, 
+		self->dim, 
+		context->entryPoint_Register, 
+		self->communicator );
+	self->assemblyTerm = ForceTerm_New( "assemblyTerm", (FiniteElementContext*) self->context, self->assemblyVector, (Swarm*)swarm, (Stg_Component*) self );
 
 	self->massMatrixName = Stg_Object_AppendSuffix( self, "massMatrix" );
-	self->massMatrix = 
-		ForceVector_New( 
-			self->massMatrixName,
-			(FeVariable*) self, 
-			self->dim, 
-			context->entryPoint_Register, 
-			self->communicator );
-	self->massMatrixForceTerm = ForceTerm_New( "massMatrixForceTerm", self->context, self->massMatrix, (Swarm*)swarm, (Stg_Component*) self );
+	self->massMatrix = ForceVector_New( 
+		self->massMatrixName,
+		(FeVariable*) self, 
+		self->dim, 
+		context->entryPoint_Register, 
+		self->communicator );
+	self->massMatrixForceTerm = ForceTerm_New( "massMatrixForceTerm", (FiniteElementContext*) self->context, self->massMatrix, (Swarm*)swarm, (Stg_Component*) self );
 	ForceTerm_SetAssembleElementFunction( self->massMatrixForceTerm, ParticleFeVariable_AssembleElementShapeFunc );
-	
    
    /* Changed by PatrickSunter, 8/7/2009 - used to append onto stokesEqn-execute. However
     * this component should work for other FE systems other than the Stokes solver */
@@ -191,7 +187,6 @@ void _ParticleFeVariable_Print( void* materialFeVariable, Stream* stream ) {
 	
 	/* ParticleFeVariable info */
 }
-
 
 void* _ParticleFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	abort();

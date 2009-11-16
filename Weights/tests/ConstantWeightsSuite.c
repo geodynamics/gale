@@ -84,13 +84,13 @@ void circleInterface( void* feVariable, Element_DomainIndex dElement_I, Coord xi
 }
 
 void WeightsSuite_TestElementIntegral(
-      PICelleratorContext* context,
-      Name           funcName,
-      Index          count,   // was SampleSize - defaults to 5000
-      double         meanTolerance,
-      double         stdDevTolerance,
-      double         expectedMean,
-      double         expectedStdDev ) 
+ 	PICelleratorContext*	context,
+ 	Name 						funcName,
+ 	Index						count,   // was SampleSize - defaults to 5000
+ 	double					meanTolerance,
+  	double					stdDevTolerance,
+  	double					expectedMean,
+  	double					expectedStdDev ) 
 {
    Swarm*              integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "integrationSwarm" );
    Swarm*              materialSwarm    = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialPoints" );
@@ -110,8 +110,23 @@ void WeightsSuite_TestElementIntegral(
    double              differenceMean, differenceStdDev;   
 
    /* Create FeVariable */
-   feVariable = FeVariable_New_Full( "feVariable", mesh, NULL, NULL, NULL, NULL, NULL, NULL, 
-         1, context->dim, False, False, False, MPI_COMM_WORLD, context->fieldVariable_Register );
+   feVariable = FeVariable_New_Full(
+		"feVariable", 
+		(DomainContext*) context,
+		mesh,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL, 
+     	1,
+		context->dim,
+		False,
+		False,
+		False,
+		MPI_COMM_WORLD,
+		context->fieldVariable_Register );
 
    Journal_Firewall( (funcName!=NULL), Journal_Register( Error_Type, "ConstantWeightsSuite" ),
       "Error, function name input to %s is NULL", __func__ );

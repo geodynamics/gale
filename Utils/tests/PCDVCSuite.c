@@ -123,24 +123,39 @@ void compareAgainstReferenceSolution(PICelleratorContext* context, Stream* strea
 }
 
 void testElementIntegral_CircleInterface( PICelleratorContext* context, double* mean, double* standardDeviation ) {
-	Swarm*              integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "integrationSwarm" );
-	Swarm*              materialSwarm    = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialPoints" );
-	FeMesh* 	    mesh             = (FeMesh*) LiveComponentRegister_Get( context->CF->LCRegister, "linearMesh" );
-	WeightsCalculator*  weights          = (WeightsCalculator*) LiveComponentRegister_Get( context->CF->LCRegister, "weights" );
-	FeVariable*         feVariable;
-	Element_LocalIndex  lElement_I       = 0;
-	double              analyticValue    = 0.0;
-	double              integral         = 0.0;
-	double              error;
-	double              errorSquaredSum  = 0.0;
-	double              errorSum         = 0.0;
-	Index               loop_I;
-	Index               count            = Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "SampleSize", 5000 );
-	void*               data;
+	Swarm*					integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "integrationSwarm" );
+	Swarm*					materialSwarm    = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialPoints" );
+	FeMesh*					mesh             = (FeMesh*) LiveComponentRegister_Get( context->CF->LCRegister, "linearMesh" );
+	WeightsCalculator*	weights          = (WeightsCalculator*) LiveComponentRegister_Get( context->CF->LCRegister, "weights" );
+	FeVariable*				feVariable;
+	Element_LocalIndex 	lElement_I       = 0;
+	double					analyticValue    = 0.0;
+	double					integral         = 0.0;
+	double					error;
+	double					errorSquaredSum  = 0.0;
+	double					errorSum         = 0.0;
+	Index						loop_I;
+	Index						count            = Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "SampleSize", 5000 );
+	void*						data;
 
 	/* Create FeVariable */
-	feVariable = FeVariable_New_Full( "feVariable", mesh, NULL, NULL, NULL, NULL, NULL, NULL, 
-			1, context->dim, False, False, False, MPI_COMM_WORLD, context->fieldVariable_Register );
+	feVariable = FeVariable_New_Full(
+		"feVariable",
+		(DomainContext*) context,
+		mesh,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL, 
+		1,
+		context->dim,
+		False,
+		False,
+		False,
+		MPI_COMM_WORLD,
+		context->fieldVariable_Register );
 
 	feVariable->_interpolateWithinElement = CircleInterface;
 	analyticValue = M_PI;
@@ -171,24 +186,39 @@ void testElementIntegral_CircleInterface( PICelleratorContext* context, double* 
 }
 
 void testElementIntegral_PolynomialFunction( PICelleratorContext* context, double* mean, double* standardDeviation ) {
-	Swarm*              integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "integrationSwarm" );
-	Swarm*              materialSwarm    = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialPoints" );
-	FeMesh* 	    mesh             = (FeMesh*) LiveComponentRegister_Get( context->CF->LCRegister, "linearMesh" );
-	WeightsCalculator*  weights          = (WeightsCalculator*) LiveComponentRegister_Get( context->CF->LCRegister, "weights" );
-	FeVariable*         feVariable;
-	Element_LocalIndex  lElement_I       = 0;
-	double              analyticValue    = 0.0;
-	double              integral         = 0.0;
-	double              error;
-	double              errorSquaredSum  = 0.0;
-	double              errorSum         = 0.0;
-	Index               loop_I;
-	Index               count            = Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "SampleSize", 5000 );
-	void*               data;
+	Swarm*					integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "integrationSwarm" );
+	Swarm*					materialSwarm    = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialPoints" );
+	FeMesh*					mesh             = (FeMesh*) LiveComponentRegister_Get( context->CF->LCRegister, "linearMesh" );
+	WeightsCalculator*	weights          = (WeightsCalculator*) LiveComponentRegister_Get( context->CF->LCRegister, "weights" );
+	FeVariable*				feVariable;
+	Element_LocalIndex 	lElement_I       = 0;
+	double					analyticValue    = 0.0;
+	double					integral         = 0.0;
+	double					error;
+	double					errorSquaredSum  = 0.0;
+	double					errorSum         = 0.0;
+	Index						loop_I;
+	Index						count            = Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "SampleSize", 5000 );
+	void*						data;
 
 	/* Create FeVariable */
-	feVariable = FeVariable_New_Full( "feVariable", mesh, NULL, NULL, NULL, NULL, NULL, NULL, 
-			1, context->dim, False, False, False, MPI_COMM_WORLD, context->fieldVariable_Register );
+	feVariable = FeVariable_New_Full(
+		"feVariable",
+		(DomainContext*) context,
+		mesh,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL, 
+		1,
+		context->dim,
+		False,
+		False,
+		False,
+		MPI_COMM_WORLD,
+		context->fieldVariable_Register );
 
 	feVariable->_interpolateWithinElement = PolynomialFunction;
 	analyticValue = 148.0/3.0;
@@ -235,8 +265,23 @@ void testElementIntegral_ExponentialInterface( PICelleratorContext* context, dou
 	void*               data;
 
 	/* Create FeVariable */
-	feVariable = FeVariable_New_Full( "feVariable", mesh, NULL, NULL, NULL, NULL, NULL, NULL, 
-			1, context->dim, False, False, False, MPI_COMM_WORLD, context->fieldVariable_Register );
+	feVariable = FeVariable_New_Full(
+		"feVariable",
+		(DomainContext*) context,
+		mesh,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL, 
+		1,
+		context->dim,
+		False,
+		False,
+		False,
+		MPI_COMM_WORLD,
+		context->fieldVariable_Register );
 
 	feVariable->_interpolateWithinElement = ExponentialInterface;
 	analyticValue = 0.05 * (exp(2) - exp(-2)) + 2.0;

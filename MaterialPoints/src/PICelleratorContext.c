@@ -67,9 +67,9 @@ PICelleratorContext* PICelleratorContext_New(
 	PICelleratorContext* self = _PICelleratorContext_DefaultNew( name );
 
 	self->isConstructed = True;
-	_AbstractContext_Init( self );
-	_DomainContext_Init( self );	
-	_FiniteElementContext_Init( self );
+	_AbstractContext_Init( (AbstractContext*) self );
+	_DomainContext_Init( (DomainContext*) self );	
+	_FiniteElementContext_Init( (FiniteElementContext*) self );
 	_PICelleratorContext_Init( self );
 
 	return self;
