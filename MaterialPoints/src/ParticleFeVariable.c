@@ -163,16 +163,6 @@ void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm*
 void _ParticleFeVariable_Delete( void* materialFeVariable ) {
 	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
 
-	Memory_Free( self->data );
-
-	Stg_Class_Delete( self->assemblyVector );
-	Memory_Free( self->assemblyVectorName );
-	Stg_Class_Delete( self->assemblyTerm );
-
-	Stg_Class_Delete( self->massMatrix );
-	Memory_Free( self->massMatrixName );
-	Stg_Class_Delete( self->massMatrixForceTerm );
-
 	_FeVariable_Delete( self );
 }
 
@@ -273,6 +263,14 @@ void _ParticleFeVariable_Execute( void* materialFeVariable, void* _ctx ) {
 
 void _ParticleFeVariable_Destroy( void* materialFeVariable, void* data ) {
 	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
+
+	Stg_Class_Delete( self->assemblyVector );
+	Memory_Free( self->assemblyVectorName );
+	Stg_Class_Delete( self->assemblyTerm );
+
+	Stg_Class_Delete( self->massMatrix );
+	Memory_Free( self->massMatrixName );
+	Stg_Class_Delete( self->massMatrixForceTerm );
 
 	_FeVariable_Destroy( self, data );
 }
