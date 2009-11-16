@@ -108,7 +108,7 @@ OperatorFieldVariable* _OperatorFieldVariable_DefaultNew( Name name ) {
 	return _OperatorFieldVariable_New( 
 		sizeof(OperatorFieldVariable), 
 		OperatorFieldVariable_Type, 
-		_FieldVariable_Delete, 
+		_OperatorFieldVariable_Delete, 
 		_OperatorFieldVariable_Print,
 		_OperatorFieldVariable_Copy, 
 		(Stg_Component_DefaultConstructorFunction*)_OperatorFieldVariable_DefaultNew,
