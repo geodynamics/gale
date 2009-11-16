@@ -156,8 +156,7 @@ void _NodalPressureField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, v
    variable_Register = self->variable_Register; 
    assert( variable_Register );
 
-   pressureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField",
-							      FeVariable, True, data );
+   pressureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, True, data );
 
    _NodalPressureField_Init( self, variable_Register, pressureField );
 

@@ -175,13 +175,13 @@ void StressField_NonLinearUpdate( void* _sle, void* _ctx ) {
 }
 
 void _StressField_AssignFromXML( void* stressField, Stg_ComponentFactory* cf, void* data ){
-	StressField*          self              = (StressField*) stressField;
+	StressField*          self = (StressField*) stressField;
 	FeVariable*           strainRateField;
 	ConstitutiveMatrix*   constitutiveMatrix;
 	Variable_Register*    variable_Register;
 	Name                  stressVariableName;
 	Variable*             stressVariable;
-        SystemLinearEquations* sle;
+	SystemLinearEquations* sle;
 
 	/* Construct Parent */
 	_ParticleFeVariable_AssignFromXML( self, cf, data );
@@ -198,12 +198,12 @@ void _StressField_AssignFromXML( void* stressField, Stg_ComponentFactory* cf, vo
 
 	_StressField_Init( self, strainRateField, constitutiveMatrix, stressVariable, variable_Register );
 
-        /*
-        ** If we're using this field for non-linear feedback, we'll need to update it in between
-        ** non-linear iterations. */
-        sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, "SLE", SystemLinearEquations, False, data );
-        if( sle )
-           SystemLinearEquations_AddPostNonLinearEP( sle, StressField_Type, StressField_NonLinearUpdate );
+	/*
+	** If we're using this field for non-linear feedback, we'll need to update it in between
+	** non-linear iterations. */
+	sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, "SLE", SystemLinearEquations, False, data );
+	if( sle )
+		SystemLinearEquations_AddPostNonLinearEP( sle, StressField_Type, StressField_NonLinearUpdate );
 }
 
 void _StressField_Build( void* stressField, void* data ) {

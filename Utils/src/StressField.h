@@ -22,11 +22,11 @@
 		/* Virtual functions go here */ \
 		\
 		/* Passed in parameters */ \
-		Variable_Register*				  variable_Register;	\
-		FeVariable*                                       strainRateField;                \
-		ConstitutiveMatrix*                               constitutiveMatrix;             \
-		Variable*                                         dataVariableList[6];            \
-		Variable*                                         stressVariable;
+		Variable_Register*	variable_Register; \
+		FeVariable*				strainRateField; \
+		ConstitutiveMatrix*	constitutiveMatrix; \
+		Variable*				dataVariableList[6]; \
+		Variable*				stressVariable;
 		
 	struct StressField { __StressField };
 	
@@ -55,17 +55,25 @@
 	
 	/** Print the contents of an StressField construct */
 	void* _StressField_DefaultNew( Name name );
+
 	void _StressField_Delete( void* variable );
+
 	void _StressField_Print( void* variable, Stream* stream );
+
 	void* _StressField_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _StressField_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data ) ;
-	void _StressField_Build( void* variable, void* data ) ;
-	void _StressField_Initialise( void* variable, void* data ) ;
-	void _StressField_Execute( void* variable, void* data ) ;
-	void _StressField_Destroy( void* variable, void* data ) ;
-	void _StressField_ValueAtParticle_Recalculate( void* stressField, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, void* particle, double* stress ) ;
-	void _StressField_ValueAtParticle_FromVariable( void* stressField, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, void* particle, double* stress ) ;
-	
+	void _StressField_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data );
+
+	void _StressField_Build( void* variable, void* data );
+
+	void _StressField_Initialise( void* variable, void* data );
+
+	void _StressField_Execute( void* variable, void* data );
+
+	void _StressField_Destroy( void* variable, void* data );
+
+	void _StressField_ValueAtParticle_Recalculate( void* stressField, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, void* particle, double* stress );
+
+	void _StressField_ValueAtParticle_FromVariable( void* stressField, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, void* particle, double* stress );
 
 #endif 

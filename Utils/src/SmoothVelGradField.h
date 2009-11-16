@@ -55,11 +55,7 @@
       ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
       Name                                              name );
 
-	void _SmoothVelGradField_Init(
-		SmoothVelGradField* self,
-		Variable_Register* variable_Register,
-		FeVariable* velField,
-		SystemLinearEquations* sle );
+	void _SmoothVelGradField_Init( SmoothVelGradField* self, Variable_Register* variable_Register, FeVariable* velField, SystemLinearEquations* sle );
 
 	void* _SmoothVelGradField_DefaultNew( Name name );
 

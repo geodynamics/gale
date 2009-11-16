@@ -166,8 +166,7 @@ void _SmoothVelGradField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, v
    variable_Register = self->context->variable_Register;
    assert( variable_Register );
 
-   velField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField",
-							 FeVariable, True, data );
+   velField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField", FeVariable, True, data );
 
 	/*
    ** If we're using this field for non-linear feedback, we'll need to update it in between

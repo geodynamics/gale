@@ -22,8 +22,8 @@
 		/* Virtual functions go here */ \
 		\
 		/* Passed in parameters */ \
-		Variable_Register*				  variable_Register; \
-		ConstitutiveMatrix*                               constitutiveMatrix;             \
+		Variable_Register*	variable_Register; \
+		ConstitutiveMatrix*	constitutiveMatrix;
 		
 	struct ViscosityField { __ViscosityField };
 	
@@ -52,16 +52,23 @@
 	
 	/** Print the contents of an ViscosityField construct */
 	void* _ViscosityField_DefaultNew( Name name );
+
 	void _ViscosityField_Delete( void* variable );
+
 	void _ViscosityField_Print( void* variable, Stream* stream );
+
 	void* _ViscosityField_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _ViscosityField_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data ) ;
-	void _ViscosityField_Build( void* variable, void* data ) ;
-	void _ViscosityField_Initialise( void* variable, void* data ) ;
-	void _ViscosityField_Execute( void* variable, void* data ) ;
-	void _ViscosityField_Destroy( void* variable, void* data ) ;
-	void _ViscosityField_ValueAtParticle( void* viscosityField, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, void* particle, double* viscosity ) ;
-	
+	void _ViscosityField_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data );
 
+	void _ViscosityField_Build( void* variable, void* data );
+
+	void _ViscosityField_Initialise( void* variable, void* data );
+
+	void _ViscosityField_Execute( void* variable, void* data );
+
+	void _ViscosityField_Destroy( void* variable, void* data );
+
+	void _ViscosityField_ValueAtParticle( void* viscosityField, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, void* particle, double* viscosity );
+	
 #endif 
