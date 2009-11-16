@@ -349,7 +349,12 @@ void _OperatorFeVariable_AssignFromXML( void* feVariable, Stg_ComponentFactory* 
 	_OperatorFeVariable_Init( self, operatorName, feVariableCount, feVariableList, NULL );
 
 	Memory_Free( feVariableList );
+}
 
+void _OperatorFeVariable_Build( void* feVariable, void* data ) {
+	OperatorFeVariable* self = (OperatorFeVariable*) feVariable;
+	Index                  feVariable_I;
+	Stream*                     errorStream       = Journal_Register( Error_Type, self->type );
 
         {
           int dim;
@@ -361,12 +366,6 @@ void _OperatorFeVariable_AssignFromXML( void* feVariable, Stg_ComponentFactory* 
           numNodes = FeMesh_GetElementNodeSize(self->feMesh, 0);
           self->GNx = Memory_Alloc_2DArray( double, dim, numNodes, "Global Shape Function Derivatives" );
         }
-}
-
-void _OperatorFeVariable_Build( void* feVariable, void* data ) {
-	OperatorFeVariable* self = (OperatorFeVariable*) feVariable;
-	Index                  feVariable_I;
-	Stream*                     errorStream       = Journal_Register( Error_Type, self->type );
 
 	for ( feVariable_I = 0 ; feVariable_I < self->feVariableCount ; feVariable_I++ ) 
 		Stg_Component_Build( self->feVariableList[ feVariable_I ] , data, False );
