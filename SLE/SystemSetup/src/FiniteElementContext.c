@@ -280,8 +280,7 @@ void _FiniteElementContext_AssignFromXML( void* context, Stg_ComponentFactory* c
 	Journal_Firewall( self->maxTimeStepIncreasePercentage >= 0, errorStream,
 		"Error - in %s(): maxTimeStepIncreasePercentage must be >= 0\n", __func__ );
 
-        self->maxTimeStepSize = Dictionary_GetDouble_WithDefault(
-           self->dictionary, "maxTimeStepSize", 0.0 );
+	self->maxTimeStepSize = Dictionary_GetDouble_WithDefault( self->dictionary, "maxTimeStepSize", 0.0 );
 
 	_FiniteElementContext_Init( self );
 }
