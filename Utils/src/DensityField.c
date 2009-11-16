@@ -94,9 +94,6 @@ void _DensityField_Init(
 void _DensityField_Delete( void* densityField ) {
 	DensityField* self = (DensityField*) densityField;
 
-	Stg_Class_Delete( self->assemblyVector );
-	Memory_Free( self->assemblyVectorName );
-
 	_FeVariable_Delete( self );
 }
 
@@ -202,6 +199,9 @@ void _DensityField_Execute( void* densityField, void* data ) {
 }
 void _DensityField_Destroy( void* densityField, void* data ) {
 	DensityField* self = (DensityField*) densityField;
+
+	Stg_Class_Delete( self->assemblyVector );
+	Memory_Free( self->assemblyVectorName );
 
 	_ParticleFeVariable_Destroy( self, data );
 }

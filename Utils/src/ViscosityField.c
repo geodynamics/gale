@@ -93,9 +93,6 @@ void _ViscosityField_Init(
 void _ViscosityField_Delete( void* viscosityField ) {
 	ViscosityField* self = (ViscosityField*) viscosityField;
 
-	Stg_Class_Delete( self->assemblyVector );
-	Memory_Free( self->assemblyVectorName );
-
 	_FeVariable_Delete( self );
 }
 
@@ -205,6 +202,9 @@ void _ViscosityField_Execute( void* viscosityField, void* data ) {
 }
 void _ViscosityField_Destroy( void* viscosityField, void* data ) {
 	ViscosityField* self = (ViscosityField*) viscosityField;
+
+	Stg_Class_Delete( self->assemblyVector );
+	Memory_Free( self->assemblyVectorName );
 
 	_ParticleFeVariable_Destroy( self, data );
 }

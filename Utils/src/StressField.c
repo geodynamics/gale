@@ -106,9 +106,6 @@ void _StressField_Init(
 void _StressField_Delete( void* stressField ) {
 	StressField* self = (StressField*) stressField;
 
-	Stg_Class_Delete( self->assemblyVector );
-	Memory_Free( self->assemblyVectorName );
-
 	_FeVariable_Delete( self );
 }
 
@@ -310,6 +307,9 @@ void _StressField_Execute( void* stressField, void* data ) {
 }
 void _StressField_Destroy( void* stressField, void* data ) {
 	StressField* self = (StressField*) stressField;
+
+	Stg_Class_Delete( self->assemblyVector );
+	Memory_Free( self->assemblyVectorName );
 
 	_ParticleFeVariable_Destroy( self, data );
 }
