@@ -75,21 +75,24 @@ void _Underworld_Nusselt_AssignFromXML( void* component, Stg_ComponentFactory* c
 	temperatureGradientsField = FieldVariable_Register_GetByName( fV_Register, "TemperatureGradientsField" );
 	
 	self->advectiveHeatFluxField = OperatorFeVariable_NewBinary(  
-			"AdvectiveHeatFluxField",
-			temperatureField, 
-			velocityField, 
-			"VectorScale" );
+		"AdvectiveHeatFluxField",
+		context,
+		temperatureField, 
+		velocityField, 
+		"VectorScale" );
 
 	self->temperatureTotalDerivField = OperatorFeVariable_NewBinary(  
-			"TemperatureTotalDerivField",
-			self->advectiveHeatFluxField, 
-			temperatureGradientsField, 
-			"Subtraction" );
+		"TemperatureTotalDerivField",
+		context,
+		self->advectiveHeatFluxField, 
+		temperatureGradientsField, 
+		"Subtraction" );
 	
 	self->temperatureVertDerivField = (FeVariable*) OperatorFeVariable_NewUnary(  
-			"VerticalAdvectiveHeatFluxField",
-			self->temperatureTotalDerivField, 
-			"TakeSecondComponent" );
+		"VerticalAdvectiveHeatFluxField",
+		context,
+		self->temperatureTotalDerivField, 
+		"TakeSecondComponent" );
 
 	/* Add the variables to register so we can checkpoint & examine if necessary */
 	FieldVariable_Register_Add( fV_Register, self->advectiveHeatFluxField );

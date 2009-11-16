@@ -29,24 +29,68 @@ const Type SmoothVelGradField_Type = "SmoothVelGradField";
 ** Constructors/Destructors.
 */
 
-SmoothVelGradField* _SmoothVelGradField_New( SMOOTHVELGRADFIELD_ARGS ) {
+SmoothVelGradField* _SmoothVelGradField_New(
+	SizeT                                             _sizeOfSelf,
+	Type                                              type,
+	Stg_Class_DeleteFunction*                         _delete,
+ 	Stg_Class_PrintFunction*                          _print,
+	Stg_Class_CopyFunction*                           _copy,
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
+	Stg_Component_ConstructFunction*                  _construct,
+	Stg_Component_BuildFunction*                      _build,
+	Stg_Component_InitialiseFunction*                 _initialise,
+	Stg_Component_ExecuteFunction*                    _execute,
+	Stg_Component_DestroyFunction*                    _destroy,
+	FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
+	FieldVariable_GetValueFunction*                    _getMinGlobalFeMagnitude,
+	FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
+	FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
+	FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,
+	FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,
+	FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
+	ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
+	Name                                              name )
+{
    SmoothVelGradField* self;
 
    assert( _sizeOfSelf >= sizeof(SmoothVelGradField) );
    self = (SmoothVelGradField*)_ParticleFeVariable_New(
-      PARTICLEFEVARIABLE_PASSARGS );
+		_sizeOfSelf,
+      type,
+      _delete,
+      _print,
+      _copy,
+      _defaultConstructor,
+      _construct,
+      _build,
+      _initialise,
+      _execute,
+      _destroy,
+      _interpolateValueAt,
+      _getMinGlobalFeMagnitude,
+      _getMaxGlobalFeMagnitude,
+      _getMinAndMaxLocalCoords,
+      _getMinAndMaxGlobalCoords,
+      _interpolateWithinElement,
+      _getValueAtNode,
+      _valueAtParticle,
+      name
+	);
+
    return self;
 }
 
-void _SmoothVelGradField_Init( SmoothVelGradField* self,
-			       Variable_Register* variable_Register,
-			       FeVariable* velField,
-			       SystemLinearEquations* sle)
+void _SmoothVelGradField_Init(
+	SmoothVelGradField*		self,
+	Variable_Register*		variable_Register,
+	FeVariable*					velField,
+	SystemLinearEquations*	sle)
 {
    self->variable_Register = variable_Register;
    self->fieldComponentCount = 1;
    self->useDeriv = True;
    self->velField = velField;
+
    if( sle )
       SystemLinearEquations_AddPostNonLinearEP( sle, SmoothVelGradField_Type, SmoothVelGradField_NonLinearUpdate );
 }

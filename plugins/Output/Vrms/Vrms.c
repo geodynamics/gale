@@ -62,7 +62,7 @@ void _Underworld_Vrms_AssignFromXML( void* component, Stg_ComponentFactory* cf, 
 	self->velocityField = Stg_ComponentFactory_PluginConstructByKey( cf, self, "VelocityField", FeVariable, True, data );
 
 	/* Create new Field Variable */
-	self->velocitySquaredField = OperatorFeVariable_NewUnary( "VelocitySquaredField", self->velocityField, "VectorSquare" );
+	self->velocitySquaredField = OperatorFeVariable_NewUnary( "VelocitySquaredField", self->context, self->velocityField, "VectorSquare" );
 	self->velocitySquaredField->context = self->context;
 
 	Underworld_Vrms_PrintHeaderToFile( self->context );

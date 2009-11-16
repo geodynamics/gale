@@ -101,53 +101,47 @@ Index Underworld_Mobility_Register( PluginsManager* pluginsManager ) {
 }
 
 void Underworld_Mobility_Setup( void* _context ) {
-	UnderworldContext*                context       = (UnderworldContext*) _context;
-	Swarm* gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
-	FeVariable* velocityField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
+	UnderworldContext*	context = (UnderworldContext*) _context;
+	Swarm*					gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+	FeVariable*				velocityField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
 
 	Underworld_Mobility* self;
 
 	self = (Underworld_Mobility*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_Mobility_Type );
+		context->CF->LCRegister,
+		Underworld_Mobility_Type );
 
-	Journal_Firewall( 
-			gaussSwarm != NULL, 
-			Underworld_Error,
-			"Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
-	Journal_Firewall( 
-			velocityField != NULL, 
-			Underworld_Error,
-			"Cannot find velocityField. Cannot use %s.\n", CURR_MODULE_NAME );
+	Journal_Firewall( gaussSwarm != NULL, Underworld_Error, "Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
+	Journal_Firewall( velocityField != NULL, Underworld_Error, "Cannot find velocityField. Cannot use %s.\n", CURR_MODULE_NAME );
 
 	/* Create new Field Variable */
-	self->velocitySquaredField = OperatorFeVariable_NewUnary( "VelocitySquaredField", velocityField, "VectorSquare" );
+	self->velocitySquaredField = OperatorFeVariable_NewUnary( "VelocitySquaredField", context, velocityField, "VectorSquare" );
 }
 
 /* Integrate Every Step and dump to file */
 void Underworld_Mobility_Dump( void* _context ) {
-	UnderworldContext*                   context       = (UnderworldContext*) _context;
-	Swarm* gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
-	Mesh*			   	     mesh;
-	double		    	  	     maxCrd[3], minCrd[3];
-	double                               integral;
-	double                               topLayerAverage;
-	double                               mobility;
-	double                               vrms;
-	double                               volume        = 0.0;
-	Dimension_Index                      dim           = context->dim;
+	UnderworldContext*	context = (UnderworldContext*) _context;
+	Swarm*					gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+	Mesh*						mesh;
+	double					maxCrd[3], minCrd[3];
+	double					integral;
+	double					topLayerAverage;
+	double					mobility;
+	double					vrms;
+	double					volume = 0.0;
+	Dimension_Index		dim = context->dim;
 
 	Underworld_Mobility* self;
 
 	self = (Underworld_Mobility*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_Mobility_Type );
+		context->CF->LCRegister,
+		Underworld_Mobility_Type );
 
 	mesh = (Mesh*)self->velocitySquaredField->feMesh;
 	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
 	
 	/* Sum integral */
-	integral        = FeVariable_Integrate( self->velocitySquaredField, gaussSwarm );
+	integral = FeVariable_Integrate( self->velocitySquaredField, gaussSwarm );
 	topLayerAverage = FeVariable_AverageTopLayer( self->velocitySquaredField, gaussSwarm, J_AXIS );
 	/* Get Volume of Mesh - TODO Make general for irregular meshes */
 	volume = ( maxCrd[ I_AXIS ] - minCrd[ I_AXIS ] ) * 

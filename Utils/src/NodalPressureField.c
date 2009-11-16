@@ -29,19 +29,58 @@ const Type NodalPressureField_Type = "NodalPressureField";
 ** Constructors/Destructors.
 */
 
-NodalPressureField* _NodalPressureField_New( NODALPRESSUREFIELD_ARGS ) {
+NodalPressureField* _NodalPressureField_New( 
+	SizeT                                             _sizeOfSelf,
+	Type                                              type,
+	Stg_Class_DeleteFunction*                         _delete,
+	Stg_Class_PrintFunction*                          _print,
+	Stg_Class_CopyFunction*                           _copy,
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
+	Stg_Component_ConstructFunction*                  _construct,
+	Stg_Component_BuildFunction*                      _build,
+	Stg_Component_InitialiseFunction*                 _initialise,
+	Stg_Component_ExecuteFunction*                    _execute,
+	Stg_Component_DestroyFunction*                    _destroy,
+	FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
+	FieldVariable_GetValueFunction*                    _getMinGlobalFeMagnitude,
+	FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
+	FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
+	FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,
+	FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,
+	FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
+	ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
+	Name                                              name )
+{
    NodalPressureField* self;
 
    assert( _sizeOfSelf >= sizeof(NodalPressureField) );
    self = (NodalPressureField*)_ParticleFeVariable_New(
-      PARTICLEFEVARIABLE_PASSARGS );
+		_sizeOfSelf,
+		type,
+		_delete,
+		_print,
+		_copy,
+		_defaultConstructor,
+      _construct,
+		_build,
+		_initialise,
+		_execute,
+		_destroy,
+      _interpolateValueAt,
+		_getMinGlobalFeMagnitude,
+      _getMaxGlobalFeMagnitude,
+		_getMinAndMaxLocalCoords,
+      _getMinAndMaxGlobalCoords,
+		_interpolateWithinElement,
+      _getValueAtNode,
+		_valueAtParticle,
+		name
+  );
+
    return self;
 }
 
-void _NodalPressureField_Init( NodalPressureField* self,
-			       Variable_Register* variable_Register,
-			       FeVariable* pressureField)
-{
+void _NodalPressureField_Init( NodalPressureField* self, Variable_Register* variable_Register, FeVariable* pressureField) {
    self->variable_Register = variable_Register;
    self->fieldComponentCount = 1;
    self->pressureField = pressureField;
