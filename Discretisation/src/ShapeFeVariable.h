@@ -57,7 +57,7 @@
 		__FeVariable \
 		\
 		/* Virtual info */ \
-		Stg_Shape*                                         shape;
+		Stg_Shape*	shape;
 
 	struct ShapeFeVariable { __ShapeFeVariable };	
 
@@ -95,15 +95,17 @@
 		Bool                                               isCheckpointedAndReloaded,
 		MPI_Comm                                           communicator,
 		FieldVariable_Register*                            fV_Register
-	       	);
+	);
 
 	/* 'Stg_Class' Virtual Implementations */
-	void _ShapeFeVariable_Delete( void* variable ) ;
-	void _ShapeFeVariable_Print( void* _swarmVariable, Stream* stream ) ;
-	void* _ShapeFeVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
+	void _ShapeFeVariable_Delete( void* variable );
+
+	void _ShapeFeVariable_Print( void* _swarmVariable, Stream* stream );
+
+	void* _ShapeFeVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Implementations */
-	void _ShapeFeVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
+	void _ShapeFeVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data );
 	void _ShapeFeVariable_Build( void* swarmVariable, void* data ) ;
 	void _ShapeFeVariable_Execute( void* variable, void* data ) ;
 	void _ShapeFeVariable_Destroy( void* variable, void* data ) ;

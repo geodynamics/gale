@@ -146,16 +146,6 @@ void _AnalyticSolution_Init( AnalyticSolution* self, Swarm* integrationSwarm, Li
 void _AnalyticSolution_Delete( void* analyticSolution ) {
 	AnalyticSolution* self = (AnalyticSolution*)analyticSolution;
 	
-	Stg_Class_Delete( self->feVariableList );
-	Stg_Class_Delete( self->analyticFeVariableList );
-	Stg_Class_Delete( self->analyticFeVariableFuncList );
-	Stg_Class_Delete( self->errorMagnitudeFieldList );
-	Stg_Class_Delete( self->relativeErrorMagnitudeFieldList );
-	Stg_Class_Delete( self->streamList );
-
-	if ( self->toleranceList )
-		Memory_Free( self->toleranceList );
-
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
 }
@@ -237,6 +227,19 @@ void _AnalyticSolution_Execute( void* analyticSolution, void* data ) {
 }
 
 void _AnalyticSolution_Destroy( void* analyticSolution, void* data ) {
+	AnalyticSolution* self = (AnalyticSolution*)analyticSolution;
+
+	Stg_Class_Delete( self->feVariableList );
+	Stg_Class_Delete( self->analyticFeVariableList );
+	Stg_Class_Delete( self->analyticFeVariableFuncList );
+	Stg_Class_Delete( self->errorMagnitudeFieldList );
+	Stg_Class_Delete( self->relativeErrorMagnitudeFieldList );
+	Stg_Class_Delete( self->streamList );
+
+	if ( self->toleranceList )
+		Memory_Free( self->toleranceList );
+
+	Stg_Component_Destroy( self, data, False );
 }
 
 void AnalyticSolution_PutAnalyticSolutionOntoNodes( void* analyticSolution, Index analyticFeVariable_I ) {
@@ -509,7 +512,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 
 	/* Create new FeVariable */
 	tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic" );
-	analyticFeVariable = FeVariable_New( tmpName, feVariable->feMesh, feVariable->geometryMesh, dofLayout,
+	analyticFeVariable = FeVariable_New( tmpName, self->context, feVariable->feMesh, feVariable->geometryMesh, dofLayout,
 		NULL, NULL, NULL, feVariable->dim, feVariable->isCheckpointedAndReloaded, 
 		False, False,
 		feVariable->fieldVariable_Register );
@@ -519,25 +522,23 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 
 	/* Create Magnitude Field */
 	tmpName = Stg_Object_AppendSuffix( analyticFeVariable, "Magnitude" );
-	analyticMagField = OperatorFeVariable_NewUnary( tmpName, analyticFeVariable, "Magnitude" );
+	analyticMagField = OperatorFeVariable_NewUnary( tmpName, self->context, analyticFeVariable, "Magnitude" );
 	Memory_Free( tmpName );
 
 	/* Create Error field - The the calculated field minus the analytic field */
 	tmpName = Stg_Object_AppendSuffix( feVariable, "ErrorField" );
-	errorField = OperatorFeVariable_NewBinary( 
-			tmpName, feVariable, analyticFeVariable, "Subtraction" );
+	errorField = OperatorFeVariable_NewBinary( tmpName, self->context, feVariable, analyticFeVariable, "Subtraction" );
 	Memory_Free( tmpName );
 	
 	/* Create Error magnitude field */
 	tmpName = Stg_Object_AppendSuffix( feVariable, "ErrorMagnitudeField" );
-	errorMagnitudeField = OperatorFeVariable_NewUnary( tmpName, errorField, "Magnitude" );
+	errorMagnitudeField = OperatorFeVariable_NewUnary( tmpName, self->context, errorField, "Magnitude" );
 	Memory_Free( tmpName );
 	Stg_ObjectList_Append( self->errorMagnitudeFieldList, errorMagnitudeField ); /* Add it to list */
 
 	/* Create Relative Error magnitude field - The magnitude of relative error */
 	tmpName = Stg_Object_AppendSuffix( feVariable, "RelativeErrorMagnitudeField" );
-	relativeErrorMagnitudeField = OperatorFeVariable_NewBinary(
-			tmpName, errorMagnitudeField, analyticMagField, "ScalarDivision" );
+	relativeErrorMagnitudeField = OperatorFeVariable_NewBinary( tmpName, self->context, errorMagnitudeField, analyticMagField, "ScalarDivision" );
 	Memory_Free( tmpName );
 	Stg_ObjectList_Append( self->relativeErrorMagnitudeFieldList, relativeErrorMagnitudeField ); /* Add it to list */
 
@@ -570,8 +571,8 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 }
 
 FeVariable* AnalyticSolution_CreateAnalyticVectorField( void* analyticSolution, FeVariable* vectorField, AnalyticSolution_SolutionFunction* solutionFunction ) {
-	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
-	FeVariable*                                  analyticVectorField;
+	AnalyticSolution*	self = (AnalyticSolution*) analyticSolution;
+	FeVariable*			analyticVectorField;
 
 	analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField );
 
@@ -579,17 +580,24 @@ FeVariable* AnalyticSolution_CreateAnalyticVectorField( void* analyticSolution, 
 }
 
 FeVariable* AnalyticSolution_CreateAnalyticSymmetricTensorField( void* analyticSolution, FeVariable* vectorField ) {
-	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
-	FeVariable*                                  analyticVectorField;
-	OperatorFeVariable*                          analyticVectorInvField;
-	Name                                         tmpName;
+	AnalyticSolution*		self = (AnalyticSolution*) analyticSolution;
+	FeVariable*				analyticVectorField;
+	OperatorFeVariable*	analyticVectorInvField;
+	Name						tmpName, tmpName2;
+	DofLayout*				dofLayout;
 
 	analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField );
 
+	/* Create new dof layout */
+	tmpName = Stg_Object_AppendSuffix( analyticVectorField, "Analytic-DofLayout" );
+	dofLayout = DofLayout_New( tmpName, self->context->variable_Register, Mesh_GetDomainSize( analyticVectorField->feMesh, MT_VERTEX ), NULL );
+
 	/* Create Invariant Field */
-	tmpName = Stg_Object_AppendSuffix( analyticVectorField, "Invariant" );
-	analyticVectorInvField = OperatorFeVariable_NewUnary( tmpName, analyticVectorField, "SymmetricTensor_Invariant" );
+	tmpName2 = Stg_Object_AppendSuffix( analyticVectorField, "Invariant" );
+	analyticVectorInvField = OperatorFeVariable_NewUnary( tmpName2, self->context, analyticVectorField, "SymmetricTensor_Invariant" );
+
 	Memory_Free( tmpName );
+	Memory_Free( tmpName2 );
 
 	LiveComponentRegister_Add( self->LC_Register, (Stg_Component*) analyticVectorInvField );
 

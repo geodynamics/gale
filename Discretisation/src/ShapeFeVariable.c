@@ -87,87 +87,85 @@ void* ShapeFeVariable_DefaultNew( Name name ) {
 }			
 
 ShapeFeVariable* _ShapeFeVariable_New(
- 		SizeT                                             _sizeOfSelf,
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		Name                                              name,
-		Bool                                              initFlag,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-		void*                                              feMesh,
-		void*                                              geometryMesh,
-		void*                                              dofLayout,
-		Dimension_Index                                    dim,
-		Bool                                               isCheckpointedAndReloaded,
-		MPI_Comm                                           communicator,
-		FieldVariable_Register*                            fV_Register
-	       	)
+ 	SizeT                                             _sizeOfSelf,
+	Type                                              type,
+	Stg_Class_DeleteFunction*                         _delete,
+	Stg_Class_PrintFunction*                          _print,
+	Stg_Class_CopyFunction*                           _copy, 
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
+	Stg_Component_ConstructFunction*                  _construct,
+	Stg_Component_BuildFunction*                      _build,
+	Stg_Component_InitialiseFunction*                 _initialise,
+	Stg_Component_ExecuteFunction*                    _execute,
+	Stg_Component_DestroyFunction*                    _destroy,
+	Name                                              name,
+	Bool                                              initFlag,
+	FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
+	FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
+	FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
+	FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
+	FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
+	FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
+	FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
+	void*                                              feMesh,
+	void*                                              geometryMesh,
+	void*                                              dofLayout,
+	Dimension_Index                                    dim,
+	Bool                                               isCheckpointedAndReloaded,
+	MPI_Comm                                           communicator,
+	FieldVariable_Register*                            fV_Register )
 {
 	ShapeFeVariable*		self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ShapeFeVariable) );
-	self = (ShapeFeVariable*)
-		_FeVariable_New(
-			_sizeOfSelf, 
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute, 
-			_destroy,
-			name,
-			False,
-			_interpolateValueAt,
-			_getMinGlobalFeMagnitude, 
-			_getMaxGlobalFeMagnitude,
-			_getMinAndMaxLocalCoords, 
-			_getMinAndMaxGlobalCoords,
-			_interpolateWithinElement,
-			_getValueAtNode,
-			_FeVariable_SyncShadowValues, 
-			feMesh,
-			geometryMesh,
-			dofLayout, /* dofLayout */
-			NULL,   /* bcs */
-			NULL,   /* ics */
-			NULL,   /* linkedDofInfo */
-			NULL,   /* templateFeVariable */
-			1,      /* fieldComponentCount */ 
-			dim,	/* dim */
-			isCheckpointedAndReloaded, /* Checkpointing boolean */
-			False,	/* isReference */
-			False,  /* loadReferenceEachTimestep */
-			communicator,	/* communicator */
-			fV_Register	/* fv_Register */
-			);
+	self = (ShapeFeVariable*) _FeVariable_New(
+		_sizeOfSelf, 
+		type, 
+		_delete,
+		_print,
+		_copy,
+		_defaultConstructor,
+		_construct,
+		_build,
+		_initialise,
+		_execute, 
+		_destroy,
+		name,
+		NON_GLOBAL,
+		_interpolateValueAt,
+		_getMinGlobalFeMagnitude, 
+		_getMaxGlobalFeMagnitude,
+		_getMinAndMaxLocalCoords, 
+		_getMinAndMaxGlobalCoords,
+		1, /* fieldComponentCount */ 
+		dim, /* dim */
+		isCheckpointedAndReloaded, /* Checkpointing boolean */
+		communicator, /* communicator */
+		fV_Register, /* fv_Register */
+		_interpolateWithinElement,
+		_getValueAtNode,
+		_FeVariable_SyncShadowValues, 
+		feMesh,
+		geometryMesh,
+		dofLayout, /* dofLayout */
+		NULL, /* bcs */
+		NULL, /* ics */
+		NULL, /* linkedDofInfo */
+		NULL, /* templateFeVariable */
+		False, /* isReference */
+		False /* loadReferenceEachTimestep */
+	);
 
 	return self;
 }
 
 void _ShapeFeVariable_Init( void* shapeFeVariable, Stg_Shape* shape ) {
-	ShapeFeVariable*         self              = (ShapeFeVariable*) shapeFeVariable;
+	ShapeFeVariable* self = (ShapeFeVariable*) shapeFeVariable;
 
 	self->shape = shape;
 	
-/* 	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ),	ParticleFeVariable_Update, self ); */
+	/* EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ),	ParticleFeVariable_Update, self ); */
 }
 
 void _ShapeFeVariable_Delete( void* _shapeFeVariable ) {
@@ -185,23 +183,20 @@ void _ShapeFeVariable_Print( void* _shapeFeVariable, Stream* stream ) {
 	Journal_PrintPointer( stream, self->shape );
 }
 
-
 void* _ShapeFeVariable_Copy( void* shapeFeVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-/* 	ShapeFeVariable*	self = (ShapeFeVariable*)shapeFeVariable; */
-	ShapeFeVariable*	newShapeFeVariable;
+	/* ShapeFeVariable*	self = (ShapeFeVariable*)shapeFeVariable; */
+	ShapeFeVariable* newShapeFeVariable;
 	
 	assert(0);
 	return (void*)newShapeFeVariable;
 }
 
 void _ShapeFeVariable_AssignFromXML( void* shapeFeVariable, Stg_ComponentFactory* cf, void* data ) {
-	ShapeFeVariable*        self       = (ShapeFeVariable*) shapeFeVariable;
+	ShapeFeVariable* self = (ShapeFeVariable*) shapeFeVariable;
 
 	_FeVariable_AssignFromXML( self, cf, data );
 
-	_ShapeFeVariable_Init( 
-		self, 
-		Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Shape", Stg_Shape,  True, data )  ) ;
+	_ShapeFeVariable_Init( self, Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Shape", Stg_Shape,  True, data )  ) ;
 }
 
 void _ShapeFeVariable_Build( void* shapeFeVariable, void* data ) {
@@ -221,11 +216,11 @@ void _ShapeFeVariable_Initialise( void* shapeFeVariable, void* data ) {
 	/* Set up the basic "level set" describing if nodes are inside the shape or not */
 	for ( node_dI = 0; node_dI < Mesh_GetDomainSize( self->feMesh, MT_VERTEX ); node_dI++ ) {
 		if ( True == Stg_Shape_IsCoordInside( self->shape, Mesh_GetVertex( self->feMesh, node_dI ) ) ) {
-/* 			set value = 1 */
+			/* set value = 1 */
 			FeVariable_SetComponentAtNode( self, node_dI, 0, 1 );
 		}		
 		else {
-/* 			set value = 0 */
+			/* set value = 0 */
 			FeVariable_SetComponentAtNode( self, node_dI, 0, 0 );
 		}
 	}

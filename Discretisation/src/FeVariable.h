@@ -74,155 +74,153 @@
 		__FieldVariable \
 		\
 		/* Virtual info */ \
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement; \
-		FeVariable_GetValueAtNodeFunction*                _getValueAtNode;          \
-		FeVariable_SyncShadowValuesFunc*		_syncShadowValues; \
-		FeVariable_IO_File_Function         *_saveToFile; \
-		FeVariable_IO_File_Function         *_readToFile; \
+		FeVariable_InterpolateWithinElementFunction*	_interpolateWithinElement; \
+		FeVariable_GetValueAtNodeFunction*				_getValueAtNode; \
+		FeVariable_SyncShadowValuesFunc*					_syncShadowValues; \
+		FeVariable_IO_File_Function						*_saveToFile; \
+		FeVariable_IO_File_Function						*_readToFile; \
 		/* FeVariable info */ \
-		Stream*                            debug; \
+		Stream*													debug; \
 		/** Mesh that this variable is discretised over */ \
-		FeMesh*						feMesh; \
+		FeMesh*													feMesh; \
 		/** The mesh that this variable can create the determinant of the jacobian from */ \
-		FeMesh*						geometryMesh; \
+		FeMesh*													geometryMesh; \
 		/** DofLayout for this variable: relates each mesh node to the Variable's */ \
-		DofLayout*                                        dofLayout; \
+		DofLayout*												dofLayout; \
 		/** Temporary GNx for operations */ \
-		double                                            **GNx; \
+		double													**GNx; \
 		/** Boundary conditions applied to this variable - Compulsory, so the eq num table can be worked out*/ \
-		VariableCondition*                                bcs; \
-		DynamicVC*					dynamicBCs[3]; /* Temporary hack */	\
-		Bool						removeBCs;	\
+		VariableCondition*									bcs; \
+		DynamicVC*												dynamicBCs[3]; /* Temporary hack */	\
+		Bool														removeBCs;	\
 		/** Boundary conditions applied to this variable - Optional, may be NULL */ \
-		VariableCondition*                                ics; \
+		VariableCondition*									ics; \
 		/** Info on which dofs are linked together: optional, may be NULL */ \
-		LinkedDofInfo*                                    linkedDofInfo; \
+		LinkedDofInfo*											linkedDofInfo; \
 		/** Equation number array: maps where each dof of this Variable goes in any matrices based off it. */ \
-		FeEquationNumber*                                 eqNum;  \
+		FeEquationNumber*										eqNum;  \
 		/** Records whether the user has sync'd shadow values yet. */ \
-		Bool                                              shadowValuesSynchronised;  \
+		Bool														shadowValuesSynchronised;  \
 		/** A "template" feVariable this one is based on - ie this one's mesh and BCs is based off that one */ \
-		FeVariable*                                       templateFeVariable; \
+		FeVariable*												templateFeVariable; \
 		/** Records whether this FeVariable is a reference solution - and should be loaded from a file, regardless of checkpointing status */ \
-		Bool                                              isReferenceSolution; \
+		Bool														isReferenceSolution; \
 		/* if self->isReferenceSolution is true, this param determines if it's loaded once at the start, or every timestep. */ \
-		Bool                                              loadReferenceEachTimestep; \
-		Bool                                              buildEqNums; \
-									\
-		IArray* inc;
+		Bool														loadReferenceEachTimestep; \
+		Bool														buildEqNums; \
+		\
+		IArray*													inc;
 
 
 	/* Brings together and manages the life cycle of all the components required by the
 	Finite Element Method about a variable to be solved for - see FeVariable.h */
 	struct FeVariable { __FeVariable };
 
+	#define FEVARIABLE_DEFARGS \
+		FIELDVARIABLE_DEFARGS, \
+			FeVariable_InterpolateWithinElementFunction*	_interpolateWithinElement, \
+			FeVariable_GetValueAtNodeFunction*				_getValueAtNode, \
+			FeVariable_SyncShadowValuesFunc*					_syncShadowValues, \
+			void*														feMesh, \
+			void*														geometryMesh, \
+			void*														bcs, \
+			void*														ics, \
+			void*														linkedDofInfo, \
+			void*														templateFeVariable, \
+			DofLayout*												dofLayout, \
+			Bool														referenceSoulution, \
+			Bool														loadReferenceEachTimestep
+
+	#define FEVARIABLE_PASSARGS \
+		FIELDVARIABLE_PASSARGS, \
+			_interpolateWithinElement, \
+			_getValueAtNode, \
+			_syncShadowValues, \
+			feMesh, \
+			geometryMesh, \
+			bcs, \
+			ics, \
+			linkedDofInfo, \
+			templateFeVariable, \
+			dofLayout, \
+			referenceSoulution, \
+			loadReferenceEachTimestep
+
 	/* Checkpoint file version enum */
 	typedef enum FeCheckpointFileVersion {
 		FeCHECKPOINT_V1 = 1,	/** Original checkpointing format   */
-		FeCHECKPOINT_V2	        /** No longer store nodes within checkpoint files, and now store attributes including 
-		                            checkpoint version, number of dimensions and cartesion mesh size */
+		FeCHECKPOINT_V2		/** No longer store nodes within checkpoint files, and now store attributes including 
+										checkpoint version, number of dimensions and cartesion mesh size */
 	} FeCheckpointFileVersion;
 	
 	/* --- Contstructors / Destructors --- */
 	
 	/** Create a new FeVariable and initialises it. The default one - no template. */
 	
-	void* FeVariable_DefaultNew( Name name );
+	void* _FeVariable_DefaultNew( Name name );
 	
 	FeVariable* FeVariable_New(
-		Name                                            name,
-		void*                                           feMesh,
-		void*                                           geometryMesh,
-		DofLayout*                                      dofLayout, 
-		void*                                          	bcs,
-		void*                                          	ics,
-		void*                                           linkedDofInfo,
-		Dimension_Index                                 dim,
-		Bool                                            isCheckpointedAndReloaded,
-		Bool                                            referenceSoulution,
-		Bool                                            loadReferenceEachTimestep,
-		FieldVariable_Register*                         fV_Register );
+		Name							name,
+		DomainContext*				context,
+		void*							feMesh,
+		void*							geometryMesh,
+		DofLayout*					dofLayout, 
+		void*							bcs,
+		void*							ics,
+		void*							linkedDofInfo,
+		Dimension_Index			dim,
+		Bool							isCheckpointedAndReloaded,
+		Bool							referenceSoulution,
+		Bool							loadReferenceEachTimestep,
+		FieldVariable_Register*	fieldVariable_Register );
 
 	/** Create a new FeVariable and initialises it. Mesh, bcs and eqNum table is based off a template one.
 	User is required to provide new ICs (we figured this would be the case in the vast majority of
 	implementations. */
 	FeVariable* FeVariable_New_FromTemplate(
-		Name                                            name,
-		void*                                          	templateFeVariable,
-		DofLayout*                                      dofLayout, 
-		void*                                          	ics,
-		Bool                                            isReferenceSolution,
-		Bool                                            loadReferenceEachTimestep,
-		FieldVariable_Register*                         fV_Register );
+		Name							name,
+		DomainContext*				context,
+		void*							templateFeVariable,
+		DofLayout*					dofLayout, 
+		void*							ics,
+		Bool							isReferenceSolution,
+		Bool							loadReferenceEachTimestep,
+		FieldVariable_Register*	fV_Register );
 	
 	/** Create a new FeVariable and initialises it. User chooses whether to pass a template or not. */
 	FeVariable* FeVariable_New_Full(
-		Name                                            name,
-		void*                                           feMesh,
-		void*                                           geometryMesh,
-		DofLayout*                                      dofLayout, 
-		void*                                          	bcs,
-		void*                                          	ics,
-		void*                                           linkedDofInfo,
-		void*                                          	templateFeVariable,
-		Index                                           fieldComponentCount,
-		Dimension_Index                                 dim,
-		Bool                                            isCheckpointedAndReloaded,
-		Bool                                            referenceSoulution,
-		Bool                                            loadReferenceEachTimestep,
-		MPI_Comm                                        communicator,
-		FieldVariable_Register*                         fV_Register );
+		Name							name,
+		DomainContext*				context,
+		void*							feMesh,
+		void*							geometryMesh,
+		DofLayout*					dofLayout, 
+		void*							bcs,
+		void*							ics,
+		void*							linkedDofInfo,
+		void*							templateFeVariable,
+		Index							fieldComponentCount,
+		Dimension_Index			dim,
+		Bool							isCheckpointedAndReloaded,
+		Bool							referenceSoulution,
+		Bool							loadReferenceEachTimestep,
+		MPI_Comm						communicator,
+		FieldVariable_Register*	fV_Register );
 	
 	/* Creation implementation / Virtual constructor */
-	FeVariable* _FeVariable_New(
- 		SizeT                                           _sizeOfSelf,
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy, 
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,
-		Name                                            name,
-		Bool                                            initFlag,
-		FieldVariable_InterpolateValueAtFunction*       _interpolateValueAt,
-		FieldVariable_GetValueFunction*                 _getMinGlobalFieldMagnitude,
-		FieldVariable_GetValueFunction*                 _getMaxGlobalFieldMagnitude,
-		FieldVariable_GetCoordFunction*                 _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                 _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*    _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*              _getValueAtNode,
-		FeVariable_SyncShadowValuesFunc*		_syncShadowValues, 
-		void*                                           feMesh,
-		void*                                           geometryMesh,
-		DofLayout*                                      dofLayout, 
-		void*                                          	bcs,
-		void*                                          	ics,
-		void*                                           linkedDofInfo,
-		void*                                          	templateFeVariable,
-		Index                                           fieldComponentCount,
-		Dimension_Index                                 dim,
-		Bool                                            isCheckpointedAndReloaded,
-		Bool                                            referenceSoulution,
-		Bool                                            loadReferenceEachTimestep,
-		MPI_Comm                                        communicator,
-		FieldVariable_Register*                         fV_Register );
+	FeVariable* _FeVariable_New( FEVARIABLE_DEFARGS );
 	
 	/* Initialise implementation */
 	void _FeVariable_Init( 
-		FeVariable*                                     self,
-		void*                                           feMesh,
-		void*                                           geometryMesh,
-		DofLayout*                                      dofLayout, 
-		void*                                           bcs,
-		void*                                           ics,
-		void*                                           linkedDofInfo,
-		void*                                           templateFeVariable,
-		Bool                                            referenceSoulution,
-		Bool                                            loadReferenceEachTimestep );
+		FeVariable*	self,
+		void*			feMesh,
+		void*			geometryMesh,
+		DofLayout*	dofLayout, 
+		void*			bcs,
+		void*			ics,
+		void*			linkedDofInfo,
+		void*			templateFeVariable,
+		Bool			referenceSoulution,
+		Bool			loadReferenceEachTimestep );
 	
 	/** Stg_Class_Delete a FeVariable construst */
 	void _FeVariable_Delete( void* variable );
@@ -265,6 +263,7 @@
 	
 	/** Apply BCs for this variable */
 	void FeVariable_ApplyBCs( void* variable, void* data );
+
 	Bool FeVariable_IsBC( void* variable, int node, int dof );
 	
 	/** Interpolate the value of the FE variable at a particular coord **/
@@ -335,13 +334,13 @@
 	void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, const char* feVarFilename, const char* meshFilename );
 
 	/** Evaluates Spatial Derivatives using shape functions */
-	Bool FeVariable_InterpolateDerivativesAt( void* variable, double* globalCoord, double* value ) ;
+	Bool FeVariable_InterpolateDerivativesAt( void* variable, double* globalCoord, double* value );
 	
-	void FeVariable_InterpolateDerivativesToElLocalCoord( void* _feVariable, Element_LocalIndex lElement_I, double* elLocalCoord, double* value ) ;
+	void FeVariable_InterpolateDerivativesToElLocalCoord( void* _feVariable, Element_LocalIndex lElement_I, double* elLocalCoord, double* value );
 	
-	void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_LocalIndex lElement_I, double** GNx, double* value ) ;
+	void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_LocalIndex lElement_I, double** GNx, double* value );
 
-	void FeVariable_InterpolateValue_WithNi( void* _feVariable, Element_LocalIndex lElement_I, double* Ni, double* value ) ;
+	void FeVariable_InterpolateValue_WithNi( void* _feVariable, Element_LocalIndex lElement_I, double* Ni, double* value );
 	
 	void FeVariable_GetMinimumSeparation( void* feVariable, double* minSeparationPtr, double minSeparationEachDim[3] );
 
@@ -351,10 +350,11 @@
 
 	/** Perhaps should be moved into feVariable interface? */
 	void FeVariable_PrintDomainDiscreteValues( void* feVariable, Stream* stream );
-	void FeVariable_PrintCoordsAndValues( void* _feVariable, Stream* stream ) ;
+
+	void FeVariable_PrintCoordsAndValues( void* _feVariable, Stream* stream );
 
 	/** Use this function when you want the value of the field but the local coordinates you are using may not be appropriate for the mesh of this FeVariable */
-	InterpolationResult FeVariable_InterpolateFromMeshLocalCoord( void* feVariable, FeMesh* mesh, Element_DomainIndex dElement_I, double* localCoord, double* value ) ;
+	InterpolationResult FeVariable_InterpolateFromMeshLocalCoord( void* feVariable, FeMesh* mesh, Element_DomainIndex dElement_I, double* localCoord, double* value );
 	
 	#define FeVariable_IntegrateElement( feVariable, swarm, dElement_I ) \
 		FeVariable_IntegrateElement_AxisIndependent( \
@@ -362,27 +362,31 @@
 				I_AXIS, J_AXIS, K_AXIS ) 
 
 	double FeVariable_IntegrateElement_AxisIndependent( 
-			void* feVariable, void* _swarm,
-			Element_DomainIndex dElement_I, Dimension_Index dim, 
-			Axis axis0, Axis axis1, Axis axis2 ) ;
-	double FeVariable_Integrate( void* feVariable, void* _swarm ) ;
+		void* feVariable, void* _swarm,
+		Element_DomainIndex dElement_I, Dimension_Index dim, 
+		Axis axis0, Axis axis1, Axis axis2 );
+
+	double FeVariable_Integrate( void* feVariable, void* _swarm );
 
 	/** Functions assumes IJK Topology Elements */
-	double FeVariable_AverageTopLayer( void* feVariable, void* swarm, Axis layerAxis ) ;
-	double FeVariable_AverageBottomLayer( void* feVariable, void* swarm, Axis layerAxis ) ;
-	double FeVariable_AverageLayer( void* feVariable, void* swarm, Axis layerAxis, Index layerIndex ) ;
+	double FeVariable_AverageTopLayer( void* feVariable, void* swarm, Axis layerAxis );
+
+	double FeVariable_AverageBottomLayer( void* feVariable, void* swarm, Axis layerAxis );
+
+	double FeVariable_AverageLayer( void* feVariable, void* swarm, Axis layerAxis, Index layerIndex );
 
 	#define FeVariable_IntegrateLayer( feVariable, swarm, layerAxis, layerIndex ) \
 		FeVariable_IntegrateLayer_AxisIndependent( \
-				feVariable, swarm, layerAxis, layerIndex, ((FeVariable*) feVariable)->dim,\
-				I_AXIS, J_AXIS, K_AXIS ) 
+			feVariable, swarm, layerAxis, layerIndex, ((FeVariable*) feVariable)->dim, I_AXIS, J_AXIS, K_AXIS ) 
 
 	double FeVariable_IntegrateLayer_AxisIndependent( 
 		void* feVariable, void* _swarm,
 		Axis layerAxis, Index layerIndex, Dimension_Index dim, 
-		Axis axis0, Axis axis1, Axis axis2 ) ;
-	double FeVariable_AveragePlane( void* feVariable, Axis planeAxis, double planeHeight ) ;
-	double FeVariable_IntegratePlane( void* feVariable, Axis planeAxis, double planeHeight ) ;
+		Axis axis0, Axis axis1, Axis axis2 );
+
+	double FeVariable_AveragePlane( void* feVariable, Axis planeAxis, double planeHeight );
+
+	double FeVariable_IntegratePlane( void* feVariable, Axis planeAxis, double planeHeight );
 
 	/* --- Private Functions --- */
 

@@ -431,6 +431,7 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 
 		self->phiDotField = FeVariable_New_FromTemplate(
 			fieldDotName,
+			self->context,
 			self->phiField,
 			self->phiDotDofLayout,
 			NULL,

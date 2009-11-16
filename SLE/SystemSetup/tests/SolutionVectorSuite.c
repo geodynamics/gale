@@ -9,7 +9,6 @@
 #include "StgFEM/SLE/SystemSetup/SystemSetup.h"
 
 typedef struct {
-	DomainContext* context;
 } SolutionVectorSuiteData;
 
 void SolutionVectorSuite_Setup( SolutionVectorSuiteData* data ) { }
@@ -94,18 +93,18 @@ FeVariable* SolutionVectorSuite_buildFeVar() {
    Stg_Component_Initialise( eqNum, NULL, False );
 
    fieldReg = FieldVariable_Register_New();
-   feVar = FeVariable_New( "velocity", feMesh, NULL, dofs, bcs, NULL, NULL, 2, True, 
-			   False, False, fieldReg );
+   feVar = FeVariable_New( "velocity", NULL, feMesh, NULL, dofs, bcs, NULL, NULL, 2, True, 
+		False, False, fieldReg );
 
    for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, 0 ); n_i++ ) {
       /*const double pi=acos(-1.0);*/
       double* pos = Mesh_GetVertex( feMesh, n_i );
 
       Variable_SetValue( var, n_i, pos );
-/*
+		/*
       arrayPtrs[0][n_i] = (1.0 - pos[1]) + 0.1 * cos( pi * pos[0] ) * sin(  pi * pos[1]  );
       arrayPtrs[1][n_i] = (1.0 - pos[1]) + 0.1 * cos( pi * pos[0] ) * sin(  pi * pos[1]  );
-*/
+		*/
    }
 
    /* Build and initialise system */

@@ -137,20 +137,43 @@
 
 	/* --- Public Functions --- */
 	void AnalyticSolution_Test( void* analyticSolution, Index analyticFeVariable_I ) ;
+
 	void AnalyticSolution_TestAll( void* analyticSolution, void* data ) ;
 	
 	void AnalyticSolution_PutAnalyticSolutionOntoNodes( void* analyticSolution, Index analyticFeVariable_I ) ;
 
-	void AnalyticSolution_RegisterFeVariableWithAnalyticFunction( void* analyticSolution, FeVariable* feVariable, AnalyticSolution_SolutionFunction* solutionFunction );
-	FeVariable* AnalyticSolution_RegisterFeVariableFromCF( void* analyticSolution, char* fieldName, AnalyticSolution_SolutionFunction* solutionFunction, Stg_ComponentFactory* cf, Bool isEssential, void* data ) ;
+	void AnalyticSolution_RegisterFeVariableWithAnalyticFunction(
+		void*											analyticSolution,
+		FeVariable*									feVariable,
+		AnalyticSolution_SolutionFunction*	solutionFunction );
+
+	FeVariable* AnalyticSolution_RegisterFeVariableFromCF(
+		void*											analyticSolution,
+		char*											fieldName,
+		AnalyticSolution_SolutionFunction*	solutionFunction,
+		Stg_ComponentFactory*					cf,
+		Bool											isEssential,
+		void*											data );
+
 	void AnalyticSolution_BuildAllAnalyticFields( void* analyticSolution, void* data );
 
 	FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVariable* feVariable ) ;
-	FeVariable* AnalyticSolution_CreateAnalyticVectorField( void* analyticSolution, FeVariable* vectorField, AnalyticSolution_SolutionFunction* solutionFunction ) ;
+
+	FeVariable* AnalyticSolution_CreateAnalyticVectorField(
+		void*											analyticSolution,
+		FeVariable*									vectorField,
+		AnalyticSolution_SolutionFunction*	solutionFunction ) ;
+
 	FeVariable* AnalyticSolution_CreateAnalyticSymmetricTensorField( void* analyticSolution, FeVariable* vectorField ) ;
 
 	FeVariable* AnalyticSolution_GetFeVariableFromAnalyticFeVariable( void* analyticSolution, FeVariable* analyticFeVariable ) ;
-	InterpolationResult AnalyticSolution_InterpolateValueFromNormalFeVariable( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* value ) ;
+
+	InterpolationResult AnalyticSolution_InterpolateValueFromNormalFeVariable(
+		void*			analyticSolution,
+		FeVariable*	analyticFeVariable,
+		double*		coord,
+		double*		value ) ;
+
 	AnalyticSolution* AnalyticSolution_GetAnalyticSolution();
 	
 #endif /* __StgFEM_Discretisation_AnalyticSolution_h__ */

@@ -21,9 +21,10 @@ void IsoviscousStiffness_Setup( IsoviscousStiffnessData* data ) {
 }
 
 void IsoviscousStiffness_Teardown( IsoviscousStiffnessData* data ) {
-	FiniteElementContext* context = data->context;
-	char rFile[PCU_PATH_MAX];
-	int err;
+	FiniteElementContext*	context = data->context;
+	char							rFile[PCU_PATH_MAX];
+	int							err;
+
 	if( context->rank == 0 ) {
 		/* Now clean output path */
 		sprintf(rFile, "%s/input.xml", context->outputPath );
@@ -36,7 +37,7 @@ void IsoviscousStiffness2D( IsoviscousStiffnessData* data ) {
 	StiffnessMatrix*			stiffnessMatrix;
 	SystemLinearEquations*	sle;
 	Dictionary*					dictionary;
-	FiniteElementContext*		context;
+	FiniteElementContext*	context;
 	Stg_ComponentFactory*	cf;
 	PetscViewer					expViewer;
 	PetscReal					matrixNorm, errorNorm, test;
@@ -45,7 +46,7 @@ void IsoviscousStiffness2D( IsoviscousStiffnessData* data ) {
 	char							*filename, *matrixName;
 	double						tolerance;
 	char							xml_input[PCU_PATH_MAX];
-	Stream*          infoStream     = Journal_Register( Info_Type, CURR_MODULE_NAME );
+	Stream*						infoStream = Journal_Register( Info_Type, CURR_MODULE_NAME );
 
 	pcu_docstring( "This test compares a Stiffness matrix against a previously generated stiffness matrix"
 		"The stiffness matrix is generated from a 2D FEM model for an isoviscous fluid flow." 

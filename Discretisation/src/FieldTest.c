@@ -425,7 +425,7 @@ void _FieldTest_Execute( void* fieldTest, void* data ) {
 }
 
 void _FieldTest_Destroy( void* fieldTest, void* data ) {
-	FieldTest* 		self 		= (FieldTest*) fieldTest;
+	FieldTest* self = (FieldTest*) fieldTest;
 
 	if( self->fieldCount ) {
 		Memory_Free( self->numericFieldList );
@@ -449,6 +449,8 @@ void _FieldTest_Destroy( void* fieldTest, void* data ) {
 		Memory_Free( self->analyticSolnForFeVarKey );
 		Memory_Free( self->_analyticSolutionList );
 	}
+
+	Stg_Component_Destroy( self, data, False );
 }
 
 void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
@@ -520,8 +522,8 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 
 	tmpName = Stg_Object_AppendSuffix( numericField, "Analytic" );
 
-	self->referenceFieldList[field_I] = FeVariable_New( tmpName, referenceMesh, referenceMesh, referenceDofLayout, NULL, NULL, NULL, 
-							Mesh_GetDimSize( referenceMesh ), False, False, False, context->fieldVariable_Register );
+	self->referenceFieldList[field_I] = FeVariable_New( tmpName, self->context, referenceMesh, referenceMesh, referenceDofLayout, NULL, NULL, NULL, 
+		Mesh_GetDimSize( referenceMesh ), False, False, False, context->fieldVariable_Register );
 	self->referenceFieldList[field_I]->context = context;
 	/* so that the eqnation numbers don't get built for this guy */
 	self->referenceFieldList[field_I]->buildEqNums = False;
@@ -529,19 +531,19 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 	if( componentsCount > Mesh_GetDimSize( referenceMesh ) ) {
 		/* we're dealing with a tensor, so use invariant */
 		tmpName = Stg_Object_AppendSuffix( self->referenceFieldList[field_I], "Invariant" );
-		self->referenceMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->referenceFieldList[field_I], "SymmetricTensor_Invariant" );
+		self->referenceMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->context, self->referenceFieldList[field_I], "SymmetricTensor_Invariant" );
 		self->referenceMagFieldList[field_I]->context = context;
 	} else {
 		/* we're dealing with a vector, so use magnitude */
 		tmpName = Stg_Object_AppendSuffix( self->referenceFieldList[field_I], "Magnitude" );
-		self->referenceMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->referenceFieldList[field_I], "Magnitude" );
+		self->referenceMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->context, self->referenceFieldList[field_I], "Magnitude" );
 		self->referenceMagFieldList[field_I]->context = context;
 	}
 
 	Memory_Free( tmpName );
 	Stg_Component_Build( self->referenceMagFieldList[field_I], context, False );
 	self->referenceMagFieldList[field_I]->_operator = Operator_NewFromName( self->referenceMagFieldList[field_I]->operatorName, 
-										self->referenceFieldList[field_I]->fieldComponentCount, context->dim );
+		self->referenceFieldList[field_I]->fieldComponentCount, context->dim );
 	self->referenceMagFieldList[field_I]->fieldComponentCount = self->referenceMagFieldList[field_I]->_operator->resultDofs;
 	_OperatorFeVariable_SetFunctions( self->referenceMagFieldList[field_I] );
 
@@ -615,26 +617,26 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 
 	tmpName = Stg_Object_AppendSuffix( numericField, "Error" );
 
-	self->errorFieldList[field_I] = FeVariable_New( tmpName, constantMesh, constantMesh, errorDofLayout, NULL, NULL, NULL, 
-							Mesh_GetDimSize( constantMesh ), False, False, False, context->fieldVariable_Register );
+	self->errorFieldList[field_I] = FeVariable_New( tmpName, self->context, constantMesh, constantMesh, errorDofLayout, NULL, NULL, NULL, 
+		Mesh_GetDimSize( constantMesh ), False, False, False, context->fieldVariable_Register );
 	/* so that the eqnation numbers don't get built for this guy */
 	self->errorFieldList[field_I]->buildEqNums = False;
 
 	if( componentsCount > Mesh_GetDimSize( constantMesh ) ) {
 		/* we're dealing with a tensor, so use invariant */
 		tmpName = Stg_Object_AppendSuffix( self->errorFieldList[field_I], "Invariant" );
-		self->errorMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->errorFieldList[field_I], "SymmetricTensor_Invariant" );
+		self->errorMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->context, self->errorFieldList[field_I], "SymmetricTensor_Invariant" );
 		self->errorMagFieldList[field_I]->context = context;
 	} else {
 		/* we're dealing with a vector, so use magnitude */
 		tmpName = Stg_Object_AppendSuffix( self->errorFieldList[field_I], "Magnitude" );
-		self->errorMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->errorFieldList[field_I], "Magnitude" );
+		self->errorMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->context, self->errorFieldList[field_I], "Magnitude" );
 		self->errorMagFieldList[field_I]->context = context;
 	}
 	Memory_Free( tmpName );
 	Stg_Component_Build( self->errorMagFieldList[field_I], context, False );
 	self->errorMagFieldList[field_I]->_operator = Operator_NewFromName( self->errorMagFieldList[field_I]->operatorName, 
-							self->errorFieldList[field_I]->fieldComponentCount, context->dim );
+		self->errorFieldList[field_I]->fieldComponentCount, context->dim );
 	self->errorMagFieldList[field_I]->fieldComponentCount = self->errorMagFieldList[field_I]->_operator->resultDofs;
 	_OperatorFeVariable_SetFunctions( self->errorMagFieldList[field_I] );
 

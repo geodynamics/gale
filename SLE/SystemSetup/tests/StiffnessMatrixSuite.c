@@ -64,8 +64,7 @@ FeVariable* buildFeVar() {
    arraySize = Mesh_GetDomainSize( feMesh, MT_VERTEX );
    arrayPtrs[0] = Memory_Alloc_Array_Unnamed( double, arraySize * 2 );
    var = Variable_NewVector( "velocity", Variable_DataType_Double, 2, (unsigned*)&arraySize, NULL, 
-			     (void**)arrayPtrs, varReg, 
-			     "vx", "vy" );
+		(void**)arrayPtrs, varReg, "vx", "vy" );
    Variable_Register_BuildAll( varReg );
 
    dofs = DofLayout_New( "", varReg, 0, feMesh );
@@ -80,8 +79,7 @@ FeVariable* buildFeVar() {
    dict = Dictionary_New();
    pcu_filename_input( "velWallVC.xml", xml_input );
    IO_Handler_ReadAllFromFile( ioHandler, xml_input, dict );
-   bcs = (VariableCondition*)WallVC_New( "", "wallVC", varReg, cfReg, 
-					 dict, feMesh );
+   bcs = (VariableCondition*)WallVC_New( "", "wallVC", varReg, cfReg, dict, feMesh );
    Stg_Component_Build( bcs, NULL, False );
    Stg_Component_Initialise( bcs, NULL, False );
 
@@ -90,8 +88,8 @@ FeVariable* buildFeVar() {
    Stg_Component_Initialise( eqNum, NULL, False );
 
    fieldReg = FieldVariable_Register_New();
-   feVar = FeVariable_New( "velocity", feMesh, NULL, dofs, bcs, NULL, NULL, 2, True, 
-			   False, False, fieldReg );
+   feVar = FeVariable_New( "velocity", NULL, feMesh, NULL, dofs, bcs, NULL, NULL, 2, True, 
+		False, False, fieldReg );
 
    for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, 0 ); n_i++ ) {
       /*const double pi=acos(-1.0);*/

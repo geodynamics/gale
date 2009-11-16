@@ -197,7 +197,7 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 
 	/* Create the finite element field variable*/
 	fV_Register = FieldVariable_Register_New();
-	feVariable = FeVariable_New( "phi", feMesh, NULL, dofs, wallVC, NULL, NULL, context->dim, False, False, False, fV_Register );
+	feVariable = FeVariable_New( "phi", NULL, feMesh, NULL, dofs, wallVC, NULL, NULL, context->dim, False, False, False, fV_Register );
 	
 	/* Create Swarm */
 	if ( 3 == dim ) 

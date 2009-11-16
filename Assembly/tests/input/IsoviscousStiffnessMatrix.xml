@@ -4,29 +4,23 @@
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
 	<list name="import" mergeType="merge">
-<!--		<param>StgDomain</param>-->
 		<param>StgFEM</param>
 	</list>
 	
-	<include> StgFEM/ConstantMesh.xml    </include>
-	<include> StgFEM/LinearMesh.xml      </include>
-	<include> StgFEM/VelocityField.xml   </include>
-	<include> StgFEM/PressureField.xml   </include>
-	<include> StgFEM/GaussSwarm.xml      </include>
+	<include> StgFEM/ConstantMesh.xml </include>
+	<include> StgFEM/LinearMesh.xml </include>
+	<include> StgFEM/VelocityField.xml </include>
+	<include> StgFEM/PressureField.xml </include>
+	<include> StgFEM/GaussSwarm.xml </include>
 	<include> StgFEM/StokesFlowUzawa.xml </include>
 	
-	<list name="plugins" mergeType="merge">
-		<param>testStressTensor</param>
-		<param>testStiffnessMatrixCompare</param>
-	</list>
-
-    <struct name="components" mergeType="merge">
-        <struct name="context">
-            <param name="Type">FiniteElementContext</param>
-        </struct>
+	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">FiniteElementContext</param>
+		</struct>
     </struct>
 
-    <param name="StiffnessMatrixCompareFilename">testIsoviscousSiffness.matrix</param>
+	<param name="StiffnessMatrixCompareFilename">testIsoviscousSiffness.matrix</param>
 	<!-- Simulation control -->
 	<param name="outputPath"> ./output </param>
 	<param name="maxTimeSteps"> 1 </param>

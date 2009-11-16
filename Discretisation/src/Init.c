@@ -55,14 +55,13 @@ Stream* StgFEM_Discretisation_Debug = NULL;
 /** Initialises the Linear Algebra package, then any init for this package
 such as streams etc */
 Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
-	Stg_ComponentRegister*          componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
+	Stg_ComponentRegister* componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
 	int tmp;
 	
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, "Context" ) );
 	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), 0 );
-	Journal_Printf( /* DO NOT CHANGE OR REMOVE */
-		Journal_Register( InfoStream_Type, "Context" ), 
+	Journal_Printf( /* DO NOT CHANGE OR REMOVE */ Journal_Register( InfoStream_Type, "Context" ), 
 		"StGermain FEM Discretisation Framework revision %s. Copyright (C) 2003-2005 VPAC.\n", VERSION );
 	Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
 	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
@@ -80,11 +79,11 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	ElementType_Register_Add( elementType_Register, (ElementType*)Biquadratic_New( "biquadraticElementType" ) );
 	ElementType_Register_Add( elementType_Register, (ElementType*)Triquadratic_New( "triquadraticElementType" ) );
 	
-	Stg_ComponentRegister_Add( componentRegister, FeVariable_Type,         "0", FeVariable_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, LinkedDofInfo_Type,      "0", LinkedDofInfo_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, OperatorFeVariable_Type, "0", OperatorFeVariable_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, ShapeFeVariable_Type,    "0", ShapeFeVariable_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, FeSwarmVariable_Type,    "0", _FeSwarmVariable_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, FeVariable_Type, "0", _FeVariable_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, LinkedDofInfo_Type, "0", LinkedDofInfo_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, OperatorFeVariable_Type, "0", _OperatorFeVariable_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, ShapeFeVariable_Type, "0", ShapeFeVariable_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, FeSwarmVariable_Type, "0", _FeSwarmVariable_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, FeMesh_Type, "0", FeMesh_New );
 	Stg_ComponentRegister_Add( componentRegister, C0Generator_Type, "0", C0Generator_New );
 	Stg_ComponentRegister_Add( componentRegister, C2Generator_Type, "0", C2Generator_New );
@@ -97,19 +96,19 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	/** Register Parents for type checking */
 	RegisterParent( FeMesh_Algorithms_Type, Mesh_Algorithms_Type );
 	RegisterParent( FeMesh_ElementType_Type, Mesh_HexType_Type );
-	RegisterParent( ElementType_Type,                  Stg_Component_Type );
-	RegisterParent( BilinearElementType_Type,          ElementType_Type );
-	RegisterParent( TrilinearElementType_Type,         ElementType_Type );
-	RegisterParent( Biquadratic_Type,               ElementType_Type );
-	RegisterParent( Triquadratic_Type,              ElementType_Type );
-	RegisterParent( P1_Type,                        ElementType_Type );
-	RegisterParent( RegularTrilinear_Type,    TrilinearElementType_Type );
-	RegisterParent( ConstantElementType_Type,          ElementType_Type );
-	RegisterParent( LinearTriangleElementType_Type,    ElementType_Type );
-	RegisterParent( ElementType_Register_Type,         Stg_Component_Type );
+	RegisterParent( ElementType_Type, Stg_Component_Type );
+	RegisterParent( BilinearElementType_Type, ElementType_Type );
+	RegisterParent( TrilinearElementType_Type, ElementType_Type );
+	RegisterParent( Biquadratic_Type, ElementType_Type );
+	RegisterParent( Triquadratic_Type, ElementType_Type );
+	RegisterParent( P1_Type, ElementType_Type );
+	RegisterParent( RegularTrilinear_Type, TrilinearElementType_Type );
+	RegisterParent( ConstantElementType_Type, ElementType_Type );
+	RegisterParent( LinearTriangleElementType_Type, ElementType_Type );
+	RegisterParent( ElementType_Register_Type, Stg_Component_Type );
 
-	RegisterParent( FeEquationNumber_Type,             Stg_Component_Type );
-	RegisterParent( LinkedDofInfo_Type,                Stg_Component_Type );
+	RegisterParent( FeEquationNumber_Type, Stg_Component_Type );
+	RegisterParent( LinkedDofInfo_Type, Stg_Component_Type );
 	RegisterParent( FeMesh_Type, Mesh_Type );
 	RegisterParent( C0Generator_Type, MeshGenerator_Type );
 	RegisterParent( C2Generator_Type, CartesianGenerator_Type );
@@ -118,12 +117,12 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 */
 	RegisterParent( Inner2DGenerator_Type, MeshGenerator_Type );
 	
-	RegisterParent( FeVariable_Type,                   FieldVariable_Type );
-	RegisterParent( OperatorFeVariable_Type,           FeVariable_Type );
-	RegisterParent( ShapeFeVariable_Type,              FeVariable_Type );
-	RegisterParent( FeSwarmVariable_Type,              SwarmVariable_Type );
+	RegisterParent( FeVariable_Type, FieldVariable_Type );
+	RegisterParent( OperatorFeVariable_Type, FeVariable_Type );
+	RegisterParent( ShapeFeVariable_Type, FeVariable_Type );
+	RegisterParent( FeSwarmVariable_Type, SwarmVariable_Type );
 
-	RegisterParent( FieldTest_Type,			   Stg_Component_Type );
+	RegisterParent( FieldTest_Type, Stg_Component_Type );
 
 	{
 		PetscErrorCode	ec;
