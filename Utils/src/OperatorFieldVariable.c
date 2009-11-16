@@ -48,185 +48,103 @@
 const Type OperatorFieldVariable_Type = "OperatorFieldVariable";
 const Name defaultOperatorFieldVariableName = "defaultOperatorFieldVariableName";
 
-OperatorFieldVariable* OperatorFieldVariable_NewUnary( 
-		Name                                               name,
-		void*                                              _fieldVariable,
-		Name                                               operatorName )
-{
+OperatorFieldVariable* OperatorFieldVariable_NewUnary( Name	name, DomainContext* context, void* _fieldVariable, Name operatorName ) {
 	FieldVariable* fieldVariable = (FieldVariable*) _fieldVariable;
        	
 	return OperatorFieldVariable_New( 
-			name,
-			OperatorFieldVariable_UnaryInterpolationFunc, 
-			operatorName,
-			1,
-			&fieldVariable, 
-			fieldVariable->dim,
-			fieldVariable->isCheckpointedAndReloaded,
-			fieldVariable->communicator,
-			fieldVariable->fieldVariable_Register );
+		name,
+		context,
+		OperatorFieldVariable_UnaryInterpolationFunc, 
+		operatorName,
+		1,
+		&fieldVariable, 
+		fieldVariable->dim,
+		fieldVariable->isCheckpointedAndReloaded,
+		fieldVariable->communicator,
+		fieldVariable->fieldVariable_Register );
 }
 
-OperatorFieldVariable* OperatorFieldVariable_NewBinary( 
-		Name                                               name,
-		void*                                              _fieldVariable1,
-		void*                                              _fieldVariable2,
-		Name                                               operatorName )
-{
+OperatorFieldVariable* OperatorFieldVariable_NewBinary( Name name, DomainContext* context, void* _fieldVariable1, void* _fieldVariable2, Name operatorName ) {
 	FieldVariable* fieldVariableList[2];
        
 	fieldVariableList[0] = (FieldVariable*) _fieldVariable1;
 	fieldVariableList[1] = (FieldVariable*) _fieldVariable2;
 	
 	return OperatorFieldVariable_New( 
-			name,
-			OperatorFieldVariable_BinaryInterpolationFunc, 
-			operatorName,
-			2, 
-			fieldVariableList, 
-			fieldVariableList[0]->dim,
-			fieldVariableList[0]->isCheckpointedAndReloaded,
-			fieldVariableList[0]->communicator,
-			fieldVariableList[0]->fieldVariable_Register );
-}
-
-OperatorFieldVariable* _OperatorFieldVariable_DefaultNew( Name name )
-{
-		return _OperatorFieldVariable_New( 
-			sizeof(OperatorFieldVariable), 
-			OperatorFieldVariable_Type, 
-			_FieldVariable_Delete, 
-			_OperatorFieldVariable_Print,
-			_OperatorFieldVariable_Copy, 
-			(Stg_Component_DefaultConstructorFunction*)_OperatorFieldVariable_DefaultNew,
-			_OperatorFieldVariable_AssignFromXML,
-			_OperatorFieldVariable_Build, 
-			_OperatorFieldVariable_Initialise, 
-			_OperatorFieldVariable_Execute,
-			_OperatorFieldVariable_Destroy,
-			name,
-			False, 
-			_OperatorFieldVariable_GetMinLocalFieldMagnitude,
-			_OperatorFieldVariable_GetMaxLocalFieldMagnitude, 
-			_OperatorFieldVariable_GetMinAndMaxLocalCoords,
-			_OperatorFieldVariable_GetMinAndMaxGlobalCoords, 
-			_OperatorFieldVariable_InterpolateValueAt,
-			NULL,
-			0,
-			NULL,
-			0,
-			False, /* Setting default to false, as do not want to checkpoint OperatorFeVariables */
-			MPI_COMM_WORLD,
-			NULL);
+		name,
+		context,
+		OperatorFieldVariable_BinaryInterpolationFunc, 
+		operatorName,
+		2, 
+		fieldVariableList, 
+		fieldVariableList[0]->dim,
+		fieldVariableList[0]->isCheckpointedAndReloaded,
+		fieldVariableList[0]->communicator,
+		fieldVariableList[0]->fieldVariable_Register );
 }
 
 OperatorFieldVariable* OperatorFieldVariable_New( 
-		Name                                               name,
-		FieldVariable_InterpolateValueAtFunction*          interpolateValueAt,
-		Name                                               operatorName,
-		Index                                              fieldVariableCount,
-		FieldVariable**                                    fieldVariableList,
-		Dimension_Index                                    dim,
-		Bool                                               isCheckpointedAndReloaded,
-		MPI_Comm                                           communicator,
-		FieldVariable_Register*                            fV_Register ) 
+	Name													name,
+	DomainContext*										context,
+	FieldVariable_InterpolateValueAtFunction*	interpolateValueAt,
+	Name													operatorName,
+	Index													fieldVariableCount,
+	FieldVariable**									fieldVariableList,
+	Dimension_Index									dim,
+	Bool													isCheckpointedAndReloaded,
+	MPI_Comm												communicator,
+	FieldVariable_Register*							fieldVariable_Register ) 
 {
+	OperatorFieldVariable* self = _OperatorFieldVariable_DefaultNew( name );
 
-		return _OperatorFieldVariable_New( 
-			sizeof(OperatorFieldVariable), 
-			OperatorFieldVariable_Type, 
-			_FieldVariable_Delete, 
-			_OperatorFieldVariable_Print,
-			_OperatorFieldVariable_Copy, 
-			(Stg_Component_DefaultConstructorFunction*)_OperatorFieldVariable_DefaultNew,
-			_OperatorFieldVariable_AssignFromXML,
-			_OperatorFieldVariable_Build, 
-			_OperatorFieldVariable_Initialise, 
-			_OperatorFieldVariable_Execute,
-			_OperatorFieldVariable_Destroy,
-			name, 
-			True,
-			_OperatorFieldVariable_GetMinLocalFieldMagnitude,
-			_OperatorFieldVariable_GetMaxLocalFieldMagnitude, 
-			_OperatorFieldVariable_GetMinAndMaxLocalCoords,
-			_OperatorFieldVariable_GetMinAndMaxGlobalCoords,
-			interpolateValueAt,
-			operatorName,
-			fieldVariableCount,
-			fieldVariableList,
-			dim,
-			isCheckpointedAndReloaded,
-			communicator,
-			fV_Register );
-}
+	self->isConstructed = True;
+	_FieldVariable_Init( self, context, fieldVariableCount, dim, isCheckpointedAndReloaded, communicator, fieldVariable_Register );
+	_OperatorFieldVariable_Init( self, operatorName, fieldVariableCount, fieldVariableList  );
 
-OperatorFieldVariable* _OperatorFieldVariable_New(
- 		SizeT                                              _sizeOfSelf, 
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print, 
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Name                                               name,
-		Bool												initFlag,
-		FieldVariable_GetValueFunction*	                   _getMinGlobalFieldMagnitude,
-		FieldVariable_GetValueFunction*                    _getMaxGlobalFieldMagnitude,
-		FieldVariable_GetCoordFunction*                    _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                    _getMinAndMaxGlobalCoords,
-		FieldVariable_InterpolateValueAtFunction*          interpolateValueAt,
-		Name                                               operatorName,
-		Index                                              fieldVariableCount,
-		FieldVariable**                                    fieldVariableList,
-		Dimension_Index                                    dim,
-		Bool                                               isCheckpointedAndReloaded,
-		MPI_Comm                                           communicator,
-		FieldVariable_Register*                            fV_Register )
-{
-	OperatorFieldVariable*		self;
-	
-	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(OperatorFieldVariable) );
-	self = (OperatorFieldVariable*) _FieldVariable_New( 
-			_sizeOfSelf, 
-			type, 
-			_delete,
-			_print, 
-			_copy,
-			_defaultConstructor,
-			_construct,	
-			_build, 
-			_initialise, 
-			_execute,
-			_destroy,
-			name, 
-			initFlag,
-			interpolateValueAt,
-			_getMinGlobalFieldMagnitude,
-			_getMaxGlobalFieldMagnitude,
-			_getMinAndMaxLocalCoords,
-			_getMinAndMaxGlobalCoords,
-			0, /* field component count - this will be reset later */
-			dim,
-			False, /* Setting this to false as I don't think we want to checkpoint operators*/
-			communicator,
-			fV_Register );
-
-	if( initFlag ){
-		_OperatorFieldVariable_Init( self, operatorName, fieldVariableCount, fieldVariableList  );
-	}
-	
 	return self;
 }
 
+OperatorFieldVariable* _OperatorFieldVariable_DefaultNew( Name name ) {
+	return _OperatorFieldVariable_New( 
+		sizeof(OperatorFieldVariable), 
+		OperatorFieldVariable_Type, 
+		_FieldVariable_Delete, 
+		_OperatorFieldVariable_Print,
+		_OperatorFieldVariable_Copy, 
+		(Stg_Component_DefaultConstructorFunction*)_OperatorFieldVariable_DefaultNew,
+		_OperatorFieldVariable_AssignFromXML,
+		_OperatorFieldVariable_Build, 
+		_OperatorFieldVariable_Initialise, 
+		_OperatorFieldVariable_Execute,
+		_OperatorFieldVariable_Destroy,
+		name,
+		NON_GLOBAL, 
+		_OperatorFieldVariable_InterpolateValueAt,
+		_OperatorFieldVariable_GetMinLocalFieldMagnitude,
+		_OperatorFieldVariable_GetMaxLocalFieldMagnitude, 
+		_OperatorFieldVariable_GetMinAndMaxLocalCoords,
+		_OperatorFieldVariable_GetMinAndMaxGlobalCoords, 
+		0,
+		0,
+		False, /* Setting default to false, as do not want to checkpoint OperatorFeVariables */
+		MPI_COMM_WORLD,
+		NULL,
+		NULL,
+		NULL);
+}
+
+OperatorFieldVariable* _OperatorFieldVariable_New( OPERATORFIELDVARIABLE_DEFARGS ) {
+	OperatorFieldVariable* self;
+	
+	/* Allocate memory */
+	assert( sizeOfSelf >= sizeof(OperatorFieldVariable) );
+	self = (OperatorFieldVariable*) _FieldVariable_New( FIELDVARIABLE_PASSARGS );
+
+	return self;
+} 
+
 void _OperatorFieldVariable_Delete( void* _fieldVariable ) {
 	OperatorFieldVariable* self = (OperatorFieldVariable*) _fieldVariable;
-
-	Memory_Free( self->fieldVariableList );
 
 	_FieldVariable_Delete( self );
 }
@@ -248,8 +166,6 @@ void _OperatorFieldVariable_Init( void* ofv, Name operatorName, Index fieldVaria
 	FieldVariable*              fieldVariable;
 	Index                       fieldVariable_I;
 	Stream*                     errorStream       = Journal_Register( Error_Type, self->type );
-
-	self->isConstructed = True;
 
 	/* Create operator */
 	self->_operator = Operator_NewFromName( operatorName, fieldVariableList[0]->fieldComponentCount, self->dim );
@@ -293,10 +209,10 @@ void* _OperatorFieldVariable_Copy( void* fieldVariable, void* dest, Bool deep, N
 }
 
 void _OperatorFieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) {
-	OperatorFieldVariable*     self       = (OperatorFieldVariable*) fieldVariable;
-	Index                      fieldVariableCount = 0;
-	Name                       operatorName;
-	FieldVariable**            fieldVariableList;
+	OperatorFieldVariable*	self = (OperatorFieldVariable*) fieldVariable;
+	Index							fieldVariableCount = 0;
+	Name							operatorName;
+	FieldVariable**			fieldVariableList;
 	
 	/* Construct Parent */
 	_FieldVariable_AssignFromXML( self, cf, data );
@@ -328,7 +244,13 @@ void _OperatorFieldVariable_Build( void* fieldVariable, void* data ) {
 
 void _OperatorFieldVariable_Execute( void* fieldVariable, void* data ) {}
 
-void _OperatorFieldVariable_Destroy( void* fieldVariable, void* data ) {}
+void _OperatorFieldVariable_Destroy( void* fieldVariable, void* data ) {
+	OperatorFieldVariable* self = (OperatorFieldVariable*) fieldVariable;
+
+	Memory_Free( self->fieldVariableList );
+	
+	_FieldVariable_Destroy( self, data );
+}
 
 void _OperatorFieldVariable_Initialise( void* fieldVariable, void* data ) {
 	OperatorFieldVariable* self = (OperatorFieldVariable*) fieldVariable;
@@ -340,6 +262,7 @@ void _OperatorFieldVariable_Initialise( void* fieldVariable, void* data ) {
 
 /* TODO - Think of something clever for these */
 double _OperatorFieldVariable_GetMinLocalFieldMagnitude( void* fieldVariable ) { return 0.0; }
+
 double _OperatorFieldVariable_GetMaxLocalFieldMagnitude( void* fieldVariable ) { return 0.0; }
 
 void  _OperatorFieldVariable_GetMinAndMaxLocalCoords( void* fieldVariable, Coord min, Coord max ) {

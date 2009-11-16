@@ -58,7 +58,7 @@ DomainContext* DomainContext_New(
 	DomainContext* self = _DomainContext_DefaultNew( name );
 
 	self->isConstructed = True;
-	_AbstractContext_Init( self );
+	_AbstractContext_Init( (AbstractContext*) self );
 	_DomainContext_Init( self );
 
 	return self;

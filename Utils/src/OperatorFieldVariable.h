@@ -70,93 +70,90 @@
 		__FieldVariable \
 		\
 		/* Virtual info */ \
-		Operator*                                                   _operator;           \
-		Index                                                       fieldVariableCount;  \
-		FieldVariable**                                             fieldVariableList;   \
+		Operator*			_operator; \
+		Index					fieldVariableCount; \
+		FieldVariable**	fieldVariableList; \
 
+	struct OperatorFieldVariable { __OperatorFieldVariable };
+	
+	#define OPERATORFIELDVARIABLE_DEFARGS \
+		FIELDVARIABLE_DEFARGS, \
+			Name					operatorName, \
+			FieldVariable**	fieldVariableList
 
-	struct OperatorFieldVariable { __OperatorFieldVariable };	
+	#define OPERATORFIELDVARIABLE_PASSARGS \
+		FIELDVARIABLE_PASSARGS, \
+			operatorName, \
+			fieldVariableList
 
 	/** Shortcut constructors */
 	OperatorFieldVariable* OperatorFieldVariable_NewUnary(
-		Name                                               name,
-		void*                                              _fieldVariable,
-		Name                                               operatorName );
+		Name				name,
+		DomainContext*	context,
+		void*				_fieldVariable,
+		Name				operatorName );
 
 	OperatorFieldVariable* OperatorFieldVariable_NewBinary(
-		Name                                               name,
-		void*                                              _fieldVariable1,
-		void*                                              _fieldVariable2,
-		Name                                               operatorName );
+		Name				name,
+		DomainContext*	context,
+		void*				_fieldVariable1,
+		void*				_fieldVariable2,
+		Name				operatorName );
 	
 	/* Public Constructor */
 	OperatorFieldVariable* _OperatorFieldVariable_DefaultNew();
 
 	OperatorFieldVariable* OperatorFieldVariable_New( 
-		Name                                               name,
-		FieldVariable_InterpolateValueAtFunction*          interpolateValueAt,
-		Name                                               operatorName,
-		Index                                              fieldVariableCount,
-		FieldVariable**                                    fieldVariableList,
-		Dimension_Index                                    dim,
-		Bool                                               isCheckpointedAndReloaded,
-		MPI_Comm                                           communicator,
-		FieldVariable_Register*                            fV_Register ) ;
+		Name													name,
+		DomainContext*										context,
+		FieldVariable_InterpolateValueAtFunction*	interpolateValueAt,
+		Name													operatorName,
+		Index													fieldVariableCount,
+		FieldVariable**									fieldVariableList,
+		Dimension_Index									dim,
+		Bool													isCheckpointedAndReloaded,
+		MPI_Comm												communicator,
+		FieldVariable_Register*							fieldVariable_Register ) ;
 
 	/** Private Constructor */
-	OperatorFieldVariable* _OperatorFieldVariable_New(
-			SizeT                                              _sizeOfSelf, 
-			Type                                               type,
-			Stg_Class_DeleteFunction*                          _delete,
-			Stg_Class_PrintFunction*                           _print, 
-			Stg_Class_CopyFunction*                            _copy, 
-			Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-			Stg_Component_ConstructFunction*                   _construct,
-			Stg_Component_BuildFunction*                       _build,
-			Stg_Component_InitialiseFunction*                  _initialise,
-			Stg_Component_ExecuteFunction*                     _execute,
-			Stg_Component_DestroyFunction*                     _destroy,
-			Name                                               name,
-			Bool												initFlag,
-			FieldVariable_GetValueFunction*	                   _getMinGlobalFieldMagnitude,
-			FieldVariable_GetValueFunction*                    _getMaxGlobalFieldMagnitude,
-			FieldVariable_GetCoordFunction*                    _getMinAndMaxLocalCoords,
-			FieldVariable_GetCoordFunction*                    _getMinAndMaxGlobalCoords,
-			FieldVariable_InterpolateValueAtFunction*          interpolateValueAt,
-			Name                                               operatorName,
-			Index                                              fieldVariableCount,
-			FieldVariable**                                    fieldVariableList,
-			Dimension_Index                                    dim,
-			Bool                                               isCheckpointedAndReloaded,
-			MPI_Comm                                           communicator,
-			FieldVariable_Register*                            fV_Register );
+	OperatorFieldVariable* _OperatorFieldVariable_New( OPERATORFIELDVARIABLE_DEFARGS );
 
 	void _OperatorFieldVariable_Init( void* fieldVariable, Name operatorName, Index fieldVariableCount, FieldVariable** fieldVariableList ) ;
 
 	void _OperatorFieldVariable_Delete( void* variable ) ;
+
 	void _OperatorFieldVariable_Print( void* _fieldVariable, Stream* stream ) ;
 
-
 	void* _OperatorFieldVariable_Copy( void* fieldVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
+
 	void _OperatorFieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) ;
+
 	void _OperatorFieldVariable_Build( void* fieldVariable, void* data ) ;
+
 	void _OperatorFieldVariable_Execute( void* variable, void* data ) ;
+
 	void _OperatorFieldVariable_Destroy( void* variable, void* data ) ;
+
 	void _OperatorFieldVariable_Initialise( void* variable, void* data ) ;
 
 	InterpolationResult _OperatorFieldVariable_InterpolateValueAt( void* fieldVariable, Coord coord, double* value ) ;
 
 	double _OperatorFieldVariable_GetMinLocalFieldMagnitude( void* fieldVariable ) ;
+
 	double _OperatorFieldVariable_GetMaxLocalFieldMagnitude( void* fieldVariable ) ;
+
 	void  _OperatorFieldVariable_GetMinAndMaxLocalCoords( void* fieldVariable, Coord min, Coord max ) ;
+
 	void  _OperatorFieldVariable_GetMinAndMaxGlobalCoords( void* fieldVariable, Coord min, Coord max ) ;
 
 	InterpolationResult _OperatorFieldVariable_InterpolateValueAt( void* fieldVariable, Coord coord, double* value ) ;
 	
 	InterpolationResult OperatorFieldVariable_UnaryInterpolationFunc( void* fieldVariable, Coord coord, double* value ) ;
+
 	InterpolationResult OperatorFieldVariable_BinaryInterpolationFunc( void* fieldVariable, Coord coord, double* value ) ;
 
 	void OperatorFieldVariable_UnaryOperator( void* fieldVariable, double* fieldValue0, double* value ) ;
+
 	void OperatorFieldVariable_BinaryOperator( void* fieldVariable, double* fieldValue0, double* fieldValue1, double* value ) ;
 
 #endif /* __Domain_Utils_OperatorFieldVariable_h__ */

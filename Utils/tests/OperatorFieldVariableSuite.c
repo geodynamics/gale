@@ -97,30 +97,7 @@ void OperatorFieldVariableSuite_Teardown( OperatorFieldVariableSuiteData* data )
 }
 
 FieldVariable* OperatorFieldVariableSuite_GenerateVelocityField( OperatorFieldVariableSuiteData* data, FieldVariable_Register* fV_Register ) {
-	return _FieldVariable_New(
-		sizeof(FieldVariable),
-		FieldVariable_Type,
-  		_FieldVariable_Delete,
-		_FieldVariable_Print,
-		_FieldVariable_Copy,
-		(Stg_Component_DefaultConstructorFunction*)_FieldVariable_DefaultNew,
-		_FieldVariable_AssignFromXML,
-		_FieldVariable_Build,
-		_FieldVariable_Initialise,
-		_FieldVariable_Execute,
-		_FieldVariable_Destroy,
-		"Velocity",
-		NON_GLOBAL,
-		OperatorFieldVariableSuite_dummyInterpolateValueAt,
-		OperatorFieldVariableSuite_dummyGetMinGlobalValue,
-		OperatorFieldVariableSuite_dummyGetMaxGlobalValue,
-		OperatorFieldVariableSuite_dummyGetMinAndMaxLocalCoords,
-		OperatorFieldVariableSuite_dummyGetMinAndMaxGlobalCoords,
-		3,
-		3,
-		False,
-     	data->comm,
-		fV_Register );
+	return FieldVariable_New( "Velocity", NULL, 3, 3, False, data->comm, fV_Register );
 }
 
 void OperatorFieldVariableSuite_TestVelocitySquared2D( OperatorFieldVariableSuiteData* data ) {
@@ -140,8 +117,13 @@ void OperatorFieldVariableSuite_TestVelocitySquared2D( OperatorFieldVariableSuit
 	if( data->rank == procToWatch ) {
 		fV_Register = FieldVariable_Register_New();
 		velocityField = OperatorFieldVariableSuite_GenerateVelocityField( data, fV_Register );
+		velocityField->_interpolateValueAt = OperatorFieldVariableSuite_dummyInterpolateValueAt;
+		velocityField->_getMinGlobalFieldMagnitude = OperatorFieldVariableSuite_dummyGetMinGlobalValue;
+		velocityField->_getMaxGlobalFieldMagnitude = OperatorFieldVariableSuite_dummyGetMaxGlobalValue;
+		velocityField->_getMinAndMaxLocalCoords = OperatorFieldVariableSuite_dummyGetMinAndMaxLocalCoords;
+		velocityField->_getMinAndMaxGlobalCoords = OperatorFieldVariableSuite_dummyGetMinAndMaxGlobalCoords;		
 
-		velSquared2D = OperatorFieldVariable_NewUnary( "VelocitySquaredField2D", velocityField, "VectorSquare" );
+		velSquared2D = OperatorFieldVariable_NewUnary( "VelocitySquaredField2D", NULL, velocityField, "VectorSquare" );
  		velSquared2D->_operator->operandDofs = 2;
 
 		Journal_Printf( data->stream , "===Testing Velocity Squared 2D===\n" );
@@ -203,8 +185,13 @@ void OperatorFieldVariableSuite_TestVelocitySquared3D( OperatorFieldVariableSuit
 	if( data->rank == procToWatch ) {
 		fV_Register = FieldVariable_Register_New();
 		velocityField = OperatorFieldVariableSuite_GenerateVelocityField( data, fV_Register );
+		velocityField->_interpolateValueAt = OperatorFieldVariableSuite_dummyInterpolateValueAt;
+		velocityField->_getMinGlobalFieldMagnitude = OperatorFieldVariableSuite_dummyGetMinGlobalValue;
+		velocityField->_getMaxGlobalFieldMagnitude = OperatorFieldVariableSuite_dummyGetMaxGlobalValue;
+		velocityField->_getMinAndMaxLocalCoords = OperatorFieldVariableSuite_dummyGetMinAndMaxLocalCoords;
+		velocityField->_getMinAndMaxGlobalCoords = OperatorFieldVariableSuite_dummyGetMinAndMaxGlobalCoords;		
 
-		velSquared3D = OperatorFieldVariable_NewUnary( "VelocitySquaredField3D", velocityField, "VectorSquare" );
+		velSquared3D = OperatorFieldVariable_NewUnary( "VelocitySquaredField3D", NULL, velocityField, "VectorSquare" );
 
 		Journal_Printf( data->stream , "===Testing Velocity Squared 3D===\n" );
 
@@ -242,8 +229,13 @@ void OperatorFieldVariableSuite_TestVelocityMagnitude2D( OperatorFieldVariableSu
 	if( data->rank == procToWatch ) {
 		fV_Register = FieldVariable_Register_New();
 		velocityField = OperatorFieldVariableSuite_GenerateVelocityField( data, fV_Register );
+		velocityField->_interpolateValueAt = OperatorFieldVariableSuite_dummyInterpolateValueAt;
+		velocityField->_getMinGlobalFieldMagnitude = OperatorFieldVariableSuite_dummyGetMinGlobalValue;
+		velocityField->_getMaxGlobalFieldMagnitude = OperatorFieldVariableSuite_dummyGetMaxGlobalValue;
+		velocityField->_getMinAndMaxLocalCoords = OperatorFieldVariableSuite_dummyGetMinAndMaxLocalCoords;
+		velocityField->_getMinAndMaxGlobalCoords = OperatorFieldVariableSuite_dummyGetMinAndMaxGlobalCoords;		
 
-		velMag2D = OperatorFieldVariable_NewUnary( "VelocityMagnitudeField2D", velocityField, "Magnitude" );
+		velMag2D = OperatorFieldVariable_NewUnary( "VelocityMagnitudeField2D", NULL, velocityField, "Magnitude" );
 		velMag2D->_operator->operandDofs = 2;
 
 		Journal_Printf( data->stream , "===Testing Velocity Magnitude 2D===\n" );
@@ -282,8 +274,13 @@ void OperatorFieldVariableSuite_TestVelocityMagnitude3D( OperatorFieldVariableSu
 	if( data->rank == procToWatch ) {
 		fV_Register = FieldVariable_Register_New();
 		velocityField = OperatorFieldVariableSuite_GenerateVelocityField( data, fV_Register );
+		velocityField->_interpolateValueAt = OperatorFieldVariableSuite_dummyInterpolateValueAt;
+		velocityField->_getMinGlobalFieldMagnitude = OperatorFieldVariableSuite_dummyGetMinGlobalValue;
+		velocityField->_getMaxGlobalFieldMagnitude = OperatorFieldVariableSuite_dummyGetMaxGlobalValue;
+		velocityField->_getMinAndMaxLocalCoords = OperatorFieldVariableSuite_dummyGetMinAndMaxLocalCoords;
+		velocityField->_getMinAndMaxGlobalCoords = OperatorFieldVariableSuite_dummyGetMinAndMaxGlobalCoords;		
 		
-		velMag3D = OperatorFieldVariable_NewUnary( "VelocityMagnitudeField3D", velocityField, "Magnitude" );
+		velMag3D = OperatorFieldVariable_NewUnary( "VelocityMagnitudeField3D", NULL, velocityField, "Magnitude" );
 
 		Journal_Printf( data->stream , "===Testing Velocity Magnitude 3D===\n" );
 

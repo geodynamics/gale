@@ -45,112 +45,58 @@
 
 const Type FieldVariable_Type = "FieldVariable";
 
-const char* InterpolationResultToStringMap[4] = {
-	"OTHER_PROC",
-	"LOCAL",
-	"SHADOW",
-	"OUTSIDE_GLOBAL"
-	};
-
-FieldVariable* _FieldVariable_DefaultNew( Name name )
-{
-		return _FieldVariable_New( 
-			sizeof(FieldVariable), 
-			FieldVariable_Type, 
-			_FieldVariable_Delete, 
-			_FieldVariable_Print,
-			_FieldVariable_Copy, 
-			(Stg_Component_DefaultConstructorFunction*)_FieldVariable_DefaultNew,
-			_FieldVariable_AssignFromXML,
-			_FieldVariable_Build, 
-			_FieldVariable_Initialise, 
-			_FieldVariable_Execute, 
-			_FieldVariable_Destroy, 
-			name,
-			False,
-			NULL, 
-			NULL,
-			NULL, 
-			NULL,
-			NULL, 
-			0,
-			0,
-			False,
-			MPI_COMM_WORLD,
-			NULL);
-}
+const char* InterpolationResultToStringMap[4] = { "OTHER_PROC", "LOCAL", "SHADOW", "OUTSIDE_GLOBAL" };
 
 FieldVariable* FieldVariable_New(		
-		Name                                               name,
-		FieldVariable_InterpolateValueAtFunction*          _interpolateValueAt,
-		FieldVariable_GetValueFunction*                    _getMinGlobalFieldMagnitude,
-		FieldVariable_GetValueFunction*                    _getMaxGlobalFieldMagnitude,		
-		FieldVariable_GetCoordFunction*                    _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                    _getMinAndMaxGlobalCoords,
-		Index                                              fieldComponentCount,
-		Dimension_Index                                    dim,
-		Bool                                               isCheckpointedAndReloaded,
-		MPI_Comm                                           communicator,
-		FieldVariable_Register*                            fieldVariable_Register ) 
+	Name													name,
+	DomainContext*										context,
+	Index													fieldComponentCount,
+	Dimension_Index									dim,
+	Bool													isCheckpointedAndReloaded,
+	MPI_Comm												communicator,
+	FieldVariable_Register*							fieldVariable_Register ) 
 {
-	return _FieldVariable_New(
-			sizeof(FieldVariable),
-			FieldVariable_Type,
-			_FieldVariable_Delete,
-			_FieldVariable_Print,
-			_FieldVariable_Copy, 
-			(Stg_Component_DefaultConstructorFunction*)_FieldVariable_DefaultNew,
-			_FieldVariable_AssignFromXML,
-			_FieldVariable_Build, 
-			_FieldVariable_Initialise, 
-			_FieldVariable_Execute, 
-			_FieldVariable_Destroy,
-			name,
-			True,
-			_interpolateValueAt,
-			_getMinGlobalFieldMagnitude,
-			_getMaxGlobalFieldMagnitude,		
-			_getMinAndMaxLocalCoords,
-			_getMinAndMaxGlobalCoords,
-			fieldComponentCount,
-			dim,
-			isCheckpointedAndReloaded,
-			communicator,
-			fieldVariable_Register );
+	FieldVariable* self = _FieldVariable_DefaultNew( name );
+
+	self->isConstructed = True;
+	_FieldVariable_Init( self, context, fieldComponentCount, dim, isCheckpointedAndReloaded, communicator, fieldVariable_Register );
+
+	return self;
 }
 
-FieldVariable* _FieldVariable_New(
- 		SizeT                                       _sizeOfSelf, 
-		Type                                        type,
-		Stg_Class_DeleteFunction*                   _delete,
-		Stg_Class_PrintFunction*                    _print, 
-		Stg_Class_CopyFunction*	                    _copy, 
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*            _construct,
-		Stg_Component_BuildFunction*                _build,
-		Stg_Component_InitialiseFunction*           _initialise,
-		Stg_Component_ExecuteFunction*              _execute,
-		Stg_Component_ExecuteFunction*              _destroy,
-		Name                                        name,
-		Bool                                        initFlag,
-		FieldVariable_InterpolateValueAtFunction*   _interpolateValueAt,
-		FieldVariable_GetValueFunction*             _getMinGlobalFieldMagnitude,
-		FieldVariable_GetValueFunction*             _getMaxGlobalFieldMagnitude,		
-		FieldVariable_GetCoordFunction*             _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*             _getMinAndMaxGlobalCoords,
-		Index                                       fieldComponentCount,
-		Dimension_Index                             dim,
-		Bool                                        isCheckpointedAndReloaded,
-		MPI_Comm                                    communicator,
-		FieldVariable_Register*                     fieldVariable_Register )		
-{
-	FieldVariable*		self;
+FieldVariable* _FieldVariable_DefaultNew( Name name ) {
+	return _FieldVariable_New( 
+		sizeof(FieldVariable), 
+		FieldVariable_Type, 
+		_FieldVariable_Delete, 
+		_FieldVariable_Print,
+		_FieldVariable_Copy, 
+		(Stg_Component_DefaultConstructorFunction*)_FieldVariable_DefaultNew,
+		_FieldVariable_AssignFromXML,
+		_FieldVariable_Build, 
+		_FieldVariable_Initialise, 
+		_FieldVariable_Execute, 
+		_FieldVariable_Destroy, 
+		name,
+		NON_GLOBAL,
+		NULL, 
+		NULL,
+		NULL, 
+		NULL,
+		NULL, 
+		0,
+		0,
+		False,
+		MPI_COMM_WORLD,
+		NULL);
+}
+
+FieldVariable* _FieldVariable_New( FIELDVARIABLE_DEFARGS ) {
+	FieldVariable* self;
 	
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(FieldVariable) );
-	self = (FieldVariable*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy,
-		_defaultConstructor, _construct, _build, _initialise, _execute, _destroy,
-		name, NON_GLOBAL );
+	assert( sizeOfSelf >= sizeof(FieldVariable) );
+	self = (FieldVariable*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
 	
 	/* Virtual functions */
 	self->_interpolateValueAt         = _interpolateValueAt;
@@ -160,11 +106,8 @@ FieldVariable* _FieldVariable_New(
 	self->_getMinAndMaxGlobalCoords   = _getMinAndMaxGlobalCoords;
 
 	/* General info */
+
 	/* FieldVariable info */
-	if( initFlag ){
-		_FieldVariable_Init( self, fieldComponentCount, dim, isCheckpointedAndReloaded, 
-			communicator, fieldVariable_Register );
-	}
 	
 	return self;
 }
@@ -172,9 +115,6 @@ FieldVariable* _FieldVariable_New(
 void _FieldVariable_Delete( void* fieldVariable ) {
 	FieldVariable* self = (FieldVariable*) fieldVariable;
 
-	if( self->extensionMgr ) {
-		Stg_Class_Delete( self->extensionMgr );
-	}
 	_Stg_Component_Delete( self );
 }
 
@@ -206,20 +146,22 @@ void _FieldVariable_Print( void* _fieldVariable, Stream* stream ) {
 }
 
 void _FieldVariable_Init( 
-		FieldVariable*                                     self, 
-		Index                                              fieldComponentCount, 
-		Dimension_Index                                    dim,
-		Bool                                               isCheckpointedAndReloaded,
-		MPI_Comm                                           communicator, 
-		FieldVariable_Register*                            fV_Register ) {
+	FieldVariable*				self, 
+	DomainContext*				context,
+	Index							fieldComponentCount, 
+	Dimension_Index			dim,
+	Bool							isCheckpointedAndReloaded,
+	MPI_Comm						communicator, 
+	FieldVariable_Register*	fV_Register ) {
 	/* Add ourselves to the register for later retrieval by clients */
-	self->isConstructed = True;
+	
+	self->context							= context;
+	self->fieldComponentCount			= fieldComponentCount;
+	self->dim								= dim;
+	self->communicator					= communicator;
+	self->fieldVariable_Register		= fV_Register;
+	self->isCheckpointedAndReloaded	= isCheckpointedAndReloaded;
 
-	self->fieldComponentCount         = fieldComponentCount;
-	self->dim                         = dim;
-	self->communicator                = communicator;
-	self->fieldVariable_Register      = fV_Register;
-	self->isCheckpointedAndReloaded   = isCheckpointedAndReloaded;
 	if (self != NULL && fV_Register != NULL) {	
 	   /* Prevent the same field from being added more than once */
 	   if( NamedObject_Register_GetIndex( fV_Register, self->name ) == -1 )
@@ -228,7 +170,6 @@ void _FieldVariable_Init(
 
 	self->extensionMgr = ExtensionManager_New_OfExistingObject( self->name, self );
 }
-
 
 void* _FieldVariable_Copy( void* fieldVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	FieldVariable*	self = (FieldVariable*)fieldVariable;
@@ -269,12 +210,13 @@ void _FieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf
 	Index                   fieldComponentCount;
 	Bool                    isCheckpointedAndReloaded;
 	Dictionary_Entry_Value* feVarsList = NULL;
+	DomainContext*				context;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 	
-	fV_Register = self->context->fieldVariable_Register; 
+	fV_Register = context->fieldVariable_Register; 
 	assert( fV_Register );
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
@@ -335,9 +277,7 @@ void _FieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf
       }
    }
 
-	
-	_FieldVariable_Init( self, fieldComponentCount, dim, isCheckpointedAndReloaded, 
-		MPI_COMM_WORLD, fV_Register );
+	_FieldVariable_Init( self, context, fieldComponentCount, dim, isCheckpointedAndReloaded, MPI_COMM_WORLD, fV_Register );
 	
 }
 
@@ -354,7 +294,13 @@ void _FieldVariable_Execute( void* fieldVariable, void* data ) {
 }
 
 void _FieldVariable_Destroy( void* fieldVariable, void* data ) {
+	FieldVariable* self = (FieldVariable*) fieldVariable;
 
+	if( self->extensionMgr ) {
+		Stg_Class_Delete( self->extensionMgr );
+	}
+
+	Stg_Component_Destroy( self, data, False );
 }
 
 InterpolationResult FieldVariable_InterpolateValueAt( void* fieldVariable, Coord coord, double* value ) {

@@ -65,7 +65,7 @@ void FieldVariableRegisterSuite_Setup( FieldVariableRegisterSuiteData* data ) {
 }
 
 void FieldVariableRegisterSuite_Teardown( FieldVariableRegisterSuiteData* data ) {
-}
+} 
 
 void FieldVariableRegisterSuite_TestGetByIndex( FieldVariableRegisterSuiteData* data ) {
    int                     procToWatch;
@@ -82,35 +82,25 @@ void FieldVariableRegisterSuite_TestGetByIndex( FieldVariableRegisterSuiteData* 
       fV_Register = FieldVariable_Register_New();
 
       for( ii=0; ii < 3; ii++ ) {
-         testFVs[ii] = _FieldVariable_New( sizeof(FieldVariable),
-				FieldVariable_Type,
-				_Stg_Component_Delete,
-				_Stg_Component_Print,
-				NULL,
-				(Stg_Component_DefaultConstructorFunction*)_FieldVariable_DefaultNew,
-				_Variable_AssignFromXML,
-				_Variable_Build,
-				_Variable_Initialise,
-				_Variable_Execute,
-				_Variable_Destroy,
+			testFVs[ii] = FieldVariable_New(
 				fvNames[ii],
-				NON_GLOBAL,
-				FieldVariableRegisterSuite_dummyInterpolateValueAt,
-				FieldVariableRegisterSuite_dummyGetMinGlobalValue,
-				FieldVariableRegisterSuite_dummyGetMaxGlobalValue,
-				FieldVariableRegisterSuite_dummyGetMinAndMaxLocalCoords,
-				FieldVariableRegisterSuite_dummyGetMinAndMaxGlobalCoords,
-				0, 
+				NULL,
+				0,
 				3,
-    			False,
+				False,
 				data->comm,
 				fV_Register );
+			testFVs[ii]->_interpolateValueAt = FieldVariableRegisterSuite_dummyInterpolateValueAt;
+			testFVs[ii]->_getMinGlobalFieldMagnitude = FieldVariableRegisterSuite_dummyGetMinGlobalValue;
+			testFVs[ii]->_getMaxGlobalFieldMagnitude = FieldVariableRegisterSuite_dummyGetMaxGlobalValue;
+			testFVs[ii]->_getMinAndMaxLocalCoords = FieldVariableRegisterSuite_dummyGetMinAndMaxLocalCoords;
+			testFVs[ii]->_getMinAndMaxGlobalCoords = FieldVariableRegisterSuite_dummyGetMinAndMaxGlobalCoords;
+
       }
       for( ii=0; ii < 3; ii++ ) {
          fV_Index = FieldVariable_Register_GetIndex( fV_Register, fvNames[ii] );
          pcu_check_true( fV_Index == ii );
          pcu_check_streq( (FieldVariable_Register_GetByIndex( fV_Register, fV_Index ) )->name, fvNames[ii] );
-         pcu_check_streq( (FieldVariable_Register_GetByName( fV_Register, fvNames[ii] ) )->name, fvNames[ii] );
       }
       Stg_Class_Delete(fV_Register);
    }
@@ -131,33 +121,23 @@ void FieldVariableRegisterSuite_TestGetByName( FieldVariableRegisterSuiteData* d
       fV_Register = FieldVariable_Register_New();
 
       for( ii=0; ii < 3; ii++ ) {
-         testFVs[ii] = _FieldVariable_New( sizeof(FieldVariable),
-				FieldVariable_Type, _Stg_Component_Delete,
-				_Stg_Component_Print,
-				NULL,
-				(Stg_Component_DefaultConstructorFunction*)_FieldVariable_DefaultNew,
-				_Variable_AssignFromXML,
-				_Variable_Build,
-				_Variable_Initialise,
-				_Variable_Execute,
-				_Variable_Destroy,
+			testFVs[ii] = FieldVariable_New(
 				fvNames[ii],
-				NON_GLOBAL,
-				FieldVariableRegisterSuite_dummyInterpolateValueAt,
-				FieldVariableRegisterSuite_dummyGetMinGlobalValue,
-				FieldVariableRegisterSuite_dummyGetMaxGlobalValue,
-				FieldVariableRegisterSuite_dummyGetMinAndMaxLocalCoords,
-				FieldVariableRegisterSuite_dummyGetMinAndMaxGlobalCoords,
-				0, 
+				NULL,
+				0,
 				3,
 				False,
 				data->comm,
 				fV_Register );
+			testFVs[ii]->_interpolateValueAt = FieldVariableRegisterSuite_dummyInterpolateValueAt;
+			testFVs[ii]->_getMinGlobalFieldMagnitude = FieldVariableRegisterSuite_dummyGetMinGlobalValue;
+			testFVs[ii]->_getMaxGlobalFieldMagnitude = FieldVariableRegisterSuite_dummyGetMaxGlobalValue;
+			testFVs[ii]->_getMinAndMaxLocalCoords = FieldVariableRegisterSuite_dummyGetMinAndMaxLocalCoords;
+			testFVs[ii]->_getMinAndMaxGlobalCoords = FieldVariableRegisterSuite_dummyGetMinAndMaxGlobalCoords;
       }
       for( ii=0; ii < 3; ii++ ) {
          fV_Index = FieldVariable_Register_GetIndex( fV_Register, fvNames[ii] );
          pcu_check_true( fV_Index == ii );
-         pcu_check_streq( (FieldVariable_Register_GetByIndex( fV_Register, fV_Index ) )->name, fvNames[ii] );
          pcu_check_streq( (FieldVariable_Register_GetByName( fV_Register, fvNames[ii] ) )->name, fvNames[ii] );
       }
       Stg_Class_Delete(fV_Register);
