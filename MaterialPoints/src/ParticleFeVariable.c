@@ -134,6 +134,7 @@ void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm*
 	self->assemblyVectorName = Stg_Object_AppendSuffix( self, "assemblyVector" );
 	self->assemblyVector = ForceVector_New( 
 		self->assemblyVectorName,
+		(FiniteElementContext*) self->context,
 		(FeVariable*) self, 
 		self->dim, 
 		context->entryPoint_Register, 
@@ -143,6 +144,7 @@ void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm*
 	self->massMatrixName = Stg_Object_AppendSuffix( self, "massMatrix" );
 	self->massMatrix = ForceVector_New( 
 		self->massMatrixName,
+		(FiniteElementContext*) self->context,
 		(FeVariable*) self, 
 		self->dim, 
 		context->entryPoint_Register, 
