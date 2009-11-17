@@ -203,9 +203,6 @@ void _ViscosityField_Execute( void* viscosityField, void* data ) {
 void _ViscosityField_Destroy( void* viscosityField, void* data ) {
 	ViscosityField* self = (ViscosityField*) viscosityField;
 
-	Stg_Class_Delete( self->assemblyVector );
-	Memory_Free( self->assemblyVectorName );
-
 	_ParticleFeVariable_Destroy( self, data );
 }
 void _ViscosityField_ValueAtParticle( void* viscosityField, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, void* _particle, double* viscosity ) {
