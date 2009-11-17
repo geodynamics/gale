@@ -178,11 +178,11 @@ OperatorFeVariable* OperatorFeVariable_New(
 	MPI_Comm													communicator,
 	FieldVariable_Register*								fieldVariable_Register )
 {
-	FeVariable* self = _OperatorFeVariable_DefaultNew( name );
+	OperatorFeVariable* self = _OperatorFeVariable_DefaultNew( name );
 
 	self->isConstructed = True;
-	_FieldVariable_Init( self, context, feVariableCount, dim, isCheckpointedAndReloaded, communicator, fieldVariable_Register );                                                                                                          
-   _FeVariable_Init( self, feMesh, geometryMesh, dofLayout, bcs, ics, linkedDofInfo, templateFeVariable, False, False );
+	_FieldVariable_Init( (FieldVariable*)self, context, feVariableCount, dim, isCheckpointedAndReloaded, communicator, fieldVariable_Register );                                                                                                          
+   _FeVariable_Init( (FeVariable*)self, feMesh, geometryMesh, dofLayout, bcs, ics, linkedDofInfo, templateFeVariable, False, False );
 	_OperatorFeVariable_Init( self, operatorName, feVariableCount, feVariableList, ownOperator );
 
 	return self;
@@ -215,7 +215,7 @@ void* _OperatorFeVariable_DefaultNew( Name name ) {
 		NULL, /* fieldVariable_Register */
 		_OperatorFeVariable_InterpolateWithinElement, /*_interpolateWithinElement */
 		_OperatorFeVariable_GetValueAtNode, /* _getValueAtNode */
-		NULL, /* _syncShadowValues */
+		_OperatorFeVariable_SyncShadowValues, /* _syncShadowValues */
 		NULL, /* feMesh */
 		NULL, /* geometryMesh */
 		NULL, /* bcs */
