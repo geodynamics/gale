@@ -307,9 +307,6 @@ void _AdvectionDiffusionSLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, 
 void _AdvectionDiffusionSLE_Destroy( void* sle, void* data ) {
 	AdvectionDiffusionSLE* self = (AdvectionDiffusionSLE*) sle;
 
-	Stg_Class_Delete( self->massMatrix );
-	Stg_Class_Delete( self->residual );
-
 	Memory_Free( self->phiDotArray );
 
 	_SystemLinearEquations_Destroy( self, data );
@@ -383,8 +380,8 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 		self->phiDotField->context = self->context;
 
 		/* Construct Solution Vectors */
-		self->phiVector    = SolutionVector_New( phiVecName, self->phiField->communicator, self->phiField );
-		self->phiDotVector = SolutionVector_New( phiDotVecName, self->phiField->communicator, self->phiDotField );
+		self->phiVector    = SolutionVector_New( phiVecName, self->context, self->phiField->communicator, self->phiField );
+		self->phiDotVector = SolutionVector_New( phiDotVecName, self->context, self->phiField->communicator, self->phiDotField );
 
     /* free original name variables */
     Memory_Free(fieldName);

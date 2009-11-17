@@ -81,12 +81,13 @@
 			feVariable
 	
 	/* Creation implementation / Virtual constructor */
-	void* SolutionVector_DefaultNew( Name name );
+	void* _SolutionVector_DefaultNew( Name name );
 
 	SolutionVector* SolutionVector_New(
-		Name			name,
-		MPI_Comm		comm,
-		FeVariable*	feVariable );
+		Name							name,
+		FiniteElementContext*	context,
+		MPI_Comm						comm,
+		FeVariable*					feVariable );
 
 	SolutionVector* _SolutionVector_New( SOLUTIONVECTOR_DEFARGS );
 		
@@ -94,9 +95,10 @@
 
 	/* Initialise implementation */
 	void _SolutionVector_Init( 
-		SolutionVector*	self,
-		MPI_Comm				comm,
-		FeVariable*			feVariable );
+		SolutionVector*			self,
+		FiniteElementContext*	context,
+		MPI_Comm						comm,
+		FeVariable*					feVariable );
 	
 	/* Stg_Class_Delete a ElementType construst */
 	void _SolutionVector_Delete( void* solutionVector );

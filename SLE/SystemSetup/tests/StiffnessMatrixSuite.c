@@ -135,9 +135,8 @@ void StiffnessMatrixSuite_TestStiffnessMatrix( StiffnessMatrixSuiteData* data ) 
 
   /* create SiffnessMatrix, it requires a ForceVector */
   comm = Comm_GetMPIComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
-  vec = ForceVector_New( "testVector", feVar, 2, ep_reg, comm );
-  mat = StiffnessMatrix_New(
-      "testMatrix", feVar, feVar, vec, NULL, 2, False, False, ep_reg, comm);
+  vec = ForceVector_New( "testVector", NULL, feVar, 2, ep_reg, comm );
+  mat = StiffnessMatrix_New( "testMatrix", feVar, feVar, vec, NULL, 2, False, False, ep_reg, comm);
 
   /* build & initialise the mat, this should build and initialise the vec */
   Stg_Component_Build( mat, NULL, False );

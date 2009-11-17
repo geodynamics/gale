@@ -62,7 +62,7 @@ Bool StgFEM_SLE_SystemSetup_Init( int* argc, char** argv[] ) {
 	
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), FiniteElementContext_Type, "0", FiniteElementContext_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ForceVector_Type, "0", _ForceVector_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SolutionVector_Type, "0", SolutionVector_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SolutionVector_Type, "0", _SolutionVector_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), StiffnessMatrix_Type, "0", StiffnessMatrix_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), StiffnessMatrixTerm_Type, "0", _StiffnessMatrixTerm_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SystemLinearEquations_Type, "0", _SystemLinearEquations_DefaultNew );

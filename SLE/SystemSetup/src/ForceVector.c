@@ -69,16 +69,17 @@ const Type ForceVector_Type = "ForceVector";
 static const char	ForceVector_assembleForceVectorStr[] = "assembleForceVector";
 
 ForceVector* ForceVector_New(
-	Name					name,
-	FeVariable*			feVariable,
-	Dimension_Index	dim,
-	void*					entryPoint_Register,
-	MPI_Comm				comm )		
+	Name							name,
+	FiniteElementContext*	context,
+	FeVariable*					feVariable,
+	Dimension_Index			dim,
+	void*							entryPoint_Register,
+	MPI_Comm						comm )		
 {
 	ForceVector* self = _ForceVector_DefaultNew( name );
 
 	self->isConstructed = True;
-	_SolutionVector_Init( self, comm, feVariable ); 
+	_SolutionVector_Init( self, context, comm, feVariable ); 
 	_ForceVector_Init( self, dim, entryPoint_Register );
 
 	return self;
@@ -147,16 +148,9 @@ void _ForceVector_Delete( void* forceVector ) {
 	ForceVector* self = (ForceVector*)forceVector;
 	
 	Journal_DPrintf( self->debug, "In %s - for %s\n", __func__, self->name );
-	Memory_Free( self->_assembleForceVectorEPName );
-
-	/* Don't delete entry point: E.P register will delete it automatically */
-	Stg_Class_Delete( self->forceTermList );
-
-	NewClass_Delete( self->inc );
 
 	/* Stg_Class_Delete parent*/
 	_SolutionVector_Delete( self );
-	
 }
 
 void _ForceVector_Print( void* forceVector, Stream* stream ) {
@@ -231,8 +225,8 @@ void* _ForceVector_Copy( void* forceVector, void* dest, Bool deep, Name nameExt,
 
 
 void _ForceVector_AssignFromXML( void* forceVector, Stg_ComponentFactory* cf, void* data ) {
-	ForceVector*    self               = (ForceVector*)forceVector;
-	Dimension_Index dim                = 0;
+	ForceVector*    self = (ForceVector*)forceVector;
+	Dimension_Index dim = 0;
 	void*           entryPointRegister = NULL;
 
 	_SolutionVector_AssignFromXML( self, cf, data );
@@ -297,6 +291,16 @@ void _ForceVector_Execute( void* forceVector, void* data ) {
 }
 
 void _ForceVector_Destroy( void* forceVector, void* data ) {
+	ForceVector* self = (ForceVector*)forceVector;
+
+	Memory_Free( self->_assembleForceVectorEPName );
+
+	/* Don't delete entry point: E.P register will delete it automatically */
+	Stg_Class_Delete( self->forceTermList );
+
+	NewClass_Delete( self->inc );
+
+	_SolutionVector_Destroy( self, data );
 }
 
 void ForceVector_Assemble( void* forceVector ) {

@@ -61,34 +61,34 @@ static const int VALUE_TAG = 1;
 static const int VALUE_REQUEST_TAG = 2;
 
 typedef struct RequestInfo {
-	Node_LocalIndex		lNode_I;
-	Dof_Index		nodeLocalDof_I;
+	Node_LocalIndex	lNode_I;
+	Dof_Index			nodeLocalDof_I;
 } RequestInfo;
 
 void _SolutionVector_ShareValuesNotStoredLocally(
 	SolutionVector*		self,
-	Index*			reqFromOthersCounts,
-	RequestInfo**		reqFromOthersInfos,
+	Index*					reqFromOthersCounts,
+	RequestInfo**			reqFromOthersInfos,
 	Dof_EquationNumber**	reqFromOthers,
-	double*			localSolnVecValues );
+	double*					localSolnVecValues );
 
-
-SolutionVector* SolutionVector_New( Name name, MPI_Comm comm, FeVariable* feVariable ) {
-	SolutionVector* self = SolutionVector_DefaultNew( name );
+SolutionVector* SolutionVector_New( Name name, FiniteElementContext* context, MPI_Comm comm, FeVariable* feVariable ) {
+	SolutionVector* self = _SolutionVector_DefaultNew( name );
 
 	self->isConstructed = True;
-	_SolutionVector_Init( self, comm, feVariable );
+	_SolutionVector_Init( self, context, comm, feVariable );
 
 	return self;
 }
-void* SolutionVector_DefaultNew( Name name ) {
+
+void* _SolutionVector_DefaultNew( Name name ) {
 	return _SolutionVector_New( 
 		sizeof(SolutionVector), 
 		SolutionVector_Type, 
 		_SolutionVector_Delete,
 		_SolutionVector_Print, 
 		_SolutionVector_Copy,
-		SolutionVector_DefaultNew,
+		_SolutionVector_DefaultNew,
 		_SolutionVector_AssignFromXML,
 		_SolutionVector_Build, 
 		_SolutionVector_Initialise, 
@@ -99,7 +99,6 @@ void* SolutionVector_DefaultNew( Name name ) {
 		MPI_COMM_WORLD, 
 		NULL );
 }
-
 
 SolutionVector* _SolutionVector_New( SOLUTIONVECTOR_DEFARGS ) {
 	SolutionVector* self;
@@ -115,24 +114,21 @@ SolutionVector* _SolutionVector_New( SOLUTIONVECTOR_DEFARGS ) {
 	return self;
 }
 
-void _SolutionVector_Init( SolutionVector* self, MPI_Comm comm, FeVariable* feVariable ) {
+void _SolutionVector_Init( SolutionVector* self, FiniteElementContext* context, MPI_Comm comm, FeVariable* feVariable ) {
 	/* General and Virtual info should already be set */
 	
 	/* SolutionVector info */
+	self->context = context;
 	self->debug = Stream_RegisterChild( StgFEM_SLE_SystemSetup_Debug, self->type );
 	self->comm = comm;
 	self->feVariable = feVariable;
 }
-
 
 void _SolutionVector_Delete( void* solutionVector ) {
 	SolutionVector* self = (SolutionVector*)solutionVector;
 	
 	Journal_DPrintf( self->debug, "In %s - for soln. vector %s\n", __func__, self->name );
 	Stream_IndentBranch( StgFEM_Debug );
-	//FreeObject( self->vector );
-	if( self->vector != PETSC_NULL )
-		VecDestroy( self->vector );
 	
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
@@ -195,17 +191,17 @@ void* _SolutionVector_Copy( void* solutionVector, void* dest, Bool deep, Name na
 }
 
 
-void _SolutionVector_AssignFromXML( void* solutionVector, Stg_ComponentFactory* cf, void* data ) 
-{
-	SolutionVector*    self = (SolutionVector*)solutionVector;
-	FeVariable*        feVariable = NULL;
+void _SolutionVector_AssignFromXML( void* solutionVector, Stg_ComponentFactory* cf, void* data ) {
+	SolutionVector*			self = (SolutionVector*)solutionVector;
+	FeVariable*					feVariable = NULL;
+	FiniteElementContext*	context;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
 
 	feVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeVariable", FeVariable, True, data ) ;
-	_SolutionVector_Init( self, MPI_COMM_WORLD, (FeVariable*)feVariable );
+	_SolutionVector_Init( self, context, MPI_COMM_WORLD, (FeVariable*)feVariable );
 }
 
 
@@ -254,8 +250,12 @@ void _SolutionVector_Execute( void* solutionVector, void* data ) {
 }
 
 void _SolutionVector_Destroy( void* solutionVector, void* data ) {
-}
+	SolutionVector* self = (SolutionVector*)solutionVector;
 
+	//FreeObject( self->vector );
+	if( self->vector != PETSC_NULL )
+		VecDestroy( self->vector );
+}
 
 void SolutionVector_ApplyBCsToVariables( void* solutionVector, void* data ) {
 	SolutionVector*		self = (SolutionVector *)solutionVector;

@@ -135,7 +135,7 @@ void SolutionVectorSuite_TestSolutionVector( SolutionVectorSuiteData* data ) {
 
        feVar = SolutionVectorSuite_buildFeVar();
        FeVariable_SyncShadowValues( feVar );
-       sol = SolutionVector_New( "velocity", MPI_COMM_WORLD, feVar );
+       sol = SolutionVector_New( "velocity", NULL, MPI_COMM_WORLD, feVar );
         /* Check solution vector created */
         pcu_check_true(sol);
        Stg_Component_Build( sol, NULL, False );
