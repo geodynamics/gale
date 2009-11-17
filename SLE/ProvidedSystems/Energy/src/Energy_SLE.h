@@ -63,25 +63,25 @@
 		\
 		/* Energy_SLE info */ \
 		\
-		StiffnessMatrix*    stiffMat;    \
-		SolutionVector*     solutionVec; \
-		ForceVector*        fVector; 
+		StiffnessMatrix*	stiffMat; \
+		SolutionVector*	solutionVec; \
+		ForceVector*		fVector; 
 
 	struct Energy_SLE { __Energy_SLE };	
 
 	Energy_SLE* Energy_SLE_New( 		
-		Name                                                name,
-		SLE_Solver*                                         solver,
-		FiniteElementContext*                               context,
-		Bool                                                isNonLinear,
-		double                                              nonLinearTolerance,
-		Iteration_Index                                     nonLinearMaxIterations,
-		Bool                                                killNonConvergent,
-		EntryPoint_Register*                                entryPoint_Register,
-		MPI_Comm                                            comm,
-		StiffnessMatrix*                                    stiffMat,
-		SolutionVector*                                     solutionVec,
-		ForceVector*                                        fVector );
+		Name							name,
+		SLE_Solver*					solver,
+		FiniteElementContext*	context,
+		Bool							isNonLinear,
+		double						nonLinearTolerance,
+		Iteration_Index			nonLinearMaxIterations,
+		Bool							killNonConvergent,
+		EntryPoint_Register*		entryPoint_Register,
+		MPI_Comm						comm,
+		StiffnessMatrix*			stiffMat,
+		SolutionVector*			solutionVec,
+		ForceVector*				fVector );
 
 	/* Creation implementation / Virtual constructor */
 	Energy_SLE* _Energy_SLE_New(
@@ -104,29 +104,19 @@
 		Name                                                name );
 
 	void _Energy_SLE_Init( 
-		void*                                               sle,
-		StiffnessMatrix*                                    stiffMat,
-		SolutionVector*                                     solutionVec,
-		ForceVector*                                        fVector );
-	void Energy_SLE_InitAll(
-		void*                                               sle,
-		SLE_Solver*                                         solver,
-		FiniteElementContext*                               context,
-		Bool                                                isNonLinear,
-		double                                              nonLinearTolerance,
-		Iteration_Index                                     nonLinearMaxIterations,
-		Bool                                                killNonConvergent,
-		EntryPoint_Register*                                entryPoint_Register,
-		MPI_Comm                                            comm,
-		StiffnessMatrix*                                    stiffMat,
-		SolutionVector*                                     solutionVec,
-		ForceVector*                                        fVector ) ;
+		void*					sle,
+		StiffnessMatrix*	stiffMat,
+		SolutionVector*	solutionVec,
+		ForceVector*		fVector );
+
 	/** 'Class' Virtual Functions */
 	void _Energy_SLE_Delete( void* stokesSleSolver );
+
 	void _Energy_SLE_Print( void* stokesSleSolver, Stream* stream );
 
 	/* 'Stg_Component' Virtual Functions */
 	void* _Energy_SLE_DefaultNew( Name name );
+
 	void _Energy_SLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data );
 
 #endif

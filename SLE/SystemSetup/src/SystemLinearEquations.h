@@ -73,7 +73,6 @@
 	typedef int (SystemLinearEquations_BuildJFunc) ( SNES nls, Vec x, Mat* A, Mat* B, MatStructure* matStruct, void* context );	
 	typedef void (SystemLinearEquations_SetFFunc) ( Vec* F, void* context );
 	typedef void (SystemLinearEquations_ConfigureNonlinearSolver) ( void* nls, void* data );
-
 	typedef void (SLE_FormFunctionFunc)( void *someSLE, Vec X, Vec F, void *ctx );
 	
 	/*
@@ -83,84 +82,84 @@
 	#define __SystemLinearEquations \
 		/* General info */ \
 		__Stg_Component \
-		ExtensionManager*                                   extensionManager; \
+		ExtensionManager*												extensionManager; \
 		\
 		/* Virtual info */ \
-		SystemLinearEquations_LM_SetupFunction*             _LM_Setup;                 \
-		SystemLinearEquations_MatrixSetupFunction*          _matrixSetup;              \
-		SystemLinearEquations_VectorSetupFunction*          _vectorSetup;              \
-		SystemLinearEquations_UpdateSolutionOntoNodesFunc*  _updateSolutionOntoNodes;  \
-		SystemLinearEquations_MG_SelectStiffMatsFunc*       _mgSelectStiffMats;        \
+		SystemLinearEquations_LM_SetupFunction*				_LM_Setup; \
+		SystemLinearEquations_MatrixSetupFunction*			_matrixSetup; \
+		SystemLinearEquations_VectorSetupFunction*			_vectorSetup; \
+		SystemLinearEquations_UpdateSolutionOntoNodesFunc*	_updateSolutionOntoNodes; \
+		SystemLinearEquations_MG_SelectStiffMatsFunc*		_mgSelectStiffMats; \
 		\
 		/* SystemLinearEquations info */ \
-		Stream*                                             debug;                     \
-		Stream*                                             info;                      \
-		Stream*                                             convergenceStream;         \
-		Bool                                                makeConvergenceFile;       \
-		MPI_Comm                                            comm;                      \
-		StiffnessMatrixList*                                stiffnessMatrices;         \
-		ForceVectorList*                                    forceVectors;              \
-		SolutionVectorList*                                 solutionVectors;           \
-		SLE_Solver*	                                    solver;                    \
-		FiniteElementContext*                               context;                   \
-		Name                                                executeEPName;             \
-		EntryPoint*                                         executeEP;                 \
-		Name                                                integrationSetupEPName;    \
-		EntryPoint*                                         integrationSetupEP;        \
-		EntryPoint_Register*                                entryPoint_Register;       \
+		Stream*															debug; \
+		Stream*															info; \
+		Stream*															convergenceStream; \
+		Bool																makeConvergenceFile; \
+		MPI_Comm															comm; \
+		StiffnessMatrixList*											stiffnessMatrices; \
+		ForceVectorList*												forceVectors; \
+		SolutionVectorList*											solutionVectors; \
+		SLE_Solver*														solver; \
+		FiniteElementContext*										context; \
+		Name																executeEPName; \
+		EntryPoint*														executeEP; \
+		Name																integrationSetupEPName; \
+		EntryPoint*														integrationSetupEP; \
+		EntryPoint_Register*											entryPoint_Register; \
 		\
-		Bool                                                bcRemoveQuery;             \
+		Bool																bcRemoveQuery; \
 		\
 		/* Non-linear info */ \
-		Bool                                                isNonLinear;               \
-		Stg_Component_ExecuteFunction*                      linearExecute;             \
-		double                                              nonLinearTolerance;        \
-		Iteration_Index                                     nonLinearMaxIterations;    \
-		Iteration_Index                                     nonLinearIteration_I;      \
-		Bool                                                killNonConvergent;         \
-		Iteration_Index                                     nonLinearMinIterations;    \
-		double			                            curResidual;               \
-		double                                              curSolveTime;              \
-		/* BEGIN LUKE'S FRICTIONAL BCS BIT */					       \
-		char*						    nlSetupEPName;	       \
-		EntryPoint*					    nlSetupEP;		       \
-		char*						    nlEPName;	       	       \
-		EntryPoint*					    nlEP;		       \
-		char*						    postNlEPName;	       \
-		EntryPoint*					    postNlEP;		       \
-		char*						    nlConvergedEPName;	       \
-		EntryPoint*					    nlConvergedEP;	       \
-                Bool                                                nlFormJacobian; \
-                Vec                                                 nlCurIterate; \
-		/* END LUKE'S FRICTIONAL BCS BIT */					       \
+		Bool																isNonLinear; \
+		Stg_Component_ExecuteFunction*							linearExecute; \
+		double															nonLinearTolerance; \
+		Iteration_Index												nonLinearMaxIterations; \
+		Iteration_Index												nonLinearIteration_I; \
+		Bool																killNonConvergent; \
+		Iteration_Index												nonLinearMinIterations; \
+		double															curResidual; \
+		double															curSolveTime; \
+		/* BEGIN LUKE'S FRICTIONAL BCS BIT */ \
+		char*																nlSetupEPName; \
+		EntryPoint*														nlSetupEP; \
+		char*																nlEPName; \
+		EntryPoint*														nlEP; \
+		char*																postNlEPName; \
+		EntryPoint*														postNlEP; \
+		char*																nlConvergedEPName; \
+		EntryPoint*														nlConvergedEP; \
+		Bool																nlFormJacobian; \
+ 		Vec																nlCurIterate; \
+		/* END LUKE'S FRICTIONAL BCS BIT */ \
 		/* Multi-grid data. */ \
-		Bool                                                mgEnabled;                 \
-		Bool                                                mgUpdate; \
-		unsigned                                            nMGHandles;                \
-		unsigned*                                           mgHandles; /* one per MG'd 'StiffnessMatrix' */ \
+		Bool																mgEnabled; \
+		Bool																mgUpdate; \
+		unsigned															nMGHandles; \
+		unsigned*														mgHandles; /* one per MG'd 'StiffnessMatrix' */ \
 		/* for solving non linear systems using Newton's method */\
-		Name						    nonLinearSolutionType;     \
-		SystemLinearEquations_BuildFFunc*		    _buildF;		       \
-		SystemLinearEquations_BuildJFunc*		    _buildJ;		       \
-		void*						    buildFContext;             \
-		void*						    buildJContext;             \
-		SNES				    		    nlSolver;		       \
-		Bool						    linearSolveInitGuess;      \
-		Vec    						    F;			       \
-		Vec    						    X;		       	       \
-		Mat						    A;			       \
-		Mat    						    J;			       \
-		Mat    						    P;			       \
-		SystemLinearEquations_SetFFunc*		    	    _setFFunc;		       \
-		SystemLinearEquations_ConfigureNonlinearSolver*	    _configureNLSolverFunc;    \
-		SystemLinearEquations_SetFFunc*		    	    _updateOldFields;	       \
-		Name						    optionsPrefix;	       \
+		Name																nonLinearSolutionType; \
+		SystemLinearEquations_BuildFFunc*						_buildF; \
+		SystemLinearEquations_BuildJFunc*						_buildJ; \
+		void*																buildFContext; \
+		void*																buildJContext; \
+		SNES																nlSolver; \
+		Bool																linearSolveInitGuess; \
+		Vec																F; \
+		Vec																X; \
+		Mat																A; \
+		Mat																J; \
+		Mat																P; \
+		SystemLinearEquations_SetFFunc*							_setFFunc; \
+		SystemLinearEquations_ConfigureNonlinearSolver*		_configureNLSolverFunc; \
+		SystemLinearEquations_SetFFunc*							_updateOldFields; \
+		Name																optionsPrefix; \
 		/* parameter and methods relevant to PICARD */ \
-		Name                   picard_form_function_type;  \
-		double                 alpha;                      \
-		double                 rtol,ttol,xtol,abstol;      \
-		Bool                   picard_monitor;             \
-		SLE_FormFunctionFunc* _sleFormFunction;
+		Name																picard_form_function_type; \
+		double															alpha; \
+		double															rtol,ttol,xtol,abstol; \
+		Bool																picard_monitor; \
+		SLE_FormFunctionFunc*										_sleFormFunction;
 		
 		
 	/** Abstract class to manage the set up, building, initialisation etc of a System of
@@ -169,16 +168,16 @@
 
 	/** Constructor */
 	SystemLinearEquations* SystemLinearEquations_New(
-		Name                                               name,
-		SLE_Solver*                                        solver,
-		void*				   		   nlSolver,
-		FiniteElementContext*                              context,
-		Bool                                               isNonLinear,
-		double                                             nonLinearTolerance,
-		Iteration_Index                                    nonLinearMaxIterations,
-		Bool                                               killNonConvergent,		
-		EntryPoint_Register*                               entryPoint_Register,
-		MPI_Comm                                           comm );
+		Name							name,
+		SLE_Solver*					solver,
+		void*							nlSolver,
+		FiniteElementContext*	context,
+		Bool							isNonLinear,
+		double						nonLinearTolerance,
+		Iteration_Index			nonLinearMaxIterations,
+		Bool							killNonConvergent,		
+		EntryPoint_Register*		entryPoint_Register,
+		MPI_Comm						comm );
 
 	/** Creation implementation / Virtual constructor */
 	SystemLinearEquations* _SystemLinearEquations_New( 
@@ -200,18 +199,6 @@
 		SystemLinearEquations_MG_SelectStiffMatsFunc*      _mgSelectStiffMats, 
 		Name                                               name );
 
-	void SystemLinearEquations_InitAll( 
-		void*                                              sle, 
-		SLE_Solver*                                        solver, 
-		void*				   		   nlSolver,
-		FiniteElementContext*                              context, 
-		Bool                                               isNonLinear,
-		double                                             nonLinearTolerance,
-		Iteration_Index                                    nonLinearMaxIterations,
-		Bool                                               killNonConvergent,
-		EntryPoint_Register*                               entryPoint_Register,
-		MPI_Comm                                           comm );
-
 	/* Stg_Class_Delete() implementations */
 	void _SystemLinearEquations_Delete( void* sle );
 
@@ -228,8 +215,11 @@
 	
 	/* +++ Virtual Functions +++ */
 	void* _SystemLinearEquations_DefaultNew( Name name ) ;
+
 	void _SystemLinearEquations_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data );
+
 	void _SystemLinearEquations_Build( void* sle, void* data );
+
 	void _SystemLinearEquations_Initialise( void* sle, void* data );
 
 	/** Stg_Component_Execute() implementation: Assembles the correct values into all matrices of the
@@ -244,16 +234,19 @@
 
 	/* LM Setup */
 	void SystemLinearEquations_LM_Setup( void* sle, void* data );
+
 	void _SystemLinearEquations_LM_Setup( void* sle, void* data );
 
 	void SystemLinearEquations_IntegrationSetup( void* sle, void* data );
 	
 	/* Matrix Setup */
 	void SystemLinearEquations_MatrixSetup( void* sle, void* data );
+
 	void _SystemLinearEquations_MatrixSetup( void* sle, void* data );
 
 	/* Vector Setup */
 	void SystemLinearEquations_VectorSetup( void* sle, void* data );
+
 	void _SystemLinearEquations_VectorSetup( void* sle, void* data );
 
 	/* +++ Public Functions / Macros +++ */
@@ -298,27 +291,34 @@
 		((SolutionVector*)Stg_ObjectList_At( ((sle)->solutionVectors), solutionVectorIndex ))
 
 	/* Update all solution vectors back onto mesh nodes */
-	void SystemLinearEquations_UpdateSolutionOntoNodes( void* sle, void* data ) ;
+	void SystemLinearEquations_UpdateSolutionOntoNodes( void* sle, void* data );
+
 	void _SystemLinearEquations_UpdateSolutionOntoNodes( void* sle, void* data );
 
-	void SystemLinearEquations_ZeroAllVectors( void* sle, void* data ) ;
+	void SystemLinearEquations_ZeroAllVectors( void* sle, void* data );
 
 	/* Non-linear stuff */
 	/* matrix free finite difference newton's method non linear solve */
 	void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* data );
+
 	/* solitary waves model with hand rolled J */
 	void SystemLinearEquations_NewtonInitialise( void* sle, void* data );
+
 	void SystemLinearEquations_NewtonExecute( void* sle, void* data );
+
 	void SystemLinearEquations_NewtonFinalise( void* sle, void* data );
-	void SystemLinearEquations_NonLinearExecute( void* sle, void* data ) ;
-	void SystemLinearEquations_AddNonLinearSetupEP( void* sle, const char* name,
-                                                        EntryPoint_2VoidPtr_Cast func );
-	void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name,
-                                                   EntryPoint_2VoidPtr_Cast func );
-	void SystemLinearEquations_AddPostNonLinearEP( void* sle, const char* name,
-                                                       EntryPoint_2VoidPtr_Cast func );
-	void SystemLinearEquations_SetToNonLinear( void* sle ) ;
-	void SystemLinearEquations_CheckIfNonLinear( void* sle ) ;
+
+	void SystemLinearEquations_NonLinearExecute( void* sle, void* data );
+
+	void SystemLinearEquations_AddNonLinearSetupEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func );
+
+	void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func );
+
+	void SystemLinearEquations_AddPostNonLinearEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func );
+
+	void SystemLinearEquations_SetToNonLinear( void* sle );
+
+	void SystemLinearEquations_CheckIfNonLinear( void* sle );
 	
 	/*
 	** All the multi-grid virtual functions and their general implementations.
@@ -327,6 +327,7 @@
 	void SystemLinearEquations_MG_Enable( void* _sle );
 	
 	void SystemLinearEquations_MG_SelectStiffMats( void* _sle, unsigned* nSMs, StiffnessMatrix*** sms );
+
 	void _SystemLinearEquations_MG_SelectStiffMats( void* _sle, unsigned* nSMs, StiffnessMatrix*** sms );
 	
 #endif

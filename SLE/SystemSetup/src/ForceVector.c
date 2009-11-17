@@ -143,7 +143,6 @@ void _ForceVector_Init( void* forceVector, Dimension_Index dim, EntryPoint_Regis
  	self->modifyCBs = NULL;
 }
 
-
 void _ForceVector_Delete( void* forceVector ) {
 	ForceVector* self = (ForceVector*)forceVector;
 	
@@ -159,7 +158,6 @@ void _ForceVector_Delete( void* forceVector ) {
 	_SolutionVector_Delete( self );
 	
 }
-
 
 void _ForceVector_Print( void* forceVector, Stream* stream ) {
 	ForceVector* self = (ForceVector*)forceVector;

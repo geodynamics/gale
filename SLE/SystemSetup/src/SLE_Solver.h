@@ -58,34 +58,34 @@
 	extern const Type SLE_Solver_Type;
 	
 	/* virtual function interface */
-	typedef void		(SLE_Solver_SolverSetupFunction)	( void* sleSolver, void* sle );
-	typedef void		(SLE_Solver_SolveFunction)		( void* sleSolver, void* sle );
-	typedef Vec    		(SLE_Solver_GetResidualFunc)		( void* sleSolver, Index fvIndex );
+	typedef void (SLE_Solver_SolverSetupFunction) ( void* sleSolver, void* sle );
+	typedef void (SLE_Solver_SolveFunction) ( void* sleSolver, void* sle );
+	typedef Vec (SLE_Solver_GetResidualFunc) ( void* sleSolver, Index fvIndex );
 
-        typedef void            (SLE_Solver_FormResidualFunc)        ( void *someSLE, void *someSolver, Vec );
-        typedef void            (SLE_Solver_GetRhsFunc)              ( void *someSLE, void *someSovler, Vec );
-        typedef void            (SLE_Solver_GetSolutionFunc)         ( void *someSLE, void *someSolver, Vec* );
+	typedef void (SLE_Solver_FormResidualFunc) ( void *someSLE, void *someSolver, Vec );
+	typedef void (SLE_Solver_GetRhsFunc) ( void *someSLE, void *someSovler, Vec );
+	typedef void (SLE_Solver_GetSolutionFunc) ( void *someSLE, void *someSolver, Vec* );
 
 	/** SLE_Solver class contents */
 	#define __SLE_Solver \
 		__Stg_Component \
-		FiniteElementContext*		   context;          \
-		ExtensionManager*                  extensionManager; \
+		FiniteElementContext*				context; \
+		ExtensionManager*						extensionManager; \
 		\
 		/* Virtual info */ \
-		SLE_Solver_SolverSetupFunction*    _solverSetup;     \
-		SLE_Solver_SolveFunction*          _solve;           \
-		SLE_Solver_GetResidualFunc*        _getResidual;	  \
-                SLE_Solver_FormResidualFunc*       _formResidual;    \
-                SLE_Solver_GetRhsFunc*             _getRhs;          \
-                SLE_Solver_GetSolutionFunc*        _getSolution;     \
+		SLE_Solver_SolverSetupFunction*	_solverSetup; \
+		SLE_Solver_SolveFunction*			_solve; \
+		SLE_Solver_GetResidualFunc*		_getResidual; \
+  		SLE_Solver_FormResidualFunc*		_formResidual; \
+		SLE_Solver_GetRhsFunc*				_getRhs; \
+		SLE_Solver_GetSolutionFunc*		_getSolution; \
 		\
 		/* SLE_Solver info */ \
-		Stream*                            debug;            \
+		Stream*                            debug; \
 		Stream*                            info; \
-		Iteration_Index                    maxIterations;	\
+		Iteration_Index                    maxIterations; \
 		\
-		Bool                               useStatSolve;	\
+		Bool                               useStatSolve; \
 		unsigned                           nStatReps;
 		
 	/** Abstract class defining the interface for a SLE_Solver solver - see SLE_Solver.h */
@@ -113,16 +113,18 @@
 		SLE_Solver_GetResidualFunc*                _getResidual, 
 		Name                                       name );
 
-
 	/** class member initialisation */
 	void _SLE_Solver_Init( SLE_Solver* self, Bool useStatSolve, int statReps ) ;
+
 	void SLE_Solver_InitAll( void* sleSolver, Bool useStatSolve, int statReps ) ;
 
 	/* --- Virtual function implementations --- */
 	
 	/** Class Virtual Functions Implementations */
 	void* _SLE_Solver_Copy( void* sleSolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+
 	void _SLE_Solver_Delete( void* sleSolver );
+
 	void _SLE_Solver_Print( void* sleSolver, Stream* stream ) ;
 
 	/** Stg_Component_Build() implementation: does nothing by default as some solvers may not need it. */

@@ -151,9 +151,9 @@ void* _SLE_Solver_Copy( void* sleSolver, void* dest, Bool deep, Name nameExt, Pt
 
 
 void _SLE_Solver_Delete( void* sleSolver ) {
-	SLE_Solver*		self = (SLE_Solver*)sleSolver;
-	
-	_Stg_Component_Delete( self->extensionManager );
+	SLE_Solver* self = (SLE_Solver*)sleSolver;
+
+	_Stg_Component_Delete( self );	
 }
 
 void _SLE_Solver_Print( void* sleSolver, Stream* stream ) {
@@ -191,7 +191,6 @@ void _SLE_Solver_AssignFromXML( void* sleSolver, Stg_ComponentFactory* cf, void*
 }
 
 void _SLE_Solver_Initialise( void* sleSolver, void* data ) {
-	/* Do nothing by default */
 }
 
 
@@ -207,6 +206,9 @@ void _SLE_Solver_Execute( void* sleSolver, void* data ) {
 }
 
 void _SLE_Solver_Destroy( void* sleSolver, void* data ) {
+	SLE_Solver* self = (SLE_Solver*)sleSolver;
+
+	Stg_Class_Delete( self->extensionManager );
 }
 
 void SLE_Solver_SolverSetup( void* sleSolver, void* sle ) {

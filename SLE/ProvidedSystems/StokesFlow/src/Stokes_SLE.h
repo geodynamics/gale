@@ -68,35 +68,35 @@
 		\
 		/* Stokes_SLE info */ \
 		\
-		StiffnessMatrix*    kStiffMat;	/** Stress tensor matrix */ \
-		StiffnessMatrix*    gStiffMat;	/** Gradient matrix */ \
-		StiffnessMatrix*    dStiffMat;	/** Divergence matrix */ \
-		StiffnessMatrix*    cStiffMat;	/** Compressibility matrix */\
-		SolutionVector*     uSolnVec;	/** velocity vector */\
-		SolutionVector*     pSolnVec;	/** pressure vector */\
-		ForceVector*        fForceVec;	/** forcing term vector */\
-		ForceVector*        hForceVec;	/** continuity force vector */\
+		StiffnessMatrix*	kStiffMat;	/** Stress tensor matrix */ \
+		StiffnessMatrix*	gStiffMat;	/** Gradient matrix */ \
+		StiffnessMatrix*	dStiffMat;	/** Divergence matrix */ \
+		StiffnessMatrix*	cStiffMat;	/** Compressibility matrix */\
+		SolutionVector*	uSolnVec;	/** velocity vector */\
+		SolutionVector*	pSolnVec;	/** pressure vector */\
+		ForceVector*		fForceVec;	/** forcing term vector */\
+		ForceVector*		hForceVec;	/** continuity force vector */\
 
 	struct Stokes_SLE { __Stokes_SLE };	
 
 	Stokes_SLE* Stokes_SLE_New( 		
-		Name                                                name,
-		SLE_Solver*                                         solver,
-		FiniteElementContext*                               context,
-		Bool                                                isNonLinear,
-		double                                              nonLinearTolerance,
-		Iteration_Index                                     nonLinearMaxIterations,
-		Bool                                                killNonConvergent,			
-		EntryPoint_Register*                                entryPoint_Register,
-		MPI_Comm                                            comm,
-		StiffnessMatrix*                                    kStiffMat,
-		StiffnessMatrix*                                    gStiffMat,
-		StiffnessMatrix*                                    dStiffMat,
-		StiffnessMatrix*                                    cStiffMat,
-		SolutionVector*                                     uSolnVec,
-		SolutionVector*                                     pSolnVec,
-		ForceVector*                                        fForceVec,
-		ForceVector*                                        hForceVec );
+		Name							name,
+		SLE_Solver*					solver,
+		FiniteElementContext*	context,
+		Bool							isNonLinear,
+		double						nonLinearTolerance,
+		Iteration_Index			nonLinearMaxIterations,
+		Bool							killNonConvergent,			
+		EntryPoint_Register*		entryPoint_Register,
+		MPI_Comm						comm,
+		StiffnessMatrix*			kStiffMat,
+		StiffnessMatrix*			gStiffMat,
+		StiffnessMatrix*			dStiffMat,
+		StiffnessMatrix*			cStiffMat,
+		SolutionVector*			uSolnVec,
+		SolutionVector*			pSolnVec,
+		ForceVector*				fForceVec,
+		ForceVector*				hForceVec );
 
 	/* Creation implementation / Virtual constructor */
 	Stokes_SLE* _Stokes_SLE_New(
@@ -119,40 +119,23 @@
 		Name                                                name );
 
 	void _Stokes_SLE_Init( 		
-		void*                                               sle, 
-		StiffnessMatrix*                                    kStiffMat,
-		StiffnessMatrix*                                    gStiffMat,
-		StiffnessMatrix*                                    dStiffMat,
-		StiffnessMatrix*                                    cStiffMat,
-		SolutionVector*                                     uSolnVec,
-		SolutionVector*                                     pSolnVec,
-		ForceVector*                                        fForceVec,
-		ForceVector*                                        hForceVec ) ;
-
-void Stokes_SLE_InitAll( 
-		void*                                               sle, 
-		SLE_Solver*                                         solver,
-		FiniteElementContext*                               context,
-		Bool                                                isNonLinear,
-		double                                              nonLinearTolerance,
-		Iteration_Index                                     nonLinearMaxIterations,
-		Bool                                                killNonConvergent,			
-		EntryPoint_Register*                                entryPoint_Register,
-		MPI_Comm                                            comm,		
-		StiffnessMatrix*                                    kStiffMat,
-		StiffnessMatrix*                                    gStiffMat,
-		StiffnessMatrix*                                    dStiffMat,
-		StiffnessMatrix*                                    cStiffMat,
-		SolutionVector*                                     uSolnVec,
-		SolutionVector*                                     pSolnVec,
-		ForceVector*                                        fForceVec,
-		ForceVector*                                        hForceVec );
+		void*					sle, 
+		StiffnessMatrix*	kStiffMat,
+		StiffnessMatrix*	gStiffMat,
+		StiffnessMatrix*	dStiffMat,
+		StiffnessMatrix*	cStiffMat,
+		SolutionVector*	uSolnVec,
+		SolutionVector*	pSolnVec,
+		ForceVector*		fForceVec,
+		ForceVector*		hForceVec ) ;
 
 	void _Stokes_SLE_Delete( void* stokesSleSolver );
+
 	void _Stokes_SLE_Print( void* stokesSleSolver, Stream* stream );
 
-	void* _Stokes_SLE_DefaultNew( Name name ) ;
-void _Stokes_SLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data ) ;
+	void* _Stokes_SLE_DefaultNew( Name name );
+
+	void _Stokes_SLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data );
 	
 	void _Stokes_SLE_MG_SelectStiffMats( void* _sle, unsigned* nSMs, StiffnessMatrix*** sms );
 	

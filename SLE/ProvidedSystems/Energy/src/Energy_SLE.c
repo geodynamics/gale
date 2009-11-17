@@ -56,58 +56,48 @@
 const Type Energy_SLE_Type = "Energy_SLE";
 
 Energy_SLE* Energy_SLE_New( 
-		Name                                                name,
-		SLE_Solver*                                         solver,
-		FiniteElementContext*                               context,
-		Bool                                                isNonLinear,
-		double                                              nonLinearTolerance,
-		Iteration_Index                                     nonLinearMaxIterations,
-		Bool                                                killNonConvergent,
-		EntryPoint_Register*                                entryPoint_Register,
-		MPI_Comm                                            comm,
-		StiffnessMatrix*                                    stiffMat,
-		SolutionVector*                                     solutionVec,
-		ForceVector*                                        fVector )
+	Name							name,
+	SLE_Solver*					solver,
+	FiniteElementContext*	context,
+	Bool							isNonLinear,
+	double						nonLinearTolerance,
+	Iteration_Index			nonLinearMaxIterations,
+	Bool							killNonConvergent,
+	EntryPoint_Register*		entryPoint_Register,
+	MPI_Comm						comm,
+	StiffnessMatrix*			stiffMat,
+	SolutionVector*			solutionVec,
+	ForceVector*				fVector )
 {
 	Energy_SLE* self = _Energy_SLE_DefaultNew( name );
 
-	Energy_SLE_InitAll( 
-			self,
-			solver,
-			context,
-			isNonLinear,
-			nonLinearTolerance, 
-			nonLinearMaxIterations,
-			killNonConvergent, 			
-			entryPoint_Register,
-			comm, 
-			stiffMat,
-			solutionVec,
-			fVector );
+	self->isConstructed = True;
+	_SystemLinearEquations_Init( self, solver, NULL, context, False, isNonLinear, nonLinearTolerance,
+		nonLinearMaxIterations, killNonConvergent, 1, "", "", entryPoint_Register, comm );
+	_Energy_SLE_Init( self, stiffMat, solutionVec, fVector );
 
 	return self;
 }
 
 /* Creation implementation / Virtual constructor */
 Energy_SLE* _Energy_SLE_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		SystemLinearEquations_LM_SetupFunction*             _LM_Setup,
-		SystemLinearEquations_MatrixSetupFunction*          _matrixSetup,
-		SystemLinearEquations_VectorSetupFunction*          _vectorSetup,
-		SystemLinearEquations_UpdateSolutionOntoNodesFunc*	_updateSolutionOntoNodes, 
-		SystemLinearEquations_MG_SelectStiffMatsFunc*		_mgSelectStiffMats, 
-		Name                                                name )
-
+	SizeT                                               sizeOfSelf,  
+	Type                                                type,
+	Stg_Class_DeleteFunction*                           _delete,
+	Stg_Class_PrintFunction*                            _print,
+	Stg_Class_CopyFunction*                             _copy, 
+	Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
+	Stg_Component_ConstructFunction*                    _construct,
+	Stg_Component_BuildFunction*                        _build,
+	Stg_Component_InitialiseFunction*                   _initialise,
+	Stg_Component_ExecuteFunction*                      _execute,
+	Stg_Component_DestroyFunction*                      _destroy,
+	SystemLinearEquations_LM_SetupFunction*             _LM_Setup,
+	SystemLinearEquations_MatrixSetupFunction*          _matrixSetup,
+	SystemLinearEquations_VectorSetupFunction*          _vectorSetup,
+	SystemLinearEquations_UpdateSolutionOntoNodesFunc*	_updateSolutionOntoNodes, 
+	SystemLinearEquations_MG_SelectStiffMatsFunc*		_mgSelectStiffMats, 
+	Name                                                name )
 {
 	Energy_SLE* self;
 	
@@ -136,52 +126,16 @@ Energy_SLE* _Energy_SLE_New(
 	return self;
 }
 
-void _Energy_SLE_Init( 
-		void*                                               sle,
-		StiffnessMatrix*                                    stiffMat,
-		SolutionVector*                                     solutionVec,
-		ForceVector*                                        fVector ) 
-{
+void _Energy_SLE_Init( void* sle, StiffnessMatrix* stiffMat, SolutionVector* solutionVec, ForceVector* fVector ) {
 	Energy_SLE* self = (Energy_SLE*)sle;
 
-	self->stiffMat    = stiffMat;
+	self->stiffMat		= stiffMat;
 	self->solutionVec = solutionVec;
 	self->fVector     = fVector;
 
 	SystemLinearEquations_AddStiffnessMatrix( self, stiffMat );
 	SystemLinearEquations_AddSolutionVector( self, solutionVec );
 	SystemLinearEquations_AddForceVector( self, fVector );
-}
-
-void Energy_SLE_InitAll(
-		void*                                               sle,
-		SLE_Solver*                                         solver,
-		FiniteElementContext*                               context,
-		Bool                                                isNonLinear,
-		double                                              nonLinearTolerance,
-		Iteration_Index                                     nonLinearMaxIterations,
-		Bool                                                killNonConvergent,
-		EntryPoint_Register*                                entryPoint_Register,
-		MPI_Comm                                            comm,
-		StiffnessMatrix*                                    stiffMat,
-		SolutionVector*                                     solutionVec,
-		ForceVector*                                        fVector ) 
-{
-	Energy_SLE* self = (Energy_SLE*)sle;
-
-	SystemLinearEquations_InitAll( 
-			self, 
-			solver,
-			NULL, /* not sure if a non linear solver is required for the energy SLE */
-			context,
-			isNonLinear,
-			nonLinearTolerance, 
-			nonLinearMaxIterations,
-			killNonConvergent, 
-			entryPoint_Register,
-			comm );
-
-	_Energy_SLE_Init( self, stiffMat, solutionVec, fVector );
 }
 
 void _Energy_SLE_Print( void* sle, Stream* stream ) {
