@@ -794,6 +794,134 @@ Stg_Component* _Stg_ComponentFactory_PluginConstructByKey(
 	return self->constructByName( self, componentName, type, isEssential, data );
 }
 
+Dictionary_Entry_Value* _Stg_ComponentFactory_PluginGetDictionaryValue( void* cf, void *codelet, Dictionary_Entry_Key key, Dictionary_Entry_Value* defaultVal ) {
+	Stg_ComponentFactory*       self              = (Stg_ComponentFactory*) cf;
+	Stg_Component*	          plugin	       = (Stg_Component*)codelet;
+	Dictionary*		          thisPluginDict = NULL;
+	Dictionary*		          pluginDict     = Dictionary_Get( self->rootDict, "plugins" );
+	Name			             pluginType;
+	Index		pluginIndex;
+	Dictionary_Entry_Value* returnVal;
+	Bool                    usedDefault       = False;
+	Stream*                 errorStream       = Journal_Register( Error_Type, Stg_Component_Type );
+	Stream*                 stream            = self->infoStream;
+
+	Journal_Firewall( self != NULL, errorStream, "In func %s: Stg_ComponentFactory is NULL.\n", __func__ );
+
+	Journal_PrintfL( stream, 2, "Getting parameter '%s': ", key );
+
+	Journal_Firewall( pluginDict != NULL, errorStream, 
+			"In func %s: Stg_Component Factory's dictionary is NULL.\n", __func__ );
+
+	/* Get this plugins Dictionary */
+	for( pluginIndex = 0; pluginIndex < Dictionary_Entry_Value_GetCount( pluginDict ); pluginIndex++ ) {
+		thisPluginDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetElement( pluginDict, pluginIndex ) );
+		pluginType = StG_Strdup( Dictionary_GetString( thisPluginDict, "Type" ) );
+		if( !strcmp( plugin->type, pluginType ) ){
+		   Memory_Free( pluginType );
+			break;
+		}
+                Memory_Free( pluginType );
+	}
+
+	/* Get this Stg_Component's Dictionary */
+	Journal_Firewall( thisPluginDict != NULL, errorStream,
+			"In func %s: Can't find sub-dictionary for component '%s'.\n", __func__, plugin->name );
+
+	/* Get Value from dictionary */
+	returnVal = Dictionary_Get( thisPluginDict, key );
+	if ( !returnVal && defaultVal ) {
+		returnVal = Dictionary_GetDefault( thisPluginDict, key, defaultVal );
+		usedDefault = True;
+	}
+
+	/* Print Stuff */
+	if ( usedDefault ) {
+		Journal_PrintfL( stream, 2, "Using default value = " );
+		if ( Stream_IsPrintableLevel( stream, 2 ) ) 
+			Dictionary_Entry_Value_Print( returnVal, stream );
+		Journal_PrintfL( stream, 2, "\n" );
+
+		return returnVal;
+	}
+	else if ( returnVal ) {
+		Journal_PrintfL( stream, 2, "Found - Value = " );
+		if ( Stream_IsPrintableLevel( stream, 2 ) ) 
+			Dictionary_Entry_Value_Print( returnVal, stream );
+		Journal_PrintfL( stream, 2, "\n" );
+	}
+	else 
+		Journal_PrintfL( stream, 2, "Not found.\n" );
+
+	return returnVal;
+}
+
+Dictionary_Entry_Value* _Stg_ComponentFactory_PluginGetNumericalValue( void* cf, void *codelet, Dictionary_Entry_Key key, Dictionary_Entry_Value* defaultVal ) {
+	Stg_ComponentFactory*    self           = (Stg_ComponentFactory*)cf;
+	Dictionary_Entry_Value* returnVal;
+	Bool                    usedDefault       = False;
+	Stream*                 stream            = self->infoStream;
+	Stream*			errorStream       = Journal_Register( Error_Type, self->type );
+
+	Journal_Firewall( self != NULL, errorStream, "In func %s: Stg_Component is NULL.\n", __func__ );
+
+	returnVal = _Stg_ComponentFactory_PluginGetDictionaryValue( self, codelet, key, defaultVal );
+
+	/* Check to see whether the type is a string -
+	 * if it is then assume that this is a dictionary key linking to the root dictionary */
+	if ( returnVal ) {
+		Dictionary_Entry_Key rootDictKey = Dictionary_Entry_Value_AsString( returnVal );
+		Dictionary*          rootDict    = self->rootDict;
+
+		/* Check if the number really is a string or not */
+		if ( Stg_StringIsNumeric( rootDictKey ) )
+			return returnVal;
+		
+		Journal_PrintfL( stream, 2, "Key '%s' points to key '%s' in the root dictionary: ", key, rootDictKey );
+
+		Journal_Firewall( rootDict != NULL, errorStream, "Root Dictionary NULL in component factory.\n" );
+
+		/* Get Value from dictionary */
+		returnVal = Dictionary_Get( rootDict, rootDictKey );
+		if ( !returnVal && defaultVal ) {
+			returnVal = Dictionary_GetDefault( rootDict, rootDictKey, defaultVal );
+			usedDefault = True;
+		}
+
+		/* Print Stuff */
+		if ( usedDefault ) {
+			Journal_PrintfL( stream, 2, "Using default value = " );
+			if ( Stream_IsPrintableLevel( stream, 2 ) ) 
+				Dictionary_Entry_Value_Print( returnVal, stream );
+			Journal_PrintfL( stream, 2, "\n" );
+			return returnVal;
+		}
+		else if ( returnVal ) {
+			Journal_PrintfL( stream, 2, "Found - Value = " );
+			if ( Stream_IsPrintableLevel( stream, 2 ) ) 
+				Dictionary_Entry_Value_Print( returnVal, stream );
+			Journal_PrintfL( stream, 2, "\n" );
+		}
+		else 
+			Journal_PrintfL( stream, 2, "Not found.\n" );
+	}
+
+	return returnVal;
+}
+
+
+double Stg_ComponentFactory_PluginGetDouble( void* cf, void *codelet, Dictionary_Entry_Key key, double defaultVal ) {
+	return Dictionary_Entry_Value_AsDouble( 
+                _Stg_ComponentFactory_PluginGetNumericalValue( cf, codelet, key, 
+                                                               Dictionary_Entry_Value_FromDouble( defaultVal )));
+}
+
+int Stg_ComponentFactory_PluginGetInt( void* cf, void *codelet, Dictionary_Entry_Key key, int defaultVal ) {
+	return Dictionary_Entry_Value_AsInt( 
+                _Stg_ComponentFactory_PluginGetNumericalValue( cf, codelet, key, 
+                                                               Dictionary_Entry_Value_FromInt( defaultVal )));
+}
+
 Stg_Component* _Stg_ComponentFactory_ConstructByNameWithKeyFallback( 
 		void*			cf, 
 		Name 			parentComponentName, 
