@@ -76,21 +76,21 @@ void _Underworld_Nusselt_AssignFromXML( void* component, Stg_ComponentFactory* c
 	
 	self->advectiveHeatFluxField = OperatorFeVariable_NewBinary(  
 		"AdvectiveHeatFluxField",
-		context,
+		(DomainContext*) context,
 		temperatureField, 
 		velocityField, 
 		"VectorScale" );
 
 	self->temperatureTotalDerivField = OperatorFeVariable_NewBinary(  
 		"TemperatureTotalDerivField",
-		context,
+		(DomainContext*) context,
 		self->advectiveHeatFluxField, 
 		temperatureGradientsField, 
 		"Subtraction" );
 	
 	self->temperatureVertDerivField = (FeVariable*) OperatorFeVariable_NewUnary(  
 		"VerticalAdvectiveHeatFluxField",
-		context,
+		(DomainContext*) context,
 		self->temperatureTotalDerivField, 
 		"TakeSecondComponent" );
 
