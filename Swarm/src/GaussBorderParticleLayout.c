@@ -185,7 +185,7 @@ void* _GaussBorderParticleLayout_DefaultNew( Name name ) {
          name, NON_GLOBAL,
 			_PerCellParticleLayout_SetInitialCounts, _PerCellParticleLayout_InitialiseParticles,
          LocalCoordSystem, True,
-         _GaussParticleLayout_InitialCount, _GaussParticleLayout_InitialiseParticlesOfCell,
+         _GaussBorderParticleLayout_InitialCount, _GaussBorderParticleLayout_InitialiseParticlesOfCell,
 			0       /* dim */,
 			NULL    /* particlesPerDim */ );
 }
