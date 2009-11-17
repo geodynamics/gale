@@ -238,7 +238,7 @@ void _BuoyancyForceTermThermoChem_Build( void* forceTerm, void* data ) {
 		name = Stg_Object_AppendSuffix( materialSwarms[materialSwarm_I], "Density" );
 		self->densitySwarmVariables[materialSwarm_I] = MaterialSwarmVariable_New( 
 				name,
-				self->context,
+				(AbstractContext*) self->context,
 				materialSwarms[materialSwarm_I], 
 				1, 
 				self->materials_Register, 
@@ -278,7 +278,6 @@ void _BuoyancyForceTermThermoChem_Destroy( void* forceTerm, void* data ) {
 	for ( i = 0; i < self->materialSwarmCount; ++i ) {
 		Stg_Class_Delete( self->densitySwarmVariables[i] );
 	}
-	Stg_Class_Delete( self->densitySwarmVariables );
 
 	_ForceTerm_Destroy( self, data );
 }

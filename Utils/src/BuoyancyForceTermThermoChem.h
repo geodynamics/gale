@@ -109,9 +109,17 @@
 		Stg_Component_ExecuteFunction*                      _execute,
 		Stg_Component_DestroyFunction*                      _destroy,
 		ForceTerm_AssembleElementFunction*                  _assembleElement,		
-		BuoyancyForceTermThermoChem_CalcRaTFunction*              _calcRaT,
-		BuoyancyForceTermThermoChem_CalcRaCFunction*              _calcRaC,
+		BuoyancyForceTermThermoChem_CalcRaTFunction*			_calcRaT,
+		BuoyancyForceTermThermoChem_CalcRaCFunction*			_calcRaC,
 		Name                                                name );
+
+	void _BuoyancyForceTermThermoChem_Init(
+		BuoyancyForceTermThermoChem*  self, 
+		FeVariable*                   temperatureField,
+		double                        RaT,
+		double                        RaC,
+		Bool                          adjust,
+		Materials_Register*           materials_Register );
 	
 	void _BuoyancyForceTermThermoChem_Delete( void* forceTerm );
 
