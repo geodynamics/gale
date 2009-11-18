@@ -68,19 +68,27 @@
 		MESH_ALGORITHMS_PASSARGS
 
 	Mesh_HexAlgorithms* Mesh_HexAlgorithms_New( Name name, AbstractContext* context );
+
 	Mesh_HexAlgorithms* _Mesh_HexAlgorithms_New( MESH_HEXALGORITHMS_DEFARGS );
-	void _Mesh_HexAlgorithms_Init( Mesh_HexAlgorithms* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
 	*/
 
+	void _Mesh_HexAlgorithms_Init( void* hexAlgorithms );
+
 	void _Mesh_HexAlgorithms_Delete( void* hexAlgorithms );
+
 	void _Mesh_HexAlgorithms_Print( void* hexAlgorithms, Stream* stream );
+
 	void _Mesh_HexAlgorithms_AssignFromXML( void* hexAlgorithms, Stg_ComponentFactory* cf, void* data );
+
 	void _Mesh_HexAlgorithms_Build( void* hexAlgorithms, void* data );
+
 	void _Mesh_HexAlgorithms_Initialise( void* hexAlgorithms, void* data );
+
 	void _Mesh_HexAlgorithms_Execute( void* hexAlgorithms, void* data );
+
 	void _Mesh_HexAlgorithms_Destroy( void* hexAlgorithms, void* data );
 
 	/*--------------------------------------------------------------------------------------------------------------------------

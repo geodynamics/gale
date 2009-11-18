@@ -88,8 +88,8 @@ LinearSpaceAdaptor* LinearSpaceAdaptor_New( Name name, AbstractContext* context 
 				    _MeshGenerator_SetDimSize, 
 				    LinearSpaceAdaptor_Generate );
 
-   _MeshGenerator_Init( self, context );
-   _MeshAdaptor_Init( self );
+   _MeshGenerator_Init( (MeshGenerator*)self, context );
+   _MeshAdaptor_Init( (MeshAdaptor*)self );
 	_LinearSpaceAdaptor_Init( self );
 
    return self;

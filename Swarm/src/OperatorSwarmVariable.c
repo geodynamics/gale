@@ -205,8 +205,8 @@ void _OperatorSwarmVariable_Print( void* _swarmVariable, Stream* stream ) {
 
 }
 
-void _OperatorSwarmVariable_Init( void* ofv, Name operatorName, Index swarmVariableCount, SwarmVariable** swarmVariableList ) {
-	OperatorSwarmVariable*	self = (OperatorSwarmVariable*)ofv;
+void _OperatorSwarmVariable_Init( void* _swarmVariable, Name operatorName, Index swarmVariableCount, SwarmVariable** swarmVariableList ) {
+	OperatorSwarmVariable*	self = (OperatorSwarmVariable*)_swarmVariable;
 	SwarmVariable*              swarmVariable;
 	Index                       swarmVariable_I;
 	Stream*                     errorStream       = Journal_Register( Error_Type, self->type );

@@ -48,29 +48,29 @@
 		/* General info */ \
 		__Stg_Component \
 		\
-		DomainContext*			       context;			\
-		Stream*                                debug;                   \
-		Stream*                                info;                   \
-		NamedObject_Register*                  integrateeRegister;      \
-		unsigned int                           order;                   \
-		Bool                                   simultaneous;            \
-		Name                                   _setupEPName;            \
-		Name                                   _finishEPName;           \
-		EntryPoint*                            setupEP;                 \
-		Stg_ObjectList*                        setupData;               \
-		EntryPoint*                            finishEP;                \
-		Stg_ObjectList*                        finishData;              \
-		double                                 time;
+		DomainContext*				context; \
+		Stream*						debug; \
+		Stream*						info; \
+		NamedObject_Register*	integrateeRegister; \
+		unsigned int				order; \
+		Bool							simultaneous; \
+		Name							_setupEPName; \
+		Name							_finishEPName; \
+		EntryPoint*					setupEP; \
+		Stg_ObjectList*			setupData; \
+		EntryPoint*					finishEP; \
+		Stg_ObjectList*			finishData; \
+		double						time;
 		  
 	struct TimeIntegrator { __TimeIntegrator };
 	
 	/* Creation implementation / Virtual constructor */
 	TimeIntegrator* TimeIntegrator_New( 
-		Name                                       name,
-		unsigned int                               order, 
-		Bool                                       simultaneous, 
-		EntryPoint_Register*                       entryPoint_Register,
-		AbstractContext*                           context );
+		Name							name,
+		unsigned int				order, 
+		Bool							simultaneous, 
+		EntryPoint_Register*		entryPoint_Register,
+		AbstractContext*			context );
 
 	TimeIntegrator* _TimeIntegrator_New(
 		SizeT                                      _sizeOfSelf,

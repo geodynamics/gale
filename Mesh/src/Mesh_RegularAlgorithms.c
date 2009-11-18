@@ -88,7 +88,9 @@ Mesh_RegularAlgorithms* _Mesh_RegularAlgorithms_New( MESH_REGULARALGORITHMS_DEFA
 	return self;
 }
 
-void _Mesh_RegularAlgorithms_Init( Mesh_RegularAlgorithms* self ) {
+void _Mesh_RegularAlgorithms_Init( void* algorithms ) {
+	Mesh_RegularAlgorithms*	self = (Mesh_RegularAlgorithms*)algorithms;
+
 	assert( self && Stg_CheckType( self, Mesh_RegularAlgorithms ) );
 
 	self->sep = NULL;

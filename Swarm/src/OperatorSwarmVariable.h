@@ -120,56 +120,74 @@
 			SwarmVariable_GetGlobalValueFunction*              _getMaxGlobalMagnitude,		
 			Name                                               name );
 
-	void _OperatorSwarmVariable_Init( void* swarmVariable, Name operatorName, Index swarmVariableCount, SwarmVariable** swarmVariableList ) ;
+	void _OperatorSwarmVariable_Init( void* _swarmVariable, Name operatorName, Index swarmVariableCount, SwarmVariable** swarmVariableList );
 
-	void _OperatorSwarmVariable_Delete( void* variable ) ;
-	void _OperatorSwarmVariable_Print( void* _swarmVariable, Stream* stream ) ;
+	void _OperatorSwarmVariable_Delete( void* variable );
 
+	void _OperatorSwarmVariable_Print( void* _swarmVariable, Stream* stream );
 
-	void* _OperatorSwarmVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
-	void _OperatorSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
-	void _OperatorSwarmVariable_Build( void* swarmVariable, void* data ) ;
-	void _OperatorSwarmVariable_Execute( void* variable, void* data ) ;
-	void _OperatorSwarmVariable_Destroy( void* variable, void* data ) ;
-	void _OperatorSwarmVariable_Initialise( void* variable, void* data ) ;
+	void* _OperatorSwarmVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _OperatorSwarmVariable_ValueAt( void* swarmVariable, Particle_Index lParticle_I, double* value ) ;
+	void _OperatorSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data );
 
-	double _OperatorSwarmVariable_GetMinGlobalMagnitude( void* swarmVariable ) ;
-	double _OperatorSwarmVariable_GetMaxGlobalMagnitude( void* swarmVariable ) ;
+	void _OperatorSwarmVariable_Build( void* swarmVariable, void* data );
 
-	void _OperatorSwarmVariable_UnaryValueAt( void* swarmVariable, Particle_Index lParticle_I, double* value ) ;
-	void _OperatorSwarmVariable_BinaryValueAt( void* swarmVariable, Particle_Index lParticle_I, double* value ) ;
+	void _OperatorSwarmVariable_Execute( void* variable, void* data );
 
-	void OperatorSwarmVariable_UnaryOperator( void* swarmVariable, double* swarmValue0, double* value ) ;
-	void OperatorSwarmVariable_BinaryOperator( void* swarmVariable, double* swarmValue0, double* swarmValue1, double* value ) ;
+	void _OperatorSwarmVariable_Destroy( void* variable, void* data );
+
+	void _OperatorSwarmVariable_Initialise( void* variable, void* data );
+
+	void _OperatorSwarmVariable_ValueAt( void* swarmVariable, Particle_Index lParticle_I, double* value );
+
+	double _OperatorSwarmVariable_GetMinGlobalMagnitude( void* swarmVariable );
+
+	double _OperatorSwarmVariable_GetMaxGlobalMagnitude( void* swarmVariable );
+
+	void _OperatorSwarmVariable_UnaryValueAt( void* swarmVariable, Particle_Index lParticle_I, double* value );
+
+	void _OperatorSwarmVariable_BinaryValueAt( void* swarmVariable, Particle_Index lParticle_I, double* value );
+
+	void OperatorSwarmVariable_UnaryOperator( void* swarmVariable, double* swarmValue0, double* value );
+
+	void OperatorSwarmVariable_BinaryOperator( void* swarmVariable, double* swarmValue0, double* swarmValue1, double* value ); 
 
 	/** Operator Functions */
-	void OperatorSwarmVariable_VectorSquare( void* swarmVariable, double* swarmValue0, double* value ) ;
+	void OperatorSwarmVariable_VectorSquare( void* swarmVariable, double* swarmValue0, double* value );
 
-	void OperatorSwarmVariable_VectorMag( void* swarmVariable, double* swarmValue0, double* value ) ;
-	void OperatorSwarmVariable_Abs( void* swarmVariable, double* swarmValue0, double* value ) ;
+	void OperatorSwarmVariable_VectorMag( void* swarmVariable, double* swarmValue0, double* value );
+
+	void OperatorSwarmVariable_Abs( void* swarmVariable, double* swarmValue0, double* value );
 
 	/** Symmetric Part of tensor Operators */
-	void OperatorSwarmVariable_TensorSymmetricPart( void* swarmVariable, double* swarmValue0, double* value ) ;
-	void OperatorSwarmVariable_SymmetricTensor_Invariant( void* swarmVariable, double* swarmValue0, double* value ) ;
-	void OperatorSwarmVariable_TensorAntisymmetricPart( void* swarmVariable, double* swarmValue0, double* value ) ;
+	void OperatorSwarmVariable_TensorSymmetricPart( void* swarmVariable, double* swarmValue0, double* value );
+
+	void OperatorSwarmVariable_SymmetricTensor_Invariant( void* swarmVariable, double* swarmValue0, double* value );
+
+	void OperatorSwarmVariable_TensorAntisymmetricPart( void* swarmVariable, double* swarmValue0, double* value );
 
 	/** Operators to take specific componets of a vector */
-	void OperatorSwarmVariable_TakeFirstComponent( void* swarmVariable, double* swarmValue0, double* value ) ;
-	void OperatorSwarmVariable_TakeSecondComponent( void* swarmVariable, double* swarmValue0, double* value ) ;
-	void OperatorSwarmVariable_TakeThirdComponent( void* swarmVariable, double* swarmValue0, double* value ) ;
+	void OperatorSwarmVariable_TakeFirstComponent( void* swarmVariable, double* swarmValue0, double* value );
+
+	void OperatorSwarmVariable_TakeSecondComponent( void* swarmVariable, double* swarmValue0, double* value );
+
+	void OperatorSwarmVariable_TakeThirdComponent( void* swarmVariable, double* swarmValue0, double* value );
 
 	/** Binary Operator Functions */
-	void OperatorSwarmVariable_ScalarAddition( void* swarmVariable, double* swarmValue0, double* swarmValue1, double* value ) ;
-	void OperatorSwarmVariable_VectorAddition( void* swarmVariable, double* swarmValue0, double* swarmValue1, double* value) ;
-	void OperatorSwarmVariable_ScalarSubtraction( void* swarmVariable, double* swarmValue0, double* swarmValue1, double* value ) ;
-	void OperatorSwarmVariable_VectorSubtraction( void* swarmVariable, double* swarmValue0, double* swarmValue1, double* value) ;
-	void OperatorSwarmVariable_ScalarMultiplication( void* swarmVariable, double* swarmValue0, double* swarmValue1, double* value ) ;
-	void OperatorSwarmVariable_ScalarDivision( void* swarmVariable, double* swarmValue0, double* swarmValue1, double* value ) ;
+	void OperatorSwarmVariable_ScalarAddition( void* swarmVariable, double* swarmValue0, double* swarmValue1, double* value );
+
+	void OperatorSwarmVariable_VectorAddition( void* swarmVariable, double* swarmValue0, double* swarmValue1, double* value);
+
+	void OperatorSwarmVariable_ScalarSubtraction( void* swarmVariable, double* swarmValue0, double* swarmValue1, double* value );
+
+	void OperatorSwarmVariable_VectorSubtraction( void* swarmVariable, double* swarmValue0, double* swarmValue1, double* value);
+
+	void OperatorSwarmVariable_ScalarMultiplication( void* swarmVariable, double* swarmValue0, double* swarmValue1, double* value );
+
+	void OperatorSwarmVariable_ScalarDivision( void* swarmVariable, double* swarmValue0, double* swarmValue1, double* value );
 
 	void OperatorSwarmVariable_VectorScale( void* swarmVariable, double* swarmValue0, double* swarmValue1, double* value);
 
 	/** TODO HACK - This function will be obselete when function registers come to town */
-	Func_Ptr OperatorSwarmVariable_GetOperatorByName( void* swarmVariable, Name name ) ;
+	Func_Ptr OperatorSwarmVariable_GetOperatorByName( void* swarmVariable, Name name );
 #endif /* __Domain_Utils_OperatorSwarmVariable_h__ */

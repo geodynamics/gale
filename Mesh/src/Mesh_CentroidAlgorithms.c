@@ -87,7 +87,9 @@ Mesh_CentroidAlgorithms* _Mesh_CentroidAlgorithms_New( MESH_HEXALGORITHMS_DEFARG
 	return self;
 }
 
-void _Mesh_CentroidAlgorithms_Init( Mesh_CentroidAlgorithms* self ) {
+void _Mesh_CentroidAlgorithms_Init( void* centroidAlgorithms ) {
+	Mesh_CentroidAlgorithms*	self = (Mesh_CentroidAlgorithms*)centroidAlgorithms;
+
 	assert( self && Stg_CheckType( self, Mesh_CentroidAlgorithms ) );
 
 	self->elMesh = NULL;

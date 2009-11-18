@@ -83,8 +83,8 @@ SurfaceAdaptor* SurfaceAdaptor_New( Name name, AbstractContext* context ) {
 				    _MeshGenerator_SetDimSize, 
 				    SurfaceAdaptor_Generate );
 
-   _MeshGenerator_Init( self, context );
-   _MeshAdaptor_Init( self );
+   _MeshGenerator_Init( (MeshGenerator*)self, context );
+   _MeshAdaptor_Init( (MeshAdaptor*)self );
 	_SurfaceAdaptor_Init( self );
 
    return self;

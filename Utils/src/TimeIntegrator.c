@@ -49,11 +49,11 @@
 const Type TimeIntegrator_Type = "TimeIntegrator";
 
 TimeIntegrator* TimeIntegrator_New( 
-		Name                                       name,
-		unsigned int                               order, 
-		Bool                                       simultaneous, 
-		EntryPoint_Register*                       entryPoint_Register,
-		AbstractContext*                           context )
+	Name						name,
+	unsigned int			order, 
+	Bool						simultaneous, 
+	EntryPoint_Register*	entryPoint_Register,
+	AbstractContext*		context )
 {
 	TimeIntegrator* self = _TimeIntegrator_DefaultNew( name );
 
@@ -80,18 +80,18 @@ void* _TimeIntegrator_DefaultNew( Name name ) {
 }
 
 TimeIntegrator* _TimeIntegrator_New( 
-		SizeT                                     _sizeOfSelf,
-		Type                                      type,
-		Stg_Class_DeleteFunction*                 _delete,
-		Stg_Class_PrintFunction*                  _print,
-		Stg_Class_CopyFunction*                   _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*          _construct,
-		Stg_Component_BuildFunction*              _build,
-		Stg_Component_InitialiseFunction*         _initialise,
-		Stg_Component_ExecuteFunction*            _execute,
-		Stg_Component_DestroyFunction*            _destroy,
-		Name 							          name )
+	SizeT                                     _sizeOfSelf,
+	Type                                      type,
+	Stg_Class_DeleteFunction*                 _delete,
+	Stg_Class_PrintFunction*                  _print,
+	Stg_Class_CopyFunction*                   _copy, 
+	Stg_Component_DefaultConstructorFunction* _defaultConstructor,
+	Stg_Component_ConstructFunction*          _construct,
+	Stg_Component_BuildFunction*              _build,
+	Stg_Component_InitialiseFunction*         _initialise,
+	Stg_Component_ExecuteFunction*            _execute,
+	Stg_Component_DestroyFunction*            _destroy,
+	Name 							          name )
 {
 	TimeIntegrator*	self;
 	
@@ -117,20 +117,21 @@ TimeIntegrator* _TimeIntegrator_New(
 }
 
 void _TimeIntegrator_Init( 
-		void*                                      timeIntegrator, 
-		unsigned int                               order, 
-		Bool                                       simultaneous, 
-		EntryPoint_Register*                       entryPoint_Register,
-		AbstractContext*                           context )
+	void*						timeIntegrator, 
+	unsigned int			order, 
+	Bool						simultaneous, 
+	EntryPoint_Register*	entryPoint_Register,
+	AbstractContext*		context )
 {
 	TimeIntegrator* self = (TimeIntegrator*)timeIntegrator;
 
-	self->debug              = Journal_Register( Debug_Type, self->type );
-	self->info               = Journal_Register( Info_Type, self->type );
+	self->context = context;
+	self->debug = Journal_Register( Debug_Type, self->type );
+	self->info = Journal_Register( Info_Type, self->type );
 		
 	self->integrateeRegister = NamedObject_Register_New();
-	self->order              = order;
-	self->simultaneous       = simultaneous;
+	self->order = order;
+	self->simultaneous = simultaneous;
 
 	/* Entry Point Stuff */
 	Stg_asprintf( &self->_setupEPName, "%s-Setup", self->name );
@@ -295,12 +296,12 @@ void TimeIntegrator_UpdateClass( void* timeIntegrator, void* data ) {
 
 /* +++ Private Functions +++ */
 void _TimeIntegrator_ExecuteEuler( void* timeIntegrator, void* data ) {
-	TimeIntegrator*        self            = (TimeIntegrator*) timeIntegrator;
-	AbstractContext*       context         = (AbstractContext*) data;
-	Index                  integratee_I;   
-	Index                  integrateeCount = TimeIntegrator_GetCount( self );
-	double                 dt              = AbstractContext_Dt( context );
-	TimeIntegratee*        integratee;
+	TimeIntegrator*	self = (TimeIntegrator*) timeIntegrator;
+	AbstractContext*	context = (AbstractContext*) data;
+	Index					integratee_I;   
+	Index					integrateeCount = TimeIntegrator_GetCount( self );
+	double				dt = AbstractContext_Dt( context );
+	TimeIntegratee*	integratee;
 	double wallTime,tmin,tmax;
 	
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
@@ -315,21 +316,21 @@ void _TimeIntegrator_ExecuteEuler( void* timeIntegrator, void* data ) {
 		wallTime = MPI_Wtime();
 		TimeIntegratee_FirstOrder( integratee, integratee->variable, dt );
 
-        	wallTime = MPI_Wtime()-wallTime;
-        	MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
-        	MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
+		wallTime = MPI_Wtime() - wallTime;
+		MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
+		MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
 		Journal_RPrintf(self->info,"\t1st order: %35s - %9.4f [min] / %9.4f [max] (secs)\n", integratee->name, tmin,tmax);
 	}
 	TimeIntegrator_Finalise( self );
 }
 
 void _TimeIntegrator_ExecuteRK2( void* timeIntegrator, void* data ) {
-	TimeIntegrator*        self            = (TimeIntegrator*) timeIntegrator;
-	AbstractContext*       context         = (AbstractContext*) self->context;
-	Index                  integratee_I;   
-	Index                  integrateeCount = TimeIntegrator_GetCount( self );
-	double                 dt              = AbstractContext_Dt( context );
-	TimeIntegratee*        integratee;
+	TimeIntegrator*	self = (TimeIntegrator*) timeIntegrator;
+	AbstractContext*	context = (AbstractContext*) self->context;
+	Index					integratee_I;   
+	Index					integrateeCount = TimeIntegrator_GetCount( self );
+	double				dt = AbstractContext_Dt( context );
+	TimeIntegratee*	integratee;
 	double wallTime,tmin,tmax;
 
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
@@ -359,12 +360,12 @@ void _TimeIntegrator_ExecuteRK2( void* timeIntegrator, void* data ) {
 
 
 void _TimeIntegrator_ExecuteRK4( void* timeIntegrator, void* data ) {
-	TimeIntegrator*        self            = (TimeIntegrator*) timeIntegrator;
-	AbstractContext*       context         = (AbstractContext*) data;
-	Index                  integratee_I;   
-	Index                  integrateeCount = TimeIntegrator_GetCount( self );
-	double                 dt              = AbstractContext_Dt( context );
-	TimeIntegratee*        integratee;
+	TimeIntegrator*	self = (TimeIntegrator*) timeIntegrator;
+	AbstractContext*	context = (AbstractContext*) data;
+	Index					integratee_I;   
+	Index					integrateeCount = TimeIntegrator_GetCount( self );
+	double				dt = AbstractContext_Dt( context );
+	TimeIntegratee*	integratee;
 	double wallTime,tmin,tmax;
 
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
@@ -387,22 +388,22 @@ void _TimeIntegrator_ExecuteRK4( void* timeIntegrator, void* data ) {
 
 
 void _TimeIntegrator_ExecuteRK2Simultaneous( void* timeIntegrator, void* data ) {
-	TimeIntegrator*        self            = (TimeIntegrator*)timeIntegrator;
-	AbstractContext*       context         = (AbstractContext*) data;
-	Index                  integratee_I;   
-	Index                  integrateeCount = TimeIntegrator_GetCount( self );
-	double                 dt              = AbstractContext_Dt( context );
-	TimeIntegratee*        integratee;
-	Variable**             originalVariableList;
+	TimeIntegrator*	self = (TimeIntegrator*)timeIntegrator;
+	AbstractContext*	context = (AbstractContext*) data;
+	Index					integratee_I;   
+	Index					integrateeCount = TimeIntegrator_GetCount( self );
+	double				dt = AbstractContext_Dt( context );
+	TimeIntegratee*	integratee;
+	Variable**			originalVariableList;
 
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
 
 	Journal_Firewall( 
-			False,
-			Journal_MyStream( Error_Type, self ),
-			"Error in %s '%s' - This function is temporarily unavailable \n"
-			"Please only use non-simultaneous update or only first order update.\n", 
-			self->type, self->name );
+		False,
+		Journal_MyStream( Error_Type, self ),
+		"Error in %s '%s' - This function is temporarily unavailable \n"
+		"Please only use non-simultaneous update or only first order update.\n", 
+		self->type, self->name );
 
 	/* Set Time */
 	TimeIntegrator_SetTime( self, context->currentTime );
@@ -440,14 +441,14 @@ void _TimeIntegrator_ExecuteRK2Simultaneous( void* timeIntegrator, void* data ) 
 }
 
 void _TimeIntegrator_ExecuteRK4Simultaneous( void* timeIntegrator, void* data ) {
-	TimeIntegrator*        self            = (TimeIntegrator*)timeIntegrator;
-	AbstractContext*       context         = (AbstractContext*) data;
-	Index                  integratee_I;   
-	Index                  integrateeCount = TimeIntegrator_GetCount( self );
-	double                 dt              = AbstractContext_Dt( context );
-	TimeIntegratee*        integratee;
-	Variable**             originalVariableList;
-	Variable**             timeDerivVariableList;
+	TimeIntegrator*	self = (TimeIntegrator*)timeIntegrator;
+	AbstractContext*	context = (AbstractContext*) data;
+	Index					integratee_I;   
+	Index					integrateeCount = TimeIntegrator_GetCount( self );
+	double				dt = AbstractContext_Dt( context );
+	TimeIntegratee*	integratee;
+	Variable**			originalVariableList;
+	Variable**			timeDerivVariableList;
 
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
 
@@ -553,41 +554,36 @@ void TimeIntegrator_Setup( void* timeIntegrator ) {
 }
 
 void TimeIntegrator_AppendSetupEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, char* addedBy, void* data ) {
-	TimeIntegrator*        self            = (TimeIntegrator*)timeIntegrator;
+	TimeIntegrator* self = (TimeIntegrator*)timeIntegrator;
 
 	EntryPoint_Append( self->setupEP, name, funcPtr, addedBy );
 	Stg_ObjectList_Append( self->setupData, data );
 }
 
 void TimeIntegrator_PrependSetupEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, char* addedBy, void* data ) {
-	TimeIntegrator*        self            = (TimeIntegrator*)timeIntegrator;
+	TimeIntegrator* self = (TimeIntegrator*)timeIntegrator;
 
 	EntryPoint_Prepend( self->setupEP, name, funcPtr, addedBy );
 	Stg_ObjectList_Prepend( self->setupData, data );
 }
 	
-
 void TimeIntegrator_Finalise( void* timeIntegrator ) {
-	TimeIntegrator*        self            = (TimeIntegrator*)timeIntegrator;
-	EntryPoint*            entryPoint      = self->finishEP;
-	Hook_Index             hookIndex;
-	double 			wallTime,tmin,tmax;
+	TimeIntegrator*	self = (TimeIntegrator*)timeIntegrator;
+	EntryPoint*			entryPoint = self->finishEP;
+	Hook_Index			hookIndex;
+	double				wallTime,tmin,tmax;
 	
 	for( hookIndex = 0; hookIndex < entryPoint->hooks->count; hookIndex++ ) {
 		wallTime = MPI_Wtime();
 		
-		((EntryPoint_2VoidPtr_Cast*)((Hook*)entryPoint->hooks->data[hookIndex])->funcPtr)(
-			self, Stg_ObjectList_At( self->finishData, hookIndex ) );
+		((EntryPoint_2VoidPtr_Cast*)((Hook*)entryPoint->hooks->data[hookIndex])->funcPtr)( self, Stg_ObjectList_At( self->finishData, hookIndex ) );
 
-        	wallTime = MPI_Wtime()-wallTime;
-        	MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
-        	MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
+   	wallTime = MPI_Wtime()-wallTime;
+		MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
+		MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
 		Journal_RPrintf(self->info,"\t       EP: %35s - %9.4f (secs)\n",(entryPoint->hooks->data[hookIndex])->name,tmin,tmax);	
-
-
 	}
 }
-
 
 void TimeIntegrator_AppendFinishEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, char* addedBy, void* data ) {
 	TimeIntegrator*        self            = (TimeIntegrator*)timeIntegrator;

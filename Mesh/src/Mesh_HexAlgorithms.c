@@ -88,7 +88,8 @@ Mesh_HexAlgorithms* _Mesh_HexAlgorithms_New( MESH_HEXALGORITHMS_DEFARGS ) {
 	return self;
 }
 
-void _Mesh_HexAlgorithms_Init( Mesh_HexAlgorithms* self ) {
+void _Mesh_HexAlgorithms_Init( void* hexAlgorithms ) {
+	Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
 }
 
 
