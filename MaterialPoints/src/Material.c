@@ -162,7 +162,6 @@ void _Material_Init(
 void _Material_Delete( void* material ) {
 	Material* self = (Material*) material;
 
-	Stg_Class_Delete( self->extensionMgr );
 	_Stg_Component_Delete( material );
 }
 
@@ -212,7 +211,13 @@ void _Material_AssignFromXML( void* material, Stg_ComponentFactory* cf, void* da
 void _Material_Build( void* material, void* data ) {}
 void _Material_Initialise( void* material, void* data ) {}
 void _Material_Execute( void* material, void* data ) {}
-void _Material_Destroy( void* material, void* data ) {}
+
+void _Material_Destroy( void* material, void* data ) {
+	Material* self = (Material*) material;
+
+	Stg_Class_Delete( self->extensionMgr );
+}
+
 
 void Material_Layout( void* material, MaterialPointsSwarm* swarm ) {	
 	Material*             self               = (Material*) material;

@@ -24,13 +24,13 @@ void LibPICelleratorSuite_Setup( LibPICelleratorSuiteData* data ) {
 void LibPICelleratorSuite_Teardown( LibPICelleratorSuiteData* data ) {
 }
 
-void LibPICelleratorSuite_DirectoryStGermain( LibPICelleratorSuiteData* data ) {
+void LibPICelleratorSuite_TestDirectoryStGermain( LibPICelleratorSuiteData* data ) {
     Stg_Object* testDirectoryStGermain;
     testDirectoryStGermain = Stg_ObjectList_Get( Project_XMLSearchPaths, "StGermain" );
     pcu_check_true( testDirectoryStGermain != NULL );
 }
 
-void LibPICelleratorSuite_DirectoryStgFEM( LibPICelleratorSuiteData * data ) {
+void LibPICelleratorSuite_TestDirectoryStgFEM( LibPICelleratorSuiteData * data ) {
     Stg_Object* testDirectoryStGermain;
     Stg_Object* testDirectoryStgFEM;
 
@@ -40,8 +40,7 @@ void LibPICelleratorSuite_DirectoryStgFEM( LibPICelleratorSuiteData * data ) {
     pcu_check_true( ( strcmp((char*)LIB_DIR, (char*)testDirectoryStGermain) ) || ( testDirectoryStgFEM != NULL ) );
 }
 
-
-void LibPICelleratorSuite_DirectoryPICellerator( LibPICelleratorSuiteData * data ) {
+void LibPICelleratorSuite_TestDirectoryPICellerator( LibPICelleratorSuiteData * data ) {
     Stg_Object* testDirectoryStGermain;
     Stg_Object* testDirectoryPICellerator;
 
@@ -56,7 +55,7 @@ void LibPICelleratorSuite( pcu_suite_t* suite ) {
     pcu_suite_setData( suite, LibPICelleratorSuiteData );
     pcu_suite_setFixtures( suite, LibPICelleratorSuite_Setup, LibPICelleratorSuite_Teardown);
 
-    pcu_suite_addTest( suite, LibPICelleratorSuite_DirectoryStGermain );
-    pcu_suite_addTest( suite, LibPICelleratorSuite_DirectoryStgFEM);
-    pcu_suite_addTest( suite, LibPICelleratorSuite_DirectoryPICellerator);
+    pcu_suite_addTest( suite, LibPICelleratorSuite_TestDirectoryStGermain );
+    pcu_suite_addTest( suite, LibPICelleratorSuite_TestDirectoryStgFEM);
+    pcu_suite_addTest( suite, LibPICelleratorSuite_TestDirectoryPICellerator);
 }

@@ -42,43 +42,38 @@
 #include "MomentBalanceWeightsSuite.h"
 
 typedef struct {
-   PICelleratorContext*       context;
-   Stg_ComponentFactory* cf;
+   PICelleratorContext*		context;
+   Stg_ComponentFactory*	cf;
 } MomentBalanceWeightsSuiteData;
 
-
 void MomentBalanceWeightsSuite_Setup( MomentBalanceWeightsSuiteData* data ) {
-   char              xmlInputFilename[PCU_PATH_MAX];
+   char xmlInputFilename[PCU_PATH_MAX];
 
    pcu_filename_input( "testMomentBalanceWeights.xml", xmlInputFilename );
    data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
-   data->context = LiveComponentRegister_Get( data->cf->LCRegister, "context" );
+   data->context = (PICelleratorContext*) LiveComponentRegister_Get( data->cf->LCRegister, "context" );
    stgMainBuildAndInitialise( data->cf );
 } 
-
 
 void MomentBalanceWeightsSuite_Teardown( MomentBalanceWeightsSuiteData* data ) {
    stgMainDestroy( data->cf );
 }
 
-
-
-
-void MomentBalanceWeightsSuite_TestElementIntegral_ConstantFunction( MomentBalanceWeightsSuiteData* data ) {
+void MomentBalanceWeightsSuite_TestConstantFunction( MomentBalanceWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "ConstantFunction", 1000,
       1e-10, /* --mean-tolerance */
       1e-10, /* --standardDeviation-tolerance */
       0.0, /* --mean-expectedValue */
       0.0 /* --standardDeviation-expectedValue */ );
 }
-void MomentBalanceWeightsSuite_TestElementIntegral_LinearFunction ( MomentBalanceWeightsSuiteData* data ) {
+void MomentBalanceWeightsSuite_TestLinearFunction ( MomentBalanceWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "LinearFunction", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
       0.00363688, /* --mean-expectedValue */
       0.029866 /* --standardDeviation-expectedValue */ );
 }
-void MomentBalanceWeightsSuite_TestElementIntegral_QuadraticFunction ( MomentBalanceWeightsSuiteData* data ) {
+void MomentBalanceWeightsSuite_TestQuadraticFunction ( MomentBalanceWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "QuadraticFunction", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
@@ -86,7 +81,7 @@ void MomentBalanceWeightsSuite_TestElementIntegral_QuadraticFunction ( MomentBal
       0.0351938 /* --standardDeviation-expectedValue */ );
 }
 
-void MomentBalanceWeightsSuite_TestElementIntegral_PolynomialFunction( MomentBalanceWeightsSuiteData* data ) {
+void MomentBalanceWeightsSuite_TestPolynomialFunction( MomentBalanceWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "PolynomialFunction", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
@@ -94,7 +89,7 @@ void MomentBalanceWeightsSuite_TestElementIntegral_PolynomialFunction( MomentBal
       0.0130415 /* --standardDeviation-expectedValue */ );
 }
 
-void MomentBalanceWeightsSuite_TestElementIntegral_CircleInterface( MomentBalanceWeightsSuiteData* data ) {
+void MomentBalanceWeightsSuite_TestCircleInterface( MomentBalanceWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "CircleInterface", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
@@ -102,7 +97,7 @@ void MomentBalanceWeightsSuite_TestElementIntegral_CircleInterface( MomentBalanc
       0.0686067 /* --standardDeviation-expectedValue */ );
 }
 
-void MomentBalanceWeightsSuite_TestElementIntegral_ExponentialInterface( MomentBalanceWeightsSuiteData* data ) {
+void MomentBalanceWeightsSuite_TestExponentialInterface( MomentBalanceWeightsSuiteData* data ) {
    WeightsSuite_TestElementIntegral( data->context, "ExponentialInterface", 1000,
       0.000001, /* --mean-tolerance */
       0.000001, /* --standardDeviation-tolerance */
@@ -113,11 +108,11 @@ void MomentBalanceWeightsSuite_TestElementIntegral_ExponentialInterface( MomentB
 void MomentBalanceWeightsSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, MomentBalanceWeightsSuiteData );
    pcu_suite_setFixtures( suite, MomentBalanceWeightsSuite_Setup, MomentBalanceWeightsSuite_Teardown );
-   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_ConstantFunction );
-   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_LinearFunction );
-   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_QuadraticFunction );
-   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_PolynomialFunction );
-   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_CircleInterface );
-   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestElementIntegral_ExponentialInterface );
+   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestConstantFunction );
+   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestLinearFunction );
+   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestQuadraticFunction );
+   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestPolynomialFunction );
+   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestCircleInterface );
+   pcu_suite_addTest( suite, MomentBalanceWeightsSuite_TestExponentialInterface );
 }
 

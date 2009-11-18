@@ -120,7 +120,7 @@ void check( PICelleratorContext* context ) {
 	pcu_check_true( maxThetaErrorGlobal < thetaErrorTolerance );
 }
 
-void AdvectionSuite_Euler( AdvectionSuiteData* data ) {
+void AdvectionSuite_TestEuler( AdvectionSuiteData* data ) {
 	Stg_ComponentFactory* 	cf;
 	PICelleratorContext* 	context;
 	char			filename[PCU_PATH_MAX];
@@ -153,7 +153,7 @@ void AdvectionSuite_Euler( AdvectionSuiteData* data ) {
 	Stg_ComponentFactory_DestroyComponents( cf, data );
 }
 
-void AdvectionSuite_RK2( AdvectionSuiteData* data ) {
+void AdvectionSuite_TestRK2( AdvectionSuiteData* data ) {
 	Stg_ComponentFactory* 	cf;
 	PICelleratorContext* 	context;
 	char			filename[PCU_PATH_MAX];
@@ -186,7 +186,7 @@ void AdvectionSuite_RK2( AdvectionSuiteData* data ) {
 	Stg_ComponentFactory_DestroyComponents( cf, data );
 }
 
-void AdvectionSuite_RK4( AdvectionSuiteData* data ) {
+void AdvectionSuite_TestRK4( AdvectionSuiteData* data ) {
 	Stg_ComponentFactory* 	cf;
 	PICelleratorContext* 	context;
 	char			filename[PCU_PATH_MAX];
@@ -222,7 +222,7 @@ void AdvectionSuite_RK4( AdvectionSuiteData* data ) {
 void AdvectionSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, AdvectionSuiteData );
    pcu_suite_setFixtures( suite, AdvectionSuite_Setup, AdvectionSuite_Teardown );
-   pcu_suite_addTest( suite, AdvectionSuite_Euler );
-   pcu_suite_addTest( suite, AdvectionSuite_RK2 );
-   pcu_suite_addTest( suite, AdvectionSuite_RK4 );
+   pcu_suite_addTest( suite, AdvectionSuite_TestEuler );
+   pcu_suite_addTest( suite, AdvectionSuite_TestRK2 );
+   pcu_suite_addTest( suite, AdvectionSuite_TestRK4 );
 }
