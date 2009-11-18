@@ -256,7 +256,8 @@ void Mesh_SetAlgorithms( void* mesh, void* algorithms ) {
       remove the mesh. This is normally ok but as the code is not
       in a Destroy or Delete phase it's problematic. Problems like
       this should be fixed with reference counters */
-   self->algorithms->mesh =NULL;
+	if( self->algorithms ) 
+   	self->algorithms->mesh = NULL;
 
 	FreeObject( self->algorithms );
 	if( algorithms ) {
@@ -265,6 +266,7 @@ void Mesh_SetAlgorithms( void* mesh, void* algorithms ) {
 	}
 	else
 		self->algorithms = Mesh_Algorithms_New( "", NULL );
+
 	Mesh_Algorithms_SetMesh( self->algorithms, self );
 }
 
