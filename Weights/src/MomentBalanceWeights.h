@@ -56,49 +56,58 @@
 /* Textual name of this class */
 extern const Type MomentBalanceWeights_Type;
 
-/* MomentBalanceWeights information */
-#define __MomentBalanceWeights                          \
-    /* General info */                                  \
-    __WeightsCalculator                                 \
-                                                        \
-    /* Virtual Info */                                  \
-    WeightsCalculator*            backupWeights;        \
-    Bool                          freeBackupWeights;
+	/* MomentBalanceWeights information */
+	#define __MomentBalanceWeights \
+		/* General info */ \
+		__WeightsCalculator \
+		\
+		/* Virtual Info */ \
+		WeightsCalculator*	backupWeights; \
+		Bool						freeBackupWeights;
 
-struct MomentBalanceWeights { __MomentBalanceWeights };
+	struct MomentBalanceWeights { __MomentBalanceWeights };
 
-/*---------------------------------------------------------------------------------------------------------------------
-** Constructors
-*/
+	#define MOMENTBALANCEWEIGHTS_DEFARGS \
+		WEIGHTSCALCULATOR_DEFARGS, \
+			WeightsCalculator*	backupWeights
 
-#define MOMENTBALANCEWEIGHTS_DEFARGS                            \
-    WEIGHTSCALCULATOR_DEFARGS,                                  \
-        WeightsCalculator*                    backupWeights
+	#define MOMENTBALANCEWEIGHTS_PASSARGS \
+		WEIGHTSCALCULATOR_PASSARG, \
+			backupWeights
 
-#define MOMENTBALANCEWEIGHTS_PASSARGS           \
-    WEIGHTSCALCULATOR_PASSARG,                  \
-        backupWeights
+	/*---------------------------------------------------------------------------------------------------------------------
+	** Constructors
+	*/
 
-MomentBalanceWeights* MomentBalanceWeights_New( Name name, Dimension_Index dim, WeightsCalculator* backupWeights );
+	MomentBalanceWeights* MomentBalanceWeights_New( Name name, Dimension_Index dim, WeightsCalculator* backupWeights );
 
-MomentBalanceWeights* _MomentBalanceWeights_New( MOMENTBALANCEWEIGHTS_DEFARGS );
+	MomentBalanceWeights* _MomentBalanceWeights_New( MOMENTBALANCEWEIGHTS_DEFARGS );
 
-/* Stg_Class implementation */
-void _MomentBalanceWeights_Delete( void* momentBalanceWeights );
-void _MomentBalanceWeights_Print( void* momentBalanceWeights, Stream* stream );
-#define MomentBalanceWeights_Copy( self )                               \
-    (MomentBalanceWeights*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
-#define MomentBalanceWeights_DeepCopy( self )                           \
-    (MomentBalanceWeights*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-void* _MomentBalanceWeights_Copy( void* momentBalanceWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	/* Stg_Class implementation */
+	void _MomentBalanceWeights_Delete( void* momentBalanceWeights );
+
+	void _MomentBalanceWeights_Print( void* momentBalanceWeights, Stream* stream );
+
+	#define MomentBalanceWeights_Copy( self ) \
+		(MomentBalanceWeights*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
+	#define MomentBalanceWeights_DeepCopy( self )                           \
+		(MomentBalanceWeights*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
+
+	void _MomentBalanceWeights_Init( void* momentBalanceWeights, WeightsCalculator* backupWeights );
+
+	void* _MomentBalanceWeights_Copy( void* momentBalanceWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
         
-void* _MomentBalanceWeights_DefaultNew( Name name ) ;
-void _MomentBalanceWeights_AssignFromXML( void* momentBalanceWeights, Stg_ComponentFactory* cf, void* data ) ;
-void _MomentBalanceWeights_Build( void* momentBalanceWeights, void* data ) ;
-void _MomentBalanceWeights_Initialise( void* momentBalanceWeights, void* data ) ;
-void _MomentBalanceWeights_Execute( void* momentBalanceWeights, void* data );
+	void* _MomentBalanceWeights_DefaultNew( Name name );
+
+	void _MomentBalanceWeights_AssignFromXML( void* momentBalanceWeights, Stg_ComponentFactory* cf, void* data );
+
+	void _MomentBalanceWeights_Build( void* momentBalanceWeights, void* data );
+
+	void _MomentBalanceWeights_Initialise( void* momentBalanceWeights, void* data );
+
+	void _MomentBalanceWeights_Execute( void* momentBalanceWeights, void* data );
                 
-void _MomentBalanceWeights_Calculate( void* momentBalanceWeights, void* _swarm, Cell_LocalIndex lCell_I ) ;
+	void _MomentBalanceWeights_Calculate( void* momentBalanceWeights, void* _swarm, Cell_LocalIndex lCell_I );
 
 /*---------------------------------------------------------------------------------------------------------------------
 ** Private functions

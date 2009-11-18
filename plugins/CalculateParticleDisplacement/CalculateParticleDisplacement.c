@@ -103,7 +103,7 @@ void _PICellerator_CalculateParticleDisplacement_AssignFromXML( void* component,
 	you give, so we have to add it manually here */
 	self->particleDisplacementMagSwarmVariable = OperatorSwarmVariable_NewUnary(
 		"materialSwarm-DisplacementMagnitude",
-		context, 
+		(AbstractContext*)context, 
 		self->particleDisplacementSwarmVariable,
 		"Magnitude" );
 	

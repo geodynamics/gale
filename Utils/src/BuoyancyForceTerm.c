@@ -124,12 +124,14 @@ BuoyancyForceTerm* _BuoyancyForceTerm_New(
 }
 
 void _BuoyancyForceTerm_Init( 
-	BuoyancyForceTerm*	self, 
+	void*						forceTerm, 
 	FeVariable*				temperatureField,
 	double					gravity,
 	Bool						adjust,
 	Materials_Register*	materials_Register )
 {
+	BuoyancyForceTerm* self = (BuoyancyForceTerm*)forceTerm;
+
 	self->temperatureField    = temperatureField;
 	self->gravity             = gravity;
 	self->gHat		  = NULL;
@@ -264,7 +266,7 @@ void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 		name = Stg_Object_AppendSuffix( materialSwarms[materialSwarm_I], "Density" );
 		self->densitySwarmVariables[materialSwarm_I] = MaterialSwarmVariable_New( 
 				name,
-				self->context,
+				(AbstractContext*)self->context,
 				materialSwarms[materialSwarm_I], 
 				1, 
 				self->materials_Register, 
@@ -275,7 +277,7 @@ void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 		name = Stg_Object_AppendSuffix( materialSwarms[materialSwarm_I], "Alpha" );
 		self->alphaSwarmVariables[materialSwarm_I] = MaterialSwarmVariable_New( 
 				name,
-				self->context,
+				(AbstractContext*)self->context,
 				materialSwarms[materialSwarm_I], 
 				1, 
 				self->materials_Register, 

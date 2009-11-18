@@ -180,7 +180,6 @@ void _SwarmVariableField_AssignFromXML( void* swarmVariableField, Stg_ComponentF
 	assert( integrationSwarm );
 
 	_SwarmVariableField_Init( self, swarmVar, variable_Register );
-	_ParticleFeVariable_Init( self, integrationSwarm );
 }
 
 void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {

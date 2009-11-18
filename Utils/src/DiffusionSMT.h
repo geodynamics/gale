@@ -44,63 +44,71 @@
 /** Textual name of this class */
 extern const Type DiffusionSMT_Type;
 
-typedef struct {
-    double diffusion;
-} DiffusionSMT_MaterialExt;
+	typedef struct {
+		double diffusion;
+	} DiffusionSMT_MaterialExt;
 
-/** DiffusionSMT class contents */
-#define __DiffusionSMT							\
-    /* General info */							\
-    __StiffnessMatrixTerm						\
-									\
-    /* Virtual info */							\
-									\
-    /* DiffusionSMT info */						\
-									\
-    Materials_Register*                                 materials_Register; \
-    ExtensionInfo_Index                                 materialExtHandle; \
-    MaterialSwarmVariable**                             diffusionSwarmVariables; \
-    Index                                               materialSwarmCount;
+	/** DiffusionSMT class contents */
+	#define __DiffusionSMT \
+		/* General info */ \
+		__StiffnessMatrixTerm \
+		\
+		/* Virtual info */ \
+		\
+		/* DiffusionSMT info */ \
+		\
+		Materials_Register*		materials_Register; \
+		ExtensionInfo_Index		materialExtHandle; \
+		MaterialSwarmVariable**	diffusionSwarmVariables; \
+		Index							materialSwarmCount;
 
-struct DiffusionSMT { __DiffusionSMT };
+	struct DiffusionSMT { __DiffusionSMT };
 
-DiffusionSMT* DiffusionSMT_New( 
-    Name                                                name,
-    FiniteElementContext*				                    context,
-    StiffnessMatrix*                                    stiffnessMatrix,
-    Swarm*                                              integrationSwarm );
+	DiffusionSMT* DiffusionSMT_New( 
+		Name							name,
+		FiniteElementContext*	context,
+		StiffnessMatrix*			stiffnessMatrix,
+		Swarm*						integrationSwarm );
 
-DiffusionSMT* _DiffusionSMT_New( 
-    SizeT                                               sizeOfSelf,  
-    Type                                                type,
-    Stg_Class_DeleteFunction*                           _delete,
-    Stg_Class_PrintFunction*                            _print,
-    Stg_Class_CopyFunction*                             _copy, 
-    Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-    Stg_Component_ConstructFunction*                    _construct,
-    Stg_Component_BuildFunction*                        _build,
-    Stg_Component_InitialiseFunction*                   _initialise,
-    Stg_Component_ExecuteFunction*                      _execute,
-    Stg_Component_DestroyFunction*                      _destroy,
-    StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
-    Name                                                name );
+	DiffusionSMT* _DiffusionSMT_New( 
+ 		SizeT                                               sizeOfSelf,  
+		Type                                                type,
+		Stg_Class_DeleteFunction*                           _delete,
+		Stg_Class_PrintFunction*                            _print,
+		Stg_Class_CopyFunction*                             _copy, 
+		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
+		Stg_Component_ConstructFunction*                    _construct,
+		Stg_Component_BuildFunction*                        _build,
+		Stg_Component_InitialiseFunction*                   _initialise,
+		Stg_Component_ExecuteFunction*                      _execute,
+		Stg_Component_DestroyFunction*                      _destroy,
+		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
+		Name                                                name );
+
+	void _DiffusionSMT_Init( void* matrixTerm );
 	
-void _DiffusionSMT_Delete( void* matrixTerm );
-void _DiffusionSMT_Print( void* matrixTerm, Stream* stream );
+	void _DiffusionSMT_Delete( void* matrixTerm );
 
-void* _DiffusionSMT_DefaultNew( Name name ) ;
-void _DiffusionSMT_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
-void _DiffusionSMT_Build( void* matrixTerm, void* data ) ;
-void _DiffusionSMT_Initialise( void* matrixTerm, void* data ) ;
-void _DiffusionSMT_Execute( void* matrixTerm, void* data ) ;
-void _DiffusionSMT_Destroy( void* matrixTerm, void* data ) ;
+	void _DiffusionSMT_Print( void* matrixTerm, Stream* stream );
 
-void _DiffusionSMT_AssembleElement( 
-    void*                                              matrixTerm,
-    StiffnessMatrix*                                   stiffnessMatrix, 
-    Element_LocalIndex                                 lElement_I, 
-    SystemLinearEquations*                             sle,
-    FiniteElementContext*                              context,
-    double**                                           elStiffMat ) ;
+	void* _DiffusionSMT_DefaultNew( Name name );
+
+	void _DiffusionSMT_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
+
+	void _DiffusionSMT_Build( void* matrixTerm, void* data );
+
+	void _DiffusionSMT_Initialise( void* matrixTerm, void* data );
+
+	void _DiffusionSMT_Execute( void* matrixTerm, void* data );
+
+	void _DiffusionSMT_Destroy( void* matrixTerm, void* data );
+	
+	void _DiffusionSMT_AssembleElement( 
+		void*							matrixTerm,
+		StiffnessMatrix*			stiffnessMatrix, 
+		Element_LocalIndex		lElement_I, 
+		SystemLinearEquations*	sle,
+		FiniteElementContext*	context,
+		double**						elStiffMat ) ;
 
 #endif

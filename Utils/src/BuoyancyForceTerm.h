@@ -100,6 +100,13 @@
 		ForceTerm_AssembleElementFunction*                  _assembleElement,		
 		BuoyancyForceTerm_CalcGravityFunction*              _calcGravity,
 		Name                                                name );
+
+	void _BuoyancyForceTerm_Init(
+		void*                forceTerm,
+		FeVariable*          temperatureField,
+		double               gravity,
+		Bool                 adjust,
+		Materials_Register*  materials_Register );
 	
 	void _BuoyancyForceTerm_Delete( void* forceTerm );
 

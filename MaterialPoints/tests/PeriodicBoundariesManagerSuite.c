@@ -66,7 +66,7 @@ void PeriodicBoundariesManagerSuite_Setup( PeriodicBoundariesManagerSuiteData* d
 
    pcu_filename_input( "testPeriodicBoundariesManager.xml", xmlInputFilename );
    data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
-   data->context = LiveComponentRegister_Get( data->cf->LCRegister, "context" );
+   data->context = (PICelleratorContext*)LiveComponentRegister_Get( data->cf->LCRegister, "context" );
 } 
 
 

@@ -112,7 +112,8 @@ DiffusionSMT* _DiffusionSMT_New(
     return self;
 }
 
-void _DiffusionSMT_Init( DiffusionSMT* self ) {
+void _DiffusionSMT_Init( void* matrixTerm ) {
+    DiffusionSMT* self = (DiffusionSMT*)matrixTerm;
 }
 
 void _DiffusionSMT_Delete( void* matrixTerm ) {
@@ -214,7 +215,7 @@ void _DiffusionSMT_Build( void* matrixTerm, void* data ) {
 	name = Stg_Object_AppendSuffix( materialSwarms[ii], "diffusivity" );
 	self->diffusionSwarmVariables[ii] = MaterialSwarmVariable_New( 
 	    name, 
-	    self->context, 
+	    (AbstractContext*) self->context, 
 	    materialSwarms[ii], 
 	    1, 
 	    self->materials_Register, 

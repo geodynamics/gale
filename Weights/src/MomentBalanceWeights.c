@@ -98,9 +98,7 @@ void _MomentBalanceWeights_Init( void* momentBalanceWeights, WeightsCalculator* 
         self->freeBackupWeights = True;
     }
         
-    Journal_Firewall( self->dim == 2, 
-                      Journal_Register( Error_Type, self->type ),
-                      "%s only works in 2D.\n", self->type );
+    Journal_Firewall( self->dim == 2, Journal_Register( Error_Type, self->type ), "%s only works in 2D.\n", self->type );
         
 }
 
