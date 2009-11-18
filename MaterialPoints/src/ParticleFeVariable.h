@@ -99,7 +99,7 @@
 		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
 		Name                                              name );
 	
-	void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm* swarm, FiniteElementContext* context );
+	void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm* swarm );
 	
 	void _ParticleFeVariable_Delete( void* variable );
 

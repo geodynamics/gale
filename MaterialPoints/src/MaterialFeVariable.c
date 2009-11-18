@@ -175,15 +175,14 @@ void* _MaterialFeVariable_DefaultNew( Name name ) {
 }
 
 void _MaterialFeVariable_AssignFromXML( void* materialFeVariable, Stg_ComponentFactory* cf, void* data ){
-	MaterialFeVariable*   self              = (MaterialFeVariable*) materialFeVariable;
-	Material*             material;
+	MaterialFeVariable*	self = (MaterialFeVariable*) materialFeVariable;
+	Material*				material;
 	
 	material = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Material", Material, True, data );
 
 	/* Construct Parent */
 	_ParticleFeVariable_AssignFromXML( self, cf, data );
 
-	_FieldVariable_AssignFromXML( self, cf, data );
 	_MaterialFeVariable_Init( self, material );
 }
 

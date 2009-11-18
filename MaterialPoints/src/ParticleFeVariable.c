@@ -129,7 +129,7 @@ ParticleFeVariable* _ParticleFeVariable_New(
 	return self;
 }
 
-void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm* swarm, FiniteElementContext* context ) {
+void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm* swarm ) {
 	/* Create Vector */
 	self->assemblyVectorName = Stg_Object_AppendSuffix( self, "assemblyVector" );
 	self->assemblyVector = ForceVector_New( 
@@ -137,7 +137,7 @@ void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm*
 		(FiniteElementContext*) self->context,
 		(FeVariable*) self, 
 		self->dim, 
-		context->entryPoint_Register, 
+		self->context->entryPoint_Register, 
 		self->communicator );
 	self->assemblyTerm = ForceTerm_New( "assemblyTerm", (FiniteElementContext*) self->context, self->assemblyVector, (Swarm*)swarm, (Stg_Component*) self );
 
@@ -147,14 +147,14 @@ void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm*
 		(FiniteElementContext*) self->context,
 		(FeVariable*) self, 
 		self->dim, 
-		context->entryPoint_Register, 
+		self->context->entryPoint_Register, 
 		self->communicator );
 	self->massMatrixForceTerm = ForceTerm_New( "massMatrixForceTerm", (FiniteElementContext*) self->context, self->massMatrix, (Swarm*)swarm, (Stg_Component*) self );
 	ForceTerm_SetAssembleElementFunction( self->massMatrixForceTerm, ParticleFeVariable_AssembleElementShapeFunc );
    
    /* Changed by PatrickSunter, 8/7/2009 - used to append onto stokesEqn-execute. However
     * this component should work for other FE systems other than the Stokes solver */
-	EP_InsertClassHookBefore( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ), "TimeIntegrator_UpdateClass", _ParticleFeVariable_Execute, self );
+	EP_InsertClassHookBefore( Context_GetEntryPoint( self->context, AbstractContext_EP_UpdateClass ), "TimeIntegrator_UpdateClass", _ParticleFeVariable_Execute, self );
 	ParticleFeVariable_names[ParticleFeVariable_nNames++] = self->name;
 
 	self->useDeriv = False;
@@ -187,21 +187,19 @@ void* _ParticleFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name na
 }
 
 void _ParticleFeVariable_AssignFromXML( void* materialFeVariable, Stg_ComponentFactory* cf, void* data ){
-	ParticleFeVariable*     self            = (ParticleFeVariable*) materialFeVariable;
-	IntegrationPointsSwarm* swarm;
-	FiniteElementContext*   context;
-	FeMesh*     mesh;
+	ParticleFeVariable*		self = (ParticleFeVariable*) materialFeVariable;
+	IntegrationPointsSwarm*	swarm;
+	FiniteElementContext*	context;
+	FeMesh*						mesh;
+
+	_FieldVariable_AssignFromXML( self, cf, data );
 
 	swarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", IntegrationPointsSwarm, True, data );
 	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
 	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", FeMesh, True, data );
 
-	/* Construct Parent */
-	_FieldVariable_AssignFromXML( self, cf, data );
 	_FeVariable_Init( (FeVariable*)self, mesh, NULL, NULL, NULL, NULL, NULL, NULL, False, False );
-	_ParticleFeVariable_Init( self, swarm, context );
+	_ParticleFeVariable_Init( self, swarm );
 }
 
 void _ParticleFeVariable_Build( void* materialFeVariable, void* data ) {

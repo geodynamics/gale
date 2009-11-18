@@ -162,27 +162,25 @@ void* _SwarmVariableField_DefaultNew( Name name ) {
 }
 
 void _SwarmVariableField_AssignFromXML( void* swarmVariableField, Stg_ComponentFactory* cf, void* data ) {
-	SwarmVariableField*     	self		= (SwarmVariableField*)swarmVariableField;
-	SwarmVariable*			swarmVar;
-	IntegrationPointsSwarm* 	integrationSwarm;
+	SwarmVariableField*		self = (SwarmVariableField*)swarmVariableField;
+	SwarmVariable*				swarmVar;
+	IntegrationPointsSwarm*	integrationSwarm;
 	Variable_Register*		variable_Register;
 
-	variable_Register = self->context->variable_Register; 
-
-	/* Construct Parent */
 	_ParticleFeVariable_AssignFromXML( self, cf, data );
+
+	variable_Register = self->context->variable_Register; 
 
 	// TODO: just get the textual name here - see gLucifer's SwarmPlotter DrawignObject 
 	self->swarmVarName = Stg_ComponentFactory_GetString( cf, self->name, "swarmVariable", "" );
 	assert( swarmVar );
 
 	self->materialSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialSwarm", MaterialPointsSwarm, True, data );
-
 	integrationSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", IntegrationPointsSwarm, True, NULL );
 	assert( integrationSwarm );
 
 	_SwarmVariableField_Init( self, swarmVar, variable_Register );
-	_ParticleFeVariable_Init( self, integrationSwarm, self->context );
+	_ParticleFeVariable_Init( self, integrationSwarm );
 }
 
 void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {
