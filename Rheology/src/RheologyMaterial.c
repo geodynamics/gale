@@ -61,34 +61,22 @@
 const Type RheologyMaterial_Type = "RheologyMaterial";
 
 RheologyMaterial* RheologyMaterial_New( 
-		Name                             name,
-		Stg_Shape*                       shape,
-		Dictionary*                      materialDictionary,
-		Materials_Register*              materialRegister,
-		Rheology**                       rheologyList,
-		Rheology_Index                   rheologyCount,
-		Compressible*                    compressible )
+	Name						name,
+	PICelleratorContext*	context,
+	Stg_Shape*				shape,
+	Dictionary*				materialDictionary,
+	Materials_Register*	materialRegister,
+	Rheology**				rheologyList,
+	Rheology_Index			rheologyCount,
+	Compressible*			compressible )
 {
-	return (void*) _RheologyMaterial_New( 
-		sizeof(RheologyMaterial), 
-		RheologyMaterial_Type, 
-		_RheologyMaterial_Delete,
-		_RheologyMaterial_Print, 
-		_RheologyMaterial_Copy,
-		_RheologyMaterial_DefaultNew,
-		_RheologyMaterial_AssignFromXML,
-		_RheologyMaterial_Build, 
-		_RheologyMaterial_Initialise,
-		_RheologyMaterial_Execute,
-		_RheologyMaterial_Destroy,
-		_RheologyMaterial_RunRheologies,
-		name,
-		shape,
-		materialDictionary,
-		materialRegister,
-		rheologyList,
-		rheologyCount,
-		compressible );
+	RheologyMaterial* self = _RheologyMaterial_DefaultNew( name );
+
+	self->isConstructed = True;
+	_Material_Init( self, context, shape, materialDictionary, materialRegister );
+	_RheologyMaterial_Init( self, rheologyList, rheologyCount, compressible, False );
+
+	return self;
 }
 
 
@@ -119,27 +107,27 @@ void* _RheologyMaterial_DefaultNew( Name name ) {
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
 RheologyMaterial* _RheologyMaterial_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		RheologyMaterial_RunRheologiesFunction*            _runRheologies,
-		Name                                               name,
-		Stg_Shape*                                         shape,
-		Dictionary*                                        materialDictionary,
-		Materials_Register*                                materialRegister,
-		Rheology**                                         rheologyList,
-		Rheology_Index                                     rheologyCount,
-		Compressible*                                      compressible ) 
+	SizeT                                              sizeOfSelf,
+	Type                                               type,
+	Stg_Class_DeleteFunction*                          _delete,
+	Stg_Class_PrintFunction*                           _print,
+	Stg_Class_CopyFunction*                            _copy, 
+	Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
+	Stg_Component_ConstructFunction*                   _construct,
+	Stg_Component_BuildFunction*                       _build,
+	Stg_Component_InitialiseFunction*                  _initialise,
+	Stg_Component_ExecuteFunction*                     _execute,
+	Stg_Component_DestroyFunction*                     _destroy,
+	RheologyMaterial_RunRheologiesFunction*            _runRheologies,
+	Name                                               name,
+	Stg_Shape*                                         shape,
+	Dictionary*                                        materialDictionary,
+	Materials_Register*                                materialRegister,
+	Rheology**                                         rheologyList,
+	Rheology_Index                                     rheologyCount,
+	Compressible*                                      compressible ) 
 {
-	RheologyMaterial*					self;
+	RheologyMaterial* self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the
  	 *  hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and
@@ -166,31 +154,37 @@ RheologyMaterial* _RheologyMaterial_New(
 	/* Function pointers for this class that are not on the parent class should be set here */
 	self->_runRheologies = _runRheologies;
 	
-	/* Now call the member-assigner, Init() */
-	_RheologyMaterial_Init( self, rheologyList, rheologyCount, compressible, False );
-
 	return self;
 }
 
 
 void _RheologyMaterial_AssignFromXML( void* rheologyMaterial, Stg_ComponentFactory* cf, void* data ){
-	RheologyMaterial*           self                 = (RheologyMaterial*)rheologyMaterial;
-	Rheology**                  rheologyList;
-	Rheology_Index              rheologyCount;
-	Compressible*               compressible;
-	Bool			    isCompressible;
+	RheologyMaterial*	self = (RheologyMaterial*)rheologyMaterial;
+	Rheology**			rheologyList;
+	Rheology_Index		rheologyCount;
+	Compressible*		compressible;
+	Bool					isCompressible;
 
 	_Material_AssignFromXML( self, cf, data );
 
-	rheologyList = Stg_ComponentFactory_ConstructByList( 
-		cf, 
-		self->name, 
-		"Rheology", 
-		Stg_ComponentFactory_Unlimited, 
-		Rheology, 
-		True, 
-		&rheologyCount,
-		data );
+	/* Adding this check now as the rheologyList is only applicable to
+		RheologyMaterial and is set to NULL for MultiRheologyMaterial.
+		MultiRheologyMaterial is a child of RheologyMaterial but it is bypassing its
+		parents _AssignFromXML functionality before. */
+	if( strcmp( self->type, "MultiRheologyMaterial" ) == 0 ) {
+		rheologyList = NULL;
+	}
+	else {
+		rheologyList = Stg_ComponentFactory_ConstructByList( 
+			cf, 
+			self->name, 
+			"Rheology", 
+			Stg_ComponentFactory_Unlimited, 
+			Rheology, 
+			True, 
+			&rheologyCount,
+			data );
+	}
 
 	compressible = Stg_ComponentFactory_ConstructByKey( 
 		cf, 
@@ -204,37 +198,37 @@ void _RheologyMaterial_AssignFromXML( void* rheologyMaterial, Stg_ComponentFacto
 
 	_RheologyMaterial_Init( self, rheologyList, rheologyCount, compressible, isCompressible );
 
-	Memory_Free( rheologyList );
+	if( rheologyList )
+		Memory_Free( rheologyList );
 }
 
 
 void _RheologyMaterial_Init(
-		void*                                              rheologyMaterial,
-		Rheology**                                         rheologyList,
-		Rheology_Index                                     rheologyCount,
-		Compressible*                                      compressible,
-	        Bool						   isCompressible )
+	void*				rheologyMaterial,
+	Rheology**		rheologyList,
+	Rheology_Index	rheologyCount,
+	Compressible*	compressible,
+	Bool				isCompressible )
 {
-	RheologyMaterial* self = (RheologyMaterial*)rheologyMaterial;
-	Rheology_Index    rheology_I;
+	RheologyMaterial*	self = (RheologyMaterial*)rheologyMaterial;
+	Rheology_Index		rheology_I;
 
-	self->compressible      = compressible;
-	self->isCompressible    = isCompressible;
+	self->compressible = compressible;
+	self->isCompressible = isCompressible;
 	self->rheology_Register = Rheology_Register_New();
 
 	/* Add rheologies */
 	for ( rheology_I = 0 ; rheology_I < rheologyCount ; rheology_I++ ) 
 		Rheology_Register_Add( self->rheology_Register, rheologyList[ rheology_I ] );
 
-        /*	self->debug = Journal_Register( Debug_Type, self->type ); /* TODO make child of Underworld_Debug */
+	/*	self->debug = Journal_Register( Debug_Type, self->type ); /* TODO make child of Underworld_Debug */
 }
 
 
 void _RheologyMaterial_Delete( void* rheologyMaterial ) {
-	RheologyMaterial*					self = (RheologyMaterial*)rheologyMaterial;
+	RheologyMaterial* self = (RheologyMaterial*)rheologyMaterial;
 
-	Stg_Class_Delete( self->rheology_Register );
-	_Stg_Component_Delete( self );
+	_Material_Delete( self );
 }
 
 
@@ -264,9 +258,11 @@ void _RheologyMaterial_Execute( void* rheologyMaterial, void* data ) {
 	_Material_Execute( self, data );
 }
 void _RheologyMaterial_Destroy( void* rheologyMaterial, void* data ) {
-	RheologyMaterial*   self                 = (RheologyMaterial*)rheologyMaterial;
-	_Material_Destroy( self, data );
+	RheologyMaterial* self = (RheologyMaterial*)rheologyMaterial;
 
+	Stg_Class_Delete( self->rheology_Register );
+
+	_Material_Destroy( self, data );
 }
 
 void RheologyMaterial_RunRheologies( 	

@@ -55,23 +55,24 @@
 		__RheologyMaterial \
 		/* Virtual functions go here */ \
 		/* Material Parameters */\
-		Rheology_Register**                                 rheology_RegisterList;   \
-		Index                                               rheology_RegisterCount;
+		Rheology_Register**	rheology_RegisterList; \
+		Index						rheology_RegisterCount;
 
 	struct MultiRheologyMaterial { __MultiRheologyMaterial };
 	
 	/** Public "New" C++-Style constructor */
 	MultiRheologyMaterial* MultiRheologyMaterial_New( 
-		Name                             name,
-		Stg_Shape*                       shape,
-		Dictionary*                      materialDictionary,
-		Materials_Register*              materialRegister,
-		Rheology**                       rheologyList,
-		Rheology_Index                   rheologyCount,
-		Compressible*                    compressible,
-		Rheology***                      rheologyListList,
-		Rheology_Index*                  rheologyCountList, 
-		Index                            rheologyListCount );
+		Name						name,
+		PICelleratorContext*	context,
+		Stg_Shape*				shape,
+		Dictionary*				materialDictionary,
+		Materials_Register*	materialRegister,
+		Rheology**				rheologyList,
+		Rheology_Index			rheologyCount,
+		Compressible*			compressible,
+		Rheology***				rheologyListList,
+		Rheology_Index*		rheologyCountList, 
+		Index						rheologyListCount );
 
 	void* _MultiRheologyMaterial_DefaultNew( Name name ) ;
 
@@ -112,11 +113,14 @@
 	/* 'Stg_Component' implementations */
 	void _MultiRheologyMaterial_Delete( void* material );
 
+	void _MultiRheologyMaterial_Destroy( void* material, void* data );
+
 	void _MultiRheologyMaterial_RunRheologies( 	
-		void*                                              material,
-		ConstitutiveMatrix*                                constitutiveMatrix,
-		MaterialPointsSwarm*                               swarm,
-		Element_LocalIndex                                 lElement_I,
-		MaterialPoint*                                     materialPoint,
-		Coord                                              xi );
+		void*						material,
+		ConstitutiveMatrix*	constitutiveMatrix,
+		MaterialPointsSwarm*	swarm,
+		Element_LocalIndex	lElement_I,
+		MaterialPoint*			materialPoint,
+		Coord						xi );
+
 #endif
