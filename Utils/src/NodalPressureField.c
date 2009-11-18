@@ -135,10 +135,10 @@ void* _NodalPressureField_Copy( void* _self, void* dest, Bool deep, Name nameExt
 }
 
 void NodalPressureField_NonLinearUpdate( void* _sle, void* _ctx ) {
-   SystemLinearEquations* sle = (SystemLinearEquations*)_sle;
-   DomainContext* ctx = (DomainContext*)_ctx;
-   FieldVariable_Register* fieldVar_Register;
-   NodalPressureField* preVar;
+   SystemLinearEquations*	sle = (SystemLinearEquations*)_sle;
+   DomainContext*				ctx = (DomainContext*)_ctx;
+   FieldVariable_Register*	fieldVar_Register;
+   NodalPressureField*		preVar;
 
    fieldVar_Register = ctx->fieldVariable_Register; 
    preVar = (NodalPressureField*)FieldVariable_Register_GetByName( fieldVar_Register, "NodalPressureField" );
@@ -146,11 +146,11 @@ void NodalPressureField_NonLinearUpdate( void* _sle, void* _ctx ) {
 }
 
 void _NodalPressureField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data ){
-   NodalPressureField* self = (NodalPressureField*) _self;
-   Variable_Register* variable_Register;
-   SystemLinearEquations* sle;
-   FeVariable* pressureField;
-   /* Construct Parent */
+   NodalPressureField*		self = (NodalPressureField*) _self;
+   Variable_Register*		variable_Register;
+   SystemLinearEquations*	sle;
+   FeVariable*					pressureField;
+
    _ParticleFeVariable_AssignFromXML( self, cf, data );
 
    variable_Register = self->variable_Register; 

@@ -183,8 +183,6 @@ void _StressField_AssignFromXML( void* stressField, Stg_ComponentFactory* cf, vo
 	/* Construct Parent */
 	_ParticleFeVariable_AssignFromXML( self, cf, data );
 
-	/* _FieldVariable_AssignFromXML( self, cf, data ); */
-
 	strainRateField =  Stg_ComponentFactory_ConstructByKey( cf,  self->name, "StrainRateField", FeVariable, True, data );
 	constitutiveMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ConstitutiveMatrix", ConstitutiveMatrix, True, data );
 	variable_Register = self->context->variable_Register; 
