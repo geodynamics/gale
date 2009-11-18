@@ -169,12 +169,12 @@ void _PICelleratorContext_SetDt( void* context, double dt ) {
 
 /* EntryPoint Hooks ----------------------------------------------------------------------------------------------------*/
 void PICelleratorContext_CreateDefaultMaterial( void* context ) {
-	PICelleratorContext*      self         = (PICelleratorContext*) context;
+	PICelleratorContext* self = (PICelleratorContext*) context;
 	
 	if ( Materials_Register_GetCount( self->materials_Register ) == 0 ) {
 		Stg_Shape* everywhereShape = (Stg_Shape*) Everywhere_New( "defaultShape", self->dim );
 
-		Material_New( "backgroundMaterial", everywhereShape, self->dictionary, self->materials_Register );
+		Material_New( "backgroundMaterial", self, everywhereShape, self->dictionary, self->materials_Register );
 	}
 }
 

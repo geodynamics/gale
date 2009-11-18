@@ -61,29 +61,16 @@ const Index UNDEFINED_MATERIAL = (unsigned)-1;
 
 /* Public Constructor */
 Material* Material_New( 
-		Name                                            name,
-		Stg_Shape*                                      shape,
-		Dictionary*                                     materialDictionary,
-		Materials_Register*                             materialRegister )
+	Name						name,
+	PICelleratorContext*	context,
+	Stg_Shape*				shape,
+	Dictionary*				materialDictionary,
+	Materials_Register*	materialRegister )
 {
-	Material* self;
+	Material* self = _Material_DefaultNew( name );
 
-	self = (Material*) _Material_New(			
-			sizeof(Material),
-			Material_Type,
-			_Material_Delete, 
-			_Material_Print, 
-			_Material_Copy, 
-			_Material_DefaultNew, 
-			_Material_AssignFromXML, 
-			_Material_Build, 
-			_Material_Initialise, 
-			_Material_Execute, 
-			_Material_Destroy,
-			name,
-			shape,
-			materialDictionary,
-			materialRegister );
+	self->isConstructed = True;
+	_Material_Init( self, context, shape, materialDictionary, materialRegister );
 
 	return self;
 }
@@ -111,21 +98,21 @@ void* _Material_DefaultNew( Name name ) {
 
 /* Private Constructor */
 Material* _Material_New(
-		SizeT                                           _sizeOfSelf,
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy,
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,
-		Name                                            name,
-		Stg_Shape*                                      shape,
-		Dictionary*                                     materialDictionary,
-		Materials_Register*                             materialRegister )
+	SizeT                                           _sizeOfSelf,
+	Type                                            type,
+	Stg_Class_DeleteFunction*                       _delete,
+	Stg_Class_PrintFunction*                        _print,
+	Stg_Class_CopyFunction*                         _copy,
+	Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
+	Stg_Component_ConstructFunction*                _construct,
+	Stg_Component_BuildFunction*                    _build,
+	Stg_Component_InitialiseFunction*               _initialise,
+	Stg_Component_ExecuteFunction*                  _execute,
+	Stg_Component_DestroyFunction*                  _destroy,
+	Name                                            name,
+	Stg_Shape*                                      shape,
+	Dictionary*                                     materialDictionary,
+	Materials_Register*                             materialRegister )
 {
 	Material* self;
 	
@@ -145,23 +132,23 @@ Material* _Material_New(
 			name,
 			NON_GLOBAL );
 
-	_Material_Init( self, shape, materialDictionary, materialRegister );
-
 	return self;
 }
 
 
 void _Material_Init( 
-		void*                                           material,
-		Stg_Shape*                                      shape,
-		Dictionary*                                     materialDictionary,
-		Materials_Register*                             materialRegister )
+	void*						material,
+	PICelleratorContext*	context,
+	Stg_Shape*				shape,
+	Dictionary*				materialDictionary,
+	Materials_Register*	materialRegister )
 {
 	Material* self = (Material*)material;
 	
 	/* Set Values */
+	self->context = context;
 	self->dictionary = materialDictionary;
-	self->shape      = shape;
+	self->shape = shape;
 
 	/* Register material */
 	if (materialRegister != NULL)	
@@ -204,20 +191,21 @@ void* _Material_Copy( void* material, void* dest, Bool deep, Name nameExt, PtrMa
 
 
 void _Material_AssignFromXML( void* material, Stg_ComponentFactory* cf, void* data ) {
-	Material*             self               = (Material*) material;
-	Dictionary*           materialDictionary;
-	Stg_Shape*            shape;
-	Materials_Register*   materials_Register;
+	Material*				self = (Material*) material;
+	Dictionary*				materialDictionary;
+	Stg_Shape*				shape;
+	Materials_Register*	materials_Register;
+	PICelleratorContext*	context;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", PICelleratorContext, False, data );
-	if( !self->context ) 
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", PICelleratorContext, False, data );
+	if( !context ) 
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
 
 	materialDictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 	shape =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Shape", Stg_Shape,  True, data  ) ;
-	materials_Register = self->context->materials_Register;
+	materials_Register = context->materials_Register;
 
-	_Material_Init( self, shape, materialDictionary, materials_Register );
+	_Material_Init( self, context, shape, materialDictionary, materials_Register );
 }
 
 

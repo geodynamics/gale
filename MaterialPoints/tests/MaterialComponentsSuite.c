@@ -213,8 +213,8 @@ void MaterialComponentsSuite_Setup( MaterialComponentsSuiteData* data ) {
 			GetOffsetOfMember( particle , matProp4 ), 
 			Variable_DataType_Int );
 
-   data->mat1 = Material_New( "mat1", data->shape1, data->matDict1, data->mRegister );
-   data->mat2 = Material_New( "mat2", data->shape2, data->matDict2, data->mRegister );
+   data->mat1 = Material_New( "mat1", NULL, data->shape1, data->matDict1, data->mRegister );
+   data->mat2 = Material_New( "mat2", NULL, data->shape2, data->matDict2, data->mRegister );
 
    MaterialComponentsSuite_BuildInitSwarmBasics( data );
    /* Now set them all the swarm var properties to 0 / False initially */

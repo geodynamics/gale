@@ -52,20 +52,21 @@
 	#define __Material \
 		__Stg_Component \
 		\
-		PICelleratorContext*		      context;          \
-		Dictionary*                           dictionary;       \
-		Stg_Shape*                            shape;            \
-		Material_Index                        index;            /**< The index inside the Materials_Register */ \
-		ExtensionManager*                     extensionMgr;     \
+		PICelleratorContext*	context; \
+		Dictionary*				dictionary; \
+		Stg_Shape*				shape; \
+		Material_Index			index; /**< The index inside the Materials_Register */ \
+		ExtensionManager*		extensionMgr; 
 		
 	struct Material { __Material };
 
 	/* Public Constructor */
 	Material* Material_New(
-		Name                                            name,
-		Stg_Shape*                                      shape,
-		Dictionary*                                     materialDictionary,
-		Materials_Register*                             materialRegister );
+		Name						name,
+		PICelleratorContext*	context, 
+		Stg_Shape*				shape,
+		Dictionary*				materialDictionary,
+		Materials_Register*	materialRegister );
 
 	void* _Material_DefaultNew( Name name );
 
@@ -90,19 +91,25 @@
 	void _Material_AssignFromXML( void* material, Stg_ComponentFactory* cf, void* data );
 
 	void _Material_Init( 
-		void*                                           material, 	
-		Stg_Shape*                                      shape,
-		Dictionary*                                     materialDictionary,
-		Materials_Register*                             materialRegister ) ;
+		void*						material, 	
+		PICelleratorContext*	context, 
+		Stg_Shape*				shape,
+		Dictionary*				materialDictionary,
+		Materials_Register*	materialRegister );
 
 	/** Virtual Functions */
-	void _Material_Delete( void* material ) ;
-	void _Material_Print( void* material, Stream* stream ) ;
-	void* _Material_Copy( void* material, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
+	void _Material_Delete( void* material );
+
+	void _Material_Print( void* material, Stream* stream );
+
+	void* _Material_Copy( void* material, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _Material_Build( void* material, void* data );
+
 	void _Material_Initialise( void* material, void* data );
+
 	void _Material_Execute( void* material, void* data );
+
 	void _Material_Destroy( void* material, void* data );
 
 	/** Performs a layout of this material onto the points of the swarm, assigning the material index if the global
@@ -121,10 +128,10 @@
 	 *                         field and store it in result. result must be an array of as many doubles as there are components
 	 *                         in the field. */
 	void Material_IntegrateField( 
-			void*                   material, 
-			IntegrationPointsSwarm* swarm, 
-			FeVariable*             field, 
-			double*                 volumeGlobal, 
-			double*                 result );
+		void*                   material, 
+		IntegrationPointsSwarm* swarm, 
+		FeVariable*             field, 
+		double*                 volumeGlobal, 
+		double*                 result );
 
 #endif 
