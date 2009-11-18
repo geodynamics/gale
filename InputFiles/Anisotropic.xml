@@ -134,7 +134,7 @@
 	<param name="particlesPerCell"> 20 </param>
 
 	<!-- Viewport stuff -->
-	<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
+	<!--<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
 	<include>Underworld/Viewports/VelocityMagnitudeVP.xml</include>
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
@@ -165,5 +165,5 @@
 		<struct name="window" mergeType="merge">
 			<param name="Viewport">TemperatureAndVelocityArrowsVP VelocityMagnitudeVP AlignmentVP</param>
 		</struct>
-	</struct>  
+	</struct>-->
 </StGermainData>

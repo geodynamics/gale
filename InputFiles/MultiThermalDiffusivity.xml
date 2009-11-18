@@ -232,7 +232,7 @@ appropriate parameters and their values if you use this xml from production runs
 	<param name="particlesPerCell"> 20 </param>
 
 	<!-- Viewport stuff -->
-	<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
+	<!--<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
 	<include>Underworld/Viewports/VelocityMagnitudeVP.xml</include>
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
@@ -246,7 +246,6 @@ appropriate parameters and their values if you use this xml from production runs
 			<param name="colours">Red Green Blue</param>
 			<param name="dynamicRange">True</param>
 		</struct>
-		<!-- Drawing Objects -->
 		<struct name="particleDots">
 			<param name="Type">lucSwarmViewer</param>
 			<param name="Swarm">materialSwarm</param>
@@ -262,7 +261,6 @@ appropriate parameters and their values if you use this xml from production runs
 			<param name="Type">lucTitle</param>
 			<param name="string">Particle Types</param>
 		</struct>
-		<!-- Viewport -->
 		<struct name="ParticleVP">
 			<param name="Type">lucViewport</param>
 			<param name="Camera">camera</param>
@@ -272,10 +270,9 @@ appropriate parameters and their values if you use this xml from production runs
 				<param>border</param>
 			</list>
 		</struct>
-		<!-- Drawing Objects -->
 		<struct name="window" mergeType="merge">
 			<param name="Viewport">TemperatureAndVelocityArrowsVP ParticleVP </param>
 		</struct>
-	</struct>
+	</struct>-->
  
 </StGermainData>

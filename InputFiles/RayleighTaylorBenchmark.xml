@@ -127,13 +127,13 @@
 	<param name="CentroidMaterial">ball</param>
 
 	<!-- Visualisation stuff -->
-	<include>Underworld/Viewports/ParticleDensityVP.xml</include>
+	<!--<include>Underworld/Viewports/ParticleDensityVP.xml</include>
 	<include>Underworld/Viewports/StrainRateInvariantVP.xml</include>
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
 			<param name="Viewport">ParticleDensityVP StrainRateInvariantVP</param>
 		</struct>
-	</struct>
+	</struct>-->
 
 </StGermainData>	
