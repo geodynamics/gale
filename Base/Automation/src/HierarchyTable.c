@@ -126,7 +126,7 @@ void HierarchyTable_PrintChildren( void* hierarchyTable, Type parentType, Stream
 	Stream_UnIndent( stream );
 }
 
-Bool Stg_Context_CheckType( const void* classPtr, Type possibleParentType ) {
+Bool Stg_Class_CompareType( const void* classPtr, Type possibleParentType ) {
 	Stg_Class* self = (Stg_Class*) classPtr;
 	/* Check if the pointer is null */
 	Journal_Firewall(

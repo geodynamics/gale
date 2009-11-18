@@ -98,8 +98,8 @@
 	#define Stg_CheckType( classPtr, possibleParentTypedef ) \
 		(possibleParentTypedef*) Stg_Class_CheckType( (classPtr), possibleParentTypedef ## _Type )
 
-	#define Stg_CheckContext( classPtr, possibleParentTypedef ) \
-		(possibleParentTypedef*) Stg_Context_CheckType( (classPtr), possibleParentTypedef ## _Type )
+	#define Stg_CompareType( classPtr, possibleParentTypedef ) \
+		(possibleParentTypedef*) Stg_Class_CompareType( (classPtr), possibleParentTypedef ## _Type )
 
 	#ifdef DEBUG
 		#define Stg_DCheckType Stg_CheckType
@@ -109,7 +109,7 @@
 	#endif
 
 	Stg_Class* Stg_Class_CheckType( const void* classPtr, Type possibleParentType );
-	Bool Stg_Context_CheckType( const void* classPtr, Type possibleParentType );
+	Bool Stg_Class_CompareType( const void* classPtr, Type possibleParentType );
 
 	void HierarchyTable_PrintParents( void* hierarchyTable, Type childType, Stream* stream ) ;
 	void HierarchyTable_PrintChildren( void* hierarchyTable, Type parentType, Stream* stream ) ;
