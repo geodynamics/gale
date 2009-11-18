@@ -203,7 +203,7 @@ void AbstractContextSuite_Setup( AbstractContextSuiteData* data ) {
       CommWorld, 
       data->dict );
 
-	_AbstractContext_Init( data->ctx );
+	_AbstractContext_Init( (AbstractContext*)data->ctx );
    _AbstractContext_AssignFromXML( data->ctx, cf, NULL );
 
    Stream_Enable( data->ctx->info, False );
@@ -336,7 +336,7 @@ void AbstractContextSuite_TestRestartFromCheckpoint( AbstractContextSuiteData* d
       CommWorld, 
       data->dict );
 
-	 _AbstractContext_Init( data->ctx );
+	_AbstractContext_Init( (AbstractContext*)data->ctx );
    _AbstractContext_AssignFromXML( data->ctx, cf, NULL );
 
    Stream_Enable( data->ctx->info, False );

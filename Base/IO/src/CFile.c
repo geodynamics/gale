@@ -103,7 +103,8 @@ void CFile_Init( CFile* self )
 	
 void _CFile_Init( CFile* self )
 {
-	_JournalFile_Init( (JournalFile*)self, _CFile_Open, _CFile_Append, _CFile_Close, _CFile_Flush );
+	_JournalFile_Init( (JournalFile*)self, (JournalFile_OpenFunction*)_CFile_Open,
+		(JournalFile_AppendFunction*)_CFile_Append, _CFile_Close, _CFile_Flush );
 }
 	
 void _CFile_Delete( void* cfile )
