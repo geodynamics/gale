@@ -62,16 +62,16 @@
 	<param name="dumpEvery"> 1 </param>	
 	<param name="checkpointEvery"> 0 </param>
 
-        <!--   choose what to checkpoint
+  	<!--   choose what to checkpoint
 	<list name="FieldVariablesToCheckpoint">
 		<param>VelocityField</param>
 		<param>VelocityGradientsField</param>
 	</list>
 	-->
 
-        <!--  restart from a previous checkpoint 
-        <param name="restartTimestep"> 10 </param>
-         -->
+	<!--  restart from a previous checkpoint 
+  	<param name="restartTimestep"> 10 </param>
+  	-->
 	
 	<param name="Ra"> 1e6 </param>	
 	
@@ -110,13 +110,13 @@
 	<!-- Integration Scheme configuration -->
 
 	<!-- Viewport stuff -->
-	<include>Underworld/Viewports/TemperatureContoursVP.xml</include>
+	<!--<include>Underworld/Viewports/TemperatureContoursVP.xml</include>
 	<include>Underworld/Viewports/StrainRateInvariantVP.xml</include>
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
 			<param name="Viewport">TemperatureContoursVP StrainRateInvariantVP</param>
 		</struct>
-	</struct>
+	</struct>-->
 
 </StGermainData>
