@@ -51,31 +51,28 @@ ExtensionInfo_Index	EulerDeform_ContextHandle;
 
 
 Index Underworld_EulerDeform_Register( PluginsManager* pluginsMgr ) {
-	return PluginsManager_Submit( pluginsMgr, 
-				      Underworld_EulerDeform_Type, 
-				      "0", 
-				      _Underworld_EulerDeform_DefaultNew );
+	return PluginsManager_Submit( pluginsMgr, Underworld_EulerDeform_Type, "0", _Underworld_EulerDeform_DefaultNew );
 }
 
 
 void* _Underworld_EulerDeform_DefaultNew( Name name ) {
 	return _Codelet_New( sizeof(Codelet), 
-			     Underworld_EulerDeform_Type, 
-			     _Codelet_Delete, 
-			     _Codelet_Print, 
-			     _Codelet_Copy, 
-			     _Underworld_EulerDeform_DefaultNew, 
-			     _Underworld_EulerDeform_AssignFromXML, 
-			     _Underworld_EulerDeform_Build, 
-			     _Codelet_Initialise, 
-			     _Codelet_Execute, 
-			     _Underworld_EulerDeform_Destroy, 
-			     name );
+		Underworld_EulerDeform_Type, 
+		_Codelet_Delete, 
+		_Codelet_Print, 
+		_Codelet_Copy, 
+		_Underworld_EulerDeform_DefaultNew, 
+		_Underworld_EulerDeform_AssignFromXML, 
+		_Underworld_EulerDeform_Build, 
+		_Codelet_Initialise, 
+		_Codelet_Execute, 
+		_Underworld_EulerDeform_Destroy, 
+		name );
 }
 
 
 void _Underworld_EulerDeform_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
-	Codelet*		ed		= (Codelet*)component;
+	Codelet*					ed = (Codelet*)component;
 	UnderworldContext*	uwCtx;
 	EulerDeform_Context*	edCtx;
 
@@ -94,8 +91,8 @@ void _Underworld_EulerDeform_AssignFromXML( void* component, Stg_ComponentFactor
 	memset( edCtx, 0, sizeof(EulerDeform_Context) );
 	edCtx->ctx = (AbstractContext*)uwCtx;
 
-        /* Get the time integrator. */
-        uwCtx->timeIntegrator = Stg_ComponentFactory_ConstructByName( cf, "timeIntegrator", TimeIntegrator, True, data );
+	/* Get the time integrator. */
+	uwCtx->timeIntegrator = Stg_ComponentFactory_ConstructByName( cf, "timeIntegrator", TimeIntegrator, True, data );
 
 	/* Grab the ArtDisplacementField from the dictionary */
 	edCtx->artDField = Stg_ComponentFactory_ConstructByName( cf, "ArtDisplacementField", FeVariable, False, data );
@@ -103,14 +100,13 @@ void _Underworld_EulerDeform_AssignFromXML( void* component, Stg_ComponentFactor
 
 
 void _Underworld_EulerDeform_Build( void* component, void* data ) {
-	Codelet*		ed	= (Codelet*)component;
-	UnderworldContext*	uwCtx	= (UnderworldContext*)ed->context;
-	//UnderworldContext*	uwCtx 	= (UnderworldContext*)data;
-	EulerDeform_Context*	edCtx;
-	Variable*		crdVar;
-	TimeIntegratee*		crdAdvector;
-	Stg_Component*		tiData[2];
-	unsigned		sys_i;
+	Codelet*						ed	= (Codelet*)component;
+	UnderworldContext*		uwCtx	= (UnderworldContext*)ed->context;
+	EulerDeform_Context*		edCtx;
+	Variable*					crdVar;
+	TimeIntegratee*			crdAdvector;
+	Stg_Component*				tiData[2];
+	unsigned						sys_i;
 	Dictionary_Entry_Value*	edDict;
 	Dictionary_Entry_Value*	sysLst;
 
@@ -136,13 +132,13 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 		memset( edCtx->systems, 0, sizeof(EulerDeform_System) * edCtx->nSystems );
 
 		for( sys_i = 0; sys_i < edCtx->nSystems; sys_i++ ) {
-			EulerDeform_System*	sys = edCtx->systems + sys_i;
-			Dictionary*		sysDict;
+			EulerDeform_System*		sys = edCtx->systems + sys_i;
+			Dictionary*					sysDict;
 			Dictionary_Entry_Value*	varLst;
-			char*			meshName;
-			char*			remesherName;
-			char*			velFieldName;
-			char* name;
+			char*							meshName;
+			char*							remesherName;
+			char*							velFieldName;
+			char*							name;
 
 			/* Get the dictionary for this system. */
 			sysDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetElement( sysLst, sys_i ) );
@@ -151,13 +147,16 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 			/* Read contents. */
 			meshName = Dictionary_GetString( sysDict, "mesh" );
 			remesherName = Dictionary_GetString( sysDict, "remesher" );
+
 			if( strcmp( remesherName, "" ) )
 				sys->remesher = Stg_ComponentFactory_ConstructByName( uwCtx->CF, remesherName, Remesher, True, data );
 			name = Dictionary_GetString(sysDict, "displacementField");
+
 			if(strcmp(name, ""))
 			    sys->dispField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, name, FeVariable, True, data );
 			else
 			    sys->dispField = NULL;
+
 			velFieldName = Dictionary_GetString( sysDict, "VelocityField" );
 			sys->interval = Dictionary_GetInt_WithDefault( sysDict, "interval", -1 );
 			sys->wrapTop = Dictionary_GetBool_WithDefault( sysDict, "wrapTop", False );
@@ -182,15 +181,17 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 
 			/* Read the list of variables to interpolate. */
 			varLst = Dictionary_Entry_Value_GetMember( Dictionary_Entry_Value_GetElement( sysLst, sys_i ), "fields" );
+
 			if( varLst ) {
 				unsigned	var_i;
 
 				sys->nFields = Dictionary_Entry_Value_GetCount( varLst );
 				sys->fields = Memory_Alloc_Array( FieldVariable*, sys->nFields, "EulerDeform->systems[].fields" );
 				sys->vars = Memory_Alloc_Array( Variable*, sys->nFields, "EulerDeform->systemsp[].vars" );
+
 				for( var_i = 0; var_i <sys->nFields; var_i++ ) {
 					Dictionary*	varDict;
-					char*		varName;
+					char*			varName;
 
 					/* Get the dictionary for this field tuple. */
 					varDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetElement( varLst, var_i ) );
@@ -217,14 +218,8 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 
 		tiData[0] = (Stg_Component*)sys->velField;
 		tiData[1] = (Stg_Component*)&sys->mesh->verts;
-		crdAdvector = TimeIntegratee_New( "EulerDeform_Velocity",
-                                                  uwCtx,
-						  uwCtx->timeIntegrator, 
-						  crdVar, 
-						  2,
-						  tiData,
-						  True /* Presume we need to allow fallback on edges of
-							  stretching mesh - PatrickSunter, 7 June 2006 */ );
+		crdAdvector = TimeIntegratee_New( "EulerDeform_Velocity", uwCtx, uwCtx->timeIntegrator, crdVar, 2, tiData, True
+			 /* Presume we need to allow fallback on edges of stretching mesh - PatrickSunter, 7 June 2006 */ );
 		crdAdvector->_calculateTimeDeriv = EulerDeform_TimeDeriv;
 
 		/* Add to live component register... */
@@ -234,27 +229,19 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 
 	if( edCtx->nSystems > 0 ) {
 		/* Insert the sync step. */
-		TimeIntegrator_PrependSetupEP( uwCtx->timeIntegrator, 
-					       "EulerDeform_IntegrationSetup", 
-					       EulerDeform_IntegrationSetup, 
-					       "EulerDeform", 
-					       edCtx );
+		TimeIntegrator_PrependSetupEP( uwCtx->timeIntegrator, "EulerDeform_IntegrationSetup", EulerDeform_IntegrationSetup, "EulerDeform", edCtx );
 	}
 
 	/* Insert the remesh step. Note that this should look for the surface process
 	   plugin's time integrator finish routine and ensure we enter the remesh step
 	   after that one but before the particle updating routines. */
-	TimeIntegrator_PrependFinishEP( uwCtx->timeIntegrator, 
-					"EulerDeform_Execute", 
-					EulerDeform_Remesh, 
-					"EulerDeform", 
-					edCtx );
+	TimeIntegrator_PrependFinishEP( uwCtx->timeIntegrator, "EulerDeform_Execute", EulerDeform_Remesh, "EulerDeform", edCtx );
 }
 
 
 void _Underworld_EulerDeform_Destroy( void* component, void* data ) {
-	Codelet*		ed	= (Codelet*)component;
-	UnderworldContext*	uwCtx 	= (UnderworldContext*)ed->context;
+	Codelet*					ed	= (Codelet*)component;
+	UnderworldContext*	uwCtx = (UnderworldContext*)ed->context;
 
 	assert( component );
 	assert( uwCtx );
@@ -266,25 +253,23 @@ void _Underworld_EulerDeform_Destroy( void* component, void* data ) {
 /* This creates a set which makes sure not to include the corners if
    we have not made both sides of the corner static. */
 
-IndexSet* EulerDeform_CreateStaticSet(EulerDeform_System* sys, int dim)
-{
+IndexSet* EulerDeform_CreateStaticSet(EulerDeform_System* sys, int dim) {
   Grid*		grid;
   unsigned	nNodes;
-  unsigned n_i;
-  IndexSet *set;
-  IJK		ijk;
+  unsigned	n_i;
+  IndexSet	*set;
+  IJK			ijk;
 
-  grid = *(Grid**)ExtensionManager_Get
-    ( sys->mesh->info, sys->mesh, 
-      ExtensionManager_GetHandle( sys->mesh->info, "vertexGrid" ) );
+  grid = *(Grid**)ExtensionManager_Get ( sys->mesh->info, sys->mesh, ExtensionManager_GetHandle( sys->mesh->info, "vertexGrid" ) );
 
   nNodes = Mesh_GetDomainSize( sys->mesh, MT_VERTEX );
   set = IndexSet_New( nNodes );
+
   for( n_i = 0; n_i < nNodes; n_i++ ) {
     Bool add;
-    add=False;
-    RegularMeshUtils_Node_1DTo3D
-      ( sys->mesh, Mesh_DomainToGlobal( sys->mesh, MT_VERTEX, n_i ), ijk );
+    add = False;
+    RegularMeshUtils_Node_1DTo3D( sys->mesh, Mesh_DomainToGlobal( sys->mesh, MT_VERTEX, n_i ), ijk );
+
     if(ijk[0]==0) {
       if(sys->staticLeft && dim == 0)
         add=True;
@@ -326,18 +311,14 @@ IndexSet* EulerDeform_CreateStaticSet(EulerDeform_System* sys, int dim)
   return set;
 }
 
-
-
-Variable* EulerDeform_RegisterLocalNodeCoordsAsVariables( EulerDeform_System* sys, void* _variable_Register, 
-							  Variable** variableList )
-{
-	FeMesh* self              = (FeMesh*)sys->mesh;
-	Variable_Register*  variable_Register = (Variable_Register*) _variable_Register;
-	Variable*           variable;
-	Name                variableName;
-	Name                variableNameX;
-	Name                variableNameY;
-	Name                variableNameZ;
+Variable* EulerDeform_RegisterLocalNodeCoordsAsVariables( EulerDeform_System* sys, void* _variable_Register, Variable** variableList ) {
+	FeMesh*					self = (FeMesh*)sys->mesh;
+	Variable_Register*	variable_Register = (Variable_Register*) _variable_Register;
+	Variable*				variable;
+	Name						variableName;
+	Name						variableNameX;
+	Name						variableNameY;
+	Name						variableNameZ;
 
 	/* Allocate advection array. */
 	sys->verts = AllocArray( double, Mesh_GetLocalSize( self, MT_VERTEX ) * Mesh_GetDimSize( self ) );
@@ -385,9 +366,8 @@ Variable* EulerDeform_RegisterLocalNodeCoordsAsVariables( EulerDeform_System* sy
 
 
 void EulerDeform_IntegrationSetup( void* _timeIntegrator, void* context ) {
-  /*TimeIntegrator*		timeIntegrator = (TimeIntegrator*)_timeIntegrator;*/
 	EulerDeform_Context*	edCtx = (EulerDeform_Context*)context;
-	unsigned		sys_i;
+	unsigned					sys_i;
 
 	FeVariable_SyncShadowValues( edCtx->systems[0].velField );
 
@@ -397,7 +377,7 @@ void EulerDeform_IntegrationSetup( void* _timeIntegrator, void* context ) {
 	*/
 
 	for( sys_i = 0; sys_i < edCtx->nSystems; sys_i++ ) {
-		EulerDeform_System*	sys = edCtx->systems + sys_i;
+		EulerDeform_System* sys = edCtx->systems + sys_i;
 
 		if( sys->staticSides ) {
 			IndexSet	*tmpIndSet;
@@ -406,35 +386,34 @@ void EulerDeform_IntegrationSetup( void* _timeIntegrator, void* context ) {
 			unsigned	ind_i, d_i;
 
 			nDims = Mesh_GetDimSize( sys->mesh );
-                        sys->sideCoords = AllocArray( double*, nDims );
+			sys->sideCoords = AllocArray( double*, nDims );
 
-                        for( d_i = 0; d_i < nDims; d_i++ ) {
+			for( d_i = 0; d_i < nDims; d_i++ ) {
+				tmpIndSet = EulerDeform_CreateStaticSet(sys, d_i);
+				IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
 
-                          tmpIndSet = EulerDeform_CreateStaticSet(sys, d_i);
-                          IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
+				/* Copy coords to temporary array. */
+				sys->sideCoords[d_i] = AllocArray( double, nInds );
 
-                          /* Copy coords to temporary array. */
-                          sys->sideCoords[d_i] = AllocArray( double, nInds );
+				for( ind_i = 0; ind_i < nInds; ind_i++ )
+					sys->sideCoords[d_i][ind_i] = sys->mesh->verts[inds[ind_i]][d_i];
 
-                          for( ind_i = 0; ind_i < nInds; ind_i++ )
-                            sys->sideCoords[d_i][ind_i] = sys->mesh->verts[inds[ind_i]][d_i];
-
-                          FreeObject( tmpIndSet );
-                          FreeArray( inds );
-
-                        }
+				FreeObject( tmpIndSet );
+				FreeArray( inds );
+			}
 		}
 	}
 
 	/* Update advection arrays. */
 	for( sys_i = 0; sys_i < edCtx->nSystems; sys_i++ ) {
 		EulerDeform_System*	sys = edCtx->systems + sys_i;
-		unsigned		nDims;
-		unsigned		nLocalNodes;
-		unsigned		n_i;
+		unsigned					nDims;
+		unsigned					nLocalNodes;
+		unsigned					n_i;
 
 		nDims = Mesh_GetDimSize( sys->mesh );
 		nLocalNodes = Mesh_GetLocalSize( sys->mesh, MT_VERTEX );
+
 		for( n_i = 0; n_i < nLocalNodes; n_i++ )
 			memcpy( sys->verts + n_i * nDims, sys->mesh->verts[n_i], nDims * sizeof(double) );
 	}
@@ -442,10 +421,10 @@ void EulerDeform_IntegrationSetup( void* _timeIntegrator, void* context ) {
 
 
 Bool EulerDeform_TimeDeriv( void* crdAdvector, Index arrayInd, double* timeDeriv ) {
-	TimeIntegratee*	self = (TimeIntegratee*)crdAdvector;
-	FeVariable*	velocityField = (FeVariable*)self->data[0];
-	double**	crds = *(double***)self->data[1];
-	InterpolationResult  result = LOCAL;
+	TimeIntegratee*		self = (TimeIntegratee*)crdAdvector;
+	FeVariable*				velocityField = (FeVariable*)self->data[0];
+	double**					crds = *(double***)self->data[1];
+	InterpolationResult	result = LOCAL;
 
 	/* check if the node information is on the local proc */
 	if (arrayInd >= Mesh_GetDomainSize(velocityField->feMesh,MT_VERTEX) )
@@ -484,37 +463,37 @@ Bool EulerDeform_TimeDeriv( void* crdAdvector, Index arrayInd, double* timeDeriv
 
 void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx ) {
 	Mesh_Algorithms	*tmpAlgs, *oldAlgs;
-	unsigned	sys_i;
+	unsigned				sys_i;
 
 	assert( edCtx );
 
-        /* We do the second system first, because that is the vertex
-           centered system.  We want the cell centered and vertex
-           centered systems to be compatible, so the cell centered
-           system is based on the vertex centered one. */
+	/* We do the second system first, because that is the vertex
+		centered system.  We want the cell centered and vertex
+		centered systems to be compatible, so the cell centered
+		system is based on the vertex centered one. */
 
 	for( sys_i = 1; sys_i < edCtx->nSystems+1; sys_i++ ) {
-		EulerDeform_System*	sys = edCtx->systems
-                  + sys_i%edCtx->nSystems;
-		double**		oldCrds;
-		double**		newCrds;
-		unsigned		nDomainNodes;
-		unsigned		nDims;
-		unsigned		var_i, n_i, dof_i;
+		EulerDeform_System*	sys = edCtx->systems + sys_i%edCtx->nSystems;
+		double**					oldCrds;
+		double**					newCrds;
+		unsigned					nDomainNodes;
+		unsigned					nDims;
+		unsigned					var_i, n_i, dof_i;
 
 		/* Update the displacement field. */
 		if(sys->dispField) {
-		    double disp[3];
-		    int num_verts, num_dims;
-		    int ii, jj;
+			double	disp[3];
+			int		num_verts, num_dims;
+			int		ii, jj;
 
-		    num_dims = Mesh_GetDimSize(sys->mesh);
-		    num_verts = Mesh_GetLocalSize(sys->mesh, MT_VERTEX);
-		    for(ii = 0; ii < num_verts; ii++) {
-			FeVariable_GetValueAtNode(sys->dispField, ii, disp);
-			for(jj = 0; jj < num_dims; jj++)
-			    disp[jj] += sys->verts[ii*num_dims + jj] - sys->mesh->verts[ii][jj];
-			FeVariable_SetValueAtNode(sys->dispField, ii, disp);
+			num_dims = Mesh_GetDimSize(sys->mesh);
+			num_verts = Mesh_GetLocalSize(sys->mesh, MT_VERTEX);
+
+			for(ii = 0; ii < num_verts; ii++) {
+				FeVariable_GetValueAtNode(sys->dispField, ii, disp);
+				for(jj = 0; jj < num_dims; jj++)
+					disp[jj] += sys->verts[ii*num_dims + jj] - sys->mesh->verts[ii][jj];
+				FeVariable_SetValueAtNode(sys->dispField, ii, disp);
 		    }
 		}
 
@@ -530,31 +509,28 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 			unsigned	nInds, *inds;
 			unsigned	ind_i, d_i;
 
-                        for( d_i = 0; d_i < nDims; d_i++ ) {
+			for( d_i = 0; d_i < nDims; d_i++ ) {
+				tmpIndSet = EulerDeform_CreateStaticSet(sys, d_i);
+				IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
 
-                          tmpIndSet = EulerDeform_CreateStaticSet(sys, d_i);
-                          IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
+				/* Copy back coords. */
+				for( ind_i = 0; ind_i < nInds; ind_i++ )
+					sys->mesh->verts[inds[ind_i]][d_i] = sys->sideCoords[d_i][ind_i];
 
-                          /* Copy back coords. */
-                          for( ind_i = 0; ind_i < nInds; ind_i++ )
-                            sys->mesh->verts[inds[ind_i]][d_i] = sys->sideCoords[d_i][ind_i];
-
-                          FreeObject( tmpIndSet );
-                          FreeArray( sys->sideCoords[d_i] );
-
-                        }
-
-                        FreeArray( sys->sideCoords );
+				FreeObject( tmpIndSet );
+				FreeArray( sys->sideCoords[d_i] );
+			}
+			FreeArray( sys->sideCoords );
 		}
 
 		/*
 		** If we have any contact sides, handle them now. */
 		if( sys->contactRight ) {
-		   int nDims;
-		   Grid* grid;
-		   int inds[3], flatInd;
-		   double height;
-		   int ii;
+		   int		nDims;
+		   Grid*		grid;
+		   int		inds[3], flatInd;
+		   double	height;
+		   int		ii;
 
 		   nDims = Mesh_GetDimSize( sys->mesh );
 		   grid = *Mesh_GetExtension( sys->mesh, Grid**, "vertexGrid" );
@@ -605,6 +581,7 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 		/* Store old coordinates. */
 		nDomainNodes = FeMesh_GetNodeDomainSize( sys->mesh );
 		oldCrds = AllocArray2D( double, nDomainNodes, nDims );
+
 		for( n_i = 0; n_i < nDomainNodes; n_i++ )
 			memcpy( oldCrds[n_i], sys->mesh->verts[n_i], nDims * sizeof(double) );
 
@@ -622,8 +599,7 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
 
 		/* Interpolate the variables. */
 		for( var_i = 0; var_i < sys->nFields; var_i++ )
-		   EulerDeform_InterpVar( sys->fields[var_i],
-					  NULL/*sys->vars[var_i]*/, sys->mesh, newCrds );
+		   EulerDeform_InterpVar( sys->fields[var_i], NULL/*sys->vars[var_i]*/, sys->mesh, newCrds );
 
 		/* Create an artificial displacement field from the nodal displacements between newCrds and oldCrds.
 		 * This displacement is currently used to correct the advDiffEqn's nodal velocity input */

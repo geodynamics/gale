@@ -60,14 +60,14 @@ const Type Anisotropic_Type = "Anisotropic";
 
 /* Public Constructor */
 Anisotropic* Anisotropic_New(
-      Name                                               name,
-      AbstractContext*                                   context,
-      Director*                                          director,
-      double                                             viscosityRatio )
+	Name					name,
+	AbstractContext*	context,
+	Director*			director,
+	double				viscosityRatio )
 {
    Anisotropic* self = (Anisotropic*) _Anisotropic_DefaultNew( name );
 
-   _Rheology_Init( self, context );
+   _Rheology_Init( self, (PICelleratorContext*)context );
    _Anisotropic_Init( self, director, viscosityRatio ) ;
 
    self->isConstructed = True;

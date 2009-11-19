@@ -59,17 +59,17 @@ const Type Arrhenius_Type = "Arrhenius";
 
 /* Public Constructor */
 Arrhenius* Arrhenius_New(
-      Name             name,
-      AbstractContext* context,
-      FeVariable*      temperatureField,
-      double           eta0,
-      double           activationEnergy,
-      double           activationVolume,
-      double           referenceTemp)
+	Name             name,
+	AbstractContext* context,
+	FeVariable*      temperatureField,
+	double           eta0,
+	double           activationEnergy,
+	double           activationVolume,
+	double           referenceTemp)
 {
    Arrhenius* self = (Arrhenius*) _Arrhenius_DefaultNew( name );
 
-   _Rheology_Init( self, context );
+   _Rheology_Init( self, (PICelleratorContext*)context );
    _Arrhenius_Init( self, temperatureField, eta0, activationEnergy, activationVolume, referenceTemp );
    self->isConstructed = True;
    return self;

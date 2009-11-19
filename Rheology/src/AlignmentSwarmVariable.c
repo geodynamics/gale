@@ -72,7 +72,7 @@ AlignmentSwarmVariable* AlignmentSwarmVariable_New(
    AlignmentSwarmVariable* self = (AlignmentSwarmVariable*) _AlignmentSwarmVariable_DefaultNew( name );
 
    /* init parent */
-   _SwarmVariable_Init( self, context, swarm, variable, dofCount );
+   _SwarmVariable_Init( (SwarmVariable*)self, context, swarm, variable, dofCount );
    /* init self */
    _AlignmentSwarmVariable_Init( self, velocityField, director );
    

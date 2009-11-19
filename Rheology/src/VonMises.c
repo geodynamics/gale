@@ -63,21 +63,22 @@ const Type VonMises_Type = "VonMises";
 
 /* Public Constructor */
 VonMises* VonMises_New(
-      Name                  name,
-      AbstractContext*      context,
-      StrainWeakening*      strainWeakening, 
-      MaterialPointsSwarm*  materialPointsSwarm, 
-      double                minVisc, 
-      FeVariable*           strainRateField,
-      SwarmVariable*        swarmStrainRate,
-      double                cohesion,
-      double                cohesionAfterSoftening,
-      Bool                  strainRateSoftening ){
+	Name                  name,
+	AbstractContext*      context,
+	StrainWeakening*      strainWeakening, 
+	MaterialPointsSwarm*  materialPointsSwarm, 
+	double                minVisc, 
+	FeVariable*           strainRateField,
+	SwarmVariable*        swarmStrainRate,
+	double                cohesion,
+	double                cohesionAfterSoftening,
+	Bool                  strainRateSoftening )
+{
    VonMises* self = (VonMises*) _VonMises_DefaultNew( name );
 
-   _Rheology_Init( self, context );
-   _YieldRheology_Init( self, strainWeakening, materialPointsSwarm, minVisc ); 
-   _VonMises_Init( self, strainRateField, swarmStrainRate, cohesion, cohesionAfterSoftening, strainRateSoftening );
+   _Rheology_Init( self, (PICelleratorContext*)context );
+   _YieldRheology_Init( (YieldRheology*)self, strainWeakening, materialPointsSwarm, minVisc ); 
+   _VonMises_Init( (VonMises*)self, strainRateField, swarmStrainRate, cohesion, cohesionAfterSoftening, strainRateSoftening );
 
    self->isConstructed = True;
    return self;

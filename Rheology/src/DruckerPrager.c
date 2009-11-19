@@ -64,27 +64,27 @@ const Type DruckerPrager_Type = "DruckerPrager";
 
 /* Public Constructor */
 DruckerPrager* DruckerPrager_New(
-      Name                  name,
-      AbstractContext*      context,
-      StrainWeakening*      strainWeakening, 
-      MaterialPointsSwarm*  materialPointsSwarm, 
-      double                minVisc, 
-      FeVariable*           strainRateField,
-      SwarmVariable*        swarmStrainRate,
-      double                cohesion,
-      double                cohesionAfterSoftening,
-      Bool                  strainRateSoftening,
-		FeVariable*           pressureField,
-		SwarmVariable*        swarmPressure,
-		double                minimumYieldStress,
-		double                frictionCoefficient,
-		double                frictionCoefficientAfterSoftening )
+	Name                  name,
+	AbstractContext*      context,
+	StrainWeakening*      strainWeakening, 
+	MaterialPointsSwarm*  materialPointsSwarm, 
+	double                minVisc, 
+	FeVariable*           strainRateField,
+	SwarmVariable*        swarmStrainRate,
+	double                cohesion,
+	double                cohesionAfterSoftening,
+	Bool                  strainRateSoftening,
+	FeVariable*           pressureField,
+	SwarmVariable*        swarmPressure,
+	double                minimumYieldStress,
+	double                frictionCoefficient,
+	double                frictionCoefficientAfterSoftening )
 {
    DruckerPrager* self = (DruckerPrager*) _DruckerPrager_DefaultNew( name );
 
-   _Rheology_Init( self, context );
-   _YieldRheology_Init( self, strainWeakening, materialPointsSwarm, minVisc ); 
-   _VonMises_Init( self, strainRateField, swarmStrainRate, cohesion, cohesionAfterSoftening, strainRateSoftening );
+   _Rheology_Init( self, (PICelleratorContext*)context );
+   _YieldRheology_Init( (YieldRheology*)self, strainWeakening, materialPointsSwarm, minVisc ); 
+   _VonMises_Init( (VonMises*)self, strainRateField, swarmStrainRate, cohesion, cohesionAfterSoftening, strainRateSoftening );
    _DruckerPrager_Init( self, pressureField, swarmPressure, materialPointsSwarm, minimumYieldStress, frictionCoefficient, frictionCoefficientAfterSoftening );
    self->isConstructed = True;
    return self;
