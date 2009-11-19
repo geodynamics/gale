@@ -352,6 +352,9 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 	
 	Journal_Printf( self->debug, "In: %s\n", __func__ );
 
+   /* the following just pauses at this point to allow time to attach a debugger.. useful for mpi debugging */
+   sleep( Dictionary_Entry_Value_AsUnsignedInt(Dictionary_GetDefault( self->dictionary, "pauseToAttachDebugger", Dictionary_Entry_Value_FromUnsignedInt( 0 )) ) ); 
+      
 	/* Main input parameters */
 	self->frequentOutputEvery = Dictionary_Entry_Value_AsUnsignedInt( 
 		Dictionary_GetDefault( self->dictionary, "outputEvery", Dictionary_Entry_Value_FromUnsignedInt( 1 ) ) );
