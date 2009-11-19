@@ -216,10 +216,11 @@ void _Materials_Register_PrintParticleAssignUpdate(
 	static Particle_Index      nextCompletedParticleCountToPrint=0;
 	static Particle_Index      nextPlusOneCompletedParticleCountToPrint=0;
 
-	if (firstStatusPrint) {
+	if (*firstStatusPrint) {
 		nextCompletionRatioToPrint = completionRatioIncrement;
 		nextCompletedParticleCountToPrint = ceil(swarm->particleLocalCount * nextCompletionRatioToPrint - 0.001 );
 		nextPlusOneCompletedParticleCountToPrint=0;
+                *firstStatusPrint=False;
 	}
 
 	if ( /*(swarm->myRank == 0) && */ ((lParticle_I+1) >= nextCompletedParticleCountToPrint ) ) {
