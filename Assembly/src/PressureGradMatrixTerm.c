@@ -55,11 +55,11 @@
 const Type PressureGradMatrixTerm_Type = "PressureGradMatrixTerm";
 
 PressureGradMatrixTerm* PressureGradMatrixTerm_New( 
-		Name                                                name,
-		FiniteElementContext*				                   context,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         gradField )
+	Name							name,
+	FiniteElementContext*	context,
+	StiffnessMatrix*			stiffnessMatrix,
+	Swarm*						integrationSwarm,
+	FeVariable*					gradField )
 {
 	PressureGradMatrixTerm* self = (PressureGradMatrixTerm*) _PressureGradMatrixTerm_DefaultNew( name );
 
@@ -110,10 +110,9 @@ PressureGradMatrixTerm* _PressureGradMatrixTerm_New(
 	return self;
 }
 
-void _PressureGradMatrixTerm_Init( 
-		PressureGradMatrixTerm*	self, 
-		FeVariable*					gradField )
-{
+void _PressureGradMatrixTerm_Init( void* matrixTerm, FeVariable* gradField ) {
+	PressureGradMatrixTerm* self = (PressureGradMatrixTerm*)matrixTerm;
+
 	self->assm = Assembler_New();
 	Assembler_SetCallbacks( self->assm, 
 		NULL, 

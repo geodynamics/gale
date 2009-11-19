@@ -112,11 +112,9 @@ PressureGradForceTerm* _PressureGradForceTerm_New(
 	return self;
 }
 
-void _PressureGradForceTerm_Init( 
-	PressureGradForceTerm*	self, 
-	FeVariable*					pressureField, 
-	FeVariable*					gradField )
-{
+void _PressureGradForceTerm_Init( void* forceTerm, FeVariable* pressureField, FeVariable* gradField ) {
+	PressureGradForceTerm* self = (PressureGradForceTerm*)forceTerm;
+
 	self->asmb = Assembler_New();
 	Assembler_SetCallbacks( self->asmb, 
 		NULL, 

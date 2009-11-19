@@ -79,23 +79,25 @@
 		Stg_Component_DestroyFunction*                      _destroy,
 		ForceTerm_AssembleElementFunction*                  _assembleElement,		
 		Name                                                name );
+
+	void _ThermalBuoyancyForceTerm_Init( void* forceTerm, FeVariable* temperatureField, double rayleighNumber );
 	
 	void _ThermalBuoyancyForceTerm_Delete( void* residual );
 
 	void _ThermalBuoyancyForceTerm_Print( void* residual, Stream* stream );
 
-	void* _ThermalBuoyancyForceTerm_DefaultNew( Name name ) ;
+	void* _ThermalBuoyancyForceTerm_DefaultNew( Name name );
 
-	void _ThermalBuoyancyForceTerm_AssignFromXML( void* residual, Stg_ComponentFactory* cf, void* data ) ;
+	void _ThermalBuoyancyForceTerm_AssignFromXML( void* residual, Stg_ComponentFactory* cf, void* data );
 
-	void _ThermalBuoyancyForceTerm_Build( void* residual, void* data ) ;
+	void _ThermalBuoyancyForceTerm_Build( void* residual, void* data );
 
-	void _ThermalBuoyancyForceTerm_Initialise( void* residual, void* data ) ;
+	void _ThermalBuoyancyForceTerm_Initialise( void* residual, void* data );
 
-	void _ThermalBuoyancyForceTerm_Execute( void* residual, void* data ) ;
+	void _ThermalBuoyancyForceTerm_Execute( void* residual, void* data );
 
-	void _ThermalBuoyancyForceTerm_Destroy( void* residual, void* data ) ;
+	void _ThermalBuoyancyForceTerm_Destroy( void* residual, void* data );
 
-	void _ThermalBuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) ;
+	void _ThermalBuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec );
 
 #endif

@@ -50,16 +50,16 @@
 		__StiffnessMatrixTerm \
 		/* Virtual info */ \
 		/* GradientStiffnessMatrixTerm info */ \
-		int         max_nElNodes_col;    \
-		double      *Ni_col;
+		int		max_nElNodes_col;    \
+		double	*Ni_col;
 
 	struct GradientStiffnessMatrixTerm { __GradientStiffnessMatrixTerm };
 
 	GradientStiffnessMatrixTerm* GradientStiffnessMatrixTerm_New( 
-		Name                                                name,
-		FiniteElementContext*				                   context,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm );
+		Name							name,
+		FiniteElementContext*	context,
+		StiffnessMatrix*			stiffnessMatrix,
+		Swarm*						integrationSwarm );
 
 	GradientStiffnessMatrixTerm* _GradientStiffnessMatrixTerm_New( 
 		SizeT                                               sizeOfSelf,  
@@ -75,23 +75,31 @@
 		Stg_Component_DestroyFunction*                      _destroy,
 		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
 		Name                                                name );
+
+	void _GradientStiffnessMatrixTerm_Init( void* matrixTerm );
 	
 	void _GradientStiffnessMatrixTerm_Delete( void* matrixTerm );
+
 	void _GradientStiffnessMatrixTerm_Print( void* matrixTerm, Stream* stream );
 
-	void* _GradientStiffnessMatrixTerm_DefaultNew( Name name ) ;
-void _GradientStiffnessMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
-	void _GradientStiffnessMatrixTerm_Build( void* matrixTerm, void* data ) ;
-	void _GradientStiffnessMatrixTerm_Initialise( void* matrixTerm, void* data ) ;
-	void _GradientStiffnessMatrixTerm_Execute( void* matrixTerm, void* data ) ;
-	void _GradientStiffnessMatrixTerm_Destroy( void* matrixTerm, void* data ) ;
+	void* _GradientStiffnessMatrixTerm_DefaultNew( Name name );
+
+	void _GradientStiffnessMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
+
+	void _GradientStiffnessMatrixTerm_Build( void* matrixTerm, void* data );
+
+	void _GradientStiffnessMatrixTerm_Initialise( void* matrixTerm, void* data );
+
+	void _GradientStiffnessMatrixTerm_Execute( void* matrixTerm, void* data );
+
+	void _GradientStiffnessMatrixTerm_Destroy( void* matrixTerm, void* data );
 
 	void _GradientStiffnessMatrixTerm_AssembleElement( 
-		void*                                              matrixTerm,
-		StiffnessMatrix*                                   stiffnessMatrix, 
-		Element_LocalIndex                                 lElement_I, 
-		SystemLinearEquations*                             sle,
-		FiniteElementContext*                              context,
-		double**                                           elStiffMat ) ;
+		void*							matrixTerm,
+		StiffnessMatrix*			stiffnessMatrix, 
+		Element_LocalIndex		lElement_I, 
+		SystemLinearEquations*	sle,
+		FiniteElementContext*	context,
+		double**						elStiffMat ) ;
 
 #endif

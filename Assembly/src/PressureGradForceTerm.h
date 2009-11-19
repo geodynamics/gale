@@ -83,6 +83,8 @@
 		Stg_Component_DestroyFunction*                      _destroy,
 		ForceTerm_AssembleElementFunction*                  _assembleElement,		
 		Name                                                name );
+
+	void _PressureGradForceTerm_Init( void* forceTerm, FeVariable* pressureField, FeVariable* gradField );
 	
 	void _PressureGradForceTerm_Delete( void* forceTerm );
 

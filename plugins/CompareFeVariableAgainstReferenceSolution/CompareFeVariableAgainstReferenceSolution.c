@@ -406,7 +406,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 
 	referenceFeVar = FeVariable_New_FromTemplate( 
 		refName, 
-		self->context,
+		(DomainContext*)self->context,
 		feVarToTest,
 		referenceDofLayout, 
 		NULL, 
@@ -417,7 +417,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "Rounded" );
 	roundedFeVar = FeVariable_New_FromTemplate( 
 		tmpName, 
-		self->context,
+		(DomainContext*)self->context,
 		feVarToTest, 
 		roundedDofLayout, 
 		NULL, 
@@ -450,7 +450,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 		referenceFeVar->name = Stg_Object_AppendSuffix( feVarToTest, "Reference" );
 	}
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "MagnitudeField" );
-	refMagnitudeField = OperatorFeVariable_NewUnary( tmpName, self->context, referenceFeVar, "Magnitude" );
+	refMagnitudeField = OperatorFeVariable_NewUnary( tmpName, (DomainContext*)self->context, referenceFeVar, "Magnitude" );
 	Memory_Free( tmpName );
 
 	/* now we need to round off the feVar we are testing, and copy the result to the roundedFeVar */
@@ -471,15 +471,15 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	Memory_Free( nodalValues );
 
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "ErrorField" );
-	errorField = OperatorFeVariable_NewBinary( tmpName, self->context, roundedFeVar, referenceFeVar, "Subtraction" );
+	errorField = OperatorFeVariable_NewBinary( tmpName, (DomainContext*)self->context, roundedFeVar, referenceFeVar, "Subtraction" );
 	Memory_Free( tmpName );
 
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "ErrorMagnitudeField" );
-	errorMagnitudeField = OperatorFeVariable_NewUnary( tmpName, self->context, errorField, "Magnitude" );
+	errorMagnitudeField = OperatorFeVariable_NewUnary( tmpName, (DomainContext*)self->context, errorField, "Magnitude" );
 	Memory_Free( tmpName );
 
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "RelativeErrorMagnitudeField" );
-	relativeErrorMagnitudeField = OperatorFeVariable_NewBinary( tmpName, self->context, errorMagnitudeField, refMagnitudeField, "ScalarDivision" );
+	relativeErrorMagnitudeField = OperatorFeVariable_NewBinary( tmpName, (DomainContext*)self->context, errorMagnitudeField, refMagnitudeField, "ScalarDivision" );
 	Memory_Free( tmpName );
 
 	/* Build and Initialise the newly-created OperatorFeVariables - else we can't use them */

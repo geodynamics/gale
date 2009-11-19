@@ -62,10 +62,11 @@ Inner2DGenerator* Inner2DGenerator_New( Name name, AbstractContext* context ) {
 				 name, 
 				 NON_GLOBAL, 
 				 _MeshGenerator_SetDimSize, 
-				 Inner2DGenerator_Generate );
+				 (MeshGenerator_GenerateFunc*)Inner2DGenerator_Generate );
 
-   _MeshGenerator_Init( self, context );
+   _MeshGenerator_Init( (MeshGenerator*)self, context );
    _Inner2DGenerator_Init( self );
+
    return self;
 }
 

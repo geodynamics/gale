@@ -49,8 +49,8 @@ typedef struct {
 
 FeMesh* BuildMeshLinear( unsigned nDims, unsigned* sizes, double* minCrd, double* maxCrd ) {
 	CartesianGenerator*	gen;
-	FeMesh*			feMesh;
-	unsigned		maxDecomp[3] = {0, 1, 1};
+	FeMesh*					feMesh;
+	unsigned					maxDecomp[3] = {0, 1, 1};
 
 	gen = CartesianGenerator_New( "", NULL );
 	CartesianGenerator_SetDimSize( gen, nDims );
@@ -69,10 +69,10 @@ FeMesh* BuildMeshLinear( unsigned nDims, unsigned* sizes, double* minCrd, double
 
 FeMesh* BuildMeshQuadratic( unsigned nDims, unsigned* sizes, double* minCrd, double* maxCrd ) {
 	CartesianGenerator*	gen;
-	FeMesh*			feMesh;
-	unsigned		maxDecomp[3] = {0, 1, 1};
+	FeMesh*					feMesh;
+	unsigned					maxDecomp[3] = {0, 1, 1};
 
-	gen = C2Generator_New( "", NULL );
+	gen = (CartesianGenerator*)C2Generator_New( "", NULL );
 	CartesianGenerator_SetDimSize( gen, nDims );
 	C2Generator_SetTopologyParams( gen, sizes, 0, NULL, maxDecomp );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );

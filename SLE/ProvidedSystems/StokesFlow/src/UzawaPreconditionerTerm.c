@@ -57,10 +57,10 @@
 const Type UzawaPreconditionerTerm_Type = "UzawaPreconditionerTerm";
 
 UzawaPreconditionerTerm* UzawaPreconditionerTerm_New( 
-		Name                                                name,
-		FiniteElementContext*				                   context,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm )
+	Name							name,
+	FiniteElementContext*	context,
+	StiffnessMatrix*			stiffnessMatrix,
+	Swarm*						integrationSwarm )
 {
 	UzawaPreconditionerTerm* self = (UzawaPreconditionerTerm*) _UzawaPreconditionerTerm_DefaultNew( name );
 
@@ -111,9 +111,8 @@ UzawaPreconditionerTerm* _UzawaPreconditionerTerm_New(
 	return self;
 }
 
-void _UzawaPreconditionerTerm_Init( 
-		UzawaPreconditionerTerm*                                    self )
-{
+void _UzawaPreconditionerTerm_Init( void* matrixTerm ) {
+	UzawaPreconditionerTerm* self = (UzawaPreconditionerTerm*)matrixTerm;
 }
 
 void _UzawaPreconditionerTerm_Delete( void* matrixTerm ) {

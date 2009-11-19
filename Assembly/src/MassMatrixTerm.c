@@ -55,11 +55,11 @@
 const Type MassMatrixTerm_Type = "MassMatrixTerm";
 
 MassMatrixTerm* MassMatrixTerm_New( 
-    Name                                                name,
-    FiniteElementContext*				                    context,
-    StiffnessMatrix*                                    stiffnessMatrix,
-    Swarm*                                              integrationSwarm,
-    FeVariable*                                         field )
+	Name							name,
+	FiniteElementContext*	context,
+	StiffnessMatrix*			stiffnessMatrix,
+	Swarm*						integrationSwarm,
+	FeVariable*					field )
 {
     MassMatrixTerm* self = (MassMatrixTerm*) _MassMatrixTerm_DefaultNew( name );
 
@@ -110,7 +110,9 @@ MassMatrixTerm* _MassMatrixTerm_New(
     return self;
 }
 
-void _MassMatrixTerm_Init( MassMatrixTerm* self, FeVariable* field ) {
+void _MassMatrixTerm_Init( void* matrixTerm, FeVariable* field ) {
+    MassMatrixTerm* self = (MassMatrixTerm*)matrixTerm;
+
     self->field = field;
 }
 

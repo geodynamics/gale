@@ -79,7 +79,7 @@ ForceVector* ForceVector_New(
 	ForceVector* self = _ForceVector_DefaultNew( name );
 
 	self->isConstructed = True;
-	_SolutionVector_Init( self, context, comm, feVariable ); 
+	_SolutionVector_Init( (SolutionVector*)self, context, comm, feVariable ); 
 	_ForceVector_Init( self, dim, entryPoint_Register );
 
 	return self;
@@ -100,10 +100,10 @@ void* _ForceVector_DefaultNew( Name name ) {
 		_ForceVector_Destroy,
 		name,
 		NON_GLOBAL,
+		MPI_COMM_WORLD,
 		NULL,
 		0,
-		NULL,
-		MPI_COMM_WORLD );
+		NULL );
 }
 
 ForceVector* _ForceVector_New( FORCEVECTOR_DEFARGS ) {

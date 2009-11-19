@@ -110,7 +110,9 @@ DivergenceMatrixTerm* _DivergenceMatrixTerm_New(
    return self;
 }
 
-void _DivergenceMatrixTerm_Init( DivergenceMatrixTerm* self ) {
+void _DivergenceMatrixTerm_Init( void* matrixTerm ) {
+   DivergenceMatrixTerm* self = (DivergenceMatrixTerm*)matrixTerm;
+
 	self->max_nElNodes_col = 0;
 	self->Ni_col = NULL;
 }

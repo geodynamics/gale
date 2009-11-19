@@ -76,8 +76,8 @@ C2Generator* C2Generator_New( Name name, AbstractContext* context ) {
 				 C2Generator_GenEdgeVertexInc, 
 				 C2Generator_GenElementTypes );
 
-   _MeshGenerator_Init( self, context );
-   _CartesianGenerator_Init( self );
+   _MeshGenerator_Init( (MeshGenerator*)self, context );
+   _CartesianGenerator_Init( (CartesianGenerator*)self );
    _C2Generator_Init( self );
    return self;
 }
@@ -265,8 +265,7 @@ void C2Generator_GenElementVertexInc( void* meshGenerator, IGraph* topo, Grid***
 				dimInds[2] -= 2;
 			}
 		}
-		CartesianGenerator_MapToDomain( (CartesianGenerator*)self, IGraph_GetDomain( topo, 0), 
-						vertsPerEl, incEls );
+		CartesianGenerator_MapToDomain( (CartesianGenerator*)self, IGraph_GetDomain( topo, 0), vertsPerEl, incEls );
 		IGraph_SetIncidence( topo, topo->nDims, e_i, MT_VERTEX, vertsPerEl, incEls );
 	}
 

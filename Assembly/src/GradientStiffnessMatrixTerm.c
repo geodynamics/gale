@@ -56,10 +56,10 @@
 const Type GradientStiffnessMatrixTerm_Type = "GradientStiffnessMatrixTerm";
 
 GradientStiffnessMatrixTerm* GradientStiffnessMatrixTerm_New( 
-		Name                                                name,
-		FiniteElementContext*				                   context,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm )
+	Name							name,
+	FiniteElementContext*	context,
+	StiffnessMatrix*			stiffnessMatrix,
+	Swarm*						integrationSwarm )
 {
 	GradientStiffnessMatrixTerm* self = (GradientStiffnessMatrixTerm*) _GradientStiffnessMatrixTerm_DefaultNew( name );
 
@@ -110,7 +110,9 @@ GradientStiffnessMatrixTerm* _GradientStiffnessMatrixTerm_New(
 	return self;
 }
 
-void _GradientStiffnessMatrixTerm_Init( GradientStiffnessMatrixTerm* self ) {
+void _GradientStiffnessMatrixTerm_Init( void* matrixTerm ) {
+	GradientStiffnessMatrixTerm* self = (GradientStiffnessMatrixTerm*)matrixTerm;
+
 	self->max_nElNodes_col = 0;
 	self->Ni_col = NULL;
 }

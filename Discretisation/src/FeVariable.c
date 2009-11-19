@@ -163,7 +163,7 @@ FeVariable* FeVariable_New_Full(
 	FeVariable* self = _FeVariable_DefaultNew( name );
 
 	self->isConstructed = True;
-	_FieldVariable_Init( self, context, fieldComponentCount, dim, isCheckpointedAndReloaded, communicator, fieldVariable_Register );
+	_FieldVariable_Init( (FieldVariable*)self, context, fieldComponentCount, dim, isCheckpointedAndReloaded, communicator, fieldVariable_Register );
 	_FeVariable_Init( self, feMesh, geometryMesh, dofLayout, bcs, ics, linkedDofInfo, templateFeVariable, isReferenceSolution, loadReferenceEachTimestep );
 
 	return self;
@@ -469,25 +469,25 @@ void _FeVariable_Build( void* variable, void* data ) {
 }
 
 void _FeVariable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data ) {
-	FeVariable*         self          	= (FeVariable*)variable;
-	FeMesh*             feMesh        	= NULL;
-	FeMesh*             geometryMesh  	= NULL;
-	DofLayout*          dofLayout     	= NULL;
-	VariableCondition*  bc            	= NULL;
-	VariableCondition*  ic            	= NULL;
+	FeVariable*         self = (FeVariable*)variable;
+	FeMesh*             feMesh = NULL;
+	FeMesh*             geometryMesh = NULL;
+	DofLayout*          dofLayout = NULL;
+	VariableCondition*  bc = NULL;
+	VariableCondition*  ic = NULL;
 	LinkedDofInfo*      linkedDofInfo 	= NULL;
 	Bool                isReferenceSolution = False;
 	Bool                loadReferenceEachTimestep = False;
 
 	_FieldVariable_AssignFromXML( self, cf, data );
 
-	feMesh        = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FEMesh",        FeMesh, True, data );
-	geometryMesh  = Stg_ComponentFactory_ConstructByKey( cf, self->name, "GeometryMesh",  FeMesh, False, data );
-	dofLayout     = Stg_ComponentFactory_ConstructByKey( cf, self->name, DofLayout_Type,  DofLayout,          True, data );
+	feMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FEMesh", FeMesh, True, data );
+	geometryMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "GeometryMesh", FeMesh, False, data );
+	dofLayout = Stg_ComponentFactory_ConstructByKey( cf, self->name, DofLayout_Type, DofLayout, True, data );
 
-	ic            = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IC",            VariableCondition,  False, data );
-	bc            = Stg_ComponentFactory_ConstructByKey( cf, self->name, "BC",            VariableCondition,  False, data );
-	linkedDofInfo = Stg_ComponentFactory_ConstructByKey( cf, self->name, "LinkedDofInfo", LinkedDofInfo,      False, data );
+	ic = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IC", VariableCondition, False, data );
+	bc = Stg_ComponentFactory_ConstructByKey( cf, self->name, "BC", VariableCondition, False, data );
+	linkedDofInfo = Stg_ComponentFactory_ConstructByKey( cf, self->name, "LinkedDofInfo", LinkedDofInfo, False, data );
 
 	isReferenceSolution = Stg_ComponentFactory_GetBool( cf, self->name, "isReferenceSolution", False );
 	loadReferenceEachTimestep = Stg_ComponentFactory_GetBool( cf, self->name, "loadReferenceEachTimestep", False );
@@ -1927,7 +1927,7 @@ double FeVariable_IntegratePlane( void* feVariable, Axis planeAxis, double plane
 	if (self->dim == 3)
 		dimExists[ bAxis ] = True;
 	
-	singleCellLayout = SingleCellLayout_New( "cellLayout", self->context, dimExists, NULL, NULL );
+	singleCellLayout = SingleCellLayout_New( "cellLayout", (AbstractContext*)self->context, dimExists, NULL, NULL );
 	particlesPerDim[ planeAxis ] = 1;
 	gaussParticleLayout = GaussParticleLayout_New( "particleLayout", NULL, LocalCoordSystem, True, self->dim - 1, particlesPerDim );
 	tmpSwarm = Swarm_New( 
@@ -2671,12 +2671,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
 
    varReg = Variable_Register_New();
    if (self->fieldComponentCount == 1){
-      var = Variable_NewScalar( "interpolation_temp_scalar", 
-                                 Variable_DataType_Double,
-                                 &nDomainVerts,
-                                 NULL,
-                                 &arrayPtr,
-                                 varReg );
+      var = Variable_NewScalar( "interpolation_temp_scalar", Variable_DataType_Double, &nDomainVerts, NULL, &arrayPtr, varReg );
    }
    else {
       unsigned var_I;

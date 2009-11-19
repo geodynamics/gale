@@ -66,7 +66,6 @@ ThermalBuoyancyForceTerm* ThermalBuoyancyForceTerm_New(
 	ThermalBuoyancyForceTerm* self = (ThermalBuoyancyForceTerm*) _ThermalBuoyancyForceTerm_DefaultNew( name );
 
 	self->isConstructed = True;
-
 	_ForceTerm_Init( self, context, forceVector, integrationSwarm, NULL );
 	_ThermalBuoyancyForceTerm_Init( self, temperatureField, rayleighNumber );
 
@@ -114,13 +113,11 @@ ThermalBuoyancyForceTerm* _ThermalBuoyancyForceTerm_New(
 	return self;
 }
 
-void _ThermalBuoyancyForceTerm_Init( 
-		ThermalBuoyancyForceTerm*                                    self, 
-		FeVariable*                                         temperatureField,
-		double                                              rayleighNumber )
-{
-	self->temperatureField    = temperatureField;
-	self->rayleighNumber      = rayleighNumber;
+void _ThermalBuoyancyForceTerm_Init( void* forceTerm, FeVariable* temperatureField, double rayleighNumber ) {
+	ThermalBuoyancyForceTerm* self = (ThermalBuoyancyForceTerm*)forceTerm;
+
+	self->temperatureField = temperatureField;
+	self->rayleighNumber = rayleighNumber;
 }
 
 void _ThermalBuoyancyForceTerm_Delete( void* forceTerm ) {

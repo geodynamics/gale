@@ -81,7 +81,7 @@ RegularTrilinear* _RegularTrilinear_New( REGULARTRILINEAR_DEFARGS ) {
 	/* RegularTrilinear info */
 	self->isConstructed = True;
 	_ElementType_Init( (ElementType*)self, nodeCount );
-   _TrilinearElementType_Init( self );
+   _TrilinearElementType_Init( (TrilinearElementType*)self );
 	_RegularTrilinear_Init( self );
 
 	return self;

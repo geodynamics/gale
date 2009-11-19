@@ -199,6 +199,22 @@
 		SystemLinearEquations_MG_SelectStiffMatsFunc*      _mgSelectStiffMats, 
 		Name                                               name );
 
+	void _SystemLinearEquations_Init(
+		void*                   sle,
+		SLE_Solver*             solver,
+		void*                   nlSolver,
+		FiniteElementContext*   context,
+		Bool                    makeConvergenceFile,
+		Bool                    isNonLinear,
+		double                  nonLinearTolerance,
+		Iteration_Index         nonLinearMaxIterations,
+		Bool                    killNonConvergent,
+		Iteration_Index         nonLinearMinIterations,
+		Name                    nonLinearSolutionType,
+		Name                    optionsPrefix,
+		EntryPoint_Register*    entryPoint_Register,
+		MPI_Comm                comm );
+
 	/* Stg_Class_Delete() implementations */
 	void _SystemLinearEquations_Delete( void* sle );
 

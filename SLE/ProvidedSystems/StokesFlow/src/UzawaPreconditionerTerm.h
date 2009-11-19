@@ -56,10 +56,10 @@
 	struct UzawaPreconditionerTerm { __UzawaPreconditionerTerm };
 
 	UzawaPreconditionerTerm* UzawaPreconditionerTerm_New( 
-		Name                                                name,
-		FiniteElementContext*				                   context,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm );
+		Name							name,
+		FiniteElementContext*	context,
+		StiffnessMatrix*			stiffnessMatrix,
+		Swarm*						integrationSwarm );
 
 	UzawaPreconditionerTerm* _UzawaPreconditionerTerm_New( 
 		SizeT                                               sizeOfSelf,  
@@ -75,23 +75,31 @@
 		Stg_Component_DestroyFunction*                      _destroy,
 		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
 		Name                                                name );
+
+	void _UzawaPreconditionerTerm_Init( void* matrixTerm );
 	
 	void _UzawaPreconditionerTerm_Delete( void* matrixTerm );
+
 	void _UzawaPreconditionerTerm_Print( void* matrixTerm, Stream* stream );
 
-	void* _UzawaPreconditionerTerm_DefaultNew( Name name ) ;
-void _UzawaPreconditionerTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
-	void _UzawaPreconditionerTerm_Build( void* matrixTerm, void* data ) ;
-	void _UzawaPreconditionerTerm_Initialise( void* matrixTerm, void* data ) ;
-	void _UzawaPreconditionerTerm_Execute( void* matrixTerm, void* data ) ;
-	void _UzawaPreconditionerTerm_Destroy( void* matrixTerm, void* data ) ;
+	void* _UzawaPreconditionerTerm_DefaultNew( Name name );
+
+	void _UzawaPreconditionerTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
+
+	void _UzawaPreconditionerTerm_Build( void* matrixTerm, void* data );
+
+	void _UzawaPreconditionerTerm_Initialise( void* matrixTerm, void* data );
+
+	void _UzawaPreconditionerTerm_Execute( void* matrixTerm, void* data );
+
+	void _UzawaPreconditionerTerm_Destroy( void* matrixTerm, void* data );
 
 	void _UzawaPreconditionerTerm_AssembleElement( 
-		void*                                              matrixTerm,
-		StiffnessMatrix*                                   stiffnessMatrix, 
-		Element_LocalIndex                                 lElement_I, 
-		SystemLinearEquations*                             sle,
-		FiniteElementContext*                              context,
-		double**                                           elStiffMat ) ;
+		void*							matrixTerm,
+		StiffnessMatrix*			stiffnessMatrix, 
+		Element_LocalIndex		lElement_I, 
+		SystemLinearEquations*	sle,
+		FiniteElementContext*	context,
+		double**						elStiffMat ) ;
 
 #endif

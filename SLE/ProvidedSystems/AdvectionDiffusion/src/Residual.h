@@ -102,6 +102,13 @@
 		ForceTerm_AssembleElementFunction*                   _assembleElement,		
 		AdvDiffResidualForceTerm_UpwindParamFunction*       _upwindParam,
 		Name                                                name );
+
+	void _AdvDiffResidualForceTerm_Init(
+   	void*                                        residual,
+   	FeVariable*                                  velocityField,
+   	Variable*                                    diffusivityVariable,
+   	double                                       defaultDiffusivity,
+   	AdvDiffResidualForceTerm_UpwindParamFuncType upwindFuncType );
 	
 	void _AdvDiffResidualForceTerm_Delete( void* residual );
 

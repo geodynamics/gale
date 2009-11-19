@@ -111,7 +111,8 @@ LumpedMassMatrixForceTerm* _LumpedMassMatrixForceTerm_New(
 	return self;
 }
 
-void _LumpedMassMatrixForceTerm_Init( LumpedMassMatrixForceTerm* self ) {
+void _LumpedMassMatrixForceTerm_Init( void* forceTerm ) {
+	LumpedMassMatrixForceTerm* self = (LumpedMassMatrixForceTerm*)forceTerm;
 }
 
 void _LumpedMassMatrixForceTerm_Delete( void* forceTerm ) {

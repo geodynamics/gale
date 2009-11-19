@@ -182,17 +182,19 @@ void __AdvDiffResidualForceTerm_FreeLocalMemory( AdvectionDiffusionSLE* sle ){
 	NewClass_Delete(sle->advDiffResidualForceTerm->incarray);
 }
 
-void _AdvDiffResidualForceTerm_Init( 
-	AdvDiffResidualForceTerm*								self, 
-	FeVariable*													velocityField,
-	Variable*													diffusivityVariable,
-	double														defaultDiffusivity,
-	AdvDiffResidualForceTerm_UpwindParamFuncType		upwindFuncType ) //WHY IS THIS LINE HERE???
+void _AdvDiffResidualForceTerm_Init(
+	void*														residual,
+	FeVariable*												velocityField,
+	Variable*												diffusivityVariable,
+	double													defaultDiffusivity,
+	AdvDiffResidualForceTerm_UpwindParamFuncType	upwindFuncType ) //WHY IS THIS LINE HERE???
 {
-	self->velocityField       = velocityField;
+	AdvDiffResidualForceTerm* self = (AdvDiffResidualForceTerm*)residual;
+
+	self->velocityField = velocityField;
 	self->diffusivityVariable = diffusivityVariable;
-	self->defaultDiffusivity  = defaultDiffusivity;
-	self->upwindParamType    = upwindFuncType;
+	self->defaultDiffusivity = defaultDiffusivity;
+	self->upwindParamType = upwindFuncType;
 }
 
 void _AdvDiffResidualForceTerm_Delete( void* residual ) {

@@ -75,6 +75,8 @@
 		Stg_Component_DestroyFunction*                      _destroy,
 		ForceTerm_AssembleElementFunction*                  _assembleElement,
 		Name                                                name );
+
+	void _LumpedMassMatrixForceTerm_Init( void* forceTerm );
 	
 	void _LumpedMassMatrixForceTerm_Delete( void* residual );
 

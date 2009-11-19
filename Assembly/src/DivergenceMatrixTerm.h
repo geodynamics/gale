@@ -41,58 +41,65 @@
 #ifndef __StgFEM_Assembly_DivergenceMatrixTerm_h__
 #define __StgFEM_Assembly_DivergenceMatrixTerm_h__
 
-/** Textual name of this class */
-extern const Type DivergenceMatrixTerm_Type;
+	/** Textual name of this class */
+	extern const Type DivergenceMatrixTerm_Type;
 
-/** DivergenceMatrixTerm class contents */
-#define __DivergenceMatrixTerm         \
-	/* General info */                   \
-	__StiffnessMatrixTerm                \
-	/* Virtual info */                   \
-	/* DivergenceMatrixTerm info */      \
-	int         max_nElNodes_col;    \
-	double      *Ni_col; 
+	/** DivergenceMatrixTerm class contents */
+	#define __DivergenceMatrixTerm \
+		/* General info */ \
+		__StiffnessMatrixTerm \
+		/* Virtual info */ \
+		/* DivergenceMatrixTerm info */ \
+		int		max_nElNodes_col; \
+		double	*Ni_col; 
 
+	struct DivergenceMatrixTerm { __DivergenceMatrixTerm };
 
-struct DivergenceMatrixTerm { __DivergenceMatrixTerm };
+	DivergenceMatrixTerm* DivergenceMatrixTerm_New( 
+	   Name							name,
+	   FiniteElementContext*	context,
+	   StiffnessMatrix*			stiffnessMatrix,
+	   Swarm*						integrationSwarm );
 
-DivergenceMatrixTerm* DivergenceMatrixTerm_New( 
-   Name                                                name,
-   FiniteElementContext*				                   context,
-   StiffnessMatrix*                                    stiffnessMatrix,
-   Swarm*                                              integrationSwarm );
+	DivergenceMatrixTerm* _DivergenceMatrixTerm_New( 
+	   SizeT                                               sizeOfSelf,  
+	   Type                                                type,
+	   Stg_Class_DeleteFunction*                           _delete,
+	   Stg_Class_PrintFunction*                            _print,
+	   Stg_Class_CopyFunction*                             _copy, 
+	   Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
+	   Stg_Component_ConstructFunction*                    _construct,
+	   Stg_Component_BuildFunction*                        _build,
+	   Stg_Component_InitialiseFunction*                   _initialise,
+	   Stg_Component_ExecuteFunction*                      _execute,
+	   Stg_Component_DestroyFunction*                      _destroy,
+	   StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
+	   Name                                                name );
 
-DivergenceMatrixTerm* _DivergenceMatrixTerm_New( 
-   SizeT                                               sizeOfSelf,  
-   Type                                                type,
-   Stg_Class_DeleteFunction*                           _delete,
-   Stg_Class_PrintFunction*                            _print,
-   Stg_Class_CopyFunction*                             _copy, 
-   Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-   Stg_Component_ConstructFunction*                    _construct,
-   Stg_Component_BuildFunction*                        _build,
-   Stg_Component_InitialiseFunction*                   _initialise,
-   Stg_Component_ExecuteFunction*                      _execute,
-   Stg_Component_DestroyFunction*                      _destroy,
-   StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
-   Name                                                name );
+	void _DivergenceMatrixTerm_Init( void* matrixTerm );
 	
-void _DivergenceMatrixTerm_Delete( void* matrixTerm );
-void _DivergenceMatrixTerm_Print( void* matrixTerm, Stream* stream );
+	void _DivergenceMatrixTerm_Delete( void* matrixTerm );
 
-void* _DivergenceMatrixTerm_DefaultNew( Name name ) ;
-void _DivergenceMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
-void _DivergenceMatrixTerm_Build( void* matrixTerm, void* data ) ;
-void _DivergenceMatrixTerm_Initialise( void* matrixTerm, void* data ) ;
-void _DivergenceMatrixTerm_Execute( void* matrixTerm, void* data ) ;
-void _DivergenceMatrixTerm_Destroy( void* matrixTerm, void* data ) ;
+	void _DivergenceMatrixTerm_Print( void* matrixTerm, Stream* stream );
 
-void _DivergenceMatrixTerm_AssembleElement( 
-   void*                                              matrixTerm,
-   StiffnessMatrix*                                   stiffnessMatrix, 
-   Element_LocalIndex                                 lElement_I, 
-   SystemLinearEquations*                             sle,
-   FiniteElementContext*                              context,
-   double**                                           elStiffMat ) ;
+	void* _DivergenceMatrixTerm_DefaultNew( Name name );
+
+	void _DivergenceMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
+
+	void _DivergenceMatrixTerm_Build( void* matrixTerm, void* data );
+
+	void _DivergenceMatrixTerm_Initialise( void* matrixTerm, void* data );
+
+	void _DivergenceMatrixTerm_Execute( void* matrixTerm, void* data );
+
+	void _DivergenceMatrixTerm_Destroy( void* matrixTerm, void* data );
+
+	void _DivergenceMatrixTerm_AssembleElement( 
+		void*							matrixTerm,
+		StiffnessMatrix*			stiffnessMatrix, 
+		Element_LocalIndex		lElement_I, 
+		SystemLinearEquations*	sle,
+		FiniteElementContext*	context,
+		double**						elStiffMat ) ;
 
 #endif

@@ -115,7 +115,7 @@ AnalyticSolution* _AnalyticSolution_New(
 void _AnalyticSolution_Init( AnalyticSolution* self, Swarm* integrationSwarm, LiveComponentRegister* LC_Register, AbstractContext* context, Bool verboseMode ) {
 	self->LC_Register = LC_Register;
 	self->integrationSwarm = integrationSwarm;
-	self->context = context;
+	self->context = (DomainContext*)context;
 
 	/* Initialise AnalyticFunctions */
 	self->_getAnalyticVelocity = NULL;

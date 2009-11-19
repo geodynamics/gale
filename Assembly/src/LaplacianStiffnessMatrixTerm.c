@@ -56,10 +56,10 @@
 const Type LaplacianStiffnessMatrixTerm_Type = "LaplacianStiffnessMatrixTerm";
 
 LaplacianStiffnessMatrixTerm* LaplacianStiffnessMatrixTerm_New( 
-		Name                                                name,
-		FiniteElementContext*				                   context,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm )
+	Name							name,
+	FiniteElementContext*	context,
+	StiffnessMatrix*			stiffnessMatrix,
+	Swarm*						integrationSwarm )
 {
 	LaplacianStiffnessMatrixTerm* self = (LaplacianStiffnessMatrixTerm*) _LaplacianStiffnessMatrixTerm_DefaultNew( name );
 
@@ -110,7 +110,8 @@ LaplacianStiffnessMatrixTerm* _LaplacianStiffnessMatrixTerm_New(
 	return self;
 }
 
-void _LaplacianStiffnessMatrixTerm_Init( LaplacianStiffnessMatrixTerm* self ) {
+void _LaplacianStiffnessMatrixTerm_Init( void* matrixTerm ) {
+	LaplacianStiffnessMatrixTerm* self = (LaplacianStiffnessMatrixTerm*)matrixTerm;
 }
 
 void _LaplacianStiffnessMatrixTerm_Delete( void* matrixTerm ) {

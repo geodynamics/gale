@@ -66,12 +66,12 @@
 		/* Virtual info */ \
 		\
 		/* FiniteElementContext info */ \
-		SystemLinearEquationList*           slEquations;             \
-		double                              prevTimestepDt;          \
-		Bool                                limitTimeStepIncreaseRate; \
-		double                              maxTimeStepIncreasePercentage; \
-                double                              maxTimeStepSize;\
-		EntryPoint*                         calcDtEP;                 \
+		SystemLinearEquationList*	slEquations; \
+		double							prevTimestepDt; \
+		Bool								limitTimeStepIncreaseRate; \
+		double							maxTimeStepIncreasePercentage; \
+		double							maxTimeStepSize; \
+		EntryPoint*						calcDtEP;
 		
 	struct FiniteElementContext { __FiniteElementContext };
 

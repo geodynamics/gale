@@ -62,9 +62,9 @@ C0Generator* C0Generator_New( Name name, AbstractContext* context ) {
 				 name, 
 				 NON_GLOBAL, 
 				 _MeshGenerator_SetDimSize, 
-				 C0Generator_Generate );
+				 (MeshGenerator_GenerateFunc*)C0Generator_Generate );
    
-   _MeshGenerator_Init( self, context );
+   _MeshGenerator_Init( (MeshGenerator*)self, context );
 	_C0Generator_Init( self );
 
    return self;
@@ -78,7 +78,6 @@ C0Generator* _C0Generator_New( C0GENERATOR_DEFARGS ) {
 	self = (C0Generator*)_MeshGenerator_New( MESHGENERATOR_PASSARGS );
 
 	/* Virtual info */
-
 
 	return self;
 }
@@ -259,10 +258,11 @@ void C0Generator_BuildElementTypes( C0Generator* self, FeMesh* mesh ) {
 	Mesh_CentroidType_SetElementMesh( mesh->elTypes[0], self->elMesh );
 	nDomainEls = Mesh_GetDomainSize( mesh, Mesh_GetDimSize( mesh ) );
 	mesh->elTypeMap = AllocNamedArray( unsigned, nDomainEls, "Mesh::elTypeMap" );
+
 	for( e_i = 0; e_i < nDomainEls; e_i++ )
 		mesh->elTypeMap[e_i] = 0;
 
-	algs = Mesh_CentroidAlgorithms_New( "", NULL );
+	algs = (Mesh_Algorithms*)Mesh_CentroidAlgorithms_New( "", NULL );
 	Mesh_CentroidAlgorithms_SetElementMesh( algs, self->elMesh );
 	Mesh_SetAlgorithms( mesh, algs );
 }

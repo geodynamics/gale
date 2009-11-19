@@ -52,16 +52,16 @@
 		/* Virtual info */ \
 		\
 		/* MassMatrixTerm info */ \
-		FeVariable*                                     field; \
+		FeVariable*	field; \
 
 	struct MassMatrixTerm { __MassMatrixTerm };
 
 	MassMatrixTerm* MassMatrixTerm_New( 
-		Name                                                name,
-		FiniteElementContext*				                   context,
-		StiffnessMatrix*                                    stiffMat,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         gradField );
+		Name							name,
+		FiniteElementContext*	context,
+		StiffnessMatrix*			stiffMat,
+		Swarm*						integrationSwarm,
+		FeVariable*					gradField );
 
 	MassMatrixTerm* _MassMatrixTerm_New( 
 		SizeT                                               sizeOfSelf,  
@@ -77,22 +77,31 @@
 		Stg_Component_DestroyFunction*                      _destroy,
 		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement, 
 		Name                                                name );
+
+	void _MassMatrixTerm_Init( void* matrixTerm, FeVariable* field );
 	
 	void _MassMatrixTerm_Delete( void* matrixTerm );
+
 	void _MassMatrixTerm_Print( void* matrixTerm, Stream* stream );
 
-	void* _MassMatrixTerm_DefaultNew( Name name ) ;
-	void _MassMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
-	void _MassMatrixTerm_Build( void* matrixTerm, void* data ) ;
-	void _MassMatrixTerm_Initialise( void* matrixTerm, void* data ) ;
-	void _MassMatrixTerm_Execute( void* matrixTerm, void* data ) ;
-	void _MassMatrixTerm_Destroy( void* matrixTerm, void* data ) ;
+	void* _MassMatrixTerm_DefaultNew( Name name );
 
-	void _MassMatrixTerm_AssembleElement( void* matrixTerm,
-						      StiffnessMatrix* stiffMat, 
-						      Element_LocalIndex lElement_I, 
-						      SystemLinearEquations* sle, 
-						      FiniteElementContext* context, 
-						      double** elStiffMat );
+	void _MassMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
+
+	void _MassMatrixTerm_Build( void* matrixTerm, void* data );
+
+	void _MassMatrixTerm_Initialise( void* matrixTerm, void* data );
+
+	void _MassMatrixTerm_Execute( void* matrixTerm, void* data );
+
+	void _MassMatrixTerm_Destroy( void* matrixTerm, void* data );
+
+	void _MassMatrixTerm_AssembleElement(
+		void*							matrixTerm,
+		StiffnessMatrix*			stiffMat, 
+		Element_LocalIndex		lElement_I, 
+		SystemLinearEquations*	sle, 
+		FiniteElementContext*	context, 
+		double**						elStiffMat );
 
 #endif

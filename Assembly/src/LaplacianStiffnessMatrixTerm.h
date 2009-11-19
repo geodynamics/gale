@@ -56,10 +56,10 @@
 	struct LaplacianStiffnessMatrixTerm { __LaplacianStiffnessMatrixTerm };
 
 	LaplacianStiffnessMatrixTerm* LaplacianStiffnessMatrixTerm_New( 
-		Name                                                name,
-		FiniteElementContext*				                   context,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm );
+		Name							name,
+		FiniteElementContext*	context,
+		StiffnessMatrix*			stiffnessMatrix,
+		Swarm*						integrationSwarm );
 
 	LaplacianStiffnessMatrixTerm* _LaplacianStiffnessMatrixTerm_New( 
 		SizeT                                               sizeOfSelf,  
@@ -75,23 +75,31 @@
 		Stg_Component_DestroyFunction*                      _destroy,
 		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
 		Name                                                name );
+
+	void _LaplacianStiffnessMatrixTerm_Init( void* matrixTerm );
 	
 	void _LaplacianStiffnessMatrixTerm_Delete( void* matrixTerm );
+
 	void _LaplacianStiffnessMatrixTerm_Print( void* matrixTerm, Stream* stream );
 
-	void* _LaplacianStiffnessMatrixTerm_DefaultNew( Name name ) ;
-void _LaplacianStiffnessMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
-	void _LaplacianStiffnessMatrixTerm_Build( void* matrixTerm, void* data ) ;
-	void _LaplacianStiffnessMatrixTerm_Initialise( void* matrixTerm, void* data ) ;
-	void _LaplacianStiffnessMatrixTerm_Execute( void* matrixTerm, void* data ) ;
-	void _LaplacianStiffnessMatrixTerm_Destroy( void* matrixTerm, void* data ) ;
+	void* _LaplacianStiffnessMatrixTerm_DefaultNew( Name name );
+
+	void _LaplacianStiffnessMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
+
+	void _LaplacianStiffnessMatrixTerm_Build( void* matrixTerm, void* data );
+
+	void _LaplacianStiffnessMatrixTerm_Initialise( void* matrixTerm, void* data );
+
+	void _LaplacianStiffnessMatrixTerm_Execute( void* matrixTerm, void* data );
+
+	void _LaplacianStiffnessMatrixTerm_Destroy( void* matrixTerm, void* data );
 
 	void _LaplacianStiffnessMatrixTerm_AssembleElement( 
-		void*                                              matrixTerm,
-		StiffnessMatrix*                                   stiffnessMatrix, 
-		Element_LocalIndex                                 lElement_I, 
-		SystemLinearEquations*                             sle,
-		FiniteElementContext*                              context,
-		double**                                           elStiffMat ) ;
+		void*							matrixTerm,
+		StiffnessMatrix*			stiffnessMatrix, 
+		Element_LocalIndex		lElement_I, 
+		SystemLinearEquations*	sle,
+		FiniteElementContext*	context,
+		double**						elStiffMat );
 
 #endif

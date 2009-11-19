@@ -377,7 +377,7 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 			NULL,
 			False, False,
 			fieldVariable_Register );
-		self->phiDotField->context = self->context;
+		self->phiDotField->context = (DomainContext*)self->context;
 
 		/* Construct Solution Vectors */
 		self->phiVector    = SolutionVector_New( phiVecName, self->context, self->phiField->communicator, self->phiField );

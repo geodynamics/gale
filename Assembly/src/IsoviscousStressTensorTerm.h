@@ -52,16 +52,16 @@
 		/* Virtual info */ \
 		\
 		/* IsoviscousStressTensorTerm info */ \
-		double                                              viscosity;
+		double	viscosity;
 
 	struct IsoviscousStressTensorTerm { __IsoviscousStressTensorTerm };
 
 	IsoviscousStressTensorTerm* IsoviscousStressTensorTerm_New( 
-		Name                                                name,
-		FiniteElementContext*				                   context,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm,
-		double                                              viscosity );
+		Name							name,
+		FiniteElementContext*	context,
+		StiffnessMatrix*			stiffnessMatrix,
+		Swarm*						integrationSwarm,
+		double						viscosity );
 
 	IsoviscousStressTensorTerm* _IsoviscousStressTensorTerm_New( 
 		SizeT                                               sizeOfSelf,  
@@ -77,23 +77,31 @@
 		Stg_Component_DestroyFunction*                      _destroy,
 		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
 		Name                                                name );
+
+	void _IsoviscousStressTensorTerm_Init( void* matrixTerm, double viscosity );
 	
 	void _IsoviscousStressTensorTerm_Delete( void* matrixTerm );
+
 	void _IsoviscousStressTensorTerm_Print( void* matrixTerm, Stream* stream );
 
-	void* _IsoviscousStressTensorTerm_DefaultNew( Name name ) ;
-void _IsoviscousStressTensorTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
-	void _IsoviscousStressTensorTerm_Build( void* matrixTerm, void* data ) ;
-	void _IsoviscousStressTensorTerm_Initialise( void* matrixTerm, void* data ) ;
-	void _IsoviscousStressTensorTerm_Execute( void* matrixTerm, void* data ) ;
-	void _IsoviscousStressTensorTerm_Destroy( void* matrixTerm, void* data ) ;
+	void* _IsoviscousStressTensorTerm_DefaultNew( Name name );
+
+	void _IsoviscousStressTensorTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
+
+	void _IsoviscousStressTensorTerm_Build( void* matrixTerm, void* data );
+
+	void _IsoviscousStressTensorTerm_Initialise( void* matrixTerm, void* data );
+
+	void _IsoviscousStressTensorTerm_Execute( void* matrixTerm, void* data );
+
+	void _IsoviscousStressTensorTerm_Destroy( void* matrixTerm, void* data );
 
 	void _IsoviscousStressTensorTerm_AssembleElement( 
-		void*                                              matrixTerm,
-		StiffnessMatrix*                                   stiffnessMatrix, 
-		Element_LocalIndex                                 lElement_I, 
-		SystemLinearEquations*                             sle,
-		FiniteElementContext*                              context,
-		double**                                           elStiffMat ) ;
+		void*							matrixTerm,
+		StiffnessMatrix*			stiffnessMatrix, 
+		Element_LocalIndex		lElement_I, 
+		SystemLinearEquations*	sle,
+		FiniteElementContext*	context,
+		double**						elStiffMat );
 
 #endif

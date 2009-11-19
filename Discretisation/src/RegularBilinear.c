@@ -80,7 +80,7 @@ RegularBilinear* _RegularBilinear_New( REGULARTRILINEAR_DEFARGS ) {
 	/* RegularBilinear info */
 	self->isConstructed = True;
 	_ElementType_Init( (ElementType*)self, nodeCount );
-   _BilinearElementType_Init( self );
+   _BilinearElementType_Init( (BilinearElementType*)self );
 	_RegularBilinear_Init( self );
 
 	return self;

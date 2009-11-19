@@ -52,20 +52,20 @@
 		/* Virtual info */ \
 		\
 		/* PressureGradMatrixTerm info */ \
-		Assembler*					assm; \
-		FeVariable*                                     gradField; \
-		StiffnessMatrix*				stiffMat; \
-		double**					elStiffMat; \
-		double						factor;
+		Assembler*			assm; \
+		FeVariable*			gradField; \
+		StiffnessMatrix*	stiffMat; \
+		double**				elStiffMat; \
+		double				factor;
 
 	struct PressureGradMatrixTerm { __PressureGradMatrixTerm };
 
 	PressureGradMatrixTerm* PressureGradMatrixTerm_New( 
-		Name                                                name,
-		FiniteElementContext*				                   context,
-		StiffnessMatrix*                                    stiffMat,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         gradField );
+		Name							name,
+		FiniteElementContext*	context,
+		StiffnessMatrix*			stiffMat,
+		Swarm*						integrationSwarm,
+		FeVariable*					gradField );
 
 	PressureGradMatrixTerm* _PressureGradMatrixTerm_New( 
 		SizeT                                               sizeOfSelf,  
@@ -81,24 +81,35 @@
 		Stg_Component_DestroyFunction*                      _destroy,
 		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement, 
 		Name                                                name );
+
+	void _PressureGradMatrixTerm_Init( void* matrixTerm, FeVariable* gradField );
 	
 	void _PressureGradMatrixTerm_Delete( void* matrixTerm );
+
 	void _PressureGradMatrixTerm_Print( void* matrixTerm, Stream* stream );
 
 	void* _PressureGradMatrixTerm_DefaultNew( Name name ) ;
+
 	void _PressureGradMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
+
 	void _PressureGradMatrixTerm_Build( void* matrixTerm, void* data ) ;
+
 	void _PressureGradMatrixTerm_Initialise( void* matrixTerm, void* data ) ;
+
 	void _PressureGradMatrixTerm_Execute( void* matrixTerm, void* data ) ;
+
 	void _PressureGradMatrixTerm_Destroy( void* matrixTerm, void* data ) ;
 
-	void _PressureGradMatrixTerm_AssembleElement( void* matrixTerm,
-						      StiffnessMatrix* stiffMat, 
-						      Element_LocalIndex lElement_I, 
-						      SystemLinearEquations* sle, 
-						      FiniteElementContext* context, 
-						      double** elStiffMat );
+	void _PressureGradMatrixTerm_AssembleElement(
+		void*							matrixTerm,
+		StiffnessMatrix*			stiffMat, 
+		Element_LocalIndex		lElement_I, 
+		SystemLinearEquations*	sle, 
+		FiniteElementContext*	context, 
+		double**						elStiffMat );
+
 	Bool PressureGradMatrixTerm_RowCB( PressureGradMatrixTerm* self, Assembler* assm );
+
 	Bool PressureGradMatrixTerm_ColCB( PressureGradMatrixTerm* self, Assembler* assm );
 
 #endif

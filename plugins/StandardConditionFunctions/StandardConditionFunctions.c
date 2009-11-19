@@ -107,8 +107,8 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_EdgeDriveConvectionIC, "EdgeDriveConvectionIC" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ThermalEdgeDriveConvectionIC, "ThermalEdgeDriveConvectionIC" );
-        ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ThermalEdgeDriveConvectionIC, "ThermalEdgeDriveConvectionIC" );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_AnalyticalTemperatureIC, "AnalyticalTemperatureIC" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );

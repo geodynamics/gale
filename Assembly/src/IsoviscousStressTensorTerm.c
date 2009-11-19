@@ -56,11 +56,11 @@
 const Type IsoviscousStressTensorTerm_Type = "IsoviscousStressTensorTerm";
 
 IsoviscousStressTensorTerm* IsoviscousStressTensorTerm_New( 
-		Name                                                name,
-		FiniteElementContext*				                   context,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm,
-		double                                              viscosity )
+	Name							name,
+	FiniteElementContext*	context,
+	StiffnessMatrix*			stiffnessMatrix,
+	Swarm*						integrationSwarm,
+	double						viscosity )
 {
 	IsoviscousStressTensorTerm* self = (IsoviscousStressTensorTerm*) _IsoviscousStressTensorTerm_DefaultNew( name );
 
@@ -111,7 +111,8 @@ IsoviscousStressTensorTerm* _IsoviscousStressTensorTerm_New(
 	return self;
 }
 
-void _IsoviscousStressTensorTerm_Init( IsoviscousStressTensorTerm* self, double viscosity ) {
+void _IsoviscousStressTensorTerm_Init( void* matrixTerm, double viscosity ) {
+	IsoviscousStressTensorTerm* self = (IsoviscousStressTensorTerm*)matrixTerm;
 	self->viscosity = viscosity;
 }
 
