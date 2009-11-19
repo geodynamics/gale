@@ -53,14 +53,14 @@
 		</struct>
 	</struct>
 	<!-- Visualisation stuff -->
-	<include>Underworld/Viewports/PressureVP.xml</include>
+	<!--<include>Underworld/Viewports/PressureVP.xml</include>
 	<include>Underworld/Viewports/StrainRateInvariantVP.xml</include>
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
 			<param name="Viewport">PressureVP StrainRateInvariantVP</param>
 		</struct>
-	</struct>
+	</struct>-->
 
 	<!-- The numeric pressure is tied down to the numeric solution within the setToAnalytic shape -->
 	<struct name="pressureBCs" mergeType="merge">
@@ -80,6 +80,4 @@
 
 		</list>
 	</struct>
-	
-
 </StGermainData>
