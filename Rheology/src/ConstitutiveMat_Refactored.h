@@ -47,11 +47,11 @@
 #define __Underworld_Rheology_ConstitutiveMat_Refactored_h__
 	
 	/* typedefs for virtual functions: */
-	typedef double  (ConstitutiveMat_Refactored_GetValueFunc)            ( void* constitutiveMatrix );
-	typedef void    (ConstitutiveMat_Refactored_SetValueFunc)            ( void* constitutiveMatrix, double value );
-	typedef void    (ConstitutiveMat_Refactored_SetSecondViscosityFunc)  ( void* constitutiveMatrix, double value, XYZ vector );
-	typedef void    (ConstitutiveMat_Refactored_Assemble_D_B_Func)       ( void* constitutiveMatrix, double** GNx, Node_Index node_I, double** D_B );
-	typedef void    (ConstitutiveMat_Refactored_CalculateStressFunc)     ( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress );
+	typedef double (ConstitutiveMat_Refactored_GetValueFunc) ( void* constitutiveMatrix );
+	typedef void (ConstitutiveMat_Refactored_SetValueFunc) ( void* constitutiveMatrix, double value );
+	typedef void (ConstitutiveMat_Refactored_SetSecondViscosityFunc) ( void* constitutiveMatrix, double value, XYZ vector );
+	typedef void (ConstitutiveMat_Refactored_Assemble_D_B_Func) ( void* constitutiveMatrix, double** GNx, Node_Index node_I, double** D_B );
+	typedef void (ConstitutiveMat_Refactored_CalculateStressFunc) ( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress );
 	
 	extern const Type ConstitutiveMat_Refactored_Type;
 	
@@ -59,72 +59,79 @@
 	#define __ConstitutiveMat_Refactored  \
 		/* Parent info */ \
 		__Stg_Component \
+		PICelleratorContext*											context; \
 		\
-		/* Virtual functions go here */                                                            \
-		ConstitutiveMat_Refactored_SetValueFunc*             _setValue;                         \
-		ConstitutiveMat_Refactored_GetValueFunc*             _getViscosity;                     \
-		ConstitutiveMat_Refactored_SetValueFunc*             _isotropicCorrection;              \
-		ConstitutiveMat_Refactored_SetSecondViscosityFunc*   _setSecondViscosity;               \
-		ConstitutiveMat_Refactored_Assemble_D_B_Func*        _assemble_D_B;                     \
-		ConstitutiveMat_Refactored_CalculateStressFunc*      _calculateStress;                  \
+		/* Virtual functions go here */ \
+		ConstitutiveMat_Refactored_SetValueFunc*				_setValue; \
+		ConstitutiveMat_Refactored_GetValueFunc*				_getViscosity; \
+		ConstitutiveMat_Refactored_SetValueFunc*				_isotropicCorrection; \
+		ConstitutiveMat_Refactored_SetSecondViscosityFunc*	_setSecondViscosity; \
+		ConstitutiveMat_Refactored_Assemble_D_B_Func*		_assemble_D_B; \
+		ConstitutiveMat_Refactored_CalculateStressFunc*		_calculateStress;\
 		\
-		/* ConstitutiveMat_Refactored info */                                                   \
-		Stream*					     debug;				\
-		double**                                     matrixData;                        \
-                double                                       derivs[9];                         \
-		Dimension_Index                              dim;                               \
-		Materials_Register*                          materials_Register;                \
-		Bool                                         isDiagonal;                        \
-		Index                                        columnSize;                        \
-		Index                                        rowSize;                           \
-		Bool                                         previousSolutionExists;            \
-		int                                          currentParticleIndex;              \
-		SystemLinearEquations*                       sle;                               \
-		Iteration_Index                              sleNonLinearIteration_I;
+		/* ConstitutiveMat_Refactored info */ \
+		Stream*															debug; \
+		double**															matrixData; \
+		double															derivs[9]; \
+		Dimension_Index												dim; \
+		Materials_Register*											materials_Register; \
+		Bool																isDiagonal; \
+		Index																columnSize; \
+		Index																rowSize; \
+		Bool																previousSolutionExists; \
+		int																currentParticleIndex; \
+		SystemLinearEquations*										sle; \
+		Iteration_Index												sleNonLinearIteration_I;
 		
 	struct ConstitutiveMat_Refactored { __ConstitutiveMat_Refactored };
 
-	ConstitutiveMat_Refactored* _ConstitutiveMat_Refactored_New( 
-		SizeT                                        _sizeOfSelf,
-		Type                                         type,
-		Stg_Class_DeleteFunction*                    _delete,
-		Stg_Class_PrintFunction*                     _print,
-		Stg_Class_CopyFunction*                      _copy, 
-		Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
-		Stg_Component_ConstructFunction*             _construct,
-		Stg_Component_BuildFunction*                 _build,
-		Stg_Component_InitialiseFunction*            _initialise,
-		Stg_Component_ExecuteFunction*               _execute,
-		Stg_Component_DestroyFunction*               _destroy,
-		ConstitutiveMat_Refactored_SetValueFunc*             _setValue,
-		ConstitutiveMat_Refactored_GetValueFunc*             _getViscosity,
-		ConstitutiveMat_Refactored_SetValueFunc*             _isotropicCorrection,
-		ConstitutiveMat_Refactored_SetSecondViscosityFunc*   _setSecondViscosity,
-		ConstitutiveMat_Refactored_Assemble_D_B_Func*        _assemble_D_B,
-		ConstitutiveMat_Refactored_CalculateStressFunc*      _calculateStress,
-		Name                                         name );
-		
-	/* Initialise implementation */
-	void ConstitutiveMat_Refactored_InitAll( 
-		void*                                        constitutiveMatrix,
-		Dimension_Index                              dim,
-		FiniteElementContext*                        context,
-		Materials_Register*                          materials_Register );
+	#define CONSTITUTIVEMAT_REFACTORED_DEFARGS \
+		STG_COMPONENT_DEFARGS, \
+			ConstitutiveMat_Refactored_SetValueFunc*				_setValue, \
+			ConstitutiveMat_Refactored_GetValueFunc*				_getViscosity, \
+			ConstitutiveMat_Refactored_SetValueFunc*				_isotropicCorrection, \
+			ConstitutiveMat_Refactored_SetSecondViscosityFunc*	_setSecondViscosity, \
+			ConstitutiveMat_Refactored_Assemble_D_B_Func*		_assemble_D_B, \
+			ConstitutiveMat_Refactored_CalculateStressFunc*		_calculateStress
+
+	#define CONSTITUTIVEMAT_REFACTORED_PASSARGS \
+		STG_COMPONENT_PASSARGS, \
+			_setValue, \
+			_getViscosity, \
+			_isotropicCorrection, \
+			_setSecondViscosity, \
+			_assemble_D_B, \
+			_calculateStress
+
+	ConstitutiveMat_Refactored* _ConstitutiveMat_Refactored_New( CONSTITUTIVEMAT_REFACTORED_DEFARGS );
+
+	void _ConstitutiveMat_Refactored_Init(                                                                                
+		void*                constitutiveMatrix,                                                                           
+		Dimension_Index      dim,                                                                                          
+		PICelleratorContext* context,                                                                                      
+		Materials_Register*  materials_Register );
 	
 	/* 'Stg_Class' Virtual Functions */
 	void _ConstitutiveMat_Refactored_Delete( void* constitutiveMatrix );
+
 	void _ConstitutiveMat_Refactored_Print( void* constitutiveMatrix, Stream* stream );
+
 	#define ConstitutiveMat_Refactored_Copy( self ) \
 		(ConstitutiveMat_Refactored*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define ConstitutiveMat_Refactored_DeepCopy( self ) \
 		(ConstitutiveMat_Refactored*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
+
 	void* _ConstitutiveMat_Refactored_Copy( void* constitutiveMatrix, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Functions */
 	void _ConstitutiveMat_Refactored_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data );
+
 	void _ConstitutiveMat_Refactored_Build( void* constitutiveMatrix, void* data );
+
 	void _ConstitutiveMat_Refactored_Initialise( void* constitutiveMatrix, void* data );
+
 	void _ConstitutiveMat_Refactored_Execute( void* constitutiveMatrix, void* data );
+
 	void _ConstitutiveMat_Refactored_Destroy( void* constitutiveMatrix, void* data );
 
 	/* Wrapper macros to virtual functions - These must be macros for the sake of speed */
@@ -147,18 +154,20 @@
 		(((ConstitutiveMat_Refactored*) constitutiveMatrix)->_calculateStress( constitutiveMatrix, strainRate, stress ) )
 
 	/* +++ Public Functions +++ */
-	void ConstitutiveMat_Refactored_MultiplyByValue( void* constitutiveMatrix, double factor ) ;
-	void ConstitutiveMat_Refactored_PrintContents( void* constitutiveMatrix, Stream* stream ) ;
+	void ConstitutiveMat_Refactored_MultiplyByValue( void* constitutiveMatrix, double factor );
+
+	void ConstitutiveMat_Refactored_PrintContents( void* constitutiveMatrix, Stream* stream );
 	
-	void ConstitutiveMat_Refactored_ZeroMatrix( void* constitutiveMatrix ) ;
+	void ConstitutiveMat_Refactored_ZeroMatrix( void* constitutiveMatrix );
+
 	void ConstitutiveMat_Refactored_SetIsotropicViscosity( void* constitutiveMatrix, double viscosity );
 
 	void ConstitutiveMat_Refactored_Assemble( 
-		void*                                              constitutiveMatrix,
-		Element_LocalIndex                                 lElement_I,
-		IntegrationPointsSwarm*				   swarm,
-		int                                                particleIndex,
-		IntegrationPoint*                                  particle );
+		void*							constitutiveMatrix,
+		Element_LocalIndex		lElement_I,
+		IntegrationPointsSwarm*	swarm,
+		int							particleIndex,
+		IntegrationPoint*			particle );
 
 	#define ConstitutiveMat_Refactored_SetToNonLinear( constitutiveMatrix ) \
 		StiffnessMatrix_SetToNonLinear( constitutiveMatrix->stiffnessMatrix )
