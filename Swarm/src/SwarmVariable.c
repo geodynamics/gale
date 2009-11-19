@@ -116,7 +116,7 @@ void _SwarmVariable_Init( SwarmVariable* self, AbstractContext* context, Swarm* 
 	self->dim                       = swarm->dim;
    self->isCheckpointedAndReloaded = True;
 	
-	if( swarm )
+	if( variable )
 		Swarm_AddVariable( swarm, self );
 	if ( self->swarmVariable_Register != NULL )	
 		SwarmVariable_Register_Add( self->swarmVariable_Register, self );
