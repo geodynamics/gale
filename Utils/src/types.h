@@ -55,5 +55,6 @@
 	typedef struct SmoothVelGradField SmoothVelGradField;
 	typedef struct ViscosityField                ViscosityField;
 	typedef struct DensityField                  DensityField;
+	typedef struct MixedStabiliserTerm           MixedStabiliserTerm;
 
 #endif 

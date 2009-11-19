@@ -72,7 +72,8 @@ Bool Underworld_Utils_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, SmoothVelGradField_Type , "0", _SmoothVelGradField_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, ViscosityField_Type ,           "0", _ViscosityField_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, DensityField_Type ,           "0", _DensityField_DefaultNew );
-
+	Stg_ComponentRegister_Add( componentRegister, MixedStabiliserTerm_Type,
+                                   "0", _MixedStabiliserTerm_DefaultNew );
 
 	RegisterParent( UnderworldContext_Type,             PICelleratorContext_Type );
 	RegisterParent( PressureTemperatureOutput_Type,     SwarmOutput_Type );
@@ -83,6 +84,7 @@ Bool Underworld_Utils_Init( int* argc, char** argv[] ) {
 	RegisterParent( SmoothVelGradField_Type,                   ParticleFeVariable_Type );
 	RegisterParent( ViscosityField_Type,                ParticleFeVariable_Type );
 	RegisterParent( DensityField_Type,                  ParticleFeVariable_Type );
+	RegisterParent( MixedStabiliserTerm_Type, StiffnessMatrixTerm_Type );
         
 
 	return True;

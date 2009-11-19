@@ -53,6 +53,7 @@
 	#include "SmoothVelGradField.h"
 	#include "ViscosityField.h"
 	#include "DensityField.h"
+        #include "MixedStabiliserTerm.h"
 	#include "PressureTemperatureOutput.h"
 	#include "Underworld_SwarmOutput.h"
 	#include "RadiogenicHeatingTerm.h"
