@@ -70,6 +70,7 @@ Anisotropic* Anisotropic_New(
    _Rheology_Init( self, context );
    _Anisotropic_Init( self, director, viscosityRatio ) ;
 
+   self->isConstructed = True;
    return self;
 }
 

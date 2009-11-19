@@ -131,8 +131,8 @@
 	
 	<!-- Geometry & Mesh setup -->
 	<param name="dim"> 2 </param>
-	<param name="elementResI"> 8 </param>
-	<param name="elementResJ"> 8 </param>
+	<param name="elementResI"> 64 </param>
+	<param name="elementResJ"> 32 </param>
 	<param name="elementResK"> 1 </param>
 	<param name="shadowDepth"> 1 </param>
 	<param name="minX"> 0.0 </param>

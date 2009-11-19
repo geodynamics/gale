@@ -104,7 +104,7 @@ Pouliquen_etal* _Pouliquen_etal_New(
 			name );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
-	
+	self->isConstructed = True;
 	return self;
 }
 
@@ -113,7 +113,6 @@ void _Pouliquen_etal_Init(
 		FeVariable*                                        pressureField,
 		FeVariable*                                        strainRateInvField,
 		MaterialPointsSwarm*                               materialPointsSwarm,
-		FiniteElementContext*                              context,
 		double                                             minimumYieldStress,
 		double                                             frictionCoefficient,
 		double                                             frictionCoefficientAfterSoftening,
@@ -155,7 +154,7 @@ void _Pouliquen_etal_Init(
 	self->minViscosity = minViscosity;
 
 	/* Update Drawing Parameters */
-	EP_PrependClassHook( Context_GetEntryPoint( context, AbstractContext_EP_DumpClass ),
+	EP_PrependClassHook( Context_GetEntryPoint( self->context, AbstractContext_EP_DumpClass ),
 								_Pouliquen_etal_UpdateDrawParameters, self );
 	
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &materialPoint, self->particleExtHandle );
@@ -200,7 +199,7 @@ void* _Pouliquen_etal_DefaultNew( Name name ) {
 			_Pouliquen_etal_Build,
 			_Pouliquen_etal_Initialise,
 			_YieldRheology_Execute,
-			_YieldRheology_Destroy,
+			_Pouliquen_etal_Destroy,
 			_YieldRheology_ModifyConstitutiveMatrix,
 			_Pouliquen_etal_GetYieldCriterion,
 			_VonMises_GetYieldIndicator,
@@ -213,7 +212,6 @@ void _Pouliquen_etal_AssignFromXML( void* pouliquen_etal, Stg_ComponentFactory* 
 	FeVariable*             pressureField;
 	FeVariable*             strainRateInvField;
 	MaterialPointsSwarm*    materialPointsSwarm;
-	FiniteElementContext*   context;
 
 	/* Construct Parent */
 	_VonMises_AssignFromXML( self, cf, data );
@@ -226,15 +224,11 @@ void _Pouliquen_etal_AssignFromXML( void* pouliquen_etal, Stg_ComponentFactory* 
 
 	materialPointsSwarm     = (MaterialPointsSwarm*)
 			Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialPointsSwarm", MaterialPointsSwarm, True, data );
-
-	context = (FiniteElementContext*)
-			Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data ); 
 		
 	_Pouliquen_etal_Init( self, 
 			pressureField,
 			strainRateInvField,
 			materialPointsSwarm, 
-			context,
 			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficient", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficientAfterSoftening", 0.0 ),
@@ -255,6 +249,9 @@ void _Pouliquen_etal_Build( void* rheology, void* data ) {
 	/* Build parent */
 	_YieldRheology_Build( self, data );
 
+	Stg_Component_Build( self->pressureField, data, False );
+	Stg_Component_Build( self->strainRateInvField, data, False );
+	
 	Stg_Component_Build( self->brightness, data, False );
 	Stg_Component_Build( self->opacity, data, False );
 	Stg_Component_Build( self->diameter, data, False );
@@ -262,14 +259,16 @@ void _Pouliquen_etal_Build( void* rheology, void* data ) {
 
 }
 
-
 void _Pouliquen_etal_Initialise( void* rheology, void* data ) {
 	Pouliquen_etal*                  self                  = (Pouliquen_etal*) rheology;
 	Particle_Index                  lParticle_I;
 	Particle_Index                  particleLocalCount;
-	AbstractContext*                context = (AbstractContext*)data;
+	AbstractContext*                context = (AbstractContext*)self->context;
 
 	_YieldRheology_Initialise( self, data );
+
+   Stg_Component_Initialise( self->pressureField, data, False );
+	Stg_Component_Initialise( self->strainRateInvField, data, False );
 
 	/* Initialise variables that I've created - (mainly just SwarmVariables)
 	 * This will run a Variable_Update for us */
@@ -280,7 +279,7 @@ void _Pouliquen_etal_Initialise( void* rheology, void* data ) {
 
 	/* We should only set initial conditions if in regular non-restart mode. If in restart mode, then
 	the particle-based variables will be set correcty when we re-load the Swarm. */
-	if ( !(context && (True == context->loadFromCheckPoint)) ) {
+	if ( !(True == self->context->loadFromCheckPoint) ) {
 		/* We don't need to Initialise hasYieldedVariable because it's a parent variable and _YieldRheology_Initialise
 		 * has already been called */
 		particleLocalCount = self->hasYieldedVariable->variable->arraySize;
@@ -296,6 +295,23 @@ void _Pouliquen_etal_Initialise( void* rheology, void* data ) {
 		}
 	}	
 }
+
+void _Pouliquen_etal_Destroy( void* rheology, void* data ) {
+	Pouliquen_etal*          self               = (Pouliquen_etal*) rheology;
+
+	Stg_Component_Destroy( self->pressureField, data, False );
+	Stg_Component_Destroy( self->strainRateInvField, data, False );
+	
+	Stg_Component_Destroy( self->brightness, data, False );
+	Stg_Component_Destroy( self->opacity, data, False );
+	Stg_Component_Destroy( self->diameter, data, False );
+	Stg_Component_Destroy( self->tensileFailure, data, False );
+
+	/* Destroy parent */
+	_YieldRheology_Destroy( self, data );
+
+}
+
 
 double _Pouliquen_etal_GetYieldCriterion( 
 			void*                            pouliquen_etal,

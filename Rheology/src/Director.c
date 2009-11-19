@@ -69,6 +69,44 @@
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type Director_Type = "Director";
 
+/* Public Constructor */
+Director* Director_New( 
+		Name                   name,
+		DomainContext*         context,
+		TimeIntegrator*        timeIntegrator, 
+		Variable*              variable,
+		Index                  dataCount, 
+		Stg_Component**        data,
+		Bool                   allowFallbackToFirstOrder,
+		FeVariable*            velGradField,
+		MaterialPointsSwarm*   materialPointsSwarm,
+		InitialDirectionType   initialDirectionType,
+		double                 globalInitialDirectionX,
+		double                 globalInitialDirectionY,
+		double                 globalInitialDirectionZ,
+		int                    randomInitialDirectionSeed,
+		Bool                   dontUpdate )
+{
+	Director*	self;
+
+	self = (Director*) _Director_DefaultNew( name );
+	
+	_TimeIntegratee_Init( self, context, timeIntegrator, variable, dataCount, data, allowFallbackToFirstOrder );
+   _Director_Init(
+		self,
+		velGradField,
+		materialPointsSwarm,
+		initialDirectionType,
+		globalInitialDirectionX,
+		globalInitialDirectionY,
+		globalInitialDirectionZ,
+		randomInitialDirectionSeed,
+		dontUpdate );
+
+	self->isConstructed = True;
+	return self;
+}
+
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
 Director* _Director_New( 
 		SizeT                                              sizeOfSelf,
@@ -157,6 +195,11 @@ void _Director_Init(
 			"DirectorX",
 			"DirectorY",
 			"DirectorZ" );
+		self->dontUpdateParticle = Swarm_NewScalarVariable(
+			materialPointsSwarm,
+			"dontUpdateParticle",
+			(ArithPointer) &particleExt->dontUpdateParticle - (ArithPointer) &particle,
+			Variable_DataType_Int );
 	}
 	else {
 		Name variableName;
@@ -165,6 +208,11 @@ void _Director_Init(
 		variableName = Stg_Object_AppendSuffix( materialPointsSwarm, "Director" );
 		self->directorSwarmVariable = SwarmVariable_Register_GetByName( materialPointsSwarm->swarmVariable_Register, variableName );
 		assert( self->directorSwarmVariable );
+		Memory_Free( variableName );
+		/* Get Variables already created */
+		variableName = Stg_Object_AppendSuffix( materialPointsSwarm, "dontUpdateParticle" );
+		self->dontUpdateParticle = SwarmVariable_Register_GetByName( materialPointsSwarm->swarmVariable_Register, variableName );
+		assert( self->dontUpdateParticle );
 		Memory_Free( variableName );
 	}
 	
@@ -186,7 +234,7 @@ void* _Director_DefaultNew( Name name ) {
 		_Director_Build,
 		_Director_Initialise,
 		_TimeIntegratee_Execute,
-		_TimeIntegratee_Destroy,
+		_Director_Destroy,
 		_Director_TimeDerivative,
 		_Director_Intermediate,
 		name );
@@ -256,6 +304,7 @@ void _Director_Build( void* director, void* data ) {
 	_TimeIntegratee_Build( self, data );
 
 	Stg_Component_Build( self->directorSwarmVariable, data, False );
+	Stg_Component_Build( self->dontUpdateParticle, data, False );
 }
 
 void _Director_Initialise( void* director, void* data ) {
@@ -271,6 +320,7 @@ void _Director_Initialise( void* director, void* data ) {
 
 	Stg_Component_Initialise( self->materialPointsSwarm, data, False );
 	Stg_Component_Initialise( self->directorSwarmVariable, data, False );
+	Stg_Component_Initialise( self->dontUpdateParticle, data, True );
 
 	/* Update variables */
 	Variable_Update( self->variable );
@@ -445,9 +495,23 @@ void _Director_Initialise( void* director, void* data ) {
 			"in Director.h\n", __func__, 
 			self->initialDirectionType);
 		}
-		/* We don't need to initialise the 'dontUpdate' flag on the particle because
-		 * all the memory is initialised to zero when the particles are allocated */
+      /* Initialise the dontUpdate flag on each particle */
+      for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) { 
+         Variable_SetValueInt(self->dontUpdateParticle->variable, lParticle_I, 0);
+      }	
 	}
+
+}
+
+void _Director_Destroy( void* _self, void* data ) {
+	Director*          self               = (Director*) _self;
+
+   Stg_Component_Destroy( self->velGradField, data, False );
+   Stg_Component_Destroy( self->materialPointsSwarm, data, False );
+   Stg_Component_Destroy( self->directorSwarmVariable, data, False );
+   Stg_Component_Destroy( self->dontUpdateParticle, data, False );
+	/* Destroy parent */
+	_TimeIntegratee_Destroy( self, data );
 
 }
 
@@ -466,7 +530,7 @@ Bool _Director_TimeDerivative( void* director, Index lParticle_I, double* timeDe
 		materialPoint, self->particleExtHandle );
 	
 	/* Check if this particle should be updated or not */
-	if ( self->dontUpdate || particleExt->dontUpdate ) {
+	if ( self->dontUpdate || particleExt->dontUpdateParticle ) {
 		memset( timeDeriv, 0, sizeof(double) * materialPointsSwarm->dim );
 		return True;
 	}
@@ -476,21 +540,19 @@ Bool _Director_TimeDerivative( void* director, Index lParticle_I, double* timeDe
 	lElement_I = materialPoint->owningCell;
 	
 	result = FieldVariable_InterpolateValueAt( self->velGradField, materialPoint->coord, velGrad );
-
+#if 0
 	if ( result == OTHER_PROC || result == OUTSIDE_GLOBAL || isinf(velGrad[0]) || isinf(velGrad[1]) || 
 		( self->materialPointsSwarm->dim == 3 && isinf(velGrad[2]) ) ) 
 	{
-		#if 0
 		Journal_Printf( Journal_Register( Error_Type, self->type ),
 			"Error in func '%s' for particle with index %u.\n\tPosition (%g, %g, %g)\n\tVelGrad here is (%g, %g, %g)."
 			"\n\tInterpolation result is %s.\n",
-			__func__, array_I, coord[0], coord[1], coord[2], 
+			__func__, lParticle_I, materialPoint->coord[0], materialPoint->coord[1], materialPoint->coord[2], 
 			velGrad[0], velGrad[1], ( self->materialPointsSwarm->dim == 3 ? velGrad[2] : 0.0 ),
 			InterpolationResultToStringMap[result]  );
-		return False;	
-		#endif	
+		return False;		
 	}
-
+#endif
 	if ( materialPointsSwarm->dim == 2 ) {
 		timeDeriv[0] = -velGrad[MAP_2D_TENSOR(0,0)] * normal[0] - velGrad[MAP_2D_TENSOR(1,0)] * normal[1];
 		timeDeriv[1] = -velGrad[MAP_2D_TENSOR(0,1)] * normal[0] - velGrad[MAP_2D_TENSOR(1,1)] * normal[1];
@@ -517,6 +579,7 @@ void _Director_Intermediate( void* director, Index lParticle_I ) {
 /* Update these variables in case the swarm has been reallocated */
 void Director_UpdateVariables( void* timeIntegrator, Director* self ) {
 	Variable_Update( self->variable );
+	Variable_Update( self->dontUpdateParticle->variable );
 	Variable_Update( self->materialPointsSwarm->particleCoordVariable->variable );
 	Variable_Update( self->materialPointsSwarm->owningCellVariable->variable );
 }
@@ -558,5 +621,5 @@ void Director_SetDontUpdateParticleFlag( void* director, void* particle, Particl
 	particleExt = (Director_ParticleExt*) 
 			ExtensionManager_Get( self->materialPointsSwarm->particleExtensionMgr, particle, self->particleExtHandle );
 	
-	particleExt->dontUpdate = dontUpdateFlag;
+	particleExt->dontUpdateParticle = dontUpdateFlag;
 }

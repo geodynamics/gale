@@ -228,6 +228,7 @@ void _RheologyMaterial_Init(
 void _RheologyMaterial_Delete( void* rheologyMaterial ) {
 	RheologyMaterial* self = (RheologyMaterial*)rheologyMaterial;
 
+	Stg_Class_Delete( self->rheology_Register );
 	_Material_Delete( self );
 }
 
@@ -245,24 +246,52 @@ void* _RheologyMaterial_Copy( void* rheologyMaterial, void* dest, Bool deep, Nam
 
 void _RheologyMaterial_Build( void* rheologyMaterial, void* data ) {
 	RheologyMaterial*   self                 = (RheologyMaterial*)rheologyMaterial;
+	Rheology_Index      rheologyCount = Rheology_Register_GetCount( self->rheology_Register ); 
+	Rheology*           rheology;
+	Rheology_Index      rheology_I; 
 
 	_Material_Build( self, data );
+	
+	for( rheology_I = 0; rheology_I < rheologyCount ; rheology_I++ ) { 
+		rheology = Rheology_Register_GetByIndex( self->rheology_Register, rheology_I );
+		
+		Stg_Component_Build( rheology, data, False ); 
+	}
+	
 }
 void _RheologyMaterial_Initialise( void* rheologyMaterial, void* data ) {
 	RheologyMaterial*   self                 = (RheologyMaterial*)rheologyMaterial;
+	Rheology_Index      rheologyCount = Rheology_Register_GetCount( self->rheology_Register ); 
+	Rheology*           rheology;
+	Rheology_Index      rheology_I; 
 
 	_Material_Initialise( self, data );
+
+	for( rheology_I = 0; rheology_I < rheologyCount ; rheology_I++ ) { 
+		rheology = Rheology_Register_GetByIndex( self->rheology_Register, rheology_I );
+		
+		Stg_Component_Initialise( rheology, data, False ); 
+	}
+	
 }
 void _RheologyMaterial_Execute( void* rheologyMaterial, void* data ) {
 	RheologyMaterial*   self                 = (RheologyMaterial*)rheologyMaterial;
 	_Material_Execute( self, data );
 }
 void _RheologyMaterial_Destroy( void* rheologyMaterial, void* data ) {
-	RheologyMaterial* self = (RheologyMaterial*)rheologyMaterial;
+	RheologyMaterial*   self                 = (RheologyMaterial*)rheologyMaterial;
+	Rheology_Index      rheologyCount = Rheology_Register_GetCount( self->rheology_Register ); 
+	Rheology*           rheology;
+	Rheology_Index      rheology_I; 
 
-	Stg_Class_Delete( self->rheology_Register );
-
+	for( rheology_I = 0; rheology_I < rheologyCount ; rheology_I++ ) { 
+		rheology = Rheology_Register_GetByIndex( self->rheology_Register, rheology_I );
+		
+		Stg_Component_Destroy( rheology, data, False ); 
+	}
+	
 	_Material_Destroy( self, data );
+
 }
 
 void RheologyMaterial_RunRheologies( 	

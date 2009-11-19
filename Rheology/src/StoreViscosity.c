@@ -112,7 +112,7 @@ void _StoreVisc_Init(
 	/* Add SwarmVariables for plotting */
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle, self->particleExtHandle );
 	
-	swarmVariable = Swarm_NewScalarVariable(
+	self->swarmVariable = Swarm_NewScalarVariable(
 		materialPointsSwarm,
 		"Viscosity",
 		(ArithPointer) &particleExt->effVisc - (ArithPointer) &particle,
@@ -154,6 +154,39 @@ void _StoreVisc_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* d
 	_StoreVisc_Init( self, materialPointsSwarm );
 }
 	
+void _StoreVisc_Build( void* _self, void* data ) {
+	StoreVisc*  self               = (StoreVisc*) _self;
+
+	/* Build parent */
+	_Rheology_Build( self, data );
+
+	Stg_Component_Build(	self->swarmVariable, data, False);	
+	Stg_Component_Build(	self->materialPointsSwarm, data, False);
+
+}
+
+void _StoreVisc_Initialise( void* _self, void* data ) {
+	StoreVisc*  self               = (StoreVisc*) _self;
+
+	/* Initialise parent */
+	_Rheology_Initialise( self, data );
+
+	Stg_Component_Initialise(	self->swarmVariable, data, False);	
+	Stg_Component_Initialise(	self->materialPointsSwarm, data, False);
+
+}
+
+void _StoreVisc_Destroy( void* _self, void* data ) {
+	StoreVisc*  self               = (StoreVisc*) _self;
+
+	Stg_Component_Destroy(	self->swarmVariable, data, False);	
+	Stg_Component_Destroy(	self->materialPointsSwarm, data, False);
+
+	/* Destroy parent */
+	_Rheology_Destroy( self, data );
+
+}
+
 void _StoreVisc_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
 		ConstitutiveMatrix*                                constitutiveMatrix,

@@ -157,9 +157,9 @@ void _YieldRheology_Init( YieldRheology* self, StrainWeakening* strainWeakening,
 void _YieldRheology_Delete( void* rheology ) {
 	YieldRheology*					self = (YieldRheology*)rheology;
 	
-	
-	_Stg_Class_Delete( self );
+	_Stg_Component_Delete( self );
 }
+
 void _YieldRheology_Print( void* rheology, Stream* stream ) {}
 
 void* _YieldRheology_Copy( void* rheology, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
@@ -206,10 +206,10 @@ void _YieldRheology_Build( void* rheology, void* data ) {
 	/* This variable only needs to be built if there are material points (hasYieldedVariable is created
 	 * in _YieldRheology_Init only in that case) */
 	
-	if ( self->hasYieldedVariable ) {
-		Stg_Component_Build( self->hasYieldedVariable, data, False );
-	}
+	if ( self->hasYieldedVariable ) Stg_Component_Build( self->hasYieldedVariable, data, False );
+
 }
+
 void _YieldRheology_Initialise( void* rheology, void* data ) {
 	YieldRheology*                   self          = (YieldRheology*) rheology;
 	
@@ -217,16 +217,16 @@ void _YieldRheology_Initialise( void* rheology, void* data ) {
 
 	/* This variable only needs to be initialised if there are material points (hasYieldedVariable is created
 	 * in _YieldRheology_Init only in that case) */
-	if ( self->hasYieldedVariable ) {
-		Stg_Component_Initialise( self->hasYieldedVariable, data, False );
-	}
+	if ( self->hasYieldedVariable ) Stg_Component_Initialise( self->hasYieldedVariable, data, False );
 }
+
 void _YieldRheology_Execute( void* rheology, void* data ) {}
 
 void _YieldRheology_Destroy( void* rheology, void* data ) {
    YieldRheology* self = (YieldRheology*) rheology;
    
-   if( self->strainWeakening ) Stg_Component_Destroy( self->strainWeakening, data, False );
+   if( self->strainWeakening )     Stg_Component_Destroy( self->strainWeakening, data, False );
+   if ( self->hasYieldedVariable ) Stg_Component_Destroy( self->hasYieldedVariable, data, False );
    
    _Rheology_Destroy( self, data ); 
 }

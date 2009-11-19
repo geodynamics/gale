@@ -82,7 +82,7 @@ Byerlee* Byerlee_New(
    _YieldRheology_Init( self, strainWeakening, materialPointsSwarm, minVisc ); 
    _VonMises_Init( self, strainRateField, swarmStrainRate, cohesion, cohesionAfterSoftening, strainRateSoftening );
    _Byerlee_Init( self, mesh, depthCoefficient );
-
+   self->isConstructed = True;
    return self;
 }
 

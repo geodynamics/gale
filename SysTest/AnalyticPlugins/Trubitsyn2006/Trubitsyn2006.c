@@ -161,6 +161,20 @@ void Trubitsyn2006_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I,
 
 }
 
+void Trubitsyn2006_PressureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	DomainContext*         context            = (DomainContext*)_context;
+	FeVariable*            PressureField      = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "PressureField" );
+	FeMesh*                mesh               = PressureField->feMesh;
+	double*                pressure           = (double*) _result;
+	double*                coord;
+	Trubitsyn2006* self = Stg_ComponentFactory_ConstructByName( context->CF, Trubitsyn2006_Type, Trubitsyn2006, True, context );
+	
+	/* Find coordinate of node */
+	coord = Mesh_GetVertex( mesh, node_lI );
+	
+	_Trubitsyn2006_PressureFunction( self,  coord,  pressure );
+}
+
 void _Trubitsyn2006_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
 	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
 	double                 v0                 = Trubitsyn2006_V0( self );
@@ -242,6 +256,10 @@ void _Trubitsyn2006_AssignFromXML( void* analyticSolution, Stg_ComponentFactory*
 
 	/* Add temperature initial condition */
 	condFunc = ConditionFunction_New( Trubitsyn2006_TemperatureIC, "Trubitsyn2006_TemperatureIC" );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+
+  /* Add pressure initial condition */
+	condFunc = ConditionFunction_New( Trubitsyn2006_PressureIC, "Trubitsyn2006_PressureIC" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
 	/* Create Analytic Fields */

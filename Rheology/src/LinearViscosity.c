@@ -58,6 +58,36 @@
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type LinearViscosity_Type = "LinearViscosity";
 
+/* Public Constructor */
+LinearViscosity* LinearViscosity_New(
+      Name              name,
+      AbstractContext*  context,
+      double            C,
+      double            X,
+      double            Y,
+      double            Z,
+      double            XY,
+      double            XZ,
+      double            YZ,
+      double            XYZ )
+{
+   LinearViscosity* self = (LinearViscosity*) _LinearViscosity_DefaultNew( name );
+
+   _Rheology_Init( self, context );
+   _LinearViscosity_Init( self,
+	     C,
+	     X,
+	     Y,
+	     Z,
+	     XY,
+	     XZ,
+	     YZ,
+	     XYZ );
+
+   self->isConstructed = True;
+   return self;
+}
+
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
 LinearViscosity* _LinearViscosity_New( 
 		SizeT                                              sizeOfSelf,

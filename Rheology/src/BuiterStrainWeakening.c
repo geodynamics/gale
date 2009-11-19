@@ -96,7 +96,7 @@ BuiterStrainWeakening* BuiterStrainWeakening_New(
 	       initialDamageFactor,
 	       randomSeed,
 	       initialStrainShape  );
-
+   self->isConstructed = True;
    return self;
 }
 

@@ -80,7 +80,10 @@
 	/* 'Stg_Component' implementations */
 	void* _NonNewtonian_DefaultNew( Name name ) ;
 	void _NonNewtonian_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
-
+   void _NonNewtonian_Build( void* _self, void* data );
+   void _NonNewtonian_Initialise( void* _self, void* data );
+   void _NonNewtonian_Destroy( void* _self, void* data );
+   
 	void _NonNewtonian_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
 		ConstitutiveMatrix*                                constitutiveMatrix,

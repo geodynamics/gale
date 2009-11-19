@@ -75,6 +75,8 @@ AlignmentSwarmVariable* AlignmentSwarmVariable_New(
    _SwarmVariable_Init( self, context, swarm, variable, dofCount );
    /* init self */
    _AlignmentSwarmVariable_Init( self, velocityField, director );
+   
+   self->isConstructed = True;
 
    return self;
 }

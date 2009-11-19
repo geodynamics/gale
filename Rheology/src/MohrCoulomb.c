@@ -150,7 +150,7 @@ void* _MohrCoulomb_DefaultNew( Name name ) {
 		_MohrCoulomb_Build,
 		_MohrCoulomb_Initialise,
 		_YieldRheology_Execute,
-		_YieldRheology_Destroy,
+		_MohrCoulomb_Destroy,
 		_MohrCoulomb_ModifyConstitutiveMatrix,
 		_MohrCoulomb_GetYieldCriterion,
 		_MohrCoulomb_GetYieldIndicator,
@@ -204,6 +204,11 @@ void _MohrCoulomb_Build( void* rheology, void* data ) {
 
 	/* Build parent */
 	_YieldRheology_Build( self, data );
+	
+	Stg_Component_Build(	self->materialPointsSwarm, data, False);
+	Stg_Component_Build(	self->pressureField, data, False);
+	Stg_Component_Build(	self->strainRateField, data, False);
+
 }
 
 void _MohrCoulomb_Initialise( void* rheology, void* data ) {
@@ -216,6 +221,7 @@ void _MohrCoulomb_Initialise( void* rheology, void* data ) {
 	
 	/* Initialise these components now just in case this function is called before their own _Initialise function */
 	Stg_Component_Initialise( self->materialPointsSwarm, data, False );
+	Stg_Component_Build(	self->pressureField, data, False);	
 	Stg_Component_Initialise( self->strainWeakening, data, False );
 
 	/* We don't need to Initialise hasYieldedVariable because it's a parent variable and _YieldRheology_Initialise
@@ -228,6 +234,18 @@ void _MohrCoulomb_Initialise( void* rheology, void* data ) {
 			Variable_SetValueChar( self->hasYieldedVariable->variable, lParticle_I, False );
                 }
 	}
+}
+
+void _MohrCoulomb_Destroy( void* rheology, void* data ) {
+	MohrCoulomb*  self               = (MohrCoulomb*) rheology;
+
+	Stg_Component_Destroy(	self->materialPointsSwarm, data, False);
+	Stg_Component_Destroy(	self->pressureField, data, False);
+	Stg_Component_Destroy(	self->strainRateField, data, False);
+
+	/* Destroy parent */
+	_YieldRheology_Destroy( self, data );
+
 }
 	
 void _MohrCoulomb_ModifyConstitutiveMatrix( 

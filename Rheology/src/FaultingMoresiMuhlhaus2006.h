@@ -102,6 +102,26 @@
 		Bool                                                tryingOldOrientation;			\
 
 	struct FaultingMoresiMuhlhaus2006 { __FaultingMoresiMuhlhaus2006 };
+
+	/** Public Constructor */
+   FaultingMoresiMuhlhaus2006* FaultingMoresiMuhlhaus2006_New(
+      Name                  name,
+      AbstractContext*      context,
+      StrainWeakening*      strainWeakening, 
+      MaterialPointsSwarm*  materialPointsSwarm, 
+      double                minVisc, 
+		FeVariable*           pressureField,
+		FeVariable*           velocityGradientsField,
+		Director*             director,
+		double                cohesion,
+		double                cohesionAfterSoftening,
+		double                frictionCoefficient,
+		double                frictionCoefficientAfterSoftening,
+		double                minimumYieldStress,
+		Bool                  ignoreOldOrientation,
+		Bool                  updateOrientationAtMaxSoftness,
+		Bool                  updateOrientations,
+		Bool                  isotropicCorrection );
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	FaultingMoresiMuhlhaus2006* _FaultingMoresiMuhlhaus2006_New( 
@@ -127,8 +147,25 @@
 	void _FaultingMoresiMuhlhaus2006_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	void _FaultingMoresiMuhlhaus2006_Build( void* rheology, void* data );
-	void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) ;
-
+	void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data );
+   void _FaultingMoresiMuhlhaus2006_Destroy( void* rheology, void* data );
+   void _FaultingMoresiMuhlhaus2006_Init(
+		FaultingMoresiMuhlhaus2006*                        self,
+		FeVariable*                                        pressureField,
+		FeVariable*                                        velocityGradientsField,
+		MaterialPointsSwarm*                               materialPointsSwarm,
+		FiniteElementContext*                              context,
+		Director*                                          director,
+		double                                             cohesion,
+		double                                             cohesionAfterSoftening,
+		double                                             frictionCoefficient,
+		double                                             frictionCoefficientAfterSoftening,
+		double                                             minimumYieldStress,
+		Bool                                               ignoreOldOrientation,
+		Bool                                               updateOrientationAtMaxSoftness,
+		Bool                                               updateOrientations,
+		Bool                                               isotropicCorrection) ; 
+   
 	/* 'YieldRheology' implementations */
 	void _FaultingMoresiMuhlhaus2006_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 

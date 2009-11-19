@@ -112,6 +112,24 @@
 
 	void _Pouliquen_etal_Build( void* rheology, void* data );
 	void _Pouliquen_etal_Initialise( void* rheology, void* data ) ;
+	void _Pouliquen_etal_Destroy( void* rheology, void* data ) ;
+   void _Pouliquen_etal_Init(
+		Pouliquen_etal*                                     self,
+		FeVariable*                                        pressureField,
+		FeVariable*                                        strainRateInvField,
+		MaterialPointsSwarm*                               materialPointsSwarm,
+		double                                             minimumYieldStress,
+		double                                             frictionCoefficient,
+		double                                             frictionCoefficientAfterSoftening,
+		double                                             grainDiameter,
+		double                                             Io,
+		double                                             rho_s,
+		double                                             mu_2,
+		double                                             mu_s,
+		double                                             mu_2_afterSoftening,
+		double                                             mu_s_afterSoftening,
+		double                                             maxViscosity,
+		double                                             minViscosity );
 	
 	/* 'YieldRheology' implementations */
 	double _Pouliquen_etal_GetYieldCriterion( 

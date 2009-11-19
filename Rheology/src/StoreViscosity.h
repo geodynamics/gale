@@ -60,7 +60,8 @@
 		/* Virtual functions go here */ \
 		/* Param passed in */ \
 		MaterialPointsSwarm*                                materialPointsSwarm;                              \
-		ExtensionInfo_Index                                 particleExtHandle;
+		ExtensionInfo_Index                                 particleExtHandle; \
+		SwarmVariable*                                      swarmVariable;
 
 	struct StoreVisc { __StoreVisc };
 	
@@ -83,7 +84,9 @@
 	/* 'Stg_Component' implementations */
 	void* _StoreVisc_DefaultNew( Name name ) ;
 	void _StoreVisc_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _StoreVisc_Build( void* rheology, void* data );
 	void _StoreVisc_Initialise( void* rheology, void* data );
+	void _StoreVisc_Destroy( void* rheology, void* data );
 
 	void _StoreVisc_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 

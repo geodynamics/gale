@@ -53,7 +53,7 @@
 	
 	typedef struct {
 		XYZ            director;
-		Particle_Bool  dontUpdate;
+		Particle_Bool  dontUpdateParticle;
 	}  Director_ParticleExt; 
 
 	/** Rheology class contents - this is defined as a macro so that sub-classes of this class can use this macro at the start of the definition of their struct */
@@ -63,6 +63,7 @@
 		/* Virtual functions go here */ \
 		/* General Info */\
 		SwarmVariable*                                      directorSwarmVariable;                 \
+		SwarmVariable*                                      dontUpdateParticle;                 \		
 		ExtensionInfo_Index                                 particleExtHandle;                     \
 		/* Param passed in */ \
 		FeVariable*                                         velGradField;                          \
@@ -74,6 +75,24 @@
 		Bool                                                dontUpdate; 
 				
 	struct Director { __Director };
+
+   /** Public Constructor */
+   Director* Director_New( 
+		Name                   name,
+		DomainContext*         context,
+		TimeIntegrator*        timeIntegrator, 
+		Variable*              variable,
+		Index                  dataCount, 
+		Stg_Component**        data,
+		Bool                   allowFallbackToFirstOrder,
+		FeVariable*            velGradField,
+		MaterialPointsSwarm*   materialPointsSwarm,
+		InitialDirectionType   initialDirectionType,
+		double                 globalInitialDirectionX,
+		double                 globalInitialDirectionY,
+		double                 globalInitialDirectionZ,
+		int                    randomInitialDirectionSeed,
+		Bool                   dontUpdate );
 
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	Director* _Director_New( 
@@ -97,6 +116,17 @@
 	void _Director_AssignFromXML( void* director, Stg_ComponentFactory* cf, void* data );
 	void _Director_Build( void* director, void* data );
 	void _Director_Initialise( void* director, void* data );
+   void _Director_Init(
+         Director*                                          self,
+         FeVariable*                                        velGradField,
+         MaterialPointsSwarm*                               materialPointsSwarm,
+         InitialDirectionType                               initialDirectionType,
+         double                                             globalInitialDirectionX,
+         double                                             globalInitialDirectionY,
+         double                                             globalInitialDirectionZ,
+         int                                                randomInitialDirectionSeed,
+         Bool                                               dontUpdate );
+	void _Director_Destroy( void* _self, void* data ) ;
 	
 	Bool _Director_TimeDerivative( void* _director, Index lParticle_I, double* timeDeriv );
 	void _Director_Intermediate( void* director, Index lParticle_I );

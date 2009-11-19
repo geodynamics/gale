@@ -35,7 +35,6 @@
 				<param>I_AXIS</param>
 			</list>	
 		</struct>
-		<!-- Create Alignment Swarm Variable - for the sake of plotting -->
 		<struct name="director">
 			<param name="Type">Director</param>
 			<param name="MaterialPointsSwarm">materialSwarm</param>
@@ -44,12 +43,6 @@
 			<param name="initialDirectionX">1.0</param>
 			<param name="initialDirectionY">0.0</param>
 			<param name="initialDirectionZ">0.0</param>
-		</struct>	
-		<struct name="alignment">
-			<param name="Type">AlignmentSwarmVariable</param>
-			<param name="Swarm">materialSwarm</param>
-			<param name="Director">director</param>
-			<param name="VelocityField">VelocityField</param>
 		</struct>	
 	</struct>
 	

@@ -89,7 +89,7 @@ void* _MultiRheologyMaterial_DefaultNew( Name name ) {
 	return (void*) _MultiRheologyMaterial_New(
 		sizeof(MultiRheologyMaterial),
 		MultiRheologyMaterial_Type,
-		_MultiRheologyMaterial_Delete,
+		_RheologyMaterial_Delete,
 		_RheologyMaterial_Print,
 		_RheologyMaterial_Copy,
 		_MultiRheologyMaterial_DefaultNew,
@@ -115,30 +115,31 @@ void* _MultiRheologyMaterial_DefaultNew( Name name ) {
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
 MultiRheologyMaterial* _MultiRheologyMaterial_New( 
-	SizeT                                              sizeOfSelf,
-	Type                                               type,
-	Stg_Class_DeleteFunction*                          _delete,
-	Stg_Class_PrintFunction*                           _print,
-	Stg_Class_CopyFunction*                            _copy, 
-	Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-	Stg_Component_ConstructFunction*                   _construct,
-	Stg_Component_BuildFunction*                       _build,
-	Stg_Component_InitialiseFunction*                  _initialise,
-	Stg_Component_ExecuteFunction*                     _execute,
-	Stg_Component_DestroyFunction*                     _destroy,
-	RheologyMaterial_RunRheologiesFunction*            _runRheologies,
-	Name                                               name,
-	Stg_Shape*                                         shape,
-	Dictionary*                                        materialDictionary,
-	Materials_Register*                                materialRegister,
-	Rheology**                                         rheologyList,
-	Rheology_Index                                     rheologyCount,
-	Compressible*                                      compressible,
-	Rheology***                                        rheologyListList,
-	Rheology_Index*                                    rheologyCountList, 
-	Index                                              rheologyListCount ) 
+		SizeT                                              sizeOfSelf,
+		Type                                               type,
+		Stg_Class_DeleteFunction*                          _delete,
+		Stg_Class_PrintFunction*                           _print,
+		Stg_Class_CopyFunction*                            _copy, 
+		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
+		Stg_Component_ConstructFunction*                   _construct,
+		Stg_Component_BuildFunction*                       _build,
+		Stg_Component_InitialiseFunction*                  _initialise,
+		Stg_Component_ExecuteFunction*                     _execute,
+		Stg_Component_DestroyFunction*                     _destroy,
+		RheologyMaterial_RunRheologiesFunction*            _runRheologies,
+		Name                                               name,
+		Stg_Shape*                                         shape,
+		Dictionary*                                        materialDictionary,
+		Materials_Register*                                materialRegister,
+		Rheology**                                         rheologyList,
+		Rheology_Index                                     rheologyCount,
+		Compressible*                                      compressible,
+		Rheology***                                        rheologyListList,
+		Rheology_Index*                                    rheologyCountList, 
+		Index                                              rheologyListCount
+		) 
 {
-	MultiRheologyMaterial* self;
+	MultiRheologyMaterial*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up
 	 *  the hierarchy tree. At the beginning of the tree it will allocate memory of the size of
@@ -193,6 +194,7 @@ void _MultiRheologyMaterial_AssignFromXML( void* material, Stg_ComponentFactory*
 		__func__, self->type, self->name );
 	
 	rheologyListCount = Dictionary_Entry_Value_GetCount( multiRheologyList );
+
 	rheologyCountList = Memory_Alloc_Array( Rheology_Index, rheologyListCount, "rheologyCountList" );
 	rheologyListList = Memory_Alloc_Array( Rheology**, rheologyListCount, "rheologyListList" );
 			
@@ -202,44 +204,47 @@ void _MultiRheologyMaterial_AssignFromXML( void* material, Stg_ComponentFactory*
 	for ( rheologyList_I = 0 ; rheologyList_I < rheologyListCount ; rheologyList_I++ ){
 		rheologyList = Dictionary_Entry_Value_GetElement( multiRheologyList, rheologyList_I );
 		rheologyCountList[ rheologyList_I ] = Dictionary_Entry_Value_GetCount( rheologyList );
-		rheologyListList[ rheologyList_I ] = Memory_Alloc_Array( Rheology*, rheologyCountList[ rheologyList_I ], "rheologyList" );
+	 rheologyListList[ rheologyList_I ] = Memory_Alloc_Array( Rheology*, rheologyCountList[ rheologyList_I ], "rheologyList" );
 	
 		Journal_PrintfL( stream, 2, "%s \"%s's\" rheological component '%u' has %u rheologies.\n", 
-			self->type, self->name, rheologyList_I, rheologyCountList[ rheologyList_I ] );
+				self->type, self->name, rheologyList_I, rheologyCountList[ rheologyList_I ] );
 
 		Stream_Indent( stream );
-
 		for ( rheology_I = 0 ; rheology_I < rheologyCountList[ rheologyList_I ] ; rheology_I++ ) {
 			rheologyEntry = Dictionary_Entry_Value_GetElement( rheologyList, rheology_I );
+
 			rheologyName = Dictionary_Entry_Value_AsString( rheologyEntry );
 		
 			Journal_PrintfL( stream, 2, "Rheological component '%u' for %s '%s' needs rheology: '%s'.\n", 
 				rheologyList_I, self->type, self->name, rheologyName );
 
 			rheologyListList[ rheologyList_I ][ rheology_I ] = 
-				Stg_ComponentFactory_ConstructByName( cf, rheologyName, Rheology, True, data ); 
+	Stg_ComponentFactory_ConstructByName( cf, rheologyName, Rheology, True, data ); 
 		}
 		Stream_UnIndent( stream );
 	}
 	Stream_UnIndent( stream );
 	
-	_MultiRheologyMaterial_Init( self, rheologyListList, rheologyCountList, rheologyListCount );
+	_MultiRheologyMaterial_Init( 
+			self,
+			rheologyListList,
+			rheologyCountList,
+			rheologyListCount );
 
 	/* Clean up */
 	for ( rheologyList_I = 0 ; rheologyList_I < rheologyListCount ; rheologyList_I++ ){
 		Memory_Free( rheologyListList[ rheologyList_I ] );
 	}
-
 	Memory_Free( rheologyListList );
 	Memory_Free( rheologyCountList );
 }
 
 
 void _MultiRheologyMaterial_Init( 
-	MultiRheologyMaterial*  self, 
-	Rheology***             rheologyListList,
-	Rheology_Index*         rheologyCountList, 
-	Index                   rheologyListCount ) 
+		MultiRheologyMaterial*  self, 
+		Rheology***             rheologyListList,
+		Rheology_Index*         rheologyCountList, 
+		Index                   rheologyListCount ) 
 {
 	Index          rheology_Register_I;
 	Rheology_Index rheology_I;
@@ -247,7 +252,6 @@ void _MultiRheologyMaterial_Init(
 
 	self->rheology_RegisterCount = rheologyListCount;
 	self->rheology_RegisterList = Memory_Alloc_Array( Rheology_Register*, rheologyListCount, "rheology_RegisterList" );
-
 	for ( rheology_Register_I = 0 ; rheology_Register_I < rheologyListCount ; rheology_Register_I++ ) {
 		self->rheology_RegisterList[ rheology_Register_I ] = Rheology_Register_New();
 
@@ -260,34 +264,31 @@ void _MultiRheologyMaterial_Init(
 }
 
 
-void _MultiRheologyMaterial_Delete( void* material ){
-	MultiRheologyMaterial*  self = (MultiRheologyMaterial*)material;
-
-	_RheologyMaterial_Delete( self );
-}
-
 void _MultiRheologyMaterial_Destroy( void* material, void* data ){
 	MultiRheologyMaterial*  self = (MultiRheologyMaterial*)material;
 	Index                   rheology_Register_I;
-	
+
 	for ( rheology_Register_I = 0 ; rheology_Register_I < self->rheology_RegisterCount ; rheology_Register_I++ ) {
-		Stg_Class_Delete( self->rheology_RegisterList[ rheology_Register_I ] );
+		Stg_Component_Destroy( self->rheology_RegisterList[ rheology_Register_I ], data, False );
 	}
 	Memory_Free( self->rheology_RegisterList );
+
+	_RheologyMaterial_Destroy( self, data );
 }
 
+
 void _MultiRheologyMaterial_RunRheologies( 	
-	void*						material,
-	ConstitutiveMatrix*	constitutiveMatrix,
-	MaterialPointsSwarm*	swarm,
-	Element_LocalIndex	lElement_I,
-	MaterialPoint*			materialPoint,
-	Coord						xi )
+		void*                                              material,
+		ConstitutiveMatrix*                                constitutiveMatrix,
+		MaterialPointsSwarm*                               swarm,
+		Element_LocalIndex                                 lElement_I,
+		MaterialPoint*                                     materialPoint,
+		Coord                                              xi )
 {
-	MultiRheologyMaterial*	self = (MultiRheologyMaterial*) material;
-	Index							rheology_RegisterCount = self->rheology_RegisterCount;
-	Index							rheology_Register_I;
-	double						oneOnViscosity         = 0.0;
+	MultiRheologyMaterial*   self                   = (MultiRheologyMaterial*) material;
+	Index                    rheology_RegisterCount = self->rheology_RegisterCount;
+	Index                    rheology_Register_I;
+	double                   oneOnViscosity         = 0.0;
 
 	for ( rheology_Register_I = 0 ; rheology_Register_I < rheology_RegisterCount ; rheology_Register_I++ ) {
 		/* Calculate Isotropic Viscosity for this rheology register */

@@ -19,6 +19,16 @@
 		double                                              referencePoint;                     
 
 	struct DepthDependentViscosity { __DepthDependentViscosity };
+
+	/** Public Constructor */
+   DepthDependentViscosity* DepthDependentViscosity_New(
+      Name                  name,
+      AbstractContext*      context,
+      FeMesh*               feMesh,
+      double                eta0,
+      double                gamma,
+      Axis                  variationAxis,
+      double                referencePoint );
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	DepthDependentViscosity* _DepthDependentViscosity_New( 
@@ -40,7 +50,9 @@
 	/* 'Stg_Component' implementations */
 	void* _DepthDependentViscosity_DefaultNew( Name name ) ;
 	void _DepthDependentViscosity_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
-
+   void _DepthDependentViscosity_Init( DepthDependentViscosity* self, FeMesh* feMesh, double eta0, double gamma, Axis variationAxis, double referencePoint );
+   void _DepthDependentViscosity_Destroy( void* rheology, void* data ) ;
+   
 	void _DepthDependentViscosity_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
 		ConstitutiveMatrix*                                constitutiveMatrix,

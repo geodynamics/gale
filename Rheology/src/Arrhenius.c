@@ -71,7 +71,7 @@ Arrhenius* Arrhenius_New(
 
    _Rheology_Init( self, context );
    _Arrhenius_Init( self, temperatureField, eta0, activationEnergy, activationVolume, referenceTemp );
-
+   self->isConstructed = True;
    return self;
 }
 

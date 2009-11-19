@@ -112,6 +112,12 @@
 
 	/* 'Stg_Component' implementations */
 	void _MultiRheologyMaterial_Delete( void* material );
+   void _MultiRheologyMaterial_Destroy( void* material, void* data );
+   void _MultiRheologyMaterial_Init( 
+		MultiRheologyMaterial*  self, 
+		Rheology***             rheologyListList,
+		Rheology_Index*         rheologyCountList, 
+		Index                   rheologyListCount );
 
 	void _MultiRheologyMaterial_Destroy( void* material, void* data );
 

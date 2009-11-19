@@ -101,10 +101,20 @@
 	void* _MohrCoulomb_DefaultNew( Name name ) ;
 	void _MohrCoulomb_AssignFromXML( void* rheology, Stg_ComponentFactory* cf,
                                      void *data );
-
+   void _MohrCoulomb_Init(    
+		MohrCoulomb*          self,
+		FeVariable*           pressureField,
+		FeVariable*           strainRateField,
+		SwarmVariable*        swarmStrainRate,
+		MaterialPointsSwarm*  materialPointsSwarm,
+		double                cohesion,
+		double                cohesionAfterSoftening,
+		double                frictionCoefficient,
+		double                frictionCoefficientAfterSoftening,
+		double                minimumYieldStress);
 	void _MohrCoulomb_Build( void* rheology, void* data );
-	void _MohrCoulomb_Initialise( void* rheology, void* data ) ;
-
+	void _MohrCoulomb_Initialise( void* rheology, void* data );
+   void _MohrCoulomb_Destroy( void* rheology, void* data );
 	/* 'YieldRheology' implementations */
 	void _MohrCoulomb_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 

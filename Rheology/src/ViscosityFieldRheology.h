@@ -55,8 +55,7 @@
 		__Rheology \
 		/* Virtual functions go here */ \
 		/* Other Info */\
-		FeVariable*                                         viscosityField;          \
-		Name                                                viscosityFieldName;
+		FeVariable*                                         viscosityField;
 
 	struct ViscosityFieldRheology { __ViscosityFieldRheology };
 	
@@ -80,7 +79,10 @@
 	void* _ViscosityFieldRheology_DefaultNew( Name name ) ;
 	void _ViscosityFieldRheology_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 	void _ViscosityFieldRheology_Build( void* rheology, void* data );
-
+	void _ViscosityFieldRheology_Initialise( void* rheology, void* data );
+	void _ViscosityFieldRheology_Destroy( void* rheology, void* data );
+	void _ViscosityFieldRheology_Init( ViscosityFieldRheology* self, FeVariable* viscosityField );
+	
 	void _ViscosityFieldRheology_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
 		ConstitutiveMatrix*                                constitutiveMatrix,
