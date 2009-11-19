@@ -36,6 +36,7 @@
 			<param name="PressureField">PressureField</param>
 		</struct>
 	</list>
+	
 	<struct name="pluginData">
 		<list name="NumericFields">
 			<param>VelocityField</param><param>0</param>
@@ -131,5 +132,33 @@
 	<param name="gaussParticlesY"> 2 </param>
 	<param name="gaussParticlesZ"> 2 </param>
 	<param name="particlesPerCell"> 20 </param>
+	
+	<!-- create shape to set initial pressure -->
+   <struct name="components" mergeType="merge">
+      <struct name="setToAnalytic">
+         <param name="Type">Box</param>
+         <param name="startX">0.</param> <param name="endX">0.04</param>
+         <param name="startY">0.</param> <param name="endY">0.04</param>
+         <param name="startZ">0.</param> <param name="endZ">0.04</param>
+      </struct>
+   </struct>
+	<!-- The numeric pressure is tied down to the numeric solution within the setToAnalytic shape -->
+	<struct name="pressureBCs" mergeType="merge">
+		<param name="type">CompositeVC</param>
+		<list name="vcList">
+		<struct>
+			<param name="type"> MeshShapeVC </param>
+			<param name="Shape"> setToAnalytic </param>
+			<list name="variables">
+				<struct>
+					<param name="name">pressure</param>
+					<param name="type">func</param>
+					<param name="value">Trubitsyn2006_PressureIC</param>
+				</struct>
+			</list>
+		</struct>
+
+		</list>
+	</struct>
 
 </StGermainData>

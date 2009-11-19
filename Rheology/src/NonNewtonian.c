@@ -96,12 +96,37 @@ NonNewtonian* _NonNewtonian_New(
 }
 
 void _NonNewtonian_Init( NonNewtonian* self, FeVariable* strainRateInvField, double stressExponent ) {
-	self->strainRateInvField = strainRateInvField;
 
+	self->strainRateInvField = strainRateInvField;
 	self->stressExponent = stressExponent;
 
 	Rheology_SetToNonLinear( self );
 }
+
+void _NonNewtonian_Build( void* _self, void* data ){
+	NonNewtonian*  self = (NonNewtonian*)_self;
+
+	_Rheology_Build( self, data );
+	
+   Stg_Component_Build( self->strainRateInvField, data, False );
+}
+
+void _NonNewtonian_Initialise( void* _self, void* data ){
+	NonNewtonian*  self = (NonNewtonian*)_self;
+
+   _Rheology_Initialise( self, data );
+
+   Stg_Component_Initialise( self->strainRateInvField, data, False );
+}
+
+void _NonNewtonian_Destroy( void* _self, void* data ){
+	NonNewtonian*  self = (NonNewtonian*)_self;
+
+   Stg_Component_Destroy( self->strainRateInvField, data, False );
+
+	_Rheology_Destroy( self, data );
+}
+
 
 void* _NonNewtonian_DefaultNew( Name name ) {
 	return (void*) _NonNewtonian_New(
@@ -112,10 +137,10 @@ void* _NonNewtonian_DefaultNew( Name name ) {
 		_Rheology_Copy,
 		_NonNewtonian_DefaultNew,
 		_NonNewtonian_AssignFromXML,
-		_Rheology_Build,
-		_Rheology_Initialise,
+		_NonNewtonian_Build,
+		_NonNewtonian_Initialise,
 		_Rheology_Execute,
-		_Rheology_Destroy,
+		_NonNewtonian_Destroy,
 		_NonNewtonian_ModifyConstitutiveMatrix,
 		name );
 }

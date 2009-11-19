@@ -59,6 +59,12 @@
 
 	struct MaterialViscosity { __MaterialViscosity };
 
+	/** Public Constructor */
+	MaterialViscosity* MaterialViscosity_New(
+      Name                  name,
+      AbstractContext*      context,
+      double                eta0 );
+
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	MaterialViscosity* _MaterialViscosity_New( 
 		SizeT                                              sizeOfSelf,

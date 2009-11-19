@@ -94,7 +94,7 @@ StrainWeakening* StrainWeakening_New(
 	    initialDamageFactor,
 	    randomSeed,
 	    initialStrainShape );
-
+   self->isConstructed = True;
    return self;
 }
 
@@ -310,9 +310,13 @@ void _StrainWeakening_Build( void* strainWeakening, void* data ) {
 	_TimeIntegratee_Build( self, data );
 
 	Stg_Component_Build( self->postFailureWeakeningIncrement, data, False );
+	Stg_Component_Build( self->postFailureWeakening, data, False );
+	Stg_Component_Build( self->initialStrainShape, data, False );
+	Stg_Component_Build( self->swarm, data, False );
 	/* The postFailureWeakening doesn't need to be built here because it has already been
 	 * built in the TimeIntegratee class
 	 * (self->variable = self->postFailureWeakening->variable in _StrainWeakening_Init function) */
+	 /* however, i've decided to build it anyway!  JM 09111 */
 }
 
 void _StrainWeakening_Delete( void* _self ) {
@@ -321,12 +325,17 @@ void _StrainWeakening_Delete( void* _self ) {
    Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
 
 	/* Delete Class */
-	Stg_Class_Delete( self );   
+	_Stg_Component_Delete( self );   
 
 }
 	
 void _StrainWeakening_Destroy( void* _self, void* data ) {
 	StrainWeakening* self = (StrainWeakening*) _self;
+
+	Stg_Component_Destroy( self->postFailureWeakeningIncrement, data, False );
+	Stg_Component_Destroy( self->postFailureWeakening, data, False );
+	Stg_Component_Destroy( self->initialStrainShape, data, False );
+	Stg_Component_Destroy( self->swarm, data, False );
 	
 	/* Destroy Parent */
 	_TimeIntegratee_Destroy( self, data );   
@@ -349,7 +358,9 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
 
 	Stg_Component_Initialise( self->swarm, data, False );
 	Stg_Component_Initialise( self->postFailureWeakeningIncrement, data, False );
-
+   Stg_Component_Initialise( self->postFailureWeakening, data, False );
+	Stg_Component_Initialise( self->initialStrainShape, data, False );
+   
 	/* Update variables */
 	Variable_Update( positionVariable );
 	Variable_Update( self->variable );

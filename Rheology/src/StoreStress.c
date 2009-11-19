@@ -131,7 +131,7 @@ void _StoreStress_Init(
 		variableName[5] = StG_Strdup( "tau_yz" );
 	}
 	
-	materialPointsSwarmVariable = Swarm_NewVectorVariable(
+	self->materialPointsSwarmVariable = Swarm_NewVectorVariable(
 		materialPointsSwarm,
 		"StressTensor",
 		(ArithPointer) &particleExt->stress - (ArithPointer) &particle, 
@@ -154,10 +154,10 @@ void* _StoreStress_DefaultNew( Name name ) {
 		_Rheology_Copy,
 		_StoreStress_DefaultNew,
 		_StoreStress_AssignFromXML,
-		_Rheology_Build,
-		_Rheology_Initialise,
+		_StoreStress_Build,
+		_StoreStress_Initialise,
 		_Rheology_Execute,
-		_Rheology_Destroy,
+		_StoreStress_Destroy,
 		_StoreStress_ModifyConstitutiveMatrix,
 		name );
 }
@@ -193,7 +193,43 @@ void _StoreStress_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void*
 
 	_StoreStress_Init( self, materialPointsSwarm, strainRateField );
 }
-	
+
+void _StoreStress_Build( void* _self, void* data ) {
+	StoreStress*  self               = (StoreStress*) _self;
+
+	/* Build parent */
+	_Rheology_Build( self, data );
+
+	Stg_Component_Build(	self->strainRateField, data, False);	
+	Stg_Component_Build(	self->materialPointsSwarm, data, False);
+	Stg_Component_Build(	self->materialPointsSwarmVariable, data, False);
+
+}
+
+void _StoreStress_Initialise( void* _self, void* data ) {
+	StoreStress*  self               = (StoreStress*) _self;
+
+	/* Initialise parent */
+	_Rheology_Initialise( self, data );
+
+	Stg_Component_Initialise(	self->strainRateField, data, False);	
+	Stg_Component_Initialise(	self->materialPointsSwarm, data, False);
+	Stg_Component_Initialise(	self->materialPointsSwarmVariable, data, False);
+
+}
+
+void _StoreStress_Destroy( void* _self, void* data ) {
+	StoreStress*  self               = (StoreStress*) _self;
+
+	Stg_Component_Destroy(	self->strainRateField, data, False);	
+	Stg_Component_Destroy(	self->materialPointsSwarm, data, False);
+	Stg_Component_Destroy(	self->materialPointsSwarmVariable, data, False);
+
+	/* Destroy parent */
+	_Rheology_Destroy( self, data );
+
+}
+
 void _StoreStress_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
 		ConstitutiveMatrix*                                constitutiveMatrix,

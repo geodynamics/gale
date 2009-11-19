@@ -82,7 +82,9 @@
 	/* 'Stg_Component' implementations */
 	void* _FrankKamenetskii_DefaultNew( Name name ) ;
 	void _FrankKamenetskii_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
-
+   void _FrankKamenetskii_Destroy( void* rheology, void* data );
+   void _FrankKamenetskii_Init( FrankKamenetskii* self, FeVariable* temperatureField, double eta0, double theta );
+   
 	void _FrankKamenetskii_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
 		ConstitutiveMatrix*                                constitutiveMatrix,

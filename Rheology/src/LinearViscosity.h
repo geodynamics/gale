@@ -22,6 +22,19 @@
 		double                                              XYZ;                             \
 
 	struct LinearViscosity { __LinearViscosity };
+
+	/** Public Constructor */
+   LinearViscosity* LinearViscosity_New(
+      Name                  name,
+      AbstractContext*      context,
+      double           C,
+      double           X,
+      double           Y,
+      double           Z,
+      double           XY,
+      double           XZ,
+      double           YZ,
+      double           XYZ );
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	LinearViscosity* _LinearViscosity_New( 
@@ -43,6 +56,16 @@
 	/* 'Stg_Component' implementations */
 	void* _LinearViscosity_DefaultNew( Name name ) ;
 	void _LinearViscosity_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
+   void _LinearViscosity_Init( 
+      LinearViscosity* self,
+      double           C,
+      double           X,
+      double           Y,
+      double           Z,
+      double           XY,
+      double           XZ,
+      double           YZ,
+      double           XYZ );
 
 	void _LinearViscosity_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 

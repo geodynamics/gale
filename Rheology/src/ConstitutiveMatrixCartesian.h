@@ -90,16 +90,9 @@
 		ConstitutiveMatrix_CalculateStressFunc*             _calculateStress,
 		Name                                                name );
 	
-	void ConstitutiveMatrixCartesian_InitAll( 
-		void*                                               constitutiveMatrix,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              swarm,
-		Dimension_Index                                     dim,
-		FiniteElementContext*                               context,
-		Materials_Register*                                 materials_Register );
-
 	void _ConstitutiveMatrixCartesian_Delete( void* constitutiveMatrix );
 	void _ConstitutiveMatrixCartesian_Print( void* constitutiveMatrix, Stream* stream );
+   void _ConstitutiveMatrixCartesian_Init( ConstitutiveMatrixCartesian* self );
 
 	void* _ConstitutiveMatrixCartesian_DefaultNew( Name name ) ;
 void _ConstitutiveMatrixCartesian_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) ;

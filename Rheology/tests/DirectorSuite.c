@@ -42,7 +42,7 @@
 #include <Underworld/Underworld.h>
 #include "DirectorSuite.h"
 
-#define TOLERANCE 0.01
+#define TOLERANCE 1e-10
 #define RANDOM_DIRECTOR_ERROR 1.0
 #define CURR_MODULE_NAME "DirectorSuite"
 
@@ -51,35 +51,28 @@ typedef struct {
 
 double dt( UnderworldContext* context ) { return 0.05; }
 
+void _Director_Intermediate_Replace( void* director, Index lParticle_I ) {}
+
 void test( UnderworldContext* context ) {
-	AlignmentSwarmVariable* alignment              = (AlignmentSwarmVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "alignment" );
-	FeVariable*             velocityField          = Stg_ComponentFactory_ConstructByName( context->CF, "VelocityField", FeVariable, True, 0 );
-	Director*               director;
+	Director*               director = (Director*)LiveComponentRegister_Get( context->CF->LCRegister, "director" );
 	Particle_Index          lParticle_I;
 	GlobalParticle*         particle;
 	double                  time                   = context->currentTime + context->dt;
-	Swarm*                  swarm;
-	double                  error                  = 0.0;
-	double                  alignmentValue;
+	Swarm*                  swarm	= (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialSwarm" );
 	XYZ                     normal;
-	double                  angle                  = 0.5 * M_PI - atan(1.0/(2.0*time) );
+	double                  error                  = 0.0;
+   double                  angle                  = 0.5 * M_PI - atan(1.0/(2.0*time) );
+   double                  angleDirector;
 	XYZ                     velocity;
-	double                  analyticAlignmentValue = 1.0 - cos( angle );
 	double			gError;
 	int			particleGlobalCount;
 	int rank;
 
-	swarm = alignment->swarm;
-	director = alignment->director;
-
 	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
 		particle = (GlobalParticle*)Swarm_ParticleAt( swarm, lParticle_I );
-		SwarmVariable_ValueAt( alignment, lParticle_I, &alignmentValue );
 		SwarmVariable_ValueAt( director->directorSwarmVariable, lParticle_I, normal );
-
-		FieldVariable_InterpolateValueAt( velocityField, particle->coord, velocity );
-
-		error += fabs( alignmentValue - analyticAlignmentValue );
+      angleDirector = atan(-normal[1]/normal[0]);
+		error += fabs( angleDirector - angle );
 	}
 	MPI_Allreduce( &error, &gError, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 	MPI_Allreduce( &swarm->particleLocalCount, &particleGlobalCount, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
@@ -272,13 +265,21 @@ void DirectorSuite_Test( DirectorSuiteData* data ) {
 	UnderworldContext* 	context;
 	Stg_ComponentFactory*	cf;
 	char			xml_input[PCU_PATH_MAX];
-
+   Director* director;
+   /* this test checks that the director will eventually spin to point in the direction of maximum shear.
+      initially the director is set to point 90 degrees to this direction, so that the director routines should result in it 
+      spinning 90 degrees eventually.   the test checks how the angle evolves in time against the analytic result, where we have disabled 
+      the intermediate re-normalisation of the director vectors */
 	pcu_filename_input( "testDirector.xml", xml_input );
 	context = _UnderworldContext_DefaultNew( "context" );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, context );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, test );
 	EP_AppendClassHook( Context_GetEntryPoint( context, FiniteElementContext_EP_CalcDt ), dt, context );
 	stgMainBuildAndInitialise( cf );
+	director = (Director*) LiveComponentRegister_Get( context->CF->LCRegister, "director" );
+	/* we disable the intermediate director step, which normalises the director.  this is done so that we can have an analytic solution, but a more inclusive test 
+	  would be a good idea */
+	director->_intermediate = _Director_Intermediate_Replace;
 	stgMainLoop( cf );
 	stgMainDestroy( cf );
 }

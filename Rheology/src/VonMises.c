@@ -80,6 +80,7 @@ VonMises* VonMises_New(
    _YieldRheology_Init( (YieldRheology*)self, strainWeakening, materialPointsSwarm, minVisc ); 
    _VonMises_Init( (VonMises*)self, strainRateField, swarmStrainRate, cohesion, cohesionAfterSoftening, strainRateSoftening );
 
+   self->isConstructed = True;
    return self;
 }
 

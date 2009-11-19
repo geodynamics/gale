@@ -86,7 +86,7 @@ DruckerPrager* DruckerPrager_New(
    _YieldRheology_Init( (YieldRheology*)self, strainWeakening, materialPointsSwarm, minVisc ); 
    _VonMises_Init( (VonMises*)self, strainRateField, swarmStrainRate, cohesion, cohesionAfterSoftening, strainRateSoftening );
    _DruckerPrager_Init( self, pressureField, swarmPressure, materialPointsSwarm, minimumYieldStress, frictionCoefficient, frictionCoefficientAfterSoftening );
-
+   self->isConstructed = True;
    return self;
 }
 

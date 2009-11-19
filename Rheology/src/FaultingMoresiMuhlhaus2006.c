@@ -64,6 +64,58 @@
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type FaultingMoresiMuhlhaus2006_Type = "FaultingMoresiMuhlhaus2006";
 
+/* Public Constructor */
+FaultingMoresiMuhlhaus2006* FaultingMoresiMuhlhaus2006_New(
+      Name                  name,
+      AbstractContext*      context,
+      StrainWeakening*      strainWeakening, 
+      MaterialPointsSwarm*  materialPointsSwarm, 
+      double                minVisc, 
+		FeVariable*           pressureField,
+		FeVariable*           velocityGradientsField,
+		Director*             director,
+		double                cohesion,
+		double                cohesionAfterSoftening,
+		double                frictionCoefficient,
+		double                frictionCoefficientAfterSoftening,
+		double                minimumYieldStress,
+		Bool                  ignoreOldOrientation,
+		Bool                  updateOrientationAtMaxSoftness,
+		Bool                  updateOrientations,
+		Bool                  isotropicCorrection )
+{
+   FaultingMoresiMuhlhaus2006* self = (FaultingMoresiMuhlhaus2006*) _FaultingMoresiMuhlhaus2006_DefaultNew( name );
+
+	/* Make sure that there is strain weakening */
+	Journal_Firewall(
+		strainWeakening != NULL,
+		Journal_Register( Error_Type, self->type ),
+		"Error in func '%s' for %s '%s': FaultingMoresiMuhlhaus2006 rheology needs strain weakening.\n", 
+		__func__, self->type, self->name );
+
+   _Rheology_Init( self, context );
+   _YieldRheology_Init( self, strainWeakening, materialPointsSwarm, minVisc ); 
+   _FaultingMoresiMuhlhaus2006_Init(
+		 self,
+		 pressureField,
+		 velocityGradientsField,
+		 materialPointsSwarm,
+		 context,
+		 director,
+		 cohesion,
+		 cohesionAfterSoftening,
+		 frictionCoefficient,
+		 frictionCoefficientAfterSoftening,
+		 minimumYieldStress,
+		 ignoreOldOrientation,
+		 updateOrientationAtMaxSoftness,
+		 updateOrientations,
+		 isotropicCorrection);
+
+   self->isConstructed = True;
+   return self;
+}
+
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
 FaultingMoresiMuhlhaus2006* _FaultingMoresiMuhlhaus2006_New( 
 		SizeT                                              sizeOfSelf,
@@ -239,7 +291,7 @@ void* _FaultingMoresiMuhlhaus2006_DefaultNew( Name name ) {
 		_FaultingMoresiMuhlhaus2006_Build,
 		_FaultingMoresiMuhlhaus2006_Initialise,
 		_YieldRheology_Execute,
-		_YieldRheology_Destroy,
+		_FaultingMoresiMuhlhaus2006_Destroy,
 		_FaultingMoresiMuhlhaus2006_ModifyConstitutiveMatrix,
 		_FaultingMoresiMuhlhaus2006_GetYieldCriterion,
 		_FaultingMoresiMuhlhaus2006_GetYieldIndicator,
@@ -415,6 +467,27 @@ void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) {
 			Variable_SetValueChar(   self->fullySoftened->variable, lParticle_I, False );
 		}
 	}
+}
+
+void _FaultingMoresiMuhlhaus2006_Destroy( void* rheology, void* data ) {
+	FaultingMoresiMuhlhaus2006* self = (FaultingMoresiMuhlhaus2006*) rheology;
+
+	Stg_Component_Destroy( self->materialPointsSwarm, data, False );
+	Stg_Component_Destroy( self->pressureField, data, False );
+	Stg_Component_Destroy( self->velocityGradientsField, data, False );
+	Stg_Component_Destroy( self->director, data, False );
+	Stg_Component_Destroy( self->slipRate, data, False );
+	Stg_Component_Destroy( self->slip, data, False );
+	Stg_Component_Destroy( self->brightness, data, False );
+	Stg_Component_Destroy( self->opacity, data, False );
+	Stg_Component_Destroy( self->length, data, False );
+	Stg_Component_Destroy( self->thickness, data, False );
+	Stg_Component_Destroy( self->tensileFailure, data, False );
+	Stg_Component_Destroy( self->fullySoftened, data, False );
+
+	/* Destroy parent */
+	_YieldRheology_Destroy( self, data );
+
 }
 	
 void _FaultingMoresiMuhlhaus2006_ModifyConstitutiveMatrix( 

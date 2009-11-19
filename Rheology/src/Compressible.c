@@ -71,6 +71,9 @@ Compressible* Compressible_New(
    Compressible* self = (Compressible*) _Compressible_DefaultNew( name );
    _StiffnessMatrixTerm_Init( self, context, stiffnessMatrix, swarm, extraInfo );
    _Compressible_Init( self, geometryMesh, materials_Register, oneOnLambda );
+   self->isConstructed = True;
+   
+   return self;
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
@@ -124,11 +127,13 @@ void _Compressible_Init(
 }
 
 
-void _Compressible_Delete( void* compressible ) {
+void _Compressible_Destroy( void* compressible, void* data ) {
    Compressible*    self = (Compressible*)compressible;
 
-   _StiffnessMatrixTerm_Delete( self );
+   Stg_Component_Destroy( self->geometryMesh, data, False );
+   _StiffnessMatrixTerm_Destroy( self, data );
 }
+
 void _Compressible_Print( void* compressible, Stream* stream ) {
    Compressible*    self = (Compressible*)compressible;
 
@@ -141,7 +146,7 @@ void* _Compressible_DefaultNew( Name name ) {
    return (void*) _Compressible_New(
       sizeof(Compressible),
       Compressible_Type,
-      _Compressible_Delete,
+      _StiffnessMatrixTerm_Delete,
       _Compressible_Print,
       NULL,
       _Compressible_DefaultNew,
@@ -189,9 +194,6 @@ void _Compressible_Initialise( void* compressible, void* data ){
 }
 void _Compressible_Execute( void* compressible, void* data ){
    _StiffnessMatrixTerm_Execute( compressible, data );
-}
-void _Compressible_Destroy( void* compressible, void* data ){
-   _StiffnessMatrixTerm_Destroy( compressible, data );
 }
 
 void _Compressible_AssembleElement(

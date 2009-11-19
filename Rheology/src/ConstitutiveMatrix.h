@@ -108,16 +108,7 @@
 		ConstitutiveMatrix_Assemble_D_B_Func*        _assemble_D_B,
 		ConstitutiveMatrix_CalculateStressFunc*      _calculateStress,
 		Name                                         name );
-		
-	/* Initialise implementation */
-	void ConstitutiveMatrix_InitAll( 
-		void*                                        constitutiveMatrix,
-		StiffnessMatrix*                             stiffnessMatrix,
-		Swarm*                                       swarm,
-		Dimension_Index                              dim,
-		FiniteElementContext*                        context,
-		Materials_Register*                          materials_Register );
-	
+
 	/* 'Stg_Class' Virtual Functions */
 	void _ConstitutiveMatrix_Delete( void* constitutiveMatrix );
 	void _ConstitutiveMatrix_Print( void* constitutiveMatrix, Stream* stream );
@@ -133,6 +124,10 @@
 	void _ConstitutiveMatrix_Initialise( void* constitutiveMatrix, void* data );
 	void _ConstitutiveMatrix_Execute( void* constitutiveMatrix, void* data );
 	void _ConstitutiveMatrix_Destroy( void* constitutiveMatrix, void* data );
+   void _ConstitutiveMatrix_Init(
+         ConstitutiveMatrix*                     self,
+         Dimension_Index                        dim,
+         Bool                                   storeConstitutiveMatrix );
 
 	/* Wrapper macros to virtual functions - These must be macros for the sake of speed */
 	#define ConstitutiveMatrix_SetValueInAllEntries( constitutiveMatrix, value ) \

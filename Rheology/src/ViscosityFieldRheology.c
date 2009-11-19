@@ -94,9 +94,9 @@ ViscosityFieldRheology* _ViscosityFieldRheology_New(
 	return self;
 }
 
-void _ViscosityFieldRheology_Init( ViscosityFieldRheology* self, Name viscosityFieldName ) 
+void _ViscosityFieldRheology_Init( ViscosityFieldRheology* self, FeVariable* viscosityField ) 
 {
-	self->viscosityFieldName = viscosityFieldName;
+	self->viscosityField = viscosityField;
 }
 
 void* _ViscosityFieldRheology_DefaultNew( Name name ) {
@@ -109,33 +109,50 @@ void* _ViscosityFieldRheology_DefaultNew( Name name ) {
 		_ViscosityFieldRheology_DefaultNew,
 		_ViscosityFieldRheology_AssignFromXML,
 		_ViscosityFieldRheology_Build,
-		_Rheology_Initialise,
+		_ViscosityFieldRheology_Initialise,
 		_Rheology_Execute,
-		_Rheology_Destroy,
+		_ViscosityFieldRheology_Destroy,
 		_ViscosityFieldRheology_ModifyConstitutiveMatrix,
 		name );
 }
 
 void _ViscosityFieldRheology_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	ViscosityFieldRheology*     self = (ViscosityFieldRheology*)rheology;
-
+   FeVariable*                 viscosityField = NULL;
 	/* Construct Parent */
 	_Rheology_AssignFromXML( self, cf, data );
-	
-	_ViscosityFieldRheology_Init( self, 
-		Stg_ComponentFactory_GetString( cf, self->name, "ViscosityField", "ViscosityField" ) );
+   
+	viscosityField = Stg_ComponentFactory_ConstructByName( cf, Stg_ComponentFactory_GetString( cf, self->name, "ViscosityField", "ViscosityField" ), FeVariable, True, data );
+	_ViscosityFieldRheology_Init( self, viscosityField );
 }
 
 void _ViscosityFieldRheology_Build( void* rheology, void* data ){
 	ViscosityFieldRheology*     self = (ViscosityFieldRheology*)rheology;
-	AbstractContext*            context     = Stg_CheckType( data, AbstractContext );
-	Stg_ComponentFactory*       cf          = context->CF;
 
 	_Rheology_Build( self, data );
 
-	self->viscosityField = Stg_ComponentFactory_ConstructByName( cf, self->viscosityFieldName, FeVariable, True, data );
+	Stg_Component_Build( self->viscosityField, data, False );
 
 }
+
+void _ViscosityFieldRheology_Initialise( void* rheology, void* data ){
+	ViscosityFieldRheology*     self = (ViscosityFieldRheology*)rheology;
+
+	_Rheology_Initialise( self, data );
+
+	Stg_Component_Initialise( self->viscosityField, data, False );
+
+}
+
+void _ViscosityFieldRheology_Destroy( void* rheology, void* data ){
+	ViscosityFieldRheology*     self = (ViscosityFieldRheology*)rheology;
+
+	_Rheology_Destroy( self, data );
+
+	Stg_Component_Destroy( self->viscosityField, data, False );
+
+}
+
 void _ViscosityFieldRheology_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
 		ConstitutiveMatrix*                                constitutiveMatrix,

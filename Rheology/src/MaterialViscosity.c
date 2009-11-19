@@ -59,6 +59,21 @@
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type MaterialViscosity_Type = "MaterialViscosity";
 
+/* Public Constructor */
+MaterialViscosity* MaterialViscosity_New(
+      Name                  name,
+      AbstractContext*      context,
+      double                eta0 )
+{
+   MaterialViscosity* self = (MaterialViscosity*) _MaterialViscosity_DefaultNew( name );
+
+   _Rheology_Init( self, context );
+   _MaterialViscosity_Init( self, eta0 );
+     
+   self->isConstructed = True;
+   return self;
+}
+
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
 MaterialViscosity* _MaterialViscosity_New( 
 		SizeT                                              sizeOfSelf,
@@ -100,7 +115,6 @@ MaterialViscosity* _MaterialViscosity_New(
 }
 
 void _MaterialViscosity_Init(MaterialViscosity* self, double eta0) {
-	self->isConstructed = True;
 	self->eta0 = eta0;
 }
 

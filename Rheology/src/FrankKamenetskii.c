@@ -57,6 +57,22 @@
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type FrankKamenetskii_Type = "FrankKamenetskii";
 
+/* Public Constructor */
+FrankKamenetskii* FrankKamenetskii_New(
+      Name                  name,
+      AbstractContext*      context,
+      FeVariable*           temperatureField, 
+      double                eta0,
+      double                theta )
+{
+   FrankKamenetskii* self = (FrankKamenetskii*) _FrankKamenetskii_DefaultNew( name );
+
+   _Rheology_Init( self, context );
+   _FrankKamenetskii_Init( self, temperatureField, eta0, theta );
+   self->isConstructed = True;
+   return self;
+}
+
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
 FrankKamenetskii* _FrankKamenetskii_New( 
 		SizeT                                              sizeOfSelf,
@@ -113,7 +129,7 @@ void* _FrankKamenetskii_DefaultNew( Name name ) {
 		_Rheology_Build,
 		_Rheology_Initialise,
 		_Rheology_Execute,
-		_Rheology_Destroy,
+		_FrankKamenetskii_Destroy,
 		_FrankKamenetskii_ModifyConstitutiveMatrix,
 		name );
 }
@@ -141,6 +157,16 @@ void _FrankKamenetskii_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, 
 			temperatureField,
 			Stg_ComponentFactory_GetDouble( cf, self->name, "eta0", 1.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "theta", 0.0 ) );
+}
+
+void _FrankKamenetskii_Destroy( void* rheology, void* data ) {
+	FrankKamenetskii*          self               = (FrankKamenetskii*) rheology;
+
+	Stg_Component_Destroy( self->temperatureField, data, False );
+
+	/* Destroy parent */
+	_Rheology_Destroy( self, data );
+
 }
 
 void _FrankKamenetskii_ModifyConstitutiveMatrix( 
