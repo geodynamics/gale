@@ -157,7 +157,7 @@ void* _SwarmVariableField_DefaultNew( Name name ) {
 			_FeVariable_InterpolateNodeValuesToElLocalCoord,
 			_FeVariable_GetValueAtNode,
 			/*_SwarmVariableField_GetValueAtNode,*/
-			_SwarmVariableField_ValueAtParticle,
+			(ParticleFeVariable_ValueAtParticleFunction*)_SwarmVariableField_ValueAtParticle,
 			name );
 }
 

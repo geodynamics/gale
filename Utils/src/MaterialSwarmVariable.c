@@ -141,17 +141,17 @@ void _MaterialSwarmVariable_Init(
 }
 
 void MaterialSwarmVariable_InitAll( 
-		void*                                               swarmVariable,
-		AbstractContext*                                    context,
-		MaterialPointsSwarm*                                swarm,
-		Index                                               dofCount,
-		Materials_Register*                                 materials_Register,
-		ExtensionInfo_Index                                 materialExtensionHandle,
-		SizeT                                               offset )
+	void*                                               swarmVariable,
+	AbstractContext*                                    context,
+	MaterialPointsSwarm*                                swarm,
+	Index                                               dofCount,
+	Materials_Register*                                 materials_Register,
+	ExtensionInfo_Index                                 materialExtensionHandle,
+	SizeT                                               offset )
 {
 	MaterialSwarmVariable* self = (MaterialSwarmVariable*) swarmVariable;
 
-	_SwarmVariable_Init( self, context, (Swarm*)swarm, NULL, dofCount );
+	_SwarmVariable_Init( (SwarmVariable*)self, context, (Swarm*)swarm, NULL, dofCount );
 	_MaterialSwarmVariable_Init( self, materials_Register, materialExtensionHandle, offset );
 }
 
