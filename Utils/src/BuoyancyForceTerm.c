@@ -53,6 +53,7 @@
 
 #include "types.h"
 #include "BuoyancyForceTerm.h"
+#include "HydrostaticTerm.h"
 #include "MaterialSwarmVariable.h"
 
 #include <assert.h>
@@ -68,18 +69,19 @@ BuoyancyForceTerm* BuoyancyForceTerm_New(
 		FeVariable*                                         temperatureField,
 		double                                              gravity,
 		Bool                                                adjust,
-		Materials_Register*                                 materials_Register )
+		Materials_Register*                                 materials_Register,
+                HydrostaticTerm*                                    hydrostaticTerm )
 {
 	BuoyancyForceTerm* self = (BuoyancyForceTerm*) _BuoyancyForceTerm_DefaultNew( name );
 
-	BuoyancyForceTerm_InitAll( 
-			self,
-			forceVector,
-			integrationSwarm,
-			temperatureField,
-			gravity,
-			adjust,
-			materials_Register );
+	BuoyancyForceTerm_InitAll(self,
+                                  forceVector,
+                                  integrationSwarm,
+                                  temperatureField,
+                                  gravity,
+                                  adjust,
+                                  materials_Register,
+                                  hydrostaticTerm);
 
 	return self;
 }
@@ -131,13 +133,15 @@ void _BuoyancyForceTerm_Init(
 		FeVariable*                                         temperatureField,
 		double                                              gravity,
 		Bool                                                adjust,
-		Materials_Register*                                 materials_Register )
+		Materials_Register*                                 materials_Register,
+                HydrostaticTerm*                                    hydrostaticTerm )
 {
 	self->temperatureField    = temperatureField;
 	self->gravity             = gravity;
 	self->gHat		  = NULL;
 	self->adjust              = adjust;
 	self->materials_Register  = materials_Register;
+        self->hydrostaticTerm     = hydrostaticTerm;
 }
 
 void BuoyancyForceTerm_InitAll( 
@@ -147,12 +151,14 @@ void BuoyancyForceTerm_InitAll(
 		FeVariable*                                         temperatureField,
 		double                                              gravity,
 		Bool                                                adjust,
-		Materials_Register*                                 materials_Register )
+		Materials_Register*                                 materials_Register,
+                HydrostaticTerm*                                    hydrostaticTerm )
 {
 	BuoyancyForceTerm* self = (BuoyancyForceTerm*) forceTerm;
 
 	ForceTerm_InitAll( self, forceVector, integrationSwarm, NULL );
-	_BuoyancyForceTerm_Init( self, temperatureField, gravity, adjust, materials_Register );
+	_BuoyancyForceTerm_Init( self, temperatureField, gravity, adjust,
+                                 materials_Register, hydrostaticTerm );
 }
 
 void _BuoyancyForceTerm_Delete( void* forceTerm ) {
@@ -211,6 +217,8 @@ void _BuoyancyForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, vo
 	Dictionary_Entry_Value*	    direcList;
 	double*			    direc;
 	unsigned		d_i;
+        HydrostaticTerm*                                    hydrostaticTerm;
+        
 
 	/* Construct Parent */
 	_ForceTerm_Construct( self, cf, data );
@@ -238,12 +246,15 @@ void _BuoyancyForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, vo
 	}
 	else
 		direc = NULL;
+	self->gHat = direc;
 
 	materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
 	assert( materials_Register );
 
-	_BuoyancyForceTerm_Init( self, temperatureField, gravity, adjust, materials_Register );
-	self->gHat = direc;
+	hydrostaticTerm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "HydrostaticTerm", HydrostaticTerm, False, data ) ;
+
+	_BuoyancyForceTerm_Init( self, temperatureField, gravity, adjust,
+                                 materials_Register, hydrostaticTerm );
 }
 
 void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
@@ -368,6 +379,7 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 	Material*                        material;
 	FeVariable*                      temperatureField   = self->temperatureField;
 	double                           temperature        = 0.0;
+        double                           background_density = 0.0;
 	double*				 gHat;
 	unsigned			d_i;
 
@@ -401,6 +413,7 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 	}
 
 	for( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
+          Coord coord;
 		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
 		xi       = particle->xi;
 
@@ -411,12 +424,19 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 		if ( temperatureField ) 
 			FeVariable_InterpolateFromMeshLocalCoord( temperatureField, mesh, lElement_I, xi, &temperature );
 	
+                if(self->hydrostaticTerm)
+                  {
+                    FeMesh_CoordLocalToGlobal(mesh, cell_I, xi, coord);
+                    background_density=HydrostaticTerm_Density(self->hydrostaticTerm,coord);
+                  }
+
 		material = IntegrationPointsSwarm_GetMaterialOn( (IntegrationPointsSwarm*) swarm, particle );
 		materialExt = ExtensionManager_Get( material->extensionMgr, material, self->materialExtHandle );
 
 		/* Calculate Force */
 		gravity = BuoyancyForceTerm_CalcGravity( self, (Swarm*)swarm, lElement_I, particle );
-		force = materialExt->density * gravity * (1.0 - materialExt->alpha * temperature);
+                force=gravity*(materialExt->density*(1.0-materialExt->alpha*temperature)
+                               - background_density);
 		factor = detJac * particle->weight * adjustFactor * force;
 
 		/* Apply force in the correct direction */

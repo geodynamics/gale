@@ -62,11 +62,13 @@ Bool PICellerator_Utils_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentsRegister, BuoyancyForceTerm_Type,            "0", _BuoyancyForceTerm_DefaultNew );
 	Stg_ComponentRegister_Add( componentsRegister, BuoyancyForceTermThermoChem_Type,            "0", _BuoyancyForceTermThermoChem_DefaultNew );
 	Stg_ComponentRegister_Add( componentsRegister, DiffusionSMT_Type,            "0", _DiffusionSMT_DefaultNew );
+	Stg_ComponentRegister_Add( componentsRegister, HydrostaticTerm_Type,            "0", _HydrostaticTerm_DefaultNew );
 
 	RegisterParent( BuoyancyForceTerm_Type,     ForceTerm_Type );
 	RegisterParent( BuoyancyForceTermThermoChem_Type,     ForceTerm_Type );
 	RegisterParent( DiffusionSMT_Type,     StiffnessMatrixTerm_Type );
 	RegisterParent( MaterialSwarmVariable_Type, SwarmVariable_Type );
 	RegisterParent( PCDVC_Type,                 DVCWeights_Type );
+	RegisterParent( HydrostaticTerm_Type,       Stg_Component_Type );
 	return True;
 }
