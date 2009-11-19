@@ -390,8 +390,12 @@ unsigned Mesh_GetOwner( void* mesh, MeshTopology_Dim dim, unsigned remote ) {
 	return Sync_GetOwner( IGraph_GetDomain( self->topo, dim ), remote );
 }
 
-void Mesh_GetSharers( void* mesh, MeshTopology_Dim dim, unsigned shared, 
-		      unsigned* nSharers, unsigned** sharers )
+void Mesh_GetSharers(
+	void*					mesh,
+	MeshTopology_Dim	dim,
+	unsigned				shared, 
+	unsigned*			nSharers,
+	unsigned**			sharers )
 {
 	Mesh*	self = (Mesh*)mesh;
 

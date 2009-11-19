@@ -71,7 +71,7 @@ Mesh_CentroidAlgorithms* Mesh_CentroidAlgorithms_New( Name name, AbstractContext
 					     Mesh_CentroidAlgorithms_GetDomainCoordRange, 
 					     Mesh_CentroidAlgorithms_GetGlobalCoordRange );
 
-	_Mesh_Algorithms_Init( self, context );
+	_Mesh_Algorithms_Init( (Mesh_Algorithms*)self, context );
 	_Mesh_CentroidAlgorithms_Init( self );
    return self;
 

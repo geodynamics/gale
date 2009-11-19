@@ -138,7 +138,7 @@ OperatorSwarmVariable* OperatorSwarmVariable_New(
 
 	/* Following Rob's inheritance approach for this file, until we do the big fix-up */
 	/* Can pass in 0 for the dofs since this will be updated in the next func */
-	_SwarmVariable_Init( self, context, swarmVariableList[0]->swarm, NULL, 0 );
+	_SwarmVariable_Init( (SwarmVariable*)self, context, swarmVariableList[0]->swarm, NULL, 0 );
 	_OperatorSwarmVariable_Init( self, operatorName, swarmVariableCount, swarmVariableList );
 
 	return self;

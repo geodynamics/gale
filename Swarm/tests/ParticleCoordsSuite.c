@@ -84,7 +84,7 @@ void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
 	pcu_filename_input( "testLineParticleLayout.xml", input_file );
 	cf = stgMainInitFromXML( input_file, data->comm, NULL );
 	stgMainBuildAndInitialise( cf );
-	context = LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
 	dictionary = context->dictionary;
 	stream = Journal_Register( Info_Type, "LinearParticleStream" );
 

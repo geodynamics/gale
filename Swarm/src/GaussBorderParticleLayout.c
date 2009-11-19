@@ -307,10 +307,10 @@ void _GaussBorderParticleLayout_InitialiseParticlesOfCell( void* gaussBorderPart
 			// (and I've modified it to work with this layout)
 			if ( 0 == strcmp( swarm->type, "MaterialPointsSwarm" ) ) {
 				((GlobalParticle*)particle)->coord[ GaussBorderParticleLayout_GetFaceAxis(self, face_I, dim_I) ] = 
-					min[ GaussBorderParticleLayout_GetFaceAxis(face_I, self->dim, dim_I) ] +
+					min[ GaussBorderParticleLayout_GetFaceAxis(self, self->dim, dim_I) ] +
 					0.5 * ( max[ GaussBorderParticleLayout_GetFaceAxis(self, face_I, dim_I) ] 
-						- min[ GaussBorderParticleLayout_GetFaceAxis(self, face_I, dim_I) ] ) 
-					        * ( abscissa[ index ] + 1.0 );
+					- min[ GaussBorderParticleLayout_GetFaceAxis(self, face_I, dim_I) ] ) 
+					* ( abscissa[ index ] + 1.0 );
 			}
 			else {
 				particle->xi[ GaussBorderParticleLayout_GetFaceAxis(self, face_I, dim_I) ] = abscissa[ index ];

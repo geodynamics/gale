@@ -99,7 +99,7 @@ void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
 	Stream_SetLevelBranch( Swarm_Debug, 3 );
 
 	cf = stgMainInitFromXML( input_file, data->comm, NULL );
-	context = LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
 
 	dictionary = context->dictionary;
 	Journal_ReadFromDictionary( dictionary );

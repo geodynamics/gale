@@ -67,23 +67,23 @@ const Type CompressionAdaptor_Type = "CompressionAdaptor";
 
 CompressionAdaptor* CompressionAdaptor_New( Name name, AbstractContext* context ) {
 	CompressionAdaptor* self = _CompressionAdaptor_New( sizeof(CompressionAdaptor), 
-				    CompressionAdaptor_Type, 
-				    _CompressionAdaptor_Delete, 
-				    _CompressionAdaptor_Print, 
-				    NULL, 
-				    (void* (*)(Name))_CompressionAdaptor_New, 
-				    _CompressionAdaptor_AssignFromXML, 
-				    _CompressionAdaptor_Build, 
-				    _CompressionAdaptor_Initialise, 
-				    _CompressionAdaptor_Execute, 
-				    _CompressionAdaptor_Destroy, 
-				    name, 
-				    NON_GLOBAL, 
-				    _MeshGenerator_SetDimSize, 
-				    CompressionAdaptor_Generate );
+		CompressionAdaptor_Type, 
+		_CompressionAdaptor_Delete, 
+		_CompressionAdaptor_Print, 
+	   NULL, 
+	   (void* (*)(Name))_CompressionAdaptor_New, 
+	   _CompressionAdaptor_AssignFromXML, 
+	   _CompressionAdaptor_Build, 
+	   _CompressionAdaptor_Initialise, 
+	   _CompressionAdaptor_Execute, 
+	   _CompressionAdaptor_Destroy, 
+	   name, 
+	   NON_GLOBAL, 
+	   _MeshGenerator_SetDimSize, 
+	   CompressionAdaptor_Generate );
    
-   _MeshGenerator_Init( self, context );
-   _MeshAdaptor_Init( self );
+   _MeshGenerator_Init( (MeshGenerator*)self, context );
+   _MeshAdaptor_Init( (MeshAdaptor*)self );
 	/* CompressionAdaptor info */
 	_CompressionAdaptor_Init( self );
 

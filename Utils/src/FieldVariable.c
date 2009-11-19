@@ -88,7 +88,7 @@ FieldVariable* _FieldVariable_DefaultNew( Name name ) {
 		0,
 		False,
 		MPI_COMM_WORLD,
-		NULL);
+		NULL );
 }
 
 FieldVariable* _FieldVariable_New( FIELDVARIABLE_DEFARGS ) {

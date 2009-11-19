@@ -125,7 +125,7 @@ void _TimeIntegrator_Init(
 {
 	TimeIntegrator* self = (TimeIntegrator*)timeIntegrator;
 
-	self->context = context;
+	self->context = (DomainContext*)context;
 	self->debug = Journal_Register( Debug_Type, self->type );
 	self->info = Journal_Register( Info_Type, self->type );
 		

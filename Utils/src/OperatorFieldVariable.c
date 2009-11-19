@@ -98,7 +98,7 @@ OperatorFieldVariable* OperatorFieldVariable_New(
 	OperatorFieldVariable* self = _OperatorFieldVariable_DefaultNew( name );
 
 	self->isConstructed = True;
-	_FieldVariable_Init( self, context, fieldVariableCount, dim, isCheckpointedAndReloaded, communicator, fieldVariable_Register );
+	_FieldVariable_Init( (FieldVariable*)self, context, fieldVariableCount, dim, isCheckpointedAndReloaded, communicator, fieldVariable_Register );
 	_OperatorFieldVariable_Init( self, operatorName, fieldVariableCount, fieldVariableList  );
 
 	return self;

@@ -192,20 +192,19 @@ void _ContactVC_AssignFromXML( void* wallVC, Stg_ComponentFactory* cf, void* dat
 }
 
 IndexSet* _ContactVC_GetSet(void* variableCondition) {
-   ContactVC*		self = (ContactVC*)variableCondition;
-   IndexSet*	set = NULL;
-   Stream*		warningStr = Journal_Register( Error_Type, self->type );
-   unsigned	nDims;
-   Grid*		vertGrid;
-   CartesianGenerator* gen;
+   ContactVC*				self = (ContactVC*)variableCondition;
+   IndexSet*				set = NULL;
+   Stream*					warningStr = Journal_Register( Error_Type, self->type );
+   unsigned					nDims;
+   Grid*						vertGrid;
+   CartesianGenerator*	gen;
 
    nDims = Mesh_GetDimSize( self->_mesh );
-   gen = self->_mesh->generator;
+   gen = (CartesianGenerator*)self->_mesh->generator;
+
    if( strcmp( gen->type, CartesianGenerator_Type ) )
       abort();
-   vertGrid = *(Grid**)ExtensionManager_Get( self->_mesh->info, self->_mesh, 
-                                             ExtensionManager_GetHandle( self->_mesh->info, 
-                                                                         "vertexGrid" ) );
+   vertGrid = *(Grid**)ExtensionManager_Get( self->_mesh->info, self->_mesh, ExtensionManager_GetHandle( self->_mesh->info, "vertexGrid" ) );
 
    switch (self->_wall) {
       case WallVC_Wall_Front:
