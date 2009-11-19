@@ -1648,7 +1648,7 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 	* was incremented when we got it out of the LC register.
 	* PatrickSunter - 13 June 2006
 	*/
-	Stg_Class_Delete( self->particleLayout );
+	Stg_Component_Destroy( self->particleLayout, NULL, False );
 	/* find out how many files fileparticlelayout is stored across.. currently for this function we assume we are reading from checkpoints.. TODO generalise */
 	/* set to one incase reading ascii */
 	checkpointfiles = 1;
