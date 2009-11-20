@@ -117,12 +117,20 @@ UnderworldContext* _UnderworldContext_New( UNDERWORLDCONTEXT_DEFARGS ) {
 
 void _UnderworldContext_Init( UnderworldContext* self ) {
 	self->isConstructed = True;
-	self->Vrms = 0.0;
    self->timeIntegrator = NULL;
    self->stokesSLE = NULL;
    self->energySLE = NULL;
    self->compositionSLE = NULL;
    self->constitutiveMatrix = NULL;
+
+	/* always generate XDMF files when we generate HDF5 checkpoints */
+#ifdef WRITE_HDF5
+	if( Dictionary_Entry_Value_AsBool( Dictionary_GetDefault( self->dictionary, "generateXDMF", Dictionary_Entry_Value_FromBool( True ) ) ) ){
+		ContextEP_Append( self, AbstractContext_EP_Save, XDMFGenerator_GenerateAll );
+		ContextEP_Append( self, AbstractContext_EP_DataSave, XDMFGenerator_GenerateAll );
+	}
+#endif
+   
    /* turn off because the context no longer holds things
 	EntryPoint_Append_AlwaysLast( Context_GetEntryPoint( self, AbstractContext_EP_AssignFromXML ),
 		"Underworld App Assign Pointers",
@@ -138,13 +146,6 @@ void _UnderworldContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, 
 
 	_PICelleratorContext_AssignFromXML( context, cf, data );
 
-	/* always generate XDMF files when we generate HDF5 checkpoints */
-#ifdef WRITE_HDF5
-	if( Dictionary_Entry_Value_AsBool( Dictionary_GetDefault( self->dictionary, "generateXDMF", Dictionary_Entry_Value_FromBool( True ) ) ) ){
-		ContextEP_Append( self, AbstractContext_EP_Save, XDMFGenerator_GenerateAll );
-		ContextEP_Append( self, AbstractContext_EP_DataSave, XDMFGenerator_GenerateAll );
-	}
-#endif
 	_UnderworldContext_Init( self );
 }
 

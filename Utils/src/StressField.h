@@ -64,7 +64,11 @@
 
 	void _StressField_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data );
 
-	void _StressField_Build( void* variable, void* data );
+	void _StressField_Init(	StressField* self, FeVariable* strainRateField,	ConstitutiveMatrix* constitutiveMatrix, Variable* stressVariable, Variable_Register* variable_Register, SystemLinearEquations* sle);
+
+   void StressField_NonLinearUpdate( void* _sle, void* _ctx );
+
+   void _StressField_Build( void* variable, void* data );
 
 	void _StressField_Initialise( void* variable, void* data );
 

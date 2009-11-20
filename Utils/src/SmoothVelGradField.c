@@ -258,6 +258,24 @@ void _SmoothVelGradField_Build( void* _self, void* data ) {
    Variable_Update( self->dataVariable );
    for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ )
       Variable_Update( self->dataVariableList[ variable_I ] );
+   
+   if( dim == 2 ) {
+      Memory_Free( variableName[0] );
+      Memory_Free( variableName[1] );
+      Memory_Free( variableName[2] );
+      Memory_Free( variableName[3] );
+   }                 
+   else {            
+      Memory_Free( variableName[0] );
+      Memory_Free( variableName[1] );
+      Memory_Free( variableName[2] );
+      Memory_Free( variableName[3] );
+      Memory_Free( variableName[4] );
+      Memory_Free( variableName[5] );
+      Memory_Free( variableName[6] );
+      Memory_Free( variableName[7] );
+      Memory_Free( variableName[8] );
+   }
 }
 
 void _SmoothVelGradField_Initialise( void* _self, void* data ) {
@@ -289,6 +307,8 @@ void _SmoothVelGradField_Execute( void* _self, void* data ) {
 
 void _SmoothVelGradField_Destroy( void* _self, void* data ) {
    SmoothVelGradField* self = (SmoothVelGradField*) _self;
+
+   Stg_Component_Destroy( self->velField, data, False );
 
    _ParticleFeVariable_Destroy( self, data );
 }
