@@ -142,34 +142,6 @@ void _DepthDependentAnalytic3D_TemperatureFunction( void* analyticSolution, doub
 	*temperature = 1 - y + perturbation;
 }
 
-void DepthDependentAnalytic3D_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DomainContext*         context            = (DomainContext*)_context;
-	FeVariable*            temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
-	FeMesh*                mesh               = temperatureField->feMesh;
-	double*                temperature        = (double*) _result;
-	double*                coord;
-	DepthDependentAnalytic3D*  self           = Stg_ComponentFactory_ConstructByName( context->CF, DepthDependentAnalytic3D_Type, DepthDependentAnalytic3D, True, context );
-	
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
-	
-	_DepthDependentAnalytic3D_TemperatureFunction( self, coord, temperature );
-}
-
-void DepthDependentAnalytic3D_PressureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	DomainContext*         context            = (DomainContext*)_context;
-	FeVariable*            PressureField      = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "PressureField" );
-	FeMesh*                mesh               = PressureField->feMesh;
-	double*                pressure           = (double*) _result;
-	double*                coord;
-	DepthDependentAnalytic3D*  self           = Stg_ComponentFactory_ConstructByName( context->CF, DepthDependentAnalytic3D_Type, DepthDependentAnalytic3D, True, context );
-	
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
-	
-	_DepthDependentAnalytic3D_PressureFunction( self, coord, pressure );
-}
-
 void _DepthDependentAnalytic3D_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
 	DepthDependentAnalytic3D* self            = (DepthDependentAnalytic3D*)analyticSolution;
 	double                 V0                 = self->V0;
@@ -220,6 +192,33 @@ void _DepthDependentAnalytic3D_PressureFunction( void* analyticSolution, double*
 	*pressure = V0 * cos( M_PI * x ) * cos( M_PI * z ) * ( 3.0 * eta * M_PI * cos( M_PI * y ) - d_eta_dy * sin( M_PI * y ) ) + f;
 }
 
+void DepthDependentAnalytic3D_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	DomainContext*         context            = (DomainContext*)_context;
+	FeVariable*            temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
+	FeMesh*                mesh               = temperatureField->feMesh;
+	double*                temperature        = (double*) _result;
+	double*                coord;
+	DepthDependentAnalytic3D*  self           = Stg_ComponentFactory_ConstructByName( context->CF, DepthDependentAnalytic3D_Type, DepthDependentAnalytic3D, True, context );
+	
+	/* Find coordinate of node */
+	coord = Mesh_GetVertex( mesh, node_lI );
+	
+	_DepthDependentAnalytic3D_TemperatureFunction( self, coord, temperature );
+}
+
+void DepthDependentAnalytic3D_PressureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	DomainContext*         context            = (DomainContext*)_context;
+	FeVariable*            PressureField      = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "PressureField" );
+	FeMesh*                mesh               = PressureField->feMesh;
+	double*                pressure           = (double*) _result;
+	double*                coord;
+	DepthDependentAnalytic3D*  self           = Stg_ComponentFactory_ConstructByName( context->CF, DepthDependentAnalytic3D_Type, DepthDependentAnalytic3D, True, context );
+	
+	/* Find coordinate of node */
+	coord = Mesh_GetVertex( mesh, node_lI );
+	
+	_DepthDependentAnalytic3D_PressureFunction( self, coord, pressure );
+}
 
 void _DepthDependentAnalytic3D_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	DepthDependentAnalytic3D*         self           = (DepthDependentAnalytic3D*)analyticSolution;

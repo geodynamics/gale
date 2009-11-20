@@ -127,6 +127,69 @@ double Trubitsyn2006_V0( void* analyticSolution ) {
 	return 0.25 * Ra * T0 * M_1_PI * M_1_PI;
 }
 
+
+void _Trubitsyn2006_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
+	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
+	double                 v0                 = Trubitsyn2006_V0( self );
+	double                 x; 
+	double                 y;
+	XYZ                    min, max;
+
+	Mesh_GetGlobalCoordRange( self->velocityField->feMesh, min, max );
+	x = coord[ I_AXIS ] - min[ I_AXIS ];
+	y = coord[ J_AXIS ] - min[ J_AXIS ];
+
+	velocity[ J_AXIS ] =   v0 * sin( M_PI * y ) * cos( M_PI * x );         /* Equation 31 */
+	velocity[ I_AXIS ] = - v0 * cos( M_PI * y ) * sin( M_PI * x );         /* Equation 32 */
+}
+
+void _Trubitsyn2006_ViscosityFunction( void* analyticSolution, double* coord, double* viscosity ) {
+	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
+
+	self->viscosityFunc( self, coord, viscosity );
+}
+
+void _Trubitsyn2006_PressureFunction( void* analyticSolution, double* coord, double* pressure ) {
+	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
+	double                 T0                 = self->T0;
+	double                 Ra                 = self->Ra;
+	double                 x; 
+	double                 y;
+	XYZ                    min, max;
+	double                 eta;
+	double                 eta01;
+	double                 upperLeftCorner[]  = { 0.0, 1.0, 0.0 };
+	
+	Mesh_GetGlobalCoordRange( self->velocityField->feMesh, min, max );
+	x = coord[ I_AXIS ] - min[ I_AXIS ];
+	y = coord[ J_AXIS ] - min[ J_AXIS ];
+
+	/* Get Viscosities */
+	self->viscosityFunc( self, coord, &eta );
+	self->viscosityFunc( self, upperLeftCorner, &eta01 );
+
+	*pressure = - Ra * ( ( y * y * 0.5 - y + 0.5 )
+			+ 0.5 * T0 / M_PI * ( eta * cos( M_PI * y ) * cos( M_PI * x ) + eta01 ) );        /* Equation 46 */
+	//printf("pressure from t0 = %g\n", *pressure );
+	//*pressure = - 2.0 * M_PI * v0 * ( eta * cos( M_PI * y ) * cos( M_PI * x ) + eta01 ) 
+	//		- Ra * ( y*y * 0.5 - y + 0.5 );
+	//printf("pressure from v0 = %g\n\n", *pressure );
+}
+
+void _Trubitsyn2006_StreamFunction( void* analyticSolution, double* coord, double* psi ) {
+	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
+	double                 v0                 = Trubitsyn2006_V0( self );
+	double                 x; 
+	double                 y;
+	XYZ                    min, max;
+
+	Mesh_GetGlobalCoordRange( self->velocityField->feMesh, min, max );
+	x = coord[ I_AXIS ] - min[ I_AXIS ];
+	y = coord[ J_AXIS ] - min[ J_AXIS ];
+
+	*psi = - v0 / M_PI * sin( M_PI * y ) * sin( M_PI * x ) ;                                          /* Equation 40 */
+}
+
 void Trubitsyn2006_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	DomainContext*         context            = (DomainContext*)_context;
 	FeVariable*            temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
@@ -174,70 +237,6 @@ void Trubitsyn2006_PressureIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 	
 	_Trubitsyn2006_PressureFunction( self,  coord,  pressure );
 }
-
-void _Trubitsyn2006_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
-	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
-	double                 v0                 = Trubitsyn2006_V0( self );
-	double                 x; 
-	double                 y;
-	XYZ                    min, max;
-
-	Mesh_GetGlobalCoordRange( self->velocityField->feMesh, min, max );
-	x = coord[ I_AXIS ] - min[ I_AXIS ];
-	y = coord[ J_AXIS ] - min[ J_AXIS ];
-
-	velocity[ J_AXIS ] =   v0 * sin( M_PI * y ) * cos( M_PI * x );         /* Equation 31 */
-	velocity[ I_AXIS ] = - v0 * cos( M_PI * y ) * sin( M_PI * x );         /* Equation 32 */
-}
-
-void _Trubitsyn2006_ViscosityFunction( void* analyticSolution, double* coord, double* viscosity ) {
-	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
-
-	self->viscosityFunc( self, coord, viscosity );
-}
-
-
-void _Trubitsyn2006_PressureFunction( void* analyticSolution, double* coord, double* pressure ) {
-	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
-	double                 T0                 = self->T0;
-	double                 Ra                 = self->Ra;
-	double                 x; 
-	double                 y;
-	XYZ                    min, max;
-	double                 eta;
-	double                 eta01;
-	double                 upperLeftCorner[]  = { 0.0, 1.0, 0.0 };
-	
-	Mesh_GetGlobalCoordRange( self->velocityField->feMesh, min, max );
-	x = coord[ I_AXIS ] - min[ I_AXIS ];
-	y = coord[ J_AXIS ] - min[ J_AXIS ];
-
-	/* Get Viscosities */
-	self->viscosityFunc( self, coord, &eta );
-	self->viscosityFunc( self, upperLeftCorner, &eta01 );
-
-	*pressure = - Ra * ( ( y * y * 0.5 - y + 0.5 )
-			+ 0.5 * T0 / M_PI * ( eta * cos( M_PI * y ) * cos( M_PI * x ) + eta01 ) );        /* Equation 46 */
-	//printf("pressure from t0 = %g\n", *pressure );
-	//*pressure = - 2.0 * M_PI * v0 * ( eta * cos( M_PI * y ) * cos( M_PI * x ) + eta01 ) 
-	//		- Ra * ( y*y * 0.5 - y + 0.5 );
-	//printf("pressure from v0 = %g\n\n", *pressure );
-}
-
-void _Trubitsyn2006_StreamFunction( void* analyticSolution, double* coord, double* psi ) {
-	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
-	double                 v0                 = Trubitsyn2006_V0( self );
-	double                 x; 
-	double                 y;
-	XYZ                    min, max;
-
-	Mesh_GetGlobalCoordRange( self->velocityField->feMesh, min, max );
-	x = coord[ I_AXIS ] - min[ I_AXIS ];
-	y = coord[ J_AXIS ] - min[ J_AXIS ];
-
-	*psi = - v0 / M_PI * sin( M_PI * y ) * sin( M_PI * x ) ;                                          /* Equation 40 */
-}
-
 
 void _Trubitsyn2006_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Trubitsyn2006*         self           = (Trubitsyn2006*)analyticSolution;

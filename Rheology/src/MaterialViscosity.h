@@ -81,8 +81,11 @@
 		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
 		Name                                               name );
 
+	void _MaterialViscosity_Init( void* rheology, double eta0 );
+
 	/* 'Stg_Component' implementations */
 	void* _MaterialViscosity_DefaultNew( Name name ) ;
+
 	void _MaterialViscosity_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	void _MaterialViscosity_ModifyConstitutiveMatrix( 

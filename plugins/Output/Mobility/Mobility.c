@@ -107,15 +107,13 @@ void Underworld_Mobility_Setup( void* _context ) {
 
 	Underworld_Mobility* self;
 
-	self = (Underworld_Mobility*)LiveComponentRegister_Get(
-		context->CF->LCRegister,
-		Underworld_Mobility_Type );
+	self = (Underworld_Mobility*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_Mobility_Type );
 
 	Journal_Firewall( gaussSwarm != NULL, Underworld_Error, "Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
 	Journal_Firewall( velocityField != NULL, Underworld_Error, "Cannot find velocityField. Cannot use %s.\n", CURR_MODULE_NAME );
 
 	/* Create new Field Variable */
-	self->velocitySquaredField = OperatorFeVariable_NewUnary( "VelocitySquaredField", context, velocityField, "VectorSquare" );
+	self->velocitySquaredField = OperatorFeVariable_NewUnary( "VelocitySquaredField", (DomainContext*)context, velocityField, "VectorSquare" );
 }
 
 /* Integrate Every Step and dump to file */

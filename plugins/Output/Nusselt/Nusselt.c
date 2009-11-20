@@ -62,7 +62,7 @@ void _Underworld_Nusselt_AssignFromXML( void* component, Stg_ComponentFactory* c
 	FieldVariable*				velocityField;
 	FieldVariable*				temperatureField;
 
-	self->context = Stg_ComponentFactory_PluginConstructByKey( cf, self, "Context", UnderworldContext, True, data );
+	self->context = (AbstractContext*)Stg_ComponentFactory_PluginConstructByKey( cf, self, "Context", UnderworldContext, True, data );
 	self->gaussSwarm = Stg_ComponentFactory_PluginConstructByKey( cf, self, "GaussSwarm", Swarm, True, data );
 
 	StgFEM_FrequentOutput_PrintString( self->context, "Nusselt" );

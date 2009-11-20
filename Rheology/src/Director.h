@@ -62,17 +62,17 @@
  		__TimeIntegratee \
 		/* Virtual functions go here */ \
 		/* General Info */\
-		SwarmVariable*                                      directorSwarmVariable;                 \
-		SwarmVariable*                                      dontUpdateParticle;                 \		
-		ExtensionInfo_Index                                 particleExtHandle;                     \
+		SwarmVariable*				directorSwarmVariable; \
+		SwarmVariable*				dontUpdateParticle; \
+		ExtensionInfo_Index		particleExtHandle; \
 		/* Param passed in */ \
-		FeVariable*                                         velGradField;                          \
-		MaterialPointsSwarm*                                materialPointsSwarm;                  \
-		Materials_Register*                                 materialsRegister;                  \
-		InitialDirectionType                                initialDirectionType;               \
-		XYZ                                                 globalInitialDirection;                      \
-		unsigned int                                        randomInitialDirectionSeed;             \
-		Bool                                                dontUpdate; 
+		FeVariable*					velGradField; \
+		MaterialPointsSwarm*		materialPointsSwarm; \
+		Materials_Register*		materialsRegister; \
+		InitialDirectionType		initialDirectionType; \
+		XYZ							globalInitialDirection; \
+		unsigned int				randomInitialDirectionSeed; \
+		Bool							dontUpdate; 
 				
 	struct Director { __Director };
 

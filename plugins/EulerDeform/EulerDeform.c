@@ -83,7 +83,7 @@ void _Underworld_EulerDeform_AssignFromXML( void* component, Stg_ComponentFactor
 
 	/* Retrieve context. */
 	uwCtx = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
-	ed->context = uwCtx;
+	ed->context = (AbstractContext*)uwCtx;
 
 	/* Create new context. */
 	EulerDeform_ContextHandle = ExtensionManager_Add( uwCtx->extensionMgr, Underworld_EulerDeform_Type, sizeof(EulerDeform_Context) );
@@ -218,7 +218,7 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 
 		tiData[0] = (Stg_Component*)sys->velField;
 		tiData[1] = (Stg_Component*)&sys->mesh->verts;
-		crdAdvector = TimeIntegratee_New( "EulerDeform_Velocity", uwCtx, uwCtx->timeIntegrator, crdVar, 2, tiData, True
+		crdAdvector = TimeIntegratee_New( "EulerDeform_Velocity", (DomainContext*)uwCtx, uwCtx->timeIntegrator, crdVar, 2, tiData, True
 			 /* Presume we need to allow fallback on edges of stretching mesh - PatrickSunter, 7 June 2006 */ );
 		crdAdvector->_calculateTimeDeriv = EulerDeform_TimeDeriv;
 

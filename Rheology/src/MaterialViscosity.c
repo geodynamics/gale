@@ -67,7 +67,7 @@ MaterialViscosity* MaterialViscosity_New(
 {
    MaterialViscosity* self = (MaterialViscosity*) _MaterialViscosity_DefaultNew( name );
 
-   _Rheology_Init( self, context );
+   _Rheology_Init( self, (PICelleratorContext*)context );
    _MaterialViscosity_Init( self, eta0 );
      
    self->isConstructed = True;
@@ -114,7 +114,9 @@ MaterialViscosity* _MaterialViscosity_New(
 	return self;
 }
 
-void _MaterialViscosity_Init(MaterialViscosity* self, double eta0) {
+void _MaterialViscosity_Init( void* rheology, double eta0 ) {
+	MaterialViscosity*  self = (MaterialViscosity*)rheology;
+
 	self->eta0 = eta0;
 }
 

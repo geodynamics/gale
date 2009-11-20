@@ -93,14 +93,14 @@ FaultingMoresiMuhlhaus2006* FaultingMoresiMuhlhaus2006_New(
 		"Error in func '%s' for %s '%s': FaultingMoresiMuhlhaus2006 rheology needs strain weakening.\n", 
 		__func__, self->type, self->name );
 
-   _Rheology_Init( self, context );
-   _YieldRheology_Init( self, strainWeakening, materialPointsSwarm, minVisc ); 
+   _Rheology_Init( self, (PICelleratorContext*)context );
+   _YieldRheology_Init( (YieldRheology*)self, strainWeakening, materialPointsSwarm, minVisc ); 
    _FaultingMoresiMuhlhaus2006_Init(
 		 self,
 		 pressureField,
 		 velocityGradientsField,
 		 materialPointsSwarm,
-		 context,
+		 (FiniteElementContext*)context,
 		 director,
 		 cohesion,
 		 cohesionAfterSoftening,

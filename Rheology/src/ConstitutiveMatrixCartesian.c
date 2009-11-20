@@ -76,7 +76,7 @@ ConstitutiveMatrixCartesian* ConstitutiveMatrixCartesian_New(
    ConstitutiveMatrixCartesian* self = (ConstitutiveMatrixCartesian*) _ConstitutiveMatrixCartesian_DefaultNew( name );
 
    _StiffnessMatrixTerm_Init( self, context, stiffnessMatrix, swarm, NULL );
-   _ConstitutiveMatrix_Init( self, dim, False );
+   _ConstitutiveMatrix_Init( (ConstitutiveMatrix*)self, dim, False );
    _ConstitutiveMatrixCartesian_Init( self );
    self->isConstructed = True;
    return self;

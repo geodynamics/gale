@@ -57,13 +57,13 @@ const Type Underworld_Vrms_Type = "Underworld_Vrms";
 void _Underworld_Vrms_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	Underworld_Vrms*	self 		= (Underworld_Vrms*)component;
 
-	self->context       = Stg_ComponentFactory_PluginConstructByKey( cf, self, "Context", UnderworldContext, True, data );
+	self->context       = (AbstractContext*)Stg_ComponentFactory_PluginConstructByKey( cf, self, "Context", UnderworldContext, True, data );
 	self->gaussSwarm    = Stg_ComponentFactory_PluginConstructByKey( cf, self, "GaussSwarm", Swarm, True, data );
 	self->velocityField = Stg_ComponentFactory_PluginConstructByKey( cf, self, "VelocityField", FeVariable, True, data );
 
 	/* Create new Field Variable */
-	self->velocitySquaredField = OperatorFeVariable_NewUnary( "VelocitySquaredField", self->context, self->velocityField, "VectorSquare" );
-	self->velocitySquaredField->context = self->context;
+	self->velocitySquaredField = OperatorFeVariable_NewUnary( "VelocitySquaredField", (DomainContext*)self->context, self->velocityField, "VectorSquare" );
+	self->velocitySquaredField->context = (DomainContext*)self->context;
 
 	Underworld_Vrms_PrintHeaderToFile( self->context );
 	ContextEP_Append( self->context, AbstractContext_EP_FrequentOutput, Underworld_Vrms_Dump );

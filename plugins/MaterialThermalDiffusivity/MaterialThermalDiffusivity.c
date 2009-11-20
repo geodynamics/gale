@@ -173,10 +173,9 @@ typedef struct {
 } Underworld_MaterialThermalDiffusivity;
 
 void _Underworld_MaterialThermalDiffusivity_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
-	UnderworldContext								context;
 	Underworld_MaterialThermalDiffusivity*	self = (Underworld_MaterialThermalDiffusivity*)component;
 
-	self->context = Stg_ComponentFactory_PluginConstructByKey( cf, self, "Context", UnderworldContext, True, data );
+	self->context = (AbstractContext*)Stg_ComponentFactory_PluginConstructByKey( cf, self, "Context", UnderworldContext, True, data );
 
 	/* Add functions to entry points */
 	ContextEP_Append( self->context, AbstractContext_EP_Build,      Underworld_MaterialThermalDiffusivity_Setup );

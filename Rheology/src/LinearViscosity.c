@@ -73,7 +73,7 @@ LinearViscosity* LinearViscosity_New(
 {
    LinearViscosity* self = (LinearViscosity*) _LinearViscosity_DefaultNew( name );
 
-   _Rheology_Init( self, context );
+   _Rheology_Init( self, (PICelleratorContext*)context );
    _LinearViscosity_Init( self,
 	     C,
 	     X,

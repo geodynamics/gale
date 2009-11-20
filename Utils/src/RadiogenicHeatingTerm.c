@@ -28,7 +28,7 @@ RadiogenicHeatingTerm* RadiogenicHeatingTerm_New(
 
 	self->isConstructed = True;
 	_ForceTerm_Init( self, context, forceVector, integrationSwarm, NULL );
-	_RadiogenicHeatingTerm_Init( self, context, materials_Register );
+	_RadiogenicHeatingTerm_Init( self, materials_Register );
 
 	return self;
 }
@@ -74,13 +74,10 @@ RadiogenicHeatingTerm* _RadiogenicHeatingTerm_New(
 	return self;
 }
 
-void _RadiogenicHeatingTerm_Init( 
-		RadiogenicHeatingTerm*                              self, 
-		FiniteElementContext*                               context,
-		Materials_Register*                                 materials_Register )
-{
-	self->context             = context;
-	self->materials_Register  = materials_Register;
+void _RadiogenicHeatingTerm_Init( void* forceTerm, Materials_Register* materials_Register ) {
+	RadiogenicHeatingTerm* self = (RadiogenicHeatingTerm*)forceTerm;
+
+	self->materials_Register = materials_Register;
 }
 
 void _RadiogenicHeatingTerm_Delete( void* forceTerm ) {
@@ -117,19 +114,16 @@ void* _RadiogenicHeatingTerm_DefaultNew( Name name ) {
 }
 
 void _RadiogenicHeatingTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
-	RadiogenicHeatingTerm*      self             = (RadiogenicHeatingTerm*)forceTerm;
-	PICelleratorContext*        context;
-	Materials_Register*         materials_Register;
+	RadiogenicHeatingTerm*	self = (RadiogenicHeatingTerm*)forceTerm;
+	Materials_Register*		materials_Register;
 
 	/* Construct Parent */
 	_ForceTerm_AssignFromXML( self, cf, data );
 
-	context = (PICelleratorContext*)self->context;
-	assert( Stg_CheckType( context, PICelleratorContext ) );
-	materials_Register = context->materials_Register; 
+	materials_Register = ((PICelleratorContext*)self->context)->materials_Register; 
 	assert( materials_Register );
 
-	_RadiogenicHeatingTerm_Init( self, context, materials_Register );
+	_RadiogenicHeatingTerm_Init( self, materials_Register );
 }
 
 void _RadiogenicHeatingTerm_Build( void* forceTerm, void* data ) {

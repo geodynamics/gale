@@ -70,7 +70,7 @@ DepthDependentViscosity* DepthDependentViscosity_New(
 {
    DepthDependentViscosity* self = (DepthDependentViscosity*) _DepthDependentViscosity_DefaultNew( name );
 
-   _Rheology_Init( self, context );
+   _Rheology_Init( self, (PICelleratorContext*)context );
    _DepthDependentViscosity_Init( self, feMesh, eta0, gamma, variationAxis, referencePoint );
    self->isConstructed = True;
    return self;

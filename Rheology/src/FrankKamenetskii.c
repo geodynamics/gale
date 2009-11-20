@@ -67,7 +67,7 @@ FrankKamenetskii* FrankKamenetskii_New(
 {
    FrankKamenetskii* self = (FrankKamenetskii*) _FrankKamenetskii_DefaultNew( name );
 
-   _Rheology_Init( self, context );
+   _Rheology_Init( self, (PICelleratorContext*)context );
    _FrankKamenetskii_Init( self, temperatureField, eta0, theta );
    self->isConstructed = True;
    return self;

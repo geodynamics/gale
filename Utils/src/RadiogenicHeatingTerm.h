@@ -7,8 +7,8 @@
 	extern const Type RadiogenicHeatingTerm_Type;
 
 	typedef struct { 
-		double          Q;                   /* value of heating coefficient */
-		double          lambda;              /* decay rate for this element */
+		double	Q; /* value of heating coefficient */
+		double	lambda; /* decay rate for this element */
 	} HeatingElement;
 
 	typedef struct {
@@ -24,8 +24,8 @@
 		/* Virtual functions go here */ \
 		\
 		/* RadiogenicHeatingTerm info */ \
-		Materials_Register*                                 materials_Register;                \
-		ExtensionInfo_Index                                 materialExtHandle;
+		Materials_Register*	materials_Register; \
+		ExtensionInfo_Index	materialExtHandle;
 
 	struct RadiogenicHeatingTerm { __RadiogenicHeatingTerm };
 
@@ -50,6 +50,8 @@
 		Stg_Component_DestroyFunction*                      _destroy,
 		ForceTerm_AssembleElementFunction*                  _assembleElement,		
 		Name                                                name );
+
+	void _RadiogenicHeatingTerm_Init( void* forceTerm, Materials_Register* materials_Register );
 	
 	void _RadiogenicHeatingTerm_Delete( void* forceTerm );
 
