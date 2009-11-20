@@ -61,7 +61,7 @@
 	/** Textual name of this class */
 	extern const Type OperatorSwarmVariable_Type;
 
-	typedef void (OperatorSwarmVariable_UnaryOperatorFunction)  ( void* swarmVariable, double* value0, double* result );
+	typedef void (OperatorSwarmVariable_UnaryOperatorFunction) ( void* swarmVariable, double* value0, double* result );
 	typedef void (OperatorSwarmVariable_BinaryOperatorFunction) ( void* swarmVariable, double* value0, double* value1, double* result );
 	
 	/** OperatorSwarmVariable contents */
@@ -70,55 +70,45 @@
 		__SwarmVariable \
 		\
 		/* Other info */ \
-		Operator*                                                   _operator;           \
-		Index                                                       swarmVariableCount;  \
-		SwarmVariable**                                             swarmVariableList;   \
+		Operator*			_operator; \
+		Index					swarmVariableCount; \
+		SwarmVariable**	swarmVariableList;
 
+	struct OperatorSwarmVariable { __OperatorSwarmVariable };
 
-	struct OperatorSwarmVariable { __OperatorSwarmVariable };	
+	#define OPERATORSWARMVARIABLE_DEFARGS \
+		SWARMVARIABLE_DEFARGS
+
+	#define OPERATORSWARMVARIABLE_PASSARGS \
+		SWARMVARIABLE_PASSARGS
 
 	/** Shortcut constructors */
 	OperatorSwarmVariable* OperatorSwarmVariable_NewUnary(
-		Name                                               name,
-		AbstractContext*                                   context,
-		void*                                              _swarmVariable,
-		Name                                               operatorName );
+		Name					name,
+		AbstractContext*	context,
+		void*					_swarmVariable,
+		Name					operatorName );
 
 	OperatorSwarmVariable* OperatorSwarmVariable_NewBinary(
-		Name                                               name,
-		AbstractContext*                                   context,
-		void*                                              _swarmVariable1,
-		void*                                              _swarmVariable2,
-		Name                                               operatorName );
+		Name					name,
+		AbstractContext*	context,
+		void*					_swarmVariable1,
+		void*					_swarmVariable2,
+		Name					operatorName );
 	
 	/* Public Constructor */
 	void* _OperatorSwarmVariable_DefaultNew( Name name );
 
 	OperatorSwarmVariable* OperatorSwarmVariable_New( 
-		Name                                               name,
-		AbstractContext*                                   context,
-		SwarmVariable_ValueAtFunction*                     valueAt,
-		Name                                               operatorName,
-		Index                                              swarmVariableCount,
-		SwarmVariable**                                    swarmVariableList );
+		Name										name,
+		AbstractContext*						context,
+		SwarmVariable_ValueAtFunction*	valueAt,
+		Name										operatorName,
+		Index										swarmVariableCount,
+		SwarmVariable**						swarmVariableList );
 
 	/** Private Constructor */
-	OperatorSwarmVariable* _OperatorSwarmVariable_New(
-			SizeT                                              _sizeOfSelf, 
-			Type                                               type,
-			Stg_Class_DeleteFunction*                          _delete,
-			Stg_Class_PrintFunction*                           _print, 
-			Stg_Class_CopyFunction*                            _copy, 
-			Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-			Stg_Component_ConstructFunction*                   _construct,
-			Stg_Component_BuildFunction*                       _build,
-			Stg_Component_InitialiseFunction*                  _initialise,
-			Stg_Component_ExecuteFunction*                     _execute,
-			Stg_Component_DestroyFunction*                     _destroy,
-			SwarmVariable_ValueAtFunction*                     _valueAt,
-			SwarmVariable_GetGlobalValueFunction*              _getMinGlobalMagnitude,
-			SwarmVariable_GetGlobalValueFunction*              _getMaxGlobalMagnitude,		
-			Name                                               name );
+	OperatorSwarmVariable* _OperatorSwarmVariable_New( OPERATORSWARMVARIABLE_DEFARGS ); 
 
 	void _OperatorSwarmVariable_Init( void* _swarmVariable, Name operatorName, Index swarmVariableCount, SwarmVariable** swarmVariableList );
 
@@ -190,4 +180,5 @@
 
 	/** TODO HACK - This function will be obselete when function registers come to town */
 	Func_Ptr OperatorSwarmVariable_GetOperatorByName( void* swarmVariable, Name name );
+
 #endif /* __Domain_Utils_OperatorSwarmVariable_h__ */

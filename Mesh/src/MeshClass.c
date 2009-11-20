@@ -520,8 +520,7 @@ Bool Mesh_HasExtension( void* mesh, const char* name ) {
 
 	assert( self );
 
-	return (ExtensionManager_GetHandle( self->info, name ) != -1) ?
-		True : False;
+	return (ExtensionManager_GetHandle( self->info, name ) != -1) ?  True : False;
 }
 
 void* _Mesh_GetExtension( void* mesh, const char* name ) {
@@ -530,9 +529,7 @@ void* _Mesh_GetExtension( void* mesh, const char* name ) {
 	assert( self );
 	assert( ExtensionManager_GetHandle( self->info, name ) != -1 );
 
-	return ExtensionManager_Get( self->info, self, 
-				     ExtensionManager_GetHandle( self->info, 
-								 name ) );
+	return ExtensionManager_Get( self->info, self, ExtensionManager_GetHandle( self->info, name ) );
 }
 
 void* Mesh_GetTopologyData( void* mesh, MeshTopology_Dim dim ) {
@@ -612,10 +609,7 @@ void Mesh_Sync( void* mesh ) {
 	sync = Mesh_GetSync( self, 0 );
 	nDims = Mesh_GetDimSize( self );
 	nLocals = Mesh_GetLocalSize( self, 0 );
-	Sync_SyncArray( sync, 
-			self->verts[0], nDims * sizeof(double), 
-			self->verts[nLocals], nDims * sizeof(double), 
-			nDims * sizeof(double) );
+	Sync_SyncArray( sync, self->verts[0], nDims * sizeof(double), self->verts[nLocals], nDims * sizeof(double), nDims * sizeof(double) );
 
 	/* TODO
 	if( self->dataSyncArrays ) {
