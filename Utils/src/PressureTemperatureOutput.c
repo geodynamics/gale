@@ -194,10 +194,16 @@ void _PressureTemperatureOutput_AssignFromXML( void* swarmOutput, Stg_ComponentF
 void _PressureTemperatureOutput_Build( void* swarmOutput, void* data ) {
 	PressureTemperatureOutput*	self = (PressureTemperatureOutput*) swarmOutput;
 
+	Stg_Component_Build( self->pressureField, data, False );
+	Stg_Component_Build( self->temperatureField, data, False );
+
 	_SwarmOutput_Build( self, data );
 }
 void _PressureTemperatureOutput_Initialise( void* swarmOutput, void* data ) {
 	PressureTemperatureOutput*	self = (PressureTemperatureOutput*) swarmOutput;
+
+	Stg_Component_Initialise( self->pressureField, data, False );
+	Stg_Component_Initialise( self->temperatureField, data, False );
 	
 	_SwarmOutput_Initialise( self, data );
 }
@@ -208,6 +214,9 @@ void _PressureTemperatureOutput_Execute( void* swarmOutput, void* data ) {
 }
 void _PressureTemperatureOutput_Destroy( void* swarmOutput, void* data ) {
 	PressureTemperatureOutput*	self = (PressureTemperatureOutput*)swarmOutput;
+
+	Stg_Component_Destroy( self->pressureField, data, False );
+	Stg_Component_Destroy( self->temperatureField, data, False );
 	
 	_SwarmOutput_Destroy( self, data );
 }

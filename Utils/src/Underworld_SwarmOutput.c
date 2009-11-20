@@ -123,6 +123,7 @@ Underworld_SwarmOutput* _Underworld_SwarmOutput_New(
 void _Underworld_SwarmOutput_Delete( void* uwSwarmOutput ) {
 	Underworld_SwarmOutput* self = (Underworld_SwarmOutput*)uwSwarmOutput;
 
+	Memory_Free( self->feVariableList );
 	/* Delete parent */
 	_SwarmOutput_Delete( self );
 }
@@ -160,14 +161,16 @@ void* _Underworld_SwarmOutput_DefaultNew( Name name ) {
 			name );
 }
 
-void _Underworld_SwarmOutput( Underworld_SwarmOutput* self,
+void _Underworld_SwarmOutput_Init( Underworld_SwarmOutput* self,
 				PICelleratorContext*  context,
 				MaterialPointsSwarm*  materialSwarm,
-				unsigned int          listCount ) {
+				unsigned int          listCount,
+				FeVariable**          feVariableList) {
 	self->materialSwarm = materialSwarm;
 	self->sizeList = listCount;
 	self->_getFeValuesFunc = _Underworld_SwarmOutput_GetFeVariableValues;
 	self->_printFunc = _Underworld_SwarmOutput_PrintStandardFormat;
+	self->feVariableList = feVariableList;
 
 	/* my Swarm output will run on the SaveClass EP - the same time as standard checkpointing */
 	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_SaveClass ), _Underworld_SwarmOutput_Execute, self );
@@ -182,7 +185,8 @@ void _Underworld_SwarmOutput_AssignFromXML( void* uwSwarmOutput, Stg_ComponentFa
 	Dictionary_Entry_Value* list;
 	unsigned int            listCount, feVar_I;
 	char*                   varName;
-	Stream                 *errorStream = Journal_Register( Error_Type, "_Underworld_SwarmOutput_Construct" );
+	Stream                  *errorStream = Journal_Register( Error_Type, "_Underworld_SwarmOutput_Construct" );
+   FeVariable**            feVariableList;
 	
 	context      =  Stg_ComponentFactory_ConstructByName(  cf,  "context", PICelleratorContext,  True, data ) ;
 	materialSwarm = (MaterialPointsSwarm*)Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", MaterialPointsSwarm, True, data );
@@ -201,7 +205,7 @@ void _Underworld_SwarmOutput_AssignFromXML( void* uwSwarmOutput, Stg_ComponentFa
 	
 	listCount = Dictionary_Entry_Value_GetCount( list );
 
-  Journal_Firewall(
+   Journal_Firewall(
 			listCount != 0,
 			errorStream,
 			"Error in %s:\n"
@@ -211,17 +215,18 @@ void _Underworld_SwarmOutput_AssignFromXML( void* uwSwarmOutput, Stg_ComponentFa
 			"</list>\n", __func__ );
 	
 	/* Allocate the memory to store pointers to them */
-	self->feVariableList = Memory_Alloc_Array( FeVariable*, listCount, "List FeVariables" );
+	feVariableList = Memory_Alloc_Array( FeVariable*, listCount, "List FeVariables" );
 
 	for( feVar_I = 0 ; feVar_I < listCount ; feVar_I++ ) {
 		varName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( list, feVar_I ) );
-		self->feVariableList[ feVar_I ] = Stg_ComponentFactory_ConstructByName( cf, varName, FeVariable, True, data );
+		feVariableList[ feVar_I ] = Stg_ComponentFactory_ConstructByName( cf, varName, FeVariable, True, data );
 	}
 
-	_Underworld_SwarmOutput( self,
+	_Underworld_SwarmOutput_Init( self,
 				 context,
 				 materialSwarm,
-				 listCount );
+				 listCount,
+				 feVariableList);
 
 }
 
@@ -316,8 +321,15 @@ void _Underworld_SwarmOutput_Execute( void* uwSwarmOutput, void* data ) {
 
 void _Underworld_SwarmOutput_Destroy( void* uwSwarmOutput, void* data ) {
 	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*)uwSwarmOutput;
+	unsigned int feVar_I, feVarNum;
+
+	/* Destroy all StGermain based data structure this component uses */
+	feVarNum = self->sizeList;	
+	for( feVar_I = 0 ; feVar_I < feVarNum; feVar_I++ ) 
+		Stg_Component_Destroy( self->feVariableList[feVar_I], data, False );
+
+	Stg_Component_Destroy( self->materialSwarm, data, False );
 	
-	Memory_Free( self->feVariableList );
 }
 
 void _Underworld_SwarmOutput_PrintStandardFormat( MaterialPoint* particle, double* result, unsigned fieldComponentCount, FILE* outputFile ) {

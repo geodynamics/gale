@@ -62,7 +62,6 @@
 		AdvectionDiffusionSLE*	energySLE; \
 		AdvectionDiffusionSLE*	compositionSLE; \
 		ConstitutiveMatrix*		constitutiveMatrix; \
-		double						Vrms; \
 		
 	struct UnderworldContext { __UnderworldContext };
 

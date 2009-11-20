@@ -165,6 +165,7 @@ void _ViscosityField_Build( void* viscosityField, void* data ) {
 	Name              tmpName;
 
 	Stg_Component_Build( self->feMesh, data, False );
+	Stg_Component_Build( self->constitutiveMatrix, data, False );
 
 	/* Create Dof Layout */
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
@@ -191,6 +192,7 @@ void _ViscosityField_Build( void* viscosityField, void* data ) {
 void _ViscosityField_Initialise( void* viscosityField, void* data ) {
 	ViscosityField* self = (ViscosityField*) viscosityField;
 
+   Stg_Component_Initialise( self->constitutiveMatrix, data, False );
 	_ParticleFeVariable_Initialise( self, data );
 }
 void _ViscosityField_Execute( void* viscosityField, void* data ) {
@@ -201,6 +203,7 @@ void _ViscosityField_Execute( void* viscosityField, void* data ) {
 void _ViscosityField_Destroy( void* viscosityField, void* data ) {
 	ViscosityField* self = (ViscosityField*) viscosityField;
 
+   Stg_Component_Destroy( self->constitutiveMatrix, data, False );
 	_ParticleFeVariable_Destroy( self, data );
 }
 void _ViscosityField_ValueAtParticle( void* viscosityField, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, void* _particle, double* viscosity ) {

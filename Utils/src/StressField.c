@@ -81,7 +81,8 @@ void _StressField_Init(
 		FeVariable*                                       strainRateField,
 		ConstitutiveMatrix*                               constitutiveMatrix,
 		Variable*                                         stressVariable,
-		Variable_Register*                                variable_Register )
+		Variable_Register*                                variable_Register,
+		SystemLinearEquations*	                          sle)
 {
 	Dimension_Index   dim = constitutiveMatrix->dim;
 
@@ -99,7 +100,14 @@ void _StressField_Init(
 		
 	/* Set pointers to swarm to be the same as the one on the constitutive matrix */
 	self->assemblyTerm->integrationSwarm = self->constitutiveMatrix->integrationSwarm;
-	self->massMatrixForceTerm->integrationSwarm = self->constitutiveMatrix->integrationSwarm;	
+	self->massMatrixForceTerm->integrationSwarm = self->constitutiveMatrix->integrationSwarm;
+
+	/*
+	** If we're using this field for non-linear feedback, we'll need to update it in between
+	** non-linear iterations. */
+	if( sle )
+		SystemLinearEquations_AddPostNonLinearEP( sle, StressField_Type, StressField_NonLinearUpdate );
+	
 }
 
 /* --- Virtual Function Implementations --- */
@@ -191,14 +199,9 @@ void _StressField_AssignFromXML( void* stressField, Stg_ComponentFactory* cf, vo
 	stressVariableName = Stg_ComponentFactory_GetString( cf, self->name, "StressVariable", "Stress" );
 	stressVariable = Variable_Register_GetByName( variable_Register, stressVariableName );
 
-	_StressField_Init( self, strainRateField, constitutiveMatrix, stressVariable, variable_Register );
+   sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, "SLE", SystemLinearEquations, False, data );
 
-	/*
-	** If we're using this field for non-linear feedback, we'll need to update it in between
-	** non-linear iterations. */
-	sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, "SLE", SystemLinearEquations, False, data );
-	if( sle )
-		SystemLinearEquations_AddPostNonLinearEP( sle, StressField_Type, StressField_NonLinearUpdate );
+	_StressField_Init( self, strainRateField, constitutiveMatrix, stressVariable, variable_Register, sle );
 }
 
 void _StressField_Build( void* stressField, void* data ) {
@@ -211,6 +214,8 @@ void _StressField_Build( void* stressField, void* data ) {
 
 	Stg_Component_Build( self->feMesh, data, False );
 	Stg_Component_Build( self->strainRateField, data, False );
+	Stg_Component_Build( self->constitutiveMatrix, data, False );
+	if ( self->stressVariable ) Stg_Component_Build( self->stressVariable, data, False );
 
 	if ( dim == 2 ) {
 		variableName[0] = StG_Strdup( "tau_xx" );
@@ -274,6 +279,19 @@ void _StressField_Build( void* stressField, void* data ) {
 		Variable_Update( self->dataVariableList[ variable_I ] );
 	}
 
+	if ( dim == 2 ) {
+      Memory_Free( variableName[0] );
+      Memory_Free( variableName[1] );
+      Memory_Free( variableName[2] );
+	}
+	else {
+      Memory_Free( variableName[0] );
+      Memory_Free( variableName[1] );
+      Memory_Free( variableName[2] );
+      Memory_Free( variableName[3] );
+      Memory_Free( variableName[4] );
+      Memory_Free( variableName[5] );
+	}
 
 }
 
@@ -282,7 +300,7 @@ void _StressField_Initialise( void* stressField, void* data ) {
 	Variable_Index variable_I;
 
 	Stg_Component_Initialise( self->strainRateField, data, False );
-	
+	Stg_Component_Initialise( self->constitutiveMatrix, data, False );
 	/* Initialise and Update all Variables that this component has created */
 	Stg_Component_Initialise( self->dataVariable, data, False); Variable_Update( self->dataVariable );
 	for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ ) {
@@ -305,6 +323,10 @@ void _StressField_Execute( void* stressField, void* data ) {
 }
 void _StressField_Destroy( void* stressField, void* data ) {
 	StressField* self = (StressField*) stressField;
+
+	Stg_Component_Destroy( self->strainRateField, data, False );
+	Stg_Component_Destroy( self->constitutiveMatrix, data, False );
+	Stg_Component_Destroy( self->dataVariable, data, False);
 
 	_ParticleFeVariable_Destroy( self, data );
 }
