@@ -94,7 +94,7 @@ void _DensityField_Init(
 void _DensityField_Delete( void* densityField ) {
 	DensityField* self = (DensityField*) densityField;
 
-	_FeVariable_Delete( self );
+	_ParticleFeVariable_Delete( self );
 }
 
 void _DensityField_Print( void* densityField, Stream* stream ) {
@@ -165,6 +165,8 @@ void _DensityField_Build( void* densityField, void* data ) {
 	Variable_Register* variable_Register = (Variable_Register*) self->variable_Register;
 	Name              tmpName;
 
+	Stg_Component_Build( self->buoyancyForceTerm, data, False );
+
   	/* Create Dof Layout */
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	tmpName = Stg_Object_AppendSuffix( self, "densityVariable" );
@@ -190,6 +192,8 @@ void _DensityField_Build( void* densityField, void* data ) {
 void _DensityField_Initialise( void* densityField, void* data ) {
 	DensityField* self = (DensityField*) densityField;
 
+	Stg_Component_Initialise( self->buoyancyForceTerm, data, False );
+
 	_ParticleFeVariable_Initialise( self, data );
 }
 void _DensityField_Execute( void* densityField, void* data ) {
@@ -200,11 +204,11 @@ void _DensityField_Execute( void* densityField, void* data ) {
 void _DensityField_Destroy( void* densityField, void* data ) {
 	DensityField* self = (DensityField*) densityField;
 
-	Stg_Class_Delete( self->assemblyVector );
-	Memory_Free( self->assemblyVectorName );
+   Stg_Component_Destroy( self->buoyancyForceTerm, data, False );
 
 	_ParticleFeVariable_Destroy( self, data );
 }
+
 void _DensityField_ValueAtParticle( void* densityField, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, void* _particle, double* density ) {
 	DensityField*                    self         = (DensityField*) densityField;
 	IntegrationPoint*                particle     = (IntegrationPoint*) _particle;
