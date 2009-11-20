@@ -61,75 +61,39 @@ const Type AlignmentSwarmVariable_Type = "AlignmentSwarmVariable";
 
 /* Public Constructor */
 AlignmentSwarmVariable* AlignmentSwarmVariable_New(
-      Name                                               name,
-      AbstractContext*                                   context,
-      Swarm*                                             swarm,
-      Variable*                                          variable,
-      Index                                              dofCount,
-      FeVariable*                                        velocityField,
-      Director*                                          director )
+	Name					name,
+	AbstractContext*	context,
+	Swarm*				swarm,
+	Variable*			variable,
+	Index					dofCount,
+	FeVariable*			velocityField,
+	Director*			director )
 {
    AlignmentSwarmVariable* self = (AlignmentSwarmVariable*) _AlignmentSwarmVariable_DefaultNew( name );
 
-   /* init parent */
-   _SwarmVariable_Init( (SwarmVariable*)self, context, swarm, variable, dofCount );
-   /* init self */
-   _AlignmentSwarmVariable_Init( self, velocityField, director );
-   
    self->isConstructed = True;
+   _SwarmVariable_Init( (SwarmVariable*)self, context, swarm, variable, dofCount );
+   _AlignmentSwarmVariable_Init( self, velocityField, director );
 
    return self;
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-AlignmentSwarmVariable* _AlignmentSwarmVariable_New(
-      SizeT                                              sizeOfSelf,
-      Type                                               type,
-      Stg_Class_DeleteFunction*                          _delete,
-      Stg_Class_PrintFunction*                           _print,
-      Stg_Class_CopyFunction*                            _copy,
-      Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-      Stg_Component_ConstructFunction*                   _construct,
-      Stg_Component_BuildFunction*                       _build,
-      Stg_Component_InitialiseFunction*                  _initialise,
-      Stg_Component_ExecuteFunction*                     _execute,
-      Stg_Component_DestroyFunction*                     _destroy,
-      SwarmVariable_ValueAtFunction*                     _valueAt,
-      SwarmVariable_GetGlobalValueFunction*              _getMinGlobalMagnitude,
-      SwarmVariable_GetGlobalValueFunction*              _getMaxGlobalMagnitude,
-      Name                                               name )
-{
-   AlignmentSwarmVariable*             self;
+AlignmentSwarmVariable* _AlignmentSwarmVariable_New( ALIGNMENTSWARMVARIABLE_DEFARGS ) {
+   AlignmentSwarmVariable* self;
 
    /* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
    assert( sizeOfSelf >= sizeof(AlignmentSwarmVariable) );
-   self = (AlignmentSwarmVariable*) _SwarmVariable_New(
-         sizeOfSelf,
-         type,
-         _delete,
-         _print,
-         _copy,
-         _defaultConstructor,
-         _construct,
-         _build,
-         _initialise,
-         _execute,
-         _destroy,
-         _valueAt,
-         _getMinGlobalMagnitude,
-         _getMaxGlobalMagnitude,
-         name );
+   self = (AlignmentSwarmVariable*) _SwarmVariable_New( SWARMVARIABLE_PASSARGS );
 
    /* Function pointers for this class that are not on the parent class should be set here */
 
    return self;
 }
 
-void _AlignmentSwarmVariable_Init(
-      AlignmentSwarmVariable*                            self,
-      FeVariable*                                        velocityField,
-      Director*                                          director )
-{
+void _AlignmentSwarmVariable_Init( void* druckerPrager, FeVariable* velocityField, Director* director ) {
+   AlignmentSwarmVariable*	self = (AlignmentSwarmVariable*)druckerPrager;
+
    self->dofCount = 1;
    self->director = director;
    self->velocityField = velocityField;
@@ -150,69 +114,64 @@ void* _AlignmentSwarmVariable_DefaultNew( Name name ) {
       _AlignmentSwarmVariable_Initialise,
       _SwarmVariable_Execute,
       _AlignmentSwarmVariable_Destroy,
+		name,
+		NON_GLOBAL,
       _AlignmentSwarmVariable_ValueAt,
       _AlignmentSwarmVariable_GetMinGlobalMagnitude,
-      _AlignmentSwarmVariable_GetMaxGlobalMagnitude,
-      name );
+      _AlignmentSwarmVariable_GetMaxGlobalMagnitude );
 }
 
 void _AlignmentSwarmVariable_AssignFromXML( void* druckerPrager, Stg_ComponentFactory* cf, void* data ){
-   AlignmentSwarmVariable*   self           = (AlignmentSwarmVariable*)druckerPrager;
-   FeVariable*               velocityField;
-   Director*                 director;
+   AlignmentSwarmVariable*	self = (AlignmentSwarmVariable*)druckerPrager;
+   FeVariable*					velocityField;
+   Director*					director;
 
    /* AssignFromXML Parent */
    _SwarmVariable_AssignFromXML( self, cf, data );
 
    /* AssignFromXML 'AlignmentSwarmVariable' stuff */
    velocityField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField", FeVariable, True, data ) ;
-   director      = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Director", Director, True, data ) ;
+   director = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Director", Director, True, data ) ;
 
-   _AlignmentSwarmVariable_Init(
-         self,
-         velocityField,
-         director );
+   _AlignmentSwarmVariable_Init( self, velocityField, director );
 }
 
 void _AlignmentSwarmVariable_Build( void* alignment, void* data ) {
-   AlignmentSwarmVariable*                       self               = (AlignmentSwarmVariable*) alignment;
+   AlignmentSwarmVariable* self = (AlignmentSwarmVariable*) alignment;
 
    /* Build parent */
    _SwarmVariable_Build( self, data );
 
-   Stg_Component_Build( self->director,      data, False );
+   Stg_Component_Build( self->director, data, False );
    Stg_Component_Build( self->velocityField, data, False );
 }
 
 void _AlignmentSwarmVariable_Initialise( void* alignment, void* data ) {
-   AlignmentSwarmVariable*                       self               = (AlignmentSwarmVariable*) alignment;
+   AlignmentSwarmVariable* self = (AlignmentSwarmVariable*) alignment;
 
    /* Initialise Parent */
    _SwarmVariable_Initialise( self, data );
 
-   Stg_Component_Initialise( self->director,      data, False );
+   Stg_Component_Initialise( self->director, data, False );
    Stg_Component_Initialise( self->velocityField, data, False );
-
 }
 
 void _AlignmentSwarmVariable_Destroy( void* alignment, void* data ) {
-   AlignmentSwarmVariable*                       self               = (AlignmentSwarmVariable*) alignment;
+   AlignmentSwarmVariable* self = (AlignmentSwarmVariable*) alignment;
 
-
-   Stg_Component_Destroy( self->director,      data, False );
+   Stg_Component_Destroy( self->director, data, False );
    Stg_Component_Destroy( self->velocityField, data, False );
 
    /* Destroy Parent */
    _SwarmVariable_Destroy( self, data );
-
 }
 
 void _AlignmentSwarmVariable_ValueAt( void* alignment, Particle_Index lParticle_I, double* value ) {
-   AlignmentSwarmVariable* self               = (AlignmentSwarmVariable*) alignment;
+   AlignmentSwarmVariable* self = (AlignmentSwarmVariable*) alignment;
    GlobalParticle*         particle;
    XYZ                     normal;
    double                  velocity[3];
-   Dimension_Index         dim                = self->swarm->dim;
+   Dimension_Index         dim = self->swarm->dim;
 
    particle = (GlobalParticle*)Swarm_ParticleAt( self->swarm, lParticle_I );
 

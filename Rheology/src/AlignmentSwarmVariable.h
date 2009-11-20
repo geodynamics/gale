@@ -55,53 +55,53 @@
       __SwarmVariable \
       /* Virtual functions go here */ \
       /* General Info */\
-      Director*                                           director;                              \
-      FeVariable*                                         velocityField;
+      Director*	director; \
+      FeVariable*	velocityField;
 
    struct AlignmentSwarmVariable { __AlignmentSwarmVariable };
+
+	#define ALIGNMENTSWARMVARIABLE_DEFARGS \
+		SWARMVARIABLE_DEFARGS
+
+	#define ALIGNMENTSWARMVARIABLE_PASSARGS \
+		SWARMVARIABLE_PASSARGS
 
    /** Public Constructor */
 
    AlignmentSwarmVariable* AlignmentSwarmVariable_New(
-      Name                                               name,
-      AbstractContext*                                   context,
-      Swarm*                                             swarm,
-      Variable*                                          variable,
-      Index                                              dofCount,
-      FeVariable*                                        velocityField,
-      Director*                                          director ) ;
+      Name					name,
+      AbstractContext*	context,
+      Swarm*				swarm,
+      Variable*			variable,
+      Index					dofCount,
+      FeVariable*			velocityField,
+      Director*			director ) ;
 
    /** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-   AlignmentSwarmVariable* _AlignmentSwarmVariable_New(
-      SizeT                                              sizeOfSelf,
-      Type                                               type,
-      Stg_Class_DeleteFunction*                          _delete,
-      Stg_Class_PrintFunction*                           _print,
-      Stg_Class_CopyFunction*                            _copy,
-      Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-      Stg_Component_ConstructFunction*                   _construct,
-      Stg_Component_BuildFunction*                       _build,
-      Stg_Component_InitialiseFunction*                  _initialise,
-      Stg_Component_ExecuteFunction*                     _execute,
-      Stg_Component_DestroyFunction*                     _destroy,
-      SwarmVariable_ValueAtFunction*                     _valueAt,
-      SwarmVariable_GetGlobalValueFunction*              _getMinGlobalMagnitude,
-      SwarmVariable_GetGlobalValueFunction*              _getMaxGlobalMagnitude,
-      Name                                               name ) ;
+   AlignmentSwarmVariable* _AlignmentSwarmVariable_New( ALIGNMENTSWARMVARIABLE_DEFARGS );
 
    /* 'Stg_Component' implementations */
-   void* _AlignmentSwarmVariable_DefaultNew( Name name ) ;
+   void* _AlignmentSwarmVariable_DefaultNew( Name name );
+
+	void _AlignmentSwarmVariable_Init( void* druckerPrager, FeVariable* velocityField, Director* director );
+
    void _AlignmentSwarmVariable_AssignFromXML( void* alignment, Stg_ComponentFactory* cf, void* data );
+
    void _AlignmentSwarmVariable_Build( void* alignment, void* data );
-   void _AlignmentSwarmVariable_Initialise( void* alignment, void* data ) ;
-   void _AlignmentSwarmVariable_Delete( void* alignment ) ;
-   void _AlignmentSwarmVariable_Build( void* alignment, void* data ) ;
-   void _AlignmentSwarmVariable_Destroy( void* alignment, void* data ) ;
-   void _AlignmentSwarmVariable_Init( AlignmentSwarmVariable* self, FeVariable* velocityField, Director* director );
+
+   void _AlignmentSwarmVariable_Initialise( void* alignment, void* data );
+
+   void _AlignmentSwarmVariable_Delete( void* alignment );
+
+   void _AlignmentSwarmVariable_Build( void* alignment, void* data );
+
+   void _AlignmentSwarmVariable_Destroy( void* alignment, void* data );
 
    /* 'SwarmVariable Virtual Implementations */
-   void _AlignmentSwarmVariable_ValueAt( void* alignment, Particle_Index lParticle_I, double* value ) ;
-   double _AlignmentSwarmVariable_GetMinGlobalMagnitude( void* alignment ) ;
-   double _AlignmentSwarmVariable_GetMaxGlobalMagnitude( void* alignment ) ;
+   void _AlignmentSwarmVariable_ValueAt( void* alignment, Particle_Index lParticle_I, double* value ); 
+
+   double _AlignmentSwarmVariable_GetMinGlobalMagnitude( void* alignment );
+
+   double _AlignmentSwarmVariable_GetMaxGlobalMagnitude( void* alignment );
 
 #endif
