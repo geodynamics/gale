@@ -80,10 +80,13 @@ NodalPressureField* _NodalPressureField_New(
    return self;
 }
 
-void _NodalPressureField_Init( NodalPressureField* self, Variable_Register* variable_Register, FeVariable* pressureField) {
+void _NodalPressureField_Init( NodalPressureField* self, Variable_Register* variable_Register, FeVariable* pressureField, SystemLinearEquations* sle) {
    self->variable_Register = variable_Register;
    self->fieldComponentCount = 1;
    self->pressureField = pressureField;
+   if( sle )
+      SystemLinearEquations_AddPostNonLinearEP( sle, NodalPressureField_Type, NodalPressureField_NonLinearUpdate );
+   
 }
 
 void* _NodalPressureField_DefaultNew( Name name ) {
@@ -158,14 +161,13 @@ void _NodalPressureField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, v
 
    pressureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, True, data );
 
-   _NodalPressureField_Init( self, variable_Register, pressureField );
-
    /*
    ** If we're using this field for non-linear feedback, we'll need to update it in between
    ** non-linear iterations. */
    sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, "SLE", SystemLinearEquations, False, data );
-   if( sle )
-      SystemLinearEquations_AddPostNonLinearEP( sle, NodalPressureField_Type, NodalPressureField_NonLinearUpdate );
+
+   _NodalPressureField_Init( self, variable_Register, pressureField, sle );
+
 }
 
 void _NodalPressureField_Build( void* _self, void* data ) {
@@ -200,6 +202,7 @@ void _NodalPressureField_Build( void* _self, void* data ) {
 
    /* Build and Update all Variables that this component has created */
    Stg_Component_Build( self->dataVariable, data, False); Variable_Update( self->dataVariable );
+   Stg_Component_Build( self->pressureField, data, False);
 
    _ParticleFeVariable_Build( self, data );
    /* Update again, just in case things were changed/reallocated when ICs loaded */
@@ -213,6 +216,8 @@ void _NodalPressureField_Initialise( void* _self, void* data ) {
 	
    /* Initialise and Update all Variables that this component has created */
    Stg_Component_Initialise( self->dataVariable, data, False); Variable_Update( self->dataVariable );
+   
+   Stg_Component_Initialise( self->pressureField, data, False);
 	
    _ParticleFeVariable_Initialise( self, data );
 
@@ -229,6 +234,8 @@ void _NodalPressureField_Execute( void* _self, void* data ) {
 
 void _NodalPressureField_Destroy( void* _self, void* data ) {
    NodalPressureField* self = (NodalPressureField*) _self;
+
+   Stg_Component_Destroy( self->pressureField, data, False);
 
    _ParticleFeVariable_Destroy( self, data );
 }

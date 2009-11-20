@@ -50,7 +50,7 @@
       ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
       Name                                              name );
 
-	void _NodalPressureField_Init( NodalPressureField* self, Variable_Register* variable_Register, FeVariable* pressureField );
+	void _NodalPressureField_Init( NodalPressureField* self, Variable_Register* variable_Register, FeVariable* pressureField, SystemLinearEquations* sle );
 
 	void* _NodalPressureField_DefaultNew( Name name );
 	
@@ -81,4 +81,5 @@
 		void*							particle,
 		double*						pressure ) ;
 
+   void NodalPressureField_NonLinearUpdate( void* _sle, void* _ctx );
 #endif
