@@ -267,6 +267,7 @@ void _ParticleFeVariable_Execute( void* materialFeVariable, void* _ctx ) {
 void _ParticleFeVariable_Destroy( void* materialFeVariable, void* data ) {
 	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
 
+	Memory_Free( self->data );
 	Stg_Component_Destroy( self->assemblyVector, data, False );
 	Stg_Component_Destroy( self->assemblyTerm, data, False );
 
