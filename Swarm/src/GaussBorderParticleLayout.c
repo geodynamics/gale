@@ -105,8 +105,8 @@ GaussBorderParticleLayout* _GaussBorderParticleLayout_New(
 		_initialiseParticlesOfCell,
 		name,
 		initFlag,
-		LocalCoordSystem,
-		True );
+		dim,
+		particlesPerDim );
 
 	self->particlesPerFace = Memory_Alloc_Array_Unnamed( Particle_InCellIndex, 6); // up to 6 faces (3d case)
 	
@@ -315,7 +315,7 @@ void _GaussBorderParticleLayout_InitialiseParticlesOfCell( void* gaussBorderPart
 			// (and I've modified it to work with this layout)
 			if ( 0 == strcmp( swarm->type, "MaterialPointsSwarm" ) ) {
 				((GlobalParticle*)particle)->coord[ GaussBorderParticleLayout_GetFaceAxis(self, face_I, dim_I) ] = 
-					min[ GaussBorderParticleLayout_GetFaceAxis(face_I, self->dim, dim_I) ] +
+                                  min[ GaussBorderParticleLayout_GetFaceAxis(self, face_I, dim_I) ] +
 					0.5 * ( max[ GaussBorderParticleLayout_GetFaceAxis(self, face_I, dim_I) ] 
 						- min[ GaussBorderParticleLayout_GetFaceAxis(self, face_I, dim_I) ] ) 
 					        * ( abscissa[ index ] + 1.0 );
