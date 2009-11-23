@@ -98,7 +98,7 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 		}
 
 		/* Simple test */
-		dof = DofLayout_New( "dofLayout", variableRegister, arraySize, NULL );
+		dof = DofLayout_New( "dofLayout", NULL, variableRegister, arraySize, NULL );
 		for (ii = 0; ii < arraySize; ii++)
 			for (var_I = 0; var_I < 6; var_I++)
 				DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);
@@ -115,7 +115,7 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 
 		/* Advanced test */
 		for (ii = 0; ii < 27; ii++) counts[ii] = 0;
-		dof = DofLayout_New( "dofLayout1", variableRegister, arraySize, NULL );
+		dof = DofLayout_New( "dofLayout1", NULL, variableRegister, arraySize, NULL );
 		
 		for (ii = 0; ii < 12; ii++) {
 			for (var_I = 0; var_I < 2; var_I++) {
@@ -141,8 +141,8 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 		Stg_Class_Delete(dof);
 
 		/* Copy test */
- 		dof = DofLayout_New( "dofLayout2", variableRegister, arraySize, NULL );
-		destDof = DofLayout_New( "dofLayout3", variableRegister, arraySize, NULL );
+ 		dof = DofLayout_New( "dofLayout2", NULL, variableRegister, arraySize, NULL );
+		destDof = DofLayout_New( "dofLayout3", NULL, variableRegister, arraySize, NULL );
 		for (ii = 0; ii < arraySize; ii++) {
 			for (var_I = 0; var_I < 3; var_I++) {
 				DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);
@@ -255,7 +255,7 @@ void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
 		}
 
 		/* Simple test */
-		dof = DofLayout_New( "dofLayout", variableRegister, 27, NULL );
+		dof = DofLayout_New( "dofLayout", NULL, variableRegister, 27, NULL );
 		for (i = 0; i < 6; i++) {
 			for (j = 0; j < 27; j++) {
 				DofLayout_AddDof_ByVarName(dof, varName[i], j);
@@ -333,7 +333,7 @@ void DofLayoutSuite_TestSaveAndLoad( DofLayoutSuiteData* data ) {
 		}
 
 		/* Simple test */
-		dof = DofLayout_New( "dofLayout", variableRegister, arraySize, NULL );
+		dof = DofLayout_New( "dofLayout", NULL, variableRegister, arraySize, NULL );
 		for (ii = 0; ii < arraySize; ii++) {
 			for (var_I = 0; var_I < 6; var_I++) {
 				DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);

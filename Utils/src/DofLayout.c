@@ -63,117 +63,63 @@ Dof_Index	_DofLayout_AddVariable_ByName(void* dofLayout, Name varName);
 ** Constructor
 */
 
-DofLayout* _DofLayout_DefaultNew( Name name )
-{
+DofLayout* DofLayout_New( Name name, DomainContext* context, Variable_Register* variableRegister, Index numItemsInLayout, void* mesh ) {
+	DofLayout* self = _DofLayout_DefaultNew( name );
+
+	self->isConstructed = True;
+	_DofLayout_Init( self, context, variableRegister, numItemsInLayout, 0, NULL, mesh );
+
+	return self;
+}
+
+DofLayout* _DofLayout_DefaultNew( Name name ) {
 	return _DofLayout_New(
-			sizeof(DofLayout), 
-			DofLayout_Type, 
-			_DofLayout_Delete, 
-			_DofLayout_Print, 
-			_DofLayout_Copy,
-			(Stg_Component_DefaultConstructorFunction*)_DofLayout_DefaultNew,
-			_DofLayout_AssignFromXML,
-			_DofLayout_Build, 
-			_DofLayout_Initialise, 
-			_DofLayout_Execute, 
-			_DofLayout_Destroy,
-			name,
-			False,
-			NULL, 
-			0, 
-			NULL );
+		sizeof(DofLayout), 
+		DofLayout_Type, 
+		_DofLayout_Delete, 
+		_DofLayout_Print, 
+		_DofLayout_Copy,
+		(Stg_Component_DefaultConstructorFunction*)_DofLayout_DefaultNew,
+		_DofLayout_AssignFromXML,
+		_DofLayout_Build, 
+		_DofLayout_Initialise, 
+		_DofLayout_Execute, 
+		_DofLayout_Destroy,
+		name,
+		NON_GLOBAL,
+		NULL, 
+		0, 
+		NULL );
 }
 
-DofLayout* DofLayout_New( Name name, Variable_Register* variableRegister, Index numItemsInLayout, void* mesh )
-{
-	return _DofLayout_New(
-			sizeof(DofLayout), 
-			DofLayout_Type, 
-			_DofLayout_Delete, 
-			_DofLayout_Print, 
-			_DofLayout_Copy,
-			(Stg_Component_DefaultConstructorFunction*)_DofLayout_DefaultNew,
-			_DofLayout_AssignFromXML,
-			_DofLayout_Build, 
-			_DofLayout_Initialise, 
-			_DofLayout_Execute, 
-			_DofLayout_Destroy,
-			name, 
-			True,
-			variableRegister, 
-			numItemsInLayout, 
-			mesh );
-}
-
-
-void DofLayout_Init(DofLayout* self, Name name, Variable_Register* variableRegister, Index numItemsInLayout, void* mesh )
-{
-	/* General info */
-	self->type = Variable_Type;
-	self->_sizeOfSelf = sizeof(Variable);
-	self->_deleteSelf = False;
-	
-	/* Virtual info */
-	self->_delete = _Variable_Delete;
-	self->_print = _Variable_Print;
-	self->_copy = _DofLayout_Copy;
-	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_DofLayout_DefaultNew;
-	self->_construct = _DofLayout_AssignFromXML;
-	self->_build = _DofLayout_Build;
-	self->_execute = _DofLayout_Execute;
-	self->_destroy = _DofLayout_Destroy;
-	
-	_Stg_Class_Init((Stg_Class*)self);
-	
-	/* Stg_Class info */
-	_DofLayout_Init(self, variableRegister, numItemsInLayout, 0, NULL, mesh);
-}
-
-DofLayout* _DofLayout_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*			_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name						name,
-		Bool						initFlag,
-		Variable_Register*				variableRegister,
-		Index						numItemsInLayout, 
-		void*						mesh )
-{
-	DofLayout*	self;
+DofLayout* _DofLayout_New( DOFLAYOUT_DEFARGS ) {
+	DofLayout* self;
 	
 	/* Allocate memory/General info */
-	assert(_sizeOfSelf >= sizeof(DofLayout));
-	self = (DofLayout*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, (Stg_Component_DefaultConstructorFunction*)_DofLayout_DefaultNew,
-			_construct, _build, _initialise, _execute, _destroy, name, NON_GLOBAL );
+	assert( sizeOfSelf >= sizeof(DofLayout) );
+	self = (DofLayout*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
 	
 	/* Virtual info */
 	self->_build = _build;
 	self->_initialise = _initialise;
 	
 	/* Stg_Class info */
-	if( initFlag ){
-		_DofLayout_Init(self, variableRegister, numItemsInLayout, 0, NULL, mesh );
-	}
 	
 	return self;
 }
 
-
-void _DofLayout_Init(void* dofLayout, Variable_Register* variableRegister, 
-		     Index numItemsInLayout, Variable_Index baseVariableCount, Variable** baseVariableArray, void* _mesh )
+void _DofLayout_Init(
+	void*						dofLayout,
+	DomainContext*			context,
+	Variable_Register*	variableRegister, 
+	Index						numItemsInLayout,
+	Variable_Index			baseVariableCount,
+	Variable**				baseVariableArray,
+	void*						_mesh )
 {
 	DofLayout*	self = (DofLayout*)dofLayout;
-	Mesh*		mesh = (Mesh*)_mesh;
+	Mesh*			mesh = (Mesh*)_mesh;
 	
-	self->isConstructed = True;
 	self->_variableRegister = variableRegister;
 
 	self->_numItemsInLayout = numItemsInLayout;
@@ -193,17 +139,15 @@ void _DofLayout_Init(void* dofLayout, Variable_Register* variableRegister,
 ** General virtual functions
 */
 
-void _DofLayout_Delete(void* dofLayout)
-{
-	DofLayout*	self = (DofLayout*)dofLayout;
+void _DofLayout_Delete(void* dofLayout) {
+	DofLayout* self = (DofLayout*)dofLayout;
 	
 	/* Stg_Class_Delete parent */
-	_Stg_Class_Delete(self);
+	_Stg_Component_Delete( self );
 }
 
 
-void _DofLayout_Print(void* dofLayout, Stream* stream)
-{
+void _DofLayout_Print(void* dofLayout, Stream* stream) {
 	DofLayout*	self = (DofLayout*)dofLayout;
 	
 	/* Set the Journal for printing informations */
@@ -225,7 +169,7 @@ void* _DofLayout_Copy( void* dofLayout, void* dest, Bool deep, Name nameExt, Ptr
 	DofLayout*	self = (DofLayout*)dofLayout;
 	DofLayout*	newDofLayout;
 	PtrMap*		map = ptrMap;
-	Bool		ownMap = False;
+	Bool			ownMap = False;
 	
 	if( !map ) {
 		map = PtrMap_New( 10 );
@@ -285,40 +229,40 @@ void* _DofLayout_Copy( void* dofLayout, void* dest, Bool deep, Name nameExt, Ptr
 	return (void*)newDofLayout;
 }
 
-void _DofLayout_AssignFromXML( void* dofLayout, Stg_ComponentFactory* cf, void* data ) 
-{
-	DofLayout *             self              = (DofLayout*)dofLayout;
+void _DofLayout_AssignFromXML( void* dofLayout, Stg_ComponentFactory* cf, void* data ) {
+	DofLayout *             self = (DofLayout*)dofLayout;
 	Dictionary*             thisComponentDict = NULL;
-	void*                   variableRegister  = NULL;
+	void*                   variableRegister = NULL;
 	Dictionary_Entry_Value* list;
 	Variable_Index          baseVariableCount = 0;
-	Variable**              baseVariableList  = NULL;
-	Mesh*			mesh;
+	Variable**              baseVariableList = NULL;
+	Mesh*							mesh;
+	DomainContext*				context;
 
 	/* Get component's dictionary setup */
 	assert( cf->componentDict );
 	thisComponentDict = Dictionary_GetDictionary( cf->componentDict, self->name );
 	assert( thisComponentDict );
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 
 	/* Get the mesh. */
 	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
 
-	variableRegister = self->context->variable_Register; 
+	variableRegister = context->variable_Register; 
 	assert( variableRegister );
 
 	if (( list = Dictionary_Get( thisComponentDict, "BaseVariables" ) )) {
-		Variable_Index          baseVariable_I    = 0;
-		Name                    variableName;
+		Variable_Index	baseVariable_I    = 0;
+		Name				variableName;
 
 		baseVariableCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "BaseVariableCount", Dictionary_Entry_Value_GetCount( list ) );
 		Journal_Firewall(
-				baseVariableCount <= Dictionary_Entry_Value_GetCount( list ),
-				Journal_Register( Error_Type, self->type ),
-				"BaseVariableCount %u is too large for list given.\n", baseVariableCount );
+			baseVariableCount <= Dictionary_Entry_Value_GetCount( list ),
+			Journal_Register( Error_Type, self->type ),
+			"BaseVariableCount %u is too large for list given.\n", baseVariableCount );
 
 		baseVariableList = Memory_Alloc_Array( Variable*, baseVariableCount, "baseVariableList" );
 		
@@ -327,13 +271,13 @@ void _DofLayout_AssignFromXML( void* dofLayout, Stg_ComponentFactory* cf, void* 
 
 			Journal_PrintfL( cf->infoStream, 2, "Looking for Variable '%s' in Variable_Register\n", variableName );
 			baseVariableList[ baseVariable_I ] = Variable_Register_GetByName( variableRegister, variableName );
+
 			if ( !baseVariableList[ baseVariable_I ] )
-				baseVariableList[ baseVariable_I ] = 
-					Stg_ComponentFactory_ConstructByName( cf, variableName, Variable, True, data );
+				baseVariableList[ baseVariable_I ] = Stg_ComponentFactory_ConstructByName( cf, variableName, Variable, True, data );
 		}
 	}
 	
-	_DofLayout_Init( self, variableRegister, 0, baseVariableCount, baseVariableList, mesh );
+	_DofLayout_Init( self, context, variableRegister, 0, baseVariableCount, baseVariableList, mesh );
 }
 
 void _DofLayout_Build( void* dofLayout, void* data ) {
