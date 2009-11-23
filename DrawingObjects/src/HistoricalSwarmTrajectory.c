@@ -254,7 +254,7 @@ void _lucHistoricalSwarmTrajectory_Setup( void* drawingObject, void* _context ) 
 		particle    = (GlobalParticle*)Swarm_ParticleAt( swarm, lParticle_I );
 		particleExt = ExtensionManager_Get( swarm->particleExtensionMgr, particle, self->particleExtHandle );
 
-		particleExt->historyCoordList = particleExt + sizeof( lucHistoricalSwarmTrajectory_ParticleExt );
+		particleExt->historyCoordList = (Coord*)(particleExt + sizeof( lucHistoricalSwarmTrajectory_ParticleExt ));
 
 		memcpy( particleExt->historyCoordList[ currentTimestep ], particle->coord, sizeof(Coord) );
 	}
