@@ -152,8 +152,6 @@ void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
 		Journal_Printf( Journal_Register( Info_Type, "success" ), "Shadow particle validation: passed\n" );
 	}
 
-	Stg_Class_Delete( dictionary );
-
 	stgMainDestroy( cf );
 }
 

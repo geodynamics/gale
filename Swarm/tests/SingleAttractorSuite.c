@@ -151,8 +151,6 @@ void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) 
 	pcu_check_fileEq( "testSingleAttractor.dat", expected_file );
 	remove( "testSingleAttractor.dat" );
 
-   Stg_Class_Delete( dictionary );
-
    stgMainDestroy( cf );
 }
 
