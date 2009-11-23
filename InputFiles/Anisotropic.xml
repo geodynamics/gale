@@ -81,21 +81,21 @@
 	</struct>
 
 	<!-- Simulation control -->
-	<param name="maxTimeSteps"> 20000 </param>
+	<param name="maxTimeSteps"> 200000 </param>
 	<param name="outputPath"> ./output </param>
 	<param name="dumpEvery"> 1 </param>	
 	<param name="checkpointEvery"> 0 </param>
 
-        <!--   choose what to checkpoint
+	<!-- choose what to checkpoint
 	<list name="FieldVariablesToCheckpoint">
 		<param>VelocityField</param>
 		<param>VelocityGradientsField</param>
 	</list>
 	-->
 
-        <!--  restart from a previous checkpoint 
-        <param name="restartTimestep"> 10 </param>
-         -->
+	<!--  restart from a previous checkpoint 
+	<param name="restartTimestep"> 10 </param>
+	-->
 	
 	<param name="Ra"> 5.6e5 </param>	
 	
@@ -134,7 +134,7 @@
 	<param name="particlesPerCell"> 20 </param>
 
 	<!-- Viewport stuff -->
-	<!--<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
+	<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
 	<include>Underworld/Viewports/VelocityMagnitudeVP.xml</include>
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
@@ -165,5 +165,6 @@
 		<struct name="window" mergeType="merge">
 			<param name="Viewport">TemperatureAndVelocityArrowsVP VelocityMagnitudeVP AlignmentVP</param>
 		</struct>
-	</struct>-->
+	</struct>
+
 </StGermainData>

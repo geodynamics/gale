@@ -134,7 +134,7 @@
 	<include> Underworld/VariableConditions/velocityBCs.freeslip.xml </include>
 
 	<!-- Visualisation stuff -->
-	<!--<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
+	<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
 	<include>Underworld/Viewports/ParticleDensityVP.xml</include>
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
@@ -144,6 +144,6 @@
 				<param>ParticleDensityVP</param>
 			</list>
 		</struct>
-	</struct>-->
+	</struct>
  
 </StGermainData>

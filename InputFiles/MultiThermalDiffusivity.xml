@@ -232,7 +232,7 @@ appropriate parameters and their values if you use this xml from production runs
 	<param name="particlesPerCell"> 20 </param>
 
 	<!-- Viewport stuff -->
-	<!--<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
+	<include>Underworld/Viewports/TemperatureAndVelocityArrowsVP.xml</include>
 	<include>Underworld/Viewports/VelocityMagnitudeVP.xml</include>
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
@@ -273,6 +273,6 @@ appropriate parameters and their values if you use this xml from production runs
 		<struct name="window" mergeType="merge">
 			<param name="Viewport">TemperatureAndVelocityArrowsVP ParticleVP </param>
 		</struct>
-	</struct>-->
+	</struct>
  
 </StGermainData>

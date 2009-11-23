@@ -177,13 +177,12 @@
 	<param name="CentroidMaterial">cylinderMaterial</param>
 
 	<!-- Visualisation stuff -->
-	<!--
 	<include>Underworld/Viewports/CylinderRiseThermalVP.xml</include>
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
 			<param name="Viewport">CylinderRiseThermalVP</param>
 		</struct>
-	</struct>-->
+	</struct>
 
 </StGermainData>	

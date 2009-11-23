@@ -149,12 +149,12 @@
 	<include> Underworld/VariableConditions/velocityBCs.extension.xml </include>
 
 	<!-- Visualisation stuff -->
-	<!--<include>Underworld/Viewports/StrainRateInvariantVP.xml</include>
+	<include>Underworld/Viewports/StrainRateInvariantVP.xml</include>
 	<include>glucifer/window.xml</include>
 	<struct name="components" mergeType="merge">
 		<struct name="window" mergeType="merge">
 			<param name="Viewport">StrainRateInvariantVP</param>
 		</struct>
-	</struct>-->
+	</struct>
 
 </StGermainData>
