@@ -189,7 +189,7 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 	/* Create variables */
 	Variable_NewScalar( "phi", Variable_DataType_Double, &nDomainVerts, NULL, (void**)&nodes, variableRegister );
 
-	dofs = DofLayout_New( "dofLayout", variableRegister, Mesh_GetDomainSize( feMesh, MT_VERTEX ), NULL );
+	dofs = DofLayout_New( "dofLayout", context, variableRegister, Mesh_GetDomainSize( feMesh, MT_VERTEX ), NULL );
 	for (i = 0; i < Mesh_GetDomainSize( feMesh, MT_VERTEX ); i++)
 		DofLayout_AddDof_ByVarName(dofs, "phi", i);
 	

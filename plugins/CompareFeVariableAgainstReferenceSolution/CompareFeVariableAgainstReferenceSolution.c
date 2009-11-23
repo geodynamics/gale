@@ -367,8 +367,8 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	/* Create Dof layout for this variable based on its own DataVariable */
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "Reference-DofLayout" );
 	tmpName2 = Stg_Object_AppendSuffix( feVarToTest, "Rounded-DofLayout" );
-	referenceDofLayout = DofLayout_New( tmpName, variable_Register, Mesh_GetDomainSize( feVarToTest->feMesh, MT_VERTEX ), NULL );
-	roundedDofLayout = DofLayout_New( tmpName2, variable_Register, Mesh_GetDomainSize( feVarToTest->feMesh, MT_VERTEX ), NULL );
+	referenceDofLayout = DofLayout_New( tmpName, (DomainContext*)self->context, variable_Register, Mesh_GetDomainSize( feVarToTest->feMesh, MT_VERTEX ), NULL );
+	roundedDofLayout = DofLayout_New( tmpName2, (DomainContext*)self->context, variable_Register, Mesh_GetDomainSize( feVarToTest->feMesh, MT_VERTEX ), NULL );
 
 	if ( scalar ) {
 		DofLayout_AddAllFromVariableArray( referenceDofLayout, 1, &referenceDataVariable );

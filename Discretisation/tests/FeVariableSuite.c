@@ -50,22 +50,22 @@ struct _Particle {
 };
 
 FeVariable* BuildFeVariable_AsPosition( unsigned dim ) {
-	CartesianGenerator* gen;
-	FeMesh* feMesh;
-	DofLayout* dofs;
-	FeEquationNumber* eqNum;
-	Variable_Register* varReg;
-	int maxDecomp[3] = {0, 1, 1};
-	int sizes[3];
-	double minCrd[3];
-	double maxCrd[3];
-	static int arraySize;
-	static double* arrayPtrs[3];
-	int nRanks;
-	Variable* var;
-	FieldVariable_Register* fieldReg;
-	FeVariable* feVar;
-	int n_i;
+	CartesianGenerator*		gen;
+	FeMesh*						feMesh;
+	DofLayout*					dofs;
+	FeEquationNumber*			eqNum;
+	Variable_Register*		varReg;
+	int							maxDecomp[3] = {0, 1, 1};
+	int							sizes[3];
+	double						minCrd[3];
+	double						maxCrd[3];
+	static int					arraySize;
+	static double*				arrayPtrs[3];
+	int							nRanks;
+	Variable*					var;
+	FieldVariable_Register*	fieldReg;
+	FeVariable*					feVar;
+	int							n_i;
 
 	MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
 	sizes[0] = nRanks * 3;
@@ -90,10 +90,10 @@ FeVariable* BuildFeVariable_AsPosition( unsigned dim ) {
 	arrayPtrs[0] = Memory_Alloc_Array_Unnamed( double, arraySize * dim );
 
 	var = Variable_NewVector( "velocity", Variable_DataType_Double, dim, (unsigned*)&arraySize, NULL,
-	                          (void**)arrayPtrs, varReg, "vx", "vy", "vz" );
+		(void**)arrayPtrs, varReg, "vx", "vy", "vz" );
 	Variable_Register_BuildAll( varReg );
 
-	dofs = DofLayout_New( "", varReg, 0, feMesh );
+	dofs = DofLayout_New( "", NULL, varReg, 0, feMesh );
 	dofs->nBaseVariables = dim;
 	dofs->baseVariables = Memory_Alloc_Array_Unnamed( Variable*, dim );
 	dofs->baseVariables[0] = var->components[0];
@@ -122,22 +122,22 @@ FeVariable* BuildFeVariable_AsPosition( unsigned dim ) {
 }
 
 FeVariable* BuildFeVariable_AsConstant( unsigned dim ) {
-	CartesianGenerator* gen;
-	FeMesh* feMesh;
-	DofLayout* dofs;
-	FeEquationNumber* eqNum;
-	Variable_Register* varReg;
-	int maxDecomp[3] = {0, 1, 1};
-	int sizes[3];
-	double minCrd[3];
-	double maxCrd[3];
-	static int arraySize;
-	static double* arrayPtr;
-	int nRanks;
-	Variable* var;
-	FieldVariable_Register* fieldReg;
-	FeVariable* feVar;
-	int n_i;
+	CartesianGenerator*		gen;
+	FeMesh*						feMesh;
+	DofLayout*					dofs;
+	FeEquationNumber*			eqNum;
+	Variable_Register*		varReg;
+	int							maxDecomp[3] = {0, 1, 1};
+	int							sizes[3];
+	double						minCrd[3];
+	double						maxCrd[3];
+	static int					arraySize;
+	static double*				arrayPtr;
+	int							nRanks;
+	Variable*					var;
+	FieldVariable_Register*	fieldReg;
+	FeVariable*					feVar;
+	int							n_i;
 	double constant[3] = {1.0, 1.0, 1.0};
 
 	MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
@@ -166,7 +166,7 @@ FeVariable* BuildFeVariable_AsConstant( unsigned dim ) {
 	                          (void**)&arrayPtr, varReg );
 	Variable_Register_BuildAll( varReg );
 
-	dofs = DofLayout_New( "", varReg, 0, feMesh );
+	dofs = DofLayout_New( "", NULL, varReg, 0, feMesh );
 	dofs->nBaseVariables = 1;
 	dofs->baseVariables = Memory_Alloc_Array_Unnamed( Variable*, 1 );
 	dofs->baseVariables[0] = var;

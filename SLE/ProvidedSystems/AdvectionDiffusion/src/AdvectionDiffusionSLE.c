@@ -315,21 +315,21 @@ void _AdvectionDiffusionSLE_Destroy( void* sle, void* data ) {
 /** Virtual Functions from "Stg_Component" Class */
 void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 	AdvectionDiffusionSLE*	self = (AdvectionDiffusionSLE*) sle;
-	Stream*                 errorStream = Journal_MyStream( Error_Type, self );
-	Index                   forceTerm_I;
-	Index                   forceTermCount = Stg_ObjectList_Count( self->residual->forceTermList );
-	ForceTerm*              forceTerm;
-	unsigned int           *nodeDomainCountPtr;
-	Variable*              variable;
-	Node_DomainIndex       node_I;
+	Stream*						errorStream = Journal_MyStream( Error_Type, self );
+	Index							forceTerm_I;
+	Index							forceTermCount = Stg_ObjectList_Count( self->residual->forceTermList );
+	ForceTerm*					forceTerm;
+	unsigned int				*nodeDomainCountPtr;
+	Variable*					variable;
+	Node_DomainIndex			node_I;
 
 	Journal_DPrintf( self->debug, "In %s()\n", __func__ );
 
 	/* Create New FeVariable for Phi Dot */
 	if (self->phiField) {
-		Variable_Register*	variable_Register;
-		FieldVariable_Register*	fieldVariable_Register;
-		char* fieldName, *dofName, *fieldDotName, *phiVecName, *phiDotVecName;
+		Variable_Register*			variable_Register;
+		FieldVariable_Register*		fieldVariable_Register;
+		char*								fieldName, *dofName, *fieldDotName, *phiVecName, *phiDotVecName;
 
 		variable_Register = self->variableReg;
 		fieldVariable_Register = self->fieldVariableReg;
@@ -339,22 +339,22 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 		assert( Class_IsSuper( self->phiField->feMesh->topo, IGraph ) );
 		nodeDomainCountPtr = &((IGraph*)self->phiField->feMesh->topo)->remotes[MT_VERTEX]->nDomains;
 
-    /* must create unique names otherwise multiple instances of this component
-     * will index incorrect instances of this component's data */
-    fieldName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+8 );
-    sprintf( fieldName, "%s-phiDot", self->name );
+ 		/* must create unique names otherwise multiple instances of this component
+		* will index incorrect instances of this component's data */
+		fieldName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+8 );
+		sprintf( fieldName, "%s-phiDot", self->name );
 
-    dofName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+11 );
-    sprintf( dofName, "%s-dofLayout", self->name );
+		dofName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+11 );
+		sprintf( dofName, "%s-dofLayout", self->name );
 
-    fieldDotName  = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+13 );
-    sprintf( fieldDotName, "%s-phiDotField", self->name );
+		fieldDotName  = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+13 );
+		sprintf( fieldDotName, "%s-phiDotField", self->name );
 
-    phiVecName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+11 );
-    sprintf( phiVecName, "%s-phiVector", self->name );
+		phiVecName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+11 );
+		sprintf( phiVecName, "%s-phiVector", self->name );
 
-    phiDotVecName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+14 );
-    sprintf( phiDotVecName, "%s-phiDotVector", self->name );
+		phiDotVecName = Memory_Alloc_Array_Unnamed( char, strlen(self->name)+14 );
+		sprintf( phiDotVecName, "%s-phiDotVector", self->name );
 
 		variable = Variable_NewScalar( 
 			fieldName, 
@@ -364,7 +364,7 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 			(void**)&self->phiDotArray, 
 			variable_Register );
 
-    self->phiDotDofLayout = DofLayout_New( dofName, variable_Register, *nodeDomainCountPtr, NULL );
+		self->phiDotDofLayout = DofLayout_New( dofName, (DomainContext*)self->context, variable_Register, *nodeDomainCountPtr, NULL );
 		//self->phiDotDofLayout = DofLayout_New( "dofLayout1", variable_Register, *nodeDomainCountPtr, NULL );
 		for( node_I = 0; node_I < *nodeDomainCountPtr ; node_I++ ) 
 			DofLayout_AddDof_ByVarName( self->phiDotDofLayout, variable->name, node_I );
@@ -380,15 +380,15 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 		self->phiDotField->context = (DomainContext*)self->context;
 
 		/* Construct Solution Vectors */
-		self->phiVector    = SolutionVector_New( phiVecName, self->context, self->phiField->communicator, self->phiField );
+		self->phiVector = SolutionVector_New( phiVecName, self->context, self->phiField->communicator, self->phiField );
 		self->phiDotVector = SolutionVector_New( phiDotVecName, self->context, self->phiField->communicator, self->phiDotField );
 
-    /* free original name variables */
-    Memory_Free(fieldName);
-    Memory_Free(dofName);
-    Memory_Free(fieldDotName);
-    Memory_Free(phiVecName);
-    Memory_Free(phiDotVecName);
+		/* free original name variables */
+		Memory_Free(fieldName);
+		Memory_Free(dofName);
+		Memory_Free(fieldDotName);
+		Memory_Free(phiVecName);
+		Memory_Free(phiDotVecName);
 	}
 
 	_SystemLinearEquations_Build( self, data );

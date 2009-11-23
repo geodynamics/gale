@@ -44,24 +44,24 @@ typedef struct {
 } FeEquationNumberSuiteData;
 
 FeEquationNumber* buildEqNum() {
-   CartesianGenerator* gen;
-   FeMesh* feMesh;
-   DofLayout* dofs;
-   FeEquationNumber* eqNum;
-   Variable_Register* varReg;
-   Variable* vars[2];
-   int maxDecomp[3] = {0, 1, 1};
-   int sizes[3];
-   double minCrd[3];
-   double maxCrd[3];
-   SizeT dataOffs = 1;
-   Variable_DataType dataType = Variable_DataType_Double;
-   int nDataTypes = 1;
-   char* dataNames = "nothing";
-   static SizeT structSize = sizeof(double);
-   static int arraySize;
-   static void* arrayPtrs[2];
-   int nRanks;
+   CartesianGenerator*	gen;
+   FeMesh*					feMesh;
+   DofLayout*				dofs;
+   FeEquationNumber*		eqNum;
+   Variable_Register*	varReg;
+   Variable*				vars[2];
+   int						maxDecomp[3] = {0, 1, 1};
+   int						sizes[3];
+   double					minCrd[3];
+   double					maxCrd[3];
+   SizeT						dataOffs = 1;
+   Variable_DataType		dataType = Variable_DataType_Double;
+   int						nDataTypes = 1;
+   char*						dataNames = "nothing";
+   static SizeT			structSize = sizeof(double);
+   static int				arraySize;
+   static void*			arrayPtrs[2];
+   int						nRanks;
 
    MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
    sizes[0] = nRanks * 2;
@@ -86,11 +86,11 @@ FeEquationNumber* buildEqNum() {
    arrayPtrs[0] = Memory_Alloc_Array_Unnamed( double, arraySize );
    arrayPtrs[1] = Memory_Alloc_Array_Unnamed( double, arraySize );
    vars[0] = Variable_New( "one", 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
-			   &dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs, varReg );
+		&dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs, varReg );
    vars[1] = Variable_New( "two", 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
-			   &dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs + 1, varReg );
+		&dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs + 1, varReg );
 
-   dofs = DofLayout_New( "", varReg, 0, feMesh );
+   dofs = DofLayout_New( "", NULL, varReg, 0, feMesh );
    dofs->nBaseVariables = 2;
    dofs->baseVariables = Memory_Alloc_Array_Unnamed( Variable*, 2 );
    dofs->baseVariables[0] = vars[0];
@@ -154,11 +154,11 @@ FeEquationNumber* buildEqNumBCs() {
    arrayPtrs[0] = Memory_Alloc_Array_Unnamed( double, arraySize );
    arrayPtrs[1] = Memory_Alloc_Array_Unnamed( double, arraySize );
    vars[0] = Variable_New( "one", 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
-			   &dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs, varReg );
-   vars[1] = Variable_New( "two", 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
-			   &dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs + 1, varReg );
+		&dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs, varReg );
+	vars[1] = Variable_New( "two", 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
+		&dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs + 1, varReg );
 
-   dofs = DofLayout_New( "", varReg, 0, feMesh );
+   dofs = DofLayout_New( "", NULL, varReg, 0, feMesh );
    dofs->nBaseVariables = 2;
    dofs->baseVariables = Memory_Alloc_Array_Unnamed( Variable*, 2 );
    dofs->baseVariables[0] = vars[0];

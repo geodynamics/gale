@@ -17,29 +17,29 @@ void SolutionVectorSuite_Teardown( SolutionVectorSuiteData* data ) {}
 
 
 FeVariable* SolutionVectorSuite_buildFeVar() {
-   CartesianGenerator* gen;
-   FeMesh* feMesh;
-   DofLayout* dofs;
-   FeEquationNumber* eqNum;
-   Variable_Register* varReg;
-   int maxDecomp[3] = {0, 1, 1};
-   int sizes[3];
-   double minCrd[3];
-   double maxCrd[3];
-   static int arraySize;
-   static double* arrayPtrs[2];
-   int nRanks;
-   Variable* var;
-   VariableCondition* bcs;
-   ConditionFunction_Register* cfReg;
-   Dictionary* dict;
-   XML_IO_Handler* ioHandler;
-   FieldVariable_Register* fieldReg;
-   FeVariable* feVar;
-   int n_i;
-   	/* read in the xml input file */
-	char xml_input[PCU_PATH_MAX];
-    pcu_filename_input( "testSolutionVector.xml", xml_input );
+   CartesianGenerator*				gen;
+   FeMesh*								feMesh;
+   DofLayout*							dofs;
+   FeEquationNumber*					eqNum;
+   Variable_Register*				varReg;
+   int									maxDecomp[3] = {0, 1, 1};
+   int									sizes[3];
+   double								minCrd[3];
+   double								maxCrd[3];
+   static int							arraySize;
+   static double*						arrayPtrs[2];
+   int									nRanks;
+   Variable*							var;
+   VariableCondition*				bcs;
+   ConditionFunction_Register*	cfReg;
+   Dictionary*							dict;
+   XML_IO_Handler*					ioHandler;
+   FieldVariable_Register*			fieldReg;
+   FeVariable*							feVar;
+   int									n_i;
+	char									xml_input[PCU_PATH_MAX];
+
+	pcu_filename_input( "testSolutionVector.xml", xml_input );
 
    MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
    sizes[0] = nRanks * 2;
@@ -49,8 +49,7 @@ FeVariable* SolutionVectorSuite_buildFeVar() {
 
    gen = CartesianGenerator_New( "", NULL );
    CartesianGenerator_SetDimSize( gen, 2 );
-   CartesianGenerator_SetTopologyParams( gen, (unsigned*)sizes, 0, 
-					 NULL, (unsigned*)maxDecomp );
+   CartesianGenerator_SetTopologyParams( gen, (unsigned*)sizes, 0, NULL, (unsigned*)maxDecomp );
    CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
    CartesianGenerator_SetShadowDepth( gen, 0 );
 
@@ -68,11 +67,11 @@ FeVariable* SolutionVectorSuite_buildFeVar() {
    arrayPtrs[1] = Memory_Alloc_Array_Unnamed( double, arraySize );
 */
    var = Variable_NewVector( "velocity", Variable_DataType_Double, 2, (unsigned*)&arraySize, NULL, 
-			     (void**)arrayPtrs, varReg, 
-			     "vx", "vy" );
+		(void**)arrayPtrs, varReg, 
+		"vx", "vy" );
    Variable_Register_BuildAll( varReg );
 
-   dofs = DofLayout_New( "", varReg, 0, feMesh );
+   dofs = DofLayout_New( "", NULL, varReg, 0, feMesh );
    dofs->nBaseVariables = 2;
    dofs->baseVariables = Memory_Alloc_Array_Unnamed( Variable*, 2 );
    dofs->baseVariables[0] = var->components[0];
@@ -117,69 +116,67 @@ FeVariable* SolutionVectorSuite_buildFeVar() {
 
 
 void SolutionVectorSuite_TestSolutionVector( SolutionVectorSuiteData* data ) {
-    /** Test Definition: */
+	FeVariable*				feVar;
+	FeMesh*					mesh;
+	int						nEls, nVerts, nDims;
+	const int				*verts;
+	double*					vert;
+	double					val[3];
+	InterpolationResult	ret;
+	SolutionVector*		sol;
+	int						lSize;
+	double*					array;
+	IArray*					incArray;
+	int						e_i, v_i, d_i, a_i;
 
-    /* Run the test  ----------------------------------------------------------------------------------------------------*/
-       FeVariable* feVar;
-       FeMesh* mesh;
-       int nEls, nVerts, nDims;
-       const int *verts;
-       double* vert;
-       double val[3];
-       InterpolationResult ret;
-       SolutionVector* sol;
-       int lSize;
-       double* array;
-       IArray* incArray;
-       int e_i, v_i, d_i, a_i;
+	feVar = SolutionVectorSuite_buildFeVar();
+	FeVariable_SyncShadowValues( feVar );
+	sol = SolutionVector_New( "velocity", NULL, MPI_COMM_WORLD, feVar );
+	/* Check solution vector created */
+	pcu_check_true(sol);
+	Stg_Component_Build( sol, NULL, False );
 
-       feVar = SolutionVectorSuite_buildFeVar();
-       FeVariable_SyncShadowValues( feVar );
-       sol = SolutionVector_New( "velocity", NULL, MPI_COMM_WORLD, feVar );
-        /* Check solution vector created */
-        pcu_check_true(sol);
-       Stg_Component_Build( sol, NULL, False );
+	SolutionVector_LoadCurrentFeVariableValuesOntoVector( sol );
+	VecGetLocalSize( sol->vector, &lSize );
+	VecGetArray( sol->vector, &array );
 
-       SolutionVector_LoadCurrentFeVariableValuesOntoVector( sol );
-       VecGetLocalSize( sol->vector, &lSize );
-       VecGetArray( sol->vector, &array );
-       for( a_i = 0; a_i < lSize; a_i++ )
-          array[a_i] += 1.0;
-       VecRestoreArray( sol->vector, &array );
-       SolutionVector_UpdateSolutionOntoNodes( sol );
+	for( a_i = 0; a_i < lSize; a_i++ )
+		array[a_i] += 1.0;
+	VecRestoreArray( sol->vector, &array );
+	SolutionVector_UpdateSolutionOntoNodes( sol );
 
-       mesh = feVar->feMesh;
-       nDims = Mesh_GetDimSize( mesh );
-       nEls = Mesh_GetDomainSize( mesh, nDims );
-       incArray = IArray_New();
-       for( e_i = 0; e_i < nEls; e_i++ ) {
-          Mesh_GetIncidence( mesh, nDims, e_i, 0, incArray );
-          nVerts = IArray_GetSize( incArray );
-          verts = IArray_GetPtr( incArray );
-          for( v_i = 0; v_i < nVerts; v_i++ ) {
-             vert = Mesh_GetVertex( mesh, verts[v_i] );
-             ret = FieldVariable_InterpolateValueAt( feVar, vert, val );
-             if( ret != LOCAL && ret != SHADOW )
-                continue;
-             for( d_i = 0; d_i < nDims; d_i++ ) {
-                if( !Num_Approx( vert[d_i] + 1.0, val[d_i] ) )
-                   break;
-             }
-             if( d_i < nDims )
-                break;
-              }
-              if( v_i < nVerts )
-         break;
-       }
+	mesh = feVar->feMesh;
+	nDims = Mesh_GetDimSize( mesh );
+	nEls = Mesh_GetDomainSize( mesh, nDims );
+	incArray = IArray_New();
 
-        /* Check all elements processed */
-        pcu_check_true(e_i == nEls);
+	for( e_i = 0; e_i < nEls; e_i++ ) {
+		Mesh_GetIncidence( mesh, nDims, e_i, 0, incArray );
+		nVerts = IArray_GetSize( incArray );
+		verts = IArray_GetPtr( incArray );
+		for( v_i = 0; v_i < nVerts; v_i++ ) {
+			vert = Mesh_GetVertex( mesh, verts[v_i] );
+			ret = FieldVariable_InterpolateValueAt( feVar, vert, val );
+			if( ret != LOCAL && ret != SHADOW )
+				continue;
+			for( d_i = 0; d_i < nDims; d_i++ ) {
+				if( !Num_Approx( vert[d_i] + 1.0, val[d_i] ) )
+					break;
+			}
+			if( d_i < nDims )
+				break;
+		}
+		if( v_i < nVerts )
+			break;
+	}
 
-       NewClass_Delete( incArray );
+	/* Check all elements processed */
+	pcu_check_true(e_i == nEls);
 
-       FreeObject( feVar );
-       FreeObject( sol );
+	NewClass_Delete( incArray );
 
+	FreeObject( feVar );
+	FreeObject( sol );
 }
 
 void SolutionVectorSuite( pcu_suite_t* suite ) {

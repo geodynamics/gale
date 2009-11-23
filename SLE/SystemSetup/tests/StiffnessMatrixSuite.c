@@ -18,27 +18,27 @@ void StiffnessMatrixSuite_Teardown( StiffnessMatrixSuiteData* data ) {
 }
 
 FeVariable* buildFeVar() {
-   CartesianGenerator* gen;
-   FeMesh* feMesh;
-   DofLayout* dofs;
-   FeEquationNumber* eqNum;
-   Variable_Register* varReg;
-   int maxDecomp[3] = {0, 1, 1};
-   int sizes[3];
-   double minCrd[3];
-   double maxCrd[3];
-   char xml_input[PCU_PATH_MAX];
-   static int arraySize;
-   static double* arrayPtrs[2];
-   int nRanks;
-   Variable* var;
-   VariableCondition* bcs;
-   ConditionFunction_Register* cfReg;
-   Dictionary* dict;
-   XML_IO_Handler* ioHandler;
-   FieldVariable_Register* fieldReg;
-   FeVariable* feVar;
-   int n_i;
+   CartesianGenerator*				gen;
+   FeMesh*								feMesh;
+   DofLayout*							dofs;
+   FeEquationNumber*					eqNum;
+   Variable_Register*				varReg;
+   int									maxDecomp[3] = {0, 1, 1};
+   int									sizes[3];
+   double								minCrd[3];
+   double								maxCrd[3];
+   char									xml_input[PCU_PATH_MAX];
+   static int							arraySize;
+   static double*						arrayPtrs[2];
+   int									nRanks;
+   Variable*							var;
+   VariableCondition*				bcs;
+   ConditionFunction_Register*	cfReg;
+   Dictionary*							dict;
+   XML_IO_Handler*					ioHandler;
+   FieldVariable_Register*			fieldReg;
+   FeVariable*							feVar;
+   int									n_i;
 
    MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
    sizes[0] = nRanks * 2;
@@ -48,8 +48,7 @@ FeVariable* buildFeVar() {
 
    gen = CartesianGenerator_New( "", NULL );
    CartesianGenerator_SetDimSize( gen, 2 );
-   CartesianGenerator_SetTopologyParams( gen, (unsigned*)sizes, 0, 
-					 NULL, (unsigned*)maxDecomp );
+   CartesianGenerator_SetTopologyParams( gen, (unsigned*)sizes, 0, NULL, (unsigned*)maxDecomp );
    CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
    CartesianGenerator_SetShadowDepth( gen, 0 );
 
@@ -67,7 +66,7 @@ FeVariable* buildFeVar() {
 		(void**)arrayPtrs, varReg, "vx", "vy" );
    Variable_Register_BuildAll( varReg );
 
-   dofs = DofLayout_New( "", varReg, 0, feMesh );
+   dofs = DofLayout_New( "", NULL, varReg, 0, feMesh );
    dofs->nBaseVariables = 2;
    dofs->baseVariables = Memory_Alloc_Array_Unnamed( Variable*, 2 );
    dofs->baseVariables[0] = var->components[0];
@@ -109,19 +108,19 @@ FeVariable* buildFeVar() {
 
 
 void StiffnessMatrixSuite_TestStiffnessMatrix( StiffnessMatrixSuiteData* data ) {
-  FeVariable* feVar;
-  FeMesh* mesh;
-  int nEls, nVerts, nDims;
-  const int *verts;
-  double* vert;
-  double val[3];
-  InterpolationResult ret;
-  EntryPoint_Register* ep_reg;
-  StiffnessMatrix* mat;
-  ForceVector* vec;
-  IArray* incArray = NULL;
-  int e_i, v_i, d_i;
-  MPI_Comm comm;
+  FeVariable*				feVar;
+  FeMesh*					mesh;
+  int							nEls, nVerts, nDims;
+  const int					*verts;
+  double*					vert;
+  double						val[3];
+  InterpolationResult	ret;
+  EntryPoint_Register*	ep_reg;
+  StiffnessMatrix*		mat;
+  ForceVector*				vec;
+  IArray*					incArray = NULL;
+  int							e_i, v_i, d_i;
+  MPI_Comm					comm;
 
   pcu_docstring( "This test just creates a Stiffness matrix data structure, builds, itialises, refreshes and then destroys it.\n" );
 

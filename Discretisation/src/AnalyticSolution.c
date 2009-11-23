@@ -489,7 +489,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 	
 	/* Create new dof layout */
 	tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic-DofLayout" );
-	dofLayout = DofLayout_New( tmpName, variable_Register, Mesh_GetDomainSize( feVariable->feMesh, MT_VERTEX ), NULL );
+	dofLayout = DofLayout_New( tmpName, self->context, variable_Register, Mesh_GetDomainSize( feVariable->feMesh, MT_VERTEX ), NULL );
 	if ( scalar ) {
 		DofLayout_AddAllFromVariableArray( dofLayout, 1, &dataVariable );
 	}
@@ -590,7 +590,7 @@ FeVariable* AnalyticSolution_CreateAnalyticSymmetricTensorField( void* analyticS
 
 	/* Create new dof layout */
 	tmpName = Stg_Object_AppendSuffix( analyticVectorField, "Analytic-DofLayout" );
-	dofLayout = DofLayout_New( tmpName, self->context->variable_Register, Mesh_GetDomainSize( analyticVectorField->feMesh, MT_VERTEX ), NULL );
+	dofLayout = DofLayout_New( tmpName, self->context, self->context->variable_Register, Mesh_GetDomainSize( analyticVectorField->feMesh, MT_VERTEX ), NULL );
 
 	/* Create Invariant Field */
 	tmpName2 = Stg_Object_AppendSuffix( analyticVectorField, "Invariant" );
@@ -621,7 +621,7 @@ FeVariable* AnalyticSolution_GetFeVariableFromAnalyticFeVariable( void* analytic
 }
 	
 InterpolationResult AnalyticSolution_InterpolateValueFromNormalFeVariable( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* value ) {
-	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
+	AnalyticSolution*	self = (AnalyticSolution*) analyticSolution;
 	FeVariable*       normalFeVariable;
 
 	normalFeVariable = AnalyticSolution_GetFeVariableFromAnalyticFeVariable( self, analyticFeVariable );
@@ -631,8 +631,8 @@ InterpolationResult AnalyticSolution_InterpolateValueFromNormalFeVariable( void*
 
 AnalyticSolution* AnalyticSolution_GetAnalyticSolution() {
 	Journal_Firewall( mySingleton != NULL , Journal_Register( Error_Type, "AnalyticSolution" ),
-			"Error in function %s: The Singleton Ptr is NULL, meaning the AnalyticSolution has not been created yet\n",
-			__func__ );
+		"Error in function %s: The Singleton Ptr is NULL, meaning the AnalyticSolution has not been created yet\n", __func__ );
+
 	return mySingleton;
 }
 

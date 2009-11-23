@@ -454,30 +454,29 @@ void _FieldTest_Destroy( void* fieldTest, void* data ) {
 }
 
 void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
-	FieldTest* 		self 			= (FieldTest*) fieldTest;
-	FeVariable*		numericField		= self->numericFieldList[field_I];
-	FeMesh*			referenceMesh		= numericField->feMesh;
-	DomainContext*		context			= self->context;
+	FieldTest*				self = (FieldTest*) fieldTest;
+	FeVariable*				numericField = self->numericFieldList[field_I];
+	FeMesh*					referenceMesh = numericField->feMesh;
+	DomainContext*			context = self->context;
 	Variable_Register*	variable_Register	= context->variable_Register;
-	Sync*			sync			= Mesh_GetSync( referenceMesh, MT_VERTEX );
-	Name			tmpName;
-	Dof_Index		componentsCount		= numericField->fieldComponentCount;
-	Name			varName[9];
-	unsigned		var_I;
-	unsigned		node_I;
-	Variable*		variable;
-	Variable*		baseVariable		= NULL;
-	DofLayout*		referenceDofLayout	= NULL;
+	Sync*						sync = Mesh_GetSync( referenceMesh, MT_VERTEX );
+	Name						tmpName;
+	Dof_Index				componentsCount = numericField->fieldComponentCount;
+	Name						varName[9];
+	unsigned					var_I;
+	unsigned					node_I;
+	Variable*				variable;
+	Variable*				baseVariable = NULL;
+	DofLayout*				referenceDofLayout	= NULL;
 
-	unsigned		nDomainVerts		= Mesh_GetDomainSize( referenceMesh, MT_VERTEX );
-	static double*		arrayPtr;
+	unsigned					nDomainVerts = Mesh_GetDomainSize( referenceMesh, MT_VERTEX );
+	static double*			arrayPtr;
 
 	tmpName = Stg_Object_AppendSuffix( numericField, "AnalyticVariable" );
 
 	if( componentsCount == 1 ) {
 		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts );
-		baseVariable = Variable_NewScalar( tmpName, Variable_DataType_Double, &nDomainVerts, NULL, (void**)&arrayPtr, 
-						   variable_Register );
+		baseVariable = Variable_NewScalar( tmpName, Variable_DataType_Double, &nDomainVerts, NULL, (void**)&arrayPtr, variable_Register );
 	}
 	else {
 		for( var_I = 0; var_I < componentsCount; var_I++ )
@@ -499,7 +498,8 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 
 	tmpName = Stg_Object_AppendSuffix( numericField, "AnalyticDofLayout" );
 
-	referenceDofLayout = DofLayout_New( tmpName, variable_Register, Mesh_GetDomainSize( referenceMesh, MT_VERTEX ), referenceMesh );
+	referenceDofLayout = DofLayout_New( tmpName, self->context, variable_Register, Mesh_GetDomainSize( referenceMesh, MT_VERTEX ), referenceMesh );
+
 	if( componentsCount == 1 )
 		DofLayout_AddAllFromVariableArray( referenceDofLayout, 1, &baseVariable );
 	else {
@@ -554,22 +554,22 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 }
 
 void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
-	FieldTest* 		self 			= (FieldTest*) fieldTest;
-	FeMesh*			constantMesh		= self->constantMesh;
-	FeVariable*		numericField		= self->numericFieldList[field_I];
-	DomainContext*		context			= self->context;
+	FieldTest*				self = (FieldTest*) fieldTest;
+	FeMesh*					constantMesh = self->constantMesh;
+	FeVariable*				numericField = self->numericFieldList[field_I];
+	DomainContext*			context = self->context;
 	Variable_Register*	variable_Register	= context->variable_Register;
-	Sync*			sync			= Mesh_GetSync( constantMesh, MT_VERTEX );
-	Name			tmpName;
-	Dof_Index		componentsCount		= numericField->fieldComponentCount;
-	Name			varName[9];
-	unsigned		var_I;
-	unsigned		node_I;
-	Variable*		variable;
-	Variable*		baseVariable		= NULL;
-	DofLayout*		errorDofLayout		= NULL;
-	unsigned		nDomainVerts		= Mesh_GetDomainSize( constantMesh, MT_VERTEX );
-	static void*		arrayPtr;
+	Sync*						sync = Mesh_GetSync( constantMesh, MT_VERTEX );
+	Name						tmpName;
+	Dof_Index				componentsCount = numericField->fieldComponentCount;
+	Name						varName[9];
+	unsigned					var_I;
+	unsigned					node_I;
+	Variable*				variable;
+	Variable*				baseVariable = NULL;
+	DofLayout*				errorDofLayout = NULL;
+	unsigned					nDomainVerts = Mesh_GetDomainSize( constantMesh, MT_VERTEX );
+	static void*			arrayPtr;
 
 	tmpName = Stg_Object_AppendSuffix( numericField, "ErrorVariable" );
 
@@ -592,7 +592,8 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 
 	tmpName = Stg_Object_AppendSuffix( numericField, "ErrorDofLayout" );
 
-	errorDofLayout = DofLayout_New( tmpName, variable_Register, Mesh_GetDomainSize( constantMesh, MT_VERTEX ), constantMesh );
+	errorDofLayout = DofLayout_New( tmpName, self->context, variable_Register, Mesh_GetDomainSize( constantMesh, MT_VERTEX ), constantMesh );
+
 	if( componentsCount == 1 )
 		DofLayout_AddAllFromVariableArray( errorDofLayout, 1, &baseVariable );
 	else {

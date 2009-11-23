@@ -2691,7 +2691,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    var->allocateSelf = True;   
    Stg_Component_Build( var, NULL, False );
 
-   dofs = DofLayout_New( "interpolation_temp_dof", varReg, nDomainVerts, feMesh );
+   dofs = DofLayout_New( "interpolation_temp_dof", self->context, varReg, nDomainVerts, feMesh );
 	if( self->fieldComponentCount == 1 )
 		DofLayout_AddAllFromVariableArray( dofs, 1, &var );
 	else {
@@ -2749,6 +2749,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    _Variable_Delete(var);
    _Variable_Register_Delete(varReg);
    _FeMesh_Delete(feMesh);
+
    if (!strcmp(self->feMesh->generator->type, C0Generator_Type)){
       _C0Generator_Delete(C0gen);
       _FeMesh_Delete(elementMesh);
