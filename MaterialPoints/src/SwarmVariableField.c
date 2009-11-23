@@ -157,7 +157,7 @@ void* _SwarmVariableField_DefaultNew( Name name ) {
 			_FeVariable_InterpolateNodeValuesToElLocalCoord,
 			_FeVariable_GetValueAtNode,
 			/*_SwarmVariableField_GetValueAtNode,*/
-			_SwarmVariableField_ValueAtParticle,
+			(ParticleFeVariable_ValueAtParticleFunction *) _SwarmVariableField_ValueAtParticle,
 			name );
 }
 
@@ -187,7 +187,7 @@ void _SwarmVariableField_Construct( void* swarmVariableField, Stg_ComponentFacto
 	assert( context );
 
 	_SwarmVariableField_Init( self, swarmVar, variable_Register );
-	_ParticleFeVariable_Init( self, integrationSwarm, context );
+	_ParticleFeVariable_Init( (ParticleFeVariable *) self, integrationSwarm, context );
 }
 
 void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {
