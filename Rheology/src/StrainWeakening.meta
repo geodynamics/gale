@@ -42,7 +42,7 @@
 		<param name="Type">Double</param>
 		<param name="Default">-1.0</param>
 		<param name="Description">This parameter is used to set the way the initial randomly oriented damage is distributed in space
-			$\phi = \cos^2 k_I x_I$.  The way the damage evolves often makes it a good idea to keep shear bands away from boundaries,
+			$\\phi = \\cos^2 k_I x_I$.  The way the damage evolves often makes it a good idea to keep shear bands away from boundaries,
 			especially where the mesh-stretching boundary condition is applied. In this case, make sure $k_I = n / L_I$ where $n$ is
 			an integer, and $L_I$ is the length of the box in the $I$ direction.</param>
 	</struct>
@@ -51,7 +51,7 @@
 		<param name="Type">Double</param>
 		<param name="Default">-1.0</param>
 		<param name="Description">This parameter is used to set the way the initial randomly oriented damage is distributed in space
-			$\phi = \sin^2 k_I x_I$.  The way the damage evolves often makes it a good idea to keep shear bands away from boundaries,
+			$\\phi = \\sin^2 k_I x_I$.  The way the damage evolves often makes it a good idea to keep shear bands away from boundaries,
 			especially where the mesh-stretching boundary condition is applied. In this case, make sure $k_I = n / L_I$ where $n$ is
 			an integer, and $L_I$ is the length of the box in the $I$ direction.</param>
 	</struct>
@@ -60,7 +60,7 @@
 		<param name="Type">Double</param>
 		<param name="Default">-1.0</param>
 		<param name="Description">This parameter is used to set the way the initial randomly oriented damage is distributed in space
-			$\phi = \cos^2 k_I x_I$.  The way the damage evolves often makes it a good idea to keep shear bands away from boundaries,
+			$\\phi = \\cos^2 k_I x_I$.  The way the damage evolves often makes it a good idea to keep shear bands away from boundaries,
 			especially where the mesh-stretching boundary condition is applied. In this case, make sure $k_I = n / L_I$ where $n$ is
 			an integer, and $L_I$ is the length of the box in the $I$ direction.</param>
 	</struct>
@@ -69,7 +69,7 @@
 		<param name="Type">Double</param>
 		<param name="Default">-1.0</param>
 		<param name="Description">>This parameter is used to set the way the initial randomly oriented damage is distributed in space
-			$\phi = \sin^2 k_K x_K$.  The way the damage evolves often makes it a good idea to keep shear bands away from boundaries,
+			$\\phi = \\sin^2 k_K x_K$.  The way the damage evolves often makes it a good idea to keep shear bands away from boundaries,
 			especially where the mesh-stretching boundary condition is applied. In this case, make sure $k_K = n / L_K$ where $n$ is
 			an integer, and $L_K$ is the length of the box in the $K$ direction.</param>
 	</struct>
@@ -78,7 +78,7 @@
 		<param name="Type">Double</param>
 		<param name="Default">-1.0</param>
 		<param name="Description">This parameter is used to set the way the initial randomly oriented damage is distributed in space
-			$\phi = \cos^2 k_K x_K$.  The way the damage evolves often makes it a good idea to keep shear bands away from boundaries,
+			$\\phi = \\cos^2 k_K x_K$.  The way the damage evolves often makes it a good idea to keep shear bands away from boundaries,
 			especially where the mesh-stretching boundary condition is applied. In this case, make sure $k_K = n / L_K$ where $n$ is
 			an integer, and $L_K$ is the length of the box in the $K$ direction.</param>
 	</struct>

@@ -59,7 +59,7 @@ void* _MixedStabiliserTerm_DefaultNew( Name name ) {
       MixedStabiliserTerm_Initialise,
       MixedStabiliserTerm_Execute,
       MixedStabiliserTerm_Destroy,
-      MixedStabiliserTerm_AssembleElement,
+      (StiffnessMatrixTerm_AssembleElementFunction*)MixedStabiliserTerm_AssembleElement,
       name );
 }
 
@@ -203,7 +203,7 @@ void MixedStabiliserTerm_AssembleElement( void* _self,
       memset( localElStiffMat[ii], 0, nElNodes * sizeof(double) );
 
    /* Assemble the mass matrix portion. */
-   swarm = self->integrationSwarm;
+   swarm = (IntegrationPointsSwarm*)(self->integrationSwarm);
    cellIndex = CellLayout_MapElementIdToCellId( swarm->cellLayout,
                                                 elementIndex );
    nParticles = swarm->cellParticleCountTbl[cellIndex];

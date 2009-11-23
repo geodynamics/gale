@@ -14,7 +14,7 @@
 <param name="Reference">...</param>
 <param name="Summary">...</param>
 <param name="Description">A rheology that varies exponentially in one direction.</param>
-<param name="Equation">$\eta = \eta_0 \exp \left( \gamma ( y - y_0 ) \right)$</param>
+<param name="Equation">$\\eta = \\eta_0 \\exp \\left( \\gamma ( y - y_0 ) \\right)$</param>
 
 <!--Now the interesting stuff-->
 <list name="Params">
@@ -28,13 +28,13 @@
 		<param name="Name">eta0</param>
 		<param name="Type">Double</param>
 		<param name="Default">1.0</param>
-		<param name="Description">This is the $\eta_0$ in the equation above.</param>
+		<param name="Description">This is the $\\eta_0$ in the equation above.</param>
 	</struct>
 	<struct>
 		<param name="Name">gamma</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.0</param>
-		<param name="Description">This is the $\gamma$ in the equation above.</param>
+		<param name="Description">This is the $\\gamma$ in the equation above.</param>
 	</struct>
 	<struct>
 		<param name="Name">referencePoint</param>

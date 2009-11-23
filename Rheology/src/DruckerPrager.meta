@@ -14,7 +14,7 @@
 <param name="Reference">...</param>
 <param name="Summary">...</param>
 <param name="Description">Implements a Drucker-Prager yield Rheology. The parameters of this criterion are calibrated so that the yield surface coincides with the Mohr Coulomb one for the condition of a compression test. </param>
-<param name="Equation">Yield Surface: $f = \sqrt{3} \bar{\tau} - \alpha p - k \le 0, \alpha = \frac{6 \sin\varphi}{3 - \sin\varphi}, k = \frac{6 c \cos\varphi}{3 - \sin\varphi}$</param>
+<param name="Equation">Yield Surface: $f = \\sqrt{3} \\bar{\\tau} - \\alpha p - k \\le 0, \\alpha = \\frac{6 \\sin\\varphi}{3 - \\sin\\varphi}, k = \\frac{6 c \\cos\\varphi}{3 - \\sin\\varphi}$</param>
 
 <!--Now the interesting stuff-->
 

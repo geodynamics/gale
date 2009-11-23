@@ -14,7 +14,7 @@
 <param name="Reference">...</param>
 <param name="Summary">...</param>
 <param name="Description">This component allows to add a vector to a material points and to update it with respect to the deformation.</param>
-<param name="Equation">Director Evolution Equation: $\dot n_i = -L_{ji} n_j, n_i \rightarrow \frac{n_i}{|n|}$</param>
+<param name="Equation">Director Evolution Equation: $\\dot n_i = -L_{ji} n_j, n_i \\rightarrow \\frac{n_i}{|n|}$</param>
 
 <!--Now the interesting stuff-->
 <list name="Params">

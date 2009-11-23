@@ -14,7 +14,7 @@
 <param name="Reference">...</param>
 <param name="Summary">...</param>
 <param name="Description">A basic yielding model.</param>
-<param name="Equation">$\tau_{yield} = c_0$</param>
+<param name="Equation">$\\tau_{yield} = c_0$</param>
 
 <!--Now the interesting stuff-->
 <list name="Params">
@@ -43,7 +43,7 @@
 		<param name="Essential">True</param>
 		<param name="Name">StrainRateField</param>
 		<param name="Type">FeVariable</param>
-		<param name="Description">The field that provides the $\dot\epsilon$ in the equation above.</param>
+		<param name="Description">The field that provides the $\\dot\\epsilon$ in the equation above.</param>
 	</struct>
 </list>
 
