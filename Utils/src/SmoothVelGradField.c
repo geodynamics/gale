@@ -233,7 +233,7 @@ void _SmoothVelGradField_Build( void* _self, void* data ) {
 
    /* Create Dof Layout */
    tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
-   self->dofLayout = DofLayout_New( tmpName, self->variable_Register, 0, self->feMesh );
+   self->dofLayout = DofLayout_New( tmpName, self->context, self->variable_Register, 0, self->feMesh );
    self->dofLayout->_numItemsInLayout = FeMesh_GetNodeDomainSize( self->feMesh );
    for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ ) {
       self->dataVariableList[ variable_I ] = Variable_Register_GetByName( self->variable_Register, 

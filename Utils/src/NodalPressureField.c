@@ -191,7 +191,7 @@ void _NodalPressureField_Build( void* _self, void* data ) {
 	
    /* Create Dof Layout */
    tmpName2 = Stg_Object_AppendSuffix( self, "DofLayout" );
-   self->dofLayout = DofLayout_New( tmpName2, self->variable_Register, 0, self->feMesh );
+   self->dofLayout = DofLayout_New( tmpName2, self->context, self->variable_Register, 0, self->feMesh );
    self->dofLayout->_numItemsInLayout = FeMesh_GetNodeDomainSize( self->feMesh );
    for( node_I = 0; node_I < FeMesh_GetNodeDomainSize( self->feMesh ); node_I++ ) {
       DofLayout_AddDof_ByVarName( self->dofLayout, tmpName, node_I );

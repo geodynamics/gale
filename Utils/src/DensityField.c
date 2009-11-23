@@ -181,7 +181,7 @@ void _DensityField_Build( void* densityField, void* data ) {
 	self->fieldComponentCount = 1;
 	
 	tmpName = Stg_Object_AppendSuffix( self, "densityDOF" );
-	self->dofLayout = DofLayout_New( tmpName, variable_Register, 0, self->feMesh );
+	self->dofLayout = DofLayout_New( tmpName, self->context, variable_Register, 0, self->feMesh );
 	self->dofLayout->_numItemsInLayout = FeMesh_GetNodeDomainSize( self->feMesh );
 	DofLayout_AddAllFromVariableArray( self->dofLayout, 1, &self->dataVariable );
 	Memory_Free( tmpName );
