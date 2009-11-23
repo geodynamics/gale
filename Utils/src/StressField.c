@@ -256,10 +256,9 @@ void _StressField_Build( void* stressField, void* data ) {
 	self->dofLayout->_numItemsInLayout = FeMesh_GetNodeDomainSize( self->feMesh );
 	for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ ) {
 		self->dataVariableList[ variable_I ] = Variable_Register_GetByName( self->variable_Register, 
-										    variableName[ variable_I ] );
-		for( node_I = 0; node_I < FeMesh_GetNodeDomainSize( self->feMesh ); node_I++ ) {
+                             variableName[ variable_I ] );
+		for( node_I = 0; node_I < FeMesh_GetNodeDomainSize( self->feMesh ); node_I++ )
 			DofLayout_AddDof_ByVarName( self->dofLayout, variableName[variable_I], node_I );
-		}
 		/* Free Name */
 		Memory_Free( variableName[ variable_I ] );
 	}
@@ -277,20 +276,6 @@ void _StressField_Build( void* stressField, void* data ) {
 	Variable_Update( self->dataVariable );
 	for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ ) {
 		Variable_Update( self->dataVariableList[ variable_I ] );
-	}
-
-	if ( dim == 2 ) {
-      Memory_Free( variableName[0] );
-      Memory_Free( variableName[1] );
-      Memory_Free( variableName[2] );
-	}
-	else {
-      Memory_Free( variableName[0] );
-      Memory_Free( variableName[1] );
-      Memory_Free( variableName[2] );
-      Memory_Free( variableName[3] );
-      Memory_Free( variableName[4] );
-      Memory_Free( variableName[5] );
 	}
 
 }
