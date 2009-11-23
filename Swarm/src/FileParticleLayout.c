@@ -367,8 +367,8 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
    /* set these spaces to null initially */
    for( jj = 0 ; jj < swarm->swarmVariable_Register->objects->count ; jj++)
       for( kk = 0 ; kk < swarm->checkpointnfiles ; kk++){
-         self->fileData [jj][kk] = NULL;
-         self->fileSpace[jj][kk] = NULL;
+         self->fileData [jj][kk] = 0;
+         self->fileSpace[jj][kk] = 0;
       }
       
    /* Open the files */

@@ -384,7 +384,7 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
                   self->readFromFile = False;
                else
                   Journal_Firewall( 
-                     NULL, 
+                     0, 
                      errorStream,
                      "\n\nError in %s for %s '%s'\n"
                      "Size of mesh (%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u,%u).\n\n"
@@ -401,7 +401,7 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
                   self->readFromFile = False;
                else
                   Journal_Firewall( 
-                     NULL, 
+                     0, 
                      errorStream,
                      "\n\nError in %s for %s '%s'\n"
                      "Size of mesh (%u,%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u,%u,%u).\n\n"
@@ -595,7 +595,7 @@ void CartesianGenerator_Generate( void* meshGenerator, void* _mesh, void* data )
 	memcpy( localRange, self->range, Mesh_GetDimSize( mesh ) * sizeof(unsigned) );
 
 	ExtensionManager_AddArray( mesh->info, "periodic", sizeof(Bool), 3 );
-	periodic = (int*)ExtensionManager_Get(
+	periodic = (Bool*)ExtensionManager_Get(
 		mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "periodic" )
 		);
 	memcpy( periodic, self->periodic, 3 * sizeof(Bool) );
@@ -1296,7 +1296,7 @@ void _CartesianGenerator_GenEdgeVertexInc( void* meshGenerator, IGraph* topo, Gr
 	unsigned		nIncEls;
 	unsigned*		incEls;
 	unsigned*		dimInds;
-	Sync*			sync;
+	const Sync*			sync;
 	unsigned		e_i;
 
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
@@ -1631,7 +1631,7 @@ void CartesianGenerator_RecurseDecomps( CartesianGenerator* self,
 
 void CartesianGenerator_GenTopo( CartesianGenerator* self, IGraph* topo ) {
 	Grid***		grids;
-	Comm*		comm;
+	const Comm*     comm;
 	unsigned	d_i, d_j;
 
 	assert( self );
@@ -1999,7 +1999,7 @@ void CartesianGenerator_GenBndVerts( CartesianGenerator* self, IGraph* topo, Gri
 
 void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGraph* topo, Grid*** grids ) {
 	Stream*		stream = Journal_Register( Info_Type, self->type );
-	Sync*		sync;
+	const Sync*     sync;
 	unsigned	nDims;
 	unsigned	nVerts;
 	unsigned*	inds;
@@ -2101,7 +2101,8 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGra
 	Stream_UnIndent( stream );
 }
 
-void CartesianGenerator_MapToDomain( CartesianGenerator* self, Sync* sync, 
+void CartesianGenerator_MapToDomain( CartesianGenerator* self,
+                                     const Sync* sync, 
 				     unsigned nIncEls, unsigned* incEls )
 {
 	unsigned	inc_i;
@@ -2253,7 +2254,7 @@ void CartesianGenerator_DestructGeometry( CartesianGenerator* self ) {
 }
 
 #ifdef READ_HDF5
-void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, char* filename ){
+void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, const char* filename ){
 	hid_t             file, fileSpace, fileData;
 	hsize_t           start[2], count[2], size[2], maxSize[2];   
 	hid_t             memSpace, error;

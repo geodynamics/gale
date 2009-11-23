@@ -215,14 +215,15 @@
 	void CartesianGenerator_GenEdges3D( CartesianGenerator* self, IGraph* topo, Grid*** grids );
 	void CartesianGenerator_GenBndVerts( CartesianGenerator* self, IGraph* topo, Grid*** grids );
 	void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGraph* topo, Grid*** grids );
-	void CartesianGenerator_MapToDomain( CartesianGenerator* self, Sync* sync, 
+	void CartesianGenerator_MapToDomain( CartesianGenerator* self, 
+                                             const Sync* sync, 
 					     unsigned nIncEls, unsigned* incEls );
 	void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* data );
 	void CartesianGenerator_CalcGeom( CartesianGenerator* self, Mesh* mesh, Sync* sync, Grid* grid, unsigned* inds, double* steps );
 	void CartesianGenerator_Destruct( CartesianGenerator* self );
 	void CartesianGenerator_DestructTopology( CartesianGenerator* self );
 	void CartesianGenerator_DestructGeometry( CartesianGenerator* self );
-	void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, char* filename );
+	void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, const char* filename );
 	void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, char* filename );
 
 #endif /* __Domain_Mesh_CartesianGenerator_h__ */

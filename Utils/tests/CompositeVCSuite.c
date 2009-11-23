@@ -92,6 +92,9 @@ void CompositeVCSuite_Setup( CompositeVCSuiteData* data ) {
 void CompositeVCSuite_Teardown( CompositeVCSuiteData* data ) {
 }
 
+/* Prototype because I can not find the prototype in any headers. */
+Mesh* buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg );
+
 void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
 	Stream*								stream;
 	Dictionary*							dictionary;

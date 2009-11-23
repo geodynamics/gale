@@ -144,7 +144,7 @@ void _RegularRemesher_Remesh( void* _self ) {
 
    /* If we have a contact depth set we'll need to manipulate the boundaries
       a little. */
-   gen = self->mesh->generator;
+   gen = (CartesianGenerator*)(self->mesh->generator);
    if( strcmp( gen->type, CartesianGenerator_Type ) )
       gen = NULL;
    if( gen && (gen->contactDepth[0][0] || gen->contactDepth[0][1] ||

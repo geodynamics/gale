@@ -80,7 +80,7 @@ Mesh* _Mesh_New( MESH_DEFARGS ) {
 }
 
 void _Mesh_Init( Mesh* self ) {
-	self->topo = IGraph_New( "" );
+        self->topo = (MeshTopology*)IGraph_New( "" );
 	self->verts = NULL;
 
 	self->vars = List_New();
@@ -374,8 +374,8 @@ unsigned Mesh_GetOwner( void* mesh, MeshTopology_Dim dim, unsigned remote ) {
 	return Sync_GetOwner( IGraph_GetDomain( self->topo, dim ), remote );
 }
 
-void Mesh_GetSharers( void* mesh, MeshTopology_Dim dim, unsigned shared, 
-		      unsigned* nSharers, unsigned** sharers )
+void Mesh_GetSharers( void* mesh, MeshTopology_Dim dim, int shared, 
+		      int* nSharers, const int** sharers )
 {
 	Mesh*	self = (Mesh*)mesh;
 
@@ -495,7 +495,7 @@ double* Mesh_GetVertex( void* mesh, unsigned domain ) {
 	return self->verts[domain];
 }
 
-Bool Mesh_HasExtension( void* mesh, const char* name ) {
+Bool Mesh_HasExtension( void* mesh, const Name name ) {
 	Mesh* self = (Mesh*)mesh;
 
 	assert( self );
@@ -504,7 +504,7 @@ Bool Mesh_HasExtension( void* mesh, const char* name ) {
 		True : False;
 }
 
-void* _Mesh_GetExtension( void* mesh, const char* name ) {
+void* _Mesh_GetExtension( void* mesh, const Name name ) {
 	Mesh* self = (Mesh*)mesh;
 
 	assert( self );

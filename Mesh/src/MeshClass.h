@@ -151,8 +151,8 @@
 	unsigned Mesh_SharedToLocal( void* meshTopology, MeshTopology_Dim dim, unsigned shared );
 
 	unsigned Mesh_GetOwner( void* mesh, MeshTopology_Dim dim, unsigned remote );
-	void Mesh_GetSharers( void* mesh, MeshTopology_Dim dim, unsigned shared, 
-			      unsigned* nSharers, unsigned** sharers );
+	void Mesh_GetSharers( void* mesh, MeshTopology_Dim dim, int shared, 
+			      int* nSharers, const int** sharers );
 
 	Bool Mesh_HasIncidence( void* mesh, MeshTopology_Dim fromDim, MeshTopology_Dim toDim );
 	unsigned Mesh_GetIncidenceSize( void* mesh, MeshTopology_Dim fromDim, unsigned fromInd, 
@@ -182,10 +182,10 @@
 	Comm* Mesh_GetCommTopology( void* mesh, MeshTopology_Dim dim );
 	double* Mesh_GetVertex( void* mesh, unsigned domain );
 
-	Bool Mesh_HasExtension( void* mesh, const char* name );
+	Bool Mesh_HasExtension( void* mesh, const Name name );
 	#define Mesh_GetExtension( mesh, type, name ) \
 		(type)_Mesh_GetExtension( mesh, name )
-	void* _Mesh_GetExtension( void* mesh, const char* name );
+	void* _Mesh_GetExtension( void* mesh, const Name name );
 
 	void Mesh_GetMinimumSeparation( void* mesh, double* minSep, double* axial );
 	void Mesh_GetLocalCoordRange( void* mesh, double* min, double* max );

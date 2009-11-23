@@ -90,6 +90,8 @@ void CornerVCSuite_Setup( CornerVCSuiteData* data ) {
 
 void CornerVCSuite_Teardown( CornerVCSuiteData* data ) {
 }
+/* Prototype because I can not find the prototype in any headers. */
+Mesh* buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg );
 
 void CornerVCSuite_TestCornerVC( CornerVCSuiteData* data ) {
 	unsigned								nDomains;

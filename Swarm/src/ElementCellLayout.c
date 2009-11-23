@@ -373,8 +373,8 @@ ShadowInfo* _ElementCellLayout_GetShadowInfo( void* elementCellLayout ) {
 void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self ) {
 	unsigned	nDims;
 	Comm*		comm;
-	unsigned	nIncProcs;
-	unsigned*	incProcs;
+	int	        nIncProcs;
+	const int*      incProcs;
 	unsigned	n_i;
 
 	nDims = Mesh_GetDimSize( self->mesh );
@@ -395,8 +395,8 @@ void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self ) {
 		memset( self->cellShadowInfo.procShadowCnt, 0, nIncProcs * sizeof(unsigned) );
 	}
 	for( n_i = 0; n_i < Mesh_GetSharedSize( self->mesh, nDims ); n_i++ ) {
-		unsigned	nSharers;
-		unsigned*	sharers;
+		int	nSharers;
+		const int*	sharers;
 		unsigned	s_i;
 
 		Mesh_GetSharers( self->mesh, nDims, n_i, 
@@ -423,8 +423,8 @@ void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self ) {
 	for( n_i = 0; n_i < Mesh_GetSharedSize( self->mesh, nDims ); n_i++ ) {
 		unsigned	local;
 		unsigned	curInd;
-		unsigned	nSharers;
-		unsigned*	sharers;
+		int	        nSharers;
+		const int*	        sharers;
 		unsigned	s_i;
 
 		local = Mesh_SharedToLocal( self->mesh, nDims, n_i );

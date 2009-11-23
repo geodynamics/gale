@@ -289,7 +289,7 @@ IndexSet* _ContactVC_GetSet(void* variableCondition) {
    CartesianGenerator* gen;
 
    nDims = Mesh_GetDimSize( self->_mesh );
-   gen = self->_mesh->generator;
+   gen = (CartesianGenerator*)(self->_mesh->generator);
    if( strcmp( gen->type, CartesianGenerator_Type ) )
       abort();
    vertGrid = *(Grid**)ExtensionManager_Get( self->_mesh->info, self->_mesh, 
