@@ -60,7 +60,7 @@
 	StreamFormatter* IndentFormatter_New();
 
 	/** Creates a new IndentFormatter which indents with the given char. */
-	StreamFormatter* IndentFormatter_New2( char _character );
+	StreamFormatter* IndentFormatter_New2( const char _character );
 
 	/** Initialise a IndentFormatter. */
 	void IndentFormatter_Init( IndentFormatter* self );
@@ -74,7 +74,7 @@
 		Stg_Class_PrintFunction*		_print,
 		Stg_Class_CopyFunction*		_copy, 
 		StreamFormatter_FormatFunction*	_format,
-		char				_character );
+		const char				_character );
 
 	/** Init interface. */
 	void _IndentFormatter_Init(

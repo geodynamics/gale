@@ -195,7 +195,7 @@
 	
 	
 	/** Get the handle of a desired particular extension... slow since uses a O(n) * strcmp algorithm. */
-	ExtensionInfo_Index ExtensionManager_GetHandle( void* extension, Name offsetName );
+	ExtensionInfo_Index ExtensionManager_GetHandle( void* extension, const Name offsetName );
 	
 	
 	/** Are we extending an object? */

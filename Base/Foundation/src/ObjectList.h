@@ -313,7 +313,7 @@
 	Index Stg_ObjectList_GetIndex( void* objectList, const Name const toGet );
 	
 	/** Get an object's ptr from the list, by name. Returns NULL if not found. */
-	void* Stg_ObjectList_Get( void* objectList, const Name const toGet );
+	void* Stg_ObjectList_Get( void* objectList, const Name toGet );
 	
 	/** Deletes all the objects in the list. */
 	void Stg_ObjectList_DeleteAllObjects( void* objectList );

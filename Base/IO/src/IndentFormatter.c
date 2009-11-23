@@ -54,14 +54,14 @@ void IndentFormatter_MakeTag( IndentFormatter* formatter );
 StreamFormatter* IndentFormatter_New()
 {
 	return (StreamFormatter*)_IndentFormatter_New( sizeof(IndentFormatter), IndentFormatter_Type,
-		_IndentFormatter_Delete, _IndentFormatter_Print, _IndentFormatter_Copy, _LineFormatter_Format,
+                                                       _IndentFormatter_Delete, _IndentFormatter_Print, _IndentFormatter_Copy, (StreamFormatter_FormatFunction*)_LineFormatter_Format,
 		IndentFormatter_IndentChar );
 }
 
-StreamFormatter* IndentFormatter_New2( char _character )
+StreamFormatter* IndentFormatter_New2( const char _character )
 {
 	return (StreamFormatter*)_IndentFormatter_New( sizeof(IndentFormatter), IndentFormatter_Type,
-		_IndentFormatter_Delete, _IndentFormatter_Print, _IndentFormatter_Copy, _LineFormatter_Format,
+                                                       _IndentFormatter_Delete, _IndentFormatter_Print, _IndentFormatter_Copy, (StreamFormatter_FormatFunction*)_LineFormatter_Format,
 		_character );
 }
 
@@ -73,7 +73,7 @@ void IndentFormatter_Init( IndentFormatter* self )
 	self->_print = _IndentFormatter_Print;
 	self->_copy = _IndentFormatter_Copy;
 	
-	_IndentFormatter_Init( self, _LineFormatter_Format, IndentFormatter_IndentChar );
+	_IndentFormatter_Init( self, (StreamFormatter_FormatFunction*)_LineFormatter_Format, IndentFormatter_IndentChar );
 }
 
 IndentFormatter* _IndentFormatter_New(
@@ -83,7 +83,7 @@ IndentFormatter* _IndentFormatter_New(
 	Stg_Class_PrintFunction*		_print,
 	Stg_Class_CopyFunction*		_copy, 
 	StreamFormatter_FormatFunction*	_format,
-	char				_character )
+	const char			_character )
 {
 	IndentFormatter* self;
 	

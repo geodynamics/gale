@@ -53,7 +53,7 @@ JournalFile* MPIFile_New()
 	return (JournalFile*)_MPIFile_New( sizeof(MPIFile), MPIFile_Type, _MPIFile_Delete, _MPIFile_Print, NULL );
 }
 
-JournalFile* MPIFile_New2( const char* const fileName )
+JournalFile* MPIFile_New2( const Name fileName )
 {
 	JournalFile* result = MPIFile_New();
 

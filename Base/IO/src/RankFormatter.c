@@ -52,7 +52,7 @@ const char* PREPEND = ": ";
 StreamFormatter* RankFormatter_New()
 {
 	return (StreamFormatter*)_RankFormatter_New( sizeof(RankFormatter), RankFormatter_Type,
-		_RankFormatter_Delete, _RankFormatter_Print, _LineFormatter_Copy, _LineFormatter_Format );
+                                                     _RankFormatter_Delete, _RankFormatter_Print, _LineFormatter_Copy, (StreamFormatter_FormatFunction*)_LineFormatter_Format );
 }
 	
 void RankFormatter_Init( RankFormatter* self )
@@ -63,8 +63,8 @@ void RankFormatter_Init( RankFormatter* self )
 	self->_print = _RankFormatter_Print;
 	self->_copy = _LineFormatter_Copy;
 
-	_LineFormatter_Init( (LineFormatter*)self, _LineFormatter_Format );
-	_RankFormatter_Init( self, _LineFormatter_Format );
+	_LineFormatter_Init( (LineFormatter*)self, (StreamFormatter_FormatFunction*)_LineFormatter_Format );
+	_RankFormatter_Init( self, (StreamFormatter_FormatFunction*)_LineFormatter_Format );
 }
 
 RankFormatter* _RankFormatter_New(

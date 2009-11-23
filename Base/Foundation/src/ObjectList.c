@@ -539,7 +539,7 @@ Index Stg_ObjectList_GetIndex( void* objectList, const Name const toGet ) {
 }
 
 
-void* Stg_ObjectList_Get( void* objectList, const Name const objectName ) {
+void* Stg_ObjectList_Get( void* objectList, const Name objectName ) {
 	Stg_ObjectList* self = (Stg_ObjectList*) objectList;
 
 	return self->_get( self, objectName );

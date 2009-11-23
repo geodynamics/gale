@@ -348,7 +348,7 @@ Bool Stream_Dump( Stream *stream, void *data )
 	return result;
 }
 
-Bool Stream_RedirectFile( Stream* stream, const char* const fileName ) {
+Bool Stream_RedirectFile( Stream* stream, const Name fileName ) {
 	JournalFile* file;
 
 	file = Journal_GetFile( fileName );
@@ -365,7 +365,7 @@ Bool Stream_RedirectFile( Stream* stream, const char* const fileName ) {
 }
 
 
-Bool Stream_RedirectFileBranch( Stream* stream, const char* const fileName ) {
+Bool Stream_RedirectFileBranch( Stream* stream, const Name fileName ) {
 	JournalFile* file;
 
 	file = Journal_GetFile( fileName );
@@ -378,7 +378,7 @@ Bool Stream_RedirectFileBranch( Stream* stream, const char* const fileName ) {
 	return Stream_SetFileBranch( stream, file );
 }
 
-Bool Stream_AppendFile( Stream* stream, const char* const fileName ) {
+Bool Stream_AppendFile( Stream* stream, const Name fileName ) {
 	JournalFile* file;
 
 	file = Journal_GetFile( fileName );

@@ -154,7 +154,7 @@ void* _Stg_Object_Copy( void* object, void* dest, Bool deep, Name nameExt, struc
 /* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-void Stg_Object_SetName( void* object, Name name )
+void Stg_Object_SetName( void* object, const Name name )
 {
 	Stg_Object* self = (Stg_Object*)object;
 	

@@ -56,8 +56,8 @@ void DictionaryCheckSuite_Teardown( DictionaryCheckSuiteData* data ) {
 void DictionaryCheckSuite_TestCheckKeys( DictionaryCheckSuiteData* data ) {
    Dictionary*       dictionary = Dictionary_New();
    Dictionary*       dictionary2 = Dictionary_New();
-   const char*       testFilename1 = "testDictionaryCheck-1.txt";
-   const char*       testFilename2 = "testDictionaryCheck-2.txt";
+   const Name       testFilename1 = "testDictionaryCheck-1.txt";
+   const Name       testFilename2 = "testDictionaryCheck-2.txt";
    char              expectedFilename[PCU_PATH_MAX];
    const char*       errMessage = "Component dictionary must have unique names\n";
    

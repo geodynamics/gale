@@ -149,17 +149,17 @@ void CallGraphSuite_TestFuncParentNameHandling( CallGraphSuiteData* data ) {
 
 void CallGraphSuite_TestTableRealloc( CallGraphSuiteData* data ) {
    Stg_CallGraph*	cg3;
-   Index		count=0;
+   int  		count=0;
    Index		size=0;
-   Index		ii=0;
+   int  		ii=0;
 
    cg3 = Stg_CallGraph_New();
    /* Test 5: Force a realloc of the table */
-   count = (Index)((double)1.5 * cg3->_tableSize);
+   count = (int)((double)1.5 * cg3->_tableSize);
    size = cg3->_tableSize;
    for( ii = 0; ii < count; ii++ ) {
       /* Use "i" as a unique string (unique pointer value)... don't try to print! */
-      Stg_CallGraph_Push( cg3, TestFunc1, (Name)ii );
+     Stg_CallGraph_Push( cg3, TestFunc1, (Name)(NULL + ii) );
    }
    pcu_check_true( 
       cg3->_tableCount == count && 
@@ -172,14 +172,14 @@ void CallGraphSuite_TestTableRealloc( CallGraphSuiteData* data ) {
 void CallGraphSuite_TestCopy( CallGraphSuiteData* data ) {
    Stg_CallGraph*	cg3;
    Stg_CallGraph*	cg3deep;
-   Index		count=0;
-   Index		ii=0;
+   int		        count=0;
+   int		        ii=0;
 
    cg3 = Stg_CallGraph_New();
-   count = (Index)((double)1.5 * cg3->_tableSize);
+   count = (int)((double)1.5 * cg3->_tableSize);
    for( ii = 0; ii < count; ii++ ) {
       /* Use "i" as a unique string (unique pointer value)... don't try to print! */
-      Stg_CallGraph_Push( cg3, TestFunc1, (Name)ii );
+     Stg_CallGraph_Push( cg3, TestFunc1, (Name)(NULL + ii) );
    }
 
    /* Shallow copying not yet implemented */

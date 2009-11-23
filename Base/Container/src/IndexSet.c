@@ -354,7 +354,7 @@ void IndexSet_AddAll( void* indexSet )
 	Index		i;
 	
 	for( i = 0; i < self->_containerSize; i++)
-		self->_container[i] |= 0xFF;
+		self->_container[i] |= 0xF;
 
 	self->membersCount = self->size;
 }

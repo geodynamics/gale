@@ -42,6 +42,7 @@
 #include "ToolboxesManager.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 /* Textual name of this class */
 const Type ToolboxesManager_Type = "ToolboxesManager";

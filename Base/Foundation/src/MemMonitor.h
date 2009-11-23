@@ -57,7 +57,7 @@ typedef struct {
 	char* tag;
 	Bool criteria;
 	Bool print;
-	int comm;
+	MPI_Comm comm;
 } Stg_MemMonitor;
 
 void Stg_MemMonitor_Initialise();
@@ -66,7 +66,7 @@ void Stg_MemMonitor_Finalise();
  * ratio specified (thus same semantics as the percentChange calculated). */
 void Stg_MemMonitor_SetMemoryWatchCriteria( double ratioOfTotalMemory );
 
-Stg_MemMonitor* Stg_MemMonitor_New( char* tag, Bool criteria, Bool print, int comm );
+Stg_MemMonitor* Stg_MemMonitor_New( char* tag, Bool criteria, Bool print, MPI_Comm comm );
 void Stg_MemMonitor_Delete( Stg_MemMonitor* mm );
 
 void Stg_MemMonitor_Begin( Stg_MemMonitor* mm );

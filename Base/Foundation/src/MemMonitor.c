@@ -85,7 +85,7 @@ void Stg_MemMonitor_SetMemoryWatchCriteria( double ratioOfTotalMemory ) {
 	Stg_MemoryWatchCriteria = ratioOfTotalMemory;
 }
 
-Stg_MemMonitor* Stg_MemMonitor_New( char* tag, Bool criteria, Bool print, int comm ) {
+Stg_MemMonitor* Stg_MemMonitor_New( char* tag, Bool criteria, Bool print, MPI_Comm comm ) {
 	Stg_MemMonitor* mm;
 	
 	mm = Memory_Alloc_Unnamed( Stg_MemMonitor );

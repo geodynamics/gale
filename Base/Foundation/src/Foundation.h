@@ -41,6 +41,7 @@
 #ifndef __Base_Foundation_h__
 #define __Base_Foundation_h__
 	
+        #include <mpi.h>
 	#include "types.h"
 	#include "shortcuts.h"
 	#include "debug.h"

@@ -88,7 +88,7 @@
 	
 	
 	/** Sets the name of the object. */
-	void Stg_Object_SetName( void* object, Name name );
+	void Stg_Object_SetName( void* object, const Name name );
 	
 	
 	/** \internal Get the object name. */
