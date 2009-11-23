@@ -744,21 +744,21 @@ Stg_Component* _Stg_ComponentFactory_ConstructByKey(
 }
 
 Stg_Component* _Stg_ComponentFactory_PluginConstructByKey( 
-		void*			cf, 
-		void*       codelet, 
-		Dictionary_Entry_Key	componentKey,
-		Type			type, 
-		Bool 			isEssential,
-		void* 			data ) 
+	void*						cf, 
+	void*						codelet, 
+	Dictionary_Entry_Key	componentKey,
+	Type						type, 
+	Bool						isEssential,
+	void*						data ) 
 {
-	Stg_ComponentFactory*    self           = (Stg_ComponentFactory*)cf;
-	Stg_Component*	          plugin	       = (Stg_Component*)codelet;
-	Dictionary*		          thisPluginDict = NULL;
-	Dictionary*		          pluginDict     = Dictionary_Get( self->rootDict, "plugins" );
-	Name			             componentName, redirect, pluginType;
-	Dictionary_Entry_Value*	 componentEntryVal;
-	Index		pluginIndex;	
-	Stream*			errorStream       = Journal_Register( Error_Type, self->type );
+	Stg_ComponentFactory*	self = (Stg_ComponentFactory*)cf;
+	Stg_Component*				plugin = (Stg_Component*)codelet;
+	Dictionary*					thisPluginDict = NULL;
+	Dictionary*					pluginDict = (Dictionary*)Dictionary_Get( self->rootDict, "plugins" );
+	Name							componentName, redirect, pluginType;
+	Dictionary_Entry_Value*	componentEntryVal;
+	Index							pluginIndex;
+	Stream*						errorStream = Journal_Register( Error_Type, self->type );
 
 	Journal_Firewall( self != NULL, errorStream, "In func %s: Stg_Component is NULL.\n", __func__ );
 
@@ -766,6 +766,7 @@ Stg_Component* _Stg_ComponentFactory_PluginConstructByKey(
 	for( pluginIndex = 0; pluginIndex < Dictionary_Entry_Value_GetCount( pluginDict ); pluginIndex++ ) {
 		thisPluginDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetElement( pluginDict, pluginIndex ) );
 		pluginType = StG_Strdup( Dictionary_GetString( thisPluginDict, "Type" ) );
+
 		if( !strcmp( plugin->type, pluginType ) ){
 		   Memory_Free( pluginType );
 			break;
@@ -798,7 +799,7 @@ Dictionary_Entry_Value* _Stg_ComponentFactory_PluginGetDictionaryValue( void* cf
 	Stg_ComponentFactory*       self              = (Stg_ComponentFactory*) cf;
 	Stg_Component*	          plugin	       = (Stg_Component*)codelet;
 	Dictionary*		          thisPluginDict = NULL;
-	Dictionary*		          pluginDict     = Dictionary_Get( self->rootDict, "plugins" );
+	Dictionary*		          pluginDict     = (Dictionary*)Dictionary_Get( self->rootDict, "plugins" );
 	Name			             pluginType;
 	Index		pluginIndex;
 	Dictionary_Entry_Value* returnVal;

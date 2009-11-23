@@ -71,12 +71,10 @@ void TestSetDt( void* context, double _dt ) {
    dt = _dt;
 }
 
-
 typedef struct {
    TestContext*	ctx;
    Dictionary*		dict;
 } AbstractContextSuiteData;
-
 
 TestContext* TestContext_New(
 	Name			name,
@@ -89,7 +87,7 @@ TestContext* TestContext_New(
 
    ctx = (TestContext*)_AbstractContext_New( 
       sizeof(TestContext), 
-      "TestContext", 
+     	"TestContext", 
       _AbstractContext_Delete, 
       _AbstractContext_Print, 
       NULL,
@@ -137,7 +135,6 @@ void TestInitialConditions( void* context ) {
    }
 }
 
-
 double TestDt( void* context ) {
    TestContext* self = (TestContext*)context;
    self->dtHookCalled++;
@@ -177,9 +174,9 @@ void TestDump( void* context ) {
 }
 
 void AbstractContextSuite_Setup( AbstractContextSuiteData* data ) {
-   Stg_ComponentFactory* cf;
-   MPI_Comm       CommWorld;
-   Index          ii;
+   Stg_ComponentFactory*	cf;
+   MPI_Comm						CommWorld;
+   Index							ii;
 
    data->dict = Dictionary_New();
 
@@ -196,12 +193,7 @@ void AbstractContextSuite_Setup( AbstractContextSuiteData* data ) {
 
    MPI_Comm_dup( MPI_COMM_WORLD, &CommWorld );
    /* Build the context */
-   data->ctx = TestContext_New( 
-      "context", 
-      0, 
-      0, 
-      CommWorld, 
-      data->dict );
+   data->ctx = TestContext_New( "context", 0, 0, CommWorld, data->dict );
 
 	_AbstractContext_Init( (AbstractContext*)data->ctx );
    _AbstractContext_AssignFromXML( data->ctx, cf, NULL );
@@ -210,10 +202,9 @@ void AbstractContextSuite_Setup( AbstractContextSuiteData* data ) {
 }
 
 void AbstractContextSuite_Teardown( AbstractContextSuiteData* data ) {
-   Stg_Class_Delete( data->dict );
+	_Stg_Component_Delete( data->ctx );
 }
 
-  
 void AbstractContextSuite_TestDefaultEPs( AbstractContextSuiteData* data ) {
    ContextEntryPoint*      contextEP=NULL;
 
@@ -286,10 +277,7 @@ void AbstractContextSuite_TestRunBasic( AbstractContextSuiteData* data ) {
    pcu_check_true( data->ctx->outputHookCalled == 10 );
    pcu_check_true( data->ctx->dumpHookCalled == 10/Dictionary_GetUnsignedInt(data->dict, "dumpEvery" ) );
    pcu_check_true( data->ctx->checkpointHookCalled == 10/Dictionary_GetUnsignedInt(data->dict, "checkpointEvery" ) );
-
-   Stg_Component_Destroy( data->ctx, 0 /* dummy */, False );
 }
-
 
 void AbstractContextSuite_TestRunNoDtDefined( AbstractContextSuiteData* data ) {
    ContextEP_ReplaceAll( data->ctx, AbstractContext_EP_Build, TestBuild );
@@ -304,10 +292,7 @@ void AbstractContextSuite_TestRunNoDtDefined( AbstractContextSuiteData* data ) {
    stJournal->enable = False;
    pcu_check_assert( Stg_Component_Execute( data->ctx, 0 /* dummy */, False ) );
    stJournal->enable = True;
-
-   Stg_Component_Destroy( data->ctx, 0 /* dummy */, False );
 }
-
 
 void AbstractContextSuite_TestRestartFromCheckpoint( AbstractContextSuiteData* data ) {
    Stg_ComponentFactory* cf;
@@ -323,18 +308,20 @@ void AbstractContextSuite_TestRestartFromCheckpoint( AbstractContextSuiteData* d
    Stg_Component_Execute( data->ctx, 0 /* dummy */, False );
    Stg_Component_Destroy( data->ctx, 0 /* dummy */, False );
 
+   data->dict = Dictionary_New();
+
+   Dictionary_Add( data->dict, "outputPath", Dictionary_Entry_Value_FromString( "output" ) );
+   Dictionary_Add( data->dict, "checkpointEvery", Dictionary_Entry_Value_FromUnsignedInt( 5 ) );
+   Dictionary_Add( data->dict, "dumpEvery", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
+   Dictionary_Add( data->dict, "maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( 10 ) );
+
    /* ReBuild the context */
    Dictionary_Set( data->dict, "maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( 20 ) );
    Dictionary_Set( data->dict, "restartTimestep", Dictionary_Entry_Value_FromUnsignedInt( 5 ) );
    MPI_Comm_dup( MPI_COMM_WORLD, &CommWorld );
    cf = Stg_ComponentFactory_New( data->dict, NULL );
 
-   data->ctx = TestContext_New( 
-      "context", 
-      0, 
-      0, 
-      CommWorld, 
-      data->dict );
+   data->ctx = TestContext_New( "context", 0, 0, CommWorld, data->dict );
 
 	_AbstractContext_Init( (AbstractContext*)data->ctx );
    _AbstractContext_AssignFromXML( data->ctx, cf, NULL );
@@ -356,10 +343,7 @@ void AbstractContextSuite_TestRestartFromCheckpoint( AbstractContextSuiteData* d
     *  run1_ts + run2_ts, and computed value should equal 1.1 to power (run1_ts + run2_ts) */  
    pcu_check_true( data->ctx->timeStep == (5 + 20) );
    pcu_check_true( abs(data->ctx->computedValue - pow( 1.1, (5 + 20) )) < 1e-8 );
-
-   Stg_Component_Destroy( data->ctx, 0 /* dummy */, False );
 }
-
 
 void AbstractContextSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, AbstractContextSuiteData );

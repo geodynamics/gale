@@ -54,23 +54,33 @@ static const int STRUCT_INIT_SIZE = 2;
 static const int STRUCT_DELTA = 2;
 
 Dictionary* Dictionary_New( void ) {
-	return _Dictionary_New( sizeof(Dictionary), Dictionary_Type, _Dictionary_Delete, _Dictionary_Print, _Dictionary_Copy, 
-		_Dictionary_Add, _Dictionary_AddWithSource, _Dictionary_Set, _Dictionary_SetWithSource, _Dictionary_Get, _Dictionary_GetSource );
+	return _Dictionary_New(
+		sizeof(Dictionary),
+		Dictionary_Type,
+		_Dictionary_Delete,
+		_Dictionary_Print,
+		_Dictionary_Copy, 
+		_Dictionary_Add,
+		_Dictionary_AddWithSource,
+		_Dictionary_Set,
+		_Dictionary_SetWithSource,
+		_Dictionary_Get,
+		_Dictionary_GetSource );
 }
 
 Dictionary* _Dictionary_New( 
-		SizeT				_sizeOfSelf, 
-		Type 				type, 
-		Stg_Class_DeleteFunction* 		_delete,
-		Stg_Class_PrintFunction* 		_print,
-		Stg_Class_CopyFunction*		_copy, 
-		Dictionary_AddFunction* 	add,
-		Dictionary_AddWithSourceFunction*	addWithSource,
-		Dictionary_SetFunction* 	set,
-		Dictionary_SetWithSourceFunction*	setWithSource,
-		Dictionary_GetFunction* 	get,
-		Dictionary_GetSourceFunction	getSource)
-{		
+	SizeT											_sizeOfSelf, 
+	Type											type, 
+	Stg_Class_DeleteFunction*				_delete,
+	Stg_Class_PrintFunction*				_print,
+	Stg_Class_CopyFunction*					_copy, 
+	Dictionary_AddFunction*					add,
+	Dictionary_AddWithSourceFunction*	addWithSource,
+	Dictionary_SetFunction*					set,
+	Dictionary_SetWithSourceFunction*	setWithSource,
+	Dictionary_GetFunction*					get,
+	Dictionary_GetSourceFunction			getSource)
+{	
 	Dictionary* self;
 	
 	/* Allocate memory */
@@ -93,38 +103,15 @@ Dictionary* _Dictionary_New(
 	return self;
 }
 
+void _Dictionary_Init( void* dictionary ) {
+	Dictionary* self = (Dictionary*) dictionary;
 
-void Dictionary_Init( Dictionary* self ) {
-	/* General info */
-	self->_sizeOfSelf = sizeof( Dictionary );
-	self->type = Dictionary_Type;
-	self->_deleteSelf = False;
-	
-	/* Virtual info */
-	_Stg_Class_Init( (Stg_Class*)self );
-	self->_print = _Dictionary_Print;
-	self->_delete = _Dictionary_Delete;
-	self->_copy = _Dictionary_Copy;
-	self->add = _Dictionary_Add;
-	self->addWithSource = _Dictionary_AddWithSource;
-	self->set = _Dictionary_Set;
-	self->setWithSource = _Dictionary_SetWithSource;
-	self->get = _Dictionary_Get;
-	self->getSource = _Dictionary_GetSource;
-	
-	/* Dictionary info */
-	_Dictionary_Init( self );
-}
-
-void _Dictionary_Init( Dictionary* self ) {
 	self->size = DEFAULT_INIT_SIZE;
 	self->delta = DEFAULT_DELTA;
 	self->count = 0;
 	self->entryPtr = Memory_Alloc_Array( Dictionary_Entry*, self->size, "Dictionary->entryPtr" );
-
 	self->debugStream = Journal_Register( Debug_Type, "DictionaryWarning" );
 }
-
 
 void _Dictionary_Delete( void* dictionary ) {
 	Dictionary* self = (Dictionary*) dictionary;
@@ -138,7 +125,6 @@ void _Dictionary_Delete( void* dictionary ) {
 	/* Stg_Class_Delete parent */
 	_Stg_Class_Delete( self );
 }
-
 
 void _Dictionary_Print( void* dictionary, Stream* stream ) {
 	Dictionary* self = (Dictionary*) dictionary;
@@ -154,6 +140,7 @@ void _Dictionary_Print( void* dictionary, Stream* stream ) {
 	Journal_Printf( (void*)stream, "\tentryPtr[0-%u]: {\n", self->count );
 	Stream_Indent( stream );
 	Stream_Indent( stream );
+
 	for( index = 0; index < self->count; index++ ) {
 		/*Journal_Printf( (void*)stream, "\t\t" );*/
 		Dictionary_Entry_Print( self->entryPtr[index], stream ); 

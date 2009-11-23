@@ -24,8 +24,6 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-*/
-/** \file
 **  Role:
 **	Abstract class faciliting how "modellers"/"solvers" are laid out and execute.
 **
@@ -87,83 +85,83 @@
 	#define __AbstractContext \
 		/* General info */ \
 		__Stg_Component \
-		Dictionary*		dictionary; \
+		Dictionary*					dictionary; \
 		\
 		/* Virtual info */ \
-		AbstractContext_SetDt* _setDt; \
+		AbstractContext_SetDt*	_setDt; \
 		\
 		/* AbstractContext info */ \
-		MPI_Comm			communicator; \
-		int				rank; \
-		int				nproc; \
+		MPI_Comm						communicator; \
+		int							rank; \
+		int							nproc; \
 		/** Start time for the simulation. */ \
-		double			startTime; \
+		double						startTime; \
 		/** Stop time for the simulation. Note that if this is 0, the sim will keep running unless a 
 		max loops criterion is met. */ \
-		double			stopTime; \
-		double			currentTime; \
-		unsigned int	timeStep; \
-		double			dtFactor; \
-		double			dt; \
+		double						stopTime; \
+		double						currentTime; \
+		unsigned int				timeStep; \
+		double						dtFactor; \
+		double						dt; \
 		/** This additional timestep is necessary for checkpoint restart runs, so it can be compared against
 			maxTimeSteps (which is now relative to job restart).*/ \
-		unsigned int	timeStepSinceJobRestart; \
+		unsigned int				timeStepSinceJobRestart; \
 		/** Maximum number of time steps to run for. If set to 0, then this will  be ignored. */ \
-		unsigned int	maxTimeSteps; \
+		unsigned int				maxTimeSteps; \
 		/** Final Time Step: last time step to run till, no matter if maxTimeSteps still has some
 		     left in a checkpoint restart run. If 0 (the default), not active. */ \
-		unsigned int	finalTimeStep; \
-		Bool				gracefulQuit; \
-		unsigned int	frequentOutputEvery; \
-		unsigned int	dumpEvery; \
-		unsigned int	checkpointEvery; \
-		unsigned int	saveDataEvery; \
-		double			checkpointAtTimeInc; \
-		double			nextCheckpointTime; \
-		Name				experimentName; \
-		char*				outputPath; \
-		char*				checkpointReadPath; \
-		char*				checkpointWritePath; \
+		unsigned int				finalTimeStep; \
+		Bool							gracefulQuit; \
+		unsigned int				frequentOutputEvery; \
+		unsigned int				dumpEvery; \
+		unsigned int				checkpointEvery; \
+		unsigned int				saveDataEvery; \
+		double						checkpointAtTimeInc; \
+		double						nextCheckpointTime; \
+		Name							experimentName; \
+		char*							outputPath; \
+		char*							checkpointReadPath; \
+		char*							checkpointWritePath; \
 		/** user set bool to determine whether checkpoint (or data) files should be placed in a per timestep directory */ \
-		Bool				checkpointAppendStep; \
+		Bool							checkpointAppendStep; \
 		/** user set bool to determine whether checkpoint restarts should interpolate to new 
 			resolution (where resolution is different from checkpoints) */ \
-		Bool				interpolateRestart; \
-		Bool				loadFromCheckPoint; \
+		Bool							interpolateRestart; \
+		Bool							loadFromCheckPoint; \
 		/** Bool to determine whether we are storing a full checkpoint (for restart) or only data for analysis */ \
-		Bool				isDataSave; \
+		Bool							isDataSave; \
 		/** flattened XML output can be disabled if desired (default True) */ \
-		Bool				outputFlattenedXML;      \
-		unsigned int	restartTimestep;         \
-		char*				checkPointPrefixString;  \
-		Stream*			info; \
-		Stream*			verbose; \
-		Stream*			debug; \
+		Bool							outputFlattenedXML; \
+		unsigned int				restartTimestep; \
+		char*							checkPointPrefixString; \
+		Stream*						info; \
+		Stream*						verbose; \
+		Stream*						debug; \
 		\
 		/* These are stored keys to entrypoints in the table, used for O(1) lookup (i.e. speed) */ \
 		/* Contexts "are" Components implemented by entrypoints... there's an entry point per component phase */ \
-		EntryPoint_Index	constructK; \
-		EntryPoint_Index	constructExtensionsK; \
-		EntryPoint_Index	buildK; \
-		EntryPoint_Index	initialiseK; \
-		EntryPoint_Index	executeK; \
-		EntryPoint_Index	destroyK; \
-		EntryPoint_Index	destroyExtensionsK; \
+		EntryPoint_Index			constructK; \
+		EntryPoint_Index			constructExtensionsK; \
+		EntryPoint_Index			buildK; \
+		EntryPoint_Index			initialiseK; \
+		EntryPoint_Index			executeK; \
+		EntryPoint_Index			destroyK; \
+		EntryPoint_Index			destroyExtensionsK; \
 		\
 		/* The following are not really part of an abstract context, and will one day be refactored somewhere else */ \
-		EntryPoint_Index	dtK; \
-		EntryPoint_Index	stepK; \
-		EntryPoint_Index	updateClassK; \
-		EntryPoint_Index	solveK; \
-		EntryPoint_Index	postSolveK; \
-		EntryPoint_Index	syncK; \
-		EntryPoint_Index	frequentOutputK; \
-		EntryPoint_Index	dumpK; \
-		EntryPoint_Index	dumpClassK; \
-		EntryPoint_Index	saveK; \
-		EntryPoint_Index	saveClassK; \
-		EntryPoint_Index	dataSaveK; \
-		EntryPoint_Index	dataSaveClassK; \
+		EntryPoint_Index			dtK; \
+		EntryPoint_Index			stepK; \
+		EntryPoint_Index			updateClassK; \
+		EntryPoint_Index			solveK; \
+		EntryPoint_Index			postSolveK; \
+		EntryPoint_Index			syncK; \
+		EntryPoint_Index			frequentOutputK; \
+		EntryPoint_Index			dumpK; \
+		EntryPoint_Index			dumpClassK; \
+		EntryPoint_Index			saveK; \
+		EntryPoint_Index			saveClassK; \
+		EntryPoint_Index			dataSaveK; \
+		EntryPoint_Index			dataSaveClassK; \
 		\
 		Variable_Register*		variable_Register; \
 		Pointer_Register*			pointer_Register; \
@@ -282,7 +280,9 @@
 	
 	/* Default construction hook, and overrides for the EP to handle the context/ptrToContext synchronisation */
 	void _AbstractContext_Construct_Hook( void* _context, void* data );
+
 	Func_Ptr _AbstractContext_Construct_EP_GetRun( void* entryPoint );
+
 	void _AbstractContext_Construct_EP_Run( void* entryPoint, void* data0, void* data1 );
 	
 	/* Default construction hook */
@@ -292,6 +292,8 @@
 	void _AbstractContext_Step( void* _context, double dt );
 	
 	void _AbstractContext_LoadTimeInfoFromCheckPoint( void* _context, Index timeStep, double* dtLoadedFromFile );
+
 	void _AbstractContext_SaveTimeInfo( void* _context );
+
 	void _AbstractContext_CreateCheckpointDirectory( void* _context );
 #endif /* __Base_Context_AbstractContext_h__ */

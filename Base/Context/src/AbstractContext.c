@@ -227,10 +227,6 @@ void _AbstractContext_Delete( void* abstractContext ) {
 
 	Stg_Class_Delete( self->variable_Register );
 	
-	/* Temporarily disabling this line as the Underworld PCU test fails 
-	when this line is called. Need to look for an alternative way to delete this. */	
-	/*Stg_Class_Delete( self->plugins );*/
-	
 	/* Stg_Class_Delete parent */
 	_Stg_Component_Delete( self );
 }
@@ -607,7 +603,7 @@ void _AbstractContext_Execute( void* context, void* data ) {
 
 
 void _AbstractContext_Destroy( void* context, void* data ) {
-	AbstractContext*	self = (AbstractContext*)context;
+	AbstractContext* self = (AbstractContext*)context;
 	
 	Journal_Printf( self->debug, "In: %s\n", __func__ );
 
@@ -624,13 +620,12 @@ void _AbstractContext_Destroy( void* context, void* data ) {
    /* remove the self->extensionMgr of this context from the extensionMgr_Register */
 	ExtensionManager_Register_Remove( extensionMgr_Register, self->extensionMgr );
    Stg_Class_Delete( self->extensionMgr );
+	Stg_Class_Delete( self->dictionary );	
 
 	Memory_Free( self->experimentName );
 	Memory_Free( self->outputPath );
 	Memory_Free( self->checkpointReadPath );
 	Memory_Free( self->checkpointWritePath );
-
-   /*_AbstractContext_Delete( context );*/
 }
 
 

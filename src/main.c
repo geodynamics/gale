@@ -143,19 +143,19 @@ static void printRightsListItem( Stream* stream, Type componentType ) {
 
 int main( int argc, char* argv[] ) {
 	/* StGermain standard bits & pieces */
-	MPI_Comm			CommWorld;
-	int				rank;
-	int				numProcessors;
-	Dictionary*			dictionary;
+	MPI_Comm						CommWorld;
+	int							rank;
+	int							numProcessors;
+	Dictionary*					dictionary;
 	XML_IO_Handler*			ioHandler;
-	Stream*                         stream;
-	char*                           helpTopic;
-	char*                           listAllTopic;
-	Stg_ObjectList*                 listAllTopics;
-	char*                           listTopic;
-	Stg_ObjectList*                 listTopics;
-	Dictionary*			componentDict;
-	Stg_ComponentFactory*		cf;
+	Stream*						stream;
+	char*							helpTopic;
+	char*							listAllTopic;
+	Stg_ObjectList*			listAllTopics;
+	char*							listTopic;
+	Stg_ObjectList*			listTopics;
+	Dictionary*					componentDict;
+	Stg_ComponentFactory*	cf;
 
 	/* Initialise PETSc, get world info */
 	MPI_Init( &argc, &argv );
@@ -291,7 +291,6 @@ int main( int argc, char* argv[] ) {
 	/* Close off everything */
 	Stg_Class_Delete( listAllTopics );
 	Stg_Class_Delete( listTopics );
-	Stg_Class_Delete( dictionary );
 	#ifdef HAVE_PYTHON
 		Py_Finalize();
 	#endif

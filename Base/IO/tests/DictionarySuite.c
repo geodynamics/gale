@@ -110,22 +110,16 @@ void DictionarySuite_SetupTestDictData( DictionarySuite_TestDictData* testDD ) {
    testStruct = Dictionary_Entry_Value_NewStruct();
    Stg_asprintf( &testDD->testKeys[++iter], "test_struct" );
    testDD->testValues[iter] = testStruct;
-   Dictionary_Entry_Value_AddMember( testStruct, "height",
-      Dictionary_Entry_Value_FromDouble( testDD->testStruct->height ) );
-   Dictionary_Entry_Value_AddMember( testStruct, "anisotropic",
-      Dictionary_Entry_Value_FromBool( testDD->testStruct->anisotropic ) );
-   Dictionary_Entry_Value_AddMember( testStruct, "person",
-      Dictionary_Entry_Value_FromString( testDD->testStruct->person ) );
+   Dictionary_Entry_Value_AddMember( testStruct, "height", Dictionary_Entry_Value_FromDouble( testDD->testStruct->height ) );
+   Dictionary_Entry_Value_AddMember( testStruct, "anisotropic", Dictionary_Entry_Value_FromBool( testDD->testStruct->anisotropic ) );
+   Dictionary_Entry_Value_AddMember( testStruct, "person", Dictionary_Entry_Value_FromString( testDD->testStruct->person ) );
 
    /* Adding a 2nd struct within the first struct */
    testStruct2 = Dictionary_Entry_Value_NewStruct();
    Dictionary_Entry_Value_AddMember( testStruct, "geom", testStruct2 );
-   Dictionary_Entry_Value_AddMember( testStruct2, "startx",
-      Dictionary_Entry_Value_FromUnsignedInt( testDD->testStruct->geom.startx ) );
-   Dictionary_Entry_Value_AddMember( testStruct2, "starty",
-      Dictionary_Entry_Value_FromUnsignedInt( testDD->testStruct->geom.starty ) );
-   Dictionary_Entry_Value_AddMember( testStruct2, "startz",
-      Dictionary_Entry_Value_FromUnsignedInt( testDD->testStruct->geom.startz ) );
+   Dictionary_Entry_Value_AddMember( testStruct2, "startx", Dictionary_Entry_Value_FromUnsignedInt( testDD->testStruct->geom.startx ) );
+   Dictionary_Entry_Value_AddMember( testStruct2, "starty", Dictionary_Entry_Value_FromUnsignedInt( testDD->testStruct->geom.starty ) );
+   Dictionary_Entry_Value_AddMember( testStruct2, "startz", Dictionary_Entry_Value_FromUnsignedInt( testDD->testStruct->geom.startz ) );
 }
 
 void DictionarySuite_Setup( DictionarySuiteData* data ) {
@@ -206,14 +200,12 @@ void DictionarySuite_TestCopyCompare( DictionarySuiteData* data ) {
    
    for( ii = 0; ii < data->dict->count; ii++ ) {
       copiedDev = Dictionary_Entry_Value_Copy( data->testDD->testValues[ii], True );
-      pcu_check_true( Dictionary_Entry_Value_Compare( data->testDD->testValues[ii],
-         copiedDev ) ); 
+      pcu_check_true( Dictionary_Entry_Value_Compare( data->testDD->testValues[ii], copiedDev ) ); 
       Dictionary_Entry_Value_Delete( copiedDev );
 
       for( jj = 0; jj < data->dict->count; jj++ ) {
          if ( ii == jj ) continue;
-         pcu_check_true( False == Dictionary_Entry_Value_Compare( data->testDD->testValues[ii],
-            data->testDD->testValues[jj] ) ); 
+         pcu_check_true( False == Dictionary_Entry_Value_Compare( data->testDD->testValues[ii], data->testDD->testValues[jj] ) ); 
       }
    }
 }
@@ -247,8 +239,7 @@ void DictionarySuite_TestGet( DictionarySuiteData* data ) {
    DictionarySuite_PopulateDictWithTestValues( data->dict, data->testDD );
 
    testStruct = Dictionary_Get( data->dict, "test_struct" );
-   yValue = Dictionary_Entry_Value_GetMember(
-      Dictionary_Entry_Value_GetMember(testStruct, "geom"), "starty");
+   yValue = Dictionary_Entry_Value_GetMember( Dictionary_Entry_Value_GetMember(testStruct, "geom"), "starty");
    pcu_check_true( data->testDD->testStruct->geom.starty == Dictionary_Entry_Value_AsDouble( yValue ) );
 }
 
@@ -296,8 +287,7 @@ void DictionarySuite_TestAddElement( DictionarySuiteData* data ) {
 
    /* turning the starty value into a list using add element */
    testStruct = Dictionary_Get( data->dict, "test_struct" );
-   yValue = Dictionary_Entry_Value_GetMember(
-      Dictionary_Entry_Value_GetMember(testStruct, "geom"), "starty");
+   yValue = Dictionary_Entry_Value_GetMember( Dictionary_Entry_Value_GetMember(testStruct, "geom"), "starty");
    Dictionary_Entry_Value_AddElement( yValue, Dictionary_Entry_Value_FromDouble(newVal) );
 
    pcu_check_true( Dictionary_Entry_Value_Type_List == yValue->type );
@@ -321,36 +311,24 @@ void DictionarySuite_TestShortcuts( DictionarySuiteData* data ) {
    pcu_check_streq( data->testDD->testString, Dictionary_GetString_WithDefault( data->dict, "test_cstring", "heya" ) );
    pcu_check_streq( "heya", Dictionary_GetString_WithDefault( data->dict, "test_cstring2", "heya" ) );
    pcu_check_true( NULL != Dictionary_Get( data->dict, "test_cstring2" ) );
-   pcu_check_true( data->testDD->testDouble =
-      Dictionary_GetDouble_WithDefault( data->dict, "test_double", 2.8 ) );
-   pcu_check_true( 2.8 ==
-      Dictionary_GetDouble_WithDefault( data->dict, "test_double2", 2.8 ) );
+   pcu_check_true( data->testDD->testDouble = Dictionary_GetDouble_WithDefault( data->dict, "test_double", 2.8 ) );
+   pcu_check_true( 2.8 == Dictionary_GetDouble_WithDefault( data->dict, "test_double2", 2.8 ) );
    pcu_check_true( NULL != Dictionary_Get( data->dict, "test_double2" ) );
-   pcu_check_true( data->testDD->testUint =
-      Dictionary_GetUnsignedInt_WithDefault( data->dict, "test_uint", 33 ) );
-   pcu_check_true( 33 ==
-      Dictionary_GetUnsignedInt_WithDefault( data->dict, "test_uint2", 33 ) );
+   pcu_check_true( data->testDD->testUint = Dictionary_GetUnsignedInt_WithDefault( data->dict, "test_uint", 33 ) );
+   pcu_check_true( 33 == Dictionary_GetUnsignedInt_WithDefault( data->dict, "test_uint2", 33 ) );
    pcu_check_true( NULL != Dictionary_Get( data->dict, "test_uint2" ) );
-   pcu_check_true( data->testDD->testInt =
-      Dictionary_GetInt_WithDefault( data->dict, "test_int", -24 ) );
-   pcu_check_true( -24 ==
-      Dictionary_GetInt_WithDefault( data->dict, "test_int2", -24 ) );
+   pcu_check_true( data->testDD->testInt = Dictionary_GetInt_WithDefault( data->dict, "test_int", -24 ) );
+   pcu_check_true( -24 == Dictionary_GetInt_WithDefault( data->dict, "test_int2", -24 ) );
    pcu_check_true( NULL != Dictionary_Get( data->dict, "test_int2" ) );
-   pcu_check_true( data->testDD->testUnsignedlong =
-      Dictionary_GetUnsignedLong_WithDefault( data->dict, "test_unsignedlong", 32433 ) );
-   pcu_check_true( 32433 ==
-      Dictionary_GetUnsignedLong_WithDefault( data->dict, "test_unsignedlong2", 32433 ) );
+   pcu_check_true( data->testDD->testUnsignedlong = Dictionary_GetUnsignedLong_WithDefault( data->dict, "test_unsignedlong", 32433 ) );
+   pcu_check_true( 32433 == Dictionary_GetUnsignedLong_WithDefault( data->dict, "test_unsignedlong2", 32433 ) );
    pcu_check_true( NULL != Dictionary_Get( data->dict, "test_unsignedlong2" ) );
-   pcu_check_true( data->testDD->testBool =
-      Dictionary_GetBool_WithDefault( data->dict, "test_bool", False ) );
-   pcu_check_true( False ==
-      Dictionary_GetBool_WithDefault( data->dict, "test_bool2", False ) );
+   pcu_check_true( data->testDD->testBool = Dictionary_GetBool_WithDefault( data->dict, "test_bool", False ) );
+   pcu_check_true( False == Dictionary_GetBool_WithDefault( data->dict, "test_bool2", False ) );
    pcu_check_true( NULL != Dictionary_Get( data->dict, "test_bool2" ) );
 
-   pcu_check_streq( data->testDD->testString, 
-      Dictionary_GetString_WithPrintfDefault( data->dict, "test_cstring", "heya%s%u", "hey", 3 ) );
-   pcu_check_streq( "heyahey3",
-      Dictionary_GetString_WithPrintfDefault( data->dict, "test_cstring3", "heya%s%u", "hey", 3 ) );
+   pcu_check_streq( data->testDD->testString, Dictionary_GetString_WithPrintfDefault( data->dict, "test_cstring", "heya%s%u", "hey", 3 ) );
+   pcu_check_streq( "heyahey3", Dictionary_GetString_WithPrintfDefault( data->dict, "test_cstring3", "heya%s%u", "hey", 3 ) );
    pcu_check_true( NULL != Dictionary_Get( data->dict, "test_cstring3" ) );
 }
 
@@ -362,31 +340,23 @@ void DictionarySuite_TestMerge( DictionarySuiteData* data ) {
    Dictionary_Entry_Value*    expectedMergedStruct=NULL;
 
    testStruct2 = Dictionary_Entry_Value_NewStruct();
-   Dictionary_Entry_Value_AddMember( testStruct2, "height",
-      Dictionary_Entry_Value_FromDouble( data->testDD->testStruct->height ) );
-   Dictionary_Entry_Value_AddMember( testStruct2, "anisotropic",
-      Dictionary_Entry_Value_FromBool( False ) );
-   Dictionary_Entry_Value_AddMember( testStruct2, "new_person",
-      Dictionary_Entry_Value_FromString( "Luke" ) );
+   Dictionary_Entry_Value_AddMember( testStruct2, "height", Dictionary_Entry_Value_FromDouble( data->testDD->testStruct->height ) );
+   Dictionary_Entry_Value_AddMember( testStruct2, "anisotropic", Dictionary_Entry_Value_FromBool( False ) );
+   Dictionary_Entry_Value_AddMember( testStruct2, "new_person", Dictionary_Entry_Value_FromString( "Luke" ) );
    testGeomStruct2 = Dictionary_Entry_Value_NewStruct();
    Dictionary_Entry_Value_AddMember( testStruct2, "geom", testGeomStruct2 );
-   Dictionary_Entry_Value_AddMember( testGeomStruct2, "startx",
-      Dictionary_Entry_Value_FromUnsignedInt( data->testDD->testStruct->geom.startx ) );
-   Dictionary_Entry_Value_AddMember( testGeomStruct2, "startz",
-      Dictionary_Entry_Value_FromUnsignedInt( 222 ) );
+   Dictionary_Entry_Value_AddMember( testGeomStruct2, "startx", Dictionary_Entry_Value_FromUnsignedInt( data->testDD->testStruct->geom.startx ) );
+   Dictionary_Entry_Value_AddMember( testGeomStruct2, "startz", Dictionary_Entry_Value_FromUnsignedInt( 222 ) );
 
    /* Testing Merge_Append */
    DictionarySuite_PopulateDictWithTestValues( data->dict, data->testDD );
    /* Do a copy of the DEV during merge, since we don't want it being deleted */
-   Dictionary_AddMerge( data->dict, "test_struct",
-      Dictionary_Entry_Value_Copy( testStruct2, True ), Dictionary_MergeType_Append );
+   Dictionary_AddMerge( data->dict, "test_struct", Dictionary_Entry_Value_Copy( testStruct2, True ), Dictionary_MergeType_Append );
    /* OK: since this was an append, we expect _two_ entries called "test_struct",
     * one preceding the other, one with the orig data, one with new data */    
    pcu_check_true( (data->testDD->testEntriesCount+1) == data->dict->count );
-   pcu_check_true( Dictionary_Entry_Value_Compare( data->testDD->testValues[7],
-      Dictionary_Get( data->dict, "test_struct" ) ) );
-   pcu_check_true( Dictionary_Entry_Value_Compare( testStruct2,
-      data->dict->entryPtr[8]->value ) );
+   pcu_check_true( Dictionary_Entry_Value_Compare( data->testDD->testValues[7], Dictionary_Get( data->dict, "test_struct" ) ) );
+   pcu_check_true( Dictionary_Entry_Value_Compare( testStruct2, data->dict->entryPtr[8]->value ) );
    Dictionary_Empty( data->dict );
 
    /* Testing Merge_Merge */
@@ -395,30 +365,23 @@ void DictionarySuite_TestMerge( DictionarySuiteData* data ) {
    /* The nicest way for this test I think is to manually build a merged struct
     *  to compare against */
    expectedMergedStruct = Dictionary_Entry_Value_Copy( data->testDD->testValues[7], True );
-   Dictionary_Set( expectedMergedStruct->as.typeStruct, "anisotropic", 
-      Dictionary_Entry_Value_FromBool( False ) );
-   Dictionary_Add( expectedMergedStruct->as.typeStruct, "new_person",
-      Dictionary_Entry_Value_FromString( "Luke" ) );
-   Dictionary_Set( (Dictionary_Get( expectedMergedStruct->as.typeStruct, "geom" ))->as.typeStruct, "startz", 
-      Dictionary_Entry_Value_FromUnsignedInt( 222 ) );
+   Dictionary_Set( expectedMergedStruct->as.typeStruct, "anisotropic", Dictionary_Entry_Value_FromBool( False ) );
+   Dictionary_Add( expectedMergedStruct->as.typeStruct, "new_person", Dictionary_Entry_Value_FromString( "Luke" ) );
+   Dictionary_Set( (Dictionary_Get( expectedMergedStruct->as.typeStruct, "geom" ))->as.typeStruct, "startz", Dictionary_Entry_Value_FromUnsignedInt( 222 ) );
 
-   Dictionary_AddMerge( data->dict, "test_struct",
-      Dictionary_Entry_Value_Copy( testStruct2, True ), Dictionary_MergeType_Merge );
+   Dictionary_AddMerge( data->dict, "test_struct", Dictionary_Entry_Value_Copy( testStruct2, True ), Dictionary_MergeType_Merge );
    /* This time, the new struct should be merged into the existing one */
    pcu_check_true( data->testDD->testEntriesCount == data->dict->count );
    mergedStruct = Dictionary_Get( data->dict, "test_struct" );
-   pcu_check_true( Dictionary_Entry_Value_Compare( mergedStruct,
-      expectedMergedStruct ) );
+   pcu_check_true( Dictionary_Entry_Value_Compare( mergedStruct, expectedMergedStruct ) );
    Dictionary_Empty( data->dict );
    Dictionary_Entry_Value_Delete( expectedMergedStruct );
 
    /* Testing Merge_Replace */
    DictionarySuite_PopulateDictWithTestValues( data->dict, data->testDD );
-   Dictionary_AddMerge( data->dict, "test_struct",
-      Dictionary_Entry_Value_Copy( testStruct2, True ), Dictionary_MergeType_Replace );
+   Dictionary_AddMerge( data->dict, "test_struct", Dictionary_Entry_Value_Copy( testStruct2, True ), Dictionary_MergeType_Replace );
    pcu_check_true( data->testDD->testEntriesCount == data->dict->count );
-   pcu_check_true( Dictionary_Entry_Value_Compare( testStruct2,
-      Dictionary_Get( data->dict, "test_struct" ) ) );
+   pcu_check_true( Dictionary_Entry_Value_Compare( testStruct2, Dictionary_Get( data->dict, "test_struct" ) ) );
    Dictionary_Empty( data->dict );
 
    Dictionary_Entry_Value_Delete( testStruct2 );
@@ -448,72 +411,60 @@ void DictionarySuite_TestReadAllParamFromCommandLine( DictionarySuiteData* data 
    Stg_asprintf( &argv[2], "--option");
    Stg_asprintf( &argv[3], "--output-dir=");
    Stg_asprintf( &expectedKeys[0], "output-dir" );
+
    expectedVals[0] = Dictionary_Entry_Value_FromString( "" );
    Stg_asprintf( &argv[4], "--Ra=1.0e4");
    Stg_asprintf( &expectedKeys[1], "Ra" );
+
    expectedVals[1] = Dictionary_Entry_Value_FromDouble( 1.0e4 );
    Stg_asprintf( &argv[5], "--foo.bar=5");
    Stg_asprintf( &expectedKeys[2], "foo" );
+
    expectedVals[2] = Dictionary_Entry_Value_NewStruct();
-   Dictionary_Entry_Value_AddMember( expectedVals[2], "bar",
-      Dictionary_Entry_Value_FromDouble( 5 ) );
+   Dictionary_Entry_Value_AddMember( expectedVals[2], "bar", Dictionary_Entry_Value_FromDouble( 5 ) );
    Stg_asprintf( &argv[6], "--vpac.csd.steve=cool");
    Stg_asprintf( &expectedKeys[3], "vpac" );
+
    expectedVals[3] = Dictionary_Entry_Value_NewStruct();
-   Dictionary_Entry_Value_AddMember( expectedVals[3], "csd",
-      tmpStruct = Dictionary_Entry_Value_NewStruct() );
-   Dictionary_Entry_Value_AddMember( tmpStruct, "steve",
-      Dictionary_Entry_Value_FromString( "cool" ) );
+   Dictionary_Entry_Value_AddMember( expectedVals[3], "csd", tmpStruct = Dictionary_Entry_Value_NewStruct() );
+   Dictionary_Entry_Value_AddMember( tmpStruct, "steve", Dictionary_Entry_Value_FromString( "cool" ) );
    Stg_asprintf( &argv[7], "--foo.bot=7");
-   Dictionary_Entry_Value_AddMember( expectedVals[2], "bot",
-      Dictionary_Entry_Value_FromDouble( 7 ) );
+   Dictionary_Entry_Value_AddMember( expectedVals[2], "bot", Dictionary_Entry_Value_FromDouble( 7 ) );
    Stg_asprintf( &argv[8], "--sports[]=hockey");
    Stg_asprintf( &expectedKeys[4], "sports" );
+
    expectedVals[4] = Dictionary_Entry_Value_NewList();
-   Dictionary_Entry_Value_AddElement( expectedVals[4], 
-      Dictionary_Entry_Value_FromString( "hockey" ) );
+   Dictionary_Entry_Value_AddElement( expectedVals[4], Dictionary_Entry_Value_FromString( "hockey" ) );
    Stg_asprintf( &argv[9], "--sports[]=chess");
    /* This should be overwritten by next entry, so ignore */
    Stg_asprintf( &argv[10], "--sports[1]=tennis");
-   Dictionary_Entry_Value_AddElement( expectedVals[4], 
-      Dictionary_Entry_Value_FromString( "tennis" ) );
+   Dictionary_Entry_Value_AddElement( expectedVals[4], Dictionary_Entry_Value_FromString( "tennis" ) );
    Stg_asprintf( &argv[11], "--sles[].name=pressure");
    Stg_asprintf( &expectedKeys[5], "sles" );
+
    expectedVals[5] = Dictionary_Entry_Value_NewList();
-   Dictionary_Entry_Value_AddElement( expectedVals[5], 
-      tmpStruct = Dictionary_Entry_Value_NewStruct() );
-   Dictionary_Entry_Value_AddMember( tmpStruct, "name",
-      Dictionary_Entry_Value_FromString( "pressure" ) );
+   Dictionary_Entry_Value_AddElement( expectedVals[5], tmpStruct = Dictionary_Entry_Value_NewStruct() );
+   Dictionary_Entry_Value_AddMember( tmpStruct, "name", Dictionary_Entry_Value_FromString( "pressure" ) );
    Stg_asprintf( &argv[12], "--sles[].name=temperature");
-   Dictionary_Entry_Value_AddElement( expectedVals[5], 
-      tmpStruct2 = Dictionary_Entry_Value_NewStruct() );
-   Dictionary_Entry_Value_AddMember( tmpStruct2, "name",
-      Dictionary_Entry_Value_FromString( "temperature" ) );
+   Dictionary_Entry_Value_AddElement( expectedVals[5], tmpStruct2 = Dictionary_Entry_Value_NewStruct() );
+   Dictionary_Entry_Value_AddMember( tmpStruct2, "name", Dictionary_Entry_Value_FromString( "temperature" ) );
    Stg_asprintf( &argv[13], "--sles[0].solver=mg");
-   Dictionary_Entry_Value_AddMember( tmpStruct, "solver",
-      Dictionary_Entry_Value_FromString( "mg" ) );
+   Dictionary_Entry_Value_AddMember( tmpStruct, "solver", Dictionary_Entry_Value_FromString( "mg" ) );
    Stg_asprintf( &argv[14], "--sles[1].solver=direct");
-   Dictionary_Entry_Value_AddMember( tmpStruct2, "solver",
-      Dictionary_Entry_Value_FromString( "direct" ) );
+   Dictionary_Entry_Value_AddMember( tmpStruct2, "solver", Dictionary_Entry_Value_FromString( "direct" ) );
    Stg_asprintf( &argv[15], "--some.crazy[].shit=here");
    Stg_asprintf( &expectedKeys[6], "some" );
+
    expectedVals[6] = Dictionary_Entry_Value_NewStruct();
-   Dictionary_Entry_Value_AddMember( expectedVals[6], "crazy",
-      tmpList = Dictionary_Entry_Value_NewList() );
-   Dictionary_Entry_Value_AddElement( tmpList, 
-      tmpStruct = Dictionary_Entry_Value_NewStruct() );
-   Dictionary_Entry_Value_AddMember( tmpStruct, "shit",
-      Dictionary_Entry_Value_FromString( "here" ) );
+   Dictionary_Entry_Value_AddMember( expectedVals[6], "crazy", tmpList = Dictionary_Entry_Value_NewList() );
+   Dictionary_Entry_Value_AddElement( tmpList, tmpStruct = Dictionary_Entry_Value_NewStruct() );
+   Dictionary_Entry_Value_AddMember( tmpStruct, "shit", Dictionary_Entry_Value_FromString( "here" ) );
 
    Dictionary_ReadAllParamFromCommandLine( data->dict, argc, argv );
 
    for (ii=0; ii < numExp; ii++) {
-      pcu_check_true( Dictionary_Entry_Compare(
-         data->dict->entryPtr[ii],
-         expectedKeys[ii]));
-      pcu_check_true( Dictionary_Entry_Value_Compare(
-         expectedVals[ii],
-         data->dict->entryPtr[ii]->value ));
+      pcu_check_true( Dictionary_Entry_Compare( data->dict->entryPtr[ii], expectedKeys[ii]));
+      pcu_check_true( Dictionary_Entry_Value_Compare( expectedVals[ii], data->dict->entryPtr[ii]->value ));
    }
 
    for (ii=0; ii < argc; ii++) {
