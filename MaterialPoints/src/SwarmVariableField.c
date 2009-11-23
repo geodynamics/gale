@@ -201,7 +201,7 @@ void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {
 	self->fieldComponentCount = 1;
 
 	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
-	self->dofLayout = DofLayout_New( tmpName, self->variable_Register, 0, self->feMesh );
+	self->dofLayout = DofLayout_New( tmpName, self->context, self->variable_Register, 0, self->feMesh );
 
 	/* must build before adding the variable to the dof layout, dave. 04.10.07 */
 	//Stg_Component_Build( self->dofLayout, data, False );
