@@ -214,12 +214,12 @@ void _FeMesh_Build( void* feMesh, void* data ) {
 
 	if( self->elementMesh ) {
 		Stg_Class_Delete( self->algorithms );
-		self->algorithms = FeMesh_Algorithms_New( "" );
+		self->algorithms = (Mesh_Algorithms*)FeMesh_Algorithms_New( "" );
 		Mesh_Algorithms_SetMesh( self->algorithms, self );
 		Mesh_Algorithms_Update( self->algorithms );
 
 		Stg_Class_Delete( self->elTypes[0] );
-		self->elTypes[0] = FeMesh_ElementType_New();
+		self->elTypes[0] = (Mesh_ElementType*)FeMesh_ElementType_New();
 		Mesh_ElementType_SetMesh( self->elTypes[0], self );
 		Mesh_ElementType_Update( self->elTypes[0] );
 	}

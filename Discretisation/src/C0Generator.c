@@ -62,7 +62,7 @@ C0Generator* C0Generator_New( Name name ) {
 				 name, 
 				 NON_GLOBAL, 
 				 _MeshGenerator_SetDimSize, 
-				 C0Generator_Generate );
+				 (MeshGenerator_GenerateFunc*)C0Generator_Generate );
 }
 
 C0Generator* _C0Generator_New( C0GENERATOR_DEFARGS ) {
@@ -259,7 +259,7 @@ void C0Generator_BuildElementTypes( C0Generator* self, FeMesh* mesh ) {
 	for( e_i = 0; e_i < nDomainEls; e_i++ )
 		mesh->elTypeMap[e_i] = 0;
 
-	algs = Mesh_CentroidAlgorithms_New( "" );
+	algs = (Mesh_Algorithms*)Mesh_CentroidAlgorithms_New( "" );
 	Mesh_CentroidAlgorithms_SetElementMesh( algs, self->elMesh );
 	Mesh_SetAlgorithms( mesh, algs );
 }

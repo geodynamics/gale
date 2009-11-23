@@ -88,7 +88,7 @@ FeMesh_Algorithms* _FeMesh_Algorithms_New( FEMESH_ALGORITHMS_DEFARGS ) {
 }
 
 void _FeMesh_Algorithms_Init( FeMesh_Algorithms* self ) {
-	_Mesh_Algorithms_Init( self );
+  _Mesh_Algorithms_Init( (Mesh_Algorithms*)self );
 }
 
 
@@ -158,10 +158,11 @@ Bool _FeMesh_Algorithms_SearchElements( void* algorithms, double* point,
 Bool FeMesh_Algorithms_SearchWithTree( void* _self, double* pnt, unsigned* dim, unsigned* el ) {
    FeMesh_Algorithms* self = (FeMesh_Algorithms*)_self;
    int nEls, *els;
-   int curDim, curRank, curEl;
+   int curRank, curEl;
    int nLocals, owner;
    FeMesh_ElementType* elType;
    int ii;
+   MeshTopology_Dim curDim;
 
    *dim = Mesh_GetDimSize( self->mesh );
    MPI_Comm_size( MPI_COMM_WORLD, &curRank );
@@ -170,7 +171,7 @@ Bool FeMesh_Algorithms_SearchWithTree( void* _self, double* pnt, unsigned* dim, 
       return False;
 
    *el = nLocals;
-   elType = Mesh_GetElementType( self->mesh, 0 );
+   elType = (FeMesh_ElementType*)Mesh_GetElementType( self->mesh, 0 );
    for( ii = 0; ii < nEls; ii++ ) {
       if( FeMesh_ElementType_ElementHasPoint( elType, els[ii], pnt, &curDim, &curEl ) ) {
 	 if( curEl >= nLocals ) {

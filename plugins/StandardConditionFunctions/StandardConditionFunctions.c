@@ -964,7 +964,7 @@ void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Va
 /*           } */
 }
 
-void StgFEM_StandardConditionFunctions_MovingStepFunction( int nodeInd, int varInd, void* _ctx, void* _result ) {
+void StgFEM_StandardConditionFunctions_MovingStepFunction( Node_LocalIndex nodeInd, Variable_Index varInd, void* _ctx, void* _result ) {
    FiniteElementContext* ctx = (FiniteElementContext*)_ctx;
    FeVariable* velField;
    FeMesh* mesh;

@@ -1024,7 +1024,7 @@ void SLEComputeFunction( void *someSLE, Vec X, Vec F, void *_context )
 		sle->_sleFormFunction( sle, X, F, _context );
 	}
 	else {
-		SETERRQ( PETSC_ERR_SUP, "SLEComputeFunction in not valid" );
+		SETERRABORT( sle->comm, PETSC_ERR_SUP, "SLEComputeFunction in not valid" );
 	}
 }
 
@@ -1094,23 +1094,23 @@ void SLE_SNESConverged(
     snes_ttol = fnorm*snes_rtol;
   }
   if (fnorm != fnorm) {
-//    ierr = PetscInfo(snes,"Failed to converged, function norm is NaN\n");CHKERRQ(ierr);
+//    ierr = PetscInfo(snes,"Failed to converged, function norm is NaN\n");CHKERRV(ierr);
     *reason = SNES_DIVERGED_FNORM_NAN;
   } else if (fnorm < snes_abstol) {
-//    ierr = PetscInfo2(snes,"Converged due to function norm %G < %G\n",fnorm,snes_abstol);CHKERRQ(ierr);
+//    ierr = PetscInfo2(snes,"Converged due to function norm %G < %G\n",fnorm,snes_abstol);CHKERRV(ierr);
     *reason = SNES_CONVERGED_FNORM_ABS;
   }
 //  } else if (snes->nfuncs >= snes->max_funcs) {
-//    ierr = PetscInfo2(snes,"Exceeded maximum number of function evaluations: %D > %D\n",snes->nfuncs,snes->max_funcs);CHKERRQ(ierr);
+//    ierr = PetscInfo2(snes,"Exceeded maximum number of function evaluations: %D > %D\n",snes->nfuncs,snes->max_funcs);CHKERRV(ierr);
 //    *reason = SNES_DIVERGED_FUNCTION_COUNT;
 //  }
 
   if (it && !*reason) {
     if (fnorm <= snes_ttol) {
-//      ierr = PetscInfo2(snes,"Converged due to function norm %G < %G (relative tolerance)\n",fnorm,snes_ttol);CHKERRQ(ierr);
+//      ierr = PetscInfo2(snes,"Converged due to function norm %G < %G (relative tolerance)\n",fnorm,snes_ttol);CHKERRV(ierr);
       *reason = SNES_CONVERGED_FNORM_RELATIVE;
     } else if (pnorm < snes_xtol*xnorm) {
-//      ierr = PetscInfo3(snes,"Converged due to small update length: %G < %G * %G\n",pnorm,snes_xtol,xnorm);CHKERRQ(ierr);
+//      ierr = PetscInfo3(snes,"Converged due to small update length: %G < %G * %G\n",pnorm,snes_xtol,xnorm);CHKERRV(ierr);
       *reason = SNES_CONVERGED_PNORM_RELATIVE;
     }
   }
@@ -1197,9 +1197,9 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
   snes_norm = 0;
   //SLEComputeFunction( sle, stg_X, stg_F, _context );
   SLEComputeFunction( sle, X, F, _context );
-  ierr = VecNorm(F, NORM_2, &fnorm);CHKERRQ(ierr); /* fnorm <- ||F||  */
+  ierr = VecNorm(F, NORM_2, &fnorm);CHKERRV(ierr); /* fnorm <- ||F||  */
   fnorm0 = fnorm;
-  if( PetscIsInfOrNanReal(fnorm) ) SETERRQ(PETSC_ERR_FP,"Infinite or not-a-number generated in norm");
+  if( PetscIsInfOrNanReal(fnorm) ) SETERRABORT( self->comm,PETSC_ERR_FP,"Infinite or not-a-number generated in norm");
 
   snes_norm = fnorm;
   if(monitor_flg==PETSC_TRUE) {
@@ -1219,12 +1219,12 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
     PetscReal  dummyNorm;
 
     /* Update guess Y = X^n - F(X^n) */
-    ierr = VecWAXPY(Y, -1.0, F, X);CHKERRQ(ierr);
+    ierr = VecWAXPY(Y, -1.0, F, X);CHKERRV(ierr);
 
     VecCopy( X, delta_X );  /* delta_X <- X */
 
     /* X^{n+1} = (1 - \alpha) X^n + alpha Y */
-    ierr = VecAXPBY(X, alpha, 1 - alpha, Y);CHKERRQ(ierr);
+    ierr = VecAXPBY(X, alpha, 1 - alpha, Y);CHKERRV(ierr);
     VecNorm( X, NORM_2, &norm_X ); 
 /*    PetscPrintf( PETSC_COMM_WORLD, "  Xn+1 = %12.12e \n", norm_X ); */
 
@@ -1233,8 +1233,8 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
 
     /* Compute F(X^{new}) */
     SLEComputeFunction( sle, X, F, _context );
-    ierr = VecNorm(F, NORM_2, &fnorm);CHKERRQ(ierr);
-    if( PetscIsInfOrNanReal(fnorm) ) SETERRQ(PETSC_ERR_FP,"Infinite or not-a-number generated norm");
+    ierr = VecNorm(F, NORM_2, &fnorm);CHKERRV(ierr);
+    if( PetscIsInfOrNanReal(fnorm) ) SETERRABORT( self->comm,PETSC_ERR_FP,"Infinite or not-a-number generated norm");
 
     /* Monitor convergence */
     snes_iter = i+1;
@@ -1250,7 +1250,7 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
     if (snes_reason) break;
   }
   if (i == snes_maxits) {
-//    ierr = PetscInfo1(snes, "Maximum number of iterations has been reached: %D\n", maxits);CHKERRQ(ierr);
+//    ierr = PetscInfo1(snes, "Maximum number of iterations has been reached: %D\n", maxits);CHKERRV(ierr);
     if (!snes_reason) snes_reason = SNES_DIVERGED_MAX_IT;
   }
 

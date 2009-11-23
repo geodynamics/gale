@@ -2628,7 +2628,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    #endif
    /** if this attribute does not exist (attrib_id < 0) then we assume MeshCHECKPOINT_V1 which is not supported  */
    if(attrib_id < 0)
-      Journal_Firewall(NULL, 
+      Journal_Firewall(0, 
                   errorStr,"\nError in %s for %s '%s' \n\n Interpolation restart not supported for Version 1 Checkpoint files \n\n", __func__, self->type, self->name );
 
    /** check for known checkpointing version type */
@@ -2695,7 +2695,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    /** use the element size read in from the checkpoint file for the new mesh generator */
    CartesianGenerator_SetTopologyParams( gen, (unsigned*)res, 0, NULL, NULL );
 	/** use the feVariable's mesh's generator's crdMin and crdMax (which have been previously read in from checkpointed mesh file  */
-   CartesianGenerator_SetGeometryParams( gen, &crdMin, &crdMax );
+   CartesianGenerator_SetGeometryParams( gen, crdMin, crdMax );
    /** set it so that the generator does not read in the mesh from a file - we will 
               explicitly do this after we build the feMesh using the provided mesh checkpoint file */
    gen->readFromFile = False;
@@ -2719,7 +2719,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
       gen->periodic[1] = ((CartesianGenerator*)((C0Generator*)self->feMesh->generator)->elMesh)->periodic[1];
       gen->periodic[2] = ((CartesianGenerator*)((C0Generator*)self->feMesh->generator)->elMesh)->periodic[2];
    } else
-      Journal_Firewall(NULL, errorStr,"\nError in %s for %s '%s' \n\n Interpolation restart not supported for this mesh type \n\n", __func__, self->type, self->name );
+      Journal_Firewall(0, errorStr,"\nError in %s for %s '%s' \n\n Interpolation restart not supported for this mesh type \n\n", __func__, self->type, self->name );
 
    /** now build the mesh, then read in the required coordinates from the given file */
    Stg_Component_Build( feMesh, NULL, False );
@@ -2752,7 +2752,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
                                  Variable_DataType_Double,
                                  &nDomainVerts,
                                  NULL,
-                                 &arrayPtr,
+                                 (void **)(&arrayPtr),
                                  varReg );
    }
    else {

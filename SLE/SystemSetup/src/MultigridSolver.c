@@ -761,7 +761,7 @@ void MultigridSolver_RestrictMatrix( MultigridSolver* self, MultigridSolver_Leve
 
 	PetscScalar	fillRatio;
 	MatInfo		mInfo;
-	PetscScalar	nRowsA, nRowsC;
+	PetscInt	nRowsA, nRowsC;
 	PetscScalar	nzA, nzP, nzC;
 
 	assert( self );

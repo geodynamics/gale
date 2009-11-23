@@ -62,7 +62,7 @@ Inner2DGenerator* Inner2DGenerator_New( Name name ) {
 				 name, 
 				 NON_GLOBAL, 
 				 _MeshGenerator_SetDimSize, 
-				 Inner2DGenerator_Generate );
+                                 (MeshGenerator_GenerateFunc *)Inner2DGenerator_Generate );
 }
 
 Inner2DGenerator* _Inner2DGenerator_New( Inner2DGENERATOR_DEFARGS ) {
@@ -378,7 +378,7 @@ void Inner2DGenerator_BuildElementTypes( Inner2DGenerator* self, FeMesh* mesh ) 
 	for( e_i = 0; e_i < nDomainEls; e_i++ )
 		mesh->elTypeMap[e_i] = 0;
 
-	algs = Mesh_CentroidAlgorithms_New( "" );
+	algs = (Mesh_Algorithms*)Mesh_CentroidAlgorithms_New( "" );
 	Mesh_CentroidAlgorithms_SetElementMesh( algs, self->elMesh );
 	Mesh_SetAlgorithms( mesh, algs );
 }

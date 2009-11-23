@@ -133,7 +133,7 @@ void _StgFEM_LidDrivenStokesAnalytic_Construct( void* codelet, Stg_ComponentFact
 	*waveSpeed = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "sinusoidalLidWavenumber", 1 );
 	self->n = *waveSpeed;
 	
-	StgFEM_LidDrivenStokesAnalytic_CalculateConstants( self );
+	StgFEM_LidDrivenStokesAnalytic_CalculateConstants( (FieldTest*)self );
 }
 
 void _StgFEM_LidDrivenStokesAnalytic_Build( void* codelet, void* data ) {
