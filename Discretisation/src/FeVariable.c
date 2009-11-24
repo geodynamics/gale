@@ -268,8 +268,7 @@ void _FeVariable_Init(
 			self->eqNum = self->templateFeVariable->eqNum;
 		}
 		else {
-			self->eqNum = FeEquationNumber_New( defaultFeVariableFeEquationNumberName, self->feMesh,
-				self->dofLayout, self->bcs, linkedDofInfo );
+			self->eqNum = FeEquationNumber_New( defaultFeVariableFeEquationNumberName, self->context, self->feMesh, self->dofLayout, self->bcs, linkedDofInfo );
 			self->eqNum->removeBCs = self->removeBCs;
 		}
 	}

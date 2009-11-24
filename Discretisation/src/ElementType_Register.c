@@ -117,20 +117,6 @@ void _ElementType_Register_Delete( void* elementType_Register ) {
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 	Stream_IndentBranch( StgFEM_Debug );
 
-	/* Assumes ownerships of the element types */
-	if( self->elementType ) {
-		ElementType_Index elementType_I;
-		
-		for( elementType_I = 0; elementType_I < self->count; elementType_I++ ) {
-			/* Disabling ElementType_Register to delete its ElementType components.
-				The components will be deleted via _DeleteAll() later on.
-			self->elementType[elementType_I]->_destroy( self->elementType[elementType_I], NULL );
-			self->elementType[elementType_I]->_delete( self->elementType[elementType_I] ); */
-		}
-		
-		Memory_Free( self->elementType );
-	}
-	
 	/* Stg_Class_Delete parent */
 	_Stg_Class_Delete( self );
 	Stream_UnIndentBranch( StgFEM_Debug );
@@ -158,6 +144,7 @@ void _ElementType_Register_Print( void* elementType_Register, Stream* stream ) {
 	
 	Journal_Printf( stream, "\telementType (ptr): %p\n", self->elementType );
 	Journal_Printf( stream, "\telementType[0-%u]:\n", self->count );
+
 	for( elementType_I = 0; elementType_I < self->count; elementType_I++ ) {
 		Journal_Printf( stream, "elementType[%u]: ", elementType_I );
 		Stg_Class_Print( self->elementType[elementType_I], elementType_RegisterStream );
@@ -167,6 +154,7 @@ void _ElementType_Register_Print( void* elementType_Register, Stream* stream ) {
 
 void _ElementType_Register_AssignFromXML( void* elementType_Register, Stg_ComponentFactory *cf, void* data ){
 	ElementType_Register*	self = (ElementType_Register*)elementType_Register;
+	DomainContext*				context;
 	
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
 	if( !self->context ) 
@@ -186,12 +174,21 @@ void _ElementType_Register_Execute( void* elementType_Register, void *data ){
 }
 
 void _ElementType_Register_Destroy( void* elementType_Register, void *data ){
+	ElementType_Register* self = (ElementType_Register*)elementType_Register;
 	
+	/* Assumes ownerships of the element types */
+	if( self->elementType ) {
+		ElementType_Index elementType_I;
+		
+		for( elementType_I = 0; elementType_I < self->count; elementType_I++ ) {
+			_Stg_Component_Delete( self->elementType[elementType_I] );
+		}
+	}
 }
 
 ElementType_Index ElementType_Register_Add( void* elementType_Register, void* elementType ) {
 	ElementType_Register*	self = (ElementType_Register*)elementType_Register;
-	ElementType_Index	handle;
+	ElementType_Index			handle;
 	
 	if( self->count >= self->_size ) {
 		ElementType**	newElementType;
@@ -201,6 +198,7 @@ ElementType_Index ElementType_Register_Add( void* elementType_Register, void* el
 		memcpy( newElementType, self->elementType, sizeof(ElementType*) * self->count );
 		Memory_Free( self->elementType );
 		self->elementType = newElementType;
+		Memory_Free( newElementType );
 	}
 	
 	handle = self->count;
@@ -215,7 +213,7 @@ ElementType_Index ElementType_Register_Add( void* elementType_Register, void* el
 
 ElementType_Index ElementType_Register_GetIndex( void* elementType_Register, Type type ) {
 	ElementType_Register*	self = (ElementType_Register*)elementType_Register;
-	ElementType_Index elementType_I;
+	ElementType_Index			elementType_I;
 	
 	for( elementType_I = 0; elementType_I < self->count; elementType_I++ ) {
 		if( self->elementType[elementType_I]->type == type ) {

@@ -82,7 +82,7 @@ FeVariable* buildFeVar() {
    Stg_Component_Build( bcs, NULL, False );
    Stg_Component_Initialise( bcs, NULL, False );
 
-   eqNum = FeEquationNumber_New( "", feMesh, dofs, bcs, NULL );
+   eqNum = FeEquationNumber_New( "", NULL, feMesh, dofs, bcs, NULL );
    Stg_Component_Build( eqNum, NULL, False );
    Stg_Component_Initialise( eqNum, NULL, False );
 

@@ -98,7 +98,7 @@ FeEquationNumber* buildEqNum() {
    Stg_Component_Build( dofs, NULL, False );
    Stg_Component_Initialise( dofs, NULL, False );
 
-   eqNum = FeEquationNumber_New( "", feMesh, dofs, NULL, NULL );
+   eqNum = FeEquationNumber_New( "", NULL, feMesh, dofs, NULL, NULL );
    Stg_Component_Build( eqNum, NULL, False );
    Stg_Component_Initialise( eqNum, NULL, False );
 
@@ -106,29 +106,29 @@ FeEquationNumber* buildEqNum() {
 }
 
 FeEquationNumber* buildEqNumBCs() {
-   CartesianGenerator* gen;
-   FeMesh* feMesh;
-   DofLayout* dofs;
-   FeEquationNumber* eqNum;
-   Variable_Register* varReg;
-   Variable* vars[2];
-   int maxDecomp[3] = {0, 1, 1};
-   int sizes[3];
-   double minCrd[3];
-   double maxCrd[3];
-   SizeT dataOffs = 1;
-   Variable_DataType dataType = Variable_DataType_Double;
-   int nDataTypes = 1;
-   char* dataNames = "nothing";
-   static SizeT structSize = sizeof(double);
-   static int arraySize;
-   static void* arrayPtrs[2];
-   int nRanks;
-   VariableCondition* bcs;
-   ConditionFunction_Register* cfReg;
-   Dictionary* dict;
-   XML_IO_Handler* ioHandler;
-   char filename[PCU_PATH_MAX];
+   CartesianGenerator*				gen;
+   FeMesh*								feMesh;
+   DofLayout*							dofs;
+   FeEquationNumber*					eqNum;
+   Variable_Register*				varReg;
+   Variable*							vars[2];
+   int									maxDecomp[3] = {0, 1, 1};
+   int									sizes[3];
+   double								minCrd[3];
+   double								maxCrd[3];
+   SizeT									dataOffs = 1;
+   Variable_DataType					dataType = Variable_DataType_Double;
+   int									nDataTypes = 1;
+   char*									dataNames = "nothing";
+   static SizeT						structSize = sizeof(double);
+   static int							arraySize;
+   static void*						arrayPtrs[2];
+   int									nRanks;
+   VariableCondition*				bcs;
+   ConditionFunction_Register*	cfReg;
+   Dictionary*							dict;
+   XML_IO_Handler*					ioHandler;
+   char									filename[PCU_PATH_MAX];
 
    MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
    sizes[0] = nRanks * 2;
@@ -174,7 +174,7 @@ FeEquationNumber* buildEqNumBCs() {
    Stg_Component_Build( bcs, NULL, False );
    Stg_Component_Initialise( bcs, NULL, False );
 
-   eqNum = FeEquationNumber_New( "", feMesh, dofs, bcs, NULL );
+   eqNum = FeEquationNumber_New( "", NULL, feMesh, dofs, bcs, NULL );
    Stg_Component_Build( eqNum, NULL, False );
    Stg_Component_Initialise( eqNum, NULL, False );
 
@@ -189,13 +189,13 @@ void FeEquationNumberSuite_Teardown( FeEquationNumberSuiteData* data ) {
 
 
 void FeEquationNumberSuite_TestLocal( FeEquationNumberSuiteData* data ) {
-   FeEquationNumber* eqNum;
-   FeMesh* feMesh;
-   int eqNumsPerProc;
-   int curEqNum;
-   int nDofs;
-   int rank;
-   int n_i, dof_i;
+   FeEquationNumber*	eqNum;
+   FeMesh*				feMesh;
+   int					eqNumsPerProc;
+   int					curEqNum;
+   int					nDofs;
+   int					rank;
+   int					n_i, dof_i;
 
    eqNum = buildEqNum();
    pcu_check_true( eqNum );
@@ -223,14 +223,14 @@ void FeEquationNumberSuite_TestLocal( FeEquationNumberSuiteData* data ) {
 }
 
 void FeEquationNumberSuite_TestShadow( FeEquationNumberSuiteData* data ) {
-   FeEquationNumber* eqNum;
-   FeMesh* feMesh;
-   int eqNumsPerProc;
-   int curEqNum;
-   int nDofs;
-   int rank;
-   int nLocalNodes, nDomainNodes;
-   int n_i, dof_i;
+   FeEquationNumber*	eqNum;
+   FeMesh*				feMesh;
+   int					eqNumsPerProc;
+   int					curEqNum;
+   int					nDofs;
+   int					rank;
+   int					nLocalNodes, nDomainNodes;
+   int					n_i, dof_i;
 
    eqNum = buildEqNum();
    pcu_check_true( eqNum );
@@ -269,16 +269,16 @@ void FeEquationNumberSuite_TestShadow( FeEquationNumberSuiteData* data ) {
 }
 
 void FeEquationNumberSuite_TestBCs( FeEquationNumberSuiteData* data ) {
-   FeEquationNumber* eqNum;
-   FeMesh* feMesh;
-   unsigned nLocalNodes, nDomainNodes;
-   unsigned eqNumsPerProc;
-   unsigned curEqNum;
-   unsigned nDofs;
-   unsigned dof_i;
-   unsigned eq;
-   int rank;
-   unsigned n_i;
+   FeEquationNumber*	eqNum;
+   FeMesh*				feMesh;
+   unsigned				nLocalNodes, nDomainNodes;
+   unsigned				eqNumsPerProc;
+   unsigned				curEqNum;
+   unsigned				nDofs;
+   unsigned				dof_i;
+   unsigned				eq;
+   int					rank;
+   unsigned				n_i;
 
    eqNum = buildEqNumBCs();
    pcu_check_true( eqNum );

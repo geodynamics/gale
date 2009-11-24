@@ -102,7 +102,7 @@ FeVariable* BuildFeVariable_AsPosition( unsigned dim ) {
 	Stg_Component_Build( dofs, NULL, False );
 	Stg_Component_Initialise( dofs, NULL, False );
 	
-	eqNum = FeEquationNumber_New( "", feMesh, dofs, NULL, NULL );
+	eqNum = FeEquationNumber_New( "", NULL, feMesh, dofs, NULL, NULL );
 	Stg_Component_Build( eqNum, NULL, False );
 	Stg_Component_Initialise( eqNum, NULL, False );
 
@@ -173,7 +173,7 @@ FeVariable* BuildFeVariable_AsConstant( unsigned dim ) {
 	Stg_Component_Build( dofs, NULL, False );
 	Stg_Component_Initialise( dofs, NULL, False );
 	
-	eqNum = FeEquationNumber_New( "", feMesh, dofs, NULL, NULL );
+	eqNum = FeEquationNumber_New( "", NULL, feMesh, dofs, NULL, NULL );
 	Stg_Component_Build( eqNum, NULL, False );
 	Stg_Component_Initialise( eqNum, NULL, False );
 
