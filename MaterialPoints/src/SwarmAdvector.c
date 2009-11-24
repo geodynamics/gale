@@ -156,7 +156,7 @@ void _SwarmAdvector_Init(
 		CartesianGenerator* cartesianGenerator = (CartesianGenerator*) swarm->mesh->generator;
 		if ( cartesianGenerator->periodic[ I_AXIS ] || cartesianGenerator->periodic[ J_AXIS ] || cartesianGenerator->periodic[ K_AXIS ] ) {
 			/* Create a periodicBCsManager if there isn't one already */
-			periodicBCsManager = PeriodicBoundariesManager_New( "periodicBCsManager", (Mesh*)swarm->mesh, (Swarm*)swarm, NULL );
+			periodicBCsManager = PeriodicBoundariesManager_New( "periodicBCsManager", (PICelleratorContext*)self->context, (Mesh*)swarm->mesh, (Swarm*)swarm, NULL );
 		}
 	}	
 	self->periodicBCsManager = periodicBCsManager;
