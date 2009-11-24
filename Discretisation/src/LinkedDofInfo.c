@@ -55,66 +55,42 @@
 /** Textual name of this class */
 const Type LinkedDofInfo_Type = "LinkedDofInfo";
 
-void* LinkedDofInfo_DefaultNew( Name name ) {
+LinkedDofInfo* LinkedDofInfo_New( Name name, DomainContext* context, void* mesh, DofLayout* dofLayout, Dictionary* dictionary ) {
+	LinkedDofInfo* self = _LinkedDofInfo_DefaultNew( name );
+
+	self->isConstructed = True;	
+	_LinkedDofInfo_Init( self, context, mesh, dofLayout, dictionary );
+
+	return self;
+}
+
+void* _LinkedDofInfo_DefaultNew( Name name ) {
 	return (void*)
 		_LinkedDofInfo_New(
-				sizeof(LinkedDofInfo),
-				LinkedDofInfo_Type,
-				_LinkedDofInfo_Delete,
-				_LinkedDofInfo_Print, 
-				_LinkedDofInfo_Copy, 
-				LinkedDofInfo_DefaultNew,
-				_LinkedDofInfo_AssignFromXML,
-				_LinkedDofInfo_Build,
-				_LinkedDofInfo_Initialise,
-				_LinkedDofInfo_Execute,
-				_LinkedDofInfo_Destroy,
-				name, 
-				False,
-				NULL,
-				NULL,
-				NULL );
+		sizeof(LinkedDofInfo),
+		LinkedDofInfo_Type,
+		_LinkedDofInfo_Delete,
+		_LinkedDofInfo_Print, 
+		_LinkedDofInfo_Copy, 
+		_LinkedDofInfo_DefaultNew,
+		_LinkedDofInfo_AssignFromXML,
+		_LinkedDofInfo_Build,
+		_LinkedDofInfo_Initialise,
+		_LinkedDofInfo_Execute,
+		_LinkedDofInfo_Destroy,
+		name, 
+		NON_GLOBAL,
+		NULL,
+		NULL,
+		NULL );
 }
 
-
-LinkedDofInfo* LinkedDofInfo_New( 
-		Name						name,
-		void*						mesh,
-		DofLayout*					dofLayout,
-		Dictionary*					dictionary )
-{
-	return _LinkedDofInfo_New( sizeof(LinkedDofInfo), LinkedDofInfo_Type, _LinkedDofInfo_Delete,
-		_LinkedDofInfo_Print, _LinkedDofInfo_Copy, (Stg_Component_DefaultConstructorFunction*)LinkedDofInfo_DefaultNew,
-		_LinkedDofInfo_AssignFromXML, (Stg_Component_BuildFunction*)_LinkedDofInfo_Build,
-		(Stg_Component_InitialiseFunction*)_LinkedDofInfo_Initialise,
-		_LinkedDofInfo_Execute, _LinkedDofInfo_Destroy, name, True, mesh, dofLayout, dictionary );
-}
-
-
-LinkedDofInfo* _LinkedDofInfo_New(
-		SizeT					_sizeOfSelf, 
-		Type					type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print, 
-		Stg_Class_CopyFunction*			_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*		_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name					name,
-		Bool					initFlag,
-		void*					mesh,
-		DofLayout*				dofLayout,
-		Dictionary*				dictionary )
-{
+LinkedDofInfo* _LinkedDofInfo_New( LINKEDDOFINFO_DEFARGS ) {
 	LinkedDofInfo* self;
 	
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(LinkedDofInfo) );
-	self = (LinkedDofInfo*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor, _construct, _build, 
-			_initialise, _execute, _destroy, name, NON_GLOBAL );
+	assert( sizeOfSelf >= sizeof(LinkedDofInfo) );
+	self = (LinkedDofInfo*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
 	
 	/* General info */
 	
@@ -123,22 +99,17 @@ LinkedDofInfo* _LinkedDofInfo_New(
 	self->_initialise = _initialise;
 	
 	/* member info */
-	if( initFlag ){
-		_LinkedDofInfo_Init( self, mesh, dofLayout, dictionary );
-	}
 	
 	return self;
 }
 	
+void _LinkedDofInfo_Init( void* linkedDofInfo, DomainContext* context, void* mesh, DofLayout* dofLayout, Dictionary* dictionary ) {
+	LinkedDofInfo*	self = (LinkedDofInfo*)linkedDofInfo;
 
-void _LinkedDofInfo_Init( LinkedDofInfo* self, void* mesh, DofLayout* dofLayout, Dictionary* dictionary ) {
-	
-	self->isConstructed = True;
+	self->context = context;
 	self->dofLayout = dofLayout;
 	self->mesh = (Mesh*)mesh;
-	
 	self->dictionary = dictionary;
-
 
 	/* Initially no sets */
 	self->linkedDofSetsCount = 0;
@@ -147,20 +118,17 @@ void _LinkedDofInfo_Init( LinkedDofInfo* self, void* mesh, DofLayout* dofLayout,
 	self->eqNumsOfLinkedDofs = Memory_Alloc_Array( int, self->linkedDofSetsSize, "linkedDofInfo->eqNumsOfLinkedDofs" );
 }
 
-
 void _LinkedDofInfo_Delete( void* linkedDofInfo ) {
 	LinkedDofInfo*	self = (LinkedDofInfo*)linkedDofInfo;
 
-	Memory_Free( self->linkedDofTbl );
-	Memory_Free( self->eqNumsOfLinkedDofs );
+	_Stg_Component_Delete( self );
 }
-
 
 void _LinkedDofInfo_Print( void* linkedDofInfo, Stream* stream ) {
 	LinkedDofInfo*	self = (LinkedDofInfo*)linkedDofInfo;
-	Index		dofSet_I = 0;
-	Node_Index	node_I = 0;
-	Dof_Index	nodeLocalDof_I = 0;
+	Index				dofSet_I = 0;
+	Node_Index		node_I = 0;
+	Dof_Index		nodeLocalDof_I = 0;
 	
 	/* General info */
 	Journal_Printf( stream, "LinkedDofInfo (ptr): %p\n", self );
@@ -170,6 +138,7 @@ void _LinkedDofInfo_Print( void* linkedDofInfo, Stream* stream ) {
 
 	Journal_Printf( stream, "%d Linked dof sets active:\n", self->linkedDofSetsCount );
 	Stream_Indent( stream );
+
 	for ( dofSet_I = 0; dofSet_I < self->linkedDofSetsCount; dofSet_I++ ) {
 		Journal_Printf( stream, "Set %u: has eqNum %d\n", dofSet_I, self->eqNumsOfLinkedDofs[dofSet_I] );
 	}
@@ -177,6 +146,7 @@ void _LinkedDofInfo_Print( void* linkedDofInfo, Stream* stream ) {
 
 	Journal_Printf( stream, "Linked dof sets table:\n", self->linkedDofSetsCount );
 	Stream_Indent( stream );
+
 	for ( node_I = 0; node_I < self->dofLayout->_numItemsInLayout; node_I++ ) {
 		Journal_Printf( stream, "Node %d: ", node_I );
 		for ( nodeLocalDof_I = 0; nodeLocalDof_I < self->dofLayout->dofCounts[node_I]; nodeLocalDof_I++ ) {
@@ -189,35 +159,38 @@ void _LinkedDofInfo_Print( void* linkedDofInfo, Stream* stream ) {
 
 void _LinkedDofInfo_AssignFromXML( void* linkedDofInfo, Stg_ComponentFactory *cf, void* data ){
 	LinkedDofInfo*	self = (LinkedDofInfo*)linkedDofInfo;
-	Dictionary* dictionary;
-	Mesh*		mesh = NULL;
-	DofLayout*	dofLayout = NULL;
+	Dictionary*		dictionary;
+	Mesh*				mesh = NULL;
+	DofLayout*		dofLayout = NULL;
+	DomainContext*	context;
 
 	dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 	
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
-	if( !self->context ) 
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !context ) 
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 
-	mesh      = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh",         Mesh,      True, data );
+	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh",         Mesh,      True, data );
 	dofLayout = Stg_ComponentFactory_ConstructByKey( cf, self->name, DofLayout_Type, DofLayout, True, data );
 
-	_LinkedDofInfo_Init( self, mesh, dofLayout, dictionary ); 
+	_LinkedDofInfo_Init( self, context, mesh, dofLayout, dictionary ); 
 }
 	
 void _LinkedDofInfo_Execute( void* linkedDofInfo, void *data ){
-	
 }
 	
 void _LinkedDofInfo_Destroy( void* linkedDofInfo, void *data ){
+	LinkedDofInfo*	self = (LinkedDofInfo*)linkedDofInfo;
 	
+	Memory_Free( self->linkedDofTbl );
+	Memory_Free( self->eqNumsOfLinkedDofs );
 }
 
 void* _LinkedDofInfo_Copy( void* linkedDofInfo, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	LinkedDofInfo*	self = (LinkedDofInfo*)linkedDofInfo;
 	LinkedDofInfo*	newLinkedDofInfo;
-	PtrMap*		map = ptrMap;
-	Bool		ownMap = False;
+	PtrMap*			map = ptrMap;
+	Bool				ownMap = False;
 	
 	if( !map ) {
 		map = PtrMap_New( 10 );
@@ -235,13 +208,10 @@ void* _LinkedDofInfo_Copy( void* linkedDofInfo, void* dest, Bool deep, Name name
 		newLinkedDofInfo->dofLayout = (DofLayout*)Stg_Class_Copy( self->dofLayout, NULL, deep, nameExt, map );
 		newLinkedDofInfo->mesh = (Mesh*)Stg_Class_Copy( self->mesh, NULL, deep, nameExt, map );
 
-		if ( (newLinkedDofInfo->linkedDofTbl = PtrMap_Find( map, self->linkedDofTbl )) == NULL 
-			&& self->linkedDofTbl )
-		{
+		if ( (newLinkedDofInfo->linkedDofTbl = PtrMap_Find( map, self->linkedDofTbl )) == NULL && self->linkedDofTbl ) {
 			Node_Index	node_I;
 			Dof_Index	dof_I;
-			newLinkedDofInfo->linkedDofTbl = Memory_Alloc_2DComplex( int, self->dofLayout->_numItemsInLayout,
-				self->dofLayout->dofCounts, "linkedDofInfo->linkedDofTbl" );
+			newLinkedDofInfo->linkedDofTbl = Memory_Alloc_2DComplex( int, self->dofLayout->_numItemsInLayout, self->dofLayout->dofCounts, "linkedDofInfo->linkedDofTbl" );
 			for ( node_I = 0; node_I < self->dofLayout->_numItemsInLayout; node_I++ ) {
 				for ( dof_I = 0; dof_I < self->dofLayout->dofCounts[node_I]; dof_I++ ) {
 					newLinkedDofInfo->linkedDofTbl[node_I][dof_I] =
@@ -250,13 +220,9 @@ void* _LinkedDofInfo_Copy( void* linkedDofInfo, void* dest, Bool deep, Name name
 			}
 			PtrMap_Append( map, self->linkedDofTbl, newLinkedDofInfo->linkedDofTbl );
 		}
-		if ( (newLinkedDofInfo->eqNumsOfLinkedDofs = PtrMap_Find( map, self->eqNumsOfLinkedDofs )) == NULL &&
-			self->eqNumsOfLinkedDofs )
-		{	
-			newLinkedDofInfo->eqNumsOfLinkedDofs = Memory_Alloc_Array( int, self->linkedDofSetsCount,
-				"linkedDofInfo->eqNumsOfLinkedDofs" );
-			memcpy( newLinkedDofInfo->eqNumsOfLinkedDofs, self->eqNumsOfLinkedDofs,
-				self->linkedDofSetsCount * sizeof(int) );
+		if ( (newLinkedDofInfo->eqNumsOfLinkedDofs = PtrMap_Find( map, self->eqNumsOfLinkedDofs )) == NULL && self->eqNumsOfLinkedDofs ) {	
+			newLinkedDofInfo->eqNumsOfLinkedDofs = Memory_Alloc_Array( int, self->linkedDofSetsCount, "linkedDofInfo->eqNumsOfLinkedDofs" );
+			memcpy( newLinkedDofInfo->eqNumsOfLinkedDofs, self->eqNumsOfLinkedDofs, self->linkedDofSetsCount * sizeof(int) );
 			PtrMap_Append( map, self->eqNumsOfLinkedDofs, newLinkedDofInfo->eqNumsOfLinkedDofs );
 		}
 	}
@@ -270,18 +236,16 @@ void* _LinkedDofInfo_Copy( void* linkedDofInfo, void* dest, Bool deep, Name name
 	if( ownMap ) {
 		Stg_Class_Delete( map );
 	}
-	
-	return (void*)newLinkedDofInfo;
 
+	return (void*)newLinkedDofInfo;
 }
 
-
 void _LinkedDofInfo_Build( void* linkedDofInfo, void* data ) {
-	LinkedDofInfo*              self      = (LinkedDofInfo*)linkedDofInfo;
-	Dictionary_Entry_Value*     linkSpecs = NULL;
-	Node_Index                  node_I;
-	Node_Index                  nodeLocalDof_I;
-	DofLayout*                  dofLayout;
+	LinkedDofInfo*				self = (LinkedDofInfo*)linkedDofInfo;
+	Dictionary_Entry_Value*	linkSpecs = NULL;
+	Node_Index					node_I;
+	Node_Index					nodeLocalDof_I;
+	DofLayout*					dofLayout;
 
 	dofLayout = self->dofLayout;
 	Stg_Component_Build( self->dofLayout, data, False );
@@ -302,15 +266,15 @@ void _LinkedDofInfo_Build( void* linkedDofInfo, void* data ) {
 	using the AddDofToSet and AddDofsToSet_FromIndexSet functions */
 	
 	if ( linkSpecs ) {
-		Index				numSpecs = 0;
-		Index				linkSpec_I;
-		Dictionary_Entry_Value*		linkSpec = NULL;
-		Dictionary*			linkSpecDict;
-		Index				dofSet = 0;
-		Dictionary_Entry_Value*		wallVal;
-		Dictionary_Entry_Value*		shapeVal;
-		Dictionary_Entry_Value*		wallPairVal;
-		Index				nodalDof;
+		Index							numSpecs = 0;
+		Index							linkSpec_I;
+		Dictionary_Entry_Value*	linkSpec = NULL;
+		Dictionary*					linkSpecDict;
+		Index							dofSet = 0;
+		Dictionary_Entry_Value*	wallVal;
+		Dictionary_Entry_Value*	shapeVal;
+		Dictionary_Entry_Value*	wallPairVal;
+		Index							nodalDof;
 
 		numSpecs = Dictionary_Entry_Value_GetCount( linkSpecs );
 		
@@ -390,7 +354,7 @@ void _LinkedDofInfo_Build( void* linkedDofInfo, void* data ) {
 					LinkedDofInfo_AddDofSet( linkedDofInfo );
 				}
 				
-	shape = Stg_ComponentFactory_ConstructByName( context->CF, shapeStr, Stg_Shape, True, data ) ;
+				shape = Stg_ComponentFactory_ConstructByName( context->CF, shapeStr, Stg_Shape, True, data );
 				
 				for ( lNode_I = 0; lNode_I < Mesh_GetLocalSize( self->mesh, MT_VERTEX ); lNode_I++ ) {
 					if ( Stg_Shape_IsCoordInside( shape, Mesh_GetVertex( self->mesh, lNode_I ) ) ) {
@@ -466,14 +430,12 @@ void _LinkedDofInfo_Build( void* linkedDofInfo, void* data ) {
 	}
 }
 
-
 void _LinkedDofInfo_Initialise( void* linkedDofInfo, void* data ) {
 }
 
-
 Index LinkedDofInfo_AddDofSet( void* linkedDofInfo ) {
 	LinkedDofInfo*	self = (LinkedDofInfo*)linkedDofInfo;
-	Index		indexIntoArray;
+	Index				indexIntoArray;
 
 	if ( self->linkedDofSetsCount == self->linkedDofSetsSize ) {
 		self->linkedDofSetsSize += self->linkedDofSetsDelta;
@@ -482,13 +444,13 @@ Index LinkedDofInfo_AddDofSet( void* linkedDofInfo ) {
 	/* Set the eq num to -1 since uninitialised */
 	self->eqNumsOfLinkedDofs[self->linkedDofSetsCount] = -1;
 	indexIntoArray = self->linkedDofSetsCount++;
+
 	return indexIntoArray;
 }
 
-
 void LinkedDofInfo_AddDofToSet( void* linkedDofInfo, Index linkedDofSet_I, Node_Index node_I, Dof_Index nodeLocalDof_I ) {
-	LinkedDofInfo*  self = (LinkedDofInfo*)linkedDofInfo;
-	Stream*         errorStr = Journal_Register( Error_Type, self->type );
+	LinkedDofInfo*	self = (LinkedDofInfo*)linkedDofInfo;
+	Stream*			errorStr = Journal_Register( Error_Type, self->type );
 	
 	Journal_Firewall( node_I < self->dofLayout->_numItemsInLayout, errorStr, "Error- in %s: tried to add a dof at a "
 		"node that doesn't exist.\n", __func__ );
@@ -499,10 +461,8 @@ void LinkedDofInfo_AddDofToSet( void* linkedDofInfo, Index linkedDofSet_I, Node_
 	self->linkedDofTbl[node_I][nodeLocalDof_I] = linkedDofSet_I;
 }
 
-
-void LinkedDofInfo_AddDofsToSet_FromIndexSet( void* linkedDofInfo, Index linkedDofSet_I, IndexSet* nodeSet, Dof_Index
-nodeLocalDof_I ) {
-	LinkedDofInfo* 		self = (LinkedDofInfo*)linkedDofInfo;
+void LinkedDofInfo_AddDofsToSet_FromIndexSet( void* linkedDofInfo, Index linkedDofSet_I, IndexSet* nodeSet, Dof_Index nodeLocalDof_I ) {
+	LinkedDofInfo*		self = (LinkedDofInfo*)linkedDofInfo;
 	Node_DomainIndex	node_I;
 
 	for ( node_I = 0; node_I < nodeSet->size; node_I++ ) {

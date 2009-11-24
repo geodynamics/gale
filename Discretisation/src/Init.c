@@ -80,7 +80,7 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	ElementType_Register_Add( elementType_Register, (ElementType*)Triquadratic_New( "triquadraticElementType" ) );
 	
 	Stg_ComponentRegister_Add( componentRegister, FeVariable_Type, "0", _FeVariable_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, LinkedDofInfo_Type, "0", LinkedDofInfo_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, LinkedDofInfo_Type, "0", _LinkedDofInfo_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, OperatorFeVariable_Type, "0", _OperatorFeVariable_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, ShapeFeVariable_Type, "0", ShapeFeVariable_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, FeSwarmVariable_Type, "0", _FeSwarmVariable_DefaultNew );
