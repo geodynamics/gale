@@ -282,9 +282,9 @@ void _DofLayout_AssignFromXML( void* dofLayout, Stg_ComponentFactory* cf, void* 
 
 void _DofLayout_Build( void* dofLayout, void* data ) {
 	DofLayout*	self = (DofLayout*)dofLayout;
-	Index		indexCount;
+	Index			indexCount;
 	Index*		indices;
-	Index		set_I, i, pos;
+	Index			set_I, i, pos;
 
 	assert( self );
 
@@ -304,24 +304,22 @@ void _DofLayout_Build( void* dofLayout, void* data ) {
 	self->dofCounts = Memory_Alloc_Array( Index, self->_numItemsInLayout, "DofLayout->dofCounts" );
 	memset(self->dofCounts, 0, sizeof(Index)*self->_numItemsInLayout);
 	
-	for (set_I = 0; set_I < self->_totalVarCount; set_I++)
-	{
+	for (set_I = 0; set_I < self->_totalVarCount; set_I++) {
 		IndexSet_GetMembers(self->_variableEnabledSets[set_I], &indexCount, &indices);
-		for (i = 0; i < indexCount; i++)
-		{
+
+		for (i = 0; i < indexCount; i++) {
 			self->dofCounts[indices[i]]++;
 		}
 			
-		if (indices) Memory_Free(indices);
+		if (indices)
+			Memory_Free(indices);
 	}
 	
-	self->varIndices = Memory_Alloc_2DComplex( Variable_Index, self->_numItemsInLayout, self->dofCounts,
-		"DofLayout->varIndices" );
-	for (i = 0; i < self->_numItemsInLayout; i++)
-	{
+	self->varIndices = Memory_Alloc_2DComplex( Variable_Index, self->_numItemsInLayout, self->dofCounts, "DofLayout->varIndices" );
+	for (i = 0; i < self->_numItemsInLayout; i++) {
 		pos = 0;
-		for (set_I = 0; set_I < self->_totalVarCount; set_I++)
-		{
+
+		for (set_I = 0; set_I < self->_totalVarCount; set_I++) {
 			if (IndexSet_IsMember(self->_variableEnabledSets[set_I], i))
 				self->varIndices[i][pos++] = self->_varIndicesMapping[set_I];
 		}
@@ -331,7 +329,7 @@ void _DofLayout_Build( void* dofLayout, void* data ) {
 
 void _DofLayout_Initialise( void* dofLayout, void* data ) {
 	DofLayout*	self = (DofLayout*)dofLayout;
-	Index           var_I;
+	Index			var_I;
 
 	/* Initialise all the Variables used - in some cases they don't allocate themselves properly until
 		this is done */
@@ -346,6 +344,16 @@ void _DofLayout_Execute( void* dofLayout, void* data ) {
 }
 
 void _DofLayout_Destroy( void* dofLayout, void* data ) {
+	DofLayout*	self = (DofLayout*)dofLayout;
+
+	if( self->baseVariables )
+		Memory_Free( self->baseVariables );
+
+	if( self->dofCounts )
+		Memory_Free( self->dofCounts );
+
+	if( self->varIndices )
+		Memory_Free( self->varIndices );
 }
 
 
@@ -364,23 +372,19 @@ Dof_Index _DofLayout_AddVariable_ByIndex(void* dofLayout, Variable_Index varInde
 	self->_totalVarCount++;
 	
 	/* Do an Alloc if array does not exist to register stats in memory module. Other times, just Realloc */
-	if ( self->_varIndicesMapping )
-	{
+	if ( self->_varIndicesMapping ) {
 		self->_varIndicesMapping = Memory_Realloc_Array( self->_varIndicesMapping, Variable_Index, self->_totalVarCount );
 	}
-	else
-	{
+	else {
 		self->_varIndicesMapping = Memory_Alloc_Array( Variable_Index, self->_totalVarCount,
 			"DofLayout->_varIndicesMapping" );
 	}
 	self->_varIndicesMapping[self->_totalVarCount - 1] = varIndex;
 
-	if ( self->_variableEnabledSets )
-	{
+	if ( self->_variableEnabledSets ) {
 		self->_variableEnabledSets = Memory_Realloc_Array( self->_variableEnabledSets, IndexSet*, self->_totalVarCount );
 	}
-	else
-	{
+	else {
 		self->_variableEnabledSets = Memory_Alloc_Array( IndexSet*, self->_totalVarCount,
 			"DofLayout->_variableEnabledSets" );
 	}

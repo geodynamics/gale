@@ -155,7 +155,6 @@ void SwarmSuite_Teardown( SwarmSuiteData* data ) {
 	Stg_Class_Delete( data->swarm );
 	Stg_Class_Delete( data->randomParticleLayout );
 	Stg_Class_Delete( data->elementCellLayout );
-	/*Stg_Class_Delete( data->mesh );*/
 	Stg_Class_Delete( data->extensionMgr_Register );
 }
 
@@ -174,7 +173,7 @@ void SwarmSuite_TestParticleSearch( SwarmSuiteData* data ) {
 			coord[0] = 0.20*( data->maxCrds[0] - data->minCrds[0] );
 			coord[1] = 0.90*( data->maxCrds[1] - data->minCrds[1] );
 			coord[2] = 0.12*( data->maxCrds[2] - data->minCrds[2] );
-			pcu_check_true( SwarmSuite_TestParticleSearchFunc( data->swarm, coord, stream )  );
+			pcu_check_true( SwarmSuite_TestParticleSearchFunc( data->swarm, coord, stream ) );
 		}	
 	}
 }
@@ -183,7 +182,7 @@ void SwarmSuite_TestParticleCoords( SwarmSuiteData* data ) {
 	char		expected_file[PCU_PATH_MAX];
 	int		procToWatch = data->nProcs > 1 ? 1 : 0;
 	Stream*	stream = Journal_Register (Info_Type, "TestParticleCorrds");
-	
+
 	if( data->rank == procToWatch ) {
 		Stream_RedirectFile( stream, "testParticleCoords.dat" );
 		Swarm_PrintParticleCoords( data->swarm, stream );

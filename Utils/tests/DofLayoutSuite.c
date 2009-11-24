@@ -278,7 +278,6 @@ void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
 		Stg_Class_Delete( map );
 		Stg_Component_Build(dof, 0, False);
 
-		printf("Simple test:\n");
 		Journal_Printf( stream, "Simple test:\n" );
 		for (i = 0; i < 14; i++) {
 			Journal_Printf( stream, "\t%u\n", dof->dofCounts[i] );
