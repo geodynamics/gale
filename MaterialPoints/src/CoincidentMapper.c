@@ -66,247 +66,194 @@
 const Type CoincidentMapper_Type = "CoincidentMapper";
 
 CoincidentMapper* CoincidentMapper_New(
-    Name                       name,
-    IntegrationPointsSwarm*    integrationSwarm,
-    MaterialPointsSwarm*       materialSwarm
-    )
+	Name							name,
+	PICelleratorContext*		context,
+	IntegrationPointsSwarm*	integrationSwarm,
+	MaterialPointsSwarm*		materialSwarm )
 {
-    CoincidentMapper* self = (CoincidentMapper*) _CoincidentMapper_New(
-        sizeof(CoincidentMapper),
-        CoincidentMapper_Type,
-        _CoincidentMapper_Delete,
-        _CoincidentMapper_Print,
-        _CoincidentMapper_Copy,
-        _CoincidentMapper_DefaultNew,
-        _CoincidentMapper_AssignFromXML,
-        _CoincidentMapper_Build,
-        _CoincidentMapper_Initialise,
-        _CoincidentMapper_Execute,
-        _CoincidentMapper_Destroy,
-        _CoincidentMapper_Map,
-        _OneToOneMapper_GetMaterialPointsSwarms,
-        _OneToOneMapper_GetMaterialIndexOn,
-        _OneToOneMapper_GetExtensionOn,
-        name,
-        True, /* initFlag */
-        integrationSwarm,
-        materialSwarm
-        );
+	CoincidentMapper* self = _CoincidentMapper_DefaultNew( name );
 
-    return self;
+	self->isConstructed = True;
+	_IntegrationPointMapper_Init( self, context, integrationSwarm );
+	_OneToOneMapper_Init( self, materialSwarm );
+	_CoincidentMapper_Init( self );
+
+	return self;
 }
-
 
 void* _CoincidentMapper_DefaultNew( Name name ) {
-    return _CoincidentMapper_New(
-        sizeof(CoincidentMapper),
-        CoincidentMapper_Type,
-        _CoincidentMapper_Delete,
-        _CoincidentMapper_Print,
-        _CoincidentMapper_Copy,
-        _CoincidentMapper_DefaultNew,
-        _CoincidentMapper_AssignFromXML,
-        _CoincidentMapper_Build,
-        _CoincidentMapper_Initialise,
-        _CoincidentMapper_Execute,
-        _CoincidentMapper_Destroy,
-        _CoincidentMapper_Map,
-        _OneToOneMapper_GetMaterialPointsSwarms,
-        _OneToOneMapper_GetMaterialIndexOn,
-        _OneToOneMapper_GetExtensionOn,
-        name,
-        False,
-        NULL,
-        NULL );
+	return _CoincidentMapper_New(
+		sizeof(CoincidentMapper),
+		CoincidentMapper_Type,
+		_CoincidentMapper_Delete,
+		_CoincidentMapper_Print,
+		_CoincidentMapper_Copy,
+		_CoincidentMapper_DefaultNew,
+		_CoincidentMapper_AssignFromXML,
+		_CoincidentMapper_Build,
+		_CoincidentMapper_Initialise,
+		_CoincidentMapper_Execute,
+		_CoincidentMapper_Destroy,
+		name,
+		NON_GLOBAL,
+		_CoincidentMapper_Map,
+		_OneToOneMapper_GetMaterialPointsSwarms,
+		_OneToOneMapper_GetMaterialIndexOn,
+		_OneToOneMapper_GetExtensionOn,
+		NULL,
+		NULL );
 }
 
+CoincidentMapper* _CoincidentMapper_New( COINCIDENTMAPPER_DEFARGS ) {
+	CoincidentMapper* result;
 
-CoincidentMapper* _CoincidentMapper_New(
-    SizeT                                                           _sizeOfSelf,
-    Type                                                            type,
-    Stg_Class_DeleteFunction*                                       _delete,
-    Stg_Class_PrintFunction*                                        _print,
-    Stg_Class_CopyFunction*                                         _copy,
-    Stg_Component_DefaultConstructorFunction*                       _defaultConstructor,
-    Stg_Component_ConstructFunction*                                _construct,
-    Stg_Component_BuildFunction*                                    _build,
-    Stg_Component_InitialiseFunction*                               _initialise,
-    Stg_Component_ExecuteFunction*                                  _execute,
-    Stg_Component_DestroyFunction*                                  _destroy,
-    IntegrationPointMapper_MapFunction*                             _map,
-    IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms,
-    IntegrationPointMapper_GetMaterialIndexOnFunction*              _getMaterialIndexOn,
-    IntegrationPointMapper_GetExtensionOnFunction*                  _getExtensionOn,
-    Name                                                            name,
-    Bool                                                            initFlag,
-    IntegrationPointsSwarm*                                         integrationSwarm,
-    MaterialPointsSwarm*                                            materialSwarm )
-{
-    CoincidentMapper* result;
+	result = (CoincidentMapper*)_OneToOneMapper_New( ONETOONEMAPPER_PASSARGS );
 
-    result = (CoincidentMapper*)_OneToOneMapper_New(
-        _sizeOfSelf,
-        type,
-        _delete,
-        _print,
-        _copy,
-        _defaultConstructor,
-        _construct,
-        _build,
-        _initialise,
-        _execute,
-        _destroy,
-        _map,
-        _getMaterialPointsSwarms,
-        _getMaterialIndexOn,
-        _getExtensionOn,
-        name,
-        initFlag,
-        integrationSwarm,
-        materialSwarm );
-
-    if (initFlag) {
-        _CoincidentMapper_Init( result );
-    }
-		
-    return result;
+	return result;
 }
 
 void _CoincidentMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, void* data ) {
-    _OneToOneMapper_AssignFromXML( mapper, cf, data );
+	_OneToOneMapper_AssignFromXML( mapper, cf, data );
 }
 
-void _CoincidentMapper_Init(
-    void*                   mapper )
-{
+void _CoincidentMapper_Init( void* mapper ) {
 }
 
 void _CoincidentMapper_Delete( void* mapper ) {
-    _IntegrationPointMapper_Delete( mapper );
+	CoincidentMapper* self = (CoincidentMapper*)mapper;
+
+	_OneToOneMapper_Delete( self );
 }
+
 void _CoincidentMapper_Print( void* mapper, Stream* stream ) {
-    _IntegrationPointMapper_Print( mapper, stream );
+	_IntegrationPointMapper_Print( mapper, stream );
 }
+
 void* _CoincidentMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-    return _IntegrationPointMapper_Copy( mapper, dest, deep, nameExt, ptrMap );
+	return _IntegrationPointMapper_Copy( mapper, dest, deep, nameExt, ptrMap );
 }
 
 void _CoincidentMapper_Build( void* mapper, void* cf ) {
-    _OneToOneMapper_Build( mapper, cf );
+	CoincidentMapper* self = (CoincidentMapper*)mapper;
+
+	_OneToOneMapper_Build( self, cf );
 }
 
 void _CoincidentMapper_Initialise( void* mapper, void* cf ) {
-    _OneToOneMapper_Initialise( mapper, cf );
+	CoincidentMapper* self = (CoincidentMapper*)mapper;
+
+	_OneToOneMapper_Initialise( self, cf );
 }
 
 void _CoincidentMapper_Execute( void* mapper, void* data ) {
 }
 
 void _CoincidentMapper_Destroy( void* mapper, void* data ) {
+	CoincidentMapper* self = (CoincidentMapper*)mapper;
+
+	_OneToOneMapper_Destroy( self, data );
 }
 
 void _CoincidentMapper_Map( void* mapper ) {
-    CoincidentMapper*       self                   = (CoincidentMapper*)mapper;
-
-    IntegrationPointsSwarm* integrationSwarm       = self->integrationSwarm;
-    MaterialPointsSwarm*    materialSwarm          = self->materialSwarm;
-
-    IntegrationPoint*       integrationPoint;
-    MaterialPoint*          materialPoint;
-    MaterialPointRef*       ref;
-
-    FeMesh*     mesh                   = materialSwarm->mesh;
-
-    Particle_Index          particle_lI;
-    Cell_Index              cell_dI;
+	CoincidentMapper*			self = (CoincidentMapper*)mapper;
+	IntegrationPointsSwarm*	integrationSwarm = self->integrationSwarm;
+	MaterialPointsSwarm*		materialSwarm = self->materialSwarm;
+	IntegrationPoint*			integrationPoint;
+	MaterialPoint*				materialPoint;
+	MaterialPointRef*			ref;
+	FeMesh*						mesh = materialSwarm->mesh;
+	Particle_Index				particle_lI;
+	Cell_Index					cell_dI;
 
 #ifdef CAUTIOUS
-    Index			dim_I;
-    Stream*                 errorStream = Journal_Register( Error_Type, self->type );
+	Index							dim_I;
+	Stream*						errorStream = Journal_Register( Error_Type, self->type );
 #endif
-    Stream*                 debugStream = Swarm_Debug;
+	Stream*						debugStream = Swarm_Debug;
 	
+	Journal_DPrintfL( debugStream, 1, "In %s(): Re-creating a new set of integration points, exactly\n" 
+		"\tmapping to the current material points & their positions.\n", __func__ );
 
-    Journal_DPrintfL( debugStream, 1, "In %s(): Re-creating a new set of integration points, exactly\n" 
-                      "\tmapping to the current material points & their positions.\n",
-                      __func__ ) ;
-    Stream_IndentBranch( debugStream );
+	Stream_IndentBranch( debugStream );
 
-    Journal_DPrintfL( debugStream, 2, "Reallocating the integration points array from size of %u points "
-                      "to the \n\tcurrent material swarm particle count of %u\n", integrationSwarm->particleLocalCount,
-                      materialSwarm->particleLocalCount );
-    integrationSwarm->particleLocalCount = materialSwarm->particleLocalCount;
-    Swarm_Realloc( integrationSwarm );
+	Journal_DPrintfL( debugStream, 2, "Reallocating the integration points array from size of %u points "
+		"to the \n\tcurrent material swarm particle count of %u\n", integrationSwarm->particleLocalCount,
+		materialSwarm->particleLocalCount );
 
-    Journal_DPrintfL( debugStream, 2, "Clearing all the cell->particle ownership tables, "
-                      "ready to add new cell->particle\n\trelationships as new integration points are set up.\n" );
-    for( cell_dI = 0; cell_dI < integrationSwarm->cellDomainCount; cell_dI++ ) {
-        integrationSwarm->cellParticleCountTbl[cell_dI] = 0;
-        integrationSwarm->cellParticleSizeTbl[cell_dI] = 0;
-        if ( integrationSwarm->cellParticleTbl[cell_dI] ) {
-            Memory_Free( integrationSwarm->cellParticleTbl[cell_dI] );
-        }
-        integrationSwarm->cellParticleTbl[cell_dI] = NULL;
-    }
+	integrationSwarm->particleLocalCount = materialSwarm->particleLocalCount;
+	Swarm_Realloc( integrationSwarm );
 
-    Journal_DPrintfL( debugStream, 2, "For each material particle, setting up a corresponding integration "
+	Journal_DPrintfL( debugStream, 2, "Clearing all the cell->particle ownership tables, "
+		"ready to add new cell->particle\n\trelationships as new integration points are set up.\n" );
+
+	for( cell_dI = 0; cell_dI < integrationSwarm->cellDomainCount; cell_dI++ ) {
+		integrationSwarm->cellParticleCountTbl[cell_dI] = 0;
+		integrationSwarm->cellParticleSizeTbl[cell_dI] = 0;
+
+		if ( integrationSwarm->cellParticleTbl[cell_dI] ) {
+			Memory_Free( integrationSwarm->cellParticleTbl[cell_dI] );
+		}
+		integrationSwarm->cellParticleTbl[cell_dI] = NULL;
+	}
+
+	Journal_DPrintfL( debugStream, 2, "For each material particle, setting up a corresponding integration "
                       "point, and\n\tcalculating its element-local coord based on the material's global coord:\n" );
-    Stream_IndentBranch( debugStream );	
-    /* Map each point */
-    for ( particle_lI = 0; particle_lI < materialSwarm->particleLocalCount; particle_lI++ ) {
-        integrationPoint = (IntegrationPoint*)Swarm_ParticleAt( integrationSwarm, particle_lI );
-        materialPoint    = (MaterialPoint*)   Swarm_ParticleAt( materialSwarm, particle_lI );
+	Stream_IndentBranch( debugStream );	
 
-        cell_dI = materialPoint->owningCell;
+	/* Map each point */
+	for ( particle_lI = 0; particle_lI < materialSwarm->particleLocalCount; particle_lI++ ) {
+		integrationPoint = (IntegrationPoint*)Swarm_ParticleAt( integrationSwarm, particle_lI );
+		materialPoint = (MaterialPoint*)Swarm_ParticleAt( materialSwarm, particle_lI );
 
-        Journal_DPrintfL( debugStream, 3, "Referring to local material point %u, from material swarm cell %u:\n",
-                          particle_lI, cell_dI );
-        Stream_IndentBranch( debugStream );	
+		cell_dI = materialPoint->owningCell;
 
-        Journal_DPrintfL( debugStream, 3, "Adding new integration point %u to integration swarm cell %u\n",
-                          particle_lI, cell_dI );
+		Journal_DPrintfL( debugStream, 3, "Referring to local material point %u, from material swarm cell %u:\n", particle_lI, cell_dI );
+		Stream_IndentBranch( debugStream );	
 
-        Swarm_AddParticleToCell( integrationSwarm, cell_dI, particle_lI );
+		Journal_DPrintfL( debugStream, 3, "Adding new integration point %u to integration swarm cell %u\n", particle_lI, cell_dI );
 
-        /* Convert global to local coordinates */
-        ElementType_ConvertGlobalCoordToElLocal(
-            FeMesh_GetElementType( mesh, cell_dI ),
-            mesh, 
-            cell_dI, 
-            materialPoint->coord,
-            integrationPoint->xi );
+		Swarm_AddParticleToCell( integrationSwarm, cell_dI, particle_lI );
 
-        Journal_DPrintfL( debugStream, 3, "Based on material point's coord of (%.2f,%.2f,%.2f):\n"
-                          "calculated and set new integration point's local coord as (%.2f,%.2f,%.2f)\n",
-                          materialPoint->coord[0], materialPoint->coord[1], materialPoint->coord[2],
-                          integrationPoint->xi[0], integrationPoint->xi[1], integrationPoint->xi[2] );
+		/* Convert global to local coordinates */
+		ElementType_ConvertGlobalCoordToElLocal(
+			FeMesh_GetElementType( mesh, cell_dI ),
+			mesh, 
+			cell_dI, 
+			materialPoint->coord,
+			integrationPoint->xi );
+
+		Journal_DPrintfL( debugStream, 3, "Based on material point's coord of (%.2f,%.2f,%.2f):\n"
+			"calculated and set new integration point's local coord as (%.2f,%.2f,%.2f)\n",
+			materialPoint->coord[0], materialPoint->coord[1], materialPoint->coord[2],
+			integrationPoint->xi[0], integrationPoint->xi[1], integrationPoint->xi[2] );
+
 #ifdef CAUTIOUS
-        /* Check the result is between -1 to 1 in all dimensions : if not, something is stuffed */		
-        for ( dim_I= 0; dim_I < materialSwarm->dim; dim_I++ ) {
-            Journal_Firewall(
-                (integrationPoint->xi[dim_I] >= -1.001) && (integrationPoint->xi[dim_I] <= 1.001 ),
-                errorStream,
-                "Error - in %s(): unable to map material point %d in cell %d of swarm \"%s\" (type %s) "
-                "coord to a valid \"local\" coordinate (xi). Coord was (%.3f,%.3f,%.3f), swarm's "
-                "particle layout type was %s, Xi result was (%.4f,%.4f,%.4f).\n",
-                __func__, particle_lI, cell_dI, materialSwarm->name, materialSwarm->type,
-                materialPoint->coord[0], materialPoint->coord[1], materialPoint->coord[2],
-                materialSwarm->particleLayout->type, integrationPoint->xi[0],
-                integrationPoint->xi[1], integrationPoint->xi[2] );
-        }
+		/* Check the result is between -1 to 1 in all dimensions : if not, something is stuffed */		
+		for ( dim_I= 0; dim_I < materialSwarm->dim; dim_I++ ) {
+			Journal_Firewall(
+				(integrationPoint->xi[dim_I] >= -1.001) && (integrationPoint->xi[dim_I] <= 1.001 ),
+				errorStream,
+				"Error - in %s(): unable to map material point %d in cell %d of swarm \"%s\" (type %s) "
+				"coord to a valid \"local\" coordinate (xi). Coord was (%.3f,%.3f,%.3f), swarm's "
+				"particle layout type was %s, Xi result was (%.4f,%.4f,%.4f).\n",
+				__func__, particle_lI, cell_dI, materialSwarm->name, materialSwarm->type,
+				materialPoint->coord[0], materialPoint->coord[1], materialPoint->coord[2],
+				materialSwarm->particleLayout->type, integrationPoint->xi[0],
+				integrationPoint->xi[1], integrationPoint->xi[2] );
+		}
 #endif
 
-        ref = OneToOneMapper_GetMaterialRef( self, integrationPoint );
-        ref->swarm_I = materialSwarm->swarmReg_I;
-        ref->particle_I = particle_lI;
-        Journal_DPrintfL( debugStream, 3, "updated the coincident mapper's material reference for "
-                          "this integration point to map back to the material point.\n" );
-        Stream_UnIndentBranch( debugStream );	
-    }
+		ref = OneToOneMapper_GetMaterialRef( self, integrationPoint );
+		ref->swarm_I = materialSwarm->swarmReg_I;
+		ref->particle_I = particle_lI;
+		Journal_DPrintfL( debugStream, 3, "updated the coincident mapper's material reference for "
+			"this integration point to map back to the material point.\n" );
+		Stream_UnIndentBranch( debugStream );	
+	}
 
-    Stream_UnIndentBranch( debugStream );	
-    Journal_DPrintfL( debugStream, 2, "...finished updating local positions.\n" );
+	Stream_UnIndentBranch( debugStream );	
+	Journal_DPrintfL( debugStream, 2, "...finished updating local positions.\n" );
 
-    Stream_UnIndentBranch( debugStream );
-    Journal_DPrintfL( debugStream, 1, "...%s(): Done.\n", __func__ );
+	Stream_UnIndentBranch( debugStream );
+	Journal_DPrintfL( debugStream, 1, "...%s(): Done.\n", __func__ );
 }

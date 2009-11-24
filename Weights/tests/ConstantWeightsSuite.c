@@ -205,13 +205,13 @@ void ConstantWeightsSuite_Setup( ConstantWeightsSuiteData* data ) {
    pcu_filename_input( "testConstantWeights.xml", xmlInputFilename );
    data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
    data->context = (PICelleratorContext*)LiveComponentRegister_Get( data->cf->LCRegister, "context" );
-//   Stg_ComponentFactory_BuildComponents( data->cf, NULL );
+	// Stg_ComponentFactory_BuildComponents( data->cf, NULL );
    
    stgMainBuildAndInitialise( data->cf );
 }
 
 void ConstantWeightsSuite_Teardown( ConstantWeightsSuiteData* data ) {
-  stgMainDestroy( data->cf );
+	stgMainDestroy( data->cf );
 }
 
 void ConstantWeightsSuite_TestConstantFunction( ConstantWeightsSuiteData* data ) {

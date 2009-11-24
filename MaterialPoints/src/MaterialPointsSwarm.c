@@ -244,8 +244,6 @@ void _MaterialPointsSwarm_Print( void* swarm, Stream* stream ) {
 	_Swarm_Print( self, stream );
 }
 
-
-
 void* _MaterialPointsSwarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	MaterialPointsSwarm*	self = (MaterialPointsSwarm*)swarm;
 	MaterialPointsSwarm*	newMaterialPointsSwarm;

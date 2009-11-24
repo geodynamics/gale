@@ -54,63 +54,58 @@
 #ifndef __PICellerator_MaterialPoints_ManyToOneMapper_h__
 #define __PICellerator_MaterialPoints_ManyToOneMapper_h__
 
-/* Textual name of this class */
-extern const Type ManyToOneMapper_Type;
+	/* Textual name of this class */
+	extern const Type ManyToOneMapper_Type;
 
-/* ManyToOneMapper information */
-#define __ManyToOneMapper                       \
-    __IntegrationPointMapper                    \
-                                                \
-    MaterialPointsSwarm**   materialSwarms;     \
-    Index                   materialSwarmCount;
+	/* ManyToOneMapper information */
+	#define __ManyToOneMapper \
+		__IntegrationPointMapper \
+		\
+		MaterialPointsSwarm**	materialSwarms; \
+		Index							materialSwarmCount;
 
-struct ManyToOneMapper { __ManyToOneMapper };
+	struct ManyToOneMapper { __ManyToOneMapper };
 	
+	#define MANYTOONEMAPPER_DEFARGS \
+		INTEGRATIONPOINTMAPPER_DEFARGS, \
+			MaterialPointsSwarm**	materialSwarms, \
+			Index							materialSwarmCount 
+
+	#define MANYTOONEMAPPER_PASSARGS \
+		INTEGRATIONPOINTMAPPER_PASSARGS, \
+			materialSwarms, \
+			materialSwarmCount 
+
+	/*---------------------------------------------------------------------------------------------------------------------
+	** Constructors
+	*/
+	ManyToOneMapper* _ManyToOneMapper_New( MANYTOONEMAPPER_DEFARGS );
+
+	void _ManyToOneMapper_Init( void* mapper, MaterialPointsSwarm** materialSwarms, Index materialSwarmCount );
+
+	void _ManyToOneMapper_Delete( void* mapper );
+
+	void _ManyToOneMapper_Print( void* mapper, Stream* stream );
+
+	#define ManyToOneMapper_Copy( self ) \
+		(ManyToOneMapper*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
+	#define ManyToOneMapper_DeepCopy( self ) \
+		(ManyToOneMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
+
+	void* _ManyToOneMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-/*---------------------------------------------------------------------------------------------------------------------
-** Constructors
-*/
-ManyToOneMapper* _ManyToOneMapper_New(
-    SizeT                                                           _sizeOfSelf,
-    Type                                                            type,
-    Stg_Class_DeleteFunction*                                       _delete,
-    Stg_Class_PrintFunction*                                        _print,
-    Stg_Class_CopyFunction*                                         _copy,
-    Stg_Component_DefaultConstructorFunction*                       _defaultConstructor,
-    Stg_Component_ConstructFunction*                                _construct,
-    Stg_Component_BuildFunction*                                    _build,
-    Stg_Component_InitialiseFunction*                               _initialise,
-    Stg_Component_ExecuteFunction*                                  _execute,
-    Stg_Component_DestroyFunction*                                  _destroy,
-    IntegrationPointMapper_MapFunction*                             _map,
-    IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms,
-    IntegrationPointMapper_GetMaterialIndexOnFunction*              _getMaterialIndexOn,
-    IntegrationPointMapper_GetExtensionOnFunction*                  _getExtensionOn,
-    Name                                                            name,
-    Bool                                                            initFlag,
-    IntegrationPointsSwarm*                                         integrationSwarm,
-    MaterialPointsSwarm**                                           materialSwarms,
-    Index                                                           materialSwarmCount );
+	void* _ManyToOneMapper_DefaultNew( Name name );
 
-void _ManyToOneMapper_Init( 
-    void*                   mapper, 
-    MaterialPointsSwarm**   materialSwarms, 
-    Index                   materialSwarmCount );
+	void _ManyToOneMapper_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data );
 
-void _ManyToOneMapper_Delete( void* mapper );
-void _ManyToOneMapper_Print( void* mapper, Stream* stream );
-#define ManyToOneMapper_Copy( self )                                    \
-    (ManyToOneMapper*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
-#define ManyToOneMapper_DeepCopy( self )                                \
-    (ManyToOneMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-void* _ManyToOneMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
-	
-void* _ManyToOneMapper_DefaultNew( Name name );
-void _ManyToOneMapper_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
-void _ManyToOneMapper_Build( void* mapper, void* data ) ;
-void _ManyToOneMapper_Initialise( void* mapper, void* data ) ;
-void _ManyToOneMapper_Execute( void* mapper, void* data );
-void _ManyToOneMapper_Destroy( void* mapper, void* data ) ;
+	void _ManyToOneMapper_Build( void* mapper, void* data );
 
-MaterialPointsSwarm** ManyToOneMapper_GetMaterialPointsSwarms( void* mapper, Index* count );
+	void _ManyToOneMapper_Initialise( void* mapper, void* data );
+
+	void _ManyToOneMapper_Execute( void* mapper, void* data );
+
+	void _ManyToOneMapper_Destroy( void* mapper, void* data );
+
+	MaterialPointsSwarm** ManyToOneMapper_GetMaterialPointsSwarms( void* mapper, Index* count );
+
 #endif

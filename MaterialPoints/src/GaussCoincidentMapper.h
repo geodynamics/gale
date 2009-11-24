@@ -55,60 +55,53 @@
 #ifndef __PICellerator_MaterialPoints_GaussCoincidentMapper_h__
 #define __PICellerator_MaterialPoints_GaussCoincidentMapper_h__
 
-/* Textual name of this class */
-extern const Type GaussCoincidentMapper_Type;
+	/* Textual name of this class */
+	extern const Type GaussCoincidentMapper_Type;
 
-#define __GaussCoincidentMapper                 \
-    __OneToOneMapper 
+	#define __GaussCoincidentMapper \
+		__OneToOneMapper 
 
-struct GaussCoincidentMapper { __GaussCoincidentMapper };
+	struct GaussCoincidentMapper { __GaussCoincidentMapper };
 
-GaussCoincidentMapper* GaussCoincidentMapper_New(
-    Name                       name,
-    IntegrationPointsSwarm*    integrationSwarm,
-    MaterialPointsSwarm*       materialSwarm);	
+	#define GAUSSCOINCIDENTMAPPER_DEFARGS \
+		ONETOONEMAPPER_DEFARGS
+
+	#define GAUSSCOINCIDENTMAPPER_PASSARGS \
+		ONETOONEMAPPER_PASSARGS
+
+	GaussCoincidentMapper* GaussCoincidentMapper_New(
+		Name							name,
+		PICelleratorContext*		context,
+		IntegrationPointsSwarm*	integrationSwarm,
+		MaterialPointsSwarm*		materialSwarm);	
 	
-GaussCoincidentMapper* _GaussCoincidentMapper_New(
-    SizeT                                                           _sizeOfSelf,
-    Type                                                            type,
-    Stg_Class_DeleteFunction*                                       _delete,
-    Stg_Class_PrintFunction*                                        _print,
-    Stg_Class_CopyFunction*                                         _copy,
-    Stg_Component_DefaultConstructorFunction*                       _defaultConstructor,
-    Stg_Component_ConstructFunction*                                _construct,
-    Stg_Component_BuildFunction*                                    _build,
-    Stg_Component_InitialiseFunction*                               _initialise,
-    Stg_Component_ExecuteFunction*                                  _execute,
-    Stg_Component_DestroyFunction*                                  _destroy,
-    IntegrationPointMapper_MapFunction*                             _map,
-    IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms,
-    IntegrationPointMapper_GetMaterialIndexOnFunction*              _getMaterialIndexOn,
-    IntegrationPointMapper_GetExtensionOnFunction*                  _getExtensionOn,
-    Name                                                            name,
-    Bool                                                            initFlag,
-    IntegrationPointsSwarm*                                         integrationSwarm,
-    MaterialPointsSwarm*                                            materialSwarm );
+	GaussCoincidentMapper* _GaussCoincidentMapper_New( GAUSSCOINCIDENTMAPPER_DEFARGS );
 
-void _GaussCoincidentMapper_Init(
-    void*                   mapper );
+	void _GaussCoincidentMapper_Init( void* mapper );
 
+	void _GaussCoincidentMapper_Delete( void* mapper );
 
-void _GaussCoincidentMapper_Delete( void* mapper );
-void _GaussCoincidentMapper_Print( void* mapper, Stream* stream );
-#define GaussCoincidentMapper_Copy( self )                              \
-    (GaussCoincidentMapper*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
-#define GaussCoincidentMapper_DeepCopy( self )                          \
-    (GaussCoincidentMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-void* _GaussCoincidentMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void _GaussCoincidentMapper_Print( void* mapper, Stream* stream );
+
+	#define GaussCoincidentMapper_Copy( self ) \
+		(GaussCoincidentMapper*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
+	#define GaussCoincidentMapper_DeepCopy( self ) \
+		(GaussCoincidentMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
+
+	void* _GaussCoincidentMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-void* _GaussCoincidentMapper_DefaultNew( Name name );
-void _GaussCoincidentMapper_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
-void _GaussCoincidentMapper_Build( void* mapper, void* data ) ;
-void _GaussCoincidentMapper_Initialise( void* mapper, void* data ) ;
-void _GaussCoincidentMapper_Execute( void* mapper, void* data );
-void _GaussCoincidentMapper_Destroy( void* mapper, void* data ) ;
-	
+	void* _GaussCoincidentMapper_DefaultNew( Name name );
 
-void _GaussCoincidentMapper_Map( void* mapper );
+	void _GaussCoincidentMapper_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data );
+
+	void _GaussCoincidentMapper_Build( void* mapper, void* data );
+
+	void _GaussCoincidentMapper_Initialise( void* mapper, void* data );
+
+	void _GaussCoincidentMapper_Execute( void* mapper, void* data );
+
+	void _GaussCoincidentMapper_Destroy( void* mapper, void* data );
+		
+	void _GaussCoincidentMapper_Map( void* mapper );
 	
 #endif

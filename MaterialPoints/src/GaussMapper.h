@@ -34,55 +34,47 @@
 #ifndef __PICellerator_MaterialPoints_GaussMapper_h__
 #define __PICellerator_MaterialPoints_GaussMapper_h__
 
-/* Textual name of this class */
-extern const Type GaussMapper_Type;
+	/* Textual name of this class */
+	extern const Type GaussMapper_Type;
 
-#define __GaussMapper                           \
-    __OneToOneMapper 
+	#define __GaussMapper \
+		__OneToOneMapper 
 
-struct GaussMapper { __GaussMapper };
+	struct GaussMapper { __GaussMapper };
+
+	#define GAUSSMAPPER_DEFARGS \
+		ONETOONEMAPPER_DEFARGS
 		
-GaussMapper* _GaussMapper_New(
-    SizeT                                                           _sizeOfSelf,
-    Type                                                            type,
-    Stg_Class_DeleteFunction*                                       _delete,
-    Stg_Class_PrintFunction*                                        _print,
-    Stg_Class_CopyFunction*                                         _copy,
-    Stg_Component_DefaultConstructorFunction*                       _defaultConstructor,
-    Stg_Component_ConstructFunction*                                _construct,
-    Stg_Component_BuildFunction*                                    _build,
-    Stg_Component_InitialiseFunction*                               _initialise,
-    Stg_Component_ExecuteFunction*                                  _execute,
-    Stg_Component_DestroyFunction*                                  _destroy,
-    IntegrationPointMapper_MapFunction*                             _map,
-    IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms,
-    IntegrationPointMapper_GetMaterialIndexOnFunction*              _getMaterialIndexOn,
-    IntegrationPointMapper_GetExtensionOnFunction*                  _getExtensionOn,
-    Name                                                            name,
-    Bool                                                            initFlag,
-    IntegrationPointsSwarm*                                         integrationSwarm,
-    MaterialPointsSwarm*                                            materialSwarm );
+	#define GAUSSMAPPER_PASSARGS \
+		ONETOONEMAPPER_PASSARGS
 
-void _GaussMapper_Init(
-    void*                   mapper );
+	GaussMapper* _GaussMapper_New( GAUSSMAPPER_DEFARGS );
 
+	void _GaussMapper_Init( void* mapper );
 
-void _GaussMapper_Delete( void* mapper );
-void _GaussMapper_Print( void* mapper, Stream* stream );
-#define GaussMapper_Copy( self )                                        \
-    (GaussMapper*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
-#define GaussMapper_DeepCopy( self )                                    \
-    (GaussMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-void* _GaussMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void _GaussMapper_Delete( void* mapper );
+
+	void _GaussMapper_Print( void* mapper, Stream* stream );
+
+	#define GaussMapper_Copy( self ) \
+		(GaussMapper*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
+	#define GaussMapper_DeepCopy( self ) \
+		(GaussMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
+
+	void* _GaussMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-void* _GaussMapper_DefaultNew( Name name );
-void _GaussMapper_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
-void _GaussMapper_Build( void* mapper, void* data ) ;
-void _GaussMapper_Initialise( void* mapper, void* data ) ;
-void _GaussMapper_Execute( void* mapper, void* data );
-void _GaussMapper_Destroy( void* mapper, void* data ) ;
-	
+	void* _GaussMapper_DefaultNew( Name name );
 
-void _GaussMapper_Map( void* mapper );
+	void _GaussMapper_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data );
+
+	void _GaussMapper_Build( void* mapper, void* data );
+
+	void _GaussMapper_Initialise( void* mapper, void* data );
+
+	void _GaussMapper_Execute( void* mapper, void* data );
+
+	void _GaussMapper_Destroy( void* mapper, void* data );
+	
+	void _GaussMapper_Map( void* mapper );
 	
 #endif
