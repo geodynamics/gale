@@ -149,7 +149,7 @@ void* _DVCWeights_DefaultNew( Name name ) {
         _DVCWeights_Build,
         _DVCWeights_Initialise,
         _DVCWeights_Execute,
-        NULL,
+        _DVCWeights_Destroy,
         name,
         NON_GLOBAL,
         _DVCWeights_Calculate,
@@ -185,6 +185,11 @@ void _DVCWeights_Initialise( void* dvcWeights, void* data ) {
 void _DVCWeights_Execute( void* dvcWeights, void* data ) {
     DVCWeights* self = (DVCWeights*)dvcWeights;
     _WeightsCalculator_Execute( self, data );
+}
+
+void _DVCWeights_Destroy( void* dvcWeights, void* data ) {
+    DVCWeights* self = (DVCWeights*)dvcWeights;
+    _WeightsCalculator_Destroy( self, data );
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------

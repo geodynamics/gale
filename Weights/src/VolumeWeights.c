@@ -114,7 +114,7 @@ void* _VolumeWeights_DefaultNew( Name name ) {
         _VolumeWeights_Build,
         _VolumeWeights_Initialise,
         _VolumeWeights_Execute,
-        NULL,
+        _VolumeWeights_Destroy,
         name,
         NON_GLOBAL,
         _VolumeWeights_Calculate,
@@ -144,17 +144,28 @@ void _VolumeWeights_AssignFromXML( void* weights, Stg_ComponentFactory* cf, void
 void _VolumeWeights_Build( void* weights, void* data ) {
     VolumeWeights*	self = (VolumeWeights*)weights;
 
+    Stg_Component_Build( self->shape, data, False );
+    Stg_Component_Build( self->mesh, data, False );
     _WeightsCalculator_Build( self, data );
 }
 void _VolumeWeights_Initialise( void* weights, void* data ) {
     VolumeWeights*	self = (VolumeWeights*)weights;
-	
+
+    Stg_Component_Initialise( self->shape, data, False );
+    Stg_Component_Initialise( self->mesh, data, False );	
     _WeightsCalculator_Initialise( self, data );
 }
 void _VolumeWeights_Execute( void* weights, void* data ) {
     VolumeWeights*	self = (VolumeWeights*)weights;
 	
     _WeightsCalculator_Execute( self, data );
+}
+void _VolumeWeights_Destroy( void* weights, void* data ) {
+    VolumeWeights*	self = (VolumeWeights*)weights;
+
+    Stg_Component_Destroy( self->shape, data, False );
+    Stg_Component_Destroy( self->mesh, data, False );	
+    _WeightsCalculator_Destroy( self, data );
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------

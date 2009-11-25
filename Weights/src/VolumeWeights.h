@@ -79,7 +79,7 @@ void _VolumeWeights_AssignFromXML( void* weights, Stg_ComponentFactory* cf, void
 void _VolumeWeights_Build( void* weights, void* data ) ;
 void _VolumeWeights_Initialise( void* weights, void* data ) ;
 void _VolumeWeights_Execute( void* weights, void* data );
-        
+void _VolumeWeights_Destroy( void* weights, void* data );
                 
 void _VolumeWeights_Calculate( void* weights, void* _swarm, Cell_LocalIndex lCell_I ) ;
         

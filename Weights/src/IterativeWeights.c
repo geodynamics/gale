@@ -148,7 +148,7 @@ void* _IterativeWeights_DefaultNew( Name name ) {
         _IterativeWeights_Build,
         _IterativeWeights_Initialise,
         _IterativeWeights_Execute,
-        NULL,
+        _IterativeWeights_Destroy,
         name,
         NON_GLOBAL,
         _IterativeWeights_Calculate,
@@ -177,17 +177,26 @@ void _IterativeWeights_AssignFromXML( void* iterativeWeights, Stg_ComponentFacto
 void _IterativeWeights_Build( void* iterativeWeights, void* data ) {
     IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
 
+    Stg_Component_Build( self->initialWeights, data, False ); 
     _ConstantWeights_Build( self, data );
 }
 void _IterativeWeights_Initialise( void* iterativeWeights, void* data ) {
     IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
-	
+
+    Stg_Component_Initialise( self->initialWeights, data, False ); 	
     _ConstantWeights_Initialise( self, data );
 }
 void _IterativeWeights_Execute( void* iterativeWeights, void* data ) {
     IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
 	
     _ConstantWeights_Execute( self, data );
+}
+void _IterativeWeights_Destroy( void* iterativeWeights, void* data ) {
+    IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
+
+    if (self->freeInitialWeights )
+       Stg_Component_Destroy( self->initialWeights, data, False ); 	
+    _ConstantWeights_Destroy( self, data );
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------

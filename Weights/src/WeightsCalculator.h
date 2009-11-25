@@ -101,6 +101,7 @@ extern const Type WeightsCalculator_Type;
         
 	void _WeightsCalculator_AssignFromXML( void* self, Stg_ComponentFactory* cf, void* data ) ;
 	void _WeightsCalculator_Build( void* self, void* data ) ;
+	void _WeightsCalculator_Destroy( void* self, void* data ) ;
 	void _WeightsCalculator_Initialise( void* self, void* data ) ;
 	void _WeightsCalculator_Execute( void* self, void* data );
         

@@ -105,6 +105,8 @@ extern const Type MomentBalanceWeights_Type;
 
 	void _MomentBalanceWeights_Initialise( void* momentBalanceWeights, void* data );
 
+	void _MomentBalanceWeights_Destroy( void* momentBalanceWeights, void* data );
+
 	void _MomentBalanceWeights_Execute( void* momentBalanceWeights, void* data );
                 
 	void _MomentBalanceWeights_Calculate( void* momentBalanceWeights, void* _swarm, Cell_LocalIndex lCell_I );

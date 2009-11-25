@@ -133,6 +133,12 @@ void _WeightsCalculator_Build( void* weightsCalculator, void* data ) {
 /*      WeightsCalculator*      self = (WeightsCalculator*)weightsCalculator; */
 
 }
+
+void _WeightsCalculator_Destroy( void* weightsCalculator, void* data ) {
+/*      WeightsCalculator*      self = (WeightsCalculator*)weightsCalculator; */
+}
+
+
 void _WeightsCalculator_Initialise( void* weightsCalculator, void* data ) {
 /*      WeightsCalculator*      self = (WeightsCalculator*)weightsCalculator; */
         

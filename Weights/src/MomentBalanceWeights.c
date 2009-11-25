@@ -108,14 +108,10 @@ void _MomentBalanceWeights_Init( void* momentBalanceWeights, WeightsCalculator* 
 
 void _MomentBalanceWeights_Delete( void* momentBalanceWeights ) {
     MomentBalanceWeights* self = (MomentBalanceWeights*)momentBalanceWeights;
-
-    if ( self->freeBackupWeights )
-        Stg_Class_Delete( self->backupWeights );
         
     /* Delete parent */
     _WeightsCalculator_Delete( self );
 }
-
 
 void _MomentBalanceWeights_Print( void* momentBalanceWeights, Stream* stream ) {
     MomentBalanceWeights* self = (MomentBalanceWeights*)momentBalanceWeights;
@@ -145,7 +141,7 @@ void* _MomentBalanceWeights_DefaultNew( Name name ) {
         _MomentBalanceWeights_Build,
         _MomentBalanceWeights_Initialise,
         _MomentBalanceWeights_Execute,
-        NULL,
+        _MomentBalanceWeights_Destroy,
         name,
         NON_GLOBAL,
         _MomentBalanceWeights_Calculate,
@@ -165,18 +161,27 @@ void _MomentBalanceWeights_AssignFromXML( void* momentBalanceWeights, Stg_Compon
 
 void _MomentBalanceWeights_Build( void* momentBalanceWeights, void* data ) {
     MomentBalanceWeights*       self = (MomentBalanceWeights*)momentBalanceWeights;
-
+    
+    Stg_Component_Build( self->backupWeights, data, False );
     _WeightsCalculator_Build( self, data );
 }
 void _MomentBalanceWeights_Initialise( void* momentBalanceWeights, void* data ) {
     MomentBalanceWeights*       self = (MomentBalanceWeights*)momentBalanceWeights;
-        
+
+    Stg_Component_Initialise( self->backupWeights, data, False );
     _WeightsCalculator_Initialise( self, data );
 }
 void _MomentBalanceWeights_Execute( void* momentBalanceWeights, void* data ) {
     MomentBalanceWeights*       self = (MomentBalanceWeights*)momentBalanceWeights;
         
     _WeightsCalculator_Execute( self, data );
+}
+void _MomentBalanceWeights_Destroy( void* momentBalanceWeights, void* data ) {
+    MomentBalanceWeights*       self = (MomentBalanceWeights*)momentBalanceWeights;
+
+    if ( self->freeBackupWeights )
+       Stg_Component_Destroy( self->backupWeights, data, False );
+    _WeightsCalculator_Destroy( self, data );
 }
 
 

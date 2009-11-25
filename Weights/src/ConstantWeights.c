@@ -132,7 +132,7 @@ void* _ConstantWeights_DefaultNew( Name name ) {
         _ConstantWeights_Build,
         _ConstantWeights_Initialise,
         _ConstantWeights_Execute,
-        NULL,
+        _ConstantWeights_Destroy,
         name,
         NON_GLOBAL,
         _ConstantWeights_Calculate,
@@ -153,6 +153,13 @@ void _ConstantWeights_Build( void* constantWeights, void* data ) {
 
     _WeightsCalculator_Build( self, data );
 }
+
+void _ConstantWeights_Destroy( void* constantWeights, void* data ) {
+    ConstantWeights*    self = (ConstantWeights*)constantWeights;
+
+    _WeightsCalculator_Destroy( self, data );
+}
+
 void _ConstantWeights_Initialise( void* constantWeights, void* data ) {
     ConstantWeights*    self = (ConstantWeights*)constantWeights;
         

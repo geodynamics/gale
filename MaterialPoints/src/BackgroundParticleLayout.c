@@ -165,7 +165,10 @@ void  _BackgroundParticleLayout_AssignFromXML( void* component, Stg_ComponentFac
 void  _BackgroundParticleLayout_Build( void* component, void* data ) {}
 void  _BackgroundParticleLayout_Initialise( void* component, void* data ) {}
 void  _BackgroundParticleLayout_Execute( void* component, void* data ) {}
-void  _BackgroundParticleLayout_Destroy( void* component, void* data ) {}
+void  _BackgroundParticleLayout_Destroy( void* component, void* data ) {
+   BackgroundParticleLayout*	self = (BackgroundParticleLayout*)component;
+   _ParticleLayout_Destroy( self, data );
+}
 
 
 void _BackgroundParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm )

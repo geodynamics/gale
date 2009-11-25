@@ -102,7 +102,7 @@ void _IterativeWeights_AssignFromXML( void* iterativeWeights, Stg_ComponentFacto
 void _IterativeWeights_Build( void* iterativeWeights, void* data ) ;
 void _IterativeWeights_Initialise( void* iterativeWeights, void* data ) ;
 void _IterativeWeights_Execute( void* iterativeWeights, void* data );
-        
+void _IterativeWeights_Destroy( void* iterativeWeights, void* data );
                 
 void _IterativeWeights_Calculate( void* iterativeWeights, void* _swarm, Cell_LocalIndex lCell_I ) ;
 /*---------------------------------------------------------------------------------------------------------------------

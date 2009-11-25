@@ -254,10 +254,10 @@ void* _DVCWeights_DefaultNew( Name name ) ;
 
 void _DVCWeights_AssignFromXML( void* dvcWeights, Stg_ComponentFactory* cf, void* data ) ;
 
-void _DVCWeights_Build( void* dvcWeights, void* data ) ;
-void _DVCWeights_Initialise( void* dvcWeights, void* data ) ;
+void _DVCWeights_Build( void* dvcWeights, void* data );
+void _DVCWeights_Initialise( void* dvcWeights, void* data );
 void _DVCWeights_Execute( void* dvcWeights, void* data );
-        
+void _DVCWeights_Destroy( void* dvcWeights, void* data );
                 
 void _DVCWeights_Calculate( void* dvcWeights, void* _swarm, Cell_LocalIndex lCell_I ) ;
 
