@@ -717,7 +717,7 @@ void PETScMGSolver_Destruct( PETScMGSolver* self ) {
 	assert( self && Stg_CheckType( self, PETScMGSolver ) );
 
 	PETScMGSolver_DestructLevels( self );
-	KillObject( self->opGen );
+	/*KillObject( self->opGen );*/
 }
 
 void PETScMGSolver_DestructLevels( PETScMGSolver* self ) {
@@ -736,16 +736,20 @@ void PETScMGSolver_DestructLevels( PETScMGSolver* self ) {
 		if( level->A )
 			Stg_Class_RemoveRef( level->A );
 		*/
-		if( level->R != PETSC_NULL ) MatDestroy( level->R );
+		if( level->R != PETSC_NULL && level->R != level->P )
+                    MatDestroy( level->R );
 		if( level->P != PETSC_NULL ) MatDestroy( level->P );
 		if( level->A != PETSC_NULL ) MatDestroy( level->A );
 
 		//FreeObject( level->workRes );
 		//FreeObject( level->workSol );
 		//FreeObject( level->workRHS );
-		VecDestroy( level->workRes );
-		VecDestroy( level->workSol );
-		VecDestroy( level->workRHS );
+                if( level->workRes )
+                    VecDestroy( level->workRes );
+                if( level->workSol )
+                    VecDestroy( level->workSol );
+                if( level->workRHS )
+                    VecDestroy( level->workRHS );
 	}
 
 	KillArray( self->levels );

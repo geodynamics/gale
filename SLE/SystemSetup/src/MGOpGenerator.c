@@ -96,7 +96,7 @@ void _MGOpGenerator_Delete( void* mgOpGenerator ) {
 
 	/* this stuff was previously taken care of in the MatrixSolver class */
 	if( self->solver ) {
-		if( self->solver->ksp != PETSC_NULL )         KSPDestroy( self->solver->ksp );
+            /*if( self->solver->ksp != PETSC_NULL )         KSPDestroy( self->solver->ksp );*/
 		if( self->solver->matrix != PETSC_NULL )      MatDestroy( self->solver->matrix );
 		if( self->solver->inversion != PETSC_NULL )   MatDestroy( self->solver->inversion );
 		if( self->solver->residual != PETSC_NULL )    VecDestroy( self->solver->residual );
