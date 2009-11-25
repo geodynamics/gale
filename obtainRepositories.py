@@ -3,7 +3,7 @@
 from mercurial import hg, ui, util
 import urllib2
 import ConfigParser
-import os, errno
+import os, errno, sys
 
 # hacky way to find out what the name of the branch is
 branch = os.popen('hg branch').readlines()
@@ -19,6 +19,10 @@ deps = [ \
 	['https://csd.vpac.org/hg/StGermain', 'StGermain' ], \
 	['https://csd.vpac.org/hg/StgFEM', 'StgFEM' ], \
 	['https://www.mcc.monash.edu.au/hg/Underworld', 'Underworld' ] ]
+
+# Check for run time flags
+if( len(sys.argv) > 1 and sys.argv[1] == "--with-experimental=1"):
+	deps.append(['https://www.mcc.monash.edu.au/hg/Experimental', 'Experimental']);
 
 # Make sure the '.hg' directory exists
 try:
