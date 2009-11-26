@@ -46,15 +46,15 @@
 	#define __ShapeAdvector \
 		/* General info */ \
 		__Stg_Component \
-		DomainContext*			      context;		    \
+		DomainContext*		context; \
 		/* Virtual Info */\
 		/* Other Info */\
-		Stg_Shape*                            shape;                \
-		FieldVariable*                        velocityField;        \
-		TimeIntegratee*                       timeIntegratee;       \
-		Variable*                             shapeCentreVariable;  \
-		Index                                 shapeCount;           \
-		void*                                 shapeCentrePtr;
+		Stg_Shape*			shape; \
+		FieldVariable*		velocityField; \
+		TimeIntegratee*	timeIntegratee; \
+		Variable*			shapeCentreVariable;  \
+		Index					shapeCount; \
+		void*					shapeCentrePtr;
 
 	struct ShapeAdvector { __ShapeAdvector };
 	
@@ -62,11 +62,12 @@
 	** Constructors
 	*/
 	ShapeAdvector* ShapeAdvector_New(
-		Name                                       name,
-		TimeIntegrator*                            timeIntegrator,
-		FieldVariable*                             velocityField,
-		Stg_Shape*                                 shape,
-		Bool                                       allowFallbackToFirstOrder );
+		Name					name,
+		DomainContext*		context,
+		TimeIntegrator*	timeIntegrator,
+		FieldVariable*		velocityField,
+		Stg_Shape*			shape,
+		Bool					allowFallbackToFirstOrder );
 
 	ShapeAdvector* _ShapeAdvector_New(
 		SizeT                                      _sizeOfSelf, 
@@ -83,28 +84,36 @@
 		Name                                       name );
 
 	void _ShapeAdvector_Init( 
-		ShapeAdvector*                             self,
-		TimeIntegrator*                            timeIntegrator,
-		FieldVariable*                             velocityField,
-		Stg_Shape*                                 shape,
-		Bool                                       allowFallbackToFirstOrder );
+		ShapeAdvector*		self,
+		DomainContext*		context,
+		TimeIntegrator*	timeIntegrator,
+		FieldVariable*		velocityField,
+		Stg_Shape*			shape,
+		Bool					allowFallbackToFirstOrder );
 
 	void _ShapeAdvector_Delete( void* materialPoints );
+
 	void _ShapeAdvector_Print( void* materialPoints, Stream* stream );
+
 	#define ShapeAdvector_Copy( self ) \
 		(ShapeAdvector*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define ShapeAdvector_DeepCopy( self ) \
 		(ShapeAdvector*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
+
 	void* _ShapeAdvector_Copy( void* materialPoints, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-	void* _ShapeAdvector_DefaultNew( Name name ) ;
-	void _ShapeAdvector_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
-	void _ShapeAdvector_Build( void* materialPoints, void* data ) ;
-	void _ShapeAdvector_Initialise( void* materialPoints, void* data ) ;
+	void* _ShapeAdvector_DefaultNew( Name name );
+
+	void _ShapeAdvector_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data );
+
+	void _ShapeAdvector_Build( void* materialPoints, void* data );
+
+	void _ShapeAdvector_Initialise( void* materialPoints, void* data );
+
 	void _ShapeAdvector_Execute( void* materialPoints, void* data );
-	void _ShapeAdvector_Destroy( void* materialPoints, void* data ) ;
-	
-		
+
+	void _ShapeAdvector_Destroy( void* materialPoints, void* data );
+
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Private functions
 	*/

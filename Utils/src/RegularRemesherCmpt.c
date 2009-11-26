@@ -161,7 +161,7 @@ void _RegularRemesherCmpt_AssignFromXML( void* remesher, Stg_ComponentFactory* c
 		for( i_i = 0; i_i < nItms; i_i++ ) {
 			dim = Dictionary_Entry_Value_AsInt( 
 			Dictionary_Entry_Value_GetElement( list, i_i ) );
-			RegularRemesher_SetRemeshState( self->regRemesh, dim, True );
+			RegularRemesher_SetRemeshState( regRemesh, dim, True );
       }
    }
 
@@ -174,7 +174,7 @@ void _RegularRemesherCmpt_AssignFromXML( void* remesher, Stg_ComponentFactory* c
 			Dictionary_Entry_Value_GetElement( list, i_i ) );
 			wall = Dictionary_Entry_Value_AsInt( 
 			Dictionary_Entry_Value_GetElement( list, i_i + 1 ) );
-			RegularRemesher_SetStaticWall( self->regRemesh, dim, wall, True );
+			RegularRemesher_SetStaticWall( regRemesh, dim, wall, True );
       }
    }
    _RegularRemesherCmpt_Init( self, regRemesh );
