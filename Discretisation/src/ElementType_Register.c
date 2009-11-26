@@ -117,8 +117,7 @@ void _ElementType_Register_Delete( void* elementType_Register ) {
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 	Stream_IndentBranch( StgFEM_Debug );
 
-	/* Stg_Class_Delete parent */
-	_Stg_Class_Delete( self );
+	_Stg_Component_Delete( self );
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
 
@@ -184,6 +183,7 @@ void _ElementType_Register_Destroy( void* elementType_Register, void *data ){
 			_Stg_Component_Delete( self->elementType[elementType_I] );
 		}
 	}
+   Memory_Free( self->elementType );
 }
 
 ElementType_Index ElementType_Register_Add( void* elementType_Register, void* elementType ) {
