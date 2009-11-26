@@ -43,53 +43,62 @@
 
 #ifdef HAVE_PETSC
 
-/* Textual name of this class. */
-extern const Type RegularRemesherCmpt_Type;
+	/* Textual name of this class. */
+	extern const Type RegularRemesherCmpt_Type;
 
-/* Virtual function types. */
+	/* Virtual function types. */
 
-/* Class contents. */
-#define __RegularRemesherCmpt			\
-   /* General info */				\
-   __Remesher					\
-						\
-   /* Virtual info */				\
-						\
-   /* RegularRemesherCmpt info ... */		\
-   RegularRemesher*	regRemesh;
+	/* Class contents. */
+	#define __RegularRemesherCmpt \
+		/* General info */ \
+		__Remesher \
+		\
+		/* Virtual info */ \
+		\
+		/* RegularRemesherCmpt info ... */ \
+		RegularRemesher*	regRemesh;
 
-struct RegularRemesherCmpt { __RegularRemesherCmpt };
+	struct RegularRemesherCmpt { __RegularRemesherCmpt };
+
+	#define REGULARREMESHERCMPT_DEFARGS \
+		REMESHER_DEFARGS
+
+	#define REGULARREMESHERCMPT_PASSARGS \
+		REMESHER_PASSARGS
+
+	/*-----------------------------------------------------------------------------------------------------------------------------
+	** Constructors
+	*/
+
+	/* Create a RegularRemesherCmpt */
+	RegularRemesherCmpt* RegularRemesherCmpt_New( Name name, AbstractContext* context, Mesh* mesh, RegularRemesher* regRemesh );
+
+	/* Creation implementation */
+	RegularRemesherCmpt* _RegularRemesherCmpt_New( REGULARREMESHERCMPT_DEFARGS );
+
+	/* Initialisation implementation functions */
+	void _RegularRemesherCmpt_Init( void* remesher, RegularRemesher* regRemesh );
 
 
-/*-----------------------------------------------------------------------------------------------------------------------------
-** Constructors
-*/
+	/*-----------------------------------------------------------------------------------------------------------------------------
+	** Virtual functions
+	*/
 
-/* Create a RegularRemesherCmpt */
-RegularRemesherCmpt* RegularRemesherCmpt_New( Name name );
+	void _RegularRemesherCmpt_Delete( void* remesher );
 
-/* Creation implementation */
-RegularRemesherCmpt* _RegularRemesherCmpt_New( REMESHER_ARGS );
+	void _RegularRemesherCmpt_Print( void* remesher, Stream* stream );
 
-/* Initialise a RegularRemesherCmpt */
-void RegularRemesherCmpt_Init( RegularRemesherCmpt* self );
+	RegularRemesherCmpt* _RegularRemesherCmpt_DefaultNew( Name name );
 
-/* Initialisation implementation functions */
-void _RegularRemesherCmpt_Init( RegularRemesherCmpt* self );
+	void _RegularRemesherCmpt_AssignFromXML( void* remesher, Stg_ComponentFactory* cf, void* data );
 
+	void _RegularRemesherCmpt_Build( void* remesher, void* data );
 
-/*-----------------------------------------------------------------------------------------------------------------------------
-** Virtual functions
-*/
+	void _RegularRemesherCmpt_Initialise( void* remesher, void* data );
 
-void _RegularRemesherCmpt_Delete( void* remesher );
-void _RegularRemesherCmpt_Print( void* remesher, Stream* stream );
-RegularRemesherCmpt* _RegularRemesherCmpt_DefaultNew( Name name );
-void _RegularRemesherCmpt_AssignFromXML( void* remesher, Stg_ComponentFactory* cf, void* data );
-void _RegularRemesherCmpt_Build( void* remesher, void* data );
-void _RegularRemesherCmpt_Initialise( void* remesher, void* data );
-void _RegularRemesherCmpt_Execute( void* remesher, void* data );
-void _RegularRemesherCmpt_Destroy( void* remesher, void* data );
+	void _RegularRemesherCmpt_Execute( void* remesher, void* data );
+
+	void _RegularRemesherCmpt_Destroy( void* remesher, void* data );
 
 
 /*-----------------------------------------------------------------------------------------------------------------------------

@@ -40,55 +40,56 @@
 #ifndef __StGermain_Domain_Utils_Remesher_h__
 #define __StGermain_Domain_Utils_Remesher_h__
 
-/* Textual name of this class. */
-extern const Type Remesher_Type;
+	/* Textual name of this class. */
+	extern const Type Remesher_Type;
 
-/* Virtual function types. */
-typedef void (Remesher_RemeshFunc)( void* _self );
+	/* Virtual function types. */
+	typedef void (Remesher_RemeshFunc)( void* _self );
 
-/* Class contents. */
-#define __Remesher                              \
-  __Stg_Component                               \
-  AbstractContext*  context;			\
-  Remesher_RemeshFunc*	remeshFunc;		\
-  Mesh* mesh;
+	/* Class contents. */
+	#define __Remesher \
+		__Stg_Component \
+		AbstractContext*		context; \
+		Remesher_RemeshFunc*	remeshFunc; \
+		Mesh*						mesh;
 
-struct Remesher { __Remesher };
+	struct Remesher { __Remesher };
 
+	#define REMESHER_DEFARGS \
+		STG_COMPONENT_DEFARGS, \
+    		Remesher_RemeshFunc* remeshFunc
 
-/*
-** Constructors */
+	#define REMESHER_PASSARGS \
+		STG_COMPONENT_PASSARGS, \
+			remeshFunc
 
-#define REMESHER_ARGS				\
-  STG_COMPONENT_DEFARGS,                        \
-    Remesher_RemeshFunc* remeshFunc
+	/* Constructors */
 
-#define REMESHER_PASSARGS                       \
-  STG_COMPONENT_PASSARGS, remeshFunc
+	Remesher* _Remesher_New( REMESHER_DEFARGS );
 
+	void _Remesher_Init( void* remeshser, AbstractContext* context, Mesh* mesh );
 
-Remesher* _Remesher_New( REMESHER_ARGS );
-void _Remesher_Init( Remesher* self );
+	/* Virtual functions */
 
+	void _Remesher_Delete( void* remesher );
 
-/*
-** Virtual functions */
+	void _Remesher_Print( void* remesher, Stream* stream );
 
-void _Remesher_Delete( void* remesher );
-void _Remesher_Print( void* remesher, Stream* stream );
-Remesher* _Remesher_DefaultNew( Name name );
-void _Remesher_AssignFromXML( void* remesher, Stg_ComponentFactory* cf, void* data );
-void _Remesher_Build( void* remesher, void* data );
-void _Remesher_Initialise( void* remesher, void* data );
-void _Remesher_Execute( void* remesher, void* data );
-void _Remesher_Destroy( void* remesher, void* data );
+	Remesher* _Remesher_DefaultNew( Name name );
 
+	void _Remesher_AssignFromXML( void* remesher, Stg_ComponentFactory* cf, void* data );
 
-/*
-** Public functions */
+	void _Remesher_Build( void* remesher, void* data );
 
-#define Remesher_Remesh( self)                  \
-  (self)->remeshFunc( self )
+	void _Remesher_Initialise( void* remesher, void* data );
 
+	void _Remesher_Execute( void* remesher, void* data );
+
+	void _Remesher_Destroy( void* remesher, void* data );
+
+	/* Public functions */
+
+	#define Remesher_Remesh( self ) \
+		(self)->remeshFunc( self )
 
 #endif
