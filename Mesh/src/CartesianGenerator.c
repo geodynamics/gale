@@ -2257,7 +2257,7 @@ void CartesianGenerator_DestructGeometry( CartesianGenerator* self ) {
 }
 
 #ifdef READ_HDF5
-void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, char* filename ){
+void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, const char* filename ){
 	hid_t             file, fileSpace, fileData;
 	hsize_t           start[2], count[2], size[2], maxSize[2];   
 	hid_t             memSpace, error;
@@ -2439,7 +2439,7 @@ void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, cha
 }
 #endif
 
-void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, char* filename ){
+void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, const char* filename ){
    int               proc_I;
 	Node_LocalIndex   lNode_I = 0;
 	Node_GlobalIndex  gNode_I = 0;
