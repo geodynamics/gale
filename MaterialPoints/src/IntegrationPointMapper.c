@@ -128,12 +128,12 @@ void _IntegrationPointMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* 
 
 void _IntegrationPointMapper_Build( void* mapper, void* data ) {
 	IntegrationPointMapper*	self = (IntegrationPointMapper*)mapper;
-	Stg_Component_Build( self->integrationSwarm, data, False );
+	//Stg_Component_Build( self->integrationSwarm, data, False );
 }
 
 void _IntegrationPointMapper_Initialise( void* mapper, void* data ) {
 	IntegrationPointMapper*	self = (IntegrationPointMapper*)mapper;
-	Stg_Component_Initialise( self->integrationSwarm, data, False );
+	//Stg_Component_Initialise( self->integrationSwarm, data, False );
 }
 
 void _IntegrationPointMapper_Execute( void* mapper, void* data ) {
@@ -141,7 +141,7 @@ void _IntegrationPointMapper_Execute( void* mapper, void* data ) {
 
 void _IntegrationPointMapper_Destroy( void* mapper, void* data ) {
 	IntegrationPointMapper* self = (IntegrationPointMapper*)mapper;
-	Stg_Component_Destroy( self->integrationSwarm, data, False );
+	//Stg_Component_Destroy( self->integrationSwarm, data, False );
 }
 
 void IntegrationPointMapper_Map( void* mapper ) {
