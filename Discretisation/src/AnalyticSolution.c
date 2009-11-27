@@ -145,6 +145,16 @@ void _AnalyticSolution_Init( AnalyticSolution* self, Swarm* integrationSwarm, Li
 
 void _AnalyticSolution_Delete( void* analyticSolution ) {
 	AnalyticSolution* self = (AnalyticSolution*)analyticSolution;
+
+	Stg_Class_Delete( self->feVariableList );
+	Stg_Class_Delete( self->analyticFeVariableList );
+	Stg_Class_Delete( self->analyticFeVariableFuncList );
+	Stg_Class_Delete( self->errorMagnitudeFieldList );
+	Stg_Class_Delete( self->relativeErrorMagnitudeFieldList );
+	Stg_Class_Delete( self->streamList );
+
+	if ( self->toleranceList )
+		Memory_Free( self->toleranceList );
 	
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
@@ -170,9 +180,9 @@ void _AnalyticSolution_AssignFromXML( void* analyticSolution, Stg_ComponentFacto
 	Swarm*            integrationSwarm;
 	Bool              verboseMode;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 
 	integrationSwarm = Stg_ComponentFactory_ConstructByName( cf, "gaussSwarm", Swarm, True, data ); 
 	verboseMode = Stg_ComponentFactory_GetRootDictBool( cf, "analyticSolutionVerbose", False );
@@ -185,6 +195,7 @@ void _AnalyticSolution_Build( void* analyticSolution, void* data ) {
 	Index             analyticFeVariableCount;
 	Index             analyticFeVariable_I;
 
+   Stg_Component_Build( self->integrationSwarm, data, False );
 	/* Build all the analytic fields registered to this AnalyticSolution */
 	AnalyticSolution_BuildAllAnalyticFields( self, data );
 	
@@ -203,6 +214,7 @@ void _AnalyticSolution_Initialise( void* analyticSolution, void* data ) {
 	Index             analyticFeVariableCount = Stg_ObjectList_Count( self->analyticFeVariableList );
 	Index             analyticFeVariable_I;
 
+   Stg_Component_Initialise( self->integrationSwarm, data, False );
 	assert( analyticFeVariableCount == Stg_ObjectList_Count( self->analyticFeVariableFuncList ) );
 
 	/* Assign values to all analytic fields */
@@ -228,18 +240,22 @@ void _AnalyticSolution_Execute( void* analyticSolution, void* data ) {
 
 void _AnalyticSolution_Destroy( void* analyticSolution, void* data ) {
 	AnalyticSolution* self = (AnalyticSolution*)analyticSolution;
+	Index             analyticFeVariableCount = Stg_ObjectList_Count( self->analyticFeVariableList );
+	Index             analyticFeVariable_I;
 
-	Stg_Class_Delete( self->feVariableList );
-	Stg_Class_Delete( self->analyticFeVariableList );
-	Stg_Class_Delete( self->analyticFeVariableFuncList );
-	Stg_Class_Delete( self->errorMagnitudeFieldList );
-	Stg_Class_Delete( self->relativeErrorMagnitudeFieldList );
-	Stg_Class_Delete( self->streamList );
+   Stg_Component_Destroy( self, data, False );
+   
+   Stg_Component_Destroy( self->integrationSwarm, data, False );
+	assert( analyticFeVariableCount == Stg_ObjectList_Count( self->analyticFeVariableFuncList ) );
 
-	if ( self->toleranceList )
-		Memory_Free( self->toleranceList );
+	/* Destroy all analytic fields */
+	for ( analyticFeVariable_I = 0 ; analyticFeVariable_I < analyticFeVariableCount ; analyticFeVariable_I++ ) {
+		Stg_Component_Destroy( Stg_ObjectList_At( self->feVariableList, analyticFeVariable_I ), data, False ) ;
+		Stg_Component_Destroy( Stg_ObjectList_At( self->analyticFeVariableList, analyticFeVariable_I ), data, False ) ;
+		Stg_Component_Destroy( Stg_ObjectList_At( self->errorMagnitudeFieldList, analyticFeVariable_I ), data, False ) ;
+		Stg_Component_Destroy( Stg_ObjectList_At( self->relativeErrorMagnitudeFieldList, analyticFeVariable_I ), data, False ) ;
+	}
 
-	Stg_Component_Destroy( self, data, False );
 }
 
 void AnalyticSolution_PutAnalyticSolutionOntoNodes( void* analyticSolution, Index analyticFeVariable_I ) {

@@ -2504,7 +2504,6 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 	FeVariable_SyncShadowValues( self );
 }
 
-
 void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, const char* feVarFilename, const char* meshFilename ){
 	FeVariable*							self = (FeVariable*)feVariable;
    Stream*								errorStr = Journal_Register( Error_Type, self->type );   
@@ -2617,7 +2616,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    /** use the element size read in from the checkpoint file for the new mesh generator */
    CartesianGenerator_SetTopologyParams( gen, (unsigned*)res, 0, NULL, NULL );
 	/** use the feVariable's mesh's generator's crdMin and crdMax (which have been previously read in from checkpointed mesh file  */
-   CartesianGenerator_SetGeometryParams( gen, &crdMin, &crdMax );
+   CartesianGenerator_SetGeometryParams( gen, (double*)&crdMin, (double*)&crdMax );
    /** set it so that the generator does not read in the mesh from a file - we will 
               explicitly do this after we build the feMesh using the provided mesh checkpoint file */
    gen->readFromFile = False;
@@ -2671,8 +2670,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    varReg = Variable_Register_New();
    if (self->fieldComponentCount == 1){
       var = Variable_NewScalar( "interpolation_temp_scalar", Variable_DataType_Double, &nDomainVerts, NULL, &arrayPtr, varReg );
-   }
-   else {
+   } else {
       unsigned var_I;
 		for( var_I = 0; var_I < self->fieldComponentCount; var_I++ )
 			Stg_asprintf( &varName[var_I], "%s-loaded-Component-%d", self->name, var_I );
