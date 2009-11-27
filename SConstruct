@@ -120,6 +120,12 @@ if env['with_glucifer']:
                duplicate=0)
     env.Prepend(LIBS=['glucifer'])
 
+if env['with_experimental']:
+    SConscript('Experimental/SConscript',
+               variant_dir=env['build_dir'] + '/Experimental',
+               duplicate=0)
+    env.Prepend(LIBS=['experimental'])
+
 #
 # Build static version of StGermain.
 #
