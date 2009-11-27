@@ -72,7 +72,7 @@
 	typedef struct lucDrawingObject            lucDrawingObject;
 	
 	typedef struct lucLight_Register           lucLight_Register;
-  typedef struct lucLight                    lucLight;
+   typedef struct lucLight                    lucLight;
 	
 	/* types for clarity */
 	typedef Index Colour_Index;

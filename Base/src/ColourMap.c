@@ -312,15 +312,14 @@ void lucColourMap_GetColourFromValue( void* colourMap, double value, lucColour* 
 
     /* Convert scaled value to colour */
     lucColourMap_GetColourFromScaledValue(colourMap, scaledValue, colour );
-
-    /* Check for invalid range - set colour to invisible */
-    if (self->maximum == self->minimum) colour->opacity = 0;
 }
 
 float lucColourMap_ScaleValue( void* colourMap, double value ) {
 	lucColourMap* self        = colourMap;
-	float         scaledValue;
-	float 	      max, min, centre, sampleValue;
+	double 	      scaledValue, max, min, centre, sampleValue;
+
+    if (value == self->minimum) return 0.0;
+    if (value == self->maximum) return 1.0;
 
     /* To get a log scale, transform each value to log10(value) */
 	if (self->logScale == True) {
@@ -398,14 +397,12 @@ void lucColourMap_GetColourFromScaledValue( void* colourMap, float scaledValue, 
 void lucColourMap_SetMinMax( void* colourMap, double min, double max ) {
 	lucColourMap* self       = colourMap;
 	double        tolerance  = 1e-10;
-   Stream*       stream     = Journal_Register( InfoStream_Type, self->type );
-	/* Shift max and min if they are too close /
+    Stream*       stream     = Journal_Register( InfoStream_Type, self->type );
+	/* Shift max and min if they are too close */
 	if (fabs(min - max) < tolerance) {	
-		max += 0.5 * tolerance;
-		min -= 0.5 * tolerance;
+		max += tolerance;
+		min -= tolerance;
 	}
-    Removed, caused attempt to draw colourBar with incorrect values
-    now checked in colour calculations */
 
 	/* Copy to colour map */
 	self->minimum = min;

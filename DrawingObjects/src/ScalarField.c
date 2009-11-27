@@ -51,6 +51,7 @@
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
+#include <glucifer/Base/CrossSection.h>
 
 #include "types.h"
 #include "OpenGLDrawingObject.h"
@@ -214,40 +215,31 @@ void _lucScalarField_CleanUp( void* drawingObject, void* _context ) {
 void _lucScalarField_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucScalarField*          self          = (lucScalarField*)drawingObject;
 	DomainContext*   context       = (DomainContext*) _context;
-	FieldVariable*           fieldVariable = self->fieldVariable;
-	Coord                    min;
-	Coord                    max;
-	Dimension_Index          dim_I;
 
-	/* Scale Colour Map */
-	FieldVariable_GetMinAndMaxGlobalCoords( fieldVariable, min, max );
+   lucCrossSection          crossSection;
 
-	/* Crop the size of the cros-section that you wish to draw */
-	for ( dim_I = 0 ; dim_I < fieldVariable->dim ; dim_I++ ) {
-		min[ dim_I ] = MAX( self->minCropValues[ dim_I ], min[ dim_I ]);
-		max[ dim_I ] = MIN( self->maxCropValues[ dim_I ], max[ dim_I ]);
+	if (context->dim == 2) 
+   {
+
+       if( self->useMesh )
+          lucScalarField_DrawWithMesh( self );
+       else {
+          lucScalarFieldCrossSection_DrawCrossSection( self, lucCrossSection_Set(&crossSection, 0.0, K_AXIS, False));
+       }
 	}
-
-	
-	if (context->dim == 2) {
-           if( self->useMesh )
-              lucScalarField_DrawWithMesh( self );
-           else
-              lucScalarFieldCrossSection_DrawCrossSection( self, 0.0, K_AXIS );
-	}
-	else {
-		if ( self->cullFace ) 
-			glEnable(GL_CULL_FACE);
+	else 
+   {
+		if ( self->cullFace ) glEnable(GL_CULL_FACE);
 	
 		glFrontFace(GL_CCW);
-		lucScalarFieldCrossSection_DrawCrossSection( self, min[ I_AXIS ], I_AXIS );
-		lucScalarFieldCrossSection_DrawCrossSection( self, max[ J_AXIS ], J_AXIS );
-		lucScalarFieldCrossSection_DrawCrossSection( self, min[ K_AXIS ], K_AXIS );
-	
+		lucScalarFieldCrossSection_DrawCrossSection( self, lucCrossSection_Set(&crossSection, 0.0, I_AXIS, True));
+		lucScalarFieldCrossSection_DrawCrossSection( self, lucCrossSection_Set(&crossSection, 1.0, J_AXIS, True));
+		lucScalarFieldCrossSection_DrawCrossSection( self, lucCrossSection_Set(&crossSection, 0.0, K_AXIS, True));
+
 		glFrontFace(GL_CW);
-		lucScalarFieldCrossSection_DrawCrossSection( self, max[ I_AXIS ], I_AXIS );
-		lucScalarFieldCrossSection_DrawCrossSection( self, min[ J_AXIS ], J_AXIS );
-		lucScalarFieldCrossSection_DrawCrossSection( self, max[ K_AXIS ], K_AXIS );
+		lucScalarFieldCrossSection_DrawCrossSection( self, lucCrossSection_Set(&crossSection, 1.0, I_AXIS, True));
+		lucScalarFieldCrossSection_DrawCrossSection( self, lucCrossSection_Set(&crossSection, 0.0, J_AXIS, True));
+		lucScalarFieldCrossSection_DrawCrossSection( self, lucCrossSection_Set(&crossSection, 1.0, K_AXIS, True));
 
 		glDisable(GL_CULL_FACE);
 	}

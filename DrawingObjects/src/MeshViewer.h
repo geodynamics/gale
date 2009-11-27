@@ -133,4 +133,6 @@
 	void lucMeshViewer_RenderEdges_WithInc( lucMeshViewer* self, vertexFuncType* vertexFunc );
 	void lucMeshViewer_RenderEdges( lucMeshViewer* self, vertexFuncType* vertexFunc );
 
+        void lucMeshViewer_PrintAllNodesNumber( void* drawingObject );
+
 #endif

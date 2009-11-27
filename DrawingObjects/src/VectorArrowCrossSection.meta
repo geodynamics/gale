@@ -47,7 +47,7 @@
 		<param name="Name">crossSection</param>
 		<param name="Type">String</param>
 		<param name="Default">""</param>
-		<param name="Description">The description of the plane in the format: "axis=value". e.g. x=1.5 will descrive a Y-Z plane where the X coordinate is 1.5. The axis is case insensitive.</param>
+		<param name="Description">The description of the plane in the format: "axis=value". e.g. x=1.5 will describe a Y-Z plane where the X coordinate is 1.5. The axis is case insensitive. To specify plane dynamically based on current minimum/maximum global coords use "axis=min", "axis=max" or "axis=value%".</param>
 	</struct>
 	<struct>
 		<param name="Name">colour</param>

@@ -604,7 +604,7 @@ void lucMeshViewer_BuildEdges( lucMeshViewer* self ) {
 
 void lucMeshViewer_RenderEdges_WithInc( lucMeshViewer* self, vertexFuncType* vertexFunc ) {
 	unsigned	nEdges;
-	unsigned	nIncVerts, *incVerts;
+	int	nIncVerts, *incVerts;
 	IArray*		inc;
 	unsigned	e_i;
 

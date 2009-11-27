@@ -43,6 +43,7 @@
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#include <glucifer/Base/CrossSection.h>
 
 #ifndef __lucEigenvectorsCrossSection_h__
 #define __lucEigenvectorsCrossSection_h__
@@ -64,8 +65,7 @@
 		double                                             arrowHeadSize;            \
 		double                                             lengthScale;              \
 		float                                              lineWidth;                \
-		double                                             crossSectionValue;        \
-		Axis                                               crossSectionAxis;	     \
+      lucCrossSection*                                   crossSection;           \
 		/* Specifies if the eigenvalue is used to draw the vector - default true */  \
 		Bool 						   useEigenValue;            \
 		/* Value used to draw the vector if the eigenvalue is not used */            \
@@ -116,6 +116,6 @@
 	void _lucEigenvectorsCrossSection_CleanUp( void* drawingObject, void* _context ) ;
 
 	void _lucEigenvectorsCrossSection_BuildDisplayList( void* drawingObject, void* _context ) ;
-	void _lucEigenvectorsCrossSection_DrawCrossSection( void* drawingObject, Dimension_Index dim, double crossSectionValue, Axis axis );
+   void _lucEigenvectorsCrossSection_DrawCrossSection( void* drawingObject, Dimension_Index dim, lucCrossSection* crossSection );
 
 #endif
