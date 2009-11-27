@@ -301,6 +301,7 @@ void _Trubitsyn2006_Build( void* analyticSolution, void* data ) {
 	Trubitsyn2006*         self = (Trubitsyn2006*)analyticSolution;
 
 	Stg_Component_Build(self->velocityField, data, False);
+   Stg_Component_Build(self->pressureField, data, False);
 
 	_FieldTest_Build( self, data );
 
@@ -314,8 +315,18 @@ void _Trubitsyn2006_Initialise( void* analyticSolution, void* data ) {
 	Trubitsyn2006*         self = (Trubitsyn2006*)analyticSolution;
 
 	Stg_Component_Initialise(self->velocityField, data, False);
+	Stg_Component_Initialise(self->pressureField, data, False);
 
 	_FieldTest_Initialise( self, data );
+}
+
+void _Trubitsyn2006_Destroy( void* analyticSolution, void* data ) {
+	Trubitsyn2006*         self = (Trubitsyn2006*)analyticSolution;
+
+   _FieldTest_Destroy( self, data );
+   
+	Stg_Component_Destroy(self->velocityField, data, False);
+	Stg_Component_Destroy(self->pressureField, data, False);
 }
 
 
@@ -331,7 +342,7 @@ void* _Trubitsyn2006_DefaultNew( Name name ) {
 			_Trubitsyn2006_Build,
 			_Trubitsyn2006_Initialise,
 			_FieldTest_Execute,
-			_FieldTest_Destroy,
+			_Trubitsyn2006_Destroy,
 			name );
 }
 

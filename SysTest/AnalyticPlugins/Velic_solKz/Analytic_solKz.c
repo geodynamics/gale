@@ -116,7 +116,7 @@ void _Velic_solKz_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* c
 	m = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_m", 1 );
 	n = Stg_ComponentFactory_GetRootDictInt( cf, "solKz_n", 1 );
 
-  km = M_PI * m;
+   km = M_PI * m;
 	
   /* Note: in the _Velic_solKz function km and n must be supplied */
 	_Velic_solKz_Init( self, sigma, km, B, n );

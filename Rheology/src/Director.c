@@ -540,7 +540,8 @@ Bool _Director_TimeDerivative( void* director, Index lParticle_I, double* timeDe
 	lElement_I = materialPoint->owningCell;
 	
 	result = FieldVariable_InterpolateValueAt( self->velGradField, materialPoint->coord, velGrad );
-#if 0
+	/* if in debug mode, perform some tests */
+#ifdef DEBUG
 	if ( result == OTHER_PROC || result == OUTSIDE_GLOBAL || isinf(velGrad[0]) || isinf(velGrad[1]) || 
 		( self->materialPointsSwarm->dim == 3 && isinf(velGrad[2]) ) ) 
 	{

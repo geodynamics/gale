@@ -421,10 +421,25 @@ void _LateralViscosityAnalytic_AssignFromXML( void* analyticSolution, Stg_Compon
 void _LateralViscosityAnalytic_Build( void* analyticSolution, void* data ) {
 	LateralViscosityAnalytic*         self = (LateralViscosityAnalytic*)analyticSolution;
 
+   Stg_Component_Build( self->velocityField, data, False ); 
 	_FieldTest_Build( self, data );
 
 	self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, 1 );
 	self->_analyticSolutionList[0] = _LateralViscosityAnalytic_VelocityFunction;
+}
+
+void _LateralViscosityAnalytic_Initialise( void* analyticSolution, void* data ) {
+	LateralViscosityAnalytic*         self = (LateralViscosityAnalytic*)analyticSolution;
+
+   Stg_Component_Initialise( self->velocityField, data, False ); 
+	_FieldTest_Initialise( self, data );
+}
+
+void _LateralViscosityAnalytic_Destroy( void* analyticSolution, void* data ) {
+	LateralViscosityAnalytic*         self = (LateralViscosityAnalytic*)analyticSolution;
+
+   _FieldTest_Destroy( self, data );
+   Stg_Component_Destroy( self->velocityField, data, False ); 
 }
 
 
@@ -438,9 +453,9 @@ void* _LateralViscosityAnalytic_DefaultNew( Name name ) {
 			_LateralViscosityAnalytic_DefaultNew,
 			_LateralViscosityAnalytic_AssignFromXML,
 			_LateralViscosityAnalytic_Build,
-			_FieldTest_Initialise,
+			_LateralViscosityAnalytic_Initialise,
 			_FieldTest_Execute,
-			_FieldTest_Destroy,
+			_LateralViscosityAnalytic_Destroy,
 			name );
 }
 

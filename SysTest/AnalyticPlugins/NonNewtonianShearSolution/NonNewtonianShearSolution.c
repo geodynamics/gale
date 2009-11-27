@@ -136,13 +136,46 @@ void _NonNewtonianShearSolution_AssignFromXML( void* analyticSolution, Stg_Compo
 void _NonNewtonianShearSolution_Build( void* analyticSolution, void* data ) {
 	NonNewtonianShearSolution* self = (NonNewtonianShearSolution*)analyticSolution;
 
-	_FieldTest_Build( self, data );
-
+   Stg_Component_Build( self->strainRateField, data, False );
+   Stg_Component_Build( self->stressField, data, False );
+   Stg_Component_Build( self->viscosityField, data, False );
+   Stg_Component_Build( self->materialViscosity, data, False );
+   Stg_Component_Build( self->nonNewtonianRheology, data, False );
+   Stg_Component_Build( self->mesh, data, False );
 	self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, 4 );
 	self->_analyticSolutionList[0] = NonNewtonianShearSolution_VelocityFunction;
 	self->_analyticSolutionList[1] = NonNewtonianShearSolution_StrainRateFunction;
 	self->_analyticSolutionList[2] = NonNewtonianShearSolution_StressFunction;
 	self->_analyticSolutionList[3] = NonNewtonianShearSolution_ViscosityFunction;
+   
+   _FieldTest_Build( self, data );
+
+}
+
+void _NonNewtonianShearSolution_Initialise( void* analyticSolution, void* data ) {
+	NonNewtonianShearSolution* self = (NonNewtonianShearSolution*)analyticSolution;
+
+   Stg_Component_Initialise( self->strainRateField, data, False );
+   Stg_Component_Initialise( self->stressField, data, False );
+   Stg_Component_Initialise( self->viscosityField, data, False );
+   Stg_Component_Initialise( self->materialViscosity, data, False );
+   Stg_Component_Initialise( self->nonNewtonianRheology, data, False );
+   Stg_Component_Initialise( self->mesh, data, False );
+   
+   _FieldTest_Initialise( self, data );
+}
+
+void _NonNewtonianShearSolution_Destroy( void* analyticSolution, void* data ) {
+	NonNewtonianShearSolution* self = (NonNewtonianShearSolution*)analyticSolution;
+
+	_FieldTest_Destroy( self, data );
+
+   Stg_Component_Destroy( self->strainRateField, data, False );
+   Stg_Component_Destroy( self->stressField, data, False );
+   Stg_Component_Destroy( self->viscosityField, data, False );
+   Stg_Component_Destroy( self->materialViscosity, data, False );
+   Stg_Component_Destroy( self->nonNewtonianRheology, data, False );
+   Stg_Component_Destroy( self->mesh, data, False );
 }
 
 
@@ -157,9 +190,9 @@ void* _NonNewtonianShearSolution_DefaultNew( Name name ) {
 			_NonNewtonianShearSolution_DefaultNew,
 			_NonNewtonianShearSolution_AssignFromXML,
 			_NonNewtonianShearSolution_Build,
-			_FieldTest_Initialise,
+			_NonNewtonianShearSolution_Initialise,
 			_FieldTest_Execute,
-			_FieldTest_Destroy,
+			_NonNewtonianShearSolution_Destroy,
 			name );	
 }
 	
