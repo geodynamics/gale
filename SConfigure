@@ -13,6 +13,7 @@ options = [
     ('--cc', 'CC', 'C compiler', None),
     ('--cflags', 'CFLAGS', 'Flags for the C compiler', None),
     ('--with-glucifer', 'with_glucifer', 'Enable gLucifer', 1, 'int'),
+    ('--with-experimental', 'with_experimental', 'Download Experimental Repository', 0, 'int'),
     ('--with-osmesa', 'with_osmesa', 'Enable OSMesa output', 1, 'int'),
     ('--with-sdl', 'with_sdl', 'Enable SDL output', 1, 'int'),
     ('--with-x11', 'with_x11', 'Enable X11 output', 1, 'int'),
