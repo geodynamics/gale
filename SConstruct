@@ -1,4 +1,4 @@
-import sys, os, subprocess
+import sys, os, subprocess, platform
 
 EnsureSConsVersion(0, 98)
 
@@ -21,6 +21,10 @@ env.Decider("MD5-timestamp")
 values = {}
 execfile("config.cfg", globals(), values)
 env._dict.update(values)
+
+# Check if we're using 64bit.
+if platform.architecture()[0] == '64bit':
+    env.AppendUnique(CPPDEFINES=[('SYSTEM_SIZEOF_LONG', 8)])
 
 # Need to manipulate the build directory to keep SCons happy. Because of SCons' target
 # rules we need to make the build directory a default target.
@@ -105,17 +109,16 @@ SConscript('Underworld/SConscript',
            duplicate=0)
 env.Prepend(LIBS=['Underworld'])
 
+SConscript('Experimental/SConscript',
+           variant_dir=env['build_dir'] + '/Experimental',
+           duplicate=0)
+env.Prepend(LIBS=['Experimental'])
+
 if env['with_glucifer']:
     SConscript('gLucifer/SConscript',
                variant_dir=env['build_dir'] + '/gLucifer',
                duplicate=0)
     env.Prepend(LIBS=['glucifer'])
-
-if env['with_experimental']:
-    SConscript('Experimental/SConscript',
-               variant_dir=env['build_dir'] + '/Experimental',
-               duplicate=0)
-    env.Prepend(LIBS=['experimental'])
 
 #
 # Build static version of StGermain.

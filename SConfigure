@@ -1,5 +1,5 @@
 import platform, os, sys
-from config import packages, cc
+from config import Package, packages, cc
 
 #
 # Add options to be passed on to build.
@@ -13,7 +13,6 @@ options = [
     ('--cc', 'CC', 'C compiler', None),
     ('--cflags', 'CFLAGS', 'Flags for the C compiler', None),
     ('--with-glucifer', 'with_glucifer', 'Enable gLucifer', 1, 'int'),
-    ('--with-experimental', 'with_experimental', 'Download Experimental Repository', 0, 'int'),
     ('--with-osmesa', 'with_osmesa', 'Enable OSMesa output', 1, 'int'),
     ('--with-sdl', 'with_sdl', 'Enable SDL output', 1, 'int'),
     ('--with-x11', 'with_x11', 'Enable X11 output', 1, 'int'),
@@ -38,7 +37,7 @@ env.Tool('config', toolpath=['config'], options=options)
 #
 
 env.UsePackage(packages.libXML2)
-env.UsePackage(packages.PETSc)
+env.UsePackage(packages.PETScExt)
 env.UsePackage(packages.HDF5)
 env.UsePackage(packages.OSMesa)
 env.UsePackage(packages.OpenGL)
@@ -58,6 +57,10 @@ if not (GetOption('help') or GetOption('clean')):
 
     if env.get('CC', None) is not None:
         cc.apply_cc(env, env['CC'])
+
+    # Switch off auto compilers if we were given one.
+    if '--cc' in ARGUMENTS:
+        env['packages'][packages.MPI].try_compilers = False
 
     if env.get('prefix', None) is None:
         env['prefix'] = env.GetLaunchDir()
@@ -83,6 +86,9 @@ if not (GetOption('help') or GetOption('clean')):
     elif env.get('lib_type', None) == 'static':
         env['shared_libs'] = 0
         env['static_libs'] = 1
+        #env.MergeFlags('-static')
+	#env.AppendUnique(LINKFLAGS=['-static'])
+	Package.static = True
     else:
         print 'Invalid option \'--lib-type\''
         sys.exit()
@@ -95,9 +101,9 @@ if not (GetOption('help') or GetOption('clean')):
     # packages.
     if env.get('with_glucifer', None):
 
-        # Try for OSMesa first.
+        # Try for OSMesa first on *nix systems.
         osm = 0
-        if env.get('with_osmesa'):
+        if platform.system() != 'Darwin' and env.get('with_osmesa'):
             osm = env.ConfigurePackage(packages.OSMesa, required=False).result
 
         # If not, go for OpenGL.
@@ -147,6 +153,7 @@ if not (GetOption('help') or GetOption('clean')):
             env.ConfigurePackage(packages.libFAME, required=False)
 
     env.ConfigurePackage(packages.PETSc)
+    env.ConfigurePackage(packages.PETScExt, required=False)
 
 #
 # Export the environment.
