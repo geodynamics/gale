@@ -173,8 +173,14 @@ void _ManyToOneMapper_Execute( void* mapper, void* data ) {
 
 void _ManyToOneMapper_Destroy( void* mapper, void* data ) {
 	ManyToOneMapper*	self = (ManyToOneMapper*)mapper;
+	int					i;
+
+	for ( i = 0; i < self->materialSwarmCount; ++i ) {
+		Stg_Component_Destroy( self->materialSwarms[i], data, False );
+	}
 
 	_IntegrationPointMapper_Destroy( self, data );
+   
 }
 
 MaterialPointsSwarm** ManyToOneMapper_GetMaterialPointsSwarms( void* mapper, Index* count ) {
