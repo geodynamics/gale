@@ -396,6 +396,12 @@ void _IntegrationPointsSwarm_Build( void* integrationPoints, void* data ) {
 	Stg_Component_Build( self->localCoordVariable, data, False );
 	Stg_Component_Build( self->weightVariable, data, False );
 	Stg_Component_Build( self->mapper, data, False );
+   Stg_Component_Build( self->mesh, data, False );
+   Stg_Component_Build( self->timeIntegrator, data, False );
+   if ( self->weights != NULL ) {
+		Stg_Component_Build( self->weights, data, False );
+	}
+   
 }
 void _IntegrationPointsSwarm_Initialise( void* integrationPoints, void* data ) {
 	IntegrationPointsSwarm*	self = (IntegrationPointsSwarm*) integrationPoints;
@@ -409,6 +415,8 @@ void _IntegrationPointsSwarm_Initialise( void* integrationPoints, void* data ) {
 	Stg_Component_Initialise( self->localCoordVariable, data, False );
 	Stg_Component_Initialise( self->weightVariable, data, False );
 	Stg_Component_Initialise( self->mapper, data, False );
+   Stg_Component_Initialise( self->mesh, data, False );
+   Stg_Component_Initialise( self->timeIntegrator, data, False );
 
 	if ( self->weights != NULL ) {
 		Stg_Component_Initialise( self->weights, data, False );
@@ -429,6 +437,15 @@ void _IntegrationPointsSwarm_Execute( void* integrationPoints, void* data ) {
 }
 void _IntegrationPointsSwarm_Destroy( void* integrationPoints, void* data ) {
 	IntegrationPointsSwarm*	self = (IntegrationPointsSwarm*)integrationPoints;
+
+	Stg_Component_Destroy( self->localCoordVariable, data, False );
+	Stg_Component_Destroy( self->weightVariable, data, False );
+	Stg_Component_Destroy( self->mapper, data, False );
+   Stg_Component_Destroy( self->mesh, data, False );
+   Stg_Component_Destroy( self->timeIntegrator, data, False );
+   if ( self->weights != NULL ) {
+		Stg_Component_Destroy( self->weights, data, False );
+	}
 	
 	_Swarm_Destroy( self, data );
 }
