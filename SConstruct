@@ -109,11 +109,6 @@ SConscript('Underworld/SConscript',
            duplicate=0)
 env.Prepend(LIBS=['Underworld'])
 
-SConscript('Experimental/SConscript',
-           variant_dir=env['build_dir'] + '/Experimental',
-           duplicate=0)
-env.Prepend(LIBS=['Experimental'])
-
 if env['with_glucifer']:
     SConscript('gLucifer/SConscript',
                variant_dir=env['build_dir'] + '/gLucifer',
