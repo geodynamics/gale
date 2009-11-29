@@ -79,12 +79,12 @@ AlignmentSwarmVariable* AlignmentSwarmVariable_New(
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-AlignmentSwarmVariable* _AlignmentSwarmVariable_New( ALIGNMENTSWARMVARIABLE_DEFARGS ) {
+AlignmentSwarmVariable* _AlignmentSwarmVariable_New(  ALIGNMENTSWARMVARIABLE_DEFARGS  ) {
    AlignmentSwarmVariable* self;
 
    /* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-   assert( sizeOfSelf >= sizeof(AlignmentSwarmVariable) );
-   self = (AlignmentSwarmVariable*) _SwarmVariable_New( SWARMVARIABLE_PASSARGS );
+   assert( _sizeOfSelf >= sizeof(AlignmentSwarmVariable) );
+   self = (AlignmentSwarmVariable*) _SwarmVariable_New(  SWARMVARIABLE_PASSARGS  );
 
    /* Function pointers for this class that are not on the parent class should be set here */
 
@@ -102,23 +102,24 @@ void _AlignmentSwarmVariable_Init( void* druckerPrager, FeVariable* velocityFiel
 }
 
 void* _AlignmentSwarmVariable_DefaultNew( Name name ) {
-   return (void*) _AlignmentSwarmVariable_New(
-      sizeof(AlignmentSwarmVariable),
-      AlignmentSwarmVariable_Type,
-      _SwarmVariable_Delete,
-      _SwarmVariable_Print,
-      _SwarmVariable_Copy,
-      _AlignmentSwarmVariable_DefaultNew,
-      _AlignmentSwarmVariable_AssignFromXML,
-      _AlignmentSwarmVariable_Build,
-      _AlignmentSwarmVariable_Initialise,
-      _SwarmVariable_Execute,
-      _AlignmentSwarmVariable_Destroy,
-		name,
-		NON_GLOBAL,
-      _AlignmentSwarmVariable_ValueAt,
-      _AlignmentSwarmVariable_GetMinGlobalMagnitude,
-      _AlignmentSwarmVariable_GetMaxGlobalMagnitude );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(AlignmentSwarmVariable);
+	Type                                                         type = AlignmentSwarmVariable_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _SwarmVariable_Delete;
+	Stg_Class_PrintFunction*                                   _print = _SwarmVariable_Print;
+	Stg_Class_CopyFunction*                                     _copy = _SwarmVariable_Copy;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _AlignmentSwarmVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _AlignmentSwarmVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _AlignmentSwarmVariable_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _AlignmentSwarmVariable_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _SwarmVariable_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _AlignmentSwarmVariable_Destroy;
+	AllocationType                                 nameAllocationType = NON_GLOBAL;
+	SwarmVariable_ValueAtFunction*                           _valueAt = _AlignmentSwarmVariable_ValueAt;
+	SwarmVariable_GetGlobalValueFunction*      _getMinGlobalMagnitude = _AlignmentSwarmVariable_GetMinGlobalMagnitude;
+	SwarmVariable_GetGlobalValueFunction*      _getMaxGlobalMagnitude = _AlignmentSwarmVariable_GetMaxGlobalMagnitude;
+
+   return (void*) _AlignmentSwarmVariable_New(  ALIGNMENTSWARMVARIABLE_PASSARGS  );
 }
 
 void _AlignmentSwarmVariable_AssignFromXML( void* druckerPrager, Stg_ComponentFactory* cf, void* data ){
@@ -188,3 +189,5 @@ double _AlignmentSwarmVariable_GetMinGlobalMagnitude( void* alignment ) {
 double _AlignmentSwarmVariable_GetMaxGlobalMagnitude( void* alignment ) {
    return 1.0;
 }
+
+

@@ -123,21 +123,27 @@ void _Velic_solKz_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* c
 }
 
 void* _Velic_solKz_DefaultNew( Name name ) {
-	return _FieldTest_New(
-			sizeof(Velic_solKz),
-			Velic_solKz_Type,
-			_FieldTest_Delete,
-			_FieldTest_Print,
-			_FieldTest_Copy,
-			_Velic_solKz_DefaultNew,
-			_Velic_solKz_AssignFromXML,
-			_Velic_solKz_Build,
-			_FieldTest_Initialise,
-			_FieldTest_Execute,
-			_FieldTest_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Velic_solKz);
+	Type                                                      type = Velic_solKz_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FieldTest_Delete;
+	Stg_Class_PrintFunction*                                _print = _FieldTest_Print;
+	Stg_Class_CopyFunction*                                  _copy = _FieldTest_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Velic_solKz_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Velic_solKz_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Velic_solKz_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FieldTest_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FieldTest_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FieldTest_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _FieldTest_New(  FIELDTEST_PASSARGS  );
 }
 
 Index Underworld_Velic_solKz_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Velic_solKz_Type, "0", _Velic_solKz_DefaultNew );
 }
+
+

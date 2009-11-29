@@ -60,11 +60,7 @@
 
    struct AlignmentSwarmVariable { __AlignmentSwarmVariable };
 
-	#define ALIGNMENTSWARMVARIABLE_DEFARGS \
-		SWARMVARIABLE_DEFARGS
 
-	#define ALIGNMENTSWARMVARIABLE_PASSARGS \
-		SWARMVARIABLE_PASSARGS
 
    /** Public Constructor */
 
@@ -78,7 +74,18 @@
       Director*			director ) ;
 
    /** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-   AlignmentSwarmVariable* _AlignmentSwarmVariable_New( ALIGNMENTSWARMVARIABLE_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ALIGNMENTSWARMVARIABLE_DEFARGS \
+                SWARMVARIABLE_DEFARGS
+
+	#define ALIGNMENTSWARMVARIABLE_PASSARGS \
+                SWARMVARIABLE_PASSARGS
+
+   AlignmentSwarmVariable* _AlignmentSwarmVariable_New(  ALIGNMENTSWARMVARIABLE_DEFARGS  );
 
    /* 'Stg_Component' implementations */
    void* _AlignmentSwarmVariable_DefaultNew( Name name );
@@ -105,3 +112,4 @@
    double _AlignmentSwarmVariable_GetMaxGlobalMagnitude( void* alignment );
 
 #endif
+

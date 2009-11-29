@@ -334,3 +334,5 @@ void DirectorSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, DirectorSuite_TestPerMaterial );
    pcu_suite_addTest( suite, DirectorSuite_TestPerMaterial2 );
 }
+
+

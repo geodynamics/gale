@@ -80,33 +80,34 @@ UnderworldContext* UnderworldContext_New(
 }	
 
 void* _UnderworldContext_DefaultNew( Name name ) {
-	return (void*) _UnderworldContext_New(
-		sizeof(UnderworldContext),
-		UnderworldContext_Type,
-		_UnderworldContext_Delete,
-		_UnderworldContext_Print,
-		NULL, 
-		_UnderworldContext_DefaultNew,
-		_UnderworldContext_AssignFromXML,
-		(Stg_Component_BuildFunction*)_FiniteElementContext_Build,
-		(Stg_Component_InitialiseFunction*)_FiniteElementContext_Initialise,
-		_AbstractContext_Execute,
-		(Stg_Component_DestroyFunction*)_UnderworldContext_Destroy,
-		name,
-		NON_GLOBAL,
-		_UnderworldContext_SetDt,
-		0,
-		0,
-		MPI_COMM_WORLD,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(UnderworldContext);
+	Type                                                      type = UnderworldContext_Type;
+	Stg_Class_DeleteFunction*                              _delete = _UnderworldContext_Delete;
+	Stg_Class_PrintFunction*                                _print = _UnderworldContext_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _UnderworldContext_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _UnderworldContext_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = (Stg_Component_BuildFunction*)_FiniteElementContext_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = (Stg_Component_InitialiseFunction*)_FiniteElementContext_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _AbstractContext_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = (Stg_Component_DestroyFunction*)_UnderworldContext_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	AbstractContext_SetDt*                                  _setDt = _UnderworldContext_SetDt;
+	double                                               startTime = 0;
+	double                                                stopTime = 0;
+	MPI_Comm                                          communicator = MPI_COMM_WORLD;
+	Dictionary*                                         dictionary = NULL;
+
+	return (void*) _UnderworldContext_New(  UNDERWORLDCONTEXT_PASSARGS  );
 }
 
-UnderworldContext* _UnderworldContext_New( UNDERWORLDCONTEXT_DEFARGS ) {
+UnderworldContext* _UnderworldContext_New(  UNDERWORLDCONTEXT_DEFARGS  ) {
 	UnderworldContext* self;
 	
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. 
 		At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	self = (UnderworldContext*)_PICelleratorContext_New( PICELLERATORCONTEXT_PASSARGS );
+	self = (UnderworldContext*)_PICelleratorContext_New(  PICELLERATORCONTEXT_PASSARGS  );
 	
 	/* General info */
 	
@@ -212,3 +213,5 @@ void UnderworldContext_AssignPointers( void* context, void* ptrToContext ) {
 	
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
+
+

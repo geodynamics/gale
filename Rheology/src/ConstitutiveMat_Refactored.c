@@ -60,13 +60,13 @@
 
 const Type ConstitutiveMat_Refactored_Type = "ConstitutiveMat_Refactored";
 
-ConstitutiveMat_Refactored* _ConstitutiveMat_Refactored_New( CONSTITUTIVEMAT_REFACTORED_DEFARGS ) {
+ConstitutiveMat_Refactored* _ConstitutiveMat_Refactored_New(  CONSTITUTIVEMAT_REFACTORED_DEFARGS  ) {
 	ConstitutiveMat_Refactored* self;
 	
-	assert( sizeOfSelf >= sizeof(ConstitutiveMat_Refactored) );
+	assert( _sizeOfSelf >= sizeof(ConstitutiveMat_Refactored) );
 	
 	/* General info */
-	self = (ConstitutiveMat_Refactored*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	self = (ConstitutiveMat_Refactored*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* Virtual functions */
 	self->_setValue            = _setValue;
@@ -321,4 +321,6 @@ void ConstitutiveMat_Refactored_PrintContents( void* constitutiveMatrix, Stream*
 		Journal_Printf( stream, "\n" );
 	}
 }
+
+
 

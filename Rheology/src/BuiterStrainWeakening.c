@@ -101,43 +101,13 @@ BuiterStrainWeakening* BuiterStrainWeakening_New(
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-BuiterStrainWeakening* _BuiterStrainWeakening_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		TimeIntegratee_CalculateTimeDerivFunction*         _calculateTimeDeriv,
-		TimeIntegratee_IntermediateFunction*               _intermediate,
-		StrainWeakening_CalcIncrementFunction*             _calcIncrement,
-		Name                                               name ) 
+BuiterStrainWeakening* _BuiterStrainWeakening_New(  BUITERSTRAINWEAKENING_DEFARGS  ) 
 {
 	BuiterStrainWeakening*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(BuiterStrainWeakening) );
-	self = (BuiterStrainWeakening*) _StrainWeakening_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_calculateTimeDeriv,
-			_intermediate,
-			_calcIncrement, 
-			name );
+	assert( _sizeOfSelf >= sizeof(BuiterStrainWeakening) );
+	self = (BuiterStrainWeakening*) _StrainWeakening_New(  STRAINWEAKENING_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	
@@ -173,21 +143,27 @@ void _BuiterStrainWeakening_Init(
 }
 
 void* _BuiterStrainWeakening_DefaultNew( Name name ) {
-	return (void*) _BuiterStrainWeakening_New(
-		sizeof(BuiterStrainWeakening),
-		BuiterStrainWeakening_Type,
-		_TimeIntegratee_Delete,
-		_TimeIntegratee_Print,
-		_TimeIntegratee_Copy,
-		_BuiterStrainWeakening_DefaultNew,
-		_StrainWeakening_AssignFromXML,
-		_StrainWeakening_Build,
-		_StrainWeakening_Initialise,
-		_TimeIntegratee_Execute,
-		_TimeIntegratee_Destroy,
-		_StrainWeakening_TimeDerivative,
-		_TimeIntegratee_Intermediate,
-		_StrainWeakening_CalcIncrementIsotropic,
-		name );
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(BuiterStrainWeakening);
+	Type                                                       type = BuiterStrainWeakening_Type;
+	Stg_Class_DeleteFunction*                               _delete = _TimeIntegratee_Delete;
+	Stg_Class_PrintFunction*                                 _print = _TimeIntegratee_Print;
+	Stg_Class_CopyFunction*                                   _copy = _TimeIntegratee_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _BuiterStrainWeakening_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _StrainWeakening_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _StrainWeakening_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _StrainWeakening_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _TimeIntegratee_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _TimeIntegratee_Destroy;
+	TimeIntegratee_CalculateTimeDerivFunction*  _calculateTimeDeriv = _StrainWeakening_TimeDerivative;
+	TimeIntegratee_IntermediateFunction*              _intermediate = _TimeIntegratee_Intermediate;
+	StrainWeakening_CalcIncrementFunction*           _calcIncrement = _StrainWeakening_CalcIncrementIsotropic;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _BuiterStrainWeakening_New(  BUITERSTRAINWEAKENING_PASSARGS  );
 }
+
+
 

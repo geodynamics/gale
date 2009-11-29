@@ -47,39 +47,13 @@
 const Type Orthotropic_Type = "Orthotropic";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-Orthotropic* _Orthotropic_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name ) 
+Orthotropic* _Orthotropic_New(  ORTHOTROPIC_DEFARGS  ) 
 {
 	Orthotropic*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(Orthotropic) );
-	self = (Orthotropic*) _Rheology_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			name );
+	assert( _sizeOfSelf >= sizeof(Orthotropic) );
+	self = (Orthotropic*) _Rheology_New(  RHEOLOGY_PASSARGS  );
 	
 	return self;
 }
@@ -110,20 +84,24 @@ void _Orthotropic_Init( Orthotropic* self,
 }
 
 void* _Orthotropic_DefaultNew( Name name ) {
-	return (void*) _Orthotropic_New(
-		sizeof(Orthotropic),
-		Orthotropic_Type,
-		_Rheology_Delete,
-		_Rheology_Print,
-		_Rheology_Copy,
-		_Orthotropic_DefaultNew,
-		_Orthotropic_AssignFromXML,
-		_Rheology_Build,
-		_Rheology_Initialise,
-		_Rheology_Execute,
-		_Rheology_Destroy,
-		_Orthotropic_ModifyConstitutiveMatrix,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(Orthotropic);
+	Type                                                             type = Orthotropic_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _Rheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _Rheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _Rheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _Orthotropic_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _Orthotropic_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _Rheology_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _Rheology_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _Rheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _Rheology_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _Orthotropic_ModifyConstitutiveMatrix;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _Orthotropic_New(  ORTHOTROPIC_PASSARGS  );
 }
 
 void _Orthotropic_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
@@ -307,3 +285,5 @@ void _Orthotropic_UpdateDrawParameters( void* rheology )
 	/* do stuff */
 }
 #endif
+
+

@@ -117,45 +117,13 @@ FaultingMoresiMuhlhaus2006* FaultingMoresiMuhlhaus2006_New(
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-FaultingMoresiMuhlhaus2006* _FaultingMoresiMuhlhaus2006_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion,
-		YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator,
-		YieldRheology_HasYieldedFunction*                  _hasYielded,
-		Name                                               name ) 
+FaultingMoresiMuhlhaus2006* _FaultingMoresiMuhlhaus2006_New(  FAULTINGMORESIMUHLHAUS2006_DEFARGS  ) 
 {
 	FaultingMoresiMuhlhaus2006*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(FaultingMoresiMuhlhaus2006) );
-	self = (FaultingMoresiMuhlhaus2006*) _YieldRheology_New( 
-			sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			_getYieldCriterion,
-			_getYieldIndicator,
-			_hasYielded,
-			name );
+	assert( _sizeOfSelf >= sizeof(FaultingMoresiMuhlhaus2006) );
+	self = (FaultingMoresiMuhlhaus2006*) _YieldRheology_New(  YIELDRHEOLOGY_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	
@@ -280,23 +248,27 @@ void _FaultingMoresiMuhlhaus2006_Init(
 }
 
 void* _FaultingMoresiMuhlhaus2006_DefaultNew( Name name ) {
-	return (void*) _FaultingMoresiMuhlhaus2006_New(
-		sizeof(FaultingMoresiMuhlhaus2006),
-		FaultingMoresiMuhlhaus2006_Type,
-		_YieldRheology_Delete,
-		_YieldRheology_Print,
-		_YieldRheology_Copy,
-		_FaultingMoresiMuhlhaus2006_DefaultNew,
-		_FaultingMoresiMuhlhaus2006_AssignFromXML,
-		_FaultingMoresiMuhlhaus2006_Build,
-		_FaultingMoresiMuhlhaus2006_Initialise,
-		_YieldRheology_Execute,
-		_FaultingMoresiMuhlhaus2006_Destroy,
-		_FaultingMoresiMuhlhaus2006_ModifyConstitutiveMatrix,
-		_FaultingMoresiMuhlhaus2006_GetYieldCriterion,
-		_FaultingMoresiMuhlhaus2006_GetYieldIndicator,
-		_FaultingMoresiMuhlhaus2006_HasYielded,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(FaultingMoresiMuhlhaus2006);
+	Type                                                             type = FaultingMoresiMuhlhaus2006_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _YieldRheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _YieldRheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _YieldRheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _FaultingMoresiMuhlhaus2006_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _FaultingMoresiMuhlhaus2006_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _FaultingMoresiMuhlhaus2006_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _FaultingMoresiMuhlhaus2006_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _YieldRheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _FaultingMoresiMuhlhaus2006_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _FaultingMoresiMuhlhaus2006_ModifyConstitutiveMatrix;
+	YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion = _FaultingMoresiMuhlhaus2006_GetYieldCriterion;
+	YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator = _FaultingMoresiMuhlhaus2006_GetYieldIndicator;
+	YieldRheology_HasYieldedFunction*                         _hasYielded = _FaultingMoresiMuhlhaus2006_HasYielded;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _FaultingMoresiMuhlhaus2006_New(  FAULTINGMORESIMUHLHAUS2006_PASSARGS  );
 }
 
 void _FaultingMoresiMuhlhaus2006_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
@@ -1211,3 +1183,5 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 	}
 	*/
 }
+
+

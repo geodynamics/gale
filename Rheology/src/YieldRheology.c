@@ -61,42 +61,13 @@
 const Type YieldRheology_Type = "YieldRheology";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-YieldRheology* _YieldRheology_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion,
-		YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator,
-		YieldRheology_HasYieldedFunction*                  _hasYielded,
-		Name                                               name ) 
+YieldRheology* _YieldRheology_New(  YIELDRHEOLOGY_DEFARGS  ) 
 {
 	YieldRheology*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(YieldRheology) );
-	self = (YieldRheology*) _Rheology_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			name );
+	assert( _sizeOfSelf >= sizeof(YieldRheology) );
+	self = (YieldRheology*) _Rheology_New(  RHEOLOGY_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	self->_getYieldCriterion = _getYieldCriterion;
@@ -270,4 +241,6 @@ void _YieldRheology_ModifyConstitutiveMatrix(
 		YieldRheology_HasYielded( self, constitutiveMatrix, materialPointsSwarm, lElement_I, materialPoint, yieldCriterion, yieldIndicator );
 	}
 }
+
+
 

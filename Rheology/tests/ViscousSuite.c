@@ -397,3 +397,5 @@ void ViscousSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, ViscousSuite_ArrheniusStiffnessMatrix2D_DualMesh );
    pcu_suite_addTest( suite, ViscousSuite_FrankKamenetskiiStiffnessMatrix2D_DualMesh );
 }
+
+

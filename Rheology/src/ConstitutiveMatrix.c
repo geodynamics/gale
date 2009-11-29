@@ -60,46 +60,14 @@
 
 const Type ConstitutiveMatrix_Type = "ConstitutiveMatrix";
 
-ConstitutiveMatrix* _ConstitutiveMatrix_New(
-      SizeT                                        _sizeOfSelf,
-      Type                                         type,
-      Stg_Class_DeleteFunction*                    _delete,
-      Stg_Class_PrintFunction*                     _print,
-      Stg_Class_CopyFunction*                      _copy,
-      Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
-      Stg_Component_ConstructFunction*             _construct,
-      Stg_Component_BuildFunction*                 _build,
-      Stg_Component_InitialiseFunction*            _initialise,
-      Stg_Component_ExecuteFunction*               _execute,
-      Stg_Component_DestroyFunction*               _destroy,
-      StiffnessMatrixTerm_AssembleElementFunction* _assembleElement,
-      ConstitutiveMatrix_SetValueFunc*             _setValue,
-      ConstitutiveMatrix_GetValueFunc*             _getViscosity,
-      ConstitutiveMatrix_SetValueFunc*             _isotropicCorrection,
-      ConstitutiveMatrix_SetSecondViscosityFunc*   _setSecondViscosity,
-      ConstitutiveMatrix_Assemble_D_B_Func*        _assemble_D_B,
-      ConstitutiveMatrix_CalculateStressFunc*      _calculateStress,
-      Name                                         name )
+ConstitutiveMatrix* _ConstitutiveMatrix_New(  CONSTITUTIVEMATRIX_DEFARGS  )
 {
    ConstitutiveMatrix*  self;
 
    assert( _sizeOfSelf >= sizeof(ConstitutiveMatrix) );
 
    /* General info */
-   self = (ConstitutiveMatrix*)_StiffnessMatrixTerm_New(
-         _sizeOfSelf,
-         type,
-         _delete,
-         _print,
-         _copy,
-         _defaultConstructor,
-         _construct,
-         _build,
-         _initialise,
-         _execute,
-         _destroy,
-         _assembleElement,
-         name );
+   self = (ConstitutiveMatrix*)_StiffnessMatrixTerm_New(  STIFFNESSMATRIXTERM_PASSARGS  );
 
    /* Virtual functions */
    self->_setValue            = _setValue;
@@ -426,4 +394,6 @@ void ConstitutiveMatrix_GetStoredMatrixOnParticle(
       cm[5][0] = ext[30]; cm[5][1] = ext[31]; cm[5][2] = ext[32]; cm[5][3] = ext[33] ; cm[5][4] = ext[34]; cm[5][5] = ext[35];
    }
 }
+
+
 

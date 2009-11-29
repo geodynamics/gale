@@ -204,3 +204,5 @@ void* _testMovingMesh_DefaultNew( Name name ) {
 Index testMovingMesh_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, testMovingMesh_Type, "0", _testMovingMesh_DefaultNew );
 }
+
+

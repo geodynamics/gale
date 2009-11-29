@@ -86,85 +86,37 @@ MultiRheologyMaterial* MultiRheologyMaterial_New(
 
 
 void* _MultiRheologyMaterial_DefaultNew( Name name ) {
-	return (void*) _MultiRheologyMaterial_New(
-		sizeof(MultiRheologyMaterial),
-		MultiRheologyMaterial_Type,
-		_RheologyMaterial_Delete,
-		_RheologyMaterial_Print,
-		_RheologyMaterial_Copy,
-		_MultiRheologyMaterial_DefaultNew,
-		_MultiRheologyMaterial_AssignFromXML,
-		_RheologyMaterial_Build,
-		_RheologyMaterial_Initialise,
-		_RheologyMaterial_Execute,
-		_MultiRheologyMaterial_Destroy,
-		_MultiRheologyMaterial_RunRheologies,
-		name,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		0,
-		NULL,
-		NULL,
-		NULL,
-		0
-		);
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(MultiRheologyMaterial);
+	Type                                                      type = MultiRheologyMaterial_Type;
+	Stg_Class_DeleteFunction*                              _delete = _RheologyMaterial_Delete;
+	Stg_Class_PrintFunction*                                _print = _RheologyMaterial_Print;
+	Stg_Class_CopyFunction*                                  _copy = _RheologyMaterial_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _MultiRheologyMaterial_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _MultiRheologyMaterial_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _RheologyMaterial_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _RheologyMaterial_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _RheologyMaterial_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _MultiRheologyMaterial_Destroy;
+	RheologyMaterial_RunRheologiesFunction*         _runRheologies = _MultiRheologyMaterial_RunRheologies;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _MultiRheologyMaterial_New(  MULTIRHEOLOGYMATERIAL_PASSARGS  );
 }
 
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-MultiRheologyMaterial* _MultiRheologyMaterial_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		RheologyMaterial_RunRheologiesFunction*            _runRheologies,
-		Name                                               name,
-		Stg_Shape*                                         shape,
-		Dictionary*                                        materialDictionary,
-		Materials_Register*                                materialRegister,
-		Rheology**                                         rheologyList,
-		Rheology_Index                                     rheologyCount,
-		Compressible*                                      compressible,
-		Rheology***                                        rheologyListList,
-		Rheology_Index*                                    rheologyCountList, 
-		Index                                              rheologyListCount
-		) 
+MultiRheologyMaterial* _MultiRheologyMaterial_New(  MULTIRHEOLOGYMATERIAL_DEFARGS  ) 
 {
 	MultiRheologyMaterial*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up
 	 *  the hierarchy tree. At the beginning of the tree it will allocate memory of the size of
 	 *  object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(MultiRheologyMaterial) );
-	self = (MultiRheologyMaterial*) _RheologyMaterial_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_runRheologies,
-			name,
-			shape,
-			materialDictionary,
-			materialRegister,
-			rheologyList,
-			rheologyCount,
-			compressible );
+	assert( _sizeOfSelf >= sizeof(MultiRheologyMaterial) );
+	self = (MultiRheologyMaterial*) _RheologyMaterial_New(  RHEOLOGYMATERIAL_PASSARGS  );
 
 	return self;
 }
@@ -308,3 +260,5 @@ void _MultiRheologyMaterial_RunRheologies(
 
 	ConstitutiveMatrix_SetIsotropicViscosity( constitutiveMatrix, 1.0/oneOnViscosity );
 }
+
+

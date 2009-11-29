@@ -58,39 +58,13 @@
 const Type NonNewtonian_Type = "NonNewtonian";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-NonNewtonian* _NonNewtonian_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name ) 
+NonNewtonian* _NonNewtonian_New(  NONNEWTONIAN_DEFARGS  ) 
 {
 	NonNewtonian*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(NonNewtonian) );
-	self = (NonNewtonian*) _Rheology_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			name );
+	assert( _sizeOfSelf >= sizeof(NonNewtonian) );
+	self = (NonNewtonian*) _Rheology_New(  RHEOLOGY_PASSARGS  );
 	
 	return self;
 }
@@ -129,20 +103,24 @@ void _NonNewtonian_Destroy( void* _self, void* data ){
 
 
 void* _NonNewtonian_DefaultNew( Name name ) {
-	return (void*) _NonNewtonian_New(
-		sizeof(NonNewtonian),
-		NonNewtonian_Type,
-		_Rheology_Delete,
-		_Rheology_Print,
-		_Rheology_Copy,
-		_NonNewtonian_DefaultNew,
-		_NonNewtonian_AssignFromXML,
-		_NonNewtonian_Build,
-		_NonNewtonian_Initialise,
-		_Rheology_Execute,
-		_NonNewtonian_Destroy,
-		_NonNewtonian_ModifyConstitutiveMatrix,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(NonNewtonian);
+	Type                                                             type = NonNewtonian_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _Rheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _Rheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _Rheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _NonNewtonian_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _NonNewtonian_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _NonNewtonian_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _NonNewtonian_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _Rheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _NonNewtonian_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _NonNewtonian_ModifyConstitutiveMatrix;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _NonNewtonian_New(  NONNEWTONIAN_PASSARGS  );
 }
 
 void _NonNewtonian_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
@@ -197,3 +175,5 @@ void _NonNewtonian_ModifyConstitutiveMatrix(
 	viscosity = pow(2.0 * strainRateInv, 1.0/n - 1.0) * pow(viscosity,1.0/n);
 	ConstitutiveMatrix_SetIsotropicViscosity( constitutiveMatrix, viscosity );
 }
+
+

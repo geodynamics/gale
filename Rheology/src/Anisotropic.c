@@ -75,39 +75,13 @@ Anisotropic* Anisotropic_New(
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-Anisotropic* _Anisotropic_New(
-      SizeT                                              sizeOfSelf,
-      Type                                               type,
-      Stg_Class_DeleteFunction*                          _delete,
-      Stg_Class_PrintFunction*                           _print,
-      Stg_Class_CopyFunction*                            _copy,
-      Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-      Stg_Component_ConstructFunction*                   _construct,
-      Stg_Component_BuildFunction*                       _build,
-      Stg_Component_InitialiseFunction*                  _initialise,
-      Stg_Component_ExecuteFunction*                     _execute,
-      Stg_Component_DestroyFunction*                     _destroy,
-      Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-      Name                                               name )
+Anisotropic* _Anisotropic_New(  ANISOTROPIC_DEFARGS  )
 {
    Anisotropic*               self;
 
    /* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-   assert( sizeOfSelf >= sizeof(Anisotropic) );
-   self = (Anisotropic*) _Rheology_New(
-         sizeOfSelf,
-         type,
-         _delete,
-         _print,
-         _copy,
-         _defaultConstructor,
-         _construct,
-         _build,
-         _initialise,
-         _execute,
-         _destroy,
-         _modifyConstitutiveMatrix,
-         name );
+   assert( _sizeOfSelf >= sizeof(Anisotropic) );
+   self = (Anisotropic*) _Rheology_New(  RHEOLOGY_PASSARGS  );
 
    return self;
 }
@@ -118,20 +92,24 @@ void _Anisotropic_Init( Anisotropic* self, Director* director, double viscosityR
 }
 
 void* _Anisotropic_DefaultNew( Name name ) {
-   return (void*) _Anisotropic_New(
-      sizeof(Anisotropic),
-      Anisotropic_Type,
-      _Rheology_Delete,
-      _Rheology_Print,
-      _Rheology_Copy,
-      _Anisotropic_DefaultNew,
-      _Anisotropic_AssignFromXML,
-      _Anisotropic_Build,
-      _Anisotropic_Initialise,
-      _Rheology_Execute,
-      _Anisotropic_Destroy,
-      _Anisotropic_ModifyConstitutiveMatrix,
-      name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(Anisotropic);
+	Type                                                             type = Anisotropic_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _Rheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _Rheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _Rheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _Anisotropic_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _Anisotropic_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _Anisotropic_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _Anisotropic_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _Rheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _Anisotropic_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _Anisotropic_ModifyConstitutiveMatrix;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+   return (void*) _Anisotropic_New(  ANISOTROPIC_PASSARGS  );
 }
 
 void _Anisotropic_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
@@ -198,3 +176,5 @@ void _Anisotropic_ModifyConstitutiveMatrix(
 
    ConstitutiveMatrix_SetSecondViscosity( constitutiveMatrix, deltaViscosity, normal );
 }
+
+

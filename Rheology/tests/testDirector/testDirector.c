@@ -95,3 +95,5 @@ void* _Underworld_testDirector_DefaultNew( Name name ) {
 Index Underworld_testDirector_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Underworld_testDirector_Type, "0", _Underworld_testDirector_DefaultNew );
 }
+
+

@@ -73,20 +73,18 @@
 	struct OrthotropicAligned { __OrthotropicAligned };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	OrthotropicAligned* _OrthotropicAligned_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ORTHOTROPICALIGNED_DEFARGS \
+                RHEOLOGY_DEFARGS
+
+	#define ORTHOTROPICALIGNED_PASSARGS \
+                RHEOLOGY_PASSARGS
+
+	OrthotropicAligned* _OrthotropicAligned_New(  ORTHOTROPICALIGNED_DEFARGS  );
 
 	/* 'Stg_Component' implementations */
 	void* _OrthotropicAligned_DefaultNew( Name name ) ;
@@ -101,3 +99,4 @@
 		Coord                                              xi );
 
 #endif
+

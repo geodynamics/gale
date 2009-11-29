@@ -81,36 +81,37 @@ ConstitutiveMatCartesian_Refactored* ConstitutiveMatCartesian_Refactored_New(
 }
 
 void* _ConstitutiveMatCartesian_Refactored_DefaultNew( Name name ) {
-	return (void*)_ConstitutiveMatCartesian_Refactored_New( 
-		sizeof(ConstitutiveMatCartesian_Refactored), 
-		ConstitutiveMatCartesian_Refactored_Type,
-		_ConstitutiveMatCartesian_Refactored_Delete,
-		_ConstitutiveMatCartesian_Refactored_Print,
-		NULL,
-		_ConstitutiveMatCartesian_Refactored_DefaultNew,
-		_ConstitutiveMatCartesian_Refactored_AssignFromXML,
-		_ConstitutiveMatCartesian_Refactored_Build,
-		_ConstitutiveMatCartesian_Refactored_Initialise,
-		_ConstitutiveMatCartesian_Refactored_Execute,
-		_ConstitutiveMatCartesian_Refactored_Destroy,
-		name,
-		NON_GLOBAL, 
-		_ConstitutiveMatCartesian_Refactored_SetValueInAllEntries,
-		_ConstitutiveMatCartesian_Refactored_GetIsotropicViscosity,
-		_ConstitutiveMatCartesian_Refactored_IsotropicCorrection,
-		_ConstitutiveMatCartesian_Refactored_SetSecondViscosity,
-		_ConstitutiveMatCartesian_Refactored_Assemble_D_B,
-		_ConstitutiveMatCartesian_Refactored_CalculateStress );
+	/* Variables set in this function */
+	SizeT                                                        _sizeOfSelf = sizeof(ConstitutiveMatCartesian_Refactored);
+	Type                                                                type = ConstitutiveMatCartesian_Refactored_Type;
+	Stg_Class_DeleteFunction*                                        _delete = _ConstitutiveMatCartesian_Refactored_Delete;
+	Stg_Class_PrintFunction*                                          _print = _ConstitutiveMatCartesian_Refactored_Print;
+	Stg_Class_CopyFunction*                                            _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*            _defaultConstructor = _ConstitutiveMatCartesian_Refactored_DefaultNew;
+	Stg_Component_ConstructFunction*                              _construct = _ConstitutiveMatCartesian_Refactored_AssignFromXML;
+	Stg_Component_BuildFunction*                                      _build = _ConstitutiveMatCartesian_Refactored_Build;
+	Stg_Component_InitialiseFunction*                            _initialise = _ConstitutiveMatCartesian_Refactored_Initialise;
+	Stg_Component_ExecuteFunction*                                  _execute = _ConstitutiveMatCartesian_Refactored_Execute;
+	Stg_Component_DestroyFunction*                                  _destroy = _ConstitutiveMatCartesian_Refactored_Destroy;
+	AllocationType                                        nameAllocationType = NON_GLOBAL;
+	ConstitutiveMat_Refactored_SetValueFunc*                       _setValue = _ConstitutiveMatCartesian_Refactored_SetValueInAllEntries;
+	ConstitutiveMat_Refactored_GetValueFunc*                   _getViscosity = _ConstitutiveMatCartesian_Refactored_GetIsotropicViscosity;
+	ConstitutiveMat_Refactored_SetValueFunc*            _isotropicCorrection = _ConstitutiveMatCartesian_Refactored_IsotropicCorrection;
+	ConstitutiveMat_Refactored_SetSecondViscosityFunc*   _setSecondViscosity = _ConstitutiveMatCartesian_Refactored_SetSecondViscosity;
+	ConstitutiveMat_Refactored_Assemble_D_B_Func*              _assemble_D_B = _ConstitutiveMatCartesian_Refactored_Assemble_D_B;
+	ConstitutiveMat_Refactored_CalculateStressFunc*         _calculateStress = _ConstitutiveMatCartesian_Refactored_CalculateStress;
+
+	return (void*)_ConstitutiveMatCartesian_Refactored_New(  CONSTITUTIVEMATCARTESIAN_REFACTORED_PASSARGS  );
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-ConstitutiveMatCartesian_Refactored* _ConstitutiveMatCartesian_Refactored_New( CONSTITUTIVEMATCARTESIAN_REFACTORED_DEFARGS ) {
+ConstitutiveMatCartesian_Refactored* _ConstitutiveMatCartesian_Refactored_New(  CONSTITUTIVEMATCARTESIAN_REFACTORED_DEFARGS  ) {
 	ConstitutiveMatCartesian_Refactored* self;
 	
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree.
 		At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(ConstitutiveMatCartesian_Refactored) );
-	self = (ConstitutiveMatCartesian_Refactored*) _ConstitutiveMat_Refactored_New( CONSTITUTIVEMAT_REFACTORED_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(ConstitutiveMatCartesian_Refactored) );
+	self = (ConstitutiveMatCartesian_Refactored*) _ConstitutiveMat_Refactored_New(  CONSTITUTIVEMAT_REFACTORED_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	
@@ -515,4 +516,6 @@ void _ConstitutiveMatCartesian_Refactored3D_CalculateStress( void* constitutiveM
 			+ 2.0 * (D[5][3] * strainRate[3] + D[5][4] * strainRate[4] + D[5][5] * strainRate[5]);
 	}
 }
+
+
 

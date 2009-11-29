@@ -24,54 +24,14 @@
 
 const Type StressField_Type = "StressField";
 
-StressField* _StressField_New(
- 		SizeT                                             _sizeOfSelf,
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-		Name                                              name )
+StressField* _StressField_New(  STRESSFIELD_DEFARGS  )
 {
 	StressField*		self;
 	
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
 	assert( _sizeOfSelf >= sizeof(StressField) );
 	self = (StressField*)
-		_ParticleFeVariable_New(
-			_sizeOfSelf, 
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute, 
-			_destroy,
-			_interpolateValueAt,
-			_getMinGlobalFeMagnitude, 
-			_getMaxGlobalFeMagnitude,
-			_getMinAndMaxLocalCoords, 
-			_getMinAndMaxGlobalCoords,
-			_interpolateWithinElement,
-			_getValueAtNode,
-			_valueAtParticle,
-			name );
+		_ParticleFeVariable_New(  PARTICLEFEVARIABLE_PASSARGS  );
 	
 	return self;
 }
@@ -145,27 +105,32 @@ void* _StressField_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, 
 }
 
 void* _StressField_DefaultNew( Name name ) {
-	return (void*) _StressField_New(
-		sizeof(StressField),
-		StressField_Type,
-		_StressField_Delete,
-		_StressField_Print,
-		_StressField_Copy,
-		_StressField_DefaultNew,
-		_StressField_AssignFromXML,
-		_StressField_Build, 
-		_StressField_Initialise,
-		_StressField_Execute,
-		_StressField_Destroy,
-		_FeVariable_InterpolateValueAt,
-		_FeVariable_GetMinGlobalFieldMagnitude,
-		_FeVariable_GetMaxGlobalFieldMagnitude,
-		_FeVariable_GetMinAndMaxLocalCoords,
-		_FeVariable_GetMinAndMaxGlobalCoords,
-		_FeVariable_InterpolateNodeValuesToElLocalCoord,
-		_FeVariable_GetValueAtNode,
-		_StressField_ValueAtParticle_Recalculate,
-		name );
+	/* Variables set in this function */
+	SizeT                                                       _sizeOfSelf = sizeof(StressField);
+	Type                                                               type = StressField_Type;
+	Stg_Class_DeleteFunction*                                       _delete = _StressField_Delete;
+	Stg_Class_PrintFunction*                                         _print = _StressField_Print;
+	Stg_Class_CopyFunction*                                           _copy = _StressField_Copy;
+	Stg_Component_DefaultConstructorFunction*           _defaultConstructor = _StressField_DefaultNew;
+	Stg_Component_ConstructFunction*                             _construct = _StressField_AssignFromXML;
+	Stg_Component_BuildFunction*                                     _build = _StressField_Build;
+	Stg_Component_InitialiseFunction*                           _initialise = _StressField_Initialise;
+	Stg_Component_ExecuteFunction*                                 _execute = _StressField_Execute;
+	Stg_Component_DestroyFunction*                                 _destroy = _StressField_Destroy;
+	FieldVariable_InterpolateValueAtFunction*           _interpolateValueAt = _FeVariable_InterpolateValueAt;
+	FieldVariable_GetCoordFunction*                _getMinAndMaxLocalCoords = _FeVariable_GetMinAndMaxLocalCoords;
+	FieldVariable_GetCoordFunction*               _getMinAndMaxGlobalCoords = _FeVariable_GetMinAndMaxGlobalCoords;
+	FeVariable_InterpolateWithinElementFunction*  _interpolateWithinElement = _FeVariable_InterpolateNodeValuesToElLocalCoord;
+	FeVariable_GetValueAtNodeFunction*                      _getValueAtNode = _FeVariable_GetValueAtNode;
+	ParticleFeVariable_ValueAtParticleFunction*            _valueAtParticle = _StressField_ValueAtParticle_Recalculate;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType                             nameAllocationType = ZERO;
+	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = ZERO;
+	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
+	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
+
+	return (void*) _StressField_New(  STRESSFIELD_PASSARGS  );
 }
 
 void StressField_NonLinearUpdate( void* _sle, void* _ctx ) {
@@ -346,3 +311,5 @@ void _StressField_ValueAtParticle_FromVariable( void* stressField, IntegrationPo
 	stressParticleExt = (double*) ((ArithPointer) materialPoint + (ArithPointer)self->stressVariable->offsets[0]);
 	memcpy( stress, stressParticleExt, sizeof(double)*self->fieldComponentCount );
 }
+
+

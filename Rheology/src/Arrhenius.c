@@ -76,38 +76,12 @@ Arrhenius* Arrhenius_New(
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-Arrhenius* _Arrhenius_New(
-      SizeT                                              sizeOfSelf,
-      Type                                               type,
-      Stg_Class_DeleteFunction*                          _delete,
-      Stg_Class_PrintFunction*                           _print,
-      Stg_Class_CopyFunction*                            _copy,
-      Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-      Stg_Component_ConstructFunction*                   _construct,
-      Stg_Component_BuildFunction*                       _build,
-      Stg_Component_InitialiseFunction*                  _initialise,
-      Stg_Component_ExecuteFunction*                     _execute,
-      Stg_Component_DestroyFunction*                     _destroy,
-      Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-      Name                                               name )
+Arrhenius* _Arrhenius_New(  ARRHENIUS_DEFARGS  )
 {
    Arrhenius*              self;
 
-   assert( sizeOfSelf >= sizeof(Arrhenius) );
-   self = (Arrhenius*) _Rheology_New(
-         sizeOfSelf,
-         type,
-         _delete,
-         _print,
-         _copy,
-         _defaultConstructor,
-         _construct,
-         _build,
-         _initialise,
-         _execute,
-         _destroy,
-         _modifyConstitutiveMatrix,
-         name );
+   assert( _sizeOfSelf >= sizeof(Arrhenius) );
+   self = (Arrhenius*) _Rheology_New(  RHEOLOGY_PASSARGS  );
 
    return self;
 }
@@ -122,20 +96,24 @@ void _Arrhenius_Init( Arrhenius* self, FeVariable* temperatureField, double eta0
 }
 
 void* _Arrhenius_DefaultNew( Name name ) {
-   return (void*) _Arrhenius_New(
-      sizeof(Arrhenius),
-      Arrhenius_Type,
-      _Rheology_Delete,
-      _Rheology_Print,
-      _Rheology_Copy,
-      _Arrhenius_DefaultNew,
-      _Arrhenius_AssignFromXML,
-      _Rheology_Build,
-      _Rheology_Initialise,
-      _Rheology_Execute,
-      _Rheology_Destroy,
-      _Arrhenius_ModifyConstitutiveMatrix,
-      name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(Arrhenius);
+	Type                                                             type = Arrhenius_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _Rheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _Rheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _Rheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _Arrhenius_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _Arrhenius_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _Rheology_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _Rheology_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _Rheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _Rheology_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _Arrhenius_ModifyConstitutiveMatrix;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+   return (void*) _Arrhenius_New(  ARRHENIUS_PASSARGS  );
 }
 
 void _Arrhenius_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
@@ -241,3 +219,5 @@ void _Arrhenius_ModifyConstitutiveMatrix(
    }
    ConstitutiveMatrix_SetIsotropicViscosity( constitutiveMatrix, viscosity );
 }
+
+

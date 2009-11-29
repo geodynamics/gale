@@ -81,75 +81,37 @@ RheologyMaterial* RheologyMaterial_New(
 
 
 void* _RheologyMaterial_DefaultNew( Name name ) {
-	return (void*) _RheologyMaterial_New( 
-		sizeof(RheologyMaterial), 
-		RheologyMaterial_Type, 
-		_RheologyMaterial_Delete,
-		_RheologyMaterial_Print, 
-		_RheologyMaterial_Copy,
-		_RheologyMaterial_DefaultNew,
-		_RheologyMaterial_AssignFromXML,
-		_RheologyMaterial_Build, 
-		_RheologyMaterial_Initialise,
-		_RheologyMaterial_Execute,
-		_RheologyMaterial_Destroy,
-		_RheologyMaterial_RunRheologies,
-		name,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		0,
-		NULL
-		);
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(RheologyMaterial);
+	Type                                                      type = RheologyMaterial_Type;
+	Stg_Class_DeleteFunction*                              _delete = _RheologyMaterial_Delete;
+	Stg_Class_PrintFunction*                                _print = _RheologyMaterial_Print;
+	Stg_Class_CopyFunction*                                  _copy = _RheologyMaterial_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _RheologyMaterial_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _RheologyMaterial_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _RheologyMaterial_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _RheologyMaterial_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _RheologyMaterial_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _RheologyMaterial_Destroy;
+	RheologyMaterial_RunRheologiesFunction*         _runRheologies = _RheologyMaterial_RunRheologies;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _RheologyMaterial_New(  RHEOLOGYMATERIAL_PASSARGS  );
 }
 
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-RheologyMaterial* _RheologyMaterial_New( 
-	SizeT                                              sizeOfSelf,
-	Type                                               type,
-	Stg_Class_DeleteFunction*                          _delete,
-	Stg_Class_PrintFunction*                           _print,
-	Stg_Class_CopyFunction*                            _copy, 
-	Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-	Stg_Component_ConstructFunction*                   _construct,
-	Stg_Component_BuildFunction*                       _build,
-	Stg_Component_InitialiseFunction*                  _initialise,
-	Stg_Component_ExecuteFunction*                     _execute,
-	Stg_Component_DestroyFunction*                     _destroy,
-	RheologyMaterial_RunRheologiesFunction*            _runRheologies,
-	Name                                               name,
-	Stg_Shape*                                         shape,
-	Dictionary*                                        materialDictionary,
-	Materials_Register*                                materialRegister,
-	Rheology**                                         rheologyList,
-	Rheology_Index                                     rheologyCount,
-	Compressible*                                      compressible ) 
+RheologyMaterial* _RheologyMaterial_New(  RHEOLOGYMATERIAL_DEFARGS  ) 
 {
 	RheologyMaterial* self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the
  	 *  hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and
  	 *  initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(RheologyMaterial) );
-	self = (RheologyMaterial*) _Material_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name,
-			shape,
-			materialDictionary,
-			materialRegister
-			);
+	assert( _sizeOfSelf >= sizeof(RheologyMaterial) );
+	self = (RheologyMaterial*) _Material_New(  MATERIAL_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	self->_runRheologies = _runRheologies;
@@ -376,3 +338,5 @@ Bool RheologyMaterial_HasRheology( void* rheologyMaterial, void* rheology ) {
 	}
 	return False;
 }
+
+

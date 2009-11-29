@@ -85,25 +85,32 @@
 		
 	struct ConstitutiveMat_Refactored { __ConstitutiveMat_Refactored };
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define CONSTITUTIVEMAT_REFACTORED_DEFARGS \
-		STG_COMPONENT_DEFARGS, \
-			ConstitutiveMat_Refactored_SetValueFunc*				_setValue, \
-			ConstitutiveMat_Refactored_GetValueFunc*				_getViscosity, \
-			ConstitutiveMat_Refactored_SetValueFunc*				_isotropicCorrection, \
-			ConstitutiveMat_Refactored_SetSecondViscosityFunc*	_setSecondViscosity, \
-			ConstitutiveMat_Refactored_Assemble_D_B_Func*		_assemble_D_B, \
-			ConstitutiveMat_Refactored_CalculateStressFunc*		_calculateStress
+                STG_COMPONENT_DEFARGS, \
+                ConstitutiveMat_Refactored_SetValueFunc*                       _setValue, \
+                ConstitutiveMat_Refactored_GetValueFunc*                   _getViscosity, \
+                ConstitutiveMat_Refactored_SetValueFunc*            _isotropicCorrection, \
+                ConstitutiveMat_Refactored_SetSecondViscosityFunc*   _setSecondViscosity, \
+                ConstitutiveMat_Refactored_Assemble_D_B_Func*              _assemble_D_B, \
+                ConstitutiveMat_Refactored_CalculateStressFunc*         _calculateStress
 
 	#define CONSTITUTIVEMAT_REFACTORED_PASSARGS \
-		STG_COMPONENT_PASSARGS, \
-			_setValue, \
-			_getViscosity, \
-			_isotropicCorrection, \
-			_setSecondViscosity, \
-			_assemble_D_B, \
-			_calculateStress
+                STG_COMPONENT_PASSARGS, \
+	        _setValue,            \
+	        _getViscosity,        \
+	        _isotropicCorrection, \
+	        _setSecondViscosity,  \
+	        _assemble_D_B,        \
+	        _calculateStress    
 
-	ConstitutiveMat_Refactored* _ConstitutiveMat_Refactored_New( CONSTITUTIVEMAT_REFACTORED_DEFARGS );
+	ConstitutiveMat_Refactored* _ConstitutiveMat_Refactored_New(  CONSTITUTIVEMAT_REFACTORED_DEFARGS  );
 
 	void _ConstitutiveMat_Refactored_Init(                                                                                
 		void*                constitutiveMatrix,                                                                           
@@ -176,3 +183,4 @@
 		( (constitutiveMatrix)->stiffnessMatrix->rowVariable->feMesh )
 
 #endif /* __Underworld_Rheology_ConstitutiveMat_Refactored_h__ */
+

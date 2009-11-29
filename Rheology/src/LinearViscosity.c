@@ -89,39 +89,13 @@ LinearViscosity* LinearViscosity_New(
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-LinearViscosity* _LinearViscosity_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name ) 
+LinearViscosity* _LinearViscosity_New(  LINEARVISCOSITY_DEFARGS  ) 
 {
 	LinearViscosity*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(LinearViscosity) );
-	self = (LinearViscosity*) _Rheology_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			name );
+	assert( _sizeOfSelf >= sizeof(LinearViscosity) );
+	self = (LinearViscosity*) _Rheology_New(  RHEOLOGY_PASSARGS  );
 	
 	return self;
 }
@@ -148,20 +122,24 @@ void _LinearViscosity_Init(
 }
 
 void* _LinearViscosity_DefaultNew( Name name ) {
-	return (void*) _LinearViscosity_New(
-		sizeof(LinearViscosity),
-		LinearViscosity_Type,
-		_Rheology_Delete,
-		_Rheology_Print,
-		_Rheology_Copy,
-		_LinearViscosity_DefaultNew,
-		_LinearViscosity_AssignFromXML,
-		_Rheology_Build,
-		_Rheology_Initialise,
-		_Rheology_Execute,
-		_Rheology_Destroy,
-		_LinearViscosity_ModifyConstitutiveMatrix,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(LinearViscosity);
+	Type                                                             type = LinearViscosity_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _Rheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _Rheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _Rheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _LinearViscosity_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _LinearViscosity_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _Rheology_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _Rheology_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _Rheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _Rheology_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _LinearViscosity_ModifyConstitutiveMatrix;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _LinearViscosity_New(  LINEARVISCOSITY_PASSARGS  );
 }
 
 void _LinearViscosity_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
@@ -219,3 +197,5 @@ void _LinearViscosity_ModifyConstitutiveMatrix(
 		
 	ConstitutiveMatrix_SetIsotropicViscosity( constitutiveMatrix, viscosity );
 }
+
+

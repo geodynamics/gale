@@ -128,21 +128,27 @@ void _Underworld_solCx_AssignFromXML( void* analyticSolution, Stg_ComponentFacto
 }
 
 void* _Underworld_solCx_DefaultNew( Name name ) {
-	return _FieldTest_New(
-			sizeof(Velic_solCx),
-			Underworld_solCx_Type,
-			_FieldTest_Delete,
-			_FieldTest_Print,
-			_FieldTest_Copy,
-			_Underworld_solCx_DefaultNew,
-			_Underworld_solCx_AssignFromXML,
-			_Underworld_solCx_Build,
-			_FieldTest_Initialise,
-			_FieldTest_Execute,
-			_FieldTest_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Velic_solCx);
+	Type                                                      type = Underworld_solCx_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FieldTest_Delete;
+	Stg_Class_PrintFunction*                                _print = _FieldTest_Print;
+	Stg_Class_CopyFunction*                                  _copy = _FieldTest_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_solCx_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Underworld_solCx_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Underworld_solCx_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FieldTest_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FieldTest_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FieldTest_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _FieldTest_New(  FIELDTEST_PASSARGS  );
 }
 
 Index Underworld_Velic_solCx_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Underworld_solCx_Type, "0", _Underworld_solCx_DefaultNew );
 }
+
+

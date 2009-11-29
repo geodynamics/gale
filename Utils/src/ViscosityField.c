@@ -23,54 +23,14 @@
 
 const Type ViscosityField_Type = "ViscosityField";
 
-ViscosityField* _ViscosityField_New(
- 		SizeT                                             _sizeOfSelf,
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-		Name                                              name )
+ViscosityField* _ViscosityField_New(  VISCOSITYFIELD_DEFARGS  )
 {
 	ViscosityField*		self;
 	
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
 	assert( _sizeOfSelf >= sizeof(ViscosityField) );
 	self = (ViscosityField*)
-		_ParticleFeVariable_New(
-			_sizeOfSelf, 
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute, 
-			_destroy,
-			_interpolateValueAt,
-			_getMinGlobalFeMagnitude, 
-			_getMaxGlobalFeMagnitude,
-			_getMinAndMaxLocalCoords, 
-			_getMinAndMaxGlobalCoords,
-			_interpolateWithinElement,
-			_getValueAtNode,
-			_valueAtParticle,
-			name );
+		_ParticleFeVariable_New(  PARTICLEFEVARIABLE_PASSARGS  );
 	
 	return self;
 }
@@ -122,27 +82,32 @@ void* _ViscosityField_Copy( void* feVariable, void* dest, Bool deep, Name nameEx
 }
 
 void* _ViscosityField_DefaultNew( Name name ) {
-	return (void*) _ViscosityField_New(
-		sizeof(ViscosityField),
-		ViscosityField_Type,
-		_ViscosityField_Delete,
-		_ViscosityField_Print,
-		_ViscosityField_Copy,
-		_ViscosityField_DefaultNew,
-		_ViscosityField_AssignFromXML,
-		_ViscosityField_Build, 
-		_ViscosityField_Initialise,
-		_ViscosityField_Execute,
-		_ViscosityField_Destroy,
-		_FeVariable_InterpolateValueAt,
-		_FeVariable_GetMinGlobalFieldMagnitude,
-		_FeVariable_GetMaxGlobalFieldMagnitude,
-		_FeVariable_GetMinAndMaxLocalCoords,
-		_FeVariable_GetMinAndMaxGlobalCoords,
-		_FeVariable_InterpolateNodeValuesToElLocalCoord,
-		_FeVariable_GetValueAtNode,
-		_ViscosityField_ValueAtParticle,
-		name );
+	/* Variables set in this function */
+	SizeT                                                       _sizeOfSelf = sizeof(ViscosityField);
+	Type                                                               type = ViscosityField_Type;
+	Stg_Class_DeleteFunction*                                       _delete = _ViscosityField_Delete;
+	Stg_Class_PrintFunction*                                         _print = _ViscosityField_Print;
+	Stg_Class_CopyFunction*                                           _copy = _ViscosityField_Copy;
+	Stg_Component_DefaultConstructorFunction*           _defaultConstructor = _ViscosityField_DefaultNew;
+	Stg_Component_ConstructFunction*                             _construct = _ViscosityField_AssignFromXML;
+	Stg_Component_BuildFunction*                                     _build = _ViscosityField_Build;
+	Stg_Component_InitialiseFunction*                           _initialise = _ViscosityField_Initialise;
+	Stg_Component_ExecuteFunction*                                 _execute = _ViscosityField_Execute;
+	Stg_Component_DestroyFunction*                                 _destroy = _ViscosityField_Destroy;
+	FieldVariable_InterpolateValueAtFunction*           _interpolateValueAt = _FeVariable_InterpolateValueAt;
+	FieldVariable_GetCoordFunction*                _getMinAndMaxLocalCoords = _FeVariable_GetMinAndMaxLocalCoords;
+	FieldVariable_GetCoordFunction*               _getMinAndMaxGlobalCoords = _FeVariable_GetMinAndMaxGlobalCoords;
+	FeVariable_InterpolateWithinElementFunction*  _interpolateWithinElement = _FeVariable_InterpolateNodeValuesToElLocalCoord;
+	FeVariable_GetValueAtNodeFunction*                      _getValueAtNode = _FeVariable_GetValueAtNode;
+	ParticleFeVariable_ValueAtParticleFunction*            _valueAtParticle = _ViscosityField_ValueAtParticle;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType                             nameAllocationType = ZERO;
+	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = ZERO;
+	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
+	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
+
+	return (void*) _ViscosityField_New(  VISCOSITYFIELD_PASSARGS  );
 }
 
 void _ViscosityField_AssignFromXML( void* viscosityField, Stg_ComponentFactory* cf, void* data ){
@@ -215,4 +180,6 @@ void _ViscosityField_ValueAtParticle( void* viscosityField, IntegrationPointsSwa
                                      self->currentParticleIndex, particle );
 	*viscosity = ConstitutiveMatrix_GetIsotropicViscosity( self->constitutiveMatrix );
 }
+
+
 

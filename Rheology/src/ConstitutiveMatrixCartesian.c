@@ -83,51 +83,13 @@ ConstitutiveMatrixCartesian* ConstitutiveMatrixCartesian_New(
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-ConstitutiveMatrixCartesian* _ConstitutiveMatrixCartesian_New(
-      SizeT                                               sizeOfSelf,
-      Type                                                type,
-      Stg_Class_DeleteFunction*                           _delete,
-      Stg_Class_PrintFunction*                            _print,
-      Stg_Class_CopyFunction*                             _copy,
-      Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-      Stg_Component_ConstructFunction*                    _construct,
-      Stg_Component_BuildFunction*                        _build,
-      Stg_Component_InitialiseFunction*                   _initialise,
-      Stg_Component_ExecuteFunction*                      _execute,
-      Stg_Component_DestroyFunction*                      _destroy,
-      StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,
-      ConstitutiveMatrix_SetValueFunc*                    _setValue,
-      ConstitutiveMatrix_GetValueFunc*                    _getViscosity,
-      ConstitutiveMatrix_SetValueFunc*                    _isotropicCorrection,
-      ConstitutiveMatrix_SetSecondViscosityFunc*          _setSecondViscosity,
-      ConstitutiveMatrix_Assemble_D_B_Func*               _assemble_D_B,
-      ConstitutiveMatrix_CalculateStressFunc*             _calculateStress,
-      Name                                                name )
+ConstitutiveMatrixCartesian* _ConstitutiveMatrixCartesian_New(  CONSTITUTIVEMATRIXCARTESIAN_DEFARGS  )
 {
    ConstitutiveMatrixCartesian* self;
 
    /* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-   assert( sizeOfSelf >= sizeof(ConstitutiveMatrixCartesian) );
-   self = (ConstitutiveMatrixCartesian*) _ConstitutiveMatrix_New(
-      sizeOfSelf,
-      type,
-      _delete,
-      _print,
-      _copy,
-      _defaultConstructor,
-      _construct,
-      _build,
-      _initialise,
-      _execute,
-      _destroy,
-      _assembleElement,
-      _setValue,
-      _getViscosity,
-      _isotropicCorrection,
-      _setSecondViscosity,
-      _assemble_D_B,
-      _calculateStress,
-      name );
+   assert( _sizeOfSelf >= sizeof(ConstitutiveMatrixCartesian) );
+   self = (ConstitutiveMatrixCartesian*) _ConstitutiveMatrix_New(  CONSTITUTIVEMATRIX_PASSARGS  );
 
    /* Function pointers for this class that are not on the parent class should be set here */
 
@@ -177,26 +139,30 @@ void _ConstitutiveMatrixCartesian_Print( void* constitutiveMatrix, Stream* strea
 }
 
 void* _ConstitutiveMatrixCartesian_DefaultNew( Name name ) {
-   return (void*)_ConstitutiveMatrixCartesian_New(
-      sizeof(ConstitutiveMatrixCartesian),
-      ConstitutiveMatrixCartesian_Type,
-      _ConstitutiveMatrixCartesian_Delete,
-      _ConstitutiveMatrixCartesian_Print,
-      NULL,
-      _ConstitutiveMatrixCartesian_DefaultNew,
-      _ConstitutiveMatrixCartesian_AssignFromXML,
-      _ConstitutiveMatrixCartesian_Build,
-      _ConstitutiveMatrixCartesian_Initialise,
-      _ConstitutiveMatrixCartesian_Execute,
-      _ConstitutiveMatrixCartesian_Destroy,
-      _ConstitutiveMatrixCartesian_AssembleElement,
-      NULL,
-      NULL,
-      NULL,
-      NULL,
-      NULL,
-      NULL,
-      name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(ConstitutiveMatrixCartesian);
+	Type                                                          type = ConstitutiveMatrixCartesian_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _ConstitutiveMatrixCartesian_Delete;
+	Stg_Class_PrintFunction*                                    _print = _ConstitutiveMatrixCartesian_Print;
+	Stg_Class_CopyFunction*                                      _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _ConstitutiveMatrixCartesian_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _ConstitutiveMatrixCartesian_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _ConstitutiveMatrixCartesian_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _ConstitutiveMatrixCartesian_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _ConstitutiveMatrixCartesian_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _ConstitutiveMatrixCartesian_Destroy;
+	StiffnessMatrixTerm_AssembleElementFunction*      _assembleElement = _ConstitutiveMatrixCartesian_AssembleElement;
+	ConstitutiveMatrix_SetValueFunc*                         _setValue = NULL;
+	ConstitutiveMatrix_GetValueFunc*                     _getViscosity = NULL;
+	ConstitutiveMatrix_SetValueFunc*              _isotropicCorrection = NULL;
+	ConstitutiveMatrix_SetSecondViscosityFunc*     _setSecondViscosity = NULL;
+	ConstitutiveMatrix_Assemble_D_B_Func*                _assemble_D_B = NULL;
+	ConstitutiveMatrix_CalculateStressFunc*           _calculateStress = NULL;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+   return (void*)_ConstitutiveMatrixCartesian_New(  CONSTITUTIVEMATRIXCARTESIAN_PASSARGS  );
 }
 
 void _ConstitutiveMatrixCartesian_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) {
@@ -741,3 +707,5 @@ void ConstitutiveMatrixCartesian_SetupParticleStorage( ConstitutiveMatrixCartesi
    /* set the storedConstitutive matrix NOT to be checkpointed */
    self->storedConstSwarmVar->isCheckpointedAndReloaded = False;
 }
+
+

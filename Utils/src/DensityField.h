@@ -28,27 +28,18 @@
 	struct DensityField { __DensityField };
 	
 	/* --- Contstructors / Destructors --- */
-	DensityField* _DensityField_New(
- 		SizeT                                             _sizeOfSelf,
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-		Name                                              name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define DENSITYFIELD_DEFARGS \
+                PARTICLEFEVARIABLE_DEFARGS
+
+	#define DENSITYFIELD_PASSARGS \
+                PARTICLEFEVARIABLE_PASSARGS
+
+	DensityField* _DensityField_New(  DENSITYFIELD_DEFARGS  );
 	
 	/** Print the contents of an DensityField construct */
 	void* _DensityField_DefaultNew( Name name );
@@ -65,3 +56,4 @@
 	
 
 #endif 
+

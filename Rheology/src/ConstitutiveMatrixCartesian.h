@@ -69,26 +69,18 @@
 		FiniteElementContext*                               context,	
 		Materials_Register*                                 materials_Register );
 
-	ConstitutiveMatrixCartesian* _ConstitutiveMatrixCartesian_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
-		ConstitutiveMatrix_SetValueFunc*                    _setValue,
-		ConstitutiveMatrix_GetValueFunc*                    _getViscosity,
-		ConstitutiveMatrix_SetValueFunc*                    _isotropicCorrection,
-		ConstitutiveMatrix_SetSecondViscosityFunc*          _setSecondViscosity,
-		ConstitutiveMatrix_Assemble_D_B_Func*               _assemble_D_B,
-		ConstitutiveMatrix_CalculateStressFunc*             _calculateStress,
-		Name                                                name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CONSTITUTIVEMATRIXCARTESIAN_DEFARGS \
+                CONSTITUTIVEMATRIX_DEFARGS
+
+	#define CONSTITUTIVEMATRIXCARTESIAN_PASSARGS \
+                CONSTITUTIVEMATRIX_PASSARGS
+
+	ConstitutiveMatrixCartesian* _ConstitutiveMatrixCartesian_New(  CONSTITUTIVEMATRIXCARTESIAN_DEFARGS  );
 	
 	void _ConstitutiveMatrixCartesian_Delete( void* constitutiveMatrix );
 	void _ConstitutiveMatrixCartesian_Print( void* constitutiveMatrix, Stream* stream );
@@ -132,3 +124,4 @@ void _ConstitutiveMatrixCartesian_AssignFromXML( void* constitutiveMatrix, Stg_C
 	void ConstitutiveMatrixCartesian_SetupParticleStorage( ConstitutiveMatrixCartesian* self );
 
 #endif
+

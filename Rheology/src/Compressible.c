@@ -77,39 +77,13 @@ Compressible* Compressible_New(
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-Compressible* _Compressible_New(
-      SizeT                                              sizeOfSelf,
-      Type                                               type,
-      Stg_Class_DeleteFunction*                          _delete,
-      Stg_Class_PrintFunction*                           _print,
-      Stg_Class_CopyFunction*                            _copy,
-      Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-      Stg_Component_ConstructFunction*                   _construct,
-      Stg_Component_BuildFunction*                       _build,
-      Stg_Component_InitialiseFunction*                  _initialise,
-      Stg_Component_ExecuteFunction*                     _execute,
-      Stg_Component_DestroyFunction*                     _destroy,
-      StiffnessMatrixTerm_AssembleElementFunction*       _assembleElement,
-      Name                                               name )
+Compressible* _Compressible_New(  COMPRESSIBLE_DEFARGS  )
 {
    Compressible*              self;
 
    /* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-   assert( sizeOfSelf >= sizeof(Compressible) );
-   self = (Compressible*) _StiffnessMatrixTerm_New(
-         sizeOfSelf,
-         type,
-         _delete,
-         _print,
-         _copy,
-         _defaultConstructor,
-         _construct,
-         _build,
-         _initialise,
-         _execute,
-         _destroy,
-         _assembleElement,
-         name );
+   assert( _sizeOfSelf >= sizeof(Compressible) );
+   self = (Compressible*) _StiffnessMatrixTerm_New(  STIFFNESSMATRIXTERM_PASSARGS  );
 
    return self;
 }
@@ -143,20 +117,24 @@ void _Compressible_Print( void* compressible, Stream* stream ) {
 }
 
 void* _Compressible_DefaultNew( Name name ) {
-   return (void*) _Compressible_New(
-      sizeof(Compressible),
-      Compressible_Type,
-      _StiffnessMatrixTerm_Delete,
-      _Compressible_Print,
-      NULL,
-      _Compressible_DefaultNew,
-      _Compressible_AssignFromXML,
-      _Compressible_Build,
-      _Compressible_Initialise,
-      _Compressible_Execute,
-      _Compressible_Destroy,
-      _Compressible_AssembleElement,
-      name );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(Compressible);
+	Type                                                         type = Compressible_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _StiffnessMatrixTerm_Delete;
+	Stg_Class_PrintFunction*                                   _print = _Compressible_Print;
+	Stg_Class_CopyFunction*                                     _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _Compressible_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _Compressible_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _Compressible_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _Compressible_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _Compressible_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _Compressible_Destroy;
+	StiffnessMatrixTerm_AssembleElementFunction*     _assembleElement = _Compressible_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+   return (void*) _Compressible_New(  COMPRESSIBLE_PASSARGS  );
 }
 
 
@@ -260,3 +238,5 @@ void _Compressible_AssembleElement(
       }
    }
 }
+
+

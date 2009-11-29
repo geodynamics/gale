@@ -65,11 +65,7 @@
 		
 	struct UnderworldContext { __UnderworldContext };
 
-	#define UNDERWORLDCONTEXT_DEFARGS \
-		PICELLERATORCONTEXT_DEFARGS
 
-	#define UNDERWORLDCONTEXT_PASSARGS \
-		PICELLERATORCONTEXT_PASSARGS
 	
 	/* Constructors ----------------------------------------------------------------------------------------------------*/
 	
@@ -85,7 +81,18 @@
 
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	UnderworldContext* _UnderworldContext_New( UNDERWORLDCONTEXT_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define UNDERWORLDCONTEXT_DEFARGS \
+                PICELLERATORCONTEXT_DEFARGS
+
+	#define UNDERWORLDCONTEXT_PASSARGS \
+                PICELLERATORCONTEXT_PASSARGS
+
+	UnderworldContext* _UnderworldContext_New(  UNDERWORLDCONTEXT_DEFARGS  );
 	
 	/** Initialisation implementation */
 	void _UnderworldContext_Init( UnderworldContext* self );
@@ -112,3 +119,4 @@
 	void UnderworldContext_AssignPointers( void* context, void* ptrToContext );
 	
 #endif
+

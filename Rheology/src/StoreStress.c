@@ -58,39 +58,13 @@
 const Type StoreStress_Type = "StoreStress";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-StoreStress* _StoreStress_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name ) 
+StoreStress* _StoreStress_New(  STORESTRESS_DEFARGS  ) 
 {
 	StoreStress*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(StoreStress) );
-	self = (StoreStress*) _Rheology_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			name );
+	assert( _sizeOfSelf >= sizeof(StoreStress) );
+	self = (StoreStress*) _Rheology_New(  RHEOLOGY_PASSARGS  );
 	
 	return self;
 }
@@ -146,20 +120,24 @@ void _StoreStress_Init(
 }
 
 void* _StoreStress_DefaultNew( Name name ) {
-	return (void*) _StoreStress_New(
-		sizeof(StoreStress),
-		StoreStress_Type,
-		_Rheology_Delete,
-		_Rheology_Print,
-		_Rheology_Copy,
-		_StoreStress_DefaultNew,
-		_StoreStress_AssignFromXML,
-		_StoreStress_Build,
-		_StoreStress_Initialise,
-		_Rheology_Execute,
-		_StoreStress_Destroy,
-		_StoreStress_ModifyConstitutiveMatrix,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(StoreStress);
+	Type                                                             type = StoreStress_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _Rheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _Rheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _Rheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _StoreStress_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _StoreStress_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _StoreStress_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _StoreStress_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _Rheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _StoreStress_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _StoreStress_ModifyConstitutiveMatrix;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _StoreStress_New(  STORESTRESS_PASSARGS  );
 }
 
 void _StoreStress_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
@@ -253,3 +231,5 @@ void _StoreStress_ModifyConstitutiveMatrix(
 	FeVariable_InterpolateWithinElement( self->strainRateField, lElement_I, xi, strainRate );
 	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, strainRate, particleExt->stress );
 }
+
+

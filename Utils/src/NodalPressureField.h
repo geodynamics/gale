@@ -28,27 +28,18 @@
 	** Constructors/Destructors.
 	*/
 
-	NodalPressureField* _NodalPressureField_New( 
-		SizeT                                             _sizeOfSelf,
-      Type                                              type,
-      Stg_Class_DeleteFunction*                         _delete,
-      Stg_Class_PrintFunction*                          _print,
-      Stg_Class_CopyFunction*                           _copy,
-      Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-      Stg_Component_ConstructFunction*                  _construct,
-      Stg_Component_BuildFunction*                      _build,
-      Stg_Component_InitialiseFunction*                 _initialise,
-      Stg_Component_ExecuteFunction*                    _execute,
-      Stg_Component_DestroyFunction*                    _destroy,
-      FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-      FieldVariable_GetValueFunction*                    _getMinGlobalFeMagnitude,
-      FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-      FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-      FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,
-      FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,
-      FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-      ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-      Name                                              name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define NODALPRESSUREFIELD_DEFARGS \
+                PARTICLEFEVARIABLE_DEFARGS
+
+	#define NODALPRESSUREFIELD_PASSARGS \
+                PARTICLEFEVARIABLE_PASSARGS
+
+	NodalPressureField* _NodalPressureField_New(  NODALPRESSUREFIELD_DEFARGS  );
 
 	void _NodalPressureField_Init( NodalPressureField* self, Variable_Register* variable_Register, FeVariable* pressureField, SystemLinearEquations* sle );
 
@@ -83,3 +74,4 @@
 
    void NodalPressureField_NonLinearUpdate( void* _sle, void* _ctx );
 #endif
+

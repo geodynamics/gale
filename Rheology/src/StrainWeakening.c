@@ -99,42 +99,13 @@ StrainWeakening* StrainWeakening_New(
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-StrainWeakening* _StrainWeakening_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		TimeIntegratee_CalculateTimeDerivFunction*         _calculateTimeDeriv,
-		TimeIntegratee_IntermediateFunction*               _intermediate,
-		StrainWeakening_CalcIncrementFunction*             _calcIncrement,
-		Name                                               name ) 
+StrainWeakening* _StrainWeakening_New(  STRAINWEAKENING_DEFARGS  ) 
 {
 	StrainWeakening*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(StrainWeakening) );
-	self = (StrainWeakening*) _TimeIntegratee_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_calculateTimeDeriv,
-			_intermediate,
-			name );
+	assert( _sizeOfSelf >= sizeof(StrainWeakening) );
+	self = (StrainWeakening*) _TimeIntegratee_New(  TIMEINTEGRATEE_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	self->_calcIncrement = _calcIncrement;
@@ -231,22 +202,26 @@ void _StrainWeakening_Init(
 }
 
 void* _StrainWeakening_DefaultNew( Name name ) {
-	return (void*) _StrainWeakening_New(
-			sizeof(StrainWeakening),
-		StrainWeakening_Type,
-		_TimeIntegratee_Delete,
-		_TimeIntegratee_Print,
-		_TimeIntegratee_Copy,
-		_StrainWeakening_DefaultNew,
-		_StrainWeakening_AssignFromXML,
-		_StrainWeakening_Build,
-		_StrainWeakening_Initialise,
-		_TimeIntegratee_Execute,
-		_TimeIntegratee_Destroy,
-		_StrainWeakening_TimeDerivative,
-		_TimeIntegratee_Intermediate,
-		_StrainWeakening_CalcIncrementIsotropic,
-		name );
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(StrainWeakening);
+	Type                                                       type = StrainWeakening_Type;
+	Stg_Class_DeleteFunction*                               _delete = _TimeIntegratee_Delete;
+	Stg_Class_PrintFunction*                                 _print = _TimeIntegratee_Print;
+	Stg_Class_CopyFunction*                                   _copy = _TimeIntegratee_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _StrainWeakening_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _StrainWeakening_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _StrainWeakening_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _StrainWeakening_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _TimeIntegratee_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _TimeIntegratee_Destroy;
+	TimeIntegratee_CalculateTimeDerivFunction*  _calculateTimeDeriv = _StrainWeakening_TimeDerivative;
+	TimeIntegratee_IntermediateFunction*              _intermediate = _TimeIntegratee_Intermediate;
+	StrainWeakening_CalcIncrementFunction*           _calcIncrement = _StrainWeakening_CalcIncrementIsotropic;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _StrainWeakening_New(  STRAINWEAKENING_PASSARGS  );
 }
 
 void _StrainWeakening_AssignFromXML( void* strainWeakening, Stg_ComponentFactory* cf, void* data ){
@@ -548,4 +523,6 @@ double StrainWeakening_GetInitialDamageFraction( void* strainWeakening, void* pa
 
 	return self->initialDamageFraction;
 }
+
+
 

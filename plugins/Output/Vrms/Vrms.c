@@ -86,19 +86,23 @@ void _Underworld_Vrms_Initialise( void* component, void* data ) {
 }
 
 void* _Underworld_Vrms_DefaultNew( Name name ) {
-	return _Codelet_New(
-		sizeof(Underworld_Vrms),
-		Underworld_Vrms_Type,
-		_Codelet_Delete,
-		_Codelet_Print,
-		_Codelet_Copy,
-		_Underworld_Vrms_DefaultNew,
-		_Underworld_Vrms_AssignFromXML,
-		_Underworld_Vrms_Build,
-		_Underworld_Vrms_Initialise,
-		_Codelet_Execute,
-		_Codelet_Destroy,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Underworld_Vrms);
+	Type                                                      type = Underworld_Vrms_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_Vrms_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Underworld_Vrms_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Underworld_Vrms_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Underworld_Vrms_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
 
 Index Underworld_Vrms_Register( PluginsManager* pluginsManager ) {
@@ -145,4 +149,6 @@ void Underworld_Vrms_Dump( void* _context ) {
 void Underworld_Vrms_PrintHeaderToFile( void* context ) {
 	StgFEM_FrequentOutput_PrintString( context, "Vrms" );
 }
+
+
 

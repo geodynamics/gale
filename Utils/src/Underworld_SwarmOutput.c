@@ -74,38 +74,18 @@ Underworld_SwarmOutput* Underworld_SwarmOutput_New(
 	return self;
 }
 
-Underworld_SwarmOutput* _Underworld_SwarmOutput_New(
-		SizeT                                              _sizeOfSelf, 
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		Name                                               name )
+Underworld_SwarmOutput* _Underworld_SwarmOutput_New(  UNDERWORLD_SWARMOUTPUT_DEFARGS  )
 {
 	Underworld_SwarmOutput* self;
 	
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
 	assert( _sizeOfSelf >= sizeof(Underworld_SwarmOutput) );
-	self = (Underworld_SwarmOutput*)_Stg_Component_New( 
-					_sizeOfSelf,
-					type,
-					_delete,
-					_print,
-					_copy,
-					_defaultConstructor,
-					_construct,
-					_build,
-					_initialise,
-					_execute,
-					_destroy,		
-					name,
-					NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (Underworld_SwarmOutput*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	
 	/* General info */
@@ -146,19 +126,23 @@ void* _Underworld_SwarmOutput_Copy( void* uwSwarmOutput, void* dest, Bool deep, 
 }
 
 void* _Underworld_SwarmOutput_DefaultNew( Name name ) {
-	return (void*) _Underworld_SwarmOutput_New(
-			sizeof(Underworld_SwarmOutput),
-			Underworld_SwarmOutput_Type,
-			_Underworld_SwarmOutput_Delete,
-			_Underworld_SwarmOutput_Print,
-			_Underworld_SwarmOutput_Copy,
-			_Underworld_SwarmOutput_DefaultNew,
-			_Underworld_SwarmOutput_AssignFromXML,
-			_Underworld_SwarmOutput_Build,
-			_Underworld_SwarmOutput_Initialise,
-			_Underworld_SwarmOutput_Execute,
-			_Underworld_SwarmOutput_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Underworld_SwarmOutput);
+	Type                                                      type = Underworld_SwarmOutput_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Underworld_SwarmOutput_Delete;
+	Stg_Class_PrintFunction*                                _print = _Underworld_SwarmOutput_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Underworld_SwarmOutput_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_SwarmOutput_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Underworld_SwarmOutput_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Underworld_SwarmOutput_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Underworld_SwarmOutput_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Underworld_SwarmOutput_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Underworld_SwarmOutput_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _Underworld_SwarmOutput_New(  UNDERWORLD_SWARMOUTPUT_PASSARGS  );
 }
 
 void _Underworld_SwarmOutput_Init( Underworld_SwarmOutput* self,
@@ -382,4 +366,6 @@ void _Underworld_SwarmOutput_GetFeVariableValues(Underworld_SwarmOutput* uwSwarm
 /*-------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
 */
+
+
 

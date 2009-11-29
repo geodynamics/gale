@@ -279,21 +279,27 @@ void _DepthDependentAnalytic3D_Build( void* analyticSolution, void* data ) {
 
 
 void* _DepthDependentAnalytic3D_DefaultNew( Name name ) {
-	return _FieldTest_New(
-			sizeof(DepthDependentAnalytic3D),
-			DepthDependentAnalytic3D_Type,
-			_FieldTest_Delete,
-			_FieldTest_Print,
-			_FieldTest_Copy,
-			_DepthDependentAnalytic3D_DefaultNew,
-			_DepthDependentAnalytic3D_AssignFromXML,
-			_DepthDependentAnalytic3D_Build,
-			_FieldTest_Initialise,
-			_FieldTest_Execute,
-			_FieldTest_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(DepthDependentAnalytic3D);
+	Type                                                      type = DepthDependentAnalytic3D_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FieldTest_Delete;
+	Stg_Class_PrintFunction*                                _print = _FieldTest_Print;
+	Stg_Class_CopyFunction*                                  _copy = _FieldTest_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _DepthDependentAnalytic3D_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _DepthDependentAnalytic3D_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _DepthDependentAnalytic3D_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FieldTest_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FieldTest_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FieldTest_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _FieldTest_New(  FIELDTEST_PASSARGS  );
 }
 
 Index Underworld_DepthDependentAnalytic3D_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, DepthDependentAnalytic3D_Type, "0", _DepthDependentAnalytic3D_DefaultNew );
 }
+
+

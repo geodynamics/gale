@@ -87,45 +87,13 @@ Byerlee* Byerlee_New(
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-Byerlee* _Byerlee_New(
-      SizeT                                              sizeOfSelf,
-      Type                                               type,
-      Stg_Class_DeleteFunction*                          _delete,
-      Stg_Class_PrintFunction*                           _print,
-      Stg_Class_CopyFunction*                            _copy,
-      Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-      Stg_Component_ConstructFunction*                   _construct,
-      Stg_Component_BuildFunction*                       _build,
-      Stg_Component_InitialiseFunction*                  _initialise,
-      Stg_Component_ExecuteFunction*                     _execute,
-      Stg_Component_DestroyFunction*                     _destroy,
-      Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-      YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion,
-      YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator,
-      YieldRheology_HasYieldedFunction*                  _hasYielded,
-      Name                                               name )
+Byerlee* _Byerlee_New(  BYERLEE_DEFARGS  )
 {
    Byerlee*             self;
 
    /* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-   assert( sizeOfSelf >= sizeof(Byerlee) );
-   self = (Byerlee*) _VonMises_New(
-         sizeOfSelf,
-         type,
-         _delete,
-         _print,
-         _copy,
-         _defaultConstructor,
-         _construct,
-         _build,
-         _initialise,
-         _execute,
-         _destroy,
-         _modifyConstitutiveMatrix,
-         _getYieldCriterion,
-         _getYieldIndicator,
-         _hasYielded,
-         name );
+   assert( _sizeOfSelf >= sizeof(Byerlee) );
+   self = (Byerlee*) _VonMises_New(  VONMISES_PASSARGS  );
 
    /* Function pointers for this class that are not on the parent class should be set here */
 
@@ -138,23 +106,27 @@ void _Byerlee_Init( Byerlee* self, FeMesh* mesh, double depthCoefficient ) {
 }
 
 void* _Byerlee_DefaultNew( Name name ) {
-   return (void*) _Byerlee_New(
-      sizeof(Byerlee),
-      Byerlee_Type,
-      _YieldRheology_Delete,
-      _YieldRheology_Print,
-      _YieldRheology_Copy,
-      _Byerlee_DefaultNew,
-      _Byerlee_AssignFromXML,
-      _YieldRheology_Build,
-      _YieldRheology_Initialise,
-      _YieldRheology_Execute,
-      _Byerlee_Destroy,
-      _YieldRheology_ModifyConstitutiveMatrix,
-      _Byerlee_GetYieldCriterion,
-      _VonMises_GetYieldIndicator,
-      _VonMises_HasYielded,
-      name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(Byerlee);
+	Type                                                             type = Byerlee_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _YieldRheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _YieldRheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _YieldRheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _Byerlee_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _Byerlee_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _YieldRheology_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _YieldRheology_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _YieldRheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _Byerlee_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _YieldRheology_ModifyConstitutiveMatrix;
+	YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion = _Byerlee_GetYieldCriterion;
+	YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator = _VonMises_GetYieldIndicator;
+	YieldRheology_HasYieldedFunction*                         _hasYielded = _VonMises_HasYielded;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+   return (void*) _Byerlee_New(  BYERLEE_PASSARGS  );
 }
 
 void _Byerlee_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
@@ -216,3 +188,5 @@ double _Byerlee_GetYieldCriterion(
 
    return self->cohesion + self->depthCoefficient * depth;
 }
+
+

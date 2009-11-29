@@ -85,26 +85,20 @@
 	void* _RheologyMaterial_DefaultNew( Name name ) ;
 
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	RheologyMaterial* _RheologyMaterial_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		RheologyMaterial_RunRheologiesFunction*            _runRheologies,
-		Name                                               name,
-		Stg_Shape*                                         shape,
-		Dictionary*                                        materialDictionary,
-		Materials_Register*                                materialRegister,
-		Rheology**                                         rheologyList,
-		Rheology_Index                                     rheologyCount,
-		Compressible*                                      compressible );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define RHEOLOGYMATERIAL_DEFARGS \
+                MATERIAL_DEFARGS, \
+                RheologyMaterial_RunRheologiesFunction*  _runRheologies
+
+	#define RHEOLOGYMATERIAL_PASSARGS \
+                MATERIAL_PASSARGS, \
+	        _runRheologies
+
+	RheologyMaterial* _RheologyMaterial_New(  RHEOLOGYMATERIAL_DEFARGS  );
 
 	void _RheologyMaterial_AssignFromXML( void* rheologyMaterial, Stg_ComponentFactory* cf, void* data );
 
@@ -159,3 +153,4 @@
 	Bool RheologyMaterial_HasRheology( void* rheologyMaterial, void* rheology ) ;
 
 #endif
+

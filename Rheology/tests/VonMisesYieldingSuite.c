@@ -187,3 +187,5 @@ void VonMisesYieldingSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, VonMisesYieldingSuite_Setup, VonMisesYieldingSuite_Teardown );
    pcu_suite_addTest( suite, VonMisesYieldingSuite_VonMises2D );
 }
+
+

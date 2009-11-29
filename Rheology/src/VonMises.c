@@ -86,45 +86,13 @@ VonMises* VonMises_New(
 
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-VonMises* _VonMises_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion,
-		YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator,
-		YieldRheology_HasYieldedFunction*                  _hasYielded,
-		Name                                               name ) 
+VonMises* _VonMises_New(  VONMISES_DEFARGS  ) 
 {
 	VonMises*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(VonMises) );
-	self = (VonMises*) _YieldRheology_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			_getYieldCriterion,
-			_getYieldIndicator,
-			_hasYielded,
-			name );
+	assert( _sizeOfSelf >= sizeof(VonMises) );
+	self = (VonMises*) _YieldRheology_New(  YIELDRHEOLOGY_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	
@@ -150,23 +118,27 @@ void _VonMises_Init(
 }
 
 void* _VonMises_DefaultNew( Name name ) {
-	return (void*) _VonMises_New(
-		sizeof(VonMises),
-		VonMises_Type,
-		_YieldRheology_Delete,
-		_YieldRheology_Print,
-		_YieldRheology_Copy,
-		_VonMises_DefaultNew,
-		_VonMises_AssignFromXML,
-		_VonMises_Build,
-		_VonMises_Initialise,
-		_YieldRheology_Execute,
-		_VonMises_Destroy,
-		_YieldRheology_ModifyConstitutiveMatrix,
-		_VonMises_GetYieldCriterion,
-		_VonMises_GetYieldIndicator,
-		_VonMises_HasYielded,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(VonMises);
+	Type                                                             type = VonMises_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _YieldRheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _YieldRheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _YieldRheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _VonMises_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _VonMises_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _VonMises_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _VonMises_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _YieldRheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _VonMises_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _YieldRheology_ModifyConstitutiveMatrix;
+	YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion = _VonMises_GetYieldCriterion;
+	YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator = _VonMises_GetYieldIndicator;
+	YieldRheology_HasYieldedFunction*                         _hasYielded = _VonMises_HasYielded;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _VonMises_New(  VONMISES_PASSARGS  );
 }
 
 void _VonMises_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
@@ -321,3 +293,5 @@ void _VonMises_HasYielded(
         }
 
 }
+
+

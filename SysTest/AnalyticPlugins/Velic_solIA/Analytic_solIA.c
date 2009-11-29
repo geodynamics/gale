@@ -134,21 +134,27 @@ void _Velic_solIA_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* c
 }
 
 void* _Velic_solIA_DefaultNew( Name name ) {
-	return _AnalyticSolution_New(
-			sizeof(Velic_solIA),
-			Velic_solIA_Type,
-			_AnalyticSolution_Delete,
-			_AnalyticSolution_Print,
-			_AnalyticSolution_Copy,
-			_Velic_solIA_DefaultNew,
-			_Velic_solIA_AssignFromXML,
-			_AnalyticSolution_Build,
-			_AnalyticSolution_Initialise,
-			_AnalyticSolution_Execute,
-			_AnalyticSolution_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Velic_solIA);
+	Type                                                      type = Velic_solIA_Type;
+	Stg_Class_DeleteFunction*                              _delete = _AnalyticSolution_Delete;
+	Stg_Class_PrintFunction*                                _print = _AnalyticSolution_Print;
+	Stg_Class_CopyFunction*                                  _copy = _AnalyticSolution_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Velic_solIA_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Velic_solIA_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _AnalyticSolution_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _AnalyticSolution_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _AnalyticSolution_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _AnalyticSolution_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _AnalyticSolution_New(  ANALYTICSOLUTION_PASSARGS  );
 }
 
 Index Underworld_Velic_solIA_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Velic_solIA_Type, "0", _Velic_solIA_DefaultNew );
 }
+
+

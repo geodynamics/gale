@@ -91,45 +91,13 @@ DruckerPrager* DruckerPrager_New(
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-DruckerPrager* _DruckerPrager_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion,
-		YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator,
-		YieldRheology_HasYieldedFunction*                  _hasYielded,
-		Name                                               name ) 
+DruckerPrager* _DruckerPrager_New(  DRUCKERPRAGER_DEFARGS  ) 
 {
 	DruckerPrager*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(DruckerPrager) );
-	self = (DruckerPrager*) _VonMises_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			_getYieldCriterion,
-			_getYieldIndicator,
-			_hasYielded,
-			name );
+	assert( _sizeOfSelf >= sizeof(DruckerPrager) );
+	self = (DruckerPrager*) _VonMises_New(  VONMISES_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	
@@ -198,23 +166,27 @@ void _DruckerPrager_Init(
 }
 
 void* _DruckerPrager_DefaultNew( Name name ) {
-	return (void*) _DruckerPrager_New(
-			sizeof(DruckerPrager),
-			DruckerPrager_Type,
-			_YieldRheology_Delete,
-			_YieldRheology_Print,
-			_YieldRheology_Copy,
-			_DruckerPrager_DefaultNew,
-			_DruckerPrager_AssignFromXML,
-			_DruckerPrager_Build,
-			_DruckerPrager_Initialise,
-			_YieldRheology_Execute,
-			_DruckerPrager_Destroy,
-			_YieldRheology_ModifyConstitutiveMatrix,
-			_DruckerPrager_GetYieldCriterion,
-			_VonMises_GetYieldIndicator,
-			_DruckerPrager_HasYielded,
-			name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(DruckerPrager);
+	Type                                                             type = DruckerPrager_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _YieldRheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _YieldRheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _YieldRheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _DruckerPrager_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _DruckerPrager_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _DruckerPrager_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _DruckerPrager_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _YieldRheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _DruckerPrager_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _YieldRheology_ModifyConstitutiveMatrix;
+	YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion = _DruckerPrager_GetYieldCriterion;
+	YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator = _VonMises_GetYieldIndicator;
+	YieldRheology_HasYieldedFunction*                         _hasYielded = _DruckerPrager_HasYielded;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _DruckerPrager_New(  DRUCKERPRAGER_PASSARGS  );
 }
 
 void _DruckerPrager_AssignFromXML( void* druckerPrager, Stg_ComponentFactory* cf, void* data ){
@@ -534,3 +506,5 @@ void _DruckerPrager_UpdateDrawParameters( void* rheology ) {
 	}
 	
 }
+
+

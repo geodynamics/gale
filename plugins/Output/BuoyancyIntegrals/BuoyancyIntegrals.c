@@ -84,21 +84,24 @@ Index Underworld_BuoyancyIntegrals_Register( PluginsManager *pluginsManager )
 
 void* _Underworld_BuoyancyIntegrals_DefaultNew( Name name ) 
 {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Underworld_BuoyancyIntegrals_CTX);
+	Type                                                      type = Underworld_BuoyancyIntegrals_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Underworld_BuoyancyIntegrals_CTX_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_BuoyancyIntegrals_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Underworld_BuoyancyIntegrals_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Codelet_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
 	
-	return _Codelet_New(
-			sizeof(Underworld_BuoyancyIntegrals_CTX),
-			Underworld_BuoyancyIntegrals_Type,
-			_Underworld_BuoyancyIntegrals_CTX_Delete,
-			/*_Codelet_Delete, */
-	_Codelet_Print,
-			_Codelet_Copy,
-			_Underworld_BuoyancyIntegrals_DefaultNew,
-			_Underworld_BuoyancyIntegrals_AssignFromXML,
-			_Codelet_Build,
-			_Codelet_Initialise,
-			_Codelet_Execute,
-			_Codelet_Destroy,
-			name );
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
 
 void _Underworld_BuoyancyIntegrals_CTX_Delete( void *component ) 
@@ -531,3 +534,5 @@ void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context )
 	
 	
 }
+
+

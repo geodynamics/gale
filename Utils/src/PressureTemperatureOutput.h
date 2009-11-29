@@ -62,21 +62,18 @@
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Constructors
 	*/
-	PressureTemperatureOutput* _PressureTemperatureOutput_New(
-		SizeT                                              _sizeOfSelf, 
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		SwarmOutput_PrintHeaderFunction*                   _printHeader,		
-		SwarmOutput_PrintDataFunction*                     _printData,		
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PRESSURETEMPERATUREOUTPUT_DEFARGS \
+                SWARMOUTPUT_DEFARGS
+
+	#define PRESSURETEMPERATUREOUTPUT_PASSARGS \
+                SWARMOUTPUT_PASSARGS
+
+	PressureTemperatureOutput* _PressureTemperatureOutput_New(  PRESSURETEMPERATUREOUTPUT_DEFARGS  );
 
 	/* Stg_Class_Delete PressureTemperatureOutput implementation */
 	void _PressureTemperatureOutput_Delete( void* swarmOutput );
@@ -110,3 +107,4 @@ void _PressureTemperatureOutput_AssignFromXML( void* shape, Stg_ComponentFactory
 	*/
 	
 #endif 
+

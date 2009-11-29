@@ -108,41 +108,13 @@ Director* Director_New(
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-Director* _Director_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		TimeIntegratee_CalculateTimeDerivFunction*         _calculateTimeDeriv,
-		TimeIntegratee_IntermediateFunction*               _intermediate,
-		Name                                               name ) 
+Director* _Director_New(  DIRECTOR_DEFARGS  ) 
 {
 	Director*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(Director) );
-	self = (Director*) _TimeIntegratee_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_calculateTimeDeriv,
-			_intermediate,
-			name );
+	assert( _sizeOfSelf >= sizeof(Director) );
+	self = (Director*) _TimeIntegratee_New(  TIMEINTEGRATEE_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	
@@ -223,21 +195,25 @@ void _Director_Init(
 }
 
 void* _Director_DefaultNew( Name name ) {
-	return (void*) _Director_New(
-		sizeof(Director),
-		Director_Type,
-		_TimeIntegratee_Delete,
-		_TimeIntegratee_Print,
-		_TimeIntegratee_Copy,
-		_Director_DefaultNew,
-		_Director_AssignFromXML,
-		_Director_Build,
-		_Director_Initialise,
-		_TimeIntegratee_Execute,
-		_Director_Destroy,
-		_Director_TimeDerivative,
-		_Director_Intermediate,
-		name );
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(Director);
+	Type                                                       type = Director_Type;
+	Stg_Class_DeleteFunction*                               _delete = _TimeIntegratee_Delete;
+	Stg_Class_PrintFunction*                                 _print = _TimeIntegratee_Print;
+	Stg_Class_CopyFunction*                                   _copy = _TimeIntegratee_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _Director_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _Director_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _Director_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _Director_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _TimeIntegratee_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _Director_Destroy;
+	TimeIntegratee_CalculateTimeDerivFunction*  _calculateTimeDeriv = _Director_TimeDerivative;
+	TimeIntegratee_IntermediateFunction*              _intermediate = _Director_Intermediate;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _Director_New(  DIRECTOR_PASSARGS  );
 }
 
 void _Director_AssignFromXML( void* director, Stg_ComponentFactory* cf, void* data ){
@@ -624,3 +600,5 @@ void Director_SetDontUpdateParticleFlag( void* director, void* particle, Particl
 	
 	particleExt->dontUpdateParticle = dontUpdateFlag;
 }
+
+

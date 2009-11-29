@@ -62,11 +62,7 @@
 
 	struct ConstitutiveMatCartesian_Refactored { __ConstitutiveMatCartesian_Refactored };
 
-	#define CONSTITUTIVEMATCARTESIAN_REFACTORED_DEFARGS \
-		CONSTITUTIVEMAT_REFACTORED_DEFARGS
 
-	#define CONSTITUTIVEMATCARTESIAN_REFACTORED_PASSARGS \
-		CONSTITUTIVEMAT_REFACTORED_PASSARGS
 
 	ConstitutiveMatCartesian_Refactored* ConstitutiveMatCartesian_Refactored_New( 
 		Name							name,
@@ -74,7 +70,18 @@
 		PICelleratorContext*		context,	
 		Materials_Register*		materials_Register );
 
-	ConstitutiveMatCartesian_Refactored* _ConstitutiveMatCartesian_Refactored_New( CONSTITUTIVEMATCARTESIAN_REFACTORED_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CONSTITUTIVEMATCARTESIAN_REFACTORED_DEFARGS \
+                CONSTITUTIVEMAT_REFACTORED_DEFARGS
+
+	#define CONSTITUTIVEMATCARTESIAN_REFACTORED_PASSARGS \
+                CONSTITUTIVEMAT_REFACTORED_PASSARGS
+
+	ConstitutiveMatCartesian_Refactored* _ConstitutiveMatCartesian_Refactored_New(  CONSTITUTIVEMATCARTESIAN_REFACTORED_DEFARGS  );
 
 	void _ConstitutiveMatCartesian_Refactored_Init( void* self );
 	
@@ -131,3 +138,4 @@
 	void _ConstitutiveMatCartesian_Refactored3D_CalculateStress( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress );
 
 #endif
+

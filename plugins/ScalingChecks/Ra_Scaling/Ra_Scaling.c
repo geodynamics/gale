@@ -133,3 +133,5 @@ Index Underworld_Ra_Scaling_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
 	return PluginsManager_Submit( pluginsManager, Underworld_Ra_Scaling_Type, "0", _Underworld_Ra_Scaling_DefaultNew );
 }
+
+

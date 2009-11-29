@@ -266,3 +266,5 @@ Index Underworld_IncompressibleExtensionBC_Register( PluginsManager* pluginsMana
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
 	return PluginsManager_Submit( pluginsManager, Underworld_IncompressibleExtensionBC_Type, "0", _Underworld_IncompressibleExtensionBC_DefaultNew );
 }
+
+
