@@ -949,3 +949,5 @@ void VariableSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, VariableSuite_TestVariableCopy );
    pcu_suite_addTest( suite, VariableSuite_TestVariableValueCompare );
 }
+
+

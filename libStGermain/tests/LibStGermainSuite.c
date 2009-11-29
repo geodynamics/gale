@@ -60,3 +60,5 @@ void LibStGermainSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, LibStGermainSuite_Setup, LibStGermainSuite_Teardown );
    pcu_suite_addTest( suite, LibStGermainSuite_TestXMLLibraryPath );
 }
+
+

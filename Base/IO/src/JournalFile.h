@@ -81,16 +81,26 @@
 
 
 	/** Constructor interface. */
-	JournalFile* _JournalFile_New(
-		SizeT				_sizeOfSelf,
-		Type				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy, 
-		JournalFile_OpenFunction*	_open,
-		JournalFile_AppendFunction*	_append,
-		JournalFile_CloseFunction*	_close,
-		JournalFile_FlushFunction*	_flush );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define JOURNALFILE_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                JournalFile_OpenFunction*      _open, \
+                JournalFile_AppendFunction*  _append, \
+                JournalFile_CloseFunction*    _close, \
+                JournalFile_FlushFunction*    _flush
+
+	#define JOURNALFILE_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        _open,   \
+	        _append, \
+	        _close,  \
+	        _flush 
+
+	JournalFile* _JournalFile_New(  JOURNALFILE_DEFARGS  );
 	
 	/** Init interface. */
 	void _JournalFile_Init(
@@ -150,3 +160,4 @@
 
 
 #endif /* __Base_IO_JournalFile_h__ */
+

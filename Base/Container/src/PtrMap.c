@@ -54,13 +54,14 @@ const Type PtrMap_Type = "PtrMap";
 PtrMap* PtrMap_New(
 		unsigned					delta )
 {
-	return _PtrMap_New( 
-		sizeof(PtrMap), 
-		PtrMap_Type, 
-		_PtrMap_Delete, 
-		_PtrMap_Print, 
-		NULL, 
-		delta );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(PtrMap);
+	Type                              type = PtrMap_Type;
+	Stg_Class_DeleteFunction*      _delete = _PtrMap_Delete;
+	Stg_Class_PrintFunction*        _print = _PtrMap_Print;
+	Stg_Class_CopyFunction*          _copy = NULL;
+
+	return _PtrMap_New(  PTRMAP_PASSARGS  );
 }
 
 
@@ -84,24 +85,13 @@ void PtrMap_Init(
 }
 
 
-PtrMap* _PtrMap_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		unsigned					delta )
+PtrMap* _PtrMap_New(  PTRMAP_DEFARGS  )
 {
 	PtrMap*			self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(PtrMap) );
-	self = (PtrMap*)_Stg_Class_New(
-		_sizeOfSelf,
-		type,
-		_delete,
-		_print,
-		_copy );
+	self = (PtrMap*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* General info */
 	
@@ -227,3 +217,5 @@ void* PtrMap_Find( void* ptrMap, void* key ) {
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+

@@ -403,3 +403,5 @@ void EntryPointSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, EntryPointSuite_TestClassHook );
    pcu_suite_addTest( suite, EntryPointSuite_TestMinMax );
 }
+
+

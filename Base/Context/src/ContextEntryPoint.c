@@ -51,8 +51,18 @@ const Type ContextEntryPoint_Type = "ContextEntryPoint";
 
 
 ContextEntryPoint* ContextEntryPoint_New( const Name name, unsigned int castType ) {
-	return _ContextEntryPoint_New( sizeof(ContextEntryPoint), ContextEntryPoint_Type, _EntryPoint_Delete, 
-		_EntryPoint_Print, NULL, _ContextEntryPoint_GetRun, name, castType );
+	/* Variables set in this function */
+	SizeT                       _sizeOfSelf = sizeof(ContextEntryPoint);
+	Type                               type = ContextEntryPoint_Type;
+	Stg_Class_DeleteFunction*       _delete = _EntryPoint_Delete;
+	Stg_Class_PrintFunction*         _print = _EntryPoint_Print;
+	Stg_Class_CopyFunction*           _copy = NULL;
+	EntryPoint_GetRunFunction*      _getRun = _ContextEntryPoint_GetRun;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _ContextEntryPoint_New(  CONTEXTENTRYPOINT_PASSARGS  );
 }
 
 void ContextEntryPoint_Init( void* contextEntryPoint, Name name, unsigned int castType ) {
@@ -76,22 +86,13 @@ void ContextEntryPoint_Init( void* contextEntryPoint, Name name, unsigned int ca
 	_ContextEntryPoint_Init( self );
 }
 
-ContextEntryPoint* _ContextEntryPoint_New( 
-		SizeT				_sizeOfSelf,
-		Type				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy, 
-		EntryPoint_GetRunFunction*	_getRun,
-		Name				name,
-		unsigned int			castType )
+ContextEntryPoint* _ContextEntryPoint_New(  CONTEXTENTRYPOINT_DEFARGS  )
 {
 	ContextEntryPoint* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ContextEntryPoint) );
-	self = (ContextEntryPoint*)_EntryPoint_New( _sizeOfSelf, type, _delete, _print, _copy, 
-		_getRun, name, castType );
+	self = (ContextEntryPoint*)_EntryPoint_New(  ENTRYPOINT_PASSARGS  );
 	
 	/* General info */
 	
@@ -162,4 +163,6 @@ void _ContextEntryPoint_Run_Step( void* contextEntryPoint, void* data0, double d
 		Stg_CallGraph_Pop( stgCallGraph );
 	#endif
 }
+
+
 

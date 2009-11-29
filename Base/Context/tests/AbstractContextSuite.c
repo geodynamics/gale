@@ -83,27 +83,24 @@ TestContext* TestContext_New(
 	MPI_Comm		communicator,
 	Dictionary*	dictionary ) 
 {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(TestContext);
+	Type                                                      type = "TestContext";
+	Stg_Class_DeleteFunction*                              _delete = _AbstractContext_Delete;
+	Stg_Class_PrintFunction*                                _print = _AbstractContext_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = NULL;
+	Stg_Component_ConstructFunction*                    _construct = NULL;
+	Stg_Component_BuildFunction*                            _build = _AbstractContext_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _AbstractContext_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _AbstractContext_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _AbstractContext_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	AbstractContext_SetDt*                                  _setDt = TestSetDt;
+
    TestContext* ctx;
 
-   ctx = (TestContext*)_AbstractContext_New( 
-      sizeof(TestContext), 
-     	"TestContext", 
-      _AbstractContext_Delete, 
-      _AbstractContext_Print, 
-      NULL,
-      NULL, 
-      NULL, 
-      _AbstractContext_Build, 
-      _AbstractContext_Initialise, 
-      _AbstractContext_Execute, 
-      _AbstractContext_Destroy, 
-      name, 
-      NON_GLOBAL, 
-      TestSetDt, 
-      startTime, 
-      stopTime, 
-      communicator, 
-      dictionary );
+   ctx = (TestContext*)_AbstractContext_New(  ABSTRACTCONTEXT_PASSARGS  );
 
    ctx->buildHookCalled = 0;  
    ctx->icHookCalled = 0;
@@ -353,3 +350,5 @@ void AbstractContextSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, AbstractContextSuite_TestRunNoDtDefined );
    pcu_suite_addTest( suite, AbstractContextSuite_TestRestartFromCheckpoint );
 }
+
+

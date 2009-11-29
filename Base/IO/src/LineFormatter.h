@@ -60,13 +60,20 @@
 
 
 	/** Constructor interface. */
-	LineFormatter* _LineFormatter_New(
-		SizeT 				_sizeOfSelf,
-		Type 				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy, 
-		StreamFormatter_FormatFunction*	_format );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LINEFORMATTER_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                StreamFormatter_FormatFunction*  _format
+
+	#define LINEFORMATTER_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        _format
+
+	LineFormatter* _LineFormatter_New(  LINEFORMATTER_DEFARGS  );
 
 	/** Init interface. */
 	void _LineFormatter_Init(
@@ -93,6 +100,7 @@
 
 
 #endif /* __Base_IO_LineFormatter_h__ */
+
 
 
 

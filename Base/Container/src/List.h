@@ -66,14 +66,21 @@
 	** Constructors
 	*/
 
-	#define LIST_DEFARGS		\
-		STG_CLASS_DEFARGS
 
-	#define LIST_PASSARGS		\
-		STG_CLASS_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LIST_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define LIST_PASSARGS \
+                STG_CLASS_PASSARGS
 
 	List* List_New();
-	List* _List_New( LIST_DEFARGS );
+	List* _List_New(  LIST_DEFARGS  );
 	void _List_Init( List* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -112,3 +119,4 @@
 	void List_Destruct( List* self );
 
 #endif /* __Base_Container_List_h__ */
+

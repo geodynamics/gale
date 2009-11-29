@@ -137,3 +137,5 @@ SizeT NewClass_GetMemUsage( const void* _self ) {
    Stg_Class_Delete( ptrs );
    return mem;
 }
+
+

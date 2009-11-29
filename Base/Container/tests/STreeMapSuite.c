@@ -93,3 +93,5 @@ void STreeMapSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, STreeMapSuite_TestInsert );
    pcu_suite_addTest( suite, STreeMapSuite_TestMap );
 }
+
+

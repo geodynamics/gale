@@ -66,12 +66,18 @@
 	void EntryPoint_Register_Init( void* entryPoint_Register );
 	
 	/* Creation implementation / Virtual constructor */
-	EntryPoint_Register* _EntryPoint_Register_New( 
-		SizeT				_sizeOfSelf,
-		Type				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ENTRYPOINT_REGISTER_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define ENTRYPOINT_REGISTER_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	EntryPoint_Register* _EntryPoint_Register_New(  ENTRYPOINT_REGISTER_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _EntryPoint_Register_Init( void* entryPoint_Register );
@@ -98,3 +104,4 @@
 	EntryPoint_Index EntryPoint_Register_Find( void* entryPoint_Register, void* entryPoint );
 	
 #endif /* __Base_Extensibility_EntryPoint_Register_h__ */
+

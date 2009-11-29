@@ -104,3 +104,5 @@ Bool STreeMap_HasKey( const void* _self, const void* key ) {
 
    return STree_Has( self, key );
 }
+
+

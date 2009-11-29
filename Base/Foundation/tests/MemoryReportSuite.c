@@ -570,3 +570,5 @@ void MemoryReportSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, MemoryReportSuite_TestReportPrintsFour );
    #endif
 }
+
+

@@ -345,3 +345,5 @@ Bool Stg_DirectoryExists( const char* path ) {
 	}
         return (info.st_mode & S_IFDIR);
 }
+
+

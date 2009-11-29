@@ -54,12 +54,14 @@ Stg_CallGraph* stgCallGraph = 0;
 
 
 Stg_CallGraph* Stg_CallGraph_New() {
-	return _Stg_CallGraph_New(
-		sizeof(Stg_CallGraph),
-		Stg_CallGraph_Type,
-		_Stg_CallGraph_Delete,
-		_Stg_CallGraph_Print,
-		_Stg_CallGraph_Copy );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(Stg_CallGraph);
+	Type                              type = Stg_CallGraph_Type;
+	Stg_Class_DeleteFunction*      _delete = _Stg_CallGraph_Delete;
+	Stg_Class_PrintFunction*        _print = _Stg_CallGraph_Print;
+	Stg_Class_CopyFunction*          _copy = _Stg_CallGraph_Copy;
+
+	return _Stg_CallGraph_New(  STG_CALLGRAPH_PASSARGS  );
 }
 
 void Stg_CallGraph_Init( void* callGraph ) {
@@ -80,12 +82,7 @@ void Stg_CallGraph_Init( void* callGraph ) {
 	_Stg_CallGraph_Init( self );
 };
 
-Stg_CallGraph* _Stg_CallGraph_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print, 
-		Stg_Class_CopyFunction*				_copy )
+Stg_CallGraph* _Stg_CallGraph_New(  STG_CALLGRAPH_DEFARGS  )
 {
 	Stg_CallGraph* self;
 	
@@ -94,7 +91,7 @@ Stg_CallGraph* _Stg_CallGraph_New(
 		_sizeOfSelf >= sizeof(Stg_CallGraph), 
 		Journal_Register( Error_Type, Stg_CallGraph_Type ), 
 		"Attempting to construct an object that is smaller than this class" );
-	self = (Stg_CallGraph*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (Stg_CallGraph*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* General info */
 	
@@ -354,3 +351,5 @@ void Stg_CallGraph_Pop( void* callGraph ) {
 	self->_stack = oldStack->pop;
 	Memory_Free( oldStack );
 }
+
+

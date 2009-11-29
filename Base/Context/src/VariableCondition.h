@@ -132,43 +132,44 @@
 	see VariableCondition.h for details */
 	struct _VariableCondition { __VariableCondition };
 	
-	#define VARIABLECONDITION_DEFARGS	\
-		STG_COMPONENT_DEFARGS,	\
-			VariableCondition_BuildSelfFunc*				_buildSelf,	\
-			VariableCondition_PrintConciseFunc*			_printConcise, \
-			VariableCondition_ReadDictionaryFunc*		_readDictionary, \
-			VariableCondition_GetSetFunc*					_getSet, \
-			VariableCondition_GetVariableCountFunc		_getVariableCount, \
-			VariableCondition_GetVariableIndexFunc*	_getVariableIndex, \
-			VariableCondition_GetValueIndexFunc*		_getValueIndex, \
-			VariableCondition_GetValueCountFunc*		_getValueCount, \
-			VariableCondition_GetValueFunc*				_getValue, \
-			VariableCondition_ApplyFunc*					_apply, \
-			Variable_Register*								variable_Register, \
-			ConditionFunction_Register*					conFunc_Register, \
-			Dictionary*											dictionary 
 
-	#define VARIABLECONDITION_PASSARGS	\
-		STG_COMPONENT_PASSARGS,		\
-			_buildSelf,	\
-			_printConcise, \
-			_readDictionary, \
-			_getSet, \
-			_getVariableCount, \
-			_getVariableIndex, \
-			_getValueIndex, \
-			_getValueCount, \
-			_getValue, \
-			_apply, \
-			variable_Register, \
-			conFunc_Register, \
-			dictionary 
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
-	VariableCondition* _VariableCondition_New( VARIABLECONDITION_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define VARIABLECONDITION_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                VariableCondition_BuildSelfFunc*                _buildSelf, \
+                VariableCondition_PrintConciseFunc*          _printConcise, \
+                VariableCondition_ReadDictionaryFunc*      _readDictionary, \
+                VariableCondition_GetSetFunc*                      _getSet, \
+                VariableCondition_GetVariableCountFunc   _getVariableCount, \
+                VariableCondition_GetVariableIndexFunc*  _getVariableIndex, \
+                VariableCondition_GetValueIndexFunc*        _getValueIndex, \
+                VariableCondition_GetValueCountFunc*        _getValueCount, \
+                VariableCondition_GetValueFunc*                  _getValue, \
+                VariableCondition_ApplyFunc*                        _apply
+
+	#define VARIABLECONDITION_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _buildSelf,        \
+	        _printConcise,     \
+	        _readDictionary,   \
+	        _getSet,           \
+	        _getVariableCount, \
+	        _getVariableIndex, \
+	        _getValueIndex,    \
+	        _getValueCount,    \
+	        _getValue,         \
+	        _apply           
+
+	VariableCondition* _VariableCondition_New(  VARIABLECONDITION_DEFARGS  );
 	
 	void _VariableCondition_Init(
 		void*									variableCondition, 
@@ -251,3 +252,4 @@
 	void VariableCondition_PrintConcise( void* variableCondition, Stream* stream );
 	
 #endif /* __Base_Automation_VariableCondition_h__ */
+

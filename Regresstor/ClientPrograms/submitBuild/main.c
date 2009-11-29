@@ -339,3 +339,5 @@ int interpretResponse( SoapCtx* response, xmlChar** buildID ) {
 	printf( "Regresstor: Successfully submited build.\n" );
 	return 1;
 }
+
+

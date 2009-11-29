@@ -64,17 +64,18 @@
 	void MPIStream_Init( MPIStream* self, Name name );
 
 	/** Constructor interface. */
-	MPIStream* _MPIStream_New( 
-		SizeT			_sizeOfSelf, 
-		Type			type, 
-		Stg_Class_DeleteFunction*	_delete, 
-		Stg_Class_PrintFunction* 	_print,
-		Stg_Class_CopyFunction*	_copy, 
-		Name			name,
-		Stream_PrintfFunction*	_printf, 
-		Stream_WriteFunction*	_write, 
-		Stream_DumpFunction*	_dump,
-		Stream_SetFileFunction*	_setFile );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MPISTREAM_DEFARGS \
+                STREAM_DEFARGS
+
+	#define MPISTREAM_PASSARGS \
+                STREAM_PASSARGS
+
+	MPIStream* _MPIStream_New(  MPISTREAM_DEFARGS  );
 
 	/** Init interface. */
 	void _MPIStream_Init( MPIStream *self );
@@ -103,6 +104,7 @@
 	SizeT MPIStream_WriteAllProcessors( Stream* stream, void *data, SizeT elem_size, SizeT num_elems, MPI_Comm communicator ) ;
 	
 #endif /* __IO_MPIStreamFile_h__ */
+
 
 
 

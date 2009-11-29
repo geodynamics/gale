@@ -51,8 +51,15 @@ const char* PREPEND = ": ";
 
 StreamFormatter* RankFormatter_New()
 {
-	return (StreamFormatter*)_RankFormatter_New( sizeof(RankFormatter), RankFormatter_Type,
-		_RankFormatter_Delete, _RankFormatter_Print, _LineFormatter_Copy, _LineFormatter_Format );
+	/* Variables set in this function */
+	SizeT                            _sizeOfSelf = sizeof(RankFormatter);
+	Type                                    type = RankFormatter_Type;
+	Stg_Class_DeleteFunction*            _delete = _RankFormatter_Delete;
+	Stg_Class_PrintFunction*              _print = _RankFormatter_Print;
+	Stg_Class_CopyFunction*                _copy = _LineFormatter_Copy;
+	StreamFormatter_FormatFunction*      _format = _LineFormatter_Format;
+
+	return (StreamFormatter*)_RankFormatter_New(  RANKFORMATTER_PASSARGS  );
 }
 	
 void RankFormatter_Init( RankFormatter* self )
@@ -67,19 +74,13 @@ void RankFormatter_Init( RankFormatter* self )
 	_RankFormatter_Init( self, _LineFormatter_Format );
 }
 
-RankFormatter* _RankFormatter_New(
-	SizeT 				_sizeOfSelf,
-	Type 				type,
-	Stg_Class_DeleteFunction*		_delete,
-	Stg_Class_PrintFunction*		_print,
-	Stg_Class_CopyFunction*		_copy, 
-	StreamFormatter_FormatFunction*	_format )
+RankFormatter* _RankFormatter_New(  RANKFORMATTER_DEFARGS  )
 {
 	RankFormatter* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(RankFormatter) );
-	self = (RankFormatter*)_LineFormatter_New( _sizeOfSelf, type, _delete, _print, _copy, _format );
+	self = (RankFormatter*)_LineFormatter_New(  LINEFORMATTER_PASSARGS  );
 	
 	_RankFormatter_Init( self, _format );
 
@@ -144,5 +145,7 @@ void _RankFormatter_Print( void* formatter, Stream* stream )
 	
 	_LineFormatter_Print( formatter, stream );
 }
+
+
 
 

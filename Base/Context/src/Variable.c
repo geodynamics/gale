@@ -70,64 +70,62 @@ Variable* Variable_New(
 		void**						arrayPtrPtr,
 		Variable_Register*				vr )
 {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Variable);
+	Type                                                      type = Variable_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Variable_Delete;
+	Stg_Class_PrintFunction*                                _print = _Variable_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Variable_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Variable_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Variable_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Variable_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Variable_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Variable_Destroy;
+	Bool                                                  initFlag = True;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
 	Variable*	self;
 	
-	self = _Variable_New( 
-		sizeof(Variable), 
-		Variable_Type, 
-		_Variable_Delete, 
-		_Variable_Print, 
-		_Variable_Copy,
-		(Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew,
-		_Variable_AssignFromXML,
-		_Variable_Build, 
-		_Variable_Initialise, 
-		_Variable_Execute, 
-		_Variable_Destroy,
-		name,
-		True,
-		dataCount, 
-		dataOffsets, 
-		dataTypes, 
-		dataTypeCounts, 
-		dataNames, 
-		structSizePtr, 
-		arraySizePtr,
-		arraySizeFunc,
-		arrayPtrPtr, 
-		vr );
+	self = _Variable_New(  VARIABLE_PASSARGS  );
 	
 	return self;
 }
 
 Variable* Variable_DefaultNew( Name name )
 {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Variable);
+	Type                                                      type = Variable_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Variable_Delete;
+	Stg_Class_PrintFunction*                                _print = _Variable_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Variable_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Variable_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Variable_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Variable_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Variable_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Variable_Destroy;
+	Bool                                                  initFlag = False;
+	Index                                                dataCount = 0;
+	SizeT*                                             dataOffsets = NULL;
+	Variable_DataType*                                   dataTypes = NULL;
+	Index*                                          dataTypeCounts = NULL;
+	Name*                                                dataNames = NULL;
+	SizeT*                                           structSizePtr = NULL;
+	Index*                                            arraySizePtr = NULL;
+	Variable_ArraySizeFunc*                          arraySizeFunc = NULL;
+	void**                                             arrayPtrPtr = NULL;
+	Variable_Register*                                          vr = NULL;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
 	Variable*	self;
 	
-	self = _Variable_New( 
-		sizeof(Variable), 
-		Variable_Type, 
-		_Variable_Delete, 
-		_Variable_Print, 
-		_Variable_Copy,
-		(Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew,
-		_Variable_AssignFromXML,
-		_Variable_Build, 
-		_Variable_Initialise, 
-		_Variable_Execute, 
-		_Variable_Destroy,
-		name,
-		False,
-		0, 
-		NULL, 
-		NULL, 
-		NULL, 
-		NULL, 
-		NULL, 
-		NULL,
-		NULL, 
-		NULL,
-		NULL );
+	self = _Variable_New(  VARIABLE_PASSARGS  );
 	
 	return self;
 }
@@ -140,6 +138,26 @@ Variable* Variable_NewScalar(
 		void**						arrayPtrPtr,
 		Variable_Register*				vr )
 {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Variable);
+	Type                                                      type = Variable_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Variable_Delete;
+	Stg_Class_PrintFunction*                                _print = _Variable_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Variable_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Variable_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Variable_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Variable_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Variable_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Variable_Destroy;
+	Bool                                                  initFlag = True;
+	Index                                                dataCount = 1;
+	Name*                                                dataNames = 0;
+	SizeT*                                           structSizePtr = 0;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
 	Variable*		self;
 	SizeT			dataOffsets[] = { 0 };
 	Variable_DataType	dataTypes[] = { 0 };		/* Init value later */
@@ -147,30 +165,7 @@ Variable* Variable_NewScalar(
 	
 	dataTypes[0] = dataType;
 	
-	self = _Variable_New( 
-		sizeof(Variable), 
-		Variable_Type, 
-		_Variable_Delete, 
-		_Variable_Print, 
-		_Variable_Copy,
-		(Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew,
-		_Variable_AssignFromXML,
-		_Variable_Build, 
-		_Variable_Initialise, 
-		_Variable_Execute,
-		_Variable_Destroy,
-		name,
-		True,
-		1, 
-		dataOffsets, 
-		dataTypes, 
-		dataTypeCounts, 
-		0, /* no component names */
-		0, /* means work out from dataType at build phase */
-		arraySizePtr,
-		arraySizeFunc,
-		arrayPtrPtr, 
-		vr );
+	self = _Variable_New(  VARIABLE_PASSARGS  );
 	
 	return self;
 }
@@ -185,6 +180,25 @@ Variable* Variable_NewVector(
 		Variable_Register*				vr,
 		... 						/* vector component names */ )
 {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Variable);
+	Type                                                      type = Variable_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Variable_Delete;
+	Stg_Class_PrintFunction*                                _print = _Variable_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Variable_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Variable_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Variable_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Variable_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Variable_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Variable_Destroy;
+	Bool                                                  initFlag = True;
+	Index                                                dataCount = 1;
+	SizeT*                                           structSizePtr = 0;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
 	Variable*		self;
 	SizeT			dataOffsets[] = { 0 };
 	Variable_DataType	dataTypes[] = { 0 };				/* Init later... */
@@ -204,30 +218,7 @@ Variable* Variable_NewVector(
 	}
 	va_end( ap );
 	
-	self = _Variable_New( 
-		sizeof(Variable), 
-		Variable_Type, 
-		_Variable_Delete, 
-		_Variable_Print, 
-		_Variable_Copy, 
-		(Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew,
-		_Variable_AssignFromXML,
-		_Variable_Build, 
-		_Variable_Initialise, 
-		_Variable_Execute, 
-		_Variable_Destroy,
-		name,
-		True,
-		1, 
-		dataOffsets, 
-		dataTypes, 
-		dataTypeCounts, 
-		dataNames,
-		0, /* means work out from dataType at build phase */
-		arraySizePtr,
-		arraySizeFunc,
-		arrayPtrPtr, 
-		vr );
+	self = _Variable_New(  VARIABLE_PASSARGS  );
 
 	Memory_Free( dataNames );
 	
@@ -244,6 +235,25 @@ Variable* Variable_NewVector2(
 		Variable_Register*				vr,
 		char**						dataNames )
 {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Variable);
+	Type                                                      type = Variable_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Variable_Delete;
+	Stg_Class_PrintFunction*                                _print = _Variable_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Variable_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void*)Variable_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Variable_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Variable_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Variable_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Variable_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Variable_Destroy;
+	Bool                                                  initFlag = True;
+	Index                                                dataCount = 1;
+	SizeT*                                           structSizePtr = 0;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
 	Variable*		self;
 	SizeT			dataOffsets[] = { 0 };
 	Variable_DataType	dataTypes[] = { 0 };
@@ -252,30 +262,7 @@ Variable* Variable_NewVector2(
 	dataTypes[0] = dataType;
 	dataTypeCounts[0] = dataTypeCount;
 
-	self = _Variable_New( 
-		sizeof(Variable), 
-		Variable_Type, 
-		_Variable_Delete, 
-		_Variable_Print, 
-		_Variable_Copy, 
-		(void*)Variable_DefaultNew,
-		_Variable_AssignFromXML,
-		_Variable_Build, 
-		_Variable_Initialise, 
-		_Variable_Execute, 
-		_Variable_Destroy,
-		name,
-		True,
-		1, 
-		dataOffsets, 
-		dataTypes, 
-		dataTypeCounts, 
-		dataNames,
-		0, /* means work out from dataType at build phase */
-		arraySizePtr,
-		arraySizeFunc,
-		arrayPtrPtr, 
-		vr );
+	self = _Variable_New(  VARIABLE_PASSARGS  );
 
 	return self;
 }
@@ -329,37 +316,18 @@ void Variable_Init(
 }
 
 
-Variable* _Variable_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*		_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*			_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name						name,
-		Bool						initFlag,
-		Index						dataCount,
-		SizeT*						dataOffsets,
-		Variable_DataType*				dataTypes,
-		Index*						dataTypeCounts,
-		Name*						dataNames,
-		SizeT*						structSizePtr,
-		Index*						arraySizePtr,
-		Variable_ArraySizeFunc*				arraySizeFunc,
-		void**						arrayPtrPtr,
-		Variable_Register*				vr )
+Variable* _Variable_New(  VARIABLE_DEFARGS  )
 {
 	Variable*	self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Variable) );
-	self = (Variable*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-					      _construct, _build, _initialise, _execute, _destroy, name, NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (Variable*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* General info */
 	
@@ -1227,3 +1195,5 @@ double Variable_ValueCompare( void* variable, void* _comparison ) {
 Bool Variable_ValueCompareWithinTolerance( void* variable, void* comparison, double tolerance ) {
 	return ( Variable_ValueCompare( variable, comparison ) < tolerance );
 }
+
+

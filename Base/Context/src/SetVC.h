@@ -59,13 +59,7 @@
 
 	struct _SetVC { __SetVC };
 
-	#define SETVC_DEFARGS \
-    	VARIABLECONDITION_DEFARGS, \
-			Name _dictionaryEntryName 
 
-	#define SETVC_PASSARGS \
-    	VARIABLECONDITION_PASSARGS, \
-			_dictionaryEntryName
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
@@ -86,7 +80,18 @@
 	
 	SetVC* _SetVC_DefaultNew( Name name );
 	
-	SetVC* _SetVC_New( SETVC_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SETVC_DEFARGS \
+                VARIABLECONDITION_DEFARGS
+
+	#define SETVC_PASSARGS \
+                VARIABLECONDITION_PASSARGS
+
+	SetVC* _SetVC_New(  SETVC_DEFARGS  );
 	
 	void _SetVC_Init( void* setVC, Name _dictionaryEntryName );
 	
@@ -147,3 +152,4 @@
 	*/
 
 #endif /* __Base_Automation_SetVC_h__ */
+

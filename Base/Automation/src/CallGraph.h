@@ -89,12 +89,18 @@
 	void Stg_CallGraph_Init( void* callGraph );
 	
 	/* Creation implementation */
-	Stg_CallGraph* _Stg_CallGraph_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print, 
-		Stg_Class_CopyFunction*				_copy );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STG_CALLGRAPH_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define STG_CALLGRAPH_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	Stg_CallGraph* _Stg_CallGraph_New(  STG_CALLGRAPH_DEFARGS  );
 	
 	
 	/* Class Administration members ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -127,3 +133,4 @@
 	void Stg_CallGraph_Pop( void* callGraph );
 	
 #endif /* __Base_Automation_Stg_CallGraph_h__ */
+

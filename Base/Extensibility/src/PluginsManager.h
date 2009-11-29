@@ -64,18 +64,18 @@
 	PluginsManager* PluginsManager_New( void );
 	
 	/* Creation implementation / Virtual constructor */
-	PluginsManager* _PluginsManager_New( 
-		SizeT                                   _sizeOfSelf,
-		Type                                    type,
-		Stg_Class_DeleteFunction*               _delete,
-		Stg_Class_PrintFunction*                _print,
-		Stg_Class_CopyFunction*                 _copy, 
-		ModulesManager_GetModulesListFunction*  _getModulesList,
-		ModulesManager_LoadModuleFunction*	_loadModule,
-		ModulesManager_UnloadModuleFunction*	_unloadModule,
-		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
-		ModulesManager_CheckContextFunction*	_checkContext,
-		ModulesManager_GetModuleNameFunction*	_getModuleName );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PLUGINSMANAGER_DEFARGS \
+                MODULESMANAGER_DEFARGS
+
+	#define PLUGINSMANAGER_PASSARGS \
+                MODULESMANAGER_PASSARGS
+
+	PluginsManager* _PluginsManager_New(  PLUGINSMANAGER_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _PluginsManager_Init( void* pluginsManager );
@@ -105,3 +105,4 @@
 	#define PluginsManager_Submit ModulesManager_Submit
 	
 #endif /* __Base_Extensibility_PluginsManager_h__ */
+

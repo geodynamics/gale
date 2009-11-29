@@ -63,14 +63,21 @@
 	** Constructors
 	*/
 
-	#define UINTMAP_DEFARGS		\
-		STG_CLASS_DEFARGS
 
-	#define UINTMAP_PASSARGS	\
-		STG_CLASS_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define UINTMAP_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define UINTMAP_PASSARGS \
+                STG_CLASS_PASSARGS
 
 	UIntMap* UIntMap_New();
-	UIntMap* _UIntMap_New( UINTMAP_DEFARGS );
+	UIntMap* _UIntMap_New(  UINTMAP_DEFARGS  );
 	void _UIntMap_Init( UIntMap* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -107,3 +114,4 @@
 	void UIntMap_ParseNode( void* data, void* _parseStruct );
 
 #endif /* __Base_Container_UIntMap_h__ */
+

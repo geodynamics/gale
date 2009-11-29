@@ -44,25 +44,11 @@ const Type MemoryPool_Type = "MemoryPool";
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
-MemoryPool* _MemoryPool_New(
-			SizeT							_sizeOfSelf,
-			Type							type,
-			Stg_Class_DeleteFunction*			_delete,
-			Stg_Class_PrintFunction*			_print,
-			Stg_Class_CopyFunction*				_copy,
-			int									elementSize,
-			int									numElements,
-			int									delta
-			)
+MemoryPool* _MemoryPool_New(  MEMORYPOOL_DEFARGS  )
 {
 	MemoryPool *self = NULL;
 
-	self = (MemoryPool*)_Stg_Class_New(
-							_sizeOfSelf,
-							type,
-							_delete,
-							_print,
-							_copy);
+	self = (MemoryPool*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 
 	self->numMemChunks = 1;
 	self->delta = delta;
@@ -78,19 +64,17 @@ MemoryPool* _MemoryPool_New(
 
 MemoryPool* MemoryPool_NewFunc( SizeT elementSize, int numElements, int delta )
 {
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(MemoryPool);
+	Type                              type = MemoryPool_Type;
+	Stg_Class_DeleteFunction*      _delete = _MemoryPool_DeleteFunc;
+	Stg_Class_PrintFunction*        _print = _MemoryPool_PrintFunc;
+	Stg_Class_CopyFunction*          _copy = NULL;
+
 	
 	MemoryPool* self;
 	
-	self = _MemoryPool_New( 
-		   					sizeof(MemoryPool),
-							MemoryPool_Type,
-							_MemoryPool_DeleteFunc,
-							_MemoryPool_PrintFunc,
-							NULL,
-							elementSize,
-							numElements,
-							delta
-							);
+	self = _MemoryPool_New(  MEMORYPOOL_PASSARGS  );
 
 	/* Virtual functions */
 	_MemoryPool_Init( self );
@@ -358,4 +342,6 @@ void MemoryPool_SetCallbackFuncArg( MemoryPool *memPool, void *callbackFuncArg )
 	assert( memPool );
 	memPool->callbackFuncArg = callbackFuncArg;
 }
+
+
 

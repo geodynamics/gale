@@ -55,13 +55,18 @@
 	** Constructor
 	*/
 		/* Creation implementation */
-	LiveComponentRegister* _LiveComponentRegister_New( 
-		SizeT					_sizeOfSelf, 
-		Type					type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print, 
-		Stg_Class_CopyFunction*			_copy
-		);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LIVECOMPONENTREGISTER_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define LIVECOMPONENTREGISTER_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	LiveComponentRegister* _LiveComponentRegister_New(  LIVECOMPONENTREGISTER_DEFARGS  );
 	
 	LiveComponentRegister* LiveComponentRegister_New(  );
 
@@ -102,3 +107,4 @@
 
 	void LiveComponentRegister_PrintSimilar( void* liveComponentRegister, Name name, Stream* stream, unsigned int number ) ;
 #endif /* __Base_Automation_LiveComponentRegister_h__ */
+

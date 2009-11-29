@@ -51,9 +51,15 @@ ConditionFunction_Register* condFunc_Register = 0;
 */
 
 ConditionFunction_Register* ConditionFunction_Register_New(void)
-{ 
-	return _ConditionFunction_Register_New( sizeof(ConditionFunction_Register), ConditionFunction_Register_Type, 
-		_ConditionFunction_Register_Delete, _ConditionFunction_Register_Print, NULL);
+{
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(ConditionFunction_Register);
+	Type                              type = ConditionFunction_Register_Type;
+	Stg_Class_DeleteFunction*      _delete = _ConditionFunction_Register_Delete;
+	Stg_Class_PrintFunction*        _print = _ConditionFunction_Register_Print;
+	Stg_Class_CopyFunction*          _copy = NULL;
+ 
+	return _ConditionFunction_Register_New(  CONDITIONFUNCTION_REGISTER_PASSARGS  );
 }
 
 
@@ -76,17 +82,12 @@ void ConditionFunction_Register_Init(ConditionFunction_Register* self)
 }
 
 
-ConditionFunction_Register* _ConditionFunction_Register_New( 
-				SizeT			_sizeOfSelf,
-				Type			type,
-				Stg_Class_DeleteFunction*	_delete,
-				Stg_Class_PrintFunction*	_print, 
-				Stg_Class_CopyFunction*	_copy )
+ConditionFunction_Register* _ConditionFunction_Register_New(  CONDITIONFUNCTION_REGISTER_DEFARGS  )
 {
 	ConditionFunction_Register*	self;
 	
 	/* Allocate memory */
-	self = (ConditionFunction_Register*)_Stg_Class_New(_sizeOfSelf, type, _delete, _print, _copy);
+	self = (ConditionFunction_Register*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -220,3 +221,5 @@ void ConditionFunction_Register_PrintNameOfEachFunc( void* conditionFunction_Reg
 		Journal_Printf( stream, "\"%s\", ", self->_cf[cf_I]->name );
 	}
 }
+
+

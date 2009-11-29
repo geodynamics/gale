@@ -60,23 +60,13 @@ static const int STREAM_CHILDREN_DELTA = 4;	/**< Number of streams to resize by 
 /** Returns True if the current process is allowed to print. */
 Bool _Stream_IsPrintingRank( Stream* stream );
 
-Stream* _Stream_New(
-	SizeT			_sizeOfSelf,
-	Type			type,
-	Stg_Class_DeleteFunction*	_delete,
-	Stg_Class_PrintFunction*	_print,
-	Stg_Class_CopyFunction*	_copy, 
-	Name			name,
-	Stream_PrintfFunction*	_printf,
-	Stream_WriteFunction*	_write,
-	Stream_DumpFunction*	_dump,
-	Stream_SetFileFunction*	_setFile )
+Stream* _Stream_New(  STREAM_DEFARGS  )
 {
 	Stream* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Stream) );
-	self = (Stream*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (Stream*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
                                                                                 
 	_Stream_Init( self, name, _printf, _write, _dump, _setFile );
 
@@ -717,3 +707,5 @@ Bool _Stream_IsPrintingRank( Stream* stream )
 
 	return True;
 }
+
+

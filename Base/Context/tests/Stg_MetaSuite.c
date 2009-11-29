@@ -119,3 +119,5 @@ void Stg_MetaSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, Stg_MetaSuite_Setup, Stg_MetaSuite_Teardown );
    pcu_suite_addTest( suite, Stg_MetaSuite_TestGetFunctions );
 }
+
+

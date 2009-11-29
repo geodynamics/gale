@@ -89,12 +89,12 @@ const Type AbstractContext_Dict_Components =	"components";
 const Type AbstractContext_Type = "Context";
 const Type AbstractContext_Type_Verbose = "Context-verbose";
 
-AbstractContext* _AbstractContext_New( ABSTRACTCONTEXT_DEFARGS ) {
+AbstractContext* _AbstractContext_New(  ABSTRACTCONTEXT_DEFARGS  ) {
 	AbstractContext* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(AbstractContext) );
-	self = (AbstractContext*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(AbstractContext) );
+	self = (AbstractContext*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* General info */
 	self->dictionary = dictionary;
@@ -1159,3 +1159,5 @@ void _AbstractContext_CreateCheckpointDirectory( void* _context ) {
       MPI_Barrier( self->communicator );
    }
 }
+
+

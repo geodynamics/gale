@@ -73,3 +73,5 @@ void IndexMapSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, IndexMapSuite_Setup, IndexMapSuite_Teardown );
    pcu_suite_addTest( suite, IndexMapSuite_TestAppendFind );
 }
+
+

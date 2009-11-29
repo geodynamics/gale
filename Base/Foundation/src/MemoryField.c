@@ -311,3 +311,5 @@ unsigned int _MemoryField_CalcLongestSubFieldNameLen( MemoryField* memoryField )
 
 	return longestSubFieldNameLen;
 }
+
+

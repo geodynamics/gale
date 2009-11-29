@@ -94,3 +94,5 @@ void Variable_RegisterSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, Variable_RegisterSuite_Setup, Variable_RegisterSuite_Teardown );
    pcu_suite_addTest( suite, Variable_RegisterSuite_TestAddGet );
 }
+
+

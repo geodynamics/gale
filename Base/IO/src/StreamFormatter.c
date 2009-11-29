@@ -42,19 +42,13 @@
 
 const Type StreamFormatter_Type = "StreamFormatter";
 
-StreamFormatter* _StreamFormatter_New(
-	SizeT 				_sizeOfSelf,
-	Type 				type,
-	Stg_Class_DeleteFunction*		_delete,
-	Stg_Class_PrintFunction*		_print,
-	Stg_Class_CopyFunction*		_copy, 
-	StreamFormatter_FormatFunction*	_format )
+StreamFormatter* _StreamFormatter_New(  STREAMFORMATTER_DEFARGS  )
 {
 	StreamFormatter* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(StreamFormatter) );
-	self = (StreamFormatter*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (StreamFormatter*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
                                                                                 
 	_StreamFormatter_Init( self, _format );
 
@@ -169,3 +163,5 @@ char* StreamFormatter_Buffer_AllocNext( Index size ) {
 
 	return *stgStreamFormatter_Buffer->current;
 }
+
+

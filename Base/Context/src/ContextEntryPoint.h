@@ -69,15 +69,18 @@
 	void ContextEntryPoint_Init( void* contextEntryPoint, Name name, unsigned int castType );
 	
 	/* Creation implementation */
-	ContextEntryPoint* _ContextEntryPoint_New( 
-		SizeT				_sizeOfSelf,
-		Type				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy, 
-		EntryPoint_GetRunFunction*	_getRun,
-		Name				name,
-		unsigned int			castType );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CONTEXTENTRYPOINT_DEFARGS \
+                ENTRYPOINT_DEFARGS
+
+	#define CONTEXTENTRYPOINT_PASSARGS \
+                ENTRYPOINT_PASSARGS
+
+	ContextEntryPoint* _ContextEntryPoint_New(  CONTEXTENTRYPOINT_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _ContextEntryPoint_Init( ContextEntryPoint* self );
@@ -93,3 +96,4 @@
 	void _ContextEntryPoint_Run_Step( void* contextEntryPoint, void* data0, double data1 );
 	
 #endif /* __Base_Context_ContextEntryPoint_h__ */
+

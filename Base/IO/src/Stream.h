@@ -90,17 +90,28 @@
 	struct Stream { __Stream };
 
 	/** Constructor interface. */
-	Stream* _Stream_New(
-		SizeT			_sizeOfSelf,
-		Type			type,
-		Stg_Class_DeleteFunction*	_delete,
-		Stg_Class_PrintFunction*	_print,
-		Stg_Class_CopyFunction*	_copy, 
-		Name			name,
-		Stream_PrintfFunction*	_printf,
-		Stream_WriteFunction*	_write,
-		Stream_DumpFunction*	_dump,
-		Stream_SetFileFunction*	_setFile );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STREAM_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                Name                         name, \
+                Stream_PrintfFunction*    _printf, \
+                Stream_WriteFunction*      _write, \
+                Stream_DumpFunction*        _dump, \
+                Stream_SetFileFunction*  _setFile
+
+	#define STREAM_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        name,     \
+	        _printf,  \
+	        _write,   \
+	        _dump,    \
+	        _setFile
+
+	Stream* _Stream_New(  STREAM_DEFARGS  );
 		
 	/** Init interface. */
 	void _Stream_Init(
@@ -263,3 +274,4 @@
 	void Stream_CloseAndFreeFile( void* stream ) ;
 
 #endif /* __Base_IO_Stream_h__ */
+

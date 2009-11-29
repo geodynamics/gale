@@ -49,8 +49,14 @@ const Type ConditionFunction_Type = "ConditionFunction";
 
 ConditionFunction* ConditionFunction_New(ConditionFunction_ApplyFunc* apply, Name name)
 {
-	return _ConditionFunction_New(sizeof(ConditionFunction), ConditionFunction_Type, _ConditionFunction_Delete,
-		_ConditionFunction_Print, NULL, apply, name);
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(ConditionFunction);
+	Type                              type = ConditionFunction_Type;
+	Stg_Class_DeleteFunction*      _delete = _ConditionFunction_Delete;
+	Stg_Class_PrintFunction*        _print = _ConditionFunction_Print;
+	Stg_Class_CopyFunction*          _copy = NULL;
+
+	return _ConditionFunction_New(  CONDITIONFUNCTION_PASSARGS  );
 }
 
 
@@ -73,20 +79,13 @@ void ConditionFunction_Init(ConditionFunction* self, ConditionFunction_ApplyFunc
 }
 
 
-ConditionFunction* _ConditionFunction_New( 
-		SizeT				_sizeOfSelf, 
-		Type				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print, 
-		Stg_Class_CopyFunction*		_copy, 
-		ConditionFunction_ApplyFunc*	apply,
-		Name				name)
+ConditionFunction* _ConditionFunction_New(  CONDITIONFUNCTION_DEFARGS  )
 {
 	ConditionFunction* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ConditionFunction) );
-	self = (ConditionFunction*)_Stg_Class_New(_sizeOfSelf, type, _delete, _print, _copy);
+	self = (ConditionFunction*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* General info */
 	
@@ -169,3 +168,5 @@ void _ConditionFunction_Apply(void* conditionFunction, Index index, Variable_Ind
 	
 	ConditionFunction_Apply(self, index, var_I, context, result);
 }
+
+

@@ -64,13 +64,20 @@
 
 
 	/** Constructor interface. */
-	StreamFormatter* _StreamFormatter_New(
-		SizeT 				_sizeOfSelf,
-		Type 				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy, 
-		StreamFormatter_FormatFunction*	_format );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STREAMFORMATTER_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                StreamFormatter_FormatFunction*  _format
+
+	#define STREAMFORMATTER_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        _format
+
+	StreamFormatter* _StreamFormatter_New(  STREAMFORMATTER_DEFARGS  );
 	
 	/** Init interface. */
 	void _StreamFormatter_Init(
@@ -108,3 +115,4 @@
 	char* StreamFormatter_Buffer_AllocNext( Index size );
 
 #endif /* __Base_IO_StreamFormatter_h__ */
+

@@ -494,3 +494,5 @@ void DictionarySuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, DictionarySuite_TestMerge );
    pcu_suite_addTest( suite, DictionarySuite_TestReadAllParamFromCommandLine );
 }
+
+

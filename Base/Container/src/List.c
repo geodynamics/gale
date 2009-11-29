@@ -50,19 +50,22 @@ const Type List_Type = "List";
 */
 
 List* List_New( Name name ) {
-	return _List_New( sizeof(List), 
-			  List_Type, 
-			  _List_Delete, 
-			  _List_Print, 
-			  NULL );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(List);
+	Type                              type = List_Type;
+	Stg_Class_DeleteFunction*      _delete = _List_Delete;
+	Stg_Class_PrintFunction*        _print = _List_Print;
+	Stg_Class_CopyFunction*          _copy = NULL;
+
+	return _List_New(  LIST_PASSARGS  );
 }
 
-List* _List_New( LIST_DEFARGS ) {
+List* _List_New(  LIST_DEFARGS  ) {
 	List*	self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(List) );
-	self = (List*)_Stg_Class_New( STG_CLASS_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(List) );
+	self = (List*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 
 	/* Virtual info */
 
@@ -260,3 +263,5 @@ void List_Destruct( List* self ) {
 	self->itemSize = 0;
 	self->maxItems = 0;
 }
+
+

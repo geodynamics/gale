@@ -83,32 +83,35 @@
 		Type													destroyType;
 	struct Stg_Component { __Stg_Component };
 
-	#define STG_COMPONENT_DEFARGS \
-		STG_CLASS_DEFARGS, \
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor, \
-		Stg_Component_ConstructFunction*				_construct, \
-		Stg_Component_BuildFunction*					_build, \
-		Stg_Component_InitialiseFunction*			_initialise, \
-		Stg_Component_ExecuteFunction*				_execute, \
-		Stg_Component_DestroyFunction*				_destroy, \
-		Name													name, \
-		AllocationType										nameAllocationType
 
-	#define STG_COMPONENT_PASSARGS \
-		STG_CLASS_PASSARGS, \
-			_defaultConstructor, \
-			_construct, \
-			_build, \
-			_initialise, \
-			_execute, \
-			_destroy, \
-			name, \
-			nameAllocationType
 	
 	/* No Stg_Component_New or Stg_Component_Init as this is an abstract class */
 	
 	/* Creation implementation */
-	Stg_Component* _Stg_Component_New( STG_COMPONENT_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STG_COMPONENT_DEFARGS \
+                STG_OBJECT_DEFARGS, \
+                Stg_Component_DefaultConstructorFunction*  _defaultConstructor, \
+                Stg_Component_ConstructFunction*                    _construct, \
+                Stg_Component_BuildFunction*                            _build, \
+                Stg_Component_InitialiseFunction*                  _initialise, \
+                Stg_Component_ExecuteFunction*                        _execute, \
+                Stg_Component_DestroyFunction*                        _destroy
+
+	#define STG_COMPONENT_PASSARGS \
+                STG_OBJECT_PASSARGS, \
+	        _defaultConstructor, \
+	        _construct,          \
+	        _build,              \
+	        _initialise,         \
+	        _execute,            \
+	        _destroy           
+
+	Stg_Component* _Stg_Component_New(  STG_COMPONENT_DEFARGS  );
 	
 	
 	/* Class Administration members ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -175,3 +178,4 @@
 
 	
 #endif /* __Base_Automation_Stg_Component_h__ */
+

@@ -41,14 +41,15 @@ typedef struct {
 } TestObject2;
 
 Stg_Object* TestObject2_New( Name name ) {
-	return _Stg_Object_New(
-		sizeof( TestObject2 ),
-		"TestObject",
-		_Stg_Object_Delete,
-		_Stg_Object_Print,
-		_Stg_Object_Copy, 
-		name,
-		NON_GLOBAL );
+	/* Variables set in this function */
+	SizeT                             _sizeOfSelf = sizeof( TestObject2 );
+	Type                                     type = "TestObject";
+	Stg_Class_DeleteFunction*             _delete = _Stg_Object_Delete;
+	Stg_Class_PrintFunction*               _print = _Stg_Object_Print;
+	Stg_Class_CopyFunction*                 _copy = _Stg_Object_Copy;
+	AllocationType             nameAllocationType = NON_GLOBAL;
+
+	return _Stg_Object_New(  STG_OBJECT_PASSARGS  );
 }
 
 typedef struct {
@@ -110,3 +111,5 @@ void NamedObject_Register2Suite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, NamedObject_RegisterSuite2_Setup, NamedObject_RegisterSuite2_Teardown );
    pcu_suite_addTest( suite, NamedObject_RegisterSuite2_TestDeleteAll );
 }
+
+

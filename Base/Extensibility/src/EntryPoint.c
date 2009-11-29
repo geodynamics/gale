@@ -62,8 +62,18 @@ static const Type _EntryPoint_Run_Type = "EntryPoint->Run";
  * \param name textual name of the entry point (useful if its to be stored in a list).
  * \return the allocated entry point. */
 EntryPoint* EntryPoint_New( const Name name, unsigned int castType ) {
-	return _EntryPoint_New( sizeof(EntryPoint), EntryPoint_Type, _EntryPoint_Delete, _EntryPoint_Print, _EntryPoint_Copy, _EntryPoint_GetRun,
-		name, castType );
+	/* Variables set in this function */
+	SizeT                       _sizeOfSelf = sizeof(EntryPoint);
+	Type                               type = EntryPoint_Type;
+	Stg_Class_DeleteFunction*       _delete = _EntryPoint_Delete;
+	Stg_Class_PrintFunction*         _print = _EntryPoint_Print;
+	Stg_Class_CopyFunction*           _copy = _EntryPoint_Copy;
+	EntryPoint_GetRunFunction*      _getRun = _EntryPoint_GetRun;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _EntryPoint_New(  ENTRYPOINT_PASSARGS  );
 }
 
 /** Initialise an existing entry point. See EntryPoint_New() for argument descriptions. */
@@ -87,21 +97,18 @@ void EntryPoint_Init( void* entryPoint, const Name name, unsigned int castType )
 	_EntryPoint_Init( self, castType );
 }
 
-EntryPoint* _EntryPoint_New( 
-		SizeT 				_sizeOfSelf, 
-		Type 				type, 
-		Stg_Class_DeleteFunction* 		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy, 
-		EntryPoint_GetRunFunction*	_getRun,
-		const Name 				name, 
-		unsigned int 			castType )
+EntryPoint* _EntryPoint_New(  ENTRYPOINT_DEFARGS  )
 {
 	EntryPoint* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(EntryPoint) );
-	self = (EntryPoint*)_Stg_Object_New( _sizeOfSelf, type, _delete, _print, _copy, name, GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = GLOBAL;
+
+	self = (EntryPoint*)_Stg_Object_New(  STG_OBJECT_PASSARGS  );
 	
 	/* General info */
 	
@@ -914,3 +921,5 @@ void EntryPoint_ErrorIfNoHooks( void* entryPoint, const char* parentFunction ) {
 			epName, parentFunction, epName );
 	}
 }
+
+

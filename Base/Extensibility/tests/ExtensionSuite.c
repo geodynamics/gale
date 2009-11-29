@@ -697,3 +697,5 @@ void ExtensionSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, ExtensionSuite_TestExtendOfExtendedArray );
    pcu_suite_addTest( suite, ExtensionSuite_TestCopyExtendedArray );
 }
+
+

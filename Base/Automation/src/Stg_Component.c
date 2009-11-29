@@ -53,26 +53,13 @@
 const Type Stg_Component_Type = "Stg_Component";
 
 
-Stg_Component* _Stg_Component_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*		_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name						name,
-		AllocationType					nameAllocationType )
+Stg_Component* _Stg_Component_New(  STG_COMPONENT_DEFARGS  )
 {
 	Stg_Component* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Stg_Component) );
-	self = (Stg_Component*)_Stg_Object_New( _sizeOfSelf, type, _delete, _print, _copy, name, nameAllocationType );
+	self = (Stg_Component*)_Stg_Object_New(  STG_OBJECT_PASSARGS  );
 	
 	/* General info */
 	
@@ -493,4 +480,6 @@ void Stg_Component_SetupStreamFromDictionary( void* component, Dictionary* dicti
 	}
 											
 }
+
+
 

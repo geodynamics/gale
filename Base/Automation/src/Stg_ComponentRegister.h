@@ -89,12 +89,18 @@
 	/* Class Administration members ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	
 	/** Constructor Implementation */
-	Stg_ComponentRegister *_Stg_ComponentRegister_New(
-		SizeT					_sizeOfSelf, 
-		Type					type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print, 
-		Stg_Class_CopyFunction*			_copy );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STG_COMPONENTREGISTER_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define STG_COMPONENTREGISTER_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	Stg_ComponentRegister *_Stg_ComponentRegister_New(  STG_COMPONENTREGISTER_DEFARGS  );
 	
 	Stg_ComponentRegister *Stg_ComponentRegister_New(  );
 	
@@ -187,3 +193,4 @@
 	Dictionary* Stg_ComponentRegisterElement_GetMetadata( Stg_ComponentRegisterElement* element );
 	
 #endif /* __Base_Automation_Stg_ComponentRegister_h__ */
+

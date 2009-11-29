@@ -218,3 +218,5 @@ void IArray_ZeroAll( IArray* self ) {
    self->ptr = NULL;
    self->own = True;
 }
+
+

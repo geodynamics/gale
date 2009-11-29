@@ -71,24 +71,13 @@ const char* Codelet_GetMetadata();
 /* Define memory for global pointer to moduleDirectories */
 Stg_ObjectList*  moduleDirectories = NULL;	
 
-ModulesManager* _ModulesManager_New(
-		SizeT                                   _sizeOfSelf,
-		Type                                    type,
-		Stg_Class_DeleteFunction*               _delete,
-		Stg_Class_PrintFunction*                _print,
-		Stg_Class_CopyFunction*                 _copy, 
-		ModulesManager_GetModulesListFunction*  _getModulesList,
-		ModulesManager_LoadModuleFunction*	_loadModule,
-		ModulesManager_UnloadModuleFunction*	_unloadModule,
-		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
-		ModulesManager_CheckContextFunction*	_checkContext,
-		ModulesManager_GetModuleNameFunction*	_getModuleName  )
+ModulesManager* _ModulesManager_New(  MODULESMANAGER_DEFARGS  )
 {
 	ModulesManager* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ModulesManager) );
-	self = (ModulesManager*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (ModulesManager*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* General info */
 	
@@ -498,3 +487,5 @@ Bool ModulesManager_ConstructModule( void* modulesManager, Name moduleName, Stg_
 
 	return True;
 }
+
+

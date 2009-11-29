@@ -77,3 +77,5 @@ const char* NewObject_GetName( void* self ) {
    return ((NewObject*)self)->name;
 }
 
+
+

@@ -91,16 +91,24 @@
 	
 	
 	/* Creation implementation */
-	ExtensionInfo* _ExtensionInfo_New( 
-		SizeT 				_sizeOfSelf, 
-		Type 				type, 
-		Stg_Class_DeleteFunction* 	_delete,	/**< Derivatives: implement how to delete the extension */
-		Stg_Class_PrintFunction*	_print,		/**< Derivatives: implement how to print the extension */
-		Stg_Class_CopyFunction*		_copy, 		/**< Derivatives: implement how to copy the extension */
-		ExtensionInfo_DataCopyFunction*	_dataCopy,	/**< Derivatives: implement how to copy the extension data */
-		Name 				name,
-		SizeT 				size,
-		Index				count );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define EXTENSIONINFO_DEFARGS \
+                STG_OBJECT_DEFARGS, \
+                ExtensionInfo_DataCopyFunction*  _dataCopy, \
+                SizeT                                 size, \
+                Index                                count
+
+	#define EXTENSIONINFO_PASSARGS \
+                STG_OBJECT_PASSARGS, \
+	        _dataCopy, \
+	        size,      \
+	        count    
+
+	ExtensionInfo* _ExtensionInfo_New(  EXTENSIONINFO_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _ExtensionInfo_Init( ExtensionInfo* self, Name name, SizeT size, Index count );
@@ -203,3 +211,4 @@
 		void*				data );
 	
 #endif /* __Base_Extensibility_ExtensionInfo_h__ */
+

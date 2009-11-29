@@ -100,33 +100,7 @@
 	** Constructors
 	*/
 
-	#define VARIABLE_DEFARGS							\
-		STG_CLASS_DEFARGS,							\
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor, 	\
-		Stg_Component_ConstructFunction*		_construct, 		\
-		Stg_Component_BuildFunction*			_build, 		\
-		Stg_Component_InitialiseFunction*		_initialise, 		\
-		Stg_Component_ExecuteFunction*			_execute, 		\
-		Stg_Component_DestroyFunction*			_destroy, 		\
-		Name						name, 			\
-		Bool						initFlag, 		\
-		Index						dataCount,		\
-		SizeT*						dataOffsets,		\
-		Variable_DataType*				dataTypes,		\
-		Index*						dataTypeCounts,		\
-		Name*						dataNames,		\
-		SizeT*						structSizePtr,		\
-		Index*						arraySizePtr,		\
-		Variable_ArraySizeFunc*				arraySizeFunc,		\
-		void**						arrayPtrPtr,		\
-		Variable_Register*				vr
 
-	#define VARIABLE_PASSARGS						\
-		STG_CLASS_PASSARGS, _defaultConstructor, _construct, 		\
-		_build, _initialise, _execute, _destroy, name, initFlag,	\
-		dataCount, dataOffsets, dataTypes, dataTypeCounts,		\
-		dataNames, structSizePtr, arraySizePtr, arraySizeFunc,				\
-		arrayPtrPtr, vr
 	
 	/** Creates a new Variable. A Variable holds the run-time information of a complex data type created by the programmer.
 	  * Essentially it associates a textual name to a variable in the program that the user can use to access or modify.
@@ -205,30 +179,40 @@
 		char**						dataNames );
 	
 	/** Constructor interface. */
-	Variable* _Variable_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*		_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name						name,
-		Bool						initFlag,
-		Index						dataCount,
-		SizeT*						dataOffsets,
-		Variable_DataType*				dataTypes,
-		Index*						dataTypeCounts,
-		Name*						dataNames,
-		SizeT*						structSizePtr,
-		Index*						arraySizePtr,
-		Variable_ArraySizeFunc*				arraySizeFunc,
-		void**						arrayPtrPtr,
-		Variable_Register*				vr );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define VARIABLE_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                Bool                           initFlag, \
+                Index                         dataCount, \
+                SizeT*                      dataOffsets, \
+                Variable_DataType*            dataTypes, \
+                Index*                   dataTypeCounts, \
+                Name*                         dataNames, \
+                SizeT*                    structSizePtr, \
+                Index*                     arraySizePtr, \
+                Variable_ArraySizeFunc*   arraySizeFunc, \
+                void**                      arrayPtrPtr, \
+                Variable_Register*                   vr
+
+	#define VARIABLE_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        initFlag,       \
+	        dataCount,      \
+	        dataOffsets,    \
+	        dataTypes,      \
+	        dataTypeCounts, \
+	        dataNames,      \
+	        structSizePtr,  \
+	        arraySizePtr,   \
+	        arraySizeFunc,  \
+	        arrayPtrPtr,    \
+	        vr            
+
+	Variable* _Variable_New(  VARIABLE_DEFARGS  );
 	
 	
 	/** Initialise a Variable */
@@ -1231,3 +1215,4 @@
 	Bool Variable_ValueCompareWithinTolerance( void* variable, void* comparison, double tolerance );
 
 #endif /* __Base_Automation_Variable__ */
+

@@ -45,22 +45,11 @@ const Type LinkedList_Type = "LinkedList";
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
-LinkedList* _LinkedList_New(
-			SizeT							_sizeOfSelf,
-			Type							type,
-			Stg_Class_DeleteFunction*			_delete,
-			Stg_Class_PrintFunction*			_print,
-			Stg_Class_CopyFunction*				_copy
-			)
+LinkedList* _LinkedList_New(  LINKEDLIST_DEFARGS  )
 {
 	LinkedList *self = NULL;
 
-	self = (LinkedList*)_Stg_Class_New(
-							_sizeOfSelf,
-							type,
-							_delete,
-							_print,
-							_copy);
+	self = (LinkedList*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	return self;
 }
 
@@ -71,18 +60,20 @@ LinkedList* LinkedList_New(
 		LinkedList_dataDeleteFunction*	dataDeleteFunction,
 		Order listOrder )
 {
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(LinkedList);
+	Type                              type = LinkedList_Type;
+	Stg_Class_DeleteFunction*      _delete = _LinkedList_DeleteFunc;
+	Stg_Class_PrintFunction*        _print = _LinkedList_PrintFunc;
+	Stg_Class_CopyFunction*          _copy = NULL;
+
 	
 	LinkedList* self;
 	
 	/* General info */
 	assert ( compareFunction );
 	
-	self = _LinkedList_New( 
-		   					sizeof(LinkedList),
-							LinkedList_Type,
-							_LinkedList_DeleteFunc,
-							_LinkedList_PrintFunc,
-							NULL);
+	self = _LinkedList_New(  LINKEDLIST_PASSARGS  );
 
 	/* List info */
 	self->compareFunction = compareFunction;
@@ -388,3 +379,5 @@ void *LinkedList_ReturnNodeDataAtFunc( LinkedList *list, int index )
 	}
 	return NULL;
 }
+
+

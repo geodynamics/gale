@@ -54,20 +54,21 @@ const Type PtrSet_Type = "PtrSet";
 PtrSet* PtrSet_New(
 		Dictionary*					dictionary )
 {
-	return _PtrSet_New( 
-		sizeof(PtrSet), 
-		PtrSet_Type, 
-		_PtrSet_Delete, 
-		_PtrSet_Print, 
-		NULL, 
-		_PtrSet_Union, 
-		_PtrSet_Intersection, 
-		_PtrSet_Subtraction, 
-		dictionary, 
-		0, 
-		_PtrSet_CompareData, 
-		NULL, 
-		_PtrSet_DeleteData );
+	/* Variables set in this function */
+	SizeT                            _sizeOfSelf = sizeof(PtrSet);
+	Type                                    type = PtrSet_Type;
+	Stg_Class_DeleteFunction*            _delete = _PtrSet_Delete;
+	Stg_Class_PrintFunction*              _print = _PtrSet_Print;
+	Stg_Class_CopyFunction*                _copy = NULL;
+	Set_UnionFunc*                    _unionFunc = _PtrSet_Union;
+	Set_IntersectionFunc*      _intersectionFunc = _PtrSet_Intersection;
+	Set_SubtractionFunc*        _subtractionFunc = _PtrSet_Subtraction;
+	SizeT                            elementSize = 0;
+	BTree_compareFunction*           compareFunc = _PtrSet_CompareData;
+	BTree_dataCopyFunction*         dataCopyFunc = NULL;
+	BTree_dataDeleteFunction*     dataDeleteFunc = _PtrSet_DeleteData;
+
+	return _PtrSet_New(  PTRSET_PASSARGS  );
 }
 
 
@@ -95,39 +96,13 @@ void PtrSet_Init(
 }
 
 
-PtrSet* _PtrSet_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		Set_UnionFunc*					_unionFunc, 
-		Set_IntersectionFunc*				_intersectionFunc, 
-		Set_SubtractionFunc*				_subtractionFunc, 
-		Dictionary*					dictionary, 
-		SizeT						elementSize, 
-		BTree_compareFunction*				compareFunc, 
-		BTree_dataCopyFunction*				dataCopyFunc, 
-		BTree_dataDeleteFunction*			dataDeleteFunc )
+PtrSet* _PtrSet_New(  PTRSET_DEFARGS  )
 {
 	PtrSet*	self;
 	
 	/* allocate memory */
 	assert( _sizeOfSelf >= sizeof(PtrSet) );
-	self = (PtrSet*)_Set_New(
-		_sizeOfSelf,
-		type,
-		_delete,
-		_print, 
-		_copy, 
-		_unionFunc, 
-		_intersectionFunc, 
-		_subtractionFunc, 
-		dictionary, 
-		elementSize, 
-		compareFunc, 
-		dataCopyFunc, 
-		dataDeleteFunc );
+	self = (PtrSet*)_Set_New(  SET_PASSARGS  );
 	
 	/* general info */
 	
@@ -244,3 +219,5 @@ int _PtrSet_CompareData( void* left, void* right ) {
 
 void _PtrSet_DeleteData( void* data ) {
 }
+
+

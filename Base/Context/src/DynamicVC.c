@@ -78,40 +78,39 @@ DynamicVC* DynamicVC_New(
 }
 
 DynamicVC* _DynamicVC_DefaultNew( Name name ) {
-	return (DynamicVC*)_DynamicVC_New( sizeof(DynamicVC), 
-		DynamicVC_Type, 
-		_DynamicVC_Delete, 
-	   _DynamicVC_Print, 
-		_DynamicVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)_DynamicVC_DefaultNew,
-		_VariableCondition_AssignFromXML,
-		_VariableCondition_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
-		name, 
-		NON_GLOBAL,
-		NULL,
-		_DynamicVC_PrintConcise,
-		_DynamicVC_ReadDictionary,
-		_DynamicVC_GetSet, 
-		_DynamicVC_GetVariableCount, 
-		_DynamicVC_GetVariableIndex, 
-		_DynamicVC_GetValueIndex, 
-		_DynamicVC_GetValueCount, 
-		_DynamicVC_GetValue,
-		DynamicVC_Apply, 
-		NULL, 
-		NULL, 
-		NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(DynamicVC);
+	Type                                                      type = DynamicVC_Type;
+	Stg_Class_DeleteFunction*                              _delete = _DynamicVC_Delete;
+	Stg_Class_PrintFunction*                                _print = _DynamicVC_Print;
+	Stg_Class_CopyFunction*                                  _copy = _DynamicVC_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_DynamicVC_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _VariableCondition_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _VariableCondition_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _VariableCondition_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _VariableCondition_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _VariableCondition_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	VariableCondition_BuildSelfFunc*                    _buildSelf = NULL;
+	VariableCondition_PrintConciseFunc*              _printConcise = _DynamicVC_PrintConcise;
+	VariableCondition_ReadDictionaryFunc*          _readDictionary = _DynamicVC_ReadDictionary;
+	VariableCondition_GetSetFunc*                          _getSet = _DynamicVC_GetSet;
+	VariableCondition_GetVariableCountFunc*      _getVariableCount = _DynamicVC_GetVariableCount;
+	VariableCondition_GetVariableIndexFunc*      _getVariableIndex = _DynamicVC_GetVariableIndex;
+	VariableCondition_GetValueIndexFunc*            _getValueIndex = _DynamicVC_GetValueIndex;
+	VariableCondition_GetValueCountFunc*            _getValueCount = _DynamicVC_GetValueCount;
+	VariableCondition_GetValueFunc*                      _getValue = _DynamicVC_GetValue;
+	VariableCondition_ApplyFunc*                            _apply = DynamicVC_Apply;
+
+	return (DynamicVC*)_DynamicVC_New(  DYNAMICVC_PASSARGS  );
 }
 
-DynamicVC* _DynamicVC_New( DYNAMICVC_DEFARGS ) {
+DynamicVC* _DynamicVC_New(  DYNAMICVC_DEFARGS  ) {
 	DynamicVC* self;
 
 	/* Allocate memory/General info */
-	assert( sizeOfSelf >= sizeof(DynamicVC) );
-	self = (DynamicVC*)_VariableCondition_New( VARIABLECONDITION_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(DynamicVC) );
+	self = (DynamicVC*)_VariableCondition_New(  VARIABLECONDITION_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -332,3 +331,5 @@ Bool DynamicVC_Has( void* _self, int index ) {
 	assert( self );
         return IMap_Has( self->vcMap, index );
 }
+
+

@@ -203,3 +203,5 @@ void PtrSetSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, PtrSetSuite_TestSubtraction );
    pcu_suite_addTest( suite, PtrSetSuite_TestPerformance );
 }
+
+

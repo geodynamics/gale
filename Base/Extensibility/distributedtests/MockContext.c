@@ -62,22 +62,24 @@ void _MockContext_Destroy( void* c, void* data ) {
 }
 
 MockContext* MockContext_New( Dictionary* dictionary ) {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( MockContext );
+	Type                                                      type = "MockContext";
+	Stg_Class_DeleteFunction*                              _delete = _MockContext_Delete;
+	Stg_Class_PrintFunction*                                _print = NULL;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _MockContext_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _MockContext_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _MockContext_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _MockContext_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _MockContext_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _MockContext_Destroy;
+	Name                                                      name = "context";
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
 	MockContext* self;
 
-	self = (MockContext*) _Stg_Component_New(
-		sizeof( MockContext ),
-		"MockContext",
-		_MockContext_Delete,
-		NULL,
-		NULL,
-		_MockContext_DefaultNew,
-		_MockContext_AssignFromXML,
-		_MockContext_Build,
-		_MockContext_Initialise,
-		_MockContext_Execute,
-		_MockContext_Destroy,
-		"context",
-		NON_GLOBAL );
+	self = (MockContext*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	self->plugins = PluginsManager_New();
 	ModulesManager_AddDirectory( "StGermain", LIB_DIR );
@@ -96,3 +98,5 @@ void _MockContext_Delete( void* context ) {
 	
 	_Stg_Class_Delete( self );
 }
+
+

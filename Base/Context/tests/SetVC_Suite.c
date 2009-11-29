@@ -255,3 +255,5 @@ void SetVC_Suite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, SetVC_Suite_TestGetValueIndex );
    pcu_suite_addTest( suite, SetVC_Suite_TestApply );
 }
+
+

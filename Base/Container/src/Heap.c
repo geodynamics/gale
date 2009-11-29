@@ -51,30 +51,11 @@
 
 const Type Heap_Type = "Heap";
 
-_Heap* _Heap_New(
-				SizeT							_sizeOfSelf,
-				Type							type,
-				Stg_Class_DeleteFunction*			_delete,
-				Stg_Class_PrintFunction*			_print,
-				Stg_Class_CopyFunction*				_copy,
-				Heap_HeapifyFunction				*heapify,
-				Heap_ExtractFunction				*extract,
-				Heap_InsertFunction					*insert,
-				Heap_KeySwapFunction*				keySwapFunction,
-				Heap_CompareFunction				*compareFunction,
-				Heap_ExtendArrayFunc				*extendArray,
-				void						**keys,
-				int							keyLength,
-				int							numArrayElements )
+_Heap* _Heap_New(  HEAP_DEFARGS  )
 {
 	_Heap *self = NULL;
 
-	self = (_Heap*)_Stg_Class_New(
-							_sizeOfSelf,
-							type,
-							_delete,
-							_print,
-							_copy);
+	self = (_Heap*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 
 	assert( heapify );
 	assert( extract );
@@ -177,3 +158,5 @@ int _Heap_Right( _Heap *heap, int i )
 {
 	return 2*i+1;
 }
+
+

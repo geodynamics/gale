@@ -54,30 +54,30 @@
 const Type LiveComponentRegister_Type = "LiveComponentRegister";
 LiveComponentRegister* stgLiveComponentRegister = NULL;
 
-LiveComponentRegister* _LiveComponentRegister_New( 
-		SizeT					_sizeOfSelf, 
-		Type					type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print, 
-		Stg_Class_CopyFunction*			_copy )
+LiveComponentRegister* _LiveComponentRegister_New(  LIVECOMPONENTREGISTER_DEFARGS  )
 {
 	LiveComponentRegister *self = NULL;
 
 	assert( _sizeOfSelf >= sizeof( LiveComponentRegister ) );
-	self = (LiveComponentRegister*) _Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (LiveComponentRegister*) _Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	return self;
 }
 	
 LiveComponentRegister* LiveComponentRegister_New(  )
 {
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof( LiveComponentRegister );
+	Type                              type = LiveComponentRegister_Type;
+	Stg_Class_DeleteFunction*      _delete = _LiveComponentRegister_Delete;
+	Stg_Class_PrintFunction*        _print = _LiveComponentRegister_Print;
+
 	LiveComponentRegister *self = NULL;
 
-	self = _LiveComponentRegister_New( sizeof( LiveComponentRegister ), 
-					LiveComponentRegister_Type,
-					_LiveComponentRegister_Delete,
-					_LiveComponentRegister_Print,
-					NULL);
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_Class_CopyFunction*  _copy = NULL;
+
+	self = _LiveComponentRegister_New(  LIVECOMPONENTREGISTER_PASSARGS  );
 
 	LiveComponentRegister_Init( self );
 
@@ -245,3 +245,5 @@ void LiveComponentRegister_DestroyAll( void* lcReg ) {
 	}
 
 }
+
+

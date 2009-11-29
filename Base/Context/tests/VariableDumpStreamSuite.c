@@ -158,3 +158,5 @@ void VariableDumpStreamSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, VariableDumpStreamSuite_Setup, VariableDumpStreamSuite_Teardown );
    pcu_suite_addTest( suite, VariableDumpStreamSuite_TestDump );
 }
+
+

@@ -109,3 +109,5 @@ void PrimitiveObjectSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, PrimitiveObjectSuite_Setup, PrimitiveObjectSuite_Teardown );
    pcu_suite_addTest( suite, PrimitiveObjectSuite_TestPrimObjects );
 }
+
+

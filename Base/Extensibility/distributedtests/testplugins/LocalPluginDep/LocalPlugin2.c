@@ -72,3 +72,5 @@ void* _LocalPlugin2_DefaultNew( Name name ) {
 Index LocalPlugin2_Register( PluginsManager* pluginsManager ) {
 	return ModulesManager_Submit( pluginsManager, LocalPlugin2_Type, "0", _LocalPlugin2_DefaultNew );
 }
+
+

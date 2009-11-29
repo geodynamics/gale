@@ -61,19 +61,18 @@
 			Stg_Component_DestroyFunction*                  _destroy,
 			Name                                            name );
 	
-	void* _Codelet_New(
-			SizeT                                           _sizeOfSelf,
-			Type                                            type,
-			Stg_Class_DeleteFunction*                       _delete,
-			Stg_Class_PrintFunction*                        _print,
-			Stg_Class_CopyFunction*                         _copy,
-			Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-			Stg_Component_ConstructFunction*                _construct,
-			Stg_Component_BuildFunction*                    _build,
-			Stg_Component_InitialiseFunction*               _initialise,
-			Stg_Component_ExecuteFunction*                  _execute,
-			Stg_Component_DestroyFunction*                  _destroy,
-			Name                                            name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CODELET_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define CODELET_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	void* _Codelet_New(  CODELET_DEFARGS  );
 
 	void  _Codelet_Delete( void* codelet );
 	void  _Codelet_Print( void* codelet, Stream* stream );
@@ -87,3 +86,4 @@
 	Dictionary* Codelet_GetPluginDictionary( void* codelet, Dictionary* rootDict );
 
 #endif
+

@@ -118,7 +118,7 @@ void _Stg_Class_Print( void* _class, struct Stream* stream ) {
 	
 	Journal_Printf( stream, "Stg_Class (ptr): %p\n", self );
 	Stream_Indent( stream );
-	Journal_Printf( stream, "sizeOfSelf: %lu\n", self->_sizeOfSelf );
+	Journal_Printf( stream, "_sizeOfSelf: %lu\n", self->_sizeOfSelf );
 	Journal_Printf( stream, "_deleteSelf: %s\n", self->_deleteSelf ? "Yes" : "No" );
 	Journal_Printf( stream, "type: %s\n", self->type == Type_Invalid ? "Invalid" : self->type );
 	Journal_Printf( stream, "_delete (func ptr): %p\n", self->_delete );
@@ -233,3 +233,7 @@ void Stg_Class_RemoveRef( void* _class ) {
 	if( !(--self->nRefs) )
 		Stg_Class_Delete( self );
 }
+
+
+
+

@@ -50,7 +50,14 @@ const Type MPIFile_Type = "MPIFile";
 
 JournalFile* MPIFile_New()
 {
-	return (JournalFile*)_MPIFile_New( sizeof(MPIFile), MPIFile_Type, _MPIFile_Delete, _MPIFile_Print, NULL );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(MPIFile);
+	Type                              type = MPIFile_Type;
+	Stg_Class_DeleteFunction*      _delete = _MPIFile_Delete;
+	Stg_Class_PrintFunction*        _print = _MPIFile_Print;
+	Stg_Class_CopyFunction*          _copy = NULL;
+
+	return (JournalFile*)_MPIFile_New(  MPIFILE_PASSARGS  );
 }
 
 JournalFile* MPIFile_New2( const char* const fileName )
@@ -67,16 +74,11 @@ JournalFile* MPIFile_New2( const char* const fileName )
 	return result;
 }
 
-MPIFile* _MPIFile_New(
-	SizeT _sizeOfSelf,
-	Type type,
-	Stg_Class_DeleteFunction* _delete,
-	Stg_Class_PrintFunction* _print,
-	Stg_Class_CopyFunction* _copy )
+MPIFile* _MPIFile_New(  MPIFILE_DEFARGS  )
 {
 	MPIFile* self;
 	
-	self = (MPIFile*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (MPIFile*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	_MPIFile_Init( self );
 	
@@ -183,3 +185,5 @@ Bool _MPIFile_Flush( void* file )
 	
 	return True;
 }
+
+

@@ -81,22 +81,36 @@
 		int							numArrayElements;
 	struct _Heap { __Heap };
 
-	_Heap* _Heap_New(
-				SizeT							_sizeOfSelf,
-				Type							type,
-				Stg_Class_DeleteFunction*			_delete,
-				Stg_Class_PrintFunction*			_print,
-				Stg_Class_CopyFunction*				_copy,
-				Heap_HeapifyFunction				*heapify,
-				Heap_ExtractFunction				*extract,
-				Heap_InsertFunction					*insert,
-				Heap_KeySwapFunction*				KeySwapFunction,
-				Heap_CompareFunction				*compareFunction,
-				Heap_ExtendArrayFunc				*extendArray,
-				void						**keys,
-				int							keyLength,
-				int							numArrayElements
-				);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define HEAP_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                Heap_HeapifyFunction*           heapify, \
+                Heap_ExtractFunction*           extract, \
+                Heap_InsertFunction*             insert, \
+                Heap_KeySwapFunction*   keySwapFunction, \
+                Heap_CompareFunction*   compareFunction, \
+                Heap_ExtendArrayFunc*       extendArray, \
+                void**                             keys, \
+                int                           keyLength, \
+                int                    numArrayElements
+
+	#define HEAP_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        heapify,          \
+	        extract,          \
+	        insert,           \
+	        keySwapFunction,  \
+	        compareFunction,  \
+	        extendArray,      \
+	        keys,             \
+	        keyLength,        \
+	        numArrayElements
+
+	_Heap* _Heap_New(  HEAP_DEFARGS  );
 
 	
 	void _Heap_Init( _Heap* self );
@@ -125,4 +139,5 @@
 	int _Heap_Right( _Heap *heap, int i );
 
 #endif /* __Heap_h__ */
+
 

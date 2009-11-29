@@ -53,22 +53,13 @@ const Dictionary_MergeType IO_Handler_DefaultChildrenMergeType = Dictionary_Merg
 
 /* TODO: register with IO_Handler registry */
 
-IO_Handler* _IO_Handler_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		IO_Handler_ReadAllFromFileFunction*		_readAllFromFile,
-		IO_Handler_ReadAllFromFileForceSourceFunction*		_readAllFromFileForceSource,
-		IO_Handler_ReadAllFromBufferFunction*		_readAllFromBuffer,
-		IO_Handler_WriteAllToFileFunction*		_writeAllToFile )
+IO_Handler* _IO_Handler_New(  IO_HANDLER_DEFARGS  )
 {
 	IO_Handler* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(IO_Handler) );
-	self = (IO_Handler*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (IO_Handler*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* General info */
 	
@@ -476,3 +467,5 @@ Index IO_Handler_ReadAllFromCommandLineForceSource( void* ioHandler, int argc, c
 
 	return filesRead;
 }
+
+

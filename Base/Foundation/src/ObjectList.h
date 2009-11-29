@@ -132,27 +132,48 @@
 	void Stg_ObjectList_Init2( Stg_ObjectList* self, Index initialSize, Index delta );
 	
 	/** Creation implementation */
-	Stg_ObjectList* _Stg_ObjectList_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_ObjectList_AppendFunction*			_append,
-		Stg_ObjectList_PrependFunction*			_prepend,
-		Stg_ObjectList_ReplaceAllFunction*			_replaceAll,
-		Stg_ObjectList_ReplaceFunction*			_replace,
-		Stg_ObjectList_InsertBeforeFunction*		_insertBefore,
-		Stg_ObjectList_InsertAfterFunction*			_insertAfter,
-		Stg_ObjectList_RemoveFunction*			_remove,
-		Stg_ObjectList_GetIndexFunction*			_getIndex,
-		Stg_ObjectList_GetFunction*				_get,
-		Stg_ObjectList_AllocMoreMemoryFunction*		_allocMoreMemory,
-		Stg_ObjectList_InsertAtIndexFunction*		_insertAtIndex,
-		Stg_ObjectList_RemoveByIndexFunction*		_removeByIndex,
-		Stg_ObjectList_DeleteAllObjectsFunction*		_deleteAllObjects,
-		Index						initialSize,
-		Index						delta );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STG_OBJECTLIST_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                Stg_ObjectList_AppendFunction*                      _append, \
+                Stg_ObjectList_PrependFunction*                    _prepend, \
+                Stg_ObjectList_ReplaceAllFunction*              _replaceAll, \
+                Stg_ObjectList_ReplaceFunction*                    _replace, \
+                Stg_ObjectList_InsertBeforeFunction*          _insertBefore, \
+                Stg_ObjectList_InsertAfterFunction*            _insertAfter, \
+                Stg_ObjectList_RemoveFunction*                      _remove, \
+                Stg_ObjectList_GetIndexFunction*                  _getIndex, \
+                Stg_ObjectList_GetFunction*                            _get, \
+                Stg_ObjectList_AllocMoreMemoryFunction*    _allocMoreMemory, \
+                Stg_ObjectList_InsertAtIndexFunction*        _insertAtIndex, \
+                Stg_ObjectList_RemoveByIndexFunction*        _removeByIndex, \
+                Stg_ObjectList_DeleteAllObjectsFunction*  _deleteAllObjects, \
+                Index                                           initialSize, \
+                Index                                                 delta
+
+	#define STG_OBJECTLIST_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        _append,           \
+	        _prepend,          \
+	        _replaceAll,       \
+	        _replace,          \
+	        _insertBefore,     \
+	        _insertAfter,      \
+	        _remove,           \
+	        _getIndex,         \
+	        _get,              \
+	        _allocMoreMemory,  \
+	        _insertAtIndex,    \
+	        _removeByIndex,    \
+	        _deleteAllObjects, \
+	        initialSize,       \
+	        delta            
+
+	Stg_ObjectList* _Stg_ObjectList_New(  STG_OBJECTLIST_DEFARGS  );
 	
 	/** Initialisation implementation */
 	void _Stg_ObjectList_Init( Stg_ObjectList* self, Index initialSize, Index delta );
@@ -401,3 +422,4 @@
 	/** Prints the first 'number' of names of objects in list which are most similar to 'name' */
 	void Stg_ObjectList_PrintSimilar( void* objectList, Name name, void* _stream, unsigned int number ) ;
 #endif /* __Base_Foundation_Stg_ObjectList_h__ */
+

@@ -83,16 +83,26 @@
 	/* No "IO_Handler_New" and "IO_Handler_Init" as this is an abstract class */
 	
 	/** Creation implementation */
-	IO_Handler* _IO_Handler_New( 
-		SizeT						sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		IO_Handler_ReadAllFromFileFunction*		_readAllFromFile,
-		IO_Handler_ReadAllFromFileForceSourceFunction*		_readAllFromFileForceSource,
-		IO_Handler_ReadAllFromBufferFunction*		_readAllFromBuffer,
-		IO_Handler_WriteAllToFileFunction*		_writeAllToFile );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define IO_HANDLER_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                IO_Handler_ReadAllFromFileFunction*                        _readAllFromFile, \
+                IO_Handler_ReadAllFromFileForceSourceFunction*  _readAllFromFileForceSource, \
+                IO_Handler_ReadAllFromBufferFunction*                    _readAllFromBuffer, \
+                IO_Handler_WriteAllToFileFunction*                          _writeAllToFile
+
+	#define IO_HANDLER_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        _readAllFromFile,            \
+	        _readAllFromFileForceSource, \
+	        _readAllFromBuffer,          \
+	        _writeAllToFile            
+
+	IO_Handler* _IO_Handler_New(  IO_HANDLER_DEFARGS  );
 	
 	/** Initialisation implementation */
 	void _IO_Handler_Init( IO_Handler* self );
@@ -152,3 +162,4 @@
 	Index IO_Handler_ReadAllFromCommandLineForceSource( void* ioHandler, int argc, char* argv[], Dictionary* dictionary ) ;
 	
 #endif /* __Base_IO_IO_Handler_h__ */
+

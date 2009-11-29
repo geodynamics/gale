@@ -60,36 +60,31 @@ static const char* TOOLBOX_MODULE_SUFFIX = "_Toolbox";
 #endif
 
 Toolbox* Toolbox_New( Name name, Stg_ObjectList* directories ) {
-	return _Toolbox_New( 
-		sizeof(Toolbox), 
-		Toolbox_Type, 
-		_Toolbox_Delete, 
-		_Toolbox_Print, 
-		NULL,
-		name,
-		_Toolbox_MangleName,
-		directories );
+	/* Variables set in this function */
+	SizeT                       _sizeOfSelf = sizeof(Toolbox);
+	Type                               type = Toolbox_Type;
+	Stg_Class_DeleteFunction*       _delete = _Toolbox_Delete;
+	Stg_Class_PrintFunction*         _print = _Toolbox_Print;
+	Stg_Class_CopyFunction*           _copy = NULL;
+	Module_MangleNameFunction*   MangleName = _Toolbox_MangleName;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _Toolbox_New(  TOOLBOX_PASSARGS  );
 }
 
 Module* Toolbox_Factory( Name name, Stg_ObjectList* directories ) {
 	return (Module*)Toolbox_New( name, directories );
 }
 	
-Toolbox* _Toolbox_New( 
-		SizeT                        _sizeOfSelf,
-		Type                         type,
-		Stg_Class_DeleteFunction*    _delete,
-		Stg_Class_PrintFunction*     _print,
-		Stg_Class_CopyFunction*      _copy, 
-		Name                         name,
-		Module_MangleNameFunction    MangleName,
-		Stg_ObjectList*              directories )
+Toolbox* _Toolbox_New(  TOOLBOX_DEFARGS  )
 {
 	Toolbox* self;
 
 	assert( _sizeOfSelf >= sizeof(Toolbox) );
 
-	self = (Toolbox*)_Module_New( _sizeOfSelf, type, _delete, _print, _copy, name, MangleName, directories );
+	self = (Toolbox*)_Module_New(  MODULE_PASSARGS  );
 	
 	_Toolbox_Init( self );
 
@@ -159,3 +154,5 @@ Toolbox_FinaliseFunction* Toolbox_GetFinaliseFunc( void* toolbox ) {
 
 	return self->Finalise;
 }
+
+

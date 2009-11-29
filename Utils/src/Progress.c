@@ -41,23 +41,24 @@ const Type Progress_Type = "Progress";
 
 
 Progress* Progress_New() {
-   return _Progress_New( sizeof(Progress), Progress_Type,
-			 _Progress_Delete,
-			 _Progress_Print,
-			 NULL );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(Progress);
+	Type                              type = Progress_Type;
+	Stg_Class_DeleteFunction*      _delete = _Progress_Delete;
+	Stg_Class_PrintFunction*        _print = _Progress_Print;
+	Stg_Class_CopyFunction*          _copy = NULL;
+
+   return _Progress_New(  PROGRESS_PASSARGS  );
 }
 
 
-Progress* _Progress_New( SizeT sizeOfSelf, Type type,
-			 Stg_Class_DeleteFunction* delete,
-			 Stg_Class_PrintFunction* print, 
-			 Stg_Class_CopyFunction* copy )
+Progress* _Progress_New(  PROGRESS_DEFARGS  )
 {
    Progress* self;
 
    /* Allocate memory */
-   assert( sizeOfSelf >= sizeof(Progress) );
-   self = (Progress*)_Stg_Class_New( sizeOfSelf, type, delete, print, copy );
+   assert( _sizeOfSelf >= sizeof(Progress) );
+   self = (Progress*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
    _Progress_Init( self );
 
    return self;
@@ -206,3 +207,5 @@ Bool Progress_CalcStatus( Progress* self ) {
 
    return (self->perc != oldPerc || self->nBars != oldnBars);
 }
+
+

@@ -52,3 +52,5 @@ Bool BaseFoundation_Init( int* argc, char** argv[] ) {
 	
 	return True;
 }
+
+

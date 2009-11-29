@@ -128,19 +128,30 @@
 		Index				count );
 	
 	/** Creation implementation / Virtual constructor */
-	ExtensionManager* _ExtensionManager_New( 
-		SizeT				_sizeOfSelf,
-		Type				type,
-		Stg_Class_DeleteFunction*	_delete,
-		Stg_Class_PrintFunction*	_print,
-		Stg_Class_CopyFunction*		_copy, 
-		Name				name, 
-		SizeT				initialSize,
-		void*				_existingObject,
-		void*				_array,
-		SizeT				itemSize,
-		ExtensionManager*		em,
-		Index				count );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define EXTENSIONMANAGER_DEFARGS \
+                STG_OBJECT_DEFARGS, \
+                SizeT                  initialSize, \
+                void*              _existingObject, \
+                void*                       _array, \
+                SizeT                     itemSize, \
+                ExtensionManager*               em, \
+                Index                        count
+
+	#define EXTENSIONMANAGER_PASSARGS \
+                STG_OBJECT_PASSARGS, \
+	        initialSize,     \
+	        _existingObject, \
+	        _array,          \
+	        itemSize,        \
+	        em,              \
+	        count          
+
+	ExtensionManager* _ExtensionManager_New(  EXTENSIONMANAGER_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _ExtensionManager_Init(
@@ -451,3 +462,4 @@
 	void ExtensionManager_SetLockDown( void* extension, Bool lockDown );
 	Bool ExtensionManager_GetLockDown( void* extension );
 #endif /* __Base_Extensibility_ExtensionManager_h__ */
+

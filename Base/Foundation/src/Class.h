@@ -72,14 +72,14 @@
 	/* Class Administration members ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 	#define STG_CLASS_DEFARGS					\
-		SizeT				sizeOfSelf,		\
+		SizeT				_sizeOfSelf,		\
 		Type				type,			\
-		Stg_Class_DeleteFunction*	deleteFunc,		\
-		Stg_Class_PrintFunction*	printFunc,		\
-		Stg_Class_CopyFunction*		copyFunc
+		Stg_Class_DeleteFunction*	_delete,		\
+		Stg_Class_PrintFunction*	 _print,		\
+		Stg_Class_CopyFunction*		  _copy
 
 	#define STG_CLASS_PASSARGS					\
-		sizeOfSelf, type, deleteFunc, printFunc, copyFunc
+		_sizeOfSelf, type, _delete, _print, _copy
     
 	
 	/** Constructor interface. */

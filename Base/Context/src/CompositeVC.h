@@ -60,11 +60,7 @@
 	
 	struct _CompositeVC { __CompositeVC };
 	
-	#define COMPOSITEVC_DEFARGS \
-    	VARIABLECONDITION_DEFARGS
 
-	#define COMPOSITEVC_PASSARGS \
-    	VARIABLECONDITION_PASSARGS
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
@@ -93,7 +89,18 @@
 		Dictionary*							dictionary,
 		void*									data );
 	
-	CompositeVC* _CompositeVC_New( COMPOSITEVC_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define COMPOSITEVC_DEFARGS \
+                VARIABLECONDITION_DEFARGS
+
+	#define COMPOSITEVC_PASSARGS \
+                VARIABLECONDITION_PASSARGS
+
+	CompositeVC* _CompositeVC_New(  COMPOSITEVC_DEFARGS  );
 	
 	void _CompositeVC_Init(
 		void* compositeVC,
@@ -165,3 +172,4 @@ void _CompositeVC_Apply( void* _self, void* _ctx );
 
 	
 #endif /* __Base_Automation_CompositeVC_h__ */
+

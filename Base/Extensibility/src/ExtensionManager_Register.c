@@ -50,7 +50,14 @@ const Type ExtensionManager_Register_Type = "ExtensionManager_Register";
 ExtensionManager_Register* extensionMgr_Register = 0;
 
 ExtensionManager_Register* ExtensionManager_Register_New( void ) {
-	return _ExtensionManager_Register_New( sizeof(ExtensionManager_Register), ExtensionManager_Register_Type, _ExtensionManager_Register_Delete, _ExtensionManager_Register_Print, NULL );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(ExtensionManager_Register);
+	Type                              type = ExtensionManager_Register_Type;
+	Stg_Class_DeleteFunction*      _delete = _ExtensionManager_Register_Delete;
+	Stg_Class_PrintFunction*        _print = _ExtensionManager_Register_Print;
+	Stg_Class_CopyFunction*          _copy = NULL;
+
+	return _ExtensionManager_Register_New(  EXTENSIONMANAGER_REGISTER_PASSARGS  );
 }
 
 void ExtensionManager_Register_Init( void* extensionManager_Register ) {
@@ -71,18 +78,13 @@ void ExtensionManager_Register_Init( void* extensionManager_Register ) {
 	_ExtensionManager_Register_Init( self );
 }
 
-ExtensionManager_Register* _ExtensionManager_Register_New(
-		SizeT				_sizeOfSelf,
-		Type				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy )
+ExtensionManager_Register* _ExtensionManager_Register_New(  EXTENSIONMANAGER_REGISTER_DEFARGS  )
 {
 	ExtensionManager_Register* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ExtensionManager_Register) );
-	self = (ExtensionManager_Register*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (ExtensionManager_Register*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* General info */
 	
@@ -153,3 +155,5 @@ ExtensionManager* _ExtensionManager_Register_GetExtension( void* extensionManage
 	
 	return ExtensionManager_Register_GetExtension( self, handle );
 }
+
+

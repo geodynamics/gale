@@ -128,3 +128,5 @@ void LiveComponentRegisterSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, LiveComponentRegisterSuite_Setup, LiveComponentRegisterSuite_Teardown );
    pcu_suite_addTest( suite, LiveComponentRegisterSuite_TestGet );
 }
+
+

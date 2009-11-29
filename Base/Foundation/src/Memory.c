@@ -1860,3 +1860,5 @@ void _Memory_OutOfMemoryErrorFunc( const char* func, int line, SizeT size ) {
 		stgMemory->stgCurrentMemory );
 }
 
+
+

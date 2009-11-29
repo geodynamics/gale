@@ -82,43 +82,39 @@ VariableAllVC*	VariableAllVC_New(
 }
 
 VariableAllVC*	_VariableAllVC_DefaultNew( Name name ) {
-	return (VariableAllVC*)_VariableAllVC_New(
-		sizeof(VariableAllVC), 
-		VariableAllVC_Type, 
-		_VariableAllVC_Delete, 
-		_VariableAllVC_Print, 
-		_VariableAllVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)_VariableAllVC_DefaultNew,
-		_VariableCondition_AssignFromXML,
-		_VariableAllVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_VariableAllVC_Destroy,
-		name,
-		NON_GLOBAL,
-		_VariableAllVC_BuildSelf, 
-		_VariableAllVC_PrintConcise,
-		_VariableAllVC_ReadDictionary,
-		_VariableAllVC_GetSet, 
-		_VariableAllVC_GetVariableCount, 
-		_VariableAllVC_GetVariableIndex, 
-		_VariableAllVC_GetValueIndex, 
-		_VariableAllVC_GetValueCount, 
-		_VariableAllVC_GetValue,
-		_VariableCondition_Apply, 
-		NULL,
-		NULL, 
-		NULL, 
-		NULL,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(VariableAllVC);
+	Type                                                       type = VariableAllVC_Type;
+	Stg_Class_DeleteFunction*                               _delete = _VariableAllVC_Delete;
+	Stg_Class_PrintFunction*                                 _print = _VariableAllVC_Print;
+	Stg_Class_CopyFunction*                                   _copy = _VariableAllVC_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_VariableAllVC_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _VariableCondition_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _VariableAllVC_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _VariableCondition_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _VariableCondition_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _VariableAllVC_Destroy;
+	AllocationType                               nameAllocationType = NON_GLOBAL;
+	VariableCondition_BuildSelfFunc*                     _buildSelf = _VariableAllVC_BuildSelf;
+	VariableCondition_PrintConciseFunc*               _printConcise = _VariableAllVC_PrintConcise;
+	VariableCondition_ReadDictionaryFunc*           _readDictionary = _VariableAllVC_ReadDictionary;
+	VariableCondition_GetSetFunc*                           _getSet = _VariableAllVC_GetSet;
+	VariableCondition_GetVariableCountFunc*       _getVariableCount = _VariableAllVC_GetVariableCount;
+	VariableCondition_GetVariableIndexFunc*       _getVariableIndex = _VariableAllVC_GetVariableIndex;
+	VariableCondition_GetValueIndexFunc*             _getValueIndex = _VariableAllVC_GetValueIndex;
+	VariableCondition_GetValueCountFunc*             _getValueCount = _VariableAllVC_GetValueCount;
+	VariableCondition_GetValueFunc*                       _getValue = _VariableAllVC_GetValue;
+	VariableCondition_ApplyFunc*                             _apply = _VariableCondition_Apply;
+
+	return (VariableAllVC*)_VariableAllVC_New(  VARIABLEALLVC_PASSARGS  );
 }
 
-VariableAllVC* _VariableAllVC_New( VARIABLEALLVC_DEFARGS ) {
+VariableAllVC* _VariableAllVC_New(  VARIABLEALLVC_DEFARGS  ) {
 	VariableAllVC*	self;
 	
 	/* Allocate memory/General info */
-	assert( sizeOfSelf >= sizeof(VariableAllVC) );
-	self = (VariableAllVC*)_VariableCondition_New( VARIABLECONDITION_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(VariableAllVC) );
+	self = (VariableAllVC*)_VariableCondition_New(  VARIABLECONDITION_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -465,3 +461,5 @@ void _VariableAllVC_PrintConcise( void* variableCondition, Stream* stream ) {
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Functions
 */
+
+

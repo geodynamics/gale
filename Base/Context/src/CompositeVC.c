@@ -83,41 +83,39 @@ CompositeVC* CompositeVC_New(
 }
 
 CompositeVC* _CompositeVC_DefaultNew( Name name ) {
-	return (CompositeVC*)_CompositeVC_New(
-		sizeof(CompositeVC), 
-		CompositeVC_Type, 
-		_CompositeVC_Delete, 
-		_CompositeVC_Print,
-		_CompositeVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)_CompositeVC_DefaultNew,
-		_CompositeVC_AssignFromXML,
-		_CompositeVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_CompositeVC_Destroy,	
-		name,
-		NON_GLOBAL,
-		NULL,
-		_CompositeVC_PrintConcise,
-		_CompositeVC_ReadDictionary,
-		_CompositeVC_GetSet, 
-		_CompositeVC_GetVariableCount, 
-		_CompositeVC_GetVariableIndex, 
-		_CompositeVC_GetValueIndex, 
-		_CompositeVC_GetValueCount, 
-		_CompositeVC_GetValue, 
-		_CompositeVC_Apply, 
-		NULL/*variable_Register*/, 
-		NULL/*conFunc_Register*/,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(CompositeVC);
+	Type                                                      type = CompositeVC_Type;
+	Stg_Class_DeleteFunction*                              _delete = _CompositeVC_Delete;
+	Stg_Class_PrintFunction*                                _print = _CompositeVC_Print;
+	Stg_Class_CopyFunction*                                  _copy = _CompositeVC_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_CompositeVC_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _CompositeVC_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _CompositeVC_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _VariableCondition_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _VariableCondition_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _CompositeVC_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	VariableCondition_BuildSelfFunc*                    _buildSelf = NULL;
+	VariableCondition_PrintConciseFunc*              _printConcise = _CompositeVC_PrintConcise;
+	VariableCondition_ReadDictionaryFunc*          _readDictionary = _CompositeVC_ReadDictionary;
+	VariableCondition_GetSetFunc*                          _getSet = _CompositeVC_GetSet;
+	VariableCondition_GetVariableCountFunc*      _getVariableCount = _CompositeVC_GetVariableCount;
+	VariableCondition_GetVariableIndexFunc*      _getVariableIndex = _CompositeVC_GetVariableIndex;
+	VariableCondition_GetValueIndexFunc*            _getValueIndex = _CompositeVC_GetValueIndex;
+	VariableCondition_GetValueCountFunc*            _getValueCount = _CompositeVC_GetValueCount;
+	VariableCondition_GetValueFunc*                      _getValue = _CompositeVC_GetValue;
+	VariableCondition_ApplyFunc*                            _apply = _CompositeVC_Apply;
+
+	return (CompositeVC*)_CompositeVC_New(  COMPOSITEVC_PASSARGS  );
 }
 
-CompositeVC* _CompositeVC_New( COMPOSITEVC_DEFARGS ) {
+CompositeVC* _CompositeVC_New(  COMPOSITEVC_DEFARGS  ) {
 	CompositeVC* self;
 	
 	/* Allocate memory/General info */
-	assert (sizeOfSelf >= sizeof(CompositeVC) );
-	self = (CompositeVC*)_VariableCondition_New( VARIABLECONDITION_PASSARGS );
+	assert (_sizeOfSelf >= sizeof(CompositeVC) );
+	self = (CompositeVC*)_VariableCondition_New(  VARIABLECONDITION_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -650,3 +648,5 @@ void _CompositeVC_Apply( void* _self, void* _ctx ) {
    for( ii = 0; ii < self->nIndepItems; ii++ )
       VariableCondition_Apply( self->indepItems[ii], _ctx );
 }
+
+

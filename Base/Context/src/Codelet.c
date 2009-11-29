@@ -53,6 +53,11 @@
 #include <assert.h>
 #include <string.h>
 
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
 const Type Codelet_Type = "Codelet";
 
 void* Codelet_New(
@@ -65,49 +70,26 @@ void* Codelet_New(
 		Stg_Component_DestroyFunction*                  _destroy,
 		Name                                            name )
 {
-	return _Codelet_New(
-			sizeof( Codelet ),
-			type,
-			_Codelet_Delete,
-			_Codelet_Print, 
-			_Codelet_Copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof( Codelet );
+	Stg_Class_DeleteFunction*      _delete = _Codelet_Delete;
+	Stg_Class_PrintFunction*        _print = _Codelet_Print;
+	Stg_Class_CopyFunction*          _copy = _Codelet_Copy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
 
-void* _Codelet_New(
-		SizeT                                           _sizeOfSelf,
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy,
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,
-		Name                                            name )
+void* _Codelet_New(  CODELET_DEFARGS  )
 {
-	return _Stg_Component_New(
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print, 
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name,
-			NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	return _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 }
 
 void  _Codelet_Delete( void* codelet ) {
@@ -153,3 +135,5 @@ Dictionary* Codelet_GetPluginDictionary( void* codelet, Dictionary* rootDict ) {
 
 	return NULL;
 }
+
+

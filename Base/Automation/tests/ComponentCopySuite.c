@@ -84,20 +84,21 @@ void Stg_ComponentA_Destroy( void* component, void* data );
 
 void* Stg_ComponentA_NewDefault( Name name )
 {
-	return _Stg_Component_New(
-		sizeof(Stg_ComponentA),
-		"Stg_ComponentA",
-		Stg_ComponentA_Delete,
-		Stg_ComponentA_Print,
-		Stg_ComponentA_Copy,
-		Stg_ComponentA_NewDefault,
-		Stg_ComponentA_AssignFromXML,
-		Stg_ComponentA_Build,
-		Stg_ComponentA_Initialise,
-		Stg_ComponentA_Execute,
-		Stg_ComponentA_Destroy,
-		name,
-		NON_GLOBAL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Stg_ComponentA);
+	Type                                                      type = "Stg_ComponentA";
+	Stg_Class_DeleteFunction*                              _delete = Stg_ComponentA_Delete;
+	Stg_Class_PrintFunction*                                _print = Stg_ComponentA_Print;
+	Stg_Class_CopyFunction*                                  _copy = Stg_ComponentA_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = Stg_ComponentA_NewDefault;
+	Stg_Component_ConstructFunction*                    _construct = Stg_ComponentA_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = Stg_ComponentA_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = Stg_ComponentA_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = Stg_ComponentA_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = Stg_ComponentA_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
+	return _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 }
 void Stg_ComponentA_Delete( void* class ) {
 	Stg_ComponentA* self = (Stg_ComponentA*)class;
@@ -169,20 +170,21 @@ void Stg_ComponentB_Destroy( void* component, void* data );
 
 void* Stg_ComponentB_NewDefault( Name name )
 {
-	return _Stg_Component_New(
-		sizeof(Stg_ComponentB),
-		"Stg_ComponentB",
-		Stg_ComponentB_Delete,
-		Stg_ComponentB_Print,
-		Stg_ComponentB_Copy,
-		Stg_ComponentB_NewDefault,
-		Stg_ComponentB_AssignFromXML,
-		Stg_ComponentB_Build,
-		Stg_ComponentB_Initialise,
-		Stg_ComponentB_Execute,
-		Stg_ComponentB_Destroy,
-		name,
-		NON_GLOBAL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Stg_ComponentB);
+	Type                                                      type = "Stg_ComponentB";
+	Stg_Class_DeleteFunction*                              _delete = Stg_ComponentB_Delete;
+	Stg_Class_PrintFunction*                                _print = Stg_ComponentB_Print;
+	Stg_Class_CopyFunction*                                  _copy = Stg_ComponentB_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = Stg_ComponentB_NewDefault;
+	Stg_Component_ConstructFunction*                    _construct = Stg_ComponentB_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = Stg_ComponentB_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = Stg_ComponentB_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = Stg_ComponentB_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = Stg_ComponentB_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
+	return _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 }
 void Stg_ComponentB_Delete( void* class ) {
 	Stg_ComponentB* self = (Stg_ComponentB*)class;
@@ -238,20 +240,21 @@ void Stg_ComponentC_Destroy( void* component, void* data );
 
 void* Stg_ComponentC_NewDefault( Name name )
 {
-	return _Stg_Component_New(
-		sizeof(Stg_ComponentC),
-		"Stg_ComponentC",
-		Stg_ComponentC_Delete,
-		Stg_ComponentC_Print,
-		Stg_ComponentC_Copy,
-		Stg_ComponentC_NewDefault,
-		Stg_ComponentC_AssignFromXML,
-		Stg_ComponentC_Build,
-		Stg_ComponentC_Initialise,
-		Stg_ComponentC_Execute,
-		Stg_ComponentC_Destroy,
-		name,
-		NON_GLOBAL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Stg_ComponentC);
+	Type                                                      type = "Stg_ComponentC";
+	Stg_Class_DeleteFunction*                              _delete = Stg_ComponentC_Delete;
+	Stg_Class_PrintFunction*                                _print = Stg_ComponentC_Print;
+	Stg_Class_CopyFunction*                                  _copy = Stg_ComponentC_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = Stg_ComponentC_NewDefault;
+	Stg_Component_ConstructFunction*                    _construct = Stg_ComponentC_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = Stg_ComponentC_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = Stg_ComponentC_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = Stg_ComponentC_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = Stg_ComponentC_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
+	return _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 }
 void Stg_ComponentC_Delete( void* class ) {
 	Stg_ComponentC* self = (Stg_ComponentC*)class;
@@ -401,3 +404,5 @@ void ComponentCopySuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, ComponentCopySuite_Setup, ComponentCopySuite_Teardown );
    pcu_suite_addTest( suite, ComponentCopySuite_TestCopy );
 }
+
+

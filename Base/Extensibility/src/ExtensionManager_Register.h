@@ -70,12 +70,18 @@
 	void ExtensionManager_Register_Init( void* extension_Register );
 	
 	/** Creation implementation / Virtual constructor */
-	ExtensionManager_Register* _ExtensionManager_Register_New( 
-		SizeT				_sizeOfSelf,
-		Type				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define EXTENSIONMANAGER_REGISTER_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define EXTENSIONMANAGER_REGISTER_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	ExtensionManager_Register* _ExtensionManager_Register_New(  EXTENSIONMANAGER_REGISTER_DEFARGS  );
 	
 	/** Initialisation implementation */
 	void _ExtensionManager_Register_Init( void* extension_Register );
@@ -103,3 +109,4 @@
 	ExtensionManager* _ExtensionManager_Register_At( void* extension_Register, ExtensionManager_Index handle );
 	
 #endif /* __Base_Extensibility_ExtensionManager_Register_h__ */
+

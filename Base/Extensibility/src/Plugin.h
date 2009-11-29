@@ -63,15 +63,18 @@
 	Module* Plugin_Factory( Name name, Stg_ObjectList* directories );
 	
 	/* Creation implementation / Virtual constructor */
-	Plugin* _Plugin_New( 
-		SizeT                        _sizeOfSelf,
-		Type                         type,
-		Stg_Class_DeleteFunction*    _delete,
-		Stg_Class_PrintFunction*     _print,
-		Stg_Class_CopyFunction*      _copy, 
-		Name                         name,
-		Module_MangleNameFunction    MangleName,
-		Stg_ObjectList*              directories );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PLUGIN_DEFARGS \
+                MODULE_DEFARGS
+
+	#define PLUGIN_PASSARGS \
+                MODULE_PASSARGS
+
+	Plugin* _Plugin_New(  PLUGIN_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _Plugin_Init( Plugin* self );
@@ -89,3 +92,4 @@
 	Plugin_RegisterFunction* Plugin_GetRegisterFunc( void* plugin );
 	
 #endif /* __Base_Extensibility_Plugin_h__ */
+

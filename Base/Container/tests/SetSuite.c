@@ -228,3 +228,5 @@ void SetSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, SetSuite_TestSubtraction );
    pcu_suite_addTest( suite, SetSuite_TestPerformance );
 }
+
+

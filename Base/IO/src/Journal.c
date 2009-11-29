@@ -751,3 +751,5 @@ void Journal_SetupDefaultTypedStreams() {
 	Stream_SetLevel( typedStream, 1 );
 	Journal_RegisterTypedStream( typedStream );
 }
+
+

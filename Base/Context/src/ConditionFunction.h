@@ -70,14 +70,22 @@
 	
 	void			ConditionFunction_Init(ConditionFunction* self, ConditionFunction_ApplyFunc* apply, Name name);
 	
-	ConditionFunction*	_ConditionFunction_New( 
-					SizeT				_sizeOfSelf, 
-					Type				type,
-					Stg_Class_DeleteFunction*		_delete,
-					Stg_Class_PrintFunction*		_print, 
-					Stg_Class_CopyFunction*		_copy, 
-					ConditionFunction_ApplyFunc*	apply,
-					Name				name);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CONDITIONFUNCTION_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                ConditionFunction_ApplyFunc*  apply, \
+                Name                           name
+
+	#define CONDITIONFUNCTION_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        apply, \
+	        name 
+
+	ConditionFunction*	_ConditionFunction_New(  CONDITIONFUNCTION_DEFARGS  );
 	
 	void			_ConditionFunction_Init(void* conditionFunction, ConditionFunction_ApplyFunc* apply, Name name);
 	
@@ -118,3 +126,4 @@
 
 
 #endif /* __Base_Automation_ConditionFunction_h__ */
+

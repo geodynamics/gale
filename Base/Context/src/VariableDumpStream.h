@@ -67,17 +67,18 @@
 	void VariableDumpStream_Init( VariableDumpStream* self, Name name );
 
 	/** Constructor interface. */
-	VariableDumpStream* _VariableDumpStream_New( 
-		SizeT			_sizeOfSelf, 
-		Type			type, 
-		Stg_Class_DeleteFunction*	_delete, 
-		Stg_Class_PrintFunction* 	_print,
-		Stg_Class_CopyFunction*	_copy, 
-		Name			name,
-		Stream_PrintfFunction*	_printf, 
-		Stream_WriteFunction*	_write, 
-		Stream_DumpFunction*	_dump,
-		Stream_SetFileFunction*	_setFile );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define VARIABLEDUMPSTREAM_DEFARGS \
+                CSTREAM_DEFARGS
+
+	#define VARIABLEDUMPSTREAM_PASSARGS \
+                CSTREAM_PASSARGS
+
+	VariableDumpStream* _VariableDumpStream_New(  VARIABLEDUMPSTREAM_DEFARGS  );
 
 	/** Init interface. */
 	void _VariableDumpStream_Init( VariableDumpStream *self );
@@ -104,6 +105,7 @@
 	
 	
 #endif /* __IO_VariableDumpStreamFile_h__ */
+
 
 
 

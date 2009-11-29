@@ -44,21 +44,12 @@
 const Type JournalFile_Type = "JournalFile";
 
 
-JournalFile* _JournalFile_New(
-	SizeT				_sizeOfSelf,
-	Type				type,
-	Stg_Class_DeleteFunction*	_delete,
-	Stg_Class_PrintFunction*	_print,
-	Stg_Class_CopyFunction*		_copy, 
-	JournalFile_OpenFunction*	_open,
-	JournalFile_AppendFunction*	_append,
-	JournalFile_CloseFunction*	_close,
-	JournalFile_FlushFunction*	_flush )
+JournalFile* _JournalFile_New(  JOURNALFILE_DEFARGS  )
 {
 	JournalFile* self;
 	
 	assert( _sizeOfSelf >= sizeof(JournalFile) );
-	self = (JournalFile*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (JournalFile*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	_JournalFile_Init( self, _open, _append, _close, _flush );
 	
@@ -167,3 +158,5 @@ Bool JournalFile_Flush( void* file )
 	stJournal->flushCount++;
 	return self->_flush( self );
 }
+
+

@@ -150,28 +150,50 @@
 	** Constructor
 	*/
 	/* Creation implementation */
-	Stg_ComponentFactory* _Stg_ComponentFactory_New( 
-		SizeT                                                    _sizeOfSelf,
-		Type                                                     type,
-		Stg_Class_DeleteFunction*                                _delete,
-		Stg_Class_PrintFunction*                                 _print,
-		Stg_Class_CopyFunction*                                  _copy,
-		Stg_ComponentFactory_GetDoubleFunc*                      getDouble,
-		Stg_ComponentFactory_GetIntFunc*                         getInt,
-		Stg_ComponentFactory_GetUnsignedIntFunc*                 getUnsignedInt,
-		Stg_ComponentFactory_GetBoolFunc*                        getBool,
-		Stg_ComponentFactory_GetStringFunc*                      getString,
-		Stg_ComponentFactory_GetRootDictDoubleFunc*              getRootDictDouble,
-		Stg_ComponentFactory_GetRootDictIntFunc*                 getRootDictInt,
-		Stg_ComponentFactory_GetRootDictUnsignedIntFunc*         getRootDictUnsignedInt,
-		Stg_ComponentFactory_GetRootDictBoolFunc*                getRootDictBool,
-		Stg_ComponentFactory_GetRootDictStringFunc*              getRootDictString,
-		Stg_ComponentFactory_ConstructByNameFunc*                constructByName,
-		Stg_ComponentFactory_ConstructByKeyFunc*                 constructByKey,
-		Stg_ComponentFactory_ConstructByNameWithKeyFallbackFunc* constructByNameWithKeyFallback,
-		Stg_ComponentFactory_ConstructByListFunc*                constructByList,
-		Dictionary*                                              rootDict,
-		Dictionary*                                              componentDict );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STG_COMPONENTFACTORY_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                Stg_ComponentFactory_GetDoubleFunc*                                            getDouble, \
+                Stg_ComponentFactory_GetIntFunc*                                                  getInt, \
+                Stg_ComponentFactory_GetUnsignedIntFunc*                                  getUnsignedInt, \
+                Stg_ComponentFactory_GetBoolFunc*                                                getBool, \
+                Stg_ComponentFactory_GetStringFunc*                                            getString, \
+                Stg_ComponentFactory_GetRootDictDoubleFunc*                            getRootDictDouble, \
+                Stg_ComponentFactory_GetRootDictIntFunc*                                  getRootDictInt, \
+                Stg_ComponentFactory_GetRootDictUnsignedIntFunc*                  getRootDictUnsignedInt, \
+                Stg_ComponentFactory_GetRootDictBoolFunc*                                getRootDictBool, \
+                Stg_ComponentFactory_GetRootDictStringFunc*                            getRootDictString, \
+                Stg_ComponentFactory_ConstructByNameFunc*                                constructByName, \
+                Stg_ComponentFactory_ConstructByKeyFunc*                                  constructByKey, \
+                Stg_ComponentFactory_ConstructByNameWithKeyFallbackFunc*  constructByNameWithKeyFallback, \
+                Stg_ComponentFactory_ConstructByListFunc*                                constructByList, \
+                Dictionary*                                                                     rootDict, \
+                Dictionary*                                                                componentDict
+
+	#define STG_COMPONENTFACTORY_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        getDouble,                      \
+	        getInt,                         \
+	        getUnsignedInt,                 \
+	        getBool,                        \
+	        getString,                      \
+	        getRootDictDouble,              \
+	        getRootDictInt,                 \
+	        getRootDictUnsignedInt,         \
+	        getRootDictBool,                \
+	        getRootDictString,              \
+	        constructByName,                \
+	        constructByKey,                 \
+	        constructByNameWithKeyFallback, \
+	        constructByList,                \
+	        rootDict,                       \
+	        componentDict                 
+
+	Stg_ComponentFactory* _Stg_ComponentFactory_New(  STG_COMPONENTFACTORY_DEFARGS  );
 	
 	Stg_ComponentFactory* Stg_ComponentFactory_New( 
 		Dictionary*                                              rootDict,
@@ -299,3 +321,4 @@
 	#define Stg_ComponentFactory_Unlimited ((unsigned int) -1)
 
 #endif /* __Base_Automation_Stg_ComponentFactory_h__ */
+

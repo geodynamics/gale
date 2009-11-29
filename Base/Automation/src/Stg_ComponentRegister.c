@@ -51,33 +51,33 @@ const Type Stg_ComponentRegisterElement_Type = "Stg_ComponentRegisterElement";
 const Name Version = "0";
 Stg_ComponentRegister *stgComponentRegister = NULL;
 
-Stg_ComponentRegister *_Stg_ComponentRegister_New(
-	SizeT					_sizeOfSelf, 
-	Type					type,
-	Stg_Class_DeleteFunction*		_delete,
-	Stg_Class_PrintFunction*		_print, 
-	Stg_Class_CopyFunction*			_copy )
+Stg_ComponentRegister *_Stg_ComponentRegister_New(  STG_COMPONENTREGISTER_DEFARGS  )
 {
 	Stg_ComponentRegister *self = NULL;
 
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Stg_ComponentRegister) );
-	self = (Stg_ComponentRegister*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (Stg_ComponentRegister*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 
 	return self;
 }
 	
 Stg_ComponentRegister *Stg_ComponentRegister_New(  )
 {
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof( Stg_ComponentRegister );
+	Type                              type = Stg_ComponentRegister_Type;
+	Stg_Class_DeleteFunction*      _delete = _Stg_ComponentRegister_Delete;
+	Stg_Class_PrintFunction*        _print = _Stg_ComponentRegister_Print;
+
 	Stg_ComponentRegister *self = NULL;
 
 	if( stgComponentRegister == NULL ){
 		
-		self = _Stg_ComponentRegister_New( sizeof( Stg_ComponentRegister ),
-			Stg_ComponentRegister_Type,
-			_Stg_ComponentRegister_Delete,
-			_Stg_ComponentRegister_Print,
-			NULL );
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_Class_CopyFunction*  _copy = NULL;
+
+		self = _Stg_ComponentRegister_New(  STG_COMPONENTREGISTER_PASSARGS  );
 		Stg_ComponentRegister_Init( self );
 	}
 	else{
@@ -323,3 +323,5 @@ void Stg_ComponentRegister_PrintAllTypes( void* componentRegister, void* stream 
 	   Journal_Printf( stream, "%s\n", element->componentType );
 	}
 }
+
+

@@ -98,3 +98,5 @@ void _pcu_check_fileEq( const char* const fileName1, const char* const fileName2
    fclose(testFile1);
    fclose(testFile2);
 }
+
+

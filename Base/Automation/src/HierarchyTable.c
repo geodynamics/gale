@@ -190,3 +190,5 @@ Type HierarchyTable_GetTypePtrFromName( void* hierarchyTable, Name typeName ) {
 	}
 	return NULL;
 }
+
+

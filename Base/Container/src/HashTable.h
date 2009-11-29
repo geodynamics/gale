@@ -111,13 +111,18 @@
 				HashTable_dataDeleteFunction*	dataDeleteFunction,
 				KeyType keyType);
 
-	HashTable* _HashTable_New(
-				SizeT				_sizeOfSelf,
-				Type				type,
-				Stg_Class_DeleteFunction*	_delete,
-				Stg_Class_PrintFunction*	_print,
-				Stg_Class_CopyFunction*		_copy
-				);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define HASHTABLE_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define HASHTABLE_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	HashTable* _HashTable_New(  HASHTABLE_DEFARGS  );
 
 	
 	/** Init interface. */
@@ -167,4 +172,5 @@
 	struct HashTable_Index* HashTable_First( struct HashTable *ht );
 
 #endif /* __HashTable_h__ */
+
 

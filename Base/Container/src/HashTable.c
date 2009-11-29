@@ -46,22 +46,11 @@ const Type HashTable_Type = "HashTable";
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
-HashTable* _HashTable_New(
-			SizeT							_sizeOfSelf,
-			Type							type,
-			Stg_Class_DeleteFunction*	_delete,
-			Stg_Class_PrintFunction*	_print,
-			Stg_Class_CopyFunction*		_copy
-			)
+HashTable* _HashTable_New(  HASHTABLE_DEFARGS  )
 {
 	HashTable *self = NULL;
 
-	self = (HashTable*)_Stg_Class_New(
-							_sizeOfSelf,
-							type,
-							_delete,
-							_print,
-							_copy);
+	self = (HashTable*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	return self;
 }
 
@@ -71,16 +60,18 @@ HashTable* HashTable_New(
 			HashTable_dataDeleteFunction*	dataDeleteFunction,
 			KeyType keyType)
 {
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(HashTable);
+	Type                              type = HashTable_Type;
+	Stg_Class_DeleteFunction*      _delete = _HashTable_DeleteFunc;
+	Stg_Class_PrintFunction*        _print = _HashTable_PrintFunc;
+	Stg_Class_CopyFunction*          _copy = _HashTable_CopyFunc;
+
 	
 	HashTable* self;
 	
 	/* General info */
-	self = _HashTable_New( 
-		   					sizeof(HashTable),
-							HashTable_Type,
-							_HashTable_DeleteFunc,
-							_HashTable_PrintFunc,
-							_HashTable_CopyFunc);
+	self = _HashTable_New(  HASHTABLE_PASSARGS  );
 
 	/* List info */
 	/* At the moment only String keys are supported */
@@ -609,3 +600,5 @@ HashTable_Index* HashTable_First( HashTable *ht )
     
 	return HashTable_Next( hi );
 }
+
+

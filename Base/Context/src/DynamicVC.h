@@ -51,11 +51,7 @@ extern const Type DynamicVC_Type;
 
 	struct DynamicVC { __DynamicVC };
 
-	#define DYNAMICVC_DEFARGS \
-    	VARIABLECONDITION_DEFARGS
 
-	#define DYNAMICVC_PASSARGS \
-    	VARIABLECONDITION_PASSARGS
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
@@ -73,7 +69,18 @@ extern const Type DynamicVC_Type;
 
 	DynamicVC* _DynamicVC_DefaultNew( Name name );
 
-	DynamicVC* _DynamicVC_New( DYNAMICVC_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define DYNAMICVC_DEFARGS \
+                VARIABLECONDITION_DEFARGS
+
+	#define DYNAMICVC_PASSARGS \
+                VARIABLECONDITION_PASSARGS
+
+	DynamicVC* _DynamicVC_New(  DYNAMICVC_DEFARGS  );
 
 	void _DynamicVC_Init( void* vc );
 
@@ -151,3 +158,4 @@ extern const Type DynamicVC_Type;
 	Bool DynamicVC_Has( void* _self, int index );
 
 #endif /* __Base_Automation_DynamicVC_h__ */
+

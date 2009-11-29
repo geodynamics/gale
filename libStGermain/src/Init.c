@@ -76,3 +76,5 @@ Bool StGermain_Init( int* argc, char** argv[] ) {
 	
 	return True;
 }
+
+

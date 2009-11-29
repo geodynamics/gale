@@ -51,22 +51,18 @@
 /* Textual name of this class */
 const Type ExtensionInfo_Type = "ExtensionInfo";
 
-ExtensionInfo* _ExtensionInfo_New( 
-		SizeT 				_sizeOfSelf, 
-		Type 				type, 
-		Stg_Class_DeleteFunction* 	_delete,
-		Stg_Class_PrintFunction*	_print,
-		Stg_Class_CopyFunction*		_copy,
-		ExtensionInfo_DataCopyFunction*	_dataCopy,
-		Name 				name, 
-		SizeT 				size,
-		Index				count )
+ExtensionInfo* _ExtensionInfo_New(  EXTENSIONINFO_DEFARGS  )
 {
 	ExtensionInfo* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ExtensionInfo) );
-	self = (ExtensionInfo*)_Stg_Object_New( _sizeOfSelf, type, _delete, _print, _copy, name, NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (ExtensionInfo*)_Stg_Object_New(  STG_OBJECT_PASSARGS  );
 	
 	/* General info */
 	
@@ -286,3 +282,5 @@ void ExtensionInfo_Register(
 	
 	/* To consider... is there a way of checking that the handle is a sane value? SQ20050505 */
 }
+
+

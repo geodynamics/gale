@@ -57,20 +57,17 @@ Set* Set_New_all(
 		BTree_dataCopyFunction*				dataCopyFunc, 
 		BTree_dataDeleteFunction*			dataDeleteFunc )
 {
-	return _Set_New( 
-		sizeof(Set), 
-		Set_Type, 
-		_Set_Delete, 
-		_Set_Print, 
-		NULL, 
-		_Set_Union, 
-		_Set_Intersection, 
-		_Set_Subtraction, 
-		dictionary, 
-		elementSize, 
-		compareFunc, 
-		dataCopyFunc, 
-		dataDeleteFunc );
+	/* Variables set in this function */
+	SizeT                            _sizeOfSelf = sizeof(Set);
+	Type                                    type = Set_Type;
+	Stg_Class_DeleteFunction*            _delete = _Set_Delete;
+	Stg_Class_PrintFunction*              _print = _Set_Print;
+	Stg_Class_CopyFunction*                _copy = NULL;
+	Set_UnionFunc*                    _unionFunc = _Set_Union;
+	Set_IntersectionFunc*      _intersectionFunc = _Set_Intersection;
+	Set_SubtractionFunc*        _subtractionFunc = _Set_Subtraction;
+
+	return _Set_New(  SET_PASSARGS  );
 }
 
 
@@ -102,31 +99,13 @@ void Set_Init(
 }
 
 
-Set* _Set_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		Set_UnionFunc*					_unionFunc, 
-		Set_IntersectionFunc*				_intersectionFunc, 
-		Set_SubtractionFunc*				_subtractionFunc, 
-		Dictionary*					dictionary, 
-		SizeT						elementSize, 
-		BTree_compareFunction*				compareFunc, 
-		BTree_dataCopyFunction*				dataCopyFunc, 
-		BTree_dataDeleteFunction*			dataDeleteFunc )
+Set* _Set_New(  SET_DEFARGS  )
 {
 	Set*	self;
 	
 	/* allocate memory */
 	assert( _sizeOfSelf >= sizeof(Set) );
-	self = (Set*)_Stg_Class_New(
-		_sizeOfSelf,
-		type,
-		_delete,
-		_print, 
-		_copy );
+	self = (Set*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* general info */
 	self->dictionary = dictionary;
@@ -297,3 +276,5 @@ void _Set_BTreeSubtraction( void* data, void* pack ) {
 		Set_Insert( ((Set**)pack)[1], data );
 	}
 }
+
+

@@ -51,7 +51,14 @@ VariableCondition_Register* variableCondition_Register = 0;
 
 
 VariableCondition_Register* VariableCondition_Register_New(void) {
-	return _VariableCondition_Register_New( sizeof(VariableCondition_Register), VariableCondition_Register_Type, _VariableCondition_Register_Delete, _VariableCondition_Register_Print, NULL );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(VariableCondition_Register);
+	Type                              type = VariableCondition_Register_Type;
+	Stg_Class_DeleteFunction*      _delete = _VariableCondition_Register_Delete;
+	Stg_Class_PrintFunction*        _print = _VariableCondition_Register_Print;
+	Stg_Class_CopyFunction*          _copy = NULL;
+
+	return _VariableCondition_Register_New(  VARIABLECONDITION_REGISTER_PASSARGS  );
 }
 
 void VariableCondition_Register_Init( void* variableCondition_Register ) {
@@ -72,18 +79,13 @@ void VariableCondition_Register_Init( void* variableCondition_Register ) {
 	_VariableCondition_Register_Init( self );
 }
 
-VariableCondition_Register* _VariableCondition_Register_New(
-		SizeT				_sizeOfSelf,
-		Type				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy )
+VariableCondition_Register* _VariableCondition_Register_New(  VARIABLECONDITION_REGISTER_DEFARGS  )
 {
 	VariableCondition_Register* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(VariableCondition_Register) );
-	self = (VariableCondition_Register*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (VariableCondition_Register*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* General info */
 	
@@ -223,3 +225,5 @@ VariableCondition* VariableCondition_Register_CreateNew(
 		(Dictionary*)dictionary,
 		data );
 }
+
+

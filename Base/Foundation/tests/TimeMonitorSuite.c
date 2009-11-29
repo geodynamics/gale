@@ -81,3 +81,5 @@ void TimeMonitorSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, TimeMonitorSuite_Setup, TimeMonitorSuite_Teardown );
    pcu_suite_addTest( suite, TimeMonitorSuite_TestTimingPeriod );
 }
+
+

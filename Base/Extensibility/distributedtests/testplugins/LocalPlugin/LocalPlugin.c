@@ -74,3 +74,5 @@ Index LocalPlugin_Register( PluginsManager* pluginsManager ) {
 	return ModulesManager_Submit( pluginsManager, LocalPlugin_Type, "0", _LocalPlugin_DefaultNew );
 }
 
+
+

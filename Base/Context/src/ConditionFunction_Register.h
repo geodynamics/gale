@@ -74,12 +74,18 @@
 	
 	void				ConditionFunction_Register_Init(ConditionFunction_Register* self);
 	
-	ConditionFunction_Register*	_ConditionFunction_Register_New( 
-						SizeT			_sizeOfSelf,
-						Type			type,
-						Stg_Class_DeleteFunction*	_delete,
-						Stg_Class_PrintFunction*	_print,
-						Stg_Class_CopyFunction*	_copy );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CONDITIONFUNCTION_REGISTER_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define CONDITIONFUNCTION_REGISTER_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	ConditionFunction_Register*	_ConditionFunction_Register_New(  CONDITIONFUNCTION_REGISTER_DEFARGS  );
 		
 	void				_ConditionFunction_Register_Init(void* conditionFunction_Register);
 	
@@ -120,3 +126,4 @@
 
 	
 #endif /* __Base_Automation_ConditionFunction_Register_h__ */
+

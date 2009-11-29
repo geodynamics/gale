@@ -64,17 +64,18 @@
 	void CStream_Init( CStream* self, Name name );
 
 	/** Constructor interface. */
-	CStream* _CStream_New( 
-		SizeT			_sizeOfSelf, 
-		Type			type, 
-		Stg_Class_DeleteFunction*	_delete, 
-		Stg_Class_PrintFunction* 	_print,
-		Stg_Class_CopyFunction*	_copy, 
-		Name			name,
-		Stream_PrintfFunction*	_printf, 
-		Stream_WriteFunction*	_write, 
-		Stream_DumpFunction*	_dump,
-		Stream_SetFileFunction*	_setFile );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CSTREAM_DEFARGS \
+                STREAM_DEFARGS
+
+	#define CSTREAM_PASSARGS \
+                STREAM_PASSARGS
+
+	CStream* _CStream_New(  CSTREAM_DEFARGS  );
 
 	/** Init interface. */
 	void _CStream_Init( CStream *self );
@@ -100,6 +101,7 @@
 	
 	
 #endif /* __IO_CStreamFile_h__ */
+
 
 
 

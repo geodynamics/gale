@@ -51,19 +51,22 @@ const Type RangeSet_Type = "RangeSet";
 */
 
 RangeSet* RangeSet_New() {
-	return _RangeSet_New( sizeof(RangeSet), 
-			      RangeSet_Type, 
-			      _RangeSet_Delete, 
-			      _RangeSet_Print, 
-			      _RangeSet_Copy );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(RangeSet);
+	Type                              type = RangeSet_Type;
+	Stg_Class_DeleteFunction*      _delete = _RangeSet_Delete;
+	Stg_Class_PrintFunction*        _print = _RangeSet_Print;
+	Stg_Class_CopyFunction*          _copy = _RangeSet_Copy;
+
+	return _RangeSet_New(  RANGESET_PASSARGS  );
 }
 
-RangeSet* _RangeSet_New( RANGESET_DEFARGS ) {
+RangeSet* _RangeSet_New(  RANGESET_DEFARGS  ) {
 	RangeSet* self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(RangeSet) );
-	self = (RangeSet*)_Stg_Class_New( STG_CLASS_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(RangeSet) );
+	self = (RangeSet*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 
 	/* Virtual info */
 
@@ -609,3 +612,5 @@ void RangeSet_Destruct( RangeSet* self ) {
 	self->btree = BTree_New( RangeSet_DataCompare, RangeSet_DataCopy, RangeSet_DataDelete, NULL, 
 				 BTREE_NO_DUPLICATES );
 }
+
+

@@ -54,26 +54,18 @@
 	/* Creation implementation */
 	DocumentationComponentFactory* DocumentationComponentFactory_New( );
 	
-	DocumentationComponentFactory* _DocumentationComponentFactory_New( 
-		SizeT                                                    _sizeOfSelf,
-		Type                                                     type,
-		Stg_Class_DeleteFunction*                                _delete,
-		Stg_Class_PrintFunction*                                 _print,
-		Stg_Class_CopyFunction*                                  _copy,
-		Stg_ComponentFactory_GetDoubleFunc*                      getDouble,
-		Stg_ComponentFactory_GetIntFunc*                         getInt,
-		Stg_ComponentFactory_GetUnsignedIntFunc*                 getUnsignedInt,
-		Stg_ComponentFactory_GetBoolFunc*                        getBool,
-		Stg_ComponentFactory_GetStringFunc*                      getString,
-		Stg_ComponentFactory_GetRootDictDoubleFunc*              getRootDictDouble,
-		Stg_ComponentFactory_GetRootDictIntFunc*                 getRootDictInt,
-		Stg_ComponentFactory_GetRootDictUnsignedIntFunc*         getRootDictUnsignedInt,
-		Stg_ComponentFactory_GetRootDictBoolFunc*                getRootDictBool,
-		Stg_ComponentFactory_GetRootDictStringFunc*              getRootDictString,
-		Stg_ComponentFactory_ConstructByNameFunc*                constructByName,
-		Stg_ComponentFactory_ConstructByKeyFunc*                 constructByKey,
-		Stg_ComponentFactory_ConstructByNameWithKeyFallbackFunc* constructByNameWithKeyFallback,
-		Stg_ComponentFactory_ConstructByListFunc*                constructByList );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define DOCUMENTATIONCOMPONENTFACTORY_DEFARGS \
+                STG_COMPONENTFACTORY_DEFARGS
+
+	#define DOCUMENTATIONCOMPONENTFACTORY_PASSARGS \
+                STG_COMPONENTFACTORY_PASSARGS
+
+	DocumentationComponentFactory* _DocumentationComponentFactory_New(  DOCUMENTATIONCOMPONENTFACTORY_DEFARGS  );
 	
 	/*-----------------------------------------------------------------------------------------------------------------
 	** Virtual functions
@@ -140,3 +132,4 @@
 	void DocumentationComponentFactory_DocumentType( void* cf, Type type ) ;
 
 #endif /* __Base_Automation_DocumentationComponentFactory_h__ */
+

@@ -161,3 +161,5 @@ void CommonRoutinesSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, CommonRoutinesSuite_TestStG_RoundDoubleToNDecimalPlaces );
    pcu_suite_addTest( suite, CommonRoutinesSuite_TestStG_RoundDoubleToNSigFigs );
 }
+
+

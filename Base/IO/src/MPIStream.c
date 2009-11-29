@@ -56,8 +56,18 @@ const Type MPIStream_Type = "MPIStream";
 
 Stream* MPIStream_New( Name name )
 {
-	return (Stream*)_MPIStream_New( sizeof(MPIStream), MPIStream_Type, _MPIStream_Delete, _MPIStream_Print, _Stream_Copy, 
-		name, _MPIStream_Printf, _MPIStream_Write, _MPIStream_Dump, _MPIStream_SetFile );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(MPIStream);
+	Type                              type = MPIStream_Type;
+	Stg_Class_DeleteFunction*      _delete = _MPIStream_Delete;
+	Stg_Class_PrintFunction*        _print = _MPIStream_Print;
+	Stg_Class_CopyFunction*          _copy = _Stream_Copy;
+	Stream_PrintfFunction*         _printf = _MPIStream_Printf;
+	Stream_WriteFunction*           _write = _MPIStream_Write;
+	Stream_DumpFunction*             _dump = _MPIStream_Dump;
+	Stream_SetFileFunction*       _setFile = _MPIStream_SetFile;
+
+	return (Stream*)_MPIStream_New(  MPISTREAM_PASSARGS  );
 }
 
 void MPIStream_Init( MPIStream* self, Name name )
@@ -66,24 +76,13 @@ void MPIStream_Init( MPIStream* self, Name name )
 }
 
 
-MPIStream* _MPIStream_New( 
-	SizeT			_sizeOfSelf, 
-	Type			type, 
-	Stg_Class_DeleteFunction*	_delete, 
-	Stg_Class_PrintFunction* 	_print,
-	Stg_Class_CopyFunction*	_copy, 
-	Name			name,
-	Stream_PrintfFunction*	_printf, 
-	Stream_WriteFunction*	_write, 
-	Stream_DumpFunction*	_dump,
-	Stream_SetFileFunction*	_setFile )
+MPIStream* _MPIStream_New(  MPISTREAM_DEFARGS  )
 {
 	MPIStream* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(MPIStream) );
-	self = (MPIStream*)_Stream_New( _sizeOfSelf, type, _delete, _print, _copy, name, 
-		_printf, _write, _dump, _setFile );
+	self = (MPIStream*)_Stream_New(  STREAM_PASSARGS  );
 	
 	_MPIStream_Init( self );
 	
@@ -230,3 +229,5 @@ SizeT MPIStream_WriteAllProcessors( Stream* stream, void *data, SizeT elem_size,
 
 	return Stream_Write( stream, data, elem_size, num_elems );
 }
+
+

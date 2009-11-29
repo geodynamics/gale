@@ -49,7 +49,14 @@ const Type EntryPoint_Register_Type = "EntryPoint_Register";
 
 
 EntryPoint_Register* EntryPoint_Register_New( void ) {
-	return _EntryPoint_Register_New( sizeof(EntryPoint_Register), EntryPoint_Register_Type, _EntryPoint_Register_Delete, _EntryPoint_Register_Print, NULL );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(EntryPoint_Register);
+	Type                              type = EntryPoint_Register_Type;
+	Stg_Class_DeleteFunction*      _delete = _EntryPoint_Register_Delete;
+	Stg_Class_PrintFunction*        _print = _EntryPoint_Register_Print;
+	Stg_Class_CopyFunction*          _copy = NULL;
+
+	return _EntryPoint_Register_New(  ENTRYPOINT_REGISTER_PASSARGS  );
 }
 
 void EntryPoint_Register_Init( void* entryPoint_Register ) {
@@ -70,18 +77,13 @@ void EntryPoint_Register_Init( void* entryPoint_Register ) {
 	_EntryPoint_Register_Init( self );
 }
 
-EntryPoint_Register* _EntryPoint_Register_New(
-		SizeT				_sizeOfSelf,
-		Type				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy )
+EntryPoint_Register* _EntryPoint_Register_New(  ENTRYPOINT_REGISTER_DEFARGS  )
 {
 	EntryPoint_Register* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(EntryPoint_Register) );
-	self = (EntryPoint_Register*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (EntryPoint_Register*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* General info */
 	
@@ -209,3 +211,5 @@ EntryPoint_Index EntryPoint_Register_Find( void* entryPoint_Register, void* entr
 	
 	return (EntryPoint_Index)-1;
 }
+
+

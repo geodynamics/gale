@@ -51,12 +51,12 @@ const Type VariableCondition_Type = "VariableCondition";
 ** Constructor
 */
 
-VariableCondition* _VariableCondition_New( VARIABLECONDITION_DEFARGS ) {
+VariableCondition* _VariableCondition_New(  VARIABLECONDITION_DEFARGS  ) {
 	VariableCondition*	self;
 	
 	/* Allocate memory/General info */
-	assert( sizeOfSelf >= sizeof(VariableCondition) );
-	self = (VariableCondition*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(VariableCondition) );
+	self = (VariableCondition*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* Virtual info */
 	self->_buildSelf = _buildSelf;
@@ -739,3 +739,5 @@ void VariableCondition_PrintConcise( void* variableCondition, Stream* stream ) {
 	
 	self->_printConcise( self, stream );
 }
+
+

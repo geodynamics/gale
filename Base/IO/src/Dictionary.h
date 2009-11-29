@@ -105,18 +105,30 @@
 	Dictionary* Dictionary_New( void );
 	
 	/** Constructor interface. */
-	Dictionary* _Dictionary_New( 
-		SizeT											_sizeOfSelf, 
-		Type											type, 
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print,
-		Stg_Class_CopyFunction*					_copy, 
-		Dictionary_AddFunction*					add,
-		Dictionary_AddWithSourceFunction*	addWithSource,
-		Dictionary_SetFunction*					set,
-		Dictionary_SetWithSourceFunction*	setWithSource,
-		Dictionary_GetFunction*					get,
-		Dictionary_GetSourceFunction*			getSource);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define DICTIONARY_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                Dictionary_AddFunction*                      add, \
+                Dictionary_AddWithSourceFunction*  addWithSource, \
+                Dictionary_SetFunction*                      set, \
+                Dictionary_SetWithSourceFunction*  setWithSource, \
+                Dictionary_GetFunction*                      get, \
+                Dictionary_GetSourceFunction*          getSource
+
+	#define DICTIONARY_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        add,           \
+	        addWithSource, \
+	        set,           \
+	        setWithSource, \
+	        get,           \
+	        getSource    
+
+	Dictionary* _Dictionary_New(  DICTIONARY_DEFARGS  );
 	
 	/** Init interface. */
 	void _Dictionary_Init( void* dictionary );
@@ -218,3 +230,4 @@
 	Bool Dictionary_CompareAllEntriesFull( void* dictionary1, void* dictionary2, Bool strictTypeCheck );
 
 #endif /* __Base_IO_Dictionary_h__ */
+

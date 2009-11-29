@@ -48,12 +48,28 @@ const Type CFile_Type = "CFile";
 
 JournalFile* CFile_New()
 {
-	return (JournalFile*)_CFile_New( sizeof(CFile), CFile_Type, _CFile_Delete, _CFile_Print, NULL, False );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(CFile);
+	Type                              type = CFile_Type;
+	Stg_Class_DeleteFunction*      _delete = _CFile_Delete;
+	Stg_Class_PrintFunction*        _print = _CFile_Print;
+	Stg_Class_CopyFunction*          _copy = NULL;
+	Bool                            binary = False;
+
+	return (JournalFile*)_CFile_New(  CFILE_PASSARGS  );
 }
 
 JournalFile* CFileBinary_New()
 {
-	return (JournalFile*)_CFile_New( sizeof(CFile), CFile_Type, _CFile_Delete, _CFile_Print, NULL, True );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(CFile);
+	Type                              type = CFile_Type;
+	Stg_Class_DeleteFunction*      _delete = _CFile_Delete;
+	Stg_Class_PrintFunction*        _print = _CFile_Print;
+	Stg_Class_CopyFunction*          _copy = NULL;
+	Bool                            binary = True;
+
+	return (JournalFile*)_CFile_New(  CFILE_PASSARGS  );
 }
 
 
@@ -71,17 +87,11 @@ JournalFile* CFile_New2( char* fileName )
 	return result;
 }
 
-CFile* _CFile_New(
-	SizeT _sizeOfSelf,
-	Type type,
-	Stg_Class_DeleteFunction* _delete,
-	Stg_Class_PrintFunction* _print,
-	Stg_Class_CopyFunction* _copy,
-	Bool                    binary)
+CFile* _CFile_New(  CFILE_DEFARGS  )
 {
 	CFile* self;
 	
-	self = (CFile*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (CFile*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	self->binary = binary;
 	
 	_CFile_Init( self );
@@ -179,4 +189,6 @@ Bool _CFile_Flush( void* file )
 	}
 	return False;
 }
+
+
 

@@ -47,49 +47,29 @@ const Type PluginsManager_Type = "PluginsManager";
 
 
 PluginsManager* PluginsManager_New( void ) {
-	return _PluginsManager_New( 
-		sizeof(PluginsManager), 
-		PluginsManager_Type, 
-		_PluginsManager_Delete, 
-		_PluginsManager_Print, 
-		NULL, 
-		_PluginsManager_GetPluginsList,
-		_PluginsManager_LoadPlugin,
-		_PluginsManager_UnloadPlugin,
-		Plugin_Factory,
-		_PluginsManager_CheckContext,
-		_PluginsManager_GetModuleName );
+	/* Variables set in this function */
+	SizeT                                       _sizeOfSelf = sizeof(PluginsManager);
+	Type                                               type = PluginsManager_Type;
+	Stg_Class_DeleteFunction*                       _delete = _PluginsManager_Delete;
+	Stg_Class_PrintFunction*                         _print = _PluginsManager_Print;
+	Stg_Class_CopyFunction*                           _copy = NULL;
+	ModulesManager_GetModulesListFunction*  _getModulesList = _PluginsManager_GetPluginsList;
+	ModulesManager_LoadModuleFunction*          _loadModule = _PluginsManager_LoadPlugin;
+	ModulesManager_UnloadModuleFunction*      _unloadModule = _PluginsManager_UnloadPlugin;
+	ModulesManager_ModuleFactoryFunction*    _moduleFactory = Plugin_Factory;
+	ModulesManager_CheckContextFunction*      _checkContext = _PluginsManager_CheckContext;
+	ModulesManager_GetModuleNameFunction*    _getModuleName = _PluginsManager_GetModuleName;
+
+	return _PluginsManager_New(  PLUGINSMANAGER_PASSARGS  );
 }
 
-PluginsManager* _PluginsManager_New(
-		SizeT                                   _sizeOfSelf,
-		Type                                    type,
-		Stg_Class_DeleteFunction*               _delete,
-		Stg_Class_PrintFunction*                _print,
-		Stg_Class_CopyFunction*                 _copy, 
-		ModulesManager_GetModulesListFunction*  _getModulesList,
-		ModulesManager_LoadModuleFunction*	_loadModule,
-		ModulesManager_UnloadModuleFunction*	_unloadModule,
-		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
-		ModulesManager_CheckContextFunction*	_checkContext,
-		ModulesManager_GetModuleNameFunction*	_getModuleName )
+PluginsManager* _PluginsManager_New(  PLUGINSMANAGER_DEFARGS  )
 {
 	PluginsManager* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(PluginsManager) );
-	self = (PluginsManager*)_ModulesManager_New( 
-		_sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy, 
-		_getModulesList, 
-		_loadModule, 
-		_unloadModule,
-		_moduleFactory,
-		_checkContext,
-		_getModuleName );
+	self = (PluginsManager*)_ModulesManager_New(  MODULESMANAGER_PASSARGS  );
 	
 	/* General info */
 	
@@ -185,5 +165,7 @@ Name _PluginsManager_GetModuleName( void* pluginsManager, Dictionary_Entry_Value
 
 	return pluginName;	
 }
+
+
 
 

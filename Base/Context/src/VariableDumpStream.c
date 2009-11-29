@@ -48,17 +48,18 @@ const Type VariableDumpStream_Type = "VariableDumpStream";
 
 Stream* VariableDumpStream_New( Name name )
 {
-	return (Stream*)_VariableDumpStream_New( 
-		sizeof(VariableDumpStream), 
-		VariableDumpStream_Type, 
-		_VariableDumpStream_Delete, 
-		_VariableDumpStream_Print, 
-		_VariableDumpStream_Copy, 
-		name,
-		_CStream_Printf,
-		_CStream_Write,
-		_VariableDumpStream_Dump,
-		_CStream_SetFile );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(VariableDumpStream);
+	Type                              type = VariableDumpStream_Type;
+	Stg_Class_DeleteFunction*      _delete = _VariableDumpStream_Delete;
+	Stg_Class_PrintFunction*        _print = _VariableDumpStream_Print;
+	Stg_Class_CopyFunction*          _copy = _VariableDumpStream_Copy;
+	Stream_PrintfFunction*         _printf = _CStream_Printf;
+	Stream_WriteFunction*           _write = _CStream_Write;
+	Stream_DumpFunction*             _dump = _VariableDumpStream_Dump;
+	Stream_SetFileFunction*       _setFile = _CStream_SetFile;
+
+	return (Stream*)_VariableDumpStream_New(  VARIABLEDUMPSTREAM_PASSARGS  );
 }
 
 void VariableDumpStream_Init( VariableDumpStream* self, Name name )
@@ -67,24 +68,13 @@ void VariableDumpStream_Init( VariableDumpStream* self, Name name )
 }
 
 
-VariableDumpStream* _VariableDumpStream_New( 
-	SizeT			_sizeOfSelf, 
-	Type			type, 
-	Stg_Class_DeleteFunction*	_delete, 
-	Stg_Class_PrintFunction* 	_print,
-	Stg_Class_CopyFunction*	_copy, 
-	Name			name,
-	Stream_PrintfFunction*	_printf, 
-	Stream_WriteFunction*	_write, 
-	Stream_DumpFunction*	_dump,
-	Stream_SetFileFunction*	_setFile )
+VariableDumpStream* _VariableDumpStream_New(  VARIABLEDUMPSTREAM_DEFARGS  )
 {
 	VariableDumpStream* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(VariableDumpStream) );
-	self = (VariableDumpStream*)_CStream_New( _sizeOfSelf, type, _delete, _print, _copy, name, 
-		_printf, _write, _dump, _setFile );
+	self = (VariableDumpStream*)_CStream_New(  CSTREAM_PASSARGS  );
 	
 	_VariableDumpStream_Init( self );
 	
@@ -199,3 +189,5 @@ void VariableDumpStream_SetVariable( void* stream, Variable* data, int numItems,
 	}
 	Stream_SetFile( stream, file );
 }
+
+

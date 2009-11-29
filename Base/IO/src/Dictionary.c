@@ -54,38 +54,29 @@ static const int STRUCT_INIT_SIZE = 2;
 static const int STRUCT_DELTA = 2;
 
 Dictionary* Dictionary_New( void ) {
-	return _Dictionary_New(
-		sizeof(Dictionary),
-		Dictionary_Type,
-		_Dictionary_Delete,
-		_Dictionary_Print,
-		_Dictionary_Copy, 
-		_Dictionary_Add,
-		_Dictionary_AddWithSource,
-		_Dictionary_Set,
-		_Dictionary_SetWithSource,
-		_Dictionary_Get,
-		_Dictionary_GetSource );
+	/* Variables set in this function */
+	SizeT                                _sizeOfSelf = sizeof(Dictionary);
+	Type                                        type = Dictionary_Type;
+	Stg_Class_DeleteFunction*                _delete = _Dictionary_Delete;
+	Stg_Class_PrintFunction*                  _print = _Dictionary_Print;
+	Stg_Class_CopyFunction*                    _copy = _Dictionary_Copy;
+	Dictionary_AddFunction*                      add = _Dictionary_Add;
+	Dictionary_AddWithSourceFunction*  addWithSource = _Dictionary_AddWithSource;
+	Dictionary_SetFunction*                      set = _Dictionary_Set;
+	Dictionary_SetWithSourceFunction*  setWithSource = _Dictionary_SetWithSource;
+	Dictionary_GetFunction*                      get = _Dictionary_Get;
+	Dictionary_GetSourceFunction*          getSource = _Dictionary_GetSource;
+
+	return _Dictionary_New(  DICTIONARY_PASSARGS  );
 }
 
-Dictionary* _Dictionary_New( 
-	SizeT											_sizeOfSelf, 
-	Type											type, 
-	Stg_Class_DeleteFunction*				_delete,
-	Stg_Class_PrintFunction*				_print,
-	Stg_Class_CopyFunction*					_copy, 
-	Dictionary_AddFunction*					add,
-	Dictionary_AddWithSourceFunction*	addWithSource,
-	Dictionary_SetFunction*					set,
-	Dictionary_SetWithSourceFunction*	setWithSource,
-	Dictionary_GetFunction*					get,
-	Dictionary_GetSourceFunction			getSource)
+Dictionary* _Dictionary_New(  DICTIONARY_DEFARGS  )
 {	
 	Dictionary* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Dictionary) );
-	self = (Dictionary*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (Dictionary*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* General info */
 	
@@ -880,3 +871,7 @@ Bool Dictionary_CompareAllEntriesFull( void* dictionary1, void* dictionary2, Boo
 
 	return retValue;
 }
+
+
+
+

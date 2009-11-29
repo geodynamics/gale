@@ -51,8 +51,18 @@ const Type CStream_Type = "CStream";
 
 Stream* CStream_New( Name name )
 {
-	return (Stream*)_CStream_New( sizeof(CStream), CStream_Type, _CStream_Delete, _CStream_Print, _Stream_Copy, 
-		name, _CStream_Printf, _CStream_Write, _CStream_Dump, _CStream_SetFile );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(CStream);
+	Type                              type = CStream_Type;
+	Stg_Class_DeleteFunction*      _delete = _CStream_Delete;
+	Stg_Class_PrintFunction*        _print = _CStream_Print;
+	Stg_Class_CopyFunction*          _copy = _Stream_Copy;
+	Stream_PrintfFunction*         _printf = _CStream_Printf;
+	Stream_WriteFunction*           _write = _CStream_Write;
+	Stream_DumpFunction*             _dump = _CStream_Dump;
+	Stream_SetFileFunction*       _setFile = _CStream_SetFile;
+
+	return (Stream*)_CStream_New(  CSTREAM_PASSARGS  );
 }
 
 void CStream_Init( CStream* self, Name name )
@@ -61,24 +71,13 @@ void CStream_Init( CStream* self, Name name )
 }
 
 
-CStream* _CStream_New( 
-	SizeT			_sizeOfSelf, 
-	Type			type, 
-	Stg_Class_DeleteFunction*	_delete, 
-	Stg_Class_PrintFunction* 	_print,
-	Stg_Class_CopyFunction*	_copy, 
-	Name			name,
-	Stream_PrintfFunction*	_printf, 
-	Stream_WriteFunction*	_write, 
-	Stream_DumpFunction*	_dump,
-	Stream_SetFileFunction*	_setFile )
+CStream* _CStream_New(  CSTREAM_DEFARGS  )
 {
 	CStream* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(CStream) );
-	self = (CStream*)_Stream_New( _sizeOfSelf, type, _delete, _print, _copy, name, 
-		_printf, _write, _dump, _setFile );
+	self = (CStream*)_Stream_New(  STREAM_PASSARGS  );
 	
 	_CStream_Init( self );
 	
@@ -146,6 +145,8 @@ Bool _CStream_SetFile( Stream* stream, JournalFile* file )
 	}
 	return False;
 }
+
+
 
 
 

@@ -55,13 +55,14 @@ const Type IndexMap_Type = "IndexMap";
 IndexMap* IndexMap_New_Param(
 		unsigned					delta )
 {
-	return _IndexMap_New( 
-		sizeof(IndexMap), 
-		IndexMap_Type, 
-		_IndexMap_Delete, 
-		_IndexMap_Print, 
-		_IndexMap_Copy, 
-		delta );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(IndexMap);
+	Type                              type = IndexMap_Type;
+	Stg_Class_DeleteFunction*      _delete = _IndexMap_Delete;
+	Stg_Class_PrintFunction*        _print = _IndexMap_Print;
+	Stg_Class_CopyFunction*          _copy = _IndexMap_Copy;
+
+	return _IndexMap_New(  INDEXMAP_PASSARGS  );
 }
 
 
@@ -85,24 +86,13 @@ void IndexMap_Init(
 }
 
 
-IndexMap* _IndexMap_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		unsigned					delta )
+IndexMap* _IndexMap_New(  INDEXMAP_DEFARGS  )
 {
 	IndexMap*			self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(IndexMap) );
-	self = (IndexMap*)_Stg_Class_New(
-		_sizeOfSelf,
-		type,
-		_delete,
-		_print,
-		_copy );
+	self = (IndexMap*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* General info */
 	
@@ -279,4 +269,6 @@ void IndexMap_Remap( void* indexMap, void* mapThrough ) {
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+
 

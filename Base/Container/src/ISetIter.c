@@ -89,3 +89,5 @@ int ISetIter_GetKey( const void* self ) {
    assert( ((ISetIter*)self)->valid && ((ISetIter*)self)->cur );
    return ((ISetIter*)self)->cur->key;
 }
+
+

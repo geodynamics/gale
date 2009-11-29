@@ -172,28 +172,35 @@
 
 	struct AbstractContext { __AbstractContext };
 		
-	#define ABSTRACTCONTEXT_DEFARGS \
-		STG_COMPONENT_DEFARGS, \
-			AbstractContext_SetDt*	_setDt, \
-			double						startTime, \
-			double						stopTime, \
-			MPI_Comm						communicator, \
-			Dictionary*					dictionary
 
-	#define ABSTRACTCONTEXT_PASSARGS \
-		STG_COMPONENT_PASSARGS, \
-			_setDt, \
-			startTime, \
-			stopTime, \
-			communicator, \
-			dictionary
 		
 	/* Class stuff ************************************************************************************************************/
 	
 	/* No "AbstractContext_New" and "AbstractContext_Init" as this is an abstract class */
 	
 	/* Creation implementation / Virtual constructor */
-	AbstractContext* _AbstractContext_New( ABSTRACTCONTEXT_DEFARGS ); 
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ABSTRACTCONTEXT_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                AbstractContext_SetDt*        _setDt, \
+                double                     startTime, \
+                double                      stopTime, \
+                MPI_Comm                communicator, \
+                Dictionary*               dictionary
+
+	#define ABSTRACTCONTEXT_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _setDt,       \
+	        startTime,    \
+	        stopTime,     \
+	        communicator, \
+	        dictionary  
+
+	AbstractContext* _AbstractContext_New(  ABSTRACTCONTEXT_DEFARGS  ); 
 
 	/* Initialisation implementation */
 	void _AbstractContext_Init( AbstractContext* self );
@@ -297,3 +304,4 @@
 
 	void _AbstractContext_CreateCheckpointDirectory( void* _context );
 #endif /* __Base_Context_AbstractContext_h__ */
+

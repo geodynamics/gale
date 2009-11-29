@@ -67,14 +67,22 @@
 
 
 	/** Constructor interface. */
-	IndentFormatter* _IndentFormatter_New(
-		SizeT 				_sizeOfSelf,
-		Type 				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy, 
-		StreamFormatter_FormatFunction*	_format,
-		char				_character );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define INDENTFORMATTER_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                StreamFormatter_FormatFunction*     _format, \
+                char                             _character
+
+	#define INDENTFORMATTER_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        _format,    \
+	        _character
+
+	IndentFormatter* _IndentFormatter_New(  INDENTFORMATTER_DEFARGS  );
 
 	/** Init interface. */
 	void _IndentFormatter_Init(
@@ -109,3 +117,4 @@
 
 
 #endif /* __Base_IO_IndentFormatter_h__ */
+

@@ -79,18 +79,30 @@
 	extern Stg_ObjectList* moduleDirectories;	
 
 	/* Creation implementation / Virtual constructor */
-	ModulesManager* _ModulesManager_New( 
-		SizeT                                   _sizeOfSelf,
-		Type                                    type,
-		Stg_Class_DeleteFunction*               _delete,
-		Stg_Class_PrintFunction*                _print,
-		Stg_Class_CopyFunction*                 _copy, 
-		ModulesManager_GetModulesListFunction*  _getModulesList,
-		ModulesManager_LoadModuleFunction*	_loadModule,
-		ModulesManager_UnloadModuleFunction*	_unloadModule,
-		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
-		ModulesManager_CheckContextFunction*	_checkContext,
-		ModulesManager_GetModuleNameFunction*	_getModuleName  );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MODULESMANAGER_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                ModulesManager_GetModulesListFunction*  _getModulesList, \
+                ModulesManager_LoadModuleFunction*          _loadModule, \
+                ModulesManager_UnloadModuleFunction*      _unloadModule, \
+                ModulesManager_ModuleFactoryFunction*    _moduleFactory, \
+                ModulesManager_CheckContextFunction*      _checkContext, \
+                ModulesManager_GetModuleNameFunction*    _getModuleName
+
+	#define MODULESMANAGER_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        _getModulesList, \
+	        _loadModule,     \
+	        _unloadModule,   \
+	        _moduleFactory,  \
+	        _checkContext,   \
+	        _getModuleName 
+
+	ModulesManager* _ModulesManager_New(  MODULESMANAGER_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _ModulesManager_Init( void* modulesManager );
@@ -139,3 +151,4 @@
 	Bool ModulesManager_ConstructModule( void* modulesManager, Name moduleName, Stg_ComponentFactory* cf, void* data );
 
 #endif /* __Base_Extensibility_ModulesManager_h__ */
+

@@ -303,3 +303,5 @@ unsigned int Stg_LongestMatchingSubsequenceLength( char* string1, char* string2,
 	return lmsLength;
 }
 					
+
+

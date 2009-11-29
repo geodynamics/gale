@@ -162,9 +162,22 @@ static void _XML_IO_Handler_WriteParameter( XML_IO_Handler*, char*, Dictionary_E
 
 
 XML_IO_Handler* XML_IO_Handler_New( void ) {
-	return _XML_IO_Handler_New( sizeof(XML_IO_Handler), XML_IO_Handler_Type, _XML_IO_Handler_Delete, _XML_IO_Handler_Print, 
-		NULL, _XML_IO_Handler_ReadAllFromFile, _XML_IO_Handler_ReadAllFromFileForceSource, _XML_IO_Handler_ReadAllFromBuffer, _XML_IO_Handler_WriteAllToFile, _XML_IO_Handler_WriteEntryToFile, 
-		_XML_IO_Handler_SetListEncoding, _XML_IO_Handler_SetWritingPrecision, _XML_IO_Handler_SetWriteExplicitTypes );
+	/* Variables set in this function */
+	SizeT                                                           _sizeOfSelf = sizeof(XML_IO_Handler);
+	Type                                                                   type = XML_IO_Handler_Type;
+	Stg_Class_DeleteFunction*                                           _delete = _XML_IO_Handler_Delete;
+	Stg_Class_PrintFunction*                                             _print = _XML_IO_Handler_Print;
+	Stg_Class_CopyFunction*                                               _copy = NULL;
+	IO_Handler_ReadAllFromFileFunction*                        _readAllFromFile = _XML_IO_Handler_ReadAllFromFile;
+	IO_Handler_ReadAllFromFileForceSourceFunction*  _readAllFromFileForceSource = _XML_IO_Handler_ReadAllFromFileForceSource;
+	IO_Handler_ReadAllFromBufferFunction*                    _readAllFromBuffer = _XML_IO_Handler_ReadAllFromBuffer;
+	IO_Handler_WriteAllToFileFunction*                          _writeAllToFile = _XML_IO_Handler_WriteAllToFile;
+	XML_IO_Handler_WriteEntryToFileFunction*                  _writeEntryToFile = _XML_IO_Handler_WriteEntryToFile;
+	XML_IO_Handler_SetListEncodingFunction*                    _setListEncoding = _XML_IO_Handler_SetListEncoding;
+	XML_IO_Handler_SetWritingPrecisionFunction*            _setWritingPrecision = _XML_IO_Handler_SetWritingPrecision;
+	XML_IO_Handler_SetWriteExplicitTypesFunction*        _setWriteExplicitTypes = _XML_IO_Handler_SetWriteExplicitTypes;
+
+	return _XML_IO_Handler_New(  XML_IO_HANDLER_PASSARGS  );
 }
 
 XML_IO_Handler* XML_IO_Handler_New_Schema( XML_IO_Handler* old );
@@ -189,35 +202,13 @@ void XML_IO_Handler_Init( XML_IO_Handler* self ) {
 	_XML_IO_Handler_Init( self );
 }
 
-XML_IO_Handler* _XML_IO_Handler_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		IO_Handler_ReadAllFromFileFunction*		_readAllFromFile,
-		IO_Handler_ReadAllFromFileForceSourceFunction*		_readAllFromFileForceSource,
-		IO_Handler_ReadAllFromBufferFunction*		_readAllFromBuffer,
-		IO_Handler_WriteAllToFileFunction*		_writeAllToFile,
-		XML_IO_Handler_WriteEntryToFileFunction*	_writeEntryToFile, 
-		XML_IO_Handler_SetListEncodingFunction*		_setListEncoding,
-		XML_IO_Handler_SetWritingPrecisionFunction*	_setWritingPrecision,
-		XML_IO_Handler_SetWriteExplicitTypesFunction*	_setWriteExplicitTypes )
+XML_IO_Handler* _XML_IO_Handler_New(  XML_IO_HANDLER_DEFARGS  )
 {
 	XML_IO_Handler* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(XML_IO_Handler) );
-	self = (XML_IO_Handler*)_IO_Handler_New( 
-		_sizeOfSelf, 
-		type,
-		_delete,
-		_print,
-		_copy, 
-		_readAllFromFile,
-		_readAllFromFileForceSource,
-		_readAllFromBuffer,
-		_writeAllToFile );
+	self = (XML_IO_Handler*)_IO_Handler_New(  IO_HANDLER_PASSARGS  );
 	
 	/* General info */
 	
@@ -2350,3 +2341,5 @@ void XML_IO_Handler_LibXMLErrorHandler( void* ctx, const char* msg, ... ) {
    Stream_Printf( Journal_Register( Error_Type, XML_IO_Handler_Type ), msg, ap );
    va_end(ap);
 }
+
+

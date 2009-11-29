@@ -83,12 +83,18 @@
 			void*				variableCondition_Register);
 	
 	/* Creation implementation / Virtual constructor */
-	VariableCondition_Register* _VariableCondition_Register_New( 
-		SizeT					_sizeOfSelf,
-		Type					type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print, 
-		Stg_Class_CopyFunction*			_copy );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define VARIABLECONDITION_REGISTER_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define VARIABLECONDITION_REGISTER_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	VariableCondition_Register* _VariableCondition_Register_New(  VARIABLECONDITION_REGISTER_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _VariableCondition_Register_Init( void* variableCondition_Register);
@@ -127,3 +133,4 @@
 				void* data );
 	
 #endif /* __Base_Automation_VariableCondition_Register_h__ */
+

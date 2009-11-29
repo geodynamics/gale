@@ -55,16 +55,18 @@ const Type SimpleExtensionInfo_Type = "SimpleExtensionInfo";
 
 /** allocate and initialise a new SimpleExtensionInfo. */
 SimpleExtensionInfo* SimpleExtensionInfo_New( const Name name, SizeT size, Index count ) {
-	return _SimpleExtensionInfo_New( 
-		sizeof(SimpleExtensionInfo), 
-		SimpleExtensionInfo_Type, 
-		_SimpleExtensionInfo_Delete,
-		_SimpleExtensionInfo_Print, 
-		_SimpleExtensionInfo_Copy, 
-		_SimpleExtensionInfo_DataCopy,
-		(Name)name, 
-		size, 
-		count );
+	/* Variables set in this function */
+	SizeT                            _sizeOfSelf = sizeof(SimpleExtensionInfo);
+	Type                                    type = SimpleExtensionInfo_Type;
+	Stg_Class_DeleteFunction*            _delete = _SimpleExtensionInfo_Delete;
+	Stg_Class_PrintFunction*              _print = _SimpleExtensionInfo_Print;
+	Stg_Class_CopyFunction*                _copy = _SimpleExtensionInfo_Copy;
+	ExtensionInfo_DataCopyFunction*    _dataCopy = _SimpleExtensionInfo_DataCopy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _SimpleExtensionInfo_New(  SIMPLEEXTENSIONINFO_PASSARGS  );
 }
 
 
@@ -87,31 +89,13 @@ void SimpleExtensionInfo_Init( void* simpleExtensionInfo, const Name name, SizeT
 }
 
 
-SimpleExtensionInfo* _SimpleExtensionInfo_New( 
-		SizeT 				_sizeOfSelf, 
-		Type 				type, 
-		Stg_Class_DeleteFunction* 	_delete,
-		Stg_Class_PrintFunction*	_print,
-		Stg_Class_CopyFunction*		_copy, 
-		ExtensionInfo_DataCopyFunction*	_dataCopy,
-		Name 				name, 
-		SizeT 				size,
-		Index				count )
+SimpleExtensionInfo* _SimpleExtensionInfo_New(  SIMPLEEXTENSIONINFO_DEFARGS  )
 {
 	SimpleExtensionInfo* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(SimpleExtensionInfo) );
-	self = (SimpleExtensionInfo*)_ExtensionInfo_New( 
-		_sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy, 
-		_dataCopy,
-		name, 
-		size,
-		count );
+	self = (SimpleExtensionInfo*)_ExtensionInfo_New(  EXTENSIONINFO_PASSARGS  );
 	
 	/* General info */
 	
@@ -193,3 +177,5 @@ void* _SimpleExtensionInfo_DataCopy(
 
 /* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+

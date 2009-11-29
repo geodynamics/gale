@@ -62,14 +62,22 @@
 	
 	
 	/** Constructor interface. */
-	Stg_Object* _Stg_Object_New( 
-		SizeT				_sizeOfSelf, 
-		Type				type,
-		Stg_Class_DeleteFunction*	_delete,
-		Stg_Class_PrintFunction*	_print, 
-		Stg_Class_CopyFunction*		_copy, 
-		Name				name,
-		AllocationType			nameAllocationType );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STG_OBJECT_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                Name                          name, \
+                AllocationType  nameAllocationType
+
+	#define STG_OBJECT_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        name,               \
+	        nameAllocationType
+
+	Stg_Object* _Stg_Object_New(  STG_OBJECT_DEFARGS  );
 	
 	/** Init interface. */
 	void _Stg_Object_Init( Stg_Object* self, Name name, AllocationType nameAllocationType );
@@ -107,3 +115,4 @@
 	
 	/* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #endif /* __Base_Foundation_Object_h__ */
+

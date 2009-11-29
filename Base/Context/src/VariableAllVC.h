@@ -64,15 +64,7 @@
 
 	struct _VariableAllVC { __VariableAllVC };
 	
-	#define VARIABLEALLVC_DEFARGS \
-		VARIABLECONDITION_DEFARGS, \
-         Name	_dictionaryEntryName, \
-			void*	mesh 
 
-   #define VARIABLEALLVC_PASSARGS \
-      VARIABLECONDITION_PASSARGS, \
-         _dictionaryEntryName, \
-			mesh 
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
@@ -94,7 +86,18 @@
 	
 	VariableAllVC* _VariableAllVC_DefaultNew( Name name );
 	
-	VariableAllVC* _VariableAllVC_New( VARIABLEALLVC_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define VARIABLEALLVC_DEFARGS \
+                VARIABLECONDITION_DEFARGS
+
+	#define VARIABLEALLVC_PASSARGS \
+                VARIABLECONDITION_PASSARGS
+
+	VariableAllVC* _VariableAllVC_New(  VARIABLEALLVC_DEFARGS  );
 	
 	void _VariableAllVC_Init( void* allElementsVC, Name _dictionaryEntryName, void* mesh );
 	
@@ -157,3 +160,4 @@
 
 	
 #endif /* __Base_Automation_VariableAllVC_h__ */
+

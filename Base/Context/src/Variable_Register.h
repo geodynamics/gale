@@ -72,12 +72,18 @@
 	
 	void			Variable_Register_Init(Variable_Register* self);
 	
-	Variable_Register*	_Variable_Register_New( 
-					SizeT			_sizeOfSelf,
-					Type			type,
-					Stg_Class_DeleteFunction*	_delete,
-					Stg_Class_PrintFunction*	_print, 
-					Stg_Class_CopyFunction*	_copy );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define VARIABLE_REGISTER_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define VARIABLE_REGISTER_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	Variable_Register*	_Variable_Register_New(  VARIABLE_REGISTER_DEFARGS  );
 		
 	void			_Variable_Register_Init(void* variable_Register);
 	
@@ -123,3 +129,4 @@
 	Variable*	Variable_Register_GetByIndex( void* variable_Register, Variable_Index varIndex);	
 	
 #endif /* __Base_Automation_Variable_Register_h__ */
+

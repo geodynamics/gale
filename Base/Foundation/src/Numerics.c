@@ -45,3 +45,5 @@ Bool Num_Approx( double var, double val ) {
 Bool Num_InRange( double var, double low, double upp ) {
 	return (var >= low - Num_Epsilon && var <= upp + Num_Epsilon);
 }
+
+

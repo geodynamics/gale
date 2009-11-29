@@ -52,9 +52,15 @@ const Type Variable_Register_Type = "Variable_Register";
 */
 
 Variable_Register* Variable_Register_New(void)
-{ 
-	return _Variable_Register_New( sizeof(Variable_Register), Variable_Register_Type, _Variable_Register_Delete,
-		_Variable_Register_Print, _Variable_Register_Copy );
+{
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(Variable_Register);
+	Type                              type = Variable_Register_Type;
+	Stg_Class_DeleteFunction*      _delete = _Variable_Register_Delete;
+	Stg_Class_PrintFunction*        _print = _Variable_Register_Print;
+	Stg_Class_CopyFunction*          _copy = _Variable_Register_Copy;
+ 
+	return _Variable_Register_New(  VARIABLE_REGISTER_PASSARGS  );
 }
 
 
@@ -77,17 +83,12 @@ void Variable_Register_Init(Variable_Register* self)
 }
 
 
-Variable_Register* _Variable_Register_New( 
-			SizeT			_sizeOfSelf,
-			Type			type,
-			Stg_Class_DeleteFunction*	_delete,
-			Stg_Class_PrintFunction*	_print, 
-			Stg_Class_CopyFunction*	_copy )
+Variable_Register* _Variable_Register_New(  VARIABLE_REGISTER_DEFARGS  )
 {
 	Variable_Register*	self;
 	
 	/* Allocate memory */
-	self = (Variable_Register*)_Stg_Class_New(_sizeOfSelf, type, _delete, _print, _copy);
+	self = (Variable_Register*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -267,3 +268,5 @@ Variable* Variable_Register_GetByIndex(void* variable_Register, Variable_Index v
 		
 	return  self->_variable[varIndex];
 }
+
+

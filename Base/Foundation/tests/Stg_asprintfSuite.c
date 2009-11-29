@@ -66,3 +66,5 @@ void Stg_asprintfSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, Stg_asprintfSuite_Setup, Stg_asprintfSuite_Teardown );
    pcu_suite_addTest( suite, Stg_asprintfSuite_TestPrint );
 }
+
+

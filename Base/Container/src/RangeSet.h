@@ -63,14 +63,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define RANGESET_DEFARGS \
-		STG_CLASS_DEFARGS
+                STG_CLASS_DEFARGS
 
 	#define RANGESET_PASSARGS \
-		STG_CLASS_PASSARGS
+                STG_CLASS_PASSARGS
 
 	RangeSet* RangeSet_New();
-	RangeSet* _RangeSet_New( RANGESET_DEFARGS );
+	RangeSet* _RangeSet_New(  RANGESET_DEFARGS  );
 	void _RangeSet_Init( RangeSet* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -133,3 +140,4 @@
 	void RangeSet_Destruct( RangeSet* self );
 
 #endif /* __Base_Container_RangeSet_h__ */
+

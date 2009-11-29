@@ -109,3 +109,5 @@ void RankFormatterSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, RankFormatterSuite_Setup, RankFormatterSuite_Teardown );
    pcu_suite_addTest( suite, RankFormatterSuite_TestPrintWithRank );
 }
+
+

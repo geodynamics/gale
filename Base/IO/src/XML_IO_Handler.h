@@ -108,20 +108,26 @@
 	XML_IO_Handler* XML_IO_Handler_New( void );
 	
 	/** Creation implementation */
-	XML_IO_Handler* _XML_IO_Handler_New( 
-		SizeT						_sizeOfSelf,
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		IO_Handler_ReadAllFromFileFunction*		_readAllFromFile,
-		IO_Handler_ReadAllFromFileForceSourceFunction*		_readAllFromFileForceSource,
-		IO_Handler_ReadAllFromBufferFunction*		_readAllFromBuffer,
-		IO_Handler_WriteAllToFileFunction*		_writeAllToFile,
-		XML_IO_Handler_WriteEntryToFileFunction*	_writeEntryToFile,
-		XML_IO_Handler_SetListEncodingFunction*		_setListEncoding,
-		XML_IO_Handler_SetWritingPrecisionFunction*	_setWritingPrecision,
-		XML_IO_Handler_SetWriteExplicitTypesFunction*	_setWriteExplicitTypes );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define XML_IO_HANDLER_DEFARGS \
+                IO_HANDLER_DEFARGS, \
+                XML_IO_Handler_WriteEntryToFileFunction*            _writeEntryToFile, \
+                XML_IO_Handler_SetListEncodingFunction*              _setListEncoding, \
+                XML_IO_Handler_SetWritingPrecisionFunction*      _setWritingPrecision, \
+                XML_IO_Handler_SetWriteExplicitTypesFunction*  _setWriteExplicitTypes
+
+	#define XML_IO_HANDLER_PASSARGS \
+                IO_HANDLER_PASSARGS, \
+	        _writeEntryToFile,      \
+	        _setListEncoding,       \
+	        _setWritingPrecision,   \
+	        _setWriteExplicitTypes
+
+	XML_IO_Handler* _XML_IO_Handler_New(  XML_IO_HANDLER_DEFARGS  );
 	
 	/** Initialise a XML_IO_Handler construct */
 	void XML_IO_Handler_Init( XML_IO_Handler* self );
@@ -180,3 +186,4 @@
 	void XML_IO_Handler_LibXMLErrorHandler( void* ctx, const char* msg, ... );
 
 #endif /* __Base_IO_XML_IO_Handler_h__ */
+

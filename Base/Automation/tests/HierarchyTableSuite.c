@@ -176,3 +176,5 @@ void HierarchyTableSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, HierarchyTableSuite_TestPrintParents );
    pcu_suite_addTest( suite, HierarchyTableSuite_TestPrintChildren );
 }
+
+

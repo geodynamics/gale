@@ -63,79 +63,53 @@ const Type DocumentationComponentFactory_Type = "DocumentationComponentFactory";
 */
 	
 DocumentationComponentFactory* DocumentationComponentFactory_New( ) {
+	/* Variables set in this function */
+	SizeT                                                                        _sizeOfSelf = sizeof( DocumentationComponentFactory );
+	Type                                                                                type = DocumentationComponentFactory_Type;
+	Stg_Class_DeleteFunction*                                                        _delete = _DocumentationComponentFactory_Delete;
+	Stg_Class_PrintFunction*                                                          _print = _DocumentationComponentFactory_Print;
+	Stg_ComponentFactory_GetDoubleFunc*                                            getDouble = _DocumentationComponentFactory_GetDouble;
+	Stg_ComponentFactory_GetIntFunc*                                                  getInt = _DocumentationComponentFactory_GetInt;
+	Stg_ComponentFactory_GetUnsignedIntFunc*                                  getUnsignedInt = _DocumentationComponentFactory_GetUnsignedInt;
+	Stg_ComponentFactory_GetBoolFunc*                                                getBool = _DocumentationComponentFactory_GetBool;
+	Stg_ComponentFactory_GetStringFunc*                                            getString = _DocumentationComponentFactory_GetString;
+	Stg_ComponentFactory_GetRootDictDoubleFunc*                            getRootDictDouble = _DocumentationComponentFactory_GetRootDictDouble;
+	Stg_ComponentFactory_GetRootDictIntFunc*                                  getRootDictInt = _DocumentationComponentFactory_GetRootDictInt;
+	Stg_ComponentFactory_GetRootDictUnsignedIntFunc*                  getRootDictUnsignedInt = _DocumentationComponentFactory_GetRootDictUnsignedInt;
+	Stg_ComponentFactory_GetRootDictBoolFunc*                                getRootDictBool = _DocumentationComponentFactory_GetRootDictBool;
+	Stg_ComponentFactory_GetRootDictStringFunc*                            getRootDictString = _DocumentationComponentFactory_GetRootDictString;
+	Stg_ComponentFactory_ConstructByNameFunc*                                constructByName = _DocumentationComponentFactory_ConstructByName;
+	Stg_ComponentFactory_ConstructByKeyFunc*                                  constructByKey = _DocumentationComponentFactory_ConstructByKey;
+	Stg_ComponentFactory_ConstructByNameWithKeyFallbackFunc*  constructByNameWithKeyFallback = _DocumentationComponentFactory_ConstructByNameWithKeyFallback;
+	Stg_ComponentFactory_ConstructByListFunc*                                constructByList = _DocumentationComponentFactory_ConstructByList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	Dictionary*       rootDict = ZERO;
+	Dictionary*  componentDict = ZERO;
+
 	DocumentationComponentFactory *self = NULL;
 
-	self = _DocumentationComponentFactory_New( 
-			sizeof( DocumentationComponentFactory ), 
-			DocumentationComponentFactory_Type,
-			_DocumentationComponentFactory_Delete,
-			_DocumentationComponentFactory_Print,
-			NULL,
-			_DocumentationComponentFactory_GetDouble,
-			_DocumentationComponentFactory_GetInt,
-			_DocumentationComponentFactory_GetUnsignedInt,
-			_DocumentationComponentFactory_GetBool,
-			_DocumentationComponentFactory_GetString,
-			_DocumentationComponentFactory_GetRootDictDouble,
-			_DocumentationComponentFactory_GetRootDictInt,
-			_DocumentationComponentFactory_GetRootDictUnsignedInt,
-			_DocumentationComponentFactory_GetRootDictBool,
-			_DocumentationComponentFactory_GetRootDictString,
-			_DocumentationComponentFactory_ConstructByName,
-			_DocumentationComponentFactory_ConstructByKey,
-			_DocumentationComponentFactory_ConstructByNameWithKeyFallback,
-			_DocumentationComponentFactory_ConstructByList );
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_Class_CopyFunction*  _copy = NULL;
+
+	self = _DocumentationComponentFactory_New(  DOCUMENTATIONCOMPONENTFACTORY_PASSARGS  );
 
 	return self;
 }
 
 /* Creation implementation */
-DocumentationComponentFactory* _DocumentationComponentFactory_New( 
-		SizeT                                                    _sizeOfSelf,
-		Type                                                     type,
-		Stg_Class_DeleteFunction*                                _delete,
-		Stg_Class_PrintFunction*                                 _print,
-		Stg_Class_CopyFunction*                                  _copy,
-		Stg_ComponentFactory_GetDoubleFunc*                      getDouble,
-		Stg_ComponentFactory_GetIntFunc*                         getInt,
-		Stg_ComponentFactory_GetUnsignedIntFunc*                 getUnsignedInt,
-		Stg_ComponentFactory_GetBoolFunc*                        getBool,
-		Stg_ComponentFactory_GetStringFunc*                      getString,
-		Stg_ComponentFactory_GetRootDictDoubleFunc*              getRootDictDouble,
-		Stg_ComponentFactory_GetRootDictIntFunc*                 getRootDictInt,
-		Stg_ComponentFactory_GetRootDictUnsignedIntFunc*         getRootDictUnsignedInt,
-		Stg_ComponentFactory_GetRootDictBoolFunc*                getRootDictBool,
-		Stg_ComponentFactory_GetRootDictStringFunc*              getRootDictString,
-		Stg_ComponentFactory_ConstructByNameFunc*                constructByName,
-		Stg_ComponentFactory_ConstructByKeyFunc*                 constructByKey,
-		Stg_ComponentFactory_ConstructByNameWithKeyFallbackFunc* constructByNameWithKeyFallback,
-		Stg_ComponentFactory_ConstructByListFunc*                constructByList )
+DocumentationComponentFactory* _DocumentationComponentFactory_New(  DOCUMENTATIONCOMPONENTFACTORY_DEFARGS  )
 {
 	DocumentationComponentFactory *self = NULL;
 
 	assert( _sizeOfSelf >= sizeof( DocumentationComponentFactory ) );
-	self = (DocumentationComponentFactory*) _Stg_ComponentFactory_New( 
-			_sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			getDouble,
-			getInt,
-			getUnsignedInt,
-			getBool,
-			getString,
-			getRootDictDouble,
-			getRootDictInt,
-			getRootDictUnsignedInt,
-			getRootDictBool,
-			getRootDictString,
-			constructByName,
-			constructByKey,
-			constructByNameWithKeyFallback,
-			constructByList,
-			NULL,
-			NULL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	rootDict      = NULL;
+	componentDict = NULL;
+
+	self = (DocumentationComponentFactory*) _Stg_ComponentFactory_New(  STG_COMPONENTFACTORY_PASSARGS  );
 
 	return self;
 }
@@ -329,3 +303,5 @@ void DocumentationComponentFactory_DocumentType( void* cf, Name typeName ) {
 	Stg_Class_Delete( component );
 	Stream_UnIndent( self->infoStream );
 }
+
+

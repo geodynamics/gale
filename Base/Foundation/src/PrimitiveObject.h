@@ -92,10 +92,22 @@
 	Stg_PrimitiveObject* Stg_PrimitiveObject_New_Float( float value, Name name );
 	Stg_PrimitiveObject* Stg_PrimitiveObject_New_Double( double value, Name name );
 	
-	Stg_PrimitiveObject* _Stg_PrimitiveObject_New( 
-		Stg_C_Primitive_Type	dataType,
-		Stg_C_Primitive		value,
-		Name			name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STG_PRIMITIVEOBJECT_DEFARGS \
+                STG_OBJECT_DEFARGS, \
+                Stg_C_Primitive_Type  dataType, \
+                Stg_C_Primitive          value
+
+	#define STG_PRIMITIVEOBJECT_PASSARGS \
+                STG_OBJECT_PASSARGS, \
+	        dataType, \
+	        value   
+
+	Stg_PrimitiveObject* _Stg_PrimitiveObject_New(  STG_PRIMITIVEOBJECT_DEFARGS  );
 
 
 	void _Stg_PrimitiveObject_Init( 
@@ -115,4 +127,5 @@
 		
 	
 #endif /* __Base_Foundation_PrimitiveObject_h__ */
+
 

@@ -422,3 +422,5 @@ void IndexSetSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, IndexSetSuite_TestBadAssign );
    #endif
 }
+
+

@@ -59,33 +59,12 @@ const Type Stg_ComponentFactory_Type = "Stg_ComponentFactory";
 ** Constructor
 */
 /* Creation implementation */
-Stg_ComponentFactory* _Stg_ComponentFactory_New( 
-		SizeT                                                    _sizeOfSelf,
-		Type                                                     type,
-		Stg_Class_DeleteFunction*                                _delete,
-		Stg_Class_PrintFunction*                                 _print,
-		Stg_Class_CopyFunction*                                  _copy,
-		Stg_ComponentFactory_GetDoubleFunc*                      getDouble,
-		Stg_ComponentFactory_GetIntFunc*                         getInt,
-		Stg_ComponentFactory_GetUnsignedIntFunc*                 getUnsignedInt,
-		Stg_ComponentFactory_GetBoolFunc*                        getBool,
-		Stg_ComponentFactory_GetStringFunc*                      getString,
-		Stg_ComponentFactory_GetRootDictDoubleFunc*              getRootDictDouble,
-		Stg_ComponentFactory_GetRootDictIntFunc*                 getRootDictInt,
-		Stg_ComponentFactory_GetRootDictUnsignedIntFunc*         getRootDictUnsignedInt,
-		Stg_ComponentFactory_GetRootDictBoolFunc*                getRootDictBool,
-		Stg_ComponentFactory_GetRootDictStringFunc*              getRootDictString,
-		Stg_ComponentFactory_ConstructByNameFunc*                constructByName,
-		Stg_ComponentFactory_ConstructByKeyFunc*                 constructByKey,
-		Stg_ComponentFactory_ConstructByNameWithKeyFallbackFunc* constructByNameWithKeyFallback,
-		Stg_ComponentFactory_ConstructByListFunc*                constructByList,
-		Dictionary*                                              rootDict,
-		Dictionary*                                              componentDict )
+Stg_ComponentFactory* _Stg_ComponentFactory_New(  STG_COMPONENTFACTORY_DEFARGS  )
 {
 	Stg_ComponentFactory *self = NULL;
 
 	assert( _sizeOfSelf >= sizeof( Stg_ComponentFactory ) );
-	self = (Stg_ComponentFactory*) _Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (Stg_ComponentFactory*) _Stg_Class_New(  STG_CLASS_PASSARGS  );
 
 	self->getDouble = getDouble;
 	self->getInt = getInt;
@@ -116,30 +95,33 @@ Stg_ComponentFactory* _Stg_ComponentFactory_New(
 }
 	
 Stg_ComponentFactory* Stg_ComponentFactory_New( Dictionary* rootDict, Dictionary* componentDict ) {
+	/* Variables set in this function */
+	SizeT                                                                        _sizeOfSelf = sizeof( Stg_ComponentFactory );
+	Type                                                                                type = Stg_ComponentFactory_Type;
+	Stg_Class_DeleteFunction*                                                        _delete = _Stg_ComponentFactory_Delete;
+	Stg_Class_PrintFunction*                                                          _print = _Stg_ComponentFactory_Print;
+	Stg_ComponentFactory_GetDoubleFunc*                                            getDouble = _Stg_ComponentFactory_GetDouble;
+	Stg_ComponentFactory_GetIntFunc*                                                  getInt = _Stg_ComponentFactory_GetInt;
+	Stg_ComponentFactory_GetUnsignedIntFunc*                                  getUnsignedInt = _Stg_ComponentFactory_GetUnsignedInt;
+	Stg_ComponentFactory_GetBoolFunc*                                                getBool = _Stg_ComponentFactory_GetBool;
+	Stg_ComponentFactory_GetStringFunc*                                            getString = _Stg_ComponentFactory_GetString;
+	Stg_ComponentFactory_GetRootDictDoubleFunc*                            getRootDictDouble = _Stg_ComponentFactory_GetRootDictDouble;
+	Stg_ComponentFactory_GetRootDictIntFunc*                                  getRootDictInt = _Stg_ComponentFactory_GetRootDictInt;
+	Stg_ComponentFactory_GetRootDictUnsignedIntFunc*                  getRootDictUnsignedInt = _Stg_ComponentFactory_GetRootDictUnsignedInt;
+	Stg_ComponentFactory_GetRootDictBoolFunc*                                getRootDictBool = _Stg_ComponentFactory_GetRootDictBool;
+	Stg_ComponentFactory_GetRootDictStringFunc*                            getRootDictString = _Stg_ComponentFactory_GetRootDictString;
+	Stg_ComponentFactory_ConstructByNameFunc*                                constructByName = _Stg_ComponentFactory_ConstructByName;
+	Stg_ComponentFactory_ConstructByKeyFunc*                                  constructByKey = _Stg_ComponentFactory_ConstructByKey;
+	Stg_ComponentFactory_ConstructByNameWithKeyFallbackFunc*  constructByNameWithKeyFallback = _Stg_ComponentFactory_ConstructByNameWithKeyFallback;
+	Stg_ComponentFactory_ConstructByListFunc*                                constructByList = _Stg_ComponentFactory_ConstructByList;
+
 	Stg_ComponentFactory *self = NULL;
 
 	assert( rootDict );
-	self = _Stg_ComponentFactory_New( sizeof( Stg_ComponentFactory ), 
-					Stg_ComponentFactory_Type,
-					_Stg_ComponentFactory_Delete,
-					_Stg_ComponentFactory_Print,
-					NULL,
-					_Stg_ComponentFactory_GetDouble,
-					_Stg_ComponentFactory_GetInt,
-					_Stg_ComponentFactory_GetUnsignedInt,
-					_Stg_ComponentFactory_GetBool,
-					_Stg_ComponentFactory_GetString,
-					_Stg_ComponentFactory_GetRootDictDouble,
-					_Stg_ComponentFactory_GetRootDictInt,
-					_Stg_ComponentFactory_GetRootDictUnsignedInt,
-					_Stg_ComponentFactory_GetRootDictBool,
-					_Stg_ComponentFactory_GetRootDictString,
-					_Stg_ComponentFactory_ConstructByName,
-					_Stg_ComponentFactory_ConstructByKey,
-					_Stg_ComponentFactory_ConstructByNameWithKeyFallback,
-					_Stg_ComponentFactory_ConstructByList,
-					rootDict,
-					componentDict );
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_Class_CopyFunction*  _copy = NULL;
+
+	self = _Stg_ComponentFactory_New(  STG_COMPONENTFACTORY_PASSARGS  );
 
 	return self;
 }
@@ -1016,3 +998,5 @@ Stg_Component** _Stg_ComponentFactory_ConstructByList(
 
 	return componentList;
 }
+
+
