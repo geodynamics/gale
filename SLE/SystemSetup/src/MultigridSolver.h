@@ -103,8 +103,45 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MULTIGRIDSOLVER_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                MGSolver_SetCommFunc*                              setCommFunc, \
+                MGSolver_SetMatrixFunc*                          setMatrixFunc, \
+                MGSolver_SetMaxIterationsFunc*            setMaxIterationsFunc, \
+                MGSolver_SetRelativeToleranceFunc*    setRelativeToleranceFunc, \
+                MGSolver_SetAbsoluteToleranceFunc*    setAbsoluteToleranceFunc, \
+                MGSolver_SetUseInitialSolutionFunc*  setUseInitialSolutionFunc, \
+                MGSolver_SolveFunc*                                  solveFunc, \
+                MGSolver_SetupFunc*                                  setupFunc, \
+                MGSolver_GetSolveStatusFunc*                getSolveStatusFunc, \
+                MGSolver_GetIterationsFunc*                  getIterationsFunc, \
+                MGSolver_GetMaxIterationsFunc*            getMaxIterationsFunc, \
+                MGSolver_GetResidualNormFunc*              getResidualNormFunc
+
+	#define MULTIGRIDSOLVER_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        setCommFunc,               \
+	        setMatrixFunc,             \
+	        setMaxIterationsFunc,      \
+	        setRelativeToleranceFunc,  \
+	        setAbsoluteToleranceFunc,  \
+	        setUseInitialSolutionFunc, \
+	        solveFunc,                 \
+	        setupFunc,                 \
+	        getSolveStatusFunc,        \
+	        getIterationsFunc,         \
+	        getMaxIterationsFunc,      \
+	        getResidualNormFunc      
+
 	MultigridSolver* MultigridSolver_New( Name name );
-	MultigridSolver* _MultigridSolver_New( MGSOLVER_DEFARGS );
+	MultigridSolver* _MultigridSolver_New(  MULTIGRIDSOLVER_DEFARGS  );
 	void _MultigridSolver_Init( MultigridSolver* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -181,3 +218,4 @@
 	void MultigridSolver_DestructLevels( MultigridSolver* self );
 
 #endif /* __Experimental_Solvers_MultigridSolver_h__ */
+

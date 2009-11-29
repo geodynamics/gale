@@ -70,21 +70,28 @@
 	** Constructors
 	*/
 
-	#define MGOPGENERATOR_DEFARGS							\
-		STG_COMPONENT_DEFARGS,							\
-		MGOpGenerator_SetNumLevelsFunc*		setNumLevelsFunc,		\
-		MGOpGenerator_HasExpiredFunc*		hasExpiredFunc,			\
-		MGOpGenerator_GenerateFunc*		generateFunc
 
 
-	#define MGOPGENERATOR_PASSARGS		\
-		STG_COMPONENT_PASSARGS,		\
-		setNumLevelsFunc,		\
-		hasExpiredFunc,			\
-		generateFunc
 
 
-	MGOpGenerator* _MGOpGenerator_New( MGOPGENERATOR_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MGOPGENERATOR_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                MGOpGenerator_SetNumLevelsFunc*  setNumLevelsFunc, \
+                MGOpGenerator_HasExpiredFunc*      hasExpiredFunc, \
+                MGOpGenerator_GenerateFunc*          generateFunc
+
+	#define MGOPGENERATOR_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        setNumLevelsFunc, \
+	        hasExpiredFunc,   \
+	        generateFunc    
+
+	MGOpGenerator* _MGOpGenerator_New(  MGOPGENERATOR_DEFARGS  );
 	void _MGOpGenerator_Init( MGOpGenerator* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -122,3 +129,4 @@
 	*/
 
 #endif /* __Experimental_Solvers_MGOpGenerator_h__ */
+

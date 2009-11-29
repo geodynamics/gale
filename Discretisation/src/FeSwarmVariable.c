@@ -54,31 +54,32 @@
 const Type FeSwarmVariable_Type = "FeSwarmVariable";
 
 void* _FeSwarmVariable_DefaultNew( Name name ) {
-	return _FeSwarmVariable_New( 
-		sizeof(FeSwarmVariable), 
-		FeSwarmVariable_Type, 
-		_FeSwarmVariable_Delete, 
-		_FeSwarmVariable_Print,
-		_FeSwarmVariable_Copy, 
-		_FeSwarmVariable_DefaultNew,
-		_FeSwarmVariable_AssignFromXML,
-		_FeSwarmVariable_Build, 
-		_FeSwarmVariable_Initialise, 
-		_FeSwarmVariable_Execute,
-		_FeSwarmVariable_Destroy,
-		name,
-		NON_GLOBAL,
-		_FeSwarmVariable_ValueAt,
-		_FeSwarmVariable_GetMinGlobalMagnitude,
-		_FeSwarmVariable_GetMaxGlobalMagnitude );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(FeSwarmVariable);
+	Type                                                         type = FeSwarmVariable_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _FeSwarmVariable_Delete;
+	Stg_Class_PrintFunction*                                   _print = _FeSwarmVariable_Print;
+	Stg_Class_CopyFunction*                                     _copy = _FeSwarmVariable_Copy;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _FeSwarmVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _FeSwarmVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _FeSwarmVariable_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _FeSwarmVariable_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _FeSwarmVariable_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _FeSwarmVariable_Destroy;
+	AllocationType                                 nameAllocationType = NON_GLOBAL;
+	SwarmVariable_ValueAtFunction*                           _valueAt = _FeSwarmVariable_ValueAt;
+	SwarmVariable_GetGlobalValueFunction*      _getMinGlobalMagnitude = _FeSwarmVariable_GetMinGlobalMagnitude;
+	SwarmVariable_GetGlobalValueFunction*      _getMaxGlobalMagnitude = _FeSwarmVariable_GetMaxGlobalMagnitude;
+
+	return _FeSwarmVariable_New(  FESWARMVARIABLE_PASSARGS  );
 }
 
-FeSwarmVariable* _FeSwarmVariable_New( FESWARMVARIABLE_DEFARGS ) {
+FeSwarmVariable* _FeSwarmVariable_New(  FESWARMVARIABLE_DEFARGS  ) {
 	FeSwarmVariable* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(FeSwarmVariable) );
-	self = (FeSwarmVariable*) _SwarmVariable_New( SWARMVARIABLE_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(FeSwarmVariable) );
+	self = (FeSwarmVariable*) _SwarmVariable_New(  SWARMVARIABLE_PASSARGS  );
 
 	return self;
 }
@@ -172,3 +173,5 @@ double _FeSwarmVariable_GetMaxGlobalMagnitude( void* swarmVariable ) {
 
 	return FieldVariable_GetMaxGlobalFieldMagnitude( self->feVariable );
 }
+
+

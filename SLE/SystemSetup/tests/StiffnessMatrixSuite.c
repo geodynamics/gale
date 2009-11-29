@@ -159,3 +159,5 @@ void StiffnessMatrixSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, StiffnessMatrixSuite_Setup, StiffnessMatrixSuite_Teardown );
    pcu_suite_addTest( suite, StiffnessMatrixSuite_TestStiffnessMatrix );
 }
+
+

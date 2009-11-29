@@ -68,43 +68,13 @@ AdvDiffMulticorrector* AdvDiffMulticorrector_New(
 }
 
 /* Creation implementation / Virtual constructor */
-AdvDiffMulticorrector* _AdvDiffMulticorrector_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		SLE_Solver_SolverSetupFunction*                     _solverSetup,
-		SLE_Solver_SolveFunction*                           _solve,
-		SLE_Solver_GetResidualFunc*                         _getResidual, 
-		Name                                                name )
+AdvDiffMulticorrector* _AdvDiffMulticorrector_New(  ADVDIFFMULTICORRECTOR_DEFARGS  )
 {
 	AdvDiffMulticorrector* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(AdvDiffMulticorrector) );
-	self = (AdvDiffMulticorrector*) _SLE_Solver_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_solverSetup,
-		_solve,
-		_getResidual, 
-		name );
+	assert( _sizeOfSelf >= sizeof(AdvDiffMulticorrector) );
+	self = (AdvDiffMulticorrector*) _SLE_Solver_New(  SLE_SOLVER_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -150,22 +120,26 @@ void _AdvDiffMulticorrector_Print( void* solver, Stream* stream ) {
 }
 
 void* _AdvDiffMulticorrector_DefaultNew( Name name ) {
-	return (void*)_AdvDiffMulticorrector_New( 
-		sizeof(AdvDiffMulticorrector), 
-		AdvDiffMulticorrector_Type,
-		_AdvDiffMulticorrector_Delete,
-		_AdvDiffMulticorrector_Print,
-		NULL,
-		_AdvDiffMulticorrector_DefaultNew,
-		_AdvDiffMulticorrector_AssignFromXML,
-		_AdvDiffMulticorrector_Build,
-		_AdvDiffMulticorrector_Initialise,
-		_AdvDiffMulticorrector_Execute,
-		_AdvDiffMulticorrector_Destroy,
-		_AdvDiffMulticorrector_SolverSetup,
-		_AdvDiffMulticorrector_Solve,
-		NULL, /*_AdvDiffMulticorrector_GetResidual, */
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(AdvDiffMulticorrector);
+	Type                                                      type = AdvDiffMulticorrector_Type;
+	Stg_Class_DeleteFunction*                              _delete = _AdvDiffMulticorrector_Delete;
+	Stg_Class_PrintFunction*                                _print = _AdvDiffMulticorrector_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _AdvDiffMulticorrector_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _AdvDiffMulticorrector_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _AdvDiffMulticorrector_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _AdvDiffMulticorrector_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _AdvDiffMulticorrector_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _AdvDiffMulticorrector_Destroy;
+	SLE_Solver_SolverSetupFunction*                   _solverSetup = _AdvDiffMulticorrector_SolverSetup;
+	SLE_Solver_SolveFunction*                               _solve = _AdvDiffMulticorrector_Solve;
+	SLE_Solver_GetResidualFunc*                       _getResidual = NULL;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*)_AdvDiffMulticorrector_New(  ADVDIFFMULTICORRECTOR_PASSARGS  );
 }
 
 void _AdvDiffMulticorrector_AssignFromXML( void* solver, Stg_ComponentFactory* cf, void* data ) {
@@ -381,3 +355,5 @@ void _AdvDiffMulticorrector_CalculatePhiDot_Implicit( AdvDiffMulticorrector* sel
 
 	KSPSolve( self->matrixSolver, deltaPhiDot, sle->residual->vector );
 }
+
+

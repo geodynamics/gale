@@ -61,14 +61,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define REGULARTRILINEAR_DEFARGS \
-		ELEMENTTYPE_DEFARGS
+                TRILINEARELEMENTTYPE_DEFARGS
 
 	#define REGULARTRILINEAR_PASSARGS \
-		ELEMENTTYPE_PASSARGS
+                TRILINEARELEMENTTYPE_PASSARGS
 
 	RegularTrilinear* RegularTrilinear_New( Name name );
-	RegularTrilinear* _RegularTrilinear_New( REGULARTRILINEAR_DEFARGS );
+	RegularTrilinear* _RegularTrilinear_New(  REGULARTRILINEAR_DEFARGS  );
 	void _RegularTrilinear_Init( RegularTrilinear* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -95,3 +102,4 @@
 	*/
 
 #endif /* __Discretisaton_Mesh_RegularTrilinear_h__ */
+

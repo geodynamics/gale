@@ -272,3 +272,5 @@ void LumpedMassMatrixSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, LumpedMassMatrixSuite_Setup, LumpedMassMatrixSuite_Teardown );
    pcu_suite_addTest( suite, LumpedMassMatrixSuite_TestLumpedMassMatrix );
 }
+
+

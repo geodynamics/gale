@@ -58,22 +58,26 @@ const Type Energy_SLE_Solver_Type = "Energy_SLE_Solver";
 PetscTruth Energy_SLE_HasNullSpace( Mat A );
 
 void* Energy_SLE_Solver_DefaultNew( Name name ) {
-	return _Energy_SLE_Solver_New( 
-		sizeof(Energy_SLE_Solver), 
-		Energy_SLE_Solver_Type, 
-		_Energy_SLE_Solver_Delete, 
-		_Energy_SLE_Solver_Print, 
-		_Energy_SLE_Solver_Copy,
-		Energy_SLE_Solver_DefaultNew,
-		_Energy_SLE_Solver_AssignFromXML,
-		_Energy_SLE_Solver_Build, 
-		_Energy_SLE_Solver_Initialise,
-		_SLE_Solver_Execute,
-		_SLE_Solver_Destroy,
-		_Energy_SLE_Solver_SolverSetup, 
-		_Energy_SLE_Solver_Solve, 
-		_Energy_SLE_GetResidual, 
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Energy_SLE_Solver);
+	Type                                                      type = Energy_SLE_Solver_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Energy_SLE_Solver_Delete;
+	Stg_Class_PrintFunction*                                _print = _Energy_SLE_Solver_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Energy_SLE_Solver_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = Energy_SLE_Solver_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Energy_SLE_Solver_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Energy_SLE_Solver_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Energy_SLE_Solver_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _SLE_Solver_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _SLE_Solver_Destroy;
+	SLE_Solver_SolverSetupFunction*                   _solverSetup = _Energy_SLE_Solver_SolverSetup;
+	SLE_Solver_SolveFunction*                               _solve = _Energy_SLE_Solver_Solve;
+	SLE_Solver_GetResidualFunc*                       _getResidual = _Energy_SLE_GetResidual;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _Energy_SLE_Solver_New(  ENERGY_SLE_SOLVER_PASSARGS  );
 }
 
 Energy_SLE_Solver* Energy_SLE_Solver_New( Name name, Bool useStatSolve, int statReps ) {
@@ -85,43 +89,13 @@ Energy_SLE_Solver* Energy_SLE_Solver_New( Name name, Bool useStatSolve, int stat
 }
 
 /* Creation implementation / Virtual constructor */
-Energy_SLE_Solver* _Energy_SLE_Solver_New( 
-		SizeT                                   sizeOfSelf,
-		Type                                    type,
-		Stg_Class_DeleteFunction*               _delete,
-		Stg_Class_PrintFunction*                _print,
-		Stg_Class_CopyFunction*                 _copy, 
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*        _construct,
-		Stg_Component_BuildFunction*            _build,
-		Stg_Component_InitialiseFunction*       _initialise,
-		Stg_Component_ExecuteFunction*          _execute,
-		Stg_Component_DestroyFunction*          _destroy,
-		SLE_Solver_SolverSetupFunction*         _solverSetup,
-		SLE_Solver_SolveFunction*               _solve,
-		SLE_Solver_GetResidualFunc*             _getResidual, 
-		Name									name )
+Energy_SLE_Solver* _Energy_SLE_Solver_New(  ENERGY_SLE_SOLVER_DEFARGS  )
 {
 	Energy_SLE_Solver* self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Energy_SLE_Solver) );
-	self = (Energy_SLE_Solver*) _SLE_Solver_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_solverSetup,
-		_solve,
-		_getResidual, 
-		name );
+	assert( _sizeOfSelf >= sizeof(Energy_SLE_Solver) );
+	self = (Energy_SLE_Solver*) _SLE_Solver_New(  SLE_SOLVER_PASSARGS  );
 	
 	/* Virtual info */
 	return self;
@@ -321,3 +295,5 @@ PetscTruth Energy_SLE_HasNullSpace( Mat A ) {
 
     return isNull;
 }
+
+

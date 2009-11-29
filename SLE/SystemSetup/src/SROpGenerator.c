@@ -52,30 +52,32 @@ const Type SROpGenerator_Type = "SROpGenerator";
 */
 
 SROpGenerator* SROpGenerator_New( Name name ) {
-	return _SROpGenerator_New( sizeof(SROpGenerator), 
-				   SROpGenerator_Type, 
-				   _SROpGenerator_Delete, 
-				   _SROpGenerator_Print, 
-				   NULL, 
-				   (void* (*)(Name))SROpGenerator_New, 
-				   _SROpGenerator_AssignFromXML, 
-				   _SROpGenerator_Build, 
-				   _SROpGenerator_Initialise, 
-				   _SROpGenerator_Execute, 
-				   _SROpGenerator_Destroy, 
-				   name, 
-				   NON_GLOBAL, 
-				   _MGOpGenerator_SetNumLevels, 
-				   SROpGenerator_HasExpired, 
-				   SROpGenerator_Generate );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(SROpGenerator);
+	Type                                                      type = SROpGenerator_Type;
+	Stg_Class_DeleteFunction*                              _delete = _SROpGenerator_Delete;
+	Stg_Class_PrintFunction*                                _print = _SROpGenerator_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void* (*)(Name))SROpGenerator_New;
+	Stg_Component_ConstructFunction*                    _construct = _SROpGenerator_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _SROpGenerator_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _SROpGenerator_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _SROpGenerator_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _SROpGenerator_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	MGOpGenerator_SetNumLevelsFunc*               setNumLevelsFunc = _MGOpGenerator_SetNumLevels;
+	MGOpGenerator_HasExpiredFunc*                   hasExpiredFunc = SROpGenerator_HasExpired;
+	MGOpGenerator_GenerateFunc*                       generateFunc = SROpGenerator_Generate;
+
+	return _SROpGenerator_New(  SROPGENERATOR_PASSARGS  );
 }
 
-SROpGenerator* _SROpGenerator_New( SROPGENERATOR_DEFARGS ) {
+SROpGenerator* _SROpGenerator_New(  SROPGENERATOR_DEFARGS  ) {
 	SROpGenerator*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(SROpGenerator) );
-	self = (SROpGenerator*)_MGOpGenerator_New( MGOPGENERATOR_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(SROpGenerator) );
+	self = (SROpGenerator*)_MGOpGenerator_New(  MGOPGENERATOR_PASSARGS  );
 
 	/* Virtual info */
 
@@ -1328,3 +1330,5 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
    mat = P;
    return mat;
 }
+
+

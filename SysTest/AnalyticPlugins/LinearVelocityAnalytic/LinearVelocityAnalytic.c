@@ -351,19 +351,23 @@ void _LinearVelocityAnalytic_Initialise( void* analyticSolution, void* data ) {
 }
 
 void* _LinearVelocityAnalytic_DefaultNew( Name name ) {
-	return (void*) _FieldTest_New( 
-			sizeof(LinearVelocityAnalytic),
-			LinearVelocityAnalytic_Type,
-			_FieldTest_Delete,
-			_FieldTest_Print,
-			_FieldTest_Copy,
-			_LinearVelocityAnalytic_DefaultNew,
-			_LinearVelocityAnalytic_AssignFromXML,
-			_LinearVelocityAnalytic_Build,
-			_LinearVelocityAnalytic_Initialise,
-			_FieldTest_Execute,
-			_FieldTest_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(LinearVelocityAnalytic);
+	Type                                                      type = LinearVelocityAnalytic_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FieldTest_Delete;
+	Stg_Class_PrintFunction*                                _print = _FieldTest_Print;
+	Stg_Class_CopyFunction*                                  _copy = _FieldTest_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _LinearVelocityAnalytic_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _LinearVelocityAnalytic_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _LinearVelocityAnalytic_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _LinearVelocityAnalytic_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FieldTest_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FieldTest_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _FieldTest_New(  FIELDTEST_PASSARGS  );
 }
 
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
@@ -371,3 +375,5 @@ Index StgFEM_LinearVelocityAnalytic_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
 	return PluginsManager_Submit( pluginsManager, LinearVelocityAnalytic_Type, "0", _LinearVelocityAnalytic_DefaultNew );
 }
+
+

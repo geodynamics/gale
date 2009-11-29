@@ -78,15 +78,7 @@
 	
 	struct ForceVector { __ForceVector };
 
-	#define FORCEVECTOR_DEFARGS \
-		SOLUTIONVECTOR_DEFARGS, \
-			Dimension_Index	dim, \
-			void*					entryPoint_Register
 
-	#define FORCEVECTOR_PASSARGS \
-		SOLUTIONVECTOR_PASSARGS, \
-			dim, \
-			entryPoint_Register
 	
 	/* Creation implementation / Virtual constructor */
 	
@@ -98,7 +90,18 @@
 		void*							entryPoint_Register,
 		MPI_Comm						comm );
 
-	ForceVector* _ForceVector_New( FORCEVECTOR_DEFARGS ); 
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FORCEVECTOR_DEFARGS \
+                SOLUTIONVECTOR_DEFARGS
+
+	#define FORCEVECTOR_PASSARGS \
+                SOLUTIONVECTOR_PASSARGS
+
+	ForceVector* _ForceVector_New(  FORCEVECTOR_DEFARGS  ); 
 
 	void _ForceVector_Init(
 		void*						forceVector,
@@ -150,3 +153,4 @@
 void ForceVector_AddModifyCallback( ForceVector* self, void* callback, void* object );
 
 #endif /* __StgFEM_SLE_SystemSetup_ForceVector_h__ */
+

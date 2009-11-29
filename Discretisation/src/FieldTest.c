@@ -59,54 +59,38 @@ const Type FieldTest_Type = "FieldTest";
 FieldTest* fieldTestSingleton = NULL;
 
 void* _FieldTest_DefaultNew( Name name ) {
-	return _FieldTest_New(
-		sizeof(FieldTest),
-		FieldTest_Type,
-		_FieldTest_Delete, 
-		_FieldTest_Print,
-		_FieldTest_Copy,
-		_FieldTest_DefaultNew,
-		_FieldTest_AssignFromXML,
-		_FieldTest_Build,
-		_FieldTest_Initialise,
-		_FieldTest_Execute, 
-		_FieldTest_Destroy,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(FieldTest);
+	Type                                                      type = FieldTest_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FieldTest_Delete;
+	Stg_Class_PrintFunction*                                _print = _FieldTest_Print;
+	Stg_Class_CopyFunction*                                  _copy = _FieldTest_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _FieldTest_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _FieldTest_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _FieldTest_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FieldTest_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FieldTest_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FieldTest_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _FieldTest_New(  FIELDTEST_PASSARGS  );
 }
 
-FieldTest* _FieldTest_New( 
-		SizeT                                       _sizeOfSelf,
-		Type                                        type,
-		Stg_Class_DeleteFunction*                   _delete,
-		Stg_Class_PrintFunction*                    _print,
-		Stg_Class_CopyFunction*                     _copy, 
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*            _construct,
-		Stg_Component_BuildFunction*                _build,
-		Stg_Component_InitialiseFunction*           _initialise,
-		Stg_Component_ExecuteFunction*              _execute,
-		Stg_Component_DestroyFunction*              _destroy,
-		Name                                        name )
+FieldTest* _FieldTest_New(  FIELDTEST_DEFARGS  )
 {
 	FieldTest*			self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(FieldTest) );
 	/* Construct using parent */
-	self = (FieldTest*)_Stg_Component_New( 
-			_sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name,
-			NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (FieldTest*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	self->normalise = False;
 	self->epsilon = 0.0001;
@@ -1187,5 +1171,7 @@ void FieldTest_AddAnalyticSolutionFuncToListAtIndex( void* fieldTest, Index func
 	self->_analyticSolutionList[func_I] = func;
 	self->analyticSolnForFeVarKey[field_I] = func_I;
 }
+
+
 
 

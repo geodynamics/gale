@@ -49,12 +49,12 @@ const Type MGOpGenerator_Type = "MGOpGenerator";
 ** Constructors
 */
 
-MGOpGenerator* _MGOpGenerator_New( MGOPGENERATOR_DEFARGS ) {
+MGOpGenerator* _MGOpGenerator_New(  MGOPGENERATOR_DEFARGS  ) {
 	MGOpGenerator*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(MGOpGenerator) );
-	self = (MGOpGenerator*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(MGOpGenerator) );
+	self = (MGOpGenerator*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	/* stuff previously housed in the MatrixSolver class */
 	self->solver = malloc( sizeof( MGSolver_PETScData ) );
@@ -179,3 +179,5 @@ unsigned MGOpGenerator_GetNumLevels( void* mgOpGenerator ) {
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+

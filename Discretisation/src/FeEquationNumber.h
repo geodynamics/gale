@@ -139,19 +139,7 @@
 
 	struct FeEquationNumber { __FeEquationNumber };
 
-	#define FEEQUATIONNUMBER_DEFARGS	\
-		STG_COMPONENT_DEFARGS,	\
-			void* feMesh,	\
-			DofLayout* dofLayout,	\
-			VariableCondition* bcs, \
-			LinkedDofInfo* linkedDofInfo 	
 
-	#define FEEQUATIONNUMBER_PASSARGS	\
-		STG_COMPONENT_PASSARGS,		\
-			feMesh,	\
-			dofLayout,	\
-			bcs, \
-			linkedDofInfo 	
 	
 	/* +++ Constructors / Destructors +++ */
 	
@@ -167,7 +155,18 @@
 		LinkedDofInfo*			linkedDofInfo );
 	
 	/** Creation implementation */
-	FeEquationNumber* _FeEquationNumber_New( FEEQUATIONNUMBER_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FEEQUATIONNUMBER_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define FEEQUATIONNUMBER_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	FeEquationNumber* _FeEquationNumber_New(  FEEQUATIONNUMBER_DEFARGS  );
 	
 	/** Initialisation implementation functions */
 	void _FeEquationNumber_Init(
@@ -281,3 +280,4 @@
 	void FeEquationNumber_BuildWithDave( FeEquationNumber* self );
 
 #endif /* __StgFEM_Discretisation_EquationNumber_h__ */
+

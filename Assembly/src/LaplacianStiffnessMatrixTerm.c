@@ -71,39 +71,13 @@ LaplacianStiffnessMatrixTerm* LaplacianStiffnessMatrixTerm_New(
 }
 
 /* Creation implementation / Virtual constructor */
-LaplacianStiffnessMatrixTerm* _LaplacianStiffnessMatrixTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,
-		Name                                                name )
+LaplacianStiffnessMatrixTerm* _LaplacianStiffnessMatrixTerm_New(  LAPLACIANSTIFFNESSMATRIXTERM_DEFARGS  )
 {
 	LaplacianStiffnessMatrixTerm* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(LaplacianStiffnessMatrixTerm) );
-	self = (LaplacianStiffnessMatrixTerm*) _StiffnessMatrixTerm_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_assembleElement,
-		name );
+	assert( _sizeOfSelf >= sizeof(LaplacianStiffnessMatrixTerm) );
+	self = (LaplacianStiffnessMatrixTerm*) _StiffnessMatrixTerm_New(  STIFFNESSMATRIXTERM_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -129,20 +103,24 @@ void _LaplacianStiffnessMatrixTerm_Print( void* matrixTerm, Stream* stream ) {
 }
 
 void* _LaplacianStiffnessMatrixTerm_DefaultNew( Name name ) {
-	return (void*)_LaplacianStiffnessMatrixTerm_New( 
-		sizeof(LaplacianStiffnessMatrixTerm), 
-		LaplacianStiffnessMatrixTerm_Type,
-		_LaplacianStiffnessMatrixTerm_Delete,
-		_LaplacianStiffnessMatrixTerm_Print,
-		NULL,
-		_LaplacianStiffnessMatrixTerm_DefaultNew,
-		_LaplacianStiffnessMatrixTerm_AssignFromXML,
-		_LaplacianStiffnessMatrixTerm_Build,
-		_LaplacianStiffnessMatrixTerm_Initialise,
-		_LaplacianStiffnessMatrixTerm_Execute,
-		_LaplacianStiffnessMatrixTerm_Destroy,
-		_LaplacianStiffnessMatrixTerm_AssembleElement,
-		name );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(LaplacianStiffnessMatrixTerm);
+	Type                                                         type = LaplacianStiffnessMatrixTerm_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _LaplacianStiffnessMatrixTerm_Delete;
+	Stg_Class_PrintFunction*                                   _print = _LaplacianStiffnessMatrixTerm_Print;
+	Stg_Class_CopyFunction*                                     _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _LaplacianStiffnessMatrixTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _LaplacianStiffnessMatrixTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _LaplacianStiffnessMatrixTerm_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _LaplacianStiffnessMatrixTerm_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _LaplacianStiffnessMatrixTerm_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _LaplacianStiffnessMatrixTerm_Destroy;
+	StiffnessMatrixTerm_AssembleElementFunction*     _assembleElement = _LaplacianStiffnessMatrixTerm_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*)_LaplacianStiffnessMatrixTerm_New(  LAPLACIANSTIFFNESSMATRIXTERM_PASSARGS  );
 }
 
 void _LaplacianStiffnessMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
@@ -235,3 +213,5 @@ void _LaplacianStiffnessMatrixTerm_AssembleElement(
 		}
 	}
 }
+
+

@@ -77,29 +77,30 @@ ForceTerm* ForceTerm_New(
 }
 
 void* _ForceTerm_DefaultNew( Name name ) {
-	return _ForceTerm_New( 
-		sizeof(ForceTerm), 
-		ForceTerm_Type, 
-		_ForceTerm_Delete,
-		_ForceTerm_Print,
-		_ForceTerm_Copy,
-		_ForceTerm_DefaultNew, 
-		_ForceTerm_AssignFromXML,
-		_ForceTerm_Build, 
-		_ForceTerm_Initialise,
-		_ForceTerm_Execute, 
-		_ForceTerm_Destroy,
-		name,
-		NON_GLOBAL,
-		_ForceTerm_AssembleElement );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(ForceTerm);
+	Type                                                      type = ForceTerm_Type;
+	Stg_Class_DeleteFunction*                              _delete = _ForceTerm_Delete;
+	Stg_Class_PrintFunction*                                _print = _ForceTerm_Print;
+	Stg_Class_CopyFunction*                                  _copy = _ForceTerm_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _ForceTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _ForceTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _ForceTerm_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _ForceTerm_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _ForceTerm_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _ForceTerm_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	ForceTerm_AssembleElementFunction*            _assembleElement = _ForceTerm_AssembleElement;
+
+	return _ForceTerm_New(  FORCETERM_PASSARGS  );
 }
 
-ForceTerm* _ForceTerm_New( FORCETERM_DEFARGS ) {
+ForceTerm* _ForceTerm_New(  FORCETERM_DEFARGS  ) {
 	ForceTerm* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(ForceTerm) );
-	self = (ForceTerm*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(ForceTerm) );
+	self = (ForceTerm*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	self->_assembleElement = _assembleElement;
 	
@@ -266,3 +267,5 @@ void ForceTerm_SetAssembleElementFunction( void* forceTerm, ForceTerm_AssembleEl
 
 	self->_assembleElement = assembleElementFunction;
 }
+
+

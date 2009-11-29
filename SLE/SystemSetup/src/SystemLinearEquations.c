@@ -90,43 +90,18 @@ SystemLinearEquations* SystemLinearEquations_New(
 }
 
 /* Creation implementation / Virtual constructor */
-SystemLinearEquations* _SystemLinearEquations_New( 
-	SizeT                                              sizeOfSelf,
-	Type                                               type,
-	Stg_Class_DeleteFunction*                          _delete,
-	Stg_Class_PrintFunction*                           _print,
-	Stg_Class_CopyFunction*                            _copy, 
-	Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-	Stg_Component_ConstructFunction*                   _construct,
-	Stg_Component_BuildFunction*                       _build,
-	Stg_Component_InitialiseFunction*                  _initialise,
-	Stg_Component_ExecuteFunction*                     _execute,
-	Stg_Component_DestroyFunction*                     _destroy,
-	SystemLinearEquations_LM_SetupFunction*            _LM_Setup,
-	SystemLinearEquations_MatrixSetupFunction*         _matrixSetup,
-	SystemLinearEquations_VectorSetupFunction*         _vectorSetup,
-	SystemLinearEquations_UpdateSolutionOntoNodesFunc* _updateSolutionOntoNodes, 
-	SystemLinearEquations_MG_SelectStiffMatsFunc*		_mgSelectStiffMats, 
-	Name                                               name ) 
+SystemLinearEquations* _SystemLinearEquations_New(  SYSTEMLINEAREQUATIONS_DEFARGS  ) 
 {
 	SystemLinearEquations* self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(SystemLinearEquations) );
-	self = (SystemLinearEquations*) _Stg_Component_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name,
-			NON_GLOBAL );
+	assert( _sizeOfSelf >= sizeof(SystemLinearEquations) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (SystemLinearEquations*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* Virtual info */
 	self->_LM_Setup = _LM_Setup;
@@ -329,24 +304,28 @@ void* _SystemLinearEquations_Copy( void* sle, void* dest, Bool deep, Name nameEx
 }
 
 void* _SystemLinearEquations_DefaultNew( Name name ) {
-	return _SystemLinearEquations_New(
-		sizeof(SystemLinearEquations), 
-		SystemLinearEquations_Type,
-		_SystemLinearEquations_Delete,
-		_SystemLinearEquations_Print,
-		_SystemLinearEquations_Copy,
-		_SystemLinearEquations_DefaultNew,
-		_SystemLinearEquations_AssignFromXML,
-		_SystemLinearEquations_Build,
-		_SystemLinearEquations_Initialise,
-		_SystemLinearEquations_Execute,
-		_SystemLinearEquations_Destroy,
-		_SystemLinearEquations_LM_Setup,
-		_SystemLinearEquations_MatrixSetup,
-		_SystemLinearEquations_VectorSetup,
-		_SystemLinearEquations_UpdateSolutionOntoNodes,
-		_SystemLinearEquations_MG_SelectStiffMats, 
-		name );
+	/* Variables set in this function */
+	SizeT                                                            _sizeOfSelf = sizeof(SystemLinearEquations);
+	Type                                                                    type = SystemLinearEquations_Type;
+	Stg_Class_DeleteFunction*                                            _delete = _SystemLinearEquations_Delete;
+	Stg_Class_PrintFunction*                                              _print = _SystemLinearEquations_Print;
+	Stg_Class_CopyFunction*                                                _copy = _SystemLinearEquations_Copy;
+	Stg_Component_DefaultConstructorFunction*                _defaultConstructor = _SystemLinearEquations_DefaultNew;
+	Stg_Component_ConstructFunction*                                  _construct = _SystemLinearEquations_AssignFromXML;
+	Stg_Component_BuildFunction*                                          _build = _SystemLinearEquations_Build;
+	Stg_Component_InitialiseFunction*                                _initialise = _SystemLinearEquations_Initialise;
+	Stg_Component_ExecuteFunction*                                      _execute = _SystemLinearEquations_Execute;
+	Stg_Component_DestroyFunction*                                      _destroy = _SystemLinearEquations_Destroy;
+	SystemLinearEquations_LM_SetupFunction*                            _LM_Setup = _SystemLinearEquations_LM_Setup;
+	SystemLinearEquations_MatrixSetupFunction*                      _matrixSetup = _SystemLinearEquations_MatrixSetup;
+	SystemLinearEquations_VectorSetupFunction*                      _vectorSetup = _SystemLinearEquations_VectorSetup;
+	SystemLinearEquations_UpdateSolutionOntoNodesFunc*  _updateSolutionOntoNodes = _SystemLinearEquations_UpdateSolutionOntoNodes;
+	SystemLinearEquations_MG_SelectStiffMatsFunc*             _mgSelectStiffMats = _SystemLinearEquations_MG_SelectStiffMats;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _SystemLinearEquations_New(  SYSTEMLINEAREQUATIONS_PASSARGS  );
 }
 
 void _SystemLinearEquations_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data ){
@@ -1365,4 +1344,6 @@ void _SystemLinearEquations_MG_SelectStiffMats( void* _sle, unsigned* nSMs, Stif
 		}
 	}
 }
+
+
 

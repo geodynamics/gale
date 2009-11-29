@@ -50,33 +50,34 @@ const Type Biquadratic_Type = "Biquadratic";
 #define BIQUADRATICNODECOUNT 9
 
 Biquadratic* Biquadratic_New( Name name ) {
-	return _Biquadratic_New( sizeof(Biquadratic), 
-		Biquadratic_Type, 
-		_Biquadratic_Delete, 
-		_Biquadratic_Print, 
-		NULL, 
-		(void* (*)(Name))_Biquadratic_New, 
-		_Biquadratic_AssignFromXML, 
-		_Biquadratic_Build, 
-		_Biquadratic_Initialise, 
-		_Biquadratic_Execute, 
-		_Biquadratic_Destroy, 
-		name,
-		NON_GLOBAL,
-		Biquadratic_EvalBasis, 
-		Biquadratic_EvalLocalDerivs, 
-		_ElementType_ConvertGlobalCoordToElLocal, 
-		Biquadratic_JacobianDeterminantSurface,
-		_ElementType_SurfaceNormal,
-		BIQUADRATICNODECOUNT );
+	/* Variables set in this function */
+	SizeT                                                                            _sizeOfSelf = sizeof(Biquadratic);
+	Type                                                                                    type = Biquadratic_Type;
+	Stg_Class_DeleteFunction*                                                            _delete = _Biquadratic_Delete;
+	Stg_Class_PrintFunction*                                                              _print = _Biquadratic_Print;
+	Stg_Class_CopyFunction*                                                                _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*                                _defaultConstructor = (void* (*)(Name))_Biquadratic_New;
+	Stg_Component_ConstructFunction*                                                  _construct = _Biquadratic_AssignFromXML;
+	Stg_Component_BuildFunction*                                                          _build = _Biquadratic_Build;
+	Stg_Component_InitialiseFunction*                                                _initialise = _Biquadratic_Initialise;
+	Stg_Component_ExecuteFunction*                                                      _execute = _Biquadratic_Execute;
+	Stg_Component_DestroyFunction*                                                      _destroy = _Biquadratic_Destroy;
+	AllocationType                                                            nameAllocationType = NON_GLOBAL;
+	ElementType_EvaluateShapeFunctionsAtFunction*                      _evaluateShapeFunctionsAt = Biquadratic_EvalBasis;
+	ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*  _evaluateShapeFunctionLocalDerivsAt = Biquadratic_EvalLocalDerivs;
+	ElementType_ConvertGlobalCoordToElLocalFunction*                _convertGlobalCoordToElLocal = _ElementType_ConvertGlobalCoordToElLocal;
+	ElementType_JacobianDeterminantSurfaceFunction*                  _jacobianDeterminantSurface = Biquadratic_JacobianDeterminantSurface;
+	ElementType_SurfaceNormalFunction*                                            _surfaceNormal = _ElementType_SurfaceNormal;
+
+	return _Biquadratic_New(  BIQUADRATIC_PASSARGS  );
 }
 
-Biquadratic* _Biquadratic_New( BIQUADRATIC_DEFARGS ) {
+Biquadratic* _Biquadratic_New(  BIQUADRATIC_DEFARGS  ) {
 	Biquadratic*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Biquadratic) );
-	self = (Biquadratic*)_ElementType_New( ELEMENTTYPE_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(Biquadratic) );
+	self = (Biquadratic*)_ElementType_New(  ELEMENTTYPE_PASSARGS  );
 
 	/* Virtual info */
 
@@ -239,3 +240,5 @@ double Biquadratic_JacobianDeterminantSurface( void* elementType, void* _mesh, u
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+

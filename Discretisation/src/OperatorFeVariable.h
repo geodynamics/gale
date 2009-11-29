@@ -70,19 +70,7 @@
 
 	struct OperatorFeVariable { __OperatorFeVariable };	
 
-	#define OPERATORFEVARIABLE_DEFARGS \
-		FEVARIABLE_DEFARGS, \
-			Name				operatorName, \
-			Operator*		ownOperator, \
-			Index				feVariableCount, \
-			FeVariable**	feVariableList
 
-	#define OPERATORFEVARIABLE_PASSARGS \
-		FEVARIABLE_PASSARGS, \
-			operatorName, \
-			ownOperator, \
-			feVariableCount, \
-			feVariableList
 
 	/** Shortcut constructors */
 	OperatorFeVariable* OperatorFeVariable_NewUnary(
@@ -129,7 +117,18 @@
 		FieldVariable_Register*								fieldVariable_Register );
 
 	/** Private Constructor */
-	OperatorFeVariable* _OperatorFeVariable_New( OPERATORFEVARIABLE_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define OPERATORFEVARIABLE_DEFARGS \
+                FEVARIABLE_DEFARGS
+
+	#define OPERATORFEVARIABLE_PASSARGS \
+                FEVARIABLE_PASSARGS
+
+	OperatorFeVariable* _OperatorFeVariable_New(  OPERATORFEVARIABLE_DEFARGS  );
 
 	void _OperatorFeVariable_Init( void* feVariable, Name operatorName, Index feVariableCount, FeVariable** feVariableList, Operator* ownOperator );
 
@@ -178,3 +177,4 @@
 	void OperatorFeVariable_GradientValueAtNodeFunc( void* feVariable, Node_DomainIndex dNode_I, double* value );
 
 #endif /* __Discretisation_OperatorFeVariable_h__ */
+

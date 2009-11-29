@@ -61,20 +61,18 @@
 	   StiffnessMatrix*			stiffnessMatrix,
 	   Swarm*						integrationSwarm );
 
-	DivergenceMatrixTerm* _DivergenceMatrixTerm_New( 
-	   SizeT                                               sizeOfSelf,  
-	   Type                                                type,
-	   Stg_Class_DeleteFunction*                           _delete,
-	   Stg_Class_PrintFunction*                            _print,
-	   Stg_Class_CopyFunction*                             _copy, 
-	   Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-	   Stg_Component_ConstructFunction*                    _construct,
-	   Stg_Component_BuildFunction*                        _build,
-	   Stg_Component_InitialiseFunction*                   _initialise,
-	   Stg_Component_ExecuteFunction*                      _execute,
-	   Stg_Component_DestroyFunction*                      _destroy,
-	   StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
-	   Name                                                name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define DIVERGENCEMATRIXTERM_DEFARGS \
+                STIFFNESSMATRIXTERM_DEFARGS
+
+	#define DIVERGENCEMATRIXTERM_PASSARGS \
+                STIFFNESSMATRIXTERM_PASSARGS
+
+	DivergenceMatrixTerm* _DivergenceMatrixTerm_New(  DIVERGENCEMATRIXTERM_DEFARGS  );
 
 	void _DivergenceMatrixTerm_Init( void* matrixTerm );
 	
@@ -103,3 +101,4 @@
 		double**						elStiffMat ) ;
 
 #endif
+

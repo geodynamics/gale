@@ -61,14 +61,21 @@
 	** Constructors
 	*/
 
-	#define FEMESH_ALGORITHMS_DEFARGS	\
-		MESH_ALGORITHMS_DEFARGS
 
-	#define FEMESH_ALGORITHMS_PASSARGS	\
-		MESH_ALGORITHMS_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FEMESH_ALGORITHMS_DEFARGS \
+                MESH_ALGORITHMS_DEFARGS
+
+	#define FEMESH_ALGORITHMS_PASSARGS \
+                MESH_ALGORITHMS_PASSARGS
 
 	FeMesh_Algorithms* FeMesh_Algorithms_New( Name name, AbstractContext* context );
-	FeMesh_Algorithms* _FeMesh_Algorithms_New( FEMESH_ALGORITHMS_DEFARGS );
+	FeMesh_Algorithms* _FeMesh_Algorithms_New(  FEMESH_ALGORITHMS_DEFARGS  );
 	void _FeMesh_Algorithms_Init( FeMesh_Algorithms* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -99,3 +106,4 @@
 	*/
 
 #endif /* __StgFEM_Discretisation_FeMesh_Algorithms_h__ */
+

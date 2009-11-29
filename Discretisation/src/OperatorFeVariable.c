@@ -189,54 +189,37 @@ OperatorFeVariable* OperatorFeVariable_New(
 }
 
 void* _OperatorFeVariable_DefaultNew( Name name ) {
-	return _OperatorFeVariable_New( 
-		sizeof(OperatorFeVariable), 
-		OperatorFeVariable_Type, 
-		_OperatorFeVariable_Delete, 
-		_OperatorFeVariable_Print,
-		_OperatorFeVariable_Copy, 
-		(Stg_Component_DefaultConstructorFunction*)_OperatorFeVariable_DefaultNew,
-		_OperatorFeVariable_AssignFromXML,
-		_OperatorFeVariable_Build, 
-		_OperatorFeVariable_Initialise, 
-		_OperatorFeVariable_Execute,
-		_OperatorFeVariable_Destroy,
-		name,
-		NON_GLOBAL,
-		_OperatorFeVariable_InterpolateValueAt, /* _interpolateValueAt */
-		_FeVariable_GetMinGlobalFieldMagnitude, /* _getMinGlobalFieldMagnitude */
-		_FeVariable_GetMaxGlobalFieldMagnitude, /* _getMaxGlobalFieldMagnitude */
-		_FeVariable_GetMinAndMaxLocalCoords, /* _getMinAndMaxLocalCoords */
-		_FeVariable_GetMinAndMaxGlobalCoords, /* _getMinAndMaxGlobalCoords */
-		0, /* fieldComponentCount */
-		0, /* dim */
-		False, /* isCheckpointedAndReloaded */
-		MPI_COMM_WORLD, /* communicator */
-		NULL, /* fieldVariable_Register */
-		_OperatorFeVariable_InterpolateWithinElement, /*_interpolateWithinElement */
-		_OperatorFeVariable_GetValueAtNode, /* _getValueAtNode */
-		_OperatorFeVariable_SyncShadowValues, /* _syncShadowValues */
-		NULL, /* feMesh */
-		NULL, /* geometryMesh */
-		NULL, /* bcs */
-		NULL, /* ics */
-		NULL, /* linkedDofInfo */
-		NULL, /* templateFeVariable */
-		NULL, /* dofLayout */
-		False, /* referenceSoulution */
-		False, /* loadReferenceEachTimestep */
-		NULL, /* operatorName */
-		NULL, /* ownOperator */
-		0, /* feVariableCount */
-		NULL ); /* feVariableList */
+	/* Variables set in this function */
+	SizeT                                                         _sizeOfSelf = sizeof(OperatorFeVariable);
+	Type                                                                 type = OperatorFeVariable_Type;
+	Stg_Class_DeleteFunction*                                         _delete = _OperatorFeVariable_Delete;
+	Stg_Class_PrintFunction*                                           _print = _OperatorFeVariable_Print;
+	Stg_Class_CopyFunction*                                             _copy = _OperatorFeVariable_Copy;
+	Stg_Component_DefaultConstructorFunction*             _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_OperatorFeVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                               _construct = _OperatorFeVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                                       _build = _OperatorFeVariable_Build;
+	Stg_Component_InitialiseFunction*                             _initialise = _OperatorFeVariable_Initialise;
+	Stg_Component_ExecuteFunction*                                   _execute = _OperatorFeVariable_Execute;
+	Stg_Component_DestroyFunction*                                   _destroy = _OperatorFeVariable_Destroy;
+	AllocationType                                         nameAllocationType = NON_GLOBAL;
+	FieldVariable_InterpolateValueAtFunction*             _interpolateValueAt = _OperatorFeVariable_InterpolateValueAt;
+	FieldVariable_GetValueFunction*               _getMinGlobalFieldMagnitude = _FeVariable_GetMinGlobalFieldMagnitude;
+	FieldVariable_GetValueFunction*               _getMaxGlobalFieldMagnitude = _FeVariable_GetMaxGlobalFieldMagnitude;
+	FieldVariable_GetCoordFunction*                  _getMinAndMaxLocalCoords = _FeVariable_GetMinAndMaxLocalCoords;
+	FieldVariable_GetCoordFunction*                 _getMinAndMaxGlobalCoords = _FeVariable_GetMinAndMaxGlobalCoords;
+	FeVariable_InterpolateWithinElementFunction*    _interpolateWithinElement = _OperatorFeVariable_InterpolateWithinElement;
+	FeVariable_GetValueAtNodeFunction*                        _getValueAtNode = _OperatorFeVariable_GetValueAtNode;
+	FeVariable_SyncShadowValuesFunc*                        _syncShadowValues = _OperatorFeVariable_SyncShadowValues;
+
+	return _OperatorFeVariable_New(  OPERATORFEVARIABLE_PASSARGS  ); /* feVariableList_renamed */
 }
 
-OperatorFeVariable* _OperatorFeVariable_New( OPERATORFEVARIABLE_DEFARGS ) {
+OperatorFeVariable* _OperatorFeVariable_New(  OPERATORFEVARIABLE_DEFARGS  ) {
 	OperatorFeVariable* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(OperatorFeVariable) );
-	self = (OperatorFeVariable*) _FeVariable_New( FEVARIABLE_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(OperatorFeVariable) );
+	self = (OperatorFeVariable*) _FeVariable_New(  FEVARIABLE_PASSARGS  );
 
 	return self;
 }
@@ -715,3 +698,5 @@ void OperatorFeVariable_GradientValueAtNodeFunc( void* feVariable, Node_DomainIn
 	memset( value, 0, self->fieldComponentCount * sizeof(double) );
 	FeVariable_InterpolateDerivativesAt( self->feVariableList[0], coord, value );
 }
+
+

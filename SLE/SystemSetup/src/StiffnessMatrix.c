@@ -79,30 +79,34 @@ static const char	StiffnessMatrix_assembleStiffnessMatrixStr[] = "assembleStiffn
 
 void* StiffnessMatrix_DefaultNew( Name name )
 {
-	return _StiffnessMatrix_New( 
-		sizeof(StiffnessMatrix), 
-		StiffnessMatrix_Type, 
-		_StiffnessMatrix_Delete,
-		_StiffnessMatrix_Print, 
-		_StiffnessMatrix_Copy,
-		StiffnessMatrix_DefaultNew,
-		_StiffnessMatrix_AssignFromXML,
-		_StiffnessMatrix_Build, 
-		_StiffnessMatrix_Initialise,
-		_StiffnessMatrix_Execute,
-		_StiffnessMatrix_Destroy,
-		name,
-		False,
-		StiffnessMatrix_CalcNonZeros,
-		NULL, 
-		NULL, 
-		NULL, 
-		NULL,
-		0,
-		False,
-		False,
-		NULL,
-		0 );
+	/* Variables set in this function */
+	SizeT                                                               _sizeOfSelf = sizeof(StiffnessMatrix);
+	Type                                                                       type = StiffnessMatrix_Type;
+	Stg_Class_DeleteFunction*                                               _delete = _StiffnessMatrix_Delete;
+	Stg_Class_PrintFunction*                                                 _print = _StiffnessMatrix_Print;
+	Stg_Class_CopyFunction*                                                   _copy = _StiffnessMatrix_Copy;
+	Stg_Component_DefaultConstructorFunction*                   _defaultConstructor = StiffnessMatrix_DefaultNew;
+	Stg_Component_ConstructFunction*                                     _construct = _StiffnessMatrix_AssignFromXML;
+	Stg_Component_BuildFunction*                                             _build = _StiffnessMatrix_Build;
+	Stg_Component_InitialiseFunction*                                   _initialise = _StiffnessMatrix_Initialise;
+	Stg_Component_ExecuteFunction*                                         _execute = _StiffnessMatrix_Execute;
+	Stg_Component_DestroyFunction*                                         _destroy = _StiffnessMatrix_Destroy;
+	Bool                                                                   initFlag = False;
+	StiffnessMatrix_CalculateNonZeroEntriesFunction*       _calculateNonZeroEntries = StiffnessMatrix_CalcNonZeros;
+	void*                                                               rowVariable = NULL;
+	void*                                                            columnVariable = NULL;
+	void*                                                                       rhs = NULL;
+	Stg_Component*                                               applicationDepInfo = NULL;
+	Dimension_Index                                                             dim = 0;
+	Bool                                                                isNonLinear = False;
+	Bool                                              allowZeroElementContributions = False;
+	void*                                                       entryPoint_Register = NULL;
+	MPI_Comm                                                                   comm = 0;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _StiffnessMatrix_New(  STIFFNESSMATRIX_PASSARGS  );
 }
 
 
@@ -118,76 +122,40 @@ StiffnessMatrix* StiffnessMatrix_New(
 	void*                                            entryPoint_Register,
 	MPI_Comm                                         comm )
 {
-	return _StiffnessMatrix_New( 
-		sizeof(StiffnessMatrix), 
-		StiffnessMatrix_Type, 
-		_StiffnessMatrix_Delete,
-		_StiffnessMatrix_Print, 
-		_StiffnessMatrix_Copy,
-		StiffnessMatrix_DefaultNew,
-		_StiffnessMatrix_AssignFromXML,
-		_StiffnessMatrix_Build, 
-		_StiffnessMatrix_Initialise,
-		_StiffnessMatrix_Execute,
-		_StiffnessMatrix_Destroy,
-		name, 
-		True,
-		StiffnessMatrix_CalcNonZeros,
-		rowVariable, 
-		columnVariable, 
-		rhs,
-		applicationDepInfo,
-		dim,
-		isNonLinear,
-		allowZeroElementContributions,
-		entryPoint_Register,
-		comm );
+	/* Variables set in this function */
+	SizeT                                                          _sizeOfSelf = sizeof(StiffnessMatrix);
+	Type                                                                  type = StiffnessMatrix_Type;
+	Stg_Class_DeleteFunction*                                          _delete = _StiffnessMatrix_Delete;
+	Stg_Class_PrintFunction*                                            _print = _StiffnessMatrix_Print;
+	Stg_Class_CopyFunction*                                              _copy = _StiffnessMatrix_Copy;
+	Stg_Component_DefaultConstructorFunction*              _defaultConstructor = StiffnessMatrix_DefaultNew;
+	Stg_Component_ConstructFunction*                                _construct = _StiffnessMatrix_AssignFromXML;
+	Stg_Component_BuildFunction*                                        _build = _StiffnessMatrix_Build;
+	Stg_Component_InitialiseFunction*                              _initialise = _StiffnessMatrix_Initialise;
+	Stg_Component_ExecuteFunction*                                    _execute = _StiffnessMatrix_Execute;
+	Stg_Component_DestroyFunction*                                    _destroy = _StiffnessMatrix_Destroy;
+	Bool                                                              initFlag = True;
+	StiffnessMatrix_CalculateNonZeroEntriesFunction*  _calculateNonZeroEntries = StiffnessMatrix_CalcNonZeros;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _StiffnessMatrix_New(  STIFFNESSMATRIX_PASSARGS  );
 }
 
 
-StiffnessMatrix* _StiffnessMatrix_New(
-	SizeT                                            _sizeOfSelf,
-	Type                                             type,
-	Stg_Class_DeleteFunction*                        _delete,
-	Stg_Class_PrintFunction*                         _print,
-	Stg_Class_CopyFunction*                          _copy, 
-	Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-	Stg_Component_ConstructFunction*                 _construct,
-	Stg_Component_BuildFunction*                     _build,
-	Stg_Component_InitialiseFunction*                _initialise,
-	Stg_Component_ExecuteFunction*                   _execute,
-	Stg_Component_DestroyFunction*                   _destroy,
-	Name                                             name,
-	Bool                                             initFlag,
-	StiffnessMatrix_CalculateNonZeroEntriesFunction* _calculateNonZeroEntries,
-	void*                                            rowVariable,
-	void*                                            columnVariable,
-	void*                                            rhs,
-	Stg_Component*                                   applicationDepInfo,
-	Dimension_Index                                  dim,
-	Bool                                             isNonLinear,
-	Bool                                             allowZeroElementContributions,
-	void*                                            entryPoint_Register,
-	MPI_Comm                                         comm )
+StiffnessMatrix* _StiffnessMatrix_New(  STIFFNESSMATRIX_DEFARGS  )
 {
 	StiffnessMatrix*	self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(StiffnessMatrix) );
-	self = (StiffnessMatrix*)_Stg_Component_New(
-		_sizeOfSelf,
-		type,
-		_delete,
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy, 
-		name, 
-		NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (StiffnessMatrix*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* General info */
 	
@@ -2959,5 +2927,7 @@ void StiffnessMatrix_AddModifyCallback( StiffnessMatrix* self, void* callback, v
    self->modifyCBs[self->nModifyCBs - 1].callback = callback;
    self->modifyCBs[self->nModifyCBs - 1].object = object;
 }
+
+
 
 

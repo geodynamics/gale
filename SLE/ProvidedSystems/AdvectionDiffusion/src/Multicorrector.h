@@ -64,22 +64,18 @@
 		double                                              gamma,
 		Iteration_Index                                     multiCorrectorIterations );
 
-	AdvDiffMulticorrector* _AdvDiffMulticorrector_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		SLE_Solver_SolverSetupFunction*                     _solverSetup,
-		SLE_Solver_SolveFunction*                           _solve,
-		SLE_Solver_GetResidualFunc*                         _getResidual, 
-		Name                                                name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ADVDIFFMULTICORRECTOR_DEFARGS \
+                SLE_SOLVER_DEFARGS
+
+	#define ADVDIFFMULTICORRECTOR_PASSARGS \
+                SLE_SOLVER_PASSARGS
+
+	AdvDiffMulticorrector* _AdvDiffMulticorrector_New(  ADVDIFFMULTICORRECTOR_DEFARGS  );
 
 	void _AdvDiffMulticorrector_Init( 
 		AdvDiffMulticorrector*                              self, 
@@ -114,3 +110,4 @@
 	void _AdvDiffMulticorrector_CalculatePhiDot_Implicit( AdvDiffMulticorrector* self, AdvectionDiffusionSLE* sle, Vec deltaPhiDot ) ;
 
 #endif
+

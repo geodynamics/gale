@@ -62,14 +62,21 @@
 	** Constructors
 	*/
 
-	#define Inner2DGENERATOR_DEFARGS	\
-		MESHGENERATOR_DEFARGS
 
-	#define Inner2DGENERATOR_PASSARGS	\
-		MESHGENERATOR_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define INNER2DGENERATOR_DEFARGS \
+                MESHGENERATOR_DEFARGS
+
+	#define INNER2DGENERATOR_PASSARGS \
+                MESHGENERATOR_PASSARGS
 
 	Inner2DGenerator* Inner2DGenerator_New( Name name, AbstractContext* context );
-	Inner2DGenerator* _Inner2DGenerator_New( Inner2DGENERATOR_DEFARGS );
+	Inner2DGenerator* _Inner2DGenerator_New(  INNER2DGENERATOR_DEFARGS  );
 	void _Inner2DGenerator_Init( Inner2DGenerator* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -101,3 +108,4 @@
 	void Inner2DGenerator_BuildElementTypes( Inner2DGenerator* self, FeMesh* mesh );
 
 #endif /* __Discretisaton_Mesh_Inner2DGenerator_h__ */
+

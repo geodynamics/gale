@@ -86,32 +86,33 @@ FiniteElementContext* FiniteElementContext_New(
 }
 	
 void* FiniteElementContext_DefaultNew( Name name ) {
-	return _FiniteElementContext_New(
-		sizeof(FiniteElementContext),
-		FiniteElementContext_Type,
-		_FiniteElementContext_Delete,
-		_FiniteElementContext_Print,
-		NULL,
-		FiniteElementContext_DefaultNew,
-		_FiniteElementContext_AssignFromXML,
-		(Stg_Component_BuildFunction*)_FiniteElementContext_Build,
-		(Stg_Component_InitialiseFunction*)_FiniteElementContext_Initialise,
-		_AbstractContext_Execute,
-		(Stg_Component_DestroyFunction*)_FiniteElementContext_Destroy,
-		name,
-		NON_GLOBAL,
-		_FiniteElementContext_SetDt,
-		0,
-		0,
-		MPI_COMM_WORLD,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(FiniteElementContext);
+	Type                                                      type = FiniteElementContext_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FiniteElementContext_Delete;
+	Stg_Class_PrintFunction*                                _print = _FiniteElementContext_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = FiniteElementContext_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _FiniteElementContext_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = (Stg_Component_BuildFunction*)_FiniteElementContext_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = (Stg_Component_InitialiseFunction*)_FiniteElementContext_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _AbstractContext_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = (Stg_Component_DestroyFunction*)_FiniteElementContext_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	AbstractContext_SetDt*                                  _setDt = _FiniteElementContext_SetDt;
+	double                                               startTime = 0;
+	double                                                stopTime = 0;
+	MPI_Comm                                          communicator = MPI_COMM_WORLD;
+	Dictionary*                                         dictionary = NULL;
+
+	return _FiniteElementContext_New(  FINITEELEMENTCONTEXT_PASSARGS  );
 }
 
-FiniteElementContext* _FiniteElementContext_New( FINITEELEMENTCONTEXT_DEFARGS ) {
+FiniteElementContext* _FiniteElementContext_New(  FINITEELEMENTCONTEXT_DEFARGS  ) {
 	FiniteElementContext* self;
 	
 	/* Allocate memory */
-	self = (FiniteElementContext*)_DomainContext_New( DOMAINCONTEXT_PASSARGS );
+	self = (FiniteElementContext*)_DomainContext_New(  DOMAINCONTEXT_PASSARGS  );
 	
 	/* General info */
 	
@@ -834,5 +835,7 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
    NewClass_Delete( iarray );
 }
 #endif
+
+
 
 

@@ -61,14 +61,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define BIQUADRATIC_DEFARGS \
-		ELEMENTTYPE_DEFARGS
+                ELEMENTTYPE_DEFARGS
 
 	#define BIQUADRATIC_PASSARGS \
-		ELEMENTTYPE_PASSARGS
+                ELEMENTTYPE_PASSARGS
 
 	Biquadratic* Biquadratic_New( Name name );
-	Biquadratic* _Biquadratic_New( BIQUADRATIC_DEFARGS );
+	Biquadratic* _Biquadratic_New(  BIQUADRATIC_DEFARGS  );
 	void _Biquadratic_Init( Biquadratic* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -97,3 +104,4 @@
 	*/
 
 #endif /* __Discretisaton_Mesh_Biquadratic_h__ */
+

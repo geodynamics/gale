@@ -71,40 +71,18 @@ LumpedMassMatrixForceTerm* LumpedMassMatrixForceTerm_New(
 }
 
 /* Creation implementation / Virtual constructor */
-LumpedMassMatrixForceTerm* _LumpedMassMatrixForceTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		ForceTerm_AssembleElementFunction*                   _assembleElement,		
-		Name                                                name )
+LumpedMassMatrixForceTerm* _LumpedMassMatrixForceTerm_New(  LUMPEDMASSMATRIXFORCETERM_DEFARGS  )
 {
 	LumpedMassMatrixForceTerm* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(LumpedMassMatrixForceTerm) );
-	self = (LumpedMassMatrixForceTerm*) _ForceTerm_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		NON_GLOBAL,
-		_assembleElement );
+	assert( _sizeOfSelf >= sizeof(LumpedMassMatrixForceTerm) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (LumpedMassMatrixForceTerm*) _ForceTerm_New(  FORCETERM_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -130,20 +108,24 @@ void _LumpedMassMatrixForceTerm_Print( void* forceTerm, Stream* stream ) {
 }
 
 void* _LumpedMassMatrixForceTerm_DefaultNew( Name name ) {
-	return (void*)_LumpedMassMatrixForceTerm_New( 
-		sizeof(LumpedMassMatrixForceTerm), 
-		LumpedMassMatrixForceTerm_Type,
-		_LumpedMassMatrixForceTerm_Delete,
-		_LumpedMassMatrixForceTerm_Print,
-		NULL,
-		_LumpedMassMatrixForceTerm_DefaultNew,
-		_LumpedMassMatrixForceTerm_AssignFromXML,
-		_LumpedMassMatrixForceTerm_Build,
-		_LumpedMassMatrixForceTerm_Initialise,
-		_LumpedMassMatrixForceTerm_Execute,
-		_LumpedMassMatrixForceTerm_Destroy,
-		_LumpedMassMatrixForceTerm_AssembleElement,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(LumpedMassMatrixForceTerm);
+	Type                                                      type = LumpedMassMatrixForceTerm_Type;
+	Stg_Class_DeleteFunction*                              _delete = _LumpedMassMatrixForceTerm_Delete;
+	Stg_Class_PrintFunction*                                _print = _LumpedMassMatrixForceTerm_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _LumpedMassMatrixForceTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _LumpedMassMatrixForceTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _LumpedMassMatrixForceTerm_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _LumpedMassMatrixForceTerm_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _LumpedMassMatrixForceTerm_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _LumpedMassMatrixForceTerm_Destroy;
+	ForceTerm_AssembleElementFunction*            _assembleElement = _LumpedMassMatrixForceTerm_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*)_LumpedMassMatrixForceTerm_New(  LUMPEDMASSMATRIXFORCETERM_PASSARGS  );
 }
 
 void _LumpedMassMatrixForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
@@ -249,3 +231,5 @@ void _LumpedMassMatrixForceTerm_AssembleElement_Box( void* forceTerm, ForceVecto
 	for ( node_I = 0 ; node_I < elementNodeCount ; node_I++ ) 
 		elForceVector[ node_I ] = detJac;
 }
+
+

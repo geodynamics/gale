@@ -46,41 +46,43 @@ const Type RegularTrilinear_Type = "RegularTrilinear";
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
+#define REGULARTRILINEAR_NODECOUNT 8
 
 RegularTrilinear* RegularTrilinear_New( Name name ) {
-	return _RegularTrilinear_New( sizeof(RegularTrilinear), 
-		RegularTrilinear_Type, 
-		_RegularTrilinear_Delete, 
-		_RegularTrilinear_Print, 
-		NULL, 
-		(void* (*)(Name))_RegularTrilinear_New, 
-		_RegularTrilinear_AssignFromXML, 
-		_RegularTrilinear_Build, 
-		_RegularTrilinear_Initialise, 
-		_RegularTrilinear_Execute, 
-		_RegularTrilinear_Destroy, 
-		name, 
-		NON_GLOBAL, 
-		_TrilinearElementType_SF_allNodes, 
-		_TrilinearElementType_SF_allLocalDerivs_allNodes, 
-		_ElementType_ConvertGlobalCoordToElLocal, 
-		_TrilinearElementType_JacobianDeterminantSurface,
-		_ElementType_SurfaceNormal,
-		8 );
+	/* Variables set in this function */
+	SizeT                                                                            _sizeOfSelf = sizeof(RegularTrilinear);
+	Type                                                                                    type = RegularTrilinear_Type;
+	Stg_Class_DeleteFunction*                                                            _delete = _RegularTrilinear_Delete;
+	Stg_Class_PrintFunction*                                                              _print = _RegularTrilinear_Print;
+	Stg_Class_CopyFunction*                                                                _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*                                _defaultConstructor = (void* (*)(Name))_RegularTrilinear_New;
+	Stg_Component_ConstructFunction*                                                  _construct = _RegularTrilinear_AssignFromXML;
+	Stg_Component_BuildFunction*                                                          _build = _RegularTrilinear_Build;
+	Stg_Component_InitialiseFunction*                                                _initialise = _RegularTrilinear_Initialise;
+	Stg_Component_ExecuteFunction*                                                      _execute = _RegularTrilinear_Execute;
+	Stg_Component_DestroyFunction*                                                      _destroy = _RegularTrilinear_Destroy;
+	AllocationType                                                            nameAllocationType = NON_GLOBAL;
+	ElementType_EvaluateShapeFunctionsAtFunction*                      _evaluateShapeFunctionsAt = _TrilinearElementType_SF_allNodes;
+	ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*  _evaluateShapeFunctionLocalDerivsAt = _TrilinearElementType_SF_allLocalDerivs_allNodes;
+	ElementType_ConvertGlobalCoordToElLocalFunction*                _convertGlobalCoordToElLocal = _ElementType_ConvertGlobalCoordToElLocal;
+	ElementType_JacobianDeterminantSurfaceFunction*                  _jacobianDeterminantSurface = _TrilinearElementType_JacobianDeterminantSurface;
+	ElementType_SurfaceNormalFunction*                                            _surfaceNormal = _ElementType_SurfaceNormal;
+
+	return _RegularTrilinear_New(  REGULARTRILINEAR_PASSARGS  );
 }
 
-RegularTrilinear* _RegularTrilinear_New( REGULARTRILINEAR_DEFARGS ) {
+RegularTrilinear* _RegularTrilinear_New(  REGULARTRILINEAR_DEFARGS  ) {
 	RegularTrilinear*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(RegularTrilinear) );
-	self = (RegularTrilinear*)_TrilinearElementType_New( ELEMENTTYPE_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(RegularTrilinear) );
+	self = (RegularTrilinear*)_TrilinearElementType_New(  TRILINEARELEMENTTYPE_PASSARGS  );
 
 	/* Virtual info */
 
 	/* RegularTrilinear info */
 	self->isConstructed = True;
-	_ElementType_Init( (ElementType*)self, nodeCount );
+	_ElementType_Init( (ElementType*)self, REGULARTRILINEAR_NODECOUNT );
    _TrilinearElementType_Init( (TrilinearElementType*)self );
 	_RegularTrilinear_Init( self );
 
@@ -174,3 +176,7 @@ void RegularTrilinear_ConvertGlobalCoordToElLocal( void* elementType, void* mesh
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+
+
+

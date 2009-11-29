@@ -96,15 +96,18 @@
 	void FeEntryPoint_Init( void* feEntryPoint, Name name, unsigned int castType );
 	
 	/* Creation implementation */
-	FeEntryPoint* _FeEntryPoint_New( 
-		SizeT							_sizeOfSelf,
-		Type							type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*					_copy, 
-		EntryPoint_GetRunFunction*				_getRun,
-		Name							name,
-		unsigned int						castType );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FEENTRYPOINT_DEFARGS \
+                ENTRYPOINT_DEFARGS
+
+	#define FEENTRYPOINT_PASSARGS \
+                ENTRYPOINT_PASSARGS
+
+	FeEntryPoint* _FeEntryPoint_New(  FEENTRYPOINT_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _FeEntryPoint_Init( FeEntryPoint* self );
@@ -131,3 +134,4 @@
 		void* forceVector );
 	
 #endif /* __Fe_FeEntryPoint_h__ */
+

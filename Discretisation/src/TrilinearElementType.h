@@ -69,11 +69,7 @@
 		
 	struct TrilinearElementType { __TrilinearElementType };
 
-	#define TRILINEARELEMENTTYPE_DEFARGS \
-    	ELEMENTTYPE_DEFARGS
 
-	#define TRILINEARELEMENTTYPE_PASSARGS \
-    	ELEMENTTYPE_PASSARGS
 	
 	/* Create a new TrilinearElementType and initialise */
 	void* _TrilinearElementTypea_DefaultNew( Name name );
@@ -81,7 +77,18 @@
 	TrilinearElementType* TrilinearElementType_New( Name name );
 	
 	/* Creation implementation / Virtual constructor */
-	TrilinearElementType* _TrilinearElementType_New( TRILINEARELEMENTTYPE_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define TRILINEARELEMENTTYPE_DEFARGS \
+                ELEMENTTYPE_DEFARGS
+
+	#define TRILINEARELEMENTTYPE_PASSARGS \
+                ELEMENTTYPE_PASSARGS
+
+	TrilinearElementType* _TrilinearElementType_New(  TRILINEARELEMENTTYPE_DEFARGS  );
 	
 	/* Initialise implementation */
 	void _TrilinearElementType_Init( TrilinearElementType* self );
@@ -128,3 +135,4 @@
 		unsigned	norm );
 
 #endif /* __StgFEM_Discretisation_TrilinearElementType_h__ */
+

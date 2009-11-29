@@ -71,39 +71,13 @@ GradientStiffnessMatrixTerm* GradientStiffnessMatrixTerm_New(
 }
 
 /* Creation implementation / Virtual constructor */
-GradientStiffnessMatrixTerm* _GradientStiffnessMatrixTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
-		Name                                                name )
+GradientStiffnessMatrixTerm* _GradientStiffnessMatrixTerm_New(  GRADIENTSTIFFNESSMATRIXTERM_DEFARGS  )
 {
 	GradientStiffnessMatrixTerm* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(GradientStiffnessMatrixTerm) );
-	self = (GradientStiffnessMatrixTerm*) _StiffnessMatrixTerm_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_assembleElement,
-		name );
+	assert( _sizeOfSelf >= sizeof(GradientStiffnessMatrixTerm) );
+	self = (GradientStiffnessMatrixTerm*) _StiffnessMatrixTerm_New(  STIFFNESSMATRIXTERM_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -132,20 +106,24 @@ void _GradientStiffnessMatrixTerm_Print( void* matrixTerm, Stream* stream ) {
 }
 
 void* _GradientStiffnessMatrixTerm_DefaultNew( Name name ) {
-	return (void*)_GradientStiffnessMatrixTerm_New( 
-		sizeof(GradientStiffnessMatrixTerm), 
-		GradientStiffnessMatrixTerm_Type,
-		_GradientStiffnessMatrixTerm_Delete,
-		_GradientStiffnessMatrixTerm_Print,
-		NULL,
-		_GradientStiffnessMatrixTerm_DefaultNew,
-		_GradientStiffnessMatrixTerm_AssignFromXML,
-		_GradientStiffnessMatrixTerm_Build,
-		_GradientStiffnessMatrixTerm_Initialise,
-		_GradientStiffnessMatrixTerm_Execute,
-		_GradientStiffnessMatrixTerm_Destroy,
-		_GradientStiffnessMatrixTerm_AssembleElement,
-		name );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(GradientStiffnessMatrixTerm);
+	Type                                                         type = GradientStiffnessMatrixTerm_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _GradientStiffnessMatrixTerm_Delete;
+	Stg_Class_PrintFunction*                                   _print = _GradientStiffnessMatrixTerm_Print;
+	Stg_Class_CopyFunction*                                     _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _GradientStiffnessMatrixTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _GradientStiffnessMatrixTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _GradientStiffnessMatrixTerm_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _GradientStiffnessMatrixTerm_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _GradientStiffnessMatrixTerm_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _GradientStiffnessMatrixTerm_Destroy;
+	StiffnessMatrixTerm_AssembleElementFunction*     _assembleElement = _GradientStiffnessMatrixTerm_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*)_GradientStiffnessMatrixTerm_New(  GRADIENTSTIFFNESSMATRIXTERM_PASSARGS  );
 }
 
 void _GradientStiffnessMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
@@ -275,3 +253,5 @@ void _GradientStiffnessMatrixTerm_AssembleElement(
 		}
 	}
 }
+
+

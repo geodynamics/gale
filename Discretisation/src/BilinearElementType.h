@@ -70,11 +70,7 @@
 		
 	struct BilinearElementType { __BilinearElementType };
 
-	#define BILINEARELEMENTTYPE_DEFARGS \
-    	ELEMENTTYPE_DEFARGS
 
-	#define BILINEARELEMENTTYPE_PASSARGS \
-    	ELEMENTTYPE_PASSARGS
 
 	/* Create a new BilinearElementType and initialise */
 	void* _BilinearElementType_DefaultNew( Name name );
@@ -82,7 +78,18 @@
 	BilinearElementType* BilinearElementType_New( Name name );
 	
 	/* Creation implementation / Virtual constructor */
-	BilinearElementType* _BilinearElementType_New( BILINEARELEMENTTYPE_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define BILINEARELEMENTTYPE_DEFARGS \
+                ELEMENTTYPE_DEFARGS
+
+	#define BILINEARELEMENTTYPE_PASSARGS \
+                ELEMENTTYPE_PASSARGS
+
+	BilinearElementType* _BilinearElementType_New(  BILINEARELEMENTTYPE_DEFARGS  );
 	
 	/* Initialise implementation */
 	void _BilinearElementType_Init( BilinearElementType* self );
@@ -129,3 +136,4 @@
 		unsigned	norm );
 
 #endif /* __StgFEM_Discretisation_BilinearElementType_h__ */
+

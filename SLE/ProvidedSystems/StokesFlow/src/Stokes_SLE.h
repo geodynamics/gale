@@ -99,24 +99,18 @@
 		ForceVector*				hForceVec );
 
 	/* Creation implementation / Virtual constructor */
-	Stokes_SLE* _Stokes_SLE_New(
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		SystemLinearEquations_LM_SetupFunction*             _LM_Setup,
-		SystemLinearEquations_MatrixSetupFunction*          _matrixSetup,
-		SystemLinearEquations_VectorSetupFunction*          _vectorSetup,
-		SystemLinearEquations_UpdateSolutionOntoNodesFunc*	_updateSolutionOntoNodes,
-		SystemLinearEquations_MG_SelectStiffMatsFunc*		_mgSelectStiffMats, 
-		Name                                                name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STOKES_SLE_DEFARGS \
+                SYSTEMLINEAREQUATIONS_DEFARGS
+
+	#define STOKES_SLE_PASSARGS \
+                SYSTEMLINEAREQUATIONS_PASSARGS
+
+	Stokes_SLE* _Stokes_SLE_New(  STOKES_SLE_DEFARGS  );
 
 	void _Stokes_SLE_Init( 		
 		void*					sle, 
@@ -140,3 +134,4 @@
 	void _Stokes_SLE_MG_SelectStiffMats( void* _sle, unsigned* nSMs, StiffnessMatrix*** sms );
 	
 #endif
+

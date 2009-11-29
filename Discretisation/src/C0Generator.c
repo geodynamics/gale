@@ -48,21 +48,23 @@ const Type C0Generator_Type = "C0Generator";
 */
 
 C0Generator* C0Generator_New( Name name, AbstractContext* context ) {
-	C0Generator* self = _C0Generator_New( sizeof(C0Generator), 
-				 C0Generator_Type, 
-				 _C0Generator_Delete, 
-				 _C0Generator_Print, 
-				 NULL, 
-				 (void* (*)(Name))_C0Generator_New, 
-				 _C0Generator_AssignFromXML, 
-				 _C0Generator_Build, 
-				 _C0Generator_Initialise, 
-				 _C0Generator_Execute, 
-				 NULL, 
-				 name, 
-				 NON_GLOBAL, 
-				 _MeshGenerator_SetDimSize, 
-				 (MeshGenerator_GenerateFunc*)C0Generator_Generate );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(C0Generator);
+	Type                                                      type = C0Generator_Type;
+	Stg_Class_DeleteFunction*                              _delete = _C0Generator_Delete;
+	Stg_Class_PrintFunction*                                _print = _C0Generator_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void* (*)(Name))_C0Generator_New;
+	Stg_Component_ConstructFunction*                    _construct = _C0Generator_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _C0Generator_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _C0Generator_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _C0Generator_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = NULL;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	MeshGenerator_SetDimSizeFunc*                   setDimSizeFunc = _MeshGenerator_SetDimSize;
+	MeshGenerator_GenerateFunc*                       generateFunc = (MeshGenerator_GenerateFunc*)C0Generator_Generate;
+
+	C0Generator* self = _C0Generator_New(  C0GENERATOR_PASSARGS  );
    
    _MeshGenerator_Init( (MeshGenerator*)self, context );
 	_C0Generator_Init( self );
@@ -70,12 +72,12 @@ C0Generator* C0Generator_New( Name name, AbstractContext* context ) {
    return self;
 }
 
-C0Generator* _C0Generator_New( C0GENERATOR_DEFARGS ) {
+C0Generator* _C0Generator_New(  C0GENERATOR_DEFARGS  ) {
 	C0Generator*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(C0Generator) );
-	self = (C0Generator*)_MeshGenerator_New( MESHGENERATOR_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(C0Generator) );
+	self = (C0Generator*)_MeshGenerator_New(  MESHGENERATOR_PASSARGS  );
 
 	/* Virtual info */
 
@@ -266,3 +268,5 @@ void C0Generator_BuildElementTypes( C0Generator* self, FeMesh* mesh ) {
 	Mesh_CentroidAlgorithms_SetElementMesh( algs, self->elMesh );
 	Mesh_SetAlgorithms( mesh, algs );
 }
+
+

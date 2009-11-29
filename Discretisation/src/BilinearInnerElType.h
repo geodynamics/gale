@@ -70,11 +70,7 @@
 		
 	struct BilinearInnerElType { __BilinearInnerElType };
 
-	#define BILINEARINNERELTYPE_DEFARGS \
-      ELEMENTTYPE_DEFARGS
 
-   #define BILINEARINNERELTYPE_PASSARGS \
-      ELEMENTTYPE_PASSARGS
 
 	/* Create a new BilinearInnerElType and initialise */
 	void* BilinearInnerElType_DefaultNew( Name name );
@@ -82,7 +78,18 @@
 	BilinearInnerElType* BilinearInnerElType_New( Name name );
 	
 	/* Creation implementation / Virtual constructor */
-	BilinearInnerElType* _BilinearInnerElType_New( BILINEARINNERELTYPE_DEFARGS);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define BILINEARINNERELTYPE_DEFARGS \
+                ELEMENTTYPE_DEFARGS
+
+	#define BILINEARINNERELTYPE_PASSARGS \
+                ELEMENTTYPE_PASSARGS
+
+	BilinearInnerElType* _BilinearInnerElType_New(  BILINEARINNERELTYPE_DEFARGS  );
 	
 	/* Initialise implementation */
 	void _BilinearInnerElType_Init( BilinearInnerElType* self );
@@ -114,3 +121,4 @@
 	int _BilinearInnerElType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal );
 
 #endif /* __StgFEM_Discretisation_BilinearInnerElType_h__ */
+

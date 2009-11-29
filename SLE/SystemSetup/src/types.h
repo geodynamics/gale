@@ -119,39 +119,6 @@ typedef unsigned (MGSolver_GetIterationsFunc)( void* matrixSolver );
 typedef unsigned (MGSolver_GetMaxIterationsFunc)( void* matrixSolver );
 typedef double (MGSolver_GetResidualNormFunc)( void* matrixSolver );
 
-#define MGSOLVER_DEFARGS	\
-	STG_COMPONENT_DEFARGS,							\
-	MGSolver_SetCommFunc*			setCommFunc,			\
-	MGSolver_SetMatrixFunc*			setMatrixFunc,			\
-	MGSolver_SetMaxIterationsFunc*		setMaxIterationsFunc,		\
-	MGSolver_SetRelativeToleranceFunc*	setRelativeToleranceFunc,	\
-	MGSolver_SetAbsoluteToleranceFunc*	setAbsoluteToleranceFunc,	\
-	MGSolver_SetUseInitialSolutionFunc*	setUseInitialSolutionFunc,	\
-										\
-	MGSolver_SolveFunc*			solveFunc,			\
-	MGSolver_SetupFunc*			setupFunc,			\
-										\
-	MGSolver_GetSolveStatusFunc*		getSolveStatusFunc,		\
-	MGSolver_GetIterationsFunc*		getIterationsFunc,		\
-	MGSolver_GetMaxIterationsFunc*		getMaxIterationsFunc,		\
-	MGSolver_GetResidualNormFunc*		getResidualNormFunc
-
-#define MGSOLVER_PASSARGS \
-	STG_COMPONENT_PASSARGS,		\
-	setCommFunc, 			\
-	setMatrixFunc,			\
-	setMaxIterationsFunc,		\
-	setRelativeToleranceFunc,	\
-	setAbsoluteToleranceFunc,	\
-	setUseInitialSolutionFunc,	\
-					\
-	solveFunc,			\
-	setupFunc,			\
-					\
-	getSolveStatusFunc,		\
-	getIterationsFunc,		\
-	getMaxIterationsFunc,		\
-	getResidualNormFunc
 
 /* MatrixSolver class has been depreciated, so this class can no
  * longer inherit from it. all the data previously encapsulated in 

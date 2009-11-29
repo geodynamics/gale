@@ -116,35 +116,7 @@
 	Finite Element Method about a variable to be solved for - see FeVariable.h */
 	struct FeVariable { __FeVariable };
 
-	#define FEVARIABLE_DEFARGS \
-		FIELDVARIABLE_DEFARGS, \
-			FeVariable_InterpolateWithinElementFunction*	_interpolateWithinElement, \
-			FeVariable_GetValueAtNodeFunction*				_getValueAtNode, \
-			FeVariable_SyncShadowValuesFunc*					_syncShadowValues, \
-			void*														feMesh, \
-			void*														geometryMesh, \
-			void*														bcs, \
-			void*														ics, \
-			void*														linkedDofInfo, \
-			void*														templateFeVariable, \
-			DofLayout*												dofLayout, \
-			Bool														referenceSoulution, \
-			Bool														loadReferenceEachTimestep
 
-	#define FEVARIABLE_PASSARGS \
-		FIELDVARIABLE_PASSARGS, \
-			_interpolateWithinElement, \
-			_getValueAtNode, \
-			_syncShadowValues, \
-			feMesh, \
-			geometryMesh, \
-			bcs, \
-			ics, \
-			linkedDofInfo, \
-			templateFeVariable, \
-			dofLayout, \
-			referenceSoulution, \
-			loadReferenceEachTimestep
 
 	/* Checkpoint file version enum */
 	typedef enum FeCheckpointFileVersion {
@@ -207,7 +179,24 @@
 		FieldVariable_Register*	fV_Register );
 	
 	/* Creation implementation / Virtual constructor */
-	FeVariable* _FeVariable_New( FEVARIABLE_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FEVARIABLE_DEFARGS \
+                FIELDVARIABLE_DEFARGS, \
+                FeVariable_InterpolateWithinElementFunction*  _interpolateWithinElement, \
+                FeVariable_GetValueAtNodeFunction*                      _getValueAtNode, \
+                FeVariable_SyncShadowValuesFunc*                      _syncShadowValues
+
+	#define FEVARIABLE_PASSARGS \
+                FIELDVARIABLE_PASSARGS, \
+	        _interpolateWithinElement, \
+	        _getValueAtNode,           \
+	        _syncShadowValues        
+
+	FeVariable* _FeVariable_New(  FEVARIABLE_DEFARGS  );
 	
 	/* Initialise implementation */
 	void _FeVariable_Init( 
@@ -398,3 +387,4 @@
 
 
 #endif /* __StgFEM_Discretisation_FeVariable_h__ */
+

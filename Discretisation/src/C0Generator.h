@@ -62,14 +62,21 @@
 	** Constructors
 	*/
 
-	#define C0GENERATOR_DEFARGS	\
-		MESHGENERATOR_DEFARGS
 
-	#define C0GENERATOR_PASSARGS	\
-		MESHGENERATOR_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define C0GENERATOR_DEFARGS \
+                MESHGENERATOR_DEFARGS
+
+	#define C0GENERATOR_PASSARGS \
+                MESHGENERATOR_PASSARGS
 
 	C0Generator* C0Generator_New( Name name, AbstractContext* context );
-	C0Generator* _C0Generator_New( C0GENERATOR_DEFARGS );
+	C0Generator* _C0Generator_New(  C0GENERATOR_DEFARGS  );
 	void _C0Generator_Init( C0Generator* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -101,3 +108,4 @@
 	void C0Generator_BuildElementTypes( C0Generator* self, FeMesh* mesh );
 
 #endif /* __Discretisaton_Mesh_C0Generator_h__ */
+

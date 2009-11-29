@@ -170,51 +170,38 @@ FeVariable* FeVariable_New_Full(
 }
 
 void* _FeVariable_DefaultNew( Name name ) {
-	return _FeVariable_New(
-		sizeof(FeVariable),
-		FeVariable_Type,
-		_FeVariable_Delete,
-		_FeVariable_Print,
-		_FeVariable_Copy,
-		(Stg_Component_DefaultConstructorFunction*)_FeVariable_DefaultNew,
-		_FeVariable_AssignFromXML,
-		_FeVariable_Build, 
-		_FeVariable_Initialise,
-		_FeVariable_Execute,
-		_FeVariable_Destroy,
-		name,
-		NON_GLOBAL,
-		_FeVariable_InterpolateValueAt, /* _interpolateValueAt */
-		_FeVariable_GetMinGlobalFieldMagnitude, /* _getMinGlobalFieldMagnitude */
-		_FeVariable_GetMaxGlobalFieldMagnitude, /* _getMaxGlobalFieldMagnitude */
-		_FeVariable_GetMinAndMaxLocalCoords, /* _getMinAndMaxLocalCoords */
-		_FeVariable_GetMinAndMaxGlobalCoords, /* _getMinAndMaxGlobalCoords */
-		0, /* fieldComponentCount */
-		0, /* dim */
-		False, /* isCheckpointedAndReloaded */
-		MPI_COMM_WORLD, /* communicator */
-		NULL, /* fieldVariable_Register */
-		_FeVariable_InterpolateNodeValuesToElLocalCoord, /* _interpolateWithinElement */
-		_FeVariable_GetValueAtNode, /* _getValueAtNode */
-		_FeVariable_SyncShadowValues, /* _syncShadowValues */
-		NULL, /* feMesh */
-		NULL, /* geometryMesh */
-		NULL, /* bcs */
-		NULL, /* ics */
-		NULL, /* linkedDofInfo */
-		NULL, /* templateFeVariable */
-		NULL, /* dofLayout */
-		False, /* feVariableCount */
-		False ); /* feVariableList */
+	/* Variables set in this function */
+	SizeT                                                         _sizeOfSelf = sizeof(FeVariable);
+	Type                                                                 type = FeVariable_Type;
+	Stg_Class_DeleteFunction*                                         _delete = _FeVariable_Delete;
+	Stg_Class_PrintFunction*                                           _print = _FeVariable_Print;
+	Stg_Class_CopyFunction*                                             _copy = _FeVariable_Copy;
+	Stg_Component_DefaultConstructorFunction*             _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_FeVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                               _construct = _FeVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                                       _build = _FeVariable_Build;
+	Stg_Component_InitialiseFunction*                             _initialise = _FeVariable_Initialise;
+	Stg_Component_ExecuteFunction*                                   _execute = _FeVariable_Execute;
+	Stg_Component_DestroyFunction*                                   _destroy = _FeVariable_Destroy;
+	AllocationType                                         nameAllocationType = NON_GLOBAL;
+	FieldVariable_InterpolateValueAtFunction*             _interpolateValueAt = _FeVariable_InterpolateValueAt;
+	FieldVariable_GetValueFunction*               _getMinGlobalFieldMagnitude = _FeVariable_GetMinGlobalFieldMagnitude;
+	FieldVariable_GetValueFunction*               _getMaxGlobalFieldMagnitude = _FeVariable_GetMaxGlobalFieldMagnitude;
+	FieldVariable_GetCoordFunction*                  _getMinAndMaxLocalCoords = _FeVariable_GetMinAndMaxLocalCoords;
+	FieldVariable_GetCoordFunction*                 _getMinAndMaxGlobalCoords = _FeVariable_GetMinAndMaxGlobalCoords;
+	FeVariable_InterpolateWithinElementFunction*    _interpolateWithinElement = _FeVariable_InterpolateNodeValuesToElLocalCoord;
+	FeVariable_GetValueAtNodeFunction*                        _getValueAtNode = _FeVariable_GetValueAtNode;
+	FeVariable_SyncShadowValuesFunc*                        _syncShadowValues = _FeVariable_SyncShadowValues;
+
+	return _FeVariable_New(  FEVARIABLE_PASSARGS  ); /* feVariableList */
 }
 
-FeVariable* _FeVariable_New( FEVARIABLE_DEFARGS ) {
+FeVariable* _FeVariable_New(  FEVARIABLE_DEFARGS  ) {
 	FeVariable* self;
 	
 	/** Allocate memory */
-	assert( sizeOfSelf >= sizeof(FeVariable) );
+	assert( _sizeOfSelf >= sizeof(FeVariable) );
 	
-	self = (FeVariable*) _FieldVariable_New( FIELDVARIABLE_PASSARGS );
+	self = (FeVariable*) _FieldVariable_New(  FIELDVARIABLE_PASSARGS  );
 	
 	/** General info */
 	
@@ -2758,4 +2745,6 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
                errorStr,"\n\n Interpolation restart not supported for ASCII checkpoint files \n\n");
 #endif   
 }
+
+
 

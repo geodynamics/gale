@@ -69,34 +69,34 @@ BilinearInnerElType* BilinearInnerElType_New( Name name ) {
 }
 
 void* BilinearInnerElType_DefaultNew( Name name ) {
-	return _BilinearInnerElType_New(
-		sizeof(BilinearInnerElType), 
-		BilinearInnerElType_Type,
-		_BilinearInnerElType_Delete,
-		_BilinearInnerElType_Print,
-		NULL, 
-		BilinearInnerElType_DefaultNew,
-		_BilinearInnerElType_AssignFromXML,
-		_BilinearInnerElType_Build,
-		_BilinearInnerElType_Initialise,
-		_BilinearInnerElType_Execute,
-		_BilinearInnerElType_Destroy, 
-		name,
-		NON_GLOBAL, 
-		_BilinearInnerElType_SF_allNodes,
-		_BilinearInnerElType_SF_allLocalDerivs_allNodes,
-		_ElementType_ConvertGlobalCoordToElLocal,
-		_ElementType_JacobianDeterminantSurface,
-		_BilinearInnerElType_SurfaceNormal,
-		_BilinearInnerElType_NodeCount );
+	/* Variables set in this function */
+	SizeT                                                                            _sizeOfSelf = sizeof(BilinearInnerElType);
+	Type                                                                                    type = BilinearInnerElType_Type;
+	Stg_Class_DeleteFunction*                                                            _delete = _BilinearInnerElType_Delete;
+	Stg_Class_PrintFunction*                                                              _print = _BilinearInnerElType_Print;
+	Stg_Class_CopyFunction*                                                                _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*                                _defaultConstructor = BilinearInnerElType_DefaultNew;
+	Stg_Component_ConstructFunction*                                                  _construct = _BilinearInnerElType_AssignFromXML;
+	Stg_Component_BuildFunction*                                                          _build = _BilinearInnerElType_Build;
+	Stg_Component_InitialiseFunction*                                                _initialise = _BilinearInnerElType_Initialise;
+	Stg_Component_ExecuteFunction*                                                      _execute = _BilinearInnerElType_Execute;
+	Stg_Component_DestroyFunction*                                                      _destroy = _BilinearInnerElType_Destroy;
+	AllocationType                                                            nameAllocationType = NON_GLOBAL;
+	ElementType_EvaluateShapeFunctionsAtFunction*                      _evaluateShapeFunctionsAt = _BilinearInnerElType_SF_allNodes;
+	ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*  _evaluateShapeFunctionLocalDerivsAt = _BilinearInnerElType_SF_allLocalDerivs_allNodes;
+	ElementType_ConvertGlobalCoordToElLocalFunction*                _convertGlobalCoordToElLocal = _ElementType_ConvertGlobalCoordToElLocal;
+	ElementType_JacobianDeterminantSurfaceFunction*                  _jacobianDeterminantSurface = _ElementType_JacobianDeterminantSurface;
+	ElementType_SurfaceNormalFunction*                                            _surfaceNormal = _BilinearInnerElType_SurfaceNormal;
+
+	return _BilinearInnerElType_New(  BILINEARINNERELTYPE_PASSARGS  );
 }
 
-BilinearInnerElType* _BilinearInnerElType_New( BILINEARINNERELTYPE_DEFARGS  ) {
+BilinearInnerElType* _BilinearInnerElType_New(  BILINEARINNERELTYPE_DEFARGS  ) {
 	BilinearInnerElType*		self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(BilinearInnerElType) );
-	self = (BilinearInnerElType*)_ElementType_New( ELEMENTTYPE_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(BilinearInnerElType) );
+	self = (BilinearInnerElType*)_ElementType_New(  ELEMENTTYPE_PASSARGS  );
 	
 	/* General info */
 	
@@ -232,4 +232,6 @@ int _BilinearInnerElType_SurfaceNormal( void* elementType, unsigned element_I, u
 
 	return -1;
 }
+
+
 

@@ -86,47 +86,13 @@ AdvectionDiffusionSLE* AdvectionDiffusionSLE_New(
 }
 
 /* Creation implementation / Virtual constructor */
-AdvectionDiffusionSLE* _AdvectionDiffusionSLE_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		SystemLinearEquations_LM_SetupFunction*            _LM_Setup,
-		SystemLinearEquations_MatrixSetupFunction*         _matrixSetup,
-		SystemLinearEquations_VectorSetupFunction*         _vectorSetup,		
-		SystemLinearEquations_UpdateSolutionOntoNodesFunc* _updateOntoNodes,
-		SystemLinearEquations_MG_SelectStiffMatsFunc*      _mgSelectStiffMats, 
-		Name                                               name )
+AdvectionDiffusionSLE* _AdvectionDiffusionSLE_New(  ADVECTIONDIFFUSIONSLE_DEFARGS  )
 {
 	AdvectionDiffusionSLE* self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(AdvectionDiffusionSLE) );
-	self = (AdvectionDiffusionSLE*) _SystemLinearEquations_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_LM_Setup,
-		_matrixSetup,
-		_vectorSetup, 
-		_updateOntoNodes,
-		_mgSelectStiffMats, 
-		name );
+	assert( _sizeOfSelf >= sizeof(AdvectionDiffusionSLE) );
+	self = (AdvectionDiffusionSLE*) _SystemLinearEquations_New(  SYSTEMLINEAREQUATIONS_PASSARGS  );
 
 	return self;
 }
@@ -241,24 +207,28 @@ void* _AdvectionDiffusionSLE_Copy( void* _sle, void* dest, Bool deep, Name nameE
 }
 
 void* _AdvectionDiffusionSLE_DefaultNew( Name name ) {
-	return (void*) _AdvectionDiffusionSLE_New( 
-		sizeof(AdvectionDiffusionSLE), 
-		AdvectionDiffusionSLE_Type, 
-		_AdvectionDiffusionSLE_Delete, 
-		_AdvectionDiffusionSLE_Print, 
-		_AdvectionDiffusionSLE_Copy,
-		_AdvectionDiffusionSLE_DefaultNew,
-		_AdvectionDiffusionSLE_AssignFromXML,
-		_AdvectionDiffusionSLE_Build,
-		_AdvectionDiffusionSLE_Initialise,
-		_AdvectionDiffusionSLE_Execute,
-		_AdvectionDiffusionSLE_Destroy,
-		_SystemLinearEquations_LM_Setup,
-		_SystemLinearEquations_MatrixSetup,
-		_SystemLinearEquations_VectorSetup,
-		_SystemLinearEquations_UpdateSolutionOntoNodes, 
-		_SystemLinearEquations_MG_SelectStiffMats, 
-		name );
+	/* Variables set in this function */
+	SizeT                                                       _sizeOfSelf = sizeof(AdvectionDiffusionSLE);
+	Type                                                               type = AdvectionDiffusionSLE_Type;
+	Stg_Class_DeleteFunction*                                       _delete = _AdvectionDiffusionSLE_Delete;
+	Stg_Class_PrintFunction*                                         _print = _AdvectionDiffusionSLE_Print;
+	Stg_Class_CopyFunction*                                           _copy = _AdvectionDiffusionSLE_Copy;
+	Stg_Component_DefaultConstructorFunction*           _defaultConstructor = _AdvectionDiffusionSLE_DefaultNew;
+	Stg_Component_ConstructFunction*                             _construct = _AdvectionDiffusionSLE_AssignFromXML;
+	Stg_Component_BuildFunction*                                     _build = _AdvectionDiffusionSLE_Build;
+	Stg_Component_InitialiseFunction*                           _initialise = _AdvectionDiffusionSLE_Initialise;
+	Stg_Component_ExecuteFunction*                                 _execute = _AdvectionDiffusionSLE_Execute;
+	Stg_Component_DestroyFunction*                                 _destroy = _AdvectionDiffusionSLE_Destroy;
+	SystemLinearEquations_LM_SetupFunction*                       _LM_Setup = _SystemLinearEquations_LM_Setup;
+	SystemLinearEquations_MatrixSetupFunction*                 _matrixSetup = _SystemLinearEquations_MatrixSetup;
+	SystemLinearEquations_VectorSetupFunction*                 _vectorSetup = _SystemLinearEquations_VectorSetup;
+	SystemLinearEquations_MG_SelectStiffMatsFunc*        _mgSelectStiffMats = _SystemLinearEquations_MG_SelectStiffMats;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType                                            nameAllocationType = ZERO;
+	SystemLinearEquations_UpdateSolutionOntoNodesFunc*  _updateSolutionOntoNodes = ZERO;
+
+	return (void*) _AdvectionDiffusionSLE_New(  ADVECTIONDIFFUSIONSLE_PASSARGS  );
 }
 
 void _AdvectionDiffusionSLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data ) {
@@ -492,4 +462,6 @@ void AdvectionDiffusionSLE_ResetStoredValues( void* sle ) {
 	
 	self->maxDiffusivity = SMALL_VALUE;
 }
+
+
 

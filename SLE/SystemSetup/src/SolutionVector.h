@@ -70,15 +70,7 @@
 
 	struct SolutionVector { __SolutionVector };
 
-	#define SOLUTIONVECTOR_DEFARGS	\
-		STG_COMPONENT_DEFARGS,	\
-			MPI_Comm		comm, \
-			FeVariable*	feVariable
 
-	#define SOLUTIONVECTOR_PASSARGS  \
-      STG_COMPONENT_PASSARGS,    \
-			comm, \
-			feVariable
 	
 	/* Creation implementation / Virtual constructor */
 	void* _SolutionVector_DefaultNew( Name name );
@@ -89,7 +81,18 @@
 		MPI_Comm						comm,
 		FeVariable*					feVariable );
 
-	SolutionVector* _SolutionVector_New( SOLUTIONVECTOR_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SOLUTIONVECTOR_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define SOLUTIONVECTOR_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	SolutionVector* _SolutionVector_New(  SOLUTIONVECTOR_DEFARGS  );
 		
 	void SolutionVector_LoadFromDict( void* solutionVector, Dictionary* subDict, Dictionary* dictionary, Stg_ObjectList* objList );
 
@@ -134,3 +137,4 @@
 	void SolutionVector_LoadCurrentFeVariableValuesOntoVector( void* solutionVector );
 	
 #endif /* __StgFEM_SLE_SystemSetup_SolutionVector_h__ */
+

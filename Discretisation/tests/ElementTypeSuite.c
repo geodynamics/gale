@@ -553,3 +553,5 @@ void ElementTypeSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, ElementTypeSuite_TestSurfaceJacobian_Quadratic2D );
    pcu_suite_addTest( suite, ElementTypeSuite_TestSurfaceJacobian_Quadratic3D );
 }
+
+

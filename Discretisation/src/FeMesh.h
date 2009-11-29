@@ -65,17 +65,21 @@
 	** Constructors
 	*/
 
-	#define FEMESH_DEFARGS	\
-		MESH_DEFARGS, \
-		ElementType* elType, \
-		const char* family, \
-		Bool elementMesh
 
-	#define FEMESH_PASSARGS	\
-		MESH_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FEMESH_DEFARGS \
+                MESH_DEFARGS
+
+	#define FEMESH_PASSARGS \
+                MESH_PASSARGS
 
 	FeMesh* FeMesh_New( Name name, AbstractContext* context );
-	FeMesh* _FeMesh_New( FEMESH_DEFARGS );
+	FeMesh* _FeMesh_New(  FEMESH_DEFARGS  );
 	void _FeMesh_Init( FeMesh* self, ElementType* elType, const char* family, Bool elementMesh );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -135,3 +139,4 @@
 	void FeMesh_Destruct( FeMesh* self );
 
 #endif /* __StgFEM_Discretisaton_Mesh_FeMesh_h__ */
+

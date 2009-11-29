@@ -86,32 +86,29 @@ ForceVector* ForceVector_New(
 }
 
 void* _ForceVector_DefaultNew( Name name ) {
-	return _ForceVector_New( 
-		sizeof(ForceVector), 
-		ForceVector_Type, 
-		_ForceVector_Delete,
-		_ForceVector_Print,
-		_ForceVector_Copy,
-		_ForceVector_DefaultNew, 
-		_ForceVector_AssignFromXML,
-		_ForceVector_Build, 
-		_ForceVector_Initialise,
-		_ForceVector_Execute, 
-		_ForceVector_Destroy,
-		name,
-		NON_GLOBAL,
-		MPI_COMM_WORLD,
-		NULL,
-		0,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(ForceVector);
+	Type                                                      type = ForceVector_Type;
+	Stg_Class_DeleteFunction*                              _delete = _ForceVector_Delete;
+	Stg_Class_PrintFunction*                                _print = _ForceVector_Print;
+	Stg_Class_CopyFunction*                                  _copy = _ForceVector_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _ForceVector_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _ForceVector_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _ForceVector_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _ForceVector_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _ForceVector_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _ForceVector_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
+	return _ForceVector_New(  FORCEVECTOR_PASSARGS  );
 }
 
-ForceVector* _ForceVector_New( FORCEVECTOR_DEFARGS ) {
+ForceVector* _ForceVector_New(  FORCEVECTOR_DEFARGS  ) {
 	ForceVector* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(ForceVector) );
-	self = (ForceVector*)_SolutionVector_New( SOLUTIONVECTOR_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(ForceVector) );
+	self = (ForceVector*)_SolutionVector_New(  SOLUTIONVECTOR_PASSARGS  );
 	
 	return self;
 }
@@ -557,3 +554,5 @@ void ForceVector_AddModifyCallback( ForceVector* self, void* callback, void* obj
    self->modifyCBs[self->nModifyCBs - 1].callback = callback;
    self->modifyCBs[self->nModifyCBs - 1].object = object;
 }
+
+

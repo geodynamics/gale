@@ -58,3 +58,5 @@ void StgFEM_Document_Register( AbstractContext* context ) {
 	
 	exit( EXIT_SUCCESS );
 }
+
+

@@ -71,39 +71,13 @@ DivergenceMatrixTerm* DivergenceMatrixTerm_New(
 }
 
 /* Creation implementation / Virtual constructor */
-DivergenceMatrixTerm* _DivergenceMatrixTerm_New( 
-   SizeT														sizeOfSelf,  
-   Type														type,
-   Stg_Class_DeleteFunction*							_delete,
-   Stg_Class_PrintFunction*							_print,
-   Stg_Class_CopyFunction*								_copy, 
-   Stg_Component_DefaultConstructorFunction*		_defaultConstructor,
-   Stg_Component_ConstructFunction*					_construct,
-   Stg_Component_BuildFunction*						_build,
-   Stg_Component_InitialiseFunction*				_initialise,
-   Stg_Component_ExecuteFunction*					_execute,
-   Stg_Component_DestroyFunction*					_destroy,
-   StiffnessMatrixTerm_AssembleElementFunction*	_assembleElement,		
-   Name														name )
+DivergenceMatrixTerm* _DivergenceMatrixTerm_New(  DIVERGENCEMATRIXTERM_DEFARGS  )
 {
    DivergenceMatrixTerm* self;
 	
    /* Allocate memory */
-   assert( sizeOfSelf >= sizeof(DivergenceMatrixTerm) );
-   self = (DivergenceMatrixTerm*) _StiffnessMatrixTerm_New( 
-      sizeOfSelf, 
-      type, 
-      _delete, 
-      _print, 
-      _copy,
-      _defaultConstructor,
-      _construct,
-      _build, 
-      _initialise,
-      _execute,
-      _destroy,
-      _assembleElement,
-      name );
+   assert( _sizeOfSelf >= sizeof(DivergenceMatrixTerm) );
+   self = (DivergenceMatrixTerm*) _StiffnessMatrixTerm_New(  STIFFNESSMATRIXTERM_PASSARGS  );
 	
    /* Virtual info */
 	
@@ -134,20 +108,24 @@ void _DivergenceMatrixTerm_Print( void* matrixTerm, Stream* stream ) {
 }
 
 void* _DivergenceMatrixTerm_DefaultNew( Name name ) {
-   return (void*)_DivergenceMatrixTerm_New( 
-      sizeof(DivergenceMatrixTerm), 
-      DivergenceMatrixTerm_Type,
-      _DivergenceMatrixTerm_Delete,
-      _DivergenceMatrixTerm_Print,
-      NULL,
-      _DivergenceMatrixTerm_DefaultNew,
-      _DivergenceMatrixTerm_AssignFromXML,
-      _DivergenceMatrixTerm_Build,
-      _DivergenceMatrixTerm_Initialise,
-      _DivergenceMatrixTerm_Execute,
-      _DivergenceMatrixTerm_Destroy,
-      _DivergenceMatrixTerm_AssembleElement,
-      name );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(DivergenceMatrixTerm);
+	Type                                                         type = DivergenceMatrixTerm_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _DivergenceMatrixTerm_Delete;
+	Stg_Class_PrintFunction*                                   _print = _DivergenceMatrixTerm_Print;
+	Stg_Class_CopyFunction*                                     _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _DivergenceMatrixTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _DivergenceMatrixTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _DivergenceMatrixTerm_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _DivergenceMatrixTerm_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _DivergenceMatrixTerm_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _DivergenceMatrixTerm_Destroy;
+	StiffnessMatrixTerm_AssembleElementFunction*     _assembleElement = _DivergenceMatrixTerm_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+   return (void*)_DivergenceMatrixTerm_New(  DIVERGENCEMATRIXTERM_PASSARGS  );
 }
 
 void _DivergenceMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
@@ -272,3 +250,5 @@ void _DivergenceMatrixTerm_AssembleElement(
       }
    }
 }
+
+

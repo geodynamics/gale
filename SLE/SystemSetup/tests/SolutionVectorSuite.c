@@ -183,3 +183,5 @@ void SolutionVectorSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, SolutionVectorSuite_Setup, SolutionVectorSuite_Teardown );
    pcu_suite_addTest( suite, SolutionVectorSuite_TestSolutionVector );
 }
+
+

@@ -71,39 +71,13 @@ PressureGradMatrixTerm* PressureGradMatrixTerm_New(
 }
 
 /* Creation implementation / Virtual constructor */
-PressureGradMatrixTerm* _PressureGradMatrixTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement, 
-		Name                                                name )
+PressureGradMatrixTerm* _PressureGradMatrixTerm_New(  PRESSUREGRADMATRIXTERM_DEFARGS  )
 {
 	PressureGradMatrixTerm* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(PressureGradMatrixTerm) );
-	self = (PressureGradMatrixTerm*) _StiffnessMatrixTerm_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_assembleElement,
-		name );
+	assert( _sizeOfSelf >= sizeof(PressureGradMatrixTerm) );
+	self = (PressureGradMatrixTerm*) _StiffnessMatrixTerm_New(  STIFFNESSMATRIXTERM_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -143,20 +117,24 @@ void _PressureGradMatrixTerm_Print( void* matrixTerm, Stream* stream ) {
 }
 
 void* _PressureGradMatrixTerm_DefaultNew( Name name ) {
-	return (void*)_PressureGradMatrixTerm_New( 
-		sizeof(PressureGradMatrixTerm), 
-		PressureGradMatrixTerm_Type,
-		_PressureGradMatrixTerm_Delete,
-		_PressureGradMatrixTerm_Print,
-		NULL,
-		_PressureGradMatrixTerm_DefaultNew,
-		_PressureGradMatrixTerm_AssignFromXML,
-		_PressureGradMatrixTerm_Build,
-		_PressureGradMatrixTerm_Initialise,
-		_PressureGradMatrixTerm_Execute,
-		_PressureGradMatrixTerm_Destroy,
-		_PressureGradMatrixTerm_AssembleElement,
-		name );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(PressureGradMatrixTerm);
+	Type                                                         type = PressureGradMatrixTerm_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _PressureGradMatrixTerm_Delete;
+	Stg_Class_PrintFunction*                                   _print = _PressureGradMatrixTerm_Print;
+	Stg_Class_CopyFunction*                                     _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _PressureGradMatrixTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _PressureGradMatrixTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _PressureGradMatrixTerm_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _PressureGradMatrixTerm_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _PressureGradMatrixTerm_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _PressureGradMatrixTerm_Destroy;
+	StiffnessMatrixTerm_AssembleElementFunction*     _assembleElement = _PressureGradMatrixTerm_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*)_PressureGradMatrixTerm_New(  PRESSUREGRADMATRIXTERM_PASSARGS  );
 }
 
 void _PressureGradMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
@@ -227,3 +205,5 @@ Bool PressureGradMatrixTerm_ColCB( PressureGradMatrixTerm* self, Assembler* assm
 		self->factor;
 	return True;
 }
+
+

@@ -82,30 +82,29 @@ SolutionVector* SolutionVector_New( Name name, FiniteElementContext* context, MP
 }
 
 void* _SolutionVector_DefaultNew( Name name ) {
-	return _SolutionVector_New( 
-		sizeof(SolutionVector), 
-		SolutionVector_Type, 
-		_SolutionVector_Delete,
-		_SolutionVector_Print, 
-		_SolutionVector_Copy,
-		_SolutionVector_DefaultNew,
-		_SolutionVector_AssignFromXML,
-		_SolutionVector_Build, 
-		_SolutionVector_Initialise, 
-		_SolutionVector_Execute, 
-		_SolutionVector_Destroy,
-		name,
-		NON_GLOBAL,
-		MPI_COMM_WORLD, 
-		NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(SolutionVector);
+	Type                                                      type = SolutionVector_Type;
+	Stg_Class_DeleteFunction*                              _delete = _SolutionVector_Delete;
+	Stg_Class_PrintFunction*                                _print = _SolutionVector_Print;
+	Stg_Class_CopyFunction*                                  _copy = _SolutionVector_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _SolutionVector_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _SolutionVector_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _SolutionVector_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _SolutionVector_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _SolutionVector_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _SolutionVector_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
+	return _SolutionVector_New(  SOLUTIONVECTOR_PASSARGS  );
 }
 
-SolutionVector* _SolutionVector_New( SOLUTIONVECTOR_DEFARGS ) {
+SolutionVector* _SolutionVector_New(  SOLUTIONVECTOR_DEFARGS  ) {
 	SolutionVector* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(SolutionVector) );
-	self = (SolutionVector*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(SolutionVector) );
+	self = (SolutionVector*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* General info */
 	
@@ -766,3 +765,5 @@ void SolutionVector_LoadCurrentFeVariableValuesOntoVector( void* solutionVector 
 	VecAssemblyBegin( self->vector );
 	VecAssemblyEnd( self->vector ); 
 }
+
+

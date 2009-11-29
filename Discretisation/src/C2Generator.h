@@ -61,14 +61,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define C2GENERATOR_DEFARGS \
-		CARTESIANGENERATOR_DEFARGS
+                CARTESIANGENERATOR_DEFARGS
 
 	#define C2GENERATOR_PASSARGS \
-		CARTESIANGENERATOR_PASSARGS
+                CARTESIANGENERATOR_PASSARGS
 
 	C2Generator* C2Generator_New( Name name, AbstractContext* context );
-	C2Generator* _C2Generator_New( C2GENERATOR_DEFARGS );
+	C2Generator* _C2Generator_New(  C2GENERATOR_DEFARGS  );
 	void _C2Generator_Init( C2Generator* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -99,3 +106,4 @@
 	*/
 
 #endif /* __StgFEM_Discretisaton_C2Generator_h__ */
+

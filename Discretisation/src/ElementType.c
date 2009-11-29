@@ -55,12 +55,12 @@
 
 const Type ElementType_Type = "ElementType";
 
-ElementType* _ElementType_New( ELEMENTTYPE_DEFARGS ) {
+ElementType* _ElementType_New(  ELEMENTTYPE_DEFARGS  ) {
 	ElementType* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(ElementType) );
-	self = (ElementType*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(ElementType) );
+	self = (ElementType*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* General info */
 	
@@ -623,5 +623,7 @@ void ElementType_GetFaceNodes( void* elementType, Mesh* mesh, unsigned element_I
 	for( node_i = 0; node_i < nNodes; node_i++ )
 		nodes[node_i] = inc[self->faceNodes[face_I][node_i]];
 }
+
+
 
 

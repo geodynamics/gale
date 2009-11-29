@@ -65,34 +65,34 @@ ConstantElementType* ConstantElementType_New( Name name ) {
 }
 
 void* ConstantElementType_DefaultNew( Name name ) {
-	return _ConstantElementType_New( 
-		sizeof(ConstantElementType),
-		ConstantElementType_Type,
-		_ConstantElementType_Delete,
-		_ConstantElementType_Print,
-		NULL, 
-		ConstantElementType_DefaultNew,
-		_ConstantElementType_AssignFromXML,
-		_ConstantElementType_Build,
-		_ConstantElementType_Initialise,
-		_ConstantElementType_Execute,
-		_ConstantElementType_Destroy, 
-		name,
-		NON_GLOBAL,
-		_ConstantElementType_SF_allNodes,
-		_ConstantElementType_SF_allLocalDerivs_allNodes,
-		_ConstantElementType_ConvertGlobalCoordToElLocal,
-		_ElementType_JacobianDeterminantSurface,
-		_ConstantElementType_SurfaceNormal,
-		_ConstantElementType_NodeCount );
+	/* Variables set in this function */
+	SizeT                                                                            _sizeOfSelf = sizeof(ConstantElementType);
+	Type                                                                                    type = ConstantElementType_Type;
+	Stg_Class_DeleteFunction*                                                            _delete = _ConstantElementType_Delete;
+	Stg_Class_PrintFunction*                                                              _print = _ConstantElementType_Print;
+	Stg_Class_CopyFunction*                                                                _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*                                _defaultConstructor = ConstantElementType_DefaultNew;
+	Stg_Component_ConstructFunction*                                                  _construct = _ConstantElementType_AssignFromXML;
+	Stg_Component_BuildFunction*                                                          _build = _ConstantElementType_Build;
+	Stg_Component_InitialiseFunction*                                                _initialise = _ConstantElementType_Initialise;
+	Stg_Component_ExecuteFunction*                                                      _execute = _ConstantElementType_Execute;
+	Stg_Component_DestroyFunction*                                                      _destroy = _ConstantElementType_Destroy;
+	AllocationType                                                            nameAllocationType = NON_GLOBAL;
+	ElementType_EvaluateShapeFunctionsAtFunction*                      _evaluateShapeFunctionsAt = _ConstantElementType_SF_allNodes;
+	ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*  _evaluateShapeFunctionLocalDerivsAt = _ConstantElementType_SF_allLocalDerivs_allNodes;
+	ElementType_ConvertGlobalCoordToElLocalFunction*                _convertGlobalCoordToElLocal = _ConstantElementType_ConvertGlobalCoordToElLocal;
+	ElementType_JacobianDeterminantSurfaceFunction*                  _jacobianDeterminantSurface = _ElementType_JacobianDeterminantSurface;
+	ElementType_SurfaceNormalFunction*                                            _surfaceNormal = _ConstantElementType_SurfaceNormal;
+
+	return _ConstantElementType_New(  CONSTANTELEMENTTYPE_PASSARGS  );
 }
 
-ConstantElementType* _ConstantElementType_New( CONSTANTELEMENTTYPE_DEFARGS ) {
+ConstantElementType* _ConstantElementType_New(  CONSTANTELEMENTTYPE_DEFARGS  ) {
 	ConstantElementType*		self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(ConstantElementType) );
-	self = (ConstantElementType*)_ElementType_New( ELEMENTTYPE_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(ConstantElementType) );
+	self = (ConstantElementType*)_ElementType_New(  ELEMENTTYPE_PASSARGS  );
 	
 	/* General info */
 	
@@ -207,4 +207,6 @@ int _ConstantElementType_SurfaceNormal( void* elementType, unsigned element_I, u
 
 	return -1;
 }
+
+
 

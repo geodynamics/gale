@@ -69,8 +69,6 @@
 		
 	struct TrilinearInnerElType { __TrilinearInnerElType };
 
-	#define TRILINEARINNERELTYPE_DEFARGS \
-    	ELEMENTTYPE_DEFARGS
 
 	#define TRILINEARINEERELTYPE_PASSARGS \
     	ELEMENTTYPE_PASSARGS
@@ -82,7 +80,18 @@
 	TrilinearInnerElType* TrilinearInnerElType_New( Name name );
 	
 	/* Creation implementation / Virtual constructor */
-	TrilinearInnerElType* _TrilinearInnerElType_New( TRILINEARINNERELTYPE_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define TRILINEARINNERELTYPE_DEFARGS \
+                ELEMENTTYPE_DEFARGS
+
+	#define TRILINEARINNERELTYPE_PASSARGS \
+                ELEMENTTYPE_PASSARGS
+
+	TrilinearInnerElType* _TrilinearInnerElType_New(  TRILINEARINNERELTYPE_DEFARGS  );
 	
 	/* Initialise implementation */
 	void _TrilinearInnerElType_Init( TrilinearInnerElType* self );
@@ -124,3 +133,4 @@
 	int _TrilinearInnerElType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal );
 
 #endif /* __StgFEM_Discretisation_TrilinearInnerElType_h__ */
+

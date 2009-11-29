@@ -74,17 +74,7 @@
 
 	struct LinkedDofInfo { __LinkedDofInfo };
 
-	#define LINKEDDOFINFO_DEFARGS \
-		STG_COMPONENT_DEFARGS, \
-			void*			mesh, \
-			DofLayout*	dofLayout, \
-			Dictionary*	dictionary
 
-	#define LINKEDDOFINFO_PASSARGS \
-		STG_COMPONENT_PASSARGS, \
-			mesh, \
-			dofLayout, \
-			dictionary
 
 	/* +++ Constructors / Destructors +++ */
 	
@@ -99,7 +89,18 @@
 		Dictionary*		dictionary );
 	
 	/** Creation implementation */
-	LinkedDofInfo* _LinkedDofInfo_New( LINKEDDOFINFO_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LINKEDDOFINFO_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define LINKEDDOFINFO_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	LinkedDofInfo* _LinkedDofInfo_New(  LINKEDDOFINFO_DEFARGS  );
 	
 	/** Initialisation implementation functions */
 	void _LinkedDofInfo_Init( void* linkedDofInfo, DomainContext* context, void* mesh, DofLayout* dofLayout, Dictionary* dictionary );
@@ -137,3 +138,4 @@
 	void LinkedDofInfo_AddDofsToSet_FromIndexSet( void* linkedDofInfo, Index linkedDofSet_I, IndexSet* nodeSet, Dof_Index nodeLocalDof_I );
 		
 #endif
+

@@ -134,30 +134,40 @@
 		MPI_Comm                                         comm );
 
 
-	StiffnessMatrix* _StiffnessMatrix_New(
-		SizeT                                            _sizeOfSelf,
-		Type                                             type,
-		Stg_Class_DeleteFunction*                        _delete,
-		Stg_Class_PrintFunction*                         _print,
-		Stg_Class_CopyFunction*                          _copy, 
-		Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-		Stg_Component_ConstructFunction*                 _construct,
-		Stg_Component_BuildFunction*                     _build,
-		Stg_Component_InitialiseFunction*                _initialise,
-		Stg_Component_ExecuteFunction*                   _execute,
-		Stg_Component_DestroyFunction*                   _destroy,
-		Name                                             name,
-		Bool                                             initFlag,
-		StiffnessMatrix_CalculateNonZeroEntriesFunction* _calculateNonZeroEntries,
-		void*                                            rowVariable,
-		void*                                            columnVariable,
-		void*                                            rhs,
-		Stg_Component*                                   applicationDepInfo,
-		Dimension_Index                                  dim,
-		Bool                                             isNonLinear,
-		Bool                                             allowZeroElementContributions,
-		void*                                            entryPoint_Register,
-		MPI_Comm                                         comm );		
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STIFFNESSMATRIX_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                Bool                                                                   initFlag, \
+                StiffnessMatrix_CalculateNonZeroEntriesFunction*       _calculateNonZeroEntries, \
+                void*                                                               rowVariable, \
+                void*                                                            columnVariable, \
+                void*                                                                       rhs, \
+                Stg_Component*                                               applicationDepInfo, \
+                Dimension_Index                                                             dim, \
+                Bool                                                                isNonLinear, \
+                Bool                                              allowZeroElementContributions, \
+                void*                                                       entryPoint_Register, \
+                MPI_Comm                                                                   comm
+
+	#define STIFFNESSMATRIX_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        initFlag,                      \
+	        _calculateNonZeroEntries,      \
+	        rowVariable,                   \
+	        columnVariable,                \
+	        rhs,                           \
+	        applicationDepInfo,            \
+	        dim,                           \
+	        isNonLinear,                   \
+	        allowZeroElementContributions, \
+	        entryPoint_Register,           \
+	        comm                         
+
+	StiffnessMatrix* _StiffnessMatrix_New(  STIFFNESSMATRIX_DEFARGS  );		
 		
 	void _StiffnessMatrix_Init(
 		StiffnessMatrix*                                 self,
@@ -299,3 +309,4 @@
 void StiffnessMatrix_AddModifyCallback( StiffnessMatrix* self, void* callback, void* object );
 	
 #endif /* __StgFEM_SLE_SystemSetup_StiffnessMatrix_h__ */
+

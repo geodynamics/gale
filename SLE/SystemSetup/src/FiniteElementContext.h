@@ -75,11 +75,7 @@
 		
 	struct FiniteElementContext { __FiniteElementContext };
 
-	#define FINITEELEMENTCONTEXT_DEFARGS \
-		DOMAINCONTEXT_DEFARGS
 
-	#define FINITEELEMENTCONTEXT_PASSARGS \
-		DOMAINCONTEXT_PASSARGS
 	
 	/* Constructors ----------------------------------------------------------------------------------------------------------*/
 	
@@ -94,7 +90,18 @@
 		Dictionary*	dictionary );
 	
 	/** Creation implementation / Virtual constructor */
-	FiniteElementContext* _FiniteElementContext_New( FINITEELEMENTCONTEXT_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FINITEELEMENTCONTEXT_DEFARGS \
+                DOMAINCONTEXT_DEFARGS
+
+	#define FINITEELEMENTCONTEXT_PASSARGS \
+                DOMAINCONTEXT_PASSARGS
+
+	FiniteElementContext* _FiniteElementContext_New(  FINITEELEMENTCONTEXT_DEFARGS  );
 	
 	/** Initialisation implementation */
 	void  _FiniteElementContext_Init( FiniteElementContext* self );
@@ -183,3 +190,4 @@
    #endif
 
 #endif /* __StgFEM_SLE_SystemSetup_Context_h__ */
+

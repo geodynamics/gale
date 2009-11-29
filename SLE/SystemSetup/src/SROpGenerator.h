@@ -68,14 +68,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define SROPGENERATOR_DEFARGS \
-		MGOPGENERATOR_DEFARGS
+                MGOPGENERATOR_DEFARGS
 
 	#define SROPGENERATOR_PASSARGS \
-		MGOPGENERATOR_PASSARGS
+                MGOPGENERATOR_PASSARGS
 
 	SROpGenerator* SROpGenerator_New( Name name );
-	SROpGenerator* _SROpGenerator_New( SROPGENERATOR_DEFARGS );
+	SROpGenerator* _SROpGenerator_New(  SROPGENERATOR_DEFARGS  );
 	void _SROpGenerator_Init( SROpGenerator* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -124,3 +131,4 @@
 	Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level );
 
 #endif /* __Experimental_Solvers_SROpGenerator_h__ */
+

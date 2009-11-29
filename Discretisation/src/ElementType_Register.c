@@ -67,28 +67,29 @@ ElementType_Register* ElementType_Register_New( Name name ) {
 }
 
 void* ElementType_Register_DefaultNew( Name name ) {
-	return (void*) _ElementType_Register_New( 
-		sizeof(ElementType_Register), 
-		ElementType_Register_Type,
-		_ElementType_Register_Delete, 
-		_ElementType_Register_Print, 
-		NULL,
-		ElementType_Register_DefaultNew,
-		_ElementType_Register_AssignFromXML,
-		_ElementType_Register_Build,
-		_ElementType_Register_Initialise,
-		_ElementType_Register_Execute,
-		_ElementType_Register_Destroy,
-		name,
-		NON_GLOBAL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(ElementType_Register);
+	Type                                                      type = ElementType_Register_Type;
+	Stg_Class_DeleteFunction*                              _delete = _ElementType_Register_Delete;
+	Stg_Class_PrintFunction*                                _print = _ElementType_Register_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = ElementType_Register_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _ElementType_Register_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _ElementType_Register_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _ElementType_Register_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _ElementType_Register_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _ElementType_Register_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
+	return (void*) _ElementType_Register_New(  ELEMENTTYPE_REGISTER_PASSARGS  );
 }
 
-ElementType_Register* _ElementType_Register_New( ELEMENTTYPEREGISTER_DEFARGS ) {
+ElementType_Register* _ElementType_Register_New(  ELEMENTTYPE_REGISTER_DEFARGS  ) {
 	ElementType_Register* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(ElementType_Register) );
-	self = (ElementType_Register*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(ElementType_Register) );
+	self = (ElementType_Register*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* General info */
 	
@@ -228,3 +229,5 @@ ElementType* _ElementType_Register_At( void* elementType_Register, ElementType_I
 	
 	return ElementType_Register_At( self, handle );
 }
+
+

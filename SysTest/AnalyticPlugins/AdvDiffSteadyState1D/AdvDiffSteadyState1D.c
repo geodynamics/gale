@@ -149,19 +149,23 @@ void _AdvDiffSteadyState1D_AssignFromXML( void* analyticSolution, Stg_ComponentF
 }
 
 void* _AdvDiffSteadyState1D_DefaultNew( Name name ) {
-	return (void*) _FieldTest_New( 
-			sizeof(AdvDiffSteadyState1D),
-			AdvDiffSteadyState1D_Type,
-			_FieldTest_Delete,
-			_FieldTest_Print,
-			_FieldTest_Copy,
-			_AdvDiffSteadyState1D_DefaultNew,
-			_AdvDiffSteadyState1D_AssignFromXML,
-			_AdvDiffSteadyState1D_Build,
-			_FieldTest_Initialise,
-			_FieldTest_Execute,
-			_FieldTest_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(AdvDiffSteadyState1D);
+	Type                                                      type = AdvDiffSteadyState1D_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FieldTest_Delete;
+	Stg_Class_PrintFunction*                                _print = _FieldTest_Print;
+	Stg_Class_CopyFunction*                                  _copy = _FieldTest_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _AdvDiffSteadyState1D_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _AdvDiffSteadyState1D_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _AdvDiffSteadyState1D_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FieldTest_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FieldTest_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FieldTest_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _FieldTest_New(  FIELDTEST_PASSARGS  );
 }
 
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
@@ -169,4 +173,6 @@ Index StgFEM_AdvDiffSteadyState1D_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
 	return PluginsManager_Submit( pluginsManager, AdvDiffSteadyState1D_Type, "0", _AdvDiffSteadyState1D_DefaultNew );
 }
+
+
 

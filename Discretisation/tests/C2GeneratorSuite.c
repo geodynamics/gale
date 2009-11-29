@@ -672,3 +672,5 @@ void C2GeneratorSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, C2GeneratorSuite_TestEdgeVertexInc );
    pcu_suite_addTest( suite, C2GeneratorSuite_TestFaceVertexInc );
 }
+
+

@@ -75,19 +75,24 @@
 
 	struct ElementType_Register { __ElementType_Register };
 
-	#define ELEMENTTYPEREGISTER_DEFARGS \
-		STG_COMPONENT_DEFARGS \
-
-	#define ELEMENTTYPEREGISTER_PASSARGS \
-  		STG_COMPONENT_PASSARGS \
-	
 	/* Create a new ElementType_Register */
 	void* ElementType_Register_DefaultNew( Name name );
 	
 	ElementType_Register* ElementType_Register_New( Name name );
 	
 	/* Creation implementation / Virtual constructor */
-	ElementType_Register* _ElementType_Register_New( ELEMENTTYPEREGISTER_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ELEMENTTYPE_REGISTER_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define ELEMENTTYPE_REGISTER_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	ElementType_Register* _ElementType_Register_New(  ELEMENTTYPE_REGISTER_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _ElementType_Register_Init( void* elementType_Register );
@@ -120,3 +125,4 @@
 	ElementType* _ElementType_Register_At( void* elementType_Register, ElementType_Index handle );
 	
 #endif /* __StgFEM_Discretisation_ElementType_Register_h__ */
+

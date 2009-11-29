@@ -124,19 +124,18 @@
 	void* _FieldTest_DefaultNew( Name name );
 	
 	/* Creation implementation / Virtual constructor */
-	FieldTest* _FieldTest_New(
-		SizeT                                       _sizeOfSelf,
-		Type                                        type,
-		Stg_Class_DeleteFunction*                   _delete,
-		Stg_Class_PrintFunction*                    _print,
-		Stg_Class_CopyFunction*                     _copy, 
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*            _construct,
-		Stg_Component_BuildFunction*                _build,
-		Stg_Component_InitialiseFunction*           _initialise,
-		Stg_Component_ExecuteFunction*              _execute,
-		Stg_Component_DestroyFunction*              _destroy,
-		Name                                        name );			
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FIELDTEST_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define FIELDTEST_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	FieldTest* _FieldTest_New(  FIELDTEST_DEFARGS  );			
 
 	/* Stg_Class_Delete a FieldTest construst */
 	void _FieldTest_Delete( void* fieldTest );
@@ -193,3 +192,4 @@
 	void FieldTest_AddAnalyticSolutionFuncToListAtIndex( void* fieldTest, Index func_I, FieldTest_AnalyticSolutionFunc* func, Index field_I );
 	void FieldTest_AddExpectedFuncAndFieldToListAtIndex( void* fieldTest, FieldTest_ExpectedResultFunc* func, FeVariable* feVariable, Index i );
 #endif /* __StgFEM_Discretisation_FieldTest_h__ */
+

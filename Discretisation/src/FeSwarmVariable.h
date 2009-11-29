@@ -61,16 +61,23 @@
 
 	struct FeSwarmVariable { __FeSwarmVariable };
 
-	#define FESWARMVARIABLE_DEFARGS \
-		SWARMVARIABLE_DEFARGS
 
-	#define FESWARMVARIABLE_PASSARGS \
-		SWARMVARIABLE_PASSARGS
 
 	/* Public Constructor */
 
 	/** Private Constructor */
-	FeSwarmVariable* _FeSwarmVariable_New( FESWARMVARIABLE_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FESWARMVARIABLE_DEFARGS \
+                SWARMVARIABLE_DEFARGS
+
+	#define FESWARMVARIABLE_PASSARGS \
+                SWARMVARIABLE_PASSARGS
+
+	FeSwarmVariable* _FeSwarmVariable_New(  FESWARMVARIABLE_DEFARGS  );
 
 	/* 'Stg_Class' Virtual Implementations */
 	void _FeSwarmVariable_Init( void* swarmVariable, FeVariable* feVariable );
@@ -105,3 +112,4 @@
 
 
 #endif /* __Discretisation_FeSwarmVariable_h__ */
+

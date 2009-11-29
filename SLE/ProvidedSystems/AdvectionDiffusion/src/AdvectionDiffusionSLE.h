@@ -86,24 +86,18 @@
 		Variable_Register*		variable_Register,
 		FieldVariable_Register*	fieldVariable_Register ) ;
 	
-	AdvectionDiffusionSLE* _AdvectionDiffusionSLE_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		SystemLinearEquations_LM_SetupFunction*            _LM_Setup,
-		SystemLinearEquations_MatrixSetupFunction*         _matrixSetup,
-		SystemLinearEquations_VectorSetupFunction*         _vectorSetup,		
-		SystemLinearEquations_UpdateSolutionOntoNodesFunc* _updateOntoNodes, 
-		SystemLinearEquations_MG_SelectStiffMatsFunc*      _mgSelectStiffMats, 
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ADVECTIONDIFFUSIONSLE_DEFARGS \
+                SYSTEMLINEAREQUATIONS_DEFARGS
+
+	#define ADVECTIONDIFFUSIONSLE_PASSARGS \
+                SYSTEMLINEAREQUATIONS_PASSARGS
+
+	AdvectionDiffusionSLE* _AdvectionDiffusionSLE_New(  ADVECTIONDIFFUSIONSLE_DEFARGS  );
 
 	void _AdvectionDiffusionSLE_Init(
 		void*							sle,
@@ -141,3 +135,4 @@
 	void AdvectionDiffusionSLE_ResetStoredValues( void* sle );
 
 #endif
+

@@ -77,3 +77,5 @@ Index StgFEM_Toolbox_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, StgFEM_Toolbox_Type, "0", _StgFEM_Toolbox_DefaultNew );
 }
 
+
+

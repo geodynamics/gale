@@ -109,30 +109,35 @@
 	struct ElementType { __ElementType };
 
 
-	#define ELEMENTTYPE_DEFARGS	\
-		STG_COMPONENT_DEFARGS,	\
-			ElementType_EvaluateShapeFunctionsAtFunction*				_evaluateShapeFunctionsAt,		\
-			ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*	_evaluateShapeFunctionLocalDerivsAt,	\
-			ElementType_ConvertGlobalCoordToElLocalFunction*			_convertGlobalCoordToElLocal,		\
-			ElementType_JacobianDeterminantSurfaceFunction*				_jacobianDeterminantSurface, 		\
-			ElementType_SurfaceNormalFunction*								_surfaceNormal,				\
-			Index																		nodeCount
 
-	#define ELEMENTTYPE_PASSARGS	\
-		STG_COMPONENT_PASSARGS,		\
-			_evaluateShapeFunctionsAt,		\
-			_evaluateShapeFunctionLocalDerivsAt,	\
-			_convertGlobalCoordToElLocal,		\
-			_jacobianDeterminantSurface,		\
-			_surfaceNormal,				\
-			nodeCount
 	
 	
 	/* No "ElementType_New" and "ElementType_Init" as this is an abstract class */
 	
 	
 	/* Creation implementation / Virtual constructor */
-	ElementType* _ElementType_New( ELEMENTTYPE_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ELEMENTTYPE_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                ElementType_EvaluateShapeFunctionsAtFunction*                      _evaluateShapeFunctionsAt, \
+                ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*  _evaluateShapeFunctionLocalDerivsAt, \
+                ElementType_ConvertGlobalCoordToElLocalFunction*                _convertGlobalCoordToElLocal, \
+                ElementType_JacobianDeterminantSurfaceFunction*                  _jacobianDeterminantSurface, \
+                ElementType_SurfaceNormalFunction*                                            _surfaceNormal
+
+	#define ELEMENTTYPE_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _evaluateShapeFunctionsAt,           \
+	        _evaluateShapeFunctionLocalDerivsAt, \
+	        _convertGlobalCoordToElLocal,        \
+	        _jacobianDeterminantSurface,         \
+	        _surfaceNormal                     
+
+	ElementType* _ElementType_New(  ELEMENTTYPE_DEFARGS  );
 	
 	/* Initialise implementation */
 	void _ElementType_Init( 
@@ -249,3 +254,4 @@
 					unsigned element_I, unsigned face_I, unsigned nNodes, unsigned* nodes );
 
 #endif /* __StgFEM_Discretisation_ElementType_h__ */
+

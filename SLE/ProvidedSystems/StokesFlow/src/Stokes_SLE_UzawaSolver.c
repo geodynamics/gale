@@ -59,22 +59,26 @@
 const Type Stokes_SLE_UzawaSolver_Type = "Stokes_SLE_UzawaSolver";
 
 void* _Stokes_SLE_UzawaSolver_DefaultNew( Name name ) {
-	return (void*) _Stokes_SLE_UzawaSolver_New( 
-		sizeof(Stokes_SLE_UzawaSolver), 
-		Stokes_SLE_UzawaSolver_Type, 
-		_Stokes_SLE_UzawaSolver_Delete, 
-		_Stokes_SLE_UzawaSolver_Print, 
-		_Stokes_SLE_UzawaSolver_Copy,
-		_Stokes_SLE_UzawaSolver_DefaultNew,
-		_Stokes_SLE_UzawaSolver_AssignFromXML,
-		_Stokes_SLE_UzawaSolver_Build,
-		_Stokes_SLE_UzawaSolver_Initialise,
-		_SLE_Solver_Execute,
-		_SLE_Solver_Destroy,
-		_Stokes_SLE_UzawaSolver_SolverSetup, 
-		_Stokes_SLE_UzawaSolver_Solve, 
-		_Stokes_SLE_UzawaSolver_GetResidual,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Stokes_SLE_UzawaSolver);
+	Type                                                      type = Stokes_SLE_UzawaSolver_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Stokes_SLE_UzawaSolver_Delete;
+	Stg_Class_PrintFunction*                                _print = _Stokes_SLE_UzawaSolver_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Stokes_SLE_UzawaSolver_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Stokes_SLE_UzawaSolver_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Stokes_SLE_UzawaSolver_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Stokes_SLE_UzawaSolver_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Stokes_SLE_UzawaSolver_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _SLE_Solver_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _SLE_Solver_Destroy;
+	SLE_Solver_SolverSetupFunction*                   _solverSetup = _Stokes_SLE_UzawaSolver_SolverSetup;
+	SLE_Solver_SolveFunction*                               _solve = _Stokes_SLE_UzawaSolver_Solve;
+	SLE_Solver_GetResidualFunc*                       _getResidual = _Stokes_SLE_UzawaSolver_GetResidual;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _Stokes_SLE_UzawaSolver_New(  STOKES_SLE_UZAWASOLVER_PASSARGS  );
 }
 
 Stokes_SLE_UzawaSolver* Stokes_SLE_UzawaSolver_New( 
@@ -97,43 +101,13 @@ Stokes_SLE_UzawaSolver* Stokes_SLE_UzawaSolver_New(
 
 
 /* Creation implementation / Virtual constructor */
-Stokes_SLE_UzawaSolver* _Stokes_SLE_UzawaSolver_New( 
-		SizeT                                       sizeOfSelf,
-		Type                                        type,
-		Stg_Class_DeleteFunction*                   _delete,
-		Stg_Class_PrintFunction*                    _print,
-		Stg_Class_CopyFunction*                     _copy, 
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*            _construct,
-		Stg_Component_BuildFunction*                _build,
-		Stg_Component_InitialiseFunction*           _initialise,
-		Stg_Component_ExecuteFunction*              _execute,
-		Stg_Component_DestroyFunction*              _destroy,
-		SLE_Solver_SolverSetupFunction*             _solverSetup,
-		SLE_Solver_SolveFunction*                   _solve,
-		SLE_Solver_GetResidualFunc*                 _getResidual, 
-		Name                                        name )
+Stokes_SLE_UzawaSolver* _Stokes_SLE_UzawaSolver_New(  STOKES_SLE_UZAWASOLVER_DEFARGS  )
 {
 	Stokes_SLE_UzawaSolver* self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Stokes_SLE_UzawaSolver) );
-	self = (Stokes_SLE_UzawaSolver*) _SLE_Solver_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_solverSetup,
-		_solve,
-		_getResidual, 
-		name );
+	assert( _sizeOfSelf >= sizeof(Stokes_SLE_UzawaSolver) );
+	self = (Stokes_SLE_UzawaSolver*) _SLE_Solver_New(  SLE_SOLVER_PASSARGS  );
 
 	self->_formResidual  = _Stokes_SLE_UzawaSolver_FormResidual;
         self->_getRhs        = _Stokes_SLE_UzawaSolver_GetRhs;
@@ -1028,4 +1002,6 @@ void _Stokes_SLE_UzawaSolver_FormResidual( void *stokesSLE, void *solver, Vec r 
 Vec _Stokes_SLE_UzawaSolver_GetResidual( void* solver, Index fv_I ) {
 	return NULL;
 }
+
+
 

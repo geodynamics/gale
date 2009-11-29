@@ -66,34 +66,34 @@ LinearTriangleElementType* LinearTriangleElementType_New( Name name ) {
 }
 
 void* _LinearTriangleElementType_DefaultNew( Name name ) {
-	return _LinearTriangleElementType_New(
-		sizeof(LinearTriangleElementType),
-		LinearTriangleElementType_Type,
-		_LinearTriangleElementType_Delete,
-		_LinearTriangleElementType_Print,
-		NULL,
-		_LinearTriangleElementType_DefaultNew,
-		_LinearTriangleElementType_AssignFromXML,
-		_LinearTriangleElementType_Build,
-		_LinearTriangleElementType_Initialise,
-		_LinearTriangleElementType_Execute,
-		_LinearTriangleElementType_Destroy,
-		name,
-		NON_GLOBAL,
-		_LinearTriangleElementType_SF_allNodes, 
-		_LinearTriangleElementType_SF_allLocalDerivs_allNodes,
-		_ElementType_ConvertGlobalCoordToElLocal,
-		_ElementType_JacobianDeterminantSurface,
-		_LinearTriangularElementType_SurfaceNormal,
-		_LinearTriangleElementType_NodeCount );
+	/* Variables set in this function */
+	SizeT                                                                            _sizeOfSelf = sizeof(LinearTriangleElementType);
+	Type                                                                                    type = LinearTriangleElementType_Type;
+	Stg_Class_DeleteFunction*                                                            _delete = _LinearTriangleElementType_Delete;
+	Stg_Class_PrintFunction*                                                              _print = _LinearTriangleElementType_Print;
+	Stg_Class_CopyFunction*                                                                _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*                                _defaultConstructor = _LinearTriangleElementType_DefaultNew;
+	Stg_Component_ConstructFunction*                                                  _construct = _LinearTriangleElementType_AssignFromXML;
+	Stg_Component_BuildFunction*                                                          _build = _LinearTriangleElementType_Build;
+	Stg_Component_InitialiseFunction*                                                _initialise = _LinearTriangleElementType_Initialise;
+	Stg_Component_ExecuteFunction*                                                      _execute = _LinearTriangleElementType_Execute;
+	Stg_Component_DestroyFunction*                                                      _destroy = _LinearTriangleElementType_Destroy;
+	AllocationType                                                            nameAllocationType = NON_GLOBAL;
+	ElementType_EvaluateShapeFunctionsAtFunction*                      _evaluateShapeFunctionsAt = _LinearTriangleElementType_SF_allNodes;
+	ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*  _evaluateShapeFunctionLocalDerivsAt = _LinearTriangleElementType_SF_allLocalDerivs_allNodes;
+	ElementType_ConvertGlobalCoordToElLocalFunction*                _convertGlobalCoordToElLocal = _ElementType_ConvertGlobalCoordToElLocal;
+	ElementType_JacobianDeterminantSurfaceFunction*                  _jacobianDeterminantSurface = _ElementType_JacobianDeterminantSurface;
+	ElementType_SurfaceNormalFunction*                                            _surfaceNormal = _LinearTriangularElementType_SurfaceNormal;
+
+	return _LinearTriangleElementType_New(  LINEARTRIANGLEELEMENTTYPE_PASSARGS  );
 }
 
-LinearTriangleElementType* _LinearTriangleElementType_New( LINEARTRIANGLEELEMENTTYPE_DEFARGS ) {
+LinearTriangleElementType* _LinearTriangleElementType_New(  LINEARTRIANGLEELEMENTTYPE_DEFARGS  ) {
 	LinearTriangleElementType* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(LinearTriangleElementType) );
-	self = (LinearTriangleElementType*)_ElementType_New( ELEMENTTYPE_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(LinearTriangleElementType) );
+	self = (LinearTriangleElementType*)_ElementType_New(  ELEMENTTYPE_PASSARGS  );
 	
 	/* General info */
 	
@@ -218,4 +218,6 @@ int _LinearTriangularElementType_SurfaceNormal( void* elementType, unsigned elem
 
 	return -1;
 }
+
+
 

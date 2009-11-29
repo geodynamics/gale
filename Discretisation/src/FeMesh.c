@@ -47,22 +47,26 @@ const Type FeMesh_Type = "FeMesh";
 */
 
 FeMesh* FeMesh_New( Name name, AbstractContext* context ) {
-	FeMesh* self = _FeMesh_New( sizeof(FeMesh), 
-		FeMesh_Type, 
-		_FeMesh_Delete, 
-		_FeMesh_Print, 
-		NULL, 
-		(void* (*)(Name))_FeMesh_New, 
-		_FeMesh_AssignFromXML, 
-		_FeMesh_Build, 
-		_FeMesh_Initialise, 
-		_FeMesh_Execute, 
-		_FeMesh_Destroy, 
-		name, 
-		NON_GLOBAL,
-		NULL,
-		NULL,
-		False);
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(FeMesh);
+	Type                                                      type = FeMesh_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FeMesh_Delete;
+	Stg_Class_PrintFunction*                                _print = _FeMesh_Print;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void* (*)(Name))_FeMesh_New;
+	Stg_Component_ConstructFunction*                    _construct = _FeMesh_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _FeMesh_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FeMesh_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FeMesh_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FeMesh_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_Class_CopyFunction*        _copy = NULL;
+	ElementType*                  elType = NULL;
+	const char*                   family = NULL;
+	Bool                     elementMesh = False;
+
+	FeMesh* self = _FeMesh_New(  FEMESH_PASSARGS  );
 
    _Mesh_Init( (Mesh*)self, context );
 	/* FeMesh info */
@@ -70,12 +74,12 @@ FeMesh* FeMesh_New( Name name, AbstractContext* context ) {
    return self;
 }
 
-FeMesh* _FeMesh_New( FEMESH_DEFARGS ) {
+FeMesh* _FeMesh_New(  FEMESH_DEFARGS  ) {
 	FeMesh*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(FeMesh) );
-	self = (FeMesh*)_Mesh_New( MESH_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(FeMesh) );
+	self = (FeMesh*)_Mesh_New(  MESH_PASSARGS  );
 
 	return self;
 }
@@ -444,3 +448,5 @@ void FeMesh_Destruct( FeMesh* self ) {
 	component as this will be destroyed by the LiveComponentRegister_DestroyAll function 101109 */
 	/*KillObject( self->feElType );*/ 
 }
+
+

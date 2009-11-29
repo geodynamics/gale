@@ -65,32 +65,30 @@ LinkedDofInfo* LinkedDofInfo_New( Name name, DomainContext* context, void* mesh,
 }
 
 void* _LinkedDofInfo_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(LinkedDofInfo);
+	Type                                                      type = LinkedDofInfo_Type;
+	Stg_Class_DeleteFunction*                              _delete = _LinkedDofInfo_Delete;
+	Stg_Class_PrintFunction*                                _print = _LinkedDofInfo_Print;
+	Stg_Class_CopyFunction*                                  _copy = _LinkedDofInfo_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _LinkedDofInfo_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _LinkedDofInfo_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _LinkedDofInfo_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _LinkedDofInfo_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _LinkedDofInfo_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _LinkedDofInfo_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
 	return (void*)
-		_LinkedDofInfo_New(
-		sizeof(LinkedDofInfo),
-		LinkedDofInfo_Type,
-		_LinkedDofInfo_Delete,
-		_LinkedDofInfo_Print, 
-		_LinkedDofInfo_Copy, 
-		_LinkedDofInfo_DefaultNew,
-		_LinkedDofInfo_AssignFromXML,
-		_LinkedDofInfo_Build,
-		_LinkedDofInfo_Initialise,
-		_LinkedDofInfo_Execute,
-		_LinkedDofInfo_Destroy,
-		name, 
-		NON_GLOBAL,
-		NULL,
-		NULL,
-		NULL );
+		_LinkedDofInfo_New(  LINKEDDOFINFO_PASSARGS  );
 }
 
-LinkedDofInfo* _LinkedDofInfo_New( LINKEDDOFINFO_DEFARGS ) {
+LinkedDofInfo* _LinkedDofInfo_New(  LINKEDDOFINFO_DEFARGS  ) {
 	LinkedDofInfo* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(LinkedDofInfo) );
-	self = (LinkedDofInfo*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(LinkedDofInfo) );
+	self = (LinkedDofInfo*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* General info */
 	
@@ -471,4 +469,6 @@ void LinkedDofInfo_AddDofsToSet_FromIndexSet( void* linkedDofInfo, Index linkedD
 		}
 	}	
 }
+
+
 

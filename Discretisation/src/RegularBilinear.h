@@ -61,14 +61,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define REGULARBILINEAR_DEFARGS \
-		ELEMENTTYPE_DEFARGS
+                BILINEARELEMENTTYPE_DEFARGS
 
 	#define REGULARBILINEAR_PASSARGS \
-		ELEMENTTYPE_PASSARGS
+                BILINEARELEMENTTYPE_PASSARGS
 
 	RegularBilinear* RegularBilinear_New( Name name );
-	RegularBilinear* _RegularBilinear_New( REGULARBILINEAR_DEFARGS );
+	RegularBilinear* _RegularBilinear_New(  REGULARBILINEAR_DEFARGS  );
 	void _RegularBilinear_Init( RegularBilinear* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -95,3 +102,4 @@
 	*/
 
 #endif /* __Discretisaton_Mesh_RegularBilinear_h__ */
+

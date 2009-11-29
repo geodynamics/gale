@@ -59,15 +59,18 @@ const Type FeEntryPoint_Type = "FeEntryPoint";
 
 
 FeEntryPoint* FeEntryPoint_New( const Name name, unsigned int castType ) {
-	return _FeEntryPoint_New( 
-		sizeof(FeEntryPoint), 
-		FeEntryPoint_Type, 
-		_EntryPoint_Delete, 
-		_EntryPoint_Print, 
-		_EntryPoint_Copy, 
-		_FeEntryPoint_GetRun, 
-		name, 
-		castType );
+	/* Variables set in this function */
+	SizeT                       _sizeOfSelf = sizeof(FeEntryPoint);
+	Type                               type = FeEntryPoint_Type;
+	Stg_Class_DeleteFunction*       _delete = _EntryPoint_Delete;
+	Stg_Class_PrintFunction*         _print = _EntryPoint_Print;
+	Stg_Class_CopyFunction*           _copy = _EntryPoint_Copy;
+	EntryPoint_GetRunFunction*      _getRun = _FeEntryPoint_GetRun;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _FeEntryPoint_New(  FEENTRYPOINT_PASSARGS  );
 }
 
 void FeEntryPoint_Init( void* feEntryPoint, Name name, unsigned int castType ) {
@@ -91,29 +94,13 @@ void FeEntryPoint_Init( void* feEntryPoint, Name name, unsigned int castType ) {
 	_FeEntryPoint_Init( self );
 }
 
-FeEntryPoint* _FeEntryPoint_New( 
-		SizeT							_sizeOfSelf,
-		Type							type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*					_copy, 
-		EntryPoint_GetRunFunction*				_getRun,
-		Name							name,
-		unsigned int						castType )
+FeEntryPoint* _FeEntryPoint_New(  FEENTRYPOINT_DEFARGS  )
 {
 	FeEntryPoint* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(FeEntryPoint) );
-	self = (FeEntryPoint*)_EntryPoint_New( 
-		_sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy, 
-		_getRun, 
-		name, 
-		castType );
+	self = (FeEntryPoint*)_EntryPoint_New(  ENTRYPOINT_PASSARGS  );
 	
 	/* General info */
 	
@@ -206,5 +193,7 @@ void _FeEntryPoint_Run_AssembleForceVector(
 		Stg_CallGraph_Pop( stgCallGraph );
 	#endif
 }
+
+
 
 

@@ -72,39 +72,13 @@ IsoviscousStressTensorTerm* IsoviscousStressTensorTerm_New(
 }
 
 /* Creation implementation / Virtual constructor */
-IsoviscousStressTensorTerm* _IsoviscousStressTensorTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
-		Name                                                name )
+IsoviscousStressTensorTerm* _IsoviscousStressTensorTerm_New(  ISOVISCOUSSTRESSTENSORTERM_DEFARGS  )
 {
 	IsoviscousStressTensorTerm* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(IsoviscousStressTensorTerm) );
-	self = (IsoviscousStressTensorTerm*) _StiffnessMatrixTerm_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_assembleElement,
-		name );
+	assert( _sizeOfSelf >= sizeof(IsoviscousStressTensorTerm) );
+	self = (IsoviscousStressTensorTerm*) _StiffnessMatrixTerm_New(  STIFFNESSMATRIXTERM_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -132,20 +106,24 @@ void _IsoviscousStressTensorTerm_Print( void* matrixTerm, Stream* stream ) {
 }
 
 void* _IsoviscousStressTensorTerm_DefaultNew( Name name ) {
-	return (void*)_IsoviscousStressTensorTerm_New( 
-		sizeof(IsoviscousStressTensorTerm), 
-		IsoviscousStressTensorTerm_Type,
-		_IsoviscousStressTensorTerm_Delete,
-		_IsoviscousStressTensorTerm_Print,
-		NULL,
-		_IsoviscousStressTensorTerm_DefaultNew,
-		_IsoviscousStressTensorTerm_AssignFromXML,
-		_IsoviscousStressTensorTerm_Build,
-		_IsoviscousStressTensorTerm_Initialise,
-		_IsoviscousStressTensorTerm_Execute,
-		_IsoviscousStressTensorTerm_Destroy,
-		_IsoviscousStressTensorTerm_AssembleElement,
-		name );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(IsoviscousStressTensorTerm);
+	Type                                                         type = IsoviscousStressTensorTerm_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _IsoviscousStressTensorTerm_Delete;
+	Stg_Class_PrintFunction*                                   _print = _IsoviscousStressTensorTerm_Print;
+	Stg_Class_CopyFunction*                                     _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _IsoviscousStressTensorTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _IsoviscousStressTensorTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _IsoviscousStressTensorTerm_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _IsoviscousStressTensorTerm_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _IsoviscousStressTensorTerm_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _IsoviscousStressTensorTerm_Destroy;
+	StiffnessMatrixTerm_AssembleElementFunction*     _assembleElement = _IsoviscousStressTensorTerm_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*)_IsoviscousStressTensorTerm_New(  ISOVISCOUSSTRESSTENSORTERM_PASSARGS  );
 }
 
 void _IsoviscousStressTensorTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
@@ -277,3 +255,5 @@ void _IsoviscousStressTensorTerm_AssembleElement(
 	
 	return;
 }
+
+

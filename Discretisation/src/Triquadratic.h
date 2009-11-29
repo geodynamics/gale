@@ -61,14 +61,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define TRIQUADRATIC_DEFARGS \
-		ELEMENTTYPE_DEFARGS
+                ELEMENTTYPE_DEFARGS
 
 	#define TRIQUADRATIC_PASSARGS \
-		ELEMENTTYPE_PASSARGS
+                ELEMENTTYPE_PASSARGS
 
 	Triquadratic* Triquadratic_New( Name name );
-	Triquadratic* _Triquadratic_New( TRIQUADRATIC_DEFARGS );
+	Triquadratic* _Triquadratic_New(  TRIQUADRATIC_DEFARGS  );
 	void _Triquadratic_Init( Triquadratic* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -97,3 +104,4 @@
 	*/
 
 #endif /* __Discretisaton_Mesh_Triquadratic_h__ */
+

@@ -76,13 +76,7 @@
 	
 	struct ForceTerm { __ForceTerm };
 
-	#define FORCETERM_DEFARGS \
-		STG_COMPONENT_DEFARGS, \
-			ForceTerm_AssembleElementFunction* _assembleElement
 
-	#define FORCETERM_PASSARGS \
-		STG_COMPONENT_PASSARGS, \
-			_assembleElement			
 	
 	/* Creation implementation / Virtual constructor */
 	ForceTerm* ForceTerm_New(
@@ -92,7 +86,20 @@
 		Swarm*						integrationSwarm,
 		Stg_Component*				extraInfo );
 
-	ForceTerm* _ForceTerm_New( FORCETERM_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FORCETERM_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                ForceTerm_AssembleElementFunction*  _assembleElement
+
+	#define FORCETERM_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _assembleElement
+
+	ForceTerm* _ForceTerm_New(  FORCETERM_DEFARGS  );
 	
 	void _ForceTerm_Init(
 		void*							forceTerm,
@@ -141,3 +148,4 @@
 	void ForceTerm_SetAssembleElementFunction( void* forceTerm, ForceTerm_AssembleElementFunction* assembleElementFunction ) ;
 
 #endif /* __StgFEM_SLE_SystemSetup_ForceTerm_h__ */
+

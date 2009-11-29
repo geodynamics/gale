@@ -54,108 +54,47 @@
 const Type ShapeFeVariable_Type = "ShapeFeVariable";
 
 void* ShapeFeVariable_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                                       _sizeOfSelf = sizeof(ShapeFeVariable);
+	Type                                                               type = ShapeFeVariable_Type;
+	Stg_Class_DeleteFunction*                                       _delete = _ShapeFeVariable_Delete;
+	Stg_Class_PrintFunction*                                         _print = _ShapeFeVariable_Print;
+	Stg_Class_CopyFunction*                                           _copy = _ShapeFeVariable_Copy;
+	Stg_Component_DefaultConstructorFunction*           _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)ShapeFeVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                             _construct = _ShapeFeVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                                     _build = _ShapeFeVariable_Build;
+	Stg_Component_InitialiseFunction*                           _initialise = _ShapeFeVariable_Initialise;
+	Stg_Component_ExecuteFunction*                                 _execute = _ShapeFeVariable_Execute;
+	Stg_Component_DestroyFunction*                                 _destroy = _ShapeFeVariable_Destroy;
+	FieldVariable_InterpolateValueAtFunction*           _interpolateValueAt = _FeVariable_InterpolateValueAt;
+	FieldVariable_GetCoordFunction*                _getMinAndMaxLocalCoords = _FeVariable_GetMinAndMaxLocalCoords;
+	FieldVariable_GetCoordFunction*               _getMinAndMaxGlobalCoords = _FeVariable_GetMinAndMaxGlobalCoords;
+	FeVariable_InterpolateWithinElementFunction*  _interpolateWithinElement = _FeVariable_InterpolateNodeValuesToElLocalCoord;
+	FeVariable_GetValueAtNodeFunction*                      _getValueAtNode = _FeVariable_GetValueAtNode;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType                             nameAllocationType = ZERO;
+	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = ZERO;
+	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
+	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
+
 	return (ShapeFeVariable*)
-		_ShapeFeVariable_New(
-			sizeof(ShapeFeVariable), 
-			ShapeFeVariable_Type, 
-			_ShapeFeVariable_Delete,
-			_ShapeFeVariable_Print,
-			_ShapeFeVariable_Copy,
-			(Stg_Component_DefaultConstructorFunction*)ShapeFeVariable_DefaultNew,
-			_ShapeFeVariable_AssignFromXML,
-			_ShapeFeVariable_Build,
-			_ShapeFeVariable_Initialise,
-			_ShapeFeVariable_Execute,
-			_ShapeFeVariable_Destroy,
-			name,
-			False,
-			_FeVariable_InterpolateValueAt,
-			_FeVariable_GetMinGlobalFieldMagnitude,
-			_FeVariable_GetMaxGlobalFieldMagnitude, 
-			_FeVariable_GetMinAndMaxLocalCoords,
-			_FeVariable_GetMinAndMaxGlobalCoords,
-			_FeVariable_InterpolateNodeValuesToElLocalCoord,
-			_FeVariable_GetValueAtNode,
-			NULL,
-			NULL,
-			NULL,
-			0,	/* dim */
-			False,
-			0,	/* communicator */
-			NULL	/* fv_Register */
-			);
+		_ShapeFeVariable_New(  SHAPEFEVARIABLE_PASSARGS  );
 }			
 
-ShapeFeVariable* _ShapeFeVariable_New(
- 	SizeT                                             _sizeOfSelf,
-	Type                                              type,
-	Stg_Class_DeleteFunction*                         _delete,
-	Stg_Class_PrintFunction*                          _print,
-	Stg_Class_CopyFunction*                           _copy, 
-	Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-	Stg_Component_ConstructFunction*                  _construct,
-	Stg_Component_BuildFunction*                      _build,
-	Stg_Component_InitialiseFunction*                 _initialise,
-	Stg_Component_ExecuteFunction*                    _execute,
-	Stg_Component_DestroyFunction*                    _destroy,
-	Name                                              name,
-	Bool                                              initFlag,
-	FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-	FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-	FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-	FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-	FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-	FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-	FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-	void*                                              feMesh,
-	void*                                              geometryMesh,
-	void*                                              dofLayout,
-	Dimension_Index                                    dim,
-	Bool                                               isCheckpointedAndReloaded,
-	MPI_Comm                                           communicator,
-	FieldVariable_Register*                            fV_Register )
+ShapeFeVariable* _ShapeFeVariable_New(  SHAPEFEVARIABLE_DEFARGS  )
 {
 	ShapeFeVariable*		self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ShapeFeVariable) );
-	self = (ShapeFeVariable*) _FeVariable_New(
-		_sizeOfSelf, 
-		type, 
-		_delete,
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute, 
-		_destroy,
-		name,
-		NON_GLOBAL,
-		_interpolateValueAt,
-		_getMinGlobalFeMagnitude, 
-		_getMaxGlobalFeMagnitude,
-		_getMinAndMaxLocalCoords, 
-		_getMinAndMaxGlobalCoords,
-		1, /* fieldComponentCount */ 
-		dim, /* dim */
-		isCheckpointedAndReloaded, /* Checkpointing boolean */
-		communicator, /* communicator */
-		fV_Register, /* fv_Register */
-		_interpolateWithinElement,
-		_getValueAtNode,
-		_FeVariable_SyncShadowValues, 
-		feMesh,
-		geometryMesh,
-		dofLayout, /* dofLayout */
-		NULL, /* bcs */
-		NULL, /* ics */
-		NULL, /* linkedDofInfo */
-		NULL, /* templateFeVariable */
-		False, /* isReference */
-		False /* loadReferenceEachTimestep */
-	);
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+	_syncShadowValues  = _FeVariable_SyncShadowValues;
+
+	self = (ShapeFeVariable*) _FeVariable_New(  FEVARIABLE_PASSARGS  );
 
 	return self;
 }
@@ -237,3 +176,5 @@ void _ShapeFeVariable_Destroy( void* shapeFeVariable, void* data ) {
 	
 	_FeVariable_Destroy( self, data );
 }
+
+

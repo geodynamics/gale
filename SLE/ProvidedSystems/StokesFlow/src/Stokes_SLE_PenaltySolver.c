@@ -55,22 +55,26 @@
 const Type Stokes_SLE_PenaltySolver_Type = "Stokes_SLE_PenaltySolver";
 
 void* Stokes_SLE_PenaltySolver_DefaultNew( Name name ) {
-	return _Stokes_SLE_PenaltySolver_New( 
-		sizeof(Stokes_SLE_PenaltySolver), 
-		Stokes_SLE_PenaltySolver_Type, 
-		_Stokes_SLE_PenaltySolver_Delete, 
-		_Stokes_SLE_PenaltySolver_Print, 
-		_Stokes_SLE_PenaltySolver_Copy,
-		Stokes_SLE_PenaltySolver_DefaultNew,
-		_Stokes_SLE_PenaltySolver_AssignFromXML,
-		_Stokes_SLE_PenaltySolver_Build,
-		_SLE_Solver_Initialise,
-		_SLE_Solver_Execute,
-		_SLE_Solver_Destroy,
-		_Stokes_SLE_PenaltySolver_SolverSetup, 
-		_Stokes_SLE_PenaltySolver_Solve, 
-		_Stokes_SLE_PenaltySolver_GetResidual,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Stokes_SLE_PenaltySolver);
+	Type                                                      type = Stokes_SLE_PenaltySolver_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Stokes_SLE_PenaltySolver_Delete;
+	Stg_Class_PrintFunction*                                _print = _Stokes_SLE_PenaltySolver_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Stokes_SLE_PenaltySolver_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = Stokes_SLE_PenaltySolver_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Stokes_SLE_PenaltySolver_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Stokes_SLE_PenaltySolver_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _SLE_Solver_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _SLE_Solver_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _SLE_Solver_Destroy;
+	SLE_Solver_SolverSetupFunction*                   _solverSetup = _Stokes_SLE_PenaltySolver_SolverSetup;
+	SLE_Solver_SolveFunction*                               _solve = _Stokes_SLE_PenaltySolver_Solve;
+	SLE_Solver_GetResidualFunc*                       _getResidual = _Stokes_SLE_PenaltySolver_GetResidual;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _Stokes_SLE_PenaltySolver_New(  STOKES_SLE_PENALTYSOLVER_PASSARGS  );
 }
 
 Stokes_SLE_PenaltySolver* Stokes_SLE_PenaltySolver_New(
@@ -87,43 +91,13 @@ Stokes_SLE_PenaltySolver* Stokes_SLE_PenaltySolver_New(
 
 
 /* Creation implementation / Virtual constructor */
-Stokes_SLE_PenaltySolver* _Stokes_SLE_PenaltySolver_New( 
-		SizeT                                       sizeOfSelf,
-		Type                                        type,
-		Stg_Class_DeleteFunction*                   _delete,
-		Stg_Class_PrintFunction*                    _print,
-		Stg_Class_CopyFunction*                     _copy, 
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*            _construct,
-		Stg_Component_BuildFunction*                _build,
-		Stg_Component_InitialiseFunction*           _initialise,
-		Stg_Component_ExecuteFunction*              _execute,
-		Stg_Component_DestroyFunction*              _destroy,
-		SLE_Solver_SolverSetupFunction*             _solverSetup,
-		SLE_Solver_SolveFunction*                   _solve,
-		SLE_Solver_GetResidualFunc*                 _getResidual, 
-		Name                                        name )
+Stokes_SLE_PenaltySolver* _Stokes_SLE_PenaltySolver_New(  STOKES_SLE_PENALTYSOLVER_DEFARGS  )
 {
 	Stokes_SLE_PenaltySolver* self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Stokes_SLE_PenaltySolver) );
-	self = (Stokes_SLE_PenaltySolver*) _SLE_Solver_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_solverSetup,
-		_solve,
-		_getResidual, 
-		name );
+	assert( _sizeOfSelf >= sizeof(Stokes_SLE_PenaltySolver) );
+	self = (Stokes_SLE_PenaltySolver*) _SLE_Solver_New(  SLE_SOLVER_PASSARGS  );
 
 	/* Virtual info */
 	return self;
@@ -325,4 +299,6 @@ Vec _Stokes_SLE_PenaltySolver_GetResidual( void* solver, Index fv_I ) {
 /* 	 TODO */
 	return NULL;
 }
+
+
 

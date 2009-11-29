@@ -65,11 +65,7 @@
 
 	struct LinearTriangleElementType { __LinearTriangleElementType };
 	
-	#define LINEARTRIANGLEELEMENTTYPE_DEFARGS \
-    	ELEMENTTYPE_DEFARGS
 
-	#define LINEARTRIANGLEELEMENTTYPE_PASSARGS \
-    	ELEMENTTYPE_PASSARGS
 	
 	/* Create a new LinearTriangleElementType and initialise */
 	void* _LinearTriangleElementType_DefaultNew( Name name );
@@ -77,7 +73,18 @@
 	LinearTriangleElementType* LinearTriangleElementType_New( Name name );
 	
 	/* Creation implementation / Virtual constructor */
-	LinearTriangleElementType* _LinearTriangleElementType_New( LINEARTRIANGLEELEMENTTYPE_DEFARGS );			
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LINEARTRIANGLEELEMENTTYPE_DEFARGS \
+                ELEMENTTYPE_DEFARGS
+
+	#define LINEARTRIANGLEELEMENTTYPE_PASSARGS \
+                ELEMENTTYPE_PASSARGS
+
+	LinearTriangleElementType* _LinearTriangleElementType_New(  LINEARTRIANGLEELEMENTTYPE_DEFARGS  );			
 	
 	/* Initialise implementation */
 	void _LinearTriangleElementType_Init( LinearTriangleElementType* self );
@@ -109,3 +116,4 @@
 	int _LinearTriangularElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal );
 
 #endif /* __StgFEM_Discretisation_LinearTriangleElementType_h__ */
+

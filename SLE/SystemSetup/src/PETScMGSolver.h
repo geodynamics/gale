@@ -98,14 +98,45 @@
 	** Constructors
 	*/
 
-	#define PETSCMGSOLVER_DEFARGS		\
-		MGSOLVER_DEFARGS
 
-	#define PETSCMGSOLVER_PASSARGS		\
-		MGSOLVER_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PETSCMGSOLVER_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                MGSolver_SetCommFunc*                              setCommFunc, \
+                MGSolver_SetMatrixFunc*                          setMatrixFunc, \
+                MGSolver_SetMaxIterationsFunc*            setMaxIterationsFunc, \
+                MGSolver_SetRelativeToleranceFunc*    setRelativeToleranceFunc, \
+                MGSolver_SetAbsoluteToleranceFunc*    setAbsoluteToleranceFunc, \
+                MGSolver_SetUseInitialSolutionFunc*  setUseInitialSolutionFunc, \
+                MGSolver_SolveFunc*                                  solveFunc, \
+                MGSolver_SetupFunc*                                  setupFunc, \
+                MGSolver_GetSolveStatusFunc*                getSolveStatusFunc, \
+                MGSolver_GetIterationsFunc*                  getIterationsFunc, \
+                MGSolver_GetMaxIterationsFunc*            getMaxIterationsFunc, \
+                MGSolver_GetResidualNormFunc*              getResidualNormFunc
+
+	#define PETSCMGSOLVER_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        setCommFunc,               \
+	        setMatrixFunc,             \
+	        setMaxIterationsFunc,      \
+	        setRelativeToleranceFunc,  \
+	        setAbsoluteToleranceFunc,  \
+	        setUseInitialSolutionFunc, \
+	        solveFunc,                 \
+	        setupFunc,                 \
+	        getSolveStatusFunc,        \
+	        getIterationsFunc,         \
+	        getMaxIterationsFunc,      \
+	        getResidualNormFunc      
 
 	PETScMGSolver* PETScMGSolver_New( Name name );
-	PETScMGSolver* _PETScMGSolver_New( MGSOLVER_DEFARGS );
+	PETScMGSolver* _PETScMGSolver_New(  PETSCMGSOLVER_DEFARGS  );
 	void _PETScMGSolver_Init( PETScMGSolver* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -151,3 +182,4 @@
 	void PETScMGSolver_DestructLevels( PETScMGSolver* self );
 
 #endif /* __Experimental_Solvers_PETScMGSolver_h__ */
+

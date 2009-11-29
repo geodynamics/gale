@@ -65,11 +65,7 @@
 		/* ConstantElementType info */
 	struct ConstantElementType { __ConstantElementType };
 
-	#define CONSTANTELEMENTTYPE_DEFARGS \
-    	ELEMENTTYPE_DEFARGS
 
-	#define CONSTANTELEMENTTYPE_PASSARGS \
-    	ELEMENTTYPE_PASSARGS
 
 	
 	void* ConstantElementType_DefaultNew( Name name );
@@ -78,7 +74,18 @@
 	ConstantElementType* ConstantElementType_New( Name name );
 	
 	/* Creation implementation / Virtual constructor */
-	ConstantElementType* _ConstantElementType_New( CONSTANTELEMENTTYPE_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CONSTANTELEMENTTYPE_DEFARGS \
+                ELEMENTTYPE_DEFARGS
+
+	#define CONSTANTELEMENTTYPE_PASSARGS \
+                ELEMENTTYPE_PASSARGS
+
+	ConstantElementType* _ConstantElementType_New(  CONSTANTELEMENTTYPE_DEFARGS  );
 	
 	/* Initialise a ConstantElementType construct */
 	void _ConstantElementType_Init( ConstantElementType* self );
@@ -136,3 +143,4 @@
 		double*		normal );
 
 #endif /* __StgFEM_Discretisation_ConstantElementType_h__ */
+

@@ -49,19 +49,22 @@ const Type Assembler_Type = "Assembler";
 */
 
 Assembler* Assembler_New() {
-        return _Assembler_New( sizeof(Assembler), 
-                               Assembler_Type, 
-                               _Assembler_Delete, 
-                               _Assembler_Print, 
-                               NULL );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(Assembler);
+	Type                              type = Assembler_Type;
+	Stg_Class_DeleteFunction*      _delete = _Assembler_Delete;
+	Stg_Class_PrintFunction*        _print = _Assembler_Print;
+	Stg_Class_CopyFunction*          _copy = NULL;
+
+        return _Assembler_New(  ASSEMBLER_PASSARGS  );
 }
 
-Assembler* _Assembler_New( ASSEMBLER_DEFARGS ) {
+Assembler* _Assembler_New(  ASSEMBLER_DEFARGS  ) {
 	Assembler*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Assembler) );
-	self = (Assembler*)_Stg_Class_New( STG_CLASS_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(Assembler) );
+	self = (Assembler*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 
 	/* Virtual info */
 
@@ -416,3 +419,5 @@ void Assembler_LoopVectorElement( void* assembler, unsigned element ) {
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+

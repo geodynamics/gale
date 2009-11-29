@@ -45,3 +45,5 @@ void LibStgFEMSuite( pcu_suite_t* suite ) {
     pcu_suite_addTest( suite, LibStgFEMSuite_DirectoryStGermain );
     pcu_suite_addTest( suite, LibStgFEMSuite_DirectoryStgFEM);
 }
+
+

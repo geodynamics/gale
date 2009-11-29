@@ -197,32 +197,29 @@ FeEquationNumber* FeEquationNumber_New(
 }
 
 void* FeEquationNumber_DefaultNew( Name name ) {
-   return _FeEquationNumber_New(
-		sizeof(FeEquationNumber),
-		FeEquationNumber_Type,
-		_FeEquationNumber_Delete,
-		_FeEquationNumber_Print,
-		_FeEquationNumber_Copy,
-		(Stg_Component_DefaultConstructorFunction*)FeEquationNumber_DefaultNew,
- 		_FeEquationNumber_AssignFromXML,
-		(Stg_Component_BuildFunction*)_FeEquationNumber_Build, 
-		(Stg_Component_InitialiseFunction*)_FeEquationNumber_Initialise,
-		_FeEquationNumber_Execute,
-		_FeEquationNumber_Destroy,
-		name,
-		NON_GLOBAL,
-		NULL,
-		NULL,
-		NULL,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(FeEquationNumber);
+	Type                                                      type = FeEquationNumber_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FeEquationNumber_Delete;
+	Stg_Class_PrintFunction*                                _print = _FeEquationNumber_Print;
+	Stg_Class_CopyFunction*                                  _copy = _FeEquationNumber_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)FeEquationNumber_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _FeEquationNumber_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = (Stg_Component_BuildFunction*)_FeEquationNumber_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = (Stg_Component_InitialiseFunction*)_FeEquationNumber_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FeEquationNumber_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FeEquationNumber_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
+   return _FeEquationNumber_New(  FEEQUATIONNUMBER_PASSARGS  );
 }
 /** Constructor implementation. */
-FeEquationNumber* _FeEquationNumber_New( FEEQUATIONNUMBER_DEFARGS ){
+FeEquationNumber* _FeEquationNumber_New(  FEEQUATIONNUMBER_DEFARGS  ){
    FeEquationNumber* self;
 	
    /* Allocate memory */
-   assert( sizeOfSelf >= sizeof(FeEquationNumber) );
-   self = (FeEquationNumber*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+   assert( _sizeOfSelf >= sizeof(FeEquationNumber) );
+   self = (FeEquationNumber*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
    /* General info */
 	
@@ -3357,3 +3354,5 @@ int GenerateEquationNumbering(
 	
 	return 0;
 }
+
+
