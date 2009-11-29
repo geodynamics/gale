@@ -85,46 +85,13 @@ lucAxis* lucAxis_New(
 	return self;
 }
 
-lucAxis* _lucAxis_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-	
-		Name                                               name )
+lucAxis* _lucAxis_New(  LUCAXIS_DEFARGS  )
 {
 	lucAxis*    self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucAxis) );
-	self = (lucAxis*)  _lucOpenGLDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucAxis) );
+	self = (lucAxis*)  _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_PASSARGS  );
 	
 	
 	return self;
@@ -190,23 +157,27 @@ void* _lucAxis_Copy( void* axis, void* dest, Bool deep, Name nameExt, PtrMap* pt
 }
 
 void* _lucAxis_DefaultNew( Name name ) {
-	return _lucAxis_New( 
-			sizeof( lucAxis ),
-			lucAxis_Type,
-			_lucAxis_Delete,
-			_lucAxis_Print,
-			_lucAxis_Copy,
-			_lucAxis_DefaultNew,
-			_lucAxis_AssignFromXML,
-			_lucAxis_Build,
-			_lucAxis_Initialise,
-			_lucAxis_Execute,
-			_lucAxis_Destroy,		
-		        _lucAxis_Setup,
-			_lucAxis_Draw,
-	                _lucAxis_CleanUp,
-	 		_lucAxis_BuildDisplayList,
-			name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof( lucAxis );
+	Type                                                             type = lucAxis_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucAxis_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucAxis_Print;
+	Stg_Class_CopyFunction*                                         _copy = _lucAxis_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucAxis_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucAxis_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucAxis_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucAxis_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucAxis_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucAxis_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucAxis_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucAxis_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucAxis_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucAxis_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _lucAxis_New(  LUCAXIS_PASSARGS  );
 }
 
 void _lucAxis_AssignFromXML( void* axis, Stg_ComponentFactory* cf, void* data ) {
@@ -378,6 +349,8 @@ void _lucAxis_CleanUp( void* drawingObject, void* _context ) {
 
 void _lucAxis_BuildDisplayList( void* drawingObject, void* _context ) {
 }
+
+
 
 
 

@@ -84,38 +84,18 @@ lucLight* lucLight_New(
 	return self;
 }
 
-lucLight* _lucLight_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		Name                                               name )
+lucLight* _lucLight_New(  LUCLIGHT_DEFARGS  )
 {
 	lucLight*    self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucLight) );
-	self = (lucLight*) _Stg_Component_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name, 
-			NON_GLOBAL );
+	assert( _sizeOfSelf >= sizeof(lucLight) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (lucLight*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	
 	return self;
@@ -220,19 +200,23 @@ void* _lucLight_Copy( void* light, void* dest, Bool deep, Name nameExt, PtrMap* 
 }
 
 void* _lucLight_DefaultNew( Name name ) {
-	return _lucLight_New( 
-			sizeof( lucLight ),
-			lucLight_Type,
-			_lucLight_Delete,
-			_lucLight_Print,
-			_lucLight_Copy,
-			_lucLight_DefaultNew,
-			_lucLight_AssignFromXML,
-			_lucLight_Build,
-			_lucLight_Initialise,
-			_lucLight_Execute,
-			_lucLight_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( lucLight );
+	Type                                                      type = lucLight_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucLight_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucLight_Print;
+	Stg_Class_CopyFunction*                                  _copy = _lucLight_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucLight_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucLight_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucLight_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucLight_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucLight_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucLight_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _lucLight_New(  LUCLIGHT_PASSARGS  );
 }
 
 void _lucLight_AssignFromXML( void* light, Stg_ComponentFactory* cf, void* data ) {
@@ -360,3 +344,5 @@ void lucLight_SetNeedsToDraw( void * light ){
 	lucLight* self = (lucLight*) light;
 	self->needsToDraw = True;
 }
+
+

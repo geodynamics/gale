@@ -58,12 +58,18 @@
 	/** Constructors */
 	lucInputFormat_Register* lucInputFormat_Register_New(  );
 
-	lucInputFormat_Register* _lucInputFormat_Register_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCINPUTFORMAT_REGISTER_DEFARGS \
+                STG_COMPONENTREGISTER_DEFARGS
+
+	#define LUCINPUTFORMAT_REGISTER_PASSARGS \
+                STG_COMPONENTREGISTER_PASSARGS
+
+	lucInputFormat_Register* _lucInputFormat_Register_New(  LUCINPUTFORMAT_REGISTER_DEFARGS  );
 
 	void lucInputFormat_Register_InitAll(  ) ;
 	
@@ -82,3 +88,4 @@
 	lucInputFormat* lucInputFormat_Register_CreateFromFileName( void* inputFormat_Register, Name filename );
 
 #endif
+

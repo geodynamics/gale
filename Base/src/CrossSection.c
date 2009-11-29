@@ -101,3 +101,5 @@ void lucCrossSection_Delete(lucCrossSection* self)
 {
    if (self != NULL) Memory_Free(self);
 }
+
+

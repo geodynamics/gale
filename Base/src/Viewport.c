@@ -90,38 +90,18 @@ lucViewport* lucViewport_New(
 	return self;
 }
 
-lucViewport* _lucViewport_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		Name                                               name )
+lucViewport* _lucViewport_New(  LUCVIEWPORT_DEFARGS  )
 {
 	lucViewport*    self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucViewport) );
-	self = (lucViewport*) _Stg_Component_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name, 
-			NON_GLOBAL );
+	assert( _sizeOfSelf >= sizeof(lucViewport) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (lucViewport*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	return self;
 }
@@ -248,19 +228,23 @@ void* _lucViewport_Copy( void* viewport, void* dest, Bool deep, Name nameExt, Pt
 }
 
 void* _lucViewport_DefaultNew( Name name ) {
-	return _lucViewport_New( 
-			sizeof( lucViewport ),
-			lucViewport_Type,
-			_lucViewport_Delete,
-			_lucViewport_Print,
-			_lucViewport_Copy,
-			_lucViewport_DefaultNew,
-			_lucViewport_AssignFromXML,
-			_lucViewport_Build,
-			_lucViewport_Initialise,
-			_lucViewport_Execute,
-			_lucViewport_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( lucViewport );
+	Type                                                      type = lucViewport_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucViewport_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucViewport_Print;
+	Stg_Class_CopyFunction*                                  _copy = _lucViewport_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucViewport_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucViewport_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucViewport_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucViewport_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucViewport_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucViewport_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _lucViewport_New(  LUCVIEWPORT_PASSARGS  );
 }
 
 void _lucViewport_AssignFromXML( void* viewport, Stg_ComponentFactory* cf, void* data ) {
@@ -394,3 +378,5 @@ void lucViewport_Create_MPI_Datatype() {
 	MPI_Type_struct( lucViewport_TypesCount, blocklen, displacement, typeList, &lucViewport_MPI_Datatype );
 	MPI_Type_commit( & lucViewport_MPI_Datatype );
 }
+
+

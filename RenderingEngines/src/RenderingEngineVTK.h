@@ -64,23 +64,18 @@
 	struct lucRenderingEngineVTK { __lucRenderingEngineVTK };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucRenderingEngineVTK* _lucRenderingEngineVTK_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucRenderingEngine_RenderFunction*                 _render,
-		lucRenderingEngine_ClearFunction*             	   _clear,
-		lucRenderingEngine_GetPixelDataFunction*           _getPixelData,
-		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCRENDERINGENGINEVTK_DEFARGS \
+                LUCRENDERINGENGINE_DEFARGS
+
+	#define LUCRENDERINGENGINEVTK_PASSARGS \
+                LUCRENDERINGENGINE_PASSARGS
+
+	lucRenderingEngineVTK* _lucRenderingEngineVTK_New(  LUCRENDERINGENGINEVTK_DEFARGS  );
 
 	void _lucRenderingEngineVTK_Delete( void* renderingEngine ) ;
 	void _lucRenderingEngineVTK_Print( void* renderingEngine, Stream* stream ) ;
@@ -129,3 +124,4 @@
 		Bool                                               broadcast ) ;
 
 #endif
+

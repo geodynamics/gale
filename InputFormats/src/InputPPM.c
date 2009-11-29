@@ -60,39 +60,13 @@
 const Type lucInputPPM_Type = "lucInputPPM";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucInputPPM* _lucInputPPM_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucInputFormat_InputFunction*                      _Input,
-		Name                                               name ) 
+lucInputPPM* _lucInputPPM_New(  LUCINPUTPPM_DEFARGS  ) 
 {
 	lucInputPPM*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucInputPPM) );
-	self = (lucInputPPM*) _lucInputFormat_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_Input,
-			name );	
+	assert( _sizeOfSelf >= sizeof(lucInputPPM) );
+	self = (lucInputPPM*) _lucInputFormat_New(  LUCINPUTFORMAT_PASSARGS  );	
 	
 	return self;
 }
@@ -128,20 +102,24 @@ void* _lucInputPPM_Copy( void* InputFormat, void* dest, Bool deep, Name nameExt,
 
 
 void* _lucInputPPM_DefaultNew( Name name ) {
-	return (void*) _lucInputPPM_New(
-		sizeof(lucInputPPM),
-		lucInputPPM_Type,
-		_lucInputPPM_Delete,
-		_lucInputPPM_Print,
-		NULL,
-		_lucInputPPM_DefaultNew,
-		_lucInputPPM_AssignFromXML,
-		_lucInputPPM_Build,
-		_lucInputPPM_Initialise,
-		_lucInputPPM_Execute,
-		_lucInputPPM_Destroy,
-		_lucInputPPM_Input,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(lucInputPPM);
+	Type                                                      type = lucInputPPM_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucInputPPM_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucInputPPM_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucInputPPM_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucInputPPM_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucInputPPM_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucInputPPM_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucInputPPM_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucInputPPM_Destroy;
+	lucInputFormat_InputFunction*                           _input = _lucInputPPM_Input;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucInputPPM_New(  LUCINPUTPPM_PASSARGS  );
 }
 
 void _lucInputPPM_AssignFromXML( void* InputFormat, Stg_ComponentFactory* cf, void* data ){
@@ -235,3 +213,5 @@ lucPixel* _lucInputPPM_Input( void* inputFormat, Name imageName, Pixel_Index *wi
 		
 	return pixelData;
 }
+
+

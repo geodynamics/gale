@@ -2069,3 +2069,5 @@ void gluQuadricCallback (GLUquadric* quad, GLenum which, _GLUfuncptr CallBackFun
 	Journal_Printf( stream, "%s( ptr %.6g );\n", __func__, (double) which );
 }
 #endif
+
+

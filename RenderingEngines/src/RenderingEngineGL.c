@@ -70,45 +70,13 @@
 const Type lucRenderingEngineGL_Type = "lucRenderingEngineGL";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucRenderingEngineGL* _lucRenderingEngineGL_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucRenderingEngine_RenderFunction*                 _render,
-		lucRenderingEngine_ClearFunction*             	   _clear,
-		lucRenderingEngine_GetPixelDataFunction*           _getPixelData,
-		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport,
-		Name                                               name ) 
+lucRenderingEngineGL* _lucRenderingEngineGL_New(  LUCRENDERINGENGINEGL_DEFARGS  ) 
 {
 	lucRenderingEngineGL*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucRenderingEngineGL) );
-	self = (lucRenderingEngineGL*) _lucRenderingEngine_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_render,
-			_clear,
-			_getPixelData,
-			_compositeViewport,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucRenderingEngineGL) );
+	self = (lucRenderingEngineGL*) _lucRenderingEngine_New(  LUCRENDERINGENGINE_PASSARGS  );
 	
 	return self;
 }
@@ -142,23 +110,27 @@ void* _lucRenderingEngineGL_Copy( void* renderingEngine, void* dest, Bool deep, 
 
 
 void* _lucRenderingEngineGL_DefaultNew( Name name ) {
-	return (void*) _lucRenderingEngineGL_New(
-		sizeof(lucRenderingEngineGL),
-		lucRenderingEngineGL_Type,
-		_lucRenderingEngineGL_Delete,
-		_lucRenderingEngineGL_Print,
-		NULL,
-		_lucRenderingEngineGL_DefaultNew,
-		_lucRenderingEngineGL_AssignFromXML,
-		_lucRenderingEngineGL_Build,
-		_lucRenderingEngineGL_Initialise,
-		_lucRenderingEngineGL_Execute,
-		_lucRenderingEngineGL_Destroy,
-		_lucRenderingEngineGL_Render,
-		_lucRenderingEngineGL_Clear,
-		_lucRenderingEngineGL_GetPixelData,
-		_lucRenderingEngineGL_CompositeViewport_Stencil,
-		name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(lucRenderingEngineGL);
+	Type                                                          type = lucRenderingEngineGL_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _lucRenderingEngineGL_Delete;
+	Stg_Class_PrintFunction*                                    _print = _lucRenderingEngineGL_Print;
+	Stg_Class_CopyFunction*                                      _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _lucRenderingEngineGL_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _lucRenderingEngineGL_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _lucRenderingEngineGL_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _lucRenderingEngineGL_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _lucRenderingEngineGL_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _lucRenderingEngineGL_Destroy;
+	lucRenderingEngine_RenderFunction*                         _render = _lucRenderingEngineGL_Render;
+	lucRenderingEngine_ClearFunction*                           _clear = _lucRenderingEngineGL_Clear;
+	lucRenderingEngine_GetPixelDataFunction*             _getPixelData = _lucRenderingEngineGL_GetPixelData;
+	lucRenderingEngine_CompositeViewportFunction*   _compositeViewport = _lucRenderingEngineGL_CompositeViewport_Stencil;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucRenderingEngineGL_New(  LUCRENDERINGENGINEGL_PASSARGS  );
 }
 
 void _lucRenderingEngineGL_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data ){
@@ -632,3 +604,5 @@ void _lucRenderingEngineGL_CompositeViewport_Manual(
 	
 	Journal_DPrintfL( lucDebug, 2, "Leaving: %s\n", __func__ );
 }
+
+

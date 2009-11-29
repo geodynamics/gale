@@ -71,43 +71,13 @@
 const Type lucColourBar_Type = "lucColourBar";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucColourBar* _lucColourBar_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		Name                                               name ) 
+lucColourBar* _lucColourBar_New(  LUCCOLOURBAR_DEFARGS  ) 
 {
 	lucColourBar*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucColourBar) );
-	self = (lucColourBar*) _lucDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucColourBar) );
+	self = (lucColourBar*) _lucDrawingObject_New(  LUCDRAWINGOBJECT_PASSARGS  );
 	
 	return self;
 }
@@ -167,22 +137,26 @@ void* _lucColourBar_Copy( void* drawingObject, void* dest, Bool deep, Name nameE
 
 
 void* _lucColourBar_DefaultNew( Name name ) {
-	return (void*) _lucColourBar_New(
-		sizeof(lucColourBar),
-		lucColourBar_Type,
-		_lucColourBar_Delete,
-		_lucColourBar_Print,
-		NULL,
-		_lucColourBar_DefaultNew,
-		_lucColourBar_AssignFromXML,
-		_lucColourBar_Build,
-		_lucColourBar_Initialise,
-		_lucColourBar_Execute,
-		_lucColourBar_Destroy,
-		_lucColourBar_Setup,
-		_lucColourBar_Draw,
-		_lucColourBar_CleanUp,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(lucColourBar);
+	Type                                                      type = lucColourBar_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucColourBar_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucColourBar_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucColourBar_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucColourBar_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucColourBar_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucColourBar_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucColourBar_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucColourBar_Destroy;
+	lucDrawingObject_SetupFunction*                         _setup = _lucColourBar_Setup;
+	lucDrawingObject_DrawFunction*                           _draw = _lucColourBar_Draw;
+	lucDrawingObject_CleanUpFunction*                     _cleanUp = _lucColourBar_CleanUp;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucColourBar_New(  LUCCOLOURBAR_PASSARGS  );
 }
 
 void _lucColourBar_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
@@ -415,3 +389,5 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 
 void _lucColourBar_CleanUp( void* drawingObject, void* _context ) {
 }
+
+

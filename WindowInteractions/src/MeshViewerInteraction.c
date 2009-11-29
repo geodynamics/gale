@@ -63,47 +63,13 @@ const Type lucMeshViewerInteraction_Type = "lucMeshViewerInteraction";
 
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucMeshViewerInteraction* _lucMeshViewerInteraction_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucWindowInteraction_MouseMotionFunction*          _mouseMotion,
-		lucWindowInteraction_MouseClickFunction*           _mouseClick,
-		lucWindowInteraction_MouseMessageFunction*         _mouseMessage,
-		lucWindowInteraction_KeyboardEventFunction*        _keyboardEvent,
-		lucWindowInteraction_KeyboardMessageFunction*      _keyboardMessage,		
-		Name                                               name ) 
+lucMeshViewerInteraction* _lucMeshViewerInteraction_New(  LUCMESHVIEWERINTERACTION_DEFARGS  ) 
 {
 	lucMeshViewerInteraction*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucMeshViewerInteraction) );
-	self = (lucMeshViewerInteraction*) _lucWindowInteraction_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_mouseMotion,
-			_mouseClick, 
-			_mouseMessage, 
-			_keyboardEvent,
-			_keyboardMessage,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucMeshViewerInteraction) );
+	self = (lucMeshViewerInteraction*) _lucWindowInteraction_New(  LUCWINDOWINTERACTION_PASSARGS  );
 	
 	return self;
 }
@@ -139,24 +105,28 @@ void* _lucMeshViewerInteraction_Copy( void* MeshViewerInteraction, void* dest, B
 
 
 void* _lucMeshViewerInteraction_DefaultNew( Name name ) {
-	return (void*) _lucMeshViewerInteraction_New(
-		sizeof(lucMeshViewerInteraction),
-		lucMeshViewerInteraction_Type,
-		_lucMeshViewerInteraction_Delete,
-		_lucMeshViewerInteraction_Print,
-		NULL,
-		_lucMeshViewerInteraction_DefaultNew,
-		_lucMeshViewerInteraction_AssignFromXML,
-		_lucMeshViewerInteraction_Build,
-		_lucMeshViewerInteraction_Initialise,
-		_lucMeshViewerInteraction_Execute,
-		_lucMeshViewerInteraction_Destroy,		
-		_lucMeshViewerInteraction_MouseMotion,
-		_lucMeshViewerInteraction_MouseClick,
-		_lucMeshViewerInteraction_MouseMessage,
-		_lucMeshViewerInteraction_KeyboardEvent,
-		_lucMeshViewerInteraction_KeyboardMessage,
-		name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(lucMeshViewerInteraction);
+	Type                                                          type = lucMeshViewerInteraction_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _lucMeshViewerInteraction_Delete;
+	Stg_Class_PrintFunction*                                    _print = _lucMeshViewerInteraction_Print;
+	Stg_Class_CopyFunction*                                      _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _lucMeshViewerInteraction_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _lucMeshViewerInteraction_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _lucMeshViewerInteraction_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _lucMeshViewerInteraction_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _lucMeshViewerInteraction_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _lucMeshViewerInteraction_Destroy;
+	lucWindowInteraction_MouseMotionFunction*             _mouseMotion = _lucMeshViewerInteraction_MouseMotion;
+	lucWindowInteraction_MouseClickFunction*               _mouseClick = _lucMeshViewerInteraction_MouseClick;
+	lucWindowInteraction_MouseMessageFunction*           _mouseMessage = _lucMeshViewerInteraction_MouseMessage;
+	lucWindowInteraction_KeyboardEventFunction*         _keyboardEvent = _lucMeshViewerInteraction_KeyboardEvent;
+	lucWindowInteraction_KeyboardMessageFunction*     _keyboardMessage = _lucMeshViewerInteraction_KeyboardMessage;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucMeshViewerInteraction_New(  LUCMESHVIEWERINTERACTION_PASSARGS  );
 }
 
 void _lucMeshViewerInteraction_AssignFromXML( void* MeshViewerInteraction, Stg_ComponentFactory* cf, void* data ){
@@ -274,3 +244,5 @@ void _lucMeshViewerInteraction_KeyboardMessage( void* windowInteraction, Stream*
 	Journal_Printf( stream, "n:                            Print the closest node number.\n");
 	Journal_Printf( stream, "e:                            Print the closest element number.\n");
 }
+
+

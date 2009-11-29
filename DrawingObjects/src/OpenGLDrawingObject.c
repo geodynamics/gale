@@ -68,44 +68,13 @@
 const Type lucOpenGLDrawingObject_Type = "lucOpenGLDrawingObject";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucOpenGLDrawingObject* _lucOpenGLDrawingObject_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name ) 
+lucOpenGLDrawingObject* _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_DEFARGS  ) 
 {
 	lucOpenGLDrawingObject*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucOpenGLDrawingObject) );
-	self = (lucOpenGLDrawingObject*) _lucDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucOpenGLDrawingObject) );
+	self = (lucOpenGLDrawingObject*) _lucDrawingObject_New(  LUCDRAWINGOBJECT_PASSARGS  );
 
 	self->_buildDisplayList = _buildDisplayList;
 	
@@ -213,3 +182,5 @@ void lucOpenGLDrawingObject_SyncShadowValues( void* drawingObject, void* field )
 	if ( field && Stg_Class_IsInstance( field, FeVariable_Type ) )
 		FeVariable_SyncShadowValues( field );
 }
+
+

@@ -61,20 +61,18 @@
 	struct lucOutputPPM { __lucOutputPPM };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucOutputPPM* _lucOutputPPM_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucOutputFormat_OutputFunction*                    _output,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCOUTPUTPPM_DEFARGS \
+                LUCOUTPUTFORMAT_DEFARGS
+
+	#define LUCOUTPUTPPM_PASSARGS \
+                LUCOUTPUTFORMAT_PASSARGS
+
+	lucOutputPPM* _lucOutputPPM_New(  LUCOUTPUTPPM_DEFARGS  );
 
 	void _lucOutputPPM_Delete( void* outputFormat ) ;
 	void _lucOutputPPM_Print( void* outputFormat, Stream* stream ) ;
@@ -91,3 +89,4 @@
 	void _lucOutputPPM_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) ;
 
 #endif
+

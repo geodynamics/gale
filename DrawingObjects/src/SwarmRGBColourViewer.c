@@ -66,49 +66,13 @@
 const Type lucSwarmRGBColourViewer_Type = "lucSwarmRGBColourViewer";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucSwarmRGBColourViewer* _lucSwarmRGBColourViewer_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		lucSwarmViewerBase_PlotParticleFunction*           _plotParticle,
-		lucSwarmViewerBase_SetParticleColourFunction*      _setParticleColour,
-		Name                                               name ) 
+lucSwarmRGBColourViewer* _lucSwarmRGBColourViewer_New(  LUCSWARMRGBCOLOURVIEWER_DEFARGS  ) 
 {
 	lucSwarmRGBColourViewer*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucSwarmRGBColourViewer) );
-	self = (lucSwarmRGBColourViewer*) _lucSwarmViewer_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,	
-			_plotParticle,
-			_setParticleColour,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucSwarmRGBColourViewer) );
+	self = (lucSwarmRGBColourViewer*) _lucSwarmViewer_New(  LUCSWARMVIEWER_PASSARGS  );
 
 	return self;
 }
@@ -150,25 +114,29 @@ void* _lucSwarmRGBColourViewer_Copy( void* drawingObject, void* dest, Bool deep,
 
 
 void* _lucSwarmRGBColourViewer_DefaultNew( Name name ) {
-	return (void*) _lucSwarmRGBColourViewer_New(
-		sizeof(lucSwarmRGBColourViewer),
-		lucSwarmRGBColourViewer_Type,
-		_lucSwarmRGBColourViewer_Delete,
-		_lucSwarmRGBColourViewer_Print,
-		NULL,
-		_lucSwarmRGBColourViewer_DefaultNew,
-		_lucSwarmRGBColourViewer_AssignFromXML,
-		_lucSwarmRGBColourViewer_Build,
-		_lucSwarmRGBColourViewer_Initialise,
-		_lucSwarmRGBColourViewer_Execute,
-		_lucSwarmRGBColourViewer_Destroy,
-		_lucSwarmRGBColourViewer_Setup,
-		_lucSwarmRGBColourViewer_Draw,
-		_lucSwarmRGBColourViewer_CleanUp,
-		_lucSwarmRGBColourViewer_BuildDisplayList,
-		_lucSwarmViewer_PlotParticle,
-		_lucSwarmRGBColourViewer_SetParticleColour,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucSwarmRGBColourViewer);
+	Type                                                             type = lucSwarmRGBColourViewer_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucSwarmRGBColourViewer_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucSwarmRGBColourViewer_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucSwarmRGBColourViewer_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucSwarmRGBColourViewer_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucSwarmRGBColourViewer_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucSwarmRGBColourViewer_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucSwarmRGBColourViewer_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucSwarmRGBColourViewer_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucSwarmRGBColourViewer_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucSwarmRGBColourViewer_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucSwarmRGBColourViewer_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucSwarmRGBColourViewer_BuildDisplayList;
+	lucSwarmViewerBase_PlotParticleFunction*                _plotParticle = _lucSwarmViewer_PlotParticle;
+	lucSwarmViewerBase_SetParticleColourFunction*      _setParticleColour = _lucSwarmRGBColourViewer_SetParticleColour;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucSwarmRGBColourViewer_New(  LUCSWARMRGBCOLOURVIEWER_PASSARGS  );
 }
 
 void _lucSwarmRGBColourViewer_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
@@ -320,3 +288,5 @@ void lucSwarmRGBColourViewer_UpdateVariables( void* drawingObject ) {
 		Variable_Update( self->colourBlueVariable->variable );
 	}
 }
+
+

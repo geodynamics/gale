@@ -71,23 +71,7 @@ const Type lucMeshViewer_Type = "lucMeshViewer";
 
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucMeshViewer* _lucMeshViewer_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name ) 
+lucMeshViewer* _lucMeshViewer_New(  LUCMESHVIEWER_DEFARGS  ) 
 {
 	lucMeshViewer*					self;
 
@@ -95,24 +79,8 @@ lucMeshViewer* _lucMeshViewer_New(
 	   parent and continue up the hierarchy tree. At the beginning of the tree 
 	   it will allocate memory of the size of object and initialise all the 
 	   memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucMeshViewer) );
-	self = (lucMeshViewer*) _lucOpenGLDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucMeshViewer) );
+	self = (lucMeshViewer*) _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_PASSARGS  );
 	
 	return self;
 }
@@ -167,23 +135,27 @@ void* _lucMeshViewer_Copy( void* drawingObject, void* dest, Bool deep, Name name
 
 
 void* _lucMeshViewer_DefaultNew( Name name ) {
-	return (void*) _lucMeshViewer_New(
-		sizeof(lucMeshViewer),
-		lucMeshViewer_Type,
-		_lucMeshViewer_Delete,
-		_lucMeshViewer_Print,
-		NULL,
-		_lucMeshViewer_DefaultNew,
-		_lucMeshViewer_AssignFromXML,
-		_lucMeshViewer_Build,
-		_lucMeshViewer_Initialise,
-		_lucMeshViewer_Execute,
-		_lucMeshViewer_Destroy,
-		_lucMeshViewer_Setup,
-		_lucMeshViewer_Draw,
-		_lucMeshViewer_CleanUp,
-		_lucMeshViewer_BuildDisplayList,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucMeshViewer);
+	Type                                                             type = lucMeshViewer_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucMeshViewer_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucMeshViewer_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucMeshViewer_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucMeshViewer_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucMeshViewer_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucMeshViewer_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucMeshViewer_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucMeshViewer_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucMeshViewer_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucMeshViewer_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucMeshViewer_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucMeshViewer_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucMeshViewer_New(  LUCMESHVIEWER_PASSARGS  );
 }
 
 void _lucMeshViewer_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
@@ -649,3 +621,5 @@ void lucMeshViewer_RenderEdges( lucMeshViewer* self, vertexFuncType* vertexFunc 
 	glEnd();
 	glEnable(GL_LIGHTING);
 }
+
+

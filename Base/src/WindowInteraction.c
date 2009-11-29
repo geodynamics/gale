@@ -79,43 +79,18 @@ lucWindowInteraction* lucWindowInteraction_New( Name name ) {
 	return self;
 }
 
-lucWindowInteraction* _lucWindowInteraction_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		lucWindowInteraction_MouseMotionFunction*          _mouseMotion,
-		lucWindowInteraction_MouseClickFunction*           _mouseClick,
-		lucWindowInteraction_MouseMessageFunction*         _mouseMessage,
-		lucWindowInteraction_KeyboardEventFunction*        _keyboardEvent,
-		lucWindowInteraction_KeyboardMessageFunction*      _keyboardMessage,
-		Name                                               name )
+lucWindowInteraction* _lucWindowInteraction_New(  LUCWINDOWINTERACTION_DEFARGS  )
 {
 	lucWindowInteraction*    self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucWindowInteraction) );
-	self = (lucWindowInteraction*) _Stg_Component_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name, 
-			NON_GLOBAL );
+	assert( _sizeOfSelf >= sizeof(lucWindowInteraction) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (lucWindowInteraction*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	/* Set virtual functions specific to this sub-class here: */
 	self->_mouseMotion     = _mouseMotion;
@@ -168,24 +143,28 @@ void* _lucWindowInteraction_Copy( void* windowInteractor, void* dest, Bool deep,
 }
 
 void* _lucWindowInteraction_DefaultNew( Name name ) {
-	return _lucWindowInteraction_New( 
-			sizeof( lucWindowInteraction ),
-			lucWindowInteraction_Type,
-			_lucWindowInteraction_Delete,
-			_lucWindowInteraction_Print,
-			_lucWindowInteraction_Copy,
-			_lucWindowInteraction_DefaultNew,
-			_lucWindowInteraction_AssignFromXML,
-			_lucWindowInteraction_Build,
-			_lucWindowInteraction_Initialise,
-			_lucWindowInteraction_Execute,
-			_lucWindowInteraction_Destroy,
-			_lucWindowInteraction_MouseMotion,
-			_lucWindowInteraction_MouseClick,
-			_lucWindowInteraction_MouseMessage,
-			_lucWindowInteraction_KeyboardEvent,
-			_lucWindowInteraction_KeyboardMessage,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof( lucWindowInteraction );
+	Type                                                          type = lucWindowInteraction_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _lucWindowInteraction_Delete;
+	Stg_Class_PrintFunction*                                    _print = _lucWindowInteraction_Print;
+	Stg_Class_CopyFunction*                                      _copy = _lucWindowInteraction_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _lucWindowInteraction_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _lucWindowInteraction_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _lucWindowInteraction_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _lucWindowInteraction_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _lucWindowInteraction_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _lucWindowInteraction_Destroy;
+	lucWindowInteraction_MouseMotionFunction*             _mouseMotion = _lucWindowInteraction_MouseMotion;
+	lucWindowInteraction_MouseClickFunction*               _mouseClick = _lucWindowInteraction_MouseClick;
+	lucWindowInteraction_MouseMessageFunction*           _mouseMessage = _lucWindowInteraction_MouseMessage;
+	lucWindowInteraction_KeyboardEventFunction*         _keyboardEvent = _lucWindowInteraction_KeyboardEvent;
+	lucWindowInteraction_KeyboardMessageFunction*     _keyboardMessage = _lucWindowInteraction_KeyboardMessage;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _lucWindowInteraction_New(  LUCWINDOWINTERACTION_PASSARGS  );
 }
 
 void _lucWindowInteraction_AssignFromXML( void* windowInteractor, Stg_ComponentFactory* cf, void* data ) {
@@ -379,3 +358,5 @@ void _lucWindowInteraction_KeyboardMessage( void* windowInteractor, Stream* stre
 	Journal_Printf( stream, "]:                            Zoom in with camera associated with viewport under cursor.\n" );
 	Journal_Printf( stream, "o:                            Continuous mode on/off (keep rendering new frames while interacting).\n" );
 }
+
+

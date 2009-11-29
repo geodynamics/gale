@@ -89,23 +89,18 @@
 	struct lucIsosurface { __lucIsosurface };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucIsosurface* _lucIsosurface_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCISOSURFACE_DEFARGS \
+                LUCOPENGLDRAWINGOBJECT_DEFARGS
+
+	#define LUCISOSURFACE_PASSARGS \
+                LUCOPENGLDRAWINGOBJECT_PASSARGS
+
+	lucIsosurface* _lucIsosurface_New(  LUCISOSURFACE_DEFARGS  );
 
 	void _lucIsosurface_Delete( void* drawingObject ) ;
 	void _lucIsosurface_Print( void* drawingObject, Stream* stream ) ;
@@ -143,3 +138,4 @@
 	void lucIsosurface_SetupPointsZ( Vertex** points, Vertex*** array, Index i, Index j, Index k );
 			
 #endif
+

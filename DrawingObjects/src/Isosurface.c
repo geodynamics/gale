@@ -69,45 +69,13 @@
 const Type lucIsosurface_Type = "lucIsosurface";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucIsosurface* _lucIsosurface_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name ) 
+lucIsosurface* _lucIsosurface_New(  LUCISOSURFACE_DEFARGS  ) 
 {
 	lucIsosurface*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucIsosurface) );
-	self = (lucIsosurface*) _lucOpenGLDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucIsosurface) );
+	self = (lucIsosurface*) _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_PASSARGS  );
 	
 	return self;
 }
@@ -172,23 +140,27 @@ void* _lucIsosurface_Copy( void* drawingObject, void* dest, Bool deep, Name name
 
 
 void* _lucIsosurface_DefaultNew( Name name ) {
-	return (void*) _lucIsosurface_New(
-		sizeof(lucIsosurface),
-		lucIsosurface_Type,
-		_lucIsosurface_Delete,
-		_lucIsosurface_Print,
-		NULL,
-		_lucIsosurface_DefaultNew,
-		_lucIsosurface_AssignFromXML,
-		_lucIsosurface_Build,
-		_lucIsosurface_Initialise,
-		_lucIsosurface_Execute,
-		_lucIsosurface_Destroy,
-		_lucIsosurface_Setup,
-		_lucIsosurface_Draw,
-		_lucIsosurface_CleanUp,
-		_lucIsosurface_BuildDisplayList,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucIsosurface);
+	Type                                                             type = lucIsosurface_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucIsosurface_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucIsosurface_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucIsosurface_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucIsosurface_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucIsosurface_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucIsosurface_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucIsosurface_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucIsosurface_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucIsosurface_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucIsosurface_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucIsosurface_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucIsosurface_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucIsosurface_New(  LUCISOSURFACE_PASSARGS  );
 }
 
 void _lucIsosurface_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
@@ -1237,3 +1209,5 @@ void lucIsosurface_MarchingRectangles( lucIsosurface* self, Vertex** points, cha
 			abort();
 	}
 }
+
+

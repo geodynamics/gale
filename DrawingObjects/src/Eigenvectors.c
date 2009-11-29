@@ -66,45 +66,13 @@
 const Type lucEigenvectors_Type = "lucEigenvectors";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucEigenvectors* _lucEigenvectors_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name ) 
+lucEigenvectors* _lucEigenvectors_New(  LUCEIGENVECTORS_DEFARGS  ) 
 {
 	lucEigenvectors*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucEigenvectors) );
-	self = (lucEigenvectors*) _lucEigenvectorsCrossSection_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucEigenvectors) );
+	self = (lucEigenvectors*) _lucEigenvectorsCrossSection_New(  LUCEIGENVECTORSCROSSSECTION_PASSARGS  );
 	
 	return self;
 }
@@ -138,23 +106,27 @@ void* _lucEigenvectors_Copy( void* drawingObject, void* dest, Bool deep, Name na
 
 
 void* _lucEigenvectors_DefaultNew( Name name ) {
-	return (void*) _lucEigenvectors_New(
-		sizeof(lucEigenvectors),
-		lucEigenvectors_Type,
-		_lucEigenvectors_Delete,
-		_lucEigenvectors_Print,
-		NULL,
-		_lucEigenvectors_DefaultNew,
-		_lucEigenvectors_AssignFromXML,
-		_lucEigenvectors_Build,
-		_lucEigenvectors_Initialise,
-		_lucEigenvectors_Execute,
-		_lucEigenvectors_Destroy,
-		_lucEigenvectors_Setup,
-		_lucEigenvectors_Draw,
-		_lucEigenvectors_CleanUp,
-		_lucEigenvectors_BuildDisplayList,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucEigenvectors);
+	Type                                                             type = lucEigenvectors_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucEigenvectors_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucEigenvectors_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucEigenvectors_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucEigenvectors_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucEigenvectors_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucEigenvectors_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucEigenvectors_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucEigenvectors_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucEigenvectors_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucEigenvectors_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucEigenvectors_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucEigenvectors_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucEigenvectors_New(  LUCEIGENVECTORS_PASSARGS  );
 }
 
 void _lucEigenvectors_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
@@ -209,3 +181,5 @@ void _lucEigenvectors_BuildDisplayList( void* drawingObject, void* _context ) {
 		}
 	}
 }
+
+

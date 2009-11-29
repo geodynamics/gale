@@ -62,3 +62,5 @@ void lucTestColourMaps_Register( void* _context ) {
 	ContextEP_Append( _context, AbstractContext_EP_AssignFromXMLExtensions, lucTestColourMaps );
 }
 
+
+

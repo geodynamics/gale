@@ -2086,3 +2086,5 @@ void lucColour_FromHexName( lucColour* self, Name hexName ) {
 	self->blue  = (float) rgb[2]/255.0;
 	self->opacity = 1.0;
 }
+
+

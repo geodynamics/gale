@@ -56,37 +56,29 @@
 const Type lucInputFormat_Register_Type = "lucInputFormat_Register";
 
 lucInputFormat_Register* lucInputFormat_Register_New() {
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof( lucInputFormat_Register );
+	Type                              type = lucInputFormat_Register_Type;
+	Stg_Class_DeleteFunction*      _delete = _lucInputFormat_Register_Delete;
+	Stg_Class_PrintFunction*        _print = _lucInputFormat_Register_Print;
+	Stg_Class_CopyFunction*          _copy = _lucInputFormat_Register_Copy;
+
 	lucInputFormat_Register* self;
 
-	self = _lucInputFormat_Register_New(
-			sizeof( lucInputFormat_Register ),
-			lucInputFormat_Register_Type,
-			_lucInputFormat_Register_Delete,
-			_lucInputFormat_Register_Print,
-			_lucInputFormat_Register_Copy );
+	self = _lucInputFormat_Register_New(  LUCINPUTFORMAT_REGISTER_PASSARGS  );
 
 	lucInputFormat_Register_InitAll( self );
 
 	return self;
 }
 
-lucInputFormat_Register* _lucInputFormat_Register_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy )
+lucInputFormat_Register* _lucInputFormat_Register_New(  LUCINPUTFORMAT_REGISTER_DEFARGS  )
 {
 	lucInputFormat_Register*    self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucInputFormat_Register) );
-	self = (lucInputFormat_Register*) _Stg_ComponentRegister_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy );
+	assert( _sizeOfSelf >= sizeof(lucInputFormat_Register) );
+	self = (lucInputFormat_Register*) _Stg_ComponentRegister_New(  STG_COMPONENTREGISTER_PASSARGS  );
 	
 	return self;
 }
@@ -145,3 +137,5 @@ lucInputFormat* lucInputFormat_Register_CreateFromFileName( void* inputFormat_Re
 	return (lucInputFormat*) defaultNewFunctionPtr( imageName );
 }
 	
+
+

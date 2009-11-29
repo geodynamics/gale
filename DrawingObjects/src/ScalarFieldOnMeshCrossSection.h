@@ -68,23 +68,18 @@
 	struct lucScalarFieldOnMeshCrossSection { __lucScalarFieldOnMeshCrossSection };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucScalarFieldOnMeshCrossSection* _lucScalarFieldOnMeshCrossSection_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCSCALARFIELDONMESHCROSSSECTION_DEFARGS \
+                LUCOPENGLDRAWINGOBJECT_DEFARGS
+
+	#define LUCSCALARFIELDONMESHCROSSSECTION_PASSARGS \
+                LUCOPENGLDRAWINGOBJECT_PASSARGS
+
+	lucScalarFieldOnMeshCrossSection* _lucScalarFieldOnMeshCrossSection_New(  LUCSCALARFIELDONMESHCROSSSECTION_DEFARGS  );
 
 	void _lucScalarFieldOnMeshCrossSection_Delete( void* drawingObject ) ;
 	void _lucScalarFieldOnMeshCrossSection_Print( void* drawingObject, Stream* stream ) ;
@@ -110,3 +105,4 @@
 	
 
 #endif
+

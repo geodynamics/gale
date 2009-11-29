@@ -71,45 +71,13 @@
 const Type lucScalarField_Type = "lucScalarField";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucScalarField* _lucScalarField_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name ) 
+lucScalarField* _lucScalarField_New(  LUCSCALARFIELD_DEFARGS  ) 
 {
 	lucScalarField*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucScalarField) );
-	self = (lucScalarField*) _lucScalarFieldCrossSection_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucScalarField) );
+	self = (lucScalarField*) _lucScalarFieldCrossSection_New(  LUCSCALARFIELDCROSSSECTION_PASSARGS  );
 	
 	return self;
 }
@@ -147,23 +115,27 @@ void* _lucScalarField_Copy( void* drawingObject, void* dest, Bool deep, Name nam
 
 
 void* _lucScalarField_DefaultNew( Name name ) {
-	return (void*) _lucScalarField_New(
-		sizeof(lucScalarField),
-		lucScalarField_Type,
-		_lucScalarField_Delete,
-		_lucScalarField_Print,
-		NULL,
-		_lucScalarField_DefaultNew,
-		_lucScalarField_AssignFromXML,
-		_lucScalarField_Build,
-		_lucScalarField_Initialise,
-		_lucScalarField_Execute,
-		_lucScalarField_Destroy,
-		_lucScalarField_Setup,
-		_lucScalarField_Draw,
-		_lucScalarField_CleanUp,
-		_lucScalarField_BuildDisplayList,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucScalarField);
+	Type                                                             type = lucScalarField_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucScalarField_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucScalarField_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucScalarField_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucScalarField_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucScalarField_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucScalarField_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucScalarField_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucScalarField_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucScalarField_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucScalarField_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucScalarField_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucScalarField_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucScalarField_New(  LUCSCALARFIELD_PASSARGS  );
 }
 
 void _lucScalarField_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
@@ -312,3 +284,5 @@ void lucScalarField_DrawWithMesh( lucScalarField* self ) {
    glEnd();
    glEnable(GL_LIGHTING);
 }
+
+

@@ -68,45 +68,13 @@
 const Type lucScalarFieldCrossSection_Type = "lucScalarFieldCrossSection";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucScalarFieldCrossSection* _lucScalarFieldCrossSection_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name ) 
+lucScalarFieldCrossSection* _lucScalarFieldCrossSection_New(  LUCSCALARFIELDCROSSSECTION_DEFARGS  ) 
 {
 	lucScalarFieldCrossSection*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucScalarFieldCrossSection) );
-	self = (lucScalarFieldCrossSection*) _lucOpenGLDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucScalarFieldCrossSection) );
+	self = (lucScalarFieldCrossSection*) _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_PASSARGS  );
 	
 	return self;
 }
@@ -156,23 +124,27 @@ void* _lucScalarFieldCrossSection_Copy( void* drawingObject, void* dest, Bool de
 
 
 void* _lucScalarFieldCrossSection_DefaultNew( Name name ) {
-	return (void*) _lucScalarFieldCrossSection_New(
-		sizeof(lucScalarFieldCrossSection),
-		lucScalarFieldCrossSection_Type,
-		_lucScalarFieldCrossSection_Delete,
-		_lucScalarFieldCrossSection_Print,
-		NULL,
-		_lucScalarFieldCrossSection_DefaultNew,
-		_lucScalarFieldCrossSection_AssignFromXML,
-		_lucScalarFieldCrossSection_Build,
-		_lucScalarFieldCrossSection_Initialise,
-		_lucScalarFieldCrossSection_Execute,
-		_lucScalarFieldCrossSection_Destroy,
-		_lucScalarFieldCrossSection_Setup,
-		_lucScalarFieldCrossSection_Draw,
-		_lucScalarFieldCrossSection_CleanUp,
-		_lucScalarFieldCrossSection_BuildDisplayList,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucScalarFieldCrossSection);
+	Type                                                             type = lucScalarFieldCrossSection_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucScalarFieldCrossSection_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucScalarFieldCrossSection_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucScalarFieldCrossSection_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucScalarFieldCrossSection_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucScalarFieldCrossSection_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucScalarFieldCrossSection_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucScalarFieldCrossSection_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucScalarFieldCrossSection_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucScalarFieldCrossSection_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucScalarFieldCrossSection_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucScalarFieldCrossSection_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucScalarFieldCrossSection_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucScalarFieldCrossSection_New(  LUCSCALARFIELDCROSSSECTION_PASSARGS  );
 }
 
 void _lucScalarFieldCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
@@ -392,3 +364,5 @@ Bool lucScalarFieldCrossSection_PlotColouredVertex( void* drawingObject, Coord i
 	/* If value could not be interpolated return warning */
 	return False;
 }
+
+

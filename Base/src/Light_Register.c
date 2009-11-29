@@ -58,14 +58,16 @@
 const Type lucLight_Register_Type = "lucLight_Register";
 
 lucLight_Register*	lucLight_Register_New( void ) {
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(lucLight_Register);
+	Type                              type = lucLight_Register_Type;
+	Stg_Class_DeleteFunction*      _delete = _NamedObject_Register_Delete;
+	Stg_Class_PrintFunction*        _print = _NamedObject_Register_Print;
+	Stg_Class_CopyFunction*          _copy = _NamedObject_Register_Copy;
+
 	lucLight_Register* self;
 	
-	self = (lucLight_Register*) _NamedObject_Register_New(
-		sizeof(lucLight_Register),
-		lucLight_Register_Type,
-		_NamedObject_Register_Delete,
-		_NamedObject_Register_Print,
-		_NamedObject_Register_Copy );
+	self = (lucLight_Register*) _NamedObject_Register_New(  NAMEDOBJECT_REGISTER_PASSARGS  );
 	self->currentLightIndex = 0;
 
 	return self;
@@ -112,3 +114,5 @@ void lucLight_Register_ChangeCurrentLightIndex( void * lightRegister ) {
 	if (self->currentLightIndex == lightCount)  self->currentLightIndex = 0;
 
 }
+
+

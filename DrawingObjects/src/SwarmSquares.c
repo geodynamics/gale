@@ -66,49 +66,13 @@
 const Type lucSwarmSquares_Type = "lucSwarmSquares";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucSwarmSquares* _lucSwarmSquares_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		lucSwarmViewerBase_PlotParticleFunction*           _plotParticle,
-		lucSwarmViewerBase_SetParticleColourFunction*      _setParticleColour,
-		Name                                               name ) 
+lucSwarmSquares* _lucSwarmSquares_New(  LUCSWARMSQUARES_DEFARGS  ) 
 {
 	lucSwarmSquares*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucSwarmSquares) );
-	self = (lucSwarmSquares*) _lucSwarmViewerBase_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			_plotParticle,
-			_setParticleColour,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucSwarmSquares) );
+	self = (lucSwarmSquares*) _lucSwarmViewerBase_New(  LUCSWARMVIEWERBASE_PASSARGS  );
 	
 	return self;
 }
@@ -156,25 +120,29 @@ void* _lucSwarmSquares_Copy( void* drawingObject, void* dest, Bool deep, Name na
 
 
 void* _lucSwarmSquares_DefaultNew( Name name ) {
-	return (void*) _lucSwarmSquares_New(
-		sizeof(lucSwarmSquares),
-		lucSwarmSquares_Type,
-		_lucSwarmSquares_Delete,
-		_lucSwarmSquares_Print,
-		NULL,
-		_lucSwarmSquares_DefaultNew,
-		_lucSwarmSquares_AssignFromXML,
-		_lucSwarmSquares_Build,
-		_lucSwarmSquares_Initialise,
-		_lucSwarmSquares_Execute,
-		_lucSwarmSquares_Destroy,
-		_lucSwarmSquares_Setup,
-		_lucSwarmSquares_Draw,
-		_lucSwarmSquares_CleanUp,
-		_lucSwarmSquares_BuildDisplayList,
-		_lucSwarmSquares_PlotParticle,
-		_lucSwarmViewerBase_SetParticleColourDefault,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucSwarmSquares);
+	Type                                                             type = lucSwarmSquares_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucSwarmSquares_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucSwarmSquares_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucSwarmSquares_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucSwarmSquares_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucSwarmSquares_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucSwarmSquares_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucSwarmSquares_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucSwarmSquares_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucSwarmSquares_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucSwarmSquares_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucSwarmSquares_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucSwarmSquares_BuildDisplayList;
+	lucSwarmViewerBase_PlotParticleFunction*                _plotParticle = _lucSwarmSquares_PlotParticle;
+	lucSwarmViewerBase_SetParticleColourFunction*      _setParticleColour = _lucSwarmViewerBase_SetParticleColourDefault;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucSwarmSquares_New(  LUCSWARMSQUARES_PASSARGS  );
 }
 
 void _lucSwarmSquares_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
@@ -323,3 +291,5 @@ void lucSwarmSquares_UpdateVariables( void* drawingObject ) {
 		Variable_Update( self->lengthVariable->variable );
 	}
 }
+
+

@@ -78,53 +78,37 @@ lucCamera* lucCamera_New(
 }
 
 void* _lucCamera_DefaultNew( Name name ) {
-	return _lucCamera_New( 
-		sizeof( lucCamera ),
-		lucCamera_Type,
-		_lucCamera_Delete,
-		_lucCamera_Print,
-		_lucCamera_Copy,
-		_lucCamera_DefaultNew,
-		_lucCamera_AssignFromXML,
-		_lucCamera_Build,
-		_lucCamera_Initialise,
-		_lucCamera_Execute,
-		_lucCamera_Destroy,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( lucCamera );
+	Type                                                      type = lucCamera_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucCamera_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucCamera_Print;
+	Stg_Class_CopyFunction*                                  _copy = _lucCamera_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucCamera_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucCamera_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucCamera_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucCamera_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucCamera_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucCamera_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _lucCamera_New(  LUCCAMERA_PASSARGS  );
 }
 
-lucCamera* _lucCamera_New(
-	SizeT                                              sizeOfSelf,
-	Type                                               type,
-	Stg_Class_DeleteFunction*                          _delete,
-	Stg_Class_PrintFunction*                           _print,
-	Stg_Class_CopyFunction*                            _copy, 
-	Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-	Stg_Component_ConstructFunction*                   _construct,
-	Stg_Component_BuildFunction*                       _build,
-	Stg_Component_InitialiseFunction*                  _initialise,
-	Stg_Component_ExecuteFunction*                     _execute,
-	Stg_Component_DestroyFunction*                     _destroy,		
-	Name                                               name )
+lucCamera* _lucCamera_New(  LUCCAMERA_DEFARGS  )
 {
 	lucCamera* self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucCamera) );
-	self = (lucCamera*) _Stg_Component_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name, 
-			NON_GLOBAL );
+	assert( _sizeOfSelf >= sizeof(lucCamera) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (lucCamera*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	return self;
 }
@@ -552,3 +536,5 @@ void lucCamera_Create_MPI_Datatype() {
 	MPI_Type_struct( lucCamera_TypesCount, blocklen, displacement, typeList, &lucCamera_MPI_Datatype );
 	MPI_Type_commit( & lucCamera_MPI_Datatype );
 }
+
+

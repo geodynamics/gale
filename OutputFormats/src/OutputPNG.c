@@ -62,39 +62,13 @@
 const Type lucOutputPNG_Type = "lucOutputPNG";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucOutputPNG* _lucOutputPNG_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucOutputFormat_OutputFunction*                    _output,
-		Name                                               name ) 
+lucOutputPNG* _lucOutputPNG_New(  LUCOUTPUTPNG_DEFARGS  ) 
 {
 	lucOutputPNG*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucOutputPNG) );
-	self = (lucOutputPNG*) _lucOutputFormat_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_output,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucOutputPNG) );
+	self = (lucOutputPNG*) _lucOutputFormat_New(  LUCOUTPUTFORMAT_PASSARGS  );
 	
 	return self;
 }
@@ -130,20 +104,24 @@ void* _lucOutputPNG_Copy( void* outputFormat, void* dest, Bool deep, Name nameEx
 
 
 void* _lucOutputPNG_DefaultNew( Name name ) {
-	return (void*) _lucOutputPNG_New(
-		sizeof(lucOutputPNG),
-		lucOutputPNG_Type,
-		_lucOutputPNG_Delete,
-		_lucOutputPNG_Print,
-		NULL,
-		_lucOutputPNG_DefaultNew,
-		_lucOutputPNG_AssignFromXML,
-		_lucOutputPNG_Build,
-		_lucOutputPNG_Initialise,
-		_lucOutputPNG_Execute,
-		_lucOutputPNG_Destroy,
-		_lucOutputPNG_Output,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(lucOutputPNG);
+	Type                                                      type = lucOutputPNG_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucOutputPNG_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucOutputPNG_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucOutputPNG_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucOutputPNG_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucOutputPNG_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucOutputPNG_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucOutputPNG_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucOutputPNG_Destroy;
+	lucOutputFormat_OutputFunction*                        _output = _lucOutputPNG_Output;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucOutputPNG_New(  LUCOUTPUTPNG_PASSARGS  );
 }
 
 void _lucOutputPNG_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
@@ -221,4 +199,6 @@ void _lucOutputPNG_Output( void* outputFormat, lucWindow* window, AbstractContex
 }
 
 #endif /* HAVE_PNG */
+
+
 

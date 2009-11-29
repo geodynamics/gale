@@ -69,25 +69,18 @@
 	struct lucSwarmVectors { __lucSwarmVectors };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucSwarmVectors* _lucSwarmVectors_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		lucSwarmViewerBase_PlotParticleFunction*           _plotParticle,
-		lucSwarmViewerBase_SetParticleColourFunction*      _setParticleColour,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCSWARMVECTORS_DEFARGS \
+                LUCSWARMVIEWERBASE_DEFARGS
+
+	#define LUCSWARMVECTORS_PASSARGS \
+                LUCSWARMVIEWERBASE_PASSARGS
+
+	lucSwarmVectors* _lucSwarmVectors_New(  LUCSWARMVECTORS_DEFARGS  );
 
 	void _lucSwarmVectors_Delete( void* drawingObject ) ;
 	void _lucSwarmVectors_Print( void* drawingObject, Stream* stream ) ;
@@ -114,3 +107,4 @@
 
 	void lucSwarmVectors_UpdateVariables( void* drawingObject ) ;
 #endif
+

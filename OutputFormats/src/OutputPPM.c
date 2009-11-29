@@ -60,39 +60,13 @@
 const Type lucOutputPPM_Type = "lucOutputPPM";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucOutputPPM* _lucOutputPPM_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucOutputFormat_OutputFunction*                    _output,
-		Name                                               name ) 
+lucOutputPPM* _lucOutputPPM_New(  LUCOUTPUTPPM_DEFARGS  ) 
 {
 	lucOutputPPM*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucOutputPPM) );
-	self = (lucOutputPPM*) _lucOutputFormat_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_output,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucOutputPPM) );
+	self = (lucOutputPPM*) _lucOutputFormat_New(  LUCOUTPUTFORMAT_PASSARGS  );
 	
 	return self;
 }
@@ -128,20 +102,24 @@ void* _lucOutputPPM_Copy( void* outputFormat, void* dest, Bool deep, Name nameEx
 
 
 void* _lucOutputPPM_DefaultNew( Name name ) {
-	return (void*) _lucOutputPPM_New(
-		sizeof(lucOutputPPM),
-		lucOutputPPM_Type,
-		_lucOutputPPM_Delete,
-		_lucOutputPPM_Print,
-		NULL,
-		_lucOutputPPM_DefaultNew,
-		_lucOutputPPM_AssignFromXML,
-		_lucOutputPPM_Build,
-		_lucOutputPPM_Initialise,
-		_lucOutputPPM_Execute,
-		_lucOutputPPM_Destroy,
-		_lucOutputPPM_Output,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(lucOutputPPM);
+	Type                                                      type = lucOutputPPM_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucOutputPPM_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucOutputPPM_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucOutputPPM_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucOutputPPM_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucOutputPPM_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucOutputPPM_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucOutputPPM_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucOutputPPM_Destroy;
+	lucOutputFormat_OutputFunction*                        _output = _lucOutputPPM_Output;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucOutputPPM_New(  LUCOUTPUTPPM_PASSARGS  );
 }
 
 void _lucOutputPPM_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
@@ -183,3 +161,5 @@ void _lucOutputPPM_Output( void* outputFormat, lucWindow* window, AbstractContex
 
 	Stream_CloseFile( stream );
 }
+
+

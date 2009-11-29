@@ -72,45 +72,13 @@
 const Type lucVectorArrowCrossSection_Type = "lucVectorArrowCrossSection";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucVectorArrowCrossSection* _lucVectorArrowCrossSection_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name ) 
+lucVectorArrowCrossSection* _lucVectorArrowCrossSection_New(  LUCVECTORARROWCROSSSECTION_DEFARGS  ) 
 {
 	lucVectorArrowCrossSection*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucVectorArrowCrossSection) );
-	self = (lucVectorArrowCrossSection*) _lucOpenGLDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucVectorArrowCrossSection) );
+	self = (lucVectorArrowCrossSection*) _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_PASSARGS  );
 	
 	return self;
 }
@@ -169,23 +137,27 @@ void* _lucVectorArrowCrossSection_Copy( void* drawingObject, void* dest, Bool de
 
 
 void* _lucVectorArrowCrossSection_DefaultNew( Name name ) {
-	return (void*) _lucVectorArrowCrossSection_New(
-		sizeof(lucVectorArrowCrossSection),
-		lucVectorArrowCrossSection_Type,
-		_lucVectorArrowCrossSection_Delete,
-		_lucVectorArrowCrossSection_Print,
-		NULL,
-		_lucVectorArrowCrossSection_DefaultNew,
-		_lucVectorArrowCrossSection_AssignFromXML,
-		_lucVectorArrowCrossSection_Build,
-		_lucVectorArrowCrossSection_Initialise,
-		_lucVectorArrowCrossSection_Execute,
-		_lucVectorArrowCrossSection_Destroy,
-		_lucVectorArrowCrossSection_Setup,
-		_lucVectorArrowCrossSection_Draw,
-		_lucVectorArrowCrossSection_CleanUp,
-		_lucVectorArrowCrossSection_BuildDisplayList,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucVectorArrowCrossSection);
+	Type                                                             type = lucVectorArrowCrossSection_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucVectorArrowCrossSection_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucVectorArrowCrossSection_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucVectorArrowCrossSection_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucVectorArrowCrossSection_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucVectorArrowCrossSection_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucVectorArrowCrossSection_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucVectorArrowCrossSection_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucVectorArrowCrossSection_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucVectorArrowCrossSection_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucVectorArrowCrossSection_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucVectorArrowCrossSection_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucVectorArrowCrossSection_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucVectorArrowCrossSection_New(  LUCVECTORARROWCROSSSECTION_PASSARGS  );
 }
 
 void _lucVectorArrowCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
@@ -322,3 +294,5 @@ void _lucVectorArrowCrossSection_DrawCrossSection( void* drawingObject, Dimensio
 	}
 	Stream_UnIndent( self->debugStream );
 }
+
+

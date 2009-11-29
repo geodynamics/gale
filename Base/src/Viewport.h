@@ -78,19 +78,18 @@
 		double                                             nearClipPlane,
 		double                                             farClipPlane );
 
-	lucViewport* _lucViewport_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCVIEWPORT_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define LUCVIEWPORT_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	lucViewport* _lucViewport_New(  LUCVIEWPORT_DEFARGS  );
 
 	void lucViewport_InitAll( 
 		void*                                              viewport,
@@ -125,3 +124,4 @@ void _lucViewport_AssignFromXML( void* viewport, Stg_ComponentFactory* cf, void*
 	void lucViewport_Create_MPI_Datatype() ;
 
 #endif
+

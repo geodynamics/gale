@@ -225,3 +225,5 @@ Index lucTestCameras_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, lucTestCameras_Type, "0", _lucTestCameras_DefaultNew );
 }
 
+
+

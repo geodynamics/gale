@@ -64,39 +64,13 @@
 const Type lucEncoderLibfame_Type = "lucEncoderLibfame";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucEncoderLibfame* _lucEncoderLibfame_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucOutputFormat_OutputFunction*                    _output,
-		Name                                               name ) 
+lucEncoderLibfame* _lucEncoderLibfame_New(  LUCENCODERLIBFAME_DEFARGS  ) 
 {
 	lucEncoderLibfame*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucEncoderLibfame) );
-	self = (lucEncoderLibfame*) _lucOutputFormat_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_output,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucEncoderLibfame) );
+	self = (lucEncoderLibfame*) _lucOutputFormat_New(  LUCOUTPUTFORMAT_PASSARGS  );
 	
 	return self;
 }
@@ -241,20 +215,24 @@ void* _lucEncoderLibfame_Copy( void* outputFormat, void* dest, Bool deep, Name n
 
 
 void* _lucEncoderLibfame_DefaultNew( Name name ) {
-	return (void*) _lucEncoderLibfame_New(
-		sizeof(lucEncoderLibfame),
-		lucEncoderLibfame_Type,
-		_lucEncoderLibfame_Delete,
-		_lucEncoderLibfame_Print,
-		NULL,
-		_lucEncoderLibfame_DefaultNew,
-		_lucEncoderLibfame_AssignFromXML,
-		_lucEncoderLibfame_Build,
-		_lucEncoderLibfame_Initialise,
-		_lucEncoderLibfame_Execute,
-		_lucEncoderLibfame_Destroy,
-		_lucEncoderLibfame_Output,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(lucEncoderLibfame);
+	Type                                                      type = lucEncoderLibfame_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucEncoderLibfame_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucEncoderLibfame_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucEncoderLibfame_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucEncoderLibfame_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucEncoderLibfame_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucEncoderLibfame_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucEncoderLibfame_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucEncoderLibfame_Destroy;
+	lucOutputFormat_OutputFunction*                        _output = _lucEncoderLibfame_Output;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucEncoderLibfame_New(  LUCENCODERLIBFAME_PASSARGS  );
 }
 
 void _lucEncoderLibfame_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
@@ -387,4 +365,6 @@ void _lucEncoderLibfame_Output( void* outputFormat, lucWindow* window, AbstractC
 }
 
 #endif /* HAVE_LIBFAME */
+
+
 

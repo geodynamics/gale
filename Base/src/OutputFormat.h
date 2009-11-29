@@ -61,20 +61,20 @@
 
 	struct lucOutputFormat {__lucOutputFormat};
 
-	lucOutputFormat* _lucOutputFormat_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		lucOutputFormat_OutputFunction*                    _output,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCOUTPUTFORMAT_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                lucOutputFormat_OutputFunction*  _output
+
+	#define LUCOUTPUTFORMAT_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _output
+
+	lucOutputFormat* _lucOutputFormat_New(  LUCOUTPUTFORMAT_DEFARGS  );
 
 	void lucOutputFormat_InitAll( 
 		void*                                              outputFormat,
@@ -99,3 +99,4 @@ void _lucOutputFormat_AssignFromXML( void* outputFormat, Stg_ComponentFactory* c
 	Stream* lucOutputFormat_OpenStream( void* outputFormat, lucWindow* window, void* context ) ;
 
 #endif
+

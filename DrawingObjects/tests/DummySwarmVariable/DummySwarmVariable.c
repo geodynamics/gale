@@ -131,26 +131,30 @@ void _DummySwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactor
  	DummySwarmVariable_Init( self, swarm, variable, dofCount );
 }
 
-void* _DummySwarmVariable_DefaultNew( Name name ) {
-	return _SwarmVariable_New(
-		sizeof(SwarmVariable),
-		DummySwarmVariable_Type,
-		_SwarmVariable_Delete,
-		_SwarmVariable_Print,
-		_SwarmVariable_Copy,
-		_DummySwarmVariable_DefaultNew,
-		_DummySwarmVariable_AssignFromXML,
-		_SwarmVariable_Build,
-		_SwarmVariable_Initialise,
-		_SwarmVariable_Execute,
-		_SwarmVariable_Destroy,
-		DummySwarmVariable_ValueAt,
-		DummySwarmVariable_GetMinGlobalSwarmMagnitude,
-		DummySwarmVariable_GetMaxGlobalSwarmMagnitude,
-	  	name);
+void* _DummySwarmVariable_DefaultNew( Name name_renamed ) {
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(SwarmVariable);
+	Type                                                         type = DummySwarmVariable_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _SwarmVariable_Delete;
+	Stg_Class_PrintFunction*                                   _print = _SwarmVariable_Print;
+	Stg_Class_CopyFunction*                                     _copy = _SwarmVariable_Copy;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _DummySwarmVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _DummySwarmVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _SwarmVariable_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _SwarmVariable_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _SwarmVariable_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _SwarmVariable_Destroy;
+	Name                                                         name = DummySwarmVariable_ValueAt;
+	AllocationType                                 nameAllocationType = DummySwarmVariable_GetMinGlobalSwarmMagnitude;
+	SwarmVariable_ValueAtFunction*                           _valueAt = DummySwarmVariable_GetMaxGlobalSwarmMagnitude;
+	SwarmVariable_GetGlobalValueFunction*      _getMinGlobalMagnitude = name;
+
+	return _SwarmVariable_New(  SWARMVARIABLE_PASSARGS  );
 }
 
 Index DummySwarmVariable_Register( PluginsManager* pluginsManager ) {
 	RegisterParent( DummySwarmVariable_Type, SwarmVariable_Type );
 	return PluginsManager_Submit( pluginsManager, DummySwarmVariable_Type, "0", _DummySwarmVariable_DefaultNew );
 }
+
+

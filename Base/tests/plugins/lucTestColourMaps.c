@@ -92,3 +92,5 @@ Index lucTestColourMaps_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, lucTestColourMaps_Type, "0", _lucTestColourMaps_DefaultNew );
 }
 
+
+

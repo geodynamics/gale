@@ -69,45 +69,13 @@ void CPSEnableForegroundOperation( void* psn );
 const Type lucCarbonWindow_Type = "lucCarbonWindow";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucCarbonWindow* _lucCarbonWindow_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucWindow_DisplayFunction*						   _displayWindow,	
-		lucWindow_EventsWaitingFunction*				   _eventsWaiting,	
-		lucWindow_EventProcessorFunction*				   _eventProcessor,	
-		lucWindow_ResizeFunction*						   _resizeWindow,	
-		Name                                               name ) 
+lucCarbonWindow* _lucCarbonWindow_New(  LUCCARBONWINDOW_DEFARGS  ) 
 {
 	lucCarbonWindow*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucCarbonWindow) );
-	self = (lucCarbonWindow*) _lucWindow_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_displayWindow,		
-			_eventsWaiting,		
-			_eventProcessor,	
-			_resizeWindow,		
-			name );
+	assert( _sizeOfSelf >= sizeof(lucCarbonWindow) );
+	self = (lucCarbonWindow*) _lucWindow_New(  LUCWINDOW_PASSARGS  );
 	
 	return self;
 }
@@ -146,23 +114,27 @@ void* _lucCarbonWindow_Copy( void* window, void* dest, Bool deep, Name nameExt, 
 
 
 void* _lucCarbonWindow_DefaultNew( Name name ) {
-	return (void*) _lucCarbonWindow_New(
-		sizeof(lucCarbonWindow),
-		lucCarbonWindow_Type,
-		_lucCarbonWindow_Delete,
-		_lucCarbonWindow_Print,
-		NULL,
-		_lucCarbonWindow_DefaultNew,
-		_lucCarbonWindow_AssignFromXML,
-		_lucCarbonWindow_Build,
-		_lucCarbonWindow_Initialise,
-		_lucCarbonWindow_Execute,
-		_lucCarbonWindow_Destroy,
-		_lucCarbonWindow_Display,
-		_lucCarbonWindow_EventsWaiting,
-		_lucCarbonWindow_EventProcessor,
-		_lucCarbonWindow_Resize,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(lucCarbonWindow);
+	Type                                                      type = lucCarbonWindow_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucCarbonWindow_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucCarbonWindow_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucCarbonWindow_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucCarbonWindow_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucCarbonWindow_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucCarbonWindow_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucCarbonWindow_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucCarbonWindow_Destroy;
+	lucWindow_DisplayFunction*                      _displayWindow = _lucCarbonWindow_Display;
+	lucWindow_EventsWaitingFunction*                _eventsWaiting = _lucCarbonWindow_EventsWaiting;
+	lucWindow_EventProcessorFunction*              _eventProcessor = _lucCarbonWindow_EventProcessor;
+	lucWindow_ResizeFunction*                        _resizeWindow = _lucCarbonWindow_Resize;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucCarbonWindow_New(  LUCCARBONWINDOW_PASSARGS  );
 }
 
 void _lucCarbonWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data ){
@@ -524,3 +496,5 @@ void lucCarbonWindow_GetPixelIndicies( lucCarbonWindow* self, Point* point, Pixe
 }
 
 #endif
+
+
