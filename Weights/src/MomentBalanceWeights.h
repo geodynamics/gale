@@ -67,13 +67,7 @@ extern const Type MomentBalanceWeights_Type;
 
 	struct MomentBalanceWeights { __MomentBalanceWeights };
 
-	#define MOMENTBALANCEWEIGHTS_DEFARGS \
-		WEIGHTSCALCULATOR_DEFARGS, \
-			WeightsCalculator*	backupWeights
 
-	#define MOMENTBALANCEWEIGHTS_PASSARGS \
-		WEIGHTSCALCULATOR_PASSARG, \
-			backupWeights
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Constructors
@@ -81,7 +75,18 @@ extern const Type MomentBalanceWeights_Type;
 
 	MomentBalanceWeights* MomentBalanceWeights_New( Name name, Dimension_Index dim, WeightsCalculator* backupWeights );
 
-	MomentBalanceWeights* _MomentBalanceWeights_New( MOMENTBALANCEWEIGHTS_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MOMENTBALANCEWEIGHTS_DEFARGS \
+                WEIGHTSCALCULATOR_DEFARGS
+
+	#define MOMENTBALANCEWEIGHTS_PASSARGS \
+                WEIGHTSCALCULATOR_PASSARGS
+
+	MomentBalanceWeights* _MomentBalanceWeights_New(  MOMENTBALANCEWEIGHTS_DEFARGS  );
 
 	/* Stg_Class implementation */
 	void _MomentBalanceWeights_Delete( void* momentBalanceWeights );
@@ -121,3 +126,4 @@ extern const Type MomentBalanceWeights_Type;
         
         
 #endif 
+

@@ -117,3 +117,5 @@ void IterativeWeightsSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, IterativeWeightsSuite_TestCircleInterface );
    pcu_suite_addTest( suite, IterativeWeightsSuite_TestExponentialInterface );
 }
+
+

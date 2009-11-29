@@ -56,54 +56,14 @@
 
 const Type MaterialFeVariable_Type = "MaterialFeVariable";
 
-MaterialFeVariable* _MaterialFeVariable_New(
- 		SizeT                                             _sizeOfSelf,
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-		Name                                              name )
+MaterialFeVariable* _MaterialFeVariable_New(  MATERIALFEVARIABLE_DEFARGS  )
 {
 	MaterialFeVariable*		self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(MaterialFeVariable) );
 	self = (MaterialFeVariable*)
-		_ParticleFeVariable_New(
-			_sizeOfSelf, 
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute, 
-			_destroy,
-			_interpolateValueAt,
-			_getMinGlobalFeMagnitude, 
-			_getMaxGlobalFeMagnitude,
-			_getMinAndMaxLocalCoords, 
-			_getMinAndMaxGlobalCoords,
-			_interpolateWithinElement,
-			_getValueAtNode,
-			_valueAtParticle,
-			name );
+		_ParticleFeVariable_New(  PARTICLEFEVARIABLE_PASSARGS  );
 	
 	return self;
 }
@@ -151,27 +111,32 @@ void* _MaterialFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name na
 }
 
 void* _MaterialFeVariable_DefaultNew( Name name ) {
-	return (void*) _MaterialFeVariable_New(
-		sizeof(MaterialFeVariable),
-		MaterialFeVariable_Type,
-		_MaterialFeVariable_Delete,
-		_MaterialFeVariable_Print,
-		_MaterialFeVariable_Copy,
-		_MaterialFeVariable_DefaultNew,
-		_MaterialFeVariable_AssignFromXML,
-		_MaterialFeVariable_Build, 
-		_MaterialFeVariable_Initialise,
-		_MaterialFeVariable_Execute,
-		_MaterialFeVariable_Destroy,
-		_FeVariable_InterpolateValueAt,
-		_FeVariable_GetMinGlobalFieldMagnitude,
-		_FeVariable_GetMaxGlobalFieldMagnitude,
-		_FeVariable_GetMinAndMaxLocalCoords,
-		_FeVariable_GetMinAndMaxGlobalCoords,
-		_FeVariable_InterpolateNodeValuesToElLocalCoord,
-		_FeVariable_GetValueAtNode,
-		_MaterialFeVariable_ValueAtParticle,
-		name );
+	/* Variables set in this function */
+	SizeT                                                       _sizeOfSelf = sizeof(MaterialFeVariable);
+	Type                                                               type = MaterialFeVariable_Type;
+	Stg_Class_DeleteFunction*                                       _delete = _MaterialFeVariable_Delete;
+	Stg_Class_PrintFunction*                                         _print = _MaterialFeVariable_Print;
+	Stg_Class_CopyFunction*                                           _copy = _MaterialFeVariable_Copy;
+	Stg_Component_DefaultConstructorFunction*           _defaultConstructor = _MaterialFeVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                             _construct = _MaterialFeVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                                     _build = _MaterialFeVariable_Build;
+	Stg_Component_InitialiseFunction*                           _initialise = _MaterialFeVariable_Initialise;
+	Stg_Component_ExecuteFunction*                                 _execute = _MaterialFeVariable_Execute;
+	Stg_Component_DestroyFunction*                                 _destroy = _MaterialFeVariable_Destroy;
+	FieldVariable_InterpolateValueAtFunction*           _interpolateValueAt = _FeVariable_InterpolateValueAt;
+	FieldVariable_GetCoordFunction*                _getMinAndMaxLocalCoords = _FeVariable_GetMinAndMaxLocalCoords;
+	FieldVariable_GetCoordFunction*               _getMinAndMaxGlobalCoords = _FeVariable_GetMinAndMaxGlobalCoords;
+	FeVariable_InterpolateWithinElementFunction*  _interpolateWithinElement = _FeVariable_InterpolateNodeValuesToElLocalCoord;
+	FeVariable_GetValueAtNodeFunction*                      _getValueAtNode = _FeVariable_GetValueAtNode;
+	ParticleFeVariable_ValueAtParticleFunction*            _valueAtParticle = _MaterialFeVariable_ValueAtParticle;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType                             nameAllocationType = ZERO;
+	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = ZERO;
+	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
+	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
+
+	return (void*) _MaterialFeVariable_New(  MATERIALFEVARIABLE_PASSARGS  );
 }
 
 void _MaterialFeVariable_AssignFromXML( void* materialFeVariable, Stg_ComponentFactory* cf, void* data ){
@@ -244,4 +209,6 @@ void _MaterialFeVariable_ValueAtParticle(
 	MaterialFeVariable* self = (MaterialFeVariable*) materialFeVariable;
 	*particleValue = (double) ( self->material->index == IntegrationPointsSwarm_GetMaterialIndexOn( swarm, particle ) );
 }
+
+
 

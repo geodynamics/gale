@@ -63,11 +63,7 @@
 
 	struct CoincidentMapper { __CoincidentMapper };
 
-	#define COINCIDENTMAPPER_DEFARGS \
-		ONETOONEMAPPER_DEFARGS
 
-	#define COINCIDENTMAPPER_PASSARGS \
-		ONETOONEMAPPER_PASSARGS
 
 	CoincidentMapper* CoincidentMapper_New(
 		Name							name,
@@ -75,7 +71,18 @@
 		IntegrationPointsSwarm*	integrationSwarm,
 		MaterialPointsSwarm*		materialSwarm);	
 	
-	CoincidentMapper* _CoincidentMapper_New( COINCIDENTMAPPER_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define COINCIDENTMAPPER_DEFARGS \
+                ONETOONEMAPPER_DEFARGS
+
+	#define COINCIDENTMAPPER_PASSARGS \
+                ONETOONEMAPPER_PASSARGS
+
+	CoincidentMapper* _CoincidentMapper_New(  COINCIDENTMAPPER_DEFARGS  );
 
 	void _CoincidentMapper_Init( void* mapper );
 
@@ -105,3 +112,4 @@
 	void _CoincidentMapper_Map( void* mapper );
 	
 #endif
+

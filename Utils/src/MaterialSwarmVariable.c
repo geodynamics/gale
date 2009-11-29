@@ -79,32 +79,33 @@ MaterialSwarmVariable* MaterialSwarmVariable_New(
 }
 
 void* _MaterialSwarmVariable_DefaultNew( Name name ) {
-	return (void*)_MaterialSwarmVariable_New( 
-		sizeof(MaterialSwarmVariable), 
-		MaterialSwarmVariable_Type,
-		_MaterialSwarmVariable_Delete,
-		_MaterialSwarmVariable_Print,
-		NULL,
-		_MaterialSwarmVariable_DefaultNew,
-		_MaterialSwarmVariable_AssignFromXML,
-		_MaterialSwarmVariable_Build,
-		_MaterialSwarmVariable_Initialise,
-		_MaterialSwarmVariable_Execute,
-		_MaterialSwarmVariable_Destroy,
-		name,
-		NON_GLOBAL,
-		_MaterialSwarmVariable_ValueAt,
-		_MaterialSwarmVariable_GetMinGlobalMagnitude,
-		_MaterialSwarmVariable_GetMaxGlobalMagnitude );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(MaterialSwarmVariable);
+	Type                                                         type = MaterialSwarmVariable_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _MaterialSwarmVariable_Delete;
+	Stg_Class_PrintFunction*                                   _print = _MaterialSwarmVariable_Print;
+	Stg_Class_CopyFunction*                                     _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _MaterialSwarmVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _MaterialSwarmVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _MaterialSwarmVariable_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _MaterialSwarmVariable_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _MaterialSwarmVariable_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _MaterialSwarmVariable_Destroy;
+	AllocationType                                 nameAllocationType = NON_GLOBAL;
+	SwarmVariable_ValueAtFunction*                           _valueAt = _MaterialSwarmVariable_ValueAt;
+	SwarmVariable_GetGlobalValueFunction*      _getMinGlobalMagnitude = _MaterialSwarmVariable_GetMinGlobalMagnitude;
+	SwarmVariable_GetGlobalValueFunction*      _getMaxGlobalMagnitude = _MaterialSwarmVariable_GetMaxGlobalMagnitude;
+
+	return (void*)_MaterialSwarmVariable_New(  MATERIALSWARMVARIABLE_PASSARGS  );
 }
 
 /* Creation implementation / Virtual constructor */
-MaterialSwarmVariable* _MaterialSwarmVariable_New( MATERIALSWARMVARIABLE_DEFARGS ) {
+MaterialSwarmVariable* _MaterialSwarmVariable_New(  MATERIALSWARMVARIABLE_DEFARGS  ) {
 	MaterialSwarmVariable* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(MaterialSwarmVariable) );
-	self = (MaterialSwarmVariable*) _SwarmVariable_New( SWARMVARIABLE_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(MaterialSwarmVariable) );
+	self = (MaterialSwarmVariable*) _SwarmVariable_New(  SWARMVARIABLE_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -203,3 +204,5 @@ double _MaterialSwarmVariable_GetMaxGlobalMagnitude( void* swarmVariable ) {
 }
 	
 	
+
+

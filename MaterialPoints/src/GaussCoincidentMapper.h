@@ -63,11 +63,7 @@
 
 	struct GaussCoincidentMapper { __GaussCoincidentMapper };
 
-	#define GAUSSCOINCIDENTMAPPER_DEFARGS \
-		ONETOONEMAPPER_DEFARGS
 
-	#define GAUSSCOINCIDENTMAPPER_PASSARGS \
-		ONETOONEMAPPER_PASSARGS
 
 	GaussCoincidentMapper* GaussCoincidentMapper_New(
 		Name							name,
@@ -75,7 +71,18 @@
 		IntegrationPointsSwarm*	integrationSwarm,
 		MaterialPointsSwarm*		materialSwarm);	
 	
-	GaussCoincidentMapper* _GaussCoincidentMapper_New( GAUSSCOINCIDENTMAPPER_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define GAUSSCOINCIDENTMAPPER_DEFARGS \
+                ONETOONEMAPPER_DEFARGS
+
+	#define GAUSSCOINCIDENTMAPPER_PASSARGS \
+                ONETOONEMAPPER_PASSARGS
+
+	GaussCoincidentMapper* _GaussCoincidentMapper_New(  GAUSSCOINCIDENTMAPPER_DEFARGS  );
 
 	void _GaussCoincidentMapper_Init( void* mapper );
 
@@ -105,3 +112,4 @@
 	void _GaussCoincidentMapper_Map( void* mapper );
 	
 #endif
+

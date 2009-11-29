@@ -69,29 +69,18 @@
 		MaterialPointsSwarm*                                swarm,
 		Index                                               dofCount );
 */	
-	SwarmVariableField* _SwarmVariableField_New( 
-		SizeT                                             sizeOfSelf,  
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*             	  _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*             	  _getMinAndMaxGlobalCoords,
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*	  	  _getValueAtNode,
-		/*SwarmVariableField_GetValueAtNodeFunction*	  _getValueAtNode,*/
-		/*SwarmVariableField_ValueAtParticleFunction*       _valueAtParticle,*/
-		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-		Name                                              name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SWARMVARIABLEFIELD_DEFARGS \
+                PARTICLEFEVARIABLE_DEFARGS
+
+	#define SWARMVARIABLEFIELD_PASSARGS \
+                PARTICLEFEVARIABLE_PASSARGS
+
+	SwarmVariableField* _SwarmVariableField_New(  SWARMVARIABLEFIELD_DEFARGS  );
 	
 	void _SwarmVariableField_Delete( void* swarmVariable );
 	void _SwarmVariableField_Print( void* swarmVariable, Stream* stream );
@@ -113,3 +102,4 @@
 	void _SwarmVariableField_ValueAtParticle( void* swarmVariableField, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, /*Particle_Index lParticle_I*/ IntegrationPoint* particle, double* value );
 	
 #endif
+

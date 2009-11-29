@@ -73,39 +73,13 @@ DiffusionSMT* DiffusionSMT_New(
 }
 
 /* Creation implementation / Virtual constructor */
-DiffusionSMT* _DiffusionSMT_New( 
-    SizeT                                               sizeOfSelf,  
-    Type                                                type,
-    Stg_Class_DeleteFunction*                           _delete,
-    Stg_Class_PrintFunction*                            _print,
-    Stg_Class_CopyFunction*                             _copy, 
-    Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-    Stg_Component_ConstructFunction*                    _construct,
-    Stg_Component_BuildFunction*                        _build,
-    Stg_Component_InitialiseFunction*                   _initialise,
-    Stg_Component_ExecuteFunction*                      _execute,
-    Stg_Component_DestroyFunction*                      _destroy,
-    StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,
-    Name                                                name )
+DiffusionSMT* _DiffusionSMT_New(  DIFFUSIONSMT_DEFARGS  )
 {
     DiffusionSMT* self;
 	
     /* Allocate memory */
-    assert( sizeOfSelf >= sizeof(DiffusionSMT) );
-    self = (DiffusionSMT*) _StiffnessMatrixTerm_New( 
-	sizeOfSelf, 
-	type, 
-	_delete, 
-	_print, 
-	_copy,
-	_defaultConstructor,
-	_construct,
-	_build, 
-	_initialise,
-	_execute,
-	_destroy,
-	_assembleElement,
-	name );
+    assert( _sizeOfSelf >= sizeof(DiffusionSMT) );
+    self = (DiffusionSMT*) _StiffnessMatrixTerm_New(  STIFFNESSMATRIXTERM_PASSARGS  );
 	
     /* Virtual info */
 	
@@ -135,20 +109,24 @@ void _DiffusionSMT_Print( void* matrixTerm, Stream* stream ) {
 }
 
 void* _DiffusionSMT_DefaultNew( Name name ) {
-    return (void*)_DiffusionSMT_New( 
-	sizeof(DiffusionSMT), 
-	DiffusionSMT_Type,
-	_DiffusionSMT_Delete,
-	_DiffusionSMT_Print,
-	NULL,
-	_DiffusionSMT_DefaultNew,
-	_DiffusionSMT_AssignFromXML,
-	_DiffusionSMT_Build,
-	_DiffusionSMT_Initialise,
-	_DiffusionSMT_Execute,
-	_DiffusionSMT_Destroy,
-	_DiffusionSMT_AssembleElement,
-	name );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(DiffusionSMT);
+	Type                                                         type = DiffusionSMT_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _DiffusionSMT_Delete;
+	Stg_Class_PrintFunction*                                   _print = _DiffusionSMT_Print;
+	Stg_Class_CopyFunction*                                     _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _DiffusionSMT_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _DiffusionSMT_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _DiffusionSMT_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _DiffusionSMT_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _DiffusionSMT_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _DiffusionSMT_Destroy;
+	StiffnessMatrixTerm_AssembleElementFunction*     _assembleElement = _DiffusionSMT_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+    return (void*)_DiffusionSMT_New(  DIFFUSIONSMT_PASSARGS  );
 }
 
 void _DiffusionSMT_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
@@ -316,3 +294,5 @@ void _DiffusionSMT_AssembleElement(
 	
     Memory_Free(GNx); 
 }
+
+

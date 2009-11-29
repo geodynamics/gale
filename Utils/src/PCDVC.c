@@ -137,14 +137,14 @@ PCDVC* PCDVC_New( Name name, Dimension_Index dim, int* res,
                  Inflow, CentPosRatio, ParticlesPerCell, Threshold );
 }
 
-PCDVC* _PCDVC_New( PCDVC_DEFARGS ) {
+PCDVC* _PCDVC_New(  PCDVC_DEFARGS  ) {
     PCDVC* self;
 
     /* Allocate memory */
-    assert( sizeOfSelf >= sizeof(PCDVC) );
+    assert( _sizeOfSelf >= sizeof(PCDVC) );
 
     /* Initialise the parent class. Every class has a parent, bar Stg_Component, which needs to be called */
-    self = (PCDVC*)_DVCWeights_New( DVCWEIGHTS_PASSARGS );
+    self = (PCDVC*)_DVCWeights_New(  DVCWEIGHTS_PASSARGS  );
 
     /* General info */
 
@@ -201,23 +201,22 @@ void* _PCDVC_Copy( void* pcdvc, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 }
 
 void* _PCDVC_DefaultNew( Name name ) {
-    return (void*) _PCDVC_New(
-        sizeof(PCDVC),
-        PCDVC_Type,
-        _PCDVC_Delete,
-        _PCDVC_Print,
-        _PCDVC_Copy,
-        _PCDVC_DefaultNew,
-        _PCDVC_AssignFromXML,
-        _PCDVC_Build,
-        _PCDVC_Initialise,
-        _PCDVC_Execute,
-        NULL,
-        name,
-        NON_GLOBAL,
-        _PCDVC_Calculate,
-        0, NULL, NULL, 0.0, 0.0, 0, 0, False, False, False,
-        0.0, 0, 0.0 );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(PCDVC);
+	Type                                                         type = PCDVC_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _PCDVC_Delete;
+	Stg_Class_PrintFunction*                                   _print = _PCDVC_Print;
+	Stg_Class_CopyFunction*                                     _copy = _PCDVC_Copy;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _PCDVC_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _PCDVC_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _PCDVC_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _PCDVC_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _PCDVC_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = NULL;
+	AllocationType                                 nameAllocationType = NON_GLOBAL;
+	WeightsCalculator_CalculateFunction*                   _calculate = _PCDVC_Calculate;
+
+    return (void*) _PCDVC_New(  PCDVC_PASSARGS  );
 }
 
 
@@ -1597,4 +1596,6 @@ void _PCDVC_Calculate( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ){
 /*-------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
 */
+
+
 

@@ -59,47 +59,13 @@ MappedParticleLayout* MappedParticleLayout_New(
    _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
    _MappedParticleLayout_Init( self );
 }
-MappedParticleLayout* _MappedParticleLayout_New( 
-      SizeT                                            _sizeOfSelf,
-      Type                                             type,
-      Stg_Class_DeleteFunction*                        _delete,
-      Stg_Class_PrintFunction*                         _print,
-      Stg_Class_CopyFunction*                          _copy, 
-      Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-      Stg_Component_ConstructFunction*                 _construct,
-      Stg_Component_BuildFunction*                     _build,
-      Stg_Component_InitialiseFunction*                _initialise,
-      Stg_Component_ExecuteFunction*                   _execute,
-      Stg_Component_DestroyFunction*                   _destroy,
-      Name                                             name,
-      AllocationType                                   nameAllocationType,
-      ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-      ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-      CoordSystem                                      coordSystem,
-      Bool                                             weightsInitialisedAtStartup )
+MappedParticleLayout* _MappedParticleLayout_New(  MAPPEDPARTICLELAYOUT_DEFARGS  )
 {
    MappedParticleLayout*		self;
 
    /* Allocate memory */
    assert( _sizeOfSelf >= sizeof(MappedParticleLayout) );
-   self = (MappedParticleLayout*)_ParticleLayout_New( 
-      _sizeOfSelf, 
-      type, 
-      _delete, 
-      _print, 
-      _copy, 
-      _defaultConstructor,
-      _construct, 
-      _build, 
-      _initialise, 
-      _execute, 
-      _destroy, 
-      name,
-      nameAllocationType,
-      _setInitialCounts, 
-      _initialiseParticles, 
-      coordSystem,
-      weightsInitialisedAtStartup );
+   self = (MappedParticleLayout*)_ParticleLayout_New(  PARTICLELAYOUT_PASSARGS  );
 
    return self;
 }
@@ -137,22 +103,25 @@ void* _MappedParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, N
 }
 
 void* _MappedParticleLayout_DefaultNew( Name name ) {
-    return _MappedParticleLayout_New(
-        sizeof(MappedParticleLayout),
-        MappedParticleLayout_Type,
-        _MappedParticleLayout_Delete,
-        _MappedParticleLayout_Print,
-        _MappedParticleLayout_Copy,
-        _MappedParticleLayout_DefaultNew,
-        _MappedParticleLayout_AssignFromXML,
-        _MappedParticleLayout_Build,
-        _MappedParticleLayout_Initialise,
-        _MappedParticleLayout_Execute,
-        _MappedParticleLayout_Destroy,
-        name, NON_GLOBAL, 
-        _MappedParticleLayout_SetInitialCounts,
-        _MappedParticleLayout_InitialiseParticles,
-        LocalCoordSystem, False );
+	/* Variables set in this function */
+	SizeT                                                        _sizeOfSelf = sizeof(MappedParticleLayout);
+	Type                                                                type = MappedParticleLayout_Type;
+	Stg_Class_DeleteFunction*                                        _delete = _MappedParticleLayout_Delete;
+	Stg_Class_PrintFunction*                                          _print = _MappedParticleLayout_Print;
+	Stg_Class_CopyFunction*                                            _copy = _MappedParticleLayout_Copy;
+	Stg_Component_DefaultConstructorFunction*            _defaultConstructor = _MappedParticleLayout_DefaultNew;
+	Stg_Component_ConstructFunction*                              _construct = _MappedParticleLayout_AssignFromXML;
+	Stg_Component_BuildFunction*                                      _build = _MappedParticleLayout_Build;
+	Stg_Component_InitialiseFunction*                            _initialise = _MappedParticleLayout_Initialise;
+	Stg_Component_ExecuteFunction*                                  _execute = _MappedParticleLayout_Execute;
+	Stg_Component_DestroyFunction*                                  _destroy = _MappedParticleLayout_Destroy;
+	AllocationType                                        nameAllocationType = NON_GLOBAL;
+	ParticleLayout_SetInitialCountsFunction*               _setInitialCounts = _MappedParticleLayout_SetInitialCounts;
+	ParticleLayout_InitialiseParticlesFunction*         _initialiseParticles = _MappedParticleLayout_InitialiseParticles;
+	CoordSystem                                                  coordSystem = LocalCoordSystem;
+	Bool                                         weightsInitialisedAtStartup = False;
+
+    return _MappedParticleLayout_New(  MAPPEDPARTICLELAYOUT_PASSARGS  );
 }
 void  _MappedParticleLayout_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
     MappedParticleLayout*		self = (MappedParticleLayout*)component;
@@ -197,4 +166,6 @@ void _MappedParticleLayout_InitialiseParticles( void* particleLayout, void* _swa
 {
     /* Don't need to do anything */
 }
+
+
 

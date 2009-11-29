@@ -62,12 +62,12 @@ const Type WeightsCalculator_Type = "WeightsCalculator";
 */
 
 
-WeightsCalculator* _WeightsCalculator_New( WEIGHTSCALCULATOR_DEFARGS ) {
+WeightsCalculator* _WeightsCalculator_New(  WEIGHTSCALCULATOR_DEFARGS  ) {
     WeightsCalculator* self;
 
     /* Allocate memory */
-    assert( sizeOfSelf >= sizeof(WeightsCalculator) );
-    self = (WeightsCalculator*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+    assert( _sizeOfSelf >= sizeof(WeightsCalculator) );
+    self = (WeightsCalculator*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
     /* General info */
 
@@ -456,3 +456,5 @@ void WeightsCalculator_CheckEmptyCell( void* weightsCalculator, void* _swarm, Ce
     }
 }
                         
+
+

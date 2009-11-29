@@ -79,20 +79,20 @@
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Constructors
 	*/
-	EscapedRoutine* _EscapedRoutine_New(
-		SizeT                                      _sizeOfSelf, 
-		Type                                       type,
-		Stg_Class_DeleteFunction*                  _delete,
-		Stg_Class_PrintFunction*                   _print,
-		Stg_Class_CopyFunction*                    _copy, 
-		Stg_Component_DefaultConstructorFunction*  _defaultConstructor,
-		Stg_Component_ConstructFunction*           _construct,
-		Stg_Component_BuildFunction*               _build,
-		Stg_Component_InitialiseFunction*          _initialise,
-		Stg_Component_ExecuteFunction*             _execute,
-		Stg_Component_DestroyFunction*             _destroy,		
-		EscapedRoutine_SelectFunction*     	   _select,
-		Name                                       name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ESCAPEDROUTINE_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                EscapedRoutine_SelectFunction*  _select
+
+	#define ESCAPEDROUTINE_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _select
+
+	EscapedRoutine* _EscapedRoutine_New(  ESCAPEDROUTINE_DEFARGS  );
 
 	void* _EscapedRoutine_DefaultNew( Name name );
 	
@@ -126,3 +126,4 @@
 	void EscapedRoutine_RemoveParticles( void* escapedRoutine, Swarm* swarm ) ;
 
 #endif 
+

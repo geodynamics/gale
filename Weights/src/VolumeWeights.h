@@ -49,18 +49,22 @@ struct VolumeWeights { __VolumeWeights };
 ** Constructors
 */
 
-#define VOLUMEWEIGHTS_DEFARGS                   \
-    WEIGHTSCALCULATOR_DEFARGS,                  \
-        Stg_Shape* shape,                       \
-        FeMesh* mesh
 
-#define VOLUMEWEIGHTS_PASSARGS                  \
-    WEIGHTSCALCULATOR_PASSARGS,                 \
-        shape, mesh
 
 VolumeWeights* VolumeWeights_New( Name name, Dimension_Index dim, Stg_Shape* shape, FeMesh* mesh );
 
-VolumeWeights* _VolumeWeights_New( VOLUMEWEIGHTS_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define VOLUMEWEIGHTS_DEFARGS \
+                WEIGHTSCALCULATOR_DEFARGS
+
+	#define VOLUMEWEIGHTS_PASSARGS \
+                WEIGHTSCALCULATOR_PASSARGS
+
+VolumeWeights* _VolumeWeights_New(  VOLUMEWEIGHTS_DEFARGS  );
 
 void _VolumeWeights_Init( void* weights, Stg_Shape* shape, FeMesh* mesh ) ;
 
@@ -85,3 +89,4 @@ void _VolumeWeights_Calculate( void* weights, void* _swarm, Cell_LocalIndex lCel
         
         
 #endif 
+

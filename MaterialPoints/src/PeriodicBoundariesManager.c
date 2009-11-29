@@ -79,30 +79,28 @@ PeriodicBoundariesManager* PeriodicBoundariesManager_New(
 }	
 
 void* _PeriodicBoundariesManager_DefaultNew( Name name ) {
-	return (void*) _PeriodicBoundariesManager_New(
-		sizeof(PeriodicBoundariesManager),
-		PeriodicBoundariesManager_Type,
-		_PeriodicBoundariesManager_Delete,
-		_PeriodicBoundariesManager_Print,
-		NULL, 
-		_PeriodicBoundariesManager_DefaultNew,
-		_PeriodicBoundariesManager_AssignFromXML,
-		_PeriodicBoundariesManager_Build,
-		_PeriodicBoundariesManager_Initialise,
-		_PeriodicBoundariesManager_Execute,
-		_PeriodicBoundariesManager_Destroy,
-		name,
-		NON_GLOBAL,
-		NULL,
-		NULL,
-		NULL);
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(PeriodicBoundariesManager);
+	Type                                                      type = PeriodicBoundariesManager_Type;
+	Stg_Class_DeleteFunction*                              _delete = _PeriodicBoundariesManager_Delete;
+	Stg_Class_PrintFunction*                                _print = _PeriodicBoundariesManager_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _PeriodicBoundariesManager_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _PeriodicBoundariesManager_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _PeriodicBoundariesManager_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _PeriodicBoundariesManager_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _PeriodicBoundariesManager_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _PeriodicBoundariesManager_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
+	return (void*) _PeriodicBoundariesManager_New(  PERIODICBOUNDARIESMANAGER_PASSARGS  );
 }
 
-PeriodicBoundariesManager* _PeriodicBoundariesManager_New( PERIODICBOUNDARIESMANAGER_DEFARGS ) {
+PeriodicBoundariesManager* _PeriodicBoundariesManager_New(  PERIODICBOUNDARIESMANAGER_DEFARGS  ) {
 	PeriodicBoundariesManager* self;
 	
 	/* Allocate memory */
-	self = (PeriodicBoundariesManager*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	self = (PeriodicBoundariesManager*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* General info */
 	
@@ -367,4 +365,6 @@ void PeriodicBoundariesManager_UpdateParticle( void* periodicBCsManager, Particl
 		Stream_UnIndent( self->debug );
 	}
 }	
+
+
 

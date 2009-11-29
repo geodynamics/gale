@@ -114,25 +114,7 @@ struct deleteParticle{
 ** Constructors
 */
 
-#define PCDVC_DEFARGS                                   \
-    DVCWEIGHTS_DEFARGS,                                 \
-        MaterialPointsSwarm*                  mps,      \
-        double                                upT,      \
-        double                                lowT,     \
-        int maxDeletions,                               \
-        int maxSplits,                                  \
-        Bool splitInInterfaceCells,                     \
-        Bool deleteInInterfaceCells,                    \
-        Bool Inflow,                                    \
-        double CentPosRatio,                            \
-        int ParticlesPerCell,                           \
-        double Threshold
 
-#define PCDVC_PASSARGS                                                  \
-    DVCWEIGHTS_PASSARGS,                                                \
-        mps, upT, lowT, maxDeletions, maxSplits, splitInInterfaceCells, \
-        deleteInInterfaceCells, Inflow, CentPosRatio, ParticlesPerCell, \
-        Threshold
 
 PCDVC* PCDVC_New( Name name, Dimension_Index dim, int* res,
                   MaterialPointsSwarm* mps, double upT, double lowT,
@@ -141,7 +123,18 @@ PCDVC* PCDVC_New( Name name, Dimension_Index dim, int* res,
                   int ParticlesPerCell, double Threshold ) ;
 
 
-PCDVC* _PCDVC_New( PCDVC_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PCDVC_DEFARGS \
+                DVCWEIGHTS_DEFARGS
+
+	#define PCDVC_PASSARGS \
+                DVCWEIGHTS_PASSARGS
+
+PCDVC* _PCDVC_New(  PCDVC_DEFARGS  );
 
 void _PCDVC_Init( void* pcdvc, MaterialPointsSwarm* mps, double upT, double lowT,
                   int maxDeletions, int maxSplits, Bool splitInInterfaceCells,
@@ -175,3 +168,4 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I );
 void _PCDVC_Calculate( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) ;
 
 #endif
+

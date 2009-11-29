@@ -542,3 +542,5 @@ void DVCWeightsSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, DVCWeightsSuite_TestGetCentroids2D );
    pcu_suite_addTest( suite, DVCWeightsSuite_TestDistanceSquared2D );
 }
+
+

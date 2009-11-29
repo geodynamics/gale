@@ -82,32 +82,31 @@ CoincidentMapper* CoincidentMapper_New(
 }
 
 void* _CoincidentMapper_DefaultNew( Name name ) {
-	return _CoincidentMapper_New(
-		sizeof(CoincidentMapper),
-		CoincidentMapper_Type,
-		_CoincidentMapper_Delete,
-		_CoincidentMapper_Print,
-		_CoincidentMapper_Copy,
-		_CoincidentMapper_DefaultNew,
-		_CoincidentMapper_AssignFromXML,
-		_CoincidentMapper_Build,
-		_CoincidentMapper_Initialise,
-		_CoincidentMapper_Execute,
-		_CoincidentMapper_Destroy,
-		name,
-		NON_GLOBAL,
-		_CoincidentMapper_Map,
-		_OneToOneMapper_GetMaterialPointsSwarms,
-		_OneToOneMapper_GetMaterialIndexOn,
-		_OneToOneMapper_GetExtensionOn,
-		NULL,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                                                 _sizeOfSelf = sizeof(CoincidentMapper);
+	Type                                                                         type = CoincidentMapper_Type;
+	Stg_Class_DeleteFunction*                                                 _delete = _CoincidentMapper_Delete;
+	Stg_Class_PrintFunction*                                                   _print = _CoincidentMapper_Print;
+	Stg_Class_CopyFunction*                                                     _copy = _CoincidentMapper_Copy;
+	Stg_Component_DefaultConstructorFunction*                     _defaultConstructor = _CoincidentMapper_DefaultNew;
+	Stg_Component_ConstructFunction*                                       _construct = _CoincidentMapper_AssignFromXML;
+	Stg_Component_BuildFunction*                                               _build = _CoincidentMapper_Build;
+	Stg_Component_InitialiseFunction*                                     _initialise = _CoincidentMapper_Initialise;
+	Stg_Component_ExecuteFunction*                                           _execute = _CoincidentMapper_Execute;
+	Stg_Component_DestroyFunction*                                           _destroy = _CoincidentMapper_Destroy;
+	AllocationType                                                 nameAllocationType = NON_GLOBAL;
+	IntegrationPointMapper_MapFunction*                                          _map = _CoincidentMapper_Map;
+	IntegrationPointMapper_GetMaterialPointsSwarmsFunction*  _getMaterialPointsSwarms = _OneToOneMapper_GetMaterialPointsSwarms;
+	IntegrationPointMapper_GetMaterialIndexOnFunction*            _getMaterialIndexOn = _OneToOneMapper_GetMaterialIndexOn;
+	IntegrationPointMapper_GetExtensionOnFunction*                    _getExtensionOn = _OneToOneMapper_GetExtensionOn;
+
+	return _CoincidentMapper_New(  COINCIDENTMAPPER_PASSARGS  );
 }
 
-CoincidentMapper* _CoincidentMapper_New( COINCIDENTMAPPER_DEFARGS ) {
+CoincidentMapper* _CoincidentMapper_New(  COINCIDENTMAPPER_DEFARGS  ) {
 	CoincidentMapper* result;
 
-	result = (CoincidentMapper*)_OneToOneMapper_New( ONETOONEMAPPER_PASSARGS );
+	result = (CoincidentMapper*)_OneToOneMapper_New(  ONETOONEMAPPER_PASSARGS  );
 
 	return result;
 }
@@ -257,3 +256,5 @@ void _CoincidentMapper_Map( void* mapper ) {
 	Stream_UnIndentBranch( debugStream );
 	Journal_DPrintfL( debugStream, 1, "...%s(): Done.\n", __func__ );
 }
+
+

@@ -71,15 +71,22 @@ struct ConstantWeights { __ConstantWeights };
 ** Constructors
 */
 
-#define CONSTANTWEIGHTS_DEFARGS \
-    WEIGHTSCALCULATOR_DEFARGS
 
-#define CONSTANTWEIGHTS_PASSARGS \
-    WEIGHTSCALCULATOR_PASSARGS
 
 ConstantWeights* ConstantWeights_New( Name name, int dim );
 
-ConstantWeights* _ConstantWeights_New( CONSTANTWEIGHTS_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CONSTANTWEIGHTS_DEFARGS \
+                WEIGHTSCALCULATOR_DEFARGS
+
+	#define CONSTANTWEIGHTS_PASSARGS \
+                WEIGHTSCALCULATOR_PASSARGS
+
+ConstantWeights* _ConstantWeights_New(  CONSTANTWEIGHTS_DEFARGS  );
 
 void _ConstantWeights_Init( void* constantWeights );
 
@@ -112,3 +119,4 @@ void _ConstantWeights_Calculate( void* constantWeights, void* _swarm, Cell_Local
         
         
 #endif 
+

@@ -50,12 +50,12 @@ VolumeWeights* VolumeWeights_New( Name name, Dimension_Index dim, Stg_Shape* sha
     _VolumeWeights_Init( self, shape, mesh );
 }
 
-VolumeWeights* _VolumeWeights_New( VOLUMEWEIGHTS_DEFARGS ) {
+VolumeWeights* _VolumeWeights_New(  VOLUMEWEIGHTS_DEFARGS  ) {
     VolumeWeights* self;
 	
     /* Allocate memory */
-    assert( sizeOfSelf >= sizeof(VolumeWeights) );
-    self = (VolumeWeights*)_WeightsCalculator_New( WEIGHTSCALCULATOR_PASSARGS );
+    assert( _sizeOfSelf >= sizeof(VolumeWeights) );
+    self = (VolumeWeights*)_WeightsCalculator_New(  WEIGHTSCALCULATOR_PASSARGS  );
 	
     /* General info */
 
@@ -103,22 +103,22 @@ void* _VolumeWeights_Copy( void* weights, void* dest, Bool deep, Name nameExt, P
 }
 
 void* _VolumeWeights_DefaultNew( Name name ) {
-    return (void*) _VolumeWeights_New(
-        sizeof(VolumeWeights),
-        VolumeWeights_Type,
-        _VolumeWeights_Delete,
-        _VolumeWeights_Print,
-        _VolumeWeights_Copy,
-        _VolumeWeights_DefaultNew,
-        _VolumeWeights_AssignFromXML,
-        _VolumeWeights_Build,
-        _VolumeWeights_Initialise,
-        _VolumeWeights_Execute,
-        _VolumeWeights_Destroy,
-        name,
-        NON_GLOBAL,
-        _VolumeWeights_Calculate,
-        0, NULL, NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(VolumeWeights);
+	Type                                                      type = VolumeWeights_Type;
+	Stg_Class_DeleteFunction*                              _delete = _VolumeWeights_Delete;
+	Stg_Class_PrintFunction*                                _print = _VolumeWeights_Print;
+	Stg_Class_CopyFunction*                                  _copy = _VolumeWeights_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _VolumeWeights_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _VolumeWeights_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _VolumeWeights_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _VolumeWeights_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _VolumeWeights_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _VolumeWeights_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	WeightsCalculator_CalculateFunction*                _calculate = _VolumeWeights_Calculate;
+
+    return (void*) _VolumeWeights_New(  VOLUMEWEIGHTS_PASSARGS  );
 }
 
 
@@ -218,5 +218,7 @@ void _VolumeWeights_Calculate( void* weights, void* _swarm, Cell_LocalIndex lCel
 /*-------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
 */
+
+
 
 

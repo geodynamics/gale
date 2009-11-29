@@ -82,32 +82,31 @@ GaussCoincidentMapper* GaussCoincidentMapper_New(
 }
 
 void* _GaussCoincidentMapper_DefaultNew( Name name ) {
-	return _GaussCoincidentMapper_New(
-		sizeof(GaussCoincidentMapper),
-		GaussCoincidentMapper_Type,
-		_GaussCoincidentMapper_Delete,
-		_GaussCoincidentMapper_Print,
-		_GaussCoincidentMapper_Copy,
-		_GaussCoincidentMapper_DefaultNew,
-		_GaussCoincidentMapper_AssignFromXML,
-		_GaussCoincidentMapper_Build,
-		_GaussCoincidentMapper_Initialise,
-		_GaussCoincidentMapper_Execute,
-		_GaussCoincidentMapper_Destroy,
-		name,
-		NON_GLOBAL,
-		_GaussCoincidentMapper_Map,
-		_OneToOneMapper_GetMaterialPointsSwarms,
-		_OneToOneMapper_GetMaterialIndexOn,
-		_OneToOneMapper_GetExtensionOn,
-		NULL,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                                                 _sizeOfSelf = sizeof(GaussCoincidentMapper);
+	Type                                                                         type = GaussCoincidentMapper_Type;
+	Stg_Class_DeleteFunction*                                                 _delete = _GaussCoincidentMapper_Delete;
+	Stg_Class_PrintFunction*                                                   _print = _GaussCoincidentMapper_Print;
+	Stg_Class_CopyFunction*                                                     _copy = _GaussCoincidentMapper_Copy;
+	Stg_Component_DefaultConstructorFunction*                     _defaultConstructor = _GaussCoincidentMapper_DefaultNew;
+	Stg_Component_ConstructFunction*                                       _construct = _GaussCoincidentMapper_AssignFromXML;
+	Stg_Component_BuildFunction*                                               _build = _GaussCoincidentMapper_Build;
+	Stg_Component_InitialiseFunction*                                     _initialise = _GaussCoincidentMapper_Initialise;
+	Stg_Component_ExecuteFunction*                                           _execute = _GaussCoincidentMapper_Execute;
+	Stg_Component_DestroyFunction*                                           _destroy = _GaussCoincidentMapper_Destroy;
+	AllocationType                                                 nameAllocationType = NON_GLOBAL;
+	IntegrationPointMapper_MapFunction*                                          _map = _GaussCoincidentMapper_Map;
+	IntegrationPointMapper_GetMaterialPointsSwarmsFunction*  _getMaterialPointsSwarms = _OneToOneMapper_GetMaterialPointsSwarms;
+	IntegrationPointMapper_GetMaterialIndexOnFunction*            _getMaterialIndexOn = _OneToOneMapper_GetMaterialIndexOn;
+	IntegrationPointMapper_GetExtensionOnFunction*                    _getExtensionOn = _OneToOneMapper_GetExtensionOn;
+
+	return _GaussCoincidentMapper_New(  GAUSSCOINCIDENTMAPPER_PASSARGS  );
 }
 
-GaussCoincidentMapper* _GaussCoincidentMapper_New( GAUSSCOINCIDENTMAPPER_DEFARGS ) {
+GaussCoincidentMapper* _GaussCoincidentMapper_New(  GAUSSCOINCIDENTMAPPER_DEFARGS  ) {
 	GaussCoincidentMapper* result;
 
-	result = (GaussCoincidentMapper*)_OneToOneMapper_New( ONETOONEMAPPER_PASSARGS );
+	result = (GaussCoincidentMapper*)_OneToOneMapper_New(  ONETOONEMAPPER_PASSARGS  );
 
 	return result;
 }
@@ -245,3 +244,5 @@ void _GaussCoincidentMapper_Map( void* mapper ) {
 #endif
 
 }
+
+

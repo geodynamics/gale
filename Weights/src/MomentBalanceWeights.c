@@ -72,12 +72,12 @@ MomentBalanceWeights* MomentBalanceWeights_New( Name name, Dimension_Index dim, 
     _MomentBalanceWeights_Init( self, backupWeights );
 }
 
-MomentBalanceWeights* _MomentBalanceWeights_New( MOMENTBALANCEWEIGHTS_DEFARGS ) {
+MomentBalanceWeights* _MomentBalanceWeights_New(  MOMENTBALANCEWEIGHTS_DEFARGS  ) {
     MomentBalanceWeights* self;
 
     /* Allocate memory */
-    assert( sizeOfSelf >= sizeof(MomentBalanceWeights) );
-    self = (MomentBalanceWeights*)_WeightsCalculator_New( WEIGHTSCALCULATOR_PASSARGS ); 
+    assert( _sizeOfSelf >= sizeof(MomentBalanceWeights) );
+    self = (MomentBalanceWeights*)_WeightsCalculator_New(  WEIGHTSCALCULATOR_PASSARGS  ); 
 
     /* General info */
 
@@ -130,22 +130,22 @@ void* _MomentBalanceWeights_Copy( void* momentBalanceWeights, void* dest, Bool d
 }
 
 void* _MomentBalanceWeights_DefaultNew( Name name ) {
-    return (void*) _MomentBalanceWeights_New(
-        sizeof(MomentBalanceWeights),
-        MomentBalanceWeights_Type,
-        _MomentBalanceWeights_Delete,
-        _MomentBalanceWeights_Print,
-        _MomentBalanceWeights_Copy,
-        _MomentBalanceWeights_DefaultNew,
-        _MomentBalanceWeights_AssignFromXML,
-        _MomentBalanceWeights_Build,
-        _MomentBalanceWeights_Initialise,
-        _MomentBalanceWeights_Execute,
-        _MomentBalanceWeights_Destroy,
-        name,
-        NON_GLOBAL,
-        _MomentBalanceWeights_Calculate,
-        0, NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(MomentBalanceWeights);
+	Type                                                      type = MomentBalanceWeights_Type;
+	Stg_Class_DeleteFunction*                              _delete = _MomentBalanceWeights_Delete;
+	Stg_Class_PrintFunction*                                _print = _MomentBalanceWeights_Print;
+	Stg_Class_CopyFunction*                                  _copy = _MomentBalanceWeights_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _MomentBalanceWeights_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _MomentBalanceWeights_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _MomentBalanceWeights_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _MomentBalanceWeights_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _MomentBalanceWeights_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _MomentBalanceWeights_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	WeightsCalculator_CalculateFunction*                _calculate = _MomentBalanceWeights_Calculate;
+
+    return (void*) _MomentBalanceWeights_New(  MOMENTBALANCEWEIGHTS_PASSARGS  );
 }
 
 void _MomentBalanceWeights_AssignFromXML( void* momentBalanceWeights, Stg_ComponentFactory* cf, void* data ) {
@@ -478,5 +478,7 @@ void _MomentBalanceWeights_Calculate3D( void* momentBalanceWeights, void* _swarm
 /*-------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
 */
+
+
 
 

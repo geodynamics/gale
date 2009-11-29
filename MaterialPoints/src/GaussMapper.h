@@ -42,13 +42,20 @@
 
 	struct GaussMapper { __GaussMapper };
 
-	#define GAUSSMAPPER_DEFARGS \
-		ONETOONEMAPPER_DEFARGS
 		
-	#define GAUSSMAPPER_PASSARGS \
-		ONETOONEMAPPER_PASSARGS
 
-	GaussMapper* _GaussMapper_New( GAUSSMAPPER_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define GAUSSMAPPER_DEFARGS \
+                ONETOONEMAPPER_DEFARGS
+
+	#define GAUSSMAPPER_PASSARGS \
+                ONETOONEMAPPER_PASSARGS
+
+	GaussMapper* _GaussMapper_New(  GAUSSMAPPER_DEFARGS  );
 
 	void _GaussMapper_Init( void* mapper );
 
@@ -78,3 +85,4 @@
 	void _GaussMapper_Map( void* mapper );
 	
 #endif
+

@@ -80,37 +80,26 @@ IntegrationPointsSwarm* IntegrationPointsSwarm_New(
 		Variable_Register*                    swarmVariable_Register,
 		Materials_Register*                   materials_Register,
 		MPI_Comm                              comm,
-      void*                                 ics)
+      void*                                 ics_dummy)
 {
-    IntegrationPointsSwarm* self = _IntegrationPointsSwarm_New(
-			sizeof(IntegrationPointsSwarm),
-			IntegrationPointsSwarm_Type,
-			_IntegrationPointsSwarm_Delete,
-			_IntegrationPointsSwarm_Print,
-			_IntegrationPointsSwarm_Copy,
-			_IntegrationPointsSwarm_DefaultNew,
-			_IntegrationPointsSwarm_AssignFromXML,
-			_IntegrationPointsSwarm_Build,
-			_IntegrationPointsSwarm_Initialise,
-			_IntegrationPointsSwarm_Execute,
-			_IntegrationPointsSwarm_Destroy,
-			name,
-			cellLayout,
-			particleLayout,
-			dim,
-			particleSize,
-			cellParticleTblDelta,
-			extraParticlesFactor,
-			mesh,
-			timeIntegrator,
-			weights,
-			mapper,
-			recalculateWeights,
-			extensionMgr_Register,
-			swarmVariable_Register,
-			materials_Register,
-			comm
-			);
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(IntegrationPointsSwarm);
+	Type                                                      type = IntegrationPointsSwarm_Type;
+	Stg_Class_DeleteFunction*                              _delete = _IntegrationPointsSwarm_Delete;
+	Stg_Class_PrintFunction*                                _print = _IntegrationPointsSwarm_Print;
+	Stg_Class_CopyFunction*                                  _copy = _IntegrationPointsSwarm_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _IntegrationPointsSwarm_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _IntegrationPointsSwarm_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _IntegrationPointsSwarm_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _IntegrationPointsSwarm_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _IntegrationPointsSwarm_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _IntegrationPointsSwarm_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+	void*                          ics = ZERO;
+
+    IntegrationPointsSwarm* self = _IntegrationPointsSwarm_New(  INTEGRATIONPOINTSSWARM_PASSARGS  );
 
     _Swarm_Init( 
          (Swarm*)self, context,
@@ -123,7 +112,7 @@ IntegrationPointsSwarm* IntegrationPointsSwarm_New(
          extensionMgr_Register,
          swarmVariable_Register,
          comm, 
-         ics );
+         ics_dummy );
    _IntegrationPointsSwarm_Init( 
       self,
       mesh, 
@@ -136,94 +125,40 @@ IntegrationPointsSwarm* IntegrationPointsSwarm_New(
 
 
 void* _IntegrationPointsSwarm_DefaultNew( Name name ) {
-	return (void*) _IntegrationPointsSwarm_New(
-			sizeof(IntegrationPointsSwarm),
-			IntegrationPointsSwarm_Type,
-			_IntegrationPointsSwarm_Delete,
-			_IntegrationPointsSwarm_Print,
-			_IntegrationPointsSwarm_Copy,
-			_IntegrationPointsSwarm_DefaultNew,
-			_IntegrationPointsSwarm_AssignFromXML,
-			_IntegrationPointsSwarm_Build,
-			_IntegrationPointsSwarm_Initialise,
-			_IntegrationPointsSwarm_Execute,
-			_IntegrationPointsSwarm_Destroy,
-			name,
-			NULL,                           /* cellLayout */
-			NULL,                           /* particleLayout */
-			0,                              /* dim */
-			sizeof(IntegrationPoint),       /* particleSize */
-			0,                              /* cellParticleTblDelta */
-			0.0,                            /* extraParticlesFactor */
-			NULL,                           /* mesh */
-			NULL,                           /* timeIntegrator */
-			NULL,                           /* weights */
-			NULL,                           /* mapper */
-			False,                          /* recalculateWeights */
-			NULL,                           /* extensionMgr_Register */
-			NULL,                           /* swarmVariable_Register */
-			NULL,                           /* materials_Register */
-			MPI_COMM_WORLD                 /* MPI_Comm */
-			);
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(IntegrationPointsSwarm);
+	Type                                                         type = IntegrationPointsSwarm_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _IntegrationPointsSwarm_Delete;
+	Stg_Class_PrintFunction*                                   _print = _IntegrationPointsSwarm_Print;
+	Stg_Class_CopyFunction*                                     _copy = _IntegrationPointsSwarm_Copy;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _IntegrationPointsSwarm_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _IntegrationPointsSwarm_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _IntegrationPointsSwarm_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _IntegrationPointsSwarm_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _IntegrationPointsSwarm_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _IntegrationPointsSwarm_Destroy;
+	SizeT                                                particleSize = sizeof(IntegrationPoint);
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+	void*                          ics = ZERO;
+
+	return (void*) _IntegrationPointsSwarm_New(  INTEGRATIONPOINTSSWARM_PASSARGS  );
 }
 
 
-IntegrationPointsSwarm* _IntegrationPointsSwarm_New(
-		SizeT                                           _sizeOfSelf,
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy,
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,
-		Name                                            name,
-		CellLayout*                                     cellLayout,
-		ParticleLayout*                                 particleLayout,
-		Dimension_Index                                 dim,
-		SizeT                                           particleSize,
-		Particle_InCellIndex                            cellParticleTblDelta,
-		double                                          extraParticlesFactor,
-		FeMesh*     		                        mesh, 
-		TimeIntegrator*                                 timeIntegrator,
-		WeightsCalculator*                              weights,
-		IntegrationPointMapper*                         mapper,
-		Bool                                            recalculateWeights,
-		ExtensionManager_Register*                      extensionMgr_Register,
-		Variable_Register*                              swarmVariable_Register,
-		Materials_Register*                             materials_Register,
-		MPI_Comm                                        comm)
+IntegrationPointsSwarm* _IntegrationPointsSwarm_New(  INTEGRATIONPOINTSSWARM_DEFARGS  )
 {
 	IntegrationPointsSwarm* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(IntegrationPointsSwarm) );
-	self = (IntegrationPointsSwarm*)_Swarm_New( 
-		_sizeOfSelf,
-		type,
-		_delete,
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,		
-		name,
-		cellLayout,
-		particleLayout,
-		dim,
-		particleSize,
-		cellParticleTblDelta,
-		extraParticlesFactor,
-		extensionMgr_Register,
-		swarmVariable_Register,
-		comm,
-	        NULL	);
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	ics = NULL;
+
+	self = (IntegrationPointsSwarm*)_Swarm_New(  SWARM_PASSARGS  );
 
 	return self;
 }
@@ -518,3 +453,5 @@ Material* IntegrationPointsSwarm_GetMaterialOn( IntegrationPointsSwarm* swarm, I
 		swarm->materials_Register, 
 		IntegrationPointsSwarm_GetMaterialIndexOn( swarm, point ) );
 }
+
+

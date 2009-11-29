@@ -58,10 +58,10 @@
 
 const Type OneToOneMapper_Type = "OneToOneMapper";
 
-OneToOneMapper* _OneToOneMapper_New( ONETOONEMAPPER_DEFARGS ) {
+OneToOneMapper* _OneToOneMapper_New(  ONETOONEMAPPER_DEFARGS  ) {
 	OneToOneMapper* result;
 
-	result = (OneToOneMapper*)_IntegrationPointMapper_New( INTEGRATIONPOINTMAPPER_PASSARGS );
+	result = (OneToOneMapper*)_IntegrationPointMapper_New(  INTEGRATIONPOINTMAPPER_PASSARGS  );
 
 	return result;
 }
@@ -197,3 +197,5 @@ void* _OneToOneMapper_GetExtensionOn( void* mapper, void* point, ExtensionInfo_I
 
 	return ExtensionManager_Get( swarm->particleExtensionMgr, materialPoint, extHandle );
 }
+
+

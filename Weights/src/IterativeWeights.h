@@ -75,18 +75,20 @@ struct IterativeWeights { __IterativeWeights };
 ** Constructors
 */
 
-#define ITERATIVEWEIGHTS_DEFARGS                                \
-    CONSTANTWEIGHTS_DEFARGS,                                    \
-        WeightsCalculator*                    initialWeights,   \
-        Iteration_Index                       maxIterations,    \
-        double                                tolerance,        \
-        double                                alpha
 
-#define ITERATIVEWEIGHTS_PASSARGS                       \
-    CONSTANTWEIGHTS_DEFARGS,                            \
-        initialWeights, maxIterations, tolerance, alpha
 
-IterativeWeights* _IterativeWeights_New( ITERATIVEWEIGHTS_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ITERATIVEWEIGHTS_DEFARGS \
+                CONSTANTWEIGHTS_DEFARGS
+
+	#define ITERATIVEWEIGHTS_PASSARGS \
+                CONSTANTWEIGHTS_PASSARGS
+
+IterativeWeights* _IterativeWeights_New(  ITERATIVEWEIGHTS_DEFARGS  );
 
 /* Stg_Class_Delete IterativeWeights implementation */
 void _IterativeWeights_Delete( void* iterativeWeights );
@@ -116,3 +118,4 @@ void IterativeWeights_ScaleForConstantConstraint( void* iterativeWeights, void* 
         
         
 #endif 
+

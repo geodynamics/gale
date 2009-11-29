@@ -66,12 +66,12 @@ const Type IterativeWeights_Type = "IterativeWeights";
 ** Constructors
 */
 
-IterativeWeights* _IterativeWeights_New( ITERATIVEWEIGHTS_DEFARGS ) {
+IterativeWeights* _IterativeWeights_New(  ITERATIVEWEIGHTS_DEFARGS  ) {
     IterativeWeights* self;
 
     /* Allocate memory */
-    assert( sizeOfSelf >= sizeof(IterativeWeights) );
-    self = (IterativeWeights*)_ConstantWeights_New( CONSTANTWEIGHTS_PASSARGS );
+    assert( _sizeOfSelf >= sizeof(IterativeWeights) );
+    self = (IterativeWeights*)_ConstantWeights_New(  CONSTANTWEIGHTS_PASSARGS  );
 	
     /* General info */
 
@@ -137,22 +137,22 @@ void* _IterativeWeights_Copy( void* iterativeWeights, void* dest, Bool deep, Nam
 }
 
 void* _IterativeWeights_DefaultNew( Name name ) {
-    return (void*) _IterativeWeights_New(
-        sizeof(IterativeWeights),
-        IterativeWeights_Type,
-        _IterativeWeights_Delete,
-        _IterativeWeights_Print,
-        _IterativeWeights_Copy,
-        _IterativeWeights_DefaultNew,
-        _IterativeWeights_AssignFromXML,
-        _IterativeWeights_Build,
-        _IterativeWeights_Initialise,
-        _IterativeWeights_Execute,
-        _IterativeWeights_Destroy,
-        name,
-        NON_GLOBAL,
-        _IterativeWeights_Calculate,
-        0, NULL, 0, 0.0, 0.0);
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(IterativeWeights);
+	Type                                                      type = IterativeWeights_Type;
+	Stg_Class_DeleteFunction*                              _delete = _IterativeWeights_Delete;
+	Stg_Class_PrintFunction*                                _print = _IterativeWeights_Print;
+	Stg_Class_CopyFunction*                                  _copy = _IterativeWeights_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _IterativeWeights_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _IterativeWeights_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _IterativeWeights_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _IterativeWeights_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _IterativeWeights_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _IterativeWeights_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	WeightsCalculator_CalculateFunction*                _calculate = _IterativeWeights_Calculate;
+
+    return (void*) _IterativeWeights_New(  ITERATIVEWEIGHTS_PASSARGS  );
 }
 
 
@@ -275,4 +275,6 @@ void IterativeWeights_ScaleForConstantConstraint( void* iterativeWeights, void* 
     }
 }
 	
+
+
 

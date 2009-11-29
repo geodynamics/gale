@@ -76,17 +76,22 @@ extern const Type WeightsCalculator_Type;
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define WEIGHTSCALCULATOR_DEFARGS \
-	    STG_COMPONENT_DEFARGS, \
-	        WeightsCalculator_CalculateFunction* _calculate, \
-	        int dim
+                STG_COMPONENT_DEFARGS, \
+                WeightsCalculator_CalculateFunction*  _calculate
 
 	#define WEIGHTSCALCULATOR_PASSARGS \
-	    STG_COMPONENT_PASSARGS, \
-	        _calculate, \
-				 dim
+                STG_COMPONENT_PASSARGS, \
+	        _calculate
 
-	WeightsCalculator* _WeightsCalculator_New( WEIGHTSCALCULATOR_DEFARGS );
+	WeightsCalculator* _WeightsCalculator_New(  WEIGHTSCALCULATOR_DEFARGS  );
 
 	void _WeightsCalculator_Init( void* self , int dim );
 
@@ -131,3 +136,4 @@ extern const Type WeightsCalculator_Type;
 	void WeightsCalculator_CheckEmptyCell( void* self, void* _swarm, Cell_LocalIndex lCell_I ) ;
         
 #endif 
+

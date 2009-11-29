@@ -77,60 +77,38 @@ Material* Material_New(
 
 
 void* _Material_DefaultNew( Name name ) {
-	return (void*) _Material_New(
-			sizeof(Material),
-			Material_Type,
-			_Material_Delete, 
-			_Material_Print, 
-			_Material_Copy, 
-			_Material_DefaultNew, 
-			_Material_AssignFromXML, 
-			_Material_Build, 
-			_Material_Initialise, 
-			_Material_Execute, 
-			_Material_Destroy,
-			name,
-			NULL,
-			NULL,
-			NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Material);
+	Type                                                      type = Material_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Material_Delete;
+	Stg_Class_PrintFunction*                                _print = _Material_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Material_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Material_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Material_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Material_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Material_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Material_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Material_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _Material_New(  MATERIAL_PASSARGS  );
 }
 
 
 /* Private Constructor */
-Material* _Material_New(
-	SizeT                                           _sizeOfSelf,
-	Type                                            type,
-	Stg_Class_DeleteFunction*                       _delete,
-	Stg_Class_PrintFunction*                        _print,
-	Stg_Class_CopyFunction*                         _copy,
-	Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-	Stg_Component_ConstructFunction*                _construct,
-	Stg_Component_BuildFunction*                    _build,
-	Stg_Component_InitialiseFunction*               _initialise,
-	Stg_Component_ExecuteFunction*                  _execute,
-	Stg_Component_DestroyFunction*                  _destroy,
-	Name                                            name,
-	Stg_Shape*                                      shape,
-	Dictionary*                                     materialDictionary,
-	Materials_Register*                             materialRegister )
+Material* _Material_New(  MATERIAL_DEFARGS  )
 {
 	Material* self;
 	
 	assert( _sizeOfSelf >= sizeof(Material) );
-	self = (Material*) _Stg_Component_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			name,
-			NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (Material*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	return self;
 }
@@ -368,3 +346,5 @@ void Material_IntegrateField(
 	Memory_Free( fieldValue );
 	Memory_Free( localResult );
 }
+
+

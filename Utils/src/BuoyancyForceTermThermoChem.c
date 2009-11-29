@@ -82,61 +82,41 @@ BuoyancyForceTermThermoChem* BuoyancyForceTermThermoChem_New(
 }
 
 void* _BuoyancyForceTermThermoChem_DefaultNew( Name name ) {
-	return (void*)_BuoyancyForceTermThermoChem_New( 
-		sizeof(BuoyancyForceTermThermoChem), 
-		BuoyancyForceTermThermoChem_Type,
-		_BuoyancyForceTermThermoChem_Delete,
-		_BuoyancyForceTermThermoChem_Print,
-		NULL,
-		_BuoyancyForceTermThermoChem_DefaultNew,
-		_BuoyancyForceTermThermoChem_AssignFromXML,
-		_BuoyancyForceTermThermoChem_Build,
-		_BuoyancyForceTermThermoChem_Initialise,
-		_BuoyancyForceTermThermoChem_Execute,
-		_BuoyancyForceTermThermoChem_Destroy,
-		_BuoyancyForceTermThermoChem_AssembleElement,
-		_BuoyancyForceTermThermoChem_CalcRaT,
-		_BuoyancyForceTermThermoChem_CalcRaC,
-		name );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(BuoyancyForceTermThermoChem);
+	Type                                                         type = BuoyancyForceTermThermoChem_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _BuoyancyForceTermThermoChem_Delete;
+	Stg_Class_PrintFunction*                                   _print = _BuoyancyForceTermThermoChem_Print;
+	Stg_Class_CopyFunction*                                     _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _BuoyancyForceTermThermoChem_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _BuoyancyForceTermThermoChem_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _BuoyancyForceTermThermoChem_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _BuoyancyForceTermThermoChem_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _BuoyancyForceTermThermoChem_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _BuoyancyForceTermThermoChem_Destroy;
+	ForceTerm_AssembleElementFunction*               _assembleElement = _BuoyancyForceTermThermoChem_AssembleElement;
+	BuoyancyForceTermThermoChem_CalcRaTFunction*             _calcRaT = _BuoyancyForceTermThermoChem_CalcRaT;
+	BuoyancyForceTermThermoChem_CalcRaCFunction*             _calcRaC = _BuoyancyForceTermThermoChem_CalcRaC;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*)_BuoyancyForceTermThermoChem_New(  BUOYANCYFORCETERMTHERMOCHEM_PASSARGS  );
 }
 
 /* Creation implementation / Virtual constructor */
-BuoyancyForceTermThermoChem* _BuoyancyForceTermThermoChem_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		ForceTerm_AssembleElementFunction*                  _assembleElement,		
-		BuoyancyForceTermThermoChem_CalcRaTFunction*              _calcRaT,
-		BuoyancyForceTermThermoChem_CalcRaCFunction*              _calcRaC,
-		Name                                                name )
+BuoyancyForceTermThermoChem* _BuoyancyForceTermThermoChem_New(  BUOYANCYFORCETERMTHERMOCHEM_DEFARGS  )
 {
 	BuoyancyForceTermThermoChem* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(BuoyancyForceTermThermoChem) );
-	self = (BuoyancyForceTermThermoChem*) _ForceTerm_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		NON_GLOBAL,
-		_assembleElement );
+	assert( _sizeOfSelf >= sizeof(BuoyancyForceTermThermoChem) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (BuoyancyForceTermThermoChem*) _ForceTerm_New(  FORCETERM_PASSARGS  );
 	
 	/* Virtual info */
 	self->_calcRaT = _calcRaT;
@@ -377,3 +357,5 @@ double _BuoyancyForceTermThermoChem_CalcRaC( void* forceTerm, Swarm* swarm, Elem
 
 	return self->RaC;
 }
+
+

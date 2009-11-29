@@ -90,27 +90,32 @@
 
 	struct IntegrationPointMapper { __IntegrationPointMapper };
 
-	#define INTEGRATIONPOINTMAPPER_DEFARGS \
-		STG_COMPONENT_DEFARGS, \
-   	 	IntegrationPointMapper_MapFunction*								_map,  \
-   	 	IntegrationPointMapper_GetMaterialPointsSwarmsFunction*	_getMaterialPointsSwarms, \
-   	 	IntegrationPointMapper_GetMaterialIndexOnFunction*			_getMaterialIndexOn,  \
-   	 	IntegrationPointMapper_GetExtensionOnFunction*				_getExtensionOn, \
-			IntegrationPointsSwarm*												integrationSwarm 
 
-	#define INTEGRATIONPOINTMAPPER_PASSARGS \
-		STG_COMPONENT_PASSARGS, \
-    		_map,  \
-    		_getMaterialPointsSwarms, \
-    		_getMaterialIndexOn,  \
-    		_getExtensionOn, \
-			integrationSwarm  
 	
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Constructors
 	*/
 
-	IntegrationPointMapper* _IntegrationPointMapper_New( INTEGRATIONPOINTMAPPER_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define INTEGRATIONPOINTMAPPER_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                IntegrationPointMapper_MapFunction*                                          _map, \
+                IntegrationPointMapper_GetMaterialPointsSwarmsFunction*  _getMaterialPointsSwarms, \
+                IntegrationPointMapper_GetMaterialIndexOnFunction*            _getMaterialIndexOn, \
+                IntegrationPointMapper_GetExtensionOnFunction*                    _getExtensionOn
+
+	#define INTEGRATIONPOINTMAPPER_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _map,                     \
+	        _getMaterialPointsSwarms, \
+	        _getMaterialIndexOn,      \
+	        _getExtensionOn         
+
+	IntegrationPointMapper* _IntegrationPointMapper_New(  INTEGRATIONPOINTMAPPER_DEFARGS  );
 
 	void _IntegrationPointMapper_Init( void* mapper, PICelleratorContext* context, IntegrationPointsSwarm* integrationSwarm );
 
@@ -190,3 +195,4 @@
 	void* IntegrationPointMapper_GetExtensionAtFunc( void* mapper, Index point_I, ExtensionInfo_Index extHandle );
 
 #endif
+

@@ -17,24 +17,18 @@ MappedParticleLayout* MappedParticleLayout_New(
       CoordSystem      coordSystem,
       Bool             weightsInitialisedAtStartup);
 
-MappedParticleLayout* _MappedParticleLayout_New( 
-      SizeT                                            _sizeOfSelf,
-      Type                                             type,
-      Stg_Class_DeleteFunction*                        _delete,
-      Stg_Class_PrintFunction*                         _print,
-      Stg_Class_CopyFunction*                          _copy, 
-      Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-      Stg_Component_ConstructFunction*                 _construct,
-      Stg_Component_BuildFunction*                     _build,
-      Stg_Component_InitialiseFunction*                _initialise,
-      Stg_Component_ExecuteFunction*                   _execute,
-      Stg_Component_DestroyFunction*                   _destroy,
-      Name                                             name,
-      AllocationType                                   nameAllocationType,
-      ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-      ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-      CoordSystem                                      coordSystem,
-      Bool                                             weightsInitialisedAtStartup );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MAPPEDPARTICLELAYOUT_DEFARGS \
+                PARTICLELAYOUT_DEFARGS
+
+	#define MAPPEDPARTICLELAYOUT_PASSARGS \
+                PARTICLELAYOUT_PASSARGS
+
+MappedParticleLayout* _MappedParticleLayout_New(  MAPPEDPARTICLELAYOUT_DEFARGS  );
 	
 /* Initialise implementation */
 void _MappedParticleLayout_Init( 
@@ -60,3 +54,4 @@ void _MappedParticleLayout_InitialiseParticles( void* particleLayout, void* _swa
 
 	
 #endif /* __PICellerator_MaterialPoints_MappedParticleLayout_h__ */
+

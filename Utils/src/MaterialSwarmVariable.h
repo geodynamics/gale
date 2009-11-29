@@ -59,11 +59,7 @@
 
 	struct MaterialSwarmVariable { __MaterialSwarmVariable };
 
-	#define MATERIALSWARMVARIABLE_DEFARGS \
-		SWARMVARIABLE_DEFARGS
 
-	#define MATERIALSWARMVARIABLE_PASSARGS \
-		SWARMVARIABLE_PASSARGS
 
 	MaterialSwarmVariable* MaterialSwarmVariable_New( 
 		Name						name,
@@ -74,7 +70,18 @@
 		ExtensionInfo_Index	materialExtensionHandle,
 		SizeT						offset );
 
-	MaterialSwarmVariable* _MaterialSwarmVariable_New( MATERIALSWARMVARIABLE_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MATERIALSWARMVARIABLE_DEFARGS \
+                SWARMVARIABLE_DEFARGS
+
+	#define MATERIALSWARMVARIABLE_PASSARGS \
+                SWARMVARIABLE_PASSARGS
+
+	MaterialSwarmVariable* _MaterialSwarmVariable_New(  MATERIALSWARMVARIABLE_DEFARGS  );
 	
 	void _MaterialSwarmVariable_Init(
 		void*                swarmVariable,
@@ -105,3 +112,4 @@
 	double _MaterialSwarmVariable_GetMaxGlobalMagnitude( void* swarmVariable );
 
 #endif
+

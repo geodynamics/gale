@@ -271,3 +271,5 @@ void ConstantWeightsSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, ConstantWeightsSuite_TestExponentialInterface );
    pcu_suite_addTest( suite, ConstantWeightsSuite_TestCircleInterface );
 }
+
+

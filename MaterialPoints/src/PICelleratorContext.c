@@ -75,11 +75,11 @@ PICelleratorContext* PICelleratorContext_New(
 	return self;
 }	
 
-PICelleratorContext* _PICelleratorContext_New( PICELLERATORCONTEXT_DEFARGS ) {
+PICelleratorContext* _PICelleratorContext_New(  PICELLERATORCONTEXT_DEFARGS  ) {
 	PICelleratorContext* self;
 	
 	/* Allocate memory */
-	self = (PICelleratorContext*)_FiniteElementContext_New( FINITEELEMENTCONTEXT_PASSARGS );
+	self = (PICelleratorContext*)_FiniteElementContext_New(  FINITEELEMENTCONTEXT_PASSARGS  );
 	
 	/* General info */
 	
@@ -89,25 +89,26 @@ PICelleratorContext* _PICelleratorContext_New( PICELLERATORCONTEXT_DEFARGS ) {
 }
 
 void* _PICelleratorContext_DefaultNew( Name name ) {
-	return (void*) _PICelleratorContext_New(
-		sizeof(PICelleratorContext),
-		PICelleratorContext_Type,
-		_PICelleratorContext_Delete,
-		_PICelleratorContext_Print,
-		NULL, 
-		_PICelleratorContext_DefaultNew,
-		_PICelleratorContext_AssignFromXML,
-		(Stg_Component_BuildFunction*)_FiniteElementContext_Build,
-		(Stg_Component_InitialiseFunction*)_FiniteElementContext_Initialise,
-		(Stg_Component_ExecuteFunction*)_AbstractContext_Execute,
-		_PICelleratorContext_Destroy,
-		name,
-		NON_GLOBAL,
-		_PICelleratorContext_SetDt,
-		0,
-		0,
-		MPI_COMM_WORLD,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(PICelleratorContext);
+	Type                                                      type = PICelleratorContext_Type;
+	Stg_Class_DeleteFunction*                              _delete = _PICelleratorContext_Delete;
+	Stg_Class_PrintFunction*                                _print = _PICelleratorContext_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _PICelleratorContext_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _PICelleratorContext_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = (Stg_Component_BuildFunction*)_FiniteElementContext_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = (Stg_Component_InitialiseFunction*)_FiniteElementContext_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = (Stg_Component_ExecuteFunction*)_AbstractContext_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _PICelleratorContext_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	AbstractContext_SetDt*                                  _setDt = _PICelleratorContext_SetDt;
+	double                                               startTime = 0;
+	double                                                stopTime = 0;
+	MPI_Comm                                          communicator = MPI_COMM_WORLD;
+	Dictionary*                                         dictionary = NULL;
+
+	return (void*) _PICelleratorContext_New(  PICELLERATORCONTEXT_PASSARGS  );
 }
 
 void _PICelleratorContext_Init( void* context ) {
@@ -185,3 +186,5 @@ void _PICelleratorContext_AssignFromXML( void* context, Stg_ComponentFactory *cf
 
 	_PICelleratorContext_Init( self );
 }
+
+

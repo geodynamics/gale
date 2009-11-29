@@ -85,41 +85,13 @@ SwarmAdvector* SwarmAdvector_New(
 	return self;
 }
 
-SwarmAdvector* _SwarmAdvector_New(
-		SizeT                                      _sizeOfSelf, 
-		Type                                       type,
-		Stg_Class_DeleteFunction*                  _delete,
-		Stg_Class_PrintFunction*                   _print,
-		Stg_Class_CopyFunction*                    _copy, 
-		Stg_Component_DefaultConstructorFunction*  _defaultConstructor,
-		Stg_Component_ConstructFunction*           _construct,
-		Stg_Component_BuildFunction*               _build,
-		Stg_Component_InitialiseFunction*          _initialise,
-		Stg_Component_ExecuteFunction*             _execute,
-		Stg_Component_DestroyFunction*             _destroy,		
-		TimeIntegratee_CalculateTimeDerivFunction* _calculateTimeDeriv,
-		TimeIntegratee_IntermediateFunction*       _intermediate,
-		Name                                       name )
+SwarmAdvector* _SwarmAdvector_New(  SWARMADVECTOR_DEFARGS  )
 {
 	SwarmAdvector* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(SwarmAdvector) );
-	self = (SwarmAdvector*)_TimeIntegratee_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_calculateTimeDeriv,
-			_intermediate,
-			name );
+	self = (SwarmAdvector*)_TimeIntegratee_New(  TIMEINTEGRATEE_PASSARGS  );
 	
 	/* General info */
 
@@ -212,21 +184,25 @@ void* _SwarmAdvector_Copy( void* swarmAdvector, void* dest, Bool deep, Name name
 }
 
 void* _SwarmAdvector_DefaultNew( Name name ) {
-	return (void*) _SwarmAdvector_New(
-			sizeof(SwarmAdvector),
-			SwarmAdvector_Type,
-			_SwarmAdvector_Delete,
-			_SwarmAdvector_Print,
-			_SwarmAdvector_Copy,
-			_SwarmAdvector_DefaultNew,
-			_SwarmAdvector_AssignFromXML,
-			_SwarmAdvector_Build,
-			_SwarmAdvector_Initialise,
-			_SwarmAdvector_Execute,
-			_SwarmAdvector_Destroy,
-			_SwarmAdvector_TimeDeriv,
-			_SwarmAdvector_Intermediate,
-			name );
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(SwarmAdvector);
+	Type                                                       type = SwarmAdvector_Type;
+	Stg_Class_DeleteFunction*                               _delete = _SwarmAdvector_Delete;
+	Stg_Class_PrintFunction*                                 _print = _SwarmAdvector_Print;
+	Stg_Class_CopyFunction*                                   _copy = _SwarmAdvector_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _SwarmAdvector_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _SwarmAdvector_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _SwarmAdvector_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _SwarmAdvector_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _SwarmAdvector_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _SwarmAdvector_Destroy;
+	TimeIntegratee_CalculateTimeDerivFunction*  _calculateTimeDeriv = _SwarmAdvector_TimeDeriv;
+	TimeIntegratee_IntermediateFunction*              _intermediate = _SwarmAdvector_Intermediate;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _SwarmAdvector_New(  SWARMADVECTOR_PASSARGS  );
 }
 
 
@@ -331,5 +307,7 @@ void SwarmAdvector_AdvectionFinish( TimeIntegrator* timeIntegrator, SwarmAdvecto
 /*-------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
 */
+
+
 
 

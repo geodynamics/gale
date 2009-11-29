@@ -68,11 +68,7 @@
 
 	struct PICelleratorContext { __PICelleratorContext };
 
-	#define PICELLERATORCONTEXT_DEFARGS \
-		FINITEELEMENTCONTEXT_DEFARGS
 
-	#define PICELLERATORCONTEXT_PASSARGS \
-		FINITEELEMENTCONTEXT_PASSARGS
 	
 	/* Constructors ----------------------------------------------------------------------------------------------------*/
 	
@@ -87,7 +83,18 @@
 		Dictionary*	dictionary );
 	
 	/** Creation implementation / Virtual constructor */
-	PICelleratorContext* _PICelleratorContext_New( PICELLERATORCONTEXT_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PICELLERATORCONTEXT_DEFARGS \
+                FINITEELEMENTCONTEXT_DEFARGS
+
+	#define PICELLERATORCONTEXT_PASSARGS \
+                FINITEELEMENTCONTEXT_PASSARGS
+
+	PICelleratorContext* _PICelleratorContext_New(  PICELLERATORCONTEXT_DEFARGS  );
 	
 	/** Initialisation implementation */
 	void _PICelleratorContext_Init( void* context );
@@ -115,3 +122,4 @@
 	
 	/* Private functions -----------------------------------------------------------------------------------------------*/
 #endif /* __PICelleratorContext_h__ */
+

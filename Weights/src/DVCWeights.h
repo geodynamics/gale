@@ -227,17 +227,22 @@ void   _DVCWeights_Calculate3D(
 ** Constructors
 */
 
-#define DVCWEIGHTS_DEFARGS \
-    WEIGHTSCALCULATOR_DEFARGS, \
-        int *res
 
-#define DVCWEIGHTS_PASSARGS \
-    WEIGHTSCALCULATOR_PASSARGS, \
-        res
 
 DVCWeights* DVCWeights_New( Name name, Dimension_Index dim, int *res ) ;
 
-DVCWeights* _DVCWeights_New( DVCWEIGHTS_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define DVCWEIGHTS_DEFARGS \
+                WEIGHTSCALCULATOR_DEFARGS
+
+	#define DVCWEIGHTS_PASSARGS \
+                WEIGHTSCALCULATOR_PASSARGS
+
+DVCWeights* _DVCWeights_New(  DVCWEIGHTS_DEFARGS  );
 
 void _DVCWeights_Init( void* dvcWeights, int *res ) ;
 
@@ -262,3 +267,4 @@ void _DVCWeights_Destroy( void* dvcWeights, void* data );
 void _DVCWeights_Calculate( void* dvcWeights, void* _swarm, Cell_LocalIndex lCell_I ) ;
 
 #endif
+

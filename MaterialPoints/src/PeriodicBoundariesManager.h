@@ -80,17 +80,7 @@
 
 	struct PeriodicBoundariesManager { __PeriodicBoundariesManager };
 
-	#define PERIODICBOUNDARIESMANAGER_DEFARGS \
-		STG_COMPONENT_DEFARGS, \
-			Mesh*			mesh, \
-			Swarm*		swarm, \
-			Dictionary*	dictionary 
 
-	#define PERIODICBOUNDARIESMANAGER_PASSARGS \
-		STG_COMPONENT_PASSARGS, \
-			mesh, \
-			swarm, \
-			dictionary 
 
 	void* _PeriodicBoundariesManager_DefaultNew( Name name );
 
@@ -101,7 +91,18 @@
 		Swarm*					swarm,
 		Dictionary*				dictionary );
 
-	PeriodicBoundariesManager* _PeriodicBoundariesManager_New( PERIODICBOUNDARIESMANAGER_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PERIODICBOUNDARIESMANAGER_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define PERIODICBOUNDARIESMANAGER_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	PeriodicBoundariesManager* _PeriodicBoundariesManager_New(  PERIODICBOUNDARIESMANAGER_DEFARGS  );
 
 	void _PeriodicBoundariesManager_Init(
 		void*						periodicBCsManager,
@@ -131,3 +132,4 @@
 	void PeriodicBoundariesManager_UpdateParticle( void* periodicBCsManager, Particle_Index lParticle_I );
 
 #endif
+

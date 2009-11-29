@@ -90,41 +90,13 @@ SwarmAdvectionInAPlane* SwarmAdvectionInAPlane_New(
 	return self;
 }
 
-SwarmAdvectionInAPlane* _SwarmAdvectionInAPlane_New(
-		SizeT                                      _sizeOfSelf, 
-		Type                                       type,
-		Stg_Class_DeleteFunction*                  _delete,
-		Stg_Class_PrintFunction*                   _print,
-		Stg_Class_CopyFunction*                    _copy, 
-		Stg_Component_DefaultConstructorFunction*  _defaultConstructor,
-		Stg_Component_ConstructFunction*           _construct,
-		Stg_Component_BuildFunction*               _build,
-		Stg_Component_InitialiseFunction*          _initialise,
-		Stg_Component_ExecuteFunction*             _execute,
-		Stg_Component_DestroyFunction*             _destroy,		
-		TimeIntegratee_CalculateTimeDerivFunction* _calculateTimeDeriv,
-		TimeIntegratee_IntermediateFunction*       _intermediate,
-		Name                                       name )
+SwarmAdvectionInAPlane* _SwarmAdvectionInAPlane_New(  SWARMADVECTIONINAPLANE_DEFARGS  )
 {
 	SwarmAdvectionInAPlane* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(SwarmAdvectionInAPlane) );
-	self = (SwarmAdvectionInAPlane*)_SwarmAdvector_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_calculateTimeDeriv,
-			_intermediate,
-			name );
+	self = (SwarmAdvectionInAPlane*)_SwarmAdvector_New(  SWARMADVECTOR_PASSARGS  );
 	
 	/* General info */
 
@@ -173,22 +145,25 @@ void* _SwarmAdvectionInAPlane_Copy( void* swarmAdvector, void* dest, Bool deep, 
 }
 
 void* _SwarmAdvectionInAPlane_DefaultNew( Name name ) {
-	return (void*) _SwarmAdvectionInAPlane_New(
-			sizeof(SwarmAdvectionInAPlane),
-			SwarmAdvectionInAPlane_Type,
-			_SwarmAdvectionInAPlane_Delete,
-			_SwarmAdvectionInAPlane_Print,
-			_SwarmAdvectionInAPlane_Copy,
-			_SwarmAdvectionInAPlane_DefaultNew,
-			_SwarmAdvectionInAPlane_AssignFromXML,
-			/* Just use the normal parent's implementation for next few, apart from new TimeDeriv function */
-			_SwarmAdvector_Build,
-			_SwarmAdvector_Initialise,
-			_SwarmAdvector_Execute,
-			_SwarmAdvector_Destroy,
-			_SwarmAdvectionInAPlane_TimeDeriv,
-			_SwarmAdvector_Intermediate,
-			name );
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(SwarmAdvectionInAPlane);
+	Type                                                       type = SwarmAdvectionInAPlane_Type;
+	Stg_Class_DeleteFunction*                               _delete = _SwarmAdvectionInAPlane_Delete;
+	Stg_Class_PrintFunction*                                 _print = _SwarmAdvectionInAPlane_Print;
+	Stg_Class_CopyFunction*                                   _copy = _SwarmAdvectionInAPlane_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _SwarmAdvectionInAPlane_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _SwarmAdvectionInAPlane_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _SwarmAdvector_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _SwarmAdvector_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _SwarmAdvector_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _SwarmAdvector_Destroy;
+	TimeIntegratee_CalculateTimeDerivFunction*  _calculateTimeDeriv = _SwarmAdvectionInAPlane_TimeDeriv;
+	TimeIntegratee_IntermediateFunction*              _intermediate = _SwarmAdvector_Intermediate;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _SwarmAdvectionInAPlane_New(  SWARMADVECTIONINAPLANE_PASSARGS  );
 }
 
 
@@ -246,5 +221,7 @@ Bool _SwarmAdvectionInAPlane_TimeDeriv( void* swarmAdvector, Index array_I, doub
 /*-------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
 */
+
+
 
 

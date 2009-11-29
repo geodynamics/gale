@@ -17,24 +17,18 @@ BackgroundParticleLayout* BackgroundParticleLayout_New( Name name,
    CoordSystem      coordSystem, 
    Bool             weightsInitialisedAtStartup );
 
-BackgroundParticleLayout* _BackgroundParticleLayout_New( 
-    SizeT                                       _sizeOfSelf,
-    Type                                        type,
-    Stg_Class_DeleteFunction*                   _delete,
-    Stg_Class_PrintFunction*                    _print,
-    Stg_Class_CopyFunction*                     _copy,
-    Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-    Stg_Component_ConstructFunction*            _construct,
-    Stg_Component_BuildFunction*                _build,
-    Stg_Component_InitialiseFunction*           _initialise,
-    Stg_Component_ExecuteFunction*              _execute,
-    Stg_Component_DestroyFunction*              _destroy,
-    Name                                        name,
-    AllocationType                              nameAllocationType,
-    ParticleLayout_SetInitialCountsFunction*    _setInitialCounts,
-    ParticleLayout_InitialiseParticlesFunction* _initialiseParticles,
-    CoordSystem                                 coordSystem,
-    Bool                                        weightsInitialisedAtStartup );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define BACKGROUNDPARTICLELAYOUT_DEFARGS \
+                PARTICLELAYOUT_DEFARGS
+
+	#define BACKGROUNDPARTICLELAYOUT_PASSARGS \
+                PARTICLELAYOUT_PASSARGS
+
+BackgroundParticleLayout* _BackgroundParticleLayout_New(  BACKGROUNDPARTICLELAYOUT_DEFARGS  );
 	
 /* Initialise implementation */
 void _BackgroundParticleLayout_Init( 
@@ -60,3 +54,4 @@ void _BackgroundParticleLayout_InitialiseParticles( void* particleLayout, void* 
 
 	
 #endif /* __PICellerator_MaterialPoints_BackgroundParticleLayout_h__ */
+

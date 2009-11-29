@@ -71,12 +71,12 @@ ConstantWeights* ConstantWeights_New( Name name, int dim ) {
     _ConstantWeights_Init( self );
 }
 
-ConstantWeights* _ConstantWeights_New( CONSTANTWEIGHTS_DEFARGS ) {
+ConstantWeights* _ConstantWeights_New(  CONSTANTWEIGHTS_DEFARGS  ) {
     ConstantWeights* self;
 
     /* Allocate memory */
-    assert( sizeOfSelf >= sizeof(ConstantWeights) );
-    self = (ConstantWeights*)_WeightsCalculator_New( WEIGHTSCALCULATOR_PASSARGS );
+    assert( _sizeOfSelf >= sizeof(ConstantWeights) );
+    self = (ConstantWeights*)_WeightsCalculator_New(  WEIGHTSCALCULATOR_PASSARGS  );
 
     /* General info */
 
@@ -121,22 +121,22 @@ void* _ConstantWeights_Copy( void* constantWeights, void* dest, Bool deep, Name 
 }
 
 void* _ConstantWeights_DefaultNew( Name name ) {
-    return (void*) _ConstantWeights_New(
-        sizeof(ConstantWeights),
-        ConstantWeights_Type,
-        _ConstantWeights_Delete,
-        _ConstantWeights_Print,
-        _ConstantWeights_Copy,
-        _ConstantWeights_DefaultNew,
-        _ConstantWeights_AssignFromXML,
-        _ConstantWeights_Build,
-        _ConstantWeights_Initialise,
-        _ConstantWeights_Execute,
-        _ConstantWeights_Destroy,
-        name,
-        NON_GLOBAL,
-        _ConstantWeights_Calculate,
-        0 );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(ConstantWeights);
+	Type                                                      type = ConstantWeights_Type;
+	Stg_Class_DeleteFunction*                              _delete = _ConstantWeights_Delete;
+	Stg_Class_PrintFunction*                                _print = _ConstantWeights_Print;
+	Stg_Class_CopyFunction*                                  _copy = _ConstantWeights_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _ConstantWeights_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _ConstantWeights_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _ConstantWeights_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _ConstantWeights_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _ConstantWeights_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _ConstantWeights_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	WeightsCalculator_CalculateFunction*                _calculate = _ConstantWeights_Calculate;
+
+    return (void*) _ConstantWeights_New(  CONSTANTWEIGHTS_PASSARGS  );
 }
 
 
@@ -188,5 +188,7 @@ void _ConstantWeights_Calculate( void* constantWeights, void* _swarm, Cell_Local
 /*-------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
 */
+
+
 
 

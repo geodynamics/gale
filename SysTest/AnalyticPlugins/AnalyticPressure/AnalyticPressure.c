@@ -82,21 +82,27 @@ void _AnalyticPressure_Build( void* _self, void* data ) {
 }
 
 void* _AnalyticPressure_DefaultNew( Name name ) {
-  return _FieldTest_New(
-    sizeof(AnalyticPressure),
-    AnalyticPressure_Type,
-    _FieldTest_Delete,
-    _FieldTest_Print,
-    _FieldTest_Copy,
-    _AnalyticPressure_DefaultNew,
-    _AnalyticPressure_AssignFromXML,
-    _AnalyticPressure_Build,
-    _FieldTest_Initialise,
-    _FieldTest_Execute,
-    _FieldTest_Destroy,
-    name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(AnalyticPressure);
+	Type                                                      type = AnalyticPressure_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FieldTest_Delete;
+	Stg_Class_PrintFunction*                                _print = _FieldTest_Print;
+	Stg_Class_CopyFunction*                                  _copy = _FieldTest_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _AnalyticPressure_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _AnalyticPressure_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _AnalyticPressure_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FieldTest_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FieldTest_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FieldTest_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+  return _FieldTest_New(  FIELDTEST_PASSARGS  );
 }
 
 Index PICellerator_AnalyticPressure_Register( PluginsManager* pluginsManager ) {
   return PluginsManager_Submit( pluginsManager, AnalyticPressure_Type, "0", _AnalyticPressure_DefaultNew );
 }
+
+

@@ -58,10 +58,10 @@
 
 const Type ManyToOneMapper_Type = "ManyToOneMapper";
 
-ManyToOneMapper* _ManyToOneMapper_New( MANYTOONEMAPPER_DEFARGS ) {
+ManyToOneMapper* _ManyToOneMapper_New(  MANYTOONEMAPPER_DEFARGS  ) {
 	ManyToOneMapper* result;
 
-	result = (ManyToOneMapper*)_IntegrationPointMapper_New( INTEGRATIONPOINTMAPPER_PASSARGS );
+	result = (ManyToOneMapper*)_IntegrationPointMapper_New(  INTEGRATIONPOINTMAPPER_PASSARGS  );
 
 	return result;
 }
@@ -196,3 +196,5 @@ MaterialPointsSwarm** ManyToOneMapper_GetMaterialPointsSwarms( void* mapper, Ind
 
 	return result;
 }
+
+

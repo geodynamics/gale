@@ -60,69 +60,19 @@ char* ParticleFeVariable_names[10];
 int ParticleFeVariable_nNames = 0;
 int ParticleFeVariable_curName = 0;
 
-ParticleFeVariable* _ParticleFeVariable_New(
-	SizeT                                             _sizeOfSelf,
-	Type                                              type,
-	Stg_Class_DeleteFunction*                         _delete,
-	Stg_Class_PrintFunction*                          _print,
-	Stg_Class_CopyFunction*                           _copy, 
-	Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-	Stg_Component_ConstructFunction*                  _construct,
-	Stg_Component_BuildFunction*                      _build,
-	Stg_Component_InitialiseFunction*                 _initialise,
-	Stg_Component_ExecuteFunction*                    _execute,
-	Stg_Component_DestroyFunction*                    _destroy,
-	FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-	FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-	FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-	FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-	FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-	FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-	FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-	ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-	Name                                              name )
+ParticleFeVariable* _ParticleFeVariable_New(  PARTICLEFEVARIABLE_DEFARGS  )
 {
 	ParticleFeVariable* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ParticleFeVariable) );
-	self = (ParticleFeVariable*) _FeVariable_New(
-		_sizeOfSelf, 
-		type, 
-		_delete,
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute, 
-		_destroy,
-		name,
-		NON_GLOBAL,
-		_interpolateValueAt,
-		_getMinGlobalFeMagnitude, 
-		_getMaxGlobalFeMagnitude,
-		_getMinAndMaxLocalCoords, 
-		_getMinAndMaxGlobalCoords,
-		0, /* fieldComponentCount */
-		0, /* dim */
-		True, /* isCheckpointedAndReloaded */
-		0, /* communicator */
-		NULL, /* fv_Register */
-		_interpolateWithinElement,
-		_getValueAtNode,
-		_FeVariable_SyncShadowValues, 
-		NULL, 
-		NULL, 
-		NULL, /* bcs */
-		NULL,	/* ics */	
-		NULL,	/* linkedDofInfo */	
-		NULL,	/* templateFeVariable */	
-		NULL,		
-		False, /* use a reference solution from file */
-		False /* load the reference solution at each time step */
-	);
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+	_syncShadowValues  = _FeVariable_SyncShadowValues;
+
+	self = (ParticleFeVariable*) _FeVariable_New(  FEVARIABLE_PASSARGS  );
 
 	self->_valueAtParticle = _valueAtParticle;
 	
@@ -369,3 +319,5 @@ void ParticleFeVariable_AssembleElementShapeFunc( void* _forceTerm, ForceVector*
 		}
 	}
 }
+
+

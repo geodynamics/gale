@@ -59,14 +59,16 @@
 const Type Materials_Register_Type = "Materials_Register";
 
 Materials_Register* Materials_Register_New( void ) {
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(Materials_Register);
+	Type                              type = Materials_Register_Type;
+	Stg_Class_DeleteFunction*      _delete = _Materials_Register_Delete;
+	Stg_Class_PrintFunction*        _print = _Materials_Register_Print;
+	Stg_Class_CopyFunction*          _copy = _Materials_Register_Copy;
+
 	Materials_Register* self;
 
-	self = (Materials_Register*) _NamedObject_Register_New(
-		sizeof(Materials_Register),
-		Materials_Register_Type,
-		_Materials_Register_Delete,
-		_Materials_Register_Print,
-		_Materials_Register_Copy );
+	self = (Materials_Register*) _NamedObject_Register_New(  NAMEDOBJECT_REGISTER_PASSARGS  );
 
 	return self;
 }
@@ -303,5 +305,7 @@ void Variable_Register_SetAllVariablesFromDictionary( void* _variable_Register, 
 		Variable_SetValueFromDictionary( variable, index, dictionary );
 	}
 }
+
+
 
 

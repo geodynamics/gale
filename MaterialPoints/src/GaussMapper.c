@@ -44,35 +44,34 @@
 
 const Type GaussMapper_Type = "GaussMapper";
 
-GaussMapper* _GaussMapper_New( GAUSSMAPPER_DEFARGS ) {
+GaussMapper* _GaussMapper_New(  GAUSSMAPPER_DEFARGS  ) {
 	GaussMapper* result;
 
-	result = (GaussMapper*)_OneToOneMapper_New( ONETOONEMAPPER_PASSARGS );
+	result = (GaussMapper*)_OneToOneMapper_New(  ONETOONEMAPPER_PASSARGS  );
 
 	return result;
 }
 
 void* _GaussMapper_DefaultNew( Name name ) {
-	return _GaussMapper_New(
-		sizeof(GaussMapper),
-		GaussMapper_Type,
-		_GaussMapper_Delete,
-		_GaussMapper_Print,
-		_GaussMapper_Copy,
-		_GaussMapper_DefaultNew,
-		_GaussMapper_AssignFromXML,
-		_GaussMapper_Build,
-		_GaussMapper_Initialise,
-		_GaussMapper_Execute,
-		_GaussMapper_Destroy,
-		name,
-		NON_GLOBAL,
-		_GaussMapper_Map,
-		_OneToOneMapper_GetMaterialPointsSwarms,
-		_OneToOneMapper_GetMaterialIndexOn,
-		_OneToOneMapper_GetExtensionOn,
-		NULL,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                                                 _sizeOfSelf = sizeof(GaussMapper);
+	Type                                                                         type = GaussMapper_Type;
+	Stg_Class_DeleteFunction*                                                 _delete = _GaussMapper_Delete;
+	Stg_Class_PrintFunction*                                                   _print = _GaussMapper_Print;
+	Stg_Class_CopyFunction*                                                     _copy = _GaussMapper_Copy;
+	Stg_Component_DefaultConstructorFunction*                     _defaultConstructor = _GaussMapper_DefaultNew;
+	Stg_Component_ConstructFunction*                                       _construct = _GaussMapper_AssignFromXML;
+	Stg_Component_BuildFunction*                                               _build = _GaussMapper_Build;
+	Stg_Component_InitialiseFunction*                                     _initialise = _GaussMapper_Initialise;
+	Stg_Component_ExecuteFunction*                                           _execute = _GaussMapper_Execute;
+	Stg_Component_DestroyFunction*                                           _destroy = _GaussMapper_Destroy;
+	AllocationType                                                 nameAllocationType = NON_GLOBAL;
+	IntegrationPointMapper_MapFunction*                                          _map = _GaussMapper_Map;
+	IntegrationPointMapper_GetMaterialPointsSwarmsFunction*  _getMaterialPointsSwarms = _OneToOneMapper_GetMaterialPointsSwarms;
+	IntegrationPointMapper_GetMaterialIndexOnFunction*            _getMaterialIndexOn = _OneToOneMapper_GetMaterialIndexOn;
+	IntegrationPointMapper_GetExtensionOnFunction*                    _getExtensionOn = _OneToOneMapper_GetExtensionOn;
+
+	return _GaussMapper_New(  GAUSSMAPPER_PASSARGS  );
 }
 
 void _GaussMapper_Init( void* mapper ) {
@@ -162,3 +161,5 @@ void _GaussMapper_Map( void* mapper ) {
 		ref->particle_I = 0;
 	}
 }
+
+

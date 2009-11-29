@@ -66,20 +66,23 @@
 
 	struct ManyToOneMapper { __ManyToOneMapper };
 	
-	#define MANYTOONEMAPPER_DEFARGS \
-		INTEGRATIONPOINTMAPPER_DEFARGS, \
-			MaterialPointsSwarm**	materialSwarms, \
-			Index							materialSwarmCount 
 
-	#define MANYTOONEMAPPER_PASSARGS \
-		INTEGRATIONPOINTMAPPER_PASSARGS, \
-			materialSwarms, \
-			materialSwarmCount 
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Constructors
 	*/
-	ManyToOneMapper* _ManyToOneMapper_New( MANYTOONEMAPPER_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MANYTOONEMAPPER_DEFARGS \
+                INTEGRATIONPOINTMAPPER_DEFARGS
+
+	#define MANYTOONEMAPPER_PASSARGS \
+                INTEGRATIONPOINTMAPPER_PASSARGS
+
+	ManyToOneMapper* _ManyToOneMapper_New(  MANYTOONEMAPPER_DEFARGS  );
 
 	void _ManyToOneMapper_Init( void* mapper, MaterialPointsSwarm** materialSwarms, Index materialSwarmCount );
 
@@ -109,3 +112,4 @@
 	MaterialPointsSwarm** ManyToOneMapper_GetMaterialPointsSwarms( void* mapper, Index* count );
 
 #endif
+

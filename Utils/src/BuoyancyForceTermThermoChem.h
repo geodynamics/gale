@@ -96,22 +96,22 @@
 		Bool							adjust,
 		Materials_Register*		materials_Register );
 
-	BuoyancyForceTermThermoChem* _BuoyancyForceTermThermoChem_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		ForceTerm_AssembleElementFunction*                  _assembleElement,		
-		BuoyancyForceTermThermoChem_CalcRaTFunction*			_calcRaT,
-		BuoyancyForceTermThermoChem_CalcRaCFunction*			_calcRaC,
-		Name                                                name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define BUOYANCYFORCETERMTHERMOCHEM_DEFARGS \
+                FORCETERM_DEFARGS, \
+                BuoyancyForceTermThermoChem_CalcRaTFunction*  _calcRaT, \
+                BuoyancyForceTermThermoChem_CalcRaCFunction*  _calcRaC
+
+	#define BUOYANCYFORCETERMTHERMOCHEM_PASSARGS \
+                FORCETERM_PASSARGS, \
+	        _calcRaT, \
+	        _calcRaC
+
+	BuoyancyForceTermThermoChem* _BuoyancyForceTermThermoChem_New(  BUOYANCYFORCETERMTHERMOCHEM_DEFARGS  );
 
 	void _BuoyancyForceTermThermoChem_Init(
 		BuoyancyForceTermThermoChem*  self, 
@@ -150,3 +150,4 @@
 		(( (BuoyancyForceTermThermoChem*) forceTerm )->_calcRaC( forceTerm, swarm, lElement_I, particle ) )
 
 #endif
+

@@ -74,35 +74,30 @@ MaterialPointsSwarm* MaterialPointsSwarm_New(
       ExtensionManager_Register*            extensionMgr_Register,
       Materials_Register*                   materials_Register,		
       MPI_Comm                              comm,
-      void*                                 ics ) 
+      void*                                 ics_dummy ) 
 {
-  MaterialPointsSwarm* self = _MaterialPointsSwarm_New(
-      sizeof(MaterialPointsSwarm),
-      MaterialPointsSwarm_Type,
-      _MaterialPointsSwarm_Delete,
-      _MaterialPointsSwarm_Print,
-      _MaterialPointsSwarm_Copy,
-      _MaterialPointsSwarm_DefaultNew,
-      _MaterialPointsSwarm_AssignFromXML,
-      _MaterialPointsSwarm_Build,
-      _MaterialPointsSwarm_Initialise,
-      _MaterialPointsSwarm_Execute,
-      _MaterialPointsSwarm_Destroy,
-      name,
-      cellLayout,			/* cellLayout */
-      particleLayout,                   /* particleLayout */
-      dim,                      /* dim */
-      particleSize,  /* particleSize */
-      DEFAULT_CELL_PARTICLE_TBL_DELTA,                      /* cellParticleTblDelta */
-      DEFAULT_EXTRA_PARTICLES_FACTOR,                    /* extraParticlesFactor */
-      mesh,                   /* mesh */
-      escapedRoutine,                   /* escapedRoutine */
-      material,                   /* material */
-      swarmVariable_Register,                   /* swarmVariable_Register */
-      extensionMgr_Register,                   /* extensionMgr_Register */
-      materials_Register,                   /* materials_Register */
-      comm                       /* comm */
-      );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(MaterialPointsSwarm);
+	Type                                                      type = MaterialPointsSwarm_Type;
+	Stg_Class_DeleteFunction*                              _delete = _MaterialPointsSwarm_Delete;
+	Stg_Class_PrintFunction*                                _print = _MaterialPointsSwarm_Print;
+	Stg_Class_CopyFunction*                                  _copy = _MaterialPointsSwarm_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _MaterialPointsSwarm_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _MaterialPointsSwarm_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _MaterialPointsSwarm_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _MaterialPointsSwarm_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _MaterialPointsSwarm_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _MaterialPointsSwarm_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+	void*                          ics = ZERO;
+
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Particle_InCellIndex  cellParticleTblDelta = DEFAULT_CELL_PARTICLE_TBL_DELTA;
+	double                extraParticlesFactor = DEFAULT_EXTRA_PARTICLES_FACTOR;
+
+  MaterialPointsSwarm* self = _MaterialPointsSwarm_New(  MATERIALPOINTSSWARM_PASSARGS  );
 
    _Swarm_Init( 
          (Swarm*)self, context,
@@ -115,7 +110,7 @@ MaterialPointsSwarm* MaterialPointsSwarm_New(
          extensionMgr_Register,
          swarmVariable_Register,
          comm, 
-         ics );
+         ics_dummy );
 
    _MaterialPointsSwarm_Init( 
       self, 
@@ -128,60 +123,18 @@ MaterialPointsSwarm* MaterialPointsSwarm_New(
 }
 
 
-MaterialPointsSwarm* _MaterialPointsSwarm_New(
-		SizeT                                           _sizeOfSelf,
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy,
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,
-		Name                                            name,
-		CellLayout*                                     cellLayout,
-		ParticleLayout*                                 particleLayout,
-		Dimension_Index                                 dim,
-		SizeT                                           particleSize,
-		Particle_InCellIndex                            cellParticleTblDelta,
-		double                                          extraParticlesFactor,
-		FeMesh*                   	                mesh,
-		EscapedRoutine*                                 escapedRoutine, 
-		Material*                                       material,
-		Variable_Register*                              swarmVariable_Register,
-		ExtensionManager_Register*                      extensionMgr_Register,
-		Materials_Register*                             materials_Register,
-		MPI_Comm                                        comm )
+MaterialPointsSwarm* _MaterialPointsSwarm_New(  MATERIALPOINTSSWARM_DEFARGS  )
 {
 	MaterialPointsSwarm* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(MaterialPointsSwarm) );
-	self = (MaterialPointsSwarm*)_Swarm_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			name,
-			cellLayout,
-			particleLayout,
-			dim,
-			particleSize,
-			cellParticleTblDelta,
-			extraParticlesFactor,
-			extensionMgr_Register,
-			swarmVariable_Register,
-			comm,
-		        NULL	);
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	ics = NULL;
+
+	self = (MaterialPointsSwarm*)_Swarm_New(  SWARM_PASSARGS  );
 
 	return self;
 }
@@ -261,33 +214,25 @@ void* _MaterialPointsSwarm_Copy( void* swarm, void* dest, Bool deep, Name nameEx
 }
 
 void* _MaterialPointsSwarm_DefaultNew( Name name ) {
-	return _MaterialPointsSwarm_New(
-			sizeof(MaterialPointsSwarm),
-			MaterialPointsSwarm_Type,
-			_MaterialPointsSwarm_Delete,
-			_MaterialPointsSwarm_Print,
-			_MaterialPointsSwarm_Copy,
-			_MaterialPointsSwarm_DefaultNew,
-			_MaterialPointsSwarm_AssignFromXML,
-			_MaterialPointsSwarm_Build,
-			_MaterialPointsSwarm_Initialise,
-			_MaterialPointsSwarm_Execute,
-			_MaterialPointsSwarm_Destroy,
-			name,
-			NULL,			/* cellLayout */
-			NULL,                   /* particleLayout */
-			0,                      /* dim */
-			sizeof(MaterialPoint),  /* particleSize */
-			0,                      /* cellParticleTblDelta */
-			0.0,                    /* extraParticlesFactor */
-			NULL,                   /* mesh */
-			NULL,                   /* escapedRoutine */
-			NULL,                   /* material */
-			NULL,                   /* swarmVariable_Register */
-			NULL,                   /* extensionMgr_Register */
-			NULL,                   /* materials_Register */
-			0                       /* comm */
-			);
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(MaterialPointsSwarm);
+	Type                                                         type = MaterialPointsSwarm_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _MaterialPointsSwarm_Delete;
+	Stg_Class_PrintFunction*                                   _print = _MaterialPointsSwarm_Print;
+	Stg_Class_CopyFunction*                                     _copy = _MaterialPointsSwarm_Copy;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _MaterialPointsSwarm_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _MaterialPointsSwarm_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _MaterialPointsSwarm_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _MaterialPointsSwarm_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _MaterialPointsSwarm_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _MaterialPointsSwarm_Destroy;
+	SizeT                                                particleSize = sizeof(MaterialPoint);
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+	void*                          ics = ZERO;
+
+	return _MaterialPointsSwarm_New(  MATERIALPOINTSSWARM_PASSARGS  );
 }
 
 
@@ -589,3 +534,5 @@ void* MaterialPointsSwarm_GetExtensionAt( void* swarm, Index point_I, Index extH
 	return ExtensionManager_Get( self->particleExtensionMgr, point, extHandle );
 	
 }
+
+

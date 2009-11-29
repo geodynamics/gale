@@ -87,12 +87,12 @@ DVCWeights* DVCWeights_New( Name name, Dimension_Index dim, int *res ) {
     _DVCWeights_Init( self, res );
 }
 
-DVCWeights* _DVCWeights_New( DVCWEIGHTS_DEFARGS ) {
+DVCWeights* _DVCWeights_New(  DVCWEIGHTS_DEFARGS  ) {
     DVCWeights* self;
         
     /* Allocate memory */
-    assert( sizeOfSelf >= sizeof(DVCWeights) );
-    self = (DVCWeights*)_WeightsCalculator_New( WEIGHTSCALCULATOR_PASSARGS );
+    assert( _sizeOfSelf >= sizeof(DVCWeights) );
+    self = (DVCWeights*)_WeightsCalculator_New(  WEIGHTSCALCULATOR_PASSARGS  );
         
     /* General info */
 
@@ -138,22 +138,22 @@ void* _DVCWeights_Copy( void* dvcWeights, void* dest, Bool deep, Name nameExt, P
 }
 
 void* _DVCWeights_DefaultNew( Name name ) {
-    return (void*) _DVCWeights_New(
-        sizeof(DVCWeights),
-        DVCWeights_Type,
-        _DVCWeights_Delete,
-        _DVCWeights_Print,
-        _DVCWeights_Copy,
-        _DVCWeights_DefaultNew,
-        _DVCWeights_AssignFromXML,
-        _DVCWeights_Build,
-        _DVCWeights_Initialise,
-        _DVCWeights_Execute,
-        _DVCWeights_Destroy,
-        name,
-        NON_GLOBAL,
-        _DVCWeights_Calculate,
-        0, NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(DVCWeights);
+	Type                                                      type = DVCWeights_Type;
+	Stg_Class_DeleteFunction*                              _delete = _DVCWeights_Delete;
+	Stg_Class_PrintFunction*                                _print = _DVCWeights_Print;
+	Stg_Class_CopyFunction*                                  _copy = _DVCWeights_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _DVCWeights_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _DVCWeights_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _DVCWeights_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _DVCWeights_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _DVCWeights_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _DVCWeights_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	WeightsCalculator_CalculateFunction*                _calculate = _DVCWeights_Calculate;
+
+    return (void*) _DVCWeights_New(  DVCWEIGHTS_PASSARGS  );
 }
 
 
@@ -937,3 +937,5 @@ void _DVCWeights_Calculate( void* dvcWeights, void* _swarm, Cell_LocalIndex lCel
 /*-------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
 */
+
+

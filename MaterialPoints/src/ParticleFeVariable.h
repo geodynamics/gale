@@ -77,27 +77,20 @@
 	struct ParticleFeVariable { __ParticleFeVariable };
 
 	/* --- Contstructors / Destructors --- */
-	ParticleFeVariable* _ParticleFeVariable_New(
- 		SizeT                                             _sizeOfSelf,
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-		Name                                              name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PARTICLEFEVARIABLE_DEFARGS \
+                FEVARIABLE_DEFARGS, \
+                ParticleFeVariable_ValueAtParticleFunction*  _valueAtParticle
+
+	#define PARTICLEFEVARIABLE_PASSARGS \
+                FEVARIABLE_PASSARGS, \
+	        _valueAtParticle
+
+	ParticleFeVariable* _ParticleFeVariable_New(  PARTICLEFEVARIABLE_DEFARGS  );
 	
 	void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm* swarm );
 	
@@ -147,3 +140,4 @@
 		double*					elForceVector );
 
 #endif 
+

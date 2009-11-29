@@ -58,10 +58,10 @@
 
 const Type IntegrationPointMapper_Type = "IntegrationPointMapper";
 
-IntegrationPointMapper* _IntegrationPointMapper_New( INTEGRATIONPOINTMAPPER_DEFARGS ) {
+IntegrationPointMapper* _IntegrationPointMapper_New(  INTEGRATIONPOINTMAPPER_DEFARGS  ) {
 	IntegrationPointMapper* self;
 
-	self = (IntegrationPointMapper*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	self = (IntegrationPointMapper*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	self->_map = _map;
 	self->_getMaterialPointsSwarms = _getMaterialPointsSwarms;
@@ -184,3 +184,5 @@ void* IntegrationPointMapper_GetExtensionAtFunc( void* mapper, Index point_I, Ex
 	
 	return IntegrationPointMapper_GetExtensionOn( mapper, point, extHandle );
 }
+
+

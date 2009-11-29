@@ -71,15 +71,20 @@
 
 	struct OneToOneMapper { __OneToOneMapper };
 
+
+	
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define ONETOONEMAPPER_DEFARGS \
-		INTEGRATIONPOINTMAPPER_DEFARGS, \
-			MaterialPointsSwarm* materialSwarm 
+                INTEGRATIONPOINTMAPPER_DEFARGS
 
 	#define ONETOONEMAPPER_PASSARGS \
-		INTEGRATIONPOINTMAPPER_PASSARGS, \
-			materialSwarm 
-	
-	OneToOneMapper* _OneToOneMapper_New( ONETOONEMAPPER_DEFARGS );
+                INTEGRATIONPOINTMAPPER_PASSARGS
+
+	OneToOneMapper* _OneToOneMapper_New(  ONETOONEMAPPER_DEFARGS  );
 
 	void _OneToOneMapper_Init( void* mapper, MaterialPointsSwarm* materialSwarm );
 
@@ -115,3 +120,4 @@
 	MaterialPoint* OneToOneMapper_GetMaterialPoint( void* mapper, void* integrationPoint, MaterialPointsSwarm** materialSwarm );
 	
 #endif
+

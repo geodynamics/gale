@@ -397,3 +397,5 @@ void MaterialComponentsSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, MaterialComponentsSuite_TestGetMaterial );
    pcu_suite_addTest( suite, MaterialComponentsSuite_TestAssignParticleProperties );
 }
+
+
