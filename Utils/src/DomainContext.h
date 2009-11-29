@@ -54,11 +54,7 @@
 		
 	struct DomainContext { __DomainContext };
 
-	#define DOMAINCONTEXT_DEFARGS \
-		ABSTRACTCONTEXT_DEFARGS 
 
-	#define DOMAINCONTEXT_PASSARGS \
-		ABSTRACTCONTEXT_PASSARGS
 
 	DomainContext* _DomainContext_DefaultNew( Name name );
 	
@@ -70,7 +66,18 @@
 		Dictionary*	dictionary );
 	
 	/** Creation implementation / Virtual constructor */
-	DomainContext* _DomainContext_New( DOMAINCONTEXT_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define DOMAINCONTEXT_DEFARGS \
+                ABSTRACTCONTEXT_DEFARGS
+
+	#define DOMAINCONTEXT_PASSARGS \
+                ABSTRACTCONTEXT_PASSARGS
+
+	DomainContext* _DomainContext_New(  DOMAINCONTEXT_DEFARGS  );
 	
 	/** Initialisation implementation */
 	void	_DomainContext_Init( DomainContext* self );
@@ -89,3 +96,4 @@
 	void _DomainContext_SetDt( void* context, double dt ) ;
 
 #endif /* __DomainContext_h__*/
+

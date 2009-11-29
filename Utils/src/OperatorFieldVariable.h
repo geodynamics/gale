@@ -76,15 +76,7 @@
 
 	struct OperatorFieldVariable { __OperatorFieldVariable };
 	
-	#define OPERATORFIELDVARIABLE_DEFARGS \
-		FIELDVARIABLE_DEFARGS, \
-			Name					operatorName, \
-			FieldVariable**	fieldVariableList
 
-	#define OPERATORFIELDVARIABLE_PASSARGS \
-		FIELDVARIABLE_PASSARGS, \
-			operatorName, \
-			fieldVariableList
 
 	/** Shortcut constructors */
 	OperatorFieldVariable* OperatorFieldVariable_NewUnary(
@@ -116,7 +108,18 @@
 		FieldVariable_Register*							fieldVariable_Register ) ;
 
 	/** Private Constructor */
-	OperatorFieldVariable* _OperatorFieldVariable_New( OPERATORFIELDVARIABLE_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define OPERATORFIELDVARIABLE_DEFARGS \
+                FIELDVARIABLE_DEFARGS
+
+	#define OPERATORFIELDVARIABLE_PASSARGS \
+                FIELDVARIABLE_PASSARGS
+
+	OperatorFieldVariable* _OperatorFieldVariable_New(  OPERATORFIELDVARIABLE_DEFARGS  );
 
 	void _OperatorFieldVariable_Init( void* fieldVariable, Name operatorName, Index fieldVariableCount, FieldVariable** fieldVariableList ) ;
 
@@ -157,3 +160,4 @@
 	void OperatorFieldVariable_BinaryOperator( void* fieldVariable, double* fieldValue0, double* fieldValue1, double* value ) ;
 
 #endif /* __Domain_Utils_OperatorFieldVariable_h__ */
+

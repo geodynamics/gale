@@ -86,43 +86,39 @@ InnerWallVC* InnerWallVC_New(
 	return self;
 }
 InnerWallVC* _InnerWallVC_DefaultNew( Name name ) {
-	return _InnerWallVC_New(
-		sizeof(InnerWallVC), 
-		InnerWallVC_Type, 
-		_InnerWallVC_Delete, 
-		_InnerWallVC_Print, 
-		_InnerWallVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)_InnerWallVC_DefaultNew,
-		_InnerWallVC_AssignFromXML,	
-		_InnerWallVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_InnerWallVC_Destroy,
-		name,
-		NON_GLOBAL,
-		_InnerWallVC_BuildSelf, 
-		_InnerWallVC_PrintConcise,
-		_InnerWallVC_ReadDictionary,
-		_InnerWallVC_GetSet, 
-		_InnerWallVC_GetVariableCount, 
-		_InnerWallVC_GetVariableIndex, 
-		_InnerWallVC_GetValueIndex, 
-		_InnerWallVC_GetValueCount, 
-		_InnerWallVC_GetValue,
-		_VariableCondition_Apply, 
-		NULL,
-		NULL, 
-		NULL, 
-		NULL, 
-		NULL);
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(InnerWallVC);
+	Type                                                       type = InnerWallVC_Type;
+	Stg_Class_DeleteFunction*                               _delete = _InnerWallVC_Delete;
+	Stg_Class_PrintFunction*                                 _print = _InnerWallVC_Print;
+	Stg_Class_CopyFunction*                                   _copy = _InnerWallVC_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_InnerWallVC_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _InnerWallVC_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _InnerWallVC_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _VariableCondition_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _VariableCondition_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _InnerWallVC_Destroy;
+	AllocationType                               nameAllocationType = NON_GLOBAL;
+	VariableCondition_BuildSelfFunc*                     _buildSelf = _InnerWallVC_BuildSelf;
+	VariableCondition_PrintConciseFunc*               _printConcise = _InnerWallVC_PrintConcise;
+	VariableCondition_ReadDictionaryFunc*           _readDictionary = _InnerWallVC_ReadDictionary;
+	VariableCondition_GetSetFunc*                           _getSet = _InnerWallVC_GetSet;
+	VariableCondition_GetVariableCountFunc*       _getVariableCount = _InnerWallVC_GetVariableCount;
+	VariableCondition_GetVariableIndexFunc*       _getVariableIndex = _InnerWallVC_GetVariableIndex;
+	VariableCondition_GetValueIndexFunc*             _getValueIndex = _InnerWallVC_GetValueIndex;
+	VariableCondition_GetValueCountFunc*             _getValueCount = _InnerWallVC_GetValueCount;
+	VariableCondition_GetValueFunc*                       _getValue = _InnerWallVC_GetValue;
+	VariableCondition_ApplyFunc*                             _apply = _VariableCondition_Apply;
+
+	return _InnerWallVC_New(  INNERWALLVC_PASSARGS  );
 }
 
-InnerWallVC* _InnerWallVC_New( INNERVALUEVC_DEFARGS ) {
+InnerWallVC* _InnerWallVC_New(  INNERWALLVC_DEFARGS  ) {
 	InnerWallVC* self;
 	
 	/* Allocate memory/General info */
-	assert( sizeOfSelf >= sizeof(InnerWallVC) );
-	self = (InnerWallVC*)_VariableCondition_New( VARIABLECONDITION_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(InnerWallVC) );
+	self = (InnerWallVC*)_VariableCondition_New(  VARIABLECONDITION_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -627,3 +623,5 @@ void _InnerWallVC_PrintConcise( void* variableCondition, Stream* stream ) {
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Functions
 */
+
+

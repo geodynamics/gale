@@ -548,3 +548,5 @@ void Vector_ToComplexVector(Coord vector, Dimension_Index dim, CoordC complexVec
 		complexVector[index][IMAG_PART] = 0.0;
 	}		
 }
+
+

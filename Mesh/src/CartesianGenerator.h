@@ -107,38 +107,45 @@
 	** Constructors
 	*/
 
-	#define CARTESIANGENERATOR_DEFARGS							\
-		MESHGENERATOR_DEFARGS,								\
-		CartesianGenerator_SetTopologyParamsFunc*	setTopologyParamsFunc, 		\
-		CartesianGenerator_GenElementsFunc*		genElementsFunc, 		\
-		CartesianGenerator_GenFacesFunc*		genFacesFunc, 			\
-		CartesianGenerator_GenEdgesFunc*		genEdgesFunc, 			\
-		CartesianGenerator_GenVerticesFunc*		genVerticesFunc, 		\
-		CartesianGenerator_GenElementVertexIncFunc*	genElementVertexIncFunc, 	\
-		CartesianGenerator_GenVolumeEdgeIncFunc*	genVolumeEdgeIncFunc, 		\
-		CartesianGenerator_GenVolumeFaceIncFunc*	genVolumeFaceIncFunc, 		\
-		CartesianGenerator_GenFaceVertexIncFunc*	genFaceVertexIncFunc, 		\
-		CartesianGenerator_GenFaceEdgeIncFunc*		genFaceEdgeIncFunc, 		\
-		CartesianGenerator_GenEdgeVertexIncFunc*	genEdgeVertexIncFunc,		\
-		CartesianGenerator_GenElementTypesFunc*		genElementTypesFunc
 
-	#define CARTESIANGENERATOR_PASSARGS	\
-		MESHGENERATOR_PASSARGS, 	\
-		setTopologyParamsFunc, 		\
-		genElementsFunc, 		\
-		genFacesFunc, 			\
-		genEdgesFunc, 			\
-		genVerticesFunc, 		\
-		genElementVertexIncFunc, 	\
-		genVolumeEdgeIncFunc, 		\
-		genVolumeFaceIncFunc, 		\
-		genFaceVertexIncFunc, 		\
-		genFaceEdgeIncFunc, 		\
-		genEdgeVertexIncFunc,		\
-		genElementTypesFunc
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CARTESIANGENERATOR_DEFARGS \
+                MESHGENERATOR_DEFARGS, \
+                CartesianGenerator_SetTopologyParamsFunc*      setTopologyParamsFunc, \
+                CartesianGenerator_GenElementsFunc*                  genElementsFunc, \
+                CartesianGenerator_GenFacesFunc*                        genFacesFunc, \
+                CartesianGenerator_GenEdgesFunc*                        genEdgesFunc, \
+                CartesianGenerator_GenVerticesFunc*                  genVerticesFunc, \
+                CartesianGenerator_GenElementVertexIncFunc*  genElementVertexIncFunc, \
+                CartesianGenerator_GenVolumeEdgeIncFunc*        genVolumeEdgeIncFunc, \
+                CartesianGenerator_GenVolumeFaceIncFunc*        genVolumeFaceIncFunc, \
+                CartesianGenerator_GenFaceVertexIncFunc*        genFaceVertexIncFunc, \
+                CartesianGenerator_GenFaceEdgeIncFunc*            genFaceEdgeIncFunc, \
+                CartesianGenerator_GenEdgeVertexIncFunc*        genEdgeVertexIncFunc, \
+                CartesianGenerator_GenElementTypesFunc*          genElementTypesFunc
+
+	#define CARTESIANGENERATOR_PASSARGS \
+                MESHGENERATOR_PASSARGS, \
+	        setTopologyParamsFunc,   \
+	        genElementsFunc,         \
+	        genFacesFunc,            \
+	        genEdgesFunc,            \
+	        genVerticesFunc,         \
+	        genElementVertexIncFunc, \
+	        genVolumeEdgeIncFunc,    \
+	        genVolumeFaceIncFunc,    \
+	        genFaceVertexIncFunc,    \
+	        genFaceEdgeIncFunc,      \
+	        genEdgeVertexIncFunc,    \
+	        genElementTypesFunc    
 
 	CartesianGenerator* CartesianGenerator_New( Name name, AbstractContext* context );
-	CartesianGenerator* _CartesianGenerator_New( CARTESIANGENERATOR_DEFARGS );
+	CartesianGenerator* _CartesianGenerator_New(  CARTESIANGENERATOR_DEFARGS  );
 	void _CartesianGenerator_Init( CartesianGenerator* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -226,3 +233,4 @@
 	void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, const char* filename );
 
 #endif /* __Domain_Mesh_CartesianGenerator_h__ */
+

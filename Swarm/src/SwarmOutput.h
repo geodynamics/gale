@@ -76,21 +76,22 @@
 		unsigned int                                       decimalLength,
 		char*                                              borderString );		
 	
-	SwarmOutput* _SwarmOutput_New(
-		SizeT                                              _sizeOfSelf, 
-		Type                                               type,
-		Stg_Class_DeleteFunction*	                       _delete,
-		Stg_Class_PrintFunction*	                       _print, 
-		Stg_Class_CopyFunction*	                           _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		SwarmOutput_PrintHeaderFunction*                   _printHeader,		
-		SwarmOutput_PrintDataFunction*                     _printData,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SWARMOUTPUT_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                SwarmOutput_PrintHeaderFunction*  _printHeader, \
+                SwarmOutput_PrintDataFunction*      _printData
+
+	#define SWARMOUTPUT_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _printHeader, \
+	        _printData  
+
+	SwarmOutput* _SwarmOutput_New(  SWARMOUTPUT_DEFARGS  );
 
 	/** Member initialisation implementation */
 	void _SwarmOutput_Init( 
@@ -131,3 +132,4 @@
 		SwarmOutput_PrintDouble( swarmOutput, stream, (double) ( value ) )
 
 #endif /* __Domain_Swarm_SwarmOutput_h__ */
+

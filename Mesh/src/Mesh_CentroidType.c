@@ -56,23 +56,26 @@ const Type Mesh_CentroidType_Type = "Mesh_CentroidType";
 */
 
 Mesh_CentroidType* Mesh_CentroidType_New( Name name ) {
-	return _Mesh_CentroidType_New( sizeof(Mesh_CentroidType), 
-				       Mesh_CentroidType_Type, 
-				       _Mesh_CentroidType_Delete, 
-				       _Mesh_CentroidType_Print, 
-				       NULL, 
-				       Mesh_CentroidType_Update, 
-				       Mesh_CentroidType_ElementHasPoint, 
-				       Mesh_CentroidType_GetMinimumSeparation, 
-				       Mesh_CentroidType_GetCentroid );
+	/* Variables set in this function */
+	SizeT                                                    _sizeOfSelf = sizeof(Mesh_CentroidType);
+	Type                                                            type = Mesh_CentroidType_Type;
+	Stg_Class_DeleteFunction*                                    _delete = _Mesh_CentroidType_Delete;
+	Stg_Class_PrintFunction*                                      _print = _Mesh_CentroidType_Print;
+	Stg_Class_CopyFunction*                                        _copy = NULL;
+	Mesh_ElementType_UpdateFunc*                              updateFunc = Mesh_CentroidType_Update;
+	Mesh_ElementType_ElementHasPointFunc*            elementHasPointFunc = Mesh_CentroidType_ElementHasPoint;
+	Mesh_ElementType_GetMinimumSeparationFunc*  getMinimumSeparationFunc = Mesh_CentroidType_GetMinimumSeparation;
+	Mesh_ElementType_GetCentroidFunc*                    getCentroidFunc = Mesh_CentroidType_GetCentroid;
+
+	return _Mesh_CentroidType_New(  MESH_CENTROIDTYPE_PASSARGS  );
 }
 
-Mesh_CentroidType* _Mesh_CentroidType_New( MESH_CENTROIDTYPE_DEFARGS ) {
+Mesh_CentroidType* _Mesh_CentroidType_New(  MESH_CENTROIDTYPE_DEFARGS  ) {
 	Mesh_CentroidType* self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Mesh_CentroidType) );
-	self = (Mesh_CentroidType*)_Mesh_ElementType_New( MESH_ELEMENTTYPE_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(Mesh_CentroidType) );
+	self = (Mesh_CentroidType*)_Mesh_ElementType_New(  MESH_ELEMENTTYPE_PASSARGS  );
 
 	/* Virtual info */
 
@@ -172,3 +175,5 @@ void Mesh_CentroidType_SetElementMesh( void* centroidType, void* mesh ) {
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+

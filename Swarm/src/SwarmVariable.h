@@ -67,17 +67,7 @@
 
 	struct SwarmVariable { __SwarmVariable };	
 
-	#define SWARMVARIABLE_DEFARGS \
-		STG_COMPONENT_DEFARGS, \
-			SwarmVariable_ValueAtFunction*			_valueAt, \
-			SwarmVariable_GetGlobalValueFunction*	_getMinGlobalMagnitude, \
-			SwarmVariable_GetGlobalValueFunction*	_getMaxGlobalMagnitude
 
-	#define SWARMVARIABLE_PASSARGS \
-		STG_COMPONENT_PASSARGS, \
-			_valueAt, \
-			_getMinGlobalMagnitude, \
-			_getMaxGlobalMagnitude
 
 	/** General Virtual Functions */
 	#define SwarmVariable_Copy( self ) \
@@ -93,7 +83,24 @@
 		Variable*			variable,
 		Index					dofCount );
 	
-	SwarmVariable* _SwarmVariable_New( SWARMVARIABLE_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SWARMVARIABLE_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                SwarmVariable_ValueAtFunction*                       _valueAt, \
+                SwarmVariable_GetGlobalValueFunction*  _getMinGlobalMagnitude, \
+                SwarmVariable_GetGlobalValueFunction*  _getMaxGlobalMagnitude
+
+	#define SWARMVARIABLE_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _valueAt,               \
+	        _getMinGlobalMagnitude, \
+	        _getMaxGlobalMagnitude
+
+	SwarmVariable* _SwarmVariable_New(  SWARMVARIABLE_DEFARGS  );
 
 
 	/** Member initialisation implementation */
@@ -144,3 +151,4 @@
 	double _SwarmVariable_GetMinGlobalMagnitude( void* swarmVariable );
 
 #endif /* __Domain_Swarm_SwarmVariable_h__ */
+

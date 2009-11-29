@@ -61,15 +61,7 @@ given mesh layout.
 
 	struct TriSingleCellLayout { __TriSingleCellLayout };
 
-	#define TRISINGLECELLLAYOUT_DEFARGS \
-		CELLLAYOUT_DEFARGS, \
-			int			dim, \
-			Dictionary*	dictionary
 
-	#define TRISINGLECELLLAYOUT_PASSARGS \
-		CELLAYOUT_PASSARGS, \
-			dim, \
-			dictionary
 	
 	/* Create a new TriSingleCellLayout and initialise */
 	TriSingleCellLayout* _TriSingleCellLayout_DefaultNew( Name name );
@@ -80,7 +72,20 @@ given mesh layout.
 	void TriSingleCellLayout_Init( TriSingleCellLayout* self, Name name, int dim, Dictionary* dictionary );
 	
 	/* Creation implementation / Virtual constructor */
-	TriSingleCellLayout* _TriSingleCellLayout_New( TRISINGLECELLLAYOUT_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define TRISINGLECELLLAYOUT_DEFARGS \
+                CELLLAYOUT_DEFARGS, \
+                Dictionary*  dictionary
+
+	#define TRISINGLECELLLAYOUT_PASSARGS \
+                CELLLAYOUT_PASSARGS, \
+	        dictionary
+
+	TriSingleCellLayout* _TriSingleCellLayout_New(  TRISINGLECELLLAYOUT_DEFARGS  );
 	
 	/* Initialise implementation */
 	void _TriSingleCellLayout_Init( TriSingleCellLayout* self, Dictionary* dictionary, int dim );
@@ -138,3 +143,4 @@ given mesh layout.
 	ShadowInfo* _TriSingleCellLayout_GetShadowInfo( void* triSingleCellLayout );
 	
 #endif /* __Domain_Swarm_TriSingleCellLayout_h__ */
+

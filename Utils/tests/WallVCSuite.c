@@ -229,3 +229,5 @@ void WallVCSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, WallVCSuite_Setup, WallVCSuite_Teardown );
    pcu_suite_addTest( suite, WallVCSuite_TestWallVC );
 }
+
+

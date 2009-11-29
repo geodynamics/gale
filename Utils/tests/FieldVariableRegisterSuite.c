@@ -150,3 +150,5 @@ void FieldVariableRegisterSuite( pcu_suite_t* suite ) {
 	pcu_suite_addTest( suite, FieldVariableRegisterSuite_TestGetByIndex );
 	pcu_suite_addTest( suite, FieldVariableRegisterSuite_TestGetByName );
 }
+
+

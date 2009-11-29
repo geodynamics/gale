@@ -46,12 +46,12 @@ const Type Mesh_ElementType_Type = "Mesh_ElementType";
 ** Constructors
 */
 
-Mesh_ElementType* _Mesh_ElementType_New( MESH_ELEMENTTYPE_DEFARGS ) {
+Mesh_ElementType* _Mesh_ElementType_New(  MESH_ELEMENTTYPE_DEFARGS  ) {
 	Mesh_ElementType*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Mesh_ElementType) );
-	self = (Mesh_ElementType*)_Stg_Class_New( STG_CLASS_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(Mesh_ElementType) );
+	self = (Mesh_ElementType*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 
 	/* Virtual info */
 	self->updateFunc = updateFunc;
@@ -145,3 +145,5 @@ void Mesh_ElementType_SetMesh( void* elementType, void* mesh ) {
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+

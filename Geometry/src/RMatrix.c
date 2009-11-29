@@ -118,3 +118,5 @@ void RMatrix_VectorMult( Coord dest, RMatrix mat, Coord vec ) {
 	
 	Vec_Set3D( dest, tmp );
 }
+
+

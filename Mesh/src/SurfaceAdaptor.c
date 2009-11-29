@@ -67,21 +67,23 @@ const Type SurfaceAdaptor_Type = "SurfaceAdaptor";
 */
 
 SurfaceAdaptor* SurfaceAdaptor_New( Name name, AbstractContext* context ) {
-	SurfaceAdaptor* self = _SurfaceAdaptor_New( sizeof(SurfaceAdaptor), 
-				    SurfaceAdaptor_Type, 
-				    _SurfaceAdaptor_Delete, 
-				    _SurfaceAdaptor_Print, 
-				    NULL, 
-				    (void* (*)(Name))_SurfaceAdaptor_New, 
-				    _SurfaceAdaptor_AssignFromXML, 
-				    _SurfaceAdaptor_Build, 
-				    _SurfaceAdaptor_Initialise, 
-				    _SurfaceAdaptor_Execute, 
-				    _SurfaceAdaptor_Destroy, 
-				    name, 
-				    NON_GLOBAL, 
-				    _MeshGenerator_SetDimSize, 
-				    SurfaceAdaptor_Generate );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(SurfaceAdaptor);
+	Type                                                      type = SurfaceAdaptor_Type;
+	Stg_Class_DeleteFunction*                              _delete = _SurfaceAdaptor_Delete;
+	Stg_Class_PrintFunction*                                _print = _SurfaceAdaptor_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void* (*)(Name))_SurfaceAdaptor_New;
+	Stg_Component_ConstructFunction*                    _construct = _SurfaceAdaptor_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _SurfaceAdaptor_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _SurfaceAdaptor_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _SurfaceAdaptor_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _SurfaceAdaptor_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	MeshGenerator_SetDimSizeFunc*                   setDimSizeFunc = _MeshGenerator_SetDimSize;
+	MeshGenerator_GenerateFunc*                       generateFunc = SurfaceAdaptor_Generate;
+
+	SurfaceAdaptor* self = _SurfaceAdaptor_New(  SURFACEADAPTOR_PASSARGS  );
 
    _MeshGenerator_Init( (MeshGenerator*)self, context );
    _MeshAdaptor_Init( (MeshAdaptor*)self );
@@ -90,12 +92,12 @@ SurfaceAdaptor* SurfaceAdaptor_New( Name name, AbstractContext* context ) {
    return self;
 }
 
-SurfaceAdaptor* _SurfaceAdaptor_New( SURFACEADAPTOR_DEFARGS ) {
+SurfaceAdaptor* _SurfaceAdaptor_New(  SURFACEADAPTOR_DEFARGS  ) {
 	SurfaceAdaptor* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(SurfaceAdaptor) );
-	self = (SurfaceAdaptor*)_MeshAdaptor_New( MESHADAPTOR_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(SurfaceAdaptor) );
+	self = (SurfaceAdaptor*)_MeshAdaptor_New(  MESHADAPTOR_PASSARGS  );
 
 	/* Virtual info */
 	return self;
@@ -352,3 +354,5 @@ double SurfaceAdaptor_Cosine( SurfaceAdaptor* self, Mesh* mesh,
 
 	return self->info.trig.amp * cos( self->info.trig.freq * rad );
 }
+
+

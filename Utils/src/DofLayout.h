@@ -87,17 +87,7 @@
 	 DofLayout.h for details. */
 	struct _DofLayout { __DofLayout };
 	
-	#define DOFLAYOUT_DEFARGS \
-		STG_COMPONENT_DEFARGS, \
-			Variable_Register*	variableRegister, \
-			Index						numItemsInLayout, \
-			void*						mesh 
 	
-	#define DOFLAYOUT_PASSARGS \
-		STG_COMPONENT_PASSARGS, \
-			variableRegister, \
-			numItemsInLayout, \
-			mesh 
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
@@ -107,7 +97,18 @@
 	
 	DofLayout* DofLayout_New( Name name, DomainContext* context, Variable_Register* variableRegister, Index numItemsInLayout, void* mesh );
 	
-	DofLayout* _DofLayout_New( DOFLAYOUT_DEFARGS ); 
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define DOFLAYOUT_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define DOFLAYOUT_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	DofLayout* _DofLayout_New(  DOFLAYOUT_DEFARGS  ); 
 
 	void _DofLayout_Init(
 		void*						dofLayout,
@@ -208,3 +209,4 @@
 	void DofLayout_LoadAllVariablesFromFiles( void* dofLayout, char* prefixString, unsigned rank );
 
 #endif /* __Domain_Utils_DofLayout_h__ */
+

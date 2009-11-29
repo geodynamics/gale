@@ -62,13 +62,7 @@
 
 	struct ElementCellLayout { __ElementCellLayout };
 
-	#define ELEMENTCELLLAYOUT_DEFARGS \
-		CELLLAYOUT_DEFARGS, \
-			void* mesh	
 
-	#define ELEMENTCELLLAYOUT_PASSARGS \
-		CELLLAYOUT_PASSARGS, \
-			mesh
 	
 	/* Create a new ElementCellLayout and initialise */
 	void* _ElementCellLayout_DefaultNew( Name name );
@@ -76,7 +70,18 @@
 	ElementCellLayout* ElementCellLayout_New( Name name, AbstractContext* context, void* mesh );
 	
 	/* Creation implementation / Virtual constructor */
-	ElementCellLayout* _ElementCellLayout_New( ELEMENTCELLLAYOUT_DEFARGS ); 
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ELEMENTCELLLAYOUT_DEFARGS \
+                CELLLAYOUT_DEFARGS
+
+	#define ELEMENTCELLLAYOUT_PASSARGS \
+                CELLLAYOUT_PASSARGS
+
+	ElementCellLayout* _ElementCellLayout_New(  ELEMENTCELLLAYOUT_DEFARGS  ); 
 
 	/* Initialise implementation */
 	void _ElementCellLayout_Init( ElementCellLayout* self, void* mesh );
@@ -132,3 +137,4 @@
 	void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self );
 	
 #endif /* __Domain_Swarm_ElementCellLayout_h__ */
+

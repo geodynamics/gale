@@ -125,3 +125,5 @@ char StGermain_TrigQuadrant(double angle) {
 	/* return angle * \frac{2}{\pi} */
 	return (char) (angle * M_2_PI);
 }
+
+

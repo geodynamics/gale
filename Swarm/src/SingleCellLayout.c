@@ -59,38 +59,36 @@ SingleCellLayout* SingleCellLayout_New( Name name, AbstractContext* context, con
 }
 
 void* _SingleCellLayout_DefaultNew( Name name ) {
-	return (void*)_SingleCellLayout_New( 
-		sizeof(SingleCellLayout), 
-		SingleCellLayout_Type,
-		_SingleCellLayout_Delete,
-		_SingleCellLayout_Print,
-		_SingleCellLayout_Copy,
-		_SingleCellLayout_DefaultNew,
-		_SingleCellLayout_AssignFromXML,
-		_SingleCellLayout_Build,
-		_SingleCellLayout_Initialise,
-		_SingleCellLayout_Execute,
-		_SingleCellLayout_Destroy,
-		name,
-		NON_GLOBAL,
-		_SingleCellLayout_CellLocalCount,
-		_SingleCellLayout_CellShadowCount,
-		_SingleCellLayout_PointCount,
-		_SingleCellLayout_InitialisePoints,
-		_SingleCellLayout_MapElementIdToCellId, 
-		_SingleCellLayout_IsInCell,
-		_SingleCellLayout_CellOf,
-		_SingleCellLayout_GetShadowInfo,
-		NULL, 
-		NULL,
-		NULL);
+	/* Variables set in this function */
+	SizeT                                                _sizeOfSelf = sizeof(SingleCellLayout);
+	Type                                                        type = SingleCellLayout_Type;
+	Stg_Class_DeleteFunction*                                _delete = _SingleCellLayout_Delete;
+	Stg_Class_PrintFunction*                                  _print = _SingleCellLayout_Print;
+	Stg_Class_CopyFunction*                                    _copy = _SingleCellLayout_Copy;
+	Stg_Component_DefaultConstructorFunction*    _defaultConstructor = _SingleCellLayout_DefaultNew;
+	Stg_Component_ConstructFunction*                      _construct = _SingleCellLayout_AssignFromXML;
+	Stg_Component_BuildFunction*                              _build = _SingleCellLayout_Build;
+	Stg_Component_InitialiseFunction*                    _initialise = _SingleCellLayout_Initialise;
+	Stg_Component_ExecuteFunction*                          _execute = _SingleCellLayout_Execute;
+	Stg_Component_DestroyFunction*                          _destroy = _SingleCellLayout_Destroy;
+	AllocationType                                nameAllocationType = NON_GLOBAL;
+	CellLayout_CellCountFunction*                    _cellLocalCount = _SingleCellLayout_CellLocalCount;
+	CellLayout_CellCountFunction*                   _cellShadowCount = _SingleCellLayout_CellShadowCount;
+	CellLayout_PointCountFunction*                       _pointCount = _SingleCellLayout_PointCount;
+	CellLayout_InitialisePointsFunction*           _initialisePoints = _SingleCellLayout_InitialisePoints;
+	CellLayout_MapElementIdToCellIdFunction*   _mapElementIdToCellId = _SingleCellLayout_MapElementIdToCellId;
+	CellLayout_IsInCellFunction*                           _isInCell = _SingleCellLayout_IsInCell;
+	CellLayout_CellOfFunction*                               _cellOf = _SingleCellLayout_CellOf;
+	CellLayout_GetShadowInfoFunction*                 _getShadowInfo = _SingleCellLayout_GetShadowInfo;
+
+	return (void*)_SingleCellLayout_New(  SINGLECELLLAYOUT_PASSARGS  );
 }
 
-SingleCellLayout* _SingleCellLayout_New( SINGLECELLLAYOUT_DEFARGS ) {
+SingleCellLayout* _SingleCellLayout_New(  SINGLECELLLAYOUT_DEFARGS  ) {
 	SingleCellLayout* self;
 	
 	/* Allocate memory */
-	self = (SingleCellLayout*)_CellLayout_New( CELLLAYOUT_PASSARGS );
+	self = (SingleCellLayout*)_CellLayout_New(  CELLLAYOUT_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -386,3 +384,5 @@ ShadowInfo* _SingleCellLayout_GetShadowInfo( void* singleCellLayout ) {
 	Journal_Firewall( 0, Swarm_Warning, "Error: %s not implemented yet!\n", __func__ );
 	return NULL;
 }
+
+

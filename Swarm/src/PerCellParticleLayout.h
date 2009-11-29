@@ -71,26 +71,22 @@
 	/* No "_New" and "_Init" as this is an abstract class */
 	
 	/* Creation implementation / Virtual constructor */
-   PerCellParticleLayout* _PerCellParticleLayout_New( 
-      SizeT                                        _sizeOfSelf,
-      Type                                         type,
-      Stg_Class_DeleteFunction*                    _delete,
-      Stg_Class_PrintFunction*                     _print,
-      Stg_Class_CopyFunction*                      _copy,
-      Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
-      Stg_Component_ConstructFunction*             _construct,
-      Stg_Component_BuildFunction*                 _build,
-      Stg_Component_InitialiseFunction*            _initialise,
-      Stg_Component_ExecuteFunction*               _execute,
-      Stg_Component_DestroyFunction*               _destroy,
-      Name                                         name,
-      AllocationType                               nameAllocationType,
-      ParticleLayout_SetInitialCountsFunction*     _setInitialCounts,
-      ParticleLayout_InitialiseParticlesFunction*  _initialiseParticles,
-      CoordSystem                                  coordSystem,
-      Bool                                         weightsInitialisedAtStartup,
-      PerCellParticleLayout_InitialCountFunction*  _initialCount,
-      PerCellParticleLayout_InitialiseParticlesOfCellFunction* _initialiseParticlesOfCell );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PERCELLPARTICLELAYOUT_DEFARGS \
+                PARTICLELAYOUT_DEFARGS, \
+                PerCellParticleLayout_InitialCountFunction*                            _initialCount, \
+                PerCellParticleLayout_InitialiseParticlesOfCellFunction*  _initialiseParticlesOfCell
+
+	#define PERCELLPARTICLELAYOUT_PASSARGS \
+                PARTICLELAYOUT_PASSARGS, \
+	        _initialCount,              \
+	        _initialiseParticlesOfCell
+
+   PerCellParticleLayout* _PerCellParticleLayout_New(  PERCELLPARTICLELAYOUT_DEFARGS  );
 	
 	/* Initialise implementation */
    void _PerCellParticleLayout_Init(
@@ -122,3 +118,4 @@
 	Particle_InCellIndex PerCellParticleLayout_InitialCount( void* particleLayout, void* _swarm, Cell_Index cell_I );
 	
 #endif /* __Domain_Swarm_PerCellParticleLayout_h__ */
+

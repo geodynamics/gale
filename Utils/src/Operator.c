@@ -50,34 +50,27 @@ Operator* Operator_New(
 		Dof_Index                                  resultDofs,
 		Dimension_Index                            dim ) 
 {
-	return _Operator_New( 
-			sizeof( Operator ),
-			Operator_Type,
-			_Operator_Delete,
-			_Operator_Print,
-			_Operator_Copy,
-			name,
-			_carryOut,
-			numberOfOperands,
-			operandDofs,
-			resultDofs,
-			dim );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof( Operator );
+	Type                              type = Operator_Type;
+	Stg_Class_DeleteFunction*      _delete = _Operator_Delete;
+	Stg_Class_PrintFunction*        _print = _Operator_Print;
+	Stg_Class_CopyFunction*          _copy = _Operator_Copy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _Operator_New(  OPERATOR_PASSARGS  );
 }
 
-Operator* _Operator_New(		
-		SizeT                                      _sizeOfSelf,
-		Type                                       type,
-		Stg_Class_DeleteFunction*                  _delete,
-		Stg_Class_PrintFunction*                   _print, 
-		Stg_Class_CopyFunction*                    _copy,
-		Name                                       name,
-		Func_Ptr                                   _carryOut,
-		Index                                      numberOfOperands,
-		Dof_Index                                  operandDofs,
-		Dof_Index                                  resultDofs,
-		Dimension_Index                            dim )
+Operator* _Operator_New(  OPERATOR_DEFARGS  )
 {
-	Operator* self = (Operator*) _Stg_Object_New(_sizeOfSelf, type, _delete, _print, _copy, name, NON_GLOBAL);
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	Operator* self = (Operator*) _Stg_Object_New(  STG_OBJECT_PASSARGS  );
 
 	/* Set values */
 	self->_carryOut        = _carryOut;
@@ -626,4 +619,6 @@ Operator* Operator_NewFromName(
 
 	return Operator_New( name, _carryOut, numberOfOperands, operandDofs, resultDofs, dim );
 }
+
+
 

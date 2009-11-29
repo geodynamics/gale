@@ -74,3 +74,5 @@ Mesh* NewRemesher_GetMesh( const void* self ) {
    assert( Class_IsSuper( self, NewRemesher ) );
    return ((NewRemesher*)self)->mesh;
 }
+
+

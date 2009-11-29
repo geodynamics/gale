@@ -120,3 +120,5 @@ void DecompSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, DecompSuite_Setup, DecompSuite_Teardown );
    pcu_suite_addTest( suite, DecompSuite_TestDecomp );
 }
+
+

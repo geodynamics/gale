@@ -72,25 +72,29 @@ const Type Delaunay_Type="Delaunay";
 /** Create a Delaunay */
 Delaunay* Delaunay_DefaultNew( Name name )
 {
-	Delaunay *d = _Delaunay_New(
-			sizeof( Delaunay ),
-			Delaunay_Type,
-			_Delaunay_Delete,
-			_Delaunay_Print,
-			_Delaunay_Copy,
-			(Stg_Component_DefaultConstructorFunction*)Delaunay_DefaultNew,
-			_Delaunay_AssignFromXML,
-			_Delaunay_Build,
-			_Delaunay_Initialise,
-			_Delaunay_Execute,
-			_Delaunay_Destroy,
-			name,
-			False,
-			NULL,
-			NULL,
-			0,
-			0,
-			NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( Delaunay );
+	Type                                                      type = Delaunay_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Delaunay_Delete;
+	Stg_Class_PrintFunction*                                _print = _Delaunay_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Delaunay_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)Delaunay_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Delaunay_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Delaunay_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Delaunay_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Delaunay_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Delaunay_Destroy;
+	Bool                                                  initFlag = False;
+	Dictionary*                                         dictionary = NULL;
+	CoordF*                                                  sites = NULL;
+	int                                                   numSites = 0;
+	int                                                   idOffset = 0;
+	DelaunayAttributes*                                       attr = NULL;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	Delaunay *d = _Delaunay_New(  DELAUNAY_PASSARGS  );
 
 	return d;
 }
@@ -103,25 +107,24 @@ Delaunay* Delaunay_New(
 	int							idOffset,
 	DelaunayAttributes			*attr )
 {
-	Delaunay *d = _Delaunay_New(
-			sizeof( Delaunay ),
-			Delaunay_Type,
-			_Delaunay_Delete,
-			_Delaunay_Print,
-			_Delaunay_Copy,
-			(Stg_Component_DefaultConstructorFunction*)Delaunay_DefaultNew,
-			_Delaunay_AssignFromXML,
-			_Delaunay_Build,
-			_Delaunay_Initialise,
-			_Delaunay_Execute,
-			_Delaunay_Destroy,
-			name,
-			True,
-			dictionary,
-			sites,
-			numSites,
-			idOffset,
-			attr );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( Delaunay );
+	Type                                                      type = Delaunay_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Delaunay_Delete;
+	Stg_Class_PrintFunction*                                _print = _Delaunay_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Delaunay_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)Delaunay_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Delaunay_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Delaunay_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Delaunay_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Delaunay_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Delaunay_Destroy;
+	Bool                                                  initFlag = True;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	Delaunay *d = _Delaunay_New(  DELAUNAY_PASSARGS  );
 	
 	return d;
 }
@@ -160,31 +163,17 @@ void Delaunay_Init(
 }
 
 /** Creation implementation */
-Delaunay* _Delaunay_New(
-	SizeT						_sizeOfSelf, 
-	Type						type,
-	Stg_Class_DeleteFunction*				_delete,
-	Stg_Class_PrintFunction*				_print,
-	Stg_Class_CopyFunction*				_copy, 
-	Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-	Stg_Component_ConstructFunction*			_construct,
-	Stg_Component_BuildFunction*		_build,
-	Stg_Component_InitialiseFunction*		_initialise,
-	Stg_Component_ExecuteFunction*		_execute,
-	Stg_Component_DestroyFunction*		_destroy,
-	Name							name,
-	Bool							initFlag,
-	Dictionary					*dictionary,
-	CoordF						*sites,
-	int							numSites,
-	int							idOffset,
-	DelaunayAttributes			*attr )
+Delaunay* _Delaunay_New(  DELAUNAY_DEFARGS  )
 {
 	Delaunay *self = NULL;
 	
 	assert( _sizeOfSelf >= sizeof(Delaunay) );
-	self = (Delaunay*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-			_construct, _build, _initialise, _execute, _destroy, name, NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (Delaunay*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	_Delaunay_Init( self, sites, attr, numSites, idOffset, dictionary, initFlag );
 
@@ -1019,3 +1008,5 @@ int *Delaunay_GetHull( Delaunay *delaunay )
 
 	return delaunay->hull;
 }
+
+

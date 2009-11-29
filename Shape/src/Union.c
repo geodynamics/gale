@@ -66,43 +66,13 @@ Union* Union_New(
 	return self;
 }
 
-Union* _Union_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name )
+Union* _Union_New(  UNION_DEFARGS  )
 {
 	Union* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Union) );
-	self = (Union*)_Stg_Shape_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside ,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (Union*)_Stg_Shape_New(  STG_SHAPE_PASSARGS  );
 	
 	/* General info */
 	
@@ -161,22 +131,26 @@ void* _Union_Copy( void* combination, void* dest, Bool deep, Name nameExt, PtrMa
 }
 
 void* _Union_DefaultNew( Name name ) {
-	return (void*) _Union_New(
-			sizeof(Union),
-			Union_Type,
-			_Union_Delete,
-			_Union_Print,
-			_Union_Copy,
-			_Union_DefaultNew,
-			_Union_AssignFromXML,
-			_Union_Build,
-			_Union_Initialise,
-			_Union_Execute,
-			_Union_Destroy,
-			_Union_IsCoordInside,
-			_Union_CalculateVolume,
-			_Union_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(Union);
+	Type                                                          type = Union_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _Union_Delete;
+	Stg_Class_PrintFunction*                                    _print = _Union_Print;
+	Stg_Class_CopyFunction*                                      _copy = _Union_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _Union_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _Union_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _Union_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _Union_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _Union_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _Union_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _Union_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _Union_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _Union_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _Union_New(  UNION_PASSARGS  );
 }
 
 
@@ -289,3 +263,5 @@ void _Union_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ) {
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }
 	
+
+

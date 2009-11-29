@@ -114,3 +114,5 @@ void ParticleCoordsSuite( pcu_suite_t* suite ) {
 	pcu_suite_setFixtures( suite, ParticleCoordsSuite_Setup, ParticleCoordsSuite_Teardown );
 	pcu_suite_addTest( suite, ParticleCoordsSuite_TestLineParticle );
 }
+
+

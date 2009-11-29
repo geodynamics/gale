@@ -249,3 +249,5 @@ void ShapeSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, ShapeSuite_TestSuperellipsoid2D );
    pcu_suite_addTest( suite, ShapeSuite_TestSuperellipsoid3D );
 }
+
+

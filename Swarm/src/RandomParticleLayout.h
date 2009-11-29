@@ -64,28 +64,18 @@
       unsigned int         seed );
 	
 	/* Creation implementation / Virtual constructor */
-   RandomParticleLayout* _RandomParticleLayout_New( 
-      SizeT                                        _sizeOfSelf,
-      Type                                         type,
-      Stg_Class_DeleteFunction*                    _delete,
-      Stg_Class_PrintFunction*                     _print,
-      Stg_Class_CopyFunction*                      _copy,
-      Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
-      Stg_Component_ConstructFunction*             _construct,
-      Stg_Component_BuildFunction*                 _build,
-      Stg_Component_InitialiseFunction*            _initialise,
-      Stg_Component_ExecuteFunction*               _execute,
-      Stg_Component_DestroyFunction*               _destroy,
-      Name                                         name,
-      AllocationType                               nameAllocationType,
-      ParticleLayout_SetInitialCountsFunction*     _setInitialCounts,
-      ParticleLayout_InitialiseParticlesFunction*  _initialiseParticles,
-      CoordSystem                                  coordSystem,
-      Bool                                         weightsInitialisedAtStartup,
-      PerCellParticleLayout_InitialCountFunction*  _initialCount,
-      PerCellParticleLayout_InitialiseParticlesOfCellFunction* _initialiseParticlesOfCell,
-		Particle_InCellIndex                         cellParticleCount,
-		unsigned int                                 seed );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define RANDOMPARTICLELAYOUT_DEFARGS \
+                PERCELLPARTICLELAYOUT_DEFARGS
+
+	#define RANDOMPARTICLELAYOUT_PASSARGS \
+                PERCELLPARTICLELAYOUT_PASSARGS
+
+   RandomParticleLayout* _RandomParticleLayout_New(  RANDOMPARTICLELAYOUT_DEFARGS  );
 
 	void _RandomParticleLayout_Init( 
 			void*                randomParticleLayout, 
@@ -117,3 +107,4 @@
 
 	
 #endif /* __Domain_Swarm_RandomParticleLayout_h__ */
+

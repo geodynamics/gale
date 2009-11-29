@@ -66,43 +66,13 @@ ConvexHull* ConvexHull_New(
 	return self;
 }
 
-ConvexHull* _ConvexHull_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name )
+ConvexHull* _ConvexHull_New(  CONVEXHULL_DEFARGS  )
 {
 	ConvexHull* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ConvexHull) );
-	self = (ConvexHull*)_Stg_Shape_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (ConvexHull*)_Stg_Shape_New(  STG_SHAPE_PASSARGS  );
 	
 	/* General info */
 
@@ -204,22 +174,26 @@ void* _ConvexHull_Copy( void* convexHull, void* dest, Bool deep, Name nameExt, P
 }
 
 void* _ConvexHull_DefaultNew( Name name ) {
-	return (void*) _ConvexHull_New(
-			sizeof(ConvexHull),
-			ConvexHull_Type,
-			_ConvexHull_Delete,
-			_ConvexHull_Print,
-			_ConvexHull_Copy,
-			_ConvexHull_DefaultNew,
-			_ConvexHull_AssignFromXML,
-			_ConvexHull_Build,
-			_ConvexHull_Initialise,
-			_ConvexHull_Execute,
-			_ConvexHull_Destroy,
-			_ConvexHull_IsCoordInside,
-			_ConvexHull_CalculateVolume,
-			_ConvecHull_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(ConvexHull);
+	Type                                                          type = ConvexHull_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _ConvexHull_Delete;
+	Stg_Class_PrintFunction*                                    _print = _ConvexHull_Print;
+	Stg_Class_CopyFunction*                                      _copy = _ConvexHull_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _ConvexHull_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _ConvexHull_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _ConvexHull_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _ConvexHull_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _ConvexHull_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _ConvexHull_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _ConvexHull_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _ConvexHull_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _ConvecHull_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _ConvexHull_New(  CONVEXHULL_PASSARGS  );
 }
 
 
@@ -330,5 +304,7 @@ void _ConvecHull_DistanceFromCenterAxis( void* shape, Coord coord, double* disVe
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }
+
+
 
 

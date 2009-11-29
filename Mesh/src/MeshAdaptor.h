@@ -63,13 +63,20 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define MESHADAPTOR_DEFARGS \
-		MESHGENERATOR_DEFARGS
+                MESHGENERATOR_DEFARGS
 
 	#define MESHADAPTOR_PASSARGS \
-		MESHGENERATOR_PASSARGS
+                MESHGENERATOR_PASSARGS
 
-	MeshAdaptor* _MeshAdaptor_New( MESHADAPTOR_DEFARGS );
+	MeshAdaptor* _MeshAdaptor_New(  MESHADAPTOR_DEFARGS  );
 	void _MeshAdaptor_Init( MeshAdaptor* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -96,3 +103,4 @@
 	*/
 
 #endif /* __Domain_Mesh_MeshAdaptor_h__ */
+

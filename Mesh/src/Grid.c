@@ -51,19 +51,22 @@ const Type Grid_Type = "Grid";
 */
 
 Grid* Grid_New() {
-	return _Grid_New( sizeof(Grid), 
-			  Grid_Type, 
-			  _Grid_Delete, 
-			  _Grid_Print, 
-			  NULL );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(Grid);
+	Type                              type = Grid_Type;
+	Stg_Class_DeleteFunction*      _delete = _Grid_Delete;
+	Stg_Class_PrintFunction*        _print = _Grid_Print;
+	Stg_Class_CopyFunction*          _copy = NULL;
+
+	return _Grid_New(  GRID_PASSARGS  );
 }
 
-Grid* _Grid_New( GRID_DEFARGS ) {
+Grid* _Grid_New(  GRID_DEFARGS  ) {
 	Grid*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Grid) );
-	self = (Grid*)_Stg_Class_New( STG_CLASS_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(Grid) );
+	self = (Grid*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 
 	/* Virtual info */
 
@@ -289,3 +292,5 @@ unsigned Grid_Project( void* grid, unsigned* params ) {
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+

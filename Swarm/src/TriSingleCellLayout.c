@@ -58,37 +58,37 @@ TriSingleCellLayout* TriSingleCellLayout_New( Name name, AbstractContext* contex
 }
 
 TriSingleCellLayout* _TriSingleCellLayout_DefaultNew( Name name ) {
-	return (TriSingleCellLayout*)_TriSingleCellLayout_New(
-		sizeof(TriSingleCellLayout),
-		TriSingleCellLayout_Type,
-		_TriSingleCellLayout_Delete,
-		_TriSingleCellLayout_Print,
-		_TriSingleCellLayout_Copy,
-		(Stg_Component_DefaultConstructorFunction*)_TriSingleCellLayout_DefaultNew,
-		_TriSingleCellLayout_AssignFromXML,
-		_TriSingleCellLayout_Build,
-		_TriSingleCellLayout_Initialise,
-		_TriSingleCellLayout_Execute,
-		_TriSingleCellLayout_Destroy,
-		name,
-		NON_GLOBAL,
-		_TriSingleCellLayout_CellLocalCount,
-		_TriSingleCellLayout_CellShadowCount,
-		_TriSingleCellLayout_PointCount,
-		_TriSingleCellLayout_InitialisePoints,
-		_TriSingleCellLayout_MapElementIdToCellId,
-		_TriSingleCellLayout_IsInCell,
-		_TriSingleCellLayout_CellOf,
-		_TriSingleCellLayout_GetShadowInfo,
-		0,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                                _sizeOfSelf = sizeof(TriSingleCellLayout);
+	Type                                                        type = TriSingleCellLayout_Type;
+	Stg_Class_DeleteFunction*                                _delete = _TriSingleCellLayout_Delete;
+	Stg_Class_PrintFunction*                                  _print = _TriSingleCellLayout_Print;
+	Stg_Class_CopyFunction*                                    _copy = _TriSingleCellLayout_Copy;
+	Stg_Component_DefaultConstructorFunction*    _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_TriSingleCellLayout_DefaultNew;
+	Stg_Component_ConstructFunction*                      _construct = _TriSingleCellLayout_AssignFromXML;
+	Stg_Component_BuildFunction*                              _build = _TriSingleCellLayout_Build;
+	Stg_Component_InitialiseFunction*                    _initialise = _TriSingleCellLayout_Initialise;
+	Stg_Component_ExecuteFunction*                          _execute = _TriSingleCellLayout_Execute;
+	Stg_Component_DestroyFunction*                          _destroy = _TriSingleCellLayout_Destroy;
+	AllocationType                                nameAllocationType = NON_GLOBAL;
+	CellLayout_CellCountFunction*                    _cellLocalCount = _TriSingleCellLayout_CellLocalCount;
+	CellLayout_CellCountFunction*                   _cellShadowCount = _TriSingleCellLayout_CellShadowCount;
+	CellLayout_PointCountFunction*                       _pointCount = _TriSingleCellLayout_PointCount;
+	CellLayout_InitialisePointsFunction*           _initialisePoints = _TriSingleCellLayout_InitialisePoints;
+	CellLayout_MapElementIdToCellIdFunction*   _mapElementIdToCellId = _TriSingleCellLayout_MapElementIdToCellId;
+	CellLayout_IsInCellFunction*                           _isInCell = _TriSingleCellLayout_IsInCell;
+	CellLayout_CellOfFunction*                               _cellOf = _TriSingleCellLayout_CellOf;
+	CellLayout_GetShadowInfoFunction*                 _getShadowInfo = _TriSingleCellLayout_GetShadowInfo;
+	Dictionary*                                           dictionary = NULL;
+
+	return (TriSingleCellLayout*)_TriSingleCellLayout_New(  TRISINGLECELLLAYOUT_PASSARGS  );
 }
 
-TriSingleCellLayout* _TriSingleCellLayout_New( TRISINGLECELLLAYOUT_DEFARGS ) {
+TriSingleCellLayout* _TriSingleCellLayout_New(  TRISINGLECELLLAYOUT_DEFARGS  ) {
 	TriSingleCellLayout* self;
 	
 	/* Allocate memory */
-	self = (TriSingleCellLayout*)_CellLayout_New( CELLLAYOUT_PASSARGS );
+	self = (TriSingleCellLayout*)_CellLayout_New(  CELLLAYOUT_PASSARGS  );
 	
 	/* General info */
 	self->dictionary = dictionary;
@@ -262,3 +262,5 @@ ShadowInfo* _TriSingleCellLayout_GetShadowInfo( void* triSingleCellLayout ) {
 	Journal_Firewall( 0, Swarm_Warning, "Error: %s not implemented yet!\n", __func__ );
 	return NULL;
 }
+
+

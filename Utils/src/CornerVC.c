@@ -89,43 +89,39 @@ CornerVC* CornerVC_New(
 }
 
 CornerVC* _CornerVC_DefaultNew( Name name ) {
-	return _CornerVC_New(
-		sizeof(CornerVC), 
-		CornerVC_Type, 
-		_CornerVC_Delete, 
-		_CornerVC_Print, 
-		_CornerVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)_CornerVC_DefaultNew,
-		_CornerVC_AssignFromXML,	
-		_CornerVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_CornerVC_Destroy,
-		name,
-		NON_GLOBAL,
-		_CornerVC_BuildSelf, 
-		_CornerVC_PrintConcise,
-		_CornerVC_ReadDictionary,
-		_CornerVC_GetSet, 
-		_CornerVC_GetVariableCount, 
-		_CornerVC_GetVariableIndex, 
-		_CornerVC_GetValueIndex, 
-		_CornerVC_GetValueCount, 
-		_CornerVC_GetValue,
-		_VariableCondition_Apply, 
-		NULL,
-		NULL, 
-		NULL, 
-		NULL, 
-		NULL);
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(CornerVC);
+	Type                                                       type = CornerVC_Type;
+	Stg_Class_DeleteFunction*                               _delete = _CornerVC_Delete;
+	Stg_Class_PrintFunction*                                 _print = _CornerVC_Print;
+	Stg_Class_CopyFunction*                                   _copy = _CornerVC_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_CornerVC_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _CornerVC_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _CornerVC_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _VariableCondition_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _VariableCondition_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _CornerVC_Destroy;
+	AllocationType                               nameAllocationType = NON_GLOBAL;
+	VariableCondition_BuildSelfFunc*                     _buildSelf = _CornerVC_BuildSelf;
+	VariableCondition_PrintConciseFunc*               _printConcise = _CornerVC_PrintConcise;
+	VariableCondition_ReadDictionaryFunc*           _readDictionary = _CornerVC_ReadDictionary;
+	VariableCondition_GetSetFunc*                           _getSet = _CornerVC_GetSet;
+	VariableCondition_GetVariableCountFunc*       _getVariableCount = _CornerVC_GetVariableCount;
+	VariableCondition_GetVariableIndexFunc*       _getVariableIndex = _CornerVC_GetVariableIndex;
+	VariableCondition_GetValueIndexFunc*             _getValueIndex = _CornerVC_GetValueIndex;
+	VariableCondition_GetValueCountFunc*             _getValueCount = _CornerVC_GetValueCount;
+	VariableCondition_GetValueFunc*                       _getValue = _CornerVC_GetValue;
+	VariableCondition_ApplyFunc*                             _apply = _VariableCondition_Apply;
+
+	return _CornerVC_New(  CORNERVC_PASSARGS  );
 }
 
-CornerVC* _CornerVC_New( CORNERVC_DEFARGS ) {
+CornerVC* _CornerVC_New(  CORNERVC_DEFARGS  ) {
    CornerVC* self;
 	
    /* Allocate memory/General info */
-   assert(sizeOfSelf >= sizeof(CornerVC));
-   self = (CornerVC*)_VariableCondition_New( VARIABLECONDITION_PASSARGS );
+   assert(_sizeOfSelf >= sizeof(CornerVC));
+   self = (CornerVC*)_VariableCondition_New(  VARIABLECONDITION_PASSARGS  );
 	
    /* Virtual info */
 	
@@ -680,3 +676,5 @@ void _CornerVC_PrintConcise( void* variableCondition, Stream* stream ) {
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Functions
 */
+
+

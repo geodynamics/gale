@@ -74,43 +74,39 @@ MeshShapeVC* MeshShapeVC_New(
 }
 
 void* _MeshShapeVC_DefaultNew( Name name ) {
-	return (void*) _MeshShapeVC_New(
-		sizeof(MeshShapeVC), 
-		MeshShapeVC_Type, 
-		_MeshShapeVC_Delete, 
-		_MeshShapeVC_Print, 
-		_MeshShapeVC_Copy,
-		_MeshShapeVC_DefaultNew,
-		_MeshShapeVC_AssignFromXML,	
-		_MeshShapeVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_MeshShapeVC_Destroy,
-		name,
-		NON_GLOBAL,
-		_MeshShapeVC_BuildSelf, 
-		_MeshShapeVC_PrintConcise,
-		_MeshShapeVC_ReadDictionary,
-		_MeshShapeVC_GetSet, 
-		_MeshShapeVC_GetVariableCount, 
-		_MeshShapeVC_GetVariableIndex, 
-		_MeshShapeVC_GetValueIndex, 
-		_MeshShapeVC_GetValueCount, 
-		_MeshShapeVC_GetValue,
-		_VariableCondition_Apply, 
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(MeshShapeVC);
+	Type                                                       type = MeshShapeVC_Type;
+	Stg_Class_DeleteFunction*                               _delete = _MeshShapeVC_Delete;
+	Stg_Class_PrintFunction*                                 _print = _MeshShapeVC_Print;
+	Stg_Class_CopyFunction*                                   _copy = _MeshShapeVC_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _MeshShapeVC_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _MeshShapeVC_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _MeshShapeVC_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _VariableCondition_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _VariableCondition_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _MeshShapeVC_Destroy;
+	AllocationType                               nameAllocationType = NON_GLOBAL;
+	VariableCondition_BuildSelfFunc*                     _buildSelf = _MeshShapeVC_BuildSelf;
+	VariableCondition_PrintConciseFunc*               _printConcise = _MeshShapeVC_PrintConcise;
+	VariableCondition_ReadDictionaryFunc*           _readDictionary = _MeshShapeVC_ReadDictionary;
+	VariableCondition_GetSetFunc*                           _getSet = _MeshShapeVC_GetSet;
+	VariableCondition_GetVariableCountFunc*       _getVariableCount = _MeshShapeVC_GetVariableCount;
+	VariableCondition_GetVariableIndexFunc*       _getVariableIndex = _MeshShapeVC_GetVariableIndex;
+	VariableCondition_GetValueIndexFunc*             _getValueIndex = _MeshShapeVC_GetValueIndex;
+	VariableCondition_GetValueCountFunc*             _getValueCount = _MeshShapeVC_GetValueCount;
+	VariableCondition_GetValueFunc*                       _getValue = _MeshShapeVC_GetValue;
+	VariableCondition_ApplyFunc*                             _apply = _VariableCondition_Apply;
+
+	return (void*) _MeshShapeVC_New(  MESHSHAPEVC_PASSARGS  );
 }
 
-MeshShapeVC* _MeshShapeVC_New( MESHSHAPEVC_DEFARGS ) {
+MeshShapeVC* _MeshShapeVC_New(  MESHSHAPEVC_DEFARGS  ) {
 	MeshShapeVC* self;
 	
 	/* Allocate memory/General info */
-	assert( sizeOfSelf >= sizeof(MeshShapeVC) );
-	self = (MeshShapeVC*)_VariableCondition_New( VARIABLECONDITION_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(MeshShapeVC) );
+	self = (MeshShapeVC*)_VariableCondition_New(  VARIABLECONDITION_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -483,4 +479,6 @@ VariableCondition_Value _MeshShapeVC_GetValue(void* variableCondition, VariableC
 
 	return self->_entryTbl[valIndex].value;
 }
+
+
 

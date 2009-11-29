@@ -117,3 +117,5 @@ void* _StGermain_Bouncer_DefaultNew( Name name ) {
 Index StGermain_Bouncer_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, StGermain_Bouncer_Type, "0", _StGermain_Bouncer_DefaultNew );
 }
+
+

@@ -62,15 +62,22 @@
 	** Constructors
 	*/
 
-	#define MESH_HEXALGORITHMS_DEFARGS \
-		MESH_ALGORITHMS_DEFARGS
 
-	#define MESH_HEXALGORITHMS_PASSARGS \
-		MESH_ALGORITHMS_PASSARGS
 
 	Mesh_CentroidAlgorithms* Mesh_CentroidAlgorithms_New( Name name, AbstractContext* context );
 
-	Mesh_CentroidAlgorithms* _Mesh_CentroidAlgorithms_New( MESH_HEXALGORITHMS_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESH_CENTROIDALGORITHMS_DEFARGS \
+                MESH_ALGORITHMS_DEFARGS
+
+	#define MESH_CENTROIDALGORITHMS_PASSARGS \
+                MESH_ALGORITHMS_PASSARGS
+
+	Mesh_CentroidAlgorithms* _Mesh_CentroidAlgorithms_New(  MESH_CENTROIDALGORITHMS_DEFARGS  );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
@@ -117,3 +124,4 @@
 	*/
 
 #endif /* __Domain_Mesh_Mesh_CentroidAlgorithms_h__ */
+

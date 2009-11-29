@@ -475,3 +475,5 @@ void StGermain_PrintVector( Stream* stream, double* vector, Index dim ) {
 	
 	Journal_Printf( stream, "%lf}\n", vector[d] );
 }
+
+

@@ -114,47 +114,17 @@ Swarm* Swarm_New(
    return self;
 }
 
-Swarm* _Swarm_New(
-		SizeT                                 _sizeOfSelf,
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,
-		Name                                  name,
-		CellLayout*                           cellLayout,
-		ParticleLayout*                       particleLayout,
-		Dimension_Index                       dim,
-		SizeT                                 particleSize,
-		Particle_InCellIndex                  cellParticleTblDelta, 
-		double                                extraParticlesFactor,
-		ExtensionManager_Register*            extensionMgr_Register,
-		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm,
-		void*				      ics )
+Swarm* _Swarm_New(  SWARM_DEFARGS  )
 {
 	Swarm* self;
 	
 	/* Allocate memory */
-	self = (Swarm*)_Stg_Component_New( 
-			_sizeOfSelf, 
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build, 
-			_initialise,
-			_execute,
-			_destroy,
-			name, 
-			NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (Swarm*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	self->particleSize = particleSize;
 	self->commHandlerList = Stg_ObjectList_New();
@@ -569,29 +539,25 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 }
 
 void* _Swarm_DefaultNew( Name name ) {
-	return _Swarm_New( 
-			sizeof(Swarm),
-			Swarm_Type,
-			_Swarm_Delete,
-			_Swarm_Print,
-			_Swarm_Copy,
-			_Swarm_DefaultNew,
-			_Swarm_AssignFromXML,
-			_Swarm_Build, 
-			_Swarm_Initialise,
-			_Swarm_Execute,
-			_Swarm_Destroy,
-			name, 
-			NULL,                       /* cellLayout */
-			NULL,                       /* particleLayout */
-			0,                          /* dim */
-			sizeof(IntegrationPoint),   /* particleSize */
-			0,	                    /* cellParticleTblDelta */
-			0,                          /* extraParticlesFactor */
-			NULL,                       /* extensionMgr_Register */
-			NULL,                       /* variable_Register */
-			MPI_COMM_WORLD,
-		        NULL );			    /* ics */
+	/* Variables set in this function */
+	SizeT                                                _sizeOfSelf = sizeof(Swarm);
+	Type                                                        type = Swarm_Type;
+	Stg_Class_DeleteFunction*                                _delete = _Swarm_Delete;
+	Stg_Class_PrintFunction*                                  _print = _Swarm_Print;
+	Stg_Class_CopyFunction*                                    _copy = _Swarm_Copy;
+	Stg_Component_DefaultConstructorFunction*    _defaultConstructor = _Swarm_DefaultNew;
+	Stg_Component_ConstructFunction*                      _construct = _Swarm_AssignFromXML;
+	Stg_Component_BuildFunction*                              _build = _Swarm_Build;
+	Stg_Component_InitialiseFunction*                    _initialise = _Swarm_Initialise;
+	Stg_Component_ExecuteFunction*                          _execute = _Swarm_Execute;
+	Stg_Component_DestroyFunction*                          _destroy = _Swarm_Destroy;
+	SizeT                                               particleSize = sizeof(IntegrationPoint);
+	void*                                                        ics = NULL;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _Swarm_New(  SWARM_PASSARGS  );			    /* ics_renamed */
 }
 
 void _Swarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, void* data ) {
@@ -1688,3 +1654,5 @@ void Swarm_AddVariable( Swarm* self, SwarmVariable* swarmVar ) {
 	self->swarmVars[self->nSwarmVars] = swarmVar;
 	self->nSwarmVars++;
 }
+
+

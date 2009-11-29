@@ -62,24 +62,25 @@
 
 	struct SingleCellLayout { __SingleCellLayout };
 
-	#define SINGLECELLLAYOUT_DEFARGS \
-		CELLLAYOUT_DEFARGS, \
-			const Bool	dimExists[3], \
-			const XYZ	min, \
-			const XYZ	max 
 
-	#define SINGLECELLLAYOUT_PASSARGS \
-		CELLLAYOUT_PASSARGS, \
-			dimExists[3], \
-			min, \
-			max 
 	
 	/* Create a new SingleCellLayout and initialise */
 	
 	SingleCellLayout* SingleCellLayout_New( Name name, AbstractContext* context,  const Bool dimExists[3], const XYZ min, const XYZ max ) ;
 
 	/* Creation implementation / Virtual constructor */
-	SingleCellLayout* _SingleCellLayout_New( SINGLECELLLAYOUT_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SINGLECELLLAYOUT_DEFARGS \
+                CELLLAYOUT_DEFARGS
+
+	#define SINGLECELLLAYOUT_PASSARGS \
+                CELLLAYOUT_PASSARGS
+
+	SingleCellLayout* _SingleCellLayout_New(  SINGLECELLLAYOUT_DEFARGS  );
 
 	/* Initialise implementation */
 	void _SingleCellLayout_Init( void* cellLayout, const Bool dimExists[3], const XYZ min, const XYZ max );
@@ -139,3 +140,4 @@
 	void _SingleCellLayout_InitialiseGlobalCellPointPositions( SingleCellLayout* self );
 	
 #endif /* __Domain_Swarm_SingleCellLayout_h__ */
+

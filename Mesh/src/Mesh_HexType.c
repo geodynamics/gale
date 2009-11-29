@@ -57,23 +57,26 @@ const Type Mesh_HexType_Type = "Mesh_HexType";
 */
 
 Mesh_HexType* Mesh_HexType_New( Name name ) {
-	return _Mesh_HexType_New( sizeof(Mesh_HexType), 
-				  Mesh_HexType_Type, 
-				  _Mesh_HexType_Delete, 
-				  _Mesh_HexType_Print, 
-				  NULL, 
-				  Mesh_HexType_Update, 
-				  Mesh_HexType_ElementHasPoint, 
-				  Mesh_HexType_GetMinimumSeparation, 
-				  _Mesh_ElementType_GetCentroid );
+	/* Variables set in this function */
+	SizeT                                                    _sizeOfSelf = sizeof(Mesh_HexType);
+	Type                                                            type = Mesh_HexType_Type;
+	Stg_Class_DeleteFunction*                                    _delete = _Mesh_HexType_Delete;
+	Stg_Class_PrintFunction*                                      _print = _Mesh_HexType_Print;
+	Stg_Class_CopyFunction*                                        _copy = NULL;
+	Mesh_ElementType_UpdateFunc*                              updateFunc = Mesh_HexType_Update;
+	Mesh_ElementType_ElementHasPointFunc*            elementHasPointFunc = Mesh_HexType_ElementHasPoint;
+	Mesh_ElementType_GetMinimumSeparationFunc*  getMinimumSeparationFunc = Mesh_HexType_GetMinimumSeparation;
+	Mesh_ElementType_GetCentroidFunc*                    getCentroidFunc = _Mesh_ElementType_GetCentroid;
+
+	return _Mesh_HexType_New(  MESH_HEXTYPE_PASSARGS  );
 }
 
-Mesh_HexType* _Mesh_HexType_New( MESH_HEXTYPE_DEFARGS ) {
+Mesh_HexType* _Mesh_HexType_New(  MESH_HEXTYPE_DEFARGS  ) {
 	Mesh_HexType* self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Mesh_HexType) );
-	self = (Mesh_HexType*)_Mesh_ElementType_New( MESH_ELEMENTTYPE_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(Mesh_HexType) );
+	self = (Mesh_HexType*)_Mesh_ElementType_New(  MESH_ELEMENTTYPE_PASSARGS  );
 
 	/* Virtual info */
 
@@ -1084,3 +1087,5 @@ Bool Mesh_HexType_ElementHasPoint1DWithIncidence( Mesh_HexType* self, unsigned e
 
 	return False;
 }
+
+

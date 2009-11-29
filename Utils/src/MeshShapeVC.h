@@ -63,15 +63,7 @@
 
 	struct MeshShapeVC { __MeshShapeVC };
 
-	#define MESHSHAPEVC_DEFARGS \
-      VARIABLECONDITION_DEFARGS, \
-         Name  _dictionaryEntryName, \
-         void* _mesh 
 
-   #define MESHSHAPEVC_PASSARGS \
-      VARIABLECONDITION_PASSARGS, \
-         _dictionaryEntryName, \
-         _mesh 
 
 	/*-----------------------------------------------------------------------------------------------------------------
 	** Constructor
@@ -91,7 +83,18 @@
 		Dictionary*							dictionary,
 		void*									_mesh );
 	
-	MeshShapeVC* _MeshShapeVC_New( MESHSHAPEVC_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESHSHAPEVC_DEFARGS \
+                VARIABLECONDITION_DEFARGS
+
+	#define MESHSHAPEVC_PASSARGS \
+                VARIABLECONDITION_PASSARGS
+
+	MeshShapeVC* _MeshShapeVC_New(  MESHSHAPEVC_DEFARGS  );
 	
 	void _MeshShapeVC_Init( void* shapeVC, Name _dictionaryEntryName, void* _mesh );
 	
@@ -137,3 +140,4 @@
 	
 	
 #endif
+

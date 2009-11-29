@@ -55,12 +55,12 @@ const Type MeshAdaptor_Type = "MeshAdaptor";
 ** Constructors
 */
 
-MeshAdaptor* _MeshAdaptor_New( MESHADAPTOR_DEFARGS ) {
+MeshAdaptor* _MeshAdaptor_New(  MESHADAPTOR_DEFARGS  ) {
 	MeshAdaptor* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(MeshAdaptor) );
-	self = (MeshAdaptor*)_MeshGenerator_New( MESHGENERATOR_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(MeshAdaptor) );
+	self = (MeshAdaptor*)_MeshGenerator_New(  MESHGENERATOR_PASSARGS  );
 
 	/* Virtual info */
 
@@ -158,3 +158,5 @@ void MeshAdaptor_SetSourceMesh( void* adaptor, void* mesh ) {
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+

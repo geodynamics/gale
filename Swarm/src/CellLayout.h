@@ -77,32 +77,39 @@
 
 	struct CellLayout { __CellLayout };
 
-	#define CELLLAYOUT_DEFARGS \
-		STG_COMPONENT_DEFARGS, \
-			CellLayout_CellCountFunction*					_cellLocalCount, \
-			CellLayout_CellCountFunction*					_cellShadowCount, \
-			CellLayout_PointCountFunction*				_pointCount, \
-			CellLayout_InitialisePointsFunction*		_initialisePoints, \
-			CellLayout_MapElementIdToCellIdFunction*	_mapElementIdToCellId, \
-			CellLayout_IsInCellFunction*					_isInCell, \
-			CellLayout_CellOfFunction*						_cellOf, \
-			CellLayout_GetShadowInfoFunction*			_getShadowInfo
 
-	#define CELLLAYOUT_PASSARGS \
-		STG_COMPONENT_PASSARGS, \
-			_cellLocalCount, \
-			_cellShadowCount, \
-			_pointCount, \
-			_initialisePoints, \
-			_mapElementIdToCellId, \
-			_isInCell, \
-			_cellOf, \
-			_getShadowInfo
 	
 	/* No "CellLayout_New" and "CellLayout_Init" as this is an abstract class */
 	
 	/* Creation implementation / Virtual constructor */
-	CellLayout* _CellLayout_New( CELLLAYOUT_DEFARGS ); 
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CELLLAYOUT_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                CellLayout_CellCountFunction*                   _cellLocalCount, \
+                CellLayout_CellCountFunction*                  _cellShadowCount, \
+                CellLayout_PointCountFunction*                      _pointCount, \
+                CellLayout_InitialisePointsFunction*          _initialisePoints, \
+                CellLayout_MapElementIdToCellIdFunction*  _mapElementIdToCellId, \
+                CellLayout_IsInCellFunction*                          _isInCell, \
+                CellLayout_CellOfFunction*                              _cellOf, \
+                CellLayout_GetShadowInfoFunction*                _getShadowInfo
+
+	#define CELLLAYOUT_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _cellLocalCount,       \
+	        _cellShadowCount,      \
+	        _pointCount,           \
+	        _initialisePoints,     \
+	        _mapElementIdToCellId, \
+	        _isInCell,             \
+	        _cellOf,               \
+	        _getShadowInfo       
+
+	CellLayout* _CellLayout_New(  CELLLAYOUT_DEFARGS  ); 
 
 	/* Initialise implementation */
 	void _CellLayout_Init( CellLayout* self, AbstractContext* context );
@@ -152,3 +159,4 @@
 	ShadowInfo* CellLayout_GetShadowInfo( void* cellLayout );
 	
 #endif /* __Domain_Swarm_CellLayout_h__ */
+

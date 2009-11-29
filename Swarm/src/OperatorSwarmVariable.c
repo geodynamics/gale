@@ -104,31 +104,32 @@ OperatorSwarmVariable* OperatorSwarmVariable_New(
 }
 
 void* _OperatorSwarmVariable_DefaultNew( Name name ) {
-	return (void*) _OperatorSwarmVariable_New( 
-		sizeof(OperatorSwarmVariable), 
-		OperatorSwarmVariable_Type, 
-		_OperatorSwarmVariable_Delete, 
-		_OperatorSwarmVariable_Print,
-		_OperatorSwarmVariable_Copy, 
-		_OperatorSwarmVariable_DefaultNew,
-		_OperatorSwarmVariable_AssignFromXML,
-		_OperatorSwarmVariable_Build, 
-		_OperatorSwarmVariable_Initialise, 
-		_OperatorSwarmVariable_Execute,
-		_OperatorSwarmVariable_Destroy,
-		name,
-		NON_GLOBAL,
-		_OperatorSwarmVariable_ValueAt,
-		_OperatorSwarmVariable_GetMinGlobalMagnitude,
-		_OperatorSwarmVariable_GetMaxGlobalMagnitude );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(OperatorSwarmVariable);
+	Type                                                         type = OperatorSwarmVariable_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _OperatorSwarmVariable_Delete;
+	Stg_Class_PrintFunction*                                   _print = _OperatorSwarmVariable_Print;
+	Stg_Class_CopyFunction*                                     _copy = _OperatorSwarmVariable_Copy;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _OperatorSwarmVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _OperatorSwarmVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _OperatorSwarmVariable_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _OperatorSwarmVariable_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _OperatorSwarmVariable_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _OperatorSwarmVariable_Destroy;
+	AllocationType                                 nameAllocationType = NON_GLOBAL;
+	SwarmVariable_ValueAtFunction*                           _valueAt = _OperatorSwarmVariable_ValueAt;
+	SwarmVariable_GetGlobalValueFunction*      _getMinGlobalMagnitude = _OperatorSwarmVariable_GetMinGlobalMagnitude;
+	SwarmVariable_GetGlobalValueFunction*      _getMaxGlobalMagnitude = _OperatorSwarmVariable_GetMaxGlobalMagnitude;
+
+	return (void*) _OperatorSwarmVariable_New(  OPERATORSWARMVARIABLE_PASSARGS  );
 }
 
-OperatorSwarmVariable* _OperatorSwarmVariable_New( OPERATORSWARMVARIABLE_DEFARGS ) {
+OperatorSwarmVariable* _OperatorSwarmVariable_New(  OPERATORSWARMVARIABLE_DEFARGS  ) {
 	OperatorSwarmVariable* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(OperatorSwarmVariable) );
-	self = (OperatorSwarmVariable*) _SwarmVariable_New( SWARMVARIABLE_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(OperatorSwarmVariable) );
+	self = (OperatorSwarmVariable*) _SwarmVariable_New(  SWARMVARIABLE_PASSARGS  );
 	
 	return self;
 }
@@ -313,3 +314,5 @@ void _OperatorSwarmVariable_BinaryValueAt( void* swarmVariable, Particle_Index l
 
 	Operator_CarryOutBinaryOperation( self->_operator, swarmValue0, swarmValue1, value ); 
 }
+
+

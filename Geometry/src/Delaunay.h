@@ -118,25 +118,30 @@
 		DelaunayAttributes			*attr );
 	
 	/** Creation implementation */
-	Delaunay* _Delaunay_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
-		Dictionary					*dictionary,
-		CoordF						*sites,
-		int							numSites,
-		int							idOffset,
-		DelaunayAttributes			*attr );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define DELAUNAY_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                Bool                   initFlag, \
+                Dictionary*          dictionary, \
+                CoordF*                   sites, \
+                int                    numSites, \
+                int                    idOffset, \
+                DelaunayAttributes*        attr
+
+	#define DELAUNAY_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        initFlag,   \
+	        dictionary, \
+	        sites,      \
+	        numSites,   \
+	        idOffset,   \
+	        attr      
+
+	Delaunay* _Delaunay_New(  DELAUNAY_DEFARGS  );
 	
 	//void _Delaunay_Init( Delaunay* self );
     void _Delaunay_Init( Delaunay* self, CoordF* points, DelaunayAttributes* attr, int numSites, int idOffset, Dictionary* dictionary, Bool initFlag );
@@ -186,3 +191,4 @@
 	void Delaunay_FindMinMax( Site *sites, int count, float *minX, float *minY, float *maxX, float *maxY );
 	
 #endif /* __Domain_Geometry_Delaunay_h__ */
+

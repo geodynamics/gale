@@ -66,15 +66,7 @@
 
 	struct _InnerWallVC { __InnerWallVC };
 	
-	#define INNERVALUEVC_DEFARGS \
-      VARIABLECONDITION_DEFARGS, \
-         Name  _dictionaryEntryName, \
-         void* _mesh 
 
-   #define INNERVALUEVC_PASSARGS \
-      VARIABLECONDITION_PASSARGS, \
-         _dictionaryEntryName, \
-         _mesh 
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
@@ -96,7 +88,18 @@
 		Dictionary*							dictionary,
 		void*									_mesh );
 	
-	InnerWallVC* _InnerWallVC_New( INNERVALUEVC_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define INNERWALLVC_DEFARGS \
+                VARIABLECONDITION_DEFARGS
+
+	#define INNERWALLVC_PASSARGS \
+                VARIABLECONDITION_PASSARGS
+
+	InnerWallVC* _InnerWallVC_New(  INNERWALLVC_DEFARGS  );
 	
 	void	_InnerWallVC_Init( void* innerWallVC, Name _dictionaryEntryName, void* _mesh );
 	
@@ -160,3 +163,4 @@
 	*/
 
 #endif /* __Domain_Utils_InnerWallVC_h__ */
+

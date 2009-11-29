@@ -49,30 +49,32 @@ const Type Mesh_Type = "Mesh";
 */
 
 Mesh* Mesh_New( Name name, AbstractContext* context ) {
-	Mesh* self = _Mesh_New( sizeof(Mesh), 
-			  Mesh_Type, 
-			  _Mesh_Delete, 
-			  _Mesh_Print, 
-			  NULL, 
-			  (void* (*)(Name))_Mesh_New, 
-			  _Mesh_AssignFromXML, 
-			  _Mesh_Build, 
-			  _Mesh_Initialise, 
-			  _Mesh_Execute, 
-			  _Mesh_Destroy, 
-			  name, 
-			  NON_GLOBAL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Mesh);
+	Type                                                      type = Mesh_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Mesh_Delete;
+	Stg_Class_PrintFunction*                                _print = _Mesh_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void* (*)(Name))_Mesh_New;
+	Stg_Component_ConstructFunction*                    _construct = _Mesh_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Mesh_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Mesh_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Mesh_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Mesh_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
+	Mesh* self = _Mesh_New(  MESH_PASSARGS  );
 
 	_Mesh_Init( self, context );
    return self;
 }
 
-Mesh* _Mesh_New( MESH_DEFARGS ) {
+Mesh* _Mesh_New(  MESH_DEFARGS  ) {
 	Mesh* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Mesh) );
-	self = (Mesh*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(Mesh) );
+	self = (Mesh*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	return self;
 }
@@ -652,3 +654,5 @@ void Mesh_Destruct( Mesh* self ) {
 	List_Clear( self->vars );
 	*/
 }
+
+

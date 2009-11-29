@@ -68,28 +68,7 @@ RandomParticleLayout* RandomParticleLayout_New(
 	return self;
 }
 
-RandomParticleLayout* _RandomParticleLayout_New( 
-      SizeT                                        _sizeOfSelf,
-      Type                                         type,
-      Stg_Class_DeleteFunction*                    _delete,
-      Stg_Class_PrintFunction*                     _print,
-      Stg_Class_CopyFunction*                      _copy,
-      Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
-      Stg_Component_ConstructFunction*             _construct,
-      Stg_Component_BuildFunction*                 _build,
-      Stg_Component_InitialiseFunction*            _initialise,
-      Stg_Component_ExecuteFunction*               _execute,
-      Stg_Component_DestroyFunction*               _destroy,
-      Name                                         name,
-      AllocationType                               nameAllocationType,
-      ParticleLayout_SetInitialCountsFunction*     _setInitialCounts,
-      ParticleLayout_InitialiseParticlesFunction*  _initialiseParticles,
-      CoordSystem                                  coordSystem,
-      Bool                                         weightsInitialisedAtStartup,
-      PerCellParticleLayout_InitialCountFunction*  _initialCount,
-      PerCellParticleLayout_InitialiseParticlesOfCellFunction* _initialiseParticlesOfCell,
-		Particle_InCellIndex                         cellParticleCount,
-		unsigned int                                 seed )
+RandomParticleLayout* _RandomParticleLayout_New(  RANDOMPARTICLELAYOUT_DEFARGS  )
 {
 	RandomParticleLayout* self;
 	
@@ -99,22 +78,7 @@ RandomParticleLayout* _RandomParticleLayout_New(
    nameAllocationType = NON_GLOBAL;
 
 	/* Allocate memory */
-	self = (RandomParticleLayout*)_PerCellParticleLayout_New( 
-      _sizeOfSelf, 
-		type,
-		_delete,
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-      name, nameAllocationType,
-		_setInitialCounts, _initialiseParticles,
-      coordSystem, weightsInitialisedAtStartup,
-		_initialCount, _initialiseParticlesOfCell );
+	self = (RandomParticleLayout*)_PerCellParticleLayout_New(  PERCELLPARTICLELAYOUT_PASSARGS  );
 
 	return self;
 }
@@ -169,24 +133,27 @@ void* _RandomParticleLayout_Copy( void* randomParticleLayout, void* dest, Bool d
 
 
 void* _RandomParticleLayout_DefaultNew( Name name ) {
-	return (void*)_RandomParticleLayout_New( 
-			sizeof(RandomParticleLayout),
-			RandomParticleLayout_Type,
-			_RandomParticleLayout_Delete,
-			_RandomParticleLayout_Print, 
-			_RandomParticleLayout_Copy,
-			_RandomParticleLayout_DefaultNew,
-			_RandomParticleLayout_AssignFromXML,
-			_RandomParticleLayout_Build,
-			_RandomParticleLayout_Initialise,
-			_RandomParticleLayout_Execute,
-			_RandomParticleLayout_Destroy,
-         name, NON_GLOBAL,
-			_PerCellParticleLayout_SetInitialCounts, _PerCellParticleLayout_InitialiseParticles,
-         GlobalCoordSystem, False,
-			_RandomParticleLayout_InitialCount, _RandomParticleLayout_InitialiseParticlesOfCell, 
-			0, /* cellParticleCount */
-			0  /* seed */ );
+	/* Variables set in this function */
+	SizeT                                                                     _sizeOfSelf = sizeof(RandomParticleLayout);
+	Type                                                                             type = RandomParticleLayout_Type;
+	Stg_Class_DeleteFunction*                                                     _delete = _RandomParticleLayout_Delete;
+	Stg_Class_PrintFunction*                                                       _print = _RandomParticleLayout_Print;
+	Stg_Class_CopyFunction*                                                         _copy = _RandomParticleLayout_Copy;
+	Stg_Component_DefaultConstructorFunction*                         _defaultConstructor = _RandomParticleLayout_DefaultNew;
+	Stg_Component_ConstructFunction*                                           _construct = _RandomParticleLayout_AssignFromXML;
+	Stg_Component_BuildFunction*                                                   _build = _RandomParticleLayout_Build;
+	Stg_Component_InitialiseFunction*                                         _initialise = _RandomParticleLayout_Initialise;
+	Stg_Component_ExecuteFunction*                                               _execute = _RandomParticleLayout_Execute;
+	Stg_Component_DestroyFunction*                                               _destroy = _RandomParticleLayout_Destroy;
+	AllocationType                                                     nameAllocationType = NON_GLOBAL;
+	ParticleLayout_SetInitialCountsFunction*                            _setInitialCounts = _PerCellParticleLayout_SetInitialCounts;
+	ParticleLayout_InitialiseParticlesFunction*                      _initialiseParticles = _PerCellParticleLayout_InitialiseParticles;
+	CoordSystem                                                               coordSystem = GlobalCoordSystem;
+	Bool                                                      weightsInitialisedAtStartup = False;
+	PerCellParticleLayout_InitialCountFunction*                             _initialCount = _RandomParticleLayout_InitialCount;
+	PerCellParticleLayout_InitialiseParticlesOfCellFunction*   _initialiseParticlesOfCell = _RandomParticleLayout_InitialiseParticlesOfCell;
+
+	return (void*)_RandomParticleLayout_New(  RANDOMPARTICLELAYOUT_PASSARGS  );
 }
 
 void _RandomParticleLayout_AssignFromXML( void* randomParticleLayout, Stg_ComponentFactory* cf, void* data ) {
@@ -247,4 +214,6 @@ void _RandomParticleLayout_InitialiseParticlesOfCell( void* randomParticleLayout
 		}
 	}
 }
+
+
 

@@ -72,43 +72,13 @@ BelowCosinePlane* BelowCosinePlane_New(
 	return self;
 }
 
-BelowCosinePlane* _BelowCosinePlane_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
-		Name                                  name )
+BelowCosinePlane* _BelowCosinePlane_New(  BELOWCOSINEPLANE_DEFARGS  )
 {
 	BelowCosinePlane* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(BelowCosinePlane) );
-	self = (BelowCosinePlane*)_BelowPlane_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (BelowCosinePlane*)_BelowPlane_New(  BELOWPLANE_PASSARGS  );
 	
 	/* General info */
 	return self;
@@ -156,22 +126,26 @@ void* _BelowCosinePlane_Copy( void* belowPlane, void* dest, Bool deep, Name name
 }
 
 void* _BelowCosinePlane_DefaultNew( Name name ) {
-	return (void*) _BelowCosinePlane_New(
-			sizeof(BelowCosinePlane),
-			BelowCosinePlane_Type,
-			_BelowCosinePlane_Delete,
-			_BelowCosinePlane_Print,
-			_BelowCosinePlane_Copy,
-			_BelowCosinePlane_DefaultNew,
-			_BelowCosinePlane_AssignFromXML,
-			_BelowCosinePlane_Build,
-			_BelowCosinePlane_Initialise,
-			_BelowCosinePlane_Execute,
-			_BelowCosinePlane_Destroy,
-			_BelowCosinePlane_IsCoordInside,
-			_BelowCosinePlane_CalculateVolume,
-			_BelowCosinePlane_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(BelowCosinePlane);
+	Type                                                          type = BelowCosinePlane_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _BelowCosinePlane_Delete;
+	Stg_Class_PrintFunction*                                    _print = _BelowCosinePlane_Print;
+	Stg_Class_CopyFunction*                                      _copy = _BelowCosinePlane_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _BelowCosinePlane_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _BelowCosinePlane_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _BelowCosinePlane_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _BelowCosinePlane_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _BelowCosinePlane_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _BelowCosinePlane_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _BelowCosinePlane_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _BelowCosinePlane_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _BelowCosinePlane_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _BelowCosinePlane_New(  BELOWCOSINEPLANE_PASSARGS  );
 }
 
 
@@ -263,4 +237,6 @@ void _BelowCosinePlane_DistanceFromCenterAxis( void* shape, Coord coord, double*
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }
+
+
 

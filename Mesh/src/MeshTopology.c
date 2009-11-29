@@ -107,3 +107,5 @@ const Comm* MeshTopology_GetComm( const void* self ) {
    assert( self );
    return ((MeshTopology*)self)->comm;
 }
+
+

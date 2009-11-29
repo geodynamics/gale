@@ -68,45 +68,47 @@ const Type CartesianGenerator_Type = "CartesianGenerator";
 */
 
 CartesianGenerator* CartesianGenerator_New( Name name, AbstractContext* context ) {
-	CartesianGenerator* self = _CartesianGenerator_New( sizeof(CartesianGenerator), 
-					CartesianGenerator_Type, 
-					_CartesianGenerator_Delete, 
-					_CartesianGenerator_Print, 
-					NULL, 
-					(void* (*)(Name))_CartesianGenerator_New, 
-					_CartesianGenerator_AssignFromXML, 
-					_CartesianGenerator_Build, 
-					_CartesianGenerator_Initialise, 
-					_CartesianGenerator_Execute, 
-					_CartesianGenerator_Destroy, 
-					name, 
-					NON_GLOBAL, 
-					CartesianGenerator_SetDimSize, 
-					CartesianGenerator_Generate, 
-					_CartesianGenerator_SetTopologyParams, 
-					_CartesianGenerator_GenElements, 
-					_CartesianGenerator_GenFaces, 
-					_CartesianGenerator_GenEdges, 
-					_CartesianGenerator_GenVertices, 
-					_CartesianGenerator_GenElementVertexInc, 
-					_CartesianGenerator_GenVolumeEdgeInc, 
-					_CartesianGenerator_GenVolumeFaceInc, 
-					_CartesianGenerator_GenFaceVertexInc, 
-					_CartesianGenerator_GenFaceEdgeInc, 
-					_CartesianGenerator_GenEdgeVertexInc, 
-					_CartesianGenerator_GenElementTypes );
+	/* Variables set in this function */
+	SizeT                                                    _sizeOfSelf = sizeof(CartesianGenerator);
+	Type                                                            type = CartesianGenerator_Type;
+	Stg_Class_DeleteFunction*                                    _delete = _CartesianGenerator_Delete;
+	Stg_Class_PrintFunction*                                      _print = _CartesianGenerator_Print;
+	Stg_Class_CopyFunction*                                        _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*        _defaultConstructor = (void* (*)(Name))_CartesianGenerator_New;
+	Stg_Component_ConstructFunction*                          _construct = _CartesianGenerator_AssignFromXML;
+	Stg_Component_BuildFunction*                                  _build = _CartesianGenerator_Build;
+	Stg_Component_InitialiseFunction*                        _initialise = _CartesianGenerator_Initialise;
+	Stg_Component_ExecuteFunction*                              _execute = _CartesianGenerator_Execute;
+	Stg_Component_DestroyFunction*                              _destroy = _CartesianGenerator_Destroy;
+	AllocationType                                    nameAllocationType = NON_GLOBAL;
+	MeshGenerator_SetDimSizeFunc*                         setDimSizeFunc = CartesianGenerator_SetDimSize;
+	MeshGenerator_GenerateFunc*                             generateFunc = CartesianGenerator_Generate;
+	CartesianGenerator_SetTopologyParamsFunc*      setTopologyParamsFunc = _CartesianGenerator_SetTopologyParams;
+	CartesianGenerator_GenElementsFunc*                  genElementsFunc = _CartesianGenerator_GenElements;
+	CartesianGenerator_GenFacesFunc*                        genFacesFunc = _CartesianGenerator_GenFaces;
+	CartesianGenerator_GenEdgesFunc*                        genEdgesFunc = _CartesianGenerator_GenEdges;
+	CartesianGenerator_GenVerticesFunc*                  genVerticesFunc = _CartesianGenerator_GenVertices;
+	CartesianGenerator_GenElementVertexIncFunc*  genElementVertexIncFunc = _CartesianGenerator_GenElementVertexInc;
+	CartesianGenerator_GenVolumeEdgeIncFunc*        genVolumeEdgeIncFunc = _CartesianGenerator_GenVolumeEdgeInc;
+	CartesianGenerator_GenVolumeFaceIncFunc*        genVolumeFaceIncFunc = _CartesianGenerator_GenVolumeFaceInc;
+	CartesianGenerator_GenFaceVertexIncFunc*        genFaceVertexIncFunc = _CartesianGenerator_GenFaceVertexInc;
+	CartesianGenerator_GenFaceEdgeIncFunc*            genFaceEdgeIncFunc = _CartesianGenerator_GenFaceEdgeInc;
+	CartesianGenerator_GenEdgeVertexIncFunc*        genEdgeVertexIncFunc = _CartesianGenerator_GenEdgeVertexInc;
+	CartesianGenerator_GenElementTypesFunc*          genElementTypesFunc = _CartesianGenerator_GenElementTypes;
+
+	CartesianGenerator* self = _CartesianGenerator_New(  CARTESIANGENERATOR_PASSARGS  );
 	/* CartesianGenerator info */
    _MeshGenerator_Init( (MeshGenerator*)self, context );
 	_CartesianGenerator_Init( self );
    return self;
 }
 
-CartesianGenerator* _CartesianGenerator_New( CARTESIANGENERATOR_DEFARGS ) {
+CartesianGenerator* _CartesianGenerator_New(  CARTESIANGENERATOR_DEFARGS  ) {
 	CartesianGenerator* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(CartesianGenerator) );
-	self = (CartesianGenerator*)_MeshGenerator_New( MESHGENERATOR_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(CartesianGenerator) );
+	self = (CartesianGenerator*)_MeshGenerator_New(  MESHGENERATOR_PASSARGS  );
 
 	/* Virtual info */
 	self->setTopologyParamsFunc = setTopologyParamsFunc;
@@ -2488,3 +2490,5 @@ void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, con
    }
 
 }
+
+

@@ -79,3 +79,5 @@ Index StgDomain_Toolbox_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, StgDomain_Toolbox_Type, "0", _StgDomain_Toolbox_DefaultNew );
 }
 
+
+

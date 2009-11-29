@@ -219,3 +219,5 @@ void CornerVCSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, CornerVCSuite_Setup, CornerVCSuite_Teardown );
    pcu_suite_addTest( suite, CornerVCSuite_TestCornerVC );
 }
+
+

@@ -88,32 +88,39 @@
 	** Constructors
 	*/
 
-	#define MESH_ALGORITHMS_DEFARGS								\
-		STG_COMPONENT_DEFARGS,								\
-		Mesh_Algorithms_SetMeshFunc*			setMeshFunc,			\
-		Mesh_Algorithms_UpdateFunc*			updateFunc,			\
-		Mesh_Algorithms_NearestVertexFunc*		nearestVertexFunc, 		\
-		Mesh_Algorithms_SearchFunc*			searchFunc, 			\
-		Mesh_Algorithms_SearchElementsFunc*		searchElementsFunc, 		\
-		Mesh_Algorithms_GetMinimumSeparationFunc*	getMinimumSeparationFunc, 	\
-		Mesh_Algorithms_GetLocalCoordRangeFunc*		getLocalCoordRangeFunc,		\
-		Mesh_Algorithms_GetDomainCoordRangeFunc*	getDomainCoordRangeFunc,	\
-		Mesh_Algorithms_GetGlobalCoordRangeFunc*	getGlobalCoordRangeFunc
 
-	#define MESH_ALGORITHMS_PASSARGS	\
-		STG_COMPONENT_PASSARGS, 	\
-		setMeshFunc, 			\
-		updateFunc, 			\
-		nearestVertexFunc,		\
-		searchFunc, 			\
-		searchElementsFunc,		\
-		getMinimumSeparationFunc,	\
-		getLocalCoordRangeFunc, 	\
-		getDomainCoordRangeFunc, 	\
-		getGlobalCoordRangeFunc
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESH_ALGORITHMS_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                Mesh_Algorithms_SetMeshFunc*                            setMeshFunc, \
+                Mesh_Algorithms_UpdateFunc*                              updateFunc, \
+                Mesh_Algorithms_NearestVertexFunc*                nearestVertexFunc, \
+                Mesh_Algorithms_SearchFunc*                              searchFunc, \
+                Mesh_Algorithms_SearchElementsFunc*              searchElementsFunc, \
+                Mesh_Algorithms_GetMinimumSeparationFunc*  getMinimumSeparationFunc, \
+                Mesh_Algorithms_GetLocalCoordRangeFunc*      getLocalCoordRangeFunc, \
+                Mesh_Algorithms_GetDomainCoordRangeFunc*    getDomainCoordRangeFunc, \
+                Mesh_Algorithms_GetGlobalCoordRangeFunc*    getGlobalCoordRangeFunc
+
+	#define MESH_ALGORITHMS_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        setMeshFunc,              \
+	        updateFunc,               \
+	        nearestVertexFunc,        \
+	        searchFunc,               \
+	        searchElementsFunc,       \
+	        getMinimumSeparationFunc, \
+	        getLocalCoordRangeFunc,   \
+	        getDomainCoordRangeFunc,  \
+	        getGlobalCoordRangeFunc 
 
 	Mesh_Algorithms* Mesh_Algorithms_New( Name name, AbstractContext* context );
-	Mesh_Algorithms* _Mesh_Algorithms_New( MESH_ALGORITHMS_DEFARGS );
+	Mesh_Algorithms* _Mesh_Algorithms_New(  MESH_ALGORITHMS_DEFARGS  );
 	void _Mesh_Algorithms_Init( Mesh_Algorithms* self, AbstractContext* context );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -193,3 +200,4 @@ Bool Mesh_Algorithms_SearchWithTree( void* self, double* pnt, unsigned* dim, uns
 	*/
 
 #endif /* __Domain_Mesh_Mesh_Algorithms_h__ */
+

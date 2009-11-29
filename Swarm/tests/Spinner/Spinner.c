@@ -116,3 +116,5 @@ void* _StGermain_Spinner_DefaultNew( Name name ) {
 Index StGermain_Spinner_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, StGermain_Spinner_Type, "0", _StGermain_Spinner_DefaultNew );
 }
+
+

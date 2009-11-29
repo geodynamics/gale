@@ -63,40 +63,18 @@ SwarmOutput* SwarmOutput_New(
 	return self;
 }
 
-SwarmOutput* _SwarmOutput_New(
-		SizeT                                              _sizeOfSelf, 
-		Type                                               type,
-		Stg_Class_DeleteFunction*	                       _delete,
-		Stg_Class_PrintFunction*	                       _print, 
-		Stg_Class_CopyFunction*	                           _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		SwarmOutput_PrintHeaderFunction*                   _printHeader,		
-		SwarmOutput_PrintDataFunction*                     _printData,
-		Name                                               name ) 
+SwarmOutput* _SwarmOutput_New(  SWARMOUTPUT_DEFARGS  ) 
 {
 	SwarmOutput*		self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(SwarmOutput) );
-	self = (SwarmOutput*)_Stg_Component_New( 
-			_sizeOfSelf,
-			type, 
-			_delete,
-			_print, 
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name, 
-			NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (SwarmOutput*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* Virtual functions */
 	self->_printHeader                = _printHeader;
@@ -190,21 +168,25 @@ void* _SwarmOutput_Copy( void* swarmOutput, void* dest, Bool deep, Name nameExt,
 
 
 void* _SwarmOutput_DefaultNew( Name name ) {
-		return (void*) _SwarmOutput_New( 
-			sizeof(SwarmOutput), 
-			SwarmOutput_Type, 
-			_SwarmOutput_Delete, 
-			_SwarmOutput_Print,
-			_SwarmOutput_Copy, 
-			_SwarmOutput_DefaultNew,
-			_SwarmOutput_AssignFromXML,
-			_SwarmOutput_Build, 
-			_SwarmOutput_Initialise, 
-			_SwarmOutput_Execute, 
-			_SwarmOutput_Destroy, 
-			_SwarmOutput_PrintHeader,
-			_SwarmOutput_PrintData,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(SwarmOutput);
+	Type                                                      type = SwarmOutput_Type;
+	Stg_Class_DeleteFunction*                              _delete = _SwarmOutput_Delete;
+	Stg_Class_PrintFunction*                                _print = _SwarmOutput_Print;
+	Stg_Class_CopyFunction*                                  _copy = _SwarmOutput_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _SwarmOutput_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _SwarmOutput_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _SwarmOutput_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _SwarmOutput_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _SwarmOutput_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _SwarmOutput_Destroy;
+	SwarmOutput_PrintHeaderFunction*                  _printHeader = _SwarmOutput_PrintHeader;
+	SwarmOutput_PrintDataFunction*                      _printData = _SwarmOutput_PrintData;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+		return (void*) _SwarmOutput_New(  SWARMOUTPUT_PASSARGS  );
 }
 void _SwarmOutput_AssignFromXML( void* swarmOutput, Stg_ComponentFactory* cf, void* data ) {
 	SwarmOutput*	        self         = (SwarmOutput*)swarmOutput;
@@ -398,3 +380,5 @@ void SwarmOutput_PrintTuple( void* swarmOutput, Stream* stream, double* value, I
 		Journal_Printf( stream, self->doubleFormatString, value[count] );
 	}
 }
+
+

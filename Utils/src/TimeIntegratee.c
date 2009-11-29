@@ -64,41 +64,19 @@ TimeIntegratee* TimeIntegratee_New(
 	return self;
 }
 
-TimeIntegratee* _TimeIntegratee_New( 
-		SizeT                                      _sizeOfSelf,
-		Type                                       type,
-		Stg_Class_DeleteFunction*                  _delete,
-		Stg_Class_PrintFunction*                   _print,
-		Stg_Class_CopyFunction*                    _copy, 
-		Stg_Component_DefaultConstructorFunction*  _defaultConstructor,
-		Stg_Component_ConstructFunction*           _construct,
-		Stg_Component_BuildFunction*               _build,
-		Stg_Component_InitialiseFunction*          _initialise,
-		Stg_Component_ExecuteFunction*             _execute,
-		Stg_Component_DestroyFunction*             _destroy,
-		TimeIntegratee_CalculateTimeDerivFunction* _calculateTimeDeriv,
-		TimeIntegratee_IntermediateFunction*       _intermediate,
-		Name                                       name )
+TimeIntegratee* _TimeIntegratee_New(  TIMEINTEGRATEE_DEFARGS  )
 {
 	TimeIntegratee*	self;
 	
 	assert( _sizeOfSelf >= sizeof(TimeIntegratee) );
 	
 	/* General info */
-	self = (TimeIntegratee*)_Stg_Component_New( 
-			_sizeOfSelf, 
-			type, 
-			_delete,
-			_print, 
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute, 
-			_destroy,
-			name, 
-			NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (TimeIntegratee*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	/* virtual info */
 	self->_calculateTimeDeriv = _calculateTimeDeriv;
@@ -167,21 +145,25 @@ void* _TimeIntegratee_Copy( void* timeIntegratee, void* dest, Bool deep, Name na
 }
 
 void* _TimeIntegratee_DefaultNew( Name name ) {
-	return (void*) _TimeIntegratee_New( 
-		sizeof(TimeIntegratee), 
-		TimeIntegratee_Type, 
-		_TimeIntegratee_Delete,
-		_TimeIntegratee_Print, 
-		_TimeIntegratee_Copy, 
-		_TimeIntegratee_DefaultNew, 
-		_TimeIntegratee_AssignFromXML, 
-		_TimeIntegratee_Build, 
-		_TimeIntegratee_Initialise,
-		_TimeIntegratee_Execute,
-		_TimeIntegratee_Destroy, 
-		_TimeIntegratee_AdvectionTimeDeriv,
-		_TimeIntegratee_Intermediate,
-		name );
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(TimeIntegratee);
+	Type                                                       type = TimeIntegratee_Type;
+	Stg_Class_DeleteFunction*                               _delete = _TimeIntegratee_Delete;
+	Stg_Class_PrintFunction*                                 _print = _TimeIntegratee_Print;
+	Stg_Class_CopyFunction*                                   _copy = _TimeIntegratee_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _TimeIntegratee_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _TimeIntegratee_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _TimeIntegratee_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _TimeIntegratee_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _TimeIntegratee_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _TimeIntegratee_Destroy;
+	TimeIntegratee_CalculateTimeDerivFunction*  _calculateTimeDeriv = _TimeIntegratee_AdvectionTimeDeriv;
+	TimeIntegratee_IntermediateFunction*              _intermediate = _TimeIntegratee_Intermediate;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _TimeIntegratee_New(  TIMEINTEGRATEE_PASSARGS  );
 }
 
 void _TimeIntegratee_AssignFromXML( void* timeIntegratee, Stg_ComponentFactory* cf, void* data ) {
@@ -632,5 +614,7 @@ void TimeIntegratee_FourthOrderFinalStep( void* timeIntegratee, Variable* startD
 
 	Memory_Free( k4 );
 }
+
+
 
 

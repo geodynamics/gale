@@ -73,31 +73,29 @@ DofLayout* DofLayout_New( Name name, DomainContext* context, Variable_Register* 
 }
 
 DofLayout* _DofLayout_DefaultNew( Name name ) {
-	return _DofLayout_New(
-		sizeof(DofLayout), 
-		DofLayout_Type, 
-		_DofLayout_Delete, 
-		_DofLayout_Print, 
-		_DofLayout_Copy,
-		(Stg_Component_DefaultConstructorFunction*)_DofLayout_DefaultNew,
-		_DofLayout_AssignFromXML,
-		_DofLayout_Build, 
-		_DofLayout_Initialise, 
-		_DofLayout_Execute, 
-		_DofLayout_Destroy,
-		name,
-		NON_GLOBAL,
-		NULL, 
-		0, 
-		NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(DofLayout);
+	Type                                                      type = DofLayout_Type;
+	Stg_Class_DeleteFunction*                              _delete = _DofLayout_Delete;
+	Stg_Class_PrintFunction*                                _print = _DofLayout_Print;
+	Stg_Class_CopyFunction*                                  _copy = _DofLayout_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_DofLayout_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _DofLayout_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _DofLayout_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _DofLayout_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _DofLayout_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _DofLayout_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
+	return _DofLayout_New(  DOFLAYOUT_PASSARGS  );
 }
 
-DofLayout* _DofLayout_New( DOFLAYOUT_DEFARGS ) {
+DofLayout* _DofLayout_New(  DOFLAYOUT_DEFARGS  ) {
 	DofLayout* self;
 	
 	/* Allocate memory/General info */
-	assert( sizeOfSelf >= sizeof(DofLayout) );
-	self = (DofLayout*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(DofLayout) );
+	self = (DofLayout*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* Virtual info */
 	self->_build = _build;
@@ -629,4 +627,6 @@ void DofLayout_LoadAllVariablesFromFiles( void* dofLayout, char* prefixString, u
 		Memory_Free( varFileName );
 	}
 }
+
+
 

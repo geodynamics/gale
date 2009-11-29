@@ -111,3 +111,5 @@ void EdgeSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, EdgeSuite_Setup, EdgeSuite_Teardown );
    pcu_suite_addTest( suite, EdgeSuite_TestEdge );
 }
+
+

@@ -72,51 +72,14 @@ MeshParticleLayout* MeshParticleLayout_New(
 	return self;
 }
 
-MeshParticleLayout* _MeshParticleLayout_New( 
-      SizeT                                        _sizeOfSelf,
-      Type                                         type,
-      Stg_Class_DeleteFunction*                    _delete,
-      Stg_Class_PrintFunction*                     _print,
-      Stg_Class_CopyFunction*                      _copy,
-      Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
-      Stg_Component_ConstructFunction*             _construct,
-      Stg_Component_BuildFunction*                 _build,
-      Stg_Component_InitialiseFunction*            _initialise,
-      Stg_Component_ExecuteFunction*               _execute,
-      Stg_Component_DestroyFunction*               _destroy,
-      Name                                         name,
-      AllocationType                               nameAllocationType,
-      ParticleLayout_SetInitialCountsFunction*     _setInitialCounts,
-      ParticleLayout_InitialiseParticlesFunction*  _initialiseParticles,
-      CoordSystem                                  coordSystem,
-      Bool                                         weightsInitialisedAtStartup,
-      PerCellParticleLayout_InitialCountFunction*  _initialCount,
-      PerCellParticleLayout_InitialiseParticlesOfCellFunction* _initialiseParticlesOfCell,
-      Mesh*                                        mesh,
-		Particle_InCellIndex                         cellParticleCount,
-		unsigned int                                 seed )
+MeshParticleLayout* _MeshParticleLayout_New(  MESHPARTICLELAYOUT_DEFARGS  )
 {
 	MeshParticleLayout* self;
 
    coordSystem = GlobalCoordSystem;   
    weightsInitialisedAtStartup = False;
 	/* Allocate memory */
-	self = (MeshParticleLayout*)_PerCellParticleLayout_New( 
-		_sizeOfSelf, 
-		type,
-		_delete,
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-      name, nameAllocationType,
-		_setInitialCounts, _initialiseParticles,
-      coordSystem, weightsInitialisedAtStartup,
-		_initialCount, _initialiseParticlesOfCell );
+	self = (MeshParticleLayout*)_PerCellParticleLayout_New(  PERCELLPARTICLELAYOUT_PASSARGS  );
 
    self->mesh = mesh;
    self->cellParticleCount = cellParticleCount;
@@ -176,25 +139,30 @@ void* _MeshParticleLayout_Copy( void* meshParticleLayout, void* dest, Bool deep,
 
 
 void* _MeshParticleLayout_DefaultNew( Name name ) {
-	return (void*)_MeshParticleLayout_New( 
-			sizeof(MeshParticleLayout),
-			MeshParticleLayout_Type,
-			_MeshParticleLayout_Delete,
-			_MeshParticleLayout_Print, 
-			_MeshParticleLayout_Copy,
-			_MeshParticleLayout_DefaultNew,
-			_MeshParticleLayout_AssignFromXML,
-			_MeshParticleLayout_Build,
-			_MeshParticleLayout_Initialise,
-			_MeshParticleLayout_Execute,
-			_MeshParticleLayout_Destroy,
-         name, NON_GLOBAL,
-			_PerCellParticleLayout_SetInitialCounts, _PerCellParticleLayout_InitialiseParticles,
-         LocalCoordSystem, True,
-         _MeshParticleLayout_InitialCount, _MeshParticleLayout_InitialiseParticlesOfCell,
-         NULL, /* mesh */
-			0, /* cellParticleCount */
-			0  /* seed */ );
+	/* Variables set in this function */
+	SizeT                                                                     _sizeOfSelf = sizeof(MeshParticleLayout);
+	Type                                                                             type = MeshParticleLayout_Type;
+	Stg_Class_DeleteFunction*                                                     _delete = _MeshParticleLayout_Delete;
+	Stg_Class_PrintFunction*                                                       _print = _MeshParticleLayout_Print;
+	Stg_Class_CopyFunction*                                                         _copy = _MeshParticleLayout_Copy;
+	Stg_Component_DefaultConstructorFunction*                         _defaultConstructor = _MeshParticleLayout_DefaultNew;
+	Stg_Component_ConstructFunction*                                           _construct = _MeshParticleLayout_AssignFromXML;
+	Stg_Component_BuildFunction*                                                   _build = _MeshParticleLayout_Build;
+	Stg_Component_InitialiseFunction*                                         _initialise = _MeshParticleLayout_Initialise;
+	Stg_Component_ExecuteFunction*                                               _execute = _MeshParticleLayout_Execute;
+	Stg_Component_DestroyFunction*                                               _destroy = _MeshParticleLayout_Destroy;
+	AllocationType                                                     nameAllocationType = NON_GLOBAL;
+	ParticleLayout_SetInitialCountsFunction*                            _setInitialCounts = _PerCellParticleLayout_SetInitialCounts;
+	ParticleLayout_InitialiseParticlesFunction*                      _initialiseParticles = _PerCellParticleLayout_InitialiseParticles;
+	CoordSystem                                                               coordSystem = LocalCoordSystem;
+	Bool                                                      weightsInitialisedAtStartup = True;
+	PerCellParticleLayout_InitialCountFunction*                             _initialCount = _MeshParticleLayout_InitialCount;
+	PerCellParticleLayout_InitialiseParticlesOfCellFunction*   _initialiseParticlesOfCell = _MeshParticleLayout_InitialiseParticlesOfCell;
+	Mesh*                                                                            mesh = NULL;
+	Particle_InCellIndex                                                cellParticleCount = 0;
+	unsigned int                                                                     seed = 0;
+
+	return (void*)_MeshParticleLayout_New(  MESHPARTICLELAYOUT_PASSARGS  );
 }
 
 void _MeshParticleLayout_AssignFromXML( void* meshParticleLayout, Stg_ComponentFactory* cf, void* data ) {
@@ -306,3 +274,5 @@ void _MeshParticleLayout_InitialiseParticlesOfCell( void* meshParticleLayout, vo
 
 	NewClass_Delete( inc );
 }
+
+

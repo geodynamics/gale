@@ -60,14 +60,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define COMPRESSIONADAPTOR_DEFARGS \
-		MESHADAPTOR_DEFARGS
+                MESHADAPTOR_DEFARGS
 
 	#define COMPRESSIONADAPTOR_PASSARGS \
-		MESHADAPTOR_PASSARGS
+                MESHADAPTOR_PASSARGS
 
 	CompressionAdaptor* CompressionAdaptor_New( Name name, AbstractContext* context );
-	CompressionAdaptor* _CompressionAdaptor_New( COMPRESSIONADAPTOR_DEFARGS );
+	CompressionAdaptor* _CompressionAdaptor_New(  COMPRESSIONADAPTOR_DEFARGS  );
 	void _CompressionAdaptor_Init( CompressionAdaptor* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -93,3 +100,4 @@
 	*/
 
 #endif /* __Domain_Mesh_CompressionAdaptor_h__ */
+

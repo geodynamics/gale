@@ -69,29 +69,20 @@ WithinShapeParticleLayout* WithinShapeParticleLayout_New(
 		Stg_Shape*       shape ); 
 
 	/* Creation implementation / Virtual constructor */
-WithinShapeParticleLayout* _WithinShapeParticleLayout_New( 
-		SizeT                                            _sizeOfSelf,
-		Type                                             type,
-		Stg_Class_DeleteFunction*                        _delete,
-		Stg_Class_PrintFunction*                         _print,
-		Stg_Class_CopyFunction*                          _copy,
-		Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-		Stg_Component_ConstructFunction*                 _construct,
-		Stg_Component_BuildFunction*                     _build,
-		Stg_Component_InitialiseFunction*                _initialise,
-		Stg_Component_ExecuteFunction*                   _execute,
-		Stg_Component_DestroyFunction*                   _destroy,
-		ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-      Name                                             name,
-      AllocationType                                   nameAllocationType,
-      CoordSystem                                      coordSystem,
-      Bool                                             weightsInitialisedAtStartup,
-      Particle_Index                                   totalInitialParticles,
-      double                                           averageInitialParticlesPerCell,
-      Dimension_Index                                  dim,
-		Stg_Shape*                                       shape );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define WITHINSHAPEPARTICLELAYOUT_DEFARGS \
+                SPACEFILLERPARTICLELAYOUT_DEFARGS, \
+                Stg_Shape*  shape
+
+	#define WITHINSHAPEPARTICLELAYOUT_PASSARGS \
+                SPACEFILLERPARTICLELAYOUT_PASSARGS, \
+	        shape
+
+WithinShapeParticleLayout* _WithinShapeParticleLayout_New(  WITHINSHAPEPARTICLELAYOUT_DEFARGS  );
 	
 	void _WithinShapeParticleLayout_Init( 
 			void*                   withinShapeParticleLayout, 
@@ -122,3 +113,4 @@ WithinShapeParticleLayout* _WithinShapeParticleLayout_New(
 			void*          particle);
 
 #endif /* __StGermain_Domain_Shape_WithinShapeParticleLayout_h__ */
+

@@ -121,3 +121,5 @@ void* _StGermain_SingleAttractor_DefaultNew( Name name ) {
 Index StGermain_SingleAttractor_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, StGermain_SingleAttractor_Type, "0", _StGermain_SingleAttractor_DefaultNew );
 }
+
+

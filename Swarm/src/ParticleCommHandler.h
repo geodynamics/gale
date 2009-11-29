@@ -120,34 +120,48 @@
 	/** Constructor interface */
 	
 	/** Private Constructor */
-	ParticleCommHandler* _ParticleCommHandler_New( 
-		SizeT                                                           _sizeOfSelf,
-		Type                                                            type,
-		Stg_Class_DeleteFunction*                                       _delete,
-		Stg_Class_PrintFunction*                                        _print,
-		Stg_Class_CopyFunction*                                         _copy, 
-		Stg_Component_DefaultConstructorFunction*                       _defaultConstructor,
-		Stg_Component_ConstructFunction*                                _construct,
-		Stg_Component_BuildFunction*                                    _build,
-		Stg_Component_InitialiseFunction*                               _initialise,
-		Stg_Component_ExecuteFunction*                                  _execute,
-		Stg_Component_DestroyFunction*                                  _destroy,
-		Name                                                            name,
-		Bool                                                            initFlag,
-		ParticleCommHandler_AllocateOutgoingCountArrays						*_allocateOutgoingCountArrays,
-		ParticleCommHandler_AllocateOutgoingParticleArrays						*_allocateOutgoingParticleArrays,
-		ParticleCommHandler_FreeOutgoingArrays									*_freeOutgoingArrays,
-		ParticleCommHandler_AllocateIncomingCountArrays						*_allocateIncomingCountArrays,
-		ParticleCommHandler_AllocateIncomingParticleArrays						*_allocateIncomingParticleArrays,
-		ParticleCommHandler_FreeIncomingArrays									*_freeIncomingArrays,
-		ParticleCommHandler_BeginReceiveOfIncomingParticleCounts				*_beginReceiveOfIncomingParticleCounts,
-		ParticleCommHandler_FinishReceiveOfIncomingParticleCounts				*_finishReceiveOfIncomingParticleCounts,
-		ParticleCommHandler_BeginReceiveOfIncomingParticles					*_beginReceiveOfIncomingParticles,
-		ParticleCommHandler_FinishReceiveOfIncomingParticlesAndUpdateIndices	*_finishReceiveOfIncomingParticlesAndUpdateIndices,
-		ParticleCommHandler_SendOutgoingParticleCounts							*_sendOutgoingParticleCounts,
-		ParticleCommHandler_BeginSendingParticles								*_beginSendingParticle,
-		ParticleCommHandler_ConfirmOutgoingSendsCompleted						*_confirmOutgoingSendsCompleted,
-		ParticleCommHandler_CommFunction										*_commFunction );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PARTICLECOMMHANDLER_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                Bool                                                                                                            initFlag, \
+                ParticleCommHandler_AllocateOutgoingCountArrays*                                            _allocateOutgoingCountArrays, \
+                ParticleCommHandler_AllocateOutgoingParticleArrays*                                      _allocateOutgoingParticleArrays, \
+                ParticleCommHandler_FreeOutgoingArrays*                                                              _freeOutgoingArrays, \
+                ParticleCommHandler_AllocateIncomingCountArrays*                                            _allocateIncomingCountArrays, \
+                ParticleCommHandler_AllocateIncomingParticleArrays*                                      _allocateIncomingParticleArrays, \
+                ParticleCommHandler_FreeIncomingArrays*                                                              _freeIncomingArrays, \
+                ParticleCommHandler_BeginReceiveOfIncomingParticleCounts*                          _beginReceiveOfIncomingParticleCounts, \
+                ParticleCommHandler_FinishReceiveOfIncomingParticleCounts*                        _finishReceiveOfIncomingParticleCounts, \
+                ParticleCommHandler_BeginReceiveOfIncomingParticles*                                    _beginReceiveOfIncomingParticles, \
+                ParticleCommHandler_FinishReceiveOfIncomingParticlesAndUpdateIndices*  _finishReceiveOfIncomingParticlesAndUpdateIndices, \
+                ParticleCommHandler_SendOutgoingParticleCounts*                                              _sendOutgoingParticleCounts, \
+                ParticleCommHandler_BeginSendingParticles*                                                        _beginSendingParticles, \
+                ParticleCommHandler_ConfirmOutgoingSendsCompleted*                                        _confirmOutgoingSendsCompleted, \
+                ParticleCommHandler_CommFunction*                                                                          _commFunction
+
+	#define PARTICLECOMMHANDLER_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        initFlag,                                          \
+	        _allocateOutgoingCountArrays,                      \
+	        _allocateOutgoingParticleArrays,                   \
+	        _freeOutgoingArrays,                               \
+	        _allocateIncomingCountArrays,                      \
+	        _allocateIncomingParticleArrays,                   \
+	        _freeIncomingArrays,                               \
+	        _beginReceiveOfIncomingParticleCounts,             \
+	        _finishReceiveOfIncomingParticleCounts,            \
+	        _beginReceiveOfIncomingParticles,                  \
+	        _finishReceiveOfIncomingParticlesAndUpdateIndices, \
+	        _sendOutgoingParticleCounts,                       \
+	        _beginSendingParticles,                            \
+	        _confirmOutgoingSendsCompleted,                    \
+	        _commFunction                                    
+
+	ParticleCommHandler* _ParticleCommHandler_New(  PARTICLECOMMHANDLER_DEFARGS  );
 	
 	/** Variable initialiser */
 	void _ParticleCommHandler_Init(
@@ -212,3 +226,4 @@
 	void _ParticleCommHandler_PrintCommunicationVolumeStats( ParticleCommHandler* self, double startTime, Stream* info );
 
 #endif
+

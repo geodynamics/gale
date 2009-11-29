@@ -72,19 +72,18 @@
 		EntryPoint_Register*		entryPoint_Register,
 		AbstractContext*			context );
 
-	TimeIntegrator* _TimeIntegrator_New(
-		SizeT                                      _sizeOfSelf,
-		Type                                       type,
-		Stg_Class_DeleteFunction*                  _delete,
-		Stg_Class_PrintFunction*                   _print,
-		Stg_Class_CopyFunction*                    _copy, 
-		Stg_Component_DefaultConstructorFunction*  _defaultConstructor,
-		Stg_Component_ConstructFunction*           _construct,
-		Stg_Component_BuildFunction*               _build,
-		Stg_Component_InitialiseFunction*          _initialise,
-		Stg_Component_ExecuteFunction*             _execute,
-		Stg_Component_DestroyFunction*             _destroy,
-		Name 							           name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define TIMEINTEGRATOR_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define TIMEINTEGRATOR_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	TimeIntegrator* _TimeIntegrator_New(  TIMEINTEGRATOR_DEFARGS  );
 		
 	void _TimeIntegrator_Init(	
 		void*                                      timeIntegrator, 
@@ -156,3 +155,4 @@
 	Variable* Variable_NewFromOld( Variable* oldVariable, Name name, Bool copyValues ) ;
 
 #endif 
+

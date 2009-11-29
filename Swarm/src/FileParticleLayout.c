@@ -81,55 +81,13 @@ FileParticleLayout* FileParticleLayout_New( Name name,
    return self;
 }
 
-FileParticleLayout* _FileParticleLayout_New( 
-      SizeT                                            _sizeOfSelf,
-      Type                                             type,
-      Stg_Class_DeleteFunction*                        _delete,
-      Stg_Class_PrintFunction*                         _print,
-      Stg_Class_CopyFunction*                          _copy, 
-      Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-      Stg_Component_ConstructFunction*                 _construct,
-      Stg_Component_BuildFunction*                     _build,
-      Stg_Component_InitialiseFunction*                _initialise,
-      Stg_Component_ExecuteFunction*                   _execute,
-      Stg_Component_DestroyFunction*                   _destroy,
-      Name                                             name,
-      AllocationType                                   nameAllocationType,
-      ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-      ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-      CoordSystem                                      coordSystem,
-      Bool                                             weightsInitialisedAtStartup,
-      GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-      Particle_Index                                   totalInitialParticles,
-      double                                           averageInitialParticlesPerCell,
-      Name                                             filename,
-      Index                                            checkpointfiles )
+FileParticleLayout* _FileParticleLayout_New(  FILEPARTICLELAYOUT_DEFARGS  )
 {
    FileParticleLayout* self;
    
    /* Allocate memory */
    assert( _sizeOfSelf >= sizeof( FileParticleLayout ) );
-   self = (FileParticleLayout*)_GlobalParticleLayout_New( 
-         _sizeOfSelf, 
-         type,
-         _delete,
-         _print,
-         _copy, 
-         _defaultConstructor,
-         _construct,
-         _build,
-         _initialise,
-         _execute,
-         _destroy,
-         name,
-         nameAllocationType,
-         _setInitialCounts,
-         _initialiseParticles,
-         coordSystem,
-         weightsInitialisedAtStartup,
-         _initialiseParticle,
-         totalInitialParticles,
-         averageInitialParticlesPerCell );
+   self = (FileParticleLayout*)_GlobalParticleLayout_New(  GLOBALPARTICLELAYOUT_PASSARGS  );
 
    /* set default attributes */
    self->filename = filename;
@@ -185,25 +143,30 @@ void* _FileParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Nam
 }
 
 void* _FileParticleLayout_DefaultNew( Name name ) {
-   return (void*)_FileParticleLayout_New( 
-         sizeof(FileParticleLayout),
-         FileParticleLayout_Type,
-         _FileParticleLayout_Delete,
-         _FileParticleLayout_Print,
-         _FileParticleLayout_Copy,
-         _FileParticleLayout_DefaultNew,
-         _FileParticleLayout_AssignFromXML,
-         _FileParticleLayout_Build,
-         _FileParticleLayout_Initialise,
-         _FileParticleLayout_Execute,
-         _FileParticleLayout_Destroy,
-         name, NON_GLOBAL, 
-         _FileParticleLayout_SetInitialCounts,
-         _FileParticleLayout_InitialiseParticles,
-         GlobalCoordSystem, False,
-         _FileParticleLayout_InitialiseParticle,
-         0, 0.0,
-         NULL, 0 );/* checkpointfiles*/
+	/* Variables set in this function */
+	SizeT                                                                _sizeOfSelf = sizeof(FileParticleLayout);
+	Type                                                                        type = FileParticleLayout_Type;
+	Stg_Class_DeleteFunction*                                                _delete = _FileParticleLayout_Delete;
+	Stg_Class_PrintFunction*                                                  _print = _FileParticleLayout_Print;
+	Stg_Class_CopyFunction*                                                    _copy = _FileParticleLayout_Copy;
+	Stg_Component_DefaultConstructorFunction*                    _defaultConstructor = _FileParticleLayout_DefaultNew;
+	Stg_Component_ConstructFunction*                                      _construct = _FileParticleLayout_AssignFromXML;
+	Stg_Component_BuildFunction*                                              _build = _FileParticleLayout_Build;
+	Stg_Component_InitialiseFunction*                                    _initialise = _FileParticleLayout_Initialise;
+	Stg_Component_ExecuteFunction*                                          _execute = _FileParticleLayout_Execute;
+	Stg_Component_DestroyFunction*                                          _destroy = _FileParticleLayout_Destroy;
+	AllocationType                                                nameAllocationType = NON_GLOBAL;
+	ParticleLayout_SetInitialCountsFunction*                       _setInitialCounts = _FileParticleLayout_SetInitialCounts;
+	ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles = _FileParticleLayout_InitialiseParticles;
+	CoordSystem                                                          coordSystem = GlobalCoordSystem;
+	Bool                                                 weightsInitialisedAtStartup = False;
+	GlobalParticleLayout_InitialiseParticleFunction*             _initialiseParticle = _FileParticleLayout_InitialiseParticle;
+	Particle_Index                                             totalInitialParticles = 0;
+	double                                            averageInitialParticlesPerCell = 0.0;
+	Name                                                                    filename = NULL;
+	Index                                                            checkpointfiles = 0;
+
+   return (void*)_FileParticleLayout_New(  FILEPARTICLELAYOUT_PASSARGS  );/* checkpointfiles_renamed*/
 }
 
 void _FileParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data ) {
@@ -630,5 +593,7 @@ Index _FileParticleLayout_GetFileCountFromTimeInfoFile( void* _context ){
    return checkpointnproc;
 }
 #endif
+
+
 
 

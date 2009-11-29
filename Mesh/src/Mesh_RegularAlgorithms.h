@@ -64,15 +64,22 @@
 	** Constructors
 	*/
 
-	#define MESH_REGULARALGORITHMS_DEFARGS \
-		MESH_ALGORITHMS_DEFARGS
 
-	#define MESH_REGULARALGORITHMS_PASSARGS \
-		MESH_ALGORITHMS_PASSARGS
 
 	Mesh_RegularAlgorithms* Mesh_RegularAlgorithms_New( Name name, AbstractContext* context );
 
-	Mesh_RegularAlgorithms* _Mesh_RegularAlgorithms_New( MESH_REGULARALGORITHMS_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESH_REGULARALGORITHMS_DEFARGS \
+                MESH_ALGORITHMS_DEFARGS
+
+	#define MESH_REGULARALGORITHMS_PASSARGS \
+                MESH_ALGORITHMS_PASSARGS
+
+	Mesh_RegularAlgorithms* _Mesh_RegularAlgorithms_New(  MESH_REGULARALGORITHMS_DEFARGS  );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
@@ -122,3 +129,4 @@
 	void Mesh_RegularAlgorithms_Destruct( Mesh_RegularAlgorithms* self );
 
 #endif /* __Domain_Mesh_Mesh_RegularAlgorithms_h__ */
+

@@ -62,28 +62,18 @@
       unsigned int dim, unsigned int particlesPerCell );
 	
 	/* Creation implementation / Virtual constructor */
-   TriGaussParticleLayout* _TriGaussParticleLayout_New( 
-      SizeT                                        _sizeOfSelf,
-      Type                                         type,
-      Stg_Class_DeleteFunction*                    _delete,
-      Stg_Class_PrintFunction*                     _print,
-      Stg_Class_CopyFunction*                      _copy,
-      Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
-      Stg_Component_ConstructFunction*             _construct,
-      Stg_Component_BuildFunction*                 _build,
-      Stg_Component_InitialiseFunction*            _initialise,
-      Stg_Component_ExecuteFunction*               _execute,
-      Stg_Component_DestroyFunction*               _destroy,
-      Name                                         name,
-      AllocationType                               nameAllocationType,
-      ParticleLayout_SetInitialCountsFunction*     _setInitialCounts,
-      ParticleLayout_InitialiseParticlesFunction*  _initialiseParticles,
-      CoordSystem                                  coordSystem,
-      Bool                                         weightsInitialisedAtStartup,
-      PerCellParticleLayout_InitialCountFunction*  _initialCount,
-      PerCellParticleLayout_InitialiseParticlesOfCellFunction* _initialiseParticlesOfCell,
-      unsigned int                                 dim,
-      unsigned int                                 particlesPerCell );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define TRIGAUSSPARTICLELAYOUT_DEFARGS \
+                PERCELLPARTICLELAYOUT_DEFARGS
+
+	#define TRIGAUSSPARTICLELAYOUT_PASSARGS \
+                PERCELLPARTICLELAYOUT_PASSARGS
+
+   TriGaussParticleLayout* _TriGaussParticleLayout_New(  TRIGAUSSPARTICLELAYOUT_DEFARGS  );
 
 	/* Initialise implementation */
 	void _TriGaussParticleLayout_Init( 
@@ -119,3 +109,4 @@
 	void _TriGaussParticleLayout_InitialiseParticlesOfCell( void* triGaussParticleLayout, void* swarm, Cell_Index cell_I );
 	
 #endif /* __Domain_Swarm_TriGaussParticleLayout_h__ */
+

@@ -55,17 +55,24 @@
 
 	struct Remesher { __Remesher };
 
-	#define REMESHER_DEFARGS \
-		STG_COMPONENT_DEFARGS, \
-    		Remesher_RemeshFunc* remeshFunc
 
-	#define REMESHER_PASSARGS \
-		STG_COMPONENT_PASSARGS, \
-			remeshFunc
 
 	/* Constructors */
 
-	Remesher* _Remesher_New( REMESHER_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define REMESHER_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                Remesher_RemeshFunc*  remeshFunc
+
+	#define REMESHER_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        remeshFunc
+
+	Remesher* _Remesher_New(  REMESHER_DEFARGS  );
 
 	void _Remesher_Init( void* remeshser, AbstractContext* context, Mesh* mesh );
 
@@ -93,3 +100,4 @@
 		(self)->remeshFunc( self )
 
 #endif
+

@@ -65,38 +65,34 @@ FieldVariable* FieldVariable_New(
 }
 
 FieldVariable* _FieldVariable_DefaultNew( Name name ) {
-	return _FieldVariable_New( 
-		sizeof(FieldVariable), 
-		FieldVariable_Type, 
-		_FieldVariable_Delete, 
-		_FieldVariable_Print,
-		_FieldVariable_Copy, 
-		(Stg_Component_DefaultConstructorFunction*)_FieldVariable_DefaultNew,
-		_FieldVariable_AssignFromXML,
-		_FieldVariable_Build, 
-		_FieldVariable_Initialise, 
-		_FieldVariable_Execute, 
-		_FieldVariable_Destroy, 
-		name,
-		NON_GLOBAL,
-		NULL, 
-		NULL,
-		NULL, 
-		NULL,
-		NULL, 
-		0,
-		0,
-		False,
-		MPI_COMM_WORLD,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                                      _sizeOfSelf = sizeof(FieldVariable);
+	Type                                                              type = FieldVariable_Type;
+	Stg_Class_DeleteFunction*                                      _delete = _FieldVariable_Delete;
+	Stg_Class_PrintFunction*                                        _print = _FieldVariable_Print;
+	Stg_Class_CopyFunction*                                          _copy = _FieldVariable_Copy;
+	Stg_Component_DefaultConstructorFunction*          _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_FieldVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                            _construct = _FieldVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                                    _build = _FieldVariable_Build;
+	Stg_Component_InitialiseFunction*                          _initialise = _FieldVariable_Initialise;
+	Stg_Component_ExecuteFunction*                                _execute = _FieldVariable_Execute;
+	Stg_Component_DestroyFunction*                                _destroy = _FieldVariable_Destroy;
+	AllocationType                                      nameAllocationType = NON_GLOBAL;
+	FieldVariable_InterpolateValueAtFunction*          _interpolateValueAt = NULL;
+	FieldVariable_GetValueFunction*            _getMinGlobalFieldMagnitude = NULL;
+	FieldVariable_GetValueFunction*            _getMaxGlobalFieldMagnitude = NULL;
+	FieldVariable_GetCoordFunction*               _getMinAndMaxLocalCoords = NULL;
+	FieldVariable_GetCoordFunction*              _getMinAndMaxGlobalCoords = NULL;
+
+	return _FieldVariable_New(  FIELDVARIABLE_PASSARGS  );
 }
 
-FieldVariable* _FieldVariable_New( FIELDVARIABLE_DEFARGS ) {
+FieldVariable* _FieldVariable_New(  FIELDVARIABLE_DEFARGS  ) {
 	FieldVariable* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(FieldVariable) );
-	self = (FieldVariable*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(FieldVariable) );
+	self = (FieldVariable*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* Virtual functions */
 	self->_interpolateValueAt         = _interpolateValueAt;
@@ -342,3 +338,5 @@ void _FieldVariable_GetMinAndMaxGlobalCoords( void* fieldVariable, Coord globalM
 	MPI_Allreduce( localMin, globalMin, self->dim, MPI_DOUBLE, MPI_MIN, self->communicator );
 	MPI_Allreduce( localMax, globalMax, self->dim, MPI_DOUBLE, MPI_MAX, self->communicator );
 }
+
+

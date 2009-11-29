@@ -66,38 +66,18 @@ SwarmDump* SwarmDump_New(
         return self;
 }
 
-SwarmDump* _SwarmDump_New(
-                SizeT                                              _sizeOfSelf, 
-                Type                                               type,
-                Stg_Class_DeleteFunction*                              _delete,
-                Stg_Class_PrintFunction*                               _print, 
-                Stg_Class_CopyFunction*                            _copy, 
-                Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-                Stg_Component_ConstructFunction*                   _construct,
-                Stg_Component_BuildFunction*                       _build,
-                Stg_Component_InitialiseFunction*                  _initialise,
-                Stg_Component_ExecuteFunction*                     _execute,
-                Stg_Component_DestroyFunction*                     _destroy,
-                Name                                               name ) 
+SwarmDump* _SwarmDump_New(  SWARMDUMP_DEFARGS  ) 
 {
         SwarmDump*              self;
         
         /* Allocate memory */
         assert( _sizeOfSelf >= sizeof(SwarmDump) );
-        self = (SwarmDump*)_Stg_Component_New( 
-                        _sizeOfSelf,
-                        type, 
-                        _delete,
-                        _print, 
-                        _copy,
-                        _defaultConstructor,
-                        _construct,
-                        _build,
-                        _initialise,
-                        _execute,
-                        _destroy,
-                        name, 
-                        NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+        self = (SwarmDump*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
         
         /* Virtual functions */
 
@@ -172,19 +152,23 @@ void* _SwarmDump_Copy( void* swarmDump, void* dest, Bool deep, Name nameExt, Ptr
 
 
 void* _SwarmDump_DefaultNew( Name name ) {
-                return (void*) _SwarmDump_New( 
-                        sizeof(SwarmDump), 
-                        SwarmDump_Type, 
-                        _SwarmDump_Delete, 
-                        _SwarmDump_Print,
-                        _SwarmDump_Copy, 
-                        _SwarmDump_DefaultNew,
-                        _SwarmDump_AssignFromXML,
-                        _SwarmDump_Build, 
-                        _SwarmDump_Initialise, 
-                        _SwarmDump_Execute, 
-                        _SwarmDump_Destroy, 
-                        name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(SwarmDump);
+	Type                                                      type = SwarmDump_Type;
+	Stg_Class_DeleteFunction*                              _delete = _SwarmDump_Delete;
+	Stg_Class_PrintFunction*                                _print = _SwarmDump_Print;
+	Stg_Class_CopyFunction*                                  _copy = _SwarmDump_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _SwarmDump_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _SwarmDump_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _SwarmDump_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _SwarmDump_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _SwarmDump_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _SwarmDump_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+                return (void*) _SwarmDump_New(  SWARMDUMP_PASSARGS  );
 }
 void _SwarmDump_AssignFromXML( void* swarmDump, Stg_ComponentFactory* cf, void* data ) {
         SwarmDump*                  self         = (SwarmDump*)swarmDump;
@@ -483,3 +467,5 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
    
 }
 #endif
+
+

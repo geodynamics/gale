@@ -65,28 +65,20 @@
       Dictionary*      dictionary );
 	
 	/* Creation implementation / Virtual constructor */
-   ManualParticleLayout* _ManualParticleLayout_New( 
-      SizeT                                            _sizeOfSelf,
-      Type                                             type,
-      Stg_Class_DeleteFunction*                        _delete,
-      Stg_Class_PrintFunction*                         _print,
-      Stg_Class_CopyFunction*                          _copy, 
-      Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-      Stg_Component_ConstructFunction*                 _construct,
-      Stg_Component_BuildFunction*                     _build,
-      Stg_Component_InitialiseFunction*                _initialise,
-      Stg_Component_ExecuteFunction*                   _execute,
-      Stg_Component_DestroyFunction*                   _destroy,
-      Name                                             name,
-      AllocationType                                   nameAllocationType,
-      ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-      ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-      CoordSystem                                      coordSystem,
-      Bool                                             weightsInitialisedAtStartup,
-      GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-      Particle_Index                                   totalInitialParticles,
-      double                                           averageInitialParticlesPerCell,
-      Dictionary*                                      dictionary );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MANUALPARTICLELAYOUT_DEFARGS \
+                GLOBALPARTICLELAYOUT_DEFARGS, \
+                Dictionary*  dictionary
+
+	#define MANUALPARTICLELAYOUT_PASSARGS \
+                GLOBALPARTICLELAYOUT_PASSARGS, \
+	        dictionary
+
+   ManualParticleLayout* _ManualParticleLayout_New(  MANUALPARTICLELAYOUT_DEFARGS  );
 	
 	void _ManualParticleLayout_Init( void* manualParticleLayout, Dictionary* dictionary );
 	
@@ -114,3 +106,4 @@
 			void* particle);
 
 #endif /* __Domain_Swarm_ManualParticleLayout_h__ */
+

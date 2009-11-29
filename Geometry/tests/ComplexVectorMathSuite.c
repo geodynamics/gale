@@ -538,3 +538,5 @@ void ComplexVectorMathSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, ComplexVectorMathSuite_TestComplexVectorMathBasic );
    pcu_suite_addTest( suite, ComplexVectorMathSuite_TestComplexVectorMathOperations );
 }
+
+

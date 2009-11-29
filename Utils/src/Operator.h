@@ -61,18 +61,28 @@ typedef void (Operator_CarryOutBinaryOperationFunction) ( void* operatorObject, 
 		Dof_Index                                  resultDofs,
 		Dimension_Index                            dim ) ;
 
-	Operator* _Operator_New(		
-		SizeT                                      _sizeOfSelf,
-		Type                                       type,
-		Stg_Class_DeleteFunction*                  _delete,
-		Stg_Class_PrintFunction*                   _print, 
-		Stg_Class_CopyFunction*                    _copy,
-		Name                                       name,
-		Func_Ptr                                   _carryOut,
-		Index                                      numberOfOperands,
-		Dof_Index                                  operandDofs,
-		Dof_Index                                  resultDofs,
-		Dimension_Index                            dim );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define OPERATOR_DEFARGS \
+                STG_OBJECT_DEFARGS, \
+                Func_Ptr                _carryOut, \
+                Index            numberOfOperands, \
+                Dof_Index             operandDofs, \
+                Dof_Index              resultDofs, \
+                Dimension_Index               dim
+
+	#define OPERATOR_PASSARGS \
+                STG_OBJECT_PASSARGS, \
+	        _carryOut,        \
+	        numberOfOperands, \
+	        operandDofs,      \
+	        resultDofs,       \
+	        dim             
+
+	Operator* _Operator_New(  OPERATOR_DEFARGS  );
 
 	void _Operator_Delete(void* operatorObject) ;
 	void _Operator_Print(void* operatorObject, Stream* stream) ;
@@ -157,3 +167,4 @@ typedef void (Operator_CarryOutBinaryOperationFunction) ( void* operatorObject, 
 			__func__, self->type, self->name );
 	
 #endif
+

@@ -1065,3 +1065,5 @@ int IGraph_Cmp( const void* l, const void* r ) {
    assert( *(int*)l != *(int*)r );
    return (*(int*)l < *(int*)r) ? -1 : 1;
 }
+
+

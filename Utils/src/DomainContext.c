@@ -65,32 +65,33 @@ DomainContext* DomainContext_New(
 }
 
 DomainContext* _DomainContext_DefaultNew( Name name ) {
-	return _DomainContext_New(
-		sizeof(DomainContext),
-		DomainContext_Type,
-		_DomainContext_Delete,
-		_DomainContext_Print,
-		NULL,
-		NULL,
-		_DomainContext_AssignFromXML,
-		_AbstractContext_Build,
-		_AbstractContext_Initialise,
-		_AbstractContext_Execute,
-		(Stg_Component_DestroyFunction*)_DomainContext_Destroy,	
-		name,
-		NON_GLOBAL,
-		_DomainContext_SetDt,
-		0,
-		0,
-		MPI_COMM_WORLD,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(DomainContext);
+	Type                                                      type = DomainContext_Type;
+	Stg_Class_DeleteFunction*                              _delete = _DomainContext_Delete;
+	Stg_Class_PrintFunction*                                _print = _DomainContext_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = NULL;
+	Stg_Component_ConstructFunction*                    _construct = _DomainContext_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _AbstractContext_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _AbstractContext_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _AbstractContext_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = (Stg_Component_DestroyFunction*)_DomainContext_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	AbstractContext_SetDt*                                  _setDt = _DomainContext_SetDt;
+	double                                               startTime = 0;
+	double                                                stopTime = 0;
+	MPI_Comm                                          communicator = MPI_COMM_WORLD;
+	Dictionary*                                         dictionary = NULL;
+
+	return _DomainContext_New(  DOMAINCONTEXT_PASSARGS  );
 }
 
-DomainContext* _DomainContext_New( DOMAINCONTEXT_DEFARGS ) {
+DomainContext* _DomainContext_New(  DOMAINCONTEXT_DEFARGS  ) {
 	DomainContext* self;
 	
 	/* Allocate memory */
-	self = (DomainContext*)_AbstractContext_New( ABSTRACTCONTEXT_PASSARGS );
+	self = (DomainContext*)_AbstractContext_New(  ABSTRACTCONTEXT_PASSARGS  );
 	
 	/* General info */
 
@@ -153,3 +154,5 @@ void _DomainContext_Print( void* context, Stream* stream ) {
 
 void _DomainContext_SetDt( void* context, double dt ) {
 }
+
+

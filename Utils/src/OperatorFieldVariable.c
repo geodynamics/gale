@@ -105,40 +105,34 @@ OperatorFieldVariable* OperatorFieldVariable_New(
 }
 
 OperatorFieldVariable* _OperatorFieldVariable_DefaultNew( Name name ) {
-	return _OperatorFieldVariable_New( 
-		sizeof(OperatorFieldVariable), 
-		OperatorFieldVariable_Type, 
-		_OperatorFieldVariable_Delete, 
-		_OperatorFieldVariable_Print,
-		_OperatorFieldVariable_Copy, 
-		(Stg_Component_DefaultConstructorFunction*)_OperatorFieldVariable_DefaultNew,
-		_OperatorFieldVariable_AssignFromXML,
-		_OperatorFieldVariable_Build, 
-		_OperatorFieldVariable_Initialise, 
-		_OperatorFieldVariable_Execute,
-		_OperatorFieldVariable_Destroy,
-		name,
-		NON_GLOBAL, 
-		_OperatorFieldVariable_InterpolateValueAt,
-		_OperatorFieldVariable_GetMinLocalFieldMagnitude,
-		_OperatorFieldVariable_GetMaxLocalFieldMagnitude, 
-		_OperatorFieldVariable_GetMinAndMaxLocalCoords,
-		_OperatorFieldVariable_GetMinAndMaxGlobalCoords, 
-		0,
-		0,
-		False, /* Setting default to false, as do not want to checkpoint OperatorFeVariables */
-		MPI_COMM_WORLD,
-		NULL,
-		NULL,
-		NULL);
+	/* Variables set in this function */
+	SizeT                                                      _sizeOfSelf = sizeof(OperatorFieldVariable);
+	Type                                                              type = OperatorFieldVariable_Type;
+	Stg_Class_DeleteFunction*                                      _delete = _OperatorFieldVariable_Delete;
+	Stg_Class_PrintFunction*                                        _print = _OperatorFieldVariable_Print;
+	Stg_Class_CopyFunction*                                          _copy = _OperatorFieldVariable_Copy;
+	Stg_Component_DefaultConstructorFunction*          _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_OperatorFieldVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                            _construct = _OperatorFieldVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                                    _build = _OperatorFieldVariable_Build;
+	Stg_Component_InitialiseFunction*                          _initialise = _OperatorFieldVariable_Initialise;
+	Stg_Component_ExecuteFunction*                                _execute = _OperatorFieldVariable_Execute;
+	Stg_Component_DestroyFunction*                                _destroy = _OperatorFieldVariable_Destroy;
+	AllocationType                                      nameAllocationType = NON_GLOBAL;
+	FieldVariable_InterpolateValueAtFunction*          _interpolateValueAt = _OperatorFieldVariable_InterpolateValueAt;
+	FieldVariable_GetValueFunction*            _getMinGlobalFieldMagnitude = _OperatorFieldVariable_GetMinLocalFieldMagnitude;
+	FieldVariable_GetValueFunction*            _getMaxGlobalFieldMagnitude = _OperatorFieldVariable_GetMaxLocalFieldMagnitude;
+	FieldVariable_GetCoordFunction*               _getMinAndMaxLocalCoords = _OperatorFieldVariable_GetMinAndMaxLocalCoords;
+	FieldVariable_GetCoordFunction*              _getMinAndMaxGlobalCoords = _OperatorFieldVariable_GetMinAndMaxGlobalCoords;
+
+	return _OperatorFieldVariable_New(  OPERATORFIELDVARIABLE_PASSARGS  );
 }
 
-OperatorFieldVariable* _OperatorFieldVariable_New( OPERATORFIELDVARIABLE_DEFARGS ) {
+OperatorFieldVariable* _OperatorFieldVariable_New(  OPERATORFIELDVARIABLE_DEFARGS  ) {
 	OperatorFieldVariable* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(OperatorFieldVariable) );
-	self = (OperatorFieldVariable*) _FieldVariable_New( FIELDVARIABLE_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(OperatorFieldVariable) );
+	self = (OperatorFieldVariable*) _FieldVariable_New(  FIELDVARIABLE_PASSARGS  );
 
 	return self;
 } 
@@ -320,3 +314,5 @@ InterpolationResult OperatorFieldVariable_BinaryInterpolationFunc( void* fieldVa
 
 	return result0;
 }
+
+

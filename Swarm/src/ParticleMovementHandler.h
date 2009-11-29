@@ -69,22 +69,20 @@
 			);
 	
 	/** Private Constructor */
-	ParticleMovementHandler* _ParticleMovementHandler_New( 
-		SizeT                                                           _sizeOfSelf,
-		Type                                                            type,
-		Stg_Class_DeleteFunction*                                       _delete,
-		Stg_Class_PrintFunction*                                        _print,
-		Stg_Class_CopyFunction*                                         _copy, 
-		Stg_Component_DefaultConstructorFunction*                       _defaultConstructor,
-		Stg_Component_ConstructFunction*                                _construct,
-		Stg_Component_BuildFunction*                                    _build,
-		Stg_Component_InitialiseFunction*                               _initialise,
-		Stg_Component_ExecuteFunction*                                  _execute,
-		Stg_Component_DestroyFunction*                                  _destroy,
-		Name                                                            name,
-		Bool                                                            initFlag,
-		Bool                                                            useGlobalFallbackCommStrategy
-		 );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PARTICLEMOVEMENTHANDLER_DEFARGS \
+                PARTICLECOMMHANDLER_DEFARGS, \
+                Bool  useGlobalFallbackCommStrategy
+
+	#define PARTICLEMOVEMENTHANDLER_PASSARGS \
+                PARTICLECOMMHANDLER_PASSARGS, \
+	        useGlobalFallbackCommStrategy
+
+	ParticleMovementHandler* _ParticleMovementHandler_New(  PARTICLEMOVEMENTHANDLER_DEFARGS  );
 	
 	/** Variable initialiser */
 	void _ParticleMovementHandler_Init(
@@ -155,3 +153,4 @@
 	void ParticleMovementHandler_FinishReceiveAndUpdateShadowParticlesEnteringMyDomain( ParticleCommHandler* self );
 
 #endif
+

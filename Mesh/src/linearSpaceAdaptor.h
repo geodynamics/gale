@@ -75,14 +75,21 @@
 	** Constructors
 	*/
 
-	#define COMPRESSIONADAPTOR_DEFARGS \
-		MESHADAPTOR_DEFARGS
 
-	#define COMPRESSIONADAPTOR_PASSARGS \
-		MESHADAPTOR_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LINEARSPACEADAPTOR_DEFARGS \
+                MESHADAPTOR_DEFARGS
+
+	#define LINEARSPACEADAPTOR_PASSARGS \
+                MESHADAPTOR_PASSARGS
 
 	LinearSpaceAdaptor* LinearSpaceAdaptor_New( Name name, AbstractContext* context );
-	LinearSpaceAdaptor* _LinearSpaceAdaptor_New( COMPRESSIONADAPTOR_DEFARGS );
+	LinearSpaceAdaptor* _LinearSpaceAdaptor_New(  LINEARSPACEADAPTOR_DEFARGS  );
 	void _LinearSpaceAdaptor_Init( LinearSpaceAdaptor* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -109,3 +116,4 @@
 
 
 #endif /* __Domain_Mesh_LinearSpaceAdaptor_h__ */
+

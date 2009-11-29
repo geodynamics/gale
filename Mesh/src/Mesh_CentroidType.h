@@ -63,14 +63,21 @@
 	** Constructors
 	*/
 
-	#define MESH_CENTROIDTYPE_DEFARGS		\
-		MESH_ELEMENTTYPE_DEFARGS
 
-	#define MESH_CENTROIDTYPE_PASSARGS		\
-		MESH_ELEMENTTYPE_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESH_CENTROIDTYPE_DEFARGS \
+                MESH_ELEMENTTYPE_DEFARGS
+
+	#define MESH_CENTROIDTYPE_PASSARGS \
+                MESH_ELEMENTTYPE_PASSARGS
 
 	Mesh_CentroidType* Mesh_CentroidType_New();
-	Mesh_CentroidType* _Mesh_CentroidType_New( MESH_CENTROIDTYPE_DEFARGS );
+	Mesh_CentroidType* _Mesh_CentroidType_New(  MESH_CENTROIDTYPE_DEFARGS  );
 	void _Mesh_CentroidType_Init( Mesh_CentroidType* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -97,3 +104,4 @@
 	*/
 
 #endif /* __Domain_Mesh_Mesh_CentroidType_h__ */
+

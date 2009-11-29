@@ -65,15 +65,7 @@
 
 	struct _WallVC { __WallVC };
 
-	#define WALLVC_DEFARGS \
-      VARIABLECONDITION_DEFARGS, \
-         Name	_dictionaryEntryName, \
-			void*	_mesh
  
-   #define WALLVC_PASSARGS \
-      VARIABLECONDITION_PASSARGS, \
-         _dictionaryEntryName, \
-			_mesh
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
@@ -95,7 +87,18 @@
 		Dictionary*							dictionary,
 		void*									_mesh );
 	
-	WallVC* _WallVC_New( WALLVC_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define WALLVC_DEFARGS \
+                VARIABLECONDITION_DEFARGS
+
+	#define WALLVC_PASSARGS \
+                VARIABLECONDITION_PASSARGS
+
+	WallVC* _WallVC_New(  WALLVC_DEFARGS  );
 	
 	void _WallVC_Init(
 		void*	wallVC, 
@@ -164,3 +167,4 @@
 
 	
 #endif /* __Domain_Utils_WallVC_h__ */
+

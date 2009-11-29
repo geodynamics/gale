@@ -73,52 +73,12 @@ WithinShapeParticleLayout* WithinShapeParticleLayout_New(
 	return self;
 }
 
-WithinShapeParticleLayout* _WithinShapeParticleLayout_New( 
-		SizeT                                            _sizeOfSelf,
-		Type                                             type,
-		Stg_Class_DeleteFunction*                        _delete,
-		Stg_Class_PrintFunction*                         _print,
-		Stg_Class_CopyFunction*                          _copy,
-		Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-		Stg_Component_ConstructFunction*                 _construct,
-		Stg_Component_BuildFunction*                     _build,
-		Stg_Component_InitialiseFunction*                _initialise,
-		Stg_Component_ExecuteFunction*                   _execute,
-		Stg_Component_DestroyFunction*                   _destroy,
-		ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-      Name                                             name,
-      AllocationType                                   nameAllocationType,
-      CoordSystem                                      coordSystem,
-      Bool                                             weightsInitialisedAtStartup,
-      Particle_Index                                   totalInitialParticles,
-      double                                           averageInitialParticlesPerCell,
-      Dimension_Index                                  dim,
-		Stg_Shape*                                       shape )
+WithinShapeParticleLayout* _WithinShapeParticleLayout_New(  WITHINSHAPEPARTICLELAYOUT_DEFARGS  )
 {
 	WithinShapeParticleLayout* self;
 	
 	/* Allocate memory */
-	self = (WithinShapeParticleLayout*)_SpaceFillerParticleLayout_New( 
-		_sizeOfSelf, 
-		type,
-		_delete,
-		_print,
-		_copy, 
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-      name, nameAllocationType,
-		_setInitialCounts,
-		_initialiseParticles,
-      coordSystem, weightsInitialisedAtStartup,
-		_initialiseParticle,
-      totalInitialParticles, averageInitialParticlesPerCell,
-      dim );  /* dim */
+	self = (WithinShapeParticleLayout*)_SpaceFillerParticleLayout_New(  SPACEFILLERPARTICLELAYOUT_PASSARGS  );  /* dim */
 
    self->shape = shape;
 
@@ -180,26 +140,30 @@ void* _WithinShapeParticleLayout_Copy( void* withinShapeParticleLayout, void* de
 }
 
 void* _WithinShapeParticleLayout_DefaultNew( Name name ) {
-   return (void*)_WithinShapeParticleLayout_New( 
-      sizeof(WithinShapeParticleLayout),
-      WithinShapeParticleLayout_Type,
-      _WithinShapeParticleLayout_Delete,
-      _WithinShapeParticleLayout_Print,
-      _WithinShapeParticleLayout_Copy,
-      _WithinShapeParticleLayout_DefaultNew,
-      _WithinShapeParticleLayout_AssignFromXML,
-      _WithinShapeParticleLayout_Build,
-      _WithinShapeParticleLayout_Initialise,
-      _WithinShapeParticleLayout_Execute,
-      _WithinShapeParticleLayout_Destroy,
-      _GlobalParticleLayout_SetInitialCounts,
-      _WithinShapeParticleLayout_InitialiseParticles,
-      _SpaceFillerParticleLayout_InitialiseParticle,
-      name, NON_GLOBAL, 
-      GlobalCoordSystem, False,
-      0, 0.0,
-      0,  /* dim */
-      NULL /* shape */ );
+	/* Variables set in this function */
+	SizeT                                                                _sizeOfSelf = sizeof(WithinShapeParticleLayout);
+	Type                                                                        type = WithinShapeParticleLayout_Type;
+	Stg_Class_DeleteFunction*                                                _delete = _WithinShapeParticleLayout_Delete;
+	Stg_Class_PrintFunction*                                                  _print = _WithinShapeParticleLayout_Print;
+	Stg_Class_CopyFunction*                                                    _copy = _WithinShapeParticleLayout_Copy;
+	Stg_Component_DefaultConstructorFunction*                    _defaultConstructor = _WithinShapeParticleLayout_DefaultNew;
+	Stg_Component_ConstructFunction*                                      _construct = _WithinShapeParticleLayout_AssignFromXML;
+	Stg_Component_BuildFunction*                                              _build = _WithinShapeParticleLayout_Build;
+	Stg_Component_InitialiseFunction*                                    _initialise = _WithinShapeParticleLayout_Initialise;
+	Stg_Component_ExecuteFunction*                                          _execute = _WithinShapeParticleLayout_Execute;
+	Stg_Component_DestroyFunction*                                          _destroy = _WithinShapeParticleLayout_Destroy;
+	ParticleLayout_SetInitialCountsFunction*                       _setInitialCounts = _GlobalParticleLayout_SetInitialCounts;
+	ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles = _WithinShapeParticleLayout_InitialiseParticles;
+	GlobalParticleLayout_InitialiseParticleFunction*             _initialiseParticle = _SpaceFillerParticleLayout_InitialiseParticle;
+	AllocationType                                                nameAllocationType = NON_GLOBAL;
+	CoordSystem                                                          coordSystem = GlobalCoordSystem;
+	Bool                                                 weightsInitialisedAtStartup = False;
+	Particle_Index                                             totalInitialParticles = 0;
+	double                                            averageInitialParticlesPerCell = 0.0;
+	Dimension_Index                                                              dim = 0;
+	Stg_Shape*                                                                 shape = NULL;
+
+   return (void*)_WithinShapeParticleLayout_New(  WITHINSHAPEPARTICLELAYOUT_PASSARGS  );
 }
 
 void _WithinShapeParticleLayout_AssignFromXML( void* withinShapeParticleLayout, Stg_ComponentFactory *cf, void* data ) {
@@ -264,3 +228,5 @@ void _WithinShapeParticleLayout_InitialiseParticles( void* particleLayout, void*
 		}
 	}
 }
+
+

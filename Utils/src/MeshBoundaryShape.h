@@ -57,14 +57,21 @@ struct MeshBoundaryShape { __MeshBoundaryShape };
 /*
 ** Constructors */
 
-#define MESHBOUNDARYSHAPE_ARGS                  \
-   STG_SHAPE_ARGS
 
-#define MESHBOUNDARYSHAPE_PASSARGS              \
-   STG_SHAPE_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESHBOUNDARYSHAPE_DEFARGS \
+                STG_SHAPE_DEFARGS
+
+	#define MESHBOUNDARYSHAPE_PASSARGS \
+                STG_SHAPE_PASSARGS
 
 MeshBoundaryShape* MeshBoundaryShape_New( Name name );
-MeshBoundaryShape* _MeshBoundaryShape_New( MESHBOUNDARYSHAPE_ARGS );
+MeshBoundaryShape* _MeshBoundaryShape_New(  MESHBOUNDARYSHAPE_DEFARGS  );
 void _MeshBoundaryShape_Init( MeshBoundaryShape* _self );
 
 void _MeshBoundaryShape_Delete( void* _self );
@@ -77,3 +84,4 @@ double _MeshBoundaryShape_CalculateVolume( void* _self );
 void _MeshBoundaryShape_DistanceFromCenterAxis( void* _self, Coord coord, double* disVec );
 
 #endif
+

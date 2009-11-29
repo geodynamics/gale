@@ -67,28 +67,29 @@ RegularRemesherCmpt* RegularRemesherCmpt_New( Name name, AbstractContext* contex
 }
 
 RegularRemesherCmpt* _RegularRemesherCmpt_DefaultNew( Name name ) {
-   return _RegularRemesherCmpt_New(
-		sizeof(RegularRemesherCmpt),
-		RegularRemesherCmpt_Type,
-		_RegularRemesherCmpt_Delete,
-		_RegularRemesherCmpt_Print,
-		NULL,
-		(void*(*)(Name))_RegularRemesherCmpt_DefaultNew,
-		_RegularRemesherCmpt_AssignFromXML,
-		_RegularRemesherCmpt_Build,
-		_RegularRemesherCmpt_Initialise,
-		_RegularRemesherCmpt_Execute,
-		_RegularRemesherCmpt_Destroy,
-      name,
-		NON_GLOBAL,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(RegularRemesherCmpt);
+	Type                                                      type = RegularRemesherCmpt_Type;
+	Stg_Class_DeleteFunction*                              _delete = _RegularRemesherCmpt_Delete;
+	Stg_Class_PrintFunction*                                _print = _RegularRemesherCmpt_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void*(*)(Name))_RegularRemesherCmpt_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _RegularRemesherCmpt_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _RegularRemesherCmpt_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _RegularRemesherCmpt_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _RegularRemesherCmpt_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _RegularRemesherCmpt_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	Remesher_RemeshFunc*                                remeshFunc = NULL;
+
+   return _RegularRemesherCmpt_New(  REGULARREMESHERCMPT_PASSARGS  );
 }
 
-RegularRemesherCmpt* _RegularRemesherCmpt_New( REGULARREMESHERCMPT_DEFARGS ) {
+RegularRemesherCmpt* _RegularRemesherCmpt_New(  REGULARREMESHERCMPT_DEFARGS  ) {
    RegularRemesherCmpt*	self;
 
    /* Allocate memory. */
-   self = (RegularRemesherCmpt*)_Remesher_New( REMESHER_PASSARGS );
+   self = (RegularRemesherCmpt*)_Remesher_New(  REMESHER_PASSARGS  );
 
    /* RegularRemesherCmpt info */
 
@@ -225,3 +226,5 @@ void _RegularRemesherCmpt_Destroy( void* remesher, void* data ) {
 */
 
 #endif
+
+

@@ -75,21 +75,22 @@
 		Stg_Component**                        data,
 		Bool                                   allowFallbackToFirstOrder );
 
-	TimeIntegratee* _TimeIntegratee_New( 
-		SizeT                                      _sizeOfSelf,
-		Type                                       type,
-		Stg_Class_DeleteFunction*                  _delete,
-		Stg_Class_PrintFunction*                   _print,
-		Stg_Class_CopyFunction*                    _copy, 
-		Stg_Component_DefaultConstructorFunction*  _defaultConstructor,
-		Stg_Component_ConstructFunction*           _construct,
-		Stg_Component_BuildFunction*               _build,
-		Stg_Component_InitialiseFunction*          _initialise,
-		Stg_Component_ExecuteFunction*             _execute,
-		Stg_Component_DestroyFunction*             _destroy,
-		TimeIntegratee_CalculateTimeDerivFunction* _calculateTimeDeriv,
-		TimeIntegratee_IntermediateFunction*       _intermediate,
-		Name                                       name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define TIMEINTEGRATEE_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                TimeIntegratee_CalculateTimeDerivFunction*  _calculateTimeDeriv, \
+                TimeIntegratee_IntermediateFunction*              _intermediate
+
+	#define TIMEINTEGRATEE_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _calculateTimeDeriv, \
+	        _intermediate      
+
+	TimeIntegratee* _TimeIntegratee_New(  TIMEINTEGRATEE_DEFARGS  );
 
 void _TimeIntegratee_Init( 
 		void*                                      timeIntegratee,
@@ -148,3 +149,4 @@ void _TimeIntegratee_Init(
 		TimeIntegrator_GetTime( ((TimeIntegratee*) timeIntegratee)->timeIntegrator ) 
 
 #endif 
+

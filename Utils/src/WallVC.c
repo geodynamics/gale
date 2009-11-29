@@ -87,43 +87,39 @@ WallVC* WallVC_New(
 }
 
 WallVC* _WallVC_DefaultNew( Name name ) {
-	return _WallVC_New(
-		sizeof(WallVC), 
-		WallVC_Type, 
-		_WallVC_Delete, 
-		_WallVC_Print, 
-		_WallVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)_WallVC_DefaultNew,
-		_WallVC_AssignFromXML,	
-		_WallVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_WallVC_Destroy,
-		name,
-		NON_GLOBAL,
-		_WallVC_BuildSelf, 
-		_WallVC_PrintConcise,
-		_WallVC_ReadDictionary,
-		_WallVC_GetSet, 
-		_WallVC_GetVariableCount, 
-		_WallVC_GetVariableIndex, 
-		_WallVC_GetValueIndex, 
-		_WallVC_GetValueCount, 
-		_WallVC_GetValue,
-		_VariableCondition_Apply, 
-		NULL,
-		NULL, 
-		NULL, 
-		NULL, 
-		NULL);
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(WallVC);
+	Type                                                       type = WallVC_Type;
+	Stg_Class_DeleteFunction*                               _delete = _WallVC_Delete;
+	Stg_Class_PrintFunction*                                 _print = _WallVC_Print;
+	Stg_Class_CopyFunction*                                   _copy = _WallVC_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_WallVC_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _WallVC_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _WallVC_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _VariableCondition_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _VariableCondition_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _WallVC_Destroy;
+	AllocationType                               nameAllocationType = NON_GLOBAL;
+	VariableCondition_BuildSelfFunc*                     _buildSelf = _WallVC_BuildSelf;
+	VariableCondition_PrintConciseFunc*               _printConcise = _WallVC_PrintConcise;
+	VariableCondition_ReadDictionaryFunc*           _readDictionary = _WallVC_ReadDictionary;
+	VariableCondition_GetSetFunc*                           _getSet = _WallVC_GetSet;
+	VariableCondition_GetVariableCountFunc*       _getVariableCount = _WallVC_GetVariableCount;
+	VariableCondition_GetVariableIndexFunc*       _getVariableIndex = _WallVC_GetVariableIndex;
+	VariableCondition_GetValueIndexFunc*             _getValueIndex = _WallVC_GetValueIndex;
+	VariableCondition_GetValueCountFunc*             _getValueCount = _WallVC_GetValueCount;
+	VariableCondition_GetValueFunc*                       _getValue = _WallVC_GetValue;
+	VariableCondition_ApplyFunc*                             _apply = _VariableCondition_Apply;
+
+	return _WallVC_New(  WALLVC_PASSARGS  );
 }
 
-WallVC* _WallVC_New( WALLVC_DEFARGS ) {
+WallVC* _WallVC_New(  WALLVC_DEFARGS  ) {
 	WallVC* self;
 	
 	/* Allocate memory/General info */
-	assert( sizeOfSelf >= sizeof(WallVC) );
-	self = (WallVC*)_VariableCondition_New( VARIABLECONDITION_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(WallVC) );
+	self = (WallVC*)_VariableCondition_New(  VARIABLECONDITION_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -650,3 +646,5 @@ void _WallVC_PrintConcise( void* variableCondition, Stream* stream ) {
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Functions
 */
+
+

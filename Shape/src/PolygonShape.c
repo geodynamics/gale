@@ -67,43 +67,13 @@ PolygonShape* PolygonShape_New(
 	return self;
 }
 
-PolygonShape* _PolygonShape_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name )
+PolygonShape* _PolygonShape_New(  POLYGONSHAPE_DEFARGS  )
 {
 	PolygonShape* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(PolygonShape) );
-	self = (PolygonShape*)_Stg_Shape_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside ,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (PolygonShape*)_Stg_Shape_New(  STG_SHAPE_PASSARGS  );
 	
 	/* General info */
 	return self;
@@ -159,22 +129,26 @@ void* _PolygonShape_Copy( void* polygon, void* dest, Bool deep, Name nameExt, Pt
 }
 
 void* _PolygonShape_DefaultNew( Name name ) {
-	return (void*) _PolygonShape_New(
-			sizeof(PolygonShape),
-			PolygonShape_Type,
-			_PolygonShape_Delete,
-			_PolygonShape_Print,
-			_PolygonShape_Copy,
-			_PolygonShape_DefaultNew,
-			_PolygonShape_AssignFromXML,
-			_PolygonShape_Build,
-			_PolygonShape_Initialise,
-			_PolygonShape_Execute,
-			_PolygonShape_Destroy,
-			_PolygonShape_IsCoordInside,
-			_PolygonShape_CalculateVolume,
-			_PolygonShape_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(PolygonShape);
+	Type                                                          type = PolygonShape_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _PolygonShape_Delete;
+	Stg_Class_PrintFunction*                                    _print = _PolygonShape_Print;
+	Stg_Class_CopyFunction*                                      _copy = _PolygonShape_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _PolygonShape_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _PolygonShape_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _PolygonShape_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _PolygonShape_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _PolygonShape_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _PolygonShape_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _PolygonShape_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _PolygonShape_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _PolygonShape_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _PolygonShape_New(  POLYGONSHAPE_PASSARGS  );
 }
 
 
@@ -358,3 +332,5 @@ void _PolygonShape_DistanceFromCenterAxis( void* shape, Coord coord, double* dis
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }
+
+

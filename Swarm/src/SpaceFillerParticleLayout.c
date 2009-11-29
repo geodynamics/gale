@@ -73,53 +73,12 @@ SpaceFillerParticleLayout* SpaceFillerParticleLayout_New(
 	return self;
 }
 
-SpaceFillerParticleLayout* _SpaceFillerParticleLayout_New( 
-      SizeT                                            _sizeOfSelf,
-      Type                                             type,
-      Stg_Class_DeleteFunction*                        _delete,
-      Stg_Class_PrintFunction*                         _print,
-      Stg_Class_CopyFunction*                          _copy,
-      Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-      Stg_Component_ConstructFunction*                 _construct,
-      Stg_Component_BuildFunction*                     _build,
-      Stg_Component_InitialiseFunction*                _initialise,
-      Stg_Component_ExecuteFunction*                   _execute,
-      Stg_Component_DestroyFunction*                   _destroy,
-      Name                                             name,
-      AllocationType                                   nameAllocationType,
-      ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-      ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-      CoordSystem                                      coordSystem,
-      Bool                                             weightsInitialisedAtStartup,
-      GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-      Particle_Index                                   totalInitialParticles,
-      double                                           averageInitialParticlesPerCell,
-      Dimension_Index                                  dim )
+SpaceFillerParticleLayout* _SpaceFillerParticleLayout_New(  SPACEFILLERPARTICLELAYOUT_DEFARGS  )
 {
    SpaceFillerParticleLayout* self;
 
    /* Allocate memory */
-   self = (SpaceFillerParticleLayout*)_GlobalParticleLayout_New( 
-      _sizeOfSelf, 
-      type,
-      _delete,
-      _print,
-      _copy, 
-      _defaultConstructor,
-      _construct,
-      _build,
-      _initialise,
-      _execute,
-      _destroy,
-      name,
-      nameAllocationType,
-      _setInitialCounts,
-      _initialiseParticles,
-      coordSystem,
-      weightsInitialisedAtStartup,
-      _initialiseParticle,
-      totalInitialParticles,
-      averageInitialParticlesPerCell );
+   self = (SpaceFillerParticleLayout*)_GlobalParticleLayout_New(  GLOBALPARTICLELAYOUT_PASSARGS  );
 
    self->dim = dim;
 
@@ -190,25 +149,29 @@ void* _SpaceFillerParticleLayout_Copy( void* spaceFillerParticleLayout, void* de
 }
 
 void* _SpaceFillerParticleLayout_DefaultNew( Name name ) {
-	return (void*)_SpaceFillerParticleLayout_New( 
-			sizeof(SpaceFillerParticleLayout),
-			SpaceFillerParticleLayout_Type,
-			_SpaceFillerParticleLayout_Delete,
-			_SpaceFillerParticleLayout_Print,
-			_SpaceFillerParticleLayout_Copy,
-			_SpaceFillerParticleLayout_DefaultNew,
-			_SpaceFillerParticleLayout_AssignFromXML,
-			_SpaceFillerParticleLayout_Build,
-			_SpaceFillerParticleLayout_Initialise,
-			_SpaceFillerParticleLayout_Execute,
-			_SpaceFillerParticleLayout_Destroy,
-         name, NON_GLOBAL, 
-			_GlobalParticleLayout_SetInitialCounts,
-			_SpaceFillerParticleLayout_InitialiseParticles,
-         GlobalCoordSystem, False,
-			_SpaceFillerParticleLayout_InitialiseParticle,
-         0, 0.0,
-			0  /* dim */ );
+	/* Variables set in this function */
+	SizeT                                                                _sizeOfSelf = sizeof(SpaceFillerParticleLayout);
+	Type                                                                        type = SpaceFillerParticleLayout_Type;
+	Stg_Class_DeleteFunction*                                                _delete = _SpaceFillerParticleLayout_Delete;
+	Stg_Class_PrintFunction*                                                  _print = _SpaceFillerParticleLayout_Print;
+	Stg_Class_CopyFunction*                                                    _copy = _SpaceFillerParticleLayout_Copy;
+	Stg_Component_DefaultConstructorFunction*                    _defaultConstructor = _SpaceFillerParticleLayout_DefaultNew;
+	Stg_Component_ConstructFunction*                                      _construct = _SpaceFillerParticleLayout_AssignFromXML;
+	Stg_Component_BuildFunction*                                              _build = _SpaceFillerParticleLayout_Build;
+	Stg_Component_InitialiseFunction*                                    _initialise = _SpaceFillerParticleLayout_Initialise;
+	Stg_Component_ExecuteFunction*                                          _execute = _SpaceFillerParticleLayout_Execute;
+	Stg_Component_DestroyFunction*                                          _destroy = _SpaceFillerParticleLayout_Destroy;
+	AllocationType                                                nameAllocationType = NON_GLOBAL;
+	ParticleLayout_SetInitialCountsFunction*                       _setInitialCounts = _GlobalParticleLayout_SetInitialCounts;
+	ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles = _SpaceFillerParticleLayout_InitialiseParticles;
+	CoordSystem                                                          coordSystem = GlobalCoordSystem;
+	Bool                                                 weightsInitialisedAtStartup = False;
+	GlobalParticleLayout_InitialiseParticleFunction*             _initialiseParticle = _SpaceFillerParticleLayout_InitialiseParticle;
+	Particle_Index                                             totalInitialParticles = 0;
+	double                                            averageInitialParticlesPerCell = 0.0;
+	Dimension_Index                                                              dim = 0;
+
+	return (void*)_SpaceFillerParticleLayout_New(  SPACEFILLERPARTICLELAYOUT_PASSARGS  );
 }
 
 
@@ -276,3 +239,5 @@ void _SpaceFillerParticleLayout_InitialiseParticle(
 			maxCrd[ dim_I ]);
 	}
 }
+
+

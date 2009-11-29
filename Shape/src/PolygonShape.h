@@ -73,22 +73,18 @@
 		XYZ                                   end,
 		Axis                                  perpendicularAxis);
 		
-	PolygonShape* _PolygonShape_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define POLYGONSHAPE_DEFARGS \
+                STG_SHAPE_DEFARGS
+
+	#define POLYGONSHAPE_PASSARGS \
+                STG_SHAPE_PASSARGS
+
+	PolygonShape* _PolygonShape_New(  POLYGONSHAPE_DEFARGS  );
 	
 	void _PolygonShape_Init( void* polygon, Coord_List vertexList, Index vertexCount, XYZ start, XYZ end, Axis perpendicular ) ;
 		
@@ -122,3 +118,4 @@
 	
 	
 #endif 
+

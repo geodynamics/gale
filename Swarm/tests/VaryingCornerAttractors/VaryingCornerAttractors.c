@@ -159,3 +159,5 @@ Index StGermain_VaryingCornerAttractors_Register( PluginsManager* pluginsManager
 	return PluginsManager_Submit( pluginsManager, StGermain_VaryingCornerAttractors_Type, "0",
 	_StGermain_VaryingCornerAttractors_DefaultNew );
 }
+
+

@@ -79,43 +79,39 @@ ContactVC*	ContactVC_New(
 }
 
 ContactVC* _ContactVC_DefaultNew( Name name ) {
-   return _ContactVC_New(
-      sizeof(ContactVC), 
-      ContactVC_Type, 
-      _ContactVC_Delete, 
-      _WallVC_Print, 
-      _WallVC_Copy,
-      (Stg_Component_DefaultConstructorFunction*)_ContactVC_DefaultNew,
-      _ContactVC_AssignFromXML,	
-      _ContactVC_Build,
-      _VariableCondition_Initialise,
-      _VariableCondition_Execute,
-      _VariableCondition_Destroy,
-      name,
-      NON_GLOBAL,
-      _WallVC_BuildSelf, 
-      _WallVC_PrintConcise,
-      _ContactVC_ReadDictionary,
-      _ContactVC_GetSet, 
-      _WallVC_GetVariableCount, 
-      _WallVC_GetVariableIndex, 
-      _WallVC_GetValueIndex, 
-      _WallVC_GetValueCount, 
-      _WallVC_GetValue,
-      _VariableCondition_Apply, 
-      NULL,
-      NULL, 
-      NULL, 
-      NULL, 
-      NULL);
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(ContactVC);
+	Type                                                       type = ContactVC_Type;
+	Stg_Class_DeleteFunction*                               _delete = _ContactVC_Delete;
+	Stg_Class_PrintFunction*                                 _print = _WallVC_Print;
+	Stg_Class_CopyFunction*                                   _copy = _WallVC_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_ContactVC_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _ContactVC_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _ContactVC_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _VariableCondition_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _VariableCondition_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _VariableCondition_Destroy;
+	AllocationType                               nameAllocationType = NON_GLOBAL;
+	VariableCondition_BuildSelfFunc*                     _buildSelf = _WallVC_BuildSelf;
+	VariableCondition_PrintConciseFunc*               _printConcise = _WallVC_PrintConcise;
+	VariableCondition_ReadDictionaryFunc*           _readDictionary = _ContactVC_ReadDictionary;
+	VariableCondition_GetSetFunc*                           _getSet = _ContactVC_GetSet;
+	VariableCondition_GetVariableCountFunc*       _getVariableCount = _WallVC_GetVariableCount;
+	VariableCondition_GetVariableIndexFunc*       _getVariableIndex = _WallVC_GetVariableIndex;
+	VariableCondition_GetValueIndexFunc*             _getValueIndex = _WallVC_GetValueIndex;
+	VariableCondition_GetValueCountFunc*             _getValueCount = _WallVC_GetValueCount;
+	VariableCondition_GetValueFunc*                       _getValue = _WallVC_GetValue;
+	VariableCondition_ApplyFunc*                             _apply = _VariableCondition_Apply;
+
+   return _ContactVC_New(  CONTACTVC_PASSARGS  );
 }
 
-ContactVC* _ContactVC_New( CONTACTVC_DEFARGS ) {
+ContactVC* _ContactVC_New(  CONTACTVC_DEFARGS  ) {
    ContactVC* self;
 	
    /* Allocate memory/General info */
-   assert( sizeOfSelf >= sizeof(ContactVC) );
-   self = (ContactVC*)_WallVC_New( WALLVC_PASSARGS );
+   assert( _sizeOfSelf >= sizeof(ContactVC) );
+   self = (ContactVC*)_WallVC_New(  WALLVC_PASSARGS  );
 	
    /* Virtual info */
 	
@@ -312,3 +308,5 @@ IndexSet* _ContactVC_GetSet(void* variableCondition) {
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Functions
 */
+
+

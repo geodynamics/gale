@@ -76,11 +76,7 @@
 
 	struct OperatorSwarmVariable { __OperatorSwarmVariable };
 
-	#define OPERATORSWARMVARIABLE_DEFARGS \
-		SWARMVARIABLE_DEFARGS
 
-	#define OPERATORSWARMVARIABLE_PASSARGS \
-		SWARMVARIABLE_PASSARGS
 
 	/** Shortcut constructors */
 	OperatorSwarmVariable* OperatorSwarmVariable_NewUnary(
@@ -108,7 +104,18 @@
 		SwarmVariable**						swarmVariableList );
 
 	/** Private Constructor */
-	OperatorSwarmVariable* _OperatorSwarmVariable_New( OPERATORSWARMVARIABLE_DEFARGS ); 
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define OPERATORSWARMVARIABLE_DEFARGS \
+                SWARMVARIABLE_DEFARGS
+
+	#define OPERATORSWARMVARIABLE_PASSARGS \
+                SWARMVARIABLE_PASSARGS
+
+	OperatorSwarmVariable* _OperatorSwarmVariable_New(  OPERATORSWARMVARIABLE_DEFARGS  ); 
 
 	void _OperatorSwarmVariable_Init( void* _swarmVariable, Name operatorName, Index swarmVariableCount, SwarmVariable** swarmVariableList );
 
@@ -182,3 +189,4 @@
 	Func_Ptr OperatorSwarmVariable_GetOperatorByName( void* swarmVariable, Name name );
 
 #endif /* __Domain_Utils_OperatorSwarmVariable_h__ */
+

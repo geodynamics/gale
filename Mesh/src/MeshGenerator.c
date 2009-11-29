@@ -54,12 +54,12 @@ const Type MeshGenerator_Type = "MeshGenerator";
 ** Constructors
 */
 
-MeshGenerator* _MeshGenerator_New( MESHGENERATOR_DEFARGS ) {
+MeshGenerator* _MeshGenerator_New(  MESHGENERATOR_DEFARGS  ) {
 	MeshGenerator*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(MeshGenerator) );
-	self = (MeshGenerator*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(MeshGenerator) );
+	self = (MeshGenerator*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	/* Virtual info */
 	self->setDimSizeFunc = setDimSizeFunc;
@@ -342,3 +342,5 @@ void MeshGenerator_Destruct( MeshGenerator* self ) {
 	self->nMeshes = 0;
 	self->nDims = 0;
 }
+
+

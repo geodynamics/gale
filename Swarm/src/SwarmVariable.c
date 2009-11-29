@@ -62,31 +62,32 @@ SwarmVariable* SwarmVariable_New(
 }
 
 void* _SwarmVariable_DefaultNew( Name name ) {
-	return (void*) _SwarmVariable_New( 
-		sizeof(SwarmVariable), 
-		SwarmVariable_Type, 
-		_SwarmVariable_Delete, 
-		_SwarmVariable_Print,
-		_SwarmVariable_Copy, 
-		_SwarmVariable_DefaultNew,
-		_SwarmVariable_AssignFromXML,
-		_SwarmVariable_Build, 
-		_SwarmVariable_Initialise, 
-		_SwarmVariable_Execute, 
-		_SwarmVariable_Destroy, 
-		name,
-		NON_GLOBAL,
-		_SwarmVariable_ValueAt,
-		_SwarmVariable_GetMinGlobalMagnitude,
-		_SwarmVariable_GetMaxGlobalMagnitude );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(SwarmVariable);
+	Type                                                         type = SwarmVariable_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _SwarmVariable_Delete;
+	Stg_Class_PrintFunction*                                   _print = _SwarmVariable_Print;
+	Stg_Class_CopyFunction*                                     _copy = _SwarmVariable_Copy;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _SwarmVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _SwarmVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _SwarmVariable_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _SwarmVariable_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _SwarmVariable_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _SwarmVariable_Destroy;
+	AllocationType                                 nameAllocationType = NON_GLOBAL;
+	SwarmVariable_ValueAtFunction*                           _valueAt = _SwarmVariable_ValueAt;
+	SwarmVariable_GetGlobalValueFunction*      _getMinGlobalMagnitude = _SwarmVariable_GetMinGlobalMagnitude;
+	SwarmVariable_GetGlobalValueFunction*      _getMaxGlobalMagnitude = _SwarmVariable_GetMaxGlobalMagnitude;
+
+	return (void*) _SwarmVariable_New(  SWARMVARIABLE_PASSARGS  );
 }
 
-SwarmVariable* _SwarmVariable_New( SWARMVARIABLE_DEFARGS ) {
+SwarmVariable* _SwarmVariable_New(  SWARMVARIABLE_DEFARGS  ) {
 	SwarmVariable* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(SwarmVariable) );
-	self = (SwarmVariable*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(SwarmVariable) );
+	self = (SwarmVariable*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* Virtual functions */
 	self->_valueAt						= _valueAt;
@@ -368,6 +369,8 @@ double _SwarmVariable_GetMaxGlobalMagnitude( void* swarmVariable ) {
 }
 
 	
+
+
 
 
 

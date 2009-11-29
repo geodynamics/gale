@@ -49,26 +49,7 @@
 
 const Type PerCellParticleLayout_Type = "PerCellParticleLayout";
 
-PerCellParticleLayout* _PerCellParticleLayout_New( 
-      SizeT                                        _sizeOfSelf,
-      Type                                         type,
-      Stg_Class_DeleteFunction*                    _delete,
-      Stg_Class_PrintFunction*                     _print,
-      Stg_Class_CopyFunction*                      _copy,
-      Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
-      Stg_Component_ConstructFunction*             _construct,
-      Stg_Component_BuildFunction*                 _build,
-      Stg_Component_InitialiseFunction*            _initialise,
-      Stg_Component_ExecuteFunction*               _execute,
-      Stg_Component_DestroyFunction*               _destroy,
-      Name                                         name,
-      AllocationType                               nameAllocationType,
-      ParticleLayout_SetInitialCountsFunction*     _setInitialCounts,
-      ParticleLayout_InitialiseParticlesFunction*  _initialiseParticles,
-      CoordSystem                                  coordSystem,
-      Bool                                         weightsInitialisedAtStartup,
-      PerCellParticleLayout_InitialCountFunction*  _initialCount,
-      PerCellParticleLayout_InitialiseParticlesOfCellFunction* _initialiseParticlesOfCell )
+PerCellParticleLayout* _PerCellParticleLayout_New(  PERCELLPARTICLELAYOUT_DEFARGS  )
 {
    PerCellParticleLayout*		self;
 
@@ -76,21 +57,7 @@ PerCellParticleLayout* _PerCellParticleLayout_New(
 
    /* Allocate memory */
    assert( _sizeOfSelf >= sizeof(PerCellParticleLayout) );
-   self = (PerCellParticleLayout*)_ParticleLayout_New( 
-      _sizeOfSelf, 
-      type, 
-      _delete, 
-      _print, 
-      _copy, 
-      _defaultConstructor,
-      _construct, 
-      _build, 
-      _initialise, 
-      _execute, 
-      _destroy, 
-      name, coordSystem,
-      _setInitialCounts, _initialiseParticles, 
-      coordSystem, weightsInitialisedAtStartup );
+   self = (PerCellParticleLayout*)_ParticleLayout_New(  PARTICLELAYOUT_PASSARGS  );
 
    /* General info */
 
@@ -214,6 +181,8 @@ Particle_InCellIndex PerCellParticleLayout_InitialCount( void* particleLayout, v
 	
 	return self->_initialCount( self, _swarm, cell_I );
 }
+
+
 
 
 

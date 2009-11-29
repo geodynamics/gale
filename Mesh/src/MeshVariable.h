@@ -64,14 +64,21 @@
 	** Constructors
 	*/
 
-	#define MESHVARIABLE_DEFARGS	\
-		VARIABLE_DEFARGS
 
-	#define MESHVARIABLE_PASSARGS	\
-		VARIABLE_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESHVARIABLE_DEFARGS \
+                VARIABLE_DEFARGS
+
+	#define MESHVARIABLE_PASSARGS \
+                VARIABLE_PASSARGS
 
 	MeshVariable* MeshVariable_New( Name name );
-	MeshVariable* _MeshVariable_New( MESHVARIABLE_DEFARGS );
+	MeshVariable* _MeshVariable_New(  MESHVARIABLE_DEFARGS  );
 	void _MeshVariable_Init( MeshVariable* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -101,3 +108,4 @@
 	Index _MeshVariable_GetMeshArraySize( void* meshVariable );
 
 #endif /* __Domain_Mesh_MeshVariable_h__ */
+

@@ -214,3 +214,5 @@ double Simplex_Area( double** verts, unsigned* inc, unsigned* inds ) {
 			   verts[b][0] * (verts[a][1] - verts[c][1]) + 
 			   verts[c][0] * (verts[b][1] - verts[a][1]) );
 }
+
+

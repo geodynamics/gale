@@ -70,53 +70,37 @@ ShapeAdvector* ShapeAdvector_New(
 }
 
 void* _ShapeAdvector_DefaultNew( Name name ) {
-	return (void*) _ShapeAdvector_New(
-		sizeof(ShapeAdvector),
-		ShapeAdvector_Type,
-		_ShapeAdvector_Delete,
-		_ShapeAdvector_Print,
-		_ShapeAdvector_Copy,
-		_ShapeAdvector_DefaultNew,
-		_ShapeAdvector_AssignFromXML,
-		_ShapeAdvector_Build,
-		_ShapeAdvector_Initialise,
-		_ShapeAdvector_Execute,
-		_ShapeAdvector_Destroy,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(ShapeAdvector);
+	Type                                                      type = ShapeAdvector_Type;
+	Stg_Class_DeleteFunction*                              _delete = _ShapeAdvector_Delete;
+	Stg_Class_PrintFunction*                                _print = _ShapeAdvector_Print;
+	Stg_Class_CopyFunction*                                  _copy = _ShapeAdvector_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _ShapeAdvector_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _ShapeAdvector_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _ShapeAdvector_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _ShapeAdvector_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _ShapeAdvector_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _ShapeAdvector_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _ShapeAdvector_New(  SHAPEADVECTOR_PASSARGS  );
 }
 
-ShapeAdvector* _ShapeAdvector_New(
-	SizeT                                      _sizeOfSelf, 
-	Type                                       type,
-	Stg_Class_DeleteFunction*                  _delete,
-	Stg_Class_PrintFunction*                   _print,
-	Stg_Class_CopyFunction*                    _copy, 
-	Stg_Component_DefaultConstructorFunction*  _defaultConstructor,
-	Stg_Component_ConstructFunction*           _construct,
-	Stg_Component_BuildFunction*               _build,
-	Stg_Component_InitialiseFunction*          _initialise,
-	Stg_Component_ExecuteFunction*             _execute,
-	Stg_Component_DestroyFunction*             _destroy,		
-	Name                                       name )
+ShapeAdvector* _ShapeAdvector_New(  SHAPEADVECTOR_DEFARGS  )
 {
 	ShapeAdvector* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ShapeAdvector) );
-	self = (ShapeAdvector*)_Stg_Component_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			name,
-			NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (ShapeAdvector*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* General info */
 
@@ -211,5 +195,7 @@ void _ShapeAdvector_Destroy( void* shapeAdvector, void* data ) {
 	_Stg_Component_Delete( self->shapeCentreVariable );
 	_Stg_Component_Delete( self->timeIntegratee );
 }
+
+
 
 

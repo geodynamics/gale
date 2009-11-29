@@ -63,15 +63,7 @@
 
 	struct SwarmShapeVC { __SwarmShapeVC };
 	
-	#define SWARMSHAPEVC_DEFARGS \
-      VARIABLECONDITION_DEFARGS, \
-         Name  _dictionaryEntryName, \
-         void* _mesh 
 
-   #define SWARMSHAPEVC_PASSARGS \
-      VARIABLECONDITION_PASSARGS, \
-         _dictionaryEntryName, \
-         _mesh 
 
 	/*-----------------------------------------------------------------------------------------------------------------
 	** Constructor
@@ -91,7 +83,18 @@
 		Dictionary*							dictionary,
 		void*									_mesh );
 	
-	SwarmShapeVC* _SwarmShapeVC_New( SWARMSHAPEVC_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SWARMSHAPEVC_DEFARGS \
+                VARIABLECONDITION_DEFARGS
+
+	#define SWARMSHAPEVC_PASSARGS \
+                VARIABLECONDITION_PASSARGS
+
+	SwarmShapeVC* _SwarmShapeVC_New(  SWARMSHAPEVC_DEFARGS  );
 	
 	void _SwarmShapeVC_Init( void* shapeVC, Name _dictionaryEntryName, void* _mesh );
 	
@@ -140,3 +143,4 @@
 	
 	
 #endif
+

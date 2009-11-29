@@ -70,28 +70,7 @@ TriGaussParticleLayout* TriGaussParticleLayout_New(
 	return self;
 }
 
-TriGaussParticleLayout* _TriGaussParticleLayout_New( 
-      SizeT                                        _sizeOfSelf,
-      Type                                         type,
-      Stg_Class_DeleteFunction*                    _delete,
-      Stg_Class_PrintFunction*                     _print,
-      Stg_Class_CopyFunction*                      _copy,
-      Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
-      Stg_Component_ConstructFunction*             _construct,
-      Stg_Component_BuildFunction*                 _build,
-      Stg_Component_InitialiseFunction*            _initialise,
-      Stg_Component_ExecuteFunction*               _execute,
-      Stg_Component_DestroyFunction*               _destroy,
-      Name                                         name,
-      AllocationType                               nameAllocationType,
-      ParticleLayout_SetInitialCountsFunction*     _setInitialCounts,
-      ParticleLayout_InitialiseParticlesFunction*  _initialiseParticles,
-      CoordSystem                                  coordSystem,
-      Bool                                         weightsInitialisedAtStartup,
-      PerCellParticleLayout_InitialCountFunction*  _initialCount,
-      PerCellParticleLayout_InitialiseParticlesOfCellFunction* _initialiseParticlesOfCell,
-      unsigned int                                 dim,
-      unsigned int                                 particlesPerCell )
+TriGaussParticleLayout* _TriGaussParticleLayout_New(  TRIGAUSSPARTICLELAYOUT_DEFARGS  )
 {
 	TriGaussParticleLayout* self;
 	
@@ -99,22 +78,7 @@ TriGaussParticleLayout* _TriGaussParticleLayout_New(
    coordSystem = LocalCoordSystem;
    weightsInitialisedAtStartup = True;
 	/* Allocate memory */
-	self = (TriGaussParticleLayout*)_PerCellParticleLayout_New( 
-      _sizeOfSelf, 
-		type,
-		_delete,
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-      name, nameAllocationType,
-		_setInitialCounts, _initialiseParticles,
-      coordSystem, weightsInitialisedAtStartup,
-		_initialCount, _initialiseParticlesOfCell );
+	self = (TriGaussParticleLayout*)_PerCellParticleLayout_New(  PERCELLPARTICLELAYOUT_PASSARGS  );
 	
 	return self;
 }
@@ -166,24 +130,27 @@ void* _TriGaussParticleLayout_Copy( void* triGaussParticleLayout, void* dest, Bo
 }
 
 void* _TriGaussParticleLayout_DefaultNew( Name name ) {
-	return _TriGaussParticleLayout_New(
-			sizeof(TriGaussParticleLayout),
-			TriGaussParticleLayout_Type,
-			_TriGaussParticleLayout_Delete,
-			_TriGaussParticleLayout_Print,
-			_TriGaussParticleLayout_Copy,
-			_TriGaussParticleLayout_DefaultNew,
-			_TriGaussParticleLayout_AssignFromXML,
-			_TriGaussParticleLayout_Build,
-			_TriGaussParticleLayout_Initialise,
-			_TriGaussParticleLayout_Execute,
-			_TriGaussParticleLayout_Destroy,
-         name, NON_GLOBAL,
-         _PerCellParticleLayout_SetInitialCounts, _PerCellParticleLayout_InitialiseParticles,
-         LocalCoordSystem, True,
-			_TriGaussParticleLayout_InitialCount, _TriGaussParticleLayout_InitialiseParticlesOfCell,
-			0,
-			0 );
+	/* Variables set in this function */
+	SizeT                                                                     _sizeOfSelf = sizeof(TriGaussParticleLayout);
+	Type                                                                             type = TriGaussParticleLayout_Type;
+	Stg_Class_DeleteFunction*                                                     _delete = _TriGaussParticleLayout_Delete;
+	Stg_Class_PrintFunction*                                                       _print = _TriGaussParticleLayout_Print;
+	Stg_Class_CopyFunction*                                                         _copy = _TriGaussParticleLayout_Copy;
+	Stg_Component_DefaultConstructorFunction*                         _defaultConstructor = _TriGaussParticleLayout_DefaultNew;
+	Stg_Component_ConstructFunction*                                           _construct = _TriGaussParticleLayout_AssignFromXML;
+	Stg_Component_BuildFunction*                                                   _build = _TriGaussParticleLayout_Build;
+	Stg_Component_InitialiseFunction*                                         _initialise = _TriGaussParticleLayout_Initialise;
+	Stg_Component_ExecuteFunction*                                               _execute = _TriGaussParticleLayout_Execute;
+	Stg_Component_DestroyFunction*                                               _destroy = _TriGaussParticleLayout_Destroy;
+	AllocationType                                                     nameAllocationType = NON_GLOBAL;
+	ParticleLayout_SetInitialCountsFunction*                            _setInitialCounts = _PerCellParticleLayout_SetInitialCounts;
+	ParticleLayout_InitialiseParticlesFunction*                      _initialiseParticles = _PerCellParticleLayout_InitialiseParticles;
+	CoordSystem                                                               coordSystem = LocalCoordSystem;
+	Bool                                                      weightsInitialisedAtStartup = True;
+	PerCellParticleLayout_InitialCountFunction*                             _initialCount = _TriGaussParticleLayout_InitialCount;
+	PerCellParticleLayout_InitialiseParticlesOfCellFunction*   _initialiseParticlesOfCell = _TriGaussParticleLayout_InitialiseParticlesOfCell;
+
+	return _TriGaussParticleLayout_New(  TRIGAUSSPARTICLELAYOUT_PASSARGS  );
 }
 
 void _TriGaussParticleLayout_AssignFromXML( void* triGaussParticleLayout, Stg_ComponentFactory* cf, void* data ){
@@ -302,3 +269,5 @@ void _TriGaussParticleLayout_InitialiseParticlesOfCell( void* triGaussParticleLa
 	
 	
 }
+
+

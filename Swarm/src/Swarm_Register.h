@@ -55,13 +55,18 @@
 	** Constructor
 	*/
 	/* Creation implementation */
-	Swarm_Register* _Swarm_Register_New( 
-		SizeT					_sizeOfSelf, 
-		Type					type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print, 
-		Stg_Class_CopyFunction*			_copy
-		);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SWARM_REGISTER_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define SWARM_REGISTER_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	Swarm_Register* _Swarm_Register_New(  SWARM_REGISTER_DEFARGS  );
 	
 	Swarm_Register* Swarm_Register_New();
 
@@ -95,5 +100,6 @@
 	void Swarm_Register_SaveAllRegisteredSwarms( Swarm_Register* self, void* context );
 
 #endif /* __Domain_Swarm_Swarm_Register_h__ */
+
 
 

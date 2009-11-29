@@ -323,3 +323,5 @@ void OperatorFieldVariableSuite( pcu_suite_t* suite ) {
 	pcu_suite_addTest( suite, OperatorFieldVariableSuite_TestVelocityMagnitude3D );
 	pcu_suite_addTest( suite, OperatorFieldVariableSuite_TestOutputFile );
 }
+
+

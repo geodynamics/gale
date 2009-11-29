@@ -66,43 +66,13 @@ Intersection* Intersection_New(
 	return self;
 }
 
-Intersection* _Intersection_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
-		Name                                  name )
+Intersection* _Intersection_New(  INTERSECTION_DEFARGS  )
 {
 	Intersection* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Intersection) );
-	self = (Intersection*)_Stg_Shape_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside ,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (Intersection*)_Stg_Shape_New(  STG_SHAPE_PASSARGS  );
 	
 	/* General info */
 
@@ -161,22 +131,26 @@ void* _Intersection_Copy( void* intersection, void* dest, Bool deep, Name nameEx
 }
 
 void* _Intersection_DefaultNew( Name name ) {
-	return (void*) _Intersection_New(
-			sizeof(Intersection),
-			Intersection_Type,
-			_Intersection_Delete,
-			_Intersection_Print,
-			_Intersection_Copy,
-			_Intersection_DefaultNew,
-			_Intersection_AssignFromXML,
-			_Intersection_Build,
-			_Intersection_Initialise,
-			_Intersection_Execute,
-			_Intersection_Destroy,
-			_Intersection_IsCoordInside,
-			_Intersection_CalculateVolume,
-			_Intersection_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(Intersection);
+	Type                                                          type = Intersection_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _Intersection_Delete;
+	Stg_Class_PrintFunction*                                    _print = _Intersection_Print;
+	Stg_Class_CopyFunction*                                      _copy = _Intersection_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _Intersection_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _Intersection_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _Intersection_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _Intersection_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _Intersection_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _Intersection_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _Intersection_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _Intersection_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _Intersection_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _Intersection_New(  INTERSECTION_PASSARGS  );
 }
 
 
@@ -300,4 +274,6 @@ void _Intersection_DistanceFromCenterAxis( void* shape, Coord coord, double* dis
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+
 

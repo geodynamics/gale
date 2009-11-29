@@ -63,43 +63,13 @@ Box* Box_New(
 	return self;
 }
 
-Box* _Box_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name )
+Box* _Box_New(  BOX_DEFARGS  )
 {
 	Box* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Box) );
-	self = (Box*)_Stg_Shape_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (Box*)_Stg_Shape_New(  STG_SHAPE_PASSARGS  );
 	
 	/* General info */
 
@@ -144,22 +114,26 @@ void* _Box_Copy( void* shape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMa
 }
 
 void* _Box_DefaultNew( Name name ) {
-	return (void*) _Box_New(
-			sizeof(Box),
-			Box_Type,
-			_Box_Delete,
-			_Box_Print,
-			_Box_Copy,
-			_Box_DefaultNew,
-			_Box_AssignFromXML,
-			_Box_Build,
-			_Box_Initialise,
-			_Box_Execute,
-			_Box_Destroy,
-			_Box_IsCoordInside,
-			_Box_CalculateVolume,
-			_Box_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(Box);
+	Type                                                          type = Box_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _Box_Delete;
+	Stg_Class_PrintFunction*                                    _print = _Box_Print;
+	Stg_Class_CopyFunction*                                      _copy = _Box_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _Box_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _Box_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _Box_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _Box_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _Box_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _Box_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _Box_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _Box_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _Box_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _Box_New(  BOX_PASSARGS  );
 }
 
 
@@ -265,4 +239,6 @@ void _Box_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ) {
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }
+
+
 

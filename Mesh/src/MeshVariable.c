@@ -49,37 +49,42 @@ const Type MeshVariable_Type = "MeshVariable";
 */
 
 MeshVariable* MeshVariable_New( Name name ) {
-	return _MeshVariable_New( sizeof(MeshVariable), 
-				  MeshVariable_Type, 
-				  _MeshVariable_Delete, 
-				  _MeshVariable_Print, 
-				  NULL, 
-				  (void* (*)(Name))_MeshVariable_New, 
-				  _MeshVariable_AssignFromXML, 
-				  _MeshVariable_Build, 
-				  _MeshVariable_Initialise, 
-				  _MeshVariable_Execute, 
-				  _MeshVariable_Destroy, 
-				  name, 
-				  False, 
-				  0, 
-				  NULL, 
-				  NULL, 
-				  NULL, 
-				  NULL, 
-				  NULL,
-				  NULL, 
-				  NULL, 
-				  NULL, 
-				  NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(MeshVariable);
+	Type                                                      type = MeshVariable_Type;
+	Stg_Class_DeleteFunction*                              _delete = _MeshVariable_Delete;
+	Stg_Class_PrintFunction*                                _print = _MeshVariable_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void* (*)(Name))_MeshVariable_New;
+	Stg_Component_ConstructFunction*                    _construct = _MeshVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _MeshVariable_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _MeshVariable_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _MeshVariable_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _MeshVariable_Destroy;
+	Bool                                                  initFlag = False;
+	Index                                                dataCount = 0;
+	SizeT*                                             dataOffsets = NULL;
+	Variable_DataType*                                   dataTypes = NULL;
+	Index*                                          dataTypeCounts = NULL;
+	Name*                                                dataNames = NULL;
+	SizeT*                                           structSizePtr = NULL;
+	Index*                                            arraySizePtr = NULL;
+	Variable_ArraySizeFunc*                          arraySizeFunc = NULL;
+	void**                                             arrayPtrPtr = NULL;
+	Variable_Register*                                          vr = NULL;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return _MeshVariable_New(  MESHVARIABLE_PASSARGS  );
 }
 
-MeshVariable* _MeshVariable_New( MESHVARIABLE_DEFARGS ) {
+MeshVariable* _MeshVariable_New(  MESHVARIABLE_DEFARGS  ) {
 	MeshVariable* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(MeshVariable) );
-	self = (MeshVariable*)_Variable_New( VARIABLE_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(MeshVariable) );
+	self = (MeshVariable*)_Variable_New(  VARIABLE_PASSARGS  );
 
 	/* Virtual info */
 
@@ -278,4 +283,6 @@ Index _MeshVariable_GetMeshArraySize( void* meshVariable ) {
 
 	return Mesh_GetDomainSize( self->mesh, self->topoDim );
 }
+
+
 

@@ -71,21 +71,28 @@
 	** Constructors
 	*/
 
-	#define MESH_ELEMENTTYPE_DEFARGS							\
-		STG_CLASS_DEFARGS,								\
-		Mesh_ElementType_UpdateFunc*			updateFunc, 			\
-		Mesh_ElementType_ElementHasPointFunc*		elementHasPointFunc,		\
-		Mesh_ElementType_GetMinimumSeparationFunc*	getMinimumSeparationFunc,	\
-		Mesh_ElementType_GetCentroidFunc*		getCentroidFunc
 
-	#define MESH_ELEMENTTYPE_PASSARGS	\
-		STG_CLASS_PASSARGS, 		\
-		updateFunc, 			\
-		elementHasPointFunc, 		\
-		getMinimumSeparationFunc,	\
-		getCentroidFunc
 
-	Mesh_ElementType* _Mesh_ElementType_New( MESH_ELEMENTTYPE_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESH_ELEMENTTYPE_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                Mesh_ElementType_UpdateFunc*                              updateFunc, \
+                Mesh_ElementType_ElementHasPointFunc*            elementHasPointFunc, \
+                Mesh_ElementType_GetMinimumSeparationFunc*  getMinimumSeparationFunc, \
+                Mesh_ElementType_GetCentroidFunc*                    getCentroidFunc
+
+	#define MESH_ELEMENTTYPE_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        updateFunc,               \
+	        elementHasPointFunc,      \
+	        getMinimumSeparationFunc, \
+	        getCentroidFunc         
+
+	Mesh_ElementType* _Mesh_ElementType_New(  MESH_ELEMENTTYPE_DEFARGS  );
 	void _Mesh_ElementType_Init( Mesh_ElementType* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -119,3 +126,4 @@
 	*/
 
 #endif /* __Domain_Mesh_Mesh_ElementType_h__ */
+

@@ -156,30 +156,22 @@
       void*				                       ics );
 	
 	/* Creation implementation / Virtual constructor */
-	Swarm* _Swarm_New(
-		SizeT                                 _sizeOfSelf,
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,
-		Name                                  name,
-		CellLayout*                           cellLayout,
-		ParticleLayout*                       particleLayout,
-		Dimension_Index                       dim,
-		SizeT                                 particleSize,
-		Particle_InCellIndex                  cellParticleTblDelta, 
-		double                                extraParticlesFactor,
-		ExtensionManager_Register*            extensionMgr_Register,
-		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm, 
-	        /* modified the constructor function to take in initial conditions */	
-		void*				      ics );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SWARM_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                SizeT  particleSize, \
+                void*           ics
+
+	#define SWARM_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        particleSize, \
+	        ics         
+
+	Swarm* _Swarm_New(  SWARM_DEFARGS  );
 
    void _Swarm_Init( 
       Swarm*                                self, 
@@ -345,3 +337,4 @@
 	void Swarm_AddVariable( Swarm* self, SwarmVariable* swarmVar );
 
 #endif /* __Domain_Swarm_SwarmClass_h__ */
+

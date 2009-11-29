@@ -73,17 +73,24 @@
 	** Constructors
 	*/
 
-	#define MESHGENERATOR_DEFARGS				\
-		STG_COMPONENT_DEFARGS,				\
-		MeshGenerator_SetDimSizeFunc*	setDimSizeFunc,	\
-		MeshGenerator_GenerateFunc*	generateFunc
 
-	#define MESHGENERATOR_PASSARGS		\
-		STG_COMPONENT_PASSARGS,		\
-		setDimSizeFunc,			\
-		generateFunc
 
-	MeshGenerator* _MeshGenerator_New( MESHGENERATOR_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESHGENERATOR_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                MeshGenerator_SetDimSizeFunc*  setDimSizeFunc, \
+                MeshGenerator_GenerateFunc*      generateFunc
+
+	#define MESHGENERATOR_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        setDimSizeFunc, \
+	        generateFunc  
+
+	MeshGenerator* _MeshGenerator_New(  MESHGENERATOR_DEFARGS  );
 	void _MeshGenerator_Init( MeshGenerator* self, AbstractContext* context );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -131,3 +138,4 @@
 	void MeshGenerator_Destruct( MeshGenerator* self );
 
 #endif /* __Domain_Mesh_MeshGenerator_h__ */
+

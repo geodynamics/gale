@@ -52,27 +52,7 @@ const Type GlobalParticleLayout_Type = "GlobalParticleLayout";
 
 const Index GlobalParticleLayout_Invalid = (Index) 0;
 
-GlobalParticleLayout* _GlobalParticleLayout_New( 
-      SizeT                                               _sizeOfSelf,
-      Type                                                type,
-      Stg_Class_DeleteFunction*                           _delete,
-      Stg_Class_PrintFunction*                            _print,
-      Stg_Class_CopyFunction*                             _copy,
-      Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-      Stg_Component_ConstructFunction*                    _construct,
-      Stg_Component_BuildFunction*                        _build,
-      Stg_Component_InitialiseFunction*                   _initialise,
-      Stg_Component_ExecuteFunction*                      _execute,
-      Stg_Component_DestroyFunction*                      _destroy,
-      Name                                                name,
-      AllocationType                                      nameAllocationType,
-      ParticleLayout_SetInitialCountsFunction*            _setInitialCounts,
-      ParticleLayout_InitialiseParticlesFunction*         _initialiseParticles,
-      CoordSystem                                         coordSystem,
-      Bool                                                weightsInitialisedAtStartup,
-      GlobalParticleLayout_InitialiseParticleFunction*    _initialiseParticle,
-      Particle_Index                                      totalInitialParticles,
-      double                                              averageInitialParticlesPerCell )
+GlobalParticleLayout* _GlobalParticleLayout_New(  GLOBALPARTICLELAYOUT_DEFARGS  )
 {
 	GlobalParticleLayout* self;
 	
@@ -82,24 +62,12 @@ GlobalParticleLayout* _GlobalParticleLayout_New(
    coordSystem = GlobalCoordSystem;
    weightsInitialisedAtStartup = False;
 
-	self = (GlobalParticleLayout*)_ParticleLayout_New( 
-			_sizeOfSelf, 
-			type, 
-			_delete, 
-			_print, 
-			_copy, 
-			_defaultConstructor,
-			_construct, 
-			_build, 
-			_initialise, 
-			_execute, 
-			_destroy, 
-			name, 
-         NON_GLOBAL,
-			_setInitialCounts,
-			_initialiseParticles, 
-			coordSystem,
-			weightsInitialisedAtStartup );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (GlobalParticleLayout*)_ParticleLayout_New(  PARTICLELAYOUT_PASSARGS  );
 	
    /* attributes */
    self->totalInitialParticles = totalInitialParticles; 
@@ -368,5 +336,7 @@ void GlobalParticleLayout_InitialiseParticle( void* particleLayout, void* _swarm
 	
 	self->_initialiseParticle( self, _swarm, newParticle_I, particle );
 }
+
+
 
 

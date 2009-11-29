@@ -79,43 +79,39 @@ AllNodesVC*	AllNodesVC_New(
 }
 
 AllNodesVC* _AllNodesVC_DefaultNew( Name name ) {
-	return _AllNodesVC_New(
-		sizeof(AllNodesVC), 
-		AllNodesVC_Type, 
-		_AllNodesVC_Delete, 
-		_AllNodesVC_Print, 
-		_AllNodesVC_Copy, 
-		(Stg_Component_DefaultConstructorFunction*)_AllNodesVC_DefaultNew,
-		_AllNodesVC_AssignFromXML,
-		_AllNodesVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_AllNodesVC_Destroy,
-		name,
-		NON_GLOBAL,
-		_AllNodesVC_BuildSelf, 
-		_AllNodesVC_PrintConcise,
-		_AllNodesVC_ReadDictionary,
-		_AllNodesVC_GetSet, 
-		_AllNodesVC_GetVariableCount, 
-		_AllNodesVC_GetVariableIndex, 
-		_AllNodesVC_GetValueIndex, 
-		_AllNodesVC_GetValueCount, 
-		_AllNodesVC_GetValue,
-		_VariableCondition_Apply, 
-		NULL,
-		NULL, 
-		NULL, 
-		NULL, 
-		NULL );
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(AllNodesVC);
+	Type                                                       type = AllNodesVC_Type;
+	Stg_Class_DeleteFunction*                               _delete = _AllNodesVC_Delete;
+	Stg_Class_PrintFunction*                                 _print = _AllNodesVC_Print;
+	Stg_Class_CopyFunction*                                   _copy = _AllNodesVC_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_AllNodesVC_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _AllNodesVC_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _AllNodesVC_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _VariableCondition_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _VariableCondition_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _AllNodesVC_Destroy;
+	AllocationType                               nameAllocationType = NON_GLOBAL;
+	VariableCondition_BuildSelfFunc*                     _buildSelf = _AllNodesVC_BuildSelf;
+	VariableCondition_PrintConciseFunc*               _printConcise = _AllNodesVC_PrintConcise;
+	VariableCondition_ReadDictionaryFunc*           _readDictionary = _AllNodesVC_ReadDictionary;
+	VariableCondition_GetSetFunc*                           _getSet = _AllNodesVC_GetSet;
+	VariableCondition_GetVariableCountFunc*       _getVariableCount = _AllNodesVC_GetVariableCount;
+	VariableCondition_GetVariableIndexFunc*       _getVariableIndex = _AllNodesVC_GetVariableIndex;
+	VariableCondition_GetValueIndexFunc*             _getValueIndex = _AllNodesVC_GetValueIndex;
+	VariableCondition_GetValueCountFunc*             _getValueCount = _AllNodesVC_GetValueCount;
+	VariableCondition_GetValueFunc*                       _getValue = _AllNodesVC_GetValue;
+	VariableCondition_ApplyFunc*                             _apply = _VariableCondition_Apply;
+
+	return _AllNodesVC_New(  ALLNODESVC_PASSARGS  );
 }
 
-AllNodesVC* _AllNodesVC_New( ALLNODESVC_DEFARGS ) {
+AllNodesVC* _AllNodesVC_New(  ALLNODESVC_DEFARGS  ) {
 	AllNodesVC*	self;
 	
 	/* Allocate memory/General info */
-	assert( sizeOfSelf >= sizeof(AllNodesVC) );
-	self = (AllNodesVC*)_VariableCondition_New( VARIABLECONDITION_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(AllNodesVC) );
+	self = (AllNodesVC*)_VariableCondition_New(  VARIABLECONDITION_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -483,3 +479,5 @@ void _AllNodesVC_PrintConcise( void* variableCondition, Stream* stream ) {
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Functions
 */
+
+

@@ -63,24 +63,26 @@ extern const Type ParticleLayout_Type;
 struct ParticleLayout { __ParticleLayout };
 	
 /* Creation implementation / Virtual constructor */
-ParticleLayout* _ParticleLayout_New( 
-   SizeT                                       _sizeOfSelf,
-   Type                                        type,
-   Stg_Class_DeleteFunction*                   _delete,
-   Stg_Class_PrintFunction*                    _print,
-   Stg_Class_CopyFunction*                     _copy,
-   Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-   Stg_Component_ConstructFunction*            _construct,
-   Stg_Component_BuildFunction*                _build,
-   Stg_Component_InitialiseFunction*           _initialise,
-   Stg_Component_ExecuteFunction*              _execute,
-   Stg_Component_DestroyFunction*              _destroy,
-   Name                                        name,
-   AllocationType                              nameAllocationType,
-   ParticleLayout_SetInitialCountsFunction*    _setInitialCounts,
-   ParticleLayout_InitialiseParticlesFunction* _initialiseParticles,
-   CoordSystem                                 coordSystem,
-   Bool                                        weightsInitialisedAtStartup );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PARTICLELAYOUT_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                ParticleLayout_SetInitialCountsFunction*               _setInitialCounts, \
+                ParticleLayout_InitialiseParticlesFunction*         _initialiseParticles, \
+                CoordSystem                                                  coordSystem, \
+                Bool                                         weightsInitialisedAtStartup
+
+	#define PARTICLELAYOUT_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _setInitialCounts,           \
+	        _initialiseParticles,        \
+	        coordSystem,                 \
+	        weightsInitialisedAtStartup
+
+ParticleLayout* _ParticleLayout_New(  PARTICLELAYOUT_DEFARGS  );
 
 /* Initialise implementation */
 void _ParticleLayout_Init( 
@@ -114,3 +116,4 @@ void ParticleLayout_SetInitialCounts( void* particleLayout, void* swarm );
 void ParticleLayout_InitialiseParticles( void* particleLayout, void* swarm );
 	
 #endif /* __Domain_Swarm_ParticleLayout_h__ */
+

@@ -67,43 +67,13 @@ Superellipsoid* Superellipsoid_New(
 	return self;
 }
 
-Superellipsoid* _Superellipsoid_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name )
+Superellipsoid* _Superellipsoid_New(  SUPERELLIPSOID_DEFARGS  )
 {
 	Superellipsoid* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Superellipsoid) );
-	self = (Superellipsoid*)_Stg_Shape_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (Superellipsoid*)_Stg_Shape_New(  STG_SHAPE_PASSARGS  );
 	
 	/* General info */
 
@@ -157,22 +127,26 @@ void* _Superellipsoid_Copy( void* superellipsoid, void* dest, Bool deep, Name na
 }
 
 void* _Superellipsoid_DefaultNew( Name name ) {
-	return (void*) _Superellipsoid_New(
-			sizeof(Superellipsoid),
-			Superellipsoid_Type,
-			_Superellipsoid_Delete,
-			_Superellipsoid_Print,
-			_Superellipsoid_Copy,
-			_Superellipsoid_DefaultNew,
-			_Superellipsoid_AssignFromXML,
-			_Superellipsoid_Build,
-			_Superellipsoid_Initialise,
-			_Superellipsoid_Execute,
-			_Superellipsoid_Destroy,
-			_Superellipsoid_IsCoordInside,
-			_Superellipsoid_CalculateVolume,
-			_Superellipsoid_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(Superellipsoid);
+	Type                                                          type = Superellipsoid_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _Superellipsoid_Delete;
+	Stg_Class_PrintFunction*                                    _print = _Superellipsoid_Print;
+	Stg_Class_CopyFunction*                                      _copy = _Superellipsoid_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _Superellipsoid_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _Superellipsoid_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _Superellipsoid_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _Superellipsoid_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _Superellipsoid_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _Superellipsoid_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _Superellipsoid_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _Superellipsoid_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _Superellipsoid_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _Superellipsoid_New(  SUPERELLIPSOID_PASSARGS  );
 }
 
 
@@ -260,3 +234,5 @@ void _Superellipsoid_DistanceFromCenterAxis( void* shape, Coord coord, double* d
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }	
+
+

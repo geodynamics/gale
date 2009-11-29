@@ -60,11 +60,7 @@
 
 	struct RegularRemesherCmpt { __RegularRemesherCmpt };
 
-	#define REGULARREMESHERCMPT_DEFARGS \
-		REMESHER_DEFARGS
 
-	#define REGULARREMESHERCMPT_PASSARGS \
-		REMESHER_PASSARGS
 
 	/*-----------------------------------------------------------------------------------------------------------------------------
 	** Constructors
@@ -74,7 +70,18 @@
 	RegularRemesherCmpt* RegularRemesherCmpt_New( Name name, AbstractContext* context, Mesh* mesh, RegularRemesher* regRemesh );
 
 	/* Creation implementation */
-	RegularRemesherCmpt* _RegularRemesherCmpt_New( REGULARREMESHERCMPT_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define REGULARREMESHERCMPT_DEFARGS \
+                REMESHER_DEFARGS
+
+	#define REGULARREMESHERCMPT_PASSARGS \
+                REMESHER_PASSARGS
+
+	RegularRemesherCmpt* _RegularRemesherCmpt_New(  REGULARREMESHERCMPT_DEFARGS  );
 
 	/* Initialisation implementation functions */
 	void _RegularRemesherCmpt_Init( void* remesher, RegularRemesher* regRemesh );
@@ -113,3 +120,4 @@
 #endif
 
 #endif
+

@@ -66,15 +66,7 @@
 
 	struct _CornerVC { __CornerVC };
 
-	#define CORNERVC_DEFARGS \
-      VARIABLECONDITION_DEFARGS, \
-         Name  _dictionaryEntryName, \
-			void* _mesh 
 
-	#define CORNERVC_PASSARGS \
-      VARIABLECONDITION_PASSARGS, \
-         _dictionaryEntryName, \
-         _mesh 
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
@@ -96,7 +88,18 @@
 		Dictionary*							dictionary,
 		void*									_mesh );
 	
-	CornerVC* _CornerVC_New( CORNERVC_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CORNERVC_DEFARGS \
+                VARIABLECONDITION_DEFARGS
+
+	#define CORNERVC_PASSARGS \
+                VARIABLECONDITION_PASSARGS
+
+	CornerVC* _CornerVC_New(  CORNERVC_DEFARGS  );
 	
 	void _CornerVC_Init( void* cornerVC, Name _dictionaryEntryName, void* _mesh );
 	
@@ -162,3 +165,4 @@
 
 	
 #endif /* __Domain_Utils_CornerVC_h__ */
+

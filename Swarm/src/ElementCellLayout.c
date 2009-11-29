@@ -58,36 +58,36 @@ ElementCellLayout* ElementCellLayout_New( Name name, AbstractContext* context, v
 }
 
 void* _ElementCellLayout_DefaultNew( Name name ){
-	return (void*) _ElementCellLayout_New( 
-		sizeof(ElementCellLayout),
-		ElementCellLayout_Type, 
-		_ElementCellLayout_Delete,
-		_ElementCellLayout_Print,
-		_ElementCellLayout_Copy, 
-		_ElementCellLayout_DefaultNew,
-		_ElementCellLayout_AssignFromXML,
-		_ElementCellLayout_Build,
-		_ElementCellLayout_Initialise,
-		_ElementCellLayout_Execute,
-		_ElementCellLayout_Destroy,
-		name,
-		NON_GLOBAL,
-		_ElementCellLayout_CellLocalCount,
-		_ElementCellLayout_CellShadowCount,
-		_ElementCellLayout_PointCount,
-		_ElementCellLayout_InitialisePoints, 
-		_ElementCellLayout_MapElementIdToCellId,
-		_ElementCellLayout_IsInCell,
-		_ElementCellLayout_CellOf,
-		_ElementCellLayout_GetShadowInfo,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                                _sizeOfSelf = sizeof(ElementCellLayout);
+	Type                                                        type = ElementCellLayout_Type;
+	Stg_Class_DeleteFunction*                                _delete = _ElementCellLayout_Delete;
+	Stg_Class_PrintFunction*                                  _print = _ElementCellLayout_Print;
+	Stg_Class_CopyFunction*                                    _copy = _ElementCellLayout_Copy;
+	Stg_Component_DefaultConstructorFunction*    _defaultConstructor = _ElementCellLayout_DefaultNew;
+	Stg_Component_ConstructFunction*                      _construct = _ElementCellLayout_AssignFromXML;
+	Stg_Component_BuildFunction*                              _build = _ElementCellLayout_Build;
+	Stg_Component_InitialiseFunction*                    _initialise = _ElementCellLayout_Initialise;
+	Stg_Component_ExecuteFunction*                          _execute = _ElementCellLayout_Execute;
+	Stg_Component_DestroyFunction*                          _destroy = _ElementCellLayout_Destroy;
+	AllocationType                                nameAllocationType = NON_GLOBAL;
+	CellLayout_CellCountFunction*                    _cellLocalCount = _ElementCellLayout_CellLocalCount;
+	CellLayout_CellCountFunction*                   _cellShadowCount = _ElementCellLayout_CellShadowCount;
+	CellLayout_PointCountFunction*                       _pointCount = _ElementCellLayout_PointCount;
+	CellLayout_InitialisePointsFunction*           _initialisePoints = _ElementCellLayout_InitialisePoints;
+	CellLayout_MapElementIdToCellIdFunction*   _mapElementIdToCellId = _ElementCellLayout_MapElementIdToCellId;
+	CellLayout_IsInCellFunction*                           _isInCell = _ElementCellLayout_IsInCell;
+	CellLayout_CellOfFunction*                               _cellOf = _ElementCellLayout_CellOf;
+	CellLayout_GetShadowInfoFunction*                 _getShadowInfo = _ElementCellLayout_GetShadowInfo;
+
+	return (void*) _ElementCellLayout_New(  ELEMENTCELLLAYOUT_PASSARGS  );
 }
 
-ElementCellLayout* _ElementCellLayout_New( ELEMENTCELLLAYOUT_DEFARGS ) {
+ElementCellLayout* _ElementCellLayout_New(  ELEMENTCELLLAYOUT_DEFARGS  ) {
 	ElementCellLayout* self;
 	
 	/* Allocate memory */
-	self = (ElementCellLayout*)_CellLayout_New( CELLLAYOUT_PASSARGS );
+	self = (ElementCellLayout*)_CellLayout_New(  CELLLAYOUT_PASSARGS  );
 	
 	/* General info */
 	
@@ -361,3 +361,5 @@ void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self ) {
 		self->cellShadowInfo.procShadowTbl[owner][curInd] = domain;
 	}
 }
+
+

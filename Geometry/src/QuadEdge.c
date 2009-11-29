@@ -127,3 +127,5 @@ QuadEdgeRef ConnectQuadEdges(MemoryPool *qp, QuadEdgeRef a, QuadEdgeRef b)
 	return e;
 }
 
+
+

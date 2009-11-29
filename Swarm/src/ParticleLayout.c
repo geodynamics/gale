@@ -44,24 +44,7 @@
 
 const Type ParticleLayout_Type = "ParticleLayout";
 
-ParticleLayout* _ParticleLayout_New( 
-   SizeT                                       _sizeOfSelf,
-   Type                                        type,
-   Stg_Class_DeleteFunction*                   _delete,
-   Stg_Class_PrintFunction*                    _print,
-   Stg_Class_CopyFunction*                     _copy,
-   Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-   Stg_Component_ConstructFunction*            _construct,
-   Stg_Component_BuildFunction*                _build,
-   Stg_Component_InitialiseFunction*           _initialise,
-   Stg_Component_ExecuteFunction*              _execute,
-   Stg_Component_DestroyFunction*              _destroy,
-   Name                                        name,
-   AllocationType                              nameAllocationType,
-   ParticleLayout_SetInitialCountsFunction*    _setInitialCounts,
-   ParticleLayout_InitialiseParticlesFunction* _initialiseParticles,
-   CoordSystem                                 coordSystem,
-   Bool                                        weightsInitialisedAtStartup )
+ParticleLayout* _ParticleLayout_New(  PARTICLELAYOUT_DEFARGS  )
 {
    ParticleLayout*		self;
 	
@@ -70,20 +53,7 @@ ParticleLayout* _ParticleLayout_New(
 
    /* Allocate memory */
    assert( _sizeOfSelf >= sizeof(ParticleLayout) );
-   self = (ParticleLayout*)_Stg_Component_New( 
-      _sizeOfSelf, 
-      type, 
-      _delete, 
-      _print, 
-      _copy, 
-      _defaultConstructor,
-      _construct, 
-      _build, 
-      _initialise, 
-      _execute, 
-      _destroy, 
-      name, 
-      nameAllocationType );
+   self = (ParticleLayout*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
    /* General info */
    self->coordSystem = coordSystem;	
@@ -183,3 +153,5 @@ void ParticleLayout_SetInitialCounts( void* particleLayout, void* swarm ) {
 	
     self->_setInitialCounts( particleLayout, swarm );
 }
+
+

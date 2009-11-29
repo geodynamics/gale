@@ -47,12 +47,12 @@
 /* Textual name of this class */
 const Type CellLayout_Type = "CellLayout";
 
-CellLayout* _CellLayout_New( CELLLAYOUT_DEFARGS ) {
+CellLayout* _CellLayout_New(  CELLLAYOUT_DEFARGS  ) {
 	CellLayout* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(CellLayout) );
-	self = (CellLayout*)_Stg_Component_New( STG_COMPONENT_PASSARGS  );
+	assert( _sizeOfSelf >= sizeof(CellLayout) );
+	self = (CellLayout*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* General info */
 	
@@ -197,3 +197,5 @@ ShadowInfo* CellLayout_GetShadowInfo( void* cellLayout ) {
 	
 	return self->_getShadowInfo( self );
 }
+
+

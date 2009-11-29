@@ -53,11 +53,7 @@
 
 	struct _ContactVC { __ContactVC };
 
-	#define CONTACTVC_DEFARGS \
-      WALLVC_DEFARGS
 
-   #define CONTACTVC_PASSARGS \
-      WALLVC_PASSARGS
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
@@ -79,7 +75,18 @@
 		Dictionary*							dictionary,
 		void*									_mesh );
 	
-	ContactVC* _ContactVC_New( CONTACTVC_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CONTACTVC_DEFARGS \
+                WALLVC_DEFARGS
+
+	#define CONTACTVC_PASSARGS \
+                WALLVC_PASSARGS
+
+	ContactVC* _ContactVC_New(  CONTACTVC_DEFARGS  );
 	
 	void _ContactVC_Init( void* wallVC, Name _dictionaryEntryName, void* _mesh );
 	
@@ -129,3 +136,4 @@
 
 	
 #endif /* __Domain_Utils_ContactVC_h__ */
+

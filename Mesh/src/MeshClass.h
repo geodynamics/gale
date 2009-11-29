@@ -104,14 +104,21 @@
 	** Constructors
 	*/
 
-	#define MESH_DEFARGS		\
-		STG_COMPONENT_DEFARGS
 
-	#define MESH_PASSARGS		\
-		STG_COMPONENT_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESH_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define MESH_PASSARGS \
+                STG_COMPONENT_PASSARGS
 
 	Mesh* Mesh_New( Name name, AbstractContext* context );
-	Mesh* _Mesh_New( MESH_DEFARGS );
+	Mesh* _Mesh_New(  MESH_DEFARGS  );
 	void _Mesh_Init( Mesh* self, AbstractContext* context );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -203,3 +210,4 @@
 	void Mesh_Destruct( Mesh* self );
 
 #endif /* __Domain_Mesh_Mesh_h__ */
+

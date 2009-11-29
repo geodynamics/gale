@@ -66,29 +66,22 @@
 		Index                  particleLayoutCount );
 	
    /* Creation implementation / Virtual constructor */
-   UnionParticleLayout* _UnionParticleLayout_New( 
-		SizeT                                            _sizeOfSelf,
-		Type                                             type,
-		Stg_Class_DeleteFunction*                        _delete,
-		Stg_Class_PrintFunction*                         _print,
-		Stg_Class_CopyFunction*                          _copy, 
-		Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-		Stg_Component_ConstructFunction*                 _construct,
-		Stg_Component_BuildFunction*                     _build,
-		Stg_Component_InitialiseFunction*                _initialise,
-		Stg_Component_ExecuteFunction*                   _execute,
-		Stg_Component_DestroyFunction*                   _destroy,
-		Name                                             name,
-      AllocationType                                   nameAllocationType,
-		ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-      CoordSystem                                      coordSystem,
-      Bool                                             weightsInitialisedAtStartup,
-		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-      Particle_Index                                   totalInitialParticles,
-      double                                           averageInitialParticlesPerCell,
-		GlobalParticleLayout**                           particleLayoutList,
-		Index                                            particleLayoutCount );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define UNIONPARTICLELAYOUT_DEFARGS \
+                GLOBALPARTICLELAYOUT_DEFARGS, \
+                GlobalParticleLayout**   particleLayoutList, \
+                Index                   particleLayoutCount
+
+	#define UNIONPARTICLELAYOUT_PASSARGS \
+                GLOBALPARTICLELAYOUT_PASSARGS, \
+	        particleLayoutList,  \
+	        particleLayoutCount
+
+   UnionParticleLayout* _UnionParticleLayout_New(  UNIONPARTICLELAYOUT_DEFARGS  );
 
 	void _UnionParticleLayout_Init( 
 		void*                                            unionParticleLayout, 
@@ -123,3 +116,4 @@
 
 
 #endif /* __Domain_Swarm_UnionParticleLayout_h__ */
+

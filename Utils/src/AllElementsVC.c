@@ -77,43 +77,39 @@ AllElementsVC*	AllElementsVC_New(
 }
 
 AllElementsVC* _AllElementsVC_DefaultNew( Name name ) {
-	return _AllElementsVC_New(
-		sizeof(AllElementsVC), 
-		AllElementsVC_Type, 
-		_AllElementsVC_Delete, 
-		_AllElementsVC_Print, 
-		_AllElementsVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)_AllElementsVC_DefaultNew,
-		_AllElementsVC_AssignFromXML,
-		_AllElementsVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_AllElementsVC_Destroy,
-		name,
-		NON_GLOBAL,
-		_AllElementsVC_BuildSelf, 
-		_AllElementsVC_PrintConcise,
-		_AllElementsVC_ReadDictionary,
-		_AllElementsVC_GetSet, 
-		_AllElementsVC_GetVariableCount, 
-		_AllElementsVC_GetVariableIndex, 
-		_AllElementsVC_GetValueIndex, 
-		_AllElementsVC_GetValueCount, 
-		_AllElementsVC_GetValue,
-		_VariableCondition_Apply, 
-		NULL,
-		NULL, 
-		NULL, 
-		NULL, 
-		NULL );
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(AllElementsVC);
+	Type                                                       type = AllElementsVC_Type;
+	Stg_Class_DeleteFunction*                               _delete = _AllElementsVC_Delete;
+	Stg_Class_PrintFunction*                                 _print = _AllElementsVC_Print;
+	Stg_Class_CopyFunction*                                   _copy = _AllElementsVC_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_AllElementsVC_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _AllElementsVC_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _AllElementsVC_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _VariableCondition_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _VariableCondition_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _AllElementsVC_Destroy;
+	AllocationType                               nameAllocationType = NON_GLOBAL;
+	VariableCondition_BuildSelfFunc*                     _buildSelf = _AllElementsVC_BuildSelf;
+	VariableCondition_PrintConciseFunc*               _printConcise = _AllElementsVC_PrintConcise;
+	VariableCondition_ReadDictionaryFunc*           _readDictionary = _AllElementsVC_ReadDictionary;
+	VariableCondition_GetSetFunc*                           _getSet = _AllElementsVC_GetSet;
+	VariableCondition_GetVariableCountFunc*       _getVariableCount = _AllElementsVC_GetVariableCount;
+	VariableCondition_GetVariableIndexFunc*       _getVariableIndex = _AllElementsVC_GetVariableIndex;
+	VariableCondition_GetValueIndexFunc*             _getValueIndex = _AllElementsVC_GetValueIndex;
+	VariableCondition_GetValueCountFunc*             _getValueCount = _AllElementsVC_GetValueCount;
+	VariableCondition_GetValueFunc*                       _getValue = _AllElementsVC_GetValue;
+	VariableCondition_ApplyFunc*                             _apply = _VariableCondition_Apply;
+
+	return _AllElementsVC_New(  ALLELEMENTSVC_PASSARGS  );
 }
 
-AllElementsVC* _AllElementsVC_New( ALLELEMENTSVC_DEFARGS ) {
+AllElementsVC* _AllElementsVC_New(  ALLELEMENTSVC_DEFARGS  ) {
 	AllElementsVC*	self;
 	
 	/* Allocate memory/General info */
-	assert( sizeOfSelf >= sizeof(AllElementsVC) );
-	self = (AllElementsVC*)_VariableCondition_New( VARIABLECONDITION_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(AllElementsVC) );
+	self = (AllElementsVC*)_VariableCondition_New(  VARIABLECONDITION_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -475,3 +471,5 @@ void _AllElementsVC_PrintConcise( void* variableCondition, Stream* stream ) {
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Functions
 */
+
+

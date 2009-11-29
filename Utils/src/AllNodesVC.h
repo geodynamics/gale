@@ -62,15 +62,7 @@
 
 	struct _AllNodesVC { __AllNodesVC };
 
-	#define ALLNODESVC_DEFARGS \
-      VARIABLECONDITION_DEFARGS, \
-         Name  _dictionaryEntryName, \
-         void* _mesh 
 
-   #define ALLNODESVC_PASSARGS \
-      VARIABLECONDITION_PASSARGS, \
-         _dictionaryEntryName, \
-         _mesh 
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
@@ -92,7 +84,18 @@
 		Dictionary*							dictionary,
 		void*									mesh );
 	
-	AllNodesVC* _AllNodesVC_New( ALLNODESVC_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ALLNODESVC_DEFARGS \
+                VARIABLECONDITION_DEFARGS
+
+	#define ALLNODESVC_PASSARGS \
+                VARIABLECONDITION_PASSARGS
+
+	AllNodesVC* _AllNodesVC_New(  ALLNODESVC_DEFARGS  );
 	
 	void _AllNodesVC_Init( void* allNodesVC, Name _dictionaryEntryName, void* mesh );
 	
@@ -157,3 +160,4 @@
 
 	
 #endif /* __Domain_Utils_AllNodesVC_h__ */
+

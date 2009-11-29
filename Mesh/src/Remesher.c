@@ -51,28 +51,29 @@ const Type Remesher_Type = "Remesher";
 /* Constructors */
 
 Remesher* _Remesher_DefaultNew( Name name ) {
-   return _Remesher_New(
-		sizeof(Remesher),
-		Remesher_Type,
-		_Remesher_Delete,
-		_Remesher_Print,
-		NULL,
-		(void*(*)(Name))_Remesher_DefaultNew,
-		_Remesher_AssignFromXML,
-		_Remesher_Build,
-		_Remesher_Initialise,
-		_Remesher_Execute,
-		_Remesher_Destroy,
-		name,
-		NON_GLOBAL,
-		NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Remesher);
+	Type                                                      type = Remesher_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Remesher_Delete;
+	Stg_Class_PrintFunction*                                _print = _Remesher_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void*(*)(Name))_Remesher_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Remesher_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Remesher_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Remesher_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Remesher_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Remesher_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	Remesher_RemeshFunc*                                remeshFunc = NULL;
+
+   return _Remesher_New(  REMESHER_PASSARGS  );
 }
 
-Remesher* _Remesher_New( REMESHER_DEFARGS ) {
+Remesher* _Remesher_New(  REMESHER_DEFARGS  ) {
    Remesher* self;
 
    /* Allocate memory. */
-   self = (Remesher*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+   self = (Remesher*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
    /* Virtual functions. */
    self->remeshFunc = remeshFunc;
@@ -171,3 +172,5 @@ void _Remesher_Destroy( void* remesher, void* data ) {
 }
 
 /* Public Functions */
+
+

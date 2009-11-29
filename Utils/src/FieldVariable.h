@@ -103,31 +103,7 @@
 
 	struct FieldVariable { __FieldVariable };	
 
-	#define FIELDVARIABLE_DEFARGS \
-		STG_COMPONENT_DEFARGS, \
-			FieldVariable_InterpolateValueAtFunction*	_interpolateValueAt, \
-			FieldVariable_GetValueFunction*				_getMinGlobalFieldMagnitude, \
-			FieldVariable_GetValueFunction*				_getMaxGlobalFieldMagnitude, \
-			FieldVariable_GetCoordFunction*				_getMinAndMaxLocalCoords, \
-			FieldVariable_GetCoordFunction*				_getMinAndMaxGlobalCoords, \
-			Index													fieldComponentCount, \
-			Dimension_Index									dim, \
-			Bool													isCheckpointedAndReloaded, \
-			MPI_Comm												communicator, \
-			FieldVariable_Register*							fieldVariable_Register 
 
-	#define FIELDVARIABLE_PASSARGS \
-		STG_COMPONENT_PASSARGS, \
-			_interpolateValueAt, \
-			_getMinGlobalFieldMagnitude, \
-			_getMaxGlobalFieldMagnitude, \
-			_getMinAndMaxLocalCoords, \
-			_getMinAndMaxGlobalCoords, \
-			fieldComponentCount, \
-			dim, \
-			isCheckpointedAndReloaded, \
-			communicator, \
-			fieldVariable_Register 
 
 	/** General Virtual Functions */
 	#define FieldVariable_Copy( self ) \
@@ -145,7 +121,28 @@
 		MPI_Comm												communicator,
 		FieldVariable_Register*							fieldVariable_Register ) ;
 	
-	FieldVariable* _FieldVariable_New( FIELDVARIABLE_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FIELDVARIABLE_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                FieldVariable_InterpolateValueAtFunction*          _interpolateValueAt, \
+                FieldVariable_GetValueFunction*            _getMinGlobalFieldMagnitude, \
+                FieldVariable_GetValueFunction*            _getMaxGlobalFieldMagnitude, \
+                FieldVariable_GetCoordFunction*               _getMinAndMaxLocalCoords, \
+                FieldVariable_GetCoordFunction*              _getMinAndMaxGlobalCoords
+
+	#define FIELDVARIABLE_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _interpolateValueAt,         \
+	        _getMinGlobalFieldMagnitude, \
+	        _getMaxGlobalFieldMagnitude, \
+	        _getMinAndMaxLocalCoords,    \
+	        _getMinAndMaxGlobalCoords  
+
+	FieldVariable* _FieldVariable_New(  FIELDVARIABLE_DEFARGS  );
 
 	/** Member initialisation implementation */
 	void _FieldVariable_Init( 
@@ -194,3 +191,4 @@
 
 
 #endif /* __Domain_Utils_FieldVariable_h__ */
+

@@ -90,14 +90,21 @@
 	** Constructors
 	*/
 
-	#define SURFACEADAPTOR_DEFARGS	\
-		MESHADAPTOR_DEFARGS
 
-	#define SURFACEADAPTOR_PASSARGS	\
-		MESHADAPTOR_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SURFACEADAPTOR_DEFARGS \
+                MESHADAPTOR_DEFARGS
+
+	#define SURFACEADAPTOR_PASSARGS \
+                MESHADAPTOR_PASSARGS
 
 	SurfaceAdaptor* SurfaceAdaptor_New( Name name, AbstractContext* context );
-	SurfaceAdaptor* _SurfaceAdaptor_New( SURFACEADAPTOR_DEFARGS );
+	SurfaceAdaptor* _SurfaceAdaptor_New(  SURFACEADAPTOR_DEFARGS  );
 	void _SurfaceAdaptor_Init( SurfaceAdaptor* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -132,3 +139,4 @@
 				      unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
 
 #endif /* __Domain_Mesh_SurfaceAdaptor_h__ */
+

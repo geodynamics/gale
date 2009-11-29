@@ -47,41 +47,18 @@ const Type Stg_Shape_Type = "Stg_Shape";
 ** Constructors
 */
 
-Stg_Shape* _Stg_Shape_New(
-		SizeT                                       _sizeOfSelf, 
-		Type                                        type,
-		Stg_Class_DeleteFunction*                   _delete,
-		Stg_Class_PrintFunction*                    _print,
-		Stg_Class_CopyFunction*                     _copy, 
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*            _construct,
-		Stg_Component_BuildFunction*                _build,
-		Stg_Component_InitialiseFunction*           _initialise,
-		Stg_Component_ExecuteFunction*              _execute,
-		Stg_Component_DestroyFunction*              _destroy,
-		Stg_Shape_IsCoordInsideFunction*            _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*          _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
-		Name                                        name )
+Stg_Shape* _Stg_Shape_New(  STG_SHAPE_DEFARGS  )
 {
 	Stg_Shape* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Stg_Shape) );
-	self = (Stg_Shape*)_Stg_Component_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build, 
-			_initialise,
-			_execute,
-			_destroy, 
-			name,
-			NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (Stg_Shape*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 		
 	/* General info */
 
@@ -292,6 +269,8 @@ void Stg_Shape_TranslateCoord( void* shape, Coord coord, Coord translatedCoord )
      Vec_Sub2D( translatedCoord, coord, self->centre ) :
      Vec_Sub3D( translatedCoord, coord, self->centre ) ;
 }
+
+
 
 
 
