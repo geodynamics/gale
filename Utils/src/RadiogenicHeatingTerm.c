@@ -123,41 +123,45 @@ void _RadiogenicHeatingTerm_Build( void* forceTerm, void* data ) {
 	_ForceTerm_Build( self, data );
 
 	/* Sort out material extension stuff */
-	self->materialExtHandle = Materials_Register_AddMaterialExtension( 
-			self->materials_Register, self->type, sizeof(RadiogenicHeatingTerm_MaterialExt) );
+	self->materialExtHandle = Materials_Register_AddMaterialExtension( self->materials_Register, self->type, sizeof(RadiogenicHeatingTerm_MaterialExt) );
+
 	for ( material_I = 0 ; material_I < Materials_Register_GetCount( materials_Register ) ; material_I++) {
 		material = Materials_Register_GetByIndex( materials_Register, material_I );
 		materialExt = ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
 
 		/* Get List of Heating Elements from material's dictionary */
-        	list = Dictionary_Get( material->dictionary, "heatingElements" );
-    		heatingElementCount = Dictionary_Entry_Value_GetCount( list );
-        	materialExt->heatingElementList = Memory_Alloc_Array( HeatingElement, heatingElementCount, "Heating Element" );
-    		memset( materialExt->heatingElementList, 0, heatingElementCount * sizeof(HeatingElement) );
-    		materialExt->heatingElementCount = heatingElementCount;
-    	
-    		for ( heatingElement_I = 0 ; heatingElement_I < heatingElementCount ; heatingElement_I++) { 
+		list = Dictionary_Get( material->dictionary, "heatingElements" );
+  		heatingElementCount = Dictionary_Entry_Value_GetCount( list );
+     	materialExt->heatingElementList = Memory_Alloc_Array( HeatingElement, heatingElementCount, "Heating Element" );
+  		memset( materialExt->heatingElementList, 0, heatingElementCount * sizeof(HeatingElement) );
+  		materialExt->heatingElementCount = heatingElementCount;
+  	
+  		for ( heatingElement_I = 0 ; heatingElement_I < heatingElementCount ; heatingElement_I++) { 
 			heatingElement = &materialExt->heatingElementList[ heatingElement_I ];
-    			entry = Dictionary_Entry_Value_GetElement( list, heatingElement_I );
+  			entry = Dictionary_Entry_Value_GetElement( list, heatingElement_I );
 	    	
-	    		heatingElement->Q = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, "Q"));
-	    		heatingElement->lambda = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, "lambda"));
+   		heatingElement->Q = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, "Q"));
+   		heatingElement->lambda = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, "lambda"));
 	   }
 	}
 }
 
 void _RadiogenicHeatingTerm_Initialise( void* forceTerm, void* data ) {
-	RadiogenicHeatingTerm*             self             = (RadiogenicHeatingTerm*)forceTerm;
+	RadiogenicHeatingTerm* self = (RadiogenicHeatingTerm*)forceTerm;
 
 	_ForceTerm_Initialise( self, data );
 }
 
 void _RadiogenicHeatingTerm_Execute( void* forceTerm, void* data ) {
-	_ForceTerm_Execute( forceTerm, data );
+	RadiogenicHeatingTerm* self = (RadiogenicHeatingTerm*)forceTerm;
+
+	_ForceTerm_Execute( self, data );
 }
 
 void _RadiogenicHeatingTerm_Destroy( void* forceTerm, void* data ) {
-	_ForceTerm_Destroy( forceTerm, data );
+	RadiogenicHeatingTerm* self = (RadiogenicHeatingTerm*)forceTerm;
+
+	_ForceTerm_Destroy( self, data );
 }
 
 
