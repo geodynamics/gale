@@ -178,21 +178,21 @@ void _BuoyancyForceTermThermoChem_Print( void* forceTerm, Stream* stream ) {
 }
 
 void _BuoyancyForceTermThermoChem_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
-	BuoyancyForceTermThermoChem*          self             = (BuoyancyForceTermThermoChem*)forceTerm;
-	FeVariable*                 temperatureField;
-	double                      RaT;
-	double                      RaC;
-	Bool                        adjust;
-	Materials_Register*         materials_Register;
-	PICelleratorContext*	    context;
+	BuoyancyForceTermThermoChem*	self = (BuoyancyForceTermThermoChem*)forceTerm;
+	FeVariable*							temperatureField;
+	double								RaT;
+	double								RaC;
+	Bool									adjust;
+	Materials_Register*				materials_Register;
+	PICelleratorContext*				context;
 
 	/* Construct Parent */
 	_ForceTerm_AssignFromXML( self, cf, data );
 
 	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TemperatureField", FeVariable, False, data ) ;
-	RaT              = Stg_ComponentFactory_GetDouble( cf, self->name, "RaT", 0.0 );
-	RaC              = Stg_ComponentFactory_GetDouble( cf, self->name, "RaC", 0.0 );
-	adjust           = Stg_ComponentFactory_GetBool( cf, self->name, "adjust", False );
+	RaT = Stg_ComponentFactory_GetDouble( cf, self->name, "RaT", 0.0 );
+	RaC = Stg_ComponentFactory_GetDouble( cf, self->name, "RaC", 0.0 );
+	adjust = Stg_ComponentFactory_GetBool( cf, self->name, "adjust", False );
 
 	context = (PICelleratorContext*)self->context;
 	assert( Stg_CheckType( context, PICelleratorContext ) );
@@ -276,8 +276,9 @@ void _BuoyancyForceTermThermoChem_Destroy( void* forceTerm, void* data ) {
 	Index i;
 
 	for ( i = 0; i < self->materialSwarmCount; ++i ) {
-		Stg_Class_Delete( self->densitySwarmVariables[i] );
+		_Stg_Component_Delete( self->densitySwarmVariables[i] );
 	}
+	Memory_Free( self->densitySwarmVariables );
 
 	_ForceTerm_Destroy( self, data );
 }
