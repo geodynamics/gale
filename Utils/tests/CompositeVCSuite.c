@@ -162,12 +162,12 @@ void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
    Variable_Register_BuildAll(variable_Register);
 
    /* Create CompositeVC */
-   cvc = CompositeVC_New( "CompositeVC", variable_Register, conFunc_Register, dictionary, mesh );
-	_VariableCondition_Init( cvc, variable_Register, conFunc_Register, dictionary );
+   cvc = CompositeVC_New( "CompositeVC", NULL, variable_Register, conFunc_Register, dictionary, mesh );
+	_VariableCondition_Init( cvc, NULL, variable_Register, conFunc_Register, dictionary );
    _CompositeVC_Init( cvc, 0 );
 
 	for (i = 0; i < 6; i++) {
-		vc = WallVC_New( vcKeyName[i], vcKey[i], variable_Register, conFunc_Register, dictionary, mesh );
+		vc = WallVC_New( vcKeyName[i], NULL, vcKey[i], variable_Register, conFunc_Register, dictionary, mesh );
 		Stg_Component_Build( vc, 0, False );
 		CompositeVC_Add(cvc, vc, True);
 	}
@@ -293,7 +293,7 @@ void CompositeVCSuite_TestCompositeVCDictionary( CompositeVCSuiteData* data ) {
 	Variable_Register_BuildAll(variable_Register);
 
 	/* Create CompositeVC */
-	cvc = CompositeVC_New( "CompositeVC", variable_Register, conFunc_Register, dictionary, mesh );
+	cvc = CompositeVC_New( "CompositeVC", NULL, variable_Register, conFunc_Register, dictionary, mesh );
 	Stg_Component_Build( cvc, 0, False );
 
 	for (j = 0; j < 6; j++)

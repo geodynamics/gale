@@ -152,7 +152,7 @@ void AllNodesVCSuite_TestAllNodesVC( AllNodesVCSuiteData* data ) {
    Variable_Register_BuildAll(variable_Register);
 
    /* Create AllVC */
-   vc = (VariableCondition*)AllNodesVC_New( "AllNodesVC", vcKey, variable_Register, conFunc_Register, dictionary, mesh );
+   vc = (VariableCondition*)AllNodesVC_New( "AllNodesVC", NULL, vcKey, variable_Register, conFunc_Register, dictionary, mesh );
    Stg_Component_Build( vc, 0, False );
 
    for (j = 0; j < 6; j++)

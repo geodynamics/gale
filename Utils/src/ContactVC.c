@@ -53,16 +53,18 @@ const Name defaultContactVCName = "defaultContactVCName";
 */
 
 VariableCondition* ContactVC_Factory(
+	AbstractContext*					context,
 	Variable_Register*				variable_Register, 
    ConditionFunction_Register*	conFunc_Register, 
    Dictionary*							dictionary,
    void*									data )
 {
-   return (VariableCondition*)ContactVC_New( defaultContactVCName, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
+   return (VariableCondition*)ContactVC_New( defaultContactVCName, context, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
 }
 
 ContactVC*	ContactVC_New(
    Name									name,
+	AbstractContext*					context,
    Name									_dictionaryEntryName, 
    Variable_Register*				variable_Register, 
    ConditionFunction_Register*	conFunc_Register, 
@@ -71,7 +73,7 @@ ContactVC*	ContactVC_New(
 {
    ContactVC* self = _ContactVC_DefaultNew( name );
 	
-	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
+	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, dictionary );
    _WallVC_Init( self, _dictionaryEntryName, _mesh );
 	_ContactVC_Init( self, _dictionaryEntryName, _mesh );
 
@@ -90,7 +92,7 @@ ContactVC* _ContactVC_DefaultNew( Name name ) {
 	Stg_Component_BuildFunction*                             _build = _ContactVC_Build;
 	Stg_Component_InitialiseFunction*                   _initialise = _VariableCondition_Initialise;
 	Stg_Component_ExecuteFunction*                         _execute = _VariableCondition_Execute;
-	Stg_Component_DestroyFunction*                         _destroy = _VariableCondition_Destroy;
+	Stg_Component_DestroyFunction*                         _destroy = _WallVC_Destroy;
 	AllocationType                               nameAllocationType = NON_GLOBAL;
 	VariableCondition_BuildSelfFunc*                     _buildSelf = _WallVC_BuildSelf;
 	VariableCondition_PrintConciseFunc*               _printConcise = _WallVC_PrintConcise;
@@ -158,12 +160,18 @@ void _ContactVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 }
 
 
-void _ContactVC_Delete(void* wallVC)
-{
+void _ContactVC_Delete(void* wallVC) {
    ContactVC*	self = (ContactVC*)wallVC;
 	
    /* Stg_Class_Delete parent */
-   _WallVC_Delete(self);
+   _WallVC_Delete( self );
+}
+
+void _ContactVC_Destroy(void* wallVC, void* data) {
+   ContactVC*	self = (ContactVC*)wallVC;
+	
+   /* Stg_Class_Delete parent */
+   _WallVC_Destroy( self, data);
 }
 
 void _ContactVC_Build(  void* wallVC, void* data ) {
@@ -182,9 +190,7 @@ void _ContactVC_Build(  void* wallVC, void* data ) {
 ** Virtual functions
 */
 
-void _ContactVC_AssignFromXML( void* wallVC, Stg_ComponentFactory* cf, void* data )
-{
-	
+void _ContactVC_AssignFromXML( void* wallVC, Stg_ComponentFactory* cf, void* data ) { 
 }
 
 IndexSet* _ContactVC_GetSet(void* variableCondition) {

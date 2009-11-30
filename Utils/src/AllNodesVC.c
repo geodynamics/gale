@@ -52,17 +52,19 @@ const Name defaultAllNodesVCName = "defaultAllNodesVCName";
 */
 
 VariableCondition* AllNodesVC_Factory(
+	AbstractContext*					context,
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register, 
 	Dictionary*							dictionary,
 	void*									data )
 {
-	return (VariableCondition*)AllNodesVC_New( defaultAllNodesVCName, NULL, variable_Register, conFunc_Register, dictionary, data );
+	return (VariableCondition*)AllNodesVC_New( defaultAllNodesVCName, context, NULL, variable_Register, conFunc_Register, dictionary, data );
 }
 
 
 AllNodesVC*	AllNodesVC_New(
 	Name									name,
+	AbstractContext*					context,
 	Name									_dictionaryEntryName, 
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register,
@@ -72,7 +74,7 @@ AllNodesVC*	AllNodesVC_New(
 	AllNodesVC* self = _AllNodesVC_DefaultNew( name );
 
 	self->isConstructed = True;
-	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );	
+	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, dictionary );	
 	_AllNodesVC_Init( self, _dictionaryEntryName, mesh );
 
 	return self;
@@ -137,48 +139,45 @@ void _AllNodesVC_Init(
 */
 
 void _AllNodesVC_ReadDictionary( void* variableCondition, void* dictionary ) {
-	AllNodesVC*			self = (AllNodesVC*)variableCondition;
-	Dictionary_Entry_Value*		vcDictVal;
-	Dictionary_Entry_Value		_vcDictVal;
-	Dictionary_Entry_Value*		varsVal;
-	AllNodesVC_Entry_Index		entry_I;
+	AllNodesVC*					self = (AllNodesVC*)variableCondition;
+	Dictionary_Entry_Value*	vcDictVal;
+	Dictionary_Entry_Value	_vcDictVal;
+	Dictionary_Entry_Value*	varsVal;
+	AllNodesVC_Entry_Index	entry_I;
 	
 	/* Find dictionary entry */
 	if (self->_dictionaryEntryName)
 		vcDictVal = Dictionary_Get( dictionary, self->_dictionaryEntryName );
-	else
-	{
+	else {
 		vcDictVal = &_vcDictVal;
 		Dictionary_Entry_Value_InitFromStruct( vcDictVal, dictionary );
 	}
 	
-	if (vcDictVal)
-	{
+	if (vcDictVal) {
 		/* Obtain the variable entries */
 		self->_entryCount = Dictionary_Entry_Value_GetCount(Dictionary_Entry_Value_GetMember(vcDictVal, "variables"));
 		self->_entryTbl = Memory_Alloc_Array( AllNodesVC_Entry, self->_entryCount, "AllNodesVC->_entryTbl" );
 		varsVal = Dictionary_Entry_Value_GetMember(vcDictVal, "variables");
 		
-		for (entry_I = 0; entry_I < self->_entryCount; entry_I++)
-		{
-			char*			valType;
+		for (entry_I = 0; entry_I < self->_entryCount; entry_I++) {
+			char*							valType;
 			Dictionary_Entry_Value*	valueEntry;
 			Dictionary_Entry_Value*	varDictListVal;
 			
 			varDictListVal = Dictionary_Entry_Value_GetElement(varsVal, entry_I);
 			valueEntry = Dictionary_Entry_Value_GetMember(varDictListVal, "value");
 			
-			self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString(
-				Dictionary_Entry_Value_GetMember(varDictListVal, "name"));
+			self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetMember(varDictListVal, "name"));
 				
 			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(varDictListVal, "type"));
-			if (0 == strcasecmp(valType, "func"))
-			{
+
+			if (0 == strcasecmp(valType, "func")) {
 				char*	funcName = Dictionary_Entry_Value_AsString(valueEntry);
 				Index	cfIndex;
 				
 				self->_entryTbl[entry_I].value.type = VC_ValueType_CFIndex;
 				cfIndex = ConditionFunction_Register_GetIndex( self->conFunc_Register, funcName);
+
 				if ( cfIndex == (unsigned)-1 ) {	
 					Stream*	errorStr = Journal_Register( Error_Type, self->type );
 
@@ -194,8 +193,7 @@ void _AllNodesVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 				}	
 				self->_entryTbl[entry_I].value.as.typeCFIndex = cfIndex;
 			}	
-			else if (!strcasecmp(valType, "array"))
-			{
+			else if (!strcasecmp(valType, "array")) {
 				Dictionary_Entry_Value*	valueElement;
 				Index			i;
 
@@ -204,8 +202,7 @@ void _AllNodesVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 				self->_entryTbl[entry_I].value.as.typeArray.array = Memory_Alloc_Array( double, 
 					self->_entryTbl[entry_I].value.as.typeArray.size, "AllNodesVC->_entryTbl[].value.as.typeArray.array" );
 					
-				for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
-				{
+				for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++) {
 					valueElement = Dictionary_Entry_Value_GetElement(valueEntry, i);
 					self->_entryTbl[entry_I].value.as.typeArray.array[i] = 
 						Dictionary_Entry_Value_AsDouble(valueElement);
@@ -264,9 +261,9 @@ void _AllNodesVC_Destroy( void* allNodesVC, void* data ) {
 }
 
 void _AllNodesVC_Print( void* allNodesVC, Stream* stream ) {
-	AllNodesVC*			self = (AllNodesVC*)allNodesVC;
-	AllNodesVC_Entry_Index		entry_I;
-	Index				i;
+	AllNodesVC*					self = (AllNodesVC*)allNodesVC;
+	AllNodesVC_Entry_Index	entry_I;
+	Index							i;
 	
 	/* Set the Journal for printing informations */
 	Stream* info = stream;
@@ -400,9 +397,7 @@ void _AllNodesVC_Build( void* allNodesVC, void* data ) {
 ** Virtual functions
 */
 
-void _AllNodesVC_AssignFromXML( void* allNodesVC, Stg_ComponentFactory* cf, void* data ) 
-{
-
+void _AllNodesVC_AssignFromXML( void* allNodesVC, Stg_ComponentFactory* cf, void* data ) { 
 }
 
 void _AllNodesVC_BuildSelf( void* allNodesVC, void* data ) {

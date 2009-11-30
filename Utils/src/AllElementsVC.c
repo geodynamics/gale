@@ -51,16 +51,18 @@ const Name defaultAllElementsVCName = "defaultAllElementsVCName";
 */
 
 VariableCondition* AllElementsVC_Factory(
+	AbstractContext*					context,
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register, 
 	Dictionary*							dictionary,
 	void*									data )
 {
-	return (VariableCondition*)AllElementsVC_New( defaultAllElementsVCName, NULL, variable_Register, conFunc_Register, dictionary, data );
+	return (VariableCondition*)AllElementsVC_New( defaultAllElementsVCName, context, NULL, variable_Register, conFunc_Register, dictionary, data );
 }
 
 AllElementsVC*	AllElementsVC_New(
 	Name									name,
+	AbstractContext*					context,
 	Name									_dictionaryEntryName, 
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register,
@@ -70,7 +72,7 @@ AllElementsVC*	AllElementsVC_New(
 	AllElementsVC*	self = _AllElementsVC_DefaultNew( name );
 	
 	self->isConstructed = True;
-	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
+	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, dictionary );
 	_AllElementsVC_Init( self, _dictionaryEntryName, mesh );
 
 	return self;
@@ -120,7 +122,7 @@ AllElementsVC* _AllElementsVC_New(  ALLELEMENTSVC_DEFARGS  ) {
 
 
 void _AllElementsVC_Init( void* allElementsVC, Name _dictionaryEntryName, void* mesh ) {
-	AllElementsVC*			self = (AllElementsVC*)allElementsVC;
+	AllElementsVC* self = (AllElementsVC*)allElementsVC;
 
 	self->_dictionaryEntryName = _dictionaryEntryName;
 	self->mesh = (Mesh*)mesh;
@@ -130,13 +132,11 @@ void _AllElementsVC_Init( void* allElementsVC, Name _dictionaryEntryName, void* 
 /*--------------------------------------------------------------------------------------------------------------------------
 ** General virtual functions
 */
-void _AllElementsVC_AssignFromXML( void* allElementsVC, Stg_ComponentFactory *cf, void* data )
-{
-	
+void _AllElementsVC_AssignFromXML( void* allElementsVC, Stg_ComponentFactory *cf, void* data ) { 
 }
 
 void _AllElementsVC_ReadDictionary( void* variableCondition, void* dictionary ) {
-	AllElementsVC*			self = (AllElementsVC*)variableCondition;
+	AllElementsVC*					self = (AllElementsVC*)variableCondition;
 	Dictionary_Entry_Value*		vcDictVal;
 	Dictionary_Entry_Value		_vcDictVal;
 	Dictionary_Entry_Value*		varsVal;
@@ -145,39 +145,36 @@ void _AllElementsVC_ReadDictionary( void* variableCondition, void* dictionary ) 
 	/* Find dictionary entry */
 	if (self->_dictionaryEntryName)
 		vcDictVal = Dictionary_Get( dictionary, self->_dictionaryEntryName );
-	else
-	{
+	else {
 		vcDictVal = &_vcDictVal;
 		Dictionary_Entry_Value_InitFromStruct( vcDictVal, dictionary );
 	}
 	
-	if (vcDictVal)
-	{
+	if (vcDictVal) {
 		/* Obtain the variable entries */
 		self->_entryCount = Dictionary_Entry_Value_GetCount(Dictionary_Entry_Value_GetMember(vcDictVal, "variables"));
 		self->_entryTbl = Memory_Alloc_Array( AllElementsVC_Entry, self->_entryCount, "AllElementsVC->_entryTbl" );
 		varsVal = Dictionary_Entry_Value_GetMember(vcDictVal, "variables");
 		
-		for (entry_I = 0; entry_I < self->_entryCount; entry_I++)
-		{
-			char*			valType;
+		for (entry_I = 0; entry_I < self->_entryCount; entry_I++) {
+			char*							valType;
 			Dictionary_Entry_Value*	valueEntry;
 			Dictionary_Entry_Value*	varDictListVal;
 			
 			varDictListVal = Dictionary_Entry_Value_GetElement(varsVal, entry_I);
 			valueEntry = Dictionary_Entry_Value_GetMember(varDictListVal, "value");
 			
-			self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString(
-				Dictionary_Entry_Value_GetMember(varDictListVal, "name"));
+			self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetMember(varDictListVal, "name"));
 				
 			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(varDictListVal, "type"));
-			if (0 == strcasecmp(valType, "func"))
-			{
+
+			if (0 == strcasecmp(valType, "func")) {
 				char*	funcName = Dictionary_Entry_Value_AsString(valueEntry);
 				Index	cfIndex;
 				
 				self->_entryTbl[entry_I].value.type = VC_ValueType_CFIndex;
 				cfIndex = ConditionFunction_Register_GetIndex( self->conFunc_Register, funcName);
+
 				if ( cfIndex == (unsigned)-1 ) {	
 					Stream*	errorStr = Journal_Register( Error_Type, self->type );
 
@@ -193,8 +190,7 @@ void _AllElementsVC_ReadDictionary( void* variableCondition, void* dictionary ) 
 				}	
 				self->_entryTbl[entry_I].value.as.typeCFIndex = cfIndex;
 			}			
-			else if (!strcasecmp(valType, "array"))
-			{
+			else if (!strcasecmp(valType, "array")) {
 				Dictionary_Entry_Value*	valueElement;
 				Index			i;
 
@@ -203,8 +199,7 @@ void _AllElementsVC_ReadDictionary( void* variableCondition, void* dictionary ) 
 				self->_entryTbl[entry_I].value.as.typeArray.array = Memory_Alloc_Array( double,
 					self->_entryTbl[entry_I].value.as.typeArray.size,"AllElementsVC->_entryTbl[].value.as.typeArray.array" );
 					
-				for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
-				{
+				for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++) {
 					valueElement = Dictionary_Entry_Value_GetElement(valueEntry, i);
 					self->_entryTbl[entry_I].value.as.typeArray.array[i] = 
 						Dictionary_Entry_Value_AsDouble(valueElement);

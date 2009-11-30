@@ -63,16 +63,18 @@ const char* CornerVC_CornerEnumToStr[CornerVC_Corner_Size] = {
 */
 
 VariableCondition* CornerVC_Factory(
+	AbstractContext*					context,
    Variable_Register*				variable_Register, 
    ConditionFunction_Register*	conFunc_Register, 
    Dictionary*							dictionary,
    void*									data )
 {
-   return (VariableCondition*)CornerVC_New( defaultCornerVCName, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
+   return (VariableCondition*)CornerVC_New( defaultCornerVCName, context, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
 }
 
 CornerVC* CornerVC_New(
    Name									name,
+	AbstractContext*					context,
    Name									_dictionaryEntryName, 
    Variable_Register*				variable_Register, 
    ConditionFunction_Register*	conFunc_Register, 
@@ -82,7 +84,7 @@ CornerVC* CornerVC_New(
    CornerVC* self = _CornerVC_DefaultNew( name );
 
 	self->isConstructed = True;
-	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
+	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, dictionary );
 	_CornerVC_Init( self, _dictionaryEntryName, _mesh );
 
 	return self;
@@ -157,39 +159,36 @@ void _CornerVC_ReadDictionary( void* variableCondition, void* dictionary ) {
    if (self->_dictionaryEntryName) {
       vcDictVal = Dictionary_Get(dictionary, self->_dictionaryEntryName);
    }
-   else
-   {
+   else {
       vcDictVal = &_vcDictVal;
       Dictionary_Entry_Value_InitFromStruct(vcDictVal, dictionary);
    }
 
-   if (vcDictVal)
-   {
-      char*	cornerStr;
+   if (vcDictVal) {
+		char*	cornerStr;
 	
-      /* Obtain which corner */
-      cornerStr = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(vcDictVal, "corner" ));
+		/* Obtain which corner */
+		cornerStr = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(vcDictVal, "corner" ));
 
-      if (!strcasecmp(cornerStr, "bottomLeftFront")){
-	 self->_corner = CornerVC_Corner_BottomLeftFront;
-      }
-      else if (!strcasecmp(cornerStr, "bottomRightFront"))
-	 self->_corner = CornerVC_Corner_BottomRightFront;
-      else if (!strcasecmp(cornerStr, "topLeftFront"))
-	 self->_corner = CornerVC_Corner_TopLeftFront;
-      else if (!strcasecmp(cornerStr, "topRightFront"))
-	 self->_corner = CornerVC_Corner_TopRightFront;
-      else if (!strcasecmp(cornerStr, "bottomLeftBack"))
-	 self->_corner = CornerVC_Corner_BottomLeftBack;
-      else if (!strcasecmp(cornerStr, "bottomRightBack"))
-	 self->_corner = CornerVC_Corner_BottomRightBack;
-      else if (!strcasecmp(cornerStr, "topLeftBack"))
-	 self->_corner = CornerVC_Corner_TopLeftBack;
-      else if (!strcasecmp(cornerStr, "topRightBack"))
-	 self->_corner = CornerVC_Corner_TopRightBack;
+		if (!strcasecmp(cornerStr, "bottomLeftFront")) 
+			self->_corner = CornerVC_Corner_BottomLeftFront;
+		else if (!strcasecmp(cornerStr, "bottomRightFront"))
+			self->_corner = CornerVC_Corner_BottomRightFront;
+		else if (!strcasecmp(cornerStr, "topLeftFront"))
+			self->_corner = CornerVC_Corner_TopLeftFront;
+		else if (!strcasecmp(cornerStr, "topRightFront"))
+			self->_corner = CornerVC_Corner_TopRightFront;
+		else if (!strcasecmp(cornerStr, "bottomLeftBack"))
+			self->_corner = CornerVC_Corner_BottomLeftBack;
+		else if (!strcasecmp(cornerStr, "bottomRightBack"))
+			self->_corner = CornerVC_Corner_BottomRightBack;
+		else if (!strcasecmp(cornerStr, "topLeftBack"))
+			self->_corner = CornerVC_Corner_TopLeftBack;
+		else if (!strcasecmp(cornerStr, "topRightBack"))
+			self->_corner = CornerVC_Corner_TopRightBack;
       else {
-	 assert( 0 );
-	 self->_corner = CornerVC_Corner_Size; /* invalid entry */
+			assert( 0 );
+			self->_corner = CornerVC_Corner_Size; /* invalid entry */
       }
 		
       /* Obtain the variable entries */
@@ -197,95 +196,90 @@ void _CornerVC_ReadDictionary( void* variableCondition, void* dictionary ) {
       self->_entryTbl = Memory_Alloc_Array( CornerVC_Entry, self->_entryCount, "CornerVC->_entryTbl" );
       varsVal = Dictionary_Entry_Value_GetMember(vcDictVal, "variables");
 		
-      for (entry_I = 0; entry_I < self->_entryCount; entry_I++)
-      {
-	 char*			valType;
-	 Dictionary_Entry_Value*	valueEntry;
-	 Dictionary_Entry_Value*	varDictListVal;
+		for (entry_I = 0; entry_I < self->_entryCount; entry_I++) {
+			char*							valType;
+			Dictionary_Entry_Value*	valueEntry;
+			Dictionary_Entry_Value*	varDictListVal;
 			
-	 varDictListVal = Dictionary_Entry_Value_GetElement(varsVal, entry_I);
-	 valueEntry = Dictionary_Entry_Value_GetMember(varDictListVal, "value");
+			varDictListVal = Dictionary_Entry_Value_GetElement(varsVal, entry_I);
+			valueEntry = Dictionary_Entry_Value_GetMember(varDictListVal, "value");
 			
-	 self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString(
-	    Dictionary_Entry_Value_GetMember(varDictListVal, "name"));
+			self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetMember(varDictListVal, "name") );
 				
-	 valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(varDictListVal, "type"));
-	 if (0 == strcasecmp(valType, "func"))
-	 {
-	    char*	funcName = Dictionary_Entry_Value_AsString(valueEntry);
-	    Index	cfIndex;
+			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(varDictListVal, "type"));
+
+			if (0 == strcasecmp(valType, "func")) {
+				char*	funcName = Dictionary_Entry_Value_AsString(valueEntry);
+				Index	cfIndex;
 				
-	    self->_entryTbl[entry_I].value.type = VC_ValueType_CFIndex;
-	    cfIndex = ConditionFunction_Register_GetIndex( self->conFunc_Register, funcName);
-	    if ( cfIndex == (unsigned)-1 ) {	
-	       Stream*	errorStr = Journal_Register( Error_Type, self->type );
+				self->_entryTbl[entry_I].value.type = VC_ValueType_CFIndex;
+				cfIndex = ConditionFunction_Register_GetIndex( self->conFunc_Register, funcName);
 
-	       Journal_Printf( errorStr, "Error- in %s: While parsing "
-			       "definition of cornerVC \"%s\" (applies to corner \"%s\"), the cond. func. applied to "
-			       "variable \"%s\" - \"%s\" - wasn't found in the c.f. register.\n",
-			       __func__, self->_dictionaryEntryName, CornerVC_CornerEnumToStr[self->_corner],
-			       self->_entryTbl[entry_I].varName, funcName );
-	       Journal_Printf( errorStr, "(Available functions in the C.F. register are: ");	
-	       ConditionFunction_Register_PrintNameOfEachFunc( self->conFunc_Register, errorStr );
-	       Journal_Printf( errorStr, ")\n");	
-	       assert(0);
-	    }	
-	    self->_entryTbl[entry_I].value.as.typeCFIndex = cfIndex;
-	 }
-	 else if (0 == strcasecmp(valType, "array"))
-	 {
-	    Dictionary_Entry_Value*	valueElement;
-	    Index			i;
+				if ( cfIndex == (unsigned)-1 ) {	
+					Stream*	errorStr = Journal_Register( Error_Type, self->type );
 
-	    self->_entryTbl[entry_I].value.type = VC_ValueType_DoubleArray;
-	    self->_entryTbl[entry_I].value.as.typeArray.size = Dictionary_Entry_Value_GetCount(valueEntry);
-	    self->_entryTbl[entry_I].value.as.typeArray.array = Memory_Alloc_Array( double,
-										    self->_entryTbl[entry_I].value.as.typeArray.size, "CornerVC->_entryTbl[].value.as.typeArray.array" );
+					Journal_Printf( errorStr, "Error- in %s: While parsing "
+						"definition of cornerVC \"%s\" (applies to corner \"%s\"), the cond. func. applied to "
+						"variable \"%s\" - \"%s\" - wasn't found in the c.f. register.\n",
+						__func__, self->_dictionaryEntryName, CornerVC_CornerEnumToStr[self->_corner],
+					self->_entryTbl[entry_I].varName, funcName );
+					Journal_Printf( errorStr, "(Available functions in the C.F. register are: ");	
+					ConditionFunction_Register_PrintNameOfEachFunc( self->conFunc_Register, errorStr );
+					Journal_Printf( errorStr, ")\n");	
+					assert(0);
+				}	
+				self->_entryTbl[entry_I].value.as.typeCFIndex = cfIndex;
+			}
+			else if (0 == strcasecmp(valType, "array")) {
+				Dictionary_Entry_Value*	valueElement;
+				Index							i;
+
+				self->_entryTbl[entry_I].value.type = VC_ValueType_DoubleArray;
+				self->_entryTbl[entry_I].value.as.typeArray.size = Dictionary_Entry_Value_GetCount(valueEntry);
+				self->_entryTbl[entry_I].value.as.typeArray.array = Memory_Alloc_Array( double,
+					self->_entryTbl[entry_I].value.as.typeArray.size, "CornerVC->_entryTbl[].value.as.typeArray.array" );
 					
-	    for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
-	    {
-	       valueElement = Dictionary_Entry_Value_GetElement(valueEntry, i);
-	       self->_entryTbl[entry_I].value.as.typeArray.array[i] = 
-		  Dictionary_Entry_Value_AsDouble(valueElement);
-	    }
-	 }
-	 else if( 0 == strcasecmp( valType, "double" ) || 0 == strcasecmp( valType, "d" ) ||
-		  0 == strcasecmp( valType, "float" ) || 0 == strcasecmp( valType, "f" ) )
-	 {
-	    self->_entryTbl[entry_I].value.type = VC_ValueType_Double;
-	    self->_entryTbl[entry_I].value.as.typeDouble = Dictionary_Entry_Value_AsDouble( valueEntry );
-	 }
-	 else if( 0 == strcasecmp( valType, "integer" ) || 0 == strcasecmp( valType, "int" ) || 0 == strcasecmp( valType, "i" ) ) {
-	    self->_entryTbl[entry_I].value.type = VC_ValueType_Int;
-	    self->_entryTbl[entry_I].value.as.typeInt = Dictionary_Entry_Value_AsUnsignedInt( valueEntry );
-	 }
-	 else if( 0 == strcasecmp( valType, "short" ) || 0 == strcasecmp( valType, "s" ) ) {
-	    self->_entryTbl[entry_I].value.type = VC_ValueType_Short;
-	    self->_entryTbl[entry_I].value.as.typeShort = Dictionary_Entry_Value_AsUnsignedInt( valueEntry );
-	 }
-	 else if( 0 == strcasecmp( valType, "char" ) || 0 == strcasecmp( valType, "c" ) ) {
-	    self->_entryTbl[entry_I].value.type = VC_ValueType_Char;
-	    self->_entryTbl[entry_I].value.as.typeChar = Dictionary_Entry_Value_AsUnsignedInt( valueEntry );
-	 }
-	 else if( 0 == strcasecmp( valType, "pointer" ) || 0 == strcasecmp( valType, "ptr" ) || 0 == strcasecmp( valType, "p" ) ) {
-	    self->_entryTbl[entry_I].value.type = VC_ValueType_Ptr;
-	    self->_entryTbl[entry_I].value.as.typePtr = (void*) ( (ArithPointer)Dictionary_Entry_Value_AsUnsignedInt( valueEntry ));
-	 }
-	 else {
-	    /* Assume double */
-	    Journal_DPrintf( 
-	       Journal_Register( InfoStream_Type, "myStream" ), 
-	       "Type to variable on variable condition not given, assuming double\n" );
-	    self->_entryTbl[entry_I].value.type = VC_ValueType_Double;
-	    self->_entryTbl[entry_I].value.as.typeDouble = Dictionary_Entry_Value_AsDouble( valueEntry );
-	 }
-      }
-   }
-   else
-   {
-      self->_corner =     CornerVC_Corner_Size;
-      self->_entryCount = 0;
-      self->_entryTbl =   NULL;
+				for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++) {
+					valueElement = Dictionary_Entry_Value_GetElement(valueEntry, i);
+					self->_entryTbl[entry_I].value.as.typeArray.array[i] = Dictionary_Entry_Value_AsDouble(valueElement);
+				}
+			}
+			else if( 0 == strcasecmp( valType, "double" ) || 0 == strcasecmp( valType, "d" ) ||
+				0 == strcasecmp( valType, "float" ) || 0 == strcasecmp( valType, "f" ) )
+			{
+				self->_entryTbl[entry_I].value.type = VC_ValueType_Double;
+				self->_entryTbl[entry_I].value.as.typeDouble = Dictionary_Entry_Value_AsDouble( valueEntry );
+			}
+			else if( 0 == strcasecmp( valType, "integer" ) || 0 == strcasecmp( valType, "int" ) || 0 == strcasecmp( valType, "i" ) ) {
+				self->_entryTbl[entry_I].value.type = VC_ValueType_Int;
+				self->_entryTbl[entry_I].value.as.typeInt = Dictionary_Entry_Value_AsUnsignedInt( valueEntry );
+			}
+			else if( 0 == strcasecmp( valType, "short" ) || 0 == strcasecmp( valType, "s" ) ) {
+				self->_entryTbl[entry_I].value.type = VC_ValueType_Short;
+				self->_entryTbl[entry_I].value.as.typeShort = Dictionary_Entry_Value_AsUnsignedInt( valueEntry );
+			}
+			else if( 0 == strcasecmp( valType, "char" ) || 0 == strcasecmp( valType, "c" ) ) {
+				self->_entryTbl[entry_I].value.type = VC_ValueType_Char;
+				self->_entryTbl[entry_I].value.as.typeChar = Dictionary_Entry_Value_AsUnsignedInt( valueEntry );
+			}
+			else if( 0 == strcasecmp( valType, "pointer" ) || 0 == strcasecmp( valType, "ptr" ) || 0 == strcasecmp( valType, "p" ) ) {
+				self->_entryTbl[entry_I].value.type = VC_ValueType_Ptr;
+				self->_entryTbl[entry_I].value.as.typePtr = (void*) ( (ArithPointer)Dictionary_Entry_Value_AsUnsignedInt( valueEntry ));
+			}
+			else {
+				/* Assume double */
+				Journal_DPrintf( 
+					Journal_Register( InfoStream_Type, "myStream" ), 
+					"Type to variable on variable condition not given, assuming double\n" );
+					self->_entryTbl[entry_I].value.type = VC_ValueType_Double;
+					self->_entryTbl[entry_I].value.as.typeDouble = Dictionary_Entry_Value_AsDouble( valueEntry );
+			}
+		}
+	}
+	else {
+		self->_corner = CornerVC_Corner_Size;
+		self->_entryCount = 0;
+		self->_entryTbl = NULL;
    }
 }
 
@@ -305,11 +299,10 @@ void _CornerVC_Destroy(void* cornerVC, void* data) {
    _VariableCondition_Destroy(self, data);
 }
 
-void _CornerVC_Print(void* cornerVC, Stream* stream)
-{
-   CornerVC*                   self = (CornerVC*)cornerVC;
-   CornerVC_Entry_Index        entry_I;
-   Index                       i;
+void _CornerVC_Print(void* cornerVC, Stream* stream) {
+   CornerVC*				self = (CornerVC*)cornerVC;
+   CornerVC_Entry_Index	entry_I;
+   Index						i;
 	
    /* Set the Journal for printing informations */
    Stream* info = stream;
@@ -448,9 +441,7 @@ void _CornerVC_Build(  void* cornerVC, void* data ) {
 ** Virtual functions
 */
 
-void _CornerVC_AssignFromXML( void* cornerVC, Stg_ComponentFactory* cf, void* data )
-{
-	
+void _CornerVC_AssignFromXML( void* cornerVC, Stg_ComponentFactory* cf, void* data ) { 
 }
 
 void _CornerVC_BuildSelf(  void* cornerVC, void* data ) {

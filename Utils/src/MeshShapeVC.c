@@ -48,16 +48,18 @@ const Name defaultMeshShapeVCName = "defaultMeshShapeVCName";
 ** Constructor
 */
 VariableCondition* MeshShapeVC_Factory(
+	AbstractContext*					context,
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register, 
 	Dictionary*							dictionary,
 	void*									data )
 {
-	return (VariableCondition*) MeshShapeVC_New( defaultMeshShapeVCName, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
+	return (VariableCondition*) MeshShapeVC_New( defaultMeshShapeVCName, context, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
 }
 
 MeshShapeVC* MeshShapeVC_New(
 	Name									name,
+	AbstractContext*					context,
 	Name									_dictionaryEntryName, 
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register, 
@@ -67,7 +69,7 @@ MeshShapeVC* MeshShapeVC_New(
 	MeshShapeVC* self = (MeshShapeVC*) _MeshShapeVC_DefaultNew( name );
 
 	self->isConstructed = True;
-	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
+	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, dictionary );
 	_MeshShapeVC_Init( self, _dictionaryEntryName, _mesh );
 
 	return self;
@@ -116,7 +118,6 @@ MeshShapeVC* _MeshShapeVC_New(  MESHSHAPEVC_DEFARGS  ) {
 void _MeshShapeVC_Init( void* variableCondition, Name _dictionaryEntryName, void* _mesh ) {
 	MeshShapeVC* self = (MeshShapeVC*) variableCondition;
 
-	self->isConstructed        = True;
 	self->_dictionaryEntryName = _dictionaryEntryName;
 	self->_mesh                = (Mesh*)_mesh;
 	self->_entryTbl            = 0;

@@ -61,16 +61,18 @@ const char* WallVC_WallEnumToStr[WallVC_Wall_Size] = {
 */
 
 VariableCondition* WallVC_Factory(
+	AbstractContext*					context,
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register, 
 	Dictionary*							dictionary,
 	void*									data )
 {
-	return (VariableCondition*)WallVC_New( defaultWallVCName, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
+	return (VariableCondition*)WallVC_New( defaultWallVCName, context, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
 }
 
 WallVC* WallVC_New(
 	Name									name,
+	AbstractContext*					context,
 	Name									_dictionaryEntryName, 
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register, 
@@ -80,7 +82,7 @@ WallVC* WallVC_New(
 	WallVC* self = _WallVC_DefaultNew( name );
 
 	self->isConstructed = True;
-	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
+	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, dictionary );
 	_WallVC_Init( self, _dictionaryEntryName, _mesh );
 
 	return self;
@@ -439,11 +441,6 @@ void _WallVC_Build(  void* wallVC, void* data ) {
 */
 
 void _WallVC_AssignFromXML( void* wallVC, Stg_ComponentFactory* cf, void* data ) {
-	WallVC*			self = (WallVC*)wallVC;
-
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );	
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 }
 
 void _WallVC_BuildSelf(  void* wallVC, void* data ) {

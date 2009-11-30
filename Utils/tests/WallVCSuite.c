@@ -164,7 +164,7 @@ void WallVCSuite_TestWallVC( WallVCSuiteData* data ) {
 	for (i = 0; i < 6; i++) {
 		Index j, k;
 
-		vc = (VariableCondition*) WallVC_New( vcKeyName[i], vcKey[i], variable_Register, conFunc_Register, dictionary, mesh );
+		vc = (VariableCondition*) WallVC_New( vcKeyName[i], NULL, vcKey[i], variable_Register, conFunc_Register, dictionary, mesh );
 		Stg_Component_Build( vc, 0, False );
 
 		for (j = 0; j < 6; j++)

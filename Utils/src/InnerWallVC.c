@@ -60,17 +60,18 @@ const char* InnerWallVC_InnerWallEnumToStr[InnerWallVC_InnerWall_Size] = {
 */
 
 VariableCondition* InnerWallVC_Factory(
+	AbstractContext*					context,
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register, 
 	Dictionary*							dictionary,
 	void*									data )
 {
-	return (VariableCondition*)InnerWallVC_New( defaultInnerWallVCName, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
+	return (VariableCondition*)InnerWallVC_New( defaultInnerWallVCName, context, NULL, variable_Register, conFunc_Register, dictionary, (Mesh*)data );
 }
-
 
 InnerWallVC* InnerWallVC_New(
 	Name									name,
+	AbstractContext*					context,
 	Name									_dictionaryEntryName, 
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register, 
@@ -80,7 +81,7 @@ InnerWallVC* InnerWallVC_New(
 	InnerWallVC* self = _InnerWallVC_DefaultNew( name );
 
 	self->isConstructed = True;
-	_VariableCondition_Init( (VariableCondition*)self, variable_Register, conFunc_Register, dictionary );
+	_VariableCondition_Init( (VariableCondition*)self, context, variable_Register, conFunc_Register, dictionary );
 	_InnerWallVC_Init( self, _dictionaryEntryName, _mesh );
 
 	return self;
@@ -442,13 +443,11 @@ void _InnerWallVC_Build(  void* innerWallVC, void* data ) {
 ** Virtual functions
 */
 
-void _InnerWallVC_AssignFromXML( void* innerWallVC, Stg_ComponentFactory* cf, void* data )
-{
-	
+void _InnerWallVC_AssignFromXML( void* innerWallVC, Stg_ComponentFactory* cf, void* data ) { 
 }
 
 void _InnerWallVC_BuildSelf(  void* innerWallVC, void* data ) {
-	InnerWallVC*			self = (InnerWallVC*)innerWallVC;
+	InnerWallVC* self = (InnerWallVC*)innerWallVC;
 	
 	if( self->_mesh ) {
 		Stg_Component_Build( self->_mesh, data, False );
@@ -456,18 +455,15 @@ void _InnerWallVC_BuildSelf(  void* innerWallVC, void* data ) {
 }
 
 
-IndexSet* _InnerWallVC_GetSet(void* variableCondition)
-{
-	InnerWallVC*		self = (InnerWallVC*)variableCondition;
-	IndexSet	*set = NULL;
-	Stream*		warningStr = Journal_Register( Error_Type, self->type );
-	unsigned	nDims;
-	Grid*		vertGrid;
+IndexSet* _InnerWallVC_GetSet(void* variableCondition) {
+	InnerWallVC*	self = (InnerWallVC*)variableCondition;
+	IndexSet			*set = NULL;
+	Stream*			warningStr = Journal_Register( Error_Type, self->type );
+	unsigned			nDims;
+	Grid*				vertGrid;
 
 	nDims = Mesh_GetDimSize( self->_mesh );
-	vertGrid = *(Grid**)ExtensionManager_Get( self->_mesh->info, self->_mesh, 
-						  ExtensionManager_GetHandle( self->_mesh->info, 
-									      "vertexGrid" ) );
+	vertGrid = *(Grid**)ExtensionManager_Get( self->_mesh->info, self->_mesh, ExtensionManager_GetHandle( self->_mesh->info, "vertexGrid" ) );
 	
 	switch (self->_innerWall) {
 	case InnerWallVC_InnerWall_Front:

@@ -66,13 +66,12 @@
 
 	struct _CornerVC { __CornerVC };
 
-
-
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
 	VariableCondition* CornerVC_Factory(
+		AbstractContext*					context,
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register, 
 		Dictionary*							dictionary,
@@ -82,6 +81,7 @@
 
 	CornerVC* CornerVC_New(
 		Name									name,
+		AbstractContext*					context,
 		Name									_dictionaryEntryName, 
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register, 

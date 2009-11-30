@@ -62,13 +62,12 @@
 
 	struct _AllNodesVC { __AllNodesVC };
 
-
-
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
 	VariableCondition* AllNodesVC_Factory(
+		AbstractContext*					context,
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register, 
 		Dictionary*							dictionary,
@@ -78,6 +77,7 @@
 
 	AllNodesVC* AllNodesVC_New(
 		Name									name,
+		AbstractContext*					context,
 		Name									_dictionaryEntryName, 
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register,

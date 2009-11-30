@@ -53,13 +53,12 @@
 
 	struct _ContactVC { __ContactVC };
 
-
-
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
 	VariableCondition* ContactVC_Factory(
+		AbstractContext*					context,
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register, 
 		Dictionary*							dictionary,
@@ -69,6 +68,7 @@
 
 	ContactVC* ContactVC_New(
 		Name									name,
+		AbstractContext*					context,
 		Name									_dictionaryEntryName, 
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register, 
@@ -97,6 +97,8 @@
 	
 	void _ContactVC_Delete( void* wallVC );
 	
+	void _ContactVC_Destroy( void* wallVC, void* data );
+
 	void _ContactVC_Print( void* wallVC, Stream* stream );
 	
 	/* Copy */

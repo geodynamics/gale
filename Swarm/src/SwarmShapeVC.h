@@ -63,13 +63,12 @@
 
 	struct SwarmShapeVC { __SwarmShapeVC };
 	
-
-
 	/*-----------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
 	VariableCondition* SwarmShapeVC_Factory(
+		AbstractContext*					context,
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register, 
 		Dictionary*							dictionary,
@@ -77,6 +76,7 @@
 	
 	SwarmShapeVC* SwarmShapeVC_New(
 		Name									name,
+		AbstractContext*					context,
 		Name									_dictionaryEntryName, 
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register, 

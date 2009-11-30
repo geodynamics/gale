@@ -49,16 +49,18 @@ const Name defaultSwarmShapeVCName = "defaultSwarmShapeVCName";
 ** Constructor
 */
 VariableCondition* SwarmShapeVC_Factory(
+	AbstractContext*					context,
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register, 
 	Dictionary*							dictionary,
 	void*									data )
 {
-	return (VariableCondition*) SwarmShapeVC_New( defaultSwarmShapeVCName, NULL, variable_Register, conFunc_Register, dictionary, (Swarm*)data );
+	return (VariableCondition*) SwarmShapeVC_New( defaultSwarmShapeVCName, context, NULL, variable_Register, conFunc_Register, dictionary, (Swarm*)data );
 }
 
 SwarmShapeVC* SwarmShapeVC_New(
 	Name									name,
+	AbstractContext*					context,
 	Name									_dictionaryEntryName, 
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register, 
@@ -68,7 +70,7 @@ SwarmShapeVC* SwarmShapeVC_New(
 	SwarmShapeVC* self = (SwarmShapeVC*) _SwarmShapeVC_DefaultNew( name );
 
 	self->isConstructed = True;
-	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
+	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, dictionary );
 	_SwarmShapeVC_Init( self, _dictionaryEntryName, _swarm );
 
 	return self;
@@ -118,6 +120,8 @@ SwarmShapeVC* _SwarmShapeVC_New(  SWARMSHAPEVC_DEFARGS  ) {
 void _SwarmShapeVC_Init( void* variableCondition, Name _dictionaryEntryName, void* _swarm ) {
 	SwarmShapeVC* self = (SwarmShapeVC*) variableCondition;
 
+	self->conFunc_Register = condFunc_Register; 
+	
 	self->_dictionaryEntryName = _dictionaryEntryName;
 	self->_swarm                = (Swarm*)_swarm;
 	self->_entryTbl            = 0;
@@ -270,24 +274,22 @@ void* _SwarmShapeVC_Copy( void* variableCondition, void* dest, Bool deep, Name n
 	
 /****************** Stg_Component Virtual Functions ******************/
 void _SwarmShapeVC_AssignFromXML( void* variableCondition, Stg_ComponentFactory* cf, void* data ) {
-	SwarmShapeVC*		self    		= (SwarmShapeVC*)variableCondition;
-	void*			conFunc_Register 	= NULL;
-	void*			variable_Register 	= NULL;
+	SwarmShapeVC*		self = (SwarmShapeVC*)variableCondition;
+	void*					conFunc_Register = NULL;
+	void*					variable_Register = NULL;
 	AbstractContext*	context;
 
 	self = Stg_ComponentFactory_ConstructByName( cf, self->name, SwarmShapeVC, False, data );
 
-	self->conFunc_Register = conFunc_Register; 
-	
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 
-	variable_Register = self->context->variable_Register; 
+	variable_Register = context->variable_Register; 
 	assert( variable_Register );
 	self->variable_Register = variable_Register;
 
-	_VariableCondition_Init( self, variable_Register, conFunc_Register, NULL );
+	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, NULL );
 	
 	self->dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 }
@@ -298,16 +300,15 @@ void _SwarmShapeVC_Build(  void* variableCondition, void* data ) {
 	
 	assert( context && Stg_Class_IsInstance( context, AbstractContext_Type ) );
 
-	self->_swarm = Stg_ComponentFactory_ConstructByKey(  context->CF, self->name, "Swarm", Swarm,  True, 0  ) ; 
+	self->_swarm = Stg_ComponentFactory_ConstructByKey( context->CF, self->name, "Swarm", Swarm,  True, 0  ) ; 
 	assert( self->_swarm );
 	
-	self->_shape = Stg_ComponentFactory_ConstructByKey(  context->CF, self->name, "Shape", Stg_Shape,  True, 0 /* dummy */  ) ;
+	self->_shape = Stg_ComponentFactory_ConstructByKey( context->CF, self->name, "Shape", Stg_Shape,  True, 0 /* dummy */  ) ;
 	assert( self->_shape );
 
 	_VariableCondition_Build( self, data );
 
 	Stg_Component_Build( self->_shape, data, False );
-	/*_SwarmShapeVC_BuildSelf( self, data );*/
 }
 	
 /****************** VariableCondition Virtual Functions ******************/
