@@ -147,7 +147,7 @@ void* _LumpedMassMatrixForceTerm_DefaultNew( Name name ) {
 }
 
 void _LumpedMassMatrixForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
-	LumpedMassMatrixForceTerm*            self             = (LumpedMassMatrixForceTerm*)forceTerm;
+	LumpedMassMatrixForceTerm* self = (LumpedMassMatrixForceTerm*)forceTerm;
 
 	/* Construct Parent */
 	_ForceTerm_AssignFromXML( self, cf, data );
@@ -156,23 +156,27 @@ void _LumpedMassMatrixForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFac
 }
 
 void _LumpedMassMatrixForceTerm_Build( void* forceTerm, void* data ) {
-	LumpedMassMatrixForceTerm*             self             = (LumpedMassMatrixForceTerm*)forceTerm;
+	LumpedMassMatrixForceTerm* self = (LumpedMassMatrixForceTerm*)forceTerm;
 
 	_ForceTerm_Build( self, data );
 }
 
 void _LumpedMassMatrixForceTerm_Initialise( void* forceTerm, void* data ) {
-	LumpedMassMatrixForceTerm*             self             = (LumpedMassMatrixForceTerm*)forceTerm;
+	LumpedMassMatrixForceTerm* self = (LumpedMassMatrixForceTerm*)forceTerm;
 
 	_ForceTerm_Initialise( self, data );
 }
 
 void _LumpedMassMatrixForceTerm_Execute( void* forceTerm, void* data ) {
-	_ForceTerm_Execute( forceTerm, data );
+	LumpedMassMatrixForceTerm* self = (LumpedMassMatrixForceTerm*)forceTerm;
+
+	_ForceTerm_Execute( self, data );
 }
 
 void _LumpedMassMatrixForceTerm_Destroy( void* forceTerm, void* data ) {
-	_ForceTerm_Destroy( forceTerm, data );
+	LumpedMassMatrixForceTerm* self = (LumpedMassMatrixForceTerm*)forceTerm;
+
+	_ForceTerm_Destroy( self, data );
 }
 
 void _LumpedMassMatrixForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector ,Element_LocalIndex lElement_I, double* elForceVector ) {

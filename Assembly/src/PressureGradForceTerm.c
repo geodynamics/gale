@@ -163,21 +163,21 @@ void* _PressureGradForceTerm_DefaultNew( Name name ) {
 }
 
 void _PressureGradForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
-	PressureGradForceTerm*            self             = (PressureGradForceTerm*)forceTerm;
-	FeVariable*                 pressureField;
-	FeVariable*                 gradField;
+	PressureGradForceTerm*	self = (PressureGradForceTerm*)forceTerm;
+	FeVariable*					pressureField;
+	FeVariable*					gradField;
 
 	/* Construct Parent */
 	_ForceTerm_AssignFromXML( self, cf, data );
 
-	pressureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, True, data ) ;
-	gradField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureGradField", FeVariable, True, data ) ;
-
-	_PressureGradForceTerm_Init( self, pressureField, gradField );
+	_PressureGradForceTerm_Init(
+		self, 
+		Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, True, data ),
+		Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureGradField", FeVariable, True, data ) );
 }
 
 void _PressureGradForceTerm_Build( void* forceTerm, void* data ) {
-	PressureGradForceTerm*             self             = (PressureGradForceTerm*)forceTerm;
+	PressureGradForceTerm* self = (PressureGradForceTerm*)forceTerm;
 
 	_ForceTerm_Build( self, data );
 	Stg_Component_Build( self->pressureField, data, False );
@@ -187,18 +187,22 @@ void _PressureGradForceTerm_Build( void* forceTerm, void* data ) {
 }
 
 void _PressureGradForceTerm_Initialise( void* forceTerm, void* data ) {
-	PressureGradForceTerm*             self             = (PressureGradForceTerm*)forceTerm;
+	PressureGradForceTerm* self = (PressureGradForceTerm*)forceTerm;
 
 	_ForceTerm_Initialise( self, data );
 	Stg_Component_Initialise( self->pressureField, data, False );
 }
 
 void _PressureGradForceTerm_Execute( void* forceTerm, void* data ) {
-	_ForceTerm_Execute( forceTerm, data );
+	PressureGradForceTerm* self = (PressureGradForceTerm*)forceTerm;
+
+	_ForceTerm_Execute( self, data );
 }
 
 void _PressureGradForceTerm_Destroy( void* forceTerm, void* data ) {
-	_ForceTerm_Destroy( forceTerm, data );
+	PressureGradForceTerm* self = (PressureGradForceTerm*)forceTerm;
+
+	_ForceTerm_Destroy( self, data );
 }
 
 
