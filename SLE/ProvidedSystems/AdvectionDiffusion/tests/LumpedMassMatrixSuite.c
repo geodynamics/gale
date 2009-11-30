@@ -193,7 +193,7 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 	for (i = 0; i < Mesh_GetDomainSize( feMesh, MT_VERTEX ); i++)
 		DofLayout_AddDof_ByVarName(dofs, "phi", i);
 	
-	wallVC = WallVC_New( "WallVC", "boundaryCondition", variableRegister, NULL, dictionary, feMesh );
+	wallVC = WallVC_New( "WallVC", context, "boundaryCondition", variableRegister, NULL, dictionary, feMesh );
 
 	/* Create the finite element field variable*/
 	fV_Register = FieldVariable_Register_New();

@@ -82,7 +82,7 @@ FeVariable* SolutionVectorSuite_buildFeVar() {
    ioHandler = XML_IO_Handler_New();
    dict = Dictionary_New();
    IO_Handler_ReadAllFromFile( ioHandler, xml_input, dict );
-   bcs = (VariableCondition*)WallVC_New( "", "wallVC", varReg, cfReg, dict, feMesh );
+   bcs = (VariableCondition*)WallVC_New( "", NULL, "wallVC", varReg, cfReg, dict, feMesh );
    Stg_Component_Build( bcs, NULL, False );
    Stg_Component_Initialise( bcs, NULL, False );
 

@@ -170,7 +170,7 @@ FeEquationNumber* buildEqNumBCs() {
    dict = Dictionary_New();
    pcu_filename_input( "wallVC.xml", filename );
    IO_Handler_ReadAllFromFile( ioHandler, filename, dict );
-   bcs = (VariableCondition*)WallVC_New( "", "wallVC", varReg, cfReg, dict, feMesh );
+   bcs = (VariableCondition*)WallVC_New( "", NULL, "wallVC", varReg, cfReg, dict, feMesh );
    Stg_Component_Build( bcs, NULL, False );
    Stg_Component_Initialise( bcs, NULL, False );
 
