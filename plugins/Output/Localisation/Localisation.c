@@ -99,15 +99,16 @@ Index Underworld_Localisation_Register( PluginsManager* pluginsManager ) {
 }
 
 void Underworld_Localisation_Setup( UnderworldContext* context ) {
-        FieldVariable_Register*              fV_Register               = context->fieldVariable_Register;
-        FieldVariable*                       strainRateField;
-        Func_Ptr                             _carryOut;
-        Dof_Index                            resultDofs;
-        Dof_Index                            operandDofs;
-        Index                                numberOfOperands;
-        Operator*                            ownOperator;
-        Dimension_Index                      dim;
-        
+        FieldVariable_Register*  fV_Register               = context->fieldVariable_Register;
+        FieldVariable*           strainRateField;
+        Func_Ptr                 _carryOut;
+        Dof_Index                resultDofs;
+        Dof_Index                operandDofs;
+        Index                    numberOfOperands;
+        Operator*                ownOperator;
+        Dimension_Index          dim;
+        Swarm*					      gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+
         Underworld_Localisation* self;
 
         /* create datatype for MPI communications */
@@ -123,7 +124,7 @@ void Underworld_Localisation_Setup( UnderworldContext* context ) {
 	self->deformationFactor = Dictionary_GetDouble_WithDefault( context->dictionary, "localisationDeformationFactor", 0.8 );
 
         Journal_Firewall( 
-                        context->gaussSwarm != NULL, 
+                        gaussSwarm != NULL, 
                         Underworld_Error,
                         "Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
 
@@ -141,6 +142,7 @@ void Underworld_Localisation_Setup( UnderworldContext* context ) {
 
         self->reducedStrainRateFieldInvariantRoot = OperatorFeVariable_NewUnary_OwnOperator(
                         "ReducedStrainRateFieldInvariantRoot",
+                        (DomainContext*)	context,
                         strainRateField, 
                         ownOperator );
 
@@ -291,7 +293,7 @@ void Underworld_Localisation_SymmetricTensor_LowerDimension_InvariantRoot_3d( vo
 
 double Localisation_IntegratePlane( void* feVariable, Axis planeAxis, double planeHeight, void* _Localisation  ){
         FeVariable*                fevariable = (FeVariable*) feVariable;
-        Underworld_Localisation*      Localisation  = (Underworld_Localisation*) _Localisation;
+        Underworld_Localisation*   Localisation  = (Underworld_Localisation*) _Localisation;
         IJK                        planeIJK;
         Element_LocalIndex         lElement_I;
         Element_GlobalIndex        gElement_I;
@@ -315,6 +317,7 @@ double Localisation_IntegratePlane( void* feVariable, Axis planeAxis, double pla
         Index                      planeLayer        = 0;
         Index                      planeLayerGlobal;
         Particle_InCellIndex       particlesPerDim[] = {2,2,2};
+        AbstractContext*           context = (AbstractContext*) fevariable->context;
 
         /* Find Elements which plane cuts through */
         memcpy( planeCoord, Mesh_GetVertex( fevariable->feMesh, 0 ), sizeof( Coord ) );
@@ -344,11 +347,12 @@ double Localisation_IntegratePlane( void* feVariable, Axis planeAxis, double pla
         if (fevariable->dim == 3)
                 dimExists[ bAxis ] = True;
         
-        singleCellLayout = SingleCellLayout_New( "cellLayout", dimExists, NULL, NULL );
+        singleCellLayout = SingleCellLayout_New( "cellLayout", (AbstractContext*) context, dimExists, NULL, NULL );
         particlesPerDim[ planeAxis ] = 1;
-        gaussParticleLayout = GaussParticleLayout_New( "particleLayout", fevariable->dim - 1, particlesPerDim );
+        gaussParticleLayout = GaussParticleLayout_New( "particleLayout", (AbstractContext*) context, LocalCoordSystem, True, fevariable->dim - 1, particlesPerDim );
         tmpSwarm = Swarm_New( 
                         "tmpgaussSwarm",
+                        (AbstractContext*) context,
                         singleCellLayout, 
                         gaussParticleLayout,
                         fevariable->dim,

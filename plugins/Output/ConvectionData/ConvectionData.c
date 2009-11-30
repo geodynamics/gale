@@ -70,6 +70,34 @@ double Underworld_ConvectionData_XZPlaneVrms( UnderworldContext* context, double
 const Type Underworld_ConvectionData_Type = "Underworld_ConvectionData";
 Stream* dataStream;
 
+void _Underworld_ConvectionData_Build( void* component, void* data ) {
+	Underworld_ConvectionData*	self = (Underworld_ConvectionData*)component;
+
+	assert( self );
+
+	Stg_Component_Build( self->velocitySquaredField, data, False );
+   
+   _Codelet_Build( self, data );
+}
+
+void _Underworld_ConvectionData_Destroy( void* component, void* data ) {
+	Underworld_ConvectionData*	self = (Underworld_ConvectionData*)component;
+
+   _Codelet_Destroy( self, data );
+
+	Stg_Component_Destroy( self->velocitySquaredField, data, False );
+}
+
+void _Underworld_ConvectionData_Initialise( void* component, void* data ) {
+	Underworld_ConvectionData*	self = (Underworld_ConvectionData*)component;
+
+	assert( self );
+
+	Stg_Component_Initialise( self->velocitySquaredField, data, False );
+   
+   _Codelet_Initialise( self, data );
+}
+
 void Underworld_ConvectionData_Setup( void* _context ) {
 	UnderworldContext*          context       = (UnderworldContext*) _context;
 	Underworld_ConvectionData*  self;
@@ -77,6 +105,8 @@ void Underworld_ConvectionData_Setup( void* _context ) {
 	FrankKamenetskii*           frankKamenetskii;
 	Rheology*                   rheology;
 	NonNewtonian*               nonNewtonian;
+   Swarm*					       gaussSwarm    = (Swarm*)     LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+	FeVariable*				       velocityField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
 	char*  filename;
 
 	dataStream = Journal_Register( Info_Type, "ConvectionData Info Stream" );
@@ -113,19 +143,20 @@ void Underworld_ConvectionData_Setup( void* _context ) {
 	Journal_Firewall( self->boundaryLayersPlugin != NULL, Underworld_Error, "Error in %s. Cannot find the BoundaryLayers Plugin. Make sure <param>Underworld_BoundaryLayers</param> is in your plugins list\n");
 
 	Journal_Firewall( 
-			context->gaussSwarm != NULL, 
+			gaussSwarm != NULL, 
 			Underworld_Error,
 			"Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
 	Journal_Firewall( 
-			context->velocityField != NULL, 
+			velocityField != NULL, 
 			Underworld_Error,
 			"Cannot find velocityField. Cannot use %s.\n", CURR_MODULE_NAME );
 
 	/* Create new Field Variable */
-	self->velocitySquaredField = OperatorFeVariable_NewUnary( 
-			"VelocitySquaredField", 
-			context->velocityField, 
-			"VectorSquare" );
+	self->velocitySquaredField = OperatorFeVariable_NewUnary(
+      "VelocitySquaredField",
+      (DomainContext*)context,
+      (void*)velocityField, 
+      "VectorSquare" );
 
 	Stg_asprintf( &filename, "ConvectionData.%dof%d.dat", context->rank, context->nproc );
 	Stream_RedirectFile_WithPrependedPath( dataStream, context->outputPath, filename );

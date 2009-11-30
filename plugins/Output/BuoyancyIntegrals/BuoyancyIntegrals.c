@@ -58,7 +58,7 @@ void _Underworld_BuoyancyIntegrals_CTX_Delete( void *component );
 void _Underworld_BuoyancyIntegrals_AssignFromXML( void *component, Stg_ComponentFactory *cf, void *data );
 void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context );
 void Underworld_BuoyancyIntegrals_Setup( void* _context );
-
+void _Underworld_BuoyancyIntegrals_CTX_Destroy( void* component, void* data );
 typedef struct {
 	__Codelet
 			double int_w_bar_dt;
@@ -95,7 +95,7 @@ void* _Underworld_BuoyancyIntegrals_DefaultNew( Name name )
 	Stg_Component_BuildFunction*                            _build = _Codelet_Build;
 	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
-	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+	Stg_Component_DestroyFunction*                        _destroy = _Underworld_BuoyancyIntegrals_CTX_Destroy;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = ZERO;
@@ -111,14 +111,20 @@ void _Underworld_BuoyancyIntegrals_CTX_Delete( void *component )
 	_Codelet_Delete( ctx );
 }
 
+void _Underworld_BuoyancyIntegrals_CTX_Destroy( void* component, void* data ) {
+	Underworld_BuoyancyIntegrals_CTX*	self = (Underworld_BuoyancyIntegrals_CTX*)component;
+
+   _Codelet_Destroy( self, data );
+
+	if( self->cob_swarm != NULL )
+		Stg_Component_Destroy( self->cob_swarm, data, False );
+}
 
 void _Underworld_BuoyancyIntegrals_AssignFromXML( void *component, Stg_ComponentFactory *cf, void *data ) 
 {
 	UnderworldContext *context;
 	Underworld_BuoyancyIntegrals_CTX *ctx;
 	MaterialPointsSwarm *cob_swarm; /* center of buouyancy swarm */
-	
-	
 	
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 	

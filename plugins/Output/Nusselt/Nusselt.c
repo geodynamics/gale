@@ -106,9 +106,34 @@ void _Underworld_Nusselt_AssignFromXML( void* component, Stg_ComponentFactory* c
 void _Underworld_Nusselt_Build( void* component, void* data ) {
 	Underworld_Nusselt*	self = (Underworld_Nusselt*)component;
 
+   Stg_Component_Build( self->gaussSwarm, data, False );
 	Stg_Component_Build( self->advectiveHeatFluxField, data, False );
 	Stg_Component_Build( self->temperatureTotalDerivField, data, False );
 	Stg_Component_Build( self->temperatureVertDerivField, data, False );
+   
+   _Codelet_Build( component, data );
+}
+
+void _Underworld_Nusselt_Initialise( void* component, void* data ) {
+	Underworld_Nusselt*	self = (Underworld_Nusselt*)component;
+
+   Stg_Component_Initialise( self->gaussSwarm, data, False );
+	Stg_Component_Initialise( self->advectiveHeatFluxField, data, False );
+	Stg_Component_Initialise( self->temperatureTotalDerivField, data, False );
+	Stg_Component_Initialise( self->temperatureVertDerivField, data, False );
+   
+   _Codelet_Initialise( component, data );
+}
+
+void _Underworld_Nusselt_Destroy( void* component, void* data ) {
+	Underworld_Nusselt*	self = (Underworld_Nusselt*)component;
+
+   Stg_Component_Destroy( self->gaussSwarm, data, False );
+	Stg_Component_Destroy( self->advectiveHeatFluxField, data, False );
+	Stg_Component_Destroy( self->temperatureTotalDerivField, data, False );
+	Stg_Component_Destroy( self->temperatureVertDerivField, data, False );
+   
+   _Codelet_Destroy( component, data );
 }
 
 void* _Underworld_Nusselt_DefaultNew( Name name ) {
@@ -121,9 +146,9 @@ void* _Underworld_Nusselt_DefaultNew( Name name ) {
 	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_Nusselt_DefaultNew;
 	Stg_Component_ConstructFunction*                    _construct = _Underworld_Nusselt_AssignFromXML;
 	Stg_Component_BuildFunction*                            _build = _Underworld_Nusselt_Build;
-	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
+	Stg_Component_InitialiseFunction*                  _initialise = _Underworld_Nusselt_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
-	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+	Stg_Component_DestroyFunction*                        _destroy = _Underworld_Nusselt_Destroy;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = ZERO;

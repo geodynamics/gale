@@ -70,6 +70,16 @@ void _Underworld_Mobility_Build( void* component, void* data ) {
 	assert( self );
 
 	Stg_Component_Build( self->velocitySquaredField, data, False );
+   
+   _Codelet_Build( self, data );
+}
+
+void _Underworld_Mobility_Destroy( void* component, void* data ) {
+	Underworld_Mobility*	self = (Underworld_Mobility*)component;
+
+   _Codelet_Destroy( self, data );
+
+	Stg_Component_Destroy( self->velocitySquaredField, data, False );
 }
 
 void _Underworld_Mobility_Initialise( void* component, void* data ) {
@@ -78,6 +88,8 @@ void _Underworld_Mobility_Initialise( void* component, void* data ) {
 	assert( self );
 
 	Stg_Component_Initialise( self->velocitySquaredField, data, False );
+   
+   _Codelet_Initialise( self, data );
 }
 
 void* _Underworld_Mobility_DefaultNew( Name name ) {
@@ -92,7 +104,7 @@ void* _Underworld_Mobility_DefaultNew( Name name ) {
 	Stg_Component_BuildFunction*                            _build = _Underworld_Mobility_Build;
 	Stg_Component_InitialiseFunction*                  _initialise = _Underworld_Mobility_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
-	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+	Stg_Component_DestroyFunction*                        _destroy = _Underworld_Mobility_Destroy;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = ZERO;

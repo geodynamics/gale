@@ -74,7 +74,11 @@ void _Underworld_Vrms_Build( void* component, void* data ) {
 
 	assert( self );
 
+   Stg_Component_Build( self->gaussSwarm, data, False );
+   Stg_Component_Build( self->velocityField, data, False );
 	Stg_Component_Build( self->velocitySquaredField, data, False );
+   
+   _Codelet_Build( self, data );
 }
 
 void _Underworld_Vrms_Initialise( void* component, void* data ) {
@@ -82,7 +86,25 @@ void _Underworld_Vrms_Initialise( void* component, void* data ) {
 
 	assert( self );
 
+   Stg_Component_Initialise( self->gaussSwarm, data, False );
+   Stg_Component_Initialise( self->velocityField, data, False );
 	Stg_Component_Initialise( self->velocitySquaredField, data, False );
+   
+   _Codelet_Initialise( self, data );
+
+}
+
+void _Underworld_Vrms_Destroy( void* component, void* data ) {
+	Underworld_Vrms*	self = (Underworld_Vrms*)component;
+
+	assert( self );
+
+   _Codelet_Destroy( self, data );
+   
+   Stg_Component_Destroy( self->gaussSwarm, data, False );
+   Stg_Component_Destroy( self->velocityField, data, False );
+	Stg_Component_Destroy( self->velocitySquaredField, data, False );
+
 }
 
 void* _Underworld_Vrms_DefaultNew( Name name ) {
@@ -97,7 +119,7 @@ void* _Underworld_Vrms_DefaultNew( Name name ) {
 	Stg_Component_BuildFunction*                            _build = _Underworld_Vrms_Build;
 	Stg_Component_InitialiseFunction*                  _initialise = _Underworld_Vrms_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
-	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+	Stg_Component_DestroyFunction*                        _destroy = _Underworld_Vrms_Destroy;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = ZERO;
