@@ -78,13 +78,14 @@ VariableCondition* _VariableCondition_New(  VARIABLECONDITION_DEFARGS  ) {
 
 void _VariableCondition_Init(
 	void*									variableCondition, 
+	AbstractContext*					context,
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register,
 	Dictionary*							dictionary )
 {
 	VariableCondition*	self = (VariableCondition*)variableCondition;
 	
-	self->isConstructed = True;
+	self->context = context;
 	self->variable_Register = variable_Register;
 	self->conFunc_Register = conFunc_Register;
 	self->dictionary = dictionary;
@@ -103,19 +104,18 @@ void _VariableCondition_Init(
 */
 
 void _VariableCondition_Delete(void* variableCondition) {
-	VariableCondition*	self = (VariableCondition*)variableCondition;
+	VariableCondition* self = (VariableCondition*)variableCondition;
 	
 	/* Stg_Class_Delete parent */
 	_Stg_Component_Delete( self );
 }
 
 
-void _VariableCondition_Print(void* variableCondition)
-{
-	VariableCondition*		self = (VariableCondition*)variableCondition;
+void _VariableCondition_Print(void* variableCondition) {
+	VariableCondition*					self = (VariableCondition*)variableCondition;
 	VariableCondition_VariableIndex	vcVar_I;
-	VariableCondition_ValueIndex	val_I;
-	Index				i;
+	VariableCondition_ValueIndex		val_I;
+	Index										i;
 	
 	/* Set the Journal for printing informations */
 	Stream* variableConditionStream = Journal_Register( InfoStream_Type,	"VariableConditionStream");
@@ -140,6 +140,7 @@ void _VariableCondition_Print(void* variableCondition)
 	Journal_Printf( variableConditionStream, "\t_set (ptr): %p\n", self->_set);
 	Journal_Printf( variableConditionStream, "\tindexCount: %u\n", self->indexCount);
 	Journal_Printf( variableConditionStream, "\tindexTbl (ptr): %p\n", self->indexTbl);
+
 	if (self->indexTbl)
 		for (i = 0; i < self->indexCount; i++)
 			Journal_Printf( variableConditionStream, "\t\tindexTbl[%u]: %u\n", i, self->indexTbl[i]);
@@ -301,13 +302,12 @@ void* _VariableCondition_Copy( void* variableCondition, void* dest, Bool deep, N
 */
 
 void _VariableCondition_AssignFromXML( void* variableCondition, Stg_ComponentFactory* cf, void* data ) {
-   VariableCondition* self = (VariableCondition*)variableCondition;
 }
 
 void _VariableCondition_Build( void* variableCondition, void* data ) {
-	VariableCondition*		self = (VariableCondition*)variableCondition;
+	VariableCondition*				self = (VariableCondition*)variableCondition;
 	VariableCondition_ValueIndex	val_I;
-	Index				i;
+	Index									i;
 	
 	/* Read the dictionary */
 	self->_readDictionary( self, self->dictionary );
@@ -316,8 +316,7 @@ void _VariableCondition_Build( void* variableCondition, void* data ) {
 	self->_set = self->_getSet(self);
 	if (self->_set)
 		IndexSet_GetMembers(self->_set, &self->indexCount, &self->indexTbl);
-	else
-	{
+	else {
 		self->indexCount = 0;
 		self->indexTbl = NULL;
 	}
@@ -327,19 +326,16 @@ void _VariableCondition_Build( void* variableCondition, void* data ) {
 		/* Build the variable to condition table */
 		self->vcVarCountTbl = Memory_Alloc_Array( VariableCondition_VariableIndex, self->indexCount, "VC->vcVarCountTbl" );
 		
-		for (i = 0; i < self->indexCount; i++)
-		{
+		for (i = 0; i < self->indexCount; i++) {
 			/* For the index, get the number of "variables" that have been assigned conditions */
 			self->vcVarCountTbl[i] = self->_getVariableCount(self, self->indexTbl[i]);
 		}
 
 		self->vcTbl = Memory_Alloc_2DComplex( VariableCondition_Tuple, self->indexCount, self->vcVarCountTbl, "VC->vcTbl" );
-		for ( i = 0; i < self->indexCount; i++ )
-		{
+		for ( i = 0; i < self->indexCount; i++ ) {
 			VariableCondition_VariableIndex vcVar_I;
 
-			for ( vcVar_I = 0; vcVar_I < self->vcVarCountTbl[i]; vcVar_I++ )
-			{
+			for ( vcVar_I = 0; vcVar_I < self->vcVarCountTbl[i]; vcVar_I++ ) {
 				Variable* var;
 
 				/* For the index's variable, get the variable i.d. and value i.d. */
@@ -365,8 +361,8 @@ void _VariableCondition_Build( void* variableCondition, void* data ) {
 }
 
 void _VariableCondition_Initialise( void* variableCondition, void* data ) {
-	VariableCondition*		self = (VariableCondition*)variableCondition;
-	Index				i;
+	VariableCondition*	self = (VariableCondition*)variableCondition;
+	Index						i;
 	
 	for( i = 0; i < self->indexCount; i++ ) {
 		VariableCondition_VariableIndex	vcVar_I;
@@ -388,7 +384,7 @@ void _VariableCondition_Execute( void* variableCondition, void* data ) {
 }
 
 void _VariableCondition_Destroy( void* variableCondition, void* data ) {
-	VariableCondition*	self = (VariableCondition*)variableCondition;
+	VariableCondition* self = (VariableCondition*)variableCondition;
 
 	if (self->_set) Stg_Class_Delete(self->_set);
 	if (self->indexTbl) Memory_Free(self->indexTbl);
@@ -398,7 +394,7 @@ void _VariableCondition_Destroy( void* variableCondition, void* data ) {
 
 void _VariableCondition_Apply( void* variableCondition, void* context ) {
 	VariableCondition*	self = (VariableCondition*)variableCondition;
-	Index			i;
+	Index						i;
 	
 	for (i = 0; i < self->indexCount; i++)
 		VariableCondition_ApplyToIndex(variableCondition, self->indexTbl[i], context);

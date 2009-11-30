@@ -64,13 +64,12 @@
 
 	struct _VariableAllVC { __VariableAllVC };
 	
-
-
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
 	VariableCondition* VariableAllVC_Factory(
+		AbstractContext*					context,
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register, 
 		Dictionary*							dictionary,
@@ -78,6 +77,7 @@
 	
 	VariableAllVC* VariableAllVC_New(
 		Name									name,
+		AbstractContext*					context,
 		Name									_dictionaryEntryName, 
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register,

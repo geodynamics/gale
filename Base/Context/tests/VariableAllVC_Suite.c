@@ -88,18 +88,11 @@ void VariableAllVC_Suite_Setup( VariableAllVC_SuiteData* data ) {
    Stg_asprintf( &data->vcKey, "VariableAllVC" );
    VariableAllVC_Suite_CreateDictEntries( data );
 
-   data->var = Variable_NewScalar(
-         "test",
-         Variable_DataType_Double,
-         &data->arraySize,
-         NULL,
-         (void**)&data->testArray,
-         data->vr );
+   data->var = Variable_NewScalar( "test", Variable_DataType_Double, &data->arraySize, NULL, (void**)&data->testArray, data->vr );
       
    Variable_Register_BuildAll(data->vr);
    
-   data->vc = (VariableCondition*) VariableAllVC_New( "variableAllVC", "VariableAllVC", data->vr, data->conFunc_Register,
-      data->dict, NULL );
+   data->vc = (VariableCondition*) VariableAllVC_New( "variableAllVC", NULL, "VariableAllVC", data->vr, data->conFunc_Register, data->dict, NULL );
    
    Stg_Component_Build( data->vc, 0, False );
 }

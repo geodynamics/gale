@@ -59,13 +59,12 @@
 
 	struct _SetVC { __SetVC };
 
-
-	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
 	VariableCondition* SetVC_Factory(
+		AbstractContext*					context,
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register, 
 		Dictionary*							dictionary,
@@ -73,6 +72,7 @@
 	
 	SetVC* SetVC_New(
 		Name									name,
+		AbstractContext*					context,
 		Name									_dictionaryEntryName, 
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register,

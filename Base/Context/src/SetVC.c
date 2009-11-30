@@ -56,16 +56,18 @@ const Name defaultSetVCName = "defaultSetVCName";
 */
 
 VariableCondition* SetVC_Factory(
+	AbstractContext*					context,
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register, 
 	Dictionary*							dictionary,
 	void*									data )
 {
-	return (VariableCondition*)SetVC_New( defaultSetVCName, NULL, variable_Register, conFunc_Register, dictionary );
+	return (VariableCondition*)SetVC_New( defaultSetVCName, context, NULL, variable_Register, conFunc_Register, dictionary );
 }
 
 SetVC* SetVC_New(
 	Name									name,
+	AbstractContext*					context,
 	Name									_dictionaryEntryName, 
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register,
@@ -74,7 +76,7 @@ SetVC* SetVC_New(
 	SetVC* self = _SetVC_DefaultNew( name );
 
 	self->isConstructed = True;
-	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
+	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, dictionary );
 	_SetVC_Init( self,  _dictionaryEntryName );
 
 	return self;

@@ -88,51 +88,49 @@
 		/* General info */ \
 		__Stg_Component \
 		\
-		AbstractContext*				context; \
+		AbstractContext*									context; \
 		/* Virtual info */ \
-		VariableCondition_BuildSelfFunc*		_buildSelf; \
-		VariableCondition_PrintConciseFunc*		_printConcise; \
+		VariableCondition_BuildSelfFunc*				_buildSelf; \
+		VariableCondition_PrintConciseFunc*			_printConcise; \
 		VariableCondition_ReadDictionaryFunc*		_readDictionary; \
-		VariableCondition_GetSetFunc*			_getSet; \
-		VariableCondition_GetVariableCountFunc*		_getVariableCount; \
-		VariableCondition_GetVariableIndexFunc*		_getVariableIndex; \
+		VariableCondition_GetSetFunc*					_getSet; \
+		VariableCondition_GetVariableCountFunc*	_getVariableCount; \
+		VariableCondition_GetVariableIndexFunc*	_getVariableIndex; \
 		VariableCondition_GetValueIndexFunc*		_getValueIndex; \
 		VariableCondition_GetValueCountFunc*		_getValueCount; \
-		VariableCondition_GetValueFunc*			_getValue; \
-		VariableCondition_ApplyFunc*			_apply; \
+		VariableCondition_GetValueFunc*				_getValue; \
+		VariableCondition_ApplyFunc*					_apply; \
 		\
 		/* Stg_Class info */ \
 		/** Register of Variables that may be operated on. */ \
-		Variable_Register*				variable_Register; \
+		Variable_Register*								variable_Register; \
 		/** Register of Condition functions that may be applied. */ \
-		ConditionFunction_Register*			conFunc_Register; \
-		Dictionary*					dictionary; \
+		ConditionFunction_Register*					conFunc_Register; \
+		Dictionary*											dictionary; \
 		\
 		/** Set specifying which indexes in the client structure are being controlled by this VC. */ \
-		IndexSet*					_set; \
+		IndexSet*											_set; \
 		/** the number of indexes this VC applies to. */ \
-		Index						indexCount; \
+		Index													indexCount; \
 		/** Array, of size indexCount, containing the indexes this VC applies to. */ \
-		Index*						indexTbl; \
+		Index*												indexTbl; \
 		/** Array containing the number of variables at each index that are controlled by this VC */ \
-		VariableCondition_VariableIndex*		vcVarCountTbl; \
+		VariableCondition_VariableIndex*				vcVarCountTbl; \
 		/** 2d Array, which for each index this VC controls, stores the VariableCondition_Tuple that relates
 		what condition is being applied to which Variable */ \
-		VariableCondition_Tuple**			vcTbl; \
+		VariableCondition_Tuple**						vcTbl; \
 		/** Number of values in the valueTbl which will be applied somewhere using this VC */ \
-		VariableCondition_ValueIndex			valueCount; \
+		VariableCondition_ValueIndex					valueCount; \
 		/** Array of values which are available to apply (which index/var pairs they apply to is determined
 		by VariableCondition::vcTbl). */ \
-		VariableCondition_Value*			valueTbl; \
-									\
-		UIntMap*		mapping;  \
-		Stg_ComponentFactory* cf;
+		VariableCondition_Value*						valueTbl; \
+		\
+		UIntMap*												mapping;  \
+		Stg_ComponentFactory*							cf;
 	
 	/** Abstract class for specifying (1 or more) conditions that apply to (1 or more) variables in an array - 
 	see VariableCondition.h for details */
 	struct _VariableCondition { __VariableCondition };
-	
-
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
@@ -173,6 +171,7 @@
 	
 	void _VariableCondition_Init(
 		void*									variableCondition, 
+		AbstractContext*					context,
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register,
 		Dictionary*							dictionary );

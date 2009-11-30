@@ -58,16 +58,18 @@ const Name defaultCompositeVCName = "defaultCompositeVCName";
 */
 
 VariableCondition* CompositeVC_Factory(
+	AbstractContext*					context,
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register,
 	Dictionary*							dictionary,
 	void*									data )
 {
-	return (VariableCondition*)CompositeVC_New( defaultCompositeVCName, variable_Register, conFunc_Register, dictionary, data );
+	return (VariableCondition*)CompositeVC_New( defaultCompositeVCName, context, variable_Register, conFunc_Register, dictionary, data );
 }
 
 CompositeVC* CompositeVC_New(
 	Name									name,
+	AbstractContext*					context,
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register,
 	Dictionary*							dictionary,
@@ -76,7 +78,7 @@ CompositeVC* CompositeVC_New(
 	CompositeVC* self = _CompositeVC_DefaultNew( name );
 
 	self->isConstructed = True;
-	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
+	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, dictionary );
 	_CompositeVC_Init( self, data );
 
 	return self;
@@ -187,6 +189,7 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
 			}
 		}
 		vcList = Dictionary_Get( dictionary, "vcList" );
+
 		if( vcList ) {
 			Index	count;
 			Index	entry_I;
@@ -213,39 +216,35 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
 }
 
 void _CompositeVC_AssignFromXML( void* compositeVC, Stg_ComponentFactory* cf, void* data ) {
-	CompositeVC* self                      = (CompositeVC*)compositeVC;
-	void*        variableRegister          = NULL;
-	void*        conditionFunctionRegister = NULL;
-	void*        initData                      = NULL;
-	Dictionary*  vcDict                    = NULL;
-	Name         vcName;
+	CompositeVC*		self = (CompositeVC*)compositeVC;
+	void*       		variableRegister = NULL;
+	void*       		conditionFunctionRegister = NULL;
+	void*       		initData = NULL;
+	Dictionary* 		vcDict = NULL;
+	Name       			vcName;
+	AbstractContext*	context;
 	
-	self->dictionary = cf->rootDict;
-
 	/* Need to store this so we can get at components
 		later on when using the fucked up 'ReadDictionary' function. */
 	self->cf = cf;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 	
-	variableRegister = self->context->variable_Register;
+	variableRegister = context->variable_Register;
 	assert( variableRegister );
 	conditionFunctionRegister = condFunc_Register; 
 	assert( conditionFunctionRegister );
 	
 	vcName = Stg_ComponentFactory_GetString( cf, self->name, "vcName", self->name );
+
 	if ( cf->rootDict )
 		vcDict = Dictionary_GetDictionary( cf->rootDict, vcName );
-/* 	Journal_Firewall( */
-/* 			vcDict != NULL, */
-/* 			Journal_Register( Error_Type, self->type ), */
-/* 			"For %s '%s' - Cannont find variable condition dictionary '%s'\n", self->type, self->name, vcName ); */
-	
+
 	initData = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Data", Stg_Component, False, data );
 	
-	_VariableCondition_Init( self, variableRegister, conditionFunctionRegister, vcDict );
+	_VariableCondition_Init( self, context, variableRegister, conditionFunctionRegister, vcDict );
 	_CompositeVC_Init( self, initData );
 }
 
@@ -283,10 +282,9 @@ void _CompositeVC_Destroy(void* compositeVC, void* data) {
 	_VariableCondition_Destroy( self, data );
 }
 
-void _CompositeVC_Print(void* compositeVC, Stream* stream)
-{
+void _CompositeVC_Print(void* compositeVC, Stream* stream) {
 	CompositeVC*	self = (CompositeVC*)compositeVC;
-	Index		item_I;
+	Index				item_I;
 	
 	/* Set the Journal for printing informations */
 	Stream* info = stream;

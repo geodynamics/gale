@@ -55,17 +55,19 @@ const Name defaultVariableAllVCName = "defaultVariableAllVCName";
 */
 
 VariableCondition* VariableAllVC_Factory(
+	AbstractContext*					context,
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register, 
 	Dictionary*							dictionary,
 	void*									data )
 {
-	return (VariableCondition*)VariableAllVC_New( defaultVariableAllVCName, NULL, variable_Register, conFunc_Register, dictionary, data );
+	return (VariableCondition*)VariableAllVC_New( defaultVariableAllVCName, context, NULL, variable_Register, conFunc_Register, dictionary, data );
 }
 
 
 VariableAllVC*	VariableAllVC_New(
 	Name									name,
+	AbstractContext*					context,
 	Name									_dictionaryEntryName, 
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register,
@@ -75,7 +77,7 @@ VariableAllVC*	VariableAllVC_New(
 	VariableAllVC*	self = _VariableAllVC_DefaultNew( name );
 
 	self->isConstructed = True;
-	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
+	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, dictionary );
 	_VariableAllVC_Init( self, _dictionaryEntryName, data );
 
 	return self;
