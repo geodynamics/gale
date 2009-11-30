@@ -464,8 +464,13 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 					self->swarmVariable_Register->variable_Register );
 		}
 	}
-	/* ensure all particles have been allocated to a material during Layout process
-	 * (if not, you may wish to include a backgroundLayout in the application's XML */
+	/* ensure all particles have been allocated to a material
+	 * during Layout process. We do not check if the particle uses
+	 * a BackgroundParticleLayout, since those particles are not
+	 * guaranteed to be inside the domain.*/
+   if (!Stg_Class_IsInstance(self->particleLayout,
+                             BackgroundParticleLayout_Type))
+   {
 	for ( lParticle_I = 0; lParticle_I < self->particleLocalCount; lParticle_I++ ) {
 		matPoint = (MaterialPoint*)Swarm_ParticleAt( self, lParticle_I );
 		Journal_Firewall(
@@ -479,6 +484,7 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 			matPoint->coord[ J_AXIS ],
 			matPoint->coord[ K_AXIS ] );
 	}
+   }
 }
 
 
