@@ -27,45 +27,13 @@ extern "C" {
 const Type lucRenderingEngineVTK_Type = "lucRenderingEngineVTK";
 
 /* Creation implementation / Virtual constructor */
-lucRenderingEngineVTK* _lucRenderingEngineVTK_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucRenderingEngine_RenderFunction*                 _render,
-		lucRenderingEngine_ClearFunction*             	   _clear,
-		lucRenderingEngine_GetPixelDataFunction*           _getPixelData,
-		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport,
-		Name                                               name ) 
+lucRenderingEngineVTK* _lucRenderingEngineVTK_New(  LUCRENDERINGENGINEVTK_DEFARGS  ) 
 {
 	lucRenderingEngineVTK*					self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(lucRenderingEngineVTK) );
-	self = (lucRenderingEngineVTK*) _lucRenderingEngine_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_render,
-			_clear,
-			_getPixelData,
-			_compositeViewport,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucRenderingEngineVTK) );
+	self = (lucRenderingEngineVTK*) _lucRenderingEngine_New(  LUCRENDERINGENGINE_PASSARGS  );
 	
 	return self;
 }
@@ -101,23 +69,27 @@ void* _lucRenderingEngineVTK_Copy( void* renderingEngine, void* dest, Bool deep,
 
 
 void* _lucRenderingEngineVTK_DefaultNew( Name name ) {
-	return (void*) _lucRenderingEngineVTK_New(
-		sizeof(lucRenderingEngineVTK),
-		lucRenderingEngineVTK_Type,
-		_lucRenderingEngineVTK_Delete,
-		_lucRenderingEngineVTK_Print,
-		NULL,
-		_lucRenderingEngineVTK_DefaultNew,
-		_lucRenderingEngineVTK_Construct,
-		_lucRenderingEngineVTK_Build,
-		_lucRenderingEngineVTK_Initialise,
-		_lucRenderingEngineVTK_Execute,
-		_lucRenderingEngineVTK_Destroy,
-		_lucRenderingEngineVTK_Render,
-		_lucRenderingEngineVTK_Clear,
-		_lucRenderingEngineVTK_GetPixelData,
-		_lucRenderingEngineVTK_CompositeViewport_Stencil,
-		name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(lucRenderingEngineVTK);
+	Type                                                          type = lucRenderingEngineVTK_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _lucRenderingEngineVTK_Delete;
+	Stg_Class_PrintFunction*                                    _print = _lucRenderingEngineVTK_Print;
+	Stg_Class_CopyFunction*                                      _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _lucRenderingEngineVTK_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _lucRenderingEngineVTK_Construct;
+	Stg_Component_BuildFunction*                                _build = _lucRenderingEngineVTK_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _lucRenderingEngineVTK_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _lucRenderingEngineVTK_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _lucRenderingEngineVTK_Destroy;
+	lucRenderingEngine_RenderFunction*                         _render = _lucRenderingEngineVTK_Render;
+	lucRenderingEngine_ClearFunction*                           _clear = _lucRenderingEngineVTK_Clear;
+	lucRenderingEngine_GetPixelDataFunction*             _getPixelData = _lucRenderingEngineVTK_GetPixelData;
+	lucRenderingEngine_CompositeViewportFunction*   _compositeViewport = _lucRenderingEngineVTK_CompositeViewport_Stencil;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucRenderingEngineVTK_New(  LUCRENDERINGENGINEVTK_PASSARGS  );
 }
 
 void _lucRenderingEngineVTK_Construct( void* renderingEngine, Stg_ComponentFactory* cf ){
@@ -383,3 +355,5 @@ void _lucRenderingEngineVTK_CompositeViewport_Manual(
 #endif
 
 #endif
+
+

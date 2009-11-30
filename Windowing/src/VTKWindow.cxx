@@ -30,45 +30,13 @@ extern "C" {
 const Type lucVTKWindow_Type = "lucVTKWindow";
 
 /* Creation implementation / Virtual constructor */
-lucVTKWindow* _lucVTKWindow_New( 
-		SizeT                                           sizeOfSelf,
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy, 
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,
-		lucWindow_DisplayFunction*						_displayWindow,	
-		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
-		lucWindow_EventProcessorFunction*				_eventProcessor,	
-		lucWindow_ResizeFunction*						_resizeWindow,	
-		Name                                            name ) 
+lucVTKWindow* _lucVTKWindow_New(  LUCVTKWINDOW_DEFARGS  ) 
 {
 	lucVTKWindow*					self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(lucVTKWindow) );
-	self = (lucVTKWindow*) _lucWindow_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_displayWindow,
-			_eventsWaiting,
-			_eventProcessor,
-			_resizeWindow,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucVTKWindow) );
+	self = (lucVTKWindow*) _lucWindow_New(  LUCWINDOW_PASSARGS  );
 	
 	return self;
 }
@@ -125,23 +93,27 @@ void* _lucVTKWindow_Copy( void* window, void* dest, Bool deep, Name nameExt, Ptr
 
 
 void* _lucVTKWindow_DefaultNew( Name name ) {
-	return (void*) _lucVTKWindow_New(
-		sizeof(lucVTKWindow),
-		lucVTKWindow_Type,
-		_lucVTKWindow_Delete,
-		_lucVTKWindow_Print,
-		NULL,
-		_lucVTKWindow_DefaultNew,
-		_lucVTKWindow_Construct,
-		_lucVTKWindow_Build,
-		_lucVTKWindow_Initialise,
-		_lucVTKWindow_Execute,
-		_lucVTKWindow_Destroy,
-		lucWindow_Display,	/* Use parent class default implementations */
-		lucWindow_EventsWaiting,
-		lucWindow_EventProcessor,
-		lucWindow_Resize,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(lucVTKWindow);
+	Type                                                      type = lucVTKWindow_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucVTKWindow_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucVTKWindow_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucVTKWindow_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucVTKWindow_Construct;
+	Stg_Component_BuildFunction*                            _build = _lucVTKWindow_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucVTKWindow_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucVTKWindow_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucVTKWindow_Destroy;
+	lucWindow_DisplayFunction*                      _displayWindow = lucWindow_Display;
+	lucWindow_EventsWaitingFunction*                _eventsWaiting = lucWindow_EventsWaiting;
+	lucWindow_EventProcessorFunction*              _eventProcessor = lucWindow_EventProcessor;
+	lucWindow_ResizeFunction*                        _resizeWindow = lucWindow_Resize;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = ZERO;
+
+	return (void*) _lucVTKWindow_New(  LUCVTKWINDOW_PASSARGS  );
 }
 
 void _lucVTKWindow_Construct( void* window, Stg_ComponentFactory* cf ){
@@ -406,3 +378,5 @@ void lucVTKWindow_CloseDisplay( lucVTKWindow* self ) {
 #endif
 
 #endif
+
+
