@@ -174,16 +174,19 @@ void _BuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf
 
 	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
 	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TemperatureField", FeVariable, False, data ) ;
-	gravity          = Stg_ComponentFactory_GetDouble( cf, self->name, "gravity", 0.0 );
-	adjust           = Stg_ComponentFactory_GetBool( cf, self->name, "adjust", False );
+	gravity = Stg_ComponentFactory_GetDouble( cf, self->name, "gravity", 0.0 );
+	adjust = Stg_ComponentFactory_GetBool( cf, self->name, "adjust", False );
 
 	direcList = Dictionary_Get( dict, "gravityDirection" );
+
 	if( direcList ) {
 		nDims = Dictionary_Entry_Value_GetCount( direcList );
 		direc = AllocArray( double, nDims );
+
 		for( d_i = 0; d_i < nDims; d_i++ ) {
 			tmp = Dictionary_Entry_Value_GetElement( direcList, d_i );
 			rootKey = Dictionary_Entry_Value_AsString( tmp );
+
 			if( !Stg_StringIsNumeric( rootKey ) )
 				tmp = Dictionary_Get( cf->rootDict, rootKey );
 			direc[d_i] = Dictionary_Entry_Value_AsDouble( tmp );
@@ -288,7 +291,9 @@ void _BuoyancyForceTerm_Initialise( void* forceTerm, void* data ) {
 }
 
 void _BuoyancyForceTerm_Execute( void* forceTerm, void* data ) {
-	_ForceTerm_Execute( forceTerm, data );
+	BuoyancyForceTerm* self = (BuoyancyForceTerm*)forceTerm;
+
+	_ForceTerm_Execute( self, data );
 }
 
 void _BuoyancyForceTerm_Destroy( void* forceTerm, void* data ) {
@@ -296,18 +301,17 @@ void _BuoyancyForceTerm_Destroy( void* forceTerm, void* data ) {
 	Index i;
 
 	for ( i = 0; i < self->materialSwarmCount; ++i ) {
-		Stg_Class_Delete( self->densitySwarmVariables[i] );
-		Stg_Class_Delete( self->alphaSwarmVariables[i] );
+		_Stg_Component_Delete( self->densitySwarmVariables[i] );
+		_Stg_Component_Delete( self->alphaSwarmVariables[i] );
 	}
 
 	FreeArray( self->gHat );
 
-	MemFree( self->densitySwarmVariables );
-	MemFree( self->alphaSwarmVariables );
+	Memory_Free( self->densitySwarmVariables );
+	Memory_Free( self->alphaSwarmVariables );
 
 	_ForceTerm_Destroy( forceTerm, data );
 }
-
 
 void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) {
 	BuoyancyForceTerm*               self               = (BuoyancyForceTerm*) forceTerm;
