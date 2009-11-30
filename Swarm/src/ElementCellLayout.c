@@ -104,7 +104,6 @@ void _ElementCellLayout_Init( ElementCellLayout* self, void* mesh ) {
 	
 	/* ElementCellInfo info */
 	self->mesh = (Mesh*)mesh;
-	self->isConstructed = True;
 	self->incArray = IArray_New();
 }
 
