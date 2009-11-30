@@ -58,6 +58,7 @@
 #include "ConstitutiveMatrix.h"
 
 #include <assert.h>
+#include <string.h>
 
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type DruckerPrager_Type = "DruckerPrager";
@@ -109,13 +110,24 @@ DruckerPrager* _DruckerPrager_New(
 }
 
 void _DruckerPrager_Init(
-		DruckerPrager*                                     self,
-		FeVariable*                                        pressureField,
-		MaterialPointsSwarm*                               materialPointsSwarm,
-		FiniteElementContext*                              context,
-		double                                             minimumYieldStress,
-		double                                             frictionCoefficient,
-		double                                             frictionCoefficientAfterSoftening )
+		DruckerPrager*            self,
+		FeVariable*               pressureField,
+		MaterialPointsSwarm*      materialPointsSwarm,
+		FiniteElementContext*     context,
+		double                    frictionCoefficient,
+		double                    frictionCoefficientAfterSoftening,
+                double                    boundaryCohesion,
+                double                    boundaryCohesionAfterSoftening,
+                double                    boundaryFrictionCoefficient,
+                double                    boundaryFrictionCoefficientAfterSoftening,
+                Bool                      boundaryBottom,
+                Bool                      boundaryTop,
+                Bool                      boundaryLeft,
+                Bool                      boundaryRight,
+                Bool                      boundaryFront,
+                Bool                      boundaryBack,
+                double                    minimumYieldStress,
+                HydrostaticTerm*          hydrostaticTerm )
 {
 	DruckerPrager_Particle*   particleExt;
 	StandardParticle          materialPoint;
@@ -128,9 +140,23 @@ void _DruckerPrager_Init(
 	self->frictionCoefficient = frictionCoefficient;
 	self->minimumYieldStress  = minimumYieldStress;
 	
-	/* Strain softening of Friction - (linear weakening is assumed) */
-	/* needs a softening factor between +0 and 1 and a reference strain > 0 */
+	/* Strain softening of Cohesion and friction - (linear
+           weakening is assumed) needs a softening factor between +0
+           and 1 and a reference strain > 0 */
 	self->frictionCoefficientAfterSoftening = frictionCoefficientAfterSoftening;
+	self->boundaryCohesion = boundaryCohesion;
+	self->boundaryFrictionCoefficient = boundaryFrictionCoefficient;
+	self->boundaryCohesionAfterSoftening = boundaryCohesionAfterSoftening;
+	self->boundaryFrictionCoefficientAfterSoftening = boundaryFrictionCoefficientAfterSoftening;
+        self->boundaryBottom=boundaryBottom;
+        self->boundaryTop=boundaryTop;
+        self->boundaryLeft=boundaryLeft;
+        self->boundaryRight=boundaryRight;
+        self->boundaryFront=boundaryFront;
+        self->boundaryBack=boundaryBack;
+
+	self->minimumYieldStress = minimumYieldStress;
+        self->hydrostaticTerm=hydrostaticTerm;
 
 	/* Update Drawing Parameters */
 	EP_PrependClassHook( Context_GetEntryPoint( context, AbstractContext_EP_DumpClass ),
@@ -165,7 +191,6 @@ void _DruckerPrager_Init(
 		Variable_DataType_Char );
 
         self->curFrictionCoef = 0.0;
-
 }
 
 void* _DruckerPrager_DefaultNew( Name name ) {
@@ -213,9 +238,21 @@ void _DruckerPrager_Construct( void* druckerPrager, Stg_ComponentFactory* cf, vo
 			pressureField,
 			materialPointsSwarm, 
 			context,
-			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficient", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficientAfterSoftening", 0.0 ) );
+			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficientAfterSoftening", 0.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "boundaryCohesion", 0.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "boundaryCohesionAfterSoftening", 0.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "boundaryFrictionCoefficient", 0.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "boundaryFrictionCoefficientAfterSoftening", 0.0 ),
+                        Stg_ComponentFactory_GetBool(  cf,  self->name, "boundaryBottom", False ),
+                        Stg_ComponentFactory_GetBool(  cf,  self->name, "boundaryTop", False ),
+                        Stg_ComponentFactory_GetBool(  cf,  self->name, "boundaryLeft", False ),
+                        Stg_ComponentFactory_GetBool(  cf,  self->name, "boundaryRight", False ),
+                        Stg_ComponentFactory_GetBool(  cf,  self->name, "boundaryFront", False ),
+                        Stg_ComponentFactory_GetBool(  cf,  self->name, "boundaryBack", False ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ),
+                        Stg_ComponentFactory_ConstructByKey( cf, self->name, 
+                                                             "HydrostaticTerm", HydrostaticTerm, False, data ) );
 }
 
 void _DruckerPrager_Build( void* rheology, void* data ) {
@@ -275,6 +312,7 @@ double _DruckerPrager_GetYieldCriterion(
 			Coord                            xi )
 {
 	DruckerPrager*                    self             = (DruckerPrager*) druckerPrager;
+        Dimension_Index                   dim = constitutiveMatrix->dim;
 	double                            cohesion;
 	double                            cohesionAfterSoftening;
 	double                            frictionCoefficient;
@@ -292,6 +330,13 @@ double _DruckerPrager_GetYieldCriterion(
 	FeVariable*                       pressureField  = self->pressureField;  
 	double                            pressure;
 	DruckerPrager_Particle*           particleExt;
+        Cell_Index                        cell_I;
+        Coord                             coord;
+        Element_GlobalIndex	          element_gI = 0;
+        unsigned		          inds[3];
+        Grid*			          elGrid;
+        Bool                              inside_boundary;
+        double                            factor;
 	
 	/* Get Parameters From Rheology */
 	cohesion                           = self->cohesion;
@@ -309,43 +354,90 @@ double _DruckerPrager_GetYieldCriterion(
                                  constitutiveMatrix->currentParticleIndex,
                                  &pressure );
         }
-	
-	/* Strain softening of yield stress - if the strain weakening is not defined then this function returns 
-	 * a 0 value */
-	strainWeakeningRatio = StrainWeakening_CalcRatio( self->strainWeakening, materialPoint );
-		
-	effectiveCohesion =  cohesion * (1.0 - strainWeakeningRatio) + 
-			cohesionAfterSoftening * strainWeakeningRatio;
-		
-	effectiveFrictionCoefficient = frictionCoefficient * (1.0 - strainWeakeningRatio) +
-			frictionCoefficientAfterSoftening * strainWeakeningRatio;
-	
-		
-	phi = atan(effectiveFrictionCoefficient);
-	sinphi = sin(phi);
-	oneOverDenominator = 1.0 / (sqrt(3.0) * (3.0 - sinphi));
-		
-	dpFrictionCoefficient = 6.0 * sinphi * oneOverDenominator;
-	dpCohesion = 6.0 * effectiveCohesion * cos(phi) * oneOverDenominator;
 
-	/* plane strain */
+        cell_I=CellLayout_MapElementIdToCellId(materialPointsSwarm->cellLayout,
+                                               lElement_I );
+        FeMesh_CoordLocalToGlobal(pressureField->feMesh, cell_I, xi, coord);
+        if(self->hydrostaticTerm)
+          {
+            pressure+=HydrostaticTerm_Pressure(self->hydrostaticTerm,coord);
+          }
+
+        /* Normally we add the average of the trace of the stress.
+           With compressible material, you have to do it.  But with
+           stabilized linear pressure elements, the non-zero trace is
+           a numerical artifact.  So we do not add it. */
+
+/*   pressure+=self->trace/dim; */
+
+        /* Calculate frictional strength.  We modify the friction and
+           cohesion because we have grouped terms from the normal
+           stresses and moved it to the yield indicator. */
 	
-	phi = atan(effectiveFrictionCoefficient);
-	dpCohesion = effectiveCohesion * cos(phi);
-	dpFrictionCoefficient = sin(phi);
-	
-	
-	frictionalStrength = dpFrictionCoefficient * pressure + dpCohesion ;
 
-	particleExt->tensileFailure = (frictionalStrength <= 0.0);
+        /* Big song and dance to see if we are at a boundary that we care about */
+        elGrid = *(Grid**)ExtensionManager_Get(pressureField->feMesh->info,
+                                               pressureField->feMesh,
+                                               ExtensionManager_GetHandle(pressureField->feMesh->info, "elementGrid" ) );
+  
+        element_gI = FeMesh_ElementDomainToGlobal( pressureField->feMesh, lElement_I );
+        RegularMeshUtils_Element_1DTo3D( pressureField->feMesh, element_gI, inds );
+  
+        inside_boundary=(self->boundaryBottom && inds[1]==0)
+          || (self->boundaryTop && inds[1]==elGrid->sizes[1]-1)
+          || (self->boundaryLeft && inds[0]==0)
+          || (self->boundaryRight && inds[0]==elGrid->sizes[0]-1)
+          || (dim==3 && ((self->boundaryBack && inds[2]==0)
+                         || (self->boundaryFront && inds[2]==elGrid->sizes[2]-1)));
 
-	if ( frictionalStrength < minimumYieldStress) 
-		frictionalStrength = minimumYieldStress;
+        effectiveFrictionCoefficient =
+          _DruckerPrager_EffectiveFrictionCoefficient( self, materialPoint,
+                                                       inside_boundary );
+        effectiveCohesion = _DruckerPrager_EffectiveCohesion(self,materialPoint,
+                                                             inside_boundary);
 
-        self->yieldCriterion = frictionalStrength;
-        self->curFrictionCoef = dpFrictionCoefficient;
+  if(dim==2)
+    {
+      /* effectiveFrictionCoefficient=tan(phi).  If
+         factor=sin(atan(1/tan(phi))) =>
+         factor=cos(phi)=1/sqrt(1+tan(phi)**2) */
+      factor=1/sqrt(1 + effectiveFrictionCoefficient*effectiveFrictionCoefficient);
+      frictionalStrength = effectiveFrictionCoefficient*pressure*factor
+        + effectiveCohesion*factor;
+    }
+  else
+    {
+      double cos_phi, sin_phi;
+      /* cos(phi)=1/sqrt(1+tan(phi)**2) */
+      cos_phi=
+        1/sqrt(1 + effectiveFrictionCoefficient*effectiveFrictionCoefficient);
+      sin_phi=effectiveFrictionCoefficient*cos_phi;
+      factor=2*cos_phi/(sqrt(3.0)*(3-sin_phi));
 
-	return frictionalStrength;
+      /* The full expression is
+
+         sqrt(J2)=p*2*sin(phi)/(sqrt(3)*(3-sin(phi)))
+                  + C*6*cos(phi)/(sqrt(3)*(3-sin(phi)))
+
+         Note the extra factor of 3 for cohesion */
+
+      frictionalStrength = effectiveFrictionCoefficient*factor*pressure
+        + effectiveCohesion*3*factor;
+    }
+  
+  /* If the minimumYieldStress is not set, then use the
+     effective cohesion.  Maybe it should be the modified
+     effective cohesion, though that probably should not matter
+     much. */
+  minimumYieldStress = self->minimumYieldStress;
+  if(minimumYieldStress==0.0)
+    minimumYieldStress=effectiveCohesion;
+  
+  /* Make sure frictionalStrength is above the minimum */
+  if ( frictionalStrength < minimumYieldStress*factor) 
+    frictionalStrength = minimumYieldStress*factor;
+
+  return frictionalStrength;
 }
 
 void _DruckerPrager_HasYielded( 
@@ -370,6 +462,50 @@ void _DruckerPrager_HasYielded(
 
    }
 
+}
+
+double _DruckerPrager_EffectiveCohesion( void* rheology, void* materialPoint,
+                                       Bool inside_boundary ) {
+	DruckerPrager*    self                          = (DruckerPrager*) rheology;
+	double                         effectiveCohesion;
+	
+        double strainWeakeningRatio = StrainWeakening_CalcRatio( self->strainWeakening, materialPoint );
+
+        if(inside_boundary)
+          {
+            effectiveCohesion=self->boundaryCohesion*(1.0-strainWeakeningRatio)+
+              self->boundaryCohesionAfterSoftening*strainWeakeningRatio;
+          }
+        else
+          {
+            effectiveCohesion = self->cohesion * (1.0 - strainWeakeningRatio) + 
+              self->cohesionAfterSoftening * strainWeakeningRatio;
+          }
+
+	return effectiveCohesion;
+}
+
+double _DruckerPrager_EffectiveFrictionCoefficient( void* rheology, void* materialPoint, Bool inside_boundary ) {
+	DruckerPrager*    self                          = (DruckerPrager*) rheology;
+	double                  effectiveFrictionCoefficient  = 0.0;
+
+        double strainWeakeningRatio = StrainWeakening_CalcRatio( self->strainWeakening, materialPoint );
+	
+        if(inside_boundary)
+          {
+            effectiveFrictionCoefficient =
+              self->boundaryFrictionCoefficient * (1.0 - strainWeakeningRatio) +
+              self->boundaryFrictionCoefficientAfterSoftening
+              *strainWeakeningRatio;	
+          }
+        else
+          {
+            effectiveFrictionCoefficient =
+              self->frictionCoefficient * (1.0 - strainWeakeningRatio) +
+              self->frictionCoefficientAfterSoftening * strainWeakeningRatio;	
+          }
+
+	return effectiveFrictionCoefficient;
 }
 
 void _DruckerPrager_UpdateDrawParameters( void* rheology ) {

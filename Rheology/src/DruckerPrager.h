@@ -73,6 +73,22 @@
 		double                                              minimumYieldStress;                    \
 		double                                              frictionCoefficient;                   \
 		double                                              frictionCoefficientAfterSoftening; \
+		double                                              boundaryCohesion;                              \
+		double                                              boundaryCohesionAfterSoftening;                \
+		double                                              boundaryFrictionCoefficient;                   \
+		double                                              boundaryFrictionCoefficientAfterSoftening;     \
+                Bool                                                boundaryTop; \
+                Bool                                                boundaryBottom; \
+                Bool                                                boundaryLeft; \
+                Bool                                                boundaryRight; \
+                Bool                                                boundaryFront; \
+                Bool                                                boundaryBack; \
+		/* Stored values that are calculated once for each particle */ \
+                double                                              trace; \
+		TensorArray                                         currentVelocityGradient;               \
+		double                                              currentPressure;                       \
+		double                                              strainRateSecondInvariant;                   \
+                HydrostaticTerm*                                    hydrostaticTerm; \
                                                                         \
                 double curFrictionCoef;
 
@@ -123,6 +139,8 @@ void _DruckerPrager_HasYielded(
 		double                           yieldCriterion,
 		double                           yieldIndicator );
 
+	double _DruckerPrager_EffectiveCohesion( void* rheology, void* materialPoint, Bool inside_boundary ) ;
+	double _DruckerPrager_EffectiveFrictionCoefficient( void* rheology, void* materialPoint, Bool inside_boundary ) ;
 	void _DruckerPrager_UpdateDrawParameters( void* rheology ) ;
 	
 #endif
