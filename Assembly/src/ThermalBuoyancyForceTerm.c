@@ -136,9 +136,9 @@ void* _ThermalBuoyancyForceTerm_DefaultNew( Name name ) {
 }
 
 void _ThermalBuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
-	ThermalBuoyancyForceTerm*            self             = (ThermalBuoyancyForceTerm*)forceTerm;
-	FeVariable*                 temperatureField;
-	double                      rayleighNumber;
+	ThermalBuoyancyForceTerm*	self = (ThermalBuoyancyForceTerm*)forceTerm;
+	FeVariable*						temperatureField;
+	double							rayleighNumber;
 
 	/* Construct Parent */
 	_ForceTerm_AssignFromXML( self, cf, data );
@@ -150,7 +150,7 @@ void _ThermalBuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFact
 }
 
 void _ThermalBuoyancyForceTerm_Build( void* forceTerm, void* data ) {
-	ThermalBuoyancyForceTerm*             self             = (ThermalBuoyancyForceTerm*)forceTerm;
+	ThermalBuoyancyForceTerm* self = (ThermalBuoyancyForceTerm*)forceTerm;
 
 	_ForceTerm_Build( self, data );
 
@@ -158,7 +158,7 @@ void _ThermalBuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 }
 
 void _ThermalBuoyancyForceTerm_Initialise( void* forceTerm, void* data ) {
-	ThermalBuoyancyForceTerm*             self             = (ThermalBuoyancyForceTerm*)forceTerm;
+	ThermalBuoyancyForceTerm* self = (ThermalBuoyancyForceTerm*)forceTerm;
 
 	_ForceTerm_Initialise( self, data );
 
@@ -166,38 +166,42 @@ void _ThermalBuoyancyForceTerm_Initialise( void* forceTerm, void* data ) {
 }
 
 void _ThermalBuoyancyForceTerm_Execute( void* forceTerm, void* data ) {
-	_ForceTerm_Execute( forceTerm, data );
+	ThermalBuoyancyForceTerm* self = (ThermalBuoyancyForceTerm*)forceTerm;
+
+	_ForceTerm_Execute( self, data );
 }
 
 void _ThermalBuoyancyForceTerm_Destroy( void* forceTerm, void* data ) {
-	_ForceTerm_Destroy( forceTerm, data );
+	ThermalBuoyancyForceTerm* self = (ThermalBuoyancyForceTerm*)forceTerm;
+
+	_ForceTerm_Destroy( self, data );
 }
 
 
 void _ThermalBuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) {
-	ThermalBuoyancyForceTerm*        self               = Stg_CheckType( forceTerm, ThermalBuoyancyForceTerm );
-	Swarm*                  swarm              = self->integrationSwarm;
-	Dimension_Index         dim                = forceVector->dim;
-	IntegrationPoint*       particle;
-	FeVariable*             temperatureField;
-	FeMesh*                 mesh;
-	FeMesh*                 temperatureMesh;
-	double*                 xi;
-	Particle_InCellIndex    cParticle_I;
-	Particle_InCellIndex    cellParticleCount;
-	Element_NodeIndex       elementNodeCount;
-	Node_ElementLocalIndex  node_I;
-	ElementType*            elementType;
-	Dof_Index               dofsPerNode;
-	Cell_Index              cell_I;
-	double                  detJac;
-	double                  factor;
-	/*double                  Ni[8];*/
-	double                  Ni[27];
-	double                  force;
-	double                  rayleighNumber;
-	double                  temperature;
-	double                  tmpGlobalCoord[3];
+	ThermalBuoyancyForceTerm*	self = Stg_CheckType( forceTerm, ThermalBuoyancyForceTerm );
+	Swarm*							swarm = self->integrationSwarm;
+	Dimension_Index				dim = forceVector->dim;
+	IntegrationPoint*				particle;
+	FeVariable*						temperatureField;
+	FeMesh*							mesh;
+	FeMesh*							temperatureMesh;
+	double*							xi;
+	Particle_InCellIndex			cParticle_I;
+	Particle_InCellIndex			cellParticleCount;
+	Element_NodeIndex				elementNodeCount;
+	Node_ElementLocalIndex		node_I;
+	ElementType*					elementType;
+	Dof_Index						dofsPerNode;
+	Cell_Index						cell_I;
+	double							detJac;
+	double							factor;
+	/*double							Ni[8];*/
+	double							Ni[27];
+	double							force;
+	double							rayleighNumber;
+	double							temperature;
+	double							tmpGlobalCoord[3];
 
 	/* Get context extension */
 	rayleighNumber   = self->rayleighNumber;

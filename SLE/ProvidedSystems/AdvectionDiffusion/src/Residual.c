@@ -209,20 +209,20 @@ void _AdvDiffResidualForceTerm_Print( void* residual, Stream* stream ) {
 }
 
 void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFactory* cf, void* data ) {
-	AdvDiffResidualForceTerm*            self             = (AdvDiffResidualForceTerm*)residual;
-	FeVariable*                          velocityField;
-	Variable*                            diffusivityVariable;
-	Name                                 upwindParamFuncName;
-	double                               defaultDiffusivity;
-	AdvDiffResidualForceTerm_UpwindParamFuncType  upwindFuncType       = 0;
+	AdvDiffResidualForceTerm*							self = (AdvDiffResidualForceTerm*)residual;
+	FeVariable*												velocityField;
+	Variable*												diffusivityVariable;
+	Name														upwindParamFuncName;
+	double													defaultDiffusivity;
+	AdvDiffResidualForceTerm_UpwindParamFuncType	upwindFuncType = 0;
 
 	/* Construct Parent */
 	_ForceTerm_AssignFromXML( self, cf, data );
 
-	velocityField       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField",       FeVariable, True,  data );
+	velocityField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField", FeVariable, True,  data );
 	diffusivityVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, "DiffusivityVariable", Variable,   False, data );
-
 	upwindParamFuncName = Stg_ComponentFactory_GetString( cf, self->name, "UpwindXiFunction", "Exact" );
+
 	if ( strcasecmp( upwindParamFuncName, "DoublyAsymptoticAssumption" ) == 0 )
 		upwindFuncType = DoublyAsymptoticAssumption;
 	else if ( strcasecmp( upwindParamFuncName, "CriticalAssumption" ) == 0 )
@@ -230,8 +230,7 @@ void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFacto
 	else if ( strcasecmp( upwindParamFuncName, "Exact" ) == 0 )
 		upwindFuncType = Exact;
 	else 
-		Journal_Firewall( False, Journal_Register( Error_Type, self->type ), 
-				"Cannot understand '%s'\n", upwindParamFuncName );
+		Journal_Firewall( False, Journal_Register( Error_Type, self->type ), "Cannot understand '%s'\n", upwindParamFuncName );
 
 	defaultDiffusivity = Stg_ComponentFactory_GetDouble( cf, self->name, "defaultDiffusivity", 1.0 );
 
@@ -261,13 +260,16 @@ void _AdvDiffResidualForceTerm_Initialise( void* residual, void* data ) {
 }
 
 void _AdvDiffResidualForceTerm_Execute( void* residual, void* data ) {
-	_ForceTerm_Execute( residual, data );
+	AdvDiffResidualForceTerm* self = (AdvDiffResidualForceTerm*)residual;
+
+	_ForceTerm_Execute( self, data );
 }
 
 void _AdvDiffResidualForceTerm_Destroy( void* residual, void* data ) {
-	_ForceTerm_Destroy( residual, data );
-}
+	AdvDiffResidualForceTerm* self = (AdvDiffResidualForceTerm*)residual;
 
+	_ForceTerm_Destroy( self, data );
+}
 
 void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elementResidual ) {
 	AdvDiffResidualForceTerm*  self               = Stg_CheckType( forceTerm, AdvDiffResidualForceTerm );

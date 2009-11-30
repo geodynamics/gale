@@ -21,16 +21,6 @@ void IsoviscousStiffness_Setup( IsoviscousStiffnessData* data ) {
 }
 
 void IsoviscousStiffness_Teardown( IsoviscousStiffnessData* data ) {
-	FiniteElementContext*	context = data->context;
-	char							rFile[PCU_PATH_MAX];
-	int							err;
-
-	if( context->rank == 0 ) {
-		/* Now clean output path */
-		sprintf(rFile, "%s/input.xml", context->outputPath );
-		err = remove( rFile );
-		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
-	}
 }
 
 void IsoviscousStiffness2D( IsoviscousStiffnessData* data ) {
@@ -47,6 +37,8 @@ void IsoviscousStiffness2D( IsoviscousStiffnessData* data ) {
 	double						tolerance;
 	char							xml_input[PCU_PATH_MAX];
 	Stream*						infoStream = Journal_Register( Info_Type, CURR_MODULE_NAME );
+	char							rFile[PCU_PATH_MAX];
+	int							err;
 
 	pcu_docstring( "This test compares a Stiffness matrix against a previously generated stiffness matrix"
 		"The stiffness matrix is generated from a 2D FEM model for an isoviscous fluid flow." 
@@ -118,6 +110,12 @@ void IsoviscousStiffness2D( IsoviscousStiffnessData* data ) {
 	PetscViewerDestroy(currViewer);
 	PetscViewerDestroy(parallelViewer);
 	*/
+	if( data->context->rank == 0 ) {
+		/* Now clean output path */
+		sprintf(rFile, "%s/input.xml", data->context->outputPath );
+		err = remove( rFile );
+		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
+	}
 
 	stgMainDestroy( cf );
 }
