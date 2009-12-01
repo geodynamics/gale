@@ -58,13 +58,13 @@
 
         typedef struct {
                 __Codelet
-                Stream*                                 stream;
+                Stream*           stream;
         /*FieldVariable_Register*       fV_Register;*/
         } StgFEM_FeVariableList;
 
         Index StgFEM_FeVariableList_Register( PluginsManager* pluginsManager );
 
         /** Utility Functions */
-        void StgFEM_FeVariableList_PrintVariables( void* _context) ;
+        void StgFEM_FeVariableList_PrintVariables( void* _self, void* data );
 
 #endif

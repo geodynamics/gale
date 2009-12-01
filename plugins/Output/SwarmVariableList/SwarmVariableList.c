@@ -60,20 +60,17 @@ void _StgFEM_SwarmVariableList_AssignFromXML( void* component, Stg_ComponentFact
         Name                            swarmVariableListFilename;
         Bool                            fileOpened;
         Bool                            PrintToFile;
-        Swarm_Register*                 swarmRegister;   
-        
-        context             = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+        Swarm_Register*                 swarmRegister;
+
+        self->context       = context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
         dictionary          = context->dictionary;
         self->swarmRegister = Swarm_Register_GetSwarm_Register();
 
-        /** append to end of build entry point **/
-        ContextEP_Append( context,  AbstractContext_EP_Build, StgFEM_SwarmVariableList_PrintVariables );  
-        
         /** create stream **/
         stream = self->stream = Journal_Register( InfoStream_Type, "SwarmVariableList" );
-        
+
         /** set auto flush on stream **/
-        Stream_SetAutoFlush( stream, True );    
+        Stream_SetAutoFlush( stream, True );
 
         /** print to screen or to file? **/
         PrintToFile = Dictionary_GetBool_WithDefault( dictionary, "SwarmVariableListPrintToFile", True );
@@ -84,31 +81,31 @@ void _StgFEM_SwarmVariableList_AssignFromXML( void* component, Stg_ComponentFact
                 if ( context->rank == MASTER ) {
                         Stream* errorStream = Journal_Register( Error_Type, CURR_MODULE_NAME );
                         fileOpened          = Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, swarmVariableListFilename );
-                        Journal_Firewall( fileOpened, errorStream, 
+                        Journal_Firewall( fileOpened, errorStream,
                                         "Could not open file %s/%s. Possibly directory %s does not exist or is not writable.\n"
                                         "Check 'outputPath' in input file.\n", context->outputPath, swarmVariableListFilename, context->outputPath );
                 }
                 /** set it so only master processor can print to stream **/
                 Stream_SetPrintingRank( stream, MASTER );
-        }       
+        }
 }
 
 void* _StgFEM_SwarmVariableList_DefaultNew( Name name ) {
-	/* Variables set in this function */
-	SizeT                                              _sizeOfSelf = sizeof(StgFEM_SwarmVariableList);
-	Type                                                      type = StgFEM_SwarmVariableList_Type;
-	Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
-	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
-	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
-	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _StgFEM_SwarmVariableList_DefaultNew;
-	Stg_Component_ConstructFunction*                    _construct = _StgFEM_SwarmVariableList_AssignFromXML;
-	Stg_Component_BuildFunction*                            _build = _Codelet_Build;
-	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
-	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
-	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+   /* Variables set in this function */
+   SizeT                                              _sizeOfSelf = sizeof(StgFEM_SwarmVariableList);
+   Type                                                      type = StgFEM_SwarmVariableList_Type;
+   Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
+   Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+   Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+   Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _StgFEM_SwarmVariableList_DefaultNew;
+   Stg_Component_ConstructFunction*                    _construct = _StgFEM_SwarmVariableList_AssignFromXML;
+   Stg_Component_BuildFunction*                            _build = _Codelet_Build;
+   Stg_Component_InitialiseFunction*                  _initialise = StgFEM_SwarmVariableList_PrintVariables;
+   Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+   Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
 
-	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+   /* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+   AllocationType  nameAllocationType = ZERO;
 
         return _Codelet_New(  CODELET_PASSARGS  );
 }
@@ -117,44 +114,40 @@ Index StgFEM_SwarmVariableList_Register( PluginsManager* pluginsManager ) {
         return PluginsManager_Submit( pluginsManager, StgFEM_SwarmVariableList_Type, "0", _StgFEM_SwarmVariableList_DefaultNew );
 }
 
-void StgFEM_SwarmVariableList_PrintVariables( void* _context ){
-        AbstractContext*        context         = (AbstractContext*) _context;
-        Stream*                 stream;
-        Index                   swarmCount;
-        Index                   variablecount;
-        Index                   countindex;
-        Index                   swarmcountindex;
-        Index                   columnWidth     = 40;
-        Swarm*                  currentSwarm;
-        
-        StgFEM_SwarmVariableList* self   = (StgFEM_SwarmVariableList*)LiveComponentRegister_Get( 
-                                                                        context->CF->LCRegister, 
-                                                                        StgFEM_SwarmVariableList_Type );
-        stream      = self->stream;
-        
-        /** print header material **/
-        Journal_Printf( stream, "\n");
-        Journal_PrintString_WithLength( stream, "SwarmVariable", columnWidth );
-        Journal_PrintString_WithLength( stream, "Swarm", columnWidth );
-        Journal_Printf( stream, "\n");
-        Journal_PrintString_WithLength( stream, "------------------------", columnWidth );
-        Journal_PrintString_WithLength( stream, "------------------------", columnWidth );
-        Journal_Printf( stream, "\n");  
-
-        /** get total number of different swarms **/
-        swarmCount  = self->swarmRegister->swarmList->count;
-
-        /** print swarm variables **/
-        for(swarmcountindex = 0; swarmcountindex < swarmCount; ++swarmcountindex){
-                currentSwarm = (Swarm*)Stg_ComponentFactory_ConstructByName( context->CF, self->swarmRegister->swarmList->data[swarmcountindex]->name, Swarm, True, NULL );
-                variablecount = currentSwarm->swarmVariable_Register->objects->count;
-                for(countindex = 0; countindex < variablecount; ++countindex){
-                        Journal_PrintString_WithLength( stream, currentSwarm->swarmVariable_Register->objects->data[ countindex ]->name, columnWidth );
-                        Journal_PrintString_WithLength( stream, self->swarmRegister->swarmList->data[swarmcountindex]->name, columnWidth );
-                        Journal_Printf( stream, "\n");
-                }
-        }
-        Journal_Printf( stream, "\n");
+void StgFEM_SwarmVariableList_PrintVariables( void* _self, void* data ){
+   StgFEM_SwarmVariableList* self    = (StgFEM_SwarmVariableList*)_self;
+   AbstractContext*          context = self->context;
+   Stream*                   stream  = self->stream;;
+   Index                     swarmCount;
+   Index                     variablecount;
+   Index                     countindex;
+   Index                     swarmcountindex;
+   Index                     columnWidth     = 40;
+   Swarm*                    currentSwarm;
+   
+   /** print header material **/
+   Journal_Printf( stream, "\n");
+   Journal_PrintString_WithLength( stream, "SwarmVariable", columnWidth );
+   Journal_PrintString_WithLength( stream, "Swarm", columnWidth );
+   Journal_Printf( stream, "\n");
+   Journal_PrintString_WithLength( stream, "------------------------", columnWidth );
+   Journal_PrintString_WithLength( stream, "------------------------", columnWidth );
+   Journal_Printf( stream, "\n");
+   
+   /** get total number of different swarms **/
+   swarmCount  = self->swarmRegister->swarmList->count;
+   
+   /** print swarm variables **/
+   for(swarmcountindex = 0; swarmcountindex < swarmCount; ++swarmcountindex){
+          currentSwarm = (Swarm*)Stg_ComponentFactory_ConstructByName( context->CF, self->swarmRegister->swarmList->data[swarmcountindex]->name, Swarm, True, NULL );
+          variablecount = currentSwarm->swarmVariable_Register->objects->count;
+          for(countindex = 0; countindex < variablecount; ++countindex){
+                  Journal_PrintString_WithLength( stream, currentSwarm->swarmVariable_Register->objects->data[ countindex ]->name, columnWidth );
+                  Journal_PrintString_WithLength( stream, self->swarmRegister->swarmList->data[swarmcountindex]->name, columnWidth );
+                  Journal_Printf( stream, "\n");
+          }
+   }
+   Journal_Printf( stream, "\n");
 }
 
 
