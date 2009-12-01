@@ -97,8 +97,8 @@ void* _PICelleratorContext_DefaultNew( Name name ) {
 	Stg_Class_CopyFunction*                                  _copy = NULL;
 	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _PICelleratorContext_DefaultNew;
 	Stg_Component_ConstructFunction*                    _construct = _PICelleratorContext_AssignFromXML;
-	Stg_Component_BuildFunction*                            _build = (Stg_Component_BuildFunction*)_FiniteElementContext_Build;
-	Stg_Component_InitialiseFunction*                  _initialise = (Stg_Component_InitialiseFunction*)_FiniteElementContext_Initialise;
+	Stg_Component_BuildFunction*                            _build = _AbstractContext_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _AbstractContext_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = (Stg_Component_ExecuteFunction*)_AbstractContext_Execute;
 	Stg_Component_DestroyFunction*                        _destroy = _PICelleratorContext_Destroy;
 	AllocationType                              nameAllocationType = NON_GLOBAL;
@@ -132,6 +132,8 @@ void _PICelleratorContext_Delete( void* context ) {
 	
 	Journal_DPrintf( self->debug, "In: %s()\n", __func__ );
 
+	Stg_Class_Delete( self->materials_Register );
+
 	/* Stg_Class_Delete parent */
 	_FiniteElementContext_Delete( self );
 }
@@ -139,8 +141,6 @@ void _PICelleratorContext_Delete( void* context ) {
 void _PICelleratorContext_Destroy( void* context ) {
 	PICelleratorContext* self = (PICelleratorContext*)context;
 	
-	Stg_Class_Delete( self->materials_Register );
-
 	_FiniteElementContext_Destroy( self );
 }
 
