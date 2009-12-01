@@ -89,6 +89,7 @@
 	void _SwarmVariableField_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
 	void _SwarmVariableField_Build( void* swarmVariable, void* data ) ;
 	void _SwarmVariableField_Initialise( void* swarmVariable, void* data ) ;
+   void _SwarmVariableField_Init( SwarmVariableField* swarmVariableField, Variable_Register* variable_Register, Name swarmVarName, MaterialPointsSwarm*	materialSwarm ) ;
 	void _SwarmVariableField_Execute( void* swarmVariable, void* data ) ;
 	void _SwarmVariableField_Destroy( void* swarmVariable, void* data ) ;
 

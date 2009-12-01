@@ -76,10 +76,11 @@ SwarmVariableField* _SwarmVariableField_New(  SWARMVARIABLEFIELD_DEFARGS  )
 	return self;
 }
 
-void _SwarmVariableField_Init( SwarmVariableField* swarmVariableField, SwarmVariable* swarmVar, Variable_Register* variable_Register ) {
+void _SwarmVariableField_Init( SwarmVariableField* swarmVariableField, Variable_Register* variable_Register, Name swarmVarName, MaterialPointsSwarm*	materialSwarm ) {
 	SwarmVariableField* 	self 	= (SwarmVariableField*)swarmVariableField;
-	self->swarmVar = swarmVar;
 	self->variable_Register = variable_Register;
+	self->swarmVarName = swarmVarName;
+	self->materialSwarm = materialSwarm;
 }
 
 void _SwarmVariableField_Delete( void* swarmVariableField ) {
@@ -125,30 +126,32 @@ void* _SwarmVariableField_DefaultNew( Name name ) {
 
 void _SwarmVariableField_AssignFromXML( void* swarmVariableField, Stg_ComponentFactory* cf, void* data ) {
 	SwarmVariableField*		self = (SwarmVariableField*)swarmVariableField;
-	SwarmVariable*				swarmVar;
 	IntegrationPointsSwarm*	integrationSwarm;
 	Variable_Register*		variable_Register;
-
+   Name			            swarmVarName;
+   MaterialPointsSwarm*	   materialSwarm;
 	_ParticleFeVariable_AssignFromXML( self, cf, data );
 
 	variable_Register = self->context->variable_Register; 
 
 	// TODO: just get the textual name here - see gLucifer's SwarmPlotter DrawignObject 
-	self->swarmVarName = Stg_ComponentFactory_GetString( cf, self->name, "swarmVariable", "" );
-	assert( swarmVar );
+	swarmVarName = Stg_ComponentFactory_GetString( cf, self->name, "swarmVariable", "" );
 
-	self->materialSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialSwarm", MaterialPointsSwarm, True, data );
+	materialSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialSwarm", MaterialPointsSwarm, True, data );
 	integrationSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", IntegrationPointsSwarm, True, NULL );
 	assert( integrationSwarm );
 
-	_SwarmVariableField_Init( self, swarmVar, variable_Register );
+	_SwarmVariableField_Init( self, variable_Register, swarmVarName, materialSwarm );
 }
 
 void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {
-	SwarmVariableField*	self	= (SwarmVariableField*)swarmVariableField;
-	Name			tmpName;
-	unsigned		nDomainVerts	= Mesh_GetDomainSize( self->feMesh, MT_VERTEX );
+	SwarmVariableField*	      self	            = (SwarmVariableField*)swarmVariableField;
+	unsigned		               nDomainVerts      = Mesh_GetDomainSize( self->feMesh, MT_VERTEX );
+	SwarmVariable_Register*		swarmVar_Register	= self->materialSwarm->swarmVariable_Register;
+	Stream*				         errorStream		   = Journal_Register( Error_Type, self->type );
+	Name			               tmpName;
 
+	Stg_Component_Build( self->materialSwarm, data, False );
 	/* make this more flexible to handle vector values at each node - will have to get the num dofs from the XML
 	 * as other components are not necessarily built yet... dave. 03.10.07 */
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
@@ -174,6 +177,15 @@ void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {
 	
 	self->eqNum->dofLayout = self->dofLayout;
 
+	/* assign the swarm variable, assume its already built */
+	if( 0 != strcmp( self->swarmVarName, "" ) ) {
+		self->swarmVar = SwarmVariable_Register_GetByName( swarmVar_Register, self->swarmVarName );
+		Journal_Firewall( self->swarmVar != NULL, errorStream, "Error - cannot find swarm variable \"%s\" in %s() for swarm \"%s\".\n",
+			          self->swarmVarName, __func__, self->materialSwarm->name );
+
+		Stg_Component_Build( self->swarmVar, data, False );
+	}
+
 	_ParticleFeVariable_Build( self, data );
 	/* TODO: build self->swarmVar */
 	// TODO: granb self->SwarmVariableName out of the swarm vart register, save reference as self->swarmVar
@@ -182,22 +194,12 @@ void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {
 
 void _SwarmVariableField_Initialise( void* swarmVariableField, void* data ) {
 	SwarmVariableField*		self			= (SwarmVariableField*)swarmVariableField;
-	SwarmVariable_Register*		swarmVar_Register	= self->materialSwarm->swarmVariable_Register;
-	Stream*				errorStream		= Journal_Register( Error_Type, self->type );
 
-	/* assign the swarm variable, assume its already built */
-	if( 0 != strcmp( self->swarmVarName, "" ) ) {
-		self->swarmVar = SwarmVariable_Register_GetByName( swarmVar_Register, self->swarmVarName );
-		Journal_Firewall( self->swarmVar != NULL, errorStream, "Error - cannot find swarm variable \"%s\" in %s() for swarm \"%s\".\n",
-			          self->swarmVarName, __func__, self->materialSwarm->name );
+   Stg_Component_Initialise( self->materialSwarm, data, False );
 
-		Stg_Component_Build( self->swarmVar, data, False );
-		Stg_Component_Initialise( self->swarmVar, data, False );
-	}
+   if( self->swarmVar ) Stg_Component_Initialise( self->swarmVar, data, False );
 
 	_ParticleFeVariable_Initialise( self, data );
-
-	_SwarmVariable_Initialise( self->swarmVar, data );
 }
 
 void _SwarmVariableField_Execute( void* swarmVariableField, void* data ) {
@@ -205,6 +207,11 @@ void _SwarmVariableField_Execute( void* swarmVariableField, void* data ) {
 }
 
 void _SwarmVariableField_Destroy( void* swarmVariableField, void* data ) {
+	SwarmVariableField*		self			= (SwarmVariableField*)swarmVariableField;
+
+   Stg_Component_Destroy( self->materialSwarm, data, False );
+   if( self->swarmVar ) Stg_Component_Destroy( self->swarmVar, data, False );
+   
 	_ParticleFeVariable_Destroy( swarmVariableField, data );
 }
 

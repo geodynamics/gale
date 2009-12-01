@@ -221,7 +221,9 @@ void* _PeriodicBoundariesManager_Copy( void* periodicBCsManager, void* dest, Boo
 void _PeriodicBoundariesManager_Build( void* periodicBCsManager, void* data ) {	
 	PeriodicBoundariesManager* self = (PeriodicBoundariesManager*)periodicBCsManager;
 	Dictionary_Entry_Value*    periodicBCsList = NULL;
-	
+
+	Stg_Component_Build( self->swarm, data, False );
+	Stg_Component_Build( self->mesh, data, False );
 	self->size = 4;
 	self->boundaries = Memory_Alloc_Array( PeriodicBoundary, self->size, "PeriodicBoundariesManager->boundaries" );
 
@@ -266,7 +268,11 @@ void _PeriodicBoundariesManager_Build( void* periodicBCsManager, void* data ) {
 	}
 }
 
-void _PeriodicBoundariesManager_Initialise( void* periodicBCsManager, void* data ) {	
+void _PeriodicBoundariesManager_Initialise( void* periodicBCsManager, void* data ) {
+	PeriodicBoundariesManager* self = (PeriodicBoundariesManager*)periodicBCsManager;
+
+	Stg_Component_Initialise( self->swarm, data, False );
+	Stg_Component_Initialise( self->mesh, data, False );
 }
 
 void _PeriodicBoundariesManager_Execute( void* periodicBCsManager, void* data ) {	
@@ -274,6 +280,9 @@ void _PeriodicBoundariesManager_Execute( void* periodicBCsManager, void* data ) 
 
 void _PeriodicBoundariesManager_Destroy( void* periodicBCsManager, void* data ) {	
 	PeriodicBoundariesManager* self = (PeriodicBoundariesManager*)periodicBCsManager;
+
+	Stg_Component_Destroy( self->swarm, data, False );
+	Stg_Component_Destroy( self->mesh, data, False );
 
 	Memory_Free( self->boundaries );
 }
