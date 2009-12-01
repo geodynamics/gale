@@ -163,8 +163,6 @@ void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
 
    /* Create CompositeVC */
    cvc = CompositeVC_New( "CompositeVC", NULL, variable_Register, conFunc_Register, dictionary, mesh );
-	_VariableCondition_Init( cvc, NULL, variable_Register, conFunc_Register, dictionary );
-   _CompositeVC_Init( cvc, 0 );
 
 	for (i = 0; i < 6; i++) {
 		vc = WallVC_New( vcKeyName[i], NULL, vcKey[i], variable_Register, conFunc_Register, dictionary, mesh );
@@ -213,10 +211,10 @@ void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
 		remove( "testCompositeVC.dat" );
    }
 
-	Stg_Class_Delete(cvc);
+	_Stg_Component_Delete(cvc);
 	Stg_Class_Delete(variable_Register);
 	for (i = 0; i < 7; i++) {
-		Stg_Class_Delete(var[i]);
+		_Stg_Component_Delete(var[i]);
 		if (array[i]) Memory_Free(array[i]);
 	}
 	Stg_Class_Delete(conFunc_Register);
@@ -335,10 +333,10 @@ void CompositeVCSuite_TestCompositeVCDictionary( CompositeVCSuiteData* data ) {
 		remove( "testCompositeVCDictionary.dat" );
 	}
 
-	Stg_Class_Delete(cvc);
+	_Stg_Component_Delete(cvc);
 	Stg_Class_Delete(variable_Register);
 	for (i = 0; i < 7; i++) {
-		Stg_Class_Delete(var[i]);
+		_Stg_Component_Delete(var[i]);
  		if (array[i]) Memory_Free(array[i]);
  	}
 	Stg_Class_Delete(conFunc_Register);
