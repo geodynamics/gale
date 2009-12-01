@@ -339,17 +339,8 @@ void _OperatorFeVariable_Build( void* feVariable, void* data ) {
 	Index                  feVariable_I;
 	Stream*                     errorStream       = Journal_Register( Error_Type, self->type );
 
-        {
-          int dim;
-          int numNodes;
-
-          Stg_Component_Build(self->feMesh, NULL, False);
-
-          dim = Mesh_GetDimSize(self->feMesh);
-          numNodes = FeMesh_GetElementNodeSize(self->feMesh, 0);
-          self->GNx = Memory_Alloc_2DArray( double, dim, numNodes, "Global Shape Function Derivatives" );
-        }
-
+   void _FeVariable_Build( self, data );
+   
 	for ( feVariable_I = 0 ; feVariable_I < self->feVariableCount ; feVariable_I++ ) 
 		Stg_Component_Build( self->feVariableList[ feVariable_I ] , data, False );
 

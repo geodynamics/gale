@@ -65,6 +65,6 @@
         Index StgFEM_SwarmVariableList_Register( PluginsManager* pluginsManager );
 
         /** Utility Functions */
-        void StgFEM_SwarmVariableList_PrintVariables( void* _context) ;
+        void StgFEM_SwarmVariableList_PrintVariables( void* _self, void* data ) ;
 
 #endif
