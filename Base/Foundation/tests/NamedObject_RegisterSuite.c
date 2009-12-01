@@ -117,8 +117,8 @@ void NamedObject_RegisterSuite_TestGetFunctions( NamedObject_RegisterSuiteData* 
    for (ii=0; ii < data->testObjectsCount; ii++ ) {
       pcu_check_true( ii == NamedObject_Register_GetIndex( data->reg,
          data->testObjectNames[ii] ) );
-      pcu_check_true( data->testObjects[ii] = NamedObject_Register_GetByIndex( data->reg, ii ) );
-      pcu_check_true( data->testObjects[ii] = NamedObject_Register_GetByName( data->reg,
+      pcu_check_true( data->testObjects[ii] == NamedObject_Register_GetByIndex( data->reg, ii ) );
+      pcu_check_true( data->testObjects[ii] == NamedObject_Register_GetByName( data->reg,
          data->testObjectNames[ii] ) );
    }
 }
