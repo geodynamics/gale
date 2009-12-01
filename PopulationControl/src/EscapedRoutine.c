@@ -103,12 +103,15 @@ void* _EscapedRoutine_DefaultNew( Name name ) {
 }
 
 void _EscapedRoutine_Init( 
-		EscapedRoutine*                            self, 
-		Dimension_Index                            dim, 
-		Particle_Index                             particlesToRemoveDelta )
+	void*					escapedRoutine, 
+	DomainContext*		context,
+	Dimension_Index	dim, 
+	Particle_Index		particlesToRemoveDelta )
 {
-	self->isConstructed          = True;
-	self->dim                    = dim;
+	EscapedRoutine* self = (EscapedRoutine*)escapedRoutine;
+
+	self->context = context;
+	self->dim = dim;
 	self->particlesToRemoveDelta = particlesToRemoveDelta;
 
 	self->debug = Journal_Register( Debug_Type, EscapedRoutine_Type ); /* TODO Register Child */
@@ -123,12 +126,9 @@ void _EscapedRoutine_Init(
 void _EscapedRoutine_Delete( void* escapedRoutine ) {
 	EscapedRoutine* self = (EscapedRoutine*)escapedRoutine;
 	
-	Memory_Free( self->particlesToRemoveList );
-
 	/* Delete parent */
 	_Stg_Component_Delete( self );
 }
-
 
 void _EscapedRoutine_Print( void* escapedRoutine, Stream* stream ) {
 	EscapedRoutine* self = (EscapedRoutine*)escapedRoutine;
@@ -136,7 +136,6 @@ void _EscapedRoutine_Print( void* escapedRoutine, Stream* stream ) {
 	/* Print parent */
 	_Stg_Component_Print( self, stream );
 }
-
 
 void* _EscapedRoutine_Copy( void* escapedRoutine, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	EscapedRoutine*	self = (EscapedRoutine*)escapedRoutine;
@@ -148,37 +147,41 @@ void* _EscapedRoutine_Copy( void* escapedRoutine, void* dest, Bool deep, Name na
 }
 
 void _EscapedRoutine_AssignFromXML( void* escapedRoutine, Stg_ComponentFactory* cf, void* data ) {
-	EscapedRoutine*	     self          = (EscapedRoutine*) escapedRoutine;
-	Dimension_Index      dim;
-	Particle_Index       particlesToRemoveDelta;
+	EscapedRoutine*	self = (EscapedRoutine*) escapedRoutine;
+	Dimension_Index	dim;
+	Particle_Index		particlesToRemoveDelta;
+	DomainContext*		context;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
-	if( !self->context ) 
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !context ) 
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 	particlesToRemoveDelta = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "particlesToRemoveDelta", 20 );
 
-	_EscapedRoutine_Init( self, dim, particlesToRemoveDelta );
+	_EscapedRoutine_Init( self, context, dim, particlesToRemoveDelta );
 }
 
 void _EscapedRoutine_Build( void* escapedRoutine, void* data ) {
-	EscapedRoutine*	     self          = (EscapedRoutine*) escapedRoutine;
+	EscapedRoutine* self = (EscapedRoutine*) escapedRoutine;
 
 	self->particlesToRemoveAlloced = self->particlesToRemoveDelta * 10;
-	self->particlesToRemoveList = Memory_Alloc_Array( unsigned, self->particlesToRemoveAlloced,
-		"particlesToRemoveList" );
+	self->particlesToRemoveList = Memory_Alloc_Array( unsigned, self->particlesToRemoveAlloced, "particlesToRemoveList" );
 }
 
 void _EscapedRoutine_Initialise( void* escapedRoutine, void* data ) {
 }
+
 void _EscapedRoutine_Execute( void* escapedRoutine, void* data ) {
-	Swarm*               swarm = Stg_CheckType( data, Swarm );
+	Swarm* swarm = Stg_CheckType( data, Swarm );
 
 	EscapedRoutine_RemoveFromSwarm( escapedRoutine, swarm );
 }
 
 void _EscapedRoutine_Destroy( void* escapedRoutine, void* data ) {
+	EscapedRoutine* self = (EscapedRoutine*) escapedRoutine;
+
+	Memory_Free( self->particlesToRemoveList );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------
@@ -186,15 +189,14 @@ void _EscapedRoutine_Destroy( void* escapedRoutine, void* data ) {
 */
 
 void EscapedRoutine_Select( void* escapedRoutine, void* _swarm ) {
-	EscapedRoutine*	 self          = (EscapedRoutine*) escapedRoutine;
+	EscapedRoutine* self = (EscapedRoutine*) escapedRoutine;
 
 	self->_select( self, _swarm );
 }
 
-
 void _EscapedRoutine_Select( void* escapedRoutine, void* _swarm ) {
 	EscapedRoutine*	self = (EscapedRoutine*)escapedRoutine;
-	Swarm*		swarm = (Swarm*)_swarm;
+	Swarm*				swarm = (Swarm*)_swarm;
 	unsigned	p_i;
 
 	assert( self );
@@ -212,8 +214,8 @@ void _EscapedRoutine_Select( void* escapedRoutine, void* _swarm ) {
 
 
 void EscapedRoutine_RemoveFromSwarm( void* escapedRoutine, void* _swarm ) {
-	EscapedRoutine*	     self                = (EscapedRoutine*) escapedRoutine;
-	Swarm*               swarm               = (Swarm*) _swarm;
+	EscapedRoutine*	self = (EscapedRoutine*) escapedRoutine;
+	Swarm*				swarm = (Swarm*) _swarm;
 	
 	EscapedRoutine_InitialiseParticleList( self );
 	
@@ -225,24 +227,22 @@ void EscapedRoutine_RemoveFromSwarm( void* escapedRoutine, void* _swarm ) {
 }
 
 void EscapedRoutine_InitialiseParticleList( void* escapedRoutine ) {
-	EscapedRoutine*	     self                = (EscapedRoutine*) escapedRoutine;
+	EscapedRoutine* self = (EscapedRoutine*) escapedRoutine;
 
 	self->particlesToRemoveCount = 0;
 	memset( self->particlesToRemoveList, 0, sizeof(unsigned) * self->particlesToRemoveAlloced );
 }
 
 void EscapedRoutine_SetParticleToRemove( void* escapedRoutine, Swarm* swarm, Particle_Index lParticle_I ) {
-	EscapedRoutine*	      self                = (EscapedRoutine*) escapedRoutine;
+	EscapedRoutine* self = (EscapedRoutine*) escapedRoutine;
 
 	/* Check memory */
 	if ( self->particlesToRemoveCount >= self->particlesToRemoveAlloced ) {
 		self->particlesToRemoveAlloced += self->particlesToRemoveDelta;
-		self->particlesToRemoveList = 
-			Memory_Realloc_Array( self->particlesToRemoveList, unsigned, self->particlesToRemoveAlloced );
+		self->particlesToRemoveList = Memory_Realloc_Array( self->particlesToRemoveList, unsigned, self->particlesToRemoveAlloced );
 	}
 
 	self->particlesToRemoveList[ self->particlesToRemoveCount ] = lParticle_I;
-
 	self->particlesToRemoveCount++;
 }
 
@@ -254,12 +254,11 @@ int _EscapedRoutine_CompareParticles( const void* _aParticleInfo, const void* _b
 void EscapedRoutine_SortParticleList( void* escapedRoutine ) {
 	EscapedRoutine*	     self                = (EscapedRoutine*) escapedRoutine;
 
-	qsort( self->particlesToRemoveList, self->particlesToRemoveCount, 
-			sizeof(unsigned), _EscapedRoutine_CompareParticles );
+	qsort( self->particlesToRemoveList, self->particlesToRemoveCount, sizeof(unsigned), _EscapedRoutine_CompareParticles );
 }
 
 void EscapedRoutine_RemoveParticles( void* escapedRoutine, Swarm* swarm ) {
-	EscapedRoutine*	      self                = (EscapedRoutine*) escapedRoutine;
+	EscapedRoutine*		self = (EscapedRoutine*) escapedRoutine;
 	Index                 array_I;
 	StandardParticle*     particleToRemove;
 	Particle_Index        particleToRemove_I;
@@ -294,8 +293,8 @@ void EscapedRoutine_RemoveParticles( void* escapedRoutine, Swarm* swarm ) {
 	#endif
 
 	for ( array_I = self->particlesToRemoveCount - 1 ; array_I < self->particlesToRemoveCount ; array_I-- ) {
-		particleToRemove_I               = self->particlesToRemoveList[ array_I ];
-		particleToRemove                 = Swarm_ParticleAt( swarm, particleToRemove_I );
+		particleToRemove_I = self->particlesToRemoveList[ array_I ];
+		particleToRemove = Swarm_ParticleAt( swarm, particleToRemove_I );
 
 		Journal_DPrintfL( self->debug, 2, "Removing particle %u\n", particleToRemove_I );
 		
