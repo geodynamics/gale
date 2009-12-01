@@ -50,6 +50,12 @@
 #include <Underworld/Underworld.h>
 #include <assert.h>
 
+const Type Underworld_MaterialThermalDiffusivity_Type = "Underworld_MaterialThermalDiffusivity";
+
+typedef struct { 
+	__Codelet
+} Underworld_MaterialThermalDiffusivity;
+
 double Underworld_MaterialThermalDiffusivity_GetDiffusivityFromIntPoint( void* _residualForceTerm, void* particle ) {
 
 	/* A function which should will only ever be called via a function pointer 
@@ -68,7 +74,7 @@ double Underworld_MaterialThermalDiffusivity_GetDiffusivityFromIntPoint( void* _
 	return Variable_GetValueDouble( residualForceTerm->diffusivityVariable, materialRef->particle_I );
 }
 
-void Underworld_MaterialThermalDiffusivity_Setup( void* _context ) {
+void Underworld_MaterialThermalDiffusivity_Setup( void* _self, void* data ) {
 	/* 
 	 * Role:
 	 * 1) create a new variable on the material Swarm, called thermalDiffusivity.
@@ -80,8 +86,8 @@ void Underworld_MaterialThermalDiffusivity_Setup( void* _context ) {
 	 * 	A OneToOneMapper is used
 	 *	AdvDiffResidualForceTerm setup and execution is compatible with it
 	 */
-
-	UnderworldContext*	  context = (UnderworldContext*) _context;
+	Underworld_MaterialThermalDiffusivity*	self = (Underworld_MaterialThermalDiffusivity*)_self;
+	UnderworldContext*	  context = (UnderworldContext*) self->context;
 	AdvectionDiffusionSLE*    energySLE           = context->energySLE;
         /* TODO: This assumes OneToOne mapping of intPoints to matPoints, should be fixed in future */
 	IntegrationPointsSwarm*	  picIntegrationPoints = (IntegrationPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, "picIntegrationPoints" );
@@ -118,11 +124,13 @@ void Underworld_MaterialThermalDiffusivity_Setup( void* _context ) {
 	residualForceTerm->_getDiffusivityFromIntPoint = Underworld_MaterialThermalDiffusivity_GetDiffusivityFromIntPoint;
 }
 
-void Underworld_MaterialThermalDiffusivity_Assign( UnderworldContext* context ) {
+void Underworld_MaterialThermalDiffusivity_Assign( void* _self, void* data ) {
 	/* 
 	 * Role: 
 	 * Assign diffusivity values given via the input dictionary to the materialPoints.
 	 */ 
+	Underworld_MaterialThermalDiffusivity*	self = (Underworld_MaterialThermalDiffusivity*)_self;
+	UnderworldContext*	                  context = (UnderworldContext*) self->context;	
 	Materials_Register*               materialRegister = context->materials_Register;
 	Material*                         material;
 	Material_Index                    material_I;
@@ -165,21 +173,10 @@ void Underworld_MaterialThermalDiffusivity_Assign( UnderworldContext* context ) 
 	Memory_Free( materialThermalDiffusivity );
 }
 
-
-const Type Underworld_MaterialThermalDiffusivity_Type = "Underworld_MaterialThermalDiffusivity";
-
-typedef struct { 
-	__Codelet
-} Underworld_MaterialThermalDiffusivity;
-
 void _Underworld_MaterialThermalDiffusivity_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	Underworld_MaterialThermalDiffusivity*	self = (Underworld_MaterialThermalDiffusivity*)component;
 
 	self->context = (AbstractContext*)Stg_ComponentFactory_PluginConstructByKey( cf, self, "Context", UnderworldContext, True, data );
-
-	/* Add functions to entry points */
-	ContextEP_Append( self->context, AbstractContext_EP_Build,      Underworld_MaterialThermalDiffusivity_Setup );
-	ContextEP_Append( self->context, AbstractContext_EP_Initialise, Underworld_MaterialThermalDiffusivity_Assign );
 }
 
 void* _Underworld_MaterialThermalDiffusivity_DefaultNew( Name name ) {
@@ -187,8 +184,8 @@ void* _Underworld_MaterialThermalDiffusivity_DefaultNew( Name name ) {
 			Underworld_MaterialThermalDiffusivity_Type, 
 			_Underworld_MaterialThermalDiffusivity_DefaultNew,
 			_Underworld_MaterialThermalDiffusivity_AssignFromXML,
-			_Codelet_Build,
-			_Codelet_Initialise,
+			Underworld_MaterialThermalDiffusivity_Setup,
+			Underworld_MaterialThermalDiffusivity_Assign,
 			_Codelet_Execute,
 			_Codelet_Destroy,
 			name );
