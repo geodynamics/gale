@@ -174,7 +174,7 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
 				vcEntry = Dictionary_Entry_Value_GetElement(vcList, entry_I);
 				type = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(vcEntry, "type"));
 				dictionary = Dictionary_Entry_Value_AsDictionary(vcEntry);
-				vc = VariableCondition_Register_CreateNew(variableCondition_Register, self->variable_Register, 
+				vc = VariableCondition_Register_CreateNew( self->context, variableCondition_Register, self->variable_Register, 
 					self->conFunc_Register, type, dictionary, self->data );
 				vc->cf = self->cf;
 				vc->_readDictionary( vc, dictionary );
@@ -205,7 +205,7 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
 				vcEntry = Dictionary_Entry_Value_GetElement(vcList, entry_I);
 				type = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(vcEntry, "type"));
 				dictionary = Dictionary_Entry_Value_AsDictionary(vcEntry);
-				vc = VariableCondition_Register_CreateNew(variableCondition_Register, self->variable_Register, 
+				vc = VariableCondition_Register_CreateNew( self->context, variableCondition_Register, self->variable_Register, 
 					self->conFunc_Register, type, dictionary, self->data );
 				vc->_readDictionary( vc, dictionary );
 				CompositeVC_Add(self, vc, True);

@@ -210,16 +210,18 @@ VariableCondition_Register_Entry* _VariableCondition_Register_At(
 }
 
 VariableCondition* VariableCondition_Register_CreateNew(
-				void* variableCondition_Register, 
-				void* variable_Register, 
-				void* conFunc_Register, 
-				Type type, 
-				void* dictionary, 
-				void* data )
+	void*	context,
+	void* variableCondition_Register, 
+	void* variable_Register, 
+	void* conFunc_Register, 
+	Type type, 
+	void* dictionary, 
+	void* data )
 {
 	VariableCondition_Register*	self = (VariableCondition_Register*)variableCondition_Register;
 	
 	return VariableCondition_Register_At( self, VariableCondition_Register_GetIndex( self, type ) )->factory( 
+		(AbstractContext*)context,
 		(Variable_Register*)variable_Register,
 		(ConditionFunction_Register*)conFunc_Register,
 		(Dictionary*)dictionary,
