@@ -137,6 +137,7 @@ void _DensityField_Build( void* densityField, void* data ) {
 	tmpName = Stg_Object_AppendSuffix( self, "densityVariable" );
 	self->dataVariable = Variable_NewScalar( 	
 			tmpName,
+			(AbstractContext*)self->context,
 			Variable_DataType_Double, 
 			&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
 			NULL,

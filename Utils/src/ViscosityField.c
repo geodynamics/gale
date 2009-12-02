@@ -137,6 +137,7 @@ void _ViscosityField_Build( void* viscosityField, void* data ) {
 	tmpName = Stg_Object_AppendSuffix( self, "viscosityVariable" );
 	self->dataVariable = Variable_NewScalar( 	
 			tmpName,
+			(AbstractContext*)self->context,
 			Variable_DataType_Double, 
 			&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
 			NULL,

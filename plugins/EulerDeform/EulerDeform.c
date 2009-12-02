@@ -344,6 +344,7 @@ Variable* EulerDeform_RegisterLocalNodeCoordsAsVariables( EulerDeform_System* sy
 	/* Construct */
 	variable = Variable_NewVector( 
 		variableName, 
+		self->context,	
 		Variable_DataType_Double, 
 		Mesh_GetDimSize( self ), 
 		(unsigned*)&((IGraph*)self->topo)->remotes[MT_VERTEX]->decomp->locals->size, 

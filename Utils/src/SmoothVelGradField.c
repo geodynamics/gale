@@ -178,6 +178,7 @@ void _SmoothVelGradField_Build( void* _self, void* data ) {
    tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
    self->dataVariable = Variable_NewVector(
       tmpName,
+		(AbstractContext*)self->context,	
       Variable_DataType_Double, 
       self->fieldComponentCount,
       &((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 

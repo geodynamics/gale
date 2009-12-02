@@ -147,6 +147,7 @@ void _NodalPressureField_Build( void* _self, void* data ) {
    tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
    self->dataVariable = Variable_NewScalar(
       tmpName,
+		(AbstractContext*)self->context,
       Variable_DataType_Double, 
       &((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
       NULL,
