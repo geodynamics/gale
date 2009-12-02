@@ -157,44 +157,38 @@ void _OperatorFieldVariable_Print( void* _fieldVariable, Stream* stream ) {
 
 void _OperatorFieldVariable_Init( void* ofv, Name operatorName, Index fieldVariableCount, FieldVariable** fieldVariableList ) {
 	OperatorFieldVariable*	self = (OperatorFieldVariable*)ofv;
-	FieldVariable*              fieldVariable;
-	Index                       fieldVariable_I;
-	Stream*                     errorStream       = Journal_Register( Error_Type, self->type );
+	FieldVariable*				fieldVariable;
+	Index							fieldVariable_I;
+	Stream*						errorStream = Journal_Register( Error_Type, self->type );
 
 	/* Create operator */
 	self->_operator = Operator_NewFromName( operatorName, fieldVariableList[0]->fieldComponentCount, self->dim );
 	self->fieldComponentCount = self->_operator->resultDofs; /* Reset this value from the one generated from the operator */
-
-	self->fieldVariableCount     = fieldVariableCount;
+	self->fieldVariableCount = fieldVariableCount;
 
 	/* Copy field variable list */
-	self->fieldVariableList      = Memory_Alloc_Array( FieldVariable*, fieldVariableCount, "Array of Field Variables" );
+	self->fieldVariableList = Memory_Alloc_Array( FieldVariable*, fieldVariableCount, "Array of Field Variables" );
 	memcpy( self->fieldVariableList, fieldVariableList, fieldVariableCount * sizeof( FieldVariable* ) );
 
 	for ( fieldVariable_I = 0 ; fieldVariable_I < fieldVariableCount ; fieldVariable_I++ ) {
 		fieldVariable = fieldVariableList[ fieldVariable_I ];
-		Journal_Firewall( fieldVariable != NULL, errorStream, 
-				"In func %s: FieldVariable %u in list is NULL\n", __func__, fieldVariable_I );
-		Journal_Firewall( fieldVariable->fieldComponentCount <= MAX_FIELD_COMPONENTS, errorStream, 
+		Journal_Firewall( fieldVariable != NULL, errorStream, "In func %s: FieldVariable %u in list is NULL\n", __func__, fieldVariable_I );
+		Journal_Firewall( fieldVariable->fieldComponentCount <= MAX_FIELD_COMPONENTS, errorStream,
 			"In func %s: Field Variable '%s' has too many components.\n", __func__, fieldVariable->name );
 	}
 }
-
 
 void* _OperatorFieldVariable_Copy( void* fieldVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	OperatorFieldVariable*	self = (OperatorFieldVariable*)fieldVariable;
 	OperatorFieldVariable*	newOperatorFieldVariable;
 	
 	newOperatorFieldVariable = _FieldVariable_Copy( self, dest, deep, nameExt, ptrMap );
-	
-	newOperatorFieldVariable->_operator              = self->_operator;
-	newOperatorFieldVariable->fieldVariableCount     = self->fieldVariableCount;
+	newOperatorFieldVariable->_operator = self->_operator;
+	newOperatorFieldVariable->fieldVariableCount = self->fieldVariableCount;
 	
 	if (deep) {
-		newOperatorFieldVariable->fieldVariableList = Memory_Alloc_Array( FieldVariable*, self->fieldVariableCount, 
-				"Array of Field Variables" );
-		memcpy( newOperatorFieldVariable->fieldVariableList, self->fieldVariableList, 
-				self->fieldVariableCount * sizeof( FieldVariable* ) );
+		newOperatorFieldVariable->fieldVariableList = Memory_Alloc_Array( FieldVariable*, self->fieldVariableCount, "Array of Field Variables" );
+		memcpy( newOperatorFieldVariable->fieldVariableList, self->fieldVariableList, self->fieldVariableCount * sizeof( FieldVariable* ) );
 	}
 	else 
 		newOperatorFieldVariable->fieldVariableList = self->fieldVariableList;
@@ -260,19 +254,19 @@ double _OperatorFieldVariable_GetMinLocalFieldMagnitude( void* fieldVariable ) {
 double _OperatorFieldVariable_GetMaxLocalFieldMagnitude( void* fieldVariable ) { return 0.0; }
 
 void  _OperatorFieldVariable_GetMinAndMaxLocalCoords( void* fieldVariable, Coord min, Coord max ) {
-	OperatorFieldVariable* self            = (OperatorFieldVariable*) fieldVariable;
+	OperatorFieldVariable* self = (OperatorFieldVariable*) fieldVariable;
 
 	FieldVariable_GetMinAndMaxLocalCoords( self->fieldVariableList[0], min, max );
 }
 
 void  _OperatorFieldVariable_GetMinAndMaxGlobalCoords( void* fieldVariable, Coord min, Coord max ) {
-	OperatorFieldVariable* self            = (OperatorFieldVariable*) fieldVariable;
+	OperatorFieldVariable* self = (OperatorFieldVariable*) fieldVariable;
 
 	FieldVariable_GetMinAndMaxGlobalCoords( self->fieldVariableList[0], min, max );
 }
 
 InterpolationResult _OperatorFieldVariable_InterpolateValueAt( void* fieldVariable, Coord coord, double* value ) {
-	OperatorFieldVariable* self            = (OperatorFieldVariable*) fieldVariable;
+	OperatorFieldVariable* self = (OperatorFieldVariable*) fieldVariable;
 
 	switch ( self->fieldVariableCount ) {
 		case 1:
@@ -288,8 +282,8 @@ InterpolationResult _OperatorFieldVariable_InterpolateValueAt( void* fieldVariab
 }
 
 InterpolationResult OperatorFieldVariable_UnaryInterpolationFunc( void* fieldVariable, Coord coord, double* value ) {
-	OperatorFieldVariable* self            = (OperatorFieldVariable*) fieldVariable;
-	FieldVariable*         field0          = self->fieldVariableList[0];
+	OperatorFieldVariable* self = (OperatorFieldVariable*) fieldVariable;
+	FieldVariable*         field0 = self->fieldVariableList[0];
 	InterpolationResult    result;
 	double                 fieldValue[ MAX_FIELD_COMPONENTS ]; 
 
@@ -299,9 +293,9 @@ InterpolationResult OperatorFieldVariable_UnaryInterpolationFunc( void* fieldVar
 }
 
 InterpolationResult OperatorFieldVariable_BinaryInterpolationFunc( void* fieldVariable, Coord coord, double* value ) {
-	OperatorFieldVariable* self            = (OperatorFieldVariable*) fieldVariable;
-	FieldVariable*         field0          = self->fieldVariableList[0];
-	FieldVariable*         field1          = self->fieldVariableList[1];
+	OperatorFieldVariable* self = (OperatorFieldVariable*) fieldVariable;
+	FieldVariable*         field0 = self->fieldVariableList[0];
+	FieldVariable*         field1 = self->fieldVariableList[1];
 	double                 fieldValue0[ MAX_FIELD_COMPONENTS ]; 
 	double                 fieldValue1[ MAX_FIELD_COMPONENTS ]; 
 	InterpolationResult    result0;
@@ -314,5 +308,3 @@ InterpolationResult OperatorFieldVariable_BinaryInterpolationFunc( void* fieldVa
 
 	return result0;
 }
-
-
