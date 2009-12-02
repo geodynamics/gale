@@ -58,6 +58,8 @@
 			IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms,
 			IntegrationPointMapper_GetMaterialIndexOnFunction*              _getMaterialIndexOn,
 			IntegrationPointMapper_GetExtensionOnFunction*                  _getExtensionOn,
+			IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension,
+			IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial,
 			Name                                                            name,
 			Bool                                                            initFlag,
 			IntegrationPointsSwarm*                                         integrationSwarm,

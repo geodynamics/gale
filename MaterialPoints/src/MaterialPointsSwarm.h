@@ -161,6 +161,12 @@
 	/** Returns the material instance associated with the given point index */
 	Index MaterialPointsSwarm_GetMaterialIndexAt( void* swarm, Index point_I );
 
+        /** Get the extension on a material. */
+        void* MaterialPointsSwarm_GetMaterialExtensionOn( void* swarm, void *matPoint, Index extHandle );
+
+        /** Get the extension on a material index. */
+        void* MaterialPointsSwarm_GetMaterialExtensionAt( void* swarm, int matPointInd, Index extHandle );
+
 	/** Returns the particle extension at given point index */
 	void* MaterialPointsSwarm_GetExtensionAt( void* swarm, Index point_I, Index extHandle );
 	

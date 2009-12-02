@@ -61,6 +61,8 @@
 
 	typedef struct IntegrationPointMapper       IntegrationPointMapper;
 	typedef struct OneToOneMapper               OneToOneMapper;
+        typedef struct OneToManyRef OneToManyRef;
+        typedef struct OneToManyMapper OneToManyMapper;
 	typedef struct CoincidentMapper             CoincidentMapper;
 	typedef struct GaussCoincidentMapper        GaussCoincidentMapper;
 	typedef struct GaussMapper                  GaussMapper;

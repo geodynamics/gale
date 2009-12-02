@@ -74,6 +74,8 @@ IntegrationPointMapper* _IntegrationPointMapper_New(
 		IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms,
 		IntegrationPointMapper_GetMaterialIndexOnFunction*              _getMaterialIndexOn,
 		IntegrationPointMapper_GetExtensionOnFunction*                  _getExtensionOn,
+                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension,
+                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial,
 		Name                                                            name,
 		Bool                                            initFlag,
 		IntegrationPointsSwarm*                                         integrationSwarm )
@@ -99,6 +101,8 @@ IntegrationPointMapper* _IntegrationPointMapper_New(
 	self->_getMaterialPointsSwarms       = _getMaterialPointsSwarms;
 	self->_getMaterialIndexOn            = _getMaterialIndexOn;
 	self->_getExtensionOn                = _getExtensionOn;
+	self->_getDoubleFromExtension        = _getDoubleFromExtension;
+	self->_getDoubleFromMaterial         = _getDoubleFromMaterial;
 
 	if (initFlag) {
 		_IntegrationPointMapper_Init( self, integrationSwarm );

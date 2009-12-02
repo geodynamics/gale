@@ -76,7 +76,19 @@
 				void*                   mapper, 
 				void*                   points, 
 				ExtensionInfo_Index     extHandle );
-	
+
+	typedef double (IntegrationPointMapper_GetDoubleFromExtension)(
+	    void*                   mapper,
+	    void*                   intPoint,
+	    ExtensionInfo_Index     extHandle,
+	    int                     offs );
+
+        typedef double (IntegrationPointMapper_GetDoubleFromMaterial)(
+	    void*                   mapper,
+	    void*                   intPoint,
+	    ExtensionInfo_Index     extHandle,
+	    int                     offs );
+
 	/* IntegrationPointMapper information */
 	#define __IntegrationPointMapper \
 		__Stg_Component \
@@ -86,6 +98,8 @@
 		IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms; \
 		IntegrationPointMapper_GetMaterialIndexOnFunction*              _getMaterialIndexOn; \
 		IntegrationPointMapper_GetExtensionOnFunction*                  _getExtensionOn; \
+                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension; \
+                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial; \
 		\
 		/* General info */ \
 		IntegrationPointsSwarm*                                     integrationSwarm;
@@ -112,6 +126,8 @@
 		IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms,
 		IntegrationPointMapper_GetMaterialIndexOnFunction*              _getMaterialIndexOn, 
 		IntegrationPointMapper_GetExtensionOnFunction*                  _getExtensionOn, 
+                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension,
+                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial,
 		Name                                                            name,
 		Bool                                                            initFlag,
 		IntegrationPointsSwarm*                                         integrationSwarm );
@@ -185,5 +201,12 @@ void _IntegrationPointMapper_Construct( void* mapper, Stg_ComponentFactory* cf, 
 					Swarm_ParticleAt( ((IntegrationPointMapper*)mapper)->integrationSwarm, point_I ), \
 					extHandle )
 	void* IntegrationPointMapper_GetExtensionAtFunc( void* mapper, Index point_I, ExtensionInfo_Index extHandle );
+
+
+#define IntegrationPointMapper_GetDoubleFromExtension(mapper, intPoint, extHandle, offs) \
+    ((IntegrationPointMapper*)mapper)->_getDoubleFromExtension(mapper, intPoint, extHandle, offs);
+
+#define IntegrationPointMapper_GetDoubleFromMaterial(mapper, intPoint, extHandle, offs) \
+    ((IntegrationPointMapper*)mapper)->_getDoubleFromMaterial(mapper, intPoint, extHandle, offs);
 
 #endif

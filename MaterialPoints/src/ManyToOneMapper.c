@@ -74,6 +74,8 @@ ManyToOneMapper* _ManyToOneMapper_New(
 		IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms,
 		IntegrationPointMapper_GetMaterialIndexOnFunction*              _getMaterialIndexOn,
 		IntegrationPointMapper_GetExtensionOnFunction*                  _getExtensionOn,
+		IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension,
+		IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial,
 		Name                                                            name,
 		Bool                                            initFlag,
 		IntegrationPointsSwarm*                                         integrationSwarm,
@@ -98,6 +100,8 @@ ManyToOneMapper* _ManyToOneMapper_New(
 			_getMaterialPointsSwarms,
 			_getMaterialIndexOn,
 			_getExtensionOn,
+			_getDoubleFromExtension,
+			_getDoubleFromMaterial,
 			name,
 			initFlag,	
 			integrationSwarm );

@@ -52,26 +52,32 @@
 **     struct, which has enough information to fetch a particular point out of a particular swarm again.
 **     
 **
-** $Id: OneToOneMapper.h 189 2005-10-20 00:39:29Z RobertTurnbull $
+** $Id: OneToManyMapper.h 189 2005-10-20 00:39:29Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __PICellerator_MaterialPoints_OneToOneMapper_h__
-#define __PICellerator_MaterialPoints_OneToOneMapper_h__
+#ifndef __PICellerator_MaterialPoints_OneToManyMapper_h__
+#define __PICellerator_MaterialPoints_OneToManyMapper_h__
 
-	extern const Type OneToOneMapper_Type;
+	extern const Type OneToManyMapper_Type;
 
-	/* OneToOneMapper information */
-	#define __OneToOneMapper \
+        struct OneToManyRef {
+	    int numParticles;
+	    int *particleInds;
+	    float *weights;
+        };
+
+	/* OneToManyMapper information */
+	#define __OneToManyMapper \
 		__IntegrationPointMapper \
 		\
 		Stream*				errorStream; \
 		MaterialPointsSwarm*		materialSwarm; \
-		Index                           materialRefHandle; /**< Extension handle to reference struct of material points */
+		Index                           refHandle; /**< Extension handle to reference struct of material points */
 
-	struct OneToOneMapper { __OneToOneMapper };
+	struct OneToManyMapper { __OneToManyMapper };
 	
-	OneToOneMapper* _OneToOneMapper_New(
+	OneToManyMapper* _OneToManyMapper_New(
 			SizeT                                                           _sizeOfSelf,
 			Type                                                            type,
 			Stg_Class_DeleteFunction*                                       _delete,
@@ -94,33 +100,31 @@
 			IntegrationPointsSwarm*                                         integrationSwarm,
 			MaterialPointsSwarm*                                            materialSwarm );
 
-	void _OneToOneMapper_Init( 
+	void _OneToManyMapper_Init( 
 			void*                   mapper, 
 			IntegrationPointsSwarm* integrationSwarm,
 			MaterialPointsSwarm*    materialSwarm );
 
-	void _OneToOneMapper_Delete( void* mapper );
-	void _OneToOneMapper_Print( void* mapper, Stream* stream );
-	#define OneToOneMapper_Copy( self ) \
-		(OneToOneMapper*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
-	#define OneToOneMapper_DeepCopy( self ) \
-		(OneToOneMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _OneToOneMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void _OneToManyMapper_Delete( void* mapper );
+	void _OneToManyMapper_Print( void* mapper, Stream* stream );
+	#define OneToManyMapper_Copy( self ) \
+		(OneToManyMapper*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
+	#define OneToManyMapper_DeepCopy( self ) \
+		(OneToManyMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
+	void* _OneToManyMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-	void _OneToOneMapper_Construct( void* shape, Stg_ComponentFactory* cf, void* data );
-	void _OneToOneMapper_Build( void* mapper, void* data ) ;
-	void _OneToOneMapper_Initialise( void* mapper, void* data );
-	void _OneToOneMapper_Execute( void* mapper, void* data );
-	void _OneToOneMapper_Destroy( void* mapper, void* data );
+	void _OneToManyMapper_Construct( void* shape, Stg_ComponentFactory* cf, void* data );
+	void _OneToManyMapper_Build( void* mapper, void* data ) ;
+	void _OneToManyMapper_Initialise( void* mapper, void* data );
+	void _OneToManyMapper_Execute( void* mapper, void* data );
+	void _OneToManyMapper_Destroy( void* mapper, void* data );
 
-	MaterialPointsSwarm** _OneToOneMapper_GetMaterialPointsSwarms( void* mapper, Index* count );	
-	Material_Index _OneToOneMapper_GetMaterialIndexOn( void* mapper, void* point );
-	void* _OneToOneMapper_GetExtensionOn( void* mapper, void* point, ExtensionInfo_Index extHandle );
-        double _OneToOneMapper_GetDoubleFromExtension(void* mapper, void* intPoint, ExtensionInfo_Index extHandle, int offs);
-        double _OneToOneMapper_GetDoubleFromMaterial(void* mapper, void* intPoint, ExtensionInfo_Index extHandle, int offs);
+	MaterialPointsSwarm** _OneToManyMapper_GetMaterialPointsSwarms( void* mapper, Index* count );	
+	Material_Index _OneToManyMapper_GetMaterialIndexOn( void* mapper, void* point );
+	void* _OneToManyMapper_GetExtensionOn( void* mapper, void* point, ExtensionInfo_Index extHandle );
+        double _OneToManyMapper_GetDoubleFromExtension(void* mapper, void* intPoint, ExtensionInfo_Index extHandle, int offs);
+        double _OneToManyMapper_GetDoubleFromMaterial(void* mapper, void* intPoint, ExtensionInfo_Index extHandle, int offs);
 
-	MaterialPointRef* OneToOneMapper_GetMaterialRef( void* mapper, void* integrationPoint );
-	MaterialPoint* OneToOneMapper_GetMaterialPoint( void* mapper, void* integrationPoint, MaterialPointsSwarm** materialSwarm );
-	
-	
+        OneToManyRef* OneToManyMapper_GetMaterialRef( void* mapper, void* intPoint );
+
 #endif
