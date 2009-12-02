@@ -86,12 +86,12 @@ void Underworld_MaterialThermalDiffusivity_Setup( void* _self, void* data ) {
 	 * 	A OneToOneMapper is used
 	 *	AdvDiffResidualForceTerm setup and execution is compatible with it
 	 */
-	Underworld_MaterialThermalDiffusivity*	self = (Underworld_MaterialThermalDiffusivity*)_self;
-	UnderworldContext*	  context = (UnderworldContext*) self->context;
-	AdvectionDiffusionSLE*    energySLE           = context->energySLE;
+	Underworld_MaterialThermalDiffusivity*	self      = (Underworld_MaterialThermalDiffusivity*)_self;
+	UnderworldContext*	                  context   = (UnderworldContext*) self->context;
+	AdvectionDiffusionSLE*                 energySLE = (AdvectionDiffusionSLE*) LiveComponentRegister_Get( context->CF->LCRegister, "EnergyEqn" );
         /* TODO: This assumes OneToOne mapping of intPoints to matPoints, should be fixed in future */
-	IntegrationPointsSwarm*	  picIntegrationPoints = (IntegrationPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, "picIntegrationPoints" );
-	OneToOneMapper*           mapper              = (OneToOneMapper*)picIntegrationPoints->mapper;
+	IntegrationPointsSwarm*	  picIntegrationPoints   = (IntegrationPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, "picIntegrationPoints" );
+	OneToOneMapper*           mapper                 = (OneToOneMapper*)picIntegrationPoints->mapper;
 
 	MaterialPointsSwarm*      materialSwarm = mapper->materialSwarm;
 	ExtensionInfo_Index       particleExtHandle;
@@ -102,6 +102,10 @@ void Underworld_MaterialThermalDiffusivity_Setup( void* _self, void* data ) {
 	assert( energySLE );
 	assert( materialSwarm );
 
+   Stg_Component_Build( picIntegrationPoints, data, False );
+	Stg_Component_Build( materialSwarm, data, False );
+	Stg_Component_Build( mapper, data, False );
+	
 	/* Add Material Extension */
 	particleExtHandle = ExtensionManager_Add( materialSwarm->particleExtensionMgr, 
 				CURR_MODULE_NAME, sizeof( double ) );
@@ -109,8 +113,10 @@ void Underworld_MaterialThermalDiffusivity_Setup( void* _self, void* data ) {
 	swarmVariable = Swarm_NewScalarVariable(
 			materialSwarm,
 			"thermalDiffusivity",
-			(ArithPointer) ExtensionManager_Get( materialSwarm->particleExtensionMgr, 0, particleExtHandle ),
+			(ArithPointer) ExtensionManager_Get( materialSwarm->particleExtensionMgr, NULL, particleExtHandle ),
 			Variable_DataType_Double );
+	
+	Stg_Component_Build( swarmVariable, data, False ); 
 
 	/* Set Pointers */
 	residual = energySLE->residual;
@@ -139,7 +145,7 @@ void Underworld_MaterialThermalDiffusivity_Assign( void* _self, void* data ) {
 	double*                           materialThermalDiffusivity;
 	Particle_Index                    lParticle_I;
 	MaterialPointsSwarm*           	  materialSwarm;               
-	AdvectionDiffusionSLE*            energySLE           = context->energySLE;
+	AdvectionDiffusionSLE*            energySLE = (AdvectionDiffusionSLE*) LiveComponentRegister_Get( context->CF->LCRegister, "EnergyEqn" );
 	ForceVector*                      residual;
 	AdvDiffResidualForceTerm*         residualForceTerm;
 	Variable*                         variable;

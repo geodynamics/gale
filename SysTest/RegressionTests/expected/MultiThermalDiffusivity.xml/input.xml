@@ -5,28 +5,52 @@
     <toolbox>Underworld</toolbox>
   </import>
   <plugins>
-    <plugin>StgFEM_StandardConditionFunctions</plugin>
-    <plugin>Underworld_Ra_Scaling</plugin>
-    <plugin>StgFEM_FrequentOutput</plugin>
-    <plugin>Underworld_Nusselt</plugin>
-    <plugin>Underworld_Vrms</plugin>
-    <plugin>StgFEM_CPUTime</plugin>
-    <plugin>Underworld_MaterialThermalDiffusivity</plugin>
-    <plugin>Underworld_ShapeFemIC</plugin>
-    <plugin>lucPlugin</plugin>
-    <plugin>lucPlugin</plugin>
+    <element type="struct">
+      <element type="param" name="Type">StgFEM_StandardConditionFunctions</element>
+      <element type="param" name="Contest">context</element>
+      <element type="param" name="Context">context</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">Underworld_Ra_Scaling</element>
+      <element type="param" name="Context">context</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">StgFEM_FrequentOutput</element>
+      <element type="param" name="Context">context</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">Underworld_Nusselt</element>
+      <element type="param" name="Context">context</element>
+      <element type="param" name="GaussSwarm">gaussSwarm</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">Underworld_Vrms</element>
+      <element type="param" name="Context">context</element>
+      <element type="param" name="GaussSwarm">gaussSwarm</element>
+      <element type="param" name="VelocityField">VelocityField</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">StgFEM_CPUTime</element>
+      <element type="param" name="Context">context</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">Underworld_MaterialThermalDiffusivity</element>
+      <element type="param" name="Context">context</element>
+      <element type="param" name="IntegrationSwarm">picIntegrationPoints</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">Underworld_ShapeFemIC</element>
+      <element type="param" name="Context">context</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">lucPlugin</element>
+      <element type="param" name="Context">lucPluginContext</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">lucPlugin</element>
+      <element type="param" name="Context">lucPluginContext</element>
+    </element>
   </plugins>
-  <element type="struct" name="pluginContexts">
-    <element type="param" name="StgFEM_StandardConditionFunctions">context</element>
-    <element type="param" name="Underworld_Ra_Scaling">context</element>
-    <element type="param" name="StgFEM_FrequentOutput">context</element>
-    <element type="param" name="Underworld_Nusselt">context</element>
-    <element type="param" name="Underworld_Vrms">context</element>
-    <element type="param" name="StgFEM_CPUTime">context</element>
-    <element type="param" name="Underworld_MaterialThermalDiffusivity">context</element>
-    <element type="param" name="Underworld_ShapeFemIC">context</element>
-    <element type="param" name="lucPlugin">lucPluginContext</element>
-  </element>
   <components>
     <element type="struct" name="constantMesh">
       <element type="param" name="Type">FeMesh</element>
@@ -440,9 +464,6 @@
     </element>
     <element type="struct" name="context">
       <element type="param" name="Type">UnderworldContext</element>
-      <element type="param" name="GaussSwarm">gaussSwarm</element>
-      <element type="param" name="IntegrationSwarm">picIntegrationPoints</element>
-      <element type="param" name="VelocityField">VelocityField</element>
     </element>
     <element type="struct" name="isotropicViscosity">
       <element type="param" name="Type">MaterialViscosity</element>
@@ -680,7 +701,7 @@
     <element type="param">TemperatureField</element>
     <element type="param">TemperatureField-phiDotField</element>
   </element>
-  <element type="struct" name="lucPluginContext"/>
+  <element type="param" name="lucPluginContext">context</element>
   <element type="param" name="maxTimeSteps">10</element>
   <element type="param" name="outputPath">./expected/MultiThermalDiffusivity.xml</element>
   <element type="param" name="dumpEvery">0</element>
@@ -798,14 +819,12 @@
   <element type="struct" name="pluginData">
     <element type="param" name="appendToAnalysisFile">True</element>
   </element>
-  <element type="param" name="timestepFactor">1</element>
+  <element type="param" name="pauseToAttachDebugger">0</element>
   <element type="param" name="outputEvery">1</element>
   <element type="param" name="saveDataEvery">0</element>
   <element type="param" name="checkpointAtTimeInc">0</element>
   <element type="param" name="experimentName">experiment</element>
-  <element type="param" name="checkpointPath">./expected/MultiThermalDiffusivity.xml</element>
-  <element type="param" name="checkpointReadPath">./expected/MultiThermalDiffusivity.xml</element>
-  <element type="param" name="checkpointWritePath">./expected/MultiThermalDiffusivity.xml</element>
   <element type="param" name="checkpointAppendStep">false</element>
   <element type="param" name="interpolateRestart">false</element>
+  <element type="param" name="outputFlattenedXML">true</element>
 </StGermainData>
