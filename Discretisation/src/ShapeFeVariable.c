@@ -78,13 +78,11 @@ void* ShapeFeVariable_DefaultNew( Name name ) {
 	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
 	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
 
-	return (ShapeFeVariable*)
-		_ShapeFeVariable_New(  SHAPEFEVARIABLE_PASSARGS  );
+	return (ShapeFeVariable*) _ShapeFeVariable_New(  SHAPEFEVARIABLE_PASSARGS  );
 }			
 
-ShapeFeVariable* _ShapeFeVariable_New(  SHAPEFEVARIABLE_DEFARGS  )
-{
-	ShapeFeVariable*		self;
+ShapeFeVariable* _ShapeFeVariable_New(  SHAPEFEVARIABLE_DEFARGS  ) {
+	ShapeFeVariable* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ShapeFeVariable) );

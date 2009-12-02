@@ -266,21 +266,18 @@ void _OperatorFeVariable_Print( void* _feVariable, Stream* stream ) {
 
 }
 
-
 void* _OperatorFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	OperatorFeVariable*	self = (OperatorFeVariable*)feVariable;
 	OperatorFeVariable*	newOperatorFeVariable;
 	
 	newOperatorFeVariable = _FeVariable_Copy( self, dest, deep, nameExt, ptrMap );
 	
-	newOperatorFeVariable->_operator              = self->_operator;
-	newOperatorFeVariable->feVariableCount     = self->feVariableCount;
+	newOperatorFeVariable->_operator = self->_operator;
+	newOperatorFeVariable->feVariableCount = self->feVariableCount;
 	
 	if (deep) {
-		newOperatorFeVariable->feVariableList = Memory_Alloc_Array( FeVariable*, self->feVariableCount, 
-				"Array of Field Variables" );
-		memcpy( newOperatorFeVariable->feVariableList, self->feVariableList, 
-				self->feVariableCount * sizeof( FeVariable* ) );
+		newOperatorFeVariable->feVariableList = Memory_Alloc_Array( FeVariable*, self->feVariableCount, "Array of Field Variables" );
+		memcpy( newOperatorFeVariable->feVariableList, self->feVariableList, self->feVariableCount * sizeof( FeVariable* ) );
 	}
 	else 
 		newOperatorFeVariable->feVariableList = self->feVariableList;
@@ -289,7 +286,7 @@ void* _OperatorFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name na
 }
 
 void _OperatorFeVariable_AssignFromXML( void* feVariable, Stg_ComponentFactory* cf, void* data ) {
-	OperatorFeVariable*     self       = (OperatorFeVariable*) feVariable;
+	OperatorFeVariable*     self = (OperatorFeVariable*) feVariable;
 	Dictionary*             dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 	Dictionary_Entry_Value* list;
 	Index                   feVariableCount = 0;
@@ -312,32 +309,28 @@ void _OperatorFeVariable_AssignFromXML( void* feVariable, Stg_ComponentFactory* 
 	feVariableList = Memory_Alloc_Array( FeVariable*, feVariableCount, "FeVars" );
 
 	for ( feVariable_I = 0 ; feVariable_I < feVariableCount ; feVariable_I++ ) {
-		feVariableName = (list ? 
-				Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( list, feVariable_I ) ) :
-				Dictionary_GetString( dictionary, "FeVariable" ) );
+		feVariableName = (list ?  Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( list, feVariable_I ) ) :
+			Dictionary_GetString( dictionary, "FeVariable" ) );
 
 		/* Check in fV_Register first before assuming in LiveComponentRegister */
-		Journal_PrintfL( cf->infoStream, 2, "Looking for FeVariable '%s' in fieldVariable_Register.\n",
-				feVariableName );
+		Journal_PrintfL( cf->infoStream, 2, "Looking for FeVariable '%s' in fieldVariable_Register.\n", feVariableName );
 		feVariableList[feVariable_I] = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, feVariableName );
 		
 		if ( !feVariableList[feVariable_I] )
 			feVariableList[feVariable_I] = 
-	Stg_ComponentFactory_ConstructByName( cf, feVariableName, FeVariable, True, data ); 
-		
+		Stg_ComponentFactory_ConstructByName( cf, feVariableName, FeVariable, True, data ); 
 	}
 
-	_FeVariable_Init( (FeVariable*) self, feVariableList[0]->feMesh, feVariableList[0]->geometryMesh,
-		feVariableList[0]->dofLayout, NULL, NULL, NULL, NULL, False, False );
+	_FeVariable_Init( (FeVariable*) self, feVariableList[0]->feMesh, feVariableList[0]->geometryMesh, feVariableList[0]->dofLayout, NULL, NULL, NULL, NULL, False, False );
 	_OperatorFeVariable_Init( self, operatorName, feVariableCount, feVariableList, NULL );
 
 	Memory_Free( feVariableList );
 }
 
 void _OperatorFeVariable_Build( void* feVariable, void* data ) {
-	OperatorFeVariable* self = (OperatorFeVariable*) feVariable;
-	Index                  feVariable_I;
-	Stream*                     errorStream       = Journal_Register( Error_Type, self->type );
+	OperatorFeVariable*	self = (OperatorFeVariable*) feVariable;
+	Index						feVariable_I;
+	Stream*					errorStream = Journal_Register( Error_Type, self->type );
 
    void _FeVariable_Build( self, data );
    
@@ -373,9 +366,10 @@ void _OperatorFeVariable_Build( void* feVariable, void* data ) {
 	
 			self->fieldComponentCount = self->_operator->resultDofs; /* reset this value from that which is from operator */
 		}
-	} else {
-			self->useGradient = False;
-			self->fieldComponentCount = self->_operator->resultDofs; /* reset this value from that which is from operator */
+	}
+	else {
+		self->useGradient = False;
+		self->fieldComponentCount = self->_operator->resultDofs; /* reset this value from that which is from operator */
 	}		
 		
 	_OperatorFeVariable_SetFunctions( self );
@@ -445,8 +439,8 @@ void _OperatorFeVariable_Destroy( void* feVariable, void* data ) {
 }
 
 void _OperatorFeVariable_SetFunctions( void* feVariable ) {
-	OperatorFeVariable* self            = (OperatorFeVariable*) feVariable;
-	Stream*             error           = Journal_Register( Error_Type, self->type );
+	OperatorFeVariable* self = (OperatorFeVariable*) feVariable;
+	Stream*             error = Journal_Register( Error_Type, self->type );
 
 	if ( self->useGradient ) {
 		Journal_Firewall( self->feVariableCount == 1, error, "Cannot use gradient operators for multiple variables.\n" );

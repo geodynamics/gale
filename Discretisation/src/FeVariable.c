@@ -232,13 +232,10 @@ void _FeVariable_Init(
 	/** General and Virtual info should already be set */
 	
 	/** FeVariable info */
-	self->isConstructed = True;
 	self->debug = Stream_RegisterChild( StgFEM_Discretisation_Debug, self->type );
 	self->feMesh = Stg_CheckType( feMesh, FeMesh );
 	/** Set pointer for geometry mesh - if none is provided then it'll use the feMesh */
-	self->geometryMesh = ( geometryMesh ? 
-		Stg_CheckType( geometryMesh, FeMesh ) : 
-		Stg_CheckType( feMesh, FeMesh ) );
+	self->geometryMesh = ( geometryMesh ?  Stg_CheckType( geometryMesh, FeMesh ) : Stg_CheckType( feMesh, FeMesh ) );
 	self->dofLayout = dofLayout;
 	if ( bcs )
 		self->bcs = Stg_CheckType( bcs, VariableCondition );
@@ -264,8 +261,7 @@ void _FeVariable_Init(
 
 	self->isReferenceSolution = isReferenceSolution;
 	self->loadReferenceEachTimestep = loadReferenceEachTimestep;
-	Journal_Firewall( (self->loadReferenceEachTimestep != True), errorStream,
-		 "The loadReferenceEachTimestep feature isn't implemented yet, sorry.\n" );
+	Journal_Firewall( (self->loadReferenceEachTimestep != True), errorStream, "The loadReferenceEachTimestep feature isn't implemented yet, sorry.\n" );
 
 	self->dynamicBCs[0] = NULL;
 	self->dynamicBCs[1] = NULL;
@@ -276,7 +272,6 @@ void _FeVariable_Init(
 	self->inc = IArray_New();
 }
 
-
 void _FeVariable_Delete( void* variable ) {
 	FeVariable* self = (FeVariable*)variable;
 	Journal_DPrintf( self->debug, "In %s- for \"%s\":\n", __func__, self->name );
@@ -285,7 +280,6 @@ void _FeVariable_Delete( void* variable ) {
 	_Stg_Component_Delete( self );
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
-
 
 /** --- Virtual Function Implementations --- */
 
@@ -335,7 +329,6 @@ void _FeVariable_Print( void* variable, Stream* stream ) {
 		Journal_Printf( stream, "\teqNum: (null)... not built yet\n" );
 	}
 }
-
 
 void* _FeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	FeVariable*	self = (FeVariable*)feVariable;
@@ -481,8 +474,7 @@ void _FeVariable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* 
 	/** TODO: should really be a parameter */
 	self->removeBCs = Stg_ComponentFactory_GetBool( cf, self->name, "removeBCs", True );
 
-	_FeVariable_Init( self, feMesh, geometryMesh, dofLayout, bc, ic, linkedDofInfo, NULL,
-		isReferenceSolution, loadReferenceEachTimestep );
+	_FeVariable_Init( self, feMesh, geometryMesh, dofLayout, bc, ic, linkedDofInfo, NULL, isReferenceSolution, loadReferenceEachTimestep );
 }
 
 void _FeVariable_Initialise( void* variable, void* data ) {
@@ -692,7 +684,7 @@ void _FeVariable_Destroy( void* variable, void* data ) {
 	Stream_IndentBranch( StgFEM_Debug );
 
 	if( self->eqNum && ( NULL == self->templateFeVariable ) ) {
-		Stg_Class_Delete( self->eqNum );
+		_Stg_Component_Delete( self->eqNum );
       self->eqNum = NULL;
 	}
 	/** feMesh bc and doflayout are purposely not deleted */
@@ -713,7 +705,6 @@ void FeVariable_PrintLocalDiscreteValues( void* variable, Stream* stream ) {
 	_FeVariable_PrintLocalOrDomainValues( variable, FeMesh_GetNodeLocalSize( self->feMesh ), stream );
 }
 
-
 unsigned _FeVariable_ClosestNode( FeVariable* self, double* crd ) {
 	assert( self );
 	return Mesh_NearestVertex( self->feMesh, crd );
@@ -721,9 +712,9 @@ unsigned _FeVariable_ClosestNode( FeVariable* self, double* crd ) {
 
 
 InterpolationResult _FeVariable_InterpolateValueAt( void* variable, double* globalCoord, double* value ) {
-	FeVariable*		self = (FeVariable*)variable;
+	FeVariable*				self = (FeVariable*)variable;
 	Element_DomainIndex	elementCoordIn = (unsigned)-1;
-	Coord			elLocalCoord={0,0,0};
+	Coord						elLocalCoord={0,0,0};
 	InterpolationResult	retValue;
 
 
