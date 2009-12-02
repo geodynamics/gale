@@ -137,10 +137,10 @@ void _ConstitutiveMatrix_Init(
 		self->integrationSwarm->name );
 
 	Journal_Firewall(
-		Stg_Class_IsInstance( ((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, OneToOneMapper_Type ),
+		Stg_Class_IsInstance( ((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, OneToOneMapper_Type ) || Stg_Class_IsInstance( ((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, OneToManyMapper_Type ),
 		Journal_MyStream( Error_Type, self ),
 		"Error In %s - ConstitutiveMatrix %s cannot use %s. ConstitutiveMatrix only works with IntegrationPointsSwarms"
-		" which uses one-to-one mapping\n",
+		" which uses one-to-one or one-to-many mapping\n",
 		__func__,
 		self->name,
 		self->integrationSwarm->name );
@@ -345,6 +345,34 @@ void ConstitutiveMatrix_Assemble(
   if( self->storeConstitutiveMatrix ) {
     /* copy the recently calculated self->matrixData, the constitutive matrix, onto the particle extension */
     double* cMatrix = ExtensionManager_Get( materialSwarm->particleExtensionMgr, materialPoint, self->storedConstHandle );
+    Index row_I, rowSize = self->rowSize;
+    Index columnSize = self->columnSize;
+
+    /* flatten the matrix into a 1D array */
+    for( row_I = 0 ; row_I < rowSize ; row_I++ ) 
+      memcpy( &cMatrix[columnSize*row_I], self->matrixData[row_I], columnSize*sizeof(double) );
+  }
+	Journal_DPrintfL( self->debug, 3, "Viscosity = %g\n", ConstitutiveMatrix_GetIsotropicViscosity( self ) );
+}
+
+void ConstitutiveMatrix_AssembleMaterialPoint(void *constitutiveMatrix, int element,
+					      MaterialPointsSwarm *matSwarm, int matPointInd)
+{
+	ConstitutiveMatrix *self = (ConstitutiveMatrix*)constitutiveMatrix;
+	IntegrationPointsSwarm *swarm       = (IntegrationPointsSwarm*)self->integrationSwarm;
+	RheologyMaterial *material;
+	MaterialPoint *matPoint;
+	double xi[3];
+
+	matPoint = (MaterialPoint*)Swarm_ParticleAt(matSwarm, matPointInd);
+	material = (RheologyMaterial*)MaterialPointsSwarm_GetMaterialOn(matSwarm, matPoint);
+	FeMesh_CoordGlobalToLocal(matSwarm->mesh, element, matPoint->coord, xi);
+	self->currentParticleIndex = matPointInd;
+	RheologyMaterial_RunRheologies(material, self, matSwarm, element, matPoint, xi);
+
+  if( self->storeConstitutiveMatrix ) {
+    /* copy the recently calculated self->matrixData, the constitutive matrix, onto the particle extension */
+    double* cMatrix = ExtensionManager_Get( matSwarm->particleExtensionMgr, matPoint, self->storedConstHandle );
     Index row_I, rowSize = self->rowSize;
     Index columnSize = self->columnSize;
 

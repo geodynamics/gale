@@ -205,6 +205,8 @@ void _Compressible_AssembleElement(
 	FeMesh*  		  geometryMesh        = self->geometryMesh;
 	ElementType*              geometryElementType;
 	Particle_Index            lParticle_I;
+	double oneOnLambda = 0.0;
+	Bool oneToMany;
 
 	/* Set the element type */
 	elementType         = FeMesh_GetElementType( mesh, lElement_I );
@@ -215,22 +217,59 @@ void _Compressible_AssembleElement(
 	/* Get number of particles per element */
 	cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
 	cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
+
+	/*
+	 * Keep a flag indicating whether we are usinga one-to-one swarm mapper or not.
+	 */
+
+	oneToMany = Stg_Class_IsInstance(((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, OneToManyMapper_Type);
 	
 	/* Loop over points to build Stiffness Matrix */
 	for ( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
 		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
 		lParticle_I = swarm->cellParticleTbl[cell_I][cParticle_I];
-		material = (RheologyMaterial*) IntegrationPointsSwarm_GetMaterialAt( swarm, lParticle_I );
 
-		/* Only make contribution to the compressibility matrix if this material is compressible */
-		if ( !material->compressible ) 
+		if(oneToMany) {
+		    /*
+		     * We're dealing with a one-to-many mapper. We will assemble each material point's
+		     * constitutive matrix and combine them using their weights.
+		     */
+
+		    OneToManyRef *ref;
+		    MaterialPointsSwarm *matSwarm;
+		    int isComp = 0;
+		    int ii;
+
+		    matSwarm = ((OneToManyMapper*)((IntegrationPointsSwarm*)swarm)->mapper)->materialSwarm;
+		    ref = OneToManyMapper_GetMaterialRef(((IntegrationPointsSwarm*)swarm)->mapper, particle);
+		    for(ii = 0; ii < ref->numParticles; ii++) {
+			material = (RheologyMaterial*)MaterialPointsSwarm_GetMaterialAt(matSwarm, ref->particleInds[ii]);
+			if(!material->compressible)
+			    continue;
+			isComp++;
+			oneOnLambda += material->compressible->oneOnLambda;
+		    }
+
+		    if(((float)isComp)/((float)ref->numParticles) < 0.5)
 			continue;
+		    oneOnLambda /= ((double)ref->numParticles);
+		}
+		else {
+
+		    material = (RheologyMaterial*) IntegrationPointsSwarm_GetMaterialAt( swarm, lParticle_I );
+
+		    /* Only make contribution to the compressibility matrix if this material is compressible */
+		    if ( !material->compressible ) 
+			continue;
+
+		    oneOnLambda = material->compressible->oneOnLambda;
+		}
 
 		/* Calculate Determinant of Jacobian and Shape Functions */
 		xi = particle->xi;
 		detJac = ElementType_JacobianDeterminant( geometryElementType, geometryMesh, lElement_I, xi, dim );
 		ElementType_EvaluateShapeFunctionsAt( elementType, xi, Ni );
-		factor = detJac * particle->weight * material->compressible->oneOnLambda;
+		factor = detJac * particle->weight * oneOnLambda;
 
 		for( row_I = 0 ; row_I < dofCount ; row_I++ ) {
 			for( col_I = 0 ; col_I < dofCount ; col_I++ ) {

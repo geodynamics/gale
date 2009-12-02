@@ -276,6 +276,7 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 	Dof_Index               nodeDofCount;
 	double**                Dtilda_B;
 	double                  vel[3], velDerivs[9], *Ni, eta;
+	Bool oneToMany;
 
 	self->sle = sle;
 
@@ -310,6 +311,14 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 		self->previousSolutionExists = sle->hasExecuted;
 	}
 	self->sleNonLinearIteration_I = sle->nonLinearIteration_I;
+
+
+	/*
+	 * Keep a flag indicating whether we are usinga one-to-one swarm mapper or not.
+	 */
+
+	oneToMany = Stg_Class_IsInstance(((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, OneToManyMapper_Type);
+
 	
 	/* Loop over points to build Stiffness Matrix */
 	for ( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
@@ -327,11 +336,47 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
                 FeVariable_InterpolateDerivatives_WithGNx(
                    variable1, lElement_I, GNx, velDerivs );
 
-		/* Assemble Constitutive Matrix */
-		// TODO : pass in the context here?
-		ConstitutiveMatrix_Assemble( constitutiveMatrix, lElement_I,
-                                             swarm->cellParticleTbl[cell_I][cParticle_I], particle );
-                eta = self->matrixData[2][2];
+		/*
+		 * Assemble constitutive matrix. Note that we have to handle one-to-many swarms
+		 * differently.
+		 */
+
+		if(!oneToMany) {
+		    // TODO : pass in the context here?
+		    ConstitutiveMatrix_Assemble( constitutiveMatrix, lElement_I,
+						 swarm->cellParticleTbl[cell_I][cParticle_I], particle );
+		}
+		else {
+		    /*
+		     * We're dealing with a one-to-many mapper. We will assemble each material point's
+		     * constitutive matrix and combine them using their weights.
+		     */
+
+		    OneToManyRef *ref;
+		    double **matrixData;
+		    int ii, jj, kk;
+
+		    matrixData = Memory_Alloc_2DArray(double, self->columnSize, self->rowSize, self->name);
+		    memset(matrixData[0], 0, self->columnSize*self->rowSize*sizeof(double));
+		    ref = OneToManyMapper_GetMaterialRef(((IntegrationPointsSwarm*)swarm)->mapper, particle);
+		    for(ii = 0; ii < ref->numParticles; ii++) {
+			/* Assemble this material point. */
+			ConstitutiveMatrix_AssembleMaterialPoint(
+			    constitutiveMatrix, lElement_I,
+			    ((OneToManyMapper*)((IntegrationPointsSwarm*)swarm)->mapper)->materialSwarm,
+			    ref->particleInds[ii]);
+			/* Add to cumulative matrix. */
+			for(jj = 0; jj < self->rowSize; jj++) {
+			    for(kk = 0; kk < self->columnSize; kk++)
+				matrixData[jj][kk] += ref->weights[ii]*self->matrixData[jj][kk];
+			}
+		    }
+		    /* Copy matrix data and free temporary array. */
+		    memcpy(self->matrixData[0], matrixData[0], self->columnSize*self->rowSize*sizeof(double));
+		    Memory_Free(matrixData);
+		}
+
+		eta = self->matrixData[2][2];
 
 		/* Turn D Matrix into D~ Matrix by multiplying in the weight and the detJac (this is a shortcut for speed) */
 		ConstitutiveMatrix_MultiplyByValue( constitutiveMatrix, detJac * particle->weight );
