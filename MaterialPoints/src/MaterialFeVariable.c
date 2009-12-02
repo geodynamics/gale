@@ -168,6 +168,7 @@ void _MaterialFeVariable_Build( void* materialFeVariable, void* data ) {
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	self->dataVariable = Variable_NewScalar( 
 		tmpName,
+		(AbstractContext*)self->context,
 		Variable_DataType_Double, 
 		&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
 		NULL,

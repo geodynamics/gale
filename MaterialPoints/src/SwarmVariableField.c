@@ -154,11 +154,12 @@ void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
 	self->dataVariable = Variable_NewScalar( tmpName,
-		       				 Variable_DataType_Double,
-						 &nDomainVerts,
-						 NULL,
-						 (void**)&self->data,
-						 self->variable_Register );
+		(AbstractContext*)self->context,
+		Variable_DataType_Double,
+		&nDomainVerts,
+		NULL,
+		(void**)&self->data,
+		self->variable_Register );
 	Memory_Free( tmpName );
 	self->fieldComponentCount = 1;
 
