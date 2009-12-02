@@ -60,8 +60,7 @@ char* ParticleFeVariable_names[10];
 int ParticleFeVariable_nNames = 0;
 int ParticleFeVariable_curName = 0;
 
-ParticleFeVariable* _ParticleFeVariable_New(  PARTICLEFEVARIABLE_DEFARGS  )
-{
+ParticleFeVariable* _ParticleFeVariable_New(  PARTICLEFEVARIABLE_DEFARGS  ) {
 	ParticleFeVariable* self;
 	
 	/* Allocate memory */
@@ -114,9 +113,6 @@ void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm*
 /* --- Virtual Function Implementations --- */
 void _ParticleFeVariable_Delete( void* materialFeVariable ) {
 	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
-
-	Memory_Free( self->assemblyVectorName );
-	Memory_Free( self->massMatrixName );
 
 	_FeVariable_Delete( self );
 }
@@ -217,7 +213,10 @@ void _ParticleFeVariable_Execute( void* materialFeVariable, void* _ctx ) {
 void _ParticleFeVariable_Destroy( void* materialFeVariable, void* data ) {
 	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
 
+	Memory_Free( self->assemblyVectorName );
+	Memory_Free( self->massMatrixName );
 	Memory_Free( self->data );
+
 	Stg_Component_Destroy( self->assemblyVector, data, False );
 	Stg_Component_Destroy( self->assemblyTerm, data, False );
 
@@ -227,11 +226,8 @@ void _ParticleFeVariable_Destroy( void* materialFeVariable, void* data ) {
 	_FeVariable_Destroy( self, data );
 }
 
-
 void ParticleFeVariable_Update( void* materialFeVariable ) {
 	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
-
-	/* printf( "***\n*** Updating %s\n***\n", self->name );   Why - shouldn't this be done properly ?? */
 
 	/* Initialise Vectors */
 	VecSet( self->assemblyVector->vector, 0.0 );
@@ -245,12 +241,11 @@ void ParticleFeVariable_Update( void* materialFeVariable ) {
 	SolutionVector_UpdateSolutionOntoNodes( self->assemblyVector );
 }
 
-void ParticleFeVariable_AssembleElement( void* _forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVector ) 
-{
+void ParticleFeVariable_AssembleElement( void* _forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVector ) {
 	ForceTerm*                 forceTerm         = (ForceTerm*) _forceTerm;
 	ParticleFeVariable*        self              = Stg_CheckType( forceVector->feVariable, ParticleFeVariable );
 	IntegrationPointsSwarm*    swarm             = (IntegrationPointsSwarm*)forceTerm->integrationSwarm;
-	FeMesh*        		   mesh              = self->feMesh;
+	FeMesh*							mesh              = self->feMesh;
 	Element_NodeIndex          elementNodeCount  = FeMesh_GetElementNodeSize( mesh, lElement_I );
 	ElementType*               elementType       = FeMesh_GetElementType( mesh, lElement_I );
 	Cell_Index                 cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
@@ -289,7 +284,7 @@ void ParticleFeVariable_AssembleElementShapeFunc( void* _forceTerm, ForceVector*
 	ForceTerm*                 forceTerm         = (ForceTerm*) _forceTerm;
 	ParticleFeVariable*        self              = Stg_CheckType( forceVector->feVariable, ParticleFeVariable );
 	Swarm*                     swarm             = forceTerm->integrationSwarm;
-	FeMesh*        		   mesh              = self->feMesh;
+	FeMesh*							mesh              = self->feMesh;
 	Element_NodeIndex          elementNodeCount  = FeMesh_GetElementNodeSize( mesh, lElement_I );
 	ElementType*               elementType       = FeMesh_GetElementType( mesh, lElement_I );
 	Cell_Index                 cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );

@@ -56,14 +56,12 @@
 
 const Type MaterialFeVariable_Type = "MaterialFeVariable";
 
-MaterialFeVariable* _MaterialFeVariable_New(  MATERIALFEVARIABLE_DEFARGS  )
-{
-	MaterialFeVariable*		self;
+MaterialFeVariable* _MaterialFeVariable_New(  MATERIALFEVARIABLE_DEFARGS  ) {
+	MaterialFeVariable* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(MaterialFeVariable) );
-	self = (MaterialFeVariable*)
-		_ParticleFeVariable_New(  PARTICLEFEVARIABLE_PASSARGS  );
+	self = (MaterialFeVariable*) _ParticleFeVariable_New(  PARTICLEFEVARIABLE_PASSARGS  );
 	
 	return self;
 }
@@ -74,7 +72,7 @@ void _MaterialFeVariable_Init( MaterialFeVariable* self, Material* material ) {
 	/* Assign Pointers */
 	swarm = Stg_CheckType( self->assemblyTerm->integrationSwarm, IntegrationPointsSwarm );
 	self->picIntegrationPoints = swarm;
-	self->material       = material;
+	self->material = material;
 }
 
 /* --- Virtual Function Implementations --- */
@@ -96,7 +94,6 @@ void _MaterialFeVariable_Print( void* materialFeVariable, Stream* stream ) {
 	/* MaterialFeVariable info */
 	Journal_PrintPointer( stream, self->material );
 }
-
 
 void* _MaterialFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	MaterialFeVariable*	self = (MaterialFeVariable*)feVariable;
@@ -185,27 +182,31 @@ void _MaterialFeVariable_Build( void* materialFeVariable, void* data ) {
 	
 	_ParticleFeVariable_Build( self, data );
 }
+
 void _MaterialFeVariable_Initialise( void* materialFeVariable, void* data ) {
 	MaterialFeVariable* self = (MaterialFeVariable*) materialFeVariable;
 
 	_ParticleFeVariable_Initialise( self, data );
 }
+
 void _MaterialFeVariable_Execute( void* materialFeVariable, void* data ) {
 	MaterialFeVariable* self = (MaterialFeVariable*) materialFeVariable;
 
 	_ParticleFeVariable_Execute( self, data );
 }
+
 void _MaterialFeVariable_Destroy( void* materialFeVariable, void* data ) {
 	MaterialFeVariable* self = (MaterialFeVariable*) materialFeVariable;
 
 	_ParticleFeVariable_Destroy( self, data );
 }
+
 void _MaterialFeVariable_ValueAtParticle( 
-		void*                   materialFeVariable,
-		IntegrationPointsSwarm* swarm,
-		Element_LocalIndex      lElement_I,
-		void*                   particle,
-		double*                 particleValue )
+	void*                   materialFeVariable,
+	IntegrationPointsSwarm* swarm,
+	Element_LocalIndex      lElement_I,
+	void*                   particle,
+	double*                 particleValue )
 {
 	MaterialFeVariable* self = (MaterialFeVariable*) materialFeVariable;
 	*particleValue = (double) ( self->material->index == IntegrationPointsSwarm_GetMaterialIndexOn( swarm, particle ) );
