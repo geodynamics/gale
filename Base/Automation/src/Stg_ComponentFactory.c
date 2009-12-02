@@ -745,8 +745,8 @@ Stg_Component* _Stg_ComponentFactory_PluginConstructByKey(
 	Journal_Firewall( self != NULL, errorStream, "In func %s: Stg_Component is NULL.\n", __func__ );
 
 	/* Get this plugins Dictionary */
-	for( pluginIndex = 0; pluginIndex < Dictionary_Entry_Value_GetCount( pluginDict ); pluginIndex++ ) {
-		thisPluginDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetElement( pluginDict, pluginIndex ) );
+	for( pluginIndex = 0; pluginIndex < Dictionary_Entry_Value_GetCount( (Dictionary_Entry_Value*)pluginDict ); pluginIndex++ ) {
+		thisPluginDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetElement( (Dictionary_Entry_Value*)pluginDict, pluginIndex ) );
 		pluginType = StG_Strdup( Dictionary_GetString( thisPluginDict, "Type" ) );
 
 		if( !strcmp( plugin->type, pluginType ) ){
@@ -797,8 +797,8 @@ Dictionary_Entry_Value* _Stg_ComponentFactory_PluginGetDictionaryValue( void* cf
 			"In func %s: Stg_Component Factory's dictionary is NULL.\n", __func__ );
 
 	/* Get this plugins Dictionary */
-	for( pluginIndex = 0; pluginIndex < Dictionary_Entry_Value_GetCount( pluginDict ); pluginIndex++ ) {
-		thisPluginDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetElement( pluginDict, pluginIndex ) );
+	for( pluginIndex = 0; pluginIndex < Dictionary_Entry_Value_GetCount( (Dictionary_Entry_Value*)pluginDict ); pluginIndex++ ) {
+		thisPluginDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetElement( (Dictionary_Entry_Value*)pluginDict, pluginIndex ) );
 		pluginType = StG_Strdup( Dictionary_GetString( thisPluginDict, "Type" ) );
 		if( !strcmp( plugin->type, pluginType ) ){
 		   Memory_Free( pluginType );
