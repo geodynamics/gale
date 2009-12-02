@@ -85,9 +85,9 @@ FeEquationNumber* buildEqNum() {
    arraySize = Mesh_GetDomainSize( feMesh, MT_VERTEX );
    arrayPtrs[0] = Memory_Alloc_Array_Unnamed( double, arraySize );
    arrayPtrs[1] = Memory_Alloc_Array_Unnamed( double, arraySize );
-   vars[0] = Variable_New( "one", 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
+   vars[0] = Variable_New( "one", NULL, 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
 		&dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs, varReg );
-   vars[1] = Variable_New( "two", 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
+   vars[1] = Variable_New( "two", NULL, 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
 		&dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs + 1, varReg );
 
    dofs = DofLayout_New( "", NULL, varReg, 0, feMesh );
@@ -153,9 +153,9 @@ FeEquationNumber* buildEqNumBCs() {
    arraySize = Mesh_GetDomainSize( feMesh, MT_VERTEX );
    arrayPtrs[0] = Memory_Alloc_Array_Unnamed( double, arraySize );
    arrayPtrs[1] = Memory_Alloc_Array_Unnamed( double, arraySize );
-   vars[0] = Variable_New( "one", 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
+   vars[0] = Variable_New( "one", NULL, 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
 		&dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs, varReg );
-	vars[1] = Variable_New( "two", 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
+	vars[1] = Variable_New( "two", NULL, 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
 		&dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs + 1, varReg );
 
    dofs = DofLayout_New( "", NULL, varReg, 0, feMesh );

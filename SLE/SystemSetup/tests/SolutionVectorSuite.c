@@ -66,7 +66,7 @@ FeVariable* SolutionVectorSuite_buildFeVar() {
 /*
    arrayPtrs[1] = Memory_Alloc_Array_Unnamed( double, arraySize );
 */
-   var = Variable_NewVector( "velocity", Variable_DataType_Double, 2, (unsigned*)&arraySize, NULL, 
+   var = Variable_NewVector( "velocity", NULL, Variable_DataType_Double, 2, (unsigned*)&arraySize, NULL, 
 		(void**)arrayPtrs, varReg, 
 		"vx", "vy" );
    Variable_Register_BuildAll( varReg );

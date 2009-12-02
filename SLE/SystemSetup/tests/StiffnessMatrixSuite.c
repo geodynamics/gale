@@ -62,7 +62,7 @@ FeVariable* buildFeVar() {
 
    arraySize = Mesh_GetDomainSize( feMesh, MT_VERTEX );
    arrayPtrs[0] = Memory_Alloc_Array_Unnamed( double, arraySize * 2 );
-   var = Variable_NewVector( "velocity", Variable_DataType_Double, 2, (unsigned*)&arraySize, NULL, 
+   var = Variable_NewVector( "velocity", NULL, Variable_DataType_Double, 2, (unsigned*)&arraySize, NULL, 
 		(void**)arrayPtrs, varReg, "vx", "vy" );
    Variable_Register_BuildAll( varReg );
 

@@ -187,13 +187,13 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 	variableRegister = Variable_Register_New();
 	
 	/* Create variables */
-	Variable_NewScalar( "phi", Variable_DataType_Double, &nDomainVerts, NULL, (void**)&nodes, variableRegister );
+	Variable_NewScalar( "phi", (AbstractContext*)context, Variable_DataType_Double, &nDomainVerts, NULL, (void**)&nodes, variableRegister );
 
-	dofs = DofLayout_New( "dofLayout", context, variableRegister, Mesh_GetDomainSize( feMesh, MT_VERTEX ), NULL );
+	dofs = DofLayout_New( "dofLayout", (DomainContext*)context, variableRegister, Mesh_GetDomainSize( feMesh, MT_VERTEX ), NULL );
 	for (i = 0; i < Mesh_GetDomainSize( feMesh, MT_VERTEX ); i++)
 		DofLayout_AddDof_ByVarName(dofs, "phi", i);
 	
-	wallVC = WallVC_New( "WallVC", context, "boundaryCondition", variableRegister, NULL, dictionary, feMesh );
+	wallVC = WallVC_New( "WallVC", (AbstractContext*)context, "boundaryCondition", variableRegister, NULL, dictionary, feMesh );
 
 	/* Create the finite element field variable*/
 	fV_Register = FieldVariable_Register_New();

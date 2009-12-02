@@ -460,7 +460,7 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 
 	if( componentsCount == 1 ) {
 		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts );
-		baseVariable = Variable_NewScalar( tmpName, Variable_DataType_Double, &nDomainVerts, NULL, (void**)&arrayPtr, variable_Register );
+		baseVariable = Variable_NewScalar( tmpName, (AbstractContext*)self->context, Variable_DataType_Double, &nDomainVerts, NULL, (void**)&arrayPtr, variable_Register );
 	}
 	else {
 		for( var_I = 0; var_I < componentsCount; var_I++ )
@@ -468,6 +468,7 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 
 		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts * componentsCount );
 		baseVariable = Variable_NewVector( tmpName, 
+							(AbstractContext*)self->context,
 						   Variable_DataType_Double, 
 						   componentsCount, 
 						   &nDomainVerts,
@@ -559,7 +560,7 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 
 	if( componentsCount == 1 ) {
 		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts );
-		baseVariable = Variable_NewScalar( tmpName, Variable_DataType_Double, &nDomainVerts, NULL, &arrayPtr, 
+		baseVariable = Variable_NewScalar( tmpName, (AbstractContext*)self->context, Variable_DataType_Double, &nDomainVerts, NULL, &arrayPtr, 
 						   variable_Register );
 	}
 	else {
@@ -567,7 +568,7 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 			Stg_asprintf( &varName[var_I], "%s-Component-%d", tmpName, var_I );
 
 		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts * componentsCount );
-		baseVariable = Variable_NewVector( tmpName, Variable_DataType_Double, componentsCount, &nDomainVerts, 
+		baseVariable = Variable_NewVector( tmpName, (AbstractContext*)self->context, Variable_DataType_Double, componentsCount, &nDomainVerts, 
 						   NULL, (void**)&arrayPtr, variable_Register,
 						   varName[0], varName[1], varName[2], varName[3], varName[4],
 						   varName[5], varName[6], varName[7], varName[8] );

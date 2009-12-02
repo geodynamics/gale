@@ -89,7 +89,7 @@ FeVariable* BuildFeVariable_AsPosition( unsigned dim ) {
 	arraySize = Mesh_GetDomainSize( feMesh, MT_VERTEX );
 	arrayPtrs[0] = Memory_Alloc_Array_Unnamed( double, arraySize * dim );
 
-	var = Variable_NewVector( "velocity", Variable_DataType_Double, dim, (unsigned*)&arraySize, NULL,
+	var = Variable_NewVector( "velocity", NULL, Variable_DataType_Double, dim, (unsigned*)&arraySize, NULL,
 		(void**)arrayPtrs, varReg, "vx", "vy", "vz" );
 	Variable_Register_BuildAll( varReg );
 
@@ -162,7 +162,7 @@ FeVariable* BuildFeVariable_AsConstant( unsigned dim ) {
 	arraySize = Mesh_GetDomainSize( feMesh, MT_VERTEX );
 	arrayPtr = Memory_Alloc_Array_Unnamed( double, arraySize );
 
-	var = Variable_NewScalar( "pressure", Variable_DataType_Double, (unsigned*)&arraySize, NULL,
+	var = Variable_NewScalar( "pressure", NULL, Variable_DataType_Double, (unsigned*)&arraySize, NULL,
 	                          (void**)&arrayPtr, varReg );
 	Variable_Register_BuildAll( varReg );
 

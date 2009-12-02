@@ -81,7 +81,6 @@ void _ElementType_Init( ElementType* self, Index nodeCount ) {
 	/* General and Virtual info should already be set */
 	self->dim = 0;
 	/* ElementType info */
-	self->isConstructed = True;
 	self->nodeCount = nodeCount;
 	self->debug = Stream_RegisterChild( StgFEM_Discretisation_Debug, ElementType_Type );
 	self->inc = IArray_New();

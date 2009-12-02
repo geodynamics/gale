@@ -328,6 +328,7 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 
 		variable = Variable_NewScalar( 
 			fieldName, 
+			(AbstractContext*)self->context,
 			Variable_DataType_Double, 
 			nodeDomainCountPtr, 
 			NULL,

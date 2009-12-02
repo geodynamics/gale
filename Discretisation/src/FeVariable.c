@@ -2656,12 +2656,13 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
 
    varReg = Variable_Register_New();
    if (self->fieldComponentCount == 1){
-      var = Variable_NewScalar( "interpolation_temp_scalar", Variable_DataType_Double, &nDomainVerts, NULL, &arrayPtr, varReg );
+      var = Variable_NewScalar( "interpolation_temp_scalar", (AbstractContext*)self->context, Variable_DataType_Double, &nDomainVerts, NULL, &arrayPtr, varReg );
    } else {
       unsigned var_I;
 		for( var_I = 0; var_I < self->fieldComponentCount; var_I++ )
 			Stg_asprintf( &varName[var_I], "%s-loaded-Component-%d", self->name, var_I );
       var = Variable_NewVector( "interpolation_temp_vector", 
+											(AbstractContext*)self->context,
                                  Variable_DataType_Double,
                                  self->fieldComponentCount,
                                  &nDomainVerts,

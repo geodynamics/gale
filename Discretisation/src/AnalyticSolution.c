@@ -447,6 +447,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 		sync = Mesh_GetSync( feVariable->feMesh, MT_VERTEX );
 		dataVariable = Variable_NewScalar( 	
 			tmpName,
+			(AbstractContext*)self->context,
 			Variable_DataType_Double, 
 			(unsigned*)&sync->nDomains, 
 			NULL,
@@ -466,6 +467,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 		}
 		dataVariable = Variable_NewVector( 	
 				tmpName,
+				(AbstractContext*)self->context,
 				Variable_DataType_Double, 
 				componentsCount,
 				(unsigned*)&sync->nDomains, 
