@@ -88,8 +88,8 @@ void* _UnderworldContext_DefaultNew( Name name ) {
 	Stg_Class_CopyFunction*                                  _copy = NULL;
 	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _UnderworldContext_DefaultNew;
 	Stg_Component_ConstructFunction*                    _construct = _UnderworldContext_AssignFromXML;
-	Stg_Component_BuildFunction*                            _build = (Stg_Component_BuildFunction*)_FiniteElementContext_Build;
-	Stg_Component_InitialiseFunction*                  _initialise = (Stg_Component_InitialiseFunction*)_FiniteElementContext_Initialise;
+	Stg_Component_BuildFunction*                            _build = _AbstractContext_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _AbstractContext_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = _AbstractContext_Execute;
 	Stg_Component_DestroyFunction*                        _destroy = (Stg_Component_DestroyFunction*)_UnderworldContext_Destroy;
 	AllocationType                              nameAllocationType = NON_GLOBAL;
