@@ -61,7 +61,6 @@ MeshVariable* MeshVariable_New( Name name ) {
 	Stg_Component_InitialiseFunction*                  _initialise = _MeshVariable_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = _MeshVariable_Execute;
 	Stg_Component_DestroyFunction*                        _destroy = _MeshVariable_Destroy;
-	Bool                                                  initFlag = False;
 	Index                                                dataCount = 0;
 	SizeT*                                             dataOffsets = NULL;
 	Variable_DataType*                                   dataTypes = NULL;
@@ -76,7 +75,11 @@ MeshVariable* MeshVariable_New( Name name ) {
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = ZERO;
 
-	return _MeshVariable_New(  MESHVARIABLE_PASSARGS  );
+	MeshVariable* self = _MeshVariable_New(  MESHVARIABLE_PASSARGS  );
+
+	_MeshVariable_Init( self );
+
+	return self;
 }
 
 MeshVariable* _MeshVariable_New(  MESHVARIABLE_DEFARGS  ) {
@@ -88,9 +91,6 @@ MeshVariable* _MeshVariable_New(  MESHVARIABLE_DEFARGS  ) {
 
 	/* Virtual info */
 
-	/* MeshVariable info */
-	_MeshVariable_Init( self );
-
 	return self;
 }
 
@@ -100,15 +100,12 @@ void _MeshVariable_Init( MeshVariable* self ) {
 	self->meshArraySize = 0;
 }
 
-
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */
 
 void _MeshVariable_Delete( void* meshVariable ) {
 	MeshVariable*	self = (MeshVariable*)meshVariable;
-
-	MeshVariable_Destruct( self );
 
 	/* Delete the parent. */
 	_Variable_Delete( self );
@@ -128,18 +125,19 @@ void _MeshVariable_Print( void* meshVariable, Stream* stream ) {
 
 void _MeshVariable_AssignFromXML( void* meshVariable, Stg_ComponentFactory* cf, void* data ) {
 	MeshVariable*		self = (MeshVariable*)meshVariable;
-	SizeT			    dataOffsets[]     = { 0 };
-	Variable_DataType	dataTypes[]       = { 0 };		/* Init value later */
-	Index			    dataTypeCounts[]  = { 1 };
-	Dictionary *        componentDict     = NULL;
-	Dictionary *        thisComponentDict = NULL;
-	Name                dataTypeName      = NULL;
-	Name                rankName          = NULL;
-	void *              variableRegister  = NULL;
-	void *              pointerRegister   = NULL;
-	Name*               names             = NULL;
-	Stream*             error             = Journal_Register( Error_Type, self->type );
-	Mesh*			mesh;
+	SizeT					dataOffsets[] = { 0 };
+	Variable_DataType	dataTypes[] = { 0 };		/* Init value later */
+	Index					dataTypeCounts[] = { 1 };
+	Dictionary*			componentDict = NULL;
+	Dictionary*			thisComponentDict = NULL;
+	Name					dataTypeName = NULL;
+	Name					rankName = NULL;
+	void*					variableRegister = NULL;
+	void*					pointerRegister = NULL;
+	Name*					names = NULL;
+	Stream*				error = Journal_Register( Error_Type, self->type );
+	Mesh*					mesh;
+	AbstractContext*	context;
 	
 	assert( self );
 
@@ -148,14 +146,14 @@ void _MeshVariable_AssignFromXML( void* meshVariable, Stg_ComponentFactory* cf, 
 	thisComponentDict = Dictionary_GetDictionary( componentDict, self->name );
 	assert( thisComponentDict );
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 	
 	/* Grab Registers */
-	variableRegister = self->context->variable_Register;
+	variableRegister = context->variable_Register;
 	assert( variableRegister );
-	pointerRegister = self->context->pointer_Register;
+	pointerRegister = context->pointer_Register;
 	assert( pointerRegister );
 
 	/* Construct the mesh. */
@@ -201,24 +199,12 @@ void _MeshVariable_AssignFromXML( void* meshVariable, Stg_ComponentFactory* cf, 
 		}
 		dataTypeCounts[0] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "VectorComponentCount", nameCount );
 
-		Journal_Firewall( nameCount >= dataTypeCounts[0], error,
-				"Variable '%s' has too few names in list for %d vector components.\n", self->name, dataTypeCounts[0] );
+		Journal_Firewall( nameCount >= dataTypeCounts[0], error, "Variable '%s' has too few names in list for %d vector components.\n", self->name, dataTypeCounts[0] );
 	}
 	else
 		Journal_Firewall( False, error, "Variable '%s' cannot understand rank '%s'\n", self->name, rankName );
 
-	_Variable_Init( (Variable*)self, 
-			1, 
-			dataOffsets, 
-			dataTypes, 
-			dataTypeCounts, 
-			names, 
-			0, 
-			NULL,
-			_MeshVariable_GetMeshArraySize,
-			(void**)&self->arrayPtr,
-			True, 
-			variableRegister );
+	_Variable_Init( (Variable*)self, context, 1, dataOffsets, dataTypes, dataTypeCounts, names, 0, NULL, _MeshVariable_GetMeshArraySize, (void**)&self->arrayPtr, True, variableRegister );
 
 	/* Clean Up */
 	if (names)
@@ -249,9 +235,10 @@ void _MeshVariable_Execute( void* meshVariable, void* data ) {
 void _MeshVariable_Destroy( void* meshVariable, void* data ) {
 	MeshVariable*	self = (MeshVariable*)meshVariable;
 
-    Stg_Component_Destroy( self->mesh, data, False );
-}
+	MeshVariable_Destruct( self );
 
+	Stg_Component_Destroy( self->mesh, data, False );
+}
 
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
@@ -259,7 +246,7 @@ void _MeshVariable_Destroy( void* meshVariable, void* data ) {
 
 void MeshVariable_SetMesh( void* meshVariable, void* _mesh ) {
 	MeshVariable*	self = (MeshVariable*)meshVariable;
-	Mesh*		mesh = (Mesh*)_mesh;
+	Mesh*				mesh = (Mesh*)_mesh;
 
 	assert( self );
 
@@ -279,7 +266,7 @@ void MeshVariable_Destruct( MeshVariable* self ) {
 }
 
 Index _MeshVariable_GetMeshArraySize( void* meshVariable ) {
-	MeshVariable*	self = (MeshVariable*)meshVariable;
+	MeshVariable* self = (MeshVariable*)meshVariable;
 
 	return Mesh_GetDomainSize( self->mesh, self->topoDim );
 }

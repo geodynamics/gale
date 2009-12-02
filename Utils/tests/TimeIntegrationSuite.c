@@ -189,8 +189,8 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	/* Create Stuff */
 	order							= _order;
 	simultaneous				= False;
-	variableList[0]			= Variable_NewVector( "testVariable",  Variable_DataType_Double, 2, &size0, NULL, (void**)&array, NULL );
-	variableList[1]			= Variable_NewVector( "testVariable2", Variable_DataType_Double, 2, &size1, NULL, (void**)&array2, NULL );
+	variableList[0]			= Variable_NewVector( "testVariable", (AbstractContext*)context, Variable_DataType_Double, 2, &size0, NULL, (void**)&array, NULL );
+	variableList[1]			= Variable_NewVector( "testVariable2", (AbstractContext*)context, Variable_DataType_Double, 2, &size1, NULL, (void**)&array2, NULL );
 	timeIntegrator				= TimeIntegrator_New( "testTimeIntegrator", order, simultaneous, NULL, NULL );
 	timeIntegrator->context	= context;
 	timeIntegrateeList[0]	= TimeIntegratee_New( "testTimeIntegratee0", context, timeIntegrator, variableList[0], 0, NULL, True );

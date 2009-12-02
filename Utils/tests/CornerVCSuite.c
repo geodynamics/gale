@@ -115,7 +115,6 @@ void CornerVCSuite_TestCornerVC( CornerVCSuiteData* data ) {
 	ConditionFunction*				quadCF;
 	ConditionFunction_Register*	conFunc_Register;
 	ExtensionManager_Register*		extensionMgr_Register;
-	DomainContext*						context;
 	Dictionary*							dictionary;
 	Stream*								stream;
 	XML_IO_Handler*					io_handler;
@@ -153,7 +152,7 @@ void CornerVCSuite_TestCornerVC( CornerVCSuiteData* data ) {
 	/* Create variables */
 	for (i = 0; i < 7; i++) {
 		array[i] = Memory_Alloc_Array( double, nDomains, "array[i]" );
-      var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &nDomains, NULL, (void**)&array[i], 0 );
+      var[i] = Variable_NewScalar( varName[i], NULL, Variable_DataType_Double, &nDomains, NULL, (void**)&array[i], 0 );
 		Variable_Register_Add(variable_Register, var[i]);
 	}
 

@@ -648,17 +648,18 @@ Variable* Variable_NewFromOld( Variable* oldVariable, Name name, Bool copyValues
 	Variable_Update( oldVariable );
 
 	self = Variable_New(  
-			name,
-			1,
-			dataOffsets,
-			oldVariable->dataTypes,
-			oldVariable->dataTypeCounts,
-			NULL,
-			0,
-			oldVariable->arraySizePtr,
-			oldVariable->arraySizeFunc,
-			NULL,
-			NULL );
+		name,
+		self->context,
+		1,
+		dataOffsets,
+		oldVariable->dataTypes,
+		oldVariable->dataTypeCounts,
+		NULL,
+		0,
+		oldVariable->arraySizePtr,
+		oldVariable->arraySizeFunc,
+		NULL,
+		NULL );
 
 	self->allocateSelf = True;
 	self->arrayPtrPtr = &self->arrayPtr;

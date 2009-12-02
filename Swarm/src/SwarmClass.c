@@ -1381,6 +1381,7 @@ SwarmVariable* Swarm_NewScalarVariable(
 	name = Stg_Object_AppendSuffix( self, nameExt );
 	variable = Variable_New( 
 		name,
+		self->context,
 		1, 
 		dataOffsets, 
 		dataTypes, 
@@ -1446,6 +1447,7 @@ SwarmVariable* Swarm_NewVectorVariable(
 	/* Construct */
 	variable = Variable_New( 
 		name,
+		self->context,
 		1, 
 		dataOffsets, 
 		dataTypes, 

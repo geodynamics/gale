@@ -153,11 +153,11 @@ void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
 	/* Create variables */
    for (i = 0; i < 6; i++) {
       array[i] = Memory_Alloc_Array( double, nDomains, "array[i]" );
-      var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &nDomains, NULL, (void**)&array[i], 0 );
+      var[i] = Variable_NewScalar( varName[i], NULL, Variable_DataType_Double, &nDomains, NULL, (void**)&array[i], 0 );
       Variable_Register_Add(variable_Register, var[i]);
    }
    array[6] = Memory_Alloc_Array( double, nDomains*5, "array[6]" );
-   var[6] = Variable_NewVector( varName[6], Variable_DataType_Double, 5, &nDomains, NULL, (void**)&array[6], 0 );
+   var[6] = Variable_NewVector( varName[6], NULL, Variable_DataType_Double, 5, &nDomains, NULL, (void**)&array[6], 0 );
    Variable_Register_Add(variable_Register, var[6]);
    Variable_Register_BuildAll(variable_Register);
 
@@ -282,11 +282,11 @@ void CompositeVCSuite_TestCompositeVCDictionary( CompositeVCSuiteData* data ) {
 	/* Create variables */
 	for (i = 0; i < 6; i++) {
 		array[i] = Memory_Alloc_Array( double, 3*3*3, "array[i]" );
-		var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &nDomains, NULL, (void**)&array[i], 0 );
+		var[i] = Variable_NewScalar( varName[i], NULL, Variable_DataType_Double, &nDomains, NULL, (void**)&array[i], 0 );
  		Variable_Register_Add(variable_Register, var[i]);
 	}
 	array[6] = Memory_Alloc_Array( double, 3*3*3*5, "array[6]" );
-	var[6] = Variable_NewVector( varName[6], Variable_DataType_Double, 5, &nDomains, NULL, (void**)&array[6], 0 );
+	var[6] = Variable_NewVector( varName[6], NULL, Variable_DataType_Double, 5, &nDomains, NULL, (void**)&array[6], 0 );
 	Variable_Register_Add(variable_Register, var[6]);
 	Variable_Register_BuildAll(variable_Register);
 

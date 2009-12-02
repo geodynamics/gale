@@ -123,7 +123,8 @@ void _ShapeAdvector_Init(
 	self->shapeCount = 1;
 	self->shapeCentrePtr = shape->centre;
 
-	self->shapeCentreVariable = Variable_NewVector( "shapeCentreVariable", Variable_DataType_Double, shape->dim, &self->shapeCount, NULL,  &self->shapeCentrePtr, NULL );
+	self->shapeCentreVariable = Variable_NewVector( "shapeCentreVariable", (AbstractContext*)self->context,
+		Variable_DataType_Double, shape->dim, &self->shapeCount, NULL,  &self->shapeCentrePtr, NULL );
 	self->timeIntegratee = TimeIntegratee_New( "shapeTimeIntegratee", self->context, timeIntegrator, self->shapeCentreVariable, 1,
 		(Stg_Component**) &velocityField, allowFallbackToFirstOrder );
 }
