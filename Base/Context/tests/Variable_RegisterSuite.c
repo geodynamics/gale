@@ -67,7 +67,7 @@ void Variable_RegisterSuite_TestAddGet( Variable_RegisterSuiteData* data ) {
    Index		   	i;
 
    for (i = 0; i < 10; i++) {
-      var[i] = Variable_NewVector( name[i], Variable_DataType_Double, 4, &arraySize, NULL, (void**)&array, 0 );
+      var[i] = Variable_NewVector( name[i], NULL, Variable_DataType_Double, 4, &arraySize, NULL, (void**)&array, 0 );
    }
 
    for (i = 0; i < 10; i++)

@@ -60,13 +60,12 @@
 	
 	struct _CompositeVC { __CompositeVC };
 	
-
-
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
 	VariableCondition* CompositeVC_Factory(
+		AbstractContext*					context,
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register,
 		Dictionary*							dictionary,
@@ -74,6 +73,7 @@
 	
 	CompositeVC* CompositeVC_New(
 		Name									name,
+		AbstractContext*					context,
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register,
 		Dictionary*							dictionary,

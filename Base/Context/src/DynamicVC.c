@@ -54,16 +54,19 @@ const Name defaultDynamicVCName = "defaultDynamicVCName";
 ** Constructor
 */
 
-VariableCondition* DynamicVC_Factory( Variable_Register* varReg, 
-	ConditionFunction_Register* conFuncReg, 
-	Dictionary* dict, 
-	void* data )
+VariableCondition* DynamicVC_Factory(
+	AbstractContext*					context,
+	Variable_Register*				varReg, 
+	ConditionFunction_Register*	conFuncReg, 
+	Dictionary*							dict, 
+	void*									data )
 {
-	return (VariableCondition*)DynamicVC_New( defaultDynamicVCName, varReg, conFuncReg, dict );
+	return (VariableCondition*)DynamicVC_New( defaultDynamicVCName, context, varReg, conFuncReg, dict );
 }
 
 DynamicVC* DynamicVC_New(
 	Name									name,
+	AbstractContext*					context,
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register, 
 	Dictionary*							dictionary )
@@ -71,7 +74,7 @@ DynamicVC* DynamicVC_New(
 	DynamicVC* self = _DynamicVC_DefaultNew( name );
 
 	self->isConstructed = True;
-	_VariableCondition_Init( self, variable_Register, conFunc_Register, dictionary );
+	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, dictionary );
 	_DynamicVC_Init( self );	
 
 	return self;

@@ -67,32 +67,32 @@
 
 	/* See Variable */
 	#define __Variable \
-		/* General info */ 					\
-		__Stg_Component						\
-									\
-		AbstractContext*		context;		\
-		/* Virtual info */ 					\
-									\
-		/* Variable info */ 					\
-		Index				offsetCount; 		/**< Number of fields in this variable. */ \
-		SizeT*				offsets; 		/**< The offset in bytes these fields are in the struct.*/ \
-		Variable_DataType*		dataTypes;		/**< A list of original data types. */ \
-		Index*				dataTypeCounts;		/**< A list of the number of data. */ \
-		SizeT*				structSizePtr; 		/**< A pointer to the size of the structure. */ \
-		void**				arrayPtrPtr; 		/**< A pointer to a pointer to the 1D array data. */ \
-		Index*				arraySizePtr; 		/**< A ptr to the size/count of the 1D array data. Note that if this is NULL, the arraySizeFunc will be used */ \
-		Variable_ArraySizeFunc*		arraySizeFunc; 		/**< A func ptr to the size/count of the 1D array data. */ \
-									\
-		SizeT*				dataSizes; 		/**< The size in bytes of each field in this variable. */ \
-		SizeT				structSize; 		/**< The size of the structure. */ \
-		void*				arrayPtr; 		/**< A pointer to the 1D array of structures. */ \
-		Index				arraySize; 		/**< The size/count of the 1D array of structures. */ \
-		Index                           subVariablesCount;      /**< The number of subvariables. Necessary since determined by whether user passes in names or not at init time. */ \
-		Variable**			components;		/**< For each component of this variable that we made a variable for, the pointer to the variable. */ \
-		Bool				allocateSelf;		\
-		Variable_Register*		vr;			\
-									\
-		Variable*			parent;
+		/* General info */ \
+		__Stg_Component \
+		\
+		AbstractContext*			context; \
+		/* Virtual info */ \
+		\
+		/* Variable info */ \
+		Index							offsetCount; /**< Number of fields in this variable. */ \
+		SizeT*						offsets; /**< The offset in bytes these fields are in the struct.*/ \
+		Variable_DataType*		dataTypes; /**< A list of original data types. */ \
+		Index*						dataTypeCounts; /**< A list of the number of data. */ \
+		SizeT*						structSizePtr; /**< A pointer to the size of the structure. */ \
+		void**						arrayPtrPtr; /**< A pointer to a pointer to the 1D array data. */ \
+		Index*						arraySizePtr; /**< A ptr to the size/count of the 1D array data. Note that if this is NULL, the arraySizeFunc will be used */ \
+		Variable_ArraySizeFunc*	arraySizeFunc; /**< A func ptr to the size/count of the 1D array data. */ \
+		\
+		SizeT*						dataSizes; /**< The size in bytes of each field in this variable. */ \
+		SizeT							structSize; /**< The size of the structure. */ \
+		void*							arrayPtr; /**< A pointer to the 1D array of structures. */ \
+		Index							arraySize; /**< The size/count of the 1D array of structures. */ \
+		Index							subVariablesCount; /**< The number of subvariables. Necessary since determined by whether user passes in names or not at init time. */ \
+		Variable**					components; /**< For each component of this variable that we made a variable for, the pointer to the variable. */ \
+		Bool							allocateSelf; \
+		Variable_Register*		vr; \
+		\
+		Variable*					parent;
 
 	struct _Variable { __Variable };
 
@@ -100,8 +100,6 @@
 	** Constructors
 	*/
 
-
-	
 	/** Creates a new Variable. A Variable holds the run-time information of a complex data type created by the programmer.
 	  * Essentially it associates a textual name to a variable in the program that the user can use to access or modify.
 	  *
@@ -120,20 +118,20 @@
 	  * size of the struct, the size of the array and the pointer to the array are provided as pointers to this information, of
 	  * which will get resolved/dereferenced at the build phase. */
 	Variable* Variable_New( 
-		Name						name,
-		Index						dataCount,
-		SizeT*						dataOffsets,
-		Variable_DataType*				dataTypes,
-		Index*						dataTypeCounts,
-		Name*						dataNames,
-		SizeT*						structSizePtr,
-		Index*						arraySizePtr,
-		Variable_ArraySizeFunc*				arraySizeFunc,
-		void**						arrayPtrPtr,
-		Variable_Register*				vr );
+		Name								name,
+		AbstractContext*				context,
+		Index								dataCount,
+		SizeT*							dataOffsets,
+		Variable_DataType*			dataTypes,
+		Index*							dataTypeCounts,
+		Name*								dataNames,
+		SizeT*							structSizePtr,
+		Index*							arraySizePtr,
+		Variable_ArraySizeFunc*		arraySizeFunc,
+		void**							arrayPtrPtr,
+		Variable_Register*			vr );
 	
-	
-	Variable* Variable_DefaultNew( Name name );
+	Variable* _Variable_DefaultNew( Name name );
 	
 	/** Creates a new Variable. A Variable holds the run-time information of a complex data type created by the programmer.
 	  * Essentially it associates a textual name to a variable in the program that the user can use to access or modify.
@@ -143,12 +141,13 @@
 	  * This constructor is a shortcut to create a Variable of a scalar in an array. The stride/struct size is the size
 	  * of the dataType. There is no casting. */
 	Variable* Variable_NewScalar( 
-		Name						name,
+		Name								name,
+		AbstractContext*				context,
 		Variable_DataType				dataType,
-		Index*						arraySizePtr,
-		Variable_ArraySizeFunc*				arraySizeFunc,
-		void**						arrayPtrPtr,
-		Variable_Register*				vr );
+		Index*							arraySizePtr,
+		Variable_ArraySizeFunc*		arraySizeFunc,
+		void**							arrayPtrPtr,
+		Variable_Register*			vr );
 	
 	/** Creates a new Variable. A Variable holds the run-time information of a complex data type created by the programmer.
 	  * Essentially it associates a textual name to a variable in the program that the user can use to access or modify.
@@ -159,24 +158,26 @@
 	  * optional and are specified via the variable arguement list at the end. A 0 value signifies no name for the associated
 	  * vector component. The stride/struct size is the size of the dataType. There is no casting.*/
 	Variable* Variable_NewVector( 
-		Name						name,
+		Name								name,
+		AbstractContext*				context,
 		Variable_DataType				dataType,
-		Index						dataTypeCount,
-		Index*						arraySizePtr,
-		Variable_ArraySizeFunc*			        arraySizeFunc,
-		void**						arrayPtrPtr,
-		Variable_Register*				vr,
+		Index								dataTypeCount,
+		Index*							arraySizePtr,
+		Variable_ArraySizeFunc*		arraySizeFunc,
+		void**							arrayPtrPtr,
+		Variable_Register*			vr,
 		... 						/* vector component names */ );
 
 	Variable* Variable_NewVector2( 
-		Name						name,
+		Name								name,
+		AbstractContext*				context,
 		Variable_DataType				dataType,
-		Index						dataTypeCount,
-		Index*						arraySizePtr,
-		Variable_ArraySizeFunc*				arraySizeFunc,
-		void**						arrayPtrPtr,
-		Variable_Register*				vr,
-		char**						dataNames );
+		Index								dataTypeCount,
+		Index*							arraySizePtr,
+		Variable_ArraySizeFunc*		arraySizeFunc,
+		void**							arrayPtrPtr,
+		Variable_Register*			vr,
+		char**							dataNames );
 	
 	/** Constructor interface. */
 	
@@ -185,66 +186,48 @@
 	#endif
 
 	#define VARIABLE_DEFARGS \
-                STG_COMPONENT_DEFARGS, \
-                Bool                           initFlag, \
-                Index                         dataCount, \
-                SizeT*                      dataOffsets, \
-                Variable_DataType*            dataTypes, \
-                Index*                   dataTypeCounts, \
-                Name*                         dataNames, \
-                SizeT*                    structSizePtr, \
-                Index*                     arraySizePtr, \
-                Variable_ArraySizeFunc*   arraySizeFunc, \
-                void**                      arrayPtrPtr, \
-                Variable_Register*                   vr
+		STG_COMPONENT_DEFARGS, \
+			Index                         dataCount, \
+			SizeT*                      dataOffsets, \
+			Variable_DataType*            dataTypes, \
+			Index*                   dataTypeCounts, \
+			Name*                         dataNames, \
+			SizeT*                    structSizePtr, \
+			Index*                     arraySizePtr, \
+			Variable_ArraySizeFunc*   arraySizeFunc, \
+			void**                      arrayPtrPtr, \
+			Variable_Register*                   vr
 
 	#define VARIABLE_PASSARGS \
-                STG_COMPONENT_PASSARGS, \
-	        initFlag,       \
-	        dataCount,      \
-	        dataOffsets,    \
-	        dataTypes,      \
-	        dataTypeCounts, \
-	        dataNames,      \
-	        structSizePtr,  \
-	        arraySizePtr,   \
-	        arraySizeFunc,  \
-	        arrayPtrPtr,    \
-	        vr            
+		STG_COMPONENT_PASSARGS, \
+			dataCount, \
+			dataOffsets, \
+			dataTypes, \
+			dataTypeCounts, \
+			dataNames, \
+			structSizePtr, \
+			arraySizePtr, \
+			arraySizeFunc, \
+			arrayPtrPtr, \
+			vr            
 
 	Variable* _Variable_New(  VARIABLE_DEFARGS  );
-	
-	
-	/** Initialise a Variable */
-	void Variable_Init(
-		Name						name,
-		Variable*					self,
-		Index						dataCount,
-		SizeT*						dataOffsets,
-		Variable_DataType*				dataTypes,
-		Index*						dataTypeCounts,
-		Name*						dataNames,
-		SizeT*						structSizePtr,
-		Index*						arraySizePtr,
-		Variable_ArraySizeFunc*				arraySizeFunc,
-		void**						arrayPtrPtr,
-		Bool						allocateSelf,
-		Variable_Register*				vr );
 	
 	/** Init interface. */
 	void _Variable_Init(
 		Variable*					self, 
-		Index						dataCount,
+		AbstractContext*			context,
+		Index							dataCount,
 		SizeT*						dataOffsets,
-		Variable_DataType*				dataTypes,
+		Variable_DataType*		dataTypes,
 		Index*						dataTypeCounts,
-		Name*						dataNames,
+		Name*							dataNames,
 		SizeT*						structSizePtr,
 		Index*						arraySizePtr,
-		Variable_ArraySizeFunc*				arraySizeFunc,
+		Variable_ArraySizeFunc*	arraySizeFunc,
 		void**						arrayPtrPtr,
-		Bool						allocateSelf,
-		Variable_Register*				vr );
+		Bool							allocateSelf,
+		Variable_Register*		vr );
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------

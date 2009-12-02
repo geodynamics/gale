@@ -76,6 +76,7 @@ void LiveComponentRegisterSuite_TestGet( LiveComponentRegisterSuiteData* data ) 
 
    var = Variable_NewScalar(
       "Scalar",
+		NULL,
       Variable_DataType_Float,
       &length,
       NULL,
@@ -84,6 +85,7 @@ void LiveComponentRegisterSuite_TestGet( LiveComponentRegisterSuiteData* data ) 
 
    vec = Variable_NewVector(
       "Three",
+		NULL,
       Variable_DataType_Float,
       3,
       &length,

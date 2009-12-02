@@ -42,7 +42,7 @@
 	
 
 	/* Child classes must define these factories */
-	typedef VariableCondition*	(VariableCondition_Register_FactoryFunc)	( Variable_Register* variable_Register, ConditionFunction_Register* conFunc_Register, Dictionary* dictionary, void* data );
+	typedef VariableCondition*	(VariableCondition_Register_FactoryFunc)	( AbstractContext* context, Variable_Register* variable_Register, ConditionFunction_Register* conFunc_Register, Dictionary* dictionary, void* data );
 	
 	
 	/** Textual name of this class */
@@ -125,12 +125,13 @@
 	
 	/* Create a new instance of a type */
 	VariableCondition* VariableCondition_Register_CreateNew(
-				void* variableCondition_Register, 
-				void* variable_Register, 
-				void* conFunc_Register, 
-				Type type, 
-				void* dictionary, 
-				void* data );
+		void* context,
+		void* variableCondition_Register, 
+		void* variable_Register, 
+		void* conFunc_Register, 
+		Type type, 
+		void* dictionary, 
+		void* data );
 	
 #endif /* __Base_Automation_VariableCondition_Register_h__ */
 

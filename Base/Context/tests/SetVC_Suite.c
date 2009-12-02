@@ -110,20 +110,20 @@ void SetVC_Suite_Setup( SetVC_SuiteData* data ) {
    /* Create variables */
    for (ii = 0; ii < (TEMP_INDEX); ii++) {
       data->array[ii] = Memory_Alloc_Array( double, data->arraySize, "data->array[]" );
-      data->var[ii] = Variable_NewScalar( data->varNames[ii], Variable_DataType_Double, &data->arraySize, NULL,
+      data->var[ii] = Variable_NewScalar( data->varNames[ii], NULL, Variable_DataType_Double, &data->arraySize, NULL,
          (void**)&data->array[ii], 0 ); 
       Variable_Register_Add(data->vr, data->var[ii]);
    }
 
    data->array[TEMP_INDEX] = Memory_Alloc_Array( double , data->arraySize*TEMP_VAR_ARRAYSIZE, "data->array[TEMP_INDEX]" );
-   data->var[TEMP_INDEX] = Variable_NewVector( data->varNames[TEMP_INDEX], Variable_DataType_Double, TEMP_VAR_ARRAYSIZE,
+   data->var[TEMP_INDEX] = Variable_NewVector( data->varNames[TEMP_INDEX], NULL, Variable_DataType_Double, TEMP_VAR_ARRAYSIZE,
        &data->arraySize, NULL, (void**)&data->array[TEMP_INDEX], 0, "a", "b", "c", "d", "e" );
    Variable_Register_Add( data->vr, data->var[TEMP_INDEX] );
 
    Variable_Register_BuildAll( data->vr );
    
    /* Create the VC */
-   data->vc = (VariableCondition*)SetVC_New( "setVC", "setVC", data->vr, data->conFunc_Register, data->dict );
+   data->vc = (VariableCondition*)SetVC_New( "setVC", NULL, "setVC", data->vr, data->conFunc_Register, data->dict );
    Stg_Component_Build( data->vc, 0, False );
 
    /* Blank the memory to be applied to before the test */

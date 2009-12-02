@@ -51,18 +51,20 @@ extern const Type DynamicVC_Type;
 
 	struct DynamicVC { __DynamicVC };
 
-
-
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 
-	VariableCondition* DynamicVC_Factory( Variable_Register* varReg, 
+	VariableCondition* DynamicVC_Factory(
+		AbstractContext*					context,
+		Variable_Register*				varReg, 
 		ConditionFunction_Register*	conFuncReg, 
 		Dictionary*							dict, 
 		void*									data );
 
-	DynamicVC* DynamicVC_New( Name name,
+	DynamicVC* DynamicVC_New(
+		Name									name,
+		AbstractContext*					context,
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register,
 		Dictionary*							dict );
