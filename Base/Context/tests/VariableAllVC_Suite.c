@@ -88,7 +88,7 @@ void VariableAllVC_Suite_Setup( VariableAllVC_SuiteData* data ) {
    Stg_asprintf( &data->vcKey, "VariableAllVC" );
    VariableAllVC_Suite_CreateDictEntries( data );
 
-   data->var = Variable_NewScalar( "test", Variable_DataType_Double, &data->arraySize, NULL, (void**)&data->testArray, data->vr );
+   data->var = Variable_NewScalar( "test", NULL, Variable_DataType_Double, &data->arraySize, NULL, (void**)&data->testArray, data->vr );
       
    Variable_Register_BuildAll(data->vr);
    

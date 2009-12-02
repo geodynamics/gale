@@ -58,17 +58,18 @@ const Type Variable_Type = "Variable";
 */
 
 Variable* Variable_New(
-		Name						name,
-		Index						dataCount,
-		SizeT*						dataOffsets,
-		Variable_DataType*				dataTypes,
-		Index*						dataTypeCounts,
-		Name*						dataNames,
-		SizeT*						structSizePtr,
-		Index*						arraySizePtr,
-		Variable_ArraySizeFunc*				arraySizeFunc,
-		void**						arrayPtrPtr,
-		Variable_Register*				vr )
+	Name								name,
+	AbstractContext*				context,
+	Index								dataCount,
+	SizeT*							dataOffsets,
+	Variable_DataType*			dataTypes,
+	Index*							dataTypeCounts,
+	Name*								dataNames,
+	SizeT*							structSizePtr,
+	Index*							arraySizePtr,
+	Variable_ArraySizeFunc*		arraySizeFunc,
+	void**							arrayPtrPtr,
+	Variable_Register*			vr )
 {
 	/* Variables set in this function */
 	SizeT                                              _sizeOfSelf = sizeof(Variable);
@@ -76,39 +77,37 @@ Variable* Variable_New(
 	Stg_Class_DeleteFunction*                              _delete = _Variable_Delete;
 	Stg_Class_PrintFunction*                                _print = _Variable_Print;
 	Stg_Class_CopyFunction*                                  _copy = _Variable_Copy;
-	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_Variable_DefaultNew;
 	Stg_Component_ConstructFunction*                    _construct = _Variable_AssignFromXML;
 	Stg_Component_BuildFunction*                            _build = _Variable_Build;
 	Stg_Component_InitialiseFunction*                  _initialise = _Variable_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = _Variable_Execute;
 	Stg_Component_DestroyFunction*                        _destroy = _Variable_Destroy;
-	Bool                                                  initFlag = True;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = ZERO;
 
-	Variable*	self;
-	
-	self = _Variable_New(  VARIABLE_PASSARGS  );
+	Variable* self = _Variable_New(  VARIABLE_PASSARGS  );
+
+	self->isConstructed = True;
+	_Variable_Init( self, context, dataCount, dataOffsets, dataTypes, dataTypeCounts, dataNames, structSizePtr, arraySizePtr, arraySizeFunc, arrayPtrPtr, False, vr );
 	
 	return self;
 }
 
-Variable* Variable_DefaultNew( Name name )
-{
+Variable* _Variable_DefaultNew( Name name ) {
 	/* Variables set in this function */
 	SizeT                                              _sizeOfSelf = sizeof(Variable);
 	Type                                                      type = Variable_Type;
 	Stg_Class_DeleteFunction*                              _delete = _Variable_Delete;
 	Stg_Class_PrintFunction*                                _print = _Variable_Print;
 	Stg_Class_CopyFunction*                                  _copy = _Variable_Copy;
-	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_Variable_DefaultNew;
 	Stg_Component_ConstructFunction*                    _construct = _Variable_AssignFromXML;
 	Stg_Component_BuildFunction*                            _build = _Variable_Build;
 	Stg_Component_InitialiseFunction*                  _initialise = _Variable_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = _Variable_Execute;
 	Stg_Component_DestroyFunction*                        _destroy = _Variable_Destroy;
-	Bool                                                  initFlag = False;
 	Index                                                dataCount = 0;
 	SizeT*                                             dataOffsets = NULL;
 	Variable_DataType*                                   dataTypes = NULL;
@@ -123,20 +122,19 @@ Variable* Variable_DefaultNew( Name name )
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = ZERO;
 
-	Variable*	self;
-	
-	self = _Variable_New(  VARIABLE_PASSARGS  );
+	Variable* self = _Variable_New(  VARIABLE_PASSARGS  );
 	
 	return self;
 }
 
 Variable* Variable_NewScalar( 
-		Name						name,
-		Variable_DataType				dataType,
-		Index*						arraySizePtr,
-		Variable_ArraySizeFunc*				arraySizeFunc,
-		void**						arrayPtrPtr,
-		Variable_Register*				vr )
+	Name							name,
+	AbstractContext*			context,
+	Variable_DataType			dataType,
+	Index*						arraySizePtr,
+	Variable_ArraySizeFunc*	arraySizeFunc,
+	void**						arrayPtrPtr,
+	Variable_Register*		vr )
 {
 	/* Variables set in this function */
 	SizeT                                              _sizeOfSelf = sizeof(Variable);
@@ -144,13 +142,12 @@ Variable* Variable_NewScalar(
 	Stg_Class_DeleteFunction*                              _delete = _Variable_Delete;
 	Stg_Class_PrintFunction*                                _print = _Variable_Print;
 	Stg_Class_CopyFunction*                                  _copy = _Variable_Copy;
-	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_Variable_DefaultNew;
 	Stg_Component_ConstructFunction*                    _construct = _Variable_AssignFromXML;
 	Stg_Component_BuildFunction*                            _build = _Variable_Build;
 	Stg_Component_InitialiseFunction*                  _initialise = _Variable_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = _Variable_Execute;
 	Stg_Component_DestroyFunction*                        _destroy = _Variable_Destroy;
-	Bool                                                  initFlag = True;
 	Index                                                dataCount = 1;
 	Name*                                                dataNames = 0;
 	SizeT*                                           structSizePtr = 0;
@@ -158,27 +155,31 @@ Variable* Variable_NewScalar(
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = ZERO;
 
-	Variable*		self;
-	SizeT			dataOffsets[] = { 0 };
+	Variable*			self;
+	SizeT					dataOffsets[] = { 0 };
 	Variable_DataType	dataTypes[] = { 0 };		/* Init value later */
-	Index			dataTypeCounts[] = { 1 };
+	Index					dataTypeCounts[] = { 1 };
 	
 	dataTypes[0] = dataType;
 	
 	self = _Variable_New(  VARIABLE_PASSARGS  );
-	
+
+	self->isConstructed = True;
+	_Variable_Init( self, context, dataCount, dataOffsets, dataTypes, dataTypeCounts, dataNames, structSizePtr, arraySizePtr, arraySizeFunc, arrayPtrPtr, False, vr );
+
 	return self;
 }
 
 Variable* Variable_NewVector( 
-		Name						name,
-		Variable_DataType				dataType,
-		Index						dataTypeCount,
-		Index*						arraySizePtr,
-		Variable_ArraySizeFunc*				arraySizeFunc,
-		void**						arrayPtrPtr,
-		Variable_Register*				vr,
-		... 						/* vector component names */ )
+	Name							name,
+	AbstractContext*			context,
+	Variable_DataType			dataType,
+	Index							dataTypeCount,
+	Index*						arraySizePtr,
+	Variable_ArraySizeFunc*	arraySizeFunc,
+	void**						arrayPtrPtr,
+	Variable_Register*		vr,
+	... 						/* vector component names */ )
 {
 	/* Variables set in this function */
 	SizeT                                              _sizeOfSelf = sizeof(Variable);
@@ -186,26 +187,25 @@ Variable* Variable_NewVector(
 	Stg_Class_DeleteFunction*                              _delete = _Variable_Delete;
 	Stg_Class_PrintFunction*                                _print = _Variable_Print;
 	Stg_Class_CopyFunction*                                  _copy = _Variable_Copy;
-	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)Variable_DefaultNew;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_Variable_DefaultNew;
 	Stg_Component_ConstructFunction*                    _construct = _Variable_AssignFromXML;
 	Stg_Component_BuildFunction*                            _build = _Variable_Build;
 	Stg_Component_InitialiseFunction*                  _initialise = _Variable_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = _Variable_Execute;
 	Stg_Component_DestroyFunction*                        _destroy = _Variable_Destroy;
-	Bool                                                  initFlag = True;
 	Index                                                dataCount = 1;
 	SizeT*                                           structSizePtr = 0;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = ZERO;
 
-	Variable*		self;
-	SizeT			dataOffsets[] = { 0 };
-	Variable_DataType	dataTypes[] = { 0 };				/* Init later... */
-	Index			dataTypeCounts[] = { 0 };			/* Init later... */
-	Name*			dataNames;
-	Index			vector_I;
-	va_list			ap;
+	Variable*			self;
+	SizeT					dataOffsets[] = { 0 };
+	Variable_DataType	dataTypes[] = { 0 }; /* Init later... */
+	Index					dataTypeCounts[] = { 0 }; /* Init later... */
+	Name*					dataNames;
+	Index					vector_I;
+	va_list				ap;
 
 	dataTypes[0] = dataType;
 	dataTypeCounts[0] = dataTypeCount;
@@ -220,20 +220,24 @@ Variable* Variable_NewVector(
 	
 	self = _Variable_New(  VARIABLE_PASSARGS  );
 
+	self->isConstructed = True;
+	_Variable_Init( self, context, dataCount, dataOffsets, dataTypes, dataTypeCounts, dataNames, structSizePtr, arraySizePtr, arraySizeFunc, arrayPtrPtr, False, vr );
+
 	Memory_Free( dataNames );
-	
+
 	return self;
 }
 
 Variable* Variable_NewVector2( 
-		Name						name,
-		Variable_DataType				dataType,
-		Index						dataTypeCount,
-		Index*						arraySizePtr,
-		Variable_ArraySizeFunc*				arraySizeFunc,
-		void**						arrayPtrPtr,
-		Variable_Register*				vr,
-		char**						dataNames )
+	Name							name,
+	AbstractContext*			context,
+	Variable_DataType			dataType,
+	Index							dataTypeCount,
+	Index*						arraySizePtr,
+	Variable_ArraySizeFunc*	arraySizeFunc,
+	void**						arrayPtrPtr,
+	Variable_Register*		vr,
+	char**						dataNames )
 {
 	/* Variables set in this function */
 	SizeT                                              _sizeOfSelf = sizeof(Variable);
@@ -241,84 +245,36 @@ Variable* Variable_NewVector2(
 	Stg_Class_DeleteFunction*                              _delete = _Variable_Delete;
 	Stg_Class_PrintFunction*                                _print = _Variable_Print;
 	Stg_Class_CopyFunction*                                  _copy = _Variable_Copy;
-	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void*)Variable_DefaultNew;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void*)_Variable_DefaultNew;
 	Stg_Component_ConstructFunction*                    _construct = _Variable_AssignFromXML;
 	Stg_Component_BuildFunction*                            _build = _Variable_Build;
 	Stg_Component_InitialiseFunction*                  _initialise = _Variable_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = _Variable_Execute;
 	Stg_Component_DestroyFunction*                        _destroy = _Variable_Destroy;
-	Bool                                                  initFlag = True;
 	Index                                                dataCount = 1;
 	SizeT*                                           structSizePtr = 0;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = ZERO;
 
-	Variable*		self;
-	SizeT			dataOffsets[] = { 0 };
+	Variable*			self;
+	SizeT					dataOffsets[] = { 0 };
 	Variable_DataType	dataTypes[] = { 0 };
-	Index			dataTypeCounts[] = { 0 };
+	Index					dataTypeCounts[] = { 0 };
 
 	dataTypes[0] = dataType;
 	dataTypeCounts[0] = dataTypeCount;
 
 	self = _Variable_New(  VARIABLE_PASSARGS  );
 
+	self->isConstructed = True;
+	_Variable_Init( self, context, dataCount, dataOffsets, dataTypes, dataTypeCounts, dataNames, structSizePtr, arraySizePtr, arraySizeFunc, arrayPtrPtr, False, vr );
+
 	return self;
 }
 
-
-void Variable_Init(
-		Name						name,
-		Variable*					self,
-		Index						dataCount,
-		SizeT*						dataOffsets,
-		Variable_DataType*				dataTypes,
-		Index*						dataTypeCounts,
-		Name*						dataNames,
-		SizeT*						structSizePtr,
-		Index*						arraySizePtr,
-		Variable_ArraySizeFunc*				arraySizeFunc,
-		void**						arrayPtrPtr,
-		Bool						allocateSelf,
-		Variable_Register*				vr )
-{
-	/* General info */
-	self->type = Variable_Type;
-	self->_sizeOfSelf = sizeof(Variable);
-	self->_deleteSelf = False;
-		
-	/* Virtual info */
-	self->_delete = _Variable_Delete;
-	self->_print = _Variable_Print;
-	self->_copy = _Variable_Copy;
-	self->_build = _Variable_Build;
-	self->_initialise = _Variable_Initialise;
-	self->_execute = _Variable_Execute;
-	
-	_Stg_Class_Init( (Stg_Class*)self );
-	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-	_Stg_Component_Init( (Stg_Component*)self );
-	/* Variable info */
-	_Variable_Init( 
-		self, 
-		dataCount, 
-		dataOffsets, 
-		dataTypes, 
-		dataTypeCounts, 
-		dataNames, 
-		structSizePtr,
-		arraySizePtr,
-		arraySizeFunc,
-		arrayPtrPtr, 
-		allocateSelf,
-		vr );
-}
-
-
-Variable* _Variable_New(  VARIABLE_DEFARGS  )
-{
-	Variable*	self;
+Variable* _Variable_New(  VARIABLE_DEFARGS  ) {
+	Variable* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Variable) );
@@ -336,45 +292,31 @@ Variable* _Variable_New(  VARIABLE_DEFARGS  )
 	self->_initialise = _initialise;
 	
 	/* Variable info */
-	if( initFlag ){
-		_Variable_Init( 
-			self, 
-			dataCount, 
-			dataOffsets, 
-			dataTypes, 
-			dataTypeCounts, 
-			dataNames, 
-			structSizePtr, 
-			arraySizePtr,
-			arraySizeFunc,
-			arrayPtrPtr, 
-			False,
-			vr );
-	}
 	
 	return self;
 }
 
 void _Variable_Init(
-		Variable*					self, 
-		Index						dataCount,
-		SizeT*						dataOffsets,
-		Variable_DataType*				dataTypes,
-		Index*						dataTypeCounts,
-		Name*						dataNames,
-		SizeT*						structSizePtr,
-		Index*						arraySizePtr,
-		Variable_ArraySizeFunc*				arraySizeFunc,
-		void**						arrayPtrPtr,
-		Bool                                            allocateSelf,
-		Variable_Register*				vr )
+	Variable*					self, 
+	AbstractContext*			context,
+	Index							dataCount,
+	SizeT*						dataOffsets,
+	Variable_DataType*		dataTypes,
+	Index*						dataTypeCounts,
+	Name*							dataNames,
+	SizeT*						structSizePtr,
+	Index*						arraySizePtr,
+	Variable_ArraySizeFunc*	arraySizeFunc,
+	void**						arrayPtrPtr,
+	Bool							allocateSelf,
+	Variable_Register*		vr )
 {
-	Stream*      errorStream = Journal_Register( Error_Type, self->type );
+	Stream* errorStream = Journal_Register( Error_Type, self->type );
 
 	/* General and Virtual info should already be set */
 	
 	/* Variable info */
-	self->isConstructed = True;
+	self->context = context;
 	self->allocateSelf  = allocateSelf;
 	self->offsetCount = dataCount;
 	self->structSizePtr = structSizePtr;
@@ -384,9 +326,9 @@ void _Variable_Init(
 	self->parent = NULL;
 
 	/* Checks */
-	Journal_Firewall( (self->arraySizePtr || self->arraySizeFunc) ,
+	/*Journal_Firewall( (self->arraySizePtr || self->arraySizeFunc) ,
 		errorStream, "Error: in %s(), for Variable %s - either arraySizePtr or arraySizeFunc "
-			"passed in must be non-NULL.\n", __func__, self->name );
+			"passed in must be non-NULL.\n", __func__, self->name );*/
 
 	/* Use of this class has increased... can't assume the info arrays are on persistant memory... copy by default. They will
 	   be deleted. */
@@ -398,10 +340,7 @@ void _Variable_Init(
 	self->dataTypes = Memory_Alloc_Array( Variable_DataType, self->offsetCount, "Variable->dataTypes" );
 	memcpy( self->dataTypes, dataTypes, sizeof(Variable_DataType) * self->offsetCount );
 	
-	Journal_Firewall( 
-		dataTypeCounts ? True : False , 
-		Journal_Register( Error_Type, Variable_Type ), 
-		"dataTypeCounts is null\n" );
+	Journal_Firewall( dataTypeCounts ? True : False , Journal_Register( Error_Type, Variable_Type ), "dataTypeCounts is null\n" );
 	self->dataTypeCounts = Memory_Alloc_Array( Index, self->offsetCount, "Variable->dataTypeCounts" );
 	memcpy( self->dataTypeCounts, dataTypeCounts, sizeof(Index) * self->offsetCount );
 	
@@ -428,13 +367,13 @@ void _Variable_Init(
 		
 		/* If we have component names, create the associated variables. Don't do if there is only one component. */
 		if( dataNames && self->offsetCount > 1 ) {
-			Index			component_I;
+			Index component_I;
 			
 			for( component_I = 0; component_I < self->offsetCount; component_I++ ) {
 				if( dataNames[component_I] ) {
-					SizeT			componentOffsets[] = { 0 };
+					SizeT					componentOffsets[] = { 0 };
 					Variable_DataType	componentTypes[] = { 0 };
-					Index			componentTypeCounts[] = { 0 };
+					Index					componentTypeCounts[] = { 0 };
 
 					componentOffsets[0] = self->offsets[component_I];
 					componentTypes[0] = self->dataTypes[component_I];
@@ -443,6 +382,7 @@ void _Variable_Init(
 					/* Assumption: components are scalar or vector, but cannot be complex */
 					self->components[component_I] = Variable_New( 
 						dataNames[component_I], 
+						self->context,
 						1, 
 						componentOffsets, 
 						componentTypes, 
@@ -459,16 +399,16 @@ void _Variable_Init(
 		}
 		/* Else if we have vector-component names, create the associated variables. Do only if non-complex and a vector. */
 		else if( dataNames && self->offsetCount == 1 && self->dataTypeCounts[0] > 1 ) {
-			Index			vector_I;
+			Index vector_I;
 
 			for( vector_I = 0; vector_I < self->dataTypeCounts[0]; vector_I++ ) {
 				if( dataNames[vector_I] ) {
 					/* Unfortunately we cannot call any of our fancy macros here as the array is not resolved
 					 * yet. As a consequence we have to manually work out the vector's indecis offsets. Ouch
 					 * only from a code-maintenance point of view. */
-					SizeT			componentOffsets[] = { 0 };		/* Init later... */
-					Variable_DataType	componentTypes[] = { 0 };		/* Init later... */
-					Index			componentTypeCounts[] = { 1 };
+					SizeT					componentOffsets[] = { 0 }; /* Init later... */
+					Variable_DataType	componentTypes[] = { 0 }; /* Init later... */
+					Index					componentTypeCounts[] = { 1 };
 				
 					componentOffsets[0] = 
 						(ArithPointer)self->offsets[0] + 
@@ -484,10 +424,10 @@ void _Variable_Init(
 							"Vector is of a non-builtin type\n" ) );
 					componentTypes[0] = self->dataTypes[0];
 
-							
 					/* Assumption: vector-components are scalar, but cannot be complex */
 					self->components[vector_I] = Variable_New( 
 						dataNames[vector_I],
+						self->context,
 						1, 
 						componentOffsets, 
 						componentTypes, 
@@ -514,20 +454,8 @@ void _Variable_Init(
 */
 
 void _Variable_Delete( void* variable ) {
-	Variable*	self = (Variable*)variable;
+	Variable* self = (Variable*)variable;
 
-	if ( self->dataSizes ) {
-		Memory_Free( self->dataSizes );
-	}
-	if (self->allocateSelf) {
-		Memory_Free( self->arrayPtr );
-	}
-	
-	Memory_Free( self->dataTypeCounts );
-	Memory_Free( self->dataTypes );
-	Memory_Free( self->offsets );
-	Memory_Free( self->components );
-	
 	/* Stg_Class_Delete parent */
 	_Stg_Component_Delete( self );
 }
@@ -902,26 +830,27 @@ void _Variable_Execute( void* variable, void* data ) {
 }
 
 void _Variable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data ) {
-	Variable*           self              = (Variable*) variable;
-	SizeT			    dataOffsets[]     = { 0 };
-	Variable_DataType	dataTypes[]       = { 0 };		/* Init value later */
-	Index			    dataTypeCounts[]  = { 1 };
-	Dictionary *        componentDict     = NULL;
-	Dictionary *        thisComponentDict = NULL;
-	Name                dataTypeName      = NULL;
-	Name                rankName          = NULL;
-	Name                countName         = NULL;
-	unsigned int*       count             = NULL;
-	void *              variableRegister  = NULL;
-	void *              pointerRegister   = NULL;
-	Name*               names             = NULL;
-	Stream*             error             = Journal_Register( Error_Type, self->type );
+	Variable*			self = (Variable*) variable;
+	SizeT					dataOffsets[] = { 0 };
+	Variable_DataType	dataTypes[] = { 0 };		/* Init value later */
+	Index					dataTypeCounts[] = { 1 };
+	Dictionary*			componentDict = NULL;
+	Dictionary*			thisComponentDict = NULL;
+	Name					dataTypeName = NULL;
+	Name					rankName = NULL;
+	Name					countName = NULL;
+	unsigned int*		count = NULL;
+	void*					variableRegister = NULL;
+	void*					pointerRegister = NULL;
+	Name*					names = NULL;
+	Stream*				error = Journal_Register( Error_Type, self->type );
+	AbstractContext*	context;	
 	
 	assert( self );
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 
 	componentDict = cf->componentDict;
 	assert( componentDict );
@@ -929,9 +858,9 @@ void _Variable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* da
 	assert( thisComponentDict );
 	
 	/* Grab Registers */
-	variableRegister = self->context->variable_Register; 
+	variableRegister = context->variable_Register; 
 	assert( variableRegister );
-	pointerRegister = self->context->pointer_Register;
+	pointerRegister = context->pointer_Register;
 	assert( pointerRegister );
 	
 	Stg_ComponentFactory_ConstructByKey( cf, self->name, "Dependency", Stg_Component, False, data );
@@ -939,7 +868,7 @@ void _Variable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* da
 	/* Get Pointer to number of elements in array */
 	countName = Dictionary_GetString( thisComponentDict, "Count" );
 	count = Stg_ObjectList_Get( pointerRegister, countName );
-	assert( count );
+	//assert( count );
 	
 	/* Get Type of Variable */
 	dataTypeName = Dictionary_GetString( thisComponentDict, "DataType" );
@@ -977,35 +906,46 @@ void _Variable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* da
 		}
 		dataTypeCounts[0] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "VectorComponentCount", nameCount );
 
-		Journal_Firewall( nameCount >= dataTypeCounts[0], error,
-				"Variable '%s' has too few names in list for %d vector components.\n", self->name, dataTypeCounts[0] );
+		Journal_Firewall( nameCount >= dataTypeCounts[0], error, "Variable '%s' has too few names in list for %d vector components.\n", self->name, dataTypeCounts[0] );
 	}
 	else
 		Journal_Firewall( False, error, "Variable '%s' cannot understand rank '%s'\n", self->name, rankName );
 
 	_Variable_Init( 
-			self, 
-			1, 
-			dataOffsets,
-			dataTypes,
-			dataTypeCounts, 
-			names, 
-			0, 
-			count, 
-			NULL,	/* Note: don't support arraySize being calculated from a Func Ptr through
-			 Construct() Yet - PatrickSunter, 29 Jun 2007 */ 
-			(void**)&self->arrayPtr,
-			True,
-			variableRegister );
+		self, 
+		context,
+		1, 
+		dataOffsets,
+		dataTypes,
+		dataTypeCounts, 
+		names, 
+		0, 
+		count, 
+		NULL,	/* Note: don't support arraySize being calculated from a Func Ptr through
+		Construct() Yet - PatrickSunter, 29 Jun 2007 */ 
+		(void**)&self->arrayPtr,
+		True,
+		variableRegister );
 
 	/* Clean Up */
 	if (names)
 		Memory_Free(names);
 }
 	
-void _Variable_Destroy( void* variable, void* data )
-{
+void _Variable_Destroy( void* variable, void* data ) {
+	Variable* self = (Variable*)variable;
 	
+	if ( self->dataSizes ) {
+		Memory_Free( self->dataSizes );
+	}
+	if (self->allocateSelf) {
+		Memory_Free( self->arrayPtr );
+	}
+	
+	Memory_Free( self->dataTypeCounts );
+	Memory_Free( self->dataTypes );
+	Memory_Free( self->offsets );
+	Memory_Free( self->components );
 }
 
 Index _Variable_GetNewArraySize( Variable* self ) {
@@ -1039,9 +979,9 @@ Index _Variable_GetNewArraySize( Variable* self ) {
 */
 
 void Variable_SetValue( void* variable, Index array_I, void* value ) {
-	Variable*	self = (Variable*)variable;
+	Variable*		self = (Variable*)variable;
 	ArithPointer*	vPtr;
-	Index		component_I;
+	Index				component_I;
 	
 	vPtr = value;
 	for( component_I = 0; component_I < self->offsetCount; component_I++ ) {

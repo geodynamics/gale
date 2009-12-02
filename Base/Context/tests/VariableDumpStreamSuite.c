@@ -89,6 +89,7 @@ void VariableDumpStreamSuite_TestDump( VariableDumpStreamSuiteData* data ) {
 
    var = Variable_NewScalar(
       "Scalar",
+		NULL,
       Variable_DataType_Double,
       &length,
       NULL,
@@ -97,6 +98,7 @@ void VariableDumpStreamSuite_TestDump( VariableDumpStreamSuiteData* data ) {
 
    vec = Variable_NewVector(
       "Three",
+		NULL,
       Variable_DataType_Double,
       3,
       &length,

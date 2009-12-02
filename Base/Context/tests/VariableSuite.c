@@ -83,9 +83,9 @@ void VariableSuite_Setup( VariableSuiteData* data ) {
 
    /* Construction phase --------------------------------------------------------------------------------------------*/
    data->vr = Variable_Register_New();
-   Variable_NewScalar( "temperature", Variable_DataType_Double, &data->aSize[0], NULL, (void**)&data->temperature, data->vr );
-   Variable_NewVector( "velocity", Variable_DataType_Double, 3, &data->aSize[1], NULL, (void**)&data->velocity, data->vr, "vx", "vy", "vz" );
-   Variable_New( "particle", 3, pOffsets, pDataTypes, pDtCounts, pNames, &pSize, &data->aSize[2], NULL, (void**)&data->particle, data->vr );
+   Variable_NewScalar( "temperature", NULL, Variable_DataType_Double, &data->aSize[0], NULL, (void**)&data->temperature, data->vr );
+   Variable_NewVector( "velocity", NULL, Variable_DataType_Double, 3, &data->aSize[1], NULL, (void**)&data->velocity, data->vr, "vx", "vy", "vz" );
+   Variable_New( "particle", NULL, 3, pOffsets, pDataTypes, pDtCounts, pNames, &pSize, &data->aSize[2], NULL, (void**)&data->particle, data->vr );
    
    /* Build phase ---------------------------------------------------------------------------------------------------*/
    data->temperature = Memory_Alloc_Array( double, data->aSize[0], "temperature" );
@@ -224,25 +224,9 @@ void VariableSuite_TestVariable_Char( VariableSuiteData* data ) {
    array = Memory_Alloc_Array( char, length, "test" );
    structArray = Memory_Alloc_Array( Triple, length, "test" );
 
-   var = Variable_NewScalar(
-      "Char-Scalar",
-      Variable_DataType_Char,
-      &length,
-      NULL,
-      (void**)&array,
-      data->vr );
+   var = Variable_NewScalar( "Char-Scalar", NULL, Variable_DataType_Char, &length, NULL, (void**)&array, data->vr );
+   vec = Variable_NewVector( "Char-Three", NULL, Variable_DataType_Char, 3, &length, NULL, (void**)&structArray, data->vr, "a", "b", "c" );
 
-   vec = Variable_NewVector(
-      "Char-Three",
-      Variable_DataType_Char,
-      3,
-      &length,
-      NULL,
-      (void**)&structArray,
-      data->vr,
-      "a",
-      "b",
-      "c" );
    vecVar[0] = Variable_Register_GetByName( data->vr, "a" );
    vecVar[1] = Variable_Register_GetByName( data->vr, "b" );
    vecVar[2] = Variable_Register_GetByName( data->vr, "c" );
@@ -325,25 +309,9 @@ void VariableSuite_TestVariable_Double( VariableSuiteData* data ) {
    array = Memory_Alloc_Array( double, length, "test" );
    structArray = Memory_Alloc_Array( Triple, length, "test" );
 
-   var = Variable_NewScalar(
-      "Double-Scalar",
-      Variable_DataType_Double,
-      &length,
-      NULL,
-      (void**)&array,
-      data->vr );
+   var = Variable_NewScalar( "Double-Scalar", NULL, Variable_DataType_Double, &length, NULL, (void**)&array, data->vr ); 
+   vec = Variable_NewVector( "Double-Three", NULL, Variable_DataType_Double, 3, &length, NULL, (void**)&structArray, data->vr, "a", "b", "c" );
 
-   vec = Variable_NewVector(
-      "Double-Three",
-      Variable_DataType_Double,
-      3,
-      &length,
-      NULL,
-      (void**)&structArray,
-      data->vr,
-      "a",
-      "b",
-      "c" );
    vecVar[0] = Variable_Register_GetByName( data->vr, "a" );
    vecVar[1] = Variable_Register_GetByName( data->vr, "b" );
    vecVar[2] = Variable_Register_GetByName( data->vr, "c" );
@@ -427,25 +395,9 @@ void VariableSuite_TestVariable_Float( VariableSuiteData* data ) {
    array = Memory_Alloc_Array( float, length, "test" );
    structArray = Memory_Alloc_Array( Triple, length, "test" );
 
-   var = Variable_NewScalar(
-      "Float-Scalar",
-      Variable_DataType_Float,
-      &length,
-      NULL,
-      (void**)&array,
-      data->vr );
+   var = Variable_NewScalar( "Float-Scalar", NULL, Variable_DataType_Float, &length, NULL, (void**)&array, data->vr );
+   vec = Variable_NewVector( "Float-Three", NULL, Variable_DataType_Float, 3, &length, NULL, (void**)&structArray, data->vr, "a", "b", "c" );
 
-   vec = Variable_NewVector(
-      "Float-Three",
-      Variable_DataType_Float,
-      3,
-      &length,
-      NULL,
-      (void**)&structArray,
-      data->vr,
-      "a",
-      "b",
-      "c" );
    vecVar[0] = Variable_Register_GetByName( data->vr, "a" );
    vecVar[1] = Variable_Register_GetByName( data->vr, "b" );
    vecVar[2] = Variable_Register_GetByName( data->vr, "c" );
@@ -453,7 +405,6 @@ void VariableSuite_TestVariable_Float( VariableSuiteData* data ) {
    Variable_Register_BuildAll( data->vr );
 
    for ( test_I = 0; test_I < testValueCount; ++test_I ) {	
-
       testValue = testValues[test_I];
 
       for ( i = 0; i < length; ++i ) {
@@ -532,25 +483,9 @@ void VariableSuite_TestVariable_Int( VariableSuiteData* data ) {
    array = Memory_Alloc_Array( int, length, "test" );
    structArray = Memory_Alloc_Array( Triple, length, "test" );
 
-   var = Variable_NewScalar(
-      "Int-Scalar",
-      Variable_DataType_Int,
-      &length,
-      NULL,
-      (void**)&array,
-      data->vr );
+   var = Variable_NewScalar( "Int-Scalar", NULL, Variable_DataType_Int, &length, NULL, (void**)&array, data->vr );
+   vec = Variable_NewVector( "Int-Three", NULL, Variable_DataType_Int, 3, &length, NULL, (void**)&structArray, data->vr, "a", "b", "c" );
 
-   vec = Variable_NewVector(
-      "Int-Three",
-      Variable_DataType_Int,
-      3,
-      &length,
-      NULL,
-      (void**)&structArray,
-      data->vr,
-      "a",
-      "b",
-      "c" );
    vecVar[0] = Variable_Register_GetByName( data->vr, "a" );
    vecVar[1] = Variable_Register_GetByName( data->vr, "b" );
    vecVar[2] = Variable_Register_GetByName( data->vr, "c" );
@@ -637,25 +572,9 @@ void VariableSuite_TestVariable_Short( VariableSuiteData* data ) {
    array = Memory_Alloc_Array( short, length, "test" );
    structArray = Memory_Alloc_Array( Triple, length, "test" );
 
-   var = Variable_NewScalar(
-      "Short-Scalar",
-      Variable_DataType_Short,
-      &length,
-      NULL,
-      (void**)&array,
-      data->vr );
+   var = Variable_NewScalar( "Short-Scalar", NULL, Variable_DataType_Short, &length, NULL, (void**)&array, data->vr );
+   vec = Variable_NewVector( "Short-Three", NULL, Variable_DataType_Short, 3, &length, NULL, (void**)&structArray, data->vr, "a", "b", "c" );
 
-   vec = Variable_NewVector(
-      "Short-Three",
-      Variable_DataType_Short,
-      3,
-      &length,
-      NULL,
-      (void**)&structArray,
-      data->vr,
-      "a",
-      "b",
-      "c" );
    vecVar[0] = Variable_Register_GetByName( data->vr, "a" );
    vecVar[1] = Variable_Register_GetByName( data->vr, "b" );
    vecVar[2] = Variable_Register_GetByName( data->vr, "c" );
@@ -765,24 +684,9 @@ void VariableSuite_TestVariableCopy( VariableSuiteData* data ) {
 
    ctx1->vr = Variable_Register_New();
 
-	Variable_NewScalar(
-		"Scalar",
-		Variable_DataType_Float,
-		&(ctx1->scalarCount),
-		NULL,
-		(void**)&(ctx1->scalars),
-		ctx1->vr );
-	Variable_NewVector(
-		"Vector",
-		Variable_DataType_Double,
-		VECTOR_DATA_COUNT,
-		&(ctx1->vectorCount),
-		NULL,
-		(void**)&(ctx1->vectors),
-		ctx1->vr,
-		"x",
-		"y",
-		"z" );
+	Variable_NewScalar( "Scalar", NULL, Variable_DataType_Float, &(ctx1->scalarCount), NULL, (void**)&(ctx1->scalars), ctx1->vr );
+	Variable_NewVector( "Vector", NULL, Variable_DataType_Double, VECTOR_DATA_COUNT, &(ctx1->vectorCount), NULL, (void**)&(ctx1->vectors), ctx1->vr, "x", "y", "z" );
+
 	{
 		ComplexStuff tmp;
 		SizeT dataOffsets[] = { 0, 0 };
@@ -793,18 +697,7 @@ void VariableSuite_TestVariableCopy( VariableSuiteData* data ) {
 		dataOffsets[0] = (ArithPointer)&tmp.y - (ArithPointer)&tmp;
 		dataOffsets[1] = (ArithPointer)&tmp.z - (ArithPointer)&tmp;
 
-		Variable_New(
-			"Complex",
-			2,
-			dataOffsets,
-			dataTypes,
-			dataTypeCounts,
-			dataNames,
-			&(ctx1->complexStuffSize),
-			&(ctx1->stuffCount),
-			NULL,
-			(void**)&(ctx1->stuff),
-			ctx1->vr );
+		Variable_New( "Complex", NULL, 2, dataOffsets, dataTypes, dataTypeCounts, dataNames, &(ctx1->complexStuffSize), &(ctx1->stuffCount), NULL, (void**)&(ctx1->stuff), ctx1->vr );
 	}
 
 	Variable_Register_BuildAll( ctx1->vr );
@@ -899,30 +792,11 @@ void VariableSuite_TestVariableValueCompare( VariableSuiteData* data ) {
       dataArray2[ index ] = dataArray[ index ] + amp * cos( index );
    }		
    
-   orig = Variable_NewVector( 
-         "orig", 
-         Variable_DataType_Double, 
-         componentCount,
-         &arrayCount,
-         NULL,
-         (void**)&dataArray,
-         data->vr,
-         "orig1",
-         "orig2",
-         "orig3",
-         "orig4" );
-   compare = Variable_NewVector( 
-         "compare", 
-         Variable_DataType_Double, 
-         componentCount,
-         &arrayCount,
-         NULL,
-         (void**)&dataArray2,
-         data->vr,
-         "compare1",
-         "compare2",
-         "compare3",
-         "compare4" );
+   orig = Variable_NewVector( "orig", NULL, Variable_DataType_Double, componentCount,
+		&arrayCount, NULL, (void**)&dataArray, data->vr, "orig1", "orig2", "orig3", "orig4" );
+   compare = Variable_NewVector( "compare", NULL, Variable_DataType_Double, componentCount,
+		&arrayCount, NULL, (void**)&dataArray2, data->vr, "compare1", "compare2", "compare3", "compare4" );
+
    Stg_Component_Build( orig, 0, False );
    Stg_Component_Build( compare, 0, False );
 
