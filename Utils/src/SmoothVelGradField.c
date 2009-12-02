@@ -29,8 +29,7 @@ const Type SmoothVelGradField_Type = "SmoothVelGradField";
 ** Constructors/Destructors.
 */
 
-SmoothVelGradField* _SmoothVelGradField_New(  SMOOTHVELGRADFIELD_DEFARGS  )
-{
+SmoothVelGradField* _SmoothVelGradField_New(  SMOOTHVELGRADFIELD_DEFARGS  ) {
    SmoothVelGradField* self;
 
    assert( _sizeOfSelf >= sizeof(SmoothVelGradField) );
@@ -138,7 +137,6 @@ void _SmoothVelGradField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, v
    sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, "SLE", SystemLinearEquations, False, data );
 
    _SmoothVelGradField_Init( self, variable_Register, velField, sle );
-
 }
 
 void _SmoothVelGradField_Build( void* _self, void* data ) {
@@ -225,7 +223,7 @@ void _SmoothVelGradField_Build( void* _self, void* data ) {
    Variable_Update( self->dataVariable );
    for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ )
       Variable_Update( self->dataVariableList[ variable_I ] );
-   }
+}
 
 void _SmoothVelGradField_Initialise( void* _self, void* data ) {
    SmoothVelGradField* self = (SmoothVelGradField*) _self;
@@ -262,9 +260,12 @@ void _SmoothVelGradField_Destroy( void* _self, void* data ) {
    _ParticleFeVariable_Destroy( self, data );
 }
 
-void _SmoothVelGradField_ValueAtParticle( void* _self, IntegrationPointsSwarm* swarm,
-					  Element_LocalIndex lElement_I, void* _particle,
-					  double* velGrad )
+void _SmoothVelGradField_ValueAtParticle(
+	void*							_self,
+	IntegrationPointsSwarm*	swarm,
+	Element_LocalIndex		lElement_I,
+	void*							_particle,
+	double*						velGrad )
 {
    SmoothVelGradField* self = (SmoothVelGradField*)_self;
    IntegrationPoint* particle = (IntegrationPoint*)_particle;

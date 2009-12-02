@@ -29,8 +29,7 @@ const Type NodalPressureField_Type = "NodalPressureField";
 ** Constructors/Destructors.
 */
 
-NodalPressureField* _NodalPressureField_New(  NODALPRESSUREFIELD_DEFARGS  )
-{
+NodalPressureField* _NodalPressureField_New(  NODALPRESSUREFIELD_DEFARGS  ) {
    NodalPressureField* self;
 
    assert( _sizeOfSelf >= sizeof(NodalPressureField) );
@@ -45,7 +44,6 @@ void _NodalPressureField_Init( NodalPressureField* self, Variable_Register* vari
    self->pressureField = pressureField;
    if( sle )
       SystemLinearEquations_AddPostNonLinearEP( sle, NodalPressureField_Type, NodalPressureField_NonLinearUpdate );
-   
 }
 
 void* _NodalPressureField_DefaultNew( Name name ) {
@@ -172,7 +170,6 @@ void _NodalPressureField_Build( void* _self, void* data ) {
    _ParticleFeVariable_Build( self, data );
    /* Update again, just in case things were changed/reallocated when ICs loaded */
    Variable_Update( self->dataVariable );
-
 }
 
 void _NodalPressureField_Initialise( void* _self, void* data ) {
@@ -200,15 +197,12 @@ void _NodalPressureField_Execute( void* _self, void* data ) {
 void _NodalPressureField_Destroy( void* _self, void* data ) {
    NodalPressureField* self = (NodalPressureField*) _self;
 
-   Stg_Component_Destroy( self->pressureField, data, False);
+	Stg_Component_Destroy( self->pressureField, data, False);
 
-   _ParticleFeVariable_Destroy( self, data );
+	_ParticleFeVariable_Destroy( self, data );
 }
 
-void _NodalPressureField_ValueAtParticle( void* _self, IntegrationPointsSwarm* swarm,
-					  Element_LocalIndex lElement_I, void* _particle,
-					  double* pressure )
-{
+void _NodalPressureField_ValueAtParticle( void* _self, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, void* _particle, double* pressure ) {
    NodalPressureField* self = (NodalPressureField*)_self;
    IntegrationPoint* particle = (IntegrationPoint*)_particle;
 

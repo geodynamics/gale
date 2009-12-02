@@ -23,22 +23,21 @@
 
 const Type ViscosityField_Type = "ViscosityField";
 
-ViscosityField* _ViscosityField_New(  VISCOSITYFIELD_DEFARGS  )
-{
-	ViscosityField*		self;
+ViscosityField* _ViscosityField_New(  VISCOSITYFIELD_DEFARGS  ) {
+	ViscosityField* self;
 	
-	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
+	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree.
+		At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
 	assert( _sizeOfSelf >= sizeof(ViscosityField) );
-	self = (ViscosityField*)
-		_ParticleFeVariable_New(  PARTICLEFEVARIABLE_PASSARGS  );
+	self = (ViscosityField*) _ParticleFeVariable_New(  PARTICLEFEVARIABLE_PASSARGS  );
 	
 	return self;
 }
 
 void _ViscosityField_Init( 
-		ViscosityField*                                   self,
-		ConstitutiveMatrix*                               constitutiveMatrix,
-		Variable_Register*                                variable_Register )
+	ViscosityField*		self,
+	ConstitutiveMatrix*	constitutiveMatrix,
+	Variable_Register*	variable_Register )
 {
 	/* Assign Pointers */
 	self->variable_Register = variable_Register;
@@ -136,13 +135,13 @@ void _ViscosityField_Build( void* viscosityField, void* data ) {
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	tmpName = Stg_Object_AppendSuffix( self, "viscosityVariable" );
 	self->dataVariable = Variable_NewScalar( 	
-			tmpName,
-			(AbstractContext*)self->context,
-			Variable_DataType_Double, 
-			&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
-			NULL,
-			(void**)&self->data, 
-			self->variable_Register );
+		tmpName,
+		(AbstractContext*)self->context,
+		Variable_DataType_Double, 
+		&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
+		NULL,
+		(void**)&self->data, 
+		self->variable_Register );
 	Memory_Free( tmpName );
 	self->fieldComponentCount = 1;
 	
@@ -170,6 +169,7 @@ void _ViscosityField_Destroy( void* viscosityField, void* data ) {
 	ViscosityField* self = (ViscosityField*) viscosityField;
 
    Stg_Component_Destroy( self->constitutiveMatrix, data, False );
+
 	_ParticleFeVariable_Destroy( self, data );
 }
 void _ViscosityField_ValueAtParticle( void* viscosityField, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, void* _particle, double* viscosity ) {

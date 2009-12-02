@@ -23,24 +23,18 @@
 
 const Type DensityField_Type = "DensityField";
 
-DensityField* _DensityField_New(  DENSITYFIELD_DEFARGS  )
-{
-	DensityField*		self;
+DensityField* _DensityField_New(  DENSITYFIELD_DEFARGS  ) {
+	DensityField* self;
 	
-	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
+	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree.
+	At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
 	assert( _sizeOfSelf >= sizeof(DensityField) );
-	self = (DensityField*)
-		_ParticleFeVariable_New(  PARTICLEFEVARIABLE_PASSARGS  );
+	self = (DensityField*) _ParticleFeVariable_New(  PARTICLEFEVARIABLE_PASSARGS  );
 	
 	return self;
 }
 
-void _DensityField_Init( 
-		DensityField*                                   self,
-		BuoyancyForceTerm*                               buoyancyForceTerm,
-		Variable_Register*                                variable_Register )
-{
-
+void _DensityField_Init( DensityField* self, BuoyancyForceTerm* buoyancyForceTerm, Variable_Register* variable_Register ) {
 	/* Assign Pointers */
 	self->buoyancyForceTerm = buoyancyForceTerm;
 	self->variable_Register = variable_Register;
@@ -69,7 +63,6 @@ void _DensityField_Print( void* densityField, Stream* stream ) {
 	/* DensityField info */
 	Journal_PrintPointer( stream, self->buoyancyForceTerm );
 }
-
 
 void* _DensityField_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	DensityField*	self = (DensityField*)feVariable;
@@ -126,9 +119,9 @@ void _DensityField_AssignFromXML( void* densityField, Stg_ComponentFactory* cf, 
 }
 
 void _DensityField_Build( void* densityField, void* data ) {
-	DensityField* self = (DensityField*) densityField;
-	Variable_Register* variable_Register = (Variable_Register*) self->variable_Register;
-	Name              tmpName;
+	DensityField*			self = (DensityField*) densityField;
+	Variable_Register*	variable_Register = (Variable_Register*) self->variable_Register;
+	Name						tmpName;
 
 	Stg_Component_Build( self->buoyancyForceTerm, data, False );
 
@@ -136,13 +129,13 @@ void _DensityField_Build( void* densityField, void* data ) {
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	tmpName = Stg_Object_AppendSuffix( self, "densityVariable" );
 	self->dataVariable = Variable_NewScalar( 	
-			tmpName,
-			(AbstractContext*)self->context,
-			Variable_DataType_Double, 
-			&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
-			NULL,
-			(void**)&self->data, 
-			variable_Register );
+		tmpName,
+		(AbstractContext*)self->context,
+		Variable_DataType_Double, 
+		&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
+		NULL,
+		(void**)&self->data, 
+		variable_Register );
 	Memory_Free( tmpName );
 	self->fieldComponentCount = 1;
 	
@@ -176,8 +169,8 @@ void _DensityField_Destroy( void* densityField, void* data ) {
 }
 
 void _DensityField_ValueAtParticle( void* densityField, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, void* _particle, double* density ) {
-	DensityField*                    self         = (DensityField*) densityField;
-	IntegrationPoint*                particle     = (IntegrationPoint*) _particle;
+	DensityField*                    self = (DensityField*) densityField;
+	IntegrationPoint*                particle = (IntegrationPoint*) _particle;
 	Material*                        material = NULL;
 	BuoyancyForceTerm_MaterialExt*   materialExt;
 	

@@ -24,30 +24,29 @@
 
 const Type StressField_Type = "StressField";
 
-StressField* _StressField_New(  STRESSFIELD_DEFARGS  )
-{
-	StressField*		self;
+StressField* _StressField_New(  STRESSFIELD_DEFARGS  ) {
+	StressField* self;
 	
-	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
+	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree.
+		At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
 	assert( _sizeOfSelf >= sizeof(StressField) );
-	self = (StressField*)
-		_ParticleFeVariable_New(  PARTICLEFEVARIABLE_PASSARGS  );
+	self = (StressField*) _ParticleFeVariable_New(  PARTICLEFEVARIABLE_PASSARGS  );
 	
 	return self;
 }
 
 void _StressField_Init( 
-		StressField*                                      self,
-		FeVariable*                                       strainRateField,
-		ConstitutiveMatrix*                               constitutiveMatrix,
-		Variable*                                         stressVariable,
-		Variable_Register*                                variable_Register,
-		SystemLinearEquations*	                          sle)
+	StressField*				self,
+	FeVariable*					strainRateField,
+	ConstitutiveMatrix*		constitutiveMatrix,
+	Variable*					stressVariable,
+	Variable_Register*		variable_Register,
+	SystemLinearEquations*	sle)
 {
-	Dimension_Index   dim = constitutiveMatrix->dim;
+	Dimension_Index dim = constitutiveMatrix->dim;
 
 	/* Assign Pointers */
-	self->strainRateField    = strainRateField;
+	self->strainRateField = strainRateField;
 	self->constitutiveMatrix = constitutiveMatrix;
 	self->variable_Register = variable_Register;
 
@@ -67,7 +66,6 @@ void _StressField_Init(
 	** non-linear iterations. */
 	if( sle )
 		SystemLinearEquations_AddPostNonLinearEP( sle, StressField_Type, StressField_NonLinearUpdate );
-	
 }
 
 /* --- Virtual Function Implementations --- */
@@ -90,7 +88,6 @@ void _StressField_Print( void* stressField, Stream* stream ) {
 	Journal_PrintPointer( stream, self->strainRateField );
 	Journal_PrintPointer( stream, self->constitutiveMatrix );
 }
-
 
 void* _StressField_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	StressField*	self = (StressField*)feVariable;
@@ -200,20 +197,20 @@ void _StressField_Build( void* stressField, void* data ) {
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
 	self->dataVariable = Variable_NewVector(
-			tmpName,
-			(AbstractContext*)self->context,
-			Variable_DataType_Double, 
-			self->fieldComponentCount,
-			&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
-			NULL,
-			(void**)&self->data, 
-			self->variable_Register,
-			variableName[0],
-			variableName[1],
-			variableName[2],
-			variableName[3],
-			variableName[4],
-			variableName[5] );
+		tmpName,
+		(AbstractContext*)self->context,
+		Variable_DataType_Double, 
+		self->fieldComponentCount,
+		&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
+		NULL,
+		(void**)&self->data, 
+		self->variable_Register,
+		variableName[0],
+		variableName[1],
+		variableName[2],
+		variableName[3],
+		variableName[4],
+		variableName[5] );
 	Memory_Free( tmpName );
 	
 	/* Create Dof Layout */
@@ -243,7 +240,6 @@ void _StressField_Build( void* stressField, void* data ) {
 	for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ ) {
 		Variable_Update( self->dataVariableList[ variable_I ] );
 	}
-
 }
 
 void _StressField_Initialise( void* stressField, void* data ) {
@@ -267,11 +263,13 @@ void _StressField_Initialise( void* stressField, void* data ) {
 	}
 
 }
+
 void _StressField_Execute( void* stressField, void* data ) {
 	StressField* self = (StressField*) stressField;
 
 	_ParticleFeVariable_Execute( self, data );
 }
+
 void _StressField_Destroy( void* stressField, void* data ) {
 	StressField* self = (StressField*) stressField;
 
@@ -281,6 +279,7 @@ void _StressField_Destroy( void* stressField, void* data ) {
 
 	_ParticleFeVariable_Destroy( self, data );
 }
+
 void _StressField_ValueAtParticle_Recalculate( void* stressField, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, void* _particle, double* stress ) {
 	StressField*      self         = (StressField*) stressField;
 	SymmetricTensor   strainRate;
