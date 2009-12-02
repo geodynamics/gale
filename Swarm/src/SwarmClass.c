@@ -679,12 +679,6 @@ void _Swarm_Build( void* swarm, void* data ) {
 	Stg_Component_Build( self->owningCellVariable, data, False );
 	Journal_DPrintf( self->debug, "...done.\n" );
 	
-	/* these three functions were in initialise function before... 10.08.07*/
-	_Swarm_InitialiseCells( self, data );
-	_Swarm_InitialiseParticles( self, data );
-	Stg_Component_Initialise( self->owningCellVariable, data, False );
-	/**/
-
 	Stream_UnIndentBranch( Swarm_Debug );
 	Journal_DPrintf( self->debug, "...done in %s().\n", __func__ );
 
@@ -697,15 +691,17 @@ void _Swarm_Build( void* swarm, void* data ) {
 void _Swarm_Initialise( void* swarm, void* data ) {
 	Swarm* self = (Swarm*)swarm;
 	AbstractContext* context = self->context; 
-	
 	Journal_DPrintf( self->debug, "In %s(): for swarm \"%s\" (of type %s)\n", __func__, self->name, self->type ); 
 	Stream_IndentBranch( Swarm_Debug );
 	
 	self->stillDoingInitialisation = False;
 
 	Stream_UnIndentBranch( Swarm_Debug );
-	Journal_DPrintf( self->debug, "...done in %s().\n", __func__ );
 
+   /* these three functions were in initialise function before... 10.08.07, now they are moved back to the initialise function, where it seems they should belong JM 031209*/
+	_Swarm_InitialiseCells( self, data );
+	_Swarm_InitialiseParticles( self, data );
+	Stg_Component_Initialise( self->owningCellVariable, data, False );
 	/* removed context->loadFromCheckPoint condition from this statement
 	 * as can have a swarm initial condition without requiring a checkpointed
 	 * solution. Dave 08.11.07
@@ -717,6 +713,8 @@ void _Swarm_Initialise( void* swarm, void* data ) {
 		/* call the initial conditions plugin here */
 		VariableCondition_Apply( self->ics, data );
 	}
+   Journal_DPrintf( self->debug, "...done in %s().\n", __func__ );
+
 }
 
 
