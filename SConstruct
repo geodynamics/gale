@@ -109,17 +109,17 @@ SConscript('Underworld/SConscript',
            duplicate=0)
 env.Prepend(LIBS=['Underworld'])
 
-if env['with_glucifer']:
-    SConscript('gLucifer/SConscript',
-               variant_dir=env['build_dir'] + '/gLucifer',
-               duplicate=0)
-    env.Prepend(LIBS=['glucifer'])
-
 if env['with_experimental']:
     SConscript('Experimental/SConscript',
                variant_dir=env['build_dir'] + '/Experimental',
                duplicate=0)
     env.Prepend(LIBS=['Experimental'])
+
+if env['with_glucifer']:
+    SConscript('gLucifer/SConscript',
+               variant_dir=env['build_dir'] + '/gLucifer',
+               duplicate=0)
+    env.Prepend(LIBS=['glucifer'])
 
 #
 # Build static version of StGermain.
