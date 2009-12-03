@@ -119,7 +119,7 @@ if env['with_experimental']:
     SConscript('Experimental/SConscript',
                variant_dir=env['build_dir'] + '/Experimental',
                duplicate=0)
-    env.Prepend(LIBS=['experimental'])
+    env.Prepend(LIBS=['Experimental'])
 
 #
 # Build static version of StGermain.
