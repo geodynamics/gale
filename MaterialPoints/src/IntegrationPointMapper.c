@@ -67,6 +67,8 @@ IntegrationPointMapper* _IntegrationPointMapper_New(  INTEGRATIONPOINTMAPPER_DEF
 	self->_getMaterialPointsSwarms = _getMaterialPointsSwarms;
 	self->_getMaterialIndexOn = _getMaterialIndexOn;
 	self->_getExtensionOn = _getExtensionOn;
+    self->_getDoubleFromExtension        = _getDoubleFromExtension;
+	self->_getDoubleFromMaterial         = _getDoubleFromMaterial;
 
 	return self;
 }

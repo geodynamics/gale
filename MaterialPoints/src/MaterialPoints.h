@@ -59,6 +59,7 @@
 
 	#include "IntegrationPointMapper.h"
 	#include "OneToOneMapper.h"
+        #include "OneToManyMapper.h"
 	#include "CoincidentMapper.h"
 	#include "GaussCoincidentMapper.h"
 	#include "GaussMapper.h"

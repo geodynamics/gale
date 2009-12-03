@@ -99,6 +99,8 @@ void* _CoincidentMapper_DefaultNew( Name name ) {
 	IntegrationPointMapper_GetMaterialPointsSwarmsFunction*  _getMaterialPointsSwarms = _OneToOneMapper_GetMaterialPointsSwarms;
 	IntegrationPointMapper_GetMaterialIndexOnFunction*            _getMaterialIndexOn = _OneToOneMapper_GetMaterialIndexOn;
 	IntegrationPointMapper_GetExtensionOnFunction*                    _getExtensionOn = _OneToOneMapper_GetExtensionOn;
+    IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension = _OneToOneMapper_GetDoubleFromExtension;
+	IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial = _OneToOneMapper_GetDoubleFromMaterial;
 
 	return _CoincidentMapper_New(  COINCIDENTMAPPER_PASSARGS  );
 }

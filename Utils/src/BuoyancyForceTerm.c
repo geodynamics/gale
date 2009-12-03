@@ -341,6 +341,8 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 
 	double totalWeight = 0.0;
 	double adjustFactor = 0.0;
+	double density;
+	double alpha;
 
 	elementType       = FeMesh_GetElementType( mesh, lElement_I );
 	elementNodeCount  = elementType->nodeCount;
@@ -378,13 +380,22 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 		/* Get parameters */
 		if ( temperatureField ) 
 			FeVariable_InterpolateFromMeshLocalCoord( temperatureField, mesh, lElement_I, xi, &temperature );
-	
+
+		density = IntegrationPointMapper_GetDoubleFromMaterial(
+		    swarm->mapper, particle, self->materialExtHandle,
+		    offsetof(BuoyancyForceTerm_MaterialExt, density));
+		alpha = IntegrationPointMapper_GetDoubleFromMaterial(
+		    swarm->mapper, particle, self->materialExtHandle,
+		    offsetof(BuoyancyForceTerm_MaterialExt, alpha));
+
+/*
 		material = IntegrationPointsSwarm_GetMaterialOn( (IntegrationPointsSwarm*) swarm, particle );
 		materialExt = ExtensionManager_Get( material->extensionMgr, material, self->materialExtHandle );
+*/
 
 		/* Calculate Force */
 		gravity = BuoyancyForceTerm_CalcGravity( self, (Swarm*)swarm, lElement_I, particle );
-		force = materialExt->density * gravity * (1.0 - materialExt->alpha * temperature);
+		force = density * gravity * (1.0 - alpha * temperature);
 		factor = detJac * particle->weight * adjustFactor * force;
 
 		/* Apply force in the correct direction */

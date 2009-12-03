@@ -73,6 +73,18 @@
 
 	/** @see IntegrationPointMapper_GetExtensionOn */
 	typedef void* (IntegrationPointMapper_GetExtensionOnFunction) ( void* mapper, void* points, ExtensionInfo_Index extHandle );
+
+    typedef double (IntegrationPointMapper_GetDoubleFromExtension)(
+	    void*                   mapper,
+	    void*                   intPoint,
+	    ExtensionInfo_Index     extHandle,
+	    int                     offs );
+
+    typedef double (IntegrationPointMapper_GetDoubleFromMaterial)(
+	    void*                   mapper,
+	    void*                   intPoint,
+	    ExtensionInfo_Index     extHandle,
+	    int                     offs );
 	
 	/* IntegrationPointMapper information */
 	#define __IntegrationPointMapper \
@@ -84,6 +96,8 @@
 		IntegrationPointMapper_GetMaterialPointsSwarmsFunction*	_getMaterialPointsSwarms; \
 		IntegrationPointMapper_GetMaterialIndexOnFunction*			_getMaterialIndexOn; \
 		IntegrationPointMapper_GetExtensionOnFunction*				_getExtensionOn; \
+        IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension; \
+        IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial; \
 		\
 		/* General info */ \
 		IntegrationPointsSwarm*												integrationSwarm;
@@ -106,14 +120,18 @@
                 IntegrationPointMapper_MapFunction*                                          _map, \
                 IntegrationPointMapper_GetMaterialPointsSwarmsFunction*  _getMaterialPointsSwarms, \
                 IntegrationPointMapper_GetMaterialIndexOnFunction*            _getMaterialIndexOn, \
-                IntegrationPointMapper_GetExtensionOnFunction*                    _getExtensionOn
+                IntegrationPointMapper_GetExtensionOnFunction*                    _getExtensionOn, \
+                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension, \
+                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial
 
 	#define INTEGRATIONPOINTMAPPER_PASSARGS \
                 STG_COMPONENT_PASSARGS, \
 	        _map,                     \
 	        _getMaterialPointsSwarms, \
 	        _getMaterialIndexOn,      \
-	        _getExtensionOn         
+	        _getExtensionOn, \
+            _getDoubleFromExtension, \
+            _getDoubleFromMaterial
 
 	IntegrationPointMapper* _IntegrationPointMapper_New(  INTEGRATIONPOINTMAPPER_DEFARGS  );
 
@@ -193,6 +211,13 @@
 			Swarm_ParticleAt( ((IntegrationPointMapper*)mapper)->integrationSwarm, point_I ), \
 			extHandle )
 	void* IntegrationPointMapper_GetExtensionAtFunc( void* mapper, Index point_I, ExtensionInfo_Index extHandle );
+
+
+#define IntegrationPointMapper_GetDoubleFromExtension(mapper, intPoint, extHandle, offs) \
+    ((IntegrationPointMapper*)mapper)->_getDoubleFromExtension(mapper, intPoint, extHandle, offs);
+
+#define IntegrationPointMapper_GetDoubleFromMaterial(mapper, intPoint, extHandle, offs) \
+    ((IntegrationPointMapper*)mapper)->_getDoubleFromMaterial(mapper, intPoint, extHandle, offs);
 
 #endif
 

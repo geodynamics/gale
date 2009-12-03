@@ -526,6 +526,22 @@ Index MaterialPointsSwarm_GetMaterialIndexAt( void* swarm, Index point_I ) {
 	return point->materialIndex;
 }
 
+void* MaterialPointsSwarm_GetMaterialExtensionOn( void* swarm, void *matPoint, Index extHandle ) {
+	MaterialPointsSwarm *self  = (MaterialPointsSwarm*)swarm;
+	Material *mat;
+
+	mat = MaterialPointsSwarm_GetMaterialOn(self, matPoint);
+	return ExtensionManager_Get(mat->extensionMgr, mat, extHandle);
+}
+
+void* MaterialPointsSwarm_GetMaterialExtensionAt( void* swarm, int matPointInd, Index extHandle ) {
+	MaterialPointsSwarm *self  = (MaterialPointsSwarm*)swarm;
+	Material *mat;
+
+	mat = MaterialPointsSwarm_GetMaterialAt(self, matPointInd);
+	return ExtensionManager_Get(mat->extensionMgr, mat, extHandle);
+}
+
 void* MaterialPointsSwarm_GetExtensionAt( void* swarm, Index point_I, Index extHandle ) {
 	MaterialPointsSwarm* self  = (MaterialPointsSwarm*)swarm;
 	MaterialPoint*       point;

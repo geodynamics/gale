@@ -198,4 +198,14 @@ void* _OneToOneMapper_GetExtensionOn( void* mapper, void* point, ExtensionInfo_I
 	return ExtensionManager_Get( swarm->particleExtensionMgr, materialPoint, extHandle );
 }
 
+double _OneToOneMapper_GetDoubleFromExtension(void* mapper, void* intPoint, ExtensionInfo_Index extHandle, int offs) {
+    return *(double*)(IntegrationPointMapper_GetExtensionOn(mapper, intPoint, extHandle) + offs);
+}
 
+double _OneToOneMapper_GetDoubleFromMaterial(void* mapper, void* intPoint, ExtensionInfo_Index extHandle, int offs) {
+    MaterialPointsSwarm *matSwarm;
+    MaterialPoint *matPoint;
+
+    matPoint = OneToOneMapper_GetMaterialPoint(mapper, intPoint, &matSwarm);
+    return *(double*)(MaterialPointsSwarm_GetMaterialExtensionOn(matSwarm, matPoint, extHandle) + offs);
+}
