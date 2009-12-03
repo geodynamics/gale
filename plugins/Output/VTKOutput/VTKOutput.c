@@ -46,7 +46,7 @@
 #include <PICellerator/PICellerator.h>
 #include <Underworld/Underworld.h>
 #include "VTKOutput.h"
-/* #include <PICellerator/Utils/HydrostaticTerm.h> */
+#include <PICellerator/Utils/HydrostaticTerm.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -475,7 +475,7 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
   int nDims, pn, i;
   int lower[3], upper[3], p_lower[3], p_upper[3];
 
-  /* HydrostaticTerm *hydrostaticTerm; */
+  HydrostaticTerm *hydrostaticTerm;
   Name field_filename;
   FILE *field_fp, *pfield_fp;
 
@@ -486,9 +486,9 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
      the values. */
   Grid *elGrid, *vertGrid;
 
-  /* hydrostaticTerm = (HydrostaticTerm*)LiveComponentRegister_Get( */
-  /*                                                           self->CF->LCRegister, */
-  /*                                                           "hydrostaticTerm" ); */
+  hydrostaticTerm =
+    (HydrostaticTerm*)LiveComponentRegister_Get(self->CF->LCRegister,
+                                                "hydrostaticTerm" );
   /* Open the file */
 
   field_list=Dictionary_Get(self->dictionary, "VTKOutput_FieldList" );
@@ -752,12 +752,12 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
                           }
                       }
                       /* Next add the hydrostatic term */
-                      /* if(hydrostaticTerm) */
-                      /*   { */
-                      /*     double *coord; */
-                      /*     coord=Mesh_GetVertex(feVar->feMesh,local); */
-                      /*     p+=HydrostaticTerm_Pressure(hydrostaticTerm,coord); */
-                      /*   } */
+                      if(hydrostaticTerm)
+                        {
+                          double *coord;
+                          coord=Mesh_GetVertex(feVar->feMesh,local);
+                          p+=HydrostaticTerm_Pressure(hydrostaticTerm,coord);
+                        }
                       p+=variableValues[0];
                       fprintf(field_fp, "%.15g ", p );
                     }
