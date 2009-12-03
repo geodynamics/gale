@@ -179,9 +179,15 @@ void _RheologyMaterial_Init(
 	self->isCompressible = isCompressible;
 	self->rheology_Register = Rheology_Register_New();
 
-	/* Add rheologies */
-	for ( rheology_I = 0 ; rheology_I < rheologyCount ; rheology_I++ ) 
-		Rheology_Register_Add( self->rheology_Register, rheologyList[ rheology_I ] );
+	/* Adding this check now as the rheologyList is only applicable to
+		RheologyMaterial and is set to NULL for MultiRheologyMaterial.
+		MultiRheologyMaterial is a child of RheologyMaterial but it is bypassing its
+		parents _AssignFromXML functionality before. */
+	if( strcmp( self->type, "MultiRheologyMaterial" ) != 0 ) {
+      /* Add rheologies */
+      for ( rheology_I = 0 ; rheology_I < rheologyCount ; rheology_I++ ) 
+         Rheology_Register_Add( self->rheology_Register, rheologyList[ rheology_I ] );
+   }
 
 	/*	self->debug = Journal_Register( Debug_Type, self->type ); /* TODO make child of Underworld_Debug */
 }
