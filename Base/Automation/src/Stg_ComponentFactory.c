@@ -905,6 +905,12 @@ int Stg_ComponentFactory_PluginGetInt( void* cf, void *codelet, Dictionary_Entry
                                                                Dictionary_Entry_Value_FromInt( defaultVal )));
 }
 
+Bool Stg_ComponentFactory_PluginGetBool( void* cf, void *codelet, Dictionary_Entry_Key key, Bool defaultVal ) {
+        return Dictionary_Entry_Value_AsBool( 
+                _Stg_ComponentFactory_PluginGetDictionaryValue( cf, codelet, key,
+                                                                Dictionary_Entry_Value_FromBool( defaultVal ) ) );
+}
+
 Stg_Component* _Stg_ComponentFactory_ConstructByNameWithKeyFallback( 
 		void*			cf, 
 		Name 			parentComponentName, 
