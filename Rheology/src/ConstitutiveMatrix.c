@@ -312,6 +312,34 @@ void ConstitutiveMatrix_Assemble(
    Journal_DPrintfL( self->debug, 3, "Viscosity = %g\n", ConstitutiveMatrix_GetIsotropicViscosity( self ) );
 }
 
+void ConstitutiveMatrix_AssembleMaterialPoint(void *constitutiveMatrix, int element,
+					      MaterialPointsSwarm *matSwarm, int matPointInd)
+{
+	ConstitutiveMatrix *self = (ConstitutiveMatrix*)constitutiveMatrix;
+	IntegrationPointsSwarm *swarm       = (IntegrationPointsSwarm*)self->integrationSwarm;
+	RheologyMaterial *material;
+	MaterialPoint *matPoint;
+	double xi[3];
+
+	matPoint = (MaterialPoint*)Swarm_ParticleAt(matSwarm, matPointInd);
+	material = (RheologyMaterial*)MaterialPointsSwarm_GetMaterialOn(matSwarm, matPoint);
+	FeMesh_CoordGlobalToLocal(matSwarm->mesh, element, matPoint->coord, xi);
+	self->currentParticleIndex = matPointInd;
+	RheologyMaterial_RunRheologies(material, self, matSwarm, element, matPoint, xi);
+
+  if( self->storeConstitutiveMatrix ) {
+    /* copy the recently calculated self->matrixData, the constitutive matrix, onto the particle extension */
+    double* cMatrix = ExtensionManager_Get( matSwarm->particleExtensionMgr, matPoint, self->storedConstHandle );
+    Index row_I, rowSize = self->rowSize;
+    Index columnSize = self->columnSize;
+
+    /* flatten the matrix into a 1D array */
+    for( row_I = 0 ; row_I < rowSize ; row_I++ ) 
+      memcpy( &cMatrix[columnSize*row_I], self->matrixData[row_I], columnSize*sizeof(double) );
+  }
+	Journal_DPrintfL( self->debug, 3, "Viscosity = %g\n", ConstitutiveMatrix_GetIsotropicViscosity( self ) );
+}
+
 void ConstitutiveMatrix_ZeroMatrix( void* constitutiveMatrix ) {
    ConstitutiveMatrix* self   = (ConstitutiveMatrix*)constitutiveMatrix;
 

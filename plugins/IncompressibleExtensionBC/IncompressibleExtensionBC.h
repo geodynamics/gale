@@ -48,6 +48,12 @@
 #ifndef __Underworld_IncompressibleExtensionBC_h__
 #define __Underworld_IncompressibleExtensionBC_h__
 
+	#define __IncExtBC \
+		__Codelet \
+		UnderworldContext *ctx;
+
+	typedef struct IncExtBC { __IncExtBC } IncExtBC;
+
 	void IncompressibleExtensionBC_TopCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 	void IncompressibleExtensionBC_LeftCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 	void IncompressibleExtensionBC_LeftShearCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;

@@ -42,6 +42,8 @@
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#include <stdlib.h>
+#include <string.h>
 #include <mpi.h>
 #include <assert.h>
 #include <StGermain/StGermain.h>
@@ -224,9 +226,76 @@ void IncompressibleExtensionBC_BottomCondition( Node_LocalIndex node_lI, Variabl
 	*result = GetBottomWallVelocity( context );
 }
 
-void _Underworld_IncompressibleExtensionBC_AssignFromXML( void* self, Stg_ComponentFactory* cf, void* data ) {
+void Underworld_IncompressibleExtensionBC_Remesh( TimeIntegrator* timeIntegrator, IncExtBC* self ) {
+    FeVariable* velocityField = (FeVariable*) LiveComponentRegister_Get( self->context->CF->LCRegister, "VelocityField" );
+    FeVariable* pressureField = (FeVariable*) LiveComponentRegister_Get( self->context->CF->LCRegister, "PressureField" );
+    FeMesh *mesh;
+    Grid *nodeGrid;
+    double dt;
+    double top, bottom, left, right;
+    double minCrd[3], maxCrd[3];
+    double nodeWidth[3];
+    int numNodes;
+    int nodeInds[3];
+    int ii, jj;
+
+    mesh = velocityField->feMesh;
+
+    nodeGrid = *Mesh_GetExtension(mesh, Grid**, "vertexGrid");
+
+    dt = AbstractContext_Dt(self->ctx);
+    top = GetTopWallVelocity(self->ctx);
+    bottom = GetBottomWallVelocity(self->ctx);
+    left = GetLeftWallVelocity(self->ctx);
+    right = GetRightWallVelocity(self->ctx);
+    Mesh_GetGlobalCoordRange(mesh, minCrd, maxCrd);
+
+    minCrd[0] += dt*left;
+    minCrd[1] += dt*bottom;
+    maxCrd[0] += dt*right;
+    maxCrd[1] += dt*top;
+
+    nodeWidth[0] = (maxCrd[0] - minCrd[0])/(double)(nodeGrid->sizes[0] - 1);
+    nodeWidth[1] = (maxCrd[1] - minCrd[1])/(double)(nodeGrid->sizes[1] - 1);
+
+    numNodes = FeMesh_GetNodeLocalSize(mesh);
+    for(ii = 0; ii < numNodes; ii++) {
+	Grid_Lift(nodeGrid, FeMesh_NodeDomainToGlobal(mesh, ii), nodeInds);
+	Mesh_GetVertex(mesh, ii)[0] = minCrd[0] + ((double)nodeInds[0])*nodeWidth[0];
+	Mesh_GetVertex(mesh, ii)[1] = minCrd[1] + ((double)nodeInds[1])*nodeWidth[1];
+    }
+
+    Mesh_Sync(mesh);
+    Mesh_DeformationUpdate(mesh);
+
+    if(velocityField->feMesh != pressureField->feMesh) {
+	if(!strcmp(pressureField->feMesh->type, "CartesianGenerator")) {
+	    FeMesh *pmesh;
+	    Grid *pnodeGrid;
+	    int lind;
+
+	    pmesh = pressureField->feMesh;
+	    pnodeGrid = *Mesh_GetExtension(pmesh, Grid**, "vertexGrid");
+
+	    numNodes = FeMesh_GetNodeLocalSize(pmesh);
+	    for(ii = 0; ii < numNodes; ii++) {
+		Grid_Lift(pnodeGrid, FeMesh_NodeDomainToGlobal(pmesh, ii), nodeInds);
+		nodeInds[0] *= 2;
+		nodeInds[1] *= 2;
+		insist(FeMesh_NodeGlobalToDomain(mesh, Grid_Project(nodeGrid, nodeInds), &lind), != 0);
+		memcpy(Mesh_GetVertex(pmesh, ii), Mesh_GetVertex(mesh, lind), 2*sizeof(double));
+	    }
+	}
+    }
+}
+
+void _Underworld_IncompressibleExtensionBC_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data ) {
+    IncExtBC* self = (IncExtBC*)_self;
 	UnderworldContext*  context  = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
 	ConditionFunction*  condFunc;
+
+        self->context   = Stg_ComponentFactory_PluginConstructByKey( cf, self, "Context", AbstractContext, True, data );
+        context = (UnderworldContext*)self->context;
 
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_TopCondition, "IncompressibleExtensionBC_TopCondition" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
@@ -245,20 +314,30 @@ void _Underworld_IncompressibleExtensionBC_AssignFromXML( void* self, Stg_Compon
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_BackCondition, "IncompressibleExtensionBC_BackCondition" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
+        if( Stg_ComponentFactory_PluginGetBool( cf, self, "Remesh", False ) ) {
+	    TimeIntegrator_PrependFinishEP( 
+		context->timeIntegrator, "Underworld_IncompressibleExtensionBC_Remesh", Underworld_IncompressibleExtensionBC_Remesh, 
+		CURR_MODULE_NAME, self );
+	}
 }
 
 
 /* This function will provide StGermain the abilty to instantiate (create) this codelet on demand. */
 void* _Underworld_IncompressibleExtensionBC_DefaultNew( Name name ) {
-	return Codelet_New(
+   return _Codelet_New(
+			sizeof( IncExtBC ),
 			Underworld_IncompressibleExtensionBC_Type,
+			_Codelet_Delete,
+			_Codelet_Print, 
+			_Codelet_Copy,
+                        name,
+                        NON_GLOBAL,
 			_Underworld_IncompressibleExtensionBC_DefaultNew,
-			_Underworld_IncompressibleExtensionBC_AssignFromXML, /* SQ NOTE: Used to be a construct extensions. */
+			_Underworld_IncompressibleExtensionBC_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,
-			_Codelet_Destroy,
-			name );
+			_Codelet_Destroy );
 }
 	
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
