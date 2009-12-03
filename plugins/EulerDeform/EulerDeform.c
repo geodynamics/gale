@@ -877,9 +877,6 @@ void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx
       *(Grid**)ExtensionManager_Get(sys->mesh->info, sys->mesh, 
                                     ExtensionManager_GetHandle( sys->mesh->info,
                                                                 "vertexGrid" ));
-
-    printf("system %d %d\n",sys_i,edCtx->nSystems);
-
     /* Update the displacement field. */
     if(sys->dispField) {
       double disp[3];
