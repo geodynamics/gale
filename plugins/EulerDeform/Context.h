@@ -47,17 +47,44 @@
 		Bool		wrapBottom;
 		Bool		wrapLeft;
 
-		Bool		staticTop;
-		Bool		staticBottom;
 		Bool		staticLeft;
 		Bool		staticRight;
+		Bool		staticTop;
+		Bool		staticBottom;
 		Bool		staticFront;
 		Bool		staticBack;
+
+		Bool		staticLeftTop;
+		Bool		staticRightTop;
+		Bool		staticLeftTopFront;
+		Bool		staticRightTopFront;
+		Bool		staticLeftTopBack;
+		Bool		staticRightTopBack;
+
+		Bool		staticLeftBottom;
+		Bool		staticRightBottom;
+		Bool		staticLeftBottomFront;
+		Bool		staticRightBottomFront;
+		Bool		staticLeftBottomBack;
+		Bool		staticRightBottomBack;
+
+		Bool		staticLeftFront;
+		Bool		staticRightFront;
+		Bool		staticLeftBack;
+		Bool		staticRightBack;
+
+		Bool		staticTopFront;
+		Bool		staticBottomFront;
+		Bool		staticTopBack;
+		Bool		staticBottomBack;
+
+		Bool		floatLeftTop;
+		Bool		floatRightTop;
+
 		Bool		staticSides;
 		double**	sideCoords;
-
-		Bool contactRight;
-		Bool contactLeft;
+                double          x_right_coord;
+                double          x_left_coord;
 	};
 
 #endif
