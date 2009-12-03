@@ -540,13 +540,22 @@ void _FeVariable_Build( void* variable, void* data ) {
 
 		dim = Mesh_GetDimSize(self->feMesh);
 		/** allocate GNx here */
-		if( !strcmp( self->feMesh->name, "linearMesh" ) ) {
+		if( !strncmp( self->feMesh->feElFamily, "linear", 6 ) ) {
 			numNodes = ( dim == 2 ) ? 4 : 8;
 		}
-		else if( !strcmp( self->feMesh->name, "quadraticMesh" ) ) {
+		else if( !strncmp( self->feMesh->feElFamily, "quadratic", 9) ) {
 			numNodes = ( dim == 2 ) ? 9 : 27;
 		} 
-		else { numNodes = 0; } /** for constantMesh type */
+		else if( !strcmp( self->feMesh->feElFamily, "constant") ) {
+                  numNodes = 0;
+		} 
+		else {
+                  Stream* errorStream
+                    = Journal_Register( Error_Type, self->type );
+
+                  Journal_Firewall(0,errorStream,"Unknown type of element: %s",
+                                   self->feMesh->feElFamily);
+                }
 
 		self->GNx = Memory_Alloc_2DArray( double, dim, numNodes, "Global Shape Function Derivatives" );
 		
