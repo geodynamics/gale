@@ -383,9 +383,25 @@
       <param name="Type">StoreStress</param>
       <param name="MaterialPointsSwarm">materialSwarm</param>
     </struct>
+
+    <struct name="sphereShape">
+      <param name="Type">Sphere</param>
+      <param name="CentreX">1.0</param>
+      <param name="CentreY">0.15</param>
+      <param name="radius">0.1</param>
+    </struct>
+
+    <struct name="nonSphereShape">
+      <param name="Type">Intersection</param>
+      <list name="shapes">
+        <param>boxShape</param>
+        <param>!sphereShape</param>
+      </list>
+    </struct>
+
     <struct name="viscous">
       <param name="Type">RheologyMaterial</param>
-      <param name="Shape">boxShape</param>
+      <param name="Shape">nonSphereShape</param>
       <param name="density">1.0</param>
       <list name="Rheology">
         <param>backgroundViscosity</param>
@@ -394,8 +410,23 @@
       </list>
     </struct>
 
-  </struct>
+    <struct name="sphereViscosity">
+      <param name="Type">MaterialViscosity</param>
+      <param name="eta0">10.0</param>
+    </struct>
 
+    <struct name="sphereViscous">
+      <param name="Type">RheologyMaterial</param>
+      <param name="Shape">sphereShape</param>
+      <param name="density">1.0</param>
+      <list name="Rheology">
+        <param>sphereViscosity</param>
+        <param>storeViscosity</param>
+        <param>storeStress</param>
+      </list>
+    </struct>
+
+  </struct>
   <list name="FieldVariablesToCheckpoint">
     <param>VelocityField</param>
     <param>PressureField</param>

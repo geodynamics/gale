@@ -488,7 +488,7 @@
           <struct>
             <param name="name">vx</param>
             <param name="type">double</param>
-            <param name="value">1.0</param>
+            <param name="value">0.0</param>
           </struct>
         </list>
       </struct>

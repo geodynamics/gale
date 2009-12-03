@@ -361,20 +361,7 @@
         <param>2</param>
       </list>
     </struct>
-
-    <struct name="boxShape">
-      <param name="Type">Box</param>
-      <param name="startX">minX</param>
-      <param name="endX">maxX</param>
-      <param name="startY">minY</param>
-      <param name="endY">maxY</param>
-      <param name="startZ">minZ</param>
-      <param name="endZ">maxZ</param>
-    </struct>
-    <struct name="backgroundViscosity">
-      <param name="Type">MaterialViscosity</param>
-      <param name="eta0">1.0</param>
-    </struct>
+  </struct>
     <struct name="storeViscosity">
       <param name="Type">StoreVisc</param>
       <param name="MaterialPointsSwarm">materialSwarm</param>
@@ -383,18 +370,6 @@
       <param name="Type">StoreStress</param>
       <param name="MaterialPointsSwarm">materialSwarm</param>
     </struct>
-    <struct name="viscous">
-      <param name="Type">RheologyMaterial</param>
-      <param name="Shape">boxShape</param>
-      <param name="density">1.0</param>
-      <list name="Rheology">
-        <param>backgroundViscosity</param>
-        <param>storeViscosity</param>
-        <param>storeStress</param>
-      </list>
-    </struct>
-
-  </struct>
 
   <list name="FieldVariablesToCheckpoint">
     <param>VelocityField</param>
@@ -488,7 +463,7 @@
           <struct>
             <param name="name">vx</param>
             <param name="type">double</param>
-            <param name="value">1.0</param>
+            <param name="value">0.0</param>
           </struct>
         </list>
       </struct>
