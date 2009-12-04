@@ -50,8 +50,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StgFEM_SLE_ProvidedSystems_h__
-#define __StgFEM_SLE_ProvidedSystems_h__
+#ifndef __StgFEM_SLE_ProvidedSystems_ProvidedSystems_h__
+#define __StgFEM_SLE_ProvidedSystems_ProvidedSystems_h__
 	
 	#include "Energy/Energy.h"
 	#include "StokesFlow/StokesFlow.h"

@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Discretisaton_Mesh_RegularBilinear_h__
-#define __Discretisaton_Mesh_RegularBilinear_h__
+#ifndef __StgFEM_Discretisaton_RegularBilinear_h__
+#define __StgFEM_Discretisaton_RegularBilinear_h__
 
 	/** Textual name of this class */
 	extern const Type RegularBilinear_Type;
@@ -101,5 +101,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Discretisaton_Mesh_RegularBilinear_h__ */
+#endif /* __StgFEM_Discretisaton_RegularBilinear_h__ */
 

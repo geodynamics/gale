@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Experimental_Solvers_PETScMGSolver_h__
-#define __Experimental_Solvers_PETScMGSolver_h__
+#ifndef __StgFEM_SLE_SystemSetup_PETScMGSolver_h__
+#define __StgFEM_SLE_SystemSetup_PETScMGSolver_h__
 
 	/** Textual name of this class */
 	extern const Type PETScMGSolver_Type;
@@ -181,5 +181,5 @@
 	void PETScMGSolver_Destruct( PETScMGSolver* self );
 	void PETScMGSolver_DestructLevels( PETScMGSolver* self );
 
-#endif /* __Experimental_Solvers_PETScMGSolver_h__ */
+#endif /* __StgFEM_SLE_SystemSetup_PETScMGSolver_h__ */
 

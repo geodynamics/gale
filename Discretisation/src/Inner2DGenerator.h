@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Discretisaton_Mesh_Inner2DGenerator_h__
-#define __Discretisaton_Mesh_Inner2DGenerator_h__
+#ifndef __StgFEM_Discretisaton_Inner2DGenerator_h__
+#define __StgFEM_Discretisaton_Inner2DGenerator_h__
 
 	/** Textual name of this class */
 	extern const Type Inner2DGenerator_Type;
@@ -107,5 +107,5 @@
 	void Inner2DGenerator_BuildGeometry( Inner2DGenerator* self, FeMesh* mesh );
 	void Inner2DGenerator_BuildElementTypes( Inner2DGenerator* self, FeMesh* mesh );
 
-#endif /* __Discretisaton_Mesh_Inner2DGenerator_h__ */
+#endif /* __StgFEM_Discretisaton_Inner2DGenerator_h__ */
 

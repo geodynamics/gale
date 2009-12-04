@@ -50,8 +50,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StgFEM_SLE_SystemSetup_h__
-#define __StgFEM_SLE_SystemSetup_h__
+#ifndef __StgFEM_SLE_SystemSetup_SystemSetup_h__
+#define __StgFEM_SLE_SystemSetup_SystemSetup_h__
 	
 	#include "units.h"
 	#include "types.h"

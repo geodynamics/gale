@@ -38,8 +38,8 @@
 */
 
 
-#ifndef __StgFEM_LaplacianStiffnessMatrixTerm_h__
-#define __StgFEM_LaplacianStiffnessMatrixTerm_h__
+#ifndef __StgFEM_Assembly_LaplacianStiffnessMatrixTerm_h__
+#define __StgFEM_Assembly_LaplacianStiffnessMatrixTerm_h__
 
 	/** Textual name of this class */
 	extern const Type LaplacianStiffnessMatrixTerm_Type;

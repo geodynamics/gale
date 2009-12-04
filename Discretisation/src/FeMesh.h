@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StgFEM_Discretisation_Mesh_FeMesh_h__
-#define __StgFEM_Discretisation_Mesh_FeMesh_h__
+#ifndef __StgFEM_Discretisation_FeMesh_h__
+#define __StgFEM_Discretisation_FeMesh_h__
 
 	/** Textual name of this class */
 	extern const Type FeMesh_Type;
@@ -138,5 +138,5 @@
 
 	void FeMesh_Destruct( FeMesh* self );
 
-#endif /* __StgFEM_Discretisaton_Mesh_FeMesh_h__ */
+#endif /* __StgFEM_Discretisaton_FeMesh_h__ */
 

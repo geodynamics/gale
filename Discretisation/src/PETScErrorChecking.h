@@ -37,8 +37,8 @@
 **
 */
 
-#ifndef __StgFEM_SLE_LinearAlgebra_PETScErrorChecking_h__
-#define __StgFEM_SLE_LinearAlgebra_PETScErrorChecking_h__
+#ifndef __StgFEM_Discretisaton_PETScErrorChecking_h__
+#define __StgFEM_Discretisaton_PETScErrorChecking_h__
 	
 	#define CheckPETScError( errorFlag ) \
 		do {								\
@@ -49,4 +49,4 @@
 			}						\
 		} while (0)
 
-#endif	/* __StgFEM_SLE_LinearAlgebra_PETScErrorChecking_h__ */
+#endif	/* __StgFEM_Discretisaton_PETScErrorChecking_h__ */

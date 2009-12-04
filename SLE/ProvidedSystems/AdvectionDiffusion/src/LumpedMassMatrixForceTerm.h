@@ -38,8 +38,8 @@
 */
 
 
-#ifndef __StgFEM_LumpedMassMatrixForceTerm_h__
-#define __StgFEM_LumpedMassMatrixForceTerm_h__
+#ifndef __StgFEM_SLE_ProvidedSystems_LumpedMassMatrixForceTerm_h__
+#define __StgFEM_SLE_ProvidedSystems_LumpedMassMatrixForceTerm_h__
 
 	/** Textual name of this class */
 	extern const Type LumpedMassMatrixForceTerm_Type;

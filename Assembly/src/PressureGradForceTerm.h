@@ -38,8 +38,8 @@
 */
 
 
-#ifndef __StgFEM_PressureGradForceTerm_h__
-#define __StgFEM_PressureGradForceTerm_h__
+#ifndef __StgFEM_Assembly_PressureGradForceTerm_h__
+#define __StgFEM_Assembly_PressureGradForceTerm_h__
 
 	/** Textual name of this class */
 	extern const Type PressureGradForceTerm_Type;

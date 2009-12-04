@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Experimental_Solvers_MultigridSolver_h__
-#define __Experimental_Solvers_MultigridSolver_h__
+#ifndef __StgFEM_SLE_SystemSetup_MultigridSolver_h__
+#define __StgFEM_SLE_SystemSetup_MultigridSolver_h__
 
 	/** Textual name of this class */
 	extern const Type MultigridSolver_Type;
@@ -217,5 +217,5 @@
 	void MultigridSolver_Destruct( MultigridSolver* self );
 	void MultigridSolver_DestructLevels( MultigridSolver* self );
 
-#endif /* __Experimental_Solvers_MultigridSolver_h__ */
+#endif /* __StgFEM_SLE_SystemSetup_MultigridSolver_h__ */
 

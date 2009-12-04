@@ -38,8 +38,8 @@
 */
 
 
-#ifndef __StgFEM_PressureGradMatrixTerm_h__
-#define __StgFEM_PressureGradMatrixTerm_h__
+#ifndef __StgFEM_Assembly_PressureGradMatrixTerm_h__
+#define __StgFEM_Assembly_PressureGradMatrixTerm_h__
 
 	/** Textual name of this class */
 	extern const Type PressureGradMatrixTerm_Type;

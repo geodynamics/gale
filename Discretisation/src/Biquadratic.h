@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Discretisaton_Mesh_Biquadratic_h__
-#define __Discretisaton_Mesh_Biquadratic_h__
+#ifndef __StgFEM_Discretisaton_Biquadratic_h__
+#define __StgFEM_Discretisaton_Biquadratic_h__
 
 	/** Textual name of this class */
 	extern const Type Biquadratic_Type;
@@ -103,5 +103,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Discretisaton_Mesh_Biquadratic_h__ */
+#endif /* __StgFEM_Discretisaton_Biquadratic_h__ */
 

@@ -48,8 +48,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __FiniteElement_FeEntryPoint_h__
-#define __FiniteElement_FeEntryPoint_h__
+#ifndef __StgFEM_SLE_SystemSetup_FeEntryPoint_h__
+#define __StgFEM_SLE_SystemSetup_FeEntryPoint_h__
 	
 	/* Templates for feEntry point type */
 	typedef void		(FeEntryPoint_AssembleStiffnessMatrix_Function)	( 

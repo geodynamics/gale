@@ -48,8 +48,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Discretisation_OperatorFeVariable_h__
-#define __Discretisation_OperatorFeVariable_h__
+#ifndef __StgFEM_Discretisation_OperatorFeVariable_h__
+#define __StgFEM_Discretisation_OperatorFeVariable_h__
 
 	#define MAX_FIELD_COMPONENTS 9
 
@@ -176,5 +176,5 @@
 
 	void OperatorFeVariable_GradientValueAtNodeFunc( void* feVariable, Node_DomainIndex dNode_I, double* value );
 
-#endif /* __Discretisation_OperatorFeVariable_h__ */
+#endif /* __StgFEM_Discretisation_OperatorFeVariable_h__ */
 

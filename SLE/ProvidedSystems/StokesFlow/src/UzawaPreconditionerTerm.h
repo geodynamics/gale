@@ -38,8 +38,8 @@
 */
 
 
-#ifndef __StgFEM_UzawaPreconditionerTerm_h__
-#define __StgFEM_UzawaPreconditionerTerm_h__
+#ifndef __StgFEM_SLE_ProvidedSystems_StokesFlow_UzawaPreconditionerTerm_h__
+#define __StgFEM_SLE_ProvidedSystems_StokesFlow_UzawaPreconditionerTerm_h__
 
 	/** Textual name of this class */
 	extern const Type UzawaPreconditionerTerm_Type;

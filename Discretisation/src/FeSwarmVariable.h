@@ -45,8 +45,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Discretisation_FeSwarmVariable_h__
-#define __Discretisation_FeSwarmVariable_h__
+#ifndef __StgFEM_Discretisation_FeSwarmVariable_h__
+#define __StgFEM_Discretisation_FeSwarmVariable_h__
 
 	/** Textual name of this class */
 	extern const Type FeSwarmVariable_Type;
@@ -111,5 +111,5 @@
 	/** Private Functions */
 
 
-#endif /* __Discretisation_FeSwarmVariable_h__ */
+#endif /* __StgFEM_Discretisation_FeSwarmVariable_h__ */
 

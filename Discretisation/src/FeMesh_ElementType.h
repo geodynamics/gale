@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_FeMesh_ElementType_h__
-#define __Domain_Mesh_FeMesh_ElementType_h__
+#ifndef __StgFEM_Discretisation_FeMesh_ElementType_h__
+#define __StgFEM_Discretisation_FeMesh_ElementType_h__
 
 	/** Textual name of this class */
 	extern const Type FeMesh_ElementType_Type;
@@ -98,5 +98,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Domain_Mesh_FeMesh_ElementType_h__ */
+#endif /* __StgFEM_Discretisation_FeMesh_ElementType_h__ */
 

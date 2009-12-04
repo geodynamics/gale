@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Experimental_Solvers_SROpGenerator_h__
-#define __Experimental_Solvers_SROpGenerator_h__
+#ifndef __StgFEM_SLE_SystemSetup_SROpGenerator_h__
+#define __StgFEM_SLE_SystemSetup_SROpGenerator_h__
 
 	/** Textual name of this class */
 	extern const Type SROpGenerator_Type;
@@ -130,5 +130,5 @@
 	Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self );
 	Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level );
 
-#endif /* __Experimental_Solvers_SROpGenerator_h__ */
+#endif /* __StgFEM_SLE_SystemSetup_SROpGenerator_h__ */
 

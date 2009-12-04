@@ -37,8 +37,8 @@
 **
 */
 
-#ifndef __StgFEM_AdvectionDiffusion_types_h__
-#define __StgFEM_AdvectionDiffusion_types_h__
+#ifndef __StgFEM_SLE_ProvidedSystems_AdvectionDiffusion_types_h__
+#define __StgFEM_SLE_ProvidedSystems_AdvectionDiffusion_types_h__
 
 	/* Classes */
 	typedef	struct AdvectionDiffusionSLE         AdvectionDiffusionSLE; 

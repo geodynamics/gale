@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Discretisaton_Mesh_C0Generator_h__
-#define __Discretisaton_Mesh_C0Generator_h__
+#ifndef __StgFEM_Discretisaton_C0Generator_h__
+#define __StgFEM_Discretisaton_C0Generator_h__
 
 	/** Textual name of this class */
 	extern const Type C0Generator_Type;
@@ -107,5 +107,5 @@
 	void C0Generator_BuildGeometry( C0Generator* self, FeMesh* mesh );
 	void C0Generator_BuildElementTypes( C0Generator* self, FeMesh* mesh );
 
-#endif /* __Discretisaton_Mesh_C0Generator_h__ */
+#endif /* __StgFEM_Discretisaton_C0Generator_h__ */
 

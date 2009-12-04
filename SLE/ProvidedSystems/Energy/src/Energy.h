@@ -50,8 +50,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StgFEM_SLE_ProvidedSystems_Energy_h__
-#define __StgFEM_SLE_ProvidedSystems_Energy_h__
+#ifndef __StgFEM_SLE_ProvidedSystems_Energy_Energy_h__
+#define __StgFEM_SLE_ProvidedSystems_Energy_Energy_h__
 	
 	#include "types.h"
 		
@@ -61,4 +61,4 @@
 	#include "Init.h"
 	#include "Finalise.h"
 
-#endif /* __StgFEM_SLE_ProvidedSystems_Energy_h__ */
+#endif /* __StgFEM_SLE_ProvidedSystems_Energy_Energy_h__ */

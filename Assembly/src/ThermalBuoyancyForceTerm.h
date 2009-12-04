@@ -38,8 +38,8 @@
 */
 
 
-#ifndef __StgFEM_ThermalBuoyancyForceTerm_h__
-#define __StgFEM_ThermalBuoyancyForceTerm_h__
+#ifndef __StgFEM_Assembly_ThermalBuoyancyForceTerm_h__
+#define __StgFEM_Assembly_ThermalBuoyancyForceTerm_h__
 
 	/** Textual name of this class */
 	extern const Type ThermalBuoyancyForceTerm_Type;

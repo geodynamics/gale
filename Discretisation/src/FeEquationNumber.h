@@ -43,7 +43,7 @@
 ** Assumptions:
 **	feMesh partitioned by node, no shadow nodes, L2G tables built.
 **	The Variable's DofLayout is indexed by local node numbers, not global.
-**	(These are verified by the FiniteElement_Mesh at construction.)
+**	(These are verified by the FiniteElement at construction.)
 **
 ** Comments:
 **	Is now (as of 12 OCtober 2004) also responsible for determining how
@@ -71,8 +71,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StgFEM_Discretisation_EquationNumber_h__
-#define __StgFEM_Discretisation_EquationNumber_h__
+#ifndef __StgFEM_Discretisation_FeEquationNumber_h__
+#define __StgFEM_Discretisation_FeEquationNumber_h__
 	#include <mpi.h>
 	
 	typedef void (FeEquationNumber_BuildFunction) ( void* feEquationNumber, void *data );
@@ -279,5 +279,5 @@
 
 	void FeEquationNumber_BuildWithDave( FeEquationNumber* self );
 
-#endif /* __StgFEM_Discretisation_EquationNumber_h__ */
+#endif /* __StgFEM_Discretisation_FeEquationNumber_h__ */
 

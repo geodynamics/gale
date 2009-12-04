@@ -48,8 +48,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __SLE_ProvidedSystems_Energy_SLE_h__
-#define __SLE_ProvidedSystems_Energy_SLE_h__
+#ifndef __StgFEM_SLE_ProvidedSystems_Energy_Energy_SLE_h__
+#define __StgFEM_SLE_ProvidedSystems_Energy_Energy_SLE_h__
 
 	/** Textual name of this class */
 	extern const Type Energy_SLE_Type;

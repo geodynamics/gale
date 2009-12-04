@@ -38,8 +38,8 @@
 */
 
 
-#ifndef __StgFEM_GradientStiffnessMatrixTerm_h__
-#define __StgFEM_GradientStiffnessMatrixTerm_h__
+#ifndef __StgFEM_Assembly_GradientStiffnessMatrixTerm_h__
+#define __StgFEM_Assembly_GradientStiffnessMatrixTerm_h__
 
 	/** Textual name of this class */
 	extern const Type GradientStiffnessMatrixTerm_Type;

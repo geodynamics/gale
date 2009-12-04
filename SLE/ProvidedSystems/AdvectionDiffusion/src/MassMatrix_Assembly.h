@@ -38,8 +38,8 @@
 */
 
 
-#ifndef __StgFEM_AdvectionDiffusion_MassMatrix_Assembly_h__
-#define __StgFEM_AdvectionDiffusion_MassMatrix_Assembly_h__
+#ifndef __StgFEM_SLE_ProvidedSystems_AdvectionDiffusion_MassMatrix_Assembly_h__
+#define __StgFEM_SLE_ProvidedSystems_AdvectionDiffusion_MassMatrix_Assembly_h__
 	
 	void MassMatrix_Assembly_Lumped( void* forceTerm, ForceVector* forceVector ,Element_LocalIndex lElement_I, double* elForceVector ) ;
 	void MassMatrix_Assembly_Lumped_Box( void* forceTerm, ForceVector* forceVector ,Element_LocalIndex lElement_I, double* elForceVector ) ;

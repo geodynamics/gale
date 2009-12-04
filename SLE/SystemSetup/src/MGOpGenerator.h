@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Experimental_Solvers_MGOpGenerator_h__
-#define __Experimental_Solvers_MGOpGenerator_h__
+#ifndef __StgFEM_SLE_SystemSetup_MGOpGenerator_h__
+#define __StgFEM_SLE_SystemSetup_MGOpGenerator_h__
 
 	/** Textual name of this class */
 	extern const Type MGOpGenerator_Type;
@@ -128,5 +128,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Experimental_Solvers_MGOpGenerator_h__ */
+#endif /* __StgFEM_SLE_SystemSetup_MGOpGenerator_h__ */
 

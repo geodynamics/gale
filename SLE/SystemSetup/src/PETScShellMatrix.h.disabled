@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StgFEM_SLE_LinearAlgebra_PETScShellMatrix_h__
-#define __StgFEM_SLE_LinearAlgebra_PETScShellMatrix_h__
+#ifndef __StgFEM_SLE_SystemSetup_SystemSetup_PETScShellMatrix_h__
+#define __StgFEM_SLE_SystemSetup_SystemSetup_PETScShellMatrix_h__
 
 	/** Textual name of this class */
 	extern const Type PETScShellMatrix_Type;
@@ -136,4 +136,4 @@
 	PetscErrorCode PETScShellMatrix_MatMultTranspose( Mat A, Vec x, Vec y );
 	PetscErrorCode PETScShellMatrix_MatGetDiagonal( Mat A, Vec x );
 
-#endif /* __StgFEM_SLE_LinearAlgebra_PETScShellMatrix_h__ */
+#endif /* __StgFEM_SLE_SystemSetup_SystemSetup_PETScShellMatrix_h__ */
