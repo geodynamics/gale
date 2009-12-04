@@ -22,9 +22,9 @@ if len(sys.argv) > 1:
 		['https://' + (sys.argv[1] + '@') + 'csd.vpac.org/hg/StgFEM', 'StgFEM' ], \
 		['https://' + (sys.argv[1] + '@') + 'www.mcc.monash.edu.au/hg/Underworld', 'Underworld' ], \
 		['https://' + (sys.argv[1] + '@') + 'www.mcc.monash.edu.au/hg/Experimental', 'Experimental' ], \
-		['https://' + (sys.argv[1] + '@') + 'www.mcc.monash.edu.au/hg/Experimental', 'Experimental/PDERework/config' ], \
-		['https://' + (sys.argv[1] + '@') + 'www.mcc.monash.edu.au/hg/Experimental', 'Experimental/Magma/config' ], \
-		['https://' + (sys.argv[1] + '@') + 'www.mcc.monash.edu.au/hg/Experimental', 'Experimental/Geothermal/config' ] ]
+		['https://' + (sys.argv[1] + '@') + 'csd.vpac.org/hg/SConfigure', 'Experimental/PDERework/config' ], \
+		['https://' + (sys.argv[1] + '@') + 'csd.vpac.org/hg/SConfigure', 'Experimental/Magma/config' ], \
+		['https://' + (sys.argv[1] + '@') + 'csd.vpac.org/hg/SConfigure', 'Experimental/Geothermal/config' ] ]
 else:
 	deps = [ \
 		['https://csd.vpac.org/hg/hgforest', '.hg/forest' ], \
@@ -36,6 +36,9 @@ else:
 		['https://csd.vpac.org/hg/StgFEM', 'StgFEM' ], \
 		['https://www.mcc.monash.edu.au/hg/Underworld', 'Underworld' ], \
 		['https://www.mcc.monash.edu.au/hg/Experimental', 'Experimental' ] ]
+		['https://csd.vpac.org/hg/SConfigure', 'Experimental/PDERework/config' ], \
+		['https://csd.vpac.org/hg/SConfigure', 'Experimental/Magma/config' ], \
+		['https://csd.vpac.org/hg/SConfigure', 'Experimental/Geothermal/config' ] ]
 	
 
 # Make sure the '.hg' directory exists
