@@ -43,8 +43,8 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-#ifndef __Underworld_FrankKamenetskii_h__
-#define __Underworld_FrankKamenetskii_h__
+#ifndef __Underworld_Rheology_FrankKamenetskii_h__
+#define __Underworld_Rheology_FrankKamenetskii_h__
 
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 	extern const Type FrankKamenetskii_Type;

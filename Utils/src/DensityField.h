@@ -8,8 +8,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Underworld_MaterialPoints_DensityField_h__
-#define __Underworld_MaterialPoints_DensityField_h__
+#ifndef __Underworld_Utils_DensityField_h__
+#define __Underworld_Utils_DensityField_h__
 	
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 	extern const Type DensityField_Type;

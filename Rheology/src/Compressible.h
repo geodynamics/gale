@@ -43,8 +43,8 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-#ifndef __Underworld_Compressible_h__
-#define __Underworld_Compressible_h__
+#ifndef __Underworld_Rheology_Compressible_h__
+#define __Underworld_Rheology_Compressible_h__
 
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 	extern const Type Compressible_Type;
