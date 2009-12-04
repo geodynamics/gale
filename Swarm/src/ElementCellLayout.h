@@ -41,8 +41,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_ElementCellLayout_h__
-#define __Domain_Swarm_ElementCellLayout_h__
+#ifndef __StgDomain_Swarm_ElementCellLayout_h__
+#define __StgDomain_Swarm_ElementCellLayout_h__
 	
 
 	/* Textual name of this class */
@@ -136,5 +136,5 @@
 
 	void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self );
 	
-#endif /* __Domain_Swarm_ElementCellLayout_h__ */
+#endif /* __StgDomain_Swarm_ElementCellLayout_h__ */
 

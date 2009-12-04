@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_PlaneParticleLayout_h__
-#define __Domain_Swarm_PlaneParticleLayout_h__
+#ifndef __StgDomain_Swarm_PlaneParticleLayout_h__
+#define __StgDomain_Swarm_PlaneParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -119,5 +119,5 @@ PlaneParticleLayout* _PlaneParticleLayout_New(  PLANEPARTICLELAYOUT_DEFARGS  );
 			Particle_Index newParticle_I,
 			void* particle );
 
-#endif /* __StGermain_Domain_PlaneParticleLayout_h__ */
+#endif /* __StgDomain_PlaneParticleLayout_h__ */
 

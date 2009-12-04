@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_WallVC_h__
-#define __Domain_Utils_WallVC_h__
+#ifndef __StgDomain_Utils_WallVC_h__
+#define __StgDomain_Utils_WallVC_h__
 	
 
 	extern const Type WallVC_Type;
@@ -166,5 +166,5 @@
 	*/
 
 	
-#endif /* __Domain_Utils_WallVC_h__ */
+#endif /* __StgDomain_Utils_WallVC_h__ */
 

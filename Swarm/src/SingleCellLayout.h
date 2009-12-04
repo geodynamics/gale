@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_SingleCellLayout_h__
-#define __Domain_Swarm_SingleCellLayout_h__
+#ifndef __StgDomain_Swarm_SingleCellLayout_h__
+#define __StgDomain_Swarm_SingleCellLayout_h__
 	
 
 	/* Textual name of this class */
@@ -139,5 +139,5 @@
 
 	void _SingleCellLayout_InitialiseGlobalCellPointPositions( SingleCellLayout* self );
 	
-#endif /* __Domain_Swarm_SingleCellLayout_h__ */
+#endif /* __StgDomain_Swarm_SingleCellLayout_h__ */
 

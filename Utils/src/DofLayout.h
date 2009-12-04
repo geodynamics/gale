@@ -45,8 +45,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_DofLayout_h__
-#define __Domain_Utils_DofLayout_h__
+#ifndef __StgDomain_Utils_DofLayout_h__
+#define __StgDomain_Utils_DofLayout_h__
 	
 	/** Textual name of this class */
 	extern const Type DofLayout_Type;
@@ -208,5 +208,5 @@
 	/** Saves all variables used by this dofLayout to files */
 	void DofLayout_LoadAllVariablesFromFiles( void* dofLayout, char* prefixString, unsigned rank );
 
-#endif /* __Domain_Utils_DofLayout_h__ */
+#endif /* __StgDomain_Utils_DofLayout_h__ */
 

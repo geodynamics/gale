@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_InnerWallVC_h__
-#define __Domain_Utils_InnerWallVC_h__
+#ifndef __StgDomain_Utils_InnerWallVC_h__
+#define __StgDomain_Utils_InnerWallVC_h__
 	
 
 	extern const Type InnerWallVC_Type;
@@ -162,5 +162,5 @@
 	** Functions
 	*/
 
-#endif /* __Domain_Utils_InnerWallVC_h__ */
+#endif /* __StgDomain_Utils_InnerWallVC_h__ */
 

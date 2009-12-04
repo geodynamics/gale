@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_ShapeAdvector_h__
-#define __Domain_Utils_ShapeAdvector_h__
+#ifndef __StgDomain_Utils_ShapeAdvector_h__
+#define __StgDomain_Utils_ShapeAdvector_h__
 
 	/* Textual name of this class */
 	extern const Type ShapeAdvector_Type;

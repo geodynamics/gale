@@ -29,8 +29,8 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-#ifndef __Domain_Utils_Operator_h__
-#define __Domain_Utils_Operator_h__
+#ifndef __StgDomain_Utils_Operator_h__
+#define __StgDomain_Utils_Operator_h__
 
 typedef void (Operator_CarryOutUnaryOperationFunction)  ( void* operatorObject, double* operand0, double* result );
 typedef void (Operator_CarryOutBinaryOperationFunction) ( void* operatorObject, double* operand0, double* operand1, double* result );

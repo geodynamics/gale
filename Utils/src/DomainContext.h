@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_DomainContext_h__
-#define __Domain_Utils_DomainContext_h__
+#ifndef __StgDomain_Utils_DomainContext_h__
+#define __StgDomain_Utils_DomainContext_h__
 	
 	/* Textual name of this class */
 	extern const Type DomainContext_Type;

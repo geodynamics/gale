@@ -38,8 +38,8 @@
  **
  **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StGermain_Domain_Utils_RegularRemesherCmpt_h__
-#define __StGermain_Domain_Utils_RegularRemesherCmpt_h__
+#ifndef __StgDomain_Utils_RegularRemesherCmpt_h__
+#define __StgDomain_Utils_RegularRemesherCmpt_h__
 
 #ifdef HAVE_PETSC
 

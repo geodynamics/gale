@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_QuadEdge_h__
-#define __Domain_Geometry_QuadEdge_h__
+#ifndef __StgDomain_Geometry_QuadEdge_h__
+#define __StgDomain_Geometry_QuadEdge_h__
 
 	/* Virtual function types */
 	
@@ -198,4 +198,4 @@ do{\
 	void SpliceQuadEdges(QuadEdgeRef a, QuadEdgeRef b);
 	QuadEdgeRef ConnectQuadEdges(MemoryPool *qp, QuadEdgeRef a, QuadEdgeRef b);
 	
-#endif /* __Domain_Geometry_QuadEdge_h__ */
+#endif /* __StgDomain_Geometry_QuadEdge_h__ */

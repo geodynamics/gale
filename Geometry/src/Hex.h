@@ -38,9 +38,9 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_Hex_h__
-#define __Domain_Geometry_Hex_h__
+#ifndef __StgDomain_Geometry_Hex_h__
+#define __StgDomain_Geometry_Hex_h__
 
 	double Hex_Volume( double** verts, unsigned* inc, unsigned* inds );
 
-#endif /* __Domain_Geometry_Hex_h__ */
+#endif /* __StgDomain_Geometry_Hex_h__ */

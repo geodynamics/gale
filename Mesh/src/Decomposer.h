@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Decomposer_h__
-#define __Domain_Mesh_Decomposer_h__
+#ifndef __StgDomain_Mesh_Decomposer_h__
+#define __StgDomain_Mesh_Decomposer_h__
 
 	/** Textual name of this class */
 	extern const Type	Decomposer_Type;
@@ -110,4 +110,4 @@
 	void Decomposer_BuildIndices( Decomposer* self, unsigned nDomains, unsigned* domains, RangeSet* claimed, 
 				      CommTopology* commTopo, Decomp** decomp, Decomp_Sync** sync );
 
-#endif /* __Domain_Mesh_Decomposer_h__ */
+#endif /* __StgDomain_Mesh_Decomposer_h__ */

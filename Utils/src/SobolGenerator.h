@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_SobolGenerator_h__
-#define __Domain_Utils_SobolGenerator_h__
+#ifndef __StgDomain_Utils_SobolGenerator_h__
+#define __StgDomain_Utils_SobolGenerator_h__
 
 	/** Textual name of this class */
 	extern const Type SobolGenerator_Type;
@@ -108,5 +108,5 @@
 	double SobolGenerator_GetNextNumber_WithMinMax( void* sobolGenerator, double min, double max ) ;
 	double SobolGenerator_GetNumberByIndex_WithMinMax( void* sobolGenerator, unsigned int index, double min, double max ) ;
 
-#endif /* __Domain_Utils_SobolGenerator_h__ */
+#endif /* __StgDomain_Utils_SobolGenerator_h__ */
 

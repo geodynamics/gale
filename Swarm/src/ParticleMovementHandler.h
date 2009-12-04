@@ -40,8 +40,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	
-#ifndef __Domain_Swarm_ParticleMovementHandler_h__
-#define __Domain_Swarm_ParticleMovementHandler_h__
+#ifndef __StgDomain_Swarm_ParticleMovementHandler_h__
+#define __StgDomain_Swarm_ParticleMovementHandler_h__
 
 	/** Textual name of this class */
 	extern const Type ParticleMovementHandler_Type;

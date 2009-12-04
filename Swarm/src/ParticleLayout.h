@@ -38,8 +38,8 @@
  **
  **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_ParticleLayout_h__
-#define __Domain_Swarm_ParticleLayout_h__
+#ifndef __StgDomain_Swarm_ParticleLayout_h__
+#define __StgDomain_Swarm_ParticleLayout_h__
 
 /** @see ParticleLayout_SetInitialCounts */
 typedef void (ParticleLayout_SetInitialCountsFunction)    ( void* particleLayout, void* swarm );
@@ -115,5 +115,5 @@ void ParticleLayout_SetInitialCounts( void* particleLayout, void* swarm );
 /** Initialise startup positions of all particles in given swarm. */
 void ParticleLayout_InitialiseParticles( void* particleLayout, void* swarm );
 	
-#endif /* __Domain_Swarm_ParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_ParticleLayout_h__ */
 

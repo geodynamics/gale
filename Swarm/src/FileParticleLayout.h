@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_FileParticleLayout_h__
-#define __Domain_Swarm_FileParticleLayout_h__
+#ifndef __StgDomain_Swarm_FileParticleLayout_h__
+#define __StgDomain_Swarm_FileParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -125,5 +125,5 @@
 	/* small routine to find out number of files fileParticleLayout is stored across, which maybe have been stored in the timeInfo checkpoint file */ 
 	Index _FileParticleLayout_GetFileCountFromTimeInfoFile( void* context );
 
-#endif /* __Domain_Swarm_FileParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_FileParticleLayout_h__ */
 

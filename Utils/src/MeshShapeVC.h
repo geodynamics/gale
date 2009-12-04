@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_MeshShapeVC_h__
-#define __Domain_Utils_MeshShapeVC_h__
+#ifndef __StgDomain_Utils_MeshShapeVC_h__
+#define __StgDomain_Utils_MeshShapeVC_h__
 	
 	extern const Type MeshShapeVC_Type;
 	

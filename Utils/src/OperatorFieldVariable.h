@@ -53,8 +53,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_OperatorFieldVariable_h__
-#define __Domain_Utils_OperatorFieldVariable_h__
+#ifndef __StgDomain_Utils_OperatorFieldVariable_h__
+#define __StgDomain_Utils_OperatorFieldVariable_h__
 
 	#define MAX_FIELD_COMPONENTS 9
 
@@ -159,5 +159,5 @@
 
 	void OperatorFieldVariable_BinaryOperator( void* fieldVariable, double* fieldValue0, double* fieldValue1, double* value ) ;
 
-#endif /* __Domain_Utils_OperatorFieldVariable_h__ */
+#endif /* __StgDomain_Utils_OperatorFieldVariable_h__ */
 

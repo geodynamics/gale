@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Mesh_HexAlgorithms_h__
-#define __Domain_Mesh_Mesh_HexAlgorithms_h__
+#ifndef __StgDomain_Mesh_HexAlgorithms_h__
+#define __StgDomain_Mesh_HexAlgorithms_h__
 
 	/** Textual name of this class */
 	extern const Type Mesh_HexAlgorithms_Type;
@@ -106,5 +106,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Domain_Mesh_Mesh_HexAlgorithms_h__ */
+#endif /* __StgDomain_Mesh_HexAlgorithms_h__ */
 

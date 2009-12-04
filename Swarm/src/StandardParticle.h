@@ -41,8 +41,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_StandardParticle_h__
-#define __Domain_Swarm_StandardParticle_h__
+#ifndef __StgDomain_Swarm_StandardParticle_h__
+#define __StgDomain_Swarm_StandardParticle_h__
 
 	extern const Type StandardParticle_Type;
 	extern const Type LocalParticle_Type;

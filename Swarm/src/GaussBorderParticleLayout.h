@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_GaussBorderParticleLayout_h__
-#define __Domain_Swarm_GaussBorderParticleLayout_h__
+#ifndef __StgDomain_Swarm_GaussBorderParticleLayout_h__
+#define __StgDomain_Swarm_GaussBorderParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -107,5 +107,5 @@
 
         void _GaussBorderParticleLayout_InitialiseParticlesPerFace( GaussBorderParticleLayout* self );
 	
-#endif /* __Domain_Swarm_GaussBorderParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_GaussBorderParticleLayout_h__ */
 

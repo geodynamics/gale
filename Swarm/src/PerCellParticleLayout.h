@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_PerCellParticleLayout_h__
-#define __Domain_Swarm_PerCellParticleLayout_h__
+#ifndef __StgDomain_Swarm_PerCellParticleLayout_h__
+#define __StgDomain_Swarm_PerCellParticleLayout_h__
 	
 	/** @see PerCellParticleLayout_InitialCount */
 	typedef Particle_InCellIndex (PerCellParticleLayout_InitialCountFunction) ( 
@@ -117,5 +117,5 @@
 	/** Return the initial number of particles in cell */
 	Particle_InCellIndex PerCellParticleLayout_InitialCount( void* particleLayout, void* _swarm, Cell_Index cell_I );
 	
-#endif /* __Domain_Swarm_PerCellParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_PerCellParticleLayout_h__ */
 

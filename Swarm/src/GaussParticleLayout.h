@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_GaussParticleLayout_h__
-#define __Domain_Swarm_GaussParticleLayout_h__
+#ifndef __StgDomain_Swarm_GaussParticleLayout_h__
+#define __StgDomain_Swarm_GaussParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -114,5 +114,5 @@ GaussParticleLayout* GaussParticleLayout_New(
 	 *     @param pointCount Number of points to create in a dimension */
 	void GaussParticleLayout_GetAbscissaAndWeights1D( double* weight, double* abscissa, Index pointCount ) ;
 	
-#endif /* __Domain_Swarm_GaussParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_GaussParticleLayout_h__ */
 

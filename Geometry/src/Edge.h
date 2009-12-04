@@ -35,8 +35,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_Edge_h__
-#define __Domain_Geometry_Edge_h__
+#ifndef __StgDomain_Geometry_Edge_h__
+#define __StgDomain_Geometry_Edge_h__
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -56,4 +56,4 @@
 			EdgeFaces_List*		edgeFacesTbl );
 
 	
-#endif /* __Domain_Geometry_Edge_h__ */
+#endif /* __StgDomain_Geometry_Edge_h__ */

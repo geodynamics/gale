@@ -38,9 +38,9 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_Finalise_h__
-#define __Domain_Utils_Finalise_h__
+#ifndef __StgDomain_Utils_Finalise_h__
+#define __StgDomain_Utils_Finalise_h__
 	
 	Bool StgDomainUtils_Finalise( void );
 	
-#endif /* __Domain_Utils_Finalise_h__ */
+#endif /* __StgDomain_Utils_Finalise_h__ */

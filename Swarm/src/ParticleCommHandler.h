@@ -40,8 +40,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	
-#ifndef __Domain_Swarm_ParticleCommHandler_h__
-#define __Domain_Swarm_ParticleCommHandler_h__
+#ifndef __StgDomain_Swarm_ParticleCommHandler_h__
+#define __StgDomain_Swarm_ParticleCommHandler_h__
 
 	
 	/** Textual name of this class */

@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_MeshAdaptor_h__
-#define __Domain_Mesh_MeshAdaptor_h__
+#ifndef __StgDomain_Mesh_MeshAdaptor_h__
+#define __StgDomain_Mesh_MeshAdaptor_h__
 
 	/** Textual name of this class */
 	extern const Type MeshAdaptor_Type;
@@ -102,5 +102,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Domain_Mesh_MeshAdaptor_h__ */
+#endif /* __StgDomain_Mesh_MeshAdaptor_h__ */
 

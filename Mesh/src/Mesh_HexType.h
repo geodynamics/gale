@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Mesh_HexType_h__
-#define __Domain_Mesh_Mesh_HexType_h__
+#ifndef __StgDomain_Mesh_HexType_h__
+#define __StgDomain_Mesh_HexType_h__
 
 	/** Textual name of this class */
 	extern const Type Mesh_HexType_Type;
@@ -122,5 +122,5 @@
 	void Mesh_HexType_TetBarycenter( double** verts, unsigned* inc, unsigned* inds, double* point, double* bc );
 	void Mesh_HexType_TriBarycenter( double** verts, unsigned* inc, unsigned* inds, double* point, double* bc );
 
-#endif /* __Domain_Mesh_Mesh_HexType_h__ */
+#endif /* __StgDomain_Mesh_HexType_h__ */
 

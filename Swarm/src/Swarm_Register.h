@@ -33,8 +33,8 @@
 ** $Id: Swarm_Register.h 2745 2005-05-10 08:12:18Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#ifndef __Domain_Swarm_Swarm_Register_h__
-#define __Domain_Swarm_Swarm_Register_h__
+#ifndef __StgDomain_Swarm_Swarm_Register_h__
+#define __StgDomain_Swarm_Swarm_Register_h__
 
 	extern const Type Swarm_Register_Type;
 	extern Swarm_Register* stgSwarm_Register;		/**< Swarm register singleton. */
@@ -99,7 +99,7 @@
 
 	void Swarm_Register_SaveAllRegisteredSwarms( Swarm_Register* self, void* context );
 
-#endif /* __Domain_Swarm_Swarm_Register_h__ */
+#endif /* __StgDomain_Swarm_Swarm_Register_h__ */
 
 
 

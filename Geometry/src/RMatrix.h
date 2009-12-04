@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_TMatrix_h__
-#define __Domain_Geometry_TMatrix_h__
+#ifndef __StgDomain_Geometry_TMatrix_h__
+#define __StgDomain_Geometry_TMatrix_h__
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -65,4 +65,4 @@
 		(dest)[6] = 0.0; (dest)[7] = 0.0; (dest)[8] = 1.0
 	
 	
-#endif /* __Domain_Geometry_TMatrix_h__ */
+#endif /* __StgDomain_Geometry_TMatrix_h__ */

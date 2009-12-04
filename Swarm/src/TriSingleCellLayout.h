@@ -41,8 +41,8 @@ given mesh layout.
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_TriSingleCellLayout_h__
-#define __Domain_Swarm_TriSingleCellLayout_h__
+#ifndef __StgDomain_Swarm_TriSingleCellLayout_h__
+#define __StgDomain_Swarm_TriSingleCellLayout_h__
 
 	
 	/* Textual name of this class */
@@ -142,5 +142,5 @@ given mesh layout.
 	/* Get the shadow info */
 	ShadowInfo* _TriSingleCellLayout_GetShadowInfo( void* triSingleCellLayout );
 	
-#endif /* __Domain_Swarm_TriSingleCellLayout_h__ */
+#endif /* __StgDomain_Swarm_TriSingleCellLayout_h__ */
 

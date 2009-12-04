@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_HMesh_h__
-#define __Domain_Mesh_HMesh_h__
+#ifndef __StgDomain_Mesh_HMesh_h__
+#define __StgDomain_Mesh_HMesh_h__
 
 	/** Textual name of this class */
 	extern const Type HMesh_Type;
@@ -167,4 +167,4 @@
 	void HMesh_CalcWeldEpsilons( HMesh* self );
 	void HMesh_DeleteLevel( HMesh_Level* level );
 
-#endif /* __Domain_Mesh_HMesh_h__ */
+#endif /* __StgDomain_Mesh_HMesh_h__ */

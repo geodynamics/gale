@@ -35,8 +35,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_Line_h__
-#define __Domain_Geometry_Line_h__
+#ifndef __StgDomain_Geometry_Line_h__
+#define __StgDomain_Geometry_Line_h__
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -59,4 +59,4 @@
 	*/
 
 	
-#endif /* __Domain_Geometry_Line_h__ */
+#endif /* __StgDomain_Geometry_Line_h__ */

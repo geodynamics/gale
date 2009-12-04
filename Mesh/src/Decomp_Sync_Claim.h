@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Decomp_Sync_Claim_h__
-#define __Domain_Mesh_Decomp_Sync_Claim_h__
+#ifndef __StgDomain_Mesh_Decomp_Sync_Claim_h__
+#define __StgDomain_Mesh_Decomp_Sync_Claim_h__
 
 	/** Textual name of this class */
 	extern const Type Decomp_Sync_Claim_Type;
@@ -112,4 +112,4 @@
 	void Decomp_Sync_Claim_BuildIndices( Decomp_Sync_Claim* self, unsigned nRequired, unsigned* required, RangeSet* claimed, 
 					     unsigned* nLocals, unsigned** locals, unsigned* nRemotes, unsigned** remotes );
 
-#endif /* __Domain_Mesh_Decomp_Sync_Claim_h__ */
+#endif /* __StgDomain_Mesh_Decomp_Sync_Claim_h__ */

@@ -38,9 +38,9 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_Finalise_h__
-#define __Domain_Swarm_Finalise_h__
+#ifndef __StgDomain_Swarm_Finalise_h__
+#define __StgDomain_Swarm_Finalise_h__
 	
 	Bool StgDomainSwarm_Finalise( void );
 	
-#endif /* __Domain_Swarm_Finalise_h__ */
+#endif /* __StgDomain_Swarm_Finalise_h__ */

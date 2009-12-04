@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StGermain_Domain_Shape_BelowCosinePlaneClass_h__
-#define __StGermain_Domain_Shape_BelowCosinePlaneClass_h__
+#ifndef __StgDomain_Shape_BelowCosinePlaneClass_h__
+#define __StgDomain_Shape_BelowCosinePlaneClass_h__
 
 	/* Textual name of this class */
 	extern const Type BelowCosinePlane_Type;

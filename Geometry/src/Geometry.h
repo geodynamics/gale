@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_h__
-#define __Domain_Geometry_h__
+#ifndef __StgDomain_Geometry_h__
+#define __StgDomain_Geometry_h__
 	
 	#include "units.h"
 	#include "types.h"
@@ -65,4 +65,4 @@
 	#include "Init.h"
 	#include "Finalise.h"
 
-#endif /* __Domain_Geometry_h__ */
+#endif /* __StgDomain_Geometry_h__ */

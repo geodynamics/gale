@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_SurfaceAdaptor_h__
-#define __Domain_Mesh_SurfaceAdaptor_h__
+#ifndef __StgDomain_Mesh_SurfaceAdaptor_h__
+#define __StgDomain_Mesh_SurfaceAdaptor_h__
 
 	/** Textual name of this class */
 	extern const Type SurfaceAdaptor_Type;
@@ -138,5 +138,5 @@
 	double SurfaceAdaptor_Cosine( SurfaceAdaptor* self, Mesh* mesh, 
 				      unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
 
-#endif /* __Domain_Mesh_SurfaceAdaptor_h__ */
+#endif /* __StgDomain_Mesh_SurfaceAdaptor_h__ */
 

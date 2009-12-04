@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_UnionParticleLayout_h__
-#define __Domain_Swarm_UnionParticleLayout_h__
+#ifndef __StgDomain_Swarm_UnionParticleLayout_h__
+#define __StgDomain_Swarm_UnionParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -115,5 +115,5 @@
 			void*             particle );
 
 
-#endif /* __Domain_Swarm_UnionParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_UnionParticleLayout_h__ */
 

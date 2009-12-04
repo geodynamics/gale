@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_MeshVariable_h__
-#define __Domain_Mesh_MeshVariable_h__
+#ifndef __StgDomain_Mesh_MeshVariable_h__
+#define __StgDomain_Mesh_MeshVariable_h__
 
 	/** Textual name of this class */
 	extern const Type MeshVariable_Type;
@@ -112,5 +112,5 @@
 
 	Index _MeshVariable_GetMeshArraySize( void* meshVariable );
 
-#endif /* __Domain_Mesh_MeshVariable_h__ */
+#endif /* __StgDomain_Mesh_MeshVariable_h__ */
 

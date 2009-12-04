@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_CellLayout_h__
-#define __Domain_Swarm_CellLayout_h__
+#ifndef __StgDomain_Swarm_CellLayout_h__
+#define __StgDomain_Swarm_CellLayout_h__
 	
 	/* Child classes must define these abstract functions */
 	typedef Cell_Index (CellLayout_CellCountFunction) ( void* cellLayout );
@@ -158,5 +158,5 @@
 
 	ShadowInfo* CellLayout_GetShadowInfo( void* cellLayout );
 	
-#endif /* __Domain_Swarm_CellLayout_h__ */
+#endif /* __StgDomain_Swarm_CellLayout_h__ */
 

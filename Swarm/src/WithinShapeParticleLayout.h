@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_WithinShapeParticleLayout_h__
-#define __Domain_Swarm_WithinShapeParticleLayout_h__
+#ifndef __StgDomain_Swarm_WithinShapeParticleLayout_h__
+#define __StgDomain_Swarm_WithinShapeParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -112,5 +112,5 @@ WithinShapeParticleLayout* _WithinShapeParticleLayout_New(  WITHINSHAPEPARTICLEL
 			Particle_Index newParticle_I,
 			void*          particle);
 
-#endif /* __StGermain_Domain_Shape_WithinShapeParticleLayout_h__ */
+#endif /* __StgDomain_Shape_WithinShapeParticleLayout_h__ */
 

@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_isinf_h__
-#define __Domain_Geometry_isinf_h__
+#ifndef __StgDomain_Geometry_isinf_h__
+#define __StgDomain_Geometry_isinf_h__
 	
 	#include <math.h>
 	
@@ -47,4 +47,4 @@
 		#define isinf( value )	( finite( value ) ? 0 : isnan( value ) ? 0 : 1 )
 	#endif
 	
-#endif /* __Domain_Geometry_isinf_h__ */
+#endif /* __StgDomain_Geometry_isinf_h__ */

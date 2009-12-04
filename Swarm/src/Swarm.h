@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_h__
-#define __Domain_Swarm_h__
+#ifndef __StgDomain_Swarm_Swarm_h__
+#define __StgDomain_Swarm_Swarm_h__
 
 #if defined(READ_HDF5) || defined(WRITE_HDF5)
 #include <hdf5.h>
@@ -87,4 +87,4 @@
 	#include "Init.h"
 	#include "Finalise.h"
 
-#endif /* __Domain_Swarm_h__ */
+#endif /* __StgDomain_Swarm_Swarm_h__ */

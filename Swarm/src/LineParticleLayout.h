@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_LineParticleLayout_h__
-#define __Domain_Swarm_LineParticleLayout_h__
+#ifndef __StgDomain_Swarm_LineParticleLayout_h__
+#define __StgDomain_Swarm_LineParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -115,5 +115,5 @@
 	/* Initialises the coordinates of a cell's particle */
 	void _LineParticleLayout_InitialiseParticle( void* particleLayout, void* swarm, Particle_Index newParticle_I, void* particle);
 
-#endif /* __Domain_Swarm_LineParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_LineParticleLayout_h__ */
 

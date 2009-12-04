@@ -41,8 +41,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_GlobalParticleLayout_h__
-#define __Domain_Swarm_GlobalParticleLayout_h__
+#ifndef __StgDomain_Swarm_GlobalParticleLayout_h__
+#define __StgDomain_Swarm_GlobalParticleLayout_h__
 	
 	/** @see GlobalParticleLayout_InitialiseParticle */
 	typedef void (GlobalParticleLayout_InitialiseParticleFunction) ( 
@@ -119,5 +119,5 @@ GlobalParticleLayout* _GlobalParticleLayout_New(  GLOBALPARTICLELAYOUT_DEFARGS  
 			Particle_Index    newParticle_I,
 			void*             particle );
 	
-#endif /* __Domain_Swarm_GlobalParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_GlobalParticleLayout_h__ */
 

@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_MeshParticleLayout_h__
-#define __Domain_Swarm_MeshParticleLayout_h__
+#ifndef __StgDomain_Swarm_MeshParticleLayout_h__
+#define __StgDomain_Swarm_MeshParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -115,5 +115,5 @@
 
 
 	
-#endif /* __Domain_Swarm_MeshParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_MeshParticleLayout_h__ */
 

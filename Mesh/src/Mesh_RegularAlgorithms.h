@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Mesh_RegularAlgorithms_h__
-#define __Domain_Mesh_Mesh_RegularAlgorithms_h__
+#ifndef __StgDomain_Mesh_RegularAlgorithms_h__
+#define __StgDomain_Mesh_RegularAlgorithms_h__
 
 	/** Textual name of this class */
 	extern const Type Mesh_RegularAlgorithms_Type;
@@ -128,5 +128,5 @@
 
 	void Mesh_RegularAlgorithms_Destruct( Mesh_RegularAlgorithms* self );
 
-#endif /* __Domain_Mesh_Mesh_RegularAlgorithms_h__ */
+#endif /* __StgDomain_Mesh_RegularAlgorithms_h__ */
 

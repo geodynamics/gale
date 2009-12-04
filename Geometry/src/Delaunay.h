@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_Delaunay_h__
-#define __Domain_Geometry_Delaunay_h__
+#ifndef __StgDomain_Geometry_Delaunay_h__
+#define __StgDomain_Geometry_Delaunay_h__
 
 	/* Virtual function types */
 	
@@ -190,5 +190,5 @@
 	void Delaunay_FindNeighbours( Delaunay *delaunay );
 	void Delaunay_FindMinMax( Site *sites, int count, float *minX, float *minY, float *maxX, float *maxY );
 	
-#endif /* __Domain_Geometry_Delaunay_h__ */
+#endif /* __StgDomain_Geometry_Delaunay_h__ */
 

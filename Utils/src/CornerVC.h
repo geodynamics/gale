@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_CornerVC_h__
-#define __Domain_Utils_CornerVC_h__
+#ifndef __StgDomain_Utils_CornerVC_h__
+#define __StgDomain_Utils_CornerVC_h__
 	
 
 	extern const Type CornerVC_Type;
@@ -164,5 +164,5 @@
 	*/
 
 	
-#endif /* __Domain_Utils_CornerVC_h__ */
+#endif /* __StgDomain_Utils_CornerVC_h__ */
 

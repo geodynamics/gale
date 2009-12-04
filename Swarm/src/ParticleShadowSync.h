@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	
-#ifndef __Domain_Swarm_ParticleShadowSync_h__
-#define __Domain_Swarm_ParticleShadowSync_h__
+#ifndef __StgDomain_Swarm_ParticleShadowSync_h__
+#define __StgDomain_Swarm_ParticleShadowSync_h__
 
 	/** Textual name of this class */
 	extern const Type ParticleShadowSync_Type;

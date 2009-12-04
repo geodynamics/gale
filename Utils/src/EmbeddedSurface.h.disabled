@@ -35,8 +35,8 @@
 ** $Id: EmbeddedSurface.h 3462 2006-02-19 06:53:24Z WalterLandry $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#ifndef __Domain_Utils_EmbeddedSurface_h__
-#define __Domain_Utils_EmbeddedSurface_h__
+#ifndef __StgDomain_Utils_EmbeddedSurface_h__
+#define __StgDomain_Utils_EmbeddedSurface_h__
 
 
 	extern const Type EmbeddedSurface_Type;

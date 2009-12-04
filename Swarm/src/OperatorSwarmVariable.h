@@ -53,8 +53,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_OperatorSwarmVariable_h__
-#define __Domain_Utils_OperatorSwarmVariable_h__
+#ifndef __StgDomain_Utils_OperatorSwarmVariable_h__
+#define __StgDomain_Utils_OperatorSwarmVariable_h__
 
 	#define MAX_DOF 9
 
@@ -188,5 +188,5 @@
 	/** TODO HACK - This function will be obselete when function registers come to town */
 	Func_Ptr OperatorSwarmVariable_GetOperatorByName( void* swarmVariable, Name name );
 
-#endif /* __Domain_Utils_OperatorSwarmVariable_h__ */
+#endif /* __StgDomain_Utils_OperatorSwarmVariable_h__ */
 

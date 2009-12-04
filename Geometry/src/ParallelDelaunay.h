@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_ParallelDelaunay_h__
-#define __Domain_Geometry_ParallelDelaunay_h__
+#ifndef __StgDomain_Geometry_ParallelDelaunay_h__
+#define __StgDomain_Geometry_ParallelDelaunay_h__
 
 	/* Virtual function types */
 	
@@ -166,5 +166,5 @@
 	
 	void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd );
 	
-#endif /* __Domain_Geometry_ParallelDelaunay_h__ */
+#endif /* __StgDomain_Geometry_ParallelDelaunay_h__ */
 

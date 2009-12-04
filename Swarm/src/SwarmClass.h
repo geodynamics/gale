@@ -44,8 +44,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_SwarmClass_h__
-#define __Domain_Swarm_SwarmClass_h__
+#ifndef __StgDomain_Swarm_SwarmClass_h__
+#define __StgDomain_Swarm_SwarmClass_h__
 	
 
 	/* Textual name of this class */
@@ -336,5 +336,5 @@
 
 	void Swarm_AddVariable( Swarm* self, SwarmVariable* swarmVar );
 
-#endif /* __Domain_Swarm_SwarmClass_h__ */
+#endif /* __StgDomain_Swarm_SwarmClass_h__ */
 

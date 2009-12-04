@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_h__
-#define __Domain_Utils_h__
+#ifndef __StgDomain_Utils_Utils_h__
+#define __StgDomain_Utils_Utils_h__
 
 	#include <assert.h>
 	#include "types.h"
@@ -79,4 +79,4 @@
 	#include "Init.h"
 	#include "Finalise.h"
 	
-#endif /* __Domain_Utils_h__ */
+#endif /* __StgDomain_Utils_Utils_h__ */

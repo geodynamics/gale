@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Decomp_Sync_Negotiate_h__
-#define __Domain_Mesh_Decomp_Sync_Negotiate_h__
+#ifndef __StgDomain_Mesh_Decomp_Sync_Negotiate_h__
+#define __StgDomain_Mesh_Decomp_Sync_Negotiate_h__
 
 	/** Textual name of this class */
 	extern const Type Decomp_Sync_Negotiate_Type;
@@ -107,4 +107,4 @@
 	void Decomp_Sync_Negotiate_RemoteSearch( Decomp_Sync_Negotiate* self, Decomp_Sync* decomp, 
 						 unsigned** nRemFound, unsigned*** remFound );
 
-#endif /* __Domain_Mesh_Decomp_Sync_Negotiate_h__ */
+#endif /* __StgDomain_Mesh_Decomp_Sync_Negotiate_h__ */

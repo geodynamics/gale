@@ -41,8 +41,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_ComplexVectorMath_h__
-#define __Domain_Geometry_ComplexVectorMath_h__
+#ifndef __StgDomain_Geometry_ComplexVectorMath_h__
+#define __StgDomain_Geometry_ComplexVectorMath_h__
 		
 #include "ComplexMath.h"
 
@@ -97,4 +97,4 @@ void StGermain_PrintComplexVector( Stream* stream, Cmplx* vector, Index dim ) ;
 		
 
 		
-#endif /* __Domain_Geometry_ComplexVectorMath_h__ */
+#endif /* __StgDomain_Geometry_ComplexVectorMath_h__ */

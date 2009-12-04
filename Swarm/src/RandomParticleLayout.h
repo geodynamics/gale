@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_RandomParticleLayout_h__
-#define __Domain_Swarm_RandomParticleLayout_h__
+#ifndef __StgDomain_Swarm_RandomParticleLayout_h__
+#define __StgDomain_Swarm_RandomParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -106,5 +106,5 @@
 
 
 	
-#endif /* __Domain_Swarm_RandomParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_RandomParticleLayout_h__ */
 

@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_SwarmVariable_h__
-#define __Domain_Swarm_SwarmVariable_h__
+#ifndef __StgDomain_Swarm_SwarmVariable_h__
+#define __StgDomain_Swarm_SwarmVariable_h__
 
 	/** Textual name of this class */
 	extern const Type SwarmVariable_Type;
@@ -150,5 +150,5 @@
 
 	double _SwarmVariable_GetMinGlobalMagnitude( void* swarmVariable );
 
-#endif /* __Domain_Swarm_SwarmVariable_h__ */
+#endif /* __StgDomain_Swarm_SwarmVariable_h__ */
 

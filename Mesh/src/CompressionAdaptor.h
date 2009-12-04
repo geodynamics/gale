@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_CompressionAdaptor_h__
-#define __Domain_Mesh_CompressionAdaptor_h__
+#ifndef __StgDomain_Mesh_CompressionAdaptor_h__
+#define __StgDomain_Mesh_CompressionAdaptor_h__
 
 	/** Textual name of this class */
 	extern const Type CompressionAdaptor_Type;
@@ -99,5 +99,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Domain_Mesh_CompressionAdaptor_h__ */
+#endif /* __StgDomain_Mesh_CompressionAdaptor_h__ */
 

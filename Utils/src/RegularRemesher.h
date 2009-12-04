@@ -39,8 +39,8 @@
  **
  **/
  
-#ifndef __StGermain_Domain_Utils_RegularRemesher_h__
-#define __StGermain_Domain_Utils_RegularRemesher_h__
+#ifndef __StgDomain_Utils_RegularRemesher_h__
+#define __StgDomain_Utils_RegularRemesher_h__
 
 #ifdef HAVE_PETSC
 
@@ -51,4 +51,4 @@
 
 #endif
 
-#endif /* __StGermain_Domain_Utils_RegularRemesher_h__ */
+#endif /* __StgDomain_Utils_RegularRemesher_h__ */

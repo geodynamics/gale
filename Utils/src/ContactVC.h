@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_ContactVC_h__
-#define __Domain_Utils_ContactVC_h__
+#ifndef __StgDomain_Utils_ContactVC_h__
+#define __StgDomain_Utils_ContactVC_h__
 	
 
 	extern const Type ContactVC_Type;
@@ -137,5 +137,5 @@
 	*/
 
 	
-#endif /* __Domain_Utils_ContactVC_h__ */
+#endif /* __StgDomain_Utils_ContactVC_h__ */
 

@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_SwarmOutput_h__
-#define __Domain_Swarm_SwarmOutput_h__
+#ifndef __StgDomain_Swarm_SwarmOutput_h__
+#define __StgDomain_Swarm_SwarmOutput_h__
 
 	/** Textual name of this class */
 	extern const Type SwarmOutput_Type;
@@ -131,5 +131,5 @@
 	#define SwarmOutput_PrintValue( swarmOutput, stream, value )\
 		SwarmOutput_PrintDouble( swarmOutput, stream, (double) ( value ) )
 
-#endif /* __Domain_Swarm_SwarmOutput_h__ */
+#endif /* __StgDomain_Swarm_SwarmOutput_h__ */
 

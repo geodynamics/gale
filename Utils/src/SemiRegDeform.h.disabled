@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_SemiRegDeform_h__
-#define __Domain_Utils_SemiRegDeform_h__
+#ifndef __StgDomain_Utils_SemiRegDeform_h__
+#define __StgDomain_Utils_SemiRegDeform_h__
 	
 	/* Textual name of this class */
 	extern const Type SemiRegDeform_Type;
@@ -110,4 +110,4 @@
 	void SemiRegDeform_InitSync( SemiRegDeform* self );
 	void SemiRegDeform_Destruct( SemiRegDeform* self );
 	
-#endif /* __Domain_Utils_SemiRegDeform_h__ */
+#endif /* __StgDomain_Utils_SemiRegDeform_h__ */

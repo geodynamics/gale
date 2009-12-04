@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Mesh_h__
-#define __Domain_Mesh_Mesh_h__
+#ifndef __StgDomain_Mesh_MeshClass_h__
+#define __StgDomain_Mesh_MeshClass_h__
 
 	/** Textual name of this class */
 	extern const Type Mesh_Type;
@@ -209,5 +209,5 @@
 
 	void Mesh_Destruct( Mesh* self );
 
-#endif /* __Domain_Mesh_Mesh_h__ */
+#endif /* __StgDomain_Mesh_MeshClass_h__ */
 

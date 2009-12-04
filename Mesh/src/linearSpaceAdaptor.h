@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_LinearSpaceAdaptor_h__
-#define __Domain_Mesh_LinearSpaceAdaptor_h__
+#ifndef __StgDomain_Mesh_LinearSpaceAdaptor_h__
+#define __StgDomain_Mesh_LinearSpaceAdaptor_h__
 
 	typedef struct {
 	  double x, y, p, y0;
@@ -115,5 +115,5 @@
 	*/
 
 
-#endif /* __Domain_Mesh_LinearSpaceAdaptor_h__ */
+#endif /* __StgDomain_Mesh_LinearSpaceAdaptor_h__ */
 

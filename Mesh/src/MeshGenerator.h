@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_MeshGenerator_h__
-#define __Domain_Mesh_MeshGenerator_h__
+#ifndef __StgDomain_Mesh_MeshGenerator_h__
+#define __StgDomain_Mesh_MeshGenerator_h__
 
 	/** Textual name of this class */
 	extern const Type MeshGenerator_Type;
@@ -137,5 +137,5 @@
 
 	void MeshGenerator_Destruct( MeshGenerator* self );
 
-#endif /* __Domain_Mesh_MeshGenerator_h__ */
+#endif /* __StgDomain_Mesh_MeshGenerator_h__ */
 

@@ -53,8 +53,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_LinearRegression_h__
-#define __Domain_Utils_LinearRegression_h__
+#ifndef __StgDomain_Utils_LinearRegression_h__
+#define __StgDomain_Utils_LinearRegression_h__
 
 	extern const Type LinearRegression_Type;
 
@@ -106,5 +106,5 @@
 	 * http://mathworld.wolfram.com/LeastSquaresFitting.html */
 	void LinearRegression_Calculate( void* linearRegression ) ;
 
-#endif /* __Domain_Utils_LinearRegression_h__ */
+#endif /* __StgDomain_Utils_LinearRegression_h__ */
 

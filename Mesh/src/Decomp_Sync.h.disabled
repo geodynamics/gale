@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Decomp_Sync_h__
-#define __Domain_Mesh_Decomp_Sync_h__
+#ifndef __StgDomain_Mesh_Decomp_Sync_h__
+#define __StgDomain_Mesh_Decomp_Sync_h__
 
 	/** Textual name of this class */
 	extern const Type Decomp_Sync_Type;
@@ -173,4 +173,4 @@
 	Bool Decomp_Sync_ValidateComms( Decomp_Sync* self );
 #endif
 
-#endif /* __Domain_Mesh_Decomp_Sync_h__ */
+#endif /* __StgDomain_Mesh_Decomp_Sync_h__ */

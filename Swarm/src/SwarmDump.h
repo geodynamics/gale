@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_SwarmDump_h__
-#define __Domain_Swarm_SwarmDump_h__
+#ifndef __StgDomain_Swarm_SwarmDump_h__
+#define __StgDomain_Swarm_SwarmDump_h__
 
 	/** Textual name of this class */
 	extern const Type SwarmDump_Type;
@@ -105,5 +105,5 @@
 	void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename );
 #endif
 
-#endif /* __Domain_Swarm_SwarmDump_h__ */
+#endif /* __StgDomain_Swarm_SwarmDump_h__ */
 

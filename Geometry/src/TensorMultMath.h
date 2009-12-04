@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_TensorMultMath_h__
-#define __Domain_Geometry_TensorMultMath_h__
+#ifndef __StgDomain_Geometry_TensorMultMath_h__
+#define __StgDomain_Geometry_TensorMultMath_h__
 
 /* Added to enhance Tensor math for Solid Mechanics applications */
 
@@ -119,4 +119,4 @@ void Journal_PrintNonSquareMatrix_Unnamed( Stream* stream, double** NonSquareMat
 
 
 
-#endif /* __Domain_Geometry_TensorMultMath_h__ */
+#endif /* __StgDomain_Geometry_TensorMultMath_h__ */

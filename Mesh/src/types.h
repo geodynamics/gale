@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_types_h__
-#define __Domain_Mesh_types_h__
+#ifndef __StgDomain_Mesh_types_h__
+#define __StgDomain_Mesh_types_h__
 
 typedef struct Grid Grid;
 typedef struct Decomp Decomp;
@@ -146,4 +146,4 @@ typedef enum {
 	extern Stream*	Mesh_Warning; 
 	extern Stream*	Mesh_Error;
 	
-#endif /* __Domain_Mesh_types_h__ */
+#endif /* __StgDomain_Mesh_types_h__ */

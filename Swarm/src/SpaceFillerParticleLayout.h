@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_SpaceFillerParticleLayout_h__
-#define __Domain_Swarm_SpaceFillerParticleLayout_h__
+#ifndef __StgDomain_Swarm_SpaceFillerParticleLayout_h__
+#define __StgDomain_Swarm_SpaceFillerParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -113,5 +113,5 @@
 			void*             particle );
 
 
-#endif /* __Domain_Swarm_SpaceFillerParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_SpaceFillerParticleLayout_h__ */
 

@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_ManualParticleLayout_h__
-#define __Domain_Swarm_ManualParticleLayout_h__
+#ifndef __StgDomain_Swarm_ManualParticleLayout_h__
+#define __StgDomain_Swarm_ManualParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -105,5 +105,5 @@
 			Particle_Index newParticle_I,
 			void* particle);
 
-#endif /* __Domain_Swarm_ManualParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_ManualParticleLayout_h__ */
 

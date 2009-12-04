@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_TriGaussParticleLayout_h__
-#define __Domain_Swarm_TriGaussParticleLayout_h__
+#ifndef __StgDomain_Swarm_TriGaussParticleLayout_h__
+#define __StgDomain_Swarm_TriGaussParticleLayout_h__
 
 	
 	/* Textual name of this class */
@@ -108,5 +108,5 @@
 	
 	void _TriGaussParticleLayout_InitialiseParticlesOfCell( void* triGaussParticleLayout, void* swarm, Cell_Index cell_I );
 	
-#endif /* __Domain_Swarm_TriGaussParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_TriGaussParticleLayout_h__ */
 

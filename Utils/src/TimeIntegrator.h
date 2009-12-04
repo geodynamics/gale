@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_TimeIntegrator_h__
-#define __Domain_Utils_TimeIntegrator_h__
+#ifndef __StgDomain_Utils_TimeIntegrator_h__
+#define __StgDomain_Utils_TimeIntegrator_h__
 	
 	/* typedefs for virtual functions: */
 	extern const Type TimeIntegrator_Type;

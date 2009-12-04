@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_AllElementsVC_h__
-#define __Domain_Utils_AllElementsVC_h__
+#ifndef __StgDomain_Utils_AllElementsVC_h__
+#define __StgDomain_Utils_AllElementsVC_h__
 	
 
 	extern const Type AllElementsVC_Type;
@@ -159,5 +159,5 @@
 	*/
 
 	
-#endif /* __Domain_Utils_AllElementsVC_h__ */
+#endif /* __StgDomain_Utils_AllElementsVC_h__ */
 

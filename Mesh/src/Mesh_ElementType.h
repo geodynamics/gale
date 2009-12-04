@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Mesh_ElementType_h__
-#define __Domain_Mesh_Mesh_ElementType_h__
+#ifndef __StgDomain_Mesh_ElementType_h__
+#define __StgDomain_Mesh_ElementType_h__
 
 	/** Textual name of this class */
 	extern const Type Mesh_ElementType_Type;
@@ -125,5 +125,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Domain_Mesh_Mesh_ElementType_h__ */
+#endif /* __StgDomain_Mesh_ElementType_h__ */
 

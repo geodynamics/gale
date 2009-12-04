@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_types_h__
-#define __Domain_Swarm_types_h__
+#ifndef __StgDomain_Swarm_types_h__
+#define __StgDomain_Swarm_types_h__
 	
 	/* Types user needs to define */
 	typedef struct _Particle			Particle;
@@ -119,4 +119,4 @@
 	extern Stream* Swarm_Warning;
 	extern Stream* Swarm_Error;
 	
-#endif /* __Domain_Swarm_types_h__ */
+#endif /* __StgDomain_Swarm_types_h__ */

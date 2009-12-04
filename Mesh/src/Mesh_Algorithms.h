@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Mesh_Algorithms_h__
-#define __Domain_Mesh_Mesh_Algorithms_h__
+#ifndef __StgDomain_Mesh_Algorithms_h__
+#define __StgDomain_Mesh_Algorithms_h__
 
 	/** Textual name of this class */
 	extern const Type Mesh_Algorithms_Type;
@@ -199,5 +199,5 @@ Bool Mesh_Algorithms_SearchWithTree( void* self, double* pnt, unsigned* dim, uns
 	** Private Member functions
 	*/
 
-#endif /* __Domain_Mesh_Mesh_Algorithms_h__ */
+#endif /* __StgDomain_Mesh_Algorithms_h__ */
 

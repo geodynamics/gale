@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_CartesianGenerator_h__
-#define __Domain_Mesh_CartesianGenerator_h__
+#ifndef __StgDomain_Mesh_CartesianGenerator_h__
+#define __StgDomain_Mesh_CartesianGenerator_h__
 
 	/** Textual name of this class */
 	extern const Type CartesianGenerator_Type;
@@ -232,5 +232,5 @@
 	void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, const char* filename );
 	void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, const char* filename );
 
-#endif /* __Domain_Mesh_CartesianGenerator_h__ */
+#endif /* __StgDomain_Mesh_CartesianGenerator_h__ */
 

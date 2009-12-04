@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_TimeIntegratee_h__
-#define __Domain_Utils_TimeIntegratee_h__
+#ifndef __StgDomain_Utils_TimeIntegratee_h__
+#define __StgDomain_Utils_TimeIntegratee_h__
 	
 	typedef Bool (TimeIntegratee_CalculateTimeDerivFunction) ( void* timeIntegrator, Index array_I, double* timeDeriv );
 	typedef void (TimeIntegratee_IntermediateFunction) ( void* timeIntegrator, Index array_I );

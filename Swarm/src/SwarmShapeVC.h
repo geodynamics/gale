@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_SwarmShapeVC_h__
-#define __Domain_Swarm_SwarmShapeVC_h__
+#ifndef __StgDomain_Swarm_SwarmShapeVC_h__
+#define __StgDomain_Swarm_SwarmShapeVC_h__
 	
 	extern const Type SwarmShapeVC_Type;
 	

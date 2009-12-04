@@ -41,8 +41,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_Dimension_h__
-#define __Domain_Geometry_Dimension_h__
+#ifndef __StgDomain_Geometry_Dimension_h__
+#define __StgDomain_Geometry_Dimension_h__
 
 	/** Converts 3 3d coordinates into the sequential number for a given sized region. */ 
 	#define Dimension_3DTo1D_3_Macro( dim0, dim1, dim2, dim0Size, dim1Size, dim2Size, indexPtr ) \
