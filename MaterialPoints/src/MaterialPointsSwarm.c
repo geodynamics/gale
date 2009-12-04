@@ -274,6 +274,10 @@ void _MaterialPointsSwarm_Build( void* swarm, void* data ) {
 
 	_Swarm_Build( self, data );
 
+	Stg_Component_Build( self->mesh, data , False );
+	if( self->escapedRoutine != NULL) Stg_Component_Build( self->escapedRoutine, data , False );
+	if( self->material       != NULL) Stg_Component_Build( self->material,       data , False );
+
 	/* Since this swarm is being set up to advect a PICellerator material, it should make sure
 	 * at least one ParticleMovementHandler-type ParticleCommHandler has been added to the base
 	 * Swarm. */
@@ -303,6 +307,10 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 	MaterialPoint*		matPoint=NULL;
 
 	_Swarm_Initialise( self, data );
+
+	Stg_Component_Initialise( self->mesh, data , False );
+	if( self->escapedRoutine != NULL) Stg_Component_Initialise( self->escapedRoutine, data , False );
+	if( self->material       != NULL) Stg_Component_Initialise( self->material,       data , False );
 
 	for( var_I = 0 ; var_I < self->nSwarmVars ; var_I++ ) {
 		Stg_Component_Initialise( self->swarmVars[var_I], data , False );
@@ -458,8 +466,18 @@ void _MaterialPointsSwarm_Execute( void* swarm, void* data ) {
 }
 void _MaterialPointsSwarm_Destroy( void* swarm, void* data ) {
 	MaterialPointsSwarm*	self = (MaterialPointsSwarm*)swarm;
-	
+   int var_I;
+
 	_Swarm_Destroy( self, data );
+	
+	Stg_Component_Destroy( self->mesh, data , False );
+	if( self->escapedRoutine != NULL) Stg_Component_Destroy( self->escapedRoutine, data , False );
+	if( self->material       != NULL) Stg_Component_Destroy( self->material,       data , False );
+
+	for( var_I = 0 ; var_I < self->nSwarmVars ; var_I++ ) {
+		Stg_Component_Destroy( self->swarmVars[var_I], data , False );
+	}
+	
 }
 
 void _MaterialPointsSwarm_UpdateHook( void* timeIntegrator, void* swarm ) {

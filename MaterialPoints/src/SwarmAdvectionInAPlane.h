@@ -95,8 +95,6 @@
 		SwarmAdvectionInAPlane*                             self,
 		int											whichaxis);
 
-	void _SwarmAdvectionInAPlane_Delete( void* materialSwarm );
-	void _SwarmAdvectionInAPlane_Print( void* materialSwarm, Stream* stream );
 	#define SwarmAdvectionInAPlane_Copy( self ) \
 		(SwarmAdvectionInAPlane*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define SwarmAdvectionInAPlane_DeepCopy( self ) \
