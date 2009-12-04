@@ -40,8 +40,8 @@
 **
 **/
 
-#ifndef __Base_IO_IndentFormatter_h__
-#define __Base_IO_IndentFormatter_h__
+#ifndef __StGermain_Base_IO_IndentFormatter_h__
+#define __StGermain_Base_IO_IndentFormatter_h__
 
 
 	/** Textual name for IndentFormatter class. */
@@ -116,5 +116,5 @@
 	void IndentFormatter_SetCharacter( char _character );
 
 
-#endif /* __Base_IO_IndentFormatter_h__ */
+#endif /* __StGermain_Base_IO_IndentFormatter_h__ */
 

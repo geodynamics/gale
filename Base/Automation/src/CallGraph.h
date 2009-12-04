@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_Stg_CallGraph_h__
-#define __Base_Automation_Stg_CallGraph_h__
+#ifndef __StGermain_Base_Automation_Stg_CallGraph_h__
+#define __StGermain_Base_Automation_Stg_CallGraph_h__
 	
 	/* Templates of virtual functions */
 	typedef struct {
@@ -132,5 +132,5 @@
 	/** Pop the function on the stack, and finalise trace */
 	void Stg_CallGraph_Pop( void* callGraph );
 	
-#endif /* __Base_Automation_Stg_CallGraph_h__ */
+#endif /* __StGermain_Base_Automation_Stg_CallGraph_h__ */
 

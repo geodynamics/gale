@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __Base_Automation_h__
-#define __Base_Automation_h__
+#ifndef __StGermain_Base_Automation_h__
+#define __StGermain_Base_Automation_h__
 	
 	#include "types.h"
 	#include "shortcuts.h"
@@ -56,4 +56,4 @@
 	#include "Init.h"
 	#include "Finalise.h"
 	
-#endif /* __Base_Automation_h__ */
+#endif /* __StGermain_Base_Automation_h__ */

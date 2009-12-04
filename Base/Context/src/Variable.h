@@ -46,8 +46,8 @@
 **
 **/
 
-#ifndef __Base_Automation_Variable_h__
-#define __Base_Automation_Variable_h__
+#ifndef __StGermain_Base_Context_Variable_h__
+#define __StGermain_Base_Context_Variable_h__
 	
 	/** Textual name for Variable class. */
 	extern const Type Variable_Type;
@@ -273,8 +273,8 @@
 		( ( (self)->offsetCount < 2 ) ? \
 			( (void*)( (ArithPointer)(self)->arrayPtr + (ArithPointer)(array_I) * (ArithPointer)( (self)->structSize) + (ArithPointer)( (self)->offsets[0] ) ))  : \
 			( (void*)((ArithPointer)(self)->arrayPtr + (ArithPointer)(array_I) * (ArithPointer)((self)->structSize)) ) )
-	#ifdef CAUTIOUS
-		/** Implementation of "get" the structure in an array that the requested data member is in if CAUTIOUS is defined.
+	#ifdef CAUTContextUS
+		/** Implementation of "get" the structure in an array that the requested data member is in if CAUTContextUS is defined.
 		 *  It ensures that array_I is within its bounds. Private (Do not directly use!) */
 		#define _Variable_GetStructPtr( self, array_I ) \
 			( ((array_I) < (self)->arraySize) ? \
@@ -287,7 +287,7 @@
 					"out of range (array size is %d). Exiting.\n", (self)->name, array_I, \
 					(self)->arraySize ), NULL) )
 	#else
-		/** Implementation of "get" the structure in an array, that the requested data member is in if CAUTIOUS is NOT
+		/** Implementation of "get" the structure in an array, that the requested data member is in if CAUTContextUS is NOT
 		 *  defined. It DOES NOT ensure that array_I is within its bounds. Private (Do not directly use!) */
 		#define _Variable_GetStructPtr __Variable_GetStructPtr
 	#endif
@@ -300,8 +300,8 @@
 		some architectures such as the SGI Altix is of a different size to the ArithPointer (unsigned long) */
 	#define __Variable_GetPtr( self, array_I, component_I, vector_I ) \
 		( (void*)((ArithPointer)(self)->arrayPtr + (ArithPointer)(array_I) * (self)->structSize + (self)->offsets[component_I]) )
-	#ifdef CAUTIOUS
-		/** Implementation of "get" the requested data member in a structure in an array if CAUTIOUS is defined.
+	#ifdef CAUTContextUS
+		/** Implementation of "get" the requested data member in a structure in an array if CAUTContextUS is defined.
 		 *  It ensures that component_I  and array_I are within its bounds. Private (Do not directly use!) */
 		#define _Variable_GetPtr( self, array_I, component_I, vector_I ) \
 			( ((component_I) < (self)->offsetCount) ? \
@@ -311,7 +311,7 @@
 					Journal_Register( Error_Type, Variable_Type ), \
 					"Offset array_I out of range\n" ), NULL) )
 	#else
-		/** Implementation of "get" the requested data member in a structure in an array if CAUTIOUS is NOT
+		/** Implementation of "get" the requested data member in a structure in an array if CAUTContextUS is NOT
 		 *  defined. It DOES NOT ensure that component_I and array_I are within its bounds. Private (Do not directly
 		 *  use!) */
 		#define _Variable_GetPtr __Variable_GetPtr
@@ -326,7 +326,7 @@
 	 * (Do not directly use!). */
 	#define _Variable_GetPtrChar( self, array_I ) \
 		( (char*)_Variable_GetStructPtr( (self), (array_I) ) )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of a "char" inbuilt type, return a pointer to that char (type casted to char*).
 		 *  It ensures the Variable is of a "char" and is not complex. */
 		#define Variable_GetPtrChar( self, array_I ) \
@@ -346,7 +346,7 @@
 	/** Assuming this is a Variable of a vector "char" inbuilt type, return that char. Private (Do not directly use!). */
 	#define _Variable_GetValueAtChar( self, array_I, vector_I ) \
 		( Variable_GetPtrChar( (self), (array_I) )[(vector_I)] )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of a vector "char" inbuilt type, return that char. It ensures that vector_I is
 		 *  within range. */
 		#define Variable_GetValueAtChar( self, array_I, vector_I ) \
@@ -430,7 +430,7 @@
 	 * (Do not directly use!). */
 	#define _Variable_GetPtrShort( self, array_I ) \
 		( (short*)_Variable_GetStructPtr( (self), (array_I) ) )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of a "short" inbuilt type, return a pointer to that short (type casted to short*).
 		 *  It ensures the Variable is of a "short" and is not complex. */
 		#define Variable_GetPtrShort( self, array_I ) \
@@ -450,7 +450,7 @@
 	/** Assuming this is a Variable of a vector "short" inbuilt type, return that short. Private (Do not directly use!). */
 	#define _Variable_GetValueAtShort( self, array_I, vector_I ) \
 		( Variable_GetPtrShort( (self), (array_I) )[(vector_I)] )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of a vector "short" inbuilt type, return that short. It ensures that vector_I is
 		 *  within range. */
 		#define Variable_GetValueAtShort( self, array_I, vector_I ) \
@@ -535,7 +535,7 @@
 	 * (Do not directly use!). */
 	#define _Variable_GetPtrInt( self, array_I ) \
 		( (int*)_Variable_GetStructPtr( (self), (array_I) ) )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of a "int" inbuilt type, return a pointer to that int (type casted to int*).
 		 *  It ensures the Variable is of a "int" and is not complex. */
 		#define Variable_GetPtrInt( self, array_I ) \
@@ -555,7 +555,7 @@
 	/** Assuming this is a Variable of a vector "int" inbuilt type, return that int. Private (Do not directly use!). */
 	#define _Variable_GetValueAtInt( self, array_I, vector_I ) \
 		( Variable_GetPtrInt( (self), (array_I) )[(vector_I)] )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of a vector "int" inbuilt type, return that int. It ensures that vector_I is
 		 *  within range. */
 		#define Variable_GetValueAtInt( self, array_I, vector_I ) \
@@ -638,7 +638,7 @@
 	 * (Do not directly use!). */
 	#define _Variable_GetPtrFloat( self, array_I ) \
 		( (float*)_Variable_GetStructPtr( (self), (array_I) ) )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of a "float" inbuilt type, return a pointer to that float (type casted to float*).
 		 *  It ensures the Variable is of a "float" and is not complex. */
 		#define Variable_GetPtrFloat( self, array_I ) \
@@ -658,7 +658,7 @@
 	/** Assuming this is a Variable of a vector "float" inbuilt type, return that float. Private (Do not directly use!). */
 	#define _Variable_GetValueAtFloat( self, array_I, vector_I ) \
 		( Variable_GetPtrFloat( (self), (array_I) )[(vector_I)] )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of a vector "float" inbuilt type, return that float. It ensures that vector_I is
 		 *  within range. */
 		#define Variable_GetValueAtFloat( self, array_I, vector_I ) \
@@ -743,7 +743,7 @@
 	 *  Private (Do not directly use!). */
 	#define _Variable_GetPtrDouble( self, array_I ) \
 		( (double*)_Variable_GetStructPtr( (self), (array_I) ) )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of a "double" inbuilt type, return a pointer to that double (type casted to
 		 *  double*). It ensures the Variable is of a "double" and is not complex. */
 		#define Variable_GetPtrDouble( self, array_I ) \
@@ -763,7 +763,7 @@
 	/** Assuming this is a Variable of a vector "double" inbuilt type, return that double. Private (Do not directly use!). */
 	#define _Variable_GetValueAtDouble( self, array_I, vector_I ) \
 		( (Variable_GetPtrDouble( (self), (array_I) ))[(vector_I)] )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of a vector "double" inbuilt type, return that double. It ensures that vector_I is
 		 *  within range. */
 		#define Variable_GetValueAtDouble( self, array_I, vector_I ) \
@@ -856,7 +856,7 @@
 	 *  Private. (Do not directly use!). */
 	#define _Variable_GetPtrPointer( self, array_I ) \
 		( (void**)_Variable_GetStructPtr( (self), (array_I) ) )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of a "pointer" inbuilt type, return a pointer to that pointer (type casted to
 		 *  void**). It ensures the Variable is of a "pointer" and is not complex. */
 		#define Variable_GetPtrPointer( self, array_I ) \
@@ -876,7 +876,7 @@
 	/** Assuming this is a Variable of a vector "pointer" inbuilt type, return that pointer. Private (Do not directly use!). */
 	#define _Variable_GetValueAtPointer( self, array_I, vector_I ) \
 		( Variable_GetPtrPointer( (self), (array_I) )[(vector_I)] )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of a vector "pointer" inbuilt type, return that pointer. It ensures that vector_I is
 		 *  within range. */
 		#define Variable_GetValueAtPointer( self, array_I, vector_I ) \
@@ -969,7 +969,7 @@
 			0, \
 			Journal_Register( Error_Type, Variable_Type ), \
 			"Variable is not of any inbuilt type, but this macro assumes so.\n" ) )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of any inbuilt type, return a char (type casted to char). It ensures the Variable
 		 * is not complex. Resolution order: char, short, int, float, double, pointer. */
 		#define Variable_GetValueAsChar( self, array_I ) \
@@ -997,7 +997,7 @@
 			0, \
 			Journal_Register( Error_Type, Variable_Type ), \
 			"Variable is not of any inbuilt type, but this macro assumes so.\n" ) )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of any inbuilt type, return a short (type casted to short). It ensures the Variable
 		 * is not complex. Resolution order: char, short, int, float, double, pointer. */
 		#define Variable_GetValueAsShort( self, array_I ) \
@@ -1025,7 +1025,7 @@
 			0, \
 			Journal_Register( Error_Type, Variable_Type ), \
 			"Variable is not of any inbuilt type, but this macro assumes so.\n" ) )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of any inbuilt type, return a int (type casted to int). It ensures the Variable
 		 * is not complex. Resolution order: char, short, int, float, double, pointer. */
 		#define Variable_GetValueAsInt( self, array_I ) \
@@ -1053,7 +1053,7 @@
 			0, \
 			Journal_Register( Error_Type, Variable_Type ), \
 			"Variable is not of any inbuilt type, but this macro assumes so.\n" ) )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of any inbuilt type, return a float (type casted to float). It ensures the Variable
 		 * is not complex. Resolution order: char, short, int, float, double, pointer. */
 		#define Variable_GetValueAsFloat( self, array_I ) \
@@ -1081,7 +1081,7 @@
 			0, \
 			Journal_Register( Error_Type, Variable_Type ), \
 			"Variable is not of any inbuilt type, but this macro assumes so.\n" ) )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of any inbuilt type, return a double (type casted to double). It ensures the
 		 *  Variable is not complex. Resolution order: char, short, int, float, double, pointer. */
 		#define Variable_GetValueAsDouble( self, array_I ) \
@@ -1110,7 +1110,7 @@
 			0, \
 			Journal_Register( Error_Type, Variable_Type ), \
 			"Variable is not of any inbuilt type, but this macro assumes so.\n" ), NULL) )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of any inbuilt type, return a pointer (type casted to void*). It ensures the Variable
 		 * is not complex. Resolution order: pointer, short, int, float, double, pointer. */
 		#define Variable_GetValueAsPointer( self, array_I ) \
@@ -1140,7 +1140,7 @@
 			0, \
 			Journal_Register( Error_Type, Variable_Type ), \
 			"Variable is not of any inbuilt type, but this macro assumes so.\n" ), NULL) )
-	#ifdef CAUTIOUS
+	#ifdef CAUTContextUS
 		/** Assuming this is a Variable of any inbuilt type, set the value. It ensures the Variable is not complex.
 		  * Resolution order: pointer, short, int, float, double, pointer. */
 		#define Variable_SetValueFromInbuilt( self, array_I, value ) \
@@ -1197,5 +1197,5 @@
 	/** Checks whether || variable - comparison || / || variable || < tolerance */
 	Bool Variable_ValueCompareWithinTolerance( void* variable, void* comparison, double tolerance );
 
-#endif /* __Base_Automation_Variable__ */
+#endif /* __StGermain_Base_Context_Variable__ */
 

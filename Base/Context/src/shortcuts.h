@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Context_shortcuts_h__
-#define __Base_Context_shortcuts_h__
+#ifndef __StGermain_Base_Context_shortcuts_h__
+#define __StGermain_Base_Context_shortcuts_h__
 	
 	#define Context_PrintConcise		AbstractContext_PrintConcise
 	#define Context_AddEntryPoint		AbstractContext_AddEntryPoint
@@ -109,4 +109,4 @@
 	#define ContextEP_Purge( context, epName ) \
 		EP_Purge( Context_GetEntryPoint( context, epName ) )
 
-#endif /* __Base_Context_shortcuts_h__ */
+#endif /* __StGermain_Base_Context_shortcuts_h__ */

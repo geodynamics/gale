@@ -39,8 +39,8 @@
  * the StGermain framework.
  */
 
-#ifndef __Base_Foundation_forwardDecl_h__
-#define __Base_Foundation_forwardDecl_h__
+#ifndef __StGermain_Base_Foundation_forwardDecl_h__
+#define __StGermain_Base_Foundation_forwardDecl_h__
 	
 	
 	/* Forward Declaration of Stream ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

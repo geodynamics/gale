@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_PluginsManager_h__
-#define __Base_Extensibility_PluginsManager_h__
+#ifndef __StGermain_Base_Extensibility_PluginsManager_h__
+#define __StGermain_Base_Extensibility_PluginsManager_h__
 	
 
 	/* Textual name of this class */
@@ -104,5 +104,5 @@
 
 	#define PluginsManager_Submit ModulesManager_Submit
 	
-#endif /* __Base_Extensibility_PluginsManager_h__ */
+#endif /* __StGermain_Base_Extensibility_PluginsManager_h__ */
 

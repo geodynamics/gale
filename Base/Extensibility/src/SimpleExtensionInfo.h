@@ -48,8 +48,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_SimpleExtensionInfo_h__
-#define __Base_Extensibility_SimpleExtensionInfo_h__
+#ifndef __StGermain_Base_Extensibility_SimpleExtensionInfo_h__
+#define __StGermain_Base_Extensibility_SimpleExtensionInfo_h__
 	
 	/** Textual name of this class */
 	extern const Type SimpleExtensionInfo_Type;
@@ -107,5 +107,5 @@
 
 	/* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	/* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#endif /* __Base_Extensibility_SimpleExtensionInfo_h__ */
+#endif /* __StGermain_Base_Extensibility_SimpleExtensionInfo_h__ */
 

@@ -41,12 +41,12 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_BaseIO_Finalise_h__
-#define __Base_BaseIO_Finalise_h__
+#ifndef __StGermain_Base_IO_Finalise_h__
+#define __StGermain_Base_IO_Finalise_h__
 	
-	Bool BaseIO_Finalise( void );
+	Bool IO_Finalise( void );
 	
-#endif /* __Base_BaseIO_Finalise_h__ */
+#endif /* __StGermain_Base_IO_Finalise_h__ */
 
 
 

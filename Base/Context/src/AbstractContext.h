@@ -37,18 +37,18 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Context_AbstractContext_h__
-#define __Base_Context_AbstractContext_h__
+#ifndef __StGermain_Base_Context_AbstractContext_h__
+#define __StGermain_Base_Context_AbstractContext_h__
 	
 
 	/* Templates of virtual functions */
 	typedef void (AbstractContext_SetDt) ( void* self, double dt );
 	
 	/* Context_CallInfo info */
-	#define __Base_Context_CallInfo \
+	#define __StGermain_Base_Context_CallInfo \
 		void* functionPointer; \
 		void* entryPoint;
-	struct Context_CallInfo { __Base_Context_CallInfo };
+	struct Context_CallInfo { __StGermain_Base_Context_CallInfo };
 	
 	typedef enum CheckpointFileFormat {
 		CHECKPOINT_FORMAT_ASCII,	/** Default Stg Ascii text format */
@@ -303,5 +303,5 @@
 	void _AbstractContext_SaveTimeInfo( void* _context );
 
 	void _AbstractContext_CreateCheckpointDirectory( void* _context );
-#endif /* __Base_Context_AbstractContext_h__ */
+#endif /* __StGermain_Base_Context_AbstractContext_h__ */
 

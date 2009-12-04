@@ -67,8 +67,8 @@
 **
 **/
 
-#ifndef __Base_Foundation_Memory_h__
-#define __Base_Foundation_Memory_h__
+#ifndef __StGermain_Base_Foundation_Memory_h__
+#define __StGermain_Base_Foundation_Memory_h__
 
 
 	/** Textual name for Memory class. */
@@ -754,4 +754,4 @@
 #define MemArray3D			Memory_Alloc_3DArray
 #define MemFree				Memory_Free
 
-#endif /* __Base_Foundation_Memory_h__ */
+#endif /* __StGermain_Base_Foundation_Memory_h__ */

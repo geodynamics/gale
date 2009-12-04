@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Foundation_PrimitiveObject_h__
-#define __Base_Foundation_PrimitiveObject_h__
+#ifndef __StGermain_Base_Foundation_PrimitiveObject_h__
+#define __StGermain_Base_Foundation_PrimitiveObject_h__
 	
 	extern const Type Stg_PrimitiveObject_Type;
 	
@@ -126,6 +126,6 @@
 	void* _Stg_PrimitiveObject_Copy( void* objectAdaptor, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 		
 	
-#endif /* __Base_Foundation_PrimitiveObject_h__ */
+#endif /* __StGermain_Base_Foundation_PrimitiveObject_h__ */
 
 

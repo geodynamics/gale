@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __LinkedList_h__
-#define __LinkedList_h__
+#ifndef __StGermain_Base_Container_LinkedList_h__
+#define __StGermain_Base_Container_LinkedList_h__
 
 	/** Textual name for List class. */
 	extern const Type LinkedList_Type;
@@ -155,6 +155,6 @@
 	/** Private Functions */
 	
 	
-#endif /* __LinkedList_h__ */
+#endif /* __StGermain_Base_Container_LinkedList_h__ */
 
 

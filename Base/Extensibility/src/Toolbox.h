@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_Toolbox_h__
-#define __Base_Extensibility_Toolbox_h__
+#ifndef __StGermain_Base_Extensibility_Toolbox_h__
+#define __StGermain_Base_Extensibility_Toolbox_h__
 	
 	/** The prototype for the Register function in a toolbox */
 	typedef Index (Toolbox_RegisterFunction)   ( void* toolboxesManager );
@@ -101,5 +101,5 @@
 	/** Get the function pointer the to the toolbox's register function */
 	Toolbox_FinaliseFunction* Toolbox_GetFinaliseFunc( void* toolbox );
 	
-#endif /* __Base_Extensibility_Toolbox_h__ */
+#endif /* __StGermain_Base_Extensibility_Toolbox_h__ */
 

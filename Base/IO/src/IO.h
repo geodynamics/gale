@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_IO_h__
-#define __Base_IO_h__
+#ifndef __StGermain_Base_IO_h__
+#define __StGermain_Base_IO_h__
 	
 	#include "types.h"
 	#include "shortcuts.h"
@@ -67,5 +67,5 @@
 
 	#include "StGermain/Base/IO/mpirecord/mpimessaging.h"
 
-#endif /* __Base_IO_h__ */
+#endif /* __StGermain_Base_IO_h__ */
 

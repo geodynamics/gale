@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __Base_IO_types_h__
-#define __Base_IO_types_h__
+#ifndef __StGermain_Base_IO_types_h__
+#define __StGermain_Base_IO_types_h__
 	
 	/* Dicitonary internal types */
 	typedef char*				Dictionary_Entry_Key;
@@ -86,4 +86,4 @@
 	typedef struct RankFormatter		RankFormatter;
 	typedef struct IndentFormatter		IndentFormatter;
 
-#endif /* __Base_IO_types_h__ */
+#endif /* __StGermain_Base_IO_types_h__ */

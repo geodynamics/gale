@@ -62,8 +62,8 @@
 **
 **/
 
-#ifndef __Base_Foundation_Stg_ObjectList_h__
-#define __Base_Foundation_Stg_ObjectList_h__
+#ifndef __StGermain_Base_Foundation_Stg_ObjectList_h__
+#define __StGermain_Base_Foundation_Stg_ObjectList_h__
 
 	/* function prototype interface */
 	typedef Index (Stg_ObjectList_AppendFunction) ( void* objects, void* objectPtr );
@@ -421,5 +421,5 @@
 
 	/** Prints the first 'number' of names of objects in list which are most similar to 'name' */
 	void Stg_ObjectList_PrintSimilar( void* objectList, Name name, void* _stream, unsigned int number ) ;
-#endif /* __Base_Foundation_Stg_ObjectList_h__ */
+#endif /* __StGermain_Base_Foundation_Stg_ObjectList_h__ */
 

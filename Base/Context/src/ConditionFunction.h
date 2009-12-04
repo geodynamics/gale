@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_ConditionFunction_h__
-#define __Base_Automation_ConditionFunction_h__
+#ifndef __StGermain_Base_Context_ConditionFunction_h__
+#define __StGermain_Base_Context_ConditionFunction_h__
 
 
 	typedef void	(ConditionFunction_ApplyFunc)	(Index index, Variable_Index var_I, void* context, void* result);
@@ -125,5 +125,5 @@
 	void	_ConditionFunction_Apply(void* conditionFunction, Index index, Variable_Index var_I, void* context, void* result);
 
 
-#endif /* __Base_Automation_ConditionFunction_h__ */
+#endif /* __StGermain_Base_Context_ConditionFunction_h__ */
 

@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_Stg_ComponentMeta_h__
-#define __Base_Automation_Stg_ComponentMeta_h__
+#ifndef __StGermain_Base_Automation_Stg_ComponentMeta_h__
+#define __StGermain_Base_Automation_Stg_ComponentMeta_h__
 	
 	char* Stg_Meta_GetType( Dictionary* dictionary );
 	char* Stg_Meta_GetCreator( Dictionary* dictionary );
@@ -67,4 +67,4 @@
 	char* Stg_Meta_GetAssociationNillable( Dictionary* dictionary, Index i );
 	char* Stg_Meta_GetAssociationDocumentation( Dictionary* dictionary, Index i );
 	
-#endif /* __Base_Automation_Stg_ComponentMeta_h__ */
+#endif /* __StGermain_Base_Automation_Stg_ComponentMeta_h__ */

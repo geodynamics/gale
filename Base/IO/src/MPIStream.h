@@ -43,8 +43,8 @@
 **
 **/
 
-#ifndef __Base_IO_MPIStream_h__
-#define __Base_IO_MPIStream_h__
+#ifndef __StGermain_Base_IO_MPIStream_h__
+#define __StGermain_Base_IO_MPIStream_h__
 	
 	/** Textual name for MPIStream class. */
 	extern const Type MPIStream_Type;

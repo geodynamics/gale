@@ -54,8 +54,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_ExtensionInfo_h__
-#define __Base_Extensibility_ExtensionInfo_h__
+#ifndef __StGermain_Base_Extensibility_ExtensionInfo_h__
+#define __StGermain_Base_Extensibility_ExtensionInfo_h__
 	
 	/** Textual name of this class */
 	extern const Type ExtensionInfo_Type;
@@ -210,5 +210,5 @@
 		ExtensionInfo_Index		handle,
 		void*				data );
 	
-#endif /* __Base_Extensibility_ExtensionInfo_h__ */
+#endif /* __StGermain_Base_Extensibility_ExtensionInfo_h__ */
 

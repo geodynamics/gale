@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_Stg_Component_h__
-#define __Base_Automation_Stg_Component_h__
+#ifndef __StGermain_Base_Automation_Stg_Component_h__
+#define __StGermain_Base_Automation_Stg_Component_h__
 	
 	/* Templates of virtual functions */
 	typedef void*				(Stg_Component_DefaultConstructorFunction)	( Name name );
@@ -177,5 +177,5 @@
 	void Stg_Component_SetupStreamFromDictionary( void* component, Dictionary* dictionary );
 
 	
-#endif /* __Base_Automation_Stg_Component_h__ */
+#endif /* __StGermain_Base_Automation_Stg_Component_h__ */
 

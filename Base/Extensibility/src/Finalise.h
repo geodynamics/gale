@@ -38,9 +38,9 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_BaseExtensibility_Finalise_h__
-#define __Base_BaseExtensibility_Finalise_h__
+#ifndef __StGermain_Base_BaseExtensibility_Finalise_h__
+#define __StGermain_Base_BaseExtensibility_Finalise_h__
 	
 	Bool BaseExtensibility_Finalise( void );
 	
-#endif /* __Base_BaseExtensibility_Finalise_h__ */
+#endif /* __StGermain_Base_BaseExtensibility_Finalise_h__ */

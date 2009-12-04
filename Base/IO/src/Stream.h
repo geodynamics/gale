@@ -43,8 +43,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_IO_Stream_h__
-#define __Base_IO_Stream_h__
+#ifndef __StGermain_Base_IO_Stream_h__
+#define __StGermain_Base_IO_Stream_h__
 
 #include <stdarg.h>
 
@@ -273,5 +273,5 @@
 	/* Closes, deregisters and deletes the JournalFile associated with this stream */
 	void Stream_CloseAndFreeFile( void* stream ) ;
 
-#endif /* __Base_IO_Stream_h__ */
+#endif /* __StGermain_Base_IO_Stream_h__ */
 

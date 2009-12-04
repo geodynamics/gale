@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_HierarchyTable_h__
-#define __Base_Automation_HierarchyTable_h__
+#ifndef __StGermain_Base_Automation_HierarchyTable_h__
+#define __StGermain_Base_Automation_HierarchyTable_h__
 	
 	/* Textual name of this class */
 	extern const Type HierarchyTable_Type;
@@ -121,4 +121,4 @@
 
 	Type HierarchyTable_GetTypePtrFromName( void* hierarchyTable, Name typeName ) ;
 
-#endif /* __Base_Automation_HierarchyTable_h__ */
+#endif /* __StGermain_Base_Automation_HierarchyTable_h__ */

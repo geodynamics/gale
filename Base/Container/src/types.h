@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Container_types_h__
-#define __Base_Container_types_h__
+#ifndef __StGermain_Base_Container_types_h__
+#define __StGermain_Base_Container_types_h__
 
 typedef struct Iter Iter;
 typedef struct AbsArray AbsArray;
@@ -154,5 +154,5 @@ struct IMapItem {
 	} RangeSet_ParseStruct;
 
 
-#endif /* __Base_Container_types_h__ */
+#endif /* __StGermain_Base_Container_types_h__ */
 

@@ -39,7 +39,7 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Context_units_h__
-#define __Base_Context_units_h__
+#ifndef __StGermain_Base_Context_units_h__
+#define __StGermain_Base_Context_units_h__
 
-#endif /* __Base_Context_units_h__ */
+#endif /* __StGermain_Base_Context_units_h__ */

@@ -23,8 +23,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __STG_BASE_FOUNDATION_SRC_LOG__
-#define __STG_BASE_FOUNDATION_SRC_LOG__
+#ifndef __StGermain_Base_Foundation_Log_h__
+#define __StGermain_Base_Foundation_Log_h__
 
 
 void stg_log_printf( const char *format, ... );

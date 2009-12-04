@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_Plugin_h__
-#define __Base_Extensibility_Plugin_h__
+#ifndef __StGermain_Base_Extensibility_Plugin_h__
+#define __StGermain_Base_Extensibility_Plugin_h__
 	
 	/** The prototype for the Register function in a plugin */
 	typedef Index (Plugin_RegisterFunction) ( void* pluginsManager );
@@ -91,5 +91,5 @@
 	/** Get the function pointer the to the plugin's register function */
 	Plugin_RegisterFunction* Plugin_GetRegisterFunc( void* plugin );
 	
-#endif /* __Base_Extensibility_Plugin_h__ */
+#endif /* __StGermain_Base_Extensibility_Plugin_h__ */
 

@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __Base_IO_shortcuts_h__
-#define __Base_IO_shortcuts_h__
+#ifndef __StGermain_Base_IO_shortcuts_h__
+#define __StGermain_Base_IO_shortcuts_h__
 
 	#define Printf			Journal_Printf
 	#define Write			Journal_Write
@@ -144,4 +144,4 @@
 			Journal_Printf( stream, "%.5g }\n", (double)array[ journalPrintArray_array_I ] ); \
 		} while(0)
 
-#endif /* __Base_IO_shortcuts_h__ */
+#endif /* __StGermain_Base_IO_shortcuts_h__ */

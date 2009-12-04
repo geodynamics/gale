@@ -28,8 +28,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Foundation_MemMonitor_h__
-#define __Base_Foundation_MemMonitor_h__
+#ifndef __StGermain_Base_Foundation_MemMonitor_h__
+#define __StGermain_Base_Foundation_MemMonitor_h__
 
 extern double Stg_MemoryWatchCriteria;
 

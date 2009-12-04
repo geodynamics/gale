@@ -46,8 +46,8 @@
 **
 **/
 
-#ifndef __Heap_h__
-#define __Heap_h__
+#ifndef __StGermain_Base_Container_Heap_h__
+#define __StGermain_Base_Container_Heap_h__
 
 	/** Textual name for List class. */
 	extern const Type Heap_Type;
@@ -138,6 +138,6 @@
 	
 	int _Heap_Right( _Heap *heap, int i );
 
-#endif /* __Heap_h__ */
+#endif /* __StGermain_Base_Container_Heap_h__ */
 
 

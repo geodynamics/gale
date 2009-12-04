@@ -43,8 +43,8 @@
 **
 **/
 
-#ifndef __Base_IO_RegisterFactory_h__
-#define __Base_IO_RegisterFactory_h__
+#ifndef __StGermain_Base_IO_RegisterFactory_h__
+#define __StGermain_Base_IO_RegisterFactory_h__
 	
 	/** Textual name for RegisterFactory class. */
 	extern const Type RegisterFactory_Type;

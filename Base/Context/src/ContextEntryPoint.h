@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Context_ContextEntryPoint_h__
-#define __Base_Context_ContextEntryPoint_h__
+#ifndef __StGermain_Base_Context_ContextEntryPoint_h__
+#define __StGermain_Base_Context_ContextEntryPoint_h__
 	
 	/* Templates for default entry point type */
 	typedef double			(ContextEntryPoint_Dt_Cast)		( void* context );
@@ -95,5 +95,5 @@
 	/* Context entry point run... one void* arguement passed, one double arguement passed */
 	void _ContextEntryPoint_Run_Step( void* contextEntryPoint, void* data0, double data1 );
 	
-#endif /* __Base_Context_ContextEntryPoint_h__ */
+#endif /* __StGermain_Base_Context_ContextEntryPoint_h__ */
 

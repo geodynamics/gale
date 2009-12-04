@@ -40,9 +40,9 @@
 **
 **/
 
-#ifndef __Base_BaseFoundation_Init_h__
-#define __Base_BaseFoundation_Init_h__
+#ifndef __StGermain_Base_Foundation_Init_h__
+#define __StGermain_Base_Foundation_Init_h__
 
-	Bool BaseFoundation_Init( int* argc, char** argv[] );
+	Bool Foundation_Init( int* argc, char** argv[] );
 
-#endif /* __Base_BaseFoundation_Init_h__ */
+#endif /* __StGermain_Base_Foundation_Init_h__ */

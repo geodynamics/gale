@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Container_RangeSet_h__
-#define __Base_Container_RangeSet_h__
+#ifndef __StGermain_Base_Container_RangeSet_h__
+#define __StGermain_Base_Container_RangeSet_h__
 
 	/** Textual name of this class */
 	extern const Type RangeSet_Type;
@@ -139,5 +139,5 @@
 
 	void RangeSet_Destruct( RangeSet* self );
 
-#endif /* __Base_Container_RangeSet_h__ */
+#endif /* __StGermain_Base_Container_RangeSet_h__ */
 

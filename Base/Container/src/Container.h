@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Container_h__
-#define __Base_Container_h__
+#ifndef __StGermain_Base_Container_h__
+#define __StGermain_Base_Container_h__
 	
 	#include "units.h"
 	#include "types.h"
@@ -75,5 +75,5 @@
 	#include "Init.h"
 	#include "Finalise.h"
 	
-#endif /* __Base_Container_h__ */
+#endif /* __StGermain_Base_Container_h__ */
 

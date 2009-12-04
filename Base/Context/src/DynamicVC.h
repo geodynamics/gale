@@ -34,8 +34,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_DynamicVC_h__
-#define __Base_Automation_DynamicVC_h__
+#ifndef __StGermain_Base_Context_DynamicVC_h__
+#define __StGermain_Base_Context_DynamicVC_h__
 
 extern const Type DynamicVC_Type;
 
@@ -159,5 +159,5 @@ extern const Type DynamicVC_Type;
 	void DynamicVC_Remove( void* vc, int index );
 	Bool DynamicVC_Has( void* _self, int index );
 
-#endif /* __Base_Automation_DynamicVC_h__ */
+#endif /* __StGermain_Base_Context_DynamicVC_h__ */
 

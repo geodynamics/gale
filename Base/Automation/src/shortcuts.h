@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_shortcuts_h__
-#define __Base_Automation_shortcuts_h__
+#ifndef __StGermain_Base_Automation_shortcuts_h__
+#define __StGermain_Base_Automation_shortcuts_h__
 	
 
-#endif /* __Base_Automation_shortcuts_h__ */
+#endif /* __StGermain_Base_Automation_shortcuts_h__ */

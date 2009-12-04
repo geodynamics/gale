@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __Base_Foundation_h__
-#define __Base_Foundation_h__
+#ifndef __StGermain_Base_Foundation_h__
+#define __StGermain_Base_Foundation_h__
 	
 	#include "types.h"
 	#include "shortcuts.h"
@@ -66,4 +66,4 @@
 	#include "Finalise.h"
 	#include "Log.h"
 
-#endif /* __Base_Foundation_h__ */
+#endif /* __StGermain_Base_Foundation_h__ */

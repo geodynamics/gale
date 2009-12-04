@@ -58,8 +58,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_EntryPoint_h__
-#define __Base_Extensibility_EntryPoint_h__
+#ifndef __StGermain_Base_Extensibility_EntryPoint_h__
+#define __StGermain_Base_Extensibility_EntryPoint_h__
 	
 
 	/* Templates of virtual functions */
@@ -309,5 +309,5 @@
 
 	void EntryPoint_ErrorIfNoHooks( void* entryPoint, const char* parentFunction );
 	
-#endif /* __Base_Extensibility_EntryPoint_h__ */
+#endif /* __StGermain_Base_Extensibility_EntryPoint_h__ */
 

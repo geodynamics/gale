@@ -42,8 +42,8 @@
 **
 **/
 
-#ifndef __Base_IO_StreamFormatter_h__
-#define __Base_IO_StreamFormatter_h__
+#ifndef __StGermain_Base_IO_StreamFormatter_h__
+#define __StGermain_Base_IO_StreamFormatter_h__
 
 
 	/** Textual name for StreamFormatter class. */
@@ -114,5 +114,5 @@
 	void StreamFormatter_Buffer_Delete( StreamFormatter_Buffer* buffer );
 	char* StreamFormatter_Buffer_AllocNext( Index size );
 
-#endif /* __Base_IO_StreamFormatter_h__ */
+#endif /* __StGermain_Base_IO_StreamFormatter_h__ */
 

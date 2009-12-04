@@ -42,8 +42,8 @@
 **
 **/
 
-#ifndef __Base_IO_Dictionary_Entry_Value_h__
-#define __Base_IO_Dictionary_Entry_Value_h__
+#ifndef __StGermain_Base_IO_Dictionary_Entry_Value_h__
+#define __StGermain_Base_IO_Dictionary_Entry_Value_h__
 
 
 	/** The available formats which a dictionary can be written to output. */
@@ -255,4 +255,4 @@
 		Dictionary_Entry_Value* self,
 		Bool deep );
 	
-#endif /* __Base_IO_Dictionary_Entry_Value_h__ */
+#endif /* __StGermain_Base_IO_Dictionary_Entry_Value_h__ */

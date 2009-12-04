@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_EntryPoint_Register_h__
-#define __Base_Extensibility_EntryPoint_Register_h__
+#ifndef __StGermain_Base_Extensibility_EntryPoint_Register_h__
+#define __StGermain_Base_Extensibility_EntryPoint_Register_h__
 	
 
 	/* Textual name of this class */
@@ -103,5 +103,5 @@
 	/* If 'entryPoint' is in the register, return its index */
 	EntryPoint_Index EntryPoint_Register_Find( void* entryPoint_Register, void* entryPoint );
 	
-#endif /* __Base_Extensibility_EntryPoint_Register_h__ */
+#endif /* __StGermain_Base_Extensibility_EntryPoint_Register_h__ */
 

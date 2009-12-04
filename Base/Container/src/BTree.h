@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __Base_Foundation__BTree_h__
-#define __Base_Foundation__BTree_h__
+#ifndef __StGermain_Base_Container_BTree_h__
+#define __StGermain_Base_Container_BTree_h__
 
 #define MAX_DEPTH 100
 
@@ -159,4 +159,4 @@
 		/** Added ss alias to Stg_Class_Delete for forward declaraion wrappers */
 	void BTree_Delete( void* tree );
 	
-#endif /* __Base_Foundation__BTree_h__ */
+#endif /* __StGermain_Base_Container_BTree_h__ */

@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __Base_Foundation__BTreeNode_h__
-#define __Base_Foundation__BTreeNode_h__
+#ifndef __StGermain_Base_Container_BTreeNode_h__
+#define __StGermain_Base_Container_BTreeNode_h__
 
 	/** Textual name for BTreeNode class. */
 	extern const Type BTreeNode_Type;
@@ -76,5 +76,5 @@
 	
 	/** Print interface. */
 
-#endif /* __Base_Foundation__BTreeNode_h__ */
+#endif /* __StGermain_Base_Container_BTreeNode_h__ */
 

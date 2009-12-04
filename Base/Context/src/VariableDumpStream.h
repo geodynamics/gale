@@ -43,8 +43,8 @@
 **
 **/
 
-#ifndef __Base_IO_VariableDumpStream_h__
-#define __Base_IO_VariableDumpStream_h__
+#ifndef __StGermain_Base_Context_VariableDumpStream_h__
+#define __StGermain_Base_Context_VariableDumpStream_h__
 	
 	/** Textual name for VariableDumpStream class. */
 	extern const Type VariableDumpStream_Type;
@@ -104,7 +104,7 @@
 	void VariableDumpStream_SetVariable( void* stream, Variable* data, int numItems, unsigned int dumpEvery, const Name const fileName );
 	
 	
-#endif /* __IO_VariableDumpStreamFile_h__ */
+#endif /* __Context_VariableDumpStreamFile_h__ */
 
 
 

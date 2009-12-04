@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __Base_Foundation_Class_h__
-#define __Base_Foundation_Class_h__
+#ifndef __StGermain_Base_Foundation_Class_h__
+#define __StGermain_Base_Foundation_Class_h__
 
 	/* Textual name of this class */
 	extern const Type Stg_Class_Type;
@@ -146,4 +146,4 @@
 	
 	
 	/* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#endif /* __Base_Foundation_Class_h__ */
+#endif /* __StGermain_Base_Foundation_Class_h__ */

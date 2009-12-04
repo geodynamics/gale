@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __Base_Foundation__LinkedListIterator_h__
-#define __Base_Foundation__LinkedListIterator_h__
+#ifndef __StGermain_Base_Container_LinkedListIterator_h__
+#define __StGermain_Base_Container_LinkedListIterator_h__
 
 	/** Textual name for LinkedListIterator class. */
 	extern const Type LinkedListIterator_Type;
@@ -87,5 +87,5 @@
 		(it==NULL)?NULL:(it->curr == NULL)?NULL:((it->curr = it->curr->next)==NULL)?NULL:it->curr->data
 
 
-#endif /* __Base_Foundation__LinkedListIterator_h__ */
+#endif /* __StGermain_Base_Container_LinkedListIterator_h__ */
 

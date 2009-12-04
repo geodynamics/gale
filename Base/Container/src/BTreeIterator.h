@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __Base_Foundation__BTreeIterator_h__
-#define __Base_Foundation__BTreeIterator_h__
+#ifndef __StGermain_Base_Container_BTreeIterator_h__
+#define __StGermain_Base_Container_BTreeIterator_h__
 
 #define MAX_DEPTH 100
 
@@ -87,4 +87,4 @@
 	/* Returns the data stored inside the Tree's next node ( will be used for iterating through the tree ) */
 	void *BTreeIterator_Next( BTreeIterator *self );
 	
-#endif /* __Base_Foundation__BTreeIterator_h__ */
+#endif /* __StGermain_Base_Container_BTreeIterator_h__ */

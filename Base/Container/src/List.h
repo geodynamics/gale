@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Container_List_h__
-#define __Base_Contianer_List_h__
+#ifndef __StGermain_Base_Container_List_h__
+#define __StGermain_Base_Contianer_List_h__
 
 	/** Textual name of this class */
 	extern const Type List_Type;
@@ -118,5 +118,5 @@
 	void List_Contract( List* self );
 	void List_Destruct( List* self );
 
-#endif /* __Base_Container_List_h__ */
+#endif /* __StGermain_Base_Container_List_h__ */
 

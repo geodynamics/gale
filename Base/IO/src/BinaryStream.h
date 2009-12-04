@@ -43,8 +43,8 @@
 **
 **/
 
-#ifndef __Base_IO_BinaryStream_h__
-#define __Base_IO_BinaryStream_h__
+#ifndef __StGermain_Base_IO_BinaryStream_h__
+#define __StGermain_Base_IO_BinaryStream_h__
 	
 	/** Textual name for BinaryStream class. */
 	extern const Type BinaryStream_Type;

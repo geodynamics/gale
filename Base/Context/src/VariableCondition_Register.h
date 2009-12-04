@@ -37,12 +37,13 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_VariableCondition_Register_h__
-#define __Base_Automation_VariableCondition_Register_h__
+#ifndef __StGermain_Base_Context_VariableCondition_Register_h__
+#define __StGermain_Base_Context_VariableCondition_Register_h__
 	
 
 	/* Child classes must define these factories */
-	typedef VariableCondition*	(VariableCondition_Register_FactoryFunc)	( AbstractContext* context, Variable_Register* variable_Register, ConditionFunction_Register* conFunc_Register, Dictionary* dictionary, void* data );
+	typedef VariableCondition*	(VariableCondition_Register_FactoryFunc)
+		( AbstractContext* context, Variable_Register* variable_Register, ConditionFunction_Register* conFunc_Register, Dictionary* dictionary, void* data );
 	
 	
 	/** Textual name of this class */
@@ -133,5 +134,5 @@
 		void* dictionary, 
 		void* data );
 	
-#endif /* __Base_Automation_VariableCondition_Register_h__ */
+#endif /* __StGermain_Base_Context_VariableCondition_Register_h__ */
 

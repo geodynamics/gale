@@ -41,8 +41,8 @@
 **
 **/
 
-#ifndef __MemoryPool_h__
-#define __MemoryPool_h__
+#ifndef __StGermain_Base_Container_MemoryPool_h__
+#define __StGermain_Base_Container_MemoryPool_h__
 
 	/** Textual name for List class. */
 	extern const Type MemoryPool_Type;
@@ -133,6 +133,6 @@
 	
 	/** Private Functions */
 	
-#endif /* __MemoryPool_h__ */
+#endif /* __StGermain_Base_Container_MemoryPool_h__ */
 
 

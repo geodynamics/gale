@@ -44,8 +44,8 @@
 **
 **/
 
-#ifndef __Base_IO_CFile_h__
-#define __Base_IO_CFile_h__
+#ifndef __StGermain_Base_IO_CFile_h__
+#define __StGermain_Base_IO_CFile_h__
 
 	/** Textual name for CFile class. */
 	extern const Type CFile_Type;
@@ -111,7 +111,7 @@
 	Bool _CFile_Flush( void* file );
 	
 
-#endif /* __Base_IO_CFile_h__ */
+#endif /* __StGermain_Base_IO_CFile_h__ */
 
 
 

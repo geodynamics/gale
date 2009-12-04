@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_Stg_ComponentRegister_h__
-#define __Base_Automation_Stg_ComponentRegister_h__
+#ifndef __StGermain_Base_Automation_Stg_ComponentRegister_h__
+#define __StGermain_Base_Automation_Stg_ComponentRegister_h__
 	
 	/* Textual name of this class */
 	extern const Type Stg_ComponentRegister_Type;
@@ -192,5 +192,5 @@
 	/** Obtain the component metadata from the component list element */
 	Dictionary* Stg_ComponentRegisterElement_GetMetadata( Stg_ComponentRegisterElement* element );
 	
-#endif /* __Base_Automation_Stg_ComponentRegister_h__ */
+#endif /* __StGermain_Base_Automation_Stg_ComponentRegister_h__ */
 

@@ -34,8 +34,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_SetVC_h__
-#define __Base_Automation_SetVC_h__
+#ifndef __StGermain_Base_Context_SetVC_h__
+#define __StGermain_Base_Context_SetVC_h__
 	
 	extern const Type SetVC_Type;
 	
@@ -151,5 +151,5 @@
 	** Functions
 	*/
 
-#endif /* __Base_Automation_SetVC_h__ */
+#endif /* __StGermain_Base_Context_SetVC_h__ */
 

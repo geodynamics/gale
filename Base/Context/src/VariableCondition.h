@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_VariableCondition_h__
-#define __Base_Automation_VariableCondition_h__
+#ifndef __StGermain_Base_Context_VariableCondition_h__
+#define __StGermain_Base_Context_VariableCondition_h__
 	
 	/** Textual name of this class */
 	extern const Type VariableCondition_Type;
@@ -155,7 +155,7 @@
                 VariableCondition_ApplyFunc*                        _apply
 
 	#define VARIABLECONDITION_PASSARGS \
-                STG_COMPONENT_PASSARGS, \
+ 		STG_COMPONENT_PASSARGS, \
 	        _buildSelf,        \
 	        _printConcise,     \
 	        _readDictionary,   \
@@ -250,5 +250,5 @@
 	
 	void VariableCondition_PrintConcise( void* variableCondition, Stream* stream );
 	
-#endif /* __Base_Automation_VariableCondition_h__ */
+#endif /* __StGermain_Base_Context_VariableCondition_h__ */
 

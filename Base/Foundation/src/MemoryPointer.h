@@ -42,8 +42,8 @@
 **
 **/
 
-#ifndef __Base_Foundation_MemoryPointer_h__
-#define __Base_Foundation_MemoryPointer_h__
+#ifndef __StGermain_Base_Foundation_MemoryPointer_h__
+#define __StGermain_Base_Foundation_MemoryPointer_h__
 
 	/** Textual name for MemoryPointer class. */
 	extern const Type MemoryPointer_Type;
@@ -179,7 +179,7 @@
 	/** Displays all fields of a MemoryPointer. */
 	#define MemoryPointer_PrintAll( memoryPointer ) MemoryPointer_Print( memoryPointer, MEMORYPOINTER_ALL );			
 			
-#endif /* __Base_Foundation_MemoryPointer_h__ */
+#endif /* __StGermain_Base_Foundation_MemoryPointer_h__ */
 
 
 

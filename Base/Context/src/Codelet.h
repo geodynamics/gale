@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Context_Codelet_h__
-#define __Base_Context_Codelet_h__
+#ifndef __StGermain_Base_Context_Codelet_h__
+#define __StGermain_Base_Context_Codelet_h__
 	
 	/* Textual name of this class */
 	extern const Type Codelet_Type;

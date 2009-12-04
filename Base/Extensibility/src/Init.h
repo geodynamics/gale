@@ -39,12 +39,12 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_BaseExtensibility_Init_h__
-#define __Base_BaseExtensibility_Init_h__
+#ifndef __StGermain_Base_BaseExtensibility_Init_h__
+#define __StGermain_Base_BaseExtensibility_Init_h__
 
 	/** The toolboxes singleton... this is the manager of loading and unloading toolboxes */
 	extern ToolboxesManager* stgToolboxesManager;
 
 	Bool BaseExtensibility_Init( int* argc, char** argv[] );
 	
-#endif /* __Base_BaseExtensibility_Init_h__ */
+#endif /* __StGermain_Base_BaseExtensibility_Init_h__ */

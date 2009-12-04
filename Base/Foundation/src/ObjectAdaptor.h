@@ -49,8 +49,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_ObjectAdaptor_h__
-#define __Base_Automation_ObjectAdaptor_h__
+#ifndef __StGermain_Base_Automation_ObjectAdaptor_h__
+#define __StGermain_Base_Automation_ObjectAdaptor_h__
 	
 	/** Delete/Print/Copy function prototypes for attached pointers (not StGermain classes) */
 	/** *Note*: this function should only delete extra memory allocated by the object, _not
@@ -223,5 +223,5 @@
 	#endif
 	
 	/* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#endif /* __Base_Automation_ObjectAdaptor_h__ */
+#endif /* __StGermain_Base_Automation_ObjectAdaptor_h__ */
 

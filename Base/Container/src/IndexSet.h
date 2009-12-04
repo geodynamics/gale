@@ -45,8 +45,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Container_IndexSet_h__
-#define __Base_Container_IndexSet_h__
+#ifndef __StGermain_Base_Container_IndexSet_h__
+#define __StGermain_Base_Container_IndexSet_h__
 	
 
 	/** Virtual function template */
@@ -195,5 +195,5 @@
 	/** Prints message and exits properly when bad access/write detected. */
 	void _IndexSet_Abort( IndexSet* indexSet, const char* const funcName, IndexSet_Index index );
 
-#endif /* __Base_Container_IndexSet_h__ */
+#endif /* __StGermain_Base_Container_IndexSet_h__ */
 

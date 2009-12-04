@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_Module_h__
-#define __Base_Extensibility_Module_h__
+#ifndef __StGermain_Base_Extensibility_Module_h__
+#define __StGermain_Base_Extensibility_Module_h__
 	
 	/* The prototype for the virtual functions in a module */
 	typedef char*       (Module_MangleNameFunction)         ( char* name );
@@ -115,5 +115,5 @@
 	/** Un load the module */
 	void Module_UnLoad( void* module );
 	
-#endif /* __Base_Extensibility_Module_h__ */
+#endif /* __StGermain_Base_Extensibility_Module_h__ */
 

@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_VariableAllVC_h__
-#define __Base_Automation_VariableAllVC_h__
+#ifndef __StGermain_Base_Context_VariableAllVC_h__
+#define __StGermain_Base_Context_VariableAllVC_h__
 	
 
 	extern const Type VariableAllVC_Type;
@@ -159,5 +159,5 @@
 	*/
 
 	
-#endif /* __Base_Automation_VariableAllVC_h__ */
+#endif /* __StGermain_Base_Context_VariableAllVC_h__ */
 

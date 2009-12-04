@@ -44,8 +44,8 @@
 **
 **/
 
-#ifndef __Base_Foundation_MemoryReport_h__
-#define __Base_Foundation_MemoryReport_h__
+#ifndef __StGermain_Base_Foundation_MemoryReport_h__
+#define __StGermain_Base_Foundation_MemoryReport_h__
 
 	/** Textual name for MemoryReport class. */
 	extern const Type MemoryReport_Type;
@@ -95,7 +95,7 @@
 
    const char* _MemoryReport_GetValue( MemoryReport* memoryReport, MemoryReportGroup reportGroup, MemoryPointer* memPtr );
 		
-#endif /* __Base_Foundation_MemoryReport_h__ */
+#endif /* __StGermain_Base_Foundation_MemoryReport_h__ */
 
 
 

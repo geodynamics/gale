@@ -33,8 +33,8 @@
 ** $Id: LiveComponentRegister.h 2745 2005-05-10 08:12:18Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#ifndef __Base_Automation_LiveComponentRegister_h__
-#define __Base_Automation_LiveComponentRegister_h__
+#ifndef __StGermain_Base_Automation_LiveComponentRegister_h__
+#define __StGermain_Base_Automation_LiveComponentRegister_h__
 
 	extern const Type LiveComponentRegister_Type;
 	extern LiveComponentRegister* stgLiveComponentRegister; /**< Live components singleton. */
@@ -106,5 +106,5 @@
 	LiveComponentRegister* LiveComponentRegister_GetLiveComponentRegister();
 
 	void LiveComponentRegister_PrintSimilar( void* liveComponentRegister, Name name, Stream* stream, unsigned int number ) ;
-#endif /* __Base_Automation_LiveComponentRegister_h__ */
+#endif /* __StGermain_Base_Automation_LiveComponentRegister_h__ */
 

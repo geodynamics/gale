@@ -40,8 +40,8 @@
 **
 **/
 
-#ifndef __Base_IO_MPIFile_h__
-#define __Base_IO_MPIFile_h__
+#ifndef __StGermain_Base_IO_MPIFile_h__
+#define __StGermain_Base_IO_MPIFile_h__
 
 #include <mpi.h>
 
@@ -103,5 +103,5 @@
 	Bool _MPIFile_Flush( void* file );
 	
 
-#endif /* __Base_IO_MPIFile_h__ */
+#endif /* __StGermain_Base_IO_MPIFile_h__ */
 

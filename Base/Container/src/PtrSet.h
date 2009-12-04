@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Container_PtrSet_h__
-#define __Base_Container_PtrSet_h__
+#ifndef __StGermain_Base_Container_PtrSet_h__
+#define __StGermain_Base_Container_PtrSet_h__
 	
 
 	/* Textual name of this class */
@@ -126,5 +126,5 @@
 	void _PtrSet_DeleteData( void* data );
 
 
-#endif /* __Base_Container_PtrSet_h__ */
+#endif /* __StGermain_Base_Container_PtrSet_h__ */
 

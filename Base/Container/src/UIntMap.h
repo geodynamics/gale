@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Container_UIntMap_h__
-#define __Base_Container_UIntMap_h__
+#ifndef __StGermain_Base_Container_UIntMap_h__
+#define __StGermain_Base_Container_UIntMap_h__
 
 	/** Textual name of this class */
 	extern const Type UIntMap_Type;
@@ -113,5 +113,5 @@
 	void UIntMap_DataDelete( void* data );
 	void UIntMap_ParseNode( void* data, void* _parseStruct );
 
-#endif /* __Base_Container_UIntMap_h__ */
+#endif /* __StGermain_Base_Container_UIntMap_h__ */
 

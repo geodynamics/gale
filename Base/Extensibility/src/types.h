@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_types_h__
-#define __Base_Extensibility_types_h__
+#ifndef __StGermain_Base_Extensibility_types_h__
+#define __StGermain_Base_Extensibility_types_h__
 	
 	/* Generic types */
 	/* Base types/classes */
@@ -82,4 +82,4 @@
 	typedef void*				DLL_Handle;
 	typedef DLL_Handle*			DLL_Handle_List;
 
-#endif /* __Base_Extensibility_types_h__ */
+#endif /* __StGermain_Base_Extensibility_types_h__ */

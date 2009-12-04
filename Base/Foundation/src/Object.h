@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __Base_Foundation_Object_h__
-#define __Base_Foundation_Object_h__
+#ifndef __StGermain_Base_Foundation_Object_h__
+#define __StGermain_Base_Foundation_Object_h__
 
 	/** Textual name for Stg_Object class. */
 	extern const Type Stg_Object_Type;
@@ -114,5 +114,5 @@
 	Name Stg_Object_AppendSuffix( void* object, Name suffix ) ;
 	
 	/* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#endif /* __Base_Foundation_Object_h__ */
+#endif /* __StGermain_Base_Foundation_Object_h__ */
 

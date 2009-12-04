@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Context_types_h__
-#define __Base_Context_types_h__
+#ifndef __StGermain_Base_Context_types_h__
+#define __StGermain_Base_Context_types_h__
 	
 	/* types/classes */
 	typedef struct Codelet				Codelet;
@@ -103,4 +103,4 @@
 	typedef Stg_ObjectList			Pointer_Register;
 	typedef Stg_ObjectList			Register_Register;
 	
-#endif /* __Base_Context_types_h__ */
+#endif /* __StGermain_Base_Context_types_h__ */

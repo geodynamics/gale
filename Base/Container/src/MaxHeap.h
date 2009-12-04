@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __MaxHeap_h__
-#define __MaxHeap_h__
+#ifndef __StGermain_Base_Container_MaxHeap_h__
+#define __StGermain_Base_Container_MaxHeap_h__
 
 	/** Textual name for List class. */
 	extern const Type MaxHeap_Type;
@@ -92,6 +92,6 @@
 
 	/** Private Functions */
 	
-#endif /* __MaxHeap_h__ */
+#endif /* __StGermain_Base_Container_MaxHeap_h__ */
 
 

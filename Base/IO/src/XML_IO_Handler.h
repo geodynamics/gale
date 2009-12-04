@@ -40,8 +40,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_IO_XML_IO_Handler_h__
-#define __Base_IO_XML_IO_Handler_h__
+#ifndef __StGermain_Base_IO_XML_IO_Handler_h__
+#define __StGermain_Base_IO_XML_IO_Handler_h__
 	
 	#include <libxml/tree.h>
 	
@@ -185,5 +185,5 @@
 	 *  up using xmlSetGenericErrorFunc(), e.g. at the Init() stage. */
 	void XML_IO_Handler_LibXMLErrorHandler( void* ctx, const char* msg, ... );
 
-#endif /* __Base_IO_XML_IO_Handler_h__ */
+#endif /* __StGermain_Base_IO_XML_IO_Handler_h__ */
 

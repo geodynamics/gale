@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_types_h__
-#define __Base_Automation_types_h__
+#ifndef __StGermain_Base_Automation_types_h__
+#define __StGermain_Base_Automation_types_h__
 
 typedef struct stgComponent stgComponent;
 typedef struct Comm Comm;
@@ -64,4 +64,4 @@ typedef struct Comm Comm;
 	typedef void (Stg_Component_LoadFromDict) ( void*, Dictionary*, Dictionary*, Stg_ObjectList* );
 
 
-#endif /* __Base_Automation_types_h__ */
+#endif /* __StGermain_Base_Automation_types_h__ */

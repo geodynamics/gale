@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Context_h__
-#define __Base_Context_h__
+#ifndef __StGermain_Base_Context_h__
+#define __StGermain_Base_Context_h__
 	
 	#include "units.h"
 	#include "types.h"
@@ -63,4 +63,4 @@
 	#include "Finalise.h"
 	#include "DictionaryCheck.h"
 	
-#endif /* __Base_Context_h__ */
+#endif /* __StGermain_Base_Context_h__ */

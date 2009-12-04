@@ -38,9 +38,9 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Container_Finalise_h__
-#define __Base_Container_Finalise_h__
+#ifndef __StGermain_Base_Container_Finalise_h__
+#define __StGermain_Base_Container_Finalise_h__
 	
 	Bool BaseContainer_Finalise( void );
 	
-#endif /* __Base_Container_Finalise_h__ */
+#endif /* __StGermain_Base_Container_Finalise_h__ */

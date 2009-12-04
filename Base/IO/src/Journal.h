@@ -49,8 +49,8 @@
 **
 **/
 
-#ifndef __Base_IO_Journal_h__
-#define __Base_IO_Journal_h__
+#ifndef __StGermain_Base_IO_Journal_h__
+#define __StGermain_Base_IO_Journal_h__
 
 #include <stdarg.h>
 
@@ -254,4 +254,4 @@
 	/** Set up the default type streams expected throughout StGermain */
 	void Journal_SetupDefaultTypedStreams();
 	
-#endif /* __Base_IO_Journal_h__ */
+#endif /* __StGermain_Base_IO_Journal_h__ */

@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_ModulesManager_h__
-#define __Base_Extensibility_ModulesManager_h__
+#ifndef __StGermain_Base_Extensibility_ModulesManager_h__
+#define __StGermain_Base_Extensibility_ModulesManager_h__
 	
 
 	/* Textual name of this class */
@@ -150,5 +150,5 @@
 
 	Bool ModulesManager_ConstructModule( void* modulesManager, Name moduleName, Stg_ComponentFactory* cf, void* data );
 
-#endif /* __Base_Extensibility_ModulesManager_h__ */
+#endif /* __StGermain_Base_Extensibility_ModulesManager_h__ */
 

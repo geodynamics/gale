@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Foundation_NamedObject_Register_h__
-#define __Base_Foundation_NamedObject_Register_h__ 
+#ifndef __StGermain_Base_Foundation_NamedObject_Register_h__
+#define __StGermain_Base_Foundation_NamedObject_Register_h__ 
 
 	extern const Type NamedObject_Register_Type;
 	
@@ -105,5 +105,5 @@
 		( Stg_ObjectList_PrintAllEntryNames( (self)->objects, stream ) )
 	
 	/* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#endif /* __Base_Foundation_NamedObject_Register_h__ */
+#endif /* __StGermain_Base_Foundation_NamedObject_Register_h__ */
 

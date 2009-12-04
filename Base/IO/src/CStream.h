@@ -43,8 +43,8 @@
 **
 **/
 
-#ifndef __Base_IO_CStream_h__
-#define __Base_IO_CStream_h__
+#ifndef __StGermain_Base_IO_CStream_h__
+#define __StGermain_Base_IO_CStream_h__
 	
 	/** Textual name for CStream class. */
 	extern const Type CStream_Type;

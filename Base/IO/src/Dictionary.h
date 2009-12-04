@@ -48,8 +48,8 @@
 **
 **/
 
-#ifndef __Base_IO_Dictionary_h__
-#define __Base_IO_Dictionary_h__
+#ifndef __StGermain_Base_IO_Dictionary_h__
+#define __StGermain_Base_IO_Dictionary_h__
 	
 	typedef Index Dictionary_Index;		/**< Index type for Dictionary, */
 	
@@ -229,5 +229,5 @@
 	/** Compares two dictionaries, returns True if all entries are identical */
 	Bool Dictionary_CompareAllEntriesFull( void* dictionary1, void* dictionary2, Bool strictTypeCheck );
 
-#endif /* __Base_IO_Dictionary_h__ */
+#endif /* __StGermain_Base_IO_Dictionary_h__ */
 

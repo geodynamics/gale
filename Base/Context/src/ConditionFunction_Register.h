@@ -42,8 +42,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_ConditionFunction_Register_h__
-#define __Base_Automation_ConditionFunction_Register_h__
+#ifndef __StGermain_Base_Context_ConditionFunction_Register_h__
+#define __StGermain_Base_Context_ConditionFunction_Register_h__
 	
 	
 	extern const Type ConditionFunction_Register_Type;
@@ -125,5 +125,5 @@
 	void ConditionFunction_Register_PrintNameOfEachFunc( void* conditionFunction_Register, Stream* stream );
 
 	
-#endif /* __Base_Automation_ConditionFunction_Register_h__ */
+#endif /* __StGermain_Base_Context_ConditionFunction_Register_h__ */
 

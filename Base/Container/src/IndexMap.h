@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Container_IndexMap_h__
-#define __Base_Container_IndexMap_h__
+#ifndef __StGermain_Base_Container_IndexMap_h__
+#define __StGermain_Base_Container_IndexMap_h__
 	
 	
 	/** Textual name of this class */
@@ -150,5 +150,5 @@
 	*/
 	
 
-#endif /* __Base_Container_IndexMap_h__ */
+#endif /* __StGermain_Base_Container_IndexMap_h__ */
 

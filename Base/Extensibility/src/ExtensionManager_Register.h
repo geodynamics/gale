@@ -40,8 +40,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_ExtensionManager_Register_h__
-#define __Base_Extensibility_ExtensionManager_Register_h__
+#ifndef __StGermain_Base_Extensibility_ExtensionManager_Register_h__
+#define __StGermain_Base_Extensibility_ExtensionManager_Register_h__
 	
 
 	/** Textual name of this class */
@@ -108,5 +108,5 @@
 
 	ExtensionManager* _ExtensionManager_Register_At( void* extension_Register, ExtensionManager_Index handle );
 	
-#endif /* __Base_Extensibility_ExtensionManager_Register_h__ */
+#endif /* __StGermain_Base_Extensibility_ExtensionManager_Register_h__ */
 

@@ -38,11 +38,11 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_BaseContext_DictionaryCheck_h__
-#define __Base_BaseContext_DictionaryCheck_h__
+#ifndef __StGermain_Base_Context_DictionaryCheck_h__
+#define __StGermain_Base_Context_DictionaryCheck_h__
 	
-	void BaseContext_DictionaryCheck( Dictionary* dictionary );
+	void Context_DictionaryCheck( Dictionary* dictionary );
 	
 	void CheckDictionaryKeys(Dictionary* dictionary, const char* errorMessage);
 	
-#endif /* __Base_BaseContext_DictionaryCheck_h__ */
+#endif /* __StGermain_Base_Context_DictionaryCheck_h__ */

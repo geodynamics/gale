@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Container_Set_h__
-#define __Base_Container_Set_h__
+#ifndef __StGermain_Base_Container_Set_h__
+#define __StGermain_Base_Container_Set_h__
 	
 
 	/* Textual name of this class */
@@ -185,5 +185,5 @@
 	void _Set_BTreeSubtraction( void* data, void* pack );
 
 
-#endif /* __Base_Container_Set_h__ */
+#endif /* __StGermain_Base_Container_Set_h__ */
 

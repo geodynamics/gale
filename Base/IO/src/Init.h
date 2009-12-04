@@ -40,8 +40,8 @@
 **
 **/
 
-#ifndef __Base_BaseIO_Init_h__
-#define __Base_BaseIO_Init_h__
+#ifndef __StGermain_Base_IO_Init_h__
+#define __StGermain_Base_IO_Init_h__
 	
 	extern const Name    LiveDebugName;
 	/** A global stream for interactive debugging through GDB. Note that the 
@@ -50,9 +50,9 @@
 
 	extern Stream* stgErrorStream;
 
-	Bool      BaseIO_Init( int* argc, char** argv[] );
+	Bool      IO_Init( int* argc, char** argv[] );
 	
-#endif /* __Base_BaseIO_Init_h__ */
+#endif /* __StGermain_Base_IO_Init_h__ */
 
 
 

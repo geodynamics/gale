@@ -35,8 +35,8 @@
 **
 **/
 
-#ifndef __Base_Automation_CompositeVC_h__
-#define __Base_Automation_CompositeVC_h__
+#ifndef __StGermain_Base_Context_CompositeVC_h__
+#define __StGermain_Base_Context_CompositeVC_h__
 	
 	extern const Type CompositeVC_Type;
 	
@@ -171,5 +171,5 @@
 void _CompositeVC_Apply( void* _self, void* _ctx );
 
 	
-#endif /* __Base_Automation_CompositeVC_h__ */
+#endif /* __StGermain_Base_Context_CompositeVC_h__ */
 

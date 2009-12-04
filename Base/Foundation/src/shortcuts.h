@@ -38,8 +38,8 @@
  **
  **/
 
-#ifndef __Base_Foundation_shortcuts_h__
-#define __Base_Foundation_shortcuts_h__
+#ifndef __StGermain_Base_Foundation_shortcuts_h__
+#define __StGermain_Base_Foundation_shortcuts_h__
 
 /* If the system does not have these macros, define it here */
 #ifndef MAX
@@ -172,4 +172,4 @@
 #define insist( stmnt, expr ) stmnt
 #endif
 	
-#endif /* __Base_Foundation_shortcuts_h__ */
+#endif /* __StGermain_Base_Foundation_shortcuts_h__ */

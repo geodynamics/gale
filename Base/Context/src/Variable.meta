@@ -6,14 +6,15 @@
 <param name="Author">Steve Quenette</param>
 <param name="Organisation">VPAC</param>
 <param name="Project">StGermain</param>
-<param name="Location">./StGermain/Base/Automation/src/</param>
+<param name="Location">./StGermain/Base/Context/src/</param>
 <param name="Project Web">http://www.stgermainproject.org/</param>
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
 <param name="Parent">Stg_Component</param>
 <param name="Reference"></param>
 <param name="Summary">Associates a textual label with a piece of data in memory, which can then be referred to via the Variable Register.</param>
-<param name="Description"><![CDATA[
+<param name="Description">
+
 <p>Variable makes an association between a defined, textual name and a chunk of data in memory.  This data could take the form of a basic type (such as an int or double), or an element of an array, or an entire array or struct.  Variable may also index a regular series of non-contiguous locations in memory.  This capability to define arbitrary data within a datastructure makes it very powerful.</p>
 
 <p>For example, a Variable can refer to a series of ints in an array with an offset of 1 and a stride of 3.  This terminology will be familiar to those who are accustomed with  MPI. Once a Variable is defined, it is stored in the Variable Register.  Like other Registers of StGermain, it can be accessed by any other Component.
@@ -24,7 +25,7 @@
 <p>When specified throught the XML system, the Variable will actually allocate the memory of the underlying memory variable itself. When used in the C API, the Variable must be passed the underlying memory chunk (but the memory chunk itself need not yet be allocated until just before the Variable undergoes its build phase).</p>
 
 <p>The XML implementation of Variable doesn't allow the specification of complex data types or arrays. For arrays, components such as MeshVariable should be used</p>
-]]>
+
 </param>
 
 
@@ -89,7 +90,7 @@ which is a vector of 3 double components. Also, 3 more entries into the variable
 Using Variable in C is different to the XML implementation because you need to
  do own memory handling.
 This example is based on the sourcecode in 
-~/code/StGermain/Base/Automation/tests/testVariable.c </p>
+~/code/StGermain/Base/Context/tests/testVariable.c </p>
 <p>
 /* Construct phase */
 double* velocity;

@@ -33,8 +33,8 @@
 ** $Id: Stg_ComponentFactory.h 3851 2006-10-12 08:57:22Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#ifndef __Base_Automation_Stg_ComponentFactory_h__
-#define __Base_Automation_Stg_ComponentFactory_h__
+#ifndef __StGermain_Base_Automation_Stg_ComponentFactory_h__
+#define __StGermain_Base_Automation_Stg_ComponentFactory_h__
 
 	extern const Type Stg_ComponentFactory_Type;
 	
@@ -320,5 +320,5 @@
 
 	#define Stg_ComponentFactory_Unlimited ((unsigned int) -1)
 
-#endif /* __Base_Automation_Stg_ComponentFactory_h__ */
+#endif /* __StGermain_Base_Automation_Stg_ComponentFactory_h__ */
 

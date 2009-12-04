@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __HashTable_h__
-#define __HashTable_h__
+#ifndef __StGermain_Base_Container_HashTable_h__
+#define __StGermain_Base_Container_HashTable_h__
 
 	/** Textual name for List class. */
 	extern const Type HashTable_Type;
@@ -171,6 +171,6 @@
 	struct HashTable_Index* HashTable_Next( struct HashTable_Index *hi );
 	struct HashTable_Index* HashTable_First( struct HashTable *ht );
 
-#endif /* __HashTable_h__ */
+#endif /* __StGermain_Base_Container_HashTable_h__ */
 
 

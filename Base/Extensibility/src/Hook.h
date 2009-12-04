@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_Hook_h__
-#define __Base_Extensibility_Hook_h__
+#ifndef __StGermain_Base_Extensibility_Hook_h__
+#define __StGermain_Base_Extensibility_Hook_h__
 	
 
 	/** Textual name of this class */
@@ -94,5 +94,5 @@
 	
 	void* _Hook_Copy( void* hook, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-#endif /* __Base_Extensibility_Hook_h__ */
+#endif /* __StGermain_Base_Extensibility_Hook_h__ */
 

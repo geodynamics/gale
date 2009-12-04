@@ -39,9 +39,9 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_BaseAutomation_Init_h__
-#define __Base_BaseAutomation_Init_h__
+#ifndef __StGermain_Base_Automation_Init_h__
+#define __StGermain_Base_Automation_Init_h__
 	
-	Bool BaseAutomation_Init( int* argc, char** argv[] );
+	Bool Automation_Init( int* argc, char** argv[] );
 	
-#endif /* __Base_BaseAutomation_Init_h__ */
+#endif /* __StGermain_Base_Automation_Init_h__ */

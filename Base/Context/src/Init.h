@@ -39,9 +39,9 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_BaseContext_Init_h__
-#define __Base_BaseContext_Init_h__
+#ifndef __StGermain_Base_Context_Init_h__
+#define __StGermain_Base_Context_Init_h__
 	
-	Bool BaseContext_Init( int* argc, char** argv[] );
+	Bool Context_Init( int* argc, char** argv[] );
 	
-#endif /* __Base_BaseContext_Init_h__ */
+#endif /* __StGermain_Base_Context_Init_h__ */

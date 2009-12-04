@@ -43,8 +43,8 @@
 **/
 
 
-#ifndef __Base_IO_LineFormatter_h__
-#define __Base_IO_LineFormatter_h__
+#ifndef __StGermain_Base_IO_LineFormatter_h__
+#define __StGermain_Base_IO_LineFormatter_h__
 
 	/** Textual name for LineFormatter class. */
 	extern const Type LineFormatter_Type;
@@ -99,7 +99,7 @@
 	char* _LineFormatter_Format( void* formatter, const char* const fmt );
 
 
-#endif /* __Base_IO_LineFormatter_h__ */
+#endif /* __StGermain_Base_IO_LineFormatter_h__ */
 
 
 

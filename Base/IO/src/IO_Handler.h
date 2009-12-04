@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_IO_IO_Handler_h__
-#define __Base_IO_IO_Handler_h__
+#ifndef __StGermain_Base_IO_IO_Handler_h__
+#define __StGermain_Base_IO_IO_Handler_h__
 	
 	/* Function pointer interface for inherited classes to use */
 	typedef void (IO_Handler_DeleteFunction) (void* io_handler);
@@ -161,5 +161,5 @@
 	Returns the number of files successfully read. */
 	Index IO_Handler_ReadAllFromCommandLineForceSource( void* ioHandler, int argc, char* argv[], Dictionary* dictionary ) ;
 	
-#endif /* __Base_IO_IO_Handler_h__ */
+#endif /* __StGermain_Base_IO_IO_Handler_h__ */
 

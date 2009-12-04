@@ -46,8 +46,8 @@
 **
 **/
 
-#ifndef __Base_Foundation_MemoryField_h__
-#define __Base_Foundation_MemoryField_h__
+#ifndef __StGermain_Base_Foundation_MemoryField_h__
+#define __StGermain_Base_Foundation_MemoryField_h__
 
 	/** Textual name for MemoryField class. */
 	extern const Type MemoryField_Type;
@@ -134,4 +134,4 @@
 	
 	unsigned int _MemoryField_CalcLongestSubFieldNameLen( MemoryField* memoryField );
 
-#endif /* __Base_Foundation_MemoryField_h__ */
+#endif /* __StGermain_Base_Foundation_MemoryField_h__ */

@@ -52,8 +52,8 @@
 **
 **/
 
-#ifndef __Base_IO_JournalFile_h__
-#define __Base_IO_JournalFile_h__
+#ifndef __StGermain_Base_IO_JournalFile_h__
+#define __StGermain_Base_IO_JournalFile_h__
 
 	/** Textual name for JournalFile class. */
 	extern const Type JournalFile_Type;
@@ -159,5 +159,5 @@
 	Bool JournalFile_Flush( void* journalFile );
 
 
-#endif /* __Base_IO_JournalFile_h__ */
+#endif /* __StGermain_Base_IO_JournalFile_h__ */
 
