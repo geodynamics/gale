@@ -178,6 +178,11 @@ void _ConstitutiveMatrixCartesian_Build( void* constitutiveMatrix, void* data ) 
    ConstitutiveMatrixCartesian*             self             = (ConstitutiveMatrixCartesian*)constitutiveMatrix;
 
    _ConstitutiveMatrix_Build( self, data );
+
+   /* Commented out with the section ~line 695
+   if( self->storedConstSwarmVar ) 
+      Stg_Component_Build( self->storedConstSwarmVar, NULL, False );
+     */
 }
 
 void _ConstitutiveMatrixCartesian_Initialise( void* constitutiveMatrix, void* data ) {
@@ -728,6 +733,8 @@ void ConstitutiveMatrixCartesian_SetupParticleStorage( ConstitutiveMatrixCartesi
 
    cMatrix = ExtensionManager_Get( materialSwarm->particleExtensionMgr, &particle, self->storedConstHandle );
 
+#if 0
+   /*This isn't needed so I've disabled it, 2Dec09, JG*/
    if( self->dim == 2 ) {
       /* TODO: clean up this vector logic. The only reson there's an if is because
       *        * of the list of names the must be given as the final arguments to this function.  */
@@ -749,6 +756,7 @@ void ConstitutiveMatrixCartesian_SetupParticleStorage( ConstitutiveMatrixCartesi
 
    /* set the storedConstitutive matrix NOT to be checkpointed */
    self->storedConstSwarmVar->isCheckpointedAndReloaded = False;
+#endif
 }
 
 
