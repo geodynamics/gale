@@ -46,8 +46,8 @@
 **
 **/
 
-#ifndef __Base_Context_Variable_h__
-#define __Base_Context_Variable_h__
+#ifndef __StGermain_Base_Context_Variable_h__
+#define __StGermain_Base_Context_Variable_h__
 	
 	/** Textual name for Variable class. */
 	extern const Type Variable_Type;
@@ -1215,5 +1215,5 @@
 	/** Checks whether || variable - comparison || / || variable || < tolerance */
 	Bool Variable_ValueCompareWithinTolerance( void* variable, void* comparison, double tolerance );
 
-#endif /* __Base_Context_Variable__ */
+#endif /* __StGermain_Base_Context_Variable__ */
 
