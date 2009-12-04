@@ -694,14 +694,16 @@ void _Swarm_Initialise( void* swarm, void* data ) {
 	Journal_DPrintf( self->debug, "In %s(): for swarm \"%s\" (of type %s)\n", __func__, self->name, self->type ); 
 	Stream_IndentBranch( Swarm_Debug );
 	
-	self->stillDoingInitialisation = False;
-
 	Stream_UnIndentBranch( Swarm_Debug );
 
    /* these three functions were in initialise function before... 10.08.07, now they are moved back to the initialise function, where it seems they should belong JM 031209*/
 	_Swarm_InitialiseCells( self, data );
 	_Swarm_InitialiseParticles( self, data );
 	Stg_Component_Initialise( self->owningCellVariable, data, False );
+	
+   self->stillDoingInitialisation = False;  /* this needs to go after the _Swarm_InitialiseParticles call */
+
+
 	/* removed context->loadFromCheckPoint condition from this statement
 	 * as can have a swarm initial condition without requiring a checkpointed
 	 * solution. Dave 08.11.07
