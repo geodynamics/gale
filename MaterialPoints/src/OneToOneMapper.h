@@ -114,6 +114,8 @@
 	Material_Index _OneToOneMapper_GetMaterialIndexOn( void* mapper, void* point );
 
 	void* _OneToOneMapper_GetExtensionOn( void* mapper, void* point, ExtensionInfo_Index extHandle );
+    double _OneToOneMapper_GetDoubleFromExtension(void* mapper, void* intPoint, ExtensionInfo_Index extHandle, int offs);
+    double _OneToOneMapper_GetDoubleFromMaterial(void* mapper, void* intPoint, ExtensionInfo_Index extHandle, int offs);
 
 	MaterialPointRef* OneToOneMapper_GetMaterialRef( void* mapper, void* integrationPoint );
 

@@ -95,6 +95,7 @@ Bool PICellerator_MaterialPoints_Init( int* argc, char** argv[] ) {
 	RegisterParent( Materials_Register_Type,        NamedObject_Register_Type );
 	RegisterParent( MaterialPointsSwarm_Type,       Swarm_Type );
 	RegisterParent( OneToOneMapper_Type,            IntegrationPointMapper_Type );
+	RegisterParent(OneToManyMapper_Type, IntegrationPointMapper_Type);
 	RegisterParent( ParticleFeVariable_Type,        FeVariable_Type );
 	RegisterParent( PeriodicBoundariesManager_Type, Stg_Component_Type );
 	RegisterParent( SwarmAdvector_Type,             TimeIntegratee_Type );
