@@ -46,8 +46,8 @@
 **
 **/
 
-#ifndef __Base_Automation_Variable_h__
-#define __Base_Automation_Variable_h__
+#ifndef __Base_Context_Variable_h__
+#define __Base_Context_Variable_h__
 	
 	/** Textual name for Variable class. */
 	extern const Type Variable_Type;
@@ -66,6 +66,7 @@
 	typedef Index (Variable_ArraySizeFunc) ( void* self );
 
 	/* See Variable */
+
 	#define __Variable \
 		/* General info */ 					\
 		__Stg_Component						\
@@ -1214,5 +1215,5 @@
 	/** Checks whether || variable - comparison || / || variable || < tolerance */
 	Bool Variable_ValueCompareWithinTolerance( void* variable, void* comparison, double tolerance );
 
-#endif /* __Base_Automation_Variable__ */
+#endif /* __Base_Context_Variable__ */
 

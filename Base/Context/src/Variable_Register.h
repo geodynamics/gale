@@ -42,8 +42,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_Variable_Register_h__
-#define __Base_Automation_Variable_Register_h__
+#ifndef __Base_Context_Variable_Register_h__
+#define __Base_Context_Variable_Register_h__
 	
 	
 	extern const Type Variable_Register_Type;
@@ -128,5 +128,5 @@
 
 	Variable*	Variable_Register_GetByIndex( void* variable_Register, Variable_Index varIndex);	
 	
-#endif /* __Base_Automation_Variable_Register_h__ */
+#endif /* __Base_Context_Variable_Register_h__ */
 

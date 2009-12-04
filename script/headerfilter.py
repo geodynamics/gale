@@ -36,6 +36,7 @@ class Input():
         self.metaFilename = nameList[0] + ".meta"
         if os.path.isfile(self.metaFilename):
             return True
+
         else:
             return False
 
@@ -159,19 +160,25 @@ class Input():
         stringStart = -1
         stringEnd = -1
         lineCount = 0
+        functionNames = []
+        parentNames = []
+        functionLineCount = []
+        functionCounter = 0
         for line in text:
 			# find the function Name of the macro:
 			# Find line that starts with: "#define __" and ends with " \"
 			stringStart = (str(line)).find("#define __" )
-                        
+                        functionName = ""
+                        parentName = ""
+
 			if stringStart >= 0:
-                                
+
 				stringEnd =(str(line)).find("\\")
 				if stringEnd >=0:
-                                        
-					self.lines = [lineCount]
-					self.functionName = ((line[stringStart+10: stringEnd]).lstrip()).rstrip()
-                                        
+
+
+					functionName = ((line[stringStart+10: stringEnd]).lstrip()).rstrip()
+
 					stringNextStart = -1
 					stringNextEnd = -1
 					stringTemp = ""
@@ -180,48 +187,94 @@ class Input():
 					for i in range(1,15):
 					    if (lineCount + i) < (len(text)-1):
 					        stringNextStart = (str(text[lineCount +i])).find("__")
+
+
+
+
 					    else:
 					        stringNextStart = (str(text[len(text)-1])).find("__")
+
                                                 
 					    if stringNextStart >=0:
 
                                                 if (lineCount + i) < (len(text)-1): 
 						    stringNextEnd =(str(text[lineCount+i])).find("\\")
+
                                                 else:
                                                     stringNextEnd = (str(text[len(text)-1])).find("\\")
+
+
 						if stringNextEnd >= 0:
                                                     if (lineCount + i) < (len(text)-1):
-							self.parentName = ((text[lineCount +i][stringNextStart + 2:stringNextEnd]).lstrip()).rstrip()
+							parentName = ((text[lineCount +i][stringNextStart + 2:stringNextEnd]).lstrip()).rstrip()
+
+                                                        functionNames.append(functionName)
+                                                        parentNames.append(parentName)
+                          	                        functionLineCount.append(lineCount)
+                                                        functionCounter = functionCounter+1
                                                     else:
-                                                        self.parentName = ((text[len(text)-1][stringNextStart + 2:stringNextEnd]).lstrip()).rstrip()
+                                                        parentName = ((text[len(text)-1][stringNextStart + 2:stringNextEnd]).lstrip()).rstrip()
+
+                                                        functionNames.append(functionName)
+                                                        parentNames.append(parentName)
+					                functionLineCount.append(lineCount)
+                                                        functionCounter = functionCounter+1
 
 					    stringNextStart = -1
 					    stringNextEnd = -1
+
+
+                                        
+                                        
 			stringStart = -1
 			stringEnd = -1
 			stringMiddle = -1
+
+                        
 			#Find line that creates the inherited struct:
 			# Find line that looks like "	struct ",self.functionName," { __",self.FunctionName," };"
-			myString = ""
-			myString = "struct "
-                        myMiddleString = self.functionName
-			myNextString = "__"+self.functionName
-			stringStart = (str(line)).find(myString )
+                        functionCounter = 0
                         
-			if stringStart >=0:
+                        for functionName in functionNames:
+			    myString = ""
+			    myString = "struct "
+                            myMiddleString = functionName
+			    myNextString = "__"+functionName
+			    stringStart = (str(line)).find(myString )
+
+			    if stringStart >=0:
+
                                 stringMiddle = (str(line)).find(myMiddleString)
 				stringEnd = (str(line)).find(myNextString)
 				if stringEnd >=0:
-                                        
-				    (self.lines).append(lineCount)
+
+                                    self.functionName = functionName
+                                    self.parentName = parentNames[functionCounter]
+                                    #Extract out lineCount beginning for section
+
+                                    (self.lines).append(functionLineCount[functionCounter])
+                                    # add lineCount end for section
+                                    (self.lines).append(lineCount)
+
 			        elif stringMiddle >=0:
                                 #check next line for remainder of code, just in case it didn't fit on one line.
                                     stringEnd = (str(text[lineCount+1])).find(myNextString)
                                     if stringEnd >=0:
-                                        (self.lines).append(lineCount+1)
-			
-			lineCount = lineCount + 1		
+                                         self.functionName = functionName
+                                         self.parentName = parentNames[functionCounter]
 
+                                         (self.lines).append(functionLineCount[functionCounter])
+                                         (self.lines).append(lineCount+1)
+
+                                            
+                            functionCounter = functionCounter +1			
+			lineCount = lineCount + 1
+
+        #print functionNames
+        #print parentNames
+        #print functionLineCount
+        #print "self.lines = " + str(self.lines)           		
+        #print "******** "+ self.functionName +" " +self.parentName
 		
 		# Now, if there is text to replace:
         if self.functionName != "":
@@ -232,8 +285,10 @@ class Input():
 				inheritanceText = " : "+self.parentName
 			self.addedText = "struct "+ self.functionName + inheritanceText +"\n {\n "
 			lineNum = -1
-                        
+                        #print self.addedText
+                        #print self.lines
 			if len(self.lines) == 2:
+                                #print self.lines
 				for lineNum in range(self.lines[0]+1, self.lines[1]-1):
 					if self.parentName == "":
 						self.addedText += text[lineNum].split("\\")[0] + "\n "
@@ -246,22 +301,22 @@ class Input():
 							self.addedText += text[lineNum].split("\\")[0] + "\n "
 		                
 				# replace old text section with new 'addedText'
-				for lines in range(0, self.lines[0]-1):
+			        for lines in range(0, self.lines[0]-1):
 					self.output += text[lines]
-				self.output += self.addedText
-
-                                #Add in public: statement just in case.
+			        self.output += self.addedText
+                                #print self.addedText
+                        #Add in public: statement just in case.
                                 self.output += "public: \n" 
 				
                 # Find #endif statement and insert bracket before it.
-				for lines in range(self.lines[1]+1, len(text)):
+			        for lines in range(self.lines[1]+1, len(text)):
 					if ((text[lines]).find("#endif") >= 0):
 
 					   self.output +=  "};\n" + text[lines]
 					else:
 					    self.output += text[lines]
-
-
+                        #print self.addedText
+             
                 
 		# if no alterations are needed, then write output to screen as is	
         elif self.functionName == "":
