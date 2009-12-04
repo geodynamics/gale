@@ -165,6 +165,9 @@
 		int                                                particleIndex,
 		IntegrationPoint*                                  particle );
 
+        void ConstitutiveMatrix_AssembleMaterialPoint(void *constitutiveMatrix, int element,
+						      MaterialPointsSwarm *matSwarm, int matPointInd);
+
 	#define ConstitutiveMatrix_SetToNonLinear( constitutiveMatrix ) \
 		StiffnessMatrix_SetToNonLinear( constitutiveMatrix->stiffnessMatrix )
 
