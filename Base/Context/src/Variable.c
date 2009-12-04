@@ -1083,9 +1083,9 @@ void Variable_ReadFromFileAsDoubles( void* variable, char* filename ) {
 }
 
 
-/** Returns || variable - comparison || / || variable ||, 
-  * where ||x|| indicates the Euclidean Norm which is the square root of the sum of the squares for each component in x
-  * i.e.  ||x|| = \sqrt{\sum_i x_i^2}*/
+/** Returns \f$ \frac{|| variable - comparison ||} { || variable ||} \f$, 
+  * where \f$ ||x|| \f$ indicates the Euclidean Norm which is the square root of the sum of the squares for each component in x
+  * i.e.  \f$ ||x|| = \sqrt{\sum_i x_i^2} \f$ */
 double Variable_ValueCompare( void* variable, void* _comparison ) {
 	Variable* self            = (Variable*)  variable;
 	Variable* comparison      = (Variable*) _comparison;

@@ -66,6 +66,7 @@
 	typedef Index (Variable_ArraySizeFunc) ( void* self );
 
 	/* See Variable */
+
 	#define __Variable \
 		/* General info */ \
 		__Stg_Component \
