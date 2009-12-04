@@ -158,9 +158,7 @@ void MaterialComponentsSuite_Setup( MaterialComponentsSuiteData* data ) {
    data->feMesh = buildFeMesh( dim, meshSize, minCrds, maxCrds, data->eRegister );
 
    data->cellLayout = (CellLayout*)ElementCellLayout_New( "elementCellLayout", NULL, data->feMesh );
-   data->particleLayout = (ParticleLayout*)RandomParticleLayout_New( "randomParticleCellLayout", NULL, 
-         GlobalCoordSystem, False, 
-         20, 13 );
+   data->particleLayout = (ParticleLayout*)RandomParticleLayout_New( "randomParticleCellLayout", NULL, GlobalCoordSystem, False, 20, 13 );
 
    data->mpSwarm = MaterialPointsSwarm_New(
          "testSwarm", NULL,
@@ -192,26 +190,10 @@ void MaterialComponentsSuite_Setup( MaterialComponentsSuiteData* data ) {
    Dictionary_Add( data->matDict2, "testSwarm-matProp4", Dictionary_Entry_Value_FromBool( True ) );
 
    /* Now update the svRegister to match the material properties */
-	data->matPropVar1 = Swarm_NewScalarVariable( 
-			data->mpSwarm,
-			"matProp1",
-			GetOffsetOfMember( particle , matProp1 ), 
-			Variable_DataType_Int );
-	data->matPropVar2 = Swarm_NewScalarVariable( 
-			data->mpSwarm,
-			"matProp2",
-			GetOffsetOfMember( particle , matProp2 ), 
-			Variable_DataType_Double );
-	data->matPropVar3 = Swarm_NewScalarVariable( 
-			data->mpSwarm,
-			"matProp3",
-			GetOffsetOfMember( particle , matProp3 ), 
-			Variable_DataType_Int );
-	data->matPropVar4 = Swarm_NewScalarVariable( 
-			data->mpSwarm,
-			"matProp4",
-			GetOffsetOfMember( particle , matProp4 ), 
-			Variable_DataType_Int );
+	data->matPropVar1 = Swarm_NewScalarVariable( data->mpSwarm, "matProp1", GetOffsetOfMember( particle , matProp1 ), Variable_DataType_Int );
+	data->matPropVar2 = Swarm_NewScalarVariable( data->mpSwarm, "matProp2", GetOffsetOfMember( particle , matProp2 ), Variable_DataType_Double );
+	data->matPropVar3 = Swarm_NewScalarVariable( data->mpSwarm, "matProp3", GetOffsetOfMember( particle , matProp3 ), Variable_DataType_Int );
+	data->matPropVar4 = Swarm_NewScalarVariable( data->mpSwarm, "matProp4", GetOffsetOfMember( particle , matProp4 ), Variable_DataType_Int );
 
    data->mat1 = Material_New( "mat1", NULL, data->shape1, data->matDict1, data->mRegister );
    data->mat2 = Material_New( "mat2", NULL, data->shape2, data->matDict2, data->mRegister );
@@ -229,19 +211,19 @@ void MaterialComponentsSuite_Setup( MaterialComponentsSuiteData* data ) {
 
 
 void MaterialComponentsSuite_Teardown( MaterialComponentsSuiteData* data ) {
-   Stg_Class_Delete( data->mpSwarm );
-   Stg_Class_Delete( data->cellLayout );
-   Stg_Class_Delete( data->particleLayout );
-   Stg_Class_Delete( data->feMesh );
+   _Stg_Component_Delete( data->mpSwarm );
+   _Stg_Component_Delete( data->cellLayout );
+   _Stg_Component_Delete( data->particleLayout );
+   _Stg_Component_Delete( data->feMesh );
    Stg_Class_Delete( data->eRegister );
    Stg_Class_Delete( data->svRegister );
    Stg_Class_Delete( data->mRegister );
-   Stg_Class_Delete( data->mat1 );
-   Stg_Class_Delete( data->mat2 );
+   _Stg_Component_Delete( data->mat1 );
+   _Stg_Component_Delete( data->mat2 );
    Stg_Class_Delete( data->matDict1 );
    Stg_Class_Delete( data->matDict2 );
-   Stg_Class_Delete( data->shape1 );
-   Stg_Class_Delete( data->shape2 );
+   _Stg_Component_Delete( data->shape1 );
+   _Stg_Component_Delete( data->shape2 );
 }
 
 
@@ -252,12 +234,9 @@ void MaterialComponentsSuite_TestRegisterSetup( MaterialComponentsSuiteData* dat
       "Swarm's Build phase (performed already in test suite setup." );
 
    pcu_check_true( data->mRegister != NULL );
-
    pcu_check_true( Materials_Register_GetCount( data->mRegister ) == 2 );
    pcu_check_true( Materials_Register_GetByIndex( data->mRegister, 0 ) == data->mat1 );
    pcu_check_true( Materials_Register_GetByIndex( data->mRegister, 1 ) == data->mat2 );
-
-
 }
 
 

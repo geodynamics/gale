@@ -167,11 +167,7 @@ void _MaterialPointsSwarm_Init(
 		"PositionY",
 		"PositionZ" );
 
-	self->materialIndexVariable = Swarm_NewScalarVariable( 
-			self,
-			"MaterialIndex",
-			GetOffsetOfMember( particle , materialIndex ), 
-			Variable_DataType_Int ); /* Should be unsigned int */
+	self->materialIndexVariable = Swarm_NewScalarVariable( self, "MaterialIndex", GetOffsetOfMember( particle , materialIndex ), Variable_DataType_Int ); /* Should be unsigned int */
 
 	/* If we have an escaped routine, clear the defensive flag. */
 #if 0
