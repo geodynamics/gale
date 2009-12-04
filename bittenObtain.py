@@ -35,7 +35,7 @@ else:
 		['https://csd.vpac.org/hg/StGermain', 'StGermain' ], \
 		['https://csd.vpac.org/hg/StgFEM', 'StgFEM' ], \
 		['https://www.mcc.monash.edu.au/hg/Underworld', 'Underworld' ], \
-		['https://www.mcc.monash.edu.au/hg/Experimental', 'Experimental' ] ]
+		['https://www.mcc.monash.edu.au/hg/Experimental', 'Experimental' ] ], \
 		['https://csd.vpac.org/hg/SConfigure', 'Experimental/PDERework/config' ], \
 		['https://csd.vpac.org/hg/SConfigure', 'Experimental/Magma/config' ], \
 		['https://csd.vpac.org/hg/SConfigure', 'Experimental/Geothermal/config' ] ]
