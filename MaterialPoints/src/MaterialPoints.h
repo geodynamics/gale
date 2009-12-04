@@ -40,8 +40,8 @@
 **
 */
 
-#ifndef __PICellerator_MaterialPoints_h__
-#define __PICellerator_MaterialPoints_h__
+#ifndef __PICellerator_MaterialPoints_MaterialPoints_h__
+#define __PICellerator_MaterialPoints_MaterialPoints_h__
 	
 	#include "types.h"
 	#include "Materials_Register.h"

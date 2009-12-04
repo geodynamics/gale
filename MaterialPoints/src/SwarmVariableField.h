@@ -41,8 +41,8 @@
 */
 
 
-#ifndef __PICellerator_Utils_SwarmVariableField_h__
-#define __PICellerator_Utils_SwarmVariableField_h__
+#ifndef __PICellerator_MaterialPoints_SwarmVariableField_h__
+#define __PICellerator_MaterialPoints_SwarmVariableField_h__
 
 	/** Textual name of this class */
 	extern const Type SwarmVariableField_Type;

@@ -53,8 +53,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __PICellerator_IntegrationPointsSwarm_IntegrationPointsSwarm_h__
-#define __PICellerator_IntegrationPointsSwarm_IntegrationPointsSwarm_h__
+#ifndef __PICellerator_MaterialPoints_IntegrationPointsSwarm_h__
+#define __PICellerator_MaterialPoints_IntegrationPointsSwarm_h__
 
 	/* Textual name of this class */
 	extern const Type IntegrationPointsSwarm_Type;

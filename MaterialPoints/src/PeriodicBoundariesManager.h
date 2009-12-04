@@ -51,8 +51,8 @@
 *
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __PICellerator_PeriodicBoundaries_PeriodicBoundariesManager_h__
-#define __PICellerator_PeriodicBoundaries_PeriodicBoundariesManager_h__
+#ifndef __PICellerator_MaterialPoints_PeriodicBoundariesManager_h__
+#define __PICellerator_MaterialPoints_PeriodicBoundariesManager_h__
 	
 	/* Textual name of this class */
 	extern const Type PeriodicBoundariesManager_Type;
