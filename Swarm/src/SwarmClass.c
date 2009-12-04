@@ -247,6 +247,23 @@ void* _Swarm_ParticleAt( void* swarm, Particle_Index dParticle_I ) {
 
 void _Swarm_Delete( void* swarm ) {
 	Swarm*			self = (Swarm*)swarm;
+
+	Stg_ObjectList_DeleteAllObjects( self->commHandlerList );
+	Stg_Class_Delete( self->commHandlerList );
+
+	FreeArray( self->swarmVars );
+
+	Memory_Free( self->cellPointTbl );
+	Memory_Free( self->cellPointCountTbl );
+
+	/* Delete SwarmVariable_Register if it has been created */
+	if ( self->swarmVariable_Register ) {
+		Stg_Class_Delete( self->swarmVariable_Register );
+	}
+
+	NewClass_Delete( self->incArray );
+
+	Swarm_Register_RemoveIndex( Swarm_Register_GetSwarm_Register(), self->swarmReg_I );
 	
 	_Stg_Component_Delete( self );
 }
@@ -691,23 +708,14 @@ void _Swarm_Build( void* swarm, void* data ) {
 void _Swarm_Initialise( void* swarm, void* data ) {
 	Swarm* self = (Swarm*)swarm;
 	AbstractContext* context = self->context; 
+
 	Journal_DPrintf( self->debug, "In %s(): for swarm \"%s\" (of type %s)\n", __func__, self->name, self->type ); 
 	Stream_IndentBranch( Swarm_Debug );
-	
-	Stream_UnIndentBranch( Swarm_Debug );
+   Stg_Component_Initialise( self->owningCellVariable, data, False );
 
-   /* these three functions were in initialise function before... 10.08.07, now they are moved back to the initialise function, where it seems they should belong JM 031209*/
 	_Swarm_InitialiseCells( self, data );
 	_Swarm_InitialiseParticles( self, data );
-	Stg_Component_Initialise( self->owningCellVariable, data, False );
 	
-   self->stillDoingInitialisation = False;  /* this needs to go after the _Swarm_InitialiseParticles call */
-
-
-	/* removed context->loadFromCheckPoint condition from this statement
-	 * as can have a swarm initial condition without requiring a checkpointed
-	 * solution. Dave 08.11.07
-	 */
 	if( self->ics ) {
 		Journal_DPrintf( self->debug, "applying the ICs for this swarm.\n" );
 		Stream_Indent( self->debug );
@@ -715,6 +723,11 @@ void _Swarm_Initialise( void* swarm, void* data ) {
 		/* call the initial conditions plugin here */
 		VariableCondition_Apply( self->ics, data );
 	}
+
+   self->stillDoingInitialisation = False;  /* this needs to go after the _Swarm_InitialiseParticles call */
+	
+	Stream_UnIndentBranch( Swarm_Debug );
+   
    Journal_DPrintf( self->debug, "...done in %s().\n", __func__ );
 
 }
@@ -726,15 +739,7 @@ void _Swarm_Execute( void* swarm, void* data ) {
 void _Swarm_Destroy( void* swarm, void* data ) {
 	Swarm* self = (Swarm*)swarm;
    Cell_LocalIndex cell_I;
-		
-	Stg_ObjectList_DeleteAllObjects( self->commHandlerList );
-	Stg_Class_Delete( self->commHandlerList );
 
-	FreeArray( self->swarmVars );
-
-	Memory_Free( self->cellPointTbl );
-	Memory_Free( self->cellPointCountTbl );
-	
 	for( cell_I = 0; cell_I < self->cellDomainCount; cell_I++ ) {
 		if( self->cellParticleTbl[cell_I] ){
 			Memory_Free( self->cellParticleTbl[cell_I] );
@@ -762,15 +767,7 @@ void _Swarm_Destroy( void* swarm, void* data ) {
 		ExtensionManager_Free( self->particleExtensionMgr, self->particles );
 	}
 	if(self->owningCellVariable)
-		_SwarmVariable_Delete(self->owningCellVariable);
-	/* Delete SwarmVariable_Register if it has been created */
-	if ( self->swarmVariable_Register ) {
-		Stg_Class_Delete( self->swarmVariable_Register );
-	}
-
-	NewClass_Delete( self->incArray );
-
-	Swarm_Register_RemoveIndex( Swarm_Register_GetSwarm_Register(), self->swarmReg_I );
+		Stg_Component_Destroy(self->owningCellVariable, data, False );
 }
 
 void _Swarm_BuildCells( void* swarm, void* data ) {
