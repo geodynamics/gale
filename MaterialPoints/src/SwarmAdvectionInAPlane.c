@@ -115,21 +115,6 @@ void _SwarmAdvectionInAPlane_Init( SwarmAdvectionInAPlane* self, int whichaxis )
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */
-void _SwarmAdvectionInAPlane_Delete( void* swarmAdvector ) {
-	SwarmAdvectionInAPlane* self = (SwarmAdvectionInAPlane*)swarmAdvector;
-
-	/* Delete parent */
-	_SwarmAdvector_Delete( self );
-}
-
-
-void _SwarmAdvectionInAPlane_Print( void* swarmAdvector, Stream* stream ) {
-	SwarmAdvectionInAPlane* self = (SwarmAdvectionInAPlane*)swarmAdvector;
-	
-	/* Print parent */
-	_SwarmAdvector_Print( self, stream );
-}
-
 
 void* _SwarmAdvectionInAPlane_Copy( void* swarmAdvector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	SwarmAdvectionInAPlane*	self = (SwarmAdvectionInAPlane*)swarmAdvector;
@@ -148,8 +133,8 @@ void* _SwarmAdvectionInAPlane_DefaultNew( Name name ) {
 	/* Variables set in this function */
 	SizeT                                               _sizeOfSelf = sizeof(SwarmAdvectionInAPlane);
 	Type                                                       type = SwarmAdvectionInAPlane_Type;
-	Stg_Class_DeleteFunction*                               _delete = _SwarmAdvectionInAPlane_Delete;
-	Stg_Class_PrintFunction*                                 _print = _SwarmAdvectionInAPlane_Print;
+	Stg_Class_DeleteFunction*                               _delete = _SwarmAdvector_Delete;
+	Stg_Class_PrintFunction*                                 _print = _SwarmAdvector_Print;
 	Stg_Class_CopyFunction*                                   _copy = _SwarmAdvectionInAPlane_Copy;
 	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _SwarmAdvectionInAPlane_DefaultNew;
 	Stg_Component_ConstructFunction*                     _construct = _SwarmAdvectionInAPlane_AssignFromXML;
