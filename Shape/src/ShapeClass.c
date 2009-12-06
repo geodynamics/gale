@@ -191,8 +191,6 @@ void _Stg_Shape_Execute( void* shape, void* data ) {
 }
 void _Stg_Shape_Destroy( void* shape, void* data ) {
 	Stg_Shape* self = (Stg_Shape*) shape;
-
-   Stg_Component_Destroy( self, data, False );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------

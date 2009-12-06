@@ -97,6 +97,8 @@ void _Intersection_Init( void* intersection,  Stg_Shape** shapeList, Index shape
 void _Intersection_Delete( void* intersection ) {
 	Intersection*       self = (Intersection*)intersection;
 
+	Memory_Free( self->shapeList );
+
 	/* Delete parent */
 	_Stg_Shape_Delete( self );
 }
@@ -212,12 +214,20 @@ void _Intersection_AssignFromXML( void* intersection, Stg_ComponentFactory* cf, 
 
 void _Intersection_Build( void* intersection, void* data ) {
 	Intersection*	self = (Intersection*)intersection;
-
+   unsigned shape_I = 0;
+ 
+   for( shape_I = 0 ; shape_I < self->shapeCount ; shape_I++ ) {
+      Stg_Component_Build( self->shapeList[shape_I], data, False );
+   }
 	_Stg_Shape_Build( self, data );
 }
 void _Intersection_Initialise( void* intersection, void* data ) {
 	Intersection*	self = (Intersection*)intersection;
-	
+   unsigned shape_I = 0;
+
+   for( shape_I = 0 ; shape_I < self->shapeCount ; shape_I++ ) {
+      Stg_Component_Initialise( self->shapeList[shape_I], data, False );
+   }	
 	_Stg_Shape_Initialise( self, data );
 }
 void _Intersection_Execute( void* intersection, void* data ) {
@@ -227,8 +237,11 @@ void _Intersection_Execute( void* intersection, void* data ) {
 }
 void _Intersection_Destroy( void* intersection, void* data ) {
 	Intersection*	self = (Intersection*)intersection;
+   unsigned shape_I = 0;
     
-	Memory_Free( self->shapeList );
+   for( shape_I = 0 ; shape_I < self->shapeCount ; shape_I++ ) {
+      Stg_Component_Destroy( self->shapeList[shape_I], data, False );
+   }
 	Memory_Free( self->isComplement );
 	_Stg_Shape_Destroy( self, data );
 }

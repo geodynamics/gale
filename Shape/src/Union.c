@@ -99,6 +99,7 @@ void _Union_Init( void* combination,  Stg_Shape** shapeList, Index shapeCount, B
 void _Union_Delete( void* combination ) {
 	Union*       self = (Union*)combination;
 
+	Memory_Free( self->shapeList );
 	/* Delete parent */
 	_Stg_Shape_Delete( self );
 }
@@ -202,12 +203,21 @@ void _Union_AssignFromXML( void* combination, Stg_ComponentFactory* cf, void* da
 
 void _Union_Build( void* combination, void* data ) {
 	Union*	self = (Union*)combination;
+   unsigned shape_I = 0;
+    
+   for( shape_I = 0 ; shape_I < self->shapeCount ; shape_I++ ) {
+      Stg_Component_Build( self->shapeList[shape_I], data, False );
+   }
 
 	_Stg_Shape_Build( self, data );
 }
 void _Union_Initialise( void* combination, void* data ) {
 	Union*	self = (Union*)combination;
-	
+	unsigned shape_I = 0;
+    
+   for( shape_I = 0 ; shape_I < self->shapeCount ; shape_I++ ) {
+      Stg_Component_Initialise( self->shapeList[shape_I], data, False );
+   }
 	_Stg_Shape_Initialise( self, data );
 }
 void _Union_Execute( void* combination, void* data ) {
@@ -217,8 +227,11 @@ void _Union_Execute( void* combination, void* data ) {
 }
 void _Union_Destroy( void* combination, void* data ) {
 	Union*	self = (Union*)combination;
-	
-	Memory_Free( self->shapeList );
+	unsigned shape_I = 0;
+    
+   for( shape_I = 0 ; shape_I < self->shapeCount ; shape_I++ ) {
+      Stg_Component_Destroy( self->shapeList[shape_I], data, False );
+   }
 	Memory_Free( self->isComplement );
 
 	_Stg_Shape_Destroy( self, data );

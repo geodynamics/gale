@@ -166,16 +166,26 @@ void _MeshBoundaryShape_Build( void* _self, void* data ) {
 
    _Stg_Shape_Build( self, data );
    Stg_Component_Build( self->mesh, data, False );
+   Stg_Component_Build( self->gen, data, False );
    if( !self->mesh->generator || strcmp( self->mesh->generator->type, CartesianGenerator_Type ) )
       abort();
    self->gen = (CartesianGenerator*)self->mesh->generator;
 }
 
+void _MeshBoundaryShape_Destroy( void* _self, void* data ) {
+   MeshBoundaryShape* self = (MeshBoundaryShape*)_self;
+
+   Stg_Component_Destroy( self->mesh, data, False );
+   Stg_Component_Destroy( self->gen, data, False );
+   _Stg_Shape_Destroy( self, data );
+}
+
 void _MeshBoundaryShape_Initialise( void* _self, void* data ) {
    MeshBoundaryShape* self = (MeshBoundaryShape*)_self;
 
-   _Stg_Shape_Build( self, data );
+   _Stg_Shape_Initialise( self, data );
    Stg_Component_Initialise( self->mesh, data, False );
+   Stg_Component_Initialise( self->gen, data, False );
 }
 
 Bool _MeshBoundaryShape_IsCoordInside( void* _self, Coord coord ) {
