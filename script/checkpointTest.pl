@@ -267,7 +267,7 @@ sub readOptionsFile {
 	foreach $line (<OPTFILE>) {
 		chomp $line;
 		# only process lines that start with np
-		if( $line =~ m/^np\s+(\d+)\s+(.*)/ ) {
+		if( $line =~ m/^np\s+(\d+)(\s*$|\s+(.*))/ ) {
 			$procs->[$line_I] = $1;
 			$commandLines->[$line_I] = $2;
 			$line_I++;
@@ -279,7 +279,7 @@ sub readOptionsFile {
 sub testConvergence {
  	my $datFile = $_[0]; 
 	my @keys;
-	my $tolerance = 3e-2;
+	my $tolerance = 1e-3;
 	my @errors;
 	my $line;
 	my $nKeys;
