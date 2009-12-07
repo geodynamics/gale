@@ -75,7 +75,6 @@
 	typedef struct MohrCoulomb MohrCoulomb;
 	
 	typedef struct StrainWeakening                  StrainWeakening;
-	typedef struct BuiterStrainWeakening		BuiterStrainWeakening;
 	typedef struct Director                         Director;
 	typedef struct AlignmentSwarmVariable           AlignmentSwarmVariable;
 	

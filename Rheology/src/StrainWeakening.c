@@ -110,7 +110,8 @@ void _StrainWeakening_Init(
 		StrainWeakening*                                   self,
 		MaterialPointsSwarm*                               swarm,
 		double                                             healingRate,
-		double                                             softeningStrain,
+		double                                             initialSofteningStrain,
+		double                                             finalSofteningStrain,
 		double                                             initialDamageFraction,
 		double                                             initialDamageWavenumber,
 		double                                             initialDamageWavenumberSinI,
@@ -124,7 +125,8 @@ void _StrainWeakening_Init(
 	/* Assign Values */
 	self->swarm                    = swarm;
 	self->healingRate              = healingRate;
-	self->softeningStrain          = softeningStrain;
+	self->initialSofteningStrain  = initialSofteningStrain;
+	self->finalSofteningStrain    = finalSofteningStrain;
 	self->initialDamageFraction    = initialDamageFraction;
 	self->initialDamageWavenumber  = initialDamageWavenumber;
 	self->initialDamageWavenumberSinI = initialDamageWavenumberSinI;
@@ -217,7 +219,8 @@ void _StrainWeakening_Construct( void* strainWeakening, Stg_ComponentFactory* cf
 	StrainWeakening*        self           = (StrainWeakening*) strainWeakening;
 	MaterialPointsSwarm*    materialPointsSwarm;
 	double                  healingRate;
-	double                  softeningStrain;
+	double                  initialSofteningStrain;
+	double                  finalSofteningStrain;
 	double                  initialDamageFraction;
 	double                  initialDamageWavenumber;
 	double                  initialDamageWavenumberSinI;
@@ -240,7 +243,11 @@ void _StrainWeakening_Construct( void* strainWeakening, Stg_ComponentFactory* cf
 		data );
 
 	healingRate              = Stg_ComponentFactory_GetDouble( cf, self->name, "healingRate",              0.0 );
-	softeningStrain          = Stg_ComponentFactory_GetDouble( cf, self->name, "softeningStrain",          HUGE_VAL );
+	initialSofteningStrain  = Stg_ComponentFactory_GetDouble( cf, self->name, "initialSofteningStrain", 0 );
+        /* Backwards compatibility.  Look at softeningStrain and
+           finalSofteningStrain. */
+	finalSofteningStrain    = Stg_ComponentFactory_GetDouble( cf, self->name, "softeningStrain",   HUGE_VAL );
+	finalSofteningStrain    = Stg_ComponentFactory_GetDouble( cf, self->name, "finalSofteningStrain", finalSofteningStrain );
 	initialDamageFraction    = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageFraction",    0.0 );
 	initialDamageWavenumber  = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumber",  -1.0 );
 	initialDamageWavenumberSinI = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberSinI", -1.0 );
@@ -255,7 +262,8 @@ void _StrainWeakening_Construct( void* strainWeakening, Stg_ComponentFactory* cf
 			self, 
 			materialPointsSwarm, 
 			healingRate,
-			softeningStrain,
+			initialSofteningStrain,
+			finalSofteningStrain,
 			initialDamageFraction,
 			initialDamageWavenumber, 
 			initialDamageWavenumberSinI, 
@@ -335,7 +343,7 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
 						continue;
 				}
 				
-				postFailureWeakening = self->initialDamageFactor * rand() * self->softeningStrain/RAND_MAX;
+				postFailureWeakening = self->initialDamageFactor * rand() * self->finalSofteningStrain/RAND_MAX;
 
 				/* Modulate the initial weakening by a harmonic-squared function with wavenumber(s) specified by
 					the user. */
@@ -368,7 +376,7 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
 						pow(0.5+0.5*sin(M_PI * coord[ K_AXIS ] * self->initialDamageWavenumberSinK),2.0);
 				}
 			}
-		
+
 			Variable_SetValueDouble( self->variable, lParticle_I, postFailureWeakening );
 		}
 	}	
@@ -443,10 +451,13 @@ double StrainWeakening_CalcRatio( void* strainWeakening, void* particle ) {
 	if ( particleExt->postFailureWeakening < 0.0 ) 
 		particleExt->postFailureWeakening = 0.0;
 
-	strainWeakeningRatio = particleExt->postFailureWeakening / self->softeningStrain;
+	strainWeakeningRatio = (particleExt->postFailureWeakening - self->initialSofteningStrain)
+          / (self->finalSofteningStrain - self->initialSofteningStrain);
 
 	if (strainWeakeningRatio > 1.0)
 		strainWeakeningRatio = 1.0;
+	if (strainWeakeningRatio < 0.0)
+		strainWeakeningRatio = 0.0;
 	
 	return strainWeakeningRatio;
 }

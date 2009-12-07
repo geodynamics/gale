@@ -77,7 +77,8 @@
 		/* Param passed in */ \
 		MaterialPointsSwarm*                   swarm;                             \
 		double                                 healingRate;                       \
-		double                                 softeningStrain;                   \
+		double                                 initialSofteningStrain;                   \
+		double                                 finalSofteningStrain;                   \
 		double                                 initialDamageFraction;             \
 		double                                 initialDamageWavenumber;           \
 		double                                 initialDamageWavenumberSinI;           \
@@ -112,7 +113,8 @@
 		StrainWeakening*                                   self,
 		MaterialPointsSwarm*                               swarm,
 		double                                             healingRate,
-		double                                             softeningStrain,
+		double                                             initialSofteningStrain,
+		double                                             finalSofteningStrain,
 		double                                             initialDamageFraction,
 		double                                             initialDamageWavenumber,
 		double                                             initialDamageWavenumberSinI,

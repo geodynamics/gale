@@ -72,7 +72,6 @@
 	#include "FaultingMoresiMuhlhaus2006.h"
 	#include "MohrCoulomb.h"
 	#include "StrainWeakening.h"
-	#include "BuiterStrainWeakening.h"
 	#include "Director.h"
 	#include "AlignmentSwarmVariable.h"
 	#include "StoreStress.h"

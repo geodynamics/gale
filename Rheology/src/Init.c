@@ -79,7 +79,6 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, Pouliquen_etal_Type,          "0", _Pouliquen_etal_DefaultNew );
 
 	Stg_ComponentRegister_Add( componentRegister, StrainWeakening_Type,         "0", _StrainWeakening_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, BuiterStrainWeakening_Type,   "0", _BuiterStrainWeakening_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, Director_Type,                "0", _Director_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, AlignmentSwarmVariable_Type,  "0", _AlignmentSwarmVariable_DefaultNew );
 	
@@ -115,7 +114,6 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	RegisterParent( Pouliquen_etal_Type,             VonMises_Type );
 	
 	RegisterParent( StrainWeakening_Type,         TimeIntegratee_Type );
-	RegisterParent( BuiterStrainWeakening_Type,   StrainWeakening_Type );
 	RegisterParent( Director_Type,                TimeIntegratee_Type );
 	RegisterParent( AlignmentSwarmVariable_Type,  SwarmVariable_Type );
 
