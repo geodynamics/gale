@@ -84,6 +84,27 @@
 		Stream*                            debug; \
 		Stream*                            info; \
 		Iteration_Index                    maxIterations; \
+                                                                  \
+		/* Timing variables for solvers */ \
+		double				inneritsinitialtime; \
+		double				outeritsinitialtime; \
+		double				nonlinearitsinitialtime; \
+		double				inneritsendtime; \
+		double				outeritsendtime; \
+		double				nonlinearitsendtime; \
+		double				totalinneritstime; \
+		double				totalouteritstime; \
+		double				totalnonlinearitstime; \
+		int					totalnuminnerits; \
+		int				totalnumouterits; \
+		int				totalnumnonlinearits; \
+		int				avgnuminnerits; \
+		int				avgnumouterits; \
+		double			avgtimeinnerits; \
+		double			avgtimeouterits; \
+		double			avgtimenonlinearits; \
+		int				currenttimestep; \
+		int				previoustimestep; \
 		\
 		Bool                               useStatSolve; \
 		unsigned                           nStatReps;

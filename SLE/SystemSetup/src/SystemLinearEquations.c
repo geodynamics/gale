@@ -747,6 +747,7 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	Stream*                 errorStream     = Journal_Register( Error_Type, self->type );
 	double					wallTime;
 	Iteration_Index         minIterations   = self->nonLinearMinIterations;
+        SLE_Solver*             solver;
 
 	PetscScalar		currVecNorm, prevVecNorm;
 
@@ -756,6 +757,34 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	wallTime = MPI_Wtime();		
 
 	/* First Solve */
+	/* setting the nonlinear stuff */
+	//START OF NONLINEAR ITERATION!!!!!
+	/* first get current timestep */
+        solver = self->solver;
+	solver->currenttimestep = self->context->timeStep;
+	/* if current timestep is not the same as previous timestep, then reset all variables back to zero and update previous timestep */
+	if(solver->currenttimestep != solver->previoustimestep){
+		//update prev timestep
+		solver->previoustimestep = solver->currenttimestep;
+		solver->nonlinearitsinitialtime = 0; 
+		solver->nonlinearitsendtime = 0; 
+		solver->totalnonlinearitstime = 0; 
+		solver->totalnumnonlinearits = 0; 
+		solver->avgtimenonlinearits = 0; 	
+		solver->inneritsinitialtime = 0; 
+		solver->outeritsinitialtime = 0; 
+		solver->inneritsendtime = 0; 
+		solver->outeritsendtime = 0; 
+		solver->totalinneritstime = 0; 
+		solver->totalouteritstime = 0; 
+		solver->totalnuminnerits = 0; 
+		solver->totalnumouterits = 0; 
+		solver->avgnuminnerits = 0; 
+		solver->avgnumouterits = 0; 
+		solver->avgtimeinnerits = 0; 
+		solver->avgtimeouterits = 0;	
+	}
+
 	self->nonLinearIteration_I = 0;
 	Journal_Printf(self->info,"\nNon linear solver - iteration %d\n", self->nonLinearIteration_I);
 
@@ -765,6 +794,15 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	self->linearExecute( self, _context );
 	self->hasExecuted = True;
 
+	/*Don't know if we should include this but the timing of the outer and inner iterations starts here so it makes sense to count this one? */		
+	solver->nonlinearitsinitialtime = MPI_Wtime();
+	self->linearExecute( self, _context );
+	self->hasExecuted = True;
+	solver->nonlinearitsendtime = MPI_Wtime();
+	solver->totalnonlinearitstime = solver->totalnonlinearitstime + (-solver->nonlinearitsinitialtime + solver->nonlinearitsendtime);
+	/* reset initial time and end time for inner its back to 0 - probs don't need to do this but just in case */
+	solver->nonlinearitsinitialtime = 0;
+	solver->nonlinearitsendtime = 0;
 	/*
 	** Include an entry point to do some kind of post-non-linear-iteration operation. */
 	_EntryPoint_Run_2VoidPtr( self->postNlEP, sle, _context );
@@ -774,6 +812,9 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	VecDuplicate( currentVector, &previousVector );
 	
 	for ( self->nonLinearIteration_I = 1 ; self->nonLinearIteration_I < maxIterations ; self->nonLinearIteration_I++ ) {
+		/* get initial wall time for nonlinear loop */
+		solver->nonlinearitsinitialtime = MPI_Wtime();
+		
 		/*
 		** BEGIN LUKE'S FRICTIONAL BCS BIT
 		**
@@ -783,7 +824,7 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 		*/
 
 		_EntryPoint_Run_2VoidPtr( self->nlEP, sle, _context );
-
+		
 		/*
 		** END LUKE'S FRICTIONAL BCS BIT
 		*/
@@ -823,7 +864,19 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 			(converged) ? " - Converged" : " - Not converged",
 			(self->nonLinearIteration_I < maxIterations) ? "" : " - Reached iteration limit",
 			MPI_Wtime() - wallTime );
-                
+			//END OF NONLINEAR ITERATION LOOP!!!
+			
+			/* add the outer loop iterations to the total outer iterations */
+			solver->totalnumnonlinearits = solver->totalnumnonlinearits++;
+			/*get wall time for end of outer loop*/
+			solver->nonlinearitsendtime = MPI_Wtime();
+			/* add time to total time inner its: */
+			solver->totalnonlinearitstime = solver->totalnonlinearitstime + (-solver->nonlinearitsinitialtime + solver->nonlinearitsendtime);
+			//printf("totalnumnonlinearits before converging is %d totalnonlinearitstime is %g, totalouteritstime is %g and totalinneritstime is %g\n",solver->totalnumnonlinearits,solver->totalnonlinearitstime,solver->totalouteritstime,solver->totalinneritstime);
+
+			/* reset initial time and end time for inner its back to 0 - probs don't need to do this but just in case */
+			solver->nonlinearitsinitialtime = 0;
+			solver->nonlinearitsendtime = 0;        
 		if ( (converged) && (self->nonLinearIteration_I>=minIterations) ) {
 		   int result;
 
@@ -854,6 +907,15 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	Stream_UnIndentBranch( StgFEM_Debug );
 
 	VecDestroy( previousVector );
+	
+	/*Set all the printout variables */
+	solver->avgtimenonlinearits = (solver->totalnonlinearitstime - solver->totalouteritstime)/solver->totalnumnonlinearits;
+	solver->avgnuminnerits = solver->totalnuminnerits/solver->totalnumouterits;
+	solver->avgnumouterits = solver->totalnumouterits/solver->totalnumnonlinearits;
+	solver->avgtimeouterits = (solver->totalouteritstime - solver->totalinneritstime)/solver->totalnumouterits;
+	solver->avgtimeinnerits = solver->totalinneritstime/solver->totalnuminnerits;
+	//printf("totalnumnonlinearits = %d, avgnumouterits %d, avgnuminnerits %d\n",solver->totalnumnonlinearits, solver->avgnumouterits, solver->avgnuminnerits); 
+
 }
 
 void SystemLinearEquations_AddNonLinearSetupEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func ) {

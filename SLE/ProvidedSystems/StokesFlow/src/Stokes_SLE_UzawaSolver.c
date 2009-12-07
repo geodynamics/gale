@@ -712,8 +712,24 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 		MatMult( G_Mat, sVec, fTempVec );
 		
 		Journal_DPrintfL( self->debug, 2, "Uzawa inner iteration step\n");
+		
+		//START OF INNER ITERATIONS!!!!
+		/*get initial wall time for inner loop*/
+		self->inneritsinitialtime = MPI_Wtime();
 		KSPSolve( velSolver, fTempVec, vStarVec );
+		/*get end wall time for inner loop*/
+		self->inneritsendtime = MPI_Wtime();
+		
+		/* add time to total time inner its: */
+		self->totalinneritstime = self->totalinneritstime + (-self->inneritsinitialtime + self->inneritsendtime);
+		/* reset initial time and end time for inner its back to 0 - probs don't need to do this but just in case */
+		self->inneritsinitialtime = 0;
+		self->inneritsendtime = 0;
+		
 		KSPGetIterationNumber( velSolver, &innerLoopIterations );
+		/* add the inner loop iterations to the total inner iterations */
+		self->totalnuminnerits = self->totalnuminnerits + innerLoopIterations;
+		
 		Journal_DPrintfL( self->debug, 2, "Completed Uzawa inner iteration in '%u' iterations \n", innerLoopIterations );
 				
 		/* STEP 4.4: Calculate the step size ( \alpha = z_{I-1} . r_{I-1} / (s_I . \hat{K} s_I) )
@@ -802,6 +818,16 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
         	}
 			
 	iteration_I++;  
+	//END OF OUTER ITERATION LOOP!!!
+		/*get wall time for end of outer loop*/
+		self->outeritsendtime = MPI_Wtime();
+		/* add time to total time inner its: */
+		self->totalouteritstime = self->totalouteritstime + (-self->outeritsinitialtime + self->outeritsendtime);
+		/* reset initial time and end time for inner its back to 0 - probs don't need to do this but just in case */
+		self->outeritsinitialtime = 0;
+		self->outeritsendtime = 0;
+		/* add the outer loop iterations to the total outer iterations */
+		self->totalnumouterits = self->totalnumouterits++; 
 	}  while ( (*chosenResidual > self->tolerance) || (iteration_I<minIterations) );  
 //	}  while ( *chosenResidual > self->tolerance );
 
@@ -892,7 +918,17 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	#endif
 	Stream_UnIndentBranch( StgFEM_Debug );
 
-        Stream_SetPrintingRank( self->info, init_info_stream_rank );	
+        Stream_SetPrintingRank( self->info, init_info_stream_rank );
+		/* Now gather up data for printing out to FrequentOutput file: */
+	
+	
+	/*!!! if non-linear need to divide by number of nonlinear iterations and we do this in SystemLinearEquations */
+	if((sle->isNonLinear != True)){
+		self->avgnuminnerits = self->totalnuminnerits/self->totalnumouterits;
+		self->avgnumouterits = self->totalnumouterits;
+		self->avgtimeouterits = (self->totalouteritstime - self->totalinneritstime)/self->totalnumouterits;
+		self->avgtimeinnerits = self->totalinneritstime/self->totalnuminnerits;
+	}	
 }
 
 void _Stokes_SLE_UzawaSolver_GetSolution( void *stokesSLE, void *solver, Vec *x )

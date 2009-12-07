@@ -89,6 +89,26 @@ void _SLE_Solver_Init( SLE_Solver* self, Bool useStatSolve, int statReps ) {
 	self->debug         = Stream_RegisterChild( StgFEM_SLE_SystemSetup_Debug, self->type );
 	self->info          = Journal_MyStream( Info_Type, self );
 	self->maxIterations = 0;
+
+	self->previoustimestep = 0;
+	self->currenttimestep = 0;
+	self->nonlinearitsinitialtime = 0; 
+	self->nonlinearitsendtime = 0; 
+	self->totalnonlinearitstime = 0; 
+	self->totalnumnonlinearits = 0; 
+	self->avgtimenonlinearits = 0; 	
+	self->inneritsinitialtime = 0; 
+	self->outeritsinitialtime = 0; 
+	self->inneritsendtime = 0; 
+	self->outeritsendtime = 0; 
+	self->totalinneritstime = 0; 
+	self->totalouteritstime = 0; 
+	self->totalnuminnerits = 0; 
+	self->totalnumouterits = 0; 
+	self->avgnuminnerits = 0; 
+	self->avgnumouterits = 0; 
+	self->avgtimeinnerits = 0; 
+	self->avgtimeouterits = 0;
 	
 	self->useStatSolve = useStatSolve;
 	self->nStatReps     = statReps;
@@ -115,6 +135,26 @@ void* _SLE_Solver_Copy( void* sleSolver, void* dest, Bool deep, Name nameExt, Pt
 	newSleSolver->_solverSetup  = self->_solverSetup;
 	newSleSolver->_solve        = self->_solve;
 	newSleSolver->maxIterations = self->maxIterations;
+
+	newSleSolver->inneritsinitialtime = self->inneritsinitialtime;
+	newSleSolver->outeritsinitialtime = self->outeritsinitialtime;
+	newSleSolver->nonlinearitsinitialtime = self->nonlinearitsinitialtime;
+	newSleSolver->inneritsendtime = self->inneritsendtime;
+	newSleSolver->outeritsendtime = self->outeritsendtime;
+	newSleSolver->nonlinearitsendtime = self->nonlinearitsendtime;
+	newSleSolver->totalinneritstime = self->totalinneritstime;
+	newSleSolver->totalouteritstime = self->totalouteritstime;
+	newSleSolver->totalnonlinearitstime = self->totalnonlinearitstime;
+	newSleSolver->totalnuminnerits = self->totalnuminnerits; 
+	newSleSolver->totalnumouterits = self->totalnumouterits; 
+	newSleSolver->totalnumnonlinearits = self->totalnumnonlinearits; 	
+	newSleSolver->avgnuminnerits = self->avgnuminnerits;
+    newSleSolver->avgnumouterits = self->avgnumouterits;
+	newSleSolver->avgtimeinnerits = self->avgtimeinnerits; 
+	newSleSolver->avgtimeouterits = self->avgtimeouterits; 
+	newSleSolver->avgtimenonlinearits = self->avgtimenonlinearits; 
+	newSleSolver->currenttimestep = self->currenttimestep; 
+	newSleSolver->previoustimestep = self->previoustimestep;
 	
 	if( deep ) {
 		if( (newSleSolver->debug = PtrMap_Find( map, self->debug )) == NULL ) {
