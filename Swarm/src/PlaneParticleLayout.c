@@ -131,7 +131,6 @@ void* _PlaneParticleLayout_DefaultNew( Name name ) {
 	
 void _PlaneParticleLayout_Destroy( void* particleLayout, void* data ){
    PlaneParticleLayout* self = (PlaneParticleLayout*)particleLayout;
-
    _SpaceFillerParticleLayout_Destroy( self, data );
 }
 
@@ -201,10 +200,13 @@ void _PlaneParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFact
 }
 	
 void _PlaneParticleLayout_Build( void* particleLayout, void* data ){
-	
+   PlaneParticleLayout* self = (PlaneParticleLayout*)particleLayout;
+   _SpaceFillerParticleLayout_Build( self, data );
 }
 	
 void _PlaneParticleLayout_Initialise( void* particleLayout, void* data ){
+   PlaneParticleLayout* self = (PlaneParticleLayout*)particleLayout;
+   _SpaceFillerParticleLayout_Initialise( self, data );
 }
 	
 void _PlaneParticleLayout_Execute( void* particleLayout, void* data ){

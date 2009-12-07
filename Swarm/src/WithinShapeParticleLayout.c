@@ -178,8 +178,12 @@ void _WithinShapeParticleLayout_AssignFromXML( void* withinShapeParticleLayout, 
 }
 	
 void _WithinShapeParticleLayout_Build( void* withinShapeParticleLayout, void* data ) {
+   WithinShapeParticleLayout* self = (WithinShapeParticleLayout*) withinShapeParticleLayout;
+   _SpaceFillerParticleLayout_Build( self, data );
 }
 void _WithinShapeParticleLayout_Initialise( void* withinShapeParticleLayout, void* data ) {
+   WithinShapeParticleLayout* self = (WithinShapeParticleLayout*) withinShapeParticleLayout;
+   _SpaceFillerParticleLayout_Initialise( self, data );
 }
 void _WithinShapeParticleLayout_Execute( void* withinShapeParticleLayout, void* data ) {
 }

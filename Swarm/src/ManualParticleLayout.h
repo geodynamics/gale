@@ -51,7 +51,7 @@
 	#define __ManualParticleLayout \
 		__GlobalParticleLayout \
 		\
-		Dictionary*             dictionary;
+		Dictionary*             dictionary; /* TODO: don't think this dictionary needs to be defined on the component, JG, 7Dec09 */
 
 	struct ManualParticleLayout { __ManualParticleLayout };
 	

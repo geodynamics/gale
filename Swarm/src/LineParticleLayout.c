@@ -248,6 +248,7 @@ void _LineParticleLayout_Destroy( void* particleLayout, void* data ) {
 	LineParticleLayout*        self             = (LineParticleLayout*)particleLayout;
 
 	Memory_Free( self->vertexList );
+	Memory_Free( self->segmentLengthList );
 
    _GlobalParticleLayout_Destroy( self, data );
 }

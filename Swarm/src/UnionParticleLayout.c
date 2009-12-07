@@ -172,13 +172,28 @@ void _UnionParticleLayout_AssignFromXML( void* unionParticleLayout, Stg_Componen
 }
 	
 void _UnionParticleLayout_Build( void* unionParticleLayout, void* data ) {
+   UnionParticleLayout* self     = (UnionParticleLayout*)unionParticleLayout;
+   unsigned ii = 0;
+   for( ii = 0 ; ii < self->particleLayoutCount ; ii++ ) {
+      Stg_Component_Build( self->particleLayoutList[ii], data, False );
+   }
 }
 void _UnionParticleLayout_Initialise( void* unionParticleLayout, void* data ) {
+   UnionParticleLayout* self     = (UnionParticleLayout*)unionParticleLayout;
+   unsigned ii = 0;
+   for( ii = 0 ; ii < self->particleLayoutCount ; ii++ ) {
+      Stg_Component_Initialise( self->particleLayoutList[ii], data, False );
+   }
 }	
 void _UnionParticleLayout_Execute( void* unionParticleLayout, void* data ) {	
 }
 void _UnionParticleLayout_Destroy( void* unionParticleLayout, void* data ) {	
 	UnionParticleLayout* self     = (UnionParticleLayout*)unionParticleLayout;
+   unsigned ii = 0;
+
+   for( ii = 0 ; ii < self->particleLayoutCount ; ii++ ) {
+      Stg_Component_Destroy( self->particleLayoutList[ii], data, False );
+   }
 
    _GlobalParticleLayout_Destroy( self, data );
 }

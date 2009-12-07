@@ -173,9 +173,13 @@ void _GaussBorderParticleLayout_AssignFromXML( void* gaussBorderParticleLayout, 
 }
 	
 void _GaussBorderParticleLayout_Build( void* gaussBorderParticleLayout, void* data ) {
+   GaussBorderParticleLayout* self   = (GaussBorderParticleLayout*)gaussBorderParticleLayout;
+   _GaussParticleLayout_Build( self, data );
 }
 	
 void _GaussBorderParticleLayout_Initialise( void* gaussBorderParticleLayout, void* data ) {
+   GaussBorderParticleLayout* self   = (GaussBorderParticleLayout*)gaussBorderParticleLayout;
+   _GaussParticleLayout_Initialise( self, data );
 }
 	
 void _GaussBorderParticleLayout_Execute( void* gaussBorderParticleLayout, void* data ) {
@@ -185,7 +189,7 @@ void _GaussBorderParticleLayout_Destroy( void* gaussBorderParticleLayout, void* 
    GaussBorderParticleLayout* self   = (GaussBorderParticleLayout*)gaussBorderParticleLayout;
 
    Memory_Free( self->particlesPerFace );
-   _GaussBorderParticleLayout_Destroy( self, data );
+   _GaussParticleLayout_Destroy( self, data );
 }
 
 Particle_InCellIndex _GaussBorderParticleLayout_InitialCount( void* gaussBorderParticleLayout, void* celllayout, Cell_Index cell_I )
