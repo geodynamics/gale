@@ -57,6 +57,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <stddef.h>
 
 /* Textual name of this class */
 const Type BuoyancyForceTerm_Type = "BuoyancyForceTerm";
