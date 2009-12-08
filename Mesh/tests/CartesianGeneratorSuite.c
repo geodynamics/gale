@@ -64,6 +64,8 @@ void CartesianGeneratorSuite_Setup( CartesianGeneratorSuiteData* data ) {
 
 	data->mesh = Mesh_New( "", NULL );
 	CartesianGenerator_Generate( gen, data->mesh, NULL );
+   Stg_Component_Build(data->mesh, NULL, False);
+   Stg_Component_Initialise(data->mesh, NULL, False);
 }
 
 void CartesianGeneratorSuite_Teardown( CartesianGeneratorSuiteData* data ) {
