@@ -157,6 +157,7 @@ void _PCDVC_AssignFromXML( void* pcdvc, Stg_ComponentFactory* cf, void* data ) ;
 
 void _PCDVC_Build( void* pcdvc, void* data ) ;
 void _PCDVC_Initialise( void* pcdvc, void* data ) ;
+void _PCDVC_Destroy( void* pcdvc, void* data )  ;
 void _PCDVC_Execute( void* pcdvc, void* data );
 MaterialPointRef* getIntParticleMaterialRef_PointingToMaterialParticle( IntegrationPointsSwarm*  intSwarm, Particle_Index matLastParticle_IndexOnCPU );
 void splitIntParticleByIndexWithinCell( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm, Cell_LocalIndex lCell_I, Particle_Index intParticleToSplit_IndexOnCPU, Coord xi );

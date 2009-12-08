@@ -221,7 +221,11 @@ void _DiffusionSMT_Execute( void* matrixTerm, void* data ) {
 }
 
 void _DiffusionSMT_Destroy( void* matrixTerm, void* data ) {
+    DiffusionSMT*             self             = (DiffusionSMT*)matrixTerm;
+    int ii;
     _StiffnessMatrixTerm_Destroy( matrixTerm, data );
+    for ( ii = 0; ii < self->materialSwarmCount; ++ii )
+      Stg_Component_Destroy( self->diffusionSwarmVariables[ii], data, False );
 }
 
 

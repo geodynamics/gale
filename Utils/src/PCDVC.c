@@ -212,7 +212,7 @@ void* _PCDVC_DefaultNew( Name name ) {
 	Stg_Component_BuildFunction*                               _build = _PCDVC_Build;
 	Stg_Component_InitialiseFunction*                     _initialise = _PCDVC_Initialise;
 	Stg_Component_ExecuteFunction*                           _execute = _PCDVC_Execute;
-	Stg_Component_DestroyFunction*                           _destroy = NULL;
+	Stg_Component_DestroyFunction*                           _destroy = _PCDVC_Destroy;
 	AllocationType                                 nameAllocationType = NON_GLOBAL;
 	WeightsCalculator_CalculateFunction*                   _calculate = _PCDVC_Calculate;
 
@@ -268,6 +268,12 @@ void _PCDVC_AssignFromXML( void* pcdvc, Stg_ComponentFactory* cf, void *data ) {
 void _PCDVC_Build( void* pcdvc, void* data ) {
     PCDVC*	self = (PCDVC*)pcdvc;
     _DVCWeights_Build( self, data );
+    Stg_Component_Build( self->materialPointsSwarm, data, False );
+}
+void _PCDVC_Destroy( void* pcdvc, void* data ) {
+    PCDVC*	self = (PCDVC*)pcdvc;
+    _DVCWeights_Destroy( self, data );
+    Stg_Component_Destroy( self->materialPointsSwarm, data, False );
 }
 void _PCDVC_Initialise( void* pcdvc, void* data ) {
     PCDVC*	self = (PCDVC*)pcdvc;
@@ -282,7 +288,7 @@ void _PCDVC_Initialise( void* pcdvc, void* data ) {
         self->splitInInterfaceCells  = True;
         self->deleteInInterfaceCells = True;
     }
-   
+    Stg_Component_Initialise( self->materialPointsSwarm, data, False );
     _DVCWeights_Initialise( self, data );
 }
 void _PCDVC_Execute( void* pcdvc, void* data ) {
