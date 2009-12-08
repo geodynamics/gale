@@ -202,6 +202,8 @@ void AllNodesVCSuite_TestAllNodesVC( AllNodesVCSuiteData* data ) {
       if (array[i]) Memory_Free(array[i]);
    }
 
+	Stg_Class_Delete(extensionMgr_Register);
+	Stg_Class_Delete(io_handler);
    Stg_Class_Delete(conFunc_Register);
    Stg_Class_Delete(dictionary);
    FreeObject( mesh );
