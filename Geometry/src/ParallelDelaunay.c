@@ -503,6 +503,8 @@ void _ParallelDelaunay_Destroy( void* pd, void* data ) {
 	Stg_Class_Delete( self->localTriangulation );
 	Stg_Class_Delete( self->sitePool );
 	Stg_Class_Delete( self->coordPool );
+
+   _Delaunay_Destroy(pd, data);
 }
 
 #define onCurrentProc( pd, id ) ( id < (pd->processorLoad[pd->rank]+pd->localTriangulation->idOffset) )
