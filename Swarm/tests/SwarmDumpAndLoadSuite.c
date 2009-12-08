@@ -192,6 +192,10 @@ void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data
       remove(context->outputPath);
    }
    
+		Stg_Class_Delete( fileParticleLayout);
+		Stg_Class_Delete( posVariableNew);
+		Stg_Class_Delete( newSwarm);
+
    stgMainDestroy( cf );
 
 }

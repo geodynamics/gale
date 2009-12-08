@@ -615,7 +615,7 @@ void DofLayout_LoadAllVariablesFromFiles( void* dofLayout, char* prefixString, u
 			prefixStringLength = 0;
 		}
 
-		varFileName = Memory_Alloc_Array_Unnamed( char, prefixStringLength + strlen( variable->name ) + 5 + 4 + 1 );
+		varFileName = Memory_Alloc_Array_Unnamed( char, prefixStringLength + strlen( variable->name ) + 6 + 4 + 1 );
 		if ( prefixString ) {
 			sprintf( varFileName, "%s.%s.dat.%.4d", prefixString, variable->name, rank );
 		}
