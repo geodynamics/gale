@@ -254,21 +254,6 @@ void _StiffnessMatrix_Init(
 
 void _StiffnessMatrix_Delete( void* stiffnessMatrix ) {
 	StiffnessMatrix* self = (StiffnessMatrix*)stiffnessMatrix;
-	
-	Journal_DPrintf( self->debug, "In %s - for matrix %s\n", __func__, self->name );
-	FreeObject( self->stiffnessMatrixTermList );
-	FreeArray( self->_assembleStiffnessMatrixEPName );
-	FreeArray( self->diagonalNonZeroIndices );
-	FreeArray( self->offDiagonalNonZeroIndices );
-	FreeObject( self->zeroBCsAsm );
-	FreeObject( self->bcAsm );
-	FreeObject( self->transBCAsm );
-	FreeObject( self->diagBCsAsm );
-	/* Don't delete entry points: E.P. register will delete them automatically */
-
-	NewClass_Delete( self->rowInc );
-	NewClass_Delete( self->colInc );
-
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
 	
@@ -574,6 +559,22 @@ void _StiffnessMatrix_Execute( void* stiffnessMatrix, void* data ) {
 
 void _StiffnessMatrix_Destroy( void* stiffnessMatrix, void* data ) {
 	StiffnessMatrix* self = (StiffnessMatrix*)stiffnessMatrix;
+	
+	Journal_DPrintf( self->debug, "In %s - for matrix %s\n", __func__, self->name );
+	MatDestroy( self->matrix );
+	FreeObject( self->stiffnessMatrixTermList );
+	FreeArray( self->_assembleStiffnessMatrixEPName );
+	FreeArray( self->diagonalNonZeroIndices );
+	FreeArray( self->offDiagonalNonZeroIndices );
+	FreeObject( self->zeroBCsAsm );
+	FreeObject( self->bcAsm );
+	FreeObject( self->transBCAsm );
+	FreeObject( self->diagBCsAsm );
+	/* Don't delete entry points: E.P. register will delete them automatically */
+	NewClass_Delete( self->rowInc );
+	NewClass_Delete( self->colInc );
+
+
 }
 
 void StiffnessMatrix_CalculateNonZeroEntries( void* stiffnessMatrix ) {
