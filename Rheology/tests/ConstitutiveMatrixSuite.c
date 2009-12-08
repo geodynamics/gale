@@ -20,13 +20,6 @@ void ConstitutiveMatrixSuite_Setup( ConstitutiveMatrixSuiteData* data ) {
 }
 
 void ConstitutiveMatrixSuite_Teardown( ConstitutiveMatrixSuiteData* data ) {
-	UnderworldContext* context = data->context;
-	char rFile[PCU_PATH_MAX];
-	int err;
-	/* Now clean output path */
-	sprintf(rFile, "%s/output.dat", context->outputPath );
-	err = remove( rFile );
-	if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
 }
 
 void SetMatrixWithSecondViscosity2( ConstitutiveMatrix* constitutiveMatrix, Element_LocalIndex lElement_I, Particle_InCellIndex cParticle_I, void* data ) {
@@ -96,6 +89,8 @@ void ConstitutiveMatrixSuite_CartesianMatrix2D( ConstitutiveMatrixSuiteData* dat
 	char							*filename;
 	double						tolerance;
 	char							xml_input[PCU_PATH_MAX];
+	char							rFile[PCU_PATH_MAX];
+	int							err;
 
 	pcu_docstring( "This test creates a 2D cartesian constitutive matrix data structure and tests its functionality against an expected file" );
 
@@ -124,6 +119,11 @@ void ConstitutiveMatrixSuite_CartesianMatrix2D( ConstitutiveMatrixSuiteData* dat
 
 	/* check the output file against the expected output file */
 	pcu_check_fileEq( output_file, expected_file );
+
+	/* Now clean output path */
+	sprintf(rFile, "%s/output.dat", data->context->outputPath );
+	err = remove( rFile );
+	if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
 
 	/* end the run */
 	stgMainDestroy( cf );

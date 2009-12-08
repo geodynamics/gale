@@ -21,15 +21,6 @@ void ViscousSuite_Setup( ViscousSuiteData* data ) {
 }
 
 void ViscousSuite_Teardown( ViscousSuiteData* data ) {
-	UnderworldContext* context = data->context;
-	char rFile[PCU_PATH_MAX];
-	int err;
-	if( context->rank == 0 ) {
-		/* Now clean output path */
-		sprintf(rFile, "%s/input.xml", context->outputPath );
-		err = remove( rFile );
-		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
-	}
 }
 
 void ViscousSuite_ArrheniusStiffnessMatrix2D( ViscousSuiteData* data ) {
@@ -45,6 +36,8 @@ void ViscousSuite_ArrheniusStiffnessMatrix2D( ViscousSuiteData* data ) {
 	char							*filename;
 	double						tolerance;
 	char							xml_input[PCU_PATH_MAX];
+	char							rFile[PCU_PATH_MAX];
+	int							err;
 
 
 	pcu_docstring( "This test compares a Stiffness matrix against a previously generated stiffness matrix"
@@ -101,6 +94,13 @@ void ViscousSuite_ArrheniusStiffnessMatrix2D( ViscousSuiteData* data ) {
 
 	pcu_check_lt( test, tolerance );
 
+	if( data->context->rank == 0 ) {
+		/* Now clean output path */
+		sprintf(rFile, "%s/input.xml", data->context->outputPath );
+		err = remove( rFile );
+		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
+	}
+
 	stgMainDestroy( cf );
 }
 
@@ -117,6 +117,8 @@ void ViscousSuite_FrankKamenetskiiStiffnessMatrix2D( ViscousSuiteData* data ) {
 	char							*filename;
 	double						tolerance;
 	char							xml_input[PCU_PATH_MAX];
+	char							rFile[PCU_PATH_MAX];
+	int							err;
 
 	pcu_docstring( "This test compares a Stiffness matrix against a previously generated stiffness matrix"
 		"The stiffness matrix is generated from a 2D FEM model for a flow with an FrankKamenetskii rheology."
@@ -172,9 +174,15 @@ void ViscousSuite_FrankKamenetskiiStiffnessMatrix2D( ViscousSuiteData* data ) {
 
 	pcu_check_lt( test, tolerance );
 
+	if( data->context->rank == 0 ) {
+		/* Now clean output path */
+		sprintf(rFile, "%s/input.xml", data->context->outputPath );
+		err = remove( rFile );
+		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
+	}
+
 	stgMainDestroy( cf );
 }
-
 
 void ViscousSuite_MaterialViscosityStiffnessMatrix2D( ViscousSuiteData* data ) {
 	StiffnessMatrix*			stiffnessMatrix;
@@ -189,6 +197,8 @@ void ViscousSuite_MaterialViscosityStiffnessMatrix2D( ViscousSuiteData* data ) {
 	char							*filename;
 	double						tolerance;
 	char							xml_input[PCU_PATH_MAX];
+	char							rFile[PCU_PATH_MAX];
+	int							err;
 
 	pcu_docstring( "This test compares a Stiffness matrix against a previously generated stiffness matrix"
 		"The stiffness matrix is generated from a 2D FEM model for a flow with an constant isoviscous rheology."
@@ -243,8 +253,14 @@ void ViscousSuite_MaterialViscosityStiffnessMatrix2D( ViscousSuiteData* data ) {
 
 	pcu_check_lt( test, tolerance );
 
-	stgMainDestroy( cf );
+	if( data->context->rank == 0 ) {
+		/* Now clean output path */
+		sprintf(rFile, "%s/input.xml", data->context->outputPath );
+		err = remove( rFile );
+		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
+	}
 
+	stgMainDestroy( cf );
 }
 
 void ViscousSuite_ArrheniusStiffnessMatrix2D_DualMesh( ViscousSuiteData* data ) {
@@ -260,6 +276,8 @@ void ViscousSuite_ArrheniusStiffnessMatrix2D_DualMesh( ViscousSuiteData* data ) 
 	char							*filename;
 	double						tolerance;
 	char							xml_input[PCU_PATH_MAX];
+	char							rFile[PCU_PATH_MAX];
+	int							err;
 
 	pcu_docstring( "This test compares a Stiffness matrix against a previously generated stiffness matrix"
 		"The stiffness matrix is generated from a 2D FEM model for a flow with an FrankKamenetskii rheology."
@@ -315,8 +333,16 @@ void ViscousSuite_ArrheniusStiffnessMatrix2D_DualMesh( ViscousSuiteData* data ) 
 
 	pcu_check_lt( test, tolerance );
 
+	if( data->context->rank == 0 ) {
+		/* Now clean output path */
+		sprintf(rFile, "%s/input.xml", data->context->outputPath );
+		err = remove( rFile );
+		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
+	}
+
 	stgMainDestroy( cf );
 }
+
 void ViscousSuite_FrankKamenetskiiStiffnessMatrix2D_DualMesh( ViscousSuiteData* data ) {
 	StiffnessMatrix*			stiffnessMatrix;
 	SystemLinearEquations*	sle;
@@ -330,6 +356,8 @@ void ViscousSuite_FrankKamenetskiiStiffnessMatrix2D_DualMesh( ViscousSuiteData* 
 	char							*filename;
 	double						tolerance;
 	char							xml_input[PCU_PATH_MAX];
+	char							rFile[PCU_PATH_MAX];
+	int							err;
 
 	pcu_docstring( "This test compares a Stiffness matrix against a previously generated stiffness matrix"
 		"The stiffness matrix is generated from a 2D FEM model for a flow with an FrankKamenetskii rheology."
@@ -384,6 +412,13 @@ void ViscousSuite_FrankKamenetskiiStiffnessMatrix2D_DualMesh( ViscousSuiteData* 
 	test = errorNorm / matrixNorm;
 
 	pcu_check_lt( test, tolerance );
+
+	if( data->context->rank == 0 ) {
+		/* Now clean output path */
+		sprintf(rFile, "%s/input.xml", data->context->outputPath );
+		err = remove( rFile );
+		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
+	}
 
 	stgMainDestroy( cf );
 }
