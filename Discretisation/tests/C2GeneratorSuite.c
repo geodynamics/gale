@@ -62,9 +62,14 @@ void C2GeneratorSuite_Setup( C2GeneratorSuiteData* data ) {
 	CartesianGenerator_SetShadowDepth( gen, 1 );
 	C2Generator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
+   Stg_Component_Build( gen, NULL, False );
+   Stg_Component_Initialise( gen, NULL, False );
 
 	data->mesh = Mesh_New( "", NULL );
 	CartesianGenerator_Generate( gen, data->mesh, NULL );
+   /* need 2 lines below to setup mesh */
+   Stg_Component_Build( data->mesh, NULL, False );
+   Stg_Component_Initialise( data->mesh, NULL, False );
 }
 
 void C2GeneratorSuite_Teardown( C2GeneratorSuiteData* data ) {
