@@ -207,14 +207,26 @@ void _Mesh_Execute( void* mesh, void* data ) {
 }
 
 void _Mesh_Destroy( void* mesh, void* data ) {
-   Mesh*			self = (Mesh*)mesh;
+   Mesh*		self = (Mesh*)mesh;
+	unsigned nDims;
+	unsigned	d_i;
 
    Mesh_Destruct( self );
    Stg_Class_Delete( self->algorithms );
-   NewClass_Delete( self->topo );
    Stg_Class_Delete( self->info );
    Stg_Class_Delete( self->vars );
    Stg_Class_Delete( self->topoDataSizes );
+
+	for( d_i = 0; d_i < Mesh_GetDimSize( self ); d_i++ ) {
+		if( self->topoDataInfos[d_i] )	
+			Stg_Class_Delete( self->topoDataInfos[d_i] );
+		if( self->topoDatas[d_i] )
+			Memory_Free( self->topoDatas[d_i] );
+	}
+   Memory_Free( self->topoDataInfos );
+   Memory_Free( self->topoDatas );
+
+   NewClass_Delete( self->topo );
 }
 
 
@@ -416,9 +428,7 @@ Bool Mesh_HasIncidence( void* mesh, MeshTopology_Dim fromDim, MeshTopology_Dim t
 	return IGraph_HasIncidence( self->topo, fromDim, toDim );
 }
 
-unsigned Mesh_GetIncidenceSize( void* mesh, MeshTopology_Dim fromDim, unsigned fromInd, 
-				MeshTopology_Dim toDim )
-{
+unsigned Mesh_GetIncidenceSize( void* mesh, MeshTopology_Dim fromDim, unsigned fromInd, MeshTopology_Dim toDim ) {
 	Mesh*	self = (Mesh*)mesh;
 
 	assert( self );
@@ -426,9 +436,7 @@ unsigned Mesh_GetIncidenceSize( void* mesh, MeshTopology_Dim fromDim, unsigned f
 	return IGraph_GetIncidenceSize( self->topo, fromDim, fromInd, toDim );
 }
 
-void Mesh_GetIncidence( void* mesh, MeshTopology_Dim fromDim, unsigned fromInd, MeshTopology_Dim toDim, 
-			IArray* inc )
-{
+void Mesh_GetIncidence( void* mesh, MeshTopology_Dim fromDim, unsigned fromInd, MeshTopology_Dim toDim, IArray* inc ) {
 	Mesh*	self = (Mesh*)mesh;
 
 	assert( self );
@@ -445,9 +453,7 @@ unsigned Mesh_NearestVertex( void* mesh, double* point ) {
 	return Mesh_Algorithms_NearestVertex( self->algorithms, point );
 }
 
-Bool Mesh_Search( void* mesh, double* point, 
-		  MeshTopology_Dim* dim, unsigned* ind )
-{
+Bool Mesh_Search( void* mesh, double* point, MeshTopology_Dim* dim, unsigned* ind ) {
 	Mesh*	self = (Mesh*)mesh;
 
 	assert( self && Stg_CheckType( self, Mesh ) );
