@@ -101,6 +101,8 @@ void ViscousSuite_ArrheniusStiffnessMatrix2D( ViscousSuiteData* data ) {
 		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
 	}
 
+   PetscViewerDestroy( expViewer );
+   MatDestroy( expected);
 	stgMainDestroy( cf );
 }
 
@@ -181,6 +183,8 @@ void ViscousSuite_FrankKamenetskiiStiffnessMatrix2D( ViscousSuiteData* data ) {
 		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
 	}
 
+   PetscViewerDestroy( expViewer );
+   MatDestroy( expected);
 	stgMainDestroy( cf );
 }
 
@@ -260,6 +264,8 @@ void ViscousSuite_MaterialViscosityStiffnessMatrix2D( ViscousSuiteData* data ) {
 		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
 	}
 
+   PetscViewerDestroy( expViewer );
+   MatDestroy( expected);
 	stgMainDestroy( cf );
 }
 
@@ -340,6 +346,8 @@ void ViscousSuite_ArrheniusStiffnessMatrix2D_DualMesh( ViscousSuiteData* data ) 
 		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
 	}
 
+   PetscViewerDestroy( expViewer );
+   MatDestroy( expected);
 	stgMainDestroy( cf );
 }
 
@@ -420,6 +428,8 @@ void ViscousSuite_FrankKamenetskiiStiffnessMatrix2D_DualMesh( ViscousSuiteData* 
 		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
 	}
 
+   PetscViewerDestroy( expViewer );
+   MatDestroy( expected);
 	stgMainDestroy( cf );
 }
 
