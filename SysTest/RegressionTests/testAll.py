@@ -6,6 +6,7 @@ def runTests():
 
     commands = ['./checkpointTest.pl Anisotropic.xml', \
                 './checkpointTest.pl Arrhenius.xml', \
+                './checkpointTest.pl Arrhenius.xml -optionsFile np-2.dat', \
                 './checkpointTest.pl ArrheniusPIC.xml', \
                 './checkpointTest.pl CylinderRiseThermal.xml ', \
                 './checkpointTest.pl DepthDependentViscosity.xml', \
@@ -18,6 +19,7 @@ def runTests():
                 './checkpointTest.pl NonNewtonian.xml', \
                 './checkpointTest.pl NonNewtonianPicard.xml', \
                 './checkpointTest.pl RayleighTaylorBenchmark.xml', \
+                './checkpointTest.pl RayleighTaylorBenchmark.xml -optionsFile np-2.dat', \
                 './checkpointTest.pl ThermoChemBenchmark.xml', \
                 './analyticTest.pl NonNewtonianShear.xml -optionsFile np-1.dat', \
                 './analyticTest.pl NonNewtonianShear.xml -optionsFile np-2.dat', \
