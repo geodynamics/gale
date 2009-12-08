@@ -53,8 +53,6 @@ PerCellParticleLayout* _PerCellParticleLayout_New(  PERCELLPARTICLELAYOUT_DEFARG
 {
    PerCellParticleLayout*		self;
 
-   coordSystem = NON_GLOBAL;
-
    /* Allocate memory */
    assert( _sizeOfSelf >= sizeof(PerCellParticleLayout) );
    self = (PerCellParticleLayout*)_ParticleLayout_New(  PARTICLELAYOUT_PASSARGS  );

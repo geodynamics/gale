@@ -90,11 +90,13 @@ GaussParticleLayout* _GaussParticleLayout_New(  GAUSSPARTICLELAYOUT_DEFARGS  )
 }
 
 void _GaussParticleLayout_Init( void* gaussParticleLayout, Dimension_Index dim, Particle_InCellIndex* particlesPerDim ) {
-	GaussParticleLayout* self = (GaussParticleLayout*)gaussParticleLayout;
+   GaussParticleLayout* self = (GaussParticleLayout*)gaussParticleLayout;
 
-	self->isConstructed       = True;
-	self->dim                 = dim;
-	memcpy( self->particlesPerDim, particlesPerDim, 3 * sizeof(Particle_InCellIndex) );
+   self->isConstructed       = True;
+   self->coordSystem         = LocalCoordSystem;
+   self->weightsInitialisedAtStartup = True;
+   self->dim                 = dim;
+   memcpy( self->particlesPerDim, particlesPerDim, 3 * sizeof(Particle_InCellIndex) );
 }
 
 void _GaussParticleLayout_Delete( void* gaussParticleLayout ) {
