@@ -162,7 +162,7 @@ void CornerVCSuite_TestCornerVC( CornerVCSuiteData* data ) {
  		Index j, k;
 
 		vc = (VariableCondition*) CornerVC_New( vcKeyName[i], NULL, vcKey[i], variable_Register, conFunc_Register, dictionary, mesh );
-		_CornerVC_ReadDictionary(vc, dictionary);
+		//_CornerVC_ReadDictionary(vc, dictionary); //already done in build
 		Stg_Component_Build( vc, 0, False );
 		for (j = 0; j < 7; j++) { 
 			memset(array[j], 0, sizeof(double)* nDomains );
@@ -195,7 +195,7 @@ void CornerVCSuite_TestCornerVC( CornerVCSuiteData* data ) {
 			} Journal_Printf( stream,"\n");
 	
       }
-		Stg_Class_Delete(vc);
+	   _Stg_Component_Delete(vc);
 	}
 	if (data->rank == procToWatch) {
 		pcu_filename_expected( "testCornerVC.expected", expected_file );
@@ -208,8 +208,11 @@ void CornerVCSuite_TestCornerVC( CornerVCSuiteData* data ) {
 		Stg_Class_Delete(var[i]);
 		if (array[i]) Memory_Free(array[i]);
 	}
+	Stg_Class_Delete(extensionMgr_Register);
+	Stg_Class_Delete(io_handler);
 	Stg_Class_Delete(conFunc_Register);
 	Stg_Class_Delete(dictionary);
+
 	FreeObject( mesh );
 }
 
