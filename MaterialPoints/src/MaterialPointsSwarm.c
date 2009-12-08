@@ -463,8 +463,6 @@ void _MaterialPointsSwarm_Execute( void* swarm, void* data ) {
 void _MaterialPointsSwarm_Destroy( void* swarm, void* data ) {
 	MaterialPointsSwarm*	self = (MaterialPointsSwarm*)swarm;
    int var_I;
-
-	_Swarm_Destroy( self, data );
 	
 	Stg_Component_Destroy( self->mesh, data , False );
 	if( self->escapedRoutine != NULL) Stg_Component_Destroy( self->escapedRoutine, data , False );
@@ -473,7 +471,8 @@ void _MaterialPointsSwarm_Destroy( void* swarm, void* data ) {
 	for( var_I = 0 ; var_I < self->nSwarmVars ; var_I++ ) {
 		Stg_Component_Destroy( self->swarmVars[var_I], data , False );
 	}
-	
+
+	_Swarm_Destroy( self, data );
 }
 
 void _MaterialPointsSwarm_UpdateHook( void* timeIntegrator, void* swarm ) {
