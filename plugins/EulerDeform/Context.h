@@ -31,6 +31,7 @@
 		FeVariable*             artDField; /* artificial displacement field */
 		EulerDeform_System*	systems;
 		AbstractContext*        ctx;
+      TimeIntegrator*         timeIntegrator;
 	};
 
 	struct EulerDeform_System {

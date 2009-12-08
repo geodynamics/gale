@@ -293,9 +293,9 @@ void _Underworld_IncompressibleExtensionBC_AssignFromXML( void* _self, Stg_Compo
     IncExtBC* self = (IncExtBC*)_self;
 	UnderworldContext*  context  = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
 	ConditionFunction*  condFunc;
+   TimeIntegrator* timeIntegrator = (TimeIntegrator*)  LiveComponentRegister_Get( context->CF->LCRegister, "timeIntegrator" );
 
-        self->context   = Stg_ComponentFactory_PluginConstructByKey( cf, self, "Context", AbstractContext, True, data );
-        context = (UnderworldContext*)self->context;
+        self->context   = context;
 
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_TopCondition, "IncompressibleExtensionBC_TopCondition" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
@@ -316,7 +316,7 @@ void _Underworld_IncompressibleExtensionBC_AssignFromXML( void* _self, Stg_Compo
 
         if( Stg_ComponentFactory_PluginGetBool( cf, self, "Remesh", False ) ) {
 	    TimeIntegrator_PrependFinishEP( 
-		context->timeIntegrator, "Underworld_IncompressibleExtensionBC_Remesh", Underworld_IncompressibleExtensionBC_Remesh, 
+		timeIntegrator, "Underworld_IncompressibleExtensionBC_Remesh", Underworld_IncompressibleExtensionBC_Remesh, 
 		CURR_MODULE_NAME, self );
 	}
 }
