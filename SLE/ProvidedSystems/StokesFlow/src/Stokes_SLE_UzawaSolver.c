@@ -70,7 +70,7 @@ void* _Stokes_SLE_UzawaSolver_DefaultNew( Name name ) {
 	Stg_Component_BuildFunction*                            _build = _Stokes_SLE_UzawaSolver_Build;
 	Stg_Component_InitialiseFunction*                  _initialise = _Stokes_SLE_UzawaSolver_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = _SLE_Solver_Execute;
-	Stg_Component_DestroyFunction*                        _destroy = _SLE_Solver_Destroy;
+	Stg_Component_DestroyFunction*                        _destroy = _Stokes_SLE_UzawaSolver_Destroy;
 	SLE_Solver_SolverSetupFunction*                   _solverSetup = _Stokes_SLE_UzawaSolver_SolverSetup;
 	SLE_Solver_SolveFunction*                               _solve = _Stokes_SLE_UzawaSolver_Solve;
 	SLE_Solver_GetResidualFunc*                       _getResidual = _Stokes_SLE_UzawaSolver_GetResidual;
@@ -155,21 +155,9 @@ void Stokes_SLE_UzawaSolver_InitAll(
 
 void _Stokes_SLE_UzawaSolver_Delete( void* solver ) {
 	Stokes_SLE_UzawaSolver* self = (Stokes_SLE_UzawaSolver*)solver;
+
+   _SLE_Solver_Delete( self );
 		
-	Journal_DPrintf( self->debug, "In: %s \n", __func__);
-
-	Stream_IndentBranch( StgFEM_Debug );
-	Journal_DPrintfL( self->debug, 2, "Deleting Solver contexts.\n" );
-	KSPDestroy( self->velSolver );
-	KSPDestroy( self->pcSolver );
-
-	Journal_DPrintfL( self->debug, 2, "Deleting temporary solver vectors.\n" );
-	if( self->pTempVec != PETSC_NULL ) VecDestroy( self->pTempVec );
-	if( self->rVec != PETSC_NULL )     VecDestroy( self->rVec );
-	if( self->sVec != PETSC_NULL )     VecDestroy( self->sVec );
-	if( self->fTempVec != PETSC_NULL ) VecDestroy( self->fTempVec );
-	if( self->vStarVec != PETSC_NULL ) VecDestroy( self->vStarVec );
-	Stream_UnIndentBranch( StgFEM_Debug );
 }       
 
 
@@ -279,6 +267,23 @@ void _Stokes_SLE_UzawaSolver_Execute( void* solver, void* data ) {
 }
 
 void _Stokes_SLE_UzawaSolver_Destroy( void* solver, void* data ) {
+   Stokes_SLE_UzawaSolver* self = (Stokes_SLE_UzawaSolver*) solver;
+	Journal_DPrintf( self->debug, "In: %s \n", __func__);
+
+	Stream_IndentBranch( StgFEM_Debug );
+	Journal_DPrintfL( self->debug, 2, "Destroying Solver contexts.\n" );
+	KSPDestroy( self->velSolver );
+	KSPDestroy( self->pcSolver );
+
+	Journal_DPrintfL( self->debug, 2, "Destroying temporary solver vectors.\n" );
+	if( self->pTempVec != PETSC_NULL ) VecDestroy( self->pTempVec );
+	if( self->rVec != PETSC_NULL )     VecDestroy( self->rVec );
+	if( self->sVec != PETSC_NULL )     VecDestroy( self->sVec );
+	if( self->fTempVec != PETSC_NULL ) VecDestroy( self->fTempVec );
+	if( self->vStarVec != PETSC_NULL ) VecDestroy( self->vStarVec );
+	Stream_UnIndentBranch( StgFEM_Debug );
+   _SLE_Solver_Destroy( self, data );
+
 }
 
 void _Stokes_SLE_UzawaSolver_Initialise( void* solver, void* stokesSLE ) {
