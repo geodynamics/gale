@@ -386,9 +386,11 @@ void _VariableCondition_Execute( void* variableCondition, void* data ) {
 void _VariableCondition_Destroy( void* variableCondition, void* data ) {
 	VariableCondition* self = (VariableCondition*)variableCondition;
 
+	if (self->mapping) Stg_Class_Delete(self->mapping);
 	if (self->_set) Stg_Class_Delete(self->_set);
 	if (self->indexTbl) Memory_Free(self->indexTbl);
 	if (self->vcVarCountTbl) Memory_Free(self->vcVarCountTbl);
+	if (self->vcTbl) Memory_Free(self->vcTbl);
 	if (self->valueTbl) Memory_Free(self->valueTbl);
 }
 
