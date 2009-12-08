@@ -131,6 +131,9 @@ void _AbstractContext_Init( AbstractContext* self ) {
 	MPI_Comm_size( self->communicator, &self->nproc );
 	self->debug = debug;
 
+	Journal_Enable_TypedStream( DebugStream_Type, False );
+	Journal_Enable_TypedStream( DumpStream_Type, False );
+
 	if( self->rank == 0 ) {
 		Journal_Printf( 
 			debug, 
@@ -590,7 +593,7 @@ void _AbstractContext_Execute( void* context, void* data ) {
 	
 	Journal_Printf( self->debug, "In: %s\n", __func__ );
 
-	#if DEBUG
+	#ifdef DEBUG
 		AbstractContext_WarnIfNoHooks( self, self->executeK, __func__ );
 	#endif
 	
@@ -604,7 +607,7 @@ void _AbstractContext_Execute( void* context, void* data ) {
 
 void _AbstractContext_Destroy( void* context, void* data ) {
 	AbstractContext* self = (AbstractContext*)context;
-	
+
 	Journal_Printf( self->debug, "In: %s\n", __func__ );
 
 	/* Pre-mark the phase as complete as a default hook will attempt to initialise all live components (including this again) */

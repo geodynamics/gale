@@ -54,10 +54,7 @@ void _NewClass_Destruct( void* _self ) {
 
 #ifndef NDEBUG
    if( ((NewClass*)self)->curAllocd != 0 ) {
-      fprintf( stderr, "\nWhile destructing a class memory has been leaked.\n"
-	       "Class type:    %s\n"
-	       "Memory leaked: %ld\n", 
-	       self->type, self->curAllocd );
+      fprintf( stderr, "\nWhile destructing a class memory has been leaked.\n" "Class type: %s\n" "Memory leaked: %ld\n", self->type, self->curAllocd );
    }
 #endif
 }

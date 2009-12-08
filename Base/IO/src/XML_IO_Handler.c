@@ -1435,11 +1435,11 @@ static char* _XML_IO_Handler_GetNextAsciiToken( XML_IO_Handler* self, xmlNodePtr
 
 /** parses a node containing struct info. */
 static void _XML_IO_Handler_ParseStruct( 
-		XML_IO_Handler*					self, 
-		xmlNodePtr					cur, 
-		Dictionary_Entry_Value*				parent, 
-		Dictionary_MergeType				defaultMergeType,
-		Dictionary_Entry_Source				source )
+	XML_IO_Handler*			self, 
+	xmlNodePtr					cur, 
+	Dictionary_Entry_Value*	parent, 
+	Dictionary_MergeType		defaultMergeType,
+	Dictionary_Entry_Source	source )
 {
 	xmlChar* name = xmlGetProp( cur, NAME_ATTR );
 	xmlChar* sourceFile = xmlGetProp( cur, SOURCEFILE_ATTR );
