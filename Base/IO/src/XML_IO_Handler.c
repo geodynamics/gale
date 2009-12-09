@@ -601,6 +601,8 @@ Bool _XML_IO_Handler_ReadAllFromFile( void* xml_io_handler, const char* filename
 
 	/* open the file and check syntax */
 	if ( !(rootElement = _XML_IO_Handler_OpenCheckFile( self, filename )) ) {
+		if( self->currDoc )
+			xmlFreeDoc( self->currDoc );
 		return False;
 	}
 	
@@ -706,19 +708,23 @@ static xmlNodePtr _XML_IO_Handler_OpenCheckFile( XML_IO_Handler* self, const cha
 		Journal_Register( Error_Type, XML_IO_Handler_Type ),
 		"Error: File %s doesn't exist, not readable, or not valid.\n",
 		filename );
+	
+	if( self->currDoc != NULL ) {
+		cur = xmlDocGetRootElement( self->currDoc );
+		status = _XML_IO_Handler_Check( self, self->currDoc );
 
-	cur = xmlDocGetRootElement( self->currDoc );
-	status = _XML_IO_Handler_Check( self, self->currDoc );
-	Journal_Firewall( status == True,
-		Journal_Register( Error_Type, XML_IO_Handler_Type ),
-		"Error: File %s not valid/readable.\n",
-		filename );
+		Journal_Firewall( status,
+			Journal_Register( Error_Type, XML_IO_Handler_Type ),
+			"Error: File %s not valid/readable.\n",
+			filename );
 
-	if( status == True )
-		return cur;
+		if( status == True )
+			return cur;
+		else
+			return NULL;
+	}
 	else
-		return NULL;
-	 
+		return NULL; 
 }
 
 static xmlNodePtr _XML_IO_Handler_OpenCheckBuffer( XML_IO_Handler* self, const char* buffer ) {
@@ -847,23 +853,19 @@ static void _XML_IO_Handler_OpenBuffer( XML_IO_Handler* self, const char* buffer
 }
 
 Bool _XML_IO_Handler_Check( XML_IO_Handler* self, xmlDocPtr currDoc ) {
-	xmlNodePtr    rootElement = NULL;
-	xmlNodePtr    cur = NULL;
+	xmlNodePtr	rootElement = NULL;
+	xmlNodePtr	cur = NULL;
 	
 	rootElement = xmlDocGetRootElement( self->currDoc );
-	if (rootElement == NULL) {
+	if ( !rootElement ) {
 		Journal_Printf(
 			Journal_Register( Error_Type, XML_IO_Handler_Type ),
 			"Error: empty document. Not parsing.\n" );
-		if( self->currDoc )
-			xmlFreeDoc( self->currDoc );
 		return False;
 	}
 	
 	/* check the namespace */
 	if( _XML_IO_Handler_CheckNameSpace( self, rootElement ) == False ) {
-		if( self->currDoc )
-			xmlFreeDoc( self->currDoc );
 		return False;
 	}
 	
@@ -875,8 +877,6 @@ Bool _XML_IO_Handler_Check( XML_IO_Handler* self, xmlDocPtr currDoc ) {
 			self->resource,
 			(const char*) rootElement->name, 
 			ROOT_NODE_NAME );
-		if( self->currDoc )
-			xmlFreeDoc( self->currDoc );
 		return False;
 	}
 	

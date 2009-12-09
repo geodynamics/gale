@@ -623,7 +623,11 @@ void IO_HandlerSuite_TestReadNonExistent( IO_HandlerSuiteData* data ) {
    Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
 
    if (0 == data->rank) {
-		IO_Handler_ReadAllFromFile( data->io_handler, notExistFilename, data->dict2 );
+		#ifdef DEBUG
+			pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, notExistFilename, data->dict2 ) );
+		#else
+			IO_Handler_ReadAllFromFile( data->io_handler, notExistFilename, data->dict2 );
+		#endif
       errorFile = fopen( errorFilename, "r" );
       pcu_check_true( errorFile );
 
@@ -647,17 +651,21 @@ void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
    Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
 
    if ( 0 == data->rank ) {
-		IO_Handler_ReadAllFromFile( data->io_handler, invalidXMLFilename, data->dict2 );
+		#ifdef DEBUG
+			pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, invalidXMLFilename, data->dict2 ) );
+		#else
+			IO_Handler_ReadAllFromFile( data->io_handler, invalidXMLFilename, data->dict2 );
+		#endif
       pcu_check_fileEq( errorFilename, expectedErrorFilename );
-      remove( errorFilename );
+      //remove( errorFilename );
    }
 }
 
 
 void IO_HandlerSuite_TestReadWrongNS( IO_HandlerSuiteData* data ) {
-   char              wrongNS_XMLFilename[PCU_PATH_MAX];
-   char              expectedErrorFilename[PCU_PATH_MAX];
-   const char*       errorFilename = "errorMsg-wrongNS.txt";
+   char			wrongNS_XMLFilename[PCU_PATH_MAX];
+   char			expectedErrorFilename[PCU_PATH_MAX];
+   const char*	errorFilename = "errorMsg-wrongNS.txt";
 
    pcu_filename_input( "WrongNS.xml", wrongNS_XMLFilename );
    pcu_filename_expected( errorFilename, expectedErrorFilename );
@@ -666,7 +674,11 @@ void IO_HandlerSuite_TestReadWrongNS( IO_HandlerSuiteData* data ) {
    Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
 
    if ( 0 == data->rank ) {
-		IO_Handler_ReadAllFromFile( data->io_handler, wrongNS_XMLFilename, data->dict2 );
+		#ifdef DEBUG
+			pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, wrongNS_XMLFilename, data->dict2 ) );
+		#else
+			IO_Handler_ReadAllFromFile( data->io_handler, wrongNS_XMLFilename, data->dict2 );
+		#endif
       pcu_check_fileEq( errorFilename, expectedErrorFilename );
       remove( errorFilename );
    }
@@ -674,9 +686,9 @@ void IO_HandlerSuite_TestReadWrongNS( IO_HandlerSuiteData* data ) {
 
 
 void IO_HandlerSuite_TestReadWrongRootNode( IO_HandlerSuiteData* data ) {
-   char          wrongRootNode_XMLFilename[PCU_PATH_MAX];
-   char          expectedErrorFilename[PCU_PATH_MAX];
-   const char*   errorFilename = "./errorMsg-wrongRootNode.txt";
+   char			wrongRootNode_XMLFilename[PCU_PATH_MAX];
+   char			expectedErrorFilename[PCU_PATH_MAX];
+   const char*	errorFilename = "./errorMsg-wrongRootNode.txt";
 
    pcu_filename_input( "WrongRootNode.xml", wrongRootNode_XMLFilename );
    pcu_filename_expected( errorFilename, expectedErrorFilename );
@@ -685,7 +697,11 @@ void IO_HandlerSuite_TestReadWrongRootNode( IO_HandlerSuiteData* data ) {
    Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
 
    if ( 0 == data->rank ) {
-		IO_Handler_ReadAllFromFile( data->io_handler, wrongRootNode_XMLFilename, data->dict2 );
+		#ifdef DEBUG
+			pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, wrongRootNode_XMLFilename, data->dict2 ) );
+		#else
+			IO_Handler_ReadAllFromFile( data->io_handler, wrongRootNode_XMLFilename, data->dict2 );
+		#endif
       pcu_check_fileEq( errorFilename, expectedErrorFilename ); 
       remove( errorFilename );
    }
