@@ -790,14 +790,13 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 
         /* More of Luke's stuff. I need an entry point for a non-linear setup operation. */
         _EntryPoint_Run_2VoidPtr( self->nlSetupEP, sle, _context );
-	
-	self->linearExecute( self, _context );
-	self->hasExecuted = True;
 
 	/*Don't know if we should include this but the timing of the outer and inner iterations starts here so it makes sense to count this one? */		
 	solver->nonlinearitsinitialtime = MPI_Wtime();
+
 	self->linearExecute( self, _context );
 	self->hasExecuted = True;
+
 	solver->nonlinearitsendtime = MPI_Wtime();
 	solver->totalnonlinearitstime = solver->totalnonlinearitstime + (-solver->nonlinearitsinitialtime + solver->nonlinearitsendtime);
 	/* reset initial time and end time for inner its back to 0 - probs don't need to do this but just in case */
