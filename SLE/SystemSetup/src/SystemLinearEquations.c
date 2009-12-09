@@ -909,11 +909,16 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	VecDestroy( previousVector );
 	
 	/*Set all the printout variables */
-	solver->avgtimenonlinearits = (solver->totalnonlinearitstime - solver->totalouteritstime)/solver->totalnumnonlinearits;
-	solver->avgnuminnerits = solver->totalnuminnerits/solver->totalnumouterits;
-	solver->avgnumouterits = solver->totalnumouterits/solver->totalnumnonlinearits;
-	solver->avgtimeouterits = (solver->totalouteritstime - solver->totalinneritstime)/solver->totalnumouterits;
-	solver->avgtimeinnerits = solver->totalinneritstime/solver->totalnuminnerits;
+        if( solver->totalnumnonlinearits ) {
+           solver->avgtimenonlinearits = (solver->totalnonlinearitstime - solver->totalouteritstime)/solver->totalnumnonlinearits;
+           solver->avgnumouterits = solver->totalnumouterits/solver->totalnumnonlinearits;
+        }
+        if( solver->totalnumouterits ) {
+           solver->avgnuminnerits = solver->totalnuminnerits/solver->totalnumouterits;
+           solver->avgtimeouterits = (solver->totalouteritstime - solver->totalinneritstime)/solver->totalnumouterits;
+        }
+        if( solver->totalnuminnerits )
+           solver->avgtimeinnerits = solver->totalinneritstime/solver->totalnuminnerits;
 	//printf("totalnumnonlinearits = %d, avgnumouterits %d, avgnuminnerits %d\n",solver->totalnumnonlinearits, solver->avgnumouterits, solver->avgnuminnerits); 
 
 }
