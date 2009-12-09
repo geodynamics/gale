@@ -97,7 +97,7 @@ void _Underworld_EulerDeform_AssignFromXML( void* component, Stg_ComponentFactor
 	edCtx->ctx = (AbstractContext*)uwCtx;
 
 	/* Get the time integrator. */
-	uwCtx->timeIntegrator = Stg_ComponentFactory_ConstructByName( cf, "timeIntegrator", TimeIntegrator, True, data );
+	edCtx->timeIntegrator = Stg_ComponentFactory_ConstructByName( cf, "timeIntegrator", TimeIntegrator, True, data );
 
 	/* Grab the ArtDisplacementField from the dictionary */
 	edCtx->artDField = Stg_ComponentFactory_ConstructByName( cf, "ArtDisplacementField", FeVariable, False, data );
@@ -223,7 +223,7 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 
 		tiData[0] = (Stg_Component*)sys->velField;
 		tiData[1] = (Stg_Component*)&sys->mesh->verts;
-		crdAdvector = TimeIntegratee_New( "EulerDeform_Velocity", (DomainContext*)uwCtx, uwCtx->timeIntegrator, crdVar, 2, tiData, True
+		crdAdvector = TimeIntegratee_New( "EulerDeform_Velocity", (DomainContext*)uwCtx, edCtx->timeIntegrator, crdVar, 2, tiData, True
 			 /* Presume we need to allow fallback on edges of stretching mesh - PatrickSunter, 7 June 2006 */ );
 		crdAdvector->_calculateTimeDeriv = EulerDeform_TimeDeriv;
 
@@ -234,13 +234,13 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 
 	if( edCtx->nSystems > 0 ) {
 		/* Insert the sync step. */
-		TimeIntegrator_PrependSetupEP( uwCtx->timeIntegrator, "EulerDeform_IntegrationSetup", EulerDeform_IntegrationSetup, "EulerDeform", edCtx );
+		TimeIntegrator_PrependSetupEP( edCtx->timeIntegrator, "EulerDeform_IntegrationSetup", EulerDeform_IntegrationSetup, "EulerDeform", edCtx );
 	}
 
 	/* Insert the remesh step. Note that this should look for the surface process
 	   plugin's time integrator finish routine and ensure we enter the remesh step
 	   after that one but before the particle updating routines. */
-	TimeIntegrator_PrependFinishEP( uwCtx->timeIntegrator, "EulerDeform_Execute", EulerDeform_Remesh, "EulerDeform", edCtx );
+	TimeIntegrator_PrependFinishEP( edCtx->timeIntegrator, "EulerDeform_Execute", EulerDeform_Remesh, "EulerDeform", edCtx );
 }
 
 

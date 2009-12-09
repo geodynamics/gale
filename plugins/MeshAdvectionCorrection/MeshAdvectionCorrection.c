@@ -201,13 +201,14 @@ void _Underworld_MeshAdvectionCorrection_AssignFromXML( void* component, Stg_Com
 	UnderworldContext*                                      context = 
 	Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 	Underworld_MeshAdvectionCorrection_ContextExt*       plugin;
+   AdvectionDiffusionSLE* energySLE = (AdvectionDiffusionSLE*) Stg_ComponentFactory_ConstructByName( cf, "EnergyEqn", UnderworldContext, True, data );
 	
 	Journal_DFirewall( 
 		(Bool)context, 
 		Journal_Register( Error_Type, Underworld_MeshAdvectionCorrection_Type ), 
 		"No context found\n" );
 	Journal_DFirewall( 
-		(Bool)context->energySLE, 
+		(Bool)energySLE, 
 		Journal_Register( Error_Type, Underworld_MeshAdvectionCorrection_Type ), 
 		"The required energy SLE component has not been created or placed on the context.\n");	
 	
@@ -227,8 +228,8 @@ void _Underworld_MeshAdvectionCorrection_AssignFromXML( void* component, Stg_Com
 	}
 
 	/* Replace the energy SLE's execute with this one. Save the old value for use later. */
-	plugin->energySolverExecute = context->energySLE->_execute;
-	context->energySLE->_execute = MeshAdvectionCorrection;
+	plugin->energySolverExecute = energySLE->_execute;
+	energySLE->_execute = MeshAdvectionCorrection;
 }
 
 /* This function will provide StGermain the abilty to instantiate (create) this codelet on demand. */

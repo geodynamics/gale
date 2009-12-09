@@ -118,11 +118,13 @@ UnderworldContext* _UnderworldContext_New(  UNDERWORLDCONTEXT_DEFARGS  ) {
 
 void _UnderworldContext_Init( UnderworldContext* self ) {
 	self->isConstructed = True;
+   /*
    self->timeIntegrator = NULL;
    self->stokesSLE = NULL;
    self->energySLE = NULL;
    self->compositionSLE = NULL;
    self->constitutiveMatrix = NULL;
+   */
 
 	/* always generate XDMF files when we generate HDF5 checkpoints */
 #ifdef WRITE_HDF5
@@ -174,10 +176,12 @@ void _UnderworldContext_Print( void* context, Stream* stream ) {
 	/* Print parent */
 	_PICelleratorContext_Print( self, stream );
 
+#if 0
 	Journal_PrintPointer( stream, self->stokesSLE );
 	Journal_PrintPointer( stream, self->energySLE );
 	Journal_PrintPointer( stream, self->compositionSLE );
 	Journal_PrintPointer( stream, self->constitutiveMatrix );
+#endif
 }
 
 
@@ -203,6 +207,7 @@ void UnderworldContext_AssignPointers( void* context, void* ptrToContext ) {
 	if ( !self->CF )
 		return;
 	
+#if 0
 	self->timeIntegrator = (TimeIntegrator*)  LiveComponentRegister_Get( self->CF->LCRegister, "timeIntegrator" );
 
 	/* Get SLEs */
@@ -210,6 +215,7 @@ void UnderworldContext_AssignPointers( void* context, void* ptrToContext ) {
 	self->energySLE = (AdvectionDiffusionSLE*) LiveComponentRegister_Get( self->CF->LCRegister, "EnergyEqn" );
 	self->compositionSLE = (AdvectionDiffusionSLE*) LiveComponentRegister_Get( self->CF->LCRegister, "CompositionEqn" );
 	self->constitutiveMatrix = (ConstitutiveMatrix*) LiveComponentRegister_Get( self->CF->LCRegister, "constitutiveMatrix" );
+#endif
 	
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
