@@ -270,7 +270,8 @@ void _CompositeVC_Destroy(void* compositeVC, void* data) {
 		
 		for (entry_I = 0; entry_I < self->itemCount; entry_I++) {
 			if (self->iOwnTbl[entry_I] && self->itemTbl[entry_I])
-				Stg_Component_Destroy( self->itemTbl[entry_I], NULL, False );
+				//Stg_Component_Destroy( self->itemTbl[entry_I], NULL, False );
+				_VariableCondition_Delete( self->itemTbl[entry_I]);
 		}
 		Memory_Free(self->itemTbl);
 	}
