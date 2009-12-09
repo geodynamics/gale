@@ -152,48 +152,38 @@ void Mesh_HexType_Update( void* hexType ) {
 
 	nDims = Mesh_GetDimSize( self->mesh );
 	for( d_i = 0; d_i < nDims; d_i++ ) {
-		if( Class_IsSuper( self->mesh->topo, IGraph ) && 
-		    (!Mesh_GetGlobalSize( self->mesh, d_i ) || !Mesh_HasIncidence( self->mesh, nDims, d_i )) )
-		{
+		if( Class_IsSuper( self->mesh->topo, IGraph ) && (!Mesh_GetGlobalSize( self->mesh, d_i ) || !Mesh_HasIncidence( self->mesh, nDims, d_i )) ) {
 			break;
 		}
 	}
 
 	if( Mesh_GetDimSize( self->mesh ) == 3 ) {
 		if( d_i == nDims ) {
-			self->elementHasPoint = 
-				(Mesh_ElementType_ElementHasPointFunc*)Mesh_HexType_ElementHasPoint3DWithIncidence;
+			self->elementHasPoint = (Mesh_ElementType_ElementHasPointFunc*)Mesh_HexType_ElementHasPoint3DWithIncidence;
 		}
 		else {
-			self->elementHasPoint = 
-				(Mesh_ElementType_ElementHasPointFunc*)Mesh_HexType_ElementHasPoint3DGeneral;
+			self->elementHasPoint = (Mesh_ElementType_ElementHasPointFunc*)Mesh_HexType_ElementHasPoint3DGeneral;
 		}
 	}
 	else if( Mesh_GetDimSize( self->mesh ) == 2 ) {
 		if( d_i == nDims ) {
-			self->elementHasPoint = 
-				(Mesh_ElementType_ElementHasPointFunc*)Mesh_HexType_ElementHasPoint2DWithIncidence;
+			self->elementHasPoint = (Mesh_ElementType_ElementHasPointFunc*)Mesh_HexType_ElementHasPoint2DWithIncidence;
 		}
 		else {
-			self->elementHasPoint = 
-				(Mesh_ElementType_ElementHasPointFunc*)Mesh_HexType_ElementHasPoint2DGeneral;
+			self->elementHasPoint = (Mesh_ElementType_ElementHasPointFunc*)Mesh_HexType_ElementHasPoint2DGeneral;
 		}
 	}
 	else {
 		if( d_i == nDims ) {
-			self->elementHasPoint = 
-				(Mesh_ElementType_ElementHasPointFunc*)Mesh_HexType_ElementHasPoint1DWithIncidence;
+			self->elementHasPoint = (Mesh_ElementType_ElementHasPointFunc*)Mesh_HexType_ElementHasPoint1DWithIncidence;
 		}
 		else {
-			self->elementHasPoint = 
-				(Mesh_ElementType_ElementHasPointFunc*)Mesh_HexType_ElementHasPoint1DGeneral;
+			self->elementHasPoint = (Mesh_ElementType_ElementHasPointFunc*)Mesh_HexType_ElementHasPoint1DGeneral;
 		}
 	}
 }
 
-Bool Mesh_HexType_ElementHasPoint( void* hexType, unsigned elInd, double* point, 
-				   MeshTopology_Dim* dim, unsigned* ind )
-{
+Bool Mesh_HexType_ElementHasPoint( void* hexType, unsigned elInd, double* point, MeshTopology_Dim* dim, unsigned* ind ) {
 	Mesh_HexType*	self = (Mesh_HexType*)hexType;
 
 	assert( self && Stg_CheckType( self, Mesh_HexType ) );
@@ -205,18 +195,16 @@ Bool Mesh_HexType_ElementHasPoint( void* hexType, unsigned elInd, double* point,
 
 double Mesh_HexType_GetMinimumSeparation( void* hexType, unsigned elInd, double* perDim ) {
 	Mesh_HexType*	self = (Mesh_HexType*)hexType;
-	Mesh*		mesh;
-	unsigned*	map;
-	double		curSep;
-	double*		dimSep;
-	unsigned	nInc;
-	const int	*inc;
+	unsigned*		map = NULL;
+	double			curSep = 0.0;
+	double*			dimSep = NULL;
+	unsigned			nInc = 0;
+	unsigned			e_i;
+	int				*inc = NULL;
 
 	assert( self );
 	assert( elInd < Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ) );
 	assert( Mesh_GetDimSize( self->mesh ) <= 3 );
-
-	mesh = self->mesh;
 
 	/*
 	** We know we're a hexahedral element but we may not be regular.  This algorithm (originally from
@@ -224,77 +212,79 @@ double Mesh_HexType_GetMinimumSeparation( void* hexType, unsigned elInd, double*
 	** close.
 	*/
 
-	dimSep = AllocArray( double, Mesh_GetDimSize( mesh ) );
+	dimSep = AllocArray( double, Mesh_GetDimSize( self->mesh ) );
 
-	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
+	for( e_i = 0; e_i > Mesh_GetDimSize( self->mesh ); e_i++ )
+		dimSep[e_i] = 0.0;
+
+	Mesh_GetIncidence( self->mesh, Mesh_GetDimSize( self->mesh ), elInd, MT_VERTEX, self->incArray );
 	nInc = IArray_GetSize( self->incArray );
 	inc = IArray_GetPtr( self->incArray );
 	map = self->vertMap;
 
-	curSep = Mesh_GetVertex( mesh, inc[map[1]] )[0] - Mesh_GetVertex( mesh, inc[map[0]] )[0];
-	dimSep[0] = curSep;
+	curSep = Mesh_GetVertex( self->mesh, inc[map[1]] )[0] - Mesh_GetVertex( self->mesh, inc[map[0]] )[0];
+	dimSep[0] = curSep;	
 
-	if( Mesh_GetDimSize( mesh ) >= 2 ) {
-		curSep = Mesh_GetVertex( mesh, inc[map[3]] )[0] - Mesh_GetVertex( mesh, inc[map[2]] )[0];
+	if( Mesh_GetDimSize( self->mesh ) >= 2 ) {
+		curSep = Mesh_GetVertex( self->mesh, inc[map[3]] )[0] - Mesh_GetVertex( self->mesh, inc[map[2]] )[0];
 		if( curSep < dimSep[0] )
 			dimSep[0] = curSep;
 	}
 
-	if( Mesh_GetDimSize( mesh ) == 3 ) {
-		curSep = Mesh_GetVertex( mesh, inc[map[5]] )[0] - Mesh_GetVertex( mesh, inc[map[4]] )[0];
+	if( Mesh_GetDimSize( self->mesh ) == 3 ) {
+		curSep = Mesh_GetVertex( self->mesh, inc[map[5]] )[0] - Mesh_GetVertex( self->mesh, inc[map[4]] )[0];
 		if( curSep < dimSep[0] )
 			dimSep[0] = curSep;
 
-		curSep = Mesh_GetVertex( mesh, inc[map[7]] )[0] - Mesh_GetVertex( mesh, inc[map[6]] )[0];
+		curSep = Mesh_GetVertex( self->mesh, inc[map[7]] )[0] - Mesh_GetVertex( self->mesh, inc[map[6]] )[0];
 		if( curSep < dimSep[0] )
 			dimSep[0] = curSep;
 	}
 
-	if( Mesh_GetDimSize( mesh ) >= 2 ) {
-		curSep = Mesh_GetVertex( mesh, inc[map[2]] )[1] - Mesh_GetVertex( mesh, inc[map[0]] )[1];
-		dimSep[1] = curSep;
+	if( Mesh_GetDimSize( self->mesh ) >= 2 ) {
+		dimSep[1] = Mesh_GetVertex( self->mesh, inc[map[2]] )[1] - Mesh_GetVertex( self->mesh, inc[map[0]] )[1];
 
-		curSep = Mesh_GetVertex( mesh, inc[map[3]] )[1] - Mesh_GetVertex( mesh, inc[map[1]] )[1];
+		curSep = Mesh_GetVertex( self->mesh, inc[map[3]] )[1] - Mesh_GetVertex( self->mesh, inc[map[1]] )[1];
 		if( curSep < dimSep[1] )
 			dimSep[1] = curSep;
 	}
 
-	if( Mesh_GetDimSize( mesh ) == 3 ) {
-		curSep = Mesh_GetVertex( mesh, inc[map[6]] )[1] - Mesh_GetVertex( mesh, inc[map[4]] )[1];
+	if( Mesh_GetDimSize( self->mesh ) == 3 ) {
+		curSep = Mesh_GetVertex( self->mesh, inc[map[6]] )[1] - Mesh_GetVertex( self->mesh, inc[map[4]] )[1];
 		if( curSep < dimSep[1] )
 			dimSep[1] = curSep;
 
-		curSep = Mesh_GetVertex( mesh, inc[map[7]] )[1] - Mesh_GetVertex( mesh, inc[map[5]] )[1];
+		curSep = Mesh_GetVertex( self->mesh, inc[map[7]] )[1] - Mesh_GetVertex( self->mesh, inc[map[5]] )[1];
 		if( curSep < dimSep[1] )
 			dimSep[1] = curSep;
 	}
 
-	if( Mesh_GetDimSize( mesh ) == 3 ) {
-		curSep = Mesh_GetVertex( mesh, inc[map[4]] )[2] - Mesh_GetVertex( mesh, inc[map[0]] )[2];
+	if( Mesh_GetDimSize( self->mesh ) == 3 ) {
+		curSep = Mesh_GetVertex( self->mesh, inc[map[4]] )[2] - Mesh_GetVertex( self->mesh, inc[map[0]] )[2];
 		dimSep[2] = curSep;
 
-		curSep = Mesh_GetVertex( mesh, inc[map[5]] )[2] - Mesh_GetVertex( mesh, inc[map[1]] )[2];
+		curSep = Mesh_GetVertex( self->mesh, inc[map[5]] )[2] - Mesh_GetVertex( self->mesh, inc[map[1]] )[2];
 		if( curSep < dimSep[2] )
 			dimSep[2] = curSep;
 
-		curSep = Mesh_GetVertex( mesh, inc[map[6]] )[2] - Mesh_GetVertex( mesh, inc[map[2]] )[2];
+		curSep = Mesh_GetVertex( self->mesh, inc[map[6]] )[2] - Mesh_GetVertex( self->mesh, inc[map[2]] )[2];
 		if ( curSep < dimSep[2] )
 			dimSep[2] = curSep;
 
-		curSep = Mesh_GetVertex( mesh, inc[map[7]] )[2] - Mesh_GetVertex( mesh, inc[map[3]] )[2];
+		curSep = Mesh_GetVertex( self->mesh, inc[map[7]] )[2] - Mesh_GetVertex( self->mesh, inc[map[3]] )[2];
 		if ( curSep < dimSep[2] )
 			dimSep[2] = curSep;
 	}
 
 	curSep = dimSep[0];
-	if( Mesh_GetDimSize( mesh ) >= 2 ) {
+	if( Mesh_GetDimSize( self->mesh ) >= 2 ) {
 		curSep = dimSep[1] < curSep ? dimSep[1] : curSep;
-		if ( Mesh_GetDimSize( mesh ) == 3 )
+		if ( Mesh_GetDimSize( self->mesh ) == 3 )
 			curSep = dimSep[2] < curSep ? dimSep[2] : curSep;
 	}
 
 	if( perDim )
-		memcpy( perDim, dimSep, Mesh_GetDimSize( mesh ) * sizeof(double) );
+		memcpy( perDim, dimSep, Mesh_GetDimSize( self->mesh ) * sizeof(double) );
 
 	FreeArray( dimSep );
 

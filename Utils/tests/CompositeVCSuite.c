@@ -212,7 +212,6 @@ void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
    }
 
 	_Stg_Component_Delete(cvc);
-	_Stg_Component_Delete(vc);
 	Stg_Class_Delete(variable_Register);
 	for (i = 0; i < 7; i++) {
 		_Stg_Component_Delete(var[i]);

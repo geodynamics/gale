@@ -577,41 +577,33 @@ void CartesianGenerator_Generate( void* meshGenerator, void* _mesh, void* data )
 
 	/* Add extensions to the mesh and fill with cartesian information. */
 	ExtensionManager_Add( mesh->info, "vertexGrid", sizeof(Grid*) );
-	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, 
-					     ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
 	*grid = Grid_New();
 	Grid_SetNumDims( *grid, self->vertGrid->nDims );
 	Grid_SetSizes( *grid, self->vertGrid->sizes );
 
 	ExtensionManager_Add( mesh->info, "elementGrid", sizeof(Grid*) );
-	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, 
-					     ExtensionManager_GetHandle( mesh->info, "elementGrid" ) );
+	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "elementGrid" ) );
 	*grid = Grid_New();
 	Grid_SetNumDims( *grid, self->elGrid->nDims );
 	Grid_SetSizes( *grid, self->elGrid->sizes );
 
 	ExtensionManager_AddArray( mesh->info, "localOrigin", sizeof(unsigned), Mesh_GetDimSize( mesh ) );
-	localOrigin = (unsigned*)ExtensionManager_Get( mesh->info, mesh, 
-						       ExtensionManager_GetHandle( mesh->info, "localOrigin" ) );
+	localOrigin = (unsigned*)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "localOrigin" ) );
 	memcpy( localOrigin, self->origin, Mesh_GetDimSize( mesh ) * sizeof(unsigned) );
 
 	ExtensionManager_AddArray( mesh->info, "localRange", sizeof(unsigned), Mesh_GetDimSize( mesh ) );
-	localRange = (unsigned*)ExtensionManager_Get( mesh->info, mesh, 
-						      ExtensionManager_GetHandle( mesh->info, "localRange" ) );
+	localRange = (unsigned*)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "localRange" ) );
 	memcpy( localRange, self->range, Mesh_GetDimSize( mesh ) * sizeof(unsigned) );
 
 	ExtensionManager_AddArray( mesh->info, "periodic", sizeof(Bool), 3 );
-	periodic = (Bool*)ExtensionManager_Get(
-		mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "periodic" )
-		);
+	periodic = (Bool*)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "periodic" ));
 	memcpy( periodic, self->periodic, 3 * sizeof(Bool) );
 
 	Stream_UnIndent( stream );
 }
 
-void _CartesianGenerator_SetTopologyParams( void* meshGenerator, unsigned* sizes, 
-					    unsigned maxDecompDims, unsigned* minDecomp, unsigned* maxDecomp )
-{
+void _CartesianGenerator_SetTopologyParams( void* meshGenerator, unsigned* sizes, unsigned maxDecompDims, unsigned* minDecomp, unsigned* maxDecomp ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	unsigned		d_i;
 
