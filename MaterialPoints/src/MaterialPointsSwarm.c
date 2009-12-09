@@ -166,8 +166,12 @@ void _MaterialPointsSwarm_Init(
 		"PositionX",
 		"PositionY",
 		"PositionZ" );
+   LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->particleCoordVariable->variable );
+   LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->particleCoordVariable );
 
 	self->materialIndexVariable = Swarm_NewScalarVariable( self, "MaterialIndex", GetOffsetOfMember( particle , materialIndex ), Variable_DataType_Int ); /* Should be unsigned int */
+   LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->materialIndexVariable->variable );
+   LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->materialIndexVariable );
 
 	/* If we have an escaped routine, clear the defensive flag. */
 #if 0

@@ -238,6 +238,9 @@ void _IntegrationPointsSwarm_Init(
 			GetOffsetOfMember( particle , weight ), 
 			Variable_DataType_Double );
 
+   LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->weightVariable );
+   LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->weightVariable->variable );
+
 	self->localCoordVariable = Swarm_NewVectorVariable(
 		self,
 		"LocalElCoord",
@@ -247,6 +250,8 @@ void _IntegrationPointsSwarm_Init(
 		"Xi",
 		"Eta",
 		"Zeta" );
+   LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->localCoordVariable );
+   LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->localCoordVariable->variable );
 
 	if ( timeIntegrator ) {
 		/* Assuming this is called from _IntegrationPointsSwarm_AssignFromXML, it would have always called construct
