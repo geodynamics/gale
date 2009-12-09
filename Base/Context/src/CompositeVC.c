@@ -261,8 +261,8 @@ void _CompositeVC_Destroy(void* compositeVC, void* data) {
 
 	if( self->indepItems ) {
 		for( ii = 0; ii < self->nIndepItems; ii++ )
-			Stg_Class_Delete( self->indepItems[ii] );
-		FreeArray( self->indepItems );
+         _VariableCondition_Delete( self->indepItems[ii]);
+		Memory_Free( self->indepItems );
 	}
 	
 	if (self->itemTbl) {
@@ -279,6 +279,8 @@ void _CompositeVC_Destroy(void* compositeVC, void* data) {
 	if( self->attachedSets ) {
 		Memory_Free( self->attachedSets );
 	}
+
+   Stg_Component_Destroy( self->data, NULL, False );
 
 	_VariableCondition_Destroy( self, data );
 }
