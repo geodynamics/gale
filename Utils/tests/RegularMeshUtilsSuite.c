@@ -132,6 +132,7 @@ void RegularMeshUtilsSuite_TestMeshUtils( RegularMeshUtilsSuiteData* data ) {
 		NewClass_Delete( inc );
 		remove( "regularMeshUtils.dat" );
 	}
+	Stg_Class_Delete(extensionMgr_Register);
 }
 	
 void RegularMeshUtilsSuite( pcu_suite_t* suite ) {
