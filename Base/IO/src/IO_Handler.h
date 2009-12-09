@@ -45,8 +45,7 @@
 	typedef void (IO_Handler_DeleteFunction) (void* io_handler);
 	typedef void (IO_Handler_PrintFunction) (void* io_handler);
 	typedef Bool (IO_Handler_ReadAllFromFileFunction) (void* io_handler, const char* filename, Dictionary* dictionary );
-	typedef Bool (IO_Handler_ReadAllFromFileForceSourceFunction) (void* io_handler, const char* filename, 
-									Dictionary* dictionary );
+	typedef Bool (IO_Handler_ReadAllFromFileForceSourceFunction) (void* io_handler, const char* filename, Dictionary* dictionary );
 	typedef Bool (IO_Handler_ReadAllFromBufferFunction) (void* io_handler, const char* buffer, Dictionary* dictionary );
 	typedef Bool (IO_Handler_WriteAllToFileFunction) (void* io_handler, const char* filename, Dictionary* dictionary );
 	typedef Bool (IO_Handler_DictSetAddValueFunction)
@@ -67,17 +66,17 @@
 		__Stg_Class \
 		\
 		/* Virtual info */ \
-		IO_Handler_ReadAllFromFileFunction*	_readAllFromFile; \
+		IO_Handler_ReadAllFromFileFunction*					_readAllFromFile; \
 		IO_Handler_ReadAllFromFileForceSourceFunction*	_readAllFromFileForceSource; \
-		IO_Handler_ReadAllFromBufferFunction*	_readAllFromBuffer; \
-		IO_Handler_WriteAllToFileFunction*	_writeAllToFile; \
+		IO_Handler_ReadAllFromBufferFunction*				_readAllFromBuffer; \
+		IO_Handler_WriteAllToFileFunction*					_writeAllToFile; \
 		\
 		/* IO_Handler info */ \
-		Dictionary*				currDictionary; \
-		char*					resource; \
-		char*					currPath; \
-		char*					schema; \
-		int           validate;
+		Dictionary*	currDictionary; \
+		char*			resource; \
+		char*			currPath; \
+		char*			schema; \
+		int			validate;
 	struct _IO_Handler { __IO_Handler };
 	
 	/* No "IO_Handler_New" and "IO_Handler_Init" as this is an abstract class */

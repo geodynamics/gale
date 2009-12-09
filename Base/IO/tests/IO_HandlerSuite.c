@@ -61,18 +61,13 @@ typedef struct {
 } IO_HandlerSuiteData;
 
 
-void _IO_HandlerSuite_CreateTestXMLFile( const char* testXMLFilename,
-     const char* entriesString )
-{
+void _IO_HandlerSuite_CreateTestXMLFile( const char* testXMLFilename, const char* entriesString ) {
    FILE*         testFile = NULL;
    testFile = fopen(testXMLFilename, "w");
-   fwrite( IO_HandlerSuite_XMLStartString1, sizeof(char),
-      strlen( IO_HandlerSuite_XMLStartString1 ), testFile );
-   fwrite( IO_HandlerSuite_XMLStartString2, sizeof(char),
-      strlen( IO_HandlerSuite_XMLStartString2 ), testFile );
+   fwrite( IO_HandlerSuite_XMLStartString1, sizeof(char), strlen( IO_HandlerSuite_XMLStartString1 ), testFile );
+   fwrite( IO_HandlerSuite_XMLStartString2, sizeof(char), strlen( IO_HandlerSuite_XMLStartString2 ), testFile );
    fwrite( entriesString, sizeof(char), strlen( entriesString ), testFile );
-   fwrite( IO_HandlerSuite_XMLEndString, sizeof(char),
-      strlen( IO_HandlerSuite_XMLEndString ), testFile );
+   fwrite( IO_HandlerSuite_XMLEndString, sizeof(char), strlen( IO_HandlerSuite_XMLEndString ), testFile );
    fclose( testFile );
 }
 
@@ -124,10 +119,8 @@ void IO_HandlerSuite_TestWriteReadNormalEntries( IO_HandlerSuiteData* data ) {
    pcu_check_true( data->dict1->count == data->dict2->count );
    if ( data->dict1->count == data->dict2->count ) {
       for (ii=0; ii<data->dict1->count; ii++) {
-         pcu_check_true( Dictionary_Entry_Compare( data->dict1->entryPtr[ii],
-            data->dict2->entryPtr[ii]->key) );
-         pcu_check_true( Dictionary_Entry_Value_Compare( data->dict1->entryPtr[ii]->value,
-            data->dict2->entryPtr[ii]->value) );
+         pcu_check_true( Dictionary_Entry_Compare( data->dict1->entryPtr[ii], data->dict2->entryPtr[ii]->key) );
+         pcu_check_true( Dictionary_Entry_Value_Compare( data->dict1->entryPtr[ii]->value, data->dict2->entryPtr[ii]->value) );
       }
    }
 
@@ -148,10 +141,7 @@ void IO_HandlerSuite_TestWriteReadNormalSingleEntry( IO_HandlerSuiteData* data )
 
    for (ii=0; ii<data->dict1->count; ii++) {
       if (data->rank == 0) {
-         XML_IO_Handler_WriteEntryToFile( data->io_handler, fileName,
-            data->testDD->testKeys[ii],
-            data->testDD->testValues[ii], 
-            NULL );
+         XML_IO_Handler_WriteEntryToFile( data->io_handler, fileName, data->testDD->testKeys[ii], data->testDD->testValues[ii], NULL );
       }
 
       for ( rank_I=0; rank_I< data->nProcs; rank_I++ ) {
@@ -163,10 +153,8 @@ void IO_HandlerSuite_TestWriteReadNormalSingleEntry( IO_HandlerSuiteData* data )
 
       pcu_check_true( 1 == data->dict2->count );
       if ( 1 == data->dict2->count ) {
-         pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
-            data->testDD->testKeys[ii]) );
-         pcu_check_true( Dictionary_Entry_Value_Compare( data->dict2->entryPtr[0]->value,
-            data->testDD->testValues[ii] ) );
+         pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0], data->testDD->testKeys[ii]) );
+         pcu_check_true( Dictionary_Entry_Value_Compare( data->dict2->entryPtr[0]->value, data->testDD->testValues[ii] ) );
       }
 
       Dictionary_Empty( data->dict2 );
@@ -236,8 +224,7 @@ void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
       IO_Handler_WriteAllToFile( data->io_handler, testFilename, data->dict1 );
    }
 
-   explicitTypesExpectedFilename = Memory_Alloc_Array_Unnamed( char, 
-      pcu_filename_expectedLen( "explicitTypesExpected.xml" ));
+   explicitTypesExpectedFilename = Memory_Alloc_Array_Unnamed( char, pcu_filename_expectedLen( "explicitTypesExpected.xml" ));
    pcu_filename_expected( "explicitTypesExpected.xml", explicitTypesExpectedFilename );
    pcu_check_fileEq( testFilename, explicitTypesExpectedFilename );
 
@@ -258,8 +245,7 @@ void IO_HandlerSuite_TestReadWhitespaceEntries( IO_HandlerSuiteData* data ) {
    Index             rank_I;
 
    if( data->rank==0 ) {
-      Stg_asprintf( &whiteSpacesEntry, "<param name=\"    %s   \"> \t %s \n\t</param>\n",
-         testKey, testValString );
+      Stg_asprintf( &whiteSpacesEntry, "<param name=\"    %s   \"> \t %s \n\t</param>\n", testKey, testValString );
       _IO_HandlerSuite_CreateTestXMLFile( testFilename, whiteSpacesEntry );
       Memory_Free( whiteSpacesEntry );
    }
@@ -274,8 +260,7 @@ void IO_HandlerSuite_TestReadWhitespaceEntries( IO_HandlerSuiteData* data ) {
 
    pcu_check_true( 1 == data->dict2->count );
    if ( 1 == data->dict2->count ) {
-      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
-         (Dictionary_Entry_Key)testKey) );
+      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0], (Dictionary_Entry_Key)testKey) );
       pcu_check_streq( Dictionary_Entry_Value_AsString( data->dict2->entryPtr[0]->value ), testValString );
    }
 
@@ -313,13 +298,11 @@ void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
       char*             searchPathLine = NULL;
       char*             includeLineSP = NULL;
 
-      Stg_asprintf( &xmlEntry, "<param name=\"%s\">%s</param>\n",
-         testKey, testValString );
+      Stg_asprintf( &xmlEntry, "<param name=\"%s\">%s</param>\n", testKey, testValString );
       Stg_asprintf( &includeLine, "<include>%s</include>\n", testIncludedFilename );
       Stg_asprintf( &searchPathLine, "<searchPath>%s</searchPath>\n", testSearchPathSubdir );
       Stg_asprintf( &includeLineSP, "<include>%s</include>\n", testIncludedFilenameSP );
-      Stg_asprintf( &xmlTestEntries, "%s%s%s%s", xmlEntry, includeLine, searchPathLine,
-         includeLineSP );
+      Stg_asprintf( &xmlTestEntries, "%s%s%s%s", xmlEntry, includeLine, searchPathLine, includeLineSP );
       _IO_HandlerSuite_CreateTestXMLFile( testFilename, xmlTestEntries );
       Memory_Free( xmlEntry );
       Memory_Free( includeLine );
@@ -349,14 +332,11 @@ void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
 
    pcu_check_true( 3 == data->dict2->count );
    if ( 3 == data->dict2->count ) {
-      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
-         (Dictionary_Entry_Key)testKey) );
+      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0], (Dictionary_Entry_Key)testKey) );
       pcu_check_streq( Dictionary_Entry_Value_AsString( data->dict2->entryPtr[0]->value ), testValString );
-      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[1],
-         (Dictionary_Entry_Key)testKeyInc) );
+      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[1], (Dictionary_Entry_Key)testKeyInc) );
       pcu_check_streq( Dictionary_Entry_Value_AsString( data->dict2->entryPtr[1]->value ), testValStringInc );
-      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[2],
-         (Dictionary_Entry_Key)testKeyIncSP) );
+      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[2], (Dictionary_Entry_Key)testKeyIncSP) );
       pcu_check_streq( Dictionary_Entry_Value_AsString( data->dict2->entryPtr[2]->value ), testValStringIncSP );
    }
 
@@ -405,10 +385,8 @@ void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
       Bool                    boolVal = False;
 
       pcu_check_true( 2 == data->dict2->count );
-      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
-         (Dictionary_Entry_Key)list1Name) );
-      pcu_check_true( Dictionary_Entry_Value_Type_List ==
-         data->dict2->entryPtr[0]->value->type );
+      pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0], (Dictionary_Entry_Key)list1Name) );
+      pcu_check_true( Dictionary_Entry_Value_Type_List == data->dict2->entryPtr[0]->value->type );
       for (ii=0; ii < list1EntryCount; ii++ ) {
          dev = Dictionary_Entry_Value_GetElement( data->dict2->entryPtr[0]->value, ii );
          intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember( dev, "0" ) );
@@ -493,10 +471,8 @@ void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data ) {
     *  separate files. */
    pcu_check_true( data->dict1->count == data->dict2->count );
    for (ii=0; ii<data->dict1->count; ii++) {
-      pcu_check_true( Dictionary_Entry_Compare( data->dict1->entryPtr[ii],
-         data->dict2->entryPtr[ii]->key) );
-      pcu_check_true( Dictionary_Entry_Value_Compare( data->dict1->entryPtr[ii]->value,
-         data->dict2->entryPtr[ii]->value) );
+      pcu_check_true( Dictionary_Entry_Compare( data->dict1->entryPtr[ii], data->dict2->entryPtr[ii]->key) );
+      pcu_check_true( Dictionary_Entry_Value_Compare( data->dict1->entryPtr[ii]->value, data->dict2->entryPtr[ii]->value) );
    }
 
 
@@ -550,14 +526,12 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFilename1, data->dict2 );
 
    pcu_check_true( 1 == data->dict2->count );
-   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
-      (Dictionary_Entry_Key)struct1Name) );
+   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0], (Dictionary_Entry_Key)struct1Name) );
    structDev = data->dict2->entryPtr[0]->value;
    pcu_check_true( Dictionary_Entry_Value_Type_Struct == structDev->type );
    pcu_check_true( struct1_OrigParamCount == Dictionary_Entry_Value_GetCount( structDev ) );
    for (ii=0; ii < struct1_OrigParamCount; ii++ ) {
-      elementDev = Dictionary_Entry_Value_GetMember( structDev,
-         (Dictionary_Entry_Key)paramNames2[ii] );
+      elementDev = Dictionary_Entry_Value_GetMember( structDev, (Dictionary_Entry_Key)paramNames2[ii] );
       pcu_check_true( paramVals2[ii] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
    }
    Dictionary_Empty( data->dict2 );
@@ -568,25 +542,21 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
 
    pcu_check_true( 2 == data->dict2->count );
    /* First entry should be unchanged */
-   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
-      (Dictionary_Entry_Key)struct1Name) );
+   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0], (Dictionary_Entry_Key)struct1Name) );
    structDev = data->dict2->entryPtr[0]->value;
    pcu_check_true( Dictionary_Entry_Value_Type_Struct == structDev->type );
    pcu_check_true( struct1_OrigParamCount == Dictionary_Entry_Value_GetCount( structDev ) );
    for (ii=0; ii < struct1_OrigParamCount; ii++ ) {
-      elementDev = Dictionary_Entry_Value_GetMember( structDev,
-         (Dictionary_Entry_Key)paramNames[ii] );
+      elementDev = Dictionary_Entry_Value_GetMember( structDev, (Dictionary_Entry_Key)paramNames[ii] );
       pcu_check_true( paramVals[ii] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
    }
    /* Second entry should be struct2 */
-   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[1],
-      (Dictionary_Entry_Key)struct1Name) );
+   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[1], (Dictionary_Entry_Key)struct1Name) );
    structDev = data->dict2->entryPtr[1]->value;
    pcu_check_true( Dictionary_Entry_Value_Type_Struct == structDev->type );
    pcu_check_true( struct1_OrigParamCount == Dictionary_Entry_Value_GetCount( structDev ) );
    for (ii=0; ii < struct1_OrigParamCount; ii++ ) {
-      elementDev = Dictionary_Entry_Value_GetMember( structDev,
-         (Dictionary_Entry_Key)paramNames[ii] );
+      elementDev = Dictionary_Entry_Value_GetMember( structDev, (Dictionary_Entry_Key)paramNames[ii] );
       pcu_check_true( paramVals2[ii] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
    }
    Dictionary_Empty( data->dict2 );
@@ -597,8 +567,7 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFilename3_1, data->dict2 );
 
    pcu_check_true( 1 == data->dict2->count );
-   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
-      (Dictionary_Entry_Key)struct1Name) );
+   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0], (Dictionary_Entry_Key)struct1Name) );
    structDev = data->dict2->entryPtr[0]->value;
    structDict = structDev->as.typeStruct;
    pcu_check_true( Dictionary_Entry_Value_Type_Struct == structDev->type );
@@ -623,8 +592,7 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    IO_Handler_ReadAllFromFile( data->io_handler, xmlTestFilename3_2, data->dict2 );
 
    pcu_check_true( 1 == data->dict2->count );
-   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0],
-      (Dictionary_Entry_Key)struct1Name) );
+   pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[0], (Dictionary_Entry_Key)struct1Name) );
    structDev = data->dict2->entryPtr[0]->value;
    structDict = structDev->as.typeStruct;
    pcu_check_true( Dictionary_Entry_Value_Type_Struct == structDev->type );
@@ -655,13 +623,12 @@ void IO_HandlerSuite_TestReadNonExistent( IO_HandlerSuiteData* data ) {
    Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
 
    if (0 == data->rank) {
-      pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, notExistFilename, data->dict2 ) );
+		IO_Handler_ReadAllFromFile( data->io_handler, notExistFilename, data->dict2 );
       errorFile = fopen( errorFilename, "r" );
       pcu_check_true( errorFile );
 
       pcu_check_true( fgets( errorLine, MAXLINE, errorFile ) );
-      sprintf( expectedErrorMsg, "Error: File %s doesn't exist, not readable, or not valid.\n",
-         notExistFilename );
+      sprintf( expectedErrorMsg, "Error: File %s doesn't exist, not readable, or not valid.\n", notExistFilename );
       pcu_check_streq( errorLine, expectedErrorMsg );
       remove( errorFilename );
    }
@@ -680,7 +647,7 @@ void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
    Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
 
    if ( 0 == data->rank ) {
-      pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, invalidXMLFilename, data->dict2 ) );
+		IO_Handler_ReadAllFromFile( data->io_handler, invalidXMLFilename, data->dict2 );
       pcu_check_fileEq( errorFilename, expectedErrorFilename );
       remove( errorFilename );
    }
@@ -699,7 +666,7 @@ void IO_HandlerSuite_TestReadWrongNS( IO_HandlerSuiteData* data ) {
    Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
 
    if ( 0 == data->rank ) {
-      pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, wrongNS_XMLFilename, data->dict2 ) );
+		IO_Handler_ReadAllFromFile( data->io_handler, wrongNS_XMLFilename, data->dict2 );
       pcu_check_fileEq( errorFilename, expectedErrorFilename );
       remove( errorFilename );
    }
@@ -718,7 +685,7 @@ void IO_HandlerSuite_TestReadWrongRootNode( IO_HandlerSuiteData* data ) {
    Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
 
    if ( 0 == data->rank ) {
-      pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, wrongRootNode_XMLFilename, data->dict2 ) );
+		IO_Handler_ReadAllFromFile( data->io_handler, wrongRootNode_XMLFilename, data->dict2 );
       pcu_check_fileEq( errorFilename, expectedErrorFilename ); 
       remove( errorFilename );
    }

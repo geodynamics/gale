@@ -81,26 +81,26 @@
 		__IO_Handler \
 		\
 		/* Virtual info */ \
-		XML_IO_Handler_WriteEntryToFileFunction*	_writeEntryToFile; \
-		XML_IO_Handler_SetListEncodingFunction*		_setListEncoding; \
-		XML_IO_Handler_SetWritingPrecisionFunction*	_setWritingPrecision; \
+		XML_IO_Handler_WriteEntryToFileFunction*			_writeEntryToFile; \
+		XML_IO_Handler_SetListEncodingFunction*			_setListEncoding; \
+		XML_IO_Handler_SetWritingPrecisionFunction*		_setWritingPrecision; \
 		XML_IO_Handler_SetWriteExplicitTypesFunction*	_setWriteExplicitTypes; \
 		\
 		/* XML_IO_Handler */ \
-		NameSpaceInfo*					nameSpacesList;	/**< Allows chain of namespaces. */\
-		xmlDocPtr					currDoc; \
-		xmlNsPtr					currNameSpace; \
-		int						tokeniserCalls; \
-		ListEncoding					listEncoding; \
-		Stg_ObjectList*					typeKeywords; /**< Maps strings to dictionary types. */\
-		char*						TYPE_KEYWORDS[Dictionary_Entry_Value_Num_Types + 1]; \
-		unsigned int					writingPrecision[Dictionary_Entry_Value_Num_Types + 1]; \
-		unsigned int					writingFieldWidth[Dictionary_Entry_Value_Num_Types + 1]; \
-		unsigned int					WRITING_FIELD_EXTRAS[Dictionary_Entry_Value_Num_Types + 1]; \
-		Bool						writeExplicitTypes; \
+		NameSpaceInfo*		nameSpacesList;	/**< Allows chain of namespaces. */\
+		xmlDocPtr			currDoc; \
+		xmlNsPtr				currNameSpace; \
+		int					tokeniserCalls; \
+		ListEncoding		listEncoding; \
+		Stg_ObjectList*	typeKeywords; /**< Maps strings to dictionary types. */\
+		char*					TYPE_KEYWORDS[Dictionary_Entry_Value_Num_Types + 1]; \
+		unsigned int		writingPrecision[Dictionary_Entry_Value_Num_Types + 1]; \
+		unsigned int		writingFieldWidth[Dictionary_Entry_Value_Num_Types + 1]; \
+		unsigned int		WRITING_FIELD_EXTRAS[Dictionary_Entry_Value_Num_Types + 1]; \
+		Bool					writeExplicitTypes; \
 		\
-		unsigned					searchPathsSize; \
-		char**						searchPaths;
+		unsigned				searchPathsSize; \
+		char**				searchPaths;
 	struct _XML_IO_Handler { __XML_IO_Handler };
 	
 	
@@ -114,18 +114,18 @@
 	#endif
 
 	#define XML_IO_HANDLER_DEFARGS \
-                IO_HANDLER_DEFARGS, \
-                XML_IO_Handler_WriteEntryToFileFunction*            _writeEntryToFile, \
-                XML_IO_Handler_SetListEncodingFunction*              _setListEncoding, \
-                XML_IO_Handler_SetWritingPrecisionFunction*      _setWritingPrecision, \
-                XML_IO_Handler_SetWriteExplicitTypesFunction*  _setWriteExplicitTypes
+		IO_HANDLER_DEFARGS, \
+			XML_IO_Handler_WriteEntryToFileFunction*			_writeEntryToFile, \
+			XML_IO_Handler_SetListEncodingFunction*			_setListEncoding, \
+			XML_IO_Handler_SetWritingPrecisionFunction*		_setWritingPrecision, \
+			XML_IO_Handler_SetWriteExplicitTypesFunction*	_setWriteExplicitTypes
 
 	#define XML_IO_HANDLER_PASSARGS \
-                IO_HANDLER_PASSARGS, \
-	        _writeEntryToFile,      \
-	        _setListEncoding,       \
-	        _setWritingPrecision,   \
-	        _setWriteExplicitTypes
+		IO_HANDLER_PASSARGS, \
+			_writeEntryToFile, \
+			_setListEncoding, \
+			_setWritingPrecision, \
+			_setWriteExplicitTypes
 
 	XML_IO_Handler* _XML_IO_Handler_New(  XML_IO_HANDLER_DEFARGS  );
 	

@@ -525,11 +525,6 @@ void _XML_IO_Handler_AddSearchPath( void* xml_io_handler, char* path ) {
 	self->searchPaths[ self->searchPathsSize - 1 ] = StG_Strdup( path );
 }
 
-
-
-
-
-
 /** Read all parameters from a file implementation. See IO_Handler_ReadAllFromFile(). It will first check if the file
  * exists, and contains valid XML. */
 Bool _XML_IO_Handler_ReadAllFromFile( void* xml_io_handler, const char* filename, Dictionary* dictionary ) {
@@ -604,8 +599,6 @@ Bool _XML_IO_Handler_ReadAllFromFile( void* xml_io_handler, const char* filename
 		_XML_IO_Handler_AddSearchPath( self, STG_INCLUDE_PATH );
 	#endif
 
-
-	
 	/* open the file and check syntax */
 	if ( !(rootElement = _XML_IO_Handler_OpenCheckFile( self, filename )) ) {
 		return False;
@@ -618,7 +611,8 @@ Bool _XML_IO_Handler_ReadAllFromFile( void* xml_io_handler, const char* filename
 	_XML_IO_Handler_ParseNodes( self, firstElement, NULL, IO_Handler_DefaultMergeType, NULL );
 	
 	/* free memory */
-	xmlFreeDoc( self->currDoc );
+	if( self->currDoc )
+		xmlFreeDoc( self->currDoc );
 	xmlCleanupParser();
 	
 	return True;
@@ -658,7 +652,8 @@ Bool _XML_IO_Handler_ReadAllFromFileForceSource( void* xml_io_handler, const cha
 	_XML_IO_Handler_ParseNodes( self, firstElement, NULL, Dictionary_MergeType_Replace, (char*) rootElement->doc->URL );
 	
 	/* free memory */
-	xmlFreeDoc( self->currDoc );
+	if( self->currDoc )
+		xmlFreeDoc( self->currDoc );
 	xmlCleanupParser();
 	
 	return True;
@@ -683,7 +678,8 @@ Bool _XML_IO_Handler_ReadAllFromBuffer( void* xml_io_handler, const char* buffer
 	_XML_IO_Handler_ParseNodes( self, rootElement, NULL, Dictionary_MergeType_Replace, NULL );
 	
 	/* free memory */
-	xmlFreeDoc( self->currDoc );
+	if( self->currDoc )
+		xmlFreeDoc( self->currDoc );
 	xmlCleanupParser();
 	
 	return True;
@@ -693,8 +689,9 @@ Bool _XML_IO_Handler_ReadAllFromBuffer( void* xml_io_handler, const char* buffer
  * \return a pointer to the root node if the file is valid, NULL otherwise. */
 static xmlNodePtr _XML_IO_Handler_OpenCheckFile( XML_IO_Handler* self, const char* filename )
 {
-	xmlChar      absolute[1024];
-	xmlNodePtr   cur = NULL;
+	xmlChar		absolute[1024];
+	xmlNodePtr	cur = NULL;
+	Bool			status = False;
 
 	if ( FindFileInPathList(
 		(char*)absolute,
@@ -711,12 +708,16 @@ static xmlNodePtr _XML_IO_Handler_OpenCheckFile( XML_IO_Handler* self, const cha
 		filename );
 
 	cur = xmlDocGetRootElement( self->currDoc );
-	Journal_Firewall( _XML_IO_Handler_Check( self, self->currDoc ),
+	status = _XML_IO_Handler_Check( self, self->currDoc );
+	Journal_Firewall( status == True,
 		Journal_Register( Error_Type, XML_IO_Handler_Type ),
 		"Error: File %s not valid/readable.\n",
 		filename );
 
-	return cur;
+	if( status == True )
+		return cur;
+	else
+		return NULL;
 	 
 }
 
@@ -854,13 +855,15 @@ Bool _XML_IO_Handler_Check( XML_IO_Handler* self, xmlDocPtr currDoc ) {
 		Journal_Printf(
 			Journal_Register( Error_Type, XML_IO_Handler_Type ),
 			"Error: empty document. Not parsing.\n" );
-		xmlFreeDoc( self->currDoc );
+		if( self->currDoc )
+			xmlFreeDoc( self->currDoc );
 		return False;
 	}
 	
 	/* check the namespace */
-	if( False == _XML_IO_Handler_CheckNameSpace( self, rootElement ) ) {
-		xmlFreeDoc( self->currDoc );
+	if( _XML_IO_Handler_CheckNameSpace( self, rootElement ) == False ) {
+		if( self->currDoc )
+			xmlFreeDoc( self->currDoc );
 		return False;
 	}
 	
@@ -872,7 +875,8 @@ Bool _XML_IO_Handler_Check( XML_IO_Handler* self, xmlDocPtr currDoc ) {
 			self->resource,
 			(const char*) rootElement->name, 
 			ROOT_NODE_NAME );
-		xmlFreeDoc( self->currDoc );
+		if( self->currDoc )
+			xmlFreeDoc( self->currDoc );
 		return False;
 	}
 	
@@ -1789,7 +1793,8 @@ Bool _XML_IO_Handler_WriteAllToFile( void* xml_io_handler, const char* filename,
 	}
 	
 	/* Memory_Free memory */
-	xmlFreeDoc( self->currDoc );
+	if( self->currDoc )
+		xmlFreeDoc( self->currDoc );
 	/*xmlCleanupParser(); */
 	/* TODO if updating, xmlCleanupParser(); */
 	self->currDoc = NULL;
@@ -1860,16 +1865,16 @@ Bool _XML_IO_Handler_WriteEntryToFile( void* xml_io_handler, const char* filenam
 	/* write result to file */
 	if ( 0 < (fileSize = xmlSaveFormatFile( filename, self->currDoc, 1 )) ) {
 		Journal_Printf( stream, "Writing dictionary entry %s to file %s successfully concluded.\n", name, filename );
-	} else
-	{
+	}
+	else {
 		Journal_Printf( 
 			Journal_Register( Error_Type, XML_IO_Handler_Type ),
 			"Warning: failed to write dictionary entry %s to file %s.\n", 
 			name, 
 			filename );
 	}
-	
-	xmlFreeDoc( self->currDoc );
+	if( self->currDoc )	
+		xmlFreeDoc( self->currDoc );
 	/*xmlCleanupParser();*/
 	/* TODO if updating, xmlCleanupParser(); */
 	self->currDoc = NULL;

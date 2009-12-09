@@ -608,7 +608,9 @@ int Journal_Firewall( int expression, void* _stream, const char* const fmt, ... 
 	if ( stJournal->firewallProducesAssert == True ) {
 		/* Use pcu_assert, so that StGermain PCU tests can check that a Firewall
 		 * is correctly produced. */ 
-		pcu_assert( expression );
+		#ifndef NDEBUG
+			pcu_assert( expression );
+		#endif
 	}
 	else {
 		/* TODO: Don't use FAILURE until Pat beef's up the test scripts to do .error checks
