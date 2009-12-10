@@ -657,7 +657,7 @@ void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
 			IO_Handler_ReadAllFromFile( data->io_handler, invalidXMLFilename, data->dict2 );
 		#endif
       pcu_check_fileEq( errorFilename, expectedErrorFilename );
-      //remove( errorFilename );
+      remove( errorFilename );
    }
 }
 
