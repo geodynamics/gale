@@ -74,7 +74,7 @@ Bool StgDomainSwarm_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SingleCellLayout_Type, "0", _SingleCellLayout_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ElementCellLayout_Type, "0", _ElementCellLayout_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), TriSingleCellLayout_Type, "0", (Stg_Component_DefaultConstructorFunction*)_TriSingleCellLayout_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Swarm_Type, "0", (Stg_Component_DefaultConstructorFunction*)Swarm_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Swarm_Type, "0", (Stg_Component_DefaultConstructorFunction*)_Swarm_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SwarmVariable_Type, "0", _SwarmVariable_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), OperatorSwarmVariable_Type, "0", _OperatorSwarmVariable_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SwarmOutput_Type, "0", _SwarmOutput_DefaultNew );
