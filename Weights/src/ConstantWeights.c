@@ -69,6 +69,8 @@ ConstantWeights* ConstantWeights_New( Name name, int dim ) {
     self->isConstructed = True;
     _WeightsCalculator_Init( self, dim );
     _ConstantWeights_Init( self );
+
+	return self;
 }
 
 ConstantWeights* _ConstantWeights_New(  CONSTANTWEIGHTS_DEFARGS  ) {

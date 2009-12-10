@@ -98,10 +98,7 @@ void _IterativeWeights_Init( void* iterativeWeights, WeightsCalculator* initialW
     self->tolerance = tolerance;
     self->alpha = alpha;
 	
-    Journal_Firewall( self->dim == 2, 
-                      Journal_Register( Error_Type, self->type ),
-                      "%s only works in 2D.\n", self->type );
-	
+    Journal_Firewall( self->dim == 2, Journal_Register( Error_Type, self->type ), "%s only works in 2D.\n", self->type );
 }
 
 /*------------------------------------------------------------------------------------------------------------------------

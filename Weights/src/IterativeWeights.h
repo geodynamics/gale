@@ -53,69 +53,72 @@
 #ifndef __PICellerator_Weights_IterativeWeightsClass_h__
 #define __PICellerator_Weights_IterativeWeightsClass_h__
 
-/* Textual name of this class */
-extern const Type IterativeWeights_Type;
+	/* Textual name of this class */
+	extern const Type IterativeWeights_Type;
 
-/* IterativeWeights information */
-#define __IterativeWeights                                              \
-    /* General info */                                                  \
-    __ConstantWeights                                                   \
-                                                                        \
-    /* Virtual Info */                                                  \
-    WeightsCalculator*                        initialWeights;           \
-    Iteration_Index                           maxIterations;            \
-    double                                    tolerance;                \
-    double                                    alpha;                    \
-    Bool                                      freeInitialWeights;       \
-                                                                        \
-
-struct IterativeWeights { __IterativeWeights };
-
-/*---------------------------------------------------------------------------------------------------------------------
-** Constructors
-*/
-
-
-
+	/* IterativeWeights information */
+	#define __IterativeWeights \
+	/* General info */ \
+		__ConstantWeights \
+		\
+		/* Virtual Info */ \
+		WeightsCalculator*	initialWeights; \
+		Iteration_Index		maxIterations; \
+		double					tolerance; \
+		double					alpha; \
+		Bool						freeInitialWeights;
 	
+	struct IterativeWeights { __IterativeWeights };
+
+	/*---------------------------------------------------------------------------------------------------------------------
+	** Constructors
+	*/
+
 	#ifndef ZERO
 	#define ZERO 0
 	#endif
 
 	#define ITERATIVEWEIGHTS_DEFARGS \
-                CONSTANTWEIGHTS_DEFARGS
+		CONSTANTWEIGHTS_DEFARGS
 
 	#define ITERATIVEWEIGHTS_PASSARGS \
-                CONSTANTWEIGHTS_PASSARGS
+		CONSTANTWEIGHTS_PASSARGS
 
-IterativeWeights* _IterativeWeights_New(  ITERATIVEWEIGHTS_DEFARGS  );
+	IterativeWeights* _IterativeWeights_New(  ITERATIVEWEIGHTS_DEFARGS  );
 
-/* Stg_Class_Delete IterativeWeights implementation */
-void _IterativeWeights_Delete( void* iterativeWeights );
-void _IterativeWeights_Print( void* iterativeWeights, Stream* stream );
-#define IterativeWeights_Copy( self )                                   \
-    (IterativeWeights*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
-#define IterativeWeights_DeepCopy( self )                               \
-    (IterativeWeights*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-void* _IterativeWeights_Copy( void* iterativeWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	/* Stg_Class_Delete IterativeWeights implementation */
+	void _IterativeWeights_Delete( void* iterativeWeights );
+
+	void _IterativeWeights_Print( void* iterativeWeights, Stream* stream );
+
+	#define IterativeWeights_Copy( self ) \
+		(IterativeWeights*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
+	#define IterativeWeights_DeepCopy( self ) \
+		(IterativeWeights*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
+
+	void* _IterativeWeights_Copy( void* iterativeWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
         
-void* _IterativeWeights_DefaultNew( Name name ) ;
-void _IterativeWeights_AssignFromXML( void* iterativeWeights, Stg_ComponentFactory* cf, void* data ) ;
-void _IterativeWeights_Build( void* iterativeWeights, void* data ) ;
-void _IterativeWeights_Initialise( void* iterativeWeights, void* data ) ;
-void _IterativeWeights_Execute( void* iterativeWeights, void* data );
-void _IterativeWeights_Destroy( void* iterativeWeights, void* data );
+	void* _IterativeWeights_DefaultNew( Name name );
+
+	void _IterativeWeights_AssignFromXML( void* iterativeWeights, Stg_ComponentFactory* cf, void* data );
+
+	void _IterativeWeights_Build( void* iterativeWeights, void* data );
+
+	void _IterativeWeights_Initialise( void* iterativeWeights, void* data );
+
+	void _IterativeWeights_Execute( void* iterativeWeights, void* data );
+
+	void _IterativeWeights_Destroy( void* iterativeWeights, void* data );
                 
-void _IterativeWeights_Calculate( void* iterativeWeights, void* _swarm, Cell_LocalIndex lCell_I ) ;
-/*---------------------------------------------------------------------------------------------------------------------
-** Private functions
-*/
+	void _IterativeWeights_Calculate( void* iterativeWeights, void* _swarm, Cell_LocalIndex lCell_I );
+	/*---------------------------------------------------------------------------------------------------------------------
+	** Private functions
+	*/
         
-/*---------------------------------------------------------------------------------------------------------------------
-** Public functions
-*/
-void IterativeWeights_ScaleForConstantConstraint( void* iterativeWeights, void* _swarm, Cell_LocalIndex lCell_I ) ;
-        
+	/*---------------------------------------------------------------------------------------------------------------------
+	** Public functions
+	*/
+	void IterativeWeights_ScaleForConstantConstraint( void* iterativeWeights, void* _swarm, Cell_LocalIndex lCell_I ) ;
         
 #endif 
 
