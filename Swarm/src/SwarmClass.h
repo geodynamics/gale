@@ -139,9 +139,6 @@
 	struct Swarm { __Swarm };
 	
 	
-	/* Create a new Swarm and initialise */
-	Swarm* Swarm_DefaultNew( Name name );
-
    Swarm* Swarm_New( 
       Name                                  name,
       AbstractContext*                      context,
