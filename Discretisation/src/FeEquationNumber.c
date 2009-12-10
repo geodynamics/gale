@@ -205,8 +205,8 @@ void* FeEquationNumber_DefaultNew( Name name ) {
 	Stg_Class_CopyFunction*                                  _copy = _FeEquationNumber_Copy;
 	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)FeEquationNumber_DefaultNew;
 	Stg_Component_ConstructFunction*                    _construct = _FeEquationNumber_AssignFromXML;
-	Stg_Component_BuildFunction*                            _build = (Stg_Component_BuildFunction*)_FeEquationNumber_Build;
-	Stg_Component_InitialiseFunction*                  _initialise = (Stg_Component_InitialiseFunction*)_FeEquationNumber_Initialise;
+	Stg_Component_BuildFunction*                            _build = _FeEquationNumber_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FeEquationNumber_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = _FeEquationNumber_Execute;
 	Stg_Component_DestroyFunction*                        _destroy = _FeEquationNumber_Destroy;
 	AllocationType                              nameAllocationType = NON_GLOBAL;
@@ -282,6 +282,13 @@ void _FeEquationNumber_Execute( void* feEquationNumber, void *data ){
 	
 void _FeEquationNumber_Destroy( void* feEquationNumber, void *data ){
    FeEquationNumber* self = (FeEquationNumber*) feEquationNumber;
+   Index ii;
+   Index nDims = Mesh_GetDimSize( self->feMesh );
+
+   Stg_Component_Destroy( self->feMesh   , data, False );
+   Stg_Component_Destroy( self->dofLayout, data, False );
+   if ( self->linkedDofInfo ) Stg_Component_Destroy( self->dofLayout, data, False );
+   if ( self->bcs )           Stg_Component_Destroy( self->bcs      , data, False );
 	
    FreeArray( self->remappedNodeInfos );
    /* free destination array memory */
@@ -290,6 +297,9 @@ void _FeEquationNumber_Destroy( void* feEquationNumber, void *data ){
 	
    if (self->locationMatrix) {
       Journal_DPrintfL( self->debug, 2, "Freeing Full L.M. Array\n" );
+      for( ii = 0; ii < self->nDomainEls; ii++ )
+         FreeArray( self->locationMatrix[ii] );
+         
       FreeArray( self->locationMatrix );
    }
 
@@ -473,16 +483,7 @@ void* _FeEquationNumber_Copy( void* feEquationNumber, void* dest, Bool deep, Nam
    abort();
 }
 
-void FeEquationNumber_Build( void* feEquationNumber ) {
-   FeEquationNumber* self = (FeEquationNumber*)feEquationNumber;
-	
-   if ( False == self->isBuilt ) {
-      self->_build( self, NULL );
-      self->isBuilt = True;
-   }
-}
-
-void _FeEquationNumber_Build( void* feEquationNumber ) {
+void _FeEquationNumber_Build( void* feEquationNumber, void* data ) {
    FeEquationNumber* self = (FeEquationNumber*) feEquationNumber;
 
    assert(self);
@@ -490,6 +491,10 @@ void _FeEquationNumber_Build( void* feEquationNumber ) {
    Journal_DPrintf( self->debug, "In %s:\n",  __func__ );
    Stream_IndentBranch( StgFEM_Debug );
 
+   Stg_Component_Build( self->feMesh   , data, False );
+   Stg_Component_Build( self->dofLayout, data, False );
+   if ( self->linkedDofInfo ) Stg_Component_Build( self->dofLayout, data, False );
+   if ( self->bcs )           Stg_Component_Build( self->bcs      , data, False );
 	/* If we have new mesh topology information, do this differently. */
    /* if( self->feMesh->topo->domains && self->feMesh->topo->domains[MT_VERTEX] ) { */
 
@@ -533,20 +538,14 @@ void _FeEquationNumber_Build( void* feEquationNumber ) {
    Stream_UnIndentBranch( StgFEM_Debug );
 }
 
-void FeEquationNumber_Initialise( void* feEquationNumber ) {
-   FeEquationNumber* self = (FeEquationNumber*)feEquationNumber;
-	
-   self->_initialise( self, NULL );
-   self->isInitialised = True;
-}
-
-
 /** Initialise implementation. Currently does nothing. */
-void _FeEquationNumber_Initialise( void* feEquationNumber ) {
-#if DEBUG
+void _FeEquationNumber_Initialise( void* feEquationNumber, void* data ) {
    FeEquationNumber* self = (FeEquationNumber*) feEquationNumber;
-   assert(self);
-#endif
+
+   Stg_Component_Initialise( self->feMesh   , data, False );
+   Stg_Component_Initialise( self->dofLayout, data, False );
+   if ( self->linkedDofInfo ) Stg_Component_Initialise( self->dofLayout, data, False );
+   if ( self->bcs )           Stg_Component_Initialise( self->bcs      , data, False );
 }
 
 
@@ -2343,7 +2342,7 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
    MPI_Comm		mpiComm;
    unsigned		rank, nProcs;
    unsigned		nDims;
-   unsigned		nDomainNodes, nDomainEls;
+   unsigned		nDomainNodes;
    unsigned		nLocalNodes;
    unsigned*		nNodalDofs;
    unsigned		nElNodes, *elNodes;
@@ -2388,7 +2387,7 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
    MPI_Comm_rank( mpiComm, (int*)&rank );
    nDims = Mesh_GetDimSize( feMesh );
    nDomainNodes = FeMesh_GetNodeDomainSize( feMesh );
-   nDomainEls = FeMesh_GetElementDomainSize( feMesh );
+   self->nDomainEls = FeMesh_GetElementDomainSize( feMesh );
    nLocalNodes = FeMesh_GetNodeLocalSize( feMesh );
    nNodalDofs = self->dofLayout->dofCounts;
    links = self->linkedDofInfo;
@@ -2408,8 +2407,8 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 
    /* Allocate for the location matrix. */
    nLocMatDofs = NULL;
-   locMat = AllocArray( int**, nDomainEls );
-   for( e_i = 0; e_i < nDomainEls; e_i++ ) {
+   locMat = AllocArray( int**, self->nDomainEls );
+   for( e_i = 0; e_i < self->nDomainEls; e_i++ ) {
       FeMesh_GetElementNodes( feMesh, e_i, inc );
       nElNodes = IArray_GetSize( inc );
       elNodes = IArray_GetPtr( inc );
@@ -2516,7 +2515,7 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
    FreeArray( tuples );
 
    /* Build location matrix. */
-   for( e_i = 0; e_i < nDomainEls; e_i++ ) {
+   for( e_i = 0; e_i < self->nDomainEls; e_i++ ) {
       FeMesh_GetElementNodes( feMesh, e_i, inc );
       nElNodes = IArray_GetSize( inc );
       elNodes = IArray_GetPtr( inc );
@@ -2793,8 +2792,10 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
                    nDofs * sizeof(int) );
 
    /* Allocate for location matrix. */
-   locMat = AllocArray( int**, Mesh_GetDomainSize( self->feMesh, nDims ) );
-   for( ii = 0; ii < Mesh_GetDomainSize( self->feMesh, nDims ); ii++ )
+   /* first store nDomainEls for usage during destroy */
+   self->nDomainEls = Mesh_GetDomainSize( self->feMesh, nDims );
+   locMat = AllocArray( int**, self->nDomainEls );
+   for( ii = 0; ii < self->nDomainEls; ii++ )
       locMat[ii] = AllocArray2D( int, FeMesh_GetElementNodeSize( self->feMesh, 0 ), nDofs );
 
    /* Fill in location matrix. */

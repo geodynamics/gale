@@ -135,7 +135,9 @@
 		\
 		/** Some vars to deal with removing BCs from mats and vecs. */ \
 		Bool							removeBCs; \
-		STree*						bcEqNums;
+		STree*						bcEqNums;  \
+		/** nDomainEls is required during the destroy phase */ \
+		Index                   nDomainEls;
 
 	struct FeEquationNumber { __FeEquationNumber };
 
@@ -207,16 +209,12 @@
 	optional as some users prefer to only calculate this element-by-element as
 	required.
 	*/
-	void FeEquationNumber_Build( void* feEquationNumber );
 	
 	/** Build the FeEquationNumber. \see FeEquationNumber_Build() */
-	void _FeEquationNumber_Build( void* feEquationNumber );
-
-	/** Initialise interface */
-	void FeEquationNumber_Initialise( void* feEquationNumber );
+	void _FeEquationNumber_Build( void* feEquationNumber, void* data );
 	
 	/** Initialise implementation. Currently does nothing. */
-	void _FeEquationNumber_Initialise( void* feEquationNumber );
+	void _FeEquationNumber_Initialise( void* feEquationNumber, void* data );
 	
 	/* +++ Public Functions +++ */
 	

@@ -440,7 +440,7 @@ void _FeVariable_Build( void* variable, void* data ) {
 		/** don't build the equation numbers for fields that aren't being solved for 
 		 * (ie: error and reference fields) */
 		if( !self->isReferenceSolution && self->buildEqNums ) {
-			FeEquationNumber_Build( self->eqNum );
+			Stg_Component_Build( self->eqNum, data, False );
 		}
 
 		Stream_UnIndentBranch( StgFEM_Debug );
@@ -495,7 +495,7 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	}
 
 	if( !self->isReferenceSolution ) {	
-		FeEquationNumber_Initialise( self->eqNum );
+		Stg_Component_Initialise( self->eqNum, data, False );
 	}
 
 	if ( context ) {
