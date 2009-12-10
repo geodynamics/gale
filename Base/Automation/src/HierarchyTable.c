@@ -112,7 +112,8 @@ void HierarchyTable_PrintChildren( void* hierarchyTable, Type parentType, Stream
 	Stream_Flush( stream );
 	Stream_Indent( stream );
 
-	for ( entry_I = 0 ; entry_I < self->max ; entry_I++ ) {
+   /* increasing terminating limit by 1 - seems to be right due to comments in HashTable.c ~line 154 */
+	for ( entry_I = 0 ; entry_I < self->max+1 ; entry_I++ ) {
 		hashTableEntry = self->entries[ entry_I ];
 
 		while( hashTableEntry ){
