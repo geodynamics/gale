@@ -52,7 +52,7 @@
 
 	typedef void (ForceTerm_AssembleElementFunction)	(
 		void*						forceTerm, 
-		ForceVector*			forceVector, 
+		ForceVector*			forceVec, 
 		Element_LocalIndex	lElement_I,
 		double*					elForceVecToAdd );
 	
@@ -60,19 +60,20 @@
 	/* Textual name of this class */
 	extern const Type ForceTerm_Type;
 	
-	/* StiffnessMatrix information */
-	#define __ForceTerm  \
-		/* General info */ \
-		__Stg_Component \
-		\
-		FiniteElementContext*					context; \
-		/* Virtual info */ \
-		ForceTerm_AssembleElementFunction*	_assembleElement; \
-		\
-		/* General info */ \
-		Stream*										debug; \
-		Swarm*										integrationSwarm; \
-		Stg_Component*								extraInfo;
+	/* ForceTerm information */
+   #define __ForceTerm  \
+      /* General info */ \
+      __Stg_Component \
+      \
+      FiniteElementContext*					context; \
+      /* Virtual info */ \
+      ForceTerm_AssembleElementFunction*	_assembleElement; \
+      \
+      /* General info */ \
+      Stream*										debug; \
+      ForceVector*                        forceVector; \
+      Swarm*										integrationSwarm; \
+      Stg_Component*								extraInfo;
 	
 	struct ForceTerm { __ForceTerm };
 
@@ -141,7 +142,7 @@
 
 	void _ForceTerm_AssembleElement( 
 		void*						forceTerm, 
-		ForceVector*			forceVector, 
+		ForceVector*			forceVec, 
 		Element_LocalIndex	lElement_I,
 		double*					elForceVecToAdd ) ;
 

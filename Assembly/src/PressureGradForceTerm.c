@@ -103,7 +103,7 @@ void _PressureGradForceTerm_Init( void* forceTerm, FeVariable* pressureField, Fe
 		self );
 	self->pressureField = pressureField;
 	self->gradField = gradField;
-	self->forceVec = NULL;
+	self->forceVector = NULL;
 	self->elForceVec = NULL;
 	self->factor = 0.0;
 }
@@ -171,8 +171,9 @@ void _PressureGradForceTerm_Build( void* forceTerm, void* data ) {
 void _PressureGradForceTerm_Initialise( void* forceTerm, void* data ) {
 	PressureGradForceTerm* self = (PressureGradForceTerm*)forceTerm;
 
-	_ForceTerm_Initialise( self, data );
 	Stg_Component_Initialise( self->pressureField, data, False );
+	Stg_Component_Initialise( self->gradField, data, False );
+	_ForceTerm_Initialise( self, data );
 }
 
 void _PressureGradForceTerm_Execute( void* forceTerm, void* data ) {
@@ -184,6 +185,8 @@ void _PressureGradForceTerm_Execute( void* forceTerm, void* data ) {
 void _PressureGradForceTerm_Destroy( void* forceTerm, void* data ) {
 	PressureGradForceTerm* self = (PressureGradForceTerm*)forceTerm;
 
+	Stg_Component_Destroy( self->pressureField, data, False );
+	Stg_Component_Destroy( self->gradField, data, False );
 	_ForceTerm_Destroy( self, data );
 }
 
@@ -193,7 +196,7 @@ void _PressureGradForceTerm_AssembleElement( void* forceTerm, ForceVector* force
 
 	assert( self );
 
-	self->forceVec = forceVector;
+	self->forceVector = forceVector;
 	self->elForceVec = elForceVec;
 	Assembler_IntegrateMatrixElement( self->asmb, lElement_I );
 }

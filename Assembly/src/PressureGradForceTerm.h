@@ -55,7 +55,6 @@
 		Assembler*		asmb; \
 		FeVariable*		pressureField; \
 		FeVariable*		gradField; \
-		ForceVector*	forceVec; \
 		double*			elForceVec; \
 		double			factor;
 
