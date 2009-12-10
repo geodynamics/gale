@@ -152,17 +152,15 @@ void _ThermalBuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFact
 void _ThermalBuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 	ThermalBuoyancyForceTerm* self = (ThermalBuoyancyForceTerm*)forceTerm;
 
-	_ForceTerm_Build( self, data );
-
 	Stg_Component_Build( self->temperatureField, data, False );
+	_ForceTerm_Build( self, data );
 }
 
 void _ThermalBuoyancyForceTerm_Initialise( void* forceTerm, void* data ) {
 	ThermalBuoyancyForceTerm* self = (ThermalBuoyancyForceTerm*)forceTerm;
 
-	_ForceTerm_Initialise( self, data );
-
 	Stg_Component_Initialise( self->temperatureField, data, False );
+	_ForceTerm_Initialise( self, data );
 }
 
 void _ThermalBuoyancyForceTerm_Execute( void* forceTerm, void* data ) {
@@ -174,6 +172,7 @@ void _ThermalBuoyancyForceTerm_Execute( void* forceTerm, void* data ) {
 void _ThermalBuoyancyForceTerm_Destroy( void* forceTerm, void* data ) {
 	ThermalBuoyancyForceTerm* self = (ThermalBuoyancyForceTerm*)forceTerm;
 
+   Stg_Component_Destroy( self->temperatureField, data, False );
 	_ForceTerm_Destroy( self, data );
 }
 

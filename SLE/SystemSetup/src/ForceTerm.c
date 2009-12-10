@@ -120,6 +120,7 @@ void _ForceTerm_Init(
 	self->debug					= Stream_RegisterChild( StgFEM_SLE_SystemSetup_Debug, self->type );
 	self->extraInfo			= extraInfo;
 	self->integrationSwarm	= integrationSwarm;	
+   self->forceVector       = forceVector;
 
 	ForceVector_AddForceTerm( forceVector, self );
 }
@@ -205,6 +206,7 @@ void _ForceTerm_Build( void* forceTerm, void* data ) {
 	
 	/* ensure integrationSwarm is built */
 	Stg_Component_Build( self->integrationSwarm, data, False );
+	Stg_Component_Build( self->forceVector, data, False );
 
 	if ( self->extraInfo ) 
 		Stg_Component_Build( self->extraInfo, data, False );
@@ -220,6 +222,7 @@ void _ForceTerm_Initialise( void* forceTerm, void* data ) {
 	Stream_IndentBranch( StgFEM_Debug );
 
 	Stg_Component_Initialise( self->integrationSwarm, data, False );
+	Stg_Component_Initialise( self->forceVector, data, False );
 	if ( self->extraInfo ) 
 		Stg_Component_Initialise( self->extraInfo, data, False );
 	
@@ -232,7 +235,11 @@ void _ForceTerm_Execute( void* forceTerm, void* data ) {
 void _ForceTerm_Destroy( void* forceTerm, void* data ) {
 	ForceTerm* self = (ForceTerm*)forceTerm;
 
-	Stg_Component_Destroy( self, data, False );
+	if ( self->extraInfo ) 
+      Stg_Component_Destroy( self->extraInfo, data, False );
+
+   Stg_Component_Destroy( self->integrationSwarm, data, False );
+   Stg_Component_Destroy( self->forceVector, data, False );
 }
 
 void ForceTerm_AssembleElement( 
