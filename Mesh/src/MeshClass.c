@@ -212,7 +212,7 @@ void _Mesh_Destroy( void* mesh, void* data ) {
 	unsigned	d_i;
 
    Mesh_Destruct( self );
-   Stg_Class_Delete( self->algorithms );
+   Stg_Component_Destroy( self->algorithms, NULL, False );
    Stg_Class_Delete( self->info );
    Stg_Class_Delete( self->vars );
    Stg_Class_Delete( self->topoDataSizes );
