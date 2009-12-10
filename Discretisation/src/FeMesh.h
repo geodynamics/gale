@@ -81,6 +81,7 @@
 	FeMesh* FeMesh_New( Name name, AbstractContext* context );
 	FeMesh* _FeMesh_New(  FEMESH_DEFARGS  );
 	void _FeMesh_Init( FeMesh* self, ElementType* elType, const char* family, Bool elementMesh );
+   FeMesh* _FeMesh_DefaultNew( Name name );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions

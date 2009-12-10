@@ -47,6 +47,15 @@ const Type FeMesh_Type = "FeMesh";
 */
 
 FeMesh* FeMesh_New( Name name, AbstractContext* context ) {
+   FeMesh* self = _FeMesh_DefaultNew( name );
+   _Mesh_Init( (Mesh*)self, context );
+	/* FeMesh info */
+	_FeMesh_Init( self, NULL, NULL, False ); /* this is a useless Init() */
+
+   return self;
+}
+
+FeMesh* _FeMesh_DefaultNew( Name name ) {
 	/* Variables set in this function */
 	SizeT                                              _sizeOfSelf = sizeof(FeMesh);
 	Type                                                      type = FeMesh_Type;
@@ -66,12 +75,7 @@ FeMesh* FeMesh_New( Name name, AbstractContext* context ) {
 	const char*                   family = NULL;
 	Bool                     elementMesh = False;
 
-	FeMesh* self = _FeMesh_New(  FEMESH_PASSARGS  );
-
-   _Mesh_Init( (Mesh*)self, context );
-	/* FeMesh info */
-	_FeMesh_Init( self, NULL, NULL, False ); /* this is a useless Init() */
-   return self;
+   return _FeMesh_New(  FEMESH_PASSARGS  );
 }
 
 FeMesh* _FeMesh_New(  FEMESH_DEFARGS  ) {
@@ -265,7 +269,7 @@ void FeMesh_SetElementType( void* feMesh, ElementType* elType ) {
 
 	assert( self );
 
-	FreeObject( self->feElType );
+   if( self->feElType ) Stg_Class_Delete( self->feElType );
 	self->feElType = elType;
 }
 
@@ -443,6 +447,7 @@ void FeMesh_EvalGlobalDerivs( void* feMesh, unsigned element, double* localCoord
 */
 
 void FeMesh_Destruct( FeMesh* self ) {
+   Stg_Class_Delete( self->feElType );
 	self->feElFamily = NULL;
 	/* Disabling the killing of this object from within this
 	component as this will be destroyed by the LiveComponentRegister_DestroyAll function 101109 */
