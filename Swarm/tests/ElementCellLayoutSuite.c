@@ -103,6 +103,8 @@ void ElementCellLayoutSuite_Setup( ElementCellLayoutSuiteData* data ) {
 	
 	/* Configure the element-cell-layout */
 	data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", NULL, data->mesh );
+   Stg_Component_Build( data->elementCellLayout, NULL, False );
+   Stg_Component_Initialise( data->elementCellLayout, NULL, False );
 }
 
 void ElementCellLayoutSuite_Teardown( ElementCellLayoutSuiteData* data ) {

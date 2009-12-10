@@ -197,6 +197,7 @@ void _ElementCellLayout_Execute( void *elementCellLayout, void *data ){
 void _ElementCellLayout_Destroy( void *elementCellLayout, void *data ){
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
 		
+	ElementCellLayout_DestroyShadowInfo( self );
 	NewClass_Delete( self->incArray );
 	
 	_CellLayout_Destroy( self, data );
@@ -282,6 +283,19 @@ ShadowInfo* _ElementCellLayout_GetShadowInfo( void* elementCellLayout ) {
 	return &self->cellShadowInfo;
 }
 
+void ElementCellLayout_DestroyShadowInfo( ElementCellLayout* self ) {
+	unsigned	nIncProcs = self->cellShadowInfo.procNbrInfo->procNbrCnt;
+
+	/* Extract neighbouring proc information. */
+	Memory_Free( self->cellShadowInfo.procNbrInfo->procNbrTbl );
+   if( nIncProcs ) {
+      Memory_Free( self->cellShadowInfo.procShadowedCnt );
+      Memory_Free( self->cellShadowInfo.procShadowCnt );
+      Memory_Free( self->cellShadowInfo.procShadowedTbl );
+      Memory_Free( self->cellShadowInfo.procShadowTbl );
+   }
+	Memory_Free( self->cellShadowInfo.procNbrInfo );
+}
 
 void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self ) {
 	unsigned	nDims;
