@@ -84,7 +84,7 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, OperatorFeVariable_Type, "0", _OperatorFeVariable_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, ShapeFeVariable_Type, "0", ShapeFeVariable_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, FeSwarmVariable_Type, "0", _FeSwarmVariable_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, FeMesh_Type, "0", FeMesh_New );
+	Stg_ComponentRegister_Add( componentRegister, FeMesh_Type, "0", _FeMesh_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, C0Generator_Type, "0", C0Generator_New );
 	Stg_ComponentRegister_Add( componentRegister, C2Generator_Type, "0", C2Generator_New );
 /*
