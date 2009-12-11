@@ -79,9 +79,12 @@ int main( int argc, char* argv[] ) {
     return File(target.abspath)
 
 def generate(env, **kw):
-    env.SetDefault(PCUALL_TARGET="check")
-    env.SetDefault(PCUUNIT_TARGET="unit")
-    env.SetDefault(PCUSYSTEST_TARGET="systest")
+    env.SetDefault(PCUALL_TARGET="check-complete")
+    env.SetDefault(REGTEST_TARGET="check")
+    env.SetDefault(UNIT_TARGET="check-unit")
+    env.SetDefault(INTEGRATION_TARGET="check-integration")
+    env.SetDefault(CONVERGENCE_TARGET="check-convergence")
+    env.SetDefault(LOWRES_TARGET="check-lowres")
     # Make the 'all' target point to everything.
 
     def PCUSuite(env, target, source, **kw):
@@ -111,25 +114,52 @@ def generate(env, **kw):
         libs = multiget([kw, env], 'LIBS', []) + ["pcu"]
         test = env.Program(target[0], objs, LIBS=libs)
         runner = env.Action('-' + test[0].abspath)
-        env.Alias(env["PCUUNIT_TARGET"], [exps, inputs, test], runner)
-        env.AlwaysBuild(env["PCUUNIT_TARGET"])
-        env.Alias(env['PCUALL_TARGET'], env['PCUUNIT_TARGET'])
+        env.Alias(env["UNIT_TARGET"], [exps, inputs, test], runner)
+        env.AlwaysBuild(env["UNIT_TARGET"])
+        env.Alias(env['PCUALL_TARGET'], env['UNIT_TARGET'])
+        env.Alias(env['REGTEST_TARGET'], env['UNIT_TARGET'])
         return test
 
-    def PCUSysTest(env, target, source, **kw):
+    def IntegrationTest(env, target, source, **kw):
         script = File(source[0].split()[0]).srcnode().abspath
         script_dir = os.path.dirname(script)
         script = os.path.basename(script)
         args = source[0].split()[1:]
 
         runner = env.Action('-./' + script + ' ' + ' '.join(args), chdir=script_dir)
-        env.Alias(env["PCUSYSTEST_TARGET"], [], runner)
-        env.AlwaysBuild(env["PCUSYSTEST_TARGET"])
-        env.Alias(env['PCUALL_TARGET'], env['PCUSYSTEST_TARGET'])
+        env.Alias(env["INTEGRATION_TARGET"], [], runner)
+        env.AlwaysBuild(env["INTEGRATION_TARGET"])
+        env.Alias(env['PCUALL_TARGET'], env['INTEGRATION_TARGET'])
+        return None
+
+
+    def LowResTest(env, target, source, **kw):
+        script = File(source[0].split()[0]).srcnode().abspath
+        script_dir = os.path.dirname(script)
+        script = os.path.basename(script)
+        args = source[0].split()[1:]
+
+        runner = env.Action('-./' + script + ' ' + ' '.join(args), chdir=script_dir)
+        env.Alias(env["LOWRES_TARGET"], [], runner)
+        env.AlwaysBuild(env["LOWRES_TARGET"])
+        env.Alias(env['PCUALL_TARGET'], env['LOWRES_TARGET'])
+        env.Alias(env['REGTEST_TARGET'], env['LOWRES_TARGET'])
+        return None
+
+    def ConvergenceTest(env, target, source, **kw):
+        script = File(source[0].split()[0]).srcnode().abspath
+        script_dir = os.path.dirname(script)
+        script = os.path.basename(script)
+        args = source[0].split()[1:]
+
+        runner = env.Action('-./' + script + ' ' + ' '.join(args), chdir=script_dir)
+        env.Alias(env["CONVERGENCE_TARGET"], [], runner)
+        env.AlwaysBuild(env["CONVERGENCE_TARGET"])
+        env.Alias(env['PCUALL_TARGET'], env['CONVERGENCE_TARGET'])
         return None
 
     env.Append(BUILDERS={"PCUSuite": PCUSuite, "PCUTest": PCUTest,
-                         'PCUSysTest': PCUSysTest})
+                         "LowResTest": LowResTest, "IntegrationTest": IntegrationTest, "ConvergenceTest": ConvergenceTest})
 
 def exists(env):
     # Should probably have this search for the pcu
