@@ -342,7 +342,7 @@ void Stg_Component_Execute( void* component, void* data, Bool force ) {
 void Stg_Component_Destroy( void* component, void* data, Bool force ) {
 	Stg_Component* self = (Stg_Component*)component;
 
-	if( /* force TODO: remove this comment after pcu_rejig period|| */ !self->isDestroyed ) {
+	if( /* TODO: once the refCounters are implemented there is no longeer a need to check self|| */ self && !self->isDestroyed ) {
 		/*Stg_TimeMonitor*	tm;
 		Stg_MemMonitor*		mm;
 		char*						buf;
