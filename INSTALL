@@ -40,8 +40,11 @@ not garaunteed to produce a consistent build):
 
 To run tests:
 
-  ./scons.py check
+  ./scons.py check             ... runs unit-tests & low resolution integration tests 
+  ./scons.py check-convergence ... runs only convergence tests
+  ./scons.py check-complete    ... runs all tests (recommended for cluster installs)
 
 To install:
 
   ./scons.py install
+
