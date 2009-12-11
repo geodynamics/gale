@@ -76,6 +76,8 @@ Mesh* ManualParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, doubl
 }
 
 void ManualParticleLayoutSuite_Setup( ManualParticleLayoutSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
+
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
@@ -83,6 +85,7 @@ void ManualParticleLayoutSuite_Setup( ManualParticleLayoutSuiteData* data ) {
 }
 
 void ManualParticleLayoutSuite_Teardown( ManualParticleLayoutSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
 }
 
 void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData* data ) {
@@ -105,8 +108,6 @@ void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData
 	char								expected_file[PCU_PATH_MAX];
 	
 	if( data->rank == procToWatch ) {
-		stream = Journal_Register( Info_Type, "ManualParticle" );
-
 		/* Dictionary Initialization */
 		dictionary = Dictionary_New();
 		particlePositionsList = Dictionary_Entry_Value_NewList();
@@ -158,19 +159,21 @@ void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData
 		Stg_Component_Build( swarm, 0, False );
 		Stg_Component_Initialise( swarm, 0, False );
 
-		Stg_Class_Print( particleLayout, stream );
+		Journal_Enable_AllTypedStream( True );
+		stream = Journal_Register( Info_Type, "ManualParticle" );
 
 		/* Print out the particles on all cells */
 		Stream_RedirectFile( stream, "testManualParticle.dat" );
 		Swarm_PrintParticleCoords_ByCell( swarm, stream );
+		Journal_Enable_AllTypedStream( False );
+
 		pcu_filename_expected( "testManualParticleLayoutOutput.expected", expected_file );
 		pcu_check_fileEq( "testManualParticle.dat", expected_file );
 
 		Stg_Class_Delete( extensionMgr_Register );
-		Stg_Component_Destroy( particleLayout, NULL, True );
-		Stg_Component_Destroy( elementCellLayout, NULL, True );
-		/*Stg_Component_Destroy( mesh, NULL, True );*/
-		Stg_Component_Destroy( swarm, NULL, True );
+		_Stg_Component_Delete( particleLayout );
+		_Stg_Component_Delete( elementCellLayout );
+		_Stg_Component_Delete( swarm );
 		Stg_Class_Delete( dictionary );	
 		remove( "testManualParticle.dat" );
 	}

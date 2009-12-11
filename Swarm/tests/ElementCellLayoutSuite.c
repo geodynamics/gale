@@ -81,6 +81,8 @@ Mesh* ElementCellLayout_BuildMesh( unsigned nDims, unsigned* size, double* minCr
 }
 
 void ElementCellLayoutSuite_Setup( ElementCellLayoutSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
+
 	/* MPI Initializations */	
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
@@ -110,6 +112,8 @@ void ElementCellLayoutSuite_Teardown( ElementCellLayoutSuiteData* data ) {
 	Stg_Class_Delete( data->extensionMgr_Register );
 	Stg_Component_Destroy( data->elementCellLayout, NULL, True );
 	/*Stg_Component_Destroy( data->mesh, NULL, True );*/
+
+	Journal_Enable_AllTypedStream( True );
 }
 
 void ElementCellLayoutSuite_TestElementCellLayout( ElementCellLayoutSuiteData* data ) {

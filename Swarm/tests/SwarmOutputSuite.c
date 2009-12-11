@@ -79,6 +79,8 @@ void SwarmOutputSuite_MoveParticles( DomainContext* context ) {
 }
 
 void SwarmOutputSuite_Setup( SwarmOutputSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
+
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
@@ -86,6 +88,7 @@ void SwarmOutputSuite_Setup( SwarmOutputSuiteData* data ) {
 }
 
 void SwarmOutputSuite_Teardown( SwarmOutputSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
 }
 
 void SwarmOutputSuite_TestSwarmOutput( SwarmOutputSuiteData* data ) {

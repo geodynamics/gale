@@ -530,7 +530,7 @@ void TimeIntegrator_Setup( void* timeIntegrator ) {
 		((EntryPoint_2VoidPtr_Cast*)((Hook*)entryPoint->hooks->data[hookIndex])->funcPtr)(
 			self, Stg_ObjectList_At( self->setupData, hookIndex ) );
 	
-       		wallTime = MPI_Wtime()-wallTime;
+			wallTime = MPI_Wtime()-wallTime;
         	MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
         	MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
 		Journal_RPrintf(self->info,"\t       EP: %35s - %9.4f [min] / %9.4f [max] (secs)\n",(entryPoint->hooks->data[hookIndex])->name,tmin,tmax);	

@@ -121,20 +121,16 @@ TimeIntegratee_CalculateTimeDerivFunction* TimeIntegrationSuite_GetFunctionPtr( 
 }
 
 void TimeIntegrationSuite_TestContextType( void* timeIntegratee, Stg_Class* data ) {
-   Stream* stream = Journal_Register (Info_Type, "myStream");
-
-   Journal_Printf( stream, "In func %s\n", __func__ );
    assert( data->type == DomainContext_Type );
 }
-void TimeIntegrationSuite_TestVariableType( void* timeIntegratee, Stg_Class* data ) {
-   Stream* stream = Journal_Register (Info_Type, "myStream");
 
-   Journal_Printf( stream, "In func %s\n", __func__ );
+void TimeIntegrationSuite_TestVariableType( void* timeIntegratee, Stg_Class* data ) {
    assert( data->type == Variable_Type );
 }
 
-
 void TimeIntegrationSuite_Setup( TimeIntegrationSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
+
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;
 	MPI_Comm_rank( data->comm, &data->rank );
@@ -142,6 +138,7 @@ void TimeIntegrationSuite_Setup( TimeIntegrationSuiteData* data ) {
 }
 
 void TimeIntegrationSuite_Teardown( TimeIntegrationSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
 }
 
 void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_name, char *_DerivName0, char *_DerivName1, int _order ) {
@@ -171,9 +168,6 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
    Index							integrateeCount	= 2;
 	char							expected_file[PCU_PATH_MAX];
 
-	stream = Journal_Register( Info_Type, "EulerStream" );
-	Stream_RedirectFile( stream, _name );
-
 	dictionary = Dictionary_New();
 	Dictionary_Add(dictionary, "outputPath", Dictionary_Entry_Value_FromString("./output"));
 	Dictionary_Add(dictionary, "DerivName0", Dictionary_Entry_Value_FromString(_DerivName0));
@@ -184,7 +178,6 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	stgMainBuildAndInitialise( cf );
       
 	ContextEP_Append( context, AbstractContext_EP_Dt, TimeIntegrationSuite_GetDt );
-	Journal_Printf( stream, "!!! info %d\n", Stream_IsEnable( Journal_Register( Info_Type, "TimeIntegrator" ) ) );
 
 	/* Create Stuff */
 	order							= _order;
@@ -196,6 +189,11 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	timeIntegrateeList[0]	= TimeIntegratee_New( "testTimeIntegratee0", context, timeIntegrator, variableList[0], 0, NULL, True );
 	timeIntegrateeList[1]	= TimeIntegratee_New( "testTimeIntegratee1", context, timeIntegrator, variableList[1], 0, NULL, True );
 
+	Journal_Enable_AllTypedStream( True );
+	stream = Journal_Register( Info_Type, "EulerStream" );
+	Stream_RedirectFile( stream, _name );
+
+	Stream_Enable( timeIntegrator->info, False );
 	derivName = Dictionary_GetString( dictionary, "DerivName0" );
 	timeIntegrateeList[0]->_calculateTimeDeriv = TimeIntegrationSuite_GetFunctionPtr( derivName );
 	Journal_Printf( stream, "DerivName0 - %s\n", derivName );
@@ -264,7 +262,7 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 				else if ( timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_CubicTimeDeriv2 ) {
 					error += fabs( Variable_GetValueAtDouble( variable, array_I, 0 ) + 0.5 * array_I * ( 0.25 * pow( context->currentTime, 4.0 ) - pow( context->currentTime, 3.0)/3.0));
 					error += fabs( Variable_GetValueAtDouble( variable, array_I, 1 ) - 3.0 * array_I * ( 0.25 * pow( context->currentTime, 4.0 ) - pow( context->currentTime, 3.0 )/3.0));
-					}
+				}
 				else
 					Journal_Firewall( 0 , Journal_Register( Error_Type, CURR_MODULE_NAME ), "Don't understand _calculateTimeDeriv = %p\n", timeIntegratee->_calculateTimeDeriv );
 			}
@@ -276,6 +274,8 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 		Journal_Printf( stream, "Passed\n" );
 	else
 		Journal_Printf( stream, "Failed - Error = %lf\n", error );
+	
+	Journal_Enable_AllTypedStream( False );
 
 	if ( timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_ConstantTimeDeriv
 		|| timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_ConstantTimeDeriv2 ) {
@@ -297,9 +297,9 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	Memory_Free( array );
 	Memory_Free( array2 );
 	Stg_Class_Delete( variable );
-	Stg_Class_Delete( timeIntegrator );
-	Stg_Class_Delete( timeIntegrateeList[0] );
-	Stg_Class_Delete( timeIntegrateeList[1] );
+	_Stg_Component_Delete( timeIntegrator );
+	_Stg_Component_Delete( timeIntegrateeList[0] );
+	_Stg_Component_Delete( timeIntegrateeList[1] );
 	remove( _name );
 }
 	

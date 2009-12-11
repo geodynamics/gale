@@ -73,6 +73,8 @@ int MeshSuite_findOwner( Mesh* mesh, int vert ) {
 }
 
 void MeshSuite_Setup( MeshSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
+
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;
 	MPI_Comm_rank( data->comm, &data->rank );
@@ -80,6 +82,7 @@ void MeshSuite_Setup( MeshSuiteData* data ) {
 }
 
 void MeshSuite_Teardown( MeshSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
 }
 
 void MeshSuite_TestMeshNearVert1D( MeshSuiteData* data ) {

@@ -66,19 +66,21 @@ typedef struct {
 } SingleAttractorSuiteData;
 
 void SingleAttractorSuite_Setup( SingleAttractorSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
+
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
 	MPI_Comm_size( data->comm, &data->nProcs );
 }
 
 void SingleAttractorSuite_Teardown( SingleAttractorSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
 }
 
 void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) {
 	Dictionary*					dictionary;
 	Dictionary*					componentDict;
 	Stg_ComponentFactory*	cf;
-	Stream*						stream;
 	Swarm*						swarm = NULL;
 	Particle						particle;
 	Particle*					currParticle = NULL;
@@ -88,7 +90,6 @@ void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) 
 	char							input_file[PCU_PATH_MAX];
 	char							expected_file[PCU_PATH_MAX];
 
-	stream = Journal_Register (Info_Type, "SingleAttractorStream");
 	pcu_filename_input( "testSwarmParticleAdvectionSingleAttractor.xml", input_file );
 
 	Journal_Enable_TypedStream( DebugStream_Type, False );
@@ -99,6 +100,8 @@ void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) 
 
 	cf = stgMainInitFromXML( input_file, data->comm, NULL );
 	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	Stream_Enable( context->info, False );
+	Stream_Enable( context->verbose, False );
 
 	dictionary = context->dictionary;
 	Journal_ReadFromDictionary( dictionary );
@@ -212,8 +215,7 @@ void SingleAttractorSuite_SingleAttractor( DomainContext* context ) {
 			Journal_Printf( stream, "\t\tUpdating particleInCell %d:\n", cParticle_I );
 
 			for ( dim_I=0; dim_I < 3; dim_I++ ) {
-				movementVector[dim_I] = ( attractorPoint[dim_I] - (*oldCoord)[dim_I] ) /
-					movementSpeedDivisor;
+				movementVector[dim_I] = ( attractorPoint[dim_I] - (*oldCoord)[dim_I] ) / movementSpeedDivisor;
 				movementVector[dim_I] *= movementSign;	
 				if ( movementSign == -1 ) {
 					movementVector[dim_I] *= (float)movementSpeedDivisor / (movementSpeedDivisor-1); 
