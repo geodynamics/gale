@@ -321,20 +321,27 @@ void PCDVCSuite_Test( PCDVCSuiteData* data ) {
 
 	pcu_filename_input( "testPCDVC.xml", inputFile );
 
+   /* rejigged this test to clean up after each run */
 	context = _PICelleratorContext_DefaultNew( "context" );
 	cf = stgMainInitFromXML( inputFile, MPI_COMM_WORLD, context );
 	stgMainBuildAndInitialise( cf );
-
 	testElementIntegral_CircleInterface( context, &mean, &standardDeviation );
 	compareAgainstReferenceSolution(context, stream, mean, standardDeviation, "testPCDVC_CircleInterface.expected" );
+	stgMainDestroy( cf );
 
+   context = _PICelleratorContext_DefaultNew( "context" );
+	cf = stgMainInitFromXML( inputFile, MPI_COMM_WORLD, context );
+	stgMainBuildAndInitialise( cf );
 	testElementIntegral_PolynomialFunction( context, &mean, &standardDeviation );
 	compareAgainstReferenceSolution(context, stream, mean, standardDeviation, "testPCDVC_PolynomialFunction.expected" );
+	stgMainDestroy( cf );
 
+   context = _PICelleratorContext_DefaultNew( "context" );
+	cf = stgMainInitFromXML( inputFile, MPI_COMM_WORLD, context );
+	stgMainBuildAndInitialise( cf );
 	testElementIntegral_ExponentialInterface( context, &mean, &standardDeviation );
 	compareAgainstReferenceSolution(context, stream, mean, standardDeviation, "testPCDVC_ExponentialInterface.expected" );
-
-	Stg_ComponentFactory_DestroyComponents( cf, NULL );
+	stgMainDestroy( cf );
 }
 
 
