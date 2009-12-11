@@ -265,4 +265,4 @@ env.PCUTest('tests/testStgFEM', suites,
 
 env.Install('lib/StGermain/StgFEM', Glob('Apps/StgFEM_Components/*.xml'))
 
-#env.PCUSysTest('SysTest/PerformanceTests/testAll.sh')
+#env.ConvergenceTest('SysTest/PerformanceTests/testAll.sh')
