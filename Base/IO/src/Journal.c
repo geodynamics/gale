@@ -394,6 +394,7 @@ void Journal_RegisterTypedStream( Stream* typedStream )
 	/* check exists and update */
 	Stg_ObjectList_Append( stJournal->_typedStreams, typedStream );
 }
+
 Stream* Journal_GetTypedStream( const Type type )
 {
 	Stream* typedStream = NULL;
@@ -412,6 +413,7 @@ Stream* Journal_GetTypedStream( const Type type )
 	
 	return typedStream;
 }
+
 Stream* Journal_GetNamedStream( Stream* typedStream, const Name name )
 {
 	Stream* currentStream ;
@@ -447,9 +449,9 @@ Stream* Journal_Register( const Type type, const Name name )
 	typedStream = Journal_GetTypedStream( type );
 	namedStream = Journal_GetNamedStream( typedStream, name );	
 	
-
 	return namedStream;
 }
+
 Stream* Journal_Register2( const Type streamType, const Type componentType, const Name componentName ) {
 	Stream* componentStream;
 	Stream* instanceStream;
@@ -486,6 +488,20 @@ void Journal_DeregisterFile( JournalFile* file )
 void Journal_Enable_TypedStream( const Type type, Bool enable )
 {
 	Stream* typedStream = Journal_GetTypedStream( type );
+	Stream_Enable( typedStream, enable );
+}
+
+void Journal_Enable_AllTypedStream( Bool enable )
+{
+	Stream* typedStream;
+
+	typedStream = Journal_GetTypedStream( InfoStream_Type );
+	Stream_Enable( typedStream, enable );
+	typedStream = Journal_GetTypedStream( DumpStream_Type );
+	Stream_Enable( typedStream, enable );
+	typedStream = Journal_GetTypedStream( DebugStream_Type );
+	Stream_Enable( typedStream, enable );
+	typedStream = Journal_GetTypedStream( ErrorStream_Type );
 	Stream_Enable( typedStream, enable );
 }
 
