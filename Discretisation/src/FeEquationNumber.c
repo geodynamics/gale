@@ -283,7 +283,6 @@ void _FeEquationNumber_Execute( void* feEquationNumber, void *data ){
 void _FeEquationNumber_Destroy( void* feEquationNumber, void *data ){
    FeEquationNumber* self = (FeEquationNumber*) feEquationNumber;
    Index ii;
-   Index nDims = Mesh_GetDimSize( self->feMesh );
 
    Stg_Component_Destroy( self->feMesh   , data, False );
    Stg_Component_Destroy( self->dofLayout, data, False );
