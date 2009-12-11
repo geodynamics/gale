@@ -97,6 +97,9 @@ FeMesh* LumpedMassMatrixSuite_buildFeMesh( unsigned nDims, unsigned* size, doubl
 }
 
 void LumpedMassMatrixSuite_Setup( LumpedMassMatrixSuiteData* data ) {
+
+	Journal_Enable_AllTypedStream( False );
+
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;
 	MPI_Comm_rank( data->comm, &data->rank );
@@ -127,7 +130,6 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 	FiniteElementContext*		context;
 	Index								i;
 	Dimension_Index				dim;
-	Stream*							stream;
 	/* Swarm Stuff */
 	CellLayout*						singleCellLayout;
 	ParticleLayout*				gaussParticleLayout;
@@ -142,8 +144,6 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 	LumpedMassMatrixForceTerm*	massMatrixForceTerm;
 	Particle_InCellIndex			particlesPerDim[] = {2,2,2};
 	char								expected_file[PCU_PATH_MAX];
-
-	stream = Journal_Register (Info_Type, "LumpedMassMatrixStream");
 
 	/* Read input */
 	dictionary = Dictionary_New();
@@ -220,15 +220,15 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 	Stg_Component_Build( dofs, context, False);
 	Stg_Component_Build( feVariable, context, False );
 	FeEquationNumber_BuildLocationMatrix( feVariable->eqNum );
-	Stg_Component_Build( singleCellLayout,    context, False );
+	Stg_Component_Build( singleCellLayout, context, False );
 	Stg_Component_Build( gaussParticleLayout, context, False );
-	Stg_Component_Build( swarm,               context, False );
-	Stg_Component_Build( massMatrix,          context, False );
+	Stg_Component_Build( swarm, context, False );
+	Stg_Component_Build( massMatrix, context, False );
 
 	/* Initialise */
-	Stg_Component_Initialise( feMesh,     context, False );
+	Stg_Component_Initialise( feMesh, context, False );
 	Stg_Component_Initialise( feVariable, context, False );
-	Stg_Component_Initialise( swarm,      context, False );
+	Stg_Component_Initialise( swarm, context, False );
 	Stg_Component_Initialise( massMatrix, context, False );
 
 	/* Assemble */
@@ -256,14 +256,14 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 	}
 
 	/* Destroy stuff */
-	Stg_Class_Delete( massMatrix );
-	Stg_Class_Delete( massMatrixForceTerm );
+	_Stg_Component_Delete( massMatrix );
+	_Stg_Component_Delete( massMatrixForceTerm );
 	Stg_Class_Delete( fV_Register );
-	Stg_Class_Delete( wallVC );
-	Stg_Class_Delete( feMesh );
+	_Stg_Component_Delete( wallVC );
+	_Stg_Component_Delete( feMesh );
 	Stg_Class_Delete( elementType_Register );
 	Stg_Class_Delete( extensionMgr_Register );
-	Stg_Class_Delete( dofs );
+	_Stg_Component_Delete( dofs );
 	Stg_Class_Delete( dictionary );
 }
 

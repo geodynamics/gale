@@ -88,6 +88,8 @@ FeMesh* BuildMeshQuadratic( unsigned nDims, unsigned* sizes, double* minCrd, dou
 }
 
 void ElementTypeSuite_Setup( ElementTypeSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
+
 	data->dict = Dictionary_New();
 }
 

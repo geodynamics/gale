@@ -47,6 +47,8 @@ typedef struct {
 void ElementTypeRegisterSuite_Setup( ElementTypeRegisterSuiteData* data ) {
 	data->etReg = ElementType_Register_New( "elementType_Register" );
 
+	Journal_Enable_AllTypedStream( False );
+
 	_ElementType_Register_Init( data->etReg );
 
 	ElementType_Register_Add( data->etReg, (ElementType*)ConstantElementType_New( "constant" ) );
