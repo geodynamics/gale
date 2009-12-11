@@ -493,16 +493,10 @@ void Journal_Enable_TypedStream( const Type type, Bool enable )
 
 void Journal_Enable_AllTypedStream( Bool enable )
 {
-	Stream* typedStream;
-
-	typedStream = Journal_GetTypedStream( InfoStream_Type );
-	Stream_Enable( typedStream, enable );
-	typedStream = Journal_GetTypedStream( DumpStream_Type );
-	Stream_Enable( typedStream, enable );
-	typedStream = Journal_GetTypedStream( DebugStream_Type );
-	Stream_Enable( typedStream, enable );
-	typedStream = Journal_GetTypedStream( ErrorStream_Type );
-	Stream_Enable( typedStream, enable );
+	Journal_Enable_TypedStream( Info_Type, enable );
+	Journal_Enable_TypedStream( Debug_Type, enable );
+	Journal_Enable_TypedStream( Dump_Type, enable );
+	Journal_Enable_TypedStream( Error_Type, enable );
 }
 
 void Journal_Enable_NamedStream( const Type type, const Name name, Bool enable )
