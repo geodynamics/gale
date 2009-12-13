@@ -77,10 +77,6 @@ const unsigned int DEFAULT_CELL_PARTICLE_TBL_DELTA = 4;
 
 /* --- Function Definitions --- */
 
-Swarm* Swarm_DefaultNew( Name name ) {
-	return (Swarm*)_Swarm_DefaultNew( name );
-}
-
 Swarm* Swarm_New( 
    Name                                  name,
    AbstractContext*                      context,
@@ -248,23 +244,6 @@ void* _Swarm_ParticleAt( void* swarm, Particle_Index dParticle_I ) {
 void _Swarm_Delete( void* swarm ) {
 	Swarm*			self = (Swarm*)swarm;
 
-	Stg_ObjectList_DeleteAllObjects( self->commHandlerList );
-	Stg_Class_Delete( self->commHandlerList );
-
-	FreeArray( self->swarmVars );
-
-	Memory_Free( self->cellPointTbl );
-	Memory_Free( self->cellPointCountTbl );
-
-	/* Delete SwarmVariable_Register if it has been created */
-	if ( self->swarmVariable_Register ) {
-		Stg_Class_Delete( self->swarmVariable_Register );
-	}
-
-	NewClass_Delete( self->incArray );
-
-	Swarm_Register_RemoveIndex( Swarm_Register_GetSwarm_Register(), self->swarmReg_I );
-	
 	_Stg_Component_Delete( self );
 }
 
@@ -768,6 +747,27 @@ void _Swarm_Destroy( void* swarm, void* data ) {
 	}
 	if(self->owningCellVariable)
 		Stg_Component_Destroy(self->owningCellVariable, data, False );
+
+ //  Stg_ObjectList_DeleteAllObjects( self->commHandlerList );
+	Stg_Class_Delete( self->commHandlerList );
+
+	FreeArray( self->swarmVars );
+
+	Memory_Free( self->cellPointTbl );
+	Memory_Free( self->cellPointCountTbl );
+
+	/* Delete SwarmVariable_Register if it has been created */
+	if ( self->swarmVariable_Register ) {
+		Stg_Class_Delete( self->swarmVariable_Register );
+	}
+
+	NewClass_Delete( self->incArray );
+
+	Swarm_Register_RemoveIndex( Swarm_Register_GetSwarm_Register(), self->swarmReg_I );
+
+
+
+
 }
 
 void _Swarm_BuildCells( void* swarm, void* data ) {

@@ -135,6 +135,7 @@
 	ShadowInfo* _ElementCellLayout_GetShadowInfo( void* elementCellLayout );
 
 	void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self );
+   void ElementCellLayout_DestroyShadowInfo( ElementCellLayout* self );
 	
 #endif /* __StgDomain_Swarm_ElementCellLayout_h__ */
 

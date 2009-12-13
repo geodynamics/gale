@@ -319,6 +319,8 @@ double _Mesh_Algorithms_GetMinimumSeparation( void* algorithms, double* perDim )
 		}
 	}
 
+   if( dimSep ) Memory_Free( dimSep );
+
 	return minSep;
 }
 

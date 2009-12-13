@@ -95,6 +95,7 @@ void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data
    IntegrationPoint integrationPoint;
    SwarmVariable* posVariable;
    SwarmVariable* posVariableNew;
+   Variable_Register* varReg = Variable_Register_New();
    stream = Journal_Register (Info_Type, "SwarmDumpStream");
    
    Journal_Enable_TypedStream( DebugStream_Type, False );
@@ -136,7 +137,7 @@ void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data
    Stg_Component_AssignFromXML( fileParticleLayout, cf, 0, False );
    
    newSwarm = Swarm_New( "testSwarm2", (AbstractContext*)context, (ElementCellLayout*) LiveComponentRegister_Get( context->CF->LCRegister, "elementCellLayout" ),
-		fileParticleLayout, 3, sizeof(Particle), extensionMgr_Register, Variable_Register_New(), data->comm, NULL );
+		fileParticleLayout, 3, sizeof(Particle), extensionMgr_Register, varReg, data->comm, NULL );
    /* as with for the swarmDump,  create a swarmVariable, as this will be required for the HDF5 checkpointing (else it doesn't know about the required variable to save) */   
    posVariableNew = Swarm_NewVectorVariable( newSwarm, "Position", GetOffsetOfMember( integrationPoint, xi ), Variable_DataType_Double, newSwarm->dim, "PositionX", "PositionY", "PositionZ" );
    posVariableNew->isCheckpointedAndReloaded = True;
@@ -192,10 +193,17 @@ void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data
       remove(context->outputPath);
    }
    
-		Stg_Class_Delete( fileParticleLayout);
-		Stg_Class_Delete( posVariableNew);
-		Stg_Class_Delete( newSwarm);
+   Stg_Class_Delete( varReg );
 
+   Stg_Component_Build( posVariable, NULL, False );
+   Stg_Component_Destroy( fileParticleLayout, NULL, False );
+   Stg_Component_Destroy( posVariableNew, NULL, False );
+   Stg_Component_Destroy( newSwarm, NULL, False );
+
+   Stg_Class_Delete( posVariable );
+   Stg_Class_Delete( fileParticleLayout );
+   Stg_Class_Delete( posVariableNew );
+   Stg_Class_Delete( newSwarm );
    stgMainDestroy( cf );
 
 }
