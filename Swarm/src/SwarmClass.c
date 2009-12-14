@@ -148,7 +148,8 @@ void _Swarm_Init(
 {
 	StandardParticle   particle;
 	Stream*            errorStream = Journal_Register( Error_Type, self->type );
-	
+   LiveComponentRegister* lcReg = NULL; 	
+
 	self->debug = Stream_RegisterChild( Swarm_Debug, self->type );
 	self->dim   = dim;
 	self->comm = comm;
@@ -211,6 +212,12 @@ void _Swarm_Init(
 			"OwningCell",
 			GetOffsetOfMember( particle , owningCell ),
 			Variable_DataType_Int ); /* Should be unsigned int */
+
+   lcReg = LiveComponentRegister_GetLiveComponentRegister(); /* only needed for tests like GaussLayoutSingleCellSuite which don't have liveComponent_Registers */
+   if( lcReg ) {
+      LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->owningCellVariable );
+      LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->owningCellVariable->variable );
+   }
 
    /* disable checkpointing of OwningCell as it is reinitialised on startup */   
    self->owningCellVariable->isCheckpointedAndReloaded = False;
