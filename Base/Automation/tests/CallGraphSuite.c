@@ -161,10 +161,8 @@ void CallGraphSuite_TestTableRealloc( CallGraphSuiteData* data ) {
       /* Use "i" as a unique string (unique pointer value)... don't try to print! */
       Stg_CallGraph_Push( cg3, TestFunc1, (Name)ii );
    }
-   pcu_check_true( 
-      cg3->_tableCount == count && 
-      cg3->_tableSize == (size * 2) );
-   
+   pcu_check_true( cg3->_tableCount == count && cg3->_tableSize == (size * 2) ); 
+
    Stg_Class_Delete(  cg3 );
 }
 

@@ -147,6 +147,13 @@
 	    Defaults CFile for now. TODO for next io commit */
 	Bool Stream_RedirectFile( Stream* stream, const char* const fileName );
 
+	/** Opens a registers a file for all the stream if not already opened and assigns it for output
+	    Defaults CFile for now. TODO for next io commit */
+	Bool Stream_RedirectAllToFile( const char* const fileName );
+
+	/** Purges all redirected stream files */
+	void Stream_PurgeAllRedirectedFiles( void );
+
 	/** Opens a registers a file for this stream if not already opened and assigns it for output for whole branch */
 	Bool Stream_RedirectFileBranch( Stream* stream, const char* const fileName );
 
