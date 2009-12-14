@@ -57,7 +57,7 @@
 	</struct>
 
 	<!-- Simulation control -->
-	<param name="maxTimeSteps"> 1 </param>
+	<param name="maxTimeSteps"> 2 </param>
 	<param name="outputPath"> ./output </param>
 	<param name="dumpEvery"> 1 </param>	
 	<param name="checkpointEvery"> 0 </param>
