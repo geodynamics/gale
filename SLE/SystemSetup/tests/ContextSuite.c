@@ -13,10 +13,12 @@ typedef struct {
 } ContextSuiteData;
 
 void ContextSuite_Setup( ContextSuiteData* data ) {
-	Journal_Enable_AllTypedStream( True );
+	Journal_Enable_AllTypedStream( False );
 }
 
-void ContextSuite_Teardown( ContextSuiteData* data ) {}
+void ContextSuite_Teardown( ContextSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
+}
 
 double ContextSuite_CalcDtFunc( FiniteElementContext* context) {
 	double dt;
@@ -36,21 +38,18 @@ void ContextSuite_TestContext( ContextSuiteData* data ) {
 	Dictionary*					componentDict;
 	XML_IO_Handler*			ioHandler;
 	Name							outputPath;
-	Stream*						stream = Journal_Register( Info_Type, "testContext.xml");
+	Stream*						stream; 
 	char							xml_input[PCU_PATH_MAX];
 
 	/* read in the xml input file */
 	pcu_filename_input( "testContext.xml", xml_input );
 	
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	stgMainBuildAndInitialise(cf);
 	data->context = (FiniteElementContext*)LiveComponentRegister_Get( cf->LCRegister, "context" ); 
-	data->context->info = stream;  /* Redirect output to test data stream */
+	stgMainBuildAndInitialise(cf);
 
 	dictionary = data->context->dictionary;
 	outputPath = Dictionary_GetString( dictionary, "outputPath" );
-	Journal_Enable_TypedStream( InfoStream_Type, True );
-	Stream_RedirectFile_WithPrependedPath( stream, outputPath, "test.dat" );
 
 	/* Run the test  ----------------------------------------------------------------------------------------------------*/
 	/* This is where we'd normally construct components if it was real main.
@@ -71,10 +70,13 @@ void ContextSuite_TestContext( ContextSuiteData* data ) {
 	Stg_Component_Initialise( data->context, 0 /* dummy */, False );
     
 	/* Run (Solve) phase ------------------------------------------------------------------------------------------------*/
-	AbstractContext_Dump( data->context );
-
 	data->context->maxTimeSteps = 10;
 	data->context->dtFactor = 1.0;
+
+	Journal_Enable_TypedStream( InfoStream_Type, True );
+	stream = Journal_Register( Info_Type, "testContext.xml"); 
+	data->context->info = stream;  /* Redirect output to test data stream */
+	Stream_RedirectFile_WithPrependedPath( stream, outputPath, "test.dat" );
 
 	Journal_Printf( stream, "Running with no timestep braking, using  " "dt that increases 50%% each step:\n" );
 

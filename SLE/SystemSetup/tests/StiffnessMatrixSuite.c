@@ -12,9 +12,11 @@ typedef struct {
 } StiffnessMatrixSuiteData;
 
 void StiffnessMatrixSuite_Setup( StiffnessMatrixSuiteData* data ) { 
+	Journal_Enable_AllTypedStream( False );
 }
 
 void StiffnessMatrixSuite_Teardown( StiffnessMatrixSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
 }
 
 FeVariable* buildFeVar() {

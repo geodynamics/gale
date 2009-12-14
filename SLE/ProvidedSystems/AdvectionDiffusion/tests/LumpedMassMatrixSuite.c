@@ -97,7 +97,6 @@ FeMesh* LumpedMassMatrixSuite_buildFeMesh( unsigned nDims, unsigned* size, doubl
 }
 
 void LumpedMassMatrixSuite_Setup( LumpedMassMatrixSuiteData* data ) {
-
 	Journal_Enable_AllTypedStream( False );
 
 	/* MPI Initializations */
@@ -107,6 +106,7 @@ void LumpedMassMatrixSuite_Setup( LumpedMassMatrixSuiteData* data ) {
 }
 
 void LumpedMassMatrixSuite_Teardown( LumpedMassMatrixSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
 }
 
 void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data ) {
@@ -168,9 +168,6 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 	context = FiniteElementContext_New( "context", 0,0, data->comm, dictionary );
 
 	dim = context->dim = Dictionary_GetUnsignedInt_WithDefault( dictionary, "dim", 2 );
-	Journal_Enable_TypedStream( DebugStream_Type, True );
-	Stream_SetLevelBranch( StgFEM_Debug, 3 );
-	Stream_EnableBranch( StgFEM_Debug, True );
 	
 	/* create the layout, dof and mesh to use */
 	extensionMgr_Register = ExtensionManager_Register_New();
