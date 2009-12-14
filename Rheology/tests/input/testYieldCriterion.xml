@@ -71,11 +71,11 @@
 	<param name="nonLinearMaxIterations"> 500 </param>	
 	
 	<!-- Journal Control -->
-	<param name="journal.info.Context-verbose">True</param>
-	<param name="journal-level.info.Stg_ComponentFactory">2</param>
+	<param name="journal.info.Context-verbose">False</param>
+	<param name="journal-level.info.Stg_ComponentFactory">0</param>
 	<param name="journal.debug">f</param>
 	<param name="journal-enable-branch.debug.StgFEM">f</param>
-	<param name="journal-level-branch.debug.StgFEM"> 2 </param>	
+	<param name="journal-level-branch.debug.StgFEM">0</param>	
 	
 	<!-- Geometry & Mesh setup -->
 	<param name="dim"> 2 </param>

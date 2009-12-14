@@ -4,10 +4,10 @@
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 	
 	<!-- Component Stuff -->
-	<include>StgFEM/LinearMesh.xml                 </include>
-	<include>StgFEM/VelocityField.xml              </include>
-	<include>StgFEM/TimeIntegrator.xml             </include>
-	<include>PICellerator/MaterialPointSwarm.xml   </include>
+	<include>StgFEM/LinearMesh.xml</include>
+	<include>StgFEM/VelocityField.xml</include>
+	<include>StgFEM/TimeIntegrator.xml</include>
+	<include>PICellerator/MaterialPointSwarm.xml</include>
 	
 	<list name="plugins" mergeType="merge">
 		<struct>
@@ -18,6 +18,9 @@
 
 	<!-- Rheology Components -->
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
 		<struct name="everywhere">
 			<param name="Type">Everywhere</param>
 		</struct>
@@ -77,46 +80,46 @@
 	</struct>
 	
 	<!-- Simulation control -->
-	<param name="maxTimeSteps"> 1      </param>
+	<param name="maxTimeSteps">1</param>
 	<param name="outputPath">./output</param>
-	<param name="dumpEvery"> 1 </param>	
+	<param name="dumpEvery">1</param>	
 	<!-- For randomness test to pass, particlesPerCell = 20
 		as this is hard-coded value in testDirectorRandomness.c.
 		This is because test relies on the particle directions
 		fitting a normal distribution bell-curve based on
 		an average no of particles in certain set directions,
 		which requires prior knowledge of the Standard deviation.	-->
-	<param name="particlesPerCell">  20    </param>
-	<param name="SimpleShearFactor">  2    </param>
+	<param name="particlesPerCell">20</param>
+	<param name="SimpleShearFactor">2</param>
 
 	<!-- Journal Control -->
-	<param name="journal.info.Context-verbose">True</param>
-	<param name="journal-level.info.Stg_ComponentFactory">2</param>
+	<param name="journal.info.Context-verbose">False</param>
+	<param name="journal-level.info.Stg_ComponentFactory">0</param>
 	<param name="journal.debug">f</param>
-	<param name="journal-enable-branch.debug.StgFEM">t</param>
-	<param name="journal-level-branch.debug.StgFEM"> 1 </param>	
+	<param name="journal-enable-branch.debug.StgFEM">f</param>
+	<param name="journal-level-branch.debug.StgFEM">0</param>	
 	
 	<!-- Geometry & Mesh setup -->
-	<param name="dim">        2 </param>
-	<param name="elementResI">10 </param>
-	<param name="elementResJ">10 </param>
-	<param name="elementResK">1 </param>
-	<param name="shadowDepth">1 </param>
-	<param name="minX">       0.0 </param>
-	<param name="minY">       0.0 </param>
-	<param name="minZ">       0.0 </param>
-	<param name="maxX">       1.0 </param>
-	<param name="maxY">       1.0 </param>
-	<param name="maxZ">       1.0 </param>
-	<param name="allowUnbalancing"> True </param>
+	<param name="dim">2</param>
+	<param name="elementResI">10</param>
+	<param name="elementResJ">10</param>
+	<param name="elementResK">1</param>
+	<param name="shadowDepth">1</param>
+	<param name="minX">0.0</param>
+	<param name="minY">0.0</param>
+	<param name="minZ">0.0</param>
+	<param name="maxX">1.0</param>
+	<param name="maxY">1.0</param>
+	<param name="maxZ">1.0</param>
+	<param name="allowUnbalancing">True</param>
 
 	<!-- Set up BCs and ICs -->
-	<include> Underworld/VariableConditions/velocityBCs.simpleShear.xml </include>
-	<include> Underworld/VariableConditions/velocityICs.simpleShear.xml </include>
+	<include>Underworld/VariableConditions/velocityBCs.simpleShear.xml</include>
+	<include>Underworld/VariableConditions/velocityICs.simpleShear.xml</include>
 
 	<!-- Integration Scheme configuration -->
-	<param name="gaussParticlesX"> 2 </param>
-	<param name="gaussParticlesY"> 2 </param>
-	<param name="gaussParticlesZ"> 2 </param>
+	<param name="gaussParticlesX">2</param>
+	<param name="gaussParticlesY">2</param>
+	<param name="gaussParticlesZ">2</param>
 
 </StGermainData>

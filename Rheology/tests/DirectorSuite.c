@@ -84,7 +84,7 @@ void test( UnderworldContext* context ) {
 }
 
 void testRandom( UnderworldContext* context ) {
-	AlignmentSwarmVariable* alignment              = (AlignmentSwarmVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "alignment" );
+	AlignmentSwarmVariable* alignment = (AlignmentSwarmVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "alignment" );
 	Director*               director;
 	Particle_Index          lParticle_I;
 	GlobalParticle*         particle;
@@ -256,23 +256,29 @@ void testPerMaterial2( UnderworldContext* context ) {
 }
 
 void DirectorSuite_Setup( DirectorSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
 }
 
 void DirectorSuite_Teardown( DirectorSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
 }
 
 void DirectorSuite_Test( DirectorSuiteData* data ) {
-	UnderworldContext* 	context;
+	UnderworldContext*		context;
 	Stg_ComponentFactory*	cf;
-	char			xml_input[PCU_PATH_MAX];
-   Director* director;
+	char							xml_input[PCU_PATH_MAX];
+   Director*					director;
    /* this test checks that the director will eventually spin to point in the direction of maximum shear.
       initially the director is set to point 90 degrees to this direction, so that the director routines should result in it 
       spinning 90 degrees eventually.   the test checks how the angle evolves in time against the analytic result, where we have disabled 
       the intermediate re-normalisation of the director vectors */
 	pcu_filename_input( "testDirector.xml", xml_input );
-	context = _UnderworldContext_DefaultNew( "context" );
-	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, context );
+	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
+	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	Stream_Enable( context->info, False );
+	Stream_Enable( context->verbose, False );
+	Stream_Enable( context->debug, False );
+
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, test );
 	EP_AppendClassHook( Context_GetEntryPoint( context, FiniteElementContext_EP_CalcDt ), dt, context );
 	stgMainBuildAndInitialise( cf );
@@ -285,13 +291,17 @@ void DirectorSuite_Test( DirectorSuiteData* data ) {
 }
 
 void DirectorSuite_TestRandom( DirectorSuiteData* data ) {
-	UnderworldContext* 	context;
+	UnderworldContext*		context;
 	Stg_ComponentFactory*	cf;
-	char			xml_input[PCU_PATH_MAX];
+	char							xml_input[PCU_PATH_MAX];
 
 	pcu_filename_input( "testDirectorRandom.xml", xml_input );
-	context = _UnderworldContext_DefaultNew( "context" );
-	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, context );
+	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
+	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	Stream_Enable( context->info, False );
+	Stream_Enable( context->verbose, False );
+	Stream_Enable( context->debug, False );
+	
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, testRandom );
 	stgMainBuildAndInitialise( cf );
 	stgMainLoop( cf );
@@ -299,13 +309,17 @@ void DirectorSuite_TestRandom( DirectorSuiteData* data ) {
 }
 
 void DirectorSuite_TestPerMaterial( DirectorSuiteData* data ) {
-	UnderworldContext* 	context;
+	UnderworldContext*		context;
 	Stg_ComponentFactory*	cf;
-	char			xml_input[PCU_PATH_MAX];
+	char							xml_input[PCU_PATH_MAX];
 
 	pcu_filename_input( "testDirectorPerMaterial.xml", xml_input );
-	context = _UnderworldContext_DefaultNew( "context" );
-	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, context );
+	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
+	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	Stream_Enable( context->info, False );
+	Stream_Enable( context->verbose, False );
+	Stream_Enable( context->debug, False );
+
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, testPerMaterial );
 	stgMainBuildAndInitialise( cf );
 	stgMainLoop( cf );
@@ -313,13 +327,17 @@ void DirectorSuite_TestPerMaterial( DirectorSuiteData* data ) {
 }
 
 void DirectorSuite_TestPerMaterial2( DirectorSuiteData* data ) {
-	UnderworldContext* 	context;
+	UnderworldContext*		context;
 	Stg_ComponentFactory*	cf;
-	char			xml_input[PCU_PATH_MAX];
+	char							xml_input[PCU_PATH_MAX];
 
 	pcu_filename_input( "testDirectorPerMaterial2.xml", xml_input );
-	context = _UnderworldContext_DefaultNew( "context" );
-	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, context );
+	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
+	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	Stream_Enable( context->info, False );
+	Stream_Enable( context->verbose, False );
+	Stream_Enable( context->debug, False );
+
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, testPerMaterial2 );
 	stgMainBuildAndInitialise( cf );
 	stgMainLoop( cf );

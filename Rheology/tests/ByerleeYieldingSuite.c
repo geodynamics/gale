@@ -31,9 +31,11 @@ typedef struct {
 } ByerleeYieldingSuiteData;
 
 void ByerleeYieldingSuite_Setup( ByerleeYieldingSuiteData* data ) { 
+	Journal_Enable_AllTypedStream( False );
 }
 
 void ByerleeYieldingSuite_Teardown( ByerleeYieldingSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
 }
 
 double ByerleeYieldingSuite_dt( FiniteElementContext* context ) {
@@ -44,13 +46,13 @@ double ByerleeYieldingSuite_dt( FiniteElementContext* context ) {
 }
 
 void testByerlee2D_HasYielded( 
-		void*						yieldRheology,
-		ConstitutiveMatrix*	constitutiveMatrix,
-		MaterialPointsSwarm*	materialPointsSwarm,
-		Element_LocalIndex	lElement_I,
-		MaterialPoint*			materialPoint,
-		double					yieldCriterion,
-		double					yieldIndicator ) 
+	void*						yieldRheology,
+	ConstitutiveMatrix*	constitutiveMatrix,
+	MaterialPointsSwarm*	materialPointsSwarm,
+	Element_LocalIndex	lElement_I,
+	MaterialPoint*			materialPoint,
+	double					yieldCriterion,
+	double					yieldIndicator ) 
 {
 	Dimension_Index dim_I;
 
@@ -74,7 +76,11 @@ void testByerlee2D_HasYielded(
 
 
 void ByerleeYieldingSuite_Check( FiniteElementContext* context ) {
-	Stream* stream = Journal_Register( Dump_Type, ByerleeYieldingSuite_testByerlee2D_Type );
+	Stream* stream;
+	
+	Journal_Enable_AllTypedStream( True );
+
+	stream = Journal_Register( Dump_Type, ByerleeYieldingSuite_testByerlee2D_Type );
 
    if(context->rank == 0){
       /* Don't do anything if nothing has yielded yet */
@@ -96,6 +102,7 @@ void ByerleeYieldingSuite_Check( FiniteElementContext* context ) {
       }
       Stream_CloseAndFreeFile( stream );
    }
+	Journal_Enable_AllTypedStream( False );
 }
 
 void ByerleeYieldingSuite_Check_Sync( FiniteElementContext* context ) {
@@ -126,7 +133,7 @@ void ByerleeYieldingSuite_Check_Sync( FiniteElementContext* context ) {
 }
 
 void ByerleeYieldingSuite_TestByerlee2D( ByerleeYieldingSuiteData* data ) {
-	UnderworldContext* context;
+	UnderworldContext*		context;
 	Dictionary*					dictionary;
 	YieldRheology*          yieldRheology;
 	Stg_ComponentFactory*	cf;
@@ -139,6 +146,9 @@ void ByerleeYieldingSuite_TestByerlee2D( ByerleeYieldingSuiteData* data ) {
 	pcu_filename_input( "testByerleeYieldCriterion.xml", xml_input );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
 	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	Stream_Enable( context->info, False );
+	Stream_Enable( context->debug, False );
+	Stream_Enable( context->verbose, False );
 	dictionary = context->dictionary;
 
 	stgMainBuildAndInitialise( cf );

@@ -17,9 +17,11 @@ typedef struct {
 } ConstitutiveMatrixSuiteData;
 
 void ConstitutiveMatrixSuite_Setup( ConstitutiveMatrixSuiteData* data ) { 
+	Journal_Enable_AllTypedStream( False );
 }
 
 void ConstitutiveMatrixSuite_Teardown( ConstitutiveMatrixSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
 }
 
 void SetMatrixWithSecondViscosity2( ConstitutiveMatrix* constitutiveMatrix, Element_LocalIndex lElement_I, Particle_InCellIndex cParticle_I, void* data ) {
@@ -31,11 +33,14 @@ void SetMatrixWithSecondViscosity2( ConstitutiveMatrix* constitutiveMatrix, Elem
 }
 
 void testConstitutiveMatrix( FiniteElementContext* context ) {
-	Stream*                     stream     = Journal_Register( Info_Type, "testConstitutiveMatrix" );
-	SymmetricTensor             stress;
-	SymmetricTensor             strainRate = {1, 2, 3, 4, 5, 6};
-	ConstitutiveMatrix*         constitutiveMatrix;
+	Stream*					stream;
+	SymmetricTensor		stress;
+	SymmetricTensor		strainRate = {1, 2, 3, 4, 5, 6};
+	ConstitutiveMatrix*	constitutiveMatrix;
 
+	Journal_Enable_AllTypedStream( True );
+	stream = Journal_Register( Info_Type, "testConstitutiveMatrix" );
+ 
 	constitutiveMatrix = (ConstitutiveMatrix*) LiveComponentRegister_Get( context->CF->LCRegister, "constitutiveMatrix" );
 
 	/* Create Constitutive Matrix */
@@ -73,6 +78,8 @@ void testConstitutiveMatrix( FiniteElementContext* context ) {
 	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, strainRate, stress );
 	Journal_PrintSymmetricTensor( stream, strainRate, constitutiveMatrix->dim );
 	Journal_PrintSymmetricTensor( stream, stress, constitutiveMatrix->dim );
+
+	Journal_Enable_AllTypedStream( False );
 }
 
 
