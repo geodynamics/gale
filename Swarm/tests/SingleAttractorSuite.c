@@ -92,16 +92,12 @@ void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) 
 
 	pcu_filename_input( "testSwarmParticleAdvectionSingleAttractor.xml", input_file );
 
-	Journal_Enable_TypedStream( DebugStream_Type, False );
-	Stream_EnableBranch( Swarm_Debug, True );
-	Stream_SetLevelBranch( Swarm_Debug, 3 );
-	Stream_Enable( Journal_Register( Info_Type, ParticleMovementHandler_Type ), False );
-	Stream_Enable( Journal_Register( Info_Type, CartesianGenerator_Type ), False );
-
 	cf = stgMainInitFromXML( input_file, data->comm, NULL );
 	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	Stream_Enable( cf->infoStream, False );
 	Stream_Enable( context->info, False );
 	Stream_Enable( context->verbose, False );
+	Stream_Enable( context->debug, False );
 
 	dictionary = context->dictionary;
 	Journal_ReadFromDictionary( dictionary );
@@ -141,8 +137,6 @@ void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) 
 		currParticle->randomColour = ( (double)  rand() ) / RAND_MAX;
 	}
 	
-	AbstractContext_Dump( context );
-
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Dt, SingleAttractorSuite_Dt );
 	ContextEP_Append( context, AbstractContext_EP_Save, SingleAttractorSuite_SaveSwarms );
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Solve, SingleAttractorSuite_SingleAttractor );

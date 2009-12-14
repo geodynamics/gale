@@ -52,7 +52,7 @@
 			</list>			
 		</struct>
 	</struct>
-	<param name="journal.info.lucInfo">true</param>
+	<param name="journal.info.lucInfo">True</param>
 	<param name="journal-level.info.lucInfo">2</param>
 	<param name="maxTimeSteps">1</param> 
 	<param name="dumpEvery">1</param>

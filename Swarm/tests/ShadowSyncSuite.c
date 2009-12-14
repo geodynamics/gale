@@ -66,6 +66,8 @@ double ShadowSyncSuite_Dt( void* context ) {
 }
 
 void ShadowSyncSuite_Setup( ShadowSyncSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
+
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
@@ -73,6 +75,7 @@ void ShadowSyncSuite_Setup( ShadowSyncSuiteData* data ) {
 }
 
 void ShadowSyncSuite_Teardown( ShadowSyncSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
 }
 
 void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
@@ -80,7 +83,6 @@ void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
 	Dictionary*						dictionary;
 	Dictionary*						componentDict;
 	Stg_ComponentFactory*		cf;
-	Stream*							stream;
 	Swarm*							swarm = NULL;
 	Particle							particle;
 	Particle*						currParticle = NULL;
@@ -91,15 +93,14 @@ void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
-	stream = Journal_Register (Info_Type, "SingleAttractorStream");
 	pcu_filename_input( "testSwarmParticleShadowSync.xml", input_file );
-
-	Journal_Enable_TypedStream( DebugStream_Type, False );
-	Stream_EnableBranch( Swarm_Debug, True );
-	Stream_SetLevelBranch( Swarm_Debug, 3 );
 
 	cf = stgMainInitFromXML( input_file, data->comm, NULL );
 	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	Stream_Enable( cf->infoStream, False );
+	Stream_Enable( context->info, False );
+	Stream_Enable( context->debug, False );
+	Stream_Enable( context->verbose, False );
 
 	dictionary = context->dictionary;
 	Journal_ReadFromDictionary( dictionary );
@@ -140,17 +141,11 @@ void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
 		currParticle->randomColour = ( (double)  rand() ) / RAND_MAX;
 	}
 	
-	AbstractContext_Dump( context );
-
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Dt, ShadowSyncSuite_Dt );
 	ContextEP_Append( context, AbstractContext_EP_Sync, ShadowSyncSuite_ValidateShadowing );
 
 	Stg_Component_Execute( context, 0, False );
 	Stg_Component_Destroy( context, 0, False );
-
-	if( data->rank == procToWatch ) {
-		Journal_Printf( Journal_Register( Info_Type, "success" ), "Shadow particle validation: passed\n" );
-	}
 
 	stgMainDestroy( cf );
 }
