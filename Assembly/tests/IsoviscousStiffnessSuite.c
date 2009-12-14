@@ -17,6 +17,7 @@ typedef struct {
 } IsoviscousStiffnessData;
 
 void IsoviscousStiffness_Setup( IsoviscousStiffnessData* data ) { 
+	Journal_Enable_AllTypedStream( False );
 	data->context=NULL;
 }
 

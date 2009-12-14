@@ -47,6 +47,7 @@ typedef struct {
 
 
 void UpwindXiSuite_Setup( UpwindXiSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
 }
 
 void UpwindXiSuite_Teardown( UpwindXiSuiteData* data ) {
@@ -66,7 +67,8 @@ void UpwindXiSuite_Test( UpwindXiSuiteData* data ) {
 	MPI_Comm_rank( MPI_COMM_WORLD, &rank );
 	sprintf( outputFilename, "output_%2d.dat", rank );
 
-	dataStream    = Journal_Register( Info_Type, "DataStream" );
+	Journal_Enable_TypedStream( InfoStream_Type, True );
+	dataStream = Journal_Register( Info_Type, "DataStream" );
 	Stream_RedirectFile( dataStream, outputFilename );
 		
 	Journal_Printf( dataStream, "# File to compare code with Brooks, Hughes 1982 - Fig 3.3\n");

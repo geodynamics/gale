@@ -182,11 +182,11 @@ FeEquationNumber* buildEqNumBCs() {
 }
 
 void FeEquationNumberSuite_Setup( FeEquationNumberSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
 }
 
 void FeEquationNumberSuite_Teardown( FeEquationNumberSuiteData* data ) {
 }
-
 
 void FeEquationNumberSuite_TestLocal( FeEquationNumberSuiteData* data ) {
    FeEquationNumber*	eqNum;

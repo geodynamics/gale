@@ -52,6 +52,8 @@ void C2GeneratorSuite_Setup( C2GeneratorSuiteData* data ) {
 	double maxCrd[3];
 	int rank;
 
+	Journal_Enable_AllTypedStream( False );
+
 	insist( MPI_Comm_size( MPI_COMM_WORLD, &nRanks ), == MPI_SUCCESS );
 	sizes[0] = sizes[1] = sizes[2] = nRanks * 4;
 	minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
