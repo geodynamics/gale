@@ -347,9 +347,6 @@ void _lucWindow_Execute( void* window, void* data ) {
 	lucWindow*     self         = (lucWindow*) window ;
 	lucDebug_PrintFunctionBegin( self, 1 );
 
-	/* Reset idle timer */
-	lucWindow_IdleReset(self);	
-
 	/* Flag viewports need to re-render new information */
 	lucWindow_SetViewportNeedsToSetupFlag( self, True );
 	lucWindow_SetViewportNeedsToDrawFlag( self, True );
@@ -357,6 +354,9 @@ void _lucWindow_Execute( void* window, void* data ) {
 	/* Draw Window (Call virtual to display) 
 	 initial output for background & interactive modes */
 	self->_displayWindow( self );
+
+	/* Reset idle timer */
+	lucWindow_IdleReset(self);	
 
 	/* Interactive mode? Enter event loop processing */
 	if ( self->interactive ) {
