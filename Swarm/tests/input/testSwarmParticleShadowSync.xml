@@ -13,6 +13,7 @@
 	<list name="import">
 		<param> StgDomain </param>
 	</list>
+
 	<struct name="components">
 		<struct name="mesh-linear">
 			<param name="Type">Mesh</param>
@@ -81,10 +82,6 @@
 	<param name="maxX">100.0</param> 
 	<param name="maxY">100.0</param>
 	<param name="maxZ">100.0</param>
-
-	<param name="journal.info.Context-verbose">true</param>
-	<param name="journal-level.info.Stg_ComponentFactory">0</param>
-	<param name="journal.info.Stg_ComponentFactory">False</param>
 
 	<struct name="components" mergeType="merge">
 		<struct name="context">

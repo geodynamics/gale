@@ -81,6 +81,8 @@ Mesh* GaussLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrd
 }
 
 void GaussLayoutSuite_Setup( GaussLayoutSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
+
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
@@ -93,6 +95,7 @@ void GaussLayoutSuite_Setup( GaussLayoutSuiteData* data ) {
 }
 
 void GaussLayoutSuite_Teardown( GaussLayoutSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
 }
 
 void GaussLayoutSuite_TestDriver( GaussLayoutSuiteData* data, char* name,  char* expected, char* output, Particle_InCellIndex particlesPerDim[], int totalParticleCount ) {
@@ -113,9 +116,6 @@ void GaussLayoutSuite_TestDriver( GaussLayoutSuiteData* data, char* name,  char*
 		Stream*							stream;
 		char								expected_file[PCU_PATH_MAX];
 
-		stream = Journal_Register( Info_Type, name );
-		Stream_RedirectFile( stream, output );
-
 		/* Init mesh */
 		extensionMgr_Register = ExtensionManager_Register_New();
 		mesh = GaussLayoutSuite_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, extensionMgr_Register );
@@ -133,11 +133,15 @@ void GaussLayoutSuite_TestDriver( GaussLayoutSuiteData* data, char* name,  char*
 			
 		len = (int) sizeof( swarm->cellParticleCountTbl );
 		count = 0;
-		
+
+		Journal_Enable_AllTypedStream( True );
+		stream = Journal_Register( Info_Type, name );
+		Stream_RedirectFile( stream, output );
+
 		/* Checks that the particule count on each cell are the same. */
 		for( i = 0; i < len; i++ ) {
 			count = swarm->cellParticleCountTbl[i];
-				pcu_check_true( count == totalParticleCount  );
+			pcu_check_true( count == totalParticleCount  );
 		}	
 		Swarm_GetCellMinMaxCoords( swarm, 4, minCell, maxCell );
 		Journal_Printf( stream, "Particle per dim: %d %d %d\n", particlesPerDim[0], particlesPerDim[1], particlesPerDim[2]);	
@@ -158,10 +162,9 @@ void GaussLayoutSuite_TestDriver( GaussLayoutSuiteData* data, char* name,  char*
 
 		/* Destroy stuff */
 		Stg_Class_Delete( extensionMgr_Register );
-		Stg_Component_Destroy( gaussParticleLayout, NULL, True );
-		Stg_Component_Destroy( elementCellLayout, NULL, True );
-		Stg_Component_Destroy( swarm, NULL, True );
-		/*Stg_Component_Destroy( mesh, NULL, True );*/
+		_Stg_Component_Delete( gaussParticleLayout );
+		_Stg_Component_Delete( elementCellLayout );
+		_Stg_Component_Delete( swarm );
 		remove( output );
 	}
 }

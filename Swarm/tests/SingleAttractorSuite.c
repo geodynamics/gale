@@ -66,19 +66,21 @@ typedef struct {
 } SingleAttractorSuiteData;
 
 void SingleAttractorSuite_Setup( SingleAttractorSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
+
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
 	MPI_Comm_size( data->comm, &data->nProcs );
 }
 
 void SingleAttractorSuite_Teardown( SingleAttractorSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
 }
 
 void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) {
 	Dictionary*					dictionary;
 	Dictionary*					componentDict;
 	Stg_ComponentFactory*	cf;
-	Stream*						stream;
 	Swarm*						swarm = NULL;
 	Particle						particle;
 	Particle*					currParticle = NULL;
@@ -88,17 +90,14 @@ void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) 
 	char							input_file[PCU_PATH_MAX];
 	char							expected_file[PCU_PATH_MAX];
 
-	stream = Journal_Register (Info_Type, "SingleAttractorStream");
 	pcu_filename_input( "testSwarmParticleAdvectionSingleAttractor.xml", input_file );
-
-	Journal_Enable_TypedStream( DebugStream_Type, False );
-	Stream_EnableBranch( Swarm_Debug, True );
-	Stream_SetLevelBranch( Swarm_Debug, 3 );
-	Stream_Enable( Journal_Register( Info_Type, ParticleMovementHandler_Type ), False );
-	Stream_Enable( Journal_Register( Info_Type, CartesianGenerator_Type ), False );
 
 	cf = stgMainInitFromXML( input_file, data->comm, NULL );
 	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	Stream_Enable( cf->infoStream, False );
+	Stream_Enable( context->info, False );
+	Stream_Enable( context->verbose, False );
+	Stream_Enable( context->debug, False );
 
 	dictionary = context->dictionary;
 	Journal_ReadFromDictionary( dictionary );
@@ -138,8 +137,6 @@ void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) 
 		currParticle->randomColour = ( (double)  rand() ) / RAND_MAX;
 	}
 	
-	AbstractContext_Dump( context );
-
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Dt, SingleAttractorSuite_Dt );
 	ContextEP_Append( context, AbstractContext_EP_Save, SingleAttractorSuite_SaveSwarms );
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Solve, SingleAttractorSuite_SingleAttractor );
@@ -212,8 +209,7 @@ void SingleAttractorSuite_SingleAttractor( DomainContext* context ) {
 			Journal_Printf( stream, "\t\tUpdating particleInCell %d:\n", cParticle_I );
 
 			for ( dim_I=0; dim_I < 3; dim_I++ ) {
-				movementVector[dim_I] = ( attractorPoint[dim_I] - (*oldCoord)[dim_I] ) /
-					movementSpeedDivisor;
+				movementVector[dim_I] = ( attractorPoint[dim_I] - (*oldCoord)[dim_I] ) / movementSpeedDivisor;
 				movementVector[dim_I] *= movementSign;	
 				if ( movementSign == -1 ) {
 					movementVector[dim_I] *= (float)movementSpeedDivisor / (movementSpeedDivisor-1); 

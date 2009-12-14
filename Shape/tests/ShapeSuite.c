@@ -19,15 +19,17 @@ void ShapeSuite_Teardown( ShapeSuiteData* data ) {
 
 void ShapeSuite_GeneratePoints( ShapeSuiteData* data, Dimension_Index dim, char* inputFileName ) {
 /** Test Definition: */
-	Stg_ComponentFactory* cf;
-	DomainContext*   context = NULL;
-	Dictionary*      dictionary;
-	Stg_Shape*       shape;
-	unsigned         testCoordCount, index;
-	Name             outputPath;
-	Coord            coord;
-	Stream*          stream = Journal_Register( Info_Type, inputFileName );
-	char xml_input[PCU_PATH_MAX];
+	Stg_ComponentFactory*	cf;
+	DomainContext*				context = NULL;
+	Dictionary*					dictionary;
+	Stg_Shape*					shape;
+	unsigned						testCoordCount, index;
+	Name							outputPath;
+	Coord							coord;
+	Stream*						stream = Journal_Register( Info_Type, inputFileName );
+	char							xml_input[PCU_PATH_MAX];
+
+	Journal_Enable_AllTypedStream( False );
 
 	/* read in the xml input file */
 	pcu_filename_input( inputFileName, xml_input );
@@ -35,14 +37,16 @@ void ShapeSuite_GeneratePoints( ShapeSuiteData* data, Dimension_Index dim, char*
 	stgMainBuildAndInitialise( cf );
 	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, "context" ); 
 
-
 	dictionary = context->dictionary;
 	outputPath = Dictionary_GetString( dictionary, "outputPath" );
+
 	Stream_RedirectFile_WithPrependedPath( stream, outputPath, "test.dat" );
 	shape = (Stg_Shape*) LiveComponentRegister_Get( context->CF->LCRegister, "shape" );
 	assert( shape );
 
 	testCoordCount = Dictionary_GetUnsignedInt_WithDefault( dictionary, "testCoordCount", 10000 );
+
+	Journal_Enable_TypedStream( InfoStream_Type, True );
 
 	/* Test to see if random points are in shape */
 	srand48(0);
@@ -55,7 +59,6 @@ void ShapeSuite_GeneratePoints( ShapeSuiteData* data, Dimension_Index dim, char*
 		if ( Stg_Shape_IsCoordInside( shape, coord ) ) 
 			Journal_Printf( stream, "%u\n", index );
 	}
-
 	Stream_CloseAndFreeFile( stream );
 }
 
@@ -68,6 +71,7 @@ void ShapeSuite_TestBox2D( ShapeSuiteData* data ) {
 	pcu_check_fileEq( "output/test.dat", expected_file );
 	remove("output/test.dat");
 }
+
 void ShapeSuite_TestBox3D( ShapeSuiteData* data ) {
 	Dimension_Index  dim = 3;
 	char expected_file[PCU_PATH_MAX];

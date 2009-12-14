@@ -121,6 +121,8 @@ Bool SwarmSuite_TestParticleSearchFunc( Swarm* swarm, Coord coord, Stream* strea
 }
 	
 void SwarmSuite_Setup( SwarmSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
+
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
@@ -152,10 +154,12 @@ void SwarmSuite_Setup( SwarmSuiteData* data ) {
 
 void SwarmSuite_Teardown( SwarmSuiteData* data ) {
 	/* Destroy stuff */
-	Stg_Class_Delete( data->swarm );
-	Stg_Class_Delete( data->randomParticleLayout );
-	Stg_Class_Delete( data->elementCellLayout );
+	_Stg_Component_Delete( data->swarm );
+	_Stg_Component_Delete( data->randomParticleLayout );
+	_Stg_Component_Delete( data->elementCellLayout );
 	Stg_Class_Delete( data->extensionMgr_Register );
+
+	Journal_Enable_AllTypedStream( True );
 }
 
 void SwarmSuite_TestParticleSearch( SwarmSuiteData* data ) {
@@ -181,14 +185,16 @@ void SwarmSuite_TestParticleSearch( SwarmSuiteData* data ) {
 void SwarmSuite_TestParticleCoords( SwarmSuiteData* data ) {
 	char		expected_file[PCU_PATH_MAX];
 	int		procToWatch = data->nProcs > 1 ? 1 : 0;
-	Stream*	stream = Journal_Register (Info_Type, "TestParticleCorrds");
+	Stream*	stream; 
 
 	if( data->rank == procToWatch ) {
+		Journal_Enable_AllTypedStream( True );
+		stream = Journal_Register (Info_Type, "TestParticleCorrds"); 
 		Stream_RedirectFile( stream, "testParticleCoords.dat" );
 		Swarm_PrintParticleCoords( data->swarm, stream );
 		Journal_Printf( stream, "\n" );
 		Swarm_PrintParticleCoords_ByCell( data->swarm, stream );
-	
+		Journal_Enable_AllTypedStream( False );	
 		pcu_filename_expected( "testSwarmOutput.expected", expected_file );
 		pcu_check_fileEq( "testParticleCoords.dat", expected_file );
 		remove( "testParticleCoords.dat" );

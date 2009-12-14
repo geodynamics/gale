@@ -14,10 +14,6 @@
 		<param> StgDomain </param>
 	</list>
 
-	<param name="journal.info.Context-verbose">true</param>
-	<param name="journal-level.info.Stg_ComponentFactory">0</param>
-	<param name="journal.info.Stg_ComponentFactory">False</param>
-
 	<include>testParticleCoords.xml</include>
 
 	<struct name="components" mergeType="merge">

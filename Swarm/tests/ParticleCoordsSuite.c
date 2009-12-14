@@ -76,25 +76,27 @@ void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
 	char								expected_file[PCU_PATH_MAX];
 	Stg_ComponentFactory*		cf;
 
-	/* Registers */
-	extensionMgr_Register = ExtensionManager_Register_New();   
-	variable_Register = Variable_Register_New();
-
-	/* read in the xml input file */
-	pcu_filename_input( "testLineParticleLayout.xml", input_file );
-	cf = stgMainInitFromXML( input_file, data->comm, NULL );
-	stgMainBuildAndInitialise( cf );
-	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
-	dictionary = context->dictionary;
-	stream = Journal_Register( Info_Type, "LinearParticleStream" );
-
 	if( data->rank == procToWatch ) {
-		Stream_RedirectFile( stream, "linearParticle.dat" );
+		Journal_Enable_AllTypedStream( False );
+		/* Registers */
+		extensionMgr_Register = ExtensionManager_Register_New();   
+		variable_Register = Variable_Register_New();
+
+		/* read in the xml input file */
+		pcu_filename_input( "testLineParticleLayout.xml", input_file );
+		cf = stgMainInitFromXML( input_file, data->comm, NULL );
+		stgMainBuildAndInitialise( cf );
+		context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+		dictionary = context->dictionary;
 
 		swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
 		pcu_check_true( swarm );
 
+		Journal_Enable_AllTypedStream( True );
+		stream = Journal_Register( Info_Type, "LinearParticleStream" );
+		Stream_RedirectFile( stream, "linearParticle.dat" );
 		Swarm_PrintParticleCoords( swarm, stream );
+		Journal_Enable_AllTypedStream( False );
 
 		pcu_filename_expected( "testLineParticleLayoutOutput.expected", expected_file );
 		pcu_check_fileEq( "linearParticle.dat", expected_file );

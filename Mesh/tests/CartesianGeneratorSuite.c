@@ -51,6 +51,8 @@ void CartesianGeneratorSuite_Setup( CartesianGeneratorSuiteData* data ) {
 	double maxCrd[3];
 	int rank;
 
+	Journal_Enable_AllTypedStream( False );
+
 	insist( MPI_Comm_size( MPI_COMM_WORLD, &nRanks ), == MPI_SUCCESS );
 	sizes[0] = sizes[1] = sizes[2] = nRanks * 4;
 	minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
@@ -70,10 +72,12 @@ void CartesianGeneratorSuite_Setup( CartesianGeneratorSuiteData* data ) {
 
 void CartesianGeneratorSuite_Teardown( CartesianGeneratorSuiteData* data ) {
 	Stg_Component_Destroy( data->mesh, NULL, True );
+
+	Journal_Enable_AllTypedStream( True );
 }
 
 void CartesianGeneratorSuite_TestElementVertexInc( CartesianGeneratorSuiteData* data ) {
-	unsigned	dim		= Mesh_GetDimSize( data->mesh );
+	unsigned	dim = Mesh_GetDimSize( data->mesh );
 	Sync*		elSync		= (Sync*)IGraph_GetDomain( (IGraph*)data->mesh->topo, dim );
 	Sync*		vertSync	= (Sync*)IGraph_GetDomain( (IGraph*)data->mesh->topo, MT_VERTEX );
 	Grid*		elGrid		= *(Grid**)Mesh_GetExtension( data->mesh, Grid**, "elementGrid" );
