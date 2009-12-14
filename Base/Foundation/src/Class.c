@@ -99,8 +99,9 @@ void _Stg_Class_Delete( void* _class ) {
 	if( self->_deleteSelf ) {
 		Memory_CountDec( self );
 
+      Memory_Free( self );
 		if ( Memory_CountGet( self ) <= 0 ) {
-			Memory_Free( self );
+			//Memory_Free( self );
 		}
 	}
 }
@@ -201,6 +202,7 @@ void* _Stg_Class_Copy( void* _class, void* dest, Bool deep, Name nameExt, struct
 	newClass->_delete = self->_delete;
 	newClass->_print = self->_print;
 	newClass->_copy = self->_copy;
+	newClass->nRefs = self->nRefs;
 	
 	return (void*)newClass;
 }
