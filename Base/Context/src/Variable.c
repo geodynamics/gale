@@ -533,6 +533,7 @@ void* _Variable_Copy( void* variable, void* dest, Bool deep, Name nameExt, PtrMa
 	newVariable->arraySizeFunc = self->arraySizeFunc;
 	
 	newVariable->allocateSelf = self->allocateSelf; /* This may change depending on whether arrayPtr is found in map */
+	newVariable->subVariablesCount = self->subVariablesCount;
 
 	/* single valued members */
 	
@@ -934,11 +935,16 @@ void _Variable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* da
 	
 void _Variable_Destroy( void* variable, void* data ) {
 	Variable* self = (Variable*)variable;
+   int ii;
+
+   for( ii = 0 ; ii < self->subVariablesCount ; ii++ ) {
+      Stg_Component_Destroy( self->components[ii], data, False );
+   }
 	
 	if ( self->dataSizes ) {
 		Memory_Free( self->dataSizes );
 	}
-	if (self->allocateSelf) {
+	if (self->allocateSelf && self->arraySize != 0) {
 		Memory_Free( self->arrayPtr );
 	}
 	
