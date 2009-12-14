@@ -157,7 +157,10 @@ void _MassMatrixTerm_Execute( void* matrixTerm, void* data ) {
 }
 
 void _MassMatrixTerm_Destroy( void* matrixTerm, void* data ) {
-    _StiffnessMatrixTerm_Destroy( matrixTerm, data );
+   MassMatrixTerm* self = (MassMatrixTerm*)matrixTerm;
+
+   Stg_Component_Destroy( self->field, data, False );
+   _StiffnessMatrixTerm_Destroy( matrixTerm, data );
 }
 
 

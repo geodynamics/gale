@@ -170,6 +170,10 @@ void _PressureGradMatrixTerm_Execute( void* matrixTerm, void* data ) {
 }
 
 void _PressureGradMatrixTerm_Destroy( void* matrixTerm, void* data ) {
+   PressureGradMatrixTerm* self = (PressureGradMatrixTerm*)matrixTerm;
+   Stg_Component_Destroy( self->gradField, data, False );
+   Stg_Component_Destroy( self->stiffMat, data, False );
+
 	_StiffnessMatrixTerm_Destroy( matrixTerm, data );
 }
 

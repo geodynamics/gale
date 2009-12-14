@@ -154,7 +154,7 @@ void _GradientStiffnessMatrixTerm_Execute( void* matrixTerm, void* data ) {
 void _GradientStiffnessMatrixTerm_Destroy( void* matrixTerm, void* data ) {
 	GradientStiffnessMatrixTerm* self = (GradientStiffnessMatrixTerm*)matrixTerm;
 
-	Memory_Free( self->Ni_col ); 
+   if( self->Ni_col ) Memory_Free( self->Ni_col ); 
 	_StiffnessMatrixTerm_Destroy( matrixTerm, data );
 }
 

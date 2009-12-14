@@ -120,15 +120,21 @@ void _FeMesh_Algorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* c
 }
 
 void _FeMesh_Algorithms_Build( void* algorithms, void* data ) {
+   FeMesh_Algorithms* self = (FeMesh_Algorithms*)algorithms;
+   _Mesh_Algorithms_Build( self, data );
 }
 
 void _FeMesh_Algorithms_Initialise( void* algorithms, void* data ) {
+   FeMesh_Algorithms* self = (FeMesh_Algorithms*)algorithms;
+   _Mesh_Algorithms_Initialise( self, data );
 }
 
 void _FeMesh_Algorithms_Execute( void* algorithms, void* data ) {
 }
 
 void _FeMesh_Algorithms_Destroy( void* algorithms, void* data ) {
+   FeMesh_Algorithms* self = (FeMesh_Algorithms*)algorithms;
+   _Mesh_Algorithms_Destroy( self, data );
 }
 
 Bool _FeMesh_Algorithms_Search( void* algorithms, double* point, 

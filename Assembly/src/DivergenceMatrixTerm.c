@@ -156,6 +156,7 @@ void _DivergenceMatrixTerm_Execute( void* matrixTerm, void* data ) {
 void _DivergenceMatrixTerm_Destroy( void* matrixTerm, void* data ) {
 	DivergenceMatrixTerm* self = (DivergenceMatrixTerm*) matrixTerm;
 
+   if( self->Ni_col) Memory_Free( self->Ni_col );
 	_StiffnessMatrixTerm_Destroy( matrixTerm, data );
 }
 
