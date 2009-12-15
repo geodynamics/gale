@@ -57,6 +57,7 @@ BackgroundParticleLayout* BackgroundParticleLayout_New( Name name,
    _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
    _BackgroundParticleLayout_Init( self );
    self->isConstructed = True;
+   return self;
 }
 BackgroundParticleLayout* _BackgroundParticleLayout_New(  BACKGROUNDPARTICLELAYOUT_DEFARGS  )
 {
@@ -128,7 +129,7 @@ void  _BackgroundParticleLayout_AssignFromXML( void* component, Stg_ComponentFac
 
    _ParticleLayout_AssignFromXML( self, cf, data );
 
-   _BackgroundParticleLayout_Init( component );
+   _BackgroundParticleLayout_Init( self );
 }
 
 void  _BackgroundParticleLayout_Build( void* component, void* data ) {}
