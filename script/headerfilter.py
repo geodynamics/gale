@@ -4,7 +4,7 @@ import getopt
 import glob
 import os.path
 import shutil
-import string
+import string, math, operator
 import sys
 import token
 import tokenize
@@ -50,7 +50,7 @@ class Input():
 
             metaFile = Meta(metaText)
             metaFile.createMetaDictionaryDtd()
-            #print metaFile.dictionary
+
 
             # put into C friendly format at top of function
             # allows for dictionaries embedded in lists in the dictionary
@@ -143,7 +143,7 @@ class Input():
                 # add in rest of file
                 for i in range(stringNum, stringEnd-1):
                     outText += self.output[i]
-                #print outText
+
                 # save to self.output
                 self.output = outText
             else:
@@ -162,6 +162,8 @@ class Input():
         lineCount = 0
         functionNames = []
         parentNames = []
+        goodFunctionNames = []
+        goodParentNames = []
         functionLineCount = []
         functionCounter = 0
         for line in text:
@@ -175,8 +177,6 @@ class Input():
 
 				stringEnd =(str(line)).find("\\")
 				if stringEnd >=0:
-
-
 					functionName = ((line[stringStart+10: stringEnd]).lstrip()).rstrip()
 
 					stringNextStart = -1
@@ -207,11 +207,16 @@ class Input():
 						if stringNextEnd >= 0:
                                                     if (lineCount + i) < (len(text)-1):
 							parentName = ((text[lineCount +i][stringNextStart + 2:stringNextEnd]).lstrip()).rstrip()
+                                                        
+
 
                                                         functionNames.append(functionName)
                                                         parentNames.append(parentName)
+                                                      
                           	                        functionLineCount.append(lineCount)
                                                         functionCounter = functionCounter+1
+                                                        break
+                                                        
                                                     else:
                                                         parentName = ((text[len(text)-1][stringNextStart + 2:stringNextEnd]).lstrip()).rstrip()
 
@@ -219,7 +224,8 @@ class Input():
                                                         parentNames.append(parentName)
 					                functionLineCount.append(lineCount)
                                                         functionCounter = functionCounter+1
-
+                                                        break
+                                                   
 					    stringNextStart = -1
 					    stringNextEnd = -1
 
@@ -234,22 +240,25 @@ class Input():
 			#Find line that creates the inherited struct:
 			# Find line that looks like "	struct ",self.functionName," { __",self.FunctionName," };"
                         functionCounter = 0
-                        
+
+
                         for functionName in functionNames:
 			    myString = ""
 			    myString = "struct "
                             myMiddleString = functionName
 			    myNextString = "__"+functionName
 			    stringStart = (str(line)).find(myString )
-
+                            
 			    if stringStart >=0:
 
                                 stringMiddle = (str(line)).find(myMiddleString)
 				stringEnd = (str(line)).find(myNextString)
 				if stringEnd >=0:
 
-                                    self.functionName = functionName
-                                    self.parentName = parentNames[functionCounter]
+                                    # have to make this adaptable to multifunction possiblilities ...ouch.
+                                    goodFunctionNames.append(functionName)
+
+                                    goodParentNames.append(parentNames[functionCounter])
                                     #Extract out lineCount beginning for section
 
                                     (self.lines).append(functionLineCount[functionCounter])
@@ -260,8 +269,8 @@ class Input():
                                 #check next line for remainder of code, just in case it didn't fit on one line.
                                     stringEnd = (str(text[lineCount+1])).find(myNextString)
                                     if stringEnd >=0:
-                                         self.functionName = functionName
-                                         self.parentName = parentNames[functionCounter]
+                                         goodFunctionNames.append(functionName)
+                                         goodParentNames.append(parentNames[functionCounter])
 
                                          (self.lines).append(functionLineCount[functionCounter])
                                          (self.lines).append(lineCount+1)
@@ -270,60 +279,158 @@ class Input():
                             functionCounter = functionCounter +1			
 			lineCount = lineCount + 1
 
-        #print functionNames
-        #print parentNames
-        #print functionLineCount
-        #print "self.lines = " + str(self.lines)           		
-        #print "******** "+ self.functionName +" " +self.parentName
-		
-		# Now, if there is text to replace:
-        if self.functionName != "":
+                   		
+
+        # Now we have to check for #ifdef and #else statements within the code structure.
+        # If length self.lines > 2, then that means there maybe multiple definitions of the
+        # class, or multiple classes defined within the file... the second would be harder to manage.
+        
+        if len(self.lines) > 2:
+
+            endLines = []
+            #check line before self.lines beginning for #ifdef or #else statements
+	    # self.lines comes in [start, stop] pairs
+            for i in range (len(self.lines)/2):
+
+              # arbitrary range to check no of lines before #define line
+              inLoop = False
+              for k in range(1,4):
+                lineNum = self.lines[2*i] -k
+                if lineNum < 0:
+                    lineNum = 0
+
+                if ((text[lineNum]).find("#ifdef") ) or ( (text[lineNum]).find("#else") ) :
+                     inLoop = True
+
+                     break
+                
+              # It is in an #ifdef loop. 
+              #so have to redefine the lines to be removed.
+              #Look for #else or #end
+              if inLoop == True:
+
+                 for lineNum in range(self.lines[2*i], len(text) ):     
+                     if ((text[lineNum]).find("#else") >=0 ) or ( (text[lineNum]).find("#end") >=0 ) :
+
+                          endLines.append(self.lines[2*i+1])
+                          self.lines[2*i +1] = lineNum -1
+                          break
+
+
+
+        # Now, if there is text to replace:
+        goodFuncCount = 0
+
+        for functionName in goodFunctionNames:
+            # dodgy set here, to let meta stuff work.
+            self.functionName = functionName
+
+            if functionName != "":
 			# replace all text between lines [a, b] with new struct structure:
 			inheritanceText = ""
 			# if no parent function, add all inbetween text
-			if self.parentName != "":
-				inheritanceText = " : "+self.parentName
-			self.addedText = "struct "+ self.functionName + inheritanceText +"\n {\n "
+                        parentName = goodParentNames[goodFuncCount]
+                        self.parentName = goodParentNames[goodFuncCount]
+			if parentName != "":
+				inheritanceText = " : "+parentName
+			self.addedText = "struct "+ functionName + inheritanceText +"\n {\n "
 			lineNum = -1
-                        #print self.addedText
-                        #print self.lines
-			if len(self.lines) == 2:
-                                #print self.lines
-				for lineNum in range(self.lines[0]+1, self.lines[1]-1):
-					if self.parentName == "":
-						self.addedText += text[lineNum].split("\\")[0] + "\n "
-					else:
-						# add inbetween text removing old parent function line
-						myText = 0
-						myText = text[lineNum].count(self.parentName)
 
-						if myText ==  0:
+			if operator.mod(len(self.lines),2) == 0:
+
+				for lineNum in range(self.lines[goodFuncCount*2]+1, self.lines[goodFuncCount*2 + 1]+1):
+					if parentName == "":
+                                            if (text[lineNum].find(functionName) < 0) and (text[lineNum].find("struct ") < 0) :
+						self.addedText += text[lineNum].split("\\")[0] + "\n "
+
+					else:
+                                            if (text[lineNum].find(functionName) < 0) and (text[lineNum].find("struct ") < 0) :
+						# add inbetween text removing old parent function line
+						myText = -1
+						myText = text[lineNum].find(parentName)
+						if (myText < 0):
 							self.addedText += text[lineNum].split("\\")[0] + "\n "
-		                
+                                     
+
 				# replace old text section with new 'addedText'
-			        for lines in range(0, self.lines[0]-1):
-					self.output += text[lines]
+
+                                if goodFuncCount == 0 :
+
+			            for lines in range(0, self.lines[goodFuncCount*2]):
+
+                                       # make sure old struct functionname line not included.
+                                        if len(self.lines) >2 :
+                                            if lines != endLines[goodFuncCount]:
+					        self.output += text[lines]
+
+                                        else:
+
+                                                self.output += text[lines]
+
+                                else:
+                                    for lines in range(self.lines[((goodFuncCount-1) * 2)+1]+1, self.lines[goodFuncCount*2]):
+
+
+                                       # make sure old struct functionname line not included.
+                                        if len(self.lines) >2 :
+                                            if lines != endLines[goodFuncCount]:
+					        self.output += text[lines]
+                                        else:
+                                            if lines != self.lines[len(self.lines)-1]:
+                                                self.output += text[lines]
+
+
 			        self.output += self.addedText
-                                #print self.addedText
+
+
                         #Add in public: statement just in case.
                                 self.output += "public: \n" 
-				
-                # Find #endif statement and insert bracket before it.
-			        for lines in range(self.lines[1]+1, len(text)):
-					if ((text[lines]).find("#endif") >= 0):
 
-					   self.output +=  "};\n" + text[lines]
-					else:
-					    self.output += text[lines]
-                        #print self.addedText
-             
+
                 
-		# if no alterations are needed, then write output to screen as is	
-        elif self.functionName == "":
-			for lines in range(0, len(text)):
-				self.output += text[lines] 
-        self.output+="  "
-		
+            goodFuncCount = goodFuncCount + 1
+  		
+
+
+                
+        # if no alterations are needed, then write output to screen as is
+        totalFunctionName = ""	
+        for functionName in goodFunctionNames:
+            totalFunctionName = totalFunctionName + functionName
+
+        if totalFunctionName == "":
+	    for lines in range(0, len(text)):
+	        self.output += text[lines] 
+            self.output+="  "
+
+        # Find last #endif statement and insert bracket before it.
+        if goodFunctionNames != []:
+          if goodFunctionNames[0] != "" :
+
+            for lines in range(len(text)-1, self.lines[len(self.lines) -1], -1):
+		if ((text[lines]).find("#endif") >= 0):
+                    endLineNum = lines
+                    break
+
+            for lines in range(self.lines[len(self.lines)-1]+1, len(text) ):
+                 if (lines == endLineNum):
+	             self.output +=  "};\n" + text[lines]
+		 else:
+                     valueBool = False
+                     if len(self.lines) > 2:
+                         for value in range(0, len(endLines)):
+                             if lines == endLines[value]:
+                                  valueBool = True
+                     else:
+                        
+                         if lines == self.lines[1]:
+
+                             valueBool = True
+                     if valueBool == False:
+		         self.output += text[lines]
+
+
+
     ## main function to tie all class functions together in a run
     def main(self):  	
 		# Read in files
