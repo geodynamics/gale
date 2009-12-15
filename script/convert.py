@@ -144,14 +144,10 @@ def dtdDict2metaXsdDict( stgDtdDict ):
 def metaXsdDict2stgCodeHeader():
 	s = ''
 	s += '#include <stdarg.h>\n'
-	s += '#include <string.h>\n'
-	s += '#include <stdio.h>\n'
-	s += '#include <stdlib.h>\n'
 	# Purposely refer to internal StGermain headers, as StGermain/StGermain.h would necessarily exist yet if a meta file exists
 	# within StGermain itself.
 	s += '#include "StGermain/Base/Foundation/Foundation.h"\n'
 	s += '#include "StGermain/Base/IO/IO.h"\n'
-	s += '#define MAX_CHAR_SIZE 50\n'
 
 	return s
 
@@ -192,42 +188,6 @@ def metaXsdDict2stgDictionaryCode( xsdDict ):
 	s += '\tDictionary* code;\n'
 	s += '\tDictionary* implements;\n'
 	s += '\tDictionary* parameters;\n'
-
-	s += '\tchar _xml[MAX_CHAR_SIZE];\n'
-	s += '\tchar _title[MAX_CHAR_SIZE];\n'
-	s += '\tchar _creator[MAX_CHAR_SIZE];\n'
-	s += '\tchar _publisher[MAX_CHAR_SIZE];\n'
-	s += '\tchar _rights[MAX_CHAR_SIZE];\n'
-	s += '\tchar _source[MAX_CHAR_SIZE];\n'
-	s += '\tchar _subject[MAX_CHAR_SIZE];\n'
-	s += '\tchar _description[MAX_CHAR_SIZE];\n'
-	s += '\tchar _info[MAX_CHAR_SIZE];\n'
-	
-	s += '\tchar _example_documentation[MAX_CHAR_SIZE];\n'
-	s += '\tchar _example_code[MAX_CHAR_SIZE];\n'
-	s += '\tchar _inherits[MAX_CHAR_SIZE];\n'
-	s += '\tchar _code[MAX_CHAR_SIZE];\n'
-	s += '\tchar _reference[MAX_CHAR_SIZE];\n'
-	s += '\tchar _equation[MAX_CHAR_SIZE];\n'
-	s += '\tchar _implements[MAX_CHAR_SIZE];\n'
-	s += '\tchar _name[MAX_CHAR_SIZE];\n'
-	s += '\tchar _type[MAX_CHAR_SIZE];\n'
-	s += '\tchar _default[MAX_CHAR_SIZE];\n'
-	s += '\tchar _parameters[MAX_CHAR_SIZE];\n'
-	s += '\tchar _nillable[MAX_CHAR_SIZE];\n'
-	s += '\tchar _documentation[MAX_CHAR_SIZE];\n'
-	s += '\tchar _associations[MAX_CHAR_SIZE];\n'
-	s += '\tchar _parameter_var[MAX_CHAR_SIZE];\n'
-	s += '\tchar _association_var[MAX_CHAR_SIZE];\n'
-
-	s += '\tstrcpy( _xml, "xml" ); strcpy( _title, "title" ); strcpy( _creator, "creator" ); strcpy( _publisher, "publisher" );\n'
-	s += '\tstrcpy( _rights, "rights" ); strcpy( _source, "source" ); strcpy( _subject, "subject" ); strcpy( _description, "description" );\n'
-	s += '\tstrcpy( _info, "info" ); strcpy( _example_documentation, "example-documentation" ); strcpy( _example_code, "example-code" );\n'
-	s += '\tstrcpy( _inherits, "inherits" ); strcpy( _code, "code" ); strcpy( _reference, "reference" ); strcpy( _equation, "equation" );\n'
-	s += '\tstrcpy( _implements, "_implements" ); strcpy( _name, "name" ); strcpy( _type, "type" ); strcpy( _default, "default" );\n'
-	s += '\tstrcpy( _parameters, "parameters" ); strcpy( _nillable, "nillable" ); strcpy( _documentation, "documentation" );\n'
-	s += '\tstrcpy( _associations, "associations" ); strcpy( _parameter_var, "" ); strcpy( _association_var, "" );\n'
-
 	for param in xsdDict["parameters"]:
 		s+= '\tDictionary* ' + safecvar( param["name"] ) + 'Param;\n'
 	s += '\tDictionary* associations;\n'
@@ -239,108 +199,88 @@ def metaXsdDict2stgDictionaryCode( xsdDict ):
 	s += '\n'
 
 	# XML ... (requires metaXsdDict2stgStrings( xsdDict ) to have been called first)
-	s += '\tDictionary_Add( meta, _xml, Dictionary_Entry_Value_FromString( ' + safecvar( xsdDict["info"]["title"] ) + '_Meta ));\n'
+	s += '\tDictionary_Add( meta, "xml", Dictionary_Entry_Value_FromString( ' + safecvar( xsdDict["info"]["title"] ) + '_Meta ));\n'
 	s += '\n'
 	
 	# Info...
 	s += '\tinfo = Dictionary_New();\n'
-	s += '\tDictionary_Add( info, _title, Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["info"]["title"] ) + '" ));\n'
-	s += '\tDictionary_Add( info, _creator, Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["info"]["creator"] ) + '" ));\n'
-	s += '\tDictionary_Add( info, _publisher, Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["info"]["publisher"] ) + '" ));\n'
-	s += '\tDictionary_Add( info, _rights, Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["info"]["rights"] ) + '" ));\n'
-	s += '\tDictionary_Add( info, _source, Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["info"]["source"] ) + '" ));\n'
-	s += '\tDictionary_Add( info, _subject, Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["info"]["subject"] ) + '" ));\n'
-	s += '\tDictionary_Add( info, _description, Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["info"]["description"] ) + '" ));\n'
-	s += '\tDictionary_Add( meta, _info, Dictionary_Entry_Value_FromStruct( info ) );\n'
+	s += '\tDictionary_Add( info, "title", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["info"]["title"] ) + '" ));\n'
+	s += '\tDictionary_Add( info, "creator", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["info"]["creator"] ) + '" ));\n'
+	s += '\tDictionary_Add( info, "publisher", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["info"]["publisher"] ) + '" ));\n'
+	s += '\tDictionary_Add( info, "rights", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["info"]["rights"] ) + '" ));\n'
+	s += '\tDictionary_Add( info, "source", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["info"]["source"] ) + '" ));\n'
+	s += '\tDictionary_Add( info, "subject", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["info"]["subject"] ) + '" ));\n'
+	s += '\tDictionary_Add( info, "description", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["info"]["description"] ) + '" ));\n'
+	s += '\tDictionary_Add( meta, "info", Dictionary_Entry_Value_FromStruct( info ) );\n'
 	s += '\n'
 
 	# Code...
 	s += '\tcode = Dictionary_New();\n'
 	try:
-		s += '\tDictionary_Add( code, _example_documentation, Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["code"]["example-documentation"] ) + '" ));\n'
+		s += '\tDictionary_Add( code, "example-documentation", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["code"]["example-documentation"] ) + '" ));\n'
 	except KeyError:
 		pass
 	try:
-		s += '\tDictionary_Add( code, _example_code, Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["code"]["example-code"] ) + '" ));\n'
+		s += '\tDictionary_Add( code, "example-code", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["code"]["example-code"] ) + '" ));\n'
 	except KeyError:
 		pass
 	try:
-		s += '\tDictionary_Add( code, _inherits, Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["code"]["inherits"] ) + '" ));\n'
+		s += '\tDictionary_Add( code, "inherits", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["code"]["inherits"] ) + '" ));\n'
 	except KeyError:
 		pass
-	s += '\tDictionary_Add( meta, _code, Dictionary_Entry_Value_FromStruct( code ) );\n'
+	s += '\tDictionary_Add( meta, "code", Dictionary_Entry_Value_FromStruct( code ) );\n'
 	s += '\n'
 
 	# Implements...
 	s += '\timplements = Dictionary_New();\n'
 	try:
-		s += '\tDictionary_Add( implements, _reference, Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["implements"]["reference"] ) + '" ));\n'
+		s += '\tDictionary_Add( implements, "reference", Dictionary_Entry_Value_FromString( "' + safecval( xsdDict["implements"]["reference"] ) + '" ));\n'
 	except KeyError:
 		pass
 	try:
 		# BIG ASSUMPTION: equation is in latex
-		s += '\tDictionary_Add( implements, _equation, Dictionary_Entry_Value_FromString( "' + safecvalFromLatex( xsdDict["implements"]["equation"] ) + '" ));\n'
+		s += '\tDictionary_Add( implements, "equation", Dictionary_Entry_Value_FromString( "' + safecvalFromLatex( xsdDict["implements"]["equation"] ) + '" ));\n'
 	except KeyError:
 		pass
-	s += '\tDictionary_Add( meta, _implements, Dictionary_Entry_Value_FromStruct( implements ) );\n'
+	s += '\tDictionary_Add( meta, "implements", Dictionary_Entry_Value_FromStruct( implements ) );\n'
 	s += '\n'
 
 	# Parameters...
 	s += '\tparameters = Dictionary_New();\n'
-    
-	parameter_list=[]
 	for param in xsdDict["parameters"]:
-		parameter_list.append( safecvar( param["name"] ) ) 
-                
-	p_i = 0
-	for param in xsdDict["parameters"]:
-		s += 'strcpy( _parameter_var, ' + "\"" + parameter_list[p_i]  + "\"" + ');' 
 		s += '\t' + safecvar( param["name"] ) + 'Param = Dictionary_New();\n'
-		s += '\tDictionary_Add( ' + safecvar( param["name"] ) + 'Param, _name, Dictionary_Entry_Value_FromString( "' + safecval( param["name"] ) + '" ));\n'
-		s += '\tDictionary_Add( ' + safecvar( param["name"] ) + 'Param, _type, Dictionary_Entry_Value_FromString( "' + safecval( param["type"] ) + '" ));\n'
+		s += '\tDictionary_Add( ' + safecvar( param["name"] ) + 'Param, "name", Dictionary_Entry_Value_FromString( "' + safecval( param["name"] ) + '" ));\n'
+		s += '\tDictionary_Add( ' + safecvar( param["name"] ) + 'Param, "type", Dictionary_Entry_Value_FromString( "' + safecval( param["type"] ) + '" ));\n'
 		try:
-			s += '\tDictionary_Add( ' + safecvar( param["name"] ) + 'Param, _default, Dictionary_Entry_Value_FromString( "' + safecval( param["default"] ) + '" ));\n'
+			s += '\tDictionary_Add( ' + safecvar( param["name"] ) + 'Param, "default", Dictionary_Entry_Value_FromString( "' + safecval( param["default"] ) + '" ));\n'
 		except KeyError:
 			pass
 		try:
-			s += '\tDictionary_Add( ' + safecvar( param["name"] ) + 'Param, _documentation, Dictionary_Entry_Value_FromString( "' + safecval( param["documentation"] ) + '" ));\n'
+			s += '\tDictionary_Add( ' + safecvar( param["name"] ) + 'Param, "documentation", Dictionary_Entry_Value_FromString( "' + safecval( param["documentation"] ) + '" ));\n'
 		except KeyError:
 			pass
-		s += '\tDictionary_Add( parameters, _parameter_var, Dictionary_Entry_Value_FromStruct( ' + safecvar( param["name"] ) + 'Param ) );\n'
+		s += '\tDictionary_Add( parameters, "' + safecval( param["name"] ) + '", Dictionary_Entry_Value_FromStruct( ' + safecvar( param["name"] ) + 'Param ) );\n'
 		s += '\n'
-		p_i +=1
-		s += '\tmemset( _parameter_var, 0, 512 );'
-
-	s += '\tDictionary_Add( meta, _parameters, Dictionary_Entry_Value_FromStruct( parameters ) );\n'
+	s += '\tDictionary_Add( meta, "parameters", Dictionary_Entry_Value_FromStruct( parameters ) );\n'
 	s += '\n'
 
-	association_list = []
-	for assoc in xsdDict["associations"]:
-		association_list.append( safecvar( assoc["name"] ) )
-
-	a_i = 0
 	# Associations...
 	s += '\tassociations = Dictionary_New();\n'
-
 	for assoc in xsdDict["associations"]:
-		s += 'strcpy( _association_var, ' + "\"" + association_list[a_i]  + "\"" + ');' 
 		s += '\t' + safecvar( assoc["name"] ) + 'Assoc = Dictionary_New();\n'
-		s += '\tDictionary_Add( ' + safecvar( assoc["name"] ) + 'Assoc, _name, Dictionary_Entry_Value_FromString( "' + safecval( assoc["name"] ) + '" ));\n'
-		s += '\tDictionary_Add( ' + safecvar( assoc["name"] ) + 'Assoc, _type, Dictionary_Entry_Value_FromString( "' + safecval( assoc["type"] ) + '" ));\n'
+		s += '\tDictionary_Add( ' + safecvar( assoc["name"] ) + 'Assoc, "name", Dictionary_Entry_Value_FromString( "' + safecval( assoc["name"] ) + '" ));\n'
+		s += '\tDictionary_Add( ' + safecvar( assoc["name"] ) + 'Assoc, "type", Dictionary_Entry_Value_FromString( "' + safecval( assoc["type"] ) + '" ));\n'
 		try:
-			s += '\tDictionary_Add( ' + safecvar( assoc["name"] ) + 'Assoc, _nillable, Dictionary_Entry_Value_FromString( "' + safecval( assoc["nillable"] ) + '" ));\n'
+			s += '\tDictionary_Add( ' + safecvar( assoc["name"] ) + 'Assoc, "nillable", Dictionary_Entry_Value_FromString( "' + safecval( assoc["nillable"] ) + '" ));\n'
 		except KeyError:
 			pass
 		try:
-			s += '\tDictionary_Add( ' + safecvar( assoc["name"] ) + 'Assoc, _documentation, Dictionary_Entry_Value_FromString( "' + safecval( assoc["documentation"] ) + '" ));\n'
+			s += '\tDictionary_Add( ' + safecvar( assoc["name"] ) + 'Assoc, "documentation", Dictionary_Entry_Value_FromString( "' + safecval( assoc["documentation"] ) + '" ));\n'
 		except KeyError:
 			pass
-		s += '\tDictionary_Add( associations, _association_var , Dictionary_Entry_Value_FromStruct( ' + safecvar( assoc["name"] ) + 'Assoc ) );\n'
+		s += '\tDictionary_Add( associations, "' + safecval( assoc["name"] ) + '", Dictionary_Entry_Value_FromStruct( ' + safecvar( assoc["name"] ) + 'Assoc ) );\n'
 		s += '\n'
-		a_i += 1
-		s += '\tmemset( _association_var, 0, 512 );'
-
-	s += '\tDictionary_Add( meta, _associations, Dictionary_Entry_Value_FromStruct( associations ) );\n'
+	s += '\tDictionary_Add( meta, "associations", Dictionary_Entry_Value_FromStruct( associations ) );\n'
 	s += '\n'
 	s += '\treturn meta;\n'
 	s += '}\n'
@@ -350,7 +290,6 @@ def metaXsdDict2stgDictionaryCode( xsdDict ):
 	s += '\treturn ' + safecvar( xsdDict["info"]["title"] ) +  '_MetaAsDictionary();\n'
 	s += '}\n'
 
-	# Reset char[] variables
 	return s
 
 
