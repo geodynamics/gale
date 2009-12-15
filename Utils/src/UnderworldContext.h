@@ -53,15 +53,7 @@
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
 		__PICelleratorContext \
 		/* Virtual functions go here */ \
-		//\
-		/* UnderworldContext info */ \
-		TimeIntegrator*			timeIntegrator; \
-		/* SLE Stuff */ \
-		Stokes_SLE*					stokesSLE; \
-		AdvectionDiffusionSLE*	energySLE; \
-		AdvectionDiffusionSLE*	compositionSLE; \
-		ConstitutiveMatrix*		constitutiveMatrix; \
-		
+
 	struct UnderworldContext { __UnderworldContext };
 
 
