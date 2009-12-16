@@ -512,14 +512,14 @@ Index Stg_ObjectList_Remove( void* objectList, Name reference, ReplacementOption
 	return self->_remove( self, reference, option );
 }
 
-Index Stg_ObjectList_GetIndex( void* objectList, const Name const toGet ) {
+Index Stg_ObjectList_GetIndex( void* objectList, const Name toGet ) {
 	Stg_ObjectList* self = (Stg_ObjectList*) objectList;
 
 	return self->_getIndex( self, toGet );
 }
 
 
-void* Stg_ObjectList_Get( void* objectList, const Name const objectName ) {
+void* Stg_ObjectList_Get( void* objectList, const Name objectName ) {
 	Stg_ObjectList* self = (Stg_ObjectList*) objectList;
 
 	return self->_get( self, objectName );
@@ -728,7 +728,7 @@ Index _Stg_ObjectList_Remove( void* namedObjectList, Name reference, Replacement
 }
 
 
-Index _Stg_ObjectList_GetIndex( void* namedObjectList, const Name const toGet ) {
+Index _Stg_ObjectList_GetIndex( void* namedObjectList, const Name toGet ) {
 	Stg_ObjectList* self = (Stg_ObjectList*) namedObjectList;
 	Index objectIndex;
 	
@@ -744,7 +744,7 @@ Index _Stg_ObjectList_GetIndex( void* namedObjectList, const Name const toGet ) 
 }
 
 
-void* _Stg_ObjectList_Get( void* objectList, const Name const toGet ) {
+void* _Stg_ObjectList_Get( void* objectList, const Name toGet ) {
         Stg_ObjectList* self = (Stg_ObjectList*) objectList;
         Index objectIndex;
                                                                                                                                     

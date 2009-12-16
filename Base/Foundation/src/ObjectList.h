@@ -73,8 +73,8 @@
 	typedef Index (Stg_ObjectList_InsertBeforeFunction) ( void* objects,  Name reference, void* objectPtr );
 	typedef Index (Stg_ObjectList_InsertAfterFunction) ( void* objects,  Name reference, void* objectPtr );
 	typedef Index (Stg_ObjectList_RemoveFunction) ( void* objects,  Name reference, ReplacementOption option );
-	typedef Index (Stg_ObjectList_GetIndexFunction) ( void* objects, const Name const toGet );
-	typedef void* (Stg_ObjectList_GetFunction) ( void* objects, const Name const toGet );
+	typedef Index (Stg_ObjectList_GetIndexFunction) ( void* objects, const Name toGet );
+	typedef void* (Stg_ObjectList_GetFunction) ( void* objects, const Name toGet );
 	typedef void  (Stg_ObjectList_AllocMoreMemoryFunction) ( void* objects );
 	typedef void (Stg_ObjectList_InsertAtIndexFunction) ( void* objects, Index index, void* objectPtr );
 	typedef void (Stg_ObjectList_RemoveByIndexFunction) ( void* objects, Index index, ReplacementOption option );
@@ -331,10 +331,10 @@
 	Index Stg_ObjectList_Remove( void* objectList, Name reference, ReplacementOption option ) ;
 	
 	/** Find an object's index in the list, by name. Returns (unsigned)-1 if not found. */
-	Index Stg_ObjectList_GetIndex( void* objectList, const Name const toGet );
+	Index Stg_ObjectList_GetIndex( void* objectList, const Name toGet );
 	
 	/** Get an object's ptr from the list, by name. Returns NULL if not found. */
-	void* Stg_ObjectList_Get( void* objectList, const Name const toGet );
+	void* Stg_ObjectList_Get( void* objectList, const Name toGet );
 	
 	/** Deletes all the objects in the list. */
 	void Stg_ObjectList_DeleteAllObjects( void* objectList );
