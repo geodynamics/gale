@@ -128,7 +128,7 @@ void* _lucRenderingEngineGL_DefaultNew( Name name ) {
 	lucRenderingEngine_CompositeViewportFunction*   _compositeViewport = _lucRenderingEngineGL_CompositeViewport_Stencil;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return (void*) _lucRenderingEngineGL_New(  LUCRENDERINGENGINEGL_PASSARGS  );
 }

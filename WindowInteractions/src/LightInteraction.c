@@ -125,7 +125,7 @@ void* _lucLightInteraction_DefaultNew( Name name ) {
 	lucWindowInteraction_KeyboardMessageFunction*     _keyboardMessage = _lucLightInteraction_KeyboardMessage;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return (void*) _lucLightInteraction_New(  LUCLIGHTINTERACTION_PASSARGS  );
 }

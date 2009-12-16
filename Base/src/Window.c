@@ -232,7 +232,7 @@ void* _lucWindow_DefaultNew( Name name ) {
 	lucWindow_ResizeFunction*                        _resizeWindow = lucWindow_Resize;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return _lucWindow_New(  LUCWINDOW_PASSARGS  );
 }

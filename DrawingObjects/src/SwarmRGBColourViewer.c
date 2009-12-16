@@ -134,7 +134,7 @@ void* _lucSwarmRGBColourViewer_DefaultNew( Name name ) {
 	lucSwarmViewerBase_SetParticleColourFunction*      _setParticleColour = _lucSwarmRGBColourViewer_SetParticleColour;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return (void*) _lucSwarmRGBColourViewer_New(  LUCSWARMRGBCOLOURVIEWER_PASSARGS  );
 }
