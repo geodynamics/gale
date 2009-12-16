@@ -150,7 +150,7 @@ void* _BuoyancyForceTerm_DefaultNew( Name name ) {
 	BuoyancyForceTerm_CalcGravityFunction*            _calcGravity = _BuoyancyForceTerm_CalcGravity;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return (void*)_BuoyancyForceTerm_New(  BUOYANCYFORCETERM_PASSARGS  );
 }

@@ -96,7 +96,7 @@ IntegrationPointsSwarm* IntegrationPointsSwarm_New(
 	Stg_Component_DestroyFunction*                        _destroy = _IntegrationPointsSwarm_Destroy;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 	void*                          ics = ZERO;
 
     IntegrationPointsSwarm* self = _IntegrationPointsSwarm_New(  INTEGRATIONPOINTSSWARM_PASSARGS  );
@@ -140,7 +140,7 @@ void* _IntegrationPointsSwarm_DefaultNew( Name name ) {
 	SizeT                                                particleSize = sizeof(IntegrationPoint);
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 	void*                          ics = ZERO;
 
 	return (void*) _IntegrationPointsSwarm_New(  INTEGRATIONPOINTSSWARM_PASSARGS  );

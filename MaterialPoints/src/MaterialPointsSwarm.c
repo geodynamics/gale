@@ -90,7 +90,7 @@ MaterialPointsSwarm* MaterialPointsSwarm_New(
 	Stg_Component_DestroyFunction*                        _destroy = _MaterialPointsSwarm_Destroy;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 	void*                          ics = ZERO;
 
 	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
@@ -229,7 +229,7 @@ void* _MaterialPointsSwarm_DefaultNew( Name name ) {
 	SizeT                                                particleSize = sizeof(MaterialPoint);
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 	void*                          ics = ZERO;
 
 	return _MaterialPointsSwarm_New(  MATERIALPOINTSSWARM_PASSARGS  );
