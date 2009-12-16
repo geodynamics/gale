@@ -214,7 +214,7 @@ sub runTests {
 	my $resx;
 	my $resy;
 	my $resz;
-	open( FLATOUTPUT, "./output/$xmlFile/input.xml" )
+	open( FLATOUTPUT, "$outputPath/input.xml" )
 		or die ("\n\n### ERROR ###\n\t\tCouldn't open output file, ./output/$xmlFile/input.xml " );
 
 	my $resolution;
@@ -229,7 +229,7 @@ sub runTests {
 	my @labels;
 	my $label;
 	my $totalTime;
-	my $freqOutput = "./output/$xmlFile/FrequentOutput.dat";
+	my $freqOutput = "./$outputPath/FrequentOutput.dat";
 
 	if( !(-e $freqOutput) ) {
 		die("\n\n### ERROR ###\nCouldn't open $freqOutput");
