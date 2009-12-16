@@ -64,7 +64,7 @@ SimpleExtensionInfo* SimpleExtensionInfo_New( const Name name, SizeT size, Index
 	ExtensionInfo_DataCopyFunction*    _dataCopy = _SimpleExtensionInfo_DataCopy;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return _SimpleExtensionInfo_New(  SIMPLEEXTENSIONINFO_PASSARGS  );
 }

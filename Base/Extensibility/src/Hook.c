@@ -57,7 +57,7 @@ Hook* Hook_New( Name name, Func_Ptr funcPtr, char* addedBy ) {
 	Stg_Class_CopyFunction*          _copy = _Hook_Copy;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return _Hook_New(  HOOK_PASSARGS  );
 }

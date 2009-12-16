@@ -63,7 +63,7 @@ Stg_ObjectAdaptor* Stg_ObjectAdaptor_NewOfClass( void* dataPtr, Name name, Bool 
 	Stg_ObjectAdaptor_CopyPointerFunction*        ptrCopy = NULL;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return _Stg_ObjectAdaptor_New(  STG_OBJECTADAPTOR_PASSARGS  ); 
 }
@@ -105,7 +105,7 @@ Stg_ObjectAdaptor* Stg_ObjectAdaptor_NewOfPointer(
 	Bool                        isStgClass = False;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return _Stg_ObjectAdaptor_New(  STG_OBJECTADAPTOR_PASSARGS  ); 
 }

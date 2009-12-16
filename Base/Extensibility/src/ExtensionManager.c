@@ -69,7 +69,7 @@ ExtensionManager* ExtensionManager_New_OfStruct(
 	Index                                count = 0;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return _ExtensionManager_New(  EXTENSIONMANAGER_PASSARGS  );
 }
@@ -91,7 +91,7 @@ ExtensionManager* ExtensionManager_New_OfExistingObject(
 	Index                            count = 0;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return _ExtensionManager_New(  EXTENSIONMANAGER_PASSARGS  );
 }
@@ -113,7 +113,7 @@ ExtensionManager* ExtensionManager_New_OfArray(
 	ExtensionManager*                       em = NULL;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return _ExtensionManager_New(  EXTENSIONMANAGER_PASSARGS  );
 }
@@ -135,7 +135,7 @@ ExtensionManager* ExtensionManager_New_OfExtendedArray(
 	SizeT                             itemSize = 0;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return _ExtensionManager_New(  EXTENSIONMANAGER_PASSARGS  );
 }

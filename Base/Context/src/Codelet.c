@@ -77,7 +77,7 @@ void* Codelet_New(
 	Stg_Class_CopyFunction*          _copy = _Codelet_Copy;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return _Codelet_New(  CODELET_PASSARGS  );
 }

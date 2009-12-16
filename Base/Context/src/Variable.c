@@ -85,7 +85,7 @@ Variable* Variable_New(
 	Stg_Component_DestroyFunction*                        _destroy = _Variable_Destroy;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	Variable* self = _Variable_New(  VARIABLE_PASSARGS  );
 
@@ -120,7 +120,7 @@ Variable* _Variable_DefaultNew( Name name ) {
 	Variable_Register*                                          vr = NULL;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	Variable* self = _Variable_New(  VARIABLE_PASSARGS  );
 	
@@ -153,7 +153,7 @@ Variable* Variable_NewScalar(
 	SizeT*                                           structSizePtr = 0;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	Variable*			self;
 	SizeT					dataOffsets[] = { 0 };
@@ -197,7 +197,7 @@ Variable* Variable_NewVector(
 	SizeT*                                           structSizePtr = 0;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	Variable*			self;
 	SizeT					dataOffsets[] = { 0 };
@@ -255,7 +255,7 @@ Variable* Variable_NewVector2(
 	SizeT*                                           structSizePtr = 0;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	Variable*			self;
 	SizeT					dataOffsets[] = { 0 };

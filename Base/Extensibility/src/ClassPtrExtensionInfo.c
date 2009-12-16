@@ -64,7 +64,7 @@ ClassPtrExtensionInfo* ClassPtrExtensionInfo_New( const Name name, Stg_Class_Cop
 	ExtensionInfo_DataCopyFunction*    _dataCopy = _ClassPtrExtensionInfo_DataCopy;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 	SizeT                         size = ZERO;
 
 	return _ClassPtrExtensionInfo_New(  CLASSPTREXTENSIONINFO_PASSARGS  );
