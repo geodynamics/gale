@@ -279,78 +279,78 @@ void _StrainWeakening_AssignFromXML( void* strainWeakening, Stg_ComponentFactory
 }
 
 void _StrainWeakening_Build( void* strainWeakening, void* data ) {
-	StrainWeakening*                       self               = (StrainWeakening*) strainWeakening;
+   StrainWeakening*                       self               = (StrainWeakening*) strainWeakening;
 
-	/* Build parent */
-	_TimeIntegratee_Build( self, data );
+   /* Build parent */
+   _TimeIntegratee_Build( self, data );
 
-	Stg_Component_Build( self->postFailureWeakeningIncrement, data, False );
-	Stg_Component_Build( self->postFailureWeakening, data, False );
-	Stg_Component_Build( self->initialStrainShape, data, False );
-	Stg_Component_Build( self->swarm, data, False );
-	/* The postFailureWeakening doesn't need to be built here because it has already been
-	 * built in the TimeIntegratee class
-	 * (self->variable = self->postFailureWeakening->variable in _StrainWeakening_Init function) */
-	 /* however, i've decided to build it anyway!  JM 09111 */
+   Stg_Component_Build( self->postFailureWeakeningIncrement, data, False );
+   Stg_Component_Build( self->postFailureWeakening, data, False );
+   if( self->initialStrainShape ) Stg_Component_Build( self->initialStrainShape, data, False );
+   Stg_Component_Build( self->swarm, data, False );
+   /* The postFailureWeakening doesn't need to be built here because it has already been
+    * built in the TimeIntegratee class
+    * (self->variable = self->postFailureWeakening->variable in _StrainWeakening_Init function) */
+    /* however, i've decided to build it anyway!  JM 09111 */
 }
 
 void _StrainWeakening_Delete( void* _self ) {
-	StrainWeakening* self = (StrainWeakening*) _self;
+   StrainWeakening* self = (StrainWeakening*) _self;
 
    Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
 
-	/* Delete Class */
-	_Stg_Component_Delete( self );   
+   /* Delete Class */
+   _Stg_Component_Delete( self );   
 
 }
 	
 void _StrainWeakening_Destroy( void* _self, void* data ) {
-	StrainWeakening* self = (StrainWeakening*) _self;
+   StrainWeakening* self = (StrainWeakening*) _self;
 
-	Stg_Component_Destroy( self->postFailureWeakeningIncrement, data, False );
-	Stg_Component_Destroy( self->postFailureWeakening, data, False );
-	Stg_Component_Destroy( self->initialStrainShape, data, False );
-	Stg_Component_Destroy( self->swarm, data, False );
-	
-	/* Destroy Parent */
-	_TimeIntegratee_Destroy( self, data );   
+   Stg_Component_Destroy( self->postFailureWeakeningIncrement, data, False );
+   Stg_Component_Destroy( self->postFailureWeakening, data, False );
+   if( self->initialStrainShape ) Stg_Component_Destroy( self->initialStrainShape, data, False );
+   Stg_Component_Destroy( self->swarm, data, False );
+
+   /* Destroy Parent */
+   _TimeIntegratee_Destroy( self, data );   
 
 }
 
 void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
-	StrainWeakening*                       self  = (StrainWeakening*) strainWeakening;
-	Particle_Index                         lParticle_I;
-	Particle_Index                         particleLocalCount;
-	Variable*                              positionVariable   = self->swarm->particleCoordVariable->variable;
-	double                                 postFailureWeakening;
-	double*                                coord;
-	AbstractContext*                       context = (AbstractContext*)data;
+   StrainWeakening*                       self  = (StrainWeakening*) strainWeakening;
+   Particle_Index                         lParticle_I;
+   Particle_Index                         particleLocalCount;
+   Variable*                              positionVariable   = self->swarm->particleCoordVariable->variable;
+   double                                 postFailureWeakening;
+   double*                                coord;
+   DomainContext*                         context = self->context;
 
-	int myrank;
-	
-	/* Initialise Parent */
-	_TimeIntegratee_Initialise( self, data );
+   int myrank;
 
-	Stg_Component_Initialise( self->swarm, data, False );
-	Stg_Component_Initialise( self->postFailureWeakeningIncrement, data, False );
+   /* Initialise Parent */
+   _TimeIntegratee_Initialise( self, data );
+
+   Stg_Component_Initialise( self->swarm, data, False );
+   Stg_Component_Initialise( self->postFailureWeakeningIncrement, data, False );
    Stg_Component_Initialise( self->postFailureWeakening, data, False );
-	Stg_Component_Initialise( self->initialStrainShape, data, False );
-   
-	/* Update variables */
-	Variable_Update( positionVariable );
-	Variable_Update( self->variable );
-	Variable_Update( self->postFailureWeakeningIncrement->variable );
+   if( self->initialStrainShape ) Stg_Component_Initialise( self->initialStrainShape, data, False );
 
-	particleLocalCount = self->variable->arraySize;
+   /* Update variables */
+   Variable_Update( positionVariable );
+   Variable_Update( self->variable );
+   Variable_Update( self->postFailureWeakeningIncrement->variable );
 
-	/* We should only set initial conditions if in regular non-restart mode. If in restart mode, then
-	the particle-based variables will be set correcty when we re-load the Swarm. */
+   particleLocalCount = self->variable->arraySize;
+
+   /* We should only set initial conditions if in regular non-restart mode. If in restart mode, then
+   the particle-based variables will be set correcty when we re-load the Swarm. */
 	
 	if ( !(context && (True == context->loadFromCheckPoint)) ) {
 		/* Initialise random number generator */
 		if(self->randomSeed==0) {
-                    MPI_Comm_rank( context->communicator, &myrank);
-		    srand( self->randomSeed );
+         MPI_Comm_rank( context->communicator, &myrank);
+         srand( self->randomSeed );
 		}
 		else {
 			srand( self->randomSeed );
