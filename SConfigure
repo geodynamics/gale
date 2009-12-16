@@ -162,6 +162,9 @@ if not (GetOption('help') or GetOption('clean')):
 
     # enable all warning except -Wwrite-strings. StGermain API needs modifying.
     env.MergeFlags('-Wall -Wno-write-strings')
+    if env.get('CC', None) == 'icc':
+        env.MergeFlags('-wd869 -wd1419')
+
 
 
 #
