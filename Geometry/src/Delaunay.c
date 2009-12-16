@@ -92,7 +92,7 @@ Delaunay* Delaunay_DefaultNew( Name name )
 	DelaunayAttributes*                                       attr = NULL;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	Delaunay *d = _Delaunay_New(  DELAUNAY_PASSARGS  );
 
@@ -122,7 +122,7 @@ Delaunay* Delaunay_New(
 	Bool                                                  initFlag = True;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	Delaunay *d = _Delaunay_New(  DELAUNAY_PASSARGS  );
 	

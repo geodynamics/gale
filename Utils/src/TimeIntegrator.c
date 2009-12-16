@@ -78,7 +78,7 @@ void* _TimeIntegrator_DefaultNew( Name name ) {
 	Stg_Component_DestroyFunction*                        _destroy = _TimeIntegrator_Destroy;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return (void*) _TimeIntegrator_New(  TIMEINTEGRATOR_PASSARGS  );
 }
