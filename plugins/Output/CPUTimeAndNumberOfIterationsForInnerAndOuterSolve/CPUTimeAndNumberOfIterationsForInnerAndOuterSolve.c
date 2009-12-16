@@ -120,7 +120,7 @@ void* _StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_DefaultNew( Name
 	Stg_Component_InitialiseFunction*                  _initialise = _StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
 	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return _Codelet_New( CODELET_PASSARGS );
 }

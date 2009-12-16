@@ -104,7 +104,7 @@ void* StiffnessMatrix_DefaultNew( Name name )
 	MPI_Comm                                                                   comm = 0;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return _StiffnessMatrix_New(  STIFFNESSMATRIX_PASSARGS  );
 }
@@ -138,7 +138,7 @@ StiffnessMatrix* StiffnessMatrix_New(
 	StiffnessMatrix_CalculateNonZeroEntriesFunction*  _calculateNonZeroEntries = StiffnessMatrix_CalcNonZeros;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return _StiffnessMatrix_New(  STIFFNESSMATRIX_PASSARGS  );
 }

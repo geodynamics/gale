@@ -137,7 +137,7 @@ void* _AdvDiffMulticorrector_DefaultNew( Name name ) {
 	SLE_Solver_GetResidualFunc*                       _getResidual = NULL;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return (void*)_AdvDiffMulticorrector_New(  ADVDIFFMULTICORRECTOR_PASSARGS  );
 }

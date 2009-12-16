@@ -130,7 +130,7 @@ void* _ThermalBuoyancyForceTerm_DefaultNew( Name name ) {
 	ForceTerm_AssembleElementFunction*            _assembleElement = _ThermalBuoyancyForceTerm_AssembleElement;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return (void*)_ThermalBuoyancyForceTerm_New(  THERMALBUOYANCYFORCETERM_PASSARGS  );
 }

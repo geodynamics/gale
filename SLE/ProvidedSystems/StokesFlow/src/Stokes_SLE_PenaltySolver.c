@@ -72,7 +72,7 @@ void* Stokes_SLE_PenaltySolver_DefaultNew( Name name ) {
 	SLE_Solver_GetResidualFunc*                       _getResidual = _Stokes_SLE_PenaltySolver_GetResidual;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return _Stokes_SLE_PenaltySolver_New(  STOKES_SLE_PENALTYSOLVER_PASSARGS  );
 }
