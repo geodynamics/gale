@@ -184,7 +184,7 @@ void* _DruckerPrager_DefaultNew( Name name ) {
 	YieldRheology_HasYieldedFunction*                         _hasYielded = _DruckerPrager_HasYielded;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return (void*) _DruckerPrager_New(  DRUCKERPRAGER_PASSARGS  );
 }
@@ -415,6 +415,7 @@ void _DruckerPrager_UpdateDrawParameters( void* rheology ) {
 
 	double                           oneOverGlobalMaxStrainIncrement;
 	double                           postFailureWeakeningIncrement;
+   int ierr; /* mpi error code */
 
 	/* Note : this function defines some drawing parameters (brightness, opacity, diameter) as
 	 * functions of the strain weakening - this needs to be improved since most of the parameters
@@ -452,9 +453,9 @@ void _DruckerPrager_UpdateDrawParameters( void* rheology ) {
 		}
 	}
 	
-	MPI_Allreduce( &localMaxStrainIncrement,  &globalMaxStrainIncrement,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD );
-	MPI_Allreduce( &localMeanStrainIncrement, &globalMeanStrainIncrement, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
-	MPI_Allreduce( &localFailed,              &globalFailed,              1, MPI_INT,    MPI_SUM, MPI_COMM_WORLD );
+	ierr = MPI_Allreduce( &localMaxStrainIncrement,  &globalMaxStrainIncrement,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD );
+	ierr = MPI_Allreduce( &localMeanStrainIncrement, &globalMeanStrainIncrement, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+	ierr = MPI_Allreduce( &localFailed,              &globalFailed,              1, MPI_INT,    MPI_SUM, MPI_COMM_WORLD );
 	
 	if(globalFailed == 0) 
 		return;

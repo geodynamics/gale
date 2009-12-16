@@ -107,7 +107,7 @@ void* _FrankKamenetskii_DefaultNew( Name name ) {
 	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _FrankKamenetskii_ModifyConstitutiveMatrix;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return (void*) _FrankKamenetskii_New(  FRANKKAMENETSKII_PASSARGS  );
 }

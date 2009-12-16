@@ -157,7 +157,7 @@ void* _Velic_solG_DefaultNew( Name name ) {
 	Stg_Component_DestroyFunction*                        _destroy = _AnalyticSolution_Destroy;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = ZERO;
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
 	return _AnalyticSolution_New(  ANALYTICSOLUTION_PASSARGS  );
 }
