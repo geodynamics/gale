@@ -458,6 +458,9 @@ void lucViewportInfo_SetOpenGLCamera( lucViewportInfo* viewportInfo ) {
 		/*	abort();*/
 			break;
 	}
+
+   /* Apply scaling factors */
+   glScalef(viewport->scaleX, viewport->scaleY, viewport->scaleZ);
 }
 
 void luc_OpenGlSquare( Dimension_Index dim, double* pos, double* normal, double* orientation, double width) {

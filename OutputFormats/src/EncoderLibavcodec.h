@@ -92,7 +92,7 @@
 	void _lucEncoderLibavcodec_Execute( void* outputFormat, void* data );
 	void _lucEncoderLibavcodec_Destroy( void* outputFormat, void* data ) ;
 	
-	void _lucEncoderLibavcodec_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) ;
+	void _lucEncoderLibavcodec_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) ;
 
 #endif /* HAVE_LIBAVCODEC */
 #endif

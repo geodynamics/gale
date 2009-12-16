@@ -481,6 +481,7 @@ void lucWindow_Dump( void* window, AbstractContext* context ) {
 	Pixel_Index    width        = self->width;
 	Pixel_Index    height       = self->height;
 	lucPixel*      imageBuffer  = NULL;
+	lucAlphaPixel* imageAlphaBuffer  = NULL;
 	Stream*        errorStream  = Journal_MyStream( Error_Type, self );
 
 	lucDebug_PrintFunctionBegin( self, 1 );
@@ -488,15 +489,19 @@ void lucWindow_Dump( void* window, AbstractContext* context ) {
 	/* Allocate Memory */
 	imageBuffer = Memory_Alloc_Array( lucPixel, width * height, "Pixels" );
 	Journal_Firewall( imageBuffer != NULL, errorStream, "In func %s: Cannot allocate array.", __func__ );
+	imageAlphaBuffer = Memory_Alloc_Array( lucAlphaPixel, width * height, "Pixels" );
+	Journal_Firewall( imageAlphaBuffer != NULL, errorStream, "In func %s: Cannot allocate array.", __func__ );
 
 	/* Grab Pixels from window */
-	lucRenderingEngine_GetPixelData( self->renderingEngine, self, imageBuffer );
+	lucRenderingEngine_GetPixelData( self->renderingEngine, self, imageBuffer, False );
+	lucRenderingEngine_GetPixelData( self->renderingEngine, self, imageAlphaBuffer, True );
 
 	/* Output in different formats that the user gives */
-	lucOutputFormat_Register_OutputAll( self->outputFormat_Register, self, context, imageBuffer );
+	lucOutputFormat_Register_OutputAll( self->outputFormat_Register, self, context, imageBuffer, imageAlphaBuffer);
 	
 	/* Free memory */
 	Memory_Free( imageBuffer );
+	Memory_Free( imageAlphaBuffer );
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
 

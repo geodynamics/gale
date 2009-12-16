@@ -243,7 +243,10 @@ void _lucEncoderLibavcodec_AssignFromXML( void* outputFormat, Stg_ComponentFacto
 	AbstractContext*    context;
 
 	/* Construct Parent */
-	lucOutputFormat_InitAll( self, "mpeg" );
+   self->extension = "mpeg";
+	_lucOutputFormat_AssignFromXML( outputFormat, cf, data);
+   self->transparent = False; /* Not supported */
+   
 
 	window =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Window", lucWindow,  True, data  ) ;
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ) ;
@@ -265,7 +268,8 @@ void _lucEncoderLibavcodec_Initialise( void* outputFormat, void* data ) {}
 void _lucEncoderLibavcodec_Execute( void* outputFormat, void* data ) {}
 void _lucEncoderLibavcodec_Destroy( void* outputFormat, void* data ) {}
 
-void _lucEncoderLibavcodec_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) {
+void _lucEncoderLibavcodec_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixData ) {
+   lucPixel* pixelData = (lucPixel)pixData;
 	lucEncoderLibavcodec*         self            = (lucEncoderLibavcodec*) outputFormat;
 	AVFrame*                      frame           = (AVFrame*) self->frame;
 	Pixel_Index                   width           = window->width;

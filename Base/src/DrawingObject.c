@@ -141,8 +141,11 @@ void _lucDrawingObject_Destroy( void* camera, void* data ) { }
 
 void lucDrawingObject_Setup( void* drawingObject, void* context ) {
 	lucDrawingObject*   self       = (lucDrawingObject*) drawingObject ;
+   double time;
 
 	lucDebug_PrintFunctionBegin( self, 2 );
+
+	time = MPI_Wtime();
 
 	if ( self->needsToSetup ) 
 		self->_setup( self, context );
@@ -152,6 +155,8 @@ void lucDrawingObject_Setup( void* drawingObject, void* context ) {
 
 	self->needsToSetup   = False;
 	self->needsToCleanUp = True;
+
+	time = MPI_Wtime() - time;
 
 	lucDebug_PrintFunctionEnd( self, 2 );
 }
@@ -164,6 +169,7 @@ void lucDrawingObject_Draw( void* drawingObject, lucWindow* window, lucViewportI
 
 	lucDrawingObject_Setup( self, context );
 	
+
 	time = MPI_Wtime();
 	
 	self->_draw( self, window, viewportInfo, context );

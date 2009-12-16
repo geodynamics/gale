@@ -255,7 +255,7 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 	Journal_DPrintfL( lucDebug, 2, "Leaving func %s\n", __func__ );
 }
 
-void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* window, lucPixel* buffer ) {
+void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* window, void *buffer, Bool withAlpha) {
 	lucRenderingEngineGL* self              = (lucRenderingEngineGL*) renderingEngine;
 	GLsizei width  = window->width;
 	GLsizei height = window->height;
@@ -272,7 +272,10 @@ void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* windo
 		glReadBuffer( self->doubleBuffered ? GL_BACK : GL_FRONT );
 	
 	/* Actually read the pixels. */
-	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer); 
+   if (withAlpha)
+   	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer); 
+   else
+   	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer); 
 }
 
 void lucRenderingEngineGL_WriteViewportText( void* renderingEngine, lucWindow* window, lucViewportInfo* viewportInfo, AbstractContext* context ) {
@@ -307,7 +310,7 @@ void _lucRenderingEngineGL_Clear( void* renderingEngineGL, lucWindow* window, Bo
     
     glEnable (GL_SCISSOR_TEST);
     glClearColor(window->backgroundColour.red, window->backgroundColour.green,
-                 window->backgroundColour.blue, window->backgroundColour.opacity );
+                 window->backgroundColour.blue, 0.0); /* window->backgroundColour.opacity );*/
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 

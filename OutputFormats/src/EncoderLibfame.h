@@ -100,7 +100,7 @@
 	void _lucEncoderLibfame_Execute( void* outputFormat, void* data );
 	void _lucEncoderLibfame_Destroy( void* outputFormat, void* data ) ;
 	
-	void _lucEncoderLibfame_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) ;
+	void _lucEncoderLibfame_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) ;
 
 #endif /* HAVE_LIBFAME */
 #endif

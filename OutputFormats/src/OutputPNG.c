@@ -128,7 +128,8 @@ void _lucOutputPNG_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, 
 	lucOutputPNG*  self = (lucOutputPNG*)outputFormat;
 
 	/* Construct Parent */
-	lucOutputFormat_InitAll( self, "png" );
+   self->extension = "png";
+	_lucOutputFormat_AssignFromXML( outputFormat, cf, data);
 
 	_lucOutputPNG_Init( self );
 }
@@ -150,7 +151,7 @@ void lucImagePNG_Write(png_structp png_ptr, png_bytep data, png_size_t length) {
 	Journal_Write( stream, (void*) data, 1, length );
 }
 
-void _lucOutputPNG_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) {
+void _lucOutputPNG_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) {
 	lucOutputPNG* self       = (lucOutputPNG*) outputFormat;
 	Pixel_Index   width        = window->width;
 	Pixel_Index   height       = window->height;
@@ -162,7 +163,13 @@ void _lucOutputPNG_Output( void* outputFormat, lucWindow* window, AbstractContex
 	png_infop     pngInfo;
 	Pixel_Index   pixel_I;
 	int           result;
+   int colour_type = PNG_COLOR_TYPE_RGB; 
 	
+   if (self->transparent) {
+	   rowStride    = width * 4; /* Don't pad lines! pack alignment is set to 1 */
+      colour_type = PNG_COLOR_TYPE_RGBA;
+   }
+
 	for ( pixel_I = 0 ; pixel_I < height ; pixel_I++ )
 		row_pointers[pixel_I] = (png_bytep) &pixels[rowStride * (height - pixel_I - 1)];
 
@@ -181,7 +188,7 @@ void _lucOutputPNG_Output( void* outputFormat, lucWindow* window, AbstractContex
 	png_set_IHDR(pngWrite, pngInfo,
 		width, height,
 		8,
-		PNG_COLOR_TYPE_RGB,
+		colour_type,
 		PNG_INTERLACE_NONE,
 		PNG_COMPRESSION_TYPE_DEFAULT,
 		PNG_FILTER_TYPE_DEFAULT);

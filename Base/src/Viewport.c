@@ -70,26 +70,6 @@ const Type lucViewport_Type = "lucViewport";
 
 MPI_Datatype lucViewport_MPI_Datatype;
 
-lucViewport* lucViewport_New(
-		Name                                               name,
-		lucCamera*                                         camera,
-		lucDrawingObject**                                 drawingObjectList,
-		DrawingObject_Index                                drawingObjectCount,
-		lucLight**          				   lightList,
-	  	Light_Index                                        lightCount,
-		Bool                                               drawTitle,
-		Bool                                               drawTime,
-		Bool                                               compositeEachObject,
-		double                                             nearClipPlane,
-		double                                             farClipPlane )
-{
-	lucViewport* self = _lucViewport_DefaultNew( name );
-
-	lucViewport_InitAll( self, camera, drawingObjectList, drawingObjectCount, lightList, lightCount, drawTitle, drawTime, compositeEachObject, nearClipPlane, farClipPlane );
-
-	return self;
-}
-
 lucViewport* _lucViewport_New(  LUCVIEWPORT_DEFARGS  )
 {
 	lucViewport*    self;
@@ -111,13 +91,16 @@ void _lucViewport_Init(
 		lucCamera*                                         camera, 
 		lucDrawingObject**                                 drawingObjectList, 
 		DrawingObject_Index                                drawingObjectCount,
-		lucLight**          				   lightList,
-	        Light_Index                                        lightCount,
+      lucLight**          				                     lightList,
+      Light_Index                                        lightCount,
 		Bool                                               drawTitle,
 		Bool                                               drawTime,
 		Bool                                               compositeEachObject,
 		double                                             nearClipPlane,
-		double                                             farClipPlane )
+		double                                             farClipPlane,
+		double                                             scaleX,
+		double                                             scaleY,
+		double                                             scaleZ)
 {
 	DrawingObject_Index object_I;
 	Light_Index light_I;
@@ -136,6 +119,9 @@ void _lucViewport_Init(
 	self->drawTime                 = drawTime;
 	self->nearClipPlane            = nearClipPlane;
 	self->farClipPlane             = farClipPlane;
+	self->scaleX                   = scaleX;
+	self->scaleY                   = scaleY;
+	self->scaleZ                   = scaleZ;
 	self->compositeEachObject      = compositeEachObject;
 
 	self->drawingObject_Register = lucDrawingObject_Register_New();
@@ -157,25 +143,29 @@ void _lucViewport_Init(
 
 }
 
-void lucViewport_InitAll( 
-		void*                                              viewport,
-		lucCamera*                                         camera, 
-		lucDrawingObject**                                 drawingObjectList, 
+lucViewport* lucViewport_New(
+		Name                                               name,
+		lucCamera*                                         camera,
+		lucDrawingObject**                                 drawingObjectList,
 		DrawingObject_Index                                drawingObjectCount,
-	        lucLight**          			           lightList,
-	 	Light_Index                                        lightCount,
+		lucLight**          				   lightList,
+	  	Light_Index                                        lightCount,
 		Bool                                               drawTitle,
 		Bool                                               drawTime,
 		Bool                                               compositeEachObject,
 		double                                             nearClipPlane,
-		double                                             farClipPlane )
+		double                                             farClipPlane,
+		double                                             scaleX,
+		double                                             scaleY,
+		double                                             scaleZ)
 {
-	lucViewport* self        = viewport;
+	lucViewport* self = _lucViewport_DefaultNew( name );
 
-	_lucViewport_Init( self, camera, drawingObjectList, drawingObjectCount, lightList, lightCount, drawTitle, drawTime, compositeEachObject, nearClipPlane, farClipPlane );
+	_lucViewport_Init( self, camera, drawingObjectList, drawingObjectCount, lightList, lightCount, drawTitle, drawTime, compositeEachObject, nearClipPlane, farClipPlane, scaleX, scaleY, scaleZ);
+
+	return self;
 }
 
-	
 void _lucViewport_Delete( void* viewport ) {
 	lucViewport* self        = viewport;
 	
@@ -295,7 +285,10 @@ void _lucViewport_AssignFromXML( void* viewport, Stg_ComponentFactory* cf, void*
 			Stg_ComponentFactory_GetBool( cf, self->name, "drawTime", False ),
 			Stg_ComponentFactory_GetBool( cf, self->name, "compositeEachObject", False ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "nearClipPlane", 0.1 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "farClipPlane", 40.0 ) );
+			Stg_ComponentFactory_GetDouble( cf, self->name, "farClipPlane", 40.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "scaleX", 1.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "scaleY", 1.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "scaleZ", 1.0 ) );
 
 	Memory_Free( drawingObjectList );
         if(lightList)
