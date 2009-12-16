@@ -37,31 +37,36 @@ class MPI(Package):
                           ['dl', 'pthread', 'rt']]
             for libs in extra_libs:
 
+                # Check for OpenMPI with nsl and util libs.
+                if self.find_libraries(loc[2], ['open-pal', 'nsl', 'util']):
+                    lib_env = env.Clone()
+                    lib_env.PrependUnique(LIBS=['mpi', 'open-rte', 'open-pal', 'nsl', 'util'] + libs)
+                    yield lib_env
+
+                # Check for OpenMPI.
+                if self.find_libraries(loc[2], 'open-pal'):
+                    lib_env = env.Clone()
+                    lib_env.PrependUnique(LIBS=['mpi', 'open-rte', 'open-pal'] + libs)
+                    yield lib_env
+
                 # Check for general MPI.
                 if self.find_libraries(loc[2], 'mpi'):
                     lib_env = env.Clone()
                     lib_env.PrependUnique(LIBS=['mpi'] + libs)
                     yield lib_env
 
-                # Check for MPICH.
-                if self.find_libraries(loc[2], 'mpich'):
-                    lib_env = env.Clone()
-                    lib_env.PrependUnique(LIBS=['mpich'] + libs)
-                    yield lib_env
+                # Check for MPICH + pmpich.
                 if self.find_libraries(loc[2], ['mpich', 'pmpich']):
                     lib_env = env.Clone()
                     lib_env.PrependUnique(LIBS=['pmpich', 'mpich'] + libs)
                     yield lib_env
 
-                # Check for OpenMPI.
-                if self.find_libraries(loc[2], 'mpi'):
+                # Check for MPICH
+                if self.find_libraries(loc[2], 'mpich'):
                     lib_env = env.Clone()
-                    lib_env.PrependUnique(LIBS=['mpi', 'open-rte', 'open-pal'] + libs)
+                    lib_env.PrependUnique(LIBS=['mpich'] + libs)
                     yield lib_env
-                if self.find_libraries(loc[2], 'mpi'):
-                    lib_env = env.Clone()
-                    lib_env.PrependUnique(LIBS=['mpi', 'open-rte', 'open-pal', 'nsl', 'util'] + libs)
-                    yield lib_env
+
 
     def check(self, conf, env):
         return conf.CheckLibWithHeader(None, 'mpi.h', 'c', call='MPI_Finalize();', autoadd=0)
