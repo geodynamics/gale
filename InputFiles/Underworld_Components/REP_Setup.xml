@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<list name="import" mergeType="mergeType">
+	<param>Experimental</param>
+</list>
+
+<!-- 
+Notes:
+Output FEM Fields due to this algorithm are:
+
+recoveredEpsDotField - recovered strain rate field
+recoveredSigmaField - recovered total stress field
+recoveredTauField - recovered deviatoric stress field
+recoveredPressureField - recovered pressure field
+
+recoveredEpsDotInvariantField - invariant of recovered strain rate field
+recoveredSigmaInvariantField - invariant of recovered total stress field
+recoveredTauInvariantField - invariant of recovered deviatoric stress field
+
+
+Difference between REP_Setup_Compressible.xml and REP_Setup.xml:
+REP_Setup_Compressible.xml, takes the compressible component of the stress tensor into account
+REP_Setup.xml, assumes an incompressible stress, and is 1/3 faster than REP_Setup_Compressible
+-->
+
+<struct name="components" mergeType="merge">
+
+	<!-- TODO:
+	* Define a real global gauss Swarm to use in non-linear, FEM only problems.
+	Currently the storeConstitutiveMatrix ability will not work when only a simple
+	gauss Swarm proxies in the constitutieMatrix class as the gaussMaterialSwarm.
+	(This is because only a single cell of gauss points is defined for the whole domain)
+	-->
+    <!-- For nonLinear problems the storeConstitutiveMatrix should be
+   set to 1 --> 
+   <struct name="constitutiveMatrix" mergeType="merge">
+      <param name="storeConstitutiveMatrix" mergeType="replace">1</param>
+   </struct>
+
+  <struct name="recoveredEpsDotField">
+    <param name="Type">RecoveredFeVariable</param>
+    <param name="RawField">StrainRateField</param>
+    <param name="recoverPressure">false</param>
+    <param name="nonLinearProblem">1</param>
+    <param name="coeffInterpolation">1</param>
+    <param name="recoverStrain">true</param>
+  </struct>
+  <struct name="recoveredSigmaField">
+    <param name="Type">RecoveredFeVariable</param>
+    <param name="RawField">StrainRateField</param>
+    <param name="recoverPressure">True</param>
+    <param name="RawPressureField">PressureField</param>
+    <param name="nonLinearProblem">1</param>
+    <param name="coeffInterpolation">1</param>
+  </struct>
+  <struct name="REP">
+    <param name="Type">REP_Algorithm</param>
+    <param name="ConstitutiveMatrix">constitutiveMatrix</param>
+    <list name="RepFieldList">
+      <param>recoveredSigmaField</param>
+      <param>recoveredEpsDotField</param>
+    </list>
+  </struct>
+  <!-- Operator FeVariables based on recovedSigmaField -->
+  <struct name="recoveredSigmaInvariantField"> 
+    <param name="Type">OperatorFeVariable</param>
+    <param name="Operator">SymmetricTensor_Invariant</param>
+    <param name="FeVariable">recoveredSigmaField</param>
+  </struct>
+
+  <struct name="recoveredPressureField"> 
+    <param name="Type">OperatorFeVariable</param>
+    <param name="Operator">SymmetricTensor_NegAverageTrace</param>
+    <param name="FeVariable">recoveredSigmaField</param>
+  </struct>
+
+   <struct name="recoveredTauField"> 
+      <param name="Type">OperatorFeVariable</param>
+      <param name="Operator">SymmetricTensor_MakeDeviatoric</param>
+      <param name="FeVariable">recoveredSigmaField</param>
+   </struct>
+
+  <struct name="recoveredTauInvariantField"> 
+    <param name="Type">OperatorFeVariable</param>
+    <param name="Operator">SymmetricTensor_Invariant</param>
+    <param name="FeVariable">recoveredTauField</param>
+  </struct>
+  <struct name="recoveredEpsDotInvariantField"> 
+    <param name="Type">OperatorFeVariable</param>
+    <param name="Operator">SymmetricTensor_Invariant</param>
+    <param name="FeVariable">recoveredEpsDotField</param>
+  </struct>
+  <!-- Individual components of sigma and tau.... good for debugging -->
+  <struct name="SigmaXXField"> 
+    <param name="Type">OperatorFeVariable</param>
+    <param name="Operator">TakeFirstComponent</param>
+    <param name="FeVariable">recoveredSigmaField</param>
+  </struct>			
+  <struct name="SigmaYYField"> 
+    <param name="Type">OperatorFeVariable</param>
+    <param name="Operator">TakeSecondComponent</param>
+    <param name="FeVariable">recoveredSigmaField</param>
+  </struct>		
+  <struct name="SigmaXYField"> 
+    <param name="Type">OperatorFeVariable</param>
+    <param name="Operator">TakeThirdComponent</param>
+    <param name="FeVariable">recoveredSigmaField</param>
+  </struct>
+  <struct name="TauXXField"> 
+    <param name="Type">OperatorFeVariable</param>
+    <param name="Operator">TakeFirstComponent</param>
+    <param name="FeVariable">recoveredTauField</param>
+  </struct>			
+  <struct name="TauYYField"> 
+    <param name="Type">OperatorFeVariable</param>
+    <param name="Operator">TakeSecondComponent</param>
+    <param name="FeVariable">recoveredTauField</param>
+  </struct>		
+  <struct name="TauXYField"> 
+    <param name="Type">OperatorFeVariable</param>
+    <param name="Operator">TakeThirdComponent</param>
+    <param name="FeVariable">recoveredTauField</param>
+  </struct>
+  <struct name="EpsDotXXField"> 
+    <param name="Type">OperatorFeVariable</param>
+    <param name="Operator">TakeFirstComponent</param>
+    <param name="FeVariable">recoveredEpsDotField</param>
+  </struct>			
+  <struct name="EpsDotYYField"> 
+    <param name="Type">OperatorFeVariable</param>
+    <param name="Operator">TakeSecondComponent</param>
+    <param name="FeVariable">recoveredEpsDotField</param>
+  </struct>		
+  <struct name="EpsDotXYField"> 
+    <param name="Type">OperatorFeVariable</param>
+    <param name="Operator">TakeThirdComponent</param>
+    <param name="FeVariable">recoveredEpsDotField</param>
+  </struct>
+</struct>
+</StGermainData>
