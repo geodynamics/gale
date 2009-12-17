@@ -198,7 +198,7 @@ void _lucScalarFieldOnMeshCrossSection_AssignFromXML( void* drawingObject, Stg_C
 
 void _lucScalarFieldOnMeshCrossSection_Build( void* drawingObject, void* data ) {
 	lucScalarFieldOnMeshCrossSection*     self    = (lucScalarFieldOnMeshCrossSection*)drawingObject;
-	AbstractContext*                context = Stg_CheckType( data, AbstractContext );
+	AbstractContext* context = self->context;
 	Stg_ComponentFactory*           cf      = context->CF;
 	FeVariable*                     feVariable;
 	Mesh*                           mesh;
