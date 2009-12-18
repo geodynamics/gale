@@ -21,7 +21,6 @@ void ContextSuite_Teardown( ContextSuiteData* data ) {
 }
 
 double ContextSuite_CalcDtFunc( FiniteElementContext* context) {
-	double dt;
 	if ( context->timeStep == 1 ) {
 		return 1.0;
 	}
@@ -35,8 +34,6 @@ void ContextSuite_TestContext( ContextSuiteData* data ) {
 	char							expected_file[PCU_PATH_MAX];
 	Stg_ComponentFactory*	cf;
 	Dictionary*					dictionary;
-	Dictionary*					componentDict;
-	XML_IO_Handler*			ioHandler;
 	Name							outputPath;
 	Stream*						stream; 
 	char							xml_input[PCU_PATH_MAX];

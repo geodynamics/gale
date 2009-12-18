@@ -26,7 +26,6 @@ void IsoviscousStiffness_Teardown( IsoviscousStiffnessData* data ) {
 
 void IsoviscousStiffness2D( IsoviscousStiffnessData* data ) {
 	StiffnessMatrix*			stiffnessMatrix;
-	SystemLinearEquations*	sle;
 	Dictionary*					dictionary;
 	FiniteElementContext*	context;
 	Stg_ComponentFactory*	cf;

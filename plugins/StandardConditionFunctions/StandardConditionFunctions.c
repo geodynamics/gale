@@ -1345,8 +1345,6 @@ void StgFEM_StandardConditionFunctions_1DGaussianDistribution( Node_LocalIndex n
 	double*                 result             = (double*) _result;
 	Name			variableName;
 	double*			coord;
-	unsigned		nDims              = context->dim;
-	unsigned		dim_I;
 	double			orig[3];
 	double			sigma              = Dictionary_GetDouble_WithDefault( dictionary, "sigma", 1.0 );
 	double			gaussianScale      = Dictionary_GetDouble_WithDefault( dictionary, "GaussianScale", 1.0 );

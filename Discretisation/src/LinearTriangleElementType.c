@@ -139,7 +139,6 @@ void _LinearTriangleElementType_AssignFromXML( void* elementType, Stg_ComponentF
 }
 	
 void _LinearTriangleElementType_Build( void* elementType, void *data ){
-	LinearTriangleElementType* self = (LinearTriangleElementType*)elementType;
 }
 	
 void _LinearTriangleElementType_Initialise( void* elementType, void *data ){

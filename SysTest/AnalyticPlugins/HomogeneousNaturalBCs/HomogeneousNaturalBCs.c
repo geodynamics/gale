@@ -98,7 +98,6 @@ void HomogeneousNaturalBCs_TemperatureBC( Node_LocalIndex node_lI, Variable_Inde
 
 void _HomogeneousNaturalBCs_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	HomogeneousNaturalBCs* self = (HomogeneousNaturalBCs*)analyticSolution;
-	AbstractContext*       context;
 	ConditionFunction*     condFunc;
 
 	_FieldTest_AssignFromXML( self, cf, data );

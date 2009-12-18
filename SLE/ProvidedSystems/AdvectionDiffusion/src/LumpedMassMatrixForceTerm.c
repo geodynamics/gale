@@ -90,7 +90,6 @@ LumpedMassMatrixForceTerm* _LumpedMassMatrixForceTerm_New(  LUMPEDMASSMATRIXFORC
 }
 
 void _LumpedMassMatrixForceTerm_Init( void* forceTerm ) {
-	LumpedMassMatrixForceTerm* self = (LumpedMassMatrixForceTerm*)forceTerm;
 }
 
 void _LumpedMassMatrixForceTerm_Delete( void* forceTerm ) {
@@ -162,9 +161,7 @@ void _LumpedMassMatrixForceTerm_Destroy( void* forceTerm, void* data ) {
 }
 
 void _LumpedMassMatrixForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector ,Element_LocalIndex lElement_I, double* elForceVector ) {
-	LumpedMassMatrixForceTerm* self              = Stg_CheckType( forceTerm, LumpedMassMatrixForceTerm );
-	FeVariable*                feVariable        = forceVector->feVariable;
-	FeMesh*				feMesh              = feVariable->feMesh;
+	LumpedMassMatrixForceTerm* self = Stg_CheckType( forceTerm, LumpedMassMatrixForceTerm );
 
 #if 0
 	if ( Stg_Class_IsInstance( mesh->layout->elementLayout, ParallelPipedHexaEL_Type ) ) {

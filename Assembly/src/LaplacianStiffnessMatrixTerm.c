@@ -85,7 +85,6 @@ LaplacianStiffnessMatrixTerm* _LaplacianStiffnessMatrixTerm_New(  LAPLACIANSTIFF
 }
 
 void _LaplacianStiffnessMatrixTerm_Init( void* matrixTerm ) {
-	LaplacianStiffnessMatrixTerm* self = (LaplacianStiffnessMatrixTerm*)matrixTerm;
 }
 
 void _LaplacianStiffnessMatrixTerm_Delete( void* matrixTerm ) {

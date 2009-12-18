@@ -147,21 +147,21 @@ void* _FieldTest_Copy( void* fieldTest, void* dest, Bool deep, Name nameExt, Ptr
 }
 
 void _FieldTest_AssignFromXML( void* fieldTest, Stg_ComponentFactory* cf, void* data ) {
-	FieldTest* 			self 			= (FieldTest*)fieldTest;
-	Dictionary*			dict			= cf->rootDict;
-	Dictionary_Entry_Value*		dictEntryVal		= Dictionary_Get( dict, "pluginData" );
-	Dictionary*			pluginDict  		=  Dictionary_Entry_Value_AsDictionary( dictEntryVal );
+	FieldTest*					self = (FieldTest*)fieldTest;
+	Dictionary*					dict = cf->rootDict;
+	Dictionary_Entry_Value*	dictEntryVal = Dictionary_Get( dict, "pluginData" );
+	Dictionary*					pluginDict =  Dictionary_Entry_Value_AsDictionary( dictEntryVal );
 	/* get the pluginDict from the xml, needed for rejig */
-	Dictionary*		pluginDict2	= Codelet_GetPluginDictionary( self, cf->rootDict );
-	Dictionary_Entry_Value*		fieldList;
-	Dictionary_Entry_Value*		swarmVarList		= Dictionary_Get( dict, "NumericSwarmVariableNames" );
-	FieldVariable_Register* 	fV_Register;
-	Index				feVariable_I, referenceFieldCount;
-	Index				swarmVar_I;
-	Name        fieldName;
-	Hook*				generateErrorFields;
-	Hook*				physicsTestHook;
-	Stream*     errStream = Journal_Register( Error_Type, "FieldTests" );
+	Dictionary*					pluginDict2	= Codelet_GetPluginDictionary( self, cf->rootDict );
+	Dictionary_Entry_Value*	fieldList;
+	Dictionary_Entry_Value*	swarmVarList = Dictionary_Get( dict, "NumericSwarmVariableNames" );
+	FieldVariable_Register*	fV_Register;
+	Index							feVariable_I/*, referenceFieldCount*/;
+	Index							swarmVar_I;
+	Name							fieldName;
+	Hook*							generateErrorFields;
+	Hook*							physicsTestHook;
+	Stream*						errStream = Journal_Register( Error_Type, "FieldTests" );
 
 	Journal_Firewall( pluginDict != NULL , errStream, "\nError in %s: No pluginData xml was defined ... aborting\n", __func__ );
 
@@ -404,8 +404,8 @@ void FieldTest_CalculateAnalyticSolutionForField( void* fieldTest, Index field_I
 
 	Memory_Free( value );
 }
+
 void _FieldTest_Execute( void* fieldTest, void* data ) {
-	FieldTest* 		self 		= (FieldTest*) fieldTest;
 }
 
 void _FieldTest_Destroy( void* fieldTest, void* data ) {
@@ -443,7 +443,6 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 	FeMesh*					referenceMesh = numericField->feMesh;
 	DomainContext*			context = self->context;
 	Variable_Register*	variable_Register	= context->variable_Register;
-	Sync*						sync = Mesh_GetSync( referenceMesh, MT_VERTEX );
 	Name						tmpName;
 	Dof_Index				componentsCount = numericField->fieldComponentCount;
 	Name						varName[9];
@@ -544,7 +543,6 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 	FeVariable*				numericField = self->numericFieldList[field_I];
 	DomainContext*			context = self->context;
 	Variable_Register*	variable_Register	= context->variable_Register;
-	Sync*						sync = Mesh_GetSync( constantMesh, MT_VERTEX );
 	Name						tmpName;
 	Dof_Index				componentsCount = numericField->fieldComponentCount;
 	Name						varName[9];
@@ -866,9 +864,10 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 }
 
 void _FieldTest_DumpToAnalysisFile( FieldTest* self, Stream* analysisStream ) {
-	int field_I, numDofs, dim, dof_I;
-	double error;
-	FeVariable* errorField;
+	int			field_I, numDofs, dim, dof_I;
+	/* double		error; */
+	FeVariable*	errorField;
+
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
 		/* should be using MT_VOLUME for the reference field mesh, but seems to have a bug */
 		errorField = self->errorFieldList[field_I];
@@ -940,25 +939,22 @@ void FieldTest_EvaluatePhysicsTest( void* _context, void* data ) {
 }
 
 void FieldTest_GenerateErrFields( void* _context, void* data ) {
-	DomainContext*		context			= (DomainContext*)_context;
+	DomainContext*	context = (DomainContext*)_context;
 	/* this a really dodgy way to get the self ptr, as will only work if the textual name is consistent with that in 
 	 * the XML - need to find a way to add an entry point which allows the self ptr to be passed as a void * */
 	//FieldTest* 		self 			= LiveComponentRegister_Get( context->CF->LCRegister, "NumericFields" );
 	/* this is also a dodgy way to get the self ptr, as its obtained from a global variable */
-	FieldTest*		self			= fieldTestSingleton;
+	FieldTest*		self = fieldTestSingleton;
 	FeVariable*		errorField;
-	Index			lMeshSize, lElement_I;
+	Index				lMeshSize, lElement_I;
 	double			elErrorSq[9], elNormSq[9], elError[9];
 	double			lAnalyticSq[9], gAnalyticSq[9];
 	double			lErrorSq[9], gErrorSq[9];
-	Bool			normalise		= self->normalise;
-	Index			numDofs, dof_I, fieldCount;
-	Index			field_I;
-	Index			expected_I;
-	Bool			pass;
-	double			numericTestResult;
-	Stream*     analysisStream;
-	double			eps			= self->epsilon;
+	Bool				normalise = self->normalise;
+	Index				numDofs, dof_I, fieldCount;
+	Index				field_I;
+	Stream*			analysisStream;
+	/* double			eps = self->epsilon; */
 	
 	/* if testTimestep is NOT initialise and NOT equal to the current timestep
 	 * we skip this function */
@@ -1102,26 +1098,25 @@ void FieldTest_ElementErrReferenceFromField( void* fieldTest, Index field_I, Ind
 }
 
 void FieldTest_ElementErrAnalyticFromField( void* fieldTest, Index field_I, Index lElement_I, double* elErrorSq, double* elNormSq ) {
-	FieldTest* 		self 			= (FieldTest*) fieldTest;
-	FeVariable*		referenceField		= self->referenceFieldList[field_I];
-	FeVariable*		numericField		= self->numericFieldList[field_I];
-	FeMesh*			elementMesh		= self->elementMesh;
-	Index			constantElNode		= lElement_I;
-	double*			coord			= Mesh_GetVertex( self->constantMesh, constantElNode );
-	unsigned		nDims			= Mesh_GetDimSize( elementMesh );
-	Index			el_I;
+	FieldTest*			self = (FieldTest*) fieldTest;
+	FeVariable*			numericField = self->numericFieldList[field_I];
+	FeMesh*				elementMesh = self->elementMesh;
+	Index					constantElNode = lElement_I;
+	double*				coord = Mesh_GetVertex( self->constantMesh, constantElNode );
+	unsigned				nDims = Mesh_GetDimSize( elementMesh );
+	Index					el_I;
 	ElementType*		elType;
-	Swarm*			intSwarm		= self->integrationSwarm;
-	Index			cell_I;
-	unsigned		cellParticleCount;
-	Index			cParticle_I;
+	Swarm*				intSwarm = self->integrationSwarm;
+	Index					cell_I;
+	unsigned				cellParticleCount;
+	Index					cParticle_I;
 	IntegrationPoint*	cParticle;
-	double			*xi, weight;
-	double			globalCoord[3];
-	double			detJac;
-	double			analytic[9], numeric[9];
-	Index			numDofs			= numericField->fieldComponentCount;
-	Index			dof_I;
+	double				*xi, weight;
+	double				globalCoord[3];
+	double				detJac;
+	double				analytic[9], numeric[9];
+	Index					numDofs = numericField->fieldComponentCount;
+	Index					dof_I;
 	/* corresponding analytic solution function for this feVariable, as assigned in the plugin */
 	FieldTest_AnalyticSolutionFunc*	analyticSolution = self->_analyticSolutionList[self->analyticSolnForFeVarKey[field_I]];
 
@@ -1151,15 +1146,9 @@ void FieldTest_ElementErrAnalyticFromField( void* fieldTest, Index field_I, Inde
 }
 
 void FieldTest_ElementErrAnalyticFromSwarm( void* fieldTest, Index var_I, Index lElement_I, double* elErrorSq, double* elNormSq ) {
-	FieldTest* 		self 		= (FieldTest*) fieldTest;
-
-	
 }
 
 void FieldTest_ElementErrReferenceFromSwarm( void* fieldTest, Index var_I, Index lElement_I, double* elErrorSq, double* elNormSq ) {
-	FieldTest* 		self 		= (FieldTest*) fieldTest;
-
-
 }
 
 /* the first index 'func_I' denotes the index of the function in the analytic solution list to be applied to calculate

@@ -154,7 +154,6 @@ void _ElementType_Register_Print( void* elementType_Register, Stream* stream ) {
 
 void _ElementType_Register_AssignFromXML( void* elementType_Register, Stg_ComponentFactory *cf, void* data ){
 	ElementType_Register*	self = (ElementType_Register*)elementType_Register;
-	DomainContext*				context;
 	
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
 	if( !self->context ) 

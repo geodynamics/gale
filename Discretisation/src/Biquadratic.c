@@ -215,15 +215,22 @@ void Biquadratic_EvalLocalDerivs( void* elementType, const double* localCoord, d
 	derivs[1][4] = -2.0 * eta * a4;
 }
 
-double Biquadratic_JacobianDeterminantSurface( void* elementType, void* _mesh, unsigned element_I, const double* localCoord, 
-						unsigned face_I, unsigned norm )
+double Biquadratic_JacobianDeterminantSurface(
+	void*				elementType,
+	void*				_mesh,
+	unsigned			element_I,
+	const double*	localCoord, 
+	unsigned			face_I,
+	unsigned			norm )
 {
-	Biquadratic*	self		= (Biquadratic*) elementType;
-	Mesh*		mesh		= (Mesh*)_mesh;
-	unsigned	surfaceDim	= ( norm + 1 ) % 2;
-	double		x[3];
-	double		detJac;
-	unsigned	nodes[3];
+	Biquadratic*	self = (Biquadratic*) elementType;
+	Mesh*				mesh = (Mesh*)_mesh;
+	unsigned			surfaceDim	= ( norm + 1 ) % 2;
+	double			x[3];
+	double			detJac;
+	unsigned			nodes[3];
+
+	self = (Biquadratic*) elementType;
 
 	ElementType_GetFaceNodes( elementType, mesh, element_I, face_I, 3, nodes );
 

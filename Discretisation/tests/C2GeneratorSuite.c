@@ -50,7 +50,6 @@ void C2GeneratorSuite_Setup( C2GeneratorSuiteData* data ) {
 	unsigned sizes[3];
 	double minCrd[3];
 	double maxCrd[3];
-	int rank;
 
 	Journal_Enable_AllTypedStream( False );
 
@@ -85,7 +84,6 @@ void C2GeneratorSuite_TestElementVertexInc( C2GeneratorSuiteData* data ) {
 	Grid*		elGrid		= *(Grid**)Mesh_GetExtension( data->mesh, Grid**, "elementGrid" );
 	Grid*		vertGrid	= *(Grid**)Mesh_GetExtension( data->mesh, Grid**, "vertexGrid" );
 	IArray*		inc		= IArray_New();
-	unsigned	vert;
 	unsigned*	incVerts;
 	unsigned	nIncVerts;
 	unsigned	el_i;

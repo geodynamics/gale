@@ -60,7 +60,6 @@ void _StgFEM_SwarmVariableList_AssignFromXML( void* component, Stg_ComponentFact
         Name                            swarmVariableListFilename;
         Bool                            fileOpened;
         Bool                            PrintToFile;
-        Swarm_Register*                 swarmRegister;
 
         self->context       = context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
         dictionary          = context->dictionary;

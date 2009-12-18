@@ -1923,11 +1923,11 @@ void FeEquationNumber_BuildLocationMatrix( FeEquationNumber* self ) {
 /** Build an element's local location matrix */
 Dof_EquationNumber** FeEquationNumber_BuildOneElementLocationMatrix( void* feEquationNumber, Element_LocalIndex lElement_I ) {
    FeEquationNumber* self = (FeEquationNumber*)feEquationNumber;
-   Node_DomainIndex elLocalNode_I;
+   /* Node_DomainIndex elLocalNode_I; */
    Node_DomainIndex numNodesThisElement, *elInc;
    Dof_EquationNumber** localLocationMatrix = NULL;
    FeMesh* feMesh = self->feMesh;
-   Dof_Index numDofsThisNode = 0;
+   /* Dof_Index numDofsThisNode = 0; */
    IArray* inc;
 
    inc = IArray_New();
@@ -2252,7 +2252,7 @@ void _FeEquationNumber_CalculateEqNumsDecomposition( FeEquationNumber* self ) {
 
 Partition_Index FeEquationNumber_CalculateOwningProcessorOfEqNum( void* feEquationNumber, Dof_EquationNumber eqNum ) {
    FeEquationNumber* self = (FeEquationNumber*)feEquationNumber;
-   Partition_Index ownerProc = (unsigned int)-1;
+   /* Partition_Index ownerProc = (unsigned int)-1; */
    Comm*	comm = Mesh_GetCommTopology( self->feMesh, MT_VERTEX );
    MPI_Comm	mpiComm = Comm_GetMPIComm( comm );
    unsigned	nProcs;

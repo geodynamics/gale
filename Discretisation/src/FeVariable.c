@@ -1155,12 +1155,11 @@ Bool FeVariable_InterpolateDerivativesAt( void* variable, double* globalCoord, d
 }
 
 void FeVariable_InterpolateDerivativesToElLocalCoord( void* _feVariable, Element_DomainIndex lElement_I, Coord elLocalCoord, double* value ) {
-	FeVariable*    self             = (FeVariable*) _feVariable;
-	ElementType*            elementType      = FeMesh_GetElementType( self->feMesh, lElement_I );
-	Node_Index              elementNodeCount = elementType->nodeCount;
-	double**                GNx; 
-	double                  detJac;
-	Dimension_Index         dim         = self->dim;
+	FeVariable*			self = (FeVariable*) _feVariable;
+	ElementType*		elementType = FeMesh_GetElementType( self->feMesh, lElement_I );
+	double**				GNx; 
+	double				detJac;
+	Dimension_Index	dim = self->dim;
 
 	GNx = self->GNx;
 
@@ -1175,23 +1174,23 @@ void FeVariable_InterpolateDerivativesToElLocalCoord( void* _feVariable, Element
 }
 
 void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_LocalIndex lElement_I, double** GNx, double* value ) {
-	FeVariable*             self        = (FeVariable*) _feVariable;
+	FeVariable*             self = (FeVariable*) _feVariable;
 	Node_ElementLocalIndex  elLocalNode_I;
 	Node_LocalIndex         lNode_I;
 	Dof_Index               dof_I;
 	Dof_Index               dofCount;
-	Variable*               dofVariable;
+	/* Variable*               dofVariable; */
 	double                  nodeValue;
-	unsigned		nInc, *inc;
-	Dimension_Index         dim         = self->dim;
-        double* tmpVal;
+	unsigned						nInc, *inc;
+	Dimension_Index         dim = self->dim;
+	double*						tmpVal;
 
 	/** Gets number of degrees of freedom - assuming it is the same throughout the mesh */
 	dofCount = self->dofLayout->dofCounts[0];
 
 	/** Initialise */
 	memset( value, 0, sizeof( double ) * dofCount * dim );
-        tmpVal = (double*)malloc( dim*dofCount*sizeof(double) );
+	tmpVal = (double*)malloc( dim*dofCount*sizeof(double) );
 
 	FeMesh_GetElementNodes( self->feMesh, lElement_I, self->inc );
 	nInc = IArray_GetSize( self->inc );
@@ -1949,8 +1948,8 @@ void FeVariable_ImportExportInfo_Delete( void* ptr ) {
 
 void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoords ) {
 	FeVariable*       self = (FeVariable*)feVariable;
-	Node_LocalIndex   lNode_I = 0;
-	Node_GlobalIndex  gNode_I = 0;
+	Node_LocalIndex   lNode_I;
+	Node_GlobalIndex  gNode_I;
 	double*           coord;
 	Dof_Index         dof_I;
 	Dof_Index         dofAtEachNodeCount;
@@ -1973,6 +1972,8 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
    FILE*             outputFile;
 #endif 
 
+	lNode_I = 0; gNode_I = 0;
+
 	MPI_Comm_size( comm, (int*)&nProcs );
 	MPI_Comm_rank( comm, (int*)&myRank );
 	
@@ -1990,7 +1991,6 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
       hid_t      attribData_id, attrib_id, group_id;
       hsize_t    a_dims;
       int        attribData;
-      int        res[3];
       Grid**     grid;
       unsigned*  sizes;
       
@@ -2201,9 +2201,11 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 	Node_GlobalIndex   gNode_I = 0;
 	Dof_Index          dof_I;
 	Dof_Index          dofAtEachNodeCount;
+#ifndef READ_HDF5
 	FILE*              inputFile;
+#endif
 	double             variableVal;
-	Processor_Index    proc_I=0;
+	Processor_Index    proc_I;
 	MPI_Comm	          comm = Comm_GetMPIComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
 	unsigned		       rank;
 	unsigned		       nRanks;
@@ -2234,6 +2236,8 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 	MPI_Comm_size( comm, (int*)&nRanks );
 	
 	dofAtEachNodeCount = self->fieldComponentCount;
+	proc_I = 0;
+	nDims = 0;
 	
 #ifdef READ_HDF5	
    
@@ -2490,25 +2494,16 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    C0Generator*						C0gen;
    FeMesh								*feMesh, *C0feMesh, *elementMesh;
    DofLayout*							dofs;
-   FeEquationNumber*					eqNum;
    Variable_Register*				varReg;
-   int									maxDecomp[3] = {0, 1, 1};
    Variable*							var;
-   VariableCondition*				bcs;
-   ConditionFunction_Register*	cfReg;
-   Dictionary*							dict;
-   XML_IO_Handler*					ioHandler;
    FeVariable*							feVar;
-	int									n_i;
-   hid_t									file, fileSpace, fileData, error;
+   hid_t									file, fileData;
    unsigned								totalNodes, ii;
-   FeCheckpointFileVersion			ver;
    hid_t									attrib_id, group_id;
    herr_t								status;
    int									res[3];
    int									checkVer;
    int									ndims;
-   unsigned*							sizes;
 	double								crdMin[3], crdMax[3];
 	double*								value;
 	unsigned								nDomainVerts;
@@ -2709,11 +2704,10 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    feVar->_syncShadowValues( feVar );
 
    totalNodes = Mesh_GetLocalSize( self->feMesh, MT_VERTEX );
-   value      = Memory_Alloc_Array( double, self->fieldComponentCount, "interValue" );
+   value = Memory_Alloc_Array( double, self->fieldComponentCount, "interValue" );
          
    /** step through nodes, interpolating the required values from our newly created feVariable */
    for( ii=0; ii<totalNodes; ii++ ) {
-      unsigned dof_I;
       feVar->_interpolateValueAt( feVar, Mesh_GetVertex( self->feMesh, ii ), value);
       FeVariable_SetValueAtNode( self, ii, value);
    }

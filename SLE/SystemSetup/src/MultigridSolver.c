@@ -759,7 +759,11 @@ Mat MultigridSolver_GetProlongation( void* matrixSolver, unsigned level ) {
 void MultigridSolver_RestrictMatrix( MultigridSolver* self, MultigridSolver_Level* level, Mat* dstMatrix ) {
 	Mat		srcMat;
 	PetscInt	nSrcRows, nSrcCols;
-	PetscInt	nRRows, nRCols, dummy;
+	PetscInt	nRRows, nRCols;
+
+#if( PETSC_VERSION_MAJOR > 2 )
+	PetscInt dummy;
+#endif
 
 	PetscScalar	fillRatio;
 	MatInfo		mInfo;

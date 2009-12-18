@@ -146,8 +146,6 @@ void* _PressureGradForceTerm_DefaultNew( Name name ) {
 
 void _PressureGradForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
 	PressureGradForceTerm*	self = (PressureGradForceTerm*)forceTerm;
-	FeVariable*					pressureField;
-	FeVariable*					gradField;
 
 	/* Construct Parent */
 	_ForceTerm_AssignFromXML( self, cf, data );

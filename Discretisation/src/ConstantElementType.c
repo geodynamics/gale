@@ -150,8 +150,6 @@ void _ConstantElementType_Destroy( void* elementType, void *data ){
 }
 
 void _ConstantElementType_Build( void* elementType, void *data ) {
-	ConstantElementType* self = (ConstantElementType*)elementType;
-	/* NOTHING */
 
 }
 

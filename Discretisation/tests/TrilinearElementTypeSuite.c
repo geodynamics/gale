@@ -88,7 +88,7 @@ void TrilinearElementTypeSuite_TestShape( TrilinearElementTypeSuiteData* data ) 
    double		lCrd[3] = { 0.0, 0.0, 0.0 };
 	double		basis[8] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
    IArray*		inc;
-   int			e_i, v_i, v_j, s_i;
+   int			e_i, v_i, v_j;
 
    mesh = buildMesh();
    pcu_check_true( mesh );

@@ -122,8 +122,6 @@ FiniteElementContext* _FiniteElementContext_New(  FINITEELEMENTCONTEXT_DEFARGS  
 }
 
 void _FiniteElementContext_Init( FiniteElementContext* self ) {
-	Stream*  errorStream = Journal_Register( Error_Type, self->type );
-
 	/* Set up stream preferences */
 	Journal_Enable_NamedStream( InfoStream_Type, "StgFEM_VerboseConfig", False );
 
@@ -454,14 +452,16 @@ void _FiniteElementContext_SaveSwarms( void* context ) {
 
 
 void _FiniteElementContext_SaveMesh( void* context ) {
-   FiniteElementContext*   self = (FiniteElementContext*) context;
-   Stream*         	      info = Journal_Register( Info_Type, "Context" );
+   FiniteElementContext*   self;
+	Stream*                 info = Journal_Register( Info_Type, "Context" );
    unsigned                componentCount = LiveComponentRegister_GetCount(stgLiveComponentRegister);
    unsigned                compI;
    Stg_Component*          stgComp;
    FeMesh*                 mesh;
    
 	Journal_Printf( info, "In %s(): about to save the mesh to disk:\n", __func__ );
+
+	self = (FiniteElementContext*) context;
 
    /** search for entire live component register for feMesh types  **/
    for( compI = 0 ; compI < componentCount ; compI++){
@@ -560,7 +560,6 @@ void _FiniteElementContext_DumpMeshAscii( void* context, FeMesh* feMesh ) {
 void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
    FiniteElementContext*   self = (FiniteElementContext*) context;
    int                     rank, nRanks;
-   FieldVariable*          fieldVar = NULL;
    unsigned                nDims;
    hid_t                   file, fileSpace, fileData, fileSpace2, fileData2;
    hid_t                   memSpace;
@@ -569,7 +568,6 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
    Node_LocalIndex         lNode_I = 0;
    Node_GlobalIndex        gNode_I = 0;
    double*                 coord;
-   double                  buf[4];
    int                     buf_int[5];
    MPI_Status              status;
    int                     confirmation = 0;
@@ -578,7 +576,6 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
    Element_GlobalIndex     gElement_I;
    Index                   maxNodes;
    IArray*                 iarray = IArray_New();
-   unsigned                fVar_I;
    char*                   filename = NULL;
    char*                   meshSaveFileNamePart = NULL;
 
@@ -607,7 +604,6 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
       hid_t      attribData_id, attrib_id, group_id;
       hsize_t    a_dims;
       int        attribData;
-      int        res[3];
       Grid**     grid;
       unsigned*  sizes;
 

@@ -184,7 +184,6 @@ void _MassMatrixTerm_AssembleElement(
     Particle_InCellIndex                cParticle_I, cellParticleCount;
     Index                               nodesPerEl;
     Index                               i,j, k;
-    Dimension_Index                     dim_I;
     double**                            GNx, *N;
     double                              detJac;
 	

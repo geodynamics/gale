@@ -86,7 +86,6 @@ UzawaPreconditionerTerm* _UzawaPreconditionerTerm_New(  UZAWAPRECONDITIONERTERM_
 }
 
 void _UzawaPreconditionerTerm_Init( void* matrixTerm ) {
-	UzawaPreconditionerTerm* self = (UzawaPreconditionerTerm*)matrixTerm;
 }
 
 void _UzawaPreconditionerTerm_Delete( void* matrixTerm ) {

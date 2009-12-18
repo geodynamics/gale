@@ -342,9 +342,6 @@ void _SystemLinearEquations_AssignFromXML( void* sle, Stg_ComponentFactory* cf, 
 	Name							nonLinearSolutionType;
 	SNES                    nlSolver = NULL;
 	Name							optionsPrefix;
-	double						double_from_dict;
-	Bool							bool_from_dict;
-	int							int_from_dict;
 	
 	solver = Stg_ComponentFactory_ConstructByKey( cf, self->name, SLE_Solver_Type, SLE_Solver, False, data ) ;
 
@@ -674,11 +671,10 @@ void SystemLinearEquations_ZeroAllVectors( void* sle, void* _context ) {
 /* need to do this before the SLE specific function to set up the 
 pre conditioners is called (beginning of solve) */
 void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
-	FiniteElementContext*	context		= (FiniteElementContext*)_context;
-	SystemLinearEquations*	sle             = (SystemLinearEquations*)context->slEquations->data[0];
-	Vec			F;
-	SNES			snes;
-	SNES			oldSnes		= sle->nlSolver;
+	FiniteElementContext*	context = (FiniteElementContext*)_context;
+	SystemLinearEquations*	sle = (SystemLinearEquations*)context->slEquations->data[0];
+	SNES							snes;
+	SNES							oldSnes = sle->nlSolver;
 
 	/* don't assume that a snes is being used for initial guess, check for this!!! */
 	if( oldSnes && context->timeStep == 1 && !sle->linearSolveInitGuess )
@@ -1068,9 +1064,9 @@ void SLE_SNESMonitorProgress( void *sle,
   PetscReal fnorm0, PetscReal fnorm, PetscReal dX, PetscReal X1, 
   PetscReal fatol, PetscReal frtol, PetscReal xtol )
 {
-  PetscReal f_abs_s, f_abs_e, w1, v1, p1;
-  PetscReal f_rel_s, f_rel_e, w2, v2, p2;
-  PetscReal x_del_s, x_del_e, w3, v3, p3;
+  PetscReal f_abs_s, f_abs_e, v1, p1;
+  PetscReal f_rel_s, f_rel_e, v2, p2;
+  PetscReal x_del_s, x_del_e, v3, p3;
 
   if(iter==0) {
     PetscPrintf( PETSC_COMM_WORLD, "  SLE_NS  it       |F|                 |F|/|F0|             |X1-X0|/|X1| \n" );
@@ -1099,7 +1095,7 @@ void SLE_SNESConverged(
 	PetscReal snes_abstol, PetscReal snes_rtol, PetscReal snes_ttol, PetscReal snes_xtol,
 	PetscInt it,PetscReal xnorm,PetscReal pnorm,PetscReal fnorm,SNESConvergedReason *reason )
 {
-  PetscErrorCode ierr;
+  /* PetscErrorCode ierr; */
 
   *reason = SNES_CONVERGED_ITERATING;
 
@@ -1229,9 +1225,6 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
   if (snes_reason) return;
 
   for(i = 0; i < snes_maxits; i++) {
-    PetscTruth lsSuccess = PETSC_TRUE;
-    PetscReal  dummyNorm;
-
     /* Update guess Y = X^n - F(X^n) */
     ierr = VecWAXPY(Y, -1.0, F, X);CHKERRQ(ierr);
 

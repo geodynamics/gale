@@ -149,8 +149,10 @@ void ElementType_EvaluateShapeFunctionLocalDerivsAt( void* elementType, const do
 double _ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, unsigned element_I, const double localCoord[], 
 						unsigned face_I, unsigned norm ) 
 {
-	ElementType* 	self        	= (ElementType*) elementType;
-	Stream*		error		= Journal_Register( ErrorStream_Type, ElementType_Type );
+	ElementType*	self;
+	Stream*			error = Journal_Register( ErrorStream_Type, ElementType_Type );
+
+	self = (ElementType*) elementType;
 
 	Journal_Printf( error, "Error: the jacobian for this element type cannot be evaluated on the element surface" );
 	Journal_Printf( error, "(perhaps because the nodes are defined internally for the element).\n" );
@@ -169,34 +171,36 @@ double ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, un
 #define EPS 1.0E-6
 
 int _ElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
-	ElementType* 	self = (ElementType*)elementType;
+	ElementType* self;
 
-        memset( normal, 0, sizeof(double) * dim );
+	self = (ElementType*)elementType;
 
-        if( xi[J_AXIS] < -1.0 + EPS ) {
-                normal[J_AXIS] = -1.0;
-                return 0;
-        }
-        else if( xi[J_AXIS] > +1.0 - EPS ) {
-                normal[J_AXIS] = +1.0;
-                return 1;
-        }
-        else if( xi[I_AXIS] < -1.0 + EPS ) {
-                normal[I_AXIS] = -1.0;
-                return 2;
-        }
-        else if( xi[I_AXIS] > +1.0 - EPS ) {
-                normal[I_AXIS] = +1.0;
-                return 3;
-        }
-        else if( xi[K_AXIS] < -1.0 + EPS ) {
-                normal[K_AXIS] = -1.0;
-                return 4;
-        }
-        else if( xi[K_AXIS] > +1.0 - EPS ) {
-                normal[K_AXIS] = +1.0;
-                return 5;
-        }
+	memset( normal, 0, sizeof(double) * dim );
+
+	if( xi[J_AXIS] < -1.0 + EPS ) {
+		normal[J_AXIS] = -1.0;
+		return 0;
+	}
+	else if( xi[J_AXIS] > +1.0 - EPS ) {
+		normal[J_AXIS] = +1.0;
+		return 1;
+	}
+	else if( xi[I_AXIS] < -1.0 + EPS ) {
+		normal[I_AXIS] = -1.0;
+		return 2;
+	}
+	else if( xi[I_AXIS] > +1.0 - EPS ) {
+		normal[I_AXIS] = +1.0;
+		return 3;
+	}
+	else if( xi[K_AXIS] < -1.0 + EPS ) {
+		normal[K_AXIS] = -1.0;
+		return 4;
+	}
+	else if( xi[K_AXIS] > +1.0 - EPS ) {
+		normal[K_AXIS] = +1.0;
+		return 5;
+	}
 }
 
 int ElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {

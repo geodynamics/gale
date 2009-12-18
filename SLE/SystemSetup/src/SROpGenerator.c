@@ -425,7 +425,7 @@ void SROpGenerator_GenOps( SROpGenerator* self, Mat* pOps, Mat* rOps ) {
 	Mat		fineMat, P;
 	unsigned	nRows, nCols;
 	unsigned	l_i;
-	unsigned	nProcs;
+	/* unsigned	nProcs; */
 
 	assert( self && Stg_CheckType( self, SROpGenerator ) );
 	assert( pOps && rOps );
@@ -753,12 +753,11 @@ Efficiency alert!!
 //Matrix *SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
 Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
    FeMesh *mesh;
-   int nDims, nDofsPerNode, rowDof;
+   int nDims, nDofsPerNode;
    int sideSizes[2][3];
    int inds[2][3], offsInds[3], nOffs[3];
-   int nGlobalNodes[2], nLocalNodes[2];
-   int nGlobalEqs[2], nLocalEqs[2];
-   int eqRangeBegin, eqRangeEnd;
+   int nGlobalNodes[2];
+   int nGlobalEqs[2];
    Grid *vertGrid, *elGrid, *grid[2], *offsGrid;
    int nodes[8];
    int nodeInd;
@@ -1061,8 +1060,8 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
    int nDims, nDofsPerNode, rowDof;
    int sideSizes[2][3];
    int inds[2][3], offsInds[3], nOffs[3];
-   int nGlobalNodes[2], nLocalNodes[2];
-   int nGlobalEqs[2], nLocalEqs[2];
+   int nGlobalNodes[2];
+   int nGlobalEqs[2];
    int eqRangeBegin, eqRangeEnd;
    Grid *vertGrid, *elGrid, *grid[2], *offsGrid;
    int nodes[8];
@@ -1079,7 +1078,6 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
    PetscInt sr,er, sc,ec, row_idx;
    Vec vec_o_nnz, vec_d_nnz;
    PetscScalar *v;
-   PetscTruth is_seq;
    PetscInt p, proc_owner, *row_ranges, *col_ranges;
    MPI_Comm comm;
    PetscMPIInt nproc;

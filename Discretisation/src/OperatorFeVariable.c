@@ -626,15 +626,15 @@ void OperatorFeVariable_BinaryInterpolationFunc( void* feVariable, Element_Domai
 }
 
 void OperatorFeVariable_GradientInterpolationFunc( void* feVariable, Element_DomainIndex dElement_I, Coord localCoord, double* value ) {
-	OperatorFeVariable* self            = (OperatorFeVariable*) feVariable;
-	FeVariable*         field0          = self->feVariableList[0];
+	OperatorFeVariable* self = (OperatorFeVariable*) feVariable;
+	FeVariable*         field0 = self->feVariableList[0];
 	
 	FeVariable_InterpolateDerivativesToElLocalCoord( field0, dElement_I, localCoord, value );
 }
 
 void OperatorFeVariable_UnaryValueAtNodeFunc( void* feVariable, Node_DomainIndex dNode_I, double* value ) {
-	OperatorFeVariable* self            = (OperatorFeVariable*) feVariable;
-	FeVariable*         field0          = self->feVariableList[0];
+	OperatorFeVariable* self = (OperatorFeVariable*) feVariable;
+	FeVariable*         field0 = self->feVariableList[0];
 	double              fieldValue0[ MAX_FIELD_COMPONENTS ]; 
 	
 	FeVariable_GetValueAtNode( field0, dNode_I, fieldValue0 );
@@ -642,18 +642,16 @@ void OperatorFeVariable_UnaryValueAtNodeFunc( void* feVariable, Node_DomainIndex
 }
 
 void OperatorFeVariable_BinaryValueAtNodeFunc( void* feVariable, Node_DomainIndex dNode_I, double* value ) {
-	OperatorFeVariable* self            = (OperatorFeVariable*) feVariable;
-	FeVariable*         field0          = self->feVariableList[0];
-	FeVariable*         field1          = self->feVariableList[1];
-	double              fieldValue0[ MAX_FIELD_COMPONENTS ]; 
-	double              fieldValue1[ MAX_FIELD_COMPONENTS ]; 
-	double*		    	coord;
+	OperatorFeVariable*	self = (OperatorFeVariable*) feVariable;
+	FeVariable*				field0 = self->feVariableList[0];
+	FeVariable*				field1 = self->feVariableList[1];
+	double					fieldValue0[ MAX_FIELD_COMPONENTS ]; 
+	double					fieldValue1[ MAX_FIELD_COMPONENTS ]; 
+	double*					coord;
 	Element_DomainIndex	field0Element;
 	Element_DomainIndex	field1Element;
-	Coord			field0LocalCoord;
-	Coord			field1LocalCoord;
-	Node_LocalIndex		field0NearestNode;
-	Node_LocalIndex		field1NearestNode;
+	Coord						field0LocalCoord;
+	Coord						field1LocalCoord;
 
 	if( field0->feMesh == self->feMesh && field1->feMesh == self->feMesh ) {
 		FeVariable_GetValueAtNode( field0, dNode_I, fieldValue0 );

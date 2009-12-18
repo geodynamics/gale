@@ -53,11 +53,11 @@
 const Type StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_Type = "StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve";
 
 void StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_PrintTimeInfo( AbstractContext* context ) {
-	StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve* self = (StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve*)LiveComponentRegister_Get( context->CF->LCRegister, StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_Type );
-	Stokes_SLE*  sle  = (Stokes_SLE*) LiveComponentRegister_Get( context->CF->LCRegister, "stokesEqn");
-	SLE_Solver* solver = (SLE_Solver*) LiveComponentRegister_Get( context->CF->LCRegister, "uzawa");
-	
-	
+	StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve*	self;
+	Stokes_SLE*	sle  = (Stokes_SLE*) LiveComponentRegister_Get( context->CF->LCRegister, "stokesEqn");
+	SLE_Solver*	solver = (SLE_Solver*) LiveComponentRegister_Get( context->CF->LCRegister, "uzawa");
+
+	self = (StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve*)LiveComponentRegister_Get( context->CF->LCRegister, StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_Type );
 	
 	/* Print Current Average InnerIteration Time Taken */
 	StgFEM_FrequentOutput_PrintValue( context, solver->avgtimeinnerits);
@@ -88,7 +88,6 @@ void _StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_AssignFromXML( vo
 
 void _StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_Initialise( void* component, void* data ) {
 	StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve* self = (StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve*)component;
-	Bool isNonLinear;
 	Stokes_SLE*  sle  = (Stokes_SLE*) LiveComponentRegister_Get( self->context->CF->LCRegister, "stokesEqn");
 		
 	/*this isn't set to true before the initialise phase*/
@@ -105,8 +104,6 @@ void _StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_Initialise( void*
 		StgFEM_FrequentOutput_PrintString( self->context, "NonLinIts" );
 	}
 }
-
-
 
 void* _StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_DefaultNew( Name name ) {
 	SizeT                                              _sizeOfSelf = sizeof( StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve );

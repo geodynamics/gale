@@ -131,7 +131,6 @@ void _AdvDiffSteadyState1D_Build( void* analyticSolution, void* data ) {
 
 void _AdvDiffSteadyState1D_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	AdvDiffSteadyState1D*  self = (AdvDiffSteadyState1D*)analyticSolution;
-	AbstractContext*       context;
 	ConditionFunction*     condFunc;
 
 	_FieldTest_AssignFromXML( self, cf, data );

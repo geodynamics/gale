@@ -71,9 +71,6 @@ FeMesh* _FeMesh_DefaultNew( Name name ) {
 
 	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
 	Stg_Class_CopyFunction*        _copy = NULL;
-	ElementType*                  elType = NULL;
-	const char*                   family = NULL;
-	Bool                     elementMesh = False;
 
    return _FeMesh_New(  FEMESH_PASSARGS  );
 }
@@ -134,7 +131,6 @@ void _FeMesh_Print( void* feMesh, Stream* stream ) {
 
 void _FeMesh_AssignFromXML( void* feMesh, Stg_ComponentFactory* cf, void* data ) {
 	FeMesh*	self = (FeMesh*)feMesh;
-	char*		family;
 
 	assert( self );
 

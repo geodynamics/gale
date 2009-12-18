@@ -112,16 +112,9 @@ FeVariable* buildFeVar() {
 void StiffnessMatrixSuite_TestStiffnessMatrix( StiffnessMatrixSuiteData* data ) {
   FeVariable*				feVar;
   FeMesh*					mesh;
-  int							nEls, nVerts, nDims;
-  const int					*verts;
-  double*					vert;
-  double						val[3];
-  InterpolationResult	ret;
   EntryPoint_Register*	ep_reg;
   StiffnessMatrix*		mat;
   ForceVector*				vec;
-  IArray*					incArray = NULL;
-  int							e_i, v_i, d_i;
   MPI_Comm					comm;
 
   pcu_docstring( "This test just creates a Stiffness matrix data structure, builds, itialises, refreshes and then destroys it.\n" );

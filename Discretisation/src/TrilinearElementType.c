@@ -200,8 +200,6 @@ void _TrilinearElementType_Destroy( void* elementType, void *data ){
 }
 
 void _TrilinearElementType_Build( void* elementType, void *data ) {
-	TrilinearElementType* 	self = (TrilinearElementType*)elementType;
-
 }
 
 #if 0

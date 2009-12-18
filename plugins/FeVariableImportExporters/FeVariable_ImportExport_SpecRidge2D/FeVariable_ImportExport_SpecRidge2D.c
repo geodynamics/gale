@@ -55,7 +55,6 @@ void FeVariable_ReadNodalValuesFromFile_SpecRidge2D( void* _feVariable, const ch
 	char*              filename;
 	Node_LocalIndex    lNode_I = 0;
 	Node_GlobalIndex   gNode_I = 0;
-	Node_GlobalIndex   gNodeCount_I = 0;
 	Dof_Index          dof_I;
 	Dof_Index          dofAtEachNodeCount;
 	FILE*              inputFile;
@@ -64,7 +63,7 @@ void FeVariable_ReadNodalValuesFromFile_SpecRidge2D( void* _feVariable, const ch
 	const unsigned int MAX_LINE_LENGTH = 1000;
 	Processor_Index    proc_I=0;
 	Dimension_Index    dim_I=0;
-	char*              matchString;
+	/* char*              matchString; */
 	Index              currentFileLine = 0;
 	Coord              localGeometryMin;
 	Coord              localGeometryMax;

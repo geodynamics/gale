@@ -442,7 +442,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	double                  qReciprocalGlobalProblemScale;
 	int			init_info_stream_rank;	
 	PetscScalar p_sum;
-	Bool nullsp_present;
+	/* Bool nullsp_present; */
 	Bool uzawa_summary;
 	double time,t0,rnorm0;
 

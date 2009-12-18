@@ -200,7 +200,6 @@ void _ThermalBuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 	double							force;
 	double							rayleighNumber;
 	double							temperature;
-	double							tmpGlobalCoord[3];
 
 	/* Get context extension */
 	rayleighNumber   = self->rayleighNumber;

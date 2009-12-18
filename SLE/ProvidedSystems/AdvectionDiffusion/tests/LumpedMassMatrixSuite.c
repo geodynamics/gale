@@ -137,7 +137,6 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 	unsigned							dimExists[] = { True, True, False };
 	/* Mass Matrix Stuff */
 	ForceVector*					massMatrix;
-	Vec								copyMatrix;
 	Vec								expectedMatrix;
 	PetscViewer						viewer;
 	PetscTruth						flg;
