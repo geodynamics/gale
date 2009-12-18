@@ -407,7 +407,6 @@ void JournalSuite_TestShortcuts( JournalSuiteData* data ) {
    double       floatValue    = 2.173425;
    int          intValue      = 3;
    unsigned int uintValue     = 3980;
-   int          char_I;
    char         charValue     = 'V';
    double       doubleArray[] = { 10.23, 393.1, -89, 1231 };        
    Index        uintArray[]   = { 10, 2021, 231, 2, 3, 4, 55 };

@@ -48,10 +48,6 @@ void TimeMonitorSuite_Teardown( TimeMonitorSuiteData* data ) {
 }
 
 void TimeMonitorSuite_TestTimingPeriod( TimeMonitorSuiteData* data ) {
-   Stream*           timeMonitorStream = NULL;
-   char*             timeMonitorOutputFilename = "./TimeMonitorSuite_TestOutput.txt";
-   FILE*             timeMonitorOutputFile = NULL;
-   char*             infoString = NULL;
    #define           MAXLINE 1000
    TimeMonitorData   tmData;
    Stg_TimeMonitor*  tm=NULL;
@@ -65,16 +61,15 @@ void TimeMonitorSuite_TestTimingPeriod( TimeMonitorSuiteData* data ) {
    sleep( 2 );
    Stg_TimeMonitor_End( tm, &tmData );
 
-   pcu_check_true( 2.95 < tmData.totalSinceInit < 3.05 );
-   pcu_check_true( 1.95 < tmData.dt < 2.05 );
-   pcu_check_true( 1.95 < tmData.aveProcDt < 2.05 );
+   pcu_check_true( ( 2.95 < tmData.totalSinceInit ) && ( tmData.totalSinceInit < 3.05 ) );
+   pcu_check_true( ( 1.95 < tmData.dt ) && ( tmData.dt < 2.05 ) );
+   pcu_check_true( ( 1.95 < tmData.aveProcDt ) && ( tmData.aveProcDt < 2.05 ) );
    percentOfTotalCalc = tmData.aveProcDt / tmData.totalSinceInit * 100;
    pcu_check_true( fabs( percentOfTotalCalc - tmData.percentTM_ofTotal ) < 0.01 );
    pcu_check_true( tmData.criterionPassed == True );
 
    Stg_TimeMonitor_Delete( tm );
 }
-
 
 void TimeMonitorSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, TimeMonitorSuiteData );

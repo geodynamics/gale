@@ -52,6 +52,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <time.h>
+#include <unistd.h>
 
 #if defined(READ_HDF5) || defined(WRITE_HDF5)
 #include <hdf5.h>
@@ -900,6 +901,7 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( void* _context, Index timeStep
 	
    timeInfoFileNamePart = Context_GetCheckPointReadPrefixString( self );
 #ifdef WRITE_HDF5
+	timeInfoFile = NULL;
    Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, self->restartTimestep );
 	 
 	/* Open the file and data set. */
@@ -971,6 +973,7 @@ void _AbstractContext_SaveTimeInfo( void* _context ) {
 	if ( self->rank == 0 ) {
    timeInfoFileNamePart = Context_GetCheckPointWritePrefixString( self );
 #ifdef WRITE_HDF5
+	timeInfoFile = NULL;
    Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, self->timeStep );
 	
 	/* Create parallel file property list. */
@@ -1088,9 +1091,8 @@ Bool AbstractContext_CheckPointExists( void* context, Index timeStep ) {
 }
 
 char* Context_GetCheckPointReadPrefixString( void* context ) {
-	AbstractContext*       self = context;	
-	Index                  readStrLen = 0;
-	char*                  readPathString = NULL;
+	AbstractContext*	self = context;	
+	char*					readPathString = NULL;
 
    if ( self->checkpointAppendStep ) {
       if ( strlen(self->checkPointPrefixString) > 0 ) {
@@ -1112,9 +1114,8 @@ char* Context_GetCheckPointReadPrefixString( void* context ) {
 }
 
 char* Context_GetCheckPointWritePrefixString( void* context ) {
-	AbstractContext*       self = context;	
-	Index                  writeStrLen = 0;
-	char*                  writePathString = NULL;
+	AbstractContext*	self = context;	
+	char*					writePathString = NULL;
 
    if ( self->checkpointAppendStep ) {
       if ( strlen(self->checkPointPrefixString) > 0 ) {

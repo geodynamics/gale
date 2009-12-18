@@ -248,8 +248,6 @@ void DictionarySuite_TestSet( DictionarySuiteData* data ) {
    Dictionary_Entry_Value* currValue;
    Dictionary_Entry_Value* listValue;
    double                  newVal1 = 34.3, newVal2 = 38.9;
-   Dictionary_Entry_Value* yValue;
-   Dictionary_Entry_Value* testStruct;
    Index                   ii=0;
 
    DictionarySuite_PopulateDictWithTestValues( data->dict, data->testDD );

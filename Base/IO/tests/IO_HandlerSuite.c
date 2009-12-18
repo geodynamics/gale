@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <mpi.h>
@@ -55,8 +56,8 @@ typedef struct {
    Dictionary*                      dict1;
    Dictionary*                      dict2;
    DictionarySuite_TestDictData*    testDD;
-   Index                            rank;
-   Index                            nProcs;
+   int										rank;
+   int										nProcs;
    MPI_Comm                         comm;
 } IO_HandlerSuiteData;
 
@@ -168,7 +169,6 @@ void IO_HandlerSuite_TestWriteReadNormalSingleEntry( IO_HandlerSuiteData* data )
 
 /* Similar to above test, except test we can write out an empty Dictionary, then read in */
 void IO_HandlerSuite_TestWriteReadEmpty( IO_HandlerSuiteData* data ) {
-   Index          ii;
    const char*    xmlTestFilename = "empty.xml";
    FILE*          testFile = NULL;
    const int      MAXLINE = 1000;
@@ -237,7 +237,6 @@ void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
 
 
 void IO_HandlerSuite_TestReadWhitespaceEntries( IO_HandlerSuiteData* data ) {
-   Index             ii;
    const char*       testFilename = "xmlTest-whitespaces.xml";
    char*             whiteSpacesEntry = NULL;
    const char*       testKey = "spacedKey";
@@ -275,7 +274,6 @@ void IO_HandlerSuite_TestReadWhitespaceEntries( IO_HandlerSuiteData* data ) {
 /* Note: it'd be good to use the PCU input fule capabilities, but unfortunately Scons glob doesn't seem to support
  * subdirectories currently. */
 void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
-   Index             ii;
    const char*       testFilename = "xmlTest-include.xml";
    const char*       testIncludedFilename = "xmlTest-included.xml";
    const char*       testSearchPathSubdir = "./testXML-subdir";
@@ -358,14 +356,11 @@ void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
    const int         list1EntryCount = 2;
    const int         list1Vals[2][3] = { {1, 3, 6}, {2, 9, 14} };
    const char*       list2Name = "boundary_conditions2";
-   const int         list2CompCount = 5;
    const int         list2EntryCount = 3;
    const char*       list2CompNames[5] = {"side", "xval", "yval", "zval", "active"};
-   const char*       list2CompTypes[5] = {"string", "int", "int", "int", "bool"};
    const char*       list2StringVals[3] = {"top", "bottom", "left"};
    const int         list2CoordVals[3][3] = { {4,5,8}, {3,5,9}, {9,3,4} };
    const Bool        list2BoolVals[3] = { True, False, True };
-   const char*       list2BoolValStrings[3] = { "True", "False", "1" };
    Index             rank_I;
 
    testFilename = Memory_Alloc_Array_Unnamed( char, pcu_filename_inputLen( "xmlTest-rawData.xml" ) );
@@ -509,11 +504,6 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    Dictionary_Entry_Value* structDev = NULL;
    Dictionary_Entry_Value* elementDev = NULL;
    Dictionary*             structDict = NULL;
-   char                    struct1Entry[10000];
-   char                    struct2Entry[10000];
-   char*                   testEntries = NULL;
-   char                    xmlLine[1000];
-   Index                   rank_I;
 
    /* Only do this test for processor 0, to avoid probs with multiple opens */
    if ( data->rank != 0 ) return;
@@ -610,13 +600,12 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
 
 
 void IO_HandlerSuite_TestReadNonExistent( IO_HandlerSuiteData* data ) {
-   char*          errorFilename;
-   char*          notExistFilename = "I_Dont_Exist.xml";
-   FILE*          errorFile;
-   #define        MAXLINE 1000
-   char           errorLine[MAXLINE];
-   char           expectedErrorMsg[MAXLINE];
-   Index          rank_I;
+   char*		errorFilename;
+   char*		notExistFilename = "I_Dont_Exist.xml";
+   FILE*		errorFile;
+   #define	MAXLINE 1000
+   char		errorLine[MAXLINE];
+   char		expectedErrorMsg[MAXLINE];
 
    Stg_asprintf( &errorFilename, "./errorMsg-NonExist-%d.txt", data->rank );
    Stream_RedirectFile( Journal_Register( Error_Type, XML_IO_Handler_Type ), errorFilename );
@@ -640,9 +629,9 @@ void IO_HandlerSuite_TestReadNonExistent( IO_HandlerSuiteData* data ) {
 
 
 void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
-   char              invalidXMLFilename[PCU_PATH_MAX];
-   char              expectedErrorFilename[PCU_PATH_MAX];
-   const char*       errorFilename = "errorMsg-Invalid.txt";
+   char			invalidXMLFilename[PCU_PATH_MAX];
+   char			expectedErrorFilename[PCU_PATH_MAX];
+   const char*	errorFilename = "errorMsg-Invalid.txt";
 
    pcu_filename_input( "Invalid.xml", invalidXMLFilename );
    pcu_filename_expected( errorFilename, expectedErrorFilename );

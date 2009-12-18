@@ -449,9 +449,8 @@ void _get_XML(void* ioHandler, char* argv[], int argc) {
 
 
 Index IO_Handler_ReadAllFromCommandLine( void* ioHandler, int argc, char* argv[], Dictionary* dictionary ) {
-	Index       filesRead = 0;
-	Index arg_I;
-	IO_Handler* self;	
+	Index filesRead = 0;
+
 	_get_XML( ioHandler, argv, argc );
 	filesRead = IO_Handler_ReadAllFilesFromCommandLine( ioHandler, argc, argv, dictionary );
 	Dictionary_ReadAllParamFromCommandLine( dictionary, argc, argv );
@@ -461,7 +460,8 @@ Index IO_Handler_ReadAllFromCommandLine( void* ioHandler, int argc, char* argv[]
 
 
 Index IO_Handler_ReadAllFromCommandLineForceSource( void* ioHandler, int argc, char* argv[], Dictionary* dictionary ) {
-	Index       filesRead = 0;
+	Index filesRead = 0;
+
 	filesRead = IO_Handler_ReadAllFilesFromCommandLineForceSource( ioHandler, argc, argv, dictionary );
 	Dictionary_ReadAllParamFromCommandLine( dictionary, argc, argv );
 

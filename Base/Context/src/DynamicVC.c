@@ -150,7 +150,7 @@ void _DynamicVC_Destroy( void* vc, void* data ) {
 
 	NewClass_Delete( self->vcMap );
 
-	__VariableCondition( self, data );
+	_VariableCondition_Destroy( self, data );
 }
 
 void _DynamicVC_ReadDictionary( void* vc, void* dict ) {

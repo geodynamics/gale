@@ -62,7 +62,6 @@ void RangeSetSuite_Teardown( RangeSetSuiteData* data ) {
 
 
 void RangeSetSuite_TestIndices( RangeSetSuiteData* data ) {
-   Bool      result = True;
    unsigned   nInds = NUM_ITEMS;
    unsigned   inds[NUM_ITEMS];
    unsigned   nDstInds, *dstInds;
@@ -90,7 +89,6 @@ void RangeSetSuite_TestIndices( RangeSetSuiteData* data ) {
 
 
 void RangeSetSuite_TestRanges( RangeSetSuiteData* data ) {
-   Bool              result = True;
    unsigned          nInds = NUM_ITEMS;
    unsigned          inds[NUM_ITEMS];
    unsigned          nDstInds, *dstInds;

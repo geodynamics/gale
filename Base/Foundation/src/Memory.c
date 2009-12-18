@@ -1206,9 +1206,10 @@ void* _Memory_Realloc_3DArrayAs1D_Func(
 
 
 /* This function should only be called on ptrs allocated by StGermain's Memory routines */
-void _Memory_Free_Func( void* ptr )
-{
+void _Memory_Free_Func( void* ptr ) {
+	#ifdef MEMORY_STATS
 	MemoryPointer* memoryPointer = NULL;
+	#endif
 
 	if( !ptr ) return;
 	

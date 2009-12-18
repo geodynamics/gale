@@ -183,20 +183,20 @@ Name ModulesManager_GetModuleName( void* modulesManager, Dictionary_Entry_Value*
 }
 
 void ModulesManager_Load( void* modulesManager, void* _dictionary, Name contextName ) {
-	ModulesManager*			self 		= (ModulesManager*)modulesManager;
-	Dictionary*			dictionary 	= (Dictionary*)_dictionary;
-	unsigned int			entryCount;
-	unsigned int			entry_I;
-	Dictionary_Entry_Value*		modulesVal;
+	ModulesManager*			self = (ModulesManager*)modulesManager;
+	Dictionary*					dictionary = (Dictionary*)_dictionary;
+	unsigned int				entryCount;
+	unsigned int				entry_I;
+	Dictionary_Entry_Value*	modulesVal;
 
 	/* First add the directory list onto LD_LIBRARY_PATH so that it can potentially
 	 * resolve the unknown symbols */
+#ifndef NOSHARED
 	char* curEnvPath;
 	char* newEnvPath;
-	Index newEnvPathLength = 0;
+	Index newEnvPathLength;
 	Index dir_I;
-	
-#ifndef NOSHARED
+
 	if( dictionary ) {
 		Dictionary_Entry_Value* localLibDirList = Dictionary_Get( dictionary, "LD_LIBRARY_PATH" );
 		if( localLibDirList ) {

@@ -311,7 +311,7 @@ void _Variable_Init(
 	Bool							allocateSelf,
 	Variable_Register*		vr )
 {
-	Stream* errorStream = Journal_Register( Error_Type, self->type );
+	/*Stream* errorStream = Journal_Register( Error_Type, self->type );*/
 
 	/* General and Virtual info should already be set */
 	

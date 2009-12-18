@@ -61,7 +61,9 @@ void MemorySuite_Test2DArray( MemorySuiteData* data ) {
    double**       array2d = NULL;
    Index          ii = 0;
    Index          jj = 0;
+	#ifdef MEMORY_STATS
    MemoryPointer* memoryPtr;
+	#endif
 
    array2d = Memory_Alloc_2DArray_Unnamed( double, 2, 3 );
    pcu_check_true( NULL != array2d );

@@ -745,6 +745,7 @@ static xmlNodePtr _XML_IO_Handler_OpenCheckBuffer( XML_IO_Handler* self, const c
 	return rootElement;
 }
 
+#if 0
 static void _processNode(xmlTextReaderPtr reader) {
 	const xmlChar *name, *value;
 
@@ -769,13 +770,14 @@ static void _processNode(xmlTextReaderPtr reader) {
 			printf(" %s\n", value);
 	}
 }
+#endif
 
 static void _XML_IO_Handler_ValidateFile( XML_IO_Handler* self, const char* filename ) {
-	xmlTextReaderPtr reader;
-	int ret, valid;
-
 	#ifdef LIBXML_VERSION 
 	#if LIBXML_VERSION == 20631
+	xmlTextReaderPtr reader;
+	//int valid;
+	int ret;
 
 	reader = xmlNewTextReaderFilename( filename );
 
@@ -854,7 +856,6 @@ static void _XML_IO_Handler_OpenBuffer( XML_IO_Handler* self, const char* buffer
 
 Bool _XML_IO_Handler_Check( XML_IO_Handler* self, xmlDocPtr currDoc ) {
 	xmlNodePtr	rootElement = NULL;
-	xmlNodePtr	cur = NULL;
 	
 	rootElement = xmlDocGetRootElement( self->currDoc );
 	if ( !rootElement ) {
@@ -1191,8 +1192,6 @@ static void _XML_IO_Handler_ParseList( XML_IO_Handler* self, xmlNodePtr cur, Dic
 	xmlChar* childrenMergeTypeStr = xmlGetProp( cur, CHILDRENMERGETYPE_ATTR );
 	xmlChar* spaceStrippedName = NULL;
 	xmlChar* spaceStrippedSourceFile = NULL;
-	xmlChar* spaceStrippedMergeType = NULL;
-	xmlChar* spaceStrippedChildrenMergeType = NULL;
 	Dictionary_Entry_Value* newList = NULL;
 	Dictionary_MergeType mergeType = defaultMergeType;
 	Dictionary_MergeType childrenMergeType = Dictionary_MergeType_Append;
@@ -1451,8 +1450,6 @@ static void _XML_IO_Handler_ParseStruct(
 	xmlChar* childrenMergeTypeStr = xmlGetProp( cur, CHILDRENMERGETYPE_ATTR );
 	xmlChar* spaceStrippedName = NULL;
 	xmlChar* spaceStrippedSourceFile = NULL;
-	xmlChar* spaceStrippedMergeType = NULL;
-	xmlChar* spaceStrippedChildrenMergeType = NULL;
 	Dictionary_Entry_Value* newStruct = NULL;
 	Dictionary_MergeType mergeType = defaultMergeType;
 	Dictionary_MergeType childrenMergeType = IO_Handler_DefaultChildrenMergeType;
@@ -1516,7 +1513,6 @@ static void _XML_IO_Handler_ParseParameter(
 	Dictionary_Entry_Value_Type dictValueType = _XML_IO_Handler_GetDictValueType( self, (char*) type );
 	xmlChar* spaceStrippedName = NULL;
 	xmlChar* spaceStrippedSourceFile = NULL;
-	xmlChar* spaceStrippedMergeType = NULL;
 	xmlChar* spaceStrippedType = NULL;
 	xmlChar* strippedVal = NULL;
 	Dictionary_MergeType mergeType = defaultMergeType;

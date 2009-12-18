@@ -117,7 +117,6 @@ void LinkedListSuite_Teardown( LinkedListSuiteData* data ) {
 
 
 void LinkedListSuite_TestInsert( LinkedListSuiteData* data ) {
-   LinkedList*       numList = NULL;
    Index             ii = 0;
    LinkedListNode*   currNode=NULL;   
 

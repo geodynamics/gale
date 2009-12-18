@@ -77,7 +77,6 @@ void VariableAllVC_Suite_CreateDictEntries( VariableAllVC_SuiteData* data ) {
 
 
 void VariableAllVC_Suite_Setup( VariableAllVC_SuiteData* data ) {
-
    data->arraySize = 10;
    data->testArray = Memory_Alloc_Array( double, data->arraySize, "test" );
 
@@ -99,8 +98,6 @@ void VariableAllVC_Suite_Setup( VariableAllVC_SuiteData* data ) {
 
 
 void VariableAllVC_Suite_Teardown( VariableAllVC_SuiteData* data ) {
-   Index    ii=0;
-
    Stg_Class_Delete(data->vr);
    Stg_Class_Delete(data->conFunc_Register);
    Stg_Class_Delete(data->dict);
@@ -108,12 +105,12 @@ void VariableAllVC_Suite_Teardown( VariableAllVC_SuiteData* data ) {
    Memory_Free( data->testArray );
    Stg_Class_Delete( data->var );
 
-   Stg_Class_Delete(data->vc);
+   _Stg_Component_Delete(data->vc);
 }
 
 
 void VariableAllVC_Suite_TestIsCondition( VariableAllVC_SuiteData* data ) {
-   Index      node_I=0;
+   Index node_I=0;
 
    for (node_I = 0; node_I < data->arraySize; node_I++) {
       pcu_check_true( True == VariableCondition_IsCondition(data->vc, node_I, 0) );
@@ -122,7 +119,7 @@ void VariableAllVC_Suite_TestIsCondition( VariableAllVC_SuiteData* data ) {
 
 
 void VariableAllVC_Suite_TestGetValueIndex( VariableAllVC_SuiteData* data ) {
-   Index      node_I=0;
+   Index node_I=0;
 
    for (node_I = 0; node_I < data->arraySize; node_I++) {
       pcu_check_true( 0 == VariableCondition_GetValueIndex(data->vc, node_I, 0) );
@@ -131,7 +128,7 @@ void VariableAllVC_Suite_TestGetValueIndex( VariableAllVC_SuiteData* data ) {
 
 
 void VariableAllVC_Suite_TestApply( VariableAllVC_SuiteData* data ) {
-   Index      var_I=0, node_I=0;
+   Index node_I=0;
    
    VariableCondition_Apply(data->vc, NULL);
 

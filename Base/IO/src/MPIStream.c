@@ -194,7 +194,6 @@ Bool _MPIStream_SetFile( Stream* stream, JournalFile* file )
 
 Bool MPIStream_SetOffset( Stream* stream, SizeT sizeToWrite, MPI_Comm communicator ) {
 	MPI_Offset    offset    = 0;
-	MPI_Status    status;
 	int           rank;
 	int           nproc;
 	unsigned int  localSizeToWrite;
