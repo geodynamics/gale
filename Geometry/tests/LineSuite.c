@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int rank;
+	int nProcs;
 } LineSuiteData;
 
 void LineSuite_Setup( LineSuiteData* data ) {
@@ -65,7 +65,6 @@ void LineSuite_TestLine( LineSuiteData* data ) {
 	Coord		insidePoint = { 0.7, 0.3, 0.0 };
 	Coord		outsidePoint = { -0.2, 0.3, 0.0 };
 	Stg_Line	lines[4];
-	Index		i;
 
 	/*
 	** When lines are to be used as boundaries (ie. determining whether other points lay

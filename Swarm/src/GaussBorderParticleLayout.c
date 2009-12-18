@@ -320,33 +320,29 @@ void _GaussBorderParticleLayout_InitialiseParticlesOfCell( void* gaussBorderPart
   in other words, the function allows me to map from a general boundary section to a specific one ( and vice-versa ), which allows the code
   above to be generalised and not consist of a largish switch-case statement.
 */
-Dimension_Index GaussBorderParticleLayout_GetFaceAxis( void* gaussBorderParticleLayout, Index face_I, Dimension_Index axis)
-{
-	GaussBorderParticleLayout*      self                = (GaussBorderParticleLayout*)gaussBorderParticleLayout;
-	Dimension_Index faceAxes3D[6][3];
-	Dimension_Index dim = self->dim;
+Dimension_Index GaussBorderParticleLayout_GetFaceAxis( void* gaussBorderParticleLayout, Index face_I, Dimension_Index axis) {
+	GaussBorderParticleLayout*	self;
+	Dimension_Index				faceAxes3D[6][3];
 
+	self = (GaussBorderParticleLayout*)gaussBorderParticleLayout;
 
-	faceAxes3D[0][ I_AXIS ] = I_AXIS;	faceAxes3D[0][ J_AXIS ] = K_AXIS;	faceAxes3D[0][ K_AXIS ] = J_AXIS;
-	faceAxes3D[1][ I_AXIS ] = I_AXIS;	faceAxes3D[1][ J_AXIS ] = K_AXIS;	faceAxes3D[1][ K_AXIS ] = J_AXIS;
-	faceAxes3D[2][ I_AXIS ] = J_AXIS;	faceAxes3D[2][ J_AXIS ] = K_AXIS;	faceAxes3D[2][ K_AXIS ] = I_AXIS;
-	faceAxes3D[3][ I_AXIS ] = J_AXIS;	faceAxes3D[3][ J_AXIS ] = K_AXIS;	faceAxes3D[3][ K_AXIS ] = I_AXIS;
-	faceAxes3D[4][ I_AXIS ] = I_AXIS;	faceAxes3D[4][ J_AXIS ] = J_AXIS;	faceAxes3D[4][ K_AXIS ] = K_AXIS;
-	faceAxes3D[5][ I_AXIS ] = I_AXIS;	faceAxes3D[5][ J_AXIS ] = J_AXIS;	faceAxes3D[5][ K_AXIS ] = K_AXIS;
+	faceAxes3D[0][ I_AXIS ] = I_AXIS; faceAxes3D[0][ J_AXIS ] = K_AXIS; faceAxes3D[0][ K_AXIS ] = J_AXIS;
+	faceAxes3D[1][ I_AXIS ] = I_AXIS; faceAxes3D[1][ J_AXIS ] = K_AXIS; faceAxes3D[1][ K_AXIS ] = J_AXIS;
+	faceAxes3D[2][ I_AXIS ] = J_AXIS; faceAxes3D[2][ J_AXIS ] = K_AXIS; faceAxes3D[2][ K_AXIS ] = I_AXIS;
+	faceAxes3D[3][ I_AXIS ] = J_AXIS; faceAxes3D[3][ J_AXIS ] = K_AXIS; faceAxes3D[3][ K_AXIS ] = I_AXIS;
+	faceAxes3D[4][ I_AXIS ] = I_AXIS; faceAxes3D[4][ J_AXIS ] = J_AXIS; faceAxes3D[4][ K_AXIS ] = K_AXIS;
+	faceAxes3D[5][ I_AXIS ] = I_AXIS; faceAxes3D[5][ J_AXIS ] = J_AXIS; faceAxes3D[5][ K_AXIS ] = K_AXIS;
 
 	return faceAxes3D[face_I][axis];
 }
 
-Index GaussBorderParticleLayout_ParticleInCellIndexToFaceIndex( void* gaussBorderParticleLayout, Particle_InCellIndex cParticle_I)
-{
-	GaussBorderParticleLayout*      self                = (GaussBorderParticleLayout*)gaussBorderParticleLayout;
-	Particle_InCellIndex	particle_I_ThisFace;
-	Index			face_I;
-	Index			numfaces = (self->dim == 3) ? 6 : 4;
-	int			cParticle_I_signed = (int) cParticle_I;
+Index GaussBorderParticleLayout_ParticleInCellIndexToFaceIndex( void* gaussBorderParticleLayout, Particle_InCellIndex cParticle_I) {
+	GaussBorderParticleLayout*	self = (GaussBorderParticleLayout*)gaussBorderParticleLayout;
+	Index								face_I;
+	Index								numfaces = (self->dim == 3) ? 6 : 4;
+	int								cParticle_I_signed = (int) cParticle_I;
 
-	for( face_I = 0; face_I < numfaces; face_I++ )
-	{
+	for( face_I = 0; face_I < numfaces; face_I++ ) {
 		cParticle_I_signed -= self->particlesPerFace[ face_I ];
 		if(cParticle_I_signed < 0)	/* ParticleInCellIndex is unsigned int - which generally isn't <0...hence the signed int. */
 			break;

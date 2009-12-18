@@ -184,29 +184,24 @@ void _CartesianGenerator_Print( void* meshGenerator, Stream* stream ) {
 }
 
 void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactory* cf, void* data ) {
-	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-	Dictionary*		dict;
+	CartesianGenerator*		self = (CartesianGenerator*)meshGenerator;
+	Dictionary*					dict;
 	Dictionary_Entry_Value*	tmp;
-	char*			rootKey;
+	char*							rootKey;
 	Dictionary_Entry_Value*	sizeList;
 	Dictionary_Entry_Value	*minList, *maxList;
-	unsigned		maxDecompDims;
-	unsigned		*minDecomp, *maxDecomp;
-	double			*crdMin, *crdMax;
-	unsigned*		size;
-	unsigned		shadowDepth;
-	Stream*			stream;
-	Stream*			errorStream = Journal_Register( Error_Type, self->type );
-	unsigned		d_i, i;
-	unsigned 		restartTimestep;
-	char*			checkpointPath;
-	char*			checkpointPrefix;
-	Index                   meshStrLen;
+	unsigned						maxDecompDims;
+	unsigned						*minDecomp, *maxDecomp;
+	double						*crdMin, *crdMax;
+	unsigned*					size;
+	unsigned						shadowDepth;
+	Stream*						stream;
+	Stream*						errorStream = Journal_Register( Error_Type, self->type );
+	unsigned						d_i;
+	unsigned						restartTimestep;
    AbstractContext*        context;	
 #ifdef READ_HDF5
 	hid_t file, fileData;
-	hid_t             props;
-	double      temp1[3], temp2[3];
 #endif
 	
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
@@ -698,7 +693,7 @@ void _CartesianGenerator_GenVertices( void* meshGenerator, IGraph* topo, Grid***
 	Grid*			grid;
 	unsigned		nEls;
 	unsigned		nLocals, *locals;
-	unsigned		nRemotes, *remotes;
+	unsigned		nRemotes/*, *remotes*/;
 	unsigned		*dstArray, *dstCount;
 	unsigned		*dimInds, *rankInds;
 	unsigned		d_i, e_i;
@@ -2118,7 +2113,6 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 	Stream*			   stream = Journal_Register( Info_Type, self->type );
 	Sync*			      sync;
 	AbstractContext* 	context = (AbstractContext*)data;
-	Index			      meshStrLen;
 	
 	assert( self );
 	assert( mesh );
@@ -2259,12 +2253,11 @@ void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, con
    Node_LocalIndex   lNode_I = 0;
 	Node_GlobalIndex  gNode_I = 0;
    int               totalVerts, ii;
-   hid_t             props;
-   unsigned int noffset;
+   unsigned int		noffset;
    MeshCheckpointFileVersion ver;
-   hid_t   attrib_id, group_id;
-   herr_t  status;
-   char* verticeName;
+   hid_t					attrib_id, group_id;
+   herr_t				status;
+   char*					verticeName;
 	Stream*			   errorStream = Journal_Register( Error_Type, self->type );   
 
    /* Open the file and data set. */

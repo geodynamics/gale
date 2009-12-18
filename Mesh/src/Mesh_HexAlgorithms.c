@@ -91,9 +91,7 @@ Mesh_HexAlgorithms* _Mesh_HexAlgorithms_New(  MESH_HEXALGORITHMS_DEFARGS  ) {
 }
 
 void _Mesh_HexAlgorithms_Init( void* hexAlgorithms ) {
-	Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
 }
-
 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions

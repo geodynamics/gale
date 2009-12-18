@@ -51,8 +51,8 @@ struct _Particle {
 
 typedef struct {
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 } WithinShapeParticleLayoutSuiteData;
 
 Mesh* WithinShapeParticleLayoutSuite_buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
@@ -102,7 +102,6 @@ void WithinShapeParticleLayoutSuite_TestWithinShapeSphere( WithinShapeParticleLa
 	Stg_Shape*						shape;
 	int								procToWatch;
 	int								particleCount = 10;
-	Index								i;
 
 	procToWatch = data->nProcs > 1 ? 1 : 0;	
 

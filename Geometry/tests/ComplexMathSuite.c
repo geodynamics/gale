@@ -53,8 +53,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned rank;
-	unsigned nProcs;
+	int rank;
+	int nProcs;
 } ComplexMathSuiteData;
 
 void ComplexMathSuite_Setup( ComplexMathSuiteData* data ) {
@@ -199,7 +199,6 @@ void ComplexMathSuite_TestRealNumber( ComplexMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if (data->rank == procToWatch) {
-		Cmplx		x = {1, 2};
 		Cmplx		y = {-1.5, 3};
 		Cmplx		dest = {0, 0};
 		char		expected_file[PCU_PATH_MAX];
@@ -239,8 +238,6 @@ void ComplexMathSuite_TestConjugate( ComplexMathSuiteData* data ) {
 	
 	if (data->rank == procToWatch) {
 		Cmplx		x = {1, 2};
-		Cmplx		y = {-1.5, 3};
-		Cmplx		dest = {0, 0};
 		char		expected_file[PCU_PATH_MAX];
 		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathConjugate" );
 		Stream_RedirectFile( stream, "testComplexMathConjugate.dat" );
@@ -269,7 +266,6 @@ void ComplexMathSuite_TestPolar( ComplexMathSuiteData* data ) {
 		Cmplx		v = {1.5, -3};
 		Cmplx		i = {0, 1};
 		Cmplx		minus_i = {0, -1};
-		Cmplx		dest = {0, 0};
 		double	mod, theta;
 		char		expected_file[PCU_PATH_MAX];
 		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathPolar" );
@@ -344,8 +340,6 @@ void ComplexMathSuite_TestBeautifulEquation( ComplexMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if (data->rank == procToWatch) {
-		Cmplx		x = {1, 2};
-		Cmplx		y = {-1.5, 3};
 		Cmplx		i = {0, 1};
 		Cmplx		e = {M_E, 0};
 		Cmplx		ipi = {0, M_PI};
@@ -377,7 +371,6 @@ void ComplexMathSuite_TestExponential( ComplexMathSuiteData* data ) {
 	
 	if (data->rank == procToWatch) {
 		Cmplx		x = {1, 2};
-		Cmplx		y = {-1.5, 3};
 		Cmplx		e = {M_E, 0};
 		Cmplx		ipi = {0, M_PI};
 		Cmplx		dest = {0, 0};
@@ -419,10 +412,6 @@ void ComplexMathSuite_TestCopyAndZero( ComplexMathSuiteData* data ) {
 	
 	if (data->rank == procToWatch) {
 		Cmplx		x = {1, 2};
-		Cmplx		y = {-1.5, 3};
-		Cmplx		i = {0, 1};
-		Cmplx		e = {M_E, 0};
-		Cmplx		ipi = {0, M_PI};
 		Cmplx		dest = {0, 0};
 		char		expected_file[PCU_PATH_MAX];
 		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathCopyAndZero" );

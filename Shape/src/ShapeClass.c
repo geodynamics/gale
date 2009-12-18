@@ -185,12 +185,14 @@ void StGermain_GetEulerAngles(
 
 void _Stg_Shape_Build( void* shape, void* data ) {
 }
+
 void _Stg_Shape_Initialise( void* shape, void* data ) {
 }
+
 void _Stg_Shape_Execute( void* shape, void* data ) {
 }
+
 void _Stg_Shape_Destroy( void* shape, void* data ) {
-	Stg_Shape* self = (Stg_Shape*) shape;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------

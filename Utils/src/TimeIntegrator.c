@@ -185,7 +185,6 @@ void _TimeIntegrator_AssignFromXML( void* timeIntegrator, Stg_ComponentFactory* 
 	unsigned int             order;
 	Bool                     simultaneous;
 	EntryPoint_Register*     entryPoint_Register;
-	AbstractContext*         context;
 
 	/** Default for order changed to 2nd order (was 1st order) by Pat Sunter, 10 May 2006 */
 	order          = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "order", 2 );

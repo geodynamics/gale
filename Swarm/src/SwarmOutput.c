@@ -192,7 +192,6 @@ void _SwarmOutput_AssignFromXML( void* swarmOutput, Stg_ComponentFactory* cf, vo
 	SwarmOutput*	        self         = (SwarmOutput*)swarmOutput;
 	Swarm*                  swarm;
 	Name                    baseFilename;
-	AbstractContext*	context;
 
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
 	if( !self->context )

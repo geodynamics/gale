@@ -88,6 +88,8 @@
 
 GlobalParticleLayout* _GlobalParticleLayout_New(  GLOBALPARTICLELAYOUT_DEFARGS  );
 
+	void  _GlobalParticleLayout_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );
+
    void _GlobalParticleLayout_Init( 
       void*                                               particleLayout,
       Particle_Index                                      totalInitialParticles,

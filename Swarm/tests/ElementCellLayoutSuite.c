@@ -54,8 +54,8 @@ typedef struct {
 	Mesh*								mesh;
 	ElementCellLayout*			elementCellLayout;
 	MPI_Comm							comm;
-	unsigned int					rank;
-	unsigned int					nProcs;
+	int								rank;
+	int								nProcs;
 } ElementCellLayoutSuiteData;
 
 Mesh* ElementCellLayout_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
@@ -126,10 +126,8 @@ void ElementCellLayoutSuite_TestElementCellLayout( ElementCellLayoutSuiteData* d
 		
 	if( data->rank == procToWatch ) {
 		for( element = 0; element < Mesh_GetLocalSize( data->mesh, data->nDims ); element++ ) {
-			Cell_PointIndex	point;
 			Cell_PointIndex	count;
 			double***			cellPoints;
-			Bool					result;
 	
 			cell = CellLayout_MapElementIdToCellId( data->elementCellLayout, element );
 

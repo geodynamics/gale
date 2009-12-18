@@ -131,16 +131,14 @@ Delaunay* Delaunay_New(
 
 	/** Initialise a Delaunay */
 void Delaunay_Init(
-	Delaunay*					self,
+	Delaunay*				self,
 	Name						name,
-	Dictionary*					dictionary,
-	CoordF						*sites,
-	int							numSites,
-	int							idOffset,
-	DelaunayAttributes			*attr )
+	Dictionary*				dictionary,
+	CoordF					*sites,
+	int						numSites,
+	int						idOffset,
+	DelaunayAttributes	*attr )
 {
-	int i = 0;
-
 	self->type = Delaunay_Type;
 	self->_sizeOfSelf = sizeof( Delaunay );
 	self->_deleteSelf = False;
@@ -163,8 +161,7 @@ void Delaunay_Init(
 }
 
 /** Creation implementation */
-Delaunay* _Delaunay_New(  DELAUNAY_DEFARGS  )
-{
+Delaunay* _Delaunay_New(  DELAUNAY_DEFARGS  ) {
 	Delaunay *self = NULL;
 	
 	assert( _sizeOfSelf >= sizeof(Delaunay) );

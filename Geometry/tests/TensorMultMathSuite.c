@@ -48,8 +48,8 @@
 
 typedef struct {
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int rank;
+	int nProcs;
 } TensorMultMathSuiteData;
 
 void TensorMultMathSuite_Setup( TensorMultMathSuiteData* data ) {
@@ -822,7 +822,6 @@ void TensorMultMathSuite_TestSymmetricTensorDoubleContraction( TensorMultMathSui
 
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor, symmTensor2;
-		TensorArray			tensorArray, tensorArray2;
 		double				result;
 		Stream*				stream = Journal_Register( InfoStream_Type, "SymmetricTensorDoubleContraction" );
 		char					expected_file[PCU_PATH_MAX];
@@ -1021,7 +1020,7 @@ void TensorMultMathSuite_TestMatrixVectorMultiplication( TensorMultMathSuiteData
 
 	if (data->rank == procToWatch) {
 		XYZ		vector;
-		Bool		tensorMultMathTest_Flag, error_flag;
+		Bool		error_flag;
 		double	**nonSquareMatrixA, **nonSquareMatrixAT;
 		double	solutionVector[4], solutionVectorCompare[4];
 		Dimension_Index	row;

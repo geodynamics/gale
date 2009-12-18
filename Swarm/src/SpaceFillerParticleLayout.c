@@ -116,7 +116,6 @@ void _SpaceFillerParticleLayout_Init(
 	
 void _SpaceFillerParticleLayout_Delete( void* spaceFillerParticleLayout ) {
 	SpaceFillerParticleLayout* self = (SpaceFillerParticleLayout*)spaceFillerParticleLayout;
-	Dimension_Index            dim_I;
 
 	_GlobalParticleLayout_Delete( self );
 }

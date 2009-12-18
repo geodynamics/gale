@@ -50,8 +50,8 @@ struct _Particle {
 
 typedef struct {
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int rank;
+	int nProcs;
 } ManualParticleLayoutSuiteData;
 
 Mesh* ManualParticleLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
@@ -95,7 +95,6 @@ void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData
 	double							maxCrds[3] = {1.0, 1.0, 1.0};
 	ExtensionManager_Register*	extensionMgr_Register;
 	Mesh*								mesh;
-	GaussParticleLayout*			gaussParticleLayout;
 	ElementCellLayout*			elementCellLayout;
 	Swarm*							swarm;
 	Dictionary*						dictionary;

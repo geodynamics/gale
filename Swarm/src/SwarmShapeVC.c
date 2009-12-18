@@ -490,14 +490,12 @@ VariableCondition_VariableIndex _SwarmShapeVC_GetVariableCount(void* variableCon
 }
 
 Variable_Index _SwarmShapeVC_GetVariableIndex(void* variableCondition, Index globalIndex, VariableCondition_VariableIndex varIndex) {
-	SwarmShapeVC*   self          = (SwarmShapeVC*)variableCondition;
-	Variable_Index  searchedIndex = 0;
-	Stream*         errorStr      = Journal_Register( Error_Type, self->type );
-	Name            varName;
-
-	Index		swarmVar_I;
-	Swarm*		swarm		= self->_swarm;
-	char*		swarmVarName;
+	SwarmShapeVC*	self = (SwarmShapeVC*)variableCondition;
+	Variable_Index	searchedIndex = 0;
+	Stream*			errorStr = Journal_Register( Error_Type, self->type );
+	Name				varName;
+	Swarm*			swarm = self->_swarm;
+	char*				swarmVarName;
 
 	varName = self->_entryTbl[varIndex].varName;
 

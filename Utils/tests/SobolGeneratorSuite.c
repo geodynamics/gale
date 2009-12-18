@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned	rank;
-	unsigned	nProcs;
+	int		rank;
+	int		nProcs;
 } SobolGeneratorSuiteData;
 
 void SobolGeneratorSuite_Setup( SobolGeneratorSuiteData* data ) {
@@ -66,7 +66,6 @@ void SobolGeneratorSuite_TestSobolGenerator( SobolGeneratorSuiteData* data ) {
 	SobolGenerator*	sobolGenerator;
 	Index					index;
 	Index					sobol_I;
-	Bool					singleMode = True;
 	int					bit_I;
 	double				result;
 	char					output_file[PCU_PATH_MAX];

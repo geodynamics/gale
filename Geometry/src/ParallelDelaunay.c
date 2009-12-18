@@ -291,8 +291,7 @@ void _ParallelDelaunay_AssignFromXML( void* pd, Stg_ComponentFactory* cf, void* 
 	
 }
 
-void _ParallelDelaunay_Build( void* pd, void* data )
-{
+void _ParallelDelaunay_Build( void* pd, void* data ) {
 	float _minX, _maxX;
 	float _minY, _maxY;
 	int numProcs, numSites, i, j, count;
@@ -300,7 +299,6 @@ void _ParallelDelaunay_Build( void* pd, void* data )
 	int *alloced = NULL;
 	int offset;
 	ParallelDelaunay *self = (ParallelDelaunay*)pd;
-	DelaunayAttributes attr;
 
 	assert( self );
 	

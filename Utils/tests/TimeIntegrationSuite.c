@@ -48,8 +48,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned	rank;
-	unsigned	nProcs;
+	int		rank;
+	int		nProcs;
 } TimeIntegrationSuiteData;
 
 double TimeIntegrationSuite_GetDt( void* context ) {
@@ -144,7 +144,6 @@ void TimeIntegrationSuite_Teardown( TimeIntegrationSuiteData* data ) {
 void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_name, char *_DerivName0, char *_DerivName1, int _order ) {
 	Stg_ComponentFactory*	cf;
 	Stream*						stream;
-	XML_IO_Handler*			ioHandler;
    Dictionary*					dictionary;
    TimeIntegrator*			timeIntegrator;
    TimeIntegratee*			timeIntegratee;

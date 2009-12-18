@@ -49,8 +49,8 @@
 
 typedef struct {
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 } SwarmOutputSuiteData;
 
 double SwarmOutputSuite_Dt( void* context ) {
@@ -97,12 +97,9 @@ void SwarmOutputSuite_TestSwarmOutput( SwarmOutputSuiteData* data ) {
 	if( data->rank == procToWatch ) {
 		Dictionary*					dictionary;
 		Dictionary*					componentDict;
-		XML_IO_Handler*			io_Handler;
 		Stg_ComponentFactory*	cf;
 		DomainContext*				context;
-		char							expected_file[PCU_PATH_MAX], input_file[PCU_PATH_MAX];
-		char							output_filename[PCU_PATH_MAX], expected_filename[PCU_PATH_MAX];
-		Index							steps, i;
+		char							input_file[PCU_PATH_MAX];
 		Swarm*						swarm;
 		SwarmOutput*				swarmOutput;
 		SpaceFillerParticleLayout* particleLayout;
@@ -134,7 +131,7 @@ void SwarmOutputSuite_TestSwarmOutput( SwarmOutputSuiteData* data ) {
 
 		pcu_check_streq( swarm->name, swarmOutput->swarm->name );
 
-		Stg_Component_Destroy( context, 0, False );
+		_Stg_Component_Delete( context );
 		stgMainDestroy( cf );
 	}
 }

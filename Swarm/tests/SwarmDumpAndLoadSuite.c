@@ -53,8 +53,8 @@ struct _Particle {
 
 typedef struct {
    MPI_Comm comm;
-   unsigned rank;
-   unsigned nProcs;
+   int rank;
+   int nProcs;
 } SwarmDumpAndLoadSuiteData;
 
 void SwarmDumpAndLoadSuite_UpdateParticlePositionsTowardsAttractor( DomainContext* context );
@@ -70,7 +70,6 @@ void SwarmDumpAndLoadSuite_Teardown( SwarmDumpAndLoadSuiteData* data ) {
 }
 
 void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data ) {
-   int                     procToWatch;
    int                     ii;
    Swarm*                  swarm;
    Swarm*                  newSwarm = NULL;
@@ -83,9 +82,7 @@ void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data
    FileParticleLayout*     fileParticleLayout = NULL;
    char                    input_file[PCU_PATH_MAX];
    char                    output_file[PCU_PATH_MAX];
-   char                    outputInput_file[PCU_PATH_MAX];
    char                    filenameTemp[PCU_PATH_MAX];   
-   Cell_LocalIndex         lCell_I;
    double                  diffSumX, diffSumY, diffSumZ;
    double                  totSumX, totSumY, totSumZ;
    double                  gdiffSumX, gdiffSumY, gdiffSumZ;
@@ -221,7 +218,6 @@ void SwarmDumpAndLoadSuite_UpdateParticlePositionsTowardsAttractor( DomainContex
    Index                   dim_I;
    Mesh*                   mesh = (Mesh*) LiveComponentRegister_Get( context->CF->LCRegister, "mesh-linear" );
    Swarm*                  swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
-   Stream*                 stream = Journal_Register( Info_Type, "updateParticlePositions" );
    Coord                   attractorPoint;
    double                  minCrds[3], maxCrds[3];
 

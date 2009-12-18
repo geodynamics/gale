@@ -216,13 +216,9 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
    Name                 filename     = self->filename;
    
 #ifdef READ_HDF5
-   hid_t                file, fileData, fileSpace;
+   hid_t                file;
    hid_t                group_id, attrib_id;
-   hsize_t              size[2];
-   char                 dataSpaceName[1024];
-   SwarmVariable*       swarmVar;
    Index                ii;
-   Index                swarmVar_I;
    int                  nParticles;
    herr_t               status;
 #else
@@ -452,16 +448,15 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
 }  
 	
 void _FileParticleLayout_InitialiseParticle( 
-      void*              particleLayout, 
-      void*              _swarm, 
-      Particle_Index     newParticle_I,
-      void*              particle )
+	void*              particleLayout, 
+	void*              _swarm, 
+	Particle_Index     newParticle_I,
+	void*              particle )
 {
-   FileParticleLayout*     self         = (FileParticleLayout*)particleLayout;
-   Swarm*                  swarm        = (Swarm*)_swarm;
-   SizeT                   particleSize = swarm->particleExtensionMgr->finalSize;
-   int                     result;
-   IntegrationPoint*       newParticle  = (IntegrationPoint*)particle;
+   FileParticleLayout*	self = (FileParticleLayout*)particleLayout;
+   Swarm*					swarm = (Swarm*)_swarm;
+   SizeT						particleSize; 
+   int						result;
 
 #ifdef READ_HDF5
    SwarmVariable*    swarmVar;
@@ -469,6 +464,8 @@ void _FileParticleLayout_InitialiseParticle(
    Index             ii;
    hid_t             memSpace; 
 
+	result = 0;
+	particleSize = 0;
    /* find out which file particle is contained within */
    for( ii = 1 ; ii <= self->checkpointfiles ; ii++ ){
       if( newParticle_I < self->lastParticleIndex[ii-1]) break;
@@ -495,9 +492,7 @@ void _FileParticleLayout_InitialiseParticle(
             
             /* Read particle data. */
             H5Dread( self->fileData[swarmVar_I][ii-1], H5T_NATIVE_INT, memSpace, self->fileSpace[swarmVar_I][ii-1], H5P_DEFAULT, particleInfo );
-            
             Variable_SetValue( swarmVar->variable, swarm->particleLocalCount, particleInfo );
-            
             Memory_Free( particleInfo );
          }
         
@@ -506,9 +501,7 @@ void _FileParticleLayout_InitialiseParticle(
             
             /* Read particle data. */
             H5Dread( self->fileData[swarmVar_I][ii-1], H5T_NATIVE_CHAR, memSpace, self->fileSpace[swarmVar_I][ii-1], H5P_DEFAULT, particleInfo );
-            
             Variable_SetValue( swarmVar->variable, swarm->particleLocalCount, particleInfo );
-            
             Memory_Free( particleInfo );
          }
             
@@ -517,9 +510,7 @@ void _FileParticleLayout_InitialiseParticle(
             
             /* Read particle data. */
             H5Dread( self->fileData[swarmVar_I][ii-1], H5T_NATIVE_FLOAT, memSpace, self->fileSpace[swarmVar_I][ii-1], H5P_DEFAULT, particleInfo );
-            
             Variable_SetValue( swarmVar->variable, swarm->particleLocalCount, particleInfo );
-            
             Memory_Free( particleInfo );
          }
             
@@ -528,18 +519,16 @@ void _FileParticleLayout_InitialiseParticle(
             
             /* Read particle data. */
             H5Dread( self->fileData[swarmVar_I][ii-1], H5T_NATIVE_DOUBLE, memSpace, self->fileSpace[swarmVar_I][ii-1], H5P_DEFAULT, particleInfo );
-            
             Variable_SetValue( swarmVar->variable, swarm->particleLocalCount, particleInfo );
-            
             Memory_Free( particleInfo );
          }   
-         
          H5Sclose( memSpace );
       }
    }
       
 #else
-   result = fread( particle, particleSize, 1, self->file );
+  	particleSize = swarm->particleExtensionMgr->finalSize;
+	result = fread( particle, particleSize, 1, self->file );
 
    Journal_Firewall( 
       result == 1,
@@ -558,7 +547,6 @@ Index _FileParticleLayout_GetFileCountFromTimeInfoFile( void* _context ){
    AbstractContext*     context = (AbstractContext*)_context;
    char*                timeInfoFileName = NULL;
    char*                timeInfoFileNamePart = NULL;
-   FILE*                timeInfoFile;     
    Stream*              errorStr = Journal_Register( Error_Type, FileParticleLayout_Type );
    hid_t                file, fileSpace, fileData;
    Index                checkpointnproc;

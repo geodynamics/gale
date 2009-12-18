@@ -196,7 +196,7 @@ void _SurfaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, voi
 void _SurfaceAdaptor_Build( void* adaptor, void* data ) {
    SurfaceAdaptor* self = (SurfaceAdaptor*)adaptor;
 
-   _MeshAdaptor_Build( adaptor, data );
+   _MeshAdaptor_Build( self, data );
 }
 
 void _SurfaceAdaptor_Initialise( void* adaptor, void* data ) {

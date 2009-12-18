@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned	rank;
-	unsigned	nProcs;
+	int		rank;
+	int		nProcs;
 } FieldVariableRegisterSuiteData;
 
 InterpolationResult FieldVariableRegisterSuite_dummyInterpolateValueAt( void* sdVariable, Coord coord, double* value ) { return OUTSIDE_GLOBAL; }
@@ -74,7 +74,6 @@ void FieldVariableRegisterSuite_TestGetByIndex( FieldVariableRegisterSuiteData* 
    Name                    fvNames[] = { "testFV1", "testFV2", "testFV3" };
    Index                   ii;
    Index                   fV_Index;
-   char                    expected_file[PCU_PATH_MAX];
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
@@ -113,7 +112,6 @@ void FieldVariableRegisterSuite_TestGetByName( FieldVariableRegisterSuiteData* d
    Name                    fvNames[] = { "testFV1", "testFV2", "testFV3" };
    Index                   ii;
    Index                   fV_Index;
-   char                    expected_file[PCU_PATH_MAX];
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 

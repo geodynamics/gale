@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned	rank;
-	unsigned	nProcs;
+	int		rank;
+	int		nProcs;
 	Stream*	stream; 	
 } OperatorFieldVariableSuiteData;
 
@@ -176,7 +176,6 @@ void OperatorFieldVariableSuite_TestVelocitySquared3D( OperatorFieldVariableSuit
    double						coord[3][3] = {{ 0.4 , 2.0 , 7.0 }, { -0.2 , 6.0 , 2.0 },{ 0.3 , -2.0 , -13.0 }} ;
    double						value[3];
    Index							index;
-   Coord                 	min, max;
 
 	Journal_Enable_NamedStream( Info_Type, CartesianGenerator_Type, False );
 
@@ -220,7 +219,6 @@ void OperatorFieldVariableSuite_TestVelocityMagnitude2D( OperatorFieldVariableSu
    double						coord[3][3] = {{ 0.4 , 2.0 , 7.0 }, { -0.2 , 6.0 , 2.0 },{ 0.3 , -2.0 , -13.0 }} ;
    double						value[3];
    Index							index;
-   Coord                 	min, max;
 
 	Journal_Enable_NamedStream( Info_Type, CartesianGenerator_Type, False );
 
@@ -265,7 +263,6 @@ void OperatorFieldVariableSuite_TestVelocityMagnitude3D( OperatorFieldVariableSu
    double						coord[3][3] = {{ 0.4 , 2.0 , 7.0 }, { -0.2 , 6.0 , 2.0 },{ 0.3 , -2.0 , -13.0 }} ;
    double						value[3];
    Index							index;
-   Coord                 	min, max;
 
 	Journal_Enable_NamedStream( Info_Type, CartesianGenerator_Type, False );
 

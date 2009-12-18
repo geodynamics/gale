@@ -50,8 +50,8 @@ struct _Particle {
 
 typedef struct {
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int rank;
+	int nProcs;
 } GaussLayoutSingleCellSuiteData;
 
 void GaussLayoutSingleCellSuite_Setup( GaussLayoutSingleCellSuiteData* data ) {
@@ -76,10 +76,7 @@ void GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D( GaussLayoutSingleCellSui
 	int								procToWatch = data->nProcs > 1 ? 1 : 0;
 	Cell_PointIndex				count;
 	double							x,y,z,w;
-	unsigned int					p, i, len;
-	LocalParticle*					particle;
-	Coord								minCell;
-	Coord								maxCell;
+	unsigned int					p;
 	Stream*							stream;
 	Particle_InCellIndex			particlesPerDim[3] = {1, 1, 1};
 	Bool								dimExists[] = { True, True, True };	
@@ -103,7 +100,6 @@ void GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D( GaussLayoutSingleCellSui
 		gaussParticleLayout = GaussParticleLayout_New( "gaussParticleLayout", NULL,
            LocalCoordSystem, True, nDims, particlesPerDim );
 
-		/* Configure the swarm */
 		swarm = Swarm_New( "testGaussSwarmSingleCell", NULL, singleCellLayout, gaussParticleLayout, nDims,
 			sizeof(Particle), extensionMgr_Register, NULL, data->comm, NULL );
 		
@@ -144,10 +140,7 @@ void GaussLayoutSingleCellSuite_Test2ParticlesPerDim_3D( GaussLayoutSingleCellSu
 	int								procToWatch = data->nProcs > 1 ? 1 : 0;
 	Cell_PointIndex				count;
 	double							x,y,z,w;
-	unsigned int					p, i, len;
-	LocalParticle*					particle;
-	Coord								minCell;
-	Coord								maxCell;
+	unsigned int					p;
 	Stream*							stream;
 	Particle_InCellIndex			particlesPerDim[3] = {2, 2, 2};
 	Bool								dimExists[] = { True, True, True };	
@@ -211,10 +204,7 @@ void GaussLayoutSingleCellSuite_Test3ParticlesPerDim_3D( GaussLayoutSingleCellSu
 	int								procToWatch = data->nProcs > 1 ? 1 : 0;
 	Cell_PointIndex				count;
 	double							x,y,z,w;
-	unsigned int					p, i, len;
-	LocalParticle*					particle;
-	Coord								minCell;
-	Coord								maxCell;
+	unsigned int					p;
 	Stream*							stream;
 	Particle_InCellIndex			particlesPerDim[3] = {3, 3, 3};
 	Bool								dimExists[] = { True, True, True };	

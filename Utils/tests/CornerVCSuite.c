@@ -112,7 +112,6 @@ void CornerVCSuite_TestCornerVC( CornerVCSuiteData* data ) {
 	char									expected_file[PCU_PATH_MAX];
 	Mesh*									mesh;
 	Variable_Register*				variable_Register;
-	ConditionFunction*				quadCF;
 	ConditionFunction_Register*	conFunc_Register;
 	ExtensionManager_Register*		extensionMgr_Register;
 	Dictionary*							dictionary;

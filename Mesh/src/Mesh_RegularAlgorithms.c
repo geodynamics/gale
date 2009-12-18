@@ -232,7 +232,9 @@ Bool Mesh_RegularAlgorithms_SearchElements( void* algorithms, double* point, uns
 }
 
 double _Mesh_RegularAlgorithms_GetMinimumSeparation( void* algorithms, void* _mesh, double* perDim ) {
-	Mesh*			mesh = (Mesh*)_mesh;
+	Mesh* mesh;
+
+	mesh = (Mesh*)_mesh;
 
 	/* TODO */
 	abort();

@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int rank;
+	int nProcs;
 } VectorMathSuiteData;
 
 void VectorMathSuite_Setup( VectorMathSuiteData* data ) {
@@ -69,7 +69,6 @@ void VectorMathSuite_BasicTest( VectorMathSuiteData* data ) {
 		Coord a, b, c;
 		Coord d = { 1.0, 1.0, 1.0 };
 		Coord e = { 1.0, 2.0, -3.0 };
-		Index i;
 
 		Stream_RedirectFile( stream, "testBasicTest.dat" );
 
@@ -113,8 +112,6 @@ void VectorMathSuite_CompleteTest( VectorMathSuiteData* data ) {
 
 	if (data->rank == procToWatch) {
 		Coord a, b, c;
-		Coord d = { 1.0, 1.0, 1.0 };
-		Coord e = { 1.0, 2.0, -3.0 };
 		Index i;
 
 		Stream_RedirectFile( stream, "testCompleteTest.dat" );
@@ -163,7 +160,6 @@ void VectorMathSuite_TestVectorFunctions( VectorMathSuiteData* data ) {
 		double C[] = {23  , 5  , -14  , 32, -21,    78};
 		double D[] = {23  , 5  , -14  , 32, -21,    78};
 		double angle;
-		double **matrix;
 		double vector[6];
 		double *coordList[4];
 		int d;
@@ -398,7 +394,6 @@ void VectorMathSuite_TestTriangleArea( VectorMathSuiteData* data ) {
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 		double C[] = {23  , 5  , -14  , 32, -21,    78};
 		int d;
-		double vector[6];
 
 		Stream_RedirectFile( stream, "testTriangleArea.dat" );
 
@@ -426,7 +421,6 @@ void VectorMathSuite_TestNormalisationFunction( VectorMathSuiteData* data ) {
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 		double C[] = {23  , 5  , -14  , 32, -21,    78};
 		int d;
-		double vector[6];
 
 		Stream_RedirectFile( stream, "testNormalisationFunction.dat" );
 

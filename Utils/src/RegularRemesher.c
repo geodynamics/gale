@@ -151,8 +151,8 @@ void _RegularRemesher_Remesh( void* _self ) {
                gen->contactDepth[1][0] || gen->contactDepth[1][1] ||
                gen->contactDepth[2][0] || gen->contactDepth[2][1]) )
    {
-      int curInd;
-      int ii, d_j;
+      /*int curInd;*/
+      int /*ii,*/ d_j;
 
 #if 0
       /* Reset static depths. */
@@ -171,7 +171,6 @@ void _RegularRemesher_Remesh( void* _self ) {
             Grid_Lift( vGrid, ind, (unsigned*)inds );
             center = inds[d_i];
             if( center == 0 || center == vGrid->sizes[d_i] - 1 ) {
-	       int depth;
 
                /* If we're inside the contact depth range, we need to make
                   sure the side coordinates are aligned. */
@@ -308,7 +307,7 @@ void _RegularRemesher_Remesh( void* _self ) {
    /* Meddle with the top right corner. */
    if( self->diffuseCorners ) {
       int nodeIndex, innerIndex, inner2Index;
-      double grad, *nodeVert, *innerVert, *inner2Vert;
+      double /*grad,*/ *nodeVert, *innerVert, *inner2Vert;
 
       inds[0] = vGrid->sizes[0] - 1;
       inds[1] = vGrid->sizes[1] - 1;
@@ -433,7 +432,7 @@ void _RegularRemesher_Remesh( void* _self ) {
       Vec b, x;
       KSP ksp;
       int cols[3], nDofs, nodeIndex;
-      double one = 1.0, rhs, coef, *soln;
+      double rhs, coef, *soln;
       double matVals[3], vecVals[3];
       double d, dt, sep;
       int ii;

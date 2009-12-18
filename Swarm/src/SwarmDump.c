@@ -54,20 +54,19 @@ const Type SwarmDump_Type = "SwarmDump";
 
 
 SwarmDump* SwarmDump_New(               
-                Name                                               name,
-                void*                                              context,
-                Swarm**                                            swarmList,
-                Index                                              swarmCount,
-                Bool                                               newFileEachTime )
+	Name		name,
+	void*		context,
+	Swarm**	swarmList,
+	Index		swarmCount,
+	Bool		newFileEachTime )
 {
-        SwarmDump* self = _SwarmDump_DefaultNew( name );
+	SwarmDump* self = _SwarmDump_DefaultNew( name );
 
-        _SwarmDump_Init( self, context, swarmList, swarmCount, newFileEachTime );
-        return self;
+	_SwarmDump_Init( self, context, swarmList, swarmCount, newFileEachTime );
+	return self;
 }
 
-SwarmDump* _SwarmDump_New(  SWARMDUMP_DEFARGS  ) 
-{
+SwarmDump* _SwarmDump_New(  SWARMDUMP_DEFARGS  ) {
         SwarmDump*              self;
         
         /* Allocate memory */
@@ -298,7 +297,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
    hid_t                   memSpace;
    hid_t                   props;
    hid_t                   attribData_id, attrib_id, group_id;
-   herr_t                  status;
+   /*herr_t                  status;*/
    hsize_t                 size[2];
    hsize_t                 cdims[2];
    hsize_t                 a_dims;

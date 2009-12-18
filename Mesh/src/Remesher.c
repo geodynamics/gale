@@ -120,7 +120,6 @@ void _Remesher_Print( void* remesher, Stream* stream ) {
 
 void _Remesher_AssignFromXML( void* remesher, Stg_ComponentFactory* cf, void* data ) {
    Remesher*			self = (Remesher*)remesher;
-   char*					meshName;
 	AbstractContext*	context;
 	Mesh*					mesh;
 

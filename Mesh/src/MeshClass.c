@@ -208,7 +208,6 @@ void _Mesh_Execute( void* mesh, void* data ) {
 
 void _Mesh_Destroy( void* mesh, void* data ) {
    Mesh*		self = (Mesh*)mesh;
-	unsigned nDims;
 	unsigned	d_i;
 
    Mesh_Destruct( self );
@@ -637,7 +636,7 @@ void Mesh_Sync( void* mesh ) {
 */
 
 void Mesh_Destruct( Mesh* self ) {
-	unsigned	et_i, v_i;
+	unsigned	et_i/*, v_i*/;
 
 	for( et_i = 0; et_i < self->nElTypes; et_i++ )
 		Stg_Class_Delete( self->elTypes[et_i] );
