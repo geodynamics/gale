@@ -166,9 +166,11 @@ void _GaussCoincidentMapper_Map( void* mapper ) {
 	IntegrationPoint*			integrationPoint;
 	MaterialPoint*				materialPoint;
 	MaterialPointRef*			ref;
-	FeMesh*						mesh = materialSwarm->mesh;
 	Particle_Index				particle_lI;
+#if 0
+	FeMesh*						mesh = materialSwarm->mesh;
 	Cell_Index					cell_dI;
+#endif
 
 #ifdef CAUTIOUS
     Index						dim_I;

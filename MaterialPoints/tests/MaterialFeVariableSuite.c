@@ -46,8 +46,7 @@ typedef struct {
 } MaterialFeVariableSuiteData;
 
 void MaterialFeVariableSuite_Setup( MaterialFeVariableSuiteData* data ) {
-   char              	 	xmlInputFilename[PCU_PATH_MAX];
-	PICelleratorContext*		context;
+   char xmlInputFilename[PCU_PATH_MAX];
 
    pcu_filename_input( "testMaterialFeVariable.xml", xmlInputFilename );
    data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
@@ -72,8 +71,6 @@ void MaterialFeVariableSuite_TestVolume( MaterialFeVariableSuiteData* data ) {
    double              volumePIC;
    double              volumeFEM;
    Coord               centroid;
-
-   char   testStr[] = "This test compares the volume of a swarm as calculated based on the material points swarm and as calculate from a MaterialFeVariable\n";
 
    materialFeVariable = (MaterialFeVariable*) LiveComponentRegister_Get( data->context->CF->LCRegister, "materialFeVariable" );
    gaussSwarm = (Swarm*) LiveComponentRegister_Get( data->context->CF->LCRegister, "gaussSwarm" );

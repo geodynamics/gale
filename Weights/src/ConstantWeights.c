@@ -88,7 +88,9 @@ ConstantWeights* _ConstantWeights_New(  CONSTANTWEIGHTS_DEFARGS  ) {
 }
 
 void _ConstantWeights_Init( void* constantWeights  ) {
-    ConstantWeights* self = (ConstantWeights*)constantWeights;
+	ConstantWeights* self;
+		
+	self = (ConstantWeights*)constantWeights;
 }
 
 

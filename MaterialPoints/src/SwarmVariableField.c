@@ -216,25 +216,22 @@ void _SwarmVariableField_Destroy( void* swarmVariableField, void* data ) {
 	_ParticleFeVariable_Destroy( swarmVariableField, data );
 }
 
-void _SwarmVariableField_ValueAtParticle( void* swarmVariableField, 
-					  IntegrationPointsSwarm* swarm, 
-					  Element_LocalIndex lElement_I, 
-					  IntegrationPoint* particle,
-					  double* value ) 
+void _SwarmVariableField_ValueAtParticle(
+	void*							swarmVariableField, 
+	IntegrationPointsSwarm*	swarm, 
+	Element_LocalIndex		lElement_I, 
+	IntegrationPoint*			particle,
+	double*						value ) 
 {
-	SwarmVariableField*	self            = (SwarmVariableField*)swarmVariableField;
-	GlobalParticle*		matParticle;
-	double			distance;
-	Cell_Index		cell_I;
+	SwarmVariableField*	self = (SwarmVariableField*)swarmVariableField;
+	double					distance;
+	Cell_Index				cell_I;
 	Particle_InCellIndex	cParticle_I;
-	Particle_Index		lParticle_I;
+	Particle_Index			lParticle_I;
 
 	cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
-	cParticle_I = Swarm_FindClosestParticleInCell( swarm,
-		       				       cell_I,
-						       Mesh_GetDimSize( self->dofLayout->mesh ),
-						       particle->xi,
-						       &distance );
+	cParticle_I = Swarm_FindClosestParticleInCell( swarm, cell_I, Mesh_GetDimSize( self->dofLayout->mesh ), particle->xi, &distance );
+
 	// this function doesn't seem to be doing its joob properly!
 	//lParticle_I = IntegrationPointMapper_GetMaterialIndexAt( swarm->mapper, swarm->cellParticleTbl[cell_I][cParticle_I] );
 	

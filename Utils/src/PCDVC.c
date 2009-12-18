@@ -121,20 +121,28 @@ const Type PCDVC_Type = "PCDVC";
 ** Constructors
 */
 
-PCDVC* PCDVC_New( Name name, Dimension_Index dim, int* res,
-                  MaterialPointsSwarm* mps, double upT, double lowT,
-                  int maxDeletions, int maxSplits, Bool splitInInterfaceCells,
-                  Bool deleteInInterfaceCells, Bool Inflow, double CentPosRatio,
-                  int ParticlesPerCell, double Threshold )
+PCDVC* PCDVC_New(
+	Name						name,
+	Dimension_Index		dim,
+	int*						res,
+ 	MaterialPointsSwarm*	mps,
+	double					upT,
+	double					lowT,
+	int						maxDeletions,
+	int						maxSplits,
+	Bool						splitInInterfaceCells,
+ 	Bool						deleteInInterfaceCells,
+	Bool						Inflow,
+	double					CentPosRatio,
+	int						ParticlesPerCell,
+	double					Threshold )
 {
     PCDVC *self = _PCDVC_DefaultNew( name );
 
     self->isConstructed = True;
     _WeightsCalculator_Init( self, dim );
     _DVCWeights_Init( self, res );
-    _PCDVC_Init( self, mps, upT, lowT, maxDeletions, maxSplits,
-                 splitInInterfaceCells, deleteInInterfaceCells,
-                 Inflow, CentPosRatio, ParticlesPerCell, Threshold );
+    _PCDVC_Init( self, mps, upT, lowT, maxDeletions, maxSplits, splitInInterfaceCells, deleteInInterfaceCells, Inflow, CentPosRatio, ParticlesPerCell, Threshold );
 }
 
 PCDVC* _PCDVC_New(  PCDVC_DEFARGS  ) {
@@ -855,9 +863,12 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
     }
     if(Inflow && (  ((1.0*nump_orig)/ParticlesPerCell < Thresh) || flag  ) ){
         int oneOda = (int)(1.0/da + 0.5);
+        int *VCsize=(int *)malloc(sizeof(int)*nump);
+#if 0
         double dist;
-        int numberofnewpoints, *VCsize=(int *)malloc(sizeof(int)*nump);
+        int numberofnewpoints;
         int newpindex;
+#endif
         int j;
         int delNum;
         VCsize=(int *)malloc(sizeof(int)*nump_orig);
@@ -969,8 +980,6 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
     }// if Inflow && ...
     if(Inflow){
         int oneOda = (int)(1.0/da + 0.5);
-        int sumc = 0;
-        int j;
         //recreate the lists.
         particleVoronoiCellList = (int **)malloc(nump * sizeof(int *));// [i][j] is jth cell owned by particle i
         //VCsize = (int*)realloc(VCsize,nump_orig);
@@ -1198,7 +1207,7 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
     double Thresh = self->Threshold;
     int ParticlesPerCell = self->ParticlesPerCell;
     double CentPosRatio = self->CentPosRatio;
-    time_t tm;
+    //time_t tm;
 	
 
 //	SizeT                 intparticleSize     = intSwarm->particleExtensionMgr->finalSize;
@@ -1286,12 +1295,13 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
     }
     if(Inflow && (  ((1.0*nump_orig)/ParticlesPerCell < Thresh) || flag  ) ){
         int oneOda = (int)(1.0/da + 0.5);
-        double dist;
-        int numberofnewpoints;
-        int newpindex;
-        int j,countSum;
-        double wSum;
-        int *temparray;
+        /*double dist; */
+        /*int numberofnewpoints;*/
+        /*int newpindex;*/
+        int j;
+		  /*int countSum;*/
+        /*double wSum;*/
+        /*int *temparray;*/
         int delNum;
         VCsize=(int *)malloc(sizeof(int)*nump_orig);
         count=(int *)malloc(sizeof(int)*nump_orig);
@@ -1375,8 +1385,8 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
     }// if Inflow && ...
     if(Inflow){
         int oneOda = (int)(1.0/da + 0.5);
-        int sumc = 0;
-        int j;
+        //int sumc = 0;
+        //int j;
         //recreate the lists.
         particleVoronoiCellList = (int **)malloc(nump * sizeof(int *));// [i][j] is jth cell owned by particle i
         //VCsize = (int*)realloc(VCsize,nump_orig);
@@ -1571,9 +1581,9 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 void _PCDVC_Calculate( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ){
     Swarm* swarm = (Swarm*) _swarm;
     Dimension_Index dim = swarm->dim;
-    Stream*  stream = Journal_Register( Info_Type, swarm->type );
+    /* Stream*  stream = Journal_Register( Info_Type, swarm->type ); */
     PCDVC*             self            = (PCDVC*)  pcdvc;
-    MaterialPointsSwarm* matSwarm =	(MaterialPointsSwarm*) self->materialPointsSwarm;
+    /* MaterialPointsSwarm* matSwarm =	(MaterialPointsSwarm*) self->materialPointsSwarm; */
     /* it might be nice to report the total deletions and splits as well as the final population here */
     /* One could set the parameters to be too aggressive and cause "swarm thrashing" where many particles
        are being created and destroyed while maintaining some population that it has converged on */

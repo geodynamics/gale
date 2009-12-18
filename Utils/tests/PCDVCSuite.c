@@ -105,10 +105,8 @@ void PCDVCSuite_Teardown( PCDVCSuiteData* data ) {
 void compareAgainstReferenceSolution(PICelleratorContext* context, Stream* stream, double mean, double standardDeviation, char* expFile) {
 	double 	meanTolerance, stdDevTolerance;
 	double 	expectedMean, expectedStdDev;
-	double 	differenceMean, differenceStdDev;
-	char	expectedFile[PCU_PATH_MAX];
-	int	rank;
-	FILE*	expectedfp;
+	char		expectedFile[PCU_PATH_MAX];
+	FILE*		expectedfp;
 
 	pcu_filename_expected( expFile, expectedFile );
 	expectedfp = fopen( expectedFile, "r" );

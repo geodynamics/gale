@@ -59,9 +59,9 @@ BackgroundParticleLayout* BackgroundParticleLayout_New( Name name,
    self->isConstructed = True;
    return self;
 }
-BackgroundParticleLayout* _BackgroundParticleLayout_New(  BACKGROUNDPARTICLELAYOUT_DEFARGS  )
-{
-    BackgroundParticleLayout*		self;
+
+BackgroundParticleLayout* _BackgroundParticleLayout_New(  BACKGROUNDPARTICLELAYOUT_DEFARGS  ) {
+    BackgroundParticleLayout* self;
 	
     /* Allocate memory */
     assert( _sizeOfSelf >= sizeof(BackgroundParticleLayout) );
@@ -71,10 +71,10 @@ BackgroundParticleLayout* _BackgroundParticleLayout_New(  BACKGROUNDPARTICLELAYO
 }
 
 
-void _BackgroundParticleLayout_Init(
-    void*                  particleLayout )
-{
-    BackgroundParticleLayout* self = (BackgroundParticleLayout*)particleLayout;
+void _BackgroundParticleLayout_Init( void* particleLayout ) {
+	BackgroundParticleLayout* self;
+
+	self = (BackgroundParticleLayout*)particleLayout;
 }
 
 void _BackgroundParticleLayout_Delete( void* particleLayout ) {
@@ -92,7 +92,6 @@ void _BackgroundParticleLayout_Print( void* particleLayout, Stream* stream ) {
     _ParticleLayout_Print( self, stream );
 	
 }
-
 
 void* _BackgroundParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
     BackgroundParticleLayout*		self = (BackgroundParticleLayout*)particleLayout;

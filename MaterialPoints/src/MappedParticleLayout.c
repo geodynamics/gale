@@ -71,10 +71,10 @@ MappedParticleLayout* _MappedParticleLayout_New(  MAPPEDPARTICLELAYOUT_DEFARGS  
 }
 
 
-void _MappedParticleLayout_Init(
-    void*                  particleLayout )
-{
-    MappedParticleLayout* self = (MappedParticleLayout*)particleLayout;
+void _MappedParticleLayout_Init( void* particleLayout ) {
+	MappedParticleLayout* self;
+
+	self = (MappedParticleLayout*)particleLayout;
 }
 
 void _MappedParticleLayout_Delete( void* particleLayout ) {

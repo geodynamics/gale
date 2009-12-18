@@ -77,7 +77,9 @@ void* _GaussMapper_DefaultNew( Name name ) {
 }
 
 void _GaussMapper_Init( void* mapper ) {
-	GaussMapper* self = (GaussMapper*)mapper;
+	GaussMapper* self;
+
+	self = (GaussMapper*)mapper;
 }
 
 void _GaussMapper_Delete( void* mapper ) {

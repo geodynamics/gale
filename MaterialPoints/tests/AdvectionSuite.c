@@ -77,7 +77,6 @@ void check( PICelleratorContext* context ) {
 	Coord             analyticCoord;
 	double            time                 = context->currentTime + context->dt;
 	Dictionary*       dictionary           = context->dictionary;
-	Stream*           stream               = Journal_Register( Info_Type, CURR_MODULE_NAME );
 	double		  depthErrorTolerance  = Dictionary_GetDouble( dictionary, "depthErrorTolerance" );
 	double		  radiusErrorTolerance = Dictionary_GetDouble( dictionary, "radiusErrorTolerance" );
 	double		  thetaErrorTolerance  = Dictionary_GetDouble( dictionary, "thetaErrorTolerance" );

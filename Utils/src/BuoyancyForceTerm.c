@@ -219,7 +219,6 @@ void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 	MaterialPointsSwarm**            materialSwarms;
 	Index                            materialSwarm_I;
 	Name                             name;
-	AbstractContext*                 context;
 	Stg_ComponentFactory*            cf;
 
 	cf = self->context->CF;
@@ -317,7 +316,6 @@ void _BuoyancyForceTerm_Destroy( void* forceTerm, void* data ) {
 void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) {
 	BuoyancyForceTerm*               self               = (BuoyancyForceTerm*) forceTerm;
 	IntegrationPoint*                particle;
-	BuoyancyForceTerm_MaterialExt*   materialExt;
 	Particle_InCellIndex             cParticle_I;
 	Particle_InCellIndex             cellParticleCount;
 	Element_NodeIndex                elementNodeCount;
@@ -334,7 +332,10 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 	double                           Ni[27];
 	double                           force;
 	double*                          xi;
+#if 0
+	BuoyancyForceTerm_MaterialExt*   materialExt;
 	Material*                        material;
+#endif
 	FeVariable*                      temperatureField   = self->temperatureField;
 	double                           temperature        = 0.0;
 	double*				 gHat;
