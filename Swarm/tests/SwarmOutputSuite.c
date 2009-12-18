@@ -131,7 +131,6 @@ void SwarmOutputSuite_TestSwarmOutput( SwarmOutputSuiteData* data ) {
 
 		pcu_check_streq( swarm->name, swarmOutput->swarm->name );
 
-		_Stg_Component_Delete( context );
 		stgMainDestroy( cf );
 	}
 }
