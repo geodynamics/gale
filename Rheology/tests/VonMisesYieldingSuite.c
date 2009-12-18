@@ -133,8 +133,6 @@ void VonMisesYieldingSuite_VonMises2D( VonMisesYieldingSuiteData* data ) {
 	YieldRheology*          yieldRheology;
 	Stg_ComponentFactory*	cf;
 	char							expected_file[PCU_PATH_MAX];
-	char							*filename;
-	double						tolerance;
 	char							xml_input[PCU_PATH_MAX];
 
 	/* read in the xml input file */

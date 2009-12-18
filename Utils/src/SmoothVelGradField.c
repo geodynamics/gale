@@ -107,11 +107,12 @@ void* _SmoothVelGradField_Copy( void* _self, void* dest, Bool deep, Name nameExt
 }
 
 void SmoothVelGradField_NonLinearUpdate( void* _sle, void* _ctx ) {
-   SystemLinearEquations* sle = (SystemLinearEquations*)_sle;
+   SystemLinearEquations* sle;
    DomainContext* ctx = (DomainContext*)_ctx;
    FieldVariable_Register* fieldVar_Register;
    SmoothVelGradField* preVar;
 
+	sle = (SystemLinearEquations*)_sle;
    fieldVar_Register = ctx->fieldVariable_Register;
    preVar = (SmoothVelGradField*)FieldVariable_Register_GetByName( fieldVar_Register, "VelocityGradientsField" );
    ParticleFeVariable_Update( preVar );
@@ -268,7 +269,6 @@ void _SmoothVelGradField_ValueAtParticle(
 	double*						velGrad )
 {
    SmoothVelGradField* self = (SmoothVelGradField*)_self;
-   IntegrationPoint* particle = (IntegrationPoint*)_particle;
 
    assert( self->useDeriv );
    assert( self->GNx );

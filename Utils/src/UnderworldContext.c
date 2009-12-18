@@ -198,8 +198,7 @@ void _UnderworldContext_SetDt( void* context, double dt ) {
 /* EntryPoint Hooks ----------------------------------------------------------------------------------------------------*/
 
 void UnderworldContext_AssignPointers( void* context, void* ptrToContext ) {
-	UnderworldContext*      self         = (UnderworldContext*) context;
-	FieldVariable_Register* fV_Register  = self->fieldVariable_Register;
+	UnderworldContext* self = (UnderworldContext*) context;
 	
 	Stream_IndentBranch( StgFEM_Debug );
 	Journal_DPrintf( self->debug, "In: %s()\n", __func__ );

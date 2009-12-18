@@ -70,23 +70,21 @@ StoreStress* _StoreStress_New(  STORESTRESS_DEFARGS  )
 }
 
 void _StoreStress_Init(
-		StoreStress*                                       self,
-		MaterialPointsSwarm*                               materialPointsSwarm,
-		FeVariable*                                        strainRateField )
+	StoreStress*			self,
+	MaterialPointsSwarm*	materialPointsSwarm,
+	FeVariable*				strainRateField )
 {
 	Name                       variableName[6];
-	SwarmVariable*             materialPointsSwarmVariable;
 	StandardParticle           particle;
 	StoreStress_ParticleExt*   particleExt;
 	Index                      variable_I;
-	Dimension_Index            dim            = materialPointsSwarm->dim;
+	Dimension_Index            dim = materialPointsSwarm->dim;
 		
 	/* Assign Pointers */
-	self->materialPointsSwarm           = materialPointsSwarm;
+	self->materialPointsSwarm = materialPointsSwarm;
 	self->strainRateField = strainRateField;
 
-	self->particleExtHandle = 
-		ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, self->type, sizeof( StoreStress_ParticleExt ) );
+	self->particleExtHandle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, self->type, sizeof( StoreStress_ParticleExt ) );
 	
 	/* Add SwarmVariables for plotting */
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle, self->particleExtHandle );

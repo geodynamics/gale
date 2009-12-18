@@ -81,7 +81,6 @@ void MeshAdvectionCorrection_AddCorrection( FeVariable* velocityField, double* o
 	FeMesh*      mesh          = self->feMesh;
 	int          lNodeCount    = FeMesh_GetNodeLocalSize( mesh );
 	int          dof           = self->fieldComponentCount;
-	int          dim           = self->dim;
 	double       oldV[3], artV[3], zero[3];
 	int lNode_I;
 

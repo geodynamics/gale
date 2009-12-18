@@ -70,18 +70,16 @@ StoreVisc* _StoreVisc_New(  STOREVISC_DEFARGS  )
 }
 
 void _StoreVisc_Init(
-		StoreVisc*                                         self,
-		MaterialPointsSwarm*                               materialPointsSwarm )
+	StoreVisc*				self,
+	MaterialPointsSwarm*	materialPointsSwarm )
 {
 	StandardParticle           particle;
 	StoreVisc_ParticleExt*     particleExt;
-	SwarmVariable*             swarmVariable;
 		
 	/* Assign Pointers */
-	self->materialPointsSwarm           = materialPointsSwarm;
+	self->materialPointsSwarm = materialPointsSwarm;
 
-	self->particleExtHandle = 
-			ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, self->type, sizeof( StoreVisc_ParticleExt ) );
+	self->particleExtHandle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, self->type, sizeof( StoreVisc_ParticleExt ) );
 	
 	/* Add SwarmVariables for plotting */
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle, self->particleExtHandle );

@@ -237,7 +237,7 @@ void Underworld_IncompressibleExtensionBC_Remesh( TimeIntegrator* timeIntegrator
     double nodeWidth[3];
     int numNodes;
     int nodeInds[3];
-    int ii, jj;
+    int ii;
 
     mesh = velocityField->feMesh;
 
@@ -260,9 +260,9 @@ void Underworld_IncompressibleExtensionBC_Remesh( TimeIntegrator* timeIntegrator
 
     numNodes = FeMesh_GetNodeLocalSize(mesh);
     for(ii = 0; ii < numNodes; ii++) {
-	Grid_Lift(nodeGrid, FeMesh_NodeDomainToGlobal(mesh, ii), nodeInds);
-	Mesh_GetVertex(mesh, ii)[0] = minCrd[0] + ((double)nodeInds[0])*nodeWidth[0];
-	Mesh_GetVertex(mesh, ii)[1] = minCrd[1] + ((double)nodeInds[1])*nodeWidth[1];
+		Grid_Lift(nodeGrid, FeMesh_NodeDomainToGlobal(mesh, ii), nodeInds);
+		Mesh_GetVertex(mesh, ii)[0] = minCrd[0] + ((double)nodeInds[0])*nodeWidth[0];
+		Mesh_GetVertex(mesh, ii)[1] = minCrd[1] + ((double)nodeInds[1])*nodeWidth[1];
     }
 
     Mesh_Sync(mesh);

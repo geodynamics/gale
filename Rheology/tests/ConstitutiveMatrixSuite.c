@@ -84,17 +84,10 @@ void testConstitutiveMatrix( FiniteElementContext* context ) {
 
 
 void ConstitutiveMatrixSuite_CartesianMatrix2D( ConstitutiveMatrixSuiteData* data ) {
-	StiffnessMatrix*			stiffnessMatrix;
-	SystemLinearEquations*	sle;
 	Dictionary*					dictionary;
 	UnderworldContext*		context;
 	Stg_ComponentFactory*	cf;
-	PetscViewer					bviewer;
-	PetscReal					matrixNorm, errorNorm, test;
-	Mat							expected;
 	char							expected_file[PCU_PATH_MAX], output_file[PCU_PATH_MAX];
-	char							*filename;
-	double						tolerance;
 	char							xml_input[PCU_PATH_MAX];
 	char							rFile[PCU_PATH_MAX];
 	int							err;

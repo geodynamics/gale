@@ -429,7 +429,6 @@ void EulerDeform_IntegrationSetup( void* _timeIntegrator, void* context ) {
 Bool EulerDeform_TimeDeriv( void* crdAdvector, Index arrayInd, double* timeDeriv ) {
 	TimeIntegratee*		self = (TimeIntegratee*)crdAdvector;
 	FeVariable*				velocityField = (FeVariable*)self->data[0];
-	double**					crds = *(double***)self->data[1];
 	InterpolationResult	result = LOCAL;
 
 	/* check if the node information is on the local proc */

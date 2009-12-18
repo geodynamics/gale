@@ -100,7 +100,6 @@ void* _NodalPressureField_Copy( void* _self, void* dest, Bool deep, Name nameExt
 }
 
 void NodalPressureField_NonLinearUpdate( void* _sle, void* _ctx ) {
-   SystemLinearEquations*	sle = (SystemLinearEquations*)_sle;
    DomainContext*				ctx = (DomainContext*)_ctx;
    FieldVariable_Register*	fieldVar_Register;
    NodalPressureField*		preVar;
@@ -135,7 +134,6 @@ void _NodalPressureField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, v
 void _NodalPressureField_Build( void* _self, void* data ) {
    NodalPressureField* self = (NodalPressureField*) _self;
    Name tmpName, tmpName2;
-   Variable_Index variable_I;
    Node_DomainIndex  node_I;
 
    Stg_Component_Build( self->feMesh, data, False );
@@ -174,7 +172,6 @@ void _NodalPressureField_Build( void* _self, void* data ) {
 
 void _NodalPressureField_Initialise( void* _self, void* data ) {
    NodalPressureField* self = (NodalPressureField*) _self;
-   Variable_Index variable_I;
 	
    /* Initialise and Update all Variables that this component has created */
    Stg_Component_Initialise( self->dataVariable, data, False); Variable_Update( self->dataVariable );

@@ -221,10 +221,9 @@ void DepthDependentAnalytic3D_PressureIC( Node_LocalIndex node_lI, Variable_Inde
 }
 
 void _DepthDependentAnalytic3D_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
-	DepthDependentAnalytic3D*         self           = (DepthDependentAnalytic3D*)analyticSolution;
-	AbstractContext*        context;
-	ConditionFunction*      condFunc;
-	char*                   viscosityType;
+	DepthDependentAnalytic3D*	self           = (DepthDependentAnalytic3D*)analyticSolution;
+	ConditionFunction*			condFunc;
+	char*								viscosityType;
 	
 	/* Construct Parent */
 	_FieldTest_AssignFromXML( self, cf, data );

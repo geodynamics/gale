@@ -184,8 +184,6 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
         double yielding, viscosity, density, alpha, diffusivity;
         Material_Index material_index;
         SymmetricTensor stress;
-        BuoyancyForceTerm_MaterialExt*   materialExt;
-        Material *extension_info;
         double normal[3];
         
         IntegrationPoint* integrationparticle = (IntegrationPoint*)Swarm_ParticleAt( picswarm, lParticle_I );
@@ -436,7 +434,7 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
   FiniteElementContext*     self = (FiniteElementContext*) context;
   Index var_I;
   int header_printed=0;
-  int nDims, pn, i;
+  int nDims, i;
   int lower[3], upper[3], p_lower[3], p_upper[3];
 
   Name field_filename, pressure_filename;
@@ -485,7 +483,6 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
                                                   var_I );
     if (Stg_Class_IsInstance( fieldVar, FeVariable_Type )) {
       FeVariable* feVar;
-      Node_LocalIndex    lNode_I;
       Dof_Index          dofAtEachNodeCount;
       int *low, *up;
       Grid *grid;

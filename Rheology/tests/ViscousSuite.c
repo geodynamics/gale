@@ -194,7 +194,7 @@ void ViscousSuite_MaterialViscosityStiffnessMatrix2D( ViscousSuiteData* data ) {
 	Dictionary*					dictionary;
 	UnderworldContext*		context;
 	Stg_ComponentFactory*	cf;
-	PetscViewer					parallelViewer, expViewer, currViewer;
+	PetscViewer					expViewer/*, parallelViewer, currViewer*/;
 	PetscReal					matrixNorm, errorNorm, test;
 	Mat							expected;
 	char							expected_file[PCU_PATH_MAX];

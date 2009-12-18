@@ -54,19 +54,17 @@ double dt( UnderworldContext* context ) { return 0.05; }
 void _Director_Intermediate_Replace( void* director, Index lParticle_I ) {}
 
 void test( UnderworldContext* context ) {
-	Director*               director = (Director*)LiveComponentRegister_Get( context->CF->LCRegister, "director" );
-	Particle_Index          lParticle_I;
-	GlobalParticle*         particle;
-	double                  time                   = context->currentTime + context->dt;
-	Swarm*                  swarm	= (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialSwarm" );
-	XYZ                     normal;
-	double                  error                  = 0.0;
-   double                  angle                  = 0.5 * M_PI - atan(1.0/(2.0*time) );
-   double                  angleDirector;
-	XYZ                     velocity;
-	double			gError;
-	int			particleGlobalCount;
-	int rank;
+	Director*			director = (Director*)LiveComponentRegister_Get( context->CF->LCRegister, "director" );
+	Particle_Index		lParticle_I;
+	GlobalParticle*	particle;
+	double				time = context->currentTime + context->dt;
+	Swarm*				swarm	= (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialSwarm" );
+	XYZ					normal;
+	double				error = 0.0;
+   double				angle = 0.5 * M_PI - atan(1.0/(2.0*time) );
+   double				angleDirector;
+	double				gError;
+	int					particleGlobalCount;
 
 	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
 		particle = (GlobalParticle*)Swarm_ParticleAt( swarm, lParticle_I );
@@ -101,9 +99,8 @@ void testRandom( UnderworldContext* context ) {
 	double                  circleAngleStdDev;
 	int                     circleAngleLowerBound;
 	int                     circleAngleUpperBound;
-	double			gCircleAngleAverage;
+	double						gCircleAngleAverage;
 	int                     gCircleAngleCounts[36] 	= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-	int			gCircleAngleSum;
 
 	swarm = alignment->swarm;
 	director = alignment->director;

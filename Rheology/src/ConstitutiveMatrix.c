@@ -193,11 +193,9 @@ void* _ConstitutiveMatrix_Copy( void* constitutiveMatrix, void* dest, Bool deep,
 }
 
 void _ConstitutiveMatrix_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) {
-   ConstitutiveMatrix*         self          = (ConstitutiveMatrix*)constitutiveMatrix;
-   Dimension_Index             dim;
-   Materials_Register*         materialsRegister;
-   Bool                        storeConstitutiveMatrix;
-   PICelleratorContext*        context;
+   ConstitutiveMatrix*	self = (ConstitutiveMatrix*)constitutiveMatrix;
+   Dimension_Index		dim;
+   Bool						storeConstitutiveMatrix;
 
    _StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
@@ -313,10 +311,9 @@ void ConstitutiveMatrix_Assemble(
 }
 
 void ConstitutiveMatrix_AssembleMaterialPoint(void *constitutiveMatrix, int element,
-					      MaterialPointsSwarm *matSwarm, int matPointInd)
+	MaterialPointsSwarm *matSwarm, int matPointInd)
 {
 	ConstitutiveMatrix *self = (ConstitutiveMatrix*)constitutiveMatrix;
-	IntegrationPointsSwarm *swarm       = (IntegrationPointsSwarm*)self->integrationSwarm;
 	RheologyMaterial *material;
 	MaterialPoint *matPoint;
 	double xi[3];

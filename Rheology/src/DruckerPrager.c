@@ -309,7 +309,6 @@ double _DruckerPrager_GetYieldCriterion(
 	double                            dpFrictionCoefficient;
 	double                            dpCohesion;
 	double                            frictionalStrength;
-	FeVariable*                       pressureField  = self->pressureField;  
 	double                            pressure;
 	DruckerPrager_Particle*           particleExt;
 	

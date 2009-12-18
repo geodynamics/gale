@@ -138,8 +138,6 @@ void ByerleeYieldingSuite_TestByerlee2D( ByerleeYieldingSuiteData* data ) {
 	YieldRheology*          yieldRheology;
 	Stg_ComponentFactory*	cf;
 	char							expected_file[PCU_PATH_MAX];
-	char							*filename;
-	double						tolerance;
 	char							xml_input[PCU_PATH_MAX];
 
 	/* read in the xml input file */

@@ -482,8 +482,6 @@ void _XDMFGenerator_SendInfo( UnderworldContext* context ) {
    Index           swarmcountindex;
    Index           swarmParticleLocalCount;
    Swarm*          currentSwarm;
-   SwarmVariable*  swarmVar;
-   Stream*         errorStream  = Journal_Register( Error_Type, CURR_MODULE_NAME );
 	const int       FINISHED_WRITING_TAG = 100;
    
    /** get total number of different swarms **/

@@ -251,7 +251,6 @@ void Underworld_BuoyancyIntegrals_Setup( void *_context )
 	/* Set the initial coordinates for the cob swarm */
 	if( ctx->cob_swarm != NULL ) {
 		Swarm *swarm;
-		int point_count;
 		GlobalParticle *particle;
 		
 		/* Force swarm to allocate points so that I can set initial values */
@@ -265,10 +264,6 @@ void Underworld_BuoyancyIntegrals_Setup( void *_context )
 		particle->coord[1] = ctx->y_b_initial;
 		particle->coord[2] = ctx->z_b;
 	}
-	
-	
-	
-	
 }
 
 
@@ -465,8 +460,7 @@ void assign_coords_to_swarm( double x_b, double y_b, double z_b, MaterialPointsS
 	GlobalParticle *particle;
 	Particle_Index lParticle_I;
 	Stream *errorStream = Journal_Register( Error_Type, "Underworld_BuoyancyIntegrals: assign_coords_to_swarm" );
-	int rank;
-	
+	/* int rank; */
 	
 	/* Cast to get parent */
 	swarm = (Swarm*)cob_swarm;
@@ -484,9 +478,6 @@ void assign_coords_to_swarm( double x_b, double y_b, double z_b, MaterialPointsS
 			"Error in %s:\n"
 			"Swarm with name %s is be used to plot center of buoyancy.\n"
 			"This swarm contains more then 1 point. This is unexpected!!", __func__, swarm->name );
-	
-	
-	
 	
 	/* get point to the first particle */
 	lParticle_I = 0;

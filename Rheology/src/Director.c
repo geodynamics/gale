@@ -350,14 +350,13 @@ void _Director_Initialise( void* director, void* data ) {
 		else if (self->initialDirectionType == INIT_DIR_PER_MAT) {
 			/* Assign initial direction based on material
 			  and check first is material is defined as random.*/
-			Material_Index       materialsCount = Materials_Register_GetCount( self->materialPointsSwarm->materials_Register);
-			XYZ*                 materialDirectionVectors;
-			int 				 material_I;
-			Material*            material;
-			Bool*                randomInitialDirections;
-			int*                 randomInitialDirectionSeeds;
-			int                  materialOfParticle;
-			
+			Material_Index	materialsCount = Materials_Register_GetCount( self->materialPointsSwarm->materials_Register);
+			XYZ*				materialDirectionVectors;
+			int				material_I;
+			Material*		material;
+			Bool*				randomInitialDirections;
+			int*				randomInitialDirectionSeeds;
+			/* int				materialOfParticle; */
 			
 			materialDirectionVectors = Memory_Alloc_Array(XYZ, materialsCount, "materialDirectionVectors");
 			randomInitialDirectionSeeds = Memory_Alloc_Array(int, materialsCount,

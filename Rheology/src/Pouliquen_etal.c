@@ -232,10 +232,9 @@ void _Pouliquen_etal_Build( void* rheology, void* data ) {
 }
 
 void _Pouliquen_etal_Initialise( void* rheology, void* data ) {
-	Pouliquen_etal*                  self                  = (Pouliquen_etal*) rheology;
-	Particle_Index                  lParticle_I;
-	Particle_Index                  particleLocalCount;
-	AbstractContext*                context = (AbstractContext*)self->context;
+	Pouliquen_etal*	self = (Pouliquen_etal*) rheology;
+	Particle_Index		lParticle_I;
+	Particle_Index		particleLocalCount;
 
 	_YieldRheology_Initialise( self, data );
 
@@ -445,8 +444,8 @@ void _Pouliquen_etal_HasYielded(
 	Pouliquen_etal_Particle*         particleExt;
 	double                    mu;
 	double                    strainWeakeningRatio;
-	double                    mu_2_afterSoftening =	self->mu_2_afterSoftening;
-	double                    mu_s_afterSoftening =	self->mu_s_afterSoftening;
+	/*double                    mu_2_afterSoftening =	self->mu_2_afterSoftening;
+	double                    mu_s_afterSoftening =	self->mu_s_afterSoftening;*/
 	double                    effective_mu_s;
 	double                    effective_mu_2;
 	double                    pressure;

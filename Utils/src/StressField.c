@@ -131,11 +131,12 @@ void* _StressField_DefaultNew( Name name ) {
 }
 
 void StressField_NonLinearUpdate( void* _sle, void* _ctx ) {
-   SystemLinearEquations* sle = (SystemLinearEquations*)_sle;
+   SystemLinearEquations* sle;
    DomainContext* ctx = (DomainContext*)_ctx;
    FieldVariable_Register* fieldVar_Register;
    StressField* stressVar;
 
+	sle = (SystemLinearEquations*)_sle;
    fieldVar_Register = ctx->fieldVariable_Register;
    stressVar = (StressField*)FieldVariable_Register_GetByName( fieldVar_Register, "StressField" );
    ParticleFeVariable_Update( stressVar );

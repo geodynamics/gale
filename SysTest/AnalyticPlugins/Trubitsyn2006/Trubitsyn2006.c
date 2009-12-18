@@ -239,19 +239,16 @@ void Trubitsyn2006_PressureIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 }
 
 void _Trubitsyn2006_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
-	Trubitsyn2006*         self           = (Trubitsyn2006*)analyticSolution;
-	AbstractContext*        context;
-	ConditionFunction*      condFunc;
-	char*                   viscosityType;
-	Dictionary*		pluginDict	= Codelet_GetPluginDictionary(self, cf->rootDict);
+	Trubitsyn2006*			self = (Trubitsyn2006*)analyticSolution;
+	ConditionFunction*	condFunc;
+	char*						viscosityType;
+	Dictionary*				pluginDict = Codelet_GetPluginDictionary(self, cf->rootDict);
 	
 	/* Construct Parent */
 	_FieldTest_AssignFromXML( self, cf, data );
 
-	self->velocityField = Stg_ComponentFactory_ConstructByName(
-	    cf, Dictionary_GetString(pluginDict, "VelocityField"), FeVariable, True, data);
-	self->pressureField = Stg_ComponentFactory_ConstructByName(
-	    cf, Dictionary_GetString(pluginDict, "PressureField"), FeVariable, True, data);
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString(pluginDict, "VelocityField"), FeVariable, True, data);
+	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString(pluginDict, "PressureField"), FeVariable, True, data);
 
 	/* Add temperature initial condition */
 	condFunc = ConditionFunction_New( Trubitsyn2006_TemperatureIC, "Trubitsyn2006_TemperatureIC" );

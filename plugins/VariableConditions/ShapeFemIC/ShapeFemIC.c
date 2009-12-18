@@ -94,9 +94,9 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
   double T2u, T2l;
   double Tmu, Tml;
   double o1ux, o1uy;
-  double o1lx, o1ly;
+  double o1ly;
   double o2ux, o2uy;
-  double o2lx, o2ly;
+  double o2ly;
   double omuy, omly;
   double alpha, beta, W;
 

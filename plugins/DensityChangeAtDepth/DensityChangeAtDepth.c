@@ -74,9 +74,7 @@ void Underworld_DensityChange_Check( UnderworldContext* context ) {
 		return;
 
 	/* Get self (the plugin) */
-	Underworld_DensityChange* self = (Underworld_DensityChange*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_DensityChange_Type );
+	Underworld_DensityChange* self = (Underworld_DensityChange*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_DensityChange_Type );
 
 	/* get centroid coordinate */
 	volume = Material_Volume( self->material, (IntegrationPointsSwarm*)self->swarm, centroid );
@@ -96,17 +94,12 @@ void Underworld_DensityChange_Setup( UnderworldContext* context ) {
 		/* Function pulls and checks user input from the xml file */
 	BuoyancyForceTerm*  bft = NULL;
 	BuoyancyForceTerm_MaterialExt* materialExt = NULL;;
-	Materials_Register*  materialRegister = context->materials_Register;
 	Stream* stream = Journal_Register( Info_Type, "cows" );
-	IntegrationPointsSwarm* swarm = NULL;
 	Name   materialName = NULL;
 	int materialIndex;
-	double oldDensity;
 
 	/* Get self (the plugin) */
-	Underworld_DensityChange* self = (Underworld_DensityChange*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_DensityChange_Type );
+	Underworld_DensityChange* self = (Underworld_DensityChange*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_DensityChange_Type ); 
 
 	/* Initialise plugin data */
 	self->bftExt = NULL;

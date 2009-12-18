@@ -384,37 +384,33 @@ void _MohrCoulomb_StoreCurrentParameters(
 		MaterialPoint*                                     materialPoint,
 		Coord                                              xi ) 
 {
-	MohrCoulomb*          self               = (MohrCoulomb*) rheology;
-	Dimension_Index                      dim                = constitutiveMatrix->dim;
-        Eigenvector                          evectors[3];
-        double e0, e1, e2;
-        double trace, *particleExt;
-        int i;
+	MohrCoulomb*		self = (MohrCoulomb*) rheology;
+	Dimension_Index	dim = constitutiveMatrix->dim;
+	Eigenvector			evectors[3];
+	double				trace;
+	int					i;
 	
 	FeVariable_InterpolateWithinElement( self->pressureField, lElement_I, xi, &self->currentPressure );
 	if( !self->swarmStrainRate ) {
-	   FeVariable_InterpolateWithinElement(
-	      self->strainRateField, lElement_I, xi, self->currentStrainRate );
+		FeVariable_InterpolateWithinElement( self->strainRateField, lElement_I, xi, self->currentStrainRate );
 	}
 	else {
-	   SwarmVariable_ValueAt( self->swarmStrainRate,
-				  constitutiveMatrix->currentParticleIndex,
-				  self->currentStrainRate );
+	   SwarmVariable_ValueAt( self->swarmStrainRate, constitutiveMatrix->currentParticleIndex, self->currentStrainRate );
 	}
 
-        SymmetricTensor_GetTrace(self->currentStrainRate, dim, &trace);
+	SymmetricTensor_GetTrace(self->currentStrainRate, dim, &trace);
 
-        /* Subtract the trace (which should be zero anyway).  We can
-           use TensorMapST3D even for 2D, because it is the same for
-           the xx and yy components */
-        for(i=0;i<dim;++i)
-          self->currentStrainRate[TensorMapST3D[i][i]]-=trace/dim;
+	/* Subtract the trace (which should be zero anyway).  We can
+		use TensorMapST3D even for 2D, because it is the same for
+		the xx and yy components */
+	for(i=0;i<dim;++i)
+		self->currentStrainRate[TensorMapST3D[i][i]]-=trace/dim;
 
 	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, self->currentStrainRate, self->currentStress );
 	
 	SymmetricTensor_CalcAllEigenvectors( self->currentStress, dim, self->currentEigenvectorList );
 
-        SymmetricTensor_CalcAllEigenvectors( self->currentStrainRate, dim, evectors);
+	SymmetricTensor_CalcAllEigenvectors( self->currentStrainRate, dim, evectors);
 }
 
 
