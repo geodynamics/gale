@@ -148,12 +148,15 @@ void _lucRenderingEngineGL_Execute( void* renderingEngine, void* data ) {}
 void _lucRenderingEngineGL_Destroy( void* renderingEngine, void* data ) {}
 
 void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, AbstractContext* context ) {
-	lucRenderingEngineGL* self              = (lucRenderingEngineGL*) renderingEngine;
-	lucViewport*          viewport;
-	Viewport_Index        viewport_I;
-	Viewport_Index        viewportCount     = window->viewportCount;
-	lucViewportInfo*      viewportInfo;
-	GLint                 viewport_gl2ps[4], state;
+	lucRenderingEngineGL*	self = (lucRenderingEngineGL*) renderingEngine;
+	lucViewport*				viewport;
+	Viewport_Index				viewport_I;
+	Viewport_Index				viewportCount = window->viewportCount;
+	lucViewportInfo*			viewportInfo;
+	#ifdef HAVE_GL2PS
+	GLint							viewport_gl2ps[4];
+	GLint							state;
+	#endif
 	
 	Journal_DPrintfL( lucDebug, 2, "In func: %s for %s '%s'\n", __func__, self->type, self->name );
 	Stream_Indent( lucDebug );

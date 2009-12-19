@@ -152,7 +152,6 @@ void* _lucScalarFieldOnMeshCrossSection_DefaultNew( Name name ) {
 void _lucScalarFieldOnMeshCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucScalarFieldOnMeshCrossSection*     self = (lucScalarFieldOnMeshCrossSection*)drawingObject;
 	lucColourMap*    colourMap;
-	Index            defaultResolution;
 	char             axisChar;
 	Node_Index       value               = 0;
 	Axis             axis                = 0;
@@ -264,12 +263,9 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, Nod
 	Grid*                vertGrid;
 	IJK                  node_ijk;
 	float                normal[3];
-	Dimension_Index      dim_I;
 	Node_GlobalIndex     node_gI;
 	Node_DomainIndex     node_dI_1, node_dI_2;
 	Node_DomainIndex     nDomainNodes;
-	unsigned	     nIncVerts, *incVerts;
-	IArray*              inc;
 
 	glDisable(GL_LIGHTING);
 	

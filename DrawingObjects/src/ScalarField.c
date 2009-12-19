@@ -218,15 +218,15 @@ void _lucScalarField_BuildDisplayList( void* drawingObject, void* _context ) {
 }
 
 void lucScalarField_DrawWithMesh( lucScalarField* self ) {
-   FeVariable* var = (FeVariable*)self->fieldVariable;
-   FeMesh* mesh = var->feMesh;
-   lucColourMap* cmap = self->colourMap;
-   IArray* inc;
-   double value;
-   int* nodes, nElements, curNode;
-   int nodeMap[4] = {0, 1, 3, 2};
-   double xi[3], vertex[3];
-   int ii, jj, kk;
+   FeVariable*		var = (FeVariable*)self->fieldVariable;
+   FeMesh*			mesh = var->feMesh;
+   lucColourMap*	cmap = self->colourMap;
+   IArray*			inc;
+   double			value;
+   int*				/* nodes,*/ nElements/*, curNode */;
+   /* int nodeMap[4] = {0, 1, 3, 2}; */
+   double			xi[3], vertex[3];
+   int				ii, jj, kk;
 
    lucOpenGLDrawingObject_SyncShadowValues( self, self->fieldVariable );
    glDisable( GL_LIGHTING );

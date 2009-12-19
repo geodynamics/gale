@@ -165,7 +165,6 @@ void _lucVectorArrowCrossSection_AssignFromXML( void* drawingObject, Stg_Compone
 	FieldVariable*   vectorVariable;
 	Index            defaultResolution;
 	IJK              resolution;
-   lucCrossSection* crossSection;
 
 	/* Construct Parent */
 	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );

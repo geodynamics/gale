@@ -222,14 +222,14 @@ void _lucAxis_Setup( void* drawingObject, void* _context ) {
 	lucAxis*       self            = (lucAxis*)drawingObject;
 	_lucOpenGLDrawingObject_Setup( self, _context );
 }
+
 void _lucAxis_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
-	lucAxis*         self     = (lucAxis*)drawingObject;
-        lucViewport*     viewport = viewportInfo->viewport;
-	DomainContext*   context  = (DomainContext*) _context;
-	Dimension_Index  dim      = context->dim;
-        double rodLength          = 0.0;
-	double arrowHeadLength    = 0.0;
-	double textSpacing        = 0.0;
+	lucAxis*				self = (lucAxis*)drawingObject;
+	DomainContext*		context = (DomainContext*) _context;
+	Dimension_Index	dim = context->dim;
+	double				rodLength = 0.0;
+	double				arrowHeadLength = 0.0;
+	double				textSpacing = 0.0;
 		
 	/* Initialise OpenGL stuff */
 	glShadeModel(GL_SMOOTH);

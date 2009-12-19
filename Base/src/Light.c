@@ -312,16 +312,13 @@ void lucLight_Pickle( void* light, Stream* stream ) {
 	Journal_Printf( stream, "<param name=\"spotDirectionY\">%.5g</param>\n", self->spotDirection[ 1 ]  );
 	Journal_Printf( stream, "<param name=\"spotDirectionZ\">%.5g</param>\n", self->spotDirection[ 2 ]  );
 
-
-
-       	Stream_UnIndent( stream );
+	Stream_UnIndent( stream );
 	Journal_Printf( stream, "</struct>\n");
 }
 
 /* functions to change the lights paramters */
 void lucLight_Position( void * light, int lightIndex, float posX, float posY, float posZ, float posW) {
-	lucLight*             	self               = (lucLight*) light;
-	Light_Index             index              = (Light_Index) lightIndex;
+	lucLight* self = (lucLight*) light;
 
 	/* Sets the potiotion of the light index = index */	
 	glEnable(GL_LIGHTING);
@@ -329,17 +326,16 @@ void lucLight_Position( void * light, int lightIndex, float posX, float posY, fl
 	self->position[0]  += posX;
 	self->position[1]  += posY;
 	self->position[2]  += posZ;
-        self->position[3]  += posW;
+	self->position[3]  += posW;
 
 	glLightfv(GL_LIGHT0 + lightIndex, GL_POSITION, self->position);
 
 	self->needsToDraw = True;
-	
 }
+
 void lucLight_Material( int material) {
-	
-	
 }
+
 void lucLight_SetNeedsToDraw( void * light ){
 	lucLight* self = (lucLight*) light;
 	self->needsToDraw = True;

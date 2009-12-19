@@ -196,7 +196,6 @@ void _lucEigenvectorsCrossSection_AssignFromXML( void* drawingObject, Stg_Compon
 	FieldVariable*   tensorField;
 	Index            defaultResolution;
 	IJK              resolution;
-   lucCrossSection* crossSection;
 
 	/* Construct Parent */
 	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );

@@ -152,7 +152,6 @@ void _lucScalarFieldCrossSection_AssignFromXML( void* drawingObject, Stg_Compone
 	lucColourMap*    colourMap;
 	Index            defaultResolution;
 	IJK              resolution;
-   lucCrossSection* crossSection;
 	Name             fieldVariableName;
 	XYZ              minCropValues;
 	XYZ              maxCropValues;

@@ -242,11 +242,13 @@ void lucBuildFont(int glyphsize, int columns, int startidx, int stopidx)
 	float divY = IMAGE_HEIGHT / (float)glyphsize;
 	float glyphX = 1 / divX;	/* Width & height of a glyph in texture coords */
 	float glyphY = 1 / divY;
-	GLfloat cx, cy, cx1, cy1;         /* the character coordinates in our texture */
-    if (startidx == 0) yoffset = 0;
+	GLfloat cx, cy;         /* the character coordinates in our texture */
+
+	if (startidx == 0)
+		yoffset = 0;
 	glBindTexture(GL_TEXTURE_2D, texture);
-	for (i = 0; i < (stopidx - startidx); i++)
-	{
+
+	for (i = 0; i < (stopidx - startidx); i++) {
 		cx = (float) (i % columns) / divX;
 		cy = yoffset + (float) (i / columns) / divY;
 		glNewList(fontbase + startidx + i, GL_COMPILE);
@@ -880,7 +882,6 @@ void luc_OpenGlDebug( Stream* stream, int mode, int debugLevel){
 	GLfloat    currentRasterPosition[4];
 	GLfloat    currentRasterTextureCoords[4];
 	GLfloat    currentRasterPositionValid;
-	GLfloat    textureEnvMode;
 	GLfloat    textureEnvColor[4];
 	
 	Journal_PrintfL( stream, 2, "In func %s OpenglMode is is %d\n", __func__, mode);

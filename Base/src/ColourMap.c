@@ -289,13 +289,15 @@ void _lucColourMap_Execute( void* colourMap, void* data ) { }
 void _lucColourMap_Destroy( void* colourMap, void* data ) { }
 
 void lucColourMap_GetColourFromValue( void* colourMap, double value, lucColour* colour ) {
-	lucColourMap* self        = colourMap;
+	lucColourMap* self;
 
-    /* Scale value to range [0,1] */
-    float scaledValue = lucColourMap_ScaleValue(colourMap, value);
+	self = colourMap;
 
-    /* Convert scaled value to colour */
-    lucColourMap_GetColourFromScaledValue(colourMap, scaledValue, colour );
+	/* Scale value to range [0,1] */
+	float scaledValue = lucColourMap_ScaleValue(colourMap, value);
+
+	/* Convert scaled value to colour */
+	lucColourMap_GetColourFromScaledValue(colourMap, scaledValue, colour );
 }
 
 float lucColourMap_ScaleValue( void* colourMap, double value ) {

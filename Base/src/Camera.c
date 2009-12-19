@@ -288,7 +288,6 @@ void _lucCamera_Initialise( void* camera, void* data ) {
 void _lucCamera_Execute( void* camera, void* data ) { }
 
 void _lucCamera_Destroy( void* camera, void* data ) {
-	lucCamera* self = camera;
 }
 
 void lucCamera_Zoom( void* camera, double zoomFactor ) {

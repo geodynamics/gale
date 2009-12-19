@@ -151,12 +151,11 @@ void _lucLightInteraction_MouseMessage( void* windowInteraction, Stream* stream 
 
 
 void _lucLightInteraction_KeyboardEvent( void* WindowInteraction, lucWindow* window, char key, Pixel_Index xpos, Pixel_Index ypos) {
-	lucLightInteraction*   self = (lucLightInteraction*) WindowInteraction;
+	lucLightInteraction*   self;
 	lucViewportInfo*            viewportInfo;
 	lucViewport*                viewport;
 	Coord                       coord;
 	lucLight*                   light;
-	Stream*                     stream = Journal_MyStream( Info_Type, self );
 	Light_Index                 light_I;
 	Light_Index                 lightCount;
 	float                       posX = 0;
@@ -166,6 +165,7 @@ void _lucLightInteraction_KeyboardEvent( void* WindowInteraction, lucWindow* win
 	int                         i;
 	Light_Index                  currentLight_I=0;
 
+	self = (lucLightInteraction*) WindowInteraction;
 
 	/* This function works when the key pressed is one of  'x', 'y, 'z', 'l', 'm', 'n'*/
 	if ( ( key != 'x' )&&( key != 'y' ) && ( key != 'z' ) && ( key != 'k' ) && ( key != 'l' ) &&( key != 'm') &&( key != 'p')&&( key !='w') )
@@ -243,27 +243,22 @@ void _lucLightInteraction_KeyboardEvent( void* WindowInteraction, lucWindow* win
 	
 	if (key == 'p' ){
 		/* prints the light position */
-	        glGetLightfv(GL_LIGHT0 + currentLight_I, GL_POSITION, initialPosition);
-	        printf(" position by glGET is %.2f, %.2f, %.2f, %.2f \n", initialPosition[0], initialPosition[1], initialPosition[2], initialPosition[3]);
+		glGetLightfv(GL_LIGHT0 + currentLight_I, GL_POSITION, initialPosition);
+		printf(" position by glGET is %.2f, %.2f, %.2f, %.2f \n", initialPosition[0], initialPosition[1], initialPosition[2], initialPosition[3]);
 	}
 	/* Retrieves the light corresponding to the currentLightIndex */
 	currentLight_I = lucLight_Register_GetCurrentLightIndex( viewport->light_Register );
 	light = lucLight_Register_GetByIndex( viewport->light_Register, currentLight_I );
 	lucLight_Position(light, currentLight_I, posX, posY, posZ, 0);
 
-        float position[4];
-	
-	//glGetLightfv(GL_LIGHT0, GL_POSITION, position);
+	/*float position[4];
+	glGetLightfv(GL_LIGHT0, GL_POSITION, position); */
 	
 	printf(" Position for light index %d is %.2f, %.2f, %.2f, %.2f \n", currentLight_I, light->position[0],  light->position[1],  light->position[2],  light->position[3]);
 	printf(" SpotCutOff is %.2f \n", light->spotCutOff);
 
-
-
 	/* Get spatial coordinate that the user clicked on */
 	lucViewportInfo_GetCoordFromPixel( viewportInfo, xpos, ypos, coord );
-
-	
 }
 
 void _lucLightInteraction_KeyboardMessage( void* windowInteraction, Stream* stream ) {
@@ -279,11 +274,6 @@ void _lucLightInteraction_KeyboardMessage( void* windowInteraction, Stream* stre
 			"m:                            Decreases the Y position of the light by 0.5.\n" );
 	Journal_Printf( stream,
 			"n:                            Decreases the Z position of the light by 0.5.\n" );
-
-
-
-                         
-
 }
 
 

@@ -323,11 +323,10 @@ void lucMeshViewer_PrintAllElementsNumber( void* drawingObject, Partition_Index 
 #endif
 
 void lucMeshViewer_PrintAllNodesNumber( void* drawingObject ) {
-	lucMeshViewer* self = (lucMeshViewer*)drawingObject;
-	FeMesh *mesh = (FeMesh*)self->mesh;
-	double* coord;
-	char nodeNumString[100];
-	unsigned node_lI, nodeLocalCount, dim;
+	lucMeshViewer*	self = (lucMeshViewer*)drawingObject;
+	double*			coord;
+	char				nodeNumString[100];
+	unsigned			node_lI, nodeLocalCount, dim;
 
 	glDisable(GL_LIGHTING); /*if the lighting is not disabled, the colour won't appear for the numbers*/
     lucSetFontCharset(FONT_SMALL);

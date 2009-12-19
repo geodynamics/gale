@@ -56,7 +56,6 @@ const Type LucPlugin_Type = "LucPlugin";
 /** Special run function which replaces the abstract context's normal one */
 void lucPlugin_VisualOnlyRun( Context* _context ) {
 	DomainContext*  context = (DomainContext*)_context;
-	double                  dt = 0;
 	double                  dtLoadedFromFile = 0;
 	Index                   fieldVar_I;
 	FieldVariable*          fieldVar;

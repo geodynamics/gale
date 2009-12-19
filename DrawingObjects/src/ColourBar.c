@@ -275,7 +275,7 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 	int                      	startx, starty;
 	char                     string[20];
 	int i = 0;
-	AbstractContext*         context       = (AbstractContext*) _context;
+	/* AbstractContext*         context = (AbstractContext*) _context; */
 
 	/* Only get master to draw colour bar - /
 	if ( context->rank != MASTER ) return; */

@@ -150,18 +150,22 @@ void _lucMeshViewerInteraction_MouseMessage( void* windowInteraction, Stream* st
 
 
 void _lucMeshViewerInteraction_KeyboardEvent( void* windowInteraction, lucWindow* window, char key, Pixel_Index xpos, Pixel_Index ypos) {
-	lucMeshViewerInteraction*   self = (lucMeshViewerInteraction*) windowInteraction;
+	lucMeshViewerInteraction*   self;
 	lucViewportInfo*            viewportInfo;
 	lucViewport*                viewport;
-	Coord                       coord;
 	lucDrawingObject*           object;
 	lucMeshViewer*	            meshViewer;
-	Stream*                     stream = Journal_MyStream( Info_Type, self );
 	DrawingObject_Index         object_I;
 	DrawingObject_Index         objectCount;
 
+	self = (lucMeshViewerInteraction*) windowInteraction;
+ 
+	/*
+	Coord		coord;
+	Stream* 	stream = Journal_MyStream( Info_Type, self );
 	unsigned nodeNumber;
 	unsigned elementNumber;
+	*/
 	
 	/* Declare a rank index */
 	/* TODO Disabled for now 
@@ -170,7 +174,7 @@ void _lucMeshViewerInteraction_KeyboardEvent( void* windowInteraction, lucWindow
 
 	
 	/* Stuff to construct the layout */
-	Partition_Index		maxRank = 0;
+	/* Partition_Index		maxRank = 0; */
 
 	/* This function works when the key pressed is 'r' */
 	/* TODO Will re instore the 'p' key later */

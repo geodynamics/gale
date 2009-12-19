@@ -335,11 +335,12 @@ void _lucWindow_Build( void* window, void* data ) {
 }
 
 void _lucWindow_Initialise( void* window, void* data ) {
-	lucWindow*           self            = (lucWindow*)window;
+	lucWindow* self;
 
-    lucDeleteFont(); 
+	self = (lucWindow*)window;
+
+	lucDeleteFont(); 
 	lucSetupRasterFont();
-
 }
 
 void _lucWindow_Execute( void* window, void* data ) { 

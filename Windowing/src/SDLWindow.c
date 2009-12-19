@@ -272,10 +272,8 @@ void _lucSDLWindow_Display( void* window ) {
   #endif
 }
 
-int _lucSDLWindow_EventsWaiting( void* window )
-{
+int _lucSDLWindow_EventsWaiting( void* window ) {
 	/* Check for events without removing from queue */
-	int numevents = 0;
 	SDL_Event events[10];
 	SDL_PumpEvents();
 	return SDL_PeepEvents(events, 10, SDL_PEEKEVENT, SDL_ALLEVENTS);
@@ -375,7 +373,9 @@ void _lucSDLWindow_Resize( void* window ) {
 
 /* Timer callback */
 Uint32 lucSDLWindow_IdleTimer(Uint32 interval, void* param) {
-	lucSDLWindow*        self = (lucSDLWindow*) param; 
+	lucSDLWindow* self;
+
+	self = (lucSDLWindow*) param; 
 
     /* Create a user event and post */
     SDL_Event event;
