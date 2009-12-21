@@ -197,6 +197,8 @@ void ModulesManager_Load( void* modulesManager, void* _dictionary, Name contextN
 	Index newEnvPathLength;
 	Index dir_I;
 
+	newEnvPathLength = 0;
+
 	if( dictionary ) {
 		Dictionary_Entry_Value* localLibDirList = Dictionary_Get( dictionary, "LD_LIBRARY_PATH" );
 		if( localLibDirList ) {
