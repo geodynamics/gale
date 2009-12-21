@@ -29,3 +29,4 @@
 ./analyticTest.pl TempDiffusion.xml -optionsFile np-2.dat
 ./analyticTest.pl TempDiffusion.xml -optionsFile np-4.dat
 ./analyticTest.pl TempDiffusion.xml -optionsFile np-8.dat
+./checkpointTest.pl Multigrid.xml
