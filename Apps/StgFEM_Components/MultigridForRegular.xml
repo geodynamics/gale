@@ -10,7 +10,7 @@
 
      <list name="plugins" mergeType="merge">
         <struct>
-            <param name="Type">Experimental_Multigrid</param>
+            <param name="Type">StgFEM_Multigrid</param>
             <param name="Context">context</param>
         </struct>
      </list>

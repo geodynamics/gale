@@ -741,7 +741,9 @@ void PETScMGSolver_DestructLevels( PETScMGSolver* self ) {
 		if( level->R != PETSC_NULL && level->R != level->P )
                     MatDestroy( level->R );
 		if( level->P != PETSC_NULL ) MatDestroy( level->P );
+/*
 		if( level->A != PETSC_NULL ) MatDestroy( level->A );
+*/
 
 		//FreeObject( level->workRes );
 		//FreeObject( level->workSol );

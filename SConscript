@@ -101,6 +101,7 @@ dirs = ['libStgFEM/Toolbox',
      'plugins/Output/PrintFeVariableDiscreteValues',
      'plugins/Output/PrintFeVariableDiscreteValues_2dBox',
      'plugins/StandardConditionFunctions',
+     'plugins/Multigrid',
      'SysTest/AnalyticPlugins/CosineHillRotate',
      'SysTest/AnalyticPlugins/HomogeneousNaturalBCs',
      'SysTest/AnalyticPlugins/AdvDiffSteadyState1D',
@@ -266,3 +267,4 @@ env.PCUTest('tests/testStgFEM', suites,
 env.Install('lib/StGermain/StgFEM', Glob('Apps/StgFEM_Components/*.xml'))
 
 #env.ConvergenceTest('SysTest/PerformanceTests/testAll.sh')
+env.IntegrationTest('SysTest/RegressionTests/testAll.sh')
