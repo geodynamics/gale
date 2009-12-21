@@ -52,6 +52,7 @@
 
 Bool Underworld_Utils_Finalise( void ) {
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+   _Stg_ObjectList_Delete( repRequiredRawFields_Reg );
 	
 	return True;
 }
