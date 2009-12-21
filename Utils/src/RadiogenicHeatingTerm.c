@@ -7,6 +7,7 @@
 #include <PICellerator/PopulationControl/PopulationControl.h>
 #include <PICellerator/Weights/Weights.h>
 #include <PICellerator/MaterialPoints/MaterialPoints.h>
+#include <PICellerator/Utils/Utils.h>
 
 #include "types.h"
 #include "RadiogenicHeatingTerm.h"
