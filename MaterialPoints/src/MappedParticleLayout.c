@@ -49,15 +49,18 @@
 const Type MappedParticleLayout_Type = "MappedParticleLayout";
 
 MappedParticleLayout* MappedParticleLayout_New( 
-      Name name, 
-      AbstractContext* context,
-      CoordSystem      coordSystem,
-      Bool             weightsInitialisedAtStartup) {
+	Name					name, 
+	AbstractContext*	context,
+	CoordSystem			coordSystem,
+	Bool					weightsInitialisedAtStartup )
+{
 
    MappedParticleLayout* self = _MappedParticleLayout_DefaultNew( name ); 
 
    _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
    _MappedParticleLayout_Init( self );
+
+	return self;
 }
 MappedParticleLayout* _MappedParticleLayout_New(  MAPPEDPARTICLELAYOUT_DEFARGS  )
 {

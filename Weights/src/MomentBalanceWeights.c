@@ -65,16 +65,18 @@ const Type MomentBalanceWeights_Type = "MomentBalanceWeights";
 */
 
 MomentBalanceWeights* MomentBalanceWeights_New( Name name, Dimension_Index dim, WeightsCalculator* backupWeights ) {
-    MomentBalanceWeights* self = _MomentBalanceWeights_DefaultNew( name );
+	MomentBalanceWeights* self = _MomentBalanceWeights_DefaultNew( name );
 
-    self->isConstructed = True;
-    _WeightsCalculator_Init( self, dim );
-    _MomentBalanceWeights_Init( self, backupWeights );
+	self->isConstructed = True;
+	_WeightsCalculator_Init( self, dim );
+	_MomentBalanceWeights_Init( self, backupWeights );
+
+	return self;
 }
 
 MomentBalanceWeights* _MomentBalanceWeights_New(  MOMENTBALANCEWEIGHTS_DEFARGS  ) {
-    MomentBalanceWeights* self;
-
+	MomentBalanceWeights* self;
+	
     /* Allocate memory */
     assert( _sizeOfSelf >= sizeof(MomentBalanceWeights) );
     self = (MomentBalanceWeights*)_WeightsCalculator_New(  WEIGHTSCALCULATOR_PASSARGS  ); 

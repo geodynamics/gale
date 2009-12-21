@@ -113,6 +113,7 @@ IntegrationPointsSwarm* IntegrationPointsSwarm_New(
          swarmVariable_Register,
          comm, 
          ics_dummy );
+
    _IntegrationPointsSwarm_Init( 
       self,
       mesh, 
@@ -121,8 +122,9 @@ IntegrationPointsSwarm* IntegrationPointsSwarm_New(
       mapper,
       materials_Register,
       recalculateWeights );
-}
 
+	return self;
+}
 
 void* _IntegrationPointsSwarm_DefaultNew( Name name ) {
 	/* Variables set in this function */

@@ -143,6 +143,8 @@ PCDVC* PCDVC_New(
     _WeightsCalculator_Init( self, dim );
     _DVCWeights_Init( self, res );
     _PCDVC_Init( self, mps, upT, lowT, maxDeletions, maxSplits, splitInInterfaceCells, deleteInInterfaceCells, Inflow, CentPosRatio, ParticlesPerCell, Threshold );
+
+	return self;
 }
 
 PCDVC* _PCDVC_New(  PCDVC_DEFARGS  ) {

@@ -43,11 +43,13 @@ const Type VolumeWeights_Type = "VolumeWeights";
 ** Constructors
 */
 VolumeWeights* VolumeWeights_New( Name name, Dimension_Index dim, Stg_Shape* shape, FeMesh* mesh ) {
-    VolumeWeights *self = _VolumeWeights_DefaultNew( name );
+	VolumeWeights *self = _VolumeWeights_DefaultNew( name );
 
-    self->isConstructed = True;
-    _WeightsCalculator_Init( self, dim );
-    _VolumeWeights_Init( self, shape, mesh );
+	self->isConstructed = True;
+	_WeightsCalculator_Init( self, dim );
+	_VolumeWeights_Init( self, shape, mesh );
+
+	return self;
 }
 
 VolumeWeights* _VolumeWeights_New(  VOLUMEWEIGHTS_DEFARGS  ) {

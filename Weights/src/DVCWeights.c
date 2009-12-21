@@ -80,11 +80,13 @@ const Type DVCWeights_Type = "DVCWeights";
 ** Constructors
 */
 DVCWeights* DVCWeights_New( Name name, Dimension_Index dim, int *res ) {
-    DVCWeights *self = _DVCWeights_DefaultNew( name );
+	DVCWeights *self = _DVCWeights_DefaultNew( name );
 
-    self->isConstructed = True;
-    _WeightsCalculator_Init( self, dim );
-    _DVCWeights_Init( self, res );
+	self->isConstructed = True;
+	_WeightsCalculator_Init( self, dim );
+	_DVCWeights_Init( self, res );
+
+	return self;
 }
 
 DVCWeights* _DVCWeights_New(  DVCWEIGHTS_DEFARGS  ) {
