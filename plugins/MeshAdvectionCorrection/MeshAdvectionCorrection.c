@@ -105,7 +105,7 @@ void MeshAdvectionCorrection_AddCorrection( FeVariable* velocityField, double* o
 	}
 }
 
-MeshAdvectionCorrection_StoreCurrentVelocity( FeVariable *velocityField, double *oldVelocity ) {
+void MeshAdvectionCorrection_StoreCurrentVelocity( FeVariable *velocityField, double *oldVelocity ) {
 	/* save the current values of the velocity field in the oldVelocity array */
 	FeMesh *mesh = velocityField->feMesh;
 	unsigned dof = velocityField->fieldComponentCount;
