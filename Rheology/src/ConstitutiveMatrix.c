@@ -102,7 +102,7 @@ void _ConstitutiveMatrix_Init(
       self->integrationSwarm->name );
 
    Journal_Firewall(
-      Stg_Class_IsInstance( ((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, OneToOneMapper_Type ),
+      Stg_Class_IsInstance( ((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, OneToOneMapper_Type ) || Stg_Class_IsInstance( ((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, OneToManyMapper_Type ),
       Journal_MyStream( Error_Type, self ),
       "Error In %s - ConstitutiveMatrix %s cannot use %s. ConstitutiveMatrix only works with IntegrationPointsSwarms"
       " which uses one-to-one mapping\n",
