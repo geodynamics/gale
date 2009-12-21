@@ -201,6 +201,7 @@ int _ElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned 
 		normal[K_AXIS] = +1.0;
 		return 5;
 	}
+	return 0;
 }
 
 int ElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {

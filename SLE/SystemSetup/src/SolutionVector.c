@@ -263,7 +263,7 @@ void SolutionVector_ApplyBCsToVariables( void* solutionVector, void* data ) {
 }
 
 /* from the depreciated Vector class */
-_SolutionVector_VectorView( Vec v, Stream* stream ) {
+void _SolutionVector_VectorView( Vec v, Stream* stream ) {
 	unsigned	entry_i;
 	PetscInt	size;
 	PetscScalar*	array;

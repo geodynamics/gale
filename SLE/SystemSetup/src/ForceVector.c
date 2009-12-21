@@ -364,7 +364,7 @@ void ForceVector_PrintElementForceVector(
 }
 
 /* from the depreciated Vector class */
-_ForceVector_VectorView( Vec v, Stream* stream ) {
+void _ForceVector_VectorView( Vec v, Stream* stream ) {
 	unsigned	entry_i;
 	PetscInt	size;
 	PetscScalar*	array;

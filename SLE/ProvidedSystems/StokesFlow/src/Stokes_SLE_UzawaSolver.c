@@ -375,7 +375,7 @@ void _remove_constant_nullsp( Vec v )
 }
 
 /* from the depreciated Vector class */
-_SLE_VectorView( Vec v, Stream* stream ) {
+void _SLE_VectorView( Vec v, Stream* stream ) {
 	unsigned	entry_i;
 	PetscInt	size;
 	PetscScalar*	array;
