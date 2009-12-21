@@ -71,7 +71,7 @@ void CommonRoutinesSuite_Teardown( CommonRoutinesSuiteData* data ) {
 }
 
 
-CommonRoutinesSuite_TestLMS( CommonRoutinesSuiteData* data ) {
+void CommonRoutinesSuite_TestLMS( CommonRoutinesSuiteData* data ) {
    pcu_check_true( 1 == Stg_LongestMatchingSubsequenceLength( "Acrobat", "BOAT", True ) );
    pcu_check_true( 6 == Stg_LongestMatchingSubsequenceLength( "Abracadabra", "Yabbadabbadoo", True ) );
    pcu_check_true( 7 == Stg_LongestMatchingSubsequenceLength( "Abracadabra", "Yabbadabbadoo", False ) );
@@ -79,7 +79,7 @@ CommonRoutinesSuite_TestLMS( CommonRoutinesSuiteData* data ) {
 }
 
 
-CommonRoutinesSuite_TestStringIsNumeric( CommonRoutinesSuiteData* data ) {
+void CommonRoutinesSuite_TestStringIsNumeric( CommonRoutinesSuiteData* data ) {
    pcu_check_true( False == Stg_StringIsNumeric( "nan" ) );
    pcu_check_true( True == Stg_StringIsNumeric( "567" ) );
    pcu_check_true( True == Stg_StringIsNumeric( "1.0e90" ) );
@@ -90,7 +90,7 @@ CommonRoutinesSuite_TestStringIsNumeric( CommonRoutinesSuiteData* data ) {
 }
  
   
-CommonRoutinesSuite_TestStringIsEmpty( CommonRoutinesSuiteData* data ) {
+void CommonRoutinesSuite_TestStringIsEmpty( CommonRoutinesSuiteData* data ) {
    pcu_check_true( True  == Stg_StringIsEmpty( "\t \n" ) );
    pcu_check_true( False == Stg_StringIsEmpty( "asdf" ) );
    pcu_check_true( True  == Stg_StringIsEmpty( "    " ) );
@@ -99,7 +99,7 @@ CommonRoutinesSuite_TestStringIsEmpty( CommonRoutinesSuiteData* data ) {
 }
 
 
-CommonRoutinesSuite_TestStG_RoundDoubleToNDecimalPlaces( CommonRoutinesSuiteData* data ) {
+void CommonRoutinesSuite_TestStG_RoundDoubleToNDecimalPlaces( CommonRoutinesSuiteData* data ) {
    double roundedValue;
    double errorMargin;
    Index testValue_I;
@@ -126,7 +126,7 @@ CommonRoutinesSuite_TestStG_RoundDoubleToNDecimalPlaces( CommonRoutinesSuiteData
 }
 
 
-CommonRoutinesSuite_TestStG_RoundDoubleToNSigFigs( CommonRoutinesSuiteData* data ) {
+void CommonRoutinesSuite_TestStG_RoundDoubleToNSigFigs( CommonRoutinesSuiteData* data ) {
    double roundedValue;
    double errorMargin;
    Index testValue_I;
