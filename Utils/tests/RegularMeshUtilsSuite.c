@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned	rank;
-	unsigned	nProcs;
+	int		rank;
+	int		nProcs;
 } RegularMeshUtilsSuiteData;
 
 Mesh* RegularMeshUtilsSuite_buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {

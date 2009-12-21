@@ -59,8 +59,8 @@ typedef struct {
 	RandomParticleLayout*		randomParticleLayout;
 	Swarm*							swarm;
 	MPI_Comm							comm;
-	unsigned int					rank;
-	unsigned int					nProcs;
+	int								rank;
+	int								nProcs;
 } SwarmSuiteData;
 
 Mesh* SwarmSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {

@@ -61,8 +61,8 @@ double SingleAttractorSuite_Dt( void* context ) {
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned	rank;
-	unsigned	nProcs;
+	int		rank;
+	int		nProcs;
 } SingleAttractorSuiteData;
 
 void SingleAttractorSuite_Setup( SingleAttractorSuiteData* data ) {

@@ -687,7 +687,8 @@ Bool Mesh_Algorithms_SearchGeneral( void* algorithms, double* point,
 Bool Mesh_Algorithms_SearchWithTree( void* _self, double* pnt, unsigned* dim, unsigned* el ) {
    Mesh_Algorithms* self = (Mesh_Algorithms*)_self;
    int nEls, *els;
-   unsigned curDim, curRank, curEl;
+   unsigned curDim, curEl;
+	int curRank;
    int nLocals, owner;
    int ii;
 

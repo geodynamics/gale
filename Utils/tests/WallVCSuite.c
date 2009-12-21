@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 } WallVCSuiteData;
 
 void WallVCSuite_quadratic(Index index, Variable_Index var_I, void* context, void* result) {
@@ -57,7 +57,6 @@ void WallVCSuite_quadratic(Index index, Variable_Index var_I, void* context, voi
 void WallVCSuite_exponential(Index index, Variable_Index var_I, void* context, void* result) {
 	*(double *)result = 30.0;
 }
-
 
 Mesh* WallVCSuite_buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
 	CartesianGenerator*	gen;

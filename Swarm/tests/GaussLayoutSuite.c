@@ -54,8 +54,8 @@ typedef struct {
 	double minCrds[3];
 	double maxCrds[3];
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		 rank;
+	int		 nProcs;
 } GaussLayoutSuiteData;
 
 Mesh* GaussLayoutSuite_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {

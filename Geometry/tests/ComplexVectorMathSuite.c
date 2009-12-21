@@ -52,8 +52,8 @@ Will use %.5f formatting */
 
 typedef struct {
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 } ComplexVectorMathSuiteData;
 
 void ComplexVectorMathSuite_Setup( ComplexVectorMathSuiteData* data ) {

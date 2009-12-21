@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 } CompositeVCSuiteData;
 
 void CompositeVCSuite_quadratic(Index index, Variable_Index var_I, void* context, void* result) {

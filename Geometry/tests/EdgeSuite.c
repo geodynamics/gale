@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 } EdgeSuiteData;
 
 void EdgeSuite_Setup( EdgeSuiteData* data ) {

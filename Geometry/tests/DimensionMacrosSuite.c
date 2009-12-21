@@ -45,9 +45,9 @@
 #include "DimensionMacrosSuite.h"
 
 typedef struct {
-	MPI_Comm			comm;
-	unsigned int	rank;
-	unsigned int	nProcs;
+	MPI_Comm	comm;
+	int		rank;
+	int		nProcs;
 } DimensionMacrosSuiteData;
 
 void DimensionMacrosSuite_testDimensionMacros_DoOneTest( IJK coord, IJK meshSize, Stream* stream ) {

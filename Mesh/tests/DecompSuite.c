@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 } DecompSuiteData;
 
 void DecompSuite_Setup( DecompSuiteData* data ) {

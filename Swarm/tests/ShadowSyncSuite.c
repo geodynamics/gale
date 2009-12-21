@@ -55,8 +55,8 @@ struct _Particle {
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned	rank;
-	unsigned	nProcs;
+	int		rank;
+	int		nProcs;
 } ShadowSyncSuiteData;
 
 void ShadowSyncSuite_ValidateShadowing( DomainContext* context );

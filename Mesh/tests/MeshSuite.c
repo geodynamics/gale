@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 } MeshSuiteData;
 
 int MeshSuite_findOwner( Mesh* mesh, int vert ) {

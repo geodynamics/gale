@@ -50,8 +50,8 @@ struct _Particle {
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 } ParticleCoordsSuiteData;
 
 void ParticleCoordsSuite_Setup( ParticleCoordsSuiteData* data ) {
