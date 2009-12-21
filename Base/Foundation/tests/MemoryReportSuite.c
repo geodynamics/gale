@@ -64,7 +64,7 @@ typedef struct StructC StructC;
 typedef struct {
    Memory*                 savedStgMemory;
    MemoryReport*           report;
-   unsigned int            rank;   
+   int							rank;   
    void*                   bytesObj;
    void*                   bytesArray;
    StructA*                object;

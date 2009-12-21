@@ -43,8 +43,8 @@
 
 
 typedef struct {
-   Stg_MemMonitor*   mm;
-   unsigned int      rank;   
+   Stg_MemMonitor*	mm;
+   int					rank;   
 } MemMonitorSuiteData;
 
 

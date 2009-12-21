@@ -39,8 +39,8 @@
 #include "MPIRoutinesSuite.h"
 
 typedef struct {
-   unsigned rank;
-   unsigned nProcs;
+   int rank;
+   int nProcs;
 } MPIRoutinesSuiteData;
 
 void MPIRoutinesSuite_Setup( MPIRoutinesSuiteData* data ) {

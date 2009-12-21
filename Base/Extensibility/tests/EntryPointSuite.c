@@ -45,9 +45,9 @@ Stream* stream;
 #define NUM_TEST_FUNCS 10
 
 typedef struct {
-   EntryPoint*    ep;
-   Bool           testFuncsRan[NUM_TEST_FUNCS];
-   unsigned int   rank;
+   EntryPoint*	ep;
+   Bool			testFuncsRan[NUM_TEST_FUNCS];
+   int			rank;
 } EntryPointSuiteData;
 
 void TestHook0( EntryPointSuiteData* data ) {

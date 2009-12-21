@@ -12,8 +12,8 @@ typedef struct {
    FILE*          testStdOutFile;
    FILE*          testStdErrFile;
    MPI_Comm       comm;
-   unsigned int   rank;
-   unsigned int   nProcs;
+   int				rank;
+   int 				nProcs;
 } JournalSuiteData;
 
 #endif

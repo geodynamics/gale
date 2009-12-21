@@ -42,7 +42,7 @@
 typedef struct {
    HierarchyTable*   hTable;
    HierarchyTable*   savedHierarchyTable;
-   unsigned int      rank;
+   int					rank;
 } HierarchyTableSuiteData;
 
 

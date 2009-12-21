@@ -42,7 +42,7 @@
 #include "PathUtilsSuite.h"
 
 typedef struct {
-   unsigned int   rank;
+   int rank;
 } PathUtilsSuiteData;
 
 

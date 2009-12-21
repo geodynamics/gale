@@ -42,7 +42,7 @@
 #include "DictionaryCheckSuite.h"
 
 typedef struct {
-   unsigned int   rank;
+   int rank;
 } DictionaryCheckSuiteData;
 
 void DictionaryCheckSuite_Setup( DictionaryCheckSuiteData* data ) {
