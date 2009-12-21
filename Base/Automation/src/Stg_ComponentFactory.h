@@ -292,6 +292,8 @@
 
 	Bool Stg_ComponentFactory_PluginGetBool( void* cf, void *codelet, Dictionary_Entry_Key key, Bool defaultVal );
 
+        char* Stg_ComponentFactory_PluginGetString( void* cf, void* codelet, Dictionary_Entry_Key key, const char* const defaultVal );
+
 	#define Stg_ComponentFactory_ConstructByNameWithKeyFallback( \
 		cf, parentComponentName, componentTrialName, componentFallbackKey, type, isEssential, data ) \
 		(type*) ( (Stg_ComponentFactory*) cf )->constructByNameWithKeyFallback( \

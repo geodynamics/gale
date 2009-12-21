@@ -911,6 +911,12 @@ Bool Stg_ComponentFactory_PluginGetBool( void* cf, void *codelet, Dictionary_Ent
                                                                 Dictionary_Entry_Value_FromBool( defaultVal ) ) );
 }
 
+char* Stg_ComponentFactory_PluginGetString( void* cf, void* codelet, Dictionary_Entry_Key key, const char* const defaultVal ) {
+	return Dictionary_Entry_Value_AsString( 
+            _Stg_ComponentFactory_PluginGetDictionaryValue( cf, codelet, key,
+                                                            Dictionary_Entry_Value_FromString( defaultVal ) ) );
+}
+
 Stg_Component* _Stg_ComponentFactory_ConstructByNameWithKeyFallback( 
 		void*			cf, 
 		Name 			parentComponentName, 
