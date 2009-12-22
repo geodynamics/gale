@@ -8,7 +8,7 @@ from config import Package, packages, cc
 options = [
     ('--prefix', 'prefix', 'Installation prefix.', None),
     ('--build-dir', 'build_dir', 'Sandbox location.', 'build'),
-    ('--build-type', 'build_type', 'Build type (debug or optimised)', 'debug'),
+    ('--with-debug', 'with_debug', 'Build with debugging', 0, 'int'),
     ('--lib-type', 'lib_type', 'Library type (shared or static)', 'shared'),
     ('--cc', 'CC', 'C compiler', None),
     ('--cflags', 'CFLAGS', 'Flags for the C compiler', None),
@@ -79,7 +79,7 @@ if not (GetOption('help') or GetOption('clean')):
     if env.get('with_cautious_mode', None):
         env.MergeFlags('-DCAUTIOUS')
 
-    if env.get('build_type', None) == 'debug':
+    if env.get('with_debug', None):
         env.MergeFlags('-g -DDEBUG')
     else:
         env.MergeFlags('-O3 -DNDEBUG')
