@@ -242,4 +242,4 @@ env.PCUTest('tests/testPICellerator', suites,
 
 env.Install('lib/StGermain/PICellerator', Glob('Apps/src/*.xml'))
 
-env.IntegrationTest('SysTest/RegressionTests/testAll.sh')
+env.IntegrationTest('SysTest/RegressionTests/testAll.py')
