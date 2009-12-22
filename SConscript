@@ -271,4 +271,4 @@ env.PCUTest('tests/testStgFEM', suites,
 env.Install('lib/StGermain/StgFEM', Glob('Apps/StgFEM_Components/*.xml'))
 
 #env.ConvergenceTest('SysTest/PerformanceTests/testAll.sh')
-env.IntegrationTest('SysTest/RegressionTests/testAll.sh')
+env.IntegrationTest('SysTest/RegressionTests/testAll.py')
