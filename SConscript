@@ -287,28 +287,11 @@ env.Install('lib/StGermain/Underworld/Viewports', Glob('InputFiles/Viewports/*.x
 #
 
 # Setup low resolution integration tests
-env.LowResTest('SysTest/RegressionTests/systest.pl Anisotropic.xml -optionsFile lowres_np1.dat -D lowres_expected')
-env.LowResTest('SysTest/RegressionTests/systest.pl Arrhenius.xml -optionsFile lowres_np1.dat -D lowres_expected')
-env.LowResTest('SysTest/RegressionTests/systest.pl ArrheniusPIC.xml -optionsFile lowres_np1.dat -D lowres_expected')
-env.LowResTest('SysTest/RegressionTests/systest.pl CylinderRiseThermal.xml -optionsFile lowres_np1.dat -D lowres_expected')
-env.LowResTest('SysTest/RegressionTests/systest.pl DepthDependentViscosity.xml -optionsFile lowres_np1.dat -D lowres_expected')
-env.LowResTest('SysTest/RegressionTests/systest.pl Extension.xml -optionsFile lowres_np1.dat -D lowres_expected')
-env.LowResTest('SysTest/RegressionTests/systest.pl FrankKamenetskii.xml -optionsFile lowres_np1.dat -D lowres_expected')
-env.LowResTest('SysTest/RegressionTests/systest.pl InternalHeating.xml -optionsFile lowres_np1.dat -D lowres_expected')
-env.LowResTest('SysTest/RegressionTests/systest.pl MobileLid.xml -optionsFile lowres_np1.dat -D lowres_expected')
-env.LowResTest('SysTest/RegressionTests/systest.pl MultiThermalDiffusivity.xml -optionsFile lowres_np1.dat -D lowres_expected')
-env.LowResTest('SysTest/RegressionTests/systest.pl MultiComponent.xml -optionsFile lowres_np1.dat -D lowres_expected')
-env.LowResTest('SysTest/RegressionTests/systest.pl NonNewtonian.xml -optionsFile lowres_np1.dat -D lowres_expected')
-env.LowResTest('SysTest/RegressionTests/systest.pl NonNewtonianPicard.xml -optionsFile lowres_np1.dat -D lowres_expected')
-#env.LowResTest('SysTest/RegressionTests/systest.pl PeriodicBenchmark.xml -optionsFile lowres_np1.dat -D lowres_expected')
-env.LowResTest('SysTest/RegressionTests/systest.pl RayleighTaylorBenchmark.xml -optionsFile lowres_np1.dat -D lowres_expected')
-env.LowResTest('SysTest/RegressionTests/systest.pl ThermoChemBenchmark.xml -optionsFile lowres_np1.dat -D lowres_expected')
+env.LowResTest('SysTest/RegressionTests/testAll-lowres.py')
+
+# Setup normal resolution integration tests
+env.IntegrationTest('SysTest/RegressionTests/testAll.py')
 
 # Setup convergence tests
-env.ConvergenceTest('SysTest/PerformanceTests/runAndTestConvergence.pl testVelicSolA.xml -optionsFile OFile2D.dat')
-env.ConvergenceTest('SysTest/PerformanceTests/runAndTestConvergence.pl testVelicSolB.xml -optionsFile OFile2D.dat')
-env.ConvergenceTest('SysTest/PerformanceTests/runAndTestConvergence.pl testVelicSolCx.xml -optionsFile OFile2D.dat')
-env.ConvergenceTest('SysTest/PerformanceTests/runAndTestConvergence.pl testVelicSolKz.xml -optionsFile OFile2D.dat')
-env.ConvergenceTest('SysTest/PerformanceTests/runAndTestConvergence.pl testVelicSolS.xml -optionsFile OFile2D.dat')
-env.ConvergenceTest('SysTest/PerformanceTests/runAndTestConvergence.pl testDepthDependentViscosity3D_Exponential.xml -optionsFile OFile3D.dat')
+env.ConvergenceTest('SysTest/PerformanceTests/testAll.py')
 
