@@ -28,7 +28,12 @@ def runTests():
                 './analyticTest.pl Trubitsyn2006Isoviscous.xml -optionsFile np-1.dat', \
                 './analyticTest.pl Trubitsyn2006Isoviscous.xml -optionsFile np-2.dat', \
                 './analyticTest.pl Trubitsyn2006Isoviscous.xml -optionsFile np-4.dat', \
-                './analyticTest.pl Trubitsyn2006Isoviscous.xml -optionsFile np-8.dat' ]
+                './analyticTest.pl Trubitsyn2006Isoviscous.xml -optionsFile np-8.dat', \
+                './restartTest.pl Arrhenius.xml', \
+                './restartTest.pl DepthDependentViscosity.xml', \
+                './restartTest.pl Extension.xml', \
+                './restartTest.pl NonNewtonian.xml', \
+                './restartTest.pl RayleighTaylorBenchmark.xml' ]
 
     for command in commands:
         os.system( command )
