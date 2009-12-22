@@ -4,23 +4,23 @@ import os
 
 def runTests():
 
-    commands = ['./checkpointTest.pl Anisotropic.xml', \
-                './checkpointTest.pl Arrhenius.xml', \
-                './checkpointTest.pl Arrhenius.xml -optionsFile np-2.dat', \
-                './checkpointTest.pl ArrheniusPIC.xml', \
-                './checkpointTest.pl CylinderRiseThermal.xml ', \
-                './checkpointTest.pl DepthDependentViscosity.xml', \
-                './checkpointTest.pl Extension.xml', \
-                './checkpointTest.pl FrankKamenetskii.xml', \
-                './checkpointTest.pl InternalHeating.xml', \
-                './checkpointTest.pl MobileLid.xml', \
-                './checkpointTest.pl MultiThermalDiffusivity.xml', \
-                './checkpointTest.pl MultiComponent.xml', \
-                './checkpointTest.pl NonNewtonian.xml', \
-                './checkpointTest.pl NonNewtonianPicard.xml', \
-                './checkpointTest.pl RayleighTaylorBenchmark.xml', \
-                './checkpointTest.pl RayleighTaylorBenchmark.xml -optionsFile np-2.dat', \
-                './checkpointTest.pl ThermoChemBenchmark.xml', \
+    commands = ['./systest.pl Anisotropic.xml -n 10', \
+                './systest.pl Arrhenius.xml -n 10', \
+                './systest.pl Arrhenius.xml -optionsFile np-2.dat -n 10', \
+                './systest.pl ArrheniusPIC.xml -n 10', \
+                './systest.pl CylinderRiseThermal.xml -n 10 ', \
+                './systest.pl DepthDependentViscosity.xml -n 10', \
+                './systest.pl Extension.xml -n 10', \
+                './systest.pl FrankKamenetskii.xml -n 10', \
+                './systest.pl InternalHeating.xml -n 10', \
+                './systest.pl MobileLid.xml -n 10', \
+                './systest.pl MultiThermalDiffusivity.xml -n 10', \
+                './systest.pl MultiComponent.xml -n 10', \
+                './systest.pl NonNewtonian.xml -n 10', \
+                './systest.pl NonNewtonianPicard.xml -n 10', \
+                './systest.pl RayleighTaylorBenchmark.xml -n 10', \
+                './systest.pl RayleighTaylorBenchmark.xml -optionsFile np-2.dat -n 10', \
+                './systest.pl ThermoChemBenchmark.xml -n 10', \
                 './analyticTest.pl NonNewtonianShear.xml -optionsFile np-1.dat', \
                 './analyticTest.pl NonNewtonianShear.xml -optionsFile np-2.dat', \
                 './analyticTest.pl NonNewtonianShear.xml -optionsFile np-4.dat', \
