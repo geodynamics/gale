@@ -214,8 +214,9 @@
       <param name="MaterialPointsSwarm">materialSwarm</param>
     </struct>
     <struct name="materialSwarmParticleLayout">
-      <param name="Type">SpaceFillerParticleLayout</param>
-      <param name="averageInitialParticlesPerCell">particlesPerCell</param>
+      <param name="Type">MeshParticleLayout</param>
+      <param name="cellParticleCount">particlesPerCell</param>
+      <param name="mesh">mesh-linear</param>
     </struct>
     <struct name="pMovementHandler">
       <param name="Type">ParticleMovementHandler</param>
