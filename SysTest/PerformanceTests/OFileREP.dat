@@ -1,0 +1,7 @@
+# this line is a comment
+# np x, where x is the number of procs to run test
+# everything after will be passed as a command line arg
+np 1 testREP.xml --elementResI=16 --elementResJ=16  --components.constitutiveMatrix.storeConstitutiveMatrix=0 --components.recoveredSigmaField.useStoredConstitutive=0
+np 2 testREP.xml --elementResI=32 --elementResJ=32  --components.constitutiveMatrix.storeConstitutiveMatrix=0 --components.recoveredSigmaField.useStoredConstitutive=0
+np 1 testREP.xml --elementResI=64 --elementResJ=64  --components.constitutiveMatrix.storeConstitutiveMatrix=0 --components.recoveredSigmaField.useStoredConstitutive=0
+np 2 testREP.xml --elementResI=128 --elementResJ=128  --components.constitutiveMatrix.storeConstitutiveMatrix=0 --components.recoveredSigmaField.useStoredConstitutive=0
