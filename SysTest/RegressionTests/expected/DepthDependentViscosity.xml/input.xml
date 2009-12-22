@@ -5,13 +5,41 @@
     <toolbox>Underworld</toolbox>
   </import>
   <plugins>
-    <plugin>StgFEM_StandardConditionFunctions</plugin>
-    <plugin>Underworld_Ra_Scaling</plugin>
-    <plugin>StgFEM_FrequentOutput</plugin>
-    <plugin>Underworld_Nusselt</plugin>
-    <plugin>Underworld_Vrms</plugin>
-    <plugin>StgFEM_CPUTime</plugin>
-    <plugin>lucPlugin</plugin>
+    <element type="struct">
+      <element type="param" name="Type">StgFEM_StandardConditionFunctions</element>
+      <element type="param" name="Context">context</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">Underworld_Ra_Scaling</element>
+      <element type="param" name="Context">context</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">StgFEM_FrequentOutput</element>
+      <element type="param" name="Context">context</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">Underworld_Nusselt</element>
+      <element type="param" name="Context">context</element>
+      <element type="param" name="GaussSwarm">gaussSwarm</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">Underworld_Vrms</element>
+      <element type="param" name="Context">context</element>
+      <element type="param" name="GaussSwarm">gaussSwarm</element>
+      <element type="param" name="VelocityField">VelocityField</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">StgFEM_CPUTime</element>
+      <element type="param" name="Context">context</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">lucPlugin</element>
+      <element type="param" name="Context">lucPluginContext</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">lucPlugin</element>
+      <element type="param" name="Context">lucPluginContext</element>
+    </element>
   </plugins>
   <components>
     <element type="struct" name="constantMesh">
@@ -361,6 +389,9 @@
       <element type="param" name="Swarm">gaussSwarm</element>
       <element type="param" name="Ra">Ra</element>
     </element>
+    <element type="struct" name="context">
+      <element type="param" name="Type">UnderworldContext</element>
+    </element>
     <element type="struct" name="rheology">
       <element type="param" name="Type">DepthDependentViscosity</element>
       <element type="param" name="Mesh">linearMesh</element>
@@ -445,6 +476,9 @@
       <element type="param" name="xFontName">-adobe-helvetica-bold-r-normal--14-140-75-75-p-82-iso8859-1</element>
       <element type="param" name="Viewport">TemperatureAndVelocityArrowsVP</element>
     </element>
+    <element type="struct" name="tester">
+      <element type="param" name="Type">FieldTest</element>
+    </element>
   </components>
   <element type="param" name="velocityMesh">linearMesh</element>
   <element type="param" name="elementMesh">linearMesh</element>
@@ -457,10 +491,11 @@
     <element type="param">TemperatureField</element>
     <element type="param">TemperatureField-phiDotField</element>
   </element>
+  <element type="param" name="lucPluginContext">context</element>
   <element type="param" name="maxTimeSteps">10</element>
-  <element type="param" name="outputPath">./expected/DepthDependentViscosity.xml</element>
+  <element type="param" name="outputPath">./expected//DepthDependentViscosity.xml</element>
   <element type="param" name="dumpEvery">0</element>
-  <element type="param" name="checkpointEvery">10</element>
+  <element type="param" name="checkpointEvery">0</element>
   <element type="param" name="Ra">1e7</element>
   <element type="param" name="courantFactor">0.25</element>
   <element type="param" name="journal.info.Context-verbose">True</element>
@@ -598,18 +633,35 @@
   <element type="param" name="gaussParticlesZ">2</element>
   <element type="param" name="particlesPerCell">20</element>
   <element type="struct" name="pluginData">
+    <element type="list" name="NumericFields">
+      <element type="param">VelocityField</element>
+      <element type="param">0</element>
+      <element type="param">PressureField</element>
+      <element type="param">1</element>
+      <element type="param">TemperatureField</element>
+      <element type="param">2</element>
+    </element>
+    <element type="param" name="IntegrationSwarm">gaussSwarm</element>
+    <element type="param" name="ConstantMesh">constantMesh</element>
+    <element type="param" name="testTimestep">10</element>
+    <element type="param" name="ElementMesh">linearMesh</element>
+    <element type="param" name="normaliseByAnalyticSolution">True</element>
+    <element type="param" name="context">context</element>
     <element type="param" name="appendToAnalysisFile">True</element>
+    <element type="param" name="useReferenceSolutionFromFile">true</element>
+    <element type="param" name="referenceSolutionFilePath">./expected//DepthDependentViscosity.xml</element>
+    <element type="list" name="ReferenceFields">
+      <element type="param">VelocityField</element>
+      <element type="param">PressureField</element>
+      <element type="param">TemperatureField</element>
+    </element>
   </element>
+  <element type="param" name="pauseToAttachDebugger">0</element>
   <element type="param" name="outputEvery">1</element>
+  <element type="param" name="saveDataEvery">0</element>
   <element type="param" name="checkpointAtTimeInc">0</element>
   <element type="param" name="experimentName">experiment</element>
-  <element type="param" name="checkpointPath">./expected/DepthDependentViscosity.xml</element>
-  <element type="param" name="checkpointReadPath">./expected/DepthDependentViscosity.xml</element>
-  <element type="param" name="checkpointWritePath">./expected/DepthDependentViscosity.xml</element>
-  <element type="param" name="startTime">0</element>
-  <element type="param" name="stopTime">0</element>
-  <element type="param" name="finalTimeStep">0</element>
-  <element type="param" name="restartTimestep">0</element>
-  <element type="param" name="checkPointPrefixString"></element>
-  <element type="param" name="timestepFactor">1</element>
+  <element type="param" name="checkpointAppendStep">false</element>
+  <element type="param" name="interpolateRestart">false</element>
+  <element type="param" name="outputFlattenedXML">true</element>
 </StGermainData>

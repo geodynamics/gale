@@ -576,6 +576,9 @@
         <element type="param">ParticleDensityVP</element>
       </element>
     </element>
+    <element type="struct" name="tester">
+      <element type="param" name="Type">FieldTest</element>
+    </element>
   </components>
   <element type="param" name="velocityMesh">linearMesh</element>
   <element type="param" name="elementMesh">linearMesh</element>
@@ -588,10 +591,10 @@
     <element type="param">TemperatureField</element>
     <element type="param">TemperatureField-phiDotField</element>
   </element>
-  <element type="param" name="maxTimeSteps">10</element>
-  <element type="param" name="outputPath">./expected/ThermoChemBenchmark.xml</element>
+  <element type="param" name="maxTimeSteps">5</element>
+  <element type="param" name="outputPath">./expected//ThermoChemBenchmark.xml</element>
   <element type="param" name="dumpEvery">0</element>
-  <element type="param" name="checkpointEvery">10</element>
+  <element type="param" name="checkpointEvery">0</element>
   <element type="param" name="RaT">3.0e5</element>
   <element type="param" name="RaC">4.5e5</element>
   <element type="param" name="courantFactor">0.25</element>
@@ -750,16 +753,34 @@
   </element>
   <element type="param" name="lucPluginContext">context</element>
   <element type="struct" name="pluginData">
+    <element type="list" name="NumericFields">
+      <element type="param">VelocityField</element>
+      <element type="param">0</element>
+      <element type="param">PressureField</element>
+      <element type="param">1</element>
+      <element type="param">TemperatureField</element>
+      <element type="param">2</element>
+    </element>
+    <element type="param" name="IntegrationSwarm">gaussSwarm</element>
+    <element type="param" name="ConstantMesh">constantMesh</element>
+    <element type="param" name="testTimestep">5</element>
+    <element type="param" name="ElementMesh">linearMesh</element>
+    <element type="param" name="normaliseByAnalyticSolution">True</element>
+    <element type="param" name="context">context</element>
     <element type="param" name="appendToAnalysisFile">True</element>
+    <element type="param" name="useReferenceSolutionFromFile">true</element>
+    <element type="param" name="referenceSolutionFilePath">./expected//ThermoChemBenchmark.xml</element>
+    <element type="list" name="ReferenceFields">
+      <element type="param">VelocityField</element>
+      <element type="param">PressureField</element>
+      <element type="param">TemperatureField</element>
+    </element>
   </element>
-  <element type="param" name="timestepFactor">1</element>
+  <element type="param" name="pauseToAttachDebugger">0</element>
   <element type="param" name="outputEvery">1</element>
   <element type="param" name="saveDataEvery">0</element>
   <element type="param" name="checkpointAtTimeInc">0</element>
   <element type="param" name="experimentName">experiment</element>
-  <element type="param" name="checkpointPath">./expected/ThermoChemBenchmark.xml</element>
-  <element type="param" name="checkpointReadPath">./expected/ThermoChemBenchmark.xml</element>
-  <element type="param" name="checkpointWritePath">./expected/ThermoChemBenchmark.xml</element>
   <element type="param" name="checkpointAppendStep">false</element>
   <element type="param" name="interpolateRestart">false</element>
   <element type="param" name="outputFlattenedXML">true</element>

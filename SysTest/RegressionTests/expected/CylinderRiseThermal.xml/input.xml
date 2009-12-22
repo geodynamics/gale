@@ -39,6 +39,10 @@
       <element type="param" name="Type">lucPlugin</element>
       <element type="param" name="Context">lucPluginContext</element>
     </element>
+    <element type="struct">
+      <element type="param" name="Type">lucPlugin</element>
+      <element type="param" name="Context">lucPluginContext</element>
+    </element>
   </plugins>
   <components>
     <element type="struct" name="constantMesh">
@@ -416,6 +420,71 @@
       <element type="param" name="Swarm">gaussSwarm</element>
       <element type="param" name="gravity">gravity</element>
     </element>
+    <element type="struct" name="camera">
+      <element type="param" name="Type">lucCamera</element>
+      <element type="param" name="coordX">-0.8594</element>
+      <element type="param" name="coordY">1.6687</element>
+      <element type="param" name="coordZ">2.7159</element>
+      <element type="param" name="focalPointX">1</element>
+      <element type="param" name="focalPointY">0.5</element>
+      <element type="param" name="focalPointZ">0.5</element>
+    </element>
+    <element type="struct" name="temperatureColourMap">
+      <element type="param" name="Type">lucColourMap</element>
+      <element type="param" name="colours">Blue White Red</element>
+      <element type="param" name="dynamicRange">y</element>
+    </element>
+    <element type="struct" name="crosssection">
+      <element type="param" name="Type">lucScalarFieldCrossSection</element>
+      <element type="param" name="ColourMap">temperatureColourMap</element>
+      <element type="param" name="FieldVariable">TemperatureField</element>
+      <element type="param" name="crossSection">z=0.5</element>
+      <element type="param" name="resolution">256</element>
+    </element>
+    <element type="struct" name="border">
+      <element type="param" name="Type">lucFieldVariableBorder</element>
+      <element type="param" name="FieldVariable">VelocityField</element>
+    </element>
+    <element type="struct" name="temperatureColourBar">
+      <element type="param" name="Type">lucColourBar</element>
+      <element type="param" name="ColourMap">temperatureColourMap</element>
+    </element>
+    <element type="struct" name="cylinderRiseThermalTitle">
+      <element type="param" name="Type">lucTitle</element>
+      <element type="param" name="string">Cylinder Rise Thermal</element>
+    </element>
+    <element type="struct" name="CylinderRiseThermalVP">
+      <element type="param" name="Type">lucViewport</element>
+      <element type="param" name="Camera">camera</element>
+      <element type="list" name="DrawingObject">
+        <element type="param">crosssection</element>
+        <element type="param">border</element>
+        <element type="param">temperatureColourBar</element>
+        <element type="param">cylinderRiseThermalTitle</element>
+      </element>
+    </element>
+    <element type="struct" name="renderingEngine">
+      <element type="param" name="Type">lucRenderingEngineGL</element>
+    </element>
+    <element type="struct" name="imageOutput">
+      <element type="param" name="Type">lucOutputPNG</element>
+    </element>
+    <element type="struct" name="window">
+      <element type="param" name="Type">lucDefaultWindow</element>
+      <element type="param" name="RenderingEngine">renderingEngine</element>
+      <element type="list" name="OutputFormat">
+        <element type="param">imageOutput</element>
+      </element>
+      <element type="param" name="height">400</element>
+      <element type="param" name="width">800</element>
+      <element type="param" name="backgroundColour">white</element>
+      <element type="param" name="interactive">False</element>
+      <element type="param" name="xFontName">-adobe-helvetica-bold-r-normal--14-140-75-75-p-82-iso8859-1</element>
+      <element type="param" name="Viewport">CylinderRiseThermalVP</element>
+    </element>
+    <element type="struct" name="tester">
+      <element type="param" name="Type">FieldTest</element>
+    </element>
   </components>
   <element type="param" name="velocityMesh">linearMesh</element>
   <element type="param" name="elementMesh">linearMesh</element>
@@ -440,8 +509,8 @@
   <element type="param" name="journal-level-branch.debug.Swarm">2</element>
   <element type="param" name="maxTimeSteps">10</element>
   <element type="param" name="dumpEvery">0</element>
-  <element type="param" name="outputPath">./expected/CylinderRiseThermal.xml</element>
-  <element type="param" name="checkpointEvery">10</element>
+  <element type="param" name="outputPath">./expected//CylinderRiseThermal.xml</element>
+  <element type="param" name="checkpointEvery">0</element>
   <element type="param" name="dim">3</element>
   <element type="param" name="elementResI">12</element>
   <element type="param" name="elementResJ">12</element>
@@ -550,16 +619,35 @@
   </element>
   <element type="param" name="CentroidMaterial">cylinderMaterial</element>
   <element type="struct" name="pluginData">
+    <element type="list" name="NumericFields">
+      <element type="param">VelocityField</element>
+      <element type="param">0</element>
+      <element type="param">PressureField</element>
+      <element type="param">1</element>
+      <element type="param">TemperatureField</element>
+      <element type="param">2</element>
+    </element>
+    <element type="param" name="IntegrationSwarm">gaussSwarm</element>
+    <element type="param" name="ConstantMesh">constantMesh</element>
+    <element type="param" name="testTimestep">10</element>
+    <element type="param" name="ElementMesh">linearMesh</element>
+    <element type="param" name="normaliseByAnalyticSolution">True</element>
+    <element type="param" name="context">context</element>
     <element type="param" name="appendToAnalysisFile">True</element>
+    <element type="param" name="useReferenceSolutionFromFile">true</element>
+    <element type="param" name="referenceSolutionFilePath">./expected//CylinderRiseThermal.xml</element>
+    <element type="list" name="ReferenceFields">
+      <element type="param">VelocityField</element>
+      <element type="param">PressureField</element>
+      <element type="param">TemperatureField</element>
+    </element>
   </element>
-  <element type="param" name="timestepFactor">1</element>
+  <element type="param" name="pauseToAttachDebugger">0</element>
   <element type="param" name="outputEvery">1</element>
   <element type="param" name="saveDataEvery">0</element>
   <element type="param" name="checkpointAtTimeInc">0</element>
   <element type="param" name="experimentName">experiment</element>
-  <element type="param" name="checkpointPath">./expected/CylinderRiseThermal.xml</element>
-  <element type="param" name="checkpointReadPath">./expected/CylinderRiseThermal.xml</element>
-  <element type="param" name="checkpointWritePath">./expected/CylinderRiseThermal.xml</element>
   <element type="param" name="checkpointAppendStep">false</element>
   <element type="param" name="interpolateRestart">false</element>
+  <element type="param" name="outputFlattenedXML">true</element>
 </StGermainData>

@@ -549,8 +549,8 @@
     </element>
   </element>
   <element type="param" name="lucPluginContext">context</element>
-  <element type="param" name="maxTimeSteps">10</element>
-  <element type="param" name="outputPath">./expected//Extension.xml</element>
+  <element type="param" name="maxTimeSteps">5</element>
+  <element type="param" name="outputPath">lowres_expected/Extension.xml</element>
   <element type="param" name="dumpEvery">0</element>
   <element type="param" name="checkpointEvery">0</element>
   <element type="param" name="nonLinearMaxIterations">500</element>
@@ -560,9 +560,9 @@
   <element type="param" name="journal-enable-branch.debug.StgFEM">t</element>
   <element type="param" name="journal-level-branch.debug.StgFEM">2</element>
   <element type="param" name="dim">2</element>
-  <element type="param" name="elementResI">64</element>
-  <element type="param" name="elementResJ">32</element>
-  <element type="param" name="elementResK">1</element>
+  <element type="param" name="elementResI">10</element>
+  <element type="param" name="elementResJ">10</element>
+  <element type="param" name="elementResK">10</element>
   <element type="param" name="shadowDepth">1</element>
   <element type="param" name="minX">0.0</element>
   <element type="param" name="minY">0.0</element>
@@ -654,13 +654,13 @@
     </element>
     <element type="param" name="IntegrationSwarm">gaussSwarm</element>
     <element type="param" name="ConstantMesh">constantMesh</element>
-    <element type="param" name="testTimestep">10</element>
+    <element type="param" name="testTimestep">5</element>
     <element type="param" name="ElementMesh">linearMesh</element>
     <element type="param" name="normaliseByAnalyticSolution">True</element>
     <element type="param" name="context">context</element>
     <element type="param" name="appendToAnalysisFile">True</element>
     <element type="param" name="useReferenceSolutionFromFile">true</element>
-    <element type="param" name="referenceSolutionFilePath">./expected//Extension.xml</element>
+    <element type="param" name="referenceSolutionFilePath">lowres_expected/Extension.xml</element>
     <element type="list" name="ReferenceFields">
       <element type="param">VelocityField</element>
       <element type="param">PressureField</element>
