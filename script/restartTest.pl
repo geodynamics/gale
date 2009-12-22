@@ -12,20 +12,19 @@ sub readOptionsFile;
 
 
 ##### GLOBAL VARS #####
-our $testReport = "[Bitten] purpose=test current numerical fields against previously checkpoint fields of this model\n";
+our $testReport = "[Bitten] purpose=test checkpoint restarts by restarting a simulation and checking that its final state is consistent with that achieved by integrating straight through.\n";
 our $cvgFileName = "";
-our $helpStr = "To run checkpoint tests:
+our $helpStr = "To run restart tests:
 
-./$ARGV[0] <xmlFile> [ OPTIONS ]
+./restartTest.pl <xmlFile> [ OPTIONS ]
 
 where OPTIONS:
 	-optionsFile <fileName>   : where <fileName> is the options file. Command line agruments in StGermain format.
-	-c                        : will \"create\" checkpointed data only. By default this flag in not set and the script only checks against previous checkpointed data.  
-	-n                        : the timestep checkpoint writing (if -c is defined) or checkpoint testing will occur on. By default this is timestep 10.  
+	-n                        : the timestep checkpoint writing (if -c is defined). testing will occur at twice this timestep
 	-h                        : this help message
 
 EXAMPLE:
-  ./checkpointTest.pl testVelicSolS.xml -optionsFile OFile.dat
+  ./restartTest.pl RayleighTaylorBenchmark.xml -optionsFile OFile.dat
 		(Runs with option file OFile.dat and checks against the expected file)
 	
 ";
@@ -44,29 +43,27 @@ exit &testConvergence( $cvgFileName );
 sub runTests {
 	my $res;
 	my $command;
-	my $createTest=0; #boolean to create an expected file, defaut 0
 
 	# read commandline args
 	my $arg;
 	my $ii = 0;
 	my $xmlFile = " ";
 	my $optFile = " ";
-	my $numberOfTimeSteps = 5; # testing Timestep is 10 by default
+	my $checkpointAndRestartAt = 10; # how often to checkpoint (and timestep to restart at)	
 	my @procs = (1,1,1,1);
 	my @commandLines = ""; #("--elementResI=32 --elementResJ=32 " );
-	my $outputPath = "./expected/";
+	my $outputPath = " ";
 												
 	# check if xml exists and options file is specified
-   for( $ii = 0 ; $ii < scalar(@ARGV) ; $ii++ ) {
-      $arg = $ARGV[$ii];
+	foreach $arg (@ARGV) {
 		if( $arg =~ m/.*\.xml$/ ) { $xmlFile = $arg; }
 		elsif( $arg =~ m/\-optionsFile/ ) { $optFile = $ARGV[$ii+1]; $ii++; }
 		elsif( $arg =~ m/^\-h$/ ) { print $helpStr; exit }
 		elsif( $arg =~ m/^\-\-help$/ ) { print $helpStr; exit }
-		elsif( $arg =~ m/^\-c/ ) { $createTest=1; }
-		elsif( $arg =~ m/^\-n/ ) { $numberOfTimeSteps=$ARGV[$ii+1]; $ii++; }
-		elsif( $arg =~ m/^\-D/ ) { $outputPath=$ARGV[$ii+1]; $ii++; }
+		elsif( $arg =~ m/^\-n/ ) { $checkpointAndRestartAt=$ARGV[$ii+1]; $ii++; }
+		$ii++;
 	}
+	my $numberOfTimeSteps = 2*$checkpointAndRestartAt; # testing timestep is twice that of checkpoint	
 	if( $xmlFile eq " " ) { die "\n\n### ERROR ###\nNo xml file specified, stopped" ; }
 	if( !(-e $xmlFile) ) { die "\n\n### ERROR ###\nCannot find input file: $xmlFile, stopped" ; }
 
@@ -83,12 +80,10 @@ sub runTests {
 	my $stdout;
 	my $stderr;
 
-   $outputPath = $outputPath."/$xmlFile";
-
-	# create strings for 1) creating checkpoint data & 2) testing against checkpointed data
-	my $xmlSegmentCreateTest = "<StGermainData xmlns=\"http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003\">
-		<param name=\"checkpointEvery\" mergeType=\"replace\">$numberOfTimeSteps</param>
-		<param name=\"outputPath\" mergeType=\"replace\">$outputPath</param>
+	# create strings for 1) initial full run & 2) restart run, and testing against checkpointed data
+	my $xmlSegmentInitialRun = "<StGermainData xmlns=\"http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003\">
+		<param name=\"checkpointEvery\" mergeType=\"replace\">$checkpointAndRestartAt</param>
+		<param name=\"outputPath\" mergeType=\"replace\">./restartTestInitialOutput/$xmlFile</param>
 		<param name=\"maxTimeSteps\" mergeType=\"replace\">$numberOfTimeSteps</param>
 		<param name=\"dumpEvery\" mergeType=\"replace\">0</param>
 </StGermainData>";
@@ -99,10 +94,12 @@ sub runTests {
 		</struct>	
 	</struct>
 
-	<param name=\"outputPath\" mergeType=\"replace\">$outputPath</param>
-	<param name=\"checkpointEvery\" mergeType=\"replace\">0</param>
+	<param name=\"outputPath\" mergeType=\"replace\">./restartTestRestartOutput/$xmlFile</param>
+	<param name=\"checkpointReadPath\" mergeType=\"replace\">./restartTestInitialOutput/$xmlFile</param>
+	<param name=\"checkpointEvery\" mergeType=\"replace\">$checkpointAndRestartAt</param>
+	<param name=\"restartTimestep\" mergeType=\"replace\">$checkpointAndRestartAt</param>
 	<param name=\"dumpEvery\" mergeType=\"replace\">0</param>
-	<param name=\"maxTimeSteps\" mergeType=\"replace\">$numberOfTimeSteps</param>
+	<param name=\"maxTimeSteps\" mergeType=\"replace\">$checkpointAndRestartAt</param>
 	<struct name=\"pluginData\" mergeType=\"replace\">
 		<list name=\"NumericFields\">
 			<param>VelocityField</param> <param>0</param>
@@ -118,7 +115,7 @@ sub runTests {
 		<param name=\"appendToAnalysisFile\">True</param>
 		<!-- reference soln stuff -->
 		<param name=\"useReferenceSolutionFromFile\">true</param>
-		<param name=\"referenceSolutionFilePath\">$outputPath</param>
+		<param name=\"referenceSolutionFilePath\">./restartTestInitialOutput/$xmlFile</param>
 		<list name=\"ReferenceFields\">
 			<param>VelocityField</param>
 			<param>PressureField</param>
@@ -128,21 +125,22 @@ sub runTests {
 </StGermainData>";
 
 	# Need to check for an executable
-	if( !(-e "./../../../build/bin/StGermain" ) ) {
-		die "\n\n### ERROR ###\nCan't find ./../../../build/bin/StGermain - the executable which runs the test, stopped";
+	my $stg_exec = $ENV{'STG_EXEC'}; 
+	if( !(-e "./../../../build/bin/StGermain" ) && !(-e $stg_exec ) ) {
+		die "\n\n### ERROR ###\nCan not find the StGermain executable, stopped.\n If not in default location, set an environment variable STG_EXEC pointing to executable.\n ";
 	}
 
-	if( $createTest ) {
-		print "\n--- Creating checkpoint files for $xmlFile at timestep $numberOfTimeSteps---\n";
-	} else {
-		print "\n--- Testing the $xmlFile ---\n";
-	}
+	print "\n--- Testing the $xmlFile ---\n";
 
 	# is the symbolic link there, if not create it
 	if( !(-e $exec) ) {
-		$command = "ln -s ../../../build/bin/StGermain $exec";
-		print "\n$command\n\n";
-		&executeCommandline( $command );
+		if(-e "./../../../build/bin/StGermain" ) {
+			$command = "ln -s ../../../build/bin/StGermain $exec";
+			&executeCommandline( $command );
+		} elsif(-e $stg_exec) {
+			$command = "ln -s $stg_exec $exec";
+			&executeCommandline( $command );			
+		}
 	}	
 
 	# check if there's a log dir
@@ -167,16 +165,44 @@ sub runTests {
 		&executeCommandline( $command );
 	} 
 
-	# create help.xml for setting up test
-	if( $createTest ) {
-		$command = "echo \'$xmlSegmentCreateTest\' > help.xml ";
-	} else {
-		$command = "echo \'$xmlSegmentToTest\' > help.xml ";
-	}
+	# create help.xml for initial run
+	$command = "echo \'$xmlSegmentInitialRun\' > help.xml ";
 	&executeCommandline($command);
 
-	# run test case
-	$command = "mpiexec -n $procs[0] ./$exec $xmlFile help.xml $commandLines[0] --pluginData.appendToAnalysisFile=True >$stdout";
+	print "\n--- Performing the initial run, checkpointing every $checkpointAndRestartAt steps, running for $numberOfTimeSteps steps ---\n";
+
+	# perform initial run
+	$command = "mpiexec -n $procs[0] ./$exec $xmlFile help.xml $commandLines[0] >$stdout";
+	$command .= " 2>$stderr";
+	print "$command";
+	&executeCommandline( $command );
+
+	# check error stream for error result
+	open( ERROR, "<$stderr" );
+	my $line2;
+	foreach $line2 (<ERROR>) {
+		if( $line2 =~ m/[E|e]rror/ ) {
+			close(ERROR); 
+			die ("\n\n### ERROR ###\nError in runtime: see $stderr or $stdout - stopped" ); 
+		}
+	}
+
+	# if no error close file and delete it
+	close(ERROR); 
+	$command = "rm $stderr"; &executeCommandline($command);
+
+	# removing help.xml
+	$command = "rm help.xml";
+	&executeCommandline($command);
+
+	# create help.xml for restart run
+	$command = "echo \'$xmlSegmentToTest\' > help.xml ";
+	&executeCommandline($command);
+
+	print "\n\n--- Performing the restart run, restarting at step $checkpointAndRestartAt and comparing with initial run at step $numberOfTimeSteps ---\n";
+
+	# perform restart run
+	$command = "mpiexec -n $procs[0] ./$exec $xmlFile help.xml $commandLines[0] >$stdout";
 	$command .= " 2>$stderr";
 	print "$command";
 	&executeCommandline( $command );
@@ -197,16 +223,13 @@ sub runTests {
 
 	# removing help.xml
 	$command = "rm help.xml";
-	print "\n$command\n"; &executeCommandline($command);
+	&executeCommandline($command);
 
 	# removing softlink
 	$command = "rm $exec";
-	print "$command\n"; &executeCommandline($command);
+	&executeCommandline($command);
 
-	print "--- Finished  ---\n\n";
-
-	# if we're only creating checkpoint file, end program here
-	if( $createTest ) { exit(0); }
+	print "\n\n--- Finished  ---\n\n";
 
 	$testReport .= "[Bitten] proc=$procs[0]\n";
 
@@ -214,7 +237,7 @@ sub runTests {
 	my $resx;
 	my $resy;
 	my $resz;
-	open( FLATOUTPUT, "$outputPath/input.xml" )
+	open( FLATOUTPUT, "./restartTestRestartOutput/$xmlFile/input.xml" )
 		or die ("\n\n### ERROR ###\n\t\tCouldn't open output file, ./output/$xmlFile/input.xml " );
 
 	my $resolution;
@@ -229,7 +252,7 @@ sub runTests {
 	my @labels;
 	my $label;
 	my $totalTime;
-	my $freqOutput = "./$outputPath/FrequentOutput.dat";
+	my $freqOutput = "./restartTestRestartOutput/$xmlFile/FrequentOutput.dat";
 
 	if( !(-e $freqOutput) ) {
 		die("\n\n### ERROR ###\nCouldn't open $freqOutput");
@@ -253,6 +276,14 @@ sub runTests {
 	if ( defined $resz ) { $testReport .= "[Bitten] resz=$resz\n"; }
 	else { $testReport .= "[Bitten] resz=0\n"; }
 
+	# remove data
+	$command = "rm -f ./restartTestInitialOutput/$xmlFile/*"; &executeCommandline($command);
+	$command = "rm -f ./restartTestRestartOutput/$xmlFile/*"; &executeCommandline($command);
+	$command = "rmdir ./restartTestInitialOutput/$xmlFile";   &executeCommandline($command);
+	$command = "rmdir ./restartTestRestartOutput/$xmlFile";   &executeCommandline($command);
+	$command = "rmdir ./restartTestInitialOutput/";           &executeCommandline($command);
+	$command = "rmdir ./restartTestRestartOutput/";           &executeCommandline($command);
+
 	# return convergence file name
 	$command = "ls *\.cvg 2>/dev/null";
 	my $cvg = &executeCommandline($command);
@@ -270,7 +301,7 @@ sub readOptionsFile {
 	foreach $line (<OPTFILE>) {
 		chomp $line;
 		# only process lines that start with np
-		if( $line =~ m/^np\s+(\d+)(\s*$|\s+(.*))/ ) {
+		if( $line =~ m/^np\s+(\d+)\s+(.*)/ ) {
 			$procs->[$line_I] = $1;
 			$commandLines->[$line_I] = $2;
 			$line_I++;
@@ -282,7 +313,7 @@ sub readOptionsFile {
 sub testConvergence {
  	my $datFile = $_[0]; 
 	my @keys;
-	my $tolerance = 1e-3;
+	my $tolerance = 1e-5;
 	my @errors;
 	my $line;
 	my $nKeys;
