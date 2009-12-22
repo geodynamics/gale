@@ -251,9 +251,13 @@ if env['static_libs']:
 env.PCUTest('tests/testStgFEM', suites,
             PCU_LIBHEADERS="#include <StGermain/StGermain.h>\n#include <StgDomain/StgDomain.h>\n" \
                 "#include <StgFEM/StgFEM.h>",
-            PCU_SETUP="StGermain_Init(&argc, &argv);StgDomain_Init(&argc, &argv);" \
-                "StgFEM_Init(&argc, &argv);",
-            PCU_TEARDOWN="StgFEM_Finalise();StgDomain_Finalise();" \
+            PCU_SETUP="StGermain_Init(&argc, &argv);\nStgDomain_Init(&argc, &argv);\n" \
+                "StgFEM_Init(&argc, &argv);\n\n" \
+                "#ifdef NOSHARED\n" \
+                "   stgfem_register_static_modules();\n" \
+                "   stgdomain_register_static_modules();\n" \
+                "#endif",
+            PCU_TEARDOWN="StgFEM_Finalise();\nStgDomain_Finalise();\n" \
                 "StGermain_Finalise();",
             LIBS=libs,
             PCU_EXP=tst_exp,
