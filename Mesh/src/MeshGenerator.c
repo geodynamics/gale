@@ -146,7 +146,8 @@ void _MeshGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, vo
 	}
 
 	/* Read dimensions and state. */
-	nDims = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "dims", 2 );
+	nDims = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "dim", 2 );
+	nDims = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "dims", nDims );
 	MeshGenerator_SetDimSize( self, nDims );
 	enabledDimsList = Dictionary_Get( dict, "enabledDims" );
 	enabledIncList = Dictionary_Get( dict, "enabledIncidence" );
