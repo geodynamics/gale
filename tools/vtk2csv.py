@@ -74,18 +74,26 @@ def decode(vtk_file):
 
     # Print everything out
     if extents:
-        outfile.write("# %s" % extents)
-    outfile.write("#")
+        outfile.write("# %s\n" % extents)
+    outfile.write("# x, y, z, ")
     for j in components:
-        outfile.write(" %s %d" % (j,components[j]))
+        if j!="Points":
+            if components==1:
+                outfile.write("%s, " % j)
+            else:
+                for k in range(0,components[j]):
+                    outfile.write("%s%d, " % (j,k))
     outfile.write("\n")
     for i in range(0,len(fields["Points"])/3):
+        for n in range(0,3):
+            outfile.write("%s, " % fields["Points"][i*3+n])
         for j in fields:
-            for n in range(0,components[j]):
-                outfile.write(" %s" % fields[j][i*components[j]+n])
+            if j!="Points":
+                for n in range(0,components[j]):
+                    outfile.write("%s, " % fields[j][i*components[j]+n])
         outfile.write("\n")
     # Remove the old vtk file
-    os.path.remove(vtk_file)
+    os.remove(vtk_file)
 
 
 # First open the parallel vtk xml file and write a serial xml file
