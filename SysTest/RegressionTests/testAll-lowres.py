@@ -21,7 +21,7 @@ def runTests():
                   './systest.pl ThermoChemBenchmark.xml -optionsFile lowres_np1.dat -D lowres_expected' ]
 
     for command in commands:
-        os.system( command )
+        os.system( command + ' -serial' )
 
 runTests()
 
