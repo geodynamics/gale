@@ -828,21 +828,18 @@ void _AbstractContext_Execute_Hook( void* _context ) {
 		}	
 		if ( self->checkpointEvery ) {
 			if ( self->timeStep % self->checkpointEvery == 0 ){
-            self->isDataSave = False;
 				AbstractContext_Save( self );
          }
 		}	
 
 		if ( self->saveDataEvery ) {
 			if ( self->timeStep % self->saveDataEvery == 0 ){
-            self->isDataSave = True;
 				AbstractContext_DataSave( self );
          }
 		}	
 
 		if ( self->checkpointAtTimeInc ) {
 			if ( self->currentTime >= self->nextCheckpointTime){
-            self->isDataSave = False;
 				AbstractContext_Save( self );
 				self->nextCheckpointTime += self->checkpointAtTimeInc; 
 			}
