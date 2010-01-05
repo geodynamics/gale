@@ -13,7 +13,7 @@ import os, errno
 import sys
 
 deps = [ 
-	 'gLucifer', 'PICellerator', 'StgDomain' , 'StGermain' , 'StgFEM' , 'Underworld' , 'Experimental' \
+	 '.', 'gLucifer', 'PICellerator', 'StgDomain' , 'StGermain' , 'StgFEM' , 'Underworld' , 'Experimental' \
 		] #, 'Experimental/PDERework/config', 'Experimental/Magma/config' ]
 
 cwd = os.getcwd()
