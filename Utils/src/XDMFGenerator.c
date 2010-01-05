@@ -94,7 +94,8 @@ void XDMFGenerator_GenerateAll( void* _context ) {
       _XDMFGenerator_WriteFieldSchema( context, stream );
 
       /** Write all (checkpointed) FeVariable field information  **/
-      if (context->isDataSave == False) _XDMFGenerator_WriteSwarmSchema( context, stream);
+      if ( (context->timeStep % context->checkpointEvery == 0) || 
+           (context->checkpointAtTimeInc && (context->currentTime >= context->nextCheckpointTime)) ) _XDMFGenerator_WriteSwarmSchema( context, stream);
 
       /** writes footer information and close file/stream **/
       _XDMFGenerator_WriteFooter( context, stream );
@@ -203,7 +204,9 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
 
          if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
             feVar = (FeVariable*)fieldVar;
-            if ( (feVar->isCheckpointedAndReloaded && context->isDataSave==False) || (feVar->isSavedData && context->isDataSave==True) ){
+            if ( (feVar->isCheckpointedAndReloaded && (context->timeStep % context->checkpointEvery == 0))                                     || 
+                 (feVar->isCheckpointedAndReloaded && (context->checkpointAtTimeInc && (context->currentTime >= context->nextCheckpointTime))) ||
+                 (feVar->isSavedData               && (context->timeStep % context->saveDataEvery   == 0)) ){
                FeMesh* feVarMesh = NULL;
                /** check what type of generator was used to know where elementMesh is **/
                if( Stg_Class_IsInstance( feVar->feMesh->generator, C0Generator_Type))        feVarMesh = (FeMesh*)((C0Generator*)feVar->feMesh->generator)->elMesh;
