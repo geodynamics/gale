@@ -19,10 +19,14 @@ our $helpStr = "To run checkpoint tests:
 ./checkpointTest.pl <xmlFile> [ OPTIONS ]
 
 where OPTIONS:
-	-optionsFile <fileName>   : where <fileName> is the options file. Command line agruments in StGermain format.
-	-c                        : will \"create\" checkpointed data only. By default this flag in not set and the script only checks against previous checkpointed data.  
-	-n                        : the timestep checkpoint writing (if -c is defined) or checkpoint testing will occur on. By default this is timestep 10.  
-	-h                        : this help message
+   -optionsFile <fileName>   : where <fileName> is the options file. Command line agruments in StGermain format.
+   -c                        : will \"create\" checkpointed data only. By default this flag in not set and the script only checks against previous checkpointed data.  
+   -n <#>                    : the timestep checkpoint writing (if -c is defined) or checkpoint testing will occur on. By default this is timestep 10.  
+   -np <#>                   : the number of processors to run. (This value will overwrite the number of preocessors given in the optionsFile  
+   -serial                   : will execute test without any mpi binary prefix. (Overwrites \"-np\" option).
+   -h                        : this help message
+
+Also the environment variable \$UNDERWORLD_MPI can be set to specify the mpi binary to be used 
 
 EXAMPLE:
   ./checkpointTest.pl testVelicSolS.xml -optionsFile OFile.dat
@@ -55,16 +59,21 @@ sub runTests {
 	my @procs = (1,1,1,1);
 	my @commandLines = ""; #("--elementResI=32 --elementResJ=32 " );
 	my $outputPath = " ";
+   my $nProcs = -1;
+	my $isSerial = 0;
+	my $mpiBin = $ENV{'UNDERWORLD_MPI'};
 												
 	# check if xml exists and options file is specified
-	foreach $arg (@ARGV) {
+        for( $ii = 0; $ii < scalar(@ARGV); $ii++ ) {
+                $arg = $ARGV[$ii];
 		if( $arg =~ m/.*\.xml$/ ) { $xmlFile = $arg; }
 		elsif( $arg =~ m/\-optionsFile/ ) { $optFile = $ARGV[$ii+1]; $ii++; }
 		elsif( $arg =~ m/^\-h$/ ) { print $helpStr; exit }
 		elsif( $arg =~ m/^\-\-help$/ ) { print $helpStr; exit }
 		elsif( $arg =~ m/^\-c/ ) { $createTest=1; }
 		elsif( $arg =~ m/^\-n/ ) { $numberOfTimeSteps=$ARGV[$ii+1]; $ii++; }
-		$ii++;
+      elsif( $arg =~ m/^\-np/ ) { $nProcs=$ARGV[$ii+1]; $ii++; }
+		elsif( $arg =~ m/^\-serial/ ) { $isSerial=1; }
 	}
 	if( $xmlFile eq " " ) { die "\n\n### ERROR ###\nNo xml file specified, stopped" ; }
 	if( !(-e $xmlFile) ) { die "\n\n### ERROR ###\nCannot find input file: $xmlFile, stopped" ; }
@@ -75,8 +84,15 @@ sub runTests {
 
 		# read in run options file
 		&readOptionsFile( $optFile, \@procs, \@commandLines );
-		print "\nUsing options file $optFile, specifed options are:\n-n $procs[0] "; foreach (@commandLines) { print "$_ "; }
 	}
+
+   # if commandline option np is valid use it
+   if( $nProcs > 0 ) { $procs[0] = $nProcs; }
+   if( $isSerial ) { $procs[0] = 1; }
+
+	if( $optFile ne " " ) {
+		print "\nUsing options file $optFile, specifed options are:\n-n $procs[0] "; foreach (@commandLines) { print "$_ "; }
+   }
 
 	my $exec = "udw"; # executable name
 	my $stdout;
@@ -170,8 +186,16 @@ sub runTests {
 	}
 	&executeCommandline($command);
 
-	# run test case
-	$command = "mpiexec -n $procs[0] ./$exec $xmlFile help.xml $commandLines[0] --pluginData.appendToAnalysisFile=True >$stdout";
+   # run test case
+   if( defined($mpiBin) ) { # if custom mpi is specified use it
+      $command = "$mpiBin -np $procs[0] ./$exec $xmlFile help.xml $commandLines[0] --pluginData.appendToAnalysisFile=True >$stdout";
+   }
+   if( $isSerial ) { # if the serial flag is specified don't add anything parallel
+      $command = "./$exec $xmlFile help.xml $commandLines[0] --pluginData.appendToAnalysisFile=True >$stdout";
+   }
+   if( !defined($mpiBin) && !$isSerial ) { # by default use mpich2 standard
+      $command = "mpiexec -np $procs[0] ./$exec $xmlFile help.xml $commandLines[0] --pluginData.appendToAnalysisFile=True >$stdout";
+   }
 	$command .= " 2>$stderr";
 	print "$command";
 	&executeCommandline( $command );
