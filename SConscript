@@ -294,4 +294,6 @@ env.IntegrationTest('SysTest/RegressionTests/testAll.py')
 
 # Setup convergence tests
 env.ConvergenceTest('SysTest/PerformanceTests/testAll.py')
+env.ConvergenceTest('SysTest/PerformanceTests/repTestAll.py')
+env.ConvergenceTest('SysTest/PerformanceTests/sprTestAll.py')
 
