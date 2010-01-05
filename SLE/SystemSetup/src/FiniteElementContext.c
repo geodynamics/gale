@@ -421,7 +421,9 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 
 		if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
 			feVar = (FeVariable*)fieldVar;	
-			if ( (feVar->isCheckpointedAndReloaded && self->isDataSave==False) || (feVar->isSavedData && self->isDataSave==True) ) {
+         if ( (feVar->isCheckpointedAndReloaded && (self->timeStep % self->checkpointEvery == 0))                                  ||
+              (feVar->isCheckpointedAndReloaded && (self->checkpointAtTimeInc && (self->currentTime >= self->nextCheckpointTime))) ||
+              (feVar->isSavedData               && (self->timeStep % self->saveDataEvery   == 0)) ){
             char*			feVarSaveFileName     = NULL;
             char*			feVarSaveFileNamePart = NULL;   
 
