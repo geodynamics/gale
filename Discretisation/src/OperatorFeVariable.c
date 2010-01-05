@@ -332,7 +332,7 @@ void _OperatorFeVariable_Build( void* feVariable, void* data ) {
 	Index						feVariable_I;
 	Stream*					errorStream = Journal_Register( Error_Type, self->type );
 
-   void _FeVariable_Build( self, data );
+   _FeVariable_Build( self, data );
    
 	for ( feVariable_I = 0 ; feVariable_I < self->feVariableCount ; feVariable_I++ ) 
 		Stg_Component_Build( self->feVariableList[ feVariable_I ] , data, False );
