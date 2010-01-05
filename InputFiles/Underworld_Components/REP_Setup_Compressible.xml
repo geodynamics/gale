@@ -23,7 +23,7 @@ REP_Setup.xml, assumes an incompressible stress, and is 1/3 faster than REP_Setu
 -->
 
 <list name="import" mergeType="mergeType">
-	<param>Experimental</param>
+	<param>Underworld</param>
 </list>
 
 <struct name="components" mergeType="merge">
