@@ -142,3 +142,16 @@ env.Dist("underworld-%s"%env.GetOption("dist_version"),
          ["configure.py", "SConstruct", "config", "script", "StGermain",
           "StgDomain", "StgFEM", "PICellerator", "Underworld",
           "Experimental", "gLucifer"])
+
+#
+# SCons check-related help options.
+#
+Help("""
+SCons-Check Options:
+    Type: './scons.py check' to run the stgUnderworld unit and low-res integration tests only,
+          './scons.py check-complete' to run the stgUnderworld unit, convergence, low-res and normal-res integration tests,
+          './scons.py check-unit' to run the stgUnderworld unit tests only,
+          './scons.py check-convergence' to run the stgUnderworld convergence tests only,
+          './scons.py check-integration' to run the normal-res integration tests,
+          './scons.py check-lowres' to run the low-res integration tests.
+""")
