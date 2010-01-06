@@ -59,7 +59,7 @@
 	/** Rheology class contents - this is defined as a macro so that sub-classes of this class can use this macro at the start of the definition of their struct */
 	#define __Director \
 		/* Parent info */ \
- 		__TimeIntegratee \
+ 		__TimeIntegrand \
 		/* Virtual functions go here */ \
 		/* General Info */\
 		SwarmVariable*				directorSwarmVariable; \
@@ -101,10 +101,10 @@
 	#endif
 
 	#define DIRECTOR_DEFARGS \
-                TIMEINTEGRATEE_DEFARGS
+                TIMEINTEGRAND_DEFARGS
 
 	#define DIRECTOR_PASSARGS \
-                TIMEINTEGRATEE_PASSARGS
+                TIMEINTEGRAND_PASSARGS
 
 	Director* _Director_New(  DIRECTOR_DEFARGS  ) ;
 	

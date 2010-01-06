@@ -67,7 +67,7 @@
 	/** Rheology class contents - this is defined as a macro so that sub-classes of this class can use this macro at the start of the definition of their struct */
 	#define __StrainWeakening \
 		/* Parent info */ \
- 		__TimeIntegratee \
+ 		__TimeIntegrand \
 		/* Virtual functions go here */ \
 		StrainWeakening_CalcIncrementFunction* _calcIncrement;                    \
 		/* General Info */\
@@ -113,11 +113,11 @@
 	#endif
 
 	#define STRAINWEAKENING_DEFARGS \
-                TIMEINTEGRATEE_DEFARGS, \
+                TIMEINTEGRAND_DEFARGS, \
                 StrainWeakening_CalcIncrementFunction*  _calcIncrement
 
 	#define STRAINWEAKENING_PASSARGS \
-                TIMEINTEGRATEE_PASSARGS, \
+                TIMEINTEGRAND_PASSARGS, \
 	        _calcIncrement
 
 	StrainWeakening* _StrainWeakening_New(  STRAINWEAKENING_DEFARGS  ) ;

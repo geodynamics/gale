@@ -109,7 +109,7 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 	UnderworldContext*		uwCtx	= (UnderworldContext*)ed->context;
 	EulerDeform_Context*		edCtx;
 	Variable*					crdVar;
-	TimeIntegratee*			crdAdvector;
+	TimeIntegrand*			crdAdvector;
 	Stg_Component*				tiData[2];
 	unsigned						sys_i;
 	Dictionary_Entry_Value*	edDict;
@@ -217,13 +217,13 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 	for( sys_i = 0; sys_i < edCtx->nSystems; sys_i++ ) {
 		EulerDeform_System*	sys = edCtx->systems + sys_i;
 
-		/* Create a time integratee for the mesh's coordinates. */
+		/* Create a time integrand for the mesh's coordinates. */
 		crdVar = EulerDeform_RegisterLocalNodeCoordsAsVariables( sys, uwCtx->variable_Register, NULL );
 		Stg_Component_Build( crdVar, data, False );
 
 		tiData[0] = (Stg_Component*)sys->velField;
 		tiData[1] = (Stg_Component*)&sys->mesh->verts;
-		crdAdvector = TimeIntegratee_New( "EulerDeform_Velocity", (DomainContext*)uwCtx, edCtx->timeIntegrator, crdVar, 2, tiData, True
+		crdAdvector = TimeIntegrand_New( "EulerDeform_Velocity", (DomainContext*)uwCtx, edCtx->timeIntegrator, crdVar, 2, tiData, True
 			 /* Presume we need to allow fallback on edges of stretching mesh - PatrickSunter, 7 June 2006 */ );
 		crdAdvector->_calculateTimeDeriv = EulerDeform_TimeDeriv;
 
@@ -427,7 +427,7 @@ void EulerDeform_IntegrationSetup( void* _timeIntegrator, void* context ) {
 
 
 Bool EulerDeform_TimeDeriv( void* crdAdvector, Index arrayInd, double* timeDeriv ) {
-	TimeIntegratee*		self = (TimeIntegratee*)crdAdvector;
+	TimeIntegrand*		self = (TimeIntegrand*)crdAdvector;
 	FeVariable*				velocityField = (FeVariable*)self->data[0];
 	InterpolationResult	result = LOCAL;
 
@@ -466,7 +466,7 @@ Bool EulerDeform_TimeDeriv( void* crdAdvector, Index arrayInd, double* timeDeriv
 }
 
 
-void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx ) {
+void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx ) {
 	Mesh_Algorithms	*tmpAlgs, *oldAlgs;
 	unsigned				sys_i;
 

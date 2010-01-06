@@ -146,17 +146,17 @@ void* _BuiterStrainWeakening_DefaultNew( Name name ) {
 	/* Variables set in this function */
 	SizeT                                               _sizeOfSelf = sizeof(BuiterStrainWeakening);
 	Type                                                       type = BuiterStrainWeakening_Type;
-	Stg_Class_DeleteFunction*                               _delete = _TimeIntegratee_Delete;
-	Stg_Class_PrintFunction*                                 _print = _TimeIntegratee_Print;
-	Stg_Class_CopyFunction*                                   _copy = _TimeIntegratee_Copy;
+	Stg_Class_DeleteFunction*                               _delete = _TimeIntegrand_Delete;
+	Stg_Class_PrintFunction*                                 _print = _TimeIntegrand_Print;
+	Stg_Class_CopyFunction*                                   _copy = _TimeIntegrand_Copy;
 	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _BuiterStrainWeakening_DefaultNew;
 	Stg_Component_ConstructFunction*                     _construct = _StrainWeakening_AssignFromXML;
 	Stg_Component_BuildFunction*                             _build = _StrainWeakening_Build;
 	Stg_Component_InitialiseFunction*                   _initialise = _StrainWeakening_Initialise;
-	Stg_Component_ExecuteFunction*                         _execute = _TimeIntegratee_Execute;
-	Stg_Component_DestroyFunction*                         _destroy = _TimeIntegratee_Destroy;
-	TimeIntegratee_CalculateTimeDerivFunction*  _calculateTimeDeriv = _StrainWeakening_TimeDerivative;
-	TimeIntegratee_IntermediateFunction*              _intermediate = _TimeIntegratee_Intermediate;
+	Stg_Component_ExecuteFunction*                         _execute = _TimeIntegrand_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _TimeIntegrand_Destroy;
+	TimeIntegrand_CalculateTimeDerivFunction*  _calculateTimeDeriv = _StrainWeakening_TimeDerivative;
+	TimeIntegrand_IntermediateFunction*              _intermediate = _TimeIntegrand_Intermediate;
 	StrainWeakening_CalcIncrementFunction*           _calcIncrement = _StrainWeakening_CalcIncrementIsotropic;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */

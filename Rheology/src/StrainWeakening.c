@@ -105,7 +105,7 @@ StrainWeakening* _StrainWeakening_New(  STRAINWEAKENING_DEFARGS  )
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
 	assert( _sizeOfSelf >= sizeof(StrainWeakening) );
-	self = (StrainWeakening*) _TimeIntegratee_New(  TIMEINTEGRATEE_PASSARGS  );
+	self = (StrainWeakening*) _TimeIntegrand_New(  TIMEINTEGRAND_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	self->_calcIncrement = _calcIncrement;
@@ -189,7 +189,7 @@ void _StrainWeakening_Init(
 		Memory_Free( variableName );
 	}
 	
-	/* The strain weakening class inherits from the TimeIntegratee class - this class needs a 'Variable' to 
+	/* The strain weakening class inherits from the TimeIntegrand class - this class needs a 'Variable' to 
 	 * integrate through time. For the StrainWeakening component this variable is the 'PostFailureWeakening'
 	 * we need to set this explicitly here */
 	self->variable = self->postFailureWeakening->variable;
@@ -205,17 +205,17 @@ void* _StrainWeakening_DefaultNew( Name name ) {
 	/* Variables set in this function */
 	SizeT                                               _sizeOfSelf = sizeof(StrainWeakening);
 	Type                                                       type = StrainWeakening_Type;
-	Stg_Class_DeleteFunction*                               _delete = _TimeIntegratee_Delete;
-	Stg_Class_PrintFunction*                                 _print = _TimeIntegratee_Print;
-	Stg_Class_CopyFunction*                                   _copy = _TimeIntegratee_Copy;
+	Stg_Class_DeleteFunction*                               _delete = _TimeIntegrand_Delete;
+	Stg_Class_PrintFunction*                                 _print = _TimeIntegrand_Print;
+	Stg_Class_CopyFunction*                                   _copy = _TimeIntegrand_Copy;
 	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _StrainWeakening_DefaultNew;
 	Stg_Component_ConstructFunction*                     _construct = _StrainWeakening_AssignFromXML;
 	Stg_Component_BuildFunction*                             _build = _StrainWeakening_Build;
 	Stg_Component_InitialiseFunction*                   _initialise = _StrainWeakening_Initialise;
-	Stg_Component_ExecuteFunction*                         _execute = _TimeIntegratee_Execute;
-	Stg_Component_DestroyFunction*                         _destroy = _TimeIntegratee_Destroy;
-	TimeIntegratee_CalculateTimeDerivFunction*  _calculateTimeDeriv = _StrainWeakening_TimeDerivative;
-	TimeIntegratee_IntermediateFunction*              _intermediate = _TimeIntegratee_Intermediate;
+	Stg_Component_ExecuteFunction*                         _execute = _TimeIntegrand_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _TimeIntegrand_Destroy;
+	TimeIntegrand_CalculateTimeDerivFunction*  _calculateTimeDeriv = _StrainWeakening_TimeDerivative;
+	TimeIntegrand_IntermediateFunction*              _intermediate = _TimeIntegrand_Intermediate;
 	StrainWeakening_CalcIncrementFunction*           _calcIncrement = _StrainWeakening_CalcIncrementIsotropic;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
@@ -240,7 +240,7 @@ void _StrainWeakening_AssignFromXML( void* strainWeakening, Stg_ComponentFactory
 	Stg_Shape*              initialStrainShape;
 
 	/* Construct Parent */
-	_TimeIntegratee_AssignFromXML( self, cf, data );
+	_TimeIntegrand_AssignFromXML( self, cf, data );
 	
 	materialPointsSwarm     = Stg_ComponentFactory_ConstructByKey(
 		cf, 
@@ -282,14 +282,14 @@ void _StrainWeakening_Build( void* strainWeakening, void* data ) {
    StrainWeakening*                       self               = (StrainWeakening*) strainWeakening;
 
    /* Build parent */
-   _TimeIntegratee_Build( self, data );
+   _TimeIntegrand_Build( self, data );
 
    Stg_Component_Build( self->postFailureWeakeningIncrement, data, False );
    Stg_Component_Build( self->postFailureWeakening, data, False );
    if( self->initialStrainShape ) Stg_Component_Build( self->initialStrainShape, data, False );
    Stg_Component_Build( self->swarm, data, False );
    /* The postFailureWeakening doesn't need to be built here because it has already been
-    * built in the TimeIntegratee class
+    * built in the TimeIntegrand class
     * (self->variable = self->postFailureWeakening->variable in _StrainWeakening_Init function) */
     /* however, i've decided to build it anyway!  JM 09111 */
 }
@@ -313,7 +313,7 @@ void _StrainWeakening_Destroy( void* _self, void* data ) {
    Stg_Component_Destroy( self->swarm, data, False );
 
    /* Destroy Parent */
-   _TimeIntegratee_Destroy( self, data );   
+   _TimeIntegrand_Destroy( self, data );   
 
 }
 
@@ -329,7 +329,7 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
    int myrank;
 
    /* Initialise Parent */
-   _TimeIntegratee_Initialise( self, data );
+   _TimeIntegrand_Initialise( self, data );
 
    Stg_Component_Initialise( self->swarm, data, False );
    Stg_Component_Initialise( self->postFailureWeakeningIncrement, data, False );
