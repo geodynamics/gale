@@ -223,7 +223,8 @@ void _Cylinder_Construct( void* cylinder, Stg_ComponentFactory* cf, void* data )
 	end[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "endY", BIG );
 	end[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "endZ", BIG );
 
-	perpendicularAxisName = Stg_ComponentFactory_GetString( cf, self->name, "alongAxis", "x" );
+	perpendicularAxisName = Stg_ComponentFactory_GetString( cf, self->name, "perpendicularAxis", "x" );
+	perpendicularAxisName = Stg_ComponentFactory_GetString( cf, self->name, "alongAxis", perpendicularAxisName );
 	switch ( perpendicularAxisName[0] ) {
 		case 'x': case 'X': case 'i': case 'I': case '0':
 			alongAxis = I_AXIS; break;
