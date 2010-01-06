@@ -78,7 +78,7 @@ SwarmAdvector* SwarmAdvector_New(
 	SwarmAdvector* self = (SwarmAdvector*) _SwarmAdvector_DefaultNew( name );
 
 	/* 	SwarmAdvector_InitAll */
-	_TimeIntegratee_Init( self, context, timeIntegrator, swarm->particleCoordVariable->variable, 0, NULL,
+	_TimeIntegrand_Init( self, context, timeIntegrator, swarm->particleCoordVariable->variable, 0, NULL,
 		allowFallbackToFirstOrder );
 	_SwarmAdvector_Init( self, velocityField, swarm, periodicBCsManager );
 
@@ -91,7 +91,7 @@ SwarmAdvector* _SwarmAdvector_New(  SWARMADVECTOR_DEFARGS  )
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(SwarmAdvector) );
-	self = (SwarmAdvector*)_TimeIntegratee_New(  TIMEINTEGRATEE_PASSARGS  );
+	self = (SwarmAdvector*)_TimeIntegrand_New(  TIMEINTEGRAND_PASSARGS  );
 	
 	/* General info */
 
@@ -158,7 +158,7 @@ void _SwarmAdvector_Delete( void* swarmAdvector ) {
 	SwarmAdvector* self = (SwarmAdvector*)swarmAdvector;
 
 	/* Delete parent */
-	_TimeIntegratee_Delete( self );
+	_TimeIntegrand_Delete( self );
 }
 
 
@@ -166,7 +166,7 @@ void _SwarmAdvector_Print( void* swarmAdvector, Stream* stream ) {
 	SwarmAdvector* self = (SwarmAdvector*)swarmAdvector;
 	
 	/* Print parent */
-	_TimeIntegratee_Print( self, stream );
+	_TimeIntegrand_Print( self, stream );
 }
 
 
@@ -174,7 +174,7 @@ void* _SwarmAdvector_Copy( void* swarmAdvector, void* dest, Bool deep, Name name
 	SwarmAdvector*	self = (SwarmAdvector*)swarmAdvector;
 	SwarmAdvector*	newSwarmAdvector;
 	
-	newSwarmAdvector = (SwarmAdvector*)_TimeIntegratee_Copy( self, dest, deep, nameExt, ptrMap );
+	newSwarmAdvector = (SwarmAdvector*)_TimeIntegrand_Copy( self, dest, deep, nameExt, ptrMap );
 
 	newSwarmAdvector->velocityField = self->velocityField;
 	newSwarmAdvector->swarm         = self->swarm;
@@ -196,8 +196,8 @@ void* _SwarmAdvector_DefaultNew( Name name ) {
 	Stg_Component_InitialiseFunction*                   _initialise = _SwarmAdvector_Initialise;
 	Stg_Component_ExecuteFunction*                         _execute = _SwarmAdvector_Execute;
 	Stg_Component_DestroyFunction*                         _destroy = _SwarmAdvector_Destroy;
-	TimeIntegratee_CalculateTimeDerivFunction*  _calculateTimeDeriv = _SwarmAdvector_TimeDeriv;
-	TimeIntegratee_IntermediateFunction*              _intermediate = _SwarmAdvector_Intermediate;
+	TimeIntegrand_CalculateTimeDerivFunction*  _calculateTimeDeriv = _SwarmAdvector_TimeDeriv;
+	TimeIntegrand_IntermediateFunction*              _intermediate = _SwarmAdvector_Intermediate;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
@@ -212,7 +212,7 @@ void _SwarmAdvector_AssignFromXML( void* swarmAdvector, Stg_ComponentFactory* cf
 	MaterialPointsSwarm*        swarm;
 	PeriodicBoundariesManager*  periodicBCsManager;
 
-	_TimeIntegratee_AssignFromXML( self, cf, data );
+	_TimeIntegrand_AssignFromXML( self, cf, data );
 
 	velocityField      = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField", FeVariable,  True, data );
 	swarm              = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",  MaterialPointsSwarm, True, data );
@@ -228,7 +228,7 @@ void _SwarmAdvector_Build( void* swarmAdvector, void* data ) {
    Stg_Component_Build( self->swarm, data, False );
 	if ( self->periodicBCsManager )
 		Stg_Component_Build( self->periodicBCsManager, data, False );
-   _TimeIntegratee_Build( self, data );
+   _TimeIntegrand_Build( self, data );
 
 }
 
@@ -239,19 +239,19 @@ void _SwarmAdvector_Initialise( void* swarmAdvector, void* data ) {
    Stg_Component_Initialise( self->swarm, data, False );
 	if ( self->periodicBCsManager )
 		Stg_Component_Initialise( self->periodicBCsManager, data, False );
-	_TimeIntegratee_Initialise( self, data );
+	_TimeIntegrand_Initialise( self, data );
 }
 
 void _SwarmAdvector_Execute( void* swarmAdvector, void* data ) {
 	SwarmAdvector*	self = (SwarmAdvector*)swarmAdvector;
 	
-	_TimeIntegratee_Execute( self, data );
+	_TimeIntegrand_Execute( self, data );
 }
 
 void _SwarmAdvector_Destroy( void* swarmAdvector, void* data ) {
 	SwarmAdvector*	self = (SwarmAdvector*)swarmAdvector;
 
-	_TimeIntegratee_Destroy( self, data );	
+	_TimeIntegrand_Destroy( self, data );	
    Stg_Component_Destroy( self->velocityField, data, False );
    Stg_Component_Destroy( self->swarm, data, False );
 	if ( self->periodicBCsManager )

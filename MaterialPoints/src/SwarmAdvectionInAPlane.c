@@ -82,7 +82,7 @@ SwarmAdvectionInAPlane* SwarmAdvectionInAPlane_New(
 	int whichaxis;
 	
 	/* 	SwarmAdvectionInAPlane_InitAll */
-	_TimeIntegratee_Init( self, context, timeIntegrator, swarm->particleCoordVariable->variable, 0, NULL,
+	_TimeIntegrand_Init( self, context, timeIntegrator, swarm->particleCoordVariable->variable, 0, NULL,
 		allowFallbackToFirstOrder );
 	_SwarmAdvector_Init( (SwarmAdvector*)self, velocityField, swarm, periodicBCsManager);
 	_SwarmAdvectionInAPlane_Init( self, whichaxis );
@@ -142,8 +142,8 @@ void* _SwarmAdvectionInAPlane_DefaultNew( Name name ) {
 	Stg_Component_InitialiseFunction*                   _initialise = _SwarmAdvector_Initialise;
 	Stg_Component_ExecuteFunction*                         _execute = _SwarmAdvector_Execute;
 	Stg_Component_DestroyFunction*                         _destroy = _SwarmAdvector_Destroy;
-	TimeIntegratee_CalculateTimeDerivFunction*  _calculateTimeDeriv = _SwarmAdvectionInAPlane_TimeDeriv;
-	TimeIntegratee_IntermediateFunction*              _intermediate = _SwarmAdvector_Intermediate;
+	TimeIntegrand_CalculateTimeDerivFunction*  _calculateTimeDeriv = _SwarmAdvectionInAPlane_TimeDeriv;
+	TimeIntegrand_IntermediateFunction*              _intermediate = _SwarmAdvector_Intermediate;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
