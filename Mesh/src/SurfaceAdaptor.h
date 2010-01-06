@@ -68,8 +68,9 @@
 	} SurfaceAdaptor_PlateauInfo;
 
 	typedef struct {
-          int nx,ny;
-          short int *heights;
+          int nx,nz;
+          double minX, maxX, minZ, maxZ, dx, dz;
+          double *heights;
 	} SurfaceAdaptor_Topo_DataInfo;
 
 	typedef struct {

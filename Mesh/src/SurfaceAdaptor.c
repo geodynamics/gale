@@ -54,8 +54,8 @@
 #include "Remesher.h"
 
 
-typedef double (SurfaceAdaptor_DeformFunc)( SurfaceAdaptor* self, Mesh* mesh, 
-					    unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
+typedef double (SurfaceAdaptor_DeformFunc)( SurfaceAdaptor* self, Mesh* mesh,
+					    unsigned* globalSize, unsigned vertex, unsigned* vertexInds);
 
 
 /* Textual name of this class */
@@ -172,24 +172,37 @@ void _SurfaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* d
 	}
 	else if( !strcmp( surfaceType, "topo_data" ) ) {
                 FILE *fp;
-                int i,j,ii,jj,h,nx,ny;
-		nx = Stg_ComponentFactory_GetInt( cf, self->name, "nx", 0 );
-		ny = Stg_ComponentFactory_GetInt( cf, self->name, "ny", 0 );
-                self->info.topo_data.nx=nx;
-                self->info.topo_data.ny=ny;
-                self->info.topo_data.heights=malloc(sizeof(int)*nx*ny);
+                char* surfaceName;
+                int i,j,ii,jj;
+                surfaceName = Stg_ComponentFactory_GetString( cf, self->name, "surfaceName", "ascii_topo" );
+		self->info.topo_data.nx = Stg_ComponentFactory_GetInt( cf, self->name, "nx", 0 );
+		self->info.topo_data.nz = Stg_ComponentFactory_GetInt( cf, self->name, "nz", 0 );
+	        self->info.topo_data.minX = Stg_ComponentFactory_GetDouble( cf, self->name, "minX", 0 );
+	        self->info.topo_data.minZ = Stg_ComponentFactory_GetDouble( cf, self->name, "minZ", 0 );
+	        self->info.topo_data.maxX = Stg_ComponentFactory_GetDouble( cf, self->name, "maxX", 0 );
+	        self->info.topo_data.maxZ = Stg_ComponentFactory_GetDouble( cf, self->name, "maxZ", 0 );
+                self->info.topo_data.dx=
+                  (self->info.topo_data.maxX-self->info.topo_data.minX)
+                  /(self->info.topo_data.nx-1);
+                self->info.topo_data.dz=
+                  (self->info.topo_data.maxZ-self->info.topo_data.minZ)
+                  /(self->info.topo_data.nz-1);
+                self->info.topo_data.heights=
+                  malloc(sizeof(double)*self->info.topo_data.nx
+                         *self->info.topo_data.nz);
 		self->surfaceType = SurfaceAdaptor_SurfaceType_Topo_Data;
-                fp=fopen("ascii_topo","r");
+                fp=fopen(surfaceName,"r");
                 if(!fp)
                   {
-                    printf("Can not open the file ascii_topo\n");
+                    printf("Can not open the file %s\n",surfaceName);
                     abort();
                   }
-                for(i=0;i<nx;++i)
-                  for(j=0;j<ny;++j)
+                for(i=0;i<self->info.topo_data.nx;++i)
+                  for(j=0;j<self->info.topo_data.nz;++j)
                     {
-                      fscanf(fp,"%d %d %d",&ii,&jj,&h);
-                      self->info.topo_data.heights[ii+nx*jj]=h;
+                      float h;
+                      fscanf(fp,"%d %d %f",&ii,&jj,&h);
+                      self->info.topo_data.heights[ii+self->info.topo_data.nx*jj]=h;
                     }
                 fclose(fp);
 	}
@@ -253,7 +266,6 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 	SurfaceAdaptor_DeformFunc* deformFunc;
 	Grid *grid;
 	unsigned* inds;
-	double deform;
 	unsigned n_i;
 
 	/* Build base mesh, which is assumed to be cartesian. */
@@ -298,6 +310,7 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 	for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
 		unsigned	gNode;
 		double		height;
+                double deform;
 
 		gNode = Sync_DomainToGlobal( sync, n_i );
 		Grid_Lift( grid, gNode, inds );
@@ -310,7 +323,7 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 		height = (double)(inds[1] - self->contactDepth) / (double)(grid->sizes[1] - 1);
 
 		/* Deform this node. */
-                deform = deformFunc( self, mesh, grid->sizes, n_i, inds );
+                deform = deformFunc( self, mesh, grid->sizes, n_i, inds);
 		mesh->verts[n_i][1] += height * deform;
 	}
 
@@ -409,11 +422,29 @@ double SurfaceAdaptor_Topo_Data( SurfaceAdaptor* self, Mesh* mesh,
                                  unsigned* vertexInds )
 {
   int i,j,k;
+  double deltax,deltay;
 
-  /* Awful hard coded hack */
-  i=mesh->verts[vertex][0]/1001;
-  j=mesh->verts[vertex][2]/1001;
-  return (double)(self->info.topo_data.heights[i+self->info.topo_data.nx*j]);
+  i=floor((mesh->verts[vertex][0] - self->info.topo_data.minX)
+          /self->info.topo_data.dx + 0.5);
+  j=floor((mesh->verts[vertex][2] - self->info.topo_data.minZ)
+          /self->info.topo_data.dz + 0.5);
+
+  if(i<0 || i>self->info.topo_data.nx-1
+     || j<0 || j>self->info.topo_data.nz-1)
+    {
+      printf("Coordinate not covered by the topography file: %g %g\n\tminX: %g\n\tmaxX: %g\n\tminZ: %g\n\tmaxZ: %g\n\tnx: %d\n\tnz: %d\n",
+             mesh->verts[vertex][0],
+             mesh->verts[vertex][2],
+             self->info.topo_data.minX,
+             self->info.topo_data.maxX,
+             self->info.topo_data.minZ,
+             self->info.topo_data.maxZ,
+             self->info.topo_data.nx,
+             self->info.topo_data.nz);
+      abort();
+    }
+
+  return self->info.topo_data.heights[i+self->info.topo_data.nx*j];
 }
 
 double SurfaceAdaptor_Sine( SurfaceAdaptor* self, Mesh* mesh, 
