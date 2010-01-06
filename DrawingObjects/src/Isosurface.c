@@ -213,17 +213,20 @@ void _lucIsosurface_Execute( void* drawingObject, void* data ) {}
 void _lucIsosurface_Destroy( void* drawingObject, void* data ) {}
 
 void _lucIsosurface_Setup( void* drawingObject, void* _context ) {
-	lucIsosurface*           self            = (lucIsosurface*)drawingObject;
-	DomainContext*   context         = (DomainContext*) _context;
-	FieldVariable*           isosurfaceField = self->isosurfaceField;
-	int                      i, j, k;
-	int                      nx, ny, nz;
-	double                   dx, dy, dz;
-	Vertex***                vertex;
-	Coord                    pos;
-	Coord                    min;
-	Coord                    max;
-	Dimension_Index          dim             = context->dim;
+	lucIsosurface*             self = (lucIsosurface*)drawingObject;
+	DomainContext*             context = (DomainContext*) _context;
+	FieldVariable*             isosurfaceField = self->isosurfaceField;
+	int                        i, j, k;
+	int                        nx, ny, nz;
+	double                     dx, dy, dz;
+	Vertex***                  vertex;
+	Coord                      pos;
+	Coord                      min;
+	Coord                      max;
+	Dimension_Index            dim             = context->dim;
+
+   /* Don't attempt to draw until field has meaningful values, ie: timestep > 0 */
+   if (context->timeStep == 0) return;
 
 	lucOpenGLDrawingObject_SyncShadowValues( self, self->isosurfaceField );
 
@@ -254,7 +257,7 @@ void _lucIsosurface_Setup( void* drawingObject, void* _context ) {
 				pos[ K_AXIS ] = min[ K_AXIS ] + dz * (double) k;
 
 				memcpy( vertex[i][j][k].pos, pos, 3 * sizeof(double) );
-				
+
 				if ( i == 0 )
 					pos[ I_AXIS ] = min[ I_AXIS ] + 0.001 * dx; 
 				if ( j == 0 )
@@ -267,7 +270,14 @@ void _lucIsosurface_Setup( void* drawingObject, void* _context ) {
 					pos[ J_AXIS ] = max[ J_AXIS ] - 0.001 * dy;
 				if ( k == nz - 1 )
 					pos[ K_AXIS ] = max[ K_AXIS ] - 0.001 * dz;
-				FieldVariable_InterpolateValueAt( isosurfaceField, pos, &vertex[i][j][k].value );
+
+            if (!FieldVariable_InterpolateValueAt( isosurfaceField, pos, &vertex[i][j][k].value ))
+            {
+               /* FieldVariable_InterpolateValueAt is returning OTHER_PROC at times, even when running on 1 processor, 
+                * until fixed zero with warning... */
+               vertex[i][j][k].value = 0;
+			      Journal_Printf( self->errorStream, "Warning !! In func %s: Could not interpolate value on grid at %d,%d,%d\n", __func__, i, j, k);
+            }
 			}
 		}
 	}
@@ -365,7 +375,8 @@ void _lucIsosurface_BuildDisplayList( void* drawingObject, void* _context ) {
 	else 
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );	
 
-	/* Set up Face Culling */
+	/* Set up Face Culling - default is no culling so surface visible from both sides */
+	glDisable( GL_CULL_FACE );
 	if (self->cullBackFace) {
 		if (self->cullFrontFace) 
 			glCullFace( GL_FRONT_AND_BACK );
@@ -390,7 +401,7 @@ void _lucIsosurface_BuildDisplayList( void* drawingObject, void* _context ) {
 		lucColourMap_CalibrateFromFieldVariable( colourMap, self->isosurfaceField );
 
 
-	glFrontFace(GL_CW);
+	glFrontFace(GL_CCW);
 	glBegin(GL_TRIANGLES);
 
 	if ( ! self->colourMap || ! colourField ) {
@@ -417,15 +428,17 @@ void _lucIsosurface_BuildDisplayList( void* drawingObject, void* _context ) {
 		
 		/* Plot Second Vertex */
 		lucIsosurface_GetColourForPos( self, currentTriangle->pos3, min, max, fudgeFactor );
-		glNormal3dv(currentTriangle->normal3);
-		glVertex3dv(currentTriangle->pos3);	
-		
+		glNormal3dv(currentTriangle->normal2);
+		glVertex3dv(currentTriangle->pos2);	
+
 		/* Plot Third Vertex */
 		lucIsosurface_GetColourForPos( self, currentTriangle->pos2, min, max, fudgeFactor );
-		glNormal3dv(currentTriangle->normal2);
-		glVertex3dv(currentTriangle->pos2);
+		glNormal3dv(currentTriangle->normal3);
+		glVertex3dv(currentTriangle->pos3);
+
 	}
 	glEnd();
+	glFrontFace(GL_CCW);
 }
 
 Bool lucIsosurface_TestMask( lucIsosurface* self, Coord pos ) {
@@ -905,6 +918,7 @@ void lucIsosurface_Normals( lucIsosurface* self, Vertex*** vertex ) {
 					                              vertex[i][j][k-1].value, vertex[i][j][k].value, vertex[i][j][k+1].value,
 					                              vertex[i][j][k-1].pos[2], vertex[i][j][k].pos[2], vertex[i][j][k+1].pos[2]);
 				}														
+
 				StGermain_VectorNormalise(vertex[i][j][k].normal, 3);	
 			}
 		}
@@ -1064,8 +1078,8 @@ void lucIsosurface_AddWallTriangle( lucIsosurface* self, int a , int b, int c, V
 	
 	if (order == gLucifer_CCW) {
 		memcpy( self->triangleList[n].pos1, points[a]->pos, 3*sizeof(double) );
-		memcpy( self->triangleList[n].pos2, points[c]->pos, 3*sizeof(double) );
-		memcpy( self->triangleList[n].pos3, points[b]->pos, 3*sizeof(double) );
+		memcpy( self->triangleList[n].pos3, points[c]->pos, 3*sizeof(double) );
+		memcpy( self->triangleList[n].pos2, points[b]->pos, 3*sizeof(double) );
 	}
 	else {
 		memcpy( self->triangleList[n].pos1, points[a]->pos, 3*sizeof(double) );
@@ -1073,9 +1087,9 @@ void lucIsosurface_AddWallTriangle( lucIsosurface* self, int a , int b, int c, V
 		memcpy( self->triangleList[n].pos3, points[c]->pos, 3*sizeof(double) );
 	}
 
-	/* Calculate Normal */
+	/* Calculate Normal */ 
 	StGermain_NormalToPlane( self->triangleList[n].normal1 , 
-		self->triangleList[n].pos1, self->triangleList[n].pos2, self->triangleList[n].pos3 );
+		self->triangleList[n].pos1, self->triangleList[n].pos3, self->triangleList[n].pos2 );  
 
 	memcpy( self->triangleList[n].normal2, self->triangleList[n].normal1 , 3 * sizeof(double) );
 	memcpy( self->triangleList[n].normal3, self->triangleList[n].normal1 , 3 * sizeof(double) );

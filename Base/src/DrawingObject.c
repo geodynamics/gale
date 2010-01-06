@@ -157,6 +157,7 @@ void lucDrawingObject_Setup( void* drawingObject, void* context ) {
 	self->needsToCleanUp = True;
 
 	time = MPI_Wtime() - time;
+	Journal_DPrintfL( lucDebug, 2, "Setup took %f seconds, ", time );
 
 	lucDebug_PrintFunctionEnd( self, 2 );
 }
@@ -166,6 +167,7 @@ void lucDrawingObject_Draw( void* drawingObject, lucWindow* window, lucViewportI
    double time;
    
 	lucDebug_PrintFunctionBegin( self, 2 );
+	Journal_DPrintfL( lucDebug, 2, "Drawing (%s),  ", self->name );
 
 	lucDrawingObject_Setup( self, context );
 	
@@ -175,7 +177,7 @@ void lucDrawingObject_Draw( void* drawingObject, lucWindow* window, lucViewportI
 	self->_draw( self, window, viewportInfo, context );
 	
 	time = MPI_Wtime() - time;
-	Journal_DPrintfL( lucDebug, 2, "(%s) Drawing took %f seconds\n", self->name, time );
+	Journal_DPrintfL( lucDebug, 2, "Drawing took %f seconds\n", time );
 
 	lucDebug_PrintFunctionEnd( self, 2 );
 }

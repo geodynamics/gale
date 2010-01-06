@@ -52,10 +52,8 @@
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
 
-#include <glucifer/Base/CrossSection.h>
-
 #include "types.h"
-#include "OpenGLDrawingObject.h"
+#include "CrossSection.h"
 #include "VectorArrowCrossSection.h"
 
 #include <assert.h>
@@ -78,27 +76,22 @@ lucVectorArrowCrossSection* _lucVectorArrowCrossSection_New(  LUCVECTORARROWCROS
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
 	assert( _sizeOfSelf >= sizeof(lucVectorArrowCrossSection) );
-	self = (lucVectorArrowCrossSection*) _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_PASSARGS  );
+	self = (lucVectorArrowCrossSection*) _lucCrossSection_New(  LUCCROSSSECTION_PASSARGS  );
 	
 	return self;
 }
 
 void _lucVectorArrowCrossSection_Init( 
 		lucVectorArrowCrossSection*                                  self,
-		FieldVariable*                                               vectorVariable,
-		Name                                                         colourName,
 		IJK                                                          resolution,
 		double                                                       arrowHeadSize,
 		double                                                       maximum,
 		Bool                                                         dynamicRange,
 		double                                                       lengthScale,
-		float                                                        lineWidth,
-		lucCrossSection*                                             crossSection)
+		float                                                        lineWidth)
 {
 	Stream* errorStream   = Journal_MyStream( Error_Type, self );
 
-	self->vectorVariable = vectorVariable;
-	lucColour_FromString( &self->colour, colourName );
 	memcpy( self->resolution, resolution, sizeof(IJK) );
 	self->arrowHeadSize = arrowHeadSize;
 	Journal_Firewall( ( arrowHeadSize <= 1 && arrowHeadSize >= 0 ), errorStream,
@@ -108,33 +101,18 @@ void _lucVectorArrowCrossSection_Init(
 	self->dynamicRange = dynamicRange;
 	self->lengthScale = lengthScale;
 	self->lineWidth = lineWidth;
-	self->crossSection = crossSection;
 }
 
 void _lucVectorArrowCrossSection_Delete( void* drawingObject ) {
 	lucVectorArrowCrossSection*  self = (lucVectorArrowCrossSection*)drawingObject;
-   lucCrossSection_Delete(self->crossSection);
-	_lucOpenGLDrawingObject_Delete( self );
+	_lucCrossSection_Delete( self );
 }
 
 void _lucVectorArrowCrossSection_Print( void* drawingObject, Stream* stream ) {
 	lucVectorArrowCrossSection*  self = (lucVectorArrowCrossSection*)drawingObject;
 
-	_lucOpenGLDrawingObject_Print( self, stream );
+	_lucCrossSection_Print( self, stream );
 }
-
-void* _lucVectorArrowCrossSection_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) {
-	lucVectorArrowCrossSection*  self = (lucVectorArrowCrossSection*)drawingObject;
-	lucVectorArrowCrossSection* newDrawingObject;
-
-	newDrawingObject = _lucOpenGLDrawingObject_Copy( self, dest, deep, nameExt, ptrMap );
-
-	/* TODO */
-	abort();
-
-	return (void*) newDrawingObject;
-}
-
 
 void* _lucVectorArrowCrossSection_DefaultNew( Name name ) {
 	/* Variables set in this function */
@@ -149,9 +127,9 @@ void* _lucVectorArrowCrossSection_DefaultNew( Name name ) {
 	Stg_Component_InitialiseFunction*                         _initialise = _lucVectorArrowCrossSection_Initialise;
 	Stg_Component_ExecuteFunction*                               _execute = _lucVectorArrowCrossSection_Execute;
 	Stg_Component_DestroyFunction*                               _destroy = _lucVectorArrowCrossSection_Destroy;
-	lucDrawingObject_SetupFunction*                                _setup = _lucVectorArrowCrossSection_Setup;
-	lucDrawingObject_DrawFunction*                                  _draw = _lucVectorArrowCrossSection_Draw;
-	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucVectorArrowCrossSection_CleanUp;
+	lucDrawingObject_SetupFunction*                                _setup = _lucOpenGLDrawingObject_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucCrossSection_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucOpenGLDrawingObject_CleanUp;
 	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucVectorArrowCrossSection_BuildDisplayList;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
@@ -162,15 +140,12 @@ void* _lucVectorArrowCrossSection_DefaultNew( Name name ) {
 
 void _lucVectorArrowCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucVectorArrowCrossSection* self = (lucVectorArrowCrossSection*)drawingObject;
-	FieldVariable*   vectorVariable;
 	Index            defaultResolution;
 	IJK              resolution;
-   lucCrossSection* crossSection;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
+	_lucCrossSection_AssignFromXML( self, cf, data );
 
-	vectorVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "VectorVariable", FieldVariable, True, data );
 	defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolution", 8 );
 	resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionX", defaultResolution );
 	resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionY", defaultResolution );
@@ -178,54 +153,34 @@ void _lucVectorArrowCrossSection_AssignFromXML( void* drawingObject, Stg_Compone
 			
 	_lucVectorArrowCrossSection_Init( 
 			self, 
-			vectorVariable,
-			Stg_ComponentFactory_GetString( cf, self->name, "colour", "black" ),
 			resolution,
 			Stg_ComponentFactory_GetDouble( cf, self->name, "arrowHeadSize", 0.3 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "maximum", 1.0 ),
 			Stg_ComponentFactory_GetBool( cf, self->name, "dynamicRange", True ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "lengthScale", 0.3 ),
-			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 1.0 ),
-			lucCrossSection_Read(cf, self->name));
-
-
+			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 1.0 ));
 }
 
-void _lucVectorArrowCrossSection_Build( void* drawingObject, void* data ) {}
+void _lucVectorArrowCrossSection_Build( void* drawingObject, void* data ) {
+   /* Build field variable in parent */
+   _lucCrossSection_Build(drawingObject, data);
+}
+
 void _lucVectorArrowCrossSection_Initialise( void* drawingObject, void* data ) {}
 void _lucVectorArrowCrossSection_Execute( void* drawingObject, void* data ) {}
 void _lucVectorArrowCrossSection_Destroy( void* drawingObject, void* data ) {}
-
-void _lucVectorArrowCrossSection_Setup( void* drawingObject, void* _context ) {
-	lucVectorArrowCrossSection*       self            = (lucVectorArrowCrossSection*)drawingObject;
-
-	_lucOpenGLDrawingObject_Setup( self, _context );
-}
-	
-void _lucVectorArrowCrossSection_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
-	lucVectorArrowCrossSection*       self            = (lucVectorArrowCrossSection*)drawingObject;
-
-	_lucOpenGLDrawingObject_Draw( self, window, viewportInfo, _context );
-}
-
-
-void _lucVectorArrowCrossSection_CleanUp( void* drawingObject, void* _context ) {
-	lucVectorArrowCrossSection*       self            = (lucVectorArrowCrossSection*)drawingObject;
-
-	_lucOpenGLDrawingObject_CleanUp( self, _context );
-}
 
 void _lucVectorArrowCrossSection_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucVectorArrowCrossSection*       self            = (lucVectorArrowCrossSection*)drawingObject;
 	DomainContext*            context         = (DomainContext*) _context;
 
-	_lucVectorArrowCrossSection_DrawCrossSection( self, context->dim, self->crossSection );
+	_lucVectorArrowCrossSection_DrawCrossSection( self, context->dim );
 }
 
-void _lucVectorArrowCrossSection_DrawCrossSection( void* drawingObject, Dimension_Index dim, lucCrossSection* crossSection ) {
+void _lucVectorArrowCrossSection_DrawCrossSection( void* drawingObject, Dimension_Index dim ) {
 	lucVectorArrowCrossSection*  self           = (lucVectorArrowCrossSection*)drawingObject;
-	FieldVariable*    vectorVariable = self->vectorVariable;
-   Axis              axis = crossSection->axis;
+	FieldVariable*    vectorVariable = self->fieldVariable;
+   Axis              axis = self->axis;
 	Axis              aAxis          = (axis == I_AXIS ? J_AXIS : I_AXIS);
 	Axis              bAxis          = (axis == K_AXIS ? J_AXIS : K_AXIS);
 	Coord             pos;
@@ -245,8 +200,6 @@ void _lucVectorArrowCrossSection_DrawCrossSection( void* drawingObject, Dimensio
 		"Error - in %s(): provided FieldVariable \"%s\" has %u components - but %s Component "
 		"can only visualse FieldVariables with %d components.\n", __func__, vectorVariable->name,
 		vectorVariable->fieldComponentCount, self->type, vectorVariable->dim );
-
-	lucOpenGLDrawingObject_SyncShadowValues( self, vectorVariable );
 
 	if ( True == self->dynamicRange ) {
 		scaleValue = 1 / FieldVariable_GetMaxGlobalFieldMagnitude( vectorVariable );
@@ -274,7 +227,7 @@ void _lucVectorArrowCrossSection_DrawCrossSection( void* drawingObject, Dimensio
 	dA = (globalMax[ aAxis ] - globalMin[ aAxis ])/(double)self->resolution[ aAxis ];
 	dB = (globalMax[ bAxis ] - globalMin[ bAxis ])/(double)self->resolution[ bAxis ];
 	
-	pos[axis] = lucCrossSection_GetValue(crossSection, globalMin[axis], globalMax[axis]);
+	pos[axis] = lucCrossSection_GetValue(self, globalMin[axis], globalMax[axis]);
 	Journal_DPrintf( self->debugStream, "-- Drawing cross section on axis %d at value %lf\n", axis, pos[axis]);
 
 	for ( pos[ aAxis ] = globalMin[ aAxis ] + dA * 0.5 ; pos[ aAxis ] < globalMax[ aAxis ] ; pos[ aAxis ] += dA ) {

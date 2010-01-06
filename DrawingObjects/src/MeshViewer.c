@@ -441,8 +441,9 @@ void lucMeshViewer_RenderLocal( void* drawingObject ) {
 	assert( self->renderEdges );
 
 	/* Shortcuts. */
-	glDisable(GL_LIGHTING); /* lighting is just not set up correctly */
-	   glDisable(GL_DEPTH_TEST); /* depth testing and line smoothing do not work well together */
+	glDisable(GL_LIGHTING); 
+	glDisable(GL_LINE_SMOOTH); 
+   /*glDisable(GL_DEPTH_TEST); /* depth testing and line smoothing do not work well together */
 	mesh = self->mesh;
 
 	/* Pick the correct dimension. */
@@ -471,7 +472,7 @@ void lucMeshViewer_RenderLocal( void* drawingObject ) {
 	/* Render edges */
 	self->renderEdges( self, vertexFunc );
 
-	   glEnable(GL_DEPTH_TEST); 
+   glEnable(GL_DEPTH_TEST); 
 
 /* For now we are doing any text printing in the Draw call as fonts have their own display lists and coord system */
 #if 0

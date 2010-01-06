@@ -43,7 +43,7 @@
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include <glucifer/Base/CrossSection.h>
+#include "CrossSection.h"
 
 #ifndef __lucScalarFieldCrossSection_h__
 #define __lucScalarFieldCrossSection_h__
@@ -54,14 +54,11 @@
 	/** Class contents - this is defined as a macro so that sub-classes of this class can use this macro at the start of the definition of their struct */
 	#define __lucScalarFieldCrossSection \
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
-		__lucOpenGLDrawingObject \
+		__lucCrossSection \
 		/* Virtual functions go here */ \
 		/* Other info */\
-		FieldVariable*                                     fieldVariable;          \
-		Name                                               fieldVariableName;      \
 		lucColourMap*                                      colourMap;              \
 		IJK                                                resolution;             \
-      lucCrossSection*                                   crossSection;           \
 		XYZ                                                minCropValues;          \
 		XYZ                                                maxCropValues;          \
 
@@ -74,10 +71,10 @@
 	#endif
 
 	#define LUCSCALARFIELDCROSSSECTION_DEFARGS \
-                LUCOPENGLDRAWINGOBJECT_DEFARGS
+                LUCCROSSSECTION_DEFARGS
 
 	#define LUCSCALARFIELDCROSSSECTION_PASSARGS \
-                LUCOPENGLDRAWINGOBJECT_PASSARGS
+                LUCCROSSSECTION_PASSARGS
 
 	lucScalarFieldCrossSection* _lucScalarFieldCrossSection_New(  LUCSCALARFIELDCROSSSECTION_DEFARGS  );
 
@@ -94,12 +91,9 @@
 	void _lucScalarFieldCrossSection_Destroy( void* drawingObject, void* data ) ;
 	
 	void _lucScalarFieldCrossSection_Setup( void* drawingObject, void* _context ) ;
-	void _lucScalarFieldCrossSection_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) ;
-	void _lucScalarFieldCrossSection_CleanUp( void* drawingObject, void* _context ) ;
-
 	void _lucScalarFieldCrossSection_BuildDisplayList( void* drawingObject, void* _context ) ;
 
-   void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, lucCrossSection* crossSection );
+   void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject );
 	Bool lucScalarFieldCrossSection_PlotColouredVertex( void* drawingObject, Coord interpolationCoord, Coord plotCoord ) ;
 
 #endif

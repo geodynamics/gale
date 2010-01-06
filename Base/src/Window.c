@@ -315,7 +315,7 @@ void _lucWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* dat
 			Stg_ComponentFactory_GetString( cf, self->name, "backgroundColour", "white" ),
 			interactive,
 			continuous,
-			Stg_ComponentFactory_GetBool( cf, self->name, "isTimedOut", True ),
+			Stg_ComponentFactory_GetBool( cf, self->name, "isTimedOut", False ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "maxIdleTime", 600.0 ) 
 			);
 		

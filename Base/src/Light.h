@@ -53,13 +53,13 @@
 	extern const double LUC_LIGHT_DEFAULT_POS_Z;
 	extern const double LUC_LIGHT_DEFAULT_POS_W;
 
-	#define __lucLight                                  \
-		__Stg_Component                                 \
-		AbstractContext*		 context; \
-		Light_Index 		         index;\
+	#define __lucLight                                \
+		__Stg_Component                                \
+		AbstractContext*		            context; \
+		Light_Index 		               index;\
 		int                              model; \
 		int                              material;\
-		float	                         position[4];\
+		float	                           position[4];\
 		float                            lmodel_ambient[4];\
 		float                            spotCutOff;\
 		float                            spotDirection[3];\
@@ -70,14 +70,14 @@
 
 	/** Constructors */
 	lucLight* lucLight_New( 
-		Name                                               name,
+		Name                                name,
 		Light_Index            				   index,
-		int                                                model,
-		int                                                material,
-		float						   position[4],
-		float                                              lmodel_ambient[4],
-		float                                              spotCutOff,
-		float                                              spotDirection[3]
+		int                                 model,
+		int                                 material,
+		float						               position[4],
+		float                               lmodel_ambient[4],
+		float                               spotCutOff,
+		float                               spotDirection[3]
 	 );
 
 	
@@ -93,17 +93,6 @@
 
 	lucLight* _lucLight_New(  LUCLIGHT_DEFARGS  );
 
-	void lucLight_InitAll( 
-		void*                                              light,
-		Light_Index                                        index,
-		int                                                model,
-		int                                                material,
-		float                                              position[4],
-		float                                              lmodel_ambient[4],
-		float                                              spotCutOff,
-		float                                              spotDirection[3]
-	 );
-	
 	/** Virtual Functions */
 	void _lucLight_Delete( void* light ) ;
 	void _lucLight_Print( void* light, Stream* stream ) ;

@@ -60,29 +60,21 @@ const Type lucLight_Type = "lucLight";
 
 /* The position defaults have been chosen for a directional light source (hence posW=0)
    shining onto the left,top,front corner of a 1x1x1 box, currently the most commonly
-   used geometry. -- PatrickSunter, 8 Jun 2006 */
+   used geometry. -- PatrickSunter, 8 Jun 2006 /
 const double LUC_LIGHT_DEFAULT_POS_X = 1.0;
 const double LUC_LIGHT_DEFAULT_POS_Y = -2.0;
 const double LUC_LIGHT_DEFAULT_POS_Z = -2.0;
-const double LUC_LIGHT_DEFAULT_POS_W = 0.0;
+const double LUC_LIGHT_DEFAULT_POS_W = 0.0;*/
 
-lucLight* lucLight_New( 
-		Name                                               name,
-		Light_Index 				index,
-		int                                   model,
-		int                                   material,
-		float                                 position[4],
-		float                                 lmodel_ambient[4],
-		float                                 spotCutOff,
-		float                                 spotDirection[3]
-)
-{
-	lucLight* self = (lucLight*) _lucLight_DefaultNew( name );
-
-	lucLight_InitAll( self, index, model, material, position, lmodel_ambient, spotCutOff, spotDirection);
-
-	return self;
-}
+/* Default light at eye pos shining in all directions without attenuation, ie: sunlight from behind viewer 
+ * Setting the light position should be done relative to the eye rather than model, thus if you want the scene lit more from above, 
+ * simply increase the y component rather than calculating absolute world coordinates for such a light.
+ * this allows the lighting to move with the camera and keep the scene lit in the same way
+ * If absolute light coords required in future a flag can easily be implemented to do so */
+const double LUC_LIGHT_DEFAULT_POS_X = 0.0;
+const double LUC_LIGHT_DEFAULT_POS_Y = 0.0;
+const double LUC_LIGHT_DEFAULT_POS_Z = 0.0;
+const double LUC_LIGHT_DEFAULT_POS_W = 1.0;
 
 lucLight* _lucLight_New(  LUCLIGHT_DEFARGS  )
 {
@@ -96,7 +88,6 @@ lucLight* _lucLight_New(  LUCLIGHT_DEFARGS  )
 	nameAllocationType = NON_GLOBAL;
 
 	self = (lucLight*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
-	
 	
 	return self;
 }
@@ -131,21 +122,22 @@ void lucLight_Init(
 	
 }
 
-void lucLight_InitAll( 
-		void*                         light,
-		Light_Index                   index,
-		int                           model,
-		int                           material,
-		float                         position[4],
-		float                         lmodel_ambient[4],
-		float                         spotCutOff,
-		float                         spotDirection[3])
+lucLight* lucLight_New( 
+		Name                                               name,
+		Light_Index 				index,
+		int                                   model,
+		int                                   material,
+		float                                 position[4],
+		float                                 lmodel_ambient[4],
+		float                                 spotCutOff,
+		float                                 spotDirection[3]
+)
 {
-	
-	lucLight* self        = light;
+	lucLight* self = (lucLight*) _lucLight_DefaultNew( name );
 
-	/* TODO Init parent */
 	lucLight_Init( self, index, model, material, position, lmodel_ambient, spotCutOff, spotDirection);
+
+	return self;
 }
 
 void _lucLight_Delete( void* light ) {
@@ -250,21 +242,6 @@ void _lucLight_AssignFromXML( void* light, Stg_ComponentFactory* cf, void* data 
 	lmodel_ambient[2] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambB", 0.2 );
 	lmodel_ambient[3] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambA", 1.0 );
 
-
-	modelName = Stg_ComponentFactory_GetString( cf, self->name, "model", "TwoSide" );
-	if ( strcasecmp( modelName, "Ambient" ) == 0 ) {
-		model = GL_LIGHT_MODEL_AMBIENT;
-		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
-	}
-	else if ( strcasecmp( modelName, "Local" ) == 0 ) {
-		model = GL_LIGHT_MODEL_LOCAL_VIEWER;
-		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
-	}
-	else if ( strcasecmp( modelName, "TwoSide" ) == 0 ){
-		model =  GL_LIGHT_MODEL_TWO_SIDE;
-		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);	
-	}
-
 	position[0]  = Stg_ComponentFactory_GetDouble( cf, self->name, "posX", LUC_LIGHT_DEFAULT_POS_X );
 	position[1]  = Stg_ComponentFactory_GetDouble( cf, self->name, "posY", LUC_LIGHT_DEFAULT_POS_Y );
 	position[2]  = Stg_ComponentFactory_GetDouble( cf, self->name, "posZ", LUC_LIGHT_DEFAULT_POS_Z );
@@ -318,20 +295,22 @@ void lucLight_Pickle( void* light, Stream* stream ) {
 	Journal_Printf( stream, "</struct>\n");
 }
 
-/* functions to change the lights paramters */
+/* functions to change the lights paramters - unused as yet, only called from light interactions which don't work */
 void lucLight_Position( void * light, int lightIndex, float posX, float posY, float posZ, float posW) {
 	lucLight*             	self               = (lucLight*) light;
 	Light_Index             index              = (Light_Index) lightIndex;
 
-	/* Sets the potiotion of the light index = index */	
-	glEnable(GL_LIGHTING);
-        
+	/* Sets the position of the light index = index */	
 	self->position[0]  += posX;
 	self->position[1]  += posY;
 	self->position[2]  += posZ;
-        self->position[3]  += posW;
+   self->position[3]  += posW;
 
+   /* Light position now relative to eye, not model! */
+   glPushMatrix();
+   glLoadIdentity();
 	glLightfv(GL_LIGHT0 + lightIndex, GL_POSITION, self->position);
+   glPopMatrix();
 
 	self->needsToDraw = True;
 	

@@ -113,7 +113,7 @@ void _lucViewport_Init(
 	lightPosition[1]= LUC_LIGHT_DEFAULT_POS_Y;
 	lightPosition[2]= LUC_LIGHT_DEFAULT_POS_Z;
 	lightPosition[3]= LUC_LIGHT_DEFAULT_POS_W;
-	
+
 	self->camera                   = camera;
 	self->drawTitle                = drawTitle;
 	self->drawTime                 = drawTime;
@@ -135,12 +135,11 @@ void _lucViewport_Init(
 	for ( light_I = 0 ; light_I < lightCount ; light_I++ )
 		lucLight_Register_Add( self->light_Register, lightList[ light_I ] );
 
-       	if(lightCount == 0){
-       		self->defaultLight = lucLight_New( "defaultLight", 0, GL_LIGHT_MODEL_TWO_SIDE,  GL_AMBIENT_AND_DIFFUSE, lightPosition, lmodel_ambient, spotCutOff, spotDirection);
-		lucLight_Register_Add( self->light_Register, self->defaultLight );
-	}
-
-
+   if(lightCount == 0) {
+      self->defaultLight = lucLight_New( "defaultLight", 0, GL_LIGHT_MODEL_TWO_SIDE,  GL_AMBIENT_AND_DIFFUSE, 
+                                          lightPosition, lmodel_ambient, spotCutOff, spotDirection);
+      lucLight_Register_Add( self->light_Register, self->defaultLight );
+   }
 }
 
 lucViewport* lucViewport_New(
@@ -284,8 +283,8 @@ void _lucViewport_AssignFromXML( void* viewport, Stg_ComponentFactory* cf, void*
 			Stg_ComponentFactory_GetBool( cf, self->name, "drawTitle", True ),
 			Stg_ComponentFactory_GetBool( cf, self->name, "drawTime", False ),
 			Stg_ComponentFactory_GetBool( cf, self->name, "compositeEachObject", False ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "nearClipPlane", 0.1 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "farClipPlane", 40.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "nearClipPlane", camera->focalLength / 10.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "farClipPlane", camera->focalLength * 10.0 ), 
 			Stg_ComponentFactory_GetDouble( cf, self->name, "scaleX", 1.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "scaleY", 1.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "scaleZ", 1.0 ) );
@@ -295,19 +294,18 @@ void _lucViewport_AssignFromXML( void* viewport, Stg_ComponentFactory* cf, void*
 		Memory_Free( lightList );
 }
 
-void _lucViewport_Build( void* camera, void* data ) { }
-void _lucViewport_Initialise( void* camera, void* data ) { }
-void _lucViewport_Execute( void* camera, void* data ) { }
-void _lucViewport_Destroy( void* camera, void* data ) { }
+void _lucViewport_Build( void* viewport, void* data ) { }
+void _lucViewport_Initialise( void* viewport, void* data ) {}
+void _lucViewport_Execute( void* viewport, void* data ) { }
+void _lucViewport_Destroy( void* viewport, void* data ) { }
 
 void lucViewport_Draw( void* viewport, lucWindow* window, lucViewportInfo* viewportInfo, void* context ) {
 	lucViewport*          self = (lucViewport*) viewport ;
 
 	lucDebug_PrintFunctionBegin( self, 2 );
 
-	/*Enables the lights */
+	/* Enables the lights */
 	lucLight_Register_EnableAll( self->light_Register );
-
 	lucDrawingObject_Register_DrawAll( self->drawingObject_Register, window, viewportInfo, context, self->compositeEachObject );
 
 	lucDebug_PrintFunctionEnd( self, 2 );

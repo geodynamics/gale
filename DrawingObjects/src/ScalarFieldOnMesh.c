@@ -97,19 +97,6 @@ void _lucScalarFieldOnMesh_Print( void* drawingObject, Stream* stream ) {
 	_lucScalarFieldOnMeshCrossSection_Print( self, stream );
 }
 
-void* _lucScalarFieldOnMesh_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) {
-	lucScalarFieldOnMesh*  self = (lucScalarFieldOnMesh*)drawingObject;
-	lucScalarFieldOnMesh* newDrawingObject;
-
-	newDrawingObject = _lucScalarFieldOnMeshCrossSection_Copy( self, dest, deep, nameExt, ptrMap );
-
-	/* TODO */
-	abort();
-
-	return (void*) newDrawingObject;
-}
-
-
 void* _lucScalarFieldOnMesh_DefaultNew( Name name ) {
 	/* Variables set in this function */
 	SizeT                                                     _sizeOfSelf = sizeof(lucScalarFieldOnMesh);
@@ -123,9 +110,9 @@ void* _lucScalarFieldOnMesh_DefaultNew( Name name ) {
 	Stg_Component_InitialiseFunction*                         _initialise = _lucScalarFieldOnMesh_Initialise;
 	Stg_Component_ExecuteFunction*                               _execute = _lucScalarFieldOnMesh_Execute;
 	Stg_Component_DestroyFunction*                               _destroy = _lucScalarFieldOnMesh_Destroy;
-	lucDrawingObject_SetupFunction*                                _setup = _lucScalarFieldOnMesh_Setup;
-	lucDrawingObject_DrawFunction*                                  _draw = _lucScalarFieldOnMesh_Draw;
-	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucScalarFieldOnMesh_CleanUp;
+	lucDrawingObject_SetupFunction*                                _setup = _lucScalarFieldOnMeshCrossSection_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucOpenGLDrawingObject_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucOpenGLDrawingObject_CleanUp;
 	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucScalarFieldOnMesh_BuildDisplayList;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
@@ -160,24 +147,6 @@ void _lucScalarFieldOnMesh_Initialise( void* drawingObject, void* data ) {
 void _lucScalarFieldOnMesh_Execute( void* drawingObject, void* data ) {}
 void _lucScalarFieldOnMesh_Destroy( void* drawingObject, void* data ) {}
 
-void _lucScalarFieldOnMesh_Setup( void* drawingObject, void* _context ) {
-	lucScalarFieldOnMesh*          self          = (lucScalarFieldOnMesh*)drawingObject;
-	
-	_lucScalarFieldOnMeshCrossSection_Setup( self, _context );
-}
-	
-void _lucScalarFieldOnMesh_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
-	lucScalarFieldOnMesh*          self          = (lucScalarFieldOnMesh*)drawingObject;
-	
-	_lucScalarFieldOnMeshCrossSection_Draw( self, window, viewportInfo, _context );
-}
-
-void _lucScalarFieldOnMesh_CleanUp( void* drawingObject, void* _context ) {
-	lucScalarFieldOnMesh*          self          = (lucScalarFieldOnMesh*)drawingObject;
-	
-	_lucScalarFieldOnMeshCrossSection_CleanUp( self, _context );
-}
-
 void _lucScalarFieldOnMesh_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucScalarFieldOnMesh*  self          = (lucScalarFieldOnMesh*)drawingObject;
 	FeVariable*            fieldVariable = (FeVariable*) self->fieldVariable;
@@ -187,23 +156,27 @@ void _lucScalarFieldOnMesh_BuildDisplayList( void* drawingObject, void* _context
 	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, self->vertexGridHandle );
 	
 	if (fieldVariable->dim == 2) {
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, 0, K_AXIS );
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, K_AXIS, False));
 	}
 	else {
+	   glEnable(GL_LIGHTING);
+
 		if ( self->cullFace ) 
 			glEnable(GL_CULL_FACE);
 	
 		glFrontFace(GL_CCW);
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, 0, I_AXIS );
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, vertGrid->sizes[ J_AXIS ] - 1, J_AXIS );
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, 0, K_AXIS );
-	
-		glFrontFace(GL_CW);
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, vertGrid->sizes[ I_AXIS ] - 1, I_AXIS );
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, 0, J_AXIS );
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, vertGrid->sizes[ K_AXIS ] - 1, K_AXIS );
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, I_AXIS, False));
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, vertGrid->sizes[ J_AXIS ] - 1, J_AXIS, False));
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, K_AXIS, False));
 
-		glDisable(GL_CULL_FACE);
+		glFrontFace(GL_CW);
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, vertGrid->sizes[ I_AXIS ] - 1, I_AXIS, False));
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, J_AXIS, False));
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, vertGrid->sizes[ K_AXIS ] - 1, K_AXIS, False));
+
+
+		glFrontFace(GL_CCW);
+		//glDisable(GL_CULL_FACE);
 	}
 }
 

@@ -39,37 +39,31 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: ScalarFieldCrossSection.h 568 2006-06-02 06:21:50Z RobertTurnbull $
+** $Id: CrossSection.h 628 2006-10-12 08:23:07Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+#include "OpenGLDrawingObject.h"
 
-#include "CrossSection.h"
-
-#ifndef __lucScalarFieldOnMeshCrossSection_h__
-#define __lucScalarFieldOnMeshCrossSection_h__
-
-typedef struct {
-   double value;
-   double pos[3];
-   double normal[3];
-} MeshVertex;
+#ifndef __lucCrossSection_h__
+#define __lucCrossSection_h__
 
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
-	extern const Type lucScalarFieldOnMeshCrossSection_Type;
+	extern const Type lucCrossSection_Type;
 		
 	/** Class contents - this is defined as a macro so that sub-classes of this class can use this macro at the start of the definition of their struct */
-	#define __lucScalarFieldOnMeshCrossSection \
+	#define __lucCrossSection                    \
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
-		__lucCrossSection \
-		/* Virtual functions go here */ \
-		/* Other info */\
-		lucColourMap*                                      colourMap;              \
-		XYZ                                                minCropValues;          \
-		XYZ                                                maxCropValues;          \
-		Bool                                               wireFrame;              \
-		ExtensionInfo_Index                                vertexGridHandle;       \
+		__lucOpenGLDrawingObject                  \
+		/* Virtual functions go here */           \
+		/* Other info */                          \
+		lucColour            colour;              \
+		FieldVariable*       fieldVariable;       \
+		Name                 fieldVariableName;   \
+  		double               value;               \
+		Axis                 axis;                \
+      Bool                 interpolate;         \
 
-	struct lucScalarFieldOnMeshCrossSection { __lucScalarFieldOnMeshCrossSection };
+	struct lucCrossSection { __lucCrossSection };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	
@@ -77,31 +71,30 @@ typedef struct {
 	#define ZERO 0
 	#endif
 
-	#define LUCSCALARFIELDONMESHCROSSSECTION_DEFARGS \
-                LUCCROSSSECTION_DEFARGS
+	#define LUCCROSSSECTION_DEFARGS \
+                LUCOPENGLDRAWINGOBJECT_DEFARGS
 
-	#define LUCSCALARFIELDONMESHCROSSSECTION_PASSARGS \
-                LUCCROSSSECTION_PASSARGS
+	#define LUCCROSSSECTION_PASSARGS \
+                LUCOPENGLDRAWINGOBJECT_PASSARGS
 
-	lucScalarFieldOnMeshCrossSection* _lucScalarFieldOnMeshCrossSection_New(  LUCSCALARFIELDONMESHCROSSSECTION_DEFARGS  );
+	lucCrossSection* _lucCrossSection_New(  LUCCROSSSECTION_DEFARGS  );
 
-	void _lucScalarFieldOnMeshCrossSection_Delete( void* drawingObject ) ;
-	void _lucScalarFieldOnMeshCrossSection_Print( void* drawingObject, Stream* stream ) ;
+	void _lucCrossSection_Delete( void* drawingObject ) ;
+	void _lucCrossSection_Print( void* drawingObject, Stream* stream ) ;
 
 	/* 'Stg_Component' implementations */
-	void* _lucScalarFieldOnMeshCrossSection_DefaultNew( Name name ) ;
-	void _lucScalarFieldOnMeshCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
-	void _lucScalarFieldOnMeshCrossSection_Build( void* drawingObject, void* data ) ;
-	void _lucScalarFieldOnMeshCrossSection_Initialise( void* drawingObject, void* data ) ;
-	void _lucScalarFieldOnMeshCrossSection_Execute( void* drawingObject, void* data );
-	void _lucScalarFieldOnMeshCrossSection_Destroy( void* drawingObject, void* data ) ;
-	
-	void _lucScalarFieldOnMeshCrossSection_Setup( void* drawingObject, void* _context ) ;
-	void _lucScalarFieldOnMeshCrossSection_BuildDisplayList( void* drawingObject, void* _context ) ;
+	void* _lucCrossSection_DefaultNew( Name name ) ;
+	void _lucCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucCrossSection_Build( void* drawingObject, void* data ) ;
+	void _lucCrossSection_Initialise( void* drawingObject, void* data ) ;
+	void _lucCrossSection_Execute( void* drawingObject, void* data );
+	void _lucCrossSection_Destroy( void* drawingObject, void* data ) ;
 
-	void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject ) ;
-	Bool lucScalarFieldOnMeshCrossSection_PlotColouredVertex( void* drawingObject, Coord interpolationCoord, Coord plotCoord ) ;
-   void lucScalarFieldOnMeshCrossSection_PlotColouredNode( void* drawingObject, MeshVertex* vert);
+   void _lucCrossSection_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context );
+   void _lucCrossSection_BuildDisplayList( void* drawingObject, void* _context );
+
+   double lucCrossSection_GetValue(void* crossSection, double min, double max);
+   lucCrossSection* lucCrossSection_Set(void* crossSection, double val, Axis axis, Bool interpolate);
 
 #endif
 

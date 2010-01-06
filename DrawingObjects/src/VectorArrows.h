@@ -75,7 +75,6 @@
 
 	void _lucVectorArrows_Delete( void* drawingObject ) ;
 	void _lucVectorArrows_Print( void* drawingObject, Stream* stream ) ;
-	void* _lucVectorArrows_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) ;
 
 	/* 'Stg_Component' implementations */
 	void* _lucVectorArrows_DefaultNew( Name name ) ;
@@ -85,9 +84,6 @@
 	void _lucVectorArrows_Execute( void* drawingObject, void* data );
 	void _lucVectorArrows_Destroy( void* drawingObject, void* data ) ;
 	
-	void _lucVectorArrows_Setup( void* drawingObject, void* _context ) ;
-	void _lucVectorArrows_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) ;
-	void _lucVectorArrows_CleanUp( void* drawingObject, void* _context ) ;
 	void _lucVectorArrows_BuildDisplayList( void* drawingObject, void* _context ) ;
 
 #endif

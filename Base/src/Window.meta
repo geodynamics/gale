@@ -52,7 +52,7 @@
 	<struct>
 		<param name="Name">isTimedOut</param>
 		<param name="Type">Bool</param>
-		<param name="Default">True</param>
+		<param name="Default">False</param>
 		<param name="Description">If True, and interactive mode is on, the window will time out after maxIdleTime seconds have elapsed (default is 600).</param>
 	</struct>
 

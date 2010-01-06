@@ -13,7 +13,7 @@
 <param name="Parent">lucEigenvectorsCrossSection</param>
 <param name="Reference"></param>
 <param name="Summary"></param>
-<param name="Description">Samples the values of a tensor field in a grid and draws arrows to represent the Eigenvectors. (For more information about partameters and dependencies look at parent class lucEigenvectorCrossSection)...</param>
+<param name="Description">Samples the values of a tensor field in a grid and draws arrows to represent the Eigenvectors. (For more information about parameters and dependencies look at parent class lucEigenvectorCrossSection)...</param>
 
 <!--Now the interesting stuff-->
 
@@ -30,7 +30,7 @@
 <![CDATA[
 		<struct name="eigenvectors">
 			<param name="Type">lucEigenvectors</param>
-			<param name="TensorField">StrainRateField</param>
+			<param name="FieldVariable">StrainRateField</param>
 			<param name="leastColour">Green</param>
 			<param name="middleColour">Yellow</param>
 			<param name="greatestColour">Red</param>

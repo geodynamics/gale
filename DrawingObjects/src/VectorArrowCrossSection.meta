@@ -10,7 +10,7 @@
 <param name="Project Web">http://mcc.monash.edu.au/gLucifer</param>
 <param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
-<param name="Parent">lucOpenGLDrawingObject</param>
+<param name="Parent">lucCrossSection</param>
 <param name="Reference"></param>
 <param name="Summary"></param>
 <param name="Description">Samples the values of a vector field in a plane and draws arrows to represent the direction and scaled to represent the magnitude.</param>
@@ -98,7 +98,7 @@
 <list name="Dependencies">
 	<struct>
 		<param name="Essential">True</param>
-		<param name="Name">VectorVariable</param>
+		<param name="Name">FieldVariable</param>
 		<param name="Type">FieldVariable</param>
 		<param name="Description">The vector field that you wish to represent with arrows.</param>
 	</struct>
@@ -109,7 +109,7 @@
 <![CDATA[
 	<struct name="velocityArrowsCrossSection">
 		<param name="Type">lucVectorArrowCrossSection</param>
-		<param name="VectorVariable">VelocityField</param>
+		<param name="FieldVariable">VelocityField</param>
 		<param name="crossSection">y=0.4</param>
 		<param name="colour">Black</param>
 		<param name="arrowHeadSize">0.1</param> 

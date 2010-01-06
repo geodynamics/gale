@@ -158,24 +158,21 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 	Journal_DPrintfL( lucDebug, 2, "In func: %s for %s '%s'\n", __func__, self->type, self->name );
 	Stream_Indent( lucDebug );
 
-    /* Determine if context is double buffered or not and save flag */
-    glGetBooleanv(GL_DOUBLEBUFFER, &self->doubleBuffered);
-	/* Set up OpenGl Colour */
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	
-	glEnable(GL_COLOR_MATERIAL);
-	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
- 	/*	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);  -- Done in the viewport now	*/	
-    glDrawBuffer(self->doubleBuffered ? GL_BACK_LEFT : GL_FRONT_LEFT);
-    GL_Error_Check
+   /* Determine if context is double buffered or not and save flag */
+   glGetBooleanv(GL_DOUBLEBUFFER, &self->doubleBuffered);
+
+   glDrawBuffer(self->doubleBuffered ? GL_BACK_LEFT : GL_FRONT_LEFT);
+   GL_Error_Check
 
 	/* Allow Transparency */
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 
-    /* Interpolate colours between polygon vertices, looks nice but not technically accurate */
-    glShadeModel( GL_SMOOTH ); 
+   /* Interpolate colours between polygon vertices, looks nice but not technically accurate */
+   glShadeModel( GL_SMOOTH ); 
 
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_DEPTH_TEST);
 
 	lucWindow_Broadcast( window, 0, MPI_COMM_WORLD );
