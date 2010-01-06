@@ -51,7 +51,7 @@
 		DomainContext*				context; \
 		Stream*						debug; \
 		Stream*						info; \
-		NamedObject_Register*	integrateeRegister; \
+		NamedObject_Register*	integrandRegister; \
 		unsigned int				order; \
 		Bool							simultaneous; \
 		Name							_setupEPName; \
@@ -119,11 +119,11 @@
 	void _TimeIntegrator_ExecuteRK4Simultaneous( void* timeIntegrator, void* data ) ;
 
 	/* +++ Public Functions +++ */
-	void TimeIntegrator_Add( void* timeIntegrator, void* _timeIntegratee ) ;
+	void TimeIntegrator_Add( void* timeIntegrator, void* _timeIntegrand ) ;
 	#define TimeIntegrator_GetCount( self ) \
-		((TimeIntegrator*)self)->integrateeRegister->objects->count
+		((TimeIntegrator*)self)->integrandRegister->objects->count
 	#define TimeIntegrator_GetByIndex( self, index ) \
-		( (TimeIntegratee*) NamedObject_Register_GetByIndex( ((TimeIntegrator*)self)->integrateeRegister, index ) )
+		( (TimeIntegrand*) NamedObject_Register_GetByIndex( ((TimeIntegrator*)self)->integrandRegister, index ) )
 
 	void TimeIntegrator_Setup( void* timeIntegrator ) ;
 	void TimeIntegrator_AppendSetupEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, char* addedBy, void* data ) ;

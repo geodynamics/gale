@@ -65,7 +65,7 @@ typedef struct RegularRemesherCmpt RegularRemesherCmpt;
 	typedef struct LinearRegression     	LinearRegression;
 	typedef struct SemiRegDeform		SemiRegDeform;
 	typedef struct SobolGenerator            SobolGenerator;
-	typedef struct TimeIntegratee            TimeIntegratee;
+	typedef struct TimeIntegrand            TimeIntegrand;
 	typedef struct TimeIntegrator            TimeIntegrator;
 	typedef struct ShapeAdvector             ShapeAdvector;
 	typedef struct StripRemesher		StripRemesher;

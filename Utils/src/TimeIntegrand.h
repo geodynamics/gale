@@ -34,27 +34,27 @@
 **
 ** Comments:
 **
-** $Id: TimeIntegratee.h 3851 2006-10-12 08:57:22Z SteveQuenette $
+** $Id: TimeIntegrand.h 3851 2006-10-12 08:57:22Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StgDomain_Utils_TimeIntegratee_h__
-#define __StgDomain_Utils_TimeIntegratee_h__
+#ifndef __StgDomain_Utils_TimeIntegrand_h__
+#define __StgDomain_Utils_TimeIntegrand_h__
 	
-	typedef Bool (TimeIntegratee_CalculateTimeDerivFunction) ( void* timeIntegrator, Index array_I, double* timeDeriv );
-	typedef void (TimeIntegratee_IntermediateFunction) ( void* timeIntegrator, Index array_I );
+	typedef Bool (TimeIntegrand_CalculateTimeDerivFunction) ( void* timeIntegrator, Index array_I, double* timeDeriv );
+	typedef void (TimeIntegrand_IntermediateFunction) ( void* timeIntegrator, Index array_I );
 
-	extern const Type TimeIntegratee_Type;
+	extern const Type TimeIntegrand_Type;
 	
-	/* TimeIntegratee information */
-	#define __TimeIntegratee  \
+	/* TimeIntegrand information */
+	#define __TimeIntegrand  \
 		/* General info */ \
 		__Stg_Component \
 		\
 		DomainContext*				   context;		 \
 		/* Virtual info */ \
-		TimeIntegratee_CalculateTimeDerivFunction* _calculateTimeDeriv;  \
-		TimeIntegratee_IntermediateFunction*       _intermediate;  \
+		TimeIntegrand_CalculateTimeDerivFunction* _calculateTimeDeriv;  \
+		TimeIntegrand_IntermediateFunction*       _intermediate;  \
 		/* Other info */ \
 		TimeIntegrator*                            timeIntegrator;       \
 		Variable*                                  variable;             \
@@ -63,10 +63,10 @@
 		Bool                                       allowFallbackToFirstOrder; \
 		Stream*                                    debug;                \
 		
-	struct TimeIntegratee { __TimeIntegratee };
+	struct TimeIntegrand { __TimeIntegrand };
 	
 	/* Creation implementation / Virtual constructor */
-	TimeIntegratee* TimeIntegratee_New( 
+	TimeIntegrand* TimeIntegrand_New( 
 		Name                                   name,
 		DomainContext*                         context,
 		TimeIntegrator*                        timeIntegrator, 
@@ -80,20 +80,20 @@
 	#define ZERO 0
 	#endif
 
-	#define TIMEINTEGRATEE_DEFARGS \
+	#define TIMEINTEGRAND_DEFARGS \
                 STG_COMPONENT_DEFARGS, \
-                TimeIntegratee_CalculateTimeDerivFunction*  _calculateTimeDeriv, \
-                TimeIntegratee_IntermediateFunction*              _intermediate
+                TimeIntegrand_CalculateTimeDerivFunction*  _calculateTimeDeriv, \
+                TimeIntegrand_IntermediateFunction*              _intermediate
 
-	#define TIMEINTEGRATEE_PASSARGS \
+	#define TIMEINTEGRAND_PASSARGS \
                 STG_COMPONENT_PASSARGS, \
 	        _calculateTimeDeriv, \
 	        _intermediate      
 
-	TimeIntegratee* _TimeIntegratee_New(  TIMEINTEGRATEE_DEFARGS  );
+	TimeIntegrand* _TimeIntegrand_New(  TIMEINTEGRAND_DEFARGS  );
 
-void _TimeIntegratee_Init( 
-		void*                                      timeIntegratee,
+void _TimeIntegrand_Init( 
+		void*                                      timeIntegrand,
 		DomainContext*                             context,
 		TimeIntegrator*                            timeIntegrator, 
 		Variable*                                  variable, 
@@ -102,33 +102,33 @@ void _TimeIntegratee_Init(
 		Bool                                       allowFallbackToFirstOrder );
 		
 	/* 'Class' Virtual Functions */
-	void _TimeIntegratee_Delete( void* timeIntegrator );
-	void _TimeIntegratee_Print( void* timeIntegrator, Stream* stream );
-	#define TimeIntegratee_Copy( self ) \
-		(TimeIntegratee*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
-	#define TimeIntegratee_DeepCopy( self ) \
-		(TimeIntegratee*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _TimeIntegratee_Copy( void* timeIntegrator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void _TimeIntegrand_Delete( void* timeIntegrator );
+	void _TimeIntegrand_Print( void* timeIntegrator, Stream* stream );
+	#define TimeIntegrand_Copy( self ) \
+		(TimeIntegrand*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
+	#define TimeIntegrand_DeepCopy( self ) \
+		(TimeIntegrand*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
+	void* _TimeIntegrand_Copy( void* timeIntegrator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Functions */
-	void* _TimeIntegratee_DefaultNew( Name name ) ;
-	void _TimeIntegratee_AssignFromXML( void* timeIntegratee, Stg_ComponentFactory* cf, void* data ) ;
-	void _TimeIntegratee_Build( void* timeIntegrator, void* data );
-	void _TimeIntegratee_Initialise( void* timeIntegrator, void* data );
-	void _TimeIntegratee_Execute( void* timeIntegrator, void* data );
-	void _TimeIntegratee_Destroy( void* timeIntegratee, void* data );
+	void* _TimeIntegrand_DefaultNew( Name name ) ;
+	void _TimeIntegrand_AssignFromXML( void* timeIntegrand, Stg_ComponentFactory* cf, void* data ) ;
+	void _TimeIntegrand_Build( void* timeIntegrator, void* data );
+	void _TimeIntegrand_Initialise( void* timeIntegrator, void* data );
+	void _TimeIntegrand_Execute( void* timeIntegrator, void* data );
+	void _TimeIntegrand_Destroy( void* timeIntegrand, void* data );
 
 	/* +++ Virtual Functions +++ */
-	#define TimeIntegratee_CalculateTimeDeriv( timeIntegratee, array_I, timeDeriv ) \
-		( ((TimeIntegratee*) timeIntegratee )->_calculateTimeDeriv( timeIntegratee, array_I, timeDeriv ) )
-	#define TimeIntegratee_Intermediate( timeIntegratee, array_I ) \
-		( ((TimeIntegratee*) timeIntegratee )->_intermediate( timeIntegratee, array_I ) )
+	#define TimeIntegrand_CalculateTimeDeriv( timeIntegrand, array_I, timeDeriv ) \
+		( ((TimeIntegrand*) timeIntegrand )->_calculateTimeDeriv( timeIntegrand, array_I, timeDeriv ) )
+	#define TimeIntegrand_Intermediate( timeIntegrand, array_I ) \
+		( ((TimeIntegrand*) timeIntegrand )->_intermediate( timeIntegrand, array_I ) )
 
 	/* +++ Private Functions +++ */
-	Bool _TimeIntegratee_AdvectionTimeDeriv( void* timeIntegratee, Index array_I, double* timeDeriv ) ;
-	void _TimeIntegratee_Intermediate( void* timeIntegratee, Index array_I );
-	void _TimeIntegratee_RewindToStartAndApplyFirstOrderUpdate( 
-		TimeIntegratee* self,
+	Bool _TimeIntegrand_AdvectionTimeDeriv( void* timeIntegrand, Index array_I, double* timeDeriv ) ;
+	void _TimeIntegrand_Intermediate( void* timeIntegrand, Index array_I );
+	void _TimeIntegrand_RewindToStartAndApplyFirstOrderUpdate( 
+		TimeIntegrand* self,
 		double*         arrayDataPtr,
 		double*         startData,
 		double          startTime,
@@ -137,16 +137,16 @@ void _TimeIntegratee_Init(
 		Index           array_I );
 
 	/* +++ Public Functions +++ */
-	void TimeIntegratee_FirstOrder( void* timeIntegrator, Variable* startValue, double dt );
-	void TimeIntegratee_SecondOrder( void* timeIntegrator, Variable* startValue, double dt );
-	void TimeIntegratee_FourthOrder( void* timeIntegrator, Variable* startValue, double dt );
+	void TimeIntegrand_FirstOrder( void* timeIntegrator, Variable* startValue, double dt );
+	void TimeIntegrand_SecondOrder( void* timeIntegrator, Variable* startValue, double dt );
+	void TimeIntegrand_FourthOrder( void* timeIntegrator, Variable* startValue, double dt );
 
-	void TimeIntegratee_StoreTimeDeriv( void* timeIntegratee, Variable* timeDeriv ) ;
-	void TimeIntegratee_Add2TimesTimeDeriv( void* timeIntegratee, Variable* timeDerivVariable ) ;
-	void TimeIntegratee_FourthOrderFinalStep( void* timeIntegratee, Variable* startData, Variable* timeDerivVariable, double dt ) ;
+	void TimeIntegrand_StoreTimeDeriv( void* timeIntegrand, Variable* timeDeriv ) ;
+	void TimeIntegrand_Add2TimesTimeDeriv( void* timeIntegrand, Variable* timeDerivVariable ) ;
+	void TimeIntegrand_FourthOrderFinalStep( void* timeIntegrand, Variable* startData, Variable* timeDerivVariable, double dt ) ;
 
-	#define TimeIntegratee_GetTime( timeIntegratee ) \
-		TimeIntegrator_GetTime( ((TimeIntegratee*) timeIntegratee)->timeIntegrator ) 
+	#define TimeIntegrand_GetTime( timeIntegrand ) \
+		TimeIntegrator_GetTime( ((TimeIntegrand*) timeIntegrand)->timeIntegrator ) 
 
 #endif 
 

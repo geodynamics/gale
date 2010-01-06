@@ -51,7 +51,7 @@
 		/* Other Info */\
 		Stg_Shape*			shape; \
 		FieldVariable*		velocityField; \
-		TimeIntegratee*	timeIntegratee; \
+		TimeIntegrand*	timeIntegrand; \
 		Variable*			shapeCentreVariable;  \
 		Index					shapeCount; \
 		void*					shapeCentrePtr;

@@ -56,44 +56,44 @@ double TimeIntegrationSuite_GetDt( void* context ) {
    return 0.1;
 }
 
-Bool TimeIntegrationSuite_ConstantTimeDeriv( void* timeIntegratee, Index array_I, double* timeDeriv ) {
+Bool TimeIntegrationSuite_ConstantTimeDeriv( void* timeIntegrand, Index array_I, double* timeDeriv ) {
 	timeDeriv[0] = 2.0 * array_I;
    timeDeriv[1] = -1.0 * array_I;
 
    return True;
 }
-Bool TimeIntegrationSuite_ConstantTimeDeriv2( void* timeIntegratee, Index array_I, double* timeDeriv ) {
+Bool TimeIntegrationSuite_ConstantTimeDeriv2( void* timeIntegrand, Index array_I, double* timeDeriv ) {
    timeDeriv[0] = -0.5 * array_I;
    timeDeriv[1] = 3.0 * array_I;
 
    return True;
 }
-Bool TimeIntegrationSuite_LinearTimeDeriv( void* timeIntegratee, Index array_I, double* timeDeriv ) {
-   double time = TimeIntegratee_GetTime( timeIntegratee );
+Bool TimeIntegrationSuite_LinearTimeDeriv( void* timeIntegrand, Index array_I, double* timeDeriv ) {
+   double time = TimeIntegrand_GetTime( timeIntegrand );
 
    timeDeriv[0] = 2.0 * array_I * time;
    timeDeriv[1] = -1.0 * array_I * time;
 
    return True;
 }
-Bool TimeIntegrationSuite_LinearTimeDeriv2( void* timeIntegratee, Index array_I, double* timeDeriv ) {
-   double time = TimeIntegratee_GetTime( timeIntegratee );
+Bool TimeIntegrationSuite_LinearTimeDeriv2( void* timeIntegrand, Index array_I, double* timeDeriv ) {
+   double time = TimeIntegrand_GetTime( timeIntegrand );
 
    timeDeriv[0] = -0.5 * array_I * time;
    timeDeriv[1] = 3.0 * array_I * time;
 
    return True;
 }
-Bool TimeIntegrationSuite_CubicTimeDeriv( void* timeIntegratee, Index array_I, double* timeDeriv ) {
-   double time = TimeIntegratee_GetTime( timeIntegratee );
+Bool TimeIntegrationSuite_CubicTimeDeriv( void* timeIntegrand, Index array_I, double* timeDeriv ) {
+   double time = TimeIntegrand_GetTime( timeIntegrand );
 
    timeDeriv[0] = 2.0 * array_I * ( time * time * time - time*time );
    timeDeriv[1] = -1.0 * array_I * ( time * time * time - time*time );
 
    return True;
 }
-Bool TimeIntegrationSuite_CubicTimeDeriv2( void* timeIntegratee, Index array_I, double* timeDeriv ) {
-   double time = TimeIntegratee_GetTime( timeIntegratee );
+Bool TimeIntegrationSuite_CubicTimeDeriv2( void* timeIntegrand, Index array_I, double* timeDeriv ) {
+   double time = TimeIntegrand_GetTime( timeIntegrand );
 
    timeDeriv[0] = -0.5 * array_I * ( time * time * time - time*time );
    timeDeriv[1] = 3.0 * array_I * ( time * time * time - time*time );
@@ -101,7 +101,7 @@ Bool TimeIntegrationSuite_CubicTimeDeriv2( void* timeIntegratee, Index array_I, 
    return True;
 }
 
-TimeIntegratee_CalculateTimeDerivFunction* TimeIntegrationSuite_GetFunctionPtr( Name derivName ) {
+TimeIntegrand_CalculateTimeDerivFunction* TimeIntegrationSuite_GetFunctionPtr( Name derivName ) {
    if ( strcasecmp( derivName, "Linear" ) == 0 )
       return TimeIntegrationSuite_LinearTimeDeriv;
    else if ( strcasecmp( derivName, "Linear2" ) == 0 )
@@ -120,11 +120,11 @@ TimeIntegratee_CalculateTimeDerivFunction* TimeIntegrationSuite_GetFunctionPtr( 
    return NULL;
 }
 
-void TimeIntegrationSuite_TestContextType( void* timeIntegratee, Stg_Class* data ) {
+void TimeIntegrationSuite_TestContextType( void* timeIntegrand, Stg_Class* data ) {
    assert( data->type == DomainContext_Type );
 }
 
-void TimeIntegrationSuite_TestVariableType( void* timeIntegratee, Stg_Class* data ) {
+void TimeIntegrationSuite_TestVariableType( void* timeIntegrand, Stg_Class* data ) {
    assert( data->type == Variable_Type );
 }
 
@@ -146,8 +146,8 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	Stream*						stream;
    Dictionary*					dictionary;
    TimeIntegrator*			timeIntegrator;
-   TimeIntegratee*			timeIntegratee;
-   TimeIntegratee*			timeIntegrateeList[2];
+   TimeIntegrand*			timeIntegrand;
+   TimeIntegrand*			timeIntegrandList[2];
    DomainContext*				context;
    Variable*					variable;
    Variable*					variableList[2];
@@ -163,8 +163,8 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
    double						error	= 0.0;
    Name							derivName;
    double						tolerance	= 0.001;
-   Index							integratee_I;
-   Index							integrateeCount	= 2;
+   Index							integrand_I;
+   Index							integrandCount	= 2;
 	char							expected_file[PCU_PATH_MAX];
 
 	dictionary = Dictionary_New();
@@ -185,8 +185,8 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	variableList[1]			= Variable_NewVector( "testVariable2", (AbstractContext*)context, Variable_DataType_Double, 2, &size1, NULL, (void**)&array2, NULL );
 	timeIntegrator				= TimeIntegrator_New( "testTimeIntegrator", order, simultaneous, NULL, NULL );
 	timeIntegrator->context	= context;
-	timeIntegrateeList[0]	= TimeIntegratee_New( "testTimeIntegratee0", context, timeIntegrator, variableList[0], 0, NULL, True );
-	timeIntegrateeList[1]	= TimeIntegratee_New( "testTimeIntegratee1", context, timeIntegrator, variableList[1], 0, NULL, True );
+	timeIntegrandList[0]	= TimeIntegrand_New( "testTimeIntegrand0", context, timeIntegrator, variableList[0], 0, NULL, True );
+	timeIntegrandList[1]	= TimeIntegrand_New( "testTimeIntegrand1", context, timeIntegrator, variableList[1], 0, NULL, True );
 
 	Journal_Enable_AllTypedStream( True );
 	stream = Journal_Register( Info_Type, "EulerStream" );
@@ -194,10 +194,10 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 
 	Stream_Enable( timeIntegrator->info, False );
 	derivName = Dictionary_GetString( dictionary, "DerivName0" );
-	timeIntegrateeList[0]->_calculateTimeDeriv = TimeIntegrationSuite_GetFunctionPtr( derivName );
+	timeIntegrandList[0]->_calculateTimeDeriv = TimeIntegrationSuite_GetFunctionPtr( derivName );
 	Journal_Printf( stream, "DerivName0 - %s\n", derivName );
 	derivName = Dictionary_GetString( dictionary, "DerivName1" );
-	timeIntegrateeList[1]->_calculateTimeDeriv = TimeIntegrationSuite_GetFunctionPtr( derivName );
+	timeIntegrandList[1]->_calculateTimeDeriv = TimeIntegrationSuite_GetFunctionPtr( derivName );
 	Journal_Printf( stream, "DerivName1 - %s\n", derivName );
 
 	/* Print Stuff to file */
@@ -214,8 +214,8 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	Stg_Component_Build( variableList[0], context, False );
 	Stg_Component_Build( variableList[1], context, False );
 	Stg_Component_Build( timeIntegrator, context, False );
-	Stg_Component_Build( timeIntegrateeList[0], context, False );
-	Stg_Component_Build( timeIntegrateeList[1], context, False );
+	Stg_Component_Build( timeIntegrandList[0], context, False );
+	Stg_Component_Build( timeIntegrandList[1], context, False );
 	array = Memory_Alloc_Array( double, 2 * size0, "name" );
 	array2 = Memory_Alloc_Array( double, 2 * size1, "name" );
 
@@ -225,8 +225,8 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	Stg_Component_Initialise( timeIntegrator, context, False );
 	Stg_Component_Initialise( variableList[0], context, False );
 	Stg_Component_Initialise( variableList[1], context, False );
-	Stg_Component_Initialise( timeIntegrateeList[0], context, False );
-	Stg_Component_Initialise( timeIntegrateeList[1], context, False );
+	Stg_Component_Initialise( timeIntegrandList[0], context, False );
+	Stg_Component_Initialise( timeIntegrandList[1], context, False );
 
 	for ( timestep = 0.0 ; timestep < maxTimesteps ; timestep ++ ) {
 		Journal_Printf( stream, "Step %u - Time = %.3g\n", timestep, context->currentTime );
@@ -234,36 +234,36 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 		Stg_Component_Execute( timeIntegrator, context, True );
 		context->currentTime += AbstractContext_Dt( context );
 
-		for ( integratee_I = 0 ; integratee_I < integrateeCount ; integratee_I++ ) {
-			timeIntegratee	= timeIntegrateeList[ integratee_I ];
-			variable			= variableList[ integratee_I ];
+		for ( integrand_I = 0 ; integrand_I < integrandCount ; integrand_I++ ) {
+			timeIntegrand	= timeIntegrandList[ integrand_I ];
+			variable			= variableList[ integrand_I ];
 			for ( array_I = 0 ; array_I < variable->arraySize ; array_I++ ) {
-				if ( timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_ConstantTimeDeriv ) {
+				if ( timeIntegrand->_calculateTimeDeriv == TimeIntegrationSuite_ConstantTimeDeriv ) {
 					error += fabs( Variable_GetValueAtDouble( variable, array_I, 0 ) - 2.0 * array_I * context->currentTime );
 					error += fabs( Variable_GetValueAtDouble( variable, array_I, 1 ) + array_I * context->currentTime );
 				}
-				else if ( timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_ConstantTimeDeriv2 ) {
+				else if ( timeIntegrand->_calculateTimeDeriv == TimeIntegrationSuite_ConstantTimeDeriv2 ) {
 					error += fabs( Variable_GetValueAtDouble( variable, array_I, 0 ) + 0.5 * array_I * context->currentTime );
 					error += fabs( Variable_GetValueAtDouble( variable, array_I, 1 ) - 3 * array_I * context->currentTime );
 				}
-				else if ( timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_LinearTimeDeriv ) {
+				else if ( timeIntegrand->_calculateTimeDeriv == TimeIntegrationSuite_LinearTimeDeriv ) {
 					error += fabs( Variable_GetValueAtDouble( variable, array_I, 0 ) - array_I * context->currentTime * context->currentTime );
 					error += fabs( Variable_GetValueAtDouble( variable, array_I, 1 ) + 0.5 * array_I * context->currentTime * context->currentTime );
 				}
-				else if ( timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_LinearTimeDeriv2 ) {
+				else if ( timeIntegrand->_calculateTimeDeriv == TimeIntegrationSuite_LinearTimeDeriv2 ) {
 					error += fabs( Variable_GetValueAtDouble( variable, array_I, 0 ) + 0.25 * array_I * context->currentTime * context->currentTime );
 					error += fabs( Variable_GetValueAtDouble( variable, array_I, 1 ) - 1.5 * array_I * context->currentTime * context->currentTime );
 				}
-				else if ( timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_CubicTimeDeriv ) {
+				else if ( timeIntegrand->_calculateTimeDeriv == TimeIntegrationSuite_CubicTimeDeriv ) {
 					error += fabs( Variable_GetValueAtDouble( variable, array_I, 0 ) - 2.0 * array_I * ( 0.25 * pow( context->currentTime, 4.0 ) - pow( context->currentTime, 3.0)/3.0));
 					error += fabs( Variable_GetValueAtDouble( variable, array_I, 1 ) + array_I * ( 0.25 * pow( context->currentTime, 4.0 ) - pow( context->currentTime, 3.0 )/3.0));
 				}
-				else if ( timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_CubicTimeDeriv2 ) {
+				else if ( timeIntegrand->_calculateTimeDeriv == TimeIntegrationSuite_CubicTimeDeriv2 ) {
 					error += fabs( Variable_GetValueAtDouble( variable, array_I, 0 ) + 0.5 * array_I * ( 0.25 * pow( context->currentTime, 4.0 ) - pow( context->currentTime, 3.0)/3.0));
 					error += fabs( Variable_GetValueAtDouble( variable, array_I, 1 ) - 3.0 * array_I * ( 0.25 * pow( context->currentTime, 4.0 ) - pow( context->currentTime, 3.0 )/3.0));
 				}
 				else
-					Journal_Firewall( 0 , Journal_Register( Error_Type, CURR_MODULE_NAME ), "Don't understand _calculateTimeDeriv = %p\n", timeIntegratee->_calculateTimeDeriv );
+					Journal_Firewall( 0 , Journal_Register( Error_Type, CURR_MODULE_NAME ), "Don't understand _calculateTimeDeriv = %p\n", timeIntegrand->_calculateTimeDeriv );
 			}
 		}
 	}
@@ -276,16 +276,16 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	
 	Journal_Enable_AllTypedStream( False );
 
-	if ( timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_ConstantTimeDeriv
-		|| timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_ConstantTimeDeriv2 ) {
+	if ( timeIntegrand->_calculateTimeDeriv == TimeIntegrationSuite_ConstantTimeDeriv
+		|| timeIntegrand->_calculateTimeDeriv == TimeIntegrationSuite_ConstantTimeDeriv2 ) {
 		pcu_filename_expected( "testTimeIntegrationEulerOutput.expected", expected_file );
 	}
-	else if ( timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_LinearTimeDeriv
-		|| timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_LinearTimeDeriv2 ) {
+	else if ( timeIntegrand->_calculateTimeDeriv == TimeIntegrationSuite_LinearTimeDeriv
+		|| timeIntegrand->_calculateTimeDeriv == TimeIntegrationSuite_LinearTimeDeriv2 ) {
 		pcu_filename_expected( "testTimeIntegrationRK2Output.expected", expected_file );
 	}
-	else if ( timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_CubicTimeDeriv
-		|| timeIntegratee->_calculateTimeDeriv == TimeIntegrationSuite_CubicTimeDeriv2 ) {
+	else if ( timeIntegrand->_calculateTimeDeriv == TimeIntegrationSuite_CubicTimeDeriv
+		|| timeIntegrand->_calculateTimeDeriv == TimeIntegrationSuite_CubicTimeDeriv2 ) {
 		pcu_filename_expected( "testTimeIntegrationRK4Output.expected", expected_file );
 	}
 
@@ -297,8 +297,8 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	Memory_Free( array2 );
 	Stg_Class_Delete( variable );
 	_Stg_Component_Delete( timeIntegrator );
-	_Stg_Component_Delete( timeIntegrateeList[0] );
-	_Stg_Component_Delete( timeIntegrateeList[1] );
+	_Stg_Component_Delete( timeIntegrandList[0] );
+	_Stg_Component_Delete( timeIntegrandList[1] );
 	remove( _name );
 }
 	

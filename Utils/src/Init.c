@@ -72,7 +72,7 @@ Bool StgDomainUtils_Init( int* argc, char** argv[] ) {
 */
 
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), TimeIntegrator_Type, "0", (void*  (*)(Name))_TimeIntegrator_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), TimeIntegratee_Type, "0", (void*  (*)(Name))_TimeIntegratee_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), TimeIntegrand_Type, "0", (void*  (*)(Name))_TimeIntegrand_DefaultNew );
 	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ShapeAdvector_Type, "0", (void*  (*)(Name))_ShapeAdvector_DefaultNew );
 
 	RegisterParent( DomainContext_Type, AbstractContext_Type );
@@ -99,7 +99,7 @@ Bool StgDomainUtils_Init( int* argc, char** argv[] ) {
 	RegisterParent( OperatorFieldVariable_Type, FieldVariable_Type );
 	RegisterParent( FieldVariable_Register_Type, NamedObject_Register_Type );
 	RegisterParent( LinearRegression_Type, Stg_Class_Type );
-	RegisterParent( TimeIntegratee_Type, Stg_Component_Type );
+	RegisterParent( TimeIntegrand_Type, Stg_Component_Type );
 	RegisterParent( TimeIntegrator_Type, Stg_Component_Type );
 	RegisterParent( ShapeAdvector_Type, Stg_Component_Type );
 	
