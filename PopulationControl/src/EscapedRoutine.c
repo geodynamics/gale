@@ -283,28 +283,7 @@ void EscapedRoutine_RemoveParticles( void* escapedRoutine, Swarm* swarm ) {
 	Particle_InCellIndex  lastParticle_IndexWithinCell;
 	SizeT                 particleSize        = swarm->particleExtensionMgr->finalSize;
 
-	#if DEBUG
-	if ( Stream_IsPrintableLevel( self->debug, 2 ) ) {
-		Journal_Printf( self->debug, "Particles to remove:\n{ " );
-		for ( array_I = 0 ; array_I < self->particlesToRemoveCount - 1 ; array_I++ ) {
-			Journal_Printf( self->debug, "%u, ", self->particlesToRemoveList[ array_I ] );
-		}
-		Journal_Printf( self->debug, "%u }\n", self->particlesToRemoveList[ array_I ] );
-	}
-	#endif
-
-
 	EscapedRoutine_SortParticleList( self );
-
-	#if DEBUG
-	if ( Stream_IsPrintableLevel( self->debug, 2 ) ) {
-		Journal_Printf( self->debug, "Particles to remove:\n{ " );
-		for ( array_I = 0 ; array_I < self->particlesToRemoveCount - 1 ; array_I++ ) {
-			Journal_Printf( self->debug, "%u, ", self->particlesToRemoveList[ array_I ] );
-		}
-		Journal_Printf( self->debug, "%u }\n", self->particlesToRemoveList[ array_I ] );
-	}
-	#endif
 
 	for ( array_I = self->particlesToRemoveCount - 1 ; array_I < self->particlesToRemoveCount ; array_I-- ) {
 		particleToRemove_I               = self->particlesToRemoveList[ array_I ];
