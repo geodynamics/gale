@@ -197,15 +197,13 @@ void _lucScalarFieldOnMeshCrossSection_AssignFromXML( void* drawingObject, Stg_C
 
 void _lucScalarFieldOnMeshCrossSection_Build( void* drawingObject, void* data ) {
 	lucScalarFieldOnMeshCrossSection*     self    = (lucScalarFieldOnMeshCrossSection*)drawingObject;
-	AbstractContext*                context = Stg_CheckType( data, AbstractContext );
-	Stg_ComponentFactory*           cf      = context->CF;
 	FeVariable*                     feVariable;
 	Mesh*                           mesh;
 	Stream*                         errorStream = Journal_Register( Error_Type, self->type );
 	
 
 	/* HACK - Get pointer to FieldVariable in build phase just to let FieldVariables be created in plugins */
-	feVariable =  Stg_ComponentFactory_ConstructByName( cf, self->fieldVariableName, FeVariable, True, 0 /* dummy */ );
+	feVariable =  Stg_ComponentFactory_ConstructByName( self->context->CF, self->fieldVariableName, FeVariable, True, 0 /* dummy */ );
 	self->fieldVariable = (FieldVariable*) feVariable;
 
 	Journal_Firewall( self->fieldVariable->fieldComponentCount == 1, errorStream,
