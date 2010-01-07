@@ -59,7 +59,7 @@
 	/* SwarmAdvector information */
 	#define __SwarmAdvector \
 		/* General info */ \
-		__TimeIntegratee \
+		__TimeIntegrand \
 		/* Virtual Info */\
 		/* Other Info */\
 		MaterialPointsSwarm*                  swarm;                \
@@ -86,10 +86,10 @@
 	#endif
 
 	#define SWARMADVECTOR_DEFARGS \
-                TIMEINTEGRATEE_DEFARGS
+                TIMEINTEGRAND_DEFARGS
 
 	#define SWARMADVECTOR_PASSARGS \
-                TIMEINTEGRATEE_PASSARGS
+                TIMEINTEGRAND_PASSARGS
 
 	SwarmAdvector* _SwarmAdvector_New(  SWARMADVECTOR_DEFARGS  );
 

@@ -10,7 +10,7 @@
 <param name="Project Web">http://www.stgermainproject.org/PICellerator.html</param>
 <param name="Copyright">Copyright (C) 2005 VPAC and Monash Cluster Computing.</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
-<param name="Parent">TimeIntegratee</param>
+<param name="Parent">TimeIntegrand</param>
 <param name="Reference">http://en.wikipedia.org/wiki/Advection</param>
 <param name="Summary">A component which moves particles according to a velocity field each timestep.</param>
 <param name="Description">A component which moves particles according to a velocity field each timestep.</param>
