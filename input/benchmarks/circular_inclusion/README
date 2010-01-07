@@ -1,0 +1,9 @@
+To check the results yourself, run the accompanying input file with 3 different resolutions:
+
+Gale circular_inclusion.xml --elementResI=128 --elementResJ=128 --outputPath=128
+
+Gale circular_inclusion.xml --elementResI=256 --elementResJ=256 --outputPath=256
+
+Gale circular_inclusion.xml --elementResI=512 --elementResJ=512 --outputPath=512
+
+You will probably need to run the last one on a parallel machine.
