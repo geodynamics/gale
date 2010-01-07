@@ -91,7 +91,7 @@ Director* Director_New(
 
 	self = (Director*) _Director_DefaultNew( name );
 	
-	_TimeIntegratee_Init( self, context, timeIntegrator, variable, dataCount, data, allowFallbackToFirstOrder );
+	_TimeIntegrand_Init( self, context, timeIntegrator, variable, dataCount, data, allowFallbackToFirstOrder );
    _Director_Init(
 		self,
 		velGradField,
@@ -114,7 +114,7 @@ Director* _Director_New(  DIRECTOR_DEFARGS  )
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
 	assert( _sizeOfSelf >= sizeof(Director) );
-	self = (Director*) _TimeIntegratee_New(  TIMEINTEGRATEE_PASSARGS  );
+	self = (Director*) _TimeIntegrand_New(  TIMEINTEGRAND_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	
@@ -198,17 +198,17 @@ void* _Director_DefaultNew( Name name ) {
 	/* Variables set in this function */
 	SizeT                                               _sizeOfSelf = sizeof(Director);
 	Type                                                       type = Director_Type;
-	Stg_Class_DeleteFunction*                               _delete = _TimeIntegratee_Delete;
-	Stg_Class_PrintFunction*                                 _print = _TimeIntegratee_Print;
-	Stg_Class_CopyFunction*                                   _copy = _TimeIntegratee_Copy;
+	Stg_Class_DeleteFunction*                               _delete = _TimeIntegrand_Delete;
+	Stg_Class_PrintFunction*                                 _print = _TimeIntegrand_Print;
+	Stg_Class_CopyFunction*                                   _copy = _TimeIntegrand_Copy;
 	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _Director_DefaultNew;
 	Stg_Component_ConstructFunction*                     _construct = _Director_AssignFromXML;
 	Stg_Component_BuildFunction*                             _build = _Director_Build;
 	Stg_Component_InitialiseFunction*                   _initialise = _Director_Initialise;
-	Stg_Component_ExecuteFunction*                         _execute = _TimeIntegratee_Execute;
+	Stg_Component_ExecuteFunction*                         _execute = _TimeIntegrand_Execute;
 	Stg_Component_DestroyFunction*                         _destroy = _Director_Destroy;
-	TimeIntegratee_CalculateTimeDerivFunction*  _calculateTimeDeriv = _Director_TimeDerivative;
-	TimeIntegratee_IntermediateFunction*              _intermediate = _Director_Intermediate;
+	TimeIntegrand_CalculateTimeDerivFunction*  _calculateTimeDeriv = _Director_TimeDerivative;
+	TimeIntegrand_IntermediateFunction*              _intermediate = _Director_Intermediate;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
@@ -224,7 +224,7 @@ void _Director_AssignFromXML( void* director, Stg_ComponentFactory* cf, void* da
 	InitialDirectionType    initialDirectionType;
 	
 	/* Construct Parent */
-	_TimeIntegratee_AssignFromXML( self, cf, data );
+	_TimeIntegrand_AssignFromXML( self, cf, data );
 	
 	/* Construct 'Director' stuff */
 	/* TODO: 'KeyFallback' soon to be deprecated/updated */
@@ -277,7 +277,7 @@ void _Director_Build( void* director, void* data ) {
 	Director*                       self               = (Director*) director;
 
 	/* Build parent */
-	_TimeIntegratee_Build( self, data );
+	_TimeIntegrand_Build( self, data );
 
 	Stg_Component_Build( self->directorSwarmVariable, data, False );
 	Stg_Component_Build( self->dontUpdateParticle, data, False );
@@ -292,7 +292,7 @@ void _Director_Initialise( void* director, void* data ) {
 	AbstractContext*                context = (AbstractContext*)self->context;
 
 	/* Initialise Parent */
-	_TimeIntegratee_Initialise( self, data );
+	_TimeIntegrand_Initialise( self, data );
 
 	Stg_Component_Initialise( self->materialPointsSwarm, data, False );
 	Stg_Component_Initialise( self->directorSwarmVariable, data, False );
@@ -486,7 +486,7 @@ void _Director_Destroy( void* _self, void* data ) {
    Stg_Component_Destroy( self->directorSwarmVariable, data, False );
    Stg_Component_Destroy( self->dontUpdateParticle, data, False );
 	/* Destroy parent */
-	_TimeIntegratee_Destroy( self, data );
+	_TimeIntegrand_Destroy( self, data );
 
 }
 

@@ -46,7 +46,7 @@
 
 	Bool EulerDeform_TimeDeriv( void* crdAdvector, Index arrayInd, double* timeDeriv );
 
-	void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx );
+	void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx );
 
 	void EulerDeform_InterpVar( FieldVariable* field, Variable* var, Mesh* mesh, double** newCrds );
 

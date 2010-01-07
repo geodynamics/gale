@@ -10,7 +10,7 @@
 	<param name="Project Web">http://www.mcc.monash.edu.au/Software/Underworld</param>
 	<param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 	<param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
-	<param name="Parent">TimeIntegratee</param>
+	<param name="Parent">TimeIntegrand</param>
 	<param name="Reference">...</param>
 	<param name="Summary">...</param>
 	<param name="Description">This component allows to add a vector to a material points and to update it with respect to the deformation.</param>

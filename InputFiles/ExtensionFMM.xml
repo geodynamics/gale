@@ -8,12 +8,27 @@
 	</list>
 
 	<include> Underworld/BaseApps/ExtensionBaseApp.xml </include>
-	
+
+	<param name="lucPluginContext">context</param>	
 	<list name="plugins" mergeType="merge">
-		<!-- Output Plugins -->
-		<param>StgFEM_FrequentOutput</param>	
-		<param>Underworld_Vrms</param>	
-		<param>StgFEM_CPUTime</param>
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>	
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+			<param name="VelocityField">VelocityField</param>
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">lucPlugin</param>
+			<param name="Context">lucPluginContext</param>
+		</struct>
 	</list>
 
 	<!-- Rheology Components -->
@@ -40,7 +55,9 @@
 	I____________________________________________I
 
        -->
-
+      <struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
 
 		<!-- Definition of the geometry -->
 		<struct name="backgroundShape">
@@ -109,10 +126,17 @@
 			<param name="Type">MaterialViscosity</param>
 			<param name="eta0">10.000</param>
 		</struct>	
+		<!-- create a new timeIntegrator so that director integration does not clash with SwarmAdvection/EulerDeform -->
+		<struct name="timeIntegrator_aux" mergeType="replace">
+			<param name="Type">TimeIntegrator</param>
+			<param name="order">timeIntegratorOrder</param>
+			<param name="simultaneous">f</param>
+			<param name="Context">context</param>
+		</struct>		
 
 		<struct name="director">
 			<param name="Type">Director</param>
-			<param name="TimeIntegrator">timeIntegrator</param>
+			<param name="TimeIntegrator">timeIntegrator_aux</param>
 			<param name="VelocityGradientsField">VelocityGradientsField</param>
 			<param name="MaterialPointsSwarm">materialSwarm</param>
 			<param name="initialDirectionX">0.0</param>
@@ -123,7 +147,7 @@
 
 		<struct name="strainWeakening">
 			<param name="Type">StrainWeakening</param>
-			<param name="TimeIntegrator">timeIntegrator</param>
+			<param name="TimeIntegrator">timeIntegrator_aux</param>
 			<param name="MaterialPointsSwarm">materialSwarm</param>
 			<param name="softeningStrain">0.1</param>
 			<param name="initialDamageFraction">0.05</param>
@@ -220,7 +244,7 @@
 	<param name="dim"> 2 </param>             <!--this is a 2D problem-->
 	<param name="elementResI"> 60 </param>   <!--number of elements in x-direction-->
 	<param name="elementResJ"> 30 </param>    <!--number of elements in y-direction-->
-	<param name="elementResK"> 10 </param>    <!--number of elements in z-direction (not necessary here)-->
+	<param name="elementResK"> 1 </param>    <!--number of elements in z-direction (not necessary here)-->
 	<param name="shadowDepth"> 1 </param>     <!--used for parallel purpose-->
 
          <!--The following 6 parameters define the size of the box (or the cube in 3D)-->

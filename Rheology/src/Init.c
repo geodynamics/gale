@@ -114,9 +114,9 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	RegisterParent( MohrCoulomb_Type,                YieldRheology_Type );
 	RegisterParent( Pouliquen_etal_Type,             VonMises_Type );
 	
-	RegisterParent( StrainWeakening_Type,         TimeIntegratee_Type );
+	RegisterParent( StrainWeakening_Type,         TimeIntegrand_Type );
 	RegisterParent( BuiterStrainWeakening_Type,   StrainWeakening_Type );
-	RegisterParent( Director_Type,                TimeIntegratee_Type );
+	RegisterParent( Director_Type,                TimeIntegrand_Type );
 	RegisterParent( AlignmentSwarmVariable_Type,  SwarmVariable_Type );
 
 	RegisterParent( ConstitutiveMatrix_Type,          StiffnessMatrixTerm_Type );
