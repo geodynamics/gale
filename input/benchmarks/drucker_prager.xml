@@ -453,7 +453,7 @@
   <param name="maxTimeSteps">1</param>
   <param name="outputEvery">1</param>
   <param name="dumpEvery">1</param>
-  <param name="outputPath">./mohr_coulomb</param>
+  <param name="outputPath">./drucker_prager</param>
   <param name="dim">2</param>
   <param name="shadowDepth">1</param>
   <param name="minX">0.0f</param>
