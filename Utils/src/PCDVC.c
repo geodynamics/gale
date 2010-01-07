@@ -287,11 +287,10 @@ void _PCDVC_Destroy( void* pcdvc, void* data ) {
 }
 void _PCDVC_Initialise( void* pcdvc, void* data ) {
     PCDVC*	self = (PCDVC*)pcdvc;
-    AbstractContext* context = (AbstractContext*)data;
     /** for interpolation restart, we need to set these values high to ensure correct population of */
     /** integration point swarms                                                                    */
     /** these parameters will be reset to correct values after first timestep                       */
-    if ( context && (True == context->loadFromCheckPoint) && (True == context->interpolateRestart) ){
+    if ( (True == self->context->loadFromCheckPoint) && (True == self->context->interpolateRestart) ){
         self->maxDeletions           = 999999;
         self->maxSplits              = 999999;
         self->Inflow                 = True;
