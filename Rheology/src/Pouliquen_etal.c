@@ -241,16 +241,16 @@ void _Pouliquen_etal_Initialise( void* rheology, void* data ) {
    Stg_Component_Initialise( self->pressureField, data, False );
 	Stg_Component_Initialise( self->strainRateInvField, data, False );
 
-	/* Initialise variables that I've created - (mainly just SwarmVariables)
-	 * This will run a Variable_Update for us */
-	Stg_Component_Initialise( self->brightness, data, False );
-	Stg_Component_Initialise( self->opacity, data, False );
-	Stg_Component_Initialise( self->diameter, data, False );
-	Stg_Component_Initialise( self->tensileFailure, data, False );
-
 	/* We should only set initial conditions if in regular non-restart mode. If in restart mode, then
 	the particle-based variables will be set correcty when we re-load the Swarm. */
-	if ( !(True == self->context->loadFromCheckPoint) ) {
+	if ( self->context->loadFromCheckPoint == False ) {
+      /* Initialise variables that I've created - (mainly just SwarmVariables)
+       * This will run a Variable_Update for us */
+      Stg_Component_Initialise( self->brightness, data, False );
+      Stg_Component_Initialise( self->opacity, data, False );
+      Stg_Component_Initialise( self->diameter, data, False );
+      Stg_Component_Initialise( self->tensileFailure, data, False );
+
 		/* We don't need to Initialise hasYieldedVariable because it's a parent variable and _YieldRheology_Initialise
 		 * has already been called */
 		particleLocalCount = self->hasYieldedVariable->variable->arraySize;

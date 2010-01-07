@@ -254,7 +254,6 @@ void _DruckerPrager_Initialise( void* rheology, void* data ) {
 	DruckerPrager*                  self                  = (DruckerPrager*) rheology;
 	Particle_Index                  lParticle_I;
 	Particle_Index                  particleLocalCount;
-	AbstractContext*                context = (AbstractContext*)data;
 
 	_VonMises_Initialise( self, data );
 
@@ -262,14 +261,15 @@ void _DruckerPrager_Initialise( void* rheology, void* data ) {
 	 * This will run a Variable_Update for us */
 	if(self->pressureField) Stg_Component_Initialise( self->pressureField, data, False );
 	if(self->swarmPressure) Stg_Component_Initialise( self->swarmPressure, data, False );
-	Stg_Component_Initialise( self->brightness, data, False );
-	Stg_Component_Initialise( self->opacity, data, False );
-	Stg_Component_Initialise( self->diameter, data, False );
-	Stg_Component_Initialise( self->tensileFailure, data, False );
 
 	/* We should only set initial conditions if in regular non-restart mode. If in restart mode, then
 	the particle-based variables will be set correcty when we re-load the Swarm. */
-	if ( !(context && (True == context->loadFromCheckPoint)) ) {
+	if ( self->context->loadFromCheckPoint == False ) {
+      Stg_Component_Initialise( self->brightness, data, False );
+      Stg_Component_Initialise( self->opacity, data, False );
+      Stg_Component_Initialise( self->diameter, data, False );
+      Stg_Component_Initialise( self->tensileFailure, data, False );
+
 		/* We don't need to Initialise hasYieldedVariable because it's a parent variable and _YieldRheology_Initialise
 		 * has already been called */
 		particleLocalCount = self->hasYieldedVariable->variable->arraySize;

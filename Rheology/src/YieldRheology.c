@@ -188,7 +188,8 @@ void _YieldRheology_Initialise( void* rheology, void* data ) {
 
 	/* This variable only needs to be initialised if there are material points (hasYieldedVariable is created
 	 * in _YieldRheology_Init only in that case) */
-	if ( self->hasYieldedVariable ) Stg_Component_Initialise( self->hasYieldedVariable, data, False );
+	if ( self->context->loadFromCheckPoint == False )
+      if ( self->hasYieldedVariable ) Stg_Component_Initialise( self->hasYieldedVariable, data, False );
 }
 
 void _YieldRheology_Execute( void* rheology, void* data ) {}
