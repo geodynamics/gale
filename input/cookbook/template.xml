@@ -9,9 +9,6 @@
     <plugin>Underworld_VTKOutput</plugin>
   </plugins>
   <struct name="components">
-    <struct name="conditionFunctions">
-      <param name="Type">StgFEM_StandardConditionFunctions</param>
-    </struct>
     <struct name="mesh-linear">
       <param name="Type">FeMesh</param>
       <param name="elementType">linear</param>
@@ -362,7 +359,6 @@
         <param>2</param>
       </list>
     </struct>
-  </struct>
     <struct name="storeViscosity">
       <param name="Type">StoreVisc</param>
       <param name="MaterialPointsSwarm">materialSwarm</param>
@@ -371,6 +367,7 @@
       <param name="Type">StoreStress</param>
       <param name="MaterialPointsSwarm">materialSwarm</param>
     </struct>
+  </struct>
 
   <list name="FieldVariablesToCheckpoint">
     <param>VelocityField</param>
