@@ -223,7 +223,7 @@ void lucScalarField_DrawWithMesh( lucScalarField* self ) {
    lucColourMap*	cmap = self->colourMap;
    IArray*			inc;
    double			value;
-   int*				/* nodes,*/ nElements/*, curNode */;
+   unsigned			/* nodes,*/ nElements/*, curNode */;
    /* int nodeMap[4] = {0, 1, 3, 2}; */
    double			xi[3], vertex[3];
    int				ii, jj, kk;
