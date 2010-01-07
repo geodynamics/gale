@@ -25,7 +25,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: TimeIntegratee.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: TimeIntegrand.c 4137 2007-06-07 05:46:46Z LukeHodkinson $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -39,16 +39,16 @@
 #include "types.h"
 #include "DomainContext.h"
 #include "TimeIntegrator.h"
-#include "TimeIntegratee.h"
+#include "TimeIntegrand.h"
 #include "FieldVariable.h"
 
 #include <assert.h>
 #include <string.h>
 
 /* Textual name of this class */
-const Type TimeIntegratee_Type = "TimeIntegratee";
+const Type TimeIntegrand_Type = "TimeIntegrand";
 
-TimeIntegratee* TimeIntegratee_New( 
+TimeIntegrand* TimeIntegrand_New( 
 		Name                                       name,
 		DomainContext*                             context,
 		TimeIntegrator*                            timeIntegrator, 
@@ -57,18 +57,18 @@ TimeIntegratee* TimeIntegratee_New(
 		Stg_Component**                            data,
 		Bool                                       allowFallbackToFirstOrder )
 {
-	TimeIntegratee*	self;
+	TimeIntegrand*	self;
 
-	self = (TimeIntegratee*) _TimeIntegratee_DefaultNew( name );
-	_TimeIntegratee_Init( self, context, timeIntegrator, variable, dataCount, data, allowFallbackToFirstOrder );
+	self = (TimeIntegrand*) _TimeIntegrand_DefaultNew( name );
+	_TimeIntegrand_Init( self, context, timeIntegrator, variable, dataCount, data, allowFallbackToFirstOrder );
 	return self;
 }
 
-TimeIntegratee* _TimeIntegratee_New(  TIMEINTEGRATEE_DEFARGS  )
+TimeIntegrand* _TimeIntegrand_New(  TIMEINTEGRAND_DEFARGS  )
 {
-	TimeIntegratee*	self;
+	TimeIntegrand*	self;
 	
-	assert( _sizeOfSelf >= sizeof(TimeIntegratee) );
+	assert( _sizeOfSelf >= sizeof(TimeIntegrand) );
 	
 	/* General info */
 	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
@@ -76,7 +76,7 @@ TimeIntegratee* _TimeIntegratee_New(  TIMEINTEGRATEE_DEFARGS  )
 	   and so should be set to ZERO in any children of this class. */
 	nameAllocationType = NON_GLOBAL;
 
-	self = (TimeIntegratee*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
+	self = (TimeIntegrand*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	/* virtual info */
 	self->_calculateTimeDeriv = _calculateTimeDeriv;
@@ -85,8 +85,8 @@ TimeIntegratee* _TimeIntegratee_New(  TIMEINTEGRATEE_DEFARGS  )
 	return self;
 }
 
-void _TimeIntegratee_Init( 
-		void*                                      timeIntegratee,
+void _TimeIntegrand_Init( 
+		void*                                      timeIntegrand,
 		DomainContext*                             context,
 		TimeIntegrator*                            timeIntegrator, 
 		Variable*                                  variable, 
@@ -94,7 +94,7 @@ void _TimeIntegratee_Init(
 		Stg_Component**                            data,
 		Bool                                       allowFallbackToFirstOrder )
 {
-	TimeIntegratee* self = (TimeIntegratee*)timeIntegratee;
+	TimeIntegrand* self = (TimeIntegrand*)timeIntegrand;
 
    self->context        = context;
 	self->debug          = Journal_Register( Debug_Type, self->type );
@@ -108,19 +108,19 @@ void _TimeIntegratee_Init(
 	TimeIntegrator_Add( timeIntegrator, self );
 }
 
-void _TimeIntegratee_Delete( void* timeIntegratee ) {
-	TimeIntegratee* self = (TimeIntegratee*)timeIntegratee;
+void _TimeIntegrand_Delete( void* timeIntegrand ) {
+	TimeIntegrand* self = (TimeIntegrand*)timeIntegrand;
 	
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
 
 	_Stg_Component_Delete( self );
 }
 
-void _TimeIntegratee_Print( void* timeIntegratee, Stream* stream ) {
-	TimeIntegratee* self = (TimeIntegratee*)timeIntegratee;
+void _TimeIntegrand_Print( void* timeIntegrand, Stream* stream ) {
+	TimeIntegrand* self = (TimeIntegrand*)timeIntegrand;
 
 	/* General info */
-	Journal_DPrintf( self->debug, "TimeIntegratee - '%s'\n", self->name );
+	Journal_DPrintf( self->debug, "TimeIntegrand - '%s'\n", self->name );
 	Journal_PrintPointer( stream, self );
 	Stream_Indent( stream );
 	
@@ -134,40 +134,40 @@ void _TimeIntegratee_Print( void* timeIntegratee, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void* _TimeIntegratee_Copy( void* timeIntegratee, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-	TimeIntegratee*	self = (TimeIntegratee*)timeIntegratee;
-	TimeIntegratee*	newTimeIntegratee;
+void* _TimeIntegrand_Copy( void* timeIntegrand, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+	TimeIntegrand*	self = (TimeIntegrand*)timeIntegrand;
+	TimeIntegrand*	newTimeIntegrand;
 	
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
 	/* TODO */ abort();
 
-	return (void*)newTimeIntegratee;
+	return (void*)newTimeIntegrand;
 }
 
-void* _TimeIntegratee_DefaultNew( Name name ) {
+void* _TimeIntegrand_DefaultNew( Name name ) {
 	/* Variables set in this function */
-	SizeT                                               _sizeOfSelf = sizeof(TimeIntegratee);
-	Type                                                       type = TimeIntegratee_Type;
-	Stg_Class_DeleteFunction*                               _delete = _TimeIntegratee_Delete;
-	Stg_Class_PrintFunction*                                 _print = _TimeIntegratee_Print;
-	Stg_Class_CopyFunction*                                   _copy = _TimeIntegratee_Copy;
-	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _TimeIntegratee_DefaultNew;
-	Stg_Component_ConstructFunction*                     _construct = _TimeIntegratee_AssignFromXML;
-	Stg_Component_BuildFunction*                             _build = _TimeIntegratee_Build;
-	Stg_Component_InitialiseFunction*                   _initialise = _TimeIntegratee_Initialise;
-	Stg_Component_ExecuteFunction*                         _execute = _TimeIntegratee_Execute;
-	Stg_Component_DestroyFunction*                         _destroy = _TimeIntegratee_Destroy;
-	TimeIntegratee_CalculateTimeDerivFunction*  _calculateTimeDeriv = _TimeIntegratee_AdvectionTimeDeriv;
-	TimeIntegratee_IntermediateFunction*              _intermediate = _TimeIntegratee_Intermediate;
+	SizeT                                               _sizeOfSelf = sizeof(TimeIntegrand);
+	Type                                                       type = TimeIntegrand_Type;
+	Stg_Class_DeleteFunction*                               _delete = _TimeIntegrand_Delete;
+	Stg_Class_PrintFunction*                                 _print = _TimeIntegrand_Print;
+	Stg_Class_CopyFunction*                                   _copy = _TimeIntegrand_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _TimeIntegrand_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _TimeIntegrand_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _TimeIntegrand_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _TimeIntegrand_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _TimeIntegrand_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _TimeIntegrand_Destroy;
+	TimeIntegrand_CalculateTimeDerivFunction*  _calculateTimeDeriv = _TimeIntegrand_AdvectionTimeDeriv;
+	TimeIntegrand_IntermediateFunction*              _intermediate = _TimeIntegrand_Intermediate;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
-	return (void*) _TimeIntegratee_New(  TIMEINTEGRATEE_PASSARGS  );
+	return (void*) _TimeIntegrand_New(  TIMEINTEGRAND_PASSARGS  );
 }
 
-void _TimeIntegratee_AssignFromXML( void* timeIntegratee, Stg_ComponentFactory* cf, void* data ) {
-	TimeIntegratee*         self                    = (TimeIntegratee*)timeIntegratee;
+void _TimeIntegrand_AssignFromXML( void* timeIntegrand, Stg_ComponentFactory* cf, void* data ) {
+	TimeIntegrand*         self                    = (TimeIntegrand*)timeIntegrand;
 	Index                   dataCount               = 0;
 	Stg_Component**         initData                = NULL;
 	Variable*               variable                = NULL;
@@ -192,43 +192,43 @@ void _TimeIntegratee_AssignFromXML( void* timeIntegratee, Stg_ComponentFactory* 
 		data );
 	allowFallbackToFirstOrder = Stg_ComponentFactory_GetBool( cf, self->name, "allowFallbackToFirstOrder", False );	
 
-	_TimeIntegratee_Init( self, context, timeIntegrator, variable, dataCount, initData, allowFallbackToFirstOrder );
+	_TimeIntegrand_Init( self, context, timeIntegrator, variable, dataCount, initData, allowFallbackToFirstOrder );
 
 	if( initData != NULL )
 		Memory_Free( initData );
 }
 
-void _TimeIntegratee_Build( void* timeIntegratee, void* data ) {
-	TimeIntegratee* self = (TimeIntegratee*)timeIntegratee;
+void _TimeIntegrand_Build( void* timeIntegrand, void* data ) {
+	TimeIntegrand* self = (TimeIntegrand*)timeIntegrand;
 
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
 
 	Stg_Component_Build( self->variable, NULL, False );
 }
 
-void _TimeIntegratee_Initialise( void* timeIntegratee, void* data ) {
-	TimeIntegratee* self = (TimeIntegratee*)timeIntegratee;
+void _TimeIntegrand_Initialise( void* timeIntegrand, void* data ) {
+	TimeIntegrand* self = (TimeIntegrand*)timeIntegrand;
 	
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
-	Stg_Component_Initialise( self->variable, NULL, False );
+   if ( self->context->loadFromCheckPoint == False ) Stg_Component_Initialise( self->variable, NULL, False );
 }
 
-void _TimeIntegratee_Execute( void* timeIntegratee, void* data ) {
-	TimeIntegratee*	self = (TimeIntegratee*)timeIntegratee;
+void _TimeIntegrand_Execute( void* timeIntegrand, void* data ) {
+	TimeIntegrand*	self = (TimeIntegrand*)timeIntegrand;
 
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
 }
 	
-void _TimeIntegratee_Destroy( void* timeIntegratee, void* data ) {
-	TimeIntegratee*	self = (TimeIntegratee*)timeIntegratee;
+void _TimeIntegrand_Destroy( void* timeIntegrand, void* data ) {
+	TimeIntegrand*	self = (TimeIntegrand*)timeIntegrand;
    	
 	Memory_Free( self->data );
 
 }
 
 /* +++ Virtual Functions +++ */
-void TimeIntegratee_FirstOrder( void* timeIntegratee, Variable* startValue, double dt ) {
-	TimeIntegratee*	self           = (TimeIntegratee*)timeIntegratee;
+void TimeIntegrand_FirstOrder( void* timeIntegrand, Variable* startValue, double dt ) {
+	TimeIntegrand*	self           = (TimeIntegrand*)timeIntegrand;
 	Variable*       variable       = self->variable;
 	double*         arrayDataPtr;
 	double*         startDataPtr;
@@ -249,9 +249,9 @@ void TimeIntegratee_FirstOrder( void* timeIntegratee, Variable* startValue, doub
 
 	timeDeriv = Memory_Alloc_2DArray( double, arrayCount, componentCount, "Time Deriv" );
 	for( array_I = 0; array_I < arrayCount; array_I++ ) {
-		successFlag = TimeIntegratee_CalculateTimeDeriv( self, array_I, timeDeriv[array_I] );
+		successFlag = TimeIntegrand_CalculateTimeDeriv( self, array_I, timeDeriv[array_I] );
 		Journal_Firewall( True == successFlag, errorStream,
-			"Error - in %s(), for TimeIntegratee \"%s\" of type %s: When trying to find time "
+			"Error - in %s(), for TimeIntegrand \"%s\" of type %s: When trying to find time "
 			"deriv for item %u in step %u, *failed*.\n",
 			__func__, self->name, self->type, array_I, 1 );
 	}
@@ -264,14 +264,14 @@ void TimeIntegratee_FirstOrder( void* timeIntegratee, Variable* startValue, doub
 			arrayDataPtr[ component_I ] = startDataPtr[ component_I ] + dt * timeDeriv[array_I][ component_I ];
 		}
 	
-		TimeIntegratee_Intermediate( self, array_I );
+		TimeIntegrand_Intermediate( self, array_I );
 	}
 
 	Memory_Free( timeDeriv );
 }
 
-void TimeIntegratee_SecondOrder( void* timeIntegratee, Variable* startValue, double dt ) {
-	TimeIntegratee*	self           = (TimeIntegratee*)timeIntegratee;
+void TimeIntegrand_SecondOrder( void* timeIntegrand, Variable* startValue, double dt ) {
+	TimeIntegrand*	self           = (TimeIntegrand*)timeIntegrand;
 	Variable*       variable       = self->variable;
 	double*         arrayDataPtr;
 	double*         startDataPtr;
@@ -305,34 +305,34 @@ void TimeIntegratee_SecondOrder( void* timeIntegratee, Variable* startValue, dou
 		memcpy( startData, startDataPtr, sizeof( double ) * componentCount );
 
 		/* Do Predictor Step */
-		successFlag = TimeIntegratee_CalculateTimeDeriv( self, array_I, timeDeriv );
+		successFlag = TimeIntegrand_CalculateTimeDeriv( self, array_I, timeDeriv );
 		Journal_Firewall( True == successFlag, errorStream,
-			"Error - in %s(), for TimeIntegratee \"%s\" of type %s: When trying to find time "
+			"Error - in %s(), for TimeIntegrand \"%s\" of type %s: When trying to find time "
 			"deriv for item %u in step %u, *failed*.\n",
 			__func__, self->name, self->type, array_I, 1 );
 		
 		for ( component_I = 0 ; component_I < componentCount ; component_I++ ) 
 			arrayDataPtr[ component_I ] = startData[ component_I ] + 0.5 * dt * timeDeriv[ component_I ];
-		TimeIntegratee_Intermediate( self, array_I );
+		TimeIntegrand_Intermediate( self, array_I );
 
 		TimeIntegrator_SetTime( self->timeIntegrator, startTime + 0.5 * dt );
 
 		/* Do Corrector Step */
-		successFlag = TimeIntegratee_CalculateTimeDeriv( self, array_I, timeDeriv );
+		successFlag = TimeIntegrand_CalculateTimeDeriv( self, array_I, timeDeriv );
 
 		if ( True == successFlag ) {
 			for ( component_I = 0 ; component_I < componentCount ; component_I++ ) 
 				arrayDataPtr[ component_I ] = startData[ component_I ] + dt * timeDeriv[ component_I ];
 			
-			TimeIntegratee_Intermediate( self, array_I );
+			TimeIntegrand_Intermediate( self, array_I );
 		}
 		else {
 			Journal_Firewall( True == self->allowFallbackToFirstOrder, errorStream,
-				"Error - in %s(), for TimeIntegratee \"%s\" of type %s: When trying to find time "
+				"Error - in %s(), for TimeIntegrand \"%s\" of type %s: When trying to find time "
 				"deriv for item %u in step %u, *failed*, and self->allowFallbackToFirstOrder "
 				"not enabled.\n", __func__, self->name, self->type, array_I, 2 );
 				
-			_TimeIntegratee_RewindToStartAndApplyFirstOrderUpdate( self,
+			_TimeIntegrand_RewindToStartAndApplyFirstOrderUpdate( self,
 				arrayDataPtr, startData, startTime, dt,
 				timeDeriv, array_I );
 		}
@@ -342,8 +342,8 @@ void TimeIntegratee_SecondOrder( void* timeIntegratee, Variable* startValue, dou
 	Memory_Free( startData );
 }
 
-void TimeIntegratee_FourthOrder( void* timeIntegratee, Variable* startValue, double dt ) {
-	TimeIntegratee*	self           = (TimeIntegratee*)timeIntegratee;
+void TimeIntegrand_FourthOrder( void* timeIntegrand, Variable* startValue, double dt ) {
+	TimeIntegrand*	self           = (TimeIntegrand*)timeIntegrand;
 	Variable*       variable       = self->variable;
 	double*         arrayDataPtr;
 	double*         startDataPtr;
@@ -380,54 +380,54 @@ void TimeIntegratee_FourthOrder( void* timeIntegratee, Variable* startValue, dou
 		memcpy( startData, startDataPtr, sizeof( double ) * componentCount );
 
 		/* Do first Step - store K1 in finalTimeDeriv and update for next step */
-		successFlag = TimeIntegratee_CalculateTimeDeriv( self, array_I, finalTimeDeriv );
+		successFlag = TimeIntegrand_CalculateTimeDeriv( self, array_I, finalTimeDeriv );
 		Journal_Firewall( True == successFlag, errorStream,
-			"Error - in %s(), for TimeIntegratee \"%s\" of type %s: When trying to find time "
+			"Error - in %s(), for TimeIntegrand \"%s\" of type %s: When trying to find time "
 			"deriv for item %u in step %u, *failed*.\n",
 			__func__, self->name, self->type, array_I, 1 );
 
 		for ( component_I = 0 ; component_I < componentCount ; component_I++ ) 
 			arrayDataPtr[ component_I ] = startData[ component_I ] + 0.5 * dt * finalTimeDeriv[ component_I ];
-		TimeIntegratee_Intermediate( self, array_I );
+		TimeIntegrand_Intermediate( self, array_I );
 
 		TimeIntegrator_SetTime( self->timeIntegrator, startTime + 0.5 * dt );
 
 		/* Do Second Step - add 2xK2 value to finalTimeDeriv and update for next step */
-		successFlag = TimeIntegratee_CalculateTimeDeriv( self, array_I, timeDeriv );
+		successFlag = TimeIntegrand_CalculateTimeDeriv( self, array_I, timeDeriv );
 		if ( True == successFlag ) {
 			for ( component_I = 0 ; component_I < componentCount ; component_I++ ) {
 				arrayDataPtr[ component_I ] = startData[ component_I ] + 0.5 * dt * timeDeriv[ component_I ];
 				finalTimeDeriv[ component_I ] += 2.0 * timeDeriv[ component_I ];
 			}
-			TimeIntegratee_Intermediate( self, array_I );
+			TimeIntegrand_Intermediate( self, array_I );
 		}
 		else {
 			Journal_Firewall( True == self->allowFallbackToFirstOrder, errorStream,
-				"Error - in %s(), for TimeIntegratee \"%s\" of type %s: When trying to find time "
+				"Error - in %s(), for TimeIntegrand \"%s\" of type %s: When trying to find time "
 				"deriv for item %u in step %u, *failed*, and self->allowFallbackToFirstOrder "
 				"not enabled.\n", __func__, self->name, self->type, array_I, 2 );
 				
-			_TimeIntegratee_RewindToStartAndApplyFirstOrderUpdate( self,
+			_TimeIntegrand_RewindToStartAndApplyFirstOrderUpdate( self,
 				arrayDataPtr, startData, startTime, dt,
 				timeDeriv, array_I );
 		}
 
 		/* Do Third Step - add 2xK3 value to finalTimeDeriv and update for next step */
-		successFlag = TimeIntegratee_CalculateTimeDeriv( self, array_I, timeDeriv );
+		successFlag = TimeIntegrand_CalculateTimeDeriv( self, array_I, timeDeriv );
 		if ( True == successFlag ) {
 			for ( component_I = 0 ; component_I < componentCount ; component_I++ ) {
 				arrayDataPtr[ component_I ] = startData[ component_I ] + dt * timeDeriv[ component_I ];
 				finalTimeDeriv[ component_I ] += 2.0 * timeDeriv[ component_I ];
 			}
-			TimeIntegratee_Intermediate( self, array_I );
+			TimeIntegrand_Intermediate( self, array_I );
 		}
 		else {
 			Journal_Firewall( True == self->allowFallbackToFirstOrder, errorStream,
-				"Error - in %s(), for TimeIntegratee \"%s\" of type %s: When trying to find time "
+				"Error - in %s(), for TimeIntegrand \"%s\" of type %s: When trying to find time "
 				"deriv for item %u in step %u, *failed*, and self->allowFallbackToFirstOrder "
 				"not enabled.\n", __func__, self->name, self->type, array_I, 3 );
 				
-			_TimeIntegratee_RewindToStartAndApplyFirstOrderUpdate( self,
+			_TimeIntegrand_RewindToStartAndApplyFirstOrderUpdate( self,
 				arrayDataPtr, startData, startTime, dt,
 				timeDeriv, array_I );
 		}
@@ -435,21 +435,21 @@ void TimeIntegratee_FourthOrder( void* timeIntegratee, Variable* startValue, dou
 		TimeIntegrator_SetTime( self->timeIntegrator, startTime + dt );
 
 		/* Do Fourth Step - 'K1 + 2K2 + 2K3' and K4 finalTimeDeriv to find final value */
-		successFlag = TimeIntegratee_CalculateTimeDeriv( self, array_I, timeDeriv );
+		successFlag = TimeIntegrand_CalculateTimeDeriv( self, array_I, timeDeriv );
 		if ( True == successFlag ) {
 			for ( component_I = 0 ; component_I < componentCount ; component_I++ ) {
 				arrayDataPtr[ component_I ] = startData[ component_I ] + 
 					dt/6.0 * (timeDeriv[ component_I ] + finalTimeDeriv[ component_I ] );
 			}		
-			TimeIntegratee_Intermediate( self, array_I );
+			TimeIntegrand_Intermediate( self, array_I );
 		}
 		else {
 			Journal_Firewall( True == self->allowFallbackToFirstOrder, errorStream,
-				"Error - in %s(), for TimeIntegratee \"%s\" of type %s: When trying to find time "
+				"Error - in %s(), for TimeIntegrand \"%s\" of type %s: When trying to find time "
 				"deriv for item %u in step %u, *failed*, and self->allowFallbackToFirstOrder "
 				"not enabled.\n", __func__, self->name, self->type, array_I, 4 );
 				
-			_TimeIntegratee_RewindToStartAndApplyFirstOrderUpdate( self,
+			_TimeIntegrand_RewindToStartAndApplyFirstOrderUpdate( self,
 				arrayDataPtr, startData, startTime, dt,
 				timeDeriv, array_I );
 		}
@@ -462,8 +462,8 @@ void TimeIntegratee_FourthOrder( void* timeIntegratee, Variable* startValue, dou
 
 
 /* Note : this function is used to apply to just one item/particle - see the array_I parameter */
-void _TimeIntegratee_RewindToStartAndApplyFirstOrderUpdate( 
-		TimeIntegratee* self,
+void _TimeIntegrand_RewindToStartAndApplyFirstOrderUpdate( 
+		TimeIntegrand* self,
 		double*         arrayDataPtr,
 		double*         startData,
 		double          startTime,
@@ -480,15 +480,15 @@ void _TimeIntegratee_RewindToStartAndApplyFirstOrderUpdate(
 	for ( component_I = 0 ; component_I < componentCount ; component_I++ ) {
 		arrayDataPtr[ component_I ] = startData[ component_I ];
 	}	
-	TimeIntegratee_Intermediate( self, array_I );
+	TimeIntegrand_Intermediate( self, array_I );
 
 	/* Now recalculate time deriv at start positions, then do a full dt first order update from
 	 * there */
 	TimeIntegrator_SetTime( self->timeIntegrator, startTime );
-	successFlag = TimeIntegratee_CalculateTimeDeriv( self, array_I, timeDeriv );
+	successFlag = TimeIntegrand_CalculateTimeDeriv( self, array_I, timeDeriv );
 	for ( component_I = 0 ; component_I < componentCount ; component_I++ ) 
 		arrayDataPtr[ component_I ] = startData[ component_I ] + dt * timeDeriv[ component_I ];
-	TimeIntegratee_Intermediate( self, array_I );
+	TimeIntegrand_Intermediate( self, array_I );
 }
 
 
@@ -499,8 +499,8 @@ void _TimeIntegratee_RewindToStartAndApplyFirstOrderUpdate(
  *            the ODE that we are solving is \dot \phi = u(x,y) 
  *            the velocity Field Variable is stored in data[0]
  *            the variable being updated is the global coordinate of the object */
-Bool _TimeIntegratee_AdvectionTimeDeriv( void* timeIntegratee, Index array_I, double* timeDeriv ) {
-	TimeIntegratee*	     self          = (TimeIntegratee*) timeIntegratee;
+Bool _TimeIntegrand_AdvectionTimeDeriv( void* timeIntegrand, Index array_I, double* timeDeriv ) {
+	TimeIntegrand*	     self          = (TimeIntegrand*) timeIntegrand;
 	FieldVariable*       velocityField = (FieldVariable*)  self->data[0];
 	double*              coord;
 	InterpolationResult  result;
@@ -528,11 +528,11 @@ Bool _TimeIntegratee_AdvectionTimeDeriv( void* timeIntegratee, Index array_I, do
 }
 
 
-void _TimeIntegratee_Intermediate( void* timeIntegratee, Index array_I ) {}
+void _TimeIntegrand_Intermediate( void* timeIntegrand, Index array_I ) {}
 
 /* +++ Public Functions +++ */
-void TimeIntegratee_StoreTimeDeriv( void* timeIntegratee, Variable* timeDeriv ) {
-	TimeIntegratee*	self           = (TimeIntegratee*)timeIntegratee;
+void TimeIntegrand_StoreTimeDeriv( void* timeIntegrand, Variable* timeDeriv ) {
+	TimeIntegrand*	self           = (TimeIntegrand*)timeIntegrand;
 	double*         arrayDataPtr;
 	Index           array_I; 
 	Index           arrayCount;
@@ -543,12 +543,12 @@ void TimeIntegratee_StoreTimeDeriv( void* timeIntegratee, Variable* timeDeriv ) 
 
 	for ( array_I = 0 ; array_I < arrayCount ; array_I++ ) {
 		arrayDataPtr = Variable_GetPtrDouble( timeDeriv, array_I );
-		TimeIntegratee_CalculateTimeDeriv( self, array_I, arrayDataPtr );
+		TimeIntegrand_CalculateTimeDeriv( self, array_I, arrayDataPtr );
 	}
 }
 
-void TimeIntegratee_Add2TimesTimeDeriv( void* timeIntegratee, Variable* timeDerivVariable ) {
-	TimeIntegratee*	self           = (TimeIntegratee*)timeIntegratee;
+void TimeIntegrand_Add2TimesTimeDeriv( void* timeIntegrand, Variable* timeDerivVariable ) {
+	TimeIntegrand*	self           = (TimeIntegrand*)timeIntegrand;
 	Variable*       variable       = self->variable;
 	double*         timeDerivPtr;
 	double*         timeDeriv;
@@ -566,7 +566,7 @@ void TimeIntegratee_Add2TimesTimeDeriv( void* timeIntegratee, Variable* timeDeri
 	arrayCount = variable->arraySize;
 	
 	for ( array_I = 0 ; array_I < arrayCount ; array_I++ ) {
-		TimeIntegratee_CalculateTimeDeriv( self, array_I, timeDeriv );
+		TimeIntegrand_CalculateTimeDeriv( self, array_I, timeDeriv );
 		timeDerivPtr = Variable_GetPtrDouble( timeDerivVariable, array_I );
 		
 		for ( component_I = 0 ; component_I < componentCount ; component_I++ ) {
@@ -578,8 +578,8 @@ void TimeIntegratee_Add2TimesTimeDeriv( void* timeIntegratee, Variable* timeDeri
 }
 	
 
-void TimeIntegratee_FourthOrderFinalStep( void* timeIntegratee, Variable* startData, Variable* timeDerivVariable, double dt ) {
-	TimeIntegratee*	self           = (TimeIntegratee*)timeIntegratee;
+void TimeIntegrand_FourthOrderFinalStep( void* timeIntegrand, Variable* startData, Variable* timeDerivVariable, double dt ) {
+	TimeIntegrand*	self           = (TimeIntegrand*)timeIntegrand;
 	Variable*       variable       = self->variable;
 	double*         k4;
 	double*         k1_2k2_2k3;
@@ -600,7 +600,7 @@ void TimeIntegratee_FourthOrderFinalStep( void* timeIntegratee, Variable* startD
 	arrayCount     = variable->arraySize;
 	
 	for ( array_I = 0 ; array_I < arrayCount ; array_I++ ) {
-		TimeIntegratee_CalculateTimeDeriv( self, array_I, k4 );
+		TimeIntegrand_CalculateTimeDeriv( self, array_I, k4 );
 
 		k1_2k2_2k3 = Variable_GetPtrDouble( timeDerivVariable, array_I );
 		arrayPtr = Variable_GetPtrDouble( variable, array_I );
@@ -609,7 +609,7 @@ void TimeIntegratee_FourthOrderFinalStep( void* timeIntegratee, Variable* startD
 		for ( component_I = 0 ; component_I < componentCount ; component_I++ ) {
 			arrayPtr[ component_I ] = startPtr[ component_I ] + dt/6.0 * ( k4[ component_I ] + k1_2k2_2k3[ component_I ] );
 		}
-		TimeIntegratee_Intermediate( self, array_I );
+		TimeIntegrand_Intermediate( self, array_I );
 	}
 
 	Memory_Free( k4 );

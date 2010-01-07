@@ -39,7 +39,7 @@
 #include "DomainContext.h"
 #include "ShapeAdvector.h"
 #include "TimeIntegrator.h"
-#include "TimeIntegratee.h"
+#include "TimeIntegrand.h"
 #include "FieldVariable.h"
 
 #include <assert.h>
@@ -125,7 +125,7 @@ void _ShapeAdvector_Init(
 
 	self->shapeCentreVariable = Variable_NewVector( "shapeCentreVariable", (AbstractContext*)self->context,
 		Variable_DataType_Double, shape->dim, &self->shapeCount, NULL,  &self->shapeCentrePtr, NULL );
-	self->timeIntegratee = TimeIntegratee_New( "shapeTimeIntegratee", self->context, timeIntegrator, self->shapeCentreVariable, 1,
+	self->timeIntegrand = TimeIntegrand_New( "shapeTimeIntegrand", self->context, timeIntegrator, self->shapeCentreVariable, 1,
 		(Stg_Component**) &velocityField, allowFallbackToFirstOrder );
 }
 
@@ -194,7 +194,7 @@ void _ShapeAdvector_Destroy( void* shapeAdvector, void* data ) {
 	ShapeAdvector* self = (ShapeAdvector*)shapeAdvector;
 
 	_Stg_Component_Delete( self->shapeCentreVariable );
-	_Stg_Component_Delete( self->timeIntegratee );
+	_Stg_Component_Delete( self->timeIntegrand );
 }
 
 

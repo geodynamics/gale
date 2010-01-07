@@ -13,7 +13,7 @@
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">This is a general class designed to integrate several TimeIntegratee objects through time. When one of these is created, it puts a Hook on the AbstractContext_EP_StepClass EntryPoint so that the Execute function for this class runs at the end of every timestep. This execute function then integrates every TimeIntegratee that has been registered to it through time.</param>
+<param name="Description">This is a general class designed to integrate several TimeIntegrand objects through time. When one of these is created, it puts a Hook on the AbstractContext_EP_StepClass EntryPoint so that the Execute function for this class runs at the end of every timestep. This execute function then integrates every TimeIntegrand that has been registered to it through time.</param>
 
 <!--Now the interesting stuff-->
 <list name="Params">

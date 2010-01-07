@@ -40,7 +40,7 @@
 #include "types.h"
 #include "DomainContext.h"
 #include "TimeIntegrator.h"
-#include "TimeIntegratee.h"
+#include "TimeIntegrand.h"
 
 #include <assert.h>
 #include <string.h>
@@ -113,7 +113,7 @@ void _TimeIntegrator_Init(
 	self->debug = Journal_Register( Debug_Type, self->type );
 	self->info = Journal_Register( Info_Type, self->type );
 		
-	self->integrateeRegister = NamedObject_Register_New();
+	self->integrandRegister = NamedObject_Register_New();
 	self->order = order;
 	self->simultaneous = simultaneous;
 
@@ -164,7 +164,7 @@ void _TimeIntegrator_Print( void* timeIntegrator, Stream* stream ) {
 	/* Virtual info */
 
 	/* Regular Info */
-	Stg_Class_Print( self->integrateeRegister, stream );
+	Stg_Class_Print( self->integrandRegister, stream );
 	
 	Stream_UnIndent( stream );
 }
@@ -281,10 +281,10 @@ void TimeIntegrator_UpdateClass( void* timeIntegrator, void* data ) {
 void _TimeIntegrator_ExecuteEuler( void* timeIntegrator, void* data ) {
 	TimeIntegrator*	self = (TimeIntegrator*) timeIntegrator;
 	AbstractContext*	context = (AbstractContext*) data;
-	Index					integratee_I;   
-	Index					integrateeCount = TimeIntegrator_GetCount( self );
+	Index					integrand_I;   
+	Index					integrandCount = TimeIntegrator_GetCount( self );
 	double				dt = AbstractContext_Dt( context );
-	TimeIntegratee*	integratee;
+	TimeIntegrand*	integrand;
 	double wallTime,tmin,tmax;
 	
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
@@ -293,16 +293,16 @@ void _TimeIntegrator_ExecuteEuler( void* timeIntegrator, void* data ) {
 	TimeIntegrator_SetTime( self, context->currentTime );
 	
 	TimeIntegrator_Setup( self );
-	for ( integratee_I = 0 ; integratee_I < integrateeCount ; integratee_I++ ) {
-		integratee = TimeIntegrator_GetByIndex( self, integratee_I );
+	for ( integrand_I = 0 ; integrand_I < integrandCount ; integrand_I++ ) {
+		integrand = TimeIntegrator_GetByIndex( self, integrand_I );
 	
 		wallTime = MPI_Wtime();
-		TimeIntegratee_FirstOrder( integratee, integratee->variable, dt );
+		TimeIntegrand_FirstOrder( integrand, integrand->variable, dt );
 
 		wallTime = MPI_Wtime() - wallTime;
 		MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
 		MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
-		Journal_RPrintf(self->info,"\t1st order: %35s - %9.4f [min] / %9.4f [max] (secs)\n", integratee->name, tmin,tmax);
+		Journal_RPrintf(self->info,"\t1st order: %35s - %9.4f [min] / %9.4f [max] (secs)\n", integrand->name, tmin,tmax);
 	}
 	TimeIntegrator_Finalise( self );
 }
@@ -310,10 +310,10 @@ void _TimeIntegrator_ExecuteEuler( void* timeIntegrator, void* data ) {
 void _TimeIntegrator_ExecuteRK2( void* timeIntegrator, void* data ) {
 	TimeIntegrator*	self = (TimeIntegrator*) timeIntegrator;
 	AbstractContext*	context = (AbstractContext*) self->context;
-	Index					integratee_I;   
-	Index					integrateeCount = TimeIntegrator_GetCount( self );
+	Index					integrand_I;   
+	Index					integrandCount = TimeIntegrator_GetCount( self );
 	double				dt = AbstractContext_Dt( context );
-	TimeIntegratee*	integratee;
+	TimeIntegrand*	integrand;
 	double wallTime,tmin,tmax;
 
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
@@ -322,18 +322,18 @@ void _TimeIntegrator_ExecuteRK2( void* timeIntegrator, void* data ) {
 	wallTime = MPI_Wtime();
 	TimeIntegrator_Setup( self );
 	
-	for ( integratee_I = 0 ; integratee_I < integrateeCount ; integratee_I++ ) {
-		integratee = TimeIntegrator_GetByIndex( self, integratee_I );
+	for ( integrand_I = 0 ; integrand_I < integrandCount ; integrand_I++ ) {
+		integrand = TimeIntegrator_GetByIndex( self, integrand_I );
 				
 		TimeIntegrator_SetTime( self, context->currentTime );
 		
 		wallTime = MPI_Wtime();
-		TimeIntegratee_SecondOrder( integratee, integratee->variable, dt );
+		TimeIntegrand_SecondOrder( integrand, integrand->variable, dt );
 
         	wallTime = MPI_Wtime()-wallTime;
         	MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
         	MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
-		Journal_RPrintf(self->info,"\t2nd order: %35s - %9.4f [min] / %9.4f [max] (secs)\n", integratee->name, tmin, tmax);
+		Journal_RPrintf(self->info,"\t2nd order: %35s - %9.4f [min] / %9.4f [max] (secs)\n", integrand->name, tmin, tmax);
 		
 	}
 	
@@ -345,26 +345,26 @@ void _TimeIntegrator_ExecuteRK2( void* timeIntegrator, void* data ) {
 void _TimeIntegrator_ExecuteRK4( void* timeIntegrator, void* data ) {
 	TimeIntegrator*	self = (TimeIntegrator*) timeIntegrator;
 	AbstractContext*	context = (AbstractContext*) data;
-	Index					integratee_I;   
-	Index					integrateeCount = TimeIntegrator_GetCount( self );
+	Index					integrand_I;   
+	Index					integrandCount = TimeIntegrator_GetCount( self );
 	double				dt = AbstractContext_Dt( context );
-	TimeIntegratee*	integratee;
+	TimeIntegrand*	integrand;
 	double wallTime,tmin,tmax;
 
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
 
 	TimeIntegrator_Setup( self );
-	for ( integratee_I = 0 ; integratee_I < integrateeCount ; integratee_I++ ) {
-		integratee = TimeIntegrator_GetByIndex( self, integratee_I );
+	for ( integrand_I = 0 ; integrand_I < integrandCount ; integrand_I++ ) {
+		integrand = TimeIntegrator_GetByIndex( self, integrand_I );
 
 		TimeIntegrator_SetTime( self, context->currentTime );
 		wallTime = MPI_Wtime();
-		TimeIntegratee_FourthOrder( integratee, integratee->variable, dt );
+		TimeIntegrand_FourthOrder( integrand, integrand->variable, dt );
        	
 		wallTime = MPI_Wtime()-wallTime;
         	MPI_Reduce( &wallTime, &tmin, 1, MPI_DOUBLE, MPI_MIN, 0, MPI_COMM_WORLD );
         	MPI_Reduce( &wallTime, &tmax, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD );
-		Journal_RPrintf(self->info,"\t4th order: %35s - %9.4f [min] / %9.4f [max] (secs)\n", integratee->name, tmin, tmax);
+		Journal_RPrintf(self->info,"\t4th order: %35s - %9.4f [min] / %9.4f [max] (secs)\n", integrand->name, tmin, tmax);
 	}
 	TimeIntegrator_Finalise( self );
 }
@@ -373,10 +373,10 @@ void _TimeIntegrator_ExecuteRK4( void* timeIntegrator, void* data ) {
 void _TimeIntegrator_ExecuteRK2Simultaneous( void* timeIntegrator, void* data ) {
 	TimeIntegrator*	self = (TimeIntegrator*)timeIntegrator;
 	AbstractContext*	context = (AbstractContext*) data;
-	Index					integratee_I;   
-	Index					integrateeCount = TimeIntegrator_GetCount( self );
+	Index					integrand_I;   
+	Index					integrandCount = TimeIntegrator_GetCount( self );
 	double				dt = AbstractContext_Dt( context );
-	TimeIntegratee*	integratee;
+	TimeIntegrand*	integrand;
 	Variable**			originalVariableList;
 
 	Journal_DPrintf( self->debug, "In %s for %s '%s'\n", __func__, self->type, self->name );
@@ -391,18 +391,18 @@ void _TimeIntegrator_ExecuteRK2Simultaneous( void* timeIntegrator, void* data ) 
 	/* Set Time */
 	TimeIntegrator_SetTime( self, context->currentTime );
 
-	originalVariableList = Memory_Alloc_Array( Variable*, integrateeCount, "originalVariableList" );
+	originalVariableList = Memory_Alloc_Array( Variable*, integrandCount, "originalVariableList" );
 	
 	TimeIntegrator_Setup( self );
-	for ( integratee_I = 0 ; integratee_I < integrateeCount ; integratee_I++ ) {
-		integratee = TimeIntegrator_GetByIndex( self, integratee_I );
-		Journal_RPrintf(self->info,"\t2nd order (simultaneous): %s\n", integratee->name);
+	for ( integrand_I = 0 ; integrand_I < integrandCount ; integrand_I++ ) {
+		integrand = TimeIntegrator_GetByIndex( self, integrand_I );
+		Journal_RPrintf(self->info,"\t2nd order (simultaneous): %s\n", integrand->name);
 		
 		/* Store Original */
-		originalVariableList[ integratee_I ] = Variable_NewFromOld( integratee->variable, "Original", True );
+		originalVariableList[ integrand_I ] = Variable_NewFromOld( integrand->variable, "Original", True );
 
 		/* Predictor Step */
-		TimeIntegratee_FirstOrder( integratee, integratee->variable, 0.5 * dt );
+		TimeIntegrand_FirstOrder( integrand, integrand->variable, 0.5 * dt );
 	}
 	TimeIntegrator_Finalise( self );
 	
@@ -410,14 +410,14 @@ void _TimeIntegrator_ExecuteRK2Simultaneous( void* timeIntegrator, void* data ) 
 	TimeIntegrator_SetTime( self, context->currentTime + 0.5 * dt );
 
 	TimeIntegrator_Setup( self );
-	for ( integratee_I = 0 ; integratee_I < integrateeCount ; integratee_I++ ) {
-		integratee = TimeIntegrator_GetByIndex( self, integratee_I );
+	for ( integrand_I = 0 ; integrand_I < integrandCount ; integrand_I++ ) {
+		integrand = TimeIntegrator_GetByIndex( self, integrand_I );
 
 		/* Corrector Step */
-		TimeIntegratee_FirstOrder( integratee, originalVariableList[ integratee_I ], dt );
+		TimeIntegrand_FirstOrder( integrand, originalVariableList[ integrand_I ], dt );
 
 		/* Free Original */
-		Stg_Class_Delete( originalVariableList[ integratee_I ] );
+		Stg_Class_Delete( originalVariableList[ integrand_I ] );
 	}
 	TimeIntegrator_Finalise( self );
 	Memory_Free( originalVariableList );
@@ -426,10 +426,10 @@ void _TimeIntegrator_ExecuteRK2Simultaneous( void* timeIntegrator, void* data ) 
 void _TimeIntegrator_ExecuteRK4Simultaneous( void* timeIntegrator, void* data ) {
 	TimeIntegrator*	self = (TimeIntegrator*)timeIntegrator;
 	AbstractContext*	context = (AbstractContext*) data;
-	Index					integratee_I;   
-	Index					integrateeCount = TimeIntegrator_GetCount( self );
+	Index					integrand_I;   
+	Index					integrandCount = TimeIntegrator_GetCount( self );
 	double				dt = AbstractContext_Dt( context );
-	TimeIntegratee*	integratee;
+	TimeIntegrand*	integrand;
 	Variable**			originalVariableList;
 	Variable**			timeDerivVariableList;
 
@@ -438,24 +438,24 @@ void _TimeIntegrator_ExecuteRK4Simultaneous( void* timeIntegrator, void* data ) 
 	/* Set Time */
 	TimeIntegrator_SetTime( self, context->currentTime );
 	
-	originalVariableList  = Memory_Alloc_Array( Variable*, integrateeCount, "originalVariableList" );
-	timeDerivVariableList = Memory_Alloc_Array( Variable*, integrateeCount, "timeDerivVariableList" );
+	originalVariableList  = Memory_Alloc_Array( Variable*, integrandCount, "originalVariableList" );
+	timeDerivVariableList = Memory_Alloc_Array( Variable*, integrandCount, "timeDerivVariableList" );
 
 	/* First Step */
 	TimeIntegrator_Setup( self );
-	for ( integratee_I = 0 ; integratee_I < integrateeCount ; integratee_I++ ) {
-		integratee = TimeIntegrator_GetByIndex( self, integratee_I );
-		Journal_RPrintf(self->info,"\t4nd order (simultaneous): %s\n", integratee->name);
+	for ( integrand_I = 0 ; integrand_I < integrandCount ; integrand_I++ ) {
+		integrand = TimeIntegrator_GetByIndex( self, integrand_I );
+		Journal_RPrintf(self->info,"\t4nd order (simultaneous): %s\n", integrand->name);
 
 		/* Store Original Position Variable */
-		originalVariableList[ integratee_I ]  = Variable_NewFromOld( integratee->variable, "Original", True );
-		timeDerivVariableList[ integratee_I ] = Variable_NewFromOld( integratee->variable, "k1+2k2+2k3", False );
+		originalVariableList[ integrand_I ]  = Variable_NewFromOld( integrand->variable, "Original", True );
+		timeDerivVariableList[ integrand_I ] = Variable_NewFromOld( integrand->variable, "k1+2k2+2k3", False );
 
 		/* Store k1 */
-		TimeIntegratee_StoreTimeDeriv( integratee, timeDerivVariableList[ integratee_I ] );
+		TimeIntegrand_StoreTimeDeriv( integrand, timeDerivVariableList[ integrand_I ] );
 
 		/* 1st Step */
-		TimeIntegratee_FirstOrder( integratee, integratee->variable, 0.5 * dt );
+		TimeIntegrand_FirstOrder( integrand, integrand->variable, 0.5 * dt );
 	}
 	TimeIntegrator_Finalise( self );
 	
@@ -464,25 +464,25 @@ void _TimeIntegrator_ExecuteRK4Simultaneous( void* timeIntegrator, void* data ) 
 	
 	/* Second Step */
 	TimeIntegrator_Setup( self );
-	for ( integratee_I = 0 ; integratee_I < integrateeCount ; integratee_I++ ) {
-		integratee = TimeIntegrator_GetByIndex( self, integratee_I );
+	for ( integrand_I = 0 ; integrand_I < integrandCount ; integrand_I++ ) {
+		integrand = TimeIntegrator_GetByIndex( self, integrand_I );
 
 		/* Add k2 */
-		TimeIntegratee_Add2TimesTimeDeriv( integratee, timeDerivVariableList[ integratee_I ] );
+		TimeIntegrand_Add2TimesTimeDeriv( integrand, timeDerivVariableList[ integrand_I ] );
 
-		TimeIntegratee_FirstOrder( integratee, originalVariableList[ integratee_I ], 0.5 * dt );
+		TimeIntegrand_FirstOrder( integrand, originalVariableList[ integrand_I ], 0.5 * dt );
 	}
 	TimeIntegrator_Finalise( self );
 
 	TimeIntegrator_Setup( self );
-	for ( integratee_I = 0 ; integratee_I < integrateeCount ; integratee_I++ ) {
-		integratee = TimeIntegrator_GetByIndex( self, integratee_I );
+	for ( integrand_I = 0 ; integrand_I < integrandCount ; integrand_I++ ) {
+		integrand = TimeIntegrator_GetByIndex( self, integrand_I );
 		
 		/* Add k3 */
-		TimeIntegratee_Add2TimesTimeDeriv( integratee, timeDerivVariableList[ integratee_I ] );
+		TimeIntegrand_Add2TimesTimeDeriv( integrand, timeDerivVariableList[ integrand_I ] );
 
 		/* 3rd Step */
-		TimeIntegratee_FirstOrder( integratee, originalVariableList[ integratee_I ], dt );
+		TimeIntegrand_FirstOrder( integrand, originalVariableList[ integrand_I ], dt );
 	}
 	TimeIntegrator_Finalise( self );
 	
@@ -490,14 +490,14 @@ void _TimeIntegrator_ExecuteRK4Simultaneous( void* timeIntegrator, void* data ) 
 	TimeIntegrator_SetTime( self, context->currentTime + dt );
 	
 	TimeIntegrator_Setup( self );
-	for ( integratee_I = 0 ; integratee_I < integrateeCount ; integratee_I++ ) {
-		integratee = TimeIntegrator_GetByIndex( self, integratee_I );
+	for ( integrand_I = 0 ; integrand_I < integrandCount ; integrand_I++ ) {
+		integrand = TimeIntegrator_GetByIndex( self, integrand_I );
 
-		TimeIntegratee_FourthOrderFinalStep( integratee, originalVariableList[ integratee_I ], timeDerivVariableList[ integratee_I ], dt );
+		TimeIntegrand_FourthOrderFinalStep( integrand, originalVariableList[ integrand_I ], timeDerivVariableList[ integrand_I ], dt );
 
 		/* Free Original */
-		Stg_Class_Delete( timeDerivVariableList[ integratee_I ] );
-		Stg_Class_Delete( originalVariableList[ integratee_I ] );
+		Stg_Class_Delete( timeDerivVariableList[ integrand_I ] );
+		Stg_Class_Delete( originalVariableList[ integrand_I ] );
 	}
 	TimeIntegrator_Finalise( self );
 
@@ -509,11 +509,11 @@ void _TimeIntegrator_ExecuteRK4Simultaneous( void* timeIntegrator, void* data ) 
 
 /* +++ Public Functions +++ */
 
-void TimeIntegrator_Add( void* timeIntegrator, void* _timeIntegratee ) {
+void TimeIntegrator_Add( void* timeIntegrator, void* _timeIntegrand ) {
 	TimeIntegrator*	self           = (TimeIntegrator*) timeIntegrator;
-	TimeIntegratee*	timeIntegratee = (TimeIntegratee*)_timeIntegratee;
+	TimeIntegrand*	timeIntegrand = (TimeIntegrand*)_timeIntegrand;
 
-	NamedObject_Register_Add( self->integrateeRegister, timeIntegratee );
+	NamedObject_Register_Add( self->integrandRegister, timeIntegrand );
 }
 
 void TimeIntegrator_Setup( void* timeIntegrator ) {
