@@ -289,21 +289,21 @@ void _Director_Initialise( void* director, void* data ) {
 	Particle_Index                  particleLocalCount = self->variable->arraySize;
 	double*                         normal;
 	Dimension_Index                 dim_I;
-	AbstractContext*                context = (AbstractContext*)self->context;
 
 	/* Initialise Parent */
 	_TimeIntegrand_Initialise( self, data );
 
 	Stg_Component_Initialise( self->materialPointsSwarm, data, False );
-	Stg_Component_Initialise( self->directorSwarmVariable, data, False );
-	Stg_Component_Initialise( self->dontUpdateParticle, data, True );
-
-	/* Update variables */
-	Variable_Update( self->variable );
-
 	/* We should only set initial directors if in regular non-restart mode. If in restart mode, then
 	the directors will be set correctly when we re-load the Swarm. */
-	if ( !(context && (True == context->loadFromCheckPoint)) ) {
+	if ( self->context->loadFromCheckPoint == False ) {
+
+      Stg_Component_Initialise( self->directorSwarmVariable, data, False );
+      Stg_Component_Initialise( self->dontUpdateParticle, data, True );
+   
+      /* Update variables */
+      Variable_Update( self->variable );
+
 		particleLocalCount = self->variable->arraySize;
 		if ( self->initialDirectionType == INIT_DIR_GLOBAL ) {
 			for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) {

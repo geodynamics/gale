@@ -347,7 +347,6 @@ void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) {
 	MaterialPoint*                  materialPoint;
 	Index                           dof_I;
 	Dimension_Index                 dim                   = self->materialPointsSwarm->dim;
-	AbstractContext*                context = (AbstractContext*)data;
 
 	_YieldRheology_Initialise( self, data );
 	
@@ -355,24 +354,25 @@ void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) {
 	Stg_Component_Initialise( self->materialPointsSwarm, data, False );
 	Stg_Component_Initialise( self->director, data, False );
 	Stg_Component_Initialise( self->strainWeakening, data, False );
-
-	/* Initialise variables that I've created - (mainly just SwarmVariables)
-	 * This will run a Variable_Update for us */
-	Stg_Component_Initialise( self->slipRate, data, False );
-	Stg_Component_Initialise( self->slip, data, False );
-	Stg_Component_Initialise( self->brightness, data, False );
-	Stg_Component_Initialise( self->opacity, data, False );
-	Stg_Component_Initialise( self->length, data, False );
-	Stg_Component_Initialise( self->thickness, data, False );
-	Stg_Component_Initialise( self->tensileFailure, data, False );
-	Stg_Component_Initialise( self->fullySoftened, data, False );
-
-	/* We don't need to Initialise hasYieldedVariable because it's a parent variable and _YieldRheology_Initialise
-	 * has already been called */
-	particleLocalCount = self->hasYieldedVariable->variable->arraySize;
 	
 	/* If restarting from checkpoint, don't change the parameters on the particles */
-	if ( !(context && (True == context->loadFromCheckPoint) ) ) {
+	if ( self->context->loadFromCheckPoint == False ) {
+
+      /* Initialise variables that I've created - (mainly just SwarmVariables)
+       * This will run a Variable_Update for us */
+      Stg_Component_Initialise( self->slipRate, data, False );
+      Stg_Component_Initialise( self->slip, data, False );
+      Stg_Component_Initialise( self->brightness, data, False );
+      Stg_Component_Initialise( self->opacity, data, False );
+      Stg_Component_Initialise( self->length, data, False );
+      Stg_Component_Initialise( self->thickness, data, False );
+      Stg_Component_Initialise( self->tensileFailure, data, False );
+      Stg_Component_Initialise( self->fullySoftened, data, False );
+   
+      /* We don't need to Initialise hasYieldedVariable because it's a parent variable and _YieldRheology_Initialise
+       * has already been called */
+      particleLocalCount = self->hasYieldedVariable->variable->arraySize;
+      
 		for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) { 
 			Variable_SetValueChar( self->hasYieldedVariable->variable, lParticle_I, False );
 			Variable_SetValueDouble( self->slipRate->variable, lParticle_I, 0.0 );

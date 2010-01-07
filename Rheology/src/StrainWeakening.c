@@ -324,7 +324,6 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
    Variable*                              positionVariable   = self->swarm->particleCoordVariable->variable;
    double                                 postFailureWeakening;
    double*                                coord;
-   DomainContext*                         context = self->context;
 
    int myrank;
 
@@ -332,24 +331,26 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
    _TimeIntegrand_Initialise( self, data );
 
    Stg_Component_Initialise( self->swarm, data, False );
-   Stg_Component_Initialise( self->postFailureWeakeningIncrement, data, False );
-   Stg_Component_Initialise( self->postFailureWeakening, data, False );
-   if( self->initialStrainShape ) Stg_Component_Initialise( self->initialStrainShape, data, False );
-
-   /* Update variables */
-   Variable_Update( positionVariable );
-   Variable_Update( self->variable );
-   Variable_Update( self->postFailureWeakeningIncrement->variable );
-
-   particleLocalCount = self->variable->arraySize;
 
    /* We should only set initial conditions if in regular non-restart mode. If in restart mode, then
    the particle-based variables will be set correcty when we re-load the Swarm. */
 	
-	if ( !(context && (True == context->loadFromCheckPoint)) ) {
+	if ( self->context->loadFromCheckPoint == False ) {
+
+      particleLocalCount = self->variable->arraySize;
+
+      Stg_Component_Initialise( self->postFailureWeakeningIncrement, data, False );
+      Stg_Component_Initialise( self->postFailureWeakening, data, False );
+      if( self->initialStrainShape ) Stg_Component_Initialise( self->initialStrainShape, data, False );
+
+      /* Update variables */
+      Variable_Update( positionVariable );
+      Variable_Update( self->variable );
+      Variable_Update( self->postFailureWeakeningIncrement->variable );
+
 		/* Initialise random number generator */
 		if(self->randomSeed==0) {
-         MPI_Comm_rank( context->communicator, &myrank);
+         MPI_Comm_rank( self->context->communicator, &myrank);
          srand( self->randomSeed );
 		}
 		else {

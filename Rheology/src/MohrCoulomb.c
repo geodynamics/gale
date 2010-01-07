@@ -187,7 +187,6 @@ void _MohrCoulomb_Initialise( void* rheology, void* data ) {
 	MohrCoulomb*     self                  = (MohrCoulomb*) rheology;
 	Particle_Index                  lParticle_I;
 	Particle_Index                  particleLocalCount;
-	AbstractContext*                context = (AbstractContext*)data;
 
 	_YieldRheology_Initialise( self, data );
 	
@@ -201,7 +200,7 @@ void _MohrCoulomb_Initialise( void* rheology, void* data ) {
 	particleLocalCount = self->hasYieldedVariable->variable->arraySize;
 
 	/* If restarting from checkpoint, don't change the parameters on the particles */
-	if ( !(context && (True == context->loadFromCheckPoint) ) ) {
+	if ( self->context->loadFromCheckPoint == False ) {
 		for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) { 
 			Variable_SetValueChar( self->hasYieldedVariable->variable, lParticle_I, False );
                 }
