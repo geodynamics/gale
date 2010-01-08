@@ -66,6 +66,9 @@ if not (GetOption('help') or GetOption('clean')):
 
     if env.get('prefix', None) is None:
         env['prefix'] = env.GetLaunchDir()
+    else:
+	print("prefix specification is currently disabled.  you may use --build-dir as an alternative.");
+	env.Exit()
 
     if env.get('eptiming', None):
         env.MergeFlags('-DENABLE_STGERMAIN_LOG')
