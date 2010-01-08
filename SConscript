@@ -10,7 +10,7 @@ Import('env')
 env = env.Clone()
 
 #
-# Build the 'pcu' sub-project.
+#  Build the 'pcu' sub-project.
 #
 
 SConscript('pcu/SConscript', exports='env')
