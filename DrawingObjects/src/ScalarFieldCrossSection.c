@@ -82,12 +82,14 @@ void _lucScalarFieldCrossSection_Init(
 		lucColourMap*                                                colourMap,
 		IJK                                                          resolution,
 		XYZ                                                          minCropValues,
-		XYZ                                                          maxCropValues ) 
+		XYZ                                                          maxCropValues,
+      Bool                                                        cullFace ) 
 {
 	self->colourMap = colourMap;
 	memcpy( self->resolution, resolution, sizeof(IJK) );
 	memcpy( self->minCropValues, minCropValues, sizeof(XYZ) );
 	memcpy( self->maxCropValues, maxCropValues, sizeof(XYZ) );
+	self->cullFace = cullFace;
 }
 
 void _lucScalarFieldCrossSection_Delete( void* drawingObject ) {
@@ -133,6 +135,7 @@ void _lucScalarFieldCrossSection_AssignFromXML( void* drawingObject, Stg_Compone
 	IJK              resolution;
 	XYZ              minCropValues;
 	XYZ              maxCropValues;
+   Bool              cullFace;
 
 	/* Construct Parent */
 	_lucCrossSection_AssignFromXML( self, cf, data );
@@ -151,19 +154,21 @@ void _lucScalarFieldCrossSection_AssignFromXML( void* drawingObject, Stg_Compone
 	maxCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropX", +HUGE_VAL );
 	maxCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropY", +HUGE_VAL );
 	maxCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropZ", +HUGE_VAL );
+
+   cullFace = Stg_ComponentFactory_GetBool( cf, self->name, "cullFace", True );
 	
 	_lucScalarFieldCrossSection_Init( 
 			self, 
 			colourMap,
 			resolution,
 			minCropValues,
-			maxCropValues );
+			maxCropValues,
+         cullFace );
 }
 
 void _lucScalarFieldCrossSection_Build( void* drawingObject, void* data ) {
 	lucScalarFieldCrossSection*     self        = (lucScalarFieldCrossSection*)drawingObject;
 	AbstractContext*                context     = self->context;
-	Stg_ComponentFactory*           cf          = context->CF;
 	Stream*                         errorStream = Journal_Register( Error_Type, self->type );
 
    /* Build field variable in parent */
@@ -189,17 +194,14 @@ void _lucScalarFieldCrossSection_Setup( void* drawingObject, void* _context ) {
 	
 void _lucScalarFieldCrossSection_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucScalarFieldCrossSection*       self            = (lucScalarFieldCrossSection*)drawingObject;
-	lucScalarFieldCrossSection_DrawCrossSection( self );
+	lucScalarFieldCrossSection_DrawCrossSection( self, GL_CCW );
 }
 
 #define FUDGE_FACTOR 0.0001
 
-void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject ) {
+void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, int direction) {
 	lucScalarFieldCrossSection*       self            = (lucScalarFieldCrossSection*)drawingObject;
 	FieldVariable* fieldVariable = self->fieldVariable;
-   Axis           axis = self->axis;
-	Axis           aAxis;
-	Axis           bAxis;
 	Coord          min, globalMin;
 	Coord          max, globalMax;
 	Coord          pos;
@@ -213,13 +215,22 @@ void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject ) {
 	double         bLength;
 	Dimension_Index dim_I;
 
-	glDisable(GL_LIGHTING);
-	
-	aAxis = ( axis == I_AXIS ? J_AXIS : I_AXIS );
-	bAxis = ( axis == K_AXIS ? J_AXIS : K_AXIS );
-	
-	aResolution = self->resolution[ aAxis ];
-	bResolution = self->resolution[ bAxis ];
+   /* set polygon face winding */
+	glFrontFace(direction); 
+   /* Visible from both sides? */
+	if ( self->cullFace )
+      glEnable(GL_CULL_FACE);
+	else
+      glDisable(GL_CULL_FACE);
+
+   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	if (fieldVariable->dim == 2) 
+      glDisable(GL_LIGHTING);
+   else
+      glEnable(GL_LIGHTING);
+
+	aResolution = self->resolution[ self->axis1 ];
+	bResolution = self->resolution[ self->axis2 ];
 	
 	FieldVariable_GetMinAndMaxGlobalCoords( fieldVariable, globalMin, globalMax );
 	FieldVariable_GetMinAndMaxLocalCoords( fieldVariable, min, max );
@@ -231,20 +242,22 @@ void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject ) {
 	}
 
 	/* Find position of cross section */
-	pos[axis] = lucCrossSection_GetValue(self, globalMin[axis], globalMax[axis]);
+	pos[self->axis] = lucCrossSection_GetValue(self, globalMin[self->axis], globalMax[self->axis]);
 	Journal_DPrintfL( self->debugStream, 2, 
 			"%s called on field %s, with res[A] as %u, res[B] as %u, axis of cross section as %d, crossSection value as %g\n",
-			__func__, fieldVariable->name, aResolution, bResolution, axis, pos[axis]);
-	
+			__func__, fieldVariable->name, aResolution, bResolution, self->axis, pos[self->axis]);
 
 	/* Create normal */
-	normal[axis]  = 1.0;
-	normal[aAxis] = 0.0;
-	normal[bAxis] = 0.0;
+	normal[self->axis]  = 1.0;
+	normal[self->axis1] = 0.0;
+	normal[self->axis2] = 0.0;
+   /* Flip normal to face opposite direction if cross-section past mid-point in 3d */
+   if (fieldVariable->dim == 3 && pos[self->axis] >= globalMin[self->axis] + 0.5 * globalMax[self->axis] - globalMin[self->axis]) 
+      normal[self->axis] = -1.0;
 	glNormal3fv( normal );
 
-	aLength = (max[aAxis] - min[aAxis])/(double)aResolution;
-	bLength = (max[bAxis] - min[bAxis])/(double)bResolution;
+	aLength = (max[self->axis1] - min[self->axis1])/(double)aResolution;
+	bLength = (max[self->axis2] - min[self->axis2])/(double)bResolution;
 
 	Journal_DPrintfL( self->debugStream, 2, "Calculated aLength as %g, bLength as %g\n", aLength, bLength );
 
@@ -254,38 +267,40 @@ void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject ) {
 		glBegin(GL_QUAD_STRIP);
 		for ( bIndex = 0 ; bIndex < bResolution + 2 ; bIndex++ ) {
 			/* Get position */
-			pos[ aAxis ] = min[ aAxis ] + (double)aIndex * aLength;
-			pos[ bAxis ] = min[ bAxis ] + (double)bIndex * bLength;
+			pos[ self->axis1 ] = min[ self->axis1 ] + (double)aIndex * aLength;
+			pos[ self->axis2 ] = min[ self->axis2 ] + (double)bIndex * bLength;
 
 			memcpy( interpolationCoord, pos, sizeof(Coord) );
 
-			if ( pos[ bAxis ] >= max[ bAxis ] ) { 
-				pos[ bAxis ] = max[ bAxis ];
-				interpolationCoord[ bAxis ] = max[ bAxis ] - FUDGE_FACTOR/bLength;
+			if ( pos[ self->axis2 ] >= max[ self->axis2 ] ) { 
+				pos[ self->axis2 ] = max[ self->axis2 ];
+				interpolationCoord[ self->axis2 ] = max[ self->axis2 ] - FUDGE_FACTOR/bLength;
 			}
-			if (pos[ aAxis ] >= max[ aAxis ]) {
-				pos[ aAxis ] = max[ aAxis ];
-				interpolationCoord[ aAxis ] = max[ aAxis ] - FUDGE_FACTOR/aLength;
+			if (pos[ self->axis1 ] >= max[ self->axis1 ]) {
+				pos[ self->axis1 ] = max[ self->axis1 ];
+				interpolationCoord[ self->axis1 ] = max[ self->axis1 ] - FUDGE_FACTOR/aLength;
 			}
 			
 			/* Plot bottom left corner of coloured tile */
 			lucScalarFieldCrossSection_PlotColouredVertex( self, interpolationCoord, pos );
 
 			/* Plot top left corner of coloured tile */
-			pos[ aAxis ] += aLength;
-			if (pos[ aAxis ] >= max[ aAxis ]) {
-				pos[ aAxis ] = max[ aAxis ];
-				interpolationCoord[ aAxis ] = max[ aAxis ] - FUDGE_FACTOR/aLength;
+			pos[ self->axis1 ] += aLength;
+			if (pos[ self->axis1 ] >= max[ self->axis1 ]) {
+				pos[ self->axis1 ] = max[ self->axis1 ];
+				interpolationCoord[ self->axis1 ] = max[ self->axis1 ] - FUDGE_FACTOR/aLength;
 			}
 			else
-				interpolationCoord[ aAxis ] = pos[ aAxis ];
+				interpolationCoord[ self->axis1 ] = pos[ self->axis1 ];
 			
 			lucScalarFieldCrossSection_PlotColouredVertex( self, interpolationCoord, pos );
 		}
 		glEnd();
 	}
 
-	glEnable(GL_LIGHTING);
+   glEnable(GL_LIGHTING);
+   glEnable(GL_CULL_FACE);
+   glFrontFace(GL_CCW);
 }
 
 Bool lucScalarFieldCrossSection_PlotColouredVertex( void* drawingObject, Coord interpolationCoord, Coord plotCoord ) {

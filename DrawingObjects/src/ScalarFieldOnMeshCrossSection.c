@@ -87,9 +87,11 @@ void _lucScalarFieldOnMeshCrossSection_Init(
 		lucColourMap*                                                colourMap,
 		XYZ                                                          minCropValues,
 		XYZ                                                          maxCropValues,
-      Bool                                                         wireFrame  ) 
+      Bool                                                         wireFrame, 
+		Bool                                                         cullFace )
 {
 	self->colourMap = colourMap;
+	self->cullFace = cullFace;
 	self->wireFrame = wireFrame;
 	memcpy( self->minCropValues, minCropValues, sizeof(XYZ) );
 	memcpy( self->maxCropValues, maxCropValues, sizeof(XYZ) );
@@ -136,7 +138,7 @@ void _lucScalarFieldOnMeshCrossSection_AssignFromXML( void* drawingObject, Stg_C
 	lucColourMap*    colourMap;
 	XYZ              minCropValues;
 	XYZ              maxCropValues;
-   Bool             wireFrame;
+   Bool             wireFrame, cullFace;
 
 	/* Construct Parent */
 	_lucCrossSection_AssignFromXML( self, cf, data );
@@ -151,13 +153,15 @@ void _lucScalarFieldOnMeshCrossSection_AssignFromXML( void* drawingObject, Stg_C
 	maxCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropY", +HUGE_VAL );
 	maxCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropZ", +HUGE_VAL );
 	wireFrame = Stg_ComponentFactory_GetBool( cf, self->name, "wireFrame", False);
+   cullFace = Stg_ComponentFactory_GetBool( cf, self->name, "cullFace", True );
 	
 	_lucScalarFieldOnMeshCrossSection_Init( 
 			self, 
 			colourMap,
 			minCropValues,
 			maxCropValues,
-         wireFrame );
+         wireFrame,
+         cullFace );
 }
 
 void _lucScalarFieldOnMeshCrossSection_Build( void* drawingObject, void* data ) {
@@ -201,7 +205,7 @@ void _lucScalarFieldOnMeshCrossSection_Setup( void* drawingObject, void* _contex
 	
 void _lucScalarFieldOnMeshCrossSection_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucScalarFieldOnMeshCrossSection*       self            = (lucScalarFieldOnMeshCrossSection*)drawingObject;
-	lucScalarFieldOnMeshCrossSection_DrawCrossSection( self );
+	lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, GL_CCW);
 }
 
 void lucScalarFieldOnMeshCrossSection_PlotColouredNode( void* drawingObject, MeshVertex* vert) {
@@ -210,7 +214,8 @@ void lucScalarFieldOnMeshCrossSection_PlotColouredNode( void* drawingObject, Mes
 	/* Get colour for vertex */
 	lucColourMap_SetOpenGLColourFromValue( self->colourMap, vert->value);
 
-   if (!self->wireFrame) glNormal3dv(vert->normal);
+   if (!self->wireFrame && self->fieldVariable->dim == 3)
+      glNormal3dv(vert->normal);
 
 	/* Plot vertex */
 	if ( self->fieldVariable->dim == 2 )
@@ -219,23 +224,37 @@ void lucScalarFieldOnMeshCrossSection_PlotColouredNode( void* drawingObject, Mes
 		glVertex3dv( vert->pos );
 }
 
-void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject ) {
+Bool lucMeshVertex_SumNormal( double normal[3], MeshVertex* v1, MeshVertex* v2, MeshVertex* v3, int flip) {
+   /* Utility function for calculating per vertex normals, pass vertices of four triangles
+    * surrounding the vertex you want to calculate the normal for and they will be summed */
+   double tempnormal[3];
+   if (v1 == NULL || v2 == NULL || v3 == NULL) return False;
+   StGermain_NormalToPlane( tempnormal, v1->pos, v2->pos, v3->pos);
+   if (flip == False) {
+      normal[0] += tempnormal[0];
+      normal[1] += tempnormal[1];
+      normal[2] += tempnormal[2];
+   } else {
+      normal[0] -= tempnormal[0];
+      normal[1] -= tempnormal[1];
+      normal[2] -= tempnormal[2];
+   }
+   return True;
+}
+
+void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, int direction ) {
    lucScalarFieldOnMeshCrossSection*       self            = (lucScalarFieldOnMeshCrossSection*)drawingObject;
    FeVariable*          fieldVariable = (FeVariable*) self->fieldVariable;
    Mesh*                mesh          = (Mesh*) fieldVariable->feMesh;
    Node_LocalIndex      crossSection_I = self->value;
-   Axis                 aAxis, bAxis;
    Grid*                vertGrid;
    IJK                  node_ijk;
    Node_GlobalIndex     node_gI;
    Node_DomainIndex     node_dI;
    Node_DomainIndex     nDomainNodes;
    int i,j;
+   Bool flip = False;
 
-	/* Get Axis Directions */
-	aAxis = ( self->axis == I_AXIS ? J_AXIS : I_AXIS );
-	bAxis = ( self->axis == K_AXIS ? J_AXIS : K_AXIS );
-	
 	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, self->vertexGridHandle );
 	
 	Journal_DPrintfL( self->debugStream, 2, 
@@ -244,9 +263,17 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject ) {
 	
 	nDomainNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
 
-   /* Visible from both sides by default and wound clockwise */
-   glDisable(GL_CULL_FACE);
-   glFrontFace(GL_CW);
+   /* Flip normals to face opposite direction if cross-section past mid-point in 3d */
+   if (fieldVariable->dim == 3 && crossSection_I >= vertGrid->sizes[self->axis] / 2) flip = True;
+
+   /* set polygon face winding */
+	glFrontFace(direction); 
+   /* Visible from both sides? */
+	if ( self->cullFace )
+      glEnable(GL_CULL_FACE);
+	else
+      glDisable(GL_CULL_FACE);
+
    if (self->wireFrame) {
       /* Edges only */
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -254,17 +281,17 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject ) {
 	   glDisable(GL_LIGHTING);
    } else {
       /* Filled */
-	   glEnable(GL_LIGHTING);
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	   glEnable(GL_LIGHTING);
    }
 
 	/* Get mesh cross section vertices */
-   MeshVertex* vertices[ vertGrid->sizes[ aAxis ] ] [ vertGrid->sizes[ bAxis ] ];
+   MeshVertex* vertices[ vertGrid->sizes[ self->axis1 ] ] [ vertGrid->sizes[ self->axis2 ] ];
 	node_ijk[ self->axis ] = crossSection_I;
-	for ( i = 0 ; i < vertGrid->sizes[ aAxis ]; i++ ) {
-      node_ijk[ aAxis ] = i;
-	   for ( j = 0 ; j < vertGrid->sizes[ bAxis ]; j++ ) {
-         node_ijk[ bAxis ] = j;
+	for ( i = 0 ; i < vertGrid->sizes[ self->axis1 ]; i++ ) {
+      node_ijk[ self->axis1 ] = i;
+	   for ( j = 0 ; j < vertGrid->sizes[ self->axis2 ]; j++ ) {
+         node_ijk[ self->axis2 ] = j;
 			node_gI = Grid_Project( vertGrid, node_ijk );
 			/* Get Local Node Index */
 			if( !Mesh_GlobalToDomain( mesh, MT_VERTEX, node_gI, &node_dI ) || node_dI >= nDomainNodes ) {
@@ -274,64 +301,61 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject ) {
 
          vertices[i][j] = Memory_Alloc(MeshVertex, "Mesh Vertex");
          FeVariable_GetValueAtNode( fieldVariable, node_dI, &vertices[i][j]->value  );
-		   memcpy( &vertices[i][j]->pos, fieldVariable->feMesh->verts[node_dI], 3*sizeof(double) );
+		   memcpy( &vertices[i][j]->pos, fieldVariable->feMesh->verts[node_dI], 3 * sizeof(double) );
          vertices[i][j]->normal[0] = vertices[i][j]->normal[1] = vertices[i][j]->normal[2] = 0; /* Zero normal */
 		}
 	}
 
    /* Calc normals for irregular meshes per vertex by averaging four surrounding triangle normals */
-   if (!self->wireFrame) { 
-      for ( i = 0 ; i < vertGrid->sizes[ aAxis ]; i++ ) {
-         for ( j = 0 ; j < vertGrid->sizes[ bAxis ]; j++ ) {
+   if (!self->wireFrame && self->fieldVariable->dim == 3) { 
+      for ( i = 0 ; i < vertGrid->sizes[ self->axis1 ]; i++ ) {
+         for ( j = 0 ; j < vertGrid->sizes[ self->axis2 ]; j++ ) {
             /* Get sum of normal vectors */
             if (vertices[i][j] ==  NULL) continue;
-            int n, num = 0;
-            double tempnormal[3];
 
             if (i > 0) {
-               if (j > 0 && vertices[i][j-1] != NULL && vertices[i-1][j] != NULL) {
+               if (j > 0) 
                   /* Look back in both axis  \|  */
-                  StGermain_NormalToPlane( tempnormal, vertices[i][j]->pos, vertices[i][j-1]->pos, vertices[i-1][j]->pos);
-                  for (n=0; n<3; n++) vertices[i][j]->normal[n] += tempnormal[n];
-                  num++;
-               }
+                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i][j-1], vertices[i-1][j], flip);
 
-               if (j < vertGrid->sizes[ bAxis ] - 1 && vertices[i-1][j] != NULL && vertices[i][j+1] != NULL) {
-                  /* Look back in aAxis, forward in bAxis  /|  */
-                  StGermain_NormalToPlane( tempnormal, vertices[i][j]->pos, vertices[i-1][j]->pos, vertices[i][j+1]->pos);
-                  for (n=0; n<3; n++) vertices[i][j]->normal[n] += tempnormal[n];
-                  num++;
-               }
+               if (j < vertGrid->sizes[ self->axis2 ] - 1) 
+                  /* Look back in self->axis1, forward in self->axis2  /|  */
+                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i-1][j], vertices[i][j+1], flip);
             }
 
-            if (i <  vertGrid->sizes[ aAxis ] - 1) {
-               if (j > 0 && vertices[i+1][j] != NULL && vertices[i][j-1] != NULL) {
-                  /* Look forward in aAxis, back in bAxis  |/  */
-                  StGermain_NormalToPlane( tempnormal, vertices[i][j]->pos, vertices[i+1][j]->pos, vertices[i][j-1]->pos);
-                  for (n=0; n<3; n++) vertices[i][j]->normal[n] += tempnormal[n];
-                  num++;
-               }
+            if (i <  vertGrid->sizes[ self->axis1 ] - 1) {
+               if (j > 0) 
+                  /* Look forward in self->axis1, back in self->axis2  |/  */
+                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i+1][j], vertices[i][j-1], flip);
 
-               if (j < vertGrid->sizes[ bAxis ] - 1 && vertices[i][j+1] != NULL && vertices[i+1][j] != NULL) {
+               if (j < vertGrid->sizes[ self->axis2 ] - 1) 
                   /* Look forward both axis  |\  */
-                  StGermain_NormalToPlane( tempnormal, vertices[i][j]->pos, vertices[i][j+1]->pos, vertices[i+1][j]->pos);
-                  for (n=0; n<3; n++) vertices[i][j]->normal[n] += tempnormal[n];
-                  num++;
-               }
+                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i][j+1], vertices[i+1][j], flip);
             }
 
-            //StGermain_VectorNormalise(vertices[i][j]->normal, 3);
-            for (n=0; n<3; n++) vertices[i][j]->normal[n] /= num;
+            StGermain_VectorNormalise(vertices[i][j]->normal, 3);
          }
       }
+   } else {
+      /* Default plane normal */
+      double normal[3]; 
+      normal[self->axis1] = 0.0;
+      normal[self->axis2] = 0.0;
+
+      if (flip == False)
+         normal[self->axis] = 1.0;
+      else
+         normal[self->axis] = -1.0;
+
+      glNormal3dv(normal);
    }
 
    /* Plot quad strip vertices */
-	for ( i = 0 ; i < vertGrid->sizes[ aAxis ]; i++ ) {
+	for ( i = 0 ; i < vertGrid->sizes[ self->axis1 ]; i++ ) {
 		glBegin(GL_QUAD_STRIP);
-	   for ( j = 0 ; j < vertGrid->sizes[ bAxis ]; j++ ) {
+	   for ( j = 0 ; j < vertGrid->sizes[ self->axis2 ]; j++ ) {
          if (vertices[i][j] !=  NULL) {
-            if (i+1 < vertGrid->sizes[ aAxis ] && vertices[i+1][j] != NULL) {
+            if (i+1 < vertGrid->sizes[ self->axis1 ] && vertices[i+1][j] != NULL) {
                lucScalarFieldOnMeshCrossSection_PlotColouredNode( self, vertices[i][j]);
                lucScalarFieldOnMeshCrossSection_PlotColouredNode( self, vertices[i+1][j]);
 			      /* TODO Cropping - implement cropping for all in generic CrossSection object? */
@@ -345,5 +369,16 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject ) {
    glEnable(GL_LIGHTING);
    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
    glEnable(GL_CULL_FACE);
+   glFrontFace(GL_CCW);
+
+   /* Plot normals - debugging /
+	for ( i = 0 ; i < vertGrid->sizes[ self->axis1 ]; i++ ) {
+	   for ( j = 0 ; j < vertGrid->sizes[ self->axis2 ]; j++ ) {
+         if (vertices[i][j] !=  NULL) {
+            luc_DrawNormalVector( vertices[i][j]->pos, vertices[i][j]->normal, 1000.0);
+            Memory_Free(vertices[i][j]);
+         }
+      }
+   }*/
 }
 

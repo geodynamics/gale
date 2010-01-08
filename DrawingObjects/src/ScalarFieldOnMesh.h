@@ -56,7 +56,6 @@
 		__lucScalarFieldOnMeshCrossSection \
 		/* Virtual functions go here */ \
 		/* Other info */\
-		Bool                                               cullFace;               \
 
 	struct lucScalarFieldOnMesh { __lucScalarFieldOnMesh };
 	
@@ -80,11 +79,7 @@
 	/* 'Stg_Component' implementations */
 	void* _lucScalarFieldOnMesh_DefaultNew( Name name ) ;
 	void _lucScalarFieldOnMesh_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
-	void _lucScalarFieldOnMesh_Build( void* drawingObject, void* data ) ;
-	void _lucScalarFieldOnMesh_Initialise( void* drawingObject, void* data ) ;
-	void _lucScalarFieldOnMesh_Execute( void* drawingObject, void* data );
-	void _lucScalarFieldOnMesh_Destroy( void* drawingObject, void* data ) ;
-	
+
 	void _lucScalarFieldOnMesh_BuildDisplayList( void* drawingObject, void* _context ) ;
 
 #endif

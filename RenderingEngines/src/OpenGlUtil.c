@@ -240,7 +240,7 @@ void lucBuildFont(int glyphsize, int columns, int startidx, int stopidx)
 	float divY = IMAGE_HEIGHT / (float)glyphsize;
 	float glyphX = 1 / divX;	/* Width & height of a glyph in texture coords */
 	float glyphY = 1 / divY;
-	GLfloat cx, cy, cx1, cy1;         /* the character coordinates in our texture */
+	GLfloat cx, cy;         /* the character coordinates in our texture */
     if (startidx == 0) yoffset = 0;
 	glBindTexture(GL_TEXTURE_2D, texture);
 	for (i = 0; i < (stopidx - startidx); i++)
@@ -694,7 +694,7 @@ void luc_DrawVector3d( double* pos, double* vector, double scale, double headSiz
     	x_coords = Memory_Alloc_Array( float, (segment_count + 1), "Unit Circle X Coords" );
     	y_coords = Memory_Alloc_Array( float, (segment_count + 1), "Unit Circle Y Coords" );
 
-        GLfloat x,y,angle;     // Storage for coordinates and angles
+        GLfloat angle; 
         //fprintf(stderr, "Vector Arrow -- Point %f,%f,%f\n", C[0], C[1], C[2]);
         // Loop around in a circle and specify even points along the circle
         // as the vertices for the triangle fan cone, cone base and arrow shaft
@@ -710,6 +710,7 @@ void luc_DrawVector3d( double* pos, double* vector, double scale, double headSiz
     }
     
     /* Render a 3d arrow, cone with base for head, cylinder for shaft */
+    glDisable(GL_CULL_FACE);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     /* Radius of head */
@@ -847,11 +848,10 @@ void luc_DrawVector( Dimension_Index dim , double* pos, double* vector, double s
    (a)[1] = (b)[1] - (c)[1]; \
    (a)[2] = (b)[2] - (c)[2]; \
 /* Debugging function, draws a small white/red line representing normal */
-void luc_DrawNormalVector( double* pos, double* vector )
+void luc_DrawNormalVector( double* pos, double* vector, double scale )
 {
 	glDisable(GL_LIGHTING);
     /* Length of the drawn vector = vector magnitude * scaling factor */
-    double scale = 10.0;
     double length = scale * sqrt(dotProduct(vector,vector));
 
     glPushMatrix();
@@ -876,14 +876,14 @@ void luc_DrawNormalVector( double* pos, double* vector )
     //thus our working coordinate system origin is halfway down vec with z-axis aligned with head
     glTranslated(0.0, 0.0, -length*0.5);
 
-   /* Render vector as two lines, white base, red at tip */
+   /* Render vector as two lines, blue base, red at tip */
    glColor3f(1.0, 0.0, 0.0);
    glBegin(GL_LINES);
       glVertex3d(0, 0, 0);
       glVertex3d(0, 0, length*0.5);
    glEnd();
 
-   glColor3f(1.0, 1.0, 1.0);
+   glColor3f(0.0, 0.0, 1.0);
    glBegin(GL_LINES);
       glVertex3d(0, 0, 0);
       glVertex3d(0, 0, -length*0.5);
@@ -1000,7 +1000,6 @@ void luc_OpenGlDebug( Stream* stream, int mode, int debugLevel){
 	GLfloat    currentRasterPosition[4];
 	GLfloat    currentRasterTextureCoords[4];
 	GLfloat    currentRasterPositionValid;
-	GLfloat    textureEnvMode;
 	GLfloat    textureEnvColor[4];
 	
 	Journal_PrintfL( stream, 2, "In func %s OpenglMode is is %d\n", __func__, mode);

@@ -66,6 +66,7 @@ typedef struct {
 		lucColourMap*                                      colourMap;              \
 		XYZ                                                minCropValues;          \
 		XYZ                                                maxCropValues;          \
+		Bool                                               cullFace;               \
 		Bool                                               wireFrame;              \
 		ExtensionInfo_Index                                vertexGridHandle;       \
 
@@ -99,7 +100,7 @@ typedef struct {
 	void _lucScalarFieldOnMeshCrossSection_Setup( void* drawingObject, void* _context ) ;
 	void _lucScalarFieldOnMeshCrossSection_BuildDisplayList( void* drawingObject, void* _context ) ;
 
-	void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject ) ;
+	void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, int direction ) ;
 	Bool lucScalarFieldOnMeshCrossSection_PlotColouredVertex( void* drawingObject, Coord interpolationCoord, Coord plotCoord ) ;
    void lucScalarFieldOnMeshCrossSection_PlotColouredNode( void* drawingObject, MeshVertex* vert);
 

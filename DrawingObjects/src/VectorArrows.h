@@ -79,10 +79,6 @@
 	/* 'Stg_Component' implementations */
 	void* _lucVectorArrows_DefaultNew( Name name ) ;
 	void _lucVectorArrows_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
-	void _lucVectorArrows_Build( void* drawingObject, void* data ) ;
-	void _lucVectorArrows_Initialise( void* drawingObject, void* data ) ;
-	void _lucVectorArrows_Execute( void* drawingObject, void* data );
-	void _lucVectorArrows_Destroy( void* drawingObject, void* data ) ;
 	
 	void _lucVectorArrows_BuildDisplayList( void* drawingObject, void* _context ) ;
 

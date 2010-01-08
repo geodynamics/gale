@@ -79,11 +79,7 @@
 	/* 'Stg_Component' implementations */
 	void* _lucEigenvectors_DefaultNew( Name name ) ;
 	void _lucEigenvectors_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
-	void _lucEigenvectors_Build( void* drawingObject, void* data ) ;
-	void _lucEigenvectors_Initialise( void* drawingObject, void* data ) ;
-	void _lucEigenvectors_Execute( void* drawingObject, void* data );
-	void _lucEigenvectors_Destroy( void* drawingObject, void* data ) ;
-	
+
 	void _lucEigenvectors_BuildDisplayList( void* drawingObject, void* _context ) ;
 
 #endif

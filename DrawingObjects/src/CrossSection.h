@@ -61,6 +61,8 @@
 		Name                 fieldVariableName;   \
   		double               value;               \
 		Axis                 axis;                \
+		Axis                 axis1;               \
+		Axis                 axis2;               \
       Bool                 interpolate;         \
 
 	struct lucCrossSection { __lucCrossSection };

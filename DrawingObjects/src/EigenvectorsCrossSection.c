@@ -177,6 +177,7 @@ void _lucEigenvectorsCrossSection_AssignFromXML( void* drawingObject, Stg_Compon
 
 	/* Construct Parent */
 	_lucCrossSection_AssignFromXML( self, cf, data );
+   strcpy(self->fieldVariableName, "TensorField");
 
 	defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolution", 8 );
 	resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionX", defaultResolution );
@@ -222,9 +223,6 @@ void _lucEigenvectorsCrossSection_BuildDisplayList( void* drawingObject, void* _
 void _lucEigenvectorsCrossSection_DrawCrossSection( void* drawingObject, Dimension_Index dim ) {
 	lucEigenvectorsCrossSection*  self           = (lucEigenvectorsCrossSection*)drawingObject;
 	FieldVariable*    tensorField    = self->fieldVariable;
-   Axis              axis = self->axis;
-	Axis              aAxis          = (axis == I_AXIS ? J_AXIS : I_AXIS);
-	Axis              bAxis          = (axis == K_AXIS ? J_AXIS : K_AXIS);
 	Coord             pos;
 	SymmetricTensor   tensor;
 	Coord             globalMin;
@@ -240,18 +238,18 @@ void _lucEigenvectorsCrossSection_DrawCrossSection( void* drawingObject, Dimensi
 
 	glLineWidth(self->lineWidth);
 	
-	dA = (globalMax[ aAxis ] - globalMin[ aAxis ])/(double)self->resolution[ aAxis ];
-	dB = (globalMax[ bAxis ] - globalMin[ bAxis ])/(double)self->resolution[ bAxis ];
+	dA = (globalMax[ self->axis1 ] - globalMin[ self->axis1 ])/(double)self->resolution[ self->axis1 ];
+	dB = (globalMax[ self->axis2 ] - globalMin[ self->axis2 ])/(double)self->resolution[ self->axis2 ];
 	
-	pos[axis] = lucCrossSection_GetValue(self, globalMin[axis], globalMax[axis]);
-	Journal_DPrintf( self->debugStream, "-- Drawing cross section on axis %d at value %lf\n", axis, pos[axis]);
+	pos[self->axis] = lucCrossSection_GetValue(self, globalMin[self->axis], globalMax[self->axis]);
+	Journal_DPrintf( self->debugStream, "-- Drawing cross section on axis %d at value %lf\n", self->axis, pos[self->axis]);
 
-	for ( pos[ aAxis ] = globalMin[ aAxis ] + dA * 0.5 ; pos[ aAxis ] < globalMax[ aAxis ] ; pos[ aAxis ] += dA ) {
-		for ( pos[ bAxis ] = globalMin[ bAxis ] + dB * 0.5 ; pos[ bAxis ] < globalMax[ bAxis ] ; pos[ bAxis ] += dB ) {
+	for ( pos[ self->axis1 ] = globalMin[ self->axis1 ] + dA * 0.5 ; pos[ self->axis1 ] < globalMax[ self->axis1 ] ; pos[ self->axis1 ] += dA ) {
+		for ( pos[ self->axis2 ] = globalMin[ self->axis2 ] + dB * 0.5 ; pos[ self->axis2 ] < globalMax[ self->axis2 ] ; pos[ self->axis2 ] += dB ) {
 
-			if ( pos[ aAxis ] < localMin[ aAxis ] || pos[ aAxis ] >= localMax[ aAxis ] )
+			if ( pos[ self->axis1 ] < localMin[ self->axis1 ] || pos[ self->axis1 ] >= localMax[ self->axis1 ] )
 				continue;
-			if ( pos[ bAxis ] < localMin[ bAxis ] || pos[ bAxis ] >= localMax[ bAxis ] )
+			if ( pos[ self->axis2 ] < localMin[ self->axis2 ] || pos[ self->axis2 ] >= localMax[ self->axis2 ] )
 				continue;
 
 			/* Get Value of Tensor at this point in space */

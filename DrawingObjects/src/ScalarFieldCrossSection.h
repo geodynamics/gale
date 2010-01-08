@@ -61,6 +61,7 @@
 		IJK                                                resolution;             \
 		XYZ                                                minCropValues;          \
 		XYZ                                                maxCropValues;          \
+		Bool                                               cullFace;               \
 
 	struct lucScalarFieldCrossSection { __lucScalarFieldCrossSection };
 	
@@ -93,7 +94,7 @@
 	void _lucScalarFieldCrossSection_Setup( void* drawingObject, void* _context ) ;
 	void _lucScalarFieldCrossSection_BuildDisplayList( void* drawingObject, void* _context ) ;
 
-   void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject );
+   void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, int direction );
 	Bool lucScalarFieldCrossSection_PlotColouredVertex( void* drawingObject, Coord interpolationCoord, Coord plotCoord ) ;
 
 #endif

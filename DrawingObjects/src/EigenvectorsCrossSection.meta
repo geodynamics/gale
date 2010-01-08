@@ -137,7 +137,7 @@
 <list name="Dependencies">
 	<struct>
 		<param name="Essential">True</param>
-		<param name="Name">FieldVariable</param>
+		<param name="Name">TensorField</param>
 		<param name="Type">FieldVariable</param>
 		<param name="Description">The Tensor Field you want to visualise.</param>
 	</struct>
@@ -147,7 +147,7 @@
 <![CDATA[
 		<struct name="eigenvectorCrossSection">
 			<param name="Type">lucEigenvectorsCrossSection</param>
-			<param name="FieldVariable">StrainRateField</param>
+			<param name="TensorField">StrainRateField</param>
 			<param name="crossSection">y=0.4</param>
 			<param name="leastColour">Green</param>
 			<param name="middleColour">Yellow</param>

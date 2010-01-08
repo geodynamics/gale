@@ -100,10 +100,10 @@ void* _lucVectorArrows_DefaultNew( Name name ) {
 	Stg_Class_CopyFunction*                                         _copy = NULL;
 	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucVectorArrows_DefaultNew;
 	Stg_Component_ConstructFunction*                           _construct = _lucVectorArrows_AssignFromXML;
-	Stg_Component_BuildFunction*                                   _build = _lucVectorArrows_Build;
-	Stg_Component_InitialiseFunction*                         _initialise = _lucVectorArrows_Initialise;
-	Stg_Component_ExecuteFunction*                               _execute = _lucVectorArrows_Execute;
-	Stg_Component_DestroyFunction*                               _destroy = _lucVectorArrows_Destroy;
+	Stg_Component_BuildFunction*                                   _build = _lucVectorArrowCrossSection_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucVectorArrowCrossSection_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucVectorArrowCrossSection_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucVectorArrowCrossSection_Destroy;
 	lucDrawingObject_SetupFunction*                                _setup = _lucOpenGLDrawingObject_Setup;
 	lucDrawingObject_DrawFunction*                                  _draw = _lucOpenGLDrawingObject_Draw;
 	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucOpenGLDrawingObject_CleanUp;
@@ -123,11 +123,6 @@ void _lucVectorArrows_AssignFromXML( void* drawingObject, Stg_ComponentFactory* 
 	
 	_lucVectorArrows_Init( self );
 }
-
-void _lucVectorArrows_Build( void* drawingObject, void* data ) {}
-void _lucVectorArrows_Initialise( void* drawingObject, void* data ) {}
-void _lucVectorArrows_Execute( void* drawingObject, void* data ) {}
-void _lucVectorArrows_Destroy( void* drawingObject, void* data ) {}
 
 void _lucVectorArrows_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucVectorArrows*       self            = (lucVectorArrows*)drawingObject;

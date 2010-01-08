@@ -100,10 +100,10 @@ void* _lucEigenvectors_DefaultNew( Name name ) {
 	Stg_Class_CopyFunction*                                         _copy = NULL;
 	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucEigenvectors_DefaultNew;
 	Stg_Component_ConstructFunction*                           _construct = _lucEigenvectors_AssignFromXML;
-	Stg_Component_BuildFunction*                                   _build = _lucEigenvectors_Build;
-	Stg_Component_InitialiseFunction*                         _initialise = _lucEigenvectors_Initialise;
-	Stg_Component_ExecuteFunction*                               _execute = _lucEigenvectors_Execute;
-	Stg_Component_DestroyFunction*                               _destroy = _lucEigenvectors_Destroy;
+	Stg_Component_BuildFunction*                                   _build = _lucEigenvectorsCrossSection_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucEigenvectorsCrossSection_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucEigenvectorsCrossSection_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucEigenvectorsCrossSection_Destroy;
 	lucDrawingObject_SetupFunction*                                _setup = _lucOpenGLDrawingObject_Setup;
 	lucDrawingObject_DrawFunction*                                  _draw = _lucOpenGLDrawingObject_Draw;
 	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucOpenGLDrawingObject_CleanUp;
@@ -123,11 +123,6 @@ void _lucEigenvectors_AssignFromXML( void* drawingObject, Stg_ComponentFactory* 
 	
 	_lucEigenvectors_Init( self );
 }
-
-void _lucEigenvectors_Build( void* drawingObject, void* data ) {}
-void _lucEigenvectors_Initialise( void* drawingObject, void* data ) {}
-void _lucEigenvectors_Execute( void* drawingObject, void* data ) {}
-void _lucEigenvectors_Destroy( void* drawingObject, void* data ) {}
 
 void _lucEigenvectors_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucEigenvectors*       self            = (lucEigenvectors*)drawingObject;

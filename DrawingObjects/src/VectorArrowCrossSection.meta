@@ -98,7 +98,7 @@
 <list name="Dependencies">
 	<struct>
 		<param name="Essential">True</param>
-		<param name="Name">FieldVariable</param>
+		<param name="Name">VectorVariable</param>
 		<param name="Type">FieldVariable</param>
 		<param name="Description">The vector field that you wish to represent with arrows.</param>
 	</struct>
@@ -109,7 +109,7 @@
 <![CDATA[
 	<struct name="velocityArrowsCrossSection">
 		<param name="Type">lucVectorArrowCrossSection</param>
-		<param name="FieldVariable">VelocityField</param>
+		<param name="VectorVariable">VelocityField</param>
 		<param name="crossSection">y=0.4</param>
 		<param name="colour">Black</param>
 		<param name="arrowHeadSize">0.1</param> 

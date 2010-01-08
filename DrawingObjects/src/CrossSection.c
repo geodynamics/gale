@@ -80,15 +80,13 @@ lucCrossSection* _lucCrossSection_New(  LUCCROSSSECTION_DEFARGS  )
 void _lucCrossSection_Init( 
 		lucCrossSection*        self,
 		Name                    colourName,
-		Name                    fieldVariableName,
       double                  value, 
       Axis                    axis, 
       Bool                    interpolate)
 {
 	lucColour_FromString( &self->colour, colourName );
-	self->value = value;
-	self->axis = axis;
-	self->interpolate = interpolate;
+   /* Use provided setup function to correctly set axis etc */
+   lucCrossSection_Set(self, value, axis, interpolate);
 }
 
 void _lucCrossSection_Delete( void* drawingObject ) {
@@ -184,10 +182,12 @@ void _lucCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* 
       }
 	}
 
+   self->fieldVariableName = Memory_Alloc_Array(char, 50, "fieldVariableName");
+   strcpy(self->fieldVariableName, "FieldVariable");
+
 	_lucCrossSection_Init( 
 			self, 
 			Stg_ComponentFactory_GetString( cf, self->name, "colour", "black" ),
-         Stg_ComponentFactory_GetString( cf, self->name, "FieldVariable", "defaultName" ),
          value,
          axis,
          interpolate	);
@@ -200,13 +200,17 @@ void _lucCrossSection_Build( void* drawingObject, void* data )
 	Stg_ComponentFactory* cf = context->CF;
 	
 	/* HACK - Get pointer to FieldVariable in build phase just to let FieldVariables be created in plugins */
-	self->fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "FieldVariable", FieldVariable, False, data );
+	self->fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, self->fieldVariableName, FieldVariable, False, data );
  	Stg_Component_Build( self->fieldVariable, data, False );
 }
 
 void _lucCrossSection_Initialise( void* drawingObject, void* data ) {}
 void _lucCrossSection_Execute( void* drawingObject, void* data ) {}
-void _lucCrossSection_Destroy( void* drawingObject, void* data ) {}
+
+void _lucCrossSection_Destroy( void* drawingObject, void* data ) {
+	lucCrossSection* self    = (lucCrossSection*)drawingObject;
+   Memory_Free(self->fieldVariableName);
+}
 
 void _lucCrossSection_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
 	lucCrossSection* self = (lucCrossSection*)drawingObject;
@@ -221,37 +225,30 @@ void _lucCrossSection_Draw( void* drawingObject, lucWindow* window, lucViewportI
 void _lucCrossSection_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucCrossSection*  self          = (lucCrossSection*)drawingObject;
    double   plane[4][3], min[3], max[3];
-	Axis     axis, aAxis, bAxis;
 
-	/* Get Axis Directions */
-   axis = self->axis;
-	aAxis = ( axis == I_AXIS ? J_AXIS : I_AXIS );
-	bAxis = ( axis == K_AXIS ? J_AXIS : K_AXIS );
-	
    FieldVariable_GetMinAndMaxGlobalCoords(self->fieldVariable, min, max );
 
    /* Fixed value on chosen axis */
-   plane[0][axis] = plane[1][axis] = plane[2][axis] = plane[3][axis] = self->value;
+   plane[0][self->axis] = plane[1][self->axis] = plane[2][self->axis] = plane[3][self->axis] = self->value;
    /* Max and min values on other axis */
-   plane[0][aAxis] = min[aAxis];
-   plane[1][aAxis] = min[aAxis];
-   plane[2][aAxis] = max[aAxis];
-   plane[3][aAxis] = max[aAxis];
+   plane[0][self->axis1] = min[self->axis1];
+   plane[1][self->axis1] = min[self->axis1];
+   plane[2][self->axis1] = max[self->axis1];
+   plane[3][self->axis1] = max[self->axis1];
 
-   plane[0][bAxis] = max[bAxis];
-   plane[1][bAxis] = min[bAxis];
-   plane[2][bAxis] = min[bAxis];
-   plane[3][bAxis] = max[bAxis];
+   plane[0][self->axis2] = max[self->axis2];
+   plane[1][self->axis2] = min[self->axis2];
+   plane[2][self->axis2] = min[self->axis2];
+   plane[3][self->axis2] = max[self->axis2];
 
 	lucColour_SetOpenGLColour( &self->colour );
 
    glEnable(GL_LIGHTING);
    glDisable(GL_CULL_FACE);
-   //glEnable(GL_CULL_FACE);
 
    /* Create normal aligned to axis */
    double normal[3]  = {0.0, 0.0, 0.0};
-   normal[axis] = 1.0;
+   normal[self->axis] = 1.0;
    glNormal3dv( normal );
    glBegin(GL_QUADS);
       glVertex3dv(plane[0]);
@@ -281,6 +278,24 @@ lucCrossSection* lucCrossSection_Set(void* crossSection, double val, Axis axis, 
    self->value = val;
    self->axis = axis;
    self->interpolate = interpolate;
+
+	/* Set other axis directions for drawing cross section:
+    * These settings produce consistant polygon winding for cross sections on all axis */
+	switch (self->axis) {
+      case I_AXIS:
+         self->axis1 = J_AXIS;
+         self->axis2 = K_AXIS;
+         break;
+      case J_AXIS:
+         self->axis1 = K_AXIS;
+         self->axis2 = I_AXIS;
+         break;
+      case K_AXIS:
+         self->axis1 = I_AXIS;
+         self->axis2 = J_AXIS;
+         break;
+   }
+
    return self;
 }
 
