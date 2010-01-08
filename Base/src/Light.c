@@ -58,14 +58,6 @@
 
 const Type lucLight_Type = "lucLight";
 
-/* The position defaults have been chosen for a directional light source (hence posW=0)
-   shining onto the left,top,front corner of a 1x1x1 box, currently the most commonly
-   used geometry. -- PatrickSunter, 8 Jun 2006 */
-const double LUC_LIGHT_DEFAULT_POS_X = 1.0;
-const double LUC_LIGHT_DEFAULT_POS_Y = -2.0;
-const double LUC_LIGHT_DEFAULT_POS_Z = -2.0;
-const double LUC_LIGHT_DEFAULT_POS_W = 0.0;*/
-
 /* Default light at eye pos shining in all directions without attenuation, ie: sunlight from behind viewer 
  * Setting the light position should be done relative to the eye rather than model, thus if you want the scene lit more from above, 
  * simply increase the y component rather than calculating absolute world coordinates for such a light.
@@ -219,7 +211,6 @@ void _lucLight_AssignFromXML( void* light, Stg_ComponentFactory* cf, void* data 
 	float 	        	position[4];
 	float                   spotCutOff;
 	float                   spotDirection[3];
-	Name                    modelName;
 	Name                    materialName;
 	float                   lmodel_ambient[4]; 
 	

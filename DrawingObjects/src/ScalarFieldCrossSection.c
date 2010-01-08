@@ -168,7 +168,6 @@ void _lucScalarFieldCrossSection_AssignFromXML( void* drawingObject, Stg_Compone
 
 void _lucScalarFieldCrossSection_Build( void* drawingObject, void* data ) {
 	lucScalarFieldCrossSection*     self        = (lucScalarFieldCrossSection*)drawingObject;
-	AbstractContext*                context     = self->context;
 	Stream*                         errorStream = Journal_Register( Error_Type, self->type );
 
    /* Build field variable in parent */

@@ -163,7 +163,7 @@ void lucScalarField_DrawWithMesh( lucScalarField* self ) {
    lucColourMap* cmap = self->colourMap;
    IArray* inc;
    double value;
-   int nElements;
+   unsigned nElements;
    double xi[3], vertex[3];
    int ii, jj, kk;
 

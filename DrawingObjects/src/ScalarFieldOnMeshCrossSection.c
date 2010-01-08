@@ -95,6 +95,7 @@ void _lucScalarFieldOnMeshCrossSection_Init(
 	self->wireFrame = wireFrame;
 	memcpy( self->minCropValues, minCropValues, sizeof(XYZ) );
 	memcpy( self->maxCropValues, maxCropValues, sizeof(XYZ) );
+   self->flipNormals = False;
 }
 
 void _lucScalarFieldOnMeshCrossSection_Delete( void* drawingObject ) {
@@ -224,7 +225,7 @@ void lucScalarFieldOnMeshCrossSection_PlotColouredNode( void* drawingObject, Mes
 		glVertex3dv( vert->pos );
 }
 
-Bool lucMeshVertex_SumNormal( double normal[3], MeshVertex* v1, MeshVertex* v2, MeshVertex* v3, int flip) {
+Bool lucMeshVertex_SumNormal( double normal[3], MeshVertex* v1, MeshVertex* v2, MeshVertex* v3, Bool flip) {
    /* Utility function for calculating per vertex normals, pass vertices of four triangles
     * surrounding the vertex you want to calculate the normal for and they will be summed */
    double tempnormal[3];
@@ -253,7 +254,6 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, int
    Node_DomainIndex     node_dI;
    Node_DomainIndex     nDomainNodes;
    int i,j;
-   Bool flip = False;
 
 	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, self->vertexGridHandle );
 	
@@ -262,9 +262,6 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, int
 			__func__, fieldVariable->name, self->axis, crossSection_I );
 	
 	nDomainNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
-
-   /* Flip normals to face opposite direction if cross-section past mid-point in 3d */
-   if (fieldVariable->dim == 3 && crossSection_I >= vertGrid->sizes[self->axis] / 2) flip = True;
 
    /* set polygon face winding */
 	glFrontFace(direction); 
@@ -316,21 +313,21 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, int
             if (i > 0) {
                if (j > 0) 
                   /* Look back in both axis  \|  */
-                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i][j-1], vertices[i-1][j], flip);
+                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i-1][j], vertices[i][j-1], self->flipNormals);
 
                if (j < vertGrid->sizes[ self->axis2 ] - 1) 
                   /* Look back in self->axis1, forward in self->axis2  /|  */
-                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i-1][j], vertices[i][j+1], flip);
+                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i][j+1], vertices[i-1][j], self->flipNormals);
             }
 
             if (i <  vertGrid->sizes[ self->axis1 ] - 1) {
                if (j > 0) 
                   /* Look forward in self->axis1, back in self->axis2  |/  */
-                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i+1][j], vertices[i][j-1], flip);
+                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i][j-1], vertices[i+1][j], self->flipNormals);
 
                if (j < vertGrid->sizes[ self->axis2 ] - 1) 
                   /* Look forward both axis  |\  */
-                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i][j+1], vertices[i+1][j], flip);
+                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i+1][j], vertices[i][j+1], self->flipNormals);
             }
 
             StGermain_VectorNormalise(vertices[i][j]->normal, 3);
@@ -341,12 +338,8 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, int
       double normal[3]; 
       normal[self->axis1] = 0.0;
       normal[self->axis2] = 0.0;
-
-      if (flip == False)
-         normal[self->axis] = 1.0;
-      else
-         normal[self->axis] = -1.0;
-
+      normal[self->axis] = 1.0;
+      if (self->flipNormals == True) normal[self->axis] = -1.0;
       glNormal3dv(normal);
    }
 
@@ -371,7 +364,7 @@ void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, int
    glEnable(GL_CULL_FACE);
    glFrontFace(GL_CCW);
 
-   /* Plot normals - debugging /
+   /* Plot normals - for debugging /
 	for ( i = 0 ; i < vertGrid->sizes[ self->axis1 ]; i++ ) {
 	   for ( j = 0 ; j < vertGrid->sizes[ self->axis2 ]; j++ ) {
          if (vertices[i][j] !=  NULL) {

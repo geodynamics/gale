@@ -69,6 +69,7 @@ typedef struct {
 		Bool                                               cullFace;               \
 		Bool                                               wireFrame;              \
 		ExtensionInfo_Index                                vertexGridHandle;       \
+		Bool                                               flipNormals;            \
 
 	struct lucScalarFieldOnMeshCrossSection { __lucScalarFieldOnMeshCrossSection };
 	
