@@ -27,7 +27,7 @@ def runTests():
  
     for command in commands:
         try:
-            retcode = subprocess.call( command, shell=True )
+            retcode = subprocess.call( command+' -serial' , shell=True )
             if retcode == 0:
                  passed += 1
             else:
