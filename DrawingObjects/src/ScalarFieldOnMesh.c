@@ -139,14 +139,14 @@ void _lucScalarFieldOnMesh_BuildDisplayList( void* drawingObject, void* _context
 		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, K_AXIS, False), GL_CCW);
 	}
 	else {
-		/* Cross sections at minimums, default winding for faces, flip normals to face in */
-      self->flipNormals = True;
+		/* Cross sections at minimums, default winding for faces */ 
+      self->flipNormals = False;
 		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, I_AXIS, False), GL_CCW);
 		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, J_AXIS, False), GL_CCW);
 		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, K_AXIS, False), GL_CCW);
 
-		/* Cross sections at maximums, reverse winding for faces */
-      self->flipNormals = False;
+		/* Cross sections at maximums, reverse winding for faces and flip normals to face backwards */
+      self->flipNormals = True;
 		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, vertGrid->sizes[ I_AXIS ] - 1, I_AXIS, False), GL_CW);
 		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, vertGrid->sizes[ J_AXIS ] - 1, J_AXIS, False), GL_CW);
 		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, vertGrid->sizes[ K_AXIS ] - 1, K_AXIS, False), GL_CW);

@@ -225,9 +225,6 @@ void _lucIsosurface_Setup( void* drawingObject, void* _context ) {
 	Coord                      max;
 	Dimension_Index            dim             = context->dim;
 
-   /* Don't attempt to draw until field has meaningful values, ie: timestep > 0 */
-   if (context->timeStep == 0) return;
-
 	lucOpenGLDrawingObject_SyncShadowValues( self, self->isosurfaceField );
 
 	/* Initialise Variables */
@@ -400,7 +397,6 @@ void _lucIsosurface_BuildDisplayList( void* drawingObject, void* _context ) {
 	else if ( colourMap ) 
 		lucColourMap_CalibrateFromFieldVariable( colourMap, self->isosurfaceField );
 
-
 	glFrontFace(GL_CCW);
 	glBegin(GL_TRIANGLES);
 
@@ -427,18 +423,17 @@ void _lucIsosurface_BuildDisplayList( void* drawingObject, void* _context ) {
 		glVertex3dv(currentTriangle->pos1);
 		
 		/* Plot Second Vertex */
-		lucIsosurface_GetColourForPos( self, currentTriangle->pos3, min, max, fudgeFactor );
+		lucIsosurface_GetColourForPos( self, currentTriangle->pos2, min, max, fudgeFactor );
 		glNormal3dv(currentTriangle->normal2);
-		glVertex3dv(currentTriangle->pos2);	
+		glVertex3dv(currentTriangle->pos2);
 
 		/* Plot Third Vertex */
-		lucIsosurface_GetColourForPos( self, currentTriangle->pos2, min, max, fudgeFactor );
+		lucIsosurface_GetColourForPos( self, currentTriangle->pos3, min, max, fudgeFactor );
 		glNormal3dv(currentTriangle->normal3);
 		glVertex3dv(currentTriangle->pos3);
 
 	}
 	glEnd();
-	glFrontFace(GL_CCW);
 }
 
 Bool lucIsosurface_TestMask( lucIsosurface* self, Coord pos ) {
@@ -1089,7 +1084,7 @@ void lucIsosurface_AddWallTriangle( lucIsosurface* self, int a , int b, int c, V
 
 	/* Calculate Normal */ 
 	StGermain_NormalToPlane( self->triangleList[n].normal1 , 
-		self->triangleList[n].pos1, self->triangleList[n].pos3, self->triangleList[n].pos2 );  
+		self->triangleList[n].pos1, self->triangleList[n].pos2, self->triangleList[n].pos3 );
 
 	memcpy( self->triangleList[n].normal2, self->triangleList[n].normal1 , 3 * sizeof(double) );
 	memcpy( self->triangleList[n].normal3, self->triangleList[n].normal1 , 3 * sizeof(double) );
