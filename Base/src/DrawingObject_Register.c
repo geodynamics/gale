@@ -100,7 +100,6 @@ void lucDrawingObject_Register_DrawAll( void* drawingObject_Register, lucWindow*
 
 	for ( object_I = 0 ; object_I < objectCount ; object_I++ ) {
 		object = lucDrawingObject_Register_GetByIndex( self, object_I );
-		lucLight_Register_EnableAll( lightRegister );
 		lucDrawingObject_Draw( object, window, viewportInfo, context );
 
 		if ( compositeEachDraw )

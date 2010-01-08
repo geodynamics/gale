@@ -70,21 +70,6 @@
 
 const Type lucAxis_Type = "lucAxis";
 
-lucAxis* lucAxis_New( 
-		Name                                                  name,
-		Coord                                                 origin,
-    		float 				                      length,
-		lucColour                                             colourX,
-		lucColour                                             colourY,
-		lucColour                                             colourZ)
-{
-	lucAxis* self = (lucAxis*) _lucAxis_DefaultNew( name );
-
-	lucAxis_InitAll( self, origin, length, colourX, colourY, colourZ);
-
-	return self;
-}
-
 lucAxis* _lucAxis_New(  LUCAXIS_DEFARGS  )
 {
 	lucAxis*    self;
@@ -97,13 +82,13 @@ lucAxis* _lucAxis_New(  LUCAXIS_DEFARGS  )
 	return self;
 }
 
-void lucAxis_Init(		
-		lucAxis*                                         self,
-		Coord                                            origin,
-		float 				                 length,
-		lucColour                                        colourX,
-		lucColour                                        colourY,
-		lucColour                                        colourZ) 
+void _lucAxis_Init(		
+		lucAxis*                            self,
+		Coord                               origin,
+		float 				                length,
+		lucColour                           colourX,
+		lucColour                           colourY,
+		lucColour                           colourZ) 
 {
 	
 	self->length = length;
@@ -115,18 +100,19 @@ void lucAxis_Init(
 	
 }
 
-void lucAxis_InitAll( 
-		void*                                              axis,
-		Coord                                              origin,
-	        float 				                   length,
-		lucColour                                          colourX,
-		lucColour                                          colourY,
-		lucColour                                          colourZ)
+lucAxis* lucAxis_New( 
+      Name                                name,
+      Coord                               origin,
+      float 				                  length,
+      lucColour                           colourX,
+      lucColour                           colourY,
+      lucColour                           colourZ) 
 {
-	lucAxis* self        = axis;
+	lucAxis* self = (lucAxis*) _lucAxis_DefaultNew( name );
 
-	/* TODO Init parent */
-	lucAxis_Init( self, origin, length, colourX, colourY, colourZ );
+	_lucAxis_Init( self, origin, length, colourX, colourY, colourZ);
+
+	return self;
 }
 
 void _lucAxis_Delete( void* drawingObject ) {
@@ -182,7 +168,7 @@ void* _lucAxis_DefaultNew( Name name ) {
 
 void _lucAxis_AssignFromXML( void* axis, Stg_ComponentFactory* cf, void* data ) {
 	lucAxis*             self               = (lucAxis*) axis;
-        Name colourNameX;
+    Name colourNameX;
 	Name colourNameY;	
 	Name colourNameZ;		
 	
@@ -200,17 +186,16 @@ void _lucAxis_AssignFromXML( void* axis, Stg_ComponentFactory* cf, void* data ) 
 	lucColour_FromString( &self->colourY, colourNameY );
 	lucColour_FromString( &self->colourZ, colourNameZ );
 	
-	origin[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "originX", -0.05 );
-	origin[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "originY", -0.05 );
-	origin[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "originZ", -0.05 );
+	origin[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "originX", 20.0 );
+	origin[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "originY", 20.0 );
+	origin[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "originZ", 0.25 );
 	
-       	lucAxis_InitAll( self, 
-	                origin,
-			Stg_ComponentFactory_GetDouble( cf, self->name, "length", 0.2 ),
-		        self->colourX,
-			self->colourY,
-			self->colourZ);
-			
+   _lucAxis_Init( self, 
+	               origin,
+			         Stg_ComponentFactory_GetDouble( cf, self->name, "length", 0.2 ),
+         		   self->colourX,
+			         self->colourY,
+         			self->colourZ);
 }
 
 void _lucAxis_Build( void* Axis, void* data ) { }
@@ -224,120 +209,113 @@ void _lucAxis_Setup( void* drawingObject, void* _context ) {
 }
 
 void _lucAxis_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
-	lucAxis*				self = (lucAxis*)drawingObject;
-	DomainContext*		context = (DomainContext*) _context;
-	Dimension_Index	dim = context->dim;
-	double				rodLength = 0.0;
-	double				arrowHeadLength = 0.0;
-	double				textSpacing = 0.0;
-		
-	/* Initialise OpenGL stuff */
-	glShadeModel(GL_SMOOTH);
-	glDisable(GL_LIGHTING);
+   lucAxis*         self     = (lucAxis*)drawingObject;
+   lucViewport*     viewport = viewportInfo->viewport;
+   DomainContext*   context  = (DomainContext*) _context;
+   Dimension_Index  dim      = context->dim;
+	Coord origin, min, max;
 
-	glEnable(GL_LINE_SMOOTH);
-	glEnable(GL_BLEND);	
-	
-	/* Disable lighting because we don't want a 3D effect */
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+   /* Undo any scaling factor */
+   if (viewport->scaleX != 1.0 || viewport->scaleY != 1.0 || viewport->scaleZ != 1.0) 
+      glScalef(1.0/viewport->scaleX, 1.0/viewport->scaleY, 1.0/viewport->scaleZ);
 
-	/* The rodlength is the total length of the arrow line.
-	   By default it is 0.25 */
-	rodLength = self->length;
-	 
-	/* The tip of the arrow hea starts at rodLength. 
-	   The size of the arrow is a fifth of the total length */
-	arrowHeadLength = rodLength/5.0;
+   /* Calculate desired origin viewport coords in projected screen coords */
+   GLdouble modelMatrix[16];
+   GLdouble projMatrix[16];
+   GLint    viewportArray[4];
+   double  wx = 20, wy = 20, wz = 0.1;
 
-	textSpacing = 0; //arrowHeadLength;
-	 
+   glGetDoublev( GL_MODELVIEW_MATRIX, modelMatrix );
+   glGetDoublev( GL_PROJECTION_MATRIX, projMatrix );
+   glGetIntegerv( GL_VIEWPORT, viewportArray );
+
+   gluUnProject(self->origin[0], self->origin[1], self->origin[2], 
+      modelMatrix, projMatrix, viewportArray,
+      &origin[0], &origin[1], &origin[2]);
+
+   /* Draw axis */
 	if (dim == 2) {
-	        /* Drawing the X axis, default is the RED color */
-		lucColour_SetOpenGLColour( &self->colourX );
+   	/* The tip of the arrow head starts at length. 
+	      The size of the arrow is a fifth of the total length */
+   	double arrowHeadLength = self->length/5.0;
+   	double textSpacing = 0; //arrowHeadLength;
+   	glDisable(GL_LIGHTING);
+   	glEnable(GL_LINE_SMOOTH);
+	 
+      /* Drawing the X axis, default is the RED color */
+      lucColour_SetOpenGLColour( &self->colourX );
 
 		glBegin( GL_LINES );
-			glVertex2f( self->origin[I_AXIS], self->origin[J_AXIS] ); 
-			glVertex2f( self->origin[I_AXIS] + rodLength , self->origin[J_AXIS]  );
+			glVertex2f( origin[I_AXIS], origin[J_AXIS] ); 
+			glVertex2f( origin[I_AXIS] + self->length , origin[J_AXIS]  );
 		glEnd(); 
 		glBegin(GL_TRIANGLES);
-			glVertex2f( self->origin[I_AXIS] + rodLength, self->origin[J_AXIS] );
-			glVertex2f( self->origin[I_AXIS] + rodLength - arrowHeadLength, self->origin[J_AXIS] - arrowHeadLength/2.0);
-			glVertex2f( self->origin[I_AXIS] + rodLength - arrowHeadLength, self->origin[J_AXIS] + arrowHeadLength/2.0);
+			glVertex2f( origin[I_AXIS] + self->length, origin[J_AXIS] );
+			glVertex2f( origin[I_AXIS] + self->length - arrowHeadLength, origin[J_AXIS] - arrowHeadLength/2.0);
+			glVertex2f( origin[I_AXIS] + self->length - arrowHeadLength, origin[J_AXIS] + arrowHeadLength/2.0);
 		glEnd();
-		lucPrint(self->origin[I_AXIS] + rodLength + textSpacing, self->origin[J_AXIS], "X");
+		//lucPrint(origin[I_AXIS] + self->length + textSpacing, origin[J_AXIS], "X");
 		
 		/* Drawing the Y axis, default is the GREEN color */
 		lucColour_SetOpenGLColour( &self->colourY );
 
 		glBegin( GL_LINES );
-			glVertex2f( self->origin[I_AXIS], self->origin[J_AXIS] ); 
-			glVertex2f( self->origin[I_AXIS], self->origin[J_AXIS] + rodLength );
+			glVertex2f( origin[I_AXIS], origin[J_AXIS] ); 
+			glVertex2f( origin[I_AXIS], origin[J_AXIS] + self->length );
 		glEnd();	
 		glBegin(GL_TRIANGLES);
-			glVertex2f( self->origin[I_AXIS], self->origin[J_AXIS] + rodLength );
-			glVertex2f( self->origin[I_AXIS] + arrowHeadLength/2.0, self->origin[J_AXIS] + rodLength - arrowHeadLength);
-			glVertex2f( self->origin[I_AXIS] - arrowHeadLength/2.0, self->origin[J_AXIS] + rodLength - arrowHeadLength);
+			glVertex2f( origin[I_AXIS], origin[J_AXIS] + self->length );
+			glVertex2f( origin[I_AXIS] + arrowHeadLength/2.0, origin[J_AXIS] + self->length - arrowHeadLength);
+			glVertex2f( origin[I_AXIS] - arrowHeadLength/2.0, origin[J_AXIS] + self->length - arrowHeadLength);
 		glEnd();
-		lucPrint(self->origin[I_AXIS], self->origin[J_AXIS] + rodLength + arrowHeadLength, "Y");
-	}
-	else if ( dim == 3 ) {
-		/* Drawing the X axis, by default using the RED color */
-		lucColour_SetOpenGLColour( &self->colourX );
+		//lucPrint(origin[I_AXIS], origin[J_AXIS] + self->length + arrowHeadLength, "Y");
 
-		glBegin(GL_TRIANGLES);
-			glVertex3f( self->origin[I_AXIS] + rodLength, self->origin[J_AXIS], self->origin[K_AXIS] );
-			glVertex3f( self->origin[I_AXIS] + rodLength - arrowHeadLength, 
-				    self->origin[J_AXIS] - arrowHeadLength/2.0, self->origin[K_AXIS] );
-			glVertex3f( self->origin[I_AXIS] + rodLength - arrowHeadLength,
-				    self->origin[J_AXIS] + arrowHeadLength/2.0,
-				    self->origin[K_AXIS] );
-		glEnd();
+   	glDisable(GL_LINE_SMOOTH);
 
-		glBegin( GL_LINES );
-			glVertex3f( self->origin[I_AXIS], self->origin[J_AXIS] , self->origin[K_AXIS] ); 
-			glVertex3f( self->origin[I_AXIS] + rodLength, self->origin[J_AXIS] , self->origin[K_AXIS] );
-		glEnd(); 
-		
-		lucPrint3d( self->origin[I_AXIS] + rodLength + textSpacing, self->origin[J_AXIS], self->origin[K_AXIS], "X");
-		
-		/* Drawing the Y axis, by default using the GREEN color */
-		lucColour_SetOpenGLColour( &self->colourY );
+	} else {
+      /* Drawing the X axis */
+      lucColour_SetOpenGLColour( &self->colourX );
+      {
+         XYZ pos = {self->length/2 + origin[I_AXIS], origin[J_AXIS], (dim == 2 ? 0.0 : origin[K_AXIS])};
+         XYZ vector = {1.0, 0.0, 0.0};
+         luc_DrawVector( dim, pos, vector, self->length, 0.1 );
+      }
+         
+      /* Drawing the Y axis */
+      lucColour_SetOpenGLColour( &self->colourY );
+      {
+         XYZ pos = {origin[I_AXIS], self->length/2 + origin[J_AXIS], (dim == 2 ? 0.0 : origin[K_AXIS])};
+         XYZ vector = {0.0, 1.0, 0.0};
+         luc_DrawVector( dim, pos, vector, self->length, 0.1 );
+      }
 
-		glBegin(GL_TRIANGLES);
-			glVertex3f( self->origin[I_AXIS], self->origin[J_AXIS] + rodLength, self->origin[K_AXIS]  );
-			glVertex3f( self->origin[I_AXIS] + arrowHeadLength/2.0, self->origin[J_AXIS] + rodLength -arrowHeadLength, 
-				    self->origin[K_AXIS] );
-			glVertex3f( self->origin[I_AXIS] - arrowHeadLength/2.0, self->origin[J_AXIS] + rodLength -arrowHeadLength, 
-				    self->origin[K_AXIS] );
-		glEnd();
+      /* Drawing the Z axis */
+      if ( dim == 3 ) {
+         lucColour_SetOpenGLColour( &self->colourZ );
+         {
+            XYZ pos = {origin[I_AXIS], origin[J_AXIS], self->length/2 + origin[K_AXIS]};
+            XYZ vector = {0.0, 0.0, 1.0};
+            luc_DrawVector( dim, pos, vector, self->length, 0.1 );
+         }
+      }
+   }
 
-		glBegin( GL_LINES );
-			glVertex3f(  self->origin[I_AXIS], self->origin[J_AXIS] , self->origin[K_AXIS]  ); 
-			glVertex3f(  self->origin[I_AXIS], self->origin[J_AXIS] + rodLength , self->origin[K_AXIS]  );
-		glEnd();
+   /* Labels - don't draw in display list if using one */
+   glDisable(GL_LIGHTING);
+   lucColour_SetOpenGLColour( &self->colourX );
+   lucPrint3d(origin[I_AXIS] + self->length, origin[J_AXIS], (dim == 2 ? 0.0 : origin[K_AXIS]), "X");
+   lucColour_SetOpenGLColour( &self->colourY );
+   lucPrint3d(origin[I_AXIS], origin[J_AXIS] + self->length * 1.25, (dim == 2 ? 0.0 : origin[K_AXIS]), "Y");
+   if (dim == 3)
+   {
+      lucColour_SetOpenGLColour( &self->colourZ );
+      lucPrint3d( origin[I_AXIS], origin[J_AXIS] , origin[K_AXIS] + self->length, "Z");
+   }
+   glEnable(GL_LIGHTING);
 
-		lucPrint3d( self->origin[I_AXIS], self->origin[J_AXIS]+ rodLength + arrowHeadLength, self->origin[K_AXIS], "Y");
-		
-		
-		/* Drawing the Z axis, by default using the BLUE color */
-		lucColour_SetOpenGLColour( &self->colourZ );
-		glBegin(GL_TRIANGLES);
-			glVertex3f( self->origin[I_AXIS], self->origin[J_AXIS] , self->origin[K_AXIS] + rodLength );
-			glVertex3f( self->origin[I_AXIS] + arrowHeadLength/2.0, self->origin[J_AXIS] , 
-				    self->origin[K_AXIS] + rodLength - arrowHeadLength );
-			glVertex3f( self->origin[I_AXIS] - arrowHeadLength/2.0, self->origin[J_AXIS], 
-				    self->origin[K_AXIS] + rodLength -arrowHeadLength );
-		glEnd();
-
-		glBegin( GL_LINES );
-			glVertex3f(  self->origin[I_AXIS], self->origin[J_AXIS] , self->origin[K_AXIS] ); 
-			glVertex3f( self->origin[I_AXIS], self->origin[J_AXIS] , self->origin[K_AXIS] + rodLength );
-		glEnd(); 
-
-		lucPrint3d( self->origin[I_AXIS], self->origin[J_AXIS] , self->origin[K_AXIS] + rodLength + textSpacing, "Z");
-	}
-	/* Put back settings */
-	glEnable(GL_LIGHTING);
+   /* Re-Apply scaling factors */
+   if (viewport->scaleX != 1.0 || viewport->scaleY != 1.0 || viewport->scaleZ != 1.0) 
+      glScalef(viewport->scaleX, viewport->scaleY, viewport->scaleZ);
 }
 
 void _lucAxis_CleanUp( void* drawingObject, void* _context ) {

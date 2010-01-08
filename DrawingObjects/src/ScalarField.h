@@ -56,8 +56,7 @@
 		__lucScalarFieldCrossSection \
 		/* Virtual functions go here */ \
 		/* Other info */\
-		Bool                                               cullFace;               \
-                Bool useMesh;
+      Bool useMesh;
 
 	struct lucScalarField { __lucScalarField };
 	
@@ -77,19 +76,10 @@
 
 	void _lucScalarField_Delete( void* drawingObject ) ;
 	void _lucScalarField_Print( void* drawingObject, Stream* stream ) ;
-	void* _lucScalarField_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) ;
 
 	/* 'Stg_Component' implementations */
 	void* _lucScalarField_DefaultNew( Name name ) ;
 	void _lucScalarField_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
-	void _lucScalarField_Build( void* drawingObject, void* data ) ;
-	void _lucScalarField_Initialise( void* drawingObject, void* data ) ;
-	void _lucScalarField_Execute( void* drawingObject, void* data );
-	void _lucScalarField_Destroy( void* drawingObject, void* data ) ;
-	
-	void _lucScalarField_Setup( void* drawingObject, void* _context ) ;
-	void _lucScalarField_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) ;
-	void _lucScalarField_CleanUp( void* drawingObject, void* _context ) ;
 
 	void _lucScalarField_BuildDisplayList( void* drawingObject, void* _context ) ;
 

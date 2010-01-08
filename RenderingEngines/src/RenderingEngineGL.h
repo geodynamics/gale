@@ -95,8 +95,7 @@
 
 	void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, AbstractContext* context ) ;
 	void _lucRenderingEngineGL_Clear( void* renderingEngine, lucWindow* window, Bool clearAll ) ;
-	void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* window, lucPixel* buffer ) ;
-
+	void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* window, void* buffer, Bool withAlpha ) ;
 	void lucRenderingEngineGL_WriteViewportText( void* renderingEngine, lucWindow* window, lucViewportInfo* viewportInfo, AbstractContext* context ) ;
 
 	/** Compositing Functions */

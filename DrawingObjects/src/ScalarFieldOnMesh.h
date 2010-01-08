@@ -56,7 +56,6 @@
 		__lucScalarFieldOnMeshCrossSection \
 		/* Virtual functions go here */ \
 		/* Other info */\
-		Bool                                               cullFace;               \
 
 	struct lucScalarFieldOnMesh { __lucScalarFieldOnMesh };
 	
@@ -76,19 +75,10 @@
 
 	void _lucScalarFieldOnMesh_Delete( void* drawingObject ) ;
 	void _lucScalarFieldOnMesh_Print( void* drawingObject, Stream* stream ) ;
-	void* _lucScalarFieldOnMesh_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) ;
 
 	/* 'Stg_Component' implementations */
 	void* _lucScalarFieldOnMesh_DefaultNew( Name name ) ;
 	void _lucScalarFieldOnMesh_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
-	void _lucScalarFieldOnMesh_Build( void* drawingObject, void* data ) ;
-	void _lucScalarFieldOnMesh_Initialise( void* drawingObject, void* data ) ;
-	void _lucScalarFieldOnMesh_Execute( void* drawingObject, void* data );
-	void _lucScalarFieldOnMesh_Destroy( void* drawingObject, void* data ) ;
-	
-	void _lucScalarFieldOnMesh_Setup( void* drawingObject, void* _context ) ;
-	void _lucScalarFieldOnMesh_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) ;
-	void _lucScalarFieldOnMesh_CleanUp( void* drawingObject, void* _context ) ;
 
 	void _lucScalarFieldOnMesh_BuildDisplayList( void* drawingObject, void* _context ) ;
 

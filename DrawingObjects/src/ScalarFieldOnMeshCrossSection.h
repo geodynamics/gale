@@ -43,9 +43,16 @@
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#include "CrossSection.h"
 
 #ifndef __lucScalarFieldOnMeshCrossSection_h__
 #define __lucScalarFieldOnMeshCrossSection_h__
+
+typedef struct {
+   double value;
+   double pos[3];
+   double normal[3];
+} MeshVertex;
 
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 	extern const Type lucScalarFieldOnMeshCrossSection_Type;
@@ -53,16 +60,14 @@
 	/** Class contents - this is defined as a macro so that sub-classes of this class can use this macro at the start of the definition of their struct */
 	#define __lucScalarFieldOnMeshCrossSection \
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
-		__lucOpenGLDrawingObject \
+		__lucCrossSection \
 		/* Virtual functions go here */ \
 		/* Other info */\
-		FieldVariable*                                     fieldVariable;          \
-		Name                                               fieldVariableName;      \
 		lucColourMap*                                      colourMap;              \
-		Node_Index                                         crossSection_I;         \
-		Axis                                               crossSectionAxis;       \
 		XYZ                                                minCropValues;          \
 		XYZ                                                maxCropValues;          \
+		Bool                                               cullFace;               \
+		Bool                                               wireFrame;              \
 		ExtensionInfo_Index                                vertexGridHandle;       \
 
 	struct lucScalarFieldOnMeshCrossSection { __lucScalarFieldOnMeshCrossSection };
@@ -74,16 +79,15 @@
 	#endif
 
 	#define LUCSCALARFIELDONMESHCROSSSECTION_DEFARGS \
-                LUCOPENGLDRAWINGOBJECT_DEFARGS
+                LUCCROSSSECTION_DEFARGS
 
 	#define LUCSCALARFIELDONMESHCROSSSECTION_PASSARGS \
-                LUCOPENGLDRAWINGOBJECT_PASSARGS
+                LUCCROSSSECTION_PASSARGS
 
 	lucScalarFieldOnMeshCrossSection* _lucScalarFieldOnMeshCrossSection_New(  LUCSCALARFIELDONMESHCROSSSECTION_DEFARGS  );
 
 	void _lucScalarFieldOnMeshCrossSection_Delete( void* drawingObject ) ;
 	void _lucScalarFieldOnMeshCrossSection_Print( void* drawingObject, Stream* stream ) ;
-	void* _lucScalarFieldOnMeshCrossSection_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) ;
 
 	/* 'Stg_Component' implementations */
 	void* _lucScalarFieldOnMeshCrossSection_DefaultNew( Name name ) ;
@@ -94,15 +98,11 @@
 	void _lucScalarFieldOnMeshCrossSection_Destroy( void* drawingObject, void* data ) ;
 	
 	void _lucScalarFieldOnMeshCrossSection_Setup( void* drawingObject, void* _context ) ;
-	void _lucScalarFieldOnMeshCrossSection_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) ;
-	void _lucScalarFieldOnMeshCrossSection_CleanUp( void* drawingObject, void* _context ) ;
-
 	void _lucScalarFieldOnMeshCrossSection_BuildDisplayList( void* drawingObject, void* _context ) ;
 
-	void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, Node_LocalIndex crossSection_I, Axis axis ) ;
+	void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, int direction ) ;
 	Bool lucScalarFieldOnMeshCrossSection_PlotColouredVertex( void* drawingObject, Coord interpolationCoord, Coord plotCoord ) ;
-	void lucScalarFieldOnMeshCrossSection_PlotColouredNode( void* drawingObject, Node_LocalIndex lNode_I ) ;
-	
+   void lucScalarFieldOnMeshCrossSection_PlotColouredNode( void* drawingObject, MeshVertex* vert);
 
 #endif
 

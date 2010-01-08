@@ -133,7 +133,9 @@ void _lucOutputJPEG_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf,
 	lucOutputJPEG*  self = (lucOutputJPEG*)outputFormat;
 
 	/* Construct Parent */
-	lucOutputFormat_InitAll( self, "jpeg" );
+   self->extension = "jpeg";
+	_lucOutputFormat_AssignFromXML( outputFormat, cf, data);
+   self->transparent = False; /* Not supported */
 
 	_lucOutputJPEG_Init( 
 			self,
@@ -145,7 +147,7 @@ void _lucOutputJPEG_Initialise( void* outputFormat, void* data ) {}
 void _lucOutputJPEG_Execute( void* outputFormat, void* data ) {}
 void _lucOutputJPEG_Destroy( void* outputFormat, void* data ) {}
 
-void _lucOutputJPEG_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) {
+void _lucOutputJPEG_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) {
 	lucOutputJPEG*              self         = (lucOutputJPEG*) outputFormat;
 	Pixel_Index                 width        = window->width;
 	Pixel_Index                 height       = window->height;

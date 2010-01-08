@@ -193,12 +193,13 @@ void _lucFieldVariableBorder_BuildDisplayList( void* drawingObject, void* _conte
 	/* Initialise OpenGL stuff */
 	glDisable(GL_LIGHTING);
 
+ 	glEnable(GL_DEPTH_TEST);
 	/* Line smoothing will not work correctly with depth testing enabled*/
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_LINE_SMOOTH);
-	glHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glEnable(GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glDisable(GL_DEPTH_TEST);
+	//glEnable(GL_LINE_SMOOTH);
+	//glHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
+	//glEnable(GL_BLEND);
+	//glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
 
 	lucColour_SetOpenGLColour( &self->colour );
@@ -226,7 +227,7 @@ void _lucFieldVariableBorder_BuildDisplayList( void* drawingObject, void* _conte
 	}
 	
 	/* Clean up OpenGL stuff */
- 	glEnable(GL_DEPTH_TEST);
+ 	//glEnable(GL_DEPTH_TEST);
 	glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
 	glEnable( GL_LIGHTING );
 }

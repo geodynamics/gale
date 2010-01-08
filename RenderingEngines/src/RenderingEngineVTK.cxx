@@ -278,7 +278,7 @@ void _lucRenderingEngineVTK_Render( void* renderingEngine, lucWindow* window, Ab
 	Journal_DPrintfL( lucDebug, 2, "Leaving func %s\n", __func__ );*/
 }
 
-void _lucRenderingEngineVTK_GetPixelData( void* renderingEngine, lucWindow* window, lucPixel* buffer ) {
+void _lucRenderingEngineVTK_GetPixelData( void* renderingEngine, lucWindow* window, void* buffer, Bool withAlpha ) {
 /*	VTKsizei width  = window->width;
 	VTKsizei height = window->height;
 	

@@ -50,7 +50,6 @@
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
-#include <glucifer/Base/CrossSection.h>
 
 #include "types.h"
 #include "OpenGLDrawingObject.h"
@@ -92,19 +91,6 @@ void _lucVectorArrows_Print( void* drawingObject, Stream* stream ) {
 	_lucVectorArrowCrossSection_Print( self, stream );
 }
 
-void* _lucVectorArrows_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) {
-	lucVectorArrows*  self = (lucVectorArrows*)drawingObject;
-	lucVectorArrows* newDrawingObject;
-
-	newDrawingObject = _lucVectorArrowCrossSection_Copy( self, dest, deep, nameExt, ptrMap );
-
-	/* TODO */
-	abort();
-
-	return (void*) newDrawingObject;
-}
-
-
 void* _lucVectorArrows_DefaultNew( Name name ) {
 	/* Variables set in this function */
 	SizeT                                                     _sizeOfSelf = sizeof(lucVectorArrows);
@@ -114,13 +100,13 @@ void* _lucVectorArrows_DefaultNew( Name name ) {
 	Stg_Class_CopyFunction*                                         _copy = NULL;
 	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucVectorArrows_DefaultNew;
 	Stg_Component_ConstructFunction*                           _construct = _lucVectorArrows_AssignFromXML;
-	Stg_Component_BuildFunction*                                   _build = _lucVectorArrows_Build;
-	Stg_Component_InitialiseFunction*                         _initialise = _lucVectorArrows_Initialise;
-	Stg_Component_ExecuteFunction*                               _execute = _lucVectorArrows_Execute;
-	Stg_Component_DestroyFunction*                               _destroy = _lucVectorArrows_Destroy;
-	lucDrawingObject_SetupFunction*                                _setup = _lucVectorArrows_Setup;
-	lucDrawingObject_DrawFunction*                                  _draw = _lucVectorArrows_Draw;
-	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucVectorArrows_CleanUp;
+	Stg_Component_BuildFunction*                                   _build = _lucVectorArrowCrossSection_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucVectorArrowCrossSection_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucVectorArrowCrossSection_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucVectorArrowCrossSection_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucOpenGLDrawingObject_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucOpenGLDrawingObject_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucOpenGLDrawingObject_CleanUp;
 	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucVectorArrows_BuildDisplayList;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
@@ -138,46 +124,22 @@ void _lucVectorArrows_AssignFromXML( void* drawingObject, Stg_ComponentFactory* 
 	_lucVectorArrows_Init( self );
 }
 
-void _lucVectorArrows_Build( void* drawingObject, void* data ) {}
-void _lucVectorArrows_Initialise( void* drawingObject, void* data ) {}
-void _lucVectorArrows_Execute( void* drawingObject, void* data ) {}
-void _lucVectorArrows_Destroy( void* drawingObject, void* data ) {}
-
-void _lucVectorArrows_Setup( void* drawingObject, void* _context ) {
-	lucVectorArrows*       self            = (lucVectorArrows*)drawingObject;
-	
-	_lucVectorArrowCrossSection_Setup( self, _context );
-}
-
-void _lucVectorArrows_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
-	lucVectorArrows*       self            = (lucVectorArrows*)drawingObject;
-
-	_lucVectorArrowCrossSection_Draw( self, window, viewportInfo, _context );
-}
-
-void _lucVectorArrows_CleanUp( void* drawingObject, void* _context ) {
-	lucVectorArrows*       self            = (lucVectorArrows*)drawingObject;
-	
-	_lucVectorArrowCrossSection_CleanUp( self, _context );
-}
-	
 void _lucVectorArrows_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucVectorArrows*       self            = (lucVectorArrows*)drawingObject;
 	DomainContext* context         = (DomainContext*) _context;
 	Dimension_Index        dim             = context->dim;
-   lucCrossSection crossSection;
 
 	if ( dim == 2 ) 
    {
-		_lucVectorArrowCrossSection_DrawCrossSection(self, dim, lucCrossSection_Set(&crossSection, 0.0, K_AXIS, False));
+      _lucVectorArrowCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, K_AXIS, False), dim);
 	}
 	else 
    {
 		double dz = 1/(double)self->resolution[ K_AXIS ];
-      crossSection.axis = K_AXIS;
-      crossSection.interpolate = True;
-		for ( crossSection.value = 0.0 ; crossSection.value < 1.0+dz ; crossSection.value += dz) {
-		   _lucVectorArrowCrossSection_DrawCrossSection( self, dim, &crossSection);
+      self->axis = K_AXIS;
+      self->interpolate = True;
+		for ( self->value = 0.0 ; self->value < 1.0+dz ; self->value += dz) {
+		   _lucVectorArrowCrossSection_DrawCrossSection( self, dim);
 		}
 	}
 }

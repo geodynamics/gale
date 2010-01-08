@@ -55,6 +55,12 @@
 		<param name="Description">If True, all the element numbers will be drawn. (Not currently implemented)</param>
 	</struct>
 
+	<struct>
+		<param name="Name">skipEdges</param>
+		<param name="Type">String</param>
+		<param name="Default">""</param>
+		<param name="Description">Specify one or more axis (x, y or z) in this parameter and edges of the mesh aligned to those axis will not be drawn</param>
+	</struct>
 </list>
 
 <list name="Dependencies">
@@ -74,6 +80,7 @@
                         <param name="Mesh">linearMesh</param>
                         <param name="displayNodes">true</param>
                         <param name="localColour">blue</param>
+                        <param name="skipEdges">Y</param>
                 </struct>
 ]]>
 </param>

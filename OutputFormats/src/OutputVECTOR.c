@@ -171,7 +171,7 @@ void _lucOutputVECTOR_AssignFromXML( void* outputFormat, Stg_ComponentFactory* c
 	_lucOutputVECTOR_Init( self, cf );
 	
 	/* Construct Parent */
-	lucOutputFormat_InitAll( self, self->format);
+	_lucOutputFormat_AssignFromXML( outputFormat, cf, data);
 	
 }
 
@@ -180,7 +180,7 @@ void _lucOutputVECTOR_Initialise( void* outputFormat, void* data ) {}
 void _lucOutputVECTOR_Execute( void* outputFormat, void* data ) {}
 void _lucOutputVECTOR_Destroy( void* outputFormat, void* data ) {}
 
-void _lucOutputVECTOR_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) {
+void _lucOutputVECTOR_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) {
 	lucOutputVECTOR* self       = (lucOutputVECTOR*) outputFormat;
 	Pixel_Index   width        = window->width;
 	Pixel_Index   height       = window->height;

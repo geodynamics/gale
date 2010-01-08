@@ -69,7 +69,7 @@ lucOutputFormat_Register*	lucOutputFormat_Register_New( void ) {
 	return self;
 }
 
-void lucOutputFormat_Register_OutputAll( void* outputFormat_Register, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) {
+void lucOutputFormat_Register_OutputAll( void* outputFormat_Register, lucWindow* window, AbstractContext* context, lucPixel* pixelData, lucAlphaPixel* alphaPixelData ) {
 	lucOutputFormat_Register* self          = (lucOutputFormat_Register*) outputFormat_Register;
 	OutputFormat_Index        object_I;
 	OutputFormat_Index        objectCount   = lucOutputFormat_Register_GetCount( self );
@@ -77,7 +77,10 @@ void lucOutputFormat_Register_OutputAll( void* outputFormat_Register, lucWindow*
 
 	for ( object_I = 0 ; object_I < objectCount ; object_I++ ) {
 		object = lucOutputFormat_Register_GetByIndex( self, object_I );
-		lucOutputFormat_Output( object, window, context, pixelData );
+      if (object->transparent)
+   		lucOutputFormat_Output( object, window, context, alphaPixelData );
+      else
+   		lucOutputFormat_Output( object, window, context, pixelData );
 	}
 }
 

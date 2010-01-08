@@ -79,23 +79,53 @@ void    lucLight_Register_EnableAll( void * lightRegister ) {
 	lucLight* light;
 	Light_Index lightCount = 0;
 	Light_Index light_I = 0;
-	
-	/* Enabling the lights */
-	glEnable(GL_LIGHTING);
-	lightCount = lucLight_Register_GetCount( self );
-	
-	for (light_I = 0; light_I < lightCount; light_I++){
-            light = lucLight_Register_GetByIndex(self, light_I);	    
-	    glLightfv(GL_LIGHT0 + light_I, GL_POSITION, light->position);
-	    glLightf(GL_LIGHT0 + light_I, GL_SPOT_CUTOFF, light->spotCutOff);
-	    glLightfv(GL_LIGHT0 + light_I, GL_SPOT_DIRECTION, light->spotDirection);	
+   float black[] = { 0.0, 0.0, 0.0, 1.0 };
+   float white[] = { 1.0, 1.0, 1.0, 1.0 };
+   float ambient[] = { 0.2, 0.2, 0.2, 1.0 };
+   float diffuse[] = { 0.8, 0.8, 0.8, 1.0 };
 
-            glEnable(GL_LIGHT0 + light_I);	    
-	}
-	
-	if(lightCount == 0) 	/* No light is listed in the xml file, but we still need to enable the default light */
-	   glEnable(GL_LIGHT0);
+   /* Here we setup defaults for a standard nice looking lighting model */
+   glEnable(GL_COLOR_MATERIAL);
+   glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 
+   /* Set global material light properties */
+   glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, black);    /* Disable light emission on materials */
+   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, black);    /* Disable specular on material */
+   /* Replace preceding statement with following to enable specular highlights 
+   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, white);        /* Enable specular on material /
+   /* Set material shininess factor / 
+   float shininess = 64.0; /* Default 0, range 0-128 /
+   glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, &shininess);   */
+
+   /* glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);      /* Set global ambient, GL default is 0.2 */
+   /* Light both sides of polygons - required to see both sides of surfaces */
+   glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+
+	/* Enabling the individual lights 
+    * Light positioning now done in opengl coords, not eye coords 
+    * If we reposition lights without loading identity they will be fixed to the model and not following camera */
+ 	lightCount = lucLight_Register_GetCount( self );
+   glPushMatrix();
+   glLoadIdentity();
+   //Journal_DPrintfL( lucDebug, 2, "Enabling %d lights\n", lightCount);
+ 	for (light_I = 0; light_I < lightCount; light_I++){
+             light = lucLight_Register_GetByIndex(self, light_I);	    
+ 	    glLightfv(GL_LIGHT0 + light_I, GL_POSITION, light->position);
+ 	    glLightf(GL_LIGHT0 + light_I, GL_SPOT_CUTOFF, light->spotCutOff);
+	    glLightfv(GL_LIGHT0 + light_I, GL_SPOT_DIRECTION, light->spotDirection);
+        	GLint    viewportArray[4];
+        	glGetIntegerv( GL_VIEWPORT, viewportArray );
+
+      /* Set light properties - using defaults as most params have not been setup correctly for xml */ 
+      glLightfv(GL_LIGHT0 + light_I, GL_AMBIENT, light->lmodel_ambient);
+      glLightfv(GL_LIGHT0 + light_I, GL_DIFFUSE, diffuse);
+      glLightfv(GL_LIGHT0 + light_I, GL_SPECULAR, white);
+ 
+      /* Turn on */
+      glEnable(GL_LIGHT0 + light_I);	    
+   }
+   /* Restore model view */
+   glPopMatrix();
 }
 
 Light_Index   lucLight_Register_GetCurrentLightIndex( void * lightRegister ) {

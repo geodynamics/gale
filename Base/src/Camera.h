@@ -112,10 +112,7 @@
 
 	void _lucCamera_Print( void* camera, Stream* stream );
 
-	void* _lucCamera_Copy( void* camera, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
-
-	#define lucCamera_Copy( self ) \
-		(lucCamera*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
+	void _lucCamera_Copy( void* camera, void* dest );
 
 	void* _lucCamera_DefaultNew( Name name );
 

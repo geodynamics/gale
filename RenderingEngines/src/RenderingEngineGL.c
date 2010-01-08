@@ -161,24 +161,21 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 	Journal_DPrintfL( lucDebug, 2, "In func: %s for %s '%s'\n", __func__, self->type, self->name );
 	Stream_Indent( lucDebug );
 
-    /* Determine if context is double buffered or not and save flag */
-    glGetBooleanv(GL_DOUBLEBUFFER, &self->doubleBuffered);
-	/* Set up OpenGl Colour */
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	
-	glEnable(GL_COLOR_MATERIAL);
-	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
- 	/*	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);  -- Done in the viewport now	*/	
-    glDrawBuffer(self->doubleBuffered ? GL_BACK_LEFT : GL_FRONT_LEFT);
-    GL_Error_Check
+   /* Determine if context is double buffered or not and save flag */
+   glGetBooleanv(GL_DOUBLEBUFFER, &self->doubleBuffered);
+
+   glDrawBuffer(self->doubleBuffered ? GL_BACK_LEFT : GL_FRONT_LEFT);
+   GL_Error_Check
 
 	/* Allow Transparency */
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 
-    /* Interpolate colours between polygon vertices, looks nice but not technically accurate */
-    glShadeModel( GL_SMOOTH ); 
+   /* Interpolate colours between polygon vertices, looks nice but not technically accurate */
+   glShadeModel( GL_SMOOTH ); 
 
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_DEPTH_TEST);
 
 	lucWindow_Broadcast( window, 0, MPI_COMM_WORLD );
@@ -258,7 +255,7 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 	Journal_DPrintfL( lucDebug, 2, "Leaving func %s\n", __func__ );
 }
 
-void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* window, lucPixel* buffer ) {
+void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* window, void *buffer, Bool withAlpha) {
 	lucRenderingEngineGL* self              = (lucRenderingEngineGL*) renderingEngine;
 	GLsizei width  = window->width;
 	GLsizei height = window->height;
@@ -275,7 +272,10 @@ void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* windo
 		glReadBuffer( self->doubleBuffered ? GL_BACK : GL_FRONT );
 	
 	/* Actually read the pixels. */
-	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer); 
+   if (withAlpha)
+   	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer); 
+   else
+   	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer); 
 }
 
 void lucRenderingEngineGL_WriteViewportText( void* renderingEngine, lucWindow* window, lucViewportInfo* viewportInfo, AbstractContext* context ) {
@@ -310,7 +310,7 @@ void _lucRenderingEngineGL_Clear( void* renderingEngineGL, lucWindow* window, Bo
     
     glEnable (GL_SCISSOR_TEST);
     glClearColor(window->backgroundColour.red, window->backgroundColour.green,
-                 window->backgroundColour.blue, window->backgroundColour.opacity );
+                 window->backgroundColour.blue, 0.0); /* window->backgroundColour.opacity );*/
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 

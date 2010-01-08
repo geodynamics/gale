@@ -369,6 +369,7 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
     }
 
     /* Draw Colour Bar */
+   glDisable(GL_CULL_FACE);
     for ( pixel_I = 0 ; pixel_I < length ; pixel_I++ ) {
         value = ((float)pixel_I / length);
         lucColourMap_SetOpenGLColourFromScaledValue( colourMap, value);

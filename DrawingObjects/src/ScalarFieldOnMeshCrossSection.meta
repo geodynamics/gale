@@ -10,7 +10,7 @@
 <param name="Project Web">http://mcc.monash.edu.au/gLucifer</param>
 <param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
-<param name="Parent">lucOpenGLDrawingObject</param>
+<param name="Parent">lucCrossSection</param>
 <param name="Reference"></param>
 <param name="Summary"></param>
 <param name="Description">Tiles a plane with colours derived from the value of a scalar field at the vertex of each tile.</param>
@@ -58,6 +58,12 @@
 		<param name="Default">+infinity</param>
 		<param name="Description">The maximum z value that it'll plot for this cross-secion.</param>
 	</struct>		
+	<struct>
+		<param name="Name">wireFrame</param>
+		<param name="Type">Bool</param>
+		<param name="Default">False</param>
+		<param name="Description">Draw a wireframe mesh only, don't fill in.</param>
+	</struct>	
 </list>
 
 <list name="Dependencies">
