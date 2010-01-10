@@ -832,7 +832,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 		self->outeritsinitialtime = 0;
 		self->outeritsendtime = 0;
 		/* add the outer loop iterations to the total outer iterations */
-		self->totalnumouterits = self->totalnumouterits++; 
+		self->totalnumouterits++; 
 	}  while ( (*chosenResidual > self->tolerance) || (iteration_I<minIterations) );  
 //	}  while ( *chosenResidual > self->tolerance );
 
