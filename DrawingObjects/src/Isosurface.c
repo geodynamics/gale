@@ -269,12 +269,8 @@ void _lucIsosurface_Setup( void* drawingObject, void* _context ) {
 					pos[ K_AXIS ] = max[ K_AXIS ] - 0.001 * dz;
 
             if (!FieldVariable_InterpolateValueAt( isosurfaceField, pos, &vertex[i][j][k].value ))
-            {
-               /* FieldVariable_InterpolateValueAt is returning OTHER_PROC at times, even when running on 1 processor, 
-                * until fixed zero with warning... */
+               /* FieldVariable_InterpolateValueAt returns OTHER_PROC if point not found in mesh, so zero value */
                vertex[i][j][k].value = 0;
-			      Journal_Printf( self->errorStream, "Warning !! In func %s: Could not interpolate value on grid at %d,%d,%d\n", __func__, i, j, k);
-            }
 			}
 		}
 	}
