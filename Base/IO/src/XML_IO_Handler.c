@@ -691,40 +691,42 @@ Bool _XML_IO_Handler_ReadAllFromBuffer( void* xml_io_handler, const char* buffer
  * \return a pointer to the root node if the file is valid, NULL otherwise. */
 static xmlNodePtr _XML_IO_Handler_OpenCheckFile( XML_IO_Handler* self, const char* filename )
 {
-	xmlChar		absolute[1024];
-	xmlNodePtr	cur = NULL;
-	Bool			status = False;
+   xmlChar		absolute[1024];
+   xmlNodePtr	cur = NULL;
+   Bool			status = False;
 
-	if ( FindFileInPathList(
-		(char*)absolute,
-		(char*)filename,
-		self->searchPaths,
-		self->searchPathsSize ) )
-	{
-		_XML_IO_Handler_OpenFile( self, (char*)absolute );
-	}
+   if ( FindFileInPathList(
+      (char*)absolute,
+      (char*)filename,
+      self->searchPaths,
+      self->searchPathsSize ) )
+   {
+      _XML_IO_Handler_OpenFile( self, (char*)absolute );
+   }
 
-	Journal_Firewall( self->currDoc != NULL,
-		Journal_Register( Error_Type, XML_IO_Handler_Type ),
-		"Error: File %s doesn't exist, not readable, or not valid.\n",
-		filename );
-	
-	if( self->currDoc != NULL ) {
-		cur = xmlDocGetRootElement( self->currDoc );
-		status = _XML_IO_Handler_Check( self, self->currDoc );
+   if( self->currDoc == NULL ) {
+      Journal_RPrintf( Journal_Register( Error_Type, XML_IO_Handler_Type ),
+      "Error: File %s doesn't exist, not readable, or not valid.\n", filename );
+      exit(EXIT_FAILURE);
+   }
 
-		Journal_Firewall( status,
-			Journal_Register( Error_Type, XML_IO_Handler_Type ),
-			"Error: File %s not valid/readable.\n",
-			filename );
+   if( self->currDoc != NULL ) {
+      cur = xmlDocGetRootElement( self->currDoc );
+      status = _XML_IO_Handler_Check( self, self->currDoc );
 
-		if( status == True )
-			return cur;
-		else
-			return NULL;
-	}
-	else
-		return NULL; 
+      if( !status ) {
+         Journal_RPrintf( Journal_Register( Error_Type, XML_IO_Handler_Type ),
+         "Error: File %s not valid/readable.\n", filename );
+         exit(EXIT_FAILURE);
+      }
+
+      if( status == True )
+         return cur;
+      else
+         return NULL;
+   }
+   else
+      return NULL; 
 }
 
 static xmlNodePtr _XML_IO_Handler_OpenCheckBuffer( XML_IO_Handler* self, const char* buffer ) {
