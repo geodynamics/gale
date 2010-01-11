@@ -112,6 +112,8 @@ void VariableSuite_Teardown( VariableSuiteData* data ) {
 
 void VariableSuite_TestGetValueDouble( VariableSuiteData* data ) {
    Index                   ii;
+   double tmp;
+   Variable*      var = Variable_Register_GetByName( data->vr, "temperature" );
 
    /* Test the Get and Set of a scalar double....................................................................... */
    /* Fill the temperature array with a known pattern of kinda random (bit filling) numbers. */
@@ -121,29 +123,29 @@ void VariableSuite_TestGetValueDouble( VariableSuiteData* data ) {
    
    /* Check that Variable_GetValueDouble on the temperature Variable returns the right numbers */
    for( ii = 0; ii < data->aSize[0]; ii++ ) {
-      Variable*      var = Variable_Register_GetByName( data->vr, "temperature" );
-      const double      tmp = 1.0f / (data->aSize[0]+2) * (ii+1);
-      
-      pcu_check_true( Variable_GetValueDouble( var, ii ) == tmp );
+      tmp = 1.0f / (data->aSize[0]+2) * (ii+1);
+
+      pcu_check_true( fabs(Variable_GetValueDouble( var, ii ) - tmp ) < 1e-12);
    }
 }
    
 
 void VariableSuite_TestSetValueDouble( VariableSuiteData* data ) {
    Index                   ii;
+   double tmp;
+   Variable*      var = Variable_Register_GetByName( data->vr, "temperature" );
 
    /* Fill the temperature Variable with another known pattern of kinda random (bit filling) numbers */
    for( ii = 0; ii < data->aSize[0]; ii++ ) {
-      Variable*      var = Variable_Register_GetByName( data->vr, "temperature" );
       
       Variable_SetValueDouble( var, ii, 1.0f - ( 1.0f / (data->aSize[0]+2) * (ii+1) ) );
    }
    
    /* Check that Variable_SetValueDouble on the temperature Variable set the right numbers */
    for( ii = 0; ii < data->aSize[0]; ii++ ) {
-      const double      tmp = 1.0f - 1.0f / (data->aSize[0]+2) * (ii+1);
+      tmp = 1.0f - 1.0f / (data->aSize[0]+2) * (ii+1);
       
-      pcu_check_true( data->temperature[ii] == tmp );
+      pcu_check_true( fabs(data->temperature[ii] - tmp ) < 1e-12);
    }
 }
    
@@ -151,6 +153,8 @@ void VariableSuite_TestSetValueDouble( VariableSuiteData* data ) {
 /* Test the Get and Set of a vector double....................................................................... */
 void VariableSuite_TestGetValueAtDouble( VariableSuiteData* data ) {
    Index                   ii;
+   double tmp;
+   Variable*      var = Variable_Register_GetByName( data->vr, "velocity" );
 
 /* Fill the velocity array with a known pattern of kinda random (bit filling) numbers. */
    for( ii = 0; ii < data->aSize[1]; ii++ ) {
@@ -163,13 +167,12 @@ void VariableSuite_TestGetValueAtDouble( VariableSuiteData* data ) {
    
    /* Check that Variable_GetPtrDouble on the velocity Variable returns the right numbers */
    for( ii = 0; ii < data->aSize[1]; ii++ ) {
-      Variable*      var = Variable_Register_GetByName( data->vr, "velocity" );
       int         d;
       
       for( d = 0; d < 3; d++ ) {
-         const double       tmp = 1.0f / ((data->aSize[1]*3)+2) * (ii*3+d+1);
+         tmp = 1.0f / ((data->aSize[1]*3)+2) * (ii*3+d+1);
          
-         pcu_check_true( Variable_GetValueAtDouble( var, ii, d ) == tmp );
+         pcu_check_true( fabs(Variable_GetValueAtDouble(var, ii, d ) - tmp) < 1e-12);
       }
    }
 }
@@ -177,25 +180,25 @@ void VariableSuite_TestGetValueAtDouble( VariableSuiteData* data ) {
 
 void VariableSuite_TestSetValueAtDouble( VariableSuiteData* data ) {
    Index                   ii;
+   double tmp;
+   int d;
+   Variable*      var = Variable_Register_GetByName( data->vr, "velocity" );
 
    /* Fill the variable Variable with another known pattern of kinda random (bit filling) numbers */
    for( ii = 0; ii < data->aSize[1]; ii++ ) {
-      Variable*      var = Variable_Register_GetByName( data->vr, "velocity" );
-      int         d;
       
       for( d = 0; d < 3; d++ ) {
-         Variable_SetValueAtDouble( var, ii, d, 1.0f - ( 1.0f / ((data->aSize[1]*3)+2) * (ii*3+d+1) ) );
+         Variable_SetValueAtDouble( var, ii, d, 1.0 - ( 1.0 / ((data->aSize[1]*3)+2) * (ii*3+d+1) ) );
       }
    }
    
-   /* Check that Variable_SetValueDouble on the temperature Variable set the right numbers */
+   /* Check that Variable_SetValueDouble on the velocity Variable set the right numbers */
    for( ii = 0; ii < data->aSize[1]; ii++ ) {
-      int         d;
       
       for( d = 0; d < 3; d++ ) {
-         const double      tmp = 1.0f - ( 1.0f / ((data->aSize[1]*3)+2) * (ii*3+d+1) );
+         tmp = 1.0 - ( 1.0 / ((data->aSize[1]*3)+2) * (ii*3+d+1) );
          
-         pcu_check_true( data->velocity[ii][d] == tmp );
+         pcu_check_true( data->velocity[ii][d]-tmp < 1e-12 );
       }
    }
 }
