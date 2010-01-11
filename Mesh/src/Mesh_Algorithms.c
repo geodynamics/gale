@@ -562,13 +562,19 @@ Bool Mesh_Algorithms_SearchWithFullIncidence( void* algorithms, double* point,
 			return True;
 	}
 
+/* OK 11/1/2010 Disabling this for now as it takes forever when for a point not found and seems unnecessary
+ * Surely if a point is not found in incident elements it will not be found elsewhere?
+ * If it is required could be enabled with a flag or in another function,
+ * eg: Mesh_Algorithms_SearchBruteForce, so it doesn't do this by default
+ * Plotting IsoSurface in one instance spends 30 seconds here searching for a ~1 second rendering job */
+#if 0   
 	/* Brute force, search every element in turn (last resort). */
 	nEls = Mesh_GetDomainSize( mesh, nDims );
 	for( e_i = 0; e_i < nEls; e_i++ ) {
 		if( Mesh_ElementHasPoint( mesh, e_i, point, dim, ind ) )
 			return True;
 	}
-
+#endif
 	return False;
 }
 
