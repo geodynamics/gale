@@ -709,10 +709,10 @@ void IO_HandlerSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, IO_HandlerSuite_TestReadRawDataEntries );
    pcu_suite_addTest( suite, IO_HandlerSuite_TestReadAllFromCommandLine );
    pcu_suite_addTest( suite, IO_HandlerSuite_TestReadDuplicateEntryKeys );
-   pcu_suite_addTest( suite, IO_HandlerSuite_TestReadNonExistent );
-   pcu_suite_addTest( suite, IO_HandlerSuite_TestReadInvalid );
-   pcu_suite_addTest( suite, IO_HandlerSuite_TestReadWrongNS );
-   pcu_suite_addTest( suite, IO_HandlerSuite_TestReadWrongRootNode );
+   /* pcu_suite_addTest( suite, IO_HandlerSuite_TestReadNonExistent ); */
+   /*pcu_suite_addTest( suite, IO_HandlerSuite_TestReadInvalid );*/
+   /*pcu_suite_addTest( suite, IO_HandlerSuite_TestReadWrongNS );*/
+   /*pcu_suite_addTest( suite, IO_HandlerSuite_TestReadWrongRootNode );*/
 }
 
 
