@@ -38,8 +38,8 @@
 */
 
 
-#ifndef __StgFEM_LumpedMassMatrixForceTerm_h__
-#define __StgFEM_LumpedMassMatrixForceTerm_h__
+#ifndef __StgFEM_SLE_ProvidedSystems_LumpedMassMatrixForceTerm_h__
+#define __StgFEM_SLE_ProvidedSystems_LumpedMassMatrixForceTerm_h__
 
 	/** Textual name of this class */
 	extern const Type LumpedMassMatrixForceTerm_Type;
@@ -56,42 +56,47 @@
 	struct LumpedMassMatrixForceTerm { __LumpedMassMatrixForceTerm };
 
 	LumpedMassMatrixForceTerm* LumpedMassMatrixForceTerm_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm );
+		Name							name,
+		FiniteElementContext*	context,
+		ForceVector*				forceVector,
+		Swarm*						integrationSwarm );
 
-	LumpedMassMatrixForceTerm* _LumpedMassMatrixForceTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		ForceTerm_AssembleElementFunction*                  _assembleElement,
-		Name                                                name );
 	
-	void LumpedMassMatrixForceTerm_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
+	#define LUMPEDMASSMATRIXFORCETERM_DEFARGS \
+                FORCETERM_DEFARGS
+
+	#define LUMPEDMASSMATRIXFORCETERM_PASSARGS \
+                FORCETERM_PASSARGS
+
+	LumpedMassMatrixForceTerm* _LumpedMassMatrixForceTerm_New(  LUMPEDMASSMATRIXFORCETERM_DEFARGS  );
+
+	void _LumpedMassMatrixForceTerm_Init( void* forceTerm );
+	
 	void _LumpedMassMatrixForceTerm_Delete( void* residual );
+
 	void _LumpedMassMatrixForceTerm_Print( void* residual, Stream* stream );
 
-	void* _LumpedMassMatrixForceTerm_DefaultNew( Name name ) ;
-void _LumpedMassMatrixForceTerm_Construct( void* residual, Stg_ComponentFactory* cf, void* data ) ;
+	void* _LumpedMassMatrixForceTerm_DefaultNew( Name name );
+
+	void _LumpedMassMatrixForceTerm_AssignFromXML( void* residual, Stg_ComponentFactory* cf, void* data ) ;
+
 	void _LumpedMassMatrixForceTerm_Build( void* residual, void* data ) ;
+
 	void _LumpedMassMatrixForceTerm_Initialise( void* residual, void* data ) ;
+
 	void _LumpedMassMatrixForceTerm_Execute( void* residual, void* data ) ;
+
 	void _LumpedMassMatrixForceTerm_Destroy( void* residual, void* data ) ;
 
 	void _LumpedMassMatrixForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) ;
+
 	void _LumpedMassMatrixForceTerm_AssembleElement_General( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVector ) ;
+
 	void _LumpedMassMatrixForceTerm_AssembleElement_Box( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVector ) ;
 
 #endif
+

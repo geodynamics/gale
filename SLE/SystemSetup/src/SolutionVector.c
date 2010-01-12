@@ -47,6 +47,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
+#include "FiniteElementContext.h"
 #include "SolutionVector.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -60,144 +61,73 @@ static const int VALUE_TAG = 1;
 static const int VALUE_REQUEST_TAG = 2;
 
 typedef struct RequestInfo {
-	Node_LocalIndex		lNode_I;
-	Dof_Index		nodeLocalDof_I;
+	Node_LocalIndex	lNode_I;
+	Dof_Index			nodeLocalDof_I;
 } RequestInfo;
 
 void _SolutionVector_ShareValuesNotStoredLocally(
 	SolutionVector*		self,
-	Index*			reqFromOthersCounts,
-	RequestInfo**		reqFromOthersInfos,
+	Index*					reqFromOthersCounts,
+	RequestInfo**			reqFromOthersInfos,
 	Dof_EquationNumber**	reqFromOthers,
-	double*			localSolnVecValues );
+	double*					localSolnVecValues );
 
+SolutionVector* SolutionVector_New( Name name, FiniteElementContext* context, MPI_Comm comm, FeVariable* feVariable ) {
+	SolutionVector* self = _SolutionVector_DefaultNew( name );
 
-void* SolutionVector_DefaultNew( Name name ) {
-	return _SolutionVector_New( 
-		sizeof(SolutionVector), 
-		SolutionVector_Type, 
-		_SolutionVector_Delete,
-		_SolutionVector_Print, 
-		_SolutionVector_Copy,
-		SolutionVector_DefaultNew,
-		_SolutionVector_Construct,
-		_SolutionVector_Build, 
-		_SolutionVector_Initialise, 
-		_SolutionVector_Execute, 
-		_SolutionVector_Destroy,
-		name,
-		False,
-		MPI_COMM_WORLD, 
-		NULL );
+	self->isConstructed = True;
+	_SolutionVector_Init( self, context, comm, feVariable );
+
+	return self;
 }
 
-SolutionVector* SolutionVector_New(
-		Name 						name,
-		MPI_Comm					comm,
-		FeVariable*					feVariable )
-{
-	return _SolutionVector_New( 
-		sizeof(SolutionVector), 
-		SolutionVector_Type, 
-		_SolutionVector_Delete,
-		_SolutionVector_Print, 
-		_SolutionVector_Copy,
-		SolutionVector_DefaultNew,
-		_SolutionVector_Construct,
-		_SolutionVector_Build, 
-		_SolutionVector_Initialise, 
-		_SolutionVector_Execute, 
-		_SolutionVector_Destroy, 
-		name,
-		True,
-		comm, 
-		feVariable );
+void* _SolutionVector_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(SolutionVector);
+	Type                                                      type = SolutionVector_Type;
+	Stg_Class_DeleteFunction*                              _delete = _SolutionVector_Delete;
+	Stg_Class_PrintFunction*                                _print = _SolutionVector_Print;
+	Stg_Class_CopyFunction*                                  _copy = _SolutionVector_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _SolutionVector_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _SolutionVector_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _SolutionVector_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _SolutionVector_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _SolutionVector_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _SolutionVector_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
+	return _SolutionVector_New(  SOLUTIONVECTOR_PASSARGS  );
 }
 
-
-void SolutionVector_Init(
-		SolutionVector*					self,
-		Name 						name,
-		MPI_Comm					comm,
-		FeVariable*					feVariable )
-{
-	/* General info */
-	self->type = SolutionVector_Type;
-	self->_sizeOfSelf = sizeof(SolutionVector);
-	self->_deleteSelf = False;
-	
-	/* Virtual info */
-	self->_delete = _SolutionVector_Delete;
-	self->_print = _SolutionVector_Print;
-	self->_copy = _SolutionVector_Copy;
-	self->_build = _SolutionVector_Build;
-
-	_Stg_Class_Init( (Stg_Class*)self );
-	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-	_Stg_Component_Init( (Stg_Component*)self );
-
-	_SolutionVector_Init( self, comm, feVariable );
-}
-
-
-SolutionVector* _SolutionVector_New( 
-		SizeT						_sizeOfSelf,
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*		_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name 						name, 
-		Bool						initFlag,
-		MPI_Comm					comm,
-		FeVariable*					feVariable )
-{
-	SolutionVector*		self;
+SolutionVector* _SolutionVector_New(  SOLUTIONVECTOR_DEFARGS  ) {
+	SolutionVector* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(SolutionVector) );
-	self = (SolutionVector*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor, _construct,
-			_build, _initialise, _execute, _destroy, name, NON_GLOBAL );
+	self = (SolutionVector*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* General info */
 	
-	/* Virtual functions */
-	
-	if( initFlag ){
-		_SolutionVector_Init( self, comm, feVariable );
-	}
+	/* Virtual info */
 	
 	return self;
 }
 
-void _SolutionVector_Init(
-		SolutionVector*					self,
-		MPI_Comm					comm,
-		FeVariable*					feVariable )
-{
+void _SolutionVector_Init( SolutionVector* self, FiniteElementContext* context, MPI_Comm comm, FeVariable* feVariable ) {
 	/* General and Virtual info should already be set */
 	
 	/* SolutionVector info */
-	self->isConstructed = True;
+	self->context = context;
 	self->debug = Stream_RegisterChild( StgFEM_SLE_SystemSetup_Debug, self->type );
 	self->comm = comm;
 	self->feVariable = feVariable;
 }
-
 
 void _SolutionVector_Delete( void* solutionVector ) {
 	SolutionVector* self = (SolutionVector*)solutionVector;
 	
 	Journal_DPrintf( self->debug, "In %s - for soln. vector %s\n", __func__, self->name );
 	Stream_IndentBranch( StgFEM_Debug );
-	//FreeObject( self->vector );
-	if( self->vector != PETSC_NULL )
-		VecDestroy( self->vector );
 	
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
@@ -260,13 +190,17 @@ void* _SolutionVector_Copy( void* solutionVector, void* dest, Bool deep, Name na
 }
 
 
-void _SolutionVector_Construct( void* solutionVector, Stg_ComponentFactory* cf, void* data ) 
-{
-	SolutionVector*    self = (SolutionVector*)solutionVector;
-	FeVariable*        feVariable = NULL;
-	
+void _SolutionVector_AssignFromXML( void* solutionVector, Stg_ComponentFactory* cf, void* data ) {
+	SolutionVector*			self = (SolutionVector*)solutionVector;
+	FeVariable*					feVariable = NULL;
+	FiniteElementContext*	context;
+
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+
 	feVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeVariable", FeVariable, True, data ) ;
-	_SolutionVector_Init( self, MPI_COMM_WORLD, (FeVariable*)feVariable );
+	_SolutionVector_Init( self, context, MPI_COMM_WORLD, (FeVariable*)feVariable );
 }
 
 
@@ -315,8 +249,12 @@ void _SolutionVector_Execute( void* solutionVector, void* data ) {
 }
 
 void _SolutionVector_Destroy( void* solutionVector, void* data ) {
-}
+	SolutionVector* self = (SolutionVector*)solutionVector;
 
+	//FreeObject( self->vector );
+	if( self->vector != PETSC_NULL )
+		VecDestroy( self->vector );
+}
 
 void SolutionVector_ApplyBCsToVariables( void* solutionVector, void* data ) {
 	SolutionVector*		self = (SolutionVector *)solutionVector;
@@ -325,7 +263,7 @@ void SolutionVector_ApplyBCsToVariables( void* solutionVector, void* data ) {
 }
 
 /* from the depreciated Vector class */
-_SolutionVector_VectorView( Vec v, Stream* stream ) {
+void _SolutionVector_VectorView( Vec v, Stream* stream ) {
 	unsigned	entry_i;
 	PetscInt	size;
 	PetscScalar*	array;
@@ -827,3 +765,5 @@ void SolutionVector_LoadCurrentFeVariableValuesOntoVector( void* solutionVector 
 	VecAssemblyBegin( self->vector );
 	VecAssemblyEnd( self->vector ); 
 }
+
+

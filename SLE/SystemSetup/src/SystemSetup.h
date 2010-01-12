@@ -50,8 +50,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StgFEM_SLE_SystemSetup_h__
-#define __StgFEM_SLE_SystemSetup_h__
+#ifndef __StgFEM_SLE_SystemSetup_SystemSetup_h__
+#define __StgFEM_SLE_SystemSetup_SystemSetup_h__
 	
 	#include "units.h"
 	#include "types.h"
@@ -74,7 +74,7 @@
 	#include "MGOpGenerator.h"
 	#include "SROpGenerator.h"
 
-	#include "Context.h"
+	#include "FiniteElementContext.h"
 
 	#include "Init.h"
 	#include "Finalise.h"

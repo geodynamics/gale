@@ -57,74 +57,35 @@
 const Type UzawaPreconditionerTerm_Type = "UzawaPreconditionerTerm";
 
 UzawaPreconditionerTerm* UzawaPreconditionerTerm_New( 
-		Name                                                name,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm )
+	Name							name,
+	FiniteElementContext*	context,
+	StiffnessMatrix*			stiffnessMatrix,
+	Swarm*						integrationSwarm )
 {
 	UzawaPreconditionerTerm* self = (UzawaPreconditionerTerm*) _UzawaPreconditionerTerm_DefaultNew( name );
 
-	UzawaPreconditionerTerm_InitAll( 
-			self,
-			stiffnessMatrix,
-			integrationSwarm );
+	self->isConstructed = True;
+	_StiffnessMatrixTerm_Init( self, context, stiffnessMatrix, integrationSwarm, NULL );
+	_UzawaPreconditionerTerm_Init( self );
 
 	return self;
 }
 
 /* Creation implementation / Virtual constructor */
-UzawaPreconditionerTerm* _UzawaPreconditionerTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,
-		Name                                                name )
+UzawaPreconditionerTerm* _UzawaPreconditionerTerm_New(  UZAWAPRECONDITIONERTERM_DEFARGS  )
 {
 	UzawaPreconditionerTerm* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(UzawaPreconditionerTerm) );
-	self = (UzawaPreconditionerTerm*) _StiffnessMatrixTerm_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_assembleElement,
-		name );
+	assert( _sizeOfSelf >= sizeof(UzawaPreconditionerTerm) );
+	self = (UzawaPreconditionerTerm*) _StiffnessMatrixTerm_New(  STIFFNESSMATRIXTERM_PASSARGS  );
 	
 	/* Virtual info */
 	
 	return self;
 }
 
-void _UzawaPreconditionerTerm_Init( 
-		UzawaPreconditionerTerm*                                    self )
-{
-}
-
-void UzawaPreconditionerTerm_InitAll( 
-		void*                                               matrixTerm,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm )
-{
-	UzawaPreconditionerTerm* self = (UzawaPreconditionerTerm*) matrixTerm;
-
-	StiffnessMatrixTerm_InitAll( self, stiffnessMatrix, integrationSwarm, NULL );
-	_UzawaPreconditionerTerm_Init( self );
+void _UzawaPreconditionerTerm_Init( void* matrixTerm ) {
 }
 
 void _UzawaPreconditionerTerm_Delete( void* matrixTerm ) {
@@ -142,27 +103,31 @@ void _UzawaPreconditionerTerm_Print( void* matrixTerm, Stream* stream ) {
 }
 
 void* _UzawaPreconditionerTerm_DefaultNew( Name name ) {
-	return (void*)_UzawaPreconditionerTerm_New( 
-		sizeof(UzawaPreconditionerTerm), 
-		UzawaPreconditionerTerm_Type,
-		_UzawaPreconditionerTerm_Delete,
-		_UzawaPreconditionerTerm_Print,
-		NULL,
-		_UzawaPreconditionerTerm_DefaultNew,
-		_UzawaPreconditionerTerm_Construct,
-		_UzawaPreconditionerTerm_Build,
-		_UzawaPreconditionerTerm_Initialise,
-		_UzawaPreconditionerTerm_Execute,
-		_UzawaPreconditionerTerm_Destroy,
-		_UzawaPreconditionerTerm_AssembleElement,
-		name );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(UzawaPreconditionerTerm);
+	Type                                                         type = UzawaPreconditionerTerm_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _UzawaPreconditionerTerm_Delete;
+	Stg_Class_PrintFunction*                                   _print = _UzawaPreconditionerTerm_Print;
+	Stg_Class_CopyFunction*                                     _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _UzawaPreconditionerTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _UzawaPreconditionerTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _UzawaPreconditionerTerm_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _UzawaPreconditionerTerm_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _UzawaPreconditionerTerm_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _UzawaPreconditionerTerm_Destroy;
+	StiffnessMatrixTerm_AssembleElementFunction*     _assembleElement = _UzawaPreconditionerTerm_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*)_UzawaPreconditionerTerm_New(  UZAWAPRECONDITIONERTERM_PASSARGS  );
 }
 
-void _UzawaPreconditionerTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
+void _UzawaPreconditionerTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
 	UzawaPreconditionerTerm*            self             = (UzawaPreconditionerTerm*)matrixTerm;
 
 	/* Construct Parent */
-	_StiffnessMatrixTerm_Construct( self, cf, data );
+	_StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
 	_UzawaPreconditionerTerm_Init( self );
 }
@@ -272,3 +237,5 @@ void _UzawaPreconditionerTerm_AssembleElement(
 		Memory_Free( mElementMatrix );
 	}
 }
+
+

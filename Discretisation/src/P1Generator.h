@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Discretisaton_Mesh_P1Generator_h__
-#define __Discretisaton_Mesh_P1Generator_h__
+#ifndef __StgFEM_Discretisaton_P1Generator_h__
+#define __StgFEM_Discretisaton_P1Generator_h__
 
 	/** Textual name of this class */
 	extern const Type P1Generator_Type;
@@ -78,7 +78,7 @@
 
 	void _P1Generator_Delete( void* generator );
 	void _P1Generator_Print( void* generator, Stream* stream );
-	void _P1Generator_Construct( void* generator, Stg_ComponentFactory* cf, void* data );
+	void _P1Generator_AssignFromXML( void* generator, Stg_ComponentFactory* cf, void* data );
 	void _P1Generator_Build( void* generator, void* data );
 	void _P1Generator_Initialise( void* generator, void* data );
 	void _P1Generator_Execute( void* generator, void* data );
@@ -100,4 +100,4 @@
 	void P1Generator_BuildGeometry( P1Generator* self, FeMesh* mesh );
 	void P1Generator_BuildElementTypes( P1Generator* self, FeMesh* mesh );
 
-#endif /* __Discretisaton_Mesh_P1Generator_h__ */
+#endif /* __StgFEM_Discretisaton_P1Generator_h__ */

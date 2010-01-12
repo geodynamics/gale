@@ -91,14 +91,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define ASSEMBLER_DEFARGS \
-		STG_CLASS_DEFARGS
+                STG_CLASS_DEFARGS
 
 	#define ASSEMBLER_PASSARGS \
-		STG_CLASS_PASSARGS
+                STG_CLASS_PASSARGS
 
 	Assembler* Assembler_New();
-	Assembler* _Assembler_New( ASSEMBLER_DEFARGS );
+	Assembler* _Assembler_New(  ASSEMBLER_DEFARGS  );
 	void _Assembler_Init( Assembler* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -134,3 +141,4 @@
 	*/
 
 #endif /* __StgFEM_SLE_SystemSetup_Assembler_h__ */
+

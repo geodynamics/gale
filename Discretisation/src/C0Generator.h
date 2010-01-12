@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Discretisaton_Mesh_C0Generator_h__
-#define __Discretisaton_Mesh_C0Generator_h__
+#ifndef __StgFEM_Discretisaton_C0Generator_h__
+#define __StgFEM_Discretisaton_C0Generator_h__
 
 	/** Textual name of this class */
 	extern const Type C0Generator_Type;
@@ -62,14 +62,21 @@
 	** Constructors
 	*/
 
-	#define C0GENERATOR_DEFARGS	\
-		MESHGENERATOR_DEFARGS
 
-	#define C0GENERATOR_PASSARGS	\
-		MESHGENERATOR_PASSARGS
 
-	C0Generator* C0Generator_New( Name name );
-	C0Generator* _C0Generator_New( C0GENERATOR_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define C0GENERATOR_DEFARGS \
+                MESHGENERATOR_DEFARGS
+
+	#define C0GENERATOR_PASSARGS \
+                MESHGENERATOR_PASSARGS
+
+	C0Generator* C0Generator_New( Name name, AbstractContext* context );
+	C0Generator* _C0Generator_New(  C0GENERATOR_DEFARGS  );
 	void _C0Generator_Init( C0Generator* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -78,7 +85,7 @@
 
 	void _C0Generator_Delete( void* generator );
 	void _C0Generator_Print( void* generator, Stream* stream );
-	void _C0Generator_Construct( void* generator, Stg_ComponentFactory* cf, void* data );
+	void _C0Generator_AssignFromXML( void* generator, Stg_ComponentFactory* cf, void* data );
 	void _C0Generator_Build( void* generator, void* data );
 	void _C0Generator_Initialise( void* generator, void* data );
 	void _C0Generator_Execute( void* generator, void* data );
@@ -100,4 +107,5 @@
 	void C0Generator_BuildGeometry( C0Generator* self, FeMesh* mesh );
 	void C0Generator_BuildElementTypes( C0Generator* self, FeMesh* mesh );
 
-#endif /* __Discretisaton_Mesh_C0Generator_h__ */
+#endif /* __StgFEM_Discretisaton_C0Generator_h__ */
+

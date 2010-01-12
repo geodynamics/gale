@@ -57,60 +57,53 @@
 	#define __LinkedDofInfo \
 		__Stg_Component \
 		\
-		Dictionary*	dictionary; \
+		DomainContext*	context; \
+		Dictionary*		dictionary; \
 		/** A mesh that this indo is based around */ \
-		Mesh*		mesh; \
+		Mesh*				mesh; \
 		/** A DofLayout that this info is based around */ \
-		DofLayout*	dofLayout; \
+		DofLayout*		dofLayout; \
 		/** an array of ints, specifying for each local dof whether it is linked, and if so where to */ \
-		int**		linkedDofTbl; \
+		int**				linkedDofTbl; \
 		/** count of how many linked dof sets are active */ \
-		Index		linkedDofSetsCount; \
-		Index		linkedDofSetsSize; \
-		Index		linkedDofSetsDelta; \
+		Index				linkedDofSetsCount; \
+		Index				linkedDofSetsSize; \
+		Index				linkedDofSetsDelta; \
 		/** For each linked dof set, records the eq num they all map to */ \
-		int*		eqNumsOfLinkedDofs; \
+		int*				eqNumsOfLinkedDofs; \
 
 	struct LinkedDofInfo { __LinkedDofInfo };
+
+
 
 	/* +++ Constructors / Destructors +++ */
 	
 	/** Create a linkedDofInfo */
-	void* LinkedDofInfo_DefaultNew( Name name );
+	void* _LinkedDofInfo_DefaultNew( Name name );
 	
 	LinkedDofInfo* LinkedDofInfo_New( 
-		Name						name,
-		void*						mesh,
-		DofLayout*					dofLayout,
-		Dictionary*					dictionary );
+		Name				name,
+		DomainContext*	context,
+		void*				mesh,
+		DofLayout*		dofLayout,
+		Dictionary*		dictionary );
 	
 	/** Creation implementation */
-	LinkedDofInfo* _LinkedDofInfo_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*		_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*			_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name						name,
-		Bool						initFlag,
-		void*						mesh,
-		DofLayout*					dofLayout,
-		Dictionary*					dictionary );
 	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LINKEDDOFINFO_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define LINKEDDOFINFO_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	LinkedDofInfo* _LinkedDofInfo_New(  LINKEDDOFINFO_DEFARGS  );
 	
 	/** Initialisation implementation functions */
-	void _LinkedDofInfo_Init(
-		LinkedDofInfo*					self, 
-		void*						mesh,
-		DofLayout*					dofLayout,
-		Dictionary*					dictionary );
-	
+	void _LinkedDofInfo_Init( void* linkedDofInfo, DomainContext* context, void* mesh, DofLayout* dofLayout, Dictionary* dictionary );
 	
 	/** Stg_Class_Delete implementation. */
 	void _LinkedDofInfo_Delete( void* linkedDofInfo );
@@ -120,7 +113,7 @@
 	/** Print implementation */
 	void _LinkedDofInfo_Print( void* linkedDofInfo, Stream* stream );
 	
-	void _LinkedDofInfo_Construct( void* linkedDofInfo, Stg_ComponentFactory *cf, void* data );
+	void _LinkedDofInfo_AssignFromXML( void* linkedDofInfo, Stg_ComponentFactory *cf, void* data );
 	
 	void _LinkedDofInfo_Execute( void* linkedDofInfo, void *data );
 	
@@ -145,3 +138,4 @@
 	void LinkedDofInfo_AddDofsToSet_FromIndexSet( void* linkedDofInfo, Index linkedDofSet_I, IndexSet* nodeSet, Dof_Index nodeLocalDof_I );
 		
 #endif
+

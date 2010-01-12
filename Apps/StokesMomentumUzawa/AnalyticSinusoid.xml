@@ -7,7 +7,31 @@
 	<include>LidDrivenConvection.xml</include>
 
 	<list name="plugins" mergeType="merge">
-		<param>StgFEM_LidDrivenIsoviscousAnalytic</param>
+		<struct>
+			<param name="Type">StgFEM_LidDrivenIsoviscousAnalytic</param>
+			<param name="Context">context</param>
+		</struct>
+	</list>
+
+	<struct name="pluginData">
+		<list name="NumericFields">
+			<param>VelocityField</param> <param>0</param>
+			<param>PressureField</param> <param>1</param>
+		</list> 
+		<param name="IntegrationSwarm">gaussSwarm</param>
+		<param name="ConstantMesh">constantMesh</param>
+		<param name="ElementMesh">linearMesh</param>
+		<param name="normaliseByAnalyticSolution">true</param>
+		<param name="useReferenceSolutionFromFile">false</param>
+		<param name="appendToAnalysisFile">false</param>
+		<param name="Context">context</param>
+	</struct>
+
+	<list name="FieldVariablesToCheckpoint" mergeType="merge">
+		<param>VelocityField</param>
+		<param>PressureField</param>
+		<param>VelocityField-Analytic</param>
+		<param>PressureField-Analytic</param>
 	</list>
 
 	<param name="VelocityField-Tolerance">0.01 </param>

@@ -38,8 +38,8 @@
 */
 
 
-#ifndef __StgFEM_UzawaPreconditionerTerm_h__
-#define __StgFEM_UzawaPreconditionerTerm_h__
+#ifndef __StgFEM_SLE_ProvidedSystems_StokesFlow_UzawaPreconditionerTerm_h__
+#define __StgFEM_SLE_ProvidedSystems_StokesFlow_UzawaPreconditionerTerm_h__
 
 	/** Textual name of this class */
 	extern const Type UzawaPreconditionerTerm_Type;
@@ -56,46 +56,49 @@
 	struct UzawaPreconditionerTerm { __UzawaPreconditionerTerm };
 
 	UzawaPreconditionerTerm* UzawaPreconditionerTerm_New( 
-		Name                                                name,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm );
+		Name							name,
+		FiniteElementContext*	context,
+		StiffnessMatrix*			stiffnessMatrix,
+		Swarm*						integrationSwarm );
 
-	UzawaPreconditionerTerm* _UzawaPreconditionerTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
-		Name                                                name );
 	
-	void UzawaPreconditionerTerm_InitAll( 
-		void*                                               matrixTerm,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
+	#define UZAWAPRECONDITIONERTERM_DEFARGS \
+                STIFFNESSMATRIXTERM_DEFARGS
+
+	#define UZAWAPRECONDITIONERTERM_PASSARGS \
+                STIFFNESSMATRIXTERM_PASSARGS
+
+	UzawaPreconditionerTerm* _UzawaPreconditionerTerm_New(  UZAWAPRECONDITIONERTERM_DEFARGS  );
+
+	void _UzawaPreconditionerTerm_Init( void* matrixTerm );
+	
 	void _UzawaPreconditionerTerm_Delete( void* matrixTerm );
+
 	void _UzawaPreconditionerTerm_Print( void* matrixTerm, Stream* stream );
 
-	void* _UzawaPreconditionerTerm_DefaultNew( Name name ) ;
-void _UzawaPreconditionerTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
-	void _UzawaPreconditionerTerm_Build( void* matrixTerm, void* data ) ;
-	void _UzawaPreconditionerTerm_Initialise( void* matrixTerm, void* data ) ;
-	void _UzawaPreconditionerTerm_Execute( void* matrixTerm, void* data ) ;
-	void _UzawaPreconditionerTerm_Destroy( void* matrixTerm, void* data ) ;
+	void* _UzawaPreconditionerTerm_DefaultNew( Name name );
+
+	void _UzawaPreconditionerTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
+
+	void _UzawaPreconditionerTerm_Build( void* matrixTerm, void* data );
+
+	void _UzawaPreconditionerTerm_Initialise( void* matrixTerm, void* data );
+
+	void _UzawaPreconditionerTerm_Execute( void* matrixTerm, void* data );
+
+	void _UzawaPreconditionerTerm_Destroy( void* matrixTerm, void* data );
 
 	void _UzawaPreconditionerTerm_AssembleElement( 
-		void*                                              matrixTerm,
-		StiffnessMatrix*                                   stiffnessMatrix, 
-		Element_LocalIndex                                 lElement_I, 
-		SystemLinearEquations*                             sle,
-		FiniteElementContext*                              context,
-		double**                                           elStiffMat ) ;
+		void*							matrixTerm,
+		StiffnessMatrix*			stiffnessMatrix, 
+		Element_LocalIndex		lElement_I, 
+		SystemLinearEquations*	sle,
+		FiniteElementContext*	context,
+		double**						elStiffMat ) ;
 
 #endif
+

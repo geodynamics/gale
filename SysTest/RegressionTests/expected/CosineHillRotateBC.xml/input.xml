@@ -1,0 +1,362 @@
+<?xml version="1.0"?>
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+  <import>
+    <toolbox>StgFEM</toolbox>
+  </import>
+  <plugins>
+    <element type="struct">
+      <element type="param" name="Type">StgFEM_StandardConditionFunctions</element>
+      <element type="param" name="Context">context</element>
+    </element>
+    <element type="struct">
+      <element type="param" name="Type">StgFEM_FrequentOutput</element>
+      <element type="param" name="Context">context</element>
+    </element>
+    <plugin>StgFEM_CosineHillRotate</plugin>
+  </plugins>
+  <element type="param" name="journal-level.info.Stg_ComponentFactory">2</element>
+  <element type="param" name="journal.debug">f</element>
+  <element type="param" name="journal-enable-branch.debug.StgFEM">f</element>
+  <element type="param" name="journal-level-branch.debug.StgFEM">1</element>
+  <element type="param" name="maxTimeSteps">10</element>
+  <element type="param" name="outputEvery">1</element>
+  <element type="param" name="dumpEvery">0</element>
+  <element type="param" name="outputPath">./expected/CosineHillRotateBC.xml</element>
+  <element type="param" name="dim">2</element>
+  <element type="param" name="shadowDepth">1</element>
+  <element type="param" name="minX">-0.5</element>
+  <element type="param" name="minY">-0.5</element>
+  <element type="param" name="minZ">-0.5</element>
+  <element type="param" name="maxX">0.5</element>
+  <element type="param" name="maxY">0.5</element>
+  <element type="param" name="maxZ">0.5</element>
+  <element type="param" name="elementResI">10</element>
+  <element type="param" name="elementResJ">10</element>
+  <element type="param" name="elementResK">10</element>
+  <element type="param" name="gaussParticlesX">2</element>
+  <element type="param" name="gaussParticlesY">2</element>
+  <element type="param" name="gaussParticlesZ">2</element>
+  <components>
+    <element type="struct" name="linearMesh">
+      <element type="param" name="Type">FeMesh</element>
+      <element type="param" name="elementType">linear</element>
+    </element>
+    <element type="struct" name="linearMeshGenerator">
+      <element type="param" name="Type">CartesianGenerator</element>
+      <element type="param" name="mesh">linearMesh</element>
+      <element type="param" name="dims">dim</element>
+      <element type="param" name="shadowDepth">shadowDepth</element>
+      <element type="list" name="size">
+        <element type="param">elementResI</element>
+        <element type="param">elementResJ</element>
+        <element type="param">elementResK</element>
+      </element>
+      <element type="list" name="minCoord">
+        <element type="param">minX</element>
+        <element type="param">minY</element>
+        <element type="param">minZ</element>
+      </element>
+      <element type="list" name="maxCoord">
+        <element type="param">maxX</element>
+        <element type="param">maxY</element>
+        <element type="param">maxZ</element>
+      </element>
+    </element>
+    <element type="struct" name="constantMesh">
+      <element type="param" name="Type">FeMesh</element>
+      <element type="param" name="elementType">constant</element>
+    </element>
+    <element type="struct" name="constantMeshGenerator">
+      <element type="param" name="Type">C0Generator</element>
+      <element type="param" name="mesh">constantMesh</element>
+      <element type="param" name="elementMesh">elementMesh</element>
+    </element>
+    <element type="struct" name="velocity">
+      <element type="param" name="Type">MeshVariable</element>
+      <element type="param" name="mesh">velocityMesh</element>
+      <element type="param" name="Rank">Vector</element>
+      <element type="param" name="DataType">Double</element>
+      <element type="param" name="VectorComponentCount">dim</element>
+      <element type="list" name="names">
+        <element type="param">vx</element>
+        <element type="param">vy</element>
+        <element type="param">vz</element>
+      </element>
+    </element>
+    <element type="struct" name="velocityBCs">
+      <element type="param" name="Type">CompositeVC</element>
+      <element type="param" name="Data">velocityMesh</element>
+    </element>
+    <element type="struct" name="velocityICs">
+      <element type="param" name="Type">CompositeVC</element>
+      <element type="param" name="Data">velocityMesh</element>
+    </element>
+    <element type="struct" name="velocityDofLayout">
+      <element type="param" name="Type">DofLayout</element>
+      <element type="param" name="mesh">velocityMesh</element>
+      <element type="param" name="BaseVariableCount">dim</element>
+      <element type="list" name="BaseVariables">
+        <element type="param">vx</element>
+        <element type="param">vy</element>
+        <element type="param">vz</element>
+      </element>
+    </element>
+    <element type="struct" name="VelocityField">
+      <element type="param" name="Type">FeVariable</element>
+      <element type="param" name="FEMesh">velocityMesh</element>
+      <element type="param" name="DofLayout">velocityDofLayout</element>
+      <element type="param" name="BC">velocityBCs</element>
+      <element type="param" name="IC">velocityICs</element>
+      <element type="param" name="LinkedDofInfo">velocityLinkedDofs</element>
+    </element>
+    <element type="struct" name="VelocityMagnitudeField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">Magnitude</element>
+      <element type="param" name="FeVariable">VelocityField</element>
+    </element>
+    <element type="struct" name="VelocityGradientsField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">Gradient</element>
+      <element type="param" name="FeVariable">VelocityField</element>
+    </element>
+    <element type="struct" name="VelocityGradientsInvariantField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">TensorInvariant</element>
+      <element type="param" name="FeVariable">VelocityGradientsField</element>
+    </element>
+    <element type="struct" name="VelocityXXField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">TakeFirstComponent</element>
+      <element type="param" name="FeVariable">VelocityField</element>
+    </element>
+    <element type="struct" name="VelocityYYField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">TakeSecondComponent</element>
+      <element type="param" name="FeVariable">VelocityField</element>
+    </element>
+    <element type="struct" name="StrainRateField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">TensorSymmetricPart</element>
+      <element type="param" name="FeVariable">VelocityGradientsField</element>
+    </element>
+    <element type="struct" name="VorticityField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">TensorAntisymmetricPart</element>
+      <element type="param" name="FeVariable">VelocityGradientsField</element>
+    </element>
+    <element type="struct" name="StrainRateInvariantField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">SymmetricTensor_Invariant</element>
+      <element type="param" name="FeVariable">StrainRateField</element>
+    </element>
+    <element type="struct" name="StrainRateXXField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">TakeFirstComponent</element>
+      <element type="param" name="FeVariable">StrainRateField</element>
+    </element>
+    <element type="struct" name="StrainRateYYField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">TakeSecondComponent</element>
+      <element type="param" name="FeVariable">StrainRateField</element>
+    </element>
+    <element type="struct" name="temperature">
+      <element type="param" name="Type">MeshVariable</element>
+      <element type="param" name="Rank">Scalar</element>
+      <element type="param" name="DataType">Double</element>
+      <element type="param" name="mesh">temperatureMesh</element>
+    </element>
+    <element type="struct" name="temperatureBCs">
+      <element type="param" name="Type">CompositeVC</element>
+      <element type="param" name="Data">temperatureMesh</element>
+    </element>
+    <element type="struct" name="temperatureICs">
+      <element type="param" name="Type">CompositeVC</element>
+      <element type="param" name="Data">temperatureMesh</element>
+    </element>
+    <element type="struct" name="temperatureDofLayout">
+      <element type="param" name="Type">DofLayout</element>
+      <element type="param" name="mesh">temperatureMesh</element>
+      <element type="list" name="BaseVariables">
+        <element type="param">temperature</element>
+      </element>
+    </element>
+    <element type="struct" name="TemperatureField">
+      <element type="param" name="Type">FeVariable</element>
+      <element type="param" name="FEMesh">temperatureMesh</element>
+      <element type="param" name="DofLayout">temperatureDofLayout</element>
+      <element type="param" name="BC">temperatureBCs</element>
+      <element type="param" name="IC">temperatureICs</element>
+      <element type="param" name="LinkedDofInfo">temperatureLinkedDofs</element>
+    </element>
+    <element type="struct" name="TemperatureGradientsField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">Gradient</element>
+      <element type="param" name="FeVariable">TemperatureField</element>
+    </element>
+    <element type="struct" name="cellLayout">
+      <element type="param" name="Type">SingleCellLayout</element>
+    </element>
+    <element type="struct" name="particleLayout">
+      <element type="param" name="Type">GaussParticleLayout</element>
+      <element type="param" name="gaussParticlesX">gaussParticlesX</element>
+      <element type="param" name="gaussParticlesY">gaussParticlesY</element>
+      <element type="param" name="gaussParticlesZ">gaussParticlesZ</element>
+    </element>
+    <element type="struct" name="gaussSwarm">
+      <element type="param" name="Type">Swarm</element>
+      <element type="param" name="CellLayout">cellLayout</element>
+      <element type="param" name="ParticleLayout">particleLayout</element>
+    </element>
+    <element type="struct" name="residual">
+      <element type="param" name="Type">ForceVector</element>
+      <element type="param" name="FeVariable">TemperatureField</element>
+    </element>
+    <element type="struct" name="massMatrix">
+      <element type="param" name="Type">ForceVector</element>
+      <element type="param" name="FeVariable">TemperatureField</element>
+    </element>
+    <element type="struct" name="predictorMulticorrector">
+      <element type="param" name="Type">AdvDiffMulticorrector</element>
+    </element>
+    <element type="struct" name="EnergyEqn">
+      <element type="param" name="Type">AdvectionDiffusionSLE</element>
+      <element type="param" name="SLE_Solver">predictorMulticorrector</element>
+      <element type="param" name="Context">context</element>
+      <element type="param" name="PhiField">TemperatureField</element>
+      <element type="param" name="Residual">residual</element>
+      <element type="param" name="MassMatrix">massMatrix</element>
+      <element type="param" name="courantFactor">courantFactor</element>
+    </element>
+    <element type="struct" name="lumpedMassMatrixForceTerm">
+      <element type="param" name="Type">LumpedMassMatrixForceTerm</element>
+      <element type="param" name="Swarm">gaussSwarm</element>
+      <element type="param" name="ForceVector">massMatrix</element>
+    </element>
+    <element type="struct" name="defaultResidualForceTerm">
+      <element type="param" name="Type">AdvDiffResidualForceTerm</element>
+      <element type="param" name="Swarm">gaussSwarm</element>
+      <element type="param" name="ForceVector">residual</element>
+      <element type="param" name="ExtraInfo">EnergyEqn</element>
+      <element type="param" name="VelocityField">VelocityField</element>
+      <element type="param" name="defaultDiffusivity">defaultDiffusivity</element>
+      <element type="param" name="UpwindXiFunction">DoublyAsymptoticAssumption</element>
+    </element>
+    <element type="struct" name="context">
+      <element type="param" name="Type">FiniteElementContext</element>
+    </element>
+    <element type="struct" name="initialConditionShape">
+      <element type="param" name="Type">Box</element>
+      <element type="param" name="startX">-0.01</element>
+      <element type="param" name="endX">0.01</element>
+      <element type="param" name="startY">-1e9</element>
+      <element type="param" name="endY">0.01</element>
+      <element type="param" name="startZ">-1e9</element>
+      <element type="param" name="endZ">1e9</element>
+    </element>
+  </components>
+  <element type="param" name="velocityMesh">linearMesh</element>
+  <element type="param" name="elementMesh">linearMesh</element>
+  <element type="param" name="temperatureMesh">linearMesh</element>
+  <element type="list" name="FieldVariablesToCheckpoint">
+    <element type="param">VelocityField</element>
+    <element type="param">TemperatureField</element>
+    <element type="param">TemperatureField-phiDotField</element>
+  </element>
+  <element type="param" name="TemperatureField-Tolerance">0.035</element>
+  <element type="param" name="meshSizeK">1</element>
+  <element type="param" name="allowUnbalancing">True</element>
+  <element type="param" name="defaultDiffusivity">1.0e-6</element>
+  <element type="param" name="CosineHillHeight">1.0</element>
+  <element type="param" name="CosineHillDiameter">0.5</element>
+  <element type="param" name="CosineHillCentreX">0.0</element>
+  <element type="param" name="CosineHillCentreY">-0.25</element>
+  <element type="param" name="CosineHillCentreZ">0.0</element>
+  <element type="struct" name="velocityICs">
+    <element type="param" name="type">CompositeVC</element>
+    <element type="list" name="vcList">
+      <element type="struct">
+        <element type="param" name="type">AllNodesVC</element>
+        <element type="list" name="variables">
+          <element type="struct">
+            <element type="param" name="name">velocity</element>
+            <element type="param" name="type">func</element>
+            <element type="param" name="value">Velocity_SolidBodyRotation</element>
+          </element>
+        </element>
+      </element>
+    </element>
+  </element>
+  <element type="struct" name="temperatureBCs">
+    <element type="param" name="type">CompositeVC</element>
+    <element type="list" name="vcList">
+      <element type="struct">
+        <element type="param" name="type">MeshShapeVC</element>
+        <element type="param" name="Shape">initialConditionShape</element>
+        <element type="list" name="variables">
+          <element type="struct">
+            <element type="param" name="name">temperature</element>
+            <element type="param" name="type">func</element>
+            <element type="param" name="value">Temperature_CosineHill</element>
+          </element>
+        </element>
+      </element>
+      <element type="struct">
+        <element type="param" name="type">WallVC</element>
+        <element type="param" name="wall">right</element>
+        <element type="list" name="variables">
+          <element type="struct">
+            <element type="param" name="name">temperature</element>
+            <element type="param" name="type">double</element>
+            <element type="param" name="value">0</element>
+          </element>
+        </element>
+      </element>
+      <element type="struct">
+        <element type="param" name="type">WallVC</element>
+        <element type="param" name="wall">bottom</element>
+        <element type="list" name="variables">
+          <element type="struct">
+            <element type="param" name="name">temperature</element>
+            <element type="param" name="type">double</element>
+            <element type="param" name="value">0</element>
+          </element>
+        </element>
+      </element>
+      <element type="struct">
+        <element type="param" name="type">WallVC</element>
+        <element type="param" name="wall">top</element>
+        <element type="list" name="variables">
+          <element type="struct">
+            <element type="param" name="name">temperature</element>
+            <element type="param" name="type">double</element>
+            <element type="param" name="value">0</element>
+          </element>
+        </element>
+      </element>
+      <element type="struct">
+        <element type="param" name="type">WallVC</element>
+        <element type="param" name="wall">left</element>
+        <element type="list" name="variables">
+          <element type="struct">
+            <element type="param" name="name">temperature</element>
+            <element type="param" name="type">double</element>
+            <element type="param" name="value">0</element>
+          </element>
+        </element>
+      </element>
+    </element>
+  </element>
+  <element type="param" name="checkpointEvery">10</element>
+  <element type="struct" name="pluginData">
+    <element type="param" name="appendToAnalysisFile">True</element>
+  </element>
+  <element type="param" name="timestepFactor">1</element>
+  <element type="param" name="saveDataEvery">0</element>
+  <element type="param" name="checkpointAtTimeInc">0</element>
+  <element type="param" name="experimentName">experiment</element>
+  <element type="param" name="checkpointPath">./expected/CosineHillRotateBC.xml</element>
+  <element type="param" name="checkpointReadPath">./expected/CosineHillRotateBC.xml</element>
+  <element type="param" name="checkpointWritePath">./expected/CosineHillRotateBC.xml</element>
+  <element type="param" name="checkpointAppendStep">false</element>
+  <element type="param" name="interpolateRestart">false</element>
+</StGermainData>

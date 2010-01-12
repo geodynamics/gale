@@ -42,81 +42,70 @@
 #include <mpi.h>
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
+
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
 #include "ElementType.h"
 #include "TrilinearElementType.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 
 const Type TrilinearElementType_Type = "TrilinearElementType";
+
 #define _TrilinearElementType_NodeCount 8
 
-void* TrilinearElementType_DefaultNew( Name name ) {
-	return _TrilinearElementType_New( sizeof(TrilinearElementType), TrilinearElementType_Type, _TrilinearElementType_Delete,
-		_TrilinearElementType_Print, NULL, TrilinearElementType_DefaultNew, _TrilinearElementType_Construct,
-		_TrilinearElementType_Build, _TrilinearElementType_Initialise, _TrilinearElementType_Execute, _TrilinearElementType_Destroy,
-		name, False, _TrilinearElementType_SF_allNodes, 
-		_TrilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
-		_TrilinearElementType_JacobianDeterminantSurface, _ElementType_SurfaceNormal, _TrilinearElementType_NodeCount );
+void* _TrilinearElementType_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                                                            _sizeOfSelf = sizeof(TrilinearElementType);
+	Type                                                                                    type = TrilinearElementType_Type;
+	Stg_Class_DeleteFunction*                                                            _delete = _TrilinearElementType_Delete;
+	Stg_Class_PrintFunction*                                                              _print = _TrilinearElementType_Print;
+	Stg_Class_CopyFunction*                                                                _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*                                _defaultConstructor = _TrilinearElementType_DefaultNew;
+	Stg_Component_ConstructFunction*                                                  _construct = _TrilinearElementType_AssignFromXML;
+	Stg_Component_BuildFunction*                                                          _build = _TrilinearElementType_Build;
+	Stg_Component_InitialiseFunction*                                                _initialise = _TrilinearElementType_Initialise;
+	Stg_Component_ExecuteFunction*                                                      _execute = _TrilinearElementType_Execute;
+	Stg_Component_DestroyFunction*                                                      _destroy = _TrilinearElementType_Destroy;
+	AllocationType                                                            nameAllocationType = NON_GLOBAL;
+	ElementType_EvaluateShapeFunctionsAtFunction*                      _evaluateShapeFunctionsAt = _TrilinearElementType_SF_allNodes;
+	ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*  _evaluateShapeFunctionLocalDerivsAt = _TrilinearElementType_SF_allLocalDerivs_allNodes;
+	ElementType_ConvertGlobalCoordToElLocalFunction*                _convertGlobalCoordToElLocal = _ElementType_ConvertGlobalCoordToElLocal;
+	ElementType_JacobianDeterminantSurfaceFunction*                  _jacobianDeterminantSurface = _TrilinearElementType_JacobianDeterminantSurface;
+	ElementType_SurfaceNormalFunction*                                            _surfaceNormal = _ElementType_SurfaceNormal;
+
+	return _TrilinearElementType_New(  TRILINEARELEMENTTYPE_PASSARGS  );
 }
 
 TrilinearElementType* TrilinearElementType_New( Name name ) {
-	return _TrilinearElementType_New( sizeof(TrilinearElementType), TrilinearElementType_Type, _TrilinearElementType_Delete,
-		_TrilinearElementType_Print, NULL, TrilinearElementType_DefaultNew, _TrilinearElementType_Construct,
-		_TrilinearElementType_Build, _TrilinearElementType_Initialise, _TrilinearElementType_Execute, _TrilinearElementType_Destroy,
-		name, True, _TrilinearElementType_SF_allNodes, 
-		_TrilinearElementType_SF_allLocalDerivs_allNodes, _ElementType_ConvertGlobalCoordToElLocal,
-		_TrilinearElementType_JacobianDeterminantSurface, _ElementType_SurfaceNormal, _TrilinearElementType_NodeCount );
+	TrilinearElementType* self = _TrilinearElementType_DefaultNew( name );
+
+	self->isConstructed = True;
+	_ElementType_Init( (ElementType*)self, _TrilinearElementType_NodeCount );
+	_TrilinearElementType_Init( self );
+
+	return self;	
 }
 
-
-TrilinearElementType* _TrilinearElementType_New( 
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*				_construct,
-		Stg_Component_BuildFunction*					_build,
-		Stg_Component_InitialiseFunction*				_initialise,
-		Stg_Component_ExecuteFunction*					_execute,
-		Stg_Component_DestroyFunction*					_destroy,
-		Name								name,
-		Bool								initFlag,
-		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
-		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
-		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
-		ElementType_SurfaceNormalFunction*				_surfaceNormal,
-		Index								nodeCount )
-{
+TrilinearElementType* _TrilinearElementType_New(  TRILINEARELEMENTTYPE_DEFARGS  ) {
 	TrilinearElementType*		self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(TrilinearElementType) );
-	self = (TrilinearElementType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-		_construct, _build, _initialise, _execute, _destroy, name, initFlag, _evaluateShapeFunctionsAt,
-		_evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal, _jacobianDeterminantSurface, 
-		_surfaceNormal, nodeCount );
+	self = (TrilinearElementType*)_ElementType_New(  ELEMENTTYPE_PASSARGS  );
 	
 	/* General info */
 	
 	/* Virtual functions */
 	
 	/* TrilinearElementType info */
-	if( initFlag ){
-		_TrilinearElementType_Init( self );
-	}
 	
 	return self;
 }
-
-
 
 void _TrilinearElementType_Init( TrilinearElementType* self ) {
 	Dimension_Index dim, dim_I=0;
@@ -124,7 +113,6 @@ void _TrilinearElementType_Init( TrilinearElementType* self ) {
 	/* General and Virtual info should already be set */
 	
 	/* TrilinearElementType info */
-	self->isConstructed = True;
 	dim = self->dim = 3;
 	for ( dim_I = 0; dim_I < dim; dim_I++ ) {
 		self->minElLocalCoord[dim_I] = -1;
@@ -148,9 +136,6 @@ void _TrilinearElementType_Init( TrilinearElementType* self ) {
 
 void _TrilinearElementType_Delete( void* elementType ) {
 	TrilinearElementType* self = (TrilinearElementType*)elementType;
-	Journal_DPrintf( self->debug, "In %s\n", __func__ );
-
-	FreeArray( self->tetInds );
 	
 	/* Stg_Class_Delete parent*/
 	_ElementType_Delete( self );
@@ -173,7 +158,7 @@ void _TrilinearElementType_Print( void* elementType, Stream* stream ) {
 	/* TrilinearElementType info */
 }
 
-void _TrilinearElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data ){
+void _TrilinearElementType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data ){
 	
 }
 	
@@ -208,12 +193,13 @@ void _TrilinearElementType_Destroy( void* elementType, void *data ){
 	Memory_Free( self->faceNodes );
 	Memory_Free( self->evaluatedShapeFunc );
 	Memory_Free( self->GNi );
+
+	FreeArray( self->tetInds );
+
 	_ElementType_Destroy( self, data );
 }
 
 void _TrilinearElementType_Build( void* elementType, void *data ) {
-	TrilinearElementType* 	self = (TrilinearElementType*)elementType;
-
 }
 
 #if 0
@@ -397,4 +383,6 @@ double _TrilinearElementType_JacobianDeterminantSurface( void* elementType, void
 
 	return fabs( detJac );
 }
+
+
 

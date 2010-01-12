@@ -50,21 +50,27 @@ void C2GeneratorSuite_Setup( C2GeneratorSuiteData* data ) {
 	unsigned sizes[3];
 	double minCrd[3];
 	double maxCrd[3];
-	int rank;
+
+	Journal_Enable_AllTypedStream( False );
 
 	insist( MPI_Comm_size( MPI_COMM_WORLD, &nRanks ), == MPI_SUCCESS );
 	sizes[0] = sizes[1] = sizes[2] = nRanks * 4;
 	minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
 	maxCrd[0] = minCrd[1] = minCrd[2] = (double)nRanks;
 
-	gen = C2Generator_New( "" );
+	gen = C2Generator_New( "", NULL );
 	MeshGenerator_SetDimSize( gen, 3 );
 	CartesianGenerator_SetShadowDepth( gen, 1 );
 	C2Generator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
+   Stg_Component_Build( gen, NULL, False );
+   Stg_Component_Initialise( gen, NULL, False );
 
-	data->mesh = Mesh_New( "" );
+	data->mesh = Mesh_New( "", NULL );
 	CartesianGenerator_Generate( gen, data->mesh, NULL );
+   /* need 2 lines below to setup mesh */
+   Stg_Component_Build( data->mesh, NULL, False );
+   Stg_Component_Initialise( data->mesh, NULL, False );
 }
 
 void C2GeneratorSuite_Teardown( C2GeneratorSuiteData* data ) {
@@ -78,7 +84,6 @@ void C2GeneratorSuite_TestElementVertexInc( C2GeneratorSuiteData* data ) {
 	Grid*		elGrid		= *(Grid**)Mesh_GetExtension( data->mesh, Grid**, "elementGrid" );
 	Grid*		vertGrid	= *(Grid**)Mesh_GetExtension( data->mesh, Grid**, "vertexGrid" );
 	IArray*		inc		= IArray_New();
-	unsigned	vert;
 	unsigned*	incVerts;
 	unsigned	nIncVerts;
 	unsigned	el_i;
@@ -672,3 +677,5 @@ void C2GeneratorSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, C2GeneratorSuite_TestEdgeVertexInc );
    pcu_suite_addTest( suite, C2GeneratorSuite_TestFaceVertexInc );
 }
+
+

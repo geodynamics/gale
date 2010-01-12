@@ -48,8 +48,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Discretisation_OperatorFeVariable_h__
-#define __Discretisation_OperatorFeVariable_h__
+#ifndef __StgFEM_Discretisation_OperatorFeVariable_h__
+#define __StgFEM_Discretisation_OperatorFeVariable_h__
 
 	#define MAX_FIELD_COMPONENTS 9
 
@@ -62,124 +62,119 @@
 		__FeVariable \
 		\
 		/* Other info */ \
-		char*							    operatorName;	\
-		Operator*                                                   _operator;           \
-		Index                                                       feVariableCount;  \
-		FeVariable**                                                feVariableList;   \
-		Bool                                                        useGradient;
-
+		char*				operatorName; \
+		Operator*		_operator; \
+		Index				feVariableCount; \
+		FeVariable**	feVariableList; \
+		Bool				useGradient;
 
 	struct OperatorFeVariable { __OperatorFeVariable };	
 
+
+
 	/** Shortcut constructors */
 	OperatorFeVariable* OperatorFeVariable_NewUnary(
-		Name                                               name,
-		void*                                              _feVariable,
-		Name                                               operatorName );
+		Name				name,
+		DomainContext*	context,
+		void*				_feVariable,
+		Name				operatorName );
 
 	OperatorFeVariable* OperatorFeVariable_NewBinary(
-		Name                                               name,
-		void*                                              _feVariable1,
-		void*                                              _feVariable2,
-		Name                                               operatorName );
+		Name				name,
+		DomainContext*	context,
+		void*				_feVariable1,
+		void*				_feVariable2,
+		Name				operatorName );
 	
 	OperatorFeVariable* OperatorFeVariable_NewUnary_OwnOperator( 
-		Name                                               name,
-		void*                                              _feVariable,
-		Operator*                                          ownOperator );	
+		Name				name,
+		DomainContext*	context,
+		void*				_feVariable,
+		Operator*		ownOperator );	
 	
 	/* Public Constructor */
-	void* OperatorFeVariable_DefaultNew( Name name );
+	void* _OperatorFeVariable_DefaultNew( Name name );
 
 	OperatorFeVariable* OperatorFeVariable_New( 
-		Name                                               name,
-		FeVariable_InterpolateWithinElementFunction*       interpolateWithinElement,
-		FeVariable_GetValueAtNodeFunction*                 getValueAtNode,
-		Name                                               operatorName,
-		Index                                              feVariableCount,
-		FeVariable**                                       feVariableList,
-		Dimension_Index                                    dim,
-		Bool                                               isCheckpointedAndReloaded,
-		MPI_Comm                                           communicator,
-		FieldVariable_Register*                            fV_Register );
-
-	OperatorFeVariable* OperatorFeVariable_New2( 
-		Name                                               name,
-		FeVariable_InterpolateWithinElementFunction*       interpolateWithinElement,
-		FeVariable_GetValueAtNodeFunction*                 getValueAtNode,
-		Operator*                                          ownOperator,
-		Index                                              feVariableCount,
-		FeVariable**                                       feVariableList,
-		Dimension_Index                                    dim,
-		Bool                                               isCheckpointedAndReloaded,
-		MPI_Comm                                           communicator,
-		FieldVariable_Register*                            fV_Register );
+		Name														name,
+		DomainContext*											context,
+		void*														feMesh,
+      void*														geometryMesh,
+      DofLayout*												dofLayout,                                                                                 
+      void*														bcs,
+      void*														ics,
+      void*														linkedDofInfo,
+      void*														templateFeVariable,    
+		FeVariable_InterpolateWithinElementFunction*	interpolateWithinElement,
+		FeVariable_GetValueAtNodeFunction*				getValueAtNode,
+		Name														operatorName,
+		Operator*												ownOperator,
+		Index														feVariableCount,
+		FeVariable**											feVariableList,
+		Dimension_Index										dim,
+		Bool														isCheckpointedAndReloaded,
+		MPI_Comm													communicator,
+		FieldVariable_Register*								fieldVariable_Register );
 
 	/** Private Constructor */
-	OperatorFeVariable* _OperatorFeVariable_New(
- 		SizeT                                              _sizeOfSelf, 
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print, 
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Name                                               name,
-		Bool                                               initFlag,
-		Operator*                                          ownOperator,
-		FieldVariable_InterpolateValueAtFunction*          interpolateValueAt,
-		FieldVariable_GetValueFunction*	                   _getMinGlobalFieldMagnitude,
-		FieldVariable_GetValueFunction*                    _getMaxGlobalFieldMagnitude,
-		FieldVariable_GetCoordFunction*                    _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                    _getMinAndMaxGlobalCoords,
-		FeVariable_InterpolateWithinElementFunction*       interpolateWithinElement,
-		FeVariable_GetValueAtNodeFunction*                 getValueAtNode,
-		Name                                               operatorName,
-		Index                                              feVariableCount,
-		FeVariable**                                       feVariableList,
-		void*                                              feMesh,
-		void*                                              geometryMesh,		
-		Dimension_Index                                    dim,
-		Bool                                               isCheckpointedAndReloaded,
-		MPI_Comm                                           communicator,
-		FieldVariable_Register*                            fV_Register );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
-	void _OperatorFeVariable_Init( void* feVariable, Name operatorName, Index feVariableCount, FeVariable** feVariableList, Operator* ownOperator ) ;
+	#define OPERATORFEVARIABLE_DEFARGS \
+                FEVARIABLE_DEFARGS
+
+	#define OPERATORFEVARIABLE_PASSARGS \
+                FEVARIABLE_PASSARGS
+
+	OperatorFeVariable* _OperatorFeVariable_New(  OPERATORFEVARIABLE_DEFARGS  );
+
+	void _OperatorFeVariable_Init( void* feVariable, Name operatorName, Index feVariableCount, FeVariable** feVariableList, Operator* ownOperator );
 
 	/* 'Stg_Class' Virtual Implementations */
-	void _OperatorFeVariable_Delete( void* variable ) ;
-	void _OperatorFeVariable_Print( void* _feVariable, Stream* stream ) ;
-	void* _OperatorFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
+	void _OperatorFeVariable_Delete( void* variable );
+
+	void _OperatorFeVariable_Print( void* _feVariable, Stream* stream );
+
+	void* _OperatorFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Implementations */
-void _OperatorFeVariable_Construct( void* feVariable, Stg_ComponentFactory* cf, void* data ) ;
-	void _OperatorFeVariable_Build( void* feVariable, void* data ) ;
-	void _OperatorFeVariable_Execute( void* variable, void* data ) ;
-	void _OperatorFeVariable_Destroy( void* variable, void* data ) ;
-	void _OperatorFeVariable_Initialise( void* variable, void* data ) ;
+	void _OperatorFeVariable_AssignFromXML( void* feVariable, Stg_ComponentFactory* cf, void* data );
+
+	void _OperatorFeVariable_Build( void* feVariable, void* data );
+
+	void _OperatorFeVariable_Execute( void* variable, void* data );
+
+	void _OperatorFeVariable_Destroy( void* variable, void* data );
+
+	void _OperatorFeVariable_Initialise( void* variable, void* data );
 
 	/* 'FeVariable Virtual Implementations */
-	void _OperatorFeVariable_InterpolateWithinElement( void* feVariable, Element_DomainIndex dElement_I, Coord coord, double* value ) ;
+	void _OperatorFeVariable_InterpolateWithinElement( void* feVariable, Element_DomainIndex dElement_I, Coord coord, double* value );
+
 	void _OperatorFeVariable_GetValueAtNode( void* feVariable, Node_DomainIndex dNode_I, double* value);
-	InterpolationResult _OperatorFeVariable_InterpolateValueAt( void* variable, Coord globalCoord, double* value ) ;
+
+	InterpolationResult _OperatorFeVariable_InterpolateValueAt( void* variable, Coord globalCoord, double* value );
+
 	void _OperatorFeVariable_SyncShadowValues( void* feVariable );
 
 	/** Private Functions */
 	Bool _OperatorFeVariable_CheckIfValidToInterpolateInShadowSpace( OperatorFeVariable* self );
-	void _OperatorFeVariable_SetFunctions( void* feVariable ) ;
-	void OperatorFeVariable_UnaryInterpolationFunc( 
-		void* feVariable, Element_DomainIndex dElement_I, Coord coord, double* value ) ;
-	void OperatorFeVariable_BinaryInterpolationFunc( 
-		void* feVariable, Element_DomainIndex dElement_I, Coord coord, double* value ) ;
-	void OperatorFeVariable_GradientInterpolationFunc( 
-		void* feVariable, Element_DomainIndex dElement_I, Coord coord, double* value ) ;
 
-	void OperatorFeVariable_UnaryValueAtNodeFunc( void* feVariable, Node_DomainIndex dNode_I, double* value ) ;
-	void OperatorFeVariable_BinaryValueAtNodeFunc( void* feVariable, Node_DomainIndex dNode_I, double* value ) ;
-	void OperatorFeVariable_GradientValueAtNodeFunc( void* feVariable, Node_DomainIndex dNode_I, double* value ) ;
+	void _OperatorFeVariable_SetFunctions( void* feVariable );
 
-#endif /* __Discretisation_OperatorFeVariable_h__ */
+	void OperatorFeVariable_UnaryInterpolationFunc( void* feVariable, Element_DomainIndex dElement_I, Coord coord, double* value );
+
+	void OperatorFeVariable_BinaryInterpolationFunc( void* feVariable, Element_DomainIndex dElement_I, Coord coord, double* value );
+
+	void OperatorFeVariable_GradientInterpolationFunc( void* feVariable, Element_DomainIndex dElement_I, Coord coord, double* value );
+
+	void OperatorFeVariable_UnaryValueAtNodeFunc( void* feVariable, Node_DomainIndex dNode_I, double* value );
+
+	void OperatorFeVariable_BinaryValueAtNodeFunc( void* feVariable, Node_DomainIndex dNode_I, double* value );
+
+	void OperatorFeVariable_GradientValueAtNodeFunc( void* feVariable, Node_DomainIndex dNode_I, double* value );
+
+#endif /* __StgFEM_Discretisation_OperatorFeVariable_h__ */
+

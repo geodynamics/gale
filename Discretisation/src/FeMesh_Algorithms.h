@@ -61,14 +61,21 @@
 	** Constructors
 	*/
 
-	#define FEMESH_ALGORITHMS_DEFARGS	\
-		MESH_ALGORITHMS_DEFARGS
 
-	#define FEMESH_ALGORITHMS_PASSARGS	\
-		MESH_ALGORITHMS_PASSARGS
 
-	FeMesh_Algorithms* FeMesh_Algorithms_New( Name name );
-	FeMesh_Algorithms* _FeMesh_Algorithms_New( FEMESH_ALGORITHMS_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FEMESH_ALGORITHMS_DEFARGS \
+                MESH_ALGORITHMS_DEFARGS
+
+	#define FEMESH_ALGORITHMS_PASSARGS \
+                MESH_ALGORITHMS_PASSARGS
+
+	FeMesh_Algorithms* FeMesh_Algorithms_New( Name name, AbstractContext* context );
+	FeMesh_Algorithms* _FeMesh_Algorithms_New(  FEMESH_ALGORITHMS_DEFARGS  );
 	void _FeMesh_Algorithms_Init( FeMesh_Algorithms* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -77,7 +84,7 @@
 
 	void _FeMesh_Algorithms_Delete( void* algorithms );
 	void _FeMesh_Algorithms_Print( void* algorithms, Stream* stream );
-	void _FeMesh_Algorithms_Construct( void* algorithms, Stg_ComponentFactory* cf, void* data );
+	void _FeMesh_Algorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf, void* data );
 	void _FeMesh_Algorithms_Build( void* algorithms, void* data );
 	void _FeMesh_Algorithms_Initialise( void* algorithms, void* data );
 	void _FeMesh_Algorithms_Execute( void* algorithms, void* data );
@@ -99,3 +106,4 @@
 	*/
 
 #endif /* __StgFEM_Discretisation_FeMesh_Algorithms_h__ */
+

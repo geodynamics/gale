@@ -42,43 +42,47 @@
 /* Textual name of this class */
 const Type RegularBilinear_Type = "RegularBilinear";
 
-
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
+#define REGULARBILINEAR_NODECOUNT 4
 
 RegularBilinear* RegularBilinear_New( Name name ) {
-	return _RegularBilinear_New( sizeof(RegularBilinear), 
-				     RegularBilinear_Type, 
-				     _RegularBilinear_Delete, 
-				     _RegularBilinear_Print, 
-				     NULL, 
-				     (void* (*)(Name))_RegularBilinear_New, 
-				     _RegularBilinear_Construct, 
-				     _RegularBilinear_Build, 
-				     _RegularBilinear_Initialise, 
-				     _RegularBilinear_Execute, 
-				     _RegularBilinear_Destroy, 
-				     name, 
-				     True, 
-				     _BilinearElementType_SF_allNodes, 
-				     _BilinearElementType_SF_allLocalDerivs_allNodes, 
-				     _ElementType_ConvertGlobalCoordToElLocal, 
-				     _BilinearElementType_JacobianDeterminantSurface,
-				     _ElementType_SurfaceNormal,
-				     4 );
+	/* Variables set in this function */
+	SizeT                                                                            _sizeOfSelf = sizeof(RegularBilinear);
+	Type                                                                                    type = RegularBilinear_Type;
+	Stg_Class_DeleteFunction*                                                            _delete = _RegularBilinear_Delete;
+	Stg_Class_PrintFunction*                                                              _print = _RegularBilinear_Print;
+	Stg_Class_CopyFunction*                                                                _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*                                _defaultConstructor = (void* (*)(Name))_RegularBilinear_New;
+	Stg_Component_ConstructFunction*                                                  _construct = _RegularBilinear_AssignFromXML;
+	Stg_Component_BuildFunction*                                                          _build = _RegularBilinear_Build;
+	Stg_Component_InitialiseFunction*                                                _initialise = _RegularBilinear_Initialise;
+	Stg_Component_ExecuteFunction*                                                      _execute = _RegularBilinear_Execute;
+	Stg_Component_DestroyFunction*                                                      _destroy = _RegularBilinear_Destroy;
+	AllocationType                                                            nameAllocationType = NON_GLOBAL;
+	ElementType_EvaluateShapeFunctionsAtFunction*                      _evaluateShapeFunctionsAt = _BilinearElementType_SF_allNodes;
+	ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*  _evaluateShapeFunctionLocalDerivsAt = _BilinearElementType_SF_allLocalDerivs_allNodes;
+	ElementType_ConvertGlobalCoordToElLocalFunction*                _convertGlobalCoordToElLocal = _ElementType_ConvertGlobalCoordToElLocal;
+	ElementType_JacobianDeterminantSurfaceFunction*                  _jacobianDeterminantSurface = _BilinearElementType_JacobianDeterminantSurface;
+	ElementType_SurfaceNormalFunction*                                            _surfaceNormal = _ElementType_SurfaceNormal;
+
+	return _RegularBilinear_New(  REGULARBILINEAR_PASSARGS  );
 }
 
-RegularBilinear* _RegularBilinear_New( REGULARTRILINEAR_DEFARGS ) {
+RegularBilinear* _RegularBilinear_New(  REGULARBILINEAR_DEFARGS  ) {
 	RegularBilinear*	self;
 
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(RegularBilinear) );
-	self = (RegularBilinear*)_BilinearElementType_New( ELEMENTTYPE_PASSARGS );
+	self = (RegularBilinear*)_BilinearElementType_New(  BILINEARELEMENTTYPE_PASSARGS  );
 
 	/* Virtual info */
 
 	/* RegularBilinear info */
+	self->isConstructed = True;
+	_ElementType_Init( (ElementType*)self, REGULARBILINEAR_NODECOUNT );
+   _BilinearElementType_Init( (BilinearElementType*)self );
 	_RegularBilinear_Init( self );
 
 	return self;
@@ -94,7 +98,7 @@ void _RegularBilinear_Init( RegularBilinear* self ) {
 */
 
 void _RegularBilinear_Delete( void* elementType ) {
-	RegularBilinear*	self = (RegularBilinear*)elementType;
+	RegularBilinear* self = (RegularBilinear*)elementType;
 
 	/* Delete the parent. */
 	_BilinearElementType_Delete( self );
@@ -112,7 +116,7 @@ void _RegularBilinear_Print( void* elementType, Stream* stream ) {
 	_BilinearElementType_Print( self, stream );
 }
 
-void _RegularBilinear_Construct( void* elementType, Stg_ComponentFactory* cf, void* data ) {
+void _RegularBilinear_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void _RegularBilinear_Build( void* elementType, void* data ) {
@@ -127,6 +131,9 @@ void _RegularBilinear_Execute( void* elementType, void* data ) {
 }
 
 void _RegularBilinear_Destroy( void* elementType, void* data ) {
+	RegularBilinear* self = (RegularBilinear*)elementType;
+
+	_BilinearElementType_Destroy( self, data );
 }
 
 
@@ -165,3 +172,7 @@ void RegularBilinear_ConvertGlobalCoordToElLocal( void* elementType, void* mesh,
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+
+
+

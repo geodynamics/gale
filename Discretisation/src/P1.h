@@ -61,14 +61,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define P1_DEFARGS \
-		ELEMENTTYPE_DEFARGS
+                ELEMENTTYPE_DEFARGS
 
 	#define P1_PASSARGS \
-		ELEMENTTYPE_PASSARGS
+                ELEMENTTYPE_PASSARGS
 
 	P1* P1_New( Name name );
-	P1* _P1_New( P1_DEFARGS );
+	P1* _P1_New(  P1_DEFARGS  );
 	void _P1_Init( P1* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -77,7 +84,7 @@
 
 	void _P1_Delete( void* elementType );
 	void _P1_Print( void* elementType, Stream* stream );
-	void _P1_Construct( void* elementType, Stg_ComponentFactory* cf, void* data );
+	void _P1_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data );
 	void _P1_Build( void* elementType, void* data );
 	void _P1_Initialise( void* elementType, void* data );
 	void _P1_Execute( void* elementType, void* data );
@@ -96,3 +103,4 @@
 	*/
 
 #endif /* __StgFEM_Discretisaton_P1_h__ */
+

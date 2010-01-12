@@ -210,7 +210,7 @@ void FeVariable_SaveNodalValuesToFile_ABAQUS( void* _feVariable, const char* pre
 }
 
 
-void _StgFEM_FeVariable_ImportExport_ABAQUS_Construct( void* componment, Stg_ComponentFactory* cf, void* data ) {
+void _StgFEM_FeVariable_ImportExport_ABAQUS_AssignFromXML( void* componment, Stg_ComponentFactory* cf, void* data ) {
 	AbstractContext* context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
@@ -218,23 +218,29 @@ void _StgFEM_FeVariable_ImportExport_ABAQUS_Construct( void* componment, Stg_Com
 }
 
 void* _StgFEM_FeVariable_ImportExport_ABAQUS_DefaultNew( Name name ) {
-	return _Codelet_New(
-			sizeof( Codelet ),
-			StgFEM_FeVariable_ImportExport_ABAQUS_Type,
-			_Codelet_Delete,
-			_Codelet_Print,
-			_Codelet_Copy,
-			_StgFEM_FeVariable_ImportExport_ABAQUS_DefaultNew,
-			_StgFEM_FeVariable_ImportExport_ABAQUS_Construct,
-			_Codelet_Build,
-			_Codelet_Initialise,
-			_Codelet_Execute,
-			_Codelet_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( Codelet );
+	Type                                                      type = StgFEM_FeVariable_ImportExport_ABAQUS_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _StgFEM_FeVariable_ImportExport_ABAQUS_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _StgFEM_FeVariable_ImportExport_ABAQUS_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Codelet_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
    
 Index StgFEM_FeVariable_ImportExport_ABAQUS_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, StgFEM_FeVariable_ImportExport_ABAQUS_Type, "0", _StgFEM_FeVariable_ImportExport_ABAQUS_DefaultNew );
 }
+
+
 
 

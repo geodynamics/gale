@@ -46,6 +46,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
+#include "FiniteElementContext.h"
 #include "SLE_Solver.h"
 
 #include <assert.h>
@@ -53,29 +54,18 @@
 /** Textual name of this class */
 const Type SLE_Solver_Type = "SLE_Solver";
 
-SLE_Solver* _SLE_Solver_New(
-		SizeT                                      sizeOfSelf,
-		Type                                       type,
-		Stg_Class_DeleteFunction*                  _delete,
-		Stg_Class_PrintFunction*                   _print,
-		Stg_Class_CopyFunction*                    _copy, 
-		Stg_Component_DefaultConstructorFunction*  _defaultConstructor,
-		Stg_Component_ConstructFunction*           _construct,
-		Stg_Component_BuildFunction*               _build,
-		Stg_Component_InitialiseFunction*          _initialise,
-		Stg_Component_ExecuteFunction*             _execute,
-		Stg_Component_DestroyFunction*             _destroy,
-		SLE_Solver_SolverSetupFunction*            _solverSetup,
-		SLE_Solver_SolveFunction*                  _solve,
-		SLE_Solver_GetResidualFunc*                _getResidual, 
-		Name                                       name )
+SLE_Solver* _SLE_Solver_New(  SLE_SOLVER_DEFARGS  )
 {	
 	SLE_Solver*		self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(SLE_Solver) );
-	self = (SLE_Solver*) _Stg_Component_New( sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor, _construct,
-			_build, _initialise, _execute, _destroy, name, NON_GLOBAL );
+	assert( _sizeOfSelf >= sizeof(SLE_Solver) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (SLE_Solver*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* General info */
 	
@@ -99,6 +89,26 @@ void _SLE_Solver_Init( SLE_Solver* self, Bool useStatSolve, int statReps ) {
 	self->debug         = Stream_RegisterChild( StgFEM_SLE_SystemSetup_Debug, self->type );
 	self->info          = Journal_MyStream( Info_Type, self );
 	self->maxIterations = 0;
+
+	self->previoustimestep = 0;
+	self->currenttimestep = 0;
+	self->nonlinearitsinitialtime = 0; 
+	self->nonlinearitsendtime = 0; 
+	self->totalnonlinearitstime = 0; 
+	self->totalnumnonlinearits = 0; 
+	self->avgtimenonlinearits = 0; 	
+	self->inneritsinitialtime = 0; 
+	self->outeritsinitialtime = 0; 
+	self->inneritsendtime = 0; 
+	self->outeritsendtime = 0; 
+	self->totalinneritstime = 0; 
+	self->totalouteritstime = 0; 
+	self->totalnuminnerits = 0; 
+	self->totalnumouterits = 0; 
+	self->avgnuminnerits = 0; 
+	self->avgnumouterits = 0; 
+	self->avgtimeinnerits = 0; 
+	self->avgtimeouterits = 0;
 	
 	self->useStatSolve = useStatSolve;
 	self->nStatReps     = statReps;
@@ -125,6 +135,26 @@ void* _SLE_Solver_Copy( void* sleSolver, void* dest, Bool deep, Name nameExt, Pt
 	newSleSolver->_solverSetup  = self->_solverSetup;
 	newSleSolver->_solve        = self->_solve;
 	newSleSolver->maxIterations = self->maxIterations;
+
+	newSleSolver->inneritsinitialtime = self->inneritsinitialtime;
+	newSleSolver->outeritsinitialtime = self->outeritsinitialtime;
+	newSleSolver->nonlinearitsinitialtime = self->nonlinearitsinitialtime;
+	newSleSolver->inneritsendtime = self->inneritsendtime;
+	newSleSolver->outeritsendtime = self->outeritsendtime;
+	newSleSolver->nonlinearitsendtime = self->nonlinearitsendtime;
+	newSleSolver->totalinneritstime = self->totalinneritstime;
+	newSleSolver->totalouteritstime = self->totalouteritstime;
+	newSleSolver->totalnonlinearitstime = self->totalnonlinearitstime;
+	newSleSolver->totalnuminnerits = self->totalnuminnerits; 
+	newSleSolver->totalnumouterits = self->totalnumouterits; 
+	newSleSolver->totalnumnonlinearits = self->totalnumnonlinearits; 	
+	newSleSolver->avgnuminnerits = self->avgnuminnerits;
+    newSleSolver->avgnumouterits = self->avgnumouterits;
+	newSleSolver->avgtimeinnerits = self->avgtimeinnerits; 
+	newSleSolver->avgtimeouterits = self->avgtimeouterits; 
+	newSleSolver->avgtimenonlinearits = self->avgtimenonlinearits; 
+	newSleSolver->currenttimestep = self->currenttimestep; 
+	newSleSolver->previoustimestep = self->previoustimestep;
 	
 	if( deep ) {
 		if( (newSleSolver->debug = PtrMap_Find( map, self->debug )) == NULL ) {
@@ -150,9 +180,9 @@ void* _SLE_Solver_Copy( void* sleSolver, void* dest, Bool deep, Name nameExt, Pt
 
 
 void _SLE_Solver_Delete( void* sleSolver ) {
-	SLE_Solver*		self = (SLE_Solver*)sleSolver;
-	
-	_Stg_Component_Delete( self->extensionManager );
+	SLE_Solver* self = (SLE_Solver*)sleSolver;
+
+	_Stg_Component_Delete( self );	
 }
 
 void _SLE_Solver_Print( void* sleSolver, Stream* stream ) {
@@ -174,10 +204,14 @@ void _SLE_Solver_Build( void* sleSolver, void* data ) {
 	/* Do nothing by default */
 }
 
-void _SLE_Solver_Construct( void* sleSolver, Stg_ComponentFactory* cf, void* data ) {
+void _SLE_Solver_AssignFromXML( void* sleSolver, Stg_ComponentFactory* cf, void* data ) {
 	SLE_Solver*		self = (SLE_Solver*)sleSolver;
 	Bool            useStatSolve;
 	int             nStatReps;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
 
 	useStatSolve = Stg_ComponentFactory_GetBool( cf, self->name, "statSolve", False );
 	nStatReps = Stg_ComponentFactory_GetInt( cf, self->name, "statReps", 0 );
@@ -186,7 +220,6 @@ void _SLE_Solver_Construct( void* sleSolver, Stg_ComponentFactory* cf, void* dat
 }
 
 void _SLE_Solver_Initialise( void* sleSolver, void* data ) {
-	/* Do nothing by default */
 }
 
 
@@ -202,6 +235,9 @@ void _SLE_Solver_Execute( void* sleSolver, void* data ) {
 }
 
 void _SLE_Solver_Destroy( void* sleSolver, void* data ) {
+	SLE_Solver* self = (SLE_Solver*)sleSolver;
+
+	Stg_Class_Delete( self->extensionManager );
 }
 
 void SLE_Solver_SolverSetup( void* sleSolver, void* sle ) {
@@ -216,3 +252,5 @@ void SLE_Solver_Solve( void* sleSolver, void* sle ) {
 	
 	self->_solve( self, sle );
 }
+
+

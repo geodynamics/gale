@@ -55,23 +55,29 @@
 /* Textual name of this class */
 const Type Energy_SLE_Solver_Type = "Energy_SLE_Solver";
 
+PetscTruth Energy_SLE_HasNullSpace( Mat A );
+
 void* Energy_SLE_Solver_DefaultNew( Name name ) {
-	return _Energy_SLE_Solver_New( 
-		sizeof(Energy_SLE_Solver), 
-		Energy_SLE_Solver_Type, 
-		_Energy_SLE_Solver_Delete, 
-		_Energy_SLE_Solver_Print, 
-		_Energy_SLE_Solver_Copy,
-		Energy_SLE_Solver_DefaultNew,
-		_Energy_SLE_Solver_Construct,
-		_Energy_SLE_Solver_Build, 
-		_Energy_SLE_Solver_Initialise,
-		_SLE_Solver_Execute,
-		_SLE_Solver_Destroy,
-		_Energy_SLE_Solver_SolverSetup, 
-		_Energy_SLE_Solver_Solve, 
-		_Energy_SLE_GetResidual, 
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Energy_SLE_Solver);
+	Type                                                      type = Energy_SLE_Solver_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Energy_SLE_Solver_Delete;
+	Stg_Class_PrintFunction*                                _print = _Energy_SLE_Solver_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Energy_SLE_Solver_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = Energy_SLE_Solver_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Energy_SLE_Solver_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Energy_SLE_Solver_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Energy_SLE_Solver_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _SLE_Solver_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _SLE_Solver_Destroy;
+	SLE_Solver_SolverSetupFunction*                   _solverSetup = _Energy_SLE_Solver_SolverSetup;
+	SLE_Solver_SolveFunction*                               _solve = _Energy_SLE_Solver_Solve;
+	SLE_Solver_GetResidualFunc*                       _getResidual = _Energy_SLE_GetResidual;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Energy_SLE_Solver_New(  ENERGY_SLE_SOLVER_PASSARGS  );
 }
 
 Energy_SLE_Solver* Energy_SLE_Solver_New( Name name, Bool useStatSolve, int statReps ) {
@@ -83,43 +89,13 @@ Energy_SLE_Solver* Energy_SLE_Solver_New( Name name, Bool useStatSolve, int stat
 }
 
 /* Creation implementation / Virtual constructor */
-Energy_SLE_Solver* _Energy_SLE_Solver_New( 
-		SizeT                                   sizeOfSelf,
-		Type                                    type,
-		Stg_Class_DeleteFunction*               _delete,
-		Stg_Class_PrintFunction*                _print,
-		Stg_Class_CopyFunction*                 _copy, 
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*        _construct,
-		Stg_Component_BuildFunction*            _build,
-		Stg_Component_InitialiseFunction*       _initialise,
-		Stg_Component_ExecuteFunction*          _execute,
-		Stg_Component_DestroyFunction*          _destroy,
-		SLE_Solver_SolverSetupFunction*         _solverSetup,
-		SLE_Solver_SolveFunction*               _solve,
-		SLE_Solver_GetResidualFunc*             _getResidual, 
-		Name									name )
+Energy_SLE_Solver* _Energy_SLE_Solver_New(  ENERGY_SLE_SOLVER_DEFARGS  )
 {
 	Energy_SLE_Solver* self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Energy_SLE_Solver) );
-	self = (Energy_SLE_Solver*) _SLE_Solver_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_solverSetup,
-		_solve,
-		_getResidual, 
-		name );
+	assert( _sizeOfSelf >= sizeof(Energy_SLE_Solver) );
+	self = (Energy_SLE_Solver*) _SLE_Solver_New(  SLE_SOLVER_PASSARGS  );
 	
 	/* Virtual info */
 	return self;
@@ -175,13 +151,13 @@ void* _Energy_SLE_Solver_Copy( void* standardSleSolver, void* dest, Bool deep, N
 	return (void*)newEnergySleSolver;
 }
 
-void _Energy_SLE_Solver_Construct( void* sleSolver, Stg_ComponentFactory* cf, void* data ) {
+void _Energy_SLE_Solver_AssignFromXML( void* sleSolver, Stg_ComponentFactory* cf, void* data ) {
 	Energy_SLE_Solver	*self = (Energy_SLE_Solver*)sleSolver;
 
 	assert( self && Stg_CheckType( self, Energy_SLE_Solver ) );
 	assert( cf && Stg_CheckType( cf, Stg_ComponentFactory ) );
 
-	_SLE_Solver_Construct( self, cf, data );
+	_SLE_Solver_AssignFromXML( self, cf, data );
 }
 
 /* Build */
@@ -241,6 +217,8 @@ void _Energy_SLE_Solver_Solve( void* sleSolver, void* standardSLE ) {
 	Energy_SLE_Solver*     self       = (Energy_SLE_Solver*)sleSolver;
 	SystemLinearEquations* sle        = (SystemLinearEquations*) standardSLE;
 	Iteration_Index        iterations;
+        PetscTruth isNull;
+        MatNullSpace nsp;
 
 	
 	Journal_DPrintf( self->debug, "In %s - for standard SLE solver\n", __func__ );
@@ -259,6 +237,12 @@ void _Energy_SLE_Solver_Solve( void* sleSolver, void* standardSLE ) {
 			" solution vectors.\n" );
 	}
 
+        isNull = Energy_SLE_HasNullSpace(((StiffnessMatrix**)sle->stiffnessMatrices->data)[0]->matrix);
+        if(isNull) {
+            MatNullSpaceCreate(PETSC_COMM_WORLD, PETSC_TRUE, 0, PETSC_NULL, &nsp);
+            KSPSetNullSpace(self->matrixSolver, nsp);
+        }
+
 	KSPSolve( self->matrixSolver,
 		    ((ForceVector*) sle->forceVectors->data[0])->vector, 
 		    ((SolutionVector*) sle->solutionVectors->data[0])->vector );
@@ -273,6 +257,9 @@ void _Energy_SLE_Solver_Solve( void* sleSolver, void* standardSLE ) {
 		 ((SolutionVector**)sle->solutionVectors->data)[0]->vector, 
 		 self->residual );
 	VecAYPX( self->residual, -1.0, ((ForceVector**)sle->forceVectors->data)[0]->vector );
+
+        if(isNull)
+            MatNullSpaceDestroy(nsp);
 }
 
 
@@ -281,3 +268,32 @@ Vec _Energy_SLE_GetResidual( void* sleSolver, Index fv_I ) {
 
 	return self->residual;
 }
+
+PetscTruth Energy_SLE_HasNullSpace( Mat A ) {
+    PetscInt N;
+    PetscScalar sum;
+    PetscReal nrm;
+    PetscTruth isNull;
+    Vec r, l;
+
+    MatGetVecs(A, &r, &l); /* l = A r */
+
+    VecGetSize(r, &N);
+    sum = 1.0/(PetscScalar)N;
+    VecSet(r, sum);
+
+    MatMult(A, r, l); /* {l} = [A] {r} */
+
+    VecNorm(l, NORM_2, &nrm);
+    if(nrm < 1.e-7)
+	isNull = PETSC_TRUE;
+    else
+	isNull = PETSC_FALSE;
+
+    VecDestroy(l);
+    VecDestroy(r);
+
+    return isNull;
+}
+
+

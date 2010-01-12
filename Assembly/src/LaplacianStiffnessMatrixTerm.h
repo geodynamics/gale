@@ -38,8 +38,8 @@
 */
 
 
-#ifndef __StgFEM_LaplacianStiffnessMatrixTerm_h__
-#define __StgFEM_LaplacianStiffnessMatrixTerm_h__
+#ifndef __StgFEM_Assembly_LaplacianStiffnessMatrixTerm_h__
+#define __StgFEM_Assembly_LaplacianStiffnessMatrixTerm_h__
 
 	/** Textual name of this class */
 	extern const Type LaplacianStiffnessMatrixTerm_Type;
@@ -56,46 +56,49 @@
 	struct LaplacianStiffnessMatrixTerm { __LaplacianStiffnessMatrixTerm };
 
 	LaplacianStiffnessMatrixTerm* LaplacianStiffnessMatrixTerm_New( 
-		Name                                                name,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm );
+		Name							name,
+		FiniteElementContext*	context,
+		StiffnessMatrix*			stiffnessMatrix,
+		Swarm*						integrationSwarm );
 
-	LaplacianStiffnessMatrixTerm* _LaplacianStiffnessMatrixTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
-		Name                                                name );
 	
-	void LaplacianStiffnessMatrixTerm_InitAll( 
-		void*                                               matrixTerm,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
+	#define LAPLACIANSTIFFNESSMATRIXTERM_DEFARGS \
+                STIFFNESSMATRIXTERM_DEFARGS
+
+	#define LAPLACIANSTIFFNESSMATRIXTERM_PASSARGS \
+                STIFFNESSMATRIXTERM_PASSARGS
+
+	LaplacianStiffnessMatrixTerm* _LaplacianStiffnessMatrixTerm_New(  LAPLACIANSTIFFNESSMATRIXTERM_DEFARGS  );
+
+	void _LaplacianStiffnessMatrixTerm_Init( void* matrixTerm );
+	
 	void _LaplacianStiffnessMatrixTerm_Delete( void* matrixTerm );
+
 	void _LaplacianStiffnessMatrixTerm_Print( void* matrixTerm, Stream* stream );
 
-	void* _LaplacianStiffnessMatrixTerm_DefaultNew( Name name ) ;
-void _LaplacianStiffnessMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
-	void _LaplacianStiffnessMatrixTerm_Build( void* matrixTerm, void* data ) ;
-	void _LaplacianStiffnessMatrixTerm_Initialise( void* matrixTerm, void* data ) ;
-	void _LaplacianStiffnessMatrixTerm_Execute( void* matrixTerm, void* data ) ;
-	void _LaplacianStiffnessMatrixTerm_Destroy( void* matrixTerm, void* data ) ;
+	void* _LaplacianStiffnessMatrixTerm_DefaultNew( Name name );
+
+	void _LaplacianStiffnessMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
+
+	void _LaplacianStiffnessMatrixTerm_Build( void* matrixTerm, void* data );
+
+	void _LaplacianStiffnessMatrixTerm_Initialise( void* matrixTerm, void* data );
+
+	void _LaplacianStiffnessMatrixTerm_Execute( void* matrixTerm, void* data );
+
+	void _LaplacianStiffnessMatrixTerm_Destroy( void* matrixTerm, void* data );
 
 	void _LaplacianStiffnessMatrixTerm_AssembleElement( 
-		void*                                              matrixTerm,
-		StiffnessMatrix*                                   stiffnessMatrix, 
-		Element_LocalIndex                                 lElement_I, 
-		SystemLinearEquations*                             sle,
-		FiniteElementContext*                              context,
-		double**                                           elStiffMat ) ;
+		void*							matrixTerm,
+		StiffnessMatrix*			stiffnessMatrix, 
+		Element_LocalIndex		lElement_I, 
+		SystemLinearEquations*	sle,
+		FiniteElementContext*	context,
+		double**						elStiffMat );
 
 #endif
+

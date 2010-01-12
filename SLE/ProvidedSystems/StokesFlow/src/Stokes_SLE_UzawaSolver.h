@@ -58,8 +58,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __FE_Stokes_SLE_UzawaSolver_h__
-#define __FE_Stokes_SLE_UzawaSolver_h__
+#ifndef __StgFEM_SLE_ProvidedSystems_StokesFlow_Stokes_SLE_UzawaSolver_h__
+#define __StgFEM_SLE_ProvidedSystems_StokesFlow_Stokes_SLE_UzawaSolver_h__
 
 	/** Textual name of this class */
 	extern const Type Stokes_SLE_UzawaSolver_Type;
@@ -109,22 +109,18 @@
 		Bool                                        monitor );
 		
 	/** Creation implementation / Virtual constructor */
-	Stokes_SLE_UzawaSolver* _Stokes_SLE_UzawaSolver_New( 
-		SizeT                                       sizeOfSelf,
-		Type                                        type,
-		Stg_Class_DeleteFunction*                   _delete,
-		Stg_Class_PrintFunction*                    _print,
-		Stg_Class_CopyFunction*                     _copy, 
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*            _construct,
-		Stg_Component_BuildFunction*                _build,
-		Stg_Component_InitialiseFunction*           _initialise,
-		Stg_Component_ExecuteFunction*              _execute,
-		Stg_Component_DestroyFunction*              _destroy,
-		SLE_Solver_SolverSetupFunction*             _solverSetup,
-		SLE_Solver_SolveFunction*                   _solve,
-		SLE_Solver_GetResidualFunc*                 _getResidual, 
-		Name                                        name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STOKES_SLE_UZAWASOLVER_DEFARGS \
+                SLE_SOLVER_DEFARGS
+
+	#define STOKES_SLE_UZAWASOLVER_PASSARGS \
+                SLE_SOLVER_PASSARGS
+
+	Stokes_SLE_UzawaSolver* _Stokes_SLE_UzawaSolver_New(  STOKES_SLE_UZAWASOLVER_DEFARGS  );
 
 	/** Class member variable initialisation */
 	void _Stokes_SLE_UzawaSolver_Init(
@@ -164,7 +160,7 @@
 	/** Stg_Component_Build() implementations: allocates the 2 MatrixSolvers and additional Vectors */
 	void _Stokes_SLE_UzawaSolver_Build( void* solver, void* stokesSLE );
 	
-	void _Stokes_SLE_UzawaSolver_Construct( void* solver, Stg_ComponentFactory* cf, void* data );
+	void _Stokes_SLE_UzawaSolver_AssignFromXML( void* solver, Stg_ComponentFactory* cf, void* data );
 	
 	void _Stokes_SLE_UzawaSolver_Initialise( void* solver, void* stokesSLE ) ;
 	
@@ -202,3 +198,4 @@
 	void _Stokes_SLE_UzawaSolver_GetSolution( void *stokesSLE, void *solver, Vec *x );
 
 #endif	
+

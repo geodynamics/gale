@@ -58,54 +58,38 @@ const Type AnalyticSolution_Type = "AnalyticSolution";
 AnalyticSolution* mySingleton = NULL;
 
 void* _AnalyticSolution_DefaultNew( Name name ) {
-	return _AnalyticSolution_New(
-		sizeof(AnalyticSolution),
-		AnalyticSolution_Type,
-		_AnalyticSolution_Delete, 
-		_AnalyticSolution_Print,
-		_AnalyticSolution_Copy,
-		_AnalyticSolution_DefaultNew,
-		_AnalyticSolution_Construct,
-		_AnalyticSolution_Build,
-		_AnalyticSolution_Initialise,
-		_AnalyticSolution_Execute, 
-		_AnalyticSolution_Destroy,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(AnalyticSolution);
+	Type                                                      type = AnalyticSolution_Type;
+	Stg_Class_DeleteFunction*                              _delete = _AnalyticSolution_Delete;
+	Stg_Class_PrintFunction*                                _print = _AnalyticSolution_Print;
+	Stg_Class_CopyFunction*                                  _copy = _AnalyticSolution_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _AnalyticSolution_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _AnalyticSolution_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _AnalyticSolution_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _AnalyticSolution_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _AnalyticSolution_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _AnalyticSolution_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _AnalyticSolution_New(  ANALYTICSOLUTION_PASSARGS  );
 }
 
-AnalyticSolution* _AnalyticSolution_New( 
-		SizeT                                       _sizeOfSelf,
-		Type                                        type,
-		Stg_Class_DeleteFunction*                   _delete,
-		Stg_Class_PrintFunction*                    _print,
-		Stg_Class_CopyFunction*                     _copy, 
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*            _construct,
-		Stg_Component_BuildFunction*                _build,
-		Stg_Component_InitialiseFunction*           _initialise,
-		Stg_Component_ExecuteFunction*              _execute,
-		Stg_Component_DestroyFunction*              _destroy,
-		Name                                        name )
+AnalyticSolution* _AnalyticSolution_New(  ANALYTICSOLUTION_DEFARGS  )
 {
 	AnalyticSolution*			self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(AnalyticSolution) );
 	/* Construct using parent */
-	self = (AnalyticSolution*)_Stg_Component_New( 
-			_sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name,
-			NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (AnalyticSolution*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	/* Assign singleton ptr */
 	mySingleton = self;
@@ -115,7 +99,7 @@ AnalyticSolution* _AnalyticSolution_New(
 void _AnalyticSolution_Init( AnalyticSolution* self, Swarm* integrationSwarm, LiveComponentRegister* LC_Register, AbstractContext* context, Bool verboseMode ) {
 	self->LC_Register = LC_Register;
 	self->integrationSwarm = integrationSwarm;
-	self->context = context;
+	self->context = (DomainContext*)context;
 
 	/* Initialise AnalyticFunctions */
 	self->_getAnalyticVelocity = NULL;
@@ -145,7 +129,7 @@ void _AnalyticSolution_Init( AnalyticSolution* self, Swarm* integrationSwarm, Li
 
 void _AnalyticSolution_Delete( void* analyticSolution ) {
 	AnalyticSolution* self = (AnalyticSolution*)analyticSolution;
-	
+
 	Stg_Class_Delete( self->feVariableList );
 	Stg_Class_Delete( self->analyticFeVariableList );
 	Stg_Class_Delete( self->analyticFeVariableFuncList );
@@ -155,7 +139,7 @@ void _AnalyticSolution_Delete( void* analyticSolution ) {
 
 	if ( self->toleranceList )
 		Memory_Free( self->toleranceList );
-
+	
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
 }
@@ -173,14 +157,17 @@ void* _AnalyticSolution_Copy( void* analyticSolution, void* dest, Bool deep, Nam
 	return NULL;
 }
 
-void _AnalyticSolution_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) 
+void _AnalyticSolution_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) 
 {
 	AnalyticSolution* self = (AnalyticSolution*)analyticSolution;
 	AbstractContext*  context;
 	Swarm*            integrationSwarm;
 	Bool              verboseMode;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+
 	integrationSwarm = Stg_ComponentFactory_ConstructByName( cf, "gaussSwarm", Swarm, True, data ); 
 	verboseMode = Stg_ComponentFactory_GetRootDictBool( cf, "analyticSolutionVerbose", False );
 
@@ -192,6 +179,7 @@ void _AnalyticSolution_Build( void* analyticSolution, void* data ) {
 	Index             analyticFeVariableCount;
 	Index             analyticFeVariable_I;
 
+   Stg_Component_Build( self->integrationSwarm, data, False );
 	/* Build all the analytic fields registered to this AnalyticSolution */
 	AnalyticSolution_BuildAllAnalyticFields( self, data );
 	
@@ -210,6 +198,7 @@ void _AnalyticSolution_Initialise( void* analyticSolution, void* data ) {
 	Index             analyticFeVariableCount = Stg_ObjectList_Count( self->analyticFeVariableList );
 	Index             analyticFeVariable_I;
 
+   Stg_Component_Initialise( self->integrationSwarm, data, False );
 	assert( analyticFeVariableCount == Stg_ObjectList_Count( self->analyticFeVariableFuncList ) );
 
 	/* Assign values to all analytic fields */
@@ -225,7 +214,7 @@ void _AnalyticSolution_Initialise( void* analyticSolution, void* data ) {
 
 /* This function is called when the 'Update' phase happens */
 void AnalyticSolution_Update( void* analyticSolution ) {
-	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
+	AnalyticSolution* self = (AnalyticSolution*) analyticSolution;
 
 	self->_initialise( self, NULL );
 }
@@ -234,6 +223,23 @@ void _AnalyticSolution_Execute( void* analyticSolution, void* data ) {
 }
 
 void _AnalyticSolution_Destroy( void* analyticSolution, void* data ) {
+	AnalyticSolution* self = (AnalyticSolution*)analyticSolution;
+	Index             analyticFeVariableCount = Stg_ObjectList_Count( self->analyticFeVariableList );
+	Index             analyticFeVariable_I;
+
+   Stg_Component_Destroy( self, data, False );
+   
+   Stg_Component_Destroy( self->integrationSwarm, data, False );
+	assert( analyticFeVariableCount == Stg_ObjectList_Count( self->analyticFeVariableFuncList ) );
+
+	/* Destroy all analytic fields */
+	for ( analyticFeVariable_I = 0 ; analyticFeVariable_I < analyticFeVariableCount ; analyticFeVariable_I++ ) {
+		Stg_Component_Destroy( Stg_ObjectList_At( self->feVariableList, analyticFeVariable_I ), data, False ) ;
+		Stg_Component_Destroy( Stg_ObjectList_At( self->analyticFeVariableList, analyticFeVariable_I ), data, False ) ;
+		Stg_Component_Destroy( Stg_ObjectList_At( self->errorMagnitudeFieldList, analyticFeVariable_I ), data, False ) ;
+		Stg_Component_Destroy( Stg_ObjectList_At( self->relativeErrorMagnitudeFieldList, analyticFeVariable_I ), data, False ) ;
+	}
+
 }
 
 void AnalyticSolution_PutAnalyticSolutionOntoNodes( void* analyticSolution, Index analyticFeVariable_I ) {
@@ -441,6 +447,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 		sync = Mesh_GetSync( feVariable->feMesh, MT_VERTEX );
 		dataVariable = Variable_NewScalar( 	
 			tmpName,
+			(AbstractContext*)self->context,
 			Variable_DataType_Double, 
 			(unsigned*)&sync->nDomains, 
 			NULL,
@@ -460,6 +467,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 		}
 		dataVariable = Variable_NewVector( 	
 				tmpName,
+				(AbstractContext*)self->context,
 				Variable_DataType_Double, 
 				componentsCount,
 				(unsigned*)&sync->nDomains, 
@@ -483,7 +491,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 	
 	/* Create new dof layout */
 	tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic-DofLayout" );
-	dofLayout = DofLayout_New( tmpName, variable_Register, Mesh_GetDomainSize( feVariable->feMesh, MT_VERTEX ), NULL );
+	dofLayout = DofLayout_New( tmpName, self->context, variable_Register, Mesh_GetDomainSize( feVariable->feMesh, MT_VERTEX ), NULL );
 	if ( scalar ) {
 		DofLayout_AddAllFromVariableArray( dofLayout, 1, &dataVariable );
 	}
@@ -506,7 +514,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 
 	/* Create new FeVariable */
 	tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic" );
-	analyticFeVariable = FeVariable_New( tmpName, feVariable->feMesh, feVariable->geometryMesh, dofLayout,
+	analyticFeVariable = FeVariable_New( tmpName, self->context, feVariable->feMesh, feVariable->geometryMesh, dofLayout,
 		NULL, NULL, NULL, feVariable->dim, feVariable->isCheckpointedAndReloaded, 
 		False, False,
 		feVariable->fieldVariable_Register );
@@ -516,25 +524,23 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 
 	/* Create Magnitude Field */
 	tmpName = Stg_Object_AppendSuffix( analyticFeVariable, "Magnitude" );
-	analyticMagField = OperatorFeVariable_NewUnary( tmpName, analyticFeVariable, "Magnitude" );
+	analyticMagField = OperatorFeVariable_NewUnary( tmpName, self->context, analyticFeVariable, "Magnitude" );
 	Memory_Free( tmpName );
 
 	/* Create Error field - The the calculated field minus the analytic field */
 	tmpName = Stg_Object_AppendSuffix( feVariable, "ErrorField" );
-	errorField = OperatorFeVariable_NewBinary( 
-			tmpName, feVariable, analyticFeVariable, "Subtraction" );
+	errorField = OperatorFeVariable_NewBinary( tmpName, self->context, feVariable, analyticFeVariable, "Subtraction" );
 	Memory_Free( tmpName );
 	
 	/* Create Error magnitude field */
 	tmpName = Stg_Object_AppendSuffix( feVariable, "ErrorMagnitudeField" );
-	errorMagnitudeField = OperatorFeVariable_NewUnary( tmpName, errorField, "Magnitude" );
+	errorMagnitudeField = OperatorFeVariable_NewUnary( tmpName, self->context, errorField, "Magnitude" );
 	Memory_Free( tmpName );
 	Stg_ObjectList_Append( self->errorMagnitudeFieldList, errorMagnitudeField ); /* Add it to list */
 
 	/* Create Relative Error magnitude field - The magnitude of relative error */
 	tmpName = Stg_Object_AppendSuffix( feVariable, "RelativeErrorMagnitudeField" );
-	relativeErrorMagnitudeField = OperatorFeVariable_NewBinary(
-			tmpName, errorMagnitudeField, analyticMagField, "ScalarDivision" );
+	relativeErrorMagnitudeField = OperatorFeVariable_NewBinary( tmpName, self->context, errorMagnitudeField, analyticMagField, "ScalarDivision" );
 	Memory_Free( tmpName );
 	Stg_ObjectList_Append( self->relativeErrorMagnitudeFieldList, relativeErrorMagnitudeField ); /* Add it to list */
 
@@ -567,8 +573,8 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 }
 
 FeVariable* AnalyticSolution_CreateAnalyticVectorField( void* analyticSolution, FeVariable* vectorField, AnalyticSolution_SolutionFunction* solutionFunction ) {
-	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
-	FeVariable*                                  analyticVectorField;
+	AnalyticSolution*	self = (AnalyticSolution*) analyticSolution;
+	FeVariable*			analyticVectorField;
 
 	analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField );
 
@@ -576,17 +582,24 @@ FeVariable* AnalyticSolution_CreateAnalyticVectorField( void* analyticSolution, 
 }
 
 FeVariable* AnalyticSolution_CreateAnalyticSymmetricTensorField( void* analyticSolution, FeVariable* vectorField ) {
-	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
-	FeVariable*                                  analyticVectorField;
-	OperatorFeVariable*                          analyticVectorInvField;
-	Name                                         tmpName;
+	AnalyticSolution*		self = (AnalyticSolution*) analyticSolution;
+	FeVariable*				analyticVectorField;
+	OperatorFeVariable*	analyticVectorInvField;
+	Name						tmpName, tmpName2;
+	DofLayout*				dofLayout;
 
 	analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField );
 
+	/* Create new dof layout */
+	tmpName = Stg_Object_AppendSuffix( analyticVectorField, "Analytic-DofLayout" );
+	dofLayout = DofLayout_New( tmpName, self->context, self->context->variable_Register, Mesh_GetDomainSize( analyticVectorField->feMesh, MT_VERTEX ), NULL );
+
 	/* Create Invariant Field */
-	tmpName = Stg_Object_AppendSuffix( analyticVectorField, "Invariant" );
-	analyticVectorInvField = OperatorFeVariable_NewUnary( tmpName, analyticVectorField, "SymmetricTensor_Invariant" );
+	tmpName2 = Stg_Object_AppendSuffix( analyticVectorField, "Invariant" );
+	analyticVectorInvField = OperatorFeVariable_NewUnary( tmpName2, self->context, analyticVectorField, "SymmetricTensor_Invariant" );
+
 	Memory_Free( tmpName );
+	Memory_Free( tmpName2 );
 
 	LiveComponentRegister_Add( self->LC_Register, (Stg_Component*) analyticVectorInvField );
 
@@ -610,7 +623,7 @@ FeVariable* AnalyticSolution_GetFeVariableFromAnalyticFeVariable( void* analytic
 }
 	
 InterpolationResult AnalyticSolution_InterpolateValueFromNormalFeVariable( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* value ) {
-	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
+	AnalyticSolution*	self = (AnalyticSolution*) analyticSolution;
 	FeVariable*       normalFeVariable;
 
 	normalFeVariable = AnalyticSolution_GetFeVariableFromAnalyticFeVariable( self, analyticFeVariable );
@@ -620,9 +633,11 @@ InterpolationResult AnalyticSolution_InterpolateValueFromNormalFeVariable( void*
 
 AnalyticSolution* AnalyticSolution_GetAnalyticSolution() {
 	Journal_Firewall( mySingleton != NULL , Journal_Register( Error_Type, "AnalyticSolution" ),
-			"Error in function %s: The Singleton Ptr is NULL, meaning the AnalyticSolution has not been created yet\n",
-			__func__ );
+		"Error in function %s: The Singleton Ptr is NULL, meaning the AnalyticSolution has not been created yet\n", __func__ );
+
 	return mySingleton;
 }
+
+
 
 

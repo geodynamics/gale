@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Experimental_Solvers_SROpGenerator_h__
-#define __Experimental_Solvers_SROpGenerator_h__
+#ifndef __StgFEM_SLE_SystemSetup_SROpGenerator_h__
+#define __StgFEM_SLE_SystemSetup_SROpGenerator_h__
 
 	/** Textual name of this class */
 	extern const Type SROpGenerator_Type;
@@ -68,14 +68,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define SROPGENERATOR_DEFARGS \
-		MGOPGENERATOR_DEFARGS
+                MGOPGENERATOR_DEFARGS
 
 	#define SROPGENERATOR_PASSARGS \
-		MGOPGENERATOR_PASSARGS
+                MGOPGENERATOR_PASSARGS
 
 	SROpGenerator* SROpGenerator_New( Name name );
-	SROpGenerator* _SROpGenerator_New( SROPGENERATOR_DEFARGS );
+	SROpGenerator* _SROpGenerator_New(  SROPGENERATOR_DEFARGS  );
 	void _SROpGenerator_Init( SROpGenerator* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -84,7 +91,7 @@
 
 	void _SROpGenerator_Delete( void* srOpGenerator );
 	void _SROpGenerator_Print( void* srOpGenerator, Stream* stream );
-	void _SROpGenerator_Construct( void* srOpGenerator, Stg_ComponentFactory* cf, void* data );
+	void _SROpGenerator_AssignFromXML( void* srOpGenerator, Stg_ComponentFactory* cf, void* data );
 	void _SROpGenerator_Build( void* srOpGenerator, void* data );
 	void _SROpGenerator_Initialise( void* srOpGenerator, void* data );
 	void _SROpGenerator_Execute( void* srOpGenerator, void* data );
@@ -123,4 +130,5 @@
 	Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self );
 	Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level );
 
-#endif /* __Experimental_Solvers_SROpGenerator_h__ */
+#endif /* __StgFEM_SLE_SystemSetup_SROpGenerator_h__ */
+

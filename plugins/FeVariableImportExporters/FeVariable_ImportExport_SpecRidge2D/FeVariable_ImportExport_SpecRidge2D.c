@@ -55,7 +55,6 @@ void FeVariable_ReadNodalValuesFromFile_SpecRidge2D( void* _feVariable, const ch
 	char*              filename;
 	Node_LocalIndex    lNode_I = 0;
 	Node_GlobalIndex   gNode_I = 0;
-	Node_GlobalIndex   gNodeCount_I = 0;
 	Dof_Index          dof_I;
 	Dof_Index          dofAtEachNodeCount;
 	FILE*              inputFile;
@@ -64,7 +63,7 @@ void FeVariable_ReadNodalValuesFromFile_SpecRidge2D( void* _feVariable, const ch
 	const unsigned int MAX_LINE_LENGTH = 1000;
 	Processor_Index    proc_I=0;
 	Dimension_Index    dim_I=0;
-	char*              matchString;
+	/* char*              matchString; */
 	Index              currentFileLine = 0;
 	Coord              localGeometryMin;
 	Coord              localGeometryMax;
@@ -214,7 +213,7 @@ void FeVariable_SaveNodalValuesToFile_SpecRidge2D( void* _feVariable, const char
 }
 
 
-void _StgFEM_FeVariable_ImportExport_SpecRidge2D_Construct( void* componment, Stg_ComponentFactory* cf, void* data ) {
+void _StgFEM_FeVariable_ImportExport_SpecRidge2D_AssignFromXML( void* componment, Stg_ComponentFactory* cf, void* data ) {
 	AbstractContext* context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
@@ -222,23 +221,29 @@ void _StgFEM_FeVariable_ImportExport_SpecRidge2D_Construct( void* componment, St
 }
 
 void* _StgFEM_FeVariable_ImportExport_SpecRidge2D_DefaultNew( Name name ) {
-	return _Codelet_New(
-			sizeof( Codelet ),
-			StgFEM_FeVariable_ImportExport_SpecRidge2D_Type,
-			_Codelet_Delete,
-			_Codelet_Print,
-			_Codelet_Copy,
-			_StgFEM_FeVariable_ImportExport_SpecRidge2D_DefaultNew,
-			_StgFEM_FeVariable_ImportExport_SpecRidge2D_Construct,
-			_Codelet_Build,
-			_Codelet_Initialise,
-			_Codelet_Execute,
-			_Codelet_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( Codelet );
+	Type                                                      type = StgFEM_FeVariable_ImportExport_SpecRidge2D_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _StgFEM_FeVariable_ImportExport_SpecRidge2D_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _StgFEM_FeVariable_ImportExport_SpecRidge2D_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Codelet_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
    
 Index StgFEM_FeVariable_ImportExport_SpecRidge2D_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, StgFEM_FeVariable_ImportExport_SpecRidge2D_Type, "0", _StgFEM_FeVariable_ImportExport_SpecRidge2D_DefaultNew );
 }
+
+
 
 

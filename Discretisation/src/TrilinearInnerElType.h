@@ -68,34 +68,30 @@
 		unsigned**	tetInds;
 		
 	struct TrilinearInnerElType { __TrilinearInnerElType };
+
+
+	#define TRILINEARINEERELTYPE_PASSARGS \
+    	ELEMENTTYPE_PASSARGS
 	
 	
 	/* Create a new TrilinearInnerElType and initialise */
-	void* TrilinearInnerElTypea_DefaultNew( Name name );
+	void* _TrilinearInnerElTypea_DefaultNew( Name name );
 
 	TrilinearInnerElType* TrilinearInnerElType_New( Name name );
 	
 	/* Creation implementation / Virtual constructor */
-	TrilinearInnerElType* _TrilinearInnerElType_New(
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*				_construct,
-		Stg_Component_BuildFunction*					_build,
-		Stg_Component_InitialiseFunction*				_initialise,
-		Stg_Component_ExecuteFunction*					_execute,
-		Stg_Component_DestroyFunction*					_destroy,
-		Name								name,
-		Bool								initFlag,
-		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
-		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
-		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
-		ElementType_SurfaceNormalFunction*				_surfaceNormal,
-		Index								nodeCount );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define TRILINEARINNERELTYPE_DEFARGS \
+                ELEMENTTYPE_DEFARGS
+
+	#define TRILINEARINNERELTYPE_PASSARGS \
+                ELEMENTTYPE_PASSARGS
+
+	TrilinearInnerElType* _TrilinearInnerElType_New(  TRILINEARINNERELTYPE_DEFARGS  );
 	
 	/* Initialise implementation */
 	void _TrilinearInnerElType_Init( TrilinearInnerElType* self );
@@ -107,7 +103,7 @@
 	void _TrilinearInnerElType_Print( void* elementType, Stream* stream );
 	
 	/* Trilinear inner element type build implementation */
-	void _TrilinearInnerElType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data );
+	void _TrilinearInnerElType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data );
 	
 	void _TrilinearInnerElType_Build( void* elementType, void *data );
 	
@@ -137,3 +133,4 @@
 	int _TrilinearInnerElType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal );
 
 #endif /* __StgFEM_Discretisation_TrilinearInnerElType_h__ */
+

@@ -56,82 +56,47 @@
 const Type DivergenceMatrixTerm_Type = "DivergenceMatrixTerm";
 
 DivergenceMatrixTerm* DivergenceMatrixTerm_New( 
-   Name                                                name,
-   StiffnessMatrix*                                    stiffnessMatrix,
-   Swarm*                                              integrationSwarm )
+	Name					     name,
+	FiniteElementContext*  context,
+	StiffnessMatrix*	     stiffnessMatrix,
+	Swarm*				     integrationSwarm )
 {
-   DivergenceMatrixTerm* self = (DivergenceMatrixTerm*) _DivergenceMatrixTerm_DefaultNew( name );
-
-   DivergenceMatrixTerm_InitAll( 
-      self,
-      stiffnessMatrix,
-      integrationSwarm );
+	DivergenceMatrixTerm* self = (DivergenceMatrixTerm*) _DivergenceMatrixTerm_DefaultNew( name );
+	
+	self->isConstructed = True;
+	_StiffnessMatrixTerm_Init( self, context, stiffnessMatrix, integrationSwarm, NULL );
+   _DivergenceMatrixTerm_Init( self );
 
    return self;
 }
 
 /* Creation implementation / Virtual constructor */
-DivergenceMatrixTerm* _DivergenceMatrixTerm_New( 
-   SizeT                                               sizeOfSelf,  
-   Type                                                type,
-   Stg_Class_DeleteFunction*                           _delete,
-   Stg_Class_PrintFunction*                            _print,
-   Stg_Class_CopyFunction*                             _copy, 
-   Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-   Stg_Component_ConstructFunction*                    _construct,
-   Stg_Component_BuildFunction*                        _build,
-   Stg_Component_InitialiseFunction*                   _initialise,
-   Stg_Component_ExecuteFunction*                      _execute,
-   Stg_Component_DestroyFunction*                      _destroy,
-   StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
-   Name                                                name )
+DivergenceMatrixTerm* _DivergenceMatrixTerm_New(  DIVERGENCEMATRIXTERM_DEFARGS  )
 {
    DivergenceMatrixTerm* self;
 	
    /* Allocate memory */
-   assert( sizeOfSelf >= sizeof(DivergenceMatrixTerm) );
-   self = (DivergenceMatrixTerm*) _StiffnessMatrixTerm_New( 
-      sizeOfSelf, 
-      type, 
-      _delete, 
-      _print, 
-      _copy,
-      _defaultConstructor,
-      _construct,
-      _build, 
-      _initialise,
-      _execute,
-      _destroy,
-      _assembleElement,
-      name );
+   assert( _sizeOfSelf >= sizeof(DivergenceMatrixTerm) );
+   self = (DivergenceMatrixTerm*) _StiffnessMatrixTerm_New(  STIFFNESSMATRIXTERM_PASSARGS  );
 	
    /* Virtual info */
 	
    return self;
 }
 
-void _DivergenceMatrixTerm_Init( 
-   DivergenceMatrixTerm*                                    self )
-{
+void _DivergenceMatrixTerm_Init( void* matrixTerm ) {
+   DivergenceMatrixTerm* self = (DivergenceMatrixTerm*)matrixTerm;
+
 	self->max_nElNodes_col = 0;
 	self->Ni_col = NULL;
-}
-
-void DivergenceMatrixTerm_InitAll( 
-   void*                                               matrixTerm,
-   StiffnessMatrix*                                    stiffnessMatrix,
-   Swarm*                                              integrationSwarm )
-{
-   DivergenceMatrixTerm* self = (DivergenceMatrixTerm*) matrixTerm;
-
-   StiffnessMatrixTerm_InitAll( self, stiffnessMatrix, integrationSwarm, NULL );
-   _DivergenceMatrixTerm_Init( self );
 }
 
 void _DivergenceMatrixTerm_Delete( void* matrixTerm ) {
    DivergenceMatrixTerm* self = (DivergenceMatrixTerm*)matrixTerm;
 
    _StiffnessMatrixTerm_Delete( self );
+	
+	Memory_Free( self->Ni_col );
 }
 
 void _DivergenceMatrixTerm_Print( void* matrixTerm, Stream* stream ) {
@@ -143,39 +108,43 @@ void _DivergenceMatrixTerm_Print( void* matrixTerm, Stream* stream ) {
 }
 
 void* _DivergenceMatrixTerm_DefaultNew( Name name ) {
-   return (void*)_DivergenceMatrixTerm_New( 
-      sizeof(DivergenceMatrixTerm), 
-      DivergenceMatrixTerm_Type,
-      _DivergenceMatrixTerm_Delete,
-      _DivergenceMatrixTerm_Print,
-      NULL,
-      _DivergenceMatrixTerm_DefaultNew,
-      _DivergenceMatrixTerm_Construct,
-      _DivergenceMatrixTerm_Build,
-      _DivergenceMatrixTerm_Initialise,
-      _DivergenceMatrixTerm_Execute,
-      _DivergenceMatrixTerm_Destroy,
-      _DivergenceMatrixTerm_AssembleElement,
-      name );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(DivergenceMatrixTerm);
+	Type                                                         type = DivergenceMatrixTerm_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _DivergenceMatrixTerm_Delete;
+	Stg_Class_PrintFunction*                                   _print = _DivergenceMatrixTerm_Print;
+	Stg_Class_CopyFunction*                                     _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _DivergenceMatrixTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _DivergenceMatrixTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _DivergenceMatrixTerm_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _DivergenceMatrixTerm_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _DivergenceMatrixTerm_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _DivergenceMatrixTerm_Destroy;
+	StiffnessMatrixTerm_AssembleElementFunction*     _assembleElement = _DivergenceMatrixTerm_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+   return (void*)_DivergenceMatrixTerm_New(  DIVERGENCEMATRIXTERM_PASSARGS  );
 }
 
-void _DivergenceMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
-   DivergenceMatrixTerm*            self             = (DivergenceMatrixTerm*)matrixTerm;
+void _DivergenceMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
+   DivergenceMatrixTerm* self = (DivergenceMatrixTerm*)matrixTerm;
 
    /* Construct Parent */
-   _StiffnessMatrixTerm_Construct( self, cf, data );
+   _StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
    _DivergenceMatrixTerm_Init( self );
 }
 
 void _DivergenceMatrixTerm_Build( void* matrixTerm, void* data ) {
-   DivergenceMatrixTerm*             self             = (DivergenceMatrixTerm*)matrixTerm;
+   DivergenceMatrixTerm* self = (DivergenceMatrixTerm*)matrixTerm;
 
    _StiffnessMatrixTerm_Build( self, data );
 }
 
 void _DivergenceMatrixTerm_Initialise( void* matrixTerm, void* data ) {
-   DivergenceMatrixTerm*             self             = (DivergenceMatrixTerm*)matrixTerm;
+   DivergenceMatrixTerm* self = (DivergenceMatrixTerm*)matrixTerm;
 
    _StiffnessMatrixTerm_Initialise( self, data );
 }
@@ -186,45 +155,44 @@ void _DivergenceMatrixTerm_Execute( void* matrixTerm, void* data ) {
 
 void _DivergenceMatrixTerm_Destroy( void* matrixTerm, void* data ) {
 	DivergenceMatrixTerm* self = (DivergenceMatrixTerm*) matrixTerm;
-	_StiffnessMatrixTerm_Destroy( matrixTerm, data );
 
-	Memory_Free( self->Ni_col );
+   if( self->Ni_col) Memory_Free( self->Ni_col );
+	_StiffnessMatrixTerm_Destroy( matrixTerm, data );
 }
 
-
 void _DivergenceMatrixTerm_AssembleElement( 
-   void*                                              matrixTerm,
-   StiffnessMatrix*                                   stiffnessMatrix, 
-   Element_LocalIndex                                 lElement_I, 
-   SystemLinearEquations*                             sle,
-   FiniteElementContext*                              context,
-   double**                                           elStiffMat ) 
+   void*							matrixTerm,
+   StiffnessMatrix*			stiffnessMatrix, 
+   Element_LocalIndex		lElement_I, 
+   SystemLinearEquations*	sle,
+   FiniteElementContext*	context,
+   double**						elStiffMat ) 
 {
-   DivergenceMatrixTerm*        self         = Stg_CheckType( matrixTerm, DivergenceMatrixTerm );
-   Swarm*                              swarm        = self->integrationSwarm;
-   FeVariable*                         variable_row = stiffnessMatrix->columnVariable;
-   FeVariable*                         variable_col = stiffnessMatrix->rowVariable;
-   Dimension_Index                     dim          = stiffnessMatrix->dim;
-   double*                             xi;
-   double                              weight;
-   Particle_InCellIndex                cParticle_I, cellParticleCount;
-   Node_ElementLocalIndex              nodesPerEl_row;
-   Node_ElementLocalIndex              nodesPerEl_col;	
-   Dof_Index                           totalDofsThisElement_row, totalDofsThisElement_col;
+   DivergenceMatrixTerm*	self         = Stg_CheckType( matrixTerm, DivergenceMatrixTerm );
+   Swarm*						swarm        = self->integrationSwarm;
+   FeVariable*					variable_row = stiffnessMatrix->columnVariable;
+   FeVariable*					variable_col = stiffnessMatrix->rowVariable;
+   Dimension_Index			dim          = stiffnessMatrix->dim;
+   double*						xi;
+   double						weight;
+   Particle_InCellIndex		cParticle_I, cellParticleCount;
+   Node_ElementLocalIndex	nodesPerEl_row;
+   Node_ElementLocalIndex	nodesPerEl_col;	
+   Dof_Index					totalDofsThisElement_row, totalDofsThisElement_col;
 	
-   Dof_Index                           dofPerNode_row, dofPerNode_col;
-   Index                               row, col; /* Indices into the stiffness matrix */
-   Node_ElementLocalIndex              rowNode_I;
-   Node_ElementLocalIndex              colNode_I;
-   Dof_Index                           rowDof_I, colDof_I;
-   double**                            GNx_row;
-   double*                             Ni_col;
-   double                              detJac;
-   IntegrationPoint*                   currIntegrationPoint;
+   Dof_Index					dofPerNode_row, dofPerNode_col;
+   Index							row, col; /* Indices into the stiffness matrix */
+   Node_ElementLocalIndex	rowNode_I;
+   Node_ElementLocalIndex	colNode_I;
+   Dof_Index					rowDof_I, colDof_I;
+   double**						GNx_row;
+   double*						Ni_col;
+   double						detJac;
+   IntegrationPoint*			currIntegrationPoint;
 	
-   Cell_Index                          cell_I;
-   ElementType*                        elementType_row;
-   ElementType*                        elementType_col;
+   Cell_Index					cell_I;
+   ElementType*				elementType_row;
+   ElementType*				elementType_col;
 	
    /* Set the element type */
    elementType_row = FeMesh_GetElementType( variable_row->feMesh, lElement_I );
@@ -262,10 +230,7 @@ void _DivergenceMatrixTerm_AssembleElement(
       weight = currIntegrationPoint->weight;
 		
       /* get shape function derivs for the row (ie. velocity) */
-      ElementType_ShapeFunctionsGlobalDerivs( 
-         elementType_row,
-         variable_row->feMesh, lElement_I,
-         xi, dim, &detJac, GNx_row );
+      ElementType_ShapeFunctionsGlobalDerivs( elementType_row, variable_row->feMesh, lElement_I, xi, dim, &detJac, GNx_row );
 		
       /* get the shape functions for the col. (ie. pressure) */
       ElementType_EvaluateShapeFunctionsAt( elementType_col, xi, Ni_col );
@@ -279,11 +244,12 @@ void _DivergenceMatrixTerm_AssembleElement(
                for( colDof_I=0; colDof_I<dofPerNode_col; colDof_I++) {		
                   col = colNode_I*dofPerNode_col + colDof_I;
 						
-                  elStiffMat[col][row] +=
-                     + weight * ( -detJac ) * ( GNx_row[rowDof_I][rowNode_I] * Ni_col[colNode_I] );
+                  elStiffMat[col][row] += + weight * ( -detJac ) * ( GNx_row[rowDof_I][rowNode_I] * Ni_col[colNode_I] );
                }
             }
          }
       }
    }
 }
+
+

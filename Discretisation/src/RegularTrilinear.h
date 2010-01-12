@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Discretisaton_Mesh_RegularTrilinear_h__
-#define __Discretisaton_Mesh_RegularTrilinear_h__
+#ifndef __StgFEM_Discretisaton_RegularTrilinear_h__
+#define __StgFEM_Discretisaton_RegularTrilinear_h__
 
 	/** Textual name of this class */
 	extern const Type RegularTrilinear_Type;
@@ -61,14 +61,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define REGULARTRILINEAR_DEFARGS \
-		ELEMENTTYPE_DEFARGS
+                TRILINEARELEMENTTYPE_DEFARGS
 
 	#define REGULARTRILINEAR_PASSARGS \
-		ELEMENTTYPE_PASSARGS
+                TRILINEARELEMENTTYPE_PASSARGS
 
 	RegularTrilinear* RegularTrilinear_New( Name name );
-	RegularTrilinear* _RegularTrilinear_New( REGULARTRILINEAR_DEFARGS );
+	RegularTrilinear* _RegularTrilinear_New(  REGULARTRILINEAR_DEFARGS  );
 	void _RegularTrilinear_Init( RegularTrilinear* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -77,7 +84,7 @@
 
 	void _RegularTrilinear_Delete( void* elementType );
 	void _RegularTrilinear_Print( void* elementType, Stream* stream );
-	void _RegularTrilinear_Construct( void* elementType, Stg_ComponentFactory* cf, void* data );
+	void _RegularTrilinear_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data );
 	void _RegularTrilinear_Build( void* elementType, void* data );
 	void _RegularTrilinear_Initialise( void* elementType, void* data );
 	void _RegularTrilinear_Execute( void* elementType, void* data );
@@ -94,4 +101,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Discretisaton_Mesh_RegularTrilinear_h__ */
+#endif /* __StgFEM_Discretisaton_RegularTrilinear_h__ */
+

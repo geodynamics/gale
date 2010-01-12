@@ -54,51 +54,48 @@
 	
 	/* Textual name of this class */
 	extern const Type ElementType_Register_Type;
+
+	/* global default instantiation of this register (created in Init.c) */
+	extern ElementType_Register* elementType_Register;
 	
 	/* ElementType_Register info */
 	#define __ElementType_Register \
 		/* General info */ \
 		__Stg_Component \
 		\
+		DomainContext*			context; \
 		/* Virtual info */ \
 		\
 		/* ElementType_Register info */ \
 		Stream*					debug; \
-		ElementType_Index			count; \
-		SizeT					_size; \
-		SizeT					_delta; \
-		ElementType**				elementType;
+		ElementType_Index		count; \
+		SizeT						_size; \
+		SizeT						_delta; \
+		ElementType**			elementType;
 
 	struct ElementType_Register { __ElementType_Register };
-	
-	
+
 	/* Create a new ElementType_Register */
 	void* ElementType_Register_DefaultNew( Name name );
 	
 	ElementType_Register* ElementType_Register_New( Name name );
 	
-	/* Initialise a ElementType_Register */
-	void ElementType_Register_Init( void* elementType_Register, Name name );
-	
 	/* Creation implementation / Virtual constructor */
-	ElementType_Register* _ElementType_Register_New( 
-		SizeT				_sizeOfSelf,
-		Type				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy,
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool 							initFlag );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ELEMENTTYPE_REGISTER_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define ELEMENTTYPE_REGISTER_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	ElementType_Register* _ElementType_Register_New(  ELEMENTTYPE_REGISTER_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _ElementType_Register_Init( void* elementType_Register );
-	
 	
 	/* Stg_Class_Delete implementation */
 	void _ElementType_Register_Delete( void* elementType_Register );
@@ -106,7 +103,7 @@
 	/* Print implementation */
 	void _ElementType_Register_Print( void* elementType_Register, Stream* stream );
 	
-	void _ElementType_Register_Construct( void* elementType_Register, Stg_ComponentFactory *cf, void* data );
+	void _ElementType_Register_AssignFromXML( void* elementType_Register, Stg_ComponentFactory *cf, void* data );
 	
 	void _ElementType_Register_Build( void* elementType_Register, void *data );
 	
@@ -128,3 +125,4 @@
 	ElementType* _ElementType_Register_At( void* elementType_Register, ElementType_Index handle );
 	
 #endif /* __StgFEM_Discretisation_ElementType_Register_h__ */
+

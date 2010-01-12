@@ -61,104 +61,31 @@
 #include <hdf5.h>
 #endif
 
-const Type   FeVariable_Type = "FeVariable";
-const Name   defaultFeVariableFeEquationNumberName = "defaultFeVariableFeEqName";
+const Type FeVariable_Type = "FeVariable";
+const Name defaultFeVariableFeEquationNumberName = "defaultFeVariableFeEqName";
 
 /** MPI Tags */
 static const int DOF_VALUES_TAG = 10;
 
 /** Global objects */
-Stg_ObjectList*    FeVariable_FileFormatImportExportList = NULL;
-
-void* FeVariable_DefaultNew( Name name )
-{
-	return _FeVariable_New(
-		sizeof(FeVariable),
-		FeVariable_Type,
-		_FeVariable_Delete,
-		_FeVariable_Print,
-		_FeVariable_Copy,
-		(Stg_Component_DefaultConstructorFunction*)FeVariable_DefaultNew,
-		_FeVariable_Construct,
-		_FeVariable_Build, 
-		_FeVariable_Initialise,
-		_FeVariable_Execute,
-		_FeVariable_Destroy,
-		name,
-		False,
-		_FeVariable_InterpolateValueAt,
-		_FeVariable_GetMinGlobalFieldMagnitude,
-		_FeVariable_GetMaxGlobalFieldMagnitude,
-		_FeVariable_GetMinAndMaxLocalCoords,
-		_FeVariable_GetMinAndMaxGlobalCoords,
-		_FeVariable_InterpolateNodeValuesToElLocalCoord,
-		_FeVariable_GetValueAtNode,
-		_FeVariable_SyncShadowValues, 
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		0,
-		0,
-		False,
-		False,
-		False,
-		MPI_COMM_WORLD,
-		NULL );
-}
-
-
-FeVariable* FeVariable_New(
-		Name                                            name,
-		void*                                           feMesh,
-		void*                                           geometryMesh,
-		DofLayout*                                      dofLayout, 
-		void*                                          	bcs,
-		void*                                          	ics,
-		void*                                           linkedDofInfo,
-		Dimension_Index                                 dim,
-		Bool                                            isCheckpointedAndReloaded,
-		Bool                                            isReferenceSolution,
-		Bool                                            loadReferenceEachTimestep,
-		FieldVariable_Register*                         fV_Register )		
-{
-	assert( Class_IsSuper( ((FeMesh*)feMesh)->topo, IGraph ) );
-	return FeVariable_New_Full(
-		name,
-		feMesh,
-		geometryMesh,
-		dofLayout,
-		bcs,
-		ics,
-		linkedDofInfo,
-		NULL,
-		dofLayout->_totalVarCount,
-		dim,
-	  isCheckpointedAndReloaded,
-		isReferenceSolution,
-		loadReferenceEachTimestep,
-		((IGraph*)((FeMesh*)feMesh)->topo)->remotes[MT_VERTEX]->comm->mpiComm, 
-		fV_Register );
-}
-
+Stg_ObjectList* FeVariable_FileFormatImportExportList = NULL;
 
 FeVariable* FeVariable_New_FromTemplate(
-		Name                                            name,
-		void*                                          	_templateFeVariable,
-		DofLayout*                                      dofLayout, 
-		void*                                          	ics,
-		Bool                                            isReferenceSolution,
-		Bool                                            loadReferenceEachTimestep,
-		FieldVariable_Register*                         fV_Register )
+	Name							name,
+	DomainContext*				context,
+	void*							_templateFeVariable,
+	DofLayout*					dofLayout, 
+	void*							ics,
+	Bool							isReferenceSolution,
+	Bool							loadReferenceEachTimestep,
+	FieldVariable_Register*	fV_Register )
 {
 	FeVariable*	templateFeVariable = _templateFeVariable;
 	FeVariable*	newFeVariable = NULL;
 	
 	newFeVariable = FeVariable_New_Full(
 		name, 
+		context,
 		templateFeVariable->feMesh,
 		templateFeVariable->geometryMesh,
 		dofLayout,
@@ -175,174 +102,140 @@ FeVariable* FeVariable_New_FromTemplate(
 		fV_Register );
 
 	newFeVariable->templateFeVariable = templateFeVariable;
+
 	return newFeVariable;
 }
 
-
-FeVariable* FeVariable_New_Full(
-		Name                                            name,
-		void*                                           feMesh,
-		void*                                           geometryMesh,
-		DofLayout*                                      dofLayout, 
-		void*                                          	bcs,
-		void*                                          	ics,
-		void*                                           linkedDofInfo,
-		void*                                          	templateFeVariable,
-		Index                                           fieldComponentCount,
-		Dimension_Index                                 dim,
-		Bool                                            isCheckpointedAndReloaded,
-		Bool                                            isReferenceSolution,
-		Bool                                            loadReferenceEachTimestep,
-		MPI_Comm                                        communicator,
-		FieldVariable_Register*                         fV_Register )		
+FeVariable* FeVariable_New(
+	Name							name,
+	DomainContext*				context,
+	void*							feMesh,
+	void*							geometryMesh,
+	DofLayout*					dofLayout, 
+	void*							bcs,
+	void*							ics,
+	void*							linkedDofInfo,
+	Dimension_Index			dim,
+	Bool							isCheckpointedAndReloaded,
+	Bool							isReferenceSolution,
+	Bool							loadReferenceEachTimestep,
+	FieldVariable_Register*	fV_Register )		
 {
-	return _FeVariable_New(
-		sizeof(FeVariable),
-		FeVariable_Type,
-		_FeVariable_Delete,
-		_FeVariable_Print,
-		_FeVariable_Copy,
-		(Stg_Component_DefaultConstructorFunction*)FeVariable_DefaultNew,
-		_FeVariable_Construct,
-		_FeVariable_Build, 
-		_FeVariable_Initialise,
-		_FeVariable_Execute,
-		_FeVariable_Destroy,
+	assert( Class_IsSuper( ((FeMesh*)feMesh)->topo, IGraph ) );
+
+	return FeVariable_New_Full(
 		name,
-		True,
-		_FeVariable_InterpolateValueAt,
-		_FeVariable_GetMinGlobalFieldMagnitude,
-		_FeVariable_GetMaxGlobalFieldMagnitude,
-		_FeVariable_GetMinAndMaxLocalCoords,
-		_FeVariable_GetMinAndMaxGlobalCoords,
-		_FeVariable_InterpolateNodeValuesToElLocalCoord,
-		_FeVariable_GetValueAtNode,
-		_FeVariable_SyncShadowValues, 
+		context,
 		feMesh,
 		geometryMesh,
 		dofLayout,
 		bcs,
 		ics,
 		linkedDofInfo,
-		templateFeVariable,
-		fieldComponentCount,
+		NULL,
+		dofLayout->_totalVarCount,
 		dim,
 		isCheckpointedAndReloaded,
 		isReferenceSolution,
 		loadReferenceEachTimestep,
-		communicator,
+		((IGraph*)((FeMesh*)feMesh)->topo)->remotes[MT_VERTEX]->comm->mpiComm, 
 		fV_Register );
 }
 
-
-FeVariable* _FeVariable_New( 
-		SizeT                                           _sizeOfSelf,
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy, 
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,
-		Name                                            name,
-		Bool                                            initFlag,
-		FieldVariable_InterpolateValueAtFunction*       _interpolateValueAt,
-		FieldVariable_GetValueFunction*                 _getMinGlobalFieldMagnitude,
-		FieldVariable_GetValueFunction*                 _getMaxGlobalFieldMagnitude,
-		FieldVariable_GetCoordFunction*                 _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                 _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*    _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*              _getValueAtNode,	
-		FeVariable_SyncShadowValuesFunc*                _syncShadowValues, 
-		void*                                           feMesh,
-		void*                                           geometryMesh,
-		DofLayout*                                      dofLayout, 
-		void*                                          	bcs,
-		void*                                          	ics,
-		void*                                           linkedDofInfo,
-		void*                                          	templateFeVariable,
-		Index                                           fieldComponentCount,
-		Dimension_Index                                 dim,
-		Bool                                            isCheckpointedAndReloaded,
-		Bool                                            isReferenceSolution,
-		Bool                                            loadReferenceEachTimestep,
-		MPI_Comm                                        communicator,
-		FieldVariable_Register*                         fV_Register )
+FeVariable* FeVariable_New_Full(
+	Name							name,
+	DomainContext*				context,
+	void*							feMesh,
+	void*							geometryMesh,
+	DofLayout*					dofLayout, 
+	void*							bcs,
+	void*							ics,
+	void*							linkedDofInfo,
+	void*							templateFeVariable,
+	Index							fieldComponentCount,
+	Dimension_Index			dim,
+	Bool							isCheckpointedAndReloaded,
+	Bool							isReferenceSolution,
+	Bool							loadReferenceEachTimestep,
+	MPI_Comm						communicator,
+	FieldVariable_Register*	fieldVariable_Register )		
 {
-	FeVariable*		   self;
+	FeVariable* self = _FeVariable_DefaultNew( name );
+
+	self->isConstructed = True;
+	_FieldVariable_Init( (FieldVariable*)self, context, fieldComponentCount, dim, isCheckpointedAndReloaded, communicator, fieldVariable_Register );
+	_FeVariable_Init( self, feMesh, geometryMesh, dofLayout, bcs, ics, linkedDofInfo, templateFeVariable, isReferenceSolution, loadReferenceEachTimestep );
+
+	return self;
+}
+
+void* _FeVariable_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                                         _sizeOfSelf = sizeof(FeVariable);
+	Type                                                                 type = FeVariable_Type;
+	Stg_Class_DeleteFunction*                                         _delete = _FeVariable_Delete;
+	Stg_Class_PrintFunction*                                           _print = _FeVariable_Print;
+	Stg_Class_CopyFunction*                                             _copy = _FeVariable_Copy;
+	Stg_Component_DefaultConstructorFunction*             _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_FeVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                               _construct = _FeVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                                       _build = _FeVariable_Build;
+	Stg_Component_InitialiseFunction*                             _initialise = _FeVariable_Initialise;
+	Stg_Component_ExecuteFunction*                                   _execute = _FeVariable_Execute;
+	Stg_Component_DestroyFunction*                                   _destroy = _FeVariable_Destroy;
+	AllocationType                                         nameAllocationType = NON_GLOBAL;
+	FieldVariable_InterpolateValueAtFunction*             _interpolateValueAt = _FeVariable_InterpolateValueAt;
+	FieldVariable_GetValueFunction*               _getMinGlobalFieldMagnitude = _FeVariable_GetMinGlobalFieldMagnitude;
+	FieldVariable_GetValueFunction*               _getMaxGlobalFieldMagnitude = _FeVariable_GetMaxGlobalFieldMagnitude;
+	FieldVariable_GetCoordFunction*                  _getMinAndMaxLocalCoords = _FeVariable_GetMinAndMaxLocalCoords;
+	FieldVariable_GetCoordFunction*                 _getMinAndMaxGlobalCoords = _FeVariable_GetMinAndMaxGlobalCoords;
+	FeVariable_InterpolateWithinElementFunction*    _interpolateWithinElement = _FeVariable_InterpolateNodeValuesToElLocalCoord;
+	FeVariable_GetValueAtNodeFunction*                        _getValueAtNode = _FeVariable_GetValueAtNode;
+	FeVariable_SyncShadowValuesFunc*                        _syncShadowValues = _FeVariable_SyncShadowValues;
+
+	return _FeVariable_New(  FEVARIABLE_PASSARGS  ); /* feVariableList */
+}
+
+FeVariable* _FeVariable_New(  FEVARIABLE_DEFARGS  ) {
+	FeVariable* self;
 	
 	/** Allocate memory */
 	assert( _sizeOfSelf >= sizeof(FeVariable) );
 	
-	self = (FeVariable*)
-		_FieldVariable_New(
-				_sizeOfSelf,
-				type,
-				_delete,
-				_print,
-				_copy,
-				_defaultConstructor,
-				_construct,
-				_build,
-				_initialise,
-				_execute,
-				_destroy,
-				name,
-				initFlag,
-				_interpolateValueAt,
-				_getMinGlobalFieldMagnitude,
-				_getMaxGlobalFieldMagnitude,
-				_getMinAndMaxLocalCoords,
-				_getMinAndMaxGlobalCoords,
-				fieldComponentCount,
-				dim,
-				isCheckpointedAndReloaded,
-				communicator,
-				fV_Register );
+	self = (FeVariable*) _FieldVariable_New(  FIELDVARIABLE_PASSARGS  );
 	
 	/** General info */
 	
 	/** Virtual functions */
 	self->_interpolateWithinElement = _interpolateWithinElement;
-	self->_getValueAtNode           = _getValueAtNode;
+	self->_getValueAtNode = _getValueAtNode;
 	self->_syncShadowValues = _syncShadowValues;
 	
 	/** FeVariable info */
-	if( initFlag ){
-		_FeVariable_Init( self, feMesh, geometryMesh, dofLayout, bcs, ics, linkedDofInfo,
-			templateFeVariable, isReferenceSolution, loadReferenceEachTimestep  );
-	}
 	
 	return self;
 }
 
 
 void _FeVariable_Init( 
-		FeVariable*                                     self,
-		void*                                           feMesh,
-		void*                                           geometryMesh,
-		DofLayout*                                      dofLayout, 
-		void*                                           bcs,
-		void*                                           ics,
-		void*                                           linkedDofInfo,
-		void*                                           templateFeVariable,
-		Bool                                            isReferenceSolution,
-		Bool                                            loadReferenceEachTimestep )
+	FeVariable*	self,
+	void*			feMesh,
+	void*			geometryMesh,
+	DofLayout*	dofLayout, 
+	void*			bcs,
+	void*			ics,
+	void*			linkedDofInfo,
+	void*			templateFeVariable,
+	Bool			isReferenceSolution,
+	Bool			loadReferenceEachTimestep )
 {
-	Stream*              errorStream = Journal_Register( Error_Type, self->type );
+	Stream* errorStream = Journal_Register( Error_Type, self->type );
 	/** General and Virtual info should already be set */
 	
 	/** FeVariable info */
-	self->isConstructed = True;
 	self->debug = Stream_RegisterChild( StgFEM_Discretisation_Debug, self->type );
 	self->feMesh = Stg_CheckType( feMesh, FeMesh );
 	/** Set pointer for geometry mesh - if none is provided then it'll use the feMesh */
-	self->geometryMesh = ( geometryMesh ? 
-			Stg_CheckType( geometryMesh, FeMesh ) : 
-			Stg_CheckType( feMesh, FeMesh ) );
+	self->geometryMesh = ( geometryMesh ?  Stg_CheckType( geometryMesh, FeMesh ) : Stg_CheckType( feMesh, FeMesh ) );
 	self->dofLayout = dofLayout;
 	if ( bcs )
 		self->bcs = Stg_CheckType( bcs, VariableCondition );
@@ -359,8 +252,7 @@ void _FeVariable_Init(
 			self->eqNum = self->templateFeVariable->eqNum;
 		}
 		else {
-			self->eqNum = FeEquationNumber_New( defaultFeVariableFeEquationNumberName, self->feMesh,
-				self->dofLayout, self->bcs, linkedDofInfo );
+			self->eqNum = FeEquationNumber_New( defaultFeVariableFeEquationNumberName, self->context, self->feMesh, self->dofLayout, self->bcs, linkedDofInfo );
 			self->eqNum->removeBCs = self->removeBCs;
 		}
 	}
@@ -369,8 +261,7 @@ void _FeVariable_Init(
 
 	self->isReferenceSolution = isReferenceSolution;
 	self->loadReferenceEachTimestep = loadReferenceEachTimestep;
-	Journal_Firewall( (self->loadReferenceEachTimestep != True), errorStream,
-		 "The loadReferenceEachTimestep feature isn't implemented yet, sorry.\n" );
+	Journal_Firewall( (self->loadReferenceEachTimestep != True), errorStream, "The loadReferenceEachTimestep feature isn't implemented yet, sorry.\n" );
 
 	self->dynamicBCs[0] = NULL;
 	self->dynamicBCs[1] = NULL;
@@ -381,24 +272,14 @@ void _FeVariable_Init(
 	self->inc = IArray_New();
 }
 
-
 void _FeVariable_Delete( void* variable ) {
 	FeVariable* self = (FeVariable*)variable;
-	
 	Journal_DPrintf( self->debug, "In %s- for \"%s\":\n", __func__, self->name );
-	Stream_IndentBranch( StgFEM_Debug );
-	if( self->eqNum && ( NULL == self->templateFeVariable ) ) {
-		Stg_Class_Delete( self->eqNum );
-	}
-	/** feMesh bc and doflayout are purposely not deleted */
-
-	NewClass_Delete( self->inc );
-
+	
 	/** Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
-
 
 /** --- Virtual Function Implementations --- */
 
@@ -448,7 +329,6 @@ void _FeVariable_Print( void* variable, Stream* stream ) {
 		Journal_Printf( stream, "\teqNum: (null)... not built yet\n" );
 	}
 }
-
 
 void* _FeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	FeVariable*	self = (FeVariable*)feVariable;
@@ -540,6 +420,8 @@ void _FeVariable_Build( void* variable, void* data ) {
 
 		dim = Mesh_GetDimSize(self->feMesh);
 		/** allocate GNx here */
+#if 0
+/* WTF? This is NOT the way to do this!!!! */
 		if( !strcmp( self->feMesh->name, "linearMesh" ) ) {
 			numNodes = ( dim == 2 ) ? 4 : 8;
 		}
@@ -547,40 +429,44 @@ void _FeVariable_Build( void* variable, void* data ) {
 			numNodes = ( dim == 2 ) ? 9 : 27;
 		} 
 		else { numNodes = 0; } /** for constantMesh type */
+#endif
+		/* At least this will work for meshes with names other
+			than those listed above. I spent three hours finding
+			this out.*/
+		numNodes = FeMesh_GetElementNodeSize(self->feMesh, 0);
 
 		self->GNx = Memory_Alloc_2DArray( double, dim, numNodes, "Global Shape Function Derivatives" );
 		
 		/** don't build the equation numbers for fields that aren't being solved for 
 		 * (ie: error and reference fields) */
 		if( !self->isReferenceSolution && self->buildEqNums ) {
-			FeEquationNumber_Build( self->eqNum );
+			Stg_Component_Build( self->eqNum, data, False );
 		}
 
 		Stream_UnIndentBranch( StgFEM_Debug );
 	}
 }
 
-void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data ) 
-{
-	FeVariable*         self          	= (FeVariable*)variable;
-	FeMesh*             feMesh        	= NULL;
-	FeMesh*             geometryMesh  	= NULL;
-	DofLayout*          dofLayout     	= NULL;
-	VariableCondition*  bc            	= NULL;
-	VariableCondition*  ic            	= NULL;
+void _FeVariable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data ) {
+	FeVariable*         self = (FeVariable*)variable;
+	FeMesh*             feMesh = NULL;
+	FeMesh*             geometryMesh = NULL;
+	DofLayout*          dofLayout = NULL;
+	VariableCondition*  bc = NULL;
+	VariableCondition*  ic = NULL;
 	LinkedDofInfo*      linkedDofInfo 	= NULL;
 	Bool                isReferenceSolution = False;
 	Bool                loadReferenceEachTimestep = False;
 
-	_FieldVariable_Construct( self, cf, data );
+	_FieldVariable_AssignFromXML( self, cf, data );
 
-	feMesh        = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FEMesh",        FeMesh, True, data );
-	geometryMesh  = Stg_ComponentFactory_ConstructByKey( cf, self->name, "GeometryMesh",  FeMesh, False, data );
-	dofLayout     = Stg_ComponentFactory_ConstructByKey( cf, self->name, DofLayout_Type,  DofLayout,          True, data );
+	feMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FEMesh", FeMesh, True, data );
+	geometryMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "GeometryMesh", FeMesh, False, data );
+	dofLayout = Stg_ComponentFactory_ConstructByKey( cf, self->name, DofLayout_Type, DofLayout, True, data );
 
-	ic            = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IC",            VariableCondition,  False, data );
-	bc            = Stg_ComponentFactory_ConstructByKey( cf, self->name, "BC",            VariableCondition,  False, data );
-	linkedDofInfo = Stg_ComponentFactory_ConstructByKey( cf, self->name, "LinkedDofInfo", LinkedDofInfo,      False, data );
+	ic = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IC", VariableCondition, False, data );
+	bc = Stg_ComponentFactory_ConstructByKey( cf, self->name, "BC", VariableCondition, False, data );
+	linkedDofInfo = Stg_ComponentFactory_ConstructByKey( cf, self->name, "LinkedDofInfo", LinkedDofInfo, False, data );
 
 	isReferenceSolution = Stg_ComponentFactory_GetBool( cf, self->name, "isReferenceSolution", False );
 	loadReferenceEachTimestep = Stg_ComponentFactory_GetBool( cf, self->name, "loadReferenceEachTimestep", False );
@@ -588,14 +474,13 @@ void _FeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data
 	/** TODO: should really be a parameter */
 	self->removeBCs = Stg_ComponentFactory_GetBool( cf, self->name, "removeBCs", True );
 
-	_FeVariable_Init( self, feMesh, geometryMesh, dofLayout, bc, ic, linkedDofInfo, NULL,
-		isReferenceSolution, loadReferenceEachTimestep );
+	_FeVariable_Init( self, feMesh, geometryMesh, dofLayout, bc, ic, linkedDofInfo, NULL, isReferenceSolution, loadReferenceEachTimestep );
 }
 
 void _FeVariable_Initialise( void* variable, void* data ) {
-	FeVariable*              self = (FeVariable*)variable;
-	DomainContext*   context = (DomainContext*)data;
-	char*                    inputPathString = NULL;
+	FeVariable* 	self = (FeVariable*)variable;
+	DomainContext*	context = self->context; 
+	char*				inputPathString = NULL;
    Dictionary_Entry_Value* feVarsList = NULL;
 	
 	Journal_DPrintf( self->debug, "In %s- for %s:\n", __func__, self->name );
@@ -610,7 +495,7 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	}
 
 	if( !self->isReferenceSolution ) {	
-		FeEquationNumber_Initialise( self->eqNum );
+		Stg_Component_Initialise( self->eqNum, data, False );
 	}
 
 	if ( context ) {
@@ -643,8 +528,8 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	
 		if ( self->ics && !(context && (True == context->loadFromCheckPoint) && (True == self->isCheckpointedAndReloaded)) ) {
 			Journal_DPrintf( self->debug, "regular (non-restart) mode -> applying ICs specified in XML/constructor\n" );
-			Stg_Component_Initialise( self->ics, data, False );
-			VariableCondition_Apply( self->ics, data );
+			Stg_Component_Initialise( self->ics, context, False );
+			VariableCondition_Apply( self->ics, context );
 		}
 		else {
 			char * filename = NULL;
@@ -724,9 +609,9 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	}
    
 	if ( self->bcs ) {
-		Stg_Component_Initialise( self->bcs, data, False );
+		Stg_Component_Initialise( self->bcs, context, False );
 		Journal_DPrintf( self->debug, "applying the B.C.s for this Variable.\n" ); 
-		VariableCondition_Apply( self->bcs, data );
+		VariableCondition_Apply( self->bcs, context );
 	}
 
 	Stream_UnIndentBranch( StgFEM_Debug );
@@ -795,6 +680,20 @@ void _FeVariable_Destroy( void* variable, void* data ) {
 	FeVariable* self = (FeVariable*)variable;
 
 	Memory_Free( self->GNx );
+
+	Stream_IndentBranch( StgFEM_Debug );
+
+	if( self->eqNum && ( NULL == self->templateFeVariable ) ) {
+		_Stg_Component_Delete( self->eqNum );
+      self->eqNum = NULL;
+	}
+	/** feMesh bc and doflayout are purposely not deleted */
+
+   if( self->inc == NULL ) {
+      NewClass_Delete( self->inc );
+      self->inc = NULL;
+   }
+
 	_FieldVariable_Destroy( self, data );
 }
 
@@ -806,7 +705,6 @@ void FeVariable_PrintLocalDiscreteValues( void* variable, Stream* stream ) {
 	_FeVariable_PrintLocalOrDomainValues( variable, FeMesh_GetNodeLocalSize( self->feMesh ), stream );
 }
 
-
 unsigned _FeVariable_ClosestNode( FeVariable* self, double* crd ) {
 	assert( self );
 	return Mesh_NearestVertex( self->feMesh, crd );
@@ -814,9 +712,9 @@ unsigned _FeVariable_ClosestNode( FeVariable* self, double* crd ) {
 
 
 InterpolationResult _FeVariable_InterpolateValueAt( void* variable, double* globalCoord, double* value ) {
-	FeVariable*		self = (FeVariable*)variable;
+	FeVariable*				self = (FeVariable*)variable;
 	Element_DomainIndex	elementCoordIn = (unsigned)-1;
-	Coord			elLocalCoord={0,0,0};
+	Coord						elLocalCoord={0,0,0};
 	InterpolationResult	retValue;
 
 
@@ -1257,12 +1155,11 @@ Bool FeVariable_InterpolateDerivativesAt( void* variable, double* globalCoord, d
 }
 
 void FeVariable_InterpolateDerivativesToElLocalCoord( void* _feVariable, Element_DomainIndex lElement_I, Coord elLocalCoord, double* value ) {
-	FeVariable*    self             = (FeVariable*) _feVariable;
-	ElementType*            elementType      = FeMesh_GetElementType( self->feMesh, lElement_I );
-	Node_Index              elementNodeCount = elementType->nodeCount;
-	double**                GNx; 
-	double                  detJac;
-	Dimension_Index         dim         = self->dim;
+	FeVariable*			self = (FeVariable*) _feVariable;
+	ElementType*		elementType = FeMesh_GetElementType( self->feMesh, lElement_I );
+	double**				GNx; 
+	double				detJac;
+	Dimension_Index	dim = self->dim;
 
 	GNx = self->GNx;
 
@@ -1277,32 +1174,38 @@ void FeVariable_InterpolateDerivativesToElLocalCoord( void* _feVariable, Element
 }
 
 void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_LocalIndex lElement_I, double** GNx, double* value ) {
-	FeVariable*             self        = (FeVariable*) _feVariable;
+	FeVariable*             self = (FeVariable*) _feVariable;
 	Node_ElementLocalIndex  elLocalNode_I;
 	Node_LocalIndex         lNode_I;
 	Dof_Index               dof_I;
 	Dof_Index               dofCount;
-	Variable*               dofVariable;
+	/* Variable*               dofVariable; */
 	double                  nodeValue;
-	unsigned		nInc, *inc;
-	Dimension_Index         dim         = self->dim;
+	unsigned						nInc, *inc;
+	Dimension_Index         dim = self->dim;
+	double*						tmpVal;
 
 	/** Gets number of degrees of freedom - assuming it is the same throughout the mesh */
 	dofCount = self->dofLayout->dofCounts[0];
 
 	/** Initialise */
 	memset( value, 0, sizeof( double ) * dofCount * dim );
+	tmpVal = (double*)malloc( dim*dofCount*sizeof(double) );
 
 	FeMesh_GetElementNodes( self->feMesh, lElement_I, self->inc );
 	nInc = IArray_GetSize( self->inc );
 	inc = IArray_GetPtr( self->inc );
 
-	for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
 		/** Interpolate derivative from nodes */
-		for ( elLocalNode_I = 0 ; elLocalNode_I < nInc ; elLocalNode_I++) {
-			lNode_I      = inc[ elLocalNode_I ];
-			dofVariable  = DofLayout_GetVariable( self->dofLayout, lNode_I, dof_I );
-			nodeValue    = Variable_GetValueDouble( dofVariable, lNode_I );
+        for ( elLocalNode_I = 0 ; elLocalNode_I < nInc ; elLocalNode_I++) {
+
+                lNode_I      = inc[ elLocalNode_I ];
+                FeVariable_GetValueAtNode( self, lNode_I, tmpVal );
+                /*dofVariable  = DofLayout_GetVariable( self->dofLayout, lNode_I, dof_I );*/
+                /*nodeValue    = Variable_GetValueDouble( dofVariable, lNode_I );*/
+
+                for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
+                        nodeValue = tmpVal[dof_I];
 			
 			value[dof_I*dim + 0] += GNx[0][elLocalNode_I] * nodeValue;
 			value[dof_I*dim + 1] += GNx[1][elLocalNode_I] * nodeValue;
@@ -1310,6 +1213,8 @@ void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_Local
 				value[dof_I*dim + 2] += GNx[2][elLocalNode_I] * nodeValue;	
 		}
 	}
+
+        free( tmpVal );
 }
 
 void FeVariable_InterpolateValue_WithNi( void* _feVariable, Element_LocalIndex lElement_I, double* Ni, double* value ) {
@@ -1708,19 +1613,20 @@ void _FeVariable_PrintLocalOrDomainValues( void* variable, Index localOrDomainCo
 	}
 }
 
-void FeVariable_InterpolateFromMeshLocalCoord( void* feVariable, FeMesh* mesh, Element_DomainIndex dElement_I, double* localCoord, double* value ) {
+InterpolationResult FeVariable_InterpolateFromMeshLocalCoord( void* feVariable, FeMesh* mesh, Element_DomainIndex dElement_I, double* localCoord, double* value ) {
 	FeVariable*          self               = (FeVariable*)         feVariable;
 
 	if ( mesh == self->feMesh ) {
 		/** If the meshes are identical - then we can just interpolate within the elements because the elements are the same */
 		FeVariable_InterpolateWithinElement( self, dElement_I, localCoord, value );
+                return LOCAL;
 	}
 	else {
 		Coord               globalCoord;
 
 		/** If the meshes are different - then we must find the global coordinates and interpolate to that */
 		FeMesh_CoordLocalToGlobal( mesh, dElement_I, localCoord, globalCoord );
-		FieldVariable_InterpolateValueAt( feVariable, globalCoord, value );
+		return FieldVariable_InterpolateValueAt( feVariable, globalCoord, value );
 	}
 	
 }
@@ -1997,11 +1903,11 @@ double FeVariable_IntegratePlane( void* feVariable, Axis planeAxis, double plane
 	if (self->dim == 3)
 		dimExists[ bAxis ] = True;
 	
-	singleCellLayout = SingleCellLayout_New( "cellLayout", dimExists, NULL, NULL );
+	singleCellLayout = SingleCellLayout_New( "cellLayout", (AbstractContext*)self->context, dimExists, NULL, NULL );
 	particlesPerDim[ planeAxis ] = 1;
-	gaussParticleLayout = GaussParticleLayout_New( "particleLayout", self->dim - 1, particlesPerDim );
+	gaussParticleLayout = GaussParticleLayout_New( "particleLayout", NULL, LocalCoordSystem, True, self->dim - 1, particlesPerDim );
 	tmpSwarm = Swarm_New( 
-			"tmpgaussSwarm",
+			"tmpgaussSwarm", NULL,
 			singleCellLayout, 
 			gaussParticleLayout,
 			self->dim,
@@ -2042,8 +1948,8 @@ void FeVariable_ImportExportInfo_Delete( void* ptr ) {
 
 void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoords ) {
 	FeVariable*       self = (FeVariable*)feVariable;
-	Node_LocalIndex   lNode_I = 0;
-	Node_GlobalIndex  gNode_I = 0;
+	Node_LocalIndex   lNode_I;
+	Node_GlobalIndex  gNode_I;
 	double*           coord;
 	Dof_Index         dof_I;
 	Dof_Index         dofAtEachNodeCount;
@@ -2066,6 +1972,8 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
    FILE*             outputFile;
 #endif 
 
+	lNode_I = 0; gNode_I = 0;
+
 	MPI_Comm_size( comm, (int*)&nProcs );
 	MPI_Comm_rank( comm, (int*)&myRank );
 	
@@ -2083,7 +1991,6 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
       hid_t      attribData_id, attrib_id, group_id;
       hsize_t    a_dims;
       int        attribData;
-      int        res[3];
       Grid**     grid;
       unsigned*  sizes;
       
@@ -2294,9 +2201,11 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 	Node_GlobalIndex   gNode_I = 0;
 	Dof_Index          dof_I;
 	Dof_Index          dofAtEachNodeCount;
+#ifndef READ_HDF5
 	FILE*              inputFile;
+#endif
 	double             variableVal;
-	Processor_Index    proc_I=0;
+	Processor_Index    proc_I;
 	MPI_Comm	          comm = Comm_GetMPIComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
 	unsigned		       rank;
 	unsigned		       nRanks;
@@ -2327,6 +2236,8 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 	MPI_Comm_size( comm, (int*)&nRanks );
 	
 	dofAtEachNodeCount = self->fieldComponentCount;
+	proc_I = 0;
+	nDims = 0;
 	
 #ifdef READ_HDF5	
    
@@ -2575,48 +2486,34 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 	FeVariable_SyncShadowValues( self );
 }
 
-
 void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, const char* feVarFilename, const char* meshFilename ){
-	FeVariable*                    self = (FeVariable*)feVariable;
-   Stream*                        errorStr = Journal_Register( Error_Type, self->type );   
+	FeVariable*							self = (FeVariable*)feVariable;
+   Stream*								errorStr = Journal_Register( Error_Type, self->type );   
 #ifdef READ_HDF5
-   CartesianGenerator*            gen;
-   C0Generator*                   C0gen;
-   FeMesh                         *feMesh, *C0feMesh, *elementMesh;
-   DofLayout*                     dofs;
-   FeEquationNumber*              eqNum;
-   Variable_Register*             varReg;
-   int                            maxDecomp[3] = {0, 1, 1};
-   static int                     arraySize;
-   static double*                 arrayPtrs[2];
-   Variable*                      var;
-   VariableCondition*             bcs;
-   ConditionFunction_Register*    cfReg;
-   Dictionary*                    dict;
-   XML_IO_Handler*                ioHandler;
-   FeVariable*                    feVar;
-   int                            n_i;
-   hid_t                          file, fileSpace, fileData, error;
-   unsigned                       totalNodes, ii;
-   FeCheckpointFileVersion        ver;
-   hid_t                          attrib_id, group_id;
-   herr_t                         status;
-   int                            res[3];
-   int                            checkVer;
-   int                            ndims;
-   unsigned*                      sizes;
-	double			                crdMin[3], crdMax[3];
-	double*                        value;
-	unsigned		                   nDomainVerts;
-	static double*		             arrayPtr;
-   Name			                   varName[9];
+   CartesianGenerator*				gen;
+   C0Generator*						C0gen;
+   FeMesh								*feMesh, *C0feMesh, *elementMesh;
+   DofLayout*							dofs;
+   Variable_Register*				varReg;
+   Variable*							var;
+   FeVariable*							feVar;
+   hid_t									file, fileData;
+   unsigned								totalNodes, ii;
+   hid_t									attrib_id, group_id;
+   herr_t								status;
+   int									res[3];
+   int									checkVer;
+   int									ndims;
+	double								crdMin[3], crdMax[3];
+	double*								value;
+	unsigned								nDomainVerts;
+	static double*						arrayPtr;
+   Name									varName[9];
 
    /** Open the file and data set. */
 	file = H5Fopen( meshFilename, H5F_ACC_RDONLY, H5P_DEFAULT );
 	
-	Journal_Firewall(	file >= 0, errorStr,
-		"Error in %s for %s '%s' - Cannot open file %s.\n", 
-		__func__, self->type, self->name, meshFilename );
+	Journal_Firewall(	file >= 0, errorStr, "Error in %s for %s '%s' - Cannot open file %s.\n", __func__, self->type, self->name, meshFilename );
 
    /** get the file attributes to sanity and version checks */
    #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
@@ -2628,18 +2525,15 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    #endif
    /** if this attribute does not exist (attrib_id < 0) then we assume MeshCHECKPOINT_V1 which is not supported  */
    if(attrib_id < 0)
-      Journal_Firewall(NULL, 
-                  errorStr,"\nError in %s for %s '%s' \n\n Interpolation restart not supported for Version 1 Checkpoint files \n\n", __func__, self->type, self->name );
+      Journal_Firewall( 0, errorStr,"\nError in %s for %s '%s' \n\n Interpolation restart not supported for Version 1 Checkpoint files \n\n", __func__, self->type, self->name );
 
    /** check for known checkpointing version type */
 
    status = H5Aread(attrib_id, H5T_NATIVE_INT, &checkVer);
    H5Aclose(attrib_id);
    if(checkVer != 2)
-      Journal_Firewall( (0), errorStr,
-         "\n\nError in %s for %s '%s'\n"
-         "Unknown checkpoint version (%u) for checkpoint file (%s).\n", 
-         __func__, self->type, self->name, (unsigned int) checkVer, meshFilename);
+      Journal_Firewall( (0), errorStr, "\n\nError in %s for %s '%s'\n" "Unknown checkpoint version (%u) for checkpoint file (%s).\n", __func__,
+			 self->type, self->name, (unsigned int) checkVer, meshFilename);
 
    /** check for correct number of dimensions */
 
@@ -2689,18 +2583,18 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    H5Fclose( file );
 
    /** create a cartesian mesh generator which will be required for the fevariable creation */
-   gen = CartesianGenerator_New( "" );
+   gen = CartesianGenerator_New( "", NULL );
    /** use the feVariable dimension size for mesh generator */
    CartesianGenerator_SetDimSize( gen, self->dim );
    /** use the element size read in from the checkpoint file for the new mesh generator */
    CartesianGenerator_SetTopologyParams( gen, (unsigned*)res, 0, NULL, NULL );
 	/** use the feVariable's mesh's generator's crdMin and crdMax (which have been previously read in from checkpointed mesh file  */
-   CartesianGenerator_SetGeometryParams( gen, &crdMin, &crdMax );
+   CartesianGenerator_SetGeometryParams( gen, (double*)&crdMin, (double*)&crdMax );
    /** set it so that the generator does not read in the mesh from a file - we will 
               explicitly do this after we build the feMesh using the provided mesh checkpoint file */
    gen->readFromFile = False;
    /** create a feMesh */
-   feMesh = FeMesh_New( "" );
+   feMesh = FeMesh_New( "", NULL );
    /** set feMesh to use generator we just created  */
    Mesh_SetGenerator( feMesh, gen );
    /** set the feMesh family to be the same as that of the feVariable we are initialising/interpolating ie constant, linear, etc 
@@ -2719,7 +2613,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
       gen->periodic[1] = ((CartesianGenerator*)((C0Generator*)self->feMesh->generator)->elMesh)->periodic[1];
       gen->periodic[2] = ((CartesianGenerator*)((C0Generator*)self->feMesh->generator)->elMesh)->periodic[2];
    } else
-      Journal_Firewall(NULL, errorStr,"\nError in %s for %s '%s' \n\n Interpolation restart not supported for this mesh type \n\n", __func__, self->type, self->name );
+      Journal_Firewall( 0, errorStr,"\nError in %s for %s '%s' \n\n Interpolation restart not supported for this mesh type \n\n", __func__, self->type, self->name );
 
    /** now build the mesh, then read in the required coordinates from the given file */
    Stg_Component_Build( feMesh, NULL, False );
@@ -2729,11 +2623,11 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    if (!strcmp(self->feMesh->generator->type, C0Generator_Type)){
       elementMesh = feMesh;
       /** create the C0 generator */
-      C0gen = C0Generator_New( "" );
+      C0gen = C0Generator_New( "", (AbstractContext*)self->context );
       /** set it's element mesh to the feMesh create just above */
       C0Generator_SetElementMesh( C0gen, (void*) elementMesh );
       /** create a new feMesh */
-      C0feMesh = FeMesh_New( "" );
+      C0feMesh = FeMesh_New( "", NULL );
       /** set feMesh to use generator we just created, and set its type to constant mesh  */
       Mesh_SetGenerator( C0feMesh, C0gen );
       FeMesh_SetElementFamily( C0feMesh, self->feMesh->feElFamily );
@@ -2748,18 +2642,13 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
 
    varReg = Variable_Register_New();
    if (self->fieldComponentCount == 1){
-      var = Variable_NewScalar( "interpolation_temp_scalar", 
-                                 Variable_DataType_Double,
-                                 &nDomainVerts,
-                                 NULL,
-                                 &arrayPtr,
-                                 varReg );
-   }
-   else {
+      var = Variable_NewScalar( "interpolation_temp_scalar", (AbstractContext*)self->context, Variable_DataType_Double, &nDomainVerts, NULL, &arrayPtr, varReg );
+   } else {
       unsigned var_I;
 		for( var_I = 0; var_I < self->fieldComponentCount; var_I++ )
 			Stg_asprintf( &varName[var_I], "%s-loaded-Component-%d", self->name, var_I );
       var = Variable_NewVector( "interpolation_temp_vector", 
+											(AbstractContext*)self->context,
                                  Variable_DataType_Double,
                                  self->fieldComponentCount,
                                  &nDomainVerts,
@@ -2773,7 +2662,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    var->allocateSelf = True;   
    Stg_Component_Build( var, NULL, False );
 
-   dofs = DofLayout_New( "interpolation_temp_dof", varReg, nDomainVerts, feMesh );
+   dofs = DofLayout_New( "interpolation_temp_dof", self->context, varReg, nDomainVerts, feMesh );
 	if( self->fieldComponentCount == 1 )
 		DofLayout_AddAllFromVariableArray( dofs, 1, &var );
 	else {
@@ -2792,18 +2681,21 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    Stg_Component_Build( dofs, NULL, False );
    Stg_Component_Initialise( dofs, NULL, False );
 
-   feVar = FeVariable_New( "interpolation_temp_fevar", 
-                                               feMesh, 
-                                                 NULL, 
-                                                 dofs, 
-                                                 NULL, 
-                                                 NULL, 
-                                                 NULL, 
-                            self->fieldComponentCount, 
-                                                False, 
-                                                 True, 
-                                                False, 
-                                             NULL );
+   feVar = FeVariable_New(
+		"interpolation_temp_fevar", 
+		self->context,
+  		feMesh, 
+  		NULL, 
+		dofs, 
+		NULL, 
+		NULL, 
+		NULL, 
+		self->fieldComponentCount, 
+		False, 
+		True, 
+		False, 
+		NULL );
+
    Stg_Component_Build( feVar, context, False );
    /** not sure why these aren't being set correctly, so a little (tri/ha)ckery */
    feVar->fieldComponentCount = self->fieldComponentCount;
@@ -2812,11 +2704,10 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    feVar->_syncShadowValues( feVar );
 
    totalNodes = Mesh_GetLocalSize( self->feMesh, MT_VERTEX );
-   value      = Memory_Alloc_Array( double, self->fieldComponentCount, "interValue" );
+   value = Memory_Alloc_Array( double, self->fieldComponentCount, "interValue" );
          
    /** step through nodes, interpolating the required values from our newly created feVariable */
    for( ii=0; ii<totalNodes; ii++ ) {
-      unsigned dof_I;
       feVar->_interpolateValueAt( feVar, Mesh_GetVertex( self->feMesh, ii ), value);
       FeVariable_SetValueAtNode( self, ii, value);
    }
@@ -2828,6 +2719,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    _Variable_Delete(var);
    _Variable_Register_Delete(varReg);
    _FeMesh_Delete(feMesh);
+
    if (!strcmp(self->feMesh->generator->type, C0Generator_Type)){
       _C0Generator_Delete(C0gen);
       _FeMesh_Delete(elementMesh);
@@ -2839,4 +2731,6 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
                errorStr,"\n\n Interpolation restart not supported for ASCII checkpoint files \n\n");
 #endif   
 }
+
+
 

@@ -52,7 +52,7 @@ const Type StgFEM_PrintFeVariableDiscreteValues_Type = "StgFEM_PrintFeVariableDi
 
 const char* PRINT_FE_VARIABLE_DISCRETE_VALUES_TAG = "PrintFeVariableDiscreteValues";
 
-void _StgFEM_PrintFeVariableDiscreteValues_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _StgFEM_PrintFeVariableDiscreteValues_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	FiniteElementContext* context;
 
 	context = (FiniteElementContext*)Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data ); 
@@ -64,7 +64,7 @@ void* _StgFEM_PrintFeVariableDiscreteValues_DefaultNew( Name name ) {
 	return Codelet_New(
 			StgFEM_PrintFeVariableDiscreteValues_Type,
 			_StgFEM_PrintFeVariableDiscreteValues_DefaultNew,
-			_StgFEM_PrintFeVariableDiscreteValues_Construct,
+			_StgFEM_PrintFeVariableDiscreteValues_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,
@@ -126,3 +126,5 @@ void PrintFeVariableDiscreteValues( void* _context ) {
 		Journal_Printf( stream, "\n" );
 	}
 }
+
+

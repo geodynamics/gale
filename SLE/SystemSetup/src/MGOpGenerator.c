@@ -49,12 +49,12 @@ const Type MGOpGenerator_Type = "MGOpGenerator";
 ** Constructors
 */
 
-MGOpGenerator* _MGOpGenerator_New( MGOPGENERATOR_DEFARGS ) {
+MGOpGenerator* _MGOpGenerator_New(  MGOPGENERATOR_DEFARGS  ) {
 	MGOpGenerator*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(MGOpGenerator) );
-	self = (MGOpGenerator*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(MGOpGenerator) );
+	self = (MGOpGenerator*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	/* stuff previously housed in the MatrixSolver class */
 	self->solver = malloc( sizeof( MGSolver_PETScData ) );
@@ -96,7 +96,7 @@ void _MGOpGenerator_Delete( void* mgOpGenerator ) {
 
 	/* this stuff was previously taken care of in the MatrixSolver class */
 	if( self->solver ) {
-		if( self->solver->ksp != PETSC_NULL )         KSPDestroy( self->solver->ksp );
+            /*if( self->solver->ksp != PETSC_NULL )         KSPDestroy( self->solver->ksp );*/
 		if( self->solver->matrix != PETSC_NULL )      MatDestroy( self->solver->matrix );
 		if( self->solver->inversion != PETSC_NULL )   MatDestroy( self->solver->inversion );
 		if( self->solver->residual != PETSC_NULL )    VecDestroy( self->solver->residual );
@@ -123,7 +123,7 @@ void _MGOpGenerator_Print( void* mgOpGenerator, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void _MGOpGenerator_Construct( void* mgOpGenerator, Stg_ComponentFactory* cf, void* data ) {
+void _MGOpGenerator_AssignFromXML( void* mgOpGenerator, Stg_ComponentFactory* cf, void* data ) {
 	MGOpGenerator*		self = (MGOpGenerator*)mgOpGenerator;
 
 	assert( self && Stg_CheckType( self, MGOpGenerator ) );
@@ -179,3 +179,5 @@ unsigned MGOpGenerator_GetNumLevels( void* mgOpGenerator ) {
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+

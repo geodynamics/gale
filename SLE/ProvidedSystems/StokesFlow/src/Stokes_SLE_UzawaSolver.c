@@ -59,22 +59,26 @@
 const Type Stokes_SLE_UzawaSolver_Type = "Stokes_SLE_UzawaSolver";
 
 void* _Stokes_SLE_UzawaSolver_DefaultNew( Name name ) {
-	return (void*) _Stokes_SLE_UzawaSolver_New( 
-		sizeof(Stokes_SLE_UzawaSolver), 
-		Stokes_SLE_UzawaSolver_Type, 
-		_Stokes_SLE_UzawaSolver_Delete, 
-		_Stokes_SLE_UzawaSolver_Print, 
-		_Stokes_SLE_UzawaSolver_Copy,
-		_Stokes_SLE_UzawaSolver_DefaultNew,
-		_Stokes_SLE_UzawaSolver_Construct,
-		_Stokes_SLE_UzawaSolver_Build,
-		_Stokes_SLE_UzawaSolver_Initialise,
-		_SLE_Solver_Execute,
-		_SLE_Solver_Destroy,
-		_Stokes_SLE_UzawaSolver_SolverSetup, 
-		_Stokes_SLE_UzawaSolver_Solve, 
-		_Stokes_SLE_UzawaSolver_GetResidual,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Stokes_SLE_UzawaSolver);
+	Type                                                      type = Stokes_SLE_UzawaSolver_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Stokes_SLE_UzawaSolver_Delete;
+	Stg_Class_PrintFunction*                                _print = _Stokes_SLE_UzawaSolver_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Stokes_SLE_UzawaSolver_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Stokes_SLE_UzawaSolver_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Stokes_SLE_UzawaSolver_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Stokes_SLE_UzawaSolver_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Stokes_SLE_UzawaSolver_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _SLE_Solver_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Stokes_SLE_UzawaSolver_Destroy;
+	SLE_Solver_SolverSetupFunction*                   _solverSetup = _Stokes_SLE_UzawaSolver_SolverSetup;
+	SLE_Solver_SolveFunction*                               _solve = _Stokes_SLE_UzawaSolver_Solve;
+	SLE_Solver_GetResidualFunc*                       _getResidual = _Stokes_SLE_UzawaSolver_GetResidual;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _Stokes_SLE_UzawaSolver_New(  STOKES_SLE_UZAWASOLVER_PASSARGS  );
 }
 
 Stokes_SLE_UzawaSolver* Stokes_SLE_UzawaSolver_New( 
@@ -97,43 +101,13 @@ Stokes_SLE_UzawaSolver* Stokes_SLE_UzawaSolver_New(
 
 
 /* Creation implementation / Virtual constructor */
-Stokes_SLE_UzawaSolver* _Stokes_SLE_UzawaSolver_New( 
-		SizeT                                       sizeOfSelf,
-		Type                                        type,
-		Stg_Class_DeleteFunction*                   _delete,
-		Stg_Class_PrintFunction*                    _print,
-		Stg_Class_CopyFunction*                     _copy, 
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*            _construct,
-		Stg_Component_BuildFunction*                _build,
-		Stg_Component_InitialiseFunction*           _initialise,
-		Stg_Component_ExecuteFunction*              _execute,
-		Stg_Component_DestroyFunction*              _destroy,
-		SLE_Solver_SolverSetupFunction*             _solverSetup,
-		SLE_Solver_SolveFunction*                   _solve,
-		SLE_Solver_GetResidualFunc*                 _getResidual, 
-		Name                                        name )
+Stokes_SLE_UzawaSolver* _Stokes_SLE_UzawaSolver_New(  STOKES_SLE_UZAWASOLVER_DEFARGS  )
 {
 	Stokes_SLE_UzawaSolver* self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Stokes_SLE_UzawaSolver) );
-	self = (Stokes_SLE_UzawaSolver*) _SLE_Solver_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_solverSetup,
-		_solve,
-		_getResidual, 
-		name );
+	assert( _sizeOfSelf >= sizeof(Stokes_SLE_UzawaSolver) );
+	self = (Stokes_SLE_UzawaSolver*) _SLE_Solver_New(  SLE_SOLVER_PASSARGS  );
 
 	self->_formResidual  = _Stokes_SLE_UzawaSolver_FormResidual;
         self->_getRhs        = _Stokes_SLE_UzawaSolver_GetRhs;
@@ -181,21 +155,9 @@ void Stokes_SLE_UzawaSolver_InitAll(
 
 void _Stokes_SLE_UzawaSolver_Delete( void* solver ) {
 	Stokes_SLE_UzawaSolver* self = (Stokes_SLE_UzawaSolver*)solver;
+
+   _SLE_Solver_Delete( self );
 		
-	Journal_DPrintf( self->debug, "In: %s \n", __func__);
-
-	Stream_IndentBranch( StgFEM_Debug );
-	Journal_DPrintfL( self->debug, 2, "Deleting Solver contexts.\n" );
-	KSPDestroy( self->velSolver );
-	KSPDestroy( self->pcSolver );
-
-	Journal_DPrintfL( self->debug, 2, "Deleting temporary solver vectors.\n" );
-	if( self->pTempVec != PETSC_NULL ) VecDestroy( self->pTempVec );
-	if( self->rVec != PETSC_NULL )     VecDestroy( self->rVec );
-	if( self->sVec != PETSC_NULL )     VecDestroy( self->sVec );
-	if( self->fTempVec != PETSC_NULL ) VecDestroy( self->fTempVec );
-	if( self->vStarVec != PETSC_NULL ) VecDestroy( self->vStarVec );
-	Stream_UnIndentBranch( StgFEM_Debug );
 }       
 
 
@@ -276,7 +238,7 @@ void _Stokes_SLE_UzawaSolver_Build( void* solver, void* stokesSLE ) {
 	Stream_UnIndentBranch( StgFEM_Debug );
 }
 
-void _Stokes_SLE_UzawaSolver_Construct( void* solver, Stg_ComponentFactory* cf, void* data ) {
+void _Stokes_SLE_UzawaSolver_AssignFromXML( void* solver, Stg_ComponentFactory* cf, void* data ) {
 	Stokes_SLE_UzawaSolver* self         = (Stokes_SLE_UzawaSolver*) solver;
 	double                  tolerance;
 	Iteration_Index         maxUzawaIterations, minUzawaIterations;
@@ -284,7 +246,7 @@ void _Stokes_SLE_UzawaSolver_Construct( void* solver, Stg_ComponentFactory* cf, 
 	Bool                    useAbsoluteTolerance;
 	Bool                    monitor;
 
-	_SLE_Solver_Construct( self, cf, data );
+	_SLE_Solver_AssignFromXML( self, cf, data );
 
 	tolerance            = Stg_ComponentFactory_GetDouble( cf, self->name, "tolerance", 1.0e-5 );
 	maxUzawaIterations   = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "maxIterations", 1000 );
@@ -305,6 +267,23 @@ void _Stokes_SLE_UzawaSolver_Execute( void* solver, void* data ) {
 }
 
 void _Stokes_SLE_UzawaSolver_Destroy( void* solver, void* data ) {
+   Stokes_SLE_UzawaSolver* self = (Stokes_SLE_UzawaSolver*) solver;
+	Journal_DPrintf( self->debug, "In: %s \n", __func__);
+
+	Stream_IndentBranch( StgFEM_Debug );
+	Journal_DPrintfL( self->debug, 2, "Destroying Solver contexts.\n" );
+	KSPDestroy( self->velSolver );
+	KSPDestroy( self->pcSolver );
+
+	Journal_DPrintfL( self->debug, 2, "Destroying temporary solver vectors.\n" );
+	if( self->pTempVec != PETSC_NULL ) VecDestroy( self->pTempVec );
+	if( self->rVec != PETSC_NULL )     VecDestroy( self->rVec );
+	if( self->sVec != PETSC_NULL )     VecDestroy( self->sVec );
+	if( self->fTempVec != PETSC_NULL ) VecDestroy( self->fTempVec );
+	if( self->vStarVec != PETSC_NULL ) VecDestroy( self->vStarVec );
+	Stream_UnIndentBranch( StgFEM_Debug );
+   _SLE_Solver_Destroy( self, data );
+
 }
 
 void _Stokes_SLE_UzawaSolver_Initialise( void* solver, void* stokesSLE ) {
@@ -396,7 +375,7 @@ void _remove_constant_nullsp( Vec v )
 }
 
 /* from the depreciated Vector class */
-_SLE_VectorView( Vec v, Stream* stream ) {
+void _SLE_VectorView( Vec v, Stream* stream ) {
 	unsigned	entry_i;
 	PetscInt	size;
 	PetscScalar*	array;
@@ -463,7 +442,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	double                  qReciprocalGlobalProblemScale;
 	int			init_info_stream_rank;	
 	PetscScalar p_sum;
-	Bool nullsp_present;
+	/* Bool nullsp_present; */
 	Bool uzawa_summary;
 	double time,t0,rnorm0;
 
@@ -738,8 +717,24 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 		MatMult( G_Mat, sVec, fTempVec );
 		
 		Journal_DPrintfL( self->debug, 2, "Uzawa inner iteration step\n");
+		
+		//START OF INNER ITERATIONS!!!!
+		/*get initial wall time for inner loop*/
+		self->inneritsinitialtime = MPI_Wtime();
 		KSPSolve( velSolver, fTempVec, vStarVec );
+		/*get end wall time for inner loop*/
+		self->inneritsendtime = MPI_Wtime();
+		
+		/* add time to total time inner its: */
+		self->totalinneritstime = self->totalinneritstime + (-self->inneritsinitialtime + self->inneritsendtime);
+		/* reset initial time and end time for inner its back to 0 - probs don't need to do this but just in case */
+		self->inneritsinitialtime = 0;
+		self->inneritsendtime = 0;
+		
 		KSPGetIterationNumber( velSolver, &innerLoopIterations );
+		/* add the inner loop iterations to the total inner iterations */
+		self->totalnuminnerits = self->totalnuminnerits + innerLoopIterations;
+		
 		Journal_DPrintfL( self->debug, 2, "Completed Uzawa inner iteration in '%u' iterations \n", innerLoopIterations );
 				
 		/* STEP 4.4: Calculate the step size ( \alpha = z_{I-1} . r_{I-1} / (s_I . \hat{K} s_I) )
@@ -828,6 +823,16 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
         	}
 			
 	iteration_I++;  
+	//END OF OUTER ITERATION LOOP!!!
+		/*get wall time for end of outer loop*/
+		self->outeritsendtime = MPI_Wtime();
+		/* add time to total time inner its: */
+		self->totalouteritstime = self->totalouteritstime + (-self->outeritsinitialtime + self->outeritsendtime);
+		/* reset initial time and end time for inner its back to 0 - probs don't need to do this but just in case */
+		self->outeritsinitialtime = 0;
+		self->outeritsendtime = 0;
+		/* add the outer loop iterations to the total outer iterations */
+		self->totalnumouterits++; 
 	}  while ( (*chosenResidual > self->tolerance) || (iteration_I<minIterations) );  
 //	}  while ( *chosenResidual > self->tolerance );
 
@@ -918,7 +923,17 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	#endif
 	Stream_UnIndentBranch( StgFEM_Debug );
 
-        Stream_SetPrintingRank( self->info, init_info_stream_rank );	
+        Stream_SetPrintingRank( self->info, init_info_stream_rank );
+		/* Now gather up data for printing out to FrequentOutput file: */
+	
+	
+	/*!!! if non-linear need to divide by number of nonlinear iterations and we do this in SystemLinearEquations */
+	if((sle->isNonLinear != True)){
+		self->avgnuminnerits = self->totalnuminnerits/self->totalnumouterits;
+		self->avgnumouterits = self->totalnumouterits;
+		self->avgtimeouterits = (self->totalouteritstime - self->totalinneritstime)/self->totalnumouterits;
+		self->avgtimeinnerits = self->totalinneritstime/self->totalnuminnerits;
+	}	
 }
 
 void _Stokes_SLE_UzawaSolver_GetSolution( void *stokesSLE, void *solver, Vec *x )
@@ -1028,4 +1043,6 @@ void _Stokes_SLE_UzawaSolver_FormResidual( void *stokesSLE, void *solver, Vec r 
 Vec _Stokes_SLE_UzawaSolver_GetResidual( void* solver, Index fv_I ) {
 	return NULL;
 }
+
+
 

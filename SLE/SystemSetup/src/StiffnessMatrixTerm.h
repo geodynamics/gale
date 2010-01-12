@@ -67,6 +67,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		FiniteElementContext*				     context;                  \
 		/* Virtual info */ \
 		StiffnessMatrixTerm_AssembleElementFunction*         _assembleElement;         \
 		\
@@ -85,30 +86,25 @@
 	/* Creation implementation / Virtual constructor */
 	StiffnessMatrixTerm* StiffnessMatrixTerm_New(
 		Name                                                 name,
+		FiniteElementContext*				                    context,
 		StiffnessMatrix*                                     stiffnessMatrix,
 		Swarm*                                               integrationSwarm,
 		Stg_Component*                                       extraInfo );
 
-	StiffnessMatrixTerm* _StiffnessMatrixTerm_New( 
-		SizeT                                                _sizeOfSelf,
-		Type                                                 type,
-		Stg_Class_DeleteFunction*                            _delete,
-		Stg_Class_PrintFunction*                             _print,
-		Stg_Class_CopyFunction*                              _copy, 
-		Stg_Component_DefaultConstructorFunction*            _defaultConstructor,
-		Stg_Component_ConstructFunction*                     _construct,
-		Stg_Component_BuildFunction*                         _build,
-		Stg_Component_InitialiseFunction*                    _initialise,
-		Stg_Component_ExecuteFunction*                       _execute,
-		Stg_Component_DestroyFunction*                       _destroy,
-		StiffnessMatrixTerm_AssembleElementFunction*         _assembleElement,
-		Name                                                 name );
 	
-	void StiffnessMatrixTerm_InitAll(
-		void*                                                stiffnessMatrixTerm,
-		StiffnessMatrix*                                     stiffnessMatrix,
-		Swarm*                                               integrationSwarm,
-		Stg_Component*                                       extraInfo );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STIFFNESSMATRIXTERM_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                StiffnessMatrixTerm_AssembleElementFunction*  _assembleElement
+
+	#define STIFFNESSMATRIXTERM_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _assembleElement
+
+	StiffnessMatrixTerm* _StiffnessMatrixTerm_New(  STIFFNESSMATRIXTERM_DEFARGS  );
 	
 	/* 'Stg_Class' Virtual Functions */
 	void _StiffnessMatrixTerm_Delete( void* stiffnessMatrixTerm );
@@ -121,11 +117,18 @@
 	
 	/* 'Stg_Component' Virtual Functions */
 	void* _StiffnessMatrixTerm_DefaultNew( Name name );
-	void _StiffnessMatrixTerm_Construct( void* stiffnessMatrixTerm, Stg_ComponentFactory* cf, void* data );
+	void _StiffnessMatrixTerm_AssignFromXML( void* stiffnessMatrixTerm, Stg_ComponentFactory* cf, void* data );
 	void _StiffnessMatrixTerm_Build( void* stiffnessMatrixTerm, void* data );
 	void _StiffnessMatrixTerm_Initialise( void* stiffnessMatrixTerm, void* data );
 	void _StiffnessMatrixTerm_Execute( void* stiffnessMatrixTerm, void* data );
 	void _StiffnessMatrixTerm_Destroy( void* stiffnessMatrixTerm, void* data );
+
+	void _StiffnessMatrixTerm_Init(
+		void*                                                stiffnessMatrixTerm,
+		FiniteElementContext*				                    context,
+		StiffnessMatrix*                                     stiffnessMatrix,
+		Swarm*                                               integrationSwarm,
+		Stg_Component*                                       extraInfo );
 	
 	void StiffnessMatrixTerm_AssembleElement( 
 			void*                             stiffnessMatrixTerm, 
@@ -146,3 +149,4 @@
 	void StiffnessMatrixTerm_SetAssembleElementFunction( void* stiffnessMatrixTerm, StiffnessMatrixTerm_AssembleElementFunction* assembleElementFunction ) ;
 
 #endif /* __StgFEM_SLE_SystemSetup_StiffnessMatrixTerm_h__ */
+

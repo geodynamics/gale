@@ -54,105 +54,61 @@
 const Type ConstantElementType_Type = "ConstantElementType";
 #define _ConstantElementType_NodeCount 1
 
-void* ConstantElementType_DefaultNew( Name name ) {
-	return _ConstantElementType_New( 
-			sizeof(ConstantElementType),
-			ConstantElementType_Type,
-			_ConstantElementType_Delete,
-			_ConstantElementType_Print,
-			NULL, 
-			ConstantElementType_DefaultNew,
-			_ConstantElementType_Construct,
-			_ConstantElementType_Build,
-			_ConstantElementType_Initialise,
-			_ConstantElementType_Execute,
-			_ConstantElementType_Destroy, 
-			name,
-			False,
-			_ConstantElementType_SF_allNodes,
-			_ConstantElementType_SF_allLocalDerivs_allNodes,
-			_ConstantElementType_ConvertGlobalCoordToElLocal,
-			_ElementType_JacobianDeterminantSurface,
-			_ConstantElementType_SurfaceNormal,
-			_ConstantElementType_NodeCount );
-}
-
 ConstantElementType* ConstantElementType_New( Name name ) {
-	return _ConstantElementType_New( 
-			sizeof(ConstantElementType),
-			ConstantElementType_Type,
-			_ConstantElementType_Delete,
-			_ConstantElementType_Print, 
-			NULL, 
-			ConstantElementType_DefaultNew,
-			_ConstantElementType_Construct,
-			_ConstantElementType_Build,
-			_ConstantElementType_Initialise,
-			_ConstantElementType_Execute,
-			_ConstantElementType_Destroy,
-			name, 
-			True,
-			_ConstantElementType_SF_allNodes,
-			_ConstantElementType_SF_allLocalDerivs_allNodes,
-			_ConstantElementType_ConvertGlobalCoordToElLocal,
-			_ElementType_JacobianDeterminantSurface,
-			_ConstantElementType_SurfaceNormal,
-			_ConstantElementType_NodeCount );
+	ConstantElementType* self = ConstantElementType_DefaultNew( name );
+
+	self->isConstructed = True;	
+	_ElementType_Init( (ElementType*)self, _ConstantElementType_NodeCount );
+	_ConstantElementType_Init( self );	
+
+	return self;
 }
 
+void* ConstantElementType_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                                                            _sizeOfSelf = sizeof(ConstantElementType);
+	Type                                                                                    type = ConstantElementType_Type;
+	Stg_Class_DeleteFunction*                                                            _delete = _ConstantElementType_Delete;
+	Stg_Class_PrintFunction*                                                              _print = _ConstantElementType_Print;
+	Stg_Class_CopyFunction*                                                                _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*                                _defaultConstructor = ConstantElementType_DefaultNew;
+	Stg_Component_ConstructFunction*                                                  _construct = _ConstantElementType_AssignFromXML;
+	Stg_Component_BuildFunction*                                                          _build = _ConstantElementType_Build;
+	Stg_Component_InitialiseFunction*                                                _initialise = _ConstantElementType_Initialise;
+	Stg_Component_ExecuteFunction*                                                      _execute = _ConstantElementType_Execute;
+	Stg_Component_DestroyFunction*                                                      _destroy = _ConstantElementType_Destroy;
+	AllocationType                                                            nameAllocationType = NON_GLOBAL;
+	ElementType_EvaluateShapeFunctionsAtFunction*                      _evaluateShapeFunctionsAt = _ConstantElementType_SF_allNodes;
+	ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*  _evaluateShapeFunctionLocalDerivsAt = _ConstantElementType_SF_allLocalDerivs_allNodes;
+	ElementType_ConvertGlobalCoordToElLocalFunction*                _convertGlobalCoordToElLocal = _ConstantElementType_ConvertGlobalCoordToElLocal;
+	ElementType_JacobianDeterminantSurfaceFunction*                  _jacobianDeterminantSurface = _ElementType_JacobianDeterminantSurface;
+	ElementType_SurfaceNormalFunction*                                            _surfaceNormal = _ConstantElementType_SurfaceNormal;
 
-ConstantElementType* _ConstantElementType_New( 
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*				_construct,
-		Stg_Component_BuildFunction*					_build,
-		Stg_Component_InitialiseFunction*				_initialise,
-		Stg_Component_ExecuteFunction*					_execute,
-		Stg_Component_DestroyFunction*					_destroy,
-		Name								name,
-		Bool								initFlag,
-		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
-		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
-		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
-		ElementType_SurfaceNormalFunction*				_surfaceNormal,
-		Index								nodeCount )
-{
+	return _ConstantElementType_New(  CONSTANTELEMENTTYPE_PASSARGS  );
+}
+
+ConstantElementType* _ConstantElementType_New(  CONSTANTELEMENTTYPE_DEFARGS  ) {
 	ConstantElementType*		self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ConstantElementType) );
-	self = (ConstantElementType*)_ElementType_New( _sizeOfSelf, type, _delete, _print, _copy,
-		_defaultConstructor, _construct, _build, _initialise, _execute, _destroy, name, initFlag,
-		_evaluateShapeFunctionsAt, _evaluateShapeFunctionLocalDerivsAt, _convertGlobalCoordToElLocal,
-		_jacobianDeterminantSurface, _surfaceNormal, nodeCount );
+	self = (ConstantElementType*)_ElementType_New(  ELEMENTTYPE_PASSARGS  );
 	
 	/* General info */
 	
 	/* Virtual functions */
 	
 	/* ConstantElementType info */
-	if( initFlag ){
-		_ConstantElementType_Init( self );
-	}
-	
+
 	return self;
 }
 
-
 void _ConstantElementType_Init( ConstantElementType* self ) {
-	/* General and Virtual info should already be set */
-	self->isConstructed = True;
-	/* ConstantElementType info */
+	self->dim = 0;
 }
 
 void _ConstantElementType_Delete( void* elementType ) {
 	ConstantElementType* self = (ConstantElementType*)elementType;
-	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 
 	/* Stg_Class_Delete parent*/
 	_ElementType_Delete( self );
@@ -175,26 +131,25 @@ void _ConstantElementType_Print( void* elementType, Stream* stream ) {
 	/* ConstantElementType info */
 }
 
-void _ConstantElementType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data ){
+void _ConstantElementType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data ){
 	ConstantElementType* self = (ConstantElementType*)elementType;
-	self->dim = 0;
+
+	_ConstantElementType_Init( self );
 }
 	
 void _ConstantElementType_Initialise( void* elementType, void *data ){
-	
 }
 	
 void _ConstantElementType_Execute( void* elementType, void *data ){
-	
 }
 	
 void _ConstantElementType_Destroy( void* elementType, void *data ){
 	ConstantElementType* self = (ConstantElementType*)elementType;
+
+	_ElementType_Destroy( self, data );
 }
 
 void _ConstantElementType_Build( void* elementType, void *data ) {
-	ConstantElementType* self = (ConstantElementType*)elementType;
-	/* NOTHING */
 
 }
 
@@ -250,4 +205,6 @@ int _ConstantElementType_SurfaceNormal( void* elementType, unsigned element_I, u
 
 	return -1;
 }
+
+
 

@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Discretisaton_Mesh_Inner2DGenerator_h__
-#define __Discretisaton_Mesh_Inner2DGenerator_h__
+#ifndef __StgFEM_Discretisaton_Inner2DGenerator_h__
+#define __StgFEM_Discretisaton_Inner2DGenerator_h__
 
 	/** Textual name of this class */
 	extern const Type Inner2DGenerator_Type;
@@ -62,14 +62,21 @@
 	** Constructors
 	*/
 
-	#define Inner2DGENERATOR_DEFARGS	\
-		MESHGENERATOR_DEFARGS
 
-	#define Inner2DGENERATOR_PASSARGS	\
-		MESHGENERATOR_PASSARGS
 
-	Inner2DGenerator* Inner2DGenerator_New( Name name );
-	Inner2DGenerator* _Inner2DGenerator_New( Inner2DGENERATOR_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define INNER2DGENERATOR_DEFARGS \
+                MESHGENERATOR_DEFARGS
+
+	#define INNER2DGENERATOR_PASSARGS \
+                MESHGENERATOR_PASSARGS
+
+	Inner2DGenerator* Inner2DGenerator_New( Name name, AbstractContext* context );
+	Inner2DGenerator* _Inner2DGenerator_New(  INNER2DGENERATOR_DEFARGS  );
 	void _Inner2DGenerator_Init( Inner2DGenerator* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -78,7 +85,7 @@
 
 	void _Inner2DGenerator_Delete( void* generator );
 	void _Inner2DGenerator_Print( void* generator, Stream* stream );
-	void _Inner2DGenerator_Construct( void* generator, Stg_ComponentFactory* cf, void* data );
+	void _Inner2DGenerator_AssignFromXML( void* generator, Stg_ComponentFactory* cf, void* data );
 	void _Inner2DGenerator_Build( void* generator, void* data );
 	void _Inner2DGenerator_Initialise( void* generator, void* data );
 	void _Inner2DGenerator_Execute( void* generator, void* data );
@@ -100,4 +107,5 @@
 	void Inner2DGenerator_BuildGeometry( Inner2DGenerator* self, FeMesh* mesh );
 	void Inner2DGenerator_BuildElementTypes( Inner2DGenerator* self, FeMesh* mesh );
 
-#endif /* __Discretisaton_Mesh_Inner2DGenerator_h__ */
+#endif /* __StgFEM_Discretisaton_Inner2DGenerator_h__ */
+

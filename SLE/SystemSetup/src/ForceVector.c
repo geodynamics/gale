@@ -46,6 +46,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
+#include "FiniteElementContext.h"
 #include "SolutionVector.h"
 #include "ForceVector.h"
 #include "ForceTerm.h"
@@ -67,123 +68,65 @@ const Type ForceVector_Type = "ForceVector";
 /** Name of this class' entry points */
 static const char	ForceVector_assembleForceVectorStr[] = "assembleForceVector";
 
+ForceVector* ForceVector_New(
+	Name							name,
+	FiniteElementContext*	context,
+	FeVariable*					feVariable,
+	Dimension_Index			dim,
+	void*							entryPoint_Register,
+	MPI_Comm						comm )		
+{
+	ForceVector* self = _ForceVector_DefaultNew( name );
+
+	self->isConstructed = True;
+	_SolutionVector_Init( (SolutionVector*)self, context, comm, feVariable ); 
+	_ForceVector_Init( self, dim, entryPoint_Register );
+
+	return self;
+}
 
 void* _ForceVector_DefaultNew( Name name ) {
-	return _ForceVector_New( 
-		sizeof(ForceVector), 
-		ForceVector_Type, 
-		_ForceVector_Delete,
-		_ForceVector_Print,
-		_ForceVector_Copy,
-		_ForceVector_DefaultNew, 
-		_ForceVector_Construct,
-		_ForceVector_Build, 
-		_ForceVector_Initialise,
-		_ForceVector_Execute, 
-		_ForceVector_Destroy,
-		name,
-		False,
-		NULL,
-		0,
-		NULL,
-		MPI_COMM_WORLD );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(ForceVector);
+	Type                                                      type = ForceVector_Type;
+	Stg_Class_DeleteFunction*                              _delete = _ForceVector_Delete;
+	Stg_Class_PrintFunction*                                _print = _ForceVector_Print;
+	Stg_Class_CopyFunction*                                  _copy = _ForceVector_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _ForceVector_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _ForceVector_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _ForceVector_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _ForceVector_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _ForceVector_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _ForceVector_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
+	return _ForceVector_New(  FORCEVECTOR_PASSARGS  );
 }
 
-
-ForceVector* ForceVector_New(
-	Name                                  name,
-	FeVariable*                           feVariable,
-	Dimension_Index                       dim,
-	void*                                 entryPoint_Register,
-	MPI_Comm                              comm )		
-{
-	return _ForceVector_New( 
-		sizeof(ForceVector), 
-		ForceVector_Type, 
-		_ForceVector_Delete,
-		_ForceVector_Print,
-		_ForceVector_Copy,
-		_ForceVector_DefaultNew, 
-		_ForceVector_Construct,
-		_ForceVector_Build, 
-		_ForceVector_Initialise,
-		_ForceVector_Execute, 
-		_ForceVector_Destroy,
-		name,
-		True,
-		feVariable,
-		dim,
-		entryPoint_Register,
-		comm );
-}
-
-ForceVector* _ForceVector_New( 
-	SizeT                                 _sizeOfSelf,
-	Type                                  type,
-	Stg_Class_DeleteFunction*             _delete,
-	Stg_Class_PrintFunction*              _print,
-	Stg_Class_CopyFunction*               _copy, 
-	Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-	Stg_Component_ConstructFunction*      _construct,
-	Stg_Component_BuildFunction*          _build,
-	Stg_Component_InitialiseFunction*     _initialise,
-	Stg_Component_ExecuteFunction*        _execute,
-	Stg_Component_DestroyFunction*        _destroy,
-	Name                                  name,
-	Bool                                  initFlag,
-	FeVariable*                           feVariable,
-	Dimension_Index                       dim,
-	void*                                 entryPoint_Register,
-	MPI_Comm                              comm )
-{
-	ForceVector*		self;
+ForceVector* _ForceVector_New(  FORCEVECTOR_DEFARGS  ) {
+	ForceVector* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ForceVector) );
-	self = (ForceVector*)_SolutionVector_New( 
-		_sizeOfSelf,
-		type, 
-		_delete,
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		initFlag,
-		comm,
-		feVariable );
-	
-	if ( initFlag ) {
-		_ForceVector_Init( self, dim, entryPoint_Register );
-	}
+	self = (ForceVector*)_SolutionVector_New(  SOLUTIONVECTOR_PASSARGS  );
 	
 	return self;
 }
 
 
-void _ForceVector_Init(
-	void*                                     forceVector,
-	Dimension_Index                           dim,
-	EntryPoint_Register*                      entryPoint_Register )
-{
+void _ForceVector_Init( void* forceVector, Dimension_Index dim, EntryPoint_Register* entryPoint_Register ) {
 	ForceVector* self = (ForceVector*)  forceVector;
 	
 	/* ForceVector info */
-	self->isConstructed              = True;
-	self->dim                        = dim;
-	self->entryPoint_Register        = entryPoint_Register;
+	self->dim = dim;
+	self->entryPoint_Register = entryPoint_Register;
 	
 	/* Create Stream */
 	self->debug = Stream_RegisterChild( StgFEM_SLE_SystemSetup_Debug, self->type );
 	
 	/* Create Entry Point for assembleForceVector */
 	Stg_asprintf( &self->_assembleForceVectorEPName, "%s-%s", self->name, ForceVector_assembleForceVectorStr );
-	self->assembleForceVector = FeEntryPoint_New( self->_assembleForceVectorEPName,
-						      FeEntryPoint_AssembleForceVector_CastType );
+	self->assembleForceVector = FeEntryPoint_New( self->_assembleForceVectorEPName, FeEntryPoint_AssembleForceVector_CastType );
 	EntryPoint_Register_Add( self->entryPoint_Register, self->assembleForceVector );	
 
 	/* Add default hook to assembleForceVector entry point */
@@ -194,27 +137,18 @@ void _ForceVector_Init(
 	self->bcAsm = Assembler_New();
 	self->inc = IArray_New();
 
-        self->nModifyCBs = 0;
-        self->modifyCBs = NULL;
+	self->nModifyCBs = 0;
+ 	self->modifyCBs = NULL;
 }
-
 
 void _ForceVector_Delete( void* forceVector ) {
 	ForceVector* self = (ForceVector*)forceVector;
 	
 	Journal_DPrintf( self->debug, "In %s - for %s\n", __func__, self->name );
-	Memory_Free( self->_assembleForceVectorEPName );
-
-	/* Don't delete entry point: E.P register will delete it automatically */
-	Stg_Class_Delete( self->forceTermList );
-
-	NewClass_Delete( self->inc );
 
 	/* Stg_Class_Delete parent*/
 	_SolutionVector_Delete( self );
-	
 }
-
 
 void _ForceVector_Print( void* forceVector, Stream* stream ) {
 	ForceVector* self = (ForceVector*)forceVector;
@@ -287,16 +221,16 @@ void* _ForceVector_Copy( void* forceVector, void* dest, Bool deep, Name nameExt,
 }
 
 
-void _ForceVector_Construct( void* forceVector, Stg_ComponentFactory* cf, void* data ) {
-	ForceVector*    self               = (ForceVector*)forceVector;
-	Dimension_Index dim                = 0;
+void _ForceVector_AssignFromXML( void* forceVector, Stg_ComponentFactory* cf, void* data ) {
+	ForceVector*    self = (ForceVector*)forceVector;
+	Dimension_Index dim = 0;
 	void*           entryPointRegister = NULL;
 
-	_SolutionVector_Construct( self, cf, data );
+	_SolutionVector_AssignFromXML( self, cf, data );
 	
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 
-	entryPointRegister = Stg_ObjectList_Get( cf->registerRegister, "EntryPoint_Register" );
+	entryPointRegister = (void*)self->context->entryPoint_Register;
 	assert( entryPointRegister );
 	
 	_ForceVector_Init( self, dim, entryPointRegister );
@@ -318,9 +252,6 @@ void _ForceVector_Build( void* forceVector, void* data ) {
 	
 	/* Allocate the vector */
 	Journal_DPrintfL( self->debug, 2, "Allocating the L.A. Force Vector with %d local entries.\n", self->localSize );
-//	self->vector = (Vector*)PETScVector_New( "" );
-	//Vector_SetComm( self->vector, self->comm );
-	//Vector_SetLocalSize( self->vector, self->localSize );
 	VecCreate( self->comm, &self->vector );
 	VecSetSizes( self->vector, (PetscInt)self->localSize, PETSC_DECIDE );
 	VecSetFromOptions( self->vector );
@@ -334,10 +265,10 @@ void _ForceVector_Build( void* forceVector, void* data ) {
 
 	Assembler_SetVariables( self->bcAsm, self->feVariable, NULL );
 	Assembler_SetCallbacks( self->bcAsm, 
-				NULL, 
-				ForceVector_BCAsm_RowR, NULL, 
-				NULL, NULL, 
-				self );
+		NULL, 
+		ForceVector_BCAsm_RowR, NULL, 
+		NULL, NULL, 
+		self );
 }
 
 
@@ -357,6 +288,16 @@ void _ForceVector_Execute( void* forceVector, void* data ) {
 }
 
 void _ForceVector_Destroy( void* forceVector, void* data ) {
+	ForceVector* self = (ForceVector*)forceVector;
+
+	Memory_Free( self->_assembleForceVectorEPName );
+
+	/* Don't delete entry point: E.P register will delete it automatically */
+	Stg_Class_Delete( self->forceTermList );
+
+	NewClass_Delete( self->inc );
+
+	_SolutionVector_Destroy( self, data );
 }
 
 void ForceVector_Assemble( void* forceVector ) {
@@ -423,7 +364,7 @@ void ForceVector_PrintElementForceVector(
 }
 
 /* from the depreciated Vector class */
-_ForceVector_VectorView( Vec v, Stream* stream ) {
+void _ForceVector_VectorView( Vec v, Stream* stream ) {
 	unsigned	entry_i;
 	PetscInt	size;
 	PetscScalar*	array;
@@ -613,3 +554,5 @@ void ForceVector_AddModifyCallback( ForceVector* self, void* callback, void* obj
    self->modifyCBs[self->nModifyCBs - 1].callback = callback;
    self->modifyCBs[self->nModifyCBs - 1].object = object;
 }
+
+

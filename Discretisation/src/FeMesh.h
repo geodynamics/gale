@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StgFEM_Discretisation_Mesh_FeMesh_h__
-#define __StgFEM_Discretisation_Mesh_FeMesh_h__
+#ifndef __StgFEM_Discretisation_FeMesh_h__
+#define __StgFEM_Discretisation_FeMesh_h__
 
 	/** Textual name of this class */
 	extern const Type FeMesh_Type;
@@ -65,15 +65,23 @@
 	** Constructors
 	*/
 
-	#define FEMESH_DEFARGS	\
-		MESH_DEFARGS
 
-	#define FEMESH_PASSARGS	\
-		MESH_PASSARGS
 
-	FeMesh* FeMesh_New( Name name );
-	FeMesh* _FeMesh_New( FEMESH_DEFARGS );
-	void _FeMesh_Init( FeMesh* self );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FEMESH_DEFARGS \
+                MESH_DEFARGS
+
+	#define FEMESH_PASSARGS \
+                MESH_PASSARGS
+
+	FeMesh* FeMesh_New( Name name, AbstractContext* context );
+	FeMesh* _FeMesh_New(  FEMESH_DEFARGS  );
+	void _FeMesh_Init( FeMesh* self, ElementType* elType, const char* family, Bool elementMesh );
+   FeMesh* _FeMesh_DefaultNew( Name name );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
@@ -81,7 +89,7 @@
 
 	void _FeMesh_Delete( void* feMesh );
 	void _FeMesh_Print( void* feMesh, Stream* stream );
-	void _FeMesh_Construct( void* feMesh, Stg_ComponentFactory* cf, void* data );
+	void _FeMesh_AssignFromXML( void* feMesh, Stg_ComponentFactory* cf, void* data );
 	void _FeMesh_Build( void* feMesh, void* data );
 	void _FeMesh_Initialise( void* feMesh, void* data );
 	void _FeMesh_Execute( void* feMesh, void* data );
@@ -131,4 +139,5 @@
 
 	void FeMesh_Destruct( FeMesh* self );
 
-#endif /* __StgFEM_Discretisaton_Mesh_FeMesh_h__ */
+#endif /* __StgFEM_Discretisaton_FeMesh_h__ */
+

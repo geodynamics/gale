@@ -55,95 +55,57 @@
 const Type PressureGradForceTerm_Type = "PressureGradForceTerm";
 
 PressureGradForceTerm* PressureGradForceTerm_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*					    gradField, 
-		FeVariable*                                         pressureField )
+	Name							name,
+	FiniteElementContext*	context,
+	ForceVector*				forceVector,
+	Swarm*						integrationSwarm,
+	FeVariable*					gradField, 
+	FeVariable*					pressureField )
 {
 	PressureGradForceTerm* self = (PressureGradForceTerm*) _PressureGradForceTerm_DefaultNew( name );
 
-	PressureGradForceTerm_InitAll( 
-			self,
-			forceVector,
-			integrationSwarm,
-			pressureField, 
-			gradField );
+	self->isConstructed = True;
+	_ForceTerm_Init( self, context, forceVector, integrationSwarm, NULL );
+	_PressureGradForceTerm_Init( self, pressureField, gradField );
 
 	return self;
 }
 
 /* Creation implementation / Virtual constructor */
-PressureGradForceTerm* _PressureGradForceTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		ForceTerm_AssembleElementFunction*                   _assembleElement,		
-		Name                                                name )
+PressureGradForceTerm* _PressureGradForceTerm_New(  PRESSUREGRADFORCETERM_DEFARGS  )
 {
 	PressureGradForceTerm* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(PressureGradForceTerm) );
-	self = (PressureGradForceTerm*) _ForceTerm_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_assembleElement,
-		name );
+	assert( _sizeOfSelf >= sizeof(PressureGradForceTerm) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (PressureGradForceTerm*) _ForceTerm_New(  FORCETERM_PASSARGS  );
 	
 	/* Virtual info */
 	
 	return self;
 }
 
-void _PressureGradForceTerm_Init( 
-		PressureGradForceTerm*                              self, 
-		FeVariable*                                         pressureField, 
-		FeVariable*					    gradField )
-{
+void _PressureGradForceTerm_Init( void* forceTerm, FeVariable* pressureField, FeVariable* gradField ) {
+	PressureGradForceTerm* self = (PressureGradForceTerm*)forceTerm;
+
 	self->asmb = Assembler_New();
 	Assembler_SetCallbacks( self->asmb, 
-				NULL, 
-				NULL, 
-				(Assembler_CallbackType*)PressureGradForceTerm_RowCB, 
-				(Assembler_CallbackType*)PressureGradForceTerm_ColCB, 
-				(Assembler_CallbackType*)PressureGradForceTerm_ColCB, 
-				self );
+		NULL, 
+		NULL, 
+		(Assembler_CallbackType*)PressureGradForceTerm_RowCB, 
+		(Assembler_CallbackType*)PressureGradForceTerm_ColCB, 
+		(Assembler_CallbackType*)PressureGradForceTerm_ColCB, 
+		self );
 	self->pressureField = pressureField;
 	self->gradField = gradField;
-	self->forceVec = NULL;
+	self->forceVector = NULL;
 	self->elForceVec = NULL;
 	self->factor = 0.0;
-}
-
-void PressureGradForceTerm_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         pressureField, 
-		FeVariable*					    gradField )
-{
-	PressureGradForceTerm* self = (PressureGradForceTerm*) forceTerm;
-
-	ForceTerm_InitAll( self, forceVector, integrationSwarm, NULL );
-	_PressureGradForceTerm_Init( self, pressureField, gradField );
 }
 
 void _PressureGradForceTerm_Delete( void* forceTerm ) {
@@ -162,38 +124,40 @@ void _PressureGradForceTerm_Print( void* forceTerm, Stream* stream ) {
 }
 
 void* _PressureGradForceTerm_DefaultNew( Name name ) {
-	return (void*)_PressureGradForceTerm_New( 
-		sizeof(PressureGradForceTerm), 
-		PressureGradForceTerm_Type,
-		_PressureGradForceTerm_Delete,
-		_PressureGradForceTerm_Print,
-		NULL,
-		_PressureGradForceTerm_DefaultNew,
-		_PressureGradForceTerm_Construct,
-		_PressureGradForceTerm_Build,
-		_PressureGradForceTerm_Initialise,
-		_PressureGradForceTerm_Execute,
-		_PressureGradForceTerm_Destroy,
-		_PressureGradForceTerm_AssembleElement,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(PressureGradForceTerm);
+	Type                                                      type = PressureGradForceTerm_Type;
+	Stg_Class_DeleteFunction*                              _delete = _PressureGradForceTerm_Delete;
+	Stg_Class_PrintFunction*                                _print = _PressureGradForceTerm_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _PressureGradForceTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _PressureGradForceTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _PressureGradForceTerm_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _PressureGradForceTerm_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _PressureGradForceTerm_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _PressureGradForceTerm_Destroy;
+	ForceTerm_AssembleElementFunction*            _assembleElement = _PressureGradForceTerm_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*)_PressureGradForceTerm_New(  PRESSUREGRADFORCETERM_PASSARGS  );
 }
 
-void _PressureGradForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
-	PressureGradForceTerm*            self             = (PressureGradForceTerm*)forceTerm;
-	FeVariable*                 pressureField;
-	FeVariable*                 gradField;
+void _PressureGradForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
+	PressureGradForceTerm*	self = (PressureGradForceTerm*)forceTerm;
 
 	/* Construct Parent */
-	_ForceTerm_Construct( self, cf, data );
+	_ForceTerm_AssignFromXML( self, cf, data );
 
-	pressureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, True, data ) ;
-	gradField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureGradField", FeVariable, True, data ) ;
-
-	_PressureGradForceTerm_Init( self, pressureField, gradField );
+	_PressureGradForceTerm_Init(
+		self, 
+		Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, True, data ),
+		Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureGradField", FeVariable, True, data ) );
 }
 
 void _PressureGradForceTerm_Build( void* forceTerm, void* data ) {
-	PressureGradForceTerm*             self             = (PressureGradForceTerm*)forceTerm;
+	PressureGradForceTerm* self = (PressureGradForceTerm*)forceTerm;
 
 	_ForceTerm_Build( self, data );
 	Stg_Component_Build( self->pressureField, data, False );
@@ -203,18 +167,25 @@ void _PressureGradForceTerm_Build( void* forceTerm, void* data ) {
 }
 
 void _PressureGradForceTerm_Initialise( void* forceTerm, void* data ) {
-	PressureGradForceTerm*             self             = (PressureGradForceTerm*)forceTerm;
+	PressureGradForceTerm* self = (PressureGradForceTerm*)forceTerm;
 
-	_ForceTerm_Initialise( self, data );
 	Stg_Component_Initialise( self->pressureField, data, False );
+	Stg_Component_Initialise( self->gradField, data, False );
+	_ForceTerm_Initialise( self, data );
 }
 
 void _PressureGradForceTerm_Execute( void* forceTerm, void* data ) {
-	_ForceTerm_Execute( forceTerm, data );
+	PressureGradForceTerm* self = (PressureGradForceTerm*)forceTerm;
+
+	_ForceTerm_Execute( self, data );
 }
 
 void _PressureGradForceTerm_Destroy( void* forceTerm, void* data ) {
-	_ForceTerm_Destroy( forceTerm, data );
+	PressureGradForceTerm* self = (PressureGradForceTerm*)forceTerm;
+
+	Stg_Component_Destroy( self->pressureField, data, False );
+	Stg_Component_Destroy( self->gradField, data, False );
+	_ForceTerm_Destroy( self, data );
 }
 
 
@@ -223,7 +194,7 @@ void _PressureGradForceTerm_AssembleElement( void* forceTerm, ForceVector* force
 
 	assert( self );
 
-	self->forceVec = forceVector;
+	self->forceVector = forceVector;
 	self->elForceVec = elForceVec;
 	Assembler_IntegrateMatrixElement( self->asmb, lElement_I );
 }
@@ -244,3 +215,5 @@ Bool PressureGradForceTerm_ColCB( PressureGradForceTerm* self, Assembler* assm )
 		self->factor;
 	return True;
 }
+
+

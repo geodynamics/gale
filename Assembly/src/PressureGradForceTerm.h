@@ -38,8 +38,8 @@
 */
 
 
-#ifndef __StgFEM_PressureGradForceTerm_h__
-#define __StgFEM_PressureGradForceTerm_h__
+#ifndef __StgFEM_Assembly_PressureGradForceTerm_h__
+#define __StgFEM_Assembly_PressureGradForceTerm_h__
 
 	/** Textual name of this class */
 	extern const Type PressureGradForceTerm_Type;
@@ -52,56 +52,58 @@
 		/* Virtual info */ \
 		\
 		/* PressureGradForceTerm info */ \
-		Assembler*					asmb; \
-		FeVariable*                                     pressureField; \
-		FeVariable*					gradField; \
-		ForceVector*					forceVec; \
-		double*						elForceVec; \
-		double						factor;
+		Assembler*		asmb; \
+		FeVariable*		pressureField; \
+		FeVariable*		gradField; \
+		double*			elForceVec; \
+		double			factor;
 
 	struct PressureGradForceTerm { __PressureGradForceTerm };
 
 	PressureGradForceTerm* PressureGradForceTerm_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         pressureField, 
-		FeVariable*					    gradField );
+		Name							name,	
+		FiniteElementContext*	context,
+		ForceVector*				forceVector,
+		Swarm*						integrationSwarm,
+		FeVariable*					pressureField, 
+		FeVariable*					gradField );
 
-	PressureGradForceTerm* _PressureGradForceTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		ForceTerm_AssembleElementFunction*                  _assembleElement,		
-		Name                                                name );
 	
-	void PressureGradForceTerm_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         pressureField, 
-		FeVariable*					    gradField );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
+	#define PRESSUREGRADFORCETERM_DEFARGS \
+                FORCETERM_DEFARGS
+
+	#define PRESSUREGRADFORCETERM_PASSARGS \
+                FORCETERM_PASSARGS
+
+	PressureGradForceTerm* _PressureGradForceTerm_New(  PRESSUREGRADFORCETERM_DEFARGS  );
+
+	void _PressureGradForceTerm_Init( void* forceTerm, FeVariable* pressureField, FeVariable* gradField );
+	
 	void _PressureGradForceTerm_Delete( void* forceTerm );
+
 	void _PressureGradForceTerm_Print( void* forceTerm, Stream* stream );
 
 	void* _PressureGradForceTerm_DefaultNew( Name name ) ;
-	void _PressureGradForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data );
+
+	void _PressureGradForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data );
+
 	void _PressureGradForceTerm_Build( void* forceTerm, void* data ) ;
+
 	void _PressureGradForceTerm_Initialise( void* forceTerm, void* data ) ;
+
 	void _PressureGradForceTerm_Execute( void* forceTerm, void* data ) ;
+
 	void _PressureGradForceTerm_Destroy( void* forceTerm, void* data ) ;
 
 	void _PressureGradForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) ;
+
 	Bool PressureGradForceTerm_RowCB( PressureGradForceTerm* self, Assembler* assm );
+
 	Bool PressureGradForceTerm_ColCB( PressureGradForceTerm* self, Assembler* assm );
 
 #endif
+

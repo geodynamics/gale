@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Discretisaton_Mesh_Triquadratic_h__
-#define __Discretisaton_Mesh_Triquadratic_h__
+#ifndef __StgFEM_Discretisaton_Triquadratic_h__
+#define __StgFEM_Discretisaton_Triquadratic_h__
 
 	/** Textual name of this class */
 	extern const Type Triquadratic_Type;
@@ -61,14 +61,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define TRIQUADRATIC_DEFARGS \
-		ELEMENTTYPE_DEFARGS
+                ELEMENTTYPE_DEFARGS
 
 	#define TRIQUADRATIC_PASSARGS \
-		ELEMENTTYPE_PASSARGS
+                ELEMENTTYPE_PASSARGS
 
 	Triquadratic* Triquadratic_New( Name name );
-	Triquadratic* _Triquadratic_New( TRIQUADRATIC_DEFARGS );
+	Triquadratic* _Triquadratic_New(  TRIQUADRATIC_DEFARGS  );
 	void _Triquadratic_Init( Triquadratic* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -77,7 +84,7 @@
 
 	void _Triquadratic_Delete( void* elementType );
 	void _Triquadratic_Print( void* elementType, Stream* stream );
-	void _Triquadratic_Construct( void* elementType, Stg_ComponentFactory* cf, void* data );
+	void _Triquadratic_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data );
 	void _Triquadratic_Build( void* elementType, void* data );
 	void _Triquadratic_Initialise( void* elementType, void* data );
 	void _Triquadratic_Execute( void* elementType, void* data );
@@ -96,4 +103,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Discretisaton_Mesh_Triquadratic_h__ */
+#endif /* __StgFEM_Discretisaton_Triquadratic_h__ */
+

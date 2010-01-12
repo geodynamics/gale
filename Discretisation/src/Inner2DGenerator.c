@@ -47,35 +47,37 @@ const Type Inner2DGenerator_Type = "Inner2DGenerator";
 ** Constructors
 */
 
-Inner2DGenerator* Inner2DGenerator_New( Name name ) {
-	return _Inner2DGenerator_New( sizeof(Inner2DGenerator), 
-				 Inner2DGenerator_Type, 
-				 _Inner2DGenerator_Delete, 
-				 _Inner2DGenerator_Print, 
-				 NULL, 
-				 (void* (*)(Name))_Inner2DGenerator_New, 
-				 _Inner2DGenerator_Construct, 
-				 _Inner2DGenerator_Build, 
-				 _Inner2DGenerator_Initialise, 
-				 _Inner2DGenerator_Execute, 
-				 _Inner2DGenerator_Destroy, 
-				 name, 
-				 NON_GLOBAL, 
-				 _MeshGenerator_SetDimSize, 
-				 Inner2DGenerator_Generate );
+Inner2DGenerator* Inner2DGenerator_New( Name name, AbstractContext* context ) {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Inner2DGenerator);
+	Type                                                      type = Inner2DGenerator_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Inner2DGenerator_Delete;
+	Stg_Class_PrintFunction*                                _print = _Inner2DGenerator_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void* (*)(Name))_Inner2DGenerator_New;
+	Stg_Component_ConstructFunction*                    _construct = _Inner2DGenerator_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Inner2DGenerator_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Inner2DGenerator_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Inner2DGenerator_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = NULL;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	MeshGenerator_SetDimSizeFunc*                   setDimSizeFunc = _MeshGenerator_SetDimSize;
+	MeshGenerator_GenerateFunc*                       generateFunc = (MeshGenerator_GenerateFunc*)Inner2DGenerator_Generate;
+
+	Inner2DGenerator* self = _Inner2DGenerator_New(  INNER2DGENERATOR_PASSARGS  );
+
+   _MeshGenerator_Init( (MeshGenerator*)self, context );
+   _Inner2DGenerator_Init( self );
+
+   return self;
 }
 
-Inner2DGenerator* _Inner2DGenerator_New( Inner2DGENERATOR_DEFARGS ) {
+Inner2DGenerator* _Inner2DGenerator_New(  INNER2DGENERATOR_DEFARGS  ) {
 	Inner2DGenerator*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Inner2DGenerator) );
-	self = (Inner2DGenerator*)_MeshGenerator_New( MESHGENERATOR_PASSARGS );
-
-	/* Virtual info */
-
-	/* Inner2DGenerator info */
-	_Inner2DGenerator_Init( self );
+	assert( _sizeOfSelf >= sizeof(Inner2DGenerator) );
+	self = (Inner2DGenerator*)_MeshGenerator_New(  MESHGENERATOR_PASSARGS  );
 
 	return self;
 }
@@ -110,14 +112,14 @@ void _Inner2DGenerator_Print( void* generator, Stream* stream ) {
 	_MeshGenerator_Print( self, stream );
 }
 
-void _Inner2DGenerator_Construct( void* generator, Stg_ComponentFactory* cf, void* data ) {
+void _Inner2DGenerator_AssignFromXML( void* generator, Stg_ComponentFactory* cf, void* data ) {
 	Inner2DGenerator*	self = (Inner2DGenerator*)generator;
 	Mesh*		elMesh;
 
 	assert( self );
 	assert( cf );
 
-	_MeshGenerator_Construct( self, cf, data );
+	_MeshGenerator_AssignFromXML( self, cf, data );
 
 	elMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "elementMesh", Mesh, True, data );
 	Inner2DGenerator_SetElementMesh( self, elMesh );
@@ -135,6 +137,10 @@ void _Inner2DGenerator_Execute( void* generator, void* data ) {
 }
 
 void _Inner2DGenerator_Destroy( void* generator, void* data ) {
+	Inner2DGenerator*	self = (Inner2DGenerator*)generator;
+
+   Stg_Component_Destroy( self->elMesh, data, False );
+   _MeshGenerator_Destroy( self, data );
 }
 
 void Inner2DGenerator_Generate( void* generator, void* _mesh ) {
@@ -378,7 +384,9 @@ void Inner2DGenerator_BuildElementTypes( Inner2DGenerator* self, FeMesh* mesh ) 
 	for( e_i = 0; e_i < nDomainEls; e_i++ )
 		mesh->elTypeMap[e_i] = 0;
 
-	algs = Mesh_CentroidAlgorithms_New( "" );
+	algs = Mesh_CentroidAlgorithms_New( "", NULL );
 	Mesh_CentroidAlgorithms_SetElementMesh( algs, self->elMesh );
 	Mesh_SetAlgorithms( mesh, algs );
 }
+
+

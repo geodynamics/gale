@@ -89,9 +89,9 @@ typedef enum PrintValuesFlag {
    PRINT_VALUES
 } PrintValuesFlag;
 
-/**	MPI datatype handle for efficiently exchanging CritPointInfo structures.
-        \see FeEquationNumber_Create_CritPointInfo_MPI_Datatype() for where this
-        handle is defined. */
+/** MPI datatype handle for efficiently exchanging CritPointInfo structures.
+	see FeEquationNumber_Create_CritPointInfo_MPI_Datatype() for where this
+	handle is defined. */
 MPI_Datatype MPI_critPointInfoType;
 
 /*###### Private Function Declarations ######*/
@@ -99,44 +99,61 @@ MPI_Datatype MPI_critPointInfoType;
 #if 0
 static void _FeEquationNumber_BuildRemappedNodeInfoTable( void* feEquationNumber );
 
-static void _FeEquationNumber_CalculateDomainKnownCriticalPoints( FeEquationNumber* self, Node_DomainIndex nodeDomainCount,
-								  CritPointInfo* mySetEnds, Index* const mySetEndsTotal,
-								  Node_GlobalIndex* myWantedCriticalPoints, Index* const myWantedCriticalPointsTotal );
+static void _FeEquationNumber_CalculateDomainKnownCriticalPoints(
+	FeEquationNumber* self,
+	Node_DomainIndex	nodeDomainCount,
+	CritPointInfo*		mySetEnds,
+	Index* const		mySetEndsTotal,
+	Node_GlobalIndex*	myWantedCriticalPoints,
+	Index* const		myWantedCriticalPointsTotal );
 	
-static void _FeEquationNumber_HandleNode( FeEquationNumber* self, const Node_DomainIndex dNode_I,
-					  Dof_EquationNumber* const currEqNum );
+static void _FeEquationNumber_HandleNode(
+	FeEquationNumber*			self,
+	const Node_DomainIndex	dNode_I,
+	Dof_EquationNumber*		const currEqNum );
 	
 static void _FeEquationNumber_PostProcessLinkedDofs( FeEquationNumber* self );
 
-static void _FeEquationNumber_CalculateCritPointsIHave( FeEquationNumber* self,
-							Node_GlobalIndex** const myWantedCriticalPointsPtr, Node_GlobalIndex myWantedCriticalPointsTotal,
-							CritPointInfo** const critPointsIHave, Index* const critPointsIHaveTotal,
-							CritPointInfo* const critPointsToSend, Index* const critPointsToSendTotal );
+static void _FeEquationNumber_CalculateCritPointsIHave(
+	FeEquationNumber*				self,
+	Node_GlobalIndex** const	myWantedCriticalPointsPtr,
+	Node_GlobalIndex				myWantedCriticalPointsTotal,
+	CritPointInfo** const		critPointsIHave,
+	Index* const					critPointsIHaveTotal,
+	CritPointInfo* const			critPointsToSend,
+	Index* const					critPointsToSendTotal );
 	
 static void _FeEquationNumber_ShareCriticalPoints(
-   FeEquationNumber* self,
-   Node_GlobalIndex** const myCriticalPoints,
-   Node_GlobalIndex myCriticalPointsTotal,
-   Node_GlobalIndex** allCriticalPoints,
-   Index** procCritPointsTotals, 
-   Node_GlobalIndex* const maxCritPointsPerProc );
+   FeEquationNumber*				self,
+   Node_GlobalIndex** const	myCriticalPoints,
+   Node_GlobalIndex				myCriticalPointsTotal,
+   Node_GlobalIndex**			allCriticalPoints,
+   Index**							procCritPointsTotals, 
+   Node_GlobalIndex* const		maxCritPointsPerProc );
 
 static void _FeEquationNumber_ShareCritPointInfo(
-   FeEquationNumber* self,
-   CritPointInfo** const myCritPointInfo,
-   Index myCritPointInfoTotal,
-   CritPointInfo** allCritPointInfo,
-   Index** procCritPointInfoTotals,
-   Index* const maxCritPointInfoPerProc,
-   PrintValuesFlag printValuesFlag );
+   FeEquationNumber*	self,
+   CritPointInfo**	const myCritPointInfo,
+   Index					myCritPointInfoTotal,
+   CritPointInfo**	allCritPointInfo,
+   Index**				procCritPointInfoTotals,
+   Index*				const maxCritPointInfoPerProc,
+   PrintValuesFlag	printValuesFlag );
 
-static void _FeEquationNumber_DoPartialTotals( FeEquationNumber* self,
-					       CritPointInfo* const critPointsIHave, Index critPointsIHaveTotal,
-					       CritPointInfo* const critPointsToSend, Index critPointsToSendTotal );
+static void _FeEquationNumber_DoPartialTotals(
+	FeEquationNumber*		self,
+	CritPointInfo* const	critPointsIHave,
+	Index						critPointsIHaveTotal,
+	CritPointInfo* const	critPointsToSend,
+	Index						critPointsToSendTotal );
 
-static void _FeEquationNumber_AddAllPartialTotals( FeEquationNumber* self, CritPointInfo* mySubTotals,
-						   Index myCritPointInfoTotal, CritPointInfo* allSubTotals, Index* procCritPointInfoTotals,
-						   Index maxSubTotalsPerProc );
+static void _FeEquationNumber_AddAllPartialTotals(
+	FeEquationNumber*	self,
+	CritPointInfo*		mySubTotals,
+	Index					myCritPointInfoTotal,
+	CritPointInfo*		allSubTotals,
+	Index*				procCritPointInfoTotals,
+	Index					maxSubTotalsPerProc );
 
 Node_RemappedGlobalIndex _FeEquationNumber_RemapNode( 
    Mesh* mesh, 
@@ -144,13 +161,13 @@ Node_RemappedGlobalIndex _FeEquationNumber_RemapNode(
    Node_GlobalIndex gNode_I );
 
 int GenerateEquationNumbering(
-		int NX, int NY, int NZ,
-		int nlocal, int g_node_id[],
-		int dof, int nglobal,
-		PetscTruth periodic_x, PetscTruth periodic_y, PetscTruth periodic_z,
-		int npx, int npy, int npz,
-		int periodic_x_gnode_id[], int periodic_y_gnode_id[], int periodic_z_gnode_id[],
-		int eqnums[], int *neqnums );
+	int			NX, int NY, int NZ,
+	int			nlocal, int g_node_id[],
+	int			dof, int nglobal,
+	PetscTruth	periodic_x, PetscTruth periodic_y, PetscTruth periodic_z,
+	int			npx, int npy, int npz,
+	int			periodic_x_gnode_id[], int periodic_y_gnode_id[], int periodic_z_gnode_id[],
+	int			eqnums[], int *neqnums );
 
 /** Tests if the critical point from another processor is held by ours.
     Is complicated by the possibility of remapping. */
@@ -162,92 +179,47 @@ static Bool _FeEquationNumber_IHaveCritPoint(
 /*###### Function Definitions ######*/
 
 /** Public constructor */
-void* FeEquationNumber_DefaultNew( Name name )
-{
-   return _FeEquationNumber_New( sizeof(FeEquationNumber), FeEquationNumber_Type, _FeEquationNumber_Delete,
-                                 _FeEquationNumber_Print, _FeEquationNumber_Copy,
-                                 (Stg_Component_DefaultConstructorFunction*)FeEquationNumber_DefaultNew,
-                                 _FeEquationNumber_Construct, (Stg_Component_BuildFunction*)_FeEquationNumber_Build, 
-                                 (Stg_Component_InitialiseFunction*)_FeEquationNumber_Initialise,
-                                 _FeEquationNumber_Execute, _FeEquationNumber_Destroy, name, False, NULL, NULL, NULL, NULL );
-}
 
 FeEquationNumber* FeEquationNumber_New(
-   Name						name,
-   void* 						mesh,
-   DofLayout*					dofLayout,
-   VariableCondition*				bcs,
-   LinkedDofInfo*					linkedDofInfo )
+	Name						name,
+	DomainContext*			context,
+	void*						mesh,
+	DofLayout*				dofLayout,
+	VariableCondition*	bcs,
+	LinkedDofInfo*			linkedDofInfo )
 {
-   return _FeEquationNumber_New( sizeof(FeEquationNumber), FeEquationNumber_Type, _FeEquationNumber_Delete,
-                                 _FeEquationNumber_Print, _FeEquationNumber_Copy, 
-                                 (Stg_Component_DefaultConstructorFunction*)FeEquationNumber_DefaultNew,
-                                 _FeEquationNumber_Construct, (Stg_Component_BuildFunction*)_FeEquationNumber_Build, 
-                                 (Stg_Component_InitialiseFunction*)_FeEquationNumber_Initialise,
-                                 _FeEquationNumber_Execute, _FeEquationNumber_Destroy, name, True, mesh, dofLayout, bcs, linkedDofInfo );
+   FeEquationNumber* self = FeEquationNumber_DefaultNew( name );
+
+	self->isConstructed = True;
+	_FeEquationNumber_Init( self, context, mesh, dofLayout, bcs, linkedDofInfo );
+
+	return self;
 }
 
+void* FeEquationNumber_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(FeEquationNumber);
+	Type                                                      type = FeEquationNumber_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FeEquationNumber_Delete;
+	Stg_Class_PrintFunction*                                _print = _FeEquationNumber_Print;
+	Stg_Class_CopyFunction*                                  _copy = _FeEquationNumber_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)FeEquationNumber_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _FeEquationNumber_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _FeEquationNumber_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FeEquationNumber_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FeEquationNumber_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FeEquationNumber_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
 
-/** Constructor for when the FeEquationNumber is already allocated. */
-void FeEquationNumber_Init(
-   FeEquationNumber*				self, 
-   Name						name,
-   void* 						mesh,
-   DofLayout*					dofLayout,
-   VariableCondition*				bcs,
-   LinkedDofInfo*					linkedDofInfo )
-{
-   /* General info */
-   self->type = FeEquationNumber_Type;
-   self->_sizeOfSelf = sizeof(FeEquationNumber);
-   self->_deleteSelf = False;
-	
-   /* Virtual info */
-   self->_delete = _FeEquationNumber_Delete;
-   self->_print = _FeEquationNumber_Print;
-   self->_copy = _FeEquationNumber_Copy;
-   self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)FeEquationNumber_DefaultNew;
-   self->_construct = _FeEquationNumber_Construct;
-   self->_build = (Stg_Component_BuildFunction*)_FeEquationNumber_Build;
-   self->_initialise = (Stg_Component_InitialiseFunction*)_FeEquationNumber_Initialise;
-   self->_execute = _FeEquationNumber_Execute;
-   self->_destroy = _FeEquationNumber_Destroy;
-	
-   _Stg_Class_Init( (Stg_Class*)self );
-   _Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-   _Stg_Component_Init( (Stg_Component*)self );
-	
-   /* FeEquationNumber info */
-   _FeEquationNumber_Init( self, mesh, dofLayout, bcs, linkedDofInfo );
+   return _FeEquationNumber_New(  FEEQUATIONNUMBER_PASSARGS  );
 }
-
-
 /** Constructor implementation. */
-FeEquationNumber* _FeEquationNumber_New(
-   SizeT						_sizeOfSelf, 
-   Type						type,
-   Stg_Class_DeleteFunction*				_delete,
-   Stg_Class_PrintFunction*				_print, 
-   Stg_Class_CopyFunction*				_copy, 
-   Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-   Stg_Component_ConstructFunction*			_construct,
-   Stg_Component_BuildFunction*		_build,
-   Stg_Component_InitialiseFunction*		_initialise,
-   Stg_Component_ExecuteFunction*		_execute,
-   Stg_Component_DestroyFunction*		_destroy,
-   Name							name,
-   Bool						initFlag,
-   void*						mesh,
-   DofLayout*					dofLayout,
-   VariableCondition*				bcs,
-   LinkedDofInfo*					linkedDofInfo )
-{
+FeEquationNumber* _FeEquationNumber_New(  FEEQUATIONNUMBER_DEFARGS  ){
    FeEquationNumber* self;
 	
    /* Allocate memory */
    assert( _sizeOfSelf >= sizeof(FeEquationNumber) );
-   self = (FeEquationNumber*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor, _construct, _build, 
-                                                 _initialise, _execute, _destroy, name, NON_GLOBAL );
+   self = (FeEquationNumber*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
    /* General info */
 	
@@ -256,9 +228,6 @@ FeEquationNumber* _FeEquationNumber_New(
    self->_initialise = _initialise;
 	
    /* Mesh info */
-   if( initFlag ){
-      _FeEquationNumber_Init( self, mesh, dofLayout, bcs, linkedDofInfo );
-   }
 	
    return self;
 }
@@ -267,17 +236,17 @@ FeEquationNumber* _FeEquationNumber_New(
 /** Constructor variables initialisation. Doesn't allocate any
     memory, just saves arguments and sets counters to 0. */
 void _FeEquationNumber_Init(
-   FeEquationNumber*				self, 
+   FeEquationNumber*		self, 
+	DomainContext*			context,
    void*						feMesh,
-   DofLayout*					dofLayout,
-   VariableCondition*				bcs,
-   LinkedDofInfo*					linkedDofInfo )
+   DofLayout*				dofLayout,
+   VariableCondition*	bcs,
+   LinkedDofInfo*			linkedDofInfo )
 {
-	
    /* General and Virtual info should already be set */
 	
    /* FinteElementMesh info */
-   self->isConstructed = True;
+	self->context = context;
    self->feMesh = (FeMesh*)feMesh;
    self->globalSumUnconstrainedDofs = 0;
    self->isBuilt = False;
@@ -302,12 +271,9 @@ void _FeEquationNumber_Init(
    STree_SetIntCallbacks( self->ownedMap );
 
    Stream_SetPrintingRank( self->debug, 0 );
- 
-
 }
 
-void _FeEquationNumber_Construct( void* feEquationNumber, Stg_ComponentFactory *cf, void* data ){
-	
+void _FeEquationNumber_AssignFromXML( void* feEquationNumber, Stg_ComponentFactory *cf, void* data ) {
 }
 	
 void _FeEquationNumber_Execute( void* feEquationNumber, void *data ){
@@ -315,7 +281,32 @@ void _FeEquationNumber_Execute( void* feEquationNumber, void *data ){
 }
 	
 void _FeEquationNumber_Destroy( void* feEquationNumber, void *data ){
+   FeEquationNumber* self = (FeEquationNumber*) feEquationNumber;
+   Index ii;
+
+   Stg_Component_Destroy( self->feMesh   , data, False );
+   Stg_Component_Destroy( self->dofLayout, data, False );
+   if ( self->linkedDofInfo ) Stg_Component_Destroy( self->dofLayout, data, False );
+   if ( self->bcs )           Stg_Component_Destroy( self->bcs      , data, False );
 	
+   FreeArray( self->remappedNodeInfos );
+   /* free destination array memory */
+   Journal_DPrintfL( self->debug, 2, "Freeing I.D. Array\n" );
+   FreeArray( self->destinationArray );
+	
+   if (self->locationMatrix) {
+      Journal_DPrintfL( self->debug, 2, "Freeing Full L.M. Array\n" );
+      for( ii = 0; ii < self->nDomainEls; ii++ )
+         FreeArray( self->locationMatrix[ii] );
+         
+      FreeArray( self->locationMatrix );
+   }
+
+   if( self->bcEqNums ) 
+      NewClass_Delete( self->bcEqNums );
+   
+   if( self->ownedMap ) 
+      NewClass_Delete( self->ownedMap );
 }
 	
 /* Copy */
@@ -327,25 +318,6 @@ void _FeEquationNumber_Delete( void* feEquationNumber ) {
    Journal_DPrintfL( self->debug, 1, "In %s\n",  __func__ );
    Stream_IndentBranch( StgFEM_Debug );
 
-   FreeArray( self->remappedNodeInfos );
-   /* free destination array memory */
-   Journal_DPrintfL( self->debug, 2, "Freeing I.D. Array\n" );
-   FreeArray( self->destinationArray );
-	
-   if (self->locationMatrix) {
-      Journal_DPrintfL( self->debug, 2, "Freeing Full L.M. Array\n" );
-      FreeArray( self->locationMatrix );
-   }
-
-   if( self->bcEqNums ) {
-      NewClass_Delete( self->bcEqNums );
-   }
-   if( self->ownedMap ) {
-      NewClass_Delete( self->ownedMap );
-   }
-
-   NewClass_Delete( self->ownedMap );
-	
    /* Stg_Class_Delete parent */
    _Stg_Class_Delete( self );
    Stream_UnIndentBranch( StgFEM_Debug );
@@ -510,18 +482,7 @@ void* _FeEquationNumber_Copy( void* feEquationNumber, void* dest, Bool deep, Nam
    abort();
 }
 
-
-void FeEquationNumber_Build( void* feEquationNumber ) {
-   FeEquationNumber* self = (FeEquationNumber*)feEquationNumber;
-	
-   if ( False == self->isBuilt ) {
-      self->_build( self, NULL );
-      self->isBuilt = True;
-   }
-}
-
-
-void _FeEquationNumber_Build( void* feEquationNumber ) {
+void _FeEquationNumber_Build( void* feEquationNumber, void* data ) {
    FeEquationNumber* self = (FeEquationNumber*) feEquationNumber;
 
    assert(self);
@@ -529,10 +490,13 @@ void _FeEquationNumber_Build( void* feEquationNumber ) {
    Journal_DPrintf( self->debug, "In %s:\n",  __func__ );
    Stream_IndentBranch( StgFEM_Debug );
 
-   /* If we have new mesh topology information, do this differently. */
-/*
-   if( self->feMesh->topo->domains && self->feMesh->topo->domains[MT_VERTEX] ) {
-*/
+   Stg_Component_Build( self->feMesh   , data, False );
+   Stg_Component_Build( self->dofLayout, data, False );
+   if ( self->linkedDofInfo ) Stg_Component_Build( self->dofLayout, data, False );
+   if ( self->bcs )           Stg_Component_Build( self->bcs      , data, False );
+	/* If we have new mesh topology information, do this differently. */
+   /* if( self->feMesh->topo->domains && self->feMesh->topo->domains[MT_VERTEX] ) { */
+
    if( Mesh_HasExtension( self->feMesh, "vertexGrid" ) )
       FeEquationNumber_BuildWithDave( self );
    else
@@ -558,15 +522,13 @@ void _FeEquationNumber_Build( void* feEquationNumber ) {
       }
    }
 
-/*
-   }
+   /*}
    else {
       _FeEquationNumber_BuildRemappedNodeInfoTable( self );
       _FeEquationNumber_BuildDestinationArray( self );
       _FeEquationNumber_CalculateGlobalUnconstrainedDofTotal( self );
       _FeEquationNumber_CalculateEqNumsDecomposition( self );
-   }
-*/
+   }*/
 
    if ( Stream_IsPrintableLevel( self->debug, 3 ) ) {
       FeEquationNumber_PrintDestinationArray( self, self->debug );
@@ -575,20 +537,14 @@ void _FeEquationNumber_Build( void* feEquationNumber ) {
    Stream_UnIndentBranch( StgFEM_Debug );
 }
 
-void FeEquationNumber_Initialise( void* feEquationNumber ) {
-   FeEquationNumber* self = (FeEquationNumber*)feEquationNumber;
-	
-   self->_initialise( self, NULL );
-   self->isInitialised = True;
-}
-
-
 /** Initialise implementation. Currently does nothing. */
-void _FeEquationNumber_Initialise( void* feEquationNumber ) {
-#if DEBUG
+void _FeEquationNumber_Initialise( void* feEquationNumber, void* data ) {
    FeEquationNumber* self = (FeEquationNumber*) feEquationNumber;
-   assert(self);
-#endif
+
+   Stg_Component_Initialise( self->feMesh   , data, False );
+   Stg_Component_Initialise( self->dofLayout, data, False );
+   if ( self->linkedDofInfo ) Stg_Component_Initialise( self->dofLayout, data, False );
+   if ( self->bcs )           Stg_Component_Initialise( self->bcs      , data, False );
 }
 
 
@@ -1967,11 +1923,11 @@ void FeEquationNumber_BuildLocationMatrix( FeEquationNumber* self ) {
 /** Build an element's local location matrix */
 Dof_EquationNumber** FeEquationNumber_BuildOneElementLocationMatrix( void* feEquationNumber, Element_LocalIndex lElement_I ) {
    FeEquationNumber* self = (FeEquationNumber*)feEquationNumber;
-   Node_DomainIndex elLocalNode_I;
+   /* Node_DomainIndex elLocalNode_I; */
    Node_DomainIndex numNodesThisElement, *elInc;
    Dof_EquationNumber** localLocationMatrix = NULL;
    FeMesh* feMesh = self->feMesh;
-   Dof_Index numDofsThisNode = 0;
+   /* Dof_Index numDofsThisNode = 0; */
    IArray* inc;
 
    inc = IArray_New();
@@ -2296,7 +2252,7 @@ void _FeEquationNumber_CalculateEqNumsDecomposition( FeEquationNumber* self ) {
 
 Partition_Index FeEquationNumber_CalculateOwningProcessorOfEqNum( void* feEquationNumber, Dof_EquationNumber eqNum ) {
    FeEquationNumber* self = (FeEquationNumber*)feEquationNumber;
-   Partition_Index ownerProc = (unsigned int)-1;
+   /* Partition_Index ownerProc = (unsigned int)-1; */
    Comm*	comm = Mesh_GetCommTopology( self->feMesh, MT_VERTEX );
    MPI_Comm	mpiComm = Comm_GetMPIComm( comm );
    unsigned	nProcs;
@@ -2385,7 +2341,7 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
    MPI_Comm		mpiComm;
    unsigned		rank, nProcs;
    unsigned		nDims;
-   unsigned		nDomainNodes, nDomainEls;
+   unsigned		nDomainNodes;
    unsigned		nLocalNodes;
    unsigned*		nNodalDofs;
    unsigned		nElNodes, *elNodes;
@@ -2430,7 +2386,7 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
    MPI_Comm_rank( mpiComm, (int*)&rank );
    nDims = Mesh_GetDimSize( feMesh );
    nDomainNodes = FeMesh_GetNodeDomainSize( feMesh );
-   nDomainEls = FeMesh_GetElementDomainSize( feMesh );
+   self->nDomainEls = FeMesh_GetElementDomainSize( feMesh );
    nLocalNodes = FeMesh_GetNodeLocalSize( feMesh );
    nNodalDofs = self->dofLayout->dofCounts;
    links = self->linkedDofInfo;
@@ -2450,8 +2406,8 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 
    /* Allocate for the location matrix. */
    nLocMatDofs = NULL;
-   locMat = AllocArray( int**, nDomainEls );
-   for( e_i = 0; e_i < nDomainEls; e_i++ ) {
+   locMat = AllocArray( int**, self->nDomainEls );
+   for( e_i = 0; e_i < self->nDomainEls; e_i++ ) {
       FeMesh_GetElementNodes( feMesh, e_i, inc );
       nElNodes = IArray_GetSize( inc );
       elNodes = IArray_GetPtr( inc );
@@ -2558,7 +2514,7 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
    FreeArray( tuples );
 
    /* Build location matrix. */
-   for( e_i = 0; e_i < nDomainEls; e_i++ ) {
+   for( e_i = 0; e_i < self->nDomainEls; e_i++ ) {
       FeMesh_GetElementNodes( feMesh, e_i, inc );
       nElNodes = IArray_GetSize( inc );
       elNodes = IArray_GetPtr( inc );
@@ -2835,8 +2791,10 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
                    nDofs * sizeof(int) );
 
    /* Allocate for location matrix. */
-   locMat = AllocArray( int**, Mesh_GetDomainSize( self->feMesh, nDims ) );
-   for( ii = 0; ii < Mesh_GetDomainSize( self->feMesh, nDims ); ii++ )
+   /* first store nDomainEls for usage during destroy */
+   self->nDomainEls = Mesh_GetDomainSize( self->feMesh, nDims );
+   locMat = AllocArray( int**, self->nDomainEls );
+   for( ii = 0; ii < self->nDomainEls; ii++ )
       locMat[ii] = AllocArray2D( int, FeMesh_GetElementNodeSize( self->feMesh, 0 ), nDofs );
 
    /* Fill in location matrix. */
@@ -3362,6 +3320,7 @@ int GenerateEquationNumbering(
 		VecScatterCreate( global_eqnum, is_all_my_eqnums, all_my_eqnums, PETSC_NULL, &vscat_p );
 		_VecScatterBeginEnd( vscat_p, global_eqnum, all_my_eqnums, INSERT_VALUES, SCATTER_FORWARD );
 		VecGetArray( all_my_eqnums, &_all_my_eqnums );
+
 		for( i=0; i<nlocal*dof; i++ ) {
 			eqnums[i] = (int)_all_my_eqnums[i];
 		}
@@ -3376,8 +3335,6 @@ int GenerateEquationNumbering(
 	VecMax( global_eqnum, &loc, &max );
 	*neqnums = (int)max;
 	(*neqnums)++;
-	
-	
 	
 	/* tidy up */
 	VecRestoreArray( local_ownership, &_local_ownership );
@@ -3395,7 +3352,7 @@ int GenerateEquationNumbering(
 	ISDestroy( is_eqnum );
 	VecScatterDestroy( vscat_eqnum );
 	
-	
-	
 	return 0;
 }
+
+

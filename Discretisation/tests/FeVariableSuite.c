@@ -50,22 +50,22 @@ struct _Particle {
 };
 
 FeVariable* BuildFeVariable_AsPosition( unsigned dim ) {
-	CartesianGenerator* gen;
-	FeMesh* feMesh;
-	DofLayout* dofs;
-	FeEquationNumber* eqNum;
-	Variable_Register* varReg;
-	int maxDecomp[3] = {0, 1, 1};
-	int sizes[3];
-	double minCrd[3];
-	double maxCrd[3];
-	static int arraySize;
-	static double* arrayPtrs[3];
-	int nRanks;
-	Variable* var;
-	FieldVariable_Register* fieldReg;
-	FeVariable* feVar;
-	int n_i;
+	CartesianGenerator*		gen;
+	FeMesh*						feMesh;
+	DofLayout*					dofs;
+	FeEquationNumber*			eqNum;
+	Variable_Register*		varReg;
+	int							maxDecomp[3] = {0, 1, 1};
+	int							sizes[3];
+	double						minCrd[3];
+	double						maxCrd[3];
+	static int					arraySize;
+	static double*				arrayPtrs[3];
+	int							nRanks;
+	Variable*					var;
+	FieldVariable_Register*	fieldReg;
+	FeVariable*					feVar;
+	int							n_i;
 
 	MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
 	sizes[0] = nRanks * 3;
@@ -73,13 +73,13 @@ FeVariable* BuildFeVariable_AsPosition( unsigned dim ) {
 	minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
 	maxCrd[0] = maxCrd[1] = maxCrd[2] = (double)nRanks;
 
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	CartesianGenerator_SetDimSize( gen, dim );
 	CartesianGenerator_SetTopologyParams( gen, (unsigned*)sizes, 0, NULL, (unsigned*)maxDecomp );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 	CartesianGenerator_SetShadowDepth( gen, 0 );
 
-	feMesh = FeMesh_New( "" );
+	feMesh = FeMesh_New( "", NULL );
 	Mesh_SetGenerator( feMesh, gen );
 	FeMesh_SetElementFamily( feMesh, "linear" );
 	Stg_Component_Build( feMesh, NULL, False );
@@ -89,11 +89,11 @@ FeVariable* BuildFeVariable_AsPosition( unsigned dim ) {
 	arraySize = Mesh_GetDomainSize( feMesh, MT_VERTEX );
 	arrayPtrs[0] = Memory_Alloc_Array_Unnamed( double, arraySize * dim );
 
-	var = Variable_NewVector( "velocity", Variable_DataType_Double, dim, (unsigned*)&arraySize, NULL,
-	                          (void**)arrayPtrs, varReg, "vx", "vy", "vz" );
+	var = Variable_NewVector( "velocity", NULL, Variable_DataType_Double, dim, (unsigned*)&arraySize, NULL,
+		(void**)arrayPtrs, varReg, "vx", "vy", "vz" );
 	Variable_Register_BuildAll( varReg );
 
-	dofs = DofLayout_New( "", varReg, 0, feMesh );
+	dofs = DofLayout_New( "", NULL, varReg, 0, feMesh );
 	dofs->nBaseVariables = dim;
 	dofs->baseVariables = Memory_Alloc_Array_Unnamed( Variable*, dim );
 	dofs->baseVariables[0] = var->components[0];
@@ -102,12 +102,12 @@ FeVariable* BuildFeVariable_AsPosition( unsigned dim ) {
 	Stg_Component_Build( dofs, NULL, False );
 	Stg_Component_Initialise( dofs, NULL, False );
 	
-	eqNum = FeEquationNumber_New( "", feMesh, dofs, NULL, NULL );
+	eqNum = FeEquationNumber_New( "", NULL, feMesh, dofs, NULL, NULL );
 	Stg_Component_Build( eqNum, NULL, False );
 	Stg_Component_Initialise( eqNum, NULL, False );
 
 	fieldReg = FieldVariable_Register_New();
-	feVar = FeVariable_New( "velocity", feMesh, NULL, dofs, NULL, NULL, NULL, dim, True, False, False, fieldReg );
+	feVar = FeVariable_New( "velocity", NULL, feMesh, NULL, dofs, NULL, NULL, NULL, dim, True, False, False, fieldReg );
 
 	for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, 0 ); n_i++ ) {
 		double* pos = Mesh_GetVertex( feMesh, n_i );
@@ -122,22 +122,22 @@ FeVariable* BuildFeVariable_AsPosition( unsigned dim ) {
 }
 
 FeVariable* BuildFeVariable_AsConstant( unsigned dim ) {
-	CartesianGenerator* gen;
-	FeMesh* feMesh;
-	DofLayout* dofs;
-	FeEquationNumber* eqNum;
-	Variable_Register* varReg;
-	int maxDecomp[3] = {0, 1, 1};
-	int sizes[3];
-	double minCrd[3];
-	double maxCrd[3];
-	static int arraySize;
-	static double* arrayPtr;
-	int nRanks;
-	Variable* var;
-	FieldVariable_Register* fieldReg;
-	FeVariable* feVar;
-	int n_i;
+	CartesianGenerator*		gen;
+	FeMesh*						feMesh;
+	DofLayout*					dofs;
+	FeEquationNumber*			eqNum;
+	Variable_Register*		varReg;
+	int							maxDecomp[3] = {0, 1, 1};
+	int							sizes[3];
+	double						minCrd[3];
+	double						maxCrd[3];
+	static int					arraySize;
+	static double*				arrayPtr;
+	int							nRanks;
+	Variable*					var;
+	FieldVariable_Register*	fieldReg;
+	FeVariable*					feVar;
+	int							n_i;
 	double constant[3] = {1.0, 1.0, 1.0};
 
 	MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
@@ -146,13 +146,13 @@ FeVariable* BuildFeVariable_AsConstant( unsigned dim ) {
 	minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
 	maxCrd[0] = maxCrd[1] = maxCrd[2] = (double)nRanks;
 
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	CartesianGenerator_SetDimSize( gen, dim );
 	CartesianGenerator_SetTopologyParams( gen, (unsigned*)sizes, 0, NULL, (unsigned*)maxDecomp );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 	CartesianGenerator_SetShadowDepth( gen, 0 );
 
-	feMesh = FeMesh_New( "" );
+	feMesh = FeMesh_New( "", NULL );
 	Mesh_SetGenerator( feMesh, gen );
 	FeMesh_SetElementFamily( feMesh, "linear" );
 	Stg_Component_Build( feMesh, NULL, False );
@@ -162,23 +162,23 @@ FeVariable* BuildFeVariable_AsConstant( unsigned dim ) {
 	arraySize = Mesh_GetDomainSize( feMesh, MT_VERTEX );
 	arrayPtr = Memory_Alloc_Array_Unnamed( double, arraySize );
 
-	var = Variable_NewScalar( "pressure", Variable_DataType_Double, (unsigned*)&arraySize, NULL,
+	var = Variable_NewScalar( "pressure", NULL, Variable_DataType_Double, (unsigned*)&arraySize, NULL,
 	                          (void**)&arrayPtr, varReg );
 	Variable_Register_BuildAll( varReg );
 
-	dofs = DofLayout_New( "", varReg, 0, feMesh );
+	dofs = DofLayout_New( "", NULL, varReg, 0, feMesh );
 	dofs->nBaseVariables = 1;
 	dofs->baseVariables = Memory_Alloc_Array_Unnamed( Variable*, 1 );
 	dofs->baseVariables[0] = var;
 	Stg_Component_Build( dofs, NULL, False );
 	Stg_Component_Initialise( dofs, NULL, False );
 	
-	eqNum = FeEquationNumber_New( "", feMesh, dofs, NULL, NULL );
+	eqNum = FeEquationNumber_New( "", NULL, feMesh, dofs, NULL, NULL );
 	Stg_Component_Build( eqNum, NULL, False );
 	Stg_Component_Initialise( eqNum, NULL, False );
 
 	fieldReg = FieldVariable_Register_New();
-	feVar = FeVariable_New( "pressure", feMesh, NULL, dofs, NULL, NULL, NULL, dim, True, False, False, fieldReg );
+	feVar = FeVariable_New( "pressure", NULL, feMesh, NULL, dofs, NULL, NULL, NULL, dim, True, False, False, fieldReg );
 
 	for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, 0 ); n_i++ ) {
 		Variable_SetValue( var, n_i, constant );
@@ -200,9 +200,9 @@ Swarm* BuildSwarm( FeMesh* mesh ) {
 	unsigned			partPerDim[3]	= { 2, 2, 2 };
 	
 	extMgr_Reg = ExtensionManager_Register_New();
-	elCellLayout = ElementCellLayout_New( "elementCellLayout", mesh );
-	gaussLayout = GaussParticleLayout_New( "gaussParticleLayout", dim, partPerDim );
-	swarm = Swarm_New( "gaussSwarm", elCellLayout, gaussLayout, dim, sizeof(Particle), extMgr_Reg, NULL, MPI_COMM_WORLD, NULL );
+	elCellLayout = ElementCellLayout_New( "elementCellLayout", NULL, mesh );
+	gaussLayout = GaussParticleLayout_New( "gaussParticleLayout", NULL, LocalCoordSystem, True, dim, partPerDim );
+	swarm = Swarm_New( "gaussSwarm", NULL, elCellLayout, gaussLayout, dim, sizeof(Particle), extMgr_Reg, NULL, MPI_COMM_WORLD, NULL );
 
 	Stg_Component_Build( swarm, NULL, True );
 	Stg_Component_Initialise( swarm, NULL, True );
@@ -280,3 +280,5 @@ void FeVariableSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, FeVariableSuite_Interpolate );
    pcu_suite_addTest( suite, FeVariableSuite_Integrate );
 }
+
+

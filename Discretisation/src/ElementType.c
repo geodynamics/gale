@@ -55,33 +55,12 @@
 
 const Type ElementType_Type = "ElementType";
 
-ElementType* _ElementType_New( 
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*				_construct,
-		Stg_Component_BuildFunction*					_build,
-		Stg_Component_InitialiseFunction*				_initialise,
-		Stg_Component_ExecuteFunction*					_execute,
-		Stg_Component_DestroyFunction*					_destroy,
-		Name								name,
-		Bool								initFlag,
-		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
-		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
-		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
-		ElementType_SurfaceNormalFunction*				_surfaceNormal,
-		Index								nodeCount )
-{
-	ElementType*		self;
+ElementType* _ElementType_New(  ELEMENTTYPE_DEFARGS  ) {
+	ElementType* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ElementType) );
-	self = (ElementType*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor, _construct, _build, 
-			_initialise, _execute, _destroy, name, NON_GLOBAL );
+	self = (ElementType*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* General info */
 	
@@ -95,26 +74,13 @@ ElementType* _ElementType_New(
 	
 	/* ElementType info */
 	
-	_Stg_Class_Init( (Stg_Class*)self );
-	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-	_Stg_Component_Init( (Stg_Component*)self );
-
-	if( initFlag ){
-		_ElementType_Init( self, nodeCount );
-	}
-	
 	return self;
 }
 
-void _ElementType_Init(
-		ElementType*				self,
-		Index					nodeCount )
-{
+void _ElementType_Init( ElementType* self, Index nodeCount ) {
 	/* General and Virtual info should already be set */
-	
 	self->dim = 0;
 	/* ElementType info */
-	self->isConstructed = True;
 	self->nodeCount = nodeCount;
 	self->debug = Stream_RegisterChild( StgFEM_Discretisation_Debug, ElementType_Type );
 	self->inc = IArray_New();
@@ -124,14 +90,13 @@ void _ElementType_Init(
 void _ElementType_Destroy( void* elementType, void* data ){
 	ElementType* self = (ElementType*)elementType;
 
+	NewClass_Delete( self->inc );
+
 	Stg_Component_Destroy( self, data, False );
 }
 
 void _ElementType_Delete( void* elementType ) {
 	ElementType* self = (ElementType*)elementType;
-	Journal_DPrintf( self->debug, "In %s\n", __func__ );
-
-	NewClass_Delete( self->inc );
 
 	/* Stg_Class_Delete parent*/
 	_Stg_Component_Delete( self );
@@ -184,8 +149,10 @@ void ElementType_EvaluateShapeFunctionLocalDerivsAt( void* elementType, const do
 double _ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, unsigned element_I, const double localCoord[], 
 						unsigned face_I, unsigned norm ) 
 {
-	ElementType* 	self        	= (ElementType*) elementType;
-	Stream*		error		= Journal_Register( ErrorStream_Type, ElementType_Type );
+	ElementType*	self;
+	Stream*			error = Journal_Register( ErrorStream_Type, ElementType_Type );
+
+	self = (ElementType*) elementType;
 
 	Journal_Printf( error, "Error: the jacobian for this element type cannot be evaluated on the element surface" );
 	Journal_Printf( error, "(perhaps because the nodes are defined internally for the element).\n" );
@@ -204,34 +171,37 @@ double ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, un
 #define EPS 1.0E-6
 
 int _ElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
-	ElementType* 	self = (ElementType*)elementType;
+	ElementType* self;
 
-        memset( normal, 0, sizeof(double) * dim );
+	self = (ElementType*)elementType;
 
-        if( xi[J_AXIS] < -1.0 + EPS ) {
-                normal[J_AXIS] = -1.0;
-                return 0;
-        }
-        else if( xi[J_AXIS] > +1.0 - EPS ) {
-                normal[J_AXIS] = +1.0;
-                return 1;
-        }
-        else if( xi[I_AXIS] < -1.0 + EPS ) {
-                normal[I_AXIS] = -1.0;
-                return 2;
-        }
-        else if( xi[I_AXIS] > +1.0 - EPS ) {
-                normal[I_AXIS] = +1.0;
-                return 3;
-        }
-        else if( xi[K_AXIS] < -1.0 + EPS ) {
-                normal[K_AXIS] = -1.0;
-                return 4;
-        }
-        else if( xi[K_AXIS] > +1.0 - EPS ) {
-                normal[K_AXIS] = +1.0;
-                return 5;
-        }
+	memset( normal, 0, sizeof(double) * dim );
+
+	if( xi[J_AXIS] < -1.0 + EPS ) {
+		normal[J_AXIS] = -1.0;
+		return 0;
+	}
+	else if( xi[J_AXIS] > +1.0 - EPS ) {
+		normal[J_AXIS] = +1.0;
+		return 1;
+	}
+	else if( xi[I_AXIS] < -1.0 + EPS ) {
+		normal[I_AXIS] = -1.0;
+		return 2;
+	}
+	else if( xi[I_AXIS] > +1.0 - EPS ) {
+		normal[I_AXIS] = +1.0;
+		return 3;
+	}
+	else if( xi[K_AXIS] < -1.0 + EPS ) {
+		normal[K_AXIS] = -1.0;
+		return 4;
+	}
+	else if( xi[K_AXIS] > +1.0 - EPS ) {
+		normal[K_AXIS] = +1.0;
+		return 5;
+	}
+	return 0;
 }
 
 int ElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
@@ -657,5 +627,7 @@ void ElementType_GetFaceNodes( void* elementType, Mesh* mesh, unsigned element_I
 	for( node_i = 0; node_i < nNodes; node_i++ )
 		nodes[node_i] = inc[self->faceNodes[face_I][node_i]];
 }
+
+
 
 

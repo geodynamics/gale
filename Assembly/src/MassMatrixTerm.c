@@ -55,79 +55,39 @@
 const Type MassMatrixTerm_Type = "MassMatrixTerm";
 
 MassMatrixTerm* MassMatrixTerm_New( 
-    Name                                                name,
-    StiffnessMatrix*                                    stiffMat,
-    Swarm*                                              integrationSwarm,
-    FeVariable*                                         field )
+	Name							name,
+	FiniteElementContext*	context,
+	StiffnessMatrix*			stiffnessMatrix,
+	Swarm*						integrationSwarm,
+	FeVariable*					field )
 {
     MassMatrixTerm* self = (MassMatrixTerm*) _MassMatrixTerm_DefaultNew( name );
 
-    MassMatrixTerm_InitAll( 
-	self,
-	stiffMat,
-	integrationSwarm,
-	field );
+	self->isConstructed = True;
+	_StiffnessMatrixTerm_Init( self, context, stiffnessMatrix, integrationSwarm, NULL );
+	_MassMatrixTerm_Init( self, field );
 
     return self;
 }
 
 /* Creation implementation / Virtual constructor */
-MassMatrixTerm* _MassMatrixTerm_New( 
-    SizeT                                               sizeOfSelf,  
-    Type                                                type,
-    Stg_Class_DeleteFunction*                           _delete,
-    Stg_Class_PrintFunction*                            _print,
-    Stg_Class_CopyFunction*                             _copy, 
-    Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-    Stg_Component_ConstructFunction*                    _construct,
-    Stg_Component_BuildFunction*                        _build,
-    Stg_Component_InitialiseFunction*                   _initialise,
-    Stg_Component_ExecuteFunction*                      _execute,
-    Stg_Component_DestroyFunction*                      _destroy,
-    StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement, 
-    Name                                                name )
+MassMatrixTerm* _MassMatrixTerm_New(  MASSMATRIXTERM_DEFARGS  )
 {
     MassMatrixTerm* self;
 	
     /* Allocate memory */
-    assert( sizeOfSelf >= sizeof(MassMatrixTerm) );
-    self = (MassMatrixTerm*) _StiffnessMatrixTerm_New( 
-	sizeOfSelf, 
-	type, 
-	_delete, 
-	_print, 
-	_copy,
-	_defaultConstructor,
-	_construct,
-	_build, 
-	_initialise,
-	_execute,
-	_destroy,
-	_assembleElement,
-	name );
+    assert( _sizeOfSelf >= sizeof(MassMatrixTerm) );
+    self = (MassMatrixTerm*) _StiffnessMatrixTerm_New(  STIFFNESSMATRIXTERM_PASSARGS  );
 	
     /* Virtual info */
 	
     return self;
 }
 
-void _MassMatrixTerm_Init( 
-    MassMatrixTerm*                             self, 
-    FeVariable*                                 field )
-{
+void _MassMatrixTerm_Init( void* matrixTerm, FeVariable* field ) {
+    MassMatrixTerm* self = (MassMatrixTerm*)matrixTerm;
+
     self->field = field;
-}
-
-void MassMatrixTerm_InitAll( 
-    void*                                               matrixTerm,
-    StiffnessMatrix*                                        stiffMat,
-    Swarm*                                              integrationSwarm,
-    FeVariable*                                         field )
-{
-    MassMatrixTerm* self = (MassMatrixTerm*) matrixTerm;
-
-    StiffnessMatrixTerm_InitAll( self, stiffMat, integrationSwarm, NULL );
-    _MassMatrixTerm_Init( self, field );
 }
 
 void _MassMatrixTerm_Delete( void* matrixTerm ) {
@@ -146,28 +106,32 @@ void _MassMatrixTerm_Print( void* matrixTerm, Stream* stream ) {
 }
 
 void* _MassMatrixTerm_DefaultNew( Name name ) {
-    return (void*)_MassMatrixTerm_New( 
-	sizeof(MassMatrixTerm), 
-	MassMatrixTerm_Type,
-	_MassMatrixTerm_Delete,
-	_MassMatrixTerm_Print,
-	NULL,
-	_MassMatrixTerm_DefaultNew,
-	_MassMatrixTerm_Construct,
-	_MassMatrixTerm_Build,
-	_MassMatrixTerm_Initialise,
-	_MassMatrixTerm_Execute,
-	_MassMatrixTerm_Destroy,
-	_MassMatrixTerm_AssembleElement,
-	name );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(MassMatrixTerm);
+	Type                                                         type = MassMatrixTerm_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _MassMatrixTerm_Delete;
+	Stg_Class_PrintFunction*                                   _print = _MassMatrixTerm_Print;
+	Stg_Class_CopyFunction*                                     _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _MassMatrixTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _MassMatrixTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _MassMatrixTerm_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _MassMatrixTerm_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _MassMatrixTerm_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _MassMatrixTerm_Destroy;
+	StiffnessMatrixTerm_AssembleElementFunction*     _assembleElement = _MassMatrixTerm_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+    return (void*)_MassMatrixTerm_New(  MASSMATRIXTERM_PASSARGS  );
 }
 
-void _MassMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
+void _MassMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
     MassMatrixTerm*            self             = (MassMatrixTerm*)matrixTerm;
     FeVariable*                field;
 
     /* Construct Parent */
-    _StiffnessMatrixTerm_Construct( self, cf, data );
+    _StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
     field = Stg_ComponentFactory_ConstructByKey( cf, self->name, "field", FeVariable, True, data ) ;
 
@@ -193,30 +157,33 @@ void _MassMatrixTerm_Execute( void* matrixTerm, void* data ) {
 }
 
 void _MassMatrixTerm_Destroy( void* matrixTerm, void* data ) {
-    _StiffnessMatrixTerm_Destroy( matrixTerm, data );
+   MassMatrixTerm* self = (MassMatrixTerm*)matrixTerm;
+
+   Stg_Component_Destroy( self->field, data, False );
+   _StiffnessMatrixTerm_Destroy( matrixTerm, data );
 }
 
 
-void _MassMatrixTerm_AssembleElement( void* matrixTerm,
-				      StiffnessMatrix* stiffMat, 
-				      Element_LocalIndex lElement_I, 
-				      SystemLinearEquations* sle, 
-				      FiniteElementContext* context, 
-				      double** elStiffMat )
+void _MassMatrixTerm_AssembleElement(
+	void*							matrixTerm,
+	StiffnessMatrix*			stiffMat, 
+	Element_LocalIndex		lElement_I, 
+	SystemLinearEquations*	sle, 
+	FiniteElementContext*	context, 
+	double**						elStiffMat )
 {
-    MassMatrixTerm*       self         = Stg_CheckType( matrixTerm, MassMatrixTerm );
-    StiffnessMatrix *stiffnessMatrix = self->stiffnessMatrix;
-    Swarm*                              swarm        = self->integrationSwarm;
-    FeVariable*                         variable1    = stiffnessMatrix->rowVariable;
-    Dimension_Index                     dim          = stiffnessMatrix->dim;
-    int num_node_dofs = self->field->fieldComponentCount;
-    IntegrationPoint*                   currIntegrationPoint;
-    double*                             xi;
-    double                              weight;
+	MassMatrixTerm*       self         = Stg_CheckType( matrixTerm, MassMatrixTerm );
+	StiffnessMatrix			*stiffnessMatrix = self->stiffnessMatrix;
+	Swarm*                              swarm        = self->integrationSwarm;
+	FeVariable*                         variable1    = stiffnessMatrix->rowVariable;
+	Dimension_Index                     dim          = stiffnessMatrix->dim;
+	int num_node_dofs = self->field->fieldComponentCount;
+	IntegrationPoint*                   currIntegrationPoint;
+	double*                             xi;
+	double                              weight;
     Particle_InCellIndex                cParticle_I, cellParticleCount;
     Index                               nodesPerEl;
     Index                               i,j, k;
-    Dimension_Index                     dim_I;
     double**                            GNx, *N;
     double                              detJac;
 	
@@ -262,3 +229,5 @@ void _MassMatrixTerm_AssembleElement( void* matrixTerm,
 	}
     }
 }
+
+

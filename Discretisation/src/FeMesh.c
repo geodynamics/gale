@@ -42,43 +42,50 @@
 /* Textual name of this class */
 const Type FeMesh_Type = "FeMesh";
 
-
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
 
-FeMesh* FeMesh_New( Name name ) {
-	return _FeMesh_New( sizeof(FeMesh), 
-			  FeMesh_Type, 
-			  _FeMesh_Delete, 
-			  _FeMesh_Print, 
-			  NULL, 
-			  (void* (*)(Name))_FeMesh_New, 
-			  _FeMesh_Construct, 
-			  _FeMesh_Build, 
-			  _FeMesh_Initialise, 
-			  _FeMesh_Execute, 
-			  _FeMesh_Destroy, 
-			  name, 
-			  NON_GLOBAL );
+FeMesh* FeMesh_New( Name name, AbstractContext* context ) {
+   FeMesh* self = _FeMesh_DefaultNew( name );
+   _Mesh_Init( (Mesh*)self, context );
+	/* FeMesh info */
+	_FeMesh_Init( self, NULL, NULL, False ); /* this is a useless Init() */
+
+   return self;
 }
 
-FeMesh* _FeMesh_New( FEMESH_DEFARGS ) {
+FeMesh* _FeMesh_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(FeMesh);
+	Type                                                      type = FeMesh_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FeMesh_Delete;
+	Stg_Class_PrintFunction*                                _print = _FeMesh_Print;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void* (*)(Name))_FeMesh_New;
+	Stg_Component_ConstructFunction*                    _construct = _FeMesh_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _FeMesh_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FeMesh_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FeMesh_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FeMesh_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_Class_CopyFunction*        _copy = NULL;
+
+   return _FeMesh_New(  FEMESH_PASSARGS  );
+}
+
+FeMesh* _FeMesh_New(  FEMESH_DEFARGS  ) {
 	FeMesh*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(FeMesh) );
-	self = (FeMesh*)_Mesh_New( MESH_PASSARGS );
-
-	/* Virtual info */
-
-	/* FeMesh info */
-	_FeMesh_Init( self );
+	assert( _sizeOfSelf >= sizeof(FeMesh) );
+	self = (FeMesh*)_Mesh_New(  MESH_PASSARGS  );
 
 	return self;
 }
 
-void _FeMesh_Init( FeMesh* self ) {
+void _FeMesh_Init( FeMesh* self, ElementType* elType, const char* family, Bool elementMesh ) {
 	Stream*	stream;
 
 	assert( self && Stg_CheckType( self, FeMesh ) );
@@ -86,8 +93,16 @@ void _FeMesh_Init( FeMesh* self ) {
 	stream = Journal_Register( Info_Type, self->type );
 	Stream_SetPrintingRank( stream, 0 );
 
-	self->feElType = NULL;
-	self->feElFamily = NULL;
+	self->feElType = elType;
+	self->feElFamily = family;
+	self->elementMesh = elementMesh;
+
+   /* checkpoint non-constant meshes */
+   if ( self->feElFamily && strcmp( self->feElFamily, "constant" ) ){
+      self->isCheckpointedAndReloaded = True;
+      self->requiresCheckpointing     = True;
+   }
+	
 	self->inc = IArray_New();
 }
 
@@ -98,10 +113,6 @@ void _FeMesh_Init( FeMesh* self ) {
 
 void _FeMesh_Delete( void* feMesh ) {
 	FeMesh*	self = (FeMesh*)feMesh;
-
-	FeMesh_Destruct( self );
-	NewClass_Delete( self->inc );
-
 	/* Delete the parent. */
 	_Mesh_Delete( self );
 }
@@ -118,23 +129,15 @@ void _FeMesh_Print( void* feMesh, Stream* stream ) {
 	_Mesh_Print( self, stream );
 }
 
-void _FeMesh_Construct( void* feMesh, Stg_ComponentFactory* cf, void* data ) {
-	FeMesh*		self = (FeMesh*)feMesh;
-	char*		family;
+void _FeMesh_AssignFromXML( void* feMesh, Stg_ComponentFactory* cf, void* data ) {
+	FeMesh*	self = (FeMesh*)feMesh;
 
 	assert( self );
 
-	_Mesh_Construct( self, cf, data );
+	_Mesh_AssignFromXML( self, cf, data );
 
-	family = Stg_ComponentFactory_GetString( cf, self->name, "elementType", "linear" );
-	FeMesh_SetElementFamily( self, family );
-   /* checkpoint non-constant meshes */
-   if ( strcmp( self->feElFamily, "constant" ) ){
-      self->isCheckpointedAndReloaded = True;
-      self->requiresCheckpointing     = True;
-   }
-
-	self->elementMesh = Stg_ComponentFactory_GetBool( cf, self->name, "isElementMesh", False );
+	_FeMesh_Init( self, NULL, Stg_ComponentFactory_GetString( cf, self->name, "elementType", "linear" ), 
+		Stg_ComponentFactory_GetBool( cf, self->name, "isElementMesh", False ) );
 }
 
 void _FeMesh_Build( void* feMesh, void* data ) {
@@ -214,12 +217,12 @@ void _FeMesh_Build( void* feMesh, void* data ) {
 
 	if( self->elementMesh ) {
 		Stg_Class_Delete( self->algorithms );
-		self->algorithms = FeMesh_Algorithms_New( "" );
+		self->algorithms = FeMesh_Algorithms_New( "", NULL );
 		Mesh_Algorithms_SetMesh( self->algorithms, self );
 		Mesh_Algorithms_Update( self->algorithms );
 
 		Stg_Class_Delete( self->elTypes[0] );
-		self->elTypes[0] = FeMesh_ElementType_New();
+		self->elTypes[0] = (FeMesh_ElementType*)FeMesh_ElementType_New();
 		Mesh_ElementType_SetMesh( self->elTypes[0], self );
 		Mesh_ElementType_Update( self->elTypes[0] );
 	}
@@ -245,6 +248,11 @@ void _FeMesh_Execute( void* feMesh, void* data ) {
 }
 
 void _FeMesh_Destroy( void* feMesh, void* data ) {
+	FeMesh*	self = (FeMesh*)feMesh;
+   
+	FeMesh_Destruct( self );
+	NewClass_Delete( self->inc );
+   _Mesh_Destroy( self, data );
 }
 
 
@@ -257,7 +265,7 @@ void FeMesh_SetElementType( void* feMesh, ElementType* elType ) {
 
 	assert( self );
 
-	FreeObject( self->feElType );
+   if( self->feElType ) Stg_Class_Delete( self->feElType );
 	self->feElType = elType;
 }
 
@@ -435,6 +443,11 @@ void FeMesh_EvalGlobalDerivs( void* feMesh, unsigned element, double* localCoord
 */
 
 void FeMesh_Destruct( FeMesh* self ) {
+   Stg_Class_Delete( self->feElType );
 	self->feElFamily = NULL;
-	KillObject( self->feElType );
+	/* Disabling the killing of this object from within this
+	component as this will be destroyed by the LiveComponentRegister_DestroyAll function 101109 */
+	/*KillObject( self->feElType );*/ 
 }
+
+

@@ -48,7 +48,7 @@
 #include "StiffnessMatrix.h"
 #include "SolutionVector.h"
 #include "ForceVector.h"
-#include "Context.h"
+#include "FiniteElementContext.h"
 
 
 /* Textual name of this class */
@@ -56,73 +56,52 @@ const Type SystemLinearEquations_Type = "SystemLinearEquations";
 
 /** Constructor */
 SystemLinearEquations* SystemLinearEquations_New(
-		Name                                               name,
-		SLE_Solver*                                        solver,
-		void*				   		   nlSolver,
-		FiniteElementContext*                              context,
-		Bool                                               isNonLinear,
-		double                                             nonLinearTolerance,
-		Iteration_Index                                    nonLinearMaxIterations,
-		Bool                                               killNonConvergent,		
-		EntryPoint_Register*                               entryPoint_Register,
-		MPI_Comm                                           comm )
+	Name							name,
+	SLE_Solver*					solver,
+	void*							nlSolver,
+	FiniteElementContext*	context,
+	Bool							isNonLinear,
+	double						nonLinearTolerance,
+	Iteration_Index			nonLinearMaxIterations,
+	Bool							killNonConvergent,		
+	EntryPoint_Register*		entryPoint_Register,
+	MPI_Comm						comm )
 {
 	SystemLinearEquations* self = _SystemLinearEquations_DefaultNew( name );
 
-	SystemLinearEquations_InitAll( 
-			self, 
-			solver,
-			nlSolver,
-			context,
-			isNonLinear,
-			nonLinearTolerance, 
-			nonLinearMaxIterations,
-			killNonConvergent, 
-			entryPoint_Register,
-			comm );
+	self->isConstructed = True;
+	_SystemLinearEquations_Init(
+		self,
+		solver,
+		nlSolver,
+		context,
+		False, /* TODO: A hack put in place for setting the convergence stream to 'off' if the SLE class is created from within the code, not via an xml */
+		isNonLinear,
+		nonLinearTolerance,
+		nonLinearMaxIterations,
+		killNonConvergent,
+		1, /* TODO : hack for setting the minimum number of iterations to 1- same hack as above */
+		"",
+		"",
+		entryPoint_Register,
+		comm );
 
 	return self;
 }
 
 /* Creation implementation / Virtual constructor */
-SystemLinearEquations* _SystemLinearEquations_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		SystemLinearEquations_LM_SetupFunction*            _LM_Setup,
-		SystemLinearEquations_MatrixSetupFunction*         _matrixSetup,
-		SystemLinearEquations_VectorSetupFunction*         _vectorSetup,
-		SystemLinearEquations_UpdateSolutionOntoNodesFunc* _updateSolutionOntoNodes, 
-		SystemLinearEquations_MG_SelectStiffMatsFunc*		_mgSelectStiffMats, 
-
-		Name                                               name ) 
+SystemLinearEquations* _SystemLinearEquations_New(  SYSTEMLINEAREQUATIONS_DEFARGS  ) 
 {
-	SystemLinearEquations*					self;
+	SystemLinearEquations* self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(SystemLinearEquations) );
-	self = (SystemLinearEquations*) _Stg_Component_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name,
-			NON_GLOBAL );
+	assert( _sizeOfSelf >= sizeof(SystemLinearEquations) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (SystemLinearEquations*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* Virtual info */
 	self->_LM_Setup = _LM_Setup;
@@ -137,26 +116,25 @@ SystemLinearEquations* _SystemLinearEquations_New(
 }
 
 void _SystemLinearEquations_Init( 
-		void*                                              sle, 
-		SLE_Solver*                                        solver, 
-		void*				   		   nlSolver,
-		FiniteElementContext*                              context, 
-		Bool                                               makeConvergenceFile,  
-		Bool                                               isNonLinear,
-		double                                             nonLinearTolerance,
-		Iteration_Index                                    nonLinearMaxIterations,
-		Bool                                               killNonConvergent,
-		Iteration_Index                                    nonLinearMinIterations,
-		Name						   nonLinearSolutionType,
-		Name						   optionsPrefix,
-		EntryPoint_Register*                               entryPoint_Register,
-		MPI_Comm                                           comm ) 
+	void*							sle, 
+	SLE_Solver*					solver, 
+	void*							nlSolver,
+	FiniteElementContext*	context, 
+	Bool							makeConvergenceFile,  
+	Bool							isNonLinear,
+	double						nonLinearTolerance,
+	Iteration_Index			nonLinearMaxIterations,
+	Bool							killNonConvergent,
+	Iteration_Index			nonLinearMinIterations,
+	Name							nonLinearSolutionType,
+	Name							optionsPrefix,
+	EntryPoint_Register*		entryPoint_Register,
+	MPI_Comm						comm ) 
 {
-	SystemLinearEquations*  self 		= (SystemLinearEquations*)sle;
-	char* 			filename;
-	char* 			optionsName;
+	SystemLinearEquations*	self = (SystemLinearEquations*)sle;
+	char*							filename;
+	char*							optionsName;
 
-	self->isConstructed = True;
 	self->extensionManager = ExtensionManager_New_OfExistingObject( self->name, self );
 	
 	self->debug = Stream_RegisterChild( StgFEM_SLE_SystemSetup_Debug, self->type );
@@ -175,7 +153,6 @@ void _SystemLinearEquations_Init(
 		Memory_Free( filename );
 		Journal_Printf( self->convergenceStream , "Timestep\tIteration\tResidual\tTolerance\n" );
 	}
-	
 	
 	self->comm = comm;
 	self->solver = solver;
@@ -213,8 +190,8 @@ void _SystemLinearEquations_Init(
 	Stg_asprintf( &self->nlConvergedEPName, "%s-nlConvergedEP", self->name );
 	self->nlConvergedEP = EntryPoint_New( self->nlConvergedEPName, EntryPoint_2VoidPtr_CastType );
 	/* END LUKE'S FRICTIONAL BCS BIT */
-        self->nlFormJacobian = False;
-        self->nlCurIterate = PETSC_NULL;
+	self->nlFormJacobian = False;
+	self->nlCurIterate = PETSC_NULL;
 	
 	/* Initialise MG stuff. */
 	self->mgEnabled = False;
@@ -249,69 +226,17 @@ void _SystemLinearEquations_Init(
 		FiniteElementContext_AddSLE( context, self );
 }
 
-void SystemLinearEquations_InitAll( 
-		void*                                              sle, 
-		SLE_Solver*                                        solver,
-		void*				   		   nlSolver,
-		FiniteElementContext*                              context, 
-		Bool                                               isNonLinear,
-		double                                             nonLinearTolerance,
-		Iteration_Index                                    nonLinearMaxIterations,
-		Bool                                               killNonConvergent,
-		EntryPoint_Register*                               entryPoint_Register,
-		MPI_Comm                                           comm ) 
-{
-	/* TODO - Init Parent */
-	_SystemLinearEquations_Init( 
-			sle, 
-			solver,
-			nlSolver,
-			context,
-			False, /* TODO: A hack put in place for setting the convergence stream to 'off' if the SLE class is created from within the code, not via an xml */
-			isNonLinear,
-			nonLinearTolerance, 
-			nonLinearMaxIterations,
-			killNonConvergent, 
-			1,/* TODO : hack for setting the minimum number of iterations to 1- same hack as above */
-			"",
-			"",
-			entryPoint_Register,
-			comm );
-}
-
-
 void _SystemLinearEquations_Delete( void* sle ) {
-	SystemLinearEquations*					self = (SystemLinearEquations*)sle;
+	SystemLinearEquations* self = (SystemLinearEquations*)sle;
 	
 	Journal_DPrintf( self->debug, "In %s\n", __func__ );
 	Stream_IndentBranch( StgFEM_Debug );
 	
-	/* BEGIN LUKE'S FRICTIONAL BCS BIT */
-        Memory_Free( self->nlSetupEPName );
-	Memory_Free( self->nlEPName );
-	Memory_Free( self->postNlEPName );
-        Memory_Free( self->nlConvergedEPName );
-	/* END LUKE'S FRICTIONAL BCS BIT */
-	Memory_Free( self->executeEPName );
-	
-	Stg_Class_Delete( self->extensionManager );
-
-	Stg_Class_Delete( self->stiffnessMatrices ); 
-	Stg_Class_Delete( self->forceVectors ); 
-	Stg_Class_Delete( self->solutionVectors ); 
-
-	Memory_Free( self->optionsPrefix );
-
-	VecDestroy( self->X );
-	VecDestroy( self->F );
-	MatDestroy( self->A );
-	MatDestroy( self->J );
-	/* 	 delete parent */
+	/* delete parent */
 	_Stg_Component_Delete( self );
+
 	Stream_UnIndentBranch( StgFEM_Debug );
-
 }
-
 
 void _SystemLinearEquations_Print( void* sle, Stream* stream ) {
 	SystemLinearEquations*		self = (SystemLinearEquations*)sle;
@@ -331,7 +256,6 @@ void _SystemLinearEquations_Print( void* sle, Stream* stream ) {
 	Journal_Printf( stream, "\tsolver (ptr): %p\n", self->solver );
 	Stg_Class_Print( self->solver, stream );
 }
-
 
 void* _SystemLinearEquations_Copy( void* sle, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	SystemLinearEquations*	self = (SystemLinearEquations*)sle;
@@ -380,71 +304,71 @@ void* _SystemLinearEquations_Copy( void* sle, void* dest, Bool deep, Name nameEx
 }
 
 void* _SystemLinearEquations_DefaultNew( Name name ) {
-	return _SystemLinearEquations_New(
-		sizeof(SystemLinearEquations), 
-		SystemLinearEquations_Type,
-		_SystemLinearEquations_Delete,
-		_SystemLinearEquations_Print,
-		_SystemLinearEquations_Copy,
-		_SystemLinearEquations_DefaultNew,
-		_SystemLinearEquations_Construct,
-		_SystemLinearEquations_Build,
-		_SystemLinearEquations_Initialise,
-		_SystemLinearEquations_Execute,
-		_SystemLinearEquations_Destroy,
-		_SystemLinearEquations_LM_Setup,
-		_SystemLinearEquations_MatrixSetup,
-		_SystemLinearEquations_VectorSetup,
-		_SystemLinearEquations_UpdateSolutionOntoNodes,
-		_SystemLinearEquations_MG_SelectStiffMats, 
-		name );
+	/* Variables set in this function */
+	SizeT                                                            _sizeOfSelf = sizeof(SystemLinearEquations);
+	Type                                                                    type = SystemLinearEquations_Type;
+	Stg_Class_DeleteFunction*                                            _delete = _SystemLinearEquations_Delete;
+	Stg_Class_PrintFunction*                                              _print = _SystemLinearEquations_Print;
+	Stg_Class_CopyFunction*                                                _copy = _SystemLinearEquations_Copy;
+	Stg_Component_DefaultConstructorFunction*                _defaultConstructor = _SystemLinearEquations_DefaultNew;
+	Stg_Component_ConstructFunction*                                  _construct = _SystemLinearEquations_AssignFromXML;
+	Stg_Component_BuildFunction*                                          _build = _SystemLinearEquations_Build;
+	Stg_Component_InitialiseFunction*                                _initialise = _SystemLinearEquations_Initialise;
+	Stg_Component_ExecuteFunction*                                      _execute = _SystemLinearEquations_Execute;
+	Stg_Component_DestroyFunction*                                      _destroy = _SystemLinearEquations_Destroy;
+	SystemLinearEquations_LM_SetupFunction*                            _LM_Setup = _SystemLinearEquations_LM_Setup;
+	SystemLinearEquations_MatrixSetupFunction*                      _matrixSetup = _SystemLinearEquations_MatrixSetup;
+	SystemLinearEquations_VectorSetupFunction*                      _vectorSetup = _SystemLinearEquations_VectorSetup;
+	SystemLinearEquations_UpdateSolutionOntoNodesFunc*  _updateSolutionOntoNodes = _SystemLinearEquations_UpdateSolutionOntoNodes;
+	SystemLinearEquations_MG_SelectStiffMatsFunc*             _mgSelectStiffMats = _SystemLinearEquations_MG_SelectStiffMats;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _SystemLinearEquations_New(  SYSTEMLINEAREQUATIONS_PASSARGS  );
 }
 
-void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void* data ){
-	SystemLinearEquations*  self                     = (SystemLinearEquations*)sle;
-	SLE_Solver*             solver                   = NULL;
-	void*                   entryPointRegister       = NULL;
-	FiniteElementContext*   context                  = NULL;
+void _SystemLinearEquations_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data ){
+	SystemLinearEquations*  self = (SystemLinearEquations*)sle;
+	SLE_Solver*             solver = NULL;
+	void*                   entryPointRegister = NULL;
+	FiniteElementContext*   context = NULL;
 	double                  nonLinearTolerance;
 	Iteration_Index         nonLinearMaxIterations;
 	Bool                    isNonLinear;
 	Bool                    killNonConvergent;
 	Bool                    makeConvergenceFile;
 	Iteration_Index         nonLinearMinIterations;                     
-	Name			nonLinearSolutionType;
-	SNES                    nlSolver                 = NULL;
-	Name			optionsPrefix;
-	double double_from_dict;
-	Bool   bool_from_dict;
-	int    int_from_dict;
+	Name							nonLinearSolutionType;
+	SNES                    nlSolver = NULL;
+	Name							optionsPrefix;
 	
 	solver = Stg_ComponentFactory_ConstructByKey( cf, self->name, SLE_Solver_Type, SLE_Solver, False, data ) ;
 
-	/* TODO - Construct Parent */
-
-	makeConvergenceFile       = Stg_ComponentFactory_GetBool(   cf, self->name, "makeConvergenceFile",    False );
-	isNonLinear               = Stg_ComponentFactory_GetBool(   cf, self->name, "isNonLinear",            False );
-	nonLinearTolerance        = Stg_ComponentFactory_GetDouble( cf, self->name, "nonLinearTolerance",     0.01 );
-	nonLinearMaxIterations    = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "nonLinearMaxIterations", 500 );
-	killNonConvergent         = Stg_ComponentFactory_GetBool(   cf, self->name, "killNonConvergent",      True );
-	nonLinearMinIterations    = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "nonLinearMinIterations", 1 );
-	nonLinearSolutionType	  = Stg_ComponentFactory_GetString( cf, self->name, "nonLinearSolutionType",  "default" );
-	optionsPrefix			  = Stg_ComponentFactory_GetString( cf, self->name, "optionsPrefix",          "" );
-
+	makeConvergenceFile		= Stg_ComponentFactory_GetBool( cf, self->name, "makeConvergenceFile", False );
+	isNonLinear					= Stg_ComponentFactory_GetBool( cf, self->name, "isNonLinear", False );
+	nonLinearTolerance		= Stg_ComponentFactory_GetDouble( cf, self->name, "nonLinearTolerance", 0.01 );
+	nonLinearMaxIterations	= Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "nonLinearMaxIterations", 500 );
+	killNonConvergent			= Stg_ComponentFactory_GetBool( cf, self->name, "killNonConvergent", True );
+	nonLinearMinIterations 	= Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "nonLinearMinIterations", 1 );
+	nonLinearSolutionType	= Stg_ComponentFactory_GetString( cf, self->name, "nonLinearSolutionType", "default" );
+	optionsPrefix				= Stg_ComponentFactory_GetString( cf, self->name, "optionsPrefix", "" );
 
 	/* Read some value for Picard */
 	self->picard_form_function_type = Stg_ComponentFactory_GetString( cf, self->name, "picard_FormFunctionType", "PicardFormFunction_KSPResidual" );
 
-	self->alpha  = Stg_ComponentFactory_GetDouble( cf, self->name, "picard_alpha", 1.0 );
-	self->rtol   = Stg_ComponentFactory_GetDouble( cf, self->name, "picard_rtol", 1.0e-8 );
-	self->abstol = Stg_ComponentFactory_GetDouble( cf, self->name, "picard_atol", 1.0e-50 );        
-	self->xtol           = Stg_ComponentFactory_GetDouble( cf, self->name, "picard_xtol", 1.0e-8 );
-	self->picard_monitor = Stg_ComponentFactory_GetBool(   cf, self->name, "picard_ActivateMonitor", False );
+	self->alpha				= Stg_ComponentFactory_GetDouble( cf, self->name, "picard_alpha", 1.0 );
+	self->rtol				= Stg_ComponentFactory_GetDouble( cf, self->name, "picard_rtol", 1.0e-8 );
+	self->abstol			= Stg_ComponentFactory_GetDouble( cf, self->name, "picard_atol", 1.0e-50 );        
+	self->xtol				= Stg_ComponentFactory_GetDouble( cf, self->name, "picard_xtol", 1.0e-8 );
+	self->picard_monitor	= Stg_ComponentFactory_GetBool( cf, self->name, "picard_ActivateMonitor", False );
 	
-	entryPointRegister = Stg_ObjectList_Get( cf->registerRegister, "EntryPoint_Register" );
-	assert( entryPointRegister );
-
 	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+
+	entryPointRegister = context->entryPoint_Register;
+	assert( entryPointRegister );
 
 	if( isNonLinear ) {
 		SNESCreate( context->communicator, &nlSolver );
@@ -452,20 +376,20 @@ void _SystemLinearEquations_Construct( void* sle, Stg_ComponentFactory* cf, void
 	}
 	
 	_SystemLinearEquations_Init( 
-			self,
-			solver,
-			nlSolver,
-			context,
-			makeConvergenceFile,
-			isNonLinear,
-			nonLinearTolerance, 
-			nonLinearMaxIterations,
-			killNonConvergent, 
-			nonLinearMinIterations,
-			nonLinearSolutionType,
-			optionsPrefix,
-			entryPointRegister,
-			MPI_COMM_WORLD );
+		self,
+		solver,
+		nlSolver,
+		context,
+		makeConvergenceFile,
+		isNonLinear,
+		nonLinearTolerance, 
+		nonLinearMaxIterations,
+		killNonConvergent, 
+		nonLinearMinIterations,
+		nonLinearSolutionType,
+		optionsPrefix,
+		entryPointRegister,
+		MPI_COMM_WORLD );
 
 	VecCreate( self->comm, &self->X );
 	VecCreate( self->comm, &self->F );
@@ -576,6 +500,27 @@ void SystemLinearEquations_ExecuteSolver( void* sle, void* _context ) {
 void _SystemLinearEquations_Destroy( void* sle, void* _context ) {
 	SystemLinearEquations*	self = (SystemLinearEquations*)sle;
 	
+	/* BEGIN LUKE'S FRICTIONAL BCS BIT */
+	Memory_Free( self->nlSetupEPName );
+	Memory_Free( self->nlEPName );
+	Memory_Free( self->postNlEPName );
+	Memory_Free( self->nlConvergedEPName );
+	/* END LUKE'S FRICTIONAL BCS BIT */
+	Memory_Free( self->executeEPName );
+	
+	Stg_Class_Delete( self->extensionManager );
+
+	Stg_Class_Delete( self->stiffnessMatrices ); 
+	Stg_Class_Delete( self->forceVectors ); 
+	Stg_Class_Delete( self->solutionVectors ); 
+
+	Memory_Free( self->optionsPrefix );
+
+	VecDestroy( self->X );
+	VecDestroy( self->F );
+	MatDestroy( self->A );
+	MatDestroy( self->J );
+
 	/* Free the the MG handles. */
 	FreeArray( self->mgHandles );
 }
@@ -726,11 +671,10 @@ void SystemLinearEquations_ZeroAllVectors( void* sle, void* _context ) {
 /* need to do this before the SLE specific function to set up the 
 pre conditioners is called (beginning of solve) */
 void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
-	FiniteElementContext*	context		= (FiniteElementContext*)_context;
-	SystemLinearEquations*	sle             = (SystemLinearEquations*)context->slEquations->data[0];
-	Vec			F;
-	SNES			snes;
-	SNES			oldSnes		= sle->nlSolver;
+	FiniteElementContext*	context = (FiniteElementContext*)_context;
+	SystemLinearEquations*	sle = (SystemLinearEquations*)context->slEquations->data[0];
+	SNES							snes;
+	SNES							oldSnes = sle->nlSolver;
 
 	/* don't assume that a snes is being used for initial guess, check for this!!! */
 	if( oldSnes && context->timeStep == 1 && !sle->linearSolveInitGuess )
@@ -799,6 +743,7 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	Stream*                 errorStream     = Journal_Register( Error_Type, self->type );
 	double					wallTime;
 	Iteration_Index         minIterations   = self->nonLinearMinIterations;
+        SLE_Solver*             solver;
 
 	PetscScalar		currVecNorm, prevVecNorm;
 
@@ -808,15 +753,51 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	wallTime = MPI_Wtime();		
 
 	/* First Solve */
+	/* setting the nonlinear stuff */
+	//START OF NONLINEAR ITERATION!!!!!
+	/* first get current timestep */
+        solver = self->solver;
+	solver->currenttimestep = self->context->timeStep;
+	/* if current timestep is not the same as previous timestep, then reset all variables back to zero and update previous timestep */
+	if(solver->currenttimestep != solver->previoustimestep){
+		//update prev timestep
+		solver->previoustimestep = solver->currenttimestep;
+		solver->nonlinearitsinitialtime = 0; 
+		solver->nonlinearitsendtime = 0; 
+		solver->totalnonlinearitstime = 0; 
+		solver->totalnumnonlinearits = 0; 
+		solver->avgtimenonlinearits = 0; 	
+		solver->inneritsinitialtime = 0; 
+		solver->outeritsinitialtime = 0; 
+		solver->inneritsendtime = 0; 
+		solver->outeritsendtime = 0; 
+		solver->totalinneritstime = 0; 
+		solver->totalouteritstime = 0; 
+		solver->totalnuminnerits = 0; 
+		solver->totalnumouterits = 0; 
+		solver->avgnuminnerits = 0; 
+		solver->avgnumouterits = 0; 
+		solver->avgtimeinnerits = 0; 
+		solver->avgtimeouterits = 0;	
+	}
+
 	self->nonLinearIteration_I = 0;
 	Journal_Printf(self->info,"\nNon linear solver - iteration %d\n", self->nonLinearIteration_I);
 
         /* More of Luke's stuff. I need an entry point for a non-linear setup operation. */
         _EntryPoint_Run_2VoidPtr( self->nlSetupEP, sle, _context );
-	
+
+	/*Don't know if we should include this but the timing of the outer and inner iterations starts here so it makes sense to count this one? */		
+	solver->nonlinearitsinitialtime = MPI_Wtime();
+
 	self->linearExecute( self, _context );
 	self->hasExecuted = True;
 
+	solver->nonlinearitsendtime = MPI_Wtime();
+	solver->totalnonlinearitstime = solver->totalnonlinearitstime + (-solver->nonlinearitsinitialtime + solver->nonlinearitsendtime);
+	/* reset initial time and end time for inner its back to 0 - probs don't need to do this but just in case */
+	solver->nonlinearitsinitialtime = 0;
+	solver->nonlinearitsendtime = 0;
 	/*
 	** Include an entry point to do some kind of post-non-linear-iteration operation. */
 	_EntryPoint_Run_2VoidPtr( self->postNlEP, sle, _context );
@@ -826,6 +807,9 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	VecDuplicate( currentVector, &previousVector );
 	
 	for ( self->nonLinearIteration_I = 1 ; self->nonLinearIteration_I < maxIterations ; self->nonLinearIteration_I++ ) {
+		/* get initial wall time for nonlinear loop */
+		solver->nonlinearitsinitialtime = MPI_Wtime();
+		
 		/*
 		** BEGIN LUKE'S FRICTIONAL BCS BIT
 		**
@@ -835,7 +819,7 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 		*/
 
 		_EntryPoint_Run_2VoidPtr( self->nlEP, sle, _context );
-
+		
 		/*
 		** END LUKE'S FRICTIONAL BCS BIT
 		*/
@@ -875,7 +859,19 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 			(converged) ? " - Converged" : " - Not converged",
 			(self->nonLinearIteration_I < maxIterations) ? "" : " - Reached iteration limit",
 			MPI_Wtime() - wallTime );
-                
+			//END OF NONLINEAR ITERATION LOOP!!!
+			
+			/* add the outer loop iterations to the total outer iterations */
+			solver->totalnumnonlinearits = solver->totalnumnonlinearits++;
+			/*get wall time for end of outer loop*/
+			solver->nonlinearitsendtime = MPI_Wtime();
+			/* add time to total time inner its: */
+			solver->totalnonlinearitstime = solver->totalnonlinearitstime + (-solver->nonlinearitsinitialtime + solver->nonlinearitsendtime);
+			//printf("totalnumnonlinearits before converging is %d totalnonlinearitstime is %g, totalouteritstime is %g and totalinneritstime is %g\n",solver->totalnumnonlinearits,solver->totalnonlinearitstime,solver->totalouteritstime,solver->totalinneritstime);
+
+			/* reset initial time and end time for inner its back to 0 - probs don't need to do this but just in case */
+			solver->nonlinearitsinitialtime = 0;
+			solver->nonlinearitsendtime = 0;        
 		if ( (converged) && (self->nonLinearIteration_I>=minIterations) ) {
 		   int result;
 
@@ -906,6 +902,20 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	Stream_UnIndentBranch( StgFEM_Debug );
 
 	VecDestroy( previousVector );
+	
+	/*Set all the printout variables */
+        if( solver->totalnumnonlinearits ) {
+           solver->avgtimenonlinearits = (solver->totalnonlinearitstime - solver->totalouteritstime)/solver->totalnumnonlinearits;
+           solver->avgnumouterits = solver->totalnumouterits/solver->totalnumnonlinearits;
+        }
+        if( solver->totalnumouterits ) {
+           solver->avgnuminnerits = solver->totalnuminnerits/solver->totalnumouterits;
+           solver->avgtimeouterits = (solver->totalouteritstime - solver->totalinneritstime)/solver->totalnumouterits;
+        }
+        if( solver->totalnuminnerits )
+           solver->avgtimeinnerits = solver->totalinneritstime/solver->totalnuminnerits;
+	//printf("totalnumnonlinearits = %d, avgnumouterits %d, avgnuminnerits %d\n",solver->totalnumnonlinearits, solver->avgnumouterits, solver->avgnuminnerits); 
+
 }
 
 void SystemLinearEquations_AddNonLinearSetupEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func ) {
@@ -1054,9 +1064,9 @@ void SLE_SNESMonitorProgress( void *sle,
   PetscReal fnorm0, PetscReal fnorm, PetscReal dX, PetscReal X1, 
   PetscReal fatol, PetscReal frtol, PetscReal xtol )
 {
-  PetscReal f_abs_s, f_abs_e, w1, v1, p1;
-  PetscReal f_rel_s, f_rel_e, w2, v2, p2;
-  PetscReal x_del_s, x_del_e, w3, v3, p3;
+  PetscReal f_abs_s, f_abs_e, v1, p1;
+  PetscReal f_rel_s, f_rel_e, v2, p2;
+  PetscReal x_del_s, x_del_e, v3, p3;
 
   if(iter==0) {
     PetscPrintf( PETSC_COMM_WORLD, "  SLE_NS  it       |F|                 |F|/|F0|             |X1-X0|/|X1| \n" );
@@ -1085,7 +1095,7 @@ void SLE_SNESConverged(
 	PetscReal snes_abstol, PetscReal snes_rtol, PetscReal snes_ttol, PetscReal snes_xtol,
 	PetscInt it,PetscReal xnorm,PetscReal pnorm,PetscReal fnorm,SNESConvergedReason *reason )
 {
-  PetscErrorCode ierr;
+  /* PetscErrorCode ierr; */
 
   *reason = SNES_CONVERGED_ITERATING;
 
@@ -1215,9 +1225,6 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
   if (snes_reason) return;
 
   for(i = 0; i < snes_maxits; i++) {
-    PetscTruth lsSuccess = PETSC_TRUE;
-    PetscReal  dummyNorm;
-
     /* Update guess Y = X^n - F(X^n) */
     ierr = VecWAXPY(Y, -1.0, F, X);CHKERRQ(ierr);
 
@@ -1396,4 +1403,6 @@ void _SystemLinearEquations_MG_SelectStiffMats( void* _sle, unsigned* nSMs, Stif
 		}
 	}
 }
+
+
 

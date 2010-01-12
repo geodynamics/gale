@@ -69,33 +69,27 @@
 		unsigned**		triInds;
 		
 	struct BilinearInnerElType { __BilinearInnerElType };
-	
+
+
+
 	/* Create a new BilinearInnerElType and initialise */
 	void* BilinearInnerElType_DefaultNew( Name name );
 	
 	BilinearInnerElType* BilinearInnerElType_New( Name name );
 	
 	/* Creation implementation / Virtual constructor */
-	BilinearInnerElType* _BilinearInnerElType_New(
-		SizeT								_sizeOfSelf,
-		Type								type,
-		Stg_Class_DeleteFunction*					_delete,
-		Stg_Class_PrintFunction*					_print,
-		Stg_Class_CopyFunction*						_copy, 
-		Stg_Component_DefaultConstructorFunction*			_defaultConstructor,
-		Stg_Component_ConstructFunction*				_construct,
-		Stg_Component_BuildFunction*					_build,
-		Stg_Component_InitialiseFunction*				_initialise,
-		Stg_Component_ExecuteFunction*					_execute,
-		Stg_Component_DestroyFunction*					_destroy,
-		Name								name,
-		Bool								initFlag,
-		ElementType_EvaluateShapeFunctionsAtFunction*			_evaluateShapeFunctionsAt,
-		ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*		_evaluateShapeFunctionLocalDerivsAt,
-		ElementType_ConvertGlobalCoordToElLocalFunction*		_convertGlobalCoordToElLocal,
-		ElementType_JacobianDeterminantSurfaceFunction*			_jacobianDeterminantSurface,
-		ElementType_SurfaceNormalFunction*				_surfaceNormal,
-		Index								nodeCount );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define BILINEARINNERELTYPE_DEFARGS \
+                ELEMENTTYPE_DEFARGS
+
+	#define BILINEARINNERELTYPE_PASSARGS \
+                ELEMENTTYPE_PASSARGS
+
+	BilinearInnerElType* _BilinearInnerElType_New(  BILINEARINNERELTYPE_DEFARGS  );
 	
 	/* Initialise implementation */
 	void _BilinearInnerElType_Init( BilinearInnerElType* self );
@@ -107,7 +101,7 @@
 	void _BilinearInnerElType_Print( void* elementType, Stream* stream );
 	
 	/* Bilinear inner element type build implementation */
-	void _BilinearInnerElType_Construct( void* elementType, Stg_ComponentFactory *cf, void* data );
+	void _BilinearInnerElType_AssignFromXML( void* elementType, Stg_ComponentFactory *cf, void* data );
 	
 	void _BilinearInnerElType_Build( void* elementType, void* data );
 	
@@ -127,3 +121,4 @@
 	int _BilinearInnerElType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal );
 
 #endif /* __StgFEM_Discretisation_BilinearInnerElType_h__ */
+

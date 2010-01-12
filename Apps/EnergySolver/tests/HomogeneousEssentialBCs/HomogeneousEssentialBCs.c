@@ -101,12 +101,12 @@ void HomogeneousEssentialBCs_TemperatureBC( Node_LocalIndex node_lI, Variable_In
 	HomogeneousEssentialBCs_TemperatureFunction( self, feVariable, coord, result );
 }
 
-void _HomogeneousEssentialBCs_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _HomogeneousEssentialBCs_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	HomogeneousEssentialBCs* self = (HomogeneousEssentialBCs*)analyticSolution;
 	AbstractContext*       context;
 	ConditionFunction*     condFunc;
 
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->temperatureField, HomogeneousEssentialBCs_TemperatureFunction );
@@ -128,19 +128,23 @@ void _HomogeneousEssentialBCs_Build( void* analyticSolution, void* data ) {
 }
 
 void* _HomogeneousEssentialBCs_DefaultNew( Name name ) {
-	return (void*) _AnalyticSolution_New( 
-			sizeof(HomogeneousEssentialBCs),
-			HomogeneousEssentialBCs_Type,
-			_AnalyticSolution_Delete,
-			_AnalyticSolution_Print,
-			_AnalyticSolution_Copy,
-			_HomogeneousEssentialBCs_DefaultNew,
-			_HomogeneousEssentialBCs_Construct,
-			_HomogeneousEssentialBCs_Build,
-			_AnalyticSolution_Initialise,
-			_AnalyticSolution_Execute,
-			_AnalyticSolution_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(HomogeneousEssentialBCs);
+	Type                                                      type = HomogeneousEssentialBCs_Type;
+	Stg_Class_DeleteFunction*                              _delete = _AnalyticSolution_Delete;
+	Stg_Class_PrintFunction*                                _print = _AnalyticSolution_Print;
+	Stg_Class_CopyFunction*                                  _copy = _AnalyticSolution_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _HomogeneousEssentialBCs_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _HomogeneousEssentialBCs_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _HomogeneousEssentialBCs_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _AnalyticSolution_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _AnalyticSolution_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _AnalyticSolution_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _AnalyticSolution_New(  ANALYTICSOLUTION_PASSARGS  );
 }
 
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
@@ -148,4 +152,6 @@ Index StgFEM_HomogeneousEssentialBCs_Register( PluginsManager* pluginsManager ) 
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
 	return PluginsManager_Submit( pluginsManager, HomogeneousEssentialBCs_Type, "0", _HomogeneousEssentialBCs_DefaultNew );
 }
+
+
 

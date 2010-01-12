@@ -43,7 +43,7 @@
 ** Assumptions:
 **	feMesh partitioned by node, no shadow nodes, L2G tables built.
 **	The Variable's DofLayout is indexed by local node numbers, not global.
-**	(These are verified by the FiniteElement_Mesh at construction.)
+**	(These are verified by the FiniteElement at construction.)
 **
 ** Comments:
 **	Is now (as of 12 OCtober 2004) also responsible for determining how
@@ -71,12 +71,12 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StgFEM_Discretisation_EquationNumber_h__
-#define __StgFEM_Discretisation_EquationNumber_h__
+#ifndef __StgFEM_Discretisation_FeEquationNumber_h__
+#define __StgFEM_Discretisation_FeEquationNumber_h__
 	#include <mpi.h>
 	
-	typedef void			(FeEquationNumber_BuildFunction)	( void* feEquationNumber, void *data );
-	typedef void			(FeEquationNumber_InitialiseFunction)	( void* feEquationNumber, void *data );
+	typedef void (FeEquationNumber_BuildFunction) ( void* feEquationNumber, void *data );
+	typedef void (FeEquationNumber_InitialiseFunction)	( void* feEquationNumber, void *data );
 	
 	
 	extern const Type FeEquationNumber_Type;
@@ -85,7 +85,7 @@
 
 	typedef struct RemappedNodeInfo {
 		Node_RemappedGlobalIndex	remappedGlobal;
-		Node_DomainIndex		domain;
+		Node_DomainIndex				domain;
 	} RemappedNodeInfo;
 	
 	/** FeEquationNumber class */
@@ -93,50 +93,55 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		DomainContext*				context; \
 		/* FeEquationNumber info */ \
-		Stream*					debug; \
+		Stream*						debug; \
 		/** Stream for debugging LM. (usually only need I.D.) */ \
-		Stream*					debugLM; \
-		Stream*					warning; \
+		Stream*						debugLM; \
+		Stream*						warning; \
 		/** attached feMesh */ \
-		FeMesh*					feMesh; \
+		FeMesh*						feMesh; \
 		/** DofLayout describing the discretisation of an FeVariable over the mesh */ \
-		DofLayout*				dofLayout; \
+		DofLayout*					dofLayout; \
 		/** LinkedEquationInfo - information on which dofs are linked together */ \
 		LinkedDofInfo*				linkedDofInfo; \
 		/** BCs applied to this mesh */ \
-		VariableCondition*			bcs; \
+		VariableCondition*		bcs; \
 		/** (possibly remapped for efficiency) table of domain&global node indexes */ \
 		RemappedNodeInfo*			remappedNodeInfos; \
 		/** map of (domain node, nodeLocalDof) -> global eq num */ \
-		Dof_EquationNumber**			destinationArray; \
+		Dof_EquationNumber**		destinationArray; \
 		/** Used to calculate globalSumUnconstrainedDofs */ \
-		Dof_EquationNumber			_highestLocalEqNum;\
+		Dof_EquationNumber		_highestLocalEqNum;\
 		/** Used to determine which procs hold which numbers */ \
-		Dof_EquationNumber			_lowestLocalEqNum;\
-		Dof_EquationNumber*			_lowestGlobalEqNums;\
+		Dof_EquationNumber		_lowestLocalEqNum;\
+		Dof_EquationNumber*		_lowestGlobalEqNums;\
 		unsigned int				_eqNumsPerProcDivisor; \
 		unsigned int				_eqNumsRemainder; \
-		Dof_EquationNumber			_remNotAddedChangeover; \
-		STreeMap*				ownedMap; \
-		Dof_EquationNumber			firstOwnedEqNum; \
-		Dof_EquationNumber			lastOwnedEqNum; \
-		Dof_EquationNumber			localEqNumsOwnedCount; \
+		Dof_EquationNumber		_remNotAddedChangeover; \
+		STreeMap*					ownedMap; \
+		Dof_EquationNumber		firstOwnedEqNum; \
+		Dof_EquationNumber		lastOwnedEqNum; \
+		Dof_EquationNumber		localEqNumsOwnedCount; \
 		/** number of unconstrained dofs */ \
-		unsigned int 				globalSumUnconstrainedDofs; \
+		unsigned int				globalSumUnconstrainedDofs; \
 		/** map of (domain element, elementLocalNode,  nodeLocalDof) -> global eq. num */ \
-		Dof_EquationNumber***			locationMatrix; \
+		Dof_EquationNumber***	locationMatrix; \
 		/** Records whether someone has tried to build the eqNum table yet */ \
 		/** Bool to make sure LM only gets built once */ \
-		Bool					locationMatrixBuilt; \
+		Bool							locationMatrixBuilt; \
 		/** Bool to determine whether remapping is activated */ \
-		Bool					remappingActivated; \
+		Bool							remappingActivated; \
 		\
 		/** Some vars to deal with removing BCs from mats and vecs. */ \
-		Bool					removeBCs; \
-		STree*  			  	bcEqNums;
+		Bool							removeBCs; \
+		STree*						bcEqNums;  \
+		/** nDomainEls is required during the destroy phase */ \
+		Index                   nDomainEls;
 
 	struct FeEquationNumber { __FeEquationNumber };
+
+
 	
 	/* +++ Constructors / Destructors +++ */
 	
@@ -144,48 +149,35 @@
 	void* FeEquationNumber_DefaultNew( Name name );
 	
 	FeEquationNumber* FeEquationNumber_New( 
-		Name							name,
+		Name						name,
+		DomainContext*			context,
 		void*						feMesh,
-		DofLayout*					dofLayout,
-		VariableCondition*				bcs,
-		LinkedDofInfo*					linkedDofInfo );
+		DofLayout*				dofLayout,
+		VariableCondition*	bcs,
+		LinkedDofInfo*			linkedDofInfo );
 	
 	/** Creation implementation */
-	FeEquationNumber* _FeEquationNumber_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool						initFlag,
-		void*						feMesh,
-		DofLayout*					dofLayout,
-		VariableCondition*				bcs,
-		LinkedDofInfo*					linkedDofInfo );
 	
-	
-	/** Initialise a feMesh */
-	void FeEquationNumber_Init( 
-		FeEquationNumber*				self, 
-		Name						name,
-		void*						feMesh,
-		DofLayout*					dofLayout,
-		VariableCondition*				bcs,
-		LinkedDofInfo*					linkedDofInfo );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FEEQUATIONNUMBER_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define FEEQUATIONNUMBER_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	FeEquationNumber* _FeEquationNumber_New(  FEEQUATIONNUMBER_DEFARGS  );
 	
 	/** Initialisation implementation functions */
-	void _FeEquationNumber_Init( FeEquationNumber* self, 
+	void _FeEquationNumber_Init(
+		FeEquationNumber*		self, 
+		DomainContext*			context,
 		void*						feMesh,
-		DofLayout*					dofLayout,
-		VariableCondition*				bcs,
-		LinkedDofInfo*					linkedDofInfo );
+		DofLayout*				dofLayout,
+		VariableCondition*	bcs,
+		LinkedDofInfo*			linkedDofInfo );
 	
 	
 	/** Stg_Class_Delete implementation: frees the destination array, and the 
@@ -197,7 +189,7 @@
 	/** Print implementation */
 	void _FeEquationNumber_Print( void* feEquationNumber, Stream* stream );
 	
-	void _FeEquationNumber_Construct( void* feEquationNumber, Stg_ComponentFactory *cf, void* data );
+	void _FeEquationNumber_AssignFromXML( void* feEquationNumber, Stg_ComponentFactory *cf, void* data );
 	
 	void _FeEquationNumber_Execute( void* feEquationNumber, void *data );
 	
@@ -217,16 +209,12 @@
 	optional as some users prefer to only calculate this element-by-element as
 	required.
 	*/
-	void FeEquationNumber_Build( void* feEquationNumber );
 	
 	/** Build the FeEquationNumber. \see FeEquationNumber_Build() */
-	void _FeEquationNumber_Build( void* feEquationNumber );
-
-	/** Initialise interface */
-	void FeEquationNumber_Initialise( void* feEquationNumber );
+	void _FeEquationNumber_Build( void* feEquationNumber, void* data );
 	
 	/** Initialise implementation. Currently does nothing. */
-	void _FeEquationNumber_Initialise( void* feEquationNumber );
+	void _FeEquationNumber_Initialise( void* feEquationNumber, void* data );
 	
 	/* +++ Public Functions +++ */
 	
@@ -247,8 +235,8 @@
 	
 	/** Calculates the total number of active (i.e. Non BC) dofs at a given node */
 	Index FeEquationNumber_CalculateActiveEqCountAtNode(
-		void*			feEquationNumber,
-		Node_DomainIndex	dNode_I,
+		void*						feEquationNumber,
+		Node_DomainIndex		dNode_I,
 		Dof_EquationNumber*	lowestActiveEqNumAtNodePtr );
 	
 	/** Prints only the destination array */
@@ -260,10 +248,10 @@
 
 	/** Prints the values in a single Element Location Matrix neatly */
 	void FeEquationNumber_PrintElementLocationMatrix(
-		void*			feEquationNumber,
+		void*						feEquationNumber,
 		Dof_EquationNumber**	elementLM,
 		Element_LocalIndex	element_lI,
-		Stream*			stream );
+		Stream*					stream );
 	
 	/* +++ Private Functions +++ */
 	
@@ -284,7 +272,10 @@
 	void _FeEquationNumber_BuildDestinationArray( FeEquationNumber* self );
 
 	void FeEquationNumber_BuildWithTopology( FeEquationNumber* self );
+
 	void FeEquationNumber_BuildRegular( FeEquationNumber* self );
+
 	void FeEquationNumber_BuildWithDave( FeEquationNumber* self );
 
-#endif /* __StgFEM_Discretisation_EquationNumber_h__ */
+#endif /* __StgFEM_Discretisation_FeEquationNumber_h__ */
+

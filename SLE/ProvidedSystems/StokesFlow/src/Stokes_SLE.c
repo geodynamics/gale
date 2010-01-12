@@ -57,90 +57,42 @@
 const Type Stokes_SLE_Type = "Stokes_SLE";
 
 Stokes_SLE* Stokes_SLE_New( 
-		Name                                                name,
-		SLE_Solver*                                         solver,
-		FiniteElementContext*                               context,
-		Bool                                                isNonLinear,
-		double                                              nonLinearTolerance,
-		Iteration_Index                                     nonLinearMaxIterations,
-		Bool                                                killNonConvergent,		
-		EntryPoint_Register*                                entryPoint_Register,
-		MPI_Comm                                            comm,
-		StiffnessMatrix*                                    kStiffMat,
-		StiffnessMatrix*                                    gStiffMat,
-		StiffnessMatrix*                                    dStiffMat,
-		StiffnessMatrix*                                    cStiffMat,
-		SolutionVector*                                     uSolnVec,
-		SolutionVector*                                     pSolnVec,
-		ForceVector*                                        fForceVec,
-		ForceVector*                                        hForceVec )
+	Name							name,
+	SLE_Solver*					solver,
+	FiniteElementContext*	context,
+	Bool							isNonLinear,
+	double						nonLinearTolerance,
+	Iteration_Index			nonLinearMaxIterations,
+	Bool							killNonConvergent,		
+	EntryPoint_Register*		entryPoint_Register,
+	MPI_Comm						comm,
+	StiffnessMatrix*			kStiffMat,
+	StiffnessMatrix*			gStiffMat,
+	StiffnessMatrix*			dStiffMat,
+	StiffnessMatrix*			cStiffMat,
+	SolutionVector*			uSolnVec,
+	SolutionVector*			pSolnVec,
+	ForceVector*				fForceVec,
+	ForceVector*				hForceVec )
 {
 	Stokes_SLE* self = (Stokes_SLE*) _Stokes_SLE_DefaultNew( name );
 
-	Stokes_SLE_InitAll( 
-			self, 
-			solver, 
-			context,
-			isNonLinear,
-			nonLinearTolerance, 
-			nonLinearMaxIterations,
-			killNonConvergent, 			
-			entryPoint_Register,
-			comm, 
-			kStiffMat,
-			gStiffMat,
-			dStiffMat,
-			cStiffMat,
-			uSolnVec,
-			pSolnVec,
-			fForceVec,
-			hForceVec );
+	self->isConstructed = True;
+	_SystemLinearEquations_Init( self, solver, NULL, context, False, isNonLinear, 
+      nonLinearTolerance, nonLinearMaxIterations, killNonConvergent, 1,  "", "", entryPoint_Register, comm ); 
+	_Stokes_SLE_Init( self, kStiffMat, gStiffMat, dStiffMat, cStiffMat, uSolnVec, pSolnVec, fForceVec, hForceVec );
 
 	return self;
 }
 
 /* Creation implementation / Virtual constructor */
-Stokes_SLE* _Stokes_SLE_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		SystemLinearEquations_LM_SetupFunction*             _LM_Setup,
-		SystemLinearEquations_MatrixSetupFunction*          _matrixSetup,
-		SystemLinearEquations_VectorSetupFunction*          _vectorSetup,
-		SystemLinearEquations_UpdateSolutionOntoNodesFunc*	_updateSolutionOntoNodes,
-		SystemLinearEquations_MG_SelectStiffMatsFunc*		_mgSelectStiffMats, 
-		Name                                                name )
+Stokes_SLE* _Stokes_SLE_New(  STOKES_SLE_DEFARGS  )
 {
 	Stokes_SLE* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Stokes_SLE) );
-	self = (Stokes_SLE*) _SystemLinearEquations_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_LM_Setup,
-		_matrixSetup,
-		_vectorSetup,
-		_updateSolutionOntoNodes, 
-		_mgSelectStiffMats, 
-		name );
+	assert( _sizeOfSelf >= sizeof(Stokes_SLE) );
+	self = (Stokes_SLE*) _SystemLinearEquations_New(  SYSTEMLINEAREQUATIONS_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -189,41 +141,6 @@ void _Stokes_SLE_Init(
 		EP_AppendClassHook( self->context->calcDtEP, Stokes_SLE_UpdateDt, self );
 }
 
-void Stokes_SLE_InitAll( 
-		void*                                               sle, 
-		SLE_Solver*                                         solver,
-		FiniteElementContext*                               context,
-		Bool                                                isNonLinear,
-		double                                              nonLinearTolerance,
-		Iteration_Index                                     nonLinearMaxIterations,
-		Bool                                                killNonConvergent,			
-		EntryPoint_Register*                                entryPoint_Register,
-		MPI_Comm                                            comm,		
-		StiffnessMatrix*                                    kStiffMat,
-		StiffnessMatrix*                                    gStiffMat,
-		StiffnessMatrix*                                    dStiffMat,
-		StiffnessMatrix*                                    cStiffMat,
-		SolutionVector*                                     uSolnVec,
-		SolutionVector*                                     pSolnVec,
-		ForceVector*                                        fForceVec,
-		ForceVector*                                        hForceVec ) 
-{
-	Stokes_SLE* self = (Stokes_SLE*)sle;
-
-	SystemLinearEquations_InitAll( 
-			self, 
-			solver,
-			NULL, /* not sure if a non linear solver is required for the stokes SLE */
-			context,
-			isNonLinear,
-			nonLinearTolerance, 
-			nonLinearMaxIterations,
-			killNonConvergent, 
-			entryPoint_Register,
-			comm );
-	_Stokes_SLE_Init( self, kStiffMat, gStiffMat, dStiffMat, cStiffMat, uSolnVec, pSolnVec, fForceVec, hForceVec );
-}
-
 void _Stokes_SLE_Print( void* sle, Stream* stream ) {
 	Stokes_SLE* self = (Stokes_SLE*)sle;
 	/* Set the Journal for printing informations */
@@ -253,27 +170,31 @@ void _Stokes_SLE_Print( void* sle, Stream* stream ) {
 }
 
 void* _Stokes_SLE_DefaultNew( Name name ) {
-	return (void*)_Stokes_SLE_New( 
-		sizeof(Stokes_SLE), 
-		Stokes_SLE_Type,
-		_SystemLinearEquations_Delete,
-		_Stokes_SLE_Print,
-		_SystemLinearEquations_Copy,
-		_Stokes_SLE_DefaultNew,
-		_Stokes_SLE_Construct,
-		_SystemLinearEquations_Build,
-		_SystemLinearEquations_Initialise,
-		_SystemLinearEquations_Execute,
-		_SystemLinearEquations_Destroy,
-		_SystemLinearEquations_LM_Setup,
-		_SystemLinearEquations_MatrixSetup,
-		_SystemLinearEquations_VectorSetup,
-		_SystemLinearEquations_UpdateSolutionOntoNodes,
-		_Stokes_SLE_MG_SelectStiffMats, 
-		name );
+	/* Variables set in this function */
+	SizeT                                                            _sizeOfSelf = sizeof(Stokes_SLE);
+	Type                                                                    type = Stokes_SLE_Type;
+	Stg_Class_DeleteFunction*                                            _delete = _SystemLinearEquations_Delete;
+	Stg_Class_PrintFunction*                                              _print = _Stokes_SLE_Print;
+	Stg_Class_CopyFunction*                                                _copy = _SystemLinearEquations_Copy;
+	Stg_Component_DefaultConstructorFunction*                _defaultConstructor = _Stokes_SLE_DefaultNew;
+	Stg_Component_ConstructFunction*                                  _construct = _Stokes_SLE_AssignFromXML;
+	Stg_Component_BuildFunction*                                          _build = _SystemLinearEquations_Build;
+	Stg_Component_InitialiseFunction*                                _initialise = _SystemLinearEquations_Initialise;
+	Stg_Component_ExecuteFunction*                                      _execute = _SystemLinearEquations_Execute;
+	Stg_Component_DestroyFunction*                                      _destroy = _SystemLinearEquations_Destroy;
+	SystemLinearEquations_LM_SetupFunction*                            _LM_Setup = _SystemLinearEquations_LM_Setup;
+	SystemLinearEquations_MatrixSetupFunction*                      _matrixSetup = _SystemLinearEquations_MatrixSetup;
+	SystemLinearEquations_VectorSetupFunction*                      _vectorSetup = _SystemLinearEquations_VectorSetup;
+	SystemLinearEquations_UpdateSolutionOntoNodesFunc*  _updateSolutionOntoNodes = _SystemLinearEquations_UpdateSolutionOntoNodes;
+	SystemLinearEquations_MG_SelectStiffMatsFunc*             _mgSelectStiffMats = _Stokes_SLE_MG_SelectStiffMats;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*)_Stokes_SLE_New(  STOKES_SLE_PASSARGS  );
 }
 
-void _Stokes_SLE_Construct( void* sle, Stg_ComponentFactory* cf, void* data ) {
+void _Stokes_SLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data ) {
 	Stokes_SLE*       self = (Stokes_SLE*)sle;
 	StiffnessMatrix*  kStiffMat;
 	StiffnessMatrix*  gStiffMat;
@@ -285,7 +206,7 @@ void _Stokes_SLE_Construct( void* sle, Stg_ComponentFactory* cf, void* data ) {
 	ForceVector*      hForceVec;
 
 	/* Construct Parent */
-	_SystemLinearEquations_Construct( self, cf, data );
+	_SystemLinearEquations_AssignFromXML( self, cf, data );
 
 	kStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "StressTensorMatrix",    StiffnessMatrix, True, data );
 	gStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "GradientMatrix",        StiffnessMatrix, True, data );
@@ -313,4 +234,6 @@ void _Stokes_SLE_MG_SelectStiffMats( void* _sle, unsigned* nSMs, StiffnessMatrix
 	*sms = Memory_Alloc_Array( StiffnessMatrix*, 1, "Stokes_SLE" );
 	(*sms)[0] = self->kStiffMat;
 }
+
+
 

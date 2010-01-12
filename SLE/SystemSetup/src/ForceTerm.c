@@ -47,6 +47,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
+#include "FiniteElementContext.h"
 #include "ForceTerm.h"
 #include "SolutionVector.h"
 #include "ForceVector.h"
@@ -61,51 +62,45 @@
 const Type ForceTerm_Type = "ForceTerm";
 
 ForceTerm* ForceTerm_New(
-		Name                                      name,
-		ForceVector*                              forceVector,
-		Swarm*                                    integrationSwarm,
-		Stg_Component*                            extraInfo )		
+	Name							name,
+	FiniteElementContext*	context,
+	ForceVector*				forceVector,
+	Swarm*						integrationSwarm,
+	Stg_Component*				extraInfo )		
 {
 	ForceTerm* self = (ForceTerm*) _ForceTerm_DefaultNew( name );
 
-	ForceTerm_InitAll( self, forceVector, integrationSwarm, extraInfo );
+	self->isConstructed = True;
+	_ForceTerm_Init( self, context, forceVector, integrationSwarm, extraInfo );
 
 	return self;
 }
 
-ForceTerm* _ForceTerm_New( 
-		SizeT                                     _sizeOfSelf,
-		Type                                      type,
-		Stg_Class_DeleteFunction*                 _delete,
-		Stg_Class_PrintFunction*                  _print,
-		Stg_Class_CopyFunction*                   _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*          _construct,
-		Stg_Component_BuildFunction*              _build,
-		Stg_Component_InitialiseFunction*         _initialise,
-		Stg_Component_ExecuteFunction*            _execute,
-		Stg_Component_DestroyFunction*            _destroy,
-		ForceTerm_AssembleElementFunction*         _assembleElement,
-		Name                                      name )
-{
-	ForceTerm*		self;
+void* _ForceTerm_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(ForceTerm);
+	Type                                                      type = ForceTerm_Type;
+	Stg_Class_DeleteFunction*                              _delete = _ForceTerm_Delete;
+	Stg_Class_PrintFunction*                                _print = _ForceTerm_Print;
+	Stg_Class_CopyFunction*                                  _copy = _ForceTerm_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _ForceTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _ForceTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _ForceTerm_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _ForceTerm_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _ForceTerm_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _ForceTerm_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	ForceTerm_AssembleElementFunction*            _assembleElement = _ForceTerm_AssembleElement;
+
+	return _ForceTerm_New(  FORCETERM_PASSARGS  );
+}
+
+ForceTerm* _ForceTerm_New(  FORCETERM_DEFARGS  ) {
+	ForceTerm* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ForceTerm) );
-	self = (ForceTerm*)_Stg_Component_New( 
-			_sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name,
-			NON_GLOBAL );
+	self = (ForceTerm*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	self->_assembleElement = _assembleElement;
 	
@@ -114,30 +109,20 @@ ForceTerm* _ForceTerm_New(
 
 
 void _ForceTerm_Init(
-		void*                                     forceTerm,
-		ForceVector*                              forceVector,
-		Swarm*                                    integrationSwarm,
-		Stg_Component*                            extraInfo )
+	void*							forceTerm,
+	FiniteElementContext*	context,
+	ForceVector*				forceVector,
+	Swarm*						integrationSwarm,
+	Stg_Component*				extraInfo )
 {
-	ForceTerm* self = (ForceTerm*)  forceTerm;
-	
-	self->isConstructed    = True;
-
-	self->debug            = Stream_RegisterChild( StgFEM_SLE_SystemSetup_Debug, self->type );
-	self->extraInfo        = extraInfo;
-	self->integrationSwarm = integrationSwarm;	
+	ForceTerm* self			= (ForceTerm*) forceTerm;
+	self->context 				= context;	
+	self->debug					= Stream_RegisterChild( StgFEM_SLE_SystemSetup_Debug, self->type );
+	self->extraInfo			= extraInfo;
+	self->integrationSwarm	= integrationSwarm;	
+   self->forceVector       = forceVector;
 
 	ForceVector_AddForceTerm( forceVector, self );
-}
-
-void ForceTerm_InitAll(
-		void*                                     forceTerm,
-		ForceVector*                              forceVector,
-		Swarm*                                    integrationSwarm,
-		Stg_Component*                            extraInfo )
-{
-	ForceTerm* self = (ForceTerm*)forceTerm;
-	_ForceTerm_Init( self, forceVector, integrationSwarm, extraInfo );
 }
 
 
@@ -170,7 +155,7 @@ void* _ForceTerm_Copy( void* forceTerm, void* dest, Bool deep, Name nameExt, Ptr
 	ForceTerm*	self = (ForceTerm*)forceTerm;
 	ForceTerm*	newForceTerm;
 	PtrMap*		map = ptrMap;
-	Bool		ownMap = False;
+	Bool			ownMap = False;
 	
 	if( !map ) {
 		map = PtrMap_New( 10 );
@@ -194,34 +179,23 @@ void* _ForceTerm_Copy( void* forceTerm, void* dest, Bool deep, Name nameExt, Ptr
 	return (void*)newForceTerm;
 }
 
-void* _ForceTerm_DefaultNew( Name name ) {
-	return _ForceTerm_New( 
-			sizeof(ForceTerm), 
-			ForceTerm_Type, 
-			_ForceTerm_Delete,
-			_ForceTerm_Print,
-			_ForceTerm_Copy,
-			_ForceTerm_DefaultNew, 
-			_ForceTerm_Construct,
-			_ForceTerm_Build, 
-			_ForceTerm_Initialise,
-			_ForceTerm_Execute, 
-			_ForceTerm_Destroy,
-			_ForceTerm_AssembleElement,
-			name );
-}
+void _ForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
+	FiniteElementContext*	context;
+	ForceTerm*					self = (ForceTerm*)forceTerm;
+	Swarm*						swarm = NULL;
+	Stg_Component*				extraInfo;
+	ForceVector*				forceVector;
 
-void _ForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
-	ForceTerm*      self               = (ForceTerm*)forceTerm;
-	Swarm*          swarm              = NULL;
-	Stg_Component*  extraInfo;
-	ForceVector*    forceVector;
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
 
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
 
-	forceVector =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ForceVector", ForceVector,   True,  data ) ;
-	swarm       =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",       Swarm,         True,  data ) ;
-	extraInfo   =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ExtraInfo",   Stg_Component, False, data ) ;
-	_ForceTerm_Init( self, forceVector, swarm, extraInfo );
+	forceVector = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ForceVector", ForceVector,   True,  data ) ;
+	swarm       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",       Swarm,         True,  data ) ;
+	extraInfo   = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ExtraInfo",   Stg_Component, False, data ) ;
+
+	_ForceTerm_Init( self, context, forceVector, swarm, extraInfo );
 }
 
 void _ForceTerm_Build( void* forceTerm, void* data ) {
@@ -232,6 +206,7 @@ void _ForceTerm_Build( void* forceTerm, void* data ) {
 	
 	/* ensure integrationSwarm is built */
 	Stg_Component_Build( self->integrationSwarm, data, False );
+	Stg_Component_Build( self->forceVector, data, False );
 
 	if ( self->extraInfo ) 
 		Stg_Component_Build( self->extraInfo, data, False );
@@ -247,6 +222,7 @@ void _ForceTerm_Initialise( void* forceTerm, void* data ) {
 	Stream_IndentBranch( StgFEM_Debug );
 
 	Stg_Component_Initialise( self->integrationSwarm, data, False );
+	Stg_Component_Initialise( self->forceVector, data, False );
 	if ( self->extraInfo ) 
 		Stg_Component_Initialise( self->extraInfo, data, False );
 	
@@ -257,6 +233,13 @@ void _ForceTerm_Execute( void* forceTerm, void* data ) {
 }
 
 void _ForceTerm_Destroy( void* forceTerm, void* data ) {
+	ForceTerm* self = (ForceTerm*)forceTerm;
+
+	if ( self->extraInfo ) 
+      Stg_Component_Destroy( self->extraInfo, data, False );
+
+   Stg_Component_Destroy( self->integrationSwarm, data, False );
+   Stg_Component_Destroy( self->forceVector, data, False );
 }
 
 void ForceTerm_AssembleElement( 
@@ -291,3 +274,5 @@ void ForceTerm_SetAssembleElementFunction( void* forceTerm, ForceTerm_AssembleEl
 
 	self->_assembleElement = assembleElementFunction;
 }
+
+

@@ -45,6 +45,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
+#include "ElementType_Register.h"
 #include "Finalise.h"
 
 #include "FeVariable.h"
@@ -56,8 +57,12 @@ Bool StgFEM_Discretisation_Finalise( void ) {
 	
 	Stream_IndentBranch( StgFEM_Debug );
 
+	_ElementType_Register_Delete( elementType_Register );
+
 	PetscFinalize();
 	
 	Stream_UnIndentBranch( StgFEM_Debug );
 	return True;
 }
+
+

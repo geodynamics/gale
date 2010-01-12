@@ -51,40 +51,42 @@ const Type MultigridSolver_Type = "MultigridSolver";
 */
 
 MultigridSolver* MultigridSolver_New( Name name ) {
-	return _MultigridSolver_New( sizeof(MultigridSolver), 
-				     MultigridSolver_Type, 
-				     _MultigridSolver_Delete, 
-				     _MultigridSolver_Print, 
-				     NULL, 
-				     (void* (*)(Name))_MultigridSolver_New, 
-				     _MultigridSolver_Construct, 
-				     _MultigridSolver_Build, 
-				     _MultigridSolver_Initialise, 
-				     _MultigridSolver_Execute, 
-				     _MultigridSolver_Destroy, 
-				     name, 
-				     NON_GLOBAL, 
-				     MultigridSolver_SetComm,
-				     MultigridSolver_SetMatrix,
-				     MultigridSolver_SetMaxIterations, 
-				     MultigridSolver_SetRelativeTolerance, 
-				     MultigridSolver_SetAbsoluteTolerance, 
-				     MultigridSolver_SetUseInitialSolution, 
-				     MultigridSolver_Solve, 
-				     MultigridSolver_Setup, 
-				     MultigridSolver_GetSolveStatus, 
-				     MultigridSolver_GetIterations, 
-				     MultigridSolver_GetMaxIterations, 
-				     MultigridSolver_GetResidualNorm );
+	/* Variables set in this function */
+	SizeT                                                    _sizeOfSelf = sizeof(MultigridSolver);
+	Type                                                            type = MultigridSolver_Type;
+	Stg_Class_DeleteFunction*                                    _delete = _MultigridSolver_Delete;
+	Stg_Class_PrintFunction*                                      _print = _MultigridSolver_Print;
+	Stg_Class_CopyFunction*                                        _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*        _defaultConstructor = (void* (*)(Name))_MultigridSolver_New;
+	Stg_Component_ConstructFunction*                          _construct = _MultigridSolver_AssignFromXML;
+	Stg_Component_BuildFunction*                                  _build = _MultigridSolver_Build;
+	Stg_Component_InitialiseFunction*                        _initialise = _MultigridSolver_Initialise;
+	Stg_Component_ExecuteFunction*                              _execute = _MultigridSolver_Execute;
+	Stg_Component_DestroyFunction*                              _destroy = _MultigridSolver_Destroy;
+	AllocationType                                    nameAllocationType = NON_GLOBAL;
+	MGSolver_SetCommFunc*                                    setCommFunc = MultigridSolver_SetComm;
+	MGSolver_SetMatrixFunc*                                setMatrixFunc = MultigridSolver_SetMatrix;
+	MGSolver_SetMaxIterationsFunc*                  setMaxIterationsFunc = MultigridSolver_SetMaxIterations;
+	MGSolver_SetRelativeToleranceFunc*          setRelativeToleranceFunc = MultigridSolver_SetRelativeTolerance;
+	MGSolver_SetAbsoluteToleranceFunc*          setAbsoluteToleranceFunc = MultigridSolver_SetAbsoluteTolerance;
+	MGSolver_SetUseInitialSolutionFunc*        setUseInitialSolutionFunc = MultigridSolver_SetUseInitialSolution;
+	MGSolver_SolveFunc*                                        solveFunc = MultigridSolver_Solve;
+	MGSolver_SetupFunc*                                        setupFunc = MultigridSolver_Setup;
+	MGSolver_GetSolveStatusFunc*                      getSolveStatusFunc = MultigridSolver_GetSolveStatus;
+	MGSolver_GetIterationsFunc*                        getIterationsFunc = MultigridSolver_GetIterations;
+	MGSolver_GetMaxIterationsFunc*                  getMaxIterationsFunc = MultigridSolver_GetMaxIterations;
+	MGSolver_GetResidualNormFunc*                    getResidualNormFunc = MultigridSolver_GetResidualNorm;
+
+	return _MultigridSolver_New(  MULTIGRIDSOLVER_PASSARGS  );
 }
 
-MultigridSolver* _MultigridSolver_New( MGSOLVER_DEFARGS ) {
+MultigridSolver* _MultigridSolver_New(  MULTIGRIDSOLVER_DEFARGS  ) {
 	MultigridSolver*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(MultigridSolver) );
+	assert( _sizeOfSelf >= sizeof(MultigridSolver) );
 
-	self = (MultigridSolver*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	self = (MultigridSolver*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	/* function assignments previously in the MatrixSolver_New func */
 	self->setCommFunc = setCommFunc;
@@ -179,7 +181,7 @@ void _MultigridSolver_Print( void* matrixSolver, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void _MultigridSolver_Construct( void* matrixSolver, Stg_ComponentFactory* cf, void* data ) {
+void _MultigridSolver_AssignFromXML( void* matrixSolver, Stg_ComponentFactory* cf, void* data ) {
 	MultigridSolver*	self = (MultigridSolver*)matrixSolver;
 	unsigned		nLevels;
 
@@ -757,7 +759,11 @@ Mat MultigridSolver_GetProlongation( void* matrixSolver, unsigned level ) {
 void MultigridSolver_RestrictMatrix( MultigridSolver* self, MultigridSolver_Level* level, Mat* dstMatrix ) {
 	Mat		srcMat;
 	PetscInt	nSrcRows, nSrcCols;
-	PetscInt	nRRows, nRCols, dummy;
+	PetscInt	nRRows, nRCols;
+
+#if( PETSC_VERSION_MAJOR > 2 )
+	PetscInt dummy;
+#endif
 
 	PetscScalar	fillRatio;
 	MatInfo		mInfo;
@@ -1223,4 +1229,6 @@ void MultigridSolver_DestructLevels( MultigridSolver* self ) {
 	if( self->outerSolver->curSolution ) VecDestroy( self->outerSolver->curSolution );
 	free( self->outerSolver );
 }
+
+
 

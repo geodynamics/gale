@@ -78,22 +78,18 @@
 	Energy_SLE_Solver* Energy_SLE_Solver_New( Name name, Bool useStatSolve, int statReps ) ;
 
 	/** Creation implementation / Virtual constructor */
-	Energy_SLE_Solver* _Energy_SLE_Solver_New( 
-		SizeT                                   sizeOfSelf,
-		Type                                    type,
-		Stg_Class_DeleteFunction*               _delete,
-		Stg_Class_PrintFunction*                _print,
-		Stg_Class_CopyFunction*                 _copy, 
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*        _construct,
-		Stg_Component_BuildFunction*            _build,
-		Stg_Component_InitialiseFunction*       _initialise,
-		Stg_Component_ExecuteFunction*          _execute,
-		Stg_Component_DestroyFunction*          _destroy,
-		SLE_Solver_SolverSetupFunction*         _solverSetup,
-		SLE_Solver_SolveFunction*               _solve,
-		SLE_Solver_GetResidualFunc*             _getResidual, 
-		Name									name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ENERGY_SLE_SOLVER_DEFARGS \
+                SLE_SOLVER_DEFARGS
+
+	#define ENERGY_SLE_SOLVER_PASSARGS \
+                SLE_SOLVER_PASSARGS
+
+	Energy_SLE_Solver* _Energy_SLE_Solver_New(  ENERGY_SLE_SOLVER_DEFARGS  );
 	
 	/** Member variable initialisation */
 	void _Energy_SLE_Solver_Init( Energy_SLE_Solver* self );
@@ -120,7 +116,7 @@
 	
 	void _Energy_SLE_Solver_Initialise( void* sleSolver, void* standardSLE );
 	
-	void _Energy_SLE_Solver_Construct( void* sleSolver, Stg_ComponentFactory* cf, void* data );
+	void _Energy_SLE_Solver_AssignFromXML( void* sleSolver, Stg_ComponentFactory* cf, void* data );
 	
 	void _Energy_SLE_Solver_Execute( void* sleSolver, void* data );
 	
@@ -137,3 +133,4 @@
 	Vec _Energy_SLE_GetResidual( void* sleSolver, Index fv_I );
 
 #endif
+

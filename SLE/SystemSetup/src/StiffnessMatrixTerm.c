@@ -47,6 +47,7 @@
 #include "units.h"
 #include "types.h"
 #include "shortcuts.h"
+#include "FiniteElementContext.h"
 #include "StiffnessMatrixTerm.h"
 #include "SolutionVector.h"
 #include "StiffnessMatrix.h"
@@ -62,50 +63,30 @@ const Type StiffnessMatrixTerm_Type = "StiffnessMatrixTerm";
 
 StiffnessMatrixTerm* StiffnessMatrixTerm_New(
 		Name                                                 name,
+		FiniteElementContext*                                context,
 		StiffnessMatrix*                                     stiffnessMatrix,
 		Swarm*                                               integrationSwarm,
 		Stg_Component*                                       extraInfo )		
 {
 	StiffnessMatrixTerm* self = (StiffnessMatrixTerm*) _StiffnessMatrixTerm_DefaultNew( name );
 
-	StiffnessMatrixTerm_InitAll( self, stiffnessMatrix, integrationSwarm, extraInfo );
+	_StiffnessMatrixTerm_Init( self, context, stiffnessMatrix, integrationSwarm, extraInfo );
 
 	return self;
 }
 
-StiffnessMatrixTerm* _StiffnessMatrixTerm_New( 
-		SizeT                                                _sizeOfSelf,
-		Type                                                 type,
-		Stg_Class_DeleteFunction*                            _delete,
-		Stg_Class_PrintFunction*                             _print,
-		Stg_Class_CopyFunction*                              _copy, 
-		Stg_Component_DefaultConstructorFunction*            _defaultConstructor,
-		Stg_Component_ConstructFunction*                     _construct,
-		Stg_Component_BuildFunction*                         _build,
-		Stg_Component_InitialiseFunction*                    _initialise,
-		Stg_Component_ExecuteFunction*                       _execute,
-		Stg_Component_DestroyFunction*                       _destroy,
-		StiffnessMatrixTerm_AssembleElementFunction*         _assembleElement,
-		Name                                                 name )
+StiffnessMatrixTerm* _StiffnessMatrixTerm_New(  STIFFNESSMATRIXTERM_DEFARGS  )
 {
 	StiffnessMatrixTerm*		self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(StiffnessMatrixTerm) );
-	self = (StiffnessMatrixTerm*)_Stg_Component_New( 
-			_sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name,
-			NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (StiffnessMatrixTerm*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	self->_assembleElement = _assembleElement;
 	
@@ -115,36 +96,24 @@ StiffnessMatrixTerm* _StiffnessMatrixTerm_New(
 
 void _StiffnessMatrixTerm_Init(
 		void*                                                stiffnessMatrixTerm,
+		FiniteElementContext*				                    context,
 		StiffnessMatrix*                                     stiffnessMatrix,
 		Swarm*                                               integrationSwarm,
 		Stg_Component*                                       extraInfo )
 {
 	StiffnessMatrixTerm* self = (StiffnessMatrixTerm*)  stiffnessMatrixTerm;
 	
-	self->isConstructed    = True;
-
-	self->debug            = Journal_MyStream( Debug_Type, self );
-	self->extraInfo        = extraInfo;	
-	self->integrationSwarm = integrationSwarm;	
-	self->stiffnessMatrix  = stiffnessMatrix;
-	self->max_nElNodes = 0; /* initialise to zero, in assembly routine it will change value */
-	self->GNx = NULL;
-
-
+	self->isConstructed		= True;
+	self->context				= context;
+	self->debug					= Journal_MyStream( Debug_Type, self );
+	self->extraInfo			= extraInfo;	
+	self->integrationSwarm	= integrationSwarm;	
+	self->stiffnessMatrix	= stiffnessMatrix;
+	self->max_nElNodes		= 0; /* initialise to zero, in assembly routine it will change value */
+	self->GNx					= NULL;
 
 	StiffnessMatrix_AddStiffnessMatrixTerm( stiffnessMatrix, self );
 }
-
-void StiffnessMatrixTerm_InitAll(
-		void*                                                stiffnessMatrixTerm,
-		StiffnessMatrix*                                     stiffnessMatrix,
-		Swarm*                                               integrationSwarm,
-		Stg_Component*                                       extraInfo )
-{
-	StiffnessMatrixTerm* self = (StiffnessMatrixTerm*)stiffnessMatrixTerm;
-	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, integrationSwarm, extraInfo );
-}
-
 
 void _StiffnessMatrixTerm_Delete( void* stiffnessMatrixTerm ) {
 	StiffnessMatrixTerm* self = (StiffnessMatrixTerm*)stiffnessMatrixTerm;
@@ -200,33 +169,42 @@ void* _StiffnessMatrixTerm_Copy( void* stiffnessMatrixTerm, void* dest, Bool dee
 }
 
 void* _StiffnessMatrixTerm_DefaultNew( Name name ) {
-	return _StiffnessMatrixTerm_New( 
-			sizeof(StiffnessMatrixTerm), 
-			StiffnessMatrixTerm_Type, 
-			_StiffnessMatrixTerm_Delete,
-			_StiffnessMatrixTerm_Print,
-			_StiffnessMatrixTerm_Copy,
-			_StiffnessMatrixTerm_DefaultNew, 
-			_StiffnessMatrixTerm_Construct,
-			_StiffnessMatrixTerm_Build, 
-			_StiffnessMatrixTerm_Initialise,
-			_StiffnessMatrixTerm_Execute, 
-			_StiffnessMatrixTerm_Destroy,
-			_StiffnessMatrixTerm_AssembleElement,
-			name );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(StiffnessMatrixTerm);
+	Type                                                         type = StiffnessMatrixTerm_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _StiffnessMatrixTerm_Delete;
+	Stg_Class_PrintFunction*                                   _print = _StiffnessMatrixTerm_Print;
+	Stg_Class_CopyFunction*                                     _copy = _StiffnessMatrixTerm_Copy;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _StiffnessMatrixTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _StiffnessMatrixTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _StiffnessMatrixTerm_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _StiffnessMatrixTerm_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _StiffnessMatrixTerm_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _StiffnessMatrixTerm_Destroy;
+	StiffnessMatrixTerm_AssembleElementFunction*     _assembleElement = _StiffnessMatrixTerm_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _StiffnessMatrixTerm_New(  STIFFNESSMATRIXTERM_PASSARGS  );
 }
 
-void _StiffnessMatrixTerm_Construct( void* stiffnessMatrixTerm, Stg_ComponentFactory* cf, void* data ) {
+void _StiffnessMatrixTerm_AssignFromXML( void* stiffnessMatrixTerm, Stg_ComponentFactory* cf, void* data ) {
 	StiffnessMatrixTerm*       self               = (StiffnessMatrixTerm*)stiffnessMatrixTerm;
 	Swarm*                     swarm              = NULL;
 	Stg_Component*             extraInfo;
 	StiffnessMatrix*           stiffnessMatrix;
+   FiniteElementContext*      context;
+   
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
 
 	stiffnessMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "StiffnessMatrix", StiffnessMatrix, True,  data ) ;
 	swarm           = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",           Swarm,           True,  data ) ;
 	extraInfo       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ExtraInfo",       Stg_Component,   False, data );
 
-	_StiffnessMatrixTerm_Init( self, stiffnessMatrix, swarm, extraInfo );
+	_StiffnessMatrixTerm_Init( self, context, stiffnessMatrix, swarm, extraInfo );
 }
 
 void _StiffnessMatrixTerm_Build( void* stiffnessMatrixTerm, void* data ) {
@@ -303,3 +281,5 @@ void StiffnessMatrixTerm_SetAssembleElementFunction( void* stiffnessMatrixTerm, 
 
 	self->_assembleElement = assembleElementFunction;
 }
+
+

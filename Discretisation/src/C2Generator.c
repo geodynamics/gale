@@ -47,47 +47,51 @@ const Type C2Generator_Type = "C2Generator";
 ** Constructors
 */
 
-C2Generator* C2Generator_New( Name name ) {
-	return _C2Generator_New( sizeof(C2Generator), 
-				 C2Generator_Type, 
-				 _C2Generator_Delete, 
-				 _C2Generator_Print, 
-				 NULL, 
-				 (void* (*)(Name))_C2Generator_New, 
-				 _C2Generator_Construct, 
-				 _C2Generator_Build, 
-				 _C2Generator_Initialise, 
-				 _C2Generator_Execute, 
-				 _C2Generator_Destroy, 
-				 name, 
-				 NON_GLOBAL, 
-				 CartesianGenerator_SetDimSize, 
-				 CartesianGenerator_Generate, 
-				 C2Generator_SetTopologyParams, 
-				 _CartesianGenerator_GenElements, 
-				 _CartesianGenerator_GenFaces, 
-				 _CartesianGenerator_GenEdges, 
-				 _CartesianGenerator_GenVertices, 
-				 C2Generator_GenElementVertexInc, 
-				 _CartesianGenerator_GenVolumeEdgeInc, 
-				 _CartesianGenerator_GenVolumeFaceInc, 
-				 C2Generator_GenFaceVertexInc, 
-				 _CartesianGenerator_GenFaceEdgeInc, 
-				 C2Generator_GenEdgeVertexInc, 
-				 C2Generator_GenElementTypes );
+C2Generator* C2Generator_New( Name name, AbstractContext* context ) {
+	/* Variables set in this function */
+	SizeT                                                    _sizeOfSelf = sizeof(C2Generator);
+	Type                                                            type = C2Generator_Type;
+	Stg_Class_DeleteFunction*                                    _delete = _C2Generator_Delete;
+	Stg_Class_PrintFunction*                                      _print = _C2Generator_Print;
+	Stg_Class_CopyFunction*                                        _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*        _defaultConstructor = (void* (*)(Name))_C2Generator_New;
+	Stg_Component_ConstructFunction*                          _construct = _C2Generator_AssignFromXML;
+	Stg_Component_BuildFunction*                                  _build = _C2Generator_Build;
+	Stg_Component_InitialiseFunction*                        _initialise = _C2Generator_Initialise;
+	Stg_Component_ExecuteFunction*                              _execute = _C2Generator_Execute;
+	Stg_Component_DestroyFunction*                              _destroy = NULL;
+	AllocationType                                    nameAllocationType = NON_GLOBAL;
+	MeshGenerator_SetDimSizeFunc*                         setDimSizeFunc = CartesianGenerator_SetDimSize;
+	MeshGenerator_GenerateFunc*                             generateFunc = CartesianGenerator_Generate;
+	CartesianGenerator_SetTopologyParamsFunc*      setTopologyParamsFunc = C2Generator_SetTopologyParams;
+	CartesianGenerator_GenElementsFunc*                  genElementsFunc = _CartesianGenerator_GenElements;
+	CartesianGenerator_GenFacesFunc*                        genFacesFunc = _CartesianGenerator_GenFaces;
+	CartesianGenerator_GenEdgesFunc*                        genEdgesFunc = _CartesianGenerator_GenEdges;
+	CartesianGenerator_GenVerticesFunc*                  genVerticesFunc = _CartesianGenerator_GenVertices;
+	CartesianGenerator_GenElementVertexIncFunc*  genElementVertexIncFunc = C2Generator_GenElementVertexInc;
+	CartesianGenerator_GenVolumeEdgeIncFunc*        genVolumeEdgeIncFunc = _CartesianGenerator_GenVolumeEdgeInc;
+	CartesianGenerator_GenVolumeFaceIncFunc*        genVolumeFaceIncFunc = _CartesianGenerator_GenVolumeFaceInc;
+	CartesianGenerator_GenFaceVertexIncFunc*        genFaceVertexIncFunc = C2Generator_GenFaceVertexInc;
+	CartesianGenerator_GenFaceEdgeIncFunc*            genFaceEdgeIncFunc = _CartesianGenerator_GenFaceEdgeInc;
+	CartesianGenerator_GenEdgeVertexIncFunc*        genEdgeVertexIncFunc = C2Generator_GenEdgeVertexInc;
+	CartesianGenerator_GenElementTypesFunc*          genElementTypesFunc = C2Generator_GenElementTypes;
+
+	C2Generator* self = _C2Generator_New(  C2GENERATOR_PASSARGS  );
+
+   _MeshGenerator_Init( (MeshGenerator*)self, context );
+   _CartesianGenerator_Init( (CartesianGenerator*)self );
+   _C2Generator_Init( self );
+   return self;
 }
 
-C2Generator* _C2Generator_New( C2GENERATOR_DEFARGS ) {
+C2Generator* _C2Generator_New(  C2GENERATOR_DEFARGS  ) {
 	C2Generator*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(C2Generator) );
-	self = (C2Generator*)_CartesianGenerator_New( CARTESIANGENERATOR_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(C2Generator) );
+	self = (C2Generator*)_CartesianGenerator_New(  CARTESIANGENERATOR_PASSARGS  );
 
-	/* Virtual info */
 
-	/* C2Generator info */
-	_C2Generator_Init( self );
 
 	return self;
 }
@@ -122,8 +126,8 @@ void _C2Generator_Print( void* meshGenerator, Stream* stream ) {
 	_CartesianGenerator_Print( self, stream );
 }
 
-void _C2Generator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, void* data ) {
-	_CartesianGenerator_Construct( meshGenerator, cf, data );
+void _C2Generator_AssignFromXML( void* meshGenerator, Stg_ComponentFactory* cf, void* data ) {
+	_CartesianGenerator_AssignFromXML( meshGenerator, cf, data );
 }
 
 void _C2Generator_Build( void* meshGenerator, void* data ) {
@@ -263,8 +267,7 @@ void C2Generator_GenElementVertexInc( void* meshGenerator, IGraph* topo, Grid***
 				dimInds[2] -= 2;
 			}
 		}
-		CartesianGenerator_MapToDomain( (CartesianGenerator*)self, IGraph_GetDomain( topo, 0), 
-						vertsPerEl, incEls );
+		CartesianGenerator_MapToDomain( (CartesianGenerator*)self, IGraph_GetDomain( topo, 0), vertsPerEl, incEls );
 		IGraph_SetIncidence( topo, topo->nDims, e_i, MT_VERTEX, vertsPerEl, incEls );
 	}
 
@@ -483,7 +486,7 @@ void C2Generator_GenElementTypes( void* meshGenerator, Mesh* mesh ) {
 		mesh->elTypeMap[e_i] = 0;
 
 	if( self->regular )
-		Mesh_SetAlgorithms( mesh, Mesh_RegularAlgorithms_New( "" ) );
+		Mesh_SetAlgorithms( mesh, Mesh_RegularAlgorithms_New( "", NULL ) );
 
 	MPI_Barrier( self->mpiComm );
 	Journal_Printf( stream, "... element types are '%s',\n", mesh->elTypes[0]->type );
@@ -501,3 +504,5 @@ void C2Generator_GenElementTypes( void* meshGenerator, Mesh* mesh ) {
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+

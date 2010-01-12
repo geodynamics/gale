@@ -48,20 +48,18 @@
 const Type LidDrivenIsoviscousAnalytic_Type = "LidDrivenIsoviscousAnalytic";
 
 typedef struct { 
-	__AnalyticSolution 
+	__FieldTest 
 	unsigned int wavenumber;
 	double A, B, C, D;
-	FeVariable* velocityField;
-	FeVariable* pressureField;
 } LidDrivenIsoviscousAnalytic;
 
 
 void LidDrivenIsoviscousAnalytic_CalculateConstants( LidDrivenIsoviscousAnalytic *self ) {
-	double                  E;
-	double                  e_nPI;
-	double                  e_2nPI;
-	double                  e_4nPI;
-	double                  n;
+	double E;
+	double e_nPI;
+	double e_2nPI;
+	double e_4nPI;
+	double n;
 
 	n = (double) self->wavenumber;
 
@@ -78,8 +76,8 @@ void LidDrivenIsoviscousAnalytic_CalculateConstants( LidDrivenIsoviscousAnalytic
 	self->D = - ( 2.0 * n * M_PI * e_2nPI - e_2nPI + 1.0 ) * e_nPI / E;
 }
 
-void LidDrivenIsoviscousAnalytic_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
-	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)analyticSolution;
+void LidDrivenIsoviscousAnalytic_VelocityFunction( void* codelet, double* coord, double* velocity ) {
+	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)codelet;
 	double x,y;
 	double n;
 	double A, B, C, D;
@@ -103,9 +101,8 @@ void LidDrivenIsoviscousAnalytic_VelocityFunction( void* analyticSolution, FeVar
 		+ ( B + D * y ) * exp( - n * M_PI * y ) );
 }
 
-
-void LidDrivenIsoviscousAnalytic_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
-	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)analyticSolution;
+void LidDrivenIsoviscousAnalytic_PressureFunction( void* codelet, double* coord, double* pressure ) {
+	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)codelet;
 	double x,y;
 	double n;
 	double A, B, C, D;
@@ -124,42 +121,49 @@ void LidDrivenIsoviscousAnalytic_PressureFunction( void* analyticSolution, FeVar
 	*pressure = - 2.0 * n * M_PI * cos( n * M_PI * x ) * ( C * exp( n * M_PI * y ) + D * exp( - n * M_PI * y ) );
 }
 
-void _LidDrivenIsoviscousAnalytic_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
-	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)analyticSolution;
+void _LidDrivenIsoviscousAnalytic_AssignFromXML( void* codelet, Stg_ComponentFactory* cf, void* data ) {
+	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)codelet;
 
-	_AnalyticSolution_Construct( self, cf, data );
-
-	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
-	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->velocityField, LidDrivenIsoviscousAnalytic_VelocityFunction );
+	_FieldTest_AssignFromXML( self, cf, data );
 	
-	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
-	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->pressureField, LidDrivenIsoviscousAnalytic_PressureFunction );
-
 	/* Set constants */
 	self->wavenumber = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "sinusoidalLidWavenumber", 1 );
 	LidDrivenIsoviscousAnalytic_CalculateConstants( self );
 }
 
-void _LidDrivenIsoviscousAnalytic_Build( void* analyticSolution, void* data ) {
-	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)analyticSolution;
+void _LidDrivenIsoviscousAnalytic_Build( void* codelet, void* data ) {
+	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)codelet;
 
-	_AnalyticSolution_Build( self, data );
+	_FieldTest_Build( self, data );
+
+	 /* here we assign the memory and the func ptr for analytic sols */
+   self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, 2 );
+	self->_analyticSolutionList[0] = LidDrivenIsoviscousAnalytic_VelocityFunction;
+   self->_analyticSolutionList[1] = LidDrivenIsoviscousAnalytic_PressureFunction;
+}
+
+void _LidDrivenIsoviscousAnalytic_Initialise( void* codelet, void* data ) {
+   _FieldTest_Initialise( codelet, data );
 }
 
 void* _LidDrivenIsoviscousAnalytic_DefaultNew( Name name ) {
-	return (void*) _AnalyticSolution_New( 
-			sizeof(LidDrivenIsoviscousAnalytic),
-			LidDrivenIsoviscousAnalytic_Type,
-			_AnalyticSolution_Delete,
-			_AnalyticSolution_Print,
-			_AnalyticSolution_Copy,
-			_LidDrivenIsoviscousAnalytic_DefaultNew,
-			_LidDrivenIsoviscousAnalytic_Construct,
-			_LidDrivenIsoviscousAnalytic_Build, 
-			_AnalyticSolution_Initialise,
-			_AnalyticSolution_Execute,
-			_AnalyticSolution_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(LidDrivenIsoviscousAnalytic);
+	Type                                                      type = LidDrivenIsoviscousAnalytic_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FieldTest_Delete;
+	Stg_Class_PrintFunction*                                _print = _FieldTest_Print;
+	Stg_Class_CopyFunction*                                  _copy = _FieldTest_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _LidDrivenIsoviscousAnalytic_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _LidDrivenIsoviscousAnalytic_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _LidDrivenIsoviscousAnalytic_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FieldTest_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FieldTest_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FieldTest_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _FieldTest_New(  FIELDTEST_PASSARGS  );
 }
 
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
@@ -167,3 +171,5 @@ Index StgFEM_LidDrivenIsoviscousAnalytic_Register( PluginsManager* pluginsManage
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
 	return PluginsManager_Submit( pluginsManager, LidDrivenIsoviscousAnalytic_Type, "0", _LidDrivenIsoviscousAnalytic_DefaultNew );
 }
+
+

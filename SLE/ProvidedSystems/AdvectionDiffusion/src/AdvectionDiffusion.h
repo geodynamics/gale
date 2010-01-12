@@ -38,8 +38,8 @@
 */
 
 
-#ifndef __StgFEM_AdvectionDiffusion_h__
-#define __StgFEM_AdvectionDiffusion_h__
+#ifndef __StgFEM_SLE_ProvidedSystems_AdvectionDiffusion_AdvectionDiffusion_h__
+#define __StgFEM_SLE_ProvidedSystems_AdvectionDiffusion_AdvectionDiffusion_h__
 
 #include "types.h"
 #include "AdvectionDiffusionSLE.h"

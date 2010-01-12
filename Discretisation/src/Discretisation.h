@@ -50,8 +50,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StgFEM_Discretisation_h__
-#define __StgFEM_Discretisation_h__
+#ifndef __StgFEM_Discretisation_Discretisation_h__
+#define __StgFEM_Discretisation_Discretisation_h__
 	
 	#include "units.h"
 	#include "types.h"
@@ -100,4 +100,4 @@
 	#include "Init.h"
 	#include "Finalise.h"
 
-#endif /* __StgFEM_Discretisation_h__ */
+#endif /* __StgFEM_Discretisation_Discretisation_h__ */

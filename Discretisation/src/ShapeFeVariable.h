@@ -57,7 +57,7 @@
 		__FeVariable \
 		\
 		/* Virtual info */ \
-		Stg_Shape*                                         shape;
+		Stg_Shape*	shape;
 
 	struct ShapeFeVariable { __ShapeFeVariable };	
 
@@ -67,43 +67,28 @@
 
 	void* ShapeFeVariable_DefaultNew( Name name );
 
-	ShapeFeVariable* _ShapeFeVariable_New(
- 		SizeT                                             _sizeOfSelf,
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		Name                                              name,
-		Bool                                              initFlag,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-		void*                                              feMesh,
-		void*                                              geometryMesh,
-		void*                                              dofLayout,
-		Dimension_Index                                    dim,
-		Bool                                               isCheckpointedAndReloaded,
-		MPI_Comm                                           communicator,
-		FieldVariable_Register*                            fV_Register
-	       	);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SHAPEFEVARIABLE_DEFARGS \
+                FEVARIABLE_DEFARGS
+
+	#define SHAPEFEVARIABLE_PASSARGS \
+                FEVARIABLE_PASSARGS
+
+	ShapeFeVariable* _ShapeFeVariable_New(  SHAPEFEVARIABLE_DEFARGS  );
 
 	/* 'Stg_Class' Virtual Implementations */
-	void _ShapeFeVariable_Delete( void* variable ) ;
-	void _ShapeFeVariable_Print( void* _swarmVariable, Stream* stream ) ;
-	void* _ShapeFeVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
+	void _ShapeFeVariable_Delete( void* variable );
+
+	void _ShapeFeVariable_Print( void* _swarmVariable, Stream* stream );
+
+	void* _ShapeFeVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Implementations */
-	void _ShapeFeVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
+	void _ShapeFeVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data );
 	void _ShapeFeVariable_Build( void* swarmVariable, void* data ) ;
 	void _ShapeFeVariable_Execute( void* variable, void* data ) ;
 	void _ShapeFeVariable_Destroy( void* variable, void* data ) ;
@@ -115,3 +100,4 @@
 
 
 #endif /* __Discretisation_ShapeFeVariable_h__ */
+

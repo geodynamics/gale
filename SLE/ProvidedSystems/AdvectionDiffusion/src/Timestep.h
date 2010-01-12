@@ -39,8 +39,8 @@
 
 
 
-#ifndef __StgFEM_AdvectionDiffusion_Timestep_h__
-#define __StgFEM_AdvectionDiffusion_Timestep_h__
+#ifndef __StgFEM_SLE_ProvidedSystems_AdvectionDiffusion_Timestep_h__
+#define __StgFEM_SLE_ProvidedSystems_AdvectionDiffusion_Timestep_h__
 
 double AdvectionDiffusionSLE_CalculateDt( void* advectionDiffusionSLE, FiniteElementContext* context ) ;
 double AdvectionDiffusionSLE_DiffusiveTimestep( void* _advectionDiffusionSolver ) ;

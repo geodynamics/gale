@@ -54,8 +54,8 @@
 #define __StgFEM_Discretisation_shortcuts_h__
 
 	/* FE shortcuts */
-	#define FeMesh_NodeAt		FiniteElement_Mesh_NodeAt
-	#define FeMesh_ElementAt	FiniteElement_Mesh_ElementAt
-	#define FeMesh_ElementTypeAt	FiniteElement_Mesh_ElementTypeAt
+	#define FeMesh_NodeAt		FiniteElement_NodeAt
+	#define FeMesh_ElementAt	FiniteElement_ElementAt
+	#define FeMesh_ElementTypeAt	FiniteElement_ElementTypeAt
 
 #endif /* __StgFEM_Discretisation_shortcuts_h__ */

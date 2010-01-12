@@ -51,7 +51,7 @@
 
 const Type StgFEM_FrequentOutput_Type = "StgFEM_FrequentOutput";
 
-void _StgFEM_FrequentOutput_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _StgFEM_FrequentOutput_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	StgFEM_FrequentOutput*            self         = (StgFEM_FrequentOutput*) component;
 	AbstractContext*                   context;
 	Dictionary*                        dictionary;
@@ -59,8 +59,10 @@ void _StgFEM_FrequentOutput_Construct( void* component, Stg_ComponentFactory* cf
 	Name                               frequentOutputFilename;
 	Bool                               fileOpened;
 	Stream*                            errorStream  = Journal_Register( Error_Type, CURR_MODULE_NAME );
+	Dictionary*			   pluginDict	= Codelet_GetPluginDictionary( self, cf->rootDict );
 
-	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), AbstractContext, True, data );
+	self->context = context;
 	dictionary = context->dictionary;
 	
 	ContextEP_Append( context, AbstractContext_EP_Initialise, StgFEM_FrequentOutput_PrintNewLine );
@@ -103,19 +105,23 @@ void _StgFEM_FrequentOutput_Construct( void* component, Stg_ComponentFactory* cf
 }
 
 void* _StgFEM_FrequentOutput_DefaultNew( Name name ) {
-	return _Codelet_New(
-			sizeof(StgFEM_FrequentOutput),
-			StgFEM_FrequentOutput_Type,
-			_Codelet_Delete,
-			_Codelet_Print,
-			_Codelet_Copy,
-			_StgFEM_FrequentOutput_DefaultNew,
-			_StgFEM_FrequentOutput_Construct,
-			_Codelet_Build,
-			_Codelet_Initialise,
-			_Codelet_Execute,
-			_Codelet_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(StgFEM_FrequentOutput);
+	Type                                                      type = StgFEM_FrequentOutput_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _StgFEM_FrequentOutput_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _StgFEM_FrequentOutput_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Codelet_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
 
 Index StgFEM_FrequentOutput_Register( PluginsManager* pluginsManager ) {
@@ -199,3 +205,5 @@ void StgFEM_FrequentOutput_PrintNewLine( void* _context ) {
 
 	Journal_Printf( stream, "\n" );
 }
+
+

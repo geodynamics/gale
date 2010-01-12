@@ -52,9 +52,11 @@ void StgFEM_Document_Register( AbstractContext* context ) {
 	Stg_ComponentRegister_PrintAllTypes( Stg_ComponentRegister_Get_ComponentRegister(), componentListStream );
 
 	/* Print info for one component */
-	cf = DocumentationComponentFactory_New( context->register_Register );
+	cf = DocumentationComponentFactory_New( );
 	Stream_RedirectFile_WithPrependedPath( cf->infoStream, context->outputPath, "Documentation.txt" );
 	DocumentationComponentFactory_DocumentType( cf, Dictionary_GetString( context->dictionary, "documentType" ) );
 	
 	exit( EXIT_SUCCESS );
 }
+
+

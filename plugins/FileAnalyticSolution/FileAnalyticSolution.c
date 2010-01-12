@@ -58,14 +58,14 @@ void FileAnalyticSolution_DummyFunction( void* analyticSolution, FeVariable* ana
 
 
 
-void _FileAnalyticSolution_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _FileAnalyticSolution_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	FileAnalyticSolution *   self = (FileAnalyticSolution*)analyticSolution;
 	Dictionary_Entry_Value*  varList;
 	Index                    var_I;
 	char*                    varName;
 	FeVariable*              feVarToTest;
 
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 	varList = Dictionary_Get( cf->rootDict, self->name );
 	Journal_Firewall( varList != NULL, Journal_Register( Error_Type, self->type ), 
 		"Error- in %s(): Can't find list in XML '%s'\n", __func__, self->name );
@@ -105,19 +105,23 @@ void _FileAnalyticSolution_Initialise( void* analyticSolution, void* data ) {
 }
 
 void* _FileAnalyticSolution_DefaultNew( Name name ) {
-	return (void*) _AnalyticSolution_New( 
-			sizeof(FileAnalyticSolution),
-			FileAnalyticSolution_Type,
-			_AnalyticSolution_Delete,
-			_AnalyticSolution_Print,
-			_AnalyticSolution_Copy,
-			_FileAnalyticSolution_DefaultNew,
-			_FileAnalyticSolution_Construct,
-			_AnalyticSolution_Build, 
-			_FileAnalyticSolution_Initialise,
-			_AnalyticSolution_Execute,
-			_AnalyticSolution_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(FileAnalyticSolution);
+	Type                                                      type = FileAnalyticSolution_Type;
+	Stg_Class_DeleteFunction*                              _delete = _AnalyticSolution_Delete;
+	Stg_Class_PrintFunction*                                _print = _AnalyticSolution_Print;
+	Stg_Class_CopyFunction*                                  _copy = _AnalyticSolution_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _FileAnalyticSolution_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _FileAnalyticSolution_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _AnalyticSolution_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FileAnalyticSolution_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _AnalyticSolution_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _AnalyticSolution_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _AnalyticSolution_New(  ANALYTICSOLUTION_PASSARGS  );
 }
 
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
@@ -125,3 +129,5 @@ Index StgFEM_FileAnalyticSolution_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
 	return PluginsManager_Submit( pluginsManager, FileAnalyticSolution_Type, "0", _FileAnalyticSolution_DefaultNew );
 }
+
+

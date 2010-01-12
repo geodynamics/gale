@@ -50,8 +50,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StgFEM_SLE_ProvidedSystems_StokesFlow_h__
-#define __StgFEM_SLE_ProvidedSystems_StokesFlow_h__
+#ifndef __StgFEM_SLE_ProvidedSystems_StokesFlow_StokesFlow_h__
+#define __StgFEM_SLE_ProvidedSystems_StokesFlow_StokesFlow_h__
 	
 	#include "types.h"
 		

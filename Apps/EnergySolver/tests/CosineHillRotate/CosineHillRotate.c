@@ -83,12 +83,12 @@ void CosineHillRotate_TemperatureBC( Node_LocalIndex node_lI, Variable_Index var
 	CosineHillRotate_TemperatureFunction( self, feVariable, coord, result );
 }
 
-void _CosineHillRotate_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _CosineHillRotate_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	CosineHillRotate* self = (CosineHillRotate*)analyticSolution;
 	AbstractContext*       context;
 	ConditionFunction*     condFunc;
 
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->temperatureField, CosineHillRotate_TemperatureFunction );
@@ -103,7 +103,7 @@ void _CosineHillRotate_Construct( void* analyticSolution, Stg_ComponentFactory* 
 	/* Create Condition Functions */
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 	condFunc = ConditionFunction_New( CosineHillRotate_TemperatureBC, "Temperature_CosineHill" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 }
 
 void _CosineHillRotate_Build( void* analyticSolution, void* data ) {
@@ -113,19 +113,23 @@ void _CosineHillRotate_Build( void* analyticSolution, void* data ) {
 }
 
 void* _CosineHillRotate_DefaultNew( Name name ) {
-	return (void*) _AnalyticSolution_New( 
-			sizeof(CosineHillRotate),
-			CosineHillRotate_Type,
-			_AnalyticSolution_Delete,
-			_AnalyticSolution_Print,
-			_AnalyticSolution_Copy,
-			_CosineHillRotate_DefaultNew,
-			_CosineHillRotate_Construct,
-			_CosineHillRotate_Build,
-			_AnalyticSolution_Initialise,
-			_AnalyticSolution_Execute,
-			_AnalyticSolution_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(CosineHillRotate);
+	Type                                                      type = CosineHillRotate_Type;
+	Stg_Class_DeleteFunction*                              _delete = _AnalyticSolution_Delete;
+	Stg_Class_PrintFunction*                                _print = _AnalyticSolution_Print;
+	Stg_Class_CopyFunction*                                  _copy = _AnalyticSolution_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _CosineHillRotate_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _CosineHillRotate_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _CosineHillRotate_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _AnalyticSolution_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _AnalyticSolution_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _AnalyticSolution_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _AnalyticSolution_New(  ANALYTICSOLUTION_PASSARGS  );
 }
 
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
@@ -133,4 +137,6 @@ Index StgFEM_CosineHillRotate_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
 	return PluginsManager_Submit( pluginsManager, CosineHillRotate_Type, "0", _CosineHillRotate_DefaultNew );
 }
+
+
 

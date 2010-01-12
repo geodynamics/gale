@@ -51,37 +51,40 @@ const Type Triquadratic_Type = "Triquadratic";
 #define TRIQUADRATICNODECOUNT 27
 
 Triquadratic* Triquadratic_New( Name name ) {
-	return _Triquadratic_New( sizeof(Triquadratic),
-				  Triquadratic_Type,
-				  _Triquadratic_Delete,
-				  _Triquadratic_Print,
-				  NULL,
-				  (void* (*)(Name))_Triquadratic_New,
-				  _Triquadratic_Construct,
-				  _Triquadratic_Build,
-				  _Triquadratic_Initialise,
-				  _Triquadratic_Execute,
-				  _Triquadratic_Destroy,
-				  name,
-				  True,
-				  Triquadratic_EvalBasis,
-				  Triquadratic_EvalLocalDerivs,
-				  _ElementType_ConvertGlobalCoordToElLocal,
-				  Triquadratic_JacobianDeterminantSurface,
-				  _ElementType_SurfaceNormal,
-				  TRIQUADRATICNODECOUNT );
+	/* Variables set in this function */
+	SizeT                                                                            _sizeOfSelf = sizeof(Triquadratic);
+	Type                                                                                    type = Triquadratic_Type;
+	Stg_Class_DeleteFunction*                                                            _delete = _Triquadratic_Delete;
+	Stg_Class_PrintFunction*                                                              _print = _Triquadratic_Print;
+	Stg_Class_CopyFunction*                                                                _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*                                _defaultConstructor = (void* (*)(Name))_Triquadratic_New;
+	Stg_Component_ConstructFunction*                                                  _construct = _Triquadratic_AssignFromXML;
+	Stg_Component_BuildFunction*                                                          _build = _Triquadratic_Build;
+	Stg_Component_InitialiseFunction*                                                _initialise = _Triquadratic_Initialise;
+	Stg_Component_ExecuteFunction*                                                      _execute = _Triquadratic_Execute;
+	Stg_Component_DestroyFunction*                                                      _destroy = _Triquadratic_Destroy;
+	AllocationType                                                            nameAllocationType = NON_GLOBAL;
+	ElementType_EvaluateShapeFunctionsAtFunction*                      _evaluateShapeFunctionsAt = Triquadratic_EvalBasis;
+	ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*  _evaluateShapeFunctionLocalDerivsAt = Triquadratic_EvalLocalDerivs;
+	ElementType_ConvertGlobalCoordToElLocalFunction*                _convertGlobalCoordToElLocal = _ElementType_ConvertGlobalCoordToElLocal;
+	ElementType_JacobianDeterminantSurfaceFunction*                  _jacobianDeterminantSurface = Triquadratic_JacobianDeterminantSurface;
+	ElementType_SurfaceNormalFunction*                                            _surfaceNormal = _ElementType_SurfaceNormal;
+
+	return _Triquadratic_New(  TRIQUADRATIC_PASSARGS  );
 }
 
-Triquadratic* _Triquadratic_New( TRIQUADRATIC_DEFARGS ) {
+Triquadratic* _Triquadratic_New(  TRIQUADRATIC_DEFARGS  ) {
 	Triquadratic*	self;
 
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Triquadratic) );
-	self = (Triquadratic*)_ElementType_New( ELEMENTTYPE_PASSARGS );
+	self = (Triquadratic*)_ElementType_New(  ELEMENTTYPE_PASSARGS  );
 
 	/* Virtual info */
 
 	/* Triquadratic info */
+	self->isConstructed = True;
+	_ElementType_Init( (ElementType*)self, TRIQUADRATICNODECOUNT );
 	_Triquadratic_Init( self );
 
 	return self;
@@ -116,7 +119,7 @@ void _Triquadratic_Print( void* elementType, Stream* stream ) {
 	_ElementType_Print( self, stream );
 }
 
-void _Triquadratic_Construct( void* elementType, Stg_ComponentFactory* cf, void* data ) {
+void _Triquadratic_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void _Triquadratic_Build( void* elementType, void* data ) {
@@ -438,4 +441,6 @@ double Triquadratic_JacobianDeterminantSurface( void* elementType, void* _mesh, 
 
 	return fabs( detJac );
 }
+
+
 

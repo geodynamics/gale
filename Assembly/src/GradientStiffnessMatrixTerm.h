@@ -38,8 +38,8 @@
 */
 
 
-#ifndef __StgFEM_GradientStiffnessMatrixTerm_h__
-#define __StgFEM_GradientStiffnessMatrixTerm_h__
+#ifndef __StgFEM_Assembly_GradientStiffnessMatrixTerm_h__
+#define __StgFEM_Assembly_GradientStiffnessMatrixTerm_h__
 
 	/** Textual name of this class */
 	extern const Type GradientStiffnessMatrixTerm_Type;
@@ -50,52 +50,55 @@
 		__StiffnessMatrixTerm \
 		/* Virtual info */ \
 		/* GradientStiffnessMatrixTerm info */ \
-		int         max_nElNodes_col;    \
-		double      *Ni_col;
+		int		max_nElNodes_col;    \
+		double	*Ni_col;
 
 	struct GradientStiffnessMatrixTerm { __GradientStiffnessMatrixTerm };
 
 	GradientStiffnessMatrixTerm* GradientStiffnessMatrixTerm_New( 
-		Name                                                name,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm );
+		Name							name,
+		FiniteElementContext*	context,
+		StiffnessMatrix*			stiffnessMatrix,
+		Swarm*						integrationSwarm );
 
-	GradientStiffnessMatrixTerm* _GradientStiffnessMatrixTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,		
-		Name                                                name );
 	
-	void GradientStiffnessMatrixTerm_InitAll( 
-		void*                                               matrixTerm,
-		StiffnessMatrix*                                    stiffnessMatrix,
-		Swarm*                                              integrationSwarm );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
+	#define GRADIENTSTIFFNESSMATRIXTERM_DEFARGS \
+                STIFFNESSMATRIXTERM_DEFARGS
+
+	#define GRADIENTSTIFFNESSMATRIXTERM_PASSARGS \
+                STIFFNESSMATRIXTERM_PASSARGS
+
+	GradientStiffnessMatrixTerm* _GradientStiffnessMatrixTerm_New(  GRADIENTSTIFFNESSMATRIXTERM_DEFARGS  );
+
+	void _GradientStiffnessMatrixTerm_Init( void* matrixTerm );
+	
 	void _GradientStiffnessMatrixTerm_Delete( void* matrixTerm );
+
 	void _GradientStiffnessMatrixTerm_Print( void* matrixTerm, Stream* stream );
 
-	void* _GradientStiffnessMatrixTerm_DefaultNew( Name name ) ;
-void _GradientStiffnessMatrixTerm_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) ;
-	void _GradientStiffnessMatrixTerm_Build( void* matrixTerm, void* data ) ;
-	void _GradientStiffnessMatrixTerm_Initialise( void* matrixTerm, void* data ) ;
-	void _GradientStiffnessMatrixTerm_Execute( void* matrixTerm, void* data ) ;
-	void _GradientStiffnessMatrixTerm_Destroy( void* matrixTerm, void* data ) ;
+	void* _GradientStiffnessMatrixTerm_DefaultNew( Name name );
+
+	void _GradientStiffnessMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data );
+
+	void _GradientStiffnessMatrixTerm_Build( void* matrixTerm, void* data );
+
+	void _GradientStiffnessMatrixTerm_Initialise( void* matrixTerm, void* data );
+
+	void _GradientStiffnessMatrixTerm_Execute( void* matrixTerm, void* data );
+
+	void _GradientStiffnessMatrixTerm_Destroy( void* matrixTerm, void* data );
 
 	void _GradientStiffnessMatrixTerm_AssembleElement( 
-		void*                                              matrixTerm,
-		StiffnessMatrix*                                   stiffnessMatrix, 
-		Element_LocalIndex                                 lElement_I, 
-		SystemLinearEquations*                             sle,
-		FiniteElementContext*                              context,
-		double**                                           elStiffMat ) ;
+		void*							matrixTerm,
+		StiffnessMatrix*			stiffnessMatrix, 
+		Element_LocalIndex		lElement_I, 
+		SystemLinearEquations*	sle,
+		FiniteElementContext*	context,
+		double**						elStiffMat ) ;
 
 #endif
+

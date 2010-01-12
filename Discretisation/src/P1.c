@@ -42,43 +42,46 @@
 /* Textual name of this class */
 const Type P1_Type = "P1";
 
-
+#define P1_NODECOUNT 3
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
 
 P1* P1_New( Name name ) {
-	return _P1_New( sizeof(P1), 
-			P1_Type, 
-			_P1_Delete, 
-			_P1_Print, 
-			NULL, 
-			(void* (*)(Name))_P1_New, 
-			_P1_Construct, 
-			_P1_Build, 
-			_P1_Initialise, 
-			_P1_Execute, 
-			_P1_Destroy, 
-			name, 
-			True, 
-			P1_EvalBasis, 
-			P1_EvalLocalDerivs, 
-			NULL/*P1_CoordGlobalToLocal*/, 
-			_ElementType_JacobianDeterminantSurface,
-			_P1_SurfaceNormal,
-			3 );
+	/* Variables set in this function */
+	SizeT                                                                            _sizeOfSelf = sizeof(P1);
+	Type                                                                                    type = P1_Type;
+	Stg_Class_DeleteFunction*                                                            _delete = _P1_Delete;
+	Stg_Class_PrintFunction*                                                              _print = _P1_Print;
+	Stg_Class_CopyFunction*                                                                _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*                                _defaultConstructor = (void* (*)(Name))_P1_New;
+	Stg_Component_ConstructFunction*                                                  _construct = _P1_AssignFromXML;
+	Stg_Component_BuildFunction*                                                          _build = _P1_Build;
+	Stg_Component_InitialiseFunction*                                                _initialise = _P1_Initialise;
+	Stg_Component_ExecuteFunction*                                                      _execute = _P1_Execute;
+	Stg_Component_DestroyFunction*                                                      _destroy = _P1_Destroy;
+	AllocationType                                                            nameAllocationType = NON_GLOBAL;
+	ElementType_EvaluateShapeFunctionsAtFunction*                      _evaluateShapeFunctionsAt = P1_EvalBasis;
+	ElementType_EvaluateShapeFunctionLocalDerivsAtFunction*  _evaluateShapeFunctionLocalDerivsAt = P1_EvalLocalDerivs;
+	ElementType_ConvertGlobalCoordToElLocalFunction*                _convertGlobalCoordToElLocal = NULL;
+	ElementType_JacobianDeterminantSurfaceFunction*                  _jacobianDeterminantSurface = _ElementType_JacobianDeterminantSurface;
+	ElementType_SurfaceNormalFunction*                                            _surfaceNormal = _P1_SurfaceNormal;
+
+	return _P1_New(  P1_PASSARGS  );
 }
 
-P1* _P1_New( P1_DEFARGS ) {
-	P1*	self;
+P1* _P1_New(  P1_DEFARGS  ) {
+	P1* self;
 
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(P1) );
-	self = (P1*)_ElementType_New( ELEMENTTYPE_PASSARGS );
+	self = (P1*)_ElementType_New(  ELEMENTTYPE_PASSARGS  );
 
 	/* Virtual info */
 
 	/* P1 info */
+	self->isConstructed = True;
+	_ElementType_Init( (ElementType*)self, P1_NODECOUNT );
 	_P1_Init( self );
 
 	return self;
@@ -94,7 +97,7 @@ void _P1_Init( P1* self ) {
 */
 
 void _P1_Delete( void* elementType ) {
-	P1*	self = (P1*)elementType;
+	P1* self = (P1*)elementType;
 
 	/* Delete the parent. */
 	_ElementType_Delete( self );
@@ -112,7 +115,7 @@ void _P1_Print( void* elementType, Stream* stream ) {
 	_ElementType_Print( self, stream );
 }
 
-void _P1_Construct( void* elementType, Stg_ComponentFactory* cf, void* data ) {
+void _P1_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void _P1_Build( void* elementType, void* data ) {
@@ -125,6 +128,9 @@ void _P1_Execute( void* elementType, void* data ) {
 }
 
 void _P1_Destroy( void* elementType, void* data ) {
+	P1* self = (P1*)elementType;
+
+	_ElementType_Destroy( self, data );	
 }
 
 
@@ -204,3 +210,7 @@ int _P1_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, doub
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+
+
+

@@ -56,7 +56,6 @@ void _CompareFeVariableAgainstReferenceSolution_Delete( void* compareFeVariable 
 
 typedef struct {
 	__Codelet
-	AbstractContext*         context;
 	Stg_ComponentFactory*    cf;
 
 	char*                    referencePath;
@@ -76,7 +75,7 @@ typedef struct {
 } CompareFeVariableAgainstReferenceSolution;
 
 
-void _CompareFeVariableAgainstReferenceSolution_Construct( void* compareFeVariable, Stg_ComponentFactory* cf, void* data ) {
+void _CompareFeVariableAgainstReferenceSolution_AssignFromXML( void* compareFeVariable, Stg_ComponentFactory* cf, void* data ) {
 	CompareFeVariableAgainstReferenceSolution* self = (CompareFeVariableAgainstReferenceSolution*) compareFeVariable;
 
 	AbstractContext*         context;
@@ -180,19 +179,23 @@ void _CompareFeVariableAgainstReferenceSolution_Construct( void* compareFeVariab
 
 
 void* _CompareFeVariableAgainstReferenceSolution_DefaultNew( Name name ) {
-	return _Codelet_New(
-			sizeof(CompareFeVariableAgainstReferenceSolution),
-			CompareFeVariableAgainstReferenceSolution_Type,
-			_CompareFeVariableAgainstReferenceSolution_Delete,
-			_Codelet_Print,
-			_Codelet_Copy,
-			_CompareFeVariableAgainstReferenceSolution_DefaultNew,
-			_CompareFeVariableAgainstReferenceSolution_Construct,
-			_Codelet_Build,
-			_Codelet_Initialise,
-			_Codelet_Execute,
-			_Codelet_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(CompareFeVariableAgainstReferenceSolution);
+	Type                                                      type = CompareFeVariableAgainstReferenceSolution_Type;
+	Stg_Class_DeleteFunction*                              _delete = _CompareFeVariableAgainstReferenceSolution_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _CompareFeVariableAgainstReferenceSolution_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _CompareFeVariableAgainstReferenceSolution_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Codelet_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
 
 
@@ -235,13 +238,11 @@ void CompareFeVariableAgainstReferenceSolution_TestAll( void* compareFeVariable,
 
 void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVariable, FeVariable* feVarToTest, double tolerance, Bool relativeErrorMeasure ) {
 	CompareFeVariableAgainstReferenceSolution* self = (CompareFeVariableAgainstReferenceSolution*) compareFeVariable;
-	
 	Variable_Register*       variable_Register;
-
 	Variable*                referenceDataVariable;
 	Variable*                roundedDataVariable;
-        Name                     referenceVariableName[9];
-        Name                     roundedVariableName[9];
+	Name                     referenceVariableName[9];
+	Name                     roundedVariableName[9];
 	Variable_Index           variable_I;
 	DofLayout*               referenceDofLayout;
 	DofLayout*               roundedDofLayout;
@@ -262,13 +263,11 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	char*                    tmpName2;
 	char*                    filename;
 	Bool                     scalar;
-        Dof_Index                componentsCount;
-/* 				 TODO: hardcode for now - should be read in constructor, or read from the reference */
-/* 				 feVar type, or file reader or something */
+	Dof_Index                componentsCount;
+	/* TODO: hardcode for now - should be read in constructor, or read from the reference */
+	/* feVar type, or file reader or something */
 	unsigned int             numSigFigsInReferenceFeVar = 15;
-	
 	char*                    refName = NULL;
-
 	double                   result;
 	
 	variable_Register = self->context->variable_Register;
@@ -290,6 +289,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	if ( scalar == 1 ) {
 		referenceDataVariable = Variable_NewScalar(
 			tmpName,
+			self->context,
 			Variable_DataType_Double,
 			&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
 			NULL,
@@ -297,6 +297,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 			variable_Register );
 		roundedDataVariable = Variable_NewScalar(
 			tmpName2,
+			self->context,
 			Variable_DataType_Double,
 			&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
 			NULL,
@@ -324,6 +325,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 		}
 		referenceDataVariable = Variable_NewVector(
 				tmpName,
+				self->context,
 				Variable_DataType_Double,
 				componentsCount,
 				&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
@@ -339,8 +341,10 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 				referenceVariableName[6],
 				referenceVariableName[7],
 				referenceVariableName[8] );
+
 		roundedDataVariable = Variable_NewVector(
 				tmpName2,
+				self->context,
 				Variable_DataType_Double,
 				componentsCount,
 				&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
@@ -371,10 +375,9 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	/* Create Dof layout for this variable based on its own DataVariable */
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "Reference-DofLayout" );
 	tmpName2 = Stg_Object_AppendSuffix( feVarToTest, "Rounded-DofLayout" );
-	referenceDofLayout = DofLayout_New( tmpName, variable_Register, 
-					    Mesh_GetDomainSize( feVarToTest->feMesh, MT_VERTEX ), NULL );
-	roundedDofLayout = DofLayout_New( tmpName2, variable_Register, 
-					  Mesh_GetDomainSize( feVarToTest->feMesh, MT_VERTEX ), NULL );
+	referenceDofLayout = DofLayout_New( tmpName, (DomainContext*)self->context, variable_Register, Mesh_GetDomainSize( feVarToTest->feMesh, MT_VERTEX ), NULL );
+	roundedDofLayout = DofLayout_New( tmpName2, (DomainContext*)self->context, variable_Register, Mesh_GetDomainSize( feVarToTest->feMesh, MT_VERTEX ), NULL );
+
 	if ( scalar ) {
 		DofLayout_AddAllFromVariableArray( referenceDofLayout, 1, &referenceDataVariable );
 		DofLayout_AddAllFromVariableArray( roundedDofLayout, 1, &roundedDataVariable );
@@ -410,24 +413,25 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	}
 
 	referenceFeVar = FeVariable_New_FromTemplate( 
-			refName, 
-			feVarToTest,
-			referenceDofLayout, 
-			NULL, 
-			True,  /* isReference = True */
-			False, /* Don't set the "test every timestep var", since we re-create this guy each
-				  timestep anyway*/
-			feVarToTest->fieldVariable_Register );
+		refName, 
+		(DomainContext*)self->context,
+		feVarToTest,
+		referenceDofLayout, 
+		NULL, 
+		True,  /* isReference = True */
+		False, /* Don't set the "test every timestep var", since we re-create this guy each timestep anyway*/
+		feVarToTest->fieldVariable_Register );
 
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "Rounded" );
 	roundedFeVar = FeVariable_New_FromTemplate( 
-			tmpName, 
-			feVarToTest, 
-			roundedDofLayout, 
-			NULL, 
-			False,
-			False,
-			feVarToTest->fieldVariable_Register );
+		tmpName, 
+		(DomainContext*)self->context,
+		feVarToTest, 
+		roundedDofLayout, 
+		NULL, 
+		False,
+		False,
+		feVarToTest->fieldVariable_Register );
 
 	Memory_Free( tmpName );
 
@@ -440,9 +444,9 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 
 	filename = Memory_Alloc_Array_Unnamed( char, strlen(self->referencePath) + strlen(self->name) + 1 + 5 + 1 + 3 + 1 );
 #ifdef READ_HDF5
-				sprintf( filename, "%s/%s.%.5u.h5", self->referencePath, self->name, self->context->timeStep );
+		sprintf( filename, "%s/%s.%.5u.h5", self->referencePath, self->name, self->context->timeStep );
 #else
-				sprintf( filename, "%s/%s.%.5u.h5", self->referencePath, self->name, self->context->timeStep );
+		sprintf( filename, "%s/%s.%.5u.h5", self->referencePath, self->name, self->context->timeStep );
 #endif
 	FeVariable_ReadFromFile( referenceFeVar, filename );
 
@@ -454,7 +458,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 		referenceFeVar->name = Stg_Object_AppendSuffix( feVarToTest, "Reference" );
 	}
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "MagnitudeField" );
-	refMagnitudeField = OperatorFeVariable_NewUnary( tmpName, referenceFeVar, "Magnitude" );
+	refMagnitudeField = OperatorFeVariable_NewUnary( tmpName, (DomainContext*)self->context, referenceFeVar, "Magnitude" );
 	Memory_Free( tmpName );
 
 	/* now we need to round off the feVar we are testing, and copy the result to the roundedFeVar */
@@ -475,16 +479,15 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	Memory_Free( nodalValues );
 
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "ErrorField" );
-	errorField = OperatorFeVariable_NewBinary( tmpName, roundedFeVar, referenceFeVar, "Subtraction" );
+	errorField = OperatorFeVariable_NewBinary( tmpName, (DomainContext*)self->context, roundedFeVar, referenceFeVar, "Subtraction" );
 	Memory_Free( tmpName );
 
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "ErrorMagnitudeField" );
-	errorMagnitudeField = OperatorFeVariable_NewUnary( tmpName, errorField, "Magnitude" );
+	errorMagnitudeField = OperatorFeVariable_NewUnary( tmpName, (DomainContext*)self->context, errorField, "Magnitude" );
 	Memory_Free( tmpName );
 
 	tmpName = Stg_Object_AppendSuffix( feVarToTest, "RelativeErrorMagnitudeField" );
-	relativeErrorMagnitudeField = OperatorFeVariable_NewBinary(
-			tmpName, errorMagnitudeField, refMagnitudeField, "ScalarDivision" );
+	relativeErrorMagnitudeField = OperatorFeVariable_NewBinary( tmpName, (DomainContext*)self->context, errorMagnitudeField, refMagnitudeField, "ScalarDivision" );
 	Memory_Free( tmpName );
 
 	/* Build and Initialise the newly-created OperatorFeVariables - else we can't use them */
@@ -552,3 +555,5 @@ void _CompareFeVariableAgainstReferenceSolution_Delete( void* compareFeVariable 
 	Memory_Free( self->importFormatType );
 	Memory_Free( self->exportFormatType );
 }	
+
+

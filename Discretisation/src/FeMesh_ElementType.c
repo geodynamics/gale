@@ -49,23 +49,26 @@ const Type FeMesh_ElementType_Type = "FeMesh_ElementType";
 */
 
 FeMesh_ElementType* FeMesh_ElementType_New( Name name ) {
-	return _FeMesh_ElementType_New( sizeof(FeMesh_ElementType), 
-				  FeMesh_ElementType_Type, 
-				  _FeMesh_ElementType_Delete, 
-				  _FeMesh_ElementType_Print, 
-				  NULL, 
-				  Mesh_HexType_Update, 
-				  FeMesh_ElementType_ElementHasPoint, 
-				  Mesh_HexType_GetMinimumSeparation, 
-				  _Mesh_ElementType_GetCentroid );
+	/* Variables set in this function */
+	SizeT                                                    _sizeOfSelf = sizeof(FeMesh_ElementType);
+	Type                                                            type = FeMesh_ElementType_Type;
+	Stg_Class_DeleteFunction*                                    _delete = _FeMesh_ElementType_Delete;
+	Stg_Class_PrintFunction*                                      _print = _FeMesh_ElementType_Print;
+	Stg_Class_CopyFunction*                                        _copy = NULL;
+	Mesh_ElementType_UpdateFunc*                              updateFunc = Mesh_HexType_Update;
+	Mesh_ElementType_ElementHasPointFunc*            elementHasPointFunc = FeMesh_ElementType_ElementHasPoint;
+	Mesh_ElementType_GetMinimumSeparationFunc*  getMinimumSeparationFunc = Mesh_HexType_GetMinimumSeparation;
+	Mesh_ElementType_GetCentroidFunc*                    getCentroidFunc = _Mesh_ElementType_GetCentroid;
+
+	return _FeMesh_ElementType_New(  FEMESH_ELEMENTTYPE_PASSARGS  );
 }
 
-FeMesh_ElementType* _FeMesh_ElementType_New( FEMESH_ELEMENTTYPE_DEFARGS ) {
+FeMesh_ElementType* _FeMesh_ElementType_New(  FEMESH_ELEMENTTYPE_DEFARGS  ) {
 	FeMesh_ElementType* self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(FeMesh_ElementType) );
-	self = (FeMesh_ElementType*)_Mesh_HexType_New( MESH_HEXTYPE_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(FeMesh_ElementType) );
+	self = (FeMesh_ElementType*)_Mesh_HexType_New(  MESH_HEXTYPE_PASSARGS  );
 
 	/* Virtual info */
 
@@ -134,4 +137,6 @@ Bool FeMesh_ElementType_ElementHasPoint( void* hexType, unsigned elInd, double* 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+
 

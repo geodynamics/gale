@@ -70,7 +70,7 @@
 		double*                toleranceList;              \
 		Swarm*                 integrationSwarm;           \
 		LiveComponentRegister* LC_Register;                \
-		AbstractContext*       context;                    \
+		DomainContext*         context;                    \
 		AnalyticSolution_SolutionFunction* _getAnalyticVelocity; \
 		AnalyticSolution_SolutionFunction* _getAnalyticPressure; \
 		AnalyticSolution_SolutionFunction* _getAnalyticTotalStress; \
@@ -87,19 +87,18 @@
 	void* _AnalyticSolution_DefaultNew( Name name );
 	
 	/* Creation implementation / Virtual constructor */
-	AnalyticSolution* _AnalyticSolution_New(
-		SizeT                                       _sizeOfSelf,
-		Type                                        type,
-		Stg_Class_DeleteFunction*                   _delete,
-		Stg_Class_PrintFunction*                    _print,
-		Stg_Class_CopyFunction*                     _copy, 
-		Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-		Stg_Component_ConstructFunction*            _construct,
-		Stg_Component_BuildFunction*                _build,
-		Stg_Component_InitialiseFunction*           _initialise,
-		Stg_Component_ExecuteFunction*              _execute,
-		Stg_Component_DestroyFunction*              _destroy,
-		Name                                        name );			
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ANALYTICSOLUTION_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define ANALYTICSOLUTION_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	AnalyticSolution* _AnalyticSolution_New(  ANALYTICSOLUTION_DEFARGS  );			
 
 	/* Stg_Class_Delete a AnalyticSolution construst */
 	void _AnalyticSolution_Delete( void* analyticSolution );
@@ -121,7 +120,7 @@
 	void _AnalyticSolution_Build( void* analyticSolution, void* data );
 	
 	/* Construct implementation */
-	void _AnalyticSolution_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
+	void _AnalyticSolution_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	
 	/* Initialisation implementation */
 	void _AnalyticSolution_Initialise( void* analyticSolution, void* data );
@@ -137,20 +136,44 @@
 
 	/* --- Public Functions --- */
 	void AnalyticSolution_Test( void* analyticSolution, Index analyticFeVariable_I ) ;
+
 	void AnalyticSolution_TestAll( void* analyticSolution, void* data ) ;
 	
 	void AnalyticSolution_PutAnalyticSolutionOntoNodes( void* analyticSolution, Index analyticFeVariable_I ) ;
 
-	void AnalyticSolution_RegisterFeVariableWithAnalyticFunction( void* analyticSolution, FeVariable* feVariable, AnalyticSolution_SolutionFunction* solutionFunction );
-	FeVariable* AnalyticSolution_RegisterFeVariableFromCF( void* analyticSolution, char* fieldName, AnalyticSolution_SolutionFunction* solutionFunction, Stg_ComponentFactory* cf, Bool isEssential, void* data ) ;
+	void AnalyticSolution_RegisterFeVariableWithAnalyticFunction(
+		void*											analyticSolution,
+		FeVariable*									feVariable,
+		AnalyticSolution_SolutionFunction*	solutionFunction );
+
+	FeVariable* AnalyticSolution_RegisterFeVariableFromCF(
+		void*											analyticSolution,
+		char*											fieldName,
+		AnalyticSolution_SolutionFunction*	solutionFunction,
+		Stg_ComponentFactory*					cf,
+		Bool											isEssential,
+		void*											data );
+
 	void AnalyticSolution_BuildAllAnalyticFields( void* analyticSolution, void* data );
 
 	FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVariable* feVariable ) ;
-	FeVariable* AnalyticSolution_CreateAnalyticVectorField( void* analyticSolution, FeVariable* vectorField, AnalyticSolution_SolutionFunction* solutionFunction ) ;
+
+	FeVariable* AnalyticSolution_CreateAnalyticVectorField(
+		void*											analyticSolution,
+		FeVariable*									vectorField,
+		AnalyticSolution_SolutionFunction*	solutionFunction ) ;
+
 	FeVariable* AnalyticSolution_CreateAnalyticSymmetricTensorField( void* analyticSolution, FeVariable* vectorField ) ;
 
 	FeVariable* AnalyticSolution_GetFeVariableFromAnalyticFeVariable( void* analyticSolution, FeVariable* analyticFeVariable ) ;
-	InterpolationResult AnalyticSolution_InterpolateValueFromNormalFeVariable( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* value ) ;
+
+	InterpolationResult AnalyticSolution_InterpolateValueFromNormalFeVariable(
+		void*			analyticSolution,
+		FeVariable*	analyticFeVariable,
+		double*		coord,
+		double*		value ) ;
+
 	AnalyticSolution* AnalyticSolution_GetAnalyticSolution();
 	
 #endif /* __StgFEM_Discretisation_AnalyticSolution_h__ */
+

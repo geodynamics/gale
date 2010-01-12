@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Experimental_Solvers_PETScMGSolver_h__
-#define __Experimental_Solvers_PETScMGSolver_h__
+#ifndef __StgFEM_SLE_SystemSetup_PETScMGSolver_h__
+#define __StgFEM_SLE_SystemSetup_PETScMGSolver_h__
 
 	/** Textual name of this class */
 	extern const Type PETScMGSolver_Type;
@@ -98,14 +98,45 @@
 	** Constructors
 	*/
 
-	#define PETSCMGSOLVER_DEFARGS		\
-		MGSOLVER_DEFARGS
 
-	#define PETSCMGSOLVER_PASSARGS		\
-		MGSOLVER_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PETSCMGSOLVER_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                MGSolver_SetCommFunc*                              setCommFunc, \
+                MGSolver_SetMatrixFunc*                          setMatrixFunc, \
+                MGSolver_SetMaxIterationsFunc*            setMaxIterationsFunc, \
+                MGSolver_SetRelativeToleranceFunc*    setRelativeToleranceFunc, \
+                MGSolver_SetAbsoluteToleranceFunc*    setAbsoluteToleranceFunc, \
+                MGSolver_SetUseInitialSolutionFunc*  setUseInitialSolutionFunc, \
+                MGSolver_SolveFunc*                                  solveFunc, \
+                MGSolver_SetupFunc*                                  setupFunc, \
+                MGSolver_GetSolveStatusFunc*                getSolveStatusFunc, \
+                MGSolver_GetIterationsFunc*                  getIterationsFunc, \
+                MGSolver_GetMaxIterationsFunc*            getMaxIterationsFunc, \
+                MGSolver_GetResidualNormFunc*              getResidualNormFunc
+
+	#define PETSCMGSOLVER_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        setCommFunc,               \
+	        setMatrixFunc,             \
+	        setMaxIterationsFunc,      \
+	        setRelativeToleranceFunc,  \
+	        setAbsoluteToleranceFunc,  \
+	        setUseInitialSolutionFunc, \
+	        solveFunc,                 \
+	        setupFunc,                 \
+	        getSolveStatusFunc,        \
+	        getIterationsFunc,         \
+	        getMaxIterationsFunc,      \
+	        getResidualNormFunc      
 
 	PETScMGSolver* PETScMGSolver_New( Name name );
-	PETScMGSolver* _PETScMGSolver_New( MGSOLVER_DEFARGS );
+	PETScMGSolver* _PETScMGSolver_New(  PETSCMGSOLVER_DEFARGS  );
 	void _PETScMGSolver_Init( PETScMGSolver* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -114,7 +145,7 @@
 
 	void _PETScMGSolver_Delete( void* matrixSolver );
 	void _PETScMGSolver_Print( void* matrixSolver, Stream* stream );
-	void _PETScMGSolver_Construct( void* matrixSolver, Stg_ComponentFactory* cf, void* data );
+	void _PETScMGSolver_AssignFromXML( void* matrixSolver, Stg_ComponentFactory* cf, void* data );
 	void _PETScMGSolver_Build( void* matrixSolver, void* data );
 	void _PETScMGSolver_Initialise( void* matrixSolver, void* data );
 	void _PETScMGSolver_Execute( void* matrixSolver, void* data );
@@ -150,4 +181,5 @@
 	void PETScMGSolver_Destruct( PETScMGSolver* self );
 	void PETScMGSolver_DestructLevels( PETScMGSolver* self );
 
-#endif /* __Experimental_Solvers_PETScMGSolver_h__ */
+#endif /* __StgFEM_SLE_SystemSetup_PETScMGSolver_h__ */
+

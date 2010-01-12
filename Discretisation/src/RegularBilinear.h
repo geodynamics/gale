@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Discretisaton_Mesh_RegularBilinear_h__
-#define __Discretisaton_Mesh_RegularBilinear_h__
+#ifndef __StgFEM_Discretisaton_RegularBilinear_h__
+#define __StgFEM_Discretisaton_RegularBilinear_h__
 
 	/** Textual name of this class */
 	extern const Type RegularBilinear_Type;
@@ -61,14 +61,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define REGULARBILINEAR_DEFARGS \
-		ELEMENTTYPE_DEFARGS
+                BILINEARELEMENTTYPE_DEFARGS
 
 	#define REGULARBILINEAR_PASSARGS \
-		ELEMENTTYPE_PASSARGS
+                BILINEARELEMENTTYPE_PASSARGS
 
 	RegularBilinear* RegularBilinear_New( Name name );
-	RegularBilinear* _RegularBilinear_New( REGULARBILINEAR_DEFARGS );
+	RegularBilinear* _RegularBilinear_New(  REGULARBILINEAR_DEFARGS  );
 	void _RegularBilinear_Init( RegularBilinear* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -77,7 +84,7 @@
 
 	void _RegularBilinear_Delete( void* elementType );
 	void _RegularBilinear_Print( void* elementType, Stream* stream );
-	void _RegularBilinear_Construct( void* elementType, Stg_ComponentFactory* cf, void* data );
+	void _RegularBilinear_AssignFromXML( void* elementType, Stg_ComponentFactory* cf, void* data );
 	void _RegularBilinear_Build( void* elementType, void* data );
 	void _RegularBilinear_Initialise( void* elementType, void* data );
 	void _RegularBilinear_Execute( void* elementType, void* data );
@@ -94,4 +101,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Discretisaton_Mesh_RegularBilinear_h__ */
+#endif /* __StgFEM_Discretisaton_RegularBilinear_h__ */
+

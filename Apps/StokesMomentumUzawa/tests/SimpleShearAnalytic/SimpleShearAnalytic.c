@@ -70,12 +70,12 @@ void _SimpleShearAnalytic_Build( void* analyticSolution, void* data ) {
 	_AnalyticSolution_Build( self, data );
 }
 
-void _SimpleShearAnalytic_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _SimpleShearAnalytic_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	SimpleShearAnalytic *self = (SimpleShearAnalytic*)analyticSolution;
 	FeVariable*       velocityField;
 	FeVariable*       pressureField;
 
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, velocityField, SimpleShearAnalytic_VelocityFunction );
@@ -89,19 +89,23 @@ void _SimpleShearAnalytic_Construct( void* analyticSolution, Stg_ComponentFactor
 }
 
 void* _SimpleShearAnalytic_DefaultNew( Name name ) {
-	return (void*) _AnalyticSolution_New( 
-			sizeof(SimpleShearAnalytic),
-			SimpleShearAnalytic_Type,
-			_AnalyticSolution_Delete,
-			_AnalyticSolution_Print,
-			_AnalyticSolution_Copy,
-			_SimpleShearAnalytic_DefaultNew,
-			_SimpleShearAnalytic_Construct,
-			_SimpleShearAnalytic_Build,
-			_AnalyticSolution_Initialise,
-			_AnalyticSolution_Execute,
-			_AnalyticSolution_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(SimpleShearAnalytic);
+	Type                                                      type = SimpleShearAnalytic_Type;
+	Stg_Class_DeleteFunction*                              _delete = _AnalyticSolution_Delete;
+	Stg_Class_PrintFunction*                                _print = _AnalyticSolution_Print;
+	Stg_Class_CopyFunction*                                  _copy = _AnalyticSolution_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _SimpleShearAnalytic_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _SimpleShearAnalytic_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _SimpleShearAnalytic_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _AnalyticSolution_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _AnalyticSolution_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _AnalyticSolution_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _AnalyticSolution_New(  ANALYTICSOLUTION_PASSARGS  );
 }
 
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
@@ -109,3 +113,5 @@ Index StgFEM_SimpleShearAnalytic_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
 	return PluginsManager_Submit( pluginsManager, SimpleShearAnalytic_Type, "0", _SimpleShearAnalytic_DefaultNew );
 }
+
+

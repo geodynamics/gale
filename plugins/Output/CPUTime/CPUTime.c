@@ -55,39 +55,47 @@ void StgFEM_CPUTime_PrintTimeInfo( AbstractContext* context ) {
 	StgFEM_FrequentOutput_PrintValue( context, MPI_Wtime() - self->initialTime );
 }
 
-void _StgFEM_CPUTime_Construct( void* componment, Stg_ComponentFactory* cf, void* data ) {
-	StgFEM_CPUTime* self = (StgFEM_CPUTime*)componment;
-	AbstractContext* context;
+void _StgFEM_CPUTime_AssignFromXML( void* componment, Stg_ComponentFactory* cf, void* data ) {
+	StgFEM_CPUTime* self 		= (StgFEM_CPUTime*)componment;
+	Dictionary*	pluginDict	= Codelet_GetPluginDictionary( self, cf->rootDict );
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	self->context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), AbstractContext, True, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 	
 	/* Initialise Timer */
 	self->initialTime = MPI_Wtime();
 
 	/* Print Header to file */
-	StgFEM_FrequentOutput_PrintString( context, "CPU_Time" );
+	StgFEM_FrequentOutput_PrintString( self->context, "CPU_Time" );
 	
-	ContextEP_Append( context, AbstractContext_EP_FrequentOutput ,StgFEM_CPUTime_PrintTimeInfo );
+	ContextEP_Append( self->context, AbstractContext_EP_FrequentOutput ,StgFEM_CPUTime_PrintTimeInfo );
 }
 
 void* _StgFEM_CPUTime_DefaultNew( Name name ) {
-	return _Codelet_New(
-			sizeof( StgFEM_CPUTime ),
-			StgFEM_CPUTime_Type,
-			_Codelet_Delete,
-			_Codelet_Print,
-			_Codelet_Copy,
-			_StgFEM_CPUTime_DefaultNew,
-			_StgFEM_CPUTime_Construct,
-			_Codelet_Build,
-			_Codelet_Initialise,
-			_Codelet_Execute,
-			_Codelet_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( StgFEM_CPUTime );
+	Type                                                      type = StgFEM_CPUTime_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _StgFEM_CPUTime_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _StgFEM_CPUTime_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Codelet_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
    
 Index StgFEM_CPUTime_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, StgFEM_CPUTime_Type, "0", _StgFEM_CPUTime_DefaultNew );
 }
+
+
 
 

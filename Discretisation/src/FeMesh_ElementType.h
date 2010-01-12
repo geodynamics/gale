@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_FeMesh_ElementType_h__
-#define __Domain_Mesh_FeMesh_ElementType_h__
+#ifndef __StgFEM_Discretisation_FeMesh_ElementType_h__
+#define __StgFEM_Discretisation_FeMesh_ElementType_h__
 
 	/** Textual name of this class */
 	extern const Type FeMesh_ElementType_Type;
@@ -62,14 +62,21 @@
 	** Constructors
 	*/
 
-	#define FEMESH_ELEMENTTYPE_DEFARGS		\
-		MESH_HEXTYPE_DEFARGS
 
-	#define FEMESH_ELEMENTTYPE_PASSARGS		\
-		MESH_HEXTYPE_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FEMESH_ELEMENTTYPE_DEFARGS \
+                MESH_HEXTYPE_DEFARGS
+
+	#define FEMESH_ELEMENTTYPE_PASSARGS \
+                MESH_HEXTYPE_PASSARGS
 
 	FeMesh_ElementType* FeMesh_ElementType_New();
-	FeMesh_ElementType* _FeMesh_ElementType_New( FEMESH_ELEMENTTYPE_DEFARGS );
+	FeMesh_ElementType* _FeMesh_ElementType_New(  FEMESH_ELEMENTTYPE_DEFARGS  );
 	void _FeMesh_ElementType_Init( FeMesh_ElementType* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -91,4 +98,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Domain_Mesh_FeMesh_ElementType_h__ */
+#endif /* __StgFEM_Discretisation_FeMesh_ElementType_h__ */
+

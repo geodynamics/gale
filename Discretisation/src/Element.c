@@ -58,3 +58,5 @@ void FiniteElement_Element_Print( void* element, Stream* stream ) {
 	Journal_Printf( stream, "\telementType_I: %u", self->elementType_I );
 	Journal_Printf( stream, "\tcell_I: %u", self->cell_I );
 }
+
+

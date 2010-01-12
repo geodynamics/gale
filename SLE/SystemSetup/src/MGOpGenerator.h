@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Experimental_Solvers_MGOpGenerator_h__
-#define __Experimental_Solvers_MGOpGenerator_h__
+#ifndef __StgFEM_SLE_SystemSetup_MGOpGenerator_h__
+#define __StgFEM_SLE_SystemSetup_MGOpGenerator_h__
 
 	/** Textual name of this class */
 	extern const Type MGOpGenerator_Type;
@@ -70,21 +70,28 @@
 	** Constructors
 	*/
 
-	#define MGOPGENERATOR_DEFARGS							\
-		STG_COMPONENT_DEFARGS,							\
-		MGOpGenerator_SetNumLevelsFunc*		setNumLevelsFunc,		\
-		MGOpGenerator_HasExpiredFunc*		hasExpiredFunc,			\
-		MGOpGenerator_GenerateFunc*		generateFunc
 
 
-	#define MGOPGENERATOR_PASSARGS		\
-		STG_COMPONENT_PASSARGS,		\
-		setNumLevelsFunc,		\
-		hasExpiredFunc,			\
-		generateFunc
 
 
-	MGOpGenerator* _MGOpGenerator_New( MGOPGENERATOR_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MGOPGENERATOR_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                MGOpGenerator_SetNumLevelsFunc*  setNumLevelsFunc, \
+                MGOpGenerator_HasExpiredFunc*      hasExpiredFunc, \
+                MGOpGenerator_GenerateFunc*          generateFunc
+
+	#define MGOPGENERATOR_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        setNumLevelsFunc, \
+	        hasExpiredFunc,   \
+	        generateFunc    
+
+	MGOpGenerator* _MGOpGenerator_New(  MGOPGENERATOR_DEFARGS  );
 	void _MGOpGenerator_Init( MGOpGenerator* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -93,7 +100,7 @@
 
 	void _MGOpGenerator_Delete( void* mgOpGenerator );
 	void _MGOpGenerator_Print( void* mgOpGenerator, Stream* stream );
-	void _MGOpGenerator_Construct( void* mgOpGenerator, Stg_ComponentFactory* cf, void* data );
+	void _MGOpGenerator_AssignFromXML( void* mgOpGenerator, Stg_ComponentFactory* cf, void* data );
 	void _MGOpGenerator_Build( void* mgOpGenerator, void* data );
 	void _MGOpGenerator_Initialise( void* mgOpGenerator, void* data );
 	void _MGOpGenerator_Execute( void* mgOpGenerator, void* data );
@@ -121,4 +128,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Experimental_Solvers_MGOpGenerator_h__ */
+#endif /* __StgFEM_SLE_SystemSetup_MGOpGenerator_h__ */
+

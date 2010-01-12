@@ -49,16 +49,16 @@ typedef struct {
 
 FeMesh* BuildMeshLinear( unsigned nDims, unsigned* sizes, double* minCrd, double* maxCrd ) {
 	CartesianGenerator*	gen;
-	FeMesh*			feMesh;
-	unsigned		maxDecomp[3] = {0, 1, 1};
+	FeMesh*					feMesh;
+	unsigned					maxDecomp[3] = {0, 1, 1};
 
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	CartesianGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, maxDecomp );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 	CartesianGenerator_SetShadowDepth( gen, 0 );
 
-	feMesh = FeMesh_New( "" );
+	feMesh = FeMesh_New( "", NULL );
 	Mesh_SetGenerator( feMesh, gen );
 	FeMesh_SetElementFamily( feMesh, "linear" );
 	Stg_Component_Build( feMesh, NULL, False );
@@ -69,16 +69,16 @@ FeMesh* BuildMeshLinear( unsigned nDims, unsigned* sizes, double* minCrd, double
 
 FeMesh* BuildMeshQuadratic( unsigned nDims, unsigned* sizes, double* minCrd, double* maxCrd ) {
 	CartesianGenerator*	gen;
-	FeMesh*			feMesh;
-	unsigned		maxDecomp[3] = {0, 1, 1};
+	FeMesh*					feMesh;
+	unsigned					maxDecomp[3] = {0, 1, 1};
 
-	gen = C2Generator_New( "" );
+	gen = (CartesianGenerator*)C2Generator_New( "", NULL );
 	CartesianGenerator_SetDimSize( gen, nDims );
 	C2Generator_SetTopologyParams( gen, sizes, 0, NULL, maxDecomp );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 	CartesianGenerator_SetShadowDepth( gen, 0 );
 
-	feMesh = FeMesh_New( "" );
+	feMesh = FeMesh_New( "", NULL );
 	Mesh_SetGenerator( feMesh, gen );
 	FeMesh_SetElementFamily( feMesh, "quadratic" );
 	Stg_Component_Build( feMesh, NULL, False );
@@ -88,6 +88,8 @@ FeMesh* BuildMeshQuadratic( unsigned nDims, unsigned* sizes, double* minCrd, dou
 }
 
 void ElementTypeSuite_Setup( ElementTypeSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
+
 	data->dict = Dictionary_New();
 }
 
@@ -553,3 +555,5 @@ void ElementTypeSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, ElementTypeSuite_TestSurfaceJacobian_Quadratic2D );
    pcu_suite_addTest( suite, ElementTypeSuite_TestSurfaceJacobian_Quadratic3D );
 }
+
+

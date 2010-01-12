@@ -2566,13 +2566,13 @@ void ColumnViscosityAnalytic_StressFunction( void* analyticSolution, FeVariable*
 	stress[2] = 2*n*M_PI*sin(n*M_PI*y) * u4; /* xy stress */
 }
 
-void _ColumnViscosityAnalytic_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _ColumnViscosityAnalytic_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	ColumnViscosityAnalytic* self = (ColumnViscosityAnalytic*)analyticSolution;
 	AbstractContext*         context;
 	ConditionFunction*       condFunc;
 
 	/* Construct Parent */
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 	
@@ -2611,21 +2611,27 @@ void _ColumnViscosityAnalytic_Build( void* analyticSolution, void* data ) {
 }
 
 void* _ColumnViscosityAnalytic_DefaultNew( Name name ) {
-	return _AnalyticSolution_New(
-			sizeof(ColumnViscosityAnalytic),
-			ColumnViscosityAnalytic_Type,
-			_AnalyticSolution_Delete,
-			_AnalyticSolution_Print,
-			_AnalyticSolution_Copy,
-			_ColumnViscosityAnalytic_DefaultNew,
-			_ColumnViscosityAnalytic_Construct,
-			_ColumnViscosityAnalytic_Build, 
-			_AnalyticSolution_Initialise,
-			_AnalyticSolution_Execute,
-			_AnalyticSolution_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(ColumnViscosityAnalytic);
+	Type                                                      type = ColumnViscosityAnalytic_Type;
+	Stg_Class_DeleteFunction*                              _delete = _AnalyticSolution_Delete;
+	Stg_Class_PrintFunction*                                _print = _AnalyticSolution_Print;
+	Stg_Class_CopyFunction*                                  _copy = _AnalyticSolution_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _ColumnViscosityAnalytic_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _ColumnViscosityAnalytic_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _ColumnViscosityAnalytic_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _AnalyticSolution_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _AnalyticSolution_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _AnalyticSolution_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _AnalyticSolution_New(  ANALYTICSOLUTION_PASSARGS  );
 }
 
 Index StgFEM_ColumnViscosityAnalytic_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, ColumnViscosityAnalytic_Type, "0", _ColumnViscosityAnalytic_DefaultNew );
 }
+
+

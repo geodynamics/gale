@@ -8,9 +8,18 @@
 	<list name="import">
 		<param>StgFEM</param>
 	</list>
-	<list name="plugins">
-		<param>StgFEM_StandardConditionFunctions</param>
+	<list name="plugins" mergeType="merge">
+		<struct>
+			<param name="Type">StgFEM_StandardConditionFunctions</param>
+			<param name="Context">context</param>
+		</struct>
 	</list>
+
+	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">FiniteElementContext</param>
+		</struct>
+	</struct>
 
 	<param name="journal-level.info.Stg_ComponentFactory"> 1 </param>
 	<param name="journal.debug">True</param>

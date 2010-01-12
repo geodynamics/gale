@@ -50,39 +50,41 @@ const Type PETScMGSolver_Type = "PETScMGSolver";
 */
 
 PETScMGSolver* PETScMGSolver_New( Name name ) {
-	return _PETScMGSolver_New( sizeof(PETScMGSolver), 
-				   PETScMGSolver_Type, 
-				   _PETScMGSolver_Delete, 
-				   _PETScMGSolver_Print, 
-				   NULL, 
-				   (void* (*)(Name))_PETScMGSolver_New, 
-				   _PETScMGSolver_Construct, 
-				   _PETScMGSolver_Build, 
-				   _PETScMGSolver_Initialise, 
-				   _PETScMGSolver_Execute, 
-				   _PETScMGSolver_Destroy, 
-				   name, 
-				   NON_GLOBAL, 
-				   PETScMGSolver_SetComm, 
-				   NULL,//PETScMatrixSolver_SetMatrix, 
-				   NULL,//PETScMatrixSolver_SetMaxIterations, 
-				   NULL,//PETScMatrixSolver_SetRelativeTolerance, 
-				   NULL,//PETScMatrixSolver_SetAbsoluteTolerance, 
-				   NULL,//PETScMatrixSolver_SetUseInitialSolution, 
-				   NULL,//PETScMatrixSolver_Solve, 
-				   PETScMGSolver_Setup, 
-				   NULL,//PETScMatrixSolver_GetSolveStatus, 
-				   NULL,//PETScMatrixSolver_GetIterations, 
-				   NULL,//PETScMatrixSolver_GetMaxIterations, 
-				   NULL/*PETScMatrixSolver_GetResidualNorm*/ );
+	/* Variables set in this function */
+	SizeT                                                    _sizeOfSelf = sizeof(PETScMGSolver);
+	Type                                                            type = PETScMGSolver_Type;
+	Stg_Class_DeleteFunction*                                    _delete = _PETScMGSolver_Delete;
+	Stg_Class_PrintFunction*                                      _print = _PETScMGSolver_Print;
+	Stg_Class_CopyFunction*                                        _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*        _defaultConstructor = (void* (*)(Name))_PETScMGSolver_New;
+	Stg_Component_ConstructFunction*                          _construct = _PETScMGSolver_AssignFromXML;
+	Stg_Component_BuildFunction*                                  _build = _PETScMGSolver_Build;
+	Stg_Component_InitialiseFunction*                        _initialise = _PETScMGSolver_Initialise;
+	Stg_Component_ExecuteFunction*                              _execute = _PETScMGSolver_Execute;
+	Stg_Component_DestroyFunction*                              _destroy = _PETScMGSolver_Destroy;
+	AllocationType                                    nameAllocationType = NON_GLOBAL;
+	MGSolver_SetCommFunc*                                    setCommFunc = PETScMGSolver_SetComm;
+	MGSolver_SetMatrixFunc*                                setMatrixFunc = NULL;
+	MGSolver_SetMaxIterationsFunc*                  setMaxIterationsFunc = NULL;
+	MGSolver_SetRelativeToleranceFunc*          setRelativeToleranceFunc = NULL;
+	MGSolver_SetAbsoluteToleranceFunc*          setAbsoluteToleranceFunc = NULL;
+	MGSolver_SetUseInitialSolutionFunc*        setUseInitialSolutionFunc = NULL;
+	MGSolver_SolveFunc*                                        solveFunc = NULL;
+	MGSolver_SetupFunc*                                        setupFunc = PETScMGSolver_Setup;
+	MGSolver_GetSolveStatusFunc*                      getSolveStatusFunc = NULL;
+	MGSolver_GetIterationsFunc*                        getIterationsFunc = NULL;
+	MGSolver_GetMaxIterationsFunc*                  getMaxIterationsFunc = NULL;
+	MGSolver_GetResidualNormFunc*                    getResidualNormFunc = NULL;
+
+	return _PETScMGSolver_New(  PETSCMGSOLVER_PASSARGS  );
 }
 
-PETScMGSolver* _PETScMGSolver_New( MGSOLVER_DEFARGS ) {
+PETScMGSolver* _PETScMGSolver_New(  PETSCMGSOLVER_DEFARGS  ) {
 	PETScMGSolver*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(PETScMGSolver) );
-	//self = (PETScMGSolver*)_PETScMatrixSolver_New( MGSOLVER_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(PETScMGSolver) );
+	//self = (PETScMGSolver*)_PETScMatrixSolver_New(  STG_COMPONENT_PASSARGS  );
 	self = (PETScMGSolver*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
 
 	/* Virtual info */
@@ -166,7 +168,7 @@ void _PETScMGSolver_Print( void* matrixSolver, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void _PETScMGSolver_Construct( void* matrixSolver, Stg_ComponentFactory* cf, void* data ) {
+void _PETScMGSolver_AssignFromXML( void* matrixSolver, Stg_ComponentFactory* cf, void* data ) {
 	PETScMGSolver*	self = (PETScMGSolver*)matrixSolver;
 	Bool		pure;
 	unsigned	nLevels;
@@ -176,7 +178,7 @@ void _PETScMGSolver_Construct( void* matrixSolver, Stg_ComponentFactory* cf, voi
 	assert( self && Stg_CheckType( self, PETScMGSolver ) );
 	assert( cf );
 
-	//_PETScMatrixSolver_Construct( self, cf, data );
+	//_PETScMatrixSolver_AssignFromXML( self, cf, data );
 
 	pure = Stg_ComponentFactory_GetBool( cf, self->name, "pure", False );
 	nLevels = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "levels", 1 );
@@ -717,7 +719,7 @@ void PETScMGSolver_Destruct( PETScMGSolver* self ) {
 	assert( self && Stg_CheckType( self, PETScMGSolver ) );
 
 	PETScMGSolver_DestructLevels( self );
-	KillObject( self->opGen );
+	/*KillObject( self->opGen );*/
 }
 
 void PETScMGSolver_DestructLevels( PETScMGSolver* self ) {
@@ -736,16 +738,22 @@ void PETScMGSolver_DestructLevels( PETScMGSolver* self ) {
 		if( level->A )
 			Stg_Class_RemoveRef( level->A );
 		*/
-		if( level->R != PETSC_NULL ) MatDestroy( level->R );
+		if( level->R != PETSC_NULL && level->R != level->P )
+                    MatDestroy( level->R );
 		if( level->P != PETSC_NULL ) MatDestroy( level->P );
+/*
 		if( level->A != PETSC_NULL ) MatDestroy( level->A );
+*/
 
 		//FreeObject( level->workRes );
 		//FreeObject( level->workSol );
 		//FreeObject( level->workRHS );
-		VecDestroy( level->workRes );
-		VecDestroy( level->workSol );
-		VecDestroy( level->workRHS );
+                if( level->workRes )
+                    VecDestroy( level->workRes );
+                if( level->workSol )
+                    VecDestroy( level->workSol );
+                if( level->workRHS )
+                    VecDestroy( level->workRHS );
 	}
 
 	KillArray( self->levels );
@@ -753,3 +761,5 @@ void PETScMGSolver_DestructLevels( PETScMGSolver* self ) {
 	self->solversChanged = True;
 	self->opsChanged = True;
 }
+
+

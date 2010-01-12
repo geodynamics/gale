@@ -45,8 +45,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Discretisation_FeSwarmVariable_h__
-#define __Discretisation_FeSwarmVariable_h__
+#ifndef __StgFEM_Discretisation_FeSwarmVariable_h__
+#define __StgFEM_Discretisation_FeSwarmVariable_h__
 
 	/** Textual name of this class */
 	extern const Type FeSwarmVariable_Type;
@@ -57,49 +57,59 @@
 		__SwarmVariable \
 		\
 		/* Virtual info */ \
-		FeVariable*                                                 feVariable;
+		FeVariable*	feVariable;
 
-	struct FeSwarmVariable { __FeSwarmVariable };	
+	struct FeSwarmVariable { __FeSwarmVariable };
+
+
 
 	/* Public Constructor */
 
 	/** Private Constructor */
-	FeSwarmVariable* _FeSwarmVariable_New(
- 		SizeT                                              _sizeOfSelf, 
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print, 
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		SwarmVariable_ValueAtFunction*                     _valueAt,
-		SwarmVariable_GetGlobalValueFunction*              _getMinGlobalMagnitude,
-		SwarmVariable_GetGlobalValueFunction*              _getMaxGlobalMagnitude,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FESWARMVARIABLE_DEFARGS \
+                SWARMVARIABLE_DEFARGS
+
+	#define FESWARMVARIABLE_PASSARGS \
+                SWARMVARIABLE_PASSARGS
+
+	FeSwarmVariable* _FeSwarmVariable_New(  FESWARMVARIABLE_DEFARGS  );
 
 	/* 'Stg_Class' Virtual Implementations */
-	void _FeSwarmVariable_Delete( void* variable ) ;
-	void _FeSwarmVariable_Print( void* _swarmVariable, Stream* stream ) ;
-	void* _FeSwarmVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
+	void _FeSwarmVariable_Init( void* swarmVariable, FeVariable* feVariable );
+	
+	void _FeSwarmVariable_Delete( void* variable );
+
+	void _FeSwarmVariable_Print( void* _swarmVariable, Stream* stream );
+
+	void* _FeSwarmVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Implementations */
 	void* _FeSwarmVariable_DefaultNew( Name name );
-void _FeSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
-	void _FeSwarmVariable_Build( void* swarmVariable, void* data ) ;
-	void _FeSwarmVariable_Execute( void* variable, void* data ) ;
-	void _FeSwarmVariable_Destroy( void* variable, void* data ) ;
-	void _FeSwarmVariable_Initialise( void* variable, void* data ) ;
+
+	void _FeSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data );
+
+	void _FeSwarmVariable_Build( void* swarmVariable, void* data );
+
+	void _FeSwarmVariable_Execute( void* variable, void* data );
+
+	void _FeSwarmVariable_Destroy( void* variable, void* data );
+
+	void _FeSwarmVariable_Initialise( void* variable, void* data );
 
 	/* 'SwarmVariable Virtual Implementations */
-	void _FeSwarmVariable_ValueAt( void* swarmVariable, Particle_Index lParticle_I, double* value ) ;
-	double _FeSwarmVariable_GetMinGlobalMagnitude( void* swarmVariable ) ;
-	double _FeSwarmVariable_GetMaxGlobalMagnitude( void* swarmVariable ) ;
+	void _FeSwarmVariable_ValueAt( void* swarmVariable, Particle_Index lParticle_I, double* value );
+
+	double _FeSwarmVariable_GetMinGlobalMagnitude( void* swarmVariable );
+
+	double _FeSwarmVariable_GetMaxGlobalMagnitude( void* swarmVariable );
 	
 	/** Private Functions */
 
 
-#endif /* __Discretisation_FeSwarmVariable_h__ */
+#endif /* __StgFEM_Discretisation_FeSwarmVariable_h__ */
+
