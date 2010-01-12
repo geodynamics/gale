@@ -50,8 +50,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __PICellerator_Weights_h__
-#define __PICellerator_Weights_h__
+#ifndef __PICellerator_Weights_Weights_h__
+#define __PICellerator_Weights_Weights_h__
 
 	#include "types.h"
 	#include "Init.h"

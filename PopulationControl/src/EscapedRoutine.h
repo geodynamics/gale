@@ -45,7 +45,7 @@
 ** Assumptions:
 **
 ** Comments:
-**
+*
 ** $Id: EscapedRoutine.h 189 2005-10-20 00:39:29Z RobertTurnbull $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -62,66 +62,85 @@
 	#define __EscapedRoutine \
 		/* General info */ \
 		__Stg_Component \
+		DomainContext*							context; \
 		/* Virtual Info */\
-		EscapedRoutine_SelectFunction*		_select; \
+		EscapedRoutine_SelectFunction*	_select; \
 		/* Other Info */\
-		Stream*                                    debug;                    \
-		Dimension_Index                            dim;                      \
+		Stream*									debug; \
+		Dimension_Index						dim; \
 		/* Removal Info */  \
-		Particle_Index                             particlesToRemoveCount;   \
-		Particle_Index                             particlesToRemoveAlloced; \
-		Particle_Index                             particlesToRemoveDelta;   \
-		unsigned*				   particlesToRemoveList;    
+		Particle_Index							particlesToRemoveCount; \
+		Particle_Index							particlesToRemoveAlloced; \
+		Particle_Index							particlesToRemoveDelta; \
+		unsigned*								particlesToRemoveList;    
 
 	struct EscapedRoutine { __EscapedRoutine };
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Constructors
 	*/
-	EscapedRoutine* _EscapedRoutine_New(
-		SizeT                                      _sizeOfSelf, 
-		Type                                       type,
-		Stg_Class_DeleteFunction*                  _delete,
-		Stg_Class_PrintFunction*                   _print,
-		Stg_Class_CopyFunction*                    _copy, 
-		Stg_Component_DefaultConstructorFunction*  _defaultConstructor,
-		Stg_Component_ConstructFunction*           _construct,
-		Stg_Component_BuildFunction*               _build,
-		Stg_Component_InitialiseFunction*          _initialise,
-		Stg_Component_ExecuteFunction*             _execute,
-		Stg_Component_DestroyFunction*             _destroy,		
-		EscapedRoutine_SelectFunction*     	   _select,
-		Name                                       name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ESCAPEDROUTINE_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                EscapedRoutine_SelectFunction*  _select
+
+	#define ESCAPEDROUTINE_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _select
+
+	EscapedRoutine* _EscapedRoutine_New(  ESCAPEDROUTINE_DEFARGS  );
 
 	void* _EscapedRoutine_DefaultNew( Name name );
+
+	void _EscapedRoutine_Init(                                                                                            
+		void*             escapedRoutine,
+		DomainContext*    context,
+		Dimension_Index   dim,                                                                                             
+		Particle_Index    particlesToRemoveDelta );         
 	
 	/* Stg_Class_Delete EscapedRoutine implementation */
 	void _EscapedRoutine_Delete( void* escapedRoutine );
+
 	void _EscapedRoutine_Print( void* escapedRoutine, Stream* stream );
+
 	#define EscapedRoutine_Copy( self ) \
 		(EscapedRoutine*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define EscapedRoutine_DeepCopy( self ) \
 		(EscapedRoutine*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
+
 	void* _EscapedRoutine_Copy( void* escapedRoutine, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-	void _EscapedRoutine_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
-	void _EscapedRoutine_Build( void* escapedRoutine, void* data ) ;
-	void _EscapedRoutine_Initialise( void* escapedRoutine, void* data ) ;
+	void _EscapedRoutine_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ); 
+
+	void _EscapedRoutine_Build( void* escapedRoutine, void* data );
+
+	void _EscapedRoutine_Initialise( void* escapedRoutine, void* data );
+
 	void _EscapedRoutine_Execute( void* escapedRoutine, void* data );
-	void _EscapedRoutine_Destroy( void* escapedRoutine, void* data ) ;
+
+	void _EscapedRoutine_Destroy( void* escapedRoutine, void* data );
 	
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions
 	*/
 
-	void EscapedRoutine_Select( void* escapedRoutine, void* _swarm ) ;
+	void EscapedRoutine_Select( void* escapedRoutine, void* _swarm );
+
 	void _EscapedRoutine_Select( void* escapedRoutine, void* _swarm );
-	void EscapedRoutine_RemoveFromSwarm( void* escapedRoutine, void* _swarm ) ;
 
-	void EscapedRoutine_InitialiseParticleList( void* escapedRoutine ) ;
-	void EscapedRoutine_SetParticleToRemove( void* escapedRoutine, Swarm* swarm, Particle_Index lParticle_I ) ;
+	void EscapedRoutine_RemoveFromSwarm( void* escapedRoutine, void* _swarm );
 
-	void EscapedRoutine_SortParticleList( void* escapedRoutine ) ;
-	void EscapedRoutine_RemoveParticles( void* escapedRoutine, Swarm* swarm ) ;
+	void EscapedRoutine_InitialiseParticleList( void* escapedRoutine );
+
+	void EscapedRoutine_SetParticleToRemove( void* escapedRoutine, Swarm* swarm, Particle_Index lParticle_I );
+
+	void EscapedRoutine_SortParticleList( void* escapedRoutine );
+
+	void EscapedRoutine_RemoveParticles( void* escapedRoutine, Swarm* swarm );
 
 #endif 
+

@@ -56,54 +56,12 @@
 
 const Type MaterialFeVariable_Type = "MaterialFeVariable";
 
-MaterialFeVariable* _MaterialFeVariable_New(
- 		SizeT                                             _sizeOfSelf,
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-		Name                                              name )
-{
-	MaterialFeVariable*		self;
+MaterialFeVariable* _MaterialFeVariable_New(  MATERIALFEVARIABLE_DEFARGS  ) {
+	MaterialFeVariable* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(MaterialFeVariable) );
-	self = (MaterialFeVariable*)
-		_ParticleFeVariable_New(
-			_sizeOfSelf, 
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute, 
-			_destroy,
-			_interpolateValueAt,
-			_getMinGlobalFeMagnitude, 
-			_getMaxGlobalFeMagnitude,
-			_getMinAndMaxLocalCoords, 
-			_getMinAndMaxGlobalCoords,
-			_interpolateWithinElement,
-			_getValueAtNode,
-			_valueAtParticle,
-			name );
+	self = (MaterialFeVariable*) _ParticleFeVariable_New(  PARTICLEFEVARIABLE_PASSARGS  );
 	
 	return self;
 }
@@ -114,7 +72,7 @@ void _MaterialFeVariable_Init( MaterialFeVariable* self, Material* material ) {
 	/* Assign Pointers */
 	swarm = Stg_CheckType( self->assemblyTerm->integrationSwarm, IntegrationPointsSwarm );
 	self->picIntegrationPoints = swarm;
-	self->material       = material;
+	self->material = material;
 }
 
 /* --- Virtual Function Implementations --- */
@@ -137,7 +95,6 @@ void _MaterialFeVariable_Print( void* materialFeVariable, Stream* stream ) {
 	Journal_PrintPointer( stream, self->material );
 }
 
-
 void* _MaterialFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	MaterialFeVariable*	self = (MaterialFeVariable*)feVariable;
 	MaterialFeVariable*	newMaterialFeVariable;
@@ -151,39 +108,43 @@ void* _MaterialFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name na
 }
 
 void* _MaterialFeVariable_DefaultNew( Name name ) {
-	return (void*) _MaterialFeVariable_New(
-		sizeof(MaterialFeVariable),
-		MaterialFeVariable_Type,
-		_MaterialFeVariable_Delete,
-		_MaterialFeVariable_Print,
-		_MaterialFeVariable_Copy,
-		_MaterialFeVariable_DefaultNew,
-		_MaterialFeVariable_Construct,
-		_MaterialFeVariable_Build, 
-		_MaterialFeVariable_Initialise,
-		_MaterialFeVariable_Execute,
-		_MaterialFeVariable_Destroy,
-		_FeVariable_InterpolateValueAt,
-		_FeVariable_GetMinGlobalFieldMagnitude,
-		_FeVariable_GetMaxGlobalFieldMagnitude,
-		_FeVariable_GetMinAndMaxLocalCoords,
-		_FeVariable_GetMinAndMaxGlobalCoords,
-		_FeVariable_InterpolateNodeValuesToElLocalCoord,
-		_FeVariable_GetValueAtNode,
-		_MaterialFeVariable_ValueAtParticle,
-		name );
+	/* Variables set in this function */
+	SizeT                                                       _sizeOfSelf = sizeof(MaterialFeVariable);
+	Type                                                               type = MaterialFeVariable_Type;
+	Stg_Class_DeleteFunction*                                       _delete = _MaterialFeVariable_Delete;
+	Stg_Class_PrintFunction*                                         _print = _MaterialFeVariable_Print;
+	Stg_Class_CopyFunction*                                           _copy = _MaterialFeVariable_Copy;
+	Stg_Component_DefaultConstructorFunction*           _defaultConstructor = _MaterialFeVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                             _construct = _MaterialFeVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                                     _build = _MaterialFeVariable_Build;
+	Stg_Component_InitialiseFunction*                           _initialise = _MaterialFeVariable_Initialise;
+	Stg_Component_ExecuteFunction*                                 _execute = _MaterialFeVariable_Execute;
+	Stg_Component_DestroyFunction*                                 _destroy = _MaterialFeVariable_Destroy;
+	FieldVariable_InterpolateValueAtFunction*           _interpolateValueAt = _FeVariable_InterpolateValueAt;
+	FieldVariable_GetCoordFunction*                _getMinAndMaxLocalCoords = _FeVariable_GetMinAndMaxLocalCoords;
+	FieldVariable_GetCoordFunction*               _getMinAndMaxGlobalCoords = _FeVariable_GetMinAndMaxGlobalCoords;
+	FeVariable_InterpolateWithinElementFunction*  _interpolateWithinElement = _FeVariable_InterpolateNodeValuesToElLocalCoord;
+	FeVariable_GetValueAtNodeFunction*                      _getValueAtNode = _FeVariable_GetValueAtNode;
+	ParticleFeVariable_ValueAtParticleFunction*            _valueAtParticle = _MaterialFeVariable_ValueAtParticle;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType                             nameAllocationType = ZERO;
+	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = ZERO;
+	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
+	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
+
+	return (void*) _MaterialFeVariable_New(  MATERIALFEVARIABLE_PASSARGS  );
 }
 
-void _MaterialFeVariable_Construct( void* materialFeVariable, Stg_ComponentFactory* cf, void* data ){
-	MaterialFeVariable*   self              = (MaterialFeVariable*) materialFeVariable;
-	Material*             material;
+void _MaterialFeVariable_AssignFromXML( void* materialFeVariable, Stg_ComponentFactory* cf, void* data ){
+	MaterialFeVariable*	self = (MaterialFeVariable*) materialFeVariable;
+	Material*				material;
 	
 	material = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Material", Material, True, data );
 
 	/* Construct Parent */
-	_ParticleFeVariable_Construct( self, cf, data );
+	_ParticleFeVariable_AssignFromXML( self, cf, data );
 
-	_FieldVariable_Construct( self, cf, data );
 	_MaterialFeVariable_Init( self, material );
 }
 
@@ -203,47 +164,53 @@ void _MaterialFeVariable_Build( void* materialFeVariable, void* data ) {
 	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	self->dataVariable = Variable_NewScalar( 
-			tmpName,
-			Variable_DataType_Double, 
-			&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
-			NULL,
-			(void**)&self->data, 
-			variable_Register );
+		tmpName,
+		(AbstractContext*)self->context,
+		Variable_DataType_Double, 
+		&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
+		NULL,
+		(void**)&self->data, 
+		variable_Register );
 	Memory_Free( tmpName );
 	self->fieldComponentCount = 1;
 	
 	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
-	self->dofLayout = DofLayout_New( tmpName, variable_Register, 
-					 ((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, NULL );
+	self->dofLayout = DofLayout_New( tmpName, self->context, variable_Register, ((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, NULL );
 	DofLayout_AddAllFromVariableArray( self->dofLayout, 1, &self->dataVariable );
 	Memory_Free( tmpName );
 	self->eqNum->dofLayout = self->dofLayout;
 	
 	_ParticleFeVariable_Build( self, data );
 }
+
 void _MaterialFeVariable_Initialise( void* materialFeVariable, void* data ) {
 	MaterialFeVariable* self = (MaterialFeVariable*) materialFeVariable;
 
 	_ParticleFeVariable_Initialise( self, data );
 }
+
 void _MaterialFeVariable_Execute( void* materialFeVariable, void* data ) {
 	MaterialFeVariable* self = (MaterialFeVariable*) materialFeVariable;
 
 	_ParticleFeVariable_Execute( self, data );
 }
+
 void _MaterialFeVariable_Destroy( void* materialFeVariable, void* data ) {
 	MaterialFeVariable* self = (MaterialFeVariable*) materialFeVariable;
 
 	_ParticleFeVariable_Destroy( self, data );
 }
+
 void _MaterialFeVariable_ValueAtParticle( 
-		void*                   materialFeVariable,
-		IntegrationPointsSwarm* swarm,
-		Element_LocalIndex      lElement_I,
-		void*                   particle,
-		double*                 particleValue )
+	void*                   materialFeVariable,
+	IntegrationPointsSwarm* swarm,
+	Element_LocalIndex      lElement_I,
+	void*                   particle,
+	double*                 particleValue )
 {
 	MaterialFeVariable* self = (MaterialFeVariable*) materialFeVariable;
 	*particleValue = (double) ( self->material->index == IntegrationPointsSwarm_GetMaterialIndexOn( swarm, particle ) );
 }
+
+
 

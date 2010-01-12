@@ -44,6 +44,7 @@
 
 typedef struct {
    DomainContext*       context;
+   Stg_ComponentFactory* cf;
 } DVCWeightsXMLSuiteData;
 
 
@@ -51,12 +52,13 @@ void DVCWeightsXMLSuite_Setup( DVCWeightsXMLSuiteData* data ) {
    char              xmlInputFilename[PCU_PATH_MAX];
 
    pcu_filename_input( "testDVCWeights.xml", xmlInputFilename );
-   data->context = (DomainContext*)stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD );
+   data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
+   data->context = LiveComponentRegister_Get( data->cf, "context" );
 } 
 
 
 void DVCWeightsXMLSuite_Teardown( DVCWeightsXMLSuiteData* data ) {
-   stgMainDestroy( (AbstractContext*)data->context );
+   stgMainDestroy( data->cf );
 }
 
 

@@ -44,11 +44,7 @@
 #ifndef __PICellerator_Utils_BuoyancyForceTerm_h__
 #define __PICellerator_Utils_BuoyancyForceTerm_h__
 
-	typedef double (BuoyancyForceTerm_CalcGravityFunction) (
-				void* forceTerm, 
-				Swarm* swarm, 
-				Element_LocalIndex lElement_I, 
-				void* particle );
+	typedef double (BuoyancyForceTerm_CalcGravityFunction) ( void* forceTerm, Swarm* swarm, Element_LocalIndex lElement_I, void* particle );
 
 	/** Textual name of this class */
 	extern const Type BuoyancyForceTerm_Type;
@@ -64,69 +60,75 @@
 		__ForceTerm \
 		\
 		/* Virtual info */ \
-		BuoyancyForceTerm_CalcGravityFunction*              _calcGravity;                          \
+		BuoyancyForceTerm_CalcGravityFunction*	_calcGravity; \
 		\
 		/* BuoyancyForceTerm info */ \
-		FeVariable*                                         temperatureField;                  \
-		double                                              gravity;                           \
-		double*						    gHat;			       \
-		Bool                                                adjust;                            \
-		Materials_Register*                                 materials_Register;                \
-		ExtensionInfo_Index                                 materialExtHandle;                 \
-		MaterialSwarmVariable**                             densitySwarmVariables;             \
-		MaterialSwarmVariable**                             alphaSwarmVariables;               \
-		Index                                               materialSwarmCount;
+		FeVariable*										temperatureField; \
+		double											gravity; \
+		double*											gHat; \
+		Bool												adjust; \
+		Materials_Register*							materials_Register; \
+		ExtensionInfo_Index							materialExtHandle; \
+		MaterialSwarmVariable**						densitySwarmVariables; \
+		MaterialSwarmVariable**						alphaSwarmVariables; \
+		Index												materialSwarmCount;
 
 	struct BuoyancyForceTerm { __BuoyancyForceTerm };
 
 	BuoyancyForceTerm* BuoyancyForceTerm_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         temperatureField,
-		double                                              gravity,
-		Bool                                                adjust,
-		Materials_Register*                                 materials_Register );
+		Name							name,
+		FiniteElementContext*	context,
+		ForceVector*				forceVector,
+		Swarm*						integrationSwarm,
+		FeVariable*					temperatureField,
+		double						gravity,
+		Bool							adjust,
+		Materials_Register*		materials_Register );
 
-	BuoyancyForceTerm* _BuoyancyForceTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		ForceTerm_AssembleElementFunction*                  _assembleElement,		
-		BuoyancyForceTerm_CalcGravityFunction*              _calcGravity,
-		Name                                                name );
 	
-	void BuoyancyForceTerm_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         temperatureField,
-		double                                              gravity,
-		Bool                                                adjust,
-		Materials_Register*                                 materials_Register );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
+	#define BUOYANCYFORCETERM_DEFARGS \
+                FORCETERM_DEFARGS, \
+                BuoyancyForceTerm_CalcGravityFunction*  _calcGravity
+
+	#define BUOYANCYFORCETERM_PASSARGS \
+                FORCETERM_PASSARGS, \
+	        _calcGravity
+
+	BuoyancyForceTerm* _BuoyancyForceTerm_New(  BUOYANCYFORCETERM_DEFARGS  );
+
+	void _BuoyancyForceTerm_Init(
+		void*                forceTerm,
+		FeVariable*          temperatureField,
+		double               gravity,
+		Bool                 adjust,
+		Materials_Register*  materials_Register );
+	
 	void _BuoyancyForceTerm_Delete( void* forceTerm );
+
 	void _BuoyancyForceTerm_Print( void* forceTerm, Stream* stream );
 
 	void* _BuoyancyForceTerm_DefaultNew( Name name ) ;
-void _BuoyancyForceTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
+
+	void _BuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
+
 	void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) ;
+
 	void _BuoyancyForceTerm_Initialise( void* forceTerm, void* data ) ;
+
 	void _BuoyancyForceTerm_Execute( void* forceTerm, void* data ) ;
+
 	void _BuoyancyForceTerm_Destroy( void* forceTerm, void* data ) ;
 
 	void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) ;
+
 	double _BuoyancyForceTerm_CalcGravity( void* forceTerm, Swarm* swarm, Element_LocalIndex lElement_I, void* particle ) ;
 
-	#define BuoyancyForceTerm_CalcGravity( forceTerm, swarm, lElement_I, particle )\
+	#define BuoyancyForceTerm_CalcGravity( forceTerm, swarm, lElement_I, particle ) \
 		(( (BuoyancyForceTerm*) forceTerm )->_calcGravity( forceTerm, swarm, lElement_I, particle ) )
 
 #endif
+

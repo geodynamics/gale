@@ -10,6 +10,10 @@
 	<include>StgFEM/LinearMesh.xml</include>
 
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">PICelleratorContext</param>
+		</struct>
+
 		<struct name="elementCellLayout">
 			<param name="Type">ElementCellLayout</param>
 			<param name="Mesh">elementMesh</param>

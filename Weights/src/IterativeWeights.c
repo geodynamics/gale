@@ -66,70 +66,39 @@ const Type IterativeWeights_Type = "IterativeWeights";
 ** Constructors
 */
 
-IterativeWeights* _IterativeWeights_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		WeightsCalculator_CalculateFunction*  _calculate,
-		Name                                  name )
-{
-	IterativeWeights* self;
-	
-	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(IterativeWeights) );
-	self = (IterativeWeights*)_ConstantWeights_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_calculate,
-			name );
+IterativeWeights* _IterativeWeights_New(  ITERATIVEWEIGHTS_DEFARGS  ) {
+    IterativeWeights* self;
 
+    /* Allocate memory */
+    assert( _sizeOfSelf >= sizeof(IterativeWeights) );
+    self = (IterativeWeights*)_ConstantWeights_New(  CONSTANTWEIGHTS_PASSARGS  );
 	
-	/* General info */
+    /* General info */
 
-	/* Virtual Info */
+    /* Virtual Info */
 	
-	return self;
+    return self;
 }
 
-void _IterativeWeights_Init( void* iterativeWeights, WeightsCalculator* initialWeights, Iteration_Index maxIterations, double tolerance, double alpha ) {
-	IterativeWeights* self = (IterativeWeights*)iterativeWeights;
-	
-	self->isConstructed = True;
+void _IterativeWeights_Init( void* iterativeWeights, WeightsCalculator* initialWeights,
+                             Iteration_Index maxIterations, double tolerance, double alpha )
+{
+    IterativeWeights* self = (IterativeWeights*)iterativeWeights;
 
-	if ( initialWeights ) {
-		self->initialWeights = initialWeights;
-		self->freeInitialWeights = False;
-	}
-	else {
-		self->initialWeights = (WeightsCalculator*) ConstantWeights_New( "initialWeights", self->dim );
-		self->freeInitialWeights = True;
-	}
+    if ( initialWeights ) {
+        self->initialWeights = initialWeights;
+        self->freeInitialWeights = False;
+    }
+    else {
+        self->initialWeights = (WeightsCalculator*) ConstantWeights_New( "initialWeights", self->dim );
+        self->freeInitialWeights = True;
+    }
 
-	self->maxIterations = maxIterations;
-	self->tolerance = tolerance;
-	self->alpha = alpha;
+    self->maxIterations = maxIterations;
+    self->tolerance = tolerance;
+    self->alpha = alpha;
 	
-	Journal_Firewall( self->dim == 2, 
-			Journal_Register( Error_Type, self->type ),
-			"%s only works in 2D.\n", self->type );
-	
+    Journal_Firewall( self->dim == 2, Journal_Register( Error_Type, self->type ), "%s only works in 2D.\n", self->type );
 }
 
 /*------------------------------------------------------------------------------------------------------------------------
@@ -137,141 +106,147 @@ void _IterativeWeights_Init( void* iterativeWeights, WeightsCalculator* initialW
 */
 
 void _IterativeWeights_Delete( void* iterativeWeights ) {
-	IterativeWeights* self = (IterativeWeights*)iterativeWeights;
+    IterativeWeights* self = (IterativeWeights*)iterativeWeights;
 	
-	if (self->freeInitialWeights )
-		Stg_Class_Delete( self->initialWeights );
-	/* Delete parent */
-	_ConstantWeights_Delete( self );
+    if (self->freeInitialWeights )
+        Stg_Class_Delete( self->initialWeights );
+    /* Delete parent */
+    _ConstantWeights_Delete( self );
 }
 
 
 void _IterativeWeights_Print( void* iterativeWeights, Stream* stream ) {
-	IterativeWeights* self = (IterativeWeights*)iterativeWeights;
+    IterativeWeights* self = (IterativeWeights*)iterativeWeights;
 	
-	/* Print parent */
-	_ConstantWeights_Print( self, stream );
+    /* Print parent */
+    _ConstantWeights_Print( self, stream );
 }
 
 
 
 void* _IterativeWeights_Copy( void* iterativeWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-	IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
-	IterativeWeights*	newIterativeWeights;
+    IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
+    IterativeWeights*	newIterativeWeights;
 	
-	newIterativeWeights = (IterativeWeights*)_ConstantWeights_Copy( self, dest, deep, nameExt, ptrMap );
+    newIterativeWeights = (IterativeWeights*)_ConstantWeights_Copy( self, dest, deep, nameExt, ptrMap );
 	
-	return (void*)newIterativeWeights;
+    return (void*)newIterativeWeights;
 }
 
 void* _IterativeWeights_DefaultNew( Name name ) {
-	return (void*) _IterativeWeights_New(
-			sizeof(IterativeWeights),
-			IterativeWeights_Type,
-			_IterativeWeights_Delete,
-			_IterativeWeights_Print,
-			_IterativeWeights_Copy,
-			_IterativeWeights_DefaultNew,
-			_IterativeWeights_Construct,
-			_IterativeWeights_Build,
-			_IterativeWeights_Initialise,
-			_IterativeWeights_Execute,
-			_IterativeWeights_Destroy,
-			_IterativeWeights_Calculate,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(IterativeWeights);
+	Type                                                      type = IterativeWeights_Type;
+	Stg_Class_DeleteFunction*                              _delete = _IterativeWeights_Delete;
+	Stg_Class_PrintFunction*                                _print = _IterativeWeights_Print;
+	Stg_Class_CopyFunction*                                  _copy = _IterativeWeights_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _IterativeWeights_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _IterativeWeights_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _IterativeWeights_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _IterativeWeights_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _IterativeWeights_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _IterativeWeights_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	WeightsCalculator_CalculateFunction*                _calculate = _IterativeWeights_Calculate;
+
+    return (void*) _IterativeWeights_New(  ITERATIVEWEIGHTS_PASSARGS  );
 }
 
 
-void _IterativeWeights_Construct( void* iterativeWeights, Stg_ComponentFactory* cf, void* data ) {
-	IterativeWeights*	     self          = (IterativeWeights*) iterativeWeights;
-	WeightsCalculator*       initialWeights;
-	Iteration_Index          maxIterations;
-	double                   tolerance;
-	double                   alpha;
-	
-	_ConstantWeights_Construct( self, cf, data );
+void _IterativeWeights_AssignFromXML( void* iterativeWeights, Stg_ComponentFactory* cf, void* data ) {
+    IterativeWeights*	     self          = (IterativeWeights*) iterativeWeights;
+    WeightsCalculator*       initialWeights;
+    Iteration_Index          maxIterations;
+    double                   tolerance;
+    double                   alpha;
 
-	initialWeights =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "InitialWeights", WeightsCalculator, False, data ) ;
+    _ConstantWeights_AssignFromXML( self, cf, data );
 
-	maxIterations = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "maxIterations", 10 );
-	tolerance     = Stg_ComponentFactory_GetDouble( cf, self->name, "tolerance", 0.01 );
-	alpha         = Stg_ComponentFactory_GetDouble( cf, self->name, "alpha", 0.8 ); /* 0.8 is default in Dufour p. 65 */
+    initialWeights =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "InitialWeights", WeightsCalculator, False, data );
+
+    maxIterations = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "maxIterations", 10 );
+    tolerance     = Stg_ComponentFactory_GetDouble( cf, self->name, "tolerance", 0.01 );
+    alpha         = Stg_ComponentFactory_GetDouble( cf, self->name, "alpha", 0.8 ); /* 0.8 is default in Dufour p. 65 */
 	
-	_IterativeWeights_Init( self, initialWeights, maxIterations, tolerance, alpha );
+    _IterativeWeights_Init( self, initialWeights, maxIterations, tolerance, alpha );
 }
 
 void _IterativeWeights_Build( void* iterativeWeights, void* data ) {
-	IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
+    IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
 
-	_ConstantWeights_Build( self, data );
+    Stg_Component_Build( self->initialWeights, data, False ); 
+    _ConstantWeights_Build( self, data );
 }
 void _IterativeWeights_Initialise( void* iterativeWeights, void* data ) {
-	IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
-	
-	_ConstantWeights_Initialise( self, data );
+    IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
+
+    Stg_Component_Initialise( self->initialWeights, data, False ); 	
+    _ConstantWeights_Initialise( self, data );
 }
 void _IterativeWeights_Execute( void* iterativeWeights, void* data ) {
-	IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
+    IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
 	
-	_ConstantWeights_Execute( self, data );
+    _ConstantWeights_Execute( self, data );
 }
 void _IterativeWeights_Destroy( void* iterativeWeights, void* data ) {
-	IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
-	
-	_ConstantWeights_Destroy( self, data );
+    IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
+
+    if (self->freeInitialWeights )
+       Stg_Component_Destroy( self->initialWeights, data, False ); 	
+    _ConstantWeights_Destroy( self, data );
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
 void _IterativeWeights_Calculate( void* iterativeWeights, void* _swarm, Cell_LocalIndex lCell_I ) {
-	IterativeWeights*            self            = (IterativeWeights*)  iterativeWeights;
-	Swarm*                       swarm           = (Swarm*) _swarm;
-	Iteration_Index              iteration_I;
-	double                       constaintLHS[3] = { 0.0,0.0,0.0 };
-	double                       squareTerms[3]  = { 0.0,0.0,1.0 };
-	double                       constaintError;
-	Particle_InCellIndex         cParticle_I;
-	Particle_InCellIndex         cParticleCount  = swarm->cellParticleCountTbl[lCell_I];
-	IntegrationPoint*            particle;
-	Dimension_Index              dim_I;
-	Dimension_Index              dim             = self->dim;
+    IterativeWeights*            self            = (IterativeWeights*)  iterativeWeights;
+    Swarm*                       swarm           = (Swarm*) _swarm;
+    Iteration_Index              iteration_I;
+    double                       constaintLHS[3] = { 0.0,0.0,0.0 };
+    double                       squareTerms[3]  = { 0.0,0.0,1.0 };
+    double                       constaintError;
+    Particle_InCellIndex         cParticle_I;
+    Particle_InCellIndex         cParticleCount  = swarm->cellParticleCountTbl[lCell_I];
+    IntegrationPoint*            particle;
+    Dimension_Index              dim_I;
+    Dimension_Index              dim             = self->dim;
 
-	/* Initialise Weights Using Constant Weights routine - Dufour Equation 2.52 */
-	WeightsCalculator_CalculateCell( self->initialWeights, swarm, lCell_I );
+    /* Initialise Weights Using Constant Weights routine - Dufour Equation 2.52 */
+    WeightsCalculator_CalculateCell( self->initialWeights, swarm, lCell_I );
 		
-	for ( iteration_I = 0 ; iteration_I < self->maxIterations ; iteration_I++ ) {
-		constaintLHS[ I_AXIS ] = WeightsCalculator_GetConstraintLHS( self, swarm, lCell_I, 1, 0, 0 );
-		constaintLHS[ J_AXIS ] = WeightsCalculator_GetConstraintLHS( self, swarm, lCell_I, 0, 1, 0 );
-		if ( self->dim == 3 )
-			constaintLHS[ K_AXIS ] = WeightsCalculator_GetConstraintLHS( self, swarm, lCell_I, 0, 0, 1 );
+    for ( iteration_I = 0 ; iteration_I < self->maxIterations ; iteration_I++ ) {
+        constaintLHS[ I_AXIS ] = WeightsCalculator_GetConstraintLHS( self, swarm, lCell_I, 1, 0, 0 );
+        constaintLHS[ J_AXIS ] = WeightsCalculator_GetConstraintLHS( self, swarm, lCell_I, 0, 1, 0 );
+        if ( self->dim == 3 )
+            constaintLHS[ K_AXIS ] = WeightsCalculator_GetConstraintLHS( self, swarm, lCell_I, 0, 0, 1 );
 
-		/* Test for convergence - See Dufour Equation 2.55 */
-		constaintError = 
-			fabs(constaintLHS[ I_AXIS ]) + 
-			fabs(constaintLHS[ J_AXIS ]) + 
-			fabs(constaintLHS[ K_AXIS ]);
+        /* Test for convergence - See Dufour Equation 2.55 */
+        constaintError = 
+            fabs(constaintLHS[ I_AXIS ]) + 
+            fabs(constaintLHS[ J_AXIS ]) + 
+            fabs(constaintLHS[ K_AXIS ]);
 
-		if ( constaintError < self->tolerance )
-			/* Then this cell has converged - bail out of loop */
-			break;
+        if ( constaintError < self->tolerance )
+            /* Then this cell has converged - bail out of loop */
+            break;
 
-		/* Adjust weights according to Dufour Equation 2.54 */
-		squareTerms[ I_AXIS ] = WeightsCalculator_GetLocalCoordSum( self, swarm, lCell_I, 2, 0, 0 );
-		squareTerms[ J_AXIS ] = WeightsCalculator_GetLocalCoordSum( self, swarm, lCell_I, 0, 2, 0 );
-		if ( self->dim == 3 )
-			squareTerms[ K_AXIS ] = WeightsCalculator_GetLocalCoordSum( self, swarm, lCell_I, 0, 0, 2 );
+        /* Adjust weights according to Dufour Equation 2.54 */
+        squareTerms[ I_AXIS ] = WeightsCalculator_GetLocalCoordSum( self, swarm, lCell_I, 2, 0, 0 );
+        squareTerms[ J_AXIS ] = WeightsCalculator_GetLocalCoordSum( self, swarm, lCell_I, 0, 2, 0 );
+        if ( self->dim == 3 )
+            squareTerms[ K_AXIS ] = WeightsCalculator_GetLocalCoordSum( self, swarm, lCell_I, 0, 0, 2 );
 
-		for ( cParticle_I = 0 ; cParticle_I < cParticleCount ; cParticle_I++ ) {
-			particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, lCell_I, cParticle_I );
+        for ( cParticle_I = 0 ; cParticle_I < cParticleCount ; cParticle_I++ ) {
+            particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, lCell_I, cParticle_I );
 			
-			for ( dim_I = 0 ; dim_I < dim ; dim_I++ )
-				particle->weight -= self->alpha * constaintLHS[ dim_I ] / squareTerms[ dim_I ] * particle->xi[ dim_I ] ;
-		}
+            for ( dim_I = 0 ; dim_I < dim ; dim_I++ )
+                particle->weight -= self->alpha * constaintLHS[ dim_I ] / squareTerms[ dim_I ] * particle->xi[ dim_I ] ;
+        }
 
-		/* Scale Weights to ensure constant constaint */
-		IterativeWeights_ScaleForConstantConstraint( self, swarm, lCell_I );
-	}
+        /* Scale Weights to ensure constant constaint */
+        IterativeWeights_ScaleForConstantConstraint( self, swarm, lCell_I );
+    }
 }
 
 
@@ -280,21 +255,23 @@ void _IterativeWeights_Calculate( void* iterativeWeights, void* _swarm, Cell_Loc
 */
 
 void IterativeWeights_ScaleForConstantConstraint( void* iterativeWeights, void* _swarm, Cell_LocalIndex lCell_I ) {
-	IterativeWeights*            self            = (IterativeWeights*)  iterativeWeights;
-	Swarm*                       swarm           = (Swarm*) _swarm;
-	double                       weightsTotal    = 0.0;
-	Particle_InCellIndex         cParticle_I;
-	Particle_InCellIndex         cParticleCount  = swarm->cellParticleCountTbl[lCell_I];
-	IntegrationPoint*            particle;
+    IterativeWeights*            self            = (IterativeWeights*)  iterativeWeights;
+    Swarm*                       swarm           = (Swarm*) _swarm;
+    double                       weightsTotal    = 0.0;
+    Particle_InCellIndex         cParticle_I;
+    Particle_InCellIndex         cParticleCount  = swarm->cellParticleCountTbl[lCell_I];
+    IntegrationPoint*            particle;
 
-	weightsTotal = WeightsCalculator_SumCellWeights( self, swarm, lCell_I );
+    weightsTotal = WeightsCalculator_SumCellWeights( self, swarm, lCell_I );
 
-	for ( cParticle_I = 0 ; cParticle_I < cParticleCount ; cParticle_I++ ) {
-		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, lCell_I, cParticle_I );
+    for ( cParticle_I = 0 ; cParticle_I < cParticleCount ; cParticle_I++ ) {
+        particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, lCell_I, cParticle_I );
 
-		/* Scale weights so that sum of weights = cellLocalVolume */
-		particle->weight *= self->cellLocalVolume/weightsTotal;
-	}
+        /* Scale weights so that sum of weights = cellLocalVolume */
+        particle->weight *= self->cellLocalVolume/weightsTotal;
+    }
 }
 	
+
+
 

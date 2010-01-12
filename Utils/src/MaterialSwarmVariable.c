@@ -61,95 +61,70 @@
 const Type MaterialSwarmVariable_Type = "MaterialSwarmVariable";
 
 MaterialSwarmVariable* MaterialSwarmVariable_New( 
-		Name                                                name,
-		MaterialPointsSwarm*                                swarm,
-		Index                                               dofCount,
-		Materials_Register*                                 materials_Register,
-		ExtensionInfo_Index                                 materialExtensionHandle,
-		SizeT                                               offset )
+	Name						name,
+	AbstractContext*		context,
+	MaterialPointsSwarm*	swarm,
+	Index						dofCount,
+	Materials_Register*	materials_Register,
+	ExtensionInfo_Index	materialExtensionHandle,
+	SizeT						offset )
 {
 	MaterialSwarmVariable* self = (MaterialSwarmVariable*) _MaterialSwarmVariable_DefaultNew( name );
 
-	MaterialSwarmVariable_InitAll( 
-			self,
-			swarm,
-			dofCount,
-			materials_Register,
-			materialExtensionHandle,
-			offset );
+	self->isConstructed = True;
+	_SwarmVariable_Init( (SwarmVariable*)self, context, (Swarm*)swarm, NULL, dofCount );
+	_MaterialSwarmVariable_Init( self, materials_Register, materialExtensionHandle, offset );
 
 	return self;
 }
 
+void* _MaterialSwarmVariable_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(MaterialSwarmVariable);
+	Type                                                         type = MaterialSwarmVariable_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _MaterialSwarmVariable_Delete;
+	Stg_Class_PrintFunction*                                   _print = _MaterialSwarmVariable_Print;
+	Stg_Class_CopyFunction*                                     _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _MaterialSwarmVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _MaterialSwarmVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _MaterialSwarmVariable_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _MaterialSwarmVariable_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _MaterialSwarmVariable_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _MaterialSwarmVariable_Destroy;
+	AllocationType                                 nameAllocationType = NON_GLOBAL;
+	SwarmVariable_ValueAtFunction*                           _valueAt = _MaterialSwarmVariable_ValueAt;
+	SwarmVariable_GetGlobalValueFunction*      _getMinGlobalMagnitude = _MaterialSwarmVariable_GetMinGlobalMagnitude;
+	SwarmVariable_GetGlobalValueFunction*      _getMaxGlobalMagnitude = _MaterialSwarmVariable_GetMaxGlobalMagnitude;
+
+	return (void*)_MaterialSwarmVariable_New(  MATERIALSWARMVARIABLE_PASSARGS  );
+}
+
 /* Creation implementation / Virtual constructor */
-MaterialSwarmVariable* _MaterialSwarmVariable_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		SwarmVariable_ValueAtFunction*                      _valueAt,
-		SwarmVariable_GetGlobalValueFunction*               _getMinGlobalMagnitude,
-		SwarmVariable_GetGlobalValueFunction*               _getMaxGlobalMagnitude,
-		Name                                                name )
-{
+MaterialSwarmVariable* _MaterialSwarmVariable_New(  MATERIALSWARMVARIABLE_DEFARGS  ) {
 	MaterialSwarmVariable* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(MaterialSwarmVariable) );
-	self = (MaterialSwarmVariable*) _SwarmVariable_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_valueAt,
-		_getMinGlobalMagnitude,
-		_getMaxGlobalMagnitude,
-		name );
+	assert( _sizeOfSelf >= sizeof(MaterialSwarmVariable) );
+	self = (MaterialSwarmVariable*) _SwarmVariable_New(  SWARMVARIABLE_PASSARGS  );
 	
 	/* Virtual info */
 	
 	return self;
 }
 
-void _MaterialSwarmVariable_Init( 
-		MaterialSwarmVariable*                              self, 
-		Materials_Register*                                 materials_Register,
-		ExtensionInfo_Index                                 materialExtensionHandle,
-		SizeT                                               offset )
+void _MaterialSwarmVariable_Init(
+	void*						swarmVariable,
+	Materials_Register*	materials_Register,
+	ExtensionInfo_Index	materialExtensionHandle,
+	SizeT						offset )
 {
+	MaterialSwarmVariable* self = (MaterialSwarmVariable*)swarmVariable;
+
 	self->materials_Register        = materials_Register;
 	self->materialExtensionHandle   = materialExtensionHandle;
 	self->offset                    = offset;
    /* variable does not store data, so is not checkpointed */
    self->isCheckpointedAndReloaded = False;
-}
-
-void MaterialSwarmVariable_InitAll( 
-		void*                                               swarmVariable,
-		MaterialPointsSwarm*                                swarm,
-		Index                                               dofCount,
-		Materials_Register*                                 materials_Register,
-		ExtensionInfo_Index                                 materialExtensionHandle,
-		SizeT                                               offset )
-{
-	MaterialSwarmVariable* self = (MaterialSwarmVariable*) swarmVariable;
-
-	SwarmVariable_InitAll( self, (Swarm*)swarm, NULL, dofCount );
-	_MaterialSwarmVariable_Init( self, materials_Register, materialExtensionHandle, offset );
 }
 
 void _MaterialSwarmVariable_Delete( void* swarmVariable ) {
@@ -169,33 +144,16 @@ void _MaterialSwarmVariable_Print( void* swarmVariable, Stream* stream ) {
 	Journal_PrintValue( stream, self->offset );
 }
 
-void* _MaterialSwarmVariable_DefaultNew( Name name ) {
-	return (void*)_MaterialSwarmVariable_New( 
-		sizeof(MaterialSwarmVariable), 
-		MaterialSwarmVariable_Type,
-		_MaterialSwarmVariable_Delete,
-		_MaterialSwarmVariable_Print,
-		NULL,
-		_MaterialSwarmVariable_DefaultNew,
-		_MaterialSwarmVariable_Construct,
-		_MaterialSwarmVariable_Build,
-		_MaterialSwarmVariable_Initialise,
-		_MaterialSwarmVariable_Execute,
-		_MaterialSwarmVariable_Destroy,
-		_MaterialSwarmVariable_ValueAt,
-		_MaterialSwarmVariable_GetMinGlobalMagnitude,
-		_MaterialSwarmVariable_GetMaxGlobalMagnitude,
-		name );
-}
-
-void _MaterialSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) {
-	MaterialSwarmVariable*      self             = (MaterialSwarmVariable*)swarmVariable;
-	Materials_Register*         materials_Register;
+void _MaterialSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) {
+	MaterialSwarmVariable*	self = (MaterialSwarmVariable*)swarmVariable;
+	Materials_Register*		materials_Register;
+	PICelleratorContext*		context = (PICelleratorContext*)self->context;
 
 	/* Construct Parent */
-	_SwarmVariable_Construct( self, cf, data );
+	_SwarmVariable_AssignFromXML( self, cf, data );
 
-	materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+	assert( Stg_CheckType( context, PICelleratorContext ) );
+	materials_Register = context->materials_Register;
 	assert( materials_Register );
 
 	abort( );
@@ -203,7 +161,7 @@ void _MaterialSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory
 }
 
 void _MaterialSwarmVariable_Build( void* swarmVariable, void* data ) {
-	MaterialSwarmVariable*               self               = (MaterialSwarmVariable*)swarmVariable;
+	MaterialSwarmVariable* self = (MaterialSwarmVariable*)swarmVariable;
 
 	_SwarmVariable_Build( self, data );
 }
@@ -217,12 +175,14 @@ void _MaterialSwarmVariable_Execute( void* swarmVariable, void* data ) {
 }
 
 void _MaterialSwarmVariable_Destroy( void* swarmVariable, void* data ) {
-	_SwarmVariable_Destroy( swarmVariable, data );
+	MaterialSwarmVariable*  self = (MaterialSwarmVariable*) swarmVariable;
+
+	_SwarmVariable_Destroy( self, data );
 }
 
 void _MaterialSwarmVariable_ValueAt( void* swarmVariable, Particle_Index lParticle_I, double* value ) {
-	MaterialSwarmVariable*  self            = (MaterialSwarmVariable*) swarmVariable;
-	MaterialPointsSwarm*    swarm           = (MaterialPointsSwarm*)self->swarm;
+	MaterialSwarmVariable*  self = (MaterialSwarmVariable*) swarmVariable;
+	MaterialPointsSwarm*    swarm = (MaterialPointsSwarm*)self->swarm;
 	Material*               material;
 	ArithPointer            materialExt;
 
@@ -244,3 +204,5 @@ double _MaterialSwarmVariable_GetMaxGlobalMagnitude( void* swarmVariable ) {
 }
 	
 	
+
+

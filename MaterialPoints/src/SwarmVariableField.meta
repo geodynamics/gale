@@ -17,7 +17,7 @@
 
 <list name="Params">
 	<struct>
-		<param name="Name">swarmVariable</param>
+		<param name="Name">swarmVariableName</param>
 		<param name="Type">String</param>
 		<param name="Default">""</param>
 		<param name="Description">Textual name of the swarm variable which will be interpolated onto the mesh</param>

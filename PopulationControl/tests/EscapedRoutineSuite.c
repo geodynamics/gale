@@ -37,7 +37,6 @@
 #include <StgDomain/StgDomain.h>
 #include <StgFEM/StgFEM.h>
 #include "PICellerator/PopulationControl/PopulationControl.h"
-#include "EscapedRoutineSuite.h"
 
 struct _Particle {
    __GlobalParticle
@@ -46,9 +45,10 @@ struct _Particle {
 
 
 typedef struct {
-   DomainContext*          context;
-   Swarm*                  swarm;
-   EscapedRoutine*         escRoutine;
+   FiniteElementContext*	context;
+   Stg_ComponentFactory*	cf;
+   Swarm*						swarm;
+   EscapedRoutine*			escRoutine;
 } EscapedRoutineSuiteData;
 
 void EscapedRoutineSuite_Setup( EscapedRoutineSuiteData* data ) {
@@ -56,19 +56,20 @@ void EscapedRoutineSuite_Setup( EscapedRoutineSuiteData* data ) {
    Particle_Index    lParticle_I=0;
 
    pcu_filename_input( "EscapedRoutineSuite.xml", xmlInputFilename );
-   data->context = (DomainContext*)stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD );
+   data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
+   data->context = (FiniteElementContext*) LiveComponentRegister_Get( data->cf->LCRegister, "context" );
    data->swarm = (Swarm*) LiveComponentRegister_Get( data->context->CF->LCRegister, "swarm" );
    data->escRoutine = (EscapedRoutine*) LiveComponentRegister_Get( data->context->CF->LCRegister, "escapedRoutine" );
+	stgMainBuildAndInitialise( data->cf );
 
    /* Use our test param to mark all the particles as not to be removed by default*/
    for ( lParticle_I=0; lParticle_I < data->swarm->particleLocalCount; lParticle_I++ ) {
       ((Particle*)Swarm_ParticleAt( data->swarm, lParticle_I ))->toRemove = False;
    }
-   
 } 
 
 void EscapedRoutineSuite_Teardown( EscapedRoutineSuiteData* data ) {
-   stgMainDestroy( (AbstractContext*)data->context );
+   stgMainDestroy( data->cf );
 }
 
 
@@ -193,14 +194,12 @@ void EscapedRoutineSuite( pcu_suite_t* suite ) {
    pcu_suite_setData( suite, EscapedRoutineSuiteData );
    pcu_suite_setFixtures( suite, EscapedRoutineSuite_Setup, EscapedRoutineSuite_Teardown );
    pcu_suite_addTest( suite, EscapedRoutineSuite_TestSetParticleToRemove );
-/* TEMPORARILY disable multiple tests until Toolbox/Context issue sorted out (See tickets #70,#71
- in StGermain trac) -- PatrickSunter, 19 Aug 2009 */
-#if 0
    pcu_suite_addTest( suite, EscapedRoutineSuite_TestSelect );
    pcu_suite_addTest( suite, EscapedRoutineSuite_TestInitialiseParticleList );
    pcu_suite_addTest( suite, EscapedRoutineSuite_TestCompareParticles );
    pcu_suite_addTest( suite, EscapedRoutineSuite_TestSortParticleList );
    pcu_suite_addTest( suite, EscapedRoutineSuite_TestRemoveParticles );
    pcu_suite_addTest( suite, EscapedRoutineSuite_TestExecuteBadInput );
-#endif
 }
+
+

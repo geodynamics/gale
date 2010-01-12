@@ -40,8 +40,8 @@
 **
 */
 
-#ifndef __PICellerator_MaterialPoints_h__
-#define __PICellerator_MaterialPoints_h__
+#ifndef __PICellerator_MaterialPoints_MaterialPoints_h__
+#define __PICellerator_MaterialPoints_MaterialPoints_h__
 	
 	#include "types.h"
 	#include "Materials_Register.h"
@@ -71,7 +71,7 @@
 	/* dave 21.09.07 */
 	#include "SwarmVariableField.h"
 
-	#include "Context.h"
+	#include "PICelleratorContext.h"
 	#include "Init.h"
 	#include "Finalise.h"
 

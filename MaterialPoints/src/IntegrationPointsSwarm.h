@@ -53,8 +53,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __PICellerator_IntegrationPointsSwarm_IntegrationPointsSwarm_h__
-#define __PICellerator_IntegrationPointsSwarm_IntegrationPointsSwarm_h__
+#ifndef __PICellerator_MaterialPoints_IntegrationPointsSwarm_h__
+#define __PICellerator_MaterialPoints_IntegrationPointsSwarm_h__
 
 	/* Textual name of this class */
 	extern const Type IntegrationPointsSwarm_Type;
@@ -80,15 +80,16 @@
 	*/
 
 	/** Classic C++-style constructor */
-	IntegrationPointsSwarm* IntegrationPointsSwarm_New(
+   IntegrationPointsSwarm* IntegrationPointsSwarm_New(
 		Name                                  name,
+      AbstractContext*                      context,
 		void*                                 cellLayout,
 		void*                                 particleLayout,
 		Dimension_Index                       dim,
 		SizeT                                 particleSize,
 		Particle_InCellIndex                  cellParticleTblDelta,
 		double                                extraParticlesFactor,
-		FeMesh*				      mesh, 
+		FeMesh*                   	           mesh,
 		TimeIntegrator*                       timeIntegrator,
 		WeightsCalculator*                    weights,
 		IntegrationPointMapper*               mapper,
@@ -96,43 +97,26 @@
 		ExtensionManager_Register*            extensionMgr_Register,
 		Variable_Register*                    swarmVariable_Register,
 		Materials_Register*                   materials_Register,
-		MPI_Comm                              comm);
+		MPI_Comm                              comm,
+      void*                                 ics);
 	
 	void* _IntegrationPointsSwarm_DefaultNew( Name name ) ;
 
 	/** Private New */
-	IntegrationPointsSwarm* _IntegrationPointsSwarm_New(
-		SizeT                                           _sizeOfSelf, 
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy, 
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,
-		Name                                            name,
-		Bool                                            initFlag,
-		CellLayout*                                     cellLayout,
-		ParticleLayout*                                 particleLayout,
-		Dimension_Index                                 dim,
-		SizeT                                           particleSize, 
-		Particle_InCellIndex                            cellParticleTblDelta, 
-		double                                          extraParticlesFactor,
-		FeMesh*         		                mesh, 
-		TimeIntegrator*                                 timeIntegrator,
-		WeightsCalculator*                              weights,
-		IntegrationPointMapper*                         mapper,
-		Bool                                            recalculateWeights,
-		ExtensionManager_Register*                      extensionMgr_Register,
-		Variable_Register*                              swarmVariable_Register,
-		Materials_Register*                             materials_Register,
-		MPI_Comm                                        comm
-		);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
-	void _IntegrationPointsSwarm_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	#define INTEGRATIONPOINTSSWARM_DEFARGS \
+                SWARM_DEFARGS
+
+	#define INTEGRATIONPOINTSSWARM_PASSARGS \
+                SWARM_PASSARGS
+
+	IntegrationPointsSwarm* _IntegrationPointsSwarm_New(  INTEGRATIONPOINTSSWARM_DEFARGS  );
+
+	void _IntegrationPointsSwarm_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 
 	void _IntegrationPointsSwarm_Init(
 		void*                                           swarm,
@@ -193,3 +177,4 @@
 		IntegrationPointMapper_GetExtensionAt( ((IntegrationPointsSwarm*)(swarm))->mapper, (point_I), (extHandle) )
 
 #endif
+

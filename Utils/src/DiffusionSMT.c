@@ -59,73 +59,37 @@ const Type DiffusionSMT_Type = "DiffusionSMT";
 
 DiffusionSMT* DiffusionSMT_New( 
     Name                                                name,
+    FiniteElementContext*				                    context,
     StiffnessMatrix*                                    stiffnessMatrix,
     Swarm*                                              integrationSwarm )
 {
     DiffusionSMT* self = (DiffusionSMT*) _DiffusionSMT_DefaultNew( name );
 
-    DiffusionSMT_InitAll( 
-	self,
-	stiffnessMatrix,
-	integrationSwarm );
+	self->isConstructed = True;
+	_StiffnessMatrixTerm_Init( self, context, stiffnessMatrix, integrationSwarm, NULL );
+	_DiffusionSMT_Init( self );
 
-    return self;
+	return self;
 }
 
 /* Creation implementation / Virtual constructor */
-DiffusionSMT* _DiffusionSMT_New( 
-    SizeT                                               sizeOfSelf,  
-    Type                                                type,
-    Stg_Class_DeleteFunction*                           _delete,
-    Stg_Class_PrintFunction*                            _print,
-    Stg_Class_CopyFunction*                             _copy, 
-    Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-    Stg_Component_ConstructFunction*                    _construct,
-    Stg_Component_BuildFunction*                        _build,
-    Stg_Component_InitialiseFunction*                   _initialise,
-    Stg_Component_ExecuteFunction*                      _execute,
-    Stg_Component_DestroyFunction*                      _destroy,
-    StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,
-    Name                                                name )
+DiffusionSMT* _DiffusionSMT_New(  DIFFUSIONSMT_DEFARGS  )
 {
     DiffusionSMT* self;
 	
     /* Allocate memory */
-    assert( sizeOfSelf >= sizeof(DiffusionSMT) );
-    self = (DiffusionSMT*) _StiffnessMatrixTerm_New( 
-	sizeOfSelf, 
-	type, 
-	_delete, 
-	_print, 
-	_copy,
-	_defaultConstructor,
-	_construct,
-	_build, 
-	_initialise,
-	_execute,
-	_destroy,
-	_assembleElement,
-	name );
+    assert( _sizeOfSelf >= sizeof(DiffusionSMT) );
+    self = (DiffusionSMT*) _StiffnessMatrixTerm_New(  STIFFNESSMATRIXTERM_PASSARGS  );
 	
     /* Virtual info */
 	
     return self;
 }
 
-void _DiffusionSMT_Init( 
-    DiffusionSMT*                                    self )
-{
-}
+void _DiffusionSMT_Init( void* matrixTerm ) {
+	DiffusionSMT* self;
 
-void DiffusionSMT_InitAll( 
-    void*                                               matrixTerm,
-    StiffnessMatrix*                                    stiffnessMatrix,
-    Swarm*                                              integrationSwarm )
-{
-    DiffusionSMT* self = (DiffusionSMT*) matrixTerm;
-
-    StiffnessMatrixTerm_InitAll( self, stiffnessMatrix, integrationSwarm, NULL );
-    _DiffusionSMT_Init( self );
+	self = (DiffusionSMT*)matrixTerm;
 }
 
 void _DiffusionSMT_Delete( void* matrixTerm ) {
@@ -147,31 +111,38 @@ void _DiffusionSMT_Print( void* matrixTerm, Stream* stream ) {
 }
 
 void* _DiffusionSMT_DefaultNew( Name name ) {
-    return (void*)_DiffusionSMT_New( 
-	sizeof(DiffusionSMT), 
-	DiffusionSMT_Type,
-	_DiffusionSMT_Delete,
-	_DiffusionSMT_Print,
-	NULL,
-	_DiffusionSMT_DefaultNew,
-	_DiffusionSMT_Construct,
-	_DiffusionSMT_Build,
-	_DiffusionSMT_Initialise,
-	_DiffusionSMT_Execute,
-	_DiffusionSMT_Destroy,
-	_DiffusionSMT_AssembleElement,
-	name );
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(DiffusionSMT);
+	Type                                                         type = DiffusionSMT_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _DiffusionSMT_Delete;
+	Stg_Class_PrintFunction*                                   _print = _DiffusionSMT_Print;
+	Stg_Class_CopyFunction*                                     _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _DiffusionSMT_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _DiffusionSMT_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _DiffusionSMT_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _DiffusionSMT_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _DiffusionSMT_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _DiffusionSMT_Destroy;
+	StiffnessMatrixTerm_AssembleElementFunction*     _assembleElement = _DiffusionSMT_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+    return (void*)_DiffusionSMT_New(  DIFFUSIONSMT_PASSARGS  );
 }
 
-void _DiffusionSMT_Construct( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
+void _DiffusionSMT_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
     DiffusionSMT*            self             = (DiffusionSMT*)matrixTerm;
+    PICelleratorContext*     context;
 
     /* Construct Parent */
-    _StiffnessMatrixTerm_Construct( self, cf, data );
+    _StiffnessMatrixTerm_AssignFromXML( self, cf, data );
+    context = (PICelleratorContext*)self->context;
 
     _DiffusionSMT_Init( self );
 
-    self->materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+    assert( Stg_CheckType( context, PICelleratorContext ) );
+    self->materials_Register = context->materials_Register;
 }
 
 void _DiffusionSMT_Build( void* matrixTerm, void* data ) {
@@ -189,10 +160,8 @@ void _DiffusionSMT_Build( void* matrixTerm, void* data ) {
     _StiffnessMatrixTerm_Build( self, data );
 
     /* Get Component Factory if we can */
-    if ( Stg_Class_IsInstance( data, AbstractContext_Type ) ) {
-	context = (AbstractContext*) data;
-	cf = context->CF;
-    }
+    context = self->context;
+    cf = context->CF;
 
     /* Sort out material extension stuff */
     self->materialExtHandle = Materials_Register_AddMaterialExtension(
@@ -225,6 +194,7 @@ void _DiffusionSMT_Build( void* matrixTerm, void* data ) {
 	name = Stg_Object_AppendSuffix( materialSwarms[ii], "diffusivity" );
 	self->diffusionSwarmVariables[ii] = MaterialSwarmVariable_New( 
 	    name, 
+	    (AbstractContext*) self->context, 
 	    materialSwarms[ii], 
 	    1, 
 	    self->materials_Register, 
@@ -252,7 +222,11 @@ void _DiffusionSMT_Execute( void* matrixTerm, void* data ) {
 }
 
 void _DiffusionSMT_Destroy( void* matrixTerm, void* data ) {
+    DiffusionSMT*             self             = (DiffusionSMT*)matrixTerm;
+    int ii;
     _StiffnessMatrixTerm_Destroy( matrixTerm, data );
+    for ( ii = 0; ii < self->materialSwarmCount; ++ii )
+      Stg_Component_Destroy( self->diffusionSwarmVariables[ii], data, False );
 }
 
 
@@ -325,3 +299,5 @@ void _DiffusionSMT_AssembleElement(
 	
     Memory_Free(GNx); 
 }
+
+

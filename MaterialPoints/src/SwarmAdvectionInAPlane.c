@@ -71,6 +71,7 @@ const Type SwarmAdvectionInAPlane_Type = "SwarmAdvectionInAPlane";
 */
 SwarmAdvectionInAPlane* SwarmAdvectionInAPlane_New(
 		Name                                       name,
+		DomainContext*                             context,
 		TimeIntegrator*                            timeIntegrator,
 		FeVariable*                                velocityField,
 		Bool                                       allowFallbackToFirstOrder,
@@ -81,7 +82,7 @@ SwarmAdvectionInAPlane* SwarmAdvectionInAPlane_New(
 	int whichaxis;
 	
 	/* 	SwarmAdvectionInAPlane_InitAll */
-	_TimeIntegratee_Init( self, timeIntegrator, swarm->particleCoordVariable->variable, 0, NULL,
+	_TimeIntegrand_Init( self, context, timeIntegrator, swarm->particleCoordVariable->variable, 0, NULL,
 		allowFallbackToFirstOrder );
 	_SwarmAdvector_Init( (SwarmAdvector*)self, velocityField, swarm, periodicBCsManager);
 	_SwarmAdvectionInAPlane_Init( self, whichaxis );
@@ -89,41 +90,13 @@ SwarmAdvectionInAPlane* SwarmAdvectionInAPlane_New(
 	return self;
 }
 
-SwarmAdvectionInAPlane* _SwarmAdvectionInAPlane_New(
-		SizeT                                      _sizeOfSelf, 
-		Type                                       type,
-		Stg_Class_DeleteFunction*                  _delete,
-		Stg_Class_PrintFunction*                   _print,
-		Stg_Class_CopyFunction*                    _copy, 
-		Stg_Component_DefaultConstructorFunction*  _defaultConstructor,
-		Stg_Component_ConstructFunction*           _construct,
-		Stg_Component_BuildFunction*               _build,
-		Stg_Component_InitialiseFunction*          _initialise,
-		Stg_Component_ExecuteFunction*             _execute,
-		Stg_Component_DestroyFunction*             _destroy,		
-		TimeIntegratee_CalculateTimeDerivFunction* _calculateTimeDeriv,
-		TimeIntegratee_IntermediateFunction*       _intermediate,
-		Name                                       name )
+SwarmAdvectionInAPlane* _SwarmAdvectionInAPlane_New(  SWARMADVECTIONINAPLANE_DEFARGS  )
 {
 	SwarmAdvectionInAPlane* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(SwarmAdvectionInAPlane) );
-	self = (SwarmAdvectionInAPlane*)_SwarmAdvector_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_calculateTimeDeriv,
-			_intermediate,
-			name );
+	self = (SwarmAdvectionInAPlane*)_SwarmAdvector_New(  SWARMADVECTOR_PASSARGS  );
 	
 	/* General info */
 
@@ -142,21 +115,6 @@ void _SwarmAdvectionInAPlane_Init( SwarmAdvectionInAPlane* self, int whichaxis )
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */
-void _SwarmAdvectionInAPlane_Delete( void* swarmAdvector ) {
-	SwarmAdvectionInAPlane* self = (SwarmAdvectionInAPlane*)swarmAdvector;
-
-	/* Delete parent */
-	_SwarmAdvector_Delete( self );
-}
-
-
-void _SwarmAdvectionInAPlane_Print( void* swarmAdvector, Stream* stream ) {
-	SwarmAdvectionInAPlane* self = (SwarmAdvectionInAPlane*)swarmAdvector;
-	
-	/* Print parent */
-	_SwarmAdvector_Print( self, stream );
-}
-
 
 void* _SwarmAdvectionInAPlane_Copy( void* swarmAdvector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	SwarmAdvectionInAPlane*	self = (SwarmAdvectionInAPlane*)swarmAdvector;
@@ -172,29 +130,32 @@ void* _SwarmAdvectionInAPlane_Copy( void* swarmAdvector, void* dest, Bool deep, 
 }
 
 void* _SwarmAdvectionInAPlane_DefaultNew( Name name ) {
-	return (void*) _SwarmAdvectionInAPlane_New(
-			sizeof(SwarmAdvectionInAPlane),
-			SwarmAdvectionInAPlane_Type,
-			_SwarmAdvectionInAPlane_Delete,
-			_SwarmAdvectionInAPlane_Print,
-			_SwarmAdvectionInAPlane_Copy,
-			_SwarmAdvectionInAPlane_DefaultNew,
-			_SwarmAdvectionInAPlane_Construct,
-			/* Just use the normal parent's implementation for next few, apart from new TimeDeriv function */
-			_SwarmAdvector_Build,
-			_SwarmAdvector_Initialise,
-			_SwarmAdvector_Execute,
-			_SwarmAdvector_Destroy,
-			_SwarmAdvectionInAPlane_TimeDeriv,
-			_SwarmAdvector_Intermediate,
-			name );
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(SwarmAdvectionInAPlane);
+	Type                                                       type = SwarmAdvectionInAPlane_Type;
+	Stg_Class_DeleteFunction*                               _delete = _SwarmAdvector_Delete;
+	Stg_Class_PrintFunction*                                 _print = _SwarmAdvector_Print;
+	Stg_Class_CopyFunction*                                   _copy = _SwarmAdvectionInAPlane_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _SwarmAdvectionInAPlane_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _SwarmAdvectionInAPlane_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _SwarmAdvector_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _SwarmAdvector_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _SwarmAdvector_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _SwarmAdvector_Destroy;
+	TimeIntegrand_CalculateTimeDerivFunction*  _calculateTimeDeriv = _SwarmAdvectionInAPlane_TimeDeriv;
+	TimeIntegrand_IntermediateFunction*              _intermediate = _SwarmAdvector_Intermediate;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _SwarmAdvectionInAPlane_New(  SWARMADVECTIONINAPLANE_PASSARGS  );
 }
 
 
-void _SwarmAdvectionInAPlane_Construct( void* swarmAdvector, Stg_ComponentFactory* cf, void* data) {
+void _SwarmAdvectionInAPlane_AssignFromXML( void* swarmAdvector, Stg_ComponentFactory* cf, void* data) {
 	SwarmAdvectionInAPlane*	            self          = (SwarmAdvectionInAPlane*) swarmAdvector;
 	int							whichaxis;
-	_SwarmAdvector_Construct( self, cf, data );
+	_SwarmAdvector_AssignFromXML( self, cf, data );
 	/* Everything except whichaxis constructed by parent already */
 	whichaxis = Stg_ComponentFactory_GetInt( cf, self->name, "whichaxis",  1 );
 	_SwarmAdvectionInAPlane_Init( self, whichaxis );
@@ -245,5 +206,7 @@ Bool _SwarmAdvectionInAPlane_TimeDeriv( void* swarmAdvector, Index array_I, doub
 /*-------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
 */
+
+
 
 

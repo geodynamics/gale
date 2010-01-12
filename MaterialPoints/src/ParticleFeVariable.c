@@ -60,105 +60,50 @@ char* ParticleFeVariable_names[10];
 int ParticleFeVariable_nNames = 0;
 int ParticleFeVariable_curName = 0;
 
-ParticleFeVariable* _ParticleFeVariable_New(
- 		SizeT                                             _sizeOfSelf,
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-		Name                                              name )
-{
-	ParticleFeVariable*		self;
+ParticleFeVariable* _ParticleFeVariable_New(  PARTICLEFEVARIABLE_DEFARGS  ) {
+	ParticleFeVariable* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ParticleFeVariable) );
-	self = (ParticleFeVariable*)
-		_FeVariable_New(
-			_sizeOfSelf, 
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute, 
-			_destroy,
-			name,
-			False,
-			_interpolateValueAt,
-			_getMinGlobalFeMagnitude, 
-			_getMaxGlobalFeMagnitude,
-			_getMinAndMaxLocalCoords, 
-			_getMinAndMaxGlobalCoords,
-			_interpolateWithinElement,
-			_getValueAtNode,
-			_FeVariable_SyncShadowValues, 
-			NULL,
-			NULL,
-			NULL,
-			NULL,   /* bcs */
-			NULL,   /* ics */
-			NULL,   /* linkedDofInfo */
-			NULL,   /* templateFeVariable */
-			0,      /* fieldComponentCount */
-			0,	/* dim */
-			True, /* isCheckpointedAndReloaded */
-			False,  /* use a reference solution from file */
-			False,  /* load the reference solution at each time step */
-			0,	/* communicator */
-			NULL	/* fv_Register */
-			);
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+	_syncShadowValues  = _FeVariable_SyncShadowValues;
+
+	self = (ParticleFeVariable*) _FeVariable_New(  FEVARIABLE_PASSARGS  );
 
 	self->_valueAtParticle = _valueAtParticle;
 	
 	return self;
 }
 
-void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm* swarm, FiniteElementContext* context ) 
-{
+void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm* swarm ) {
 	/* Create Vector */
 	self->assemblyVectorName = Stg_Object_AppendSuffix( self, "assemblyVector" );
-	self->assemblyVector = 
-		ForceVector_New( 
-			self->assemblyVectorName,
-			(FeVariable*) self, 
-			self->dim, 
-			context->entryPoint_Register, 
-			self->communicator );
-	self->assemblyTerm = ForceTerm_New( "assemblyTerm", self->assemblyVector, (Swarm*)swarm, (Stg_Component*) self );
+	self->assemblyVector = ForceVector_New( 
+		self->assemblyVectorName,
+		(FiniteElementContext*) self->context,
+		(FeVariable*) self, 
+		self->dim, 
+		self->context->entryPoint_Register, 
+		self->communicator );
+	self->assemblyTerm = ForceTerm_New( "assemblyTerm", (FiniteElementContext*) self->context, self->assemblyVector, (Swarm*)swarm, (Stg_Component*) self );
 
 	self->massMatrixName = Stg_Object_AppendSuffix( self, "massMatrix" );
-	self->massMatrix = 
-		ForceVector_New( 
-			self->massMatrixName,
-			(FeVariable*) self, 
-			self->dim, 
-			context->entryPoint_Register, 
-			self->communicator );
-	self->massMatrixForceTerm = 
-		ForceTerm_New( "massMatrixForceTerm", self->massMatrix, (Swarm*)swarm, (Stg_Component*) self );
+	self->massMatrix = ForceVector_New( 
+		self->massMatrixName,
+		(FiniteElementContext*) self->context,
+		(FeVariable*) self, 
+		self->dim, 
+		self->context->entryPoint_Register, 
+		self->communicator );
+	self->massMatrixForceTerm = ForceTerm_New( "massMatrixForceTerm", (FiniteElementContext*) self->context, self->massMatrix, (Swarm*)swarm, (Stg_Component*) self );
 	ForceTerm_SetAssembleElementFunction( self->massMatrixForceTerm, ParticleFeVariable_AssembleElementShapeFunc );
-	
    
    /* Changed by PatrickSunter, 8/7/2009 - used to append onto stokesEqn-execute. However
     * this component should work for other FE systems other than the Stokes solver */
-	EP_InsertClassHookBefore( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ), "TimeIntegrator_UpdateClass", _ParticleFeVariable_Execute, self );
+	EP_InsertClassHookBefore( Context_GetEntryPoint( self->context, AbstractContext_EP_UpdateClass ), "TimeIntegrator_UpdateClass", _ParticleFeVariable_Execute, self );
 	ParticleFeVariable_names[ParticleFeVariable_nNames++] = self->name;
 
 	self->useDeriv = False;
@@ -168,16 +113,6 @@ void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm*
 /* --- Virtual Function Implementations --- */
 void _ParticleFeVariable_Delete( void* materialFeVariable ) {
 	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
-
-	Memory_Free( self->data );
-
-	Stg_Class_Delete( self->assemblyVector );
-	Memory_Free( self->assemblyVectorName );
-	Stg_Class_Delete( self->assemblyTerm );
-
-	Stg_Class_Delete( self->massMatrix );
-	Memory_Free( self->massMatrixName );
-	Stg_Class_Delete( self->massMatrixForceTerm );
 
 	_FeVariable_Delete( self );
 }
@@ -194,27 +129,26 @@ void _ParticleFeVariable_Print( void* materialFeVariable, Stream* stream ) {
 	/* ParticleFeVariable info */
 }
 
-
 void* _ParticleFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	abort();
 	
 	return NULL;
 }
 
-void _ParticleFeVariable_Construct( void* materialFeVariable, Stg_ComponentFactory* cf, void* data ){
-	ParticleFeVariable*     self            = (ParticleFeVariable*) materialFeVariable;
-	IntegrationPointsSwarm* swarm;
-	FiniteElementContext*   context;
-	FeMesh*     mesh;
+void _ParticleFeVariable_AssignFromXML( void* materialFeVariable, Stg_ComponentFactory* cf, void* data ){
+	ParticleFeVariable*		self = (ParticleFeVariable*) materialFeVariable;
+	IntegrationPointsSwarm*	swarm;
+	FiniteElementContext*	context;
+	FeMesh*						mesh;
+
+	_FieldVariable_AssignFromXML( self, cf, data );
 
 	swarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", IntegrationPointsSwarm, True, data );
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
 	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", FeMesh, True, data );
 
-	/* Construct Parent */
-	_FieldVariable_Construct( self, cf, data );
 	_FeVariable_Init( (FeVariable*)self, mesh, NULL, NULL, NULL, NULL, NULL, NULL, False, False );
-	_ParticleFeVariable_Init( self, swarm, context );
+	_ParticleFeVariable_Init( self, swarm );
 }
 
 void _ParticleFeVariable_Build( void* materialFeVariable, void* data ) {
@@ -279,14 +213,21 @@ void _ParticleFeVariable_Execute( void* materialFeVariable, void* _ctx ) {
 void _ParticleFeVariable_Destroy( void* materialFeVariable, void* data ) {
 	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
 
+	Memory_Free( self->assemblyVectorName );
+	Memory_Free( self->massMatrixName );
+	Memory_Free( self->data );
+
+	Stg_Component_Destroy( self->assemblyVector, data, False );
+	Stg_Component_Destroy( self->assemblyTerm, data, False );
+
+	Stg_Component_Destroy( self->massMatrix, data, False );
+	Stg_Component_Destroy( self->massMatrixForceTerm, data, False );
+
 	_FeVariable_Destroy( self, data );
 }
 
-
 void ParticleFeVariable_Update( void* materialFeVariable ) {
 	ParticleFeVariable* self = (ParticleFeVariable*) materialFeVariable;
-
-	/* printf( "***\n*** Updating %s\n***\n", self->name );   Why - shouldn't this be done properly ?? */
 
 	/* Initialise Vectors */
 	VecSet( self->assemblyVector->vector, 0.0 );
@@ -300,12 +241,11 @@ void ParticleFeVariable_Update( void* materialFeVariable ) {
 	SolutionVector_UpdateSolutionOntoNodes( self->assemblyVector );
 }
 
-void ParticleFeVariable_AssembleElement( void* _forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVector ) 
-{
+void ParticleFeVariable_AssembleElement( void* _forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVector ) {
 	ForceTerm*                 forceTerm         = (ForceTerm*) _forceTerm;
 	ParticleFeVariable*        self              = Stg_CheckType( forceVector->feVariable, ParticleFeVariable );
 	IntegrationPointsSwarm*    swarm             = (IntegrationPointsSwarm*)forceTerm->integrationSwarm;
-	FeMesh*        		   mesh              = self->feMesh;
+	FeMesh*							mesh              = self->feMesh;
 	Element_NodeIndex          elementNodeCount  = FeMesh_GetElementNodeSize( mesh, lElement_I );
 	ElementType*               elementType       = FeMesh_GetElementType( mesh, lElement_I );
 	Cell_Index                 cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
@@ -344,7 +284,7 @@ void ParticleFeVariable_AssembleElementShapeFunc( void* _forceTerm, ForceVector*
 	ForceTerm*                 forceTerm         = (ForceTerm*) _forceTerm;
 	ParticleFeVariable*        self              = Stg_CheckType( forceVector->feVariable, ParticleFeVariable );
 	Swarm*                     swarm             = forceTerm->integrationSwarm;
-	FeMesh*        		   mesh              = self->feMesh;
+	FeMesh*							mesh              = self->feMesh;
 	Element_NodeIndex          elementNodeCount  = FeMesh_GetElementNodeSize( mesh, lElement_I );
 	ElementType*               elementType       = FeMesh_GetElementType( mesh, lElement_I );
 	Cell_Index                 cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
@@ -374,3 +314,5 @@ void ParticleFeVariable_AssembleElementShapeFunc( void* _forceTerm, ForceVector*
 		}
 	}
 }
+
+

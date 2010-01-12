@@ -57,65 +57,17 @@
 
 const Type OneToManyMapper_Type = "OneToManyMapper";
 
-OneToManyMapper* _OneToManyMapper_New(
-		SizeT                                                           _sizeOfSelf,
-		Type                                                            type,
-		Stg_Class_DeleteFunction*                                       _delete,
-		Stg_Class_PrintFunction*                                        _print,
-		Stg_Class_CopyFunction*                                         _copy,
-		Stg_Component_DefaultConstructorFunction*                       _defaultConstructor,
-		Stg_Component_ConstructFunction*                                _construct,
-		Stg_Component_BuildFunction*                                    _build,
-		Stg_Component_InitialiseFunction*                               _initialise,
-		Stg_Component_ExecuteFunction*                                  _execute,
-		Stg_Component_DestroyFunction*                                  _destroy,
-		IntegrationPointMapper_MapFunction*                             _map,
-		IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms,
-		IntegrationPointMapper_GetMaterialIndexOnFunction*              _getMaterialIndexOn,
-		IntegrationPointMapper_GetExtensionOnFunction*                  _getExtensionOn,
-                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension,
-                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial,
-		Name                                                            name,
-		Bool                                                            initFlag,
-		IntegrationPointsSwarm*                                         integrationSwarm,
-		MaterialPointsSwarm*                                            materialSwarm )
-{
+OneToManyMapper* _OneToManyMapper_New( ONETOMANYMAPPER_DEFARGS ) {
 	OneToManyMapper* result;
 
-	result = (OneToManyMapper*)_IntegrationPointMapper_New(
-					_sizeOfSelf,
-					type,
-					_delete,
-					_print,
-					_copy,
-					_defaultConstructor,
-					_construct,
-					_build,
-					_initialise,
-					_execute,
-					_destroy,
-					_map,
-					_getMaterialPointsSwarms,
-					_getMaterialIndexOn,
-					_getExtensionOn,
-					_getDoubleFromExtension,
-					_getDoubleFromMaterial,
-					name,
-					initFlag,
-					integrationSwarm );
-
-	if (initFlag) {
-		_OneToManyMapper_Init( result, integrationSwarm, materialSwarm );
-	}
+	result = (OneToManyMapper*)_IntegrationPointMapper_New( INTEGRATIONPOINTMAPPER_PASSARGS );
 		
 	return result;
 }
 
-void _OneToManyMapper_Init( void* mapper, IntegrationPointsSwarm* integrationSwarm, MaterialPointsSwarm* materialSwarm ) {
+void _OneToManyMapper_Init( void* mapper, MaterialPointsSwarm* materialSwarm ) {
 	OneToManyMapper* self = (OneToManyMapper*)mapper;
 
-	_IntegrationPointMapper_Init( mapper, integrationSwarm );
-	
 	self->errorStream = Journal_MyStream( Error_Type, self );
 	self->materialSwarm = materialSwarm;
 
@@ -129,8 +81,6 @@ void _OneToManyMapper_Init( void* mapper, IntegrationPointsSwarm* integrationSwa
 
 void _OneToManyMapper_Delete( void* mapper ) {
 	OneToManyMapper* self = (OneToManyMapper*)mapper;
-
-	Stg_Class_Delete( self->materialSwarm );
 	
 	_IntegrationPointMapper_Delete( self );
 }
@@ -152,11 +102,11 @@ void* _OneToManyMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, 
 	return newCopy;
 }
 
-void _OneToManyMapper_Construct( void* mapper, Stg_ComponentFactory* cf, void* data ) {
+void _OneToManyMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, void* data ) {
 	OneToManyMapper* self = (OneToManyMapper*)mapper;
 	MaterialPointsSwarm* materialSwarm;
 	
-	_IntegrationPointMapper_Construct( self, cf, data );
+	_IntegrationPointMapper_AssignFromXML( self, cf, data );
 
 	materialSwarm = Stg_ComponentFactory_ConstructByKey( 
 				cf, 
@@ -166,7 +116,7 @@ void _OneToManyMapper_Construct( void* mapper, Stg_ComponentFactory* cf, void* d
 				True,
 				data  );
 
-	_OneToManyMapper_Init( self, self->integrationSwarm, materialSwarm );
+	_OneToManyMapper_Init( self, materialSwarm );
 
 }
 
@@ -184,7 +134,14 @@ void _OneToManyMapper_Initialise( void* mapper, void* data ) {
 	Stg_Component_Initialise( self->materialSwarm, data, False );
 }
 void _OneToManyMapper_Execute( void* mapper, void* data ) {}
-void _OneToManyMapper_Destroy( void* mapper, void* data ) {}
+
+void _OneToManyMapper_Destroy( void* mapper, void* data ) {
+	OneToManyMapper* self = (OneToManyMapper*)mapper;
+
+	/*Stg_Class_Delete( self->materialSwarm );*/
+
+	_IntegrationPointMapper_Destroy( self, data );
+}
 
 OneToManyRef* OneToManyMapper_GetMaterialRef( void* mapper, void* intPoint ) {
 	OneToManyMapper* self = (OneToManyMapper*)mapper;

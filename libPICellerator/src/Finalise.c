@@ -52,7 +52,7 @@
 #include <stdio.h>
 
 Bool PICellerator_Finalise( void ) {
-	if( !ToolboxesManager_IsInitialised( stgToolboxesManager, "PICellerator" ) ) {
+	if( ToolboxesManager_IsInitialised( stgToolboxesManager, "PICellerator" ) ) {
 		Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 		
 		PICellerator_Utils_Finalise();
@@ -65,3 +65,5 @@ Bool PICellerator_Finalise( void ) {
 		return False;
 	}
 }
+
+

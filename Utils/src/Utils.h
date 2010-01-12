@@ -41,8 +41,8 @@
 */
 
 
-#ifndef __PICellerator_Utils_h__
-#define __PICellerator_Utils_h__
+#ifndef __PICellerator_Utils_Utils_h__
+#define __PICellerator_Utils_Utils_h__
 
 	#include "types.h"
 	#include "BuoyancyForceTerm.h"

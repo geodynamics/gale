@@ -49,53 +49,14 @@
 
 const Type PICellerator_Toolbox_Type = "PICellerator_Toolbox";
 
-void _PICellerator_Toolbox_Construct( void* component, Stg_ComponentFactory* cf, void* ptrToContext ) {
-	PICelleratorContext*		context;
-	AbstractContext**		ptrToSelf;
-	AbstractContext*		curContext;
- 
-	/* Get the existing context, as defined by StGermain, or an alternative toolbox. */
-	ptrToSelf = (AbstractContext**)ptrToContext;
-	curContext = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, ptrToSelf ); 
-
-
-	/* Only need to initialise a new context, and copy all relevant registers over IF this is the first toolbox */
-        /* to be constructed. */
-        /* The first toolbox to be constructed is Guaranteed to have the 'largest' context. */
-        /*                       (ie is an inherited child of ALL other toolbox about to be loaded) */
-        if( curContext->type == AbstractContext_Type ) {
-		/* Create a new, empty FiniteElementContext. */
-		context = PICelleratorContext_New( curContext->name, 0, 0, curContext->communicator, curContext->dictionary );
-		Memory_CountInc( context );
-
-                context->dictionary = curContext->dictionary;
-                /* Need to get the old CF from curContext, and use that in my new context. */
-                /* Now I CANNOT delete this curContext or I'll lose the CF. :( */
-                context->CF = curContext->CF;
-
-                /* Need to get the LCRegister componentList, and replace the existing (abstract) context */
-                /* with the newly created (PICellerator) context!!! */
-                Stg_ObjectList_Replace( 
-			context->CF->LCRegister->componentList,
-			((Stg_Component*) curContext)->name,
-			KEEP,
-			(Stg_Component*) context);
-
-                /* Recreate the registerRegister link in CF. */
-                context->CF->registerRegister = context->register_Register;
-        } /* close of if( prevContext->type == AbstractContext_Type) */
-	else { /* curContext was NOT an abstract context -> that is does NOT need to be replaced */
-		context = (PICelleratorContext*)curContext;
-	}
-	
-	*ptrToSelf = (AbstractContext*)context;
+void _PICellerator_Toolbox_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 }
 
 void* _PICellerator_Toolbox_DefaultNew( Name name ) {
 	return Codelet_New(
 			PICellerator_Toolbox_Type,
 			_PICellerator_Toolbox_DefaultNew,
-			_PICellerator_Toolbox_Construct,
+			_PICellerator_Toolbox_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,
@@ -116,4 +77,6 @@ void PICellerator_Toolbox_Finalise( PluginsManager* pluginsManager ) {
 Index PICellerator_Toolbox_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, PICellerator_Toolbox_Type, "0", _PICellerator_Toolbox_DefaultNew );
 }
+
+
 

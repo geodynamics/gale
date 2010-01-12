@@ -58,6 +58,9 @@
 	
 	
 	extern const Type Materials_Register_Type;
+
+	/* global, default instantiation of this register (created in Init.c) */
+	extern Materials_Register* materials_Register;
 	
 	#define __Materials_Register \
 		__NamedObject_Register

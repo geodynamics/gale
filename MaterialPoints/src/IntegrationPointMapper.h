@@ -40,21 +40,21 @@
 **
 */
 /** \file
-**  Role:
-**     Abstract way to map integration points to a material properties.
-**     Under this scheme, IntegrationPointsSwarms are essentailly 'virtual' swarms that are generated/mapped 
-**     (and then reused/updated) at everytime time from the information obtained from MaterialPointsSwarm(s). 
-**     MaterialPointsSwarm can undergo advection which makes it very dynamic.
-**
-**     This provides an abstract interface to access integration and material point properties.
-**
-** Assumptions:
-**
-** Comments:
-**
-** $Id: IntegrationPointMapper.h 189 2005-10-20 00:39:29Z RobertTurnbull $
-**
-**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+ **  Role:
+ **     Abstract way to map integration points to a material properties.
+ **     Under this scheme, IntegrationPointsSwarms are essentailly 'virtual' swarms that are generated/mapped 
+ **     (and then reused/updated) at everytime time from the information obtained from MaterialPointsSwarm(s). 
+ **     MaterialPointsSwarm can undergo advection which makes it very dynamic.
+ **
+ **     This provides an abstract interface to access integration and material point properties.
+ **
+ ** Assumptions:
+ **
+ ** Comments:
+ **
+ ** $Id: IntegrationPointMapper.h 189 2005-10-20 00:39:29Z RobertTurnbull $
+ **
+ **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifndef __PICellerator_MaterialPoints_IntegrationPointMapper_h__
 #define __PICellerator_MaterialPoints_IntegrationPointMapper_h__
@@ -72,134 +72,144 @@
 	typedef Material_Index (IntegrationPointMapper_GetMaterialIndexOnFunction) ( void* mapper, void* point );
 
 	/** @see IntegrationPointMapper_GetExtensionOn */
-	typedef void* (IntegrationPointMapper_GetExtensionOnFunction) ( 
-				void*                   mapper, 
-				void*                   points, 
-				ExtensionInfo_Index     extHandle );
+	typedef void* (IntegrationPointMapper_GetExtensionOnFunction) ( void* mapper, void* points, ExtensionInfo_Index extHandle );
 
-	typedef double (IntegrationPointMapper_GetDoubleFromExtension)(
+    typedef double (IntegrationPointMapper_GetDoubleFromExtension)(
 	    void*                   mapper,
 	    void*                   intPoint,
 	    ExtensionInfo_Index     extHandle,
 	    int                     offs );
 
-        typedef double (IntegrationPointMapper_GetDoubleFromMaterial)(
+    typedef double (IntegrationPointMapper_GetDoubleFromMaterial)(
 	    void*                   mapper,
 	    void*                   intPoint,
 	    ExtensionInfo_Index     extHandle,
 	    int                     offs );
-
+	
 	/* IntegrationPointMapper information */
 	#define __IntegrationPointMapper \
 		__Stg_Component \
 		\
+		PICelleratorContext*													context; \
 		/* Virtual functions */ \
-		IntegrationPointMapper_MapFunction*                             _map; \
-		IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms; \
-		IntegrationPointMapper_GetMaterialIndexOnFunction*              _getMaterialIndexOn; \
-		IntegrationPointMapper_GetExtensionOnFunction*                  _getExtensionOn; \
-                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension; \
-                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial; \
+		IntegrationPointMapper_MapFunction*								_map; \
+		IntegrationPointMapper_GetMaterialPointsSwarmsFunction*	_getMaterialPointsSwarms; \
+		IntegrationPointMapper_GetMaterialIndexOnFunction*			_getMaterialIndexOn; \
+		IntegrationPointMapper_GetExtensionOnFunction*				_getExtensionOn; \
+        IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension; \
+        IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial; \
 		\
 		/* General info */ \
-		IntegrationPointsSwarm*                                     integrationSwarm;
+		IntegrationPointsSwarm*												integrationSwarm;
 
 	struct IntegrationPointMapper { __IntegrationPointMapper };
-	
+
+
 	
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Constructors
 	*/
-	IntegrationPointMapper* _IntegrationPointMapper_New(
-		SizeT                                                           _sizeOfSelf, 
-		Type                                                            type,
-		Stg_Class_DeleteFunction*                                       _delete,
-		Stg_Class_PrintFunction*                                        _print,
-		Stg_Class_CopyFunction*                                         _copy, 
-		Stg_Component_DefaultConstructorFunction*                       _defaultConstructor,
-		Stg_Component_ConstructFunction*                                _construct,
-		Stg_Component_BuildFunction*                                    _build,
-		Stg_Component_InitialiseFunction*                               _initialise,
-		Stg_Component_ExecuteFunction*                                  _execute,
-		Stg_Component_DestroyFunction*                                  _destroy,
-		IntegrationPointMapper_MapFunction*                             _map, 
-		IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms,
-		IntegrationPointMapper_GetMaterialIndexOnFunction*              _getMaterialIndexOn, 
-		IntegrationPointMapper_GetExtensionOnFunction*                  _getExtensionOn, 
-                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension,
-                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial,
-		Name                                                            name,
-		Bool                                                            initFlag,
-		IntegrationPointsSwarm*                                         integrationSwarm );
 
-	void _IntegrationPointMapper_Init( void* mapper, IntegrationPointsSwarm* integrationSwarm );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define INTEGRATIONPOINTMAPPER_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                IntegrationPointMapper_MapFunction*                                          _map, \
+                IntegrationPointMapper_GetMaterialPointsSwarmsFunction*  _getMaterialPointsSwarms, \
+                IntegrationPointMapper_GetMaterialIndexOnFunction*            _getMaterialIndexOn, \
+                IntegrationPointMapper_GetExtensionOnFunction*                    _getExtensionOn, \
+                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension, \
+                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial
+
+	#define INTEGRATIONPOINTMAPPER_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _map,                     \
+	        _getMaterialPointsSwarms, \
+	        _getMaterialIndexOn,      \
+	        _getExtensionOn, \
+            _getDoubleFromExtension, \
+            _getDoubleFromMaterial
+
+	IntegrationPointMapper* _IntegrationPointMapper_New(  INTEGRATIONPOINTMAPPER_DEFARGS  );
+
+	void _IntegrationPointMapper_Init( void* mapper, PICelleratorContext* context, IntegrationPointsSwarm* integrationSwarm );
 
 	void _IntegrationPointMapper_Delete( void* mapper );
+
 	void _IntegrationPointMapper_Print( void* mapper, Stream* stream );
+
 	#define IntegrationPointMapper_Copy( self ) \
 		(IntegrationPointMapper*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define IntegrationPointMapper_DeepCopy( self ) \
 		(IntegrationPointMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
+
 	void* _IntegrationPointMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-void _IntegrationPointMapper_Construct( void* mapper, Stg_ComponentFactory* cf, void* data ) ;
-	void _IntegrationPointMapper_Build( void* mapper, void* data ) ;
-	void _IntegrationPointMapper_Initialise( void* mapper, void* data ) ;
+	void _IntegrationPointMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, void* data );
+
+	void _IntegrationPointMapper_Build( void* mapper, void* data );
+
+	void _IntegrationPointMapper_Initialise( void* mapper, void* data );
+
 	void _IntegrationPointMapper_Execute( void* mapper, void* data );
-	void _IntegrationPointMapper_Destroy( void* mapper, void* data ) ;
+
+	void _IntegrationPointMapper_Destroy( void* mapper, void* data );
 	
 	/** Performs a mapping between the MaterialPointSwarms and IntegrationPointsSwarm */
 	void IntegrationPointMapper_Map( void* mapper );
 
 	/** Returns the MaterialPointsSwarm(s) involved in this mapping. Allocates memory so the result must be deleted.
-	 *     @param count Output parameter which stores the number of swarms returned */
+	 *		@param count Output parameter which stores the number of swarms returned */
 	MaterialPointsSwarm** IntegrationPointMapper_GetMaterialPointsSwarms( void* mapper, Index* count );
 	
 	/** Returns the material index associated with this integration point by mapping to physical material swarm(s) */
 	#ifdef MACRO_AS_FUNC
-		#define IntegrationPointMapper_GetMaterialIndexOn IntegrationPointMapper_GetMaterialIndexOnFunc
+	#define IntegrationPointMapper_GetMaterialIndexOn IntegrationPointMapper_GetMaterialIndexOnFunc
 	#else
-		#define IntegrationPointMapper_GetMaterialIndexOn IntegrationPointMapper_GetMaterialIndexOnMacro
+	#define IntegrationPointMapper_GetMaterialIndexOn IntegrationPointMapper_GetMaterialIndexOnMacro
 	#endif
 	#define IntegrationPointMapper_GetMaterialIndexOnMacro( mapper, point ) \
-			( (IntegrationPointMapper*)(mapper) )->_getMaterialIndexOn( (mapper), (point) ) 
+		( (IntegrationPointMapper*)(mapper) )->_getMaterialIndexOn( (mapper), (point) ) 
 	Material_Index IntegrationPointMapper_GetMaterialIndexOnFunc( void* mapper, void* point );
 
 	
 	/** Returns an extension associated with this integration point by mapping to physical material swarm(s) */
 	#ifdef MACRO_AS_FUNC
-		#define IntegrationPointMapper_GetExtensionOn IntegrationPointMapper_GetExtensionOnFunc
+	#define IntegrationPointMapper_GetExtensionOn IntegrationPointMapper_GetExtensionOnFunc
 	#else
-		#define IntegrationPointMapper_GetExtensionOn IntegrationPointMapper_GetExtensionOnMacro
+	#define IntegrationPointMapper_GetExtensionOn IntegrationPointMapper_GetExtensionOnMacro
 	#endif
 	#define IntegrationPointMapper_GetExtensionOnMacro( mapper, point, extHandle ) \
-			( (IntegrationPointMapper*)(mapper) )->_getExtensionOn( (mapper), (point), (extHandle) )
+		( (IntegrationPointMapper*)(mapper) )->_getExtensionOn( (mapper), (point), (extHandle) )
 	void* IntegrationPointMapper_GetExtensionOnFunc( void* mapper, void* point, ExtensionInfo_Index extHandle );
 
 
 	/** Returns the material index associated with this integration point index by mapping to physical material swarm(s) */
 	#ifdef MACRO_AS_FUNC
-		#define IntegrationPointMapper_GetMaterialIndexAt IntegrationPointMapper_GetMaterialIndexAtFunc
+	#define IntegrationPointMapper_GetMaterialIndexAt IntegrationPointMapper_GetMaterialIndexAtFunc
 	#else
-		#define IntegrationPointMapper_GetMaterialIndexAt IntegrationPointMapper_GetMaterialIndexAtMacro
+	#define IntegrationPointMapper_GetMaterialIndexAt IntegrationPointMapper_GetMaterialIndexAtMacro
 	#endif
 	#define IntegrationPointMapper_GetMaterialIndexAtMacro( mapper, point_I ) \
-			IntegrationPointMapper_GetMaterialIndexOn( \
-					(mapper), \
-					Swarm_ParticleAt( ((IntegrationPointMapper*)mapper)->integrationSwarm, point_I ) )
+		IntegrationPointMapper_GetMaterialIndexOn( \
+        (mapper), \
+        Swarm_ParticleAt( ((IntegrationPointMapper*)mapper)->integrationSwarm, point_I ) )
 	Material_Index IntegrationPointMapper_GetMaterialIndexAtFunc( void* mapper, Index point_I );
 	
 	/** Returns an extension associated with this integration point index by mapping to physical material swarm(s) */
 	#ifdef MACRO_AS_FUNC
-		#define IntegrationPointMapper_GetExtensionAt
+	#define IntegrationPointMapper_GetExtensionAt
 	#else
-		#define IntegrationPointMapper_GetExtensionAt
+	#define IntegrationPointMapper_GetExtensionAt
 	#endif
 	#define IntegrationPointMapper_GetExtensionAtMacro( mapper, point_I, extHandle ) \
-			IntegrationPointMapper_GetExtensionOn( \
-					(mapper), \
-					Swarm_ParticleAt( ((IntegrationPointMapper*)mapper)->integrationSwarm, point_I ), \
-					extHandle )
+		IntegrationPointMapper_GetExtensionOn( \
+			(mapper), \
+			Swarm_ParticleAt( ((IntegrationPointMapper*)mapper)->integrationSwarm, point_I ), \
+			extHandle )
 	void* IntegrationPointMapper_GetExtensionAtFunc( void* mapper, Index point_I, ExtensionInfo_Index extHandle );
 
 
@@ -210,3 +220,4 @@ void _IntegrationPointMapper_Construct( void* mapper, Stg_ComponentFactory* cf, 
     ((IntegrationPointMapper*)mapper)->_getDoubleFromMaterial(mapper, intPoint, extHandle, offs);
 
 #endif
+

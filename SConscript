@@ -85,7 +85,7 @@ env.Install('include/PICellerator', Glob('libPICellerator/src/*.h'))
 #
 
 dirs = Split('libPICellerator/Toolbox plugins/CalculateParticleDisplacement ' \
-             'plugins/Output/MaterialCentroid')
+             'plugins/Output/MaterialCentroid  SysTest/AnalyticPlugins/AnalyticPressure' )
 pl_objs = []
 pl_regs = []
 for d in dirs:
@@ -227,10 +227,15 @@ if env['static_libs']:
 env.PCUTest('tests/testPICellerator', suites,
             PCU_LIBHEADERS="#include <StGermain/StGermain.h>\n#include <StgDomain/StgDomain.h>\n" \
                 "#include <StgFEM/StgFEM.h>\n#include <PICellerator/PICellerator.h>",
-            PCU_SETUP="StGermain_Init(&argc, &argv);StgDomain_Init(&argc, &argv);" \
-                "StgFEM_Init(&argc, &argv);PICellerator_Init(&argc, &argv);",
-            PCU_TEARDOWN="PICellerator_Finalise();StgFEM_Finalise();" \
-                "StgDomain_Finalise();StGermain_Finalise();",
+            PCU_SETUP="StGermain_Init(&argc, &argv);\nStgDomain_Init(&argc, &argv);\n" \
+                "StgFEM_Init(&argc, &argv);\nPICellerator_Init(&argc, &argv);\n\n" \
+                "#ifdef NOSHARED\n" \
+                "   picellerator_register_static_modules();\n" \
+                "   stgfem_register_static_modules();\n" \
+                "   stgdomain_register_static_modules();\n" \
+                "#endif",
+            PCU_TEARDOWN="PICellerator_Finalise();\nStgFEM_Finalise();\n" \
+                "StgDomain_Finalise();\nStGermain_Finalise();",
             LIBS=libs,
             PCU_EXP=tst_exp,
             PCU_INPUT=tst_input,
@@ -241,3 +246,5 @@ env.PCUTest('tests/testPICellerator', suites,
 #
 
 env.Install('lib/StGermain/PICellerator', Glob('Apps/src/*.xml'))
+
+env.IntegrationTest('SysTest/RegressionTests/testAll.py')

@@ -45,16 +45,16 @@
 #define __PICellerator_Utils_BuoyancyForceTermThermoChem_h__
 
 	typedef double (BuoyancyForceTermThermoChem_CalcRaTFunction) (
-				void* forceTerm, 
-				Swarm* swarm, 
-				Element_LocalIndex lElement_I, 
-				void* particle );
+		void* forceTerm, 
+		Swarm* swarm, 
+		Element_LocalIndex lElement_I, 
+		void* particle );
 
 	typedef double (BuoyancyForceTermThermoChem_CalcRaCFunction) (
-				void* forceTerm, 
-				Swarm* swarm, 
-				Element_LocalIndex lElement_I, 
-				void* particle );
+		void* forceTerm, 
+		Swarm* swarm, 
+		Element_LocalIndex lElement_I, 
+		void* particle );
 
 	/** Textual name of this class */
 	extern const Type BuoyancyForceTermThermoChem_Type;
@@ -69,77 +69,85 @@
 		__ForceTerm \
 		\
 		/* Virtual info */ \
-		BuoyancyForceTermThermoChem_CalcRaTFunction*              _calcRaT;                          \
+		BuoyancyForceTermThermoChem_CalcRaTFunction* _calcRaT; \
 		\
-		BuoyancyForceTermThermoChem_CalcRaCFunction*              _calcRaC;                          \
+		BuoyancyForceTermThermoChem_CalcRaCFunction* _calcRaC; \
 		\
 		/* BuoyancyForceTermThermoChem info */ \
-		FeVariable*                                         temperatureField;                  \
-		double                                              RaT;                           \
-		double                                              RaC;                           \
-		Bool                                                adjust;                            \
-		Materials_Register*                                 materials_Register;                \
-		ExtensionInfo_Index                                 materialExtHandle;                 \
-		MaterialSwarmVariable**                             densitySwarmVariables;             \
-		Index                                               materialSwarmCount;
+		FeVariable*												temperatureField; \
+		double													RaT; \
+		double													RaC; \
+		Bool														adjust; \
+		Materials_Register*									materials_Register; \
+		ExtensionInfo_Index									materialExtHandle; \
+		MaterialSwarmVariable**								densitySwarmVariables; \
+		Index														materialSwarmCount;
 
 	struct BuoyancyForceTermThermoChem { __BuoyancyForceTermThermoChem };
 
 	BuoyancyForceTermThermoChem* BuoyancyForceTermThermoChem_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         temperatureField,
-		double                                              RaT,
-		double                                              RaC,
-		Bool                                                adjust,
-		Materials_Register*                                 materials_Register );
+		Name							name,
+		FiniteElementContext*	context,
+		ForceVector*				forceVector,
+		Swarm*						integrationSwarm,
+		FeVariable*					temperatureField,
+		double						RaT,
+		double						RaC,
+		Bool							adjust,
+		Materials_Register*		materials_Register );
 
-	BuoyancyForceTermThermoChem* _BuoyancyForceTermThermoChem_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		ForceTerm_AssembleElementFunction*                  _assembleElement,		
-		BuoyancyForceTermThermoChem_CalcRaTFunction*              _calcRaT,
-		BuoyancyForceTermThermoChem_CalcRaCFunction*              _calcRaC,
-		Name                                                name );
 	
-	void BuoyancyForceTermThermoChem_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		FeVariable*                                         temperatureField,
-		double                                              RaT,
-		double                                              RaC,
-		Bool                                                adjust,
-		Materials_Register*                                 materials_Register );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
+	#define BUOYANCYFORCETERMTHERMOCHEM_DEFARGS \
+                FORCETERM_DEFARGS, \
+                BuoyancyForceTermThermoChem_CalcRaTFunction*  _calcRaT, \
+                BuoyancyForceTermThermoChem_CalcRaCFunction*  _calcRaC
+
+	#define BUOYANCYFORCETERMTHERMOCHEM_PASSARGS \
+                FORCETERM_PASSARGS, \
+	        _calcRaT, \
+	        _calcRaC
+
+	BuoyancyForceTermThermoChem* _BuoyancyForceTermThermoChem_New(  BUOYANCYFORCETERMTHERMOCHEM_DEFARGS  );
+
+	void _BuoyancyForceTermThermoChem_Init(
+		BuoyancyForceTermThermoChem*  self, 
+		FeVariable*                   temperatureField,
+		double                        RaT,
+		double                        RaC,
+		Bool                          adjust,
+		Materials_Register*           materials_Register );
+	
 	void _BuoyancyForceTermThermoChem_Delete( void* forceTerm );
+
 	void _BuoyancyForceTermThermoChem_Print( void* forceTerm, Stream* stream );
 
-	void* _BuoyancyForceTermThermoChem_DefaultNew( Name name ) ;
-void _BuoyancyForceTermThermoChem_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
-	void _BuoyancyForceTermThermoChem_Build( void* forceTerm, void* data ) ;
-	void _BuoyancyForceTermThermoChem_Initialise( void* forceTerm, void* data ) ;
-	void _BuoyancyForceTermThermoChem_Execute( void* forceTerm, void* data ) ;
-	void _BuoyancyForceTermThermoChem_Destroy( void* forceTerm, void* data ) ;
+	void* _BuoyancyForceTermThermoChem_DefaultNew( Name name );
 
-	void _BuoyancyForceTermThermoChem_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) ;
-	double _BuoyancyForceTermThermoChem_CalcRaT( void* forceTerm, Swarm* swarm, Element_LocalIndex lElement_I, void* particle ) ;
+	void _BuoyancyForceTermThermoChem_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data );
+
+	void _BuoyancyForceTermThermoChem_Build( void* forceTerm, void* data );
+
+	void _BuoyancyForceTermThermoChem_Initialise( void* forceTerm, void* data );
+
+	void _BuoyancyForceTermThermoChem_Execute( void* forceTerm, void* data );
+
+	void _BuoyancyForceTermThermoChem_Destroy( void* forceTerm, void* data );
+
+	void _BuoyancyForceTermThermoChem_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec );
+
+	double _BuoyancyForceTermThermoChem_CalcRaT( void* forceTerm, Swarm* swarm, Element_LocalIndex lElement_I, void* particle );
+
 	#define BuoyancyForceTermThermoChem_CalcRaT( forceTerm, swarm, lElement_I, particle )\
 		(( (BuoyancyForceTermThermoChem*) forceTerm )->_calcRaT( forceTerm, swarm, lElement_I, particle ) )
 
-	double _BuoyancyForceTermThermoChem_CalcRaC( void* forceTerm, Swarm* swarm, Element_LocalIndex lElement_I, void* particle ) ;
+	double _BuoyancyForceTermThermoChem_CalcRaC( void* forceTerm, Swarm* swarm, Element_LocalIndex lElement_I, void* particle );
 
 	#define BuoyancyForceTermThermoChem_CalcRaC( forceTerm, swarm, lElement_I, particle )\
 		(( (BuoyancyForceTermThermoChem*) forceTerm )->_calcRaC( forceTerm, swarm, lElement_I, particle ) )
 
 #endif
+

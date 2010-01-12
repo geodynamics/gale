@@ -63,65 +63,24 @@
 const Type SwarmVariableField_Type = "SwarmVariableField";
 
 /* Creation implementation / Virtual constructor */
-SwarmVariableField* _SwarmVariableField_New( 
-		SizeT                                             _sizeOfSelf,  
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*             	  _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*             	  _getMinAndMaxGlobalCoords,
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*	  	  _getValueAtNode,
-		/*SwarmVariableField_GetValueAtNodeFunction*	  _getValueAtNode,*/
-		/*SwarmVariableField_ValueAtParticleFunction*       _valueAtParticle,*/
-		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-		Name                                              name ) 
+SwarmVariableField* _SwarmVariableField_New(  SWARMVARIABLEFIELD_DEFARGS  ) 
 {
 	SwarmVariableField* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(SwarmVariableField) );
 
-	self = (SwarmVariableField*) _ParticleFeVariable_New(
- 						_sizeOfSelf,
-						type,
-						_delete,
-						_print,
-						_copy, 
-						_defaultConstructor,
-						_construct,
-						_build,
-						_initialise,
-						_execute,
-						_destroy,
-						_interpolateValueAt,
-						_getMinGlobalFeMagnitude,
-						_getMaxGlobalFeMagnitude,
-						_getMinAndMaxLocalCoords,
-						_getMinAndMaxGlobalCoords,		
-						_interpolateWithinElement,	
-						_getValueAtNode,
-						_valueAtParticle,
-						name );
+	self = (SwarmVariableField*) _ParticleFeVariable_New(  PARTICLEFEVARIABLE_PASSARGS  );
 	/* Virtual info */
 	
 	return self;
 }
 
-void _SwarmVariableField_Init( SwarmVariableField* swarmVariableField, SwarmVariable* swarmVar, Variable_Register* variable_Register ) {
+void _SwarmVariableField_Init( SwarmVariableField* swarmVariableField, Variable_Register* variable_Register, Name swarmVarName, MaterialPointsSwarm*	materialSwarm ) {
 	SwarmVariableField* 	self 	= (SwarmVariableField*)swarmVariableField;
-	self->swarmVar = swarmVar;
 	self->variable_Register = variable_Register;
+	self->swarmVarName = swarmVarName;
+	self->materialSwarm = materialSwarm;
 }
 
 void _SwarmVariableField_Delete( void* swarmVariableField ) {
@@ -137,79 +96,78 @@ void _SwarmVariableField_Print( void* swarmVariableField, Stream* stream ) {
 }
 
 void* _SwarmVariableField_DefaultNew( Name name ) {
-	return (void*)_SwarmVariableField_New( 
-			sizeof(SwarmVariableField), 
-			SwarmVariableField_Type,
-			_SwarmVariableField_Delete,
-			_SwarmVariableField_Print,
-			NULL,
-			_SwarmVariableField_DefaultNew,
-			_SwarmVariableField_Construct,
-			_SwarmVariableField_Build,
-			_SwarmVariableField_Initialise,
-			_SwarmVariableField_Execute,
-			_SwarmVariableField_Destroy,
-			_FeVariable_InterpolateValueAt,
-			_FeVariable_GetMinGlobalFieldMagnitude,
-			_FeVariable_GetMaxGlobalFieldMagnitude,
-			_FeVariable_GetMinAndMaxLocalCoords,
-			_FeVariable_GetMinAndMaxGlobalCoords,
-			_FeVariable_InterpolateNodeValuesToElLocalCoord,
-			_FeVariable_GetValueAtNode,
-			/*_SwarmVariableField_GetValueAtNode,*/
-			_SwarmVariableField_ValueAtParticle,
-			name );
+	/* Variables set in this function */
+	SizeT                                                       _sizeOfSelf = sizeof(SwarmVariableField);
+	Type                                                               type = SwarmVariableField_Type;
+	Stg_Class_DeleteFunction*                                       _delete = _SwarmVariableField_Delete;
+	Stg_Class_PrintFunction*                                         _print = _SwarmVariableField_Print;
+	Stg_Class_CopyFunction*                                           _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*           _defaultConstructor = _SwarmVariableField_DefaultNew;
+	Stg_Component_ConstructFunction*                             _construct = _SwarmVariableField_AssignFromXML;
+	Stg_Component_BuildFunction*                                     _build = _SwarmVariableField_Build;
+	Stg_Component_InitialiseFunction*                           _initialise = _SwarmVariableField_Initialise;
+	Stg_Component_ExecuteFunction*                                 _execute = _SwarmVariableField_Execute;
+	Stg_Component_DestroyFunction*                                 _destroy = _SwarmVariableField_Destroy;
+	FieldVariable_InterpolateValueAtFunction*           _interpolateValueAt = _FeVariable_InterpolateValueAt;
+	FieldVariable_GetCoordFunction*                _getMinAndMaxLocalCoords = _FeVariable_GetMinAndMaxLocalCoords;
+	FieldVariable_GetCoordFunction*               _getMinAndMaxGlobalCoords = _FeVariable_GetMinAndMaxGlobalCoords;
+	FeVariable_InterpolateWithinElementFunction*  _interpolateWithinElement = _FeVariable_InterpolateNodeValuesToElLocalCoord;
+	FeVariable_GetValueAtNodeFunction*                      _getValueAtNode = _FeVariable_GetValueAtNode;
+	ParticleFeVariable_ValueAtParticleFunction*            _valueAtParticle = (ParticleFeVariable_ValueAtParticleFunction*)_SwarmVariableField_ValueAtParticle;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType                             nameAllocationType = ZERO;
+	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = ZERO;
+	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
+	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
+
+	return (void*)_SwarmVariableField_New(  SWARMVARIABLEFIELD_PASSARGS  );
 }
 
-void _SwarmVariableField_Construct( void* swarmVariableField, Stg_ComponentFactory* cf, void* data ) {
-	SwarmVariableField*     	self		= (SwarmVariableField*)swarmVariableField;
-	SwarmVariable*			swarmVar;
-	IntegrationPointsSwarm* 	integrationSwarm;
-	FiniteElementContext*		context;
+void _SwarmVariableField_AssignFromXML( void* swarmVariableField, Stg_ComponentFactory* cf, void* data ) {
+	SwarmVariableField*		self = (SwarmVariableField*)swarmVariableField;
+	IntegrationPointsSwarm*	integrationSwarm;
 	Variable_Register*		variable_Register;
+   Name			            swarmVarName;
+   MaterialPointsSwarm*	   materialSwarm;
+	_ParticleFeVariable_AssignFromXML( self, cf, data );
 
-	variable_Register = (Variable_Register*) Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
-
-	/* Construct Parent */
-	_ParticleFeVariable_Construct( self, cf, data );
+	variable_Register = self->context->variable_Register; 
 
 	// TODO: just get the textual name here - see gLucifer's SwarmPlotter DrawignObject 
-	self->swarmVarName = Stg_ComponentFactory_GetString( cf, self->name, "swarmVariable", "" );
-	assert( swarmVar );
+	swarmVarName = Stg_ComponentFactory_GetString( cf, self->name, "swarmVariable", "" );
 
-	self->materialSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialSwarm", MaterialPointsSwarm, True, data );
-
+	materialSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialSwarm", MaterialPointsSwarm, True, data );
 	integrationSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", IntegrationPointsSwarm, True, NULL );
 	assert( integrationSwarm );
 
-	context = (FiniteElementContext*) Stg_ComponentFactory_ConstructByKey( cf, self->name, "context", FiniteElementContext, True, data );
-	
-	assert( context );
-
-	_SwarmVariableField_Init( self, swarmVar, variable_Register );
-	_ParticleFeVariable_Init( self, integrationSwarm, context );
+	_SwarmVariableField_Init( self, variable_Register, swarmVarName, materialSwarm );
 }
 
 void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {
-	SwarmVariableField*	self	= (SwarmVariableField*)swarmVariableField;
-	Name			tmpName;
-	unsigned		nDomainVerts	= Mesh_GetDomainSize( self->feMesh, MT_VERTEX );
+	SwarmVariableField*	      self	            = (SwarmVariableField*)swarmVariableField;
+	unsigned		               nDomainVerts      = Mesh_GetDomainSize( self->feMesh, MT_VERTEX );
+	SwarmVariable_Register*		swarmVar_Register	= self->materialSwarm->swarmVariable_Register;
+	Stream*				         errorStream		   = Journal_Register( Error_Type, self->type );
+	Name			               tmpName;
 
+	Stg_Component_Build( self->materialSwarm, data, False );
 	/* make this more flexible to handle vector values at each node - will have to get the num dofs from the XML
 	 * as other components are not necessarily built yet... dave. 03.10.07 */
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
 	self->dataVariable = Variable_NewScalar( tmpName,
-		       				 Variable_DataType_Double,
-						 &nDomainVerts,
-						 NULL,
-						 (void**)&self->data,
-						 self->variable_Register );
+		(AbstractContext*)self->context,
+		Variable_DataType_Double,
+		&nDomainVerts,
+		NULL,
+		(void**)&self->data,
+		self->variable_Register );
 	Memory_Free( tmpName );
 	self->fieldComponentCount = 1;
 
 	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
-	self->dofLayout = DofLayout_New( tmpName, self->variable_Register, 0, self->feMesh );
+	self->dofLayout = DofLayout_New( tmpName, self->context, self->variable_Register, 0, self->feMesh );
 
 	/* must build before adding the variable to the dof layout, dave. 04.10.07 */
 	//Stg_Component_Build( self->dofLayout, data, False );
@@ -220,6 +178,15 @@ void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {
 	
 	self->eqNum->dofLayout = self->dofLayout;
 
+	/* assign the swarm variable, assume its already built */
+	if( 0 != strcmp( self->swarmVarName, "" ) ) {
+		self->swarmVar = SwarmVariable_Register_GetByName( swarmVar_Register, self->swarmVarName );
+		Journal_Firewall( self->swarmVar != NULL, errorStream, "Error - cannot find swarm variable \"%s\" in %s() for swarm \"%s\".\n",
+			          self->swarmVarName, __func__, self->materialSwarm->name );
+
+		Stg_Component_Build( self->swarmVar, data, False );
+	}
+
 	_ParticleFeVariable_Build( self, data );
 	/* TODO: build self->swarmVar */
 	// TODO: granb self->SwarmVariableName out of the swarm vart register, save reference as self->swarmVar
@@ -228,22 +195,12 @@ void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {
 
 void _SwarmVariableField_Initialise( void* swarmVariableField, void* data ) {
 	SwarmVariableField*		self			= (SwarmVariableField*)swarmVariableField;
-	SwarmVariable_Register*		swarmVar_Register	= self->materialSwarm->swarmVariable_Register;
-	Stream*				errorStream		= Journal_Register( Error_Type, self->type );
 
-	/* assign the swarm variable, assume its already built */
-	if( 0 != strcmp( self->swarmVarName, "" ) ) {
-		self->swarmVar = SwarmVariable_Register_GetByName( swarmVar_Register, self->swarmVarName );
-		Journal_Firewall( self->swarmVar != NULL, errorStream, "Error - cannot find swarm variable \"%s\" in %s() for swarm \"%s\".\n",
-			          self->swarmVarName, __func__, self->materialSwarm->name );
+   Stg_Component_Initialise( self->materialSwarm, data, False );
 
-		Stg_Component_Build( self->swarmVar, data, False );
-		Stg_Component_Initialise( self->swarmVar, data, False );
-	}
+   if( self->swarmVar ) Stg_Component_Initialise( self->swarmVar, data, False );
 
 	_ParticleFeVariable_Initialise( self, data );
-
-	_SwarmVariable_Initialise( self->swarmVar, data );
 }
 
 void _SwarmVariableField_Execute( void* swarmVariableField, void* data ) {
@@ -251,28 +208,30 @@ void _SwarmVariableField_Execute( void* swarmVariableField, void* data ) {
 }
 
 void _SwarmVariableField_Destroy( void* swarmVariableField, void* data ) {
+	SwarmVariableField*		self			= (SwarmVariableField*)swarmVariableField;
+
+   Stg_Component_Destroy( self->materialSwarm, data, False );
+   if( self->swarmVar ) Stg_Component_Destroy( self->swarmVar, data, False );
+   
 	_ParticleFeVariable_Destroy( swarmVariableField, data );
 }
 
-void _SwarmVariableField_ValueAtParticle( void* swarmVariableField, 
-					  IntegrationPointsSwarm* swarm, 
-					  Element_LocalIndex lElement_I, 
-					  IntegrationPoint* particle,
-					  double* value ) 
+void _SwarmVariableField_ValueAtParticle(
+	void*							swarmVariableField, 
+	IntegrationPointsSwarm*	swarm, 
+	Element_LocalIndex		lElement_I, 
+	IntegrationPoint*			particle,
+	double*						value ) 
 {
-	SwarmVariableField*	self            = (SwarmVariableField*)swarmVariableField;
-	GlobalParticle*		matParticle;
-	double			distance;
-	Cell_Index		cell_I;
+	SwarmVariableField*	self = (SwarmVariableField*)swarmVariableField;
+	double					distance;
+	Cell_Index				cell_I;
 	Particle_InCellIndex	cParticle_I;
-	Particle_Index		lParticle_I;
+	Particle_Index			lParticle_I;
 
 	cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
-	cParticle_I = Swarm_FindClosestParticleInCell( swarm,
-		       				       cell_I,
-						       Mesh_GetDimSize( self->dofLayout->mesh ),
-						       particle->xi,
-						       &distance );
+	cParticle_I = Swarm_FindClosestParticleInCell( swarm, cell_I, Mesh_GetDimSize( self->dofLayout->mesh ), particle->xi, &distance );
+
 	// this function doesn't seem to be doing its joob properly!
 	//lParticle_I = IntegrationPointMapper_GetMaterialIndexAt( swarm->mapper, swarm->cellParticleTbl[cell_I][cParticle_I] );
 	
@@ -296,6 +255,8 @@ double _SwarmVariableField_GetMaxGlobalMagnitude( void* swarmVariableField ) {
 	return _SwarmVariable_GetMaxGlobalMagnitude( swarmVariableField );
 }
 */
+
+
 
 
 

@@ -78,47 +78,34 @@
 	** Constructors
 	*/
 	
-	MaterialPointsSwarm* MaterialPointsSwarm_New(
-		Name                                            name,
-		void*                                           cellLayout,
-		void*                                           particleLayout,
-		Dimension_Index                                 dim,
-		SizeT                                           particleSize,
-		FeMesh*                   	                     mesh,
-		EscapedRoutine*                                 escapedRoutine, 
-		Material*                                       material,
-		Variable_Register*                              swarmVariable_Register,
-		ExtensionManager_Register*                      extensionMgr_Register,
-		Materials_Register*                             materials_Register,		
-		MPI_Comm                                        comm);
+   MaterialPointsSwarm* MaterialPointsSwarm_New(
+      Name                                  name,
+      AbstractContext*                      context,
+      void*                                 cellLayout,
+      void*                                 particleLayout,
+      Dimension_Index                       dim,
+      SizeT                                 particleSize,
+      FeMesh*                               mesh,
+      EscapedRoutine*                       escapedRoutine, 
+      Material*                             material,
+      Variable_Register*                    swarmVariable_Register,
+      ExtensionManager_Register*            extensionMgr_Register,
+      Materials_Register*                   materials_Register,		
+      MPI_Comm                              comm,
+      void*                                 ics );
 		
-	MaterialPointsSwarm* _MaterialPointsSwarm_New(
-		SizeT                                           _sizeOfSelf, 
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy, 
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,		
-		Name                                            name,
-		Bool                                            initFlag,
-		CellLayout*                                     cellLayout,
-		ParticleLayout*                                 particleLayout,
-		Dimension_Index                                 dim,
-		SizeT                                           particleSize,
-		Particle_InCellIndex                            cellParticleTblDelta, 
-		double                                          extraParticlesFactor,
-		FeMesh*                   	                     mesh,
-		EscapedRoutine*                                 escapedRoutine, 
-		Material*                                       material,
-		Variable_Register*                              swarmVariable_Register,
-		ExtensionManager_Register*                      extensionMgr_Register,
-		Materials_Register*                             materials_Register,		
-		MPI_Comm                                        comm);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MATERIALPOINTSSWARM_DEFARGS \
+                SWARM_DEFARGS
+
+	#define MATERIALPOINTSSWARM_PASSARGS \
+                SWARM_PASSARGS
+
+	MaterialPointsSwarm* _MaterialPointsSwarm_New(  MATERIALPOINTSSWARM_DEFARGS  );
 
 	void _MaterialPointsSwarm_Delete( void* swarm );
 	void _MaterialPointsSwarm_Print( void* swarm, Stream* stream );
@@ -130,7 +117,7 @@
 	
 	void* _MaterialPointsSwarm_DefaultNew( Name name ) ;
 
-	void _MaterialPointsSwarm_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _MaterialPointsSwarm_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _MaterialPointsSwarm_Build( void* swarm, void* data ) ;
 	void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) ;
 	void _MaterialPointsSwarm_Execute( void* swarm, void* data );
@@ -171,3 +158,4 @@
 	void* MaterialPointsSwarm_GetExtensionAt( void* swarm, Index point_I, Index extHandle );
 	
 #endif
+

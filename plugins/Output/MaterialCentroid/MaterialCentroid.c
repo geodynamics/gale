@@ -109,7 +109,7 @@ void MaterialCentroid( PICelleratorContext* context ) {
 }
 
 
-void _PICellerator_MaterialCentroid_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _PICellerator_MaterialCentroid_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 
 	AbstractContext* context;
 
@@ -119,19 +119,23 @@ void _PICellerator_MaterialCentroid_Construct( void* component, Stg_ComponentFac
 
 
 void* _PICellerator_MaterialCentroid_DefaultNew( Name name ) {
-	return _Codelet_New(
-			sizeof( Codelet ),
-			PICellerator_MaterialCentroid_Type,
-			_Codelet_Delete,
-			_Codelet_Print,
-			_Codelet_Copy,
-			_PICellerator_MaterialCentroid_DefaultNew,
-			_PICellerator_MaterialCentroid_Construct,
-			_Codelet_Build,
-			_Codelet_Initialise,
-			_Codelet_Execute,
-			_Codelet_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( Codelet );
+	Type                                                      type = PICellerator_MaterialCentroid_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _PICellerator_MaterialCentroid_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _PICellerator_MaterialCentroid_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Codelet_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
 
 
@@ -143,3 +147,5 @@ Index PICellerator_MaterialCentroid_Register( PluginsManager* pluginsManager ) {
 
 	return result;
 }
+
+

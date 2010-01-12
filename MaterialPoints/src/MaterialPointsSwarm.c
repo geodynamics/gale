@@ -61,110 +61,80 @@
 const Type MaterialPointsSwarm_Type = "MaterialPointsSwarm";
 
 MaterialPointsSwarm* MaterialPointsSwarm_New(
-		Name                                  name,
-		void*                                 cellLayout,
-		void*                                 particleLayout,
-		Dimension_Index                       dim,
-		SizeT                                 particleSize,
-		FeMesh*                               mesh,
-		EscapedRoutine*                       escapedRoutine, 
-		Material*                             material,
-		Variable_Register*                    swarmVariable_Register,
-		ExtensionManager_Register*            extensionMgr_Register,
-		Materials_Register*                   materials_Register,		
-		MPI_Comm                              comm) 
+      Name                                  name,
+      AbstractContext*                      context,
+      void*                                 cellLayout,
+      void*                                 particleLayout,
+      Dimension_Index                       dim,
+      SizeT                                 particleSize,
+      FeMesh*                               mesh,
+      EscapedRoutine*                       escapedRoutine, 
+      Material*                             material,
+      Variable_Register*                    swarmVariable_Register,
+      ExtensionManager_Register*            extensionMgr_Register,
+      Materials_Register*                   materials_Register,		
+      MPI_Comm                              comm,
+      void*                                 ics_dummy ) 
 {
-	MaterialPointsSwarm* self = (MaterialPointsSwarm*) _MaterialPointsSwarm_DefaultNew( name );
-	
-	self->particleSize = particleSize;
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(MaterialPointsSwarm);
+	Type                                                      type = MaterialPointsSwarm_Type;
+	Stg_Class_DeleteFunction*                              _delete = _MaterialPointsSwarm_Delete;
+	Stg_Class_PrintFunction*                                _print = _MaterialPointsSwarm_Print;
+	Stg_Class_CopyFunction*                                  _copy = _MaterialPointsSwarm_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _MaterialPointsSwarm_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _MaterialPointsSwarm_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _MaterialPointsSwarm_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _MaterialPointsSwarm_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _MaterialPointsSwarm_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _MaterialPointsSwarm_Destroy;
 
-	/* 	MaterialPointsSwarm_InitAll */
-	_Swarm_Init(  	(Swarm*)self, 
-			cellLayout, 
-			particleLayout, 
-			dim, 
-			DEFAULT_CELL_PARTICLE_TBL_DELTA,
-			DEFAULT_EXTRA_PARTICLES_FACTOR,
-			extensionMgr_Register,
-			swarmVariable_Register, 
-			comm,
-			NULL );
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+	void*                          ics = ZERO;
 
-	_MaterialPointsSwarm_Init(	self, 
-					mesh, 
-					escapedRoutine, 
-					material, 
-					materials_Register);
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Particle_InCellIndex  cellParticleTblDelta = DEFAULT_CELL_PARTICLE_TBL_DELTA;
+	double                extraParticlesFactor = DEFAULT_EXTRA_PARTICLES_FACTOR;
 
-	return self;
+  MaterialPointsSwarm* self = _MaterialPointsSwarm_New(  MATERIALPOINTSSWARM_PASSARGS  );
+
+   _Swarm_Init( 
+         (Swarm*)self, context,
+         cellLayout,
+         particleLayout,
+         dim,
+         particleSize,
+         cellParticleTblDelta,
+         extraParticlesFactor,
+         extensionMgr_Register,
+         swarmVariable_Register,
+         comm, 
+         ics_dummy );
+
+   _MaterialPointsSwarm_Init( 
+      self, 
+      mesh,
+      escapedRoutine, 
+      material,
+      materials_Register );
+
+   return self;
 }
 
 
-MaterialPointsSwarm* _MaterialPointsSwarm_New(
-		SizeT                                           _sizeOfSelf,
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy,
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,
-		Name                                            name,
-		Bool                                            initFlag,
-		CellLayout*                                     cellLayout,
-		ParticleLayout*                                 particleLayout,
-		Dimension_Index                                 dim,
-		SizeT                                           particleSize,
-		Particle_InCellIndex                            cellParticleTblDelta,
-		double                                          extraParticlesFactor,
-		FeMesh*                   	                mesh,
-		EscapedRoutine*                                 escapedRoutine, 
-		Material*                                       material,
-		Variable_Register*                              swarmVariable_Register,
-		ExtensionManager_Register*                      extensionMgr_Register,
-		Materials_Register*                             materials_Register,
-		MPI_Comm                                        comm )
+MaterialPointsSwarm* _MaterialPointsSwarm_New(  MATERIALPOINTSSWARM_DEFARGS  )
 {
 	MaterialPointsSwarm* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(MaterialPointsSwarm) );
-	self = (MaterialPointsSwarm*)_Swarm_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			name,
-			initFlag,
-			cellLayout,
-			particleLayout,
-			dim,
-			particleSize,
-			cellParticleTblDelta,
-			extraParticlesFactor,
-			extensionMgr_Register,
-			swarmVariable_Register,
-			comm,
-		        NULL	);
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	ics = NULL;
 
-	if (initFlag) {
-	 	_MaterialPointsSwarm_Init( 
-			self,
-			mesh,
-			escapedRoutine, 
-			material,
-			materials_Register );
-	}	
+	self = (MaterialPointsSwarm*)_Swarm_New(  SWARM_PASSARGS  );
 
 	return self;
 }
@@ -196,12 +166,12 @@ void _MaterialPointsSwarm_Init(
 		"PositionX",
 		"PositionY",
 		"PositionZ" );
+   LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->particleCoordVariable->variable );
+   LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->particleCoordVariable );
 
-	self->materialIndexVariable = Swarm_NewScalarVariable( 
-			self,
-			"MaterialIndex",
-			GetOffsetOfMember( particle , materialIndex ), 
-			Variable_DataType_Int ); /* Should be unsigned int */
+	self->materialIndexVariable = Swarm_NewScalarVariable( self, "MaterialIndex", GetOffsetOfMember( particle , materialIndex ), Variable_DataType_Int ); /* Should be unsigned int */
+   LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->materialIndexVariable->variable );
+   LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->materialIndexVariable );
 
 	/* If we have an escaped routine, clear the defensive flag. */
 #if 0
@@ -227,8 +197,6 @@ void _MaterialPointsSwarm_Print( void* swarm, Stream* stream ) {
 	_Swarm_Print( self, stream );
 }
 
-
-
 void* _MaterialPointsSwarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	MaterialPointsSwarm*	self = (MaterialPointsSwarm*)swarm;
 	MaterialPointsSwarm*	newMaterialPointsSwarm;
@@ -246,51 +214,45 @@ void* _MaterialPointsSwarm_Copy( void* swarm, void* dest, Bool deep, Name nameEx
 }
 
 void* _MaterialPointsSwarm_DefaultNew( Name name ) {
-	return _MaterialPointsSwarm_New(
-			sizeof(MaterialPointsSwarm),
-			MaterialPointsSwarm_Type,
-			_MaterialPointsSwarm_Delete,
-			_MaterialPointsSwarm_Print,
-			_MaterialPointsSwarm_Copy,
-			_MaterialPointsSwarm_DefaultNew,
-			_MaterialPointsSwarm_Construct,
-			_MaterialPointsSwarm_Build,
-			_MaterialPointsSwarm_Initialise,
-			_MaterialPointsSwarm_Execute,
-			_MaterialPointsSwarm_Destroy,
-			name,
-			False,
-			NULL,			/* cellLayout */
-			NULL,                   /* particleLayout */
-			0,                      /* dim */
-			sizeof(MaterialPoint),  /* particleSize */
-			0,                      /* cellParticleTblDelta */
-			0.0,                    /* extraParticlesFactor */
-			NULL,                   /* mesh */
-			NULL,                   /* escapedRoutine */
-			NULL,                   /* material */
-			NULL,                   /* swarmVariable_Register */
-			NULL,                   /* extensionMgr_Register */
-			NULL,                   /* materials_Register */
-			0                       /* comm */
-			);
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(MaterialPointsSwarm);
+	Type                                                         type = MaterialPointsSwarm_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _MaterialPointsSwarm_Delete;
+	Stg_Class_PrintFunction*                                   _print = _MaterialPointsSwarm_Print;
+	Stg_Class_CopyFunction*                                     _copy = _MaterialPointsSwarm_Copy;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _MaterialPointsSwarm_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _MaterialPointsSwarm_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _MaterialPointsSwarm_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _MaterialPointsSwarm_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _MaterialPointsSwarm_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _MaterialPointsSwarm_Destroy;
+	SizeT                                                particleSize = sizeof(MaterialPoint);
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+	void*                          ics = ZERO;
+
+	return _MaterialPointsSwarm_New(  MATERIALPOINTSSWARM_PASSARGS  );
 }
 
 
-void _MaterialPointsSwarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
+void _MaterialPointsSwarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	MaterialPointsSwarm*	        self          = (MaterialPointsSwarm*) swarm;
-	FeMesh*             mesh;
+	FeMesh*             		mesh;
 	EscapedRoutine*                 escapedRoutine;
 	Material*                       material;
 	Materials_Register*             materials_Register;
+	PICelleratorContext*		context;
 
-	_Swarm_Construct( self, cf, data );
+	_Swarm_AssignFromXML( self, cf, data );
 
 	mesh             = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeMesh", FeMesh, True, data );
 	escapedRoutine   = Stg_ComponentFactory_ConstructByKey( cf, self->name, "EscapedRoutine",     EscapedRoutine,     False, data );
 	material         = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Material",           Material,           False, data );
 
-	materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+	context = (PICelleratorContext*)self->context;
+	assert( Stg_CheckType( context, PICelleratorContext ) );
+	materials_Register = context->materials_Register; 
 	assert( materials_Register );
 
 	_MaterialPointsSwarm_Init(
@@ -312,6 +274,10 @@ void _MaterialPointsSwarm_Build( void* swarm, void* data ) {
 
 	_Swarm_Build( self, data );
 
+	Stg_Component_Build( self->mesh, data , False );
+	if( self->escapedRoutine != NULL) Stg_Component_Build( self->escapedRoutine, data , False );
+	if( self->material       != NULL) Stg_Component_Build( self->material,       data , False );
+
 	/* Since this swarm is being set up to advect a PICellerator material, it should make sure
 	 * at least one ParticleMovementHandler-type ParticleCommHandler has been added to the base
 	 * Swarm. */
@@ -332,24 +298,49 @@ void _MaterialPointsSwarm_Build( void* swarm, void* data ) {
 	for( var_I = 0 ; var_I < self->nSwarmVars ; var_I++ ) {
 		Stg_Component_Build( self->swarmVars[var_I], data , False );
 	}
-
 }
 void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
-	MaterialPointsSwarm*    self = (MaterialPointsSwarm*) swarm;
-	AbstractContext*        context = (AbstractContext*)data;
-	Index                   var_I=0;
+	MaterialPointsSwarm*	self 	= (MaterialPointsSwarm*) swarm;
+	AbstractContext* 	context = (AbstractContext*)self->context;
+	Index            	var_I	= 0;
 	Particle_Index          lParticle_I=0;
-	MaterialPoint*          matPoint=NULL;
-	
+	MaterialPoint*		matPoint=NULL;
+
 	_Swarm_Initialise( self, data );
+
+	Stg_Component_Initialise( self->mesh, data , False );
+	if( self->escapedRoutine != NULL) Stg_Component_Initialise( self->escapedRoutine, data , False );
+	if( self->material       != NULL) Stg_Component_Initialise( self->material,       data , False );
+
 	for( var_I = 0 ; var_I < self->nSwarmVars ; var_I++ ) {
 		Stg_Component_Initialise( self->swarmVars[var_I], data , False );
 	}
 
+	/* Now setup the material properties */
+   if(  False == context->loadFromCheckPoint ) {
+
+      /* Beforehand, set each particle to have UNDEFINED_MATERIAL */
+      for ( lParticle_I = 0; lParticle_I < self->particleLocalCount; lParticle_I++ ) {
+         matPoint = (MaterialPoint*)Swarm_ParticleAt( self, lParticle_I );
+         matPoint->materialIndex = UNDEFINED_MATERIAL;
+      }
+		if( self->material == NULL ) {
+			/* Do it by the layout of all known materials */
+			Materials_Register_SetupSwarm( self->materials_Register, self );
+		}
+		else {
+			Material_Layout( self->material, self );
+			Materials_Register_AssignParticleProperties( 
+					self->materials_Register, 
+					self, 
+					self->swarmVariable_Register->variable_Register );
+		}
+	}
+
 	/** if loading from checkpoint, particle materials etc have already been loaded in Swarm_Build() - */ 
 	/** possibly need to check for empty cells (and populate) if performing a interpolation restart */
-   if ( context && (True == context->loadFromCheckPoint)  ){
-      if ( True == self->isSwarmTypeToCheckPointAndReload && (True == context->interpolateRestart) ) {	   
+   if ( True == context->loadFromCheckPoint ){
+      if ( (True == self->isSwarmTypeToCheckPointAndReload) && (True == context->interpolateRestart) ) {	   
          Particle_InCellIndex cParticle_I         = 0;
          Particle_InCellIndex particle_I          = 0;
          GlobalParticle*      particle            = NULL;
@@ -436,15 +427,17 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
             }
          }
          /** populate empty cells */ 
-         for(ii = 0 ; ii < count ; ii++) {
-		Swarm_AddParticleToCell( self, cellID[ii], particleCPUID[ii] );
-	}
+         for(ii = 0 ; ii < count ; ii++)
+            Swarm_AddParticleToCell( self, cellID[ii], particleCPUID[ii] );
          Memory_Free( cellID );
          Memory_Free( particleCPUID );
       }
 	/* TODO: print info / debug message */
 	}
+#if 0
 	else {
+		Particle_Index          lParticle_I=0;
+		MaterialPoint*		matPoint=NULL;
 
 		/* Beforehand, set each particle to have UNDEFINED_MATERIAL */
 		for ( lParticle_I = 0; lParticle_I < self->particleLocalCount; lParticle_I++ ) {
@@ -464,24 +457,8 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 					self->swarmVariable_Register->variable_Register );
 		}
 	}
-	/* ensure all particles have been allocated to a material during Layout process
-	 * (if not, you may wish to include a backgroundLayout in the application's XML */
-	for ( lParticle_I = 0; lParticle_I < self->particleLocalCount; lParticle_I++ ) {
-		matPoint = (MaterialPoint*)Swarm_ParticleAt( self, lParticle_I );
-		Journal_Firewall(
-			matPoint->materialIndex != UNDEFINED_MATERIAL,
-			Journal_MyStream( Error_Type, self ),
-			"In func %s: MaterialPoint '%d' not allocated to a Material after Layout.\n"
-			"Coord = {%g, %g, %g}\n",
-			__func__,
-			lParticle_I,
-			matPoint->coord[ I_AXIS ],
-			matPoint->coord[ J_AXIS ],
-			matPoint->coord[ K_AXIS ] );
-	}
+#endif
 }
-
-
 void _MaterialPointsSwarm_Execute( void* swarm, void* data ) {
 	MaterialPointsSwarm*	self = (MaterialPointsSwarm*)swarm;
 	
@@ -489,7 +466,16 @@ void _MaterialPointsSwarm_Execute( void* swarm, void* data ) {
 }
 void _MaterialPointsSwarm_Destroy( void* swarm, void* data ) {
 	MaterialPointsSwarm*	self = (MaterialPointsSwarm*)swarm;
+   int var_I;
 	
+	Stg_Component_Destroy( self->mesh, data , False );
+	if( self->escapedRoutine != NULL) Stg_Component_Destroy( self->escapedRoutine, data , False );
+	if( self->material       != NULL) Stg_Component_Destroy( self->material,       data , False );
+
+	for( var_I = 0 ; var_I < self->nSwarmVars ; var_I++ ) {
+		Stg_Component_Destroy( self->swarmVars[var_I], data , False );
+	}
+
 	_Swarm_Destroy( self, data );
 }
 
@@ -511,7 +497,7 @@ void _MaterialPointsSwarm_UpdateHook( void* timeIntegrator, void* swarm ) {
 			materialPoint = (MaterialPoint*)Swarm_ParticleAt( self, point_I );
 			cell = materialPoint->owningCell;
 			Journal_Firewall(
-				cell < FeMesh_GetElementDomainSize( mesh ), 
+					 cell < FeMesh_GetElementDomainSize( mesh ), 
 				Journal_MyStream( Error_Type, self ),
 				"In func %s: MaterialPoint '%d' outside element. Coord = {%g, %g, %g}\n",
 				__func__,
@@ -581,3 +567,5 @@ void* MaterialPointsSwarm_GetExtensionAt( void* swarm, Index point_I, Index extH
 	return ExtensionManager_Get( self->particleExtensionMgr, point, extHandle );
 	
 }
+
+

@@ -76,34 +76,20 @@
 		Index                           refHandle; /**< Extension handle to reference struct of material points */
 
 	struct OneToManyMapper { __OneToManyMapper };
-	
-	OneToManyMapper* _OneToManyMapper_New(
-			SizeT                                                           _sizeOfSelf,
-			Type                                                            type,
-			Stg_Class_DeleteFunction*                                       _delete,
-			Stg_Class_PrintFunction*                                        _print,
-			Stg_Class_CopyFunction*                                         _copy,
-			Stg_Component_DefaultConstructorFunction*                       _defaultConstructor,
-			Stg_Component_ConstructFunction*                                _construct,
-			Stg_Component_BuildFunction*                                    _build,
-			Stg_Component_InitialiseFunction*                               _initialise,
-			Stg_Component_ExecuteFunction*                                  _execute,
-			Stg_Component_DestroyFunction*                                  _destroy,
-			IntegrationPointMapper_MapFunction*                             _map,
-			IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms,
-			IntegrationPointMapper_GetMaterialIndexOnFunction*              _getMaterialIndexOn,
-			IntegrationPointMapper_GetExtensionOnFunction*                  _getExtensionOn,
-			IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension,
-			IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial,
-			Name                                                            name,
-			Bool                                                            initFlag,
-			IntegrationPointsSwarm*                                         integrationSwarm,
-			MaterialPointsSwarm*                                            materialSwarm );
 
-	void _OneToManyMapper_Init( 
-			void*                   mapper, 
-			IntegrationPointsSwarm* integrationSwarm,
-			MaterialPointsSwarm*    materialSwarm );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ONETOMANYMAPPER_DEFARGS \
+                INTEGRATIONPOINTMAPPER_DEFARGS
+
+	#define ONETOMANYMAPPER_PASSARGS \
+                INTEGRATIONPOINTMAPPER_PASSARGS
+	
+OneToManyMapper* _OneToManyMapper_New( ONETOMANYMAPPER_DEFARGS );
+
+void _OneToManyMapper_Init( void* mapper, MaterialPointsSwarm* materialSwarm );
 
 	void _OneToManyMapper_Delete( void* mapper );
 	void _OneToManyMapper_Print( void* mapper, Stream* stream );
@@ -113,7 +99,7 @@
 		(OneToManyMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	void* _OneToManyMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-	void _OneToManyMapper_Construct( void* shape, Stg_ComponentFactory* cf, void* data );
+	void _OneToManyMapper_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data );
 	void _OneToManyMapper_Build( void* mapper, void* data ) ;
 	void _OneToManyMapper_Initialise( void* mapper, void* data );
 	void _OneToManyMapper_Execute( void* mapper, void* data );

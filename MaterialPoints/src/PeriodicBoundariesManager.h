@@ -51,67 +51,67 @@
 *
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __PICellerator_PeriodicBoundaries_PeriodicBoundariesManager_h__
-#define __PICellerator_PeriodicBoundaries_PeriodicBoundariesManager_h__
+#ifndef __PICellerator_MaterialPoints_PeriodicBoundariesManager_h__
+#define __PICellerator_MaterialPoints_PeriodicBoundariesManager_h__
 	
 	/* Textual name of this class */
 	extern const Type PeriodicBoundariesManager_Type;
 
 	typedef struct PeriodicBoundary {
-		Axis		axis;	/* Which plane the BC is in */
-		double		minWall;
-		double		maxWall;
-		unsigned int    particlesUpdatedMinEndCount;
-		unsigned int    particlesUpdatedMaxEndCount;
+		Axis				axis; /* Which plane the BC is in */
+		double			minWall;
+		double			maxWall;
+		unsigned int	particlesUpdatedMinEndCount;
+		unsigned int	particlesUpdatedMaxEndCount;
 	} PeriodicBoundary;
 
 	#define __PeriodicBoundariesManager \
 		__Stg_Component \
+		PICelleratorContext*	context; \
 		\
-		Dictionary*		dictionary; \
-		Mesh*			mesh; \
-		Index			count; \
-		Index			size; \
-		Index			delta; \
-		PeriodicBoundary*	boundaries; \
-		Swarm*			swarm; \
-		Stream*                 debug; \
+		Dictionary*				dictionary; \
+		Mesh*						mesh; \
+		Index						count; \
+		Index						size; \
+		Index						delta; \
+		PeriodicBoundary*		boundaries; \
+		Swarm*					swarm; \
+		Stream*					debug; 
 
 	struct PeriodicBoundariesManager { __PeriodicBoundariesManager };
+
+
 
 	void* _PeriodicBoundariesManager_DefaultNew( Name name );
 
 	PeriodicBoundariesManager* PeriodicBoundariesManager_New( 
-		Name                    			name,
+		Name						name,
+		PICelleratorContext*	context,
 		Mesh*						mesh, 
-		Swarm*                                          swarm,
-		Dictionary*					dictionary );
+		Swarm*					swarm,
+		Dictionary*				dictionary );
 
-	PeriodicBoundariesManager* _PeriodicBoundariesManager_New( 
-		SizeT                                  sizeOfSelf,
-		Type                                   type,
-		Stg_Class_DeleteFunction*              _delete,
-		Stg_Class_PrintFunction*               _print,
-		Stg_Class_CopyFunction*                _copy, 
-		Stg_Component_DefaultConstructorFunction*  _defaultConstructor,
-		Stg_Component_ConstructFunction*       _construct,
-		Stg_Component_BuildFunction*           _build,
-		Stg_Component_InitialiseFunction*      _initialise,
-		Stg_Component_ExecuteFunction*         _execute,
-		Stg_Component_DestroyFunction*         _destroy,
-		Name                                   name,
-		Bool                                   initFlag,
-		Mesh*				       mesh, 
-		Swarm*                                 swarm,
-		Dictionary*                            dictionary );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PERIODICBOUNDARIESMANAGER_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define PERIODICBOUNDARIESMANAGER_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	PeriodicBoundariesManager* _PeriodicBoundariesManager_New(  PERIODICBOUNDARIESMANAGER_DEFARGS  );
 
 	void _PeriodicBoundariesManager_Init(
-		void*             periodicBCsManager,
-		Mesh*		  mesh, 
-		Swarm*            swarm,
-		Dictionary*       dictionary );
+		void*						periodicBCsManager,
+		PICelleratorContext*	context,
+		Mesh*						mesh, 
+		Swarm*					swarm,
+		Dictionary*				dictionary );
 		
-	void _PeriodicBoundariesManager_Construct( void* periodicBCsManager, Stg_ComponentFactory* cf, void* data );
+	void _PeriodicBoundariesManager_AssignFromXML( void* periodicBCsManager, Stg_ComponentFactory* cf, void* data );
 	
 	void _PeriodicBoundariesManager_Delete( void* context );
 
@@ -132,3 +132,4 @@
 	void PeriodicBoundariesManager_UpdateParticle( void* periodicBCsManager, Particle_Index lParticle_I );
 
 #endif
+

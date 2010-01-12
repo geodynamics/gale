@@ -66,180 +66,121 @@
 const Type GaussCoincidentMapper_Type = "GaussCoincidentMapper";
 
 GaussCoincidentMapper* GaussCoincidentMapper_New(
-	Name                       name,
-	IntegrationPointsSwarm*    integrationSwarm,
-	MaterialPointsSwarm*       materialSwarm
-	)
+	Name								name,
+	PICelleratorContext*			context,
+	IntegrationPointsSwarm*		integrationSwarm,
+	MaterialPointsSwarm*			materialSwarm )
 {
-	GaussCoincidentMapper* self = (GaussCoincidentMapper*) _GaussCoincidentMapper_New(
-		sizeof(GaussCoincidentMapper),
-		GaussCoincidentMapper_Type,
-		_GaussCoincidentMapper_Delete,
-		_GaussCoincidentMapper_Print,
-		_GaussCoincidentMapper_Copy,
-		_GaussCoincidentMapper_DefaultNew,
-		_GaussCoincidentMapper_Construct,
-		_GaussCoincidentMapper_Build,
-		_GaussCoincidentMapper_Initialise,
-		_GaussCoincidentMapper_Execute,
-		_GaussCoincidentMapper_Destroy,
-		_GaussCoincidentMapper_Map,
-		_OneToOneMapper_GetMaterialPointsSwarms,
-		_OneToOneMapper_GetMaterialIndexOn,
-		_OneToOneMapper_GetExtensionOn,
-		_OneToOneMapper_GetDoubleFromExtension,
-		_OneToOneMapper_GetDoubleFromMaterial,
-		name,
-		True, /* initFlag */
-		integrationSwarm,
-		materialSwarm
-		);
+	GaussCoincidentMapper* self = _GaussCoincidentMapper_DefaultNew( name );
+
+	self->isConstructed = True;
+	_IntegrationPointMapper_Init( self, context, integrationSwarm );
+   _OneToOneMapper_Init( self, materialSwarm );
+	_GaussCoincidentMapper_Init( self );
 
 	return self;
 }
 
-
 void* _GaussCoincidentMapper_DefaultNew( Name name ) {
-	return _GaussCoincidentMapper_New(
-			sizeof(GaussCoincidentMapper),
-			GaussCoincidentMapper_Type,
-			_GaussCoincidentMapper_Delete,
-			_GaussCoincidentMapper_Print,
-			_GaussCoincidentMapper_Copy,
-			_GaussCoincidentMapper_DefaultNew,
-			_GaussCoincidentMapper_Construct,
-			_GaussCoincidentMapper_Build,
-			_GaussCoincidentMapper_Initialise,
-			_GaussCoincidentMapper_Execute,
-			_GaussCoincidentMapper_Destroy,
-			_GaussCoincidentMapper_Map,
-			_OneToOneMapper_GetMaterialPointsSwarms,
-			_OneToOneMapper_GetMaterialIndexOn,
-			_OneToOneMapper_GetExtensionOn,
-			_OneToOneMapper_GetDoubleFromExtension,
-			_OneToOneMapper_GetDoubleFromMaterial,
-			name,
-			False,
-			NULL,
-			NULL );
+	/* Variables set in this function */
+	SizeT                                                                 _sizeOfSelf = sizeof(GaussCoincidentMapper);
+	Type                                                                         type = GaussCoincidentMapper_Type;
+	Stg_Class_DeleteFunction*                                                 _delete = _GaussCoincidentMapper_Delete;
+	Stg_Class_PrintFunction*                                                   _print = _GaussCoincidentMapper_Print;
+	Stg_Class_CopyFunction*                                                     _copy = _GaussCoincidentMapper_Copy;
+	Stg_Component_DefaultConstructorFunction*                     _defaultConstructor = _GaussCoincidentMapper_DefaultNew;
+	Stg_Component_ConstructFunction*                                       _construct = _GaussCoincidentMapper_AssignFromXML;
+	Stg_Component_BuildFunction*                                               _build = _GaussCoincidentMapper_Build;
+	Stg_Component_InitialiseFunction*                                     _initialise = _GaussCoincidentMapper_Initialise;
+	Stg_Component_ExecuteFunction*                                           _execute = _GaussCoincidentMapper_Execute;
+	Stg_Component_DestroyFunction*                                           _destroy = _GaussCoincidentMapper_Destroy;
+	AllocationType                                                 nameAllocationType = NON_GLOBAL;
+	IntegrationPointMapper_MapFunction*                                          _map = _GaussCoincidentMapper_Map;
+	IntegrationPointMapper_GetMaterialPointsSwarmsFunction*  _getMaterialPointsSwarms = _OneToOneMapper_GetMaterialPointsSwarms;
+	IntegrationPointMapper_GetMaterialIndexOnFunction*            _getMaterialIndexOn = _OneToOneMapper_GetMaterialIndexOn;
+	IntegrationPointMapper_GetExtensionOnFunction*                    _getExtensionOn = _OneToOneMapper_GetExtensionOn;
+        IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension = _OneToOneMapper_GetDoubleFromExtension;
+    IntegrationPointMapper_GetDoubleFromMaterial*                  _getDoubleFromMaterial = _OneToOneMapper_GetDoubleFromMaterial;
+
+	return _GaussCoincidentMapper_New(  GAUSSCOINCIDENTMAPPER_PASSARGS  );
 }
 
-
-GaussCoincidentMapper* _GaussCoincidentMapper_New(
-		SizeT                                                           _sizeOfSelf,
-		Type                                                            type,
-		Stg_Class_DeleteFunction*                                       _delete,
-		Stg_Class_PrintFunction*                                        _print,
-		Stg_Class_CopyFunction*                                         _copy,
-		Stg_Component_DefaultConstructorFunction*                       _defaultConstructor,
-		Stg_Component_ConstructFunction*                                _construct,
-		Stg_Component_BuildFunction*                                    _build,
-		Stg_Component_InitialiseFunction*                               _initialise,
-		Stg_Component_ExecuteFunction*                                  _execute,
-		Stg_Component_DestroyFunction*                                  _destroy,
-		IntegrationPointMapper_MapFunction*                             _map,
-		IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms,
-		IntegrationPointMapper_GetMaterialIndexOnFunction*              _getMaterialIndexOn,
-		IntegrationPointMapper_GetExtensionOnFunction*                  _getExtensionOn,
-		IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension,
-		IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial,
-		Name                                                            name,
-		Bool                                                            initFlag,
-		IntegrationPointsSwarm*                                         integrationSwarm,
-		MaterialPointsSwarm*                                            materialSwarm )
-{
+GaussCoincidentMapper* _GaussCoincidentMapper_New(  GAUSSCOINCIDENTMAPPER_DEFARGS  ) {
 	GaussCoincidentMapper* result;
 
-	result = (GaussCoincidentMapper*)_OneToOneMapper_New(
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_map,
-			_getMaterialPointsSwarms,
-			_getMaterialIndexOn,
-			_getExtensionOn,
-			_getDoubleFromExtension,
-			_getDoubleFromMaterial,
-			name,
-			initFlag,
-			integrationSwarm,
-			materialSwarm );
-	if (initFlag) {
-		_GaussCoincidentMapper_Init( result, integrationSwarm, materialSwarm );
-	}
-		
+	result = (GaussCoincidentMapper*)_OneToOneMapper_New(  ONETOONEMAPPER_PASSARGS  );
+
 	return result;
 }
 
-void _GaussCoincidentMapper_Construct( void* mapper, Stg_ComponentFactory* cf, void* data ) {
-	_OneToOneMapper_Construct( mapper, cf, data );
+void _GaussCoincidentMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, void* data ) {
+	GaussCoincidentMapper* self = (GaussCoincidentMapper*)mapper;
+
+	_OneToOneMapper_AssignFromXML( self, cf, data );
 }
 
-void _GaussCoincidentMapper_Init(
-		void*                   mapper,
-		IntegrationPointsSwarm* integrationSwarm,
-		MaterialPointsSwarm*    materialSwarm ) 
-{
-	_OneToOneMapper_Init( mapper, integrationSwarm, materialSwarm );
+void _GaussCoincidentMapper_Init( void* mapper ) {
 }
 
 void _GaussCoincidentMapper_Delete( void* mapper ) {
-	_IntegrationPointMapper_Delete( mapper );
+	GaussCoincidentMapper* self = (GaussCoincidentMapper*)mapper;
+
+	_OneToOneMapper_Delete( self );
 }
+
 void _GaussCoincidentMapper_Print( void* mapper, Stream* stream ) {
-	_IntegrationPointMapper_Print( mapper, stream );
+	GaussCoincidentMapper* self = (GaussCoincidentMapper*)mapper;
+
+	_IntegrationPointMapper_Print( self, stream );
 }
+
 void* _GaussCoincidentMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	return _IntegrationPointMapper_Copy( mapper, dest, deep, nameExt, ptrMap );
 }
 
 void _GaussCoincidentMapper_Build( void* mapper, void* cf ) {
-	_OneToOneMapper_Build( mapper, cf );
+	GaussCoincidentMapper* self = (GaussCoincidentMapper*)mapper;
+
+	_OneToOneMapper_Build( self, cf );
 }
 
 void _GaussCoincidentMapper_Initialise( void* mapper, void* cf ) {
-	_OneToOneMapper_Initialise( mapper, cf );
+	GaussCoincidentMapper* self = (GaussCoincidentMapper*)mapper;
+
+	_OneToOneMapper_Initialise( self, cf );
 }
 
 void _GaussCoincidentMapper_Execute( void* mapper, void* data ) {
 }
 
 void _GaussCoincidentMapper_Destroy( void* mapper, void* data ) {
+	GaussCoincidentMapper* self = (GaussCoincidentMapper*)mapper;
+
+	_OneToOneMapper_Destroy( self, data );
 }
 
 void _GaussCoincidentMapper_Map( void* mapper ) {
-	GaussCoincidentMapper*       self                   = (GaussCoincidentMapper*)mapper;
+	GaussCoincidentMapper*	self = (GaussCoincidentMapper*)mapper;
+	IntegrationPointsSwarm*	integrationSwarm = self->integrationSwarm;
+	MaterialPointsSwarm*    materialSwarm = self->materialSwarm;
+	IntegrationPoint*			integrationPoint;
+	MaterialPoint*				materialPoint;
+	MaterialPointRef*			ref;
+	Particle_Index				particle_lI;
+#if 0
+	FeMesh*						mesh = materialSwarm->mesh;
+	Cell_Index					cell_dI;
+#endif
 
-	IntegrationPointsSwarm* integrationSwarm       = self->integrationSwarm;
-	MaterialPointsSwarm*    materialSwarm          = self->materialSwarm;
-
-	IntegrationPoint*       integrationPoint;
-	MaterialPoint*          materialPoint;
-	MaterialPointRef*       ref;
-
-	FeMesh*     mesh                   = materialSwarm->mesh;
-
-	Particle_Index          particle_lI;
-	Cell_Index              cell_dI;
-
-	#ifdef CAUTIOUS
-	Index			dim_I;
-	Stream*                 errorStream = Journal_Register( Error_Type, self->type );
-	#endif
-	Stream*                 debugStream = Swarm_Debug;
+#ifdef CAUTIOUS
+    Index						dim_I;
+    Stream*						errorStream = Journal_Register( Error_Type, self->type );
+#endif
+    Stream*						debugStream = Swarm_Debug;
 	
 #if 0
 	Journal_DPrintfL( debugStream, 1, "In %s(): Re-creating a new set of integration points, exactly\n" 
-		"\tmapping to the current material points & their positions.\n",
-		__func__ ) ;
+		"\tmapping to the current material points & their positions.\n", __func__ ) ;
 	Stream_IndentBranch( debugStream );
 
 	Journal_DPrintfL( debugStream, 2, "Reallocating the integration points array from size of %u points "
@@ -250,34 +191,34 @@ void _GaussCoincidentMapper_Map( void* mapper ) {
 
 	Journal_DPrintfL( debugStream, 2, "Clearing all the cell->particle ownership tables, "
 		"ready to add new cell->particle\n\trelationships as new integration points are set up.\n" );
+
 	for( cell_dI = 0; cell_dI < materialSwarm->cellDomainCount; cell_dI++ ) {
-	    materialSwarm->cellParticleCountTbl[cell_dI] = 0;
-	    materialSwarm->cellParticleSizeTbl[cell_dI] = 0;
-	    if ( materialSwarm->cellParticleTbl[cell_dI] ) {
-		Memory_Free( materialSwarm->cellParticleTbl[cell_dI] );
-	    }
-	    materialSwarm->cellParticleTbl[cell_dI] = NULL;
+		materialSwarm->cellParticleCountTbl[cell_dI] = 0;
+		materialSwarm->cellParticleSizeTbl[cell_dI] = 0;
+
+		if ( materialSwarm->cellParticleTbl[cell_dI] ) {
+			Memory_Free( materialSwarm->cellParticleTbl[cell_dI] );
+		}
+		materialSwarm->cellParticleTbl[cell_dI] = NULL;
 	}
 
 	Journal_DPrintfL( debugStream, 2, "For each material particle, setting up a corresponding integration "
 		"point, and\n\tcalculating its element-local coord based on the material's global coord:\n" );
-	Stream_IndentBranch( debugStream );
+		Stream_IndentBranch( debugStream );
 #endif
 
 	/* Map each point */
 	for ( particle_lI = 0; particle_lI < integrationSwarm->particleLocalCount; particle_lI++ ) {
 		integrationPoint = (IntegrationPoint*)Swarm_ParticleAt( integrationSwarm, particle_lI );
-		materialPoint    = (MaterialPoint*)   Swarm_ParticleAt( materialSwarm, particle_lI );
+		materialPoint = (MaterialPoint*)Swarm_ParticleAt( materialSwarm, particle_lI );
 
 #if 0
 		cell_dI = integrationPoint->owningCell;
 
-		Journal_DPrintfL( debugStream, 3, "Referring to local material point %u, from material swarm cell %u:\n",
-			particle_lI, cell_dI );
+		Journal_DPrintfL( debugStream, 3, "Referring to local material point %u, from material swarm cell %u:\n", particle_lI, cell_dI );
 		Stream_IndentBranch( debugStream );
 
-		Journal_DPrintfL( debugStream, 3, "Adding new integration point %u to integration swarm cell %u\n",
-			particle_lI, cell_dI );
+		Journal_DPrintfL( debugStream, 3, "Adding new integration point %u to integration swarm cell %u\n", particle_lI, cell_dI );
 
 		Swarm_AddParticleToCell( materialSwarm, cell_dI, particle_lI );
 
@@ -305,4 +246,7 @@ void _GaussCoincidentMapper_Map( void* mapper ) {
 	Stream_UnIndentBranch( debugStream );
 	Journal_DPrintfL( debugStream, 1, "...%s(): Done.\n", __func__ );
 #endif
+
 }
+
+

@@ -45,11 +45,11 @@
 
 	/** @see ParticleFeVariable_ValueAtParticle */
 	typedef void ParticleFeVariable_ValueAtParticleFunction( 
-			void*                   particleFeVariable, 
-			IntegrationPointsSwarm* swarm, 
-			Element_LocalIndex      lElement_I, 
-			void*                   particle, 
-			double*                 particleValue );
+		void*							particleFeVariable, 
+		IntegrationPointsSwarm*	swarm, 
+		Element_LocalIndex		lElement_I, 
+		void*							particle, 
+		double*						particleValue );
 	
 	/** Textual name of this class */
 	extern const Type ParticleFeVariable_Type;
@@ -60,114 +60,84 @@
 		__FeVariable \
 		\
 		/* Virtual info */ \
-		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle;               \
+		ParticleFeVariable_ValueAtParticleFunction*	_valueAtParticle; \
 		\
 		/* ParticleFeVariable info */ \
-		double*                                           data;                           \
-		Variable*                                         dataVariable;                   \
-		Name                                              assemblyVectorName;             \
-		ForceVector*                                      assemblyVector;                 \
-		ForceTerm*                                        assemblyTerm;                   \
-		Name                                              massMatrixName;                 \
-		ForceVector*                                      massMatrix;                     \
-		ForceTerm*                                        massMatrixForceTerm;            \
-		int                                               currentParticleIndex;           \
-		Bool                                              useDeriv;                       \
-		
+		double*													data; \
+		Variable*												dataVariable; \
+		Name														assemblyVectorName; \
+		ForceVector*											assemblyVector; \
+		ForceTerm*												assemblyTerm; \
+		Name														massMatrixName; \
+		ForceVector*											massMatrix; \
+		ForceTerm*												massMatrixForceTerm; \
+		int														currentParticleIndex; \
+		Bool														useDeriv; 
 		
 	struct ParticleFeVariable { __ParticleFeVariable };
 
-#define PARTICLEFEVARIABLE_ARGS						\
-   SizeT _sizeOfSelf,							\
-      Type type,							\
-      Stg_Class_DeleteFunction* _delete,				\
-      Stg_Class_PrintFunction* _print,					\
-      Stg_Class_CopyFunction* _copy,					\
-      Stg_Component_DefaultConstructorFunction* _defaultConstructor,	\
-      Stg_Component_ConstructFunction* _construct,			\
-      Stg_Component_BuildFunction* _build,				\
-      Stg_Component_InitialiseFunction*_initialise,			\
-      Stg_Component_ExecuteFunction* _execute,				\
-      Stg_Component_DestroyFunction* _destroy,				\
-      FieldVariable_InterpolateValueAtFunction* _interpolateValueAt,	\
-      FieldVariable_GetValueFunction* _getMinGlobalFeMagnitude,		\
-      FieldVariable_GetValueFunction* _getMaxGlobalFeMagnitude,		\
-      FieldVariable_GetCoordFunction* _getMinAndMaxLocalCoords,		\
-      FieldVariable_GetCoordFunction* _getMinAndMaxGlobalCoords,	\
-      FeVariable_InterpolateWithinElementFunction* _interpolateWithinElement, \
-      FeVariable_GetValueAtNodeFunction* _getValueAtNode,		\
-      ParticleFeVariable_ValueAtParticleFunction* _valueAtParticle,	\
-      Name name
-
-#define PARTICLEFEVARIABLE_PASSARGS					\
-   _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,	\
-      _construct, _build, _initialise, _execute, _destroy,		\
-      _interpolateValueAt, _getMinGlobalFeMagnitude,			\
-      _getMaxGlobalFeMagnitude, _getMinAndMaxLocalCoords,		\
-      _getMinAndMaxGlobalCoords, _interpolateWithinElement,		\
-      _getValueAtNode, _valueAtParticle, name
-	
 	/* --- Contstructors / Destructors --- */
-	ParticleFeVariable* _ParticleFeVariable_New(
- 		SizeT                                             _sizeOfSelf,
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-		Name                                              name );
 	
-	void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm* swarm, FiniteElementContext* context );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PARTICLEFEVARIABLE_DEFARGS \
+                FEVARIABLE_DEFARGS, \
+                ParticleFeVariable_ValueAtParticleFunction*  _valueAtParticle
+
+	#define PARTICLEFEVARIABLE_PASSARGS \
+                FEVARIABLE_PASSARGS, \
+	        _valueAtParticle
+
+	ParticleFeVariable* _ParticleFeVariable_New(  PARTICLEFEVARIABLE_DEFARGS  );
+	
+	void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm* swarm );
 	
 	void _ParticleFeVariable_Delete( void* variable );
+
 	void _ParticleFeVariable_Print( void* variable, Stream* stream );
+
 	void* _ParticleFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _ParticleFeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data );
+	void _ParticleFeVariable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data );
+
 	void _ParticleFeVariable_Build( void* variable, void* data );
+
 	void _ParticleFeVariable_Initialise( void* variable, void* data );
+
 	void _ParticleFeVariable_Execute( void* variable, void* data );
+
 	void _ParticleFeVariable_Destroy( void* variable, void* data );
 
 	/** Returns in particleValue the value represented on this particle */
 	#define ParticleFeVariable_ValueAtParticle( particleFeVariable, swarm, lElement_I, particle, particleValue ) \
 		( (ParticleFeVariable*)(particleFeVariable) )->_valueAtParticle(                                     \
-									(particleFeVariable),                        \
-									(swarm),                                     \
-									(lElement_I),                                \
-									(particle),                                  \
-									(particleValue) )
+			(particleFeVariable), \
+			(swarm), \
+			(lElement_I), \
+			(particle), \
+			(particleValue) )
 
 	void ParticleFeVariable_Update( void* materialFeVariable );
 
 	void ParticleFeVariable_AssembleElement( 
-			void*                   forceTerm, 
-			ForceVector*            forceVector, 
-			Element_LocalIndex      lElement_I, 
-			double*                 elForceVector );
+		void*						forceTerm, 
+		ForceVector*			forceVector, 
+		Element_LocalIndex	lElement_I, 
+		double*					elForceVector );
 
-void ParticleFeVariable_AssembleElement_Deriv( void* _forceTerm,
-					       ForceVector* forceVector,
-					       Element_LocalIndex lElement_I,
-					       double* elForceVector ) ;
+	void ParticleFeVariable_AssembleElement_Deriv(
+		void*						_forceTerm,
+		ForceVector*			forceVector,
+		Element_LocalIndex	lElement_I,
+		double*					elForceVector ) ;
 
 	void ParticleFeVariable_AssembleElementShapeFunc( 
-			void*                   forceTerm, 
-			ForceVector*            forceVector, 
-			Element_LocalIndex      lElement_I, 
-			double*                 elForceVector );
+		void*						forceTerm, 
+		ForceVector*			forceVector, 
+		Element_LocalIndex	lElement_I, 
+		double*					elForceVector );
 
 #endif 
+

@@ -58,83 +58,31 @@
 
 const Type OneToOneMapper_Type = "OneToOneMapper";
 
-OneToOneMapper* _OneToOneMapper_New(
-		SizeT                                                           _sizeOfSelf,
-		Type                                                            type,
-		Stg_Class_DeleteFunction*                                       _delete,
-		Stg_Class_PrintFunction*                                        _print,
-		Stg_Class_CopyFunction*                                         _copy,
-		Stg_Component_DefaultConstructorFunction*                       _defaultConstructor,
-		Stg_Component_ConstructFunction*                                _construct,
-		Stg_Component_BuildFunction*                                    _build,
-		Stg_Component_InitialiseFunction*                               _initialise,
-		Stg_Component_ExecuteFunction*                                  _execute,
-		Stg_Component_DestroyFunction*                                  _destroy,
-		IntegrationPointMapper_MapFunction*                             _map,
-		IntegrationPointMapper_GetMaterialPointsSwarmsFunction*         _getMaterialPointsSwarms,
-		IntegrationPointMapper_GetMaterialIndexOnFunction*              _getMaterialIndexOn,
-		IntegrationPointMapper_GetExtensionOnFunction*                  _getExtensionOn,
-                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromExtension,
-                IntegrationPointMapper_GetDoubleFromExtension*                  _getDoubleFromMaterial,
-		Name                                                            name,
-		Bool                                                            initFlag,
-		IntegrationPointsSwarm*                                         integrationSwarm,
-		MaterialPointsSwarm*                                            materialSwarm )
-{
+OneToOneMapper* _OneToOneMapper_New(  ONETOONEMAPPER_DEFARGS  ) {
 	OneToOneMapper* result;
 
-	result = (OneToOneMapper*)_IntegrationPointMapper_New(
-					_sizeOfSelf,
-					type,
-					_delete,
-					_print,
-					_copy,
-					_defaultConstructor,
-					_construct,
-					_build,
-					_initialise,
-					_execute,
-					_destroy,
-					_map,
-					_getMaterialPointsSwarms,
-					_getMaterialIndexOn,
-					_getExtensionOn,
-					_getDoubleFromExtension,
-					_getDoubleFromMaterial,
-					name,
-					initFlag,
-					integrationSwarm );
+	result = (OneToOneMapper*)_IntegrationPointMapper_New(  INTEGRATIONPOINTMAPPER_PASSARGS  );
 
-	if (initFlag) {
-		_OneToOneMapper_Init( result, integrationSwarm, materialSwarm );
-	}
-		
 	return result;
 }
 
-void _OneToOneMapper_Init( void* mapper, IntegrationPointsSwarm* integrationSwarm, MaterialPointsSwarm* materialSwarm ) {
+void _OneToOneMapper_Init( void* mapper, MaterialPointsSwarm* materialSwarm ) {
 	OneToOneMapper* self = (OneToOneMapper*)mapper;
-
-	_IntegrationPointMapper_Init( mapper, integrationSwarm );
 	
 	self->errorStream = Journal_MyStream( Error_Type, self );
 	self->materialSwarm = materialSwarm;
 
 	ExtensionManager_SetLockDown( self->integrationSwarm->particleExtensionMgr, False );
-	self->materialRefHandle = ExtensionManager_Add( 
-				self->integrationSwarm->particleExtensionMgr,
-				materialSwarm->name, 
-				sizeof(MaterialPointRef) );
+	self->materialRefHandle = ExtensionManager_Add( self->integrationSwarm->particleExtensionMgr, materialSwarm->name, sizeof(MaterialPointRef) );
 	ExtensionManager_SetLockDown( self->integrationSwarm->particleExtensionMgr, True );
 }
 
 void _OneToOneMapper_Delete( void* mapper ) {
 	OneToOneMapper* self = (OneToOneMapper*)mapper;
 
-	Stg_Class_Delete( self->materialSwarm );
-	
 	_IntegrationPointMapper_Delete( self );
 }
+
 void _OneToOneMapper_Print( void* mapper, Stream* stream ) {
 	OneToOneMapper* self = (OneToOneMapper*)mapper;
 	
@@ -143,6 +91,7 @@ void _OneToOneMapper_Print( void* mapper, Stream* stream ) {
 	Stg_Class_Print( self->materialSwarm, stream );
 	Stream_UnIndent( stream );
 }
+
 void* _OneToOneMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	OneToOneMapper* self = (OneToOneMapper*)mapper;
 	OneToOneMapper* newCopy;
@@ -153,22 +102,15 @@ void* _OneToOneMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, P
 	return newCopy;
 }
 
-void _OneToOneMapper_Construct( void* mapper, Stg_ComponentFactory* cf, void* data ) {
-	OneToOneMapper* self = (OneToOneMapper*)mapper;
-	MaterialPointsSwarm* materialSwarm;
-	
-	_IntegrationPointMapper_Construct( self, cf, data );
+void _OneToOneMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, void* data ) {
+	OneToOneMapper*		self = (OneToOneMapper*)mapper;
+	MaterialPointsSwarm*	materialSwarm;
 
-	materialSwarm = Stg_ComponentFactory_ConstructByKey( 
-				cf, 
-				self->name, 
-				MaterialPointsSwarm_Type, 
-				MaterialPointsSwarm,  
-				True,
-				data  );
+	_IntegrationPointMapper_AssignFromXML( self, cf, data );
 
-	_OneToOneMapper_Init( self, self->integrationSwarm, materialSwarm );
+	materialSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, MaterialPointsSwarm_Type, MaterialPointsSwarm, True, data );
 
+	_OneToOneMapper_Init( self, materialSwarm );
 }
 
 void _OneToOneMapper_Build( void* mapper, void* data ) {
@@ -176,65 +118,61 @@ void _OneToOneMapper_Build( void* mapper, void* data ) {
 
 	_IntegrationPointMapper_Build( mapper, data );
 	Stg_Component_Build( self->materialSwarm, data, False );
-	
 }
+
 void _OneToOneMapper_Initialise( void* mapper, void* data ) {
+    OneToOneMapper* self = (OneToOneMapper*)mapper;
+
+    _IntegrationPointMapper_Initialise( mapper, data );
+    Stg_Component_Initialise( self->materialSwarm, data, False );
+}
+
+void _OneToOneMapper_Execute( void* mapper, void* data ) {}
+
+void _OneToOneMapper_Destroy( void* mapper, void* data ) {
 	OneToOneMapper* self = (OneToOneMapper*)mapper;
 
-	_IntegrationPointMapper_Initialise( mapper, data );
-	Stg_Component_Initialise( self->materialSwarm, data, False );
+	_IntegrationPointMapper_Destroy( self, data );
 }
-void _OneToOneMapper_Execute( void* mapper, void* data ) {}
-void _OneToOneMapper_Destroy( void* mapper, void* data ) {}
 
 MaterialPointRef* OneToOneMapper_GetMaterialRef( void* mapper, void* integrationPoint ) {
 	OneToOneMapper* self = (OneToOneMapper*)mapper;
 
-	return (MaterialPointRef*)ExtensionManager_Get( 
-			self->integrationSwarm->particleExtensionMgr, 
-			integrationPoint, 
-			self->materialRefHandle );
+	return (MaterialPointRef*)ExtensionManager_Get( self->integrationSwarm->particleExtensionMgr, integrationPoint, self->materialRefHandle );
 }
 
 MaterialPoint* OneToOneMapper_GetMaterialPoint( void* mapper, void* integrationPoint, MaterialPointsSwarm** materialSwarm ) {
-	OneToOneMapper* self = (OneToOneMapper*)mapper;
-	MaterialPointRef*       ref;
-	MaterialPointsSwarm*    swarm;
-	MaterialPoint*          materialPoint; /* Assumes that material swarm holds Material particle or derivative */
+	OneToOneMapper*		self = (OneToOneMapper*)mapper;
+	MaterialPointRef*		ref;
+	MaterialPointsSwarm*	swarm;
+	MaterialPoint*			materialPoint; /* Assumes that material swarm holds Material particle or derivative */
 
 	ref = OneToOneMapper_GetMaterialRef( self, integrationPoint );
-	Journal_Firewall(
-			ref != NULL,
-			self->errorStream, 
-			"In func %s, no MaterialPointRef found on point\n",
-			__func__ );
+	Journal_Firewall( ref != NULL, self->errorStream, "In func %s, no MaterialPointRef found on point\n", __func__ );
 
 	swarm = (MaterialPointsSwarm*)Swarm_Register_At( Swarm_Register_GetSwarm_Register(), ref->swarm_I );
-	Journal_Firewall(
-			swarm != NULL,
-			self->errorStream, 
-			"In func %s, no swarm found on for index %d\n",
-			__func__,
-			ref->swarm_I );
+	Journal_Firewall( swarm != NULL, self->errorStream, "In func %s, no swarm found on for index %d\n", __func__, ref->swarm_I );
+
 	if ( materialSwarm != NULL ) {
 		*materialSwarm = swarm;
 	}
 
 	materialPoint = (MaterialPoint*)Swarm_ParticleAt( swarm, ref->particle_I );
 	Journal_Firewall(
-			materialPoint != NULL,
-			self->errorStream, 
-			"In func %s, no MaterialPoint found for swarm index %d, point index %d\n",
-			__func__,
-			ref->swarm_I,
-			ref->particle_I );
+		materialPoint != NULL,
+		self->errorStream, 
+		"In func %s, no MaterialPoint found for swarm index %d, point index %d\n",
+		__func__,
+		ref->swarm_I,
+		ref->particle_I );
 
 	return materialPoint;
 }
 
 MaterialPointsSwarm** _OneToOneMapper_GetMaterialPointsSwarms( void* mapper, Index* count ) {
-	OneToOneMapper* self = (OneToOneMapper*)mapper;
-	MaterialPointsSwarm** result = Memory_Alloc_Array( MaterialPointsSwarm*, 1,  "Swarms" );
+	OneToOneMapper*			self = (OneToOneMapper*)mapper;
+	MaterialPointsSwarm**	result = Memory_Alloc_Array( MaterialPointsSwarm*, 1,  "Swarms" );
+
 	result[0] = self->materialSwarm;
 	*count = 1;
 
@@ -242,17 +180,18 @@ MaterialPointsSwarm** _OneToOneMapper_GetMaterialPointsSwarms( void* mapper, Ind
 }
 
 Material_Index _OneToOneMapper_GetMaterialIndexOn( void* mapper, void* point ) {
-	OneToOneMapper*         self           = (OneToOneMapper*)mapper;
-	MaterialPoint*          materialPoint; /* Assumes that material swarm holds Material particle or derivative */
+	OneToOneMapper*	self = (OneToOneMapper*)mapper;
+	MaterialPoint*		materialPoint; /* Assumes that material swarm holds Material particle or derivative */
 	
 	materialPoint = OneToOneMapper_GetMaterialPoint( self, point, NULL );
 
 	return materialPoint->materialIndex;
 }
+
 void* _OneToOneMapper_GetExtensionOn( void* mapper, void* point, ExtensionInfo_Index extHandle ) {
-	OneToOneMapper*         self = (OneToOneMapper*)mapper;
-	MaterialPointsSwarm*    swarm;
-	MaterialPoint*          materialPoint; /* Assumes that material swarm holds Material particle or derivative */
+	OneToOneMapper*		self = (OneToOneMapper*)mapper;
+	MaterialPointsSwarm*	swarm;
+	MaterialPoint*			materialPoint; /* Assumes that material swarm holds Material particle or derivative */
 
 	materialPoint = OneToOneMapper_GetMaterialPoint( self, point, &swarm );
 

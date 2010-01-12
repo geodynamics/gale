@@ -57,27 +57,18 @@
 	struct MaterialFeVariable { __MaterialFeVariable };
 	
 	/* --- Contstructors / Destructors --- */
-	MaterialFeVariable* _MaterialFeVariable_New(
- 		SizeT                                             _sizeOfSelf,
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-		Name                                              name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MATERIALFEVARIABLE_DEFARGS \
+                PARTICLEFEVARIABLE_DEFARGS
+
+	#define MATERIALFEVARIABLE_PASSARGS \
+                PARTICLEFEVARIABLE_PASSARGS
+
+	MaterialFeVariable* _MaterialFeVariable_New(  MATERIALFEVARIABLE_DEFARGS  );
 	
 	void _MaterialFeVariable_Init( MaterialFeVariable* self, Material* material ) ;
 	
@@ -87,7 +78,7 @@
 	void _MaterialFeVariable_Print( void* variable, Stream* stream );
 	void* _MaterialFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _MaterialFeVariable_Construct( void* variable, Stg_ComponentFactory* cf, void* data );
+	void _MaterialFeVariable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data );
 	void _MaterialFeVariable_Build( void* variable, void* data );
 	void _MaterialFeVariable_Initialise( void* variable, void* data );
 	void _MaterialFeVariable_Execute( void* variable, void* data );
@@ -100,3 +91,4 @@
 			double*                 particleValue );
 
 #endif 
+

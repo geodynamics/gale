@@ -53,57 +53,63 @@
 		__SwarmVariable \
 		/* Virtual info */ \
 		/* MaterialSwarmVariable info */ \
-		Materials_Register*                                 materials_Register;                \
-		ExtensionInfo_Index                                 materialExtensionHandle;           \
-		SizeT                                               offset;
+		Materials_Register*	materials_Register; \
+		ExtensionInfo_Index	materialExtensionHandle; \
+		SizeT						offset;
 
 	struct MaterialSwarmVariable { __MaterialSwarmVariable };
 
-	MaterialSwarmVariable* MaterialSwarmVariable_New( 
-		Name                                                name,
-		MaterialPointsSwarm*                                swarm,
-		Index                                               dofCount,
-		Materials_Register*                                 materials_Register,
-		ExtensionInfo_Index                                 materialExtensionHandle,
-		SizeT                                               offset );
 
-	MaterialSwarmVariable* _MaterialSwarmVariable_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		SwarmVariable_ValueAtFunction*                      _valueAt,
-		SwarmVariable_GetGlobalValueFunction*               _getMinGlobalMagnitude,
-		SwarmVariable_GetGlobalValueFunction*               _getMaxGlobalMagnitude,
-		Name                                                name );
+
+	MaterialSwarmVariable* MaterialSwarmVariable_New( 
+		Name						name,
+		AbstractContext*		context,
+		MaterialPointsSwarm*	swarm,
+		Index						dofCount,
+		Materials_Register*	materials_Register,
+		ExtensionInfo_Index	materialExtensionHandle,
+		SizeT						offset );
+
 	
-	void MaterialSwarmVariable_InitAll( 
-		void*                                               swarmVariable,
-		MaterialPointsSwarm*                                swarm,
-		Index                                               dofCount,
-		Materials_Register*                                 materials_Register,
-		ExtensionInfo_Index                                 materialExtensionHandle,
-		SizeT                                               offset );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MATERIALSWARMVARIABLE_DEFARGS \
+                SWARMVARIABLE_DEFARGS
+
+	#define MATERIALSWARMVARIABLE_PASSARGS \
+                SWARMVARIABLE_PASSARGS
+
+	MaterialSwarmVariable* _MaterialSwarmVariable_New(  MATERIALSWARMVARIABLE_DEFARGS  );
+	
+	void _MaterialSwarmVariable_Init(
+		void*                swarmVariable,
+		Materials_Register*  materials_Register,
+		ExtensionInfo_Index  materialExtensionHandle,
+		SizeT                offset );
 
 	void _MaterialSwarmVariable_Delete( void* swarmVariable );
+
 	void _MaterialSwarmVariable_Print( void* swarmVariable, Stream* stream );
 
-	void* _MaterialSwarmVariable_DefaultNew( Name name ) ;
-void _MaterialSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) ;
-	void _MaterialSwarmVariable_Build( void* swarmVariable, void* data ) ;
-	void _MaterialSwarmVariable_Initialise( void* swarmVariable, void* data ) ;
-	void _MaterialSwarmVariable_Execute( void* swarmVariable, void* data ) ;
-	void _MaterialSwarmVariable_Destroy( void* swarmVariable, void* data ) ;
+	void* _MaterialSwarmVariable_DefaultNew( Name name );
 
-	void _MaterialSwarmVariable_ValueAt( void* swarmVariable, Particle_Index lParticle_I, double* value ) ;
-	double _MaterialSwarmVariable_GetMinGlobalMagnitude( void* swarmVariable ) ;
-	double _MaterialSwarmVariable_GetMaxGlobalMagnitude( void* swarmVariable ) ;
+	void _MaterialSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data );
+
+	void _MaterialSwarmVariable_Build( void* swarmVariable, void* data );
+
+	void _MaterialSwarmVariable_Initialise( void* swarmVariable, void* data );
+
+	void _MaterialSwarmVariable_Execute( void* swarmVariable, void* data );
+
+	void _MaterialSwarmVariable_Destroy( void* swarmVariable, void* data );
+
+	void _MaterialSwarmVariable_ValueAt( void* swarmVariable, Particle_Index lParticle_I, double* value );
+
+	double _MaterialSwarmVariable_GetMinGlobalMagnitude( void* swarmVariable );
+
+	double _MaterialSwarmVariable_GetMaxGlobalMagnitude( void* swarmVariable );
 
 #endif
+
