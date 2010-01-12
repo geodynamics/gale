@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_FileParticleLayout_h__
-#define __Domain_Swarm_FileParticleLayout_h__
+#ifndef __StgDomain_Swarm_FileParticleLayout_h__
+#define __StgDomain_Swarm_FileParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -56,42 +56,51 @@
 		hid_t** fileSpace; \
 		Index* lastParticleIndex; \
 		hsize_t start[2]; \
-		hsize_t count[2];
+		hsize_t count[2]; \
+		/** number of files previous checkpoint stored across */ \
+		Index                           checkpointfiles;		
 #else
 	#define __FileParticleLayout \
 		__GlobalParticleLayout \
 		\
-		Name                                             filename;    \
-		FILE*                                            file;        \
-		Stream*                                          errorStream;
+		Name       filename;    \
+		FILE*      file;        \
+		Stream*    errorStream; \
+		/** number of files previous checkpoint stored across */ \
+		Index      checkpointfiles;
 #endif
 
 	struct FileParticleLayout { __FileParticleLayout };
 	
 	/* Create a new FileParticleLayout and initialise */
-	FileParticleLayout* FileParticleLayout_New( Name name, Name filename );
+   FileParticleLayout* FileParticleLayout_New( Name name,
+      AbstractContext* context, 
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int     totalInitialParticles, 
+      double           averageInitialParticlesPerCell, 
+      Name             filename, 
+      Index            checkpointfiles );
 
-	/* Creation implementation / Virtual constructor */
-	FileParticleLayout* _FileParticleLayout_New( 
-		SizeT                                            _sizeOfSelf,
-		Type                                             type,
-		Stg_Class_DeleteFunction*                        _delete,
-		Stg_Class_PrintFunction*                         _print,
-		Stg_Class_CopyFunction*                          _copy, 
-		Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-		Stg_Component_ConstructFunction*                 _construct,
-		Stg_Component_BuildFunction*                     _build,
-		Stg_Component_InitialiseFunction*                _initialise,
-		Stg_Component_ExecuteFunction*                   _execute,
-		Stg_Component_DestroyFunction*                   _destroy,
-		ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-		Name                                             name,
-		Bool                                             initFlag,
-		Name                                             filename );
+   /* Creation implementation / Virtual constructor */
 	
-	void _FileParticleLayout_Init( void* particleLayout, Name filename );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FILEPARTICLELAYOUT_DEFARGS \
+                GLOBALPARTICLELAYOUT_DEFARGS, \
+                Name          filename, \
+                Index  checkpointfiles
+
+	#define FILEPARTICLELAYOUT_PASSARGS \
+                GLOBALPARTICLELAYOUT_PASSARGS, \
+	        filename,        \
+	        checkpointfiles
+
+   FileParticleLayout* _FileParticleLayout_New(  FILEPARTICLELAYOUT_DEFARGS  );
+	
+	void _FileParticleLayout_Init( void* particleLayout, Name filename, Index checkpointfiles );
 	
 	/* 'Stg_Class' Stuff */
 	void _FileParticleLayout_Delete( void* particleLayout );
@@ -104,7 +113,7 @@
 	
 	/* 'Stg_Component' Stuff */
 	void* _FileParticleLayout_DefaultNew( Name name ) ;
-	void _FileParticleLayout_Construct( void* particleLayout, Stg_ComponentFactory *cf, void* data );
+	void _FileParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data );
 	void _FileParticleLayout_Build( void* particleLayout, void* data );
 	void _FileParticleLayout_Initialise( void* particleLayout, void* data );
 	void _FileParticleLayout_Execute( void* particleLayout, void* data );
@@ -113,5 +122,8 @@
 	void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) ;
 	void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm ) ;
 	void _FileParticleLayout_InitialiseParticle( void* particleLayout, void* swarm, Particle_Index newParticle_I, void* particle);
+	/* small routine to find out number of files fileParticleLayout is stored across, which maybe have been stored in the timeInfo checkpoint file */ 
+	Index _FileParticleLayout_GetFileCountFromTimeInfoFile( void* context );
 
-#endif /* __Domain_Swarm_FileParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_FileParticleLayout_h__ */
+

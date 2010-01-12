@@ -48,33 +48,48 @@
 /* Textual name of this class */
 const Type Remesher_Type = "Remesher";
 
+/* Constructors */
 
-/*
-** Constructors */
+Remesher* _Remesher_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Remesher);
+	Type                                                      type = Remesher_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Remesher_Delete;
+	Stg_Class_PrintFunction*                                _print = _Remesher_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void*(*)(Name))_Remesher_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Remesher_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Remesher_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Remesher_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Remesher_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Remesher_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	Remesher_RemeshFunc*                                remeshFunc = NULL;
 
-Remesher* _Remesher_New( REMESHER_ARGS ) {
-   Remesher*	self;
+   return _Remesher_New(  REMESHER_PASSARGS  );
+}
+
+Remesher* _Remesher_New(  REMESHER_DEFARGS  ) {
+   Remesher* self;
 
    /* Allocate memory. */
-   self = (Remesher*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+   self = (Remesher*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
    /* Virtual functions. */
    self->remeshFunc = remeshFunc;
 
-   /* Remesher info */
-   _Remesher_Init( self );
-
    return self;
 }
 
-void _Remesher_Init( Remesher* self ) {
+void _Remesher_Init( void* remesher, AbstractContext* context, Mesh* mesh ) {
+   Remesher*	self = (Remesher*)remesher;
+
    /* Remesher info */
-   self->mesh = NULL;
+	self->context = context;
+   self->mesh = mesh;
 }
 
-
-/*
-** Virtual functions */
+/* Virtual functions */
 
 void _Remesher_Delete( void* remesher ) {
    Remesher*	self = (Remesher*)remesher;
@@ -103,22 +118,22 @@ void _Remesher_Print( void* remesher, Stream* stream ) {
    /* Remesher info */
 }
 
-Remesher* _Remesher_DefaultNew( Name name ) {
-   return _Remesher_New( sizeof(Remesher), Remesher_Type, _Remesher_Delete,
-                         _Remesher_Print, NULL, (void*(*)(Name))_Remesher_DefaultNew,
-                         _Remesher_Construct, _Remesher_Build, _Remesher_Initialise,
-                         _Remesher_Execute, _Remesher_Destroy, name, False, NULL );
-}
-
-void _Remesher_Construct( void* remesher, Stg_ComponentFactory* cf, void* data ) {
-   Remesher*	self = (Remesher*)remesher;
-   char*		meshName;
+void _Remesher_AssignFromXML( void* remesher, Stg_ComponentFactory* cf, void* data ) {
+   Remesher*			self = (Remesher*)remesher;
+	AbstractContext*	context;
+	Mesh*					mesh;
 
    assert( self );
    assert( cf );
    assert( cf->componentDict );
 
-   self->mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
+   context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+   if( !context )
+      context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
+   mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
+
+	_Remesher_Init ( self, context, mesh );
 }
 
 void _Remesher_Build( void* remesher, void* data ) {
@@ -127,18 +142,22 @@ void _Remesher_Build( void* remesher, void* data ) {
    assert( self );
    assert( self->mesh );
 
-   /* Build the mesh. */
-   Stg_Component_Build( self->mesh, NULL, False );
+   Stg_Component_Build( self->remeshFunc, data, False );   
+   Stg_Component_Build( self->mesh, data, False );   
 }
 
 void _Remesher_Initialise( void* remesher, void* data ) {
    Remesher*	self = (Remesher*)remesher;
 
    assert( self );
+
+   Stg_Component_Initialise( self->remeshFunc, data, False );   
+   Stg_Component_Initialise( self->mesh, data, False );   
 }
 
 void _Remesher_Execute( void* remesher, void* data ) {
    Remesher*	self = (Remesher*)remesher;
+
 
    assert( self );
 }
@@ -148,9 +167,9 @@ void _Remesher_Destroy( void* remesher, void* data ) {
 
    assert( self );
 
-   /* TODO: If delete deletes, what does destroy do? */
+   Stg_Component_Destroy( self->remeshFunc, data, False );   
 }
 
+/* Public Functions */
 
-/*
-** Public Functions */
+

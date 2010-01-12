@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Mesh_HexAlgorithms_h__
-#define __Domain_Mesh_Mesh_HexAlgorithms_h__
+#ifndef __StgDomain_Mesh_HexAlgorithms_h__
+#define __StgDomain_Mesh_HexAlgorithms_h__
 
 	/** Textual name of this class */
 	extern const Type Mesh_HexAlgorithms_Type;
@@ -61,26 +61,41 @@
 	** Constructors
 	*/
 
+
+
+	Mesh_HexAlgorithms* Mesh_HexAlgorithms_New( Name name, AbstractContext* context );
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define MESH_HEXALGORITHMS_DEFARGS \
-		MESH_ALGORITHMS_DEFARGS
+                MESH_ALGORITHMS_DEFARGS
 
 	#define MESH_HEXALGORITHMS_PASSARGS \
-		MESH_ALGORITHMS_PASSARGS
+                MESH_ALGORITHMS_PASSARGS
 
-	Mesh_HexAlgorithms* Mesh_HexAlgorithms_New( Name name );
-	Mesh_HexAlgorithms* _Mesh_HexAlgorithms_New( MESH_HEXALGORITHMS_DEFARGS );
-	void _Mesh_HexAlgorithms_Init( Mesh_HexAlgorithms* self );
+	Mesh_HexAlgorithms* _Mesh_HexAlgorithms_New(  MESH_HEXALGORITHMS_DEFARGS  );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
 	*/
 
+	void _Mesh_HexAlgorithms_Init( void* hexAlgorithms );
+
 	void _Mesh_HexAlgorithms_Delete( void* hexAlgorithms );
+
 	void _Mesh_HexAlgorithms_Print( void* hexAlgorithms, Stream* stream );
-	void _Mesh_HexAlgorithms_Construct( void* hexAlgorithms, Stg_ComponentFactory* cf, void* data );
+
+	void _Mesh_HexAlgorithms_AssignFromXML( void* hexAlgorithms, Stg_ComponentFactory* cf, void* data );
+
 	void _Mesh_HexAlgorithms_Build( void* hexAlgorithms, void* data );
+
 	void _Mesh_HexAlgorithms_Initialise( void* hexAlgorithms, void* data );
+
 	void _Mesh_HexAlgorithms_Execute( void* hexAlgorithms, void* data );
+
 	void _Mesh_HexAlgorithms_Destroy( void* hexAlgorithms, void* data );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -91,4 +106,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Domain_Mesh_Mesh_HexAlgorithms_h__ */
+#endif /* __StgDomain_Mesh_HexAlgorithms_h__ */
+

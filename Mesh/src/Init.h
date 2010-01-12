@@ -39,9 +39,9 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Init_h__
-#define __Domain_Mesh_Init_h__
+#ifndef __StgDomain_Mesh_Init_h__
+#define __StgDomain_Mesh_Init_h__
 	
 	Bool StgDomainMesh_Init( int* argc, char** argv[] );
 	
-#endif /* __Domain_Mesh_Init_h__ */
+#endif /* __StgDomain_Mesh_Init_h__ */

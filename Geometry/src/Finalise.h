@@ -38,9 +38,9 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_Finalise_h__
-#define __Domain_Geometry_Finalise_h__
+#ifndef __StgDomain_Geometry_Finalise_h__
+#define __StgDomain_Geometry_Finalise_h__
 	
 	Bool StgDomainGeometry_Finalise( void );
 	
-#endif /* __Domain_Geometry_Finalise_h__ */
+#endif /* __StgDomain_Geometry_Finalise_h__ */

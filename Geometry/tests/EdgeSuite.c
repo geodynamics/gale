@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 } EdgeSuiteData;
 
 void EdgeSuite_Setup( EdgeSuiteData* data ) {
@@ -99,6 +99,8 @@ void EdgeSuite_TestEdge( EdgeSuiteData* data ) {
 		pcu_check_fileEq( "testEdge.dat", expected_file );
 		remove( "testEdge.dat" );
 
+		Stream_CloseAndFreeFile( stream );
+
 		if( edge ) Memory_Free( edge );
 		if( edgeFace ) Memory_Free( edgeFace );
 	}
@@ -109,3 +111,5 @@ void EdgeSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, EdgeSuite_Setup, EdgeSuite_Teardown );
    pcu_suite_addTest( suite, EdgeSuite_TestEdge );
 }
+
+

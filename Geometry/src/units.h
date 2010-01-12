@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_units_h__
-#define __Domain_Geometry_units_h__
+#ifndef __StgDomain_Geometry_units_h__
+#define __StgDomain_Geometry_units_h__
 
 	#define MAX_SYMMETRIC_TENSOR_COMPONENTS 6
 	#define MAX_TENSOR_COMPONENTS           9
@@ -64,4 +64,4 @@
 	typedef double TensorArray[ MAX_TENSOR_COMPONENTS ];
 	typedef Cmplx ComplexTensorArray[MAX_TENSOR_COMPONENTS]; 
 
-#endif /* __Domain_Geometry_units_h__ */
+#endif /* __StgDomain_Geometry_units_h__ */

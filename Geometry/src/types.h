@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_types_h__
-#define __Domain_Geometry_types_h__
+#ifndef __StgDomain_Geometry_types_h__
+#define __StgDomain_Geometry_types_h__
 
 
 	typedef Index		NeighbourIndex;
@@ -100,5 +100,5 @@
 	typedef struct ParallelDelaunay	ParallelDelaunay;
 
 	
-#endif /* __Domain_Geometry_types_h__ */
+#endif /* __StgDomain_Geometry_types_h__ */
 

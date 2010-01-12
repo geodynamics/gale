@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_Plane_h__
-#define __Domain_Geometry_Plane_h__
+#ifndef __StgDomain_Geometry_Plane_h__
+#define __StgDomain_Geometry_Plane_h__
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -78,4 +78,4 @@
 	void Plane_LineIntersect( Plane plane, Line3 line, Coord point );
 
 	
-#endif /* __Domain_Geometry_Plane_h__ */
+#endif /* __StgDomain_Geometry_Plane_h__ */

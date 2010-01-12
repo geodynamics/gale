@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Decomp_Sync_Array_h__
-#define __Domain_Mesh_Decomp_Sync_Array_h__
+#ifndef __StgDomain_Mesh_Decomp_Sync_Array_h__
+#define __StgDomain_Mesh_Decomp_Sync_Array_h__
 
 	/** Textual name of this class */
 	extern const Type Decomp_Sync_Array_Type;
@@ -111,4 +111,4 @@
 	void Decomp_Sync_Array_BuildArray( Decomp_Sync_Array* self );
 	void Decomp_Sync_Array_Destruct( Decomp_Sync_Array* self );
 
-#endif /* __Domain_Mesh_Decomp_Sync_Array_h__ */
+#endif /* __StgDomain_Mesh_Decomp_Sync_Array_h__ */

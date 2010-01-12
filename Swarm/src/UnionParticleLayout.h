@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_UnionParticleLayout_h__
-#define __Domain_Swarm_UnionParticleLayout_h__
+#ifndef __StgDomain_Swarm_UnionParticleLayout_h__
+#define __StgDomain_Swarm_UnionParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -54,33 +54,35 @@
 
 	struct UnionParticleLayout { __UnionParticleLayout };
 	
-	/* Create a new UnionParticleLayout and initialise */
-	UnionParticleLayout* UnionParticleLayout_New( 
-		Name                                             name, 
-		GlobalParticleLayout**                           particleLayoutList,
-		Index                                            particleLayoutCount );
+   /* Create a new UnionParticleLayout and initialise */
+   UnionParticleLayout* UnionParticleLayout_New(
+		Name             name, 
+      AbstractContext* context, 
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int     totalInitialParticles, 
+      double           averageInitialParticlesPerCell,
+		GlobalParticleLayout** particleLayoutList,
+		Index                  particleLayoutCount );
 	
-	/* Creation implementation / Virtual constructor */
-	UnionParticleLayout* _UnionParticleLayout_New( 
-		SizeT                                            _sizeOfSelf,
-		Type                                             type,
-		Stg_Class_DeleteFunction*                        _delete,
-		Stg_Class_PrintFunction*                         _print,
-		Stg_Class_CopyFunction*                          _copy, 
-		Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-		Stg_Component_ConstructFunction*                 _construct,
-		Stg_Component_BuildFunction*                     _build,
-		Stg_Component_InitialiseFunction*                _initialise,
-		Stg_Component_ExecuteFunction*                   _execute,
-		Stg_Component_DestroyFunction*                   _destroy,
-		ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-		Name                                             name,
-		Bool                                             initFlag,
-		GlobalParticleLayout**                           particleLayoutList,
-		Index                                            particleLayoutCount );
+   /* Creation implementation / Virtual constructor */
 	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define UNIONPARTICLELAYOUT_DEFARGS \
+                GLOBALPARTICLELAYOUT_DEFARGS, \
+                GlobalParticleLayout**   particleLayoutList, \
+                Index                   particleLayoutCount
+
+	#define UNIONPARTICLELAYOUT_PASSARGS \
+                GLOBALPARTICLELAYOUT_PASSARGS, \
+	        particleLayoutList,  \
+	        particleLayoutCount
+
+   UnionParticleLayout* _UnionParticleLayout_New(  UNIONPARTICLELAYOUT_DEFARGS  );
+
 	void _UnionParticleLayout_Init( 
 		void*                                            unionParticleLayout, 
 		GlobalParticleLayout**                           particleLayoutList,
@@ -97,7 +99,7 @@
 	
 	/* 'Stg_Component' Stuff */
 	void* _UnionParticleLayout_DefaultNew( Name name ) ;
-	void _UnionParticleLayout_Construct( void* unionParticleLayout, Stg_ComponentFactory *cf, void* data );
+	void _UnionParticleLayout_AssignFromXML( void* unionParticleLayout, Stg_ComponentFactory *cf, void* data );
 	void _UnionParticleLayout_Build( void* unionParticleLayout, void* data );
 	void _UnionParticleLayout_Initialise( void* unionParticleLayout, void* data );
 	void _UnionParticleLayout_Execute( void* unionParticleLayout, void* data );
@@ -113,4 +115,5 @@
 			void*             particle );
 
 
-#endif /* __Domain_Swarm_UnionParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_UnionParticleLayout_h__ */
+

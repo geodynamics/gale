@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_Simplex_h__
-#define __Domain_Geometry_Simplex_h__
+#ifndef __StgDomain_Geometry_Simplex_h__
+#define __StgDomain_Geometry_Simplex_h__
 
 	Bool Simplex_Search3D( double** verts, unsigned* inc, 
 			       unsigned nSimplices, unsigned** inds, 
@@ -54,4 +54,4 @@
 	double Simplex_Volume( double** verts, unsigned* inc, unsigned* inds );
 	double Simplex_Area( double** verts, unsigned* inc, unsigned* inds );
 
-#endif /* __Domain_Geometry_Simplex_h__ */
+#endif /* __StgDomain_Geometry_Simplex_h__ */

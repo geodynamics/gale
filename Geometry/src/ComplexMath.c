@@ -204,3 +204,5 @@ void Cmplx_Rotate( Cmplx self, double angle, Cmplx dest ) {
 
 	Cmplx_Multiply( self, rotationFactor, dest );
 }
+
+

@@ -51,33 +51,18 @@ Bool StgDomainMesh_Init( int* argc, char** argv[] ) {
 
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   Mesh_Algorithms_Type, "0", (Stg_Component_DefaultConstructorFunction*)Mesh_Algorithms_New );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   Mesh_HexAlgorithms_Type, "0", 
-				   (Stg_Component_DefaultConstructorFunction*)Mesh_HexAlgorithms_New );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   Mesh_CentroidAlgorithms_Type, "0", 
-				   (Stg_Component_DefaultConstructorFunction*)Mesh_CentroidAlgorithms_New );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   Mesh_RegularAlgorithms_Type, "0", 
-				   (Stg_Component_DefaultConstructorFunction*)Mesh_RegularAlgorithms_New );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   MeshTopology_Type, "0", (Stg_Component_DefaultConstructorFunction*)MeshTopology_New );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   CartesianGenerator_Type, "0", (Stg_Component_DefaultConstructorFunction*)CartesianGenerator_New );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   Mesh_Type, "0", (Stg_Component_DefaultConstructorFunction*)Mesh_New );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   SurfaceAdaptor_Type, "0", (Stg_Component_DefaultConstructorFunction*)SurfaceAdaptor_New );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   CompressionAdaptor_Type, "0", (Stg_Component_DefaultConstructorFunction*)CompressionAdaptor_New );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   LinearSpaceAdaptor_Type, "0", (Stg_Component_DefaultConstructorFunction*)LinearSpaceAdaptor_New );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   MeshVariable_Type, "0", (Stg_Component_DefaultConstructorFunction*)MeshVariable_New );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), 
-				   Remesher_Type, "0", (Stg_Component_DefaultConstructorFunction*)_Remesher_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Mesh_Algorithms_Type, "0", (Stg_Component_DefaultConstructorFunction*)Mesh_Algorithms_New );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Mesh_HexAlgorithms_Type, "0", (Stg_Component_DefaultConstructorFunction*)Mesh_HexAlgorithms_New );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Mesh_CentroidAlgorithms_Type, "0", (Stg_Component_DefaultConstructorFunction*)Mesh_CentroidAlgorithms_New );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Mesh_RegularAlgorithms_Type, "0", (Stg_Component_DefaultConstructorFunction*)Mesh_RegularAlgorithms_New );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), MeshTopology_Type, "0", (Stg_Component_DefaultConstructorFunction*)MeshTopology_New );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), CartesianGenerator_Type, "0", (Stg_Component_DefaultConstructorFunction*)CartesianGenerator_New );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Mesh_Type, "0", (Stg_Component_DefaultConstructorFunction*)Mesh_New );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), SurfaceAdaptor_Type, "0", (Stg_Component_DefaultConstructorFunction*)SurfaceAdaptor_New );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), CompressionAdaptor_Type, "0", (Stg_Component_DefaultConstructorFunction*)CompressionAdaptor_New );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), LinearSpaceAdaptor_Type, "0", (Stg_Component_DefaultConstructorFunction*)LinearSpaceAdaptor_New );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), MeshVariable_Type, "0", (Stg_Component_DefaultConstructorFunction*)MeshVariable_New );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Remesher_Type, "0", (Stg_Component_DefaultConstructorFunction*)_Remesher_DefaultNew );
 
 	RegisterParent( Mesh_ElementType_Type, Stg_Class_Type );
 	RegisterParent( Mesh_HexType_Type, Mesh_ElementType_Type );
@@ -99,3 +84,5 @@ Bool StgDomainMesh_Init( int* argc, char** argv[] ) {
 
 	return True;
 }
+
+

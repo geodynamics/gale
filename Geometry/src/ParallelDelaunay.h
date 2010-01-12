@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_ParallelDelaunay_h__
-#define __Domain_Geometry_ParallelDelaunay_h__
+#ifndef __StgDomain_Geometry_ParallelDelaunay_h__
+#define __StgDomain_Geometry_ParallelDelaunay_h__
 
 	/* Virtual function types */
 	
@@ -99,29 +99,27 @@
 		DelaunayAttributes			*attr );
 	
 	/** Creation implementation */
-	ParallelDelaunay* _ParallelDelaunay_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
-		Dictionary					*dictionary,
-		CoordF						*sites,
-		int							numSites,
-		int							rank,
-		int							numProcs,
-		MPI_Comm					*comm,
-		DelaunayAttributes			*attr );
 	
-	void _ParallelDelaunay_Init( ParallelDelaunay* self );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PARALLELDELAUNAY_DEFARGS \
+                DELAUNAY_DEFARGS, \
+                int            rank, \
+                int        numProcs, \
+                MPI_Comm*      comm
+
+	#define PARALLELDELAUNAY_PASSARGS \
+                DELAUNAY_PASSARGS, \
+	        rank,     \
+	        numProcs, \
+	        comm    
+
+	ParallelDelaunay* _ParallelDelaunay_New(  PARALLELDELAUNAY_DEFARGS  );
+	
+	//void _ParallelDelaunay_Init( ParallelDelaunay* self );
+    void _ParallelDelaunay_Init( ParallelDelaunay* self, CoordF* points, int leftProc, int rightProc, int rank, int numProcs, MPI_Comm* comm, int numSites, int numInputSites, Dictionary* dictionary, Bool initFlag );
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -136,7 +134,7 @@
 	
 	void *_ParallelDelaunay_Copy( void* pd, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-	void _ParallelDelaunay_Construct( void* pd, Stg_ComponentFactory* cf, void* data );
+	void _ParallelDelaunay_AssignFromXML( void* pd, Stg_ComponentFactory* cf, void* data );
 	
 	void _ParallelDelaunay_Build( void* pd, void* data );
 	
@@ -168,4 +166,5 @@
 	
 	void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd );
 	
-#endif /* __Domain_Geometry_ParallelDelaunay_h__ */
+#endif /* __StgDomain_Geometry_ParallelDelaunay_h__ */
+

@@ -33,8 +33,8 @@
 ** $Id: Swarm_Register.h 2745 2005-05-10 08:12:18Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#ifndef __Domain_Swarm_Swarm_Register_h__
-#define __Domain_Swarm_Swarm_Register_h__
+#ifndef __StgDomain_Swarm_Swarm_Register_h__
+#define __StgDomain_Swarm_Swarm_Register_h__
 
 	extern const Type Swarm_Register_Type;
 	extern Swarm_Register* stgSwarm_Register;		/**< Swarm register singleton. */
@@ -55,13 +55,18 @@
 	** Constructor
 	*/
 	/* Creation implementation */
-	Swarm_Register* _Swarm_Register_New( 
-		SizeT					_sizeOfSelf, 
-		Type					type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print, 
-		Stg_Class_CopyFunction*			_copy
-		);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SWARM_REGISTER_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define SWARM_REGISTER_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	Swarm_Register* _Swarm_Register_New(  SWARM_REGISTER_DEFARGS  );
 	
 	Swarm_Register* Swarm_Register_New();
 
@@ -94,6 +99,7 @@
 
 	void Swarm_Register_SaveAllRegisteredSwarms( Swarm_Register* self, void* context );
 
-#endif /* __Domain_Swarm_Swarm_Register_h__ */
+#endif /* __StgDomain_Swarm_Swarm_Register_h__ */
+
 
 

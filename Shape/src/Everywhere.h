@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StGermain_Domain_Shape_EverywhereClass_h__
-#define __StGermain_Domain_Shape_EverywhereClass_h__
+#ifndef __StgDomain_Shape_EverywhereClass_h__
+#define __StgDomain_Shape_EverywhereClass_h__
 
 	/* Textual name of this class */
 	extern const Type Everywhere_Type;
@@ -59,31 +59,20 @@
 		Name                                  name,
 		Dimension_Index                       dim );
 
-	Everywhere* _Everywhere_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define EVERYWHERE_DEFARGS \
+                STG_SHAPE_DEFARGS
+
+	#define EVERYWHERE_PASSARGS \
+                STG_SHAPE_PASSARGS
+
+	Everywhere* _Everywhere_New(  EVERYWHERE_DEFARGS  );
 	
 	void _Everywhere_Init( void* everywhere ) ;
-	void Everywhere_InitAll( 
-		void*                                 everywhere, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma );
 
 	/* Stg_Class_Delete Everywhere implementation */
 	void _Everywhere_Delete( void* everywhere );
@@ -95,7 +84,7 @@
 	void* _Everywhere_Copy( void* everywhere, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Everywhere_DefaultNew( Name name ) ;
-	void _Everywhere_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _Everywhere_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _Everywhere_Build( void* everywhere, void* data ) ;
 	void _Everywhere_Initialise( void* everywhere, void* data ) ;
 	void _Everywhere_Execute( void* everywhere, void* data );
@@ -114,3 +103,4 @@
 	*/
 	
 #endif 
+

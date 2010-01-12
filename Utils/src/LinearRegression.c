@@ -43,30 +43,23 @@
 const Type LinearRegression_Type = "LinearRegression";
 
 LinearRegression* LinearRegression_New(Variable* xVariable, Variable* yVariable) {
-	return _LinearRegression_New(
-			sizeof(LinearRegression),
-			LinearRegression_Type,
-			_LinearRegression_Delete,
-			_LinearRegression_Print,
-			_LinearRegression_Copy, 
-			xVariable,
-			yVariable);
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(LinearRegression);
+	Type                              type = LinearRegression_Type;
+	Stg_Class_DeleteFunction*      _delete = _LinearRegression_Delete;
+	Stg_Class_PrintFunction*        _print = _LinearRegression_Print;
+	Stg_Class_CopyFunction*          _copy = _LinearRegression_Copy;
+
+	return _LinearRegression_New(  LINEARREGRESSION_PASSARGS  );
 }
 
-LinearRegression* _LinearRegression_New(
- 		SizeT                           _sizeOfSelf, 
-		Type                            type,
-		Stg_Class_DeleteFunction*       _delete,
-		Stg_Class_PrintFunction*        _print, 
-		Stg_Class_CopyFunction*         _copy,
-		Variable*                       xVariable, 
-		Variable*                       yVariable )		
+LinearRegression* _LinearRegression_New(  LINEARREGRESSION_DEFARGS  )		
 {
 	LinearRegression*		self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(LinearRegression) );
-	self = (LinearRegression*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (LinearRegression*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	self->xVariable = xVariable;
 	self->yVariable = yVariable;
@@ -167,3 +160,5 @@ void LinearRegression_Calculate( void* linearRegression ) {
 
 
 	
+
+

@@ -49,8 +49,8 @@ typedef struct {
 	unsigned int		dimExists[3];
 	double***			cellPoints;
 	MPI_Comm				comm;
-	unsigned int		rank;
-	unsigned int		nProcs;
+	int					rank;
+	int					nProcs;
 } SingleCellLayoutSuiteData;
 
 
@@ -62,7 +62,7 @@ void SingleCellLayoutSuite_Setup( SingleCellLayoutSuiteData* data ) {
 
 	data->dimExists[0] = True; data->dimExists[1] = True; data->dimExists[2] = True;
 	/* Configure the single-cell-layout */
-	data->singleCellLayout = SingleCellLayout_New( "singleCellLayout", data->dimExists, NULL, NULL );
+	data->singleCellLayout = SingleCellLayout_New( "singleCellLayout", NULL, data->dimExists, NULL, NULL );
 }
 
 void SingleCellLayoutSuite_Teardown( SingleCellLayoutSuiteData* data ) {
@@ -72,7 +72,6 @@ void SingleCellLayoutSuite_Driver( SingleCellLayoutSuiteData* data ) {
 	Cell_Index  cell;
 
 	for( cell = 0; cell < data->singleCellLayout->_cellLocalCount( data->singleCellLayout ); cell++ ) {
-		Cell_PointIndex point;
 		Cell_PointIndex count;
 
 		count = data->singleCellLayout->_pointCount( data->singleCellLayout, cell );
@@ -128,3 +127,5 @@ void SingleCellLayoutSuite( pcu_suite_t* suite ) {
 	pcu_suite_addTest( suite, SingleCellLayoutSuite_TestMapElement );
 	pcu_suite_addTest( suite, SingleCellLayoutSuite_TestIsInCell );
 }
+
+

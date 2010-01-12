@@ -53,8 +53,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_LinearRegression_h__
-#define __Domain_Utils_LinearRegression_h__
+#ifndef __StgDomain_Utils_LinearRegression_h__
+#define __StgDomain_Utils_LinearRegression_h__
 
 	extern const Type LinearRegression_Type;
 
@@ -80,14 +80,22 @@
 
 	LinearRegression* LinearRegression_New(Variable* xVariable, Variable* yVariable) ;
 
-	LinearRegression* _LinearRegression_New(
-					SizeT                           _sizeOfSelf,
-					Type                            type,
-					Stg_Class_DeleteFunction*       _delete,
-					Stg_Class_PrintFunction*        _print,
-					Stg_Class_CopyFunction*         _copy,
-					Variable*                       xVariable,
-					Variable*                       yVariable );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LINEARREGRESSION_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                Variable*  xVariable, \
+                Variable*  yVariable
+
+	#define LINEARREGRESSION_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        xVariable, \
+	        yVariable
+
+	LinearRegression* _LinearRegression_New(  LINEARREGRESSION_DEFARGS  );
 
 	void _LinearRegression_Delete( void* linearRegression ) ;
 	void _LinearRegression_Print( void* _linearRegression, Stream* stream ) ;
@@ -98,4 +106,5 @@
 	 * http://mathworld.wolfram.com/LeastSquaresFitting.html */
 	void LinearRegression_Calculate( void* linearRegression ) ;
 
-#endif /* __Domain_Utils_LinearRegression_h__ */
+#endif /* __StgDomain_Utils_LinearRegression_h__ */
+

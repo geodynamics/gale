@@ -48,39 +48,40 @@ const Type Mesh_Type = "Mesh";
 ** Constructors
 */
 
-Mesh* Mesh_New( Name name ) {
-	return _Mesh_New( sizeof(Mesh), 
-			  Mesh_Type, 
-			  _Mesh_Delete, 
-			  _Mesh_Print, 
-			  NULL, 
-			  (void* (*)(Name))_Mesh_New, 
-			  _Mesh_Construct, 
-			  _Mesh_Build, 
-			  _Mesh_Initialise, 
-			  _Mesh_Execute, 
-			  _Mesh_Destroy, 
-			  name, 
-			  NON_GLOBAL );
+Mesh* Mesh_New( Name name, AbstractContext* context ) {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Mesh);
+	Type                                                      type = Mesh_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Mesh_Delete;
+	Stg_Class_PrintFunction*                                _print = _Mesh_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void* (*)(Name))_Mesh_New;
+	Stg_Component_ConstructFunction*                    _construct = _Mesh_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Mesh_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Mesh_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Mesh_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Mesh_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+
+	Mesh* self = _Mesh_New(  MESH_PASSARGS  );
+
+	_Mesh_Init( self, context );
+   return self;
 }
 
-Mesh* _Mesh_New( MESH_DEFARGS ) {
+Mesh* _Mesh_New(  MESH_DEFARGS  ) {
 	Mesh* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Mesh) );
-	self = (Mesh*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
-
-	/* Virtual info */
-
-	/* Mesh info */
-	_Mesh_Init( self );
+	assert( _sizeOfSelf >= sizeof(Mesh) );
+	self = (Mesh*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	return self;
 }
 
-void _Mesh_Init( Mesh* self ) {
-	self->topo = IGraph_New( "" );
+void _Mesh_Init( Mesh* self, AbstractContext* context ) {
+   self->context = context;
+	self->topo = (MeshTopology*)IGraph_New( "" );
 	self->verts = NULL;
 
 	self->vars = List_New();
@@ -95,7 +96,7 @@ void _Mesh_Init( Mesh* self ) {
 	self->minGlobalCrd = NULL;
 	self->maxGlobalCrd = NULL;
 
-	self->algorithms = Mesh_Algorithms_New( "" );
+	self->algorithms = Mesh_Algorithms_New( "", NULL );
 	Mesh_Algorithms_SetMesh( self->algorithms, self );
 	self->nElTypes = 0;
 	self->elTypes = NULL;
@@ -121,13 +122,6 @@ void _Mesh_Init( Mesh* self ) {
 void _Mesh_Delete( void* mesh ) {
 	Mesh*	self = (Mesh*)mesh;
 
-	Mesh_Destruct( self );
-	KillObject( self->algorithms );
-	NewClass_Delete( self->topo );
-	KillObject( self->info );
-	KillObject( self->vars );
-	KillObject( self->topoDataSizes );
-
 	/* Delete the parent. */
 	_Stg_Component_Delete( self );
 }
@@ -144,7 +138,15 @@ void _Mesh_Print( void* mesh, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void _Mesh_Construct( void* mesh, Stg_ComponentFactory* cf, void* data ) {
+void _Mesh_AssignFromXML( void* mesh, Stg_ComponentFactory* cf, void* data ) {
+	Mesh*			self = (Mesh*)mesh;
+   AbstractContext* context = NULL;
+
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
+	_Mesh_Init( self, context );
 }
 
 void _Mesh_Build( void* mesh, void* data ) {
@@ -205,6 +207,25 @@ void _Mesh_Execute( void* mesh, void* data ) {
 }
 
 void _Mesh_Destroy( void* mesh, void* data ) {
+   Mesh*		self = (Mesh*)mesh;
+	unsigned	d_i;
+
+   Mesh_Destruct( self );
+   Stg_Component_Destroy( self->algorithms, NULL, False );
+   Stg_Class_Delete( self->info );
+   Stg_Class_Delete( self->vars );
+   Stg_Class_Delete( self->topoDataSizes );
+
+	for( d_i = 0; d_i < Mesh_GetDimSize( self ); d_i++ ) {
+		if( self->topoDataInfos[d_i] )	
+			Stg_Class_Delete( self->topoDataInfos[d_i] );
+		if( self->topoDatas[d_i] )
+			Memory_Free( self->topoDatas[d_i] );
+	}
+   Memory_Free( self->topoDataInfos );
+   Memory_Free( self->topoDatas );
+
+   NewClass_Delete( self->topo );
 }
 
 
@@ -244,13 +265,21 @@ void Mesh_SetAlgorithms( void* mesh, void* algorithms ) {
 
 	assert( self && Stg_CheckType( self, Mesh ) );
 
+   /* TODO: This is a hack, because the FreeObject below will try and
+      remove the mesh. This is normally ok but as the code is not
+      in a Destroy or Delete phase it's problematic. Problems like
+      this should be fixed with reference counters */
+	if( self->algorithms ) 
+   	self->algorithms->mesh = NULL;
+
 	FreeObject( self->algorithms );
 	if( algorithms ) {
 		assert( Stg_CheckType( algorithms, Mesh_Algorithms ) );
 		self->algorithms = algorithms;
 	}
 	else
-		self->algorithms = Mesh_Algorithms_New( "" );
+		self->algorithms = Mesh_Algorithms_New( "", NULL );
+
 	Mesh_Algorithms_SetMesh( self->algorithms, self );
 }
 
@@ -374,8 +403,12 @@ unsigned Mesh_GetOwner( void* mesh, MeshTopology_Dim dim, unsigned remote ) {
 	return Sync_GetOwner( IGraph_GetDomain( self->topo, dim ), remote );
 }
 
-void Mesh_GetSharers( void* mesh, MeshTopology_Dim dim, unsigned shared, 
-		      unsigned* nSharers, unsigned** sharers )
+void Mesh_GetSharers(
+	void*					mesh,
+	MeshTopology_Dim	dim,
+	unsigned				shared, 
+	unsigned*			nSharers,
+	unsigned**			sharers )
 {
 	Mesh*	self = (Mesh*)mesh;
 
@@ -394,9 +427,7 @@ Bool Mesh_HasIncidence( void* mesh, MeshTopology_Dim fromDim, MeshTopology_Dim t
 	return IGraph_HasIncidence( self->topo, fromDim, toDim );
 }
 
-unsigned Mesh_GetIncidenceSize( void* mesh, MeshTopology_Dim fromDim, unsigned fromInd, 
-				MeshTopology_Dim toDim )
-{
+unsigned Mesh_GetIncidenceSize( void* mesh, MeshTopology_Dim fromDim, unsigned fromInd, MeshTopology_Dim toDim ) {
 	Mesh*	self = (Mesh*)mesh;
 
 	assert( self );
@@ -404,9 +435,7 @@ unsigned Mesh_GetIncidenceSize( void* mesh, MeshTopology_Dim fromDim, unsigned f
 	return IGraph_GetIncidenceSize( self->topo, fromDim, fromInd, toDim );
 }
 
-void Mesh_GetIncidence( void* mesh, MeshTopology_Dim fromDim, unsigned fromInd, MeshTopology_Dim toDim, 
-			IArray* inc )
-{
+void Mesh_GetIncidence( void* mesh, MeshTopology_Dim fromDim, unsigned fromInd, MeshTopology_Dim toDim, IArray* inc ) {
 	Mesh*	self = (Mesh*)mesh;
 
 	assert( self );
@@ -423,9 +452,7 @@ unsigned Mesh_NearestVertex( void* mesh, double* point ) {
 	return Mesh_Algorithms_NearestVertex( self->algorithms, point );
 }
 
-Bool Mesh_Search( void* mesh, double* point, 
-		  MeshTopology_Dim* dim, unsigned* ind )
-{
+Bool Mesh_Search( void* mesh, double* point, MeshTopology_Dim* dim, unsigned* ind ) {
 	Mesh*	self = (Mesh*)mesh;
 
 	assert( self && Stg_CheckType( self, Mesh ) );
@@ -500,8 +527,7 @@ Bool Mesh_HasExtension( void* mesh, const char* name ) {
 
 	assert( self );
 
-	return (ExtensionManager_GetHandle( self->info, name ) != -1) ?
-		True : False;
+	return (ExtensionManager_GetHandle( self->info, name ) != -1) ?  True : False;
 }
 
 void* _Mesh_GetExtension( void* mesh, const char* name ) {
@@ -510,9 +536,7 @@ void* _Mesh_GetExtension( void* mesh, const char* name ) {
 	assert( self );
 	assert( ExtensionManager_GetHandle( self->info, name ) != -1 );
 
-	return ExtensionManager_Get( self->info, self, 
-				     ExtensionManager_GetHandle( self->info, 
-								 name ) );
+	return ExtensionManager_Get( self->info, self, ExtensionManager_GetHandle( self->info, name ) );
 }
 
 void* Mesh_GetTopologyData( void* mesh, MeshTopology_Dim dim ) {
@@ -592,10 +616,7 @@ void Mesh_Sync( void* mesh ) {
 	sync = Mesh_GetSync( self, 0 );
 	nDims = Mesh_GetDimSize( self );
 	nLocals = Mesh_GetLocalSize( self, 0 );
-	Sync_SyncArray( sync, 
-			self->verts[0], nDims * sizeof(double), 
-			self->verts[nLocals], nDims * sizeof(double), 
-			nDims * sizeof(double) );
+	Sync_SyncArray( sync, self->verts[0], nDims * sizeof(double), self->verts[nLocals], nDims * sizeof(double), nDims * sizeof(double) );
 
 	/* TODO
 	if( self->dataSyncArrays ) {
@@ -615,10 +636,10 @@ void Mesh_Sync( void* mesh ) {
 */
 
 void Mesh_Destruct( Mesh* self ) {
-	unsigned	et_i, v_i;
+	unsigned	et_i/*, v_i*/;
 
 	for( et_i = 0; et_i < self->nElTypes; et_i++ )
-		FreeObject( self->elTypes[et_i] );
+		Stg_Class_Delete( self->elTypes[et_i] );
 	KillArray( self->elTypes );
 	KillArray( self->elTypeMap );
 	self->nElTypes = 0;
@@ -638,3 +659,5 @@ void Mesh_Destruct( Mesh* self ) {
 	List_Clear( self->vars );
 	*/
 }
+
+

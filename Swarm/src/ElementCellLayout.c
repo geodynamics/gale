@@ -47,160 +47,69 @@
 
 const Type ElementCellLayout_Type = "ElementCellLayout";
 
-void* _ElementCellLayout_DefaultNew( Name name ){
-	return (void*) _ElementCellLayout_New( 
-			sizeof(ElementCellLayout),
-			ElementCellLayout_Type, 
-			_ElementCellLayout_Delete,
-			_ElementCellLayout_Print,
-			_ElementCellLayout_Copy, 
-			_ElementCellLayout_DefaultNew,
-			_ElementCellLayout_Construct,
-			_ElementCellLayout_Build,
-			_ElementCellLayout_Initialise,
-			_ElementCellLayout_Execute,
-			_ElementCellLayout_Destroy,
-			name,
-			False,
-			_ElementCellLayout_CellLocalCount,
-			_ElementCellLayout_CellShadowCount,
-			_ElementCellLayout_PointCount,
-			_ElementCellLayout_InitialisePoints, 
-			_ElementCellLayout_MapElementIdToCellId,
-			_ElementCellLayout_IsInCell,
-			_ElementCellLayout_CellOf,
-			_ElementCellLayout_GetShadowInfo,
-			NULL );
-}
+ElementCellLayout* ElementCellLayout_New( Name name, AbstractContext* context, void* mesh ) { 
+	ElementCellLayout* self = _ElementCellLayout_DefaultNew( name );
 
-ElementCellLayout* ElementCellLayout_New( 
-		Name name,
-		void* mesh )
-{ 
-	return _ElementCellLayout_New( sizeof(ElementCellLayout), ElementCellLayout_Type, _ElementCellLayout_Delete,
-		_ElementCellLayout_Print, _ElementCellLayout_Copy, _ElementCellLayout_DefaultNew,
-		_ElementCellLayout_Construct, _ElementCellLayout_Build, _ElementCellLayout_Initialise,
-		_ElementCellLayout_Execute, _ElementCellLayout_Destroy, name, True,
-		_ElementCellLayout_CellLocalCount, _ElementCellLayout_CellShadowCount,
-		_ElementCellLayout_PointCount, _ElementCellLayout_InitialisePoints, 
-		_ElementCellLayout_MapElementIdToCellId, _ElementCellLayout_IsInCell,
-		_ElementCellLayout_CellOf, _ElementCellLayout_GetShadowInfo, mesh );
-}
-
-void ElementCellLayout_Init( 
-		ElementCellLayout* self, 
-		Name name,
-		void* mesh )
-{ 
-	/* General info */
-	self->type = ElementCellLayout_Type;
-	self->_sizeOfSelf = sizeof(ElementCellLayout);
-	self->_deleteSelf = False;
-	
-	/* Virtual info */
-	self->_delete = _ElementCellLayout_Delete;
-	self->_print = _ElementCellLayout_Print;
-	self->_copy = _ElementCellLayout_Copy;
-	self->_defaultConstructor = _ElementCellLayout_DefaultNew;
-	self->_construct = _ElementCellLayout_Construct;
-	self->_build = _ElementCellLayout_Build;
-	self->_initialise = _ElementCellLayout_Initialise;
-	self->_execute = _ElementCellLayout_Execute;
-	self->_destroy = _ElementCellLayout_Destroy;
-	self->_cellLocalCount = _ElementCellLayout_CellLocalCount,
-	self->_cellShadowCount = _ElementCellLayout_CellShadowCount,
-	self->_pointCount = _ElementCellLayout_PointCount,
-	self->_initialisePoints = _ElementCellLayout_InitialisePoints,
-	self->_mapElementIdToCellId = _ElementCellLayout_MapElementIdToCellId,
-	self->_isInCell = _ElementCellLayout_IsInCell,
-	self->_cellOf = _ElementCellLayout_CellOf,
-	self->_getShadowInfo = _ElementCellLayout_GetShadowInfo,
-
-	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-	_Stg_Component_Init( (Stg_Component*)self );
-	_CellLayout_Init( (CellLayout*)self );
-	
-	/* ElementCellLayout info */
+	self->isConstructed = True;
+	_CellLayout_Init( (CellLayout*)self, context );
 	_ElementCellLayout_Init( self, mesh );
+
+	return self;
 }
 
-ElementCellLayout* _ElementCellLayout_New( 
-		SizeT					_sizeOfSelf,
-		Type					type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print,
-		Stg_Class_CopyFunction*			_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
-		CellLayout_CellCountFunction*		_cellLocalCount,
-		CellLayout_CellCountFunction*		_cellShadowCount,
-		CellLayout_PointCountFunction*		_pointCount,
-		CellLayout_InitialisePointsFunction*	_initialisePoints,
-		CellLayout_MapElementIdToCellIdFunction*	_mapElementIdToCellId,		
-		CellLayout_IsInCellFunction*		_isInCell, 
-		CellLayout_CellOfFunction*		_cellOf,
-		CellLayout_GetShadowInfoFunction*	_getShadowInfo,		
-		void*					mesh ) 
-{
+void* _ElementCellLayout_DefaultNew( Name name ){
+	/* Variables set in this function */
+	SizeT                                                _sizeOfSelf = sizeof(ElementCellLayout);
+	Type                                                        type = ElementCellLayout_Type;
+	Stg_Class_DeleteFunction*                                _delete = _ElementCellLayout_Delete;
+	Stg_Class_PrintFunction*                                  _print = _ElementCellLayout_Print;
+	Stg_Class_CopyFunction*                                    _copy = _ElementCellLayout_Copy;
+	Stg_Component_DefaultConstructorFunction*    _defaultConstructor = _ElementCellLayout_DefaultNew;
+	Stg_Component_ConstructFunction*                      _construct = _ElementCellLayout_AssignFromXML;
+	Stg_Component_BuildFunction*                              _build = _ElementCellLayout_Build;
+	Stg_Component_InitialiseFunction*                    _initialise = _ElementCellLayout_Initialise;
+	Stg_Component_ExecuteFunction*                          _execute = _ElementCellLayout_Execute;
+	Stg_Component_DestroyFunction*                          _destroy = _ElementCellLayout_Destroy;
+	AllocationType                                nameAllocationType = NON_GLOBAL;
+	CellLayout_CellCountFunction*                    _cellLocalCount = _ElementCellLayout_CellLocalCount;
+	CellLayout_CellCountFunction*                   _cellShadowCount = _ElementCellLayout_CellShadowCount;
+	CellLayout_PointCountFunction*                       _pointCount = _ElementCellLayout_PointCount;
+	CellLayout_InitialisePointsFunction*           _initialisePoints = _ElementCellLayout_InitialisePoints;
+	CellLayout_MapElementIdToCellIdFunction*   _mapElementIdToCellId = _ElementCellLayout_MapElementIdToCellId;
+	CellLayout_IsInCellFunction*                           _isInCell = _ElementCellLayout_IsInCell;
+	CellLayout_CellOfFunction*                               _cellOf = _ElementCellLayout_CellOf;
+	CellLayout_GetShadowInfoFunction*                 _getShadowInfo = _ElementCellLayout_GetShadowInfo;
+
+	return (void*) _ElementCellLayout_New(  ELEMENTCELLLAYOUT_PASSARGS  );
+}
+
+ElementCellLayout* _ElementCellLayout_New(  ELEMENTCELLLAYOUT_DEFARGS  ) {
 	ElementCellLayout* self;
 	
 	/* Allocate memory */
-	self = (ElementCellLayout*)_CellLayout_New( 
-		_sizeOfSelf, 
-		type,
-		_delete,
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		initFlag,
-		_cellLocalCount,
-		_cellShadowCount,
-		_pointCount,
-		_initialisePoints,
-		_mapElementIdToCellId,
-		_isInCell,
-		_cellOf,
-		_getShadowInfo );
+	self = (ElementCellLayout*)_CellLayout_New(  CELLLAYOUT_PASSARGS  );
 	
 	/* General info */
 	
 	/* Virtual info */
 	
 	/* ElementCellLayout info */
-	if( initFlag ){
-		_ElementCellLayout_Init( self, mesh );
-	}
 	
 	return self;
 }
+
 
 void _ElementCellLayout_Init( ElementCellLayout* self, void* mesh ) { 
 	/* General and Virtual info should already be set */
 	
 	/* ElementCellInfo info */
 	self->mesh = (Mesh*)mesh;
-	self->isConstructed = True;
 	self->incArray = IArray_New();
 }
-
 
 void _ElementCellLayout_Delete( void* elementCellLayout ) {
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
 
-	NewClass_Delete( self->incArray );
-	
 	/* Stg_Class_Delete parent class */
 	_CellLayout_Delete( self );
 }
@@ -251,14 +160,15 @@ void* _ElementCellLayout_Copy( void* elementCellLayout, void* dest, Bool deep, N
 	return (void*)newElementCellLayout;
 }
 
-void _ElementCellLayout_Construct( void* elementCellLayout, Stg_ComponentFactory *cf, void* data ){
+void _ElementCellLayout_AssignFromXML( void* elementCellLayout, Stg_ComponentFactory *cf, void* data ){
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
 	Mesh*              mesh;
 
+	_CellLayout_AssignFromXML( self, cf, data );
+
 	mesh =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Mesh", Mesh,  True, data ) ;
 	
-	_CellLayout_Init( (CellLayout*)self );
-	_ElementCellLayout_Init(self, mesh);
+	_ElementCellLayout_Init( self, mesh );
 }
 	
 void _ElementCellLayout_Build( void *elementCellLayout, void *data ){
@@ -282,11 +192,15 @@ void _ElementCellLayout_Initialise( void *elementCellLayout, void *data ){
 }
 	
 void _ElementCellLayout_Execute( void *elementCellLayout, void *data ){
-	
 }
 
 void _ElementCellLayout_Destroy( void *elementCellLayout, void *data ){
+	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
+		
+	ElementCellLayout_DestroyShadowInfo( self );
+	NewClass_Delete( self->incArray );
 	
+	_CellLayout_Destroy( self, data );
 }
 
 Cell_Index _ElementCellLayout_CellLocalCount( void* elementCellLayout ) {
@@ -369,6 +283,19 @@ ShadowInfo* _ElementCellLayout_GetShadowInfo( void* elementCellLayout ) {
 	return &self->cellShadowInfo;
 }
 
+void ElementCellLayout_DestroyShadowInfo( ElementCellLayout* self ) {
+	unsigned	nIncProcs = self->cellShadowInfo.procNbrInfo->procNbrCnt;
+
+	/* Extract neighbouring proc information. */
+	Memory_Free( self->cellShadowInfo.procNbrInfo->procNbrTbl );
+   if( nIncProcs ) {
+      Memory_Free( self->cellShadowInfo.procShadowedCnt );
+      Memory_Free( self->cellShadowInfo.procShadowCnt );
+      Memory_Free( self->cellShadowInfo.procShadowedTbl );
+      Memory_Free( self->cellShadowInfo.procShadowTbl );
+   }
+	Memory_Free( self->cellShadowInfo.procNbrInfo );
+}
 
 void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self ) {
 	unsigned	nDims;
@@ -447,3 +374,5 @@ void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self ) {
 		self->cellShadowInfo.procShadowTbl[owner][curInd] = domain;
 	}
 }
+
+

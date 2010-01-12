@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Mesh_h__
-#define __Domain_Mesh_Mesh_h__
+#ifndef __StgDomain_Mesh_MeshClass_h__
+#define __StgDomain_Mesh_MeshClass_h__
 
 	/** Textual name of this class */
 	extern const Type Mesh_Type;
@@ -51,6 +51,7 @@
 		/* General info */				\
 		__Stg_Component					\
 								\
+		AbstractContext*		context;	\
 		/* Virtual info */				\
 								\
 		/* Mesh info */					\
@@ -103,15 +104,22 @@
 	** Constructors
 	*/
 
-	#define MESH_DEFARGS		\
-		STG_COMPONENT_DEFARGS
 
-	#define MESH_PASSARGS		\
-		STG_COMPONENT_PASSARGS
 
-	Mesh* Mesh_New( Name name );
-	Mesh* _Mesh_New( MESH_DEFARGS );
-	void _Mesh_Init( Mesh* self );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESH_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define MESH_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	Mesh* Mesh_New( Name name, AbstractContext* context );
+	Mesh* _Mesh_New(  MESH_DEFARGS  );
+	void _Mesh_Init( Mesh* self, AbstractContext* context );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
@@ -119,7 +127,7 @@
 
 	void _Mesh_Delete( void* mesh );
 	void _Mesh_Print( void* mesh, Stream* stream );
-	void _Mesh_Construct( void* mesh, Stg_ComponentFactory* cf, void* data );
+	void _Mesh_AssignFromXML( void* mesh, Stg_ComponentFactory* cf, void* data );
 	void _Mesh_Build( void* mesh, void* data );
 	void _Mesh_Initialise( void* mesh, void* data );
 	void _Mesh_Execute( void* mesh, void* data );
@@ -201,4 +209,5 @@
 
 	void Mesh_Destruct( Mesh* self );
 
-#endif /* __Domain_Mesh_Mesh_h__ */
+#endif /* __StgDomain_Mesh_MeshClass_h__ */
+

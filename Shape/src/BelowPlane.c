@@ -61,63 +61,21 @@ BelowPlane* BelowPlane_New(
 {
 	BelowPlane* self = (BelowPlane*) _BelowPlane_DefaultNew( name );
 
-	BelowPlane_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		offset,
-		width,
-		minValue,
-		maxValue );
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma );
+	_BelowPlane_Init( self, offset, width, minValue, maxValue );
+
 	return self;
 }
 
-BelowPlane* _BelowPlane_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name )
+BelowPlane* _BelowPlane_New(  BELOWPLANE_DEFARGS  )
 {
 	BelowPlane* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(BelowPlane) );
-	self = (BelowPlane*)_Stg_Shape_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (BelowPlane*)_Stg_Shape_New(  STG_SHAPE_PASSARGS  );
 	
 	/* General info */
-
-	/* Virtual Info */
-	self->_isCoordInside = _isCoordInside;
-	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
 	return self;
 }
 
@@ -131,30 +89,9 @@ void _BelowPlane_Init( void* belowPlane, double offset, XYZ width, XYZ minValue,
 	memcpy( self->maxValue, maxValue, sizeof(XYZ) );
 }
 
-
-void BelowPlane_InitAll( 
-		void*                                 belowPlane, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                offest,
-		XYZ                                   width,
-		XYZ                                   minValue,
-		XYZ                                   maxValue)
-{
-	BelowPlane* self = (BelowPlane*)belowPlane;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma );
-	_BelowPlane_Init( self, offest, width, minValue, maxValue );
-}
-	
-
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */
-
 void _BelowPlane_Delete( void* belowPlane ) {
 	BelowPlane* self = (BelowPlane*)belowPlane;
 	
@@ -162,15 +99,12 @@ void _BelowPlane_Delete( void* belowPlane ) {
 	_Stg_Shape_Delete( self );
 }
 
-
 void _BelowPlane_Print( void* belowPlane, Stream* stream ) {
 	BelowPlane* self = (BelowPlane*)belowPlane;
 	
 	/* Print parent */
 	_Stg_Shape_Print( self, stream );
 }
-
-
 
 void* _BelowPlane_Copy( void* belowPlane, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	BelowPlane*	self = (BelowPlane*)belowPlane;
@@ -184,33 +118,37 @@ void* _BelowPlane_Copy( void* belowPlane, void* dest, Bool deep, Name nameExt, P
 }
 
 void* _BelowPlane_DefaultNew( Name name ) {
-	return (void*) _BelowPlane_New(
-			sizeof(BelowPlane),
-			BelowPlane_Type,
-			_BelowPlane_Delete,
-			_BelowPlane_Print,
-			_BelowPlane_Copy,
-			_BelowPlane_DefaultNew,
-			_BelowPlane_Construct,
-			_BelowPlane_Build,
-			_BelowPlane_Initialise,
-			_BelowPlane_Execute,
-			_BelowPlane_Destroy,
-			_BelowPlane_IsCoordInside,
-			_BelowPlane_CalculateVolume,
-			_BelowPlane_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(BelowPlane);
+	Type                                                          type = BelowPlane_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _BelowPlane_Delete;
+	Stg_Class_PrintFunction*                                    _print = _BelowPlane_Print;
+	Stg_Class_CopyFunction*                                      _copy = _BelowPlane_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _BelowPlane_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _BelowPlane_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _BelowPlane_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _BelowPlane_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _BelowPlane_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _BelowPlane_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _BelowPlane_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _BelowPlane_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _BelowPlane_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _BelowPlane_New(  BELOWPLANE_PASSARGS  );
 }
 
 
-void _BelowPlane_Construct( void* belowPlane, Stg_ComponentFactory* cf, void* data ) {
+void _BelowPlane_AssignFromXML( void* belowPlane, Stg_ComponentFactory* cf, void* data ) {
 	BelowPlane*	             self          = (BelowPlane*) belowPlane;
 	double                       offset;
 	XYZ                          minValue;
 	XYZ                          maxValue;
 	XYZ                          width;
 
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	offset = Stg_ComponentFactory_GetDouble( cf, self->name, "offset", 0.5 );
 
@@ -291,4 +229,6 @@ void _BelowPlane_DistanceFromCenterAxis( void* shape, Coord coord, double* disVe
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }
+
+
 

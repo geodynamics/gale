@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StGermain_Domain_Shape_CylinderClass_h__
-#define __StGermain_Domain_Shape_CylinderClass_h__
+#ifndef __StgDomain_Shape_CylinderClass_h__
+#define __StgDomain_Shape_CylinderClass_h__
 
 	/* Textual name of this class */
 	extern const Type Cylinder_Type;
@@ -70,35 +70,20 @@
 		XYZ                                   end, 
 		Axis                                  perpendicularAxis );
 
-	Cylinder* _Cylinder_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
-		Name                                  name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CYLINDER_DEFARGS \
+                STG_SHAPE_DEFARGS
+
+	#define CYLINDER_PASSARGS \
+                STG_SHAPE_PASSARGS
+
+	Cylinder* _Cylinder_New(  CYLINDER_DEFARGS  );
 	
 	void _Cylinder_Init( Cylinder* self, double radius, XYZ start, XYZ end, Axis perpendicularAxis ) ;
-	void Cylinder_InitAll( 
-		void*                                 cylinder, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                radius, 
-		XYZ                                   start, 
-		XYZ                                   end, 
-		Axis                                  perpendicularAxis );
 
 	/* Stg_Class_Delete Cylinder implementation */
 	void _Cylinder_Delete( void* cylinder );
@@ -110,7 +95,7 @@
 	void* _Cylinder_Copy( void* cylinder, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Cylinder_DefaultNew( Name name ) ;
-	void _Cylinder_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _Cylinder_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _Cylinder_Build( void* cylinder, void* data ) ;
 	void _Cylinder_Initialise( void* cylinder, void* data ) ;
 	void _Cylinder_Execute( void* cylinder, void* data );
@@ -130,3 +115,4 @@
 	
 	
 #endif 
+

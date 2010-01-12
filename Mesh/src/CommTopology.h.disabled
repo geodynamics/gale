@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_CommTopology_h__
-#define __Domain_Mesh_CommTopology_h__
+#ifndef __StgDomain_Mesh_CommTopology_h__
+#define __StgDomain_Mesh_CommTopology_h__
 
 	/** Textual name of this class */
 	extern const Type CommTopology_Type;
@@ -138,4 +138,4 @@
 	Bool CommTopology_ValidateIncidence( CommTopology* self, unsigned nIncRanks, unsigned* incRanks );
 #endif
 
-#endif /* __Domain_Mesh_CommTopology_h__ */
+#endif /* __StgDomain_Mesh_CommTopology_h__ */

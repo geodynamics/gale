@@ -59,31 +59,30 @@
 const Type Swarm_Register_Type = "Swarm_Register";
 Swarm_Register* stgSwarm_Register = NULL;
 
-Swarm_Register* _Swarm_Register_New( 
-		SizeT					_sizeOfSelf, 
-		Type					type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print, 
-		Stg_Class_CopyFunction*			_copy )
+Swarm_Register* _Swarm_Register_New(  SWARM_REGISTER_DEFARGS  )
 {
 	Swarm_Register* self = NULL;
 
 	assert( _sizeOfSelf >= sizeof(Swarm_Register) );
-	self = (Swarm_Register*) _Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (Swarm_Register*) _Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	return self;
 }
 	
 Swarm_Register* Swarm_Register_New(  )
 {
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(Swarm_Register);
+	Type                              type = Swarm_Register_Type;
+	Stg_Class_DeleteFunction*      _delete = _Swarm_Register_Delete;
+	Stg_Class_PrintFunction*        _print = _Swarm_Register_Print;
+
 	Swarm_Register* self = NULL;
 
-	self = _Swarm_Register_New( 
-			sizeof(Swarm_Register), 
-			Swarm_Register_Type,
-			_Swarm_Register_Delete,
-			_Swarm_Register_Print,
-			NULL);
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_Class_CopyFunction*  _copy = NULL;
+
+	self = _Swarm_Register_New(  SWARM_REGISTER_PASSARGS  );
 
 	Swarm_Register_Init( self );
 
@@ -153,12 +152,20 @@ Index Swarm_Register_Add( Swarm_Register* self, void* swarm )
 
 void Swarm_Register_RemoveIndex( Swarm_Register* self, unsigned int index )
 {
+   int swarm_i = 0;
 	assert( self );
 	/* The third argument controls if the Delete phase is run or not in this function
 	 * KEEP = Don't run delete
 	 * DELETE = Run delete
 	 */
 	_Stg_ObjectList_RemoveByIndex( self->swarmList, index, KEEP );
+
+   /* decrement each swarms own index of where it is in swarm register,
+   this is done because the function _Stg_ObjectList_RemoveByIndex() memmoves
+   the block of memory in the list, with out altering the values within the memory */
+   for( swarm_i = index ; swarm_i < self->swarmList->count ; swarm_i++ ) {
+      ((Swarm*)self->swarmList->data[swarm_i])->swarmReg_I--;
+   }
 }
 	
 Swarm* Swarm_Register_Get( Swarm_Register* self, Name name )
@@ -244,4 +251,6 @@ void Swarm_Register_SaveAllRegisteredSwarms( Swarm_Register* self, void* context
 	Memory_Free( swarmList );
 	Journal_Printf( info, "%s: saving of swarms completed.\n", __func__ );
 }
+
+
 

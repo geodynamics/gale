@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_CartesianGenerator_h__
-#define __Domain_Mesh_CartesianGenerator_h__
+#ifndef __StgDomain_Mesh_CartesianGenerator_h__
+#define __StgDomain_Mesh_CartesianGenerator_h__
 
 	/** Textual name of this class */
 	extern const Type CartesianGenerator_Type;
@@ -107,38 +107,45 @@
 	** Constructors
 	*/
 
-	#define CARTESIANGENERATOR_DEFARGS							\
-		MESHGENERATOR_DEFARGS,								\
-		CartesianGenerator_SetTopologyParamsFunc*	setTopologyParamsFunc, 		\
-		CartesianGenerator_GenElementsFunc*		genElementsFunc, 		\
-		CartesianGenerator_GenFacesFunc*		genFacesFunc, 			\
-		CartesianGenerator_GenEdgesFunc*		genEdgesFunc, 			\
-		CartesianGenerator_GenVerticesFunc*		genVerticesFunc, 		\
-		CartesianGenerator_GenElementVertexIncFunc*	genElementVertexIncFunc, 	\
-		CartesianGenerator_GenVolumeEdgeIncFunc*	genVolumeEdgeIncFunc, 		\
-		CartesianGenerator_GenVolumeFaceIncFunc*	genVolumeFaceIncFunc, 		\
-		CartesianGenerator_GenFaceVertexIncFunc*	genFaceVertexIncFunc, 		\
-		CartesianGenerator_GenFaceEdgeIncFunc*		genFaceEdgeIncFunc, 		\
-		CartesianGenerator_GenEdgeVertexIncFunc*	genEdgeVertexIncFunc,		\
-		CartesianGenerator_GenElementTypesFunc*		genElementTypesFunc
 
-	#define CARTESIANGENERATOR_PASSARGS	\
-		MESHGENERATOR_PASSARGS, 	\
-		setTopologyParamsFunc, 		\
-		genElementsFunc, 		\
-		genFacesFunc, 			\
-		genEdgesFunc, 			\
-		genVerticesFunc, 		\
-		genElementVertexIncFunc, 	\
-		genVolumeEdgeIncFunc, 		\
-		genVolumeFaceIncFunc, 		\
-		genFaceVertexIncFunc, 		\
-		genFaceEdgeIncFunc, 		\
-		genEdgeVertexIncFunc,		\
-		genElementTypesFunc
 
-	CartesianGenerator* CartesianGenerator_New( Name name );
-	CartesianGenerator* _CartesianGenerator_New( CARTESIANGENERATOR_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CARTESIANGENERATOR_DEFARGS \
+                MESHGENERATOR_DEFARGS, \
+                CartesianGenerator_SetTopologyParamsFunc*      setTopologyParamsFunc, \
+                CartesianGenerator_GenElementsFunc*                  genElementsFunc, \
+                CartesianGenerator_GenFacesFunc*                        genFacesFunc, \
+                CartesianGenerator_GenEdgesFunc*                        genEdgesFunc, \
+                CartesianGenerator_GenVerticesFunc*                  genVerticesFunc, \
+                CartesianGenerator_GenElementVertexIncFunc*  genElementVertexIncFunc, \
+                CartesianGenerator_GenVolumeEdgeIncFunc*        genVolumeEdgeIncFunc, \
+                CartesianGenerator_GenVolumeFaceIncFunc*        genVolumeFaceIncFunc, \
+                CartesianGenerator_GenFaceVertexIncFunc*        genFaceVertexIncFunc, \
+                CartesianGenerator_GenFaceEdgeIncFunc*            genFaceEdgeIncFunc, \
+                CartesianGenerator_GenEdgeVertexIncFunc*        genEdgeVertexIncFunc, \
+                CartesianGenerator_GenElementTypesFunc*          genElementTypesFunc
+
+	#define CARTESIANGENERATOR_PASSARGS \
+                MESHGENERATOR_PASSARGS, \
+	        setTopologyParamsFunc,   \
+	        genElementsFunc,         \
+	        genFacesFunc,            \
+	        genEdgesFunc,            \
+	        genVerticesFunc,         \
+	        genElementVertexIncFunc, \
+	        genVolumeEdgeIncFunc,    \
+	        genVolumeFaceIncFunc,    \
+	        genFaceVertexIncFunc,    \
+	        genFaceEdgeIncFunc,      \
+	        genEdgeVertexIncFunc,    \
+	        genElementTypesFunc    
+
+	CartesianGenerator* CartesianGenerator_New( Name name, AbstractContext* context );
+	CartesianGenerator* _CartesianGenerator_New(  CARTESIANGENERATOR_DEFARGS  );
 	void _CartesianGenerator_Init( CartesianGenerator* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -147,7 +154,7 @@
 
 	void _CartesianGenerator_Delete( void* meshGenerator );
 	void _CartesianGenerator_Print( void* meshGenerator, Stream* stream );
-	void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, void* data );
+	void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactory* cf, void* data );
 	void _CartesianGenerator_Build( void* meshGenerator, void* data );
 	void _CartesianGenerator_Initialise( void* meshGenerator, void* data );
 	void _CartesianGenerator_Execute( void* meshGenerator, void* data );
@@ -222,7 +229,8 @@
 	void CartesianGenerator_Destruct( CartesianGenerator* self );
 	void CartesianGenerator_DestructTopology( CartesianGenerator* self );
 	void CartesianGenerator_DestructGeometry( CartesianGenerator* self );
-	void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, char* filename );
-	void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, char* filename );
+	void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, const char* filename );
+	void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, const char* filename );
 
-#endif /* __Domain_Mesh_CartesianGenerator_h__ */
+#endif /* __StgDomain_Mesh_CartesianGenerator_h__ */
+

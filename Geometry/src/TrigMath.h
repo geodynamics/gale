@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_TrigMath_h__
-#define __Domain_Geometry_TrigMath_h__
+#ifndef __StgDomain_Geometry_TrigMath_h__
+#define __StgDomain_Geometry_TrigMath_h__
 
 	#define UPPER_RIGHT_QUADRANT 	0
 	#define UPPER_LEFT_QUADRANT 	1
@@ -63,4 +63,4 @@
 	double StGermain_TrigDomain(double angle) ;
 	char StGermain_TrigQuadrant(double angle) ;
 
-#endif /* __Domain_Geometry_TrigMath_h__ */
+#endif /* __StgDomain_Geometry_TrigMath_h__ */

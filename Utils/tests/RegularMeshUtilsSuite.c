@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned	rank;
-	unsigned	nProcs;
+	int		rank;
+	int		nProcs;
 } RegularMeshUtilsSuiteData;
 
 Mesh* RegularMeshUtilsSuite_buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
@@ -55,19 +55,19 @@ Mesh* RegularMeshUtilsSuite_buildMesh( unsigned nDims, unsigned* size, double* m
 	Mesh*						mesh;
 	unsigned					maxDecomp[3] = {0, 1, 1};
 
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	CartesianGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, maxDecomp );
 	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
 
-	mesh = Mesh_New( "" );
+	mesh = Mesh_New( "", NULL );
 	Mesh_SetExtensionManagerRegister( mesh, emReg );
 	Mesh_SetGenerator( mesh, gen );
 
 	Stg_Component_Build( mesh, NULL, False );
 	Stg_Component_Initialise( mesh, NULL, False );
 
-	KillObject( mesh->generator );
+	FreeObject( mesh->generator );
 
 	return mesh;
 }
@@ -132,6 +132,7 @@ void RegularMeshUtilsSuite_TestMeshUtils( RegularMeshUtilsSuiteData* data ) {
 		NewClass_Delete( inc );
 		remove( "regularMeshUtils.dat" );
 	}
+	Stg_Class_Delete(extensionMgr_Register);
 }
 	
 void RegularMeshUtilsSuite( pcu_suite_t* suite ) {
@@ -139,3 +140,5 @@ void RegularMeshUtilsSuite( pcu_suite_t* suite ) {
 	pcu_suite_setFixtures( suite, RegularMeshUtilsSuite_Setup, RegularMeshUtilsSuite_Teardown );
 	pcu_suite_addTest( suite, RegularMeshUtilsSuite_TestMeshUtils );
 }
+
+

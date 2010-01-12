@@ -52,8 +52,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_Random_h__
-#define __Domain_Swarm_Random_h__
+#ifndef __StgDomain_Swarm_Random_h__
+#define __StgDomain_Swarm_Random_h__
 	
 	/* Maximum random number */
 	extern const long int Swarm_Random_RandMax;
@@ -65,4 +65,4 @@
 	double Swarm_Random_Random();
 	double Swarm_Random_Random_WithMinMax( double min, double max ) ;
 	
-#endif /* __Domain_Swarm_Random_h__ */
+#endif /* __StgDomain_Swarm_Random_h__ */

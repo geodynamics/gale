@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int rank;
+	int nProcs;
 } VectorMathSuiteData;
 
 void VectorMathSuite_Setup( VectorMathSuiteData* data ) {
@@ -69,7 +69,6 @@ void VectorMathSuite_BasicTest( VectorMathSuiteData* data ) {
 		Coord a, b, c;
 		Coord d = { 1.0, 1.0, 1.0 };
 		Coord e = { 1.0, 2.0, -3.0 };
-		Index i;
 
 		Stream_RedirectFile( stream, "testBasicTest.dat" );
 
@@ -101,6 +100,8 @@ void VectorMathSuite_BasicTest( VectorMathSuiteData* data ) {
 		pcu_filename_expected( "testVectorMathBasicTest.expected", expected_file );
 		pcu_check_fileEq( "testBasicTest.dat", expected_file );
 		remove( "testBasicTest.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -111,8 +112,6 @@ void VectorMathSuite_CompleteTest( VectorMathSuiteData* data ) {
 
 	if (data->rank == procToWatch) {
 		Coord a, b, c;
-		Coord d = { 1.0, 1.0, 1.0 };
-		Coord e = { 1.0, 2.0, -3.0 };
 		Index i;
 
 		Stream_RedirectFile( stream, "testCompleteTest.dat" );
@@ -142,6 +141,8 @@ void VectorMathSuite_CompleteTest( VectorMathSuiteData* data ) {
 		pcu_filename_expected( "testVectorMathCompleteTest.expected", expected_file );
 		pcu_check_fileEq( "testCompleteTest.dat", expected_file );
 		remove( "testCompleteTest.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -159,7 +160,6 @@ void VectorMathSuite_TestVectorFunctions( VectorMathSuiteData* data ) {
 		double C[] = {23  , 5  , -14  , 32, -21,    78};
 		double D[] = {23  , 5  , -14  , 32, -21,    78};
 		double angle;
-		double **matrix;
 		double vector[6];
 		double *coordList[4];
 		int d;
@@ -213,6 +213,8 @@ void VectorMathSuite_TestVectorFunctions( VectorMathSuiteData* data ) {
 		pcu_filename_expected( "testVectorMathFunctions.expected", expected_file );
 		pcu_check_fileEq( "testFunctions.dat", expected_file );
 		remove( "testFunctions.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -239,6 +241,8 @@ void VectorMathSuite_TestMagnitudeFunction( VectorMathSuiteData* data ) {
 		pcu_filename_expected( "testVectorMathMagnitudeFunction.expected", expected_file );
 		pcu_check_fileEq( "testMagnitudeFunction.dat", expected_file );
 		remove( "testMagnitudeFunction.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -263,6 +267,8 @@ void VectorMathSuite_TestDotProductFunction( VectorMathSuiteData* data ) {
 		pcu_filename_expected( "testVectorMathDotProductFunction.expected", expected_file );
 		pcu_check_fileEq( "testDotProductFunction.dat", expected_file );
 		remove( "testDotProductFunction.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -288,6 +294,8 @@ void VectorMathSuite_TestCrossProductFunction( VectorMathSuiteData* data ) {
 		pcu_filename_expected( "testVectorMathCrossProductFunction.expected", expected_file );
 		pcu_check_fileEq( "testCrossProductFunction.dat", expected_file );
 		remove( "testCrossProductFunction.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -312,6 +320,8 @@ void VectorMathSuite_TestDistancePointsFunction( VectorMathSuiteData* data ) {
 		pcu_filename_expected( "testVectorMathDistancePointsFunction.expected", expected_file );
 		pcu_check_fileEq( "testDistancePointsFunction.dat", expected_file );
 		remove( "testDistancePointsFunction.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -338,6 +348,8 @@ void VectorMathSuite_TestNormalToPlaneFunction( VectorMathSuiteData* data ) {
 		pcu_filename_expected( "testVectorMathNormalToPlaneFunction.expected", expected_file );
 		pcu_check_fileEq( "testNormalToPlaneFunction.dat", expected_file );
 		remove( "testNormalToPlaneFunction.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -367,6 +379,8 @@ void VectorMathSuite_TestCentroidFunction( VectorMathSuiteData* data ) {
 		pcu_filename_expected( "testVectorMathCentroidFunction.expected", expected_file );
 		pcu_check_fileEq( "testCentroidFunction.dat", expected_file );
 		remove( "testCentroidFunction.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -380,7 +394,6 @@ void VectorMathSuite_TestTriangleArea( VectorMathSuiteData* data ) {
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 		double C[] = {23  , 5  , -14  , 32, -21,    78};
 		int d;
-		double vector[6];
 
 		Stream_RedirectFile( stream, "testTriangleArea.dat" );
 
@@ -393,6 +406,8 @@ void VectorMathSuite_TestTriangleArea( VectorMathSuiteData* data ) {
 		pcu_filename_expected( "testVectorMathTriangleArea.expected", expected_file );
 		pcu_check_fileEq( "testTriangleArea.dat", expected_file );
 		remove( "testTriangleArea.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -406,7 +421,6 @@ void VectorMathSuite_TestNormalisationFunction( VectorMathSuiteData* data ) {
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 		double C[] = {23  , 5  , -14  , 32, -21,    78};
 		int d;
-		double vector[6];
 
 		Stream_RedirectFile( stream, "testNormalisationFunction.dat" );
 
@@ -431,6 +445,8 @@ void VectorMathSuite_TestNormalisationFunction( VectorMathSuiteData* data ) {
 		pcu_filename_expected( "testVectorMathNormalisationFunction.expected", expected_file );
 		pcu_check_fileEq( "testNormalisationFunction.dat", expected_file );
 		remove( "testNormalisationFunction.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -457,6 +473,8 @@ void VectorMathSuite_TestVectorCrossProductMagnitude( VectorMathSuiteData* data 
 		pcu_filename_expected( "testVectorMathCrossProductMagnitude.expected", expected_file );
 		pcu_check_fileEq( "testVectorCrossProducMagnitude.dat", expected_file );
 		remove( "testVectorCrossProducMagnitude.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -485,6 +503,8 @@ void VectorMathSuite_TestConvexQuadrilateralArea( VectorMathSuiteData* data ) {
 		pcu_filename_expected( "testVectorMathConvexQuadrilateralArea.expected", expected_file );
 		pcu_check_fileEq( "testConvexQuadrilateralArea.dat", expected_file );
 		remove( "testConvexQuadrilateralArea.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -513,6 +533,8 @@ void VectorMathSuite_TestScalarTripleProduct( VectorMathSuiteData* data ) {
 		pcu_filename_expected( "testVectorMathScalarTripleProduct.expected", expected_file );
 		pcu_check_fileEq( "testScalarTripleProduct.dat", expected_file );
 		remove( "testScalarTripleProduct.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -540,6 +562,8 @@ void VectorMathSuite_TestParallelPipedVolume( VectorMathSuiteData* data ) {
 		pcu_filename_expected( "testVectorMathParallelPipedVolume.expected", expected_file );
 		pcu_check_fileEq( "testParallelPipedVolume.dat", expected_file );
 		remove( "testParallelPipedVolume.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -574,6 +598,8 @@ void VectorMathSuite_TestAverageCoord( VectorMathSuiteData* data ) {
 		pcu_filename_expected( "testVectorMathAverageCoord.expected", expected_file );
 		pcu_check_fileEq( "testAverageCoord.dat", expected_file );
 		remove( "testAverageCoord.dat" );
+
+		Stream_CloseAndFreeFile( stream );
 	}
 }
 
@@ -597,3 +623,5 @@ void VectorMathSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, VectorMathSuite_TestParallelPipedVolume );
    pcu_suite_addTest( suite, VectorMathSuite_TestAverageCoord );
 }
+
+

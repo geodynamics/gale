@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StGermain_Domain_Shape_BelowPlaneClass_h__
-#define __StGermain_Domain_Shape_BelowPlaneClass_h__
+#ifndef __StgDomain_Shape_BelowPlaneClass_h__
+#define __StgDomain_Shape_BelowPlaneClass_h__
 
 	/* Textual name of this class */
 	extern const Type BelowPlane_Type;
@@ -59,35 +59,20 @@
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Constructors
 	*/
-	BelowPlane* _BelowPlane_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*    _distanceFromCenterAxis,
-		Name                                  name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define BELOWPLANE_DEFARGS \
+                STG_SHAPE_DEFARGS
+
+	#define BELOWPLANE_PASSARGS \
+                STG_SHAPE_PASSARGS
+
+	BelowPlane* _BelowPlane_New(  BELOWPLANE_DEFARGS  );
 	
 	void _BelowPlane_Init( void* belowPlane, double offset, XYZ width, XYZ minValue, XYZ maxValue ) ;
-	void BelowPlane_InitAll( 
-		void*                                 belowPlane, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                offset,
-		XYZ                                   width,
-		XYZ                                   minValue,
-		XYZ                                   maxValue );
 
 	/* Stg_Class_Delete BelowPlane implementation */
 	void _BelowPlane_Delete( void* belowPlane );
@@ -99,7 +84,7 @@
 	void* _BelowPlane_Copy( void* belowPlane, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _BelowPlane_DefaultNew( Name name ) ;
-	void _BelowPlane_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _BelowPlane_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _BelowPlane_Build( void* belowPlane, void* data ) ;
 	void _BelowPlane_Initialise( void* belowPlane, void* data ) ;
 	void _BelowPlane_Execute( void* belowPlane, void* data );
@@ -120,3 +105,4 @@
 	
 	
 #endif 
+

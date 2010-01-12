@@ -72,25 +72,29 @@ const Type Delaunay_Type="Delaunay";
 /** Create a Delaunay */
 Delaunay* Delaunay_DefaultNew( Name name )
 {
-	Delaunay *d = _Delaunay_New(
-			sizeof( Delaunay ),
-			Delaunay_Type,
-			_Delaunay_Delete,
-			_Delaunay_Print,
-			_Delaunay_Copy,
-			(Stg_Component_DefaultConstructorFunction*)Delaunay_DefaultNew,
-			_Delaunay_Construct,
-			_Delaunay_Build,
-			_Delaunay_Initialise,
-			_Delaunay_Execute,
-			_Delaunay_Destroy,
-			name,
-			False,
-			NULL,
-			NULL,
-			0,
-			0,
-			NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( Delaunay );
+	Type                                                      type = Delaunay_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Delaunay_Delete;
+	Stg_Class_PrintFunction*                                _print = _Delaunay_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Delaunay_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)Delaunay_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Delaunay_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Delaunay_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Delaunay_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Delaunay_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Delaunay_Destroy;
+	Bool                                                  initFlag = False;
+	Dictionary*                                         dictionary = NULL;
+	CoordF*                                                  sites = NULL;
+	int                                                   numSites = 0;
+	int                                                   idOffset = 0;
+	DelaunayAttributes*                                       attr = NULL;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	Delaunay *d = _Delaunay_New(  DELAUNAY_PASSARGS  );
 
 	return d;
 }
@@ -103,41 +107,38 @@ Delaunay* Delaunay_New(
 	int							idOffset,
 	DelaunayAttributes			*attr )
 {
-	Delaunay *d = _Delaunay_New(
-			sizeof( Delaunay ),
-			Delaunay_Type,
-			_Delaunay_Delete,
-			_Delaunay_Print,
-			_Delaunay_Copy,
-			(Stg_Component_DefaultConstructorFunction*)Delaunay_DefaultNew,
-			_Delaunay_Construct,
-			_Delaunay_Build,
-			_Delaunay_Initialise,
-			_Delaunay_Execute,
-			_Delaunay_Destroy,
-			name,
-			True,
-			dictionary,
-			sites,
-			numSites,
-			idOffset,
-			attr );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( Delaunay );
+	Type                                                      type = Delaunay_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Delaunay_Delete;
+	Stg_Class_PrintFunction*                                _print = _Delaunay_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Delaunay_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)Delaunay_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Delaunay_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Delaunay_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Delaunay_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Delaunay_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Delaunay_Destroy;
+	Bool                                                  initFlag = True;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	Delaunay *d = _Delaunay_New(  DELAUNAY_PASSARGS  );
 	
 	return d;
 }
 
 	/** Initialise a Delaunay */
 void Delaunay_Init(
-	Delaunay*					self,
+	Delaunay*				self,
 	Name						name,
-	Dictionary*					dictionary,
-	CoordF						*sites,
-	int							numSites,
-	int							idOffset,
-	DelaunayAttributes			*attr )
+	Dictionary*				dictionary,
+	CoordF					*sites,
+	int						numSites,
+	int						idOffset,
+	DelaunayAttributes	*attr )
 {
-	int i = 0;
-
 	self->type = Delaunay_Type;
 	self->_sizeOfSelf = sizeof( Delaunay );
 	self->_deleteSelf = False;
@@ -147,83 +148,31 @@ void Delaunay_Init(
 	self->_print = _Delaunay_Print;
 	self->_copy = _Delaunay_Copy;
 	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)Delaunay_DefaultNew;
-	self->_construct = _Delaunay_Construct;
+	self->_construct = _Delaunay_AssignFromXML;
 	self->_build = _Delaunay_Build;
 	self->_initialise = _Delaunay_Initialise;
 	self->_execute = _Delaunay_Execute;
 	self->_destroy = _Delaunay_Destroy;
 
-	self->attributes = attr;
-	self->dictionary = dictionary;
-	
-	if( self->attributes->BuildBoundingTriangle ){
-		self->numSites = numSites + 3;
-	}
-	else{
-		self->numSites = numSites;
-	}
-	
-	self->numInputSites = numSites;
-	self->idOffset = idOffset;
-	
-	if( sites != NULL ){
-		self->sites = Memory_Alloc_Array_Unnamed( Site, self->numSites );
-		memset( self->boundingTriangle, 0, sizeof( self->boundingTriangle ) );
-
-		for( i=0; i<self->numSites; i++ ){
-			if( i < self->numInputSites ){
-				self->sites[i].coord = &(sites[i]);
-			}
-			else{
-				self->sites[i].coord = &(self->boundingTriangle[i%3]);
-			}
-			self->sites[i].id = i + self->idOffset;
-		}
-	}
-
 	_Stg_Class_Init( (Stg_Class*)self );
 	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
 	_Stg_Component_Init( (Stg_Component*)self );
-	_Delaunay_Init( self );
+	_Delaunay_Init( self, sites, attr, numSites, idOffset, dictionary, True );
 }
 
 /** Creation implementation */
-Delaunay* _Delaunay_New(
-	SizeT						_sizeOfSelf, 
-	Type						type,
-	Stg_Class_DeleteFunction*				_delete,
-	Stg_Class_PrintFunction*				_print,
-	Stg_Class_CopyFunction*				_copy, 
-	Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-	Stg_Component_ConstructFunction*			_construct,
-	Stg_Component_BuildFunction*		_build,
-	Stg_Component_InitialiseFunction*		_initialise,
-	Stg_Component_ExecuteFunction*		_execute,
-	Stg_Component_DestroyFunction*		_destroy,
-	Name							name,
-	Bool							initFlag,
-	Dictionary					*dictionary,
-	CoordF						*sites,
-	int							numSites,
-	int							idOffset,
-	DelaunayAttributes			*attr )
-{
+Delaunay* _Delaunay_New(  DELAUNAY_DEFARGS  ) {
 	Delaunay *self = NULL;
 	
 	assert( _sizeOfSelf >= sizeof(Delaunay) );
-	self = (Delaunay*)_Stg_Component_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-			_construct, _build, _initialise, _execute, _destroy, name, NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
 
-	self->points = sites;
-	self->attributes = attr;
-	self->dictionary = dictionary;
+	self = (Delaunay*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
-	self->numInputSites = numSites;
-	self->idOffset = idOffset;
-	
-	if( initFlag ){
-		_Delaunay_Init( self );
-	}
+	_Delaunay_Init( self, sites, attr, numSites, idOffset, dictionary, initFlag );
 
 	return self;
 }
@@ -257,7 +206,7 @@ void Delaunay_FindMinMax( Site *sites, int count, float *minX, float *minY, floa
 	}
 }
 
-void _Delaunay_Init( Delaunay* self )
+void _Delaunay_Init( Delaunay* self, CoordF* points, DelaunayAttributes* attr, int numSites, int idOffset, Dictionary* dictionary, Bool initFlag  )
 {
 	float maxX, minX, maxY, minY;
 	float centreX, centreY;
@@ -267,47 +216,58 @@ void _Delaunay_Init( Delaunay* self )
 	
 	assert( self );
 	
-	sites = self->points;
-	
+	self->dictionary = dictionary;
+	self->points = points;
+	self->attributes = attr;
+	self->idOffset = idOffset;
+
 	if( self->attributes->BuildBoundingTriangle ){
-		self->numSites = self->numInputSites + 3;
+		self->numSites = numSites + 3;
 	}
 	else{
-		self->numSites = self->numInputSites;
-	}
-
-	if( sites != NULL ){
-		self->sites = Memory_Alloc_Array_Unnamed( Site, self->numSites );
-		memset( self->boundingTriangle, 0, sizeof( self->boundingTriangle ) );
-
-		for( i=0; i<self->numSites; i++ ){
-			if( i < self->numInputSites ){
-				self->sites[i].coord = &(sites[i]);
-			}
-			else{
-				self->sites[i].coord = &(self->boundingTriangle[i%3]);
-			}
-			self->sites[i].id = i + self->idOffset;
-		}
+		self->numSites = numSites;
 	}
 	
-	centreX = 0; centreY = 0; 
+	self->numInputSites = numSites;
+
+
+	sites = self->points;
 	
-	Delaunay_FindMinMax( self->sites, self->numSites, &minX, &minY, &maxX, &maxY );
+    if (initFlag) {
 
-	radius = (sqrt((maxX - minX) * (maxX - minX) + (maxY - minY) * (maxY - minY)));
+	    if( sites != NULL ){
+		    self->sites = Memory_Alloc_Array_Unnamed( Site, self->numSites );
+		    memset( self->boundingTriangle, 0, sizeof( self->boundingTriangle ) );
+
+		    for( i=0; i<self->numSites; i++ ){
+			    if( i < self->numInputSites ){
+				    self->sites[i].coord = &(sites[i]);
+			    }
+			    else{
+				    self->sites[i].coord = &(self->boundingTriangle[i%3]);
+			    }
+			    self->sites[i].id = i + self->idOffset;
+		    }
+	    }
+	
+	    centreX = 0; centreY = 0; 
+	
+	    Delaunay_FindMinMax( self->sites, self->numSites, &minX, &minY, &maxX, &maxY );
+
+	    radius = (sqrt((maxX - minX) * (maxX - minX) + (maxY - minY) * (maxY - minY)));
 			
-	centreX = minX + (maxX - minX) / 2.0f;
-	centreY = minY + (maxY - minY) / 2.0f;
+	    centreX = minX + (maxX - minX) / 2.0f;
+	    centreY = minY + (maxY - minY) / 2.0f;
 
-	self->boundingTriangle[0][0] = centreX - tan(PI/3.0f)*radius;
-	self->boundingTriangle[0][1] = centreY - radius;
+	    self->boundingTriangle[0][0] = centreX - tan(PI/3.0f)*radius;
+	    self->boundingTriangle[0][1] = centreY - radius;
 
-	self->boundingTriangle[1][0] = centreX + tan(PI/3.0f)*radius;
-	self->boundingTriangle[1][1] = centreY - radius;
+	    self->boundingTriangle[1][0] = centreX + tan(PI/3.0f)*radius;
+	    self->boundingTriangle[1][1] = centreY - radius;
 			
-	self->boundingTriangle[2][0] = centreX;
-	self->boundingTriangle[2][1] = centreY + radius/cos(PI/3.0f);
+	    self->boundingTriangle[2][0] = centreX;
+	    self->boundingTriangle[2][1] = centreY + radius/cos(PI/3.0f);
+    }
 }
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -318,6 +278,108 @@ void _Delaunay_Init( Delaunay* self )
 void _Delaunay_Delete( void* delaunay )
 {
 	Delaunay *self = (Delaunay*)delaunay;
+	
+	assert( self );
+
+	_Stg_Component_Delete( self );
+}
+
+/** Stg_Class_Print() implementation */
+void _Delaunay_Print( void* delaunay, Stream* stream )
+{
+	Delaunay *self = ( Delaunay* )delaunay;
+	
+	assert( self );
+	assert( stream );
+
+	_Stg_Component_Print( self, stream );
+	Journal_Printf( stream, "Delaunay (ptr): (%p)\n", self );
+	
+	Journal_Printf( stream, "\tNum Sites %d\n", self->numSites );
+	Journal_Printf( stream, "\tNum Edges %d\n", self->numEdges );
+	Journal_Printf( stream, "\tNum Triangles %d\n", self->numTriangles );
+	Journal_Printf( stream, "\tNum Voronoi Vertices %d\n", self->numVoronoiVertices );
+}
+
+void *_Delaunay_Copy( void* delaunay, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap )
+{
+	return NULL;
+}
+
+void _Delaunay_AssignFromXML( void* delaunay, Stg_ComponentFactory* cf, void* data )
+{
+	Delaunay *self = NULL;
+	Stg_ObjectList* pointerRegister;
+	int idOffset = 0;
+	CoordF *points = NULL;
+	DelaunayAttributes *attr = NULL;
+	int numSites = 0;
+
+	self = (Delaunay*) delaunay;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	
+	pointerRegister = self->context->pointer_Register; 
+	
+	assert( pointerRegister );
+
+	points = Stg_ObjectList_Get( pointerRegister, "dataPoints" );
+	attr = Stg_ObjectList_Get( pointerRegister, "delaunayAttributes" );
+
+	numSites = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "numSites", 0 );
+
+	_Delaunay_Init( self, points, attr, numSites, idOffset, cf->rootDict, True );
+
+	_Delaunay_Build( self, NULL );
+}
+
+void _Delaunay_Build( void* delaunay, void* data )
+{
+	Delaunay *self = ( Delaunay* )delaunay;
+	DelaunayAttributes *attr = NULL;
+    
+	assert( self );
+	
+	self->qp = MemoryPool_New( QuadEdge, self->numSites * 3, 10 );
+	
+	Delaunay_SortSites(self->sites, self->numSites);
+
+    Delaunay_Recurse(self, 0, self->numSites, &self->leftMost, &self->rightMost);
+
+	self->numEdges = self->qp->numElements - self->qp->numElementsFree;
+	self->numFaces = self->numEdges - self->numSites + 2;
+	self->numTriangles = 0;
+
+	attr = self->attributes;
+
+	if( attr->CreateVoronoiVertices ){
+		self->vp = MemoryPool_New( VoronoiVertex, self->numSites * 2, 10 );
+	}
+	
+	Delaunay_FindHull( self );
+	
+	if( attr->BuildTriangleIndices ){
+		Delaunay_BuildTriangleIndices( self );
+	}
+	
+	if( attr->CreateVoronoiVertices ){
+		Delaunay_BuildVoronoiVertices( self );
+		self->numVoronoiVertices = self->vp->numElements - self->vp->numElementsFree;
+	}
+	
+	Delaunay_FindNeighbours( self );
+}
+
+void _Delaunay_Initialise( void* delaunay, void* data ) {
+}
+
+void _Delaunay_Execute( void* delaunay, void* data ) {
+}
+
+void _Delaunay_Destroy( void* delaunay, void* data ) {
+   Delaunay *self = (Delaunay*)delaunay;
 	
 	assert( self );
 
@@ -364,129 +426,11 @@ void _Delaunay_Delete( void* delaunay )
 	if( self->hull ){
 		Memory_Free( self->hull );
 	}
-
-	_Stg_Component_Delete( self );
 }
 
-/** Stg_Class_Print() implementation */
-void _Delaunay_Print( void* delaunay, Stream* stream )
-{
-	Delaunay *self = ( Delaunay* )delaunay;
-	
-	assert( self );
-	assert( stream );
-
-	_Stg_Component_Print( self, stream );
-	Journal_Printf( stream, "Delaunay (ptr): (%p)\n", self );
-	
-	Journal_Printf( stream, "\tNum Sites %d\n", self->numSites );
-	Journal_Printf( stream, "\tNum Edges %d\n", self->numEdges );
-	Journal_Printf( stream, "\tNum Triangles %d\n", self->numTriangles );
-	Journal_Printf( stream, "\tNum Voronoi Vertices %d\n", self->numVoronoiVertices );
-}
-
-void *_Delaunay_Copy( void* delaunay, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap )
-{
-	return NULL;
-}
-
-void _Delaunay_Construct( void* delaunay, Stg_ComponentFactory* cf, void* data )
-{
-	Delaunay *self = NULL;
-	Stg_ObjectList* pointerRegister;
-	int idOffset = 0;
-	CoordF *points = NULL;
-	DelaunayAttributes *attr = NULL;
-	int numSites = 0;
-
-	self = (Delaunay*) delaunay;
-	
-	pointerRegister = Stg_ObjectList_Get( cf->registerRegister, "Pointer_Register" );
-	
-	assert( pointerRegister );
-
-	points = Stg_ObjectList_Get( pointerRegister, "dataPoints" );
-	attr = Stg_ObjectList_Get( pointerRegister, "delaunayAttributes" );
-
-	numSites = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "numSites", 0 );
-
-	assert( points );
-	assert( attr );
-	assert( numSites );
-	
-	self->dictionary = cf->rootDict;
-	self->points = points;
-	self->attributes = attr;
-
-	if( self->attributes->BuildBoundingTriangle ){
-		self->numSites = numSites + 3;
-	}
-	else{
-		self->numSites = numSites;
-	}
-	
-	self->numInputSites = numSites;
-	self->idOffset = idOffset;
-
-	_Delaunay_Init( self );
-	_Delaunay_Build( self, NULL );
-}
-
-void _Delaunay_Build( void* delaunay, void* data )
-{
-	Delaunay *self = ( Delaunay* )delaunay;
-	DelaunayAttributes *attr = NULL;
-    
-	assert( self );
-	
-	self->qp = MemoryPool_New( QuadEdge, self->numSites * 3, 10 );
-	
-	Delaunay_SortSites(self->sites, self->numSites);
-
-    Delaunay_Recurse(self, 0, self->numSites, &self->leftMost, &self->rightMost);
-
-	self->numEdges = self->qp->numElements - self->qp->numElementsFree;
-	self->numFaces = self->numEdges - self->numSites + 2;
-	self->numTriangles = 0;
-
-	attr = self->attributes;
-
-	if( attr->CreateVoronoiVertices ){
-		self->vp = MemoryPool_New( VoronoiVertex, self->numSites * 2, 10 );
-	}
-	
-	Delaunay_FindHull( self );
-	
-	if( attr->BuildTriangleIndices ){
-		Delaunay_BuildTriangleIndices( self );
-	}
-	
-	if( attr->CreateVoronoiVertices ){
-		Delaunay_BuildVoronoiVertices( self );
-		self->numVoronoiVertices = self->vp->numElements - self->vp->numElementsFree;
-	}
-	
-	Delaunay_FindNeighbours( self );
-}
-
-void _Delaunay_Initialise( void* delaunay, void* data )
-{
-	
-}
-
-void _Delaunay_Execute( void* delaunay, void* data )
-{
-	
-}
-
-void _Delaunay_Destroy( void* delaunay, void* data )
-{
-	
-}
-
-	/*--------------------------------------------------------------------------------------------------------------------------
-	** Private Member functions
-	*/
+/*--------------------------------------------------------------------------------------------------------------------------
+** Private Member functions
+*/
 
 /* Function for heap sorting the input points in ascending x-coordinate */
 void Delaunay_SortSites(Site *sites, int numSites )
@@ -1061,3 +1005,5 @@ int *Delaunay_GetHull( Delaunay *delaunay )
 
 	return delaunay->hull;
 }
+
+

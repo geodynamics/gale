@@ -55,8 +55,8 @@ struct _Particle {
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned	rank;
-	unsigned	nProcs;
+	int		rank;
+	int		nProcs;
 } ShadowSyncSuiteData;
 
 void ShadowSyncSuite_ValidateShadowing( DomainContext* context );
@@ -65,8 +65,9 @@ double ShadowSyncSuite_Dt( void* context ) {
    return 2.0;
 }
 
-
 void ShadowSyncSuite_Setup( ShadowSyncSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
+
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
@@ -74,17 +75,14 @@ void ShadowSyncSuite_Setup( ShadowSyncSuiteData* data ) {
 }
 
 void ShadowSyncSuite_Teardown( ShadowSyncSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
 }
 
 void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
-	DomainContext*					context;
+	DomainContext*					context = NULL;
 	Dictionary*						dictionary;
 	Dictionary*						componentDict;
 	Stg_ComponentFactory*		cf;
-	XML_IO_Handler*				ioHandler;
-	ExtensionManager_Register*	extensionMgr_Register;
-	SwarmVariable_Register*		swarmVariable_Register;
-	Stream*							stream;
 	Swarm*							swarm = NULL;
 	Particle							particle;
 	Particle*						currParticle = NULL;
@@ -94,51 +92,21 @@ void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
 	unsigned							procToWatch;
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
-	
-	stream = Journal_Register (Info_Type, "SingleAttractorStream");
-	dictionary = Dictionary_New();
-	ioHandler = XML_IO_Handler_New();
 
-	/* Read input xml file */
 	pcu_filename_input( "testSwarmParticleShadowSync.xml", input_file );
-	IO_Handler_ReadAllFromFile( ioHandler, input_file, dictionary );
 
-	/* TODO: temporary hack until Al gets the journal read from file going again */
-	if ( False == Dictionary_GetBool_WithDefault( dictionary, "particleCommInfo", True ) ) {
-		Stream_Enable( Journal_Register( Info_Type, ParticleCommHandler_Type ), False );
-	}
+	cf = stgMainInitFromXML( input_file, data->comm, NULL );
+	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	Stream_Enable( cf->infoStream, False );
+	Stream_Enable( context->info, False );
+	Stream_Enable( context->debug, False );
+	Stream_Enable( context->verbose, False );
 
+	dictionary = context->dictionary;
 	Journal_ReadFromDictionary( dictionary );
-
-	/* *** Journal stuff *** */
-	Journal_Enable_TypedStream( DebugStream_Type, False );
-	Stream_EnableBranch( Swarm_Debug, True );
-	Stream_SetLevelBranch( Swarm_Debug, 3 );
-
-	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), procToWatch);
 	Dictionary_Add( dictionary, "procToWatch", Dictionary_Entry_Value_FromUnsignedInt( procToWatch ) );
-	
-	context = DomainContext_New(
-			"context",
-			0,
-			0,
-			MPI_COMM_WORLD,
-			dictionary );
-
 	componentDict = Dictionary_GetDictionary( dictionary, "components" );
-	
 	assert( componentDict );
-
-	cf = context->CF = Stg_ComponentFactory_New( dictionary, componentDict, context->register_Register );
-	LiveComponentRegister_Add( cf->LCRegister, (Stg_Component*) context );
-
-	extensionMgr_Register = ExtensionManager_Register_New();
-	swarmVariable_Register = SwarmVariable_Register_New( NULL );
-	Stg_ObjectList_ClassAppend( cf->registerRegister, (void*)extensionMgr_Register, "ExtensionManager_Register" );
-	Stg_ObjectList_ClassAppend( cf->registerRegister, (void*)swarmVariable_Register, "SwarmVariable_Register" );
-
-	Stg_ComponentFactory_CreateComponents( cf );
-	Stg_ComponentFactory_ConstructComponents( cf, 0 );
 
 	KeyCall( context, context->constructExtensionsK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(context,context->constructExtensionsK), context );
 
@@ -162,8 +130,7 @@ void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
 		(ArithPointer) &particle.randomColour - (ArithPointer) &particle,
 		Variable_DataType_Double );
 
-	LiveComponentRegister_BuildAll( cf->LCRegister, context );
-	LiveComponentRegister_InitialiseAll( cf->LCRegister, context );
+	stgMainBuildAndInitialise( cf );
 
 	/* for each particle, set a random colour */
 	for ( lParticle_I=0; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {
@@ -174,27 +141,13 @@ void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
 		currParticle->randomColour = ( (double)  rand() ) / RAND_MAX;
 	}
 	
-	Stg_Component_Build( context, 0 /* dummy */, False );
-	Stg_Component_Initialise( context, 0 /* dummy */, False );
-	
-	AbstractContext_Dump( context );
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Dt, ShadowSyncSuite_Dt );
 	ContextEP_Append( context, AbstractContext_EP_Sync, ShadowSyncSuite_ValidateShadowing );
 
-	Stg_Component_Execute( context, 0 /* dummy */, False );
-	Stg_Component_Destroy( context, 0 /* dummy */, False );
+	Stg_Component_Execute( context, 0, False );
+	Stg_Component_Destroy( context, 0, False );
 
-	if( data->rank == procToWatch ) {
-		Journal_Printf( Journal_Register( Info_Type, "success" ), "Shadow particle validation: passed\n" );
-	}
-
-	Stg_Class_Delete( cf );
-	/* Remaining registers etc that don't live on the context or anything */
-	Stg_Class_Delete( extensionMgr_Register );
-	Stg_Class_Delete( swarmVariable_Register );
-	/* Input/Output stuff */
-	Stg_Class_Delete( dictionary );
-	Stg_Class_Delete( ioHandler );
+	stgMainDestroy( cf );
 }
 
 void ShadowSyncSuite( pcu_suite_t* suite ) {
@@ -335,5 +288,7 @@ void ShadowSyncSuite_ValidateShadowing( DomainContext* context ) {
 		}
 	}
 }
+
+
 
 

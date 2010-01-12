@@ -52,266 +52,132 @@ const Name defaultAllNodesVCName = "defaultAllNodesVCName";
 */
 
 VariableCondition* AllNodesVC_Factory(
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register, 
-		Dictionary*					dictionary,
-		void*						data )
+	AbstractContext*					context,
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register, 
+	Dictionary*							dictionary,
+	void*									data )
 {
-	return (VariableCondition*)AllNodesVC_New( defaultAllNodesVCName, NULL, variable_Register, conFunc_Register, dictionary, data );
+	return (VariableCondition*)AllNodesVC_New( defaultAllNodesVCName, context, NULL, variable_Register, conFunc_Register, dictionary, data );
 }
 
-
-AllNodesVC* AllNodesVC_DefaultNew( Name name )
-{
-	return _AllNodesVC_New(
-		sizeof(AllNodesVC), 
-		AllNodesVC_Type, 
-		_AllNodesVC_Delete, 
-		_AllNodesVC_Print, 
-		_AllNodesVC_Copy, 
-		(Stg_Component_DefaultConstructorFunction*)AllNodesVC_DefaultNew,
-		_AllNodesVC_Construct,
-		_AllNodesVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
-		name,
-		False,
-		_AllNodesVC_BuildSelf, 
-		_AllNodesVC_PrintConcise,
-		_AllNodesVC_ReadDictionary,
-		_AllNodesVC_GetSet, 
-		_AllNodesVC_GetVariableCount, 
-		_AllNodesVC_GetVariableIndex, 
-		_AllNodesVC_GetValueIndex, 
-		_AllNodesVC_GetValueCount, 
-		_AllNodesVC_GetValue,
-		_VariableCondition_Apply, 
-		NULL,
-		NULL, 
-		NULL, 
-		NULL, 
-		NULL );
-}
 
 AllNodesVC*	AllNodesVC_New(
-		Name						name,
-		Name						_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						mesh )
+	Name									name,
+	AbstractContext*					context,
+	Name									_dictionaryEntryName, 
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register,
+	Dictionary*							dictionary,
+	void*									mesh )
 {
-	return _AllNodesVC_New(
-		sizeof(AllNodesVC), 
-		AllNodesVC_Type, 
-		_AllNodesVC_Delete, 
-		_AllNodesVC_Print, 
-		_AllNodesVC_Copy, 
-		(Stg_Component_DefaultConstructorFunction*)AllNodesVC_DefaultNew,
-		_AllNodesVC_Construct,
-		_AllNodesVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
-		name,
-		True,
-		_AllNodesVC_BuildSelf, 
-		_AllNodesVC_PrintConcise,
-		_AllNodesVC_ReadDictionary,
-		_AllNodesVC_GetSet, 
-		_AllNodesVC_GetVariableCount, 
-		_AllNodesVC_GetVariableIndex, 
-		_AllNodesVC_GetValueIndex, 
-		_AllNodesVC_GetValueCount, 
-		_AllNodesVC_GetValue,
-		_VariableCondition_Apply, 
-		_dictionaryEntryName,
-		variable_Register, 
-		conFunc_Register, 
-		dictionary, 
-		mesh );
-}
+	AllNodesVC* self = _AllNodesVC_DefaultNew( name );
 
-
-void AllNodesVC_Init(
-		AllNodesVC*					self,
-		Name						name,
-		Name						_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						mesh )
-{
-	/* General info */
-	self->type = AllNodesVC_Type;
-	self->_sizeOfSelf = sizeof(AllNodesVC);
-	self->_deleteSelf = False;
-	
-	/* Virtual info */
-	self->_delete = _AllNodesVC_Delete;
-	self->_print = _AllNodesVC_Print;
-	self->_copy = _AllNodesVC_Copy;
-	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)AllNodesVC_DefaultNew,
-	self->_construct = _AllNodesVC_Construct,
-	self->_build = _VariableCondition_Build;
-	self->_initialise = _VariableCondition_Initialise;
-	self->_execute = _VariableCondition_Execute;
-	self->_destroy = _VariableCondition_Destroy;
-	self->_buildSelf = _AllNodesVC_BuildSelf;
-	self->_printConcise = _AllNodesVC_PrintConcise;
-	self->_readDictionary = _AllNodesVC_ReadDictionary;
-	self->_getSet = _AllNodesVC_GetSet;
-	self->_getVariableCount = _AllNodesVC_GetVariableCount;
-	self->_getVariableIndex = _AllNodesVC_GetVariableIndex;
-	self->_getValueIndex = _AllNodesVC_GetValueIndex;
-	self->_getValueCount = _AllNodesVC_GetValueCount;
-	self->_getValue = _AllNodesVC_GetValue;
-	self->_apply = _VariableCondition_Apply;
-	
-	_Stg_Class_Init( (Stg_Class*)self );
-	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-	_Stg_Component_Init( (Stg_Component*)self );
-	_VariableCondition_Init( (VariableCondition*)self, variable_Register, conFunc_Register, dictionary );
-	
-	/* Stg_Class info */
+	self->isConstructed = True;
+	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, dictionary );	
 	_AllNodesVC_Init( self, _dictionaryEntryName, mesh );
+
+	return self;
 }
 
+AllNodesVC* _AllNodesVC_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(AllNodesVC);
+	Type                                                       type = AllNodesVC_Type;
+	Stg_Class_DeleteFunction*                               _delete = _AllNodesVC_Delete;
+	Stg_Class_PrintFunction*                                 _print = _AllNodesVC_Print;
+	Stg_Class_CopyFunction*                                   _copy = _AllNodesVC_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_AllNodesVC_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _AllNodesVC_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _AllNodesVC_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _VariableCondition_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _VariableCondition_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _AllNodesVC_Destroy;
+	AllocationType                               nameAllocationType = NON_GLOBAL;
+	VariableCondition_BuildSelfFunc*                     _buildSelf = _AllNodesVC_BuildSelf;
+	VariableCondition_PrintConciseFunc*               _printConcise = _AllNodesVC_PrintConcise;
+	VariableCondition_ReadDictionaryFunc*           _readDictionary = _AllNodesVC_ReadDictionary;
+	VariableCondition_GetSetFunc*                           _getSet = _AllNodesVC_GetSet;
+	VariableCondition_GetVariableCountFunc*       _getVariableCount = _AllNodesVC_GetVariableCount;
+	VariableCondition_GetVariableIndexFunc*       _getVariableIndex = _AllNodesVC_GetVariableIndex;
+	VariableCondition_GetValueIndexFunc*             _getValueIndex = _AllNodesVC_GetValueIndex;
+	VariableCondition_GetValueCountFunc*             _getValueCount = _AllNodesVC_GetValueCount;
+	VariableCondition_GetValueFunc*                       _getValue = _AllNodesVC_GetValue;
+	VariableCondition_ApplyFunc*                             _apply = _VariableCondition_Apply;
 
-AllNodesVC* _AllNodesVC_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*		_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*			_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name								name, 
-		Bool								initFlag,
-		VariableCondition_BuildSelfFunc*		_buildSelf, 
-		VariableCondition_PrintConciseFunc*		_printConcise,
-		VariableCondition_ReadDictionaryFunc*		_readDictionary,
-		VariableCondition_GetSetFunc*			_getSet,
-		VariableCondition_GetVariableCountFunc*		_getVariableCount,
-		VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-		VariableCondition_GetValueIndexFunc*		_getValueIndex,
-		VariableCondition_GetValueCountFunc*		_getValueCount,
-		VariableCondition_GetValueFunc*			_getValue,
-		VariableCondition_ApplyFunc*			_apply, 
-		Name							_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						mesh )
-{
+	return _AllNodesVC_New(  ALLNODESVC_PASSARGS  );
+}
+
+AllNodesVC* _AllNodesVC_New(  ALLNODESVC_DEFARGS  ) {
 	AllNodesVC*	self;
 	
 	/* Allocate memory/General info */
-	assert(_sizeOfSelf >= sizeof(AllNodesVC));
-	self = (AllNodesVC*)_VariableCondition_New(
-		_sizeOfSelf, 
-		type, 
-		_delete, 
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		initFlag,
-		_buildSelf, 
-		_printConcise,
-		_readDictionary,
-		_getSet, 
-		_getVariableCount, 
-		_getVariableIndex, 
-		_getValueIndex, 
-		_getValueCount, 
-		_getValue, 
-		_apply, 
-		variable_Register, 
-		conFunc_Register,
-		dictionary );
+	assert( _sizeOfSelf >= sizeof(AllNodesVC) );
+	self = (AllNodesVC*)_VariableCondition_New(  VARIABLECONDITION_PASSARGS  );
 	
 	/* Virtual info */
 	
 	/* Stg_Class info */
-	if( initFlag ){
-		_AllNodesVC_Init( self, _dictionaryEntryName, mesh );
-	}
 	
 	return self;
 }
 
-
 void _AllNodesVC_Init(
-		void*						allNodesVC, 
-		Name						_dictionaryEntryName, 
-		void*						mesh )
+	void*	allNodesVC, 
+	Name	_dictionaryEntryName, 
+	void*	mesh )
 {
-	AllNodesVC*			self = (AllNodesVC*)allNodesVC;
+	AllNodesVC* self = (AllNodesVC*)allNodesVC;
 	
 	self->isConstructed = True;
 	self->_dictionaryEntryName = _dictionaryEntryName;
 	self->mesh = (Mesh*)mesh;
 }
 
-
 /*--------------------------------------------------------------------------------------------------------------------------
 ** General virtual functions
 */
 
 void _AllNodesVC_ReadDictionary( void* variableCondition, void* dictionary ) {
-	AllNodesVC*			self = (AllNodesVC*)variableCondition;
-	Dictionary_Entry_Value*		vcDictVal;
-	Dictionary_Entry_Value		_vcDictVal;
-	Dictionary_Entry_Value*		varsVal;
-	AllNodesVC_Entry_Index		entry_I;
+	AllNodesVC*					self = (AllNodesVC*)variableCondition;
+	Dictionary_Entry_Value*	vcDictVal;
+	Dictionary_Entry_Value	_vcDictVal;
+	Dictionary_Entry_Value*	varsVal;
+	AllNodesVC_Entry_Index	entry_I;
 	
 	/* Find dictionary entry */
 	if (self->_dictionaryEntryName)
 		vcDictVal = Dictionary_Get( dictionary, self->_dictionaryEntryName );
-	else
-	{
+	else {
 		vcDictVal = &_vcDictVal;
 		Dictionary_Entry_Value_InitFromStruct( vcDictVal, dictionary );
 	}
 	
-	if (vcDictVal)
-	{
+	if (vcDictVal) {
 		/* Obtain the variable entries */
 		self->_entryCount = Dictionary_Entry_Value_GetCount(Dictionary_Entry_Value_GetMember(vcDictVal, "variables"));
 		self->_entryTbl = Memory_Alloc_Array( AllNodesVC_Entry, self->_entryCount, "AllNodesVC->_entryTbl" );
 		varsVal = Dictionary_Entry_Value_GetMember(vcDictVal, "variables");
 		
-		for (entry_I = 0; entry_I < self->_entryCount; entry_I++)
-		{
-			char*			valType;
+		for (entry_I = 0; entry_I < self->_entryCount; entry_I++) {
+			char*							valType;
 			Dictionary_Entry_Value*	valueEntry;
 			Dictionary_Entry_Value*	varDictListVal;
 			
 			varDictListVal = Dictionary_Entry_Value_GetElement(varsVal, entry_I);
 			valueEntry = Dictionary_Entry_Value_GetMember(varDictListVal, "value");
 			
-			self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString(
-				Dictionary_Entry_Value_GetMember(varDictListVal, "name"));
+			self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetMember(varDictListVal, "name"));
 				
 			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(varDictListVal, "type"));
-			if (0 == strcasecmp(valType, "func"))
-			{
+
+			if (0 == strcasecmp(valType, "func")) {
 				char*	funcName = Dictionary_Entry_Value_AsString(valueEntry);
 				Index	cfIndex;
 				
 				self->_entryTbl[entry_I].value.type = VC_ValueType_CFIndex;
 				cfIndex = ConditionFunction_Register_GetIndex( self->conFunc_Register, funcName);
+
 				if ( cfIndex == (unsigned)-1 ) {	
 					Stream*	errorStr = Journal_Register( Error_Type, self->type );
 
@@ -327,8 +193,7 @@ void _AllNodesVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 				}	
 				self->_entryTbl[entry_I].value.as.typeCFIndex = cfIndex;
 			}	
-			else if (!strcasecmp(valType, "array"))
-			{
+			else if (!strcasecmp(valType, "array")) {
 				Dictionary_Entry_Value*	valueElement;
 				Index			i;
 
@@ -337,8 +202,7 @@ void _AllNodesVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 				self->_entryTbl[entry_I].value.as.typeArray.array = Memory_Alloc_Array( double, 
 					self->_entryTbl[entry_I].value.as.typeArray.size, "AllNodesVC->_entryTbl[].value.as.typeArray.array" );
 					
-				for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
-				{
+				for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++) {
 					valueElement = Dictionary_Entry_Value_GetElement(valueEntry, i);
 					self->_entryTbl[entry_I].value.as.typeArray.array[i] = 
 						Dictionary_Entry_Value_AsDouble(valueElement);
@@ -381,21 +245,25 @@ void _AllNodesVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 	}
 }
 
-
 void _AllNodesVC_Delete( void* allNodesVC ) {
-	AllNodesVC*			self = (AllNodesVC*)allNodesVC;
-	
-	if (self->_entryTbl) Memory_Free(self->_entryTbl);
+	AllNodesVC* self = (AllNodesVC*)allNodesVC;
 	
 	/* Stg_Class_Delete parent */
 	_VariableCondition_Delete(self);
 }
 
+void _AllNodesVC_Destroy( void* allNodesVC, void* data ) {
+	AllNodesVC* self = (AllNodesVC*)allNodesVC;
+
+	if (self->_entryTbl) Memory_Free(self->_entryTbl);
+
+	_VariableCondition_Destroy( self, data );
+}
 
 void _AllNodesVC_Print( void* allNodesVC, Stream* stream ) {
-	AllNodesVC*			self = (AllNodesVC*)allNodesVC;
-	AllNodesVC_Entry_Index		entry_I;
-	Index				i;
+	AllNodesVC*					self = (AllNodesVC*)allNodesVC;
+	AllNodesVC_Entry_Index	entry_I;
+	Index							i;
 	
 	/* Set the Journal for printing informations */
 	Stream* info = stream;
@@ -408,20 +276,23 @@ void _AllNodesVC_Print( void* allNodesVC, Stream* stream ) {
 	/* Stg_Class info */
 	Journal_Printf( info, "\tdictionary (ptr): %p\n", self->dictionary);
 	Journal_Printf( info, "\t_dictionaryEntryName (ptr): %p\n", self->_dictionaryEntryName);
+
 	if (self->_dictionaryEntryName)
 		Journal_Printf( info, "\t\t_dictionaryEntryName: %s\n", self->_dictionaryEntryName);
+
 	Journal_Printf( info, "\t_entryCount: %u\n", self->_entryCount);
 	Journal_Printf( info, "\t_entryTbl (ptr): %p\n", self->_entryTbl);
+
 	if (self->_entryTbl)
-		for (entry_I = 0; entry_I < self->_entryCount; entry_I++)
-		{
+		for (entry_I = 0; entry_I < self->_entryCount; entry_I++) {
 			Journal_Printf( info, "\t\t_entryTbl[%u]:\n", entry_I);
 			Journal_Printf( info, "\t\t\tvarName (ptr): %p\n", self->_entryTbl[entry_I].varName);
+
 			if (self->_entryTbl[entry_I].varName)
 				Journal_Printf( info, "\t\t\t\tvarName: %s\n", self->_entryTbl[entry_I].varName);
 			Journal_Printf( info, "\t\t\tvalue:\n");
-			switch (self->_entryTbl[entry_I].value.type)
-			{
+
+			switch (self->_entryTbl[entry_I].value.type) {
 				case VC_ValueType_Double:
 					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Double\n" );
 					Journal_Printf( info, "\t\t\t\tasDouble: %g\n", self->_entryTbl[entry_I].value.as.typeDouble );
@@ -450,8 +321,8 @@ void _AllNodesVC_Print( void* allNodesVC, Stream* stream ) {
 				case VC_ValueType_DoubleArray:
 					Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_DoubleArray\n");
 					Journal_Printf( info, "\t\t\t\tarraySize: %u\n", self->_entryTbl[entry_I].value.as.typeArray.size);
-					Journal_Printf( info, "\t\t\t\tasDoubleArray (ptr): %p\n", 
-						self->_entryTbl[entry_I].value.as.typeArray.array);
+					Journal_Printf( info, "\t\t\t\tasDoubleArray (ptr): %p\n", self->_entryTbl[entry_I].value.as.typeArray.array);
+
 					if (self->_entryTbl[entry_I].value.as.typeArray.array)
 						for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
 							Journal_Printf( info, "\t\t\t\tasDoubleArray[%u]: %g\n", i,
@@ -526,9 +397,7 @@ void _AllNodesVC_Build( void* allNodesVC, void* data ) {
 ** Virtual functions
 */
 
-void _AllNodesVC_Construct( void* allNodesVC, Stg_ComponentFactory* cf, void* data ) 
-{
-
+void _AllNodesVC_AssignFromXML( void* allNodesVC, Stg_ComponentFactory* cf, void* data ) { 
 }
 
 void _AllNodesVC_BuildSelf( void* allNodesVC, void* data ) {
@@ -605,3 +474,5 @@ void _AllNodesVC_PrintConcise( void* variableCondition, Stream* stream ) {
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Functions
 */
+
+

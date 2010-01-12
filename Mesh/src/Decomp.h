@@ -39,12 +39,12 @@
  **
  **/
  
-#ifndef __StGermain_Domain_Mesh_Decomp_h__
-#define __StGermain_Domain_Mesh_Decomp_h__
+#ifndef __StgDomain_Mesh_Decomp_h__
+#define __StgDomain_Mesh_Decomp_h__
 
 #include "StGermain/Base/Foundation/ClassClear.h"
 #define CLASSDIR StgDomain/Mesh
 #define CLASSNAME Decomp
 #include "StGermain/Base/Foundation/ClassHdr.h"
 
-#endif /* __StGermain_Domain_Mesh_Decomp_h__ */
+#endif /* __StgDomain_Mesh_Decomp_h__ */

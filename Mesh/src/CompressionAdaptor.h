@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_CompressionAdaptor_h__
-#define __Domain_Mesh_CompressionAdaptor_h__
+#ifndef __StgDomain_Mesh_CompressionAdaptor_h__
+#define __StgDomain_Mesh_CompressionAdaptor_h__
 
 	/** Textual name of this class */
 	extern const Type CompressionAdaptor_Type;
@@ -60,14 +60,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define COMPRESSIONADAPTOR_DEFARGS \
-		MESHADAPTOR_DEFARGS
+                MESHADAPTOR_DEFARGS
 
 	#define COMPRESSIONADAPTOR_PASSARGS \
-		MESHADAPTOR_PASSARGS
+                MESHADAPTOR_PASSARGS
 
-	CompressionAdaptor* CompressionAdaptor_New( Name name );
-	CompressionAdaptor* _CompressionAdaptor_New( COMPRESSIONADAPTOR_DEFARGS );
+	CompressionAdaptor* CompressionAdaptor_New( Name name, AbstractContext* context );
+	CompressionAdaptor* _CompressionAdaptor_New(  COMPRESSIONADAPTOR_DEFARGS  );
 	void _CompressionAdaptor_Init( CompressionAdaptor* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -76,7 +83,7 @@
 
 	void _CompressionAdaptor_Delete( void* adaptor );
 	void _CompressionAdaptor_Print( void* adaptor, Stream* stream );
-	void _CompressionAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data );
+	void _CompressionAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data );
 	void _CompressionAdaptor_Build( void* adaptor, void* data );
 	void _CompressionAdaptor_Initialise( void* adaptor, void* data );
 	void _CompressionAdaptor_Execute( void* adaptor, void* data );
@@ -92,4 +99,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Domain_Mesh_CompressionAdaptor_h__ */
+#endif /* __StgDomain_Mesh_CompressionAdaptor_h__ */
+

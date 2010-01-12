@@ -75,43 +75,13 @@ PythonShape* PythonShape_New(
 	return self;
 }
 
-PythonShape* _PythonShape_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name )
+PythonShape* _PythonShape_New(  PYTHONSHAPE_DEFARGS  )
 {
 	PythonShape* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(PythonShape) );
-	self = (PythonShape*)_Stg_Shape_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside ,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (PythonShape*)_Stg_Shape_New(  STG_SHAPE_PASSARGS  );
 	
 	/* General info */
 
@@ -157,7 +127,6 @@ void _PythonShape_Delete( void* pythonShape ) {
 	/* Delete parent */
 	_Stg_Shape_Delete( self );
 
-	Memory_Free( self->testCondition );
 }
 
 
@@ -181,30 +150,34 @@ void* _PythonShape_Copy( void* pythonShape, void* dest, Bool deep, Name nameExt,
 }
 
 void* _PythonShape_DefaultNew( Name name ) {
-	return (void*) _PythonShape_New(
-			sizeof(PythonShape),
-			PythonShape_Type,
-			_PythonShape_Delete,
-			_PythonShape_Print,
-			_PythonShape_Copy,
-			_PythonShape_DefaultNew,
-			_PythonShape_Construct,
-			_PythonShape_Build,
-			_PythonShape_Initialise,
-			_PythonShape_Execute,
-			_PythonShape_Destroy,
-			_PythonShape_IsCoordInside,
-			_PythonShape_CalculateVolume,
-			_PythonShape_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(PythonShape);
+	Type                                                          type = PythonShape_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _PythonShape_Delete;
+	Stg_Class_PrintFunction*                                    _print = _PythonShape_Print;
+	Stg_Class_CopyFunction*                                      _copy = _PythonShape_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _PythonShape_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _PythonShape_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _PythonShape_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _PythonShape_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _PythonShape_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _PythonShape_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _PythonShape_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _PythonShape_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _PythonShape_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _PythonShape_New(  PYTHONSHAPE_PASSARGS  );
 }
 
 
-void _PythonShape_Construct( void* pythonShape, Stg_ComponentFactory* cf, void* data ) {
+void _PythonShape_AssignFromXML( void* pythonShape, Stg_ComponentFactory* cf, void* data ) {
 	PythonShape*	self      = (PythonShape*) pythonShape;
 	char*           conditionFunction;
 
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	conditionFunction = Stg_ComponentFactory_GetString( cf, self->name, "Function", "0" );
 
@@ -228,7 +201,8 @@ void _PythonShape_Execute( void* pythonShape, void* data ) {
 }
 void _PythonShape_Destroy( void* pythonShape, void* data ) {
 	PythonShape*	self = (PythonShape*)pythonShape;
-	
+
+   Memory_Free( self->testCondition );
 	_Stg_Shape_Destroy( self, data );
 }
 
@@ -285,3 +259,5 @@ void _PythonShape_DistanceFromCenterAxis( void* shape, Coord coord, double* disV
 }
 
 #endif /* HAVE_PYTHON */
+
+

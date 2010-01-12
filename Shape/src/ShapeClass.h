@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StGermain_Domain_Shape_Shape_h__
-#define __StGermain_Domain_Shape_Shape_h__
+#ifndef __StgDomain_Shape_ShapeClass_h__
+#define __StgDomain_Shape_ShapeClass_h__
 
 	typedef Bool (Stg_Shape_IsCoordInsideFunction) ( void* shape, Coord coord );
 
@@ -53,6 +53,7 @@
 	#define __Stg_Shape \
 		/* General info */ \
 		__Stg_Component \
+		AbstractContext*                      context;             \
 		/* Virtual Info */                                         \
 		Stg_Shape_IsCoordInsideFunction*      _isCoordInside;      \
 		Stg_Shape_CalculateVolumeFunction*    _calculateVolume;    \
@@ -70,39 +71,26 @@
 	** Constructors
 	*/
 
-#define STG_SHAPE_ARGS\
-   SizeT                                       _sizeOfSelf, \
-      Type                                        type,\
-      Stg_Class_DeleteFunction*                   _delete,\
-      Stg_Class_PrintFunction*                    _print,\
-      Stg_Class_CopyFunction*                     _copy, \
-      Stg_Component_DefaultConstructorFunction*   _defaultConstructor,\
-      Stg_Component_ConstructFunction*            _construct,\
-      Stg_Component_BuildFunction*                _build,\
-      Stg_Component_InitialiseFunction*           _initialise,\
-      Stg_Component_ExecuteFunction*              _execute,\
-      Stg_Component_DestroyFunction*              _destroy,\
-      Stg_Shape_IsCoordInsideFunction*            _isCoordInside,\
-      Stg_Shape_CalculateVolumeFunction*          _calculateVolume,\
-      Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,\
-      Name                                        name
 
-#define STG_SHAPE_PASSARGS \
-   _sizeOfSelf,\
-      type,\
-      _delete,\
-      _print,\
-      _copy,\
-      _defaultConstructor,\
-      _construct,\
-      _build, \
-      _initialise,\
-      _execute,\
-      _destroy, \
-      _isCoordInside, _calculateVolume, _distanceFromCenterAxis, \
-      name
 
-Stg_Shape* _Stg_Shape_New( STG_SHAPE_ARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STG_SHAPE_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                Stg_Shape_IsCoordInsideFunction*                    _isCoordInside, \
+                Stg_Shape_CalculateVolumeFunction*                _calculateVolume, \
+                Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis
+
+	#define STG_SHAPE_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _isCoordInside,          \
+	        _calculateVolume,        \
+	        _distanceFromCenterAxis
+
+Stg_Shape* _Stg_Shape_New(  STG_SHAPE_DEFARGS  );
 	
 	void _Stg_Shape_Init( void* shape, Dimension_Index dim, Coord centre, Bool invert, double alpha, double beta, double gamma ) ;
 	void Stg_Shape_InitAll( void* shape, Dimension_Index dim, Coord centre, double alpha, double beta, double gamma );
@@ -116,7 +104,7 @@ Stg_Shape* _Stg_Shape_New( STG_SHAPE_ARGS );
 	void* _Stg_Shape_Copy( void* shape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	/* 'Stg_Component' Virtual Function Implementations */
-	void _Stg_Shape_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _Stg_Shape_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _Stg_Shape_Build( void* shape, void* data ) ;
 	void _Stg_Shape_Initialise( void* shape, void* data ) ;
 	void _Stg_Shape_Execute( void* shape, void* data ) ;
@@ -138,3 +126,4 @@ Stg_Shape* _Stg_Shape_New( STG_SHAPE_ARGS );
 	void Stg_Shape_TranslateCoord( void* shape, Coord coord, Coord translatedCoord ) ;
 	
 #endif 
+

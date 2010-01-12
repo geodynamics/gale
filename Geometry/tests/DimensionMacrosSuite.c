@@ -45,9 +45,9 @@
 #include "DimensionMacrosSuite.h"
 
 typedef struct {
-	MPI_Comm			comm;
-	unsigned int	rank;
-	unsigned int	nProcs;
+	MPI_Comm	comm;
+	int		rank;
+	int		nProcs;
 } DimensionMacrosSuiteData;
 
 void DimensionMacrosSuite_testDimensionMacros_DoOneTest( IJK coord, IJK meshSize, Stream* stream ) {
@@ -124,6 +124,8 @@ void DimensionMacrosSuite_TestDimensionMacros( DimensionMacrosSuiteData* data ) 
 	pcu_filename_expected( "testDimensionMacros.expected", expected_file );
 	pcu_check_fileEq( "testDimensionMacros.dat", expected_file );
 	remove( "testDimensionMacros.dat" );
+
+	Stream_CloseAndFreeFile( stream );
 }
 
 void DimensionMacrosSuite( pcu_suite_t* suite ) {
@@ -131,3 +133,5 @@ void DimensionMacrosSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, DimensionMacrosSuite_Setup, DimensionMacrosSuite_Teardown );
    pcu_suite_addTest( suite, DimensionMacrosSuite_TestDimensionMacros );
 }
+
+

@@ -65,67 +65,22 @@ BelowCosinePlane* BelowCosinePlane_New(
 {
 	BelowCosinePlane* self = (BelowCosinePlane*) _BelowCosinePlane_DefaultNew( name );
 
-	BelowCosinePlane_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		offset,
-		width,
-		minValue,
-		maxValue,
-		amplitude,
-		wavelength,
-		phase ) ;
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma );
+   _BelowPlane_Init( self, offset, width, minValue, maxValue );
+   _BelowCosinePlane_Init( self, width, amplitude, wavelength, phase );
+
 	return self;
 }
 
-BelowCosinePlane* _BelowCosinePlane_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
-		Name                                  name )
+BelowCosinePlane* _BelowCosinePlane_New(  BELOWCOSINEPLANE_DEFARGS  )
 {
 	BelowCosinePlane* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(BelowCosinePlane) );
-	self = (BelowCosinePlane*)_Stg_Shape_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (BelowCosinePlane*)_BelowPlane_New(  BELOWPLANE_PASSARGS  );
 	
 	/* General info */
-
-	/* Virtual Info */
-	self->_isCoordInside = _isCoordInside;
-	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
-	
 	return self;
 }
 
@@ -138,28 +93,6 @@ void _BelowCosinePlane_Init( void* belowPlane, XYZ width, double amplitude, doub
 }
 
 
-void BelowCosinePlane_InitAll( 
-		void*                                 belowPlane, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                offset, 
-		XYZ                                   width,
-		XYZ                                   minValue,
-		XYZ                                   maxValue,
-		double                                amplitude,
-		double                                wavelength,
-		double                                phase )
-{
-	BelowCosinePlane* self = (BelowCosinePlane*)belowPlane;
-
-	BelowPlane_InitAll( self, dim, centre, alpha, beta, gamma, offset, width, minValue, maxValue );
-	_BelowCosinePlane_Init( self, width, amplitude, wavelength, phase );
-}
-	
-
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */
@@ -168,7 +101,7 @@ void _BelowCosinePlane_Delete( void* belowPlane ) {
 	BelowCosinePlane* self = (BelowCosinePlane*)belowPlane;
 	
 	/* Delete parent */
-	_Stg_Shape_Delete( self );
+	_BelowPlane_Delete( self );
 }
 
 
@@ -178,8 +111,6 @@ void _BelowCosinePlane_Print( void* belowPlane, Stream* stream ) {
 	/* Print parent */
 	_Stg_Shape_Print( self, stream );
 }
-
-
 
 void* _BelowCosinePlane_Copy( void* belowPlane, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	BelowCosinePlane*	self = (BelowCosinePlane*)belowPlane;
@@ -195,32 +126,36 @@ void* _BelowCosinePlane_Copy( void* belowPlane, void* dest, Bool deep, Name name
 }
 
 void* _BelowCosinePlane_DefaultNew( Name name ) {
-	return (void*) _BelowCosinePlane_New(
-			sizeof(BelowCosinePlane),
-			BelowCosinePlane_Type,
-			_BelowCosinePlane_Delete,
-			_BelowCosinePlane_Print,
-			_BelowCosinePlane_Copy,
-			_BelowCosinePlane_DefaultNew,
-			_BelowCosinePlane_Construct,
-			_BelowCosinePlane_Build,
-			_BelowCosinePlane_Initialise,
-			_BelowCosinePlane_Execute,
-			_BelowCosinePlane_Destroy,
-			_BelowCosinePlane_IsCoordInside,
-			_BelowCosinePlane_CalculateVolume,
-			_BelowCosinePlane_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(BelowCosinePlane);
+	Type                                                          type = BelowCosinePlane_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _BelowCosinePlane_Delete;
+	Stg_Class_PrintFunction*                                    _print = _BelowCosinePlane_Print;
+	Stg_Class_CopyFunction*                                      _copy = _BelowCosinePlane_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _BelowCosinePlane_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _BelowCosinePlane_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _BelowCosinePlane_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _BelowCosinePlane_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _BelowCosinePlane_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _BelowCosinePlane_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _BelowCosinePlane_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _BelowCosinePlane_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _BelowCosinePlane_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _BelowCosinePlane_New(  BELOWCOSINEPLANE_PASSARGS  );
 }
 
 
-void _BelowCosinePlane_Construct( void* belowPlane, Stg_ComponentFactory* cf, void* data ) {
+void _BelowCosinePlane_AssignFromXML( void* belowPlane, Stg_ComponentFactory* cf, void* data ) {
 	BelowCosinePlane*            self          = (BelowCosinePlane*) belowPlane;
 	double                       amplitude;
 	double                       wavelength;
 	double                       phase;
 
-	_BelowPlane_Construct( self, cf, data );
+	_BelowPlane_AssignFromXML( self, cf, data );
 
 	amplitude = Stg_ComponentFactory_GetDouble( cf, self->name, "amplitude", 0.1 );
 	wavelength = Stg_ComponentFactory_GetDouble( cf, self->name, "wavelength", 2*M_PI );
@@ -232,22 +167,22 @@ void _BelowCosinePlane_Construct( void* belowPlane, Stg_ComponentFactory* cf, vo
 void _BelowCosinePlane_Build( void* belowPlane, void* data ) {
 	BelowCosinePlane*	self = (BelowCosinePlane*)belowPlane;
 
-	_Stg_Shape_Build( self, data );
+	_BelowPlane_Build( self, data );
 }
 void _BelowCosinePlane_Initialise( void* belowPlane, void* data ) {
 	BelowCosinePlane*	self = (BelowCosinePlane*)belowPlane;
 	
-	_Stg_Shape_Initialise( self, data );
+	_BelowPlane_Initialise( self, data );
 }
 void _BelowCosinePlane_Execute( void* belowPlane, void* data ) {
 	BelowCosinePlane*	self = (BelowCosinePlane*)belowPlane;
 	
-	_Stg_Shape_Execute( self, data );
+	_BelowPlane_Execute( self, data );
 }
 void _BelowCosinePlane_Destroy( void* belowPlane, void* data ) {
 	BelowCosinePlane*	self = (BelowCosinePlane*)belowPlane;
-	
-	_Stg_Shape_Destroy( self, data );
+    
+	_BelowPlane_Destroy( self, data );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------
@@ -302,4 +237,6 @@ void _BelowCosinePlane_DistanceFromCenterAxis( void* shape, Coord coord, double*
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }
+
+
 

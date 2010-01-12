@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_MeshAdaptor_h__
-#define __Domain_Mesh_MeshAdaptor_h__
+#ifndef __StgDomain_Mesh_MeshAdaptor_h__
+#define __StgDomain_Mesh_MeshAdaptor_h__
 
 	/** Textual name of this class */
 	extern const Type MeshAdaptor_Type;
@@ -63,13 +63,20 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define MESHADAPTOR_DEFARGS \
-		MESHGENERATOR_DEFARGS
+                MESHGENERATOR_DEFARGS
 
 	#define MESHADAPTOR_PASSARGS \
-		MESHGENERATOR_PASSARGS
+                MESHGENERATOR_PASSARGS
 
-	MeshAdaptor* _MeshAdaptor_New( MESHADAPTOR_DEFARGS );
+	MeshAdaptor* _MeshAdaptor_New(  MESHADAPTOR_DEFARGS  );
 	void _MeshAdaptor_Init( MeshAdaptor* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -78,7 +85,7 @@
 
 	void _MeshAdaptor_Delete( void* adaptor );
 	void _MeshAdaptor_Print( void* adaptor, Stream* stream );
-	void _MeshAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data );
+	void _MeshAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data );
 	void _MeshAdaptor_Build( void* adaptor, void* data );
 	void _MeshAdaptor_Initialise( void* adaptor, void* data );
 	void _MeshAdaptor_Execute( void* adaptor, void* data );
@@ -95,4 +102,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Domain_Mesh_MeshAdaptor_h__ */
+#endif /* __StgDomain_Mesh_MeshAdaptor_h__ */
+

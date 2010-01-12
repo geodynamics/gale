@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_TimeIntegrator_h__
-#define __Domain_Utils_TimeIntegrator_h__
+#ifndef __StgDomain_Utils_TimeIntegrator_h__
+#define __StgDomain_Utils_TimeIntegrator_h__
 	
 	/* typedefs for virtual functions: */
 	extern const Type TimeIntegrator_Type;
@@ -48,42 +48,42 @@
 		/* General info */ \
 		__Stg_Component \
 		\
-		Stream*                                debug;                   \
-		Stream*                                info;                   \
-		NamedObject_Register*                  integrateeRegister;      \
-		unsigned int                           order;                   \
-		Bool                                   simultaneous;            \
-		Name                                   _setupEPName;            \
-		Name                                   _finishEPName;           \
-		EntryPoint*                            setupEP;                 \
-		Stg_ObjectList*                        setupData;               \
-		EntryPoint*                            finishEP;                \
-		Stg_ObjectList*                        finishData;              \
-		double                                 time;
+		DomainContext*				context; \
+		Stream*						debug; \
+		Stream*						info; \
+		NamedObject_Register*	integrandRegister; \
+		unsigned int				order; \
+		Bool							simultaneous; \
+		Name							_setupEPName; \
+		Name							_finishEPName; \
+		EntryPoint*					setupEP; \
+		Stg_ObjectList*			setupData; \
+		EntryPoint*					finishEP; \
+		Stg_ObjectList*			finishData; \
+		double						time;
 		  
 	struct TimeIntegrator { __TimeIntegrator };
 	
 	/* Creation implementation / Virtual constructor */
 	TimeIntegrator* TimeIntegrator_New( 
-		Name                                       name,
-		unsigned int                               order, 
-		Bool                                       simultaneous, 
-		EntryPoint_Register*                       entryPoint_Register,
-		AbstractContext*                           context );
+		Name							name,
+		unsigned int				order, 
+		Bool							simultaneous, 
+		EntryPoint_Register*		entryPoint_Register,
+		AbstractContext*			context );
 
-	TimeIntegrator* _TimeIntegrator_New(
-		SizeT                                      _sizeOfSelf,
-		Type                                       type,
-		Stg_Class_DeleteFunction*                  _delete,
-		Stg_Class_PrintFunction*                   _print,
-		Stg_Class_CopyFunction*                    _copy, 
-		Stg_Component_DefaultConstructorFunction*  _defaultConstructor,
-		Stg_Component_ConstructFunction*           _construct,
-		Stg_Component_BuildFunction*               _build,
-		Stg_Component_InitialiseFunction*          _initialise,
-		Stg_Component_ExecuteFunction*             _execute,
-		Stg_Component_DestroyFunction*             _destroy,
-		Name 							           name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define TIMEINTEGRATOR_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define TIMEINTEGRATOR_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	TimeIntegrator* _TimeIntegrator_New(  TIMEINTEGRATOR_DEFARGS  );
 		
 	void _TimeIntegrator_Init(	
 		void*                                      timeIntegrator, 
@@ -103,7 +103,7 @@
 	
 	/* 'Stg_Component' Virtual Functions */
 	void* _TimeIntegrator_DefaultNew( Name name ) ;
-	void _TimeIntegrator_Construct( void* timeIntegrator, Stg_ComponentFactory* cf, void* data ) ;
+	void _TimeIntegrator_AssignFromXML( void* timeIntegrator, Stg_ComponentFactory* cf, void* data ) ;
 	void _TimeIntegrator_Build( void* timeIntegrator, void* data );
 	void _TimeIntegrator_Initialise( void* timeIntegrator, void* data );
 	void _TimeIntegrator_Execute( void* timeIntegrator, void* data );
@@ -119,11 +119,11 @@
 	void _TimeIntegrator_ExecuteRK4Simultaneous( void* timeIntegrator, void* data ) ;
 
 	/* +++ Public Functions +++ */
-	void TimeIntegrator_Add( void* timeIntegrator, void* _timeIntegratee ) ;
+	void TimeIntegrator_Add( void* timeIntegrator, void* _timeIntegrand ) ;
 	#define TimeIntegrator_GetCount( self ) \
-		((TimeIntegrator*)self)->integrateeRegister->objects->count
+		((TimeIntegrator*)self)->integrandRegister->objects->count
 	#define TimeIntegrator_GetByIndex( self, index ) \
-		( (TimeIntegratee*) NamedObject_Register_GetByIndex( ((TimeIntegrator*)self)->integrateeRegister, index ) )
+		( (TimeIntegrand*) NamedObject_Register_GetByIndex( ((TimeIntegrator*)self)->integrandRegister, index ) )
 
 	void TimeIntegrator_Setup( void* timeIntegrator ) ;
 	void TimeIntegrator_AppendSetupEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, char* addedBy, void* data ) ;
@@ -155,3 +155,4 @@
 	Variable* Variable_NewFromOld( Variable* oldVariable, Name name, Bool copyValues ) ;
 
 #endif 
+

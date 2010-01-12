@@ -84,8 +84,6 @@ void GeneratePoints( CoordF* sites, int numSites, pointsType *p ) {
 }
 
 void DelaunaySuite_Setup( DelaunaySuiteData* data ) {
-	int i;
-
 	data->attr.BuildBoundingTriangle = 0;
 	data->attr.BuildTriangleIndices = 1;
 	data->attr.BuildTriangleNeighbours = 1;
@@ -167,7 +165,6 @@ void DelaunaySuite_TriangulateIrregularMesh( DelaunaySuiteData* data ) {
 void DelaunaySuite_TriangulatePolygonMesh( DelaunaySuiteData* data ) {
 	Delaunay*	delaunay;
 	CoordF*		sites;
-	pointsType	p		= Polygon;
 	char		filename[PCU_PATH_MAX];
 	FILE*		fp;
 	float		theta;
@@ -223,3 +220,5 @@ void DelaunaySuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, DelaunaySuite_TriangulateIrregularMesh );
    pcu_suite_addTest( suite, DelaunaySuite_TriangulatePolygonMesh );
 }
+
+

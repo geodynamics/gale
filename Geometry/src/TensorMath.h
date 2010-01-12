@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_TensorMath_h__
-#define __Domain_Geometry_TensorMath_h__
+#ifndef __StgDomain_Geometry_TensorMath_h__
+#define __StgDomain_Geometry_TensorMath_h__
 
 	/* TensorArray - Tensor (t_{ij}) here is defined in 2D as
 	 * t_{00} = tensor[0] t_{01} = tensor[1]
@@ -219,4 +219,4 @@ void CubicSolver_OnlyRealRoots( double a2, double a1, double a0, double* rootLis
 
 void TensorArray_SolveSystem( TensorArray tensorArray, double* solution, double* rightHandSide, Dimension_Index dim ) ;
 
-#endif /* __Domain_Geometry_TensorMath_h__ */
+#endif /* __StgDomain_Geometry_TensorMath_h__ */

@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StGermain_Domain_Shape_types_h__
-#define __StGermain_Domain_Shape_types_h__
+#ifndef __StgDomain_Shape_types_h__
+#define __StgDomain_Shape_types_h__
 
 	typedef struct Stg_Shape                    Stg_Shape;
 	typedef struct Superellipsoid               Superellipsoid;

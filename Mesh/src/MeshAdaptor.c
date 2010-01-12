@@ -55,17 +55,14 @@ const Type MeshAdaptor_Type = "MeshAdaptor";
 ** Constructors
 */
 
-MeshAdaptor* _MeshAdaptor_New( MESHADAPTOR_DEFARGS ) {
+MeshAdaptor* _MeshAdaptor_New(  MESHADAPTOR_DEFARGS  ) {
 	MeshAdaptor* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(MeshAdaptor) );
-	self = (MeshAdaptor*)_MeshGenerator_New( MESHGENERATOR_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(MeshAdaptor) );
+	self = (MeshAdaptor*)_MeshGenerator_New(  MESHGENERATOR_PASSARGS  );
 
 	/* Virtual info */
-
-	/* MeshAdaptor info */
-	_MeshAdaptor_Init( self );
 
 	return self;
 }
@@ -74,7 +71,6 @@ void _MeshAdaptor_Init( MeshAdaptor* self ) {
 	self->generator = NULL;
 	self->srcMesh = NULL;
 }
-
 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
@@ -99,10 +95,10 @@ void _MeshAdaptor_Print( void* adaptor, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void _MeshAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
+void _MeshAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
 	MeshAdaptor*	self = (MeshAdaptor*)adaptor;
 
-	_MeshGenerator_Construct( self, cf, data );
+	_MeshGenerator_AssignFromXML( self, cf, data );
 
 	/* There could be either a generator or a mesh to use as a template.  Prefer the mesh. */
 	self->srcMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "sourceMesh", Mesh, False, data );
@@ -113,17 +109,30 @@ void _MeshAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data
 	}
 }
 
-void _MeshAdaptor_Build( void* adaptor, void* data ) {
-	_MeshGenerator_Build( adaptor, data );
+void _MeshAdaptor_Build( void* _adaptor, void* data ) {
+   MeshAdaptor*      self = (MeshAdaptor*)_adaptor;
+   Stg_Component_Build( self->generator, data, False );
+   Stg_Component_Build( self->srcMesh, data, False );
+   _MeshGenerator_Build( self, data );
 }
 
-void _MeshAdaptor_Initialise( void* adaptor, void* data ) {
+void _MeshAdaptor_Initialise( void* _adaptor, void* data ) {
+   MeshAdaptor*      self = (MeshAdaptor*)_adaptor;
+   Stg_Component_Initialise( self->generator, data, False );
+   Stg_Component_Initialise( self->srcMesh, data, False );
+   _MeshGenerator_Initialise( self, data );
+   
 }
 
 void _MeshAdaptor_Execute( void* adaptor, void* data ) {
+    _MeshGenerator_Execute( adaptor, data );
 }
 
-void _MeshAdaptor_Destroy( void* adaptor, void* data ) {
+void _MeshAdaptor_Destroy( void* _adaptor, void* data ) {
+   MeshAdaptor*      self = (MeshAdaptor*)_adaptor;
+   Stg_Component_Destroy( self->generator, data, False );
+   Stg_Component_Destroy( self->srcMesh, data, False );
+   _MeshGenerator_Destroy( self, data );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------
@@ -149,3 +158,5 @@ void MeshAdaptor_SetSourceMesh( void* adaptor, void* mesh ) {
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+

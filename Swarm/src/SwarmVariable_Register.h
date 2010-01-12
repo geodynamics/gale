@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_SwarmVariable_Register_h__
-#define __Domain_Swarm_SwarmVariable_Register_h__
+#ifndef __StgDomain_Swarm_SwarmVariable_Register_h__
+#define __StgDomain_Swarm_SwarmVariable_Register_h__
 	
 	
 	extern const Type SwarmVariable_Register_Type;
@@ -82,4 +82,4 @@
 
 	#define SwarmVariable_Register_PrintAllEntryNames NamedObject_Register_PrintAllEntryNames
 
-#endif /* __Domain_Swarm_SwarmVariable_Register_h__ */
+#endif /* __StgDomain_Swarm_SwarmVariable_Register_h__ */

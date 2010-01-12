@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StGermain_Domain_Shape_Init_h__
-#define __StGermain_Domain_Shape_Init_h__
+#ifndef __StgDomain_Shape_Init_h__
+#define __StgDomain_Shape_Init_h__
 	
 	Bool StgDomainShape_Init( int* argc, char** argv[] );
 	

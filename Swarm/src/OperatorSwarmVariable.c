@@ -49,28 +49,28 @@ const Type OperatorSwarmVariable_Type = "OperatorSwarmVariable";
 const Name defaultOperatorSwarmVariableName = "defaultOperatorSwarmVariableName";
 
 OperatorSwarmVariable* OperatorSwarmVariable_NewUnary( 
-		Name                                               name,
-		void*                                              _swarmVariable,
-		Name                                               operatorName )
+	Name					name,
+	AbstractContext*	context,
+	void*					_swarmVariable,
+	Name					operatorName )
 {
-	SwarmVariable*          swarmVariable = (SwarmVariable*) _swarmVariable;
-	OperatorSwarmVariable*  operatorSwarmVariable;
+	SwarmVariable* swarmVariable = (SwarmVariable*) _swarmVariable;
        	
-	operatorSwarmVariable = OperatorSwarmVariable_New( 
-			name,
-			_OperatorSwarmVariable_UnaryValueAt, 
-			operatorName,
-			1,
-			&swarmVariable );
-
-	return operatorSwarmVariable;
+	return OperatorSwarmVariable_New( 
+		name,
+		context,
+		_OperatorSwarmVariable_UnaryValueAt, 
+		operatorName,
+		1,
+		&swarmVariable );
 }
 
 OperatorSwarmVariable* OperatorSwarmVariable_NewBinary( 
-		Name                                               name,
-		void*                                              _swarmVariable1,
-		void*                                              _swarmVariable2,
-		Name                                               operatorName )
+	Name					name,
+	AbstractContext*	context,
+	void*					_swarmVariable1,
+	void*					_swarmVariable2,
+	Name					operatorName )
 {
 	SwarmVariable* swarmVariableList[2];
        
@@ -78,112 +78,64 @@ OperatorSwarmVariable* OperatorSwarmVariable_NewBinary(
 	swarmVariableList[1] = (SwarmVariable*) _swarmVariable2;
 	
 	return OperatorSwarmVariable_New( 
-			name,
-			_OperatorSwarmVariable_BinaryValueAt, 
-			operatorName,
-			2, 
-			swarmVariableList );
-}
-
-void* _OperatorSwarmVariable_DefaultNew( Name name )
-{
-		return (void*) _OperatorSwarmVariable_New( 
-			sizeof(OperatorSwarmVariable), 
-			OperatorSwarmVariable_Type, 
-			_SwarmVariable_Delete, 
-			_OperatorSwarmVariable_Print,
-			_OperatorSwarmVariable_Copy, 
-			_OperatorSwarmVariable_DefaultNew,
-			_OperatorSwarmVariable_Construct,
-			_OperatorSwarmVariable_Build, 
-			_OperatorSwarmVariable_Initialise, 
-			_OperatorSwarmVariable_Execute,
-			_OperatorSwarmVariable_Destroy,
-			_OperatorSwarmVariable_ValueAt,
-			_OperatorSwarmVariable_GetMinGlobalMagnitude,
-			_OperatorSwarmVariable_GetMaxGlobalMagnitude, 
-			name );
+		name,
+		context,
+		_OperatorSwarmVariable_BinaryValueAt, 
+		operatorName,
+		2, 
+		swarmVariableList );
 }
 
 OperatorSwarmVariable* OperatorSwarmVariable_New( 
-		Name                                               name,
-		SwarmVariable_ValueAtFunction*                     _valueAt,
-		Name                                               operatorName,
-		Index                                              swarmVariableCount,
-		SwarmVariable**                                    swarmVariableList )
+	Name										name,
+	AbstractContext*						context,
+	SwarmVariable_ValueAtFunction*	_valueAt,
+	Name										operatorName,
+	Index										swarmVariableCount,
+	SwarmVariable**						swarmVariableList )
 {
-	OperatorSwarmVariable*  operatorSwarmVariable;
+	OperatorSwarmVariable* self = _OperatorSwarmVariable_DefaultNew( name );
 
-	operatorSwarmVariable = _OperatorSwarmVariable_New( 
-			sizeof(OperatorSwarmVariable), 
-			OperatorSwarmVariable_Type, 
-			_SwarmVariable_Delete, 
-			_OperatorSwarmVariable_Print,
-			_OperatorSwarmVariable_Copy, 
-			_OperatorSwarmVariable_DefaultNew,
-			_OperatorSwarmVariable_Construct,
-			_OperatorSwarmVariable_Build, 
-			_OperatorSwarmVariable_Initialise, 
-			_OperatorSwarmVariable_Execute,
-			_OperatorSwarmVariable_Destroy,
-			_OperatorSwarmVariable_ValueAt,
-			_OperatorSwarmVariable_GetMinGlobalMagnitude,
-			_OperatorSwarmVariable_GetMaxGlobalMagnitude, 
-			name );
+	self->isConstructed = True;
+	_SwarmVariable_Init( (SwarmVariable*)self, context, swarmVariableList[0]->swarm, NULL, 0 );
+	_OperatorSwarmVariable_Init( self, operatorName, swarmVariableCount, swarmVariableList );
 
-	/* Following Rob's inheritance approach for this file, until we do the big fix-up */
-	/* Can pass in 0 for the dofs since this will be updated in the next func */
-	SwarmVariable_InitAll( operatorSwarmVariable, swarmVariableList[0]->swarm, NULL, 0 );
-	_OperatorSwarmVariable_Init( operatorSwarmVariable, operatorName, swarmVariableCount, swarmVariableList );
-
-	return operatorSwarmVariable;
+	return self;
 }
 
-OperatorSwarmVariable* _OperatorSwarmVariable_New(
-			SizeT                                              _sizeOfSelf, 
-			Type                                               type,
-			Stg_Class_DeleteFunction*                          _delete,
-			Stg_Class_PrintFunction*                           _print, 
-			Stg_Class_CopyFunction*                            _copy, 
-			Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-			Stg_Component_ConstructFunction*                   _construct,
-			Stg_Component_BuildFunction*                       _build,
-			Stg_Component_InitialiseFunction*                  _initialise,
-			Stg_Component_ExecuteFunction*                     _execute,
-			Stg_Component_DestroyFunction*                     _destroy,
-			SwarmVariable_ValueAtFunction*                     _valueAt,
-			SwarmVariable_GetGlobalValueFunction*              _getMinGlobalMagnitude,
-			SwarmVariable_GetGlobalValueFunction*              _getMaxGlobalMagnitude,
-			Name                                               name )
-{
-	OperatorSwarmVariable*		self;
+void* _OperatorSwarmVariable_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                                 _sizeOfSelf = sizeof(OperatorSwarmVariable);
+	Type                                                         type = OperatorSwarmVariable_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _OperatorSwarmVariable_Delete;
+	Stg_Class_PrintFunction*                                   _print = _OperatorSwarmVariable_Print;
+	Stg_Class_CopyFunction*                                     _copy = _OperatorSwarmVariable_Copy;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _OperatorSwarmVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _OperatorSwarmVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _OperatorSwarmVariable_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _OperatorSwarmVariable_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _OperatorSwarmVariable_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _OperatorSwarmVariable_Destroy;
+	AllocationType                                 nameAllocationType = NON_GLOBAL;
+	SwarmVariable_ValueAtFunction*                           _valueAt = _OperatorSwarmVariable_ValueAt;
+	SwarmVariable_GetGlobalValueFunction*      _getMinGlobalMagnitude = _OperatorSwarmVariable_GetMinGlobalMagnitude;
+	SwarmVariable_GetGlobalValueFunction*      _getMaxGlobalMagnitude = _OperatorSwarmVariable_GetMaxGlobalMagnitude;
+
+	return (void*) _OperatorSwarmVariable_New(  OPERATORSWARMVARIABLE_PASSARGS  );
+}
+
+OperatorSwarmVariable* _OperatorSwarmVariable_New(  OPERATORSWARMVARIABLE_DEFARGS  ) {
+	OperatorSwarmVariable* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(OperatorSwarmVariable) );
-	self = (OperatorSwarmVariable*) _SwarmVariable_New( 
-			_sizeOfSelf, 
-			type, 
-			_delete,
-			_print, 
-			_copy,
-			_defaultConstructor,
-			_construct,	
-			_build, 
-			_initialise, 
-			_execute,
-			_destroy,
-			_valueAt,
-			_getMinGlobalMagnitude,
-			_getMaxGlobalMagnitude,
-			name );
+	self = (OperatorSwarmVariable*) _SwarmVariable_New(  SWARMVARIABLE_PASSARGS  );
 	
 	return self;
 }
 
 void _OperatorSwarmVariable_Delete( void* _swarmVariable ) {
 	OperatorSwarmVariable* self = (OperatorSwarmVariable*) _swarmVariable;
-
-	Memory_Free( self->swarmVariableList );
 
 	_SwarmVariable_Delete( self );
 }
@@ -200,17 +152,15 @@ void _OperatorSwarmVariable_Print( void* _swarmVariable, Stream* stream ) {
 
 }
 
-void _OperatorSwarmVariable_Init( void* ofv, Name operatorName, Index swarmVariableCount, SwarmVariable** swarmVariableList ) {
-	OperatorSwarmVariable*	self = (OperatorSwarmVariable*)ofv;
-	SwarmVariable*              swarmVariable;
-	Index                       swarmVariable_I;
-	Stream*                     errorStream       = Journal_Register( Error_Type, self->type );
+void _OperatorSwarmVariable_Init( void* _swarmVariable, Name operatorName, Index swarmVariableCount, SwarmVariable** swarmVariableList ) {
+	OperatorSwarmVariable*	self = (OperatorSwarmVariable*)_swarmVariable;
+	SwarmVariable*				swarmVariable;
+	Index							swarmVariable_I;
+	Stream*						errorStream = Journal_Register( Error_Type, self->type );
 
-	self->isConstructed = True;
-
-	self->_operator              = Operator_NewFromName( operatorName, swarmVariableList[0]->dofCount, self->dim );
-	self->dofCount               = self->_operator->resultDofs; /* reset value */
-	self->swarmVariableCount     = swarmVariableCount;
+	self->_operator = Operator_NewFromName( operatorName, swarmVariableList[0]->dofCount, self->dim );
+	self->dofCount = self->_operator->resultDofs; /* reset value */
+	self->swarmVariableCount = swarmVariableCount;
    /* variable does not store data, so is not checkpointed */
    self->isCheckpointedAndReloaded = False;
 
@@ -221,12 +171,11 @@ void _OperatorSwarmVariable_Init( void* ofv, Name operatorName, Index swarmVaria
 	for ( swarmVariable_I = 0 ; swarmVariable_I < swarmVariableCount ; swarmVariable_I++ ) {
 		swarmVariable = swarmVariableList[ swarmVariable_I ];
 		Journal_Firewall( swarmVariable != NULL, errorStream, 
-				"In func %s: SwarmVariable %u in list is NULL\n", __func__, swarmVariable_I );
+			"In func %s: SwarmVariable %u in list is NULL\n", __func__, swarmVariable_I );
 		Journal_Firewall( swarmVariable->dofCount <= MAX_DOF, errorStream, 
 			"In func %s: Swarm Variable '%s' has too many components.\n", __func__, swarmVariable->name );
 	}
 }
-
 
 void* _OperatorSwarmVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	OperatorSwarmVariable*	self = (OperatorSwarmVariable*)swarmVariable;
@@ -249,7 +198,7 @@ void* _OperatorSwarmVariable_Copy( void* swarmVariable, void* dest, Bool deep, N
 	return (void*)newOperatorSwarmVariable;
 }
 
-void _OperatorSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) {
+void _OperatorSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data ) {
 	OperatorSwarmVariable*  self       = (OperatorSwarmVariable*) swarmVariable;
 	Dictionary*             dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 	Dictionary_Entry_Value* list;
@@ -261,7 +210,7 @@ void _OperatorSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory
 	SwarmVariable_Register* swarmVariable_Register;
 
 	/* Call parent's construct function */
-	_SwarmVariable_Construct( self, cf, data );
+	_SwarmVariable_AssignFromXML( self, cf, data );
 	swarmVariable_Register = self->swarm->swarmVariable_Register;
 
 	operatorName = Stg_ComponentFactory_GetString( cf, self->name, "Operator", "" );
@@ -287,7 +236,7 @@ void _OperatorSwarmVariable_Construct( void* swarmVariable, Stg_ComponentFactory
 				Stg_ComponentFactory_ConstructByName( cf, swarmVariableName, SwarmVariable, True, data );
 	}
 
-	_SwarmVariable_Construct( self, cf, data );
+	_SwarmVariable_AssignFromXML( self, cf, data );
 	_OperatorSwarmVariable_Init( self, operatorName, swarmVariableCount, swarmVariableList );
 
 	Memory_Free( swarmVariableList );
@@ -303,7 +252,13 @@ void _OperatorSwarmVariable_Build( void* swarmVariable, void* data ) {
 
 void _OperatorSwarmVariable_Execute( void* swarmVariable, void* data ) {}
 
-void _OperatorSwarmVariable_Destroy( void* swarmVariable, void* data ) {}
+void _OperatorSwarmVariable_Destroy( void* swarmVariable, void* data ) {
+	OperatorSwarmVariable* self = (OperatorSwarmVariable*)swarmVariable;
+
+	Memory_Free( self->swarmVariableList );
+
+	_SwarmVariable_Destroy( self, data );
+}
 
 void _OperatorSwarmVariable_Initialise( void* swarmVariable, void* data ) {
 	OperatorSwarmVariable* self = (OperatorSwarmVariable*) swarmVariable;
@@ -359,3 +314,5 @@ void _OperatorSwarmVariable_BinaryValueAt( void* swarmVariable, Particle_Index l
 
 	Operator_CarryOutBinaryOperation( self->_operator, swarmValue0, swarmValue1, value ); 
 }
+
+

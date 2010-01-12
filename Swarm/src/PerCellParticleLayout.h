@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_PerCellParticleLayout_h__
-#define __Domain_Swarm_PerCellParticleLayout_h__
+#ifndef __StgDomain_Swarm_PerCellParticleLayout_h__
+#define __StgDomain_Swarm_PerCellParticleLayout_h__
 	
 	/** @see PerCellParticleLayout_InitialCount */
 	typedef Particle_InCellIndex (PerCellParticleLayout_InitialCountFunction) ( 
@@ -71,32 +71,26 @@
 	/* No "_New" and "_Init" as this is an abstract class */
 	
 	/* Creation implementation / Virtual constructor */
-	PerCellParticleLayout* _PerCellParticleLayout_New( 
-		SizeT                                                        _sizeOfSelf,
-		Type                                                         type,
-		Stg_Class_DeleteFunction*                                    _delete,
-		Stg_Class_PrintFunction*                                     _print,
-		Stg_Class_CopyFunction*                                      _copy,
-		Stg_Component_DefaultConstructorFunction*                    _defaultConstructor,
-		Stg_Component_ConstructFunction*                             _construct,
-		Stg_Component_BuildFunction*                                 _build,
-		Stg_Component_InitialiseFunction*                            _initialise,
-		Stg_Component_ExecuteFunction*                               _execute,
-		Stg_Component_DestroyFunction*                               _destroy,
-		ParticleLayout_SetInitialCountsFunction*                     _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*                  _initialiseParticles,
-		PerCellParticleLayout_InitialCountFunction*                  _initialCount,
-		PerCellParticleLayout_InitialiseParticlesOfCellFunction*     _initialiseParticlesOfCell,
-		Name                                                         name,
-		Bool                                                         initFlag,
-		CoordSystem                                                  coordSystem,
-		Bool                                                         weightsInitialisedAtStartup );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PERCELLPARTICLELAYOUT_DEFARGS \
+                PARTICLELAYOUT_DEFARGS, \
+                PerCellParticleLayout_InitialCountFunction*                            _initialCount, \
+                PerCellParticleLayout_InitialiseParticlesOfCellFunction*  _initialiseParticlesOfCell
+
+	#define PERCELLPARTICLELAYOUT_PASSARGS \
+                PARTICLELAYOUT_PASSARGS, \
+	        _initialCount,              \
+	        _initialiseParticlesOfCell
+
+   PerCellParticleLayout* _PerCellParticleLayout_New(  PERCELLPARTICLELAYOUT_DEFARGS  );
 	
 	/* Initialise implementation */
-	void _PerCellParticleLayout_Init( 
-			void*                  particleLayout, 
-			CoordSystem            coordSystem, 
-			Bool                   weightsInitialisedAtStartup );
+   void _PerCellParticleLayout_Init(
+		void*                  particleLayout );
 	
 	/* Stg_Class_Delete a PerCellParticleLayout construct */
 	void _PerCellParticleLayout_Delete( void* particleLayout );
@@ -111,6 +105,8 @@
 		(PerCellParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
 	void* _PerCellParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+   void _PerCellParticleLayout_Destroy( void* particleLayout, void* data );
+   void _PerCellParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data );
 	
 	void _PerCellParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm );
 	void _PerCellParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm );
@@ -121,4 +117,5 @@
 	/** Return the initial number of particles in cell */
 	Particle_InCellIndex PerCellParticleLayout_InitialCount( void* particleLayout, void* _swarm, Cell_Index cell_I );
 	
-#endif /* __Domain_Swarm_PerCellParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_PerCellParticleLayout_h__ */
+

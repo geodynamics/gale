@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_SwarmOutput_h__
-#define __Domain_Swarm_SwarmOutput_h__
+#ifndef __StgDomain_Swarm_SwarmOutput_h__
+#define __StgDomain_Swarm_SwarmOutput_h__
 
 	/** Textual name of this class */
 	extern const Type SwarmOutput_Type;
@@ -50,6 +50,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		AbstractContext*				   context;		  \
 		/* Virtual info */ \
 		SwarmOutput_PrintHeaderFunction*                   _printHeader;          \
 		SwarmOutput_PrintDataFunction*                     _printData;            \
@@ -75,21 +76,22 @@
 		unsigned int                                       decimalLength,
 		char*                                              borderString );		
 	
-	SwarmOutput* _SwarmOutput_New(
-		SizeT                                              _sizeOfSelf, 
-		Type                                               type,
-		Stg_Class_DeleteFunction*	                       _delete,
-		Stg_Class_PrintFunction*	                       _print, 
-		Stg_Class_CopyFunction*	                           _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		SwarmOutput_PrintHeaderFunction*                   _printHeader,		
-		SwarmOutput_PrintDataFunction*                     _printData,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SWARMOUTPUT_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                SwarmOutput_PrintHeaderFunction*  _printHeader, \
+                SwarmOutput_PrintDataFunction*      _printData
+
+	#define SWARMOUTPUT_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _printHeader, \
+	        _printData  
+
+	SwarmOutput* _SwarmOutput_New(  SWARMOUTPUT_DEFARGS  );
 
 	/** Member initialisation implementation */
 	void _SwarmOutput_Init( 
@@ -108,7 +110,7 @@
 		(SwarmOutput*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
 	void* _SwarmOutput_DefaultNew( Name name );
-	void _SwarmOutput_Construct( void* swarmOutput, Stg_ComponentFactory* cf, void* data ) ;
+	void _SwarmOutput_AssignFromXML( void* swarmOutput, Stg_ComponentFactory* cf, void* data ) ;
 	void _SwarmOutput_Build( void* swarmOutput, void* data ) ;
 	void _SwarmOutput_Initialise( void* swarmOutput, void* data ) ;
 	void _SwarmOutput_Execute( void* swarmOutput, void* data ) ;
@@ -129,4 +131,5 @@
 	#define SwarmOutput_PrintValue( swarmOutput, stream, value )\
 		SwarmOutput_PrintDouble( swarmOutput, stream, (double) ( value ) )
 
-#endif /* __Domain_Swarm_SwarmOutput_h__ */
+#endif /* __StgDomain_Swarm_SwarmOutput_h__ */
+

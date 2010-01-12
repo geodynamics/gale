@@ -60,11 +60,38 @@ static const int SHADOW_PARTICLES = 20;
 
 void* ParticleShadowSync_DefaultNew( Name name )
 {
-	return _ParticleShadowSync_New( sizeof(ParticleShadowSync), ParticleShadowSync_Type,
-		_ParticleShadowSync_Delete, _ParticleShadowSync_Print, _ParticleShadowSync_CopyFunc,
-		(Stg_Component_DefaultConstructorFunction*)ParticleShadowSync_DefaultNew,
-		_ParticleShadowSync_Construct, _ParticleShadowSync_Build, _ParticleShadowSync_Initialise,
-		_ParticleShadowSync_Execute, _ParticleShadowSync_Destroy, name, False );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(ParticleShadowSync);
+	Type                                                      type = ParticleShadowSync_Type;
+	Stg_Class_DeleteFunction*                              _delete = _ParticleShadowSync_Delete;
+	Stg_Class_PrintFunction*                                _print = _ParticleShadowSync_Print;
+	Stg_Class_CopyFunction*                                  _copy = _ParticleShadowSync_CopyFunc;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)ParticleShadowSync_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _ParticleShadowSync_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _ParticleShadowSync_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _ParticleShadowSync_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _ParticleShadowSync_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _ParticleShadowSync_Destroy;
+	Bool                                                  initFlag = False;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType                                                                                        nameAllocationType = ZERO;
+	ParticleCommHandler_AllocateOutgoingCountArrays*                                            _allocateOutgoingCountArrays = ZERO;
+	ParticleCommHandler_AllocateOutgoingParticleArrays*                                      _allocateOutgoingParticleArrays = ZERO;
+	ParticleCommHandler_FreeOutgoingArrays*                                                              _freeOutgoingArrays = ZERO;
+	ParticleCommHandler_AllocateIncomingCountArrays*                                            _allocateIncomingCountArrays = ZERO;
+	ParticleCommHandler_AllocateIncomingParticleArrays*                                      _allocateIncomingParticleArrays = ZERO;
+	ParticleCommHandler_FreeIncomingArrays*                                                              _freeIncomingArrays = ZERO;
+	ParticleCommHandler_BeginReceiveOfIncomingParticleCounts*                          _beginReceiveOfIncomingParticleCounts = ZERO;
+	ParticleCommHandler_FinishReceiveOfIncomingParticleCounts*                        _finishReceiveOfIncomingParticleCounts = ZERO;
+	ParticleCommHandler_BeginReceiveOfIncomingParticles*                                    _beginReceiveOfIncomingParticles = ZERO;
+	ParticleCommHandler_FinishReceiveOfIncomingParticlesAndUpdateIndices*  _finishReceiveOfIncomingParticlesAndUpdateIndices = ZERO;
+	ParticleCommHandler_SendOutgoingParticleCounts*                                              _sendOutgoingParticleCounts = ZERO;
+	ParticleCommHandler_BeginSendingParticles*                                                        _beginSendingParticles = ZERO;
+	ParticleCommHandler_ConfirmOutgoingSendsCompleted*                                        _confirmOutgoingSendsCompleted = ZERO;
+	ParticleCommHandler_CommFunction*                                                                          _commFunction = ZERO;
+
+	return _ParticleShadowSync_New(  PARTICLESHADOWSYNC_PASSARGS  );
 }
 
 
@@ -73,53 +100,77 @@ ParticleShadowSync* ParticleShadowSync_New(
 		void* swarm
 		)
 {
-		return _ParticleShadowSync_New( sizeof(ParticleShadowSync), ParticleShadowSync_Type,
-		_ParticleShadowSync_Delete, _ParticleShadowSync_Print, _ParticleShadowSync_CopyFunc,
-		(Stg_Component_DefaultConstructorFunction*)ParticleShadowSync_DefaultNew,
-		_ParticleShadowSync_Construct, _ParticleShadowSync_Build, _ParticleShadowSync_Initialise,
-		_ParticleShadowSync_Execute, _ParticleShadowSync_Destroy, name, True );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(ParticleShadowSync);
+	Type                                                      type = ParticleShadowSync_Type;
+	Stg_Class_DeleteFunction*                              _delete = _ParticleShadowSync_Delete;
+	Stg_Class_PrintFunction*                                _print = _ParticleShadowSync_Print;
+	Stg_Class_CopyFunction*                                  _copy = _ParticleShadowSync_CopyFunc;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)ParticleShadowSync_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _ParticleShadowSync_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _ParticleShadowSync_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _ParticleShadowSync_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _ParticleShadowSync_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _ParticleShadowSync_Destroy;
+	Bool                                                  initFlag = True;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType                                                                                        nameAllocationType = ZERO;
+	ParticleCommHandler_AllocateOutgoingCountArrays*                                            _allocateOutgoingCountArrays = ZERO;
+	ParticleCommHandler_AllocateOutgoingParticleArrays*                                      _allocateOutgoingParticleArrays = ZERO;
+	ParticleCommHandler_FreeOutgoingArrays*                                                              _freeOutgoingArrays = ZERO;
+	ParticleCommHandler_AllocateIncomingCountArrays*                                            _allocateIncomingCountArrays = ZERO;
+	ParticleCommHandler_AllocateIncomingParticleArrays*                                      _allocateIncomingParticleArrays = ZERO;
+	ParticleCommHandler_FreeIncomingArrays*                                                              _freeIncomingArrays = ZERO;
+	ParticleCommHandler_BeginReceiveOfIncomingParticleCounts*                          _beginReceiveOfIncomingParticleCounts = ZERO;
+	ParticleCommHandler_FinishReceiveOfIncomingParticleCounts*                        _finishReceiveOfIncomingParticleCounts = ZERO;
+	ParticleCommHandler_BeginReceiveOfIncomingParticles*                                    _beginReceiveOfIncomingParticles = ZERO;
+	ParticleCommHandler_FinishReceiveOfIncomingParticlesAndUpdateIndices*  _finishReceiveOfIncomingParticlesAndUpdateIndices = ZERO;
+	ParticleCommHandler_SendOutgoingParticleCounts*                                              _sendOutgoingParticleCounts = ZERO;
+	ParticleCommHandler_BeginSendingParticles*                                                        _beginSendingParticles = ZERO;
+	ParticleCommHandler_ConfirmOutgoingSendsCompleted*                                        _confirmOutgoingSendsCompleted = ZERO;
+	ParticleCommHandler_CommFunction*                                                                          _commFunction = ZERO;
+
+		return _ParticleShadowSync_New(  PARTICLESHADOWSYNC_PASSARGS  );
 }
 
 
-ParticleShadowSync* _ParticleShadowSync_New( 
-		SizeT                                                           _sizeOfSelf,
-		Type                                                            type,
-		Stg_Class_DeleteFunction*                                       _delete,
-		Stg_Class_PrintFunction*                                        _print,
-		Stg_Class_CopyFunction*                                         _copy, 
-		Stg_Component_DefaultConstructorFunction*                       _defaultConstructor,
-		Stg_Component_ConstructFunction*                                _construct,
-		Stg_Component_BuildFunction*                                    _build,
-		Stg_Component_InitialiseFunction*                               _initialise,
-		Stg_Component_ExecuteFunction*                                  _execute,
-		Stg_Component_DestroyFunction*                                  _destroy,
-		Name                                                            name,
-		Bool                                                            initFlag
-		)
+ParticleShadowSync* _ParticleShadowSync_New(  PARTICLESHADOWSYNC_DEFARGS  )
 {
 	ParticleShadowSync* self;
 	
 	/* Allocate memory */
 	
-	self = (ParticleShadowSync*)_ParticleCommHandler_New( sizeof(ParticleShadowSync), ParticleShadowSync_Type,
-		_ParticleShadowSync_Delete, _ParticleShadowSync_Print, _ParticleShadowSync_CopyFunc,
-		(Stg_Component_DefaultConstructorFunction*)ParticleShadowSync_DefaultNew,
-		_ParticleShadowSync_Construct, _ParticleShadowSync_Build, _ParticleShadowSync_Initialise,
-		_ParticleShadowSync_Execute, _ParticleShadowSync_Destroy, name, initFlag,
-		_ParticleCommHandler_AllocateOutgoingCountArrays,
-		NULL,
-		_ParticleCommHandler_FreeOutgoingArrays,
-		_ParticleCommHandler_AllocateIncomingCountArrays,
-		NULL,
-		_ParticleCommHandler_FreeIncomingArrays,
-		_ParticleCommHandler_BeginReceiveOfIncomingParticleCounts,
-		_ParticleShadowSync_FinishReceiveOfIncomingParticleCounts,
-		_ParticleShadowSync_BeginReceiveOfIncomingParticles,
-		_ParticleShadowSync_FinishReceiveOfIncomingParticles,
-		_ParticleShadowSync_SendParticleTotalsInShadowCellsToNbrs,
-		_ParticleShadowSync_SendShadowParticles,
-		_ParticleCommHandler_ConfirmOutgoingSendsCompleted,
-		ParticleShadowSync_HandleParticleMovementBetweenProcs );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	_allocateOutgoingCountArrays                      = _ParticleCommHandler_AllocateOutgoingCountArrays;
+	_allocateOutgoingParticleArrays                   = NULL;
+	_freeOutgoingArrays                               = _ParticleCommHandler_FreeOutgoingArrays;
+	_allocateIncomingCountArrays                      = _ParticleCommHandler_AllocateIncomingCountArrays;
+	_allocateIncomingParticleArrays                   = NULL;
+	_freeIncomingArrays                               = _ParticleCommHandler_FreeIncomingArrays;
+	_beginReceiveOfIncomingParticleCounts             = _ParticleCommHandler_BeginReceiveOfIncomingParticleCounts;
+	_finishReceiveOfIncomingParticleCounts            = _ParticleShadowSync_FinishReceiveOfIncomingParticleCounts;
+	_beginReceiveOfIncomingParticles                  = _ParticleShadowSync_BeginReceiveOfIncomingParticles;
+	_finishReceiveOfIncomingParticlesAndUpdateIndices = _ParticleShadowSync_FinishReceiveOfIncomingParticles;
+	_sendOutgoingParticleCounts                       = _ParticleShadowSync_SendParticleTotalsInShadowCellsToNbrs;
+	_beginSendingParticles                            = _ParticleShadowSync_SendShadowParticles;
+	_confirmOutgoingSendsCompleted                    = _ParticleCommHandler_ConfirmOutgoingSendsCompleted;
+	_commFunction                                     = ParticleShadowSync_HandleParticleMovementBetweenProcs;
+	_sizeOfSelf                                       = sizeof(ParticleShadowSync);
+	type                                              = ParticleShadowSync_Type;
+	_delete                                           = _ParticleShadowSync_Delete;
+	_print                                            = _ParticleShadowSync_Print;
+	_copy                                             = _ParticleShadowSync_CopyFunc;
+	_defaultConstructor                               = (Stg_Component_DefaultConstructorFunction*)ParticleShadowSync_DefaultNew;
+	_construct                                        = _ParticleShadowSync_AssignFromXML;
+	_build                                            = _ParticleShadowSync_Build;
+	_initialise                                       = _ParticleShadowSync_Initialise;
+	_execute                                          = _ParticleShadowSync_Execute;
+	_destroy                                          = _ParticleShadowSync_Destroy;
+
+	self = (ParticleShadowSync*)_ParticleCommHandler_New(  PARTICLECOMMHANDLER_PASSARGS  );
 	
 	/* General info */
 	/* Virtual info */
@@ -167,7 +218,7 @@ void* _ParticleShadowSync_CopyFunc( void* particleMovementHandler, void* dest, B
 		   nameExt, ptrMap );
 }
 
-void _ParticleShadowSync_Construct( void* pCommsHandler, Stg_ComponentFactory* cf, void* data ){
+void _ParticleShadowSync_AssignFromXML( void* pCommsHandler, Stg_ComponentFactory* cf, void* data ){
 	ParticleShadowSync *self = (ParticleShadowSync*)pCommsHandler;
 
 	self->isConstructed = True;
@@ -544,4 +595,6 @@ void ParticleShadowSync_GetCountOfParticlesOutsideDomainPerProcessor(
 	}	
 	#endif
 }
+
+
 

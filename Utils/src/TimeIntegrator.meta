@@ -6,14 +6,14 @@
 <param name="Author">...</param>
 <param name="Organisation">VPAC</param>
 <param name="Project">StgDomain</param>
-<param name="Location">./StgDomain/Discretisation/Utils/src/</param>
+<param name="Location">./StgDomain/Utils/src/</param>
 <param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
 <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
 <param name="Parent">Stg_Component</param>
 <param name="Reference">...</param>
 <param name="Summary">...</param>
-<param name="Description">This is a general class designed to integrate several TimeIntegratee objects through time. When one of these is created, it puts a Hook on the AbstractContext_EP_StepClass EntryPoint so that the Execute function for this class runs at the end of every timestep. This execute function then integrates every TimeIntegratee that has been registered to it through time.</param>
+<param name="Description">This is a general class designed to integrate several TimeIntegrand objects through time. When one of these is created, it puts a Hook on the AbstractContext_EP_StepClass EntryPoint so that the Execute function for this class runs at the end of every timestep. This execute function then integrates every TimeIntegrand that has been registered to it through time.</param>
 
 <!--Now the interesting stuff-->
 <list name="Params">

@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_SobolGenerator_h__
-#define __Domain_Utils_SobolGenerator_h__
+#ifndef __StgDomain_Utils_SobolGenerator_h__
+#define __StgDomain_Utils_SobolGenerator_h__
 
 	/** Textual name of this class */
 	extern const Type SobolGenerator_Type;
@@ -71,13 +71,18 @@
 			const unsigned int *                               initialDirectionNumbers );
 
 	/** Private Constructor */
-	SobolGenerator* _SobolGenerator_New(
-			SizeT                                              _sizeOfSelf, 
-			Type                                               type,
-			Stg_Class_DeleteFunction*                          _delete,
-			Stg_Class_PrintFunction*                           _print, 
-			Stg_Class_CopyFunction*                            _copy, 
-			Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SOBOLGENERATOR_DEFARGS \
+                STG_OBJECT_DEFARGS
+
+	#define SOBOLGENERATOR_PASSARGS \
+                STG_OBJECT_PASSARGS
+
+	SobolGenerator* _SobolGenerator_New(  SOBOLGENERATOR_DEFARGS  );
 
 	void _SobolGenerator_Init( 
 		SobolGenerator*                                    self,
@@ -103,4 +108,5 @@
 	double SobolGenerator_GetNextNumber_WithMinMax( void* sobolGenerator, double min, double max ) ;
 	double SobolGenerator_GetNumberByIndex_WithMinMax( void* sobolGenerator, unsigned int index, double min, double max ) ;
 
-#endif /* __Domain_Utils_SobolGenerator_h__ */
+#endif /* __StgDomain_Utils_SobolGenerator_h__ */
+

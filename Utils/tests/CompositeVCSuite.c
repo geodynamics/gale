@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 } CompositeVCSuiteData;
 
 void CompositeVCSuite_quadratic(Index index, Variable_Index var_I, void* context, void* result) {
@@ -64,20 +64,20 @@ Mesh* CompositeVCSuite_buildMesh( unsigned nDims, unsigned* size, double* minCrd
 	Mesh*						mesh;
 	unsigned					maxDecomp[3] = {0, 1, 1};
 
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	gen->shadowDepth = 0;
 	CartesianGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, maxDecomp );
 	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
 
-	mesh = Mesh_New( "" );
+	mesh = Mesh_New( "", NULL );
 	Mesh_SetExtensionManagerRegister( mesh, emReg );
 	Mesh_SetGenerator( mesh, gen );
 
 	Stg_Component_Build( mesh, NULL, False );
 	Stg_Component_Initialise( mesh, NULL, False );
 
-	KillObject( mesh->generator );
+	FreeObject( mesh->generator );
 
 	return mesh;
 }
@@ -137,7 +137,7 @@ void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
    extensionMgr_Register = ExtensionManager_Register_New(); 
 
  	/* Create a mesh. */
-   mesh = (Mesh*) buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
+   mesh = (Mesh*) CompositeVCSuite_buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
    nDomains = Mesh_GetDomainSize( mesh, MT_VERTEX );
 
    /* Create CF stuff */
@@ -153,19 +153,19 @@ void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
 	/* Create variables */
    for (i = 0; i < 6; i++) {
       array[i] = Memory_Alloc_Array( double, nDomains, "array[i]" );
-      var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &nDomains, NULL, (void**)&array[i], 0 );
+      var[i] = Variable_NewScalar( varName[i], NULL, Variable_DataType_Double, &nDomains, NULL, (void**)&array[i], 0 );
       Variable_Register_Add(variable_Register, var[i]);
    }
    array[6] = Memory_Alloc_Array( double, nDomains*5, "array[6]" );
-   var[6] = Variable_NewVector( varName[6], Variable_DataType_Double, 5, &nDomains, NULL, (void**)&array[6], 0 );
+   var[6] = Variable_NewVector( varName[6], NULL, Variable_DataType_Double, 5, &nDomains, NULL, (void**)&array[6], 0 );
    Variable_Register_Add(variable_Register, var[6]);
    Variable_Register_BuildAll(variable_Register);
 
    /* Create CompositeVC */
-   cvc = CompositeVC_New( "CompositeVC", variable_Register, conFunc_Register, dictionary, mesh );
+   cvc = CompositeVC_New( "CompositeVC", NULL, variable_Register, conFunc_Register, dictionary, mesh );
 
 	for (i = 0; i < 6; i++) {
-		vc = WallVC_New( vcKeyName[i], vcKey[i], variable_Register, conFunc_Register, dictionary, mesh );
+		vc = WallVC_New( vcKeyName[i], NULL, vcKey[i], variable_Register, conFunc_Register, dictionary, mesh );
 		Stg_Component_Build( vc, 0, False );
 		CompositeVC_Add(cvc, vc, True);
 	}
@@ -211,12 +211,14 @@ void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
 		remove( "testCompositeVC.dat" );
    }
 
-	Stg_Class_Delete(cvc);
+	_Stg_Component_Delete(cvc);
 	Stg_Class_Delete(variable_Register);
 	for (i = 0; i < 7; i++) {
-		Stg_Class_Delete(var[i]);
+		_Stg_Component_Delete(var[i]);
 		if (array[i]) Memory_Free(array[i]);
 	}
+	Stg_Class_Delete(extensionMgr_Register);
+	Stg_Class_Delete(io_handler);
 	Stg_Class_Delete(conFunc_Register);
 	Stg_Class_Delete(quadCF);
 	Stg_Class_Delete(expCF);
@@ -266,7 +268,7 @@ void CompositeVCSuite_TestCompositeVCDictionary( CompositeVCSuiteData* data ) {
 	extensionMgr_Register = ExtensionManager_Register_New();
 
 	/* Create a mesh. */
-	mesh = (Mesh*) buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
+	mesh = (Mesh*) CompositeVCSuite_buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
 	nDomains = Mesh_GetDomainSize( mesh, MT_VERTEX );
 
 	/* Create CF stuff */
@@ -282,16 +284,16 @@ void CompositeVCSuite_TestCompositeVCDictionary( CompositeVCSuiteData* data ) {
 	/* Create variables */
 	for (i = 0; i < 6; i++) {
 		array[i] = Memory_Alloc_Array( double, 3*3*3, "array[i]" );
-		var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &nDomains, NULL, (void**)&array[i], 0 );
+		var[i] = Variable_NewScalar( varName[i], NULL, Variable_DataType_Double, &nDomains, NULL, (void**)&array[i], 0 );
  		Variable_Register_Add(variable_Register, var[i]);
 	}
 	array[6] = Memory_Alloc_Array( double, 3*3*3*5, "array[6]" );
-	var[6] = Variable_NewVector( varName[6], Variable_DataType_Double, 5, &nDomains, NULL, (void**)&array[6], 0 );
+	var[6] = Variable_NewVector( varName[6], NULL, Variable_DataType_Double, 5, &nDomains, NULL, (void**)&array[6], 0 );
 	Variable_Register_Add(variable_Register, var[6]);
 	Variable_Register_BuildAll(variable_Register);
 
 	/* Create CompositeVC */
-	cvc = CompositeVC_New( "CompositeVC", variable_Register, conFunc_Register, dictionary, mesh );
+	cvc = CompositeVC_New( "CompositeVC", NULL, variable_Register, conFunc_Register, dictionary, mesh );
 	Stg_Component_Build( cvc, 0, False );
 
 	for (j = 0; j < 6; j++)
@@ -333,10 +335,10 @@ void CompositeVCSuite_TestCompositeVCDictionary( CompositeVCSuiteData* data ) {
 		remove( "testCompositeVCDictionary.dat" );
 	}
 
-	Stg_Class_Delete(cvc);
+	_Stg_Component_Delete(cvc);
 	Stg_Class_Delete(variable_Register);
 	for (i = 0; i < 7; i++) {
-		Stg_Class_Delete(var[i]);
+		_Stg_Component_Delete(var[i]);
  		if (array[i]) Memory_Free(array[i]);
  	}
 	Stg_Class_Delete(conFunc_Register);
@@ -352,3 +354,5 @@ void CompositeVCSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, CompositeVCSuite_TestCompositeVC );
    pcu_suite_addTest( suite, CompositeVCSuite_TestCompositeVCDictionary );
 }
+
+

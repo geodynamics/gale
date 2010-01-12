@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_ComplexMath_h__
-#define __Domain_Geometry_ComplexMath_h__
+#ifndef __StgDomain_Geometry_ComplexMath_h__
+#define __StgDomain_Geometry_ComplexMath_h__
 
 #include "units.h"
 

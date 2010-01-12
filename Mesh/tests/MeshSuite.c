@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 } MeshSuiteData;
 
 int MeshSuite_findOwner( Mesh* mesh, int vert ) {
@@ -73,6 +73,8 @@ int MeshSuite_findOwner( Mesh* mesh, int vert ) {
 }
 
 void MeshSuite_Setup( MeshSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
+
 	/* MPI Initializations */
 	data->comm = MPI_COMM_WORLD;
 	MPI_Comm_rank( data->comm, &data->rank );
@@ -80,6 +82,7 @@ void MeshSuite_Setup( MeshSuiteData* data ) {
 }
 
 void MeshSuite_Teardown( MeshSuiteData* data ) {
+	Journal_Enable_AllTypedStream( True );
 }
 
 void MeshSuite_TestMeshNearVert1D( MeshSuiteData* data ) {
@@ -99,13 +102,13 @@ void MeshSuite_TestMeshNearVert1D( MeshSuiteData* data ) {
 	maxCrd[0] = maxCrd[1] = maxCrd[2] = (double)data->nProcs;
 
 	nDims = 1;
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	MeshGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetShadowDepth( gen, 1 );
 	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 
-	mesh = Mesh_New( "" );
+	mesh = Mesh_New( "", NULL );
 	Mesh_SetGenerator( mesh, gen );
 	Stg_Component_Build( mesh, NULL, False );
 	incArray = IArray_New();
@@ -144,13 +147,13 @@ void MeshSuite_TestMeshNearVert2D( MeshSuiteData* data ) {
 	maxCrd[0] = maxCrd[1] = maxCrd[2] = (double)data->nProcs;
 
 	nDims = 2;
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	MeshGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetShadowDepth( gen, 1 );
 	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 
-	mesh = Mesh_New( "" );
+	mesh = Mesh_New( "", NULL );
 	Mesh_SetGenerator( mesh, gen );
 	Stg_Component_Build( mesh, NULL, False );
 	incArray = IArray_New();
@@ -189,13 +192,13 @@ void MeshSuite_TestMeshNearVert3D( MeshSuiteData* data ) {
 	maxCrd[0] = maxCrd[1] = maxCrd[2] = (double)data->nProcs;
 
 	nDims = 3;
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	MeshGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetShadowDepth( gen, 1 );
 	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 	
-	mesh = Mesh_New( "" );
+	mesh = Mesh_New( "", NULL );
 	Mesh_SetGenerator( mesh, gen );
 	Stg_Component_Build( mesh, NULL, False );
 	incArray = IArray_New();
@@ -232,12 +235,12 @@ void MeshSuite_TestMeshSearch( MeshSuiteData* data ) {
 	maxCrd[0] = maxCrd[1] = maxCrd[2] = (double)data->nProcs;
 
 	nDims = 3;
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	MeshGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetShadowDepth( gen, 1 );
 	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
-	mesh = Mesh_New( "" );
+	mesh = Mesh_New( "", NULL );
 	Mesh_SetGenerator( mesh, gen );
 	Stg_Component_Build( mesh, NULL, False );
 
@@ -258,3 +261,5 @@ void MeshSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, MeshSuite_TestMeshNearVert3D );
    pcu_suite_addTest( suite, MeshSuite_TestMeshSearch );
 }
+
+

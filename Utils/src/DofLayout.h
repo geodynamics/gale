@@ -45,8 +45,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_DofLayout_h__
-#define __Domain_Utils_DofLayout_h__
+#ifndef __StgDomain_Utils_DofLayout_h__
+#define __StgDomain_Utils_DofLayout_h__
 	
 	/** Textual name of this class */
 	extern const Type DofLayout_Type;
@@ -56,6 +56,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		DomainContext*			context; \
 		/* Virtual info */ \
 		\
 		/* Stg_Class info */ \
@@ -63,23 +64,23 @@
 		Variable_Register*	_variableRegister; \
 		\
 		/** The number of items that are controlled by this dof layout, hence number of entries in each set. */ \
-		Index			_numItemsInLayout; \
+		Index						_numItemsInLayout; \
 		/** The total number of variables referred to across all the indices in the dof layout. */ \
-		Index			_totalVarCount; \
+		Index						_totalVarCount; \
 		/** Array of sets, 1 per variable, which record the items in the layout that have that variable as a dof. */ \
-		IndexSet**		_variableEnabledSets; \
+		IndexSet**				_variableEnabledSets; \
 		/** Table which maps local storage indices of variables to indices into the Variable_Register. */ \
 		Variable_Index*		_varIndicesMapping; \
 		\
 		/** Array containing number of dofs at each index (e.g. at each node in a mesh) */ \
-		Dof_Index*		dofCounts; \
+		Dof_Index*				dofCounts; \
 		/** 2D Array: for each index (e.g. each node), stores an array (of size dofCounts[i]) containing
 		the indexes into the DofLayout::_variableRegister of the Variable s at that index. */ \
-		Variable_Index**	varIndices; \
-						    \
-		Mesh*			mesh;	\
-		unsigned		nBaseVariables; \
-		Variable**		baseVariables;
+		Variable_Index**		varIndices; \
+		\
+		Mesh*						mesh;	\
+		unsigned					nBaseVariables; \
+		Variable**				baseVariables;
 
 
 	/** Allows the user to lay out which Variables exist at each index in a structure (eg nodes of a mesh) - see
@@ -87,35 +88,36 @@
 	struct _DofLayout { __DofLayout };
 	
 	
+	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
-	DofLayout*	DofLayout_DefaultNew( Name name );
+	DofLayout* _DofLayout_DefaultNew( Name name );
 	
-	DofLayout*	DofLayout_New( Name name, Variable_Register* variableRegister, Index numItemsInLayout, void* mesh );
+	DofLayout* DofLayout_New( Name name, DomainContext* context, Variable_Register* variableRegister, Index numItemsInLayout, void* mesh );
 	
-	void		DofLayout_Init(DofLayout* self, Name name, Variable_Register* variableRegister, Index numItemsInLayout, void* mesh );
 	
-	DofLayout*	_DofLayout_New( 
-				SizeT						_sizeOfSelf, 
-				Type						type,
-				Stg_Class_DeleteFunction*				_delete,
-				Stg_Class_PrintFunction*				_print,
-				Stg_Class_CopyFunction*				_copy,
-				Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-				Stg_Component_ConstructFunction*			_construct,
-				Stg_Component_BuildFunction*			_build,
-				Stg_Component_InitialiseFunction*			_initialise,
-				Stg_Component_ExecuteFunction*			_execute,
-				Stg_Component_DestroyFunction*			_destroy,
-				Name							name,
-				Bool							initFlag,
-				Variable_Register*				variableRegister,
-				Index						numItemsInLayout, 
-				void*						mesh );
-	
-	void _DofLayout_Init(void* dofLayout, Variable_Register* variableRegister, Index numItemsInLayout, Variable_Index baseVariableCount, Variable** baseVariableArray, void* mesh );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define DOFLAYOUT_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define DOFLAYOUT_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	DofLayout* _DofLayout_New(  DOFLAYOUT_DEFARGS  ); 
+
+	void _DofLayout_Init(
+		void*						dofLayout,
+		DomainContext*			context,
+		Variable_Register*	variableRegister,
+		Index						numItemsInLayout,
+		Variable_Index			baseVariableCount,
+		Variable**				baseVariableArray,
+		void*						mesh );
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -136,8 +138,8 @@
 	
 	void* _DofLayout_Copy( void* dofLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-	/** Stg_Component_Construct() implementation */
-	void _DofLayout_Construct( void* dofLayout, Stg_ComponentFactory* cf, void* data );
+	/** Stg_Component_AssignFromXML() implementation */
+	void _DofLayout_AssignFromXML( void* dofLayout, Stg_ComponentFactory* cf, void* data );
 	
 	/** Stg_Component_Build() implementation */
 	void _DofLayout_Build( void* dofLayout, void* data );
@@ -206,4 +208,5 @@
 	/** Saves all variables used by this dofLayout to files */
 	void DofLayout_LoadAllVariablesFromFiles( void* dofLayout, char* prefixString, unsigned rank );
 
-#endif /* __Domain_Utils_DofLayout_h__ */
+#endif /* __StgDomain_Utils_DofLayout_h__ */
+

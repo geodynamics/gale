@@ -92,7 +92,7 @@ void StGermain_Spinner_UpdatePositions( DomainContext* context ) {
 }
 
 
-void _StGermain_Spinner_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _StGermain_Spinner_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	DomainContext*   context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
@@ -105,7 +105,7 @@ void* _StGermain_Spinner_DefaultNew( Name name ) {
 	return Codelet_New(
 			StGermain_Spinner_Type,
 			_StGermain_Spinner_DefaultNew,
-			_StGermain_Spinner_Construct,
+			_StGermain_Spinner_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,
@@ -116,3 +116,5 @@ void* _StGermain_Spinner_DefaultNew( Name name ) {
 Index StGermain_Spinner_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, StGermain_Spinner_Type, "0", _StGermain_Spinner_DefaultNew );
 }
+
+

@@ -51,214 +51,79 @@ const Name defaultAllElementsVCName = "defaultAllElementsVCName";
 */
 
 VariableCondition* AllElementsVC_Factory(
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register, 
-		Dictionary*					dictionary,
-		void*						data )
+	AbstractContext*					context,
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register, 
+	Dictionary*							dictionary,
+	void*									data )
 {
-	return (VariableCondition*)AllElementsVC_New( defaultAllElementsVCName, NULL, variable_Register, conFunc_Register, dictionary, data );
-}
-
-
-AllElementsVC* AllElementsVC_DefaultNew( Name name )
-{
-	return _AllElementsVC_New(
-		sizeof(AllElementsVC), 
-		AllElementsVC_Type, 
-		_AllElementsVC_Delete, 
-		_AllElementsVC_Print, 
-		_AllElementsVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)AllElementsVC_DefaultNew,
-		_AllElementsVC_Construct,
-		_AllElementsVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
-		name,
-		False,
-		_AllElementsVC_BuildSelf, 
-		_AllElementsVC_PrintConcise,
-		_AllElementsVC_ReadDictionary,
-		_AllElementsVC_GetSet, 
-		_AllElementsVC_GetVariableCount, 
-		_AllElementsVC_GetVariableIndex, 
-		_AllElementsVC_GetValueIndex, 
-		_AllElementsVC_GetValueCount, 
-		_AllElementsVC_GetValue,
-		_VariableCondition_Apply, 
-		NULL,
-		NULL, 
-		NULL, 
-		NULL, 
-		NULL );
+	return (VariableCondition*)AllElementsVC_New( defaultAllElementsVCName, context, NULL, variable_Register, conFunc_Register, dictionary, data );
 }
 
 AllElementsVC*	AllElementsVC_New(
-		Name						name,
-		Name						_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						mesh )
+	Name									name,
+	AbstractContext*					context,
+	Name									_dictionaryEntryName, 
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register,
+	Dictionary*							dictionary,
+	void*									mesh )
 {
-	return _AllElementsVC_New(
-		sizeof(AllElementsVC), 
-		AllElementsVC_Type, 
-		_AllElementsVC_Delete, 
-		_AllElementsVC_Print, 
-		_AllElementsVC_Copy,
-		(Stg_Component_DefaultConstructorFunction*)AllElementsVC_DefaultNew,
-		_AllElementsVC_Construct,
-		_AllElementsVC_Build,
-		_VariableCondition_Initialise,
-		_VariableCondition_Execute,
-		_VariableCondition_Destroy,
-		name,
-		True,
-		_AllElementsVC_BuildSelf, 
-		_AllElementsVC_PrintConcise,
-		_AllElementsVC_ReadDictionary,
-		_AllElementsVC_GetSet, 
-		_AllElementsVC_GetVariableCount, 
-		_AllElementsVC_GetVariableIndex, 
-		_AllElementsVC_GetValueIndex, 
-		_AllElementsVC_GetValueCount, 
-		_AllElementsVC_GetValue,
-		_VariableCondition_Apply, 
-		_dictionaryEntryName,
-		variable_Register, 
-		conFunc_Register, 
-		dictionary, 
-		mesh );
-}
-
-
-void AllElementsVC_Init(
-		AllElementsVC*					self,
-		Name						name,
-		Name						_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						mesh )
-{
-	/* General info */
-	self->type = AllElementsVC_Type;
-	self->_sizeOfSelf = sizeof(AllElementsVC);
-	self->_deleteSelf = False;
+	AllElementsVC*	self = _AllElementsVC_DefaultNew( name );
 	
-	/* Virtual info */
-	self->_delete = _AllElementsVC_Delete;
-	self->_print = _AllElementsVC_Print;
-	self->_copy = _AllElementsVC_Copy;
-	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)AllElementsVC_DefaultNew;
-	self->_construct = _AllElementsVC_Construct,
-	self->_build = _AllElementsVC_Build;
-	self->_initialise = _VariableCondition_Initialise;
-	self->_execute = _VariableCondition_Execute;
-	self->_destroy = _VariableCondition_Destroy;
-	self->_buildSelf = _AllElementsVC_BuildSelf;
-	self->_printConcise = _AllElementsVC_PrintConcise;
-	self->_readDictionary = _AllElementsVC_ReadDictionary;
-	self->_getSet = _AllElementsVC_GetSet;
-	self->_getVariableCount = _AllElementsVC_GetVariableCount;
-	self->_getVariableIndex = _AllElementsVC_GetVariableIndex;
-	self->_getValueIndex = _AllElementsVC_GetValueIndex;
-	self->_getValueCount = _AllElementsVC_GetValueCount;
-	self->_getValue = _AllElementsVC_GetValue;
-	self->_apply = _VariableCondition_Apply;
-	
-	_Stg_Class_Init( (Stg_Class*)self );
-	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
-	_Stg_Component_Init( (Stg_Component*)self );
-	_VariableCondition_Init( (VariableCondition*)self, variable_Register, conFunc_Register, dictionary );
-	
-	/* Stg_Class info */
+	self->isConstructed = True;
+	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, dictionary );
 	_AllElementsVC_Init( self, _dictionaryEntryName, mesh );
+
+	return self;
 }
 
+AllElementsVC* _AllElementsVC_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(AllElementsVC);
+	Type                                                       type = AllElementsVC_Type;
+	Stg_Class_DeleteFunction*                               _delete = _AllElementsVC_Delete;
+	Stg_Class_PrintFunction*                                 _print = _AllElementsVC_Print;
+	Stg_Class_CopyFunction*                                   _copy = _AllElementsVC_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_AllElementsVC_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _AllElementsVC_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _AllElementsVC_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _VariableCondition_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _VariableCondition_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _AllElementsVC_Destroy;
+	AllocationType                               nameAllocationType = NON_GLOBAL;
+	VariableCondition_BuildSelfFunc*                     _buildSelf = _AllElementsVC_BuildSelf;
+	VariableCondition_PrintConciseFunc*               _printConcise = _AllElementsVC_PrintConcise;
+	VariableCondition_ReadDictionaryFunc*           _readDictionary = _AllElementsVC_ReadDictionary;
+	VariableCondition_GetSetFunc*                           _getSet = _AllElementsVC_GetSet;
+	VariableCondition_GetVariableCountFunc*       _getVariableCount = _AllElementsVC_GetVariableCount;
+	VariableCondition_GetVariableIndexFunc*       _getVariableIndex = _AllElementsVC_GetVariableIndex;
+	VariableCondition_GetValueIndexFunc*             _getValueIndex = _AllElementsVC_GetValueIndex;
+	VariableCondition_GetValueCountFunc*             _getValueCount = _AllElementsVC_GetValueCount;
+	VariableCondition_GetValueFunc*                       _getValue = _AllElementsVC_GetValue;
+	VariableCondition_ApplyFunc*                             _apply = _VariableCondition_Apply;
 
-AllElementsVC* _AllElementsVC_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print,
-		Stg_Class_CopyFunction*				_copy,
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*	_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*			_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name								name,
-		Bool								initFlag,
-		VariableCondition_BuildSelfFunc*		_buildSelf, 
-		VariableCondition_PrintConciseFunc*		_printConcise,
-		VariableCondition_ReadDictionaryFunc*		_readDictionary,
-		VariableCondition_GetSetFunc*			_getSet,
-		VariableCondition_GetVariableCountFunc*		_getVariableCount,
-		VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-		VariableCondition_GetValueIndexFunc*		_getValueIndex,
-		VariableCondition_GetValueCountFunc*		_getValueCount,
-		VariableCondition_GetValueFunc*			_getValue,
-		VariableCondition_ApplyFunc*			_apply, 
-		Name									_dictionaryEntryName, 
-		Variable_Register*				variable_Register, 
-		ConditionFunction_Register*			conFunc_Register,
-		Dictionary*					dictionary,
-		void*						mesh)
-{
+	return _AllElementsVC_New(  ALLELEMENTSVC_PASSARGS  );
+}
+
+AllElementsVC* _AllElementsVC_New(  ALLELEMENTSVC_DEFARGS  ) {
 	AllElementsVC*	self;
 	
 	/* Allocate memory/General info */
-	assert(_sizeOfSelf >= sizeof(AllElementsVC));
-	self = (AllElementsVC*)_VariableCondition_New(
-		_sizeOfSelf, 
-		type, 
-		_delete, 
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,	
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		name,
-		initFlag,
-		_buildSelf, 
-		_printConcise,
-		_readDictionary,
-		_getSet, 
-		_getVariableCount, 
-		_getVariableIndex, 
-		_getValueIndex, 
-		_getValueCount, 
-		_getValue, 
-		_apply, 
-		variable_Register, 
-		conFunc_Register,
-		dictionary );
+	assert( _sizeOfSelf >= sizeof(AllElementsVC) );
+	self = (AllElementsVC*)_VariableCondition_New(  VARIABLECONDITION_PASSARGS  );
 	
 	/* Virtual info */
 	
 	/* Stg_Class info */
-	if( initFlag ){
-		_AllElementsVC_Init( self, _dictionaryEntryName, mesh );
-	}
 	
 	return self;
 }
 
 
-void _AllElementsVC_Init(
-		void* 						allElementsVC,
-		Name						_dictionaryEntryName, 
-		void*						mesh )
-{
-	AllElementsVC*			self = (AllElementsVC*)allElementsVC;
+void _AllElementsVC_Init( void* allElementsVC, Name _dictionaryEntryName, void* mesh ) {
+	AllElementsVC* self = (AllElementsVC*)allElementsVC;
 
-	self->isConstructed = True;
 	self->_dictionaryEntryName = _dictionaryEntryName;
 	self->mesh = (Mesh*)mesh;
 }
@@ -267,13 +132,11 @@ void _AllElementsVC_Init(
 /*--------------------------------------------------------------------------------------------------------------------------
 ** General virtual functions
 */
-void _AllElementsVC_Construct( void* allElementsVC, Stg_ComponentFactory *cf, void* data )
-{
-	
+void _AllElementsVC_AssignFromXML( void* allElementsVC, Stg_ComponentFactory *cf, void* data ) { 
 }
 
 void _AllElementsVC_ReadDictionary( void* variableCondition, void* dictionary ) {
-	AllElementsVC*			self = (AllElementsVC*)variableCondition;
+	AllElementsVC*					self = (AllElementsVC*)variableCondition;
 	Dictionary_Entry_Value*		vcDictVal;
 	Dictionary_Entry_Value		_vcDictVal;
 	Dictionary_Entry_Value*		varsVal;
@@ -282,39 +145,36 @@ void _AllElementsVC_ReadDictionary( void* variableCondition, void* dictionary ) 
 	/* Find dictionary entry */
 	if (self->_dictionaryEntryName)
 		vcDictVal = Dictionary_Get( dictionary, self->_dictionaryEntryName );
-	else
-	{
+	else {
 		vcDictVal = &_vcDictVal;
 		Dictionary_Entry_Value_InitFromStruct( vcDictVal, dictionary );
 	}
 	
-	if (vcDictVal)
-	{
+	if (vcDictVal) {
 		/* Obtain the variable entries */
 		self->_entryCount = Dictionary_Entry_Value_GetCount(Dictionary_Entry_Value_GetMember(vcDictVal, "variables"));
 		self->_entryTbl = Memory_Alloc_Array( AllElementsVC_Entry, self->_entryCount, "AllElementsVC->_entryTbl" );
 		varsVal = Dictionary_Entry_Value_GetMember(vcDictVal, "variables");
 		
-		for (entry_I = 0; entry_I < self->_entryCount; entry_I++)
-		{
-			char*			valType;
+		for (entry_I = 0; entry_I < self->_entryCount; entry_I++) {
+			char*							valType;
 			Dictionary_Entry_Value*	valueEntry;
 			Dictionary_Entry_Value*	varDictListVal;
 			
 			varDictListVal = Dictionary_Entry_Value_GetElement(varsVal, entry_I);
 			valueEntry = Dictionary_Entry_Value_GetMember(varDictListVal, "value");
 			
-			self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString(
-				Dictionary_Entry_Value_GetMember(varDictListVal, "name"));
+			self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetMember(varDictListVal, "name"));
 				
 			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(varDictListVal, "type"));
-			if (0 == strcasecmp(valType, "func"))
-			{
+
+			if (0 == strcasecmp(valType, "func")) {
 				char*	funcName = Dictionary_Entry_Value_AsString(valueEntry);
 				Index	cfIndex;
 				
 				self->_entryTbl[entry_I].value.type = VC_ValueType_CFIndex;
 				cfIndex = ConditionFunction_Register_GetIndex( self->conFunc_Register, funcName);
+
 				if ( cfIndex == (unsigned)-1 ) {	
 					Stream*	errorStr = Journal_Register( Error_Type, self->type );
 
@@ -330,8 +190,7 @@ void _AllElementsVC_ReadDictionary( void* variableCondition, void* dictionary ) 
 				}	
 				self->_entryTbl[entry_I].value.as.typeCFIndex = cfIndex;
 			}			
-			else if (!strcasecmp(valType, "array"))
-			{
+			else if (!strcasecmp(valType, "array")) {
 				Dictionary_Entry_Value*	valueElement;
 				Index			i;
 
@@ -340,8 +199,7 @@ void _AllElementsVC_ReadDictionary( void* variableCondition, void* dictionary ) 
 				self->_entryTbl[entry_I].value.as.typeArray.array = Memory_Alloc_Array( double,
 					self->_entryTbl[entry_I].value.as.typeArray.size,"AllElementsVC->_entryTbl[].value.as.typeArray.array" );
 					
-				for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
-				{
+				for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++) {
 					valueElement = Dictionary_Entry_Value_GetElement(valueEntry, i);
 					self->_entryTbl[entry_I].value.as.typeArray.array[i] = 
 						Dictionary_Entry_Value_AsDouble(valueElement);
@@ -384,21 +242,25 @@ void _AllElementsVC_ReadDictionary( void* variableCondition, void* dictionary ) 
 	}
 }
 
-
 void _AllElementsVC_Delete( void* allElementsVC ) {
-	AllElementsVC*				self = (AllElementsVC*)allElementsVC;
-	
-	if (self->_entryTbl) Memory_Free(self->_entryTbl);
+	AllElementsVC* self = (AllElementsVC*)allElementsVC;
 	
 	/* Stg_Class_Delete parent */
 	_VariableCondition_Delete(self);
 }
 
+void _AllElementsVC_Destroy( void* allElementsVC, void* data ) {
+	AllElementsVC* self = (AllElementsVC*)allElementsVC;
+
+	if (self->_entryTbl) Memory_Free(self->_entryTbl);
+	
+	_VariableCondition_Destroy( self, data );
+}
 
 void _AllElementsVC_Print( void* allElementsVC, Stream* stream ) {
-	AllElementsVC*				self = (AllElementsVC*)allElementsVC;
-	AllElementsVC_Entry_Index		entry_I;
-	Index					i;
+	AllElementsVC*					self = (AllElementsVC*)allElementsVC;
+	AllElementsVC_Entry_Index	entry_I;
+	Index								i;
 	
 	/* Set the Journal for printing informations */
 	Stream* info = stream;
@@ -604,3 +466,5 @@ void _AllElementsVC_PrintConcise( void* variableCondition, Stream* stream ) {
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Functions
 */
+
+

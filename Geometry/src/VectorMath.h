@@ -40,8 +40,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_VectorMath_h__
-#define __Domain_Geometry_VectorMath_h__
+#ifndef __StgDomain_Geometry_VectorMath_h__
+#define __StgDomain_Geometry_VectorMath_h__
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Macros
@@ -160,4 +160,4 @@
 			StGermain_PrintVector( stream, vector, dim );	\
 		} while(0)
 
-#endif /* __Domain_Geometry_VectorMath_h__ */
+#endif /* __StgDomain_Geometry_VectorMath_h__ */

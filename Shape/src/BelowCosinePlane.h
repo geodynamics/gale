@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StGermain_Domain_Shape_BelowCosinePlaneClass_h__
-#define __StGermain_Domain_Shape_BelowCosinePlaneClass_h__
+#ifndef __StgDomain_Shape_BelowCosinePlaneClass_h__
+#define __StgDomain_Shape_BelowCosinePlaneClass_h__
 
 	/* Textual name of this class */
 	extern const Type BelowCosinePlane_Type;
@@ -58,28 +58,22 @@
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Constructors
 	*/
-	BelowCosinePlane* _BelowCosinePlane_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
-		Name                                  name );
+
 	
-	void _BelowCosinePlane_Init( void* belowPlane, XYZ width, double amplitude, double wavelength, double phase ) ;
-	void BelowCosinePlane_InitAll( 
-		void*                                 belowPlane, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define BELOWCOSINEPLANE_DEFARGS \
+                BELOWPLANE_DEFARGS
+
+	#define BELOWCOSINEPLANE_PASSARGS \
+                BELOWPLANE_PASSARGS
+
+   BelowCosinePlane* BelowCosinePlane_New(
+		Name                                  name,
+		Dimension_Index                       dim,
+		XYZ                                   centre, 
 		double                                alpha,
 		double                                beta,
 		double                                gamma,
@@ -90,6 +84,9 @@
 		double                                amplitude,
 		double                                wavelength,
 		double                                phase );
+	BelowCosinePlane* _BelowCosinePlane_New(  BELOWCOSINEPLANE_DEFARGS  );
+	
+	void _BelowCosinePlane_Init( void* belowPlane, XYZ width, double amplitude, double wavelength, double phase ) ;
 
 	/* Stg_Class_Delete BelowCosinePlane implementation */
 	void _BelowCosinePlane_Delete( void* belowPlane );
@@ -101,7 +98,7 @@
 	void* _BelowCosinePlane_Copy( void* belowPlane, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _BelowCosinePlane_DefaultNew( Name name ) ;
-	void _BelowCosinePlane_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _BelowCosinePlane_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _BelowCosinePlane_Build( void* belowPlane, void* data ) ;
 	void _BelowCosinePlane_Initialise( void* belowPlane, void* data ) ;
 	void _BelowCosinePlane_Execute( void* belowPlane, void* data );
@@ -123,3 +120,4 @@
 	
 	
 #endif 
+

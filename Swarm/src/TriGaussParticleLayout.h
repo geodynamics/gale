@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_TriGaussParticleLayout_h__
-#define __Domain_Swarm_TriGaussParticleLayout_h__
+#ifndef __StgDomain_Swarm_TriGaussParticleLayout_h__
+#define __StgDomain_Swarm_TriGaussParticleLayout_h__
 
 	
 	/* Textual name of this class */
@@ -49,35 +49,32 @@
 		__PerCellParticleLayout \
 		\
 		unsigned int dim;              /**< The number of dimensions to use */ \
-	        unsigned int particlesPerCell; /**< The number of points to use per cell */
+	   unsigned int particlesPerCell; /**< The number of points to use per cell */
 
 	struct TriGaussParticleLayout { __TriGaussParticleLayout };
 	
 	/* Create a new TriGaussParticleLayout and initialise */
-	TriGaussParticleLayout* TriGaussParticleLayout_New( Name name, unsigned int dim, unsigned int particlesPerCell );
+   TriGaussParticleLayout* TriGaussParticleLayout_New( 
+      Name name, 
+      AbstractContext* context,
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int dim, unsigned int particlesPerCell );
 	
 	/* Creation implementation / Virtual constructor */
-	TriGaussParticleLayout* _TriGaussParticleLayout_New( 
-		SizeT                                                       _sizeOfSelf,
-		Type                                                        type,
-		Stg_Class_DeleteFunction*                                   _delete,
-		Stg_Class_PrintFunction*                                    _print,
-		Stg_Class_CopyFunction*                                     _copy,
-		Stg_Component_DefaultConstructorFunction*                   _defaultConstructor,
-		Stg_Component_ConstructFunction*                            _construct,
-		Stg_Component_BuildFunction*                                _build,
-		Stg_Component_InitialiseFunction*                           _initialise,
-		Stg_Component_ExecuteFunction*                              _execute,
-		Stg_Component_DestroyFunction*                              _destroy,
-		ParticleLayout_SetInitialCountsFunction*                    _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles,
-		PerCellParticleLayout_InitialCountFunction*                 _initialCount,
-		PerCellParticleLayout_InitialiseParticlesOfCellFunction*    _initialiseParticlesOfCell,
-		Name                                                        name,
-		Bool                                                        initFlag,
-		unsigned int                                                dim,
-		unsigned int                                                particlesPerCell );
 	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define TRIGAUSSPARTICLELAYOUT_DEFARGS \
+                PERCELLPARTICLELAYOUT_DEFARGS
+
+	#define TRIGAUSSPARTICLELAYOUT_PASSARGS \
+                PERCELLPARTICLELAYOUT_PASSARGS
+
+   TriGaussParticleLayout* _TriGaussParticleLayout_New(  TRIGAUSSPARTICLELAYOUT_DEFARGS  );
+
 	/* Initialise implementation */
 	void _TriGaussParticleLayout_Init( 
 			TriGaussParticleLayout* self, 
@@ -98,7 +95,7 @@
 	void* _TriGaussParticleLayout_Copy( void* triGaussParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void* _TriGaussParticleLayout_DefaultNew( Name name );
-	void  _TriGaussParticleLayout_Construct( void* triGaussParticleLayout, Stg_ComponentFactory* cf, void* data );
+	void  _TriGaussParticleLayout_AssignFromXML( void* triGaussParticleLayout, Stg_ComponentFactory* cf, void* data );
 	void  _TriGaussParticleLayout_Build( void* triGaussParticleLayout, void* data );
 	void  _TriGaussParticleLayout_Initialise( void* triGaussParticleLayout, void* data );
 	void  _TriGaussParticleLayout_Execute( void* triGaussParticleLayout, void* data );
@@ -111,4 +108,5 @@
 	
 	void _TriGaussParticleLayout_InitialiseParticlesOfCell( void* triGaussParticleLayout, void* swarm, Cell_Index cell_I );
 	
-#endif /* __Domain_Swarm_TriGaussParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_TriGaussParticleLayout_h__ */
+

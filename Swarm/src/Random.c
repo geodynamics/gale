@@ -72,3 +72,5 @@ double Swarm_Random_Random() {
 double Swarm_Random_Random_WithMinMax( double min, double max ) {
 	return ( max - min ) * Swarm_Random_Random() / (double)Swarm_Random_RandMax + min;
 }
+
+

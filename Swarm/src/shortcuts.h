@@ -39,9 +39,9 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_shortcuts_h__
-#define __Domain_Swarm_shortcuts_h__
+#ifndef __StgDomain_Swarm_shortcuts_h__
+#define __StgDomain_Swarm_shortcuts_h__
 
 	/* Domain_Swarm shortcuts */
 
-#endif /* __Domain_Swarm_shortcuts_h__ */
+#endif /* __StgDomain_Swarm_shortcuts_h__ */

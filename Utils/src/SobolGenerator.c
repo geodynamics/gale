@@ -52,38 +52,34 @@ SobolGenerator* SobolGenerator_New(
 			unsigned int                                       polynomialCoefficient,
 			const unsigned int *                               initialDirectionNumbers )
 {
-	SobolGenerator* self = _SobolGenerator_New( 
-			sizeof(SobolGenerator), 
-			SobolGenerator_Type, 
-			_SobolGenerator_Delete, 
-			_SobolGenerator_Print,
-			_SobolGenerator_Copy, 
-			name );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(SobolGenerator);
+	Type                              type = SobolGenerator_Type;
+	Stg_Class_DeleteFunction*      _delete = _SobolGenerator_Delete;
+	Stg_Class_PrintFunction*        _print = _SobolGenerator_Print;
+	Stg_Class_CopyFunction*          _copy = _SobolGenerator_Copy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	SobolGenerator* self = _SobolGenerator_New(  SOBOLGENERATOR_PASSARGS  );
 	_SobolGenerator_Init( self, polynomialDegree, polynomialCoefficient, initialDirectionNumbers );
 
 	return self;
 }
 
-SobolGenerator* _SobolGenerator_New(
-			SizeT                                              _sizeOfSelf, 
-			Type                                               type,
-			Stg_Class_DeleteFunction*                          _delete,
-			Stg_Class_PrintFunction*                           _print, 
-			Stg_Class_CopyFunction*                            _copy, 
-			Name                                               name )
+SobolGenerator* _SobolGenerator_New(  SOBOLGENERATOR_DEFARGS  )
 {
 	SobolGenerator*		self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(SobolGenerator) );
-	self = (SobolGenerator*)_Stg_Object_New(
-			_sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy, 
-			name,
-			NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (SobolGenerator*)_Stg_Object_New(  STG_OBJECT_PASSARGS  );
 
 	return self;
 }
@@ -495,4 +491,6 @@ SobolGenerator* SobolGenerator_NewFromTable( Name name ) {
 			SobolGenerator_InitialDirectionNumbers[ generatorIndex ] );
 
 }
+
+
 

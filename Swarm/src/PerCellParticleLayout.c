@@ -49,75 +49,29 @@
 
 const Type PerCellParticleLayout_Type = "PerCellParticleLayout";
 
-PerCellParticleLayout* _PerCellParticleLayout_New( 
-                SizeT                                                       _sizeOfSelf,
-                Type                                                        type,
-                Stg_Class_DeleteFunction*                                   _delete,
-                Stg_Class_PrintFunction*                                    _print,
-                Stg_Class_CopyFunction*                                     _copy,
-                Stg_Component_DefaultConstructorFunction*                   _defaultConstructor,
-                Stg_Component_ConstructFunction*                            _construct,
-                Stg_Component_BuildFunction*                                _build,
-                Stg_Component_InitialiseFunction*                           _initialise,
-                Stg_Component_ExecuteFunction*                              _execute,
-                Stg_Component_DestroyFunction*                              _destroy,
-                ParticleLayout_SetInitialCountsFunction*                    _setInitialCounts,
-                ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles,
-                PerCellParticleLayout_InitialCountFunction*                 _initialCount,
-                PerCellParticleLayout_InitialiseParticlesOfCellFunction*    _initialiseParticlesOfCell,
-                Name                                                        name,
-                Bool                                                        initFlag,
-		CoordSystem                                                 coordSystem,
-                Bool                                                        weightsInitialisedAtStartup )
+PerCellParticleLayout* _PerCellParticleLayout_New(  PERCELLPARTICLELAYOUT_DEFARGS  )
 {
-	PerCellParticleLayout*		self;
-	
-	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(PerCellParticleLayout) );
-	self = (PerCellParticleLayout*)_ParticleLayout_New( 
-			_sizeOfSelf, 
-			type, 
-			_delete, 
-			_print, 
-			_copy, 
-			_defaultConstructor,
-			_construct, 
-			_build, 
-			_initialise, 
-			_execute, 
-			_destroy, 
-			_setInitialCounts, 
-			_initialiseParticles, 
-			name, 
-			initFlag,
-			coordSystem,
-			weightsInitialisedAtStartup );
-	
-	/* General info */
-	
-	/* Virtual functions */
-	self->_initialCount = _initialCount;
-	self->_initialiseParticlesOfCell = _initialiseParticlesOfCell;
-	
-	/* PerCellParticleLayout info */
-	if( initFlag ){
-		_PerCellParticleLayout_Init( self, coordSystem, weightsInitialisedAtStartup );
-	}
-	
-	return self;
+   PerCellParticleLayout*		self;
+
+   /* Allocate memory */
+   assert( _sizeOfSelf >= sizeof(PerCellParticleLayout) );
+   self = (PerCellParticleLayout*)_ParticleLayout_New(  PARTICLELAYOUT_PASSARGS  );
+
+   /* General info */
+
+   /* Virtual functions */
+   self->_initialCount = _initialCount;
+   self->_initialiseParticlesOfCell = _initialiseParticlesOfCell;
+
+   return self;
 }
 
 
-void _PerCellParticleLayout_Init(
-		void*                  particleLayout,
-		CoordSystem            coordSystem,
-		Bool                   weightsInitialisedAtStartup )
+void _PerCellParticleLayout_Init( void* particleLayout )
 {
 	PerCellParticleLayout* self = (PerCellParticleLayout*)particleLayout;
 	
 	self->isConstructed = True;
-
-	_ParticleLayout_Init( particleLayout, coordSystem, weightsInitialisedAtStartup );
 }
 
 void _PerCellParticleLayout_Delete( void* particleLayout ) {
@@ -140,6 +94,15 @@ void _PerCellParticleLayout_Print( void* particleLayout, Stream* stream ) {
 	
 }
 
+void _PerCellParticleLayout_Destroy( void* particleLayout, void* data ) {}
+
+void _PerCellParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data ) {
+	PerCellParticleLayout*		self = (PerCellParticleLayout*)particleLayout;
+
+   _ParticleLayout_AssignFromXML( self, cf, data );
+
+   _PerCellParticleLayout_Init( self );
+}
 
 void* _PerCellParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	PerCellParticleLayout*		self = (PerCellParticleLayout*)particleLayout;
@@ -218,6 +181,8 @@ Particle_InCellIndex PerCellParticleLayout_InitialCount( void* particleLayout, v
 	
 	return self->_initialCount( self, _swarm, cell_I );
 }
+
+
 
 
 

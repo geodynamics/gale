@@ -6,7 +6,7 @@
 <param name="Author">...</param>
 <param name="Organisation">VPAC</param>
 <param name="Project">StgFEM</param>
-<param name="Location">./StgFEM/SLE/src/</param>
+<param name="Location">./StgDomain/Utils/src/</param>
 <param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
 <param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
 <param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>

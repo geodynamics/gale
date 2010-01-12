@@ -56,61 +56,35 @@
 const Type LineParticleLayout_Type = "LineParticleLayout";
 
 LineParticleLayout* LineParticleLayout_New(
-		Name                                             name,
-		Dimension_Index                                  dim,
-		Particle_Index                                   totalInitialParticles,
-		Index                                            vertexCount,
-		Coord*                                           vertexList )
+		Name             name,
+      AbstractContext* context,
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int     totalInitialParticles,
+      double           averageInitialParticlesPerCell,
+		Dimension_Index  dim,
+		Index            vertexCount,
+		Coord*           vertexList )
 {
 	LineParticleLayout* self = (LineParticleLayout*) _LineParticleLayout_DefaultNew( name );
-	_LineParticleLayout_Init( self, dim, totalInitialParticles, vertexCount, vertexList );
+
+   _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
+   _GlobalParticleLayout_Init( self, totalInitialParticles, averageInitialParticlesPerCell );
+	_LineParticleLayout_Init( self, dim, vertexCount, vertexList );
 	return self;
 }
 
-LineParticleLayout* _LineParticleLayout_New( 
-		SizeT                                            _sizeOfSelf,
-		Type                                             type,
-		Stg_Class_DeleteFunction*                        _delete,
-		Stg_Class_PrintFunction*                         _print,
-		Stg_Class_CopyFunction*                          _copy, 
-		Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-		Stg_Component_ConstructFunction*                 _construct,
-		Stg_Component_BuildFunction*                     _build,
-		Stg_Component_InitialiseFunction*                _initialise,
-		Stg_Component_ExecuteFunction*                   _execute,
-		Stg_Component_DestroyFunction*                   _destroy,
-		ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-		Name                                             name,
-		Bool                                             initFlag )
+LineParticleLayout* _LineParticleLayout_New(  LINEPARTICLELAYOUT_DEFARGS  )
 {
 	LineParticleLayout* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof( LineParticleLayout ) );
-	self = (LineParticleLayout*)_GlobalParticleLayout_New( 
-		_sizeOfSelf, 
-		type,
-		_delete,
-		_print,
-		_copy, 
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		_setInitialCounts,
-		_initialiseParticles,
-		_initialiseParticle,
-		name,
-		initFlag,
-		GlobalCoordSystem,
-		False,
-		0,
-		0.0 );
+   self = (LineParticleLayout*)_GlobalParticleLayout_New(  GLOBALPARTICLELAYOUT_PASSARGS  );
 
+		self->dim = dim;
+		self->vertexCount = vertexCount;
+		self->vertexList = vertexList;
 	return self;
 }
 
@@ -118,7 +92,6 @@ LineParticleLayout* _LineParticleLayout_New(
 void _LineParticleLayout_Init( 
 		void*                                            particleLayout,
 		Dimension_Index                                  dim,
-		Particle_Index                                   totalInitialParticles,
 		Index                                            vertexCount,
 		Coord*                                           vertexList )
 {
@@ -127,7 +100,7 @@ void _LineParticleLayout_Init(
 	Index                   segment_I;
 	double                  length;
 	
-	assert( totalInitialParticles >= 2 );
+	assert( self->totalInitialParticles >= 2 );
 	assert( vertexCount >= 2 );
 
 	self->dim = dim;
@@ -143,38 +116,42 @@ void _LineParticleLayout_Init(
 		totalLength += length;
 	}
 
-	self->dx = totalLength/( (double) totalInitialParticles - 1.0 );
-	
-	_GlobalParticleLayout_Init( self, GlobalCoordSystem, False, totalInitialParticles, 0.0 );
+	self->dx = totalLength/( (double) self->totalInitialParticles - 1.0 );
 }
 
 
 void* _LineParticleLayout_DefaultNew( Name name ) {
-	return (void*)_LineParticleLayout_New( 
-			sizeof(LineParticleLayout),
-			LineParticleLayout_Type,
-			_LineParticleLayout_Delete,
-			_LineParticleLayout_Print,
-			_LineParticleLayout_Copy,
-			_LineParticleLayout_DefaultNew,
-			_LineParticleLayout_Construct,
-			_LineParticleLayout_Build,
-			_LineParticleLayout_Initialise,
-			_LineParticleLayout_Execute,
-			_LineParticleLayout_Destroy,
-			_GlobalParticleLayout_SetInitialCounts,
-			_GlobalParticleLayout_InitialiseParticles,
-			_LineParticleLayout_InitialiseParticle,
-			name,
-			False );
+	/* Variables set in this function */
+	SizeT                                                                _sizeOfSelf = sizeof(LineParticleLayout);
+	Type                                                                        type = LineParticleLayout_Type;
+	Stg_Class_DeleteFunction*                                                _delete = _LineParticleLayout_Delete;
+	Stg_Class_PrintFunction*                                                  _print = _LineParticleLayout_Print;
+	Stg_Class_CopyFunction*                                                    _copy = _LineParticleLayout_Copy;
+	Stg_Component_DefaultConstructorFunction*                    _defaultConstructor = _LineParticleLayout_DefaultNew;
+	Stg_Component_ConstructFunction*                                      _construct = _LineParticleLayout_AssignFromXML;
+	Stg_Component_BuildFunction*                                              _build = _LineParticleLayout_Build;
+	Stg_Component_InitialiseFunction*                                    _initialise = _LineParticleLayout_Initialise;
+	Stg_Component_ExecuteFunction*                                          _execute = _LineParticleLayout_Execute;
+	Stg_Component_DestroyFunction*                                          _destroy = _LineParticleLayout_Destroy;
+	AllocationType                                                nameAllocationType = NON_GLOBAL;
+	ParticleLayout_SetInitialCountsFunction*                       _setInitialCounts = _GlobalParticleLayout_SetInitialCounts;
+	ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles = _GlobalParticleLayout_InitialiseParticles;
+	CoordSystem                                                          coordSystem = GlobalCoordSystem;
+	Bool                                                 weightsInitialisedAtStartup = False;
+	GlobalParticleLayout_InitialiseParticleFunction*             _initialiseParticle = _LineParticleLayout_InitialiseParticle;
+	Particle_Index                                             totalInitialParticles = 0;
+	double                                            averageInitialParticlesPerCell = 0.0;
+	Dimension_Index                                                              dim = 0;
+	Index                                                                vertexCount = 0;
+	Coord*                                                                vertexList = NULL;
+
+	return (void*)_LineParticleLayout_New(  LINEPARTICLELAYOUT_PASSARGS  );
 }
 
 	
 void _LineParticleLayout_Delete( void* particleLayout ) {
 	LineParticleLayout* self = (LineParticleLayout*)particleLayout;
 
-	Memory_Free( self->vertexList );
-	
 	_GlobalParticleLayout_Delete( self );
 
 }
@@ -210,7 +187,7 @@ void* _LineParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Nam
 }
 
 
-void _LineParticleLayout_Construct( void* particleLayout, Stg_ComponentFactory *cf, void* data ){
+void _LineParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data ){
 	LineParticleLayout*     self                    = (LineParticleLayout*) particleLayout;
 	Particle_Index          totalInitialParticles;
 	Dimension_Index         dim;
@@ -226,6 +203,8 @@ void _LineParticleLayout_Construct( void* particleLayout, Stg_ComponentFactory *
 	dictionary              = Dictionary_GetDictionary( cf->componentDict, self->name );
 	/*stream                  = cf->infoStream;*/
 	stream                  = Journal_MyStream( Info_Type, self );
+
+   _GlobalParticleLayout_AssignFromXML( self, cf, data );
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 
@@ -253,7 +232,7 @@ void _LineParticleLayout_Construct( void* particleLayout, Stg_ComponentFactory *
 
 	totalInitialParticles = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "totalInitialParticles", 2 );
 
-	_LineParticleLayout_Init( self, dim, totalInitialParticles, vertexCount, vertexList );
+	_LineParticleLayout_Init( self, dim, vertexCount, vertexList );
 
 	/* Delete this vertexList because _LineParticleLayout_Init made a copy of it */
 	Memory_Free( vertexList );
@@ -266,6 +245,12 @@ void _LineParticleLayout_Initialise( void* particleLayout, void* data ) {
 void _LineParticleLayout_Execute( void* particleLayout, void* data ) {
 }
 void _LineParticleLayout_Destroy( void* particleLayout, void* data ) {
+	LineParticleLayout*        self             = (LineParticleLayout*)particleLayout;
+
+	Memory_Free( self->vertexList );
+	Memory_Free( self->segmentLengthList );
+
+   _GlobalParticleLayout_Destroy( self, data );
 }
 
 void _LineParticleLayout_InitialiseParticle( void* particleLayout, void* _swarm, Particle_Index newParticle_I, void* _particle )
@@ -300,4 +285,6 @@ void _LineParticleLayout_InitialiseParticle( void* particleLayout, void* _swarm,
 			* ( self->vertexList[ segment_I + 1 ][ axis_I ] - self->vertexList[ segment_I ][ axis_I ] )  ;
 	}
 }
+
+
 

@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Decomp_Sync_Claim_h__
-#define __Domain_Mesh_Decomp_Sync_Claim_h__
+#ifndef __StgDomain_Mesh_Decomp_Sync_Claim_h__
+#define __StgDomain_Mesh_Decomp_Sync_Claim_h__
 
 	/** Textual name of this class */
 	extern const Type Decomp_Sync_Claim_Type;
@@ -53,6 +53,7 @@
 		/* General info */				\
 		__Stg_Component					\
 								\
+		AbstractContext*		context;	\
 		/* Virtual info */				\
 		Decomp_Sync_Claim_SelectFunc*	selectFunc;	\
 								\
@@ -88,7 +89,7 @@
 		(Mesh*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	void* _Decomp_Sync_Claim_Copy( void* claim, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _Decomp_Sync_Claim_Construct( void* claim, Stg_ComponentFactory* cf, void* data );
+	void _Decomp_Sync_Claim_AssignFromXML( void* claim, Stg_ComponentFactory* cf, void* data );
 	void _Decomp_Sync_Claim_Build( void* claim, void* data );
 	void _Decomp_Sync_Claim_Initialise( void* claim, void* data );
 	void _Decomp_Sync_Claim_Execute( void* claim, void* data );
@@ -111,4 +112,4 @@
 	void Decomp_Sync_Claim_BuildIndices( Decomp_Sync_Claim* self, unsigned nRequired, unsigned* required, RangeSet* claimed, 
 					     unsigned* nLocals, unsigned** locals, unsigned* nRemotes, unsigned** remotes );
 
-#endif /* __Domain_Mesh_Decomp_Sync_Claim_h__ */
+#endif /* __StgDomain_Mesh_Decomp_Sync_Claim_h__ */

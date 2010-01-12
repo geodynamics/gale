@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_ManualParticleLayout_h__
-#define __Domain_Swarm_ManualParticleLayout_h__
+#ifndef __StgDomain_Swarm_ManualParticleLayout_h__
+#define __StgDomain_Swarm_ManualParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -51,32 +51,34 @@
 	#define __ManualParticleLayout \
 		__GlobalParticleLayout \
 		\
-		Dictionary*             dictionary;
+		Dictionary*             dictionary; /* TODO: don't think this dictionary needs to be defined on the component, JG, 7Dec09 */
 
 	struct ManualParticleLayout { __ManualParticleLayout };
 	
-	/* Create a new ManualParticleLayout and initialise */
-	ManualParticleLayout* ManualParticleLayout_New( Name name, Dictionary* dictionary );
+   /* Create a new ManualParticleLayout and initialise */
+   ManualParticleLayout* ManualParticleLayout_New( Name name,
+      AbstractContext* context, 
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int     totalInitialParticles, 
+      double           averageInitialParticlesPerCell,
+      Dictionary*      dictionary );
 	
 	/* Creation implementation / Virtual constructor */
-	ManualParticleLayout* _ManualParticleLayout_New( 
-		SizeT                                            _sizeOfSelf,
-		Type                                             type,
-		Stg_Class_DeleteFunction*                        _delete,
-		Stg_Class_PrintFunction*                         _print,
-		Stg_Class_CopyFunction*                          _copy, 
-		Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-		Stg_Component_ConstructFunction*                 _construct,
-		Stg_Component_BuildFunction*                     _build,
-		Stg_Component_InitialiseFunction*                _initialise,
-		Stg_Component_ExecuteFunction*                   _execute,
-		Stg_Component_DestroyFunction*                   _destroy,
-		ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-		Name                                             name,
-		Bool                                             initFlag,
-		Dictionary*                                      dictionary );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MANUALPARTICLELAYOUT_DEFARGS \
+                GLOBALPARTICLELAYOUT_DEFARGS, \
+                Dictionary*  dictionary
+
+	#define MANUALPARTICLELAYOUT_PASSARGS \
+                GLOBALPARTICLELAYOUT_PASSARGS, \
+	        dictionary
+
+   ManualParticleLayout* _ManualParticleLayout_New(  MANUALPARTICLELAYOUT_DEFARGS  );
 	
 	void _ManualParticleLayout_Init( void* manualParticleLayout, Dictionary* dictionary );
 	
@@ -91,7 +93,7 @@
 	
 	/* 'Stg_Component' Stuff */
 	void* _ManualParticleLayout_DefaultNew( Name name ) ;
-	void _ManualParticleLayout_Construct( void* manualParticleLayout, Stg_ComponentFactory *cf, void* data );
+	void _ManualParticleLayout_AssignFromXML( void* manualParticleLayout, Stg_ComponentFactory *cf, void* data );
 	void _ManualParticleLayout_Build( void* manualParticleLayout, void* data );
 	void _ManualParticleLayout_Initialise( void* manualParticleLayout, void* data );
 	void _ManualParticleLayout_Execute( void* manualParticleLayout, void* data );
@@ -103,4 +105,5 @@
 			Particle_Index newParticle_I,
 			void* particle);
 
-#endif /* __Domain_Swarm_ManualParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_ManualParticleLayout_h__ */
+

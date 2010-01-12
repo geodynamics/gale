@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 } PlaneSuiteData;
 
 void PlaneSuite_Setup( PlaneSuiteData* data ) {
@@ -100,3 +100,5 @@ void PlaneSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, PlaneSuite_TestDistanceToPoint );
    pcu_suite_addTest( suite, PlaneSuite_TestPointIsInFront );
 }
+
+

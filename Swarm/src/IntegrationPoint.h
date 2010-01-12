@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_IntegrationPoint_h__
-#define __Domain_Swarm_IntegrationPoint_h__
+#ifndef __StgDomain_Swarm_IntegrationPoint_h__
+#define __StgDomain_Swarm_IntegrationPoint_h__
 
 	extern const Type IntegrationPoint_Type;
 
@@ -49,7 +49,7 @@
 
 	struct IntegrationPoint { __IntegrationPoint };
 
-#endif /* __Domain_Swarm_IntegrationPoint_h__ */
+#endif /* __StgDomain_Swarm_IntegrationPoint_h__ */
 
 
 

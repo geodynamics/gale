@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StGermain_Domain_Shape_h__
-#define __StGermain_Domain_Shape_h__
+#ifndef __StgDomain_Shape_Shape_h__
+#define __StgDomain_Shape_Shape_h__
 
 	#include "types.h"
 	#include "ShapeClass.h"

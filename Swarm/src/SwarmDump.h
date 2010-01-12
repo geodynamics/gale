@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_SwarmDump_h__
-#define __Domain_Swarm_SwarmDump_h__
+#ifndef __StgDomain_Swarm_SwarmDump_h__
+#define __StgDomain_Swarm_SwarmDump_h__
 
 	/** Textual name of this class */
 	extern const Type SwarmDump_Type;
@@ -47,6 +47,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		AbstractContext*				   context;		  \
 		/* Virtual info */ \
 		\
 		/* Member info */ \
@@ -64,19 +65,18 @@
 		Index                                              swarmCount,
 		Bool                                               newFileEachTime );
 	
-	SwarmDump* _SwarmDump_New(
-		SizeT                                              _sizeOfSelf, 
-		Type                                               type,
-		Stg_Class_DeleteFunction*	                       _delete,
-		Stg_Class_PrintFunction*	                       _print, 
-		Stg_Class_CopyFunction*	                           _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SWARMDUMP_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define SWARMDUMP_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	SwarmDump* _SwarmDump_New(  SWARMDUMP_DEFARGS  );
 
 	/** Member initialisation implementation */
 	void _SwarmDump_Init( 
@@ -93,7 +93,7 @@
 		(SwarmDump*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
 	void* _SwarmDump_DefaultNew( Name name );
-	void _SwarmDump_Construct( void* swarmDump, Stg_ComponentFactory* cf, void* data ) ;
+	void _SwarmDump_AssignFromXML( void* swarmDump, Stg_ComponentFactory* cf, void* data ) ;
 	void _SwarmDump_Build( void* swarmDump, void* data ) ;
 	void _SwarmDump_Initialise( void* swarmDump, void* data ) ;
 	void _SwarmDump_Execute( void* swarmDump, void* data ) ;
@@ -105,4 +105,5 @@
 	void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename );
 #endif
 
-#endif /* __Domain_Swarm_SwarmDump_h__ */
+#endif /* __StgDomain_Swarm_SwarmDump_h__ */
+

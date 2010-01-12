@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StGermain_Domain_Shape_PolygonShapeClass_h__
-#define __StGermain_Domain_Shape_PolygonShapeClass_h__
+#ifndef __StgDomain_Shape_PolygonShapeClass_h__
+#define __StgDomain_Shape_PolygonShapeClass_h__
 
 	/* Textual name of this class */
 	extern const Type PolygonShape_Type;
@@ -73,37 +73,20 @@
 		XYZ                                   end,
 		Axis                                  perpendicularAxis);
 		
-	PolygonShape* _PolygonShape_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define POLYGONSHAPE_DEFARGS \
+                STG_SHAPE_DEFARGS
+
+	#define POLYGONSHAPE_PASSARGS \
+                STG_SHAPE_PASSARGS
+
+	PolygonShape* _PolygonShape_New(  POLYGONSHAPE_DEFARGS  );
 	
 	void _PolygonShape_Init( void* polygon, Coord_List vertexList, Index vertexCount, XYZ start, XYZ end, Axis perpendicular ) ;
-	void PolygonShape_InitAll( 
-		void*                                 polygon, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		Coord_List                            vertexList,
-		Index                                 vertexCount,
-		XYZ                                   start,
-		XYZ                                   end,
-		Axis                                  perpendicularAxis
-		) ;
 		
 	/* Stg_Class_Delete PolygonShape implementation */
 	void _PolygonShape_Delete( void* polygon );
@@ -115,7 +98,7 @@
 	void* _PolygonShape_Copy( void* polygon, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _PolygonShape_DefaultNew( Name name ) ;
-	void _PolygonShape_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _PolygonShape_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _PolygonShape_Build( void* polygon, void* data ) ;
 	void _PolygonShape_Initialise( void* polygon, void* data ) ;
 	void _PolygonShape_Execute( void* polygon, void* data );
@@ -135,3 +118,4 @@
 	
 	
 #endif 
+

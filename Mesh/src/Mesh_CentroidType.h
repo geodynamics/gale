@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Mesh_CentroidType_h__
-#define __Domain_Mesh_Mesh_CentroidType_h__
+#ifndef __StgDomain_Mesh_CentroidType_h__
+#define __StgDomain_Mesh_CentroidType_h__
 
 	/** Textual name of this class */
 	extern const Type Mesh_CentroidType_Type;
@@ -63,14 +63,21 @@
 	** Constructors
 	*/
 
-	#define MESH_CENTROIDTYPE_DEFARGS		\
-		MESH_ELEMENTTYPE_DEFARGS
 
-	#define MESH_CENTROIDTYPE_PASSARGS		\
-		MESH_ELEMENTTYPE_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESH_CENTROIDTYPE_DEFARGS \
+                MESH_ELEMENTTYPE_DEFARGS
+
+	#define MESH_CENTROIDTYPE_PASSARGS \
+                MESH_ELEMENTTYPE_PASSARGS
 
 	Mesh_CentroidType* Mesh_CentroidType_New();
-	Mesh_CentroidType* _Mesh_CentroidType_New( MESH_CENTROIDTYPE_DEFARGS );
+	Mesh_CentroidType* _Mesh_CentroidType_New(  MESH_CENTROIDTYPE_DEFARGS  );
 	void _Mesh_CentroidType_Init( Mesh_CentroidType* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -96,4 +103,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Domain_Mesh_Mesh_CentroidType_h__ */
+#endif /* __StgDomain_Mesh_CentroidType_h__ */
+

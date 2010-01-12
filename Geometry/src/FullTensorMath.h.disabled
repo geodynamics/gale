@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_FullTensorMath_h__
-#define __Domain_Geometry_FullTensorMath_h__
+#ifndef __StgDomain_Geometry_FullTensorMath_h__
+#define __StgDomain_Geometry_FullTensorMath_h__
 
 #include "ComplexMath.h"
 #include "ComplexVectorMath.h"
@@ -132,4 +132,4 @@ void Journal_PrintComplexMatrix_Unnamed( Stream* stream, Cmplx** complexMatrix, 
 
 	
 	
-#endif /* __Domain_Geometry_FullTensorMath_h__ */
+#endif /* __StgDomain_Geometry_FullTensorMath_h__ */

@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	
-#ifndef __Domain_Swarm_ParticleShadowSync_h__
-#define __Domain_Swarm_ParticleShadowSync_h__
+#ifndef __StgDomain_Swarm_ParticleShadowSync_h__
+#define __StgDomain_Swarm_ParticleShadowSync_h__
 
 	/** Textual name of this class */
 	extern const Type ParticleShadowSync_Type;
@@ -63,20 +63,18 @@
 			);
 	
 	/** Private Constructor */
-	ParticleShadowSync* _ParticleShadowSync_New( 
-		SizeT                                                           _sizeOfSelf,
-		Type                                                            type,
-		Stg_Class_DeleteFunction*                                       _delete,
-		Stg_Class_PrintFunction*                                        _print,
-		Stg_Class_CopyFunction*                                         _copy, 
-		Stg_Component_DefaultConstructorFunction*                       _defaultConstructor,
-		Stg_Component_ConstructFunction*                                _construct,
-		Stg_Component_BuildFunction*                                    _build,
-		Stg_Component_InitialiseFunction*                               _initialise,
-		Stg_Component_ExecuteFunction*                                  _execute,
-		Stg_Component_DestroyFunction*                                  _destroy,
-		Name                                                            name,
-		Bool                                                            initFlag );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PARTICLESHADOWSYNC_DEFARGS \
+                PARTICLECOMMHANDLER_DEFARGS
+
+	#define PARTICLESHADOWSYNC_PASSARGS \
+                PARTICLECOMMHANDLER_PASSARGS
+
+	ParticleShadowSync* _ParticleShadowSync_New(  PARTICLESHADOWSYNC_DEFARGS  );
 	
 	/** Variable initialiser */
 	void _ParticleShadowSync_Init(
@@ -85,7 +83,7 @@
 	/** Stg_Class_Print() implementation */
 	void _ParticleShadowSync_Print( void* pCommsHandler, Stream* stream );
 	
-	void _ParticleShadowSync_Construct( void* pCommsHandler, Stg_ComponentFactory* cf, void* data );
+	void _ParticleShadowSync_AssignFromXML( void* pCommsHandler, Stg_ComponentFactory* cf, void* data );
 	
 	void _ParticleShadowSync_Build( void* pCommsHandler, void *data );
 	
@@ -135,3 +133,4 @@
 	/* --- private functions --- */
 
 #endif
+

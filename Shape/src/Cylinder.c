@@ -61,57 +61,19 @@ Cylinder* Cylinder_New(
 {
 	Cylinder* self = (Cylinder*) _Cylinder_DefaultNew( name );
 
-	Cylinder_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		radius,
-		start,
-		end,
-		alongAxis ) ;
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma );
+	_Cylinder_Init( self, radius, start, end, alongAxis );
+
 	return self;
 }
 
-Cylinder* _Cylinder_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
-		Name                                  name )
+Cylinder* _Cylinder_New(  CYLINDER_DEFARGS  )
 {
 	Cylinder* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Cylinder) );
-	self = (Cylinder*)_Stg_Shape_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (Cylinder*)_Stg_Shape_New(  STG_SHAPE_PASSARGS  );
 	
 	/* General info */
 
@@ -127,26 +89,6 @@ void _Cylinder_Init( Cylinder* self, double radius, XYZ start, XYZ end, Axis alo
 	self->radius = radius;
 }
 
-
-void Cylinder_InitAll( 
-		void*                                 cylinder, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                radius, 
-		XYZ                                   start, 
-		XYZ                                   end, 
-		Axis                                  alongAxis )
-{
-	Cylinder* self = (Cylinder*)cylinder;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma );
-	_Cylinder_Init( self, radius, start, end, alongAxis );
-}
-	
-
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */
@@ -158,15 +100,12 @@ void _Cylinder_Delete( void* cylinder ) {
 	_Stg_Shape_Delete( self );
 }
 
-
 void _Cylinder_Print( void* cylinder, Stream* stream ) {
 	Cylinder* self = (Cylinder*)cylinder;
 	
 	/* Print parent */
 	_Stg_Shape_Print( self, stream );
 }
-
-
 
 void* _Cylinder_Copy( void* cylinder, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Cylinder*	self = (Cylinder*)cylinder;
@@ -184,27 +123,31 @@ void* _Cylinder_Copy( void* cylinder, void* dest, Bool deep, Name nameExt, PtrMa
 }
 
 void* _Cylinder_DefaultNew( Name name ) {
-	return (void*) _Cylinder_New(
-			sizeof(Cylinder),
-			Cylinder_Type,
-			_Cylinder_Delete,
-			_Cylinder_Print,
-			_Cylinder_Copy,
-			_Cylinder_DefaultNew,
-			_Cylinder_Construct,
-			_Cylinder_Build,
-			_Cylinder_Initialise,
-			_Cylinder_Execute,
-			_Cylinder_Destroy,
-			_Cylinder_IsCoordInside,
-			_Cylinder_CalculateVolume,
-			_Cylinder_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(Cylinder);
+	Type                                                          type = Cylinder_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _Cylinder_Delete;
+	Stg_Class_PrintFunction*                                    _print = _Cylinder_Print;
+	Stg_Class_CopyFunction*                                      _copy = _Cylinder_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _Cylinder_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _Cylinder_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _Cylinder_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _Cylinder_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _Cylinder_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _Cylinder_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _Cylinder_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _Cylinder_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _Cylinder_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _Cylinder_New(  CYLINDER_PASSARGS  );
 }
 
 #define BIG 1.0e99
 
-void _Cylinder_Construct( void* cylinder, Stg_ComponentFactory* cf, void* data ) {
+void _Cylinder_AssignFromXML( void* cylinder, Stg_ComponentFactory* cf, void* data ) {
 	Cylinder*            self                     = (Cylinder*) cylinder;
 	XYZ                  start                    = { -BIG, -BIG, -BIG }; 
 	XYZ                  end                      = {  BIG,  BIG,  BIG };
@@ -212,7 +155,7 @@ void _Cylinder_Construct( void* cylinder, Stg_ComponentFactory* cf, void* data )
 	Axis                 alongAxis        = I_AXIS;
 	char*                perpendicularAxisName    = NULL;
 
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 	
 	radius = Stg_ComponentFactory_GetDouble( cf, self->name, "radius", 0.0 );
 
@@ -256,7 +199,7 @@ void _Cylinder_Execute( void* cylinder, void* data ) {
 }
 void _Cylinder_Destroy( void* cylinder, void* data ) {
 	Cylinder*	self = (Cylinder*)cylinder;
-	
+
 	_Stg_Shape_Destroy( self, data );
 }
 
@@ -325,4 +268,6 @@ double _Cylinder_CalculateVolume( void* cylinder ) {
 	assert( 0 /* unsure how this cylinder is setup...but shouldn't be hard to implement -- Alan */ );
 	return 0.0;
 }
+
+
 

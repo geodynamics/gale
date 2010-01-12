@@ -54,24 +54,22 @@ const Type MeshGenerator_Type = "MeshGenerator";
 ** Constructors
 */
 
-MeshGenerator* _MeshGenerator_New( MESHGENERATOR_DEFARGS ) {
+MeshGenerator* _MeshGenerator_New(  MESHGENERATOR_DEFARGS  ) {
 	MeshGenerator*	self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(MeshGenerator) );
-	self = (MeshGenerator*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(MeshGenerator) );
+	self = (MeshGenerator*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	/* Virtual info */
 	self->setDimSizeFunc = setDimSizeFunc;
 	self->generateFunc = generateFunc;
 
-	/* MeshGenerator info */
-	_MeshGenerator_Init( self );
-
 	return self;
 }
 
-void _MeshGenerator_Init( MeshGenerator* self ) {
+void _MeshGenerator_Init( MeshGenerator* self, AbstractContext* context ) {
+   self->context = context;
 	self->mpiComm = MPI_COMM_WORLD;
 	self->nMeshes = 0;
 	self->meshes = NULL;
@@ -88,9 +86,6 @@ void _MeshGenerator_Init( MeshGenerator* self ) {
 void _MeshGenerator_Delete( void* meshGenerator ) {
 	MeshGenerator*	self = (MeshGenerator*)meshGenerator;
 
-	MeshGenerator_Destruct( self );
-
-	/* Delete the parent. */
 	_Stg_Component_Delete( self );
 }
 
@@ -106,7 +101,7 @@ void _MeshGenerator_Print( void* meshGenerator, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void _MeshGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, void* data ) {
+void _MeshGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactory* cf, void* data ) {
 	MeshGenerator*		self = (MeshGenerator*)meshGenerator;
 	Dictionary*		dict;
 	unsigned		nDims;
@@ -122,6 +117,10 @@ void _MeshGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, vo
 
 	/* Set the communicator to a default. */
 	MeshGenerator_SetMPIComm( self, MPI_COMM_WORLD );
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 
 	/* Read the individual mesh if specified. */
 	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, False, data );
@@ -216,6 +215,9 @@ void _MeshGenerator_Execute( void* meshGenerator, void* data ) {
 }
 
 void _MeshGenerator_Destroy( void* meshGenerator, void* data ) {
+   MeshGenerator* self = (MeshGenerator*)meshGenerator;
+
+   MeshGenerator_Destruct( self );
 }
 
 void MeshGenerator_SetFullIncidence( void* meshGenerator ) {
@@ -340,3 +342,5 @@ void MeshGenerator_Destruct( MeshGenerator* self ) {
 	self->nMeshes = 0;
 	self->nDims = 0;
 }
+
+

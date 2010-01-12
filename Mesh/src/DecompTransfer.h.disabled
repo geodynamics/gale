@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_DecompTransfer_h__
-#define __Domain_Mesh_DecompTransfer_h__
+#ifndef __StgDomain_Mesh_DecompTransfer_h__
+#define __StgDomain_Mesh_DecompTransfer_h__
 
 	/** Textual name of this class */
 	extern const Type DecompTransfer_Type;
@@ -138,4 +138,4 @@
 	void DecompTransfer_DestructArrays( DecompTransfer* self );
 	void DecompTransfer_DestructArray( DecompTransfer_Array* array );
 
-#endif /* __Domain_Mesh_DecompTransfer_h__ */
+#endif /* __StgDomain_Mesh_DecompTransfer_h__ */

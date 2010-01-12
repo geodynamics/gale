@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Mesh_HexType_h__
-#define __Domain_Mesh_Mesh_HexType_h__
+#ifndef __StgDomain_Mesh_HexType_h__
+#define __StgDomain_Mesh_HexType_h__
 
 	/** Textual name of this class */
 	extern const Type Mesh_HexType_Type;
@@ -68,14 +68,21 @@
 	** Constructors
 	*/
 
-	#define MESH_HEXTYPE_DEFARGS		\
-		MESH_ELEMENTTYPE_DEFARGS
 
-	#define MESH_HEXTYPE_PASSARGS		\
-		MESH_ELEMENTTYPE_PASSARGS
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESH_HEXTYPE_DEFARGS \
+                MESH_ELEMENTTYPE_DEFARGS
+
+	#define MESH_HEXTYPE_PASSARGS \
+                MESH_ELEMENTTYPE_PASSARGS
 
 	Mesh_HexType* Mesh_HexType_New();
-	Mesh_HexType* _Mesh_HexType_New( MESH_HEXTYPE_DEFARGS );
+	Mesh_HexType* _Mesh_HexType_New(  MESH_HEXTYPE_DEFARGS  );
 	void _Mesh_HexType_Init( Mesh_HexType* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -115,4 +122,5 @@
 	void Mesh_HexType_TetBarycenter( double** verts, unsigned* inc, unsigned* inds, double* point, double* bc );
 	void Mesh_HexType_TriBarycenter( double** verts, unsigned* inc, unsigned* inds, double* point, double* bc );
 
-#endif /* __Domain_Mesh_Mesh_HexType_h__ */
+#endif /* __StgDomain_Mesh_HexType_h__ */
+

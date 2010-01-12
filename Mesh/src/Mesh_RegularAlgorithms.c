@@ -47,47 +47,52 @@ const Type Mesh_RegularAlgorithms_Type = "Mesh_RegularAlgorithms";
 ** Constructors
 */
 
-Mesh_RegularAlgorithms* Mesh_RegularAlgorithms_New( Name name ) {
-	return _Mesh_RegularAlgorithms_New( sizeof(Mesh_RegularAlgorithms), 
-					    Mesh_RegularAlgorithms_Type, 
-					    _Mesh_RegularAlgorithms_Delete, 
-					    _Mesh_RegularAlgorithms_Print, 
-					    NULL, 
-					    (void* (*)(Name))_Mesh_RegularAlgorithms_New, 
-					    _Mesh_RegularAlgorithms_Construct, 
-					    _Mesh_RegularAlgorithms_Build, 
-					    _Mesh_RegularAlgorithms_Initialise, 
-					    _Mesh_RegularAlgorithms_Execute, 
-					    _Mesh_RegularAlgorithms_Destroy, 
-					    name, 
-					    NON_GLOBAL, 
-					    Mesh_RegularAlgorithms_SetMesh, 
-					    Mesh_RegularAlgorithms_Update, 
-					    _Mesh_Algorithms_NearestVertex, 
-					    _Mesh_Algorithms_Search, 
-					    Mesh_RegularAlgorithms_SearchElements, 
-					    _Mesh_Algorithms_GetMinimumSeparation, 
-					    _Mesh_Algorithms_GetLocalCoordRange, 
-					    _Mesh_Algorithms_GetDomainCoordRange, 
-					    _Mesh_Algorithms_GetGlobalCoordRange );
+Mesh_RegularAlgorithms* Mesh_RegularAlgorithms_New( Name name, AbstractContext* context ) {
+	/* Variables set in this function */
+	SizeT                                                   _sizeOfSelf = sizeof(Mesh_RegularAlgorithms);
+	Type                                                           type = Mesh_RegularAlgorithms_Type;
+	Stg_Class_DeleteFunction*                                   _delete = _Mesh_RegularAlgorithms_Delete;
+	Stg_Class_PrintFunction*                                     _print = _Mesh_RegularAlgorithms_Print;
+	Stg_Class_CopyFunction*                                       _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*       _defaultConstructor = (void* (*)(Name))_Mesh_RegularAlgorithms_New;
+	Stg_Component_ConstructFunction*                         _construct = _Mesh_RegularAlgorithms_AssignFromXML;
+	Stg_Component_BuildFunction*                                 _build = _Mesh_RegularAlgorithms_Build;
+	Stg_Component_InitialiseFunction*                       _initialise = _Mesh_RegularAlgorithms_Initialise;
+	Stg_Component_ExecuteFunction*                             _execute = _Mesh_RegularAlgorithms_Execute;
+	Stg_Component_DestroyFunction*                             _destroy = _Mesh_RegularAlgorithms_Destroy;
+	AllocationType                                   nameAllocationType = NON_GLOBAL;
+	Mesh_Algorithms_SetMeshFunc*                            setMeshFunc = Mesh_RegularAlgorithms_SetMesh;
+	Mesh_Algorithms_UpdateFunc*                              updateFunc = Mesh_RegularAlgorithms_Update;
+	Mesh_Algorithms_NearestVertexFunc*                nearestVertexFunc = _Mesh_Algorithms_NearestVertex;
+	Mesh_Algorithms_SearchFunc*                              searchFunc = _Mesh_Algorithms_Search;
+	Mesh_Algorithms_SearchElementsFunc*              searchElementsFunc = Mesh_RegularAlgorithms_SearchElements;
+	Mesh_Algorithms_GetMinimumSeparationFunc*  getMinimumSeparationFunc = _Mesh_Algorithms_GetMinimumSeparation;
+	Mesh_Algorithms_GetLocalCoordRangeFunc*      getLocalCoordRangeFunc = _Mesh_Algorithms_GetLocalCoordRange;
+	Mesh_Algorithms_GetDomainCoordRangeFunc*    getDomainCoordRangeFunc = _Mesh_Algorithms_GetDomainCoordRange;
+	Mesh_Algorithms_GetGlobalCoordRangeFunc*    getGlobalCoordRangeFunc = _Mesh_Algorithms_GetGlobalCoordRange;
+
+	Mesh_RegularAlgorithms* self = _Mesh_RegularAlgorithms_New(  MESH_REGULARALGORITHMS_PASSARGS  );
+
+	/* Mesh_RegularAlgorithms info */
+	_Mesh_Algorithms_Init( (Mesh_Algorithms*)self, context );
+	_Mesh_RegularAlgorithms_Init( self );
+
+   return self;
 }
 
-Mesh_RegularAlgorithms* _Mesh_RegularAlgorithms_New( MESH_REGULARALGORITHMS_DEFARGS ) {
+Mesh_RegularAlgorithms* _Mesh_RegularAlgorithms_New(  MESH_REGULARALGORITHMS_DEFARGS  ) {
 	Mesh_RegularAlgorithms* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Mesh_RegularAlgorithms) );
-	self = (Mesh_RegularAlgorithms*)_Mesh_Algorithms_New( MESH_ALGORITHMS_PASSARGS );
-
-	/* Virtual info */
-
-	/* Mesh_RegularAlgorithms info */
-	_Mesh_RegularAlgorithms_Init( self );
+	assert( _sizeOfSelf >= sizeof(Mesh_RegularAlgorithms) );
+	self = (Mesh_RegularAlgorithms*)_Mesh_Algorithms_New(  MESH_ALGORITHMS_PASSARGS  );
 
 	return self;
 }
 
-void _Mesh_RegularAlgorithms_Init( Mesh_RegularAlgorithms* self ) {
+void _Mesh_RegularAlgorithms_Init( void* algorithms ) {
+	Mesh_RegularAlgorithms*	self = (Mesh_RegularAlgorithms*)algorithms;
+
 	assert( self && Stg_CheckType( self, Mesh_RegularAlgorithms ) );
 
 	self->sep = NULL;
@@ -100,8 +105,6 @@ void _Mesh_RegularAlgorithms_Init( Mesh_RegularAlgorithms* self ) {
 
 void _Mesh_RegularAlgorithms_Delete( void* algorithms ) {
 	Mesh_RegularAlgorithms*	self = (Mesh_RegularAlgorithms*)algorithms;
-
-	Mesh_RegularAlgorithms_Destruct( self );
 
 	/* Delete the parent. */
 	_Mesh_Algorithms_Delete( self );
@@ -119,20 +122,29 @@ void _Mesh_RegularAlgorithms_Print( void* algorithms, Stream* stream ) {
 	_Mesh_Algorithms_Print( self, stream );
 }
 
-void _Mesh_RegularAlgorithms_Construct( void* algorithms, Stg_ComponentFactory* cf, void* data ) {
-	_Mesh_Algorithms_Construct( algorithms, cf, data );
+void _Mesh_RegularAlgorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf, void* data ) {
+	_Mesh_Algorithms_AssignFromXML( algorithms, cf, data );
+   _Mesh_RegularAlgorithms_Init( algorithms );
 }
 
 void _Mesh_RegularAlgorithms_Build( void* algorithms, void* data ) {
+    _Mesh_Algorithms_Build( algorithms, data );
 }
 
 void _Mesh_RegularAlgorithms_Initialise( void* algorithms, void* data ) {
+    _Mesh_Algorithms_Initialise( algorithms, data );
 }
 
 void _Mesh_RegularAlgorithms_Execute( void* algorithms, void* data ) {
+    _Mesh_Algorithms_Execute( algorithms, data );
 }
 
 void _Mesh_RegularAlgorithms_Destroy( void* algorithms, void* data ) {
+	Mesh_RegularAlgorithms*	self = (Mesh_RegularAlgorithms*)algorithms;
+
+	Mesh_RegularAlgorithms_Destruct( self );
+
+   _Mesh_Algorithms_Destroy( algorithms, data );
 }
 
 void Mesh_RegularAlgorithms_SetMesh( void* algorithms, void* mesh ) {
@@ -220,7 +232,9 @@ Bool Mesh_RegularAlgorithms_SearchElements( void* algorithms, double* point, uns
 }
 
 double _Mesh_RegularAlgorithms_GetMinimumSeparation( void* algorithms, void* _mesh, double* perDim ) {
-	Mesh*			mesh = (Mesh*)_mesh;
+	Mesh* mesh;
+
+	mesh = (Mesh*)_mesh;
 
 	/* TODO */
 	abort();
@@ -284,3 +298,5 @@ void Mesh_RegularAlgorithms_Destruct( Mesh_RegularAlgorithms* self ) {
 	KillArray( self->minCrd );
 	KillArray( self->maxCrd );
 }
+
+

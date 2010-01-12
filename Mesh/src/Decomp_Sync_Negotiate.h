@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Decomp_Sync_Negotiate_h__
-#define __Domain_Mesh_Decomp_Sync_Negotiate_h__
+#ifndef __StgDomain_Mesh_Decomp_Sync_Negotiate_h__
+#define __StgDomain_Mesh_Decomp_Sync_Negotiate_h__
 
 	/** Textual name of this class */
 	extern const Type Decomp_Sync_Negotiate_Type;
@@ -52,6 +52,7 @@
 		/* General info */					\
 		__Stg_Component						\
 									\
+		AbstractContext*			context;	\
 		/* Virtual info */					\
 		Decomp_Sync_Negotiate_SelectFunc*	selectFunc;	\
 									\
@@ -87,7 +88,7 @@
 		(Mesh*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	void* _Decomp_Sync_Negotiate_Copy( void* negotiate, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _Decomp_Sync_Negotiate_Construct( void* negotiate, Stg_ComponentFactory* cf, void* data );
+	void _Decomp_Sync_Negotiate_AssignFromXML( void* negotiate, Stg_ComponentFactory* cf, void* data );
 	void _Decomp_Sync_Negotiate_Build( void* negotiate, void* data );
 	void _Decomp_Sync_Negotiate_Initialise( void* negotiate, void* data );
 	void _Decomp_Sync_Negotiate_Execute( void* negotiate, void* data );
@@ -106,4 +107,4 @@
 	void Decomp_Sync_Negotiate_RemoteSearch( Decomp_Sync_Negotiate* self, Decomp_Sync* decomp, 
 						 unsigned** nRemFound, unsigned*** remFound );
 
-#endif /* __Domain_Mesh_Decomp_Sync_Negotiate_h__ */
+#endif /* __StgDomain_Mesh_Decomp_Sync_Negotiate_h__ */

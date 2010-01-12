@@ -37,8 +37,8 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #ifdef HAVE_PYTHON
-#ifndef __StGermain_Domain_Shape_PythonShapeClass_h__
-#define __StGermain_Domain_Shape_PythonShapeClass_h__
+#ifndef __StgDomain_Shape_PythonShapeClass_h__
+#define __StgDomain_Shape_PythonShapeClass_h__
 
 	/* Textual name of this class */
 	extern const Type PythonShape_Type;
@@ -67,22 +67,18 @@
 		double                                gamma,
 		char*                                 conditionFunction );
 
-	PythonShape* _PythonShape_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PYTHONSHAPE_DEFARGS \
+                STG_SHAPE_DEFARGS
+
+	#define PYTHONSHAPE_PASSARGS \
+                STG_SHAPE_PASSARGS
+
+	PythonShape* _PythonShape_New(  PYTHONSHAPE_DEFARGS  );
 	
 	void _PythonShape_Init( void* pythonShape, char* conditionFunction ) ;
 	void PythonShape_InitAll( 
@@ -104,7 +100,7 @@
 	void* _PythonShape_Copy( void* pythonShape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _PythonShape_DefaultNew( Name name ) ;
-	void _PythonShape_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _PythonShape_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _PythonShape_Build( void* pythonShape, void* data ) ;
 	void _PythonShape_Initialise( void* pythonShape, void* data ) ;
 	void _PythonShape_Execute( void* pythonShape, void* data );
@@ -125,3 +121,4 @@
 	
 #endif 
 #endif /* HAVE_PYTHON */
+

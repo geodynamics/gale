@@ -38,9 +38,9 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Finalise_h__
-#define __Domain_Mesh_Finalise_h__
+#ifndef __StgDomain_Mesh_Finalise_h__
+#define __StgDomain_Mesh_Finalise_h__
 	
 	Bool StgDomainMesh_Finalise( void );
 	
-#endif /* __Domain_Mesh_Finalise_h__ */
+#endif /* __StgDomain_Mesh_Finalise_h__ */

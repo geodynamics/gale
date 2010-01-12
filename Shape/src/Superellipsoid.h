@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StGermain_Domain_Shape_SuperellipsoidClass_h__
-#define __StGermain_Domain_Shape_SuperellipsoidClass_h__
+#ifndef __StgDomain_Shape_SuperellipsoidClass_h__
+#define __StgDomain_Shape_SuperellipsoidClass_h__
 
 	/* Textual name of this class */
 	extern const Type Superellipsoid_Type;
@@ -69,34 +69,20 @@
 		double                                epsilon2,   
 		XYZ                                   radius );
 
-	Superellipsoid* _Superellipsoid_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SUPERELLIPSOID_DEFARGS \
+                STG_SHAPE_DEFARGS
+
+	#define SUPERELLIPSOID_PASSARGS \
+                STG_SHAPE_PASSARGS
+
+	Superellipsoid* _Superellipsoid_New(  SUPERELLIPSOID_DEFARGS  );
 	
 	void _Superellipsoid_Init( void* superellipsoid, double epsilon1, double epsilon2, XYZ radius ) ;
-	void Superellipsoid_InitAll( 
-		void*                                 superellipsoid, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                epsilon1, 
-		double                                epsilon2,
-		XYZ                                   radius) ;
 
 	/* Stg_Class_Delete Superellipsoid implementation */
 	void _Superellipsoid_Delete( void* superellipsoid );
@@ -108,7 +94,7 @@
 	void* _Superellipsoid_Copy( void* superellipsoid, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Superellipsoid_DefaultNew( Name name ) ;
-	void _Superellipsoid_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+	void _Superellipsoid_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
 	void _Superellipsoid_Build( void* superellipsoid, void* data ) ;
 	void _Superellipsoid_Initialise( void* superellipsoid, void* data ) ;
 	void _Superellipsoid_Execute( void* superellipsoid, void* data );
@@ -128,3 +114,4 @@
 	
 	
 #endif 
+

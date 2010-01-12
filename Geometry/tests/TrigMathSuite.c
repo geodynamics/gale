@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 	double	angle;
 	double	rectOriginal[3];
 	double	spherical[3];
@@ -162,3 +162,5 @@ void TrigMathSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, TrigMathSuite_TestCoordinateConversionFunction2D );
    pcu_suite_addTest( suite, TrigMathSuite_TestCoordinateConversionFunction3D );
 }
+
+

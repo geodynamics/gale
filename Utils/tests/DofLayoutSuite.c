@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned	rank;
-	unsigned	nProcs;
+	int		rank;
+	int		nProcs;
 } DofLayoutSuiteData;
 
 void DofLayoutSuite_Setup( DofLayoutSuiteData* data ) {
@@ -86,7 +86,7 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 		/* Create variables */
 		for (var_I = 0; var_I < 6; var_I++) {
 			varArrays[var_I] = Memory_Alloc_Array_Unnamed( double, arraySize );
-			var[var_I] = Variable_NewScalar( varName[var_I], Variable_DataType_Double, &arraySize, NULL, (void**)&(varArrays[var_I]), variableRegister );
+			var[var_I] = Variable_NewScalar( varName[var_I], NULL, Variable_DataType_Double, &arraySize, NULL, (void**)&(varArrays[var_I]), variableRegister );
 			Stg_Component_Build( var[var_I], 0, False );
 			Stg_Component_Initialise( var[var_I], 0, False );
 		}
@@ -98,7 +98,7 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 		}
 
 		/* Simple test */
-		dof = DofLayout_New( "dofLayout", variableRegister, arraySize, NULL );
+		dof = DofLayout_New( "dofLayout", NULL, variableRegister, arraySize, NULL );
 		for (ii = 0; ii < arraySize; ii++)
 			for (var_I = 0; var_I < 6; var_I++)
 				DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);
@@ -115,7 +115,7 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 
 		/* Advanced test */
 		for (ii = 0; ii < 27; ii++) counts[ii] = 0;
-		dof = DofLayout_New( "dofLayout1", variableRegister, arraySize, NULL );
+		dof = DofLayout_New( "dofLayout1", NULL, variableRegister, arraySize, NULL );
 		
 		for (ii = 0; ii < 12; ii++) {
 			for (var_I = 0; var_I < 2; var_I++) {
@@ -141,8 +141,8 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 		Stg_Class_Delete(dof);
 
 		/* Copy test */
- 		dof = DofLayout_New( "dofLayout2", variableRegister, arraySize, NULL );
-		destDof = DofLayout_New( "dofLayout3", variableRegister, arraySize, NULL );
+ 		dof = DofLayout_New( "dofLayout2", NULL, variableRegister, arraySize, NULL );
+		destDof = DofLayout_New( "dofLayout3", NULL, variableRegister, arraySize, NULL );
 		for (ii = 0; ii < arraySize; ii++) {
 			for (var_I = 0; var_I < 3; var_I++) {
 				DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);
@@ -250,12 +250,12 @@ void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
 
 		/* Create variables */
 		for (i = 0; i < 6; i++) {
-			var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &arraySize, NULL, (void**)&dummyPtr, 0 );
+			var[i] = Variable_NewScalar( varName[i], NULL, Variable_DataType_Double, &arraySize, NULL, (void**)&dummyPtr, 0 );
 			Variable_Register_Add(variableRegister, var[i]);
 		}
 
 		/* Simple test */
-		dof = DofLayout_New( "dofLayout", variableRegister, 27, NULL );
+		dof = DofLayout_New( "dofLayout", NULL, variableRegister, 27, NULL );
 		for (i = 0; i < 6; i++) {
 			for (j = 0; j < 27; j++) {
 				DofLayout_AddDof_ByVarName(dof, varName[i], j);
@@ -278,7 +278,6 @@ void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
 		Stg_Class_Delete( map );
 		Stg_Component_Build(dof, 0, False);
 
-		printf("Simple test:\n");
 		Journal_Printf( stream, "Simple test:\n" );
 		for (i = 0; i < 14; i++) {
 			Journal_Printf( stream, "\t%u\n", dof->dofCounts[i] );
@@ -321,7 +320,7 @@ void DofLayoutSuite_TestSaveAndLoad( DofLayoutSuiteData* data ) {
 		/* Create variables */
 		for (var_I = 0; var_I < 6; var_I++) {
 			varArrays[var_I] = Memory_Alloc_Array_Unnamed( double, arraySize );
-			var[var_I] = Variable_NewScalar( varName[var_I], Variable_DataType_Double, &arraySize, NULL, (void**)&(varArrays[var_I]), variableRegister );
+			var[var_I] = Variable_NewScalar( varName[var_I], NULL, Variable_DataType_Double, &arraySize, NULL, (void**)&(varArrays[var_I]), variableRegister );
 			Stg_Component_Build( var[var_I], 0, False );
 			Stg_Component_Initialise( var[var_I], 0, False );
 		}
@@ -333,7 +332,7 @@ void DofLayoutSuite_TestSaveAndLoad( DofLayoutSuiteData* data ) {
 		}
 
 		/* Simple test */
-		dof = DofLayout_New( "dofLayout", variableRegister, arraySize, NULL );
+		dof = DofLayout_New( "dofLayout", NULL, variableRegister, arraySize, NULL );
 		for (ii = 0; ii < arraySize; ii++) {
 			for (var_I = 0; var_I < 6; var_I++) {
 				DofLayout_AddDof_ByVarName(dof, varName[var_I], ii);
@@ -370,3 +369,5 @@ void DofLayoutSuite( pcu_suite_t* suite ) {
 	pcu_suite_addTest( suite, DofLayoutSuite_TestRemap );
 	pcu_suite_addTest( suite, DofLayoutSuite_TestSaveAndLoad );
 }
+
+

@@ -44,8 +44,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_SwarmClass_h__
-#define __Domain_Swarm_SwarmClass_h__
+#ifndef __StgDomain_Swarm_SwarmClass_h__
+#define __StgDomain_Swarm_SwarmClass_h__
 	
 
 	/* Textual name of this class */
@@ -62,6 +62,7 @@
 		/* General info */ \
 		__Stg_Component \
 		\
+		AbstractContext*		context; \
 		/* Virtual info */ \
 		\
 		/* General info */ \
@@ -132,68 +133,57 @@
 		Index                           swarmReg_I; /**< Own index inside the Swarm_Register */ \
 						\
 		IArray*				incArray; \
-		/** number of files previous checkpoint stored across */ \
-		Index                           checkpointnfiles;\
 								 \
 	        int                             expanding;
 
 	struct Swarm { __Swarm };
 	
 	
-	/* Create a new Swarm and initialise */
-	Swarm* Swarm_DefaultNew( Name name );
-
-	Swarm* Swarm_New( 
-		Name                                  name,
-		void*                                 cellLayout,
-		void*                                 particleLayout,
-		Dimension_Index                       dim,
-		SizeT                                 particleSize,
-		ExtensionManager_Register*            extensionMgr_Register,
-		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm,
-	        /* modified the constructor function to take in initial conditions */	
-	        void*				      ics ) ;
+   Swarm* Swarm_New( 
+      Name                                  name,
+      AbstractContext*                      context,
+      void*                                 cellLayout,
+      void*                                 particleLayout,
+      Dimension_Index                       dim,
+      SizeT                                 particleSize,
+      ExtensionManager_Register*            extensionMgr_Register,
+      Variable_Register*                    variable_Register,
+      MPI_Comm                              comm,
+      /* modified the constructor function to take in initial conditions */	
+      void*				                       ics );
 	
 	/* Creation implementation / Virtual constructor */
-	Swarm* _Swarm_New(
-		SizeT                                 _sizeOfSelf,
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,
-		Name                                  name,
-		Bool                                  initFlag,
-		CellLayout*                           cellLayout,
-		ParticleLayout*                       particleLayout,
-		Dimension_Index                       dim,
-		SizeT                                 particleSize,
-		Particle_InCellIndex                  cellParticleTblDelta, 
-		double                                extraParticlesFactor,
-		ExtensionManager_Register*            extensionMgr_Register,
-		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm, 
-	        /* modified the constructor function to take in initial conditions */	
-		void*				      ics );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
-	void _Swarm_Init( 
-		Swarm*                                self, 
-		void*                                 cellLayout,
-		void*                                 particleLayout,
-		Dimension_Index                       dim,
-		Particle_InCellIndex                  cellParticleTblDelta, 
-		double                                extraParticlesFactor,
-		ExtensionManager_Register*            extensionMgr_Register,
-		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm,
-	        /* modified the init function to take in initial conditions */	
-		void*				      ics );
+	#define SWARM_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                SizeT  particleSize, \
+                void*           ics
+
+	#define SWARM_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        particleSize, \
+	        ics         
+
+	Swarm* _Swarm_New(  SWARM_DEFARGS  );
+
+   void _Swarm_Init( 
+      Swarm*                                self, 
+      AbstractContext*                      context,
+      void*                                 cellLayout,
+      void*                                 particleLayout,
+      Dimension_Index                       dim,
+      SizeT                                 particleSize,
+      Particle_InCellIndex                  cellParticleTblDelta, 
+      double                                extraParticlesFactor,
+      ExtensionManager_Register*            extensionMgr_Register,
+      Variable_Register*                    variable_Register,
+      MPI_Comm                              comm,
+      /* modified the init function to take in initial conditions */	
+      void*				      ics );
 	
 	/* For use when Particle is not yet a complete type */
 	#define Swarm_ParticleInElementAt( self, dElement_I, cParticle_I ) \
@@ -243,7 +233,7 @@
 	void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Swarm_DefaultNew( Name name );
-	void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data );
+	void _Swarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, void* data );
 	void _Swarm_Build( void* swarm, void* data );
 	#define _Swarm_Initialize _Swarm_Initialise
 	void _Swarm_Initialise( void* swarm, void* data );
@@ -343,4 +333,5 @@
 
 	void Swarm_AddVariable( Swarm* self, SwarmVariable* swarmVar );
 
-#endif /* __Domain_Swarm_SwarmClass_h__ */
+#endif /* __StgDomain_Swarm_SwarmClass_h__ */
+

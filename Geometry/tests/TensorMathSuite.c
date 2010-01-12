@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm comm;
-	unsigned rank;
-	unsigned nProcs;
+	int rank;
+	int nProcs;
 } TensorMathSuiteData;
 
 void TensorMathSuite_testCubic( double a3, double a2, double a1, double a0, Stream* stream ) { 
@@ -190,7 +190,6 @@ void TensorMathSuite_TestMathArrayToMatrix( TensorMathSuiteData* data ) {
 
 	if (data->rank == procToWatch) {
 		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, "Tensor" );
-		SymmetricTensor	symmTensor;
 		TensorArray			tensorArray;
 		Stream*				stream = Journal_Register( InfoStream_Type, "TensorArrayToMatrix" );
 		char					expected_file[PCU_PATH_MAX];
@@ -232,7 +231,6 @@ void TensorMathSuite_TestSymmetricTensorToMatrix( TensorMathSuiteData* data ) {
 	if (data->rank == procToWatch) {
 		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, "Tensor" );
 		SymmetricTensor	symmTensor;
-		TensorArray			tensorArray;
 		Stream*				stream = Journal_Register( InfoStream_Type, "SymmetricTensorToMatrix" );
 		char					expected_file[PCU_PATH_MAX];
 
@@ -278,7 +276,6 @@ void TensorMathSuite_TestGetAntisymmetricPart( TensorMathSuiteData* data ) {
 
 	if (data->rank == procToWatch) {
 		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, "Tensor" );
-		SymmetricTensor	symmTensor;
 		TensorArray			tensorArray;
 		TensorArray			tensor2;
 		int					dim;
@@ -323,7 +320,6 @@ void TensorMathSuite_TestGetSymmetricPart( TensorMathSuiteData* data ) {
 		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, "Tensor" );
 		SymmetricTensor	symmTensor;
 		TensorArray			tensorArray;
-		TensorArray			tensor2;
 		int					dim;
 		Stream*				stream = Journal_Register( InfoStream_Type, "GetSymmetricPart" );
 		char					expected_file[PCU_PATH_MAX];
@@ -366,7 +362,6 @@ void TensorMathSuite_Test2ndInvariant( TensorMathSuiteData* data ) {
 		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, "Tensor" );
 		SymmetricTensor	symmTensor;
 		TensorArray			tensorArray;
-		TensorArray			tensor2;
 		int					dim;
 		Stream*				stream = Journal_Register( InfoStream_Type, "2ndInvariant" );
 		char					expected_file[PCU_PATH_MAX];
@@ -409,9 +404,7 @@ void TensorMathSuite_TestVectorTensorVector( TensorMathSuiteData* data ) {
 
 	if (data->rank == procToWatch) {
 		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, "Tensor" );
-		SymmetricTensor	symmTensor;
 		TensorArray			tensorArray;
-		TensorArray			tensor2;
 		int					dim;
 		double				a[] = {2,3,6,-2,9.1};
 		double				b[] = {1,-3,2.6,-2.2,-1.91};
@@ -449,11 +442,7 @@ void TensorMathSuite_TestZeroTensor( TensorMathSuiteData* data ) {
 
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
-		TensorArray			tensorArray;
 		TensorArray			tensor2;
-		int					dim;
-		double				a[] = {2,3,6,-2,9.1};
-		double				b[] = {1,-3,2.6,-2.2,-1.91};
 		Stream*				stream = Journal_Register( InfoStream_Type, "ZeroTensor" );
 		char					expected_file[PCU_PATH_MAX];
 
@@ -966,3 +955,5 @@ void TensorMathSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, TensorMathSuite_TestEigenVector3 );
    pcu_suite_addTest( suite, TensorMathSuite_TestEigenVector4 );
 }
+
+

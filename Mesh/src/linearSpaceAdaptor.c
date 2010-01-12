@@ -71,36 +71,40 @@ double LinearSpaceAdaptor_MapPoint( segment* table, unsigned size, double x );
 ** Constructors
 */
 
-LinearSpaceAdaptor* LinearSpaceAdaptor_New( Name name ) {
-	return _LinearSpaceAdaptor_New( sizeof(LinearSpaceAdaptor), 
-				    LinearSpaceAdaptor_Type, 
-				    _LinearSpaceAdaptor_Delete, 
-				    _LinearSpaceAdaptor_Print, 
-				    NULL, 
-				    (void* (*)(Name))_LinearSpaceAdaptor_New, 
-				    _LinearSpaceAdaptor_Construct, 
-				    _LinearSpaceAdaptor_Build, 
-				    _LinearSpaceAdaptor_Initialise, 
-				    _LinearSpaceAdaptor_Execute, 
-				    _LinearSpaceAdaptor_Destroy, 
-				    name, 
-				    NON_GLOBAL, 
-				    _MeshGenerator_SetDimSize, 
-				    LinearSpaceAdaptor_Generate );
+LinearSpaceAdaptor* LinearSpaceAdaptor_New( Name name, AbstractContext* context ) {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(LinearSpaceAdaptor);
+	Type                                                      type = LinearSpaceAdaptor_Type;
+	Stg_Class_DeleteFunction*                              _delete = _LinearSpaceAdaptor_Delete;
+	Stg_Class_PrintFunction*                                _print = _LinearSpaceAdaptor_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void* (*)(Name))_LinearSpaceAdaptor_New;
+	Stg_Component_ConstructFunction*                    _construct = _LinearSpaceAdaptor_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _LinearSpaceAdaptor_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _LinearSpaceAdaptor_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _LinearSpaceAdaptor_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _LinearSpaceAdaptor_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	MeshGenerator_SetDimSizeFunc*                   setDimSizeFunc = _MeshGenerator_SetDimSize;
+	MeshGenerator_GenerateFunc*                       generateFunc = LinearSpaceAdaptor_Generate;
+
+   LinearSpaceAdaptor* self = _LinearSpaceAdaptor_New(  LINEARSPACEADAPTOR_PASSARGS  );
+
+   _MeshGenerator_Init( (MeshGenerator*)self, context );
+   _MeshAdaptor_Init( (MeshAdaptor*)self );
+	_LinearSpaceAdaptor_Init( self );
+
+   return self;
 }
 
-LinearSpaceAdaptor* _LinearSpaceAdaptor_New( COMPRESSIONADAPTOR_DEFARGS ) {
+LinearSpaceAdaptor* _LinearSpaceAdaptor_New(  LINEARSPACEADAPTOR_DEFARGS  ) {
 	LinearSpaceAdaptor* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(LinearSpaceAdaptor) );
-	self = (LinearSpaceAdaptor*)_MeshGenerator_New( MESHADAPTOR_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(LinearSpaceAdaptor) );
+	self = (LinearSpaceAdaptor*)_MeshAdaptor_New(  MESHADAPTOR_PASSARGS  );
 
 	/* Virtual info */
-
-	/* LinearSpaceAdaptor info */
-	_LinearSpaceAdaptor_Init( self );
-
 	return self;
 }
 
@@ -114,12 +118,8 @@ void _LinearSpaceAdaptor_Init( LinearSpaceAdaptor* self ) {}
 void _LinearSpaceAdaptor_Delete( void* adaptor ) {
 	LinearSpaceAdaptor*	self = (LinearSpaceAdaptor*)adaptor;
 
-	Memory_Free( self->tablex );
-	Memory_Free( self->tabley );
-	Memory_Free( self->tablez );
-
 	/* Delete the parent. */
-	_MeshGenerator_Delete( self );
+	_MeshAdaptor_Delete( self );
 }
 
 void _LinearSpaceAdaptor_Print( void* adaptor, Stream* stream ) {
@@ -131,10 +131,10 @@ void _LinearSpaceAdaptor_Print( void* adaptor, Stream* stream ) {
 
 	/* Print parent */
 	Journal_Printf( stream, "LinearSpaceAdaptor (ptr): (%p)\n", self );
-	_MeshGenerator_Print( self, stream );
+	_MeshAdaptor_Print( self, stream );
 }
 
-void _LinearSpaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
+void _LinearSpaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
 	LinearSpaceAdaptor*	self = (LinearSpaceAdaptor*)adaptor;
 	Dictionary_Entry_Value* optionsList;
 	Dictionary_Entry_Value* optionSet;
@@ -147,14 +147,16 @@ void _LinearSpaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, voi
 	assert( self );
 	assert( cf );
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, True, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 	self->loadFromCheckPoint = context->loadFromCheckPoint;
 
 	if( self->loadFromCheckPoint )
 	  return;
 
 	/* Call parent construct. */
-	_MeshAdaptor_Construct( self, cf, data );
+	_MeshAdaptor_AssignFromXML( self, cf, data );
 
 	self->minX = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, "minX" ) );
 	self->maxX = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, "maxX" ) );
@@ -227,6 +229,8 @@ void _LinearSpaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, voi
 	} else {
  	  self->nSegmentsz = 0;
 	}
+
+	_LinearSpaceAdaptor_Init( self );
 }
 
 void _LinearSpaceAdaptor_Build( void* adaptor, void* data ) {
@@ -241,6 +245,13 @@ void _LinearSpaceAdaptor_Execute( void* adaptor, void* data ) {
 }
 
 void _LinearSpaceAdaptor_Destroy( void* adaptor, void* data ) {
+   LinearSpaceAdaptor*		self = (LinearSpaceAdaptor*)adaptor;
+
+   Memory_Free( self->tablex );
+   Memory_Free( self->tabley );
+   Memory_Free( self->tablez );
+
+   _MeshAdaptor_Destroy( self, data );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------
@@ -355,4 +366,6 @@ double LinearSpaceAdaptor_MapPoint( segment* table, unsigned size, double x  ) {
   }
   return 0;
 }
+
+
 

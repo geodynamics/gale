@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_GaussParticleLayout_h__
-#define __Domain_Swarm_GaussParticleLayout_h__
+#ifndef __StgDomain_Swarm_GaussParticleLayout_h__
+#define __StgDomain_Swarm_GaussParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -55,29 +55,31 @@
 	struct GaussParticleLayout { __GaussParticleLayout };
 	
 	/* Create a new GaussParticleLayout and initialise */
-	GaussParticleLayout* GaussParticleLayout_New( Name name, Dimension_Index dim, Particle_InCellIndex* particlesPerDim ) ;
+GaussParticleLayout* GaussParticleLayout_New( 
+   Name name, 
+   AbstractContext* context,
+   CoordSystem      coordSystem,
+   Bool             weightsInitialisedAtStartup,
+   Dimension_Index dim, 
+   Particle_InCellIndex* particlesPerDim );
 	
-	/* Creation implementation / Virtual constructor */
-	GaussParticleLayout* _GaussParticleLayout_New( 
-		SizeT                                                       _sizeOfSelf,
-		Type                                                        type,
-		Stg_Class_DeleteFunction*                                   _delete,
-		Stg_Class_PrintFunction*                                    _print,
-		Stg_Class_CopyFunction*                                     _copy, 
-		Stg_Component_DefaultConstructorFunction*                   _defaultConstructor,
-		Stg_Component_ConstructFunction*                            _construct,
-		Stg_Component_BuildFunction*                                _build,
-		Stg_Component_InitialiseFunction*                           _initialise,
-		Stg_Component_ExecuteFunction*                              _execute,
-		Stg_Component_DestroyFunction*                              _destroy,
-		ParticleLayout_SetInitialCountsFunction*                    _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles,
-		PerCellParticleLayout_InitialCountFunction*                 _initialCount,
-		PerCellParticleLayout_InitialiseParticlesOfCellFunction*    _initialiseParticlesOfCell,
-		Name                                                        name,
-		Bool                                                        initFlag,
-		Dimension_Index                                             dim,
-		Particle_InCellIndex*                                       particlesPerDim );
+   /* Creation implementation / Virtual constructor */
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define GAUSSPARTICLELAYOUT_DEFARGS \
+                PERCELLPARTICLELAYOUT_DEFARGS, \
+                Dimension_Index                    dim, \
+                Particle_InCellIndex*  particlesPerDim
+
+	#define GAUSSPARTICLELAYOUT_PASSARGS \
+                PERCELLPARTICLELAYOUT_PASSARGS, \
+	        dim,             \
+	        particlesPerDim
+
+   GaussParticleLayout* _GaussParticleLayout_New(  GAUSSPARTICLELAYOUT_DEFARGS  );
 		
 	/* Initialise implementation */
 	void _GaussParticleLayout_Init( void* gaussParticleLayout, Dimension_Index dim, Particle_InCellIndex* particlesPerDim );
@@ -97,7 +99,7 @@
 	void* _GaussParticleLayout_Copy( void* gaussParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _GaussParticleLayout_DefaultNew( Name name );
-	void  _GaussParticleLayout_Construct( void* gaussParticleLayout, Stg_ComponentFactory* cf, void* data );
+	void  _GaussParticleLayout_AssignFromXML( void* gaussParticleLayout, Stg_ComponentFactory* cf, void* data );
 	void  _GaussParticleLayout_Build( void* gaussParticleLayout, void* data );
 	void  _GaussParticleLayout_Initialise( void* gaussParticleLayout, void* data );
 	void  _GaussParticleLayout_Execute( void* gaussParticleLayout, void* data );
@@ -112,4 +114,5 @@
 	 *     @param pointCount Number of points to create in a dimension */
 	void GaussParticleLayout_GetAbscissaAndWeights1D( double* weight, double* abscissa, Index pointCount ) ;
 	
-#endif /* __Domain_Swarm_GaussParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_GaussParticleLayout_h__ */
+

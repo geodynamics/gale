@@ -55,83 +55,45 @@ const Type PlaneParticleLayout_Type = "PlaneParticleLayout";
 const Index PlaneParticleLayout_Invalid = (Index) 0;
 
 PlaneParticleLayout* PlaneParticleLayout_New( 
-		Name name,
-		Dimension_Index dim,
-		Index totalInitialParticles, 
-		Axis planeAxis, 
-		double planeCoord )
+      Name             name,
+      AbstractContext* context, 
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int     totalInitialParticles, 
+      double           averageInitialParticlesPerCell,
+      Dimension_Index  dim,
+      Axis             planeAxis, 
+      double           planeCoord )
 {
 	PlaneParticleLayout* self = (PlaneParticleLayout*) _PlaneParticleLayout_DefaultNew( name );
 
-	_PlaneParticleLayout_Init( self, dim, totalInitialParticles, planeAxis, planeCoord );
+   _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
+   _GlobalParticleLayout_Init( self, totalInitialParticles, averageInitialParticlesPerCell );
+	_SpaceFillerParticleLayout_Init( self, dim );
+	_PlaneParticleLayout_Init( self, planeAxis, planeCoord );
 	
 	return self;
 }
 
-PlaneParticleLayout* _PlaneParticleLayout_New( 
-		SizeT                                                   _sizeOfSelf,
-		Type                                                    type,
-		Stg_Class_DeleteFunction*                               _delete,
-		Stg_Class_PrintFunction*                                _print,
-		Stg_Class_CopyFunction*                                 _copy, 
-		Stg_Component_DefaultConstructorFunction*               _defaultConstructor,
-		Stg_Component_ConstructFunction*                        _construct,
-		Stg_Component_BuildFunction*                            _build,
-		Stg_Component_InitialiseFunction*                       _initialise,
-		Stg_Component_ExecuteFunction*                          _execute,
-		Stg_Component_DestroyFunction*                          _destroy,
-		ParticleLayout_SetInitialCountsFunction*                _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*             _initialiseParticles,
-		GlobalParticleLayout_InitialiseParticleFunction*        _initialiseParticle,
-		Name                                                    name,
-		Bool                                                    initFlag,
-		Dimension_Index                                         dim,
-		Particle_Index                                          totalInitialParticles,
-		double                                                  averageInitialParticlesPerCell,
-		Axis                                                    planeAxis, 
-		double                                                  planeCoord )
+PlaneParticleLayout* _PlaneParticleLayout_New(  PLANEPARTICLELAYOUT_DEFARGS  )
 {
 	PlaneParticleLayout* self;
 	
 	/* Allocate memory */
-	self = (PlaneParticleLayout*)_SpaceFillerParticleLayout_New( 
-		_sizeOfSelf, 
-		type,
-		_delete,
-		_print,
-		_copy, 
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		_setInitialCounts,
-		_initialiseParticles,
-		_initialiseParticle,
-		name,
-		initFlag,
-		dim,
-		totalInitialParticles,
-		averageInitialParticlesPerCell );
-	
-	if ( initFlag ) {
-		_PlaneParticleLayout_Init( self, dim, totalInitialParticles, planeAxis, planeCoord );
-	}
+	self = (PlaneParticleLayout*)_SpaceFillerParticleLayout_New(  SPACEFILLERPARTICLELAYOUT_PASSARGS  );  /* dim */
+
+   self->planeAxis = planeAxis;
+   self->planeCoord = planeCoord;
 	
 	return self;
 }
 
 void _PlaneParticleLayout_Init( 
 		void*           particleLayout, 
-		Dimension_Index dim, 
-		Particle_Index  totalInitialParticles, 
 		Axis            planeAxis, 
 		double          planeCoord )
 {
 	PlaneParticleLayout* self = (PlaneParticleLayout*) particleLayout;
-
-	_SpaceFillerParticleLayout_Init( self, dim, totalInitialParticles, SpaceFillerParticleLayout_Invalid );
 
 	self->planeAxis  = planeAxis;
 	self->planeCoord = planeCoord;
@@ -139,33 +101,37 @@ void _PlaneParticleLayout_Init(
 
 
 void* _PlaneParticleLayout_DefaultNew( Name name ) {
-	return (void*)_PlaneParticleLayout_New( 
-			sizeof(PlaneParticleLayout),
-			PlaneParticleLayout_Type,
-			_PlaneParticleLayout_Delete,
-			_PlaneParticleLayout_Print,
-			_PlaneParticleLayout_Copy,
-			_PlaneParticleLayout_DefaultNew,
-			_PlaneParticleLayout_Construct,
-			_PlaneParticleLayout_Build,
-			_PlaneParticleLayout_Initialise,
-			_PlaneParticleLayout_Execute,
-			_PlaneParticleLayout_Destroy,
-			_GlobalParticleLayout_SetInitialCounts,
-			_SpaceFillerParticleLayout_InitialiseParticles,
-			_PlaneParticleLayout_InitialiseParticle,
-			name,
-			False,
-			0, /* dim */
-			0, /* totalInitialParticles */
-			0.0, /* averageInitialParticlesPerCell */
-			0, /* planeAxis */
-			0.0 /* planeCoord */ );
+	/* Variables set in this function */
+	SizeT                                                                _sizeOfSelf = sizeof(PlaneParticleLayout);
+	Type                                                                        type = PlaneParticleLayout_Type;
+	Stg_Class_DeleteFunction*                                                _delete = _PlaneParticleLayout_Delete;
+	Stg_Class_PrintFunction*                                                  _print = _PlaneParticleLayout_Print;
+	Stg_Class_CopyFunction*                                                    _copy = _PlaneParticleLayout_Copy;
+	Stg_Component_DefaultConstructorFunction*                    _defaultConstructor = _PlaneParticleLayout_DefaultNew;
+	Stg_Component_ConstructFunction*                                      _construct = _PlaneParticleLayout_AssignFromXML;
+	Stg_Component_BuildFunction*                                              _build = _PlaneParticleLayout_Build;
+	Stg_Component_InitialiseFunction*                                    _initialise = _PlaneParticleLayout_Initialise;
+	Stg_Component_ExecuteFunction*                                          _execute = _PlaneParticleLayout_Execute;
+	Stg_Component_DestroyFunction*                                          _destroy = _PlaneParticleLayout_Destroy;
+	AllocationType                                                nameAllocationType = NON_GLOBAL;
+	ParticleLayout_SetInitialCountsFunction*                       _setInitialCounts = _GlobalParticleLayout_SetInitialCounts;
+	ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles = _SpaceFillerParticleLayout_InitialiseParticles;
+	CoordSystem                                                          coordSystem = GlobalCoordSystem;
+	Bool                                                 weightsInitialisedAtStartup = False;
+	GlobalParticleLayout_InitialiseParticleFunction*             _initialiseParticle = _PlaneParticleLayout_InitialiseParticle;
+	Particle_Index                                             totalInitialParticles = 0;
+	double                                            averageInitialParticlesPerCell = 0.0;
+	Dimension_Index                                                              dim = 0;
+	Axis                                                                   planeAxis = 0;
+	double                                                                planeCoord = 0;
+
+   return (void*)_PlaneParticleLayout_New(  PLANEPARTICLELAYOUT_PASSARGS  );
 }
 
 	
 void _PlaneParticleLayout_Destroy( void* particleLayout, void* data ){
-	
+   PlaneParticleLayout* self = (PlaneParticleLayout*)particleLayout;
+   _SpaceFillerParticleLayout_Destroy( self, data );
 }
 
 void _PlaneParticleLayout_Delete( void* particleLayout ) {
@@ -207,13 +173,13 @@ void* _PlaneParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Na
 }
 
 
-void _PlaneParticleLayout_Construct( void* particleLayout, Stg_ComponentFactory *cf, void* data ){
+void _PlaneParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data ){
 	PlaneParticleLayout* self = (PlaneParticleLayout*) particleLayout;
 	Axis   planeAxis;
 	double planeCoord;
 	char*  planeAxisString;
 	
-	_SpaceFillerParticleLayout_Construct( self, cf, data );
+	_SpaceFillerParticleLayout_AssignFromXML( self, cf, data );
 
 	planeAxisString = Stg_ComponentFactory_GetString( cf, self->name, "planeAxis", "" );
 	planeCoord = Stg_ComponentFactory_GetDouble( cf, self->name, "planeCoord", 0.0 );
@@ -229,15 +195,18 @@ void _PlaneParticleLayout_Construct( void* particleLayout, Stg_ComponentFactory 
 
 	planeAxis = planeAxisString[0] - 'X';
 
-	_PlaneParticleLayout_Init( self, self->dim, self->totalInitialParticles, planeAxis, planeCoord );
+	_PlaneParticleLayout_Init( self, planeAxis, planeCoord );
 	
 }
 	
 void _PlaneParticleLayout_Build( void* particleLayout, void* data ){
-	
+   PlaneParticleLayout* self = (PlaneParticleLayout*)particleLayout;
+   _SpaceFillerParticleLayout_Build( self, data );
 }
 	
 void _PlaneParticleLayout_Initialise( void* particleLayout, void* data ){
+   PlaneParticleLayout* self = (PlaneParticleLayout*)particleLayout;
+   _SpaceFillerParticleLayout_Initialise( self, data );
 }
 	
 void _PlaneParticleLayout_Execute( void* particleLayout, void* data ){
@@ -257,4 +226,6 @@ void _PlaneParticleLayout_InitialiseParticle(
 	_SpaceFillerParticleLayout_InitialiseParticle( self, swarm, newParticle_I, particle );
 	particle->coord[ self->planeAxis ] = self->planeCoord;
 }
+
+
 

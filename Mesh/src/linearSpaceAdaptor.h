@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_LinearSpaceAdaptor_h__
-#define __Domain_Mesh_LinearSpaceAdaptor_h__
+#ifndef __StgDomain_Mesh_LinearSpaceAdaptor_h__
+#define __StgDomain_Mesh_LinearSpaceAdaptor_h__
 
 	typedef struct {
 	  double x, y, p, y0;
@@ -75,14 +75,21 @@
 	** Constructors
 	*/
 
-	#define COMPRESSIONADAPTOR_DEFARGS \
-		MESHADAPTOR_DEFARGS
 
-	#define COMPRESSIONADAPTOR_PASSARGS \
-		MESHADAPTOR_PASSARGS
 
-	LinearSpaceAdaptor* LinearSpaceAdaptor_New( Name name );
-	LinearSpaceAdaptor* _LinearSpaceAdaptor_New( COMPRESSIONADAPTOR_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LINEARSPACEADAPTOR_DEFARGS \
+                MESHADAPTOR_DEFARGS
+
+	#define LINEARSPACEADAPTOR_PASSARGS \
+                MESHADAPTOR_PASSARGS
+
+	LinearSpaceAdaptor* LinearSpaceAdaptor_New( Name name, AbstractContext* context );
+	LinearSpaceAdaptor* _LinearSpaceAdaptor_New(  LINEARSPACEADAPTOR_DEFARGS  );
 	void _LinearSpaceAdaptor_Init( LinearSpaceAdaptor* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -91,7 +98,7 @@
 
 	void _LinearSpaceAdaptor_Delete( void* adaptor );
 	void _LinearSpaceAdaptor_Print( void* adaptor, Stream* stream );
-	void _LinearSpaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data );
+	void _LinearSpaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data );
 	void _LinearSpaceAdaptor_Build( void* adaptor, void* data );
 	void _LinearSpaceAdaptor_Initialise( void* adaptor, void* data );
 	void _LinearSpaceAdaptor_Execute( void* adaptor, void* data );
@@ -108,4 +115,5 @@
 	*/
 
 
-#endif /* __Domain_Mesh_LinearSpaceAdaptor_h__ */
+#endif /* __StgDomain_Mesh_LinearSpaceAdaptor_h__ */
+

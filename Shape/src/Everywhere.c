@@ -54,81 +54,28 @@ Everywhere* Everywhere_New(
 	Everywhere* self = (Everywhere*) _Everywhere_DefaultNew( name );
 	XYZ         centre = { 0.0,0.0,0.0 };
 
-	Everywhere_InitAll( 
-		self, 
-		dim,
-		centre,
-		0.0,
-		0.0,
-		0.0 );
+	_Stg_Shape_Init( self, dim, centre, False, 0.0, 0.0, 0.0 );
+	_Everywhere_Init( self );
+
 	return self;
 }
 
-Everywhere* _Everywhere_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name )
+Everywhere* _Everywhere_New(  EVERYWHERE_DEFARGS  )
 {
 	Everywhere* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Everywhere) );
-	self = (Everywhere*)_Stg_Shape_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (Everywhere*)_Stg_Shape_New(  STG_SHAPE_PASSARGS  );
 	
 	/* General info */
 
-	/* Virtual Info */
-	self->_isCoordInside = _isCoordInside;
-	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
-	
 	return self;
 }
 
 void _Everywhere_Init( void* everywhere ) {
 }
 
-
-void Everywhere_InitAll( 
-		void*                                 everywhere, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma )
-{
-	Everywhere* self = (Everywhere*)everywhere;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma );
-	_Everywhere_Init( self );
-}
-	
 
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
@@ -158,29 +105,33 @@ void* _Everywhere_Copy( void* everywhere, void* dest, Bool deep, Name nameExt, P
 }
 
 void* _Everywhere_DefaultNew( Name name ) {
-	return (void*) _Everywhere_New(
-			sizeof(Everywhere),
-			Everywhere_Type,
-			_Everywhere_Delete,
-			_Everywhere_Print,
-			_Everywhere_Copy,
-			_Everywhere_DefaultNew,
-			_Everywhere_Construct,
-			_Everywhere_Build,
-			_Everywhere_Initialise,
-			_Everywhere_Execute,
-			_Everywhere_Destroy,
-			_Everywhere_IsCoordInside,
-			_Everywhere_CalculateVolume,
-			_Everywhere_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(Everywhere);
+	Type                                                          type = Everywhere_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _Everywhere_Delete;
+	Stg_Class_PrintFunction*                                    _print = _Everywhere_Print;
+	Stg_Class_CopyFunction*                                      _copy = _Everywhere_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _Everywhere_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _Everywhere_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _Everywhere_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _Everywhere_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _Everywhere_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _Everywhere_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _Everywhere_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _Everywhere_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _Everywhere_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _Everywhere_New(  EVERYWHERE_PASSARGS  );
 }
 
 
-void _Everywhere_Construct( void* everywhere, Stg_ComponentFactory* cf, void* data ) {
+void _Everywhere_AssignFromXML( void* everywhere, Stg_ComponentFactory* cf, void* data ) {
 	Everywhere*	self          = (Everywhere*) everywhere;
 
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 	_Everywhere_Init( self );
 }
 
@@ -226,4 +177,6 @@ void _Everywhere_DistanceFromCenterAxis( void* shape, Coord coord, double* disVe
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+
 

@@ -47,37 +47,43 @@ const Type Mesh_Algorithms_Type = "Mesh_Algorithms";
 ** Constructors
 */
 
-Mesh_Algorithms* Mesh_Algorithms_New( Name name ) {
-	return _Mesh_Algorithms_New( sizeof(Mesh_Algorithms), 
-				     Mesh_Algorithms_Type, 
-				     _Mesh_Algorithms_Delete, 
-				     _Mesh_Algorithms_Print, 
-				     NULL, 
-				     (void* (*)(Name))_Mesh_Algorithms_New, 
-				     _Mesh_Algorithms_Construct, 
-				     _Mesh_Algorithms_Build, 
-				     _Mesh_Algorithms_Initialise, 
-				     _Mesh_Algorithms_Execute, 
-				     _Mesh_Algorithms_Destroy, 
-				     name, 
-				     NON_GLOBAL, 
-				     _Mesh_Algorithms_SetMesh, 
-				     _Mesh_Algorithms_Update, 
-				     _Mesh_Algorithms_NearestVertex, 
-				     _Mesh_Algorithms_Search, 
-				     _Mesh_Algorithms_SearchElements, 
-				     _Mesh_Algorithms_GetMinimumSeparation, 
-				     _Mesh_Algorithms_GetLocalCoordRange, 
-				     _Mesh_Algorithms_GetDomainCoordRange, 
-				     _Mesh_Algorithms_GetGlobalCoordRange );
+Mesh_Algorithms* Mesh_Algorithms_New( Name name, AbstractContext* context ) {
+	/* Variables set in this function */
+	SizeT                                                   _sizeOfSelf = sizeof(Mesh_Algorithms);
+	Type                                                           type = Mesh_Algorithms_Type;
+	Stg_Class_DeleteFunction*                                   _delete = _Mesh_Algorithms_Delete;
+	Stg_Class_PrintFunction*                                     _print = _Mesh_Algorithms_Print;
+	Stg_Class_CopyFunction*                                       _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*       _defaultConstructor = (void* (*)(Name))_Mesh_Algorithms_New;
+	Stg_Component_ConstructFunction*                         _construct = _Mesh_Algorithms_AssignFromXML;
+	Stg_Component_BuildFunction*                                 _build = _Mesh_Algorithms_Build;
+	Stg_Component_InitialiseFunction*                       _initialise = _Mesh_Algorithms_Initialise;
+	Stg_Component_ExecuteFunction*                             _execute = _Mesh_Algorithms_Execute;
+	Stg_Component_DestroyFunction*                             _destroy = _Mesh_Algorithms_Destroy;
+	AllocationType                                   nameAllocationType = NON_GLOBAL;
+	Mesh_Algorithms_SetMeshFunc*                            setMeshFunc = _Mesh_Algorithms_SetMesh;
+	Mesh_Algorithms_UpdateFunc*                              updateFunc = _Mesh_Algorithms_Update;
+	Mesh_Algorithms_NearestVertexFunc*                nearestVertexFunc = _Mesh_Algorithms_NearestVertex;
+	Mesh_Algorithms_SearchFunc*                              searchFunc = _Mesh_Algorithms_Search;
+	Mesh_Algorithms_SearchElementsFunc*              searchElementsFunc = _Mesh_Algorithms_SearchElements;
+	Mesh_Algorithms_GetMinimumSeparationFunc*  getMinimumSeparationFunc = _Mesh_Algorithms_GetMinimumSeparation;
+	Mesh_Algorithms_GetLocalCoordRangeFunc*      getLocalCoordRangeFunc = _Mesh_Algorithms_GetLocalCoordRange;
+	Mesh_Algorithms_GetDomainCoordRangeFunc*    getDomainCoordRangeFunc = _Mesh_Algorithms_GetDomainCoordRange;
+	Mesh_Algorithms_GetGlobalCoordRangeFunc*    getGlobalCoordRangeFunc = _Mesh_Algorithms_GetGlobalCoordRange;
+
+	Mesh_Algorithms* self = _Mesh_Algorithms_New(  MESH_ALGORITHMS_PASSARGS  );
+
+	_Mesh_Algorithms_Init( self, context);
+   return self;
+
 }
 
-Mesh_Algorithms* _Mesh_Algorithms_New( MESH_ALGORITHMS_DEFARGS ) {
+Mesh_Algorithms* _Mesh_Algorithms_New(  MESH_ALGORITHMS_DEFARGS  ) {
 	Mesh_Algorithms* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Mesh_Algorithms) );
-	self = (Mesh_Algorithms*)_Stg_Component_New( STG_COMPONENT_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(Mesh_Algorithms) );
+	self = (Mesh_Algorithms*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	/* Virtual info */
 	self->setMeshFunc = setMeshFunc;
@@ -90,13 +96,11 @@ Mesh_Algorithms* _Mesh_Algorithms_New( MESH_ALGORITHMS_DEFARGS ) {
 	self->getDomainCoordRangeFunc = getDomainCoordRangeFunc;
 	self->getGlobalCoordRangeFunc = getGlobalCoordRangeFunc;
 
-	/* Mesh_Algorithms info */
-	_Mesh_Algorithms_Init( self );
-
 	return self;
 }
 
-void _Mesh_Algorithms_Init( Mesh_Algorithms* self ) {
+void _Mesh_Algorithms_Init( Mesh_Algorithms* self, AbstractContext* context ) {
+   self->context = context;
 	self->nearestVertex = NULL;
 	self->search = NULL;
 	self->mesh = NULL;
@@ -112,8 +116,6 @@ void _Mesh_Algorithms_Init( Mesh_Algorithms* self ) {
 
 void _Mesh_Algorithms_Delete( void* algorithms ) {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
-
-	NewClass_Delete( self->incArray );
 
 	/* Delete the parent. */
 	_Stg_Component_Delete( self );
@@ -131,19 +133,36 @@ void _Mesh_Algorithms_Print( void* algorithms, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void _Mesh_Algorithms_Construct( void* algorithms, Stg_ComponentFactory* cf, void* data ) {
+void _Mesh_Algorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf, void* data ) {
+	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
+   AbstractContext* context = NULL;
+
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+   _Mesh_Algorithms_Init( self, context );
 }
 
 void _Mesh_Algorithms_Build( void* algorithms, void* data ) {
+	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
+   Stg_Component_Build( self->mesh, data, False );
+   Stg_Component_Build( self->tree, data, False );
 }
 
 void _Mesh_Algorithms_Initialise( void* algorithms, void* data ) {
+	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
+   Stg_Component_Initialise( self->mesh, data, False );
+   Stg_Component_Initialise( self->tree, data, False );
 }
 
 void _Mesh_Algorithms_Execute( void* algorithms, void* data ) {
 }
 
 void _Mesh_Algorithms_Destroy( void* algorithms, void* data ) {
+	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
+	NewClass_Delete( self->incArray );
+   if(self->mesh) Stg_Component_Destroy( self->mesh, data, False );
+   if(self->tree) Stg_Component_Destroy( self->tree, data, False );
 }
 
 void _Mesh_Algorithms_SetMesh( void* algorithms, void* mesh ) {
@@ -299,6 +318,8 @@ double _Mesh_Algorithms_GetMinimumSeparation( void* algorithms, double* perDim )
 				memcpy( perDim, dimSep, Mesh_GetDimSize( mesh ) * sizeof(double) );
 		}
 	}
+
+   if( dimSep ) Memory_Free( dimSep );
 
 	return minSep;
 }
@@ -541,13 +562,19 @@ Bool Mesh_Algorithms_SearchWithFullIncidence( void* algorithms, double* point,
 			return True;
 	}
 
+/* OK 11/1/2010 Disabling this for now as it takes forever when for a point not found and seems unnecessary
+ * Surely if a point is not found in incident elements it will not be found elsewhere?
+ * If it is required could be enabled with a flag or in another function,
+ * eg: Mesh_Algorithms_SearchBruteForce, so it doesn't do this by default
+ * Plotting IsoSurface in one instance spends 30 seconds here searching for a ~1 second rendering job */
+#if 0   
 	/* Brute force, search every element in turn (last resort). */
 	nEls = Mesh_GetDomainSize( mesh, nDims );
 	for( e_i = 0; e_i < nEls; e_i++ ) {
 		if( Mesh_ElementHasPoint( mesh, e_i, point, dim, ind ) )
 			return True;
 	}
-
+#endif
 	return False;
 }
 
@@ -666,7 +693,8 @@ Bool Mesh_Algorithms_SearchGeneral( void* algorithms, double* point,
 Bool Mesh_Algorithms_SearchWithTree( void* _self, double* pnt, unsigned* dim, unsigned* el ) {
    Mesh_Algorithms* self = (Mesh_Algorithms*)_self;
    int nEls, *els;
-   int curDim, curRank, curEl;
+   unsigned curDim, curEl;
+	int curRank;
    int nLocals, owner;
    int ii;
 
@@ -701,3 +729,5 @@ Bool Mesh_Algorithms_SearchWithTree( void* _self, double* pnt, unsigned* dim, un
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+

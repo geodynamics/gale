@@ -77,129 +77,79 @@ const unsigned int DEFAULT_CELL_PARTICLE_TBL_DELTA = 4;
 
 /* --- Function Definitions --- */
 
-Swarm* Swarm_DefaultNew( Name name ) {
-	return (Swarm*)_Swarm_DefaultNew( name );
-}
-
 Swarm* Swarm_New( 
-		Name                                  name,
-		void*                                 cellLayout,
-		void*                                 particleLayout,
-		Dimension_Index                       dim,
-		SizeT                                 particleSize,
-		ExtensionManager_Register*            extensionMgr_Register,
-		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm,
-		void*				      ics ) 
+   Name                                  name,
+   AbstractContext*                      context,
+   void*                                 cellLayout,
+   void*                                 particleLayout,
+   Dimension_Index                       dim,
+   SizeT                                 particleSize,
+   ExtensionManager_Register*            extensionMgr_Register,
+   Variable_Register*                    variable_Register,
+   MPI_Comm                              comm,
+   void*				                       ics ) 
 {
-	return _Swarm_New( 
-			sizeof(Swarm),
-			Swarm_Type,
-			_Swarm_Delete,
-			_Swarm_Print,
-			_Swarm_Copy,
-			_Swarm_DefaultNew,
-			_Swarm_Construct,
-			_Swarm_Build,
-			_Swarm_Initialise,
-			_Swarm_Execute,
-			_Swarm_Destroy,
-			name, 
-			True, 
-			(CellLayout*)cellLayout,
-			(ParticleLayout*)particleLayout,
-			dim,
-			particleSize,
-			DEFAULT_CELL_PARTICLE_TBL_DELTA,
-			DEFAULT_EXTRA_PARTICLES_FACTOR,
-			extensionMgr_Register, 
-			variable_Register,
-			comm, 
-			ics );
+   Swarm* self = _Swarm_DefaultNew( name ); 
+
+   _Swarm_Init( 
+      self, context,
+      cellLayout,
+      particleLayout,
+      dim,
+      particleSize,
+      DEFAULT_CELL_PARTICLE_TBL_DELTA,
+      DEFAULT_EXTRA_PARTICLES_FACTOR,
+      extensionMgr_Register,
+      variable_Register,
+      comm, 
+      ics );
+
+   self->isConstructed = True;
+
+
+   return self;
 }
 
-Swarm* _Swarm_New(
-		SizeT                                 _sizeOfSelf,
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,
-		Name                                  name,
-		Bool                                  initFlag,
-		CellLayout*                           cellLayout,
-		ParticleLayout*                       particleLayout,
-		Dimension_Index                       dim,
-		SizeT                                 particleSize,
-		Particle_InCellIndex                  cellParticleTblDelta, 
-		double                                extraParticlesFactor,
-		ExtensionManager_Register*            extensionMgr_Register,
-		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm,
-		void*				      ics )
+Swarm* _Swarm_New(  SWARM_DEFARGS  )
 {
 	Swarm* self;
 	
 	/* Allocate memory */
-	self = (Swarm*)_Stg_Component_New( 
-			_sizeOfSelf, 
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build, 
-			_initialise,
-			_execute,
-			_destroy,
-			name, 
-			NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (Swarm*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	self->particleSize = particleSize;
 	self->commHandlerList = Stg_ObjectList_New();
 	self->nSwarmVars = 0;
 	self->swarmVars = NULL;
 	self->owningCellVariable = NULL;
+   self->ics = ics;
 
-	/* Swarm info */
-	if( initFlag )
-		_Swarm_Init( 
-				self,
-				cellLayout,
-				particleLayout,
-				dim,
-				cellParticleTblDelta,
-				extraParticlesFactor,
-				extensionMgr_Register,
-				variable_Register,
-				comm, 
-				ics );
-	
 	return self;
 }
 
 void _Swarm_Init( 
-		Swarm*                                self, 
-		void*                                 cellLayout,
-		void*                                 particleLayout,
-		Dimension_Index                       dim,
-		Particle_InCellIndex                  cellParticleTblDelta, 
-		double                                extraParticlesFactor,
-		ExtensionManager_Register*            extensionMgr_Register,
-		Variable_Register*                    variable_Register,
-		MPI_Comm                              comm,
-		void*				      ics )
+   Swarm*                                self, 
+   AbstractContext*                      context,
+   void*                                 cellLayout,
+   void*                                 particleLayout,
+   Dimension_Index                       dim,
+   SizeT                                 particleSize,
+   Particle_InCellIndex                  cellParticleTblDelta, 
+   double                                extraParticlesFactor,
+   ExtensionManager_Register*            extensionMgr_Register,
+   Variable_Register*                    variable_Register,
+   MPI_Comm                              comm,
+   void*				      ics )
 {
 	StandardParticle   particle;
 	Stream*            errorStream = Journal_Register( Error_Type, self->type );
-	
-	self->isConstructed = True;
+   LiveComponentRegister* lcReg = NULL; 	
+
 	self->debug = Stream_RegisterChild( Swarm_Debug, self->type );
 	self->dim   = dim;
 	self->comm = comm;
@@ -209,6 +159,8 @@ void _Swarm_Init(
 	/* Check point and reload by default - only things like integration swarms will turn this off */
 	self->isSwarmTypeToCheckPointAndReload = True;
 
+   self->particleSize = particleSize;
+   self->context = (AbstractContext*)context;
 	self->cellLayout = (CellLayout*)cellLayout;
 	self->particleLayout = (ParticleLayout*)particleLayout;
 	
@@ -261,6 +213,12 @@ void _Swarm_Init(
 			GetOffsetOfMember( particle , owningCell ),
 			Variable_DataType_Int ); /* Should be unsigned int */
 
+   lcReg = LiveComponentRegister_GetLiveComponentRegister(); /* only needed for tests like GaussLayoutSingleCellSuite which don't have liveComponent_Registers */
+   if( lcReg ) {
+      LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->owningCellVariable );
+      LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->owningCellVariable->variable );
+   }
+
    /* disable checkpointing of OwningCell as it is reinitialised on startup */   
    self->owningCellVariable->isCheckpointedAndReloaded = False;
 
@@ -292,54 +250,7 @@ void* _Swarm_ParticleAt( void* swarm, Particle_Index dParticle_I ) {
 
 void _Swarm_Delete( void* swarm ) {
 	Swarm*			self = (Swarm*)swarm;
-	Cell_LocalIndex		cell_I;
-	
-	Stg_ObjectList_DeleteAllObjects( self->commHandlerList );
-	Stg_Class_Delete( self->commHandlerList );
 
-	FreeArray( self->swarmVars );
-
-	Memory_Free( self->cellPointTbl );
-	Memory_Free( self->cellPointCountTbl );
-	
-	for( cell_I = 0; cell_I < self->cellDomainCount; cell_I++ ) {
-		if( self->cellParticleTbl[cell_I] ){
-			Memory_Free( self->cellParticleTbl[cell_I] );
-		}
-
-		if(self->shadowTablesBuilt){
-			if( self->shadowCellParticleTbl[cell_I] ){
-				Memory_Free( self->shadowCellParticleTbl[cell_I] );
-			}
-		}
-	}
-
-	if( self->shadowTablesBuilt ){
-		Memory_Free( self->shadowCellParticleTbl );
-		Memory_Free( self->shadowCellParticleCountTbl );
-		if ( self->shadowParticles ) {
-			ExtensionManager_Free( self->particleExtensionMgr, self->shadowParticles );
-		}
-	}
-
-	Memory_Free( self->cellParticleTbl );
-	Memory_Free( self->cellParticleCountTbl );
-	Memory_Free( self->cellParticleSizeTbl );
-	if ( self->particles ) {
-		ExtensionManager_Free( self->particleExtensionMgr, self->particles );
-	}
-	if(self->owningCellVariable)
-		_SwarmVariable_Delete(self->owningCellVariable);
-	/* Delete SwarmVariable_Register if it has been created */
-	if ( self->swarmVariable_Register ) {
-		Stg_Class_Delete( self->swarmVariable_Register );
-	}
-
-	NewClass_Delete( self->incArray );
-
-	Swarm_Register_RemoveIndex( Swarm_Register_GetSwarm_Register(), self->swarmReg_I );
-	
-	/* Stg_Class_Delete parent class */
 	_Stg_Component_Delete( self );
 }
 
@@ -414,17 +325,6 @@ void _Swarm_Print( void* swarm, Stream* stream ) {
 		for( cParticle_I = 0; cParticle_I < self->cellParticleCountTbl[cell_I]; cParticle_I++ ) {
 			dParticle_I = self->cellParticleTbl[cell_I][cParticle_I];
 			Journal_Printf( swarmStream, "\t\t\t(part. index) %d\n", dParticle_I );
-			/* TODO: should probably handle this by having a particle print E.P.
-			   which the swarm holds, which can be extended to print the 
-			   particles correctly.
-			   Check how the mesh handles this for elements and nodes... */
-			#if 0
-			Journal_Printf( swarmStream, "\t\t\t(ptr) %p\n", Swarm_ParticleAt( self, dParticle_I ) );
-			Journal_Printf( swarmStream, "\t\t\t%g %g %g\n", 
-				(*(Coord*)Swarm_ParticleAt( self, cell_I, particle_I ))[0], 
-				(*(Coord*)Swarm_ParticleAt( self, cell_I, particle_I ))[1], 
-				(*(Coord*)Swarm_ParticleAt( self, cell_I, particle_I ))[2] );
-			#endif	
 		}
 		Journal_Printf( swarmStream, "\n" );
 	}
@@ -642,34 +542,30 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 }
 
 void* _Swarm_DefaultNew( Name name ) {
-	return _Swarm_New( 
-			sizeof(Swarm),
-			Swarm_Type,
-			_Swarm_Delete,
-			_Swarm_Print,
-			_Swarm_Copy,
-			_Swarm_DefaultNew,
-			_Swarm_Construct,
-			_Swarm_Build, 
-			_Swarm_Initialise,
-			_Swarm_Execute,
-			_Swarm_Destroy,
-			name, 
-			False, 
-			NULL,                       /* cellLayout */
-			NULL,                       /* particleLayout */
-			0,                          /* dim */
-			sizeof(IntegrationPoint),   /* particleSize */
-			0,	                    /* cellParticleTblDelta */
-			0,                          /* extraParticlesFactor */
-			NULL,                       /* extensionMgr_Register */
-			NULL,                       /* variable_Register */
-			MPI_COMM_WORLD,
-		        NULL );			    /* ics */
+	/* Variables set in this function */
+	SizeT                                                _sizeOfSelf = sizeof(Swarm);
+	Type                                                        type = Swarm_Type;
+	Stg_Class_DeleteFunction*                                _delete = _Swarm_Delete;
+	Stg_Class_PrintFunction*                                  _print = _Swarm_Print;
+	Stg_Class_CopyFunction*                                    _copy = _Swarm_Copy;
+	Stg_Component_DefaultConstructorFunction*    _defaultConstructor = _Swarm_DefaultNew;
+	Stg_Component_ConstructFunction*                      _construct = _Swarm_AssignFromXML;
+	Stg_Component_BuildFunction*                              _build = _Swarm_Build;
+	Stg_Component_InitialiseFunction*                    _initialise = _Swarm_Initialise;
+	Stg_Component_ExecuteFunction*                          _execute = _Swarm_Execute;
+	Stg_Component_DestroyFunction*                          _destroy = _Swarm_Destroy;
+	SizeT                                               particleSize = sizeof(IntegrationPoint);
+	void*                                                        ics = NULL;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Swarm_New(  SWARM_PASSARGS  );			    /* ics_renamed */
 }
 
-void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
+void _Swarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	Swarm*                  self                     = (Swarm*)swarm;
+   AbstractContext*        context                  = NULL;
 	CellLayout*             cellLayout               = NULL;
 	ParticleLayout*         particleLayout           = NULL;
 	void*                   extensionManagerRegister = NULL;
@@ -678,10 +574,11 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	Dimension_Index         dim;
 	Type                    particleType;
 	Variable_Register*      variable_Register        = NULL;
-	AbstractContext*        context 		 = NULL;
 	VariableCondition* 	ic            		 = NULL;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !context )
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
 	
@@ -690,9 +587,9 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	cellLayout =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  CellLayout_Type, CellLayout,  True, data ) ;
 	particleLayout =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  ParticleLayout_Type, ParticleLayout, True, data );
 	
-	extensionManagerRegister = Stg_ObjectList_Get( cf->registerRegister, "ExtensionManager_Register" );
+	extensionManagerRegister = extensionMgr_Register; 
 	assert( extensionManagerRegister );
-	variable_Register = Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
+	variable_Register = context->variable_Register; 
 	assert( variable_Register );
 	
 	cellParticleTblDelta = 
@@ -730,10 +627,11 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	ic = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IC", VariableCondition, False, data );
 	
 	_Swarm_Init( 
-			self,
+			self, context,
 			cellLayout,
 			particleLayout, 
 			dim,
+         sizeof(IntegrationPoint),
 			cellParticleTblDelta,
 			extraParticlesFactor,
 			extensionManagerRegister,
@@ -745,7 +643,7 @@ void _Swarm_Construct( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 
 void _Swarm_Build( void* swarm, void* data ) {
 	Swarm* self = (Swarm*)swarm;
-	AbstractContext* context = (AbstractContext*)data;
+	AbstractContext* context = self->context;
 	
 	Journal_DPrintf( self->debug, "In %s(): for swarm \"%s\" (of type %s)\n", __func__, self->name, self->type ); 
 	Stream_IndentBranch( Swarm_Debug );
@@ -784,12 +682,6 @@ void _Swarm_Build( void* swarm, void* data ) {
 	Stg_Component_Build( self->owningCellVariable, data, False );
 	Journal_DPrintf( self->debug, "...done.\n" );
 	
-	/* these three functions were in initialise function before... 10.08.07*/
-	_Swarm_InitialiseCells( self, data );
-	_Swarm_InitialiseParticles( self, data );
-	Stg_Component_Initialise( self->owningCellVariable, data, False );
-	/**/
-
 	Stream_UnIndentBranch( Swarm_Debug );
 	Journal_DPrintf( self->debug, "...done in %s().\n", __func__ );
 
@@ -801,27 +693,28 @@ void _Swarm_Build( void* swarm, void* data ) {
 			
 void _Swarm_Initialise( void* swarm, void* data ) {
 	Swarm* self = (Swarm*)swarm;
-	AbstractContext* context = (AbstractContext*)data; 
-	
+
 	Journal_DPrintf( self->debug, "In %s(): for swarm \"%s\" (of type %s)\n", __func__, self->name, self->type ); 
 	Stream_IndentBranch( Swarm_Debug );
+   Stg_Component_Initialise( self->owningCellVariable, data, False );
+
+	_Swarm_InitialiseCells( self, data );
+	_Swarm_InitialiseParticles( self, data );
 	
-	self->stillDoingInitialisation = False;
-
-	Stream_UnIndentBranch( Swarm_Debug );
-	Journal_DPrintf( self->debug, "...done in %s().\n", __func__ );
-
-	/* removed context->loadFromCheckPoint condition from this statement
-	 * as can have a swarm initial condition without requiring a checkpointed
-	 * solution. Dave 08.11.07
-	 */
-	if( self->ics && context ) {
+	if( self->ics ) {
 		Journal_DPrintf( self->debug, "applying the ICs for this swarm.\n" );
 		Stream_Indent( self->debug );
 		Stg_Component_Initialise( self->ics, data, False );
 		/* call the initial conditions plugin here */
 		VariableCondition_Apply( self->ics, data );
 	}
+
+   self->stillDoingInitialisation = False;  /* this needs to go after the _Swarm_InitialiseParticles call */
+	
+	Stream_UnIndentBranch( Swarm_Debug );
+   
+   Journal_DPrintf( self->debug, "...done in %s().\n", __func__ );
+
 }
 
 
@@ -829,6 +722,58 @@ void _Swarm_Execute( void* swarm, void* data ) {
 }
 
 void _Swarm_Destroy( void* swarm, void* data ) {
+	Swarm* self = (Swarm*)swarm;
+   Cell_LocalIndex cell_I;
+
+	for( cell_I = 0; cell_I < self->cellDomainCount; cell_I++ ) {
+		if( self->cellParticleTbl[cell_I] ){
+			Memory_Free( self->cellParticleTbl[cell_I] );
+		}
+
+		if(self->shadowTablesBuilt){
+			if( self->shadowCellParticleTbl[cell_I] ){
+				Memory_Free( self->shadowCellParticleTbl[cell_I] );
+			}
+		}
+	}
+
+	if( self->shadowTablesBuilt ){
+		Memory_Free( self->shadowCellParticleTbl );
+		Memory_Free( self->shadowCellParticleCountTbl );
+		if ( self->shadowParticles ) {
+			ExtensionManager_Free( self->particleExtensionMgr, self->shadowParticles );
+		}
+	}
+
+	Memory_Free( self->cellParticleTbl );
+	Memory_Free( self->cellParticleCountTbl );
+	Memory_Free( self->cellParticleSizeTbl );
+	if ( self->particles ) {
+		ExtensionManager_Free( self->particleExtensionMgr, self->particles );
+	}
+	if(self->owningCellVariable)
+		Stg_Component_Destroy(self->owningCellVariable, data, False );
+
+ //  Stg_ObjectList_DeleteAllObjects( self->commHandlerList );
+	Stg_Class_Delete( self->commHandlerList );
+
+	FreeArray( self->swarmVars );
+
+	Memory_Free( self->cellPointTbl );
+	Memory_Free( self->cellPointCountTbl );
+
+	/* Delete SwarmVariable_Register if it has been created */
+	if ( self->swarmVariable_Register ) {
+		Stg_Class_Delete( self->swarmVariable_Register );
+	}
+
+	NewClass_Delete( self->incArray );
+
+	Swarm_Register_RemoveIndex( Swarm_Register_GetSwarm_Register(), self->swarmReg_I );
+
+
+
+
 }
 
 void _Swarm_BuildCells( void* swarm, void* data ) {
@@ -1439,6 +1384,7 @@ SwarmVariable* Swarm_NewScalarVariable(
 	name = Stg_Object_AppendSuffix( self, nameExt );
 	variable = Variable_New( 
 		name,
+		self->context,
 		1, 
 		dataOffsets, 
 		dataTypes, 
@@ -1450,7 +1396,7 @@ SwarmVariable* Swarm_NewScalarVariable(
 		(void**)&self->particles,
 		variable_Register );
 
-	swarmVariable = SwarmVariable_New( name, self, variable, 1 );
+	swarmVariable = SwarmVariable_New( name, self->context, self, variable, 1 );
    /* set variable to be checkpointed */
 	swarmVariable->isCheckpointedAndReloaded = True;
 
@@ -1504,6 +1450,7 @@ SwarmVariable* Swarm_NewVectorVariable(
 	/* Construct */
 	variable = Variable_New( 
 		name,
+		self->context,
 		1, 
 		dataOffsets, 
 		dataTypes, 
@@ -1519,7 +1466,7 @@ SwarmVariable* Swarm_NewVectorVariable(
 	for( vector_I = 0; vector_I < dataTypeCount; vector_I++ ) {
 		if ( swarmVariable_Register && variable_Register ) {
 			swarmVariable = SwarmVariable_New( 
-					dataNames[ vector_I ],
+					dataNames[ vector_I ], self->context, 
 					self, 
 					Variable_Register_GetByName( variable_Register, dataNames[ vector_I ] ),
 					1 );
@@ -1528,7 +1475,7 @@ SwarmVariable* Swarm_NewVectorVariable(
 		}
 		Memory_Free( dataNames[ vector_I ] );
 	}
-	swarmVariable = SwarmVariable_New( name, self, variable, dataTypeCount );
+	swarmVariable = SwarmVariable_New( name, self->context, self, variable, dataTypeCount );
    /* set variable to be checkpointed */
    swarmVariable->isCheckpointedAndReloaded = True;
 
@@ -1565,7 +1512,7 @@ void Swarm_Realloc( void* swarm ) {
 			self->particlesArraySize );
 
 	/*
-	** FUCK: NEED TO UPDATE THINGS IF ARRAYS ARE REALLOC'D
+	** NEED TO UPDATE THINGS IF ARRAYS ARE REALLOC'D
 	*/
 	for( v_i = 0; v_i < self->nSwarmVars; v_i++ ) {
 		if( self->swarmVars[v_i]->variable )
@@ -1646,12 +1593,12 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 	char*                name = NULL;
 	char*                swarmFileName     = NULL;
 	char*                swarmFileNamePart = NULL;
+	Index                checkpointfiles;
 
 	Stg_asprintf( &name, "%s-fileParticleLayout", self->name );
 
    swarmFileNamePart = Context_GetCheckPointReadPrefixString( context );
 #ifdef READ_HDF5
-   self->checkpointnfiles = context->checkpointnproc;
 	Stg_asprintf( &swarmFileName, "%s%s.%05d", swarmFileNamePart, self->name, context->restartTimestep );
 #else
 	Stg_asprintf( &swarmFileName, "%s%s.%05d.dat", swarmFileNamePart, self->name, context->restartTimestep );
@@ -1672,9 +1619,16 @@ void Swarm_ReplaceCurrentParticleLayoutWithFileParticleLayout( void* swarm, void
 	* was incremented when we got it out of the LC register.
 	* PatrickSunter - 13 June 2006
 	*/
-	Stg_Class_Delete( self->particleLayout );
+	Stg_Component_Destroy( self->particleLayout, NULL, False );
+	/* find out how many files fileparticlelayout is stored across.. currently for this function we assume we are reading from checkpoints.. TODO generalise */
+	/* set to one incase reading ascii */
+	checkpointfiles = 1;
+	/* now check if using hdf5 */ 
+	#ifdef READ_HDF5
+	checkpointfiles = _FileParticleLayout_GetFileCountFromTimeInfoFile( context );
+	#endif
 
-	self->particleLayout = (ParticleLayout*)FileParticleLayout_New( name, swarmFileName );
+	self->particleLayout = (ParticleLayout*)FileParticleLayout_New( name, NULL, GlobalCoordSystem, False, 0, 0.0, swarmFileName, checkpointfiles );
 
    Memory_Free( name );
    Memory_Free( swarmFileName );
@@ -1705,3 +1659,5 @@ void Swarm_AddVariable( Swarm* self, SwarmVariable* swarmVar ) {
 	self->swarmVars[self->nSwarmVars] = swarmVar;
 	self->nSwarmVars++;
 }
+
+

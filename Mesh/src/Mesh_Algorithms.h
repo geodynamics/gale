@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Mesh_Algorithms_h__
-#define __Domain_Mesh_Mesh_Algorithms_h__
+#ifndef __StgDomain_Mesh_Algorithms_h__
+#define __StgDomain_Mesh_Algorithms_h__
 
 	/** Textual name of this class */
 	extern const Type Mesh_Algorithms_Type;
@@ -62,6 +62,7 @@
 		/* General info */								\
 		__Stg_Component									\
 												\
+		AbstractContext*				context;			\
 		/* Virtual info */								\
 		Mesh_Algorithms_SetMeshFunc*			setMeshFunc;			\
 		Mesh_Algorithms_UpdateFunc*			updateFunc;			\
@@ -87,33 +88,40 @@
 	** Constructors
 	*/
 
-	#define MESH_ALGORITHMS_DEFARGS								\
-		STG_COMPONENT_DEFARGS,								\
-		Mesh_Algorithms_SetMeshFunc*			setMeshFunc,			\
-		Mesh_Algorithms_UpdateFunc*			updateFunc,			\
-		Mesh_Algorithms_NearestVertexFunc*		nearestVertexFunc, 		\
-		Mesh_Algorithms_SearchFunc*			searchFunc, 			\
-		Mesh_Algorithms_SearchElementsFunc*		searchElementsFunc, 		\
-		Mesh_Algorithms_GetMinimumSeparationFunc*	getMinimumSeparationFunc, 	\
-		Mesh_Algorithms_GetLocalCoordRangeFunc*		getLocalCoordRangeFunc,		\
-		Mesh_Algorithms_GetDomainCoordRangeFunc*	getDomainCoordRangeFunc,	\
-		Mesh_Algorithms_GetGlobalCoordRangeFunc*	getGlobalCoordRangeFunc
 
-	#define MESH_ALGORITHMS_PASSARGS	\
-		STG_COMPONENT_PASSARGS, 	\
-		setMeshFunc, 			\
-		updateFunc, 			\
-		nearestVertexFunc,		\
-		searchFunc, 			\
-		searchElementsFunc,		\
-		getMinimumSeparationFunc,	\
-		getLocalCoordRangeFunc, 	\
-		getDomainCoordRangeFunc, 	\
-		getGlobalCoordRangeFunc
 
-	Mesh_Algorithms* Mesh_Algorithms_New( Name name );
-	Mesh_Algorithms* _Mesh_Algorithms_New( MESH_ALGORITHMS_DEFARGS );
-	void _Mesh_Algorithms_Init( Mesh_Algorithms* self );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESH_ALGORITHMS_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                Mesh_Algorithms_SetMeshFunc*                            setMeshFunc, \
+                Mesh_Algorithms_UpdateFunc*                              updateFunc, \
+                Mesh_Algorithms_NearestVertexFunc*                nearestVertexFunc, \
+                Mesh_Algorithms_SearchFunc*                              searchFunc, \
+                Mesh_Algorithms_SearchElementsFunc*              searchElementsFunc, \
+                Mesh_Algorithms_GetMinimumSeparationFunc*  getMinimumSeparationFunc, \
+                Mesh_Algorithms_GetLocalCoordRangeFunc*      getLocalCoordRangeFunc, \
+                Mesh_Algorithms_GetDomainCoordRangeFunc*    getDomainCoordRangeFunc, \
+                Mesh_Algorithms_GetGlobalCoordRangeFunc*    getGlobalCoordRangeFunc
+
+	#define MESH_ALGORITHMS_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        setMeshFunc,              \
+	        updateFunc,               \
+	        nearestVertexFunc,        \
+	        searchFunc,               \
+	        searchElementsFunc,       \
+	        getMinimumSeparationFunc, \
+	        getLocalCoordRangeFunc,   \
+	        getDomainCoordRangeFunc,  \
+	        getGlobalCoordRangeFunc 
+
+	Mesh_Algorithms* Mesh_Algorithms_New( Name name, AbstractContext* context );
+	Mesh_Algorithms* _Mesh_Algorithms_New(  MESH_ALGORITHMS_DEFARGS  );
+	void _Mesh_Algorithms_Init( Mesh_Algorithms* self, AbstractContext* context );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
@@ -121,7 +129,7 @@
 
 	void _Mesh_Algorithms_Delete( void* algorithms );
 	void _Mesh_Algorithms_Print( void* algorithms, Stream* stream );
-	void _Mesh_Algorithms_Construct( void* algorithms, Stg_ComponentFactory* cf, void* data );
+	void _Mesh_Algorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf, void* data );
 	void _Mesh_Algorithms_Build( void* algorithms, void* data );
 	void _Mesh_Algorithms_Initialise( void* algorithms, void* data );
 	void _Mesh_Algorithms_Execute( void* algorithms, void* data );
@@ -191,4 +199,5 @@ Bool Mesh_Algorithms_SearchWithTree( void* self, double* pnt, unsigned* dim, uns
 	** Private Member functions
 	*/
 
-#endif /* __Domain_Mesh_Mesh_Algorithms_h__ */
+#endif /* __StgDomain_Mesh_Algorithms_h__ */
+

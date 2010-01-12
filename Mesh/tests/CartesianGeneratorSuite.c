@@ -49,36 +49,40 @@ void CartesianGeneratorSuite_Setup( CartesianGeneratorSuiteData* data ) {
 	unsigned sizes[3];
 	double minCrd[3];
 	double maxCrd[3];
-	int rank;
+
+	Journal_Enable_AllTypedStream( False );
 
 	insist( MPI_Comm_size( MPI_COMM_WORLD, &nRanks ), == MPI_SUCCESS );
 	sizes[0] = sizes[1] = sizes[2] = nRanks * 4;
 	minCrd[0] = minCrd[1] = minCrd[2] = 0.0;
 	maxCrd[0] = minCrd[1] = minCrd[2] = (double)nRanks;
 
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	MeshGenerator_SetDimSize( gen, 3 );
 	CartesianGenerator_SetShadowDepth( gen, 1 );
 	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 
-	data->mesh = Mesh_New( "" );
+	data->mesh = Mesh_New( "", NULL );
 	CartesianGenerator_Generate( gen, data->mesh, NULL );
+   Stg_Component_Build(data->mesh, NULL, False);
+   Stg_Component_Initialise(data->mesh, NULL, False);
 }
 
 void CartesianGeneratorSuite_Teardown( CartesianGeneratorSuiteData* data ) {
 	Stg_Component_Destroy( data->mesh, NULL, True );
+
+	Journal_Enable_AllTypedStream( True );
 }
 
 void CartesianGeneratorSuite_TestElementVertexInc( CartesianGeneratorSuiteData* data ) {
-	unsigned	dim		= Mesh_GetDimSize( data->mesh );
+	unsigned	dim = Mesh_GetDimSize( data->mesh );
 	Sync*		elSync		= (Sync*)IGraph_GetDomain( (IGraph*)data->mesh->topo, dim );
 	Sync*		vertSync	= (Sync*)IGraph_GetDomain( (IGraph*)data->mesh->topo, MT_VERTEX );
 	Grid*		elGrid		= *(Grid**)Mesh_GetExtension( data->mesh, Grid**, "elementGrid" );
 	Grid*		vertGrid	= *(Grid**)Mesh_GetExtension( data->mesh, Grid**, "vertexGrid" );
 	IArray*		inc		= IArray_New();
-	unsigned	vert;
-	unsigned*	incVerts;
+	int*	incVerts;
 	unsigned	nIncVerts;
 	unsigned	el_i;
 	unsigned	gEl;
@@ -164,7 +168,7 @@ void CartesianGeneratorSuite_TestEdgeVertexInc( CartesianGeneratorSuiteData* dat
 	Sync*		vertSync	= (Sync*)IGraph_GetDomain( (IGraph*)data->mesh->topo, MT_VERTEX );
 	Sync*		edgeSync	= (Sync*)IGraph_GetDomain( (IGraph*)data->mesh->topo, MT_EDGE );
 	IArray*		inc		= IArray_New();
-	unsigned*	incVerts;
+	int*	incVerts;
 	unsigned	nIncVerts;
 	unsigned	dim		= ((IGraph*)data->mesh->topo)->nDims;
 	unsigned	sizes[3];
@@ -262,7 +266,7 @@ void CartesianGeneratorSuite_TestFaceVertexInc( CartesianGeneratorSuiteData* dat
 	Sync*		vertSync	= (Sync*)IGraph_GetDomain( (IGraph*)data->mesh->topo, MT_VERTEX );
 	Sync*		faceSync	= (Sync*)IGraph_GetDomain( (IGraph*)data->mesh->topo, MT_FACE );
 	IArray*		inc		= IArray_New();
-	unsigned*	incVerts;
+	int*	incVerts;
 	unsigned	nIncVerts;
 	unsigned	dim		= ((IGraph*)data->mesh->topo)->nDims;
 	unsigned	sizes[3];
@@ -402,3 +406,5 @@ void CartesianGeneratorSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, CartesianGeneratorSuite_TestEdgeVertexInc );
    pcu_suite_addTest( suite, CartesianGeneratorSuite_TestFaceVertexInc );
 }
+
+

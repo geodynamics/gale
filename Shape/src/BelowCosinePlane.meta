@@ -2,49 +2,47 @@
 <!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-<param name="Name">BelowCosinePlane</param>
-<param name="Author">...</param>
-<param name="Organisation">VPAC</param>
-<param name="Project">StgDomain</param>
-<param name="Location">./StgDomain/Shape/src/</param>
-<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
-<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
-<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
-<param name="Parent">BelowPlane</param>
-<param name="Reference">...</param>
-<param name="Summary">...</param>
-<param name="Description">Defines a cosine shape, with the region less than the function included</param>
-<param name="Equation">$y \leq a_0 + b_0sin( (2\pi/T) x + \phi)$ </param>
+	<param name="Name">BelowCosinePlane</param>
+	<param name="Author">...</param>
+	<param name="Organisation">VPAC</param>
+	<param name="Project">StgDomain</param>
+	<param name="Location">./StgDomain/Shape/src/</param>
+	<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+	<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+	<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+	<param name="Parent">BelowPlane</param>
+	<param name="Reference">...</param>
+	<param name="Summary">...</param>
+	<param name="Description">Defines a cosine shape, with the region less than the function included</param>
+	<param name="Equation">$y \\leq a_0 + b_0sin( (2\\pi/T) x + \\phi)$ </param>
 
+	<!--Now the interesting stuff-->
 
-<!--Now the interesting stuff-->
+	<list name="Params">
+		<struct>
+			<param name="Name">amplitude</param>
+			<param name="Type">Double</param>
+			<param name="Default">0.1</param>
+			<param name="Description">Is the amplitude of the oscillations, $ b_0 $ in the equation</param>
+		</struct>
+		<struct>
+			<param name="Name">wavelength</param>
+			<param name="Type">Double</param>
+			<param name="Default">2*&amp;pi</param>
+			<param name="Description"> $ T $ in the equation</param>
+		</struct>
+		<struct>
+			<param name="Name">phase</param>
+			<param name="Type">Double</param>
+			<param name="Default">0.0</param>
+			<param name="Description">$ \\phi $ in the equation</param>
+		</struct>
+	</list>
 
+	<list name="Dependencies">
 
-<list name="Params">
-	<struct>
-		<param name="Name">amplitude</param>
-		<param name="Type">Double</param>
-		<param name="Default">0.1</param>
-		<param name="Description">Is the amplitude of the oscillations, $ b_0 $ in the equation</param>
-	</struct>
-	<struct>
-		<param name="Name">wavelength</param>
-		<param name="Type">Double</param>
-		<param name="Default">2*&amp;pi</param>
-		<param name="Description"> $ T $ in the equation</param>
-	</struct>
-	<struct>
-		<param name="Name">phase</param>
-		<param name="Type">Double</param>
-		<param name="Default">0.0</param>
-		<param name="Description">$ \phi $ in the equation</param>
-	</struct>
-</list>
-
-<list name="Dependencies">
-
-</list>
-<!-- Add an exmaple XML if possible -->
-<param name="Example">...</param>
+	</list>
+	<!-- Add an exmaple XML if possible -->
+	<param name="Example">...</param>
 
 </StGermainData>

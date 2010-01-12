@@ -39,9 +39,9 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_Init_h__
-#define __Domain_Swarm_Init_h__
+#ifndef __StgDomain_Swarm_Init_h__
+#define __StgDomain_Swarm_Init_h__
 	
 	Bool StgDomainSwarm_Init( int* argc, char** argv[] );
 	
-#endif /* __Domain_Swarm_Init_h__ */
+#endif /* __StgDomain_Swarm_Init_h__ */

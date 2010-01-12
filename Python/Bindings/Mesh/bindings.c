@@ -116,3 +116,5 @@ PyObject* Mesh_Python_GetDictionary( PyObject* self, PyObject* args ) {
 	
 	return PyCObject_FromVoidPtr( mesh->dictionary, 0 );
 }
+
+

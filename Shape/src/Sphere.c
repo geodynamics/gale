@@ -59,54 +59,19 @@ Sphere* Sphere_New(
 {
 	Sphere* self = (Sphere*) _Sphere_DefaultNew( name );
 
-	Sphere_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		radius) ;
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma );
+	_Sphere_Init( self, radius );
+
 	return self;
 }
 
-Sphere* _Sphere_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name )
+Sphere* _Sphere_New(  SPHERE_DEFARGS  )
 {
 	Sphere* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Sphere) );
-	self = (Sphere*)_Stg_Shape_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside ,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (Sphere*)_Stg_Shape_New(  STG_SHAPE_PASSARGS  );
 	
 	/* General info */
 
@@ -124,22 +89,6 @@ void _Sphere_Init( void* sphere, double radius ) {
 	self->radiusSquared = radius * radius;
 }
 
-
-void Sphere_InitAll( 
-		void*                                 sphere, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		double                                radius)
-{
-	Sphere* self = (Sphere*)sphere;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma );
-	_Sphere_Init( self, radius );
-}
-	
 
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
@@ -174,33 +123,36 @@ void* _Sphere_Copy( void* sphere, void* dest, Bool deep, Name nameExt, PtrMap* p
 }
 
 void* _Sphere_DefaultNew( Name name ) {
-	return (void*) _Sphere_New(
-			sizeof(Sphere),
-			Sphere_Type,
-			_Sphere_Delete,
-			_Sphere_Print,
-			_Sphere_Copy,
-			_Sphere_DefaultNew,
-			_Sphere_Construct,
-			_Sphere_Build,
-			_Sphere_Initialise,
-			_Sphere_Execute,
-			_Sphere_Destroy,
-			_Sphere_IsCoordInside,
-			_Sphere_CalculateVolume,
-			_Sphere_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(Sphere);
+	Type                                                          type = Sphere_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _Sphere_Delete;
+	Stg_Class_PrintFunction*                                    _print = _Sphere_Print;
+	Stg_Class_CopyFunction*                                      _copy = _Sphere_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _Sphere_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _Sphere_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _Sphere_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _Sphere_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _Sphere_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _Sphere_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _Sphere_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _Sphere_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _Sphere_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _Sphere_New(  SPHERE_PASSARGS  );
 }
 
 
-void _Sphere_Construct( void* sphere, Stg_ComponentFactory* cf, void* data ) {
+void _Sphere_AssignFromXML( void* sphere, Stg_ComponentFactory* cf, void* data ) {
 	Sphere*	self      = (Sphere*) sphere;
 	double             radius;
 
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	radius = Stg_ComponentFactory_GetDouble( cf, self->name, "radius", 0.0 );
-
 
 	_Sphere_Init( self, radius );
 }
@@ -280,3 +232,5 @@ double _Sphere_CalculateVolume( void* sphere ) {
 	}
 }
 	
+
+

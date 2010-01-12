@@ -47,49 +47,51 @@ const Type Mesh_HexAlgorithms_Type = "Mesh_HexAlgorithms";
 ** Constructors
 */
 
-Mesh_HexAlgorithms* Mesh_HexAlgorithms_New( Name name ) {
-	return _Mesh_HexAlgorithms_New( sizeof(Mesh_HexAlgorithms), 
-					Mesh_HexAlgorithms_Type, 
-					_Mesh_HexAlgorithms_Delete, 
-					_Mesh_HexAlgorithms_Print, 
-					NULL, 
-					(void* (*)(Name))_Mesh_HexAlgorithms_New, 
-					_Mesh_HexAlgorithms_Construct, 
-					_Mesh_HexAlgorithms_Build, 
-					_Mesh_HexAlgorithms_Initialise, 
-					_Mesh_HexAlgorithms_Execute, 
-					_Mesh_HexAlgorithms_Destroy, 
-					name, 
-					NON_GLOBAL, 
-					_Mesh_Algorithms_SetMesh, 
-					_Mesh_Algorithms_Update, 
-					_Mesh_Algorithms_NearestVertex, 
-					_Mesh_Algorithms_Search, 
-					_Mesh_Algorithms_SearchElements, 
-					_Mesh_Algorithms_GetMinimumSeparation, 
-					_Mesh_Algorithms_GetLocalCoordRange, 
-					_Mesh_Algorithms_GetDomainCoordRange, 
-					_Mesh_Algorithms_GetGlobalCoordRange );
+Mesh_HexAlgorithms* Mesh_HexAlgorithms_New( Name name, AbstractContext* context) {
+	/* Variables set in this function */
+	SizeT                                                   _sizeOfSelf = sizeof(Mesh_HexAlgorithms);
+	Type                                                           type = Mesh_HexAlgorithms_Type;
+	Stg_Class_DeleteFunction*                                   _delete = _Mesh_HexAlgorithms_Delete;
+	Stg_Class_PrintFunction*                                     _print = _Mesh_HexAlgorithms_Print;
+	Stg_Class_CopyFunction*                                       _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*       _defaultConstructor = (void* (*)(Name))_Mesh_HexAlgorithms_New;
+	Stg_Component_ConstructFunction*                         _construct = _Mesh_HexAlgorithms_AssignFromXML;
+	Stg_Component_BuildFunction*                                 _build = _Mesh_HexAlgorithms_Build;
+	Stg_Component_InitialiseFunction*                       _initialise = _Mesh_HexAlgorithms_Initialise;
+	Stg_Component_ExecuteFunction*                             _execute = _Mesh_HexAlgorithms_Execute;
+	Stg_Component_DestroyFunction*                             _destroy = _Mesh_HexAlgorithms_Destroy;
+	AllocationType                                   nameAllocationType = NON_GLOBAL;
+	Mesh_Algorithms_SetMeshFunc*                            setMeshFunc = _Mesh_Algorithms_SetMesh;
+	Mesh_Algorithms_UpdateFunc*                              updateFunc = _Mesh_Algorithms_Update;
+	Mesh_Algorithms_NearestVertexFunc*                nearestVertexFunc = _Mesh_Algorithms_NearestVertex;
+	Mesh_Algorithms_SearchFunc*                              searchFunc = _Mesh_Algorithms_Search;
+	Mesh_Algorithms_SearchElementsFunc*              searchElementsFunc = _Mesh_Algorithms_SearchElements;
+	Mesh_Algorithms_GetMinimumSeparationFunc*  getMinimumSeparationFunc = _Mesh_Algorithms_GetMinimumSeparation;
+	Mesh_Algorithms_GetLocalCoordRangeFunc*      getLocalCoordRangeFunc = _Mesh_Algorithms_GetLocalCoordRange;
+	Mesh_Algorithms_GetDomainCoordRangeFunc*    getDomainCoordRangeFunc = _Mesh_Algorithms_GetDomainCoordRange;
+	Mesh_Algorithms_GetGlobalCoordRangeFunc*    getGlobalCoordRangeFunc = _Mesh_Algorithms_GetGlobalCoordRange;
+
+   Mesh_HexAlgorithms* self = _Mesh_HexAlgorithms_New(  MESH_HEXALGORITHMS_PASSARGS  );
+	/* Mesh_HexAlgorithms info */
+	_Mesh_Algorithms_Init( (Mesh_Algorithms*)self, context );
+	_Mesh_HexAlgorithms_Init( self );
+
+   return self;
+
 }
 
-Mesh_HexAlgorithms* _Mesh_HexAlgorithms_New( MESH_HEXALGORITHMS_DEFARGS ) {
+Mesh_HexAlgorithms* _Mesh_HexAlgorithms_New(  MESH_HEXALGORITHMS_DEFARGS  ) {
 	Mesh_HexAlgorithms* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(Mesh_HexAlgorithms) );
-	self = (Mesh_HexAlgorithms*)_Mesh_Algorithms_New( MESH_ALGORITHMS_PASSARGS );
-
-	/* Virtual info */
-
-	/* Mesh_HexAlgorithms info */
-	_Mesh_HexAlgorithms_Init( self );
+	assert( _sizeOfSelf >= sizeof(Mesh_HexAlgorithms) );
+	self = (Mesh_HexAlgorithms*)_Mesh_Algorithms_New(  MESH_ALGORITHMS_PASSARGS  );
 
 	return self;
 }
 
-void _Mesh_HexAlgorithms_Init( Mesh_HexAlgorithms* self ) {
+void _Mesh_HexAlgorithms_Init( void* hexAlgorithms ) {
 }
-
 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
@@ -114,19 +116,31 @@ void _Mesh_HexAlgorithms_Print( void* hexAlgorithms, Stream* stream ) {
 	_Mesh_Algorithms_Print( self, stream );
 }
 
-void _Mesh_HexAlgorithms_Construct( void* hexAlgorithms, Stg_ComponentFactory* cf, void* data ) {
+void _Mesh_HexAlgorithms_AssignFromXML( void* hexAlgorithms, Stg_ComponentFactory* cf, void* data ) {
+
+   Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
+   _Mesh_Algorithms_AssignFromXML( self, cf, data );
+   _Mesh_HexAlgorithms_Init( self );
 }
 
 void _Mesh_HexAlgorithms_Build( void* hexAlgorithms, void* data ) {
+	Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
+	_Mesh_Algorithms_Build( self, data );
 }
 
 void _Mesh_HexAlgorithms_Initialise( void* hexAlgorithms, void* data ) {
+	Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
+	_Mesh_Algorithms_Initialise( self, data );
 }
 
 void _Mesh_HexAlgorithms_Execute( void* hexAlgorithms, void* data ) {
+	Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
+	_Mesh_Algorithms_Execute( self, data );
 }
 
 void _Mesh_HexAlgorithms_Destroy( void* hexAlgorithms, void* data ) {
+	Mesh_HexAlgorithms*	self = (Mesh_HexAlgorithms*)hexAlgorithms;
+	_Mesh_Algorithms_Destroy( self, data );
 }
 
 
@@ -138,3 +152,5 @@ void _Mesh_HexAlgorithms_Destroy( void* hexAlgorithms, void* data ) {
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+

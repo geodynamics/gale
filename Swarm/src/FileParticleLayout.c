@@ -62,81 +62,53 @@
 
 const Type FileParticleLayout_Type = "FileParticleLayout";
 
-FileParticleLayout* FileParticleLayout_New( Name name, Name filename )
+FileParticleLayout* FileParticleLayout_New( Name name,
+      AbstractContext* context, 
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int     totalInitialParticles, 
+      double           averageInitialParticlesPerCell, 
+      Name             filename, 
+      Index            checkpointfiles )
 {
    FileParticleLayout* self = (FileParticleLayout*) _FileParticleLayout_DefaultNew( name );
-   _FileParticleLayout_Init( self, filename );
+
+   _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
+   _GlobalParticleLayout_Init( self, totalInitialParticles, averageInitialParticlesPerCell );
+   _FileParticleLayout_Init( self, filename, checkpointfiles );
+   self->isConstructed = True;
+
    return self;
 }
 
-
-FileParticleLayout* _FileParticleLayout_New( 
-                SizeT                                            _sizeOfSelf,
-                Type                                             type,
-                Stg_Class_DeleteFunction*                        _delete,
-                Stg_Class_PrintFunction*                         _print,
-                Stg_Class_CopyFunction*                          _copy,
-                Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-                Stg_Component_ConstructFunction*                 _construct,
-                Stg_Component_BuildFunction*                     _build,
-                Stg_Component_InitialiseFunction*                _initialise,
-                Stg_Component_ExecuteFunction*                   _execute,
-                Stg_Component_DestroyFunction*                   _destroy,
-                ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-                ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-                GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-                Name                                             name,
-                Bool                                             initFlag,
-                Name                                             filename )
+FileParticleLayout* _FileParticleLayout_New(  FILEPARTICLELAYOUT_DEFARGS  )
 {
    FileParticleLayout* self;
    
    /* Allocate memory */
    assert( _sizeOfSelf >= sizeof( FileParticleLayout ) );
-   self = (FileParticleLayout*)_GlobalParticleLayout_New( 
-         _sizeOfSelf, 
-         type,
-         _delete,
-         _print,
-         _copy, 
-         _defaultConstructor,
-         _construct,
-         _build,
-         _initialise,
-         _execute,
-         _destroy,
-         _setInitialCounts,
-         _initialiseParticles,
-         _initialiseParticle,
-         name,
-         initFlag,
-         GlobalCoordSystem,
-         False,
-         0,
-         0.0 );
+   self = (FileParticleLayout*)_GlobalParticleLayout_New(  GLOBALPARTICLELAYOUT_PASSARGS  );
 
-   if ( initFlag ) {
-      _FileParticleLayout_Init( self, filename );
-   }
+   /* set default attributes */
+   self->filename = filename;
+   self->checkpointfiles = checkpointfiles;
 
    return self;
 }
 
 
-void _FileParticleLayout_Init( void* particleLayout, Name filename )
+void _FileParticleLayout_Init( void* particleLayout, Name filename, Index checkpointfiles )
 {
    FileParticleLayout* self = (FileParticleLayout*) particleLayout;
 
    self->filename = StG_Strdup( filename );
+   self->checkpointfiles = checkpointfiles;
    self->errorStream = Journal_MyStream( Error_Type, self );
-   _GlobalParticleLayout_Init( self, GlobalCoordSystem, False, 0, 0.0 );
 }
 
 
 void _FileParticleLayout_Delete( void* particleLayout ) {
    FileParticleLayout* self = (FileParticleLayout*)particleLayout;
-
-   Memory_Free( self->filename );
 
    /* Stg_Class_Delete parent class */
    _GlobalParticleLayout_Delete( self );
@@ -160,8 +132,8 @@ void _FileParticleLayout_Print( void* particleLayout, Stream* stream ) {
 
 
 void* _FileParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-   FileParticleLayout*     self                    = (FileParticleLayout*)particleLayout;
-   FileParticleLayout*     newFileParticleLayout;
+   FileParticleLayout*	self = (FileParticleLayout*)particleLayout;
+   FileParticleLayout*	newFileParticleLayout;
    
    newFileParticleLayout = (FileParticleLayout*)_GlobalParticleLayout_Copy( self, dest, deep, nameExt, ptrMap );
    
@@ -171,42 +143,71 @@ void* _FileParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Nam
 }
 
 void* _FileParticleLayout_DefaultNew( Name name ) {
-   return (void*)_FileParticleLayout_New( 
-         sizeof(FileParticleLayout),
-         FileParticleLayout_Type,
-         _FileParticleLayout_Delete,
-         _FileParticleLayout_Print,
-         _FileParticleLayout_Copy,
-         _FileParticleLayout_DefaultNew,
-         _FileParticleLayout_Construct,
-         _FileParticleLayout_Build,
-         _FileParticleLayout_Initialise,
-         _FileParticleLayout_Execute,
-         _FileParticleLayout_Destroy,
-         _FileParticleLayout_SetInitialCounts,
-         _FileParticleLayout_InitialiseParticles,
-         _FileParticleLayout_InitialiseParticle,
-         name,
-         False, 
-         NULL /* filename */ );
+	/* Variables set in this function */
+	SizeT                                                                _sizeOfSelf = sizeof(FileParticleLayout);
+	Type                                                                        type = FileParticleLayout_Type;
+	Stg_Class_DeleteFunction*                                                _delete = _FileParticleLayout_Delete;
+	Stg_Class_PrintFunction*                                                  _print = _FileParticleLayout_Print;
+	Stg_Class_CopyFunction*                                                    _copy = _FileParticleLayout_Copy;
+	Stg_Component_DefaultConstructorFunction*                    _defaultConstructor = _FileParticleLayout_DefaultNew;
+	Stg_Component_ConstructFunction*                                      _construct = _FileParticleLayout_AssignFromXML;
+	Stg_Component_BuildFunction*                                              _build = _FileParticleLayout_Build;
+	Stg_Component_InitialiseFunction*                                    _initialise = _FileParticleLayout_Initialise;
+	Stg_Component_ExecuteFunction*                                          _execute = _FileParticleLayout_Execute;
+	Stg_Component_DestroyFunction*                                          _destroy = _FileParticleLayout_Destroy;
+	AllocationType                                                nameAllocationType = NON_GLOBAL;
+	ParticleLayout_SetInitialCountsFunction*                       _setInitialCounts = _FileParticleLayout_SetInitialCounts;
+	ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles = _FileParticleLayout_InitialiseParticles;
+	CoordSystem                                                          coordSystem = GlobalCoordSystem;
+	Bool                                                 weightsInitialisedAtStartup = False;
+	GlobalParticleLayout_InitialiseParticleFunction*             _initialiseParticle = _FileParticleLayout_InitialiseParticle;
+	Particle_Index                                             totalInitialParticles = 0;
+	double                                            averageInitialParticlesPerCell = 0.0;
+	Name                                                                    filename = NULL;
+	Index                                                            checkpointfiles = 0;
+
+   return (void*)_FileParticleLayout_New(  FILEPARTICLELAYOUT_PASSARGS  );/* checkpointfiles_renamed*/
 }
 
-void _FileParticleLayout_Construct( void* particleLayout, Stg_ComponentFactory *cf, void* data ) {
+void _FileParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data ) {
    FileParticleLayout* self     = (FileParticleLayout*) particleLayout;
    Name                filename;
+   Index               checkpointfiles;
 
-   filename = Stg_ComponentFactory_GetString( cf, self->name, "filename", "Swarm.dat" );
-   
-   _FileParticleLayout_Init( self, filename );
+   _GlobalParticleLayout_AssignFromXML( self, cf, data );
+
+   filename = Stg_ComponentFactory_GetString( cf, self->name, "filename", "Swarm" );
+   checkpointfiles = Stg_ComponentFactory_GetInt( cf, self->name, "checkpointfiles", 1 );
+
+#ifdef READ_HDF5
+   /* if doing checkpoint restart, grab number of particles swarmdump previously stored against */
+   if( self->context->loadFromCheckPoint ) checkpointfiles = _FileParticleLayout_GetFileCountFromTimeInfoFile( self->context );
+
+   Journal_Firewall( checkpointfiles > 0, self->errorStream,
+		"Error in %s for %s '%s' - determined number of fileParticleLayout checkpoint files (%d) for reload is not valid.\n",
+		__func__,
+		self->type,
+		self->name,
+		checkpointfiles );
+#endif
+
+   _FileParticleLayout_Init( self, filename, checkpointfiles );
 }
    
 void _FileParticleLayout_Build( void* particleLayout, void* data ) {
 }
+
 void _FileParticleLayout_Initialise( void* particleLayout, void* data ) {
 }
+
 void _FileParticleLayout_Execute( void* particleLayout, void* data ) {
 }
+
 void _FileParticleLayout_Destroy( void* particleLayout, void* data ) {
+   FileParticleLayout*  self = (FileParticleLayout*)particleLayout;
+   Memory_Free( self->filename );
+
+   _GlobalParticleLayout_Destroy( self, data );
 }
 
 void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) {
@@ -215,11 +216,8 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
    Name                 filename     = self->filename;
    
 #ifdef READ_HDF5
-   hid_t                file, fileData, fileSpace;
+   hid_t                file;
    hid_t                group_id, attrib_id;
-   hsize_t              size[2];
-   char                 dataSpaceName[1024];
-   SwarmVariable*       swarmVar;
    Index                ii;
    int                  nParticles;
    herr_t               status;
@@ -236,15 +234,15 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
    Stream_IndentBranch( Swarm_Debug ); 
 
 #ifdef READ_HDF5
-   self->lastParticleIndex  = Memory_Alloc_Array( Index, swarm->checkpointnfiles, "lastParticleIndex" );
+   self->lastParticleIndex  = Memory_Alloc_Array( Index, self->checkpointfiles, "lastParticleIndex" );
    self->totalInitialParticles = 0;
-   for( ii = 1 ; ii <= swarm->checkpointnfiles ; ii++ ){
+   for( ii = 1 ; ii <= self->checkpointfiles ; ii++ ){
       char* filenameTemp = NULL;
       /* Open the swarm checkpointing file */
-      if(swarm->checkpointnfiles == 1)
+      if(self->checkpointfiles == 1)
          Stg_asprintf( &filenameTemp, "%s.h5", filename );
       else 
-         Stg_asprintf( &filenameTemp, "%s.%dof%d.h5", filename, ii, swarm->checkpointnfiles );
+         Stg_asprintf( &filenameTemp, "%s.%dof%d.h5", filename, ii, self->checkpointfiles );
       
       file = H5Fopen( filenameTemp, H5F_ACC_RDONLY, H5P_DEFAULT );
       Journal_Firewall( file >= 0,
@@ -263,31 +261,17 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
          group_id  = H5Gopen(file, "/", H5P_DEFAULT);
          attrib_id = H5Aopen(group_id, "Swarm Particle Count", H5P_DEFAULT);
       #endif
+       Journal_Firewall( attrib_id > 0,
+              self->errorStream,
+              "\nError in %s for %s '%s' - Swarm Particle Count group not present in checkpoint file %s.\n  Perhaps you are trying to restart from an old checkpoint file.",
+              __func__,
+              self->type,
+              self->name,
+              filenameTemp );
       status = H5Aread(attrib_id, H5T_NATIVE_INT, &nParticles);
       H5Aclose(attrib_id);
       H5Gclose(group_id);
 
-      /* The following conditional should be deprecated after a sufficient grace period to allow backwards
-         compatibility with previous implementations of checkpointing  JohnMansour 28042009 */
-      if(status < 0){
-         /* Open a dataspace */
-         swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, 0 );
-         sprintf( dataSpaceName, "/%s", swarmVar->name );
-         
-         #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-         fileData = H5Dopen( file, dataSpaceName );
-         #else
-         fileData = H5Dopen( file, dataSpaceName, H5P_DEFAULT );
-         #endif
-         fileSpace = H5Dget_space( fileData );
-         
-         /* Get the dimensions of the open dataspace */
-         H5Sget_simple_extent_dims( fileSpace, size, NULL );
-         H5Sclose( fileSpace );
-         H5Dclose( fileData );
-
-         nParticles = size[0];
-      }
       self->totalInitialParticles += nParticles;
       self->lastParticleIndex[ii-1] = self->totalInitialParticles;
       
@@ -354,7 +338,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
    SwarmVariable*         swarmVar;
    Index                  swarmVar_I;
    char                   dataSpaceName[1024];
-   hid_t                  file[swarm->checkpointnfiles];
+   hid_t                  file[self->checkpointfiles];
    Index                  ii, jj, kk;
    hid_t                  group_id, attrib_id;
    int                    nParticles;
@@ -362,23 +346,23 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
      
    /* Allocate space to store arrays of dataspaces */   
    assert( swarm->swarmVariable_Register );  
-   self->fileData  = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, swarm->checkpointnfiles, "fileData" );
-   self->fileSpace = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, swarm->checkpointnfiles, "fileSpace" );
+   self->fileData  = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, self->checkpointfiles, "fileData" );
+   self->fileSpace = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, self->checkpointfiles, "fileSpace" );
    /* set these spaces to null initially */
    for( jj = 0 ; jj < swarm->swarmVariable_Register->objects->count ; jj++)
-      for( kk = 0 ; kk < swarm->checkpointnfiles ; kk++){
+      for( kk = 0 ; kk < self->checkpointfiles ; kk++){
          self->fileData [jj][kk] = NULL;
          self->fileSpace[jj][kk] = NULL;
       }
       
    /* Open the files */
-   for( ii = 1 ; ii <= swarm->checkpointnfiles ; ii++ ){
+   for( ii = 1 ; ii <= self->checkpointfiles ; ii++ ){
       char*  filenameTemp = NULL;
       /* Open the swarm checkpointing file */
-      if(swarm->checkpointnfiles == 1)
+      if(self->checkpointfiles == 1)
          Stg_asprintf( &filenameTemp, "%s.h5", self->filename );
       else 
-         Stg_asprintf( &filenameTemp, "%s.%dof%d.h5", self->filename, ii, swarm->checkpointnfiles );
+         Stg_asprintf( &filenameTemp, "%s.%dof%d.h5", self->filename, ii, self->checkpointfiles );
 
       file[ii-1] = H5Fopen( filenameTemp, H5F_ACC_RDONLY, H5P_DEFAULT );
       Journal_Firewall( 
@@ -409,7 +393,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
             swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, swarmVar_I );
             
             if( swarmVar->isCheckpointedAndReloaded ) {
-               sprintf( dataSpaceName, "/%s", swarmVar->name );
+               sprintf( dataSpaceName, "/%s", swarmVar->name + strlen(swarm->name)+1 );
                
                #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
                   self->fileData[swarmVar_I][ii-1]  = H5Dopen( file[ii-1], dataSpaceName );
@@ -431,7 +415,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
    _GlobalParticleLayout_InitialiseParticles( self, _swarm );
 
    /* Close dataspaces and the file */
-   for( ii = 1 ; ii <= swarm->checkpointnfiles ; ii++ ){
+   for( ii = 1 ; ii <= self->checkpointfiles ; ii++ ){
       for( swarmVar_I = 0; swarmVar_I < swarm->swarmVariable_Register->objects->count; swarmVar_I++ ) {
          swarmVar = SwarmVariable_Register_GetByIndex( swarm->swarmVariable_Register, swarmVar_I );
          if( swarmVar->isCheckpointedAndReloaded ) {
@@ -464,16 +448,15 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
 }  
 	
 void _FileParticleLayout_InitialiseParticle( 
-      void*              particleLayout, 
-      void*              _swarm, 
-      Particle_Index     newParticle_I,
-      void*              particle )
+	void*              particleLayout, 
+	void*              _swarm, 
+	Particle_Index     newParticle_I,
+	void*              particle )
 {
-   FileParticleLayout*     self         = (FileParticleLayout*)particleLayout;
-   Swarm*                  swarm        = (Swarm*)_swarm;
-   SizeT                   particleSize = swarm->particleExtensionMgr->finalSize;
-   int                     result;
-   IntegrationPoint*       newParticle  = (IntegrationPoint*)particle;
+   FileParticleLayout*	self = (FileParticleLayout*)particleLayout;
+   Swarm*					swarm = (Swarm*)_swarm;
+   SizeT						particleSize; 
+   int						result;
 
 #ifdef READ_HDF5
    SwarmVariable*    swarmVar;
@@ -481,8 +464,10 @@ void _FileParticleLayout_InitialiseParticle(
    Index             ii;
    hid_t             memSpace; 
 
+	result = 0;
+	particleSize = 0;
    /* find out which file particle is contained within */
-   for( ii = 1 ; ii <= swarm->checkpointnfiles ; ii++ ){
+   for( ii = 1 ; ii <= self->checkpointfiles ; ii++ ){
       if( newParticle_I < self->lastParticleIndex[ii-1]) break;
    }
    self->start[0] = newParticle_I;
@@ -507,9 +492,7 @@ void _FileParticleLayout_InitialiseParticle(
             
             /* Read particle data. */
             H5Dread( self->fileData[swarmVar_I][ii-1], H5T_NATIVE_INT, memSpace, self->fileSpace[swarmVar_I][ii-1], H5P_DEFAULT, particleInfo );
-            
             Variable_SetValue( swarmVar->variable, swarm->particleLocalCount, particleInfo );
-            
             Memory_Free( particleInfo );
          }
         
@@ -518,9 +501,7 @@ void _FileParticleLayout_InitialiseParticle(
             
             /* Read particle data. */
             H5Dread( self->fileData[swarmVar_I][ii-1], H5T_NATIVE_CHAR, memSpace, self->fileSpace[swarmVar_I][ii-1], H5P_DEFAULT, particleInfo );
-            
             Variable_SetValue( swarmVar->variable, swarm->particleLocalCount, particleInfo );
-            
             Memory_Free( particleInfo );
          }
             
@@ -529,9 +510,7 @@ void _FileParticleLayout_InitialiseParticle(
             
             /* Read particle data. */
             H5Dread( self->fileData[swarmVar_I][ii-1], H5T_NATIVE_FLOAT, memSpace, self->fileSpace[swarmVar_I][ii-1], H5P_DEFAULT, particleInfo );
-            
             Variable_SetValue( swarmVar->variable, swarm->particleLocalCount, particleInfo );
-            
             Memory_Free( particleInfo );
          }
             
@@ -540,18 +519,16 @@ void _FileParticleLayout_InitialiseParticle(
             
             /* Read particle data. */
             H5Dread( self->fileData[swarmVar_I][ii-1], H5T_NATIVE_DOUBLE, memSpace, self->fileSpace[swarmVar_I][ii-1], H5P_DEFAULT, particleInfo );
-            
             Variable_SetValue( swarmVar->variable, swarm->particleLocalCount, particleInfo );
-            
             Memory_Free( particleInfo );
          }   
-         
          H5Sclose( memSpace );
       }
    }
       
 #else
-   result = fread( particle, particleSize, 1, self->file );
+  	particleSize = swarm->particleExtensionMgr->finalSize;
+	result = fread( particle, particleSize, 1, self->file );
 
    Journal_Firewall( 
       result == 1,
@@ -564,3 +541,47 @@ void _FileParticleLayout_InitialiseParticle(
       newParticle_I );
 #endif
 }
+
+#ifdef READ_HDF5
+Index _FileParticleLayout_GetFileCountFromTimeInfoFile( void* _context ){
+   AbstractContext*     context = (AbstractContext*)_context;
+   char*                timeInfoFileName = NULL;
+   char*                timeInfoFileNamePart = NULL;
+   Stream*              errorStr = Journal_Register( Error_Type, FileParticleLayout_Type );
+   hid_t                file, fileSpace, fileData;
+   Index                checkpointnproc;
+   
+   timeInfoFileNamePart = Context_GetCheckPointReadPrefixString( context );
+   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, context->restartTimestep );
+    
+   /* Open the file and data set. */
+   file = H5Fopen( timeInfoFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
+   Journal_Firewall( 
+      file >= 0, 
+      errorStr, "\n\nError- in %s(), Couldn't find checkpoint time info file with "
+      "filename \"%s\" - aborting.\n", __func__, timeInfoFileName );
+   
+   /* Read previous nproc from file */
+   #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+   fileData = H5Dopen( file, "/nproc" );
+   #else
+   fileData = H5Dopen( file, "/nproc", H5P_DEFAULT );
+   #endif
+   fileSpace = H5Dget_space( fileData );
+      
+   H5Dread( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, &checkpointnproc );
+      
+   H5Sclose( fileSpace );
+   H5Dclose( fileData );
+   
+   H5Fclose( file );
+      
+   Memory_Free( timeInfoFileName );
+   Memory_Free( timeInfoFileNamePart );
+   return checkpointnproc;
+}
+#endif
+
+
+
+

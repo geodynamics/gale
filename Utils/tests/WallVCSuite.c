@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 } WallVCSuiteData;
 
 void WallVCSuite_quadratic(Index index, Variable_Index var_I, void* context, void* result) {
@@ -58,19 +58,18 @@ void WallVCSuite_exponential(Index index, Variable_Index var_I, void* context, v
 	*(double *)result = 30.0;
 }
 
-
 Mesh* WallVCSuite_buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
 	CartesianGenerator*	gen;
 	Mesh*						mesh;
 	unsigned					maxDecomp[3] = {0, 1, 1};
 
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	gen->shadowDepth = 0;
 	CartesianGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, maxDecomp );
 	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
 
-	mesh = Mesh_New( "" );
+	mesh = Mesh_New( "", NULL );
 	Mesh_SetExtensionManagerRegister( mesh, emReg );
 	Mesh_SetGenerator( mesh, gen );
 
@@ -110,7 +109,6 @@ void WallVCSuite_TestWallVC( WallVCSuiteData* data ) {
 	ConditionFunction*				expCF;
 	ConditionFunction_Register*	conFunc_Register;
 	ExtensionManager_Register*		extensionMgr_Register;
-	DomainContext*						context;
 	Dictionary*							dictionary;
 	Stream*								stream;
 	XML_IO_Handler*					io_handler;
@@ -137,7 +135,7 @@ void WallVCSuite_TestWallVC( WallVCSuiteData* data ) {
    extensionMgr_Register = ExtensionManager_Register_New(); 
 
 	/* Create a mesh. */
-	mesh = (Mesh*) buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
+	mesh = (Mesh*) WallVCSuite_buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
    nDomains = Mesh_GetDomainSize( mesh, MT_VERTEX );
 
 	/* Create CF stuff */
@@ -153,18 +151,18 @@ void WallVCSuite_TestWallVC( WallVCSuiteData* data ) {
 	/* Create variables */
 	for (i = 0; i < 6; i++) {
 		array[i] = Memory_Alloc_Array( double, nDomains, "array[i]" );
-		var[i] = Variable_NewScalar( varName[i], Variable_DataType_Double, &nDomains, NULL, (void**)&array[i], 0 );
+		var[i] = Variable_NewScalar( varName[i], NULL, Variable_DataType_Double, &nDomains, NULL, (void**)&array[i], 0 );
 		Variable_Register_Add(variable_Register, var[i]);
 	}
 	array[6] = Memory_Alloc_Array( double, nDomains * 5, "array[6]" );
-	var[6] = Variable_NewVector( varName[6], Variable_DataType_Double, 5, &nDomains, NULL, (void**)&array[6], 0 );
+	var[6] = Variable_NewVector( varName[6], NULL, Variable_DataType_Double, 5, &nDomains, NULL, (void**)&array[6], 0 );
 	Variable_Register_Add(variable_Register, var[6]);
 	Variable_Register_BuildAll(variable_Register);
 
 	for (i = 0; i < 6; i++) {
 		Index j, k;
 
-		vc = (VariableCondition*) WallVC_New( vcKeyName[i], vcKey[i], variable_Register, conFunc_Register, dictionary, mesh );
+		vc = (VariableCondition*) WallVC_New( vcKeyName[i], NULL, vcKey[i], variable_Register, conFunc_Register, dictionary, mesh );
 		Stg_Component_Build( vc, 0, False );
 
 		for (j = 0; j < 6; j++)
@@ -216,6 +214,8 @@ void WallVCSuite_TestWallVC( WallVCSuiteData* data ) {
 		Stg_Class_Delete(var[i]);
 		if (array[i]) Memory_Free(array[i]);
 	}
+	Stg_Class_Delete(extensionMgr_Register);
+	Stg_Class_Delete(io_handler);
 	Stg_Class_Delete(conFunc_Register);
 	Stg_Class_Delete(quadCF);
 	Stg_Class_Delete(expCF);
@@ -229,3 +229,5 @@ void WallVCSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, WallVCSuite_Setup, WallVCSuite_Teardown );
    pcu_suite_addTest( suite, WallVCSuite_TestWallVC );
 }
+
+

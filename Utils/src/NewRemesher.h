@@ -39,12 +39,12 @@
  **
  **/
  
-#ifndef __StGermain_Domain_Utils_NewRemesher_h__
-#define __StGermain_Domain_Utils_NewRemesher_h__
+#ifndef __StgDomain_Utils_NewRemesher_h__
+#define __StgDomain_Utils_NewRemesher_h__
 
 #include "StGermain/Base/Foundation/ClassClear.h"
 #define CLASSDIR StgDomain/Utils
 #define CLASSNAME NewRemesher
 #include "StGermain/Base/Foundation/ClassHdr.h"
 
-#endif /* __StGermain_Domain_Utils_NewRemesher_h__ */
+#endif /* __StgDomain_Utils_NewRemesher_h__ */

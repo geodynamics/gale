@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_LineParticleLayout_h__
-#define __Domain_Swarm_LineParticleLayout_h__
+#ifndef __StgDomain_Swarm_LineParticleLayout_h__
+#define __StgDomain_Swarm_LineParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -59,35 +59,39 @@
 	
 	/* Create a new LineParticleLayout and initialise */
 	LineParticleLayout* LineParticleLayout_New(
-		Name                                             name,
-		Dimension_Index                                  dim,
-		Particle_Index                                   totalInitialParticles,
-		Index                                            vertexCount,
-		Coord*                                           vertexList );
+		Name             name,
+      AbstractContext* context,
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int     totalInitialParticles,
+      double           averageInitialParticlesPerCell,
+		Dimension_Index  dim,
+		Index            vertexCount,
+		Coord*           vertexList );
 
 	/* Creation implementation / Virtual constructor */
-	LineParticleLayout* _LineParticleLayout_New( 
-		SizeT                                            _sizeOfSelf,
-		Type                                             type,
-		Stg_Class_DeleteFunction*                        _delete,
-		Stg_Class_PrintFunction*                         _print,
-		Stg_Class_CopyFunction*                          _copy, 
-		Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-		Stg_Component_ConstructFunction*                 _construct,
-		Stg_Component_BuildFunction*                     _build,
-		Stg_Component_InitialiseFunction*                _initialise,
-		Stg_Component_ExecuteFunction*                   _execute,
-		Stg_Component_DestroyFunction*                   _destroy,
-		ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-		Name                                             name,
-		Bool                                             initFlag );
 	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LINEPARTICLELAYOUT_DEFARGS \
+                GLOBALPARTICLELAYOUT_DEFARGS, \
+                Dimension_Index          dim, \
+                Index            vertexCount, \
+                Coord*            vertexList
+
+	#define LINEPARTICLELAYOUT_PASSARGS \
+                GLOBALPARTICLELAYOUT_PASSARGS, \
+	        dim,         \
+	        vertexCount, \
+	        vertexList 
+
+   LineParticleLayout* _LineParticleLayout_New(  LINEPARTICLELAYOUT_DEFARGS  );
+
 	void _LineParticleLayout_Init( 
 		void*                                            particleLayout,
 		Dimension_Index                                  dim,
-		Particle_Index                                   totalInitialParticles,
 		Index                                            vertexCount,
 		Coord*                                           vertexList );
 	
@@ -102,7 +106,7 @@
 	
 	/* 'Stg_Component' Stuff */
 	void* _LineParticleLayout_DefaultNew( Name name ) ;
-	void _LineParticleLayout_Construct( void* particleLayout, Stg_ComponentFactory *cf, void* data );
+	void _LineParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data );
 	void _LineParticleLayout_Build( void* particleLayout, void* data );
 	void _LineParticleLayout_Initialise( void* particleLayout, void* data );
 	void _LineParticleLayout_Execute( void* particleLayout, void* data );
@@ -111,4 +115,5 @@
 	/* Initialises the coordinates of a cell's particle */
 	void _LineParticleLayout_InitialiseParticle( void* particleLayout, void* swarm, Particle_Index newParticle_I, void* particle);
 
-#endif /* __Domain_Swarm_LineParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_LineParticleLayout_h__ */
+

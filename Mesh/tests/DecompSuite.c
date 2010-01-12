@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned rank;
-	unsigned nProcs;
+	int		rank;
+	int		nProcs;
 } DecompSuiteData;
 
 void DecompSuite_Setup( DecompSuiteData* data ) {
@@ -120,3 +120,5 @@ void DecompSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, DecompSuite_Setup, DecompSuite_Teardown );
    pcu_suite_addTest( suite, DecompSuite_TestDecomp );
 }
+
+

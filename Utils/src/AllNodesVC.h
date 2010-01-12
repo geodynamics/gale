@@ -36,19 +36,17 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_AllNodesVC_h__
-#define __Domain_Utils_AllNodesVC_h__
+#ifndef __StgDomain_Utils_AllNodesVC_h__
+#define __StgDomain_Utils_AllNodesVC_h__
 	
 	
 	extern const Type AllNodesVC_Type;
 	
-	
 	#define __AllNodesVC_Entry \
-		Name				varName; \
-		VariableCondition_Value		value; \
+		Name							varName; \
+		VariableCondition_Value	value; \
 		
 	struct _AllNodesVC_Entry { __AllNodesVC_Entry };
-	
 	
 	#define __AllNodesVC \
 		/* General info */ \
@@ -57,87 +55,60 @@
 		/* Virtual info */ \
 		\
 		/* Stg_Class info */ \
-		Name				_dictionaryEntryName; \
-		AllNodesVC_Entry_Index		_entryCount; \
-		AllNodesVC_Entry*		_entryTbl; \
-		Mesh*				mesh;
+		Name							_dictionaryEntryName; \
+		AllNodesVC_Entry_Index	_entryCount; \
+		AllNodesVC_Entry*			_entryTbl; \
+		Mesh*							mesh;
 
 	struct _AllNodesVC { __AllNodesVC };
-	
-	
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
-	VariableCondition*		AllNodesVC_Factory(
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register, 
-						Dictionary*					dictionary,
-						void*						data );
+	VariableCondition* AllNodesVC_Factory(
+		AbstractContext*					context,
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register, 
+		Dictionary*							dictionary,
+		void*									data );
 	
-	AllNodesVC*			AllNodesVC_DefaultNew( Name name );
+	AllNodesVC* _AllNodesVC_DefaultNew( Name name );
 
-	AllNodesVC*			AllNodesVC_New(
-						Name						name,
-						Name						_dictionaryEntryName, 
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register,
-						Dictionary*					dictionary,
-						void*						mesh );
+	AllNodesVC* AllNodesVC_New(
+		Name									name,
+		AbstractContext*					context,
+		Name									_dictionaryEntryName, 
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register,
+		Dictionary*							dictionary,
+		void*									mesh );
 	
-	void				AllNodesVC_Init(
-						AllNodesVC*					self,
-						Name						name,
-						Name						_dictionaryEntryName, 
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register,
-						Dictionary*					dictionary,
-						void*						mesh );
 	
-	AllNodesVC*			_AllNodesVC_New( 
-						SizeT						_sizeOfSelf, 
-						Type						type,
-						Stg_Class_DeleteFunction*				_delete,
-						Stg_Class_PrintFunction*				_print,
-						Stg_Class_CopyFunction*				_copy, 
-						Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-						Stg_Component_ConstructFunction*		_construct,
-						Stg_Component_BuildFunction*			_build,
-						Stg_Component_InitialiseFunction*			_initialise,
-						Stg_Component_ExecuteFunction*			_execute,
-						Stg_Component_DestroyFunction*			_destroy,
-						Name								name,
-						Bool								initFlag,
-						VariableCondition_BuildSelfFunc*		_buildSelf, 
-						VariableCondition_PrintConciseFunc*		_printConcise,
-						VariableCondition_ReadDictionaryFunc*		_readDictionary,
-						VariableCondition_GetSetFunc*			_getSet,
-						VariableCondition_GetVariableCountFunc*		_getVariableCount,
-						VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-						VariableCondition_GetValueIndexFunc*		_getValueIndex,
-						VariableCondition_GetValueCountFunc*		_getValueCount,
-						VariableCondition_GetValueFunc*			_getValue,
-						VariableCondition_ApplyFunc*			_apply, 
-						Name									_dictionaryEntryName, 
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register,
-						Dictionary*					dictionary,
-						void*						mesh );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ALLNODESVC_DEFARGS \
+                VARIABLECONDITION_DEFARGS
+
+	#define ALLNODESVC_PASSARGS \
+                VARIABLECONDITION_PASSARGS
+
+	AllNodesVC* _AllNodesVC_New(  ALLNODESVC_DEFARGS  );
 	
-	void				_AllNodesVC_Init(
-						void*						allNodesVC, 
-						Name						_dictionaryEntryName, 
-						void*						mesh );
-	
+	void _AllNodesVC_Init( void* allNodesVC, Name _dictionaryEntryName, void* mesh );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** General virtual functions
 	*/
 	
-	void				_AllNodesVC_Delete( void* allNodesVC );
+	void _AllNodesVC_Delete( void* allNodesVC );
 	
-	void				_AllNodesVC_Print( void* allNodesVC, Stream* stream );
+	void _AllNodesVC_Print( void* allNodesVC, Stream* stream );
 	
+	void _AllNodesVC_Destroy( void* allNodesVC, void* data );
+
 	/* Copy */
 	#define AllNodesVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
@@ -146,7 +117,7 @@
 	
 	void* _AllNodesVC_Copy( void* allNodesVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
-	void				_AllNodesVC_Build( void* allNodesVC, void* data );
+	void _AllNodesVC_Build( void* allNodesVC, void* data );
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -158,31 +129,25 @@
 	** Virtual functions
 	*/
 	
-	void				_AllNodesVC_Construct( void* allNodesVC, Stg_ComponentFactory* cf, void* data ) ;
+	void _AllNodesVC_AssignFromXML( void* allNodesVC, Stg_ComponentFactory* cf, void* data ) ;
 	
-	void				_AllNodesVC_BuildSelf( void* allNodesVC, void* data );
+	void _AllNodesVC_BuildSelf( void* allNodesVC, void* data );
 	
-	void				_AllNodesVC_ReadDictionary( void* variableCondition, void* dictionary );
+	void _AllNodesVC_ReadDictionary( void* variableCondition, void* dictionary );
 	
-	IndexSet*			_AllNodesVC_GetSet( void* variableCondition );
+	IndexSet* _AllNodesVC_GetSet( void* variableCondition );
 	
 	VariableCondition_VariableIndex	_AllNodesVC_GetVariableCount( void* variableCondition, Index globalIndex );
 	
-	Variable_Index			_AllNodesVC_GetVariableIndex(
-						void*				variableCondition,
-						Index				globalIndex, 
-						VariableCondition_VariableIndex	varIndex );
+	Variable_Index _AllNodesVC_GetVariableIndex( void* variableCondition, Index globalIndex, VariableCondition_VariableIndex	varIndex );
 						
-	VariableCondition_ValueIndex	_AllNodesVC_GetValueIndex(
-						void*				variableCondition, 
-						Index				globalIndex, 
-						VariableCondition_VariableIndex	varIndex );
+	VariableCondition_ValueIndex _AllNodesVC_GetValueIndex( void* variableCondition, Index globalIndex, VariableCondition_VariableIndex	varIndex );
 						
-	VariableCondition_ValueIndex	_AllNodesVC_GetValueCount( void* variableCondition );
+	VariableCondition_ValueIndex _AllNodesVC_GetValueCount( void* variableCondition );
 	
-	VariableCondition_Value		_AllNodesVC_GetValue( void* variableCondition, VariableCondition_ValueIndex valIndex );
+	VariableCondition_Value _AllNodesVC_GetValue( void* variableCondition, VariableCondition_ValueIndex valIndex );
 	
-	void				_AllNodesVC_PrintConcise( void* variableCondition, Stream* stream );
+	void _AllNodesVC_PrintConcise( void* variableCondition, Stream* stream );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Build functions
@@ -194,4 +159,5 @@
 	*/
 
 	
-#endif /* __Domain_Utils_AllNodesVC_h__ */
+#endif /* __StgDomain_Utils_AllNodesVC_h__ */
+

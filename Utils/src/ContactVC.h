@@ -36,12 +36,11 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_ContactVC_h__
-#define __Domain_Utils_ContactVC_h__
+#ifndef __StgDomain_Utils_ContactVC_h__
+#define __StgDomain_Utils_ContactVC_h__
 	
 
 	extern const Type ContactVC_Type;
-	
 	
 	#define __ContactVC \
 		/* General info */ \
@@ -53,80 +52,54 @@
 		Bool deep;
 
 	struct _ContactVC { __ContactVC };
-	
-	
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructor
 	*/
 	
-	VariableCondition*	ContactVC_Factory(
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register, 
-						Dictionary*					dictionary,
-						void*						data );
+	VariableCondition* ContactVC_Factory(
+		AbstractContext*					context,
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register, 
+		Dictionary*							dictionary,
+		void*									data );
 	
-	ContactVC*				ContactVC_DefaultNew( Name name );
+	ContactVC* _ContactVC_DefaultNew( Name name );
 
-	ContactVC*				ContactVC_New(
-						Name						name,
-						Name						_dictionaryEntryName, 
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register, 
-						Dictionary*					dictionary,
-						void*						_mesh );
+	ContactVC* ContactVC_New(
+		Name									name,
+		AbstractContext*					context,
+		Name									_dictionaryEntryName, 
+		Variable_Register*				variable_Register, 
+		ConditionFunction_Register*	conFunc_Register, 
+		Dictionary*							dictionary,
+		void*									_mesh );
 	
-	void				ContactVC_Init(
-						ContactVC*						self,
-						Name						name,
-						Name						_dictionaryEntryName, 
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register, 
-						Dictionary*					dictionary,
-						void*						_mesh );
 	
-	ContactVC*				_ContactVC_New( 
-						SizeT						_sizeOfSelf, 
-						Type						type,
-						Stg_Class_DeleteFunction*				_delete,
-						Stg_Class_PrintFunction*				_print,
-						Stg_Class_CopyFunction*				_copy,
-						Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-						Stg_Component_ConstructFunction*			_construct,
-						Stg_Component_BuildFunction*			_build,
-						Stg_Component_InitialiseFunction*			_initialise,
-						Stg_Component_ExecuteFunction*			_execute,
-						Stg_Component_DestroyFunction*			_destroy,
-						Name						name, 
-						Bool						initFlag,
-						VariableCondition_BuildSelfFunc*		_buildSelf, 
-						VariableCondition_PrintConciseFunc*		_printConcise,
-						VariableCondition_ReadDictionaryFunc*		_readDictionary,
-						VariableCondition_GetSetFunc*			_getSet,
-						VariableCondition_GetVariableCountFunc*		_getVariableCount,
-						VariableCondition_GetVariableIndexFunc*		_getVariableIndex,
-						VariableCondition_GetValueIndexFunc*		_getValueIndex,
-						VariableCondition_GetValueCountFunc*		_getValueCount,
-						VariableCondition_GetValueFunc*			_getValue,
-						VariableCondition_ApplyFunc*			_apply, 
-						Name						_dictionaryEntryName, 
-						Variable_Register*				variable_Register, 
-						ConditionFunction_Register*			conFunc_Register, 
-						Dictionary*					dictionary,
-						void*						_mesh );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CONTACTVC_DEFARGS \
+                WALLVC_DEFARGS
+
+	#define CONTACTVC_PASSARGS \
+                WALLVC_PASSARGS
+
+	ContactVC* _ContactVC_New(  CONTACTVC_DEFARGS  );
 	
-	void				_ContactVC_Init(
-						void*						wallVC, 
-						Name						_dictionaryEntryName, 
-						void*						_mesh );
+	void _ContactVC_Init( void* wallVC, Name _dictionaryEntryName, void* _mesh );
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** General virtual functions
 	*/
 	
-	void				_ContactVC_Delete( void* wallVC );
+	void _ContactVC_Delete( void* wallVC );
 	
-	void				_ContactVC_Print( void* wallVC, Stream* stream );
+	void _ContactVC_Destroy( void* wallVC, void* data );
+
+	void _ContactVC_Print( void* wallVC, Stream* stream );
 	
 	/* Copy */
 	#define ContactVC_Copy( self ) \
@@ -136,7 +109,7 @@
 	
 	void* _ContactVC_Copy( void* wallVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
-	void				_ContactVC_Build(  void* wallVC, void* data );
+	void _ContactVC_Build(  void* wallVC, void* data );
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -148,11 +121,11 @@
 	** Virtual functions
 	*/
 	
-	void				_ContactVC_Construct( void* wallVC, Stg_ComponentFactory* cf, void* data );
+	void _ContactVC_AssignFromXML( void* wallVC, Stg_ComponentFactory* cf, void* data );
 	
-	void				_ContactVC_ReadDictionary( void* variableCondition, void* dictionary );
+	void _ContactVC_ReadDictionary( void* variableCondition, void* dictionary );
 	
-	IndexSet*			_ContactVC_GetSet( void* variableCondition );
+	IndexSet* _ContactVC_GetSet( void* variableCondition );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Build functions
@@ -164,4 +137,5 @@
 	*/
 
 	
-#endif /* __Domain_Utils_ContactVC_h__ */
+#endif /* __StgDomain_Utils_ContactVC_h__ */
+

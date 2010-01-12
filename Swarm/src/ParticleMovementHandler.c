@@ -56,11 +56,39 @@ const Type ParticleMovementHandler_Type = "ParticleMovementHandler";
 
 void *ParticleMovementHandler_DefaultNew( Name name )
 {
-	return _ParticleMovementHandler_New( sizeof(ParticleMovementHandler), ParticleMovementHandler_Type,
-		_ParticleMovementHandler_Delete, _ParticleMovementHandler_Print, _ParticleMovementHandler_CopyFunc,
-		(Stg_Component_DefaultConstructorFunction*)ParticleMovementHandler_DefaultNew,
-		_ParticleMovementHandler_Construct, _ParticleMovementHandler_Build, _ParticleMovementHandler_Initialise,
-		_ParticleMovementHandler_Execute, _ParticleMovementHandler_Destroy, name, False, False );
+	/* Variables set in this function */
+	SizeT                                                        _sizeOfSelf = sizeof(ParticleMovementHandler);
+	Type                                                                type = ParticleMovementHandler_Type;
+	Stg_Class_DeleteFunction*                                        _delete = _ParticleMovementHandler_Delete;
+	Stg_Class_PrintFunction*                                          _print = _ParticleMovementHandler_Print;
+	Stg_Class_CopyFunction*                                            _copy = _ParticleMovementHandler_CopyFunc;
+	Stg_Component_DefaultConstructorFunction*            _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)ParticleMovementHandler_DefaultNew;
+	Stg_Component_ConstructFunction*                              _construct = _ParticleMovementHandler_AssignFromXML;
+	Stg_Component_BuildFunction*                                      _build = _ParticleMovementHandler_Build;
+	Stg_Component_InitialiseFunction*                            _initialise = _ParticleMovementHandler_Initialise;
+	Stg_Component_ExecuteFunction*                                  _execute = _ParticleMovementHandler_Execute;
+	Stg_Component_DestroyFunction*                                  _destroy = _ParticleMovementHandler_Destroy;
+	Bool                                                            initFlag = False;
+	Bool                                       useGlobalFallbackCommStrategy = False;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType                                                                                        nameAllocationType = ZERO;
+	ParticleCommHandler_AllocateOutgoingCountArrays*                                            _allocateOutgoingCountArrays = ZERO;
+	ParticleCommHandler_AllocateOutgoingParticleArrays*                                      _allocateOutgoingParticleArrays = ZERO;
+	ParticleCommHandler_FreeOutgoingArrays*                                                              _freeOutgoingArrays = ZERO;
+	ParticleCommHandler_AllocateIncomingCountArrays*                                            _allocateIncomingCountArrays = ZERO;
+	ParticleCommHandler_AllocateIncomingParticleArrays*                                      _allocateIncomingParticleArrays = ZERO;
+	ParticleCommHandler_FreeIncomingArrays*                                                              _freeIncomingArrays = ZERO;
+	ParticleCommHandler_BeginReceiveOfIncomingParticleCounts*                          _beginReceiveOfIncomingParticleCounts = ZERO;
+	ParticleCommHandler_FinishReceiveOfIncomingParticleCounts*                        _finishReceiveOfIncomingParticleCounts = ZERO;
+	ParticleCommHandler_BeginReceiveOfIncomingParticles*                                    _beginReceiveOfIncomingParticles = ZERO;
+	ParticleCommHandler_FinishReceiveOfIncomingParticlesAndUpdateIndices*  _finishReceiveOfIncomingParticlesAndUpdateIndices = ZERO;
+	ParticleCommHandler_SendOutgoingParticleCounts*                                              _sendOutgoingParticleCounts = ZERO;
+	ParticleCommHandler_BeginSendingParticles*                                                        _beginSendingParticles = ZERO;
+	ParticleCommHandler_ConfirmOutgoingSendsCompleted*                                        _confirmOutgoingSendsCompleted = ZERO;
+	ParticleCommHandler_CommFunction*                                                                          _commFunction = ZERO;
+
+	return _ParticleMovementHandler_New(  PARTICLEMOVEMENTHANDLER_PASSARGS  );
 }
 
 
@@ -69,51 +97,65 @@ ParticleMovementHandler* ParticleMovementHandler_New(
 		Bool useGlobalFallbackCommStrategy
 		)
 {
-	return _ParticleMovementHandler_New( sizeof(ParticleMovementHandler), ParticleMovementHandler_Type,
-		_ParticleMovementHandler_Delete, _ParticleMovementHandler_Print, _ParticleMovementHandler_CopyFunc,
-		(Stg_Component_DefaultConstructorFunction*)ParticleMovementHandler_DefaultNew,
-		_ParticleMovementHandler_Construct, _ParticleMovementHandler_Build, _ParticleMovementHandler_Initialise,
-		_ParticleMovementHandler_Execute, _ParticleMovementHandler_Destroy, name, True,
-		useGlobalFallbackCommStrategy );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(ParticleMovementHandler);
+	Type                                                      type = ParticleMovementHandler_Type;
+	Stg_Class_DeleteFunction*                              _delete = _ParticleMovementHandler_Delete;
+	Stg_Class_PrintFunction*                                _print = _ParticleMovementHandler_Print;
+	Stg_Class_CopyFunction*                                  _copy = _ParticleMovementHandler_CopyFunc;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)ParticleMovementHandler_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _ParticleMovementHandler_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _ParticleMovementHandler_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _ParticleMovementHandler_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _ParticleMovementHandler_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _ParticleMovementHandler_Destroy;
+	Bool                                                  initFlag = True;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType                                                                                        nameAllocationType = ZERO;
+	ParticleCommHandler_AllocateOutgoingCountArrays*                                            _allocateOutgoingCountArrays = ZERO;
+	ParticleCommHandler_AllocateOutgoingParticleArrays*                                      _allocateOutgoingParticleArrays = ZERO;
+	ParticleCommHandler_FreeOutgoingArrays*                                                              _freeOutgoingArrays = ZERO;
+	ParticleCommHandler_AllocateIncomingCountArrays*                                            _allocateIncomingCountArrays = ZERO;
+	ParticleCommHandler_AllocateIncomingParticleArrays*                                      _allocateIncomingParticleArrays = ZERO;
+	ParticleCommHandler_FreeIncomingArrays*                                                              _freeIncomingArrays = ZERO;
+	ParticleCommHandler_BeginReceiveOfIncomingParticleCounts*                          _beginReceiveOfIncomingParticleCounts = ZERO;
+	ParticleCommHandler_FinishReceiveOfIncomingParticleCounts*                        _finishReceiveOfIncomingParticleCounts = ZERO;
+	ParticleCommHandler_BeginReceiveOfIncomingParticles*                                    _beginReceiveOfIncomingParticles = ZERO;
+	ParticleCommHandler_FinishReceiveOfIncomingParticlesAndUpdateIndices*  _finishReceiveOfIncomingParticlesAndUpdateIndices = ZERO;
+	ParticleCommHandler_SendOutgoingParticleCounts*                                              _sendOutgoingParticleCounts = ZERO;
+	ParticleCommHandler_BeginSendingParticles*                                                        _beginSendingParticles = ZERO;
+	ParticleCommHandler_ConfirmOutgoingSendsCompleted*                                        _confirmOutgoingSendsCompleted = ZERO;
+	ParticleCommHandler_CommFunction*                                                                          _commFunction = ZERO;
+
+	return _ParticleMovementHandler_New(  PARTICLEMOVEMENTHANDLER_PASSARGS  );
 }
 
 
-ParticleMovementHandler* _ParticleMovementHandler_New( 
-		SizeT                                                           _sizeOfSelf,
-		Type                                                            type,
-		Stg_Class_DeleteFunction*                                       _delete,
-		Stg_Class_PrintFunction*                                        _print,
-		Stg_Class_CopyFunction*                                         _copy, 
-		Stg_Component_DefaultConstructorFunction*                       _defaultConstructor,
-		Stg_Component_ConstructFunction*                                _construct,
-		Stg_Component_BuildFunction*                                    _build,
-		Stg_Component_InitialiseFunction*                               _initialise,
-		Stg_Component_ExecuteFunction*                                  _execute,
-		Stg_Component_DestroyFunction*                                  _destroy,
-		Name                                                            name,
-		Bool                                                            initFlag,
-		Bool                                                            useGlobalFallbackCommStrategy
-		 )
+ParticleMovementHandler* _ParticleMovementHandler_New(  PARTICLEMOVEMENTHANDLER_DEFARGS  )
 {
 	ParticleMovementHandler* self;
 	
 	/* Allocate memory */
-	self = (ParticleMovementHandler*)_ParticleCommHandler_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-		   _construct, _build, _initialise, _execute, _destroy, name, initFlag,
-		  _ParticleCommHandler_AllocateOutgoingCountArrays,
-		  _ParticleCommHandler_AllocateOutgoingParticlesArrays,
-		  _ParticleCommHandler_FreeOutgoingArrays,
-		  _ParticleCommHandler_AllocateIncomingCountArrays,
-		  _ParticleCommHandler_AllocateIncomingParticlesArrays,
-		  _ParticleCommHandler_FreeIncomingArrays,
-		  _ParticleCommHandler_BeginReceiveOfIncomingParticleCounts,
-		  _ParticleCommHandler_FinishReceiveOfIncomingParticleCounts,
-		  _ParticleCommHandler_BeginReceiveOfIncomingParticles,
-		  ParticleMovementHandler_FinishReceiveAndUpdateShadowParticlesEnteringMyDomain,
-		  _ParticleCommHandler_SendParticleTotalsInShadowCellsToNbrs,
-		  _ParticleCommHandler_BeginSendingParticlesInShadowCellsToNbrs,
-		  _ParticleCommHandler_ConfirmOutgoingSendsCompleted,
-		  ParticleMovementHandler_HandleParticleMovementBetweenProcs );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	_allocateOutgoingCountArrays                      = _ParticleCommHandler_AllocateOutgoingCountArrays;
+	_allocateOutgoingParticleArrays                   = _ParticleCommHandler_AllocateOutgoingParticlesArrays;
+	_freeOutgoingArrays                               = _ParticleCommHandler_FreeOutgoingArrays;
+	_allocateIncomingCountArrays                      = _ParticleCommHandler_AllocateIncomingCountArrays;
+	_allocateIncomingParticleArrays                   = _ParticleCommHandler_AllocateIncomingParticlesArrays;
+	_freeIncomingArrays                               = _ParticleCommHandler_FreeIncomingArrays;
+	_beginReceiveOfIncomingParticleCounts             = _ParticleCommHandler_BeginReceiveOfIncomingParticleCounts;
+	_finishReceiveOfIncomingParticleCounts            = _ParticleCommHandler_FinishReceiveOfIncomingParticleCounts;
+	_beginReceiveOfIncomingParticles                  = _ParticleCommHandler_BeginReceiveOfIncomingParticles;
+	_finishReceiveOfIncomingParticlesAndUpdateIndices = ParticleMovementHandler_FinishReceiveAndUpdateShadowParticlesEnteringMyDomain;
+	_sendOutgoingParticleCounts                       = _ParticleCommHandler_SendParticleTotalsInShadowCellsToNbrs;
+	_beginSendingParticles                            = _ParticleCommHandler_BeginSendingParticlesInShadowCellsToNbrs;
+	_confirmOutgoingSendsCompleted                    = _ParticleCommHandler_ConfirmOutgoingSendsCompleted;
+	_commFunction                                     = ParticleMovementHandler_HandleParticleMovementBetweenProcs;
+
+	self = (ParticleMovementHandler*)_ParticleCommHandler_New(  PARTICLECOMMHANDLER_PASSARGS  );
 	
 	/* General info */
 	/* Virtual info */
@@ -169,7 +211,7 @@ void* _ParticleMovementHandler_CopyFunc( void* particleMovementHandler, void* de
 		   nameExt, ptrMap );
 }
 
-void _ParticleMovementHandler_Construct( void* pCommsHandler, Stg_ComponentFactory* cf, void* data ){
+void _ParticleMovementHandler_AssignFromXML( void* pCommsHandler, Stg_ComponentFactory* cf, void* data ){
 	ParticleMovementHandler *self = (ParticleMovementHandler*)pCommsHandler;
 
 	self->isConstructed = True;
@@ -187,6 +229,9 @@ void _ParticleMovementHandler_Initialise( void* pCommsHandler, void *data ){
 void _ParticleMovementHandler_Execute( void* pCommsHandler, void *data ){
 	ParticleCommHandler*	self = (ParticleCommHandler*)pCommsHandler;
 	Swarm					*swarm = (Swarm*)data;
+
+	if( !swarm || !Stg_CheckType( swarm, Swarm ) )
+		return;
 
 	self->swarm = swarm;
 	self->_commFunction( self );	
@@ -955,4 +1000,6 @@ void ParticleMovementHandler_PrintParticleSlotsYetToFill( ParticleCommHandler* s
 	}
 	Journal_DPrintf( self->debug, "}\n" );
 }
+
+
 

@@ -40,8 +40,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_ShadowInfo_h__
-#define __Domain_Mesh_ShadowInfo_h__
+#ifndef __StgDomain_Swarm_ShadowInfo_h__
+#define __StgDomain_Swarm_ShadowInfo_h__
 
 struct ProcNbrInfo {
 	/** Count of neighbouring processors */
@@ -70,4 +70,4 @@ struct ShadowInfo {
 	DomainIndex**	procShadowTbl;
 };
 
-#endif /* __Domain_Mesh_ShadowInfo_h__ */
+#endif /* __StgDomain_Swarm_ShadowInfo_h__ */

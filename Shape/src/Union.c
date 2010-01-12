@@ -61,61 +61,20 @@ Union* Union_New(
 {
 	Union* self = (Union*)_Union_DefaultNew( name );
 
-	Union_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		shapeList,
-		shapeCount,
-		isComplement);
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma);
+	_Union_Init( self, shapeList, shapeCount, isComplement );
 	return self;
 }
 
-Union* _Union_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name )
+Union* _Union_New(  UNION_DEFARGS  )
 {
 	Union* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Union) );
-	self = (Union*)_Stg_Shape_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside ,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (Union*)_Stg_Shape_New(  STG_SHAPE_PASSARGS  );
 	
 	/* General info */
-
-	/* Virtual Info */
-	self->_isCoordInside = _isCoordInside;
 	
 	return self;
 }
@@ -132,24 +91,6 @@ void _Union_Init( void* combination,  Stg_Shape** shapeList, Index shapeCount, B
 }
 
 
-void Union_InitAll( 
-		void*                                 combination, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		Stg_Shape**                           shapeList,
-		Index                                 shapeCount,
-		Bool*                                 isComplement
-		)
-{
-	Union* self = (Union*)combination;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma);
-	_Union_Init( self, shapeList, shapeCount, isComplement );
-}
-	
 
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
@@ -159,8 +100,6 @@ void _Union_Delete( void* combination ) {
 	Union*       self = (Union*)combination;
 
 	Memory_Free( self->shapeList );
-	Memory_Free( self->isComplement );
-
 	/* Delete parent */
 	_Stg_Shape_Delete( self );
 }
@@ -172,8 +111,6 @@ void _Union_Print( void* combination, Stream* stream ) {
 	/* Print parent */
 	_Stg_Shape_Print( self, stream );
 }
-
-
 
 void* _Union_Copy( void* combination, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Union*	self = (Union*)combination;
@@ -195,26 +132,30 @@ void* _Union_Copy( void* combination, void* dest, Bool deep, Name nameExt, PtrMa
 }
 
 void* _Union_DefaultNew( Name name ) {
-	return (void*) _Union_New(
-			sizeof(Union),
-			Union_Type,
-			_Union_Delete,
-			_Union_Print,
-			_Union_Copy,
-			_Union_DefaultNew,
-			_Union_Construct,
-			_Union_Build,
-			_Union_Initialise,
-			_Union_Execute,
-			_Union_Destroy,
-			_Union_IsCoordInside,
-			_Union_CalculateVolume,
-			_Union_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(Union);
+	Type                                                          type = Union_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _Union_Delete;
+	Stg_Class_PrintFunction*                                    _print = _Union_Print;
+	Stg_Class_CopyFunction*                                      _copy = _Union_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _Union_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _Union_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _Union_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _Union_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _Union_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _Union_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _Union_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _Union_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _Union_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _Union_New(  UNION_PASSARGS  );
 }
 
 
-void _Union_Construct( void* combination, Stg_ComponentFactory* cf, void* data ) {
+void _Union_AssignFromXML( void* combination, Stg_ComponentFactory* cf, void* data ) {
 	Union*                  self       = (Union*)combination;
 	Index                   shapeCount;
 	Stg_Shape**             shapeList;
@@ -225,7 +166,7 @@ void _Union_Construct( void* combination, Stg_ComponentFactory* cf, void* data )
 	char*                   nameShape;
 	Stream*                 stream     = Journal_Register( Info_Type, CURR_MODULE_NAME );
 	
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	optionsList = Dictionary_Get( dictionary, "shapes" );
 
@@ -262,12 +203,21 @@ void _Union_Construct( void* combination, Stg_ComponentFactory* cf, void* data )
 
 void _Union_Build( void* combination, void* data ) {
 	Union*	self = (Union*)combination;
+   unsigned shape_I = 0;
+    
+   for( shape_I = 0 ; shape_I < self->shapeCount ; shape_I++ ) {
+      Stg_Component_Build( self->shapeList[shape_I], data, False );
+   }
 
 	_Stg_Shape_Build( self, data );
 }
 void _Union_Initialise( void* combination, void* data ) {
 	Union*	self = (Union*)combination;
-	
+	unsigned shape_I = 0;
+    
+   for( shape_I = 0 ; shape_I < self->shapeCount ; shape_I++ ) {
+      Stg_Component_Initialise( self->shapeList[shape_I], data, False );
+   }
 	_Stg_Shape_Initialise( self, data );
 }
 void _Union_Execute( void* combination, void* data ) {
@@ -277,7 +227,13 @@ void _Union_Execute( void* combination, void* data ) {
 }
 void _Union_Destroy( void* combination, void* data ) {
 	Union*	self = (Union*)combination;
-	
+	unsigned shape_I = 0;
+    
+   for( shape_I = 0 ; shape_I < self->shapeCount ; shape_I++ ) {
+      Stg_Component_Destroy( self->shapeList[shape_I], data, False );
+   }
+	Memory_Free( self->isComplement );
+
 	_Stg_Shape_Destroy( self, data );
 }
 
@@ -320,3 +276,5 @@ void _Union_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ) {
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }
 	
+
+

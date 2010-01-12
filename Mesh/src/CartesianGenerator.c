@@ -67,42 +67,48 @@ const Type CartesianGenerator_Type = "CartesianGenerator";
 ** Constructors
 */
 
-CartesianGenerator* CartesianGenerator_New( Name name ) {
-	return _CartesianGenerator_New( sizeof(CartesianGenerator), 
-					CartesianGenerator_Type, 
-					_CartesianGenerator_Delete, 
-					_CartesianGenerator_Print, 
-					NULL, 
-					(void* (*)(Name))_CartesianGenerator_New, 
-					_CartesianGenerator_Construct, 
-					_CartesianGenerator_Build, 
-					_CartesianGenerator_Initialise, 
-					_CartesianGenerator_Execute, 
-					_CartesianGenerator_Destroy, 
-					name, 
-					NON_GLOBAL, 
-					CartesianGenerator_SetDimSize, 
-					CartesianGenerator_Generate, 
-					_CartesianGenerator_SetTopologyParams, 
-					_CartesianGenerator_GenElements, 
-					_CartesianGenerator_GenFaces, 
-					_CartesianGenerator_GenEdges, 
-					_CartesianGenerator_GenVertices, 
-					_CartesianGenerator_GenElementVertexInc, 
-					_CartesianGenerator_GenVolumeEdgeInc, 
-					_CartesianGenerator_GenVolumeFaceInc, 
-					_CartesianGenerator_GenFaceVertexInc, 
-					_CartesianGenerator_GenFaceEdgeInc, 
-					_CartesianGenerator_GenEdgeVertexInc, 
-					_CartesianGenerator_GenElementTypes );
+CartesianGenerator* CartesianGenerator_New( Name name, AbstractContext* context ) {
+	/* Variables set in this function */
+	SizeT                                                    _sizeOfSelf = sizeof(CartesianGenerator);
+	Type                                                            type = CartesianGenerator_Type;
+	Stg_Class_DeleteFunction*                                    _delete = _CartesianGenerator_Delete;
+	Stg_Class_PrintFunction*                                      _print = _CartesianGenerator_Print;
+	Stg_Class_CopyFunction*                                        _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*        _defaultConstructor = (void* (*)(Name))_CartesianGenerator_New;
+	Stg_Component_ConstructFunction*                          _construct = _CartesianGenerator_AssignFromXML;
+	Stg_Component_BuildFunction*                                  _build = _CartesianGenerator_Build;
+	Stg_Component_InitialiseFunction*                        _initialise = _CartesianGenerator_Initialise;
+	Stg_Component_ExecuteFunction*                              _execute = _CartesianGenerator_Execute;
+	Stg_Component_DestroyFunction*                              _destroy = _CartesianGenerator_Destroy;
+	AllocationType                                    nameAllocationType = NON_GLOBAL;
+	MeshGenerator_SetDimSizeFunc*                         setDimSizeFunc = CartesianGenerator_SetDimSize;
+	MeshGenerator_GenerateFunc*                             generateFunc = CartesianGenerator_Generate;
+	CartesianGenerator_SetTopologyParamsFunc*      setTopologyParamsFunc = _CartesianGenerator_SetTopologyParams;
+	CartesianGenerator_GenElementsFunc*                  genElementsFunc = _CartesianGenerator_GenElements;
+	CartesianGenerator_GenFacesFunc*                        genFacesFunc = _CartesianGenerator_GenFaces;
+	CartesianGenerator_GenEdgesFunc*                        genEdgesFunc = _CartesianGenerator_GenEdges;
+	CartesianGenerator_GenVerticesFunc*                  genVerticesFunc = _CartesianGenerator_GenVertices;
+	CartesianGenerator_GenElementVertexIncFunc*  genElementVertexIncFunc = _CartesianGenerator_GenElementVertexInc;
+	CartesianGenerator_GenVolumeEdgeIncFunc*        genVolumeEdgeIncFunc = _CartesianGenerator_GenVolumeEdgeInc;
+	CartesianGenerator_GenVolumeFaceIncFunc*        genVolumeFaceIncFunc = _CartesianGenerator_GenVolumeFaceInc;
+	CartesianGenerator_GenFaceVertexIncFunc*        genFaceVertexIncFunc = _CartesianGenerator_GenFaceVertexInc;
+	CartesianGenerator_GenFaceEdgeIncFunc*            genFaceEdgeIncFunc = _CartesianGenerator_GenFaceEdgeInc;
+	CartesianGenerator_GenEdgeVertexIncFunc*        genEdgeVertexIncFunc = _CartesianGenerator_GenEdgeVertexInc;
+	CartesianGenerator_GenElementTypesFunc*          genElementTypesFunc = _CartesianGenerator_GenElementTypes;
+
+	CartesianGenerator* self = _CartesianGenerator_New(  CARTESIANGENERATOR_PASSARGS  );
+	/* CartesianGenerator info */
+   _MeshGenerator_Init( (MeshGenerator*)self, context );
+	_CartesianGenerator_Init( self );
+   return self;
 }
 
-CartesianGenerator* _CartesianGenerator_New( CARTESIANGENERATOR_DEFARGS ) {
+CartesianGenerator* _CartesianGenerator_New(  CARTESIANGENERATOR_DEFARGS  ) {
 	CartesianGenerator* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(CartesianGenerator) );
-	self = (CartesianGenerator*)_MeshGenerator_New( MESHGENERATOR_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(CartesianGenerator) );
+	self = (CartesianGenerator*)_MeshGenerator_New(  MESHGENERATOR_PASSARGS  );
 
 	/* Virtual info */
 	self->setTopologyParamsFunc = setTopologyParamsFunc;
@@ -118,8 +124,6 @@ CartesianGenerator* _CartesianGenerator_New( CARTESIANGENERATOR_DEFARGS ) {
 	self->genEdgeVertexIncFunc = genEdgeVertexIncFunc;
 	self->genElementTypesFunc = genElementTypesFunc;
 
-	/* CartesianGenerator info */
-	_CartesianGenerator_Init( self );
 
 	return self;
 }
@@ -161,9 +165,6 @@ void _CartesianGenerator_Init( CartesianGenerator* self ) {
 
 void _CartesianGenerator_Delete( void* meshGenerator ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-
-	CartesianGenerator_Destruct( self );
-
 	/* Delete the parent. */
 	_MeshGenerator_Delete( self );
 }
@@ -182,30 +183,25 @@ void _CartesianGenerator_Print( void* meshGenerator, Stream* stream ) {
 	_MeshGenerator_Print( self, stream );
 }
 
-void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, void* data ) {
-	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-	Dictionary*		dict;
+void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactory* cf, void* data ) {
+	CartesianGenerator*		self = (CartesianGenerator*)meshGenerator;
+	Dictionary*					dict;
 	Dictionary_Entry_Value*	tmp;
-	char*			rootKey;
+	char*							rootKey;
 	Dictionary_Entry_Value*	sizeList;
 	Dictionary_Entry_Value	*minList, *maxList;
-	unsigned		maxDecompDims;
-	unsigned		*minDecomp, *maxDecomp;
-	double			*crdMin, *crdMax;
-	unsigned*		size;
-	unsigned		shadowDepth;
-	Stream*			stream;
-	Stream*			errorStream = Journal_Register( Error_Type, self->type );
-	unsigned		d_i, i;
-	unsigned 		restartTimestep;
-	char*			checkpointPath;
-	char*			checkpointPrefix;
-	Index                   meshStrLen;
+	unsigned						maxDecompDims;
+	unsigned						*minDecomp, *maxDecomp;
+	double						*crdMin, *crdMax;
+	unsigned*					size;
+	unsigned						shadowDepth;
+	Stream*						stream;
+	Stream*						errorStream = Journal_Register( Error_Type, self->type );
+	unsigned						d_i;
+	unsigned						restartTimestep;
    AbstractContext*        context;	
 #ifdef READ_HDF5
 	hid_t file, fileData;
-	hid_t             props;
-	double      temp1[3], temp2[3];
 #endif
 	
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
@@ -215,7 +211,7 @@ void _CartesianGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* c
    context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ) ;
 
 	/* Call parent construct. */
-	_MeshGenerator_Construct( self, cf, data );
+	_MeshGenerator_AssignFromXML( self, cf, data );
 
 	/* Rip out the components structure as a dictionary. */
 	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
@@ -506,6 +502,11 @@ void _CartesianGenerator_Execute( void* meshGenerator, void* data ) {
 }
 
 void _CartesianGenerator_Destroy( void* meshGenerator, void* data ) {
+   CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
+   CartesianGenerator_Destruct( self );
+
+   /* Destroy Parent */
+   _MeshGenerator_Destroy( self, data );
 }
 
 void CartesianGenerator_SetDimSize( void* meshGenerator, unsigned nDims ) {
@@ -571,41 +572,33 @@ void CartesianGenerator_Generate( void* meshGenerator, void* _mesh, void* data )
 
 	/* Add extensions to the mesh and fill with cartesian information. */
 	ExtensionManager_Add( mesh->info, "vertexGrid", sizeof(Grid*) );
-	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, 
-					     ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
 	*grid = Grid_New();
 	Grid_SetNumDims( *grid, self->vertGrid->nDims );
 	Grid_SetSizes( *grid, self->vertGrid->sizes );
 
 	ExtensionManager_Add( mesh->info, "elementGrid", sizeof(Grid*) );
-	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, 
-					     ExtensionManager_GetHandle( mesh->info, "elementGrid" ) );
+	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "elementGrid" ) );
 	*grid = Grid_New();
 	Grid_SetNumDims( *grid, self->elGrid->nDims );
 	Grid_SetSizes( *grid, self->elGrid->sizes );
 
 	ExtensionManager_AddArray( mesh->info, "localOrigin", sizeof(unsigned), Mesh_GetDimSize( mesh ) );
-	localOrigin = (unsigned*)ExtensionManager_Get( mesh->info, mesh, 
-						       ExtensionManager_GetHandle( mesh->info, "localOrigin" ) );
+	localOrigin = (unsigned*)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "localOrigin" ) );
 	memcpy( localOrigin, self->origin, Mesh_GetDimSize( mesh ) * sizeof(unsigned) );
 
 	ExtensionManager_AddArray( mesh->info, "localRange", sizeof(unsigned), Mesh_GetDimSize( mesh ) );
-	localRange = (unsigned*)ExtensionManager_Get( mesh->info, mesh, 
-						      ExtensionManager_GetHandle( mesh->info, "localRange" ) );
+	localRange = (unsigned*)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "localRange" ) );
 	memcpy( localRange, self->range, Mesh_GetDimSize( mesh ) * sizeof(unsigned) );
 
 	ExtensionManager_AddArray( mesh->info, "periodic", sizeof(Bool), 3 );
-	periodic = (int*)ExtensionManager_Get(
-		mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "periodic" )
-		);
+	periodic = (Bool*)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "periodic" ));
 	memcpy( periodic, self->periodic, 3 * sizeof(Bool) );
 
 	Stream_UnIndent( stream );
 }
 
-void _CartesianGenerator_SetTopologyParams( void* meshGenerator, unsigned* sizes, 
-					    unsigned maxDecompDims, unsigned* minDecomp, unsigned* maxDecomp )
-{
+void _CartesianGenerator_SetTopologyParams( void* meshGenerator, unsigned* sizes, unsigned maxDecompDims, unsigned* minDecomp, unsigned* maxDecomp ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	unsigned		d_i;
 
@@ -700,7 +693,7 @@ void _CartesianGenerator_GenVertices( void* meshGenerator, IGraph* topo, Grid***
 	Grid*			grid;
 	unsigned		nEls;
 	unsigned		nLocals, *locals;
-	unsigned		nRemotes, *remotes;
+	unsigned		nRemotes/*, *remotes*/;
 	unsigned		*dstArray, *dstCount;
 	unsigned		*dimInds, *rankInds;
 	unsigned		d_i, e_i;
@@ -1291,13 +1284,13 @@ void _CartesianGenerator_GenFaceEdgeInc( void* meshGenerator, IGraph* topo, Grid
 }
 
 void _CartesianGenerator_GenEdgeVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
-	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-	Stream*			stream = Journal_Register( Info_Type, self->type );
-	unsigned		nIncEls;
-	unsigned*		incEls;
-	unsigned*		dimInds;
-	Sync*			sync;
-	unsigned		e_i;
+   CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
+   Stream*			stream = Journal_Register( Info_Type, self->type );
+   unsigned		nIncEls;
+   unsigned*		incEls;
+   unsigned*		dimInds;
+   const Sync* sync;
+   unsigned		e_i;
 
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
 	assert( topo );
@@ -1382,7 +1375,7 @@ void _CartesianGenerator_GenElementTypes( void* meshGenerator, Mesh* mesh ) {
 		mesh->elTypeMap[e_i] = 0;
 
 	if( self->regular )
-		Mesh_SetAlgorithms( mesh, Mesh_RegularAlgorithms_New( "" ) );
+		Mesh_SetAlgorithms( mesh, Mesh_RegularAlgorithms_New( "", NULL ) );
 
 	MPI_Barrier( self->mpiComm );
 	Journal_Printf( stream, "... element types are '%s',\n", mesh->elTypes[0]->type );
@@ -1631,7 +1624,7 @@ void CartesianGenerator_RecurseDecomps( CartesianGenerator* self,
 
 void CartesianGenerator_GenTopo( CartesianGenerator* self, IGraph* topo ) {
 	Grid***		grids;
-	Comm*		comm;
+	const Comm* comm;
 	unsigned	d_i, d_j;
 
 	assert( self );
@@ -1998,14 +1991,14 @@ void CartesianGenerator_GenBndVerts( CartesianGenerator* self, IGraph* topo, Gri
 }
 
 void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGraph* topo, Grid*** grids ) {
-	Stream*		stream = Journal_Register( Info_Type, self->type );
-	Sync*		sync;
-	unsigned	nDims;
-	unsigned	nVerts;
-	unsigned*	inds;
-	unsigned	*nNbrs, **nbrs;
-	unsigned	domain, global;
-	unsigned	v_i;
+   Stream*		stream = Journal_Register( Info_Type, self->type );
+   const Sync* sync;
+   unsigned	nDims;
+   unsigned	nVerts;
+   unsigned*	inds;
+   unsigned	*nNbrs, **nbrs;
+   unsigned	domain, global;
+   unsigned	v_i;
 
 	assert( self );
 	assert( topo );
@@ -2120,7 +2113,6 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
 	Stream*			   stream = Journal_Register( Info_Type, self->type );
 	Sync*			      sync;
 	AbstractContext* 	context = (AbstractContext*)data;
-	Index			      meshStrLen;
 	
 	assert( self );
 	assert( mesh );
@@ -2236,9 +2228,9 @@ void CartesianGenerator_DestructTopology( CartesianGenerator* self ) {
 	self->maxDecompDims = 0;
 	memset( self->minDecomp, 0, self->nDims * sizeof(unsigned) );
 	memset( self->maxDecomp, 0, self->nDims * sizeof(unsigned) );
-	KillObject( self->vertGrid );
-	KillObject( self->elGrid );
-	KillObject( self->procGrid );
+	FreeObject( self->vertGrid );
+	FreeObject( self->elGrid );
+	FreeObject( self->procGrid );
 	KillArray( self->origin );
 	KillArray( self->range );
 	KillArray( self->vertOrigin );
@@ -2253,7 +2245,7 @@ void CartesianGenerator_DestructGeometry( CartesianGenerator* self ) {
 }
 
 #ifdef READ_HDF5
-void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, char* filename ){
+void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, const char* filename ){
 	hid_t             file, fileSpace, fileData;
 	hsize_t           start[2], count[2], size[2], maxSize[2];   
 	hid_t             memSpace, error;
@@ -2261,12 +2253,11 @@ void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, cha
    Node_LocalIndex   lNode_I = 0;
 	Node_GlobalIndex  gNode_I = 0;
    int               totalVerts, ii;
-   hid_t             props;
-   unsigned int noffset;
+   unsigned int		noffset;
    MeshCheckpointFileVersion ver;
-   hid_t   attrib_id, group_id;
-   herr_t  status;
-   char* verticeName;
+   hid_t					attrib_id, group_id;
+   herr_t				status;
+   char*					verticeName;
 	Stream*			   errorStream = Journal_Register( Error_Type, self->type );   
 
    /* Open the file and data set. */
@@ -2435,7 +2426,7 @@ void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, cha
 }
 #endif
 
-void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, char* filename ){
+void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, const char* filename ){
    int               proc_I;
 	Node_LocalIndex   lNode_I = 0;
 	Node_GlobalIndex  gNode_I = 0;
@@ -2484,3 +2475,5 @@ void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, cha
    }
 
 }
+
+

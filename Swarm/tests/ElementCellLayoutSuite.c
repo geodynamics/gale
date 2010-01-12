@@ -54,33 +54,35 @@ typedef struct {
 	Mesh*								mesh;
 	ElementCellLayout*			elementCellLayout;
 	MPI_Comm							comm;
-	unsigned int					rank;
-	unsigned int					nProcs;
+	int								rank;
+	int								nProcs;
 } ElementCellLayoutSuiteData;
 
-Mesh* buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
+Mesh* ElementCellLayout_BuildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg ) {
 	CartesianGenerator*	gen;
 	Mesh*						mesh;
 	unsigned					maxDecomp[3] = {1, 0, 1};
 
-	gen = CartesianGenerator_New( "" );
+	gen = CartesianGenerator_New( "", NULL );
 	CartesianGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetTopologyParams( gen, size, 0, NULL, maxDecomp );
 	CartesianGenerator_SetGeometryParams( gen, minCrds, maxCrds );
 
-	mesh = Mesh_New( "" );
+	mesh = Mesh_New( "", NULL );
 	Mesh_SetExtensionManagerRegister( mesh, emReg );
 	Mesh_SetGenerator( mesh, gen );
 
 	Stg_Component_Build( mesh, NULL, False );
 	Stg_Component_Initialise( mesh, NULL, False );
 
-	KillObject( mesh->generator );
+	FreeObject( mesh->generator );
 
 	return mesh;
 }
 
 void ElementCellLayoutSuite_Setup( ElementCellLayoutSuiteData* data ) {
+	Journal_Enable_AllTypedStream( False );
+
 	/* MPI Initializations */	
 	data->comm = MPI_COMM_WORLD;  
 	MPI_Comm_rank( data->comm, &data->rank );
@@ -99,30 +101,33 @@ void ElementCellLayoutSuite_Setup( ElementCellLayoutSuiteData* data ) {
 
 	/* Init mesh */
 	data->extensionMgr_Register = ExtensionManager_Register_New();
-	data->mesh = buildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, data->extensionMgr_Register );
+	data->mesh = ElementCellLayout_BuildMesh( data->nDims, data->meshSize, data->minCrds, data->maxCrds, data->extensionMgr_Register );
 	
 	/* Configure the element-cell-layout */
-	data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", data->mesh );
+	data->elementCellLayout = ElementCellLayout_New( "elementCellLayout", NULL, data->mesh );
+   Stg_Component_Build( data->elementCellLayout, NULL, False );
+   Stg_Component_Initialise( data->elementCellLayout, NULL, False );
 }
 
 void ElementCellLayoutSuite_Teardown( ElementCellLayoutSuiteData* data ) {
 	/* Destroy stuff */
-	Stg_Class_Delete( data->elementCellLayout );
-	Stg_Class_Delete( data->mesh );
 	Stg_Class_Delete( data->extensionMgr_Register );
+	Stg_Component_Destroy( data->elementCellLayout, NULL, True );
+	/*Stg_Component_Destroy( data->mesh, NULL, True );*/
+
+	Journal_Enable_AllTypedStream( True );
 }
 
 void ElementCellLayoutSuite_TestElementCellLayout( ElementCellLayoutSuiteData* data ) {
+	int						procToWatch = data->nProcs > 1 ? 1 : 0;
 	Cell_Index				cell;
 	Element_DomainIndex	element;
 	GlobalParticle			testParticle;
 		
-	if( data->rank == 0 ) {
+	if( data->rank == procToWatch ) {
 		for( element = 0; element < Mesh_GetLocalSize( data->mesh, data->nDims ); element++ ) {
-			Cell_PointIndex	point;
 			Cell_PointIndex	count;
 			double***			cellPoints;
-			Bool					result;
 	
 			cell = CellLayout_MapElementIdToCellId( data->elementCellLayout, element );
 
@@ -154,3 +159,5 @@ void ElementCellLayoutSuite( pcu_suite_t* suite ) {
 	pcu_suite_setFixtures( suite, ElementCellLayoutSuite_Setup, ElementCellLayoutSuite_Teardown );
 	pcu_suite_addTest( suite, ElementCellLayoutSuite_TestElementCellLayout );
 }
+
+

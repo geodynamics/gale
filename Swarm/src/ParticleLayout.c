@@ -44,127 +44,114 @@
 
 const Type ParticleLayout_Type = "ParticleLayout";
 
-ParticleLayout* _ParticleLayout_New( 
-                SizeT                                       _sizeOfSelf,
-                Type                                        type,
-                Stg_Class_DeleteFunction*                   _delete,
-                Stg_Class_PrintFunction*                    _print,
-                Stg_Class_CopyFunction*                     _copy,
-                Stg_Component_DefaultConstructorFunction*   _defaultConstructor,
-                Stg_Component_ConstructFunction*            _construct,
-                Stg_Component_BuildFunction*                _build,
-                Stg_Component_InitialiseFunction*           _initialise,
-                Stg_Component_ExecuteFunction*              _execute,
-                Stg_Component_DestroyFunction*              _destroy,
-                ParticleLayout_SetInitialCountsFunction*    _setInitialCounts,
-                ParticleLayout_InitialiseParticlesFunction* _initialiseParticles,
-                Name                                        name,
-                Bool                                        initFlag,
-		CoordSystem                                 coordSystem,
-                Bool                                        weightsInitialisedAtStartup )
+ParticleLayout* _ParticleLayout_New(  PARTICLELAYOUT_DEFARGS  )
 {
-	ParticleLayout*		self;
+   ParticleLayout*		self;
 	
-	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(ParticleLayout) );
-	self = (ParticleLayout*)_Stg_Component_New( 
-			_sizeOfSelf, 
-			type, 
-			_delete, 
-			_print, 
-			_copy, 
-			_defaultConstructor,
-		   	_construct, 
-			_build, 
-			_initialise, 
-			_execute, 
-			_destroy, 
-			name, 
-			NON_GLOBAL );
+   /* hard-wire this var */
+   nameAllocationType = NON_GLOBAL;
+
+   /* Allocate memory */
+   assert( _sizeOfSelf >= sizeof(ParticleLayout) );
+   self = (ParticleLayout*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
-	/* General info */
+   /* General info */
+   self->coordSystem = coordSystem;	
+   self->weightsInitialisedAtStartup = weightsInitialisedAtStartup;	
+
+   /* Virtual functions */
+   self->_setInitialCounts = _setInitialCounts;
+   self->_initialiseParticles = _initialiseParticles;
 	
-	/* Virtual functions */
-	self->_setInitialCounts = _setInitialCounts;
-	self->_initialiseParticles = _initialiseParticles;
-	
-	if( initFlag ){
-		_ParticleLayout_Init( self, coordSystem, weightsInitialisedAtStartup );
-	}
-	
-	return self;
+    return self;
 }
 
 
 void _ParticleLayout_Init( 
-		void*           particleLayout, 
-		CoordSystem     coordSystem,
-		Bool            weightsInitialisedAtStartup ) 
+   void*           particleLayout, 
+   AbstractContext* context,
+   CoordSystem     coordSystem,
+   Bool            weightsInitialisedAtStartup ) 
 { 
-	ParticleLayout* self = (ParticleLayout*)particleLayout;
-	self->isConstructed  = True;
+   ParticleLayout* self = (ParticleLayout*)particleLayout;
 
-	self->debug = Stream_RegisterChild( Swarm_Debug, self->type );
+   self->context = context;
+   self->debug = Stream_RegisterChild( Swarm_Debug, self->type );
 
-	self->coordSystem = coordSystem;
-	self->weightsInitialisedAtStartup = weightsInitialisedAtStartup;
+   self->coordSystem = coordSystem;
+   self->weightsInitialisedAtStartup = weightsInitialisedAtStartup;
 }
 
 void _ParticleLayout_Delete( void* particleLayout ) {
-	ParticleLayout* self = (ParticleLayout*)particleLayout;
+    ParticleLayout* self = (ParticleLayout*)particleLayout;
 	
-	/* Stg_Class_Delete parent class */
-	_Stg_Component_Delete( self );
+    /* Stg_Class_Delete parent class */
+    _Stg_Component_Delete( self );
 }
 
 void _ParticleLayout_Print( void* particleLayout, Stream* stream ) {
-	ParticleLayout* self = (ParticleLayout*)particleLayout;
+    ParticleLayout* self = (ParticleLayout*)particleLayout;
 	
-	Journal_Printf( stream, "ParticleLayout (ptr): %p\n", self );
+    Journal_Printf( stream, "ParticleLayout (ptr): %p\n", self );
 	
-	/* Parent class info */
-	_Stg_Class_Print( self, stream );
+    /* Parent class info */
+    _Stg_Class_Print( self, stream );
 	
-	/* Virtual info */
-	Journal_Printf( stream, "\t_setInitialCounts (func ptr): %p\n", self->_setInitialCounts );
-	Journal_Printf( stream, "\t_initialiseParticles (func ptr): %p\n", self->_initialiseParticles );
+    /* Virtual info */
+    Journal_Printf( stream, "\t_setInitialCounts (func ptr): %p\n", self->_setInitialCounts );
+    Journal_Printf( stream, "\t_initialiseParticles (func ptr): %p\n", self->_initialiseParticles );
 	
-	/* ParticleLayout info */
-	Journal_Printf( 
-		stream, 
-		"\tcoordSystem: %s\n", 
-		( self->coordSystem == LocalCoordSystem ) ? "LocalCoordSystem" : "GlobalCoordSystem" );
-	Journal_Printf( 
-		stream, 
-		"\tweightsInitialisedAtStartup : %s\n",
-		self->weightsInitialisedAtStartup ? "True" : "False" );
+    /* ParticleLayout info */
+    Journal_Printf( 
+        stream, 
+        "\tcoordSystem: %s\n", 
+        ( self->coordSystem == LocalCoordSystem ) ? "LocalCoordSystem" : "GlobalCoordSystem" );
+    Journal_Printf( 
+        stream, 
+        "\tweightsInitialisedAtStartup : %s\n",
+        self->weightsInitialisedAtStartup ? "True" : "False" );
 }
 
 
 void* _ParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-	ParticleLayout*		self = (ParticleLayout*)particleLayout;
-	ParticleLayout*		newParticleLayout;
+    ParticleLayout*		self = (ParticleLayout*)particleLayout;
+    ParticleLayout*		newParticleLayout;
 	
-	newParticleLayout = _Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
+    newParticleLayout = _Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
 	
-	/* Virtual methods */
-	newParticleLayout->_setInitialCounts = self->_setInitialCounts;
-	newParticleLayout->_initialiseParticles = self->_initialiseParticles;
-	newParticleLayout->coordSystem = self->coordSystem;
-	newParticleLayout->weightsInitialisedAtStartup = self->weightsInitialisedAtStartup;
+    /* Virtual methods */
+    newParticleLayout->_setInitialCounts = self->_setInitialCounts;
+    newParticleLayout->_initialiseParticles = self->_initialiseParticles;
+    newParticleLayout->coordSystem = self->coordSystem;
+    newParticleLayout->weightsInitialisedAtStartup = self->weightsInitialisedAtStartup;
 
-	return (void*)newParticleLayout;
+    return (void*)newParticleLayout;
 }
 
+void _ParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data ) {
+   ParticleLayout* self = (ParticleLayout*) particleLayout;
+   AbstractContext* context=NULL;
+
+   context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+   if( !context )
+      context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
+   _ParticleLayout_Init( self, context, GlobalCoordSystem, False );
+
+}
+
+void _ParticleLayout_Destroy( void* particleLayout, void* data ) {}
 
 void ParticleLayout_InitialiseParticles( void* particleLayout, void* swarm ) {
-	ParticleLayout* self = (ParticleLayout*)particleLayout;
+    ParticleLayout* self = (ParticleLayout*)particleLayout;
 	
-	self->_initialiseParticles( self, swarm );
+    self->_initialiseParticles( self, swarm );
 }
 
 void ParticleLayout_SetInitialCounts( void* particleLayout, void* swarm ) {
-	ParticleLayout* self = (ParticleLayout*)particleLayout;
+    ParticleLayout* self = (ParticleLayout*)particleLayout;
 	
-	self->_setInitialCounts( particleLayout, swarm );
+    self->_setInitialCounts( particleLayout, swarm );
 }
+
+

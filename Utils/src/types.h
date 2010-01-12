@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_types_h__
-#define __Domain_Utils_types_h__
+#ifndef __StgDomain_Utils_types_h__
+#define __StgDomain_Utils_types_h__
 
 typedef struct NewRemesher NewRemesher;
 typedef struct RegularRemesher RegularRemesher;
@@ -65,7 +65,7 @@ typedef struct RegularRemesherCmpt RegularRemesherCmpt;
 	typedef struct LinearRegression     	LinearRegression;
 	typedef struct SemiRegDeform		SemiRegDeform;
 	typedef struct SobolGenerator            SobolGenerator;
-	typedef struct TimeIntegratee            TimeIntegratee;
+	typedef struct TimeIntegrand            TimeIntegrand;
 	typedef struct TimeIntegrator            TimeIntegrator;
 	typedef struct ShapeAdvector             ShapeAdvector;
 	typedef struct StripRemesher		StripRemesher;
@@ -137,4 +137,4 @@ typedef struct RegularRemesherCmpt RegularRemesherCmpt;
 	
 	typedef Index					FieldVariable_Index;
 	
-#endif /* __Domain_Utils_types_h__ */
+#endif /* __StgDomain_Utils_types_h__ */

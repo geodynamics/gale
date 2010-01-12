@@ -52,30 +52,34 @@ const Type MeshBoundaryShape_Type = "MeshBoundaryShape";
 ** Constructors */
 
 MeshBoundaryShape* MeshBoundaryShape_New( Name name ) {
-   return (void*) _MeshBoundaryShape_New(
-      sizeof(MeshBoundaryShape),
-      MeshBoundaryShape_Type,
-      _MeshBoundaryShape_Delete,
-      _Stg_Shape_Print,
-      _Stg_Shape_Copy,
-      (void*(*)(Name))MeshBoundaryShape_New,
-      _MeshBoundaryShape_Construct,
-      _MeshBoundaryShape_Build,
-      _MeshBoundaryShape_Initialise,
-      _Stg_Shape_Execute,
-      _Stg_Shape_Destroy,
-      _MeshBoundaryShape_IsCoordInside,
-      _MeshBoundaryShape_CalculateVolume,
-      _MeshBoundaryShape_DistanceFromCenterAxis,
-      name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(MeshBoundaryShape);
+	Type                                                          type = MeshBoundaryShape_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _MeshBoundaryShape_Delete;
+	Stg_Class_PrintFunction*                                    _print = _Stg_Shape_Print;
+	Stg_Class_CopyFunction*                                      _copy = _Stg_Shape_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = (void*(*)(Name))MeshBoundaryShape_New;
+	Stg_Component_ConstructFunction*                        _construct = _MeshBoundaryShape_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _MeshBoundaryShape_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _MeshBoundaryShape_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _Stg_Shape_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _Stg_Shape_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _MeshBoundaryShape_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _MeshBoundaryShape_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _MeshBoundaryShape_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+   return (void*) _MeshBoundaryShape_New(  MESHBOUNDARYSHAPE_PASSARGS  );
 }
 
-MeshBoundaryShape* _MeshBoundaryShape_New( MESHBOUNDARYSHAPE_ARGS ) {
+MeshBoundaryShape* _MeshBoundaryShape_New(  MESHBOUNDARYSHAPE_DEFARGS  ) {
    MeshBoundaryShape* self;
 
    /* Allocate memory */
    assert( _sizeOfSelf >= sizeof(MeshBoundaryShape) );
-   self = (MeshBoundaryShape*)_Stg_Shape_New( STG_SHAPE_PASSARGS );
+   self = (MeshBoundaryShape*)_Stg_Shape_New(  STG_SHAPE_PASSARGS  );
 
    _MeshBoundaryShape_Init( self );
 
@@ -99,12 +103,12 @@ void _MeshBoundaryShape_Delete( void* _self ) {
    _Stg_Shape_Delete( self );
 }
 
-void _MeshBoundaryShape_Construct( void* _self, Stg_ComponentFactory* cf, void* data ) {
+void _MeshBoundaryShape_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data ) {
    MeshBoundaryShape* self = (MeshBoundaryShape*)_self;
    Dictionary_Entry_Value* wallList;
    int ii;
 
-   _Stg_Shape_Construct( self, cf, data );
+   _Stg_Shape_AssignFromXML( self, cf, data );
    _MeshBoundaryShape_Init( self );
 
    /* Need a mesh with a cartesian generator. */
@@ -162,16 +166,26 @@ void _MeshBoundaryShape_Build( void* _self, void* data ) {
 
    _Stg_Shape_Build( self, data );
    Stg_Component_Build( self->mesh, data, False );
+   Stg_Component_Build( self->gen, data, False );
    if( !self->mesh->generator || strcmp( self->mesh->generator->type, CartesianGenerator_Type ) )
       abort();
    self->gen = (CartesianGenerator*)self->mesh->generator;
 }
 
+void _MeshBoundaryShape_Destroy( void* _self, void* data ) {
+   MeshBoundaryShape* self = (MeshBoundaryShape*)_self;
+
+   Stg_Component_Destroy( self->mesh, data, False );
+   Stg_Component_Destroy( self->gen, data, False );
+   _Stg_Shape_Destroy( self, data );
+}
+
 void _MeshBoundaryShape_Initialise( void* _self, void* data ) {
    MeshBoundaryShape* self = (MeshBoundaryShape*)_self;
 
-   _Stg_Shape_Build( self, data );
+   _Stg_Shape_Initialise( self, data );
    Stg_Component_Initialise( self->mesh, data, False );
+   Stg_Component_Initialise( self->gen, data, False );
 }
 
 Bool _MeshBoundaryShape_IsCoordInside( void* _self, Coord coord ) {
@@ -235,4 +249,6 @@ double _MeshBoundaryShape_CalculateVolume( void* _self ) {
 void _MeshBoundaryShape_DistanceFromCenterAxis( void* _self, Coord coord, double* disVec ) {
    abort();
 }
+
+
 

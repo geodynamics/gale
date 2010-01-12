@@ -22,8 +22,14 @@
 	<struct>
 		<param name="Name">filename</param>
 		<param name="Type">String</param>
-		<param name="Default">"Swarm.dat"</param>
-		<param name="Description">The name of the file containing the global layout definitions</param>
+		<param name="Default">"Swarm"</param>
+		<param name="Description">The name of the file containing the global layout definitions.  The required extension (.dat/.h5) is automatically appended.</param>
+	</struct>
+	<struct>
+		<param name="Name">checkpointnfiles</param>
+		<param name="Type">Int</param>
+		<param name="Default">1</param>
+		<param name="Description">The number of files the fileParticleLayout is stored across.  Only valid for HDF5 checkpoints.  Naming convension is for example Swarm.00001.1of10.h5,Swarm.00001.2of10.h5 etc.</param>
 	</struct>
 
 </list>

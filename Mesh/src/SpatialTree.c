@@ -347,3 +347,5 @@ void SpatialTree_DestroyNode( SpatialTree* self, void* node ) {
 
    Class_Free( self, node );
 }
+
+

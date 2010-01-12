@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_SurfaceAdaptor_h__
-#define __Domain_Mesh_SurfaceAdaptor_h__
+#ifndef __StgDomain_Mesh_SurfaceAdaptor_h__
+#define __StgDomain_Mesh_SurfaceAdaptor_h__
 
 	/** Textual name of this class */
 	extern const Type SurfaceAdaptor_Type;
@@ -90,14 +90,21 @@
 	** Constructors
 	*/
 
-	#define SURFACEADAPTOR_DEFARGS	\
-		MESHADAPTOR_DEFARGS
 
-	#define SURFACEADAPTOR_PASSARGS	\
-		MESHADAPTOR_PASSARGS
 
-	SurfaceAdaptor* SurfaceAdaptor_New( Name name );
-	SurfaceAdaptor* _SurfaceAdaptor_New( SURFACEADAPTOR_DEFARGS );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SURFACEADAPTOR_DEFARGS \
+                MESHADAPTOR_DEFARGS
+
+	#define SURFACEADAPTOR_PASSARGS \
+                MESHADAPTOR_PASSARGS
+
+	SurfaceAdaptor* SurfaceAdaptor_New( Name name, AbstractContext* context );
+	SurfaceAdaptor* _SurfaceAdaptor_New(  SURFACEADAPTOR_DEFARGS  );
 	void _SurfaceAdaptor_Init( SurfaceAdaptor* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -106,7 +113,7 @@
 
 	void _SurfaceAdaptor_Delete( void* adaptor );
 	void _SurfaceAdaptor_Print( void* adaptor, Stream* stream );
-	void _SurfaceAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data );
+	void _SurfaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data );
 	void _SurfaceAdaptor_Build( void* adaptor, void* data );
 	void _SurfaceAdaptor_Initialise( void* adaptor, void* data );
 	void _SurfaceAdaptor_Execute( void* adaptor, void* data );
@@ -131,4 +138,5 @@
 	double SurfaceAdaptor_Cosine( SurfaceAdaptor* self, Mesh* mesh, 
 				      unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
 
-#endif /* __Domain_Mesh_SurfaceAdaptor_h__ */
+#endif /* __StgDomain_Mesh_SurfaceAdaptor_h__ */
+

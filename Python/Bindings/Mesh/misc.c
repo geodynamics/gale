@@ -38,3 +38,5 @@ char Mesh_Python_copyright__name__[] = "copyright";
 PyObject* Mesh_Python_copyright( PyObject* self, PyObject* args ) {
 	return Py_BuildValue( "s", "StGermain.Discretisation.Bindings.Mesh Python module: Copyright (c) 2003 Victorian Partnership for Advanced Computing (VPAC) Ltd. Australia." );
 }
+
+

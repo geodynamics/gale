@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_FieldVariable_Register_h__
-#define __Domain_Utils_FieldVariable_Register_h__
+#ifndef __StgDomain_Utils_FieldVariable_Register_h__
+#define __StgDomain_Utils_FieldVariable_Register_h__
 	
 	
 	extern const Type FieldVariable_Register_Type;
@@ -81,4 +81,4 @@
 
 	#define FieldVariable_Register_PrintAllEntryNames NamedObject_Register_PrintAllEntryNames
 
-#endif /* __Domain_Utils_FieldVariable_Register_h__ */
+#endif /* __StgDomain_Utils_FieldVariable_Register_h__ */

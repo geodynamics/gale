@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_GaussBorderParticleLayout_h__
-#define __Domain_Swarm_GaussBorderParticleLayout_h__
+#ifndef __StgDomain_Swarm_GaussBorderParticleLayout_h__
+#define __StgDomain_Swarm_GaussBorderParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -53,32 +53,30 @@
 	struct GaussBorderParticleLayout { __GaussBorderParticleLayout };
 	
 	/* Create a new GaussBorderParticleLayout and initialise */
-	GaussBorderParticleLayout* GaussBorderParticleLayout_New( Name name, Dimension_Index dim, Particle_InCellIndex* particlesPerDim ) ;
+   GaussBorderParticleLayout* GaussBorderParticleLayout_New( 
+      Name name,
+      AbstractContext* context,
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      Dimension_Index dim, 
+      Particle_InCellIndex* particlesPerDim );
 	
 	/* Creation implementation / Virtual constructor */
-	GaussBorderParticleLayout* _GaussBorderParticleLayout_New( 
-		SizeT                                                       _sizeOfSelf,
-		Type                                                        type,
-		Stg_Class_DeleteFunction*                                   _delete,
-		Stg_Class_PrintFunction*                                    _print,
-		Stg_Class_CopyFunction*                                     _copy, 
-		Stg_Component_DefaultConstructorFunction*                   _defaultConstructor,
-		Stg_Component_ConstructFunction*                            _construct,
-		Stg_Component_BuildFunction*                                _build,
-		Stg_Component_InitialiseFunction*                           _initialise,
-		Stg_Component_ExecuteFunction*                              _execute,
-		Stg_Component_DestroyFunction*                              _destroy,
-		ParticleLayout_SetInitialCountsFunction*                    _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles,
-		PerCellParticleLayout_InitialCountFunction*                 _initialCount,
-		PerCellParticleLayout_InitialiseParticlesOfCellFunction*    _initialiseParticlesOfCell,
-		Name                                                        name,
-		Bool                                                        initFlag,
-		Dimension_Index                                             dim,
-		Particle_InCellIndex*                                       particlesPerDim );
-		
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define GAUSSBORDERPARTICLELAYOUT_DEFARGS \
+                GAUSSPARTICLELAYOUT_DEFARGS
+
+	#define GAUSSBORDERPARTICLELAYOUT_PASSARGS \
+                GAUSSPARTICLELAYOUT_PASSARGS
+
+   GaussBorderParticleLayout* _GaussBorderParticleLayout_New(  GAUSSBORDERPARTICLELAYOUT_DEFARGS  );
+
 	/* Initialise implementation */
-	void _GaussBorderParticleLayout_Init( void* gaussBorderParticleLayout, Dimension_Index dim, Particle_InCellIndex* particlesPerDim );
+	void _GaussBorderParticleLayout_Init( void* gaussBorderParticleLayout );
 	
 	/* Stg_Class_Delete implementation */
 	void _GaussBorderParticleLayout_Delete( void* gaussBorderParticleLayout );
@@ -95,7 +93,7 @@
 	void* _GaussBorderParticleLayout_Copy( void* gaussBorderParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _GaussBorderParticleLayout_DefaultNew( Name name );
-	void  _GaussBorderParticleLayout_Construct( void* gaussBorderParticleLayout, Stg_ComponentFactory* cf, void* data );
+	void  _GaussBorderParticleLayout_AssignFromXML( void* gaussBorderParticleLayout, Stg_ComponentFactory* cf, void* data );
 	void  _GaussBorderParticleLayout_Build( void* gaussBorderParticleLayout, void* data );
 	void  _GaussBorderParticleLayout_Initialise( void* gaussBorderParticleLayout, void* data );
 	void  _GaussBorderParticleLayout_Execute( void* gaussBorderParticleLayout, void* data );
@@ -109,4 +107,5 @@
 
         void _GaussBorderParticleLayout_InitialiseParticlesPerFace( GaussBorderParticleLayout* self );
 	
-#endif /* __Domain_Swarm_GaussBorderParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_GaussBorderParticleLayout_h__ */
+

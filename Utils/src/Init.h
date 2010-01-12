@@ -39,9 +39,9 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_Init_h__
-#define __Domain_Utils_Init_h__
+#ifndef __StgDomain_Utils_Init_h__
+#define __StgDomain_Utils_Init_h__
 	
 	Bool StgDomainUtils_Init( int* argc, char** argv[] );
 	
-#endif /* __Domain_Utils_Init_h__ */
+#endif /* __StgDomain_Utils_Init_h__ */

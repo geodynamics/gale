@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_h__
-#define __Domain_Mesh_h__
+#ifndef __StgDomain_Mesh_Mesh_h__
+#define __StgDomain_Mesh_Mesh_h__
 	
 #include "types.h"
 #include "shortcuts.h"
@@ -75,4 +75,4 @@
 #include "Init.h"
 #include "Finalise.h"
 
-#endif /* __Domain_Mesh_h__ */
+#endif /* __StgDomain_Mesh_Mesh_h__ */

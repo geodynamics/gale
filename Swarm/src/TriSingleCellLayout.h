@@ -41,8 +41,8 @@ given mesh layout.
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_TriSingleCellLayout_h__
-#define __Domain_Swarm_TriSingleCellLayout_h__
+#ifndef __StgDomain_Swarm_TriSingleCellLayout_h__
+#define __StgDomain_Swarm_TriSingleCellLayout_h__
 
 	
 	/* Textual name of this class */
@@ -56,48 +56,39 @@ given mesh layout.
 		/* Virtual info */ \
 		\
 		/* TriSingleCellLayout info */ \
-		Dictionary*			dictionary; \
-		int				dim;
+		Dictionary*	dictionary; \
+		int			dim;
 
 	struct TriSingleCellLayout { __TriSingleCellLayout };
-	
+
+
 	
 	/* Create a new TriSingleCellLayout and initialise */
-	TriSingleCellLayout* TriSingleCellLayout_DefaultNew( Name name );
+	TriSingleCellLayout* _TriSingleCellLayout_DefaultNew( Name name );
 	
-	TriSingleCellLayout* TriSingleCellLayout_New( Name name, int dim, Dictionary* dictionary );
+	TriSingleCellLayout* TriSingleCellLayout_New( Name name, AbstractContext* context, int dim, Dictionary* dictionary );
 	
 	/* Initialise a TriSingleCellLayout construct */
 	void TriSingleCellLayout_Init( TriSingleCellLayout* self, Name name, int dim, Dictionary* dictionary );
 	
 	/* Creation implementation / Virtual constructor */
-	TriSingleCellLayout* _TriSingleCellLayout_New( 
-		SizeT					_sizeOfSelf,
-		Type					type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print,
-		Stg_Class_CopyFunction*			_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
-		CellLayout_CellCountFunction*		_cellLocalCount,
-		CellLayout_CellCountFunction*		_cellShadowCount,
-		CellLayout_PointCountFunction*		_pointCount,
-		CellLayout_InitialisePointsFunction*	_initialisePoints,
-		CellLayout_MapElementIdToCellIdFunction*	_mapElementIdToCellId,
-		CellLayout_IsInCellFunction*		_isInCell, 
-		CellLayout_CellOfFunction*		_cellOf,
-		CellLayout_GetShadowInfoFunction*	_getShadowInfo,		
-		int					dim,
-		Dictionary* dictionary );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define TRISINGLECELLLAYOUT_DEFARGS \
+                CELLLAYOUT_DEFARGS, \
+                Dictionary*  dictionary
+
+	#define TRISINGLECELLLAYOUT_PASSARGS \
+                CELLLAYOUT_PASSARGS, \
+	        dictionary
+
+	TriSingleCellLayout* _TriSingleCellLayout_New(  TRISINGLECELLLAYOUT_DEFARGS  );
 	
 	/* Initialise implementation */
-	void _TriSingleCellLayout_Init( TriSingleCellLayout* self, int dim );
+	void _TriSingleCellLayout_Init( TriSingleCellLayout* self, Dictionary* dictionary, int dim );
 	
 	/* Stg_Class_Delete implementation */
 	void _TriSingleCellLayout_Delete( void* triSingleCellLayout );
@@ -113,7 +104,7 @@ given mesh layout.
 	
 	void* _TriSingleCellLayout_Copy( void* triSingleCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _TriSingleCellLayout_Construct( void *triSingleCellLayout, Stg_ComponentFactory *cf, void* data );
+	void _TriSingleCellLayout_AssignFromXML( void *triSingleCellLayout, Stg_ComponentFactory *cf, void* data );
 	
 	void _TriSingleCellLayout_Build( void* triSingleCellLayout, void* data );
 	
@@ -151,4 +142,5 @@ given mesh layout.
 	/* Get the shadow info */
 	ShadowInfo* _TriSingleCellLayout_GetShadowInfo( void* triSingleCellLayout );
 	
-#endif /* __Domain_Swarm_TriSingleCellLayout_h__ */
+#endif /* __StgDomain_Swarm_TriSingleCellLayout_h__ */
+

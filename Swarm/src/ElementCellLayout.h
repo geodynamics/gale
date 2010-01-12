@@ -41,8 +41,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_ElementCellLayout_h__
-#define __Domain_Swarm_ElementCellLayout_h__
+#ifndef __StgDomain_Swarm_ElementCellLayout_h__
+#define __StgDomain_Swarm_ElementCellLayout_h__
 	
 
 	/* Textual name of this class */
@@ -56,51 +56,33 @@
 		/* Virtual info */ \
 		\
 		/* ElementCellLayout info */ \
-		Mesh*					mesh; \
-		ShadowInfo				cellShadowInfo; \
-		IArray*					incArray;
+		Mesh*			mesh; \
+		ShadowInfo	cellShadowInfo; \
+		IArray*		incArray;
 
 	struct ElementCellLayout { __ElementCellLayout };
-	
+
+
 	
 	/* Create a new ElementCellLayout and initialise */
 	void* _ElementCellLayout_DefaultNew( Name name );
 	
-	ElementCellLayout* ElementCellLayout_New( 
-			Name name,
-			void* mesh );
-	
-	/* Initialise a ElementCellLayout construct */
-	void ElementCellLayout_Init( 
-			ElementCellLayout* self, 
-			Name name,
-			void* mesh );
+	ElementCellLayout* ElementCellLayout_New( Name name, AbstractContext* context, void* mesh );
 	
 	/* Creation implementation / Virtual constructor */
-	ElementCellLayout* _ElementCellLayout_New( 
-		SizeT					_sizeOfSelf,
-		Type					type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print,
-		Stg_Class_CopyFunction*			_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*			_construct,
-		Stg_Component_BuildFunction*		_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*		_execute,
-		Stg_Component_DestroyFunction*		_destroy,
-		Name							name,
-		Bool							initFlag,
-		CellLayout_CellCountFunction*		_cellLocalCount,
-		CellLayout_CellCountFunction*		_cellShadowCount,
-		CellLayout_PointCountFunction*		_pointCount,
-		CellLayout_InitialisePointsFunction*	_initialisePoints,
-		CellLayout_MapElementIdToCellIdFunction*	_mapElementIdToCellId,		
-		CellLayout_IsInCellFunction*		_isInCell, 
-		CellLayout_CellOfFunction*		_cellOf,
-		CellLayout_GetShadowInfoFunction*	_getShadowInfo,		
-		void*					mesh );
 	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ELEMENTCELLLAYOUT_DEFARGS \
+                CELLLAYOUT_DEFARGS
+
+	#define ELEMENTCELLLAYOUT_PASSARGS \
+                CELLLAYOUT_PASSARGS
+
+	ElementCellLayout* _ElementCellLayout_New(  ELEMENTCELLLAYOUT_DEFARGS  ); 
+
 	/* Initialise implementation */
 	void _ElementCellLayout_Init( ElementCellLayout* self, void* mesh );
 	
@@ -118,7 +100,7 @@
 	
 	void* _ElementCellLayout_Copy( void* elementCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _ElementCellLayout_Construct( void *elementCellLayout, Stg_ComponentFactory *cf, void* data );
+	void _ElementCellLayout_AssignFromXML( void *elementCellLayout, Stg_ComponentFactory *cf, void* data );
 	
 	void _ElementCellLayout_Build( void *elementCellLayout, void *data );
 	
@@ -138,8 +120,7 @@
 	Cell_PointIndex _ElementCellLayout_PointCount( void* elementCellLayout, Cell_Index cellIndex );
 	
 	/* Returns the cell point array... this is the mesh's element node array */
-	void _ElementCellLayout_InitialisePoints( void* elementCellLayout, Cell_Index cellIndex, Cell_PointIndex pointCount, 
-		double*** points );
+	void _ElementCellLayout_InitialisePoints( void* elementCellLayout, Cell_Index cellIndex, Cell_PointIndex pointCount, double*** points );
 	
 	/** Implements CellLayout_MapElementIdToCellId(): just returns a cell number, after checking size */
 	Cell_Index _ElementCellLayout_MapElementIdToCellId( void* cellLayout, unsigned element_dI ); 
@@ -154,5 +135,7 @@
 	ShadowInfo* _ElementCellLayout_GetShadowInfo( void* elementCellLayout );
 
 	void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self );
+   void ElementCellLayout_DestroyShadowInfo( ElementCellLayout* self );
 	
-#endif /* __Domain_Swarm_ElementCellLayout_h__ */
+#endif /* __StgDomain_Swarm_ElementCellLayout_h__ */
+

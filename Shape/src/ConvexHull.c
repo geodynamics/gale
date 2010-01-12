@@ -60,60 +60,22 @@ ConvexHull* ConvexHull_New(
 {
 	ConvexHull* self = (ConvexHull*)_ConvexHull_DefaultNew( name );
 
-	ConvexHull_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		vertexList,
-		vertexCount);
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma);
+   _ConvexHull_Init( self, vertexList, vertexCount);
+
 	return self;
 }
 
-ConvexHull* _ConvexHull_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*     _distanceFromCenterAxis,
-		Name                                  name )
+ConvexHull* _ConvexHull_New(  CONVEXHULL_DEFARGS  )
 {
 	ConvexHull* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ConvexHull) );
-	self = (ConvexHull*)_Stg_Shape_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (ConvexHull*)_Stg_Shape_New(  STG_SHAPE_PASSARGS  );
 	
 	/* General info */
 
-	/* Virtual Info */
-	
 	return self;
 }
 
@@ -173,37 +135,13 @@ void _ConvexHull_Init( void* convexHull, Coord_List vertexList, Index vertexCoun
 	}
 }
 	
-void ConvexHull_InitAll( 
-		void*                                 convexHull, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		Coord_List                            vertexList,
-		Index                                 vertexCount
-		)
-{
-	ConvexHull* self = (ConvexHull*)convexHull;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma);
-	_ConvexHull_Init( self, vertexList, vertexCount);
-}
-	
-
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */
 
 void _ConvexHull_Delete( void* convexHull ) {
 	ConvexHull*       self       = (ConvexHull*)convexHull;
-	Coord_List        vertexList = self->vertexList;
-	XYZ*              facesList  = self->facesList;
-	
 
-	Memory_Free( vertexList );
-	Memory_Free( facesList );
-	
 	/* Delete parent */
 	_Stg_Shape_Delete( self );
 }
@@ -215,8 +153,6 @@ void _ConvexHull_Print( void* convexHull, Stream* stream ) {
 	/* Print parent */
 	_Stg_Shape_Print( self, stream );
 }
-
-
 
 void* _ConvexHull_Copy( void* convexHull, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	ConvexHull*	self = (ConvexHull*)convexHull;
@@ -238,26 +174,30 @@ void* _ConvexHull_Copy( void* convexHull, void* dest, Bool deep, Name nameExt, P
 }
 
 void* _ConvexHull_DefaultNew( Name name ) {
-	return (void*) _ConvexHull_New(
-			sizeof(ConvexHull),
-			ConvexHull_Type,
-			_ConvexHull_Delete,
-			_ConvexHull_Print,
-			_ConvexHull_Copy,
-			_ConvexHull_DefaultNew,
-			_ConvexHull_Construct,
-			_ConvexHull_Build,
-			_ConvexHull_Initialise,
-			_ConvexHull_Execute,
-			_ConvexHull_Destroy,
-			_ConvexHull_IsCoordInside,
-			_ConvexHull_CalculateVolume,
-			_ConvecHull_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(ConvexHull);
+	Type                                                          type = ConvexHull_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _ConvexHull_Delete;
+	Stg_Class_PrintFunction*                                    _print = _ConvexHull_Print;
+	Stg_Class_CopyFunction*                                      _copy = _ConvexHull_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _ConvexHull_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _ConvexHull_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _ConvexHull_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _ConvexHull_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _ConvexHull_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _ConvexHull_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _ConvexHull_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _ConvexHull_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _ConvecHull_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _ConvexHull_New(  CONVEXHULL_PASSARGS  );
 }
 
 
-void _ConvexHull_Construct( void* convexHull, Stg_ComponentFactory* cf, void* data ) {
+void _ConvexHull_AssignFromXML( void* convexHull, Stg_ComponentFactory* cf, void* data ) {
 	ConvexHull*             self       = (ConvexHull*)convexHull;
 	Index                   vertexCount;
 	Index                   vertex_I;
@@ -269,7 +209,7 @@ void _ConvexHull_Construct( void* convexHull, Stg_ComponentFactory* cf, void* da
 	Stream*                 stream     = cf->infoStream;
 
 	
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	optionsList = Dictionary_Get( dictionary, "verticies" );
 	Journal_Firewall( optionsList != NULL, 
@@ -321,7 +261,12 @@ void _ConvexHull_Execute( void* convexHull, void* data ) {
 }
 void _ConvexHull_Destroy( void* convexHull, void* data ) {
 	ConvexHull*	self = (ConvexHull*)convexHull;
-	
+   Coord_List        vertexList = self->vertexList;
+	XYZ*              facesList  = self->facesList;
+
+	Memory_Free( vertexList );
+	Memory_Free( facesList );
+	 
 	_Stg_Shape_Destroy( self, data );
 }
 
@@ -359,5 +304,7 @@ void _ConvecHull_DistanceFromCenterAxis( void* shape, Coord coord, double* disVe
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }
+
+
 
 

@@ -65,36 +65,41 @@ const Type CompressionAdaptor_Type = "CompressionAdaptor";
 ** Constructors
 */
 
-CompressionAdaptor* CompressionAdaptor_New( Name name ) {
-	return _CompressionAdaptor_New( sizeof(CompressionAdaptor), 
-				    CompressionAdaptor_Type, 
-				    _CompressionAdaptor_Delete, 
-				    _CompressionAdaptor_Print, 
-				    NULL, 
-				    (void* (*)(Name))_CompressionAdaptor_New, 
-				    _CompressionAdaptor_Construct, 
-				    _CompressionAdaptor_Build, 
-				    _CompressionAdaptor_Initialise, 
-				    _CompressionAdaptor_Execute, 
-				    _CompressionAdaptor_Destroy, 
-				    name, 
-				    NON_GLOBAL, 
-				    _MeshGenerator_SetDimSize, 
-				    CompressionAdaptor_Generate );
-}
+CompressionAdaptor* CompressionAdaptor_New( Name name, AbstractContext* context ) {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(CompressionAdaptor);
+	Type                                                      type = CompressionAdaptor_Type;
+	Stg_Class_DeleteFunction*                              _delete = _CompressionAdaptor_Delete;
+	Stg_Class_PrintFunction*                                _print = _CompressionAdaptor_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void* (*)(Name))_CompressionAdaptor_New;
+	Stg_Component_ConstructFunction*                    _construct = _CompressionAdaptor_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _CompressionAdaptor_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _CompressionAdaptor_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _CompressionAdaptor_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _CompressionAdaptor_Destroy;
+	AllocationType                              nameAllocationType = NON_GLOBAL;
+	MeshGenerator_SetDimSizeFunc*                   setDimSizeFunc = _MeshGenerator_SetDimSize;
+	MeshGenerator_GenerateFunc*                       generateFunc = CompressionAdaptor_Generate;
 
-CompressionAdaptor* _CompressionAdaptor_New( COMPRESSIONADAPTOR_DEFARGS ) {
-	CompressionAdaptor* self;
-	
-	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(CompressionAdaptor) );
-	self = (CompressionAdaptor*)_MeshGenerator_New( MESHADAPTOR_PASSARGS );
-
-	/* Virtual info */
-
+	CompressionAdaptor* self = _CompressionAdaptor_New(  COMPRESSIONADAPTOR_PASSARGS  );
+   
+   _MeshGenerator_Init( (MeshGenerator*)self, context );
+   _MeshAdaptor_Init( (MeshAdaptor*)self );
 	/* CompressionAdaptor info */
 	_CompressionAdaptor_Init( self );
 
+   return self;
+}
+
+CompressionAdaptor* _CompressionAdaptor_New(  COMPRESSIONADAPTOR_DEFARGS  ) {
+	CompressionAdaptor* self;
+	
+	/* Allocate memory */
+	assert( _sizeOfSelf >= sizeof(CompressionAdaptor) );
+	self = (CompressionAdaptor*)_MeshAdaptor_New(  MESHADAPTOR_PASSARGS  );
+
+	/* Virtual info */
 	return self;
 }
 
@@ -111,7 +116,7 @@ void _CompressionAdaptor_Delete( void* adaptor ) {
 	CompressionAdaptor*	self = (CompressionAdaptor*)adaptor;
 
 	/* Delete the parent. */
-	_MeshGenerator_Delete( self );
+	_MeshAdaptor_Delete( self );
 }
 
 void _CompressionAdaptor_Print( void* adaptor, Stream* stream ) {
@@ -123,17 +128,17 @@ void _CompressionAdaptor_Print( void* adaptor, Stream* stream ) {
 
 	/* Print parent */
 	Journal_Printf( stream, "CompressionAdaptor (ptr): (%p)\n", self );
-	_MeshGenerator_Print( self, stream );
+	_MeshAdaptor_Print( self, stream );
 }
 
-void _CompressionAdaptor_Construct( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
+void _CompressionAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
 	CompressionAdaptor*	self = (CompressionAdaptor*)adaptor;
 
 	assert( self );
 	assert( cf );
 
 	/* Call parent construct. */
-	_MeshAdaptor_Construct( self, cf, data );
+	_MeshAdaptor_AssignFromXML( self, cf, data );
 
 	self->compressionfactor = Stg_ComponentFactory_GetDouble( cf, self->name, "compressionfactor", 0.0 );
 	if(self->compressionfactor == 0.0){
@@ -151,9 +156,11 @@ void _CompressionAdaptor_Initialise( void* adaptor, void* data ) {
 }
 
 void _CompressionAdaptor_Execute( void* adaptor, void* data ) {
+	_MeshAdaptor_Execute( adaptor, data );
 }
 
 void _CompressionAdaptor_Destroy( void* adaptor, void* data ) {
+	_MeshAdaptor_Destroy( adaptor, data );
 }
 
 /*--------------------------------------------------------------------------------------------------------------------------
@@ -212,3 +219,5 @@ void CompressionAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+

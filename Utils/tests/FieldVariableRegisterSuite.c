@@ -46,8 +46,8 @@
 
 typedef struct {
 	MPI_Comm	comm;
-	unsigned	rank;
-	unsigned	nProcs;
+	int		rank;
+	int		nProcs;
 } FieldVariableRegisterSuiteData;
 
 InterpolationResult FieldVariableRegisterSuite_dummyInterpolateValueAt( void* sdVariable, Coord coord, double* value ) { return OUTSIDE_GLOBAL; }
@@ -65,7 +65,7 @@ void FieldVariableRegisterSuite_Setup( FieldVariableRegisterSuiteData* data ) {
 }
 
 void FieldVariableRegisterSuite_Teardown( FieldVariableRegisterSuiteData* data ) {
-}
+} 
 
 void FieldVariableRegisterSuite_TestGetByIndex( FieldVariableRegisterSuiteData* data ) {
    int                     procToWatch;
@@ -74,7 +74,6 @@ void FieldVariableRegisterSuite_TestGetByIndex( FieldVariableRegisterSuiteData* 
    Name                    fvNames[] = { "testFV1", "testFV2", "testFV3" };
    Index                   ii;
    Index                   fV_Index;
-   char                    expected_file[PCU_PATH_MAX];
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
@@ -82,23 +81,25 @@ void FieldVariableRegisterSuite_TestGetByIndex( FieldVariableRegisterSuiteData* 
       fV_Register = FieldVariable_Register_New();
 
       for( ii=0; ii < 3; ii++ ) {
-         testFVs[ii] = _FieldVariable_New( sizeof(FieldVariable), FieldVariable_Type, _Stg_Component_Delete,
-                        _Stg_Component_Print, NULL, (Stg_Component_DefaultConstructorFunction*)FieldVariable_DefaultNew, _Variable_Construct, _Variable_Build,
-                        _Variable_Initialise, _Variable_Execute, _Variable_Destroy, fvNames[ii], True,
-                        FieldVariableRegisterSuite_dummyInterpolateValueAt,
-                        FieldVariableRegisterSuite_dummyGetMinGlobalValue, FieldVariableRegisterSuite_dummyGetMaxGlobalValue,
-                        FieldVariableRegisterSuite_dummyGetMinAndMaxLocalCoords, FieldVariableRegisterSuite_dummyGetMinAndMaxGlobalCoords,
-                        0, 
-                        3,
-                        False,
-                        data->comm,
-                        fV_Register );
+			testFVs[ii] = FieldVariable_New(
+				fvNames[ii],
+				NULL,
+				0,
+				3,
+				False,
+				data->comm,
+				fV_Register );
+			testFVs[ii]->_interpolateValueAt = FieldVariableRegisterSuite_dummyInterpolateValueAt;
+			testFVs[ii]->_getMinGlobalFieldMagnitude = FieldVariableRegisterSuite_dummyGetMinGlobalValue;
+			testFVs[ii]->_getMaxGlobalFieldMagnitude = FieldVariableRegisterSuite_dummyGetMaxGlobalValue;
+			testFVs[ii]->_getMinAndMaxLocalCoords = FieldVariableRegisterSuite_dummyGetMinAndMaxLocalCoords;
+			testFVs[ii]->_getMinAndMaxGlobalCoords = FieldVariableRegisterSuite_dummyGetMinAndMaxGlobalCoords;
+
       }
       for( ii=0; ii < 3; ii++ ) {
          fV_Index = FieldVariable_Register_GetIndex( fV_Register, fvNames[ii] );
          pcu_check_true( fV_Index == ii );
          pcu_check_streq( (FieldVariable_Register_GetByIndex( fV_Register, fV_Index ) )->name, fvNames[ii] );
-         pcu_check_streq( (FieldVariable_Register_GetByName( fV_Register, fvNames[ii] ) )->name, fvNames[ii] );
       }
       Stg_Class_Delete(fV_Register);
    }
@@ -111,7 +112,6 @@ void FieldVariableRegisterSuite_TestGetByName( FieldVariableRegisterSuiteData* d
    Name                    fvNames[] = { "testFV1", "testFV2", "testFV3" };
    Index                   ii;
    Index                   fV_Index;
-   char                    expected_file[PCU_PATH_MAX];
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
@@ -119,22 +119,23 @@ void FieldVariableRegisterSuite_TestGetByName( FieldVariableRegisterSuiteData* d
       fV_Register = FieldVariable_Register_New();
 
       for( ii=0; ii < 3; ii++ ) {
-         testFVs[ii] = _FieldVariable_New( sizeof(FieldVariable), FieldVariable_Type, _Stg_Component_Delete,
-                        _Stg_Component_Print, NULL, (Stg_Component_DefaultConstructorFunction*)FieldVariable_DefaultNew, _Variable_Construct, _Variable_Build,
-                        _Variable_Initialise, _Variable_Execute, _Variable_Destroy, fvNames[ii], True,
-                        FieldVariableRegisterSuite_dummyInterpolateValueAt,
-                        FieldVariableRegisterSuite_dummyGetMinGlobalValue, FieldVariableRegisterSuite_dummyGetMaxGlobalValue,
-                        FieldVariableRegisterSuite_dummyGetMinAndMaxLocalCoords, FieldVariableRegisterSuite_dummyGetMinAndMaxGlobalCoords,
-                        0, 
-                        3,
-                        False,
-                        data->comm,
-                        fV_Register );
+			testFVs[ii] = FieldVariable_New(
+				fvNames[ii],
+				NULL,
+				0,
+				3,
+				False,
+				data->comm,
+				fV_Register );
+			testFVs[ii]->_interpolateValueAt = FieldVariableRegisterSuite_dummyInterpolateValueAt;
+			testFVs[ii]->_getMinGlobalFieldMagnitude = FieldVariableRegisterSuite_dummyGetMinGlobalValue;
+			testFVs[ii]->_getMaxGlobalFieldMagnitude = FieldVariableRegisterSuite_dummyGetMaxGlobalValue;
+			testFVs[ii]->_getMinAndMaxLocalCoords = FieldVariableRegisterSuite_dummyGetMinAndMaxLocalCoords;
+			testFVs[ii]->_getMinAndMaxGlobalCoords = FieldVariableRegisterSuite_dummyGetMinAndMaxGlobalCoords;
       }
       for( ii=0; ii < 3; ii++ ) {
          fV_Index = FieldVariable_Register_GetIndex( fV_Register, fvNames[ii] );
          pcu_check_true( fV_Index == ii );
-         pcu_check_streq( (FieldVariable_Register_GetByIndex( fV_Register, fV_Index ) )->name, fvNames[ii] );
          pcu_check_streq( (FieldVariable_Register_GetByName( fV_Register, fvNames[ii] ) )->name, fvNames[ii] );
       }
       Stg_Class_Delete(fV_Register);
@@ -147,3 +148,5 @@ void FieldVariableRegisterSuite( pcu_suite_t* suite ) {
 	pcu_suite_addTest( suite, FieldVariableRegisterSuite_TestGetByIndex );
 	pcu_suite_addTest( suite, FieldVariableRegisterSuite_TestGetByName );
 }
+
+

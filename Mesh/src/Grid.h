@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_Grid_h__
-#define __Domain_Mesh_Grid_h__
+#ifndef __StgDomain_Mesh_Grid_h__
+#define __StgDomain_Mesh_Grid_h__
 
 	/** Textual name of this class */
 	extern const Type Grid_Type;
@@ -68,14 +68,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define GRID_DEFARGS \
-		STG_CLASS_DEFARGS
+                STG_CLASS_DEFARGS
 
 	#define GRID_PASSARGS \
-		STG_CLASS_PASSARGS
+                STG_CLASS_PASSARGS
 
 	Grid* Grid_New();
-	Grid* _Grid_New( GRID_DEFARGS );
+	Grid* _Grid_New(  GRID_DEFARGS  );
 	void _Grid_Init( Grid* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -105,4 +112,5 @@
 	** Private Member functions
 	*/
 
-#endif /* __Domain_Mesh_Grid_h__ */
+#endif /* __StgDomain_Mesh_Grid_h__ */
+

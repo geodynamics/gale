@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Utils_RegularMeshUtils_h__
-#define __Domain_Utils_RegularMeshUtils_h__
+#ifndef __StgDomain_Utils_RegularMeshUtils_h__
+#define __StgDomain_Utils_RegularMeshUtils_h__
 
 	extern Index RegularMeshUtils_ascendingIJK_ToHughesNodeNumberMap[8];
 
@@ -149,4 +149,4 @@ IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int lowDepth, int
 IndexSet* RegularMeshUtils_CreateGlobalBottomRightSet( void* _mesh );
 IndexSet* RegularMeshUtils_CreateGlobalBottomLeftSet( void* _mesh );
 
-#endif /* __Domain_Utils_RegularMeshUtils_h__ */
+#endif /* __StgDomain_Utils_RegularMeshUtils_h__ */

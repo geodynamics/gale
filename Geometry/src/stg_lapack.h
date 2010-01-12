@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Geometry_stg_lapack_h__
-#define __Domain_Geometry_stg_lapack_h__
+#ifndef __StgDomain_Geometry_stg_lapack_h__
+#define __StgDomain_Geometry_stg_lapack_h__
 
 #ifdef BLASLAPACK_NORMAL
 	#define stg_dgeev dgeev

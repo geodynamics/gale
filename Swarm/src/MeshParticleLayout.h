@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_MeshParticleLayout_h__
-#define __Domain_Swarm_MeshParticleLayout_h__
+#ifndef __StgDomain_Swarm_MeshParticleLayout_h__
+#define __StgDomain_Swarm_MeshParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -56,32 +56,38 @@
 	struct MeshParticleLayout { __MeshParticleLayout };
 	
 	/* Create a new MeshParticleLayout and initialise */
-	MeshParticleLayout* MeshParticleLayout_New( Name name, Particle_InCellIndex cellParticleCount, unsigned int seed ) ;
+   MeshParticleLayout* MeshParticleLayout_New( 
+      Name                 name, 
+      AbstractContext* context,
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      Mesh*            mesh,
+      Particle_InCellIndex cellParticleCount, 
+      unsigned int         seed );
 	
 	/* Creation implementation / Virtual constructor */
-	MeshParticleLayout* _MeshParticleLayout_New( 
-                SizeT                                                       _sizeOfSelf,
-                Type                                                        type,
-                Stg_Class_DeleteFunction*                                   _delete,
-                Stg_Class_PrintFunction*                                    _print,
-                Stg_Class_CopyFunction*                                     _copy,
-                Stg_Component_DefaultConstructorFunction*                   _defaultConstructor,
-                Stg_Component_ConstructFunction*                            _construct,
-                Stg_Component_BuildFunction*                                _build,
-                Stg_Component_InitialiseFunction*                           _initialise,
-                Stg_Component_ExecuteFunction*                              _execute,
-                Stg_Component_DestroyFunction*                              _destroy,
-                ParticleLayout_SetInitialCountsFunction*                    _setInitialCounts,
-                ParticleLayout_InitialiseParticlesFunction*                 _initialiseParticles,
-                PerCellParticleLayout_InitialCountFunction*                 _initialCount,
-                PerCellParticleLayout_InitialiseParticlesOfCellFunction*    _initialiseParticlesOfCell,
-                Name                                                        name,
-		Bool                                                        initFlag,
-		Particle_InCellIndex                                        cellParticleCount,
-		unsigned int                                                seed );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESHPARTICLELAYOUT_DEFARGS \
+                PERCELLPARTICLELAYOUT_DEFARGS, \
+                Mesh*                              mesh, \
+                Particle_InCellIndex  cellParticleCount, \
+                unsigned int                       seed
+
+	#define MESHPARTICLELAYOUT_PASSARGS \
+                PERCELLPARTICLELAYOUT_PASSARGS, \
+	        mesh,              \
+	        cellParticleCount, \
+	        seed             
+
+   MeshParticleLayout* _MeshParticleLayout_New(  MESHPARTICLELAYOUT_DEFARGS  );
 
 	void _MeshParticleLayout_Init( 
 			void*                meshParticleLayout, 
+         Mesh*                mesh,
 			Particle_InCellIndex cellParticleCount, 
 			unsigned int         seed);
 
@@ -97,7 +103,7 @@
 	
 	/* 'Stg_Component' Stuff */
 	void* _MeshParticleLayout_DefaultNew( Name name ) ;
-	void _MeshParticleLayout_Construct( void* meshParticleLayout, Stg_ComponentFactory* cf, void* data );
+	void _MeshParticleLayout_AssignFromXML( void* meshParticleLayout, Stg_ComponentFactory* cf, void* data );
 	void _MeshParticleLayout_Build( void* meshParticleLayout, void* data );
 	void _MeshParticleLayout_Initialise( void* meshParticleLayout, void* data );
 	void _MeshParticleLayout_Execute( void* meshParticleLayout, void* data );
@@ -109,4 +115,5 @@
 
 
 	
-#endif /* __Domain_Swarm_MeshParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_MeshParticleLayout_h__ */
+

@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_shortcuts_h__
-#define __Domain_Mesh_shortcuts_h__
+#ifndef __StgDomain_Mesh_shortcuts_h__
+#define __StgDomain_Mesh_shortcuts_h__
 	
 	/* Mesh shortcuts */
 	#define Mesh_Node_Neighbour_I( mesh, node, index )		mesh->nodeNeighbourTbl[node][index]
@@ -53,4 +53,4 @@
 	#define Mesh_Element_Neighbour_P( mesh, element, index )	Mesh_ElementAt( mesh, Mesh_Element_Neighbour_I( mesh, node, index ) )
 	#define Mesh_Element_Node_P( mesh, element, index )		Mesh_NodeAt( mesh, Mesh_Element_Node_I( mesh, element, index ) )
 	
-#endif /* __Domain_Mesh_shortcuts_h__ */
+#endif /* __StgDomain_Mesh_shortcuts_h__ */

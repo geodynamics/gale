@@ -41,8 +41,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_GlobalParticleLayout_h__
-#define __Domain_Swarm_GlobalParticleLayout_h__
+#ifndef __StgDomain_Swarm_GlobalParticleLayout_h__
+#define __StgDomain_Swarm_GlobalParticleLayout_h__
 	
 	/** @see GlobalParticleLayout_InitialiseParticle */
 	typedef void (GlobalParticleLayout_InitialiseParticleFunction) ( 
@@ -67,40 +67,39 @@
 	
 	/* No "_New" and "_Init" as this is an abstract class */
 	
-	/* Creation implementation / Virtual constructor */
-	GlobalParticleLayout* _GlobalParticleLayout_New( 
-                SizeT                                               _sizeOfSelf,
-                Type                                                type,
-                Stg_Class_DeleteFunction*                           _delete,
-                Stg_Class_PrintFunction*                            _print,
-                Stg_Class_CopyFunction*                             _copy,
-                Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-                Stg_Component_ConstructFunction*                    _construct,
-                Stg_Component_BuildFunction*                        _build,
-                Stg_Component_InitialiseFunction*                   _initialise,
-                Stg_Component_ExecuteFunction*                      _execute,
-                Stg_Component_DestroyFunction*                      _destroy,
-                ParticleLayout_SetInitialCountsFunction*            _setInitialCounts,
-                ParticleLayout_InitialiseParticlesFunction*         _initialiseParticles,
-		GlobalParticleLayout_InitialiseParticleFunction*    _initialiseParticle,
-                Name                                                name,
-                Bool                                                initFlag,
-                CoordSystem                                         coordSystem,
-                Bool                                                weightsInitialisedAtStartup,
-		Particle_Index                                      totalInitialParticles,
-		double                                              averageInitialParticlesPerCell );
+   /* Creation implementation / Virtual constructor */
 
-	void _GlobalParticleLayout_Init( 
-		void *                                              particleLayout,
-		CoordSystem                                         coordSystem,
-		Bool                                                weightsInitialisedAtStartup,
-		Particle_Index                                      totalInitialParticles,
-		double                                              averageInitialParticlesPerCell );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define GLOBALPARTICLELAYOUT_DEFARGS \
+                PARTICLELAYOUT_DEFARGS, \
+                GlobalParticleLayout_InitialiseParticleFunction*             _initialiseParticle, \
+                Particle_Index                                             totalInitialParticles, \
+                double                                            averageInitialParticlesPerCell
+
+	#define GLOBALPARTICLELAYOUT_PASSARGS \
+                PARTICLELAYOUT_PASSARGS, \
+	        _initialiseParticle,            \
+	        totalInitialParticles,          \
+	        averageInitialParticlesPerCell
+
+GlobalParticleLayout* _GlobalParticleLayout_New(  GLOBALPARTICLELAYOUT_DEFARGS  );
+
+	void  _GlobalParticleLayout_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );
+
+   void _GlobalParticleLayout_Init( 
+      void*                                               particleLayout,
+      Particle_Index                                      totalInitialParticles,
+      double                                              averageInitialParticlesPerCell );
 	
 	void _GlobalParticleLayout_Delete( void* particleLayout );
 	
 	void _GlobalParticleLayout_Print( void* particleLayout, Stream* stream );
 	
+	void _GlobalParticleLayout_Destroy( void* particleLayout, void* data );
 	/* Copy */
 	#define GlobalParticleLayout_Copy( self ) \
 		(GlobalParticleLayout*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
@@ -122,4 +121,5 @@
 			Particle_Index    newParticle_I,
 			void*             particle );
 	
-#endif /* __Domain_Swarm_GlobalParticleLayout_h__ */
+#endif /* __StgDomain_Swarm_GlobalParticleLayout_h__ */
+

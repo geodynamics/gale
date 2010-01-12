@@ -3,6 +3,10 @@
 
 	<include>testParticleCoords.xml</include>
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">DomainContext</param>
+		</struct>
+
 		<struct name="particleLayout">
 			<param name="Type">LineParticleLayout</param>
 			<param name="totalInitialParticles">20</param>

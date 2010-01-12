@@ -59,3 +59,5 @@ void Plane_LineIntersect( Plane plane, Line3 line, Coord point ) {
 	point[1] = line[0][1] + line[1][1] * t;
 	point[2] = line[0][2] + line[1][2] * t;
 }
+
+

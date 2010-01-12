@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Swarm_WithinShapeParticleLayout_h__
-#define __Domain_Swarm_WithinShapeParticleLayout_h__
+#ifndef __StgDomain_Swarm_WithinShapeParticleLayout_h__
+#define __StgDomain_Swarm_WithinShapeParticleLayout_h__
 	
 
 	/* Textual name of this class */
@@ -58,41 +58,34 @@
 	struct WithinShapeParticleLayout { __WithinShapeParticleLayout };
 	
 	/* Create a new WithinShapeParticleLayout and initialise */
-	
-	WithinShapeParticleLayout* WithinShapeParticleLayout_New( 
-			Name                    name, 
-			Dimension_Index         dim, 
-			Particle_Index          totalInitialParticles, 
-			Stg_Shape*              shape );
-	
+WithinShapeParticleLayout* WithinShapeParticleLayout_New(
+      Name             name,
+      AbstractContext* context, 
+      CoordSystem      coordSystem,
+      Bool             weightsInitialisedAtStartup,
+      unsigned int     totalInitialParticles, 
+      double           averageInitialParticlesPerCell,
+      Dimension_Index  dim,
+		Stg_Shape*       shape ); 
+
 	/* Creation implementation / Virtual constructor */
-	WithinShapeParticleLayout* _WithinShapeParticleLayout_New( 
-		SizeT                                            _sizeOfSelf,
-		Type                                             type,
-		Stg_Class_DeleteFunction*                        _delete,
-		Stg_Class_PrintFunction*                         _print,
-		Stg_Class_CopyFunction*                          _copy, 
-		Stg_Component_DefaultConstructorFunction*        _defaultConstructor,
-		Stg_Component_ConstructFunction*                 _construct,
-		Stg_Component_BuildFunction*                     _build,
-		Stg_Component_InitialiseFunction*                _initialise,
-		Stg_Component_ExecuteFunction*                   _execute,
-		Stg_Component_DestroyFunction*                   _destroy,
-		ParticleLayout_SetInitialCountsFunction*         _setInitialCounts,
-		ParticleLayout_InitialiseParticlesFunction*      _initialiseParticles,
-		GlobalParticleLayout_InitialiseParticleFunction* _initialiseParticle,
-		Name                                             name,
-		Bool                                             initFlag,
-		Dimension_Index                                  dim, 
-		Particle_Index                                   totalInitialParticles, 
-		double                                           averageInitialParticlesPerCell,
-		Stg_Shape*                                       shape );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define WITHINSHAPEPARTICLELAYOUT_DEFARGS \
+                SPACEFILLERPARTICLELAYOUT_DEFARGS, \
+                Stg_Shape*  shape
+
+	#define WITHINSHAPEPARTICLELAYOUT_PASSARGS \
+                SPACEFILLERPARTICLELAYOUT_PASSARGS, \
+	        shape
+
+WithinShapeParticleLayout* _WithinShapeParticleLayout_New(  WITHINSHAPEPARTICLELAYOUT_DEFARGS  );
 	
 	void _WithinShapeParticleLayout_Init( 
 			void*                   withinShapeParticleLayout, 
-			Dimension_Index         dim, 
-			Particle_Index          totalInitialParticles, 
-			double                  averageInitialParticlesPerCell,
 			Stg_Shape*              shape );
 
 	/* 'Stg_Class' Stuff */
@@ -106,7 +99,7 @@
 	
 	/* 'Stg_Component' Stuff */
 	void* _WithinShapeParticleLayout_DefaultNew( Name name ) ;
-	void _WithinShapeParticleLayout_Construct( void* withinShapeParticleLayout, Stg_ComponentFactory *cf, void* data );
+	void _WithinShapeParticleLayout_AssignFromXML( void* withinShapeParticleLayout, Stg_ComponentFactory *cf, void* data );
 	void _WithinShapeParticleLayout_Build( void* withinShapeParticleLayout, void* data );
 	void _WithinShapeParticleLayout_Initialise( void* withinShapeParticleLayout, void* data );
 	void _WithinShapeParticleLayout_Execute( void* withinShapeParticleLayout, void* data );
@@ -119,4 +112,5 @@
 			Particle_Index newParticle_I,
 			void*          particle);
 
-#endif /* __StGermain_Domain_Shape_WithinShapeParticleLayout_h__ */
+#endif /* __StgDomain_Shape_WithinShapeParticleLayout_h__ */
+

@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Domain_Mesh_MeshGenerator_h__
-#define __Domain_Mesh_MeshGenerator_h__
+#ifndef __StgDomain_Mesh_MeshGenerator_h__
+#define __StgDomain_Mesh_MeshGenerator_h__
 
 	/** Textual name of this class */
 	extern const Type MeshGenerator_Type;
@@ -53,6 +53,7 @@
 		/* General info */				\
 		__Stg_Component					\
 								\
+		AbstractContext*		context;	\
 		/* Virtual info */				\
 		MeshGenerator_SetDimSizeFunc*	setDimSizeFunc;	\
 		MeshGenerator_GenerateFunc*	generateFunc;	\
@@ -72,18 +73,25 @@
 	** Constructors
 	*/
 
-	#define MESHGENERATOR_DEFARGS				\
-		STG_COMPONENT_DEFARGS,				\
-		MeshGenerator_SetDimSizeFunc*	setDimSizeFunc,	\
-		MeshGenerator_GenerateFunc*	generateFunc
 
-	#define MESHGENERATOR_PASSARGS		\
-		STG_COMPONENT_PASSARGS,		\
-		setDimSizeFunc,			\
-		generateFunc
 
-	MeshGenerator* _MeshGenerator_New( MESHGENERATOR_DEFARGS );
-	void _MeshGenerator_Init( MeshGenerator* self );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MESHGENERATOR_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                MeshGenerator_SetDimSizeFunc*  setDimSizeFunc, \
+                MeshGenerator_GenerateFunc*      generateFunc
+
+	#define MESHGENERATOR_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        setDimSizeFunc, \
+	        generateFunc  
+
+	MeshGenerator* _MeshGenerator_New(  MESHGENERATOR_DEFARGS  );
+	void _MeshGenerator_Init( MeshGenerator* self, AbstractContext* context );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
@@ -98,7 +106,7 @@
 		(Mesh*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	void* _MeshGenerator_Copy( void* meshGenerator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
-	void _MeshGenerator_Construct( void* meshGenerator, Stg_ComponentFactory* cf, void* data );
+	void _MeshGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactory* cf, void* data );
 	void _MeshGenerator_Build( void* meshGenerator, void* data );
 	void _MeshGenerator_Initialise( void* meshGenerator, void* data );
 	void _MeshGenerator_Execute( void* meshGenerator, void* data );
@@ -129,4 +137,5 @@
 
 	void MeshGenerator_Destruct( MeshGenerator* self );
 
-#endif /* __Domain_Mesh_MeshGenerator_h__ */
+#endif /* __StgDomain_Mesh_MeshGenerator_h__ */
+

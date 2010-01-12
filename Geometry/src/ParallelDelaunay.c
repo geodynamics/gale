@@ -70,27 +70,32 @@ const Type ParallelDelaunay_Type="ParallelDelaunay";
 /** Create a ParallelDelaunay */
 ParallelDelaunay* ParallelDelaunay_DefaultNew( Name name )
 {
-	ParallelDelaunay *d = _ParallelDelaunay_New(
-			sizeof( ParallelDelaunay ),
-			ParallelDelaunay_Type,
-			_ParallelDelaunay_Delete,
-			_ParallelDelaunay_Print,
-			_ParallelDelaunay_Copy,
-			(Stg_Component_DefaultConstructorFunction*)ParallelDelaunay_DefaultNew,
-			_ParallelDelaunay_Construct,
-			_ParallelDelaunay_Build,
-			_ParallelDelaunay_Initialise,
-			_ParallelDelaunay_Execute,
-			_ParallelDelaunay_Destroy,
-			name,
-			False,
-			NULL,
-			NULL,
-			0,
-			0,
-			0,
-			NULL,
-			NULL );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( ParallelDelaunay );
+	Type                                                      type = ParallelDelaunay_Type;
+	Stg_Class_DeleteFunction*                              _delete = _ParallelDelaunay_Delete;
+	Stg_Class_PrintFunction*                                _print = _ParallelDelaunay_Print;
+	Stg_Class_CopyFunction*                                  _copy = _ParallelDelaunay_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)ParallelDelaunay_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _ParallelDelaunay_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _ParallelDelaunay_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _ParallelDelaunay_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _ParallelDelaunay_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _ParallelDelaunay_Destroy;
+	Bool                                                  initFlag = False;
+	Dictionary*                                         dictionary = NULL;
+	CoordF*                                                  sites = NULL;
+	int                                                   numSites = 0;
+	int                                                       rank = 0;
+	int                                                   numProcs = 0;
+	MPI_Comm*                                                 comm = NULL;
+	DelaunayAttributes*                                       attr = NULL;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+	int                       idOffset = ZERO;
+
+	ParallelDelaunay *d = _ParallelDelaunay_New(  PARALLELDELAUNAY_PASSARGS  );
 
 	return d;
 }
@@ -105,27 +110,25 @@ ParallelDelaunay* ParallelDelaunay_New(
 	MPI_Comm					*comm,
 	DelaunayAttributes			*attr )
 {
-	ParallelDelaunay *d = _ParallelDelaunay_New(
-			sizeof( ParallelDelaunay ),
-			ParallelDelaunay_Type,
-			_ParallelDelaunay_Delete,
-			_ParallelDelaunay_Print,
-			_ParallelDelaunay_Copy,
-			(Stg_Component_DefaultConstructorFunction*)ParallelDelaunay_DefaultNew,
-			_ParallelDelaunay_Construct,
-			_ParallelDelaunay_Build,
-			_ParallelDelaunay_Initialise,
-			_ParallelDelaunay_Execute,
-			_ParallelDelaunay_Destroy,
-			name,
-			True,
-			dictionary,
-			sites,
-			numSites,
-			rank,
-			numProcs,
-			comm,
-			attr );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( ParallelDelaunay );
+	Type                                                      type = ParallelDelaunay_Type;
+	Stg_Class_DeleteFunction*                              _delete = _ParallelDelaunay_Delete;
+	Stg_Class_PrintFunction*                                _print = _ParallelDelaunay_Print;
+	Stg_Class_CopyFunction*                                  _copy = _ParallelDelaunay_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)ParallelDelaunay_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _ParallelDelaunay_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _ParallelDelaunay_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _ParallelDelaunay_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _ParallelDelaunay_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _ParallelDelaunay_Destroy;
+	Bool                                                  initFlag = True;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+	int                       idOffset = ZERO;
+
+	ParallelDelaunay *d = _ParallelDelaunay_New(  PARALLELDELAUNAY_PASSARGS  );
 	
 	return d;
 }
@@ -153,7 +156,7 @@ void ParallelDelaunay_Init(
 	self->_print = _ParallelDelaunay_Print;
 	self->_copy = _ParallelDelaunay_Copy;
 	self->_defaultConstructor = (Stg_Component_DefaultConstructorFunction*)ParallelDelaunay_DefaultNew;
-	self->_construct = _ParallelDelaunay_Construct;
+	self->_construct = _ParallelDelaunay_AssignFromXML;
 	self->_build = _ParallelDelaunay_Build;
 	self->_initialise = _ParallelDelaunay_Initialise;
 	self->_execute = _ParallelDelaunay_Execute;
@@ -162,73 +165,36 @@ void ParallelDelaunay_Init(
 	self->attributes = Memory_Alloc_Unnamed( DelaunayAttributes );
 	memcpy( self->attributes, attr, sizeof( DelaunayAttributes ) );
 	self->attributes->BuildBoundingTriangle = 0;
-	
-	self->dictionary = dictionary;
-	self->numSites = numSites;
-	self->numInputSites = numSites;
-	self->points = sites;
-	self->leftProc = 0;
-	self->rightProc = 0;
-	self->haloSites[0] = NULL;
-	self->haloSites[1] = NULL;
-	self->localTriangulation = NULL;
-	self->rank = rank;
-	self->numProcs = numProcs;
-	self->comm = comm;
-	
+
 	_Stg_Class_Init( (Stg_Class*)self );
 	_Stg_Object_Init( (Stg_Object*)self, name, NON_GLOBAL );
 	_Stg_Component_Init( (Stg_Component*)self );
-	_ParallelDelaunay_Init( self );
+	_ParallelDelaunay_Init( self, sites, 0, 0, rank, numProcs, comm, numSites, numSites, dictionary, True );
 }
 
 /** Creation implementation */
-ParallelDelaunay* _ParallelDelaunay_New(
-	SizeT						_sizeOfSelf, 
-	Type						type,
-	Stg_Class_DeleteFunction*				_delete,
-	Stg_Class_PrintFunction*				_print,
-	Stg_Class_CopyFunction*				_copy, 
-	Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-	Stg_Component_ConstructFunction*			_construct,
-	Stg_Component_BuildFunction*		_build,
-	Stg_Component_InitialiseFunction*		_initialise,
-	Stg_Component_ExecuteFunction*		_execute,
-	Stg_Component_DestroyFunction*		_destroy,
-	Name							name,
-	Bool							initFlag,
-	Dictionary					*dictionary,
-	CoordF						*sites,
-	int							numSites,
-	int							rank,
-	int							numProcs,
-	MPI_Comm					*comm,
-	DelaunayAttributes			*attr )
+ParallelDelaunay* _ParallelDelaunay_New(  PARALLELDELAUNAY_DEFARGS  )
 {
+	DelaunayAttributes* attr_shadowed = attr;
+	Bool initFlag_shadowed = initFlag;
 	ParallelDelaunay *self = NULL;
 	DelaunayAttributes *myAttr = NULL;
 	
 	myAttr = Memory_Alloc_Unnamed( DelaunayAttributes );
-	memcpy( myAttr, attr, sizeof( DelaunayAttributes ) );
+	memcpy( myAttr, attr_shadowed, sizeof( DelaunayAttributes ) );
 	myAttr->BuildBoundingTriangle = 0;
 	
 	assert( _sizeOfSelf >= sizeof(ParallelDelaunay) );
-	self = (ParallelDelaunay*)_Delaunay_New( _sizeOfSelf, type, _delete, _print, _copy, _defaultConstructor,
-			_construct, _build, _initialise, _execute, _destroy, name, True, dictionary, sites, numSites, 0, myAttr );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	idOffset = 0;
+	initFlag = True;
+	attr     = myAttr;
+
+	self = (ParallelDelaunay*)_Delaunay_New(  DELAUNAY_PASSARGS  );
 	
-	self->points = sites;
-	self->leftProc = 0;
-	self->rightProc = 0;
-	self->haloSites[0] = NULL;
-	self->haloSites[1] = NULL;
-	self->localTriangulation = NULL;
-	self->rank = rank;
-	self->numProcs = numProcs;
-	self->comm = comm;
-	
-	if( initFlag ){
-		_ParallelDelaunay_Init( self );
-	}
+	_ParallelDelaunay_Init( self, sites, 0, 0, rank, numProcs, comm, numSites, numSites, dictionary, initFlag_shadowed );
 
 	return self;
 }
@@ -263,14 +229,30 @@ int ParallelDelaunayBtreeCompareFunction( void *a, void *b )
 #define LOAD_TAG 1
 #define DATA_TAG 1<<1
 #define NEW_SITE_FACTOR 100
-void _ParallelDelaunay_Init( ParallelDelaunay* self )
+void _ParallelDelaunay_Init( ParallelDelaunay* self, CoordF* points, int leftProc, int rightProc, int rank, int numProcs, MPI_Comm* comm, int numSites, int numInputSites, Dictionary* dictionary, Bool initFlag )
 {
 	assert( self );
 
-	self->numHaloSites[0] = 0;
-	self->numHaloSites[1] = 0;
-	self->sitePool = MemoryPool_New( Site, NEW_SITE_FACTOR, NEW_SITE_FACTOR );
-	self->coordPool = MemoryPool_New( CoordF, NEW_SITE_FACTOR, NEW_SITE_FACTOR );
+	self->points = points;
+	self->leftProc = leftProc;
+	self->rightProc = rightProc;
+	self->haloSites[0] = NULL;
+	self->haloSites[1] = NULL;
+	self->localTriangulation = NULL;
+	self->rank = rank;
+	self->numProcs = numProcs;
+	self->comm = comm;
+
+	self->dictionary = dictionary;
+	self->numSites = numSites;
+	self->numInputSites = numInputSites;
+	
+    if (initFlag) {
+	    self->numHaloSites[0] = 0;
+	    self->numHaloSites[1] = 0;
+	    self->sitePool = MemoryPool_New( Site, NEW_SITE_FACTOR, NEW_SITE_FACTOR );
+	    self->coordPool = MemoryPool_New( CoordF, NEW_SITE_FACTOR, NEW_SITE_FACTOR );
+    }
 }
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -284,18 +266,6 @@ void _ParallelDelaunay_Delete( void* pd )
 	
 	assert( self );
 
-	Memory_Free( self->localPoints );
-	if( self->mappingTable[0] ) Memory_Free( self->mappingTable[0] );
-	if( self->mappingTable[1] ) Memory_Free( self->mappingTable[1] );
-	Memory_Free( self->mapGlobalToLocal );
-	if( self->processor ) Memory_Free( self->processor );
-	if( self->initialOrder ) Memory_Free( self->initialOrder );
-	Memory_Free( self->processorLoad );
-	Memory_Free( self->attributes );
-
-	Stg_Class_Delete( self->localTriangulation );
-	Stg_Class_Delete( self->sitePool );
-	Stg_Class_Delete( self->coordPool );
 	_Delaunay_Delete( self );
 }
 
@@ -316,13 +286,12 @@ void *_ParallelDelaunay_Copy( void* pd, void* dest, Bool deep, Name nameExt, Ptr
 	return NULL;
 }
 
-void _ParallelDelaunay_Construct( void* pd, Stg_ComponentFactory* cf, void* data )
+void _ParallelDelaunay_AssignFromXML( void* pd, Stg_ComponentFactory* cf, void* data )
 {
 	
 }
 
-void _ParallelDelaunay_Build( void* pd, void* data )
-{
+void _ParallelDelaunay_Build( void* pd, void* data ) {
 	float _minX, _maxX;
 	float _minY, _maxY;
 	int numProcs, numSites, i, j, count;
@@ -330,7 +299,6 @@ void _ParallelDelaunay_Build( void* pd, void* data )
 	int *alloced = NULL;
 	int offset;
 	ParallelDelaunay *self = (ParallelDelaunay*)pd;
-	DelaunayAttributes attr;
 
 	assert( self );
 	
@@ -517,9 +485,24 @@ void _ParallelDelaunay_Execute( void* pd, void* data )
 	}	
 }
 
-void _ParallelDelaunay_Destroy( void* pd, void* data )
-{
+void _ParallelDelaunay_Destroy( void* pd, void* data ) { 
+   ParallelDelaunay *self = (ParallelDelaunay*)pd;
 	
+	assert( self );
+   Memory_Free( self->localPoints );
+	if( self->mappingTable[0] ) Memory_Free( self->mappingTable[0] );
+	if( self->mappingTable[1] ) Memory_Free( self->mappingTable[1] );
+	Memory_Free( self->mapGlobalToLocal );
+	if( self->processor ) Memory_Free( self->processor );
+	if( self->initialOrder ) Memory_Free( self->initialOrder );
+	Memory_Free( self->processorLoad );
+	Memory_Free( self->attributes );
+
+	Stg_Class_Delete( self->localTriangulation );
+	Stg_Class_Delete( self->sitePool );
+	Stg_Class_Delete( self->coordPool );
+
+   _Delaunay_Destroy(pd, data);
 }
 
 #define onCurrentProc( pd, id ) ( id < (pd->processorLoad[pd->rank]+pd->localTriangulation->idOffset) )
@@ -1426,4 +1409,6 @@ void ParallelDelaunayMerge( ParallelDelaunay *pd, MPI_Comm *comm, int rank )
 		}
 	}
 }
+
+
 

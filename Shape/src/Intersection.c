@@ -61,63 +61,21 @@ Intersection* Intersection_New(
 {
 	Intersection* self = (Intersection*)_Intersection_DefaultNew( name );
 
-	Intersection_InitAll( 
-		self, 
-		dim,
-		centre,
-		alpha,
-		beta,
-		gamma,
-		shapeList,
-		shapeCount,
-		isComplement);
+   _Stg_Shape_Init( self, dim, centre, False, alpha, beta, gamma);
+	_Intersection_Init( self, shapeList, shapeCount, isComplement );
 	return self;
 }
 
-Intersection* _Intersection_New(
-		SizeT                                 _sizeOfSelf, 
-		Type                                  type,
-		Stg_Class_DeleteFunction*             _delete,
-		Stg_Class_PrintFunction*              _print,
-		Stg_Class_CopyFunction*               _copy, 
-		Stg_Component_DefaultConstructorFunction* _defaultConstructor,
-		Stg_Component_ConstructFunction*      _construct,
-		Stg_Component_BuildFunction*          _build,
-		Stg_Component_InitialiseFunction*     _initialise,
-		Stg_Component_ExecuteFunction*        _execute,
-		Stg_Component_DestroyFunction*        _destroy,		
-		Stg_Shape_IsCoordInsideFunction*      _isCoordInside,
-		Stg_Shape_CalculateVolumeFunction*    _calculateVolume,
-		Stg_Shape_DistanceFromCenterAxisFunction*   _distanceFromCenterAxis,
-		Name                                  name )
+Intersection* _Intersection_New(  INTERSECTION_DEFARGS  )
 {
 	Intersection* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Intersection) );
-	self = (Intersection*)_Stg_Shape_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_isCoordInside ,
-			_calculateVolume,
-			_distanceFromCenterAxis,
-			name );
+	self = (Intersection*)_Stg_Shape_New(  STG_SHAPE_PASSARGS  );
 	
 	/* General info */
 
-	/* Virtual Info */
-	self->_isCoordInside = _isCoordInside;
-	self->_distanceFromCenterAxis = _distanceFromCenterAxis;
-	
 	return self;
 }
 
@@ -132,26 +90,6 @@ void _Intersection_Init( void* intersection,  Stg_Shape** shapeList, Index shape
 	self->shapeCount = shapeCount;
 }
 
-
-void Intersection_InitAll( 
-		void*                                 intersection, 
-		Dimension_Index                       dim, 
-		Coord                                 centre,
-		double                                alpha,
-		double                                beta,
-		double                                gamma,
-		Stg_Shape**                           shapeList,
-		Index                                 shapeCount,
-		Bool*                                 isComplement
-		)
-{
-	Intersection* self = (Intersection*)intersection;
-
-	Stg_Shape_InitAll( self, dim, centre, alpha, beta, gamma);
-	_Intersection_Init( self, shapeList, shapeCount, isComplement );
-}
-	
-
 /*------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
 */
@@ -160,7 +98,6 @@ void _Intersection_Delete( void* intersection ) {
 	Intersection*       self = (Intersection*)intersection;
 
 	Memory_Free( self->shapeList );
-	Memory_Free( self->isComplement );
 
 	/* Delete parent */
 	_Stg_Shape_Delete( self );
@@ -196,26 +133,30 @@ void* _Intersection_Copy( void* intersection, void* dest, Bool deep, Name nameEx
 }
 
 void* _Intersection_DefaultNew( Name name ) {
-	return (void*) _Intersection_New(
-			sizeof(Intersection),
-			Intersection_Type,
-			_Intersection_Delete,
-			_Intersection_Print,
-			_Intersection_Copy,
-			_Intersection_DefaultNew,
-			_Intersection_Construct,
-			_Intersection_Build,
-			_Intersection_Initialise,
-			_Intersection_Execute,
-			_Intersection_Destroy,
-			_Intersection_IsCoordInside,
-			_Intersection_CalculateVolume,
-			_Intersection_DistanceFromCenterAxis,
-			name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(Intersection);
+	Type                                                          type = Intersection_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _Intersection_Delete;
+	Stg_Class_PrintFunction*                                    _print = _Intersection_Print;
+	Stg_Class_CopyFunction*                                      _copy = _Intersection_Copy;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _Intersection_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _Intersection_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _Intersection_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _Intersection_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _Intersection_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _Intersection_Destroy;
+	Stg_Shape_IsCoordInsideFunction*                    _isCoordInside = _Intersection_IsCoordInside;
+	Stg_Shape_CalculateVolumeFunction*                _calculateVolume = _Intersection_CalculateVolume;
+	Stg_Shape_DistanceFromCenterAxisFunction*  _distanceFromCenterAxis = _Intersection_DistanceFromCenterAxis;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _Intersection_New(  INTERSECTION_PASSARGS  );
 }
 
 
-void _Intersection_Construct( void* intersection, Stg_ComponentFactory* cf, void* data ) {
+void _Intersection_AssignFromXML( void* intersection, Stg_ComponentFactory* cf, void* data ) {
 	Intersection*	        self       = (Intersection*)intersection;
 	Index                   shapeCount;
 	Stg_Shape**             shapeList;
@@ -226,7 +167,7 @@ void _Intersection_Construct( void* intersection, Stg_ComponentFactory* cf, void
 	char*                   nameShape;
 	Stream*                 stream     = Journal_Register( Info_Type, CURR_MODULE_NAME );
 	
-	_Stg_Shape_Construct( self, cf, data );
+	_Stg_Shape_AssignFromXML( self, cf, data );
 
 	optionsList = Dictionary_Get( dictionary, "shapes" );
 /*	Journal_Firewall( vertexList != NULL, 
@@ -273,12 +214,20 @@ void _Intersection_Construct( void* intersection, Stg_ComponentFactory* cf, void
 
 void _Intersection_Build( void* intersection, void* data ) {
 	Intersection*	self = (Intersection*)intersection;
-
+   unsigned shape_I = 0;
+ 
+   for( shape_I = 0 ; shape_I < self->shapeCount ; shape_I++ ) {
+      Stg_Component_Build( self->shapeList[shape_I], data, False );
+   }
 	_Stg_Shape_Build( self, data );
 }
 void _Intersection_Initialise( void* intersection, void* data ) {
 	Intersection*	self = (Intersection*)intersection;
-	
+   unsigned shape_I = 0;
+
+   for( shape_I = 0 ; shape_I < self->shapeCount ; shape_I++ ) {
+      Stg_Component_Initialise( self->shapeList[shape_I], data, False );
+   }	
 	_Stg_Shape_Initialise( self, data );
 }
 void _Intersection_Execute( void* intersection, void* data ) {
@@ -288,7 +237,12 @@ void _Intersection_Execute( void* intersection, void* data ) {
 }
 void _Intersection_Destroy( void* intersection, void* data ) {
 	Intersection*	self = (Intersection*)intersection;
-	
+   unsigned shape_I = 0;
+    
+   for( shape_I = 0 ; shape_I < self->shapeCount ; shape_I++ ) {
+      Stg_Component_Destroy( self->shapeList[shape_I], data, False );
+   }
+	Memory_Free( self->isComplement );
 	_Stg_Shape_Destroy( self, data );
 }
 
@@ -333,4 +287,6 @@ void _Intersection_DistanceFromCenterAxis( void* shape, Coord coord, double* dis
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Private Functions
 */
+
+
 
