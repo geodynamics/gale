@@ -282,6 +282,7 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 
 	/* Set up 2D Viewer the size of the viewport */
 	lucViewport2d(True, viewportInfo);
+   glDisable(GL_MULTISAMPLE); /* Looks best without anti-aliasing */
 
 	lucSetFontCharset(FONT_SMALL);
 	
@@ -386,6 +387,7 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 
 	/* Restore the viewport */
 	lucViewport2d(False, viewportInfo);
+   glEnable(GL_MULTISAMPLE);
 }
 
 void _lucColourBar_CleanUp( void* drawingObject, void* _context ) {
