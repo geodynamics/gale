@@ -65,6 +65,7 @@ void test( UnderworldContext* context ) {
    double				angleDirector;
 	double				gError;
 	int					particleGlobalCount;
+   int ierr;
 
 	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
 		particle = (GlobalParticle*)Swarm_ParticleAt( swarm, lParticle_I );
@@ -72,8 +73,8 @@ void test( UnderworldContext* context ) {
       angleDirector = atan(-normal[1]/normal[0]);
 		error += fabs( angleDirector - angle );
 	}
-	MPI_Allreduce( &error, &gError, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
-	MPI_Allreduce( &swarm->particleLocalCount, &particleGlobalCount, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
+	ierr = MPI_Allreduce( &error, &gError, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+	ierr = MPI_Allreduce( &swarm->particleLocalCount, &particleGlobalCount, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
 
 	//error /= (double) swarm->particleLocalCount;
 	//pcu_check_true( error < TOLERANCE );
@@ -101,6 +102,7 @@ void testRandom( UnderworldContext* context ) {
 	int                     circleAngleUpperBound;
 	double						gCircleAngleAverage;
 	int                     gCircleAngleCounts[36] 	= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+   int ierr;
 
 	swarm = alignment->swarm;
 	director = alignment->director;
@@ -121,10 +123,10 @@ void testRandom( UnderworldContext* context ) {
 		}
 		circleAngleCounts[ (int)(circleAngle+0.5) / 10 ] += 1;
 	}
-	MPI_Allreduce( circleAngleCounts, gCircleAngleCounts, 36, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
+	ierr = MPI_Allreduce( circleAngleCounts, gCircleAngleCounts, 36, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
 
 	circleAngleAverage = (double)swarm->particleLocalCount / 36;
-	MPI_Allreduce( &circleAngleAverage, &gCircleAngleAverage, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+	ierr = MPI_Allreduce( &circleAngleAverage, &gCircleAngleAverage, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 
 	/*NB. This definition is determined based on a set no. of particlesPerCell. Currently this value is = 20 */
 	#define TheoreticalStandardDeviation 13.64
@@ -155,7 +157,7 @@ void testRandom( UnderworldContext* context ) {
 #define DIR_X_AXIS 0
 #define DIR_Y_AXIS 1
 #define DIR_Z_AXIS 2
-#define ANGLE_ERROR 1e-15
+#define ANGLE_ERROR 1e-7
 
 void testPerMaterial( UnderworldContext* context ) {
 	AlignmentSwarmVariable* alignment              = (AlignmentSwarmVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "alignment" );
