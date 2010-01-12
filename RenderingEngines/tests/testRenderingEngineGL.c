@@ -110,7 +110,7 @@ int main( int argc, char* argv[] ) {
 	KeyCall( context, context->constructExtensionsK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(context,context->constructExtensionsK), context );
 	#endif
 
-	Stg_Component_Construct( context, 0 /* dummy */, &context, True );
+	Stg_Component_AssignFromXML( context, 0 /* dummy */, &context, True );
 	if( rank == 0 ) 
 		Context_PrintConcise( context, context->verbose );
 
@@ -146,3 +146,5 @@ int main( int argc, char* argv[] ) {
 	
 	return 0; /* success */
 }
+
+

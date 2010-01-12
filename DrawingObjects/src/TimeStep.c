@@ -85,46 +85,13 @@ lucTimeStep* lucTimeStep_New(
 	return self;
 }
 
-lucTimeStep* _lucTimeStep_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-	
-		Name                                               name )
+lucTimeStep* _lucTimeStep_New(  LUCTIMESTEP_DEFARGS  )
 {
 	lucTimeStep*    self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucTimeStep) );
-	self = (lucTimeStep*)  _lucOpenGLDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucTimeStep) );
+	self = (lucTimeStep*)  _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_PASSARGS  );
 	
 	
 	return self;
@@ -179,26 +146,30 @@ void* _lucTimeStep_Copy( void* timeStep, void* dest, Bool deep, Name nameExt, Pt
 }
 
 void* _lucTimeStep_DefaultNew( Name name ) {
-	return _lucTimeStep_New( 
-			sizeof( lucTimeStep ),
-			lucTimeStep_Type,
-			_lucTimeStep_Delete,
-			_lucTimeStep_Print,
-			_lucTimeStep_Copy,
-			_lucTimeStep_DefaultNew,
-			_lucTimeStep_Construct,
-			_lucTimeStep_Build,
-			_lucTimeStep_Initialise,
-			_lucTimeStep_Execute,
-			_lucTimeStep_Destroy,		
-		        _lucTimeStep_Setup,
-			_lucTimeStep_Draw,
-	                _lucTimeStep_CleanUp,
-	 		_lucTimeStep_BuildDisplayList,
-			name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof( lucTimeStep );
+	Type                                                             type = lucTimeStep_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucTimeStep_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucTimeStep_Print;
+	Stg_Class_CopyFunction*                                         _copy = _lucTimeStep_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucTimeStep_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucTimeStep_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucTimeStep_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucTimeStep_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucTimeStep_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucTimeStep_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucTimeStep_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucTimeStep_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucTimeStep_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucTimeStep_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _lucTimeStep_New(  LUCTIMESTEP_PASSARGS  );
 }
 
-void _lucTimeStep_Construct( void* timeStep, Stg_ComponentFactory* cf, void* data ) {
+void _lucTimeStep_AssignFromXML( void* timeStep, Stg_ComponentFactory* cf, void* data ) {
 	lucTimeStep*             self               = (lucTimeStep*) timeStep;
         Name colourName;
 	Bool frame;
@@ -300,6 +271,8 @@ void _lucTimeStep_CleanUp( void* drawingObject, void* _context ) {
 
 void _lucTimeStep_BuildDisplayList( void* drawingObject, void* _context ) {
 	}
+
+
 
 
 

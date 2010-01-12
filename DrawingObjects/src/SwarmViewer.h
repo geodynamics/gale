@@ -64,25 +64,18 @@
 	struct lucSwarmViewer { __lucSwarmViewer };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucSwarmViewer* _lucSwarmViewer_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,		
-		lucSwarmViewerBase_PlotParticleFunction*           _plotParticle,
-		lucSwarmViewerBase_SetParticleColourFunction*      _setParticleColour,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCSWARMVIEWER_DEFARGS \
+                LUCSWARMVIEWERBASE_DEFARGS
+
+	#define LUCSWARMVIEWER_PASSARGS \
+                LUCSWARMVIEWERBASE_PASSARGS
+
+	lucSwarmViewer* _lucSwarmViewer_New(  LUCSWARMVIEWER_DEFARGS  );
 
 	void _lucSwarmViewer_Delete( void* drawingObject ) ;
 	void _lucSwarmViewer_Print( void* drawingObject, Stream* stream ) ;
@@ -90,7 +83,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucSwarmViewer_DefaultNew( Name name ) ;
-	void _lucSwarmViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucSwarmViewer_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucSwarmViewer_Build( void* drawingObject, void* data ) ;
 	void _lucSwarmViewer_Initialise( void* drawingObject, void* data ) ;
 	void _lucSwarmViewer_Execute( void* drawingObject, void* data );
@@ -106,3 +99,4 @@
 	void _lucSwarmViewer_PlotParticle( void* drawingObject, void* _context, Particle_Index lParticle_I ) ;
 
 #endif
+

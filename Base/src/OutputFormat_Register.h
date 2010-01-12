@@ -123,7 +123,7 @@
 		Stg_ObjectList_PrintAllObjects( (self)->objects, stream )
 
 	/* +++ Public Functions +++ */
-	void lucOutputFormat_Register_OutputAll( void* outputFormat_Register, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) ;
+	void lucOutputFormat_Register_OutputAll( void* outputFormat_Register, lucWindow* window, AbstractContext* context, lucPixel* pixelData , lucAlphaPixel* alphaPixelData) ;
 
 
 #endif 

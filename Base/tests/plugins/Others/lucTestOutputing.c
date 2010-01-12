@@ -72,3 +72,5 @@ void lucTestOutputing_Register( void* context ) {
 	ContextEP_Append( context, AbstractContext_EP_Dump, lucBase_DumpAllWindows );
 }
 
+
+

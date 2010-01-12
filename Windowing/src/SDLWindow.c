@@ -72,45 +72,13 @@ SDL_Surface *screen = NULL;
 int SDL_useCount = 0;
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucSDLWindow* _lucSDLWindow_New( 
-		SizeT                                           sizeOfSelf,
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy, 
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,
-		lucWindow_DisplayFunction						_displayWindow,	
-		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
-		lucWindow_EventProcessorFunction				_eventProcessor,	
-		lucWindow_ResizeFunction						_resizeWindow,	
-		Name                                            name ) 
+lucSDLWindow* _lucSDLWindow_New(  LUCSDLWINDOW_DEFARGS  ) 
 {
 	lucSDLWindow*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucSDLWindow) );
-	self = (lucSDLWindow*) _lucWindow_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_displayWindow,	
-			_eventsWaiting,
-			_eventProcessor,
-			_resizeWindow,	
-			name );
+	assert( _sizeOfSelf >= sizeof(lucSDLWindow) );
+	self = (lucSDLWindow*) _lucWindow_New(  LUCWINDOW_PASSARGS  );
 	
 	return self;
 }
@@ -140,30 +108,34 @@ void* _lucSDLWindow_Copy( void* window, void* dest, Bool deep, Name nameExt, Ptr
 
 
 void* _lucSDLWindow_DefaultNew( Name name ) {
-	return (void*) _lucSDLWindow_New(
-		sizeof(lucSDLWindow),
-		lucSDLWindow_Type,
-		_lucSDLWindow_Delete,
-		_lucSDLWindow_Print,
-		NULL,
-		_lucSDLWindow_DefaultNew,
-		_lucSDLWindow_Construct,
-		_lucSDLWindow_Build,
-		_lucSDLWindow_Initialise,
-		_lucSDLWindow_Execute,
-		_lucSDLWindow_Destroy,
-		_lucSDLWindow_Display,	
-		_lucSDLWindow_EventsWaiting,
-		_lucSDLWindow_EventProcessor, 
-		_lucSDLWindow_Resize,	
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(lucSDLWindow);
+	Type                                                      type = lucSDLWindow_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucSDLWindow_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucSDLWindow_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucSDLWindow_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucSDLWindow_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucSDLWindow_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucSDLWindow_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucSDLWindow_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucSDLWindow_Destroy;
+	lucWindow_DisplayFunction*                      _displayWindow = _lucSDLWindow_Display;
+	lucWindow_EventsWaitingFunction*                _eventsWaiting = _lucSDLWindow_EventsWaiting;
+	lucWindow_EventProcessorFunction*              _eventProcessor = _lucSDLWindow_EventProcessor;
+	lucWindow_ResizeFunction*                        _resizeWindow = _lucSDLWindow_Resize;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucSDLWindow_New(  LUCSDLWINDOW_PASSARGS  );
 }
 
-void _lucSDLWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) {
+void _lucSDLWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data ) {
 	lucSDLWindow*  self = (lucSDLWindow*)window;
 
 	/* Construct Parent */
-	_lucWindow_Construct( self, cf, data );
+	_lucWindow_AssignFromXML( self, cf, data );
 } 
 
 void _lucSDLWindow_Build( void* window, void* data ) {
@@ -300,10 +272,8 @@ void _lucSDLWindow_Display( void* window ) {
   #endif
 }
 
-int _lucSDLWindow_EventsWaiting( void* window )
-{
+int _lucSDLWindow_EventsWaiting( void* window ) {
 	/* Check for events without removing from queue */
-	int numevents = 0;
 	SDL_Event events[10];
 	SDL_PumpEvents();
 	return SDL_PeepEvents(events, 10, SDL_PEEKEVENT, SDL_ALLEVENTS);
@@ -403,7 +373,9 @@ void _lucSDLWindow_Resize( void* window ) {
 
 /* Timer callback */
 Uint32 lucSDLWindow_IdleTimer(Uint32 interval, void* param) {
-	lucSDLWindow*        self = (lucSDLWindow*) param; 
+	lucSDLWindow* self;
+
+	self = (lucSDLWindow*) param; 
 
     /* Create a user event and post */
     SDL_Event event;
@@ -491,3 +463,7 @@ void lucSDLWindow_DeleteWindow(void *window) {
 }
 
 #endif
+
+
+
+

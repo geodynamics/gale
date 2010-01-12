@@ -64,39 +64,13 @@
 const Type lucOutputTIFF_Type = "lucOutputTIFF";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucOutputTIFF* _lucOutputTIFF_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucOutputFormat_OutputFunction*                    _output,
-		Name                                               name ) 
+lucOutputTIFF* _lucOutputTIFF_New(  LUCOUTPUTTIFF_DEFARGS  ) 
 {
 	lucOutputTIFF*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucOutputTIFF) );
-	self = (lucOutputTIFF*) _lucOutputFormat_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_output,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucOutputTIFF) );
+	self = (lucOutputTIFF*) _lucOutputFormat_New(  LUCOUTPUTFORMAT_PASSARGS  );
 	
 	return self;
 }
@@ -132,27 +106,33 @@ void* _lucOutputTIFF_Copy( void* outputFormat, void* dest, Bool deep, Name nameE
 
 
 void* _lucOutputTIFF_DefaultNew( Name name ) {
-	return (void*) _lucOutputTIFF_New(
-		sizeof(lucOutputTIFF),
-		lucOutputTIFF_Type,
-		_lucOutputTIFF_Delete,
-		_lucOutputTIFF_Print,
-		NULL,
-		_lucOutputTIFF_DefaultNew,
-		_lucOutputTIFF_Construct,
-		_lucOutputTIFF_Build,
-		_lucOutputTIFF_Initialise,
-		_lucOutputTIFF_Execute,
-		_lucOutputTIFF_Destroy,
-		_lucOutputTIFF_Output,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(lucOutputTIFF);
+	Type                                                      type = lucOutputTIFF_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucOutputTIFF_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucOutputTIFF_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucOutputTIFF_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucOutputTIFF_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucOutputTIFF_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucOutputTIFF_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucOutputTIFF_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucOutputTIFF_Destroy;
+	lucOutputFormat_OutputFunction*                        _output = _lucOutputTIFF_Output;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucOutputTIFF_New(  LUCOUTPUTTIFF_PASSARGS  );
 }
 
-void _lucOutputTIFF_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
+void _lucOutputTIFF_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
 	lucOutputTIFF*  self = (lucOutputTIFF*)outputFormat;
 
 	/* Construct Parent */
-	lucOutputFormat_InitAll( self, "tiff" );
+   self->extension = "tiff";
+	_lucOutputFormat_AssignFromXML( outputFormat, cf, data);
+   self->transparent = False; /* Not supported */
 
 	_lucOutputTIFF_Init( self );
 }
@@ -162,7 +142,7 @@ void _lucOutputTIFF_Initialise( void* outputFormat, void* data ) {}
 void _lucOutputTIFF_Execute( void* outputFormat, void* data ) {}
 void _lucOutputTIFF_Destroy( void* outputFormat, void* data ) {}
 
-void _lucOutputTIFF_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) {
+void _lucOutputTIFF_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) {
 	lucOutputTIFF*              self         = (lucOutputTIFF*) outputFormat;
 	Pixel_Index                 width        = window->width;
 	Pixel_Index                 height       = window->height;
@@ -187,7 +167,7 @@ void _lucOutputTIFF_Output( void* outputFormat, lucWindow* window, AbstractConte
 	TIFFSetField(file, TIFFTAG_ROWSPERSTRIP, 1);
 	TIFFSetField(file, TIFFTAG_IMAGEDESCRIPTION, window->name );
 	
-	linePtr = pixelData;
+	linePtr = (lucPixel*)pixelData;
 	for ( line_I = height - 1;  line_I != (Pixel_Index) -1 ;  line_I--) {
 		if (TIFFWriteScanline(file, linePtr, line_I, 0) < 0) {
 			TIFFClose(file);
@@ -199,4 +179,6 @@ void _lucOutputTIFF_Output( void* outputFormat, lucWindow* window, AbstractConte
 }
 
 #endif
+
+
 

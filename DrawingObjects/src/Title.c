@@ -86,46 +86,13 @@ lucTitle* lucTitle_New(
 	return self;
 }
 
-lucTitle* _lucTitle_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-	
-		Name                                               name )
+lucTitle* _lucTitle_New(  LUCTITLE_DEFARGS  )
 {
 	lucTitle*    self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucTitle) );
-	self = (lucTitle*)  _lucOpenGLDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucTitle) );
+	self = (lucTitle*)  _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_PASSARGS  );
 	
 	
 	return self;
@@ -183,32 +150,36 @@ void* _lucTitle_Copy( void* title, void* dest, Bool deep, Name nameExt, PtrMap* 
 }
 
 void* _lucTitle_DefaultNew( Name name ) {
-	return _lucTitle_New( 
-			sizeof( lucTitle ),
-			lucTitle_Type,
-			_lucTitle_Delete,
-			_lucTitle_Print,
-			_lucTitle_Copy,
-			_lucTitle_DefaultNew,
-			_lucTitle_Construct,
-			_lucTitle_Build,
-			_lucTitle_Initialise,
-			_lucTitle_Execute,
-			_lucTitle_Destroy,		
-		        _lucTitle_Setup,
-			_lucTitle_Draw,
-	                _lucTitle_CleanUp,
-	 		_lucTitle_BuildDisplayList,
-			name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof( lucTitle );
+	Type                                                             type = lucTitle_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucTitle_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucTitle_Print;
+	Stg_Class_CopyFunction*                                         _copy = _lucTitle_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucTitle_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucTitle_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucTitle_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucTitle_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucTitle_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucTitle_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucTitle_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucTitle_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucTitle_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucTitle_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _lucTitle_New(  LUCTITLE_PASSARGS  );
 }
 
-void _lucTitle_Construct( void* title, Stg_ComponentFactory* cf, void* data ) {
+void _lucTitle_AssignFromXML( void* title, Stg_ComponentFactory* cf, void* data ) {
 	lucTitle*             self               = (lucTitle*) title;
         Name colourName;
 	
 	/* Get Stereo Type */
          /* Construct Parent */
-	_lucDrawingObject_Construct( self, cf, data );
+	_lucDrawingObject_AssignFromXML( self, cf, data );
 
 	colourName  = Stg_ComponentFactory_GetString( cf, self->name, "colour", "Black") ;
 	
@@ -266,6 +237,8 @@ void _lucTitle_CleanUp( void* drawingObject, void* _context ) {
 
 void _lucTitle_BuildDisplayList( void* drawingObject, void* _context ) {
 	}
+
+
 
 
 

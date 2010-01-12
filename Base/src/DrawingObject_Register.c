@@ -63,14 +63,16 @@ const Type lucDrawingObject_Register_Type = "lucDrawingObject_Register";
 
 
 lucDrawingObject_Register*	lucDrawingObject_Register_New( void ) {
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(lucDrawingObject_Register);
+	Type                              type = lucDrawingObject_Register_Type;
+	Stg_Class_DeleteFunction*      _delete = _NamedObject_Register_Delete;
+	Stg_Class_PrintFunction*        _print = _NamedObject_Register_Print;
+	Stg_Class_CopyFunction*          _copy = _NamedObject_Register_Copy;
+
 	lucDrawingObject_Register* self;
 	
-	self = (lucDrawingObject_Register*) _NamedObject_Register_New(
-		sizeof(lucDrawingObject_Register),
-		lucDrawingObject_Register_Type,
-		_NamedObject_Register_Delete,
-		_NamedObject_Register_Print,
-		_NamedObject_Register_Copy );
+	self = (lucDrawingObject_Register*) _NamedObject_Register_New(  NAMEDOBJECT_REGISTER_PASSARGS  );
 
 	return self;
 }
@@ -98,7 +100,6 @@ void lucDrawingObject_Register_DrawAll( void* drawingObject_Register, lucWindow*
 
 	for ( object_I = 0 ; object_I < objectCount ; object_I++ ) {
 		object = lucDrawingObject_Register_GetByIndex( self, object_I );
-		lucLight_Register_EnableAll( lightRegister );
 		lucDrawingObject_Draw( object, window, viewportInfo, context );
 
 		if ( compositeEachDraw )
@@ -120,3 +121,5 @@ void lucDrawingObject_Register_CleanUpAll( void* drawingObject_Register, void* c
 		lucDrawingObject_CleanUp( object, context );
 	}
 }
+
+

@@ -60,39 +60,27 @@
 	struct lucEigenvectors { __lucEigenvectors };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucEigenvectors* _lucEigenvectors_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCEIGENVECTORS_DEFARGS \
+                LUCEIGENVECTORSCROSSSECTION_DEFARGS
+
+	#define LUCEIGENVECTORS_PASSARGS \
+                LUCEIGENVECTORSCROSSSECTION_PASSARGS
+
+	lucEigenvectors* _lucEigenvectors_New(  LUCEIGENVECTORS_DEFARGS  );
 
 	void _lucEigenvectors_Delete( void* drawingObject ) ;
 	void _lucEigenvectors_Print( void* drawingObject, Stream* stream ) ;
-	void* _lucEigenvectors_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) ;
 
 	/* 'Stg_Component' implementations */
 	void* _lucEigenvectors_DefaultNew( Name name ) ;
-	void _lucEigenvectors_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
-	void _lucEigenvectors_Build( void* drawingObject, void* data ) ;
-	void _lucEigenvectors_Initialise( void* drawingObject, void* data ) ;
-	void _lucEigenvectors_Execute( void* drawingObject, void* data );
-	void _lucEigenvectors_Destroy( void* drawingObject, void* data ) ;
-	
-	void _lucEigenvectors_Setup( void* drawingObject, void* _context ) ;
-	void _lucEigenvectors_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) ;
-	void _lucEigenvectors_CleanUp( void* drawingObject, void* _context ) ;
+	void _lucEigenvectors_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+
 	void _lucEigenvectors_BuildDisplayList( void* drawingObject, void* _context ) ;
 
 #endif
+

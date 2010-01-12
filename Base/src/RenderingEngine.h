@@ -51,7 +51,7 @@
 
 	typedef void (lucRenderingEngine_RenderFunction) ( void* renderingEngine, lucWindow* window, AbstractContext* context);
 	typedef void (lucRenderingEngine_ClearFunction) ( void* renderingEngine, lucWindow* window, Bool clearAll );
-	typedef void (lucRenderingEngine_GetPixelDataFunction) ( void* renderingEngine, lucWindow* window, lucPixel* pixelData);
+	typedef void (lucRenderingEngine_GetPixelDataFunction) ( void* renderingEngine, lucWindow* window, void* pixelData, Bool withAlpha);
 	typedef void (lucRenderingEngine_CompositeViewportFunction) (  
 		void*                                              renderingEngine, 
 		lucViewportInfo*                                   viewportInfo, 
@@ -61,6 +61,7 @@
 
 	#define __lucRenderingEngine                           \
 		__Stg_Component                                   \
+		AbstractContext*				   context;		    \
 		/* Virtual Functions */ \
 		lucRenderingEngine_RenderFunction*                 _render;                 \
 		lucRenderingEngine_ClearFunction*				   _clear;					\
@@ -69,30 +70,33 @@
 
 	struct lucRenderingEngine {__lucRenderingEngine};
 
-	lucRenderingEngine* _lucRenderingEngine_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		lucRenderingEngine_RenderFunction*                 _render,
-		lucRenderingEngine_ClearFunction*				   _clear,
-		lucRenderingEngine_GetPixelDataFunction*           _getPixelData,
-		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCRENDERINGENGINE_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                lucRenderingEngine_RenderFunction*                        _render, \
+                lucRenderingEngine_ClearFunction*                          _clear, \
+                lucRenderingEngine_GetPixelDataFunction*            _getPixelData, \
+                lucRenderingEngine_CompositeViewportFunction*  _compositeViewport
+
+	#define LUCRENDERINGENGINE_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _render,            \
+	        _clear,             \
+	        _getPixelData,      \
+	        _compositeViewport
+
+	lucRenderingEngine* _lucRenderingEngine_New(  LUCRENDERINGENGINE_DEFARGS  );
 
 
 	void _lucRenderingEngine_Delete( void* renderingEngine ) ;
 	void _lucRenderingEngine_Print( void* renderingEngine, Stream* stream ) ;
 	void* _lucRenderingEngine_Copy( void* renderingEngine, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 
-	void _lucRenderingEngine_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data ) ;
+	void _lucRenderingEngine_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucRenderingEngine_Build( void* renderingEngine, void* data );
 	void _lucRenderingEngine_Initialise( void* renderingEngine, void* data );
 	void _lucRenderingEngine_Execute( void* renderingEngine, void* data );
@@ -101,7 +105,7 @@
 	/* +++ Public Functions +++ */
 	void lucRenderingEngine_Render( void* renderingEngine, lucWindow* window, AbstractContext* context ) ;
 	void lucRenderingEngine_Clear( void* renderingEngine, lucWindow* window, Bool clearAll ) ;
-	void lucRenderingEngine_GetPixelData( void* renderingEngine, lucWindow* window, lucPixel* pixelData ) ;
+	void lucRenderingEngine_GetPixelData(void* renderingEngine, lucWindow* window, void* pixelData, Bool withAlpha);
 	void lucRenderingEngine_CompositeViewport( 
 		void*                                              renderingEngine, 
 		lucViewportInfo*                                   viewportInfo, 
@@ -109,3 +113,4 @@
 		Bool                                               broadcast );
 
 #endif
+

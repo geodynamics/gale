@@ -43,7 +43,7 @@
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include <glucifer/Base/CrossSection.h>
+#include "CrossSection.h"
 
 #ifndef __lucEigenvectorsCrossSection_h__
 #define __lucEigenvectorsCrossSection_h__
@@ -52,70 +52,59 @@
 	extern const Type lucEigenvectorsCrossSection_Type;
 		
 	/** Class contents - this is defined as a macro so that sub-classes of this class can use this macro at the start of the definition of their struct */
-	#define __lucEigenvectorsCrossSection \
-		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
-		__lucOpenGLDrawingObject \
-		/* Virtual functions go here */ \
-		/* Other info */\
-		FieldVariable*                                     tensorField;              \
-		lucColour                                          colour[3];                \
-		/* Colour used to display negative EigenValues */                            \
-		lucColour                                          colourForNegative[3];     \
-		IJK                                                resolution;               \
-		double                                             arrowHeadSize;            \
-		double                                             lengthScale;              \
-		float                                              lineWidth;                \
-      lucCrossSection*                                   crossSection;           \
-		/* Specifies if the eigenvalue is used to draw the vector - default true */  \
-		Bool 						   useEigenValue;            \
-		/* Value used to draw the vector if the eigenvalue is not used */            \
-		double 				                   notEigenValue;            \
-		/* Specifies if the EigenVector and/or EigenValues are to be drawn */        \
-		/* Default is True for EigenVector, False for EigenValues */                 \
-                Bool                                               plotEigenVector;          \
-		Bool                                               plotEigenValue;           \
-		/* Used to scale the EigenValue if needed */                                 \
-		double 					           scaleEigenValue;
+	#define __lucEigenvectorsCrossSection                                                        \
+		/* Macro defining parent goes here - This means you can cast this class as its parent */  \
+		__lucCrossSection                                                                         \
+		/* Virtual functions go here */                                                           \
+		/* Other info */                                                                          \
+		lucColour                                          colours[3];                             \
+		/* Colour used to display negative EigenValues */                                         \
+		lucColour                                          colourForNegative[3];                  \
+		IJK                                                resolution;                            \
+		double                                             arrowHeadSize;                         \
+		double                                             lengthScale;                           \
+		float                                              lineWidth;                             \
+		/* Specifies if the eigenvalue is used to draw the vector - default true */               \
+		Bool 						                              useEigenValue;                         \
+		/* Value used to draw the vector if the eigenvalue is not used */                         \
+		double 				                                 notEigenValue;                         \
+		/* Specifies if the EigenVector and/or EigenValues are to be drawn */                     \
+		/* Default is True for EigenVector, False for EigenValues */                              \
+      Bool                                               plotEigenVector;                       \
+		Bool                                               plotEigenValue;                        \
+		/* Used to scale the EigenValue if needed */                                              \
+		double 					                              scaleEigenValue;                       \
 
 
 	struct lucEigenvectorsCrossSection { __lucEigenvectorsCrossSection };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucEigenvectorsCrossSection* _lucEigenvectorsCrossSection_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCEIGENVECTORSCROSSSECTION_DEFARGS \
+                LUCCROSSSECTION_DEFARGS
+
+	#define LUCEIGENVECTORSCROSSSECTION_PASSARGS \
+                LUCCROSSSECTION_PASSARGS
+
+	lucEigenvectorsCrossSection* _lucEigenvectorsCrossSection_New(  LUCEIGENVECTORSCROSSSECTION_DEFARGS  );
 
 	void _lucEigenvectorsCrossSection_Delete( void* drawingObject ) ;
 	void _lucEigenvectorsCrossSection_Print( void* drawingObject, Stream* stream ) ;
-	void* _lucEigenvectorsCrossSection_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) ;
 
 	/* 'Stg_Component' implementations */
 	void* _lucEigenvectorsCrossSection_DefaultNew( Name name ) ;
-	void _lucEigenvectorsCrossSection_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucEigenvectorsCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucEigenvectorsCrossSection_Build( void* drawingObject, void* data ) ;
 	void _lucEigenvectorsCrossSection_Initialise( void* drawingObject, void* data ) ;
 	void _lucEigenvectorsCrossSection_Execute( void* drawingObject, void* data );
 	void _lucEigenvectorsCrossSection_Destroy( void* drawingObject, void* data ) ;
 	
-	void _lucEigenvectorsCrossSection_Setup( void* drawingObject, void* _context ) ;
-	void _lucEigenvectorsCrossSection_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) ;
-	void _lucEigenvectorsCrossSection_CleanUp( void* drawingObject, void* _context ) ;
-
 	void _lucEigenvectorsCrossSection_BuildDisplayList( void* drawingObject, void* _context ) ;
-   void _lucEigenvectorsCrossSection_DrawCrossSection( void* drawingObject, Dimension_Index dim, lucCrossSection* crossSection );
+   void _lucEigenvectorsCrossSection_DrawCrossSection( void* drawingObject, Dimension_Index dim );
 
 #endif
+

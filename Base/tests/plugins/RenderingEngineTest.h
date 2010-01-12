@@ -61,22 +61,18 @@
 	typedef struct { __lucRenderingEngineTest } lucRenderingEngineTest;
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucRenderingEngineTest* _lucRenderingEngineTest_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucRenderingEngine_RenderFunction*                 _render,
-		lucRenderingEngine_GetPixelDataFunction*           _getPixelData,
-		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCRENDERINGENGINETEST_DEFARGS \
+                LUCRENDERINGENGINE_DEFARGS
+
+	#define LUCRENDERINGENGINETEST_PASSARGS \
+                LUCRENDERINGENGINE_PASSARGS
+
+	lucRenderingEngineTest* _lucRenderingEngineTest_New(  LUCRENDERINGENGINETEST_DEFARGS  );
 
 	void _lucRenderingEngineTest_Delete( void* renderingEngine ) ;
 	void _lucRenderingEngineTest_Print( void* renderingEngine, Stream* stream ) ;
@@ -84,7 +80,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucRenderingEngineTest_DefaultNew( Name name ) ;
-	void _lucRenderingEngineTest_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
+	void _lucRenderingEngineTest_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
 	void _lucRenderingEngineTest_Build( void* renderingEngine, void* data ) ;
 	void _lucRenderingEngineTest_Initialise( void* renderingEngine, void* data ) ;
 	void _lucRenderingEngineTest_Execute( void* renderingEngine, void* data );
@@ -102,3 +98,4 @@
 		Bool                                               broadcast ) ;
 
 #endif
+

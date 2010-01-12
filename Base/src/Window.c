@@ -80,42 +80,18 @@ const Type lucWindow_Type = "lucWindow";
 MPI_Datatype lucWindow_MPI_Datatype;
 MPI_Datatype lucViewportInfo_MPI_Datatype;
 
-lucWindow* _lucWindow_New(
-		SizeT                                           sizeOfSelf,
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy, 
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,		
-		lucWindow_DisplayFunction*						_displayWindow,	
-		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
-		lucWindow_EventProcessorFunction*				_eventProcessor,
-		lucWindow_ResizeFunction*						_resizeWindow,	
-		Name                                            name )
+lucWindow* _lucWindow_New(  LUCWINDOW_DEFARGS  )
 {
 	lucWindow*    self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucWindow) );
-	self = (lucWindow*) _Stg_Component_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name, 
-			NON_GLOBAL );
+	assert( _sizeOfSelf >= sizeof(lucWindow) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (lucWindow*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	/* Virtual functions */
 	self->_displayWindow = _displayWindow;
@@ -238,32 +214,35 @@ void* _lucWindow_Copy( void* window, void* dest, Bool deep, Name nameExt, PtrMap
 }
 
 void* _lucWindow_DefaultNew( Name name ) {
-	return _lucWindow_New( 
-			sizeof( lucWindow ),
-			lucWindow_Type,
-			_lucWindow_Delete,
-			_lucWindow_Print,
-			_lucWindow_Copy,
-			_lucWindow_DefaultNew,
-			_lucWindow_Construct,
-			_lucWindow_Build,
-			_lucWindow_Initialise,
-			_lucWindow_Execute,
-			_lucWindow_Destroy,
-			lucWindow_Display,
-			lucWindow_EventsWaiting,
-			lucWindow_EventProcessor,
-			lucWindow_Resize,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( lucWindow );
+	Type                                                      type = lucWindow_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucWindow_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucWindow_Print;
+	Stg_Class_CopyFunction*                                  _copy = _lucWindow_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucWindow_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucWindow_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucWindow_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucWindow_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucWindow_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucWindow_Destroy;
+	lucWindow_DisplayFunction*                      _displayWindow = lucWindow_Display;
+	lucWindow_EventsWaitingFunction*                _eventsWaiting = lucWindow_EventsWaiting;
+	lucWindow_EventProcessorFunction*              _eventProcessor = lucWindow_EventProcessor;
+	lucWindow_ResizeFunction*                        _resizeWindow = lucWindow_Resize;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _lucWindow_New(  LUCWINDOW_PASSARGS  );
 }
 
-void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) {
+void _lucWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data ) {
 	lucWindow*               self        = window;
 	lucViewportInfo*         viewportInfoList;
 	Viewport_Index           viewportCount;
 	lucOutputFormat**        outputFormatList;
 	OutputFormat_Index       outputFormatCount;
-	AbstractContext*         context;
 	lucRenderingEngine*      renderingEngine;
 	Pixel_Index              width;
 	Pixel_Index              height;
@@ -314,7 +293,10 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 		
 	/* The window needs information about the context so that it can attach itself 
 	 * onto the AbstractContext_EP_DumpClass entry point. */
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
 
 	renderingEngine = Stg_ComponentFactory_ConstructByKey( cf, self->name, "RenderingEngine", lucRenderingEngine, True, data );
 
@@ -327,13 +309,13 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 			outputFormatCount,
 			windowInteractionList,
 			windowInteractionCount,
-			context,
+			self->context,
 			width,
 			height,
 			Stg_ComponentFactory_GetString( cf, self->name, "backgroundColour", "white" ),
 			interactive,
 			continuous,
-			Stg_ComponentFactory_GetBool( cf, self->name, "isTimedOut", True ),
+			Stg_ComponentFactory_GetBool( cf, self->name, "isTimedOut", False ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "maxIdleTime", 600.0 ) 
 			);
 		
@@ -349,25 +331,22 @@ void _lucWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data ) 
 void _lucWindow_Build( void* window, void* data ) {
 	/* Save context and master flag */
 	lucWindow*  self = (lucWindow*)window;
-	self->context   = (AbstractContext*) data;
 	self->isMaster = (self->context->rank == MASTER);
 }
 
 void _lucWindow_Initialise( void* window, void* data ) {
-	lucWindow*           self            = (lucWindow*)window;
+	lucWindow* self;
 
-    lucDeleteFont(); 
+	self = (lucWindow*)window;
+
+	lucDeleteFont(); 
 	lucSetupRasterFont();
-
 }
 
 void _lucWindow_Execute( void* window, void* data ) { 
 	/* Display graphics and allow GUI interaction if enabled */
 	lucWindow*     self         = (lucWindow*) window ;
 	lucDebug_PrintFunctionBegin( self, 1 );
-
-	/* Reset idle timer */
-	lucWindow_IdleReset(self);	
 
 	/* Flag viewports need to re-render new information */
 	lucWindow_SetViewportNeedsToSetupFlag( self, True );
@@ -376,6 +355,9 @@ void _lucWindow_Execute( void* window, void* data ) {
 	/* Draw Window (Call virtual to display) 
 	 initial output for background & interactive modes */
 	self->_displayWindow( self );
+
+	/* Reset idle timer */
+	lucWindow_IdleReset(self);	
 
 	/* Interactive mode? Enter event loop processing */
 	if ( self->interactive ) {
@@ -500,6 +482,7 @@ void lucWindow_Dump( void* window, AbstractContext* context ) {
 	Pixel_Index    width        = self->width;
 	Pixel_Index    height       = self->height;
 	lucPixel*      imageBuffer  = NULL;
+	lucAlphaPixel* imageAlphaBuffer  = NULL;
 	Stream*        errorStream  = Journal_MyStream( Error_Type, self );
 
 	lucDebug_PrintFunctionBegin( self, 1 );
@@ -507,15 +490,19 @@ void lucWindow_Dump( void* window, AbstractContext* context ) {
 	/* Allocate Memory */
 	imageBuffer = Memory_Alloc_Array( lucPixel, width * height, "Pixels" );
 	Journal_Firewall( imageBuffer != NULL, errorStream, "In func %s: Cannot allocate array.", __func__ );
+	imageAlphaBuffer = Memory_Alloc_Array( lucAlphaPixel, width * height, "Pixels" );
+	Journal_Firewall( imageAlphaBuffer != NULL, errorStream, "In func %s: Cannot allocate array.", __func__ );
 
 	/* Grab Pixels from window */
-	lucRenderingEngine_GetPixelData( self->renderingEngine, self, imageBuffer );
+	lucRenderingEngine_GetPixelData( self->renderingEngine, self, imageBuffer, False );
+	lucRenderingEngine_GetPixelData( self->renderingEngine, self, imageAlphaBuffer, True );
 
 	/* Output in different formats that the user gives */
-	lucOutputFormat_Register_OutputAll( self->outputFormat_Register, self, context, imageBuffer );
+	lucOutputFormat_Register_OutputAll( self->outputFormat_Register, self, context, imageBuffer, imageAlphaBuffer);
 	
 	/* Free memory */
 	Memory_Free( imageBuffer );
+	Memory_Free( imageAlphaBuffer );
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
 
@@ -971,5 +958,7 @@ void lucWindow_IdleCheck(void *window) {
 		}
 	}
 }
+
+
 
 

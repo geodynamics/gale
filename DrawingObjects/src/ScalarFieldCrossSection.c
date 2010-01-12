@@ -52,10 +52,8 @@
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
 
-#include <glucifer/Base/CrossSection.h>
-
 #include "types.h"
-#include "OpenGLDrawingObject.h"
+#include "CrossSection.h"
 #include "ScalarFieldCrossSection.h"
 
 #include <assert.h>
@@ -68,132 +66,79 @@
 const Type lucScalarFieldCrossSection_Type = "lucScalarFieldCrossSection";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucScalarFieldCrossSection* _lucScalarFieldCrossSection_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name ) 
+lucScalarFieldCrossSection* _lucScalarFieldCrossSection_New(  LUCSCALARFIELDCROSSSECTION_DEFARGS  ) 
 {
 	lucScalarFieldCrossSection*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucScalarFieldCrossSection) );
-	self = (lucScalarFieldCrossSection*) _lucOpenGLDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucScalarFieldCrossSection) );
+	self = (lucScalarFieldCrossSection*) _lucCrossSection_New(  LUCCROSSSECTION_PASSARGS  );
 	
 	return self;
 }
 
 void _lucScalarFieldCrossSection_Init( 
 		lucScalarFieldCrossSection*                                  self,
-		Name                                                         fieldVariableName,
 		lucColourMap*                                                colourMap,
 		IJK                                                          resolution,
-		lucCrossSection*                                             crossSection,
 		XYZ                                                          minCropValues,
-		XYZ                                                          maxCropValues ) 
+		XYZ                                                          maxCropValues,
+      Bool                                                        cullFace ) 
 {
-//	self->fieldVariable = fieldVariable;
-	self->fieldVariableName = fieldVariableName;
 	self->colourMap = colourMap;
 	memcpy( self->resolution, resolution, sizeof(IJK) );
 	memcpy( self->minCropValues, minCropValues, sizeof(XYZ) );
 	memcpy( self->maxCropValues, maxCropValues, sizeof(XYZ) );
-	self->crossSection = crossSection;
+	self->cullFace = cullFace;
 }
 
 void _lucScalarFieldCrossSection_Delete( void* drawingObject ) {
 	lucScalarFieldCrossSection*  self = (lucScalarFieldCrossSection*)drawingObject;
 
-   lucCrossSection_Delete(self->crossSection);
-	_lucOpenGLDrawingObject_Delete( self );
+	_lucCrossSection_Delete( self );
 }
 
 void _lucScalarFieldCrossSection_Print( void* drawingObject, Stream* stream ) {
 	lucScalarFieldCrossSection*  self = (lucScalarFieldCrossSection*)drawingObject;
 
-	_lucOpenGLDrawingObject_Print( self, stream );
+	_lucCrossSection_Print( self, stream );
 }
-
-void* _lucScalarFieldCrossSection_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) {
-	lucScalarFieldCrossSection*  self = (lucScalarFieldCrossSection*)drawingObject;
-	lucScalarFieldCrossSection* newDrawingObject;
-
-	newDrawingObject = _lucOpenGLDrawingObject_Copy( self, dest, deep, nameExt, ptrMap );
-
-	/* TODO */
-	abort();
-
-	return (void*) newDrawingObject;
-}
-
 
 void* _lucScalarFieldCrossSection_DefaultNew( Name name ) {
-	return (void*) _lucScalarFieldCrossSection_New(
-		sizeof(lucScalarFieldCrossSection),
-		lucScalarFieldCrossSection_Type,
-		_lucScalarFieldCrossSection_Delete,
-		_lucScalarFieldCrossSection_Print,
-		NULL,
-		_lucScalarFieldCrossSection_DefaultNew,
-		_lucScalarFieldCrossSection_Construct,
-		_lucScalarFieldCrossSection_Build,
-		_lucScalarFieldCrossSection_Initialise,
-		_lucScalarFieldCrossSection_Execute,
-		_lucScalarFieldCrossSection_Destroy,
-		_lucScalarFieldCrossSection_Setup,
-		_lucScalarFieldCrossSection_Draw,
-		_lucScalarFieldCrossSection_CleanUp,
-		_lucScalarFieldCrossSection_BuildDisplayList,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucScalarFieldCrossSection);
+	Type                                                             type = lucScalarFieldCrossSection_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucScalarFieldCrossSection_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucScalarFieldCrossSection_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucScalarFieldCrossSection_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucScalarFieldCrossSection_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucScalarFieldCrossSection_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucScalarFieldCrossSection_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucScalarFieldCrossSection_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucScalarFieldCrossSection_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucScalarFieldCrossSection_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucCrossSection_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucOpenGLDrawingObject_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucScalarFieldCrossSection_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucScalarFieldCrossSection_New(  LUCSCALARFIELDCROSSSECTION_PASSARGS  );
 }
 
-void _lucScalarFieldCrossSection_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucScalarFieldCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucScalarFieldCrossSection*     self = (lucScalarFieldCrossSection*)drawingObject;
 	lucColourMap*    colourMap;
 	Index            defaultResolution;
 	IJK              resolution;
-   lucCrossSection* crossSection;
-	Name             fieldVariableName;
 	XYZ              minCropValues;
 	XYZ              maxCropValues;
+   Bool              cullFace;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
-
-	fieldVariableName = Stg_ComponentFactory_GetString( cf, self->name, "FieldVariable", "defaultName" );
-
-	/* This variable is now construct in build phase.
-	   fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "FieldVariable", FieldVariable, True ) ;
-	*/
-
+	_lucCrossSection_AssignFromXML( self, cf, data );
 
 	colourMap = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap", lucColourMap, True, data ) ;
 
@@ -209,25 +154,25 @@ void _lucScalarFieldCrossSection_Construct( void* drawingObject, Stg_ComponentFa
 	maxCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropX", +HUGE_VAL );
 	maxCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropY", +HUGE_VAL );
 	maxCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropZ", +HUGE_VAL );
+
+   cullFace = Stg_ComponentFactory_GetBool( cf, self->name, "cullFace", True );
 	
 	_lucScalarFieldCrossSection_Init( 
 			self, 
-			fieldVariableName,
 			colourMap,
 			resolution,
-			lucCrossSection_Read(cf, self->name),
 			minCropValues,
-			maxCropValues );
+			maxCropValues,
+         cullFace );
 }
 
 void _lucScalarFieldCrossSection_Build( void* drawingObject, void* data ) {
 	lucScalarFieldCrossSection*     self        = (lucScalarFieldCrossSection*)drawingObject;
-	AbstractContext*                context     = Stg_CheckType( data, AbstractContext );
-	Stg_ComponentFactory*           cf          = context->CF;
 	Stream*                         errorStream = Journal_Register( Error_Type, self->type );
 
-	/* HACK - Get pointer to FieldVariable in build phase just to let FieldVariables be created in plugins */
-	self->fieldVariable = Stg_ComponentFactory_ConstructByName( cf, self->fieldVariableName, FieldVariable, True, data ); 
+   /* Build field variable in parent */
+   _lucCrossSection_Build(self, data);
+
 	Journal_Firewall( self->fieldVariable->fieldComponentCount == 1, errorStream,
 		"Error - in %s(): provided FieldVariable \"%s\" has %u components - but %s Component "
 		"can only visualise FieldVariables with 1 component. Did you mean to visualise the "
@@ -246,30 +191,16 @@ void _lucScalarFieldCrossSection_Setup( void* drawingObject, void* _context ) {
 	_lucOpenGLDrawingObject_Setup( self, _context );
 }
 	
-void _lucScalarFieldCrossSection_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
-	lucScalarFieldCrossSection*       self            = (lucScalarFieldCrossSection*)drawingObject;
-	_lucOpenGLDrawingObject_Draw( self, window, viewportInfo, _context );
-}
-
-
-void _lucScalarFieldCrossSection_CleanUp( void* drawingObject, void* _context ) {
-	lucScalarFieldCrossSection*       self            = (lucScalarFieldCrossSection*)drawingObject;
-	_lucOpenGLDrawingObject_CleanUp( self, _context );
-}
-
 void _lucScalarFieldCrossSection_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucScalarFieldCrossSection*       self            = (lucScalarFieldCrossSection*)drawingObject;
-	lucScalarFieldCrossSection_DrawCrossSection( self, self->crossSection );
+	lucScalarFieldCrossSection_DrawCrossSection( self, GL_CCW );
 }
 
 #define FUDGE_FACTOR 0.0001
 
-void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, lucCrossSection* crossSection ) {
+void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, int direction) {
 	lucScalarFieldCrossSection*       self            = (lucScalarFieldCrossSection*)drawingObject;
 	FieldVariable* fieldVariable = self->fieldVariable;
-   Axis           axis = crossSection->axis;
-	Axis           aAxis;
-	Axis           bAxis;
 	Coord          min, globalMin;
 	Coord          max, globalMax;
 	Coord          pos;
@@ -283,16 +214,22 @@ void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, lucCrossS
 	double         bLength;
 	Dimension_Index dim_I;
 
-	/* Ensure the field is synchronised. */
-	lucOpenGLDrawingObject_SyncShadowValues( self, self->fieldVariable );
-	
-	glDisable(GL_LIGHTING);
-	
-	aAxis = ( axis == I_AXIS ? J_AXIS : I_AXIS );
-	bAxis = ( axis == K_AXIS ? J_AXIS : K_AXIS );
-	
-	aResolution = self->resolution[ aAxis ];
-	bResolution = self->resolution[ bAxis ];
+   /* set polygon face winding */
+	glFrontFace(direction); 
+   /* Visible from both sides? */
+	if ( self->cullFace )
+      glEnable(GL_CULL_FACE);
+	else
+      glDisable(GL_CULL_FACE);
+
+   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	if (fieldVariable->dim == 2) 
+      glDisable(GL_LIGHTING);
+   else
+      glEnable(GL_LIGHTING);
+
+	aResolution = self->resolution[ self->axis1 ];
+	bResolution = self->resolution[ self->axis2 ];
 	
 	FieldVariable_GetMinAndMaxGlobalCoords( fieldVariable, globalMin, globalMax );
 	FieldVariable_GetMinAndMaxLocalCoords( fieldVariable, min, max );
@@ -304,20 +241,22 @@ void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, lucCrossS
 	}
 
 	/* Find position of cross section */
-	pos[axis] = lucCrossSection_GetValue(crossSection, globalMin[axis], globalMax[axis]);
+	pos[self->axis] = lucCrossSection_GetValue(self, globalMin[self->axis], globalMax[self->axis]);
 	Journal_DPrintfL( self->debugStream, 2, 
 			"%s called on field %s, with res[A] as %u, res[B] as %u, axis of cross section as %d, crossSection value as %g\n",
-			__func__, fieldVariable->name, aResolution, bResolution, axis, pos[axis]);
-	
+			__func__, fieldVariable->name, aResolution, bResolution, self->axis, pos[self->axis]);
 
 	/* Create normal */
-	normal[axis]  = 1.0;
-	normal[aAxis] = 0.0;
-	normal[bAxis] = 0.0;
+	normal[self->axis]  = 1.0;
+	normal[self->axis1] = 0.0;
+	normal[self->axis2] = 0.0;
+   /* Flip normal to face opposite direction if cross-section past mid-point in 3d */
+   if (fieldVariable->dim == 3 && pos[self->axis] >= globalMin[self->axis] + 0.5 * globalMax[self->axis] - globalMin[self->axis]) 
+      normal[self->axis] = -1.0;
 	glNormal3fv( normal );
 
-	aLength = (max[aAxis] - min[aAxis])/(double)aResolution;
-	bLength = (max[bAxis] - min[bAxis])/(double)bResolution;
+	aLength = (max[self->axis1] - min[self->axis1])/(double)aResolution;
+	bLength = (max[self->axis2] - min[self->axis2])/(double)bResolution;
 
 	Journal_DPrintfL( self->debugStream, 2, "Calculated aLength as %g, bLength as %g\n", aLength, bLength );
 
@@ -327,38 +266,40 @@ void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, lucCrossS
 		glBegin(GL_QUAD_STRIP);
 		for ( bIndex = 0 ; bIndex < bResolution + 2 ; bIndex++ ) {
 			/* Get position */
-			pos[ aAxis ] = min[ aAxis ] + (double)aIndex * aLength;
-			pos[ bAxis ] = min[ bAxis ] + (double)bIndex * bLength;
+			pos[ self->axis1 ] = min[ self->axis1 ] + (double)aIndex * aLength;
+			pos[ self->axis2 ] = min[ self->axis2 ] + (double)bIndex * bLength;
 
 			memcpy( interpolationCoord, pos, sizeof(Coord) );
 
-			if ( pos[ bAxis ] >= max[ bAxis ] ) { 
-				pos[ bAxis ] = max[ bAxis ];
-				interpolationCoord[ bAxis ] = max[ bAxis ] - FUDGE_FACTOR/bLength;
+			if ( pos[ self->axis2 ] >= max[ self->axis2 ] ) { 
+				pos[ self->axis2 ] = max[ self->axis2 ];
+				interpolationCoord[ self->axis2 ] = max[ self->axis2 ] - FUDGE_FACTOR/bLength;
 			}
-			if (pos[ aAxis ] >= max[ aAxis ]) {
-				pos[ aAxis ] = max[ aAxis ];
-				interpolationCoord[ aAxis ] = max[ aAxis ] - FUDGE_FACTOR/aLength;
+			if (pos[ self->axis1 ] >= max[ self->axis1 ]) {
+				pos[ self->axis1 ] = max[ self->axis1 ];
+				interpolationCoord[ self->axis1 ] = max[ self->axis1 ] - FUDGE_FACTOR/aLength;
 			}
 			
 			/* Plot bottom left corner of coloured tile */
 			lucScalarFieldCrossSection_PlotColouredVertex( self, interpolationCoord, pos );
 
 			/* Plot top left corner of coloured tile */
-			pos[ aAxis ] += aLength;
-			if (pos[ aAxis ] >= max[ aAxis ]) {
-				pos[ aAxis ] = max[ aAxis ];
-				interpolationCoord[ aAxis ] = max[ aAxis ] - FUDGE_FACTOR/aLength;
+			pos[ self->axis1 ] += aLength;
+			if (pos[ self->axis1 ] >= max[ self->axis1 ]) {
+				pos[ self->axis1 ] = max[ self->axis1 ];
+				interpolationCoord[ self->axis1 ] = max[ self->axis1 ] - FUDGE_FACTOR/aLength;
 			}
 			else
-				interpolationCoord[ aAxis ] = pos[ aAxis ];
+				interpolationCoord[ self->axis1 ] = pos[ self->axis1 ];
 			
 			lucScalarFieldCrossSection_PlotColouredVertex( self, interpolationCoord, pos );
 		}
 		glEnd();
 	}
 
-	glEnable(GL_LIGHTING);
+   glEnable(GL_LIGHTING);
+   glEnable(GL_CULL_FACE);
+   glFrontFace(GL_CCW);
 }
 
 Bool lucScalarFieldCrossSection_PlotColouredVertex( void* drawingObject, Coord interpolationCoord, Coord plotCoord ) {
@@ -368,27 +309,45 @@ Bool lucScalarFieldCrossSection_PlotColouredVertex( void* drawingObject, Coord i
 	lucColourMap*  cmap          = self->colourMap;
 	double         quantity;
 
+//   static double ttime1, ttime2;
+//   double time2, time1 = MPI_Wtime();
+
 	Journal_DPrintfL( self->debugStream, 3, "%s called at interpolationCoord (%g,%g,%g)  - ",
 			__func__, interpolationCoord[0], interpolationCoord[1], interpolationCoord[2] );
 
 	/* Interpolate value to this position */
 	result = FieldVariable_InterpolateValueAt( fieldVariable, interpolationCoord, &quantity );
+//   ttime1 += (MPI_Wtime() - time1);
+//   time2 = MPI_Wtime();
+
 	if ( LOCAL == result || SHADOW == result ) {
 		/* Get colour for this value from colour map */
 		lucColourMap_SetOpenGLColourFromValue( cmap, quantity );
 
 		Journal_DPrintfL( self->debugStream, 3, "%s is %g there.\n", fieldVariable->name, quantity );
-		
-		Journal_DPrintfL( self->debugStream, 3, "Plotting At Vertex (%g,%g,%g).\n", 
-				plotCoord[0], plotCoord[1], plotCoord[2]  );
+		Journal_DPrintfL( self->debugStream, 3, "Plotting At Vertex (%g,%g,%g).\n", plotCoord[0], plotCoord[1], plotCoord[2]  );
 
 		/* Plot Vertex */
 		glVertex3dv(plotCoord);
 
+//      ttime2 += (MPI_Wtime() - time2);
+//		fprintf(stderr, "Plotting At Vertex (%g,%g,%g). (ttime1 %f ttime2 %f)\n", 
+//				plotCoord[0], plotCoord[1], plotCoord[2] , ttime1, ttime2);
+
 		return True;
 	}
 
-	Journal_DPrintfL( self->debugStream, 3, "%s NOT FOUND THERE.\n", fieldVariable->name );
+//   ttime2 += (MPI_Wtime() - time2);
+//   fprintf( stderr, "%s NOT FOUND THERE. (ttime1 %f ttime2 %f)\n", fieldVariable->name, ttime1, ttime2);
+
+   if (self->context->nproc == 1)
+	   Journal_DPrintfL( self->errorStream, 3, 
+      "%s Could not interpolate value at %f,%f,%f, returned OTHER_PROC yet running on 1 processor!\n", 
+      fieldVariable->name, interpolationCoord[0], interpolationCoord[1], interpolationCoord[2] );
+
+	Journal_DPrintfL( self->debugStream, 3, "%s InterpolateValueAt: NOT FOUND.\n", fieldVariable->name );
 	/* If value could not be interpolated return warning */
 	return False;
 }
+
+

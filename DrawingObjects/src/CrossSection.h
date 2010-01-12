@@ -39,26 +39,33 @@
 *+		Patrick Sunter
 *+		Greg Watson
 *+
-** $Id: OutputPNG.h 628 2006-10-12 08:23:07Z SteveQuenette $
+** $Id: CrossSection.h 628 2006-10-12 08:23:07Z SteveQuenette $
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+#include "OpenGLDrawingObject.h"
 
-
-#ifndef __lucOutputPNG_h__
-#define __lucOutputPNG_h__
+#ifndef __lucCrossSection_h__
+#define __lucCrossSection_h__
 
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
-	extern const Type lucOutputPNG_Type;
+	extern const Type lucCrossSection_Type;
 		
 	/** Class contents - this is defined as a macro so that sub-classes of this class can use this macro at the start of the definition of their struct */
-	#define __lucOutputPNG \
+	#define __lucCrossSection                    \
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
-		__lucOutputFormat \
-		/* Virtual functions go here */ \
-		/* Other info */\
+		__lucOpenGLDrawingObject                  \
+		/* Virtual functions go here */           \
+		/* Other info */                          \
+		lucColour            colour;              \
+		FieldVariable*       fieldVariable;       \
+		Name                 fieldVariableName;   \
+  		double               value;               \
+		Axis                 axis;                \
+		Axis                 axis1;               \
+		Axis                 axis2;               \
+      Bool                 interpolate;         \
 
-
-	struct lucOutputPNG { __lucOutputPNG };
+	struct lucCrossSection { __lucCrossSection };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	
@@ -66,27 +73,30 @@
 	#define ZERO 0
 	#endif
 
-	#define LUCOUTPUTPNG_DEFARGS \
-                LUCOUTPUTFORMAT_DEFARGS
+	#define LUCCROSSSECTION_DEFARGS \
+                LUCOPENGLDRAWINGOBJECT_DEFARGS
 
-	#define LUCOUTPUTPNG_PASSARGS \
-                LUCOUTPUTFORMAT_PASSARGS
+	#define LUCCROSSSECTION_PASSARGS \
+                LUCOPENGLDRAWINGOBJECT_PASSARGS
 
-	lucOutputPNG* _lucOutputPNG_New(  LUCOUTPUTPNG_DEFARGS  );
+	lucCrossSection* _lucCrossSection_New(  LUCCROSSSECTION_DEFARGS  );
 
-	void _lucOutputPNG_Delete( void* outputFormat ) ;
-	void _lucOutputPNG_Print( void* outputFormat, Stream* stream ) ;
-	void* _lucOutputPNG_Copy( void* outputFormat, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) ;
+	void _lucCrossSection_Delete( void* drawingObject ) ;
+	void _lucCrossSection_Print( void* drawingObject, Stream* stream ) ;
 
 	/* 'Stg_Component' implementations */
-	void* _lucOutputPNG_DefaultNew( Name name ) ;
-	void _lucOutputPNG_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data );
-	void _lucOutputPNG_Build( void* outputFormat, void* data ) ;
-	void _lucOutputPNG_Initialise( void* outputFormat, void* data ) ;
-	void _lucOutputPNG_Execute( void* outputFormat, void* data );
-	void _lucOutputPNG_Destroy( void* outputFormat, void* data ) ;
-	
-	void _lucOutputPNG_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) ;
+	void* _lucCrossSection_DefaultNew( Name name ) ;
+	void _lucCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucCrossSection_Build( void* drawingObject, void* data ) ;
+	void _lucCrossSection_Initialise( void* drawingObject, void* data ) ;
+	void _lucCrossSection_Execute( void* drawingObject, void* data );
+	void _lucCrossSection_Destroy( void* drawingObject, void* data ) ;
+
+   void _lucCrossSection_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context );
+   void _lucCrossSection_BuildDisplayList( void* drawingObject, void* _context );
+
+   double lucCrossSection_GetValue(void* crossSection, double min, double max);
+   lucCrossSection* lucCrossSection_Set(void* crossSection, double val, Axis axis, Bool interpolate);
 
 #endif
 

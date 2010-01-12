@@ -29,6 +29,7 @@
 <param name="Example"><![CDATA[
 		<struct name="imageOutput">
 			<param name="Type">lucOutputPNG</param>
+			<param name="transparent">true</param>
 		</struct>]]>
 </param>
 

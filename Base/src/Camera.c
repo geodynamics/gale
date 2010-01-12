@@ -71,59 +71,62 @@ lucCamera* lucCamera_New(
 {
 	lucCamera* self = (lucCamera*) _lucCamera_DefaultNew( name );
 
-	lucCamera_InitAll( self, coord, focalPoint, rotationCentre, upDirection, focalLength, aperture, eyeSeparation, stereoType, centreFieldVariable );
+	self->isConstructed = True;
+	_lucCamera_Init( self, coord, focalPoint, rotationCentre, upDirection, focalLength, aperture, eyeSeparation, stereoType, centreFieldVariable );
 
 	return self;
 }
 
-lucCamera* _lucCamera_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		Name                                               name )
+void* _lucCamera_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( lucCamera );
+	Type                                                      type = lucCamera_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucCamera_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucCamera_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Stg_Class_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucCamera_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucCamera_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucCamera_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucCamera_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucCamera_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucCamera_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _lucCamera_New(  LUCCAMERA_PASSARGS  );
+}
+
+lucCamera* _lucCamera_New(  LUCCAMERA_DEFARGS  )
 {
-	lucCamera*    self;
+	lucCamera* self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucCamera) );
-	self = (lucCamera*) _Stg_Component_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name, 
-			NON_GLOBAL );
+	assert( _sizeOfSelf >= sizeof(lucCamera) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (lucCamera*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	return self;
 }
 
-void lucCamera_Init(		
-		lucCamera*                                         self,
-		Coord                                              coord, 
-		Coord                                              focalPoint,
-		Coord                                              rotationCentre,
-		XYZ                                                upDirection,
-		double                                             focalLength,
-		double                                             aperture,
-		double                                             eyeSeparation,
-		lucStereoType                                      stereoType,
-		FieldVariable*                                     centreFieldVariable )
+void _lucCamera_Init(		
+	void*				camera,
+	Coord				coord, 
+	Coord				focalPoint,
+	Coord				rotationCentre,
+	XYZ				upDirection,
+	double			focalLength,
+	double			aperture,
+	double			eyeSeparation,
+	lucStereoType	stereoType,
+	FieldVariable*	centreFieldVariable )
 {
+	lucCamera* self = camera;
+
 	memcpy( self->coord, coord, sizeof(Coord) );
 	memcpy( self->focalPoint, focalPoint, sizeof(Coord) );
 	memcpy( self->rotationCentre, rotationCentre, sizeof(Coord) );
@@ -138,32 +141,13 @@ void lucCamera_Init(
 	/* Store Original Values */
 	self->needsToDraw   = True;
 	self->buffer        = lucLeft;
-	self->originalCamera = lucCamera_Copy( self );
-}
-
-void lucCamera_InitAll( 
-		void*                                              camera,
-		Coord                                              coord, 
-		Coord                                              focalPoint,
-		Coord                                              rotationCentre,
-		XYZ                                                upDirection,
-		double                                             focalLength,
-		double                                             aperture,
-		double                                             eyeSeparation,
-		lucStereoType                                      stereoType,
-		FieldVariable*                                     centreFieldVariable )
-{
-	lucCamera* self        = camera;
-
-	/* TODO Init parent */
-	lucCamera_Init( self, coord, focalPoint, rotationCentre, upDirection, focalLength, aperture, eyeSeparation, stereoType, centreFieldVariable );
+	//self->originalCamera = lucCamera_Copy( self );
+   self->originalCamera = _lucCamera_DefaultNew( "CameraCopy" );
+	_lucCamera_Copy( self, self->originalCamera );
 }
 
 void _lucCamera_Delete( void* camera ) {
-	lucCamera* self        = camera;
-	
-	if ( self->originalCamera != NULL );
-		Stg_Class_Delete( self->originalCamera );
+	lucCamera* self = camera;
 	
 	_Stg_Component_Delete( self );
 }
@@ -207,11 +191,9 @@ void _lucCamera_Print( void* camera, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void* _lucCamera_Copy( void* camera, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void _lucCamera_Copy( void* camera, void* dest ) {
 	lucCamera* self        = camera;
-	lucCamera* newCamera;
-
-	newCamera = _Stg_Component_Copy( self, dest, deep, nameExt, ptrMap );
+	lucCamera* newCamera   = dest;
 
 	newCamera->originalCamera      = NULL;
    newCamera->centreFieldVariable = NULL;
@@ -227,39 +209,26 @@ void* _lucCamera_Copy( void* camera, void* dest, Bool deep, Name nameExt, PtrMap
 	newCamera->buffer        = self->buffer;
 	newCamera->stereoType    = self->stereoType;
 	newCamera->needsToDraw   = self->needsToDraw;
-
-	return (void*) newCamera;
 }
 
-void* _lucCamera_DefaultNew( Name name ) {
-	return _lucCamera_New( 
-			sizeof( lucCamera ),
-			lucCamera_Type,
-			_lucCamera_Delete,
-			_lucCamera_Print,
-			_lucCamera_Copy,
-			_lucCamera_DefaultNew,
-			_lucCamera_Construct,
-			_lucCamera_Build,
-			_lucCamera_Initialise,
-			_lucCamera_Execute,
-			_lucCamera_Destroy,
-			name );
-}
-
-void _lucCamera_Construct( void* camera, Stg_ComponentFactory* cf, void* data ) {
+void _lucCamera_AssignFromXML( void* camera, Stg_ComponentFactory* cf, void* data ) {
 	lucCamera*             self               = (lucCamera*) camera;
 	Coord                  coord;
 	Coord                  focalPoint;
 	Coord                  rotationCentre;
 	XYZ                    upDirection;
 	FieldVariable*         centreFieldVariable;
-	double                 focalLength;
+   Coord                   vectorFocusToCamera;
+	double                 focalLength, defaultFocalLength;
 	double                 aperture;
 	double                 eyeSeparation;
 	lucStereoType          stereoType;
 	Name                   stereoTypeName;
 
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	
   #define DTOR 0.0174532925
 	focalPoint[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "focalPointX", 0.0 );
 	focalPoint[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "focalPointY", 0.0 );
@@ -273,12 +242,13 @@ void _lucCamera_Construct( void* camera, Stg_ComponentFactory* cf, void* data ) 
 	upDirection[J_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, "upDirectionY", 1.0 );
 	upDirection[K_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, "upDirectionZ", 0.0 );
 	
-	focalLength = Stg_ComponentFactory_GetDouble( cf, self->name, "focalLength", 0.0 );
-
 	coord[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "coordX", 0.0 );
 	coord[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "coordY", 0.0 );
 	coord[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "coordZ", 1.0 );
 
+	StGermain_VectorSubtraction( vectorFocusToCamera, coord, focalPoint, 3 );
+   defaultFocalLength = StGermain_VectorMagnitude(vectorFocusToCamera, 3);
+	focalLength = Stg_ComponentFactory_GetDouble( cf, self->name, "focalLength", defaultFocalLength );
 	aperture = Stg_ComponentFactory_GetDouble( cf, self->name, "aperture", 45.0 );
 
 	/* Get Stereo Type */
@@ -290,11 +260,11 @@ void _lucCamera_Construct( void* camera, Stg_ComponentFactory* cf, void* data ) 
 	else 
 		stereoType = lucMono;
 
-	eyeSeparation  = Stg_ComponentFactory_GetDouble( cf, self->name, "eyeSeparation", 0.2 );
+	eyeSeparation  = Stg_ComponentFactory_GetDouble( cf, self->name, "eyeSeparation", focalLength / 30.0 );
 
 	centreFieldVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, "CentreFieldVariable", FieldVariable,False,data);
 
-	lucCamera_Init( self, coord, focalPoint, rotationCentre, upDirection, focalLength, aperture, eyeSeparation, stereoType, centreFieldVariable );
+	_lucCamera_Init( self, coord, focalPoint, rotationCentre, upDirection, focalLength, aperture, eyeSeparation, stereoType, centreFieldVariable );
 }
 
 void _lucCamera_Build( void* camera, void* data ) { 
@@ -314,8 +284,11 @@ void _lucCamera_Initialise( void* camera, void* data ) {
 		lucCamera_CentreFromFieldVariable( self );
 	}
 }
+
 void _lucCamera_Execute( void* camera, void* data ) { }
-void _lucCamera_Destroy( void* camera, void* data ) { }
+
+void _lucCamera_Destroy( void* camera, void* data ) {
+}
 
 void lucCamera_Zoom( void* camera, double zoomFactor ) {
 	lucCamera* self                = camera;
@@ -383,7 +356,8 @@ void lucCamera_Reset( void* camera ) {
 	lucCamera* self                = camera;
 	lucCamera* originalCamera      = self->originalCamera;
 	
-	Stg_Class_Copy( originalCamera, self, False, NULL, NULL );
+   _lucCamera_Copy( originalCamera, self );
+	//Stg_Class_Copy( originalCamera, self, False, NULL, NULL );
 	self->originalCamera = originalCamera;
 	self->needsToDraw = True;
 }
@@ -493,11 +467,12 @@ void lucCamera_ChangeFocalPoint( void* camera, Pixel_Index startx, Pixel_Index s
 	lucCamera*      self = (lucCamera*) camera;
 	XYZ             leftDirection;
 	Dimension_Index dim_I;
+   double adjust = self->focalLength / 200.0;
 
 	lucCamera_GetLeftDirection( camera, leftDirection );
 	for ( dim_I = 0 ; dim_I < 3 ; dim_I++ ) {
-		self->focalPoint[ dim_I ] += 0.01 * ((double)xpos - (double)startx) * leftDirection[ dim_I ];
-		self->focalPoint[ dim_I ] -= 0.01 * ((double)ypos - (double)starty) * self->upDirection[ dim_I ];
+		self->focalPoint[ dim_I ] += adjust * ((double)xpos - (double)startx) * leftDirection[ dim_I ];
+		self->focalPoint[ dim_I ] -= adjust * ((double)ypos - (double)starty) * self->upDirection[ dim_I ];
 	}
 
 	self->needsToDraw = True;
@@ -562,3 +537,5 @@ void lucCamera_Create_MPI_Datatype() {
 	MPI_Type_struct( lucCamera_TypesCount, blocklen, displacement, typeList, &lucCamera_MPI_Datatype );
 	MPI_Type_commit( & lucCamera_MPI_Datatype );
 }
+
+

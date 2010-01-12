@@ -58,42 +58,18 @@
 
 const Type lucRenderingEngine_Type = "lucRenderingEngine";
 
-lucRenderingEngine* _lucRenderingEngine_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		lucRenderingEngine_RenderFunction*                 _render,
-		lucRenderingEngine_ClearFunction*				   _clear,
-		lucRenderingEngine_GetPixelDataFunction*           _getPixelData,
-		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport,
-		Name                                               name )
+lucRenderingEngine* _lucRenderingEngine_New(  LUCRENDERINGENGINE_DEFARGS  )
 {
 	lucRenderingEngine*    self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucRenderingEngine) );
-	self = (lucRenderingEngine*) _Stg_Component_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name, 
-			NON_GLOBAL );
+	assert( _sizeOfSelf >= sizeof(lucRenderingEngine) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (lucRenderingEngine*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	self->_render            = _render;
 	self->_clear			 = _clear;
@@ -143,8 +119,12 @@ void* _lucRenderingEngine_Copy( void* renderingEngine, void* dest, Bool deep, Na
 	return (void*) newRenderingEngine;
 }
 
-void _lucRenderingEngine_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data ) {
+void _lucRenderingEngine_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data ) {
 	lucRenderingEngine*        self            = (lucRenderingEngine*) renderingEngine ;
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 
 	_lucRenderingEngine_Init( self );
 }
@@ -174,12 +154,12 @@ void lucRenderingEngine_Clear( void* renderingEngine,  lucWindow* window, Bool c
 	lucDebug_PrintFunctionEnd( self, 2 );
 }
 
-void lucRenderingEngine_GetPixelData( void* renderingEngine, lucWindow* window, lucPixel* pixelData ) {
+void lucRenderingEngine_GetPixelData( void* renderingEngine, lucWindow* window, void* pixelData, Bool withAlpha ) {
 	lucRenderingEngine*   self       = (lucRenderingEngine*) renderingEngine ;
 	
 	lucDebug_PrintFunctionBegin( self, 2 );
 
-	self->_getPixelData( self, window, pixelData );
+	self->_getPixelData( self, window, pixelData, withAlpha );
 
 	lucDebug_PrintFunctionEnd( self, 2 );
 }
@@ -203,3 +183,5 @@ void lucRenderingEngine_CompositeViewport(
 
 	lucDebug_PrintFunctionEnd( self, 2 );
 }
+
+

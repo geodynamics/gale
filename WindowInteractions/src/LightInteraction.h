@@ -60,24 +60,18 @@
 	struct lucLightInteraction { __lucLightInteraction };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucLightInteraction* _lucLightInteraction_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucWindowInteraction_MouseMotionFunction*          _mouseMotion,
-		lucWindowInteraction_MouseClickFunction*           _mouseClick,
-		lucWindowInteraction_MouseMessageFunction*         _mouseMessage,
-		lucWindowInteraction_KeyboardEventFunction*        _keyboardEvent,
-		lucWindowInteraction_KeyboardMessageFunction*      _keyboardMessage,		
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCLIGHTINTERACTION_DEFARGS \
+                LUCWINDOWINTERACTION_DEFARGS
+
+	#define LUCLIGHTINTERACTION_PASSARGS \
+                LUCWINDOWINTERACTION_PASSARGS
+
+	lucLightInteraction* _lucLightInteraction_New(  LUCLIGHTINTERACTION_DEFARGS  );
 
 	void _lucLightInteraction_Delete( void* renderingEngine ) ;
 	void _lucLightInteraction_Print( void* renderingEngine, Stream* stream ) ;
@@ -85,7 +79,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucLightInteraction_DefaultNew( Name name ) ;
-	void _lucLightInteraction_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
+	void _lucLightInteraction_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
 	void _lucLightInteraction_Build( void* renderingEngine, void* data ) ;
 	void _lucLightInteraction_Initialise( void* renderingEngine, void* data ) ;
 	void _lucLightInteraction_Execute( void* renderingEngine, void* data );
@@ -98,3 +92,4 @@
 	void _lucLightInteraction_KeyboardMessage( void* windowInteractor, Stream* stream ) ;
 	
 #endif
+

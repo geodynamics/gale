@@ -85,32 +85,29 @@
 	struct lucSwarmViewerBase { __lucSwarmViewerBase };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucSwarmViewerBase* _lucSwarmViewerBase_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,		
-		lucSwarmViewerBase_PlotParticleFunction*           _plotParticle,
-		lucSwarmViewerBase_SetParticleColourFunction*      _setParticleColour,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCSWARMVIEWERBASE_DEFARGS \
+                LUCOPENGLDRAWINGOBJECT_DEFARGS, \
+                lucSwarmViewerBase_PlotParticleFunction*            _plotParticle, \
+                lucSwarmViewerBase_SetParticleColourFunction*  _setParticleColour
+
+	#define LUCSWARMVIEWERBASE_PASSARGS \
+                LUCOPENGLDRAWINGOBJECT_PASSARGS, \
+	        _plotParticle,      \
+	        _setParticleColour
+
+	lucSwarmViewerBase* _lucSwarmViewerBase_New(  LUCSWARMVIEWERBASE_DEFARGS  );
 
 	void _lucSwarmViewerBase_Delete( void* drawingObject ) ;
 	void _lucSwarmViewerBase_Print( void* drawingObject, Stream* stream ) ;
 	void* _lucSwarmViewerBase_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) ;
 
 	/* 'Stg_Component' implementations */
-	void _lucSwarmViewerBase_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucSwarmViewerBase_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucSwarmViewerBase_Build( void* drawingObject, void* data ) ;
 	void _lucSwarmViewerBase_Initialise( void* drawingObject, void* data ) ;
 	void _lucSwarmViewerBase_Execute( void* drawingObject, void* data );
@@ -130,3 +127,4 @@
 
 	void _lucSwarmViewerBase_SetParticleColourDefault( void* drawingObject, void* _context, Particle_Index lParticle_I ) ;
 #endif
+

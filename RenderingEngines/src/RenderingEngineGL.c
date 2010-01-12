@@ -70,45 +70,13 @@
 const Type lucRenderingEngineGL_Type = "lucRenderingEngineGL";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucRenderingEngineGL* _lucRenderingEngineGL_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucRenderingEngine_RenderFunction*                 _render,
-		lucRenderingEngine_ClearFunction*             	   _clear,
-		lucRenderingEngine_GetPixelDataFunction*           _getPixelData,
-		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport,
-		Name                                               name ) 
+lucRenderingEngineGL* _lucRenderingEngineGL_New(  LUCRENDERINGENGINEGL_DEFARGS  ) 
 {
 	lucRenderingEngineGL*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucRenderingEngineGL) );
-	self = (lucRenderingEngineGL*) _lucRenderingEngine_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_render,
-			_clear,
-			_getPixelData,
-			_compositeViewport,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucRenderingEngineGL) );
+	self = (lucRenderingEngineGL*) _lucRenderingEngine_New(  LUCRENDERINGENGINE_PASSARGS  );
 	
 	return self;
 }
@@ -142,30 +110,34 @@ void* _lucRenderingEngineGL_Copy( void* renderingEngine, void* dest, Bool deep, 
 
 
 void* _lucRenderingEngineGL_DefaultNew( Name name ) {
-	return (void*) _lucRenderingEngineGL_New(
-		sizeof(lucRenderingEngineGL),
-		lucRenderingEngineGL_Type,
-		_lucRenderingEngineGL_Delete,
-		_lucRenderingEngineGL_Print,
-		NULL,
-		_lucRenderingEngineGL_DefaultNew,
-		_lucRenderingEngineGL_Construct,
-		_lucRenderingEngineGL_Build,
-		_lucRenderingEngineGL_Initialise,
-		_lucRenderingEngineGL_Execute,
-		_lucRenderingEngineGL_Destroy,
-		_lucRenderingEngineGL_Render,
-		_lucRenderingEngineGL_Clear,
-		_lucRenderingEngineGL_GetPixelData,
-		_lucRenderingEngineGL_CompositeViewport_Stencil,
-		name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(lucRenderingEngineGL);
+	Type                                                          type = lucRenderingEngineGL_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _lucRenderingEngineGL_Delete;
+	Stg_Class_PrintFunction*                                    _print = _lucRenderingEngineGL_Print;
+	Stg_Class_CopyFunction*                                      _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _lucRenderingEngineGL_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _lucRenderingEngineGL_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _lucRenderingEngineGL_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _lucRenderingEngineGL_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _lucRenderingEngineGL_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _lucRenderingEngineGL_Destroy;
+	lucRenderingEngine_RenderFunction*                         _render = _lucRenderingEngineGL_Render;
+	lucRenderingEngine_ClearFunction*                           _clear = _lucRenderingEngineGL_Clear;
+	lucRenderingEngine_GetPixelDataFunction*             _getPixelData = _lucRenderingEngineGL_GetPixelData;
+	lucRenderingEngine_CompositeViewportFunction*   _compositeViewport = _lucRenderingEngineGL_CompositeViewport_Stencil;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucRenderingEngineGL_New(  LUCRENDERINGENGINEGL_PASSARGS  );
 }
 
-void _lucRenderingEngineGL_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data ){
+void _lucRenderingEngineGL_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data ){
 	lucRenderingEngineGL*  self = (lucRenderingEngineGL*)renderingEngine;
 
 	/* Construct Parent */
-	_lucRenderingEngine_Construct( self, cf, data );
+	_lucRenderingEngine_AssignFromXML( self, cf, data );
 	
 	_lucRenderingEngineGL_Init( self );
 }
@@ -181,29 +153,26 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 	Viewport_Index        viewport_I;
 	Viewport_Index        viewportCount     = window->viewportCount;
 	lucViewportInfo*      viewportInfo;
+	#ifdef HAVE_GL2PS	
 	GLint                 viewport_gl2ps[4], state;
-	
+   #endif
 	Journal_DPrintfL( lucDebug, 2, "In func: %s for %s '%s'\n", __func__, self->type, self->name );
 	Stream_Indent( lucDebug );
 
-    /* Determine if context is double buffered or not and save flag */
-    glGetBooleanv(GL_DOUBLEBUFFER, &self->doubleBuffered);
-	/* Set up OpenGl Colour */
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);	
-	glEnable(GL_COLOR_MATERIAL);
-	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
- 	/*	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);  -- Done in the viewport now	*/	
-    glDrawBuffer(self->doubleBuffered ? GL_BACK_LEFT : GL_FRONT_LEFT);
-    GL_Error_Check
+   /* Determine if context is double buffered or not and save flag */
+   glGetBooleanv(GL_DOUBLEBUFFER, &self->doubleBuffered);
+
+   glDrawBuffer(self->doubleBuffered ? GL_BACK_LEFT : GL_FRONT_LEFT);
 
 	/* Allow Transparency */
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 	glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);
 
-    /* Interpolate colours between polygon vertices, looks nice but not technically accurate */
-    glShadeModel( GL_SMOOTH ); 
+   /* Interpolate colours between polygon vertices, looks nice but not technically accurate */
+   glShadeModel( GL_SMOOTH ); 
 
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glEnable(GL_DEPTH_TEST);
 
 	lucWindow_Broadcast( window, 0, MPI_COMM_WORLD );
@@ -283,7 +252,7 @@ void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, Abs
 	Journal_DPrintfL( lucDebug, 2, "Leaving func %s\n", __func__ );
 }
 
-void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* window, lucPixel* buffer ) {
+void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* window, void *buffer, Bool withAlpha) {
 	lucRenderingEngineGL* self              = (lucRenderingEngineGL*) renderingEngine;
 	GLsizei width  = window->width;
 	GLsizei height = window->height;
@@ -300,7 +269,10 @@ void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* windo
 		glReadBuffer( self->doubleBuffered ? GL_BACK : GL_FRONT );
 	
 	/* Actually read the pixels. */
-	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer); 
+   if (withAlpha)
+   	glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer); 
+   else
+   	glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, buffer); 
 }
 
 void lucRenderingEngineGL_WriteViewportText( void* renderingEngine, lucWindow* window, lucViewportInfo* viewportInfo, AbstractContext* context ) {
@@ -335,7 +307,7 @@ void _lucRenderingEngineGL_Clear( void* renderingEngineGL, lucWindow* window, Bo
     
     glEnable (GL_SCISSOR_TEST);
     glClearColor(window->backgroundColour.red, window->backgroundColour.green,
-                 window->backgroundColour.blue, window->backgroundColour.opacity );
+                 window->backgroundColour.blue, 0.0); /* window->backgroundColour.opacity );*/
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 }
 
@@ -632,3 +604,5 @@ void _lucRenderingEngineGL_CompositeViewport_Manual(
 	
 	Journal_DPrintfL( lucDebug, 2, "Leaving: %s\n", __func__ );
 }
+
+

@@ -76,45 +76,13 @@
 const Type lucTextureMap_Type = "lucTextureMap";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucTextureMap* _lucTextureMap_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name ) 
+lucTextureMap* _lucTextureMap_New(  LUCTEXTUREMAP_DEFARGS  ) 
 {
 	lucTextureMap*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucTextureMap) );
-	self = (lucTextureMap*) _lucOpenGLDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucTextureMap) );
+	self = (lucTextureMap*) _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_PASSARGS  );
 				
 	return self;
 }
@@ -217,32 +185,36 @@ void* _lucTextureMap_Copy( void* drawingObject, void* dest, Bool deep, Name name
 
 
 void* _lucTextureMap_DefaultNew( Name name ) {
-	return (void*) _lucTextureMap_New(
-		sizeof(lucTextureMap),
-		lucTextureMap_Type,
-		_lucTextureMap_Delete,
-		_lucTextureMap_Print,
-		NULL,
-		_lucTextureMap_DefaultNew,
-		_lucTextureMap_Construct,
-		_lucTextureMap_Build,
-		_lucTextureMap_Initialise,
-		_lucTextureMap_Execute,
-		_lucTextureMap_Destroy,
-		_lucTextureMap_Setup,
-		_lucTextureMap_Draw,
-		_lucTextureMap_CleanUp,
-		_lucTextureMap_BuildDisplayList,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucTextureMap);
+	Type                                                             type = lucTextureMap_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucTextureMap_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucTextureMap_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucTextureMap_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucTextureMap_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucTextureMap_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucTextureMap_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucTextureMap_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucTextureMap_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucTextureMap_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucTextureMap_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucTextureMap_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucTextureMap_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucTextureMap_New(  LUCTEXTUREMAP_PASSARGS  );
 		
 		
 }
 
-void _lucTextureMap_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucTextureMap_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucTextureMap*  self = (lucTextureMap*)drawingObject;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
 	_lucTextureMap_Init( 
 			self, 
@@ -321,6 +293,8 @@ void _lucTextureMap_BuildDisplayList( void* drawingObject, void* _context ) {
 
 	glDisable(GL_TEXTURE_2D);
 }
+
+
 
 
 

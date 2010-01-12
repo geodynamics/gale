@@ -71,45 +71,13 @@ lucWindow* parent;	/* Need to save in global so signal handler for idle timer ca
 const Type lucX11Window_Type = "lucX11Window";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucX11Window* _lucX11Window_New( 
-		SizeT                                           sizeOfSelf,
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy, 
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,
-		lucWindow_DisplayFunction						_displayWindow,	
-		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
-		lucWindow_EventProcessorFunction				_eventProcessor,	
-		lucWindow_ResizeFunction						_resizeWindow,	
-		Name                                            name ) 
+lucX11Window* _lucX11Window_New(  LUCX11WINDOW_DEFARGS  ) 
 {
 	lucX11Window*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucX11Window) );
-	self = (lucX11Window*) _lucWindow_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_displayWindow,	
-			_eventsWaiting,
-			_eventProcessor,
-			_resizeWindow,	
-			name );
+	assert( _sizeOfSelf >= sizeof(lucX11Window) );
+	self = (lucX11Window*) _lucWindow_New(  LUCWINDOW_PASSARGS  );
 	
 	return self;
 }
@@ -152,30 +120,34 @@ void* _lucX11Window_Copy( void* window, void* dest, Bool deep, Name nameExt, Ptr
 
 
 void* _lucX11Window_DefaultNew( Name name ) {
-	return (void*) _lucX11Window_New(
-		sizeof(lucX11Window),
-		lucX11Window_Type,
-		_lucX11Window_Delete,
-		_lucX11Window_Print,
-		NULL,
-		_lucX11Window_DefaultNew,
-		_lucX11Window_Construct,
-		_lucX11Window_Build,
-		_lucX11Window_Initialise,
-		_lucX11Window_Execute,
-		_lucX11Window_Destroy,
-		_lucX11Window_Display,	
-		_lucX11Window_EventsWaiting,
-		_lucX11Window_EventProcessor, 
-		_lucX11Window_Resize,	
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(lucX11Window);
+	Type                                                      type = lucX11Window_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucX11Window_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucX11Window_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucX11Window_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucX11Window_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucX11Window_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucX11Window_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucX11Window_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucX11Window_Destroy;
+	lucWindow_DisplayFunction*                      _displayWindow = _lucX11Window_Display;
+	lucWindow_EventsWaitingFunction*                _eventsWaiting = _lucX11Window_EventsWaiting;
+	lucWindow_EventProcessorFunction*              _eventProcessor = _lucX11Window_EventProcessor;
+	lucWindow_ResizeFunction*                        _resizeWindow = _lucX11Window_Resize;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucX11Window_New(  LUCX11WINDOW_PASSARGS  );
 }
 
-void _lucX11Window_Construct( void* window, Stg_ComponentFactory* cf, void* data ){
+void _lucX11Window_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data ){
 	lucX11Window*  self = (lucX11Window*)window;
 
 	/* Construct Parent */
-	_lucWindow_Construct( self, cf, data ); 
+	_lucWindow_AssignFromXML( self, cf, data ); 
 				
 	_lucX11Window_Init( 
 			self,
@@ -633,3 +605,5 @@ int lucX11Window_Error(Display* display, XErrorEvent* error)
 }
 
 #endif
+
+

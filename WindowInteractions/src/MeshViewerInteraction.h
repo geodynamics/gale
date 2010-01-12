@@ -60,24 +60,18 @@
 	struct lucMeshViewerInteraction { __lucMeshViewerInteraction };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucMeshViewerInteraction* _lucMeshViewerInteraction_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucWindowInteraction_MouseMotionFunction*          _mouseMotion,
-		lucWindowInteraction_MouseClickFunction*           _mouseClick,
-		lucWindowInteraction_MouseMessageFunction*         _mouseMessage,
-		lucWindowInteraction_KeyboardEventFunction*        _keyboardEvent,
-		lucWindowInteraction_KeyboardMessageFunction*      _keyboardMessage,		
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCMESHVIEWERINTERACTION_DEFARGS \
+                LUCWINDOWINTERACTION_DEFARGS
+
+	#define LUCMESHVIEWERINTERACTION_PASSARGS \
+                LUCWINDOWINTERACTION_PASSARGS
+
+	lucMeshViewerInteraction* _lucMeshViewerInteraction_New(  LUCMESHVIEWERINTERACTION_DEFARGS  );
 
 	void _lucMeshViewerInteraction_Delete( void* renderingEngine ) ;
 	void _lucMeshViewerInteraction_Print( void* renderingEngine, Stream* stream ) ;
@@ -85,7 +79,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucMeshViewerInteraction_DefaultNew( Name name ) ;
-	void _lucMeshViewerInteraction_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
+	void _lucMeshViewerInteraction_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
 	void _lucMeshViewerInteraction_Build( void* renderingEngine, void* data ) ;
 	void _lucMeshViewerInteraction_Initialise( void* renderingEngine, void* data ) ;
 	void _lucMeshViewerInteraction_Execute( void* renderingEngine, void* data );
@@ -98,3 +92,4 @@
 	void _lucMeshViewerInteraction_KeyboardMessage( void* windowInteractor, Stream* stream ) ;
 	
 #endif
+

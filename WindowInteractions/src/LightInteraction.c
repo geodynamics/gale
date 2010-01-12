@@ -64,47 +64,13 @@
 const Type lucLightInteraction_Type = "lucLightInteraction";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucLightInteraction* _lucLightInteraction_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucWindowInteraction_MouseMotionFunction*          _mouseMotion,
-		lucWindowInteraction_MouseClickFunction*           _mouseClick,
-		lucWindowInteraction_MouseMessageFunction*         _mouseMessage,
-		lucWindowInteraction_KeyboardEventFunction*        _keyboardEvent,
-		lucWindowInteraction_KeyboardMessageFunction*      _keyboardMessage,		
-		Name                                               name ) 
+lucLightInteraction* _lucLightInteraction_New(  LUCLIGHTINTERACTION_DEFARGS  ) 
 {
 	lucLightInteraction*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucLightInteraction) );
-	self = (lucLightInteraction*) _lucWindowInteraction_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_mouseMotion,
-			_mouseClick, 
-			_mouseMessage, 
-			_keyboardEvent,
-			_keyboardMessage,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucLightInteraction) );
+	self = (lucLightInteraction*) _lucWindowInteraction_New(  LUCWINDOWINTERACTION_PASSARGS  );
 	
 	return self;
 }
@@ -140,31 +106,35 @@ void* _lucLightInteraction_Copy( void* LightInteraction, void* dest, Bool deep, 
 
 
 void* _lucLightInteraction_DefaultNew( Name name ) {
-	return (void*) _lucLightInteraction_New(
-		sizeof(lucLightInteraction),
-		lucLightInteraction_Type,
-		_lucLightInteraction_Delete,
-		_lucLightInteraction_Print,
-		NULL,
-		_lucLightInteraction_DefaultNew,
-		_lucLightInteraction_Construct,
-		_lucLightInteraction_Build,
-		_lucLightInteraction_Initialise,
-		_lucLightInteraction_Execute,
-		_lucLightInteraction_Destroy,		
-		_lucLightInteraction_MouseMotion,
-		_lucLightInteraction_MouseClick,
-		_lucLightInteraction_MouseMessage,
-		_lucLightInteraction_KeyboardEvent,
-		_lucLightInteraction_KeyboardMessage,
-		name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(lucLightInteraction);
+	Type                                                          type = lucLightInteraction_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _lucLightInteraction_Delete;
+	Stg_Class_PrintFunction*                                    _print = _lucLightInteraction_Print;
+	Stg_Class_CopyFunction*                                      _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _lucLightInteraction_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _lucLightInteraction_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _lucLightInteraction_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _lucLightInteraction_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _lucLightInteraction_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _lucLightInteraction_Destroy;
+	lucWindowInteraction_MouseMotionFunction*             _mouseMotion = _lucLightInteraction_MouseMotion;
+	lucWindowInteraction_MouseClickFunction*               _mouseClick = _lucLightInteraction_MouseClick;
+	lucWindowInteraction_MouseMessageFunction*           _mouseMessage = _lucLightInteraction_MouseMessage;
+	lucWindowInteraction_KeyboardEventFunction*         _keyboardEvent = _lucLightInteraction_KeyboardEvent;
+	lucWindowInteraction_KeyboardMessageFunction*     _keyboardMessage = _lucLightInteraction_KeyboardMessage;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucLightInteraction_New(  LUCLIGHTINTERACTION_PASSARGS  );
 }
 
-void _lucLightInteraction_Construct( void* LightInteraction, Stg_ComponentFactory* cf, void* data ){
+void _lucLightInteraction_AssignFromXML( void* LightInteraction, Stg_ComponentFactory* cf, void* data ){
 	lucLightInteraction*  self = LightInteraction;
 
 	/* Construct Parent */
-	_lucWindowInteraction_Construct(self, cf, data );
+	_lucWindowInteraction_AssignFromXML(self, cf, data );
 	
 	_lucLightInteraction_Init( self );
 }
@@ -181,12 +151,11 @@ void _lucLightInteraction_MouseMessage( void* windowInteraction, Stream* stream 
 
 
 void _lucLightInteraction_KeyboardEvent( void* WindowInteraction, lucWindow* window, char key, Pixel_Index xpos, Pixel_Index ypos) {
-	lucLightInteraction*   self = (lucLightInteraction*) WindowInteraction;
+	lucLightInteraction*   self;
 	lucViewportInfo*            viewportInfo;
 	lucViewport*                viewport;
 	Coord                       coord;
 	lucLight*                   light;
-	Stream*                     stream = Journal_MyStream( Info_Type, self );
 	Light_Index                 light_I;
 	Light_Index                 lightCount;
 	float                       posX = 0;
@@ -196,6 +165,7 @@ void _lucLightInteraction_KeyboardEvent( void* WindowInteraction, lucWindow* win
 	int                         i;
 	Light_Index                  currentLight_I=0;
 
+	self = (lucLightInteraction*) WindowInteraction;
 
 	/* This function works when the key pressed is one of  'x', 'y, 'z', 'l', 'm', 'n'*/
 	if ( ( key != 'x' )&&( key != 'y' ) && ( key != 'z' ) && ( key != 'k' ) && ( key != 'l' ) &&( key != 'm') &&( key != 'p')&&( key !='w') )
@@ -273,27 +243,22 @@ void _lucLightInteraction_KeyboardEvent( void* WindowInteraction, lucWindow* win
 	
 	if (key == 'p' ){
 		/* prints the light position */
-	        glGetLightfv(GL_LIGHT0 + currentLight_I, GL_POSITION, initialPosition);
-	        printf(" position by glGET is %.2f, %.2f, %.2f, %.2f \n", initialPosition[0], initialPosition[1], initialPosition[2], initialPosition[3]);
+		glGetLightfv(GL_LIGHT0 + currentLight_I, GL_POSITION, initialPosition);
+		printf(" position by glGET is %.2f, %.2f, %.2f, %.2f \n", initialPosition[0], initialPosition[1], initialPosition[2], initialPosition[3]);
 	}
 	/* Retrieves the light corresponding to the currentLightIndex */
 	currentLight_I = lucLight_Register_GetCurrentLightIndex( viewport->light_Register );
 	light = lucLight_Register_GetByIndex( viewport->light_Register, currentLight_I );
 	lucLight_Position(light, currentLight_I, posX, posY, posZ, 0);
 
-        float position[4];
-	
-	//glGetLightfv(GL_LIGHT0, GL_POSITION, position);
+	/*float position[4];
+	glGetLightfv(GL_LIGHT0, GL_POSITION, position); */
 	
 	printf(" Position for light index %d is %.2f, %.2f, %.2f, %.2f \n", currentLight_I, light->position[0],  light->position[1],  light->position[2],  light->position[3]);
 	printf(" SpotCutOff is %.2f \n", light->spotCutOff);
 
-
-
 	/* Get spatial coordinate that the user clicked on */
 	lucViewportInfo_GetCoordFromPixel( viewportInfo, xpos, ypos, coord );
-
-	
 }
 
 void _lucLightInteraction_KeyboardMessage( void* windowInteraction, Stream* stream ) {
@@ -309,11 +274,8 @@ void _lucLightInteraction_KeyboardMessage( void* windowInteraction, Stream* stre
 			"m:                            Decreases the Y position of the light by 0.5.\n" );
 	Journal_Printf( stream,
 			"n:                            Decreases the Z position of the light by 0.5.\n" );
-
-
-
-                         
-
 }
+
+
 
 

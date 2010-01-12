@@ -51,84 +51,98 @@
 	extern const Type lucCamera_Type;
 	extern MPI_Datatype lucCamera_MPI_Datatype;
 
-	#define __lucCamera                                  \
-		__Stg_Component                                 \
-		lucCamera*                                         originalCamera;       \
-		FieldVariable*                                     centreFieldVariable;  \
-		Coord                                              coord;                \
-		Coord                                              focalPoint;           \
-		Coord                                              rotationCentre;       \
-		XYZ                                                upDirection;          \
-		double                                             focalLength;          \
-		double                                             aperture;             \
-		double                                             eyeSeparation;        \
-		lucStereoBuffer                                    buffer;               \
-		lucStereoType                                      stereoType;           \
-		Bool                                               needsToDraw;          \
+	#define __lucCamera \
+		__Stg_Component \
+		AbstractContext*	context; \
+		lucCamera*			originalCamera; \
+		FieldVariable*		centreFieldVariable; \
+		Coord					coord; \
+		Coord					focalPoint; \
+		Coord					rotationCentre; \
+		XYZ					upDirection; \
+		double				focalLength; \
+		double				aperture; \
+		double				eyeSeparation; \
+		lucStereoBuffer	buffer; \
+		lucStereoType		stereoType; \
+		Bool					needsToDraw; 
 
 	struct lucCamera {__lucCamera};
 
 	/** Constructors */
 	lucCamera* lucCamera_New( 
-		Name                                               name,
-		Coord                                              coord, 
-		Coord                                              focalPoint,
-		Coord                                              rotationCentre,
-		XYZ                                                upDirection,
-		double                                             focalLength,
-		double                                             aperture,
-		double                                             eyeSeparation,
-		lucStereoType                                      stereoType,
-		FieldVariable*                                     centreFieldVariable );
+		Name					name,
+		Coord					coord, 
+		Coord					focalPoint,
+		Coord					rotationCentre,
+		XYZ					upDirection,
+		double				focalLength,
+		double				aperture,
+		double				eyeSeparation,
+		lucStereoType		stereoType,
+		FieldVariable*		centreFieldVariable );
 
-	lucCamera* _lucCamera_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		Name                                               name );
-
-	void lucCamera_InitAll( 
-		void*                                              camera,
-		Coord                                              coord, 
-		Coord                                              focalPoint,
-		Coord                                              rotationCentre,
-		XYZ                                                upDirection,
-		double                                             focalLength,
-		double                                             aperture,
-		double                                             eyeSeparation,
-		lucStereoType                                      stereoType,
-		FieldVariable*                                     centreFieldVariable );
 	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCCAMERA_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define LUCCAMERA_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	lucCamera* _lucCamera_New(  LUCCAMERA_DEFARGS  );
+
 	/** Virtual Functions */
-	void _lucCamera_Delete( void* camera ) ;
-	void _lucCamera_Print( void* camera, Stream* stream ) ;
-	void* _lucCamera_Copy( void* camera, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
-	#define lucCamera_Copy( self ) \
-		(lucCamera*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
-	void* _lucCamera_DefaultNew( Name name ) ;
-void _lucCamera_Construct( void* camera, Stg_ComponentFactory* cf, void* data ) ;
+	void _lucCamera_Init(                                                                                                  
+		void*          camera,                                                                                             
+		Coord          coord,                                                                                              
+		Coord          focalPoint,                                                                                         
+		Coord          rotationCentre,                                                                                     
+		XYZ            upDirection,                                                                                        
+		double         focalLength,                                                                                        
+		double         aperture,                                                                                           
+		double         eyeSeparation,                                                                                      
+		lucStereoType  stereoType,                                                                                         
+   FieldVariable* centreFieldVariable );
+      
+	void _lucCamera_Delete( void* camera );
+
+	void _lucCamera_Print( void* camera, Stream* stream );
+
+	void _lucCamera_Copy( void* camera, void* dest );
+
+	void* _lucCamera_DefaultNew( Name name );
+
+	void _lucCamera_AssignFromXML( void* camera, Stg_ComponentFactory* cf, void* data );
+
 	void _lucCamera_Build( void* camera, void* data );
+
 	void _lucCamera_Initialise( void* camera, void* data );
+
 	void _lucCamera_Execute( void* camera, void* data );
+
 	void _lucCamera_Destroy( void* camera, void* data );
 
 	/** Public Functions */
-	void lucCamera_Zoom( void* camera, double zoomFactor ) ;
-	void lucCamera_RotateAroundUpDirection( void* camera, double deltaTheta ) ;
-	void lucCamera_RotateTowardsUpDirection( void* camera, double deltaTheta ) ;
-	void lucCamera_GetFocusDirection( void* camera, XYZ focusDirection ) ;
-	void lucCamera_GetLeftDirection( void* camera, XYZ leftDirection ) ;
-	void lucCamera_Reset( void* camera ) ;
-	void lucCamera_SetOriginal( void* camera ) ;
-	void lucCamera_Broadcast( void* camera, int rootRank, MPI_Comm comm ) ;
+	void lucCamera_Zoom( void* camera, double zoomFactor );
+
+	void lucCamera_RotateAroundUpDirection( void* camera, double deltaTheta );
+
+	void lucCamera_RotateTowardsUpDirection( void* camera, double deltaTheta );
+
+	void lucCamera_GetFocusDirection( void* camera, XYZ focusDirection );
+
+	void lucCamera_GetLeftDirection( void* camera, XYZ leftDirection );
+
+	void lucCamera_Reset( void* camera );
+
+	void lucCamera_SetOriginal( void* camera );
+
+	void lucCamera_Broadcast( void* camera, int rootRank, MPI_Comm comm );
+
 	void lucCamera_SwapStereoBuffer( void* camera ) ;
 	void lucCamera_CurrentEyePosition( void* camera, Coord currEyePos ) ;
 	void lucCamera_CentreFromFieldVariable( void* camera ) ;
@@ -138,3 +152,4 @@ void _lucCamera_Construct( void* camera, Stg_ComponentFactory* cf, void* data ) 
 	
 	void lucCamera_Create_MPI_Datatype() ;
 #endif
+

@@ -63,20 +63,18 @@
 	struct lucOutputVECTOR { __lucOutputVECTOR };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucOutputVECTOR* _lucOutputVECTOR_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucOutputFormat_OutputFunction*                    _output,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCOUTPUTVECTOR_DEFARGS \
+                LUCOUTPUTFORMAT_DEFARGS
+
+	#define LUCOUTPUTVECTOR_PASSARGS \
+                LUCOUTPUTFORMAT_PASSARGS
+
+	lucOutputVECTOR* _lucOutputVECTOR_New(  LUCOUTPUTVECTOR_DEFARGS  );
 
 	void _lucOutputVECTOR_Delete( void* outputFormat ) ;
 	void _lucOutputVECTOR_Print( void* outputFormat, Stream* stream ) ;
@@ -84,12 +82,13 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucOutputVECTOR_DefaultNew( Name name ) ;
-	void _lucOutputVECTOR_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data );
+	void _lucOutputVECTOR_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data );
 	void _lucOutputVECTOR_Build( void* outputFormat, void* data ) ;
 	void _lucOutputVECTOR_Initialise( void* outputFormat, void* data ) ;
 	void _lucOutputVECTOR_Execute( void* outputFormat, void* data );
 	void _lucOutputVECTOR_Destroy( void* outputFormat, void* data ) ;
 	
-	void _lucOutputVECTOR_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) ;
+	void _lucOutputVECTOR_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) ;
 
 #endif
+

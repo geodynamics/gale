@@ -43,7 +43,7 @@
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#include <glucifer/Base/CrossSection.h>
+#include "CrossSection.h"
 
 #ifndef __lucScalarFieldCrossSection_h__
 #define __lucScalarFieldCrossSection_h__
@@ -54,37 +54,30 @@
 	/** Class contents - this is defined as a macro so that sub-classes of this class can use this macro at the start of the definition of their struct */
 	#define __lucScalarFieldCrossSection \
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
-		__lucOpenGLDrawingObject \
+		__lucCrossSection \
 		/* Virtual functions go here */ \
 		/* Other info */\
-		FieldVariable*                                     fieldVariable;          \
-		Name                                               fieldVariableName;      \
 		lucColourMap*                                      colourMap;              \
 		IJK                                                resolution;             \
-      lucCrossSection*                                   crossSection;           \
 		XYZ                                                minCropValues;          \
 		XYZ                                                maxCropValues;          \
+		Bool                                               cullFace;               \
 
 	struct lucScalarFieldCrossSection { __lucScalarFieldCrossSection };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucScalarFieldCrossSection* _lucScalarFieldCrossSection_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCSCALARFIELDCROSSSECTION_DEFARGS \
+                LUCCROSSSECTION_DEFARGS
+
+	#define LUCSCALARFIELDCROSSSECTION_PASSARGS \
+                LUCCROSSSECTION_PASSARGS
+
+	lucScalarFieldCrossSection* _lucScalarFieldCrossSection_New(  LUCSCALARFIELDCROSSSECTION_DEFARGS  );
 
 	void _lucScalarFieldCrossSection_Delete( void* drawingObject ) ;
 	void _lucScalarFieldCrossSection_Print( void* drawingObject, Stream* stream ) ;
@@ -92,19 +85,17 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucScalarFieldCrossSection_DefaultNew( Name name ) ;
-	void _lucScalarFieldCrossSection_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucScalarFieldCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucScalarFieldCrossSection_Build( void* drawingObject, void* data ) ;
 	void _lucScalarFieldCrossSection_Initialise( void* drawingObject, void* data ) ;
 	void _lucScalarFieldCrossSection_Execute( void* drawingObject, void* data );
 	void _lucScalarFieldCrossSection_Destroy( void* drawingObject, void* data ) ;
 	
 	void _lucScalarFieldCrossSection_Setup( void* drawingObject, void* _context ) ;
-	void _lucScalarFieldCrossSection_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) ;
-	void _lucScalarFieldCrossSection_CleanUp( void* drawingObject, void* _context ) ;
-
 	void _lucScalarFieldCrossSection_BuildDisplayList( void* drawingObject, void* _context ) ;
 
-   void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, lucCrossSection* crossSection );
+   void lucScalarFieldCrossSection_DrawCrossSection( void* drawingObject, int direction );
 	Bool lucScalarFieldCrossSection_PlotColouredVertex( void* drawingObject, Coord interpolationCoord, Coord plotCoord ) ;
 
 #endif
+

@@ -67,54 +67,19 @@
 const Type lucScalarFieldOnMesh_Type = "lucScalarFieldOnMesh";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucScalarFieldOnMesh* _lucScalarFieldOnMesh_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name ) 
+lucScalarFieldOnMesh* _lucScalarFieldOnMesh_New(  LUCSCALARFIELDONMESH_DEFARGS  ) 
 {
 	lucScalarFieldOnMesh*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucScalarFieldOnMesh) );
-	self = (lucScalarFieldOnMesh*) _lucScalarFieldOnMeshCrossSection_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucScalarFieldOnMesh) );
+	self = (lucScalarFieldOnMesh*) _lucScalarFieldOnMeshCrossSection_New(  LUCSCALARFIELDONMESHCROSSSECTION_PASSARGS  );
 	
 	return self;
 }
 
-void _lucScalarFieldOnMesh_Init( 
-		lucScalarFieldOnMesh*                                              self,
-		Bool                                                         cullFace )
+void _lucScalarFieldOnMesh_Init( lucScalarFieldOnMesh* self)
 {
-	self->cullFace = cullFace;
 }
 
 void _lucScalarFieldOnMesh_Delete( void* drawingObject ) {
@@ -129,81 +94,37 @@ void _lucScalarFieldOnMesh_Print( void* drawingObject, Stream* stream ) {
 	_lucScalarFieldOnMeshCrossSection_Print( self, stream );
 }
 
-void* _lucScalarFieldOnMesh_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) {
-	lucScalarFieldOnMesh*  self = (lucScalarFieldOnMesh*)drawingObject;
-	lucScalarFieldOnMesh* newDrawingObject;
-
-	newDrawingObject = _lucScalarFieldOnMeshCrossSection_Copy( self, dest, deep, nameExt, ptrMap );
-
-	/* TODO */
-	abort();
-
-	return (void*) newDrawingObject;
-}
-
-
 void* _lucScalarFieldOnMesh_DefaultNew( Name name ) {
-	return (void*) _lucScalarFieldOnMesh_New(
-		sizeof(lucScalarFieldOnMesh),
-		lucScalarFieldOnMesh_Type,
-		_lucScalarFieldOnMesh_Delete,
-		_lucScalarFieldOnMesh_Print,
-		NULL,
-		_lucScalarFieldOnMesh_DefaultNew,
-		_lucScalarFieldOnMesh_Construct,
-		_lucScalarFieldOnMesh_Build,
-		_lucScalarFieldOnMesh_Initialise,
-		_lucScalarFieldOnMesh_Execute,
-		_lucScalarFieldOnMesh_Destroy,
-		_lucScalarFieldOnMesh_Setup,
-		_lucScalarFieldOnMesh_Draw,
-		_lucScalarFieldOnMesh_CleanUp,
-		_lucScalarFieldOnMesh_BuildDisplayList,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucScalarFieldOnMesh);
+	Type                                                             type = lucScalarFieldOnMesh_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucScalarFieldOnMesh_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucScalarFieldOnMesh_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucScalarFieldOnMesh_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucScalarFieldOnMesh_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucScalarFieldOnMeshCrossSection_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucScalarFieldOnMeshCrossSection_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucScalarFieldOnMeshCrossSection_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucScalarFieldOnMeshCrossSection_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucScalarFieldOnMeshCrossSection_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucOpenGLDrawingObject_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucOpenGLDrawingObject_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucScalarFieldOnMesh_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucScalarFieldOnMesh_New(  LUCSCALARFIELDONMESH_PASSARGS  );
 }
 
-void _lucScalarFieldOnMesh_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucScalarFieldOnMesh_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucScalarFieldOnMesh*  self = (lucScalarFieldOnMesh*)drawingObject;
 
 	/* Construct Parent */
-	_lucScalarFieldOnMeshCrossSection_Construct( self, cf, data );
+	_lucScalarFieldOnMeshCrossSection_AssignFromXML( self, cf, data );
 
-	_lucScalarFieldOnMesh_Init( 
-			self, 
-			Stg_ComponentFactory_GetBool( cf, self->name, "cullFace", True ) );
-}
-
-void _lucScalarFieldOnMesh_Build( void* drawingObject, void* data ) {
-	lucScalarFieldOnMesh*  self = (lucScalarFieldOnMesh*)drawingObject;
-
-	/* Call parent function */
-	_lucScalarFieldOnMeshCrossSection_Build( self, data );
-}
-void _lucScalarFieldOnMesh_Initialise( void* drawingObject, void* data ) {
-	lucScalarFieldOnMesh*  self = (lucScalarFieldOnMesh*)drawingObject;
-
-	/* Call parent function */
-	_lucScalarFieldOnMeshCrossSection_Initialise( self, data );
-}
-void _lucScalarFieldOnMesh_Execute( void* drawingObject, void* data ) {}
-void _lucScalarFieldOnMesh_Destroy( void* drawingObject, void* data ) {}
-
-void _lucScalarFieldOnMesh_Setup( void* drawingObject, void* _context ) {
-	lucScalarFieldOnMesh*          self          = (lucScalarFieldOnMesh*)drawingObject;
-	
-	_lucScalarFieldOnMeshCrossSection_Setup( self, _context );
-}
-	
-void _lucScalarFieldOnMesh_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
-	lucScalarFieldOnMesh*          self          = (lucScalarFieldOnMesh*)drawingObject;
-	
-	_lucScalarFieldOnMeshCrossSection_Draw( self, window, viewportInfo, _context );
-}
-
-void _lucScalarFieldOnMesh_CleanUp( void* drawingObject, void* _context ) {
-	lucScalarFieldOnMesh*          self          = (lucScalarFieldOnMesh*)drawingObject;
-	
-	_lucScalarFieldOnMeshCrossSection_CleanUp( self, _context );
+	_lucScalarFieldOnMesh_Init(self); 
 }
 
 void _lucScalarFieldOnMesh_BuildDisplayList( void* drawingObject, void* _context ) {
@@ -215,23 +136,22 @@ void _lucScalarFieldOnMesh_BuildDisplayList( void* drawingObject, void* _context
 	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, self->vertexGridHandle );
 	
 	if (fieldVariable->dim == 2) {
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, 0, K_AXIS );
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, K_AXIS, False), GL_CCW);
 	}
 	else {
-		if ( self->cullFace ) 
-			glEnable(GL_CULL_FACE);
-	
-		glFrontFace(GL_CCW);
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, 0, I_AXIS );
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, vertGrid->sizes[ J_AXIS ] - 1, J_AXIS );
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, 0, K_AXIS );
-	
-		glFrontFace(GL_CW);
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, vertGrid->sizes[ I_AXIS ] - 1, I_AXIS );
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, 0, J_AXIS );
-		lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, vertGrid->sizes[ K_AXIS ] - 1, K_AXIS );
+		/* Cross sections at minimums, default winding for faces */ 
+      self->flipNormals = False;
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, I_AXIS, False), GL_CCW);
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, J_AXIS, False), GL_CCW);
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, K_AXIS, False), GL_CCW);
 
-		glDisable(GL_CULL_FACE);
+		/* Cross sections at maximums, reverse winding for faces and flip normals to face backwards */
+      self->flipNormals = True;
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, vertGrid->sizes[ I_AXIS ] - 1, I_AXIS, False), GL_CW);
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, vertGrid->sizes[ J_AXIS ] - 1, J_AXIS, False), GL_CW);
+		lucScalarFieldOnMeshCrossSection_DrawCrossSection( lucCrossSection_Set(self, vertGrid->sizes[ K_AXIS ] - 1, K_AXIS, False), GL_CW);
 	}
 }
+
+
 

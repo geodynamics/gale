@@ -68,45 +68,13 @@
 const Type lucFieldVariableBorder_Type = "lucFieldVariableBorder";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucFieldVariableBorder* _lucFieldVariableBorder_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name ) 
+lucFieldVariableBorder* _lucFieldVariableBorder_New(  LUCFIELDVARIABLEBORDER_DEFARGS  ) 
 {
 	lucFieldVariableBorder*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucFieldVariableBorder) );
-	self = (lucFieldVariableBorder*) _lucOpenGLDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucFieldVariableBorder) );
+	self = (lucFieldVariableBorder*) _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_PASSARGS  );
 	
 	return self;
 }
@@ -149,31 +117,35 @@ void* _lucFieldVariableBorder_Copy( void* drawingObject, void* dest, Bool deep, 
 
 
 void* _lucFieldVariableBorder_DefaultNew( Name name ) {
-	return (void*) _lucFieldVariableBorder_New(
-		sizeof(lucFieldVariableBorder),
-		lucFieldVariableBorder_Type,
-		_lucFieldVariableBorder_Delete,
-		_lucFieldVariableBorder_Print,
-		NULL,
-		_lucFieldVariableBorder_DefaultNew,
-		_lucFieldVariableBorder_Construct,
-		_lucFieldVariableBorder_Build,
-		_lucFieldVariableBorder_Initialise,
-		_lucFieldVariableBorder_Execute,
-		_lucFieldVariableBorder_Destroy,
-		_lucFieldVariableBorder_Setup,
-		_lucFieldVariableBorder_Draw,
-		_lucFieldVariableBorder_CleanUp,
-		_lucFieldVariableBorder_BuildDisplayList,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucFieldVariableBorder);
+	Type                                                             type = lucFieldVariableBorder_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucFieldVariableBorder_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucFieldVariableBorder_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucFieldVariableBorder_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucFieldVariableBorder_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucFieldVariableBorder_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucFieldVariableBorder_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucFieldVariableBorder_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucFieldVariableBorder_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucFieldVariableBorder_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucFieldVariableBorder_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucFieldVariableBorder_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucFieldVariableBorder_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucFieldVariableBorder_New(  LUCFIELDVARIABLEBORDER_PASSARGS  );
 }
 
-void _lucFieldVariableBorder_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucFieldVariableBorder_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucFieldVariableBorder*  self = (lucFieldVariableBorder*)drawingObject;
 	FieldVariable*           fieldVariable;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
 	fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "FieldVariable", FieldVariable, True, data );
 	
@@ -221,12 +193,13 @@ void _lucFieldVariableBorder_BuildDisplayList( void* drawingObject, void* _conte
 	/* Initialise OpenGL stuff */
 	glDisable(GL_LIGHTING);
 
+ 	glEnable(GL_DEPTH_TEST);
 	/* Line smoothing will not work correctly with depth testing enabled*/
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_LINE_SMOOTH);
-	glHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glEnable(GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glDisable(GL_DEPTH_TEST);
+	//glEnable(GL_LINE_SMOOTH);
+	//glHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
+	//glEnable(GL_BLEND);
+	//glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glPolygonMode ( GL_FRONT_AND_BACK, GL_LINE ) ;
 
 	lucColour_SetOpenGLColour( &self->colour );
@@ -254,7 +227,9 @@ void _lucFieldVariableBorder_BuildDisplayList( void* drawingObject, void* _conte
 	}
 	
 	/* Clean up OpenGL stuff */
- 	glEnable(GL_DEPTH_TEST);
+ 	//glEnable(GL_DEPTH_TEST);
 	glPolygonMode ( GL_FRONT_AND_BACK, GL_FILL ) ;
 	glEnable( GL_LIGHTING );
 }
+
+

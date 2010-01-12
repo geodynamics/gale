@@ -49,52 +49,51 @@
 
 	extern const Type lucOutputFormat_Type;
 
-	typedef void (lucOutputFormat_OutputFunction) ( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData );
+	typedef void (lucOutputFormat_OutputFunction) ( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData );
 
 	#define __lucOutputFormat                                         \
 		__Stg_Component                                           \
+		AbstractContext*				   context;		     \
 		/* Virtual Functions */ \
 		lucOutputFormat_OutputFunction*                    _output;                  \
 		/* Other Info */   \
-		Name                                               extension;
+		Name                                               extension;  \
+      Bool                                               transparent;
 
 	struct lucOutputFormat {__lucOutputFormat};
 
-	lucOutputFormat* _lucOutputFormat_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		lucOutputFormat_OutputFunction*                    _output,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
-	void lucOutputFormat_InitAll( 
-		void*                                              outputFormat,
-		Name                                               extension );
+	#define LUCOUTPUTFORMAT_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                lucOutputFormat_OutputFunction*  _output
+
+	#define LUCOUTPUTFORMAT_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _output
+
+	lucOutputFormat* _lucOutputFormat_New(  LUCOUTPUTFORMAT_DEFARGS  );
 
 	void _lucOutputFormat_Delete( void* outputFormat ) ;
 	void _lucOutputFormat_Print( void* outputFormat, Stream* stream ) ;
 	void* _lucOutputFormat_Copy( void* outputFormat, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 
 	void* _lucOutputFormat_DefaultNew( Name name ) ;
-void _lucOutputFormat_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data ) ;
+   void _lucOutputFormat_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucOutputFormat_Build( void* outputFormat, void* data );
 	void _lucOutputFormat_Initialise( void* outputFormat, void* data );
 	void _lucOutputFormat_Execute( void* outputFormat, void* data );
 	void _lucOutputFormat_Destroy( void* outputFormat, void* data );
 
 	/* +++ Public Functions +++ */
-	void lucOutputFormat_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) ;
+	void lucOutputFormat_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) ;
 
 	Name lucOutputFormat_GetImageFilename( void* outputFormat, lucWindow* window, void* _context ) ;
 	FILE* lucOutputFormat_OpenFile( void* outputFormat, lucWindow* window, void* _context, const char *mode ) ;
 	Stream* lucOutputFormat_OpenStream( void* outputFormat, lucWindow* window, void* context ) ;
 
 #endif
+

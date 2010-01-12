@@ -58,65 +58,28 @@
 
 const Type lucLight_Type = "lucLight";
 
-/* The position defaults have been chosen for a directional light source (hence posW=0)
-   shining onto the left,top,front corner of a 1x1x1 box, currently the most commonly
-   used geometry. -- PatrickSunter, 8 Jun 2006 */
-const double LUC_LIGHT_DEFAULT_POS_X = 1.0;
-const double LUC_LIGHT_DEFAULT_POS_Y = -2.0;
-const double LUC_LIGHT_DEFAULT_POS_Z = -2.0;
-const double LUC_LIGHT_DEFAULT_POS_W = 0.0;
+/* Default light at eye pos shining in all directions without attenuation, ie: sunlight from behind viewer 
+ * Setting the light position should be done relative to the eye rather than model, thus if you want the scene lit more from above, 
+ * simply increase the y component rather than calculating absolute world coordinates for such a light.
+ * this allows the lighting to move with the camera and keep the scene lit in the same way
+ * If absolute light coords required in future a flag can easily be implemented to do so */
+const double LUC_LIGHT_DEFAULT_POS_X = 0.0;
+const double LUC_LIGHT_DEFAULT_POS_Y = 0.0;
+const double LUC_LIGHT_DEFAULT_POS_Z = 0.0;
+const double LUC_LIGHT_DEFAULT_POS_W = 1.0;
 
-lucLight* lucLight_New( 
-		Name                                               name,
-		Light_Index 				index,
-		int                                   model,
-		int                                   material,
-		float                                 position[4],
-		float                                 lmodel_ambient[4],
-		float                                 spotCutOff,
-		float                                 spotDirection[3]
-)
-{
-	lucLight* self = (lucLight*) _lucLight_DefaultNew( name );
-
-	lucLight_InitAll( self, index, model, material, position, lmodel_ambient, spotCutOff, spotDirection);
-
-	return self;
-}
-
-lucLight* _lucLight_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		Name                                               name )
+lucLight* _lucLight_New(  LUCLIGHT_DEFARGS  )
 {
 	lucLight*    self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucLight) );
-	self = (lucLight*) _Stg_Component_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name, 
-			NON_GLOBAL );
-	
+	assert( _sizeOfSelf >= sizeof(lucLight) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (lucLight*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	return self;
 }
@@ -151,21 +114,22 @@ void lucLight_Init(
 	
 }
 
-void lucLight_InitAll( 
-		void*                         light,
-		Light_Index                   index,
-		int                           model,
-		int                           material,
-		float                         position[4],
-		float                         lmodel_ambient[4],
-		float                         spotCutOff,
-		float                         spotDirection[3])
+lucLight* lucLight_New( 
+		Name                                               name,
+		Light_Index 				index,
+		int                                   model,
+		int                                   material,
+		float                                 position[4],
+		float                                 lmodel_ambient[4],
+		float                                 spotCutOff,
+		float                                 spotDirection[3]
+)
 {
-	
-	lucLight* self        = light;
+	lucLight* self = (lucLight*) _lucLight_DefaultNew( name );
 
-	/* TODO Init parent */
 	lucLight_Init( self, index, model, material, position, lmodel_ambient, spotCutOff, spotDirection);
+
+	return self;
 }
 
 void _lucLight_Delete( void* light ) {
@@ -220,22 +184,26 @@ void* _lucLight_Copy( void* light, void* dest, Bool deep, Name nameExt, PtrMap* 
 }
 
 void* _lucLight_DefaultNew( Name name ) {
-	return _lucLight_New( 
-			sizeof( lucLight ),
-			lucLight_Type,
-			_lucLight_Delete,
-			_lucLight_Print,
-			_lucLight_Copy,
-			_lucLight_DefaultNew,
-			_lucLight_Construct,
-			_lucLight_Build,
-			_lucLight_Initialise,
-			_lucLight_Execute,
-			_lucLight_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( lucLight );
+	Type                                                      type = lucLight_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucLight_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucLight_Print;
+	Stg_Class_CopyFunction*                                  _copy = _lucLight_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucLight_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucLight_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucLight_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucLight_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucLight_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucLight_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _lucLight_New(  LUCLIGHT_PASSARGS  );
 }
 
-void _lucLight_Construct( void* light, Stg_ComponentFactory* cf, void* data ) {
+void _lucLight_AssignFromXML( void* light, Stg_ComponentFactory* cf, void* data ) {
 	lucLight*             	self               = (lucLight*) light;
 	Light_Index             index;
 	int 			model;
@@ -243,10 +211,13 @@ void _lucLight_Construct( void* light, Stg_ComponentFactory* cf, void* data ) {
 	float 	        	position[4];
 	float                   spotCutOff;
 	float                   spotDirection[3];
-	Name                    modelName;
 	Name                    materialName;
 	float                   lmodel_ambient[4]; 
 	
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
 	glEnable(GL_LIGHTING);
 
 	/* Spot values */
@@ -261,21 +232,6 @@ void _lucLight_Construct( void* light, Stg_ComponentFactory* cf, void* data ) {
 	lmodel_ambient[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambG", 0.2 );
 	lmodel_ambient[2] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambB", 0.2 );
 	lmodel_ambient[3] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambA", 1.0 );
-
-
-	modelName = Stg_ComponentFactory_GetString( cf, self->name, "model", "TwoSide" );
-	if ( strcasecmp( modelName, "Ambient" ) == 0 ) {
-		model = GL_LIGHT_MODEL_AMBIENT;
-		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
-	}
-	else if ( strcasecmp( modelName, "Local" ) == 0 ) {
-		model = GL_LIGHT_MODEL_LOCAL_VIEWER;
-		glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
-	}
-	else if ( strcasecmp( modelName, "TwoSide" ) == 0 ){
-		model =  GL_LIGHT_MODEL_TWO_SIDE;
-		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);	
-	}
 
 	position[0]  = Stg_ComponentFactory_GetDouble( cf, self->name, "posX", LUC_LIGHT_DEFAULT_POS_X );
 	position[1]  = Stg_ComponentFactory_GetDouble( cf, self->name, "posY", LUC_LIGHT_DEFAULT_POS_Y );
@@ -324,35 +280,35 @@ void lucLight_Pickle( void* light, Stream* stream ) {
 	Journal_Printf( stream, "<param name=\"spotDirectionY\">%.5g</param>\n", self->spotDirection[ 1 ]  );
 	Journal_Printf( stream, "<param name=\"spotDirectionZ\">%.5g</param>\n", self->spotDirection[ 2 ]  );
 
-
-
-       	Stream_UnIndent( stream );
+	Stream_UnIndent( stream );
 	Journal_Printf( stream, "</struct>\n");
 }
 
-/* functions to change the lights paramters */
+/* functions to change the lights paramters - unused as yet, only called from light interactions which don't work */
 void lucLight_Position( void * light, int lightIndex, float posX, float posY, float posZ, float posW) {
 	lucLight*             	self               = (lucLight*) light;
-	Light_Index             index              = (Light_Index) lightIndex;
 
-	/* Sets the potiotion of the light index = index */	
-	glEnable(GL_LIGHTING);
-        
+	/* Sets the position of the light index = index */	
 	self->position[0]  += posX;
 	self->position[1]  += posY;
 	self->position[2]  += posZ;
-        self->position[3]  += posW;
+	self->position[3]  += posW;
 
+   /* Light position now relative to eye, not model! */
+   glPushMatrix();
+   glLoadIdentity();
 	glLightfv(GL_LIGHT0 + lightIndex, GL_POSITION, self->position);
+   glPopMatrix();
 
 	self->needsToDraw = True;
-	
 }
+
 void lucLight_Material( int material) {
-	
-	
 }
+
 void lucLight_SetNeedsToDraw( void * light ){
 	lucLight* self = (lucLight*) light;
 	self->needsToDraw = True;
 }
+
+

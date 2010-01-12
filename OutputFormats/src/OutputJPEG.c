@@ -63,39 +63,13 @@
 const Type lucOutputJPEG_Type = "lucOutputJPEG";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucOutputJPEG* _lucOutputJPEG_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucOutputFormat_OutputFunction*                    _output,
-		Name                                               name ) 
+lucOutputJPEG* _lucOutputJPEG_New(  LUCOUTPUTJPEG_DEFARGS  ) 
 {
 	lucOutputJPEG*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucOutputJPEG) );
-	self = (lucOutputJPEG*) _lucOutputFormat_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_output,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucOutputJPEG) );
+	self = (lucOutputJPEG*) _lucOutputFormat_New(  LUCOUTPUTFORMAT_PASSARGS  );
 	
 	return self;
 }
@@ -135,27 +109,33 @@ void* _lucOutputJPEG_Copy( void* outputFormat, void* dest, Bool deep, Name nameE
 
 
 void* _lucOutputJPEG_DefaultNew( Name name ) {
-	return (void*) _lucOutputJPEG_New(
-		sizeof(lucOutputJPEG),
-		lucOutputJPEG_Type,
-		_lucOutputJPEG_Delete,
-		_lucOutputJPEG_Print,
-		NULL,
-		_lucOutputJPEG_DefaultNew,
-		_lucOutputJPEG_Construct,
-		_lucOutputJPEG_Build,
-		_lucOutputJPEG_Initialise,
-		_lucOutputJPEG_Execute,
-		_lucOutputJPEG_Destroy,
-		_lucOutputJPEG_Output,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(lucOutputJPEG);
+	Type                                                      type = lucOutputJPEG_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucOutputJPEG_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucOutputJPEG_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucOutputJPEG_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucOutputJPEG_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucOutputJPEG_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucOutputJPEG_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucOutputJPEG_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucOutputJPEG_Destroy;
+	lucOutputFormat_OutputFunction*                        _output = _lucOutputJPEG_Output;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucOutputJPEG_New(  LUCOUTPUTJPEG_PASSARGS  );
 }
 
-void _lucOutputJPEG_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
+void _lucOutputJPEG_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
 	lucOutputJPEG*  self = (lucOutputJPEG*)outputFormat;
 
 	/* Construct Parent */
-	lucOutputFormat_InitAll( self, "jpeg" );
+   self->extension = "jpeg";
+	_lucOutputFormat_AssignFromXML( outputFormat, cf, data);
+   self->transparent = False; /* Not supported */
 
 	_lucOutputJPEG_Init( 
 			self,
@@ -167,7 +147,7 @@ void _lucOutputJPEG_Initialise( void* outputFormat, void* data ) {}
 void _lucOutputJPEG_Execute( void* outputFormat, void* data ) {}
 void _lucOutputJPEG_Destroy( void* outputFormat, void* data ) {}
 
-void _lucOutputJPEG_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) {
+void _lucOutputJPEG_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) {
 	lucOutputJPEG*              self         = (lucOutputJPEG*) outputFormat;
 	Pixel_Index                 width        = window->width;
 	Pixel_Index                 height       = window->height;
@@ -204,4 +184,6 @@ void _lucOutputJPEG_Output( void* outputFormat, lucWindow* window, AbstractConte
 }
 
 #endif
+
+
 

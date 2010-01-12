@@ -63,23 +63,18 @@
 	struct lucFieldVariableBorder { __lucFieldVariableBorder };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucFieldVariableBorder* _lucFieldVariableBorder_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCFIELDVARIABLEBORDER_DEFARGS \
+                LUCOPENGLDRAWINGOBJECT_DEFARGS
+
+	#define LUCFIELDVARIABLEBORDER_PASSARGS \
+                LUCOPENGLDRAWINGOBJECT_PASSARGS
+
+	lucFieldVariableBorder* _lucFieldVariableBorder_New(  LUCFIELDVARIABLEBORDER_DEFARGS  );
 
 	void _lucFieldVariableBorder_Delete( void* drawingObject ) ;
 	void _lucFieldVariableBorder_Print( void* drawingObject, Stream* stream ) ;
@@ -87,7 +82,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucFieldVariableBorder_DefaultNew( Name name ) ;
-	void _lucFieldVariableBorder_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucFieldVariableBorder_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucFieldVariableBorder_Build( void* drawingObject, void* data ) ;
 	void _lucFieldVariableBorder_Initialise( void* drawingObject, void* data ) ;
 	void _lucFieldVariableBorder_Execute( void* drawingObject, void* data );
@@ -99,3 +94,4 @@
 	void _lucFieldVariableBorder_BuildDisplayList( void* drawingObject, void* _context ) ;
 
 #endif
+

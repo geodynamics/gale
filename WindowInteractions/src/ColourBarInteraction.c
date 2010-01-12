@@ -62,47 +62,13 @@
 const Type lucColourBarInteraction_Type = "lucColourBarInteraction";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucColourBarInteraction* _lucColourBarInteraction_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucWindowInteraction_MouseMotionFunction*          _mouseMotion,
-		lucWindowInteraction_MouseClickFunction*           _mouseClick,
-		lucWindowInteraction_MouseMessageFunction*         _mouseMessage,
-		lucWindowInteraction_KeyboardEventFunction*        _keyboardEvent,
-		lucWindowInteraction_KeyboardMessageFunction*      _keyboardMessage,		
-		Name                                               name ) 
+lucColourBarInteraction* _lucColourBarInteraction_New(  LUCCOLOURBARINTERACTION_DEFARGS  ) 
 {
 	lucColourBarInteraction*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucColourBarInteraction) );
-	self = (lucColourBarInteraction*) _lucWindowInteraction_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_mouseMotion,
-			_mouseClick, 
-			_mouseMessage, 
-			_keyboardEvent,
-			_keyboardMessage,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucColourBarInteraction) );
+	self = (lucColourBarInteraction*) _lucWindowInteraction_New(  LUCWINDOWINTERACTION_PASSARGS  );
 	
 	return self;
 }
@@ -138,31 +104,35 @@ void* _lucColourBarInteraction_Copy( void* ColourBarInteraction, void* dest, Boo
 
 
 void* _lucColourBarInteraction_DefaultNew( Name name ) {
-	return (void*) _lucColourBarInteraction_New(
-		sizeof(lucColourBarInteraction),
-		lucColourBarInteraction_Type,
-		_lucColourBarInteraction_Delete,
-		_lucColourBarInteraction_Print,
-		NULL,
-		_lucColourBarInteraction_DefaultNew,
-		_lucColourBarInteraction_Construct,
-		_lucColourBarInteraction_Build,
-		_lucColourBarInteraction_Initialise,
-		_lucColourBarInteraction_Execute,
-		_lucColourBarInteraction_Destroy,		
-		_lucColourBarInteraction_MouseMotion,
-		_lucColourBarInteraction_MouseClick,
-		_lucColourBarInteraction_MouseMessage,
-		_lucColourBarInteraction_KeyboardEvent,
-		_lucColourBarInteraction_KeyboardMessage,
-		name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(lucColourBarInteraction);
+	Type                                                          type = lucColourBarInteraction_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _lucColourBarInteraction_Delete;
+	Stg_Class_PrintFunction*                                    _print = _lucColourBarInteraction_Print;
+	Stg_Class_CopyFunction*                                      _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _lucColourBarInteraction_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _lucColourBarInteraction_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _lucColourBarInteraction_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _lucColourBarInteraction_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _lucColourBarInteraction_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _lucColourBarInteraction_Destroy;
+	lucWindowInteraction_MouseMotionFunction*             _mouseMotion = _lucColourBarInteraction_MouseMotion;
+	lucWindowInteraction_MouseClickFunction*               _mouseClick = _lucColourBarInteraction_MouseClick;
+	lucWindowInteraction_MouseMessageFunction*           _mouseMessage = _lucColourBarInteraction_MouseMessage;
+	lucWindowInteraction_KeyboardEventFunction*         _keyboardEvent = _lucColourBarInteraction_KeyboardEvent;
+	lucWindowInteraction_KeyboardMessageFunction*     _keyboardMessage = _lucColourBarInteraction_KeyboardMessage;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucColourBarInteraction_New(  LUCCOLOURBARINTERACTION_PASSARGS  );
 }
 
-void _lucColourBarInteraction_Construct( void* ColourBarInteraction, Stg_ComponentFactory* cf, void* data ){
+void _lucColourBarInteraction_AssignFromXML( void* ColourBarInteraction, Stg_ComponentFactory* cf, void* data ){
 	lucColourBarInteraction*  self = (lucColourBarInteraction*)ColourBarInteraction;
 
 	/* Construct Parent */
-	_lucWindowInteraction_Construct( self, cf, data );
+	_lucWindowInteraction_AssignFromXML( self, cf, data );
 	
 	_lucColourBarInteraction_Init( self );
 }
@@ -240,5 +210,7 @@ void _lucColourBarInteraction_KeyboardMessage( void* windowInteraction, Stream* 
 	Journal_Printf( stream,
 			"c:                            The value of ColourBar's colour under the cursor will be printed to screen.\n" );
 }
+
+
 
 

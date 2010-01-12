@@ -67,20 +67,18 @@
 	struct lucEncoderLibavcodec { __lucEncoderLibavcodec };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucEncoderLibavcodec* _lucEncoderLibavcodec_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucOutputFormat_OutputFunction*                    _output,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCENCODERLIBAVCODEC_DEFARGS \
+                LUCOUTPUTFORMAT_DEFARGS
+
+	#define LUCENCODERLIBAVCODEC_PASSARGS \
+                LUCOUTPUTFORMAT_PASSARGS
+
+	lucEncoderLibavcodec* _lucEncoderLibavcodec_New(  LUCENCODERLIBAVCODEC_DEFARGS  );
 
 	void _lucEncoderLibavcodec_Delete( void* outputFormat ) ;
 	void _lucEncoderLibavcodec_Print( void* outputFormat, Stream* stream ) ;
@@ -88,13 +86,14 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucEncoderLibavcodec_DefaultNew( Name name ) ;
-	void _lucEncoderLibavcodec_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data );
+	void _lucEncoderLibavcodec_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data );
 	void _lucEncoderLibavcodec_Build( void* outputFormat, void* data ) ;
 	void _lucEncoderLibavcodec_Initialise( void* outputFormat, void* data ) ;
 	void _lucEncoderLibavcodec_Execute( void* outputFormat, void* data );
 	void _lucEncoderLibavcodec_Destroy( void* outputFormat, void* data ) ;
 	
-	void _lucEncoderLibavcodec_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) ;
+	void _lucEncoderLibavcodec_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) ;
 
 #endif /* HAVE_LIBAVCODEC */
 #endif
+

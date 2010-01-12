@@ -68,23 +68,18 @@
 	struct lucContour { __lucContour };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucContour* _lucContour_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCCONTOUR_DEFARGS \
+                LUCOPENGLDRAWINGOBJECT_DEFARGS
+
+	#define LUCCONTOUR_PASSARGS \
+                LUCOPENGLDRAWINGOBJECT_PASSARGS
+
+	lucContour* _lucContour_New(  LUCCONTOUR_DEFARGS  );
 
 	void _lucContour_Delete( void* drawingObject ) ;
 	void _lucContour_Print( void* drawingObject, Stream* stream ) ;
@@ -92,7 +87,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucContour_DefaultNew( Name name ) ;
-	void _lucContour_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucContour_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucContour_Build( void* drawingObject, void* data ) ;
 	void _lucContour_Initialise( void* drawingObject, void* data ) ;
 	void _lucContour_Execute( void* drawingObject, void* data );
@@ -121,3 +116,4 @@
 	void lucContour_PlotPoint( char edge, double isovalue, double leftBtm, double rightBtm, double leftTop, double rightTop , Coord pos, double dA, double dB, Axis planeAxis ) ;
 
 #endif
+

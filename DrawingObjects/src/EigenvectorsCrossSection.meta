@@ -10,7 +10,7 @@
 <param name="Project Web">http://mcc.monash.edu.au/gLucifer</param>
 <param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
 <param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
-<param name="Parent">lucOpenGLDrawingObject</param>
+<param name="Parent">lucCrossSection</param>
 <param name="Reference"></param>
 <param name="Summary"></param>
 <param name="Description">Samples the values of a tensor field in a plane and draws arrows to represent the Eigenvectors.</param>
@@ -21,67 +21,67 @@
 		<param name="Name">resolution</param>
 		<param name="Type">UnsignedInt</param>
 		<param name="Default">128</param>
-		<param name="Description">The default value for the resolutionX, resolutionY and resolutionZ. If these values aren't set the sampling grid will be uniform with this number of verticies in each direction.</param>
+		<param name="Description">Default value for the resolution X, Y and Z. If not set the sampling grid will use default for each dimension.</param>
 	</struct>
 	<struct>
 		<param name="Name">resolutionX</param>
 		<param name="Type">UnsignedInt</param>
 		<param name="Default">defaultResolution</param>
-		<param name="Description">The number of sample points in the X direction.</param>
+		<param name="Description">Number of sample points in the X direction.</param>
 	</struct>
 	<struct>
 		<param name="Name">resolutionY</param>
 		<param name="Type">UnsignedInt</param>
 		<param name="Default">defaultResolution</param>
-		<param name="Description">The number of sample points in the Y direction.</param>
+		<param name="Description">Number of sample points in the Y direction.</param>
 	</struct>
 	<struct>
 		<param name="Name">resolutionZ</param>
 		<param name="Type">UnsignedInt</param>
 		<param name="Default">defaultResolution</param>
-		<param name="Description">The number of sample points in the Z direction.</param>
+		<param name="Description">Number of sample points in the Z direction.</param>
 	</struct>
 	<struct>
 		<param name="Name">crossSection</param>
 		<param name="Type">String</param>
 		<param name="Default">"z=min"</param>
-		<param name="Description">The description of the plane in the format: "axis=value". e.g. x=1.5 will describe a Y-Z plane where the X coordinate is 1.5. The axis is case insensitive. To specify plane dynamically based on current minimum/maximum global coords use "axis=min", "axis=max" or "axis=value%".</param>
+		<param name="Description">The description of the plane in the format: "axis=value". e.g. x=1.5 will describe a Y-Z plane where the X coordinate is 1.5. Can also use the dynamic values min, max or also "axis=value%".</param>
 	</struct>
 	<struct>
 		<param name="Name">leastColour</param>
 		<param name="Type">String</param>
 		<param name="Default">"black"</param>
-		<param name="Description">The colour of the arrow corresponding to the Eigenvector with the least Eigenvalue.</param>
+		<param name="Description">Colour of the arrow corresponding to the Eigenvector with the least Eigenvalue.</param>
 	</struct>
 	<struct>
 		<param name="Name">middleColour</param>
 		<param name="Type">String</param>
 		<param name="Default">"black"</param>
-		<param name="Description">The colour of the arrow corresponding to the Eigenvector with the middle Eigenvalue. (Only useful in 3D)</param>
+		<param name="Description">Colour of the arrow corresponding to the Eigenvector with the middle Eigenvalue. (Only useful in 3D)</param>
 	</struct>
 	<struct>
 		<param name="Name">greatestColour</param>
 		<param name="Type">String</param>
 		<param name="Default">"black"</param>
-		<param name="Description">The colour of the arrow corresponding to the Eigenvector with the greatest Eigenvalue.</param>
+		<param name="Description">Colour of the arrow corresponding to the Eigenvector with the greatest Eigenvalue.</param>
 	</struct>
 	<struct>
 		<param name="Name">arrowHeadSize</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.3</param>
-		<param name="Description">The size of the head of the arrow compared with the arrow length. Must be between [0, 1]</param>
+		<param name="Description">Size of the head of the arrow compared with the arrow length. Must be between [0, 1]</param>
 	</struct>
 	<struct>
 		<param name="Name">lengthScale</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.3</param>
-		<param name="Description">This is a factor to scale the size of the arrows by.</param>
+		<param name="Description">A factor to scale the size of the arrows</param>
 	</struct>
 	<struct>
 		<param name="Name">lineWidth</param>
 		<param name="Type">Double</param>
 		<param name="Default">1.0</param>
-		<param name="Description">The width of the lines for each arrow.</param>
+		<param name="Description">Width of the lines for each arrow.</param>
 	</struct>
 	<struct>
 		<param name="Name">scaleEigenValue</param>
@@ -93,7 +93,7 @@
 		<param name="Name">notEigenValue</param>
 		<param name="Type">Double</param>
 		<param name="Default">0.3</param>
-		<param name="Description">The length of the arrows if they aren't scaled by the Eigenvalue.</param>
+		<param name="Description">Length of the arrows if they aren't scaled by the Eigenvalue.</param>
 	</struct>
 	
 	<struct>
@@ -118,19 +118,19 @@
 		<param name="Name">leastColourForNegative</param>
 		<param name="Type">String</param>
 		<param name="Default">"black"</param>
-		<param name="Description">When you are plotting the Eigenvalues - this is the colour of the particle dot if the Eigenvalue is negative.</param>
+		<param name="Description">When plotting the Eigenvalues - this is the colour of the particle dot if the Eigenvalue is negative.</param>
 	</struct>
 	<struct>
 		<param name="Name">middleColourForNegative</param>
 		<param name="Type">String</param>
 		<param name="Default">"black"</param>
-		<param name="Description">When you are plotting the Eigenvalues - this is the colour of the particle dot if the Eigenvalue is negative. (Only useful in 3D)</param>
+		<param name="Description">When plotting the Eigenvalues - this is the colour of the particle dot if the Eigenvalue is negative. (Only useful in 3D)</param>
 	</struct>
 	<struct>
 		<param name="Name">greatestColourForNegative</param>
 		<param name="Type">String</param>
 		<param name="Default">"black"</param>
-		<param name="Description">When you are plotting the Eigenvalues - this is the colour of the particle dot if the Eigenvalue is negative.</param>
+		<param name="Description">When plotting the Eigenvalues - this is the colour of the particle dot if the Eigenvalue is negative.</param>
 	</struct>
 </list>
 

@@ -68,45 +68,13 @@
 const Type lucContour_Type = "lucContour";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucContour* _lucContour_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name ) 
+lucContour* _lucContour_New(  LUCCONTOUR_DEFARGS  ) 
 {
 	lucContour*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucContour) );
-	self = (lucContour*) _lucOpenGLDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucContour) );
+	self = (lucContour*) _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_PASSARGS  );
 	
 	return self;
 }
@@ -156,26 +124,30 @@ void* _lucContour_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt
 
 
 void* _lucContour_DefaultNew( Name name ) {
-	return (void*) _lucContour_New(
-		sizeof(lucContour),
-		lucContour_Type,
-		_lucContour_Delete,
-		_lucContour_Print,
-		NULL,
-		_lucContour_DefaultNew,
-		_lucContour_Construct,
-		_lucContour_Build,
-		_lucContour_Initialise,
-		_lucContour_Execute,
-		_lucContour_Destroy,
-		_lucContour_Setup,
-		_lucContour_Draw,
-		_lucContour_CleanUp,
-		_lucContour_BuildDisplayList,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucContour);
+	Type                                                             type = lucContour_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucContour_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucContour_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucContour_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucContour_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucContour_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucContour_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucContour_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucContour_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucContour_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucContour_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucContour_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucContour_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucContour_New(  LUCCONTOUR_PASSARGS  );
 }
 
-void _lucContour_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucContour_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucContour*      self = (lucContour*)drawingObject;
 	Index            defaultResolution;
 	FieldVariable*   fieldVariable;
@@ -184,7 +156,7 @@ void _lucContour_Construct( void* drawingObject, Stg_ComponentFactory* cf, void*
 	Bool             showValues;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
 	fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "FieldVariable", FieldVariable, True,  data );
 	colourMap     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap",     lucColourMap,  False, data );
@@ -509,3 +481,5 @@ void lucContour_PlotPoint( char edge, double isovalue, double leftBtm, double ri
 	}
 	glVertex3dv(vertex);
 }
+
+

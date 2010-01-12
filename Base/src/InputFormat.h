@@ -53,6 +53,7 @@
 
 	#define __lucInputFormat                                         \
 		__Stg_Component                                           \
+		AbstractContext*				 context;  \
 		/* Virtual Functions */ \
 		lucInputFormat_InputFunction*                    _input;   \
 		/* Other Info */   \
@@ -62,20 +63,20 @@
 
 	struct lucInputFormat {__lucInputFormat};
 
-	lucInputFormat* _lucInputFormat_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		lucInputFormat_InputFunction*                      _input,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCINPUTFORMAT_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                lucInputFormat_InputFunction*  _input
+
+	#define LUCINPUTFORMAT_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _input
+
+	lucInputFormat* _lucInputFormat_New(  LUCINPUTFORMAT_DEFARGS  );
 
 	void lucInputFormat_InitAll( 
 		void*                                              inputFormat,
@@ -86,7 +87,7 @@
 	void* _lucInputFormat_Copy( void* inputFormat, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 
 	void* _lucInputFormat_DefaultNew( Name name ) ;
-	void _lucInputFormat_Construct( void* inputFormat, Stg_ComponentFactory* cf, void* data ) ;
+	void _lucInputFormat_AssignFromXML( void* inputFormat, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucInputFormat_Build( void* inputFormat, void* data );
 	void _lucInputFormat_Initialise( void* inputFormat, void* data );
 	void _lucInputFormat_Execute( void* inputFormat, void* data );
@@ -98,3 +99,4 @@
 	FILE* lucInputFormat_OpenFile( void* inputFormat, lucWindow* window, void* _context, const char *mode ) ;
 
 #endif
+

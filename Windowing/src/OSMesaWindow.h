@@ -61,23 +61,18 @@
 	struct lucOSMesaWindow { __lucOSMesaWindow };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucOSMesaWindow* _lucOSMesaWindow_New( 
-		SizeT                                           sizeOfSelf,
-		Type                                            type,
-		Stg_Class_DeleteFunction*                       _delete,
-		Stg_Class_PrintFunction*                        _print,
-		Stg_Class_CopyFunction*                         _copy, 
-		Stg_Component_DefaultConstructorFunction*       _defaultConstructor,
-		Stg_Component_ConstructFunction*                _construct,
-		Stg_Component_BuildFunction*                    _build,
-		Stg_Component_InitialiseFunction*               _initialise,
-		Stg_Component_ExecuteFunction*                  _execute,
-		Stg_Component_DestroyFunction*                  _destroy,
-		lucWindow_DisplayFunction*						_displayWindow,	
-		lucWindow_EventsWaitingFunction*				_eventsWaiting,	
-		lucWindow_EventProcessorFunction*				_eventProcessor,	
-		lucWindow_ResizeFunction*						_resizeWindow,	
-		Name                                            name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCOSMESAWINDOW_DEFARGS \
+                LUCWINDOW_DEFARGS
+
+	#define LUCOSMESAWINDOW_PASSARGS \
+                LUCWINDOW_PASSARGS
+
+	lucOSMesaWindow* _lucOSMesaWindow_New(  LUCOSMESAWINDOW_DEFARGS  );
 
 	void _lucOSMesaWindow_Delete( void* window ) ;
 	void _lucOSMesaWindow_Print( void* window, Stream* stream ) ;
@@ -85,10 +80,11 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucOSMesaWindow_DefaultNew( Name name ) ;
-	void _lucOSMesaWindow_Construct( void* window, Stg_ComponentFactory* cf, void* data );
+	void _lucOSMesaWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* data );
 	void _lucOSMesaWindow_Build( void* window, void* data ) ;
 	void _lucOSMesaWindow_Initialise( void* window, void* data ) ;
 	void _lucOSMesaWindow_Execute( void* window, void* data );
 	void _lucOSMesaWindow_Destroy( void* window, void* data ) ;
 #endif
+
 

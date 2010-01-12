@@ -86,7 +86,9 @@ void lucTestPlottingObjects_Draw( AbstractContext* context ) {
 }
 
 void lucTestPlottingObjects_Register( void* context ) {
-	ContextEP_Append( context, AbstractContext_EP_ConstructExtensions, lucTestPlottingObjects );
+	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, lucTestPlottingObjects );
 	ContextEP_Append( context, AbstractContext_EP_Dump, lucTestPlottingObjects_Draw );
 }
+
+
 

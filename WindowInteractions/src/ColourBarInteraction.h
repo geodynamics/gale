@@ -60,24 +60,18 @@
 	struct lucColourBarInteraction { __lucColourBarInteraction };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucColourBarInteraction* _lucColourBarInteraction_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucWindowInteraction_MouseMotionFunction*          _mouseMotion,
-		lucWindowInteraction_MouseClickFunction*           _mouseClick,
-		lucWindowInteraction_MouseMessageFunction*         _mouseMessage,
-		lucWindowInteraction_KeyboardEventFunction*        _keyboardEvent,
-		lucWindowInteraction_KeyboardMessageFunction*      _keyboardMessage,		
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCCOLOURBARINTERACTION_DEFARGS \
+                LUCWINDOWINTERACTION_DEFARGS
+
+	#define LUCCOLOURBARINTERACTION_PASSARGS \
+                LUCWINDOWINTERACTION_PASSARGS
+
+	lucColourBarInteraction* _lucColourBarInteraction_New(  LUCCOLOURBARINTERACTION_DEFARGS  );
 
 	void _lucColourBarInteraction_Delete( void* renderingEngine ) ;
 	void _lucColourBarInteraction_Print( void* renderingEngine, Stream* stream ) ;
@@ -85,7 +79,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucColourBarInteraction_DefaultNew( Name name ) ;
-	void _lucColourBarInteraction_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
+	void _lucColourBarInteraction_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
 	void _lucColourBarInteraction_Build( void* renderingEngine, void* data ) ;
 	void _lucColourBarInteraction_Initialise( void* renderingEngine, void* data ) ;
 	void _lucColourBarInteraction_Execute( void* renderingEngine, void* data );
@@ -98,3 +92,4 @@
 	void _lucColourBarInteraction_KeyboardMessage( void* windowInteractor, Stream* stream ) ;
 	
 #endif
+

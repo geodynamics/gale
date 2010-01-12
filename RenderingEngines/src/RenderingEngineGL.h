@@ -68,23 +68,18 @@
 	struct lucRenderingEngineGL { __lucRenderingEngineGL };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucRenderingEngineGL* _lucRenderingEngineGL_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucRenderingEngine_RenderFunction*                 _render,
-		lucRenderingEngine_ClearFunction*             	   _clear,
-		lucRenderingEngine_GetPixelDataFunction*           _getPixelData,
-		lucRenderingEngine_CompositeViewportFunction*      _compositeViewport,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCRENDERINGENGINEGL_DEFARGS \
+                LUCRENDERINGENGINE_DEFARGS
+
+	#define LUCRENDERINGENGINEGL_PASSARGS \
+                LUCRENDERINGENGINE_PASSARGS
+
+	lucRenderingEngineGL* _lucRenderingEngineGL_New(  LUCRENDERINGENGINEGL_DEFARGS  );
 
 	void _lucRenderingEngineGL_Delete( void* renderingEngine ) ;
 	void _lucRenderingEngineGL_Print( void* renderingEngine, Stream* stream ) ;
@@ -92,7 +87,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucRenderingEngineGL_DefaultNew( Name name ) ;
-	void _lucRenderingEngineGL_Construct( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
+	void _lucRenderingEngineGL_AssignFromXML( void* renderingEngine, Stg_ComponentFactory* cf, void* data );
 	void _lucRenderingEngineGL_Build( void* renderingEngine, void* data ) ;
 	void _lucRenderingEngineGL_Initialise( void* renderingEngine, void* data ) ;
 	void _lucRenderingEngineGL_Execute( void* renderingEngine, void* data );
@@ -100,8 +95,7 @@
 
 	void _lucRenderingEngineGL_Render( void* renderingEngine, lucWindow* window, AbstractContext* context ) ;
 	void _lucRenderingEngineGL_Clear( void* renderingEngine, lucWindow* window, Bool clearAll ) ;
-	void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* window, lucPixel* buffer ) ;
-
+	void _lucRenderingEngineGL_GetPixelData( void* renderingEngine, lucWindow* window, void* buffer, Bool withAlpha ) ;
 	void lucRenderingEngineGL_WriteViewportText( void* renderingEngine, lucWindow* window, lucViewportInfo* viewportInfo, AbstractContext* context ) ;
 
 	/** Compositing Functions */
@@ -126,3 +120,4 @@
 		Bool                                               broadcast ) ;
 
 #endif
+

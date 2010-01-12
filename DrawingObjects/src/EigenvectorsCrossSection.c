@@ -51,10 +51,8 @@
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
 
-#include <glucifer/Base/CrossSection.h>
-
 #include "types.h"
-#include "OpenGLDrawingObject.h"
+#include "CrossSection.h"
 #include "EigenvectorsCrossSection.h"
 
 #include <assert.h>
@@ -71,52 +69,19 @@
 const Type lucEigenvectorsCrossSection_Type = "lucEigenvectorsCrossSection";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucEigenvectorsCrossSection* _lucEigenvectorsCrossSection_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name ) 
+lucEigenvectorsCrossSection* _lucEigenvectorsCrossSection_New(  LUCEIGENVECTORSCROSSSECTION_DEFARGS  ) 
 {
 	lucEigenvectorsCrossSection*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucEigenvectorsCrossSection) );
-	self = (lucEigenvectorsCrossSection*) _lucOpenGLDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucEigenvectorsCrossSection) );
+	self = (lucEigenvectorsCrossSection*) _lucCrossSection_New(  LUCCROSSSECTION_PASSARGS  );
 	
 	return self;
 }
 
 void _lucEigenvectorsCrossSection_Init( 
 		lucEigenvectorsCrossSection*                                 self,
-		FieldVariable*                                               tensorField,
 		Dimension_Index                                              dim,
 		Name                                                         leastColourName,
 		Name                                                         middleColourName,
@@ -132,22 +97,20 @@ void _lucEigenvectorsCrossSection_Init(
 		double 							     scaleEigenValue,
 		Name                                                         leastColourForNegativeName,
 		Name                                                         middleColourForNegativeName,
-		Name                                                         greatestColourForNegativeName,
-		lucCrossSection*                                             crossSection)
+		Name                                                         greatestColourForNegativeName)
 {
 	Stream* errorStream         = Journal_MyStream( Error_Type, self );
-	self->tensorField = tensorField;
 	if ( dim == 2 ) {
-		lucColour_FromString( &self->colour[0], leastColourName );
-		lucColour_FromString( &self->colour[1], greatestColourName );
+		lucColour_FromString( &self->colours[0], leastColourName );
+		lucColour_FromString( &self->colours[1], greatestColourName );
 		lucColour_FromString( &self->colourForNegative[0], leastColourForNegativeName );
 		lucColour_FromString( &self->colourForNegative[1], greatestColourForNegativeName );
 
 	}
 	else {
-		lucColour_FromString( &self->colour[0], leastColourName );
-		lucColour_FromString( &self->colour[1], middleColourName );
-		lucColour_FromString( &self->colour[2], greatestColourName );
+		lucColour_FromString( &self->colours[0], leastColourName );
+		lucColour_FromString( &self->colours[1], middleColourName );
+		lucColour_FromString( &self->colours[2], greatestColourName );
 
 	        lucColour_FromString( &self->colourForNegative[0], leastColourForNegativeName );
 		lucColour_FromString( &self->colourForNegative[1], middleColourForNegativeName );
@@ -169,67 +132,52 @@ void _lucEigenvectorsCrossSection_Init(
 	self->plotEigenVector = plotEigenVector;
 	self->plotEigenValue = plotEigenValue;
 	self->scaleEigenValue = scaleEigenValue;
-
-	self->crossSection = crossSection;
 }
 
 void _lucEigenvectorsCrossSection_Delete( void* drawingObject ) {
 	lucEigenvectorsCrossSection*  self = (lucEigenvectorsCrossSection*)drawingObject;
 
-   lucCrossSection_Delete(self->crossSection);
-	_lucOpenGLDrawingObject_Delete( self );
+	_lucCrossSection_Delete( self );
 }
 
 void _lucEigenvectorsCrossSection_Print( void* drawingObject, Stream* stream ) {
 	lucEigenvectorsCrossSection*  self = (lucEigenvectorsCrossSection*)drawingObject;
 
-	_lucOpenGLDrawingObject_Print( self, stream );
+	_lucCrossSection_Print( self, stream );
 }
-
-void* _lucEigenvectorsCrossSection_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) {
-	lucEigenvectorsCrossSection*  self = (lucEigenvectorsCrossSection*)drawingObject;
-	lucEigenvectorsCrossSection* newDrawingObject;
-
-	newDrawingObject = _lucOpenGLDrawingObject_Copy( self, dest, deep, nameExt, ptrMap );
-
-	/* TODO */
-	abort();
-
-	return (void*) newDrawingObject;
-}
-
 
 void* _lucEigenvectorsCrossSection_DefaultNew( Name name ) {
-	return (void*) _lucEigenvectorsCrossSection_New(
-		sizeof(lucEigenvectorsCrossSection),
-		lucEigenvectorsCrossSection_Type,
-		_lucEigenvectorsCrossSection_Delete,
-		_lucEigenvectorsCrossSection_Print,
-		NULL,
-		_lucEigenvectorsCrossSection_DefaultNew,
-		_lucEigenvectorsCrossSection_Construct,
-		_lucEigenvectorsCrossSection_Build,
-		_lucEigenvectorsCrossSection_Initialise,
-		_lucEigenvectorsCrossSection_Execute,
-		_lucEigenvectorsCrossSection_Destroy,
-		_lucEigenvectorsCrossSection_Setup,
-		_lucEigenvectorsCrossSection_Draw,
-		_lucEigenvectorsCrossSection_CleanUp,
-		_lucEigenvectorsCrossSection_BuildDisplayList,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucEigenvectorsCrossSection);
+	Type                                                             type = lucEigenvectorsCrossSection_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucEigenvectorsCrossSection_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucEigenvectorsCrossSection_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucEigenvectorsCrossSection_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucEigenvectorsCrossSection_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucEigenvectorsCrossSection_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucEigenvectorsCrossSection_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucEigenvectorsCrossSection_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucEigenvectorsCrossSection_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucOpenGLDrawingObject_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucCrossSection_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucOpenGLDrawingObject_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucEigenvectorsCrossSection_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucEigenvectorsCrossSection_New(  LUCEIGENVECTORSCROSSSECTION_PASSARGS  );
 }
 
-void _lucEigenvectorsCrossSection_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucEigenvectorsCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucEigenvectorsCrossSection* self = (lucEigenvectorsCrossSection*)drawingObject;
-	FieldVariable*   tensorField;
 	Index            defaultResolution;
 	IJK              resolution;
-   lucCrossSection* crossSection;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
-
-	tensorField =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "TensorField", FieldVariable, True, data );
+	_lucCrossSection_AssignFromXML( self, cf, data );
+   strcpy(self->fieldVariableName, "TensorField");
 
 	defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolution", 8 );
 	resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionX", defaultResolution );
@@ -238,7 +186,6 @@ void _lucEigenvectorsCrossSection_Construct( void* drawingObject, Stg_ComponentF
 			
 	_lucEigenvectorsCrossSection_Init( 
 			self, 
-			tensorField,
 			Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 2 ),
 			Stg_ComponentFactory_GetString( cf, self->name, "leastColour", "black" ),
 			Stg_ComponentFactory_GetString( cf, self->name, "middleColour", "black" ),
@@ -254,47 +201,28 @@ void _lucEigenvectorsCrossSection_Construct( void* drawingObject, Stg_ComponentF
 			Stg_ComponentFactory_GetDouble( cf, self->name, "scaleEigenValue", 1.0 ),
 			Stg_ComponentFactory_GetString( cf, self->name, "leastColourForNegative", "black" ),
 			Stg_ComponentFactory_GetString( cf, self->name, "middleColourForNegative", "black" ),
-			Stg_ComponentFactory_GetString( cf, self->name, "greatestColourForNegative", "black" ),
-			lucCrossSection_Read(cf, self->name));
+			Stg_ComponentFactory_GetString( cf, self->name, "greatestColourForNegative", "black" ));
 }
 
-void _lucEigenvectorsCrossSection_Build( void* drawingObject, void* data ) {}
+void _lucEigenvectorsCrossSection_Build( void* drawingObject, void* data ) {
+   /* Build field variable in parent */
+   _lucCrossSection_Build(drawingObject, data);
+}
+
 void _lucEigenvectorsCrossSection_Initialise( void* drawingObject, void* data ) {}
 void _lucEigenvectorsCrossSection_Execute( void* drawingObject, void* data ) {}
 void _lucEigenvectorsCrossSection_Destroy( void* drawingObject, void* data ) {}
-
-void _lucEigenvectorsCrossSection_Setup( void* drawingObject, void* _context ) {
-	lucEigenvectorsCrossSection*       self            = (lucEigenvectorsCrossSection*)drawingObject;
-
-	_lucOpenGLDrawingObject_Setup( self, _context );
-}
-	
-void _lucEigenvectorsCrossSection_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
-	lucEigenvectorsCrossSection*       self            = (lucEigenvectorsCrossSection*)drawingObject;
-
-	_lucOpenGLDrawingObject_Draw( self, window, viewportInfo, _context );
-}
-
-
-void _lucEigenvectorsCrossSection_CleanUp( void* drawingObject, void* _context ) {
-	lucEigenvectorsCrossSection*       self            = (lucEigenvectorsCrossSection*)drawingObject;
-
-	_lucOpenGLDrawingObject_CleanUp( self, _context );
-}
 
 void _lucEigenvectorsCrossSection_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucEigenvectorsCrossSection*       self            = (lucEigenvectorsCrossSection*)drawingObject;
 	DomainContext*            context         = (DomainContext*) _context;
 
-	_lucEigenvectorsCrossSection_DrawCrossSection( self, context->dim, self->crossSection );
+	_lucEigenvectorsCrossSection_DrawCrossSection( self, context->dim );
 }
 
-void _lucEigenvectorsCrossSection_DrawCrossSection( void* drawingObject, Dimension_Index dim, lucCrossSection* crossSection ) {
+void _lucEigenvectorsCrossSection_DrawCrossSection( void* drawingObject, Dimension_Index dim ) {
 	lucEigenvectorsCrossSection*  self           = (lucEigenvectorsCrossSection*)drawingObject;
-	FieldVariable*    tensorField    = self->tensorField;
-   Axis              axis = crossSection->axis;
-	Axis              aAxis          = (axis == I_AXIS ? J_AXIS : I_AXIS);
-	Axis              bAxis          = (axis == K_AXIS ? J_AXIS : K_AXIS);
+	FieldVariable*    tensorField    = self->fieldVariable;
 	Coord             pos;
 	SymmetricTensor   tensor;
 	Coord             globalMin;
@@ -310,18 +238,18 @@ void _lucEigenvectorsCrossSection_DrawCrossSection( void* drawingObject, Dimensi
 
 	glLineWidth(self->lineWidth);
 	
-	dA = (globalMax[ aAxis ] - globalMin[ aAxis ])/(double)self->resolution[ aAxis ];
-	dB = (globalMax[ bAxis ] - globalMin[ bAxis ])/(double)self->resolution[ bAxis ];
+	dA = (globalMax[ self->axis1 ] - globalMin[ self->axis1 ])/(double)self->resolution[ self->axis1 ];
+	dB = (globalMax[ self->axis2 ] - globalMin[ self->axis2 ])/(double)self->resolution[ self->axis2 ];
 	
-	pos[axis] = lucCrossSection_GetValue(crossSection, globalMin[axis], globalMax[axis]);
-	Journal_DPrintf( self->debugStream, "-- Drawing cross section on axis %d at value %lf\n", axis, pos[axis]);
+	pos[self->axis] = lucCrossSection_GetValue(self, globalMin[self->axis], globalMax[self->axis]);
+	Journal_DPrintf( self->debugStream, "-- Drawing cross section on axis %d at value %lf\n", self->axis, pos[self->axis]);
 
-	for ( pos[ aAxis ] = globalMin[ aAxis ] + dA * 0.5 ; pos[ aAxis ] < globalMax[ aAxis ] ; pos[ aAxis ] += dA ) {
-		for ( pos[ bAxis ] = globalMin[ bAxis ] + dB * 0.5 ; pos[ bAxis ] < globalMax[ bAxis ] ; pos[ bAxis ] += dB ) {
+	for ( pos[ self->axis1 ] = globalMin[ self->axis1 ] + dA * 0.5 ; pos[ self->axis1 ] < globalMax[ self->axis1 ] ; pos[ self->axis1 ] += dA ) {
+		for ( pos[ self->axis2 ] = globalMin[ self->axis2 ] + dB * 0.5 ; pos[ self->axis2 ] < globalMax[ self->axis2 ] ; pos[ self->axis2 ] += dB ) {
 
-			if ( pos[ aAxis ] < localMin[ aAxis ] || pos[ aAxis ] >= localMax[ aAxis ] )
+			if ( pos[ self->axis1 ] < localMin[ self->axis1 ] || pos[ self->axis1 ] >= localMax[ self->axis1 ] )
 				continue;
-			if ( pos[ bAxis ] < localMin[ bAxis ] || pos[ bAxis ] >= localMax[ bAxis ] )
+			if ( pos[ self->axis2 ] < localMin[ self->axis2 ] || pos[ self->axis2 ] >= localMax[ self->axis2 ] )
 				continue;
 
 			/* Get Value of Tensor at this point in space */
@@ -331,7 +259,7 @@ void _lucEigenvectorsCrossSection_DrawCrossSection( void* drawingObject, Dimensi
                                 if(self->plotEigenVector){
 					for ( dim_I = 0 ; dim_I < dim ; dim_I++ ) {
 						
-						lucColour_SetOpenGLColour( &self->colour[ dim_I ] );
+						lucColour_SetOpenGLColour( &self->colours[ dim_I ] );
 						if(self->useEigenValue){
 						     luc_DrawVector( dim, pos, eigenvectorList[ dim_I ].vector, 
 								(eigenvectorList[ dim_I ].eigenvalue * self->scaleEigenValue), self->arrowHeadSize );
@@ -350,7 +278,7 @@ void _lucEigenvectorsCrossSection_DrawCrossSection( void* drawingObject, Dimensi
 						/* colour for negative values, one for each dim as well */
 						if ( eigenvectorList[ dim_I ].eigenvalue >= 0) {
 						        pointSize = eigenvectorList[ dim_I ].eigenvalue * self->scaleEigenValue;
-							lucColour_SetOpenGLColour( &self->colour[ dim_I ] );
+							lucColour_SetOpenGLColour( &self->colours[ dim_I ] );
 	                                        }
 						else {
 						        lucColour_SetOpenGLColour( &self->colourForNegative[ dim_I ] );
@@ -372,3 +300,5 @@ void _lucEigenvectorsCrossSection_DrawCrossSection( void* drawingObject, Dimensi
 		}
 	}
 }
+
+

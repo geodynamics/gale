@@ -62,47 +62,13 @@
 const Type lucFieldValueInteraction_Type = "lucFieldValueInteraction";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucFieldValueInteraction* _lucFieldValueInteraction_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucWindowInteraction_MouseMotionFunction*          _mouseMotion,
-		lucWindowInteraction_MouseClickFunction*           _mouseClick,
-		lucWindowInteraction_MouseMessageFunction*         _mouseMessage,
-		lucWindowInteraction_KeyboardEventFunction*        _keyboardEvent,
-		lucWindowInteraction_KeyboardMessageFunction*      _keyboardMessage,		
-		Name                                               name ) 
+lucFieldValueInteraction* _lucFieldValueInteraction_New(  LUCFIELDVALUEINTERACTION_DEFARGS  ) 
 {
 	lucFieldValueInteraction*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucFieldValueInteraction) );
-	self = (lucFieldValueInteraction*) _lucWindowInteraction_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_mouseMotion,
-			_mouseClick, 
-			_mouseMessage, 
-			_keyboardEvent,
-			_keyboardMessage,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucFieldValueInteraction) );
+	self = (lucFieldValueInteraction*) _lucWindowInteraction_New(  LUCWINDOWINTERACTION_PASSARGS  );
 	
 	return self;
 }
@@ -138,31 +104,35 @@ void* _lucFieldValueInteraction_Copy( void* FieldValueInteraction, void* dest, B
 
 
 void* _lucFieldValueInteraction_DefaultNew( Name name ) {
-	return (void*) _lucFieldValueInteraction_New(
-		sizeof(lucFieldValueInteraction),
-		lucFieldValueInteraction_Type,
-		_lucFieldValueInteraction_Delete,
-		_lucFieldValueInteraction_Print,
-		NULL,
-		_lucFieldValueInteraction_DefaultNew,
-		_lucFieldValueInteraction_Construct,
-		_lucFieldValueInteraction_Build,
-		_lucFieldValueInteraction_Initialise,
-		_lucFieldValueInteraction_Execute,
-		_lucFieldValueInteraction_Destroy,		
-		_lucFieldValueInteraction_MouseMotion,
-		_lucFieldValueInteraction_MouseClick,
-		_lucFieldValueInteraction_MouseMessage,
-		_lucFieldValueInteraction_KeyboardEvent,
-		_lucFieldValueInteraction_KeyboardMessage,
-		name );
+	/* Variables set in this function */
+	SizeT                                                  _sizeOfSelf = sizeof(lucFieldValueInteraction);
+	Type                                                          type = lucFieldValueInteraction_Type;
+	Stg_Class_DeleteFunction*                                  _delete = _lucFieldValueInteraction_Delete;
+	Stg_Class_PrintFunction*                                    _print = _lucFieldValueInteraction_Print;
+	Stg_Class_CopyFunction*                                      _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*      _defaultConstructor = _lucFieldValueInteraction_DefaultNew;
+	Stg_Component_ConstructFunction*                        _construct = _lucFieldValueInteraction_AssignFromXML;
+	Stg_Component_BuildFunction*                                _build = _lucFieldValueInteraction_Build;
+	Stg_Component_InitialiseFunction*                      _initialise = _lucFieldValueInteraction_Initialise;
+	Stg_Component_ExecuteFunction*                            _execute = _lucFieldValueInteraction_Execute;
+	Stg_Component_DestroyFunction*                            _destroy = _lucFieldValueInteraction_Destroy;
+	lucWindowInteraction_MouseMotionFunction*             _mouseMotion = _lucFieldValueInteraction_MouseMotion;
+	lucWindowInteraction_MouseClickFunction*               _mouseClick = _lucFieldValueInteraction_MouseClick;
+	lucWindowInteraction_MouseMessageFunction*           _mouseMessage = _lucFieldValueInteraction_MouseMessage;
+	lucWindowInteraction_KeyboardEventFunction*         _keyboardEvent = _lucFieldValueInteraction_KeyboardEvent;
+	lucWindowInteraction_KeyboardMessageFunction*     _keyboardMessage = _lucFieldValueInteraction_KeyboardMessage;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucFieldValueInteraction_New(  LUCFIELDVALUEINTERACTION_PASSARGS  );
 }
 
-void _lucFieldValueInteraction_Construct( void* FieldValueInteraction, Stg_ComponentFactory* cf, void* data ){
+void _lucFieldValueInteraction_AssignFromXML( void* FieldValueInteraction, Stg_ComponentFactory* cf, void* data ){
 	lucFieldValueInteraction*  self = (lucFieldValueInteraction*)FieldValueInteraction;
 
 	/* Construct Parent */
-	_lucWindowInteraction_Construct( self, cf, data );
+	_lucWindowInteraction_AssignFromXML( self, cf, data );
 	
 	_lucFieldValueInteraction_Init( self );
 }
@@ -231,5 +201,7 @@ void _lucFieldValueInteraction_KeyboardMessage( void* windowInteraction, Stream*
 	Journal_Printf( stream,
 			"f:                            The value of fields under the cursor with be printed to screen.\n" );
 }
+
+
 
 

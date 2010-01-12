@@ -112,7 +112,7 @@ void DummyFieldVariable_GetMinAndMaxGlobalCoords( void* fieldVariable, Coord min
 	max[2] = 2.0;
 }
 
-void _DummyFieldVariable_Construct( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) {
+void _DummyFieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) {
 	FieldVariable* self = (FieldVariable*) fieldVariable;
 
 	self->fieldComponentCount = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "fieldComponentCount", 1 );
@@ -121,33 +121,31 @@ void _DummyFieldVariable_Construct( void* fieldVariable, Stg_ComponentFactory* c
 }
 
 void* _DummyFieldVariable_DefaultNew( Name name ) {
-	return _FieldVariable_New(
-		sizeof(FieldVariable),
-		DummyFieldVariable_Type,
-		_FieldVariable_Delete,
-		_FieldVariable_Print,
-		_FieldVariable_Copy,
-		_DummyFieldVariable_DefaultNew,
-		_DummyFieldVariable_Construct,
-		_FieldVariable_Build,
-		_FieldVariable_Initialise,
-		_FieldVariable_Execute,
-		_FieldVariable_Destroy,
-		name,
-		False,
-		DummyFieldVariable_InterpolateValueAt,
-		DummyFieldVariable_GetMinGlobalFieldMagnitude,
-		DummyFieldVariable_GetMaxGlobalFieldMagnitude,
-		DummyFieldVariable_GetMinAndMaxLocalCoords,
-		DummyFieldVariable_GetMinAndMaxGlobalCoords,
-		1, /*fieldComponentCount*/
-		0, /*dim */
-		False, /*isCheckpointedAndReloaded*/
-		MPI_COMM_WORLD,
-		0 );
+	/* Variables set in this function */
+	SizeT                                                      _sizeOfSelf = sizeof(FieldVariable);
+	Type                                                              type = DummyFieldVariable_Type;
+	Stg_Class_DeleteFunction*                                      _delete = _FieldVariable_Delete;
+	Stg_Class_PrintFunction*                                        _print = _FieldVariable_Print;
+	Stg_Class_CopyFunction*                                          _copy = _FieldVariable_Copy;
+	Stg_Component_DefaultConstructorFunction*          _defaultConstructor = _DummyFieldVariable_DefaultNew;
+	Stg_Component_ConstructFunction*                            _construct = _DummyFieldVariable_AssignFromXML;
+	Stg_Component_BuildFunction*                                    _build = _FieldVariable_Build;
+	Stg_Component_InitialiseFunction*                          _initialise = _FieldVariable_Initialise;
+	Stg_Component_ExecuteFunction*                                _execute = _FieldVariable_Execute;
+	Stg_Component_DestroyFunction*                                _destroy = _FieldVariable_Destroy;
+	AllocationType                                      nameAllocationType = False;
+	FieldVariable_InterpolateValueAtFunction*          _interpolateValueAt = DummyFieldVariable_InterpolateValueAt;
+	FieldVariable_GetValueFunction*            _getMinGlobalFieldMagnitude = DummyFieldVariable_GetMinGlobalFieldMagnitude;
+	FieldVariable_GetValueFunction*            _getMaxGlobalFieldMagnitude = DummyFieldVariable_GetMaxGlobalFieldMagnitude;
+	FieldVariable_GetCoordFunction*               _getMinAndMaxLocalCoords = DummyFieldVariable_GetMinAndMaxLocalCoords;
+	FieldVariable_GetCoordFunction*              _getMinAndMaxGlobalCoords = DummyFieldVariable_GetMinAndMaxGlobalCoords;
+
+	return _FieldVariable_New(  FIELDVARIABLE_PASSARGS  );
 }
 
 Index DummyFieldVariable_Register( PluginsManager* pluginsManager ) {
 	RegisterParent( DummyFieldVariable_Type, FieldVariable_Type );
 	return PluginsManager_Submit( pluginsManager, DummyFieldVariable_Type, "0", _DummyFieldVariable_DefaultNew );
 }
+
+

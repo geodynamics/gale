@@ -53,7 +53,7 @@
 	#define __lucAxis                              \
 		__lucOpenGLDrawingObject \
 		Coord                               origin;\
-		float 				    length;\
+		float 				                  length;\
 		lucColour                           colourX;\
 		lucColour                           colourY;\
 		lucColour                           colourZ;
@@ -62,47 +62,24 @@
 
 	/** Constructors */
 	lucAxis* lucAxis_New( 
-		Name                                               name,
-		Coord                                              origin,
-		float 						   length,
-		lucColour                                          colourX,
-		lucColour                                          colourY,
-		lucColour                                          colourZ);
+		Name                                name,
+		Coord                               origin,
+		float 						            length,
+		lucColour                           colourX,
+		lucColour                           colourY,
+		lucColour                           colourZ);
 
-	lucAxis* _lucAxis_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
-	void lucAxis_InitAll( 
-		void*                                              axis,
-		Coord                                              origin,
-		float                                              length, 
-		lucColour                                          colourX,
-		lucColour                                          colourY,
-		lucColour                                          colourZ);
+	#define LUCAXIS_DEFARGS \
+                LUCOPENGLDRAWINGOBJECT_DEFARGS
 
-	void _lucAxis_Init( 
-		void*                                              axis,
-		Coord                                              origin,
-		float 						   length, 
-		lucColour                                          colourX,
-		lucColour                                          colourY,
-		lucColour                                          colourZ);
+	#define LUCAXIS_PASSARGS \
+                LUCOPENGLDRAWINGOBJECT_PASSARGS
 
+	lucAxis* _lucAxis_New(  LUCAXIS_DEFARGS  );
 
 	void _lucAxis_Setup( void* drawingObject, void* _context );
 		
@@ -113,7 +90,7 @@
 	#define lucAxis_Copy( self ) \
 		(lucAxis*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	void* _lucAxis_DefaultNew( Name name ) ;
-void _lucAxis_Construct( void* axis, Stg_ComponentFactory* cf, void* data ) ;
+void _lucAxis_AssignFromXML( void* axis, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucAxis_Build( void* axis, void* data );
 	void _lucAxis_Initialise( void* axis, void* data );
 	void _lucAxis_Execute( void* axis, void* data );
@@ -123,3 +100,4 @@ void _lucAxis_Construct( void* axis, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucAxis_BuildDisplayList( void* drawingObject, void* _context );
 
 #endif
+

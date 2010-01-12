@@ -63,20 +63,18 @@
 	struct lucInputPPM { __lucInputPPM };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucInputPPM* _lucInputPPM_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucInputFormat_InputFunction*                      _Input,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCINPUTPPM_DEFARGS \
+                LUCINPUTFORMAT_DEFARGS
+
+	#define LUCINPUTPPM_PASSARGS \
+                LUCINPUTFORMAT_PASSARGS
+
+	lucInputPPM* _lucInputPPM_New(  LUCINPUTPPM_DEFARGS  );
 
 	void _lucInputPPM_Delete( void* InputFormat ) ;
 	void _lucInputPPM_Print( void* InputFormat, Stream* stream ) ;
@@ -84,7 +82,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucInputPPM_DefaultNew( Name name ) ;
-	void _lucInputPPM_Construct( void* InputFormat, Stg_ComponentFactory* cf, void* data );
+	void _lucInputPPM_AssignFromXML( void* InputFormat, Stg_ComponentFactory* cf, void* data );
 	void _lucInputPPM_Build( void* InputFormat, void* data ) ;
 	void _lucInputPPM_Initialise(void* InputFormat, void* data ) ;
 	void _lucInputPPM_Execute( void* InputFormat, void* data );
@@ -93,3 +91,4 @@
 	lucPixel* _lucInputPPM_Input( void* inputFormat, Name imageName, Pixel_Index *width, Pixel_Index* height ) ;
 
 #endif
+

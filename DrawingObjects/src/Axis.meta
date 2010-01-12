@@ -37,28 +37,27 @@
 	<struct>
 		<param name="Name">originX</param>
 		<param name="Type">Double</param>
-		<param name="Default">-0.25</param>
-		<param name="Description">Sets the X origin of the axis.</param>
+		<param name="Default">20.0</param>
+		<param name="Description">Sets the X origin of the axis, in viewport coords.</param>
 	</struct>
 	<struct>
 		<param name="Name">originY</param>
 		<param name="Type">Double</param>
-		<param name="Default">0.0</param>
-		<param name="Description">Sets the Y origin of the axis.</param>
+		<param name="Default">20.0</param>
+		<param name="Description">Sets the Y origin of the axis, in viewport coords.</param>
 	</struct>
 	<struct>
 		<param name="Name">originZ</param>
 		<param name="Type">Double</param>
-		<param name="Default">0.0</param>
-		<param name="Description">Sets the Z origin of the axis.</param>
+		<param name="Default">0.25</param>
+		<param name="Description">Sets the Z origin of the axis: depth value in viewport, range [0,1].</param>
 	</struct>
 	<struct>
 		<param name="Name">length</param>
 		<param name="Type">Double</param>
-		<param name="Default">0.25</param>
+		<param name="Default">0.2</param>
 		<param name="Description">Scales the length of the X,Y,Z axes.</param>
 	</struct>
-
 </list>
 
 <list name="Dependencies">

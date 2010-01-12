@@ -70,58 +70,18 @@ const Type lucViewport_Type = "lucViewport";
 
 MPI_Datatype lucViewport_MPI_Datatype;
 
-lucViewport* lucViewport_New(
-		Name                                               name,
-		lucCamera*                                         camera,
-		lucDrawingObject**                                 drawingObjectList,
-		DrawingObject_Index                                drawingObjectCount,
-		lucLight**          				   lightList,
-	  	Light_Index                                        lightCount,
-		Bool                                               drawTitle,
-		Bool                                               drawTime,
-		Bool                                               compositeEachObject,
-		double                                             nearClipPlane,
-		double                                             farClipPlane )
-{
-	lucViewport* self = _lucViewport_DefaultNew( name );
-
-	lucViewport_InitAll( self, camera, drawingObjectList, drawingObjectCount, lightList, lightCount, drawTitle, drawTime, compositeEachObject, nearClipPlane, farClipPlane );
-
-	return self;
-}
-
-lucViewport* _lucViewport_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		Name                                               name )
+lucViewport* _lucViewport_New(  LUCVIEWPORT_DEFARGS  )
 {
 	lucViewport*    self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucViewport) );
-	self = (lucViewport*) _Stg_Component_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name, 
-			NON_GLOBAL );
+	assert( _sizeOfSelf >= sizeof(lucViewport) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (lucViewport*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	return self;
 }
@@ -131,13 +91,16 @@ void _lucViewport_Init(
 		lucCamera*                                         camera, 
 		lucDrawingObject**                                 drawingObjectList, 
 		DrawingObject_Index                                drawingObjectCount,
-		lucLight**          				   lightList,
-	        Light_Index                                        lightCount,
+      lucLight**          				                     lightList,
+      Light_Index                                        lightCount,
 		Bool                                               drawTitle,
 		Bool                                               drawTime,
 		Bool                                               compositeEachObject,
 		double                                             nearClipPlane,
-		double                                             farClipPlane )
+		double                                             farClipPlane,
+		double                                             scaleX,
+		double                                             scaleY,
+		double                                             scaleZ)
 {
 	DrawingObject_Index object_I;
 	Light_Index light_I;
@@ -150,12 +113,15 @@ void _lucViewport_Init(
 	lightPosition[1]= LUC_LIGHT_DEFAULT_POS_Y;
 	lightPosition[2]= LUC_LIGHT_DEFAULT_POS_Z;
 	lightPosition[3]= LUC_LIGHT_DEFAULT_POS_W;
-	
+
 	self->camera                   = camera;
 	self->drawTitle                = drawTitle;
 	self->drawTime                 = drawTime;
 	self->nearClipPlane            = nearClipPlane;
 	self->farClipPlane             = farClipPlane;
+	self->scaleX                   = scaleX;
+	self->scaleY                   = scaleY;
+	self->scaleZ                   = scaleZ;
 	self->compositeEachObject      = compositeEachObject;
 
 	self->drawingObject_Register = lucDrawingObject_Register_New();
@@ -169,33 +135,36 @@ void _lucViewport_Init(
 	for ( light_I = 0 ; light_I < lightCount ; light_I++ )
 		lucLight_Register_Add( self->light_Register, lightList[ light_I ] );
 
-       	if(lightCount == 0){
-       		self->defaultLight = lucLight_New( "defaultLight", 0, GL_LIGHT_MODEL_TWO_SIDE,  GL_AMBIENT_AND_DIFFUSE, lightPosition, lmodel_ambient, spotCutOff, spotDirection);
-		lucLight_Register_Add( self->light_Register, self->defaultLight );
-	}
-
-
+   if(lightCount == 0) {
+      self->defaultLight = lucLight_New( "defaultLight", 0, GL_LIGHT_MODEL_TWO_SIDE,  GL_AMBIENT_AND_DIFFUSE, 
+                                          lightPosition, lmodel_ambient, spotCutOff, spotDirection);
+      lucLight_Register_Add( self->light_Register, self->defaultLight );
+   }
 }
 
-void lucViewport_InitAll( 
-		void*                                              viewport,
-		lucCamera*                                         camera, 
-		lucDrawingObject**                                 drawingObjectList, 
+lucViewport* lucViewport_New(
+		Name                                               name,
+		lucCamera*                                         camera,
+		lucDrawingObject**                                 drawingObjectList,
 		DrawingObject_Index                                drawingObjectCount,
-	        lucLight**          			           lightList,
-	 	Light_Index                                        lightCount,
+		lucLight**          				   lightList,
+	  	Light_Index                                        lightCount,
 		Bool                                               drawTitle,
 		Bool                                               drawTime,
 		Bool                                               compositeEachObject,
 		double                                             nearClipPlane,
-		double                                             farClipPlane )
+		double                                             farClipPlane,
+		double                                             scaleX,
+		double                                             scaleY,
+		double                                             scaleZ)
 {
-	lucViewport* self        = viewport;
+	lucViewport* self = _lucViewport_DefaultNew( name );
 
-	_lucViewport_Init( self, camera, drawingObjectList, drawingObjectCount, lightList, lightCount, drawTitle, drawTime, compositeEachObject, nearClipPlane, farClipPlane );
+	_lucViewport_Init( self, camera, drawingObjectList, drawingObjectCount, lightList, lightCount, drawTitle, drawTime, compositeEachObject, nearClipPlane, farClipPlane, scaleX, scaleY, scaleZ);
+
+	return self;
 }
 
-	
 void _lucViewport_Delete( void* viewport ) {
 	lucViewport* self        = viewport;
 	
@@ -248,22 +217,26 @@ void* _lucViewport_Copy( void* viewport, void* dest, Bool deep, Name nameExt, Pt
 }
 
 void* _lucViewport_DefaultNew( Name name ) {
-	return _lucViewport_New( 
-			sizeof( lucViewport ),
-			lucViewport_Type,
-			_lucViewport_Delete,
-			_lucViewport_Print,
-			_lucViewport_Copy,
-			_lucViewport_DefaultNew,
-			_lucViewport_Construct,
-			_lucViewport_Build,
-			_lucViewport_Initialise,
-			_lucViewport_Execute,
-			_lucViewport_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( lucViewport );
+	Type                                                      type = lucViewport_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucViewport_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucViewport_Print;
+	Stg_Class_CopyFunction*                                  _copy = _lucViewport_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucViewport_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucViewport_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucViewport_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucViewport_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucViewport_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucViewport_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _lucViewport_New(  LUCVIEWPORT_PASSARGS  );
 }
 
-void _lucViewport_Construct( void* viewport, Stg_ComponentFactory* cf, void* data ) {
+void _lucViewport_AssignFromXML( void* viewport, Stg_ComponentFactory* cf, void* data ) {
 	lucViewport*        self               = (lucViewport*) viewport;
 	DrawingObject_Index drawingObjectCount;
 	lucDrawingObject**  drawingObjectList;
@@ -272,6 +245,10 @@ void _lucViewport_Construct( void* viewport, Stg_ComponentFactory* cf, void* dat
 	lucCamera*          camera;
 
 	/* TODO Construct Parent */
+
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
+	if( !self->context ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 
 	camera =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Camera", lucCamera, True, data ) ;
 
@@ -306,27 +283,29 @@ void _lucViewport_Construct( void* viewport, Stg_ComponentFactory* cf, void* dat
 			Stg_ComponentFactory_GetBool( cf, self->name, "drawTitle", True ),
 			Stg_ComponentFactory_GetBool( cf, self->name, "drawTime", False ),
 			Stg_ComponentFactory_GetBool( cf, self->name, "compositeEachObject", False ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "nearClipPlane", 0.1 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "farClipPlane", 40.0 ) );
+			Stg_ComponentFactory_GetDouble( cf, self->name, "nearClipPlane", camera->focalLength / 10.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "farClipPlane", camera->focalLength * 10.0 ), 
+			Stg_ComponentFactory_GetDouble( cf, self->name, "scaleX", 1.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "scaleY", 1.0 ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, "scaleZ", 1.0 ) );
 
 	Memory_Free( drawingObjectList );
         if(lightList)
 		Memory_Free( lightList );
 }
 
-void _lucViewport_Build( void* camera, void* data ) { }
-void _lucViewport_Initialise( void* camera, void* data ) { }
-void _lucViewport_Execute( void* camera, void* data ) { }
-void _lucViewport_Destroy( void* camera, void* data ) { }
+void _lucViewport_Build( void* viewport, void* data ) { }
+void _lucViewport_Initialise( void* viewport, void* data ) {}
+void _lucViewport_Execute( void* viewport, void* data ) { }
+void _lucViewport_Destroy( void* viewport, void* data ) { }
 
 void lucViewport_Draw( void* viewport, lucWindow* window, lucViewportInfo* viewportInfo, void* context ) {
 	lucViewport*          self = (lucViewport*) viewport ;
 
 	lucDebug_PrintFunctionBegin( self, 2 );
 
-	/*Enables the lights */
+	/* Enables the lights */
 	lucLight_Register_EnableAll( self->light_Register );
-
 	lucDrawingObject_Register_DrawAll( self->drawingObject_Register, window, viewportInfo, context, self->compositeEachObject );
 
 	lucDebug_PrintFunctionEnd( self, 2 );
@@ -390,3 +369,5 @@ void lucViewport_Create_MPI_Datatype() {
 	MPI_Type_struct( lucViewport_TypesCount, blocklen, displacement, typeList, &lucViewport_MPI_Datatype );
 	MPI_Type_commit( & lucViewport_MPI_Datatype );
 }
+
+

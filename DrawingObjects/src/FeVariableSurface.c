@@ -65,45 +65,13 @@
 const Type lucFeVariableSurface_Type = "lucFeVariableSurface";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucFeVariableSurface* _lucFeVariableSurface_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name ) 
+lucFeVariableSurface* _lucFeVariableSurface_New(  LUCFEVARIABLESURFACE_DEFARGS  ) 
 {
 	lucFeVariableSurface*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucFeVariableSurface) );
-	self = (lucFeVariableSurface*) _lucOpenGLDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucFeVariableSurface) );
+	self = (lucFeVariableSurface*) _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_PASSARGS  );
 	
 	return self;
 }
@@ -153,32 +121,36 @@ void* _lucFeVariableSurface_Copy( void* drawingObject, void* dest, Bool deep, Na
 
 
 void* _lucFeVariableSurface_DefaultNew( Name name ) {
-	return (void*) _lucFeVariableSurface_New(
-		sizeof(lucFeVariableSurface),
-		lucFeVariableSurface_Type,
-		_lucFeVariableSurface_Delete,
-		_lucFeVariableSurface_Print,
-		NULL,
-		_lucFeVariableSurface_DefaultNew,
-		_lucFeVariableSurface_Construct,
-		_lucFeVariableSurface_Build,
-		_lucFeVariableSurface_Initialise,
-		_lucFeVariableSurface_Execute,
-		_lucFeVariableSurface_Destroy,
-		_lucFeVariableSurface_Setup,
-		_lucFeVariableSurface_Draw,
-		_lucFeVariableSurface_CleanUp,
-		_lucFeVariableSurface_BuildDisplayList,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucFeVariableSurface);
+	Type                                                             type = lucFeVariableSurface_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucFeVariableSurface_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucFeVariableSurface_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucFeVariableSurface_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucFeVariableSurface_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucFeVariableSurface_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucFeVariableSurface_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucFeVariableSurface_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucFeVariableSurface_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucFeVariableSurface_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucFeVariableSurface_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucFeVariableSurface_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucFeVariableSurface_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucFeVariableSurface_New(  LUCFEVARIABLESURFACE_PASSARGS  );
 }
 
-void _lucFeVariableSurface_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucFeVariableSurface_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucFeVariableSurface*  self = (lucFeVariableSurface*)drawingObject;
 	FieldVariable*         feVariable;
 	lucColourMap*          colourMap;
 
 	/* Construct Parent */
-	_lucDrawingObject_Construct( self, cf, data );
+	_lucDrawingObject_AssignFromXML( self, cf, data );
 
 	feVariable    =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeVariable", FieldVariable, True,  data );
 	colourMap     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap",  lucColourMap,  False, data );
@@ -284,3 +256,5 @@ void _lucFeVariableSurface_BuildDisplayList( void* drawingObject, void* _context
 
 	NewClass_Delete( inc );
 }
+
+

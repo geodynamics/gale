@@ -70,49 +70,13 @@
 const Type lucSwarmViewer_Type = "lucSwarmViewer";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucSwarmViewer* _lucSwarmViewer_New( 
-	SizeT                                              sizeOfSelf,
-	Type                                               type,
-	Stg_Class_DeleteFunction*                          _delete,
-	Stg_Class_PrintFunction*                           _print,
-	Stg_Class_CopyFunction*                            _copy, 
-	Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-	Stg_Component_ConstructFunction*                   _construct,
-	Stg_Component_BuildFunction*                       _build,
-	Stg_Component_InitialiseFunction*                  _initialise,
-	Stg_Component_ExecuteFunction*                     _execute,
-	Stg_Component_DestroyFunction*                     _destroy,
-	lucDrawingObject_SetupFunction*                    _setup,
-	lucDrawingObject_DrawFunction*                     _draw,
-	lucDrawingObject_CleanUpFunction*                  _cleanUp,
-	lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-	lucSwarmViewerBase_PlotParticleFunction*           _plotParticle,
-	lucSwarmViewerBase_SetParticleColourFunction*      _setParticleColour,
-	Name                                               name ) 
+lucSwarmViewer* _lucSwarmViewer_New(  LUCSWARMVIEWER_DEFARGS  ) 
 {
 	lucSwarmViewer*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucSwarmViewer) );
-	self = (lucSwarmViewer*) _lucSwarmViewerBase_New( 
-		sizeOfSelf,
-		type, 
-		_delete,
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		_setup,
-		_draw,
-		_cleanUp,
-		_buildDisplayList,
-		_plotParticle,
-		_setParticleColour,
-		name );
+	assert( _sizeOfSelf >= sizeof(lucSwarmViewer) );
+	self = (lucSwarmViewer*) _lucSwarmViewerBase_New(  LUCSWARMVIEWERBASE_PASSARGS  );
 
 	return self;
 }
@@ -152,32 +116,36 @@ void* _lucSwarmViewer_Copy( void* drawingObject, void* dest, Bool deep, Name nam
 
 
 void* _lucSwarmViewer_DefaultNew( Name name ) {
-	return (void*) _lucSwarmViewer_New(
-		sizeof(lucSwarmViewer),
-		lucSwarmViewer_Type,
-		_lucSwarmViewer_Delete,
-		_lucSwarmViewer_Print,
-		NULL,
-		_lucSwarmViewer_DefaultNew,
-		_lucSwarmViewer_Construct,
-		_lucSwarmViewer_Build,
-		_lucSwarmViewer_Initialise,
-		_lucSwarmViewer_Execute,
-		_lucSwarmViewer_Destroy,
-		_lucSwarmViewer_Setup,
-		_lucSwarmViewer_Draw,
-		_lucSwarmViewer_CleanUp,
-		_lucSwarmViewer_BuildDisplayList,
-		_lucSwarmViewer_PlotParticle,
-		_lucSwarmViewerBase_SetParticleColourDefault,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucSwarmViewer);
+	Type                                                             type = lucSwarmViewer_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucSwarmViewer_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucSwarmViewer_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucSwarmViewer_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucSwarmViewer_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucSwarmViewer_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucSwarmViewer_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucSwarmViewer_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucSwarmViewer_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucSwarmViewer_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucSwarmViewer_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucSwarmViewer_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucSwarmViewer_BuildDisplayList;
+	lucSwarmViewerBase_PlotParticleFunction*                _plotParticle = _lucSwarmViewer_PlotParticle;
+	lucSwarmViewerBase_SetParticleColourFunction*      _setParticleColour = _lucSwarmViewerBase_SetParticleColourDefault;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucSwarmViewer_New(  LUCSWARMVIEWER_PASSARGS  );
 }
 
-void _lucSwarmViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucSwarmViewer_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucSwarmViewer*         self = (lucSwarmViewer*)drawingObject;
 
 	/* Construct Parent */
-	_lucSwarmViewerBase_Construct( self, cf, data );
+	_lucSwarmViewerBase_AssignFromXML( self, cf, data );
 	
 	_lucSwarmViewer_Init( 
 		self, 
@@ -272,4 +240,6 @@ void _lucSwarmViewer_PlotParticle( void* drawingObject, void* _context, Particle
 	else   
 		glVertex3dv( coord );
 }
+
+
 

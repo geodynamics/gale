@@ -71,23 +71,7 @@ const Type lucMeshViewer_Type = "lucMeshViewer";
 
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucMeshViewer* _lucMeshViewer_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-		Name                                               name ) 
+lucMeshViewer* _lucMeshViewer_New(  LUCMESHVIEWER_DEFARGS  ) 
 {
 	lucMeshViewer*					self;
 
@@ -95,42 +79,32 @@ lucMeshViewer* _lucMeshViewer_New(
 	   parent and continue up the hierarchy tree. At the beginning of the tree 
 	   it will allocate memory of the size of object and initialise all the 
 	   memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucMeshViewer) );
-	self = (lucMeshViewer*) _lucOpenGLDrawingObject_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_setup,
-			_draw,
-			_cleanUp,
-			_buildDisplayList,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucMeshViewer) );
+	self = (lucMeshViewer*) _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_PASSARGS  );
 	
 	return self;
 }
 
 void _lucMeshViewer_Init( 
-                lucMeshViewer*                                            self,
+      lucMeshViewer*                                            self,
 		Mesh*                                                     mesh,
 		Name                                                      localColourName,
 		Name                                                      shadowColourName,
 		Name                                                      vacantColourName,
-		float                                                        lineWidth )
+		float                                                     lineWidth,
+      char*                                                     skipEdges )
 {
-	self->mesh  = mesh;
-	lucColour_FromString( &self->localColour, localColourName );
-	lucColour_FromString( &self->shadowColour, shadowColourName );
-	lucColour_FromString( &self->vacantColour, vacantColourName );
-    self->lineWidth = lineWidth;
-	
+   self->mesh  = mesh;
+   lucColour_FromString( &self->localColour, localColourName );
+   lucColour_FromString( &self->shadowColour, shadowColourName );
+   lucColour_FromString( &self->vacantColour, vacantColourName );
+   self->lineWidth = lineWidth;
+
+   /* Specify axis-aligned mesh edges that should not be plotted with character string representing axis */
+   if (strchr(skipEdges, 'x') || strchr(skipEdges, 'X')) self->skipXedges = True; else self->skipXedges = False;
+   if (strchr(skipEdges, 'y') || strchr(skipEdges, 'Y')) self->skipYedges = True; else self->skipYedges = False;
+   if (strchr(skipEdges, 'z') || strchr(skipEdges, 'Z')) self->skipZedges = True; else self->skipZedges = False;
+
 	assert( Stg_Class_IsInstance( mesh, Mesh_Type ) );
 
 	self->renderEdges = NULL;
@@ -167,31 +141,35 @@ void* _lucMeshViewer_Copy( void* drawingObject, void* dest, Bool deep, Name name
 
 
 void* _lucMeshViewer_DefaultNew( Name name ) {
-	return (void*) _lucMeshViewer_New(
-		sizeof(lucMeshViewer),
-		lucMeshViewer_Type,
-		_lucMeshViewer_Delete,
-		_lucMeshViewer_Print,
-		NULL,
-		_lucMeshViewer_DefaultNew,
-		_lucMeshViewer_Construct,
-		_lucMeshViewer_Build,
-		_lucMeshViewer_Initialise,
-		_lucMeshViewer_Execute,
-		_lucMeshViewer_Destroy,
-		_lucMeshViewer_Setup,
-		_lucMeshViewer_Draw,
-		_lucMeshViewer_CleanUp,
-		_lucMeshViewer_BuildDisplayList,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(lucMeshViewer);
+	Type                                                             type = lucMeshViewer_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _lucMeshViewer_Delete;
+	Stg_Class_PrintFunction*                                       _print = _lucMeshViewer_Print;
+	Stg_Class_CopyFunction*                                         _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucMeshViewer_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _lucMeshViewer_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _lucMeshViewer_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucMeshViewer_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucMeshViewer_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucMeshViewer_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucMeshViewer_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucMeshViewer_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucMeshViewer_CleanUp;
+	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucMeshViewer_BuildDisplayList;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucMeshViewer_New(  LUCMESHVIEWER_PASSARGS  );
 }
 
-void _lucMeshViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucMeshViewer_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucMeshViewer*         self = (lucMeshViewer*)drawingObject;
 	Mesh*                  mesh;
 	
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 	
 	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", Mesh, True, data );
 
@@ -205,7 +183,8 @@ void _lucMeshViewer_Construct( void* drawingObject, Stg_ComponentFactory* cf, vo
 			Stg_ComponentFactory_GetString( cf, self->name, "localColour", "black" ),
 			Stg_ComponentFactory_GetString( cf, self->name, "shadowColour", "blue" ),
 			Stg_ComponentFactory_GetString( cf, self->name, "vacantColour", "Grey" ),
-	        (float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 1.0 )
+	        (float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 1.0),
+         Stg_ComponentFactory_GetString( cf, self->name, "skipEdges", "")
 			);
 }
 
@@ -351,11 +330,10 @@ void lucMeshViewer_PrintAllElementsNumber( void* drawingObject, Partition_Index 
 #endif
 
 void lucMeshViewer_PrintAllNodesNumber( void* drawingObject ) {
-	lucMeshViewer* self = (lucMeshViewer*)drawingObject;
-	FeMesh *mesh = (FeMesh*)self->mesh;
-	double* coord;
-	char nodeNumString[100];
-	unsigned node_lI, nodeLocalCount, dim;
+	lucMeshViewer*	self = (lucMeshViewer*)drawingObject;
+	double*			coord;
+	char				nodeNumString[100];
+	unsigned			node_lI, nodeLocalCount, dim;
 
 	glDisable(GL_LIGHTING); /*if the lighting is not disabled, the colour won't appear for the numbers*/
     lucSetFontCharset(FONT_SMALL);
@@ -462,7 +440,9 @@ void lucMeshViewer_RenderLocal( void* drawingObject ) {
 	assert( self->renderEdges );
 
 	/* Shortcuts. */
-	glDisable(GL_LIGHTING); /* lighting is just not set up correctly */
+	glDisable(GL_LIGHTING); 
+	glDisable(GL_LINE_SMOOTH); 
+   /*glDisable(GL_DEPTH_TEST); /* depth testing and line smoothing do not work well together */
 	mesh = self->mesh;
 
 	/* Pick the correct dimension. */
@@ -490,6 +470,8 @@ void lucMeshViewer_RenderLocal( void* drawingObject ) {
 
 	/* Render edges */
 	self->renderEdges( self, vertexFunc );
+
+   glEnable(GL_DEPTH_TEST); 
 
 /* For now we are doing any text printing in the Draw call as fonts have their own display lists and coord system */
 #if 0
@@ -622,8 +604,15 @@ void lucMeshViewer_RenderEdges_WithInc( lucMeshViewer* self, vertexFuncType* ver
 		incVerts = IArray_GetPtr( inc );
 		assert( nIncVerts == 2 );
 
-		vertexFunc( Mesh_GetVertex( self->mesh, incVerts[0] ) );
-		vertexFunc( Mesh_GetVertex( self->mesh, incVerts[1] ) );
+		//vertexFunc( Mesh_GetVertex( self->mesh, incVerts[0] ) );
+		//vertexFunc( Mesh_GetVertex( self->mesh, incVerts[1] ) );
+      double *vertex1, *vertex2;
+		vertex1 = Mesh_GetVertex( self->mesh, incVerts[0] );
+		vertex2 = Mesh_GetVertex( self->mesh, incVerts[1] );
+      if (!EdgeSkip(self, vertex1, vertex2)) {
+   		vertexFunc(vertex1);
+	   	vertexFunc(vertex2); 
+	   }
 	}
     glEnd();
 	glEnable(GL_LIGHTING);
@@ -643,9 +632,35 @@ void lucMeshViewer_RenderEdges( lucMeshViewer* self, vertexFuncType* vertexFunc 
 	glDisable(GL_LIGHTING);
 	glBegin( GL_LINES );
 	for( e_i = 0; e_i < nEdges; e_i++ ) {
-		vertexFunc( Mesh_GetVertex( self->mesh, edges[e_i][0] ) );
-		vertexFunc( Mesh_GetVertex( self->mesh, edges[e_i][1] ) );
+		//vertexFunc( Mesh_GetVertex( self->mesh, edges[e_i][0] ) );
+		//vertexFunc( Mesh_GetVertex( self->mesh, edges[e_i][1] ) );
+      double *vertex1, *vertex2;
+		vertex1 = Mesh_GetVertex( self->mesh, edges[e_i][0] );
+		vertex2 = Mesh_GetVertex( self->mesh, edges[e_i][1] );
+      if (!EdgeSkip(self, vertex1, vertex2)) {
+   		vertexFunc(vertex1);
+	   	vertexFunc(vertex2); 
+	   }
 	}
 	glEnd();
 	glEnable(GL_LIGHTING);
 }
+
+Bool EdgeSkip(lucMeshViewer* self, double* v1, double* v2)
+{  
+   /* Skip where Y+Z unchanging (x-axis aligned horizontal edges) */
+   if (self->skipXedges && v1[J_AXIS] == v2[J_AXIS] && v1[K_AXIS] == v2[K_AXIS])
+      return True;
+
+   /* Skip where X+Z unchanging (y-axis aligned vertical edges) */
+   if (self->skipYedges && v1[I_AXIS] == v2[I_AXIS] && v1[K_AXIS] == v2[K_AXIS])
+      return True;
+
+   /* Skip where X+Y unchanging (z-axis aligned horizontal edges) */
+   if (self->skipZedges && v1[I_AXIS] == v2[I_AXIS] && v1[J_AXIS] == v2[J_AXIS])
+      return True;
+
+   return False;
+}
+
+

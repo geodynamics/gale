@@ -65,39 +65,13 @@
 const Type lucEncoderLibavcodec_Type = "lucEncoderLibavcodec";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucEncoderLibavcodec* _lucEncoderLibavcodec_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucOutputFormat_OutputFunction*                    _output,
-		Name                                               name ) 
+lucEncoderLibavcodec* _lucEncoderLibavcodec_New(  LUCENCODERLIBAVCODEC_DEFARGS  ) 
 {
 	lucEncoderLibavcodec*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucEncoderLibavcodec) );
-	self = (lucEncoderLibavcodec*) _lucOutputFormat_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_output,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucEncoderLibavcodec) );
+	self = (lucEncoderLibavcodec*) _lucOutputFormat_New(  LUCOUTPUTFORMAT_PASSARGS  );
 	
 	return self;
 }
@@ -243,29 +217,36 @@ void* _lucEncoderLibavcodec_Copy( void* outputFormat, void* dest, Bool deep, Nam
 
 
 void* _lucEncoderLibavcodec_DefaultNew( Name name ) {
-	return (void*) _lucEncoderLibavcodec_New(
-		sizeof(lucEncoderLibavcodec),
-		lucEncoderLibavcodec_Type,
-		_lucEncoderLibavcodec_Delete,
-		_lucEncoderLibavcodec_Print,
-		NULL,
-		_lucEncoderLibavcodec_DefaultNew,
-		_lucEncoderLibavcodec_Construct,
-		_lucEncoderLibavcodec_Build,
-		_lucEncoderLibavcodec_Initialise,
-		_lucEncoderLibavcodec_Execute,
-		_lucEncoderLibavcodec_Destroy,
-		_lucEncoderLibavcodec_Output,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(lucEncoderLibavcodec);
+	Type                                                      type = lucEncoderLibavcodec_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucEncoderLibavcodec_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucEncoderLibavcodec_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucEncoderLibavcodec_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucEncoderLibavcodec_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucEncoderLibavcodec_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucEncoderLibavcodec_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucEncoderLibavcodec_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucEncoderLibavcodec_Destroy;
+	lucOutputFormat_OutputFunction*                        _output = _lucEncoderLibavcodec_Output;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucEncoderLibavcodec_New(  LUCENCODERLIBAVCODEC_PASSARGS  );
 }
 
-void _lucEncoderLibavcodec_Construct( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
+void _lucEncoderLibavcodec_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
 	lucEncoderLibavcodec*  self = (lucEncoderLibavcodec*)outputFormat;
 	lucWindow*          window;
 	AbstractContext*    context;
 
 	/* Construct Parent */
-	lucOutputFormat_InitAll( self, "mpeg" );
+   self->extension = "mpeg";
+	_lucOutputFormat_AssignFromXML( outputFormat, cf, data);
+   self->transparent = False; /* Not supported */
+   
 
 	window =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Window", lucWindow,  True, data  ) ;
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ) ;
@@ -287,7 +268,8 @@ void _lucEncoderLibavcodec_Initialise( void* outputFormat, void* data ) {}
 void _lucEncoderLibavcodec_Execute( void* outputFormat, void* data ) {}
 void _lucEncoderLibavcodec_Destroy( void* outputFormat, void* data ) {}
 
-void _lucEncoderLibavcodec_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) {
+void _lucEncoderLibavcodec_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixData ) {
+   lucPixel* pixelData = (lucPixel)pixData;
 	lucEncoderLibavcodec*         self            = (lucEncoderLibavcodec*) outputFormat;
 	AVFrame*                      frame           = (AVFrame*) self->frame;
 	Pixel_Index                   width           = window->width;
@@ -357,3 +339,5 @@ void _lucEncoderLibavcodec_Output( void* outputFormat, lucWindow* window, Abstra
 }
 
 #endif /* HAVE_LIBAVCODEC */
+
+

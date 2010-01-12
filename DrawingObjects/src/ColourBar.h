@@ -71,22 +71,18 @@
 	struct lucColourBar { __lucColourBar };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	lucColourBar* _lucColourBar_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCCOLOURBAR_DEFARGS \
+                LUCDRAWINGOBJECT_DEFARGS
+
+	#define LUCCOLOURBAR_PASSARGS \
+                LUCDRAWINGOBJECT_PASSARGS
+
+	lucColourBar* _lucColourBar_New(  LUCCOLOURBAR_DEFARGS  );
 
 	void _lucColourBar_Delete( void* drawingObject ) ;
 	void _lucColourBar_Print( void* drawingObject, Stream* stream ) ;
@@ -94,7 +90,7 @@
 
 	/* 'Stg_Component' implementations */
 	void* _lucColourBar_DefaultNew( Name name ) ;
-	void _lucColourBar_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data );
+	void _lucColourBar_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
 	void _lucColourBar_Build( void* drawingObject, void* data ) ;
 	void _lucColourBar_Initialise( void* drawingObject, void* data ) ;
 	void _lucColourBar_Execute( void* drawingObject, void* data );
@@ -106,3 +102,4 @@
 
 
 #endif
+

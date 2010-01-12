@@ -55,19 +55,21 @@
 const Type lucOutputFormat_Register_Type = "lucOutputFormat_Register";
 
 lucOutputFormat_Register*	lucOutputFormat_Register_New( void ) {
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(lucOutputFormat_Register);
+	Type                              type = lucOutputFormat_Register_Type;
+	Stg_Class_DeleteFunction*      _delete = _NamedObject_Register_Delete;
+	Stg_Class_PrintFunction*        _print = _NamedObject_Register_Print;
+	Stg_Class_CopyFunction*          _copy = _NamedObject_Register_Copy;
+
 	lucOutputFormat_Register* self;
 	
-	self = (lucOutputFormat_Register*) _NamedObject_Register_New(
-		sizeof(lucOutputFormat_Register),
-		lucOutputFormat_Register_Type,
-		_NamedObject_Register_Delete,
-		_NamedObject_Register_Print,
-		_NamedObject_Register_Copy );
+	self = (lucOutputFormat_Register*) _NamedObject_Register_New(  NAMEDOBJECT_REGISTER_PASSARGS  );
 
 	return self;
 }
 
-void lucOutputFormat_Register_OutputAll( void* outputFormat_Register, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) {
+void lucOutputFormat_Register_OutputAll( void* outputFormat_Register, lucWindow* window, AbstractContext* context, lucPixel* pixelData, lucAlphaPixel* alphaPixelData ) {
 	lucOutputFormat_Register* self          = (lucOutputFormat_Register*) outputFormat_Register;
 	OutputFormat_Index        object_I;
 	OutputFormat_Index        objectCount   = lucOutputFormat_Register_GetCount( self );
@@ -75,8 +77,13 @@ void lucOutputFormat_Register_OutputAll( void* outputFormat_Register, lucWindow*
 
 	for ( object_I = 0 ; object_I < objectCount ; object_I++ ) {
 		object = lucOutputFormat_Register_GetByIndex( self, object_I );
-		lucOutputFormat_Output( object, window, context, pixelData );
+      if (object->transparent)
+   		lucOutputFormat_Output( object, window, context, alphaPixelData );
+      else
+   		lucOutputFormat_Output( object, window, context, pixelData );
 	}
 }
+
+
 
 

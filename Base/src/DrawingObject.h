@@ -57,6 +57,7 @@
 	#define __lucDrawingObject                           \
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
 		__Stg_Component                                   \
+		AbstractContext*				   context;		       \
 		/* Virtual Functions */ \
 		lucDrawingObject_SetupFunction*                    _setup;                     \
 		lucDrawingObject_DrawFunction*                     _draw;                      \
@@ -72,29 +73,31 @@
 
 	struct lucDrawingObject {__lucDrawingObject};
 
-	lucDrawingObject* _lucDrawingObject_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		lucDrawingObject_SetupFunction*                    _setup,
-		lucDrawingObject_DrawFunction*                     _draw,
-		lucDrawingObject_CleanUpFunction*                  _cleanUp,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCDRAWINGOBJECT_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                lucDrawingObject_SetupFunction*      _setup, \
+                lucDrawingObject_DrawFunction*        _draw, \
+                lucDrawingObject_CleanUpFunction*  _cleanUp
+
+	#define LUCDRAWINGOBJECT_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _setup,   \
+	        _draw,    \
+	        _cleanUp
+
+	lucDrawingObject* _lucDrawingObject_New(  LUCDRAWINGOBJECT_DEFARGS  );
 
 
 	void _lucDrawingObject_Delete( void* drawingObject ) ;
 	void _lucDrawingObject_Print( void* drawingObject, Stream* stream ) ;
 	void* _lucDrawingObject_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 
-void _lucDrawingObject_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ) ;
+void _lucDrawingObject_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucDrawingObject_Build( void* camera, void* data );
 	void _lucDrawingObject_Initialise( void* camera, void* data );
 	void _lucDrawingObject_Execute( void* camera, void* data );
@@ -115,3 +118,4 @@ void _lucDrawingObject_Construct( void* drawingObject, Stg_ComponentFactory* cf,
 	void lucDrawingObjectMask_Construct( lucDrawingObjectMask* self, Name drawingObjectName, Stg_ComponentFactory* cf, void* data ) ;
 	Bool lucDrawingObjectMask_Test( lucDrawingObjectMask* self, double value ) ;
 #endif
+

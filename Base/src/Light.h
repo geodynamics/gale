@@ -53,12 +53,13 @@
 	extern const double LUC_LIGHT_DEFAULT_POS_Z;
 	extern const double LUC_LIGHT_DEFAULT_POS_W;
 
-	#define __lucLight                                  \
-		__Stg_Component                                 \
-		Light_Index 		         index;\
+	#define __lucLight                                \
+		__Stg_Component                                \
+		AbstractContext*		            context; \
+		Light_Index 		               index;\
 		int                              model; \
 		int                              material;\
-		float	                         position[4];\
+		float	                           position[4];\
 		float                            lmodel_ambient[4];\
 		float                            spotCutOff;\
 		float                            spotDirection[3];\
@@ -69,41 +70,29 @@
 
 	/** Constructors */
 	lucLight* lucLight_New( 
-		Name                                               name,
+		Name                                name,
 		Light_Index            				   index,
-		int                                                model,
-		int                                                material,
-		float						   position[4],
-		float                                              lmodel_ambient[4],
-		float                                              spotCutOff,
-		float                                              spotDirection[3]
+		int                                 model,
+		int                                 material,
+		float						               position[4],
+		float                               lmodel_ambient[4],
+		float                               spotCutOff,
+		float                               spotDirection[3]
 	 );
 
-	lucLight* _lucLight_New(
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		Name                                               name );
-
-	void lucLight_InitAll( 
-		void*                                              light,
-		Light_Index                                        index,
-		int                                                model,
-		int                                                material,
-		float                                              position[4],
-		float                                              lmodel_ambient[4],
-		float                                              spotCutOff,
-		float                                              spotDirection[3]
-	 );
 	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LUCLIGHT_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define LUCLIGHT_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	lucLight* _lucLight_New(  LUCLIGHT_DEFARGS  );
+
 	/** Virtual Functions */
 	void _lucLight_Delete( void* light ) ;
 	void _lucLight_Print( void* light, Stream* stream ) ;
@@ -111,7 +100,7 @@
 	#define lucLight_Copy( self ) \
 		(lucLight*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	void* _lucLight_DefaultNew( Name name ) ;
-	void _lucLight_Construct( void* light, Stg_ComponentFactory* cf, void* data ) ;
+	void _lucLight_AssignFromXML( void* light, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucLight_Build( void* light, void* data );
 	void _lucLight_Initialise( void* light, void* data );
 	void _lucLight_Execute( void* light, void* data );
@@ -124,3 +113,4 @@
 
 
 #endif
+

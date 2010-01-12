@@ -55,15 +55,19 @@
 const Type lucWindowInteraction_Register_Type = "lucWindowInteraction_Register";
 
 lucWindowInteraction_Register*	lucWindowInteraction_Register_New( void ) {
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(lucWindowInteraction_Register);
+	Type                              type = lucWindowInteraction_Register_Type;
+	Stg_Class_DeleteFunction*      _delete = _NamedObject_Register_Delete;
+	Stg_Class_PrintFunction*        _print = _NamedObject_Register_Print;
+	Stg_Class_CopyFunction*          _copy = _NamedObject_Register_Copy;
+
 	lucWindowInteraction_Register* self;
 	
-	self = (lucWindowInteraction_Register*) _NamedObject_Register_New(
-		sizeof(lucWindowInteraction_Register),
-		lucWindowInteraction_Register_Type,
-		_NamedObject_Register_Delete,
-		_NamedObject_Register_Print,
-		_NamedObject_Register_Copy );
+	self = (lucWindowInteraction_Register*) _NamedObject_Register_New(  NAMEDOBJECT_REGISTER_PASSARGS  );
 
 	return self;
 }
+
+
 

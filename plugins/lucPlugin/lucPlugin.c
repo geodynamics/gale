@@ -56,7 +56,6 @@ const Type LucPlugin_Type = "LucPlugin";
 /** Special run function which replaces the abstract context's normal one */
 void lucPlugin_VisualOnlyRun( Context* _context ) {
 	DomainContext*  context = (DomainContext*)_context;
-	double                  dt = 0;
 	double                  dtLoadedFromFile = 0;
 	Index                   fieldVar_I;
 	FieldVariable*          fieldVar;
@@ -137,14 +136,18 @@ void lucPlugin_VisualOnlyRun( Context* _context ) {
 
                swarmFileNamePart = Context_GetCheckPointReadPrefixString( (AbstractContext*)context );
                #ifdef READ_HDF5
-                  swarm->checkpointnfiles = context->checkpointnproc;
                   Stg_asprintf( &swarmFileName, "%s%s.%05d", swarmFileNamePart, swarm->name, context->restartTimestep );
                #else
                   Stg_asprintf( &swarmFileName, "%s%s.%05d.dat", swarmFileNamePart, swarm->name, context->restartTimestep );
                #endif
                
-					((FileParticleLayout*)swarm->particleLayout)->filename = swarmFileName;
-               
+					((FileParticleLayout*)swarm->particleLayout)->filename         = swarmFileName;
+					/* set to one incase reading ascii */
+					((FileParticleLayout*)swarm->particleLayout)->checkpointfiles = 1;
+					/* now check if using hdf5 */ 
+					#ifdef READ_HDF5
+					((FileParticleLayout*)swarm->particleLayout)->checkpointfiles = _FileParticleLayout_GetFileCountFromTimeInfoFile( context );
+				        #endif
 					/* Need to re-build & initialise the particles in case the number of particles changed
 					due to pop. control */
 					Memory_Free( swarm->cellParticleCountTbl );
@@ -195,12 +198,14 @@ void lucPlugin_VisualOnlyRun( Context* _context ) {
 }
 
 
-void _lucPlugin_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _lucPlugin_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
+	Codelet*	self		= (Codelet*)component;
+	Dictionary*	pluginDict	= Codelet_GetPluginDictionary( component, cf->rootDict );
 
 	AbstractContext* context;
 
-
-	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), AbstractContext, True, data );
+	self->context = context;
 	//glucifer_Init();
 
 	if ( Dictionary_GetBool( context->dictionary, "printGluciferComponents" ) ) {
@@ -246,19 +251,23 @@ void _lucPlugin_Construct( void* component, Stg_ComponentFactory* cf, void* data
 
 
 void* _lucPlugin_DefaultNew( Name name ) {
-	return _Codelet_New(
-			sizeof( Codelet ),
-			LucPlugin_Type,
-			_Codelet_Delete,
-			_Codelet_Print,
-			_Codelet_Copy,
-			_lucPlugin_DefaultNew,
-			_lucPlugin_Construct,
-			_Codelet_Build,
-			_Codelet_Initialise,
-			_Codelet_Execute,
-			_Codelet_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( Codelet );
+	Type                                                      type = LucPlugin_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucPlugin_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucPlugin_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Codelet_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
 
 
@@ -271,3 +280,5 @@ Index lucPlugin_Register( PluginsManager* pluginsManager ) {
 
 	return result;
 }
+
+

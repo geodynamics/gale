@@ -73,48 +73,14 @@
 const Type lucSwarmViewerBase_Type = "lucSwarmViewerBase";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucSwarmViewerBase* _lucSwarmViewerBase_New( 
-	SizeT                                              sizeOfSelf,
-	Type                                               type,
-	Stg_Class_DeleteFunction*                          _delete,
-	Stg_Class_PrintFunction*                           _print,
-	Stg_Class_CopyFunction*                            _copy, 
-	Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-	Stg_Component_ConstructFunction*                   _construct,
-	Stg_Component_BuildFunction*                       _build,
-	Stg_Component_InitialiseFunction*                  _initialise,
-	Stg_Component_ExecuteFunction*                     _execute,
-	Stg_Component_DestroyFunction*                     _destroy,
-	lucDrawingObject_SetupFunction*                    _setup,
-	lucDrawingObject_DrawFunction*                     _draw,
-	lucDrawingObject_CleanUpFunction*                  _cleanUp,
-	lucOpenGLDrawingObject_BuildDisplayListFunction*   _buildDisplayList,
-	lucSwarmViewerBase_PlotParticleFunction*           _plotParticle,
-	lucSwarmViewerBase_SetParticleColourFunction*      _setParticleColour,
-	Name                                               name ) 
+lucSwarmViewerBase* _lucSwarmViewerBase_New(  LUCSWARMVIEWERBASE_DEFARGS  ) 
 {
 	
 	lucSwarmViewerBase*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucSwarmViewerBase) );
-	self = (lucSwarmViewerBase*) _lucOpenGLDrawingObject_New( 
-		sizeOfSelf,
-		type, 
-		_delete,
-		_print,
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build,
-		_initialise,
-		_execute,
-		_destroy,
-		_setup,
-		_draw,
-		_cleanUp,
-		_buildDisplayList,
-		name );
+	assert( _sizeOfSelf >= sizeof(lucSwarmViewerBase) );
+	self = (lucSwarmViewerBase*) _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_PASSARGS  );
 
 	self->_plotParticle = _plotParticle;
 	self->_setParticleColour = _setParticleColour;
@@ -181,7 +147,7 @@ void* _lucSwarmViewerBase_Copy( void* drawingObject, void* dest, Bool deep, Name
 	return (void*) newDrawingObject;
 }
 
-void _lucSwarmViewerBase_Construct( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
+void _lucSwarmViewerBase_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucSwarmViewerBase*     self = (lucSwarmViewerBase*)drawingObject;
 	Swarm*                  swarm;	
 	Name                    colourVariableName;
@@ -197,7 +163,7 @@ void _lucSwarmViewerBase_Construct( void* drawingObject, Stg_ComponentFactory* c
 	lucDrawingObjectMask    mask;
 
 	/* Construct Parent */
-	_lucOpenGLDrawingObject_Construct( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
 	swarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", Swarm, True, data ) ;
 	
@@ -484,4 +450,6 @@ void _lucSwarmViewerBase_SetParticleColourDefault( void* drawingObject, void* co
 
 	lucColour_SetOpenGLColour( &colour );
 }
+
+
 

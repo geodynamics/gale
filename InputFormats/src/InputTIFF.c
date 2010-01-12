@@ -65,39 +65,13 @@
 const Type lucInputTIFF_Type = "lucInputTIFF";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-lucInputTIFF* _lucInputTIFF_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		lucInputFormat_InputFunction*                      _Input,
-		Name                                               name ) 
+lucInputTIFF* _lucInputTIFF_New(  LUCINPUTTIFF_DEFARGS  ) 
 {
 	lucInputTIFF*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(lucInputTIFF) );
-	self = (lucInputTIFF*) _lucInputFormat_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_Input,
-			name );
+	assert( _sizeOfSelf >= sizeof(lucInputTIFF) );
+	self = (lucInputTIFF*) _lucInputFormat_New(  LUCINPUTFORMAT_PASSARGS  );
 	
 	return self;
 }
@@ -133,23 +107,27 @@ void* _lucInputTIFF_Copy( void* InputFormat, void* dest, Bool deep, Name nameExt
 
 
 void* _lucInputTIFF_DefaultNew( Name name ) {
-	return (void*) _lucInputTIFF_New(
-		sizeof(lucInputTIFF),
-		lucInputTIFF_Type,
-		_lucInputTIFF_Delete,
-		_lucInputTIFF_Print,
-		NULL,
-		_lucInputTIFF_DefaultNew,
-		_lucInputTIFF_Construct,
-		_lucInputTIFF_Build,
-		_lucInputTIFF_Initialise,
-		_lucInputTIFF_Execute,
-		_lucInputTIFF_Destroy,
-		_lucInputTIFF_Input,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(lucInputTIFF);
+	Type                                                      type = lucInputTIFF_Type;
+	Stg_Class_DeleteFunction*                              _delete = _lucInputTIFF_Delete;
+	Stg_Class_PrintFunction*                                _print = _lucInputTIFF_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucInputTIFF_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _lucInputTIFF_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _lucInputTIFF_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _lucInputTIFF_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _lucInputTIFF_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _lucInputTIFF_Destroy;
+	lucInputFormat_InputFunction*                           _input = _lucInputTIFF_Input;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _lucInputTIFF_New(  LUCINPUTTIFF_PASSARGS  );
 }
 
-void _lucInputTIFF_Construct( void* InputFormat, Stg_ComponentFactory* cf, void* data ){
+void _lucInputTIFF_AssignFromXML( void* InputFormat, Stg_ComponentFactory* cf, void* data ){
 	lucInputTIFF*  self = (lucInputTIFF*)InputFormat;
 
 	/* Construct Parent */
@@ -232,4 +210,6 @@ lucPixel* _lucInputTIFF_Input( void* inputFormat, Name imageName, Pixel_Index *w
 }
 
 #endif
+
+
 
