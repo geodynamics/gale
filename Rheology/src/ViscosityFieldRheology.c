@@ -58,84 +58,79 @@
 const Type ViscosityFieldRheology_Type = "ViscosityFieldRheology";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-ViscosityFieldRheology* _ViscosityFieldRheology_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name ) 
+ViscosityFieldRheology* _ViscosityFieldRheology_New(  VISCOSITYFIELDRHEOLOGY_DEFARGS  ) 
 {
 	ViscosityFieldRheology*					self;
 
-	assert( sizeOfSelf >= sizeof(ViscosityFieldRheology) );
-	self = (ViscosityFieldRheology*) _Rheology_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			name );
+	assert( _sizeOfSelf >= sizeof(ViscosityFieldRheology) );
+	self = (ViscosityFieldRheology*) _Rheology_New(  RHEOLOGY_PASSARGS  );
 	
 	return self;
 }
 
-void _ViscosityFieldRheology_Init( ViscosityFieldRheology* self, Name viscosityFieldName ) 
+void _ViscosityFieldRheology_Init( ViscosityFieldRheology* self, FeVariable* viscosityField ) 
 {
-	self->viscosityFieldName = viscosityFieldName;
+	self->viscosityField = viscosityField;
 }
 
 void* _ViscosityFieldRheology_DefaultNew( Name name ) {
-	return (void*) _ViscosityFieldRheology_New(
-		sizeof(ViscosityFieldRheology),
-		ViscosityFieldRheology_Type,
-		_Rheology_Delete,
-		_Rheology_Print,
-		_Rheology_Copy,
-		_ViscosityFieldRheology_DefaultNew,
-		_ViscosityFieldRheology_Construct,
-		_ViscosityFieldRheology_Build,
-		_Rheology_Initialise,
-		_Rheology_Execute,
-		_Rheology_Destroy,
-		_ViscosityFieldRheology_ModifyConstitutiveMatrix,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(ViscosityFieldRheology);
+	Type                                                             type = ViscosityFieldRheology_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _Rheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _Rheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _Rheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _ViscosityFieldRheology_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _ViscosityFieldRheology_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _ViscosityFieldRheology_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _ViscosityFieldRheology_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _Rheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _ViscosityFieldRheology_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _ViscosityFieldRheology_ModifyConstitutiveMatrix;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _ViscosityFieldRheology_New(  VISCOSITYFIELDRHEOLOGY_PASSARGS  );
 }
 
-void _ViscosityFieldRheology_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _ViscosityFieldRheology_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	ViscosityFieldRheology*     self = (ViscosityFieldRheology*)rheology;
-
+   FeVariable*                 viscosityField = NULL;
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
-	
-	_ViscosityFieldRheology_Init( self, 
-		Stg_ComponentFactory_GetString( cf, self->name, "ViscosityField", "ViscosityField" ) );
+	_Rheology_AssignFromXML( self, cf, data );
+   
+	viscosityField = Stg_ComponentFactory_ConstructByName( cf, Stg_ComponentFactory_GetString( cf, self->name, "ViscosityField", "ViscosityField" ), FeVariable, True, data );
+	_ViscosityFieldRheology_Init( self, viscosityField );
 }
 
 void _ViscosityFieldRheology_Build( void* rheology, void* data ){
 	ViscosityFieldRheology*     self = (ViscosityFieldRheology*)rheology;
-	AbstractContext*            context     = Stg_CheckType( data, AbstractContext );
-	Stg_ComponentFactory*       cf          = context->CF;
 
 	_Rheology_Build( self, data );
 
-	self->viscosityField = Stg_ComponentFactory_ConstructByName( cf, self->viscosityFieldName, FeVariable, True, data );
+	Stg_Component_Build( self->viscosityField, data, False );
 
 }
+
+void _ViscosityFieldRheology_Initialise( void* rheology, void* data ){
+	ViscosityFieldRheology*     self = (ViscosityFieldRheology*)rheology;
+
+	_Rheology_Initialise( self, data );
+
+	Stg_Component_Initialise( self->viscosityField, data, False );
+
+}
+
+void _ViscosityFieldRheology_Destroy( void* rheology, void* data ){
+	ViscosityFieldRheology*     self = (ViscosityFieldRheology*)rheology;
+
+	_Rheology_Destroy( self, data );
+
+	Stg_Component_Destroy( self->viscosityField, data, False );
+
+}
+
 void _ViscosityFieldRheology_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
 		ConstitutiveMatrix*                                constitutiveMatrix,
@@ -151,3 +146,5 @@ void _ViscosityFieldRheology_ModifyConstitutiveMatrix(
 	FeVariable_InterpolateFromMeshLocalCoord( self->viscosityField, mesh, lElement_I, xi, &viscosity );
 	ConstitutiveMatrix_SetIsotropicViscosity( constitutiveMatrix, viscosity );
 }
+
+

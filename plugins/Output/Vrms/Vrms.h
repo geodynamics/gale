@@ -51,10 +51,11 @@
 	typedef struct {
 		__Codelet
 		double                 vrms;
+		FeVariable*	       velocityField;
+		Swarm*		       gaussSwarm;
 		OperatorFeVariable*    velocitySquaredField;
 	} Underworld_Vrms;
 
-	void Underworld_Vrms_Setup( void* _context ) ;
 	void Underworld_Vrms_Dump( void* _context ) ;
 	void Underworld_Vrms_PrintHeaderToFile( void* _context ) ;
 	Index Underworld_Vrms_Register( PluginsManager* pluginsManager );

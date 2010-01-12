@@ -81,7 +81,6 @@ void MeshAdvectionCorrection_AddCorrection( FeVariable* velocityField, double* o
 	FeMesh*      mesh          = self->feMesh;
 	int          lNodeCount    = FeMesh_GetNodeLocalSize( mesh );
 	int          dof           = self->fieldComponentCount;
-	int          dim           = self->dim;
 	double       oldV[3], artV[3], zero[3];
 	int lNode_I;
 
@@ -106,7 +105,7 @@ void MeshAdvectionCorrection_AddCorrection( FeVariable* velocityField, double* o
 	}
 }
 
-MeshAdvectionCorrection_StoreCurrentVelocity( FeVariable *velocityField, double *oldVelocity ) {
+void MeshAdvectionCorrection_StoreCurrentVelocity( FeVariable *velocityField, double *oldVelocity ) {
 	/* save the current values of the velocity field in the oldVelocity array */
 	FeMesh *mesh = velocityField->feMesh;
 	unsigned dof = velocityField->fieldComponentCount;
@@ -155,7 +154,7 @@ void MeshAdvectionCorrection_EulerDeformCorrection( FeVariable *artDField, doubl
 void MeshAdvectionCorrection( void* sle, void* data ) {
 	UnderworldContext*                                      context                 = (UnderworldContext*) data;
 	Underworld_MeshAdvectionCorrection_ContextExt*          plugin;
-	FeVariable*                                             velocityField           = context->velocityField;
+	FeVariable*		velocityField 	= (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
 	double dt = context->dt;
 	double *artVelocity, *oldVelocity;
 	int lNodeCount;
@@ -197,17 +196,18 @@ void MeshAdvectionCorrection( void* sle, void* data ) {
 	Memory_Free( oldVelocity );
 }
 
-void _Underworld_MeshAdvectionCorrection_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_MeshAdvectionCorrection_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*                                      context = 
 	Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 	Underworld_MeshAdvectionCorrection_ContextExt*       plugin;
+   AdvectionDiffusionSLE* energySLE = (AdvectionDiffusionSLE*) Stg_ComponentFactory_ConstructByName( cf, "EnergyEqn", UnderworldContext, True, data );
 	
 	Journal_DFirewall( 
 		(Bool)context, 
 		Journal_Register( Error_Type, Underworld_MeshAdvectionCorrection_Type ), 
 		"No context found\n" );
 	Journal_DFirewall( 
-		(Bool)context->energySLE, 
+		(Bool)energySLE, 
 		Journal_Register( Error_Type, Underworld_MeshAdvectionCorrection_Type ), 
 		"The required energy SLE component has not been created or placed on the context.\n");	
 	
@@ -227,8 +227,8 @@ void _Underworld_MeshAdvectionCorrection_Construct( void* component, Stg_Compone
 	}
 
 	/* Replace the energy SLE's execute with this one. Save the old value for use later. */
-	plugin->energySolverExecute = context->energySLE->_execute;
-	context->energySLE->_execute = MeshAdvectionCorrection;
+	plugin->energySolverExecute = energySLE->_execute;
+	energySLE->_execute = MeshAdvectionCorrection;
 }
 
 /* This function will provide StGermain the abilty to instantiate (create) this codelet on demand. */
@@ -236,7 +236,7 @@ void* _Underworld_MeshAdvectionCorrection_DefaultNew( Name name ) {
 	return Codelet_New(
 			Underworld_MeshAdvectionCorrection_Type,
 			_Underworld_MeshAdvectionCorrection_DefaultNew,
-			_Underworld_MeshAdvectionCorrection_Construct, /* SQ NOTE: Used to be a construct extensions. */
+			_Underworld_MeshAdvectionCorrection_AssignFromXML, /* SQ NOTE: Used to be a construct extensions. */
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,
@@ -253,3 +253,5 @@ Index Underworld_MeshAdvectionCorrection_Register( PluginsManager* pluginsManage
 		"0", 
 		_Underworld_MeshAdvectionCorrection_DefaultNew );
 }
+
+

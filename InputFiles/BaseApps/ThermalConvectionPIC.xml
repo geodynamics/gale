@@ -8,8 +8,14 @@
 	</list>
 
 	<list name="plugins" mergeType="merge">
-		<param>StgFEM_StandardConditionFunctions</param>
-    		<param>Underworld_Ra_Scaling</param>
+		<struct>
+			<param name="Type">StgFEM_StandardConditionFunctions</param>
+			<param name="Contest">context</param>
+		</struct>
+		<struct>
+    		<param name="Type">Underworld_Ra_Scaling</param>
+			<param name="Context">context</param>
+		</struct>
 	</list>
 
 	<!-- Component Stuff -->

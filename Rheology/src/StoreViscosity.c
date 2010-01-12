@@ -58,61 +58,33 @@
 const Type StoreVisc_Type = "StoreVisc";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-StoreVisc* _StoreVisc_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name ) 
+StoreVisc* _StoreVisc_New(  STOREVISC_DEFARGS  ) 
 {
 	StoreVisc*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(StoreVisc) );
-	self = (StoreVisc*) _Rheology_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			name );
+	assert( _sizeOfSelf >= sizeof(StoreVisc) );
+	self = (StoreVisc*) _Rheology_New(  RHEOLOGY_PASSARGS  );
 	
 	return self;
 }
 
 void _StoreVisc_Init(
-		StoreVisc*                                         self,
-		MaterialPointsSwarm*                               materialPointsSwarm )
+	StoreVisc*				self,
+	MaterialPointsSwarm*	materialPointsSwarm )
 {
 	StandardParticle           particle;
 	StoreVisc_ParticleExt*     particleExt;
-	SwarmVariable*             swarmVariable;
 		
 	/* Assign Pointers */
-	self->materialPointsSwarm           = materialPointsSwarm;
+	self->materialPointsSwarm = materialPointsSwarm;
 
-	self->particleExtHandle = 
-			ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, self->type, sizeof( StoreVisc_ParticleExt ) );
+	self->particleExtHandle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, self->type, sizeof( StoreVisc_ParticleExt ) );
 	
 	/* Add SwarmVariables for plotting */
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle, self->particleExtHandle );
 	
-	swarmVariable = Swarm_NewScalarVariable(
+	self->swarmVariable = Swarm_NewScalarVariable(
 		materialPointsSwarm,
 		"Viscosity",
 		(ArithPointer) &particleExt->effVisc - (ArithPointer) &particle,
@@ -120,28 +92,32 @@ void _StoreVisc_Init(
 }
 
 void* _StoreVisc_DefaultNew( Name name ) {
-	return (void*) _StoreVisc_New(
-			sizeof(StoreVisc),
-		 StoreVisc_Type,
-		_Rheology_Delete,
-		_Rheology_Print,
-		_Rheology_Copy,
-		_StoreVisc_DefaultNew,
-		_StoreVisc_Construct,
-		_Rheology_Build,
-		_Rheology_Initialise,
-		_Rheology_Execute,
-		_Rheology_Destroy,
-		_StoreVisc_ModifyConstitutiveMatrix,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(StoreVisc);
+	Type                                                             type = StoreVisc_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _Rheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _Rheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _Rheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _StoreVisc_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _StoreVisc_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _Rheology_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _Rheology_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _Rheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _Rheology_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _StoreVisc_ModifyConstitutiveMatrix;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _StoreVisc_New(  STOREVISC_PASSARGS  );
 }
 
-void _StoreVisc_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _StoreVisc_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	StoreVisc*              self              = (StoreVisc*)rheology;
 	MaterialPointsSwarm* materialPointsSwarm;
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 
 	materialPointsSwarm = Stg_ComponentFactory_ConstructByKey( 
 		cf, 
@@ -154,6 +130,39 @@ void _StoreVisc_Construct( void* rheology, Stg_ComponentFactory* cf, void* data 
 	_StoreVisc_Init( self, materialPointsSwarm );
 }
 	
+void _StoreVisc_Build( void* _self, void* data ) {
+	StoreVisc*  self               = (StoreVisc*) _self;
+
+	/* Build parent */
+	_Rheology_Build( self, data );
+
+	Stg_Component_Build(	self->swarmVariable, data, False);	
+	Stg_Component_Build(	self->materialPointsSwarm, data, False);
+
+}
+
+void _StoreVisc_Initialise( void* _self, void* data ) {
+	StoreVisc*  self               = (StoreVisc*) _self;
+
+	/* Initialise parent */
+	_Rheology_Initialise( self, data );
+
+	Stg_Component_Initialise(	self->swarmVariable, data, False);	
+	Stg_Component_Initialise(	self->materialPointsSwarm, data, False);
+
+}
+
+void _StoreVisc_Destroy( void* _self, void* data ) {
+	StoreVisc*  self               = (StoreVisc*) _self;
+
+	Stg_Component_Destroy(	self->swarmVariable, data, False);	
+	Stg_Component_Destroy(	self->materialPointsSwarm, data, False);
+
+	/* Destroy parent */
+	_Rheology_Destroy( self, data );
+
+}
+
 void _StoreVisc_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
 		ConstitutiveMatrix*                                constitutiveMatrix,
@@ -179,4 +188,6 @@ void _StoreVisc_ModifyConstitutiveMatrix(
 	particleExt->effVisc =  ConstitutiveMatrix_GetIsotropicViscosity(constitutiveMatrix);
 	
 }
+
+
 

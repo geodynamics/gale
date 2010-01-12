@@ -77,13 +77,13 @@ void _Underworld_solA_Init( Underworld_solA* self, double sigma, double Z, doubl
 	self->n     = n;	
 }
 
-void _Underworld_solA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
-	Underworld_solA* 		self = (Underworld_solA*) analyticSolution;
-	Bool                     isCorrectInput = True;
-	double                   sigma, Z, wavenumberY, n;
+void _Underworld_solA_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+	Underworld_solA*	self = (Underworld_solA*) analyticSolution;
+	Bool					isCorrectInput = True;
+	double				sigma, Z, wavenumberY, n;
 	
 	/* Construct Parent */
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solA_sigma", 1.0 );
 	Z = Stg_ComponentFactory_GetRootDictDouble( cf, "solA_Z", 1.0 );
@@ -115,27 +115,33 @@ void _Underworld_solA_Build( void* analyticSolution, void* data ) {
 
 Bool solA_checkInputParams( Underworld_solA* self ) {
 	return ( 
-			( self->sigma > 0.0 ) && ( self->Z > 0.0 ) &&
-			( self->km > 0.0 )    && ( self->n > 0 )  
-		);
+		( self->sigma > 0.0 ) && ( self->Z > 0.0 ) &&
+		( self->km > 0.0 )    && ( self->n > 0 )  
+	);
 }
 
 void* _Underworld_solA_DefaultNew( Name name ) {
-	return _FieldTest_New(
-			sizeof(Underworld_solA),
-			Underworld_solA_Type,
-			_FieldTest_Delete,
-			_FieldTest_Print,
-			_FieldTest_Copy,
-			_Underworld_solA_DefaultNew,
-			_Underworld_solA_Construct,
-			_Underworld_solA_Build,
-			_FieldTest_Initialise,
-			_FieldTest_Execute,
-			_FieldTest_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Underworld_solA);
+	Type                                                      type = Underworld_solA_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FieldTest_Delete;
+	Stg_Class_PrintFunction*                                _print = _FieldTest_Print;
+	Stg_Class_CopyFunction*                                  _copy = _FieldTest_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_solA_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Underworld_solA_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Underworld_solA_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FieldTest_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FieldTest_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FieldTest_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _FieldTest_New(  FIELDTEST_PASSARGS  );
 }
 
 Index Underworld_Velic_solA_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Underworld_solA_Type, "0", _Underworld_solA_DefaultNew );
 }
+
+

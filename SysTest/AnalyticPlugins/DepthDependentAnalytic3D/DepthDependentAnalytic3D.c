@@ -56,62 +56,59 @@
 const Type DepthDependentAnalytic3D_Type = "DepthDependentAnalytic3D";
 
 typedef struct {
-	__AnalyticSolution
-	AnalyticSolution_SolutionFunction* viscosityFunc;
-	AnalyticSolution_SolutionFunction* viscosityDerivativeFunc;
-	AnalyticSolution_SolutionFunction* viscosity2ndDerivativeFunc;
-	FeVariable*                        velocityField;
-	FeVariable*                        pressureField;
-	FeVariable*                        temperatureField;
-	double                             Ra;
-	double                             V0;
+	__FieldTest
+	FieldTest_AnalyticSolutionFunc* viscosityFunc;
+	FieldTest_AnalyticSolutionFunc* viscosityDerivativeFunc;
+	FieldTest_AnalyticSolutionFunc* viscosity2ndDerivativeFunc;
+	double                          Ra;
+	double                          V0;
 } DepthDependentAnalytic3D;
 
-void DepthDependentAnalytic3D_ViscosityFunc_Isoviscous( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* eta ) {
+void DepthDependentAnalytic3D_ViscosityFunc_Isoviscous( void* analyticSolution, double* coord, double* eta ) {
 	*eta = 1.0;
 }
-void DepthDependentAnalytic3D_ViscosityDerivativeFunc_Isoviscous( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* d_eta_dy ) {
+void DepthDependentAnalytic3D_ViscosityDerivativeFunc_Isoviscous( void* analyticSolution, double* coord, double* d_eta_dy ) {
 	*d_eta_dy = 0.0;
 }
-void DepthDependentAnalytic3D_Viscosity2ndDerivativeFunc_Isoviscous( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* d2_eta_dy2 ) {
+void DepthDependentAnalytic3D_Viscosity2ndDerivativeFunc_Isoviscous( void* analyticSolution, double* coord, double* d2_eta_dy2 ) {
 	*d2_eta_dy2 = 0.0;
 }
 
-void DepthDependentAnalytic3D_ViscosityFunc_Linear( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* eta ) {
+void DepthDependentAnalytic3D_ViscosityFunc_Linear( void* analyticSolution, double* coord, double* eta ) {
 	double y = coord[ J_AXIS ];
 	*eta = 2.0 - y;
 }
-void DepthDependentAnalytic3D_ViscosityDerivativeFunc_Linear( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* d_eta_dy ) {
+void DepthDependentAnalytic3D_ViscosityDerivativeFunc_Linear( void* analyticSolution, double* coord, double* d_eta_dy ) {
 	*d_eta_dy = -1.0;
 }
-void DepthDependentAnalytic3D_Viscosity2ndDerivativeFunc_Linear( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* d2_eta_dy2 ) {
+void DepthDependentAnalytic3D_Viscosity2ndDerivativeFunc_Linear( void* analyticSolution, double* coord, double* d2_eta_dy2 ) {
 	*d2_eta_dy2 = 0.0;
 }
-void DepthDependentAnalytic3D_ViscosityFunc_Exponential( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* eta ) {
+void DepthDependentAnalytic3D_ViscosityFunc_Exponential( void* analyticSolution, double* coord, double* eta ) {
 	double y = coord[ J_AXIS ];
 	*eta = exp( 1.0 - y );
 }
-void DepthDependentAnalytic3D_ViscosityDerivativeFunc_Exponential( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* d_eta_dy ) {
+void DepthDependentAnalytic3D_ViscosityDerivativeFunc_Exponential( void* analyticSolution, double* coord, double* d_eta_dy ) {
 	double y = coord[ J_AXIS ];
 	*d_eta_dy = - exp( 1.0 - y );
 }
-void DepthDependentAnalytic3D_Viscosity2ndDerivativeFunc_Exponential( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* d2_eta_dy2 ) {
+void DepthDependentAnalytic3D_Viscosity2ndDerivativeFunc_Exponential( void* analyticSolution, double* coord, double* d2_eta_dy2 ) {
 	double y = coord[ J_AXIS ];
 	*d2_eta_dy2 = exp( 1.0 - y );
 }
-void DepthDependentAnalytic3D_ViscosityFunc_Exponential2( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* eta ) {
+void DepthDependentAnalytic3D_ViscosityFunc_Exponential2( void* analyticSolution, double* coord, double* eta ) {
 	double y = coord[ J_AXIS ];
 	double viscosityContrast = 1e6;
 	double gamma = log(viscosityContrast);
 	*eta = viscosityContrast * exp( - gamma *( 1.0 - y ) );
 }
-void DepthDependentAnalytic3D_ViscosityDerivativeFunc_Exponential2( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* d_eta_dy ) {
+void DepthDependentAnalytic3D_ViscosityDerivativeFunc_Exponential2( void* analyticSolution, double* coord, double* d_eta_dy ) {
 	double y = coord[ J_AXIS ];
 	double viscosityContrast = 1e6;
 	double gamma = log(viscosityContrast);
 	*d_eta_dy = viscosityContrast * gamma * exp( - gamma *( 1.0 - y ) );
 }
-void DepthDependentAnalytic3D_Viscosity2ndDerivativeFunc_Exponential2( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* d2_eta_dy2 ) {
+void DepthDependentAnalytic3D_Viscosity2ndDerivativeFunc_Exponential2( void* analyticSolution, double* coord, double* d2_eta_dy2 ) {
 	double y = coord[ J_AXIS ];
 	double viscosityContrast = 1e6;
 	double gamma = log(viscosityContrast);
@@ -119,7 +116,7 @@ void DepthDependentAnalytic3D_Viscosity2ndDerivativeFunc_Exponential2( void* ana
 }
 
 
-void _DepthDependentAnalytic3D_TemperatureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* temperature ) {
+void _DepthDependentAnalytic3D_TemperatureFunction( void* analyticSolution, double* coord, double* temperature ) {
 	DepthDependentAnalytic3D* self            = (DepthDependentAnalytic3D*)analyticSolution;
 	double                 x; 
 	double                 y;
@@ -135,14 +132,64 @@ void _DepthDependentAnalytic3D_TemperatureFunction( void* analyticSolution, FeVa
 	z = coord[ K_AXIS ];
 	
 	/* Get Viscositiy and derivatives */
-	self->viscosityFunc( self, NULL, coord, &eta );
-	self->viscosityDerivativeFunc( self, NULL, coord, &d_eta_dy );
-	self->viscosity2ndDerivativeFunc( self, NULL, coord, &d2_eta_dy2 );
+	self->viscosityFunc( self, coord, &eta );
+	self->viscosityDerivativeFunc( self, coord, &d_eta_dy );
+	self->viscosity2ndDerivativeFunc( self, coord, &d2_eta_dy2 );
 
 	perturbation = V0 / Ra * cos( M_PI * x ) * cos( M_PI * z ) * 
 		( 6.0 * M_PI * d_eta_dy * cos( M_PI * y ) - ( 9.0 * M_PI * M_PI * eta + d2_eta_dy2 ) * sin( M_PI * y ) );
 
 	*temperature = 1 - y + perturbation;
+}
+
+void _DepthDependentAnalytic3D_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
+	DepthDependentAnalytic3D* self            = (DepthDependentAnalytic3D*)analyticSolution;
+	double                 V0                 = self->V0;
+	double                 x; 
+	double                 y;
+	double                 z;
+	XYZ                    min, max;
+
+	Mesh_GetGlobalCoordRange( self->elementMesh, min, max );
+	x = coord[ I_AXIS ] - min[ I_AXIS ];
+	y = coord[ J_AXIS ] - min[ J_AXIS ];
+	z = coord[ K_AXIS ] - min[ K_AXIS ];
+
+	velocity[ I_AXIS ] =          V0 * sin( M_PI * x ) * cos( M_PI * y ) * cos( M_PI * z ) ;
+	velocity[ J_AXIS ] =  - 2.0 * V0 * cos( M_PI * x ) * sin( M_PI * y ) * cos( M_PI * z ) ;
+	velocity[ K_AXIS ] =          V0 * cos( M_PI * x ) * cos( M_PI * y ) * sin( M_PI * z ) ;
+}
+
+void _DepthDependentAnalytic3D_ViscosityFunction( void* analyticSolution, double* coord, double* viscosity ) {
+	DepthDependentAnalytic3D* self            = (DepthDependentAnalytic3D*)analyticSolution;
+
+	self->viscosityFunc( self, coord, viscosity );
+}
+
+void _DepthDependentAnalytic3D_PressureFunction( void* analyticSolution, double* coord, double* pressure ) {
+	DepthDependentAnalytic3D* self            = (DepthDependentAnalytic3D*)analyticSolution;
+	double                 x; 
+	double                 y;
+	double                 z;
+	XYZ                    min, max;
+	double                 V0                 = self->V0;
+	double                 Ra                 = self->Ra;
+	double                 C                  = 0;
+	double                 f                  = 0;
+	double                 eta, d_eta_dy;
+
+	Mesh_GetGlobalCoordRange( self->elementMesh, min, max );
+	x = coord[ I_AXIS ] - min[ I_AXIS ];
+	y = coord[ J_AXIS ] - min[ J_AXIS ];
+	z = coord[ K_AXIS ] - min[ K_AXIS ];
+
+	f = - Ra*y*y*0.5 + Ra*y + C;
+	
+	/* Get Viscositiy and derivatives */
+	self->viscosityFunc( self, coord, &eta );
+	self->viscosityDerivativeFunc( self, coord, &d_eta_dy );
+
+	*pressure = V0 * cos( M_PI * x ) * cos( M_PI * z ) * ( 3.0 * eta * M_PI * cos( M_PI * y ) - d_eta_dy * sin( M_PI * y ) ) + f;
 }
 
 void DepthDependentAnalytic3D_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -156,80 +203,45 @@ void DepthDependentAnalytic3D_TemperatureIC( Node_LocalIndex node_lI, Variable_I
 	/* Find coordinate of node */
 	coord = Mesh_GetVertex( mesh, node_lI );
 	
-	_DepthDependentAnalytic3D_TemperatureFunction( self, NULL, coord, temperature );
+	_DepthDependentAnalytic3D_TemperatureFunction( self, coord, temperature );
 }
 
-void _DepthDependentAnalytic3D_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
-	DepthDependentAnalytic3D* self            = (DepthDependentAnalytic3D*)analyticSolution;
-	double                 V0                 = self->V0;
-	double                 x; 
-	double                 y;
-	double                 z;
-	XYZ                    min, max;
-
-	Mesh_GetGlobalCoordRange( self->velocityField->feMesh, min, max );
-	x = coord[ I_AXIS ] - min[ I_AXIS ];
-	y = coord[ J_AXIS ] - min[ J_AXIS ];
-	z = coord[ K_AXIS ] - min[ K_AXIS ];
-
-	velocity[ I_AXIS ] =          V0 * sin( M_PI * x ) * cos( M_PI * y ) * cos( M_PI * z ) ;
-	velocity[ J_AXIS ] =  - 2.0 * V0 * cos( M_PI * x ) * sin( M_PI * y ) * cos( M_PI * z ) ;
-	velocity[ K_AXIS ] =          V0 * cos( M_PI * x ) * cos( M_PI * y ) * sin( M_PI * z ) ;
-}
-
-void _DepthDependentAnalytic3D_ViscosityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* viscosity ) {
-	DepthDependentAnalytic3D* self            = (DepthDependentAnalytic3D*)analyticSolution;
-
-	self->viscosityFunc( self, analyticFeVariable, coord, viscosity );
-}
-
-void _DepthDependentAnalytic3D_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
-	DepthDependentAnalytic3D* self            = (DepthDependentAnalytic3D*)analyticSolution;
-	double                 x; 
-	double                 y;
-	double                 z;
-	XYZ                    min, max;
-	double                 V0                 = self->V0;
-	double                 Ra                 = self->Ra;
-	double                 C                  = 0;
-	double                 f                  = 0;
-	double                 eta, d_eta_dy;
-
-	Mesh_GetGlobalCoordRange( self->velocityField->feMesh, min, max );
-	x = coord[ I_AXIS ] - min[ I_AXIS ];
-	y = coord[ J_AXIS ] - min[ J_AXIS ];
-	z = coord[ K_AXIS ] - min[ K_AXIS ];
-
-	f = - Ra*y*y*0.5 + Ra*y + C;
+void DepthDependentAnalytic3D_PressureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	DomainContext*         context            = (DomainContext*)_context;
+	FeVariable*            PressureField      = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "PressureField" );
+	FeMesh*                mesh               = PressureField->feMesh;
+	double*                pressure           = (double*) _result;
+	double*                coord;
+	DepthDependentAnalytic3D*  self           = Stg_ComponentFactory_ConstructByName( context->CF, DepthDependentAnalytic3D_Type, DepthDependentAnalytic3D, True, context );
 	
-	/* Get Viscositiy and derivatives */
-	self->viscosityFunc( self, NULL, coord, &eta );
-	self->viscosityDerivativeFunc( self, NULL, coord, &d_eta_dy );
-
-	*pressure = V0 * cos( M_PI * x ) * cos( M_PI * z ) * ( 3.0 * eta * M_PI * cos( M_PI * y ) - d_eta_dy * sin( M_PI * y ) ) + f;
+	/* Find coordinate of node */
+	coord = Mesh_GetVertex( mesh, node_lI );
+	
+	_DepthDependentAnalytic3D_PressureFunction( self, coord, pressure );
 }
 
-
-void _DepthDependentAnalytic3D_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
-	DepthDependentAnalytic3D*         self           = (DepthDependentAnalytic3D*)analyticSolution;
-	AbstractContext*        context;
-	ConditionFunction*      condFunc;
-	char*                   viscosityType;
+void _DepthDependentAnalytic3D_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+	DepthDependentAnalytic3D*	self           = (DepthDependentAnalytic3D*)analyticSolution;
+	ConditionFunction*			condFunc;
+	char*								viscosityType;
 	
 	/* Construct Parent */
-	_AnalyticSolution_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
-	
 	/* Add temperature initial condition */
 	condFunc = ConditionFunction_New( DepthDependentAnalytic3D_TemperatureIC, "DepthDependentAnalytic3D_TemperatureIC" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+
+	/* Add pressure initial condition */
+	condFunc = ConditionFunction_New( DepthDependentAnalytic3D_PressureIC, "DepthDependentAnalytic3D_PressureIC" );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
 	/* Create Analytic Fields */
-	self->velocityField = AnalyticSolution_RegisterFeVariableFromCF( self, "VelocityField", _DepthDependentAnalytic3D_VelocityFunction, cf, True, data );
-	self->pressureField = AnalyticSolution_RegisterFeVariableFromCF( self, "PressureField", _DepthDependentAnalytic3D_PressureFunction, cf, True, data );
-	self->temperatureField = AnalyticSolution_RegisterFeVariableFromCF( self, "TemperatureField", _DepthDependentAnalytic3D_TemperatureFunction, cf, True, data );
-	AnalyticSolution_RegisterFeVariableFromCF( self, "ViscosityField", _DepthDependentAnalytic3D_ViscosityFunction, cf, False, data );
+	self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, 4 );
+	self->_analyticSolutionList[0] = _DepthDependentAnalytic3D_VelocityFunction;
+	self->_analyticSolutionList[1] = _DepthDependentAnalytic3D_PressureFunction;
+	self->_analyticSolutionList[2] = _DepthDependentAnalytic3D_TemperatureFunction;
+	self->_analyticSolutionList[3] = _DepthDependentAnalytic3D_ViscosityFunction;
 
 	/* Setup Viscosity Functions */
 	viscosityType = Stg_ComponentFactory_GetRootDictString( cf, "ViscosityType", "Isoviscous" );
@@ -261,26 +273,32 @@ void _DepthDependentAnalytic3D_Construct( void* analyticSolution, Stg_ComponentF
 void _DepthDependentAnalytic3D_Build( void* analyticSolution, void* data ) {
 	DepthDependentAnalytic3D*         self = (DepthDependentAnalytic3D*)analyticSolution;
 
-	_AnalyticSolution_Build( self, data );
+	_FieldTest_Build( self, data );
 }
 
 
 void* _DepthDependentAnalytic3D_DefaultNew( Name name ) {
-	return _AnalyticSolution_New(
-			sizeof(DepthDependentAnalytic3D),
-			DepthDependentAnalytic3D_Type,
-			_AnalyticSolution_Delete,
-			_AnalyticSolution_Print,
-			_AnalyticSolution_Copy,
-			_DepthDependentAnalytic3D_DefaultNew,
-			_DepthDependentAnalytic3D_Construct,
-			_DepthDependentAnalytic3D_Build,
-			_AnalyticSolution_Initialise,
-			_AnalyticSolution_Execute,
-			_AnalyticSolution_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(DepthDependentAnalytic3D);
+	Type                                                      type = DepthDependentAnalytic3D_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FieldTest_Delete;
+	Stg_Class_PrintFunction*                                _print = _FieldTest_Print;
+	Stg_Class_CopyFunction*                                  _copy = _FieldTest_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _DepthDependentAnalytic3D_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _DepthDependentAnalytic3D_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _DepthDependentAnalytic3D_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FieldTest_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FieldTest_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FieldTest_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _FieldTest_New(  FIELDTEST_PASSARGS  );
 }
 
 Index Underworld_DepthDependentAnalytic3D_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, DepthDependentAnalytic3D_Type, "0", _DepthDependentAnalytic3D_DefaultNew );
 }
+
+

@@ -55,7 +55,7 @@
 
 	Index Underworld_Velic_solKz_Register( PluginsManager* pluginsManager );
 	void* _Velic_solKz_DefaultNew( Name name );
-	void _Velic_solKz_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
+	void _Velic_solKz_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solKz_Init( Velic_solKz* self, double sigma, double km, double B, int n );
 	void Velic_solKz_PressureFunction( void* analyticSolution, double* coord, double* pressure );
 	void Velic_solKz_VelocityFunction( void* analyticSolution, double* coord, double* velocity );

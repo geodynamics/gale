@@ -43,8 +43,8 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-#ifndef __Rheology_Register_h__
-#define __Rheology_Register_h__
+#ifndef __Underworld_Rheology_Rheology_Register_h__
+#define __Underworld_Rheology_Rheology_Register_h__
 	
 	extern const Type Rheology_Register_Type;
 	

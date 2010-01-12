@@ -69,42 +69,52 @@
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type Director_Type = "Director";
 
+/* Public Constructor */
+Director* Director_New( 
+		Name                   name,
+		DomainContext*         context,
+		TimeIntegrator*        timeIntegrator, 
+		Variable*              variable,
+		Index                  dataCount, 
+		Stg_Component**        data,
+		Bool                   allowFallbackToFirstOrder,
+		FeVariable*            velGradField,
+		MaterialPointsSwarm*   materialPointsSwarm,
+		InitialDirectionType   initialDirectionType,
+		double                 globalInitialDirectionX,
+		double                 globalInitialDirectionY,
+		double                 globalInitialDirectionZ,
+		int                    randomInitialDirectionSeed,
+		Bool                   dontUpdate )
+{
+	Director*	self;
+
+	self = (Director*) _Director_DefaultNew( name );
+	
+	_TimeIntegrand_Init( self, context, timeIntegrator, variable, dataCount, data, allowFallbackToFirstOrder );
+   _Director_Init(
+		self,
+		velGradField,
+		materialPointsSwarm,
+		initialDirectionType,
+		globalInitialDirectionX,
+		globalInitialDirectionY,
+		globalInitialDirectionZ,
+		randomInitialDirectionSeed,
+		dontUpdate );
+
+	self->isConstructed = True;
+	return self;
+}
+
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-Director* _Director_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		TimeIntegratee_CalculateTimeDerivFunction*         _calculateTimeDeriv,
-		TimeIntegratee_IntermediateFunction*               _intermediate,
-		Name                                               name ) 
+Director* _Director_New(  DIRECTOR_DEFARGS  ) 
 {
 	Director*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(Director) );
-	self = (Director*) _TimeIntegratee_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_calculateTimeDeriv,
-			_intermediate,
-			name );
+	assert( _sizeOfSelf >= sizeof(Director) );
+	self = (Director*) _TimeIntegrand_New(  TIMEINTEGRAND_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	
@@ -157,6 +167,11 @@ void _Director_Init(
 			"DirectorX",
 			"DirectorY",
 			"DirectorZ" );
+		self->dontUpdateParticle = Swarm_NewScalarVariable(
+			materialPointsSwarm,
+			"dontUpdateParticle",
+			(ArithPointer) &particleExt->dontUpdateParticle - (ArithPointer) &particle,
+			Variable_DataType_Int );
 	}
 	else {
 		Name variableName;
@@ -165,6 +180,11 @@ void _Director_Init(
 		variableName = Stg_Object_AppendSuffix( materialPointsSwarm, "Director" );
 		self->directorSwarmVariable = SwarmVariable_Register_GetByName( materialPointsSwarm->swarmVariable_Register, variableName );
 		assert( self->directorSwarmVariable );
+		Memory_Free( variableName );
+		/* Get Variables already created */
+		variableName = Stg_Object_AppendSuffix( materialPointsSwarm, "dontUpdateParticle" );
+		self->dontUpdateParticle = SwarmVariable_Register_GetByName( materialPointsSwarm->swarmVariable_Register, variableName );
+		assert( self->dontUpdateParticle );
 		Memory_Free( variableName );
 	}
 	
@@ -175,24 +195,28 @@ void _Director_Init(
 }
 
 void* _Director_DefaultNew( Name name ) {
-	return (void*) _Director_New(
-		sizeof(Director),
-		Director_Type,
-		_TimeIntegratee_Delete,
-		_TimeIntegratee_Print,
-		_TimeIntegratee_Copy,
-		_Director_DefaultNew,
-		_Director_Construct,
-		_Director_Build,
-		_Director_Initialise,
-		_TimeIntegratee_Execute,
-		_TimeIntegratee_Destroy,
-		_Director_TimeDerivative,
-		_Director_Intermediate,
-		name );
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(Director);
+	Type                                                       type = Director_Type;
+	Stg_Class_DeleteFunction*                               _delete = _TimeIntegrand_Delete;
+	Stg_Class_PrintFunction*                                 _print = _TimeIntegrand_Print;
+	Stg_Class_CopyFunction*                                   _copy = _TimeIntegrand_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _Director_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _Director_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _Director_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _Director_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _TimeIntegrand_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _Director_Destroy;
+	TimeIntegrand_CalculateTimeDerivFunction*  _calculateTimeDeriv = _Director_TimeDerivative;
+	TimeIntegrand_IntermediateFunction*              _intermediate = _Director_Intermediate;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _Director_New(  DIRECTOR_PASSARGS  );
 }
 
-void _Director_Construct( void* director, Stg_ComponentFactory* cf, void* data ){
+void _Director_AssignFromXML( void* director, Stg_ComponentFactory* cf, void* data ){
 	Director*               self           = (Director*)director;
 	MaterialPointsSwarm*    materialPointsSwarm;
 	FeVariable*             velGradField;
@@ -200,7 +224,7 @@ void _Director_Construct( void* director, Stg_ComponentFactory* cf, void* data )
 	InitialDirectionType    initialDirectionType;
 	
 	/* Construct Parent */
-	_TimeIntegratee_Construct( self, cf, data );
+	_TimeIntegrand_AssignFromXML( self, cf, data );
 	
 	/* Construct 'Director' stuff */
 	/* TODO: 'KeyFallback' soon to be deprecated/updated */
@@ -246,17 +270,17 @@ void _Director_Construct( void* director, Stg_ComponentFactory* cf, void* data )
 			Stg_ComponentFactory_GetDouble( cf, self->name, "initialDirectionZ",    DIRECTOR_DEFAULT_DIR_Z ),
 			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "randomInitialDirectionSeed",  1 ),
 			Stg_ComponentFactory_GetBool( cf, self->name, "dontUpdate", False ) );
-			
-			
+
 }
 
 void _Director_Build( void* director, void* data ) {
 	Director*                       self               = (Director*) director;
 
 	/* Build parent */
-	_TimeIntegratee_Build( self, data );
+	_TimeIntegrand_Build( self, data );
 
 	Stg_Component_Build( self->directorSwarmVariable, data, False );
+	Stg_Component_Build( self->dontUpdateParticle, data, False );
 }
 
 void _Director_Initialise( void* director, void* data ) {
@@ -265,20 +289,21 @@ void _Director_Initialise( void* director, void* data ) {
 	Particle_Index                  particleLocalCount = self->variable->arraySize;
 	double*                         normal;
 	Dimension_Index                 dim_I;
-	AbstractContext*                context = (AbstractContext*)data;
-	
+
 	/* Initialise Parent */
-	_TimeIntegratee_Initialise( self, data );
+	_TimeIntegrand_Initialise( self, data );
 
 	Stg_Component_Initialise( self->materialPointsSwarm, data, False );
-	Stg_Component_Initialise( self->directorSwarmVariable, data, False );
-
-	/* Update variables */
-	Variable_Update( self->variable );
-
 	/* We should only set initial directors if in regular non-restart mode. If in restart mode, then
 	the directors will be set correctly when we re-load the Swarm. */
-	if ( !(context && (True == context->loadFromCheckPoint)) ) {
+	if ( self->context->loadFromCheckPoint == False ) {
+
+      Stg_Component_Initialise( self->directorSwarmVariable, data, False );
+      Stg_Component_Initialise( self->dontUpdateParticle, data, True );
+   
+      /* Update variables */
+      Variable_Update( self->variable );
+
 		particleLocalCount = self->variable->arraySize;
 		if ( self->initialDirectionType == INIT_DIR_GLOBAL ) {
 			for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) {
@@ -289,28 +314,49 @@ void _Director_Initialise( void* director, void* data ) {
 			}	
 		}
 		else if (self->initialDirectionType == INIT_DIR_RANDOM){
+			Particle_Index	gParticle_I;
+			unsigned	approxGlobalParticleCount = particleLocalCount * self->materialPointsSwarm->nProc;
+			unsigned	startIndex = particleLocalCount * self->materialPointsSwarm->myRank;
+			double		norm[3];
+
 			/* create random directions for each particle */
 			srand( self->randomInitialDirectionSeed );
-			
+
+			lParticle_I = 0;
+			for( gParticle_I = 0; gParticle_I < approxGlobalParticleCount; gParticle_I++ ) {
+				for ( dim_I = 0; dim_I < self->materialPointsSwarm->dim; dim_I++ ) {
+					norm[dim_I] = ( (float) rand() - RAND_MAX/2 ) / RAND_MAX;
+				}	
+				if( gParticle_I >= startIndex ) {
+					normal = Variable_GetPtrDouble( self->variable, lParticle_I );
+					for ( dim_I = 0; dim_I < self->materialPointsSwarm->dim; dim_I++ ) {
+						normal[dim_I] = norm[dim_I];
+					}
+					lParticle_I++;
+				}
+				if( lParticle_I >= particleLocalCount )
+					break;
+			}
+/*
 			for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) {
 				normal = Variable_GetPtrDouble( self->variable, lParticle_I );
 				for ( dim_I = 0; dim_I < self->materialPointsSwarm->dim; dim_I++ ) {
 					normal[dim_I] = ( (float) rand() - RAND_MAX/2 ) / RAND_MAX;
 				}	
 				StGermain_VectorNormalise( normal, self->materialPointsSwarm->dim );
-			}	
+			}
+*/
 		}
 		else if (self->initialDirectionType == INIT_DIR_PER_MAT) {
 			/* Assign initial direction based on material
 			  and check first is material is defined as random.*/
-			Material_Index       materialsCount = Materials_Register_GetCount( self->materialPointsSwarm->materials_Register);
-			XYZ*                 materialDirectionVectors;
-			int 				 material_I;
-			Material*            material;
-			Bool*                randomInitialDirections;
-			int*                 randomInitialDirectionSeeds;
-			int                  materialOfParticle;
-			
+			Material_Index	materialsCount = Materials_Register_GetCount( self->materialPointsSwarm->materials_Register);
+			XYZ*				materialDirectionVectors;
+			int				material_I;
+			Material*		material;
+			Bool*				randomInitialDirections;
+			int*				randomInitialDirectionSeeds;
+			/* int				materialOfParticle; */
 			
 			materialDirectionVectors = Memory_Alloc_Array(XYZ, materialsCount, "materialDirectionVectors");
 			randomInitialDirectionSeeds = Memory_Alloc_Array(int, materialsCount,
@@ -363,19 +409,42 @@ void _Director_Initialise( void* director, void* data ) {
 			locate all random particles, and set their director */
 			for (material_I = 0; material_I < materialsCount; material_I++) {
 				if (randomInitialDirections[material_I] == True) {
+					Particle_Index	gParticle_I;
+					unsigned	approxGlobalParticleCount = particleLocalCount * self->materialPointsSwarm->nProc;
+					unsigned	startIndex = particleLocalCount * self->materialPointsSwarm->myRank;
+					double		norm[3];
+
+					srand( self->randomInitialDirectionSeed );
+					lParticle_I = 0;
+					for( gParticle_I = 0; gParticle_I < approxGlobalParticleCount; gParticle_I++ ) {
+						for ( dim_I = 0; dim_I < self->materialPointsSwarm->dim; dim_I++ ) {
+							norm[dim_I] = ( (float) rand() - RAND_MAX/2 ) / RAND_MAX;
+						}	
+						if( gParticle_I >= startIndex ) {
+							normal = Variable_GetPtrDouble( self->variable, lParticle_I );
+							for ( dim_I = 0; dim_I < self->materialPointsSwarm->dim; dim_I++ ) {
+								normal[dim_I] = norm[dim_I];
+							}
+							lParticle_I++;
+						}
+						if( lParticle_I >= particleLocalCount )
+							break;
+					}
+#if 0
+					/* create random directions for each particle */
 					srand(randomInitialDirectionSeeds[material_I]);
 					for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ){
-					materialOfParticle = MaterialPointsSwarm_GetMaterialIndexAt(
-						self->materialPointsSwarm, 
-						lParticle_I );
+						materialOfParticle = MaterialPointsSwarm_GetMaterialIndexAt( self->materialPointsSwarm, lParticle_I );
 						if (materialOfParticle == material_I){
 							normal = Variable_GetPtrDouble( self->variable, lParticle_I );
 							for ( dim_I = 0; dim_I < self->materialPointsSwarm->dim; dim_I++ ) {
 								normal[dim_I] = ( (float) rand() - RAND_MAX/2 ) / RAND_MAX;
 							}	
 							/* Normalising the direction vector */
-							StGermain_VectorNormalise( normal, self->materialPointsSwarm->dim );						}
+							StGermain_VectorNormalise( normal, self->materialPointsSwarm->dim );
+						}
 					}
+#endif
 				}
 			}
 		    /* For each non-random particle, set the initial direction */
@@ -401,9 +470,23 @@ void _Director_Initialise( void* director, void* data ) {
 			"in Director.h\n", __func__, 
 			self->initialDirectionType);
 		}
-		/* We don't need to initialise the 'dontUpdate' flag on the particle because
-		 * all the memory is initialised to zero when the particles are allocated */
+      /* Initialise the dontUpdate flag on each particle */
+      for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) { 
+         Variable_SetValueInt(self->dontUpdateParticle->variable, lParticle_I, 0);
+      }	
 	}
+
+}
+
+void _Director_Destroy( void* _self, void* data ) {
+	Director*          self               = (Director*) _self;
+
+   Stg_Component_Destroy( self->velGradField, data, False );
+   Stg_Component_Destroy( self->materialPointsSwarm, data, False );
+   Stg_Component_Destroy( self->directorSwarmVariable, data, False );
+   Stg_Component_Destroy( self->dontUpdateParticle, data, False );
+	/* Destroy parent */
+	_TimeIntegrand_Destroy( self, data );
 
 }
 
@@ -422,7 +505,7 @@ Bool _Director_TimeDerivative( void* director, Index lParticle_I, double* timeDe
 		materialPoint, self->particleExtHandle );
 	
 	/* Check if this particle should be updated or not */
-	if ( self->dontUpdate || particleExt->dontUpdate ) {
+	if ( self->dontUpdate || particleExt->dontUpdateParticle ) {
 		memset( timeDeriv, 0, sizeof(double) * materialPointsSwarm->dim );
 		return True;
 	}
@@ -432,21 +515,20 @@ Bool _Director_TimeDerivative( void* director, Index lParticle_I, double* timeDe
 	lElement_I = materialPoint->owningCell;
 	
 	result = FieldVariable_InterpolateValueAt( self->velGradField, materialPoint->coord, velGrad );
-
+	/* if in debug mode, perform some tests */
+#ifdef DEBUG
 	if ( result == OTHER_PROC || result == OUTSIDE_GLOBAL || isinf(velGrad[0]) || isinf(velGrad[1]) || 
 		( self->materialPointsSwarm->dim == 3 && isinf(velGrad[2]) ) ) 
 	{
-		#if 0
 		Journal_Printf( Journal_Register( Error_Type, self->type ),
 			"Error in func '%s' for particle with index %u.\n\tPosition (%g, %g, %g)\n\tVelGrad here is (%g, %g, %g)."
 			"\n\tInterpolation result is %s.\n",
-			__func__, array_I, coord[0], coord[1], coord[2], 
+			__func__, lParticle_I, materialPoint->coord[0], materialPoint->coord[1], materialPoint->coord[2], 
 			velGrad[0], velGrad[1], ( self->materialPointsSwarm->dim == 3 ? velGrad[2] : 0.0 ),
 			InterpolationResultToStringMap[result]  );
-		return False;	
-		#endif	
+		return False;		
 	}
-
+#endif
 	if ( materialPointsSwarm->dim == 2 ) {
 		timeDeriv[0] = -velGrad[MAP_2D_TENSOR(0,0)] * normal[0] - velGrad[MAP_2D_TENSOR(1,0)] * normal[1];
 		timeDeriv[1] = -velGrad[MAP_2D_TENSOR(0,1)] * normal[0] - velGrad[MAP_2D_TENSOR(1,1)] * normal[1];
@@ -473,6 +555,7 @@ void _Director_Intermediate( void* director, Index lParticle_I ) {
 /* Update these variables in case the swarm has been reallocated */
 void Director_UpdateVariables( void* timeIntegrator, Director* self ) {
 	Variable_Update( self->variable );
+	Variable_Update( self->dontUpdateParticle->variable );
 	Variable_Update( self->materialPointsSwarm->particleCoordVariable->variable );
 	Variable_Update( self->materialPointsSwarm->owningCellVariable->variable );
 }
@@ -514,5 +597,7 @@ void Director_SetDontUpdateParticleFlag( void* director, void* particle, Particl
 	particleExt = (Director_ParticleExt*) 
 			ExtensionManager_Get( self->materialPointsSwarm->particleExtensionMgr, particle, self->particleExtHandle );
 	
-	particleExt->dontUpdate = dontUpdateFlag;
+	particleExt->dontUpdateParticle = dontUpdateFlag;
 }
+
+

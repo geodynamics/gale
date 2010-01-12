@@ -55,10 +55,10 @@
 Index Underworld_BuoyancyIntegrals_Register( PluginsManager *pluginsManager );
 void* _Underworld_BuoyancyIntegrals_DefaultNew( Name name );
 void _Underworld_BuoyancyIntegrals_CTX_Delete( void *component );
-void _Underworld_BuoyancyIntegrals_Construct( void *component, Stg_ComponentFactory *cf, void *data );
+void _Underworld_BuoyancyIntegrals_AssignFromXML( void *component, Stg_ComponentFactory *cf, void *data );
 void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context );
 void Underworld_BuoyancyIntegrals_Setup( void* _context );
-
+void _Underworld_BuoyancyIntegrals_CTX_Destroy( void* component, void* data );
 typedef struct {
 	__Codelet
 			double int_w_bar_dt;
@@ -84,21 +84,24 @@ Index Underworld_BuoyancyIntegrals_Register( PluginsManager *pluginsManager )
 
 void* _Underworld_BuoyancyIntegrals_DefaultNew( Name name ) 
 {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Underworld_BuoyancyIntegrals_CTX);
+	Type                                                      type = Underworld_BuoyancyIntegrals_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Underworld_BuoyancyIntegrals_CTX_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_BuoyancyIntegrals_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Underworld_BuoyancyIntegrals_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Codelet_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Underworld_BuoyancyIntegrals_CTX_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
 	
-	return _Codelet_New(
-			sizeof(Underworld_BuoyancyIntegrals_CTX),
-			Underworld_BuoyancyIntegrals_Type,
-			_Underworld_BuoyancyIntegrals_CTX_Delete,
-			/*_Codelet_Delete, */
-	_Codelet_Print,
-			_Codelet_Copy,
-			_Underworld_BuoyancyIntegrals_DefaultNew,
-			_Underworld_BuoyancyIntegrals_Construct,
-			_Codelet_Build,
-			_Codelet_Initialise,
-			_Codelet_Execute,
-			_Codelet_Destroy,
-			name );
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
 
 void _Underworld_BuoyancyIntegrals_CTX_Delete( void *component ) 
@@ -108,19 +111,25 @@ void _Underworld_BuoyancyIntegrals_CTX_Delete( void *component )
 	_Codelet_Delete( ctx );
 }
 
+void _Underworld_BuoyancyIntegrals_CTX_Destroy( void* component, void* data ) {
+	Underworld_BuoyancyIntegrals_CTX*	self = (Underworld_BuoyancyIntegrals_CTX*)component;
 
-void _Underworld_BuoyancyIntegrals_Construct( void *component, Stg_ComponentFactory *cf, void *data ) 
+   _Codelet_Destroy( self, data );
+
+	if( self->cob_swarm != NULL )
+		Stg_Component_Destroy( self->cob_swarm, data, False );
+}
+
+void _Underworld_BuoyancyIntegrals_AssignFromXML( void *component, Stg_ComponentFactory *cf, void *data ) 
 {
 	UnderworldContext *context;
 	Underworld_BuoyancyIntegrals_CTX *ctx;
 	MaterialPointsSwarm *cob_swarm; /* center of buouyancy swarm */
 	
-	
-	
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 	
 	/* Add functions to entry points */
-	ContextEP_Append( context, AbstractContext_EP_ConstructExtensions, Underworld_BuoyancyIntegrals_Setup );
+	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, Underworld_BuoyancyIntegrals_Setup );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_BuoyancyIntegrals_Output );
 	
 	
@@ -242,7 +251,6 @@ void Underworld_BuoyancyIntegrals_Setup( void *_context )
 	/* Set the initial coordinates for the cob swarm */
 	if( ctx->cob_swarm != NULL ) {
 		Swarm *swarm;
-		int point_count;
 		GlobalParticle *particle;
 		
 		/* Force swarm to allocate points so that I can set initial values */
@@ -256,10 +264,6 @@ void Underworld_BuoyancyIntegrals_Setup( void *_context )
 		particle->coord[1] = ctx->y_b_initial;
 		particle->coord[2] = ctx->z_b;
 	}
-	
-	
-	
-	
 }
 
 
@@ -287,11 +291,17 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	double **GNx;
 	double _sum_vol, sum_vol;
 	
+	FeVariable *velocityField, *temperatureField;
+	Swarm* gaussSwarm;
 	
 	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get(
 			context->CF->LCRegister,
 			Underworld_BuoyancyIntegrals_Type );
 	
+	velocityField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
+	temperatureField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
+	gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+
 	/* initialise values to compute */
 	*B = *w_bar = *y_b = -1.0;
 	*int_w_bar_dt = ctx->int_w_bar_dt;
@@ -324,22 +334,22 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	
 	/* assuming all elements are the same */
 	dim = ctx->dim;
-	elementType = FeMesh_GetElementType( context->velocityField->feMesh, 0 );
+	elementType = FeMesh_GetElementType( velocityField->feMesh, 0 );
 	elementNodeCount = elementType->nodeCount;
 	GNx = Memory_Alloc_2DArray( double, dim, elementNodeCount, "Global Shape Function Derivatives for mayhem" );
 
-	mesh = context->temperatureField->feMesh;
+	mesh = temperatureField->feMesh;
 	
 	
 	_sum_T = _sum_vT = _sum_yT = 0.0;
 	_sum_vol = 0.0;
 	
-	ngp = context->gaussSwarm->particleLocalCount;
+	ngp = gaussSwarm->particleLocalCount;
 	n_elements = FeMesh_GetElementLocalSize( mesh );
 	//	printf("n_elements = %d \n", n_elements );
 	
 	for( e=0; e<n_elements; e++ ) {
-		cell_I = CellLayout_MapElementIdToCellId( context->gaussSwarm->cellLayout, e );
+		cell_I = CellLayout_MapElementIdToCellId( gaussSwarm->cellLayout, e );
 		elementType = FeMesh_GetElementType( mesh, e );
 		
 		sum_T  = 0.0;
@@ -350,7 +360,7 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 		i_T = i_v = i_vT = i_y = 0.0;
 		
 		for( p=0; p<ngp; p++ ) {
-			ip = (IntegrationPoint*)Swarm_ParticleInCellAt( context->gaussSwarm, cell_I, p );
+			ip = (IntegrationPoint*)Swarm_ParticleInCellAt( gaussSwarm, cell_I, p );
 			xi = ip->xi;
 			weight = ip->weight;
 			
@@ -359,8 +369,8 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 					mesh, e,
 					xi, dim, &det_jac, GNx );
 			
-			FeVariable_InterpolateFromMeshLocalCoord( context->temperatureField, mesh, e, xi, &i_T );
-			FeVariable_InterpolateFromMeshLocalCoord( context->velocityField,    mesh, e, xi, velocity );
+			FeVariable_InterpolateFromMeshLocalCoord( temperatureField, mesh, e, xi, &i_T );
+			FeVariable_InterpolateFromMeshLocalCoord( velocityField,    mesh, e, xi, velocity );
 			
 			i_v = velocity[1];
 			i_vT = i_v * i_T;
@@ -416,6 +426,7 @@ void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
 	double global_coord[3];
 	InterpolationResult result;
 	double T;
+	FeVariable* temperatureField;
 
 	T = -66.99;
 	
@@ -423,6 +434,7 @@ void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
 			context->CF->LCRegister,
 			Underworld_BuoyancyIntegrals_Type );
 	
+	temperatureField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
 	/* Get x_b, and z_b from xml */
 	/* "cylinder" z_b = CentreZ (0.5), x_b = CentreX (1.0) */
 	if (ctx->dim==3){
@@ -435,7 +447,7 @@ void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
 		global_coord[1] = y_b;
 	}
 
-	result = FieldVariable_InterpolateValueAt( ctx->temperatureField, global_coord, &T );
+	result = FieldVariable_InterpolateValueAt( temperatureField, global_coord, &T );
 	MPI_Allreduce ( &T, temp_b, 1, MPI_DOUBLE, MPI_MAX, context->communicator );
 
 }
@@ -448,8 +460,7 @@ void assign_coords_to_swarm( double x_b, double y_b, double z_b, MaterialPointsS
 	GlobalParticle *particle;
 	Particle_Index lParticle_I;
 	Stream *errorStream = Journal_Register( Error_Type, "Underworld_BuoyancyIntegrals: assign_coords_to_swarm" );
-	int rank;
-	
+	/* int rank; */
 	
 	/* Cast to get parent */
 	swarm = (Swarm*)cob_swarm;
@@ -467,9 +478,6 @@ void assign_coords_to_swarm( double x_b, double y_b, double z_b, MaterialPointsS
 			"Error in %s:\n"
 			"Swarm with name %s is be used to plot center of buoyancy.\n"
 			"This swarm contains more then 1 point. This is unexpected!!", __func__, swarm->name );
-	
-	
-	
 	
 	/* get point to the first particle */
 	lParticle_I = 0;
@@ -490,6 +498,7 @@ void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context )
 	double B, w_bar, y_b, int_w_bar_dt;
 	double temp_b; /* the temperature at (x_b,y_b,z_b) */
 	double temp_max;
+	FeVariable* temperatureField;
 	
 	perform_integrals( context, &B, &w_bar, &y_b, &int_w_bar_dt );
 	eval_temperature( context, y_b, &temp_b );
@@ -498,6 +507,7 @@ void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context )
 			context->CF->LCRegister,
 			Underworld_BuoyancyIntegrals_Type );
 	
+	temperatureField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
 	
 	StgFEM_FrequentOutput_PrintValue( context, B );
 	StgFEM_FrequentOutput_PrintValue( context, w_bar );
@@ -509,7 +519,7 @@ void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context )
 	StgFEM_FrequentOutput_PrintValue( context, int_w_bar_dt );
 	StgFEM_FrequentOutput_PrintValue( context, temp_b );
 	
-	temp_max = _FeVariable_GetMaxGlobalFieldMagnitude( ctx->temperatureField );
+	temp_max = _FeVariable_GetMaxGlobalFieldMagnitude( temperatureField );
 	StgFEM_FrequentOutput_PrintValue( context, temp_max );
 	
 	
@@ -521,3 +531,5 @@ void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context )
 	
 	
 }
+
+

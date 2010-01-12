@@ -88,36 +88,31 @@
 		
 	struct ConstitutiveMatrix { __ConstitutiveMatrix };
 
-	ConstitutiveMatrix* _ConstitutiveMatrix_New( 
-		SizeT                                        _sizeOfSelf,
-		Type                                         type,
-		Stg_Class_DeleteFunction*                    _delete,
-		Stg_Class_PrintFunction*                     _print,
-		Stg_Class_CopyFunction*                      _copy, 
-		Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
-		Stg_Component_ConstructFunction*             _construct,
-		Stg_Component_BuildFunction*                 _build,
-		Stg_Component_InitialiseFunction*            _initialise,
-		Stg_Component_ExecuteFunction*               _execute,
-		Stg_Component_DestroyFunction*               _destroy,
-		StiffnessMatrixTerm_AssembleElementFunction* _assembleElement,
-		ConstitutiveMatrix_SetValueFunc*             _setValue,
-		ConstitutiveMatrix_GetValueFunc*             _getViscosity,
-		ConstitutiveMatrix_SetValueFunc*             _isotropicCorrection,
-		ConstitutiveMatrix_SetSecondViscosityFunc*   _setSecondViscosity,
-		ConstitutiveMatrix_Assemble_D_B_Func*        _assemble_D_B,
-		ConstitutiveMatrix_CalculateStressFunc*      _calculateStress,
-		Name                                         name );
-		
-	/* Initialise implementation */
-	void ConstitutiveMatrix_InitAll( 
-		void*                                        constitutiveMatrix,
-		StiffnessMatrix*                             stiffnessMatrix,
-		Swarm*                                       swarm,
-		Dimension_Index                              dim,
-		FiniteElementContext*                        context,
-		Materials_Register*                          materials_Register );
 	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CONSTITUTIVEMATRIX_DEFARGS \
+                STIFFNESSMATRIXTERM_DEFARGS, \
+                ConstitutiveMatrix_SetValueFunc*                       _setValue, \
+                ConstitutiveMatrix_GetValueFunc*                   _getViscosity, \
+                ConstitutiveMatrix_SetValueFunc*            _isotropicCorrection, \
+                ConstitutiveMatrix_SetSecondViscosityFunc*   _setSecondViscosity, \
+                ConstitutiveMatrix_Assemble_D_B_Func*              _assemble_D_B, \
+                ConstitutiveMatrix_CalculateStressFunc*         _calculateStress
+
+	#define CONSTITUTIVEMATRIX_PASSARGS \
+                STIFFNESSMATRIXTERM_PASSARGS, \
+	        _setValue,            \
+	        _getViscosity,        \
+	        _isotropicCorrection, \
+	        _setSecondViscosity,  \
+	        _assemble_D_B,        \
+	        _calculateStress    
+
+	ConstitutiveMatrix* _ConstitutiveMatrix_New(  CONSTITUTIVEMATRIX_DEFARGS  );
+
 	/* 'Stg_Class' Virtual Functions */
 	void _ConstitutiveMatrix_Delete( void* constitutiveMatrix );
 	void _ConstitutiveMatrix_Print( void* constitutiveMatrix, Stream* stream );
@@ -128,11 +123,15 @@
 	void* _ConstitutiveMatrix_Copy( void* constitutiveMatrix, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Functions */
-	void _ConstitutiveMatrix_Construct( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data );
+	void _ConstitutiveMatrix_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data );
 	void _ConstitutiveMatrix_Build( void* constitutiveMatrix, void* data );
 	void _ConstitutiveMatrix_Initialise( void* constitutiveMatrix, void* data );
 	void _ConstitutiveMatrix_Execute( void* constitutiveMatrix, void* data );
 	void _ConstitutiveMatrix_Destroy( void* constitutiveMatrix, void* data );
+   void _ConstitutiveMatrix_Init(
+         ConstitutiveMatrix*                     self,
+         Dimension_Index                        dim,
+         Bool                                   storeConstitutiveMatrix );
 
 	/* Wrapper macros to virtual functions - These must be macros for the sake of speed */
 	#define ConstitutiveMatrix_SetValueInAllEntries( constitutiveMatrix, value ) \
@@ -186,3 +185,4 @@
     double** outputC );
 
 #endif /* __Underworld_Rheology_ConstitutiveMatrix_h__ */
+

@@ -43,8 +43,8 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-#ifndef __Underworld_Rheology_h__
-#define __Underworld_Rheology_h__
+#ifndef __Underworld_Rheology_Rheology_h__
+#define __Underworld_Rheology_Rheology_h__
 
 	#include "types.h"
 	#include "RheologyClass.h"

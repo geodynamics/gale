@@ -63,48 +63,16 @@
 const Type Pouliquen_etal_Type = "Pouliquen_etal";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-Pouliquen_etal* _Pouliquen_etal_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion,
-		YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator,
-		YieldRheology_HasYieldedFunction*                  _hasYielded,
-		Name                                               name ) 
+Pouliquen_etal* _Pouliquen_etal_New(  POULIQUEN_ETAL_DEFARGS  ) 
 {
 	Pouliquen_etal*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(Pouliquen_etal) );
-	self = (Pouliquen_etal*) _VonMises_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			_getYieldCriterion,
-			_getYieldIndicator,
-			_hasYielded,
-			name );
+	assert( _sizeOfSelf >= sizeof(Pouliquen_etal) );
+	self = (Pouliquen_etal*) _VonMises_New(  VONMISES_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
-	
+	self->isConstructed = True;
 	return self;
 }
 
@@ -113,7 +81,6 @@ void _Pouliquen_etal_Init(
 		FeVariable*                                        pressureField,
 		FeVariable*                                        strainRateInvField,
 		MaterialPointsSwarm*                               materialPointsSwarm,
-		FiniteElementContext*                              context,
 		double                                             minimumYieldStress,
 		double                                             frictionCoefficient,
 		double                                             frictionCoefficientAfterSoftening,
@@ -155,7 +122,7 @@ void _Pouliquen_etal_Init(
 	self->minViscosity = minViscosity;
 
 	/* Update Drawing Parameters */
-	EP_PrependClassHook( Context_GetEntryPoint( context, AbstractContext_EP_DumpClass ),
+	EP_PrependClassHook( Context_GetEntryPoint( self->context, AbstractContext_EP_DumpClass ),
 								_Pouliquen_etal_UpdateDrawParameters, self );
 	
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &materialPoint, self->particleExtHandle );
@@ -189,34 +156,37 @@ void _Pouliquen_etal_Init(
 }
 
 void* _Pouliquen_etal_DefaultNew( Name name ) {
-	return (void*) _Pouliquen_etal_New(
-			sizeof(Pouliquen_etal),
-			Pouliquen_etal_Type,
-			_YieldRheology_Delete,
-			_YieldRheology_Print,
-			_YieldRheology_Copy,
-			_Pouliquen_etal_DefaultNew,
-			_Pouliquen_etal_Construct,
-			_Pouliquen_etal_Build,
-			_Pouliquen_etal_Initialise,
-			_YieldRheology_Execute,
-			_YieldRheology_Destroy,
-			_YieldRheology_ModifyConstitutiveMatrix,
-			_Pouliquen_etal_GetYieldCriterion,
-			_VonMises_GetYieldIndicator,
-			_Pouliquen_etal_HasYielded,
-			name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(Pouliquen_etal);
+	Type                                                             type = Pouliquen_etal_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _YieldRheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _YieldRheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _YieldRheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _Pouliquen_etal_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _Pouliquen_etal_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _Pouliquen_etal_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _Pouliquen_etal_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _YieldRheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _Pouliquen_etal_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _YieldRheology_ModifyConstitutiveMatrix;
+	YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion = _Pouliquen_etal_GetYieldCriterion;
+	YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator = _VonMises_GetYieldIndicator;
+	YieldRheology_HasYieldedFunction*                         _hasYielded = _Pouliquen_etal_HasYielded;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _Pouliquen_etal_New(  POULIQUEN_ETAL_PASSARGS  );
 }
 
-void _Pouliquen_etal_Construct( void* pouliquen_etal, Stg_ComponentFactory* cf, void* data ){
+void _Pouliquen_etal_AssignFromXML( void* pouliquen_etal, Stg_ComponentFactory* cf, void* data ){
 	Pouliquen_etal*          self           = (Pouliquen_etal*)pouliquen_etal;
 	FeVariable*             pressureField;
 	FeVariable*             strainRateInvField;
 	MaterialPointsSwarm*    materialPointsSwarm;
-	FiniteElementContext*   context;
 
 	/* Construct Parent */
-	_VonMises_Construct( self, cf, data );
+	_VonMises_AssignFromXML( self, cf, data );
 	
 	pressureField      = (FeVariable *) 
 			Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, True, data );
@@ -226,15 +196,11 @@ void _Pouliquen_etal_Construct( void* pouliquen_etal, Stg_ComponentFactory* cf, 
 
 	materialPointsSwarm     = (MaterialPointsSwarm*)
 			Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialPointsSwarm", MaterialPointsSwarm, True, data );
-
-	context = (FiniteElementContext*)
-			Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data ); 
 		
 	_Pouliquen_etal_Init( self, 
 			pressureField,
 			strainRateInvField,
 			materialPointsSwarm, 
-			context,
 			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficient", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficientAfterSoftening", 0.0 ),
@@ -255,6 +221,9 @@ void _Pouliquen_etal_Build( void* rheology, void* data ) {
 	/* Build parent */
 	_YieldRheology_Build( self, data );
 
+	Stg_Component_Build( self->pressureField, data, False );
+	Stg_Component_Build( self->strainRateInvField, data, False );
+	
 	Stg_Component_Build( self->brightness, data, False );
 	Stg_Component_Build( self->opacity, data, False );
 	Stg_Component_Build( self->diameter, data, False );
@@ -262,25 +231,26 @@ void _Pouliquen_etal_Build( void* rheology, void* data ) {
 
 }
 
-
 void _Pouliquen_etal_Initialise( void* rheology, void* data ) {
-	Pouliquen_etal*                  self                  = (Pouliquen_etal*) rheology;
-	Particle_Index                  lParticle_I;
-	Particle_Index                  particleLocalCount;
-	AbstractContext*                context = (AbstractContext*)data;
+	Pouliquen_etal*	self = (Pouliquen_etal*) rheology;
+	Particle_Index		lParticle_I;
+	Particle_Index		particleLocalCount;
 
 	_YieldRheology_Initialise( self, data );
 
-	/* Initialise variables that I've created - (mainly just SwarmVariables)
-	 * This will run a Variable_Update for us */
-	Stg_Component_Initialise( self->brightness, data, False );
-	Stg_Component_Initialise( self->opacity, data, False );
-	Stg_Component_Initialise( self->diameter, data, False );
-	Stg_Component_Initialise( self->tensileFailure, data, False );
+   Stg_Component_Initialise( self->pressureField, data, False );
+	Stg_Component_Initialise( self->strainRateInvField, data, False );
 
 	/* We should only set initial conditions if in regular non-restart mode. If in restart mode, then
 	the particle-based variables will be set correcty when we re-load the Swarm. */
-	if ( !(context && (True == context->loadFromCheckPoint)) ) {
+	if ( self->context->loadFromCheckPoint == False ) {
+      /* Initialise variables that I've created - (mainly just SwarmVariables)
+       * This will run a Variable_Update for us */
+      Stg_Component_Initialise( self->brightness, data, False );
+      Stg_Component_Initialise( self->opacity, data, False );
+      Stg_Component_Initialise( self->diameter, data, False );
+      Stg_Component_Initialise( self->tensileFailure, data, False );
+
 		/* We don't need to Initialise hasYieldedVariable because it's a parent variable and _YieldRheology_Initialise
 		 * has already been called */
 		particleLocalCount = self->hasYieldedVariable->variable->arraySize;
@@ -296,6 +266,23 @@ void _Pouliquen_etal_Initialise( void* rheology, void* data ) {
 		}
 	}	
 }
+
+void _Pouliquen_etal_Destroy( void* rheology, void* data ) {
+	Pouliquen_etal*          self               = (Pouliquen_etal*) rheology;
+
+	Stg_Component_Destroy( self->pressureField, data, False );
+	Stg_Component_Destroy( self->strainRateInvField, data, False );
+	
+	Stg_Component_Destroy( self->brightness, data, False );
+	Stg_Component_Destroy( self->opacity, data, False );
+	Stg_Component_Destroy( self->diameter, data, False );
+	Stg_Component_Destroy( self->tensileFailure, data, False );
+
+	/* Destroy parent */
+	_YieldRheology_Destroy( self, data );
+
+}
+
 
 double _Pouliquen_etal_GetYieldCriterion( 
 			void*                            pouliquen_etal,
@@ -457,8 +444,8 @@ void _Pouliquen_etal_HasYielded(
 	Pouliquen_etal_Particle*         particleExt;
 	double                    mu;
 	double                    strainWeakeningRatio;
-	double                    mu_2_afterSoftening =	self->mu_2_afterSoftening;
-	double                    mu_s_afterSoftening =	self->mu_s_afterSoftening;
+	/*double                    mu_2_afterSoftening =	self->mu_2_afterSoftening;
+	double                    mu_s_afterSoftening =	self->mu_s_afterSoftening;*/
 	double                    effective_mu_s;
 	double                    effective_mu_2;
 	double                    pressure;
@@ -510,4 +497,6 @@ void _Pouliquen_etal_HasYielded(
 
 	ConstitutiveMatrix_SetIsotropicViscosity( constitutiveMatrix, viscosity );
 }
+
+
 

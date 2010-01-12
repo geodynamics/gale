@@ -61,46 +61,38 @@
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type VonMises_Type = "VonMises";
 
+/* Public Constructor */
+VonMises* VonMises_New(
+	Name                  name,
+	AbstractContext*      context,
+	StrainWeakening*      strainWeakening, 
+	MaterialPointsSwarm*  materialPointsSwarm, 
+	double                minVisc, 
+	FeVariable*           strainRateField,
+	SwarmVariable*        swarmStrainRate,
+	double                cohesion,
+	double                cohesionAfterSoftening,
+	Bool                  strainRateSoftening )
+{
+   VonMises* self = (VonMises*) _VonMises_DefaultNew( name );
+
+   _Rheology_Init( self, (PICelleratorContext*)context );
+   _YieldRheology_Init( (YieldRheology*)self, strainWeakening, materialPointsSwarm, minVisc ); 
+   _VonMises_Init( (VonMises*)self, strainRateField, swarmStrainRate, cohesion, cohesionAfterSoftening, strainRateSoftening );
+
+   self->isConstructed = True;
+   return self;
+}
+
+
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-VonMises* _VonMises_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion,
-		YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator,
-		YieldRheology_HasYieldedFunction*                  _hasYielded,
-		Name                                               name ) 
+VonMises* _VonMises_New(  VONMISES_DEFARGS  ) 
 {
 	VonMises*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(VonMises) );
-	self = (VonMises*) _YieldRheology_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			_getYieldCriterion,
-			_getYieldIndicator,
-			_hasYielded,
-			name );
+	assert( _sizeOfSelf >= sizeof(VonMises) );
+	self = (VonMises*) _YieldRheology_New(  YIELDRHEOLOGY_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	
@@ -108,13 +100,15 @@ VonMises* _VonMises_New(
 }
 
 void _VonMises_Init( 
-		VonMises*   self, 
-		FeVariable* strainRateField, 
-		double      cohesion, 
-		double      cohesionAfterSoftening,
-		Bool        strainRateSoftening)
+		VonMises*      self, 
+		FeVariable*    strainRateField,
+		SwarmVariable* swarmStrainRate,
+		double         cohesion, 
+		double         cohesionAfterSoftening,
+		Bool           strainRateSoftening)
 {
 	self->strainRateField        = strainRateField;
+	self->swarmStrainRate        = swarmStrainRate;
 	self->cohesion               = cohesion;
 	
 	/* Strain softening of Cohesion - (linear weakening is assumed) */
@@ -124,44 +118,84 @@ void _VonMises_Init(
 }
 
 void* _VonMises_DefaultNew( Name name ) {
-	return (void*) _VonMises_New(
-		sizeof(VonMises),
-		VonMises_Type,
-		_YieldRheology_Delete,
-		_YieldRheology_Print,
-		_YieldRheology_Copy,
-		_VonMises_DefaultNew,
-		_VonMises_Construct,
-		_YieldRheology_Build,
-		_YieldRheology_Initialise,
-		_YieldRheology_Execute,
-		_YieldRheology_Destroy,
-		_YieldRheology_ModifyConstitutiveMatrix,
-		_VonMises_GetYieldCriterion,
-		_VonMises_GetYieldIndicator,
-		_VonMises_HasYielded,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(VonMises);
+	Type                                                             type = VonMises_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _YieldRheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _YieldRheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _YieldRheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _VonMises_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _VonMises_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _VonMises_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _VonMises_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _YieldRheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _VonMises_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _YieldRheology_ModifyConstitutiveMatrix;
+	YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion = _VonMises_GetYieldCriterion;
+	YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator = _VonMises_GetYieldIndicator;
+	YieldRheology_HasYieldedFunction*                         _hasYielded = _VonMises_HasYielded;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _VonMises_New(  VONMISES_PASSARGS  );
 }
 
-void _VonMises_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _VonMises_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	VonMises*          self           = (VonMises*)rheology;
 	FeVariable*        strainRateField;
+	SwarmVariable*     swarmStrainRate;
 
 	/* Construct Parent */
-	_YieldRheology_Construct( self, cf, data );
+	_YieldRheology_AssignFromXML( self, cf, data );
 	
 	strainRateField = Stg_ComponentFactory_ConstructByKey(  
 			cf, self->name, "StrainRateField", FeVariable, False, data );
-	self->swarmStrainRate = Stg_ComponentFactory_ConstructByKey(
+	swarmStrainRate = Stg_ComponentFactory_ConstructByKey(
 	   cf, self->name, "swarmStrainRate", SwarmVariable, False, data );
-	assert( strainRateField || self->swarmStrainRate );
-	
+   Journal_Firewall( 
+			(strainRateField || self->swarmStrainRate), 
+			Journal_Register( Error_Type, self->type ), 
+			"\n Error in component type %s, name '%s'.\n Must specify a strainRateField OR a swarmStrainRate, but not both. \n", self->type, self->name ); 
+
 	_VonMises_Init( 
 			self, 
 			strainRateField,
+			swarmStrainRate,
 			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesion", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesionAfterSoftening", 0.0 ),
 			Stg_ComponentFactory_GetBool(   cf, self->name, "strainRateSoftening", False ) );
+}
+
+void _VonMises_Destroy( void* rheology, void* data ){
+   VonMises* self = (VonMises*) rheology;
+   
+   if( self->strainRateField ) Stg_Component_Destroy( self->strainRateField, data, False );
+   if( self->swarmStrainRate ) Stg_Component_Destroy( self->swarmStrainRate, data, False );
+   
+   _YieldRheology_Destroy( self, data );
+}
+
+void _VonMises_Build( void* rheology, void* data ){
+   VonMises* self = (VonMises*) rheology;
+   
+   /* build parent */
+   _YieldRheology_Build( self, data );
+   
+   if( self->strainRateField ) Stg_Component_Build( self->strainRateField, data, False );
+   if( self->swarmStrainRate ) Stg_Component_Build( self->swarmStrainRate, data, False );
+   
+}
+
+void _VonMises_Initialise( void* rheology, void* data ){
+   VonMises* self = (VonMises*) rheology;
+   
+   /* Initialise parent */
+   _YieldRheology_Initialise( self, data );
+   
+   if( self->strainRateField ) Stg_Component_Initialise( self->strainRateField, data, False );
+   if( self->swarmStrainRate ) Stg_Component_Initialise( self->swarmStrainRate, data, False );
+   
 }
 
 double _VonMises_GetYieldCriterion( 
@@ -259,3 +293,5 @@ void _VonMises_HasYielded(
         }
 
 }
+
+

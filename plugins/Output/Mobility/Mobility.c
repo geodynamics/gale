@@ -54,13 +54,13 @@
 
 const Type Underworld_Mobility_Type = "Underworld_Mobility";
 
-void _Underworld_Mobility_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_Mobility_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*  context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 
 	Underworld_Mobility_PrintHeaderToFile( context );
-	ContextEP_Append( context, AbstractContext_EP_ConstructExtensions, Underworld_Mobility_Setup );
+	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, Underworld_Mobility_Setup );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput     , Underworld_Mobility_Dump );
 }
 
@@ -70,6 +70,16 @@ void _Underworld_Mobility_Build( void* component, void* data ) {
 	assert( self );
 
 	Stg_Component_Build( self->velocitySquaredField, data, False );
+   
+   _Codelet_Build( self, data );
+}
+
+void _Underworld_Mobility_Destroy( void* component, void* data ) {
+	Underworld_Mobility*	self = (Underworld_Mobility*)component;
+
+   _Codelet_Destroy( self, data );
+
+	Stg_Component_Destroy( self->velocitySquaredField, data, False );
 }
 
 void _Underworld_Mobility_Initialise( void* component, void* data ) {
@@ -78,22 +88,28 @@ void _Underworld_Mobility_Initialise( void* component, void* data ) {
 	assert( self );
 
 	Stg_Component_Initialise( self->velocitySquaredField, data, False );
+   
+   _Codelet_Initialise( self, data );
 }
 
 void* _Underworld_Mobility_DefaultNew( Name name ) {
-	return _Codelet_New(
-		sizeof(Underworld_Mobility),
-		Underworld_Mobility_Type,
-		_Codelet_Delete,
-		_Codelet_Print,
-		_Codelet_Copy,
-		_Underworld_Mobility_DefaultNew,
-		_Underworld_Mobility_Construct,
-		_Underworld_Mobility_Build,
-		_Underworld_Mobility_Initialise,
-		_Codelet_Execute,
-		_Codelet_Destroy,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Underworld_Mobility);
+	Type                                                      type = Underworld_Mobility_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_Mobility_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Underworld_Mobility_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Underworld_Mobility_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Underworld_Mobility_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Underworld_Mobility_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
 
 Index Underworld_Mobility_Register( PluginsManager* pluginsManager ) {
@@ -101,54 +117,46 @@ Index Underworld_Mobility_Register( PluginsManager* pluginsManager ) {
 }
 
 void Underworld_Mobility_Setup( void* _context ) {
-	UnderworldContext*                context       = (UnderworldContext*) _context;
+	UnderworldContext*	context = (UnderworldContext*) _context;
+	Swarm*					gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+	FeVariable*				velocityField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
 
 	Underworld_Mobility* self;
 
-	self = (Underworld_Mobility*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_Mobility_Type );
+	self = (Underworld_Mobility*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_Mobility_Type );
 
-	Journal_Firewall( 
-			context->gaussSwarm != NULL, 
-			Underworld_Error,
-			"Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
-	Journal_Firewall( 
-			context->velocityField != NULL, 
-			Underworld_Error,
-			"Cannot find velocityField. Cannot use %s.\n", CURR_MODULE_NAME );
+	Journal_Firewall( gaussSwarm != NULL, Underworld_Error, "Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
+	Journal_Firewall( velocityField != NULL, Underworld_Error, "Cannot find velocityField. Cannot use %s.\n", CURR_MODULE_NAME );
 
 	/* Create new Field Variable */
-	self->velocitySquaredField = OperatorFeVariable_NewUnary( 
-			"VelocitySquaredField", 
-			context->velocityField, 
-			"VectorSquare" );
+	self->velocitySquaredField = OperatorFeVariable_NewUnary( "VelocitySquaredField", (DomainContext*)context, velocityField, "VectorSquare" );
 }
 
 /* Integrate Every Step and dump to file */
 void Underworld_Mobility_Dump( void* _context ) {
-	UnderworldContext*                   context       = (UnderworldContext*) _context;
-	Mesh*			   	     mesh;
-	double		    	  	     maxCrd[3], minCrd[3];
-	double                               integral;
-	double                               topLayerAverage;
-	double                               mobility;
-	double                               vrms;
-	double                               volume        = 0.0;
-	Dimension_Index                      dim           = context->dim;
+	UnderworldContext*	context = (UnderworldContext*) _context;
+	Swarm*					gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+	Mesh*						mesh;
+	double					maxCrd[3], minCrd[3];
+	double					integral;
+	double					topLayerAverage;
+	double					mobility;
+	double					vrms;
+	double					volume = 0.0;
+	Dimension_Index		dim = context->dim;
 
 	Underworld_Mobility* self;
 
 	self = (Underworld_Mobility*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_Mobility_Type );
+		context->CF->LCRegister,
+		Underworld_Mobility_Type );
 
 	mesh = (Mesh*)self->velocitySquaredField->feMesh;
 	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
 	
 	/* Sum integral */
-	integral        = FeVariable_Integrate( self->velocitySquaredField, context->gaussSwarm );
-	topLayerAverage = FeVariable_AverageTopLayer( self->velocitySquaredField, context->gaussSwarm, J_AXIS );
+	integral = FeVariable_Integrate( self->velocitySquaredField, gaussSwarm );
+	topLayerAverage = FeVariable_AverageTopLayer( self->velocitySquaredField, gaussSwarm, J_AXIS );
 	/* Get Volume of Mesh - TODO Make general for irregular meshes */
 	volume = ( maxCrd[ I_AXIS ] - minCrd[ I_AXIS ] ) * 
 		( maxCrd[ J_AXIS ] - minCrd[ J_AXIS ] );
@@ -170,4 +178,6 @@ void Underworld_Mobility_Dump( void* _context ) {
 void Underworld_Mobility_PrintHeaderToFile( void* context ) {
 	StgFEM_FrequentOutput_PrintString( context, "Mobility" );
 }
+
+
 

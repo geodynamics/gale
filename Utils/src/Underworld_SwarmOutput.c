@@ -74,38 +74,18 @@ Underworld_SwarmOutput* Underworld_SwarmOutput_New(
 	return self;
 }
 
-Underworld_SwarmOutput* _Underworld_SwarmOutput_New(
-		SizeT                                              _sizeOfSelf, 
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		Name                                               name )
+Underworld_SwarmOutput* _Underworld_SwarmOutput_New(  UNDERWORLD_SWARMOUTPUT_DEFARGS  )
 {
 	Underworld_SwarmOutput* self;
 	
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
 	assert( _sizeOfSelf >= sizeof(Underworld_SwarmOutput) );
-	self = (Underworld_SwarmOutput*)_Stg_Component_New( 
-					_sizeOfSelf,
-					type,
-					_delete,
-					_print,
-					_copy,
-					_defaultConstructor,
-					_construct,
-					_build,
-					_initialise,
-					_execute,
-					_destroy,		
-					name,
-					NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (Underworld_SwarmOutput*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	
 	/* General info */
@@ -123,6 +103,7 @@ Underworld_SwarmOutput* _Underworld_SwarmOutput_New(
 void _Underworld_SwarmOutput_Delete( void* uwSwarmOutput ) {
 	Underworld_SwarmOutput* self = (Underworld_SwarmOutput*)uwSwarmOutput;
 
+	Memory_Free( self->feVariableList );
 	/* Delete parent */
 	_SwarmOutput_Delete( self );
 }
@@ -145,35 +126,41 @@ void* _Underworld_SwarmOutput_Copy( void* uwSwarmOutput, void* dest, Bool deep, 
 }
 
 void* _Underworld_SwarmOutput_DefaultNew( Name name ) {
-	return (void*) _Underworld_SwarmOutput_New(
-			sizeof(Underworld_SwarmOutput),
-			Underworld_SwarmOutput_Type,
-			_Underworld_SwarmOutput_Delete,
-			_Underworld_SwarmOutput_Print,
-			_Underworld_SwarmOutput_Copy,
-			_Underworld_SwarmOutput_DefaultNew,
-			_Underworld_SwarmOutput_Construct,
-			_Underworld_SwarmOutput_Build,
-			_Underworld_SwarmOutput_Initialise,
-			_Underworld_SwarmOutput_Execute,
-			_Underworld_SwarmOutput_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Underworld_SwarmOutput);
+	Type                                                      type = Underworld_SwarmOutput_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Underworld_SwarmOutput_Delete;
+	Stg_Class_PrintFunction*                                _print = _Underworld_SwarmOutput_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Underworld_SwarmOutput_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_SwarmOutput_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Underworld_SwarmOutput_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Underworld_SwarmOutput_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Underworld_SwarmOutput_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Underworld_SwarmOutput_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Underworld_SwarmOutput_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _Underworld_SwarmOutput_New(  UNDERWORLD_SWARMOUTPUT_PASSARGS  );
 }
 
-void _Underworld_SwarmOutput( Underworld_SwarmOutput* self,
+void _Underworld_SwarmOutput_Init( Underworld_SwarmOutput* self,
 				PICelleratorContext*  context,
 				MaterialPointsSwarm*  materialSwarm,
-				unsigned int          listCount ) {
+				unsigned int          listCount,
+				FeVariable**          feVariableList) {
 	self->materialSwarm = materialSwarm;
 	self->sizeList = listCount;
 	self->_getFeValuesFunc = _Underworld_SwarmOutput_GetFeVariableValues;
 	self->_printFunc = _Underworld_SwarmOutput_PrintStandardFormat;
+	self->feVariableList = feVariableList;
 
 	/* my Swarm output will run on the SaveClass EP - the same time as standard checkpointing */
 	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_SaveClass ), _Underworld_SwarmOutput_Execute, self );
 }
 
-void _Underworld_SwarmOutput_Construct( void* uwSwarmOutput, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_SwarmOutput_AssignFromXML( void* uwSwarmOutput, Stg_ComponentFactory* cf, void* data ) {
 	Underworld_SwarmOutput*  self          = (Underworld_SwarmOutput*) uwSwarmOutput;
 
 	PICelleratorContext*    context;
@@ -182,7 +169,8 @@ void _Underworld_SwarmOutput_Construct( void* uwSwarmOutput, Stg_ComponentFactor
 	Dictionary_Entry_Value* list;
 	unsigned int            listCount, feVar_I;
 	char*                   varName;
-	Stream                 *errorStream = Journal_Register( Error_Type, "_Underworld_SwarmOutput_Construct" );
+	Stream                  *errorStream = Journal_Register( Error_Type, "_Underworld_SwarmOutput_Construct" );
+   FeVariable**            feVariableList;
 	
 	context      =  Stg_ComponentFactory_ConstructByName(  cf,  "context", PICelleratorContext,  True, data ) ;
 	materialSwarm = (MaterialPointsSwarm*)Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", MaterialPointsSwarm, True, data );
@@ -201,7 +189,7 @@ void _Underworld_SwarmOutput_Construct( void* uwSwarmOutput, Stg_ComponentFactor
 	
 	listCount = Dictionary_Entry_Value_GetCount( list );
 
-  Journal_Firewall(
+   Journal_Firewall(
 			listCount != 0,
 			errorStream,
 			"Error in %s:\n"
@@ -211,17 +199,18 @@ void _Underworld_SwarmOutput_Construct( void* uwSwarmOutput, Stg_ComponentFactor
 			"</list>\n", __func__ );
 	
 	/* Allocate the memory to store pointers to them */
-	self->feVariableList = Memory_Alloc_Array( FeVariable*, listCount, "List FeVariables" );
+	feVariableList = Memory_Alloc_Array( FeVariable*, listCount, "List FeVariables" );
 
 	for( feVar_I = 0 ; feVar_I < listCount ; feVar_I++ ) {
 		varName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( list, feVar_I ) );
-		self->feVariableList[ feVar_I ] = Stg_ComponentFactory_ConstructByName( cf, varName, FeVariable, True, data );
+		feVariableList[ feVar_I ] = Stg_ComponentFactory_ConstructByName( cf, varName, FeVariable, True, data );
 	}
 
-	_Underworld_SwarmOutput( self,
+	_Underworld_SwarmOutput_Init( self,
 				 context,
 				 materialSwarm,
-				 listCount );
+				 listCount,
+				 feVariableList);
 
 }
 
@@ -316,8 +305,15 @@ void _Underworld_SwarmOutput_Execute( void* uwSwarmOutput, void* data ) {
 
 void _Underworld_SwarmOutput_Destroy( void* uwSwarmOutput, void* data ) {
 	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*)uwSwarmOutput;
+	unsigned int feVar_I, feVarNum;
+
+	/* Destroy all StGermain based data structure this component uses */
+	feVarNum = self->sizeList;	
+	for( feVar_I = 0 ; feVar_I < feVarNum; feVar_I++ ) 
+		Stg_Component_Destroy( self->feVariableList[feVar_I], data, False );
+
+	Stg_Component_Destroy( self->materialSwarm, data, False );
 	
-	Memory_Free( self->feVariableList );
 }
 
 void _Underworld_SwarmOutput_PrintStandardFormat( MaterialPoint* particle, double* result, unsigned fieldComponentCount, FILE* outputFile ) {
@@ -370,4 +366,6 @@ void _Underworld_SwarmOutput_GetFeVariableValues(Underworld_SwarmOutput* uwSwarm
 /*-------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
 */
+
+
 

@@ -18,7 +18,7 @@
 
 	Index Underworld_Velic_solI_Register( PluginsManager* pluginsManager );
 	void* _Velic_solI_DefaultNew( Name name );
-	void _Velic_solI_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
+	void _Velic_solI_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solI_Init( Velic_solI* self, double sigma, double B, double xc );
 
 	void Velic_solI_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure );

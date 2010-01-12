@@ -18,84 +18,44 @@
 const Type RadiogenicHeatingTerm_Type = "RadiogenicHeatingTerm";
 
 RadiogenicHeatingTerm* RadiogenicHeatingTerm_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		AbstractContext*                                    context,
-		Materials_Register*                                 materials_Register )
+	Name							name,
+	FiniteElementContext*	context,
+	ForceVector*				forceVector,
+	Swarm*						integrationSwarm,
+	Materials_Register*		materials_Register )
 {
 	RadiogenicHeatingTerm* self = (RadiogenicHeatingTerm*) _RadiogenicHeatingTerm_DefaultNew( name );
 
-	RadiogenicHeatingTerm_InitAll( 
-			self,
-			forceVector,
-			integrationSwarm,
-			context,
-			materials_Register );
+	self->isConstructed = True;
+	_ForceTerm_Init( self, context, forceVector, integrationSwarm, NULL );
+	_RadiogenicHeatingTerm_Init( self, materials_Register );
 
 	return self;
 }
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-RadiogenicHeatingTerm* _RadiogenicHeatingTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		ForceTerm_AssembleElementFunction*                   _assembleElement,		
-		Name                                                name )
+RadiogenicHeatingTerm* _RadiogenicHeatingTerm_New(  RADIOGENICHEATINGTERM_DEFARGS  )
 {
 	RadiogenicHeatingTerm* self;
 	
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(RadiogenicHeatingTerm) );
-	self = (RadiogenicHeatingTerm*) _ForceTerm_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_assembleElement,
-		name );
+	assert( _sizeOfSelf >= sizeof(RadiogenicHeatingTerm) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (RadiogenicHeatingTerm*) _ForceTerm_New(  FORCETERM_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	
 	return self;
 }
 
-void _RadiogenicHeatingTerm_Init( 
-		RadiogenicHeatingTerm*                              self, 
-		AbstractContext*                                    context,
-		Materials_Register*                                 materials_Register )
-{
-	self->context             = context;
-	self->materials_Register  = materials_Register;
-}
+void _RadiogenicHeatingTerm_Init( void* forceTerm, Materials_Register* materials_Register ) {
+	RadiogenicHeatingTerm* self = (RadiogenicHeatingTerm*)forceTerm;
 
-void RadiogenicHeatingTerm_InitAll( 
-		void*                                               forceTerm,
-		ForceVector*                                        forceVector,
-		Swarm*                                              integrationSwarm,
-		AbstractContext*                                    context,
-		Materials_Register*                                 materials_Register )
-{
-	RadiogenicHeatingTerm* self = (RadiogenicHeatingTerm*) forceTerm;
-
-	ForceTerm_InitAll( self, forceVector, integrationSwarm, NULL );
-	_RadiogenicHeatingTerm_Init( self, context, materials_Register );
+	self->materials_Register = materials_Register;
 }
 
 void _RadiogenicHeatingTerm_Delete( void* forceTerm ) {
@@ -115,36 +75,37 @@ void _RadiogenicHeatingTerm_Print( void* forceTerm, Stream* stream ) {
 }
 
 void* _RadiogenicHeatingTerm_DefaultNew( Name name ) {
-	return (void*)_RadiogenicHeatingTerm_New( 
-		sizeof(RadiogenicHeatingTerm), 
-		RadiogenicHeatingTerm_Type,
-		_RadiogenicHeatingTerm_Delete,
-		_RadiogenicHeatingTerm_Print,
-		NULL,
-		_RadiogenicHeatingTerm_DefaultNew,
-		_RadiogenicHeatingTerm_Construct,
-		_RadiogenicHeatingTerm_Build,
-		_RadiogenicHeatingTerm_Initialise,
-		_RadiogenicHeatingTerm_Execute,
-		_RadiogenicHeatingTerm_Destroy,
-		_RadiogenicHeatingTerm_AssembleElement,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(RadiogenicHeatingTerm);
+	Type                                                      type = RadiogenicHeatingTerm_Type;
+	Stg_Class_DeleteFunction*                              _delete = _RadiogenicHeatingTerm_Delete;
+	Stg_Class_PrintFunction*                                _print = _RadiogenicHeatingTerm_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _RadiogenicHeatingTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _RadiogenicHeatingTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _RadiogenicHeatingTerm_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _RadiogenicHeatingTerm_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _RadiogenicHeatingTerm_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _RadiogenicHeatingTerm_Destroy;
+	ForceTerm_AssembleElementFunction*            _assembleElement = _RadiogenicHeatingTerm_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*)_RadiogenicHeatingTerm_New(  RADIOGENICHEATINGTERM_PASSARGS  );
 }
 
-void _RadiogenicHeatingTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
-	RadiogenicHeatingTerm*      self             = (RadiogenicHeatingTerm*)forceTerm;
-	AbstractContext*            context;
-	Materials_Register*         materials_Register;
+void _RadiogenicHeatingTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
+	RadiogenicHeatingTerm*	self = (RadiogenicHeatingTerm*)forceTerm;
+	Materials_Register*		materials_Register;
 
 	/* Construct Parent */
-	_ForceTerm_Construct( self, cf, data );
+	_ForceTerm_AssignFromXML( self, cf, data );
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ) ;
-
-	materials_Register = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+	materials_Register = ((PICelleratorContext*)self->context)->materials_Register; 
 	assert( materials_Register );
 
-	_RadiogenicHeatingTerm_Init( self, context, materials_Register );
+	_RadiogenicHeatingTerm_Init( self, materials_Register );
 }
 
 void _RadiogenicHeatingTerm_Build( void* forceTerm, void* data ) {
@@ -162,41 +123,45 @@ void _RadiogenicHeatingTerm_Build( void* forceTerm, void* data ) {
 	_ForceTerm_Build( self, data );
 
 	/* Sort out material extension stuff */
-	self->materialExtHandle = Materials_Register_AddMaterialExtension( 
-			self->materials_Register, self->type, sizeof(RadiogenicHeatingTerm_MaterialExt) );
+	self->materialExtHandle = Materials_Register_AddMaterialExtension( self->materials_Register, self->type, sizeof(RadiogenicHeatingTerm_MaterialExt) );
+
 	for ( material_I = 0 ; material_I < Materials_Register_GetCount( materials_Register ) ; material_I++) {
 		material = Materials_Register_GetByIndex( materials_Register, material_I );
 		materialExt = ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
 
 		/* Get List of Heating Elements from material's dictionary */
-        	list = Dictionary_Get( material->dictionary, "heatingElements" );
-    		heatingElementCount = Dictionary_Entry_Value_GetCount( list );
-        	materialExt->heatingElementList = Memory_Alloc_Array( HeatingElement, heatingElementCount, "Heating Element" );
-    		memset( materialExt->heatingElementList, 0, heatingElementCount * sizeof(HeatingElement) );
-    		materialExt->heatingElementCount = heatingElementCount;
-    	
-    		for ( heatingElement_I = 0 ; heatingElement_I < heatingElementCount ; heatingElement_I++) { 
+		list = Dictionary_Get( material->dictionary, "heatingElements" );
+  		heatingElementCount = Dictionary_Entry_Value_GetCount( list );
+     	materialExt->heatingElementList = Memory_Alloc_Array( HeatingElement, heatingElementCount, "Heating Element" );
+  		memset( materialExt->heatingElementList, 0, heatingElementCount * sizeof(HeatingElement) );
+  		materialExt->heatingElementCount = heatingElementCount;
+  	
+  		for ( heatingElement_I = 0 ; heatingElement_I < heatingElementCount ; heatingElement_I++) { 
 			heatingElement = &materialExt->heatingElementList[ heatingElement_I ];
-    			entry = Dictionary_Entry_Value_GetElement( list, heatingElement_I );
+  			entry = Dictionary_Entry_Value_GetElement( list, heatingElement_I );
 	    	
-	    		heatingElement->Q = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, "Q"));
-	    		heatingElement->lambda = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, "lambda"));
+   		heatingElement->Q = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, "Q"));
+   		heatingElement->lambda = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, "lambda"));
 	   }
 	}
 }
 
 void _RadiogenicHeatingTerm_Initialise( void* forceTerm, void* data ) {
-	RadiogenicHeatingTerm*             self             = (RadiogenicHeatingTerm*)forceTerm;
+	RadiogenicHeatingTerm* self = (RadiogenicHeatingTerm*)forceTerm;
 
 	_ForceTerm_Initialise( self, data );
 }
 
 void _RadiogenicHeatingTerm_Execute( void* forceTerm, void* data ) {
-	_ForceTerm_Execute( forceTerm, data );
+	RadiogenicHeatingTerm* self = (RadiogenicHeatingTerm*)forceTerm;
+
+	_ForceTerm_Execute( self, data );
 }
 
 void _RadiogenicHeatingTerm_Destroy( void* forceTerm, void* data ) {
-	_ForceTerm_Destroy( forceTerm, data );
+	RadiogenicHeatingTerm* self = (RadiogenicHeatingTerm*)forceTerm;
+
+	_ForceTerm_Destroy( self, data );
 }
 
 
@@ -260,4 +225,6 @@ void _RadiogenicHeatingTerm_AssembleElement( void* forceTerm, ForceVector* force
 		}
 	}
 }
+
+
 

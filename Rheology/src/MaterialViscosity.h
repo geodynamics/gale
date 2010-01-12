@@ -43,8 +43,8 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-#ifndef __Underworld_MaterialViscosity_h__
-#define __Underworld_MaterialViscosity_h__
+#ifndef __Underworld_Rheology_MaterialViscosity_h__
+#define __Underworld_Rheology_MaterialViscosity_h__
 
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 	extern const Type MaterialViscosity_Type;
@@ -59,25 +59,32 @@
 
 	struct MaterialViscosity { __MaterialViscosity };
 
+	/** Public Constructor */
+	MaterialViscosity* MaterialViscosity_New(
+      Name                  name,
+      AbstractContext*      context,
+      double                eta0 );
+
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	MaterialViscosity* _MaterialViscosity_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MATERIALVISCOSITY_DEFARGS \
+                RHEOLOGY_DEFARGS
+
+	#define MATERIALVISCOSITY_PASSARGS \
+                RHEOLOGY_PASSARGS
+
+	MaterialViscosity* _MaterialViscosity_New(  MATERIALVISCOSITY_DEFARGS  );
+
+	void _MaterialViscosity_Init( void* rheology, double eta0 );
 
 	/* 'Stg_Component' implementations */
 	void* _MaterialViscosity_DefaultNew( Name name ) ;
-	void _MaterialViscosity_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+
+	void _MaterialViscosity_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	void _MaterialViscosity_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
@@ -87,3 +94,4 @@
 		MaterialPoint*                                     materialPoint,
 		Coord                                              xi );
 #endif
+

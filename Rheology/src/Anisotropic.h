@@ -43,8 +43,8 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-#ifndef __Underworld_Anisotropic_h__
-#define __Underworld_Anisotropic_h__
+#ifndef __Underworld_Rheology_Anisotropic_h__
+#define __Underworld_Rheology_Anisotropic_h__
 
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 	extern const Type Anisotropic_Type;
@@ -61,24 +61,22 @@
 	struct Anisotropic { __Anisotropic };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	Anisotropic* _Anisotropic_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ANISOTROPIC_DEFARGS \
+                RHEOLOGY_DEFARGS
+
+	#define ANISOTROPIC_PASSARGS \
+                RHEOLOGY_PASSARGS
+
+	Anisotropic* _Anisotropic_New(  ANISOTROPIC_DEFARGS  ) ;
 
 	/* 'Stg_Component' implementations */
 	void* _Anisotropic_DefaultNew( Name name ) ;
-	void _Anisotropic_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _Anisotropic_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	void _Anisotropic_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
@@ -86,6 +84,19 @@
 		MaterialPointsSwarm*                               swarm,
 		Element_LocalIndex                                 lElement_I,
 		MaterialPoint*                                     materialPoint,
-		Coord                                              xi );
+		Coord                                              xi ) ;
+
+	Anisotropic* Anisotropic_New( 
+      Name                                               name,
+      AbstractContext*                                   context,
+		Director*                                          director,
+      double                                             viscosityRatio ) ;
+   
+	void _Anisotropic_Delete( void* _self );
+	void _Anisotropic_Destroy( void* _self, void* data );
+	void _Anisotropic_Build( void* _self, void* data );
+	void _Anisotropic_Initialise( void* _self, void* data );
+	void _Anisotropic_Init( Anisotropic* self, Director* director, double viscosityRatio );
 
 #endif
+

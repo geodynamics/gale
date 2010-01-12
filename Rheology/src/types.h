@@ -45,7 +45,7 @@
 
 #ifndef __Underworld_Rheology_types_h__
 #define __Underworld_Rheology_types_h__
-	
+
 	typedef struct ConstitutiveMatrix               ConstitutiveMatrix;
 	typedef struct ConstitutiveMatrixCartesian      ConstitutiveMatrixCartesian;
 	typedef struct Rheology_Register                Rheology_Register;

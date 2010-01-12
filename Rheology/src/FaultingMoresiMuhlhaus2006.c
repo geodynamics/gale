@@ -64,46 +64,66 @@
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type FaultingMoresiMuhlhaus2006_Type = "FaultingMoresiMuhlhaus2006";
 
+/* Public Constructor */
+FaultingMoresiMuhlhaus2006* FaultingMoresiMuhlhaus2006_New(
+      Name                  name,
+      AbstractContext*      context,
+      StrainWeakening*      strainWeakening, 
+      MaterialPointsSwarm*  materialPointsSwarm, 
+      double                minVisc, 
+		FeVariable*           pressureField,
+		FeVariable*           velocityGradientsField,
+		Director*             director,
+		double                cohesion,
+		double                cohesionAfterSoftening,
+		double                frictionCoefficient,
+		double                frictionCoefficientAfterSoftening,
+		double                minimumYieldStress,
+		Bool                  ignoreOldOrientation,
+		Bool                  updateOrientationAtMaxSoftness,
+		Bool                  updateOrientations,
+		Bool                  isotropicCorrection )
+{
+   FaultingMoresiMuhlhaus2006* self = (FaultingMoresiMuhlhaus2006*) _FaultingMoresiMuhlhaus2006_DefaultNew( name );
+
+	/* Make sure that there is strain weakening */
+	Journal_Firewall(
+		strainWeakening != NULL,
+		Journal_Register( Error_Type, self->type ),
+		"Error in func '%s' for %s '%s': FaultingMoresiMuhlhaus2006 rheology needs strain weakening.\n", 
+		__func__, self->type, self->name );
+
+   _Rheology_Init( self, (PICelleratorContext*)context );
+   _YieldRheology_Init( (YieldRheology*)self, strainWeakening, materialPointsSwarm, minVisc ); 
+   _FaultingMoresiMuhlhaus2006_Init(
+		 self,
+		 pressureField,
+		 velocityGradientsField,
+		 materialPointsSwarm,
+		 (FiniteElementContext*)context,
+		 director,
+		 cohesion,
+		 cohesionAfterSoftening,
+		 frictionCoefficient,
+		 frictionCoefficientAfterSoftening,
+		 minimumYieldStress,
+		 ignoreOldOrientation,
+		 updateOrientationAtMaxSoftness,
+		 updateOrientations,
+		 isotropicCorrection);
+
+   self->isConstructed = True;
+   return self;
+}
+
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-FaultingMoresiMuhlhaus2006* _FaultingMoresiMuhlhaus2006_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion,
-		YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator,
-		YieldRheology_HasYieldedFunction*                  _hasYielded,
-		Name                                               name ) 
+FaultingMoresiMuhlhaus2006* _FaultingMoresiMuhlhaus2006_New(  FAULTINGMORESIMUHLHAUS2006_DEFARGS  ) 
 {
 	FaultingMoresiMuhlhaus2006*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(FaultingMoresiMuhlhaus2006) );
-	self = (FaultingMoresiMuhlhaus2006*) _YieldRheology_New( 
-			sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			_getYieldCriterion,
-			_getYieldIndicator,
-			_hasYielded,
-			name );
+	assert( _sizeOfSelf >= sizeof(FaultingMoresiMuhlhaus2006) );
+	self = (FaultingMoresiMuhlhaus2006*) _YieldRheology_New(  YIELDRHEOLOGY_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	
@@ -123,7 +143,9 @@ void _FaultingMoresiMuhlhaus2006_Init(
 		double                                             frictionCoefficientAfterSoftening,
 		double                                             minimumYieldStress,
 		Bool                                               ignoreOldOrientation,
-		Bool                                               updateOrientationAtMaxSoftness)
+		Bool                                               updateOrientationAtMaxSoftness,
+		Bool                                               updateOrientations,
+		Bool                                               isotropicCorrection)
 {
 	FaultingMoresiMuhlhaus2006_Particle* particleExt;
 	StandardParticle                    materialPoint;
@@ -220,29 +242,36 @@ void _FaultingMoresiMuhlhaus2006_Init(
 			(ArithPointer) &particleExt->fullySoftened - (ArithPointer) &materialPoint,
 			Variable_DataType_Char );
 	
+	self->updateOrientations  = updateOrientations;
+	self->isotropicCorrection = isotropicCorrection;
+	
 }
 
 void* _FaultingMoresiMuhlhaus2006_DefaultNew( Name name ) {
-	return (void*) _FaultingMoresiMuhlhaus2006_New(
-		sizeof(FaultingMoresiMuhlhaus2006),
-		FaultingMoresiMuhlhaus2006_Type,
-		_YieldRheology_Delete,
-		_YieldRheology_Print,
-		_YieldRheology_Copy,
-		_FaultingMoresiMuhlhaus2006_DefaultNew,
-		_FaultingMoresiMuhlhaus2006_Construct,
-		_FaultingMoresiMuhlhaus2006_Build,
-		_FaultingMoresiMuhlhaus2006_Initialise,
-		_YieldRheology_Execute,
-		_YieldRheology_Destroy,
-		_FaultingMoresiMuhlhaus2006_ModifyConstitutiveMatrix,
-		_FaultingMoresiMuhlhaus2006_GetYieldCriterion,
-		_FaultingMoresiMuhlhaus2006_GetYieldIndicator,
-		_FaultingMoresiMuhlhaus2006_HasYielded,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(FaultingMoresiMuhlhaus2006);
+	Type                                                             type = FaultingMoresiMuhlhaus2006_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _YieldRheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _YieldRheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _YieldRheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _FaultingMoresiMuhlhaus2006_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _FaultingMoresiMuhlhaus2006_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _FaultingMoresiMuhlhaus2006_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _FaultingMoresiMuhlhaus2006_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _YieldRheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _FaultingMoresiMuhlhaus2006_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _FaultingMoresiMuhlhaus2006_ModifyConstitutiveMatrix;
+	YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion = _FaultingMoresiMuhlhaus2006_GetYieldCriterion;
+	YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator = _FaultingMoresiMuhlhaus2006_GetYieldIndicator;
+	YieldRheology_HasYieldedFunction*                         _hasYielded = _FaultingMoresiMuhlhaus2006_HasYielded;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _FaultingMoresiMuhlhaus2006_New(  FAULTINGMORESIMUHLHAUS2006_PASSARGS  );
 }
 
-void _FaultingMoresiMuhlhaus2006_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _FaultingMoresiMuhlhaus2006_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	FaultingMoresiMuhlhaus2006*   self           = (FaultingMoresiMuhlhaus2006*)rheology;
 	FeVariable*                   pressureField;
 	MaterialPointsSwarm*          materialPointsSwarm;
@@ -251,7 +280,7 @@ void _FaultingMoresiMuhlhaus2006_Construct( void* rheology, Stg_ComponentFactory
 	Director*                     director;
 	
 	/* Construct Parent */
-	_YieldRheology_Construct( self, cf, data );
+	_YieldRheology_AssignFromXML( self, cf, data );
 
 	/* Make sure that there is strain weakening */
 	Journal_Firewall(
@@ -269,9 +298,6 @@ void _FaultingMoresiMuhlhaus2006_Construct( void* rheology, Stg_ComponentFactory
 	velocityGradientsField = Stg_ComponentFactory_ConstructByKey( cf, self->name,
 			"VelocityGradientsField", FeVariable, True, data );
 	director               =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Director", Director, True, data );
-
-        self->updateOrientations = Stg_ComponentFactory_GetBool( cf, self->name, "updateOrientations", True );
-        self->isotropicCorrection = Stg_ComponentFactory_GetBool( cf, self->name, "isotropicCorrection", False );
 	
 	_FaultingMoresiMuhlhaus2006_Init( 
 			self,
@@ -286,7 +312,9 @@ void _FaultingMoresiMuhlhaus2006_Construct( void* rheology, Stg_ComponentFactory
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficientAfterSoftening", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ),
 			Stg_ComponentFactory_GetBool(   cf, self->name, "ignoreOldOrientation", False ),
-			Stg_ComponentFactory_GetBool(   cf, self->name, "updateOrientationAtMaxSoftness", True ) );
+			Stg_ComponentFactory_GetBool(   cf, self->name, "updateOrientationAtMaxSoftness", True ),
+			Stg_ComponentFactory_GetBool( cf, self->name, "updateOrientations", True ),
+         Stg_ComponentFactory_GetBool( cf, self->name, "isotropicCorrection", False ));
 }
 
 void _FaultingMoresiMuhlhaus2006_Build( void* rheology, void* data ) {
@@ -319,7 +347,6 @@ void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) {
 	MaterialPoint*                  materialPoint;
 	Index                           dof_I;
 	Dimension_Index                 dim                   = self->materialPointsSwarm->dim;
-	AbstractContext*                context = (AbstractContext*)data;
 
 	_YieldRheology_Initialise( self, data );
 	
@@ -327,24 +354,25 @@ void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) {
 	Stg_Component_Initialise( self->materialPointsSwarm, data, False );
 	Stg_Component_Initialise( self->director, data, False );
 	Stg_Component_Initialise( self->strainWeakening, data, False );
-
-	/* Initialise variables that I've created - (mainly just SwarmVariables)
-	 * This will run a Variable_Update for us */
-	Stg_Component_Initialise( self->slipRate, data, False );
-	Stg_Component_Initialise( self->slip, data, False );
-	Stg_Component_Initialise( self->brightness, data, False );
-	Stg_Component_Initialise( self->opacity, data, False );
-	Stg_Component_Initialise( self->length, data, False );
-	Stg_Component_Initialise( self->thickness, data, False );
-	Stg_Component_Initialise( self->tensileFailure, data, False );
-	Stg_Component_Initialise( self->fullySoftened, data, False );
-
-	/* We don't need to Initialise hasYieldedVariable because it's a parent variable and _YieldRheology_Initialise
-	 * has already been called */
-	particleLocalCount = self->hasYieldedVariable->variable->arraySize;
 	
 	/* If restarting from checkpoint, don't change the parameters on the particles */
-	if ( !(context && (True == context->loadFromCheckPoint) ) ) {
+	if ( self->context->loadFromCheckPoint == False ) {
+
+      /* Initialise variables that I've created - (mainly just SwarmVariables)
+       * This will run a Variable_Update for us */
+      Stg_Component_Initialise( self->slipRate, data, False );
+      Stg_Component_Initialise( self->slip, data, False );
+      Stg_Component_Initialise( self->brightness, data, False );
+      Stg_Component_Initialise( self->opacity, data, False );
+      Stg_Component_Initialise( self->length, data, False );
+      Stg_Component_Initialise( self->thickness, data, False );
+      Stg_Component_Initialise( self->tensileFailure, data, False );
+      Stg_Component_Initialise( self->fullySoftened, data, False );
+   
+      /* We don't need to Initialise hasYieldedVariable because it's a parent variable and _YieldRheology_Initialise
+       * has already been called */
+      particleLocalCount = self->hasYieldedVariable->variable->arraySize;
+      
 		for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) { 
 			Variable_SetValueChar( self->hasYieldedVariable->variable, lParticle_I, False );
 			Variable_SetValueDouble( self->slipRate->variable, lParticle_I, 0.0 );
@@ -411,6 +439,27 @@ void _FaultingMoresiMuhlhaus2006_Initialise( void* rheology, void* data ) {
 			Variable_SetValueChar(   self->fullySoftened->variable, lParticle_I, False );
 		}
 	}
+}
+
+void _FaultingMoresiMuhlhaus2006_Destroy( void* rheology, void* data ) {
+	FaultingMoresiMuhlhaus2006* self = (FaultingMoresiMuhlhaus2006*) rheology;
+
+	Stg_Component_Destroy( self->materialPointsSwarm, data, False );
+	Stg_Component_Destroy( self->pressureField, data, False );
+	Stg_Component_Destroy( self->velocityGradientsField, data, False );
+	Stg_Component_Destroy( self->director, data, False );
+	Stg_Component_Destroy( self->slipRate, data, False );
+	Stg_Component_Destroy( self->slip, data, False );
+	Stg_Component_Destroy( self->brightness, data, False );
+	Stg_Component_Destroy( self->opacity, data, False );
+	Stg_Component_Destroy( self->length, data, False );
+	Stg_Component_Destroy( self->thickness, data, False );
+	Stg_Component_Destroy( self->tensileFailure, data, False );
+	Stg_Component_Destroy( self->fullySoftened, data, False );
+
+	/* Destroy parent */
+	_YieldRheology_Destroy( self, data );
+
 }
 	
 void _FaultingMoresiMuhlhaus2006_ModifyConstitutiveMatrix( 
@@ -1134,3 +1183,5 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 	}
 	*/
 }
+
+

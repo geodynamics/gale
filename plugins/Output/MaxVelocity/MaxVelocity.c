@@ -54,7 +54,7 @@ const Type Underworld_MaxVelocity_Type = "Underworld_MaxVelocity";
 
 void Underworld_MaxVelocity_PrintHeaderToFile( void* context );
 void Underworld_MaxVelocity_Output( void* _context );
-void _Underworld_MaxVelocity_Construct( void* plugin, Stg_ComponentFactory* cf, void* data );
+void _Underworld_MaxVelocity_AssignFromXML( void* plugin, Stg_ComponentFactory* cf, void* data );
 void* _Underworld_MaxVelocity_DefaultNew( Name name );
 
 
@@ -103,7 +103,7 @@ void* _Underworld_MaxVelocity_DefaultNew( Name name ) {
 	return Codelet_New(
 		Underworld_MaxVelocity_Type,
 		_Underworld_MaxVelocity_DefaultNew,
-		_Underworld_MaxVelocity_Construct,
+		_Underworld_MaxVelocity_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,
@@ -111,7 +111,7 @@ void* _Underworld_MaxVelocity_DefaultNew( Name name ) {
 		name );
 }
 
-void _Underworld_MaxVelocity_Construct( void* plugin, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_MaxVelocity_AssignFromXML( void* plugin, Stg_ComponentFactory* cf, void* data ) {
 /*
  * 	Purpose:
  * 		This function is called on the 'Construct phase' as defined by the
@@ -180,7 +180,7 @@ void Underworld_MaxVelocity_Output( void* _context ) {
  */
 
 	UnderworldContext* context       = (UnderworldContext*) _context;
-	FeVariable*        velocityFe    = context->velocityField;
+	FeVariable*        velocityFe    = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
 	double             maxVel;
 
 	/* Find the max field component */
@@ -192,4 +192,6 @@ void Underworld_MaxVelocity_Output( void* _context ) {
 void Underworld_MaxVelocity_PrintHeaderToFile( void* context ) {
 	StgFEM_FrequentOutput_PrintString( context, "MaxVelocity" );
 }
+
+
 

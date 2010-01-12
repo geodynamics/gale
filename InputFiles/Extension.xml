@@ -3,22 +3,42 @@
 
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-        <list name="import">
-                <param> Underworld </param>
-        </list>
+	<list name="import">
+		<param> Underworld </param>
+	</list>
 
 	<include> Underworld/BaseApps/ExtensionBaseApp.xml </include>
-	
+
+	<param name="lucPluginContext">context</param>	
 	<list name="plugins" mergeType="merge">
-		<param>Underworld_EulerDeform</param>
-		
-		<!-- Output Plugins -->
-		<param>StgFEM_FrequentOutput</param>	
-		<param>Underworld_Vrms</param>	
-		<param>StgFEM_CPUTime</param>	
+		<struct>
+			<param name="Type">Underworld_EulerDeform</param>
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>	
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+			<param name="VelocityField">VelocityField</param>
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">lucPlugin</param>
+			<param name="Context">lucPluginContext</param>
+		</struct>
 	</list>
 
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
 		<!-- Shape Stuff -->
 		<struct name="backgroundShape">
 			<param name="Type">Everywhere</param>
@@ -88,7 +108,7 @@
 	<param name="dumpEvery"> 1 </param>	
 	<param name="checkpointEvery"> 0 </param>
 
-  	<!--   choose what to checkpoint
+	<!--   choose what to checkpoint
 	<list name="FieldVariablesToCheckpoint">
 		<param>VelocityField</param>
 		<param>VelocityGradientsField</param>
@@ -96,8 +116,8 @@
 	-->
 
   	<!--  restart from a previous checkpoint 
-  	<param name="restartTimestep"> 10 </param>
-  	-->
+	<param name="restartTimestep"> 10 </param>
+	-->
 
 	<!-- Non-linear stuff -->
 	<param name="nonLinearMaxIterations"> 500 </param>	
@@ -128,8 +148,6 @@
 	<!-- Set up BCs and ICs -->
 	<include> Underworld/VariableConditions/velocityBCs.extension.xml </include>
 
-	<!-- Integration Scheme configuration -->
-
 	<!-- Visualisation stuff -->
 	<include>Underworld/Viewports/StrainRateInvariantVP.xml</include>
 	<include>glucifer/window.xml</include>
@@ -138,5 +156,5 @@
 			<param name="Viewport">StrainRateInvariantVP</param>
 		</struct>
 	</struct>
- 
+
 </StGermainData>

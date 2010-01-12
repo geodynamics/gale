@@ -62,6 +62,7 @@
 	#define __Rheology \
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
 		__Stg_Component \
+		PICelleratorContext*				    context;				    \
 		/* Virtual functions go here */ \
 		Rheology_ModifyConstitutiveMatrixFunction*          _modifyConstitutiveMatrix;              \
 		/* Other info */ \
@@ -74,23 +75,24 @@
 	struct Rheology { __Rheology };
 
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	Rheology* _Rheology_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define RHEOLOGY_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix
+
+	#define RHEOLOGY_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _modifyConstitutiveMatrix
+
+	Rheology* _Rheology_New(  RHEOLOGY_DEFARGS  );
 
 	void _Rheology_Init(
-		void*                                              rheology );
+		void*                                              rheology,
+		PICelleratorContext*                               context );
 
 	void Rheology_InitAll( 
 		void*                                              rheology );
@@ -106,7 +108,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _Rheology_DefaultNew( Name name ) ;
-	void _Rheology_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _Rheology_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 	void _Rheology_Build( void* rheology, void* data );
 	void _Rheology_Initialise( void* rheology, void* data );
 	void _Rheology_Execute( void* rheology, void* data );
@@ -120,3 +122,4 @@
 		( ((Rheology*)(rheology))->nonLinear = True )
 
 #endif
+

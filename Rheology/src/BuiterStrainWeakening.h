@@ -60,28 +60,55 @@
 				
 	struct BuiterStrainWeakening { __BuiterStrainWeakening };
 
+	/** Public Constructor */
+	BuiterStrainWeakening* BuiterStrainWeakening_New(
+                Name                                               name,
+		MaterialPointsSwarm*                               swarm,
+		double                                             healingRate,
+		double                                             softeningStrain,
+		double                                             initialDamageFraction,
+		double                                             initialDamageWavenumber,
+		double                                             initialDamageWavenumberSinI,
+		double                                             initialDamageWavenumberCosI,
+		double                                             initialDamageWavenumberSinJ,
+		double                                             initialDamageWavenumberCosJ,
+		double                                             initialDamageFactor,
+		long int                                           randomSeed,
+		Stg_Shape*                                         initialStrainShape  );
+
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	BuiterStrainWeakening* _BuiterStrainWeakening_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		TimeIntegratee_CalculateTimeDerivFunction*         _calculateTimeDeriv,
-		TimeIntegratee_IntermediateFunction*               _intermediate,
-		StrainWeakening_CalcIncrementFunction*             _calcIncrement,
-		Name                                               name ) ;
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define BUITERSTRAINWEAKENING_DEFARGS \
+                STRAINWEAKENING_DEFARGS
+
+	#define BUITERSTRAINWEAKENING_PASSARGS \
+                STRAINWEAKENING_PASSARGS
+
+	BuiterStrainWeakening* _BuiterStrainWeakening_New(  BUITERSTRAINWEAKENING_DEFARGS  ) ;
 	
 	/* 'Stg_Component' implementations */
 	void* _BuiterStrainWeakening_DefaultNew( Name name ) ;
-	void _BuiterStrainWeakening_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _BuiterStrainWeakening_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 	void _BuiterStrainWeakening_Build( void* strainWeakening, void* data ) ;
 	void _BuiterStrainWeakening_Initialise( void* strainWeakening, void* data ) ;
+	void _BuiterStrainWeakening_Init(
+		BuiterStrainWeakening*                             self,
+		MaterialPointsSwarm*                               swarm,
+		double                                             healingRate,
+		double                                             softeningStrain,
+		double                                             initialDamageFraction,
+		double                                             initialDamageWavenumber,
+		double                                             initialDamageWavenumberSinI,
+		double                                             initialDamageWavenumberCosI,
+		double                                             initialDamageWavenumberSinJ,
+		double                                             initialDamageWavenumberCosJ,
+		double                                             initialDamageFactor,
+		long int                                           randomSeed,
+		Stg_Shape*                                         initialStrainShape  );
 
 #endif
+

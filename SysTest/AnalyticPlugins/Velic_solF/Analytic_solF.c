@@ -89,7 +89,7 @@ void _Velic_solF_Init( Velic_solF* self, double sigma, double etaA, double etaB,
 	self->zc = zc;
 }
 
-void _Velic_solF_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _Velic_solF_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Velic_solF* self = (Velic_solF*) analyticSolution;
 	FeVariable*              velocityField;
 	FeVariable*              pressureField;
@@ -100,7 +100,7 @@ void _Velic_solF_Construct( void* analyticSolution, Stg_ComponentFactory* cf, vo
  	double                   sigma, etaA, etaB, xc, zc;
 
 	/* Construct Parent */
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	/* Create Analytic Fields */
 	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data );
@@ -138,21 +138,27 @@ void _Velic_solF_Construct( void* analyticSolution, Stg_ComponentFactory* cf, vo
 }
 
 void* _Velic_solF_DefaultNew( Name name ) {
-	return _AnalyticSolution_New(
-			sizeof(Velic_solF),
-			Velic_solF_Type,
-			_AnalyticSolution_Delete,
-			_AnalyticSolution_Print,
-			_AnalyticSolution_Copy,
-			_Velic_solF_DefaultNew,
-			_Velic_solF_Construct,
-			_AnalyticSolution_Build,
-			_AnalyticSolution_Initialise,
-			_AnalyticSolution_Execute,
-			_AnalyticSolution_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Velic_solF);
+	Type                                                      type = Velic_solF_Type;
+	Stg_Class_DeleteFunction*                              _delete = _AnalyticSolution_Delete;
+	Stg_Class_PrintFunction*                                _print = _AnalyticSolution_Print;
+	Stg_Class_CopyFunction*                                  _copy = _AnalyticSolution_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Velic_solF_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Velic_solF_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _AnalyticSolution_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _AnalyticSolution_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _AnalyticSolution_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _AnalyticSolution_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _AnalyticSolution_New(  ANALYTICSOLUTION_PASSARGS  );
 }
 
 Index Underworld_Velic_solF_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Velic_solF_Type, "0", _Velic_solF_DefaultNew );
 }
+
+

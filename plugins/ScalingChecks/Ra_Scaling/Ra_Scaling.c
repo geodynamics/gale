@@ -63,7 +63,7 @@ void _Ra_CheckScalings_Func( void* context, void* ptrToContext ) {
   if( bfTerm != NULL && (bfTerm->type == ThermalBuoyancyForceTerm_Type ) ) {
     RheologyMaterial* material;
     Rheology* rheology;
-    Materials_Register*     materials_Register = Stg_ObjectList_Get( self->CF->registerRegister, "Materials_Register" );
+    Materials_Register*     materials_Register = self->materials_Register;
     char* errorMesg = "";
     double Ra, Ra_0, eta0, diffusivity, gravity, thermalExp=1;
     int isValid = 1; /* is this scaling check valid */
@@ -102,22 +102,17 @@ void _Ra_CheckScalings_Func( void* context, void* ptrToContext ) {
   }
 }
 
-void _Underworld_Ra_Scaling_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
-	UnderworldContext* context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
-	
-	Bool checkScaling = Stg_ComponentFactory_GetRootDictBool( cf, "Ra_ScalingCheck", True ); 
+void _Underworld_Ra_Scaling_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
+   UnderworldContext* context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 
-	Journal_DFirewall( 
-		(Bool)context->energySLE, 
-		Journal_Register( Error_Type, Underworld_Ra_Scaling_Type ), 
-		"The required energy SLE component has not been created or placed on the context.\n");	
-	
-  if ( checkScaling ) {
-    EntryPoint_Append( Context_GetEntryPoint( context, AbstractContext_EP_Build ),
+   Bool checkScaling = Stg_ComponentFactory_GetRootDictBool( cf, "Ra_ScalingCheck", True ); 
+
+   if ( checkScaling ) {
+      EntryPoint_Append( Context_GetEntryPoint( context, AbstractContext_EP_Build ),
       "Underworld CheckScalings",
       _Ra_CheckScalings_Func,
       Underworld_Ra_Scaling_Type );
-  }
+   }
 }
 
 /* This function will provide StGermain the abilty to instantiate (create) this codelet on demand. */
@@ -125,7 +120,7 @@ void* _Underworld_Ra_Scaling_DefaultNew( Name name ) {
 	return Codelet_New(
 			Underworld_Ra_Scaling_Type,
 			_Underworld_Ra_Scaling_DefaultNew,
-			_Underworld_Ra_Scaling_Construct, /* SQ NOTE: Used to be a construct extensions. */
+			_Underworld_Ra_Scaling_AssignFromXML, /* SQ NOTE: Used to be a construct extensions. */
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,
@@ -138,3 +133,5 @@ Index Underworld_Ra_Scaling_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
 	return PluginsManager_Submit( pluginsManager, Underworld_Ra_Scaling_Type, "0", _Underworld_Ra_Scaling_DefaultNew );
 }
+
+

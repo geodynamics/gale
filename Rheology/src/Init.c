@@ -55,7 +55,7 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister* componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
 
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
-	
+
 	Stg_ComponentRegister_Add( componentRegister, ConstitutiveMatrixCartesian_Type, "0", _ConstitutiveMatrixCartesian_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, MaterialViscosity_Type,       "0", _MaterialViscosity_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, RheologyMaterial_Type,        "0", _RheologyMaterial_DefaultNew );
@@ -114,9 +114,9 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	RegisterParent( MohrCoulomb_Type,                YieldRheology_Type );
 	RegisterParent( Pouliquen_etal_Type,             VonMises_Type );
 	
-	RegisterParent( StrainWeakening_Type,         TimeIntegratee_Type );
+	RegisterParent( StrainWeakening_Type,         TimeIntegrand_Type );
 	RegisterParent( BuiterStrainWeakening_Type,   StrainWeakening_Type );
-	RegisterParent( Director_Type,                TimeIntegratee_Type );
+	RegisterParent( Director_Type,                TimeIntegrand_Type );
 	RegisterParent( AlignmentSwarmVariable_Type,  SwarmVariable_Type );
 
 	RegisterParent( ConstitutiveMatrix_Type,          StiffnessMatrixTerm_Type );
@@ -130,3 +130,5 @@ Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 
 	return True;
 }
+
+

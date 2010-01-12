@@ -52,7 +52,7 @@
 
 const Type Underworld_VTKOutput_Type = "Underworld_VTKOutput";
 
-void _Underworld_VTKOutput_Construct( void* component, Stg_ComponentFactory* cf, void *data ) {
+void _Underworld_VTKOutput_AssignFromXML( void* component, Stg_ComponentFactory* cf, void *data ) {
 	UnderworldContext* context;
 
 	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
@@ -65,7 +65,7 @@ void* _Underworld_VTKOutput_DefaultNew( Name name ) {
 	return Codelet_New(
 			Underworld_VTKOutput_Type,
 			_Underworld_VTKOutput_DefaultNew,
-			_Underworld_VTKOutput_Construct,
+			_Underworld_VTKOutput_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,
@@ -89,12 +89,13 @@ void VTKOutput_fields(void *context, int myRank, int nprocs);
 void VTKOutput( void* _context ) {
 	UnderworldContext*	context = (UnderworldContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
+	IntegrationPointsSwarm*	picIntegrationPoints = (IntegrationPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, "picIntegrationPoints" );
 
         int myRank, nprocs;
         MPI_Comm comm;
 
-	if(context->picIntegrationPoints)
-	    comm = Comm_GetMPIComm( Mesh_GetCommTopology( context->picIntegrationPoints->mesh, MT_VERTEX ) );
+	if(picIntegrationPoints)
+	    comm = Comm_GetMPIComm( Mesh_GetCommTopology( picIntegrationPoints->mesh, MT_VERTEX ) );
 	else
 	    comm = MPI_COMM_WORLD;
 
@@ -102,13 +103,13 @@ void VTKOutput( void* _context ) {
         MPI_Comm_size( comm, (int*)&nprocs );
 
         /* Only dump if at the right time step. */
-        if(context->timeStep % context->dumpEvery != 0)
+        if(!context->dumpEvery || context->timeStep % context->dumpEvery != 0)
           return;
 	
         /* Write the particles and then all of the fields. */
 
-	if(context->picIntegrationPoints) {
-	    VTKOutput_particles(context->picIntegrationPoints,
+	if(picIntegrationPoints) {
+	    VTKOutput_particles(picIntegrationPoints,
 				Dictionary_GetDouble_WithDefault
 				(dictionary,"defaultDiffusivity",1.0),
 				Dictionary_GetInt_WithDefault
@@ -183,8 +184,6 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
         double yielding, viscosity, density, alpha, diffusivity;
         Material_Index material_index;
         SymmetricTensor stress;
-        BuoyancyForceTerm_MaterialExt*   materialExt;
-        Material *extension_info;
         double normal[3];
         
         IntegrationPoint* integrationparticle = (IntegrationPoint*)Swarm_ParticleAt( picswarm, lParticle_I );
@@ -435,7 +434,7 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
   FiniteElementContext*     self = (FiniteElementContext*) context;
   Index var_I;
   int header_printed=0;
-  int nDims, pn, i;
+  int nDims, i;
   int lower[3], upper[3], p_lower[3], p_upper[3];
 
   Name field_filename, pressure_filename;
@@ -484,7 +483,6 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
                                                   var_I );
     if (Stg_Class_IsInstance( fieldVar, FeVariable_Type )) {
       FeVariable* feVar;
-      Node_LocalIndex    lNode_I;
       Dof_Index          dofAtEachNodeCount;
       int *low, *up;
       Grid *grid;
@@ -738,3 +736,5 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
 
 }
      
+
+

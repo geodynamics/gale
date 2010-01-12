@@ -57,12 +57,14 @@
 const Type Rheology_Register_Type = "Rheology_Register";
 
 Rheology_Register*	Rheology_Register_New( void ) {
-	return (Rheology_Register*) _NamedObject_Register_New(
-		sizeof(Rheology_Register),
-		Rheology_Register_Type,
-		_NamedObject_Register_Delete,
-		_NamedObject_Register_Print,
-		NULL );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(Rheology_Register);
+	Type                              type = Rheology_Register_Type;
+	Stg_Class_DeleteFunction*      _delete = _NamedObject_Register_Delete;
+	Stg_Class_PrintFunction*        _print = _NamedObject_Register_Print;
+	Stg_Class_CopyFunction*          _copy = NULL;
+
+	return (Rheology_Register*) _NamedObject_Register_New(  NAMEDOBJECT_REGISTER_PASSARGS  );
 }
 
 void Rheology_Register_RunRheologies( 	
@@ -82,5 +84,7 @@ void Rheology_Register_RunRheologies(
 		Rheology_ModifyConstitutiveMatrix( rheology, constitutiveMatrix, swarm, lElement_I, materialPoint, xi ); 
 	}
 }
+
+
 
 

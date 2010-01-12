@@ -43,11 +43,11 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-#ifndef __Underworld_Utils_h__
-#define __Underworld_Utils_h__
+#ifndef __Underworld_Utils_Utils_h__
+#define __Underworld_Utils_Utils_h__
 
 	#include "types.h"
-	#include "Context.h"
+	#include "UnderworldContext.h"
 	#include "StressField.h"
 	#include "NodalPressureField.h"
 	#include "SmoothVelGradField.h"
@@ -57,6 +57,10 @@
 	#include "Underworld_SwarmOutput.h"
 	#include "RadiogenicHeatingTerm.h"
 	#include "XDMFGenerator.h"
+   #include "BaseRecoveryFeVar.h"
+   #include "SPR_StrainRate.h"
+   #include "REP_Algorithm.h"
+   #include "RecoveredFeVariable.h"
 	#include "Init.h"
 	#include "Finalise.h"
 #endif 

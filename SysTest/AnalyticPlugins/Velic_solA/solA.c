@@ -189,3 +189,5 @@ void _Velic_solutionA( double* pos,
 	 }
 	 */
 }
+
+

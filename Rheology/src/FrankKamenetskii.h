@@ -43,8 +43,8 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-#ifndef __Underworld_FrankKamenetskii_h__
-#define __Underworld_FrankKamenetskii_h__
+#ifndef __Underworld_Rheology_FrankKamenetskii_h__
+#define __Underworld_Rheology_FrankKamenetskii_h__
 
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 	extern const Type FrankKamenetskii_Type;
@@ -63,26 +63,26 @@
 	struct FrankKamenetskii { __FrankKamenetskii };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	FrankKamenetskii* _FrankKamenetskii_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define FRANKKAMENETSKII_DEFARGS \
+                RHEOLOGY_DEFARGS
+
+	#define FRANKKAMENETSKII_PASSARGS \
+                RHEOLOGY_PASSARGS
+
+	FrankKamenetskii* _FrankKamenetskii_New(  FRANKKAMENETSKII_DEFARGS  );
 
 	
 	/* 'Stg_Component' implementations */
 	void* _FrankKamenetskii_DefaultNew( Name name ) ;
-	void _FrankKamenetskii_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
-
+	void _FrankKamenetskii_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
+   void _FrankKamenetskii_Destroy( void* rheology, void* data );
+   void _FrankKamenetskii_Init( FrankKamenetskii* self, FeVariable* temperatureField, double eta0, double theta );
+   
 	void _FrankKamenetskii_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
 		ConstitutiveMatrix*                                constitutiveMatrix,
@@ -91,3 +91,4 @@
 		MaterialPoint*                                     materialPoint,
 		Coord                                              xi );
 #endif
+

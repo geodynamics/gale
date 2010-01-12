@@ -59,39 +59,18 @@
 const Type Rheology_Type = "Rheology";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-Rheology* _Rheology_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name ) 
+Rheology* _Rheology_New(  RHEOLOGY_DEFARGS  ) 
 {
 	Rheology*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(Rheology) );
-	self = (Rheology*) _Stg_Component_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name,
-			NON_GLOBAL );
+	assert( _sizeOfSelf >= sizeof(Rheology) );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (Rheology*) _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	self->_modifyConstitutiveMatrix = _modifyConstitutiveMatrix;
@@ -99,18 +78,20 @@ Rheology* _Rheology_New(
 	return self;
 }
 
-void _Rheology_Init(
-		void*                                              rheology )
+void _Rheology_Init( void* rheology, PICelleratorContext* context )
 {
 	Rheology* self = (Rheology*)rheology;
 
+	self->context = context;
 	self->debug = Journal_Register( Debug_Type, self->type ); /* TODO make child of Underworld_Debug */
 }
 
 void _Rheology_Delete( void* rheology ) {
 	Rheology*					self = (Rheology*)rheology;
+
 	_Stg_Component_Delete( self );
 }
+
 void _Rheology_Print( void* rheology, Stream* stream ) {}
 
 void* _Rheology_Copy( void* rheology, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
@@ -120,14 +101,21 @@ void* _Rheology_Copy( void* rheology, void* dest, Bool deep, Name nameExt, PtrMa
 	return (void*) self;
 }
 
-void _Rheology_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
-	Rheology*           self                 = (Rheology*)rheology;
+void _Rheology_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
+	Rheology*            self = (Rheology*)rheology;
+	PICelleratorContext* context;
 
-	_Rheology_Init( self );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", PICelleratorContext, False, data );
+	if( !context ) 
+		context = Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
+
+	_Rheology_Init( self, context );
 }
 
 void _Rheology_Build( void* rheology, void* data ) {}
 void _Rheology_Initialise( void* rheology, void* data ) {}
 void _Rheology_Execute( void* rheology, void* data ) {}
 void _Rheology_Destroy( void* rheology, void* data ) {}
+
+
 

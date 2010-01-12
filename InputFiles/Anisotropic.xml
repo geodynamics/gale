@@ -9,15 +9,38 @@
 
 	<include> Underworld/BaseApps/ThermalConvectionPIC.xml </include>
 	
+	<param name="lucPluginContext">context</param>
 	<list name="plugins" mergeType="merge">
-		<!-- Output Plugins -->
-		<param>StgFEM_FrequentOutput</param>	
-		<param>Underworld_Nusselt</param>	
-		<param>Underworld_Vrms</param>	
-		<param>StgFEM_CPUTime</param>	
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Nusselt</param>	
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>	
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+			<param name="VelocityField">VelocityField</param>
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">lucPlugin</param>
+			<param name="Context">lucPluginContext</param>
+		</struct>
 	</list>
 
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+			<!--<param name="IntegrationSwarm">picIntegrationPoints</param>-->
+		</struct>
 		<struct name="director">
 			<param name="Type">Director</param>
 			<param name="TimeIntegrator">timeIntegrator</param>
@@ -58,21 +81,21 @@
 	</struct>
 
 	<!-- Simulation control -->
-	<param name="maxTimeSteps"> 20000 </param>
+	<param name="maxTimeSteps"> 200000 </param>
 	<param name="outputPath"> ./output </param>
 	<param name="dumpEvery"> 1 </param>	
 	<param name="checkpointEvery"> 0 </param>
 
-        <!--   choose what to checkpoint
+	<!-- choose what to checkpoint
 	<list name="FieldVariablesToCheckpoint">
 		<param>VelocityField</param>
 		<param>VelocityGradientsField</param>
 	</list>
 	-->
 
-        <!--  restart from a previous checkpoint 
-        <param name="restartTimestep"> 10 </param>
-         -->
+	<!--  restart from a previous checkpoint 
+	<param name="restartTimestep"> 10 </param>
+	-->
 	
 	<param name="Ra"> 5.6e5 </param>	
 	
@@ -119,7 +142,6 @@
 			<param name="Type">lucColourMap</param>
 			<param name="colours">Yellow Black</param>
 		</struct>
-		<!-- Drawing Objects -->
 		<struct name="alignmentDrawingObject">
 			<param name="Type">lucSwarmViewer</param>
 			<param name="Swarm">materialSwarm</param>
@@ -144,5 +166,5 @@
 			<param name="Viewport">TemperatureAndVelocityArrowsVP VelocityMagnitudeVP AlignmentVP</param>
 		</struct>
 	</struct>
- 
+
 </StGermainData>

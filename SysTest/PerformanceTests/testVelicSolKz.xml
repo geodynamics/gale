@@ -10,12 +10,29 @@ is the y-axis in the code
 	<include> Underworld/BaseApps/ThermalConvection.xml </include>
 	
 	<list name="plugins" mergeType="merge">
-		<!-- Output Plugins -->
-		<param>StgFEM_FrequentOutput</param>	
-		<param>Underworld_Nusselt</param>	
-		<param>Underworld_Vrms</param>	
-		<param>StgFEM_CPUTime</param>	
-		<param>Underworld_Velic_solKz</param>	
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>	
+			<param name="Context">context</param>	
+		</struct>
+		<struct>
+         <param name="Type">Underworld_Nusselt</param>
+         <param name="Context">context</param>
+         <param name="GaussSwarm">gaussSwarm</param>
+      </struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>	
+			<param name="Context">context</param>	
+			<param name="VelocityField">VelocityField</param>	
+			<param name="GaussSwarm">gaussSwarm</param>	
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>	
+			<param name="Context">context</param>	
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Velic_solKz</param>	
+			<param name="Context">context</param>	
+		</struct>
 	</list>
 
 	<struct name="pluginData">
@@ -31,7 +48,7 @@ is the y-axis in the code
 		<param name="useReferenceSolutionFromFile">false</param>
 		<param name="appendToAnalysisFile">false</param>
 		<param name="epsilon">1e-3</param>
-		<param name="context">context</param>
+		<param name="Context">context</param>
 	</struct>
 
 	<struct name="temperatureICs">
@@ -50,15 +67,17 @@ is the y-axis in the code
 	    </list>
 	</struct>
 	
-
-  <param name="solKz_sigma"> 1.0 </param>
+	<param name="solKz_sigma"> 1.0 </param>
 	<param name="solKz_twiceB"> 2.0 </param>
-  <!-- solKz_m and wavenumberY must be equal -->
+	<!-- solKz_m and wavenumberY must be equal -->
 	<param name="solKz_m"> 1.0 </param> <param name="wavenumberY">1.0</param>
-  <!-- solKz_n and wavenumberX must be equal -->
+	<!-- solKz_n and wavenumberX must be equal -->
 	<param name="solKz_n"> 1.0 </param> <param name="wavenumberX">1.0</param>
 	
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
 		<struct name="rheology">
 			<param name="Type">DepthDependentViscosity</param>
 			<param name="Mesh">linearMesh</param>

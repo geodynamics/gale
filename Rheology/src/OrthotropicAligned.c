@@ -47,39 +47,13 @@
 const Type OrthotropicAligned_Type = "OrthotropicAligned";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-OrthotropicAligned* _OrthotropicAligned_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name ) 
+OrthotropicAligned* _OrthotropicAligned_New(  ORTHOTROPICALIGNED_DEFARGS  ) 
 {
 	OrthotropicAligned*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(OrthotropicAligned) );
-	self = (OrthotropicAligned*) _Rheology_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			name );
+	assert( _sizeOfSelf >= sizeof(OrthotropicAligned) );
+	self = (OrthotropicAligned*) _Rheology_New(  RHEOLOGY_PASSARGS  );
 	
 	return self;
 }
@@ -105,23 +79,27 @@ void _OrthotropicAligned_Init( OrthotropicAligned* self,
 }
 
 void* _OrthotropicAligned_DefaultNew( Name name ) {
-	return (void*) _OrthotropicAligned_New(
-		sizeof(OrthotropicAligned),
-		OrthotropicAligned_Type,
-		_Rheology_Delete,
-		_Rheology_Print,
-		_Rheology_Copy,
-		_OrthotropicAligned_DefaultNew,
-		_OrthotropicAligned_Construct,
-		_Rheology_Build,
-		_Rheology_Initialise,
-		_Rheology_Execute,
-		_Rheology_Destroy,
-		_OrthotropicAligned_ModifyConstitutiveMatrix,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(OrthotropicAligned);
+	Type                                                             type = OrthotropicAligned_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _Rheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _Rheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _Rheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _OrthotropicAligned_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _OrthotropicAligned_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _Rheology_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _Rheology_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _Rheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _Rheology_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _OrthotropicAligned_ModifyConstitutiveMatrix;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _OrthotropicAligned_New(  ORTHOTROPICALIGNED_PASSARGS  );
 }
 
-void _OrthotropicAligned_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _OrthotropicAligned_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	OrthotropicAligned*     self = (OrthotropicAligned*)rheology;
         /*	Director*        director; */
 	double viscosity1;
@@ -132,7 +110,7 @@ void _OrthotropicAligned_Construct( void* rheology, Stg_ComponentFactory* cf, vo
 	double viscosity6;
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 	
         /*	director =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Director", Director,  True  ) ; */
 	viscosity1 = Stg_ComponentFactory_GetDouble( cf, self->name, "viscosity1",  True );
@@ -215,3 +193,5 @@ void _OrthotropicAligned_UpdateDrawParameters( void* rheology )
 	/* do stuff */
 }
 #endif
+
+

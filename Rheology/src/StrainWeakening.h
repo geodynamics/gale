@@ -67,7 +67,7 @@
 	/** Rheology class contents - this is defined as a macro so that sub-classes of this class can use this macro at the start of the definition of their struct */
 	#define __StrainWeakening \
 		/* Parent info */ \
- 		__TimeIntegratee \
+ 		__TimeIntegrand \
 		/* Virtual functions go here */ \
 		StrainWeakening_CalcIncrementFunction* _calcIncrement;                    \
 		/* General Info */\
@@ -89,24 +89,38 @@
 		long int                               randomSeed;
 				
 	struct StrainWeakening { __StrainWeakening };
+
+	/** Public Constructor */
+	StrainWeakening* StrainWeakening_New(
+		Name                                               name,
+		MaterialPointsSwarm*                               swarm,
+		double                                             healingRate,
+		double                                             softeningStrain,
+		double                                             initialDamageFraction,
+		double                                             initialDamageWavenumber,
+		double                                             initialDamageWavenumberSinI,
+		double                                             initialDamageWavenumberCosI,
+		double                                             initialDamageWavenumberSinK,
+		double                                             initialDamageWavenumberCosK,
+		double                                             initialDamageFactor,
+		long int                                           randomSeed,
+		Stg_Shape*                                         initialStrainShape );
  
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	StrainWeakening* _StrainWeakening_New( 
-		SizeT                                              sizeOfSelf, 
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		TimeIntegratee_CalculateTimeDerivFunction*         _calculateTimeDeriv,
-		TimeIntegratee_IntermediateFunction*               _intermediate,
-		StrainWeakening_CalcIncrementFunction*             _calcIncrement,
-		Name                                               name ) ;
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STRAINWEAKENING_DEFARGS \
+                TIMEINTEGRAND_DEFARGS, \
+                StrainWeakening_CalcIncrementFunction*  _calcIncrement
+
+	#define STRAINWEAKENING_PASSARGS \
+                TIMEINTEGRAND_PASSARGS, \
+	        _calcIncrement
+
+	StrainWeakening* _StrainWeakening_New(  STRAINWEAKENING_DEFARGS  ) ;
 
 	void _StrainWeakening_Init(
 		StrainWeakening*                                   self,
@@ -125,7 +139,7 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _StrainWeakening_DefaultNew( Name name ) ;
-	void _StrainWeakening_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _StrainWeakening_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 	void _StrainWeakening_Build( void* strainWeakening, void* data ) ;
 	void _StrainWeakening_Initialise( void* strainWeakening, void* data ) ;
 	
@@ -159,3 +173,4 @@
 	double StrainWeakening_GetInitialDamageFraction( void* strainWeakening, void* particle );
 
 #endif
+

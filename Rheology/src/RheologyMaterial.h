@@ -47,13 +47,13 @@
 #define __Underworld_Rheology_RheologyMaterial_h__
 
 	/* typedefs for virtual functions: */
-	typedef void  (RheologyMaterial_RunRheologiesFunction)            (
-		void*                                              rheologyMaterial,
-		ConstitutiveMatrix*                                constitutiveMatrix,
-		MaterialPointsSwarm*                               swarm,
-		Element_LocalIndex                                 lElement_I,
-		MaterialPoint*                                     materialPoint,
-		Coord                                              xi );
+	typedef void (RheologyMaterial_RunRheologiesFunction) (
+		void*						rheologyMaterial,
+		ConstitutiveMatrix*	constitutiveMatrix,
+		MaterialPointsSwarm*	swarm,
+		Element_LocalIndex	lElement_I,
+		MaterialPoint*			materialPoint,
+		Coord						xi );
 
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 	extern const Type RheologyMaterial_Type;
@@ -63,91 +63,94 @@
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
 		__Material \
 		/* Virtual functions go here */ \
-		RheologyMaterial_RunRheologiesFunction*            _runRheologies;    \
+		RheologyMaterial_RunRheologiesFunction*	_runRheologies; \
 		/* Other info */ \
-		Rheology_Register*                                 rheology_Register; \
-		Compressible*                                      compressible;      \
+		Rheology_Register*								rheology_Register; \
+		Compressible*										compressible; \
 		/* necessary for the refactored PDE scheme */ \
-		Bool						   isCompressible;
+		Bool													isCompressible;
 
 	struct RheologyMaterial { __RheologyMaterial };
 
 	RheologyMaterial* RheologyMaterial_New( 
-		Name                             name,
-		Stg_Shape*                       shape,
-		Dictionary*                      materialDictionary,
-		Materials_Register*              materialRegister,
-		Rheology**                       rheologyList,
-		Rheology_Index                   rheologyCount,
-		Compressible*                    compressible );
+		Name						name,
+		PICelleratorContext*	context,
+		Stg_Shape*				shape,
+		Dictionary*				materialDictionary,
+		Materials_Register*	materialRegister,
+		Rheology**				rheologyList,
+		Rheology_Index			rheologyCount,
+		Compressible*			compressible );
 
 	void* _RheologyMaterial_DefaultNew( Name name ) ;
 
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	RheologyMaterial* _RheologyMaterial_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		RheologyMaterial_RunRheologiesFunction*            _runRheologies,
-		Name                                               name,
-		Stg_Shape*                                         shape,
-		Dictionary*                                        materialDictionary,
-		Materials_Register*                                materialRegister,
-		Rheology**                                         rheologyList,
-		Rheology_Index                                     rheologyCount,
-		Compressible*                                      compressible );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
-	void _RheologyMaterial_Construct( void* rheologyMaterial, Stg_ComponentFactory* cf, void* data );
+	#define RHEOLOGYMATERIAL_DEFARGS \
+                MATERIAL_DEFARGS, \
+                RheologyMaterial_RunRheologiesFunction*  _runRheologies
+
+	#define RHEOLOGYMATERIAL_PASSARGS \
+                MATERIAL_PASSARGS, \
+	        _runRheologies
+
+	RheologyMaterial* _RheologyMaterial_New(  RHEOLOGYMATERIAL_DEFARGS  );
+
+	void _RheologyMaterial_AssignFromXML( void* rheologyMaterial, Stg_ComponentFactory* cf, void* data );
 
 	void _RheologyMaterial_Init(
-		void*                                              rheologyMaterial,
-		Rheology**                                         rheologyList,
-		Rheology_Index                                     rheologyCount,
-		Compressible*                                      compressible,
-	        Bool						   isCompressible );
+		void*				rheologyMaterial,
+		Rheology**		rheologyList,
+		Rheology_Index	rheologyCount,
+		Compressible*	compressible,
+		Bool				isCompressible );
 
 	/* 'Stg_Class' implementations */
 	void _RheologyMaterial_Delete( void* rheologyMaterial );
+
 	void _RheologyMaterial_Print( void* rheologyMaterial, Stream* stream );
+
 	#define RheologyMaterial_Copy( self ) \
 		(RheologyMaterial*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define RheologyMaterial_DeepCopy( self ) \
 		(RheologyMaterial*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
+
 	void* _RheologyMaterial_Copy( void* rheologyMaterial, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' implementations */
 	void _RheologyMaterial_Build( void* rheologyMaterial, void* data );
+
 	void _RheologyMaterial_Initialise( void* rheologyMaterial, void* data );
+
 	void _RheologyMaterial_Execute( void* rheologyMaterial, void* data );
+
 	void _RheologyMaterial_Destroy( void* rheologyMaterial, void* data );
 	
 	void RheologyMaterial_RunRheologies( 	
-		void*                                              rheologyMaterial,
-		ConstitutiveMatrix*                                constitutiveMatrix,
-		MaterialPointsSwarm*                               swarm,
-		Element_LocalIndex                                 lElement_I,
-		MaterialPoint*                                     materialPoint,
-		Coord                                              xi );
+		void*						rheologyMaterial,
+		ConstitutiveMatrix*	constitutiveMatrix,
+		MaterialPointsSwarm*	swarm,
+		Element_LocalIndex	lElement_I,
+		MaterialPoint*			materialPoint,
+		Coord						xi );
 
 	void _RheologyMaterial_RunRheologies( 	
-		void*                                              rheologyMaterial,
-		ConstitutiveMatrix*                                constitutiveMatrix,
-		MaterialPointsSwarm*                               swarm,
-		Element_LocalIndex                                 lElement_I,
-		MaterialPoint*                                     materialPoint,
-		Coord                                              xi );
+		void*						rheologyMaterial,
+		ConstitutiveMatrix*	constitutiveMatrix,
+		MaterialPointsSwarm*	swarm,
+		Element_LocalIndex	lElement_I,
+		MaterialPoint*			materialPoint,
+		Coord						xi );
 
 	Bool RheologyMaterial_IsNonLinear( void* rheologyMaterial ) ;
 
 	Rheology* RheologyMaterial_GetRheologyByType( void* rheologyMaterial, Type type ) ;
+
 	Bool RheologyMaterial_HasRheology( void* rheologyMaterial, void* rheology ) ;
 
 #endif
+

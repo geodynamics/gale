@@ -57,40 +57,30 @@
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type FrankKamenetskii_Type = "FrankKamenetskii";
 
+/* Public Constructor */
+FrankKamenetskii* FrankKamenetskii_New(
+      Name                  name,
+      AbstractContext*      context,
+      FeVariable*           temperatureField, 
+      double                eta0,
+      double                theta )
+{
+   FrankKamenetskii* self = (FrankKamenetskii*) _FrankKamenetskii_DefaultNew( name );
+
+   _Rheology_Init( self, (PICelleratorContext*)context );
+   _FrankKamenetskii_Init( self, temperatureField, eta0, theta );
+   self->isConstructed = True;
+   return self;
+}
+
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-FrankKamenetskii* _FrankKamenetskii_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name ) 
+FrankKamenetskii* _FrankKamenetskii_New(  FRANKKAMENETSKII_DEFARGS  ) 
 {
 	FrankKamenetskii*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(FrankKamenetskii) );
-	self = (FrankKamenetskii*) _Rheology_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			name );
+	assert( _sizeOfSelf >= sizeof(FrankKamenetskii) );
+	self = (FrankKamenetskii*) _Rheology_New(  RHEOLOGY_PASSARGS  );
 	
 	return self;
 }
@@ -102,28 +92,32 @@ void _FrankKamenetskii_Init( FrankKamenetskii* self, FeVariable* temperatureFiel
 }
 
 void* _FrankKamenetskii_DefaultNew( Name name ) {
-	return (void*) _FrankKamenetskii_New(
-		sizeof(FrankKamenetskii),
-		FrankKamenetskii_Type,
-		_Rheology_Delete,
-		_Rheology_Print,
-		_Rheology_Copy,
-		_FrankKamenetskii_DefaultNew,
-		_FrankKamenetskii_Construct,
-		_Rheology_Build,
-		_Rheology_Initialise,
-		_Rheology_Execute,
-		_Rheology_Destroy,
-		_FrankKamenetskii_ModifyConstitutiveMatrix,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(FrankKamenetskii);
+	Type                                                             type = FrankKamenetskii_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _Rheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _Rheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _Rheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _FrankKamenetskii_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _FrankKamenetskii_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _Rheology_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _Rheology_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _Rheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _FrankKamenetskii_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _FrankKamenetskii_ModifyConstitutiveMatrix;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _FrankKamenetskii_New(  FRANKKAMENETSKII_PASSARGS  );
 }
 
-void _FrankKamenetskii_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _FrankKamenetskii_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	FrankKamenetskii*  self = (FrankKamenetskii*)rheology;
 	FeVariable* temperatureField;
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 	
 	/* TODO: KeyFallback soon to be deprecated/updated */
 	temperatureField = Stg_ComponentFactory_ConstructByNameWithKeyFallback( 
@@ -141,6 +135,16 @@ void _FrankKamenetskii_Construct( void* rheology, Stg_ComponentFactory* cf, void
 			temperatureField,
 			Stg_ComponentFactory_GetDouble( cf, self->name, "eta0", 1.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "theta", 0.0 ) );
+}
+
+void _FrankKamenetskii_Destroy( void* rheology, void* data ) {
+	FrankKamenetskii*          self               = (FrankKamenetskii*) rheology;
+
+	Stg_Component_Destroy( self->temperatureField, data, False );
+
+	/* Destroy parent */
+	_Rheology_Destroy( self, data );
+
 }
 
 void _FrankKamenetskii_ModifyConstitutiveMatrix( 
@@ -162,3 +166,5 @@ void _FrankKamenetskii_ModifyConstitutiveMatrix(
 	viscosity = self->eta0 * exp( - self->theta * temperature );
 	ConstitutiveMatrix_SetIsotropicViscosity( constitutiveMatrix, viscosity );
 }
+
+

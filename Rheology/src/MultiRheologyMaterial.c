@@ -62,159 +62,89 @@ const Type MultiRheologyMaterial_Type = "MultiRheologyMaterial";
 
 
 MultiRheologyMaterial* MultiRheologyMaterial_New( 
-		Name                             name,
-		Stg_Shape*                       shape,
-		Dictionary*                      materialDictionary,
-		Materials_Register*              materialRegister,
-		Rheology**                       rheologyList,
-		Rheology_Index                   rheologyCount,
-		Compressible*                    compressible,
-		Rheology***                      rheologyListList,
-		Rheology_Index*                  rheologyCountList, 
-		Index                            rheologyListCount ) 
+	Name						name,
+	PICelleratorContext*	context,
+	Stg_Shape*				shape,
+	Dictionary*				materialDictionary,
+	Materials_Register*	materialRegister,
+	Rheology**				rheologyList,
+	Rheology_Index			rheologyCount,
+	Compressible*			compressible,
+	Rheology***				rheologyListList,
+	Rheology_Index*		rheologyCountList, 
+	Index						rheologyListCount ) 
 {
-	return (void*) _MultiRheologyMaterial_New(
-		sizeof(MultiRheologyMaterial),
-		MultiRheologyMaterial_Type,
-		_MultiRheologyMaterial_Delete,
-		_RheologyMaterial_Print,
-		_RheologyMaterial_Copy,
-		_MultiRheologyMaterial_DefaultNew,
-		_MultiRheologyMaterial_Construct,
-		_RheologyMaterial_Build,
-		_RheologyMaterial_Initialise,
-		_RheologyMaterial_Execute,
-		_RheologyMaterial_Destroy,
-		_MultiRheologyMaterial_RunRheologies,
-		name,
-		shape,
-		materialDictionary,
-		materialRegister,
-		rheologyList,
-		rheologyCount,
-		compressible,
-		rheologyListList,
-		rheologyCountList,
-		rheologyListCount );
+	MultiRheologyMaterial* self = _MultiRheologyMaterial_DefaultNew( name );
+
+	self->isConstructed = True;
+	_Material_Init( self, context, shape, materialDictionary, materialRegister );
+   _RheologyMaterial_Init( self, rheologyList, rheologyCount, compressible, False );
+	_MultiRheologyMaterial_Init( self, rheologyListList, rheologyCountList, rheologyListCount );
+	
+	return self;
 }
 
 
 void* _MultiRheologyMaterial_DefaultNew( Name name ) {
-	return (void*) _MultiRheologyMaterial_New(
-		sizeof(MultiRheologyMaterial),
-		MultiRheologyMaterial_Type,
-		_MultiRheologyMaterial_Delete,
-		_RheologyMaterial_Print,
-		_RheologyMaterial_Copy,
-		_MultiRheologyMaterial_DefaultNew,
-		_MultiRheologyMaterial_Construct,
-		_RheologyMaterial_Build,
-		_RheologyMaterial_Initialise,
-		_RheologyMaterial_Execute,
-		_RheologyMaterial_Destroy,
-		_MultiRheologyMaterial_RunRheologies,
-		name,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		0,
-		NULL,
-		NULL,
-		NULL,
-		0
-		);
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(MultiRheologyMaterial);
+	Type                                                      type = MultiRheologyMaterial_Type;
+	Stg_Class_DeleteFunction*                              _delete = _RheologyMaterial_Delete;
+	Stg_Class_PrintFunction*                                _print = _RheologyMaterial_Print;
+	Stg_Class_CopyFunction*                                  _copy = _RheologyMaterial_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _MultiRheologyMaterial_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _MultiRheologyMaterial_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _RheologyMaterial_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _RheologyMaterial_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _RheologyMaterial_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _MultiRheologyMaterial_Destroy;
+	RheologyMaterial_RunRheologiesFunction*         _runRheologies = _MultiRheologyMaterial_RunRheologies;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _MultiRheologyMaterial_New(  MULTIRHEOLOGYMATERIAL_PASSARGS  );
 }
 
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-MultiRheologyMaterial* _MultiRheologyMaterial_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		RheologyMaterial_RunRheologiesFunction*            _runRheologies,
-		Name                                               name,
-		Stg_Shape*                                         shape,
-		Dictionary*                                        materialDictionary,
-		Materials_Register*                                materialRegister,
-		Rheology**                                         rheologyList,
-		Rheology_Index                                     rheologyCount,
-		Compressible*                                      compressible,
-		Rheology***                                        rheologyListList,
-		Rheology_Index*                                    rheologyCountList, 
-		Index                                              rheologyListCount
-		) 
+MultiRheologyMaterial* _MultiRheologyMaterial_New(  MULTIRHEOLOGYMATERIAL_DEFARGS  ) 
 {
 	MultiRheologyMaterial*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up
 	 *  the hierarchy tree. At the beginning of the tree it will allocate memory of the size of
 	 *  object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(MultiRheologyMaterial) );
-	self = (MultiRheologyMaterial*) _RheologyMaterial_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_runRheologies,
-			name,
-			shape,
-			materialDictionary,
-			materialRegister,
-			rheologyList,
-			rheologyCount,
-			compressible );
+	assert( _sizeOfSelf >= sizeof(MultiRheologyMaterial) );
+	self = (MultiRheologyMaterial*) _RheologyMaterial_New(  RHEOLOGYMATERIAL_PASSARGS  );
 
-	_MultiRheologyMaterial_Init(
-		self,
-		rheologyListList,
-		rheologyCountList,
-		rheologyListCount );
-	
 	return self;
 }
 
 
-void _MultiRheologyMaterial_Construct( void* material, Stg_ComponentFactory* cf, void* data ){
+void _MultiRheologyMaterial_AssignFromXML( void* material, Stg_ComponentFactory* cf, void* data ){
 	MultiRheologyMaterial*  self = (MultiRheologyMaterial*)material;
 	Rheology***             rheologyListList;
 	Rheology_Index*         rheologyCountList;
 	Index                   rheologyListCount;
 	Index                   rheologyList_I;
-	Dictionary*             currDictionary     = Dictionary_GetDictionary( cf->componentDict, self->name );
+	Dictionary*             currDictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 	Name                    rheologyName;
 	Dictionary_Entry_Value* multiRheologyList;
 	Dictionary_Entry_Value* rheologyList;
 	Dictionary_Entry_Value* rheologyEntry;
 	Rheology_Index          rheology_I;
-	Stream*                 stream             = cf->infoStream;
+	Stream*                 stream = cf->infoStream;
 
-	/* Construct Parent */
-	_Material_Construct( self, cf, data );
-	_RheologyMaterial_Init( 
-		self, 
-		NULL, 
-		0, 
-		Stg_ComponentFactory_ConstructByKey( cf, self->name, "Compressible", Compressible, False, data ),
-	        Stg_ComponentFactory_GetBool( cf, self->name, "isCompressible", False ) );
+	_RheologyMaterial_AssignFromXML( self, cf, data );
 
 	multiRheologyList = Dictionary_Get( currDictionary, "MultiRheologies" );
-	assert( multiRheologyList );
+	Journal_Firewall(
+		multiRheologyList != NULL,
+		Journal_Register( Error_Type, self->type ),
+		"Error in func '%s' for %s '%s': MultiRheologyMaterial rheology needs a rheology list.\n", 
+		__func__, self->type, self->name );
+	
 	rheologyListCount = Dictionary_Entry_Value_GetCount( multiRheologyList );
 
 	rheologyCountList = Memory_Alloc_Array( Rheology_Index, rheologyListCount, "rheologyCountList" );
@@ -286,16 +216,16 @@ void _MultiRheologyMaterial_Init(
 }
 
 
-void _MultiRheologyMaterial_Delete( void* material ){
+void _MultiRheologyMaterial_Destroy( void* material, void* data ){
 	MultiRheologyMaterial*  self = (MultiRheologyMaterial*)material;
 	Index                   rheology_Register_I;
 
 	for ( rheology_Register_I = 0 ; rheology_Register_I < self->rheology_RegisterCount ; rheology_Register_I++ ) {
-		Stg_Class_Delete( self->rheology_RegisterList[ rheology_Register_I ] );
+		Stg_Component_Destroy( self->rheology_RegisterList[ rheology_Register_I ], data, False );
 	}
 	Memory_Free( self->rheology_RegisterList );
 
-	_RheologyMaterial_Delete( self );
+	_RheologyMaterial_Destroy( self, data );
 }
 
 
@@ -330,3 +260,5 @@ void _MultiRheologyMaterial_RunRheologies(
 
 	ConstitutiveMatrix_SetIsotropicViscosity( constitutiveMatrix, 1.0/oneOnViscosity );
 }
+
+

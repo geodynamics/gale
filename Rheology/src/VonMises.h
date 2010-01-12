@@ -64,30 +64,41 @@
                 double                                              stressInv;
 
 	struct VonMises { __VonMises };
+
+   /* Public Constructor */
+	VonMises* VonMises_New(
+      Name                  name,
+      AbstractContext*      context,
+      StrainWeakening*      strainWeakening, 
+      MaterialPointsSwarm*  materialPointsSwarm, 
+      double                minVisc, 
+      FeVariable*           strainRateField,
+      SwarmVariable*        swarmStrainRate,
+      double                cohesion,
+      double                cohesionAfterSoftening,
+      Bool                  strainRateSoftening );
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	VonMises* _VonMises_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion,
-		YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator,
-		YieldRheology_HasYieldedFunction*                  _hasYielded,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define VONMISES_DEFARGS \
+                YIELDRHEOLOGY_DEFARGS
+
+	#define VONMISES_PASSARGS \
+                YIELDRHEOLOGY_PASSARGS
+
+	VonMises* _VonMises_New(  VONMISES_DEFARGS  );
 	
 	/* 'Stg_Component' implementations */
 	void* _VonMises_DefaultNew( Name name ) ;
-	void _VonMises_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
-
+	void _VonMises_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _VonMises_Init( VonMises* self, FeVariable* strainRateField, SwarmVariable* swarmStrainRate, double cohesion, double cohesionAfterSoftening, Bool strainRateSoftening );
+   void _VonMises_Destroy( void* rheology, void* data );
+   void _VonMises_Build( void* rheology, void* data );
+   void _VonMises_Initialise( void* rheology, void* data );
 	/* 'YieldRheology' implementations */
 	double _VonMises_GetYieldCriterion( 
 		void*                            vonMises,
@@ -115,3 +126,4 @@
 		double                           yieldIndicator );
 
 #endif
+

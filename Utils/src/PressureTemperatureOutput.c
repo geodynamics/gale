@@ -74,41 +74,13 @@ PressureTemperatureOutput* PressureTemperatureOutput_New(
 	return self;
 }
 
-PressureTemperatureOutput* _PressureTemperatureOutput_New(
-		SizeT                                              _sizeOfSelf, 
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		SwarmOutput_PrintHeaderFunction*                   _printHeader,		
-		SwarmOutput_PrintDataFunction*                     _printData,		
-		Name                                               name )
+PressureTemperatureOutput* _PressureTemperatureOutput_New(  PRESSURETEMPERATUREOUTPUT_DEFARGS  )
 {
 	PressureTemperatureOutput* self;
 	
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
 	assert( _sizeOfSelf >= sizeof(PressureTemperatureOutput) );
-	self = (PressureTemperatureOutput*)_SwarmOutput_New( 
-			_sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,		
-			_printHeader,
-			_printData,
-			name );
+	self = (PressureTemperatureOutput*)_SwarmOutput_New(  SWARMOUTPUT_PASSARGS  );
 
 	
 	/* General info */
@@ -159,30 +131,34 @@ void* _PressureTemperatureOutput_Copy( void* swarmOutput, void* dest, Bool deep,
 }
 
 void* _PressureTemperatureOutput_DefaultNew( Name name ) {
-	return (void*) _PressureTemperatureOutput_New(
-			sizeof(PressureTemperatureOutput),
-			PressureTemperatureOutput_Type,
-			_PressureTemperatureOutput_Delete,
-			_PressureTemperatureOutput_Print,
-			_PressureTemperatureOutput_Copy,
-			_PressureTemperatureOutput_DefaultNew,
-			_PressureTemperatureOutput_Construct,
-			_PressureTemperatureOutput_Build,
-			_PressureTemperatureOutput_Initialise,
-			_PressureTemperatureOutput_Execute,
-			_PressureTemperatureOutput_Destroy,
-			_PressureTemperatureOutput_PrintHeader,
-			_PressureTemperatureOutput_PrintData,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(PressureTemperatureOutput);
+	Type                                                      type = PressureTemperatureOutput_Type;
+	Stg_Class_DeleteFunction*                              _delete = _PressureTemperatureOutput_Delete;
+	Stg_Class_PrintFunction*                                _print = _PressureTemperatureOutput_Print;
+	Stg_Class_CopyFunction*                                  _copy = _PressureTemperatureOutput_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _PressureTemperatureOutput_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _PressureTemperatureOutput_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _PressureTemperatureOutput_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _PressureTemperatureOutput_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _PressureTemperatureOutput_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _PressureTemperatureOutput_Destroy;
+	SwarmOutput_PrintHeaderFunction*                  _printHeader = _PressureTemperatureOutput_PrintHeader;
+	SwarmOutput_PrintDataFunction*                      _printData = _PressureTemperatureOutput_PrintData;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _PressureTemperatureOutput_New(  PRESSURETEMPERATUREOUTPUT_PASSARGS  );
 }
 
 
-void _PressureTemperatureOutput_Construct( void* swarmOutput, Stg_ComponentFactory* cf, void* data ) {
+void _PressureTemperatureOutput_AssignFromXML( void* swarmOutput, Stg_ComponentFactory* cf, void* data ) {
 	PressureTemperatureOutput*  self          = (PressureTemperatureOutput*) swarmOutput;
 	FeVariable*                 pressureField;
 	FeVariable*                 temperatureField;
 
-	_SwarmOutput_Construct( self, cf, data );
+	_SwarmOutput_AssignFromXML( self, cf, data );
 
 	pressureField    = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField",    FeVariable, True, data ) ;
 	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TemperatureField", FeVariable, True, data ) ;
@@ -194,10 +170,16 @@ void _PressureTemperatureOutput_Construct( void* swarmOutput, Stg_ComponentFacto
 void _PressureTemperatureOutput_Build( void* swarmOutput, void* data ) {
 	PressureTemperatureOutput*	self = (PressureTemperatureOutput*) swarmOutput;
 
+	Stg_Component_Build( self->pressureField, data, False );
+	Stg_Component_Build( self->temperatureField, data, False );
+
 	_SwarmOutput_Build( self, data );
 }
 void _PressureTemperatureOutput_Initialise( void* swarmOutput, void* data ) {
 	PressureTemperatureOutput*	self = (PressureTemperatureOutput*) swarmOutput;
+
+	Stg_Component_Initialise( self->pressureField, data, False );
+	Stg_Component_Initialise( self->temperatureField, data, False );
 	
 	_SwarmOutput_Initialise( self, data );
 }
@@ -208,6 +190,9 @@ void _PressureTemperatureOutput_Execute( void* swarmOutput, void* data ) {
 }
 void _PressureTemperatureOutput_Destroy( void* swarmOutput, void* data ) {
 	PressureTemperatureOutput*	self = (PressureTemperatureOutput*)swarmOutput;
+
+	Stg_Component_Destroy( self->pressureField, data, False );
+	Stg_Component_Destroy( self->temperatureField, data, False );
 	
 	_SwarmOutput_Destroy( self, data );
 }
@@ -253,4 +238,6 @@ void _PressureTemperatureOutput_PrintData( void* swarmOutput, Stream* stream, Pa
 /*-------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
 */
+
+
 

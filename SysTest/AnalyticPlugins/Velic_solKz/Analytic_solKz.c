@@ -102,13 +102,13 @@ void _Velic_solKz_Build( void* analyticSolution, void* data ) {
 	self->_analyticSolutionList[3] = Velic_solKz_StressFunction;
 }
 
-void _Velic_solKz_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _Velic_solKz_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Velic_solKz* self = (Velic_solKz*) analyticSolution;
 	double                   sigma, m, B, twiceB, km;
 	int                      n;
 
 	/* Construct Parent */
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_sigma", 1.0 );
 	twiceB = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_twiceB", 2.0 );
@@ -116,28 +116,34 @@ void _Velic_solKz_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 	m = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_m", 1 );
 	n = Stg_ComponentFactory_GetRootDictInt( cf, "solKz_n", 1 );
 
-  km = M_PI * m;
+   km = M_PI * m;
 	
   /* Note: in the _Velic_solKz function km and n must be supplied */
 	_Velic_solKz_Init( self, sigma, km, B, n );
 }
 
 void* _Velic_solKz_DefaultNew( Name name ) {
-	return _FieldTest_New(
-			sizeof(Velic_solKz),
-			Velic_solKz_Type,
-			_FieldTest_Delete,
-			_FieldTest_Print,
-			_FieldTest_Copy,
-			_Velic_solKz_DefaultNew,
-			_Velic_solKz_Construct,
-			_Velic_solKz_Build,
-			_FieldTest_Initialise,
-			_FieldTest_Execute,
-			_FieldTest_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Velic_solKz);
+	Type                                                      type = Velic_solKz_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FieldTest_Delete;
+	Stg_Class_PrintFunction*                                _print = _FieldTest_Print;
+	Stg_Class_CopyFunction*                                  _copy = _FieldTest_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Velic_solKz_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Velic_solKz_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Velic_solKz_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FieldTest_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FieldTest_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FieldTest_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _FieldTest_New(  FIELDTEST_PASSARGS  );
 }
 
 Index Underworld_Velic_solKz_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Velic_solKz_Type, "0", _Velic_solKz_DefaultNew );
 }
+
+

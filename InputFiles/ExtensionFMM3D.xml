@@ -3,18 +3,32 @@
 
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-        <list name="import">
-                <param> Underworld </param>
-        </list>
+	<list name="import">
+		<param> Underworld </param>
+	</list>
 
 	<include> Underworld/BaseApps/ExtensionBaseApp.xml </include>
-	
+
+	<param name="lucPluginContext">context</param>	
 	<list name="plugins" mergeType="merge">
-		<!-- Output Plugins -->
-		<param>StgFEM_FrequentOutput</param>	
-		<param>Underworld_Vrms</param>	
-		<param>StgFEM_CPUTime</param>
-		<param> Underworld_ExtractPetscObjects </param> 
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>	
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+			<param name="VelocityField">VelocityField</param>
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">lucPlugin</param>
+			<param name="Context">lucPluginContext</param>
+		</struct>
 	</list>
 
   <param name="ProbDescription"> Extension-Matrices-64x32x64 </param>
@@ -22,6 +36,10 @@
 
 	<!-- Rheology Components -->
 	<struct name="components" mergeType="merge">
+      <struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
+
 		<!-- Shape Stuff -->
 		<struct name="backgroundShape">
 			<param name="Type">Everywhere</param>
@@ -249,10 +267,17 @@
 		<struct name="crustViscosity">
 			<param name="Type">MaterialViscosity</param>
 			<param name="eta0">CrustDefaultViscosity</param>
-		</struct>	
+		</struct>
+		<!-- create a new timeIntegrator so that director integration does not clash with SwarmAdvection/EulerDeform -->
+      <struct name="timeIntegrator_aux" mergeType="replace">
+         <param name="Type">TimeIntegrator</param>
+         <param name="order">timeIntegratorOrder</param>
+         <param name="simultaneous">f</param>
+         <param name="Context">context</param>
+      </struct>		
 		<struct name="strainWeakening">
 			<param name="Type">StrainWeakening</param>
-			<param name="TimeIntegrator">timeIntegrator</param>
+			<param name="TimeIntegrator">timeIntegrator_aux</param>
 			<param name="MaterialPointsSwarm">materialSwarm</param>
 			<param name="softeningStrain">0.1</param>
 			<param name="initialDamageFraction">0.0</param>
@@ -262,7 +287,7 @@
 		</struct>
 		<struct name="director">
 			<param name="Type">Director</param>
-			<param name="TimeIntegrator">timeIntegrator</param>
+			<param name="TimeIntegrator">timeIntegrator_aux</param>
 			<param name="VelocityGradientsField">VelocityGradientsField</param>
 			<param name="MaterialPointsSwarm">materialSwarm</param>
 			<param name="initialDirectionX">0.0</param>

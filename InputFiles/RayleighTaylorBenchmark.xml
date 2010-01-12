@@ -1,25 +1,43 @@
-<!-- Rayleigh-Taylor app input file -->
-<!-- 	Rayleigh-Taylor convection benchmark as detailed in
-	P.E. van Keken et al, 'A comparison of methods for 
-	the modelling of thermochemical convection', JGR, 1997	-->
+<!--	Rayleigh-Taylor app input file -->
+<!--	Rayleigh-Taylor convection benchmark as detailed in
+		P.E. van Keken et al, 'A comparison of methods for 
+		the modelling of thermochemical convection', JGR, 1997	-->
 
 <!-- DTD to validate against -->
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-        <list name="import">
-                <param> Underworld </param>
-        </list>
+	<list name="import">
+  		<param> Underworld </param>
+	</list>
 
 	<include>Underworld/BaseApps/RayleighTaylor.xml</include>
 
+	<param name="lucPluginContext">context</param>
 	<list name="plugins" mergeType="merge">
-		<!-- Output Plugins -->
-		<param>StgFEM_FrequentOutput</param>	
-		<param>Underworld_Vrms</param>	
-		<param>StgFEM_CPUTime</param>
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+			<param name="VelocityField">VelocityField</param>
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">lucPlugin</param>
+			<param name="Context">lucPluginContext</param>
+		</struct>
 	</list>
 
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
 		<struct name="backgroundViscosity">
 			<param name="Type">MaterialViscosity</param>
 			<param name="eta0">1.0</param>
@@ -33,7 +51,6 @@
 			<param name="density">1.0</param>
 			<param name="Rheology">backgroundViscosity</param>
 		</struct>
-
 		<struct name="lightLayerShape">
 			<param name="Type">BelowCosinePlane</param>
 			<param name="offset">0.2</param>
@@ -68,16 +85,16 @@
 	<param name="gravity"> 1.0 </param>
 	<param name="checkpointEvery"> 0 </param>
 
-        <!--   choose what to checkpoint
+	<!--   choose what to checkpoint
 	<list name="FieldVariablesToCheckpoint">
 		<param>VelocityField</param>
 		<param>VelocityGradientsField</param>
 	</list>
 	-->
 
-        <!--  restart from a previous checkpoint 
-        <param name="restartTimestep"> 10 </param>
-         -->
+  	<!--  restart from a previous checkpoint 
+  	<param name="restartTimestep"> 10 </param>
+  	-->
 
 	<!-- general decomposition parameters -->
 	<param name="dim"> 2 </param>

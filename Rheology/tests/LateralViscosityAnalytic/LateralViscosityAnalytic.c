@@ -403,13 +403,13 @@ void _LateralViscosityAnalytic_VelocityFunction( void* analyticSolution, FeVaria
 
 }
 
-void _LateralViscosityAnalytic_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _LateralViscosityAnalytic_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	LateralViscosityAnalytic*         self           = (LateralViscosityAnalytic*)analyticSolution;
 	AbstractContext*        context;
 	ConditionFunction*      condFunc;
 	
 	/* Construct Parent */
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 	
@@ -434,21 +434,27 @@ void _LateralViscosityAnalytic_Build( void* analyticSolution, void* data ) {
 
 
 void* _LateralViscosityAnalytic_DefaultNew( Name name ) {
-	return _AnalyticSolution_New(
-			sizeof(LateralViscosityAnalytic),
-			LateralViscosityAnalytic_Type,
-			_AnalyticSolution_Delete,
-			_AnalyticSolution_Print,
-			_AnalyticSolution_Copy,
-			_LateralViscosityAnalytic_DefaultNew,
-			_LateralViscosityAnalytic_Construct,
-			_LateralViscosityAnalytic_Build,
-			_AnalyticSolution_Initialise,
-			_AnalyticSolution_Execute,
-			_AnalyticSolution_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(LateralViscosityAnalytic);
+	Type                                                      type = LateralViscosityAnalytic_Type;
+	Stg_Class_DeleteFunction*                              _delete = _AnalyticSolution_Delete;
+	Stg_Class_PrintFunction*                                _print = _AnalyticSolution_Print;
+	Stg_Class_CopyFunction*                                  _copy = _AnalyticSolution_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _LateralViscosityAnalytic_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _LateralViscosityAnalytic_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _LateralViscosityAnalytic_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _AnalyticSolution_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _AnalyticSolution_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _AnalyticSolution_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _AnalyticSolution_New(  ANALYTICSOLUTION_PASSARGS  );
 }
 
 Index Underworld_LateralViscosityAnalytic_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, LateralViscosityAnalytic_Type, "0", _LateralViscosityAnalytic_DefaultNew );
 }
+
+

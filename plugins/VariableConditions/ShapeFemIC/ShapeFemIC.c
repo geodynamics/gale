@@ -70,6 +70,7 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
   UnderworldContext*       context            = (UnderworldContext*)_context;
 
   Dictionary*              theDictionary      = context->dictionary;
+  FeVariable*    tempField   = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "TemperatureField" );
   FeMesh*	           theMesh            = NULL;
   double*                  result             = (double*) _result;
   Stg_Shape*               shape;
@@ -93,13 +94,13 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
   double T2u, T2l;
   double Tmu, Tml;
   double o1ux, o1uy;
-  double o1lx, o1ly;
+  double o1ly;
   double o2ux, o2uy;
-  double o2lx, o2ly;
+  double o2ly;
   double omuy, omly;
   double alpha, beta, W;
 
-  theMesh = context->temperatureField->feMesh;
+  theMesh = tempField->feMesh;
 
   shapeSpecs = Dictionary_Get( theDictionary, "linearShapeIC" );
   numSpecs = Dictionary_Entry_Value_GetCount( shapeSpecs );
@@ -260,6 +261,7 @@ void Underworld_SimpleShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 void Underworld_GaussianIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	UnderworldContext*      context            = (UnderworldContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
+  FeVariable*    tempField   = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "TemperatureField" );
 	FeMesh*			mesh               = NULL;
 	double*                 result             = (double*) _result;
 	Stg_Shape*              shape;
@@ -269,7 +271,7 @@ void Underworld_GaussianIC( Node_LocalIndex node_lI, Variable_Index var_I, void*
 	double                  amplitude, width;
 	double                  rSq;
 	
-	mesh       = context->temperatureField->feMesh;
+	mesh       = tempField->feMesh;
 
 	amplitude = Dictionary_GetDouble_WithDefault( dictionary, "GaussianIC-Amplitude", 1.0 );
 	width = Dictionary_GetDouble_WithDefault( dictionary, "GaussianIC-Width", 1e-2 );
@@ -301,25 +303,25 @@ void Underworld_GaussianIC( Node_LocalIndex node_lI, Variable_Index var_I, void*
 
 }
 
-void _Underworld_ShapeFemIC_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_ShapeFemIC_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	ConditionFunction*      condFunc;
 	UnderworldContext*      context;
 
 	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
 	
 	condFunc = ConditionFunction_New( Underworld_SimpleShapeIC, "Inside1_Outside0_ShapeIC" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( Underworld_GaussianIC, "GaussianIC" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( Underworld_LinearShapeIC, "linearShapeIC" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 }
 
 void* _Underworld_ShapeFemIC_DefaultNew( Name name ) {
 	return Codelet_New(
 		Underworld_ShapeFemIC_Type,
 		_Underworld_ShapeFemIC_DefaultNew,
-		_Underworld_ShapeFemIC_Construct,
+		_Underworld_ShapeFemIC_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,
@@ -332,4 +334,6 @@ Index Underworld_ShapeFemIC_Register( PluginsManager* pluginsManager ) {
 
 	return PluginsManager_Submit( pluginsManager, Underworld_ShapeFemIC_Type, "0", _Underworld_ShapeFemIC_DefaultNew );
 }
+
+
 

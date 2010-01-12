@@ -63,62 +63,31 @@
 const Type MohrCoulomb_Type = "MohrCoulomb";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-MohrCoulomb* _MohrCoulomb_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion,
-		YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator,
-		YieldRheology_HasYieldedFunction*                  _hasYielded,
-		Name                                               name ) 
+MohrCoulomb* _MohrCoulomb_New(  MOHRCOULOMB_DEFARGS  ) 
 {
 	MohrCoulomb*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(MohrCoulomb) );
-	self = (MohrCoulomb*) _YieldRheology_New( 
-			sizeOfSelf,
-			type,
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			_getYieldCriterion,
-			_getYieldIndicator,
-			_hasYielded,
-			name );
+	assert( _sizeOfSelf >= sizeof(MohrCoulomb) );
+	self = (MohrCoulomb*) _YieldRheology_New(  YIELDRHEOLOGY_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	
 	return self;
 }
 
-void _MohrCoulomb_Init(
-		MohrCoulomb*                        self,
-		FeVariable*                                        pressureField,
-		FeVariable*                                        strainRateField,
-		MaterialPointsSwarm*                               materialPointsSwarm,
-		double                                             cohesion,
-		double                                             cohesionAfterSoftening,
-		double                                             frictionCoefficient,
-		double                                             frictionCoefficientAfterSoftening,
-		double                                             minimumYieldStress)
-{
+void _MohrCoulomb_Init(    
+		MohrCoulomb*          self,
+		FeVariable*           pressureField,
+		FeVariable*           strainRateField,
+		SwarmVariable*        swarmStrainRate,
+		MaterialPointsSwarm*  materialPointsSwarm,
+		double                cohesion,
+		double                cohesionAfterSoftening,
+		double                frictionCoefficient,
+		double                frictionCoefficientAfterSoftening,
+		double                minimumYieldStress)
+{                                                       
 	self->materialPointsSwarm     = materialPointsSwarm;
 	self->pressureField           = pressureField;
 	self->strainRateField  = strainRateField;
@@ -138,34 +107,39 @@ void _MohrCoulomb_Init(
 }
 
 void* _MohrCoulomb_DefaultNew( Name name ) {
-	return (void*) _MohrCoulomb_New(
-		sizeof(MohrCoulomb),
-		MohrCoulomb_Type,
-		_YieldRheology_Delete,
-		_YieldRheology_Print,
-		_YieldRheology_Copy,
-		_MohrCoulomb_DefaultNew,
-		_MohrCoulomb_Construct,
-		_MohrCoulomb_Build,
-		_MohrCoulomb_Initialise,
-		_YieldRheology_Execute,
-		_YieldRheology_Destroy,
-		_MohrCoulomb_ModifyConstitutiveMatrix,
-		_MohrCoulomb_GetYieldCriterion,
-		_MohrCoulomb_GetYieldIndicator,
-		_MohrCoulomb_HasYielded,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(MohrCoulomb);
+	Type                                                             type = MohrCoulomb_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _YieldRheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _YieldRheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _YieldRheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _MohrCoulomb_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _MohrCoulomb_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _MohrCoulomb_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _MohrCoulomb_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _YieldRheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _MohrCoulomb_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _MohrCoulomb_ModifyConstitutiveMatrix;
+	YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion = _MohrCoulomb_GetYieldCriterion;
+	YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator = _MohrCoulomb_GetYieldIndicator;
+	YieldRheology_HasYieldedFunction*                         _hasYielded = _MohrCoulomb_HasYielded;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _MohrCoulomb_New(  MOHRCOULOMB_PASSARGS  );
 }
 
-void _MohrCoulomb_Construct( void* rheology, Stg_ComponentFactory* cf,
+void _MohrCoulomb_AssignFromXML( void* rheology, Stg_ComponentFactory* cf,
                              void *data ){
-	MohrCoulomb*   self           = (MohrCoulomb*)rheology;
-	FeVariable*                   pressureField;
-	MaterialPointsSwarm*          materialPointsSwarm;
-	FeVariable*                   strainRateField;
+	MohrCoulomb*           self = (MohrCoulomb*)rheology;
+	FeVariable*            pressureField;
+	MaterialPointsSwarm*   materialPointsSwarm;
+	FeVariable*            strainRateField;
+	SwarmVariable*         swarmStrainRate;
 	
 	/* Construct Parent */
-	_YieldRheology_Construct( self, cf, data );
+	_YieldRheology_AssignFromXML( self, cf, data );
 
 	/* Make sure that there is strain weakening */
 	Journal_Firewall(
@@ -180,20 +154,21 @@ void _MohrCoulomb_Construct( void* rheology, Stg_ComponentFactory* cf,
 			"PressureField", FeVariable, True, data );
 	strainRateField = Stg_ComponentFactory_ConstructByKey( cf, self->name,
 			"StrainRateField", FeVariable, True, data );
+
+	swarmStrainRate = Stg_ComponentFactory_ConstructByKey(
+	   cf, self->name, "swarmStrainRate", SwarmVariable, False, data );
 	
 	_MohrCoulomb_Init( 
 			self,
 			pressureField,
 			strainRateField,
+			swarmStrainRate,
 			materialPointsSwarm, 
 			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesion", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesionAfterSoftening", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficient", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficientAfterSoftening", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ) );
-
-	self->swarmStrainRate = Stg_ComponentFactory_ConstructByKey(
-	   cf, self->name, "swarmStrainRate", SwarmVariable, False, data );
 }
 
 void _MohrCoulomb_Build( void* rheology, void* data ) {
@@ -201,18 +176,23 @@ void _MohrCoulomb_Build( void* rheology, void* data ) {
 
 	/* Build parent */
 	_YieldRheology_Build( self, data );
+	
+	Stg_Component_Build(	self->materialPointsSwarm, data, False);
+	Stg_Component_Build(	self->pressureField, data, False);
+	Stg_Component_Build(	self->strainRateField, data, False);
+
 }
 
 void _MohrCoulomb_Initialise( void* rheology, void* data ) {
 	MohrCoulomb*     self                  = (MohrCoulomb*) rheology;
 	Particle_Index                  lParticle_I;
 	Particle_Index                  particleLocalCount;
-	AbstractContext*                context = (AbstractContext*)data;
 
 	_YieldRheology_Initialise( self, data );
 	
 	/* Initialise these components now just in case this function is called before their own _Initialise function */
 	Stg_Component_Initialise( self->materialPointsSwarm, data, False );
+	Stg_Component_Build(	self->pressureField, data, False);	
 	Stg_Component_Initialise( self->strainWeakening, data, False );
 
 	/* We don't need to Initialise hasYieldedVariable because it's a parent variable and _YieldRheology_Initialise
@@ -220,11 +200,23 @@ void _MohrCoulomb_Initialise( void* rheology, void* data ) {
 	particleLocalCount = self->hasYieldedVariable->variable->arraySize;
 
 	/* If restarting from checkpoint, don't change the parameters on the particles */
-	if ( !(context && (True == context->loadFromCheckPoint) ) ) {
+	if ( self->context->loadFromCheckPoint == False ) {
 		for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) { 
 			Variable_SetValueChar( self->hasYieldedVariable->variable, lParticle_I, False );
                 }
 	}
+}
+
+void _MohrCoulomb_Destroy( void* rheology, void* data ) {
+	MohrCoulomb*  self               = (MohrCoulomb*) rheology;
+
+	Stg_Component_Destroy(	self->materialPointsSwarm, data, False);
+	Stg_Component_Destroy(	self->pressureField, data, False);
+	Stg_Component_Destroy(	self->strainRateField, data, False);
+
+	/* Destroy parent */
+	_YieldRheology_Destroy( self, data );
+
 }
 	
 void _MohrCoulomb_ModifyConstitutiveMatrix( 
@@ -391,35 +383,33 @@ void _MohrCoulomb_StoreCurrentParameters(
 		MaterialPoint*                                     materialPoint,
 		Coord                                              xi ) 
 {
-	MohrCoulomb*          self               = (MohrCoulomb*) rheology;
-	Dimension_Index                      dim                = constitutiveMatrix->dim;
-        Eigenvector                          evectors[3];
-        double e0, e1, e2;
-        double trace, *particleExt;
-        int i;
+	MohrCoulomb*		self = (MohrCoulomb*) rheology;
+	Dimension_Index	dim = constitutiveMatrix->dim;
+	Eigenvector			evectors[3];
+	double				trace;
+	int					i;
 	
 	FeVariable_InterpolateWithinElement( self->pressureField, lElement_I, xi, &self->currentPressure );
 	if( !self->swarmStrainRate ) {
-	   FeVariable_InterpolateWithinElement(
-	      self->strainRateField, lElement_I, xi, self->currentStrainRate );
+		FeVariable_InterpolateWithinElement( self->strainRateField, lElement_I, xi, self->currentStrainRate );
 	}
 	else {
-	   SwarmVariable_ValueAt( self->swarmStrainRate,
-				  constitutiveMatrix->currentParticleIndex,
-				  self->currentStrainRate );
+	   SwarmVariable_ValueAt( self->swarmStrainRate, constitutiveMatrix->currentParticleIndex, self->currentStrainRate );
 	}
 
-        SymmetricTensor_GetTrace(self->currentStrainRate, dim, &trace);
+	SymmetricTensor_GetTrace(self->currentStrainRate, dim, &trace);
 
-        /* Subtract the trace (which should be zero anyway).  We can
-           use TensorMapST3D even for 2D, because it is the same for
-           the xx and yy components */
-        for(i=0;i<dim;++i)
-          self->currentStrainRate[TensorMapST3D[i][i]]-=trace/dim;
+	/* Subtract the trace (which should be zero anyway).  We can
+		use TensorMapST3D even for 2D, because it is the same for
+		the xx and yy components */
+	for(i=0;i<dim;++i)
+		self->currentStrainRate[TensorMapST3D[i][i]]-=trace/dim;
 
 	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, self->currentStrainRate, self->currentStress );
 	
 	SymmetricTensor_CalcAllEigenvectors( self->currentStress, dim, self->currentEigenvectorList );
 
-        SymmetricTensor_CalcAllEigenvectors( self->currentStrainRate, dim, evectors);
+	SymmetricTensor_CalcAllEigenvectors( self->currentStrainRate, dim, evectors);
 }
+
+

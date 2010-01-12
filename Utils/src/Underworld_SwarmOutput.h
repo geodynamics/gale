@@ -56,6 +56,7 @@
 	#define __Underworld_SwarmOutput \
 		/* Macro defining parent goes here - This means you can cast this class as its parent */ \
 		__Stg_Component \
+		UnderworldContext*        context; \
 		/* Virtual Info */\
 		Underworld_SwarmOutput_GetFeVariableValues* _getFeValuesFunc; \
 		Underworld_SwarmOutput_PrintStandardFormat* _printFunc; \
@@ -70,19 +71,18 @@
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Constructors
 	*/
-	Underworld_SwarmOutput* _Underworld_SwarmOutput_New(
-		SizeT                                              _sizeOfSelf, 
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,		
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define UNDERWORLD_SWARMOUTPUT_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define UNDERWORLD_SWARMOUTPUT_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	Underworld_SwarmOutput* _Underworld_SwarmOutput_New(  UNDERWORLD_SWARMOUTPUT_DEFARGS  );
 
 	/* Stg_Class_Delete Underworld_SwarmOutput implementation */
 	void _Underworld_SwarmOutput_Delete( void* swarmOutput );
@@ -94,7 +94,9 @@
 	void* _Underworld_SwarmOutput_Copy( void* swarmOutput, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Underworld_SwarmOutput_DefaultNew( Name name ) ;
-void _Underworld_SwarmOutput_Construct( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+   void _Underworld_SwarmOutput_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;
+   void _Underworld_SwarmOutput_Init( Underworld_SwarmOutput* self, PICelleratorContext* context, MaterialPointsSwarm* materialSwarm, unsigned int listCount, FeVariable** feVariableList );
+   
 	void _Underworld_SwarmOutput_Build( void* swarmOutput, void* data ) ;
 	void _Underworld_SwarmOutput_Initialise( void* swarmOutput, void* data ) ;
 	void _Underworld_SwarmOutput_Execute( void* swarmOutput, void* data );
@@ -118,3 +120,4 @@ void _Underworld_SwarmOutput_Construct( void* shape, Stg_ComponentFactory* cf, v
 	*/
 	
 #endif 
+

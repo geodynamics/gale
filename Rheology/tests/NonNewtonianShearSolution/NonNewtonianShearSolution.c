@@ -102,12 +102,12 @@ void NonNewtonianShearSolution_VelocityBC( Node_LocalIndex node_lI, Variable_Ind
 	*result = self->velocityTopOfBox;
 }
 
-void _NonNewtonianShearSolution_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _NonNewtonianShearSolution_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	NonNewtonianShearSolution* self = (NonNewtonianShearSolution*)analyticSolution;
 	FiniteElementContext*          context;
 
 	/* Construct parent */
-	_AnalyticSolution_Construct( self, cf, data );
+	_AnalyticSolution_AssignFromXML( self, cf, data );
 	context = Stg_CheckType( self->context, FiniteElementContext );
 	
 	ConditionFunction_Register_Add( context->condFunc_Register, 
@@ -149,19 +149,23 @@ void _NonNewtonianShearSolution_Build( void* analyticSolution, void* data ) {
 
 /* This function will provide StGermain the abilty to instantiate (create) this codelet on demand. */
 void* _NonNewtonianShearSolution_DefaultNew( Name name ) {
-	return _AnalyticSolution_New(
-			sizeof(NonNewtonianShearSolution),
-			NonNewtonianShearSolution_Type,
-			_AnalyticSolution_Delete,
-			_AnalyticSolution_Print,
-			_AnalyticSolution_Copy,
-			_NonNewtonianShearSolution_DefaultNew,
-			_NonNewtonianShearSolution_Construct,
-			_NonNewtonianShearSolution_Build,
-			_AnalyticSolution_Initialise,
-			_AnalyticSolution_Execute,
-			_AnalyticSolution_Destroy,
-			name );	
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(NonNewtonianShearSolution);
+	Type                                                      type = NonNewtonianShearSolution_Type;
+	Stg_Class_DeleteFunction*                              _delete = _AnalyticSolution_Delete;
+	Stg_Class_PrintFunction*                                _print = _AnalyticSolution_Print;
+	Stg_Class_CopyFunction*                                  _copy = _AnalyticSolution_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _NonNewtonianShearSolution_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _NonNewtonianShearSolution_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _NonNewtonianShearSolution_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _AnalyticSolution_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _AnalyticSolution_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _AnalyticSolution_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _AnalyticSolution_New(  ANALYTICSOLUTION_PASSARGS  );	
 }
 	
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
@@ -170,4 +174,6 @@ Index Underworld_NonNewtonianShearSolution_Register( PluginsManager* pluginsMana
 	return PluginsManager_Submit( pluginsManager, NonNewtonianShearSolution_Type, "0",
 		_NonNewtonianShearSolution_DefaultNew );
 }
+
+
 

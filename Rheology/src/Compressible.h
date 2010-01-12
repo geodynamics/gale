@@ -43,8 +43,8 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-#ifndef __Underworld_Compressible_h__
-#define __Underworld_Compressible_h__
+#ifndef __Underworld_Rheology_Compressible_h__
+#define __Underworld_Rheology_Compressible_h__
 
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 	extern const Type Compressible_Type;
@@ -62,31 +62,34 @@
 	struct Compressible { __Compressible };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	Compressible* _Compressible_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		StiffnessMatrixTerm_AssembleElementFunction*       _assembleElement,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define COMPRESSIBLE_DEFARGS \
+                STIFFNESSMATRIXTERM_DEFARGS
+
+	#define COMPRESSIBLE_PASSARGS \
+                STIFFNESSMATRIXTERM_PASSARGS
+
+	Compressible* _Compressible_New(  COMPRESSIBLE_DEFARGS  );
 
 	void _Compressible_Delete( void* compressible ) ;
 	void _Compressible_Print( void* compressible, Stream* stream ) ;
 	
 	/* 'Stg_Component' implementations */
 	void* _Compressible_DefaultNew( Name name ) ;
-	void _Compressible_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _Compressible_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 	void _Compressible_Build( void* compressible, void* data );
 	void _Compressible_Initialise( void* compressible, void* data );
 	void _Compressible_Execute( void* compressible, void* data );
 	void _Compressible_Destroy( void* compressible, void* data );
+   void _Compressible_Init(
+         Compressible*        self,
+         FeMesh*              geometryMesh,
+         Materials_Register*  materials_Register,
+         double               oneOnLambda );
 
 	void _Compressible_AssembleElement(
 		void*                                              compressible,
@@ -96,3 +99,4 @@
 		FiniteElementContext*                              context,
 		double**                                           elStiffMat );
 #endif
+

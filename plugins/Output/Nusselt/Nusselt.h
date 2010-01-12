@@ -49,14 +49,14 @@
 	extern const Type Underworld_Nusselt_Type;
 	typedef struct {
 		__Codelet
-		OperatorFeVariable* advectiveHeatFluxField;
-		OperatorFeVariable* temperatureTotalDerivField;
-		FeVariable* temperatureVertDerivField;
-		double      nusseltNumber;
+		Swarm*			gaussSwarm;
+		OperatorFeVariable* 	advectiveHeatFluxField;
+		OperatorFeVariable* 	temperatureTotalDerivField;
+		FeVariable* 		temperatureVertDerivField;
+		double      		nusseltNumber;
 	} Underworld_Nusselt;
 
 	Index Underworld_Nusselt_Register( PluginsManager* pluginsManager );
-	void Underworld_Nusselt_Setup( UnderworldContext* context ) ;
 	void Underworld_Nusselt_Output( UnderworldContext* context ) ;
 
 #endif

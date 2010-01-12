@@ -3,20 +3,38 @@
 <!-- DTD to validate against -->
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-        <list name="import">
-                <param> Underworld </param>
-        </list>
+	<list name="import">
+		<param> Underworld </param>
+	</list>
 
 	<include>Underworld/BaseApps/RayleighTaylor.xml</include>
 
+	<param name="lucPluginContext">context</param>
 	<list name="plugins" mergeType="merge">
-		<!-- Output Plugins -->
-		<param>StgFEM_FrequentOutput</param>	
-		<param>Underworld_Vrms</param>	
-		<param>StgFEM_CPUTime</param>
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>	
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param> 
+			<param name="VelocityField">VelocityField</param>
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">lucPlugin</param>
+			<param name="Context">lucPluginContext</param>
+		</struct>
 	</list>
 
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
 		<!-- Shape Stuff -->
 		<struct name="upperMantleShape">
 			<param name="Type">Everywhere</param>
@@ -121,17 +139,17 @@
 			<param name="Mesh">linearMesh</param>
 		</struct>		
 		<struct name="uzawa" mergeType="replace">
-                       <param name="Type">Stokes_SLE_UzawaSolver</param>
-                       <param name="Preconditioner">preconditioner</param>
-                       <param name="tolerance">1.0e-5</param>
-                       <param name="maxIterations">5000</param>
+			<param name="Type">Stokes_SLE_UzawaSolver</param>
+			<param name="Preconditioner">preconditioner</param>
+			<param name="tolerance">1.0e-5</param>
+			<param name="maxIterations">5000</param>
 			<!-- must be in slab models as DaveStegman has tuned this simulation.
 			but this is dangerous and we must calculate a better param selection
 			for uzawa to reasonably converge 
 			JulianGiordani 24Jul07
 			-->
-                       <param name="useAbsoluteTolerance"> true </param>
-               </struct>
+			<param name="useAbsoluteTolerance"> true </param>
+		</struct>
 	</struct>
 
 	<include>Underworld/Viewports/SlabViewports.xml</include>
@@ -147,22 +165,22 @@
 	<param name="journal-enable-branch.debug.lucDebug">f</param>
 
 	<!-- general simulation parameters -->
-	<param name="maxTimeSteps"> -1 </param>
+	<param name="maxTimeSteps"> -1  </param>
 	<param name="dumpEvery"> 1 </param>
 	<param name="outputPath"> ./output/ </param>
 	<param name="gravity"> 1.0 </param>
         <param name="checkpointEvery"> 0 </param>
 
-        <!--   choose what to checkpoint
+	<!--   choose what to checkpoint
 	<list name="FieldVariablesToCheckpoint">
 		<param>VelocityField</param>
 		<param>VelocityGradientsField</param>
 	</list>
 	-->
 
-        <!--  restart from a previous checkpoint 
-        <param name="restartTimestep"> 10 </param>
-         -->
+	<!--  restart from a previous checkpoint 
+	<param name="restartTimestep"> 10 </param>
+	-->
 
 	<!-- general decomposition parameters -->
 	<param name="dim"> 3 </param>

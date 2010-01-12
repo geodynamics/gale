@@ -13,7 +13,7 @@
 
 	Index Underworld_Velic_solCx_Register( PluginsManager* pluginsManager );
 	void* _Underworld_solCx_DefaultNew( Name name );
-	void _Underworld_solCx_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
+	void _Underworld_solCx_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Underworld_solCx_Init( Velic_solCx* self, double etaA, double etaB, double xc, int n );
 
 	void Velic_solCx_PressureFunction( void* analyticSolution, double* coord, double* pressure );

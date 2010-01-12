@@ -99,13 +99,13 @@ void _Velic_solHA_Build( void* analyticSolution, void* data ) {
 	self->_analyticSolutionList[3] = Velic_solHA_StressFunction;
 }
 
-void _Velic_solHA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+void _Velic_solHA_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
 	Velic_solHA* self = (Velic_solHA*) analyticSolution;
 	double                   sigma, eta, dx, dy, x0, y0;
 	double                   startX, endX, startY, endY;
 
 	/* Construct Parent */
-	_FieldTest_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
 	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_sigma", 1.0 );
 	eta = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_eta", 1.0 );
@@ -126,21 +126,27 @@ void _Velic_solHA_Construct( void* analyticSolution, Stg_ComponentFactory* cf, v
 }
 
 void* _Velic_solHA_DefaultNew( Name name ) {
-	return _FieldTest_New(
-			sizeof(Velic_solHA),
-			Velic_solHA_Type,
-			_FieldTest_Delete,
-			_FieldTest_Print,
-			_FieldTest_Copy,
-			_Velic_solHA_DefaultNew,
-			_Velic_solHA_Construct,
-			_Velic_solHA_Build,
-			_FieldTest_Initialise,
-			_FieldTest_Execute,
-			_FieldTest_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Velic_solHA);
+	Type                                                      type = Velic_solHA_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FieldTest_Delete;
+	Stg_Class_PrintFunction*                                _print = _FieldTest_Print;
+	Stg_Class_CopyFunction*                                  _copy = _FieldTest_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Velic_solHA_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Velic_solHA_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Velic_solHA_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _FieldTest_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FieldTest_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _FieldTest_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _FieldTest_New(  FIELDTEST_PASSARGS  );
 }
 
 Index Underworld_Velic_solHA_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Velic_solHA_Type, "0", _Velic_solHA_DefaultNew );
 }
+
+

@@ -63,6 +63,6 @@
 
 	Index Underworld_IncompressibleExtensionBC_Register( PluginsManager* pluginsManager );
 	void* _Underworld_IncompressibleExtensionBC_DefaultNew( Name name );
-	void Underworld_IncompressibleExtensionBC_Construct( void* component, Stg_ComponentFactory* _cf, void* data ) ;
+	void Underworld_IncompressibleExtensionBC_AssignFromXML( void* component, Stg_ComponentFactory* _cf, void* data ) ;
 
 #endif

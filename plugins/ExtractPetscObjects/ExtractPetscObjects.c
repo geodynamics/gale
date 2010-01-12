@@ -60,7 +60,7 @@
 
 const Type Underworld_ExtractPetscObjects_Type = "Underworld_ExtractPetscObjects";
 
-void _Underworld_ExtractPetscObjects_Construct( void* component, Stg_ComponentFactory* cf, void* data ) 
+void _Underworld_ExtractPetscObjects_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) 
 {
 	UnderworldContext*  context;
 	
@@ -75,7 +75,7 @@ void* _Underworld_ExtractPetscObjects_DefaultNew( Name name )
 	return Codelet_New(
 		Underworld_ExtractPetscObjects_Type,
 		_Underworld_ExtractPetscObjects_DefaultNew,
-		_Underworld_ExtractPetscObjects_Construct,
+		_Underworld_ExtractPetscObjects_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,
@@ -300,4 +300,6 @@ void Underworld_ExtractPetscObjects_PrintHeaderToFile( void* context )
 {
 	StgFEM_FrequentOutput_PrintString( context, "ExtractPetscObjects" );
 }
+
+
 

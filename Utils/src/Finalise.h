@@ -46,6 +46,7 @@
 #ifndef __Underworld_Utils_Finalise_h__
 #define __Underworld_Utils_Finalise_h__
 	
+   extern Stg_ObjectList* repRequiredRawFields_Reg;
 	Bool Underworld_Utils_Finalise( void );
 	
 #endif 

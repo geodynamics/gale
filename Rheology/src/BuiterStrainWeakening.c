@@ -64,44 +64,50 @@
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type BuiterStrainWeakening_Type = "BuiterStrainWeakening";
 
+/* Public Constructor */
+BuiterStrainWeakening* BuiterStrainWeakening_New(
+      Name                                               name,
+		MaterialPointsSwarm*                               swarm,
+		double                                             healingRate,
+		double                                             softeningStrain,
+		double                                             initialDamageFraction,
+		double                                             initialDamageWavenumber,
+		double                                             initialDamageWavenumberSinI,
+		double                                             initialDamageWavenumberCosI,
+		double                                             initialDamageWavenumberSinJ,
+		double                                             initialDamageWavenumberCosJ,
+		double                                             initialDamageFactor,
+		long int                                           randomSeed,
+		Stg_Shape*                                         initialStrainShape  )
+{
+   BuiterStrainWeakening* self = (BuiterStrainWeakening*) _BuiterStrainWeakening_DefaultNew( name );
+
+   _BuiterStrainWeakening_Init(
+	       self,
+	       swarm,
+	       healingRate,
+	       softeningStrain,
+	       initialDamageFraction,
+	       initialDamageWavenumber,
+	       initialDamageWavenumberSinI,
+	       initialDamageWavenumberCosI,
+	       initialDamageWavenumberSinJ,
+	       initialDamageWavenumberCosJ,
+	       initialDamageFactor,
+	       randomSeed,
+	       initialStrainShape  );
+   self->isConstructed = True;
+   return self;
+}
+
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-BuiterStrainWeakening* _BuiterStrainWeakening_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		TimeIntegratee_CalculateTimeDerivFunction*         _calculateTimeDeriv,
-		TimeIntegratee_IntermediateFunction*               _intermediate,
-		StrainWeakening_CalcIncrementFunction*             _calcIncrement,
-		Name                                               name ) 
+BuiterStrainWeakening* _BuiterStrainWeakening_New(  BUITERSTRAINWEAKENING_DEFARGS  ) 
 {
 	BuiterStrainWeakening*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(BuiterStrainWeakening) );
-	self = (BuiterStrainWeakening*) _StrainWeakening_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_calculateTimeDeriv,
-			_intermediate,
-			_calcIncrement, 
-			name );
+	assert( _sizeOfSelf >= sizeof(BuiterStrainWeakening) );
+	self = (BuiterStrainWeakening*) _StrainWeakening_New(  STRAINWEAKENING_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	
@@ -137,41 +143,27 @@ void _BuiterStrainWeakening_Init(
 }
 
 void* _BuiterStrainWeakening_DefaultNew( Name name ) {
-	return (void*) _BuiterStrainWeakening_New(
-		sizeof(BuiterStrainWeakening),
-		BuiterStrainWeakening_Type,
-		_TimeIntegratee_Delete,
-		_TimeIntegratee_Print,
-		_TimeIntegratee_Copy,
-		_BuiterStrainWeakening_DefaultNew,
-		_BuiterStrainWeakening_Construct,
-		_BuiterStrainWeakening_Build,
-		_BuiterStrainWeakening_Initialise,
-		_TimeIntegratee_Execute,
-		_TimeIntegratee_Destroy,
-		_StrainWeakening_TimeDerivative,
-		_TimeIntegratee_Intermediate,
-		_StrainWeakening_CalcIncrementIsotropic,
-		name );
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(BuiterStrainWeakening);
+	Type                                                       type = BuiterStrainWeakening_Type;
+	Stg_Class_DeleteFunction*                               _delete = _TimeIntegrand_Delete;
+	Stg_Class_PrintFunction*                                 _print = _TimeIntegrand_Print;
+	Stg_Class_CopyFunction*                                   _copy = _TimeIntegrand_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _BuiterStrainWeakening_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _StrainWeakening_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _StrainWeakening_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _StrainWeakening_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _TimeIntegrand_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _TimeIntegrand_Destroy;
+	TimeIntegrand_CalculateTimeDerivFunction*  _calculateTimeDeriv = _StrainWeakening_TimeDerivative;
+	TimeIntegrand_IntermediateFunction*              _intermediate = _TimeIntegrand_Intermediate;
+	StrainWeakening_CalcIncrementFunction*           _calcIncrement = _StrainWeakening_CalcIncrementIsotropic;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _BuiterStrainWeakening_New(  BUITERSTRAINWEAKENING_PASSARGS  );
 }
 
-void _BuiterStrainWeakening_Construct( void* strainWeakening, Stg_ComponentFactory* cf, void* data ){
-	BuiterStrainWeakening*        self           = (BuiterStrainWeakening*) strainWeakening;
 
-	/* Construct Parent */
-	_StrainWeakening_Construct( self, cf, data );
-}
 
-void _BuiterStrainWeakening_Build( void* strainWeakening, void* data ) {
-	BuiterStrainWeakening*                       self               = (BuiterStrainWeakening*) strainWeakening;
-
-	/* Build parent */
-	_StrainWeakening_Build( self, data );
-}
-
-void _BuiterStrainWeakening_Initialise( void* strainWeakening, void* data ) {
-	BuiterStrainWeakening*                       self               = (BuiterStrainWeakening*) strainWeakening;
-	
-	/* Initialise Parent */
-	_StrainWeakening_Initialise( self, data );
-}

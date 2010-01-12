@@ -56,12 +56,12 @@
 #define SMALL 1.0e-5
 #define IS_ODD(A)   ( (A) % 2 == 1 )
 
-const Type Trubitsyn2006_Type = "Trubitsyn2006";
+const Type Trubitsyn2006_Type = "Underworld_Trubitsyn2006";
 
 typedef struct {
-	__AnalyticSolution
-	AnalyticSolution_SolutionFunction* viscosityFunc;
-	AnalyticSolution_SolutionFunction* viscosityDerivativeFunc;
+	__FieldTest
+	FieldTest_AnalyticSolutionFunc* viscosityFunc;
+	FieldTest_AnalyticSolutionFunc* viscosityDerivativeFunc;
 	FeVariable*                        velocityField;
 	FeVariable*                        pressureField;
 	double                             Ra;
@@ -84,34 +84,34 @@ double Trubitsyn_GDeriv( double x, double x0, double a ) {
 	return 2.0 * a * pow( exp( a * ( x - x0 ) ) + exp( -a * ( x - x0 ) ), -2.0 );
 }
 
-void _Trubitsyn2006_ViscosityFunc_Isoviscous( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* eta ) {
+void _Trubitsyn2006_ViscosityFunc_Isoviscous( void* analyticSolution, double* coord, double* eta ) {
 	*eta = 1.0;
 }
-void _Trubitsyn2006_ViscosityDerivativeFunc_Isoviscous( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* viscDeriv ) {
+void _Trubitsyn2006_ViscosityDerivativeFunc_Isoviscous( void* analyticSolution, double* coord, double* viscDeriv ) {
 	viscDeriv[0] = 0.0;
 	viscDeriv[1] = 0.0;
 }
-void _Trubitsyn2006_ViscosityFunc_Model1( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* eta ) {
+void _Trubitsyn2006_ViscosityFunc_Model1( void* analyticSolution, double* coord, double* eta ) {
 	*eta = 1.0 + 100.0 * coord[ I_AXIS ] * coord[ J_AXIS ];
 }
-void _Trubitsyn2006_ViscosityDerivativeFunc_Model1( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* viscDeriv ) {
+void _Trubitsyn2006_ViscosityDerivativeFunc_Model1( void* analyticSolution, double* coord, double* viscDeriv ) {
 	viscDeriv[0] = 100.0 * coord[ J_AXIS ];
 	viscDeriv[1] = 100.0 * coord[ I_AXIS ];
 }
-void _Trubitsyn2006_ViscosityFunc_Model2( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* eta ) {
+void _Trubitsyn2006_ViscosityFunc_Model2( void* analyticSolution, double* coord, double* eta ) {
 //	*eta = 999.0 * ( 1.0 - Trubitsyn_G( coord[ I_AXIS ], 0.5, 50 ) ) + 1;
 	*eta = ( coord[ I_AXIS ] <= 0.5 ? 1000.0 : 1 );
 }
-void _Trubitsyn2006_ViscosityDerivativeFunc_Model2( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* viscDeriv ) {
+void _Trubitsyn2006_ViscosityDerivativeFunc_Model2( void* analyticSolution, double* coord, double* viscDeriv ) {
 //	viscDeriv[0] = -999.0 * Trubitsyn_GDeriv( coord[ I_AXIS ], 0.5, 50 );
 	viscDeriv[0] = 0.0;
 	viscDeriv[1] = 0.0;
 }
-void _Trubitsyn2006_ViscosityFunc_Model3( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* eta ) {
+void _Trubitsyn2006_ViscosityFunc_Model3( void* analyticSolution, double* coord, double* eta ) {
 	//*eta = 999.0 * ( 1.0 - Trubitsyn_G( coord[ J_AXIS ], 0.5, 50 ) ) + 1;
 	*eta = ( coord[ J_AXIS ] <= 0.5 ? 1000.0 : 1 );
 }
-void _Trubitsyn2006_ViscosityDerivativeFunc_Model3( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* viscDeriv ) {
+void _Trubitsyn2006_ViscosityDerivativeFunc_Model3( void* analyticSolution, double* coord, double* viscDeriv ) {
 	viscDeriv[0] = 0.0;
 	viscDeriv[1] = 0.0;
 //	viscDeriv[1] = -999.0 * Trubitsyn_GDeriv( coord[ J_AXIS ], 0.5, 50 );
@@ -125,6 +125,69 @@ double Trubitsyn2006_V0( void* analyticSolution ) {
 
 	/* NB - Paper Trubitsyn [2006] is in error for this substitution - they leave out the square on pi */
 	return 0.25 * Ra * T0 * M_1_PI * M_1_PI;
+}
+
+
+void _Trubitsyn2006_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
+	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
+	double                 v0                 = Trubitsyn2006_V0( self );
+	double                 x; 
+	double                 y;
+	XYZ                    min, max;
+
+	Mesh_GetGlobalCoordRange( self->velocityField->feMesh, min, max );
+	x = coord[ I_AXIS ] - min[ I_AXIS ];
+	y = coord[ J_AXIS ] - min[ J_AXIS ];
+
+	velocity[ J_AXIS ] =   v0 * sin( M_PI * y ) * cos( M_PI * x );         /* Equation 31 */
+	velocity[ I_AXIS ] = - v0 * cos( M_PI * y ) * sin( M_PI * x );         /* Equation 32 */
+}
+
+void _Trubitsyn2006_ViscosityFunction( void* analyticSolution, double* coord, double* viscosity ) {
+	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
+
+	self->viscosityFunc( self, coord, viscosity );
+}
+
+void _Trubitsyn2006_PressureFunction( void* analyticSolution, double* coord, double* pressure ) {
+	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
+	double                 T0                 = self->T0;
+	double                 Ra                 = self->Ra;
+	double                 x; 
+	double                 y;
+	XYZ                    min, max;
+	double                 eta;
+	double                 eta01;
+	double                 upperLeftCorner[]  = { 0.0, 1.0, 0.0 };
+	
+	Mesh_GetGlobalCoordRange( self->velocityField->feMesh, min, max );
+	x = coord[ I_AXIS ] - min[ I_AXIS ];
+	y = coord[ J_AXIS ] - min[ J_AXIS ];
+
+	/* Get Viscosities */
+	self->viscosityFunc( self, coord, &eta );
+	self->viscosityFunc( self, upperLeftCorner, &eta01 );
+
+	*pressure = - Ra * ( ( y * y * 0.5 - y + 0.5 )
+			+ 0.5 * T0 / M_PI * ( eta * cos( M_PI * y ) * cos( M_PI * x ) + eta01 ) );        /* Equation 46 */
+	//printf("pressure from t0 = %g\n", *pressure );
+	//*pressure = - 2.0 * M_PI * v0 * ( eta * cos( M_PI * y ) * cos( M_PI * x ) + eta01 ) 
+	//		- Ra * ( y*y * 0.5 - y + 0.5 );
+	//printf("pressure from v0 = %g\n\n", *pressure );
+}
+
+void _Trubitsyn2006_StreamFunction( void* analyticSolution, double* coord, double* psi ) {
+	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
+	double                 v0                 = Trubitsyn2006_V0( self );
+	double                 x; 
+	double                 y;
+	XYZ                    min, max;
+
+	Mesh_GetGlobalCoordRange( self->velocityField->feMesh, min, max );
+	x = coord[ I_AXIS ] - min[ I_AXIS ];
+	y = coord[ J_AXIS ] - min[ J_AXIS ];
+
+	*psi = - v0 / M_PI * sin( M_PI * y ) * sin( M_PI * x ) ;                                          /* Equation 40 */
 }
 
 void Trubitsyn2006_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -150,8 +213,8 @@ void Trubitsyn2006_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I,
 	x = coord[ I_AXIS ] - min[ I_AXIS ];
 	y = coord[ J_AXIS ] - min[ J_AXIS ];
 
-	self->viscosityFunc( self, NULL, coord, &eta );
-	self->viscosityDerivativeFunc( self, NULL, coord, viscDeriv );
+	self->viscosityFunc( self, coord, &eta );
+	self->viscosityDerivativeFunc( self, coord, viscDeriv );
 	d_eta_dy = viscDeriv[ J_AXIS ];
 
 	*temperature = 1 - y + T0 * cos( M_PI * x ) * ( eta * sin( M_PI * y ) - d_eta_dy / M_PI * cos( M_PI * y ) ) ;    /* Equation 47 */ 
@@ -161,85 +224,47 @@ void Trubitsyn2006_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I,
 
 }
 
-void _Trubitsyn2006_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
-	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
-	double                 v0                 = Trubitsyn2006_V0( self );
-	double                 x; 
-	double                 y;
-	XYZ                    min, max;
-
-	Mesh_GetGlobalCoordRange( self->velocityField->feMesh, min, max );
-	x = coord[ I_AXIS ] - min[ I_AXIS ];
-	y = coord[ J_AXIS ] - min[ J_AXIS ];
-
-	velocity[ J_AXIS ] =   v0 * sin( M_PI * y ) * cos( M_PI * x );         /* Equation 31 */
-	velocity[ I_AXIS ] = - v0 * cos( M_PI * y ) * sin( M_PI * x );         /* Equation 32 */
-}
-
-void _Trubitsyn2006_ViscosityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* viscosity ) {
-	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
-
-	self->viscosityFunc( self, analyticFeVariable, coord, viscosity );
-}
-
-
-void _Trubitsyn2006_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
-	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
-	double                 T0                 = self->T0;
-	double                 Ra                 = self->Ra;
-	double                 x; 
-	double                 y;
-	XYZ                    min, max;
-	double                 eta;
-	double                 eta01;
-	double                 upperLeftCorner[]  = { 0.0, 1.0, 0.0 };
+void Trubitsyn2006_PressureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	DomainContext*         context            = (DomainContext*)_context;
+	FeVariable*            PressureField      = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "PressureField" );
+	FeMesh*                mesh               = PressureField->feMesh;
+	double*                pressure           = (double*) _result;
+	double*                coord;
+	Trubitsyn2006* self = Stg_ComponentFactory_ConstructByName( context->CF, Trubitsyn2006_Type, Trubitsyn2006, True, context );
 	
-	Mesh_GetGlobalCoordRange( self->velocityField->feMesh, min, max );
-	x = coord[ I_AXIS ] - min[ I_AXIS ];
-	y = coord[ J_AXIS ] - min[ J_AXIS ];
-
-	/* Get Viscosities */
-	self->viscosityFunc( self, NULL, coord, &eta );
-	self->viscosityFunc( self, NULL, upperLeftCorner, &eta01 );
-
-	*pressure = - Ra * ( ( y * y * 0.5 - y + 0.5 )
-			+ 0.5 * T0 / M_PI * ( eta * cos( M_PI * y ) * cos( M_PI * x ) + eta01 ) );        /* Equation 46 */
-	//printf("pressure from t0 = %g\n", *pressure );
-	//*pressure = - 2.0 * M_PI * v0 * ( eta * cos( M_PI * y ) * cos( M_PI * x ) + eta01 ) 
-	//		- Ra * ( y*y * 0.5 - y + 0.5 );
-	//printf("pressure from v0 = %g\n\n", *pressure );
+	/* Find coordinate of node */
+	coord = Mesh_GetVertex( mesh, node_lI );
+	
+	_Trubitsyn2006_PressureFunction( self,  coord,  pressure );
 }
 
-void _Trubitsyn2006_StreamFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* psi ) {
-	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
-	double                 v0                 = Trubitsyn2006_V0( self );
-	double                 x; 
-	double                 y;
-	XYZ                    min, max;
-
-	Mesh_GetGlobalCoordRange( self->velocityField->feMesh, min, max );
-	x = coord[ I_AXIS ] - min[ I_AXIS ];
-	y = coord[ J_AXIS ] - min[ J_AXIS ];
-
-	*psi = - v0 / M_PI * sin( M_PI * y ) * sin( M_PI * x ) ;                                          /* Equation 40 */
-}
-
-
-void _Trubitsyn2006_Construct( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
-	Trubitsyn2006*         self           = (Trubitsyn2006*)analyticSolution;
-	AbstractContext*        context;
-	ConditionFunction*      condFunc;
-	char*                   viscosityType;
+void _Trubitsyn2006_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data ) {
+	Trubitsyn2006*			self = (Trubitsyn2006*)analyticSolution;
+	ConditionFunction*	condFunc;
+	char*						viscosityType;
+	Dictionary*				pluginDict = Codelet_GetPluginDictionary(self, cf->rootDict);
 	
 	/* Construct Parent */
-	_AnalyticSolution_Construct( self, cf, data );
+	_FieldTest_AssignFromXML( self, cf, data );
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
-	
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString(pluginDict, "VelocityField"), FeVariable, True, data);
+	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString(pluginDict, "PressureField"), FeVariable, True, data);
+
 	/* Add temperature initial condition */
 	condFunc = ConditionFunction_New( Trubitsyn2006_TemperatureIC, "Trubitsyn2006_TemperatureIC" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+
+  /* Add pressure initial condition */
+	condFunc = ConditionFunction_New( Trubitsyn2006_PressureIC, "Trubitsyn2006_PressureIC" );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
+	/* Create Analytic Fields */
+/*
+	self->velocityField = FieldTest_RegisterFeVariableFromCF( self, "VelocityField",  _Trubitsyn2006_VelocityFunction, cf, True, data );
+	self->pressureField = FieldTest_RegisterFeVariableFromCF( self, "PressureField",  _Trubitsyn2006_PressureFunction, cf, True, data );
+	FieldTest_RegisterFeVariableFromCF( self, "ViscosityField", _Trubitsyn2006_ViscosityFunction, cf, False, data );
+*/
+
 	/* Setup Viscosity Functions */
 	viscosityType = Stg_ComponentFactory_GetRootDictString( cf, "ViscosityType", "Isoviscous" );
 	if ( strcasecmp( viscosityType, "Isoviscous" ) == 0 ) {
@@ -262,11 +287,6 @@ void _Trubitsyn2006_Construct( void* analyticSolution, Stg_ComponentFactory* cf,
 		Journal_Printf( Journal_Register( Error_Type, self->type ), "Cannot understand viscosity type = '%s'\n", viscosityType );
 		abort();
 	}
-	
-	/* Create Analytic Fields */
-	self->velocityField = AnalyticSolution_RegisterFeVariableFromCF( self, "VelocityField",  _Trubitsyn2006_VelocityFunction, cf, True, data );
-	self->pressureField = AnalyticSolution_RegisterFeVariableFromCF( self, "PressureField",  _Trubitsyn2006_PressureFunction, cf, True, data );
-	AnalyticSolution_RegisterFeVariableFromCF( self, "ViscosityField", _Trubitsyn2006_ViscosityFunction, cf, False, data );
 
 	self->Ra = Stg_ComponentFactory_GetRootDictDouble( cf, "Ra", 0.0 );
 	self->T0 = Stg_ComponentFactory_GetRootDictDouble( cf, "T0", 0.0 );
@@ -277,26 +297,58 @@ void _Trubitsyn2006_Construct( void* analyticSolution, Stg_ComponentFactory* cf,
 void _Trubitsyn2006_Build( void* analyticSolution, void* data ) {
 	Trubitsyn2006*         self = (Trubitsyn2006*)analyticSolution;
 
-	_AnalyticSolution_Build( self, data );
+	Stg_Component_Build(self->velocityField, data, False);
+   Stg_Component_Build(self->pressureField, data, False);
+
+	_FieldTest_Build( self, data );
+
+	self->_analyticSolutionList = Memory_Alloc_Array_Unnamed( FieldTest_AnalyticSolutionFunc*, 3 );
+	self->_analyticSolutionList[0] = _Trubitsyn2006_VelocityFunction;
+	self->_analyticSolutionList[1] = _Trubitsyn2006_PressureFunction;
+	self->_analyticSolutionList[2] = _Trubitsyn2006_ViscosityFunction;
+}
+
+void _Trubitsyn2006_Initialise( void* analyticSolution, void* data ) {
+	Trubitsyn2006*         self = (Trubitsyn2006*)analyticSolution;
+
+	Stg_Component_Initialise(self->velocityField, data, False);
+	Stg_Component_Initialise(self->pressureField, data, False);
+
+	_FieldTest_Initialise( self, data );
+}
+
+void _Trubitsyn2006_Destroy( void* analyticSolution, void* data ) {
+	Trubitsyn2006*         self = (Trubitsyn2006*)analyticSolution;
+
+   _FieldTest_Destroy( self, data );
+   
+	Stg_Component_Destroy(self->velocityField, data, False);
+	Stg_Component_Destroy(self->pressureField, data, False);
 }
 
 
 void* _Trubitsyn2006_DefaultNew( Name name ) {
-	return _AnalyticSolution_New(
-			sizeof(Trubitsyn2006),
-			Trubitsyn2006_Type,
-			_AnalyticSolution_Delete,
-			_AnalyticSolution_Print,
-			_AnalyticSolution_Copy,
-			_Trubitsyn2006_DefaultNew,
-			_Trubitsyn2006_Construct,
-			_Trubitsyn2006_Build,
-			_AnalyticSolution_Initialise,
-			_AnalyticSolution_Execute,
-			_AnalyticSolution_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Trubitsyn2006);
+	Type                                                      type = Trubitsyn2006_Type;
+	Stg_Class_DeleteFunction*                              _delete = _FieldTest_Delete;
+	Stg_Class_PrintFunction*                                _print = _FieldTest_Print;
+	Stg_Class_CopyFunction*                                  _copy = _FieldTest_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Trubitsyn2006_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Trubitsyn2006_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Trubitsyn2006_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Trubitsyn2006_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _FieldTest_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Trubitsyn2006_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _FieldTest_New(  FIELDTEST_PASSARGS  );
 }
 
 Index Underworld_Trubitsyn2006_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Trubitsyn2006_Type, "0", _Trubitsyn2006_DefaultNew );
 }
+
+

@@ -24,69 +24,29 @@
 
 const Type StressField_Type = "StressField";
 
-StressField* _StressField_New(
- 		SizeT                                             _sizeOfSelf,
-		Type                                              type,
-		Stg_Class_DeleteFunction*                         _delete,
-		Stg_Class_PrintFunction*                          _print,
-		Stg_Class_CopyFunction*                           _copy, 
-		Stg_Component_DefaultConstructorFunction*         _defaultConstructor,
-		Stg_Component_ConstructFunction*                  _construct,
-		Stg_Component_BuildFunction*                      _build,
-		Stg_Component_InitialiseFunction*                 _initialise,
-		Stg_Component_ExecuteFunction*                    _execute,
-		Stg_Component_DestroyFunction*                    _destroy,
-		FieldVariable_InterpolateValueAtFunction*         _interpolateValueAt,
-		FieldVariable_GetValueFunction*	                  _getMinGlobalFeMagnitude,
-		FieldVariable_GetValueFunction*                   _getMaxGlobalFeMagnitude,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxLocalCoords,
-		FieldVariable_GetCoordFunction*                   _getMinAndMaxGlobalCoords,		
-		FeVariable_InterpolateWithinElementFunction*      _interpolateWithinElement,	
-		FeVariable_GetValueAtNodeFunction*                _getValueAtNode,
-		ParticleFeVariable_ValueAtParticleFunction*       _valueAtParticle,
-		Name                                              name )
-{
-	StressField*		self;
+StressField* _StressField_New(  STRESSFIELD_DEFARGS  ) {
+	StressField* self;
 	
-	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
+	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree.
+		At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
 	assert( _sizeOfSelf >= sizeof(StressField) );
-	self = (StressField*)
-		_ParticleFeVariable_New(
-			_sizeOfSelf, 
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute, 
-			_destroy,
-			_interpolateValueAt,
-			_getMinGlobalFeMagnitude, 
-			_getMaxGlobalFeMagnitude,
-			_getMinAndMaxLocalCoords, 
-			_getMinAndMaxGlobalCoords,
-			_interpolateWithinElement,
-			_getValueAtNode,
-			_valueAtParticle,
-			name );
+	self = (StressField*) _ParticleFeVariable_New(  PARTICLEFEVARIABLE_PASSARGS  );
 	
 	return self;
 }
 
 void _StressField_Init( 
-		StressField*                                      self,
-		FeVariable*                                       strainRateField,
-		ConstitutiveMatrix*                               constitutiveMatrix,
-		Variable*                                         stressVariable,
-		Variable_Register*                                variable_Register )
+	StressField*				self,
+	FeVariable*					strainRateField,
+	ConstitutiveMatrix*		constitutiveMatrix,
+	Variable*					stressVariable,
+	Variable_Register*		variable_Register,
+	SystemLinearEquations*	sle)
 {
-	Dimension_Index   dim = constitutiveMatrix->dim;
+	Dimension_Index dim = constitutiveMatrix->dim;
 
 	/* Assign Pointers */
-	self->strainRateField    = strainRateField;
+	self->strainRateField = strainRateField;
 	self->constitutiveMatrix = constitutiveMatrix;
 	self->variable_Register = variable_Register;
 
@@ -99,15 +59,18 @@ void _StressField_Init(
 		
 	/* Set pointers to swarm to be the same as the one on the constitutive matrix */
 	self->assemblyTerm->integrationSwarm = self->constitutiveMatrix->integrationSwarm;
-	self->massMatrixForceTerm->integrationSwarm = self->constitutiveMatrix->integrationSwarm;	
+	self->massMatrixForceTerm->integrationSwarm = self->constitutiveMatrix->integrationSwarm;
+
+	/*
+	** If we're using this field for non-linear feedback, we'll need to update it in between
+	** non-linear iterations. */
+	if( sle )
+		SystemLinearEquations_AddPostNonLinearEP( sle, StressField_Type, StressField_NonLinearUpdate );
 }
 
 /* --- Virtual Function Implementations --- */
 void _StressField_Delete( void* stressField ) {
 	StressField* self = (StressField*) stressField;
-
-	Stg_Class_Delete( self->assemblyVector );
-	Memory_Free( self->assemblyVectorName );
 
 	_FeVariable_Delete( self );
 }
@@ -126,7 +89,6 @@ void _StressField_Print( void* stressField, Stream* stream ) {
 	Journal_PrintPointer( stream, self->constitutiveMatrix );
 }
 
-
 void* _StressField_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	StressField*	self = (StressField*)feVariable;
 	StressField*	newStressField;
@@ -140,70 +102,69 @@ void* _StressField_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, 
 }
 
 void* _StressField_DefaultNew( Name name ) {
-	return (void*) _StressField_New(
-		sizeof(StressField),
-		StressField_Type,
-		_StressField_Delete,
-		_StressField_Print,
-		_StressField_Copy,
-		_StressField_DefaultNew,
-		_StressField_Construct,
-		_StressField_Build, 
-		_StressField_Initialise,
-		_StressField_Execute,
-		_StressField_Destroy,
-		_FeVariable_InterpolateValueAt,
-		_FeVariable_GetMinGlobalFieldMagnitude,
-		_FeVariable_GetMaxGlobalFieldMagnitude,
-		_FeVariable_GetMinAndMaxLocalCoords,
-		_FeVariable_GetMinAndMaxGlobalCoords,
-		_FeVariable_InterpolateNodeValuesToElLocalCoord,
-		_FeVariable_GetValueAtNode,
-		_StressField_ValueAtParticle_Recalculate,
-		name );
+	/* Variables set in this function */
+	SizeT                                                       _sizeOfSelf = sizeof(StressField);
+	Type                                                               type = StressField_Type;
+	Stg_Class_DeleteFunction*                                       _delete = _StressField_Delete;
+	Stg_Class_PrintFunction*                                         _print = _StressField_Print;
+	Stg_Class_CopyFunction*                                           _copy = _StressField_Copy;
+	Stg_Component_DefaultConstructorFunction*           _defaultConstructor = _StressField_DefaultNew;
+	Stg_Component_ConstructFunction*                             _construct = _StressField_AssignFromXML;
+	Stg_Component_BuildFunction*                                     _build = _StressField_Build;
+	Stg_Component_InitialiseFunction*                           _initialise = _StressField_Initialise;
+	Stg_Component_ExecuteFunction*                                 _execute = _StressField_Execute;
+	Stg_Component_DestroyFunction*                                 _destroy = _StressField_Destroy;
+	FieldVariable_InterpolateValueAtFunction*           _interpolateValueAt = _FeVariable_InterpolateValueAt;
+	FieldVariable_GetCoordFunction*                _getMinAndMaxLocalCoords = _FeVariable_GetMinAndMaxLocalCoords;
+	FieldVariable_GetCoordFunction*               _getMinAndMaxGlobalCoords = _FeVariable_GetMinAndMaxGlobalCoords;
+	FeVariable_InterpolateWithinElementFunction*  _interpolateWithinElement = _FeVariable_InterpolateNodeValuesToElLocalCoord;
+	FeVariable_GetValueAtNodeFunction*                      _getValueAtNode = _FeVariable_GetValueAtNode;
+	ParticleFeVariable_ValueAtParticleFunction*            _valueAtParticle = _StressField_ValueAtParticle_Recalculate;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType                             nameAllocationType = ZERO;
+	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = ZERO;
+	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
+	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
+
+	return (void*) _StressField_New(  STRESSFIELD_PASSARGS  );
 }
 
 void StressField_NonLinearUpdate( void* _sle, void* _ctx ) {
-   SystemLinearEquations* sle = (SystemLinearEquations*)_sle;
-   AbstractContext* ctx = (AbstractContext*)_ctx;
+   SystemLinearEquations* sle;
+   DomainContext* ctx = (DomainContext*)_ctx;
    FieldVariable_Register* fieldVar_Register;
    StressField* stressVar;
 
-   fieldVar_Register = Stg_ObjectList_Get( ctx->register_Register, "FieldVariable_Register" );
+	sle = (SystemLinearEquations*)_sle;
+   fieldVar_Register = ctx->fieldVariable_Register;
    stressVar = (StressField*)FieldVariable_Register_GetByName( fieldVar_Register, "StressField" );
    ParticleFeVariable_Update( stressVar );
 }
 
-void _StressField_Construct( void* stressField, Stg_ComponentFactory* cf, void* data ){
-	StressField*          self              = (StressField*) stressField;
+void _StressField_AssignFromXML( void* stressField, Stg_ComponentFactory* cf, void* data ){
+	StressField*          self = (StressField*) stressField;
 	FeVariable*           strainRateField;
 	ConstitutiveMatrix*   constitutiveMatrix;
 	Variable_Register*    variable_Register;
 	Name                  stressVariableName;
 	Variable*             stressVariable;
-        SystemLinearEquations* sle;
+	SystemLinearEquations* sle;
 
 	/* Construct Parent */
-	_ParticleFeVariable_Construct( self, cf, data );
-
-	/* _FieldVariable_Construct( self, cf, data ); */
+	_ParticleFeVariable_AssignFromXML( self, cf, data );
 
 	strainRateField =  Stg_ComponentFactory_ConstructByKey( cf,  self->name, "StrainRateField", FeVariable, True, data );
 	constitutiveMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ConstitutiveMatrix", ConstitutiveMatrix, True, data );
-	variable_Register      = (Variable_Register*) Stg_ObjectList_Get( cf->registerRegister, "Variable_Register" );
+	variable_Register = self->context->variable_Register; 
 	assert( variable_Register );
 
 	stressVariableName = Stg_ComponentFactory_GetString( cf, self->name, "StressVariable", "Stress" );
 	stressVariable = Variable_Register_GetByName( variable_Register, stressVariableName );
 
-	_StressField_Init( self, strainRateField, constitutiveMatrix, stressVariable, variable_Register );
+   sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, "SLE", SystemLinearEquations, False, data );
 
-        /*
-        ** If we're using this field for non-linear feedback, we'll need to update it in between
-        ** non-linear iterations. */
-        sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, "SLE", SystemLinearEquations, False, data );
-        if( sle )
-           SystemLinearEquations_AddPostNonLinearEP( sle, StressField_Type, StressField_NonLinearUpdate );
+	_StressField_Init( self, strainRateField, constitutiveMatrix, stressVariable, variable_Register, sle );
 }
 
 void _StressField_Build( void* stressField, void* data ) {
@@ -216,6 +177,8 @@ void _StressField_Build( void* stressField, void* data ) {
 
 	Stg_Component_Build( self->feMesh, data, False );
 	Stg_Component_Build( self->strainRateField, data, False );
+	Stg_Component_Build( self->constitutiveMatrix, data, False );
+	if ( self->stressVariable ) Stg_Component_Build( self->stressVariable, data, False );
 
 	if ( dim == 2 ) {
 		variableName[0] = StG_Strdup( "tau_xx" );
@@ -235,31 +198,31 @@ void _StressField_Build( void* stressField, void* data ) {
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
 	self->dataVariable = Variable_NewVector(
-			tmpName,
-			Variable_DataType_Double, 
-			self->fieldComponentCount,
-			&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
-			NULL,
-			(void**)&self->data, 
-			self->variable_Register,
-			variableName[0],
-			variableName[1],
-			variableName[2],
-			variableName[3],
-			variableName[4],
-			variableName[5] );
+		tmpName,
+		(AbstractContext*)self->context,
+		Variable_DataType_Double, 
+		self->fieldComponentCount,
+		&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
+		NULL,
+		(void**)&self->data, 
+		self->variable_Register,
+		variableName[0],
+		variableName[1],
+		variableName[2],
+		variableName[3],
+		variableName[4],
+		variableName[5] );
 	Memory_Free( tmpName );
 	
 	/* Create Dof Layout */
 	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
-	self->dofLayout = DofLayout_New( tmpName, self->variable_Register, 0, self->feMesh );
+	self->dofLayout = DofLayout_New( tmpName, self->context, self->variable_Register, 0, self->feMesh );
 	self->dofLayout->_numItemsInLayout = FeMesh_GetNodeDomainSize( self->feMesh );
 	for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ ) {
 		self->dataVariableList[ variable_I ] = Variable_Register_GetByName( self->variable_Register, 
-										    variableName[ variable_I ] );
-		for( node_I = 0; node_I < FeMesh_GetNodeDomainSize( self->feMesh ); node_I++ ) {
+                             variableName[ variable_I ] );
+		for( node_I = 0; node_I < FeMesh_GetNodeDomainSize( self->feMesh ); node_I++ )
 			DofLayout_AddDof_ByVarName( self->dofLayout, variableName[variable_I], node_I );
-		}
 		/* Free Name */
 		Memory_Free( variableName[ variable_I ] );
 	}
@@ -278,8 +241,6 @@ void _StressField_Build( void* stressField, void* data ) {
 	for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ ) {
 		Variable_Update( self->dataVariableList[ variable_I ] );
 	}
-
-
 }
 
 void _StressField_Initialise( void* stressField, void* data ) {
@@ -287,7 +248,7 @@ void _StressField_Initialise( void* stressField, void* data ) {
 	Variable_Index variable_I;
 
 	Stg_Component_Initialise( self->strainRateField, data, False );
-	
+	Stg_Component_Initialise( self->constitutiveMatrix, data, False );
 	/* Initialise and Update all Variables that this component has created */
 	Stg_Component_Initialise( self->dataVariable, data, False); Variable_Update( self->dataVariable );
 	for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ ) {
@@ -303,16 +264,23 @@ void _StressField_Initialise( void* stressField, void* data ) {
 	}
 
 }
+
 void _StressField_Execute( void* stressField, void* data ) {
 	StressField* self = (StressField*) stressField;
 
 	_ParticleFeVariable_Execute( self, data );
 }
+
 void _StressField_Destroy( void* stressField, void* data ) {
 	StressField* self = (StressField*) stressField;
 
+	Stg_Component_Destroy( self->strainRateField, data, False );
+	Stg_Component_Destroy( self->constitutiveMatrix, data, False );
+	Stg_Component_Destroy( self->dataVariable, data, False);
+
 	_ParticleFeVariable_Destroy( self, data );
 }
+
 void _StressField_ValueAtParticle_Recalculate( void* stressField, IntegrationPointsSwarm* swarm, Element_LocalIndex lElement_I, void* _particle, double* stress ) {
 	StressField*      self         = (StressField*) stressField;
 	SymmetricTensor   strainRate;
@@ -344,3 +312,5 @@ void _StressField_ValueAtParticle_FromVariable( void* stressField, IntegrationPo
 	stressParticleExt = (double*) ((ArithPointer) materialPoint + (ArithPointer)self->stressVariable->offsets[0]);
 	memcpy( stress, stressParticleExt, sizeof(double)*self->fieldComponentCount );
 }
+
+

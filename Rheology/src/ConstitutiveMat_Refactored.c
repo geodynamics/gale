@@ -60,45 +60,13 @@
 
 const Type ConstitutiveMat_Refactored_Type = "ConstitutiveMat_Refactored";
 
-ConstitutiveMat_Refactored* _ConstitutiveMat_Refactored_New( 
-		SizeT                                        _sizeOfSelf,
-		Type                                         type,
-		Stg_Class_DeleteFunction*                    _delete,
-		Stg_Class_PrintFunction*                     _print,
-		Stg_Class_CopyFunction*                      _copy, 
-		Stg_Component_DefaultConstructorFunction*    _defaultConstructor,
-		Stg_Component_ConstructFunction*             _construct,
-		Stg_Component_BuildFunction*                 _build,
-		Stg_Component_InitialiseFunction*            _initialise,
-		Stg_Component_ExecuteFunction*               _execute,
-		Stg_Component_DestroyFunction*               _destroy,
-		ConstitutiveMat_Refactored_SetValueFunc*             _setValue,
-		ConstitutiveMat_Refactored_GetValueFunc*             _getViscosity,
-		ConstitutiveMat_Refactored_SetValueFunc*             _isotropicCorrection,
-		ConstitutiveMat_Refactored_SetSecondViscosityFunc*   _setSecondViscosity,
-		ConstitutiveMat_Refactored_Assemble_D_B_Func*        _assemble_D_B,
-		ConstitutiveMat_Refactored_CalculateStressFunc*      _calculateStress,
-		Name                                         name )
-{
-	ConstitutiveMat_Refactored*	self;
+ConstitutiveMat_Refactored* _ConstitutiveMat_Refactored_New(  CONSTITUTIVEMAT_REFACTORED_DEFARGS  ) {
+	ConstitutiveMat_Refactored* self;
 	
 	assert( _sizeOfSelf >= sizeof(ConstitutiveMat_Refactored) );
 	
 	/* General info */
-	self = (ConstitutiveMat_Refactored*)_Stg_Component_New( 
-			_sizeOfSelf, 
-			type, 
-			_delete,
-			_print, 
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			name,
-		        NON_GLOBAL );
+	self = (ConstitutiveMat_Refactored*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 	
 	/* Virtual functions */
 	self->_setValue            = _setValue;
@@ -112,25 +80,25 @@ ConstitutiveMat_Refactored* _ConstitutiveMat_Refactored_New(
 }
 
 void _ConstitutiveMat_Refactored_Init(
-		ConstitutiveMat_Refactored*	                   self,
-		Dimension_Index                            dim,	
-		FiniteElementContext*                      context,	
-		Materials_Register*                        materials_Register ) 
+	void*						constitutiveMatrix,
+	Dimension_Index		dim,	
+	PICelleratorContext*	context,	
+	Materials_Register*	materials_Register ) 
 {
+	ConstitutiveMat_Refactored* self = (ConstitutiveMat_Refactored*)constitutiveMatrix;
 	/* General and Function pointers for this class that are not on the parent class should be set here should already be set */
 	
 	/* ConstitutiveMat_Refactored info */
-	self->isConstructed = True;
-
+	self->context = context;
 	self->debug = Journal_MyStream( Debug_Type, self );
 
 	self->matrixData = NULL;
-	self->dim                 = dim;
+	self->dim = dim;
 
-	self->materials_Register  = materials_Register;
-	self->isDiagonal          = False;
-	self->columnSize          = 0;
-	self->rowSize             = 0;
+	self->materials_Register = materials_Register;
+	self->isDiagonal = False;
+	self->columnSize = 0;
+	self->rowSize = 0;
 
 	/* If we are restarting, there will be an existing valid solution for the velocity, pressure
 	etc fields - thus we record this so any yield rheologies will behave correctly */
@@ -147,17 +115,6 @@ void _ConstitutiveMat_Refactored_Init(
 	self->sleNonLinearIteration_I = 0;
 }
 
-
-void ConstitutiveMat_Refactored_InitAll( 
-		void*	                                     constitutiveMatrix,
-		Dimension_Index                              dim,
-		FiniteElementContext*                        context,
-		Materials_Register*                          materials_Register ) 
-{
-	ConstitutiveMat_Refactored* self = (ConstitutiveMat_Refactored*)constitutiveMatrix;
-
-	_ConstitutiveMat_Refactored_Init( self, dim, context, materials_Register );
-}
 
 void _ConstitutiveMat_Refactored_Delete( void* constitutiveMatrix ) {
 	ConstitutiveMat_Refactored* self = (ConstitutiveMat_Refactored*)constitutiveMatrix;
@@ -213,18 +170,18 @@ void* _ConstitutiveMat_Refactored_Copy( void* constitutiveMatrix, void* dest, Bo
 	return (void*)newConstitutiveMat_Refactored;
 }
 
-void _ConstitutiveMat_Refactored_Construct( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) {
-	ConstitutiveMat_Refactored*         self          = (ConstitutiveMat_Refactored*)constitutiveMatrix;
-	Dimension_Index             dim;
-	Materials_Register*         materialsRegister;
-	FiniteElementContext*       context;
+void _ConstitutiveMat_Refactored_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) {
+	ConstitutiveMat_Refactored*	self = (ConstitutiveMat_Refactored*)constitutiveMatrix;
+	Dimension_Index					dim;
+	Materials_Register*				materialsRegister;
+	PICelleratorContext*				context;
 
-	materialsRegister = Stg_ObjectList_Get( cf->registerRegister, "Materials_Register" );
+	context = (PICelleratorContext*)Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
+
+	materialsRegister = context->materials_Register;
 	assert( materialsRegister );
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
-
-	context = (FiniteElementContext*)Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
 
 	_ConstitutiveMat_Refactored_Init( self, dim, context, materialsRegister );
 }
@@ -364,4 +321,6 @@ void ConstitutiveMat_Refactored_PrintContents( void* constitutiveMatrix, Stream*
 		Journal_Printf( stream, "\n" );
 	}
 }
+
+
 

@@ -39,7 +39,7 @@
 
 const Type Underworld_Shfl_Type = "Underworld_Shfl";
 
-void _Underworld_Shfl_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_Shfl_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
@@ -49,20 +49,52 @@ void _Underworld_Shfl_Construct( void* component, Stg_ComponentFactory* cf, void
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_Shfl_Output );
 }
 
+void _Underworld_Shfl_Build( void* component, void* data ) {
+	Underworld_Shfl*	self = (Underworld_Shfl*)component;
+
+	assert( self );
+
+	Stg_Component_Build( self->dTField, data, False );
+   
+   _Codelet_Build( self, data );
+}
+
+void _Underworld_Shfl_Destroy( void* component, void* data ) {
+	Underworld_Shfl*	self = (Underworld_Shfl*)component;
+
+   _Codelet_Destroy( self, data );
+
+	Stg_Component_Destroy( self->dTField, data, False );
+}
+
+void _Underworld_Shfl_Initialise( void* component, void* data ) {
+	Underworld_Shfl*	self = (Underworld_Shfl*)component;
+
+	assert( self );
+
+	Stg_Component_Initialise( self->dTField, data, False );
+   
+   _Codelet_Initialise( self, data );
+}
+
 void* _Underworld_Shfl_DefaultNew( Name name ) {
-	return _Codelet_New(
-		sizeof(Underworld_Shfl),
-		Underworld_Shfl_Type,
-		_Codelet_Delete,
-		_Codelet_Print,
-		_Codelet_Copy,
-		_Underworld_Shfl_DefaultNew,
-		_Underworld_Shfl_Construct,
-		_Codelet_Build,
-		_Codelet_Initialise,
-		_Codelet_Execute,
-		_Codelet_Destroy,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Underworld_Shfl);
+	Type                                                      type = Underworld_Shfl_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_Shfl_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Underworld_Shfl_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Underworld_Shfl_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Underworld_Shfl_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Underworld_Shfl_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
 
 Index Underworld_Shfl_Register( PluginsManager* pluginsManager ) {
@@ -71,13 +103,13 @@ Index Underworld_Shfl_Register( PluginsManager* pluginsManager ) {
 
 
 void Underworld_Shfl_Setup( UnderworldContext* context ) {
-	FieldVariable_Register*              fV_Register               = context->fieldVariable_Register;
-	FieldVariable*                       temperatureGradientsField;
-	FieldVariable*                       velocityField;
-	FieldVariable*                       temperatureField;
-	OperatorFeVariable*                  advectiveHeatFluxField;
-	OperatorFeVariable*                  temperatureTotalDerivField;
-	
+	FieldVariable_Register*  fV_Register               = context->fieldVariable_Register;
+	FieldVariable*           temperatureGradientsField;
+	FieldVariable*           velocityField;
+	FieldVariable*           temperatureField;
+	OperatorFeVariable*      advectiveHeatFluxField;
+	OperatorFeVariable*      temperatureTotalDerivField;
+	Swarm*					    gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
 
 	Underworld_Shfl* self;
 
@@ -88,7 +120,7 @@ void Underworld_Shfl_Setup( UnderworldContext* context ) {
 	StgFEM_FrequentOutput_PrintString( context, "Shfl" );
 
 	Journal_Firewall( 
-			context->gaussSwarm != NULL, 
+			gaussSwarm != NULL, 
 			Underworld_Error,
 			"Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
 
@@ -100,18 +132,21 @@ void Underworld_Shfl_Setup( UnderworldContext* context ) {
 	/* get uT */
 	advectiveHeatFluxField = OperatorFeVariable_NewBinary(  
 			"AdvectiveHeatFluxField",
+         (DomainContext*)	context,
 			temperatureField, 
 			velocityField, 
 			"VectorScale" );
 	/* get dTdz - uT */
 	temperatureTotalDerivField = OperatorFeVariable_NewBinary(  
 			"TemperatureTotalDerivField",
+         (DomainContext*)	context,
 			advectiveHeatFluxField, 
 			temperatureGradientsField, 
 			"Addition" );
 	
 	self->dTField = (FeVariable*) OperatorFeVariable_NewUnary(  
 			"dTfieldz",
+         (DomainContext*)	context,
 			temperatureGradientsField, 
 			"TakeSecondComponent" );
 	self->dTField->feMesh = ((FeVariable*)velocityField)->feMesh;
@@ -140,3 +175,5 @@ void Underworld_Shfl_Output( UnderworldContext* context ) {
 		
 	StgFEM_FrequentOutput_PrintValue( context, -self->shfl  );
 }
+
+

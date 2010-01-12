@@ -53,7 +53,7 @@ const Type Underworld_AverageTemperature_Type = "Underworld_AverageTemperature";
 void Underworld_AverageTemperature_PrintHeaderToFile( void* context );
 void Underworld_AverageTemperature_Output( void* _context );
 
-void _Underworld_AverageTemperature_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_AverageTemperature_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*  context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
@@ -66,7 +66,7 @@ void* _Underworld_AverageTemperature_DefaultNew( Name name ) {
 	return Codelet_New(
 		Underworld_AverageTemperature_Type,
 		_Underworld_AverageTemperature_DefaultNew,
-		_Underworld_AverageTemperature_Construct,
+		_Underworld_AverageTemperature_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,
@@ -80,9 +80,9 @@ Index Underworld_AverageTemperature_Register( PluginsManager* pluginsManager ) {
 
 void Underworld_AverageTemperature_Output( void* _context ) {
 	UnderworldContext* context       = (UnderworldContext*) _context;
-	FeVariable*        temperatureFe = context->temperatureField;
+	FeVariable*        temperatureFe = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
 	FeMesh*		   mesh         = temperatureFe->feMesh;
-	IntegrationPointsSwarm* swarm    = (IntegrationPointsSwarm*)context->gaussSwarm;
+	IntegrationPointsSwarm* swarm    = (IntegrationPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
 	IntegrationPoint*  particle;
 	ElementType*       elementType;
 	Element_LocalIndex lElement_I, lCell_I;
@@ -131,4 +131,6 @@ void Underworld_AverageTemperature_PrintHeaderToFile( void* context ) {
 	StgFEM_FrequentOutput_PrintString( context, "AvgBuoyancyTemperature" );
 	StgFEM_FrequentOutput_PrintString( context, "BuoyancyVolume" );
 }
+
+
 

@@ -4,16 +4,30 @@
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
 	<include> Underworld/BaseApps/RayleighTaylor.xml </include>
-	
+
 	<list name="plugins" mergeType="merge">
 		<!-- Output Plugins -->
-		<param>StgFEM_FrequentOutput</param>	
-		<param>Underworld_Vrms</param>	
-		<param>StgFEM_CPUTime</param>	
-		<param>Underworld_Velic_solHA</param>
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>	
+			<param name="Context">context</param>	
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>	
+			<param name="Context">context</param>	
+			<param name="VelocityField">VelocityField</param>	
+			<param name="GaussSwarm">gaussSwarm</param>	
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>	
+			<param name="Context">context</param>	
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Velic_solA</param>	
+			<param name="Context">context</param>	
+		</struct>
 	</list>
-
-		<struct name="pluginData">
+	
+	<struct name="pluginData">
 		<list name="NumericFields">
 			<param>VelocityField</param> <param> 0 </param>
 			<param>PressureField</param> <param> 1 </param>
@@ -25,8 +39,9 @@
 		<param name="normaliseByAnalyticSolution">true</param>
 		<param name="useReferenceSolutionFromFile">false</param>
 		<param name="appendToAnalysisFile">false</param>
-		<param name="context">context</param>
+		<param name="Context">context</param>
 	</struct>
+
 	<!-- Test tolerances. THIS IS A LOW RESOLUTION TEST -->
 
 	<param name="solHA_sigma">1.0</param>
@@ -38,6 +53,9 @@
 	<param name="solHA_endY">0.75</param>
 
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
 		<struct name="Viscosity">
 			<param name="Type">MaterialViscosity</param>
 			<param name="eta0">solHA_eta</param>

@@ -50,8 +50,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __XDMFGenerator_h__
-#define __XDMFGenerator_h__
+#ifndef __Underworld_Utils_XDMFGenerator_h__
+#define __Underworld_Utils_XDMFGenerator_h__
 
     extern const Type XDMFGenerator_Type;
         

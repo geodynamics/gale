@@ -61,42 +61,13 @@
 const Type YieldRheology_Type = "YieldRheology";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-YieldRheology* _YieldRheology_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion,
-		YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator,
-		YieldRheology_HasYieldedFunction*                  _hasYielded,
-		Name                                               name ) 
+YieldRheology* _YieldRheology_New(  YIELDRHEOLOGY_DEFARGS  ) 
 {
 	YieldRheology*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(YieldRheology) );
-	self = (YieldRheology*) _Rheology_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			name );
+	assert( _sizeOfSelf >= sizeof(YieldRheology) );
+	self = (YieldRheology*) _Rheology_New(  RHEOLOGY_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	self->_getYieldCriterion = _getYieldCriterion;
@@ -106,7 +77,7 @@ YieldRheology* _YieldRheology_New(
 	return self;
 }
 
-void _YieldRheology_Init( YieldRheology* self, StrainWeakening* strainWeakening, MaterialPointsSwarm* materialPointsSwarm )
+void _YieldRheology_Init( YieldRheology* self, StrainWeakening* strainWeakening, MaterialPointsSwarm* materialPointsSwarm, double minVisc )
 {
 	ExtensionInfo_Index     handle             = (ExtensionInfo_Index) -1;
 	self->strainWeakening = strainWeakening;
@@ -149,15 +120,17 @@ void _YieldRheology_Init( YieldRheology* self, StrainWeakening* strainWeakening,
 	 * if there are material points - all YieldRheology objects will refer to the same handle */
 	self->hasYieldedParticleExtHandle = handle;
 
-        self->yieldCriterion = 0.0;
-        self->minVisc = 0.0;
+   self->yieldCriterion = 0.0;
+   self->minVisc = minVisc;
 }
 
 
 void _YieldRheology_Delete( void* rheology ) {
 	YieldRheology*					self = (YieldRheology*)rheology;
+	
 	_Stg_Component_Delete( self );
 }
+
 void _YieldRheology_Print( void* rheology, Stream* stream ) {}
 
 void* _YieldRheology_Copy( void* rheology, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
@@ -167,12 +140,13 @@ void* _YieldRheology_Copy( void* rheology, void* dest, Bool deep, Name nameExt, 
 	return (void*) self;
 }
 
-void _YieldRheology_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
-	YieldRheology*           self                 = (YieldRheology*)rheology;
-	StrainWeakening*         strainWeakening;
+void _YieldRheology_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
+	YieldRheology*        self                 = (YieldRheology*)rheology;
+	StrainWeakening*      strainWeakening;
 	MaterialPointsSwarm*  materialPoints;
+	double                minVisc;
 	
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 
 	strainWeakening =  Stg_ComponentFactory_ConstructByKey( 
 		cf, 
@@ -190,9 +164,9 @@ void _YieldRheology_Construct( void* rheology, Stg_ComponentFactory* cf, void* d
 		False,
 		data  ) ;
 
-	_YieldRheology_Init( self, strainWeakening, materialPoints );
-
-	self->minVisc = Stg_ComponentFactory_GetDouble( cf, self->name, "minimumViscosity", 0.0 );
+   minVisc = Stg_ComponentFactory_GetDouble( cf, self->name, "minimumViscosity", 0.0 );
+   
+	_YieldRheology_Init( self, strainWeakening, materialPoints, minVisc );
 }
 
 void _YieldRheology_Build( void* rheology, void* data ) {
@@ -203,10 +177,10 @@ void _YieldRheology_Build( void* rheology, void* data ) {
 	/* This variable only needs to be built if there are material points (hasYieldedVariable is created
 	 * in _YieldRheology_Init only in that case) */
 	
-	if ( self->hasYieldedVariable ) {
-		Stg_Component_Build( self->hasYieldedVariable, data, False );
-	}
+	if ( self->hasYieldedVariable ) Stg_Component_Build( self->hasYieldedVariable, data, False );
+
 }
+
 void _YieldRheology_Initialise( void* rheology, void* data ) {
 	YieldRheology*                   self          = (YieldRheology*) rheology;
 	
@@ -214,12 +188,20 @@ void _YieldRheology_Initialise( void* rheology, void* data ) {
 
 	/* This variable only needs to be initialised if there are material points (hasYieldedVariable is created
 	 * in _YieldRheology_Init only in that case) */
-	if ( self->hasYieldedVariable ) {
-		Stg_Component_Initialise( self->hasYieldedVariable, data, False );
-	}
+	if ( self->context->loadFromCheckPoint == False )
+      if ( self->hasYieldedVariable ) Stg_Component_Initialise( self->hasYieldedVariable, data, False );
 }
+
 void _YieldRheology_Execute( void* rheology, void* data ) {}
-void _YieldRheology_Destroy( void* rheology, void* data ) {}
+
+void _YieldRheology_Destroy( void* rheology, void* data ) {
+   YieldRheology* self = (YieldRheology*) rheology;
+   
+   if( self->strainWeakening )     Stg_Component_Destroy( self->strainWeakening, data, False );
+   if ( self->hasYieldedVariable ) Stg_Component_Destroy( self->hasYieldedVariable, data, False );
+   
+   _Rheology_Destroy( self, data ); 
+}
 
 void _YieldRheology_ModifyConstitutiveMatrix( 
 		void*                                              yieldRheology, 
@@ -260,4 +242,6 @@ void _YieldRheology_ModifyConstitutiveMatrix(
 		YieldRheology_HasYielded( self, constitutiveMatrix, materialPointsSwarm, lElement_I, materialPoint, yieldCriterion, yieldIndicator );
 	}
 }
+
+
 

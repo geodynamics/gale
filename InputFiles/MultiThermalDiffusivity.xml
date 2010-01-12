@@ -34,18 +34,47 @@ appropriate parameters and their values if you use this xml from production runs
 	</list>
 
 	<include> Underworld/BaseApps/ThermalConvectionPIC.xml </include>
-	
-	<list name="plugins" mergeType="merge">
-		<!-- Output Plugins -->
-		<param>StgFEM_FrequentOutput</param>	
-		<param>Underworld_Nusselt</param>	
-		<param>Underworld_Vrms</param>	
-		<param>StgFEM_CPUTime</param>	
-		<param>Underworld_MaterialThermalDiffusivity</param>	
-		<param>Underworld_ShapeFemIC</param>	
-	</list>
 
+	<param name="lucPluginContext">context</param>
+	<list name="plugins" mergeType="merge">
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Nusselt</param>	
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>	
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+			<param name="VelocityField">VelocityField</param>
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_MaterialThermalDiffusivity</param>	
+			<param name="Context">context</param>
+			<param name="IntegrationSwarm">picIntegrationPoints</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_ShapeFemIC</param>	
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">lucPlugin</param>
+			<param name="Context">lucPluginContext</param>
+		</struct>
+	</list>
+	
 	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
 		<struct name="isotropicViscosity">
 			<param name="Type">MaterialViscosity</param>
 			<param name="eta0">1.0</param>
@@ -133,8 +162,6 @@ appropriate parameters and their values if you use this xml from production runs
 				</asciidata>
 			</list>
 		</struct>
-
-					
 	</struct>
 
 	<!-- Simulation control -->
@@ -143,7 +170,7 @@ appropriate parameters and their values if you use this xml from production runs
 	<param name="dumpEvery"> 1 </param>	
 	<param name="checkpointEvery"> 0 </param>
 
-  	<!--   choose what to checkpoint
+	<!--   choose what to checkpoint
 	<list name="FieldVariablesToCheckpoint">
 		<param>VelocityField</param>
 		<param>VelocityGradientsField</param>
@@ -151,11 +178,10 @@ appropriate parameters and their values if you use this xml from production runs
 	-->
 
   	<!--  restart from a previous checkpoint 
-  	<param name="restartTimestep"> 10 </param>
-  	-->
+	<param name="restartTimestep"> 10 </param>
+	-->
 	
 	<param name="Ra"> 1e5 </param>	
-	
 	<param name="courantFactor"> 0.25 </param>	
 	
 	<!-- Journal Control -->
@@ -220,7 +246,6 @@ appropriate parameters and their values if you use this xml from production runs
 			<param name="colours">Red Green Blue</param>
 			<param name="dynamicRange">True</param>
 		</struct>
-		<!-- Drawing Objects -->
 		<struct name="particleDots">
 			<param name="Type">lucSwarmViewer</param>
 			<param name="Swarm">materialSwarm</param>
@@ -236,7 +261,6 @@ appropriate parameters and their values if you use this xml from production runs
 			<param name="Type">lucTitle</param>
 			<param name="string">Particle Types</param>
 		</struct>
-		<!-- Viewport -->
 		<struct name="ParticleVP">
 			<param name="Type">lucViewport</param>
 			<param name="Camera">camera</param>
@@ -246,7 +270,6 @@ appropriate parameters and their values if you use this xml from production runs
 				<param>border</param>
 			</list>
 		</struct>
-		<!-- Drawing Objects -->
 		<struct name="window" mergeType="merge">
 			<param name="Viewport">TemperatureAndVelocityArrowsVP ParticleVP </param>
 		</struct>

@@ -46,7 +46,7 @@
 #ifndef __Underworld_Utils_types_h__
 #define __Underworld_Utils_types_h__
 	
-	typedef struct UnderworldContext             UnderworldContext;
+	typedef struct UnderworldContext		UnderworldContext;
 	typedef struct PressureTemperatureOutput     PressureTemperatureOutput;
 	typedef struct Underworld_SwarmOutput              Underworld_SwarmOutput;
 	typedef struct RadiogenicHeatingTerm         RadiogenicHeatingTerm;
@@ -55,5 +55,23 @@
 	typedef struct SmoothVelGradField SmoothVelGradField;
 	typedef struct ViscosityField                ViscosityField;
 	typedef struct DensityField                  DensityField;
+   typedef struct BaseRecoveryFeVar     BaseRecoveryFeVar;
+   typedef struct SPR_StrainRate SPR_StrainRate;
+   typedef struct REP_Algorithm         REP_Algorithm;	
+   typedef struct RecoveredFeVariable   RecoveredFeVariable;
+
+#define REP_MAXNODESPERPATCH 30
+	typedef struct {
+		int nodeIDList[REP_MAXNODESPERPATCH]; /* TODO: Assume */
+		int numberOfNodes;
+	} LmStruct;
+
+	/* This is a little something I need for ordering the construction of the Ax=b problem
+	 * AND keeping a list of nodes which a certain patch can be applied to */
+	typedef struct {
+		Bool   onMeshBoundary;
+		int    numOfPatches2use;
+		int    patchNodes[REP_MAXNODESPERPATCH];
+	} BoundaryNodesInfo;
 
 #endif 

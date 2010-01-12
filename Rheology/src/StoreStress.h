@@ -43,8 +43,8 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-#ifndef __Underworld_StoreStress_h__
-#define __Underworld_StoreStress_h__
+#ifndef __Underworld_Rheology_StoreStress_h__
+#define __Underworld_Rheology_StoreStress_h__
 
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 	extern const Type StoreStress_Type;
@@ -61,31 +61,32 @@
 		/* Param passed in */ \
 		MaterialPointsSwarm*                                materialPointsSwarm;                              \
 		FeVariable*                                         strainRateField;                    \
-		ExtensionInfo_Index                                 particleExtHandle;
+		ExtensionInfo_Index                                 particleExtHandle; \
+		SwarmVariable*                                      materialPointsSwarmVariable;
 	
 
 	struct StoreStress { __StoreStress };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	StoreStress* _StoreStress_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STORESTRESS_DEFARGS \
+                RHEOLOGY_DEFARGS
+
+	#define STORESTRESS_PASSARGS \
+                RHEOLOGY_PASSARGS
+
+	StoreStress* _StoreStress_New(  STORESTRESS_DEFARGS  );
 
 	/* 'Stg_Component' implementations */
 	void* _StoreStress_DefaultNew( Name name ) ;
-	void _StoreStress_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _StoreStress_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _StoreStress_Build( void* rheology, void* data );
 	void _StoreStress_Initialise( void* rheology, void* data );
+	void _StoreStress_Destroy( void* rheology, void* data );
 
 	void _StoreStress_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
@@ -96,3 +97,4 @@
 		Coord                                              xi );
 
 #endif
+

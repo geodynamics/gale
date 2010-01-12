@@ -94,23 +94,24 @@
 	struct YieldRheology { __YieldRheology };
 
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	YieldRheology* _YieldRheology_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion,
-		YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator,
-		YieldRheology_HasYieldedFunction*                  _hasYielded,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define YIELDRHEOLOGY_DEFARGS \
+                RHEOLOGY_DEFARGS, \
+                YieldRheology_GetYieldCriterionFunction*  _getYieldCriterion, \
+                YieldRheology_GetYieldIndicatorFunction*  _getYieldIndicator, \
+                YieldRheology_HasYieldedFunction*                _hasYielded
+
+	#define YIELDRHEOLOGY_PASSARGS \
+                RHEOLOGY_PASSARGS, \
+	        _getYieldCriterion, \
+	        _getYieldIndicator, \
+	        _hasYielded       
+
+	YieldRheology* _YieldRheology_New(  YIELDRHEOLOGY_DEFARGS  );
 
 	/* 'Stg_Class' implementations */
 	void _YieldRheology_Delete( void* rheology );
@@ -123,11 +124,12 @@
 	
 	/* 'Stg_Component' implementations */
 	void* _YieldRheology_DefaultNew( Name name ) ;
-	void _YieldRheology_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _YieldRheology_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 	void _YieldRheology_Build( void* rheology, void* data );
 	void _YieldRheology_Initialise( void* rheology, void* data );
 	void _YieldRheology_Execute( void* rheology, void* data );
 	void _YieldRheology_Destroy( void* rheology, void* data );
+	void _YieldRheology_Init( YieldRheology* self, StrainWeakening* strainWeakening, MaterialPointsSwarm* materialPointsSwarm, double minVisc );
 	
 	void _YieldRheology_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
@@ -162,3 +164,4 @@
 			= (Particle_Bool) (flag)
 	
 #endif
+

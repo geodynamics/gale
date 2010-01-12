@@ -74,9 +74,7 @@ void Underworld_DensityChange_Check( UnderworldContext* context ) {
 		return;
 
 	/* Get self (the plugin) */
-	Underworld_DensityChange* self = (Underworld_DensityChange*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_DensityChange_Type );
+	Underworld_DensityChange* self = (Underworld_DensityChange*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_DensityChange_Type );
 
 	/* get centroid coordinate */
 	volume = Material_Volume( self->material, (IntegrationPointsSwarm*)self->swarm, centroid );
@@ -96,17 +94,12 @@ void Underworld_DensityChange_Setup( UnderworldContext* context ) {
 		/* Function pulls and checks user input from the xml file */
 	BuoyancyForceTerm*  bft = NULL;
 	BuoyancyForceTerm_MaterialExt* materialExt = NULL;;
-	Materials_Register*  materialRegister = context->materials_Register;
 	Stream* stream = Journal_Register( Info_Type, "cows" );
-	IntegrationPointsSwarm* swarm = NULL;
 	Name   materialName = NULL;
 	int materialIndex;
-	double oldDensity;
 
 	/* Get self (the plugin) */
-	Underworld_DensityChange* self = (Underworld_DensityChange*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_DensityChange_Type );
+	Underworld_DensityChange* self = (Underworld_DensityChange*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_DensityChange_Type ); 
 
 	/* Initialise plugin data */
 	self->bftExt = NULL;
@@ -136,7 +129,7 @@ void Underworld_DensityChange_Setup( UnderworldContext* context ) {
 	self->bftExt = materialExt;
 }
 
-void _Underworld_DensityChange_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_DensityChange_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context;
 
 	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
@@ -148,19 +141,23 @@ void _Underworld_DensityChange_Construct( void* component, Stg_ComponentFactory*
 }
 
 void* _Underworld_DensityChange_DefaultNew( Name name ) {
-	return _Codelet_New(
-			sizeof( Underworld_DensityChange ),
-			Underworld_DensityChange_Type, 
-			_Codelet_Delete, 
-			_Codelet_Print, 
-			_Codelet_Copy, 
-			_Underworld_DensityChange_DefaultNew,
-			_Underworld_DensityChange_Construct,
-			_Codelet_Build,
-			_Codelet_Initialise,
-			_Codelet_Execute,
-			_Codelet_Destroy,
-			name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof( Underworld_DensityChange );
+	Type                                                      type = Underworld_DensityChange_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_DensityChange_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Underworld_DensityChange_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Codelet_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
 
 Index Underworld_DensityChangeAtDepth_Register( PluginsManager* pluginsManager ) {
@@ -170,3 +167,5 @@ Index Underworld_DensityChangeAtDepth_Register( PluginsManager* pluginsManager )
 			"0",
 			_Underworld_DensityChange_DefaultNew );
 }
+
+

@@ -1,7 +1,7 @@
 
 
-#ifndef __Underworld_LinearViscosity_h__
-#define __Underworld_LinearViscosity_h__
+#ifndef __Underworld_Rheology_LinearViscosity_h__
+#define __Underworld_Rheology_LinearViscosity_h__
 
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 	extern const Type LinearViscosity_Type;
@@ -22,27 +22,48 @@
 		double                                              XYZ;                             \
 
 	struct LinearViscosity { __LinearViscosity };
+
+	/** Public Constructor */
+   LinearViscosity* LinearViscosity_New(
+      Name                  name,
+      AbstractContext*      context,
+      double           C,
+      double           X,
+      double           Y,
+      double           Z,
+      double           XY,
+      double           XZ,
+      double           YZ,
+      double           XYZ );
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	LinearViscosity* _LinearViscosity_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LINEARVISCOSITY_DEFARGS \
+                RHEOLOGY_DEFARGS
+
+	#define LINEARVISCOSITY_PASSARGS \
+                RHEOLOGY_PASSARGS
+
+	LinearViscosity* _LinearViscosity_New(  LINEARVISCOSITY_DEFARGS  );
 
 	
 	/* 'Stg_Component' implementations */
 	void* _LinearViscosity_DefaultNew( Name name ) ;
-	void _LinearViscosity_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _LinearViscosity_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
+   void _LinearViscosity_Init( 
+      LinearViscosity* self,
+      double           C,
+      double           X,
+      double           Y,
+      double           Z,
+      double           XY,
+      double           XZ,
+      double           YZ,
+      double           XYZ );
 
 	void _LinearViscosity_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
@@ -52,3 +73,4 @@
 		MaterialPoint*                                     materialPoint,
 		Coord                                              xi );
 #endif
+

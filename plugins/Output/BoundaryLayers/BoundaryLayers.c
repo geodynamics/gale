@@ -59,7 +59,7 @@
 
 const Type Underworld_BoundaryLayers_Type = "Underworld_BoundaryLayers";
 
-void _Underworld_BoundaryLayers_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_BoundaryLayers_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context;
 
 	/*printf("AKJFHQEIUH)@$UFKAJSDHRF\nKJASHRFOPUEH\nsaljkdh9\n9)#@$\n213\n\n"); The coordinates of the California Moon ??   */ 
@@ -73,20 +73,24 @@ void _Underworld_BoundaryLayers_Construct( void* component, Stg_ComponentFactory
 }
 
 void* _Underworld_BoundaryLayers_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Underworld_BoundaryLayers);
+	Type                                                      type = Underworld_BoundaryLayers_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_BoundaryLayers_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Underworld_BoundaryLayers_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Codelet_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
 	/* printf("2  AKJFHQEIUH)@$UFKAJSDHRF\nKJASHRFOPUEH\nsaljkdh9\n9)#@$\n213\n\n"); */
-	return _Codelet_New(
-		sizeof(Underworld_BoundaryLayers),
-		Underworld_BoundaryLayers_Type,
-		_Codelet_Delete,
-		_Codelet_Print,
-		_Codelet_Copy,
-		_Underworld_BoundaryLayers_DefaultNew,
-		_Underworld_BoundaryLayers_Construct,
-		_Codelet_Build,
-		_Codelet_Initialise,
-		_Codelet_Execute,
-		_Codelet_Destroy,
-		name );
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
 
 Index Underworld_BoundaryLayers_Register( PluginsManager* pluginsManager ) {
@@ -176,11 +180,11 @@ double Underworld_BoundaryLayers_InternalTemperature( UnderworldContext* context
 	double              internalTemperature;
 	double              integral               = 0.0;
 	double              integralGlobal         = 0.0;
-	Swarm*              gaussSwarm             = context->gaussSwarm;
+	Swarm*              gaussSwarm             = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
 	IntegrationPoint*   particle;
 	double              bottomLayerHeight;
 	double              topLayerHeight;
-	FeVariable*         temperatureField       = context->temperatureField;
+	FeVariable*         temperatureField       = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
 	FeMesh*		    mesh                   = temperatureField->feMesh;
 	Element_LocalIndex  lElement_I;
 	Node_LocalIndex    	nodeAtElementBottom;
@@ -297,5 +301,7 @@ double Underworld_BoundaryLayers_InternalTemperature( UnderworldContext* context
 		
 	return internalTemperature;
 }
+
+
 
 

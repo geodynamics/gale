@@ -58,61 +58,33 @@
 const Type StoreStress_Type = "StoreStress";
 
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-StoreStress* _StoreStress_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		Name                                               name ) 
+StoreStress* _StoreStress_New(  STORESTRESS_DEFARGS  ) 
 {
 	StoreStress*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(StoreStress) );
-	self = (StoreStress*) _Rheology_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			name );
+	assert( _sizeOfSelf >= sizeof(StoreStress) );
+	self = (StoreStress*) _Rheology_New(  RHEOLOGY_PASSARGS  );
 	
 	return self;
 }
 
 void _StoreStress_Init(
-		StoreStress*                                       self,
-		MaterialPointsSwarm*                               materialPointsSwarm,
-		FeVariable*                                        strainRateField )
+	StoreStress*			self,
+	MaterialPointsSwarm*	materialPointsSwarm,
+	FeVariable*				strainRateField )
 {
 	Name                       variableName[6];
-	SwarmVariable*             materialPointsSwarmVariable;
 	StandardParticle           particle;
 	StoreStress_ParticleExt*   particleExt;
 	Index                      variable_I;
-	Dimension_Index            dim            = materialPointsSwarm->dim;
+	Dimension_Index            dim = materialPointsSwarm->dim;
 		
 	/* Assign Pointers */
-	self->materialPointsSwarm           = materialPointsSwarm;
+	self->materialPointsSwarm = materialPointsSwarm;
 	self->strainRateField = strainRateField;
 
-	self->particleExtHandle = 
-		ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, self->type, sizeof( StoreStress_ParticleExt ) );
+	self->particleExtHandle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, self->type, sizeof( StoreStress_ParticleExt ) );
 	
 	/* Add SwarmVariables for plotting */
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle, self->particleExtHandle );
@@ -131,7 +103,7 @@ void _StoreStress_Init(
 		variableName[5] = StG_Strdup( "tau_yz" );
 	}
 	
-	materialPointsSwarmVariable = Swarm_NewVectorVariable(
+	self->materialPointsSwarmVariable = Swarm_NewVectorVariable(
 		materialPointsSwarm,
 		"StressTensor",
 		(ArithPointer) &particleExt->stress - (ArithPointer) &particle, 
@@ -146,29 +118,33 @@ void _StoreStress_Init(
 }
 
 void* _StoreStress_DefaultNew( Name name ) {
-	return (void*) _StoreStress_New(
-		sizeof(StoreStress),
-		StoreStress_Type,
-		_Rheology_Delete,
-		_Rheology_Print,
-		_Rheology_Copy,
-		_StoreStress_DefaultNew,
-		_StoreStress_Construct,
-		_Rheology_Build,
-		_Rheology_Initialise,
-		_Rheology_Execute,
-		_Rheology_Destroy,
-		_StoreStress_ModifyConstitutiveMatrix,
-		name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(StoreStress);
+	Type                                                             type = StoreStress_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _Rheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _Rheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _Rheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _StoreStress_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _StoreStress_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _StoreStress_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _StoreStress_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _Rheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _StoreStress_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _StoreStress_ModifyConstitutiveMatrix;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _StoreStress_New(  STORESTRESS_PASSARGS  );
 }
 
-void _StoreStress_Construct( void* rheology, Stg_ComponentFactory* cf, void* data ){
+void _StoreStress_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	StoreStress*              self              = (StoreStress*)rheology;
 	MaterialPointsSwarm*      materialPointsSwarm;
 	FeVariable*               strainRateField;
 
 	/* Construct Parent */
-	_Rheology_Construct( self, cf, data );
+	_Rheology_AssignFromXML( self, cf, data );
 
 	materialPointsSwarm = Stg_ComponentFactory_ConstructByKey( 
 		cf, 
@@ -193,7 +169,43 @@ void _StoreStress_Construct( void* rheology, Stg_ComponentFactory* cf, void* dat
 
 	_StoreStress_Init( self, materialPointsSwarm, strainRateField );
 }
-	
+
+void _StoreStress_Build( void* _self, void* data ) {
+	StoreStress*  self               = (StoreStress*) _self;
+
+	/* Build parent */
+	_Rheology_Build( self, data );
+
+	Stg_Component_Build(	self->strainRateField, data, False);	
+	Stg_Component_Build(	self->materialPointsSwarm, data, False);
+	Stg_Component_Build(	self->materialPointsSwarmVariable, data, False);
+
+}
+
+void _StoreStress_Initialise( void* _self, void* data ) {
+	StoreStress*  self               = (StoreStress*) _self;
+
+	/* Initialise parent */
+	_Rheology_Initialise( self, data );
+
+	Stg_Component_Initialise(	self->strainRateField, data, False);	
+	Stg_Component_Initialise(	self->materialPointsSwarm, data, False);
+	Stg_Component_Initialise(	self->materialPointsSwarmVariable, data, False);
+
+}
+
+void _StoreStress_Destroy( void* _self, void* data ) {
+	StoreStress*  self               = (StoreStress*) _self;
+
+	Stg_Component_Destroy(	self->strainRateField, data, False);	
+	Stg_Component_Destroy(	self->materialPointsSwarm, data, False);
+	Stg_Component_Destroy(	self->materialPointsSwarmVariable, data, False);
+
+	/* Destroy parent */
+	_Rheology_Destroy( self, data );
+
+}
+
 void _StoreStress_ModifyConstitutiveMatrix( 
 		void*                                              rheology, 
 		ConstitutiveMatrix*                                constitutiveMatrix,
@@ -217,3 +229,5 @@ void _StoreStress_ModifyConstitutiveMatrix(
 	FeVariable_InterpolateWithinElement( self->strainRateField, lElement_I, xi, strainRate );
 	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, strainRate, particleExt->stress );
 }
+
+

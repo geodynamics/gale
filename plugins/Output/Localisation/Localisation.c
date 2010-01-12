@@ -57,7 +57,7 @@ MPI_Datatype Localisation_MPI_Datatype;
 
 const Type Underworld_Localisation_Type = "Underworld_Localisation";
 
-void _Underworld_Localisation_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_Localisation_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
         UnderworldContext* context;
 
         context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
@@ -75,19 +75,23 @@ void _Underworld_Localisation_Build( void* component, void* data ) {
 }
 
 void* _Underworld_Localisation_DefaultNew( Name name ) {
-        return _Codelet_New(
-                sizeof(Underworld_Localisation),
-                Underworld_Localisation_Type,
-                _Codelet_Delete,
-                _Codelet_Print,
-                _Codelet_Copy,
-                _Underworld_Localisation_DefaultNew,
-                _Underworld_Localisation_Construct,
-                _Underworld_Localisation_Build,
-                _Codelet_Initialise,
-                _Codelet_Execute,
-                _Codelet_Destroy,
-                name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Underworld_Localisation);
+	Type                                                      type = Underworld_Localisation_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_Localisation_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Underworld_Localisation_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Underworld_Localisation_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+        return _Codelet_New(  CODELET_PASSARGS  );
 }
 
 Index Underworld_Localisation_Register( PluginsManager* pluginsManager ) {
@@ -95,15 +99,16 @@ Index Underworld_Localisation_Register( PluginsManager* pluginsManager ) {
 }
 
 void Underworld_Localisation_Setup( UnderworldContext* context ) {
-        FieldVariable_Register*              fV_Register               = context->fieldVariable_Register;
-        FieldVariable*                       strainRateField;
-        Func_Ptr                             _carryOut;
-        Dof_Index                            resultDofs;
-        Dof_Index                            operandDofs;
-        Index                                numberOfOperands;
-        Operator*                            ownOperator;
-        Dimension_Index                      dim;
-        
+        FieldVariable_Register*  fV_Register               = context->fieldVariable_Register;
+        FieldVariable*           strainRateField;
+        Func_Ptr                 _carryOut;
+        Dof_Index                resultDofs;
+        Dof_Index                operandDofs;
+        Index                    numberOfOperands;
+        Operator*                ownOperator;
+        Dimension_Index          dim;
+        Swarm*					      gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+
         Underworld_Localisation* self;
 
         /* create datatype for MPI communications */
@@ -119,7 +124,7 @@ void Underworld_Localisation_Setup( UnderworldContext* context ) {
 	self->deformationFactor = Dictionary_GetDouble_WithDefault( context->dictionary, "localisationDeformationFactor", 0.8 );
 
         Journal_Firewall( 
-                        context->gaussSwarm != NULL, 
+                        gaussSwarm != NULL, 
                         Underworld_Error,
                         "Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
 
@@ -137,6 +142,7 @@ void Underworld_Localisation_Setup( UnderworldContext* context ) {
 
         self->reducedStrainRateFieldInvariantRoot = OperatorFeVariable_NewUnary_OwnOperator(
                         "ReducedStrainRateFieldInvariantRoot",
+                        (DomainContext*)	context,
                         strainRateField, 
                         ownOperator );
 
@@ -287,7 +293,7 @@ void Underworld_Localisation_SymmetricTensor_LowerDimension_InvariantRoot_3d( vo
 
 double Localisation_IntegratePlane( void* feVariable, Axis planeAxis, double planeHeight, void* _Localisation  ){
         FeVariable*                fevariable = (FeVariable*) feVariable;
-        Underworld_Localisation*      Localisation  = (Underworld_Localisation*) _Localisation;
+        Underworld_Localisation*   Localisation  = (Underworld_Localisation*) _Localisation;
         IJK                        planeIJK;
         Element_LocalIndex         lElement_I;
         Element_GlobalIndex        gElement_I;
@@ -311,6 +317,7 @@ double Localisation_IntegratePlane( void* feVariable, Axis planeAxis, double pla
         Index                      planeLayer        = 0;
         Index                      planeLayerGlobal;
         Particle_InCellIndex       particlesPerDim[] = {2,2,2};
+        AbstractContext*           context = (AbstractContext*) fevariable->context;
 
         /* Find Elements which plane cuts through */
         memcpy( planeCoord, Mesh_GetVertex( fevariable->feMesh, 0 ), sizeof( Coord ) );
@@ -340,11 +347,12 @@ double Localisation_IntegratePlane( void* feVariable, Axis planeAxis, double pla
         if (fevariable->dim == 3)
                 dimExists[ bAxis ] = True;
         
-        singleCellLayout = SingleCellLayout_New( "cellLayout", dimExists, NULL, NULL );
+        singleCellLayout = SingleCellLayout_New( "cellLayout", (AbstractContext*) context, dimExists, NULL, NULL );
         particlesPerDim[ planeAxis ] = 1;
-        gaussParticleLayout = GaussParticleLayout_New( "particleLayout", fevariable->dim - 1, particlesPerDim );
+        gaussParticleLayout = GaussParticleLayout_New( "particleLayout", (AbstractContext*) context, LocalCoordSystem, True, fevariable->dim - 1, particlesPerDim );
         tmpSwarm = Swarm_New( 
                         "tmpgaussSwarm",
+                        (AbstractContext*) context,
                         singleCellLayout, 
                         gaussParticleLayout,
                         fevariable->dim,
@@ -570,3 +578,5 @@ void Localisation_Create_MPI_Datatype() {
 	MPI_Type_struct( 2, blocklen, displacement, typeList, &Localisation_MPI_Datatype );
 	MPI_Type_commit( & Localisation_MPI_Datatype );
 }
+
+

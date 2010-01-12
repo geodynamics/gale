@@ -62,46 +62,42 @@
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type DruckerPrager_Type = "DruckerPrager";
 
+/* Public Constructor */
+DruckerPrager* DruckerPrager_New(
+	Name                  name,
+	AbstractContext*      context,
+	StrainWeakening*      strainWeakening, 
+	MaterialPointsSwarm*  materialPointsSwarm, 
+	double                minVisc, 
+	FeVariable*           strainRateField,
+	SwarmVariable*        swarmStrainRate,
+	double                cohesion,
+	double                cohesionAfterSoftening,
+	Bool                  strainRateSoftening,
+	FeVariable*           pressureField,
+	SwarmVariable*        swarmPressure,
+	double                minimumYieldStress,
+	double                frictionCoefficient,
+	double                frictionCoefficientAfterSoftening )
+{
+   DruckerPrager* self = (DruckerPrager*) _DruckerPrager_DefaultNew( name );
+
+   _Rheology_Init( self, (PICelleratorContext*)context );
+   _YieldRheology_Init( (YieldRheology*)self, strainWeakening, materialPointsSwarm, minVisc ); 
+   _VonMises_Init( (VonMises*)self, strainRateField, swarmStrainRate, cohesion, cohesionAfterSoftening, strainRateSoftening );
+   _DruckerPrager_Init( self, pressureField, swarmPressure, materialPointsSwarm, minimumYieldStress, frictionCoefficient, frictionCoefficientAfterSoftening );
+   self->isConstructed = True;
+   return self;
+}
+
 /* Private Constructor: This will accept all the virtual functions for this class as arguments. */
-DruckerPrager* _DruckerPrager_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-		YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion,
-		YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator,
-		YieldRheology_HasYieldedFunction*                  _hasYielded,
-		Name                                               name ) 
+DruckerPrager* _DruckerPrager_New(  DRUCKERPRAGER_DEFARGS  ) 
 {
 	DruckerPrager*					self;
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	assert( sizeOfSelf >= sizeof(DruckerPrager) );
-	self = (DruckerPrager*) _VonMises_New( 
-			sizeOfSelf,
-			type, 
-			_delete,
-			_print,
-			_copy,
-			_defaultConstructor,
-			_construct,
-			_build,
-			_initialise,
-			_execute,
-			_destroy,
-			_modifyConstitutiveMatrix,
-			_getYieldCriterion,
-			_getYieldIndicator,
-			_hasYielded,
-			name );
+	assert( _sizeOfSelf >= sizeof(DruckerPrager) );
+	self = (DruckerPrager*) _VonMises_New(  VONMISES_PASSARGS  );
 	
 	/* Function pointers for this class that are not on the parent class should be set here */
 	
@@ -111,8 +107,8 @@ DruckerPrager* _DruckerPrager_New(
 void _DruckerPrager_Init(
 		DruckerPrager*                                     self,
 		FeVariable*                                        pressureField,
+		SwarmVariable*                                     swarmPressure,
 		MaterialPointsSwarm*                               materialPointsSwarm,
-		FiniteElementContext*                              context,
 		double                                             minimumYieldStress,
 		double                                             frictionCoefficient,
 		double                                             frictionCoefficientAfterSoftening )
@@ -127,13 +123,14 @@ void _DruckerPrager_Init(
 	self->pressureField       = pressureField;
 	self->frictionCoefficient = frictionCoefficient;
 	self->minimumYieldStress  = minimumYieldStress;
+	self->swarmPressure       = swarmPressure;
 	
 	/* Strain softening of Friction - (linear weakening is assumed) */
 	/* needs a softening factor between +0 and 1 and a reference strain > 0 */
 	self->frictionCoefficientAfterSoftening = frictionCoefficientAfterSoftening;
 
 	/* Update Drawing Parameters */
-	EP_PrependClassHook( Context_GetEntryPoint( context, AbstractContext_EP_DumpClass ),
+	EP_PrependClassHook( Context_GetEntryPoint( self->context, AbstractContext_EP_DumpClass ),
 								_DruckerPrager_UpdateDrawParameters, self );
 	
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &materialPoint, self->particleExtHandle );
@@ -169,50 +166,54 @@ void _DruckerPrager_Init(
 }
 
 void* _DruckerPrager_DefaultNew( Name name ) {
-	return (void*) _DruckerPrager_New(
-			sizeof(DruckerPrager),
-			DruckerPrager_Type,
-			_YieldRheology_Delete,
-			_YieldRheology_Print,
-			_YieldRheology_Copy,
-			_DruckerPrager_DefaultNew,
-			_DruckerPrager_Construct,
-			_DruckerPrager_Build,
-			_DruckerPrager_Initialise,
-			_YieldRheology_Execute,
-			_YieldRheology_Destroy,
-			_YieldRheology_ModifyConstitutiveMatrix,
-			_DruckerPrager_GetYieldCriterion,
-			_VonMises_GetYieldIndicator,
-			_DruckerPrager_HasYielded,
-			name );
+	/* Variables set in this function */
+	SizeT                                                     _sizeOfSelf = sizeof(DruckerPrager);
+	Type                                                             type = DruckerPrager_Type;
+	Stg_Class_DeleteFunction*                                     _delete = _YieldRheology_Delete;
+	Stg_Class_PrintFunction*                                       _print = _YieldRheology_Print;
+	Stg_Class_CopyFunction*                                         _copy = _YieldRheology_Copy;
+	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _DruckerPrager_DefaultNew;
+	Stg_Component_ConstructFunction*                           _construct = _DruckerPrager_AssignFromXML;
+	Stg_Component_BuildFunction*                                   _build = _DruckerPrager_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _DruckerPrager_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _YieldRheology_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _DruckerPrager_Destroy;
+	Rheology_ModifyConstitutiveMatrixFunction*  _modifyConstitutiveMatrix = _YieldRheology_ModifyConstitutiveMatrix;
+	YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion = _DruckerPrager_GetYieldCriterion;
+	YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator = _VonMises_GetYieldIndicator;
+	YieldRheology_HasYieldedFunction*                         _hasYielded = _DruckerPrager_HasYielded;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*) _DruckerPrager_New(  DRUCKERPRAGER_PASSARGS  );
 }
 
-void _DruckerPrager_Construct( void* druckerPrager, Stg_ComponentFactory* cf, void* data ){
+void _DruckerPrager_AssignFromXML( void* druckerPrager, Stg_ComponentFactory* cf, void* data ){
 	DruckerPrager*          self           = (DruckerPrager*)druckerPrager;
-	FeVariable*             pressureField;
-	MaterialPointsSwarm*    materialPointsSwarm;
-	FiniteElementContext*   context;
+	FeVariable*             pressureField = NULL;
+	SwarmVariable*          swarmPressure = NULL;
+	MaterialPointsSwarm*    materialPointsSwarm = NULL;
 
 	/* Construct Parent */
-	_VonMises_Construct( self, cf, data );
+	_VonMises_AssignFromXML( self, cf, data );
 	
 	pressureField      = (FeVariable *) 
             Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, False, data );
-        self->swarmPressure = Stg_ComponentFactory_ConstructByKey(
+   swarmPressure = Stg_ComponentFactory_ConstructByKey(
             cf, self->name, "swarmPressure", SwarmVariable, False, data );
-	assert( pressureField || self->swarmPressure );
+   Journal_Firewall( 
+			( pressureField || swarmPressure), 
+			Journal_Register( Error_Type, self->type ), 
+			"\n Error in component type %s, name '%s'.\n Must specify a PressureField OR a swarmPressure, but not both. \n", self->type, self->name ); 
 			
 	materialPointsSwarm     = (MaterialPointsSwarm*)
 			Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialPointsSwarm", MaterialPointsSwarm, True, data );
-
-	context = (FiniteElementContext*)
-			Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data ); 
 		
 	_DruckerPrager_Init( self, 
 			pressureField,
+			swarmPressure,
 			materialPointsSwarm, 
-			context,
 			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficient", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficientAfterSoftening", 0.0 ) );
@@ -222,12 +223,29 @@ void _DruckerPrager_Build( void* rheology, void* data ) {
 	DruckerPrager*          self               = (DruckerPrager*) rheology;
 
 	/* Build parent */
-	_YieldRheology_Build( self, data );
+	_VonMises_Build( self, data );
 
+	if(self->pressureField) Stg_Component_Build( self->pressureField, data, False );
+	if(self->swarmPressure) Stg_Component_Build( self->swarmPressure, data, False );
 	Stg_Component_Build( self->brightness, data, False );
 	Stg_Component_Build( self->opacity, data, False );
 	Stg_Component_Build( self->diameter, data, False );
 	Stg_Component_Build( self->tensileFailure, data, False );
+
+}
+
+void _DruckerPrager_Destroy( void* rheology, void* data ) {
+	DruckerPrager*          self               = (DruckerPrager*) rheology;
+
+	if(self->pressureField) Stg_Component_Destroy( self->pressureField, data, False );
+	if(self->swarmPressure) Stg_Component_Destroy( self->swarmPressure, data, False );
+	Stg_Component_Destroy( self->brightness, data, False );
+	Stg_Component_Destroy( self->opacity, data, False );
+	Stg_Component_Destroy( self->diameter, data, False );
+	Stg_Component_Destroy( self->tensileFailure, data, False );
+
+	/* Destroy parent */
+	_VonMises_Destroy( self, data );
 
 }
 
@@ -236,20 +254,22 @@ void _DruckerPrager_Initialise( void* rheology, void* data ) {
 	DruckerPrager*                  self                  = (DruckerPrager*) rheology;
 	Particle_Index                  lParticle_I;
 	Particle_Index                  particleLocalCount;
-	AbstractContext*                context = (AbstractContext*)data;
 
-	_YieldRheology_Initialise( self, data );
+	_VonMises_Initialise( self, data );
 
 	/* Initialise variables that I've created - (mainly just SwarmVariables)
 	 * This will run a Variable_Update for us */
-	Stg_Component_Initialise( self->brightness, data, False );
-	Stg_Component_Initialise( self->opacity, data, False );
-	Stg_Component_Initialise( self->diameter, data, False );
-	Stg_Component_Initialise( self->tensileFailure, data, False );
+	if(self->pressureField) Stg_Component_Initialise( self->pressureField, data, False );
+	if(self->swarmPressure) Stg_Component_Initialise( self->swarmPressure, data, False );
 
 	/* We should only set initial conditions if in regular non-restart mode. If in restart mode, then
 	the particle-based variables will be set correcty when we re-load the Swarm. */
-	if ( !(context && (True == context->loadFromCheckPoint)) ) {
+	if ( self->context->loadFromCheckPoint == False ) {
+      Stg_Component_Initialise( self->brightness, data, False );
+      Stg_Component_Initialise( self->opacity, data, False );
+      Stg_Component_Initialise( self->diameter, data, False );
+      Stg_Component_Initialise( self->tensileFailure, data, False );
+
 		/* We don't need to Initialise hasYieldedVariable because it's a parent variable and _YieldRheology_Initialise
 		 * has already been called */
 		particleLocalCount = self->hasYieldedVariable->variable->arraySize;
@@ -289,7 +309,6 @@ double _DruckerPrager_GetYieldCriterion(
 	double                            dpFrictionCoefficient;
 	double                            dpCohesion;
 	double                            frictionalStrength;
-	FeVariable*                       pressureField  = self->pressureField;  
 	double                            pressure;
 	DruckerPrager_Particle*           particleExt;
 	
@@ -395,6 +414,7 @@ void _DruckerPrager_UpdateDrawParameters( void* rheology ) {
 
 	double                           oneOverGlobalMaxStrainIncrement;
 	double                           postFailureWeakeningIncrement;
+   int ierr; /* mpi error code */
 
 	/* Note : this function defines some drawing parameters (brightness, opacity, diameter) as
 	 * functions of the strain weakening - this needs to be improved since most of the parameters
@@ -432,9 +452,9 @@ void _DruckerPrager_UpdateDrawParameters( void* rheology ) {
 		}
 	}
 	
-	MPI_Allreduce( &localMaxStrainIncrement,  &globalMaxStrainIncrement,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD );
-	MPI_Allreduce( &localMeanStrainIncrement, &globalMeanStrainIncrement, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
-	MPI_Allreduce( &localFailed,              &globalFailed,              1, MPI_INT,    MPI_SUM, MPI_COMM_WORLD );
+	ierr = MPI_Allreduce( &localMaxStrainIncrement,  &globalMaxStrainIncrement,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD );
+	ierr = MPI_Allreduce( &localMeanStrainIncrement, &globalMeanStrainIncrement, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+	ierr = MPI_Allreduce( &localFailed,              &globalFailed,              1, MPI_INT,    MPI_SUM, MPI_COMM_WORLD );
 	
 	if(globalFailed == 0) 
 		return;
@@ -486,3 +506,5 @@ void _DruckerPrager_UpdateDrawParameters( void* rheology ) {
 	}
 	
 }
+
+

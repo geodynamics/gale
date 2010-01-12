@@ -42,6 +42,8 @@
 ** 
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+#include <stdlib.h>
+#include <string.h>
 #include <mpi.h>
 #include <assert.h>
 #include <StGermain/StGermain.h>
@@ -116,7 +118,7 @@ double GetReferenceHeight( UnderworldContext* context ) {
 }
 
 double GetTopWallVelocity( UnderworldContext* context ) {
-	FeVariable*         velocityField = context->velocityField;
+	FeVariable*         velocityField = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
 	double              y   = GetReferenceHeight( context );
 	double              V_a = GetRightWallVelocity( context );
 	double              V_b = GetLeftWallVelocity( context );
@@ -142,7 +144,7 @@ double GetTopWallVelocity( UnderworldContext* context ) {
 }
 
 double GetBottomWallVelocity( UnderworldContext* context ) {
-	FeVariable*         velocityField = context->velocityField;
+	FeVariable*         velocityField = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
 	double              y   = GetReferenceHeight( context );
 	double              V_a = GetRightWallVelocity( context );
 	double              V_b = GetLeftWallVelocity( context );
@@ -225,6 +227,8 @@ void IncompressibleExtensionBC_BottomCondition( Node_LocalIndex node_lI, Variabl
 }
 
 void Underworld_IncompressibleExtensionBC_Remesh( TimeIntegrator* timeIntegrator, IncExtBC* self ) {
+    FeVariable* velocityField = (FeVariable*) LiveComponentRegister_Get( self->context->CF->LCRegister, "VelocityField" );
+    FeVariable* pressureField = (FeVariable*) LiveComponentRegister_Get( self->context->CF->LCRegister, "PressureField" );
     FeMesh *mesh;
     Grid *nodeGrid;
     double dt;
@@ -233,9 +237,9 @@ void Underworld_IncompressibleExtensionBC_Remesh( TimeIntegrator* timeIntegrator
     double nodeWidth[3];
     int numNodes;
     int nodeInds[3];
-    int ii, jj;
+    int ii;
 
-    mesh = self->ctx->velocityField->feMesh;
+    mesh = velocityField->feMesh;
 
     nodeGrid = *Mesh_GetExtension(mesh, Grid**, "vertexGrid");
 
@@ -256,21 +260,21 @@ void Underworld_IncompressibleExtensionBC_Remesh( TimeIntegrator* timeIntegrator
 
     numNodes = FeMesh_GetNodeLocalSize(mesh);
     for(ii = 0; ii < numNodes; ii++) {
-	Grid_Lift(nodeGrid, FeMesh_NodeDomainToGlobal(mesh, ii), nodeInds);
-	Mesh_GetVertex(mesh, ii)[0] = minCrd[0] + ((double)nodeInds[0])*nodeWidth[0];
-	Mesh_GetVertex(mesh, ii)[1] = minCrd[1] + ((double)nodeInds[1])*nodeWidth[1];
+		Grid_Lift(nodeGrid, FeMesh_NodeDomainToGlobal(mesh, ii), nodeInds);
+		Mesh_GetVertex(mesh, ii)[0] = minCrd[0] + ((double)nodeInds[0])*nodeWidth[0];
+		Mesh_GetVertex(mesh, ii)[1] = minCrd[1] + ((double)nodeInds[1])*nodeWidth[1];
     }
 
     Mesh_Sync(mesh);
     Mesh_DeformationUpdate(mesh);
 
-    if(self->ctx->velocityField->feMesh != self->ctx->pressureField->feMesh) {
-	if(!strcmp(self->ctx->pressureField->feMesh->type, "CartesianGenerator")) {
+    if(velocityField->feMesh != pressureField->feMesh) {
+	if(!strcmp(pressureField->feMesh->type, "CartesianGenerator")) {
 	    FeMesh *pmesh;
 	    Grid *pnodeGrid;
 	    int lind;
 
-	    pmesh = self->ctx->pressureField->feMesh;
+	    pmesh = pressureField->feMesh;
 	    pnodeGrid = *Mesh_GetExtension(pmesh, Grid**, "vertexGrid");
 
 	    numNodes = FeMesh_GetNodeLocalSize(pmesh);
@@ -285,32 +289,34 @@ void Underworld_IncompressibleExtensionBC_Remesh( TimeIntegrator* timeIntegrator
     }
 }
 
-void _Underworld_IncompressibleExtensionBC_Construct( void* self, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_IncompressibleExtensionBC_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data ) {
+    IncExtBC* self = (IncExtBC*)_self;
 	UnderworldContext*  context  = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
 	ConditionFunction*  condFunc;
+   TimeIntegrator* timeIntegrator = (TimeIntegrator*)  LiveComponentRegister_Get( context->CF->LCRegister, "timeIntegrator" );
+
+        self->context   = context;
 
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_TopCondition, "IncompressibleExtensionBC_TopCondition" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_BottomCondition, "IncompressibleExtensionBC_BottomCondition" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_LeftCondition, "IncompressibleExtensionBC_LeftCondition" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_LeftShearCondition, "IncompressibleExtensionBC_LeftShearCondition" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_RightCondition, "IncompressibleExtensionBC_RightCondition" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_RightShearCondition, "IncompressibleExtensionBC_RightShearCondition" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_FrontCondition, "IncompressibleExtensionBC_FrontCondition" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_BackCondition, "IncompressibleExtensionBC_BackCondition" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	((IncExtBC*)self)->ctx = context;
-
-	if(Dictionary_GetBool_WithDefault(context->dictionary, "IncompressibleExtensionBC_remesh", True)) {
+        if( Stg_ComponentFactory_PluginGetBool( cf, self, "Remesh", False ) ) {
 	    TimeIntegrator_PrependFinishEP( 
-		context->timeIntegrator, "Underworld_IncompressibleExtensionBC_Remesh", Underworld_IncompressibleExtensionBC_Remesh, 
+		timeIntegrator, "Underworld_IncompressibleExtensionBC_Remesh", Underworld_IncompressibleExtensionBC_Remesh, 
 		CURR_MODULE_NAME, self );
 	}
 }
@@ -318,19 +324,20 @@ void _Underworld_IncompressibleExtensionBC_Construct( void* self, Stg_ComponentF
 
 /* This function will provide StGermain the abilty to instantiate (create) this codelet on demand. */
 void* _Underworld_IncompressibleExtensionBC_DefaultNew( Name name ) {
-	return _Codelet_New(
+   return _Codelet_New(
 			sizeof( IncExtBC ),
 			Underworld_IncompressibleExtensionBC_Type,
 			_Codelet_Delete,
 			_Codelet_Print, 
 			_Codelet_Copy,
+                        name,
+                        NON_GLOBAL,
 			_Underworld_IncompressibleExtensionBC_DefaultNew,
-			_Underworld_IncompressibleExtensionBC_Construct,
+			_Underworld_IncompressibleExtensionBC_AssignFromXML,
 			_Codelet_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,
-			_Codelet_Destroy,
-			name );		
+			_Codelet_Destroy );
 }
 	
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
@@ -338,3 +345,5 @@ Index Underworld_IncompressibleExtensionBC_Register( PluginsManager* pluginsMana
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
 	return PluginsManager_Submit( pluginsManager, Underworld_IncompressibleExtensionBC_Type, "0", _Underworld_IncompressibleExtensionBC_DefaultNew );
 }
+
+

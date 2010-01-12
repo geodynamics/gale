@@ -43,8 +43,8 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-#ifndef __Underworld_MultiRheologyMaterial_h__
-#define __Underworld_MultiRheologyMaterial_h__
+#ifndef __Underworld_Rheology_MultiRheologyMaterial_h__
+#define __Underworld_Rheology_MultiRheologyMaterial_h__
 
 	/** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 	extern const Type MultiRheologyMaterial_Type;
@@ -55,53 +55,42 @@
 		__RheologyMaterial \
 		/* Virtual functions go here */ \
 		/* Material Parameters */\
-		Rheology_Register**                                 rheology_RegisterList;   \
-		Index                                               rheology_RegisterCount;
+		Rheology_Register**	rheology_RegisterList; \
+		Index						rheology_RegisterCount;
 
 	struct MultiRheologyMaterial { __MultiRheologyMaterial };
 	
 	/** Public "New" C++-Style constructor */
 	MultiRheologyMaterial* MultiRheologyMaterial_New( 
-		Name                             name,
-		Stg_Shape*                       shape,
-		Dictionary*                      materialDictionary,
-		Materials_Register*              materialRegister,
-		Rheology**                       rheologyList,
-		Rheology_Index                   rheologyCount,
-		Compressible*                    compressible,
-		Rheology***                      rheologyListList,
-		Rheology_Index*                  rheologyCountList, 
-		Index                            rheologyListCount );
+		Name						name,
+		PICelleratorContext*	context,
+		Stg_Shape*				shape,
+		Dictionary*				materialDictionary,
+		Materials_Register*	materialRegister,
+		Rheology**				rheologyList,
+		Rheology_Index			rheologyCount,
+		Compressible*			compressible,
+		Rheology***				rheologyListList,
+		Rheology_Index*		rheologyCountList, 
+		Index						rheologyListCount );
 
 	void* _MultiRheologyMaterial_DefaultNew( Name name ) ;
 
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	MultiRheologyMaterial* _MultiRheologyMaterial_New( 
-		SizeT                                              sizeOfSelf,
-		Type                                               type,
-		Stg_Class_DeleteFunction*                          _delete,
-		Stg_Class_PrintFunction*                           _print,
-		Stg_Class_CopyFunction*                            _copy, 
-		Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-		Stg_Component_ConstructFunction*                   _construct,
-		Stg_Component_BuildFunction*                       _build,
-		Stg_Component_InitialiseFunction*                  _initialise,
-		Stg_Component_ExecuteFunction*                     _execute,
-		Stg_Component_DestroyFunction*                     _destroy,
-		RheologyMaterial_RunRheologiesFunction*            _runRheologies,
-		Name                                               name,
-		Stg_Shape*                                         shape,
-		Dictionary*                                        materialDictionary,
-		Materials_Register*                                materialRegister,
-		Rheology**                                         rheologyList,
-		Rheology_Index                                     rheologyCount,
-		Compressible*                                      compressible,
-		Rheology***                                        rheologyListList,
-		Rheology_Index*                                    rheologyCountList, 
-		Index                                              rheologyListCount
-		);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
-	void _MultiRheologyMaterial_Construct( void* material, Stg_ComponentFactory* cf, void* data );
+	#define MULTIRHEOLOGYMATERIAL_DEFARGS \
+                RHEOLOGYMATERIAL_DEFARGS
+
+	#define MULTIRHEOLOGYMATERIAL_PASSARGS \
+                RHEOLOGYMATERIAL_PASSARGS
+
+	MultiRheologyMaterial* _MultiRheologyMaterial_New(  MULTIRHEOLOGYMATERIAL_DEFARGS  );
+
+	void _MultiRheologyMaterial_AssignFromXML( void* material, Stg_ComponentFactory* cf, void* data );
 
 	void _MultiRheologyMaterial_Init( 
 		MultiRheologyMaterial*  self, 
@@ -111,12 +100,22 @@
 
 	/* 'Stg_Component' implementations */
 	void _MultiRheologyMaterial_Delete( void* material );
+   void _MultiRheologyMaterial_Destroy( void* material, void* data );
+   void _MultiRheologyMaterial_Init( 
+		MultiRheologyMaterial*  self, 
+		Rheology***             rheologyListList,
+		Rheology_Index*         rheologyCountList, 
+		Index                   rheologyListCount );
+
+	void _MultiRheologyMaterial_Destroy( void* material, void* data );
 
 	void _MultiRheologyMaterial_RunRheologies( 	
-		void*                                              material,
-		ConstitutiveMatrix*                                constitutiveMatrix,
-		MaterialPointsSwarm*                               swarm,
-		Element_LocalIndex                                 lElement_I,
-		MaterialPoint*                                     materialPoint,
-		Coord                                              xi );
+		void*						material,
+		ConstitutiveMatrix*	constitutiveMatrix,
+		MaterialPointsSwarm*	swarm,
+		Element_LocalIndex	lElement_I,
+		MaterialPoint*			materialPoint,
+		Coord						xi );
+
 #endif
+

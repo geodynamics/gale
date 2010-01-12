@@ -70,6 +70,34 @@ double Underworld_ConvectionData_XZPlaneVrms( UnderworldContext* context, double
 const Type Underworld_ConvectionData_Type = "Underworld_ConvectionData";
 Stream* dataStream;
 
+void _Underworld_ConvectionData_Build( void* component, void* data ) {
+	Underworld_ConvectionData*	self = (Underworld_ConvectionData*)component;
+
+	assert( self );
+
+	Stg_Component_Build( self->velocitySquaredField, data, False );
+   
+   _Codelet_Build( self, data );
+}
+
+void _Underworld_ConvectionData_Destroy( void* component, void* data ) {
+	Underworld_ConvectionData*	self = (Underworld_ConvectionData*)component;
+
+   _Codelet_Destroy( self, data );
+
+	Stg_Component_Destroy( self->velocitySquaredField, data, False );
+}
+
+void _Underworld_ConvectionData_Initialise( void* component, void* data ) {
+	Underworld_ConvectionData*	self = (Underworld_ConvectionData*)component;
+
+	assert( self );
+
+	Stg_Component_Initialise( self->velocitySquaredField, data, False );
+   
+   _Codelet_Initialise( self, data );
+}
+
 void Underworld_ConvectionData_Setup( void* _context ) {
 	UnderworldContext*          context       = (UnderworldContext*) _context;
 	Underworld_ConvectionData*  self;
@@ -77,6 +105,8 @@ void Underworld_ConvectionData_Setup( void* _context ) {
 	FrankKamenetskii*           frankKamenetskii;
 	Rheology*                   rheology;
 	NonNewtonian*               nonNewtonian;
+   Swarm*					       gaussSwarm    = (Swarm*)     LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+	FeVariable*				       velocityField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
 	char*  filename;
 
 	dataStream = Journal_Register( Info_Type, "ConvectionData Info Stream" );
@@ -113,19 +143,20 @@ void Underworld_ConvectionData_Setup( void* _context ) {
 	Journal_Firewall( self->boundaryLayersPlugin != NULL, Underworld_Error, "Error in %s. Cannot find the BoundaryLayers Plugin. Make sure <param>Underworld_BoundaryLayers</param> is in your plugins list\n");
 
 	Journal_Firewall( 
-			context->gaussSwarm != NULL, 
+			gaussSwarm != NULL, 
 			Underworld_Error,
 			"Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
 	Journal_Firewall( 
-			context->velocityField != NULL, 
+			velocityField != NULL, 
 			Underworld_Error,
 			"Cannot find velocityField. Cannot use %s.\n", CURR_MODULE_NAME );
 
 	/* Create new Field Variable */
-	self->velocitySquaredField = OperatorFeVariable_NewUnary( 
-			"VelocitySquaredField", 
-			context->velocityField, 
-			"VectorSquare" );
+	self->velocitySquaredField = OperatorFeVariable_NewUnary(
+      "VelocitySquaredField",
+      (DomainContext*)context,
+      (void*)velocityField, 
+      "VectorSquare" );
 
 	Stg_asprintf( &filename, "ConvectionData.%dof%d.dat", context->rank, context->nproc );
 	Stream_RedirectFile_WithPrependedPath( dataStream, context->outputPath, filename );
@@ -218,12 +249,12 @@ double Underworld_ConvectionData_XZPlaneVrms( UnderworldContext* context, double
 
 }
 	
-void _Underworld_ConvectionData_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_ConvectionData_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*  context;
 
 	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
 
-	ContextEP_Append( context, AbstractContext_EP_ConstructExtensions, Underworld_ConvectionData_Setup );
+	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, Underworld_ConvectionData_Setup );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_ConvectionData_Dump );
 }
 
@@ -235,22 +266,27 @@ void _Underworld_ConvectionData_Delete( void* component ) {
 	_Codelet_Delete( self );
 }
 void* _Underworld_ConvectionData_DefaultNew( Name name ) {
-	return _Codelet_New(
-		sizeof(Underworld_ConvectionData),
-		Underworld_ConvectionData_Type,
-		_Underworld_ConvectionData_Delete,
-		/*_Codelet_Delete, */
-		_Codelet_Print,
-		_Codelet_Copy,
-		_Underworld_ConvectionData_DefaultNew,
-		_Underworld_ConvectionData_Construct,
-		_Codelet_Build,
-		_Codelet_Initialise,
-		_Codelet_Execute,
-		_Codelet_Destroy,
-		name );
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Underworld_ConvectionData);
+	Type                                                      type = Underworld_ConvectionData_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Underworld_ConvectionData_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_ConvectionData_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Underworld_ConvectionData_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Codelet_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Codelet_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Codelet_New(  CODELET_PASSARGS  );
 }
 
 Index Underworld_ConvectionData_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Underworld_ConvectionData_Type, "0", _Underworld_ConvectionData_DefaultNew );
 }
+
+

@@ -56,14 +56,19 @@
 
 #include "Utils.h"
 
+Stg_ObjectList* repRequiredRawFields_Reg = NULL;
+
 #include <stdio.h>
 
 Bool Underworld_Utils_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister* componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
 
+   /* A register to keep track of fields needed to be initialise before the REP_Algorithm */
+   repRequiredRawFields_Reg = Stg_ObjectList_New();
+
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
-	Stg_ComponentRegister_Add( componentRegister, UnderworldContext_Type ,        "0", _UnderworldContext_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, UnderworldContext_Type,       "0", _UnderworldContext_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, PressureTemperatureOutput_Type, "0", _PressureTemperatureOutput_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, Underworld_SwarmOutput_Type, "0", _Underworld_SwarmOutput_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, RadiogenicHeatingTerm_Type,     "0", _RadiogenicHeatingTerm_DefaultNew );
@@ -73,17 +78,31 @@ Bool Underworld_Utils_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, ViscosityField_Type ,           "0", _ViscosityField_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, DensityField_Type ,           "0", _DensityField_DefaultNew );
 
-
-	RegisterParent( UnderworldContext_Type,             PICelleratorContext_Type );
+	RegisterParent( UnderworldContext_Type,       	    PICelleratorContext_Type );
 	RegisterParent( PressureTemperatureOutput_Type,     SwarmOutput_Type );
-	RegisterParent( Underworld_SwarmOutput_Type,     SwarmOutput_Type );
+	RegisterParent( Underworld_SwarmOutput_Type,        SwarmOutput_Type );
 	RegisterParent( RadiogenicHeatingTerm_Type,         ForceTerm_Type );
 	RegisterParent( StressField_Type,                   ParticleFeVariable_Type );
-	RegisterParent( NodalPressureField_Type,                   ParticleFeVariable_Type );
-	RegisterParent( SmoothVelGradField_Type,                   ParticleFeVariable_Type );
+	RegisterParent( NodalPressureField_Type,            ParticleFeVariable_Type );
+	RegisterParent( SmoothVelGradField_Type,            ParticleFeVariable_Type );
 	RegisterParent( ViscosityField_Type,                ParticleFeVariable_Type );
 	RegisterParent( DensityField_Type,                  ParticleFeVariable_Type );
-        
+
+   /* Register the new BaseClass for recovery fields */
+   Stg_ComponentRegister_Add( componentRegister, BaseRecoveryFeVar_Type, "0", _BaseRecoveryFeVar_DefaultNew );
+   RegisterParent( BaseRecoveryFeVar_Type, FeVariable_Type );
+
+   /* Register the SPR component */
+   Stg_ComponentRegister_Add( componentRegister, SPR_StrainRate_Type, "0", _SPR_StrainRate_DefaultNew );
+   RegisterParent( SPR_StrainRate_Type, BaseRecoveryFeVar_Type );
+
+   Stg_ComponentRegister_Add( componentRegister, REP_Algorithm_Type, "0", _REP_Algorithm_DefaultNew );
+   RegisterParent( REP_Algorithm_Type,           Stg_Component_Type );
+
+   Stg_ComponentRegister_Add( componentRegister, RecoveredFeVariable_Type, "0", _RecoveredFeVariable_DefaultNew );
+   RegisterParent( RecoveredFeVariable_Type,     FeVariable_Type );
 
 	return True;
 }
+
+

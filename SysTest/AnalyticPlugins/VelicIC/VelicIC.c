@@ -136,23 +136,23 @@ void Underworld_VelicIC_Hyperbolic( Node_LocalIndex node_lI, Variable_Index var_
 
 
 
-void _Underworld_VelicIC_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _Underworld_VelicIC_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	AbstractContext*        context;
 	ConditionFunction*      condFunc;
 
 	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
 	
 	condFunc = ConditionFunction_New( Underworld_VelicIC_Sinusoidal, "VelicIC_Sinusoidal");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( Underworld_VelicIC_Hyperbolic, "VelicIC_Hyperbolic");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 }	
 
 void* _Underworld_VelicIC_DefaultNew( Name name ) {
 	return Codelet_New(
 		Underworld_VelicIC_Type,
 		_Underworld_VelicIC_DefaultNew,
-		_Underworld_VelicIC_Construct,
+		_Underworld_VelicIC_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,
@@ -165,3 +165,5 @@ Index Underworld_VelicIC_Register( PluginsManager* pluginsManager ) {
 
 	return PluginsManager_Submit( pluginsManager, Underworld_VelicIC_Type, "0", _Underworld_VelicIC_DefaultNew );
 }
+
+

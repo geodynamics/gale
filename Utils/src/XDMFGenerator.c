@@ -94,7 +94,8 @@ void XDMFGenerator_GenerateAll( void* _context ) {
       _XDMFGenerator_WriteFieldSchema( context, stream );
 
       /** Write all (checkpointed) FeVariable field information  **/
-      if (context->isDataSave == False) _XDMFGenerator_WriteSwarmSchema( context, stream);
+      if ( (context->timeStep % context->checkpointEvery == 0) || 
+           (context->checkpointAtTimeInc && (context->currentTime >= context->nextCheckpointTime)) ) _XDMFGenerator_WriteSwarmSchema( context, stream);
 
       /** writes footer information and close file/stream **/
       _XDMFGenerator_WriteFooter( context, stream );
@@ -203,10 +204,12 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
 
          if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
             feVar = (FeVariable*)fieldVar;
-            if ( (feVar->isCheckpointedAndReloaded && context->isDataSave==False) || (feVar->isSavedData && context->isDataSave==True) ){
+            if ( (feVar->isCheckpointedAndReloaded && (context->timeStep % context->checkpointEvery == 0))                                     || 
+                 (feVar->isCheckpointedAndReloaded && (context->checkpointAtTimeInc && (context->currentTime >= context->nextCheckpointTime))) ||
+                 (feVar->isSavedData               && (context->timeStep % context->saveDataEvery   == 0)) ){
                FeMesh* feVarMesh = NULL;
                /** check what type of generator was used to know where elementMesh is **/
-               if( Stg_Class_IsInstance( feVar->feMesh->generator, C0Generator_Type))        feVarMesh = ((C0Generator*)feVar->feMesh->generator)->elMesh;
+               if( Stg_Class_IsInstance( feVar->feMesh->generator, C0Generator_Type))        feVarMesh = (FeMesh*)((C0Generator*)feVar->feMesh->generator)->elMesh;
                if( Stg_Class_IsInstance( feVar->feMesh->generator, CartesianGenerator_Type)) feVarMesh = feVar->feMesh;
                if( Stg_Class_IsInstance( feVar->feMesh->generator, MeshAdaptor_Type))        feVarMesh = feVar->feMesh;
                /** make sure that the fevariable femesh is the same as that used above for the geometry definition, if so proceed **/
@@ -363,16 +366,16 @@ void _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream
                               Journal_Printf( stream, "            <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN($0, $1, 0*$1)\">\n", swarmParticleLocalCount );
                               Journal_Printf( stream, "               <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"XCoords\">\n", swarmParticleLocalCount );
                               Journal_Printf( stream, "                  <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 0 1 1 %u 1 </DataItem>\n", swarmParticleLocalCount );
-                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">%s.%05d%s.h5:/%s-Position</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part, currentSwarm->name );
+                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">%s.%05d%s.h5:/Position</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part );
                               Journal_Printf( stream, "               </DataItem>\n" );
                               Journal_Printf( stream, "               <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"YCoords\">\n", swarmParticleLocalCount );
                               Journal_Printf( stream, "                  <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 1 1 1 %u 1 </DataItem>\n", swarmParticleLocalCount );
-                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">%s.%05d%s.h5:/%s-Position</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part, currentSwarm->name );
+                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">%s.%05d%s.h5:/Position</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part );
                               Journal_Printf( stream, "               </DataItem>\n" );
                               Journal_Printf( stream, "            </DataItem>\n" );
             } else if ( swarmVar->dofCount == 3 ) {
                /** in 3d we simply feed back the 3d hdf5 array, nice and easy **/
-                              Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s Dimensions=\"%u 3\">%s.%05d%s.h5:/%s-Position</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part, currentSwarm->name );
+                              Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s Dimensions=\"%u 3\">%s.%05d%s.h5:/Position</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part );
             } else {
                Journal_DPrintf( errorStream, "\n\n Error: Position SwarmVariable is not of dofCount 2 or 3.\n\n" );
             }
@@ -398,7 +401,7 @@ void _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream
                   }
                   if (        swarmVar->dofCount == 1 ) {
                               Journal_Printf( stream, "         <Attribute Type=\"Scalar\" Center=\"Node\" Name=\"%s\">\n", swarmVar->name);
-                              Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s Dimensions=\"%u 1\">%s.%05d%s.h5:/%s</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part, swarmVar->name);
+                              Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s Dimensions=\"%u 1\">%s.%05d%s.h5:/%s</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part, swarmVar->name + strlen(currentSwarm->name)+1 );
                               Journal_Printf( stream, "         </Attribute>\n\n" );
                   } else if ( swarmVar->dofCount == 2 ){
                      /** note that for 2d, we feed back a quasi 3d array, with the 3rd Dof zeroed.  so in effect we always work in 3d.
@@ -408,18 +411,18 @@ void _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream
                               Journal_Printf( stream, "            <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN($0, $1, 0*$1)\">\n", swarmParticleLocalCount );
                               Journal_Printf( stream, "               <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"XValue\">\n", swarmParticleLocalCount );
                               Journal_Printf( stream, "                  <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 0 1 1 %u 1 </DataItem>\n", swarmParticleLocalCount );
-                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">%s.%05d%s.h5:/%s</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part, swarmVar->name);
+                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">%s.%05d%s.h5:/%s</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part, swarmVar->name + strlen(currentSwarm->name)+1 );
                               Journal_Printf( stream, "               </DataItem>\n" );
                               Journal_Printf( stream, "               <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"YValue\">\n", swarmParticleLocalCount );
                               Journal_Printf( stream, "                  <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 1 1 1 %u 1 </DataItem>\n", swarmParticleLocalCount );
-                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">%s.%05d%s.h5:/%s</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part, swarmVar->name);
+                              Journal_Printf( stream, "                  <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">%s.%05d%s.h5:/%s</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part, swarmVar->name + strlen(currentSwarm->name)+1 );
                               Journal_Printf( stream, "               </DataItem>\n" );
                               Journal_Printf( stream, "            </DataItem>\n" );
                               Journal_Printf( stream, "         </Attribute>\n\n" );
                   } else if ( swarmVar->dofCount == 3 ) {
                      /** in 3d we simply feed back the 3d hdf5 array, nice and easy **/
                               Journal_Printf( stream, "         <Attribute Type=\"Vector\" Center=\"Node\" Name=\"%s\">\n", swarmVar->name);
-                              Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s Dimensions=\"%u 3\">%s.%05d%s.h5:/%s</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part, swarmVar->name);
+                              Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s Dimensions=\"%u 3\">%s.%05d%s.h5:/%s</DataItem>\n", variableType, swarmParticleLocalCount, currentSwarm->name, context->timeStep, filename_part, swarmVar->name + strlen(currentSwarm->name)+1 );
                               Journal_Printf( stream, "         </Attribute>\n\n" );
                   } else {
                      /** where there are more than 3 components, we write each one out as a scalar **/
@@ -427,7 +430,7 @@ void _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream
                               Journal_Printf( stream, "         <Attribute Type=\"Scalar\" Center=\"Node\" Name=\"%s-Component-%u\">\n", swarmVar->name, dofCountIndex);
                               Journal_Printf( stream, "            <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" >\n", swarmParticleLocalCount );
                               Journal_Printf( stream, "               <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 %u 1 1 %u 1 </DataItem>\n", dofCountIndex, swarmParticleLocalCount );
-                              Journal_Printf( stream, "               <DataItem Format=\"HDF\" %s Dimensions=\"%u %u\">%s.%05d%s.h5:/%s</DataItem>\n", variableType, swarmParticleLocalCount, swarmVar->dofCount, currentSwarm->name, context->timeStep, filename_part, swarmVar->name);
+                              Journal_Printf( stream, "               <DataItem Format=\"HDF\" %s Dimensions=\"%u %u\">%s.%05d%s.h5:/%s</DataItem>\n", variableType, swarmParticleLocalCount, swarmVar->dofCount, currentSwarm->name, context->timeStep, filename_part, swarmVar->name + strlen(currentSwarm->name)+1 );
                               Journal_Printf( stream, "            </DataItem>\n" );
                               Journal_Printf( stream, "         </Attribute>\n" );
                      }
@@ -482,8 +485,6 @@ void _XDMFGenerator_SendInfo( UnderworldContext* context ) {
    Index           swarmcountindex;
    Index           swarmParticleLocalCount;
    Swarm*          currentSwarm;
-   SwarmVariable*  swarmVar;
-   Stream*         errorStream  = Journal_Register( Error_Type, CURR_MODULE_NAME );
 	const int       FINISHED_WRITING_TAG = 100;
    
    /** get total number of different swarms **/
@@ -501,3 +502,5 @@ void _XDMFGenerator_SendInfo( UnderworldContext* context ) {
 		MPI_Ssend( &swarmParticleLocalCount, 1, MPI_INT, MASTER, FINISHED_WRITING_TAG, context->communicator );
    }
 }
+
+

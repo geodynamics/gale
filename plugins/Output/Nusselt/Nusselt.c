@@ -54,105 +54,124 @@
 
 const Type Underworld_Nusselt_Type = "Underworld_Nusselt";
 
-void _Underworld_Nusselt_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
-	UnderworldContext* context;
+void _Underworld_Nusselt_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
+	Underworld_Nusselt*		self = (Underworld_Nusselt*)component;
+	UnderworldContext*		context;
+	FieldVariable_Register*	fV_Register;
+	FieldVariable*				temperatureGradientsField;
+	FieldVariable*				velocityField;
+	FieldVariable*				temperatureField;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
+	self->context = (AbstractContext*)Stg_ComponentFactory_PluginConstructByKey( cf, self, "Context", UnderworldContext, True, data );
+	self->gaussSwarm = Stg_ComponentFactory_PluginConstructByKey( cf, self, "GaussSwarm", Swarm, True, data );
 
-	/* Add functions to entry points */
-	Underworld_Nusselt_Setup( context );
-	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_Nusselt_Output );
-}
+	StgFEM_FrequentOutput_PrintString( self->context, "Nusselt" );
 
-void _Underworld_Nusselt_Build( void* component, void* data ) {
-	Underworld_Nusselt*	self = (Underworld_Nusselt*)component;
-
-	Stg_Component_Build( self->advectiveHeatFluxField, data, False );
-	Stg_Component_Build( self->temperatureTotalDerivField, data, False );
-	Stg_Component_Build( self->temperatureVertDerivField, data, False );
-}
-
-void* _Underworld_Nusselt_DefaultNew( Name name ) {
-	return _Codelet_New(
-		sizeof(Underworld_Nusselt),
-		Underworld_Nusselt_Type,
-		_Codelet_Delete,
-		_Codelet_Print,
-		_Codelet_Copy,
-		_Underworld_Nusselt_DefaultNew,
-		_Underworld_Nusselt_Construct,
-		_Underworld_Nusselt_Build,
-		_Codelet_Initialise,
-		_Codelet_Execute,
-		_Codelet_Destroy,
-		name );
-}
-
-Index Underworld_Nusselt_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Underworld_Nusselt_Type, "0", _Underworld_Nusselt_DefaultNew );
-}
-
-void Underworld_Nusselt_Setup( UnderworldContext* context ) {
-	FieldVariable_Register*              fV_Register               = context->fieldVariable_Register;
-	FieldVariable*                       temperatureGradientsField;
-	FieldVariable*                       velocityField;
-	FieldVariable*                       temperatureField;
-
-	Underworld_Nusselt* self;
-
-	self = (Underworld_Nusselt*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_Nusselt_Type );
-	
-	StgFEM_FrequentOutput_PrintString( context, "Nusselt" );
-
-	Journal_Firewall( 
-			context->gaussSwarm != NULL, 
-			Underworld_Error,
-			"Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
-
+	context = (UnderworldContext*)self->context;
+	fV_Register = context->fieldVariable_Register;
 	/* Create Some FeVariables to calculate nusselt number */
 	temperatureField          = FieldVariable_Register_GetByName( fV_Register, "TemperatureField" );
 	velocityField             = FieldVariable_Register_GetByName( fV_Register, "VelocityField" );
 	temperatureGradientsField = FieldVariable_Register_GetByName( fV_Register, "TemperatureGradientsField" );
 	
 	self->advectiveHeatFluxField = OperatorFeVariable_NewBinary(  
-			"AdvectiveHeatFluxField",
-			temperatureField, 
-			velocityField, 
-			"VectorScale" );
+		"AdvectiveHeatFluxField",
+		(DomainContext*) context,
+		temperatureField, 
+		velocityField, 
+		"VectorScale" );
 
 	self->temperatureTotalDerivField = OperatorFeVariable_NewBinary(  
-			"TemperatureTotalDerivField",
-			self->advectiveHeatFluxField, 
-			temperatureGradientsField, 
-			"Subtraction" );
+		"TemperatureTotalDerivField",
+		(DomainContext*) context,
+		self->advectiveHeatFluxField, 
+		temperatureGradientsField, 
+		"Subtraction" );
 	
 	self->temperatureVertDerivField = (FeVariable*) OperatorFeVariable_NewUnary(  
-			"VerticalAdvectiveHeatFluxField",
-			self->temperatureTotalDerivField, 
-			"TakeSecondComponent" );
+		"VerticalAdvectiveHeatFluxField",
+		(DomainContext*) context,
+		self->temperatureTotalDerivField, 
+		"TakeSecondComponent" );
 
 	/* Add the variables to register so we can checkpoint & examine if necessary */
 	FieldVariable_Register_Add( fV_Register, self->advectiveHeatFluxField );
 	FieldVariable_Register_Add( fV_Register, self->temperatureTotalDerivField );
 	FieldVariable_Register_Add( fV_Register, self->temperatureVertDerivField );
 
+	/* Add functions to entry points */
+	ContextEP_Append( self->context, AbstractContext_EP_FrequentOutput, Underworld_Nusselt_Output );
+}
+
+void _Underworld_Nusselt_Build( void* component, void* data ) {
+	Underworld_Nusselt*	self = (Underworld_Nusselt*)component;
+
+   Stg_Component_Build( self->gaussSwarm, data, False );
+	Stg_Component_Build( self->advectiveHeatFluxField, data, False );
+	Stg_Component_Build( self->temperatureTotalDerivField, data, False );
+	Stg_Component_Build( self->temperatureVertDerivField, data, False );
+   
+   _Codelet_Build( component, data );
+}
+
+void _Underworld_Nusselt_Initialise( void* component, void* data ) {
+	Underworld_Nusselt*	self = (Underworld_Nusselt*)component;
+
+   Stg_Component_Initialise( self->gaussSwarm, data, False );
+	Stg_Component_Initialise( self->advectiveHeatFluxField, data, False );
+	Stg_Component_Initialise( self->temperatureTotalDerivField, data, False );
+	Stg_Component_Initialise( self->temperatureVertDerivField, data, False );
+   
+   _Codelet_Initialise( component, data );
+}
+
+void _Underworld_Nusselt_Destroy( void* component, void* data ) {
+	Underworld_Nusselt*	self = (Underworld_Nusselt*)component;
+
+   Stg_Component_Destroy( self->gaussSwarm, data, False );
+	Stg_Component_Destroy( self->advectiveHeatFluxField, data, False );
+	Stg_Component_Destroy( self->temperatureTotalDerivField, data, False );
+	Stg_Component_Destroy( self->temperatureVertDerivField, data, False );
+   
+   _Codelet_Destroy( component, data );
+}
+
+void* _Underworld_Nusselt_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(Underworld_Nusselt);
+	Type                                                      type = Underworld_Nusselt_Type;
+	Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
+	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
+	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_Nusselt_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _Underworld_Nusselt_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _Underworld_Nusselt_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _Underworld_Nusselt_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _Underworld_Nusselt_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Codelet_New(  CODELET_PASSARGS  );
+}
+
+Index Underworld_Nusselt_Register( PluginsManager* pluginsManager ) {
+	return PluginsManager_Submit( pluginsManager, Underworld_Nusselt_Type, "0", _Underworld_Nusselt_DefaultNew );
 }
 
 void Underworld_Nusselt_Output( UnderworldContext* context ) {
-
 	Underworld_Nusselt* self;
 
-	self = (Underworld_Nusselt*)LiveComponentRegister_Get(
-				context->CF->LCRegister,
-				Underworld_Nusselt_Type );
+	self = (Underworld_Nusselt*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_Nusselt_Type );
 
 	/* This performs in integral given in the first half of equation 23 in 
 	 *  Moresi, L. N. and Solomatov, V. S.,  
 	 *  Numerical investigation of 2d convection with extremely large viscosity variations,  
 	 *  Phys. Fluids, 1995, Volume 7, pp 2154-2162. */
-	self->nusseltNumber = FeVariable_AverageTopLayer( self->temperatureVertDerivField, context->gaussSwarm, J_AXIS );
+	self->nusseltNumber = FeVariable_AverageTopLayer( self->temperatureVertDerivField, self->gaussSwarm, J_AXIS );
 
 	StgFEM_FrequentOutput_PrintValue( context, self->nusseltNumber );
 }
+
+

@@ -56,76 +56,86 @@
 		/* Virtual functions go here */ \
 		\
 		/* ConstitutiveMatCartesian_Refactored info */ \
-                int maxNumNodes;                       \
-                double** GNx;                          \
-                double* Ni;
+		int		maxNumNodes; \
+		double**	GNx; \
+		double*	Ni;
 
 	struct ConstitutiveMatCartesian_Refactored { __ConstitutiveMatCartesian_Refactored };
 
+
+
 	ConstitutiveMatCartesian_Refactored* ConstitutiveMatCartesian_Refactored_New( 
-		Name                                                name,
-		Dimension_Index                                     dim,
-		FiniteElementContext*                               context,	
-		Materials_Register*                                 materials_Register );
+		Name							name,
+		Dimension_Index			dim,
+		PICelleratorContext*		context,	
+		Materials_Register*		materials_Register );
 
-	ConstitutiveMatCartesian_Refactored* _ConstitutiveMatCartesian_Refactored_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		ConstitutiveMat_Refactored_SetValueFunc*            _setValue,
-		ConstitutiveMat_Refactored_GetValueFunc*            _getViscosity,
-		ConstitutiveMat_Refactored_SetValueFunc*            _isotropicCorrection,
-		ConstitutiveMat_Refactored_SetSecondViscosityFunc*  _setSecondViscosity,
-		ConstitutiveMat_Refactored_Assemble_D_B_Func*       _assemble_D_B,
-		ConstitutiveMat_Refactored_CalculateStressFunc*     _calculateStress,
-		Name                                                name );
 	
-	void ConstitutiveMatCartesian_Refactored_InitAll( 
-		void*                                               constitutiveMatrix,
-		Dimension_Index                                     dim,
-		FiniteElementContext*                               context,
-		Materials_Register*                                 materials_Register );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
+	#define CONSTITUTIVEMATCARTESIAN_REFACTORED_DEFARGS \
+                CONSTITUTIVEMAT_REFACTORED_DEFARGS
+
+	#define CONSTITUTIVEMATCARTESIAN_REFACTORED_PASSARGS \
+                CONSTITUTIVEMAT_REFACTORED_PASSARGS
+
+	ConstitutiveMatCartesian_Refactored* _ConstitutiveMatCartesian_Refactored_New(  CONSTITUTIVEMATCARTESIAN_REFACTORED_DEFARGS  );
+
+	void _ConstitutiveMatCartesian_Refactored_Init( void* self );
+	
 	void _ConstitutiveMatCartesian_Refactored_Delete( void* constitutiveMatrix );
+
 	void _ConstitutiveMatCartesian_Refactored_Print( void* constitutiveMatrix, Stream* stream );
 
-	void* _ConstitutiveMatCartesian_Refactored_DefaultNew( Name name ) ;
-	void _ConstitutiveMatCartesian_Refactored_Construct( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) ;
-	void _ConstitutiveMatCartesian_Refactored_Build( void* constitutiveMatrix, void* data ) ;
-	void _ConstitutiveMatCartesian_Refactored_Initialise( void* constitutiveMatrix, void* data ) ;
-	void _ConstitutiveMatCartesian_Refactored_Execute( void* constitutiveMatrix, void* data ) ;
-	void _ConstitutiveMatCartesian_Refactored_Destroy( void* constitutiveMatrix, void* data ) ;
+	void* _ConstitutiveMatCartesian_Refactored_DefaultNew( Name name );
 
-	void _ConstitutiveMatCartesian_Refactored_SetValueInAllEntries( void* constitutiveMatrix, double value ) ;
-	void _ConstitutiveMatCartesian_Refactored2D_SetValueInAllEntries( void* constitutiveMatrix, double value ) ;
-	void _ConstitutiveMatCartesian_Refactored3D_SetValueInAllEntries( void* constitutiveMatrix, double value ) ;
+	void _ConstitutiveMatCartesian_Refactored_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data );
 
-	double _ConstitutiveMatCartesian_Refactored_GetIsotropicViscosity( void* constitutiveMatrix ) ;
-	double _ConstitutiveMatCartesian_Refactored2D_GetIsotropicViscosity( void* constitutiveMatrix ) ;
-	double _ConstitutiveMatCartesian_Refactored3D_GetIsotropicViscosity( void* constitutiveMatrix ) ;
+	void _ConstitutiveMatCartesian_Refactored_Build( void* constitutiveMatrix, void* data );
 
-	void _ConstitutiveMatCartesian_Refactored_IsotropicCorrection( void* constitutiveMatrix, double isotropicCorrection ) ;
-	void _ConstitutiveMatCartesian_Refactored2D_IsotropicCorrection( void* constitutiveMatrix, double isotropicCorrection ) ;
-	void _ConstitutiveMatCartesian_Refactored3D_IsotropicCorrection( void* constitutiveMatrix, double isotropicCorrection ) ;
+	void _ConstitutiveMatCartesian_Refactored_Initialise( void* constitutiveMatrix, void* data );
 
-	void _ConstitutiveMatCartesian_Refactored_SetSecondViscosity( void* constitutiveMatrix, double deltaViscosity, XYZ director ) ;
+	void _ConstitutiveMatCartesian_Refactored_Execute( void* constitutiveMatrix, void* data );
+
+	void _ConstitutiveMatCartesian_Refactored_Destroy( void* constitutiveMatrix, void* data );
+
+	void _ConstitutiveMatCartesian_Refactored_SetValueInAllEntries( void* constitutiveMatrix, double value );
+
+	void _ConstitutiveMatCartesian_Refactored2D_SetValueInAllEntries( void* constitutiveMatrix, double value );
+
+	void _ConstitutiveMatCartesian_Refactored3D_SetValueInAllEntries( void* constitutiveMatrix, double value );
+
+	double _ConstitutiveMatCartesian_Refactored_GetIsotropicViscosity( void* constitutiveMatrix );
+
+	double _ConstitutiveMatCartesian_Refactored2D_GetIsotropicViscosity( void* constitutiveMatrix );
+
+	double _ConstitutiveMatCartesian_Refactored3D_GetIsotropicViscosity( void* constitutiveMatrix ); 
+
+	void _ConstitutiveMatCartesian_Refactored_IsotropicCorrection( void* constitutiveMatrix, double isotropicCorrection );
+
+	void _ConstitutiveMatCartesian_Refactored2D_IsotropicCorrection( void* constitutiveMatrix, double isotropicCorrection );
+
+	void _ConstitutiveMatCartesian_Refactored3D_IsotropicCorrection( void* constitutiveMatrix, double isotropicCorrection );
+
+	void _ConstitutiveMatCartesian_Refactored_SetSecondViscosity( void* constitutiveMatrix, double deltaViscosity, XYZ director );
+
 	void _ConstitutiveMatCartesian_Refactored2D_SetSecondViscosity( void* constitutiveMatrix, double deltaViscosity, XYZ director );
+
 	void _ConstitutiveMatCartesian_Refactored3D_SetSecondViscosity( void* constitutiveMatrix, double deltaViscosity, XYZ director );
 
-	void _ConstitutiveMatCartesian_Refactored_Assemble_D_B( void* constitutiveMatrix, double** GNx, Node_Index node_I, double** D_B ) ;
+	void _ConstitutiveMatCartesian_Refactored_Assemble_D_B( void* constitutiveMatrix, double** GNx, Node_Index node_I, double** D_B );
+
 	void _ConstitutiveMatCartesian_Refactored2D_Assemble_D_B( void* constitutiveMatrix, double** GNx, Node_Index node_I, double** D_B );
+
 	void _ConstitutiveMatCartesian_Refactored3D_Assemble_D_B( void* constitutiveMatrix, double** GNx, Node_Index node_I, double** D_B );
 
-	void _ConstitutiveMatCartesian_Refactored_CalculateStress( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress ) ;
-	void _ConstitutiveMatCartesian_Refactored2D_CalculateStress( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress ) ;
-	void _ConstitutiveMatCartesian_Refactored3D_CalculateStress( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress ) ;
+	void _ConstitutiveMatCartesian_Refactored_CalculateStress( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress );
+
+	void _ConstitutiveMatCartesian_Refactored2D_CalculateStress( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress );
+
+	void _ConstitutiveMatCartesian_Refactored3D_CalculateStress( void* constitutiveMatrix, SymmetricTensor strainRate, SymmetricTensor stress );
 
 #endif
+

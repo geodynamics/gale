@@ -33,7 +33,7 @@
 
 	void* _Underworld_EulerDeform_DefaultNew( Name name );
 
-	void _Underworld_EulerDeform_Construct( void* component, Stg_ComponentFactory* cf, void* data );
+	void _Underworld_EulerDeform_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );
 
 	void _Underworld_EulerDeform_Build( void* component, void* data );
 
@@ -46,7 +46,7 @@
 
 	Bool EulerDeform_TimeDeriv( void* crdAdvector, Index arrayInd, double* timeDeriv );
 
-	void EulerDeform_Remesh( TimeIntegratee* crdAdvector, EulerDeform_Context* edCtx );
+	void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx );
 
 	void EulerDeform_InterpVar( FieldVariable* field, Variable* var, Mesh* mesh, double** newCrds );
 

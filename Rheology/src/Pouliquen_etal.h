@@ -88,30 +88,43 @@
 	struct Pouliquen_etal { __Pouliquen_etal };
 	
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
-	Pouliquen_etal* _Pouliquen_etal_New( 
-			SizeT                                              sizeOfSelf,
-			Type                                               type,
-			Stg_Class_DeleteFunction*                          _delete,
-			Stg_Class_PrintFunction*                           _print,
-			Stg_Class_CopyFunction*                            _copy, 
-			Stg_Component_DefaultConstructorFunction*          _defaultConstructor,
-			Stg_Component_ConstructFunction*                   _construct,
-			Stg_Component_BuildFunction*                       _build,
-			Stg_Component_InitialiseFunction*                  _initialise,
-			Stg_Component_ExecuteFunction*                     _execute,
-			Stg_Component_DestroyFunction*                     _destroy,
-			Rheology_ModifyConstitutiveMatrixFunction*         _modifyConstitutiveMatrix,
-			YieldRheology_GetYieldCriterionFunction*           _getYieldCriterion,
-			YieldRheology_GetYieldIndicatorFunction*           _getYieldIndicator,
-			YieldRheology_HasYieldedFunction*                  _hasYielded,
-			Name                                               name ) ;
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define POULIQUEN_ETAL_DEFARGS \
+                VONMISES_DEFARGS
+
+	#define POULIQUEN_ETAL_PASSARGS \
+                VONMISES_PASSARGS
+
+	Pouliquen_etal* _Pouliquen_etal_New(  POULIQUEN_ETAL_DEFARGS  ) ;
 	
 	/* 'Stg_Component' implementations */
 	void* _Pouliquen_etal_DefaultNew( Name name ) ;
-	void _Pouliquen_etal_Construct( void* rheology, Stg_ComponentFactory* cf, void* data );
+	void _Pouliquen_etal_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data );
 
 	void _Pouliquen_etal_Build( void* rheology, void* data );
 	void _Pouliquen_etal_Initialise( void* rheology, void* data ) ;
+	void _Pouliquen_etal_Destroy( void* rheology, void* data ) ;
+   void _Pouliquen_etal_Init(
+		Pouliquen_etal*                                     self,
+		FeVariable*                                        pressureField,
+		FeVariable*                                        strainRateInvField,
+		MaterialPointsSwarm*                               materialPointsSwarm,
+		double                                             minimumYieldStress,
+		double                                             frictionCoefficient,
+		double                                             frictionCoefficientAfterSoftening,
+		double                                             grainDiameter,
+		double                                             Io,
+		double                                             rho_s,
+		double                                             mu_2,
+		double                                             mu_s,
+		double                                             mu_2_afterSoftening,
+		double                                             mu_s_afterSoftening,
+		double                                             maxViscosity,
+		double                                             minViscosity );
 	
 	/* 'YieldRheology' implementations */
 	double _Pouliquen_etal_GetYieldCriterion( 
@@ -135,3 +148,4 @@
 
 	
 #endif
+

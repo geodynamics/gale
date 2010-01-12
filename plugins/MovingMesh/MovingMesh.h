@@ -66,7 +66,7 @@
 
 	Index Underworld_MovingMesh_Register( PluginsManager* pluginsManager );
 	void* _Underworld_MovingMesh_DefaultNew( Name name );
-void Underworld_MovingMesh_Construct( void* component, Stg_ComponentFactory* _cf, void* data ) ;
+void Underworld_MovingMesh_AssignFromXML( void* component, Stg_ComponentFactory* _cf, void* data ) ;
 
 	void Underworld_MovingMesh_Remesh( TimeIntegrator* timeIntegrator, MeshExtender* self ) ;
 	void Underworld_MovingMesh_RemeshAccordingToSidewalls( MeshExtender* self, FeVariable* velocityField ) ;
