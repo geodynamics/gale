@@ -35,6 +35,8 @@
 #include "Dictionary_Entry_Value.h"
 #include "IO_Handler.h"
 #include "Journal.h"
+#include "JournalFile.h"
+#include "Stream.h"
 #include "PathUtils.h"
 #include <libxml/tree.h>
 #include "XML_IO_Handler.h"
@@ -695,14 +697,18 @@ static xmlNodePtr _XML_IO_Handler_OpenCheckFile( XML_IO_Handler* self, const cha
    xmlNodePtr	cur = NULL;
    Bool			status = False;
 
-   if ( FindFileInPathList(
+   if ( !FindFileInPathList(
       (char*)absolute,
       (char*)filename,
       self->searchPaths,
       self->searchPathsSize ) )
    {
-      _XML_IO_Handler_OpenFile( self, (char*)absolute );
-   }
+      Journal_RPrintf( Journal_Register( Error_Type, XML_IO_Handler_Type ),
+      "Error: File %s doesn't exist, not readable, or not valid.\n", filename );
+      exit(EXIT_FAILURE);
+   } 
+
+   _XML_IO_Handler_OpenFile( self, (char*)absolute );
 
    if( self->currDoc == NULL ) {
       Journal_RPrintf( Journal_Register( Error_Type, XML_IO_Handler_Type ),
@@ -725,7 +731,7 @@ static xmlNodePtr _XML_IO_Handler_OpenCheckFile( XML_IO_Handler* self, const cha
       else
          return NULL;
    }
-   else
+   else 
       return NULL; 
 }
 
@@ -1147,18 +1153,16 @@ static void _XML_IO_Handler_ParseElement( XML_IO_Handler* self, xmlNodePtr cur, 
 static void _XML_IO_Handler_ParseComponents( XML_IO_Handler* self, xmlNodePtr cur, Dictionary_Entry_Value* parent, 
 					Dictionary_MergeType defaultMergeType, Dictionary_Entry_Source source )
 {
-	xmlChar* name = (xmlChar*) "name";
-	xmlNewProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*) name );
-	xmlSetProp( cur, (xmlChar*) NAME_ATTR, "components" );
+	xmlNewProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*) "name" );
+	xmlSetProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*)"components" );
 	_XML_IO_Handler_ParseStruct( self, cur, parent, defaultMergeType, source );
 }
 
 static void _XML_IO_Handler_ParsePlugins( XML_IO_Handler* self, xmlNodePtr cur, Dictionary_Entry_Value* parent, 
 					Dictionary_MergeType defaultMergeType, Dictionary_Entry_Source source )
 {
-	xmlChar* name = (xmlChar*) "name";
-	xmlNewProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*) name );
-	xmlSetProp( cur, (xmlChar*) NAME_ATTR, "plugins" );
+	xmlNewProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*) "name" );
+	xmlSetProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*)"plugins" );
 	_XML_IO_Handler_ParseList( self, cur, parent, defaultMergeType, source );
 }
 
@@ -1171,9 +1175,8 @@ static void _XML_IO_Handler_ParsePlugin( XML_IO_Handler* self, xmlNodePtr cur, D
 static void _XML_IO_Handler_ParseImport( XML_IO_Handler* self, xmlNodePtr cur, Dictionary_Entry_Value* parent, 
 					Dictionary_MergeType defaultMergeType, Dictionary_Entry_Source source )
 {
-	xmlChar* name = (xmlChar*) "name";
-	xmlNewProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*) name );
-	xmlSetProp( cur, (xmlChar*) NAME_ATTR, "import" );
+	xmlNewProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*) "name" );
+	xmlSetProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*)"import" );
 	_XML_IO_Handler_ParseList( self, cur, parent, defaultMergeType, source );
 }
 
@@ -1896,7 +1899,7 @@ static void _XML_IO_Handler_WriteDictionary( XML_IO_Handler* self, Dictionary* d
 	for (index=0; index < dict->count; index++) {
 		Dictionary_Entry* currEntryPtr = dict->entryPtr[index];
 	
-		if ( strcmp(currEntryPtr->key, IMPORT_TAG) == 0 ) 
+		if ( strcmp(currEntryPtr->key, (const char*)IMPORT_TAG) == 0 ) 
 			_XML_IO_Handler_WriteNode( self, currEntryPtr->key, currEntryPtr->value, currEntryPtr->source, parent );
 	}
 
@@ -1904,7 +1907,7 @@ static void _XML_IO_Handler_WriteDictionary( XML_IO_Handler* self, Dictionary* d
 	for (index=0; index < dict->count; index++) {
 		Dictionary_Entry* currEntryPtr = dict->entryPtr[index];
 	
-		if ( strcmp(currEntryPtr->key, PLUGINS_TAG) == 0 ) 
+		if ( strcmp(currEntryPtr->key, (const char*)PLUGINS_TAG) == 0 ) 
 			_XML_IO_Handler_WriteNode( self, currEntryPtr->key, currEntryPtr->value, currEntryPtr->source, parent );
 	}
 
@@ -1912,7 +1915,7 @@ static void _XML_IO_Handler_WriteDictionary( XML_IO_Handler* self, Dictionary* d
 	for (index=0; index < dict->count; index++) {
 		Dictionary_Entry* currEntryPtr = dict->entryPtr[index];
 	
-		if ( ( strcmp(currEntryPtr->key, IMPORT_TAG) != 0 )  && ( strcmp(currEntryPtr->key, PLUGINS_TAG) != 0 ) )  
+		if ( ( strcmp(currEntryPtr->key, (const char*)IMPORT_TAG) != 0 )  && ( strcmp(currEntryPtr->key, (const char*)PLUGINS_TAG) != 0 ) )  
 			_XML_IO_Handler_WriteNode( self, currEntryPtr->key, currEntryPtr->value, currEntryPtr->source, parent );
 	}
 }
@@ -1947,10 +1950,10 @@ static void _XML_IO_Handler_WriteList( XML_IO_Handler* self, char* name, Diction
 
 	/* create and add list child node */
 	if ( NULL != name ) {
-		if ( strcmp(name, PLUGINS_TAG) == 0 ) {
+		if ( strcmp(name, (const char*)PLUGINS_TAG) == 0 ) {
 			newNode = xmlNewTextChild( parent, self->currNameSpace, PLUGINS_TAG, NULL );
 		}
-		else if ( strcmp(name, IMPORT_TAG) == 0 ) {
+		else if ( strcmp(name, (const char*)IMPORT_TAG) == 0 ) {
 			newNode = xmlNewTextChild( parent, self->currNameSpace, IMPORT_TAG, NULL );
 		}
 		else
@@ -2236,7 +2239,7 @@ static void _XML_IO_Handler_WriteStruct( XML_IO_Handler* self, char* name, Dicti
 
 	/* create and add struct child node*/
 	if ( NULL != name ) {
-		if ( strcmp(name, COMPONENTS_TAG) == 0 ) {
+		if ( strcmp(name, (const char*)COMPONENTS_TAG) == 0 ) {
 			newNode = xmlNewTextChild( parent, self->currNameSpace, COMPONENTS_TAG, NULL );
 		}
 		else
@@ -2275,10 +2278,10 @@ static void _XML_IO_Handler_WriteParameter( XML_IO_Handler* self, char* name, Di
 		"_XML_IO_Handler_WriteParameter called.\n");
 
 	/* add new child to parent, with correct value*/
-	if ( strcmp((char *)parent->name, PLUGINS_TAG) == 0 ) {
+	if ( strcmp((char *)parent->name, (const char*)PLUGINS_TAG) == 0 ) {
 		newNode = xmlNewTextChild( parent, self->currNameSpace, PLUGIN_TAG, (xmlChar*) Dictionary_Entry_Value_AsString( value ) );
 	}
-	else if ( strcmp((char *)parent->name, IMPORT_TAG) == 0 ) {
+	else if ( strcmp((char *)parent->name, (const char*)IMPORT_TAG) == 0 ) {
 		newNode = xmlNewTextChild( parent, self->currNameSpace, TOOLBOX_TAG, (xmlChar*) Dictionary_Entry_Value_AsString( value ) );
 	}
 	else {
