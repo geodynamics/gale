@@ -52,27 +52,27 @@ const Type Stg_ObjectList_Type = "Stg_ObjectList";
 
 
 Stg_ObjectList* Stg_ObjectList_New2( Index initialSize, Index delta ) {
-	return _Stg_ObjectList_New( 
-		sizeof(Stg_ObjectList), 
-		Stg_ObjectList_Type, 
-		_Stg_ObjectList_Delete,
-		_Stg_ObjectList_Print,
-		_Stg_ObjectList_Copy,
-		_Stg_ObjectList_Append, 
-		_Stg_ObjectList_Prepend, 
-		_Stg_ObjectList_ReplaceAll,
-		_Stg_ObjectList_Replace,
-		_Stg_ObjectList_InsertBefore, 
-		_Stg_ObjectList_InsertAfter, 
-		_Stg_ObjectList_Remove, 
-		_Stg_ObjectList_GetIndex,
-		_Stg_ObjectList_Get, 
-		_Stg_ObjectList_AllocMoreMemory, 
-		_Stg_ObjectList_InsertAtIndex,
-		_Stg_ObjectList_RemoveByIndex, 
-		_Stg_ObjectList_DeleteAllObjects,
-		initialSize, 
-		delta );
+	/* Variables set in this function */
+	SizeT                                           _sizeOfSelf = sizeof(Stg_ObjectList);
+	Type                                                   type = Stg_ObjectList_Type;
+	Stg_Class_DeleteFunction*                           _delete = _Stg_ObjectList_Delete;
+	Stg_Class_PrintFunction*                             _print = _Stg_ObjectList_Print;
+	Stg_Class_CopyFunction*                               _copy = _Stg_ObjectList_Copy;
+	Stg_ObjectList_AppendFunction*                      _append = _Stg_ObjectList_Append;
+	Stg_ObjectList_PrependFunction*                    _prepend = _Stg_ObjectList_Prepend;
+	Stg_ObjectList_ReplaceAllFunction*              _replaceAll = _Stg_ObjectList_ReplaceAll;
+	Stg_ObjectList_ReplaceFunction*                    _replace = _Stg_ObjectList_Replace;
+	Stg_ObjectList_InsertBeforeFunction*          _insertBefore = _Stg_ObjectList_InsertBefore;
+	Stg_ObjectList_InsertAfterFunction*            _insertAfter = _Stg_ObjectList_InsertAfter;
+	Stg_ObjectList_RemoveFunction*                      _remove = _Stg_ObjectList_Remove;
+	Stg_ObjectList_GetIndexFunction*                  _getIndex = _Stg_ObjectList_GetIndex;
+	Stg_ObjectList_GetFunction*                            _get = _Stg_ObjectList_Get;
+	Stg_ObjectList_AllocMoreMemoryFunction*    _allocMoreMemory = _Stg_ObjectList_AllocMoreMemory;
+	Stg_ObjectList_InsertAtIndexFunction*        _insertAtIndex = _Stg_ObjectList_InsertAtIndex;
+	Stg_ObjectList_RemoveByIndexFunction*        _removeByIndex = _Stg_ObjectList_RemoveByIndex;
+	Stg_ObjectList_DeleteAllObjectsFunction*  _deleteAllObjects = _Stg_ObjectList_DeleteAllObjects;
+
+	return _Stg_ObjectList_New(  STG_OBJECTLIST_PASSARGS  );
 }
 	
 
@@ -106,33 +106,13 @@ void Stg_ObjectList_Init2( Stg_ObjectList* self, Index initialSize, Index delta 
 	
 
 /* Creation implementation */
-Stg_ObjectList* _Stg_ObjectList_New( 
-	SizeT						_sizeOfSelf, 
-	Type						type,
-	Stg_Class_DeleteFunction*				_delete,
-	Stg_Class_PrintFunction*				_print,
-	Stg_Class_CopyFunction*				_copy,
-	Stg_ObjectList_AppendFunction*			_append,
-	Stg_ObjectList_PrependFunction*		_prepend,
-	Stg_ObjectList_ReplaceAllFunction*		_replaceAll,
-	Stg_ObjectList_ReplaceFunction*		_replace,
-	Stg_ObjectList_InsertBeforeFunction*		_insertBefore,
-	Stg_ObjectList_InsertAfterFunction*		_insertAfter,
-	Stg_ObjectList_RemoveFunction*		_remove,
-	Stg_ObjectList_GetIndexFunction*		_getIndex,
-	Stg_ObjectList_GetFunction*			_get,
-	Stg_ObjectList_AllocMoreMemoryFunction*	_allocMoreMemory,
-	Stg_ObjectList_InsertAtIndexFunction*		_insertAtIndex,
-	Stg_ObjectList_RemoveByIndexFunction*		_removeByIndex,
-	Stg_ObjectList_DeleteAllObjectsFunction*	_deleteAllObjects,
-	Index						initialSize,
-	Index						delta ) 
+Stg_ObjectList* _Stg_ObjectList_New(  STG_OBJECTLIST_DEFARGS  ) 
 {
 	Stg_ObjectList* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Stg_ObjectList) );
-	self = (Stg_ObjectList*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (Stg_ObjectList*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 
 	/* Virtual functions */
 	self->_append = _append;
@@ -532,14 +512,14 @@ Index Stg_ObjectList_Remove( void* objectList, Name reference, ReplacementOption
 	return self->_remove( self, reference, option );
 }
 
-Index Stg_ObjectList_GetIndex( void* objectList, const Name const toGet ) {
+Index Stg_ObjectList_GetIndex( void* objectList, const Name toGet ) {
 	Stg_ObjectList* self = (Stg_ObjectList*) objectList;
 
 	return self->_getIndex( self, toGet );
 }
 
 
-void* Stg_ObjectList_Get( void* objectList, const Name const objectName ) {
+void* Stg_ObjectList_Get( void* objectList, const Name objectName ) {
 	Stg_ObjectList* self = (Stg_ObjectList*) objectList;
 
 	return self->_get( self, objectName );
@@ -748,7 +728,7 @@ Index _Stg_ObjectList_Remove( void* namedObjectList, Name reference, Replacement
 }
 
 
-Index _Stg_ObjectList_GetIndex( void* namedObjectList, const Name const toGet ) {
+Index _Stg_ObjectList_GetIndex( void* namedObjectList, const Name toGet ) {
 	Stg_ObjectList* self = (Stg_ObjectList*) namedObjectList;
 	Index objectIndex;
 	
@@ -764,7 +744,7 @@ Index _Stg_ObjectList_GetIndex( void* namedObjectList, const Name const toGet ) 
 }
 
 
-void* _Stg_ObjectList_Get( void* objectList, const Name const toGet ) {
+void* _Stg_ObjectList_Get( void* objectList, const Name toGet ) {
         Stg_ObjectList* self = (Stg_ObjectList*) objectList;
         Index objectIndex;
                                                                                                                                     
@@ -803,6 +783,7 @@ void _Stg_ObjectList_DeleteAllObjects( void* namedObjectList ) {
 			self->data[objectIndex] = 0;
 		}
 	}
+	self->count = 0;
 }
 
 
@@ -889,3 +870,5 @@ void Stg_ObjectList_PrintSimilar( void* objectList, Name name, void* _stream, un
 
 	Memory_Free( similarityArray );
 }
+
+

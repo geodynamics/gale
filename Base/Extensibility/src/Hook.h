@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_Hook_h__
-#define __Base_Extensibility_Hook_h__
+#ifndef __StGermain_Base_Extensibility_Hook_h__
+#define __StGermain_Base_Extensibility_Hook_h__
 	
 
 	/** Textual name of this class */
@@ -59,15 +59,22 @@
 	void Hook_Init( void* hook, Name name, Func_Ptr funcPtr, char* addedBy );
 	
 	/* Creation implementation */
-	Hook* _Hook_New( 
-		SizeT 				_sizeOfSelf, 
-		Type 				type, 
-		Stg_Class_DeleteFunction* 		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy, 
-		Name 				name, 
-		Func_Ptr 			funcPtr,
-		char*				 addedBy );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define HOOK_DEFARGS \
+                STG_OBJECT_DEFARGS, \
+                Func_Ptr  funcPtr, \
+                char*     addedBy
+
+	#define HOOK_PASSARGS \
+                STG_OBJECT_PASSARGS, \
+	        funcPtr, \
+	        addedBy
+
+	Hook* _Hook_New(  HOOK_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _Hook_Init( Hook* self, Func_Ptr funcPtr, char* addedBy );
@@ -87,4 +94,5 @@
 	
 	void* _Hook_Copy( void* hook, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-#endif /* __Base_Extensibility_Hook_h__ */
+#endif /* __StGermain_Base_Extensibility_Hook_h__ */
+

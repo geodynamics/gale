@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_Module_h__
-#define __Base_Extensibility_Module_h__
+#ifndef __StGermain_Base_Extensibility_Module_h__
+#define __StGermain_Base_Extensibility_Module_h__
 	
 	/* The prototype for the virtual functions in a module */
 	typedef char*       (Module_MangleNameFunction)         ( char* name );
@@ -70,15 +70,22 @@
 
 
 	/* Creation implementation / Virtual constructor */
-	Module* _Module_New( 
-		SizeT                        _sizeOfSelf,
-		Type                         type,
-		Stg_Class_DeleteFunction*    _delete,
-		Stg_Class_PrintFunction*     _print,
-		Stg_Class_CopyFunction*      _copy, 
-		Name                         name,
-		Module_MangleNameFunction    MangleName,
-		Stg_ObjectList*              directories );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MODULE_DEFARGS \
+                STG_OBJECT_DEFARGS, \
+                Module_MangleNameFunction*   MangleName, \
+                Stg_ObjectList*             directories
+
+	#define MODULE_PASSARGS \
+                STG_OBJECT_PASSARGS, \
+	        MangleName,  \
+	        directories
+
+	Module* _Module_New(  MODULE_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _Module_Init(
@@ -108,4 +115,5 @@
 	/** Un load the module */
 	void Module_UnLoad( void* module );
 	
-#endif /* __Base_Extensibility_Module_h__ */
+#endif /* __StGermain_Base_Extensibility_Module_h__ */
+

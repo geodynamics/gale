@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __Base_Foundation_Object_h__
-#define __Base_Foundation_Object_h__
+#ifndef __StGermain_Base_Foundation_Object_h__
+#define __StGermain_Base_Foundation_Object_h__
 
 	/** Textual name for Stg_Object class. */
 	extern const Type Stg_Object_Type;
@@ -62,14 +62,22 @@
 	
 	
 	/** Constructor interface. */
-	Stg_Object* _Stg_Object_New( 
-		SizeT				_sizeOfSelf, 
-		Type				type,
-		Stg_Class_DeleteFunction*	_delete,
-		Stg_Class_PrintFunction*	_print, 
-		Stg_Class_CopyFunction*		_copy, 
-		Name				name,
-		AllocationType			nameAllocationType );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STG_OBJECT_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                Name                          name, \
+                AllocationType  nameAllocationType
+
+	#define STG_OBJECT_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        name,               \
+	        nameAllocationType
+
+	Stg_Object* _Stg_Object_New(  STG_OBJECT_DEFARGS  );
 	
 	/** Init interface. */
 	void _Stg_Object_Init( Stg_Object* self, Name name, AllocationType nameAllocationType );
@@ -106,4 +114,5 @@
 	Name Stg_Object_AppendSuffix( void* object, Name suffix ) ;
 	
 	/* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#endif /* __Base_Foundation_Object_h__ */
+#endif /* __StGermain_Base_Foundation_Object_h__ */
+

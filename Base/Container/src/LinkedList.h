@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __LinkedList_h__
-#define __LinkedList_h__
+#ifndef __StGermain_Base_Container_LinkedList_h__
+#define __StGermain_Base_Container_LinkedList_h__
 
 	/** Textual name for List class. */
 	extern const Type LinkedList_Type;
@@ -88,13 +88,18 @@
 				LinkedList_dataDeleteFunction*	dataDeleteFunction,
 				Order listOrder);
 
-	LinkedList* _LinkedList_New(
-				SizeT							_sizeOfSelf,
-				Type							type,
-				Stg_Class_DeleteFunction*			_delete,
-				Stg_Class_PrintFunction*			_print,
-				Stg_Class_CopyFunction*				_copy
-				);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LINKEDLIST_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define LINKEDLIST_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	LinkedList* _LinkedList_New(  LINKEDLIST_DEFARGS  );
 
 	
 	/** Init interface. */
@@ -150,5 +155,6 @@
 	/** Private Functions */
 	
 	
-#endif /* __LinkedList_h__ */
+#endif /* __StGermain_Base_Container_LinkedList_h__ */
+
 

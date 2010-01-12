@@ -48,8 +48,8 @@
 **
 **/
 
-#ifndef __Base_IO_Dictionary_h__
-#define __Base_IO_Dictionary_h__
+#ifndef __StGermain_Base_IO_Dictionary_h__
+#define __StGermain_Base_IO_Dictionary_h__
 	
 	typedef Index Dictionary_Index;		/**< Index type for Dictionary, */
 	
@@ -80,21 +80,21 @@
 		__Stg_Class \
 		\
 		/* Virtual info */ \
-		Dictionary_AddFunction*		add; \
+		Dictionary_AddFunction*					add; \
 		Dictionary_AddWithSourceFunction*	addWithSource; \
-		Dictionary_SetFunction*		set; \
+		Dictionary_SetFunction*					set; \
 		Dictionary_SetWithSourceFunction*	setWithSource; \
-		Dictionary_GetFunction*		get; \
-		Dictionary_GetSourceFunction*	getSource; \
+		Dictionary_GetFunction*					get; \
+		Dictionary_GetSourceFunction*			getSource; \
 		\
 		/* Dictionary info */ \
-		Dictionary_Index		size; \
-		Dictionary_Index		delta; \
+		Dictionary_Index							size; \
+		Dictionary_Index							delta; \
 		\
-		Dictionary_Index		count; \
-		Dictionary_Entry**		entryPtr; \
+		Dictionary_Index							count; \
+		Dictionary_Entry**						entryPtr; \
 		\
-		Stream*				debugStream;
+		Stream*										debugStream;
 	struct _Dictionary { __Dictionary };
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -105,24 +105,33 @@
 	Dictionary* Dictionary_New( void );
 	
 	/** Constructor interface. */
-	Dictionary* _Dictionary_New( 
-		SizeT				_sizeOfSelf, 
-		Type 				type, 
-		Stg_Class_DeleteFunction* 		_delete,
-		Stg_Class_PrintFunction* 		_print,
-		Stg_Class_CopyFunction*		_copy, 
-		Dictionary_AddFunction* 	add,
-		Dictionary_AddWithSourceFunction*	addWithSource,
-		Dictionary_SetFunction* 	set,
-		Dictionary_SetWithSourceFunction*	setWithSource,
-		Dictionary_GetFunction* 	get,
-		Dictionary_GetSourceFunction*	getSource);
 	
-	/** Initialises a Dictionary. */
-	void Dictionary_Init( Dictionary* self );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define DICTIONARY_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                Dictionary_AddFunction*                      add, \
+                Dictionary_AddWithSourceFunction*  addWithSource, \
+                Dictionary_SetFunction*                      set, \
+                Dictionary_SetWithSourceFunction*  setWithSource, \
+                Dictionary_GetFunction*                      get, \
+                Dictionary_GetSourceFunction*          getSource
+
+	#define DICTIONARY_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        add,           \
+	        addWithSource, \
+	        set,           \
+	        setWithSource, \
+	        get,           \
+	        getSource    
+
+	Dictionary* _Dictionary_New(  DICTIONARY_DEFARGS  );
 	
 	/** Init interface. */
-	void _Dictionary_Init( Dictionary* self );
+	void _Dictionary_Init( void* dictionary );
 	
 	/** Stg_Class_Delete dictionary implementation */
 	void _Dictionary_Delete( void* dictionary );
@@ -145,30 +154,28 @@
 	void Dictionary_Add( void* dictionary, Dictionary_Entry_Key key, Dictionary_Entry_Value* value );
 
 	/** Add an entry to the dictionary... orignal implementation... appends keys, with source file */
-	void Dictionary_AddWithSource( void* dictionary, Dictionary_Entry_Key key, 
-					Dictionary_Entry_Value* value, Dictionary_Entry_Source source );
+	void Dictionary_AddWithSource( void* dictionary, Dictionary_Entry_Key key, Dictionary_Entry_Value* value, Dictionary_Entry_Source source );
 	
 	/** Add an entry to the dictionary... specifying how the entry values are merged if key present already */
 	Dictionary_Entry_Value* Dictionary_AddMerge( 
-		void*						dictionary, 
-		Dictionary_Entry_Key				key, 
-		Dictionary_Entry_Value*				value,
-		Dictionary_MergeType				mergeType );
+		void*							dictionary, 
+		Dictionary_Entry_Key		key, 
+		Dictionary_Entry_Value*	value,
+		Dictionary_MergeType		mergeType );
 	
 	/** Add an entry to the dictionary... specifying how the entry values are merged if key present already */
 	Dictionary_Entry_Value* Dictionary_AddMergeWithSource( 
-		void*						dictionary, 
-		Dictionary_Entry_Key				key, 
-		Dictionary_Entry_Value*				value,
-		Dictionary_MergeType				mergeType,
-		Dictionary_Entry_Source				source );
+		void*							dictionary, 
+		Dictionary_Entry_Key		key, 
+		Dictionary_Entry_Value*	value,
+		Dictionary_MergeType		mergeType,
+		Dictionary_Entry_Source	source );
 
 	/** Set a value in the dictionary */
 	Bool Dictionary_Set( void* dictionary, Dictionary_Entry_Key key, Dictionary_Entry_Value* value );
 	
 	/** Set a value in the dictionary */
-	Bool Dictionary_SetWithSource( void* dictionary, Dictionary_Entry_Key key, 
-					Dictionary_Entry_Value* value, Dictionary_Entry_Source source );
+	Bool Dictionary_SetWithSource( void* dictionary, Dictionary_Entry_Key key, Dictionary_Entry_Value* value, Dictionary_Entry_Source source );
 
 	/** Get a value from the dictionary */
 	Dictionary_Entry_Value* Dictionary_Get( void* dictionary, Dictionary_Entry_Key key );
@@ -182,20 +189,17 @@
 	/** Get a value from the dictionary */
 	Dictionary_Entry_Value* Dictionary_GetDefault( void* dictionary, Dictionary_Entry_Key key, Dictionary_Entry_Value* value );
 	
-	
 	/** Add an entry to the dictionary implementation */
 	void _Dictionary_Add( void* dictionary, Dictionary_Entry_Key key, Dictionary_Entry_Value* value );
 	
 	/** Add an entry to the dictionary implementation */
-	void _Dictionary_AddWithSource( void* dictionary, Dictionary_Entry_Key key, 
-					Dictionary_Entry_Value* value, Dictionary_Entry_Source source );
+	void _Dictionary_AddWithSource( void* dictionary, Dictionary_Entry_Key key, Dictionary_Entry_Value* value, Dictionary_Entry_Source source );
 	
 	/** Set a value in the dictionary implementation */
 	Bool _Dictionary_Set( void* dictionary, Dictionary_Entry_Key key, Dictionary_Entry_Value* value );
 	
 	/** Set a value in the dictionary implementation */
-	Bool _Dictionary_SetWithSource( void* dictionary, Dictionary_Entry_Key key, 
-					Dictionary_Entry_Value* value, Dictionary_Entry_Source source );
+	Bool _Dictionary_SetWithSource( void* dictionary, Dictionary_Entry_Key key, Dictionary_Entry_Value* value, Dictionary_Entry_Source source );
 
 	/** Get a value from the dictionary implementation */
 	Dictionary_Entry_Value* _Dictionary_Get( void* dictionary, Dictionary_Entry_Key key );
@@ -225,4 +229,5 @@
 	/** Compares two dictionaries, returns True if all entries are identical */
 	Bool Dictionary_CompareAllEntriesFull( void* dictionary1, void* dictionary2, Bool strictTypeCheck );
 
-#endif /* __Base_IO_Dictionary_h__ */
+#endif /* __StGermain_Base_IO_Dictionary_h__ */
+

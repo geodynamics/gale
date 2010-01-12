@@ -126,28 +126,28 @@ Journal* Journal_New()
 	return self;
 }
 
-void Journal_Delete( )
-{
-	int i;
-	
+void Journal_Delete() {
 	Stg_Class_Delete( stJournal->stdOut );
 	Stg_Class_Delete( stJournal->stdErr );
 	
-	Stg_ObjectList_DeleteAllObjects( stJournal->_typedStreams );
+	Journal_Purge();
 	Stg_Class_Delete( stJournal->_typedStreams );
+	Stg_Class_Delete( stJournal->_files );
 	
-	for ( i = 0; i < stJournal->_files->count; ++i )
-	{
-		if ( !JournalFile_Close( (JournalFile*) stJournal->_files->data[i] ) )
-		{
+	Memory_Free( stJournal );
+}
+
+void Journal_Purge() {
+	int i;
+	
+	Stg_ObjectList_DeleteAllObjects( stJournal->_typedStreams );
+
+	for ( i = 0; i < stJournal->_files->count; ++i ) {
+		if ( !JournalFile_Close( (JournalFile*) stJournal->_files->data[i] ) ) {
 			/* TODO: warning can't close */
 		}
 	}
 	Stg_ObjectList_DeleteAllObjects( stJournal->_files );
-	Stg_Class_Delete( stJournal->_files );
-	
-	Memory_Free( stJournal );
-
 }
 
 void Journal_ReadFromDictionary( Dictionary* dictionary )
@@ -394,6 +394,7 @@ void Journal_RegisterTypedStream( Stream* typedStream )
 	/* check exists and update */
 	Stg_ObjectList_Append( stJournal->_typedStreams, typedStream );
 }
+
 Stream* Journal_GetTypedStream( const Type type )
 {
 	Stream* typedStream = NULL;
@@ -412,6 +413,7 @@ Stream* Journal_GetTypedStream( const Type type )
 	
 	return typedStream;
 }
+
 Stream* Journal_GetNamedStream( Stream* typedStream, const Name name )
 {
 	Stream* currentStream ;
@@ -447,9 +449,9 @@ Stream* Journal_Register( const Type type, const Name name )
 	typedStream = Journal_GetTypedStream( type );
 	namedStream = Journal_GetNamedStream( typedStream, name );	
 	
-
 	return namedStream;
 }
+
 Stream* Journal_Register2( const Type streamType, const Type componentType, const Name componentName ) {
 	Stream* componentStream;
 	Stream* instanceStream;
@@ -487,6 +489,14 @@ void Journal_Enable_TypedStream( const Type type, Bool enable )
 {
 	Stream* typedStream = Journal_GetTypedStream( type );
 	Stream_Enable( typedStream, enable );
+}
+
+void Journal_Enable_AllTypedStream( Bool enable )
+{
+	Journal_Enable_TypedStream( Info_Type, enable );
+	Journal_Enable_TypedStream( Debug_Type, enable );
+	Journal_Enable_TypedStream( Dump_Type, enable );
+	Journal_Enable_TypedStream( Error_Type, enable );
 }
 
 void Journal_Enable_NamedStream( const Type type, const Name name, Bool enable )
@@ -751,3 +761,5 @@ void Journal_SetupDefaultTypedStreams() {
 	Stream_SetLevel( typedStream, 1 );
 	Journal_RegisterTypedStream( typedStream );
 }
+
+

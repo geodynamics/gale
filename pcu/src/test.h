@@ -21,16 +21,16 @@
 #define pcu_test_h
 
 struct pcu_test_t {
-      char* name;
-      pcu_suite_t* suite;
-      pcu_testfunc_t* func;
-      pcu_test_t* next;
+	char* name;
+ 	pcu_suite_t* suite;
+ 	pcu_testfunc_t* func;
+ 	pcu_test_t* next;
 
-      int globalresult;
-      int nsrcs;
-      pcu_source_t* srcs;
-      pcu_source_t* lastSrc;
-      char* docString;
+	int globalresult;
+	int nsrcs;
+	pcu_source_t* srcs;
+	pcu_source_t* lastSrc;
+	char* docString;
 };
 
 /** Associate a documentation string with the current test (must be called from within a test function) */

@@ -39,8 +39,8 @@
 **/
 
 
-#ifndef __Base_Foundation__ChunkArray_h__
-#define __Base_Foundation__ChunkArray_h__
+#ifndef __StGermain_Base_Container_ChunkArray_h__
+#define __StGermain_Base_Container_ChunkArray_h__
 
 #define CHUNK_ARRAY_DELTA 10
 #define INVALID -1

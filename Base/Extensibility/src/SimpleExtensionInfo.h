@@ -48,8 +48,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_SimpleExtensionInfo_h__
-#define __Base_Extensibility_SimpleExtensionInfo_h__
+#ifndef __StGermain_Base_Extensibility_SimpleExtensionInfo_h__
+#define __StGermain_Base_Extensibility_SimpleExtensionInfo_h__
 	
 	/** Textual name of this class */
 	extern const Type SimpleExtensionInfo_Type;
@@ -72,16 +72,18 @@
 	void SimpleExtensionInfo_Init( void* simpleExtensionInfo, const Name name, SizeT size, Index count );
 	
 	/* Creation implementation */
-	SimpleExtensionInfo* _SimpleExtensionInfo_New( 
-		SizeT 				_sizeOfSelf, 
-		Type 				type, 
-		Stg_Class_DeleteFunction* 	_delete,
-		Stg_Class_PrintFunction*	_print,
-		Stg_Class_CopyFunction*		_copy, 
-		ExtensionInfo_DataCopyFunction*	_dataCopy,
-		Name 				name, 
-		SizeT 				size,
-		Index				count );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SIMPLEEXTENSIONINFO_DEFARGS \
+                EXTENSIONINFO_DEFARGS
+
+	#define SIMPLEEXTENSIONINFO_PASSARGS \
+                EXTENSIONINFO_PASSARGS
+
+	SimpleExtensionInfo* _SimpleExtensionInfo_New(  SIMPLEEXTENSIONINFO_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _SimpleExtensionInfo_Init( SimpleExtensionInfo* self, Name name, SizeT size, Index count );
@@ -105,4 +107,5 @@
 
 	/* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	/* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#endif /* __Base_Extensibility_SimpleExtensionInfo_h__ */
+#endif /* __StGermain_Base_Extensibility_SimpleExtensionInfo_h__ */
+

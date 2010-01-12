@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __Base_Foundation_types_h__
-#define __Base_Foundation_types_h__
+#ifndef __StGermain_Base_Foundation_types_h__
+#define __StGermain_Base_Foundation_types_h__
 
 	/*
 	 * #ifdef barrier for Bool type. Added 07-Sep-2004 -- Alan
@@ -125,4 +125,4 @@ typedef struct NewObject NewObject;
 		DELETE
 	} ReplacementOption;
 	
-#endif /* __Base_Foundation_types_h__ */
+#endif /* __StGermain_Base_Foundation_types_h__ */

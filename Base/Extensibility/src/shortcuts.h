@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_shortcuts_h__
-#define __Base_Extensibility_shortcuts_h__
+#ifndef __StGermain_Base_Extensibility_shortcuts_h__
+#define __StGermain_Base_Extensibility_shortcuts_h__
 
 	/** Macro to grab an extension from a named Stg_ObjectList */
 	#define ExtensionManager_FromList( extList, index ) \
@@ -187,5 +187,5 @@
 	#define EP_Purge( entryPoint ) \
 		EntryPoint_Purge( entryPoint )
 
-#endif /* __Base_Extensibility_shortcuts_h__ */	
+#endif /* __StGermain_Base_Extensibility_shortcuts_h__ */	
 

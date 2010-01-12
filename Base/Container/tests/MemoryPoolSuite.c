@@ -191,3 +191,5 @@ void MemoryPoolSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, MemoryPoolSuite_TestDeallocation );
    pcu_suite_addTest( suite, MemoryPoolSuite_TestIllegalDeallocation );
 }
+
+

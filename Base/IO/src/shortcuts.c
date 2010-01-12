@@ -177,3 +177,5 @@ void Journal_PrintString_WithLength( Stream* stream, char* string, int length ) 
 		Journal_Printf( stream, string );
 	}
 }
+
+

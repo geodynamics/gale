@@ -40,8 +40,8 @@
 **
 **/
 
-#ifndef __Base_IO_MPIFile_h__
-#define __Base_IO_MPIFile_h__
+#ifndef __StGermain_Base_IO_MPIFile_h__
+#define __StGermain_Base_IO_MPIFile_h__
 
 #include <mpi.h>
 
@@ -67,12 +67,18 @@
 
 
 	/** Constructor interface. */
-	MPIFile* _MPIFile_New(
-		SizeT _sizeOfSelf,
-		Type type,
-		Stg_Class_DeleteFunction* _delete,
-		Stg_Class_PrintFunction* _print,
-		Stg_Class_CopyFunction* _copy );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MPIFILE_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define MPIFILE_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	MPIFile* _MPIFile_New(  MPIFILE_DEFARGS  );
 		
 	/** Init interface. */
 	void _MPIFile_Init( MPIFile* self );
@@ -97,4 +103,5 @@
 	Bool _MPIFile_Flush( void* file );
 	
 
-#endif /* __Base_IO_MPIFile_h__ */
+#endif /* __StGermain_Base_IO_MPIFile_h__ */
+

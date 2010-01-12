@@ -42,7 +42,7 @@
 #include "PathUtilsSuite.h"
 
 typedef struct {
-   unsigned int   rank;
+   int rank;
 } PathUtilsSuiteData;
 
 
@@ -130,3 +130,5 @@ void PathUtilsSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, PathUtilsSuite_TestPathJoin );
    pcu_suite_addTest( suite, PathUtilsSuite_TestFindFile );
 }
+
+

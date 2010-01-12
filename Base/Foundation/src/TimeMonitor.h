@@ -28,8 +28,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Foundation_TimeMonitor_h__
-#define __Base_Foundation_TimeMonitor_h__
+#ifndef __StGermain_Base_Foundation_TimeMonitor_h__
+#define __StGermain_Base_Foundation_TimeMonitor_h__
 
 extern double Stg_TimeMonitor_t0;
 extern double Stg_TimerWatchCriteria;

@@ -243,3 +243,5 @@ int interpretResponse( SoapCtx* response, xmlChar** runID ) {
 	printf( "Regresstor: Successfully end run.\n" );
 	return 1;
 }
+
+

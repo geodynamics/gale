@@ -38,6 +38,7 @@
 #include "shortcuts.h"
 #include "Module.h"
 #include "ModulesManager.h"
+#include "ToolboxesManager.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -70,22 +71,13 @@ const char* Codelet_GetMetadata();
 /* Define memory for global pointer to moduleDirectories */
 Stg_ObjectList*  moduleDirectories = NULL;	
 
-ModulesManager* _ModulesManager_New(
-		SizeT                                   _sizeOfSelf,
-		Type                                    type,
-		Stg_Class_DeleteFunction*               _delete,
-		Stg_Class_PrintFunction*                _print,
-		Stg_Class_CopyFunction*                 _copy, 
-		ModulesManager_GetModulesListFunction*  _getModulesList,
-		ModulesManager_LoadModuleFunction*	_loadModule,
-		ModulesManager_UnloadModuleFunction*	_unloadModule,
-		ModulesManager_ModuleFactoryFunction*   _moduleFactory )
+ModulesManager* _ModulesManager_New(  MODULESMANAGER_DEFARGS  )
 {
 	ModulesManager* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ModulesManager) );
-	self = (ModulesManager*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (ModulesManager*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* General info */
 	
@@ -94,6 +86,8 @@ ModulesManager* _ModulesManager_New(
 	self->_loadModule = _loadModule;
 	self->_unloadModule = _unloadModule;
 	self->_moduleFactory = _moduleFactory;
+	self->_checkContext = _checkContext;
+	self->_getModuleName = _getModuleName;
 	
 	_ModulesManager_Init( self );
 	
@@ -169,7 +163,6 @@ void _ModulesManager_Print( void* modulesManager, Stream* stream ) {
 	}
 }
 
-
 Dictionary_Entry_Value* ModulesManager_GetModulesList( void* modulesManager, void* _dictionary ) {
 	ModulesManager*			self = (ModulesManager*)modulesManager;
 	Dictionary*			dictionary = (Dictionary*)_dictionary;
@@ -177,22 +170,35 @@ Dictionary_Entry_Value* ModulesManager_GetModulesList( void* modulesManager, voi
 	return self->_getModulesList( self, dictionary );
 }
 
+Bool ModulesManager_CheckContext( void* modulesManager, Dictionary_Entry_Value* modulesVal, unsigned int entry_I, Name contextName ) {
+	ModulesManager*			self 		= (ModulesManager*)modulesManager;
 
-void ModulesManager_Load( void* modulesManager, void* _dictionary ) {
+	return self->_checkContext( self, modulesVal, entry_I, contextName );
+}
+
+Name ModulesManager_GetModuleName( void* modulesManager, Dictionary_Entry_Value* moduleVal, unsigned int entry_I ) {
+	ModulesManager*			self 		= (ModulesManager*)modulesManager;
+
+	return self->_getModuleName( self, moduleVal, entry_I );
+}
+
+void ModulesManager_Load( void* modulesManager, void* _dictionary, Name contextName ) {
 	ModulesManager*			self = (ModulesManager*)modulesManager;
-	Dictionary*			dictionary = (Dictionary*)_dictionary;
-	unsigned int			entryCount;
-	unsigned int			entry_I;
-	Dictionary_Entry_Value*		modulesVal;
+	Dictionary*					dictionary = (Dictionary*)_dictionary;
+	unsigned int				entryCount;
+	unsigned int				entry_I;
+	Dictionary_Entry_Value*	modulesVal;
 
 	/* First add the directory list onto LD_LIBRARY_PATH so that it can potentially
 	 * resolve the unknown symbols */
+#ifndef NOSHARED
 	char* curEnvPath;
 	char* newEnvPath;
-	Index newEnvPathLength = 0;
+	Index newEnvPathLength;
 	Index dir_I;
-	
-#ifndef NOSHARED
+
+	newEnvPathLength = 0;
+
 	if( dictionary ) {
 		Dictionary_Entry_Value* localLibDirList = Dictionary_Get( dictionary, "LD_LIBRARY_PATH" );
 		if( localLibDirList ) {
@@ -249,7 +255,11 @@ void ModulesManager_Load( void* modulesManager, void* _dictionary ) {
 	
 	for( entry_I = 0; entry_I < entryCount; entry_I++ ) {
 		Name		moduleName;
-		moduleName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( modulesVal, entry_I ) );
+		moduleName = ModulesManager_GetModuleName( self, modulesVal, entry_I );
+		//moduleName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( modulesVal, entry_I ) );
+
+		if( !ModulesManager_CheckContext( self, modulesVal, entry_I, contextName ) )
+			continue;
 
 		if ( ! ModulesManager_LoadModule( self, moduleName ) ) {
 #ifndef NOSHARED
@@ -422,7 +432,9 @@ Index ModulesManager_Submit(
 	
 		codeletInstance = defaultNew( codeletName );
 		result = Stg_ObjectList_Append( self->codelets, codeletInstance );
-		if( LiveComponentRegister_GetLiveComponentRegister() ) {
+
+		/* only submit if not a toolbox */
+		if( LiveComponentRegister_GetLiveComponentRegister() && strcmp( self->type, ToolboxesManager_Type ) ) {
 			LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), codeletInstance );
 		}
 		
@@ -459,7 +471,7 @@ void ModulesManager_ConstructModules( void* modulesManager, Stg_ComponentFactory
 	int i;
 
 	for( i = 0; i < self->codelets->count; ++i ) {
-		Stg_Component_Construct( self->codelets->data[i], cf, data, False );
+		Stg_Component_AssignFromXML( self->codelets->data[i], cf, data, False );
 	}
 }
 
@@ -473,7 +485,9 @@ Bool ModulesManager_ConstructModule( void* modulesManager, Name moduleName, Stg_
 	if( codelet == NULL )
 		return False;
 	else
-		Stg_Component_Construct( codelet, cf, data, False );
+		Stg_Component_AssignFromXML( codelet, cf, data, False );
 
 	return True;
 }
+
+

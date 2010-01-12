@@ -195,6 +195,7 @@ Memory* Memory_Init()
 
 	result->stgCurrentMemory = 0;
 	result->stgPeakMemory = 0;
+   stgMemory = result;
 	
 	return result;
 }
@@ -216,6 +217,7 @@ void Memory_Delete()
 	if( stgMemory->pointers != NULL){
 		BTree_Delete( stgMemory->pointers );
 	}
+   free( stgMemory );
 }
 
 
@@ -1204,9 +1206,10 @@ void* _Memory_Realloc_3DArrayAs1D_Func(
 
 
 /* This function should only be called on ptrs allocated by StGermain's Memory routines */
-void _Memory_Free_Func( void* ptr )
-{
+void _Memory_Free_Func( void* ptr ) {
+	#ifdef MEMORY_STATS
 	MemoryPointer* memoryPointer = NULL;
+	#endif
 
 	if( !ptr ) return;
 	
@@ -1857,4 +1860,6 @@ void _Memory_OutOfMemoryErrorFunc( const char* func, int line, SizeT size ) {
 		line,
 		stgMemory->stgCurrentMemory );
 }
+
+
 

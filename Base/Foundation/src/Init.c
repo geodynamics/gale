@@ -37,6 +37,7 @@
 #include "Init.h"
 
 #include <stdio.h>
+#include <assert.h>
 
 /* constants */
 const int DEFAULT_LIST_INITIAL_SIZE = 8;
@@ -44,9 +45,12 @@ const int DEFAULT_LIST_DELTA = 8;
 
 Bool BaseFoundation_Init( int* argc, char** argv[] ) {
 	stgMemory = Memory_Init();
+   assert( stgMemory );
 
 	Stg_TimeMonitor_Initialise();
 	Stg_MemMonitor_Initialise();
 	
 	return True;
 }
+
+

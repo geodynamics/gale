@@ -27,15 +27,23 @@ def findProjectDirectories(mainDirectory):
     return projList
 
 ## Create a dictionary that contains all data needed to create Codex and Doxygen pages
-def createListDictionary(arg1, arg2, arg3, arg4, directoryPath, docPath):
+def createListDictionary(arg1, arg2, arg3, arg4, directoryPath, docPath, docDataPath):
     dictionary = {}
     # Add items to dictionary
 
-    dictionary['directoryPath'] = directoryPath
+    dictionary['directoryPath'] = os.path.realpath(directoryPath)
 
-    dictionary['docPath'] = docPath
-    dictionary['docDataPath'] = os.path.realpath(os.path.join(directoryPath,'StGermain/doc/'))
-    dictionary['docScriptPath'] = os.path.realpath(os.path.join(directoryPath,'StGermain/script/'))
+    dictionary['docPath'] = os.path.realpath(docPath)
+    if docDataPath == "":
+        dictionary['docDataPath'] = os.path.realpath(os.path.join(directoryPath,'StGermain/doc/'))
+    else:
+        dictionary['docDataPath'] = os.path.realpath(docDataPath)
+
+    if docDataPath != "":
+        dictionary['docScriptPath'] = os.path.join(string.rstrip(os.path.realpath(dictionary['docDataPath']), "doc/"), "script/")
+    else:
+        dictionary['docScriptPath'] = os.path.realpath(os.path.join(directoryPath,'StGermain/script/'))
+
     # Define Codex values
     # Codex Subdir
     dictionary['codexSubDir'] = 'Codex'
@@ -270,7 +278,7 @@ if __name__=='__main__':
     docPath = os.path.realpath('./doc/')
     
     # createDictionary
-    mainDictionary = createListDictionary(values[1],values[2], values[3], values[4], directoryPath, docPath)
+    mainDictionary = createListDictionary(values[1],values[2], values[3], values[4], directoryPath, docPath, "")
 
     # Set up help print statement
     if ((mainDictionary['arg1'] == "help") or (mainDictionary['arg1'] == '-h') or (mainDictionary['arg1'] =='--help') or (mainDictionary['arg1'] == 'h')):

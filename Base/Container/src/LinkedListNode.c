@@ -71,3 +71,5 @@ void _LinkedListNode_Init( LinkedListNode* self ){
 	self->data = NULL;
 	self->sizeOfData = 0;
 }
+
+

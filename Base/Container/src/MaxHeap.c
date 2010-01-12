@@ -57,54 +57,26 @@ MaxHeap* MaxHeap_New( void **keys, int keyLength, int numArrayElements,
 						Heap_CompareFunction *keyCompare,
 						Heap_ExtendArrayFunc *extendArray )
 {
-	return _MaxHeap_New( sizeof( MaxHeap ),
-									MaxHeap_Type,
-									_MaxHeap_DeleteFunc,
-									_MaxHeap_PrintFunc,
-									NULL,
-									MaxHeap_Heapify,
-									(Heap_ExtractFunction*)MaxHeap_Extract,
-									MaxHeap_InsertFunc,
-									keySwap,
-									keyCompare,
-									extendArray,
-									keys,
-									keyLength,
-									numArrayElements );
+	/* Variables set in this function */
+	SizeT                          _sizeOfSelf = sizeof( MaxHeap );
+	Type                                  type = MaxHeap_Type;
+	Stg_Class_DeleteFunction*          _delete = _MaxHeap_DeleteFunc;
+	Stg_Class_PrintFunction*            _print = _MaxHeap_PrintFunc;
+	Stg_Class_CopyFunction*              _copy = NULL;
+	Heap_HeapifyFunction*              heapify = MaxHeap_Heapify;
+	Heap_ExtractFunction*              extract = (Heap_ExtractFunction*)MaxHeap_Extract;
+	Heap_InsertFunction*                insert = MaxHeap_InsertFunc;
+	Heap_KeySwapFunction*      keySwapFunction = keySwap;
+	Heap_CompareFunction*      compareFunction = keyCompare;
+
+	return _MaxHeap_New(  MAXHEAP_PASSARGS  );
 }
 
-MaxHeap* _MaxHeap_New(
-			SizeT							_sizeOfSelf,
-			Type							type,
-			Stg_Class_DeleteFunction*			_delete,
-			Stg_Class_PrintFunction*			_print,
-			Stg_Class_CopyFunction*				_copy,
-			Heap_HeapifyFunction				*heapify,
-			Heap_ExtractFunction				*extract,
-			Heap_InsertFunction					*insert,
-			Heap_KeySwapFunction*				keySwapFunction,
-			Heap_CompareFunction				*compareFunction,
-			Heap_ExtendArrayFunc				*extendArray,
-			void						**keys,
-			int							keyLength,
-			int							numArrayElements )
+MaxHeap* _MaxHeap_New(  MAXHEAP_DEFARGS  )
 {
 	_Heap *heap;
 
-	heap = _Heap_New( _sizeOfSelf,
-						type,
-						_delete,
-						_print,
-						_copy,
-						heapify,
-						extract,
-						insert,
-						keySwapFunction,
-						compareFunction,
-						extendArray,
-						keys,
-						keyLength,
-						numArrayElements );
+	heap = _Heap_New(  HEAP_PASSARGS  );
 
 	_MaxHeap_Init( (MaxHeap*)heap );
 	return ( MaxHeap* )heap;
@@ -221,4 +193,6 @@ void MaxHeap_InsertFunc( _Heap *maxHeap, void *key )
 		i = _Heap_Parent( maxHeap, i );
 	}
 }
+
+
 

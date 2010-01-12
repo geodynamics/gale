@@ -28,8 +28,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_IO_PathUtils_h__
-#define __Base_IO_PathUtils_h__
+#ifndef __StGermain_Base_IO_PathUtils_h__
+#define __StGermain_Base_IO_PathUtils_h__
 
 
 /** Note that this function is designed as call-by-reference to modify fullPath to the found
@@ -54,4 +54,4 @@ Bool Stg_FileExists( const char* path );
 
 Bool Stg_DirectoryExists( const char* path );
 
-#endif /* __Base_IO_PathUtils_h__ */
+#endif /* __StGermain_Base_IO_PathUtils_h__ */

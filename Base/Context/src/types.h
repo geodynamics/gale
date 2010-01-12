@@ -39,9 +39,58 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Context_types_h__
-#define __Base_Context_types_h__
+#ifndef __StGermain_Base_Context_types_h__
+#define __StGermain_Base_Context_types_h__
 	
+	/* types/classes */
+	typedef struct Codelet				Codelet;
+	typedef struct _SetVC				SetVC;
+	typedef struct _CompositeVC			CompositeVC;
+	typedef struct DynamicVC			DynamicVC;
+	typedef struct _VariableAllVC_Entry		VariableAllVC_Entry;
+	typedef struct _VariableAllVC			VariableAllVC;
+	typedef struct _Variable			Variable;
+	typedef struct _Variable_Register		Variable_Register;
+	typedef struct VariableDumpStream		VariableDumpStream;
+	typedef struct _VariableCondition		VariableCondition;
+	typedef struct _VariableCondition_Register	VariableCondition_Register;
+	typedef struct _ConditionFunction		ConditionFunction;
+	typedef struct _ConditionFunction_Register	ConditionFunction_Register;
+	typedef Index					VariableAllVC_Entry_Index;
+	typedef Index					ConditionFunction_Index;
+
+	/* Variable_Register types */
+	typedef Index					Variable_Set_Index;
+	typedef Index					Variable_Index;
+	typedef Index					Dof_Index;
+	
+	/* VariableCondition_Register types */
+	typedef struct _VariableCondition_Register_Entry VariableCondition_Register_Entry;
+	
+	/* VariableCondition types */
+	typedef enum
+	{
+		VC_ValueType_Double = 1,
+		VC_ValueType_Int,
+		VC_ValueType_Short,
+		VC_ValueType_Char,
+		VC_ValueType_Ptr,
+		VC_ValueType_DoubleArray,
+		VC_ValueType_CFIndex
+	} VariableCondition_ValueType;
+	
+	typedef Index					VariableCondition_Index;
+	typedef struct _VariableCondition_Value		VariableCondition_Value;
+	typedef struct _VariableCondition_Tuple		VariableCondition_Tuple;
+	typedef Index					VariableCondition_ValueIndex;
+	typedef Index					VariableCondition_VariableIndex;
+
+	typedef struct _SetVC_Entry			SetVC_Entry;
+	typedef Index					SetVC_Entry_Index;
+	
+	/* CompositeVC types */
+	typedef Index					CompositeVC_ItemIndex;
+
 	/* Context types/classes */
 	typedef struct AbstractContext		AbstractContext;
 	typedef struct ContextEntryPoint	ContextEntryPoint;
@@ -54,4 +103,4 @@
 	typedef Stg_ObjectList			Pointer_Register;
 	typedef Stg_ObjectList			Register_Register;
 	
-#endif /* __Base_Context_types_h__ */
+#endif /* __StGermain_Base_Context_types_h__ */

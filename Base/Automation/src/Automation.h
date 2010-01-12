@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __Base_Automation_h__
-#define __Base_Automation_h__
+#ifndef __StGermain_Base_Automation_h__
+#define __StGermain_Base_Automation_h__
 	
 	#include "types.h"
 	#include "shortcuts.h"
@@ -51,20 +51,9 @@
 	#include "LiveComponentRegister.h"
 	#include "Stg_ComponentFactory.h"
 	#include "DocumentationComponentFactory.h"
-	#include "Variable.h"
-	#include "Variable_Register.h"
-	#include "VariableDumpStream.h"
-	#include "ConditionFunction.h"
-	#include "ConditionFunction_Register.h"
-	#include "VariableCondition.h"
-	#include "VariableCondition_Register.h"
-	#include "CompositeVC.h"
-	#include "SetVC.h"
-	#include "VariableAllVC.h"
-	#include "DynamicVC.h"
 	#include "HierarchyTable.h"
 	#include "CallGraph.h"
 	#include "Init.h"
 	#include "Finalise.h"
 	
-#endif /* __Base_Automation_h__ */
+#endif /* __StGermain_Base_Automation_h__ */

@@ -49,7 +49,7 @@ void LocalPlugin_Function( void* context ) {
 
 
 /* Plugins are components, so they need a Construct() function. This is where you add the entry points and extensions */
-void _LocalPlugin_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _LocalPlugin_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	MockContext* context = (MockContext*)Stg_ComponentFactory_ConstructByName(cf, "context", Stg_Component, True, data );
 
 	EP_Append( context->ep, LocalPlugin_Function );
@@ -60,7 +60,7 @@ void* _LocalPlugin_DefaultNew( Name name ) {
 	return Codelet_New(
 		LocalPlugin_Type,
 		_LocalPlugin_DefaultNew,
-		_LocalPlugin_Construct,
+		_LocalPlugin_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,
@@ -73,4 +73,6 @@ void* _LocalPlugin_DefaultNew( Name name ) {
 Index LocalPlugin_Register( PluginsManager* pluginsManager ) {
 	return ModulesManager_Submit( pluginsManager, LocalPlugin_Type, "0", _LocalPlugin_DefaultNew );
 }
+
+
 

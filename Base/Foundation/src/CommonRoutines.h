@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __Base_Foundation_CommonRoutines_h__
-#define __Base_Foundation_CommonRoutines_h__
+#ifndef __StGermain_Base_Foundation_CommonRoutines_h__
+#define __StGermain_Base_Foundation_CommonRoutines_h__
 	#include <stdarg.h>
 
 	/** Global map from a Boolean's enum value to a string: for printing purposes */
@@ -73,4 +73,4 @@
 	 *  but possibly with gaps between occurrences of each character. */
 	unsigned int Stg_LongestMatchingSubsequenceLength( char* string1, char* string2, Bool caseSensitive ) ;
 
-#endif /* __Base_Foundation_CommonRoutines_h__ */
+#endif /* __StGermain_Base_Foundation_CommonRoutines_h__ */

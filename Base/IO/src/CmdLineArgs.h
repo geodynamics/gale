@@ -23,12 +23,12 @@
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_IO_CmdLineArgs_h__
-#define __Base_IO_CmdLineArgs_h__
+#ifndef __StGermain_Base_IO_CmdLineArgs_h__
+#define __StGermain_Base_IO_CmdLineArgs_h__
 	
 	void stgRemoveCmdLineArg( int* argc, char** argv[], int index );
 	char* stgParseHelpCmdLineArg( int* argc, char** argv[] );
 	char* stgParseListCmdLineArg( int* argc, char** argv[] );
 	char* stgParseListAllCmdLineArg( int* argc, char** argv[] );
 
-#endif /* __Base_IO_CmdLineArgs_h__ */
+#endif /* __StGermain_Base_IO_CmdLineArgs_h__ */

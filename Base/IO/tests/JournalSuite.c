@@ -56,8 +56,6 @@ void JournalSuite_Setup( JournalSuiteData* data ) {
    Stg_asprintf( &data->testStdOutFilename, "./testStdOut-%d.txt", data->rank );
    Stg_asprintf( &data->testStdErrFilename, "./testStdErr-%d.txt", data->rank );
 
-   Stg_Class_Delete( stJournal->stdOut );
-   Stg_Class_Delete( stJournal->stdErr );
    stJournal->stdOut = CFile_New();
    stJournal->stdErr = CFile_New();
    JournalFile_Open( stJournal->stdOut, data->testStdOutFilename );
@@ -88,7 +86,6 @@ void JournalSuite_Teardown( JournalSuiteData* data ) {
    remove( data->testStdOutFilename );
    remove( data->testStdErrFilename );
 }
-
 
 void JournalSuite_TestRegister( JournalSuiteData* data ) {
    Journal* testJournal;
@@ -410,7 +407,6 @@ void JournalSuite_TestShortcuts( JournalSuiteData* data ) {
    double       floatValue    = 2.173425;
    int          intValue      = 3;
    unsigned int uintValue     = 3980;
-   int          char_I;
    char         charValue     = 'V';
    double       doubleArray[] = { 10.23, 393.1, -89, 1231 };        
    Index        uintArray[]   = { 10, 2021, 231, 2, 3, 4, 55 };
@@ -467,3 +463,5 @@ void JournalSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, JournalSuite_TestShortcuts );
    pcu_suite_addTest( suite, JournalSuite_TestFirewall );
 }
+
+

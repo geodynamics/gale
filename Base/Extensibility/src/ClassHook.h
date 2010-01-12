@@ -36,8 +36,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_ClassHook_h__
-#define __Base_Extensibility_ClassHook_h__
+#ifndef __StGermain_Base_Extensibility_ClassHook_h__
+#define __StGermain_Base_Extensibility_ClassHook_h__
 	
 
 	/** Textual name of this class */
@@ -58,16 +58,24 @@
 	void ClassHook_Init( void* hook, Name name, Func_Ptr funcPtr, char* addedBy, void* reference );
 	
 	/* Creation implementation */
-	ClassHook* _ClassHook_New( 
-		SizeT 				_sizeOfSelf, 
-		Type 				type, 
-		Stg_Class_DeleteFunction* 	_delete,
-		Stg_Class_PrintFunction*	_print,
-		Stg_Class_CopyFunction*		_copy, 
-		Name 				name, 
-		Func_Ptr 			funcPtr,
-		char*				addedBy,
-		void*			reference );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CLASSHOOK_DEFARGS \
+                STG_OBJECT_DEFARGS, \
+                Func_Ptr    funcPtr, \
+                char*       addedBy, \
+                void*     reference
+
+	#define CLASSHOOK_PASSARGS \
+                STG_OBJECT_PASSARGS, \
+	        funcPtr,   \
+	        addedBy,   \
+	        reference
+
+	ClassHook* _ClassHook_New(  CLASSHOOK_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _ClassHook_Init( ClassHook* self, Func_Ptr funcPtr, char* addedBy, void* reference );
@@ -87,4 +95,5 @@
 	
 	void* _ClassHook_Copy( void* hook, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
-#endif /* __Base_Extensibility_ClassHook_h__ */
+#endif /* __StGermain_Base_Extensibility_ClassHook_h__ */
+

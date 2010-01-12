@@ -153,3 +153,5 @@ const int* AbsArray_GetPtr( const void* _self ) {
 
    return self->ptr;
 }
+
+

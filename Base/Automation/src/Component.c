@@ -116,3 +116,5 @@ Bool Component_HasExecuted( void* self ) {
    assert( Class_IsSuper( self, stgComponent ) );
    return ((stgComponent*)self)->hasExecuted;
 }
+
+

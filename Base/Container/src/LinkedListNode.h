@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __LinkedListNode_h__
-#define __LinkedListNode_h__
+#ifndef __StGermain_Base_Container_LinkedListNode_h__
+#define __StGermain_Base_Container_LinkedListNode_h__
 
 	/** Textual name for ListNode class. */
 	extern const Type LinkedListNode_Type;
@@ -68,5 +68,5 @@
 	
 	/** Print interface. */
 
-#endif /* __LinkedListNode_h__ */
+#endif /* __StGermain_Base_Container_LinkedListNode_h__ */
 

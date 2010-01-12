@@ -40,14 +40,15 @@ typedef struct {
 } TestObject;
 
 Stg_Object* TestObject_New( Name name ) {
-	return _Stg_Object_New(
-		sizeof( TestObject ),
-		"TestObject",
-		_Stg_Object_Delete,
-		_Stg_Object_Print,
-		_Stg_Object_Copy, 
-		name,
-		NON_GLOBAL );
+	/* Variables set in this function */
+	SizeT                             _sizeOfSelf = sizeof( TestObject );
+	Type                                     type = "TestObject";
+	Stg_Class_DeleteFunction*             _delete = _Stg_Object_Delete;
+	Stg_Class_PrintFunction*               _print = _Stg_Object_Print;
+	Stg_Class_CopyFunction*                 _copy = _Stg_Object_Copy;
+	AllocationType             nameAllocationType = NON_GLOBAL;
+
+	return _Stg_Object_New(  STG_OBJECT_PASSARGS  );
 }
 
 typedef struct {
@@ -116,8 +117,8 @@ void NamedObject_RegisterSuite_TestGetFunctions( NamedObject_RegisterSuiteData* 
    for (ii=0; ii < data->testObjectsCount; ii++ ) {
       pcu_check_true( ii == NamedObject_Register_GetIndex( data->reg,
          data->testObjectNames[ii] ) );
-      pcu_check_true( data->testObjects[ii] = NamedObject_Register_GetByIndex( data->reg, ii ) );
-      pcu_check_true( data->testObjects[ii] = NamedObject_Register_GetByName( data->reg,
+      pcu_check_true( data->testObjects[ii] == NamedObject_Register_GetByIndex( data->reg, ii ) );
+      pcu_check_true( data->testObjects[ii] == NamedObject_Register_GetByName( data->reg,
          data->testObjectNames[ii] ) );
    }
 }
@@ -128,3 +129,5 @@ void NamedObject_RegisterSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, NamedObject_RegisterSuite_TestAdd );
    pcu_suite_addTest( suite, NamedObject_RegisterSuite_TestGetFunctions );
 }
+
+

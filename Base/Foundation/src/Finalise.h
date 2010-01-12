@@ -40,9 +40,9 @@
 **
 **/
 
-#ifndef __Base_BaseFoundation_Finalise_h__
-#define __Base_BaseFoundation_Finalise_h__
+#ifndef __StGermain_Base_Foundation_Finalise_h__
+#define __StGermain_Base_Foundation_Finalise_h__
 	
-	Bool BaseFoundation_Finalise( void );
+	Bool Foundation_Finalise( void );
 	
-#endif /* __Base_BaseFoundation_Finalise_h__ */
+#endif /* __StGermain_Base_Foundation_Finalise_h__ */

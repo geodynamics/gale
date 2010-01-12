@@ -51,20 +51,21 @@ const Type Stg_ObjectAdaptor_Type = "Stg_ObjectAdaptor";
 
 
 Stg_ObjectAdaptor* Stg_ObjectAdaptor_NewOfClass( void* dataPtr, Name name, Bool iOwn, Bool isGlobal ) {
-	return _Stg_ObjectAdaptor_New(
-		sizeof(Stg_ObjectAdaptor), 
-		Stg_ObjectAdaptor_Type, 
-		_Stg_ObjectAdaptor_Delete,
-		_Stg_ObjectAdaptor_Print, 
-		_Stg_ObjectAdaptor_Copy,
-		name,
-		dataPtr,
-		iOwn,
-		isGlobal,
-		True,
-		NULL,
-		NULL,
-		NULL ); 
+	/* Variables set in this function */
+	SizeT                                     _sizeOfSelf = sizeof(Stg_ObjectAdaptor);
+	Type                                             type = Stg_ObjectAdaptor_Type;
+	Stg_Class_DeleteFunction*                     _delete = _Stg_ObjectAdaptor_Delete;
+	Stg_Class_PrintFunction*                       _print = _Stg_ObjectAdaptor_Print;
+	Stg_Class_CopyFunction*                         _copy = _Stg_ObjectAdaptor_Copy;
+	Bool                                       isStgClass = True;
+	Stg_ObjectAdaptor_DeletePointerFunction*    ptrDelete = NULL;
+	Stg_ObjectAdaptor_PrintPointerFunction*      ptrPrint = NULL;
+	Stg_ObjectAdaptor_CopyPointerFunction*        ptrCopy = NULL;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Stg_ObjectAdaptor_New(  STG_OBJECTADAPTOR_PASSARGS  ); 
 }
 
 
@@ -95,20 +96,18 @@ Stg_ObjectAdaptor* Stg_ObjectAdaptor_NewOfPointer(
 		Stg_ObjectAdaptor_PrintPointerFunction*		ptrPrint,
 		Stg_ObjectAdaptor_CopyPointerFunction*		ptrCopy )
 {
-	return _Stg_ObjectAdaptor_New(
-		sizeof(Stg_ObjectAdaptor), 
-		Stg_ObjectAdaptor_Type, 
-		_Stg_ObjectAdaptor_Delete,
-		_Stg_ObjectAdaptor_Print, 
-		_Stg_ObjectAdaptor_Copy,
-		name,
-		dataPtr,
-		iOwn,
-		isGlobal,
-		False,
-		ptrDelete,
-		ptrPrint,
-		ptrCopy ); 
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(Stg_ObjectAdaptor);
+	Type                              type = Stg_ObjectAdaptor_Type;
+	Stg_Class_DeleteFunction*      _delete = _Stg_ObjectAdaptor_Delete;
+	Stg_Class_PrintFunction*        _print = _Stg_ObjectAdaptor_Print;
+	Stg_Class_CopyFunction*          _copy = _Stg_ObjectAdaptor_Copy;
+	Bool                        isStgClass = False;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Stg_ObjectAdaptor_New(  STG_OBJECTADAPTOR_PASSARGS  ); 
 }
 
 
@@ -139,26 +138,18 @@ void Stg_ObjectAdaptor_InitOfPointer(
 }
 
 
-Stg_ObjectAdaptor* _Stg_ObjectAdaptor_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print, 
-		Stg_Class_CopyFunction*				_copy,
-		Name						name,
-		void*						dataPtr,
-		Bool						iOwn,
-		Bool						isGlobal,
-		Bool						isStgClass,
-		Stg_ObjectAdaptor_DeletePointerFunction*	ptrDelete,
-		Stg_ObjectAdaptor_PrintPointerFunction*		ptrPrint,
-		Stg_ObjectAdaptor_CopyPointerFunction*		ptrCopy )
+Stg_ObjectAdaptor* _Stg_ObjectAdaptor_New(  STG_OBJECTADAPTOR_DEFARGS  )
 {
 	Stg_ObjectAdaptor* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Stg_ObjectAdaptor) );
-	self = (Stg_ObjectAdaptor*)_Stg_Object_New( _sizeOfSelf, type, _delete, _print, _copy, name, GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = GLOBAL;
+
+	self = (Stg_ObjectAdaptor*)_Stg_Object_New(  STG_OBJECT_PASSARGS  );
 	
 	/* General info */
 	
@@ -338,3 +329,5 @@ Bool Stg_ObjectAdaptor_IsStgClassFunc( void* objectAdaptor ) {
 
 
 /* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+

@@ -731,3 +731,5 @@ void _BTree_PrintFunc( void *self, Stream *myStream )
 void BTree_Delete( void* tree ) {
 	Stg_Class_Delete( tree );
 }
+
+

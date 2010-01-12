@@ -50,16 +50,17 @@ const Type ClassHook_Type = "ClassHook";
 
 /** allocate and initialise a new ClassHook. */
 ClassHook* ClassHook_New( Name name, Func_Ptr funcPtr, char* addedBy, void* reference ) {
-	return _ClassHook_New(
-		sizeof(ClassHook), 
-		ClassHook_Type, 
-		_ClassHook_Delete, 
-		_ClassHook_Print, 
-		_ClassHook_Copy, 
-		name, 
-		funcPtr, 
-		addedBy,
-		reference );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(ClassHook);
+	Type                              type = ClassHook_Type;
+	Stg_Class_DeleteFunction*      _delete = _ClassHook_Delete;
+	Stg_Class_PrintFunction*        _print = _ClassHook_Print;
+	Stg_Class_CopyFunction*          _copy = _ClassHook_Copy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _ClassHook_New(  CLASSHOOK_PASSARGS  );
 }
 
 void ClassHook_Init( void* hook, Name name, Func_Ptr funcPtr, char* addedBy, void* reference ) {
@@ -81,22 +82,18 @@ void ClassHook_Init( void* hook, Name name, Func_Ptr funcPtr, char* addedBy, voi
 }
 
 
-ClassHook* _ClassHook_New( 
-		SizeT 				_sizeOfSelf, 
-		Type 				type, 
-		Stg_Class_DeleteFunction* 	_delete,
-		Stg_Class_PrintFunction*	_print,
-		Stg_Class_CopyFunction*		_copy, 
-		Name 				name, 
-		Func_Ptr			funcPtr,
-		char*				addedBy,
-		void*			reference )
+ClassHook* _ClassHook_New(  CLASSHOOK_DEFARGS  )
 {
 	ClassHook* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ClassHook) );
-	self = (ClassHook*)_Stg_Object_New( _sizeOfSelf, type, _delete, _print, _copy, name, NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (ClassHook*)_Stg_Object_New(  STG_OBJECT_PASSARGS  );
 	
 	/* General info */
 	
@@ -152,4 +149,6 @@ void* _ClassHook_Copy( void* hook, void* dest, Bool deep, Name nameExt, PtrMap* 
 	
 	return (void*)newClassHook;
 }
+
+
 

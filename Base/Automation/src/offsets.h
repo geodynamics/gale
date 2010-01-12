@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_offsets_h__
-#define __Base_Automation_offsets_h__
+#ifndef __StGermain_Base_Automation_offsets_h__
+#define __StGermain_Base_Automation_offsets_h__
 
 	/** Given a struct object and the name of a member, return the member */
 	#define GetMember( structVar, member ) \
@@ -69,4 +69,4 @@
 		( GetOffsetOfIndex( (arrayVar), (structIndex) ) + \
 		  GetOffsetOfMember( GetIndex( (arrayVar), (structIndex) ), (index) ) )
 
-#endif /* __Base_Automation_offsets_h__ */
+#endif /* __StGermain_Base_Automation_offsets_h__ */

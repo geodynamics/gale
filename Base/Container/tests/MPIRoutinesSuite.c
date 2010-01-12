@@ -39,8 +39,8 @@
 #include "MPIRoutinesSuite.h"
 
 typedef struct {
-   unsigned rank;
-   unsigned nProcs;
+   int rank;
+   int nProcs;
 } MPIRoutinesSuiteData;
 
 void MPIRoutinesSuite_Setup( MPIRoutinesSuiteData* data ) {
@@ -299,3 +299,5 @@ void MPIRoutinesSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, MPIRoutinesSuite_TestAlltoall_1D );
    pcu_suite_addTest( suite, MPIRoutinesSuite_TestAlltoall_2D );
 }
+
+

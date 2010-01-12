@@ -51,31 +51,23 @@
 const Type NamedObject_Register_Type = "NamedObject_Register";
 
 NamedObject_Register*	NamedObject_Register_New( void ) {
-	return _NamedObject_Register_New(
-		sizeof(NamedObject_Register),
-		NamedObject_Register_Type,
-		_NamedObject_Register_Delete,
-		_NamedObject_Register_Print,
-		_NamedObject_Register_Copy );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(NamedObject_Register);
+	Type                              type = NamedObject_Register_Type;
+	Stg_Class_DeleteFunction*      _delete = _NamedObject_Register_Delete;
+	Stg_Class_PrintFunction*        _print = _NamedObject_Register_Print;
+	Stg_Class_CopyFunction*          _copy = _NamedObject_Register_Copy;
+
+	return _NamedObject_Register_New(  NAMEDOBJECT_REGISTER_PASSARGS  );
 }
 
-NamedObject_Register*	_NamedObject_Register_New( 
-		SizeT			_sizeOfSelf, 
-		Type			type,
-		Stg_Class_DeleteFunction*	_delete,
-		Stg_Class_PrintFunction*	_print,
-		Stg_Class_CopyFunction*	_copy ) 
+NamedObject_Register*	_NamedObject_Register_New(  NAMEDOBJECT_REGISTER_DEFARGS  ) 
 {
 	NamedObject_Register*	self;
 	
 	/* Allocate memory/General info */
 	assert(_sizeOfSelf >= sizeof(NamedObject_Register));
-	self = (NamedObject_Register*)_Stg_Class_New(
-		_sizeOfSelf, 
-		type, 
-		_delete, 
-		_print,
-		_copy );
+	self = (NamedObject_Register*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* Virtual info */
 	
@@ -100,6 +92,16 @@ void _NamedObject_Register_Delete( void* namedObjectRegister ) {
 	_Stg_Class_Delete( self );
 }
 	
+void NamedObject_Register_DeleteAll( void* reg ) {
+   /* Deletes all elements from register and then
+      deletes the register */
+   NamedObject_Register* self = (NamedObject_Register*)reg;
+
+   Stg_ObjectList_DeleteAllObjects( self->objects );
+
+   /* Stg_Class_Delete parent */
+   Stg_Class_Delete( self );
+}
 void _NamedObject_Register_Print( void* namedObjectRegister, struct Stream* stream ) {
 	NamedObject_Register*	self = (NamedObject_Register*)namedObjectRegister;
 
@@ -137,3 +139,5 @@ void* _NamedObject_Register_Copy( void* namedObjectRegister, void* dest, Bool de
 
 /* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+

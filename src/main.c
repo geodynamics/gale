@@ -63,16 +63,16 @@ static void deleteListArgItem( void* ptr ) {
 typedef void (ForEachFunc) ( Stream* stream, Type componentType );
 
 static void forEachComponent( Stream* stream, ForEachFunc* forEach ) {
-	BTreeIterator* i;
+   int i;
+	Stg_ComponentRegister* cr;
 	Stg_ComponentRegisterElement* cre;
 
-	i = Stg_ComponentRegister_GetIterator( Stg_ComponentRegister_Get_ComponentRegister() );
-	for( cre = Stg_ComponentRegisterIterator_First( i ); cre != NULL; cre = Stg_ComponentRegisterIterator_Next( i ) ) {
+	cr = Stg_ComponentRegister_Get_ComponentRegister();
+	for(i = 0; i < Stg_ComponentRegister_GetCount(cr); i++) {
+      cre = Stg_ComponentRegister_GetByIndex(cr, i);
 		Type componentType = Stg_ComponentRegisterElement_GetType( cre );
 		forEach( stream, componentType );
 	}
-
-	Stg_Class_Delete( i );
 }
 
 static void forEachLiveComponent( Stream* stream, ForEachFunc* forEach ) {
@@ -143,17 +143,19 @@ static void printRightsListItem( Stream* stream, Type componentType ) {
 
 int main( int argc, char* argv[] ) {
 	/* StGermain standard bits & pieces */
-	MPI_Comm			CommWorld;
-	int				rank;
-	int				numProcessors;
-	Dictionary*			dictionary;
+	MPI_Comm						CommWorld;
+	int							rank;
+	int							numProcessors;
+	Dictionary*					dictionary;
 	XML_IO_Handler*			ioHandler;
-	Stream*                         stream;
-	char*                           helpTopic;
-	char*                           listAllTopic;
-	Stg_ObjectList*                 listAllTopics;
-	char*                           listTopic;
-	Stg_ObjectList*                 listTopics;
+	Stream*						stream;
+	char*							helpTopic;
+	char*							listAllTopic;
+	Stg_ObjectList*			listAllTopics;
+	char*							listTopic;
+	Stg_ObjectList*			listTopics;
+	Dictionary*					componentDict;
+	Stg_ComponentFactory*	cf;
 
 	/* Initialise PETSc, get world info */
 	MPI_Init( &argc, &argv );
@@ -198,8 +200,8 @@ int main( int argc, char* argv[] ) {
 		Dictionary* metadata;
 		Index i;
 
-		ModulesManager_Load( stgToolboxesManager, dictionary );
-		ModulesManager_Load( plugins, dictionary );
+		ModulesManager_Load( stgToolboxesManager, dictionary, "" );
+		ModulesManager_Load( plugins, dictionary, "context" );
 
 		/* "--help" parameter */
 		if( helpTopic ) {
@@ -245,11 +247,17 @@ int main( int argc, char* argv[] ) {
 	}
 	else {  /* ... run the app */
 		Index i;
-		AbstractContext* context;
+		PluginsManager* lucPluginManager = PluginsManager_New();
+
+		/* the lucPlugin is not associated with a given context, as other plugins are, so load it in manually, assuming it exists */
+		ModulesManager_Load( lucPluginManager, dictionary, "lucPluginContext" );
+
+		ModulesManager_Load( stgToolboxesManager, dictionary, "" );
 
 		/* Magic happens here! */
-		context = stgMainInit( dictionary, CommWorld );
-		stgMainLoop( context );
+		cf = stgMainConstruct( dictionary, CommWorld, NULL );
+		stgMainBuildAndInitialise( cf );
+		stgMainLoop( cf );
 
 		/* "--list" parameters */
 		for( i = 0; i < Stg_ObjectList_Count( listTopics ); i++ ) {
@@ -277,14 +285,12 @@ int main( int argc, char* argv[] ) {
 			}
 		}
 
-		stgMainDestroy( context );
+		stgMainDestroy( cf );
 	}
-	
 
 	/* Close off everything */
 	Stg_Class_Delete( listAllTopics );
 	Stg_Class_Delete( listTopics );
-	Stg_Class_Delete( dictionary );
 	#ifdef HAVE_PYTHON
 		Py_Finalize();
 	#endif
@@ -293,3 +299,5 @@ int main( int argc, char* argv[] ) {
 	
 	return 0; /* success */
 }
+
+

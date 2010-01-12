@@ -27,7 +27,7 @@
 */
 /** \file
 **  Role:
-**	Shortcuts to complex types in the eyes of the Base user.
+**	Shortcuts to complex types in the eyes of the Context user.
 **
 ** Assumptions:
 **	None as yet.
@@ -35,21 +35,12 @@
 ** Comments:
 **	None as yet.
 **
-** $Id: shortcuts.h 4137 2007-06-07 05:46:46Z LukeHodkinson $
+** $Id: shortcuts.h 3851 2006-10-12 08:57:22Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_shortcuts_h__
-#define __Base_Automation_shortcuts_h__
+#ifndef __StGermain_Base_Automation_shortcuts_h__
+#define __StGermain_Base_Automation_shortcuts_h__
 	
-	/* VTK uses Stg_Class_Delete as a standard class member...so if an app
-	uses St. G and VTK, then we can't use this macro */
-/*
-	#ifndef __vtkObject_h
-		#define Build			Stg_Component_Build
-		#define Initialise		Stg_Component_Initialise
-		#define Execute			Stg_Component_Execute
-	#endif
-*/
-	
-#endif /* __Base_Automation_shortcuts_h__ */
+
+#endif /* __StGermain_Base_Automation_shortcuts_h__ */

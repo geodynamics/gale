@@ -55,16 +55,19 @@ const Type ClassPtrExtensionInfo_Type = "ClassPtrExtensionInfo";
 
 /** allocate and initialise a new ClassPtrExtensionInfo. */
 ClassPtrExtensionInfo* ClassPtrExtensionInfo_New( const Name name, Stg_Class_CopyFunction* copyFunc, Index count ) {
-	return _ClassPtrExtensionInfo_New( 
-		sizeof(ClassPtrExtensionInfo), 
-		ClassPtrExtensionInfo_Type, 
-		_ClassPtrExtensionInfo_Delete,
-		_ClassPtrExtensionInfo_Print, 
-		_ClassPtrExtensionInfo_Copy, 
-		_ClassPtrExtensionInfo_DataCopy,
-		(Name)name,
-		copyFunc,
-		count );
+	/* Variables set in this function */
+	SizeT                            _sizeOfSelf = sizeof(ClassPtrExtensionInfo);
+	Type                                    type = ClassPtrExtensionInfo_Type;
+	Stg_Class_DeleteFunction*            _delete = _ClassPtrExtensionInfo_Delete;
+	Stg_Class_PrintFunction*              _print = _ClassPtrExtensionInfo_Print;
+	Stg_Class_CopyFunction*                _copy = _ClassPtrExtensionInfo_Copy;
+	ExtensionInfo_DataCopyFunction*    _dataCopy = _ClassPtrExtensionInfo_DataCopy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+	SizeT                         size = ZERO;
+
+	return _ClassPtrExtensionInfo_New(  CLASSPTREXTENSIONINFO_PASSARGS  );
 }
 
 
@@ -87,31 +90,18 @@ void ClassPtrExtensionInfo_Init( void* arrayExtensionInfo, const Name name, Stg_
 }
 
 
-ClassPtrExtensionInfo* _ClassPtrExtensionInfo_New( 
-		SizeT 				_sizeOfSelf, 
-		Type 				type, 
-		Stg_Class_DeleteFunction* 	_delete,
-		Stg_Class_PrintFunction*	_print,
-		Stg_Class_CopyFunction*		_copy, 
-		ExtensionInfo_DataCopyFunction* _dataCopy,
-		Name 				name,
-		Stg_Class_CopyFunction*		copyFunc,
-		Index				count )
+ClassPtrExtensionInfo* _ClassPtrExtensionInfo_New(  CLASSPTREXTENSIONINFO_DEFARGS  )
 {
 	ClassPtrExtensionInfo* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ClassPtrExtensionInfo) );
-	self = (ClassPtrExtensionInfo*)_ExtensionInfo_New( 
-		_sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy, 
-		_dataCopy,
-		name, 
-		sizeof(ClassPtrExtensionInfo_PtrClass), 
-		count );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	size = sizeof(ClassPtrExtensionInfo_PtrClass);
+
+	self = (ClassPtrExtensionInfo*)_ExtensionInfo_New(  EXTENSIONINFO_PASSARGS  );
 	
 	/* General info */
 	
@@ -193,3 +183,5 @@ void* _ClassPtrExtensionInfo_DataCopy(
 
 /* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 /* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+

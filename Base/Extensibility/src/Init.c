@@ -63,6 +63,8 @@ ToolboxesManager* stgToolboxesManager = 0;
 Bool BaseExtensibility_Init( int* argc, char** argv[] ) {
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
+	extensionMgr_Register = ExtensionManager_Register_New();
+
 	RegisterParent( Hook_Type,                      Stg_Object_Type );
 	RegisterParent( ClassHook_Type,                 Hook_Type );
 
@@ -78,7 +80,7 @@ Bool BaseExtensibility_Init( int* argc, char** argv[] ) {
 
 	RegisterParent( Module_Type,                    Stg_Object_Type );
 	RegisterParent( Plugin_Type,                    Module_Type );
-	RegisterParent( Toolbox_Type,                   Toolbox_Type );
+	RegisterParent( Toolbox_Type,                   Module_Type );
 	RegisterParent( ModulesManager_Type,            Stg_Class_Type );
 	RegisterParent( PluginsManager_Type,            ModulesManager_Type );
 	RegisterParent( ToolboxesManager_Type,          ModulesManager_Type );
@@ -87,3 +89,5 @@ Bool BaseExtensibility_Init( int* argc, char** argv[] ) {
 		
 	return True;
 }
+
+

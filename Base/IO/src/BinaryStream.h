@@ -43,8 +43,8 @@
 **
 **/
 
-#ifndef __Base_IO_BinaryStream_h__
-#define __Base_IO_BinaryStream_h__
+#ifndef __StGermain_Base_IO_BinaryStream_h__
+#define __StGermain_Base_IO_BinaryStream_h__
 	
 	/** Textual name for BinaryStream class. */
 	extern const Type BinaryStream_Type;
@@ -64,17 +64,18 @@
 	void _BinaryStream_Init( BinaryStream* self );
 
 	/** Constructor interface. */
-	BinaryStream* _BinaryStream_New( 
-		SizeT			_sizeOfSelf, 
-		Type			type, 
-		Stg_Class_DeleteFunction*	_delete, 
-		Stg_Class_PrintFunction* 	_print,
-		Stg_Class_CopyFunction*	_copy, 
-		Name			name,
-		Stream_PrintfFunction*	_printf, 
-		Stream_WriteFunction*	_write, 
-		Stream_DumpFunction*	_dump,
-		Stream_SetFileFunction*	_setFile );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define BINARYSTREAM_DEFARGS \
+                STREAM_DEFARGS
+
+	#define BINARYSTREAM_PASSARGS \
+                STREAM_PASSARGS
+
+	BinaryStream* _BinaryStream_New(  BINARYSTREAM_DEFARGS  );
 
 	/** Stg_Class_Delete interface. */
 	void _BinaryStream_Delete( void* cStream );
@@ -98,6 +99,7 @@
 	SizeT BinaryStream_WriteAllProcessors( Name filename, void *data, SizeT elem_size, SizeT num_elems, MPI_Comm communicator ) ;
 	
 #endif /* __IO_BinaryStreamFile_h__ */
+
 
 
 

@@ -120,3 +120,5 @@ void STreeSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, STreeSuite_TestRemove );
    pcu_suite_addTest( suite, STreeSuite_TestHas );
 }
+
+

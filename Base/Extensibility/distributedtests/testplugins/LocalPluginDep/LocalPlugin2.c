@@ -42,7 +42,7 @@ void LocalPlugin2_Function() {
 	printf( "%s\n", __func__ );
 }
 
-void _LocalPlugin2_Construct( void* component, Stg_ComponentFactory* cf, void* data ) {
+void _LocalPlugin2_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	MockContext* context = (MockContext*)Stg_ComponentFactory_ConstructByName(cf, "context", Stg_Component, True, data );
 	int* ext;
 
@@ -61,7 +61,7 @@ void* _LocalPlugin2_DefaultNew( Name name ) {
 	return Codelet_New(
 		LocalPlugin2_Type,
 		_LocalPlugin2_DefaultNew,
-		_LocalPlugin2_Construct,
+		_LocalPlugin2_AssignFromXML,
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,
@@ -72,3 +72,5 @@ void* _LocalPlugin2_DefaultNew( Name name ) {
 Index LocalPlugin2_Register( PluginsManager* pluginsManager ) {
 	return ModulesManager_Submit( pluginsManager, LocalPlugin2_Type, "0", _LocalPlugin2_DefaultNew );
 }
+
+

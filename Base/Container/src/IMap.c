@@ -319,3 +319,5 @@ void IMap_First( const void* _self, IMapIter* iter ) {
    }
    iter->valid = False;
 }
+
+

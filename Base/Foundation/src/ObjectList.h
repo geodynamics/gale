@@ -62,8 +62,8 @@
 **
 **/
 
-#ifndef __Base_Foundation_Stg_ObjectList_h__
-#define __Base_Foundation_Stg_ObjectList_h__
+#ifndef __StGermain_Base_Foundation_Stg_ObjectList_h__
+#define __StGermain_Base_Foundation_Stg_ObjectList_h__
 
 	/* function prototype interface */
 	typedef Index (Stg_ObjectList_AppendFunction) ( void* objects, void* objectPtr );
@@ -73,8 +73,8 @@
 	typedef Index (Stg_ObjectList_InsertBeforeFunction) ( void* objects,  Name reference, void* objectPtr );
 	typedef Index (Stg_ObjectList_InsertAfterFunction) ( void* objects,  Name reference, void* objectPtr );
 	typedef Index (Stg_ObjectList_RemoveFunction) ( void* objects,  Name reference, ReplacementOption option );
-	typedef Index (Stg_ObjectList_GetIndexFunction) ( void* objects, const Name const toGet );
-	typedef void* (Stg_ObjectList_GetFunction) ( void* objects, const Name const toGet );
+	typedef Index (Stg_ObjectList_GetIndexFunction) ( void* objects, const Name toGet );
+	typedef void* (Stg_ObjectList_GetFunction) ( void* objects, const Name toGet );
 	typedef void  (Stg_ObjectList_AllocMoreMemoryFunction) ( void* objects );
 	typedef void (Stg_ObjectList_InsertAtIndexFunction) ( void* objects, Index index, void* objectPtr );
 	typedef void (Stg_ObjectList_RemoveByIndexFunction) ( void* objects, Index index, ReplacementOption option );
@@ -82,7 +82,7 @@
 	
 	/** Textual name of this class */
 	extern const Type Stg_ObjectList_Type;
-	
+
 	extern const int DEFAULT_LIST_INITIAL_SIZE;
 	extern const int DEFAULT_LIST_DELTA;
 
@@ -132,27 +132,48 @@
 	void Stg_ObjectList_Init2( Stg_ObjectList* self, Index initialSize, Index delta );
 	
 	/** Creation implementation */
-	Stg_ObjectList* _Stg_ObjectList_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_ObjectList_AppendFunction*			_append,
-		Stg_ObjectList_PrependFunction*			_prepend,
-		Stg_ObjectList_ReplaceAllFunction*			_replaceAll,
-		Stg_ObjectList_ReplaceFunction*			_replace,
-		Stg_ObjectList_InsertBeforeFunction*		_insertBefore,
-		Stg_ObjectList_InsertAfterFunction*			_insertAfter,
-		Stg_ObjectList_RemoveFunction*			_remove,
-		Stg_ObjectList_GetIndexFunction*			_getIndex,
-		Stg_ObjectList_GetFunction*				_get,
-		Stg_ObjectList_AllocMoreMemoryFunction*		_allocMoreMemory,
-		Stg_ObjectList_InsertAtIndexFunction*		_insertAtIndex,
-		Stg_ObjectList_RemoveByIndexFunction*		_removeByIndex,
-		Stg_ObjectList_DeleteAllObjectsFunction*		_deleteAllObjects,
-		Index						initialSize,
-		Index						delta );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STG_OBJECTLIST_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                Stg_ObjectList_AppendFunction*                      _append, \
+                Stg_ObjectList_PrependFunction*                    _prepend, \
+                Stg_ObjectList_ReplaceAllFunction*              _replaceAll, \
+                Stg_ObjectList_ReplaceFunction*                    _replace, \
+                Stg_ObjectList_InsertBeforeFunction*          _insertBefore, \
+                Stg_ObjectList_InsertAfterFunction*            _insertAfter, \
+                Stg_ObjectList_RemoveFunction*                      _remove, \
+                Stg_ObjectList_GetIndexFunction*                  _getIndex, \
+                Stg_ObjectList_GetFunction*                            _get, \
+                Stg_ObjectList_AllocMoreMemoryFunction*    _allocMoreMemory, \
+                Stg_ObjectList_InsertAtIndexFunction*        _insertAtIndex, \
+                Stg_ObjectList_RemoveByIndexFunction*        _removeByIndex, \
+                Stg_ObjectList_DeleteAllObjectsFunction*  _deleteAllObjects, \
+                Index                                           initialSize, \
+                Index                                                 delta
+
+	#define STG_OBJECTLIST_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        _append,           \
+	        _prepend,          \
+	        _replaceAll,       \
+	        _replace,          \
+	        _insertBefore,     \
+	        _insertAfter,      \
+	        _remove,           \
+	        _getIndex,         \
+	        _get,              \
+	        _allocMoreMemory,  \
+	        _insertAtIndex,    \
+	        _removeByIndex,    \
+	        _deleteAllObjects, \
+	        initialSize,       \
+	        delta            
+
+	Stg_ObjectList* _Stg_ObjectList_New(  STG_OBJECTLIST_DEFARGS  );
 	
 	/** Initialisation implementation */
 	void _Stg_ObjectList_Init( Stg_ObjectList* self, Index initialSize, Index delta );
@@ -310,10 +331,10 @@
 	Index Stg_ObjectList_Remove( void* objectList, Name reference, ReplacementOption option ) ;
 	
 	/** Find an object's index in the list, by name. Returns (unsigned)-1 if not found. */
-	Index Stg_ObjectList_GetIndex( void* objectList, const Name const toGet );
+	Index Stg_ObjectList_GetIndex( void* objectList, const Name toGet );
 	
 	/** Get an object's ptr from the list, by name. Returns NULL if not found. */
-	void* Stg_ObjectList_Get( void* objectList, const Name const toGet );
+	void* Stg_ObjectList_Get( void* objectList, const Name toGet );
 	
 	/** Deletes all the objects in the list. */
 	void Stg_ObjectList_DeleteAllObjects( void* objectList );
@@ -400,4 +421,5 @@
 
 	/** Prints the first 'number' of names of objects in list which are most similar to 'name' */
 	void Stg_ObjectList_PrintSimilar( void* objectList, Name name, void* _stream, unsigned int number ) ;
-#endif /* __Base_Foundation_Stg_ObjectList_h__ */
+#endif /* __StGermain_Base_Foundation_Stg_ObjectList_h__ */
+

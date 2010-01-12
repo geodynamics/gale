@@ -42,8 +42,8 @@
 **
 **/
 
-#ifndef __Base_IO_RankFormatter_h__
-#define __Base_IO_RankFormatter_h__
+#ifndef __StGermain_Base_IO_RankFormatter_h__
+#define __StGermain_Base_IO_RankFormatter_h__
 
 
 	/** Textual name for RankFormatter class. */
@@ -63,13 +63,18 @@
 
 
 	/** Constructor interface. */
-	RankFormatter* _RankFormatter_New(
-		SizeT 				_sizeOfSelf,
-		Type 				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy, 
-		StreamFormatter_FormatFunction*	_format );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define RANKFORMATTER_DEFARGS \
+                LINEFORMATTER_DEFARGS
+
+	#define RANKFORMATTER_PASSARGS \
+                LINEFORMATTER_PASSARGS
+
+	RankFormatter* _RankFormatter_New(  RANKFORMATTER_DEFARGS  );
 
 	/** Init interface. */
 	void _RankFormatter_Init(
@@ -83,7 +88,8 @@
 	void _RankFormatter_Print( void* formatter, Stream* stream );
 
 
-#endif /* __Base_IO_RankFormatter_h__ */
+#endif /* __StGermain_Base_IO_RankFormatter_h__ */
+
 
 
 

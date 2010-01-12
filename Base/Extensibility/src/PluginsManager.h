@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_PluginsManager_h__
-#define __Base_Extensibility_PluginsManager_h__
+#ifndef __StGermain_Base_Extensibility_PluginsManager_h__
+#define __StGermain_Base_Extensibility_PluginsManager_h__
 	
 
 	/* Textual name of this class */
@@ -64,16 +64,18 @@
 	PluginsManager* PluginsManager_New( void );
 	
 	/* Creation implementation / Virtual constructor */
-	PluginsManager* _PluginsManager_New( 
-		SizeT                                   _sizeOfSelf,
-		Type                                    type,
-		Stg_Class_DeleteFunction*               _delete,
-		Stg_Class_PrintFunction*                _print,
-		Stg_Class_CopyFunction*                 _copy, 
-		ModulesManager_GetModulesListFunction*  _getModulesList,
-		ModulesManager_LoadModuleFunction*	_loadModule,
-		ModulesManager_UnloadModuleFunction*	_unloadModule,
-		ModulesManager_ModuleFactoryFunction*   _moduleFactory );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PLUGINSMANAGER_DEFARGS \
+                MODULESMANAGER_DEFARGS
+
+	#define PLUGINSMANAGER_PASSARGS \
+                MODULESMANAGER_PASSARGS
+
+	PluginsManager* _PluginsManager_New(  PLUGINSMANAGER_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _PluginsManager_Init( void* pluginsManager );
@@ -89,10 +91,18 @@
 
 	/** Exactly what to do to load the plugin */
 	Bool _PluginsManager_LoadPlugin( void* pluginsManager, Module* plugin );
-	
+
 	/** Exactly what to do to unload the plugin */
 	Bool _PluginsManager_UnloadPlugin( void* pluginsManager, Module* plugin );
 
+	/** Remove all plugins from register */
+   void PluginsManager_RemoveAllFromComponentRegister( void* pluginsManager );
+	
+	Bool _PluginsManager_CheckContext( void* pluginsManager, Dictionary_Entry_Value* modulesVal, unsigned int entry_I, Name contextName );
+
+	Name _PluginsManager_GetModuleName( void* pluginsManager, Dictionary_Entry_Value* moduleVal, unsigned int entry_I );
+
 	#define PluginsManager_Submit ModulesManager_Submit
 	
-#endif /* __Base_Extensibility_PluginsManager_h__ */
+#endif /* __StGermain_Base_Extensibility_PluginsManager_h__ */
+

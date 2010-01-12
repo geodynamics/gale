@@ -53,16 +53,29 @@ void IndentFormatter_MakeTag( IndentFormatter* formatter );
 
 StreamFormatter* IndentFormatter_New()
 {
-	return (StreamFormatter*)_IndentFormatter_New( sizeof(IndentFormatter), IndentFormatter_Type,
-		_IndentFormatter_Delete, _IndentFormatter_Print, _IndentFormatter_Copy, _LineFormatter_Format,
-		IndentFormatter_IndentChar );
+	/* Variables set in this function */
+	SizeT                            _sizeOfSelf = sizeof(IndentFormatter);
+	Type                                    type = IndentFormatter_Type;
+	Stg_Class_DeleteFunction*            _delete = _IndentFormatter_Delete;
+	Stg_Class_PrintFunction*              _print = _IndentFormatter_Print;
+	Stg_Class_CopyFunction*                _copy = _IndentFormatter_Copy;
+	StreamFormatter_FormatFunction*      _format = _LineFormatter_Format;
+	char                              _character = IndentFormatter_IndentChar;
+
+	return (StreamFormatter*)_IndentFormatter_New(  INDENTFORMATTER_PASSARGS  );
 }
 
 StreamFormatter* IndentFormatter_New2( char _character )
 {
-	return (StreamFormatter*)_IndentFormatter_New( sizeof(IndentFormatter), IndentFormatter_Type,
-		_IndentFormatter_Delete, _IndentFormatter_Print, _IndentFormatter_Copy, _LineFormatter_Format,
-		_character );
+	/* Variables set in this function */
+	SizeT                            _sizeOfSelf = sizeof(IndentFormatter);
+	Type                                    type = IndentFormatter_Type;
+	Stg_Class_DeleteFunction*            _delete = _IndentFormatter_Delete;
+	Stg_Class_PrintFunction*              _print = _IndentFormatter_Print;
+	Stg_Class_CopyFunction*                _copy = _IndentFormatter_Copy;
+	StreamFormatter_FormatFunction*      _format = _LineFormatter_Format;
+
+	return (StreamFormatter*)_IndentFormatter_New(  INDENTFORMATTER_PASSARGS  );
 }
 
 void IndentFormatter_Init( IndentFormatter* self )
@@ -76,20 +89,13 @@ void IndentFormatter_Init( IndentFormatter* self )
 	_IndentFormatter_Init( self, _LineFormatter_Format, IndentFormatter_IndentChar );
 }
 
-IndentFormatter* _IndentFormatter_New(
-	SizeT 				_sizeOfSelf,
-	Type 				type,
-	Stg_Class_DeleteFunction*		_delete,
-	Stg_Class_PrintFunction*		_print,
-	Stg_Class_CopyFunction*		_copy, 
-	StreamFormatter_FormatFunction*	_format,
-	char				_character )
+IndentFormatter* _IndentFormatter_New(  INDENTFORMATTER_DEFARGS  )
 {
 	IndentFormatter* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(IndentFormatter) );
-	self = (IndentFormatter*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (IndentFormatter*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
                                                                                 
 	_IndentFormatter_Init( self, _format, _character );
 
@@ -201,6 +207,8 @@ void IndentFormatter_MakeTag( IndentFormatter* formatter )
 	}
 	formatter->_tag[i] = '\0';
 }
+
+
 
 
 

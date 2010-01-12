@@ -38,9 +38,9 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_BaseContext_Finalise_h__
-#define __Base_BaseContext_Finalise_h__
+#ifndef __StGermain_Base_Context_Finalise_h__
+#define __StGermain_Base_Context_Finalise_h__
 	
-	Bool BaseContext_Finalise( void );
+	Bool Context_Finalise( void );
 	
-#endif /* __Base_BaseContext_Finalise_h__ */
+#endif /* __StGermain_Base_Context_Finalise_h__ */

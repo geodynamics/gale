@@ -89,21 +89,18 @@ char ***stg_module_syms = NULL;
 void ***stg_module_funcs = NULL;
 #endif
 
-Module* _Module_New( 
-		SizeT                        _sizeOfSelf,
-		Type                         type,
-		Stg_Class_DeleteFunction*    _delete,
-		Stg_Class_PrintFunction*     _print,
-		Stg_Class_CopyFunction*      _copy, 
-		Name                         name,
-		Module_MangleNameFunction    MangleName,
-		Stg_ObjectList*              directories )
+Module* _Module_New(  MODULE_DEFARGS  )
 {
 	Module* self;
 
 	assert( _sizeOfSelf >= sizeof(Module) );
 
-	self = (Module*)_Stg_Object_New( _sizeOfSelf, type, _delete, _print, _copy, name, NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (Module*)_Stg_Object_New(  STG_OBJECT_PASSARGS  );
 	
 	_Module_Init( self, MangleName, directories );
 
@@ -359,3 +356,7 @@ void* Module_MapStaticSymbol(Module *self, const char *sym) {
     return stg_module_funcs[ii][jj];
 }
 #endif
+
+
+
+

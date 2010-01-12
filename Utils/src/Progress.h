@@ -45,11 +45,19 @@
    int nSpaces;
 struct Progress { __Progress };
 
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PROGRESS_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define PROGRESS_PASSARGS \
+                STG_CLASS_PASSARGS
+
 Progress* Progress_New();
-Progress* _Progress_New( SizeT sizeOfSelf, Type type,
-			 Stg_Class_DeleteFunction* delete,
-			 Stg_Class_PrintFunction* print, 
-			 Stg_Class_CopyFunction* copy );
+Progress* _Progress_New(  PROGRESS_DEFARGS  );
 void _Progress_Init( void* self );
 void _Progress_Delete( void* self );
 void _Progress_Print( void* self, Stream* stream );
@@ -63,3 +71,4 @@ void Progress_Update( void* self );
 void Progress_Increment( void* self );
 
 #endif /* __StGermain_Utils_Progress_h__ */
+

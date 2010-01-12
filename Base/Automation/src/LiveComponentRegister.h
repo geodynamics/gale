@@ -33,8 +33,8 @@
 ** $Id: LiveComponentRegister.h 2745 2005-05-10 08:12:18Z RaquibulHassan $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#ifndef __Base_Automation_LiveComponentRegister_h__
-#define __Base_Automation_LiveComponentRegister_h__
+#ifndef __StGermain_Base_Automation_LiveComponentRegister_h__
+#define __StGermain_Base_Automation_LiveComponentRegister_h__
 
 	extern const Type LiveComponentRegister_Type;
 	extern LiveComponentRegister* stgLiveComponentRegister; /**< Live components singleton. */
@@ -55,13 +55,18 @@
 	** Constructor
 	*/
 		/* Creation implementation */
-	LiveComponentRegister* _LiveComponentRegister_New( 
-		SizeT					_sizeOfSelf, 
-		Type					type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print, 
-		Stg_Class_CopyFunction*			_copy
-		);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LIVECOMPONENTREGISTER_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define LIVECOMPONENTREGISTER_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	LiveComponentRegister* _LiveComponentRegister_New(  LIVECOMPONENTREGISTER_DEFARGS  );
 	
 	LiveComponentRegister* LiveComponentRegister_New(  );
 
@@ -101,4 +106,5 @@
 	LiveComponentRegister* LiveComponentRegister_GetLiveComponentRegister();
 
 	void LiveComponentRegister_PrintSimilar( void* liveComponentRegister, Name name, Stream* stream, unsigned int number ) ;
-#endif /* __Base_Automation_LiveComponentRegister_h__ */
+#endif /* __StGermain_Base_Automation_LiveComponentRegister_h__ */
+

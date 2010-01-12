@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_types_h__
-#define __Base_Extensibility_types_h__
+#ifndef __StGermain_Base_Extensibility_types_h__
+#define __StGermain_Base_Extensibility_types_h__
 	
 	/* Generic types */
 	/* Base types/classes */
@@ -53,7 +53,6 @@
 	typedef struct ExtensionManager			ExtensionManager;
 	typedef struct ExtensionManager_Register	ExtensionManager_Register;
 	typedef struct EntryPoint_Register		EntryPoint_Register;
-	typedef struct Codelet				Codelet;
 	typedef struct Module				Module;
 	typedef struct Plugin				Plugin;
 	typedef struct Toolbox				Toolbox;
@@ -83,4 +82,4 @@
 	typedef void*				DLL_Handle;
 	typedef DLL_Handle*			DLL_Handle_List;
 
-#endif /* __Base_Extensibility_types_h__ */
+#endif /* __StGermain_Base_Extensibility_types_h__ */

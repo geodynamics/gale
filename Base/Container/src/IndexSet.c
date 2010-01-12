@@ -51,7 +51,15 @@ const Type IndexSet_Type = "IndexSet";
 	((indexSet)->_container[(index) / (sizeof(char) * 8 )] & (1 << ((index) % (sizeof(char) * 8))))
 
 IndexSet* IndexSet_New( IndexSet_Index size ) {
-	return _IndexSet_New( sizeof(IndexSet), IndexSet_Type, _IndexSet_Delete, _IndexSet_Print, _IndexSet_Copy, _IndexSet_Duplicate, size );
+	/* Variables set in this function */
+	SizeT                        _sizeOfSelf = sizeof(IndexSet);
+	Type                                type = IndexSet_Type;
+	Stg_Class_DeleteFunction*        _delete = _IndexSet_Delete;
+	Stg_Class_PrintFunction*          _print = _IndexSet_Print;
+	Stg_Class_CopyFunction*            _copy = _IndexSet_Copy;
+	IndexSet_DuplicateFunction*   _duplicate = _IndexSet_Duplicate;
+
+	return _IndexSet_New(  INDEXSET_PASSARGS  );
 }
 
 void IndexSet_Init( IndexSet* self, IndexSet_Index size ) {
@@ -72,20 +80,13 @@ void IndexSet_Init( IndexSet* self, IndexSet_Index size ) {
 }
 
 
-IndexSet* _IndexSet_New( 
-		SizeT				sizeOfSelf, 
-		Type				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print, 
-		Stg_Class_CopyFunction*		_copy, 
-		IndexSet_DuplicateFunction*	_duplicate,
-		IndexSet_Index			size )
+IndexSet* _IndexSet_New(  INDEXSET_DEFARGS  )
 {
 	IndexSet* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(IndexSet) );
-	self = (IndexSet*)_Stg_Class_New( sizeOfSelf, type, _delete, _print, _copy );
+	assert( _sizeOfSelf >= sizeof(IndexSet) );
+	self = (IndexSet*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* General info */
 	
@@ -391,3 +392,5 @@ void _IndexSet_Duplicate( void* indexSet, void* newIndexSet ){
 	memcpy( ((IndexSet*)newIndexSet)->_container, ((IndexSet*)indexSet)->_container, sizeof(char)*((IndexSet*)indexSet)->_containerSize );
 	newSet->membersCount = self->membersCount;
 }
+
+

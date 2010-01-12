@@ -44,8 +44,8 @@
 **
 **/
 
-#ifndef __Base_IO_CFile_h__
-#define __Base_IO_CFile_h__
+#ifndef __StGermain_Base_IO_CFile_h__
+#define __StGermain_Base_IO_CFile_h__
 
 	/** Textual name for CFile class. */
 	extern const Type CFile_Type;
@@ -73,13 +73,20 @@
 
 
 	/** Constructor interface. */
-	CFile* _CFile_New(
-		SizeT _sizeOfSelf,
-		Type type,
-		Stg_Class_DeleteFunction* _delete,
-		Stg_Class_PrintFunction* _print,
-		Stg_Class_CopyFunction* _copy,
-		Bool                   binary);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CFILE_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                Bool  binary
+
+	#define CFILE_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        binary
+
+	CFile* _CFile_New(  CFILE_DEFARGS  );
 		
 	/** Init interface. */
 	void _CFile_Init( CFile* self );
@@ -104,6 +111,7 @@
 	Bool _CFile_Flush( void* file );
 	
 
-#endif /* __Base_IO_CFile_h__ */
+#endif /* __StGermain_Base_IO_CFile_h__ */
+
 
 

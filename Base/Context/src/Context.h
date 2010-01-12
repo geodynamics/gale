@@ -39,16 +39,28 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Context_h__
-#define __Base_Context_h__
+#ifndef __StGermain_Base_Context_h__
+#define __StGermain_Base_Context_h__
 	
 	#include "units.h"
 	#include "types.h"
 	#include "shortcuts.h"
+	#include "Codelet.h"
+	#include "Variable.h"
+	#include "Variable_Register.h"
+	#include "VariableCondition.h"
+	#include "VariableCondition_Register.h"
+	#include "ConditionFunction.h"
+	#include "ConditionFunction_Register.h"
+	#include "CompositeVC.h"
+	#include "DynamicVC.h"
+	#include "VariableAllVC.h"
+	#include "SetVC.h"
+	#include "VariableDumpStream.h"
 	#include "ContextEntryPoint.h"
 	#include "AbstractContext.h"
 	#include "Init.h"
 	#include "Finalise.h"
 	#include "DictionaryCheck.h"
 	
-#endif /* __Base_Context_h__ */
+#endif /* __StGermain_Base_Context_h__ */

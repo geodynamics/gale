@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Container_PtrSet_h__
-#define __Base_Container_PtrSet_h__
+#ifndef __StGermain_Base_Container_PtrSet_h__
+#define __StGermain_Base_Container_PtrSet_h__
 	
 
 	/* Textual name of this class */
@@ -69,20 +69,18 @@
 		Dictionary*					dictionary );
 	
 	/* Creation implementation */
-	PtrSet* _PtrSet_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		Set_UnionFunc*					_unionFunc, 
-		Set_IntersectionFunc*				_intersectionFunc, 
-		Set_SubtractionFunc*				_subtractionFunc, 
-		Dictionary*					dictionary, 
-		SizeT						elementSize, 
-		BTree_compareFunction*				compareFunc, 
-		BTree_dataCopyFunction*				dataCopyFunc, 
-		BTree_dataDeleteFunction*			dataDeleteFunc );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define PTRSET_DEFARGS \
+                SET_DEFARGS
+
+	#define PTRSET_PASSARGS \
+                SET_PASSARGS
+
+	PtrSet* _PtrSet_New(  PTRSET_DEFARGS  );
 	
 	
 	/* Initialise an instance */
@@ -128,4 +126,5 @@
 	void _PtrSet_DeleteData( void* data );
 
 
-#endif /* __Base_Container_PtrSet_h__ */
+#endif /* __StGermain_Base_Container_PtrSet_h__ */
+

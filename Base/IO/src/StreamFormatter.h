@@ -42,8 +42,8 @@
 **
 **/
 
-#ifndef __Base_IO_StreamFormatter_h__
-#define __Base_IO_StreamFormatter_h__
+#ifndef __StGermain_Base_IO_StreamFormatter_h__
+#define __StGermain_Base_IO_StreamFormatter_h__
 
 
 	/** Textual name for StreamFormatter class. */
@@ -64,13 +64,20 @@
 
 
 	/** Constructor interface. */
-	StreamFormatter* _StreamFormatter_New(
-		SizeT 				_sizeOfSelf,
-		Type 				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy, 
-		StreamFormatter_FormatFunction*	_format );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STREAMFORMATTER_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                StreamFormatter_FormatFunction*  _format
+
+	#define STREAMFORMATTER_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        _format
+
+	StreamFormatter* _StreamFormatter_New(  STREAMFORMATTER_DEFARGS  );
 	
 	/** Init interface. */
 	void _StreamFormatter_Init(
@@ -107,4 +114,5 @@
 	void StreamFormatter_Buffer_Delete( StreamFormatter_Buffer* buffer );
 	char* StreamFormatter_Buffer_AllocNext( Index size );
 
-#endif /* __Base_IO_StreamFormatter_h__ */
+#endif /* __StGermain_Base_IO_StreamFormatter_h__ */
+

@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_h__
-#define __Base_Extensibility_h__
+#ifndef __StGermain_Base_Extensibility_h__
+#define __StGermain_Base_Extensibility_h__
 	
 	#include "types.h"
 	#include "shortcuts.h"
@@ -51,7 +51,6 @@
 	#include "ClassHook.h"
 	#include "EntryPoint.h"
 	#include "EntryPoint_Register.h"
-	#include "Codelet.h"
 	#include "Module.h"
 	#include "Plugin.h"
 	#include "ModulesManager.h"
@@ -60,5 +59,5 @@
 	#include "Init.h"
 	#include "Finalise.h"
 
-#endif /* __Base_Extensibility_h__ */
+#endif /* __StGermain_Base_Extensibility_h__ */
 

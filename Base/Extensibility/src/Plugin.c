@@ -59,36 +59,31 @@ static const char* PLUGIN_REGISTER_SUFFIX = "_Register";
 
 
 Plugin* Plugin_New( Name name, Stg_ObjectList* directories ) {
-	return _Plugin_New( 
-		sizeof(Plugin), 
-		Plugin_Type, 
-		_Plugin_Delete, 
-		_Plugin_Print, 
-		NULL,
-		name,
-		_Plugin_MangleName,
-		directories );
+	/* Variables set in this function */
+	SizeT                       _sizeOfSelf = sizeof(Plugin);
+	Type                               type = Plugin_Type;
+	Stg_Class_DeleteFunction*       _delete = _Plugin_Delete;
+	Stg_Class_PrintFunction*         _print = _Plugin_Print;
+	Stg_Class_CopyFunction*           _copy = NULL;
+	Module_MangleNameFunction*   MangleName = _Plugin_MangleName;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Plugin_New(  PLUGIN_PASSARGS  );
 }
 
 Module* Plugin_Factory( Name name, Stg_ObjectList* directories ) {
 	return (Module*)Plugin_New( name, directories );
 }
 	
-Plugin* _Plugin_New( 
-		SizeT                        _sizeOfSelf,
-		Type                         type,
-		Stg_Class_DeleteFunction*    _delete,
-		Stg_Class_PrintFunction*     _print,
-		Stg_Class_CopyFunction*      _copy, 
-		Name                         name,
-		Module_MangleNameFunction    MangleName,
-		Stg_ObjectList*              directories )
+Plugin* _Plugin_New(  PLUGIN_DEFARGS  )
 {
 	Plugin* self;
 
 	assert( _sizeOfSelf >= sizeof(Plugin) );
 
-	self = (Plugin*)_Module_New( _sizeOfSelf, type, _delete, _print, _copy, name, MangleName, directories );
+	self = (Plugin*)_Module_New(  MODULE_PASSARGS  );
 	
 	_Plugin_Init( self );
 
@@ -140,3 +135,5 @@ Plugin_RegisterFunction* Plugin_GetRegisterFunc( void* plugin ) {
 
 	return self->Register;
 }
+
+

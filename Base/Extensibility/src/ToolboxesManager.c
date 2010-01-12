@@ -42,53 +42,36 @@
 #include "ToolboxesManager.h"
 
 #include <stdlib.h>
+#include <string.h>
 
 /* Textual name of this class */
 const Type ToolboxesManager_Type = "ToolboxesManager";
 
 
 ToolboxesManager* ToolboxesManager_New( int* argc, char*** argv ) {
-	return _ToolboxesManager_New( 
-		sizeof(ToolboxesManager), 
-		ToolboxesManager_Type, 
-		_ToolboxesManager_Delete, 
-		_ToolboxesManager_Print, 
-		NULL, 
-		_ToolboxesManager_GetToolboxesList,
-		_ToolboxesManager_LoadToolbox,
-		_ToolboxesManager_UnloadToolbox,
-		Toolbox_Factory,
-		argc,
-		argv );
+	/* Variables set in this function */
+	SizeT                                       _sizeOfSelf = sizeof(ToolboxesManager);
+	Type                                               type = ToolboxesManager_Type;
+	Stg_Class_DeleteFunction*                       _delete = _ToolboxesManager_Delete;
+	Stg_Class_PrintFunction*                         _print = _ToolboxesManager_Print;
+	Stg_Class_CopyFunction*                           _copy = NULL;
+	ModulesManager_GetModulesListFunction*  _getModulesList = _ToolboxesManager_GetToolboxesList;
+	ModulesManager_LoadModuleFunction*          _loadModule = _ToolboxesManager_LoadToolbox;
+	ModulesManager_UnloadModuleFunction*      _unloadModule = _ToolboxesManager_UnloadToolbox;
+	ModulesManager_ModuleFactoryFunction*    _moduleFactory = Toolbox_Factory;
+	ModulesManager_CheckContextFunction*      _checkContext = _ToolboxesManager_CheckContext;
+	ModulesManager_GetModuleNameFunction*    _getModuleName = _ToolboxesManager_GetModuleName;
+
+	return _ToolboxesManager_New(  TOOLBOXESMANAGER_PASSARGS  );
 }
 
-ToolboxesManager* _ToolboxesManager_New(
-		SizeT                                   _sizeOfSelf,
-		Type                                    type,
-		Stg_Class_DeleteFunction*               _delete,
-		Stg_Class_PrintFunction*                _print,
-		Stg_Class_CopyFunction*                 _copy, 
-		ModulesManager_GetModulesListFunction*  _getModulesList,
-		ModulesManager_LoadModuleFunction*	_loadModule,
-		ModulesManager_UnloadModuleFunction*	_unloadModule,
-		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
-		int*					argc,
-		char***					argv )
+ToolboxesManager* _ToolboxesManager_New(  TOOLBOXESMANAGER_DEFARGS  )
 {
 	ToolboxesManager* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ToolboxesManager) );
-	self = (ToolboxesManager*)_ModulesManager_New( 
-		_sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy, 
-		_getModulesList, 
-		_loadModule, 
-		_unloadModule,
-		_moduleFactory );
+	self = (ToolboxesManager*)_ModulesManager_New(  MODULESMANAGER_PASSARGS  );
 	
 	/* General info */
 	
@@ -112,14 +95,24 @@ void _ToolboxesManager_Init( void* toolboxesManager, int* argc, char*** argv ) {
 
 void _ToolboxesManager_Delete( void* toolboxesManager ) {
 	ToolboxesManager*         self = (ToolboxesManager*)toolboxesManager;
+  unsigned count;
 
+  /* free all strings, defining loaded Toolboxes */
+  for( count = 0 ; count < self->_initialisedCount ; count++ ) {
+    Memory_Free( self->initialised[count] );
+  }
 	Memory_Free( self->initialised );
 	self->_initialisedSize = 0;
 	self->_initialisedCount = 0;
 	self->initialised = 0;
 	
+	Stg_ObjectList_DeleteAllObjects( self->codelets );
+	Stg_Class_Delete( self->codelets );
+	ModulesManager_Unload( self ); 
+	Stg_Class_Delete( self->modules );
+	
 	/* Delete parent */
-	_ModulesManager_Delete( self );
+	_Stg_Class_Delete( self );
 }
 
 void _ToolboxesManager_Print( void* toolboxesManager, Stream* stream ) {
@@ -171,6 +164,15 @@ Bool _ToolboxesManager_UnloadToolbox( void* toolboxesManager, Module* toolbox ) 
 	return True;
 }
 
+/* toolboxes do not need to be associated with contexts, so just return true */
+Bool _ToolboxesManager_CheckContext( void* toolboxesManager, Dictionary_Entry_Value* modulesVal, unsigned int entry_I, Name contextName ) {
+	return True;
+}
+
+Name _ToolboxesManager_GetModuleName( void* toolboxesManager, Dictionary_Entry_Value* moduleVal, unsigned int entry_I ) {
+	return Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( moduleVal, entry_I ) );
+}
+
 Index ToolboxesManager_SetInitialised( void* initRegister, char* label ) {
 	ToolboxesManager* self = (ToolboxesManager*)initRegister;
 	
@@ -201,3 +203,6 @@ Bool ToolboxesManager_IsInitialised( void* initRegister, char* label ) {
 	}
 	return False;
 }
+
+
+

@@ -79,3 +79,5 @@ Bool LinearAlgebra_Init( int* argc, char** argv[] ) {
 Bool LinearAlgebra_Finalise( void ) {
 	return True;
 }
+
+

@@ -117,7 +117,6 @@ void LinkedListSuite_Teardown( LinkedListSuiteData* data ) {
 
 
 void LinkedListSuite_TestInsert( LinkedListSuiteData* data ) {
-   LinkedList*       numList = NULL;
    Index             ii = 0;
    LinkedListNode*   currNode=NULL;   
 
@@ -212,3 +211,5 @@ void LinkedListSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, LinkedListSuite_TestReturnArray );
    pcu_suite_addTest( suite, LinkedListSuite_TestFindNodeData );
 }
+
+

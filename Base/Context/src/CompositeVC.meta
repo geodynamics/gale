@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">CompositeVC</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StGermain</param>
+<param name="Location">./StGermain/Base/Context/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">VariableCondition</param>
+<param name="Reference">...</param>
+<param name="Summary">...</param>
+
+<param name="Description">
+    CompositeVC is used as a container to combine multiple variable conditions.
+</param>
+
+<list name="Params">
+    <struct>
+      <param name="Name">vcName</param>
+      <param name="Type">String</param>
+      <param name="Default">self->name</param>
+      <param name="Description">
+        Deprecated; should not be used.
+      </param>
+    </struct>
+    <struct>
+      <param name="Name">vcList</param>
+      <param name="Type">List</param>
+      <param name="Default"></param>
+      <param name="Description">
+        A list of other VariableCondition definitions.
+      </param>
+    </struct>
+</list>
+
+<list name="Dependencies">
+    <struct>
+      <param name="Essential">No</param>
+      <param name="Name">Data</param>
+      <param name="Type">Stg_Component</param>
+      <param name="Description">
+        User defined data in the form of a Stg_Component.
+      </param>
+    </struct>
+</list>
+
+<param name="Example">
+    Refer to ./StgFEM/Apps/StokesMomentumUzawa/lidDrivenBCs.xml
+</param>
+
+</StGermainData>

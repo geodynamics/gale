@@ -49,8 +49,8 @@
 **
 **/
 
-#ifndef __Base_IO_Journal_h__
-#define __Base_IO_Journal_h__
+#ifndef __StGermain_Base_IO_Journal_h__
+#define __StGermain_Base_IO_Journal_h__
 
 #include <stdarg.h>
 
@@ -103,6 +103,8 @@
 	/** Deallocates the Journal singleton. */
 	void Journal_Delete( );
 
+	/** Purge all the streams */
+	void Journal_Purge();
 
 	/** Reads entries from the the given dictionary object to create/configure streams in Journal. */
 	void Journal_ReadFromDictionary( Dictionary* dictionary );
@@ -146,10 +148,11 @@
 	 ** If the argument is NULL, no operation is performed. */
 	void Journal_DeregisterFile( JournalFile* file ); 
 
-
-
 	/** Enables/Disables the specified typed stream. */
 	void Journal_Enable_TypedStream( const Type type, Bool enable );
+
+	/** Enables/Disables all defined typed streams */
+	void Journal_Enable_AllTypedStream( Bool enable );
 
 	/** Enables/Disables the given named stream.
 	 **
@@ -158,11 +161,8 @@
 	 **/
 	void Journal_Enable_NamedStream( const Type type, const Name name, Bool enable );
 
-
 	/** Prints a summary of the status of each stream in Journal */
 	void Journal_PrintConcise();
-
-
 
 	/** Performs a printf() with the given stream. */
 	int Journal_Printf( void* _stream, const char* const fmt, ... );
@@ -252,4 +252,4 @@
 	/** Set up the default type streams expected throughout StGermain */
 	void Journal_SetupDefaultTypedStreams();
 	
-#endif /* __Base_IO_Journal_h__ */
+#endif /* __StGermain_Base_IO_Journal_h__ */

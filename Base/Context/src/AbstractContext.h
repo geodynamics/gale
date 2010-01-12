@@ -24,8 +24,6 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-*/
-/** \file
 **  Role:
 **	Abstract class faciliting how "modellers"/"solvers" are laid out and execute.
 **
@@ -39,19 +37,18 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Context_AbstractContext_h__
-#define __Base_Context_AbstractContext_h__
+#ifndef __StGermain_Base_Context_AbstractContext_h__
+#define __StGermain_Base_Context_AbstractContext_h__
 	
 
 	/* Templates of virtual functions */
-	typedef void		(AbstractContext_SetDt)				( void* self, double dt );
-	
+	typedef void (AbstractContext_SetDt) ( void* self, double dt );
 	
 	/* Context_CallInfo info */
-	#define __Base_Context_CallInfo \
-		void*					functionPointer; \
-		void*					entryPoint;
-	struct Context_CallInfo { __Base_Context_CallInfo };
+	#define __StGermain_Base_Context_CallInfo \
+		void* functionPointer; \
+		void* entryPoint;
+	struct Context_CallInfo { __StGermain_Base_Context_CallInfo };
 	
 	typedef enum CheckpointFileFormat {
 		CHECKPOINT_FORMAT_ASCII,	/** Default Stg Ascii text format */
@@ -59,8 +56,8 @@
 	} CheckpointFileFormat;
 	
 	/* AbstractContext entry point names */
-	extern Type AbstractContext_EP_Construct;
-	extern Type AbstractContext_EP_ConstructExtensions;
+	extern Type AbstractContext_EP_AssignFromXML;
+	extern Type AbstractContext_EP_AssignFromXMLExtensions;
 	extern Type AbstractContext_EP_Build;
 	extern Type AbstractContext_EP_Initialise;
 	extern Type AbstractContext_EP_Execute;
@@ -88,24 +85,24 @@
 	#define __AbstractContext \
 		/* General info */ \
 		__Stg_Component \
-		Dictionary*				dictionary; \
+		Dictionary*					dictionary; \
 		\
 		/* Virtual info */ \
-		AbstractContext_SetDt*			_setDt; \
+		AbstractContext_SetDt*	_setDt; \
 		\
 		/* AbstractContext info */ \
-		MPI_Comm				communicator; \
-		int					rank; \
-		int					nproc; \
+		MPI_Comm						communicator; \
+		int							rank; \
+		int							nproc; \
 		/** Start time for the simulation. */ \
-		double					startTime; \
+		double						startTime; \
 		/** Stop time for the simulation. Note that if this is 0, the sim will keep running unless a 
 		max loops criterion is met. */ \
-		double					stopTime; \
-		double					currentTime; \
+		double						stopTime; \
+		double						currentTime; \
 		unsigned int				timeStep; \
-		double					dtFactor; \
-		double                                  dt;                                 \
+		double						dtFactor; \
+		double						dt; \
 		/** This additional timestep is necessary for checkpoint restart runs, so it can be compared against
 			maxTimeSteps (which is now relative to job restart).*/ \
 		unsigned int				timeStepSinceJobRestart; \
@@ -114,31 +111,30 @@
 		/** Final Time Step: last time step to run till, no matter if maxTimeSteps still has some
 		     left in a checkpoint restart run. If 0 (the default), not active. */ \
 		unsigned int				finalTimeStep; \
-		Bool					gracefulQuit; \
+		Bool							gracefulQuit; \
 		unsigned int				frequentOutputEvery; \
 		unsigned int				dumpEvery; \
 		unsigned int				checkpointEvery; \
 		unsigned int				saveDataEvery; \
-		unsigned int				checkpointnproc; \
-		double				        checkpointAtTimeInc; \
-		double				        nextCheckpointTime; \
-		Name                                    experimentName; \
-		char*					outputPath; \
-		char*					checkpointReadPath; \
-		char*					checkpointWritePath; \
+		double						checkpointAtTimeInc; \
+		double						nextCheckpointTime; \
+		Name							experimentName; \
+		char*							outputPath; \
+		char*							checkpointReadPath; \
+		char*							checkpointWritePath; \
 		/** user set bool to determine whether checkpoint (or data) files should be placed in a per timestep directory */ \
-		Bool                                    checkpointAppendStep;      \
+		Bool							checkpointAppendStep; \
 		/** user set bool to determine whether checkpoint restarts should interpolate to new 
-		         resolution (where resolution is different from checkpoints) */ \
-		Bool                                    interpolateRestart;      \
-		Bool                                    loadFromCheckPoint;      \
-		/** Bool to determine whether we are storing a full checkpoint (for restart) or only data for analysis */ \
-		Bool                                    isDataSave;      \
-		unsigned int                            restartTimestep;         \
-		char*                                   checkPointPrefixString;  \
-		Stream*					info; \
-		Stream*					verbose; \
-		Stream*					debug; \
+			resolution (where resolution is different from checkpoints) */ \
+		Bool							interpolateRestart; \
+		Bool							loadFromCheckPoint; \
+		/** flattened XML output can be disabled if desired (default True) */ \
+		Bool							outputFlattenedXML; \
+		unsigned int				restartTimestep; \
+		char*							checkPointPrefixString; \
+		Stream*						info; \
+		Stream*						verbose; \
+		Stream*						debug; \
 		\
 		/* These are stored keys to entrypoints in the table, used for O(1) lookup (i.e. speed) */ \
 		/* Contexts "are" Components implemented by entrypoints... there's an entry point per component phase */ \
@@ -165,51 +161,47 @@
 		EntryPoint_Index			dataSaveK; \
 		EntryPoint_Index			dataSaveClassK; \
 		\
-		Stg_ObjectList*				objectList; \
-		ConditionFunction_Register*		condFunc_Register; \
-		Variable_Register*			variable_Register; \
+		Variable_Register*		variable_Register; \
 		Pointer_Register*			pointer_Register; \
-		EntryPoint_Register*			entryPoint_Register; \
-		ExtensionManager_Register*		extensionMgr_Register; \
+		EntryPoint_Register*		entryPoint_Register; \
 		ExtensionManager*			extensionMgr; \
-		Register_Register*			register_Register; \
-		Stg_ComponentFactory*			CF; \
-		PluginsManager*				plugins;
+		Stg_ComponentFactory*	CF; \
+		PluginsManager*			plugins;
 
 	struct AbstractContext { __AbstractContext };
-	
+		
+
+		
 	/* Class stuff ************************************************************************************************************/
 	
 	/* No "AbstractContext_New" and "AbstractContext_Init" as this is an abstract class */
 	
 	/* Creation implementation / Virtual constructor */
-	AbstractContext* _AbstractContext_New( 
-		SizeT						_sizeOfSelf,
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print,
-		Stg_Class_CopyFunction*				_copy, 
-		Stg_Component_DefaultConstructorFunction*	_defaultConstructor,
-		Stg_Component_ConstructFunction*		_construct,
-		Stg_Component_BuildFunction*			_build,
-		Stg_Component_InitialiseFunction*		_initialise,
-		Stg_Component_ExecuteFunction*			_execute,
-		Stg_Component_DestroyFunction*			_destroy,
-		Name						name,
-		Bool						initFlag,
-		AbstractContext_SetDt*				_setDt,
-		double						startTime,
-		double						stopTime,
-		MPI_Comm					communicator,
-		Dictionary*					dictionary );
 	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ABSTRACTCONTEXT_DEFARGS \
+                STG_COMPONENT_DEFARGS, \
+                AbstractContext_SetDt*        _setDt, \
+                double                     startTime, \
+                double                      stopTime, \
+                MPI_Comm                communicator, \
+                Dictionary*               dictionary
+
+	#define ABSTRACTCONTEXT_PASSARGS \
+                STG_COMPONENT_PASSARGS, \
+	        _setDt,       \
+	        startTime,    \
+	        stopTime,     \
+	        communicator, \
+	        dictionary  
+
+	AbstractContext* _AbstractContext_New(  ABSTRACTCONTEXT_DEFARGS  ); 
+
 	/* Initialisation implementation */
-	void _AbstractContext_Init( 
-		AbstractContext* 		self,
-		double				startTime,
-		double				stopTime,
-		MPI_Comm			communicator );
-	
+	void _AbstractContext_Init( AbstractContext* self );
 	
 	/* Stg_Class_Delete implementation */
 	void _AbstractContext_Delete( void* abstractContext );
@@ -222,7 +214,7 @@
 	
 	
 	/* Construct the context ... connect and validate component connections, and initialise non-bulk internal values */
-	void _AbstractContext_Construct( void* context, Stg_ComponentFactory* cf, void* data );
+	void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data );
 	
 	/* Build the context ... allocates memory (builds arrays) */
 	void _AbstractContext_Build( void* context, void* data );
@@ -278,9 +270,6 @@
 	/* function to error if no hooks to an entrypoint defined */
 	void AbstractContext_ErrorIfNoHooks( void* context, EntryPoint_Index epIndex, const char* caller );
 	
-	void AbstractContext_BuildAllLiveComponents( void* context ) ;
-	void AbstractContext_InitialiseAllLiveComponents( void* context ) ;
-
 	Bool AbstractContext_CheckPointExists( void* context, Index timeStep );
 
 	/* Works out the prefix string to use for reading checkpoint files (input path + C.P. prefix)
@@ -295,17 +284,22 @@
 	
 	
 	/* Default construction hook, and overrides for the EP to handle the context/ptrToContext synchronisation */
-	void _AbstractContext_Construct_Hook( void* context, void* ptrToContext );
+	void _AbstractContext_Construct_Hook( void* _context, void* data );
+
 	Func_Ptr _AbstractContext_Construct_EP_GetRun( void* entryPoint );
+
 	void _AbstractContext_Construct_EP_Run( void* entryPoint, void* data0, void* data1 );
 	
 	/* Default construction hook */
-	void _AbstractContext_Execute_Hook( Context* context );
+	void _AbstractContext_Execute_Hook( void* _context );
 	
 	/* Step the solver implementation */
-	void _AbstractContext_Step( Context* context, double dt );
+	void _AbstractContext_Step( void* _context, double dt );
 	
-	void _AbstractContext_LoadTimeInfoFromCheckPoint( Context* self, Index timeStep, double* dtLoadedFromFile );
-	void _AbstractContext_SaveTimeInfo( Context* context );
-	void _AbstractContext_CreateCheckpointDirectory( Context* context );
-#endif /* __Base_Context_AbstractContext_h__ */
+	void _AbstractContext_LoadTimeInfoFromCheckPoint( void* _context, Index timeStep, double* dtLoadedFromFile );
+
+	void _AbstractContext_SaveTimeInfo( void* _context );
+
+	void _AbstractContext_CreateCheckpointDirectory( void* _context );
+#endif /* __StGermain_Base_Context_AbstractContext_h__ */
+

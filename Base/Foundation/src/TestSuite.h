@@ -76,14 +76,21 @@
 	** Constructors
 	*/
 
+
+
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
 	#define TESTSUITE_DEFARGS \
-		STG_CLASS_DEFARGS
+                STG_CLASS_DEFARGS
 
 	#define TESTSUITE_PASSARGS \
-		STG_CLASS_PASSARGS
+                STG_CLASS_PASSARGS
 
 	TestSuite* TestSuite_New();
-	TestSuite* _TestSuite_New( TESTSUITE_DEFARGS );
+	TestSuite* _TestSuite_New(  TESTSUITE_DEFARGS  );
 	void _TestSuite_Init( TestSuite* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -113,3 +120,4 @@
 	void TestSuite_Destruct( TestSuite* self );
 
 #endif /* __StGermain_Base_Foundation_TestSuite_h__ */
+

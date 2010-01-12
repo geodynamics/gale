@@ -47,8 +47,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_ClassPtrExtensionInfo_h__
-#define __Base_Extensibility_ClassPtrExtensionInfo_h__
+#ifndef __StGermain_Base_Extensibility_ClassPtrExtensionInfo_h__
+#define __StGermain_Base_Extensibility_ClassPtrExtensionInfo_h__
 	
 	/** Textual name of this class */
 	extern const Type ClassPtrExtensionInfo_Type;
@@ -76,16 +76,20 @@
 	void ClassPtrExtensionInfo_Init( void* arrayExtensionInfo, const Name name, Stg_Class_CopyFunction* copyFunc, Index count );
 	
 	/* Creation implementation */
-	ClassPtrExtensionInfo* _ClassPtrExtensionInfo_New( 
-		SizeT 				_sizeOfSelf, 
-		Type 				type, 
-		Stg_Class_DeleteFunction* 	_delete,
-		Stg_Class_PrintFunction*	_print,
-		Stg_Class_CopyFunction*		_copy, 
-		ExtensionInfo_DataCopyFunction*	_dataCopy,
-		Name 				name,
-		Stg_Class_CopyFunction*		copyFunc,
-		Index				count );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define CLASSPTREXTENSIONINFO_DEFARGS \
+                EXTENSIONINFO_DEFARGS, \
+                Stg_Class_CopyFunction*  copyFunc
+
+	#define CLASSPTREXTENSIONINFO_PASSARGS \
+                EXTENSIONINFO_PASSARGS, \
+	        copyFunc
+
+	ClassPtrExtensionInfo* _ClassPtrExtensionInfo_New(  CLASSPTREXTENSIONINFO_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _ClassPtrExtensionInfo_Init( ClassPtrExtensionInfo* self, Name name, Stg_Class_CopyFunction* copyFunc, Index count );
@@ -110,4 +114,5 @@
 
 	/* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	/* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#endif /* __Base_Extensibility_ClassPtrExtensionInfo_h__ */
+#endif /* __StGermain_Base_Extensibility_ClassPtrExtensionInfo_h__ */
+

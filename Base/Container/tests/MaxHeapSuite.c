@@ -172,3 +172,5 @@ void MaxHeapSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, MaxHeapSuite_TestCreationExtraction );
    pcu_suite_addTest( suite, MaxHeapSuite_TestInsertionExtraction );
 }
+
+

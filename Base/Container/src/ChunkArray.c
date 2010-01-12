@@ -502,3 +502,5 @@ char* ChunkArray_ObjectAt(ChunkArray *chunkArray, unsigned int objectId)
     
     return (char*)&(chunkArray->chunks[chunkID].memory[arrayIdx]);
 }
+
+

@@ -52,19 +52,22 @@ const Type TestSuite_Type = "TestSuite";
 */
 
 TestSuite* TestSuite_New() {
-	return _TestSuite_New( sizeof(TestSuite), 
-			      TestSuite_Type, 
-			      _TestSuite_Delete, 
-			      _TestSuite_Print, 
-			      _TestSuite_Copy );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(TestSuite);
+	Type                              type = TestSuite_Type;
+	Stg_Class_DeleteFunction*      _delete = _TestSuite_Delete;
+	Stg_Class_PrintFunction*        _print = _TestSuite_Print;
+	Stg_Class_CopyFunction*          _copy = _TestSuite_Copy;
+
+	return _TestSuite_New(  TESTSUITE_PASSARGS  );
 }
 
-TestSuite* _TestSuite_New( TESTSUITE_DEFARGS ) {
+TestSuite* _TestSuite_New(  TESTSUITE_DEFARGS  ) {
 	TestSuite* self;
 
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(TestSuite) );
-	self = (TestSuite*)_Stg_Class_New( STG_CLASS_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(TestSuite) );
+	self = (TestSuite*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 
 	/* Virtual info */
 
@@ -194,3 +197,5 @@ void TestSuite_Destruct( TestSuite* self ) {
 	self->nTests = 0;
 	KillArray( self->tests );
 }
+
+

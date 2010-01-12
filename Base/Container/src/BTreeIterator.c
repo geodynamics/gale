@@ -176,3 +176,5 @@ void _BTreeIterator_PrintFunc( void *self, Stream *myStream )
 	Journal_Printf( myStream, "\tTree (ptr): (%p)\n", iterator->tree );
 	Journal_Printf( myStream, "\tDepth : %d\n", iterator->depth );
 }
+
+

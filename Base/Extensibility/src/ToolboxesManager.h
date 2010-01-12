@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_ToolboxesManager_h__
-#define __Base_Extensibility_ToolboxesManager_h__
+#ifndef __StGermain_Base_Extensibility_ToolboxesManager_h__
+#define __StGermain_Base_Extensibility_ToolboxesManager_h__
 	
 
 	/* Textual name of this class */
@@ -69,18 +69,22 @@
 	ToolboxesManager* ToolboxesManager_New( int* argc, char*** argv );
 	
 	/* Creation implementation / Virtual constructor */
-	ToolboxesManager* _ToolboxesManager_New( 
-		SizeT                                   _sizeOfSelf,
-		Type                                    type,
-		Stg_Class_DeleteFunction*               _delete,
-		Stg_Class_PrintFunction*                _print,
-		Stg_Class_CopyFunction*                 _copy, 
-		ModulesManager_GetModulesListFunction*  _getModulesList,
-		ModulesManager_LoadModuleFunction*	_loadModule,
-		ModulesManager_UnloadModuleFunction*	_unloadModule,
-		ModulesManager_ModuleFactoryFunction*   _moduleFactory,
-		int*					argc,
-		char***					argv );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define TOOLBOXESMANAGER_DEFARGS \
+                MODULESMANAGER_DEFARGS, \
+                int*     argc, \
+                char***  argv
+
+	#define TOOLBOXESMANAGER_PASSARGS \
+                MODULESMANAGER_PASSARGS, \
+	        argc, \
+	        argv
+
+	ToolboxesManager* _ToolboxesManager_New(  TOOLBOXESMANAGER_DEFARGS  );
 
 	/* Initialisation implementation */
 	void _ToolboxesManager_Init( void* toolboxesManager, int* argc, char*** argv );
@@ -100,6 +104,10 @@
 	/** Exactly what to do to unload the toolbox */
 	Bool _ToolboxesManager_UnloadToolbox( void* toolboxesManager, Module* toolbox );
 
+	Bool _ToolboxesManager_CheckContext( void* toolboxesManager, Dictionary_Entry_Value* modulesVal, unsigned int entry_I, Name contextName );
+
+	Name _ToolboxesManager_GetModuleName( void* toolboxesManager, Dictionary_Entry_Value* moduleVal, unsigned int entry_I );
+
 	#define ToolboxesManager_Submit ModulesManager_Submit
 
 	/** Let StGermain know that the "Init" function of a module has been called. This exists to handle the case where a module
@@ -111,5 +119,5 @@
 	   function. */
 	Bool ToolboxesManager_IsInitialised( void* toolboxesManager, char* label );
 
+#endif /* __StGermain_Base_Extensibility_ToolboxesManager_h__ */
 
-#endif /* __Base_Extensibility_ToolboxesManager_h__ */

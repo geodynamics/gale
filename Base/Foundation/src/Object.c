@@ -50,20 +50,13 @@ const Type Stg_Object_Type = "Stg_Object";
 Index _Stg_Object_Counter = 0;
 static const char _Stg_Object_Unnamed[] = "Unnamed";
 
-Stg_Object* _Stg_Object_New( 
-		SizeT				_sizeOfSelf, 
-		Type				type,
-		Stg_Class_DeleteFunction*	_delete,
-		Stg_Class_PrintFunction*	_print, 
-		Stg_Class_CopyFunction*		_copy, 
-		Name				name,
-		AllocationType			nameAllocationType )
+Stg_Object* _Stg_Object_New(  STG_OBJECT_DEFARGS  )
 {
 	Stg_Object* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Stg_Object) );
-	self = (Stg_Object*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (Stg_Object*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	/* General info */
 	
@@ -187,3 +180,5 @@ Name Stg_Object_AppendSuffix( void* object, Name suffix ) {
 
 	return name;
 }
+
+

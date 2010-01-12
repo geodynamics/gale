@@ -38,8 +38,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Container_IndexMap_h__
-#define __Base_Container_IndexMap_h__
+#ifndef __StGermain_Base_Container_IndexMap_h__
+#define __StGermain_Base_Container_IndexMap_h__
 	
 	
 	/** Textual name of this class */
@@ -85,13 +85,20 @@
 		unsigned					delta );
 	
 	/* Creation implementation */
-	IndexMap* _IndexMap_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		unsigned					delta );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define INDEXMAP_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                unsigned  delta
+
+	#define INDEXMAP_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        delta
+
+	IndexMap* _IndexMap_New(  INDEXMAP_DEFARGS  );
 	
 	
 	/* Initialise a IndexMap */
@@ -143,4 +150,5 @@
 	*/
 	
 
-#endif /* __Base_Container_IndexMap_h__ */
+#endif /* __StGermain_Base_Container_IndexMap_h__ */
+

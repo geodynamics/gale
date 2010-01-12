@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_Stg_ComponentRegister_h__
-#define __Base_Automation_Stg_ComponentRegister_h__
+#ifndef __StGermain_Base_Automation_Stg_ComponentRegister_h__
+#define __StGermain_Base_Automation_Stg_ComponentRegister_h__
 	
 	/* Textual name of this class */
 	extern const Type Stg_ComponentRegister_Type;
@@ -46,13 +46,33 @@
 
 	/*struct Stg_Component_DefaultConstructorFunction;*/
 	#define __Stg_ComponentRegisterElement \
+		__Stg_Object						\
 		Type								componentType; \
 		Stg_Component_DefaultConstructorFunction*			defaultConstructor; \
 		Stg_Component_MetaAsDictionaryFunction*                         metadata; \
 		Name								version;
 
 	struct Stg_ComponentRegisterElement{ __Stg_ComponentRegisterElement };
+
+	extern const Type Stg_ComponentRegisterElement_Type;
+
+	/** ComponentRegisterElement Constructor interface. */
+	Stg_ComponentRegisterElement* Stg_ComponentRegisterElement_New(
+		Type			type,
+		Stg_Class_DeleteFunction*	_delete,
+		Stg_Class_PrintFunction*	_print,
+      Type        componentType,
+		Stg_Component_DefaultConstructorFunction*		defaultConstructor,
+		Stg_Component_MetaAsDictionaryFunction*      metadata,
+		Name								version
+      );
 	
+   	/** Stg_Class_Delete interface. */
+   	void _Stg_ComponentRegisterElement_Delete( void* element );
+
+   	/** Print interaface. */
+	   void _Stg_ComponentRegisterElement_Print( void* element, Stream* paramStream );	
+
 	/* Stg_ComponentRegister information */
 	#define __Stg_ComponentRegister \
 		/* General info */ \
@@ -61,19 +81,26 @@
 		/* Virtual info */ \
 		\
 		/* Stg_ComponentRegister info */ \
-		BTree									*constructors; \
+		Stg_ObjectList*									constructors;  \
+      Stream*                                   debugStream;   \
 	
 	struct Stg_ComponentRegister { __Stg_ComponentRegister };
 	
 	/* Class Administration members ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	
 	/** Constructor Implementation */
-	Stg_ComponentRegister *_Stg_ComponentRegister_New(
-		SizeT					_sizeOfSelf, 
-		Type					type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print, 
-		Stg_Class_CopyFunction*			_copy );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STG_COMPONENTREGISTER_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define STG_COMPONENTREGISTER_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	Stg_ComponentRegister *_Stg_ComponentRegister_New(  STG_COMPONENTREGISTER_DEFARGS  );
 	
 	Stg_ComponentRegister *Stg_ComponentRegister_New(  );
 	
@@ -115,6 +142,12 @@
 		Stg_ComponentRegister_AddFunc( self, componentType, version, func, componentType ##_MetaAsDictionary ); \
 	}
 
+   /* Remove and free a component in the register */
+   Bool Stg_ComponentRegister_RemoveEntry(
+      Stg_ComponentRegister* self,
+      Name                   componentType,
+      Name                   version );
+
 	Stg_Component_DefaultConstructorFunction* Stg_ComponentRegister_Get( 
 			Stg_ComponentRegister* self,
 			Name                   componentType,
@@ -143,16 +176,9 @@
 		Name                   version );
 	void Stg_ComponentRegister_PrintAllTypes( void* componentRegister, void* stream );
 
-	/* Functions for iterating through the component element list ------------------------------------------------------------*/
-
-	/** Obtain an iterator to the component element list */
-	BTreeIterator* Stg_ComponentRegister_GetIterator();
-
-	/** Initialise the iterator to the first component element in the list */
-	Stg_ComponentRegisterElement* Stg_ComponentRegisterIterator_First( BTreeIterator* iterator );
-
-	/** Step to the next component element in the list */
-	Stg_ComponentRegisterElement* Stg_ComponentRegisterIterator_Next( BTreeIterator* iterator );
+	/* Functions for iterating through the component element list ---------------------------------------------------*/
+   int Stg_ComponentRegister_GetCount( void* componentRegister );
+   Stg_ComponentRegisterElement* Stg_ComponentRegister_GetByIndex( void* componentRegister, int index );
 
 	/** Obtain the component type from the component list element */
 	Type Stg_ComponentRegisterElement_GetType( Stg_ComponentRegisterElement* element );
@@ -166,4 +192,5 @@
 	/** Obtain the component metadata from the component list element */
 	Dictionary* Stg_ComponentRegisterElement_GetMetadata( Stg_ComponentRegisterElement* element );
 	
-#endif /* __Base_Automation_Stg_ComponentRegister_h__ */
+#endif /* __StGermain_Base_Automation_Stg_ComponentRegister_h__ */
+

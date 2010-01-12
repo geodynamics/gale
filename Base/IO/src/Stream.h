@@ -43,8 +43,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_IO_Stream_h__
-#define __Base_IO_Stream_h__
+#ifndef __StGermain_Base_IO_Stream_h__
+#define __StGermain_Base_IO_Stream_h__
 
 #include <stdarg.h>
 
@@ -90,17 +90,28 @@
 	struct Stream { __Stream };
 
 	/** Constructor interface. */
-	Stream* _Stream_New(
-		SizeT			_sizeOfSelf,
-		Type			type,
-		Stg_Class_DeleteFunction*	_delete,
-		Stg_Class_PrintFunction*	_print,
-		Stg_Class_CopyFunction*	_copy, 
-		Name			name,
-		Stream_PrintfFunction*	_printf,
-		Stream_WriteFunction*	_write,
-		Stream_DumpFunction*	_dump,
-		Stream_SetFileFunction*	_setFile );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STREAM_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                Name                         name, \
+                Stream_PrintfFunction*    _printf, \
+                Stream_WriteFunction*      _write, \
+                Stream_DumpFunction*        _dump, \
+                Stream_SetFileFunction*  _setFile
+
+	#define STREAM_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        name,     \
+	        _printf,  \
+	        _write,   \
+	        _dump,    \
+	        _setFile
+
+	Stream* _Stream_New(  STREAM_DEFARGS  );
 		
 	/** Init interface. */
 	void _Stream_Init(
@@ -135,6 +146,13 @@
 	/** Opens a registers a file for this stream if not already opened and assigns it for output
 	    Defaults CFile for now. TODO for next io commit */
 	Bool Stream_RedirectFile( Stream* stream, const char* const fileName );
+
+	/** Opens a registers a file for all the stream if not already opened and assigns it for output
+	    Defaults CFile for now. TODO for next io commit */
+	Bool Stream_RedirectAllToFile( const char* const fileName );
+
+	/** Purges all redirected stream files */
+	void Stream_PurgeAllRedirectedFiles( void );
 
 	/** Opens a registers a file for this stream if not already opened and assigns it for output for whole branch */
 	Bool Stream_RedirectFileBranch( Stream* stream, const char* const fileName );
@@ -262,4 +280,5 @@
 	/* Closes, deregisters and deletes the JournalFile associated with this stream */
 	void Stream_CloseAndFreeFile( void* stream ) ;
 
-#endif /* __Base_IO_Stream_h__ */
+#endif /* __StGermain_Base_IO_Stream_h__ */
+

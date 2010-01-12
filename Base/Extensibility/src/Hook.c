@@ -49,7 +49,17 @@ const Type Hook_Type = "Hook";
 
 /** allocate and initialise a new Hook. */
 Hook* Hook_New( Name name, Func_Ptr funcPtr, char* addedBy ) {
-	return _Hook_New( sizeof(Hook), Hook_Type, _Hook_Delete, _Hook_Print, _Hook_Copy, name, funcPtr, addedBy );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(Hook);
+	Type                              type = Hook_Type;
+	Stg_Class_DeleteFunction*      _delete = _Hook_Delete;
+	Stg_Class_PrintFunction*        _print = _Hook_Print;
+	Stg_Class_CopyFunction*          _copy = _Hook_Copy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _Hook_New(  HOOK_PASSARGS  );
 }
 
 void Hook_Init( void* hook, Name name, Func_Ptr funcPtr, char* addedBy ) {
@@ -72,21 +82,18 @@ void Hook_Init( void* hook, Name name, Func_Ptr funcPtr, char* addedBy ) {
 }
 
 
-Hook* _Hook_New( 
-		SizeT 				_sizeOfSelf, 
-		Type 				type, 
-		Stg_Class_DeleteFunction* 		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy, 
-		Name 				name, 
-		Func_Ptr			funcPtr,
-		char*				addedBy )
+Hook* _Hook_New(  HOOK_DEFARGS  )
 {
 	Hook* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Hook) );
-	self = (Hook*)_Stg_Object_New( _sizeOfSelf, type, _delete, _print, _copy, name, NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (Hook*)_Stg_Object_New(  STG_OBJECT_PASSARGS  );
 	
 	/* General info */
 	
@@ -162,3 +169,5 @@ void* _Hook_Copy( void* hook, void* dest, Bool deep, Name nameExt, PtrMap* ptrMa
 	
 	return (void*)newHook;
 }
+
+

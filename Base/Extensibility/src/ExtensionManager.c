@@ -56,38 +56,44 @@ ExtensionManager* ExtensionManager_New_OfStruct(
 		Name				name, 
 		SizeT				initialSize )
 {
-	return _ExtensionManager_New( 
-		sizeof(ExtensionManager), 
-		ExtensionManager_Type, 
-		_ExtensionManager_Delete,
-		_ExtensionManager_Print, 
-		_ExtensionManager_Copy, 
-		name, 
-		initialSize, 
-		NULL,			/* no existing object */
-		NULL,			/* no array */
-		0,
-		NULL,
-		0 );
+	/* Variables set in this function */
+	SizeT                          _sizeOfSelf = sizeof(ExtensionManager);
+	Type                                  type = ExtensionManager_Type;
+	Stg_Class_DeleteFunction*          _delete = _ExtensionManager_Delete;
+	Stg_Class_PrintFunction*            _print = _ExtensionManager_Print;
+	Stg_Class_CopyFunction*              _copy = _ExtensionManager_Copy;
+	void*                      _existingObject = NULL;
+	void*                               _array = NULL;
+	SizeT                             itemSize = 0;
+	ExtensionManager*                       em = NULL;
+	Index                                count = 0;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _ExtensionManager_New(  EXTENSIONMANAGER_PASSARGS  );
 }
 
 ExtensionManager* ExtensionManager_New_OfExistingObject( 
 		Name				name, 
 		void*				_existingObject )
 {
-	return _ExtensionManager_New( 
-		sizeof(ExtensionManager), 
-		ExtensionManager_Type, 
-		_ExtensionManager_Delete,
-		_ExtensionManager_Print, 
-		_ExtensionManager_Copy, 
-		name, 
-		0,			/* not extending a struct here */
-		_existingObject,
-		NULL,			/* not doing arrays here */
-		0,
-		NULL,
-		0 );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(ExtensionManager);
+	Type                              type = ExtensionManager_Type;
+	Stg_Class_DeleteFunction*      _delete = _ExtensionManager_Delete;
+	Stg_Class_PrintFunction*        _print = _ExtensionManager_Print;
+	Stg_Class_CopyFunction*          _copy = _ExtensionManager_Copy;
+	SizeT                      initialSize = 0;
+	void*                           _array = NULL;
+	SizeT                         itemSize = 0;
+	ExtensionManager*                   em = NULL;
+	Index                            count = 0;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _ExtensionManager_New(  EXTENSIONMANAGER_PASSARGS  );
 }
 
 ExtensionManager* ExtensionManager_New_OfArray(
@@ -96,19 +102,20 @@ ExtensionManager* ExtensionManager_New_OfArray(
 		SizeT                           itemSize,
 		Index                           count )
 {
-	return _ExtensionManager_New(
-		sizeof( ExtensionManager ),
-		ExtensionManager_Type,
-		_ExtensionManager_Delete,
-		_ExtensionManager_Print,
-		_ExtensionManager_Copy,
-		name,
-		0,			/* not extending a struct here */
-		NULL,			/* not doing single object */
-		_array,
-		itemSize,
-		NULL,			/* not extending an array of extended structs */
-		count );
+	/* Variables set in this function */
+	SizeT                          _sizeOfSelf = sizeof( ExtensionManager );
+	Type                                  type = ExtensionManager_Type;
+	Stg_Class_DeleteFunction*          _delete = _ExtensionManager_Delete;
+	Stg_Class_PrintFunction*            _print = _ExtensionManager_Print;
+	Stg_Class_CopyFunction*              _copy = _ExtensionManager_Copy;
+	SizeT                          initialSize = 0;
+	void*                      _existingObject = NULL;
+	ExtensionManager*                       em = NULL;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _ExtensionManager_New(  EXTENSIONMANAGER_PASSARGS  );
 }
 
 ExtensionManager* ExtensionManager_New_OfExtendedArray(
@@ -117,19 +124,20 @@ ExtensionManager* ExtensionManager_New_OfExtendedArray(
 		ExtensionManager*               em,
 		Index                           count )
 {
-	return _ExtensionManager_New(
-		sizeof(ExtensionManager),
-		ExtensionManager_Type,
-		_ExtensionManager_Delete,
-		_ExtensionManager_Print,
-		_ExtensionManager_Copy,
-		name,
-		0,			/* not extending a struct here */
-		NULL,			/* not doing single object */
-		_array,
-		0,			/* take itemSize from em */
-		em,			/* The ExtensionManager which extended the struct */
-		count );
+	/* Variables set in this function */
+	SizeT                          _sizeOfSelf = sizeof(ExtensionManager);
+	Type                                  type = ExtensionManager_Type;
+	Stg_Class_DeleteFunction*          _delete = _ExtensionManager_Delete;
+	Stg_Class_PrintFunction*            _print = _ExtensionManager_Print;
+	Stg_Class_CopyFunction*              _copy = _ExtensionManager_Copy;
+	SizeT                          initialSize = 0;
+	void*                      _existingObject = NULL;
+	SizeT                             itemSize = 0;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return _ExtensionManager_New(  EXTENSIONMANAGER_PASSARGS  );
 }
 
 void ExtensionManager_Init_OfStruct( 
@@ -253,25 +261,18 @@ void ExtensionManager_Init_OfExtendedArray(
 		count );
 }
 
-ExtensionManager* _ExtensionManager_New(
-		SizeT				_sizeOfSelf,
-		Type				type,
-		Stg_Class_DeleteFunction*	_delete,
-		Stg_Class_PrintFunction*	_print,
-		Stg_Class_CopyFunction*		_copy, 
-		Name				name, 
-		SizeT				initialSize,
-		void*				_existingObject,
-		void*				_array,
-		SizeT				itemSize,
-		ExtensionManager*		em,
-		Index				count )
+ExtensionManager* _ExtensionManager_New(  EXTENSIONMANAGER_DEFARGS  )
 {
 	ExtensionManager* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(ExtensionManager) );
-	self = (ExtensionManager*)_Stg_Object_New( _sizeOfSelf, type, _delete, _print, _copy, name, NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	nameAllocationType = NON_GLOBAL;
+
+	self = (ExtensionManager*)_Stg_Object_New(  STG_OBJECT_PASSARGS  );
 	
 	/* General info */
 	
@@ -951,6 +952,8 @@ Bool ExtensionManager_GetLockDown( void* extension ) {
 
 	return self->lockDown;
 }
+
+
 
 
 

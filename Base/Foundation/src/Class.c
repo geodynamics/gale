@@ -99,8 +99,9 @@ void _Stg_Class_Delete( void* _class ) {
 	if( self->_deleteSelf ) {
 		Memory_CountDec( self );
 
+      Memory_Free( self );
 		if ( Memory_CountGet( self ) <= 0 ) {
-			Memory_Free( self );
+			//Memory_Free( self );
 		}
 	}
 }
@@ -118,7 +119,7 @@ void _Stg_Class_Print( void* _class, struct Stream* stream ) {
 	
 	Journal_Printf( stream, "Stg_Class (ptr): %p\n", self );
 	Stream_Indent( stream );
-	Journal_Printf( stream, "sizeOfSelf: %lu\n", self->_sizeOfSelf );
+	Journal_Printf( stream, "_sizeOfSelf: %lu\n", self->_sizeOfSelf );
 	Journal_Printf( stream, "_deleteSelf: %s\n", self->_deleteSelf ? "Yes" : "No" );
 	Journal_Printf( stream, "type: %s\n", self->type == Type_Invalid ? "Invalid" : self->type );
 	Journal_Printf( stream, "_delete (func ptr): %p\n", self->_delete );
@@ -201,6 +202,7 @@ void* _Stg_Class_Copy( void* _class, void* dest, Bool deep, Name nameExt, struct
 	newClass->_delete = self->_delete;
 	newClass->_print = self->_print;
 	newClass->_copy = self->_copy;
+	newClass->nRefs = self->nRefs;
 	
 	return (void*)newClass;
 }
@@ -233,3 +235,7 @@ void Stg_Class_RemoveRef( void* _class ) {
 	if( !(--self->nRefs) )
 		Stg_Class_Delete( self );
 }
+
+
+
+

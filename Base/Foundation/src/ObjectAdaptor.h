@@ -49,8 +49,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_ObjectAdaptor_h__
-#define __Base_Automation_ObjectAdaptor_h__
+#ifndef __StGermain_Base_Automation_ObjectAdaptor_h__
+#define __StGermain_Base_Automation_ObjectAdaptor_h__
 	
 	/** Delete/Print/Copy function prototypes for attached pointers (not StGermain classes) */
 	/** *Note*: this function should only delete extra memory allocated by the object, _not
@@ -119,20 +119,32 @@
 	
 	
 	/* Creation implementation */
-	Stg_ObjectAdaptor* _Stg_ObjectAdaptor_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*			_delete,
-		Stg_Class_PrintFunction*			_print, 
-		Stg_Class_CopyFunction*				_copy,
-		Name						name,
-		void*						dataPtr,
-		Bool						iOwn,
-		Bool						isGlobal,
-		Bool						isStgClass,
-		Stg_ObjectAdaptor_DeletePointerFunction*	ptrDelete,
-		Stg_ObjectAdaptor_PrintPointerFunction*		ptrPrint,
-		Stg_ObjectAdaptor_CopyPointerFunction*		ptrCopy );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STG_OBJECTADAPTOR_DEFARGS \
+                STG_OBJECT_DEFARGS, \
+                void*                                        dataPtr, \
+                Bool                                            iOwn, \
+                Bool                                        isGlobal, \
+                Bool                                      isStgClass, \
+                Stg_ObjectAdaptor_DeletePointerFunction*   ptrDelete, \
+                Stg_ObjectAdaptor_PrintPointerFunction*     ptrPrint, \
+                Stg_ObjectAdaptor_CopyPointerFunction*       ptrCopy
+
+	#define STG_OBJECTADAPTOR_PASSARGS \
+                STG_OBJECT_PASSARGS, \
+	        dataPtr,    \
+	        iOwn,       \
+	        isGlobal,   \
+	        isStgClass, \
+	        ptrDelete,  \
+	        ptrPrint,   \
+	        ptrCopy   
+
+	Stg_ObjectAdaptor* _Stg_ObjectAdaptor_New(  STG_OBJECTADAPTOR_DEFARGS  );
 	
 	/* Initialisation implementation */
 	void _Stg_ObjectAdaptor_Init( 
@@ -211,4 +223,5 @@
 	#endif
 	
 	/* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#endif /* __Base_Automation_ObjectAdaptor_h__ */
+#endif /* __StGermain_Base_Automation_ObjectAdaptor_h__ */
+

@@ -58,19 +58,22 @@ const Type UIntMap_Type = "UIntMap";
 */
 
 UIntMap* UIntMap_New() {
-	return _UIntMap_New( sizeof(UIntMap), 
-			     UIntMap_Type, 
-			     _UIntMap_Delete, 
-			     _UIntMap_Print, 
-			     _UIntMap_Copy );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(UIntMap);
+	Type                              type = UIntMap_Type;
+	Stg_Class_DeleteFunction*      _delete = _UIntMap_Delete;
+	Stg_Class_PrintFunction*        _print = _UIntMap_Print;
+	Stg_Class_CopyFunction*          _copy = _UIntMap_Copy;
+
+	return _UIntMap_New(  UINTMAP_PASSARGS  );
 }
 
-UIntMap* _UIntMap_New( UINTMAP_DEFARGS ) {
+UIntMap* _UIntMap_New(  UINTMAP_DEFARGS  ) {
 	UIntMap* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(UIntMap) );
-	self = (UIntMap*)_Stg_Class_New( STG_CLASS_PASSARGS );
+	assert( _sizeOfSelf >= sizeof(UIntMap) );
+	self = (UIntMap*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 
 	/* Virtual info */
 
@@ -260,3 +263,5 @@ void UIntMap_ParseNode( void* data, void* _parseStruct ) {
 	parseStruct->keys[parseStruct->curItem] = ((unsigned*)data)[0];
 	parseStruct->vals[parseStruct->curItem++] = ((unsigned*)data)[1];
 }
+
+

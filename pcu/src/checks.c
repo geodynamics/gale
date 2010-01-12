@@ -35,7 +35,7 @@ void _pcu_check_fileEq( const char* const fileName1, const char* const fileName2
    char           file1Line[MAXLINE];
    char           file2Line[MAXLINE];
    char           file2LineCopy[MAXLINE];
-   unsigned int   rank;
+   int				rank;
    char*          ret1;
    char*          ret2;
    unsigned int   ii=0;
@@ -98,3 +98,5 @@ void _pcu_check_fileEq( const char* const fileName1, const char* const fileName2
    fclose(testFile1);
    fclose(testFile2);
 }
+
+

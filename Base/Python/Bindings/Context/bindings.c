@@ -39,7 +39,7 @@ struct PyMethodDef Context_Python_Methods[] = {
 	{ Context_Python_copyright__name__,	Context_Python_copyright,	METH_VARARGS, Context_Python_copyright__doc__		},
 	{ Context_Python_Print__name__,		Context_Python_Print,		METH_VARARGS, Context_Python_Print__doc__		},
 	{ Context_Python_Delete__name__,	Context_Python_Delete,		METH_VARARGS, Context_Python_Delete__doc__		},
-	{ Context_Python_Construct__name__,	Context_Python_Construct,	METH_VARARGS, Context_Python_Construct__doc__		},
+	{ Context_Python_AssignFromXML__name__,	Context_Python_AssignFromXML,	METH_VARARGS, Context_Python_AssignFromXML__doc__		},
 	{ Context_Python_Build__name__,		Context_Python_Build,		METH_VARARGS, Context_Python_Build__doc__		},
 	{ Context_Python_Initialise__name__,	Context_Python_Initialise,	METH_VARARGS, Context_Python_Initialise__doc__		},
 	{ Context_Python_Execute__name__,	Context_Python_Execute,		METH_VARARGS, Context_Python_Execute__doc__		},
@@ -99,7 +99,7 @@ PyObject* Context_Python_Delete( PyObject* self, PyObject* args ) {
 /* "Construct" member */
 char Context_Python_Construct__doc__[] = "Construct the Context...";
 char Context_Python_Construct__name__[] = "Construct";
-PyObject* Context_Python_Construct( PyObject* self, PyObject* args ) {
+PyObject* Context_Python_AssignFromXML( PyObject* self, PyObject* args ) {
 	PyObject*	pyContext;
 	Context*	context;
 
@@ -109,7 +109,7 @@ PyObject* Context_Python_Construct( PyObject* self, PyObject* args ) {
 	}
 	context = (Context*)( PyCObject_AsVoidPtr( pyContext ) );
 
-	Stg_Component_Construct( context, 0 /* dummy */, &context, True );
+	Stg_Component_AssignFromXML( context, 0 /* dummy */, &context, True );
 
 	/* Return */
 	Py_INCREF( Py_None );
@@ -302,3 +302,5 @@ PyObject* Context_Python_SetTime( PyObject* self, PyObject* args ) {
 	Py_INCREF( Py_None );
 	return Py_None;
 }	
+
+

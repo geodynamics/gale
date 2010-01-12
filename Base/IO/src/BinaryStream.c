@@ -56,28 +56,27 @@ const Type BinaryStream_Type = "BinaryStream";
 
 Stream* BinaryStream_New( Name name )
 {
-	return (Stream*)_BinaryStream_New( sizeof(BinaryStream), BinaryStream_Type, _BinaryStream_Delete, _BinaryStream_Print, _Stream_Copy, 
-		name, _BinaryStream_Printf, _BinaryStream_Write, _BinaryStream_Dump, _BinaryStream_SetFile );
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(BinaryStream);
+	Type                              type = BinaryStream_Type;
+	Stg_Class_DeleteFunction*      _delete = _BinaryStream_Delete;
+	Stg_Class_PrintFunction*        _print = _BinaryStream_Print;
+	Stg_Class_CopyFunction*          _copy = _Stream_Copy;
+	Stream_PrintfFunction*         _printf = _BinaryStream_Printf;
+	Stream_WriteFunction*           _write = _BinaryStream_Write;
+	Stream_DumpFunction*             _dump = _BinaryStream_Dump;
+	Stream_SetFileFunction*       _setFile = _BinaryStream_SetFile;
+
+	return (Stream*)_BinaryStream_New(  BINARYSTREAM_PASSARGS  );
 }
 
-BinaryStream* _BinaryStream_New(
-	SizeT			_sizeOfSelf, 
-	Type			type, 
-	Stg_Class_DeleteFunction*	_delete, 
-	Stg_Class_PrintFunction* 	_print,
-	Stg_Class_CopyFunction*	_copy, 
-	Name			name,
-	Stream_PrintfFunction*	_printf, 
-	Stream_WriteFunction*	_write, 
-	Stream_DumpFunction*	_dump,
-	Stream_SetFileFunction*	_setFile )
+BinaryStream* _BinaryStream_New(  BINARYSTREAM_DEFARGS  )
 {
 	BinaryStream* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(BinaryStream) );
-	self = (BinaryStream*)_Stream_New( _sizeOfSelf, type, _delete, _print, _copy, name, 
-		_printf, _write, _dump, _setFile );
+	self = (BinaryStream*)_Stream_New(  STREAM_PASSARGS  );
 	
 	_BinaryStream_Init( self );
 	
@@ -165,3 +164,5 @@ SizeT BinaryStream_WriteAllProcessors( Name filename, void *data, SizeT elem_siz
 
 	return;
 }
+
+

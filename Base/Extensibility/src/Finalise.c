@@ -36,6 +36,7 @@
 
 #include "types.h"
 #include "shortcuts.h"
+#include "ExtensionManager_Register.h"
 #include "Init.h"
 #include "Finalise.h"
 
@@ -45,6 +46,9 @@ Bool BaseExtensibility_Finalise( void ) {
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
 	Stg_Class_Delete( stgToolboxesManager );
+	Stg_Class_Delete( extensionMgr_Register );
 	
 	return True;
 }
+
+

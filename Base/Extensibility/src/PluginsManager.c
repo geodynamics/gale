@@ -29,6 +29,7 @@
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 #include <stdarg.h>
+#include <string.h>
 #include "Base/Foundation/Foundation.h"
 #include "Base/IO/IO.h"
 #include "Base/Container/Container.h"
@@ -47,43 +48,29 @@ const Type PluginsManager_Type = "PluginsManager";
 
 
 PluginsManager* PluginsManager_New( void ) {
-	return _PluginsManager_New( 
-		sizeof(PluginsManager), 
-		PluginsManager_Type, 
-		_PluginsManager_Delete, 
-		_PluginsManager_Print, 
-		NULL, 
-		_PluginsManager_GetPluginsList,
-		_PluginsManager_LoadPlugin,
-		_PluginsManager_UnloadPlugin,
-		Plugin_Factory );
+	/* Variables set in this function */
+	SizeT                                       _sizeOfSelf = sizeof(PluginsManager);
+	Type                                               type = PluginsManager_Type;
+	Stg_Class_DeleteFunction*                       _delete = _PluginsManager_Delete;
+	Stg_Class_PrintFunction*                         _print = _PluginsManager_Print;
+	Stg_Class_CopyFunction*                           _copy = NULL;
+	ModulesManager_GetModulesListFunction*  _getModulesList = _PluginsManager_GetPluginsList;
+	ModulesManager_LoadModuleFunction*          _loadModule = _PluginsManager_LoadPlugin;
+	ModulesManager_UnloadModuleFunction*      _unloadModule = _PluginsManager_UnloadPlugin;
+	ModulesManager_ModuleFactoryFunction*    _moduleFactory = Plugin_Factory;
+	ModulesManager_CheckContextFunction*      _checkContext = _PluginsManager_CheckContext;
+	ModulesManager_GetModuleNameFunction*    _getModuleName = _PluginsManager_GetModuleName;
+
+	return _PluginsManager_New(  PLUGINSMANAGER_PASSARGS  );
 }
 
-PluginsManager* _PluginsManager_New(
-		SizeT                                   _sizeOfSelf,
-		Type                                    type,
-		Stg_Class_DeleteFunction*               _delete,
-		Stg_Class_PrintFunction*                _print,
-		Stg_Class_CopyFunction*                 _copy, 
-		ModulesManager_GetModulesListFunction*  _getModulesList,
-		ModulesManager_LoadModuleFunction*	_loadModule,
-		ModulesManager_UnloadModuleFunction*	_unloadModule,
-		ModulesManager_ModuleFactoryFunction*   _moduleFactory )
+PluginsManager* _PluginsManager_New(  PLUGINSMANAGER_DEFARGS  )
 {
 	PluginsManager* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(PluginsManager) );
-	self = (PluginsManager*)_ModulesManager_New( 
-		_sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy, 
-		_getModulesList, 
-		_loadModule, 
-		_unloadModule,
-		_moduleFactory );
+	self = (PluginsManager*)_ModulesManager_New(  MODULESMANAGER_PASSARGS  );
 	
 	/* General info */
 	
@@ -126,7 +113,6 @@ Dictionary_Entry_Value* _PluginsManager_GetPluginsList( void* pluginsManager, vo
 	return pluginsList;
 }
 
-
 Bool _PluginsManager_LoadPlugin( void* pluginsManager, Module* plugin ) {
 	PluginsManager* self = (PluginsManager*)pluginsManager;
 	
@@ -136,7 +122,55 @@ Bool _PluginsManager_LoadPlugin( void* pluginsManager, Module* plugin ) {
 }
 
 Bool _PluginsManager_UnloadPlugin( void* pluginsManager, Module* plugin ) {
-	/*PluginsManager* self = (PluginsManager*)pluginsManager;*/
+	PluginsManager* self = (PluginsManager*)pluginsManager;
+
+	ModulesManager_Unload( self );
 	
 	return True;
 }
+
+void PluginsManager_RemoveAllFromComponentRegister( void* pluginsManager ) {
+	PluginsManager*			self = (PluginsManager*)pluginsManager;
+   Stg_ComponentRegister*	componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
+   Index							i;
+
+   for (i=0; i<Stg_ObjectList_Count(self->codelets); i++) {
+      Stg_Object *codelet = self->codelets->data[i];
+      Stg_ComponentRegister_RemoveEntry(componentRegister, codelet->type, "0");
+   }
+}
+
+Bool _PluginsManager_CheckContext( void* pluginsManager, Dictionary_Entry_Value* modulesVal, unsigned int entry_I, Name contextName ) {
+	PluginsManager*			self;
+	Dictionary_Entry_Value*	pluginDEV = Dictionary_Entry_Value_GetElement( modulesVal, entry_I );
+	Dictionary*					pluginDict;
+	Name							componentName;
+
+	self = (PluginsManager*)pluginsManager;
+
+	pluginDict = Dictionary_Entry_Value_AsDictionary( pluginDEV );
+	if( !pluginDict )
+		return False;
+
+	componentName = Dictionary_GetString_WithDefault( pluginDict, "Context", "context" );
+
+	if( !strcmp( componentName, contextName ) )
+		return True;
+
+	return False;
+}
+
+Name _PluginsManager_GetModuleName( void* pluginsManager, Dictionary_Entry_Value* moduleVal, unsigned int entry_I ) {
+	PluginsManager*			self;
+	Dictionary_Entry_Value*	pluginDEV = Dictionary_Entry_Value_GetElement( moduleVal, entry_I );
+	Dictionary*					pluginDict = Dictionary_Entry_Value_AsDictionary( pluginDEV );
+	Name							pluginName = Dictionary_GetString( pluginDict, "Type" );
+
+	self = (PluginsManager*)pluginsManager;
+
+	return pluginName;	
+}
+
+
+
+

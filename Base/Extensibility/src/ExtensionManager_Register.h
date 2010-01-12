@@ -40,12 +40,15 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_ExtensionManager_Register_h__
-#define __Base_Extensibility_ExtensionManager_Register_h__
+#ifndef __StGermain_Base_Extensibility_ExtensionManager_Register_h__
+#define __StGermain_Base_Extensibility_ExtensionManager_Register_h__
 	
 
 	/** Textual name of this class */
 	extern const Type ExtensionManager_Register_Type;
+
+	/* global default instantiation of the register (created in Init.c) */
+	extern ExtensionManager_Register* extensionMgr_Register;
 	
 	/** ExtensionManager_Register class contents */
 	#define __ExtensionManager_Register \
@@ -67,12 +70,18 @@
 	void ExtensionManager_Register_Init( void* extension_Register );
 	
 	/** Creation implementation / Virtual constructor */
-	ExtensionManager_Register* _ExtensionManager_Register_New( 
-		SizeT				_sizeOfSelf,
-		Type				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define EXTENSIONMANAGER_REGISTER_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define EXTENSIONMANAGER_REGISTER_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	ExtensionManager_Register* _ExtensionManager_Register_New(  EXTENSIONMANAGER_REGISTER_DEFARGS  );
 	
 	/** Initialisation implementation */
 	void _ExtensionManager_Register_Init( void* extension_Register );
@@ -86,6 +95,9 @@
 	
 	/** Add a new Extension to the register. */
 	ExtensionManager_Index ExtensionManager_Register_Add( void* extension_Register, void* extension );
+
+   /** Removes an Extension from the register */
+   ExtensionManager_Index ExtensionManager_Register_Remove( void* extensionManager_Register, void* extension );
 	
 	/** Get the handle of an extension in the register. */
 	ExtensionManager_Index ExtensionManager_Register_GetExtensionHandle( void* extension_Register, Name toGet );
@@ -96,4 +108,5 @@
 
 	ExtensionManager* _ExtensionManager_Register_At( void* extension_Register, ExtensionManager_Index handle );
 	
-#endif /* __Base_Extensibility_ExtensionManager_Register_h__ */
+#endif /* __StGermain_Base_Extensibility_ExtensionManager_Register_h__ */
+

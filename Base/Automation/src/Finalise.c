@@ -37,7 +37,6 @@
 #include "shortcuts.h"
 #include "Finalise.h"
 
-#include "VariableCondition_Register.h"
 #include "Stg_Component.h"
 #include "Stg_ComponentRegister.h"
 #include "HierarchyTable.h"
@@ -48,9 +47,11 @@ Bool BaseAutomation_Finalise( void ) {
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
 	/* Clean up global variable */
-	Stg_Class_Delete( variableCondition_Register );
 	Stg_Class_Delete( stgComponentRegister );
 	Stg_Class_Delete( stgHierarchyTable );
 	Stg_Class_Delete( stgCallGraph );
+
 	return True;
 }
+
+

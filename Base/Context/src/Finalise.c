@@ -36,6 +36,10 @@
 #include "Base/Extensibility/Extensibility.h"
 
 #include "types.h"
+#include "VariableCondition.h"
+#include "VariableCondition_Register.h"
+#include "ConditionFunction_Register.h"
+#include "CompositeVC.h"
 #include "Finalise.h"
 
 #include <stdio.h>
@@ -43,5 +47,10 @@
 Bool BaseContext_Finalise( void ) {
 	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
+	Stg_Class_Delete( condFunc_Register );
+	Stg_Class_Delete( variableCondition_Register );
+
 	return True;
 }
+
+

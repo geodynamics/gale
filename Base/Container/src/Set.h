@@ -37,8 +37,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Container_Set_h__
-#define __Base_Container_Set_h__
+#ifndef __StGermain_Base_Container_Set_h__
+#define __StGermain_Base_Container_Set_h__
 	
 
 	/* Textual name of this class */
@@ -86,20 +86,34 @@
 		BTree_dataDeleteFunction*			dataDeleteFunc );
 	
 	/* Creation implementation */
-	Set* _Set_New(
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		Set_UnionFunc*					_unionFunc, 
-		Set_IntersectionFunc*				_intersectionFunc, 
-		Set_SubtractionFunc*				_subtractionFunc, 
-		Dictionary*					dictionary, 
-		SizeT						elementSize, 
-		BTree_compareFunction*				compareFunc, 
-		BTree_dataCopyFunction*				dataCopyFunc, 
-		BTree_dataDeleteFunction*			dataDeleteFunc );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define SET_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                Set_UnionFunc*                    _unionFunc, \
+                Set_IntersectionFunc*      _intersectionFunc, \
+                Set_SubtractionFunc*        _subtractionFunc, \
+                Dictionary*                       dictionary, \
+                SizeT                            elementSize, \
+                BTree_compareFunction*           compareFunc, \
+                BTree_dataCopyFunction*         dataCopyFunc, \
+                BTree_dataDeleteFunction*     dataDeleteFunc
+
+	#define SET_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        _unionFunc,        \
+	        _intersectionFunc, \
+	        _subtractionFunc,  \
+	        dictionary,        \
+	        elementSize,       \
+	        compareFunc,       \
+	        dataCopyFunc,      \
+	        dataDeleteFunc   
+
+	Set* _Set_New(  SET_DEFARGS  );
 	
 	
 	/* Initialise an instance */
@@ -171,4 +185,5 @@
 	void _Set_BTreeSubtraction( void* data, void* pack );
 
 
-#endif /* __Base_Container_Set_h__ */
+#endif /* __StGermain_Base_Container_Set_h__ */
+

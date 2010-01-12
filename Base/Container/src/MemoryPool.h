@@ -41,8 +41,8 @@
 **
 **/
 
-#ifndef __MemoryPool_h__
-#define __MemoryPool_h__
+#ifndef __StGermain_Base_Container_MemoryPool_h__
+#define __StGermain_Base_Container_MemoryPool_h__
 
 	/** Textual name for List class. */
 	extern const Type MemoryPool_Type;
@@ -83,16 +83,24 @@
 
 	MemoryPool* MemoryPool_NewFunc( SizeT elementSize, int numElements, int delta );
 
-	MemoryPool* _MemoryPool_New(
-				SizeT							_sizeOfSelf,
-				Type							type,
-				Stg_Class_DeleteFunction*			_delete,
-				Stg_Class_PrintFunction*			_print,
-				Stg_Class_CopyFunction*				_copy,
-				int									elementSize,
-				int									numElements,
-				int									delta
-				);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MEMORYPOOL_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                int  elementSize, \
+                int  numElements, \
+                int        delta
+
+	#define MEMORYPOOL_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        elementSize, \
+	        numElements, \
+	        delta      
+
+	MemoryPool* _MemoryPool_New(  MEMORYPOOL_DEFARGS  );
 
 	
 	/** Init interface. */
@@ -125,5 +133,6 @@
 	
 	/** Private Functions */
 	
-#endif /* __MemoryPool_h__ */
+#endif /* __StGermain_Base_Container_MemoryPool_h__ */
+
 

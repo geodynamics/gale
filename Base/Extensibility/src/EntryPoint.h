@@ -58,8 +58,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Extensibility_EntryPoint_h__
-#define __Base_Extensibility_EntryPoint_h__
+#ifndef __StGermain_Base_Extensibility_EntryPoint_h__
+#define __StGermain_Base_Extensibility_EntryPoint_h__
 	
 
 	/* Templates of virtual functions */
@@ -126,15 +126,22 @@
 	void EntryPoint_Init( void* entryPoint, const Name name, unsigned int castType );
 	
 	/** Creation implementation */
-	EntryPoint* _EntryPoint_New( 
-		SizeT 				_sizeOfSelf, 
-		Type 				type, 
-		Stg_Class_DeleteFunction* 		_delete,
-		Stg_Class_PrintFunction*		_print,
-		Stg_Class_CopyFunction*		_copy, 
-		EntryPoint_GetRunFunction*	_getRun,
-		Name 				name, 
-		unsigned int 			castType );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define ENTRYPOINT_DEFARGS \
+                STG_OBJECT_DEFARGS, \
+                EntryPoint_GetRunFunction*   _getRun, \
+                unsigned int                castType
+
+	#define ENTRYPOINT_PASSARGS \
+                STG_OBJECT_PASSARGS, \
+	        _getRun,  \
+	        castType
+
+	EntryPoint* _EntryPoint_New(  ENTRYPOINT_DEFARGS  );
 	
 	/** Member Initialisation implementation */
 	void _EntryPoint_Init( EntryPoint* self, unsigned int castType );
@@ -302,4 +309,5 @@
 
 	void EntryPoint_ErrorIfNoHooks( void* entryPoint, const char* parentFunction );
 	
-#endif /* __Base_Extensibility_EntryPoint_h__ */
+#endif /* __StGermain_Base_Extensibility_EntryPoint_h__ */
+

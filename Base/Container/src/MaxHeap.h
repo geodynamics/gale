@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __MaxHeap_h__
-#define __MaxHeap_h__
+#ifndef __StGermain_Base_Container_MaxHeap_h__
+#define __StGermain_Base_Container_MaxHeap_h__
 
 	/** Textual name for List class. */
 	extern const Type MaxHeap_Type;
@@ -55,22 +55,18 @@
 						Heap_CompareFunction *keyCompare,
 						Heap_ExtendArrayFunc *extendArray );
 
-	MaxHeap* _MaxHeap_New(
-				SizeT							_sizeOfSelf,
-				Type							type,
-				Stg_Class_DeleteFunction*			_delete,
-				Stg_Class_PrintFunction*			_print,
-				Stg_Class_CopyFunction*				_copy,
-				Heap_HeapifyFunction				*heapify,
-				Heap_ExtractFunction				*extract,
-				Heap_InsertFunction					*insert,
-				Heap_KeySwapFunction*				keySwapFunction,
-				Heap_CompareFunction				*compareFunction,
-				Heap_ExtendArrayFunc				*extendArray,				
-				void						**keys,
-				int							keyLength,
-				int							numArrayElements
-				);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MAXHEAP_DEFARGS \
+                HEAP_DEFARGS
+
+	#define MAXHEAP_PASSARGS \
+                HEAP_PASSARGS
+
+	MaxHeap* _MaxHeap_New(  MAXHEAP_DEFARGS  );
 
 	
 	void _MaxHeap_Init( MaxHeap* self );
@@ -96,5 +92,6 @@
 
 	/** Private Functions */
 	
-#endif /* __MaxHeap_h__ */
+#endif /* __StGermain_Base_Container_MaxHeap_h__ */
+
 

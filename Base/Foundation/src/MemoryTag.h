@@ -37,8 +37,8 @@
 **
 **/
 
-#ifndef __Base_Foundation_MemoryTag_h__
-#define __Base_Foundation_MemoryTag_h__
+#ifndef __StGermain_Base_Foundation_MemoryTag_h__
+#define __StGermain_Base_Foundation_MemoryTag_h__
 
 	/* Memory Header that is inserted into every malloc
 	 * As this grows, we can move into separate file.

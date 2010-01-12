@@ -33,8 +33,8 @@
 ** $Id: Stg_ComponentFactory.h 3851 2006-10-12 08:57:22Z SteveQuenette $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-#ifndef __Base_Automation_Stg_ComponentFactory_h__
-#define __Base_Automation_Stg_ComponentFactory_h__
+#ifndef __StGermain_Base_Automation_Stg_ComponentFactory_h__
+#define __StGermain_Base_Automation_Stg_ComponentFactory_h__
 
 	extern const Type Stg_ComponentFactory_Type;
 	
@@ -139,7 +139,6 @@
 		Stg_ComponentFactory_ConstructByListFunc*                constructByList; \
 		\
 		/* Class info */ \
-		Stg_ObjectList*                                          registerRegister; \
 		Dictionary*                                              rootDict; \
 		Dictionary*                                              componentDict; \
 		LiveComponentRegister*                                   LCRegister;    \
@@ -151,34 +150,54 @@
 	** Constructor
 	*/
 	/* Creation implementation */
-	Stg_ComponentFactory* _Stg_ComponentFactory_New( 
-		SizeT                                                    _sizeOfSelf,
-		Type                                                     type,
-		Stg_Class_DeleteFunction*                                _delete,
-		Stg_Class_PrintFunction*                                 _print,
-		Stg_Class_CopyFunction*                                  _copy,
-		Stg_ComponentFactory_GetDoubleFunc*                      getDouble,
-		Stg_ComponentFactory_GetIntFunc*                         getInt,
-		Stg_ComponentFactory_GetUnsignedIntFunc*                 getUnsignedInt,
-		Stg_ComponentFactory_GetBoolFunc*                        getBool,
-		Stg_ComponentFactory_GetStringFunc*                      getString,
-		Stg_ComponentFactory_GetRootDictDoubleFunc*              getRootDictDouble,
-		Stg_ComponentFactory_GetRootDictIntFunc*                 getRootDictInt,
-		Stg_ComponentFactory_GetRootDictUnsignedIntFunc*         getRootDictUnsignedInt,
-		Stg_ComponentFactory_GetRootDictBoolFunc*                getRootDictBool,
-		Stg_ComponentFactory_GetRootDictStringFunc*              getRootDictString,
-		Stg_ComponentFactory_ConstructByNameFunc*                constructByName,
-		Stg_ComponentFactory_ConstructByKeyFunc*                 constructByKey,
-		Stg_ComponentFactory_ConstructByNameWithKeyFallbackFunc* constructByNameWithKeyFallback,
-		Stg_ComponentFactory_ConstructByListFunc*                constructByList,
-		Dictionary*                                              rootDict,
-		Dictionary*                                              componentDict,
-		Stg_ObjectList*                                          registerRegister );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define STG_COMPONENTFACTORY_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                Stg_ComponentFactory_GetDoubleFunc*                                            getDouble, \
+                Stg_ComponentFactory_GetIntFunc*                                                  getInt, \
+                Stg_ComponentFactory_GetUnsignedIntFunc*                                  getUnsignedInt, \
+                Stg_ComponentFactory_GetBoolFunc*                                                getBool, \
+                Stg_ComponentFactory_GetStringFunc*                                            getString, \
+                Stg_ComponentFactory_GetRootDictDoubleFunc*                            getRootDictDouble, \
+                Stg_ComponentFactory_GetRootDictIntFunc*                                  getRootDictInt, \
+                Stg_ComponentFactory_GetRootDictUnsignedIntFunc*                  getRootDictUnsignedInt, \
+                Stg_ComponentFactory_GetRootDictBoolFunc*                                getRootDictBool, \
+                Stg_ComponentFactory_GetRootDictStringFunc*                            getRootDictString, \
+                Stg_ComponentFactory_ConstructByNameFunc*                                constructByName, \
+                Stg_ComponentFactory_ConstructByKeyFunc*                                  constructByKey, \
+                Stg_ComponentFactory_ConstructByNameWithKeyFallbackFunc*  constructByNameWithKeyFallback, \
+                Stg_ComponentFactory_ConstructByListFunc*                                constructByList, \
+                Dictionary*                                                                     rootDict, \
+                Dictionary*                                                                componentDict
+
+	#define STG_COMPONENTFACTORY_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        getDouble,                      \
+	        getInt,                         \
+	        getUnsignedInt,                 \
+	        getBool,                        \
+	        getString,                      \
+	        getRootDictDouble,              \
+	        getRootDictInt,                 \
+	        getRootDictUnsignedInt,         \
+	        getRootDictBool,                \
+	        getRootDictString,              \
+	        constructByName,                \
+	        constructByKey,                 \
+	        constructByNameWithKeyFallback, \
+	        constructByList,                \
+	        rootDict,                       \
+	        componentDict                 
+
+	Stg_ComponentFactory* _Stg_ComponentFactory_New(  STG_COMPONENTFACTORY_DEFARGS  );
 	
 	Stg_ComponentFactory* Stg_ComponentFactory_New( 
 		Dictionary*                                              rootDict,
-		Dictionary*                                              componentDict,
-		Stg_ObjectList*                                          registerRegister );
+		Dictionary*                                              componentDict );
 
 	void _Stg_ComponentFactory_Init( Stg_ComponentFactory *self );
 	
@@ -202,6 +221,14 @@
 	void Stg_ComponentFactory_CreateComponents( Stg_ComponentFactory *self );
 	
 	void Stg_ComponentFactory_ConstructComponents( Stg_ComponentFactory* self, void* data );
+
+	void Stg_ComponentFactory_BuildComponents( Stg_ComponentFactory* self, void* data );
+
+	void Stg_ComponentFactory_InitialiseComponents( Stg_ComponentFactory* self, void* data );
+
+	void Stg_ComponentFactory_ExecuteComponents( Stg_ComponentFactory* self, void* data );
+
+	void Stg_ComponentFactory_DestroyComponents( Stg_ComponentFactory* self, void* data );
 	
 	Dictionary_Entry_Value* _Stg_ComponentFactory_GetDictionaryValue( 
 			void* cf, Name componentName, Dictionary_Entry_Key key, Dictionary_Entry_Value* defaultVal ) ;
@@ -248,6 +275,25 @@
 		Bool			isEssential,
 		void*			data ) ;
 
+	#define Stg_ComponentFactory_PluginConstructByKey( cf, codelet, componentKey, type, isEssential, data ) \
+		(type*) _Stg_ComponentFactory_PluginConstructByKey( \
+			cf, codelet, componentKey, type ## _Type, isEssential, data )
+	Stg_Component* _Stg_ComponentFactory_PluginConstructByKey( 
+		void*			cf, 
+		void*			codelet, 
+		Dictionary_Entry_Key	componentKey, 
+		Type			type, 
+		Bool			isEssential,
+		void*			data ) ;
+
+        double Stg_ComponentFactory_PluginGetDouble( void* cf, void *codelet, Dictionary_Entry_Key key, double defaultVal );
+
+        int Stg_ComponentFactory_PluginGetInt( void* cf, void *codelet, Dictionary_Entry_Key key, int defaultVal );
+
+	Bool Stg_ComponentFactory_PluginGetBool( void* cf, void *codelet, Dictionary_Entry_Key key, Bool defaultVal );
+
+        char* Stg_ComponentFactory_PluginGetString( void* cf, void* codelet, Dictionary_Entry_Key key, const char* const defaultVal );
+
 	#define Stg_ComponentFactory_ConstructByNameWithKeyFallback( \
 		cf, parentComponentName, componentTrialName, componentFallbackKey, type, isEssential, data ) \
 		(type*) ( (Stg_ComponentFactory*) cf )->constructByNameWithKeyFallback( \
@@ -278,4 +324,5 @@
 
 	#define Stg_ComponentFactory_Unlimited ((unsigned int) -1)
 
-#endif /* __Base_Automation_Stg_ComponentFactory_h__ */
+#endif /* __StGermain_Base_Automation_Stg_ComponentFactory_h__ */
+

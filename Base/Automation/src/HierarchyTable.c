@@ -112,7 +112,8 @@ void HierarchyTable_PrintChildren( void* hierarchyTable, Type parentType, Stream
 	Stream_Flush( stream );
 	Stream_Indent( stream );
 
-	for ( entry_I = 0 ; entry_I < self->max ; entry_I++ ) {
+   /* increasing terminating limit by 1 - seems to be right due to comments in HashTable.c ~line 154 */
+	for ( entry_I = 0 ; entry_I < self->max+1 ; entry_I++ ) {
 		hashTableEntry = self->entries[ entry_I ];
 
 		while( hashTableEntry ){
@@ -126,6 +127,17 @@ void HierarchyTable_PrintChildren( void* hierarchyTable, Type parentType, Stream
 	Stream_UnIndent( stream );
 }
 
+Bool Stg_Class_CompareType( const void* classPtr, Type possibleParentType ) {
+	Stg_Class* self = (Stg_Class*) classPtr;
+	/* Check if the pointer is null */
+	Journal_Firewall(
+		self != NULL,
+		Journal_Register( Error_Type, HierarchyTable_Type ),
+		"Error doing type checking against possibleParentType %s - pointer is NULL.\n",
+		possibleParentType );
+
+	return( Stg_Class_IsInstance( self, possibleParentType ) );
+}
 
 Stg_Class* Stg_Class_CheckType( const void* classPtr, Type possibleParentType ) {
 	Stg_Class* self = (Stg_Class*) classPtr;
@@ -179,3 +191,5 @@ Type HierarchyTable_GetTypePtrFromName( void* hierarchyTable, Name typeName ) {
 	}
 	return NULL;
 }
+
+

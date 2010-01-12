@@ -138,9 +138,9 @@ class createHTMLDocuments(createDocuments):
         text += '<INPUT type=submit name=btnG VALUE="Google Search">\n'
         text += '<font size=-1>\n'
         text += '<input type=hidden name=domains'+\
-        ' value="'+path+'"><br><input type=radio name=sitesearch '+\
+        ' value="'+path+'"><br/><input type=radio name=sitesearch '+\
         'value=""> WWW <input type=radio name=sitesearch'+\
-        ' value="'+path+'" checked> '+path+' <br>\n'
+        ' value="'+path+'" checked> '+path+' <br/>\n'
         text +='</font>\n'
         text +='</td></tr></TABLE>\n'
         text +='</FORM>\n'
@@ -185,7 +185,7 @@ class createHTMLDocuments(createDocuments):
 
     ## Create the tabs to navigate between the project pages.
     def createNavitab(self,  projectName):
-        text = '<div id="navitab">\n <br>\n '
+        text = '<div id="navitab">\n <br/>\n '
         if projectName == 'index':
             text +=        '<a class="'+self.div.navitab[1]+'" href="index.html">Main</a><span class="hide"> | </span>'        
         else:
@@ -310,14 +310,14 @@ class createHTMLDocuments(createDocuments):
     def createBlurb(self,  projectName):
         text =        '<div id="'+self.div.desc+'">\n'
         text +=        '<h3> '+projectName+' '+self.name+' </h3>\n' 
-        text +=        '<p>'+self.blurb+'<br>\n </p>\n </div>\n<br>\n'
+        text +=        '<p>'+self.blurb+'<br/>\n </p>\n </div>\n<br/>\n'
         return text
         
     ## Put small blurb on index page, different from project pages. This is fixed
     def createIndexBlurb(self,  blurb):
         text =        '<div id="'+self.div.desc+'">\n'
         text +=        '<h3>'+self.name+'</h3>\n' 
-        text +=        '<p>'+blurb+'<br>\n </p>\n </div>\n<br>\n'
+        text +=        '<p>'+blurb+'<br/>\n </p>\n </div>\n<br/>\n'
         return text 
         
     ## Create the meta-file content part of the pages.    
@@ -349,7 +349,8 @@ class createHTMLDocuments(createDocuments):
                 text += '<div id="'+unicode(self.div.componentInfo[0])+'">\n'
                 text += '<div id="'+unicode(self.div.componentInfo[1])+'">\n'
                 text += '<b>'+unicode(name)+'</b>: </div>\n'
-                text += '<div id="'+self.div.componentInfo[2]+'">'+value+'<br>\n'
+
+                text += '<div id="'+self.div.componentInfo[2]+'">'+value+'<br/>\n'
                 text += '</div>\n</div>\n'        
                 return unicode(text)
     ## Example part of meta component            
@@ -360,7 +361,7 @@ class createHTMLDocuments(createDocuments):
         text += '<b>'+str(name)+'</b>:</div>\n'
         text += '<div id="'+self.div.componentInfo[2]+'">\n<div id="codebox">\n'
         text += '<xmp>'+str(value)+'</xmp>\n'
-        text += '<br>\n</div>\n</div>\n</div>\n'
+        text += '<br/>\n</div>\n</div>\n</div>\n'
 
         return text
     ## List entry html code    
@@ -411,20 +412,11 @@ class createHTMLDocuments(createDocuments):
             for title in titleList:
                 if item.has_key(title):
                     # check for latex code to convert Does multiple latex entries in one item.
-                    if string.count(item[title], '$') >1:
-                        #split string at $ signs
-                        titleString = " " + item[title]
-                        myList = string.split(titleString,  '$')
-                        # all 'even' occurances(index 1,3,5 etc as nos start at 0) in this string will be latex code, even if string starts with a $.
-                        for listValue in range(len(myList)/2):
-                            latexString = '$' + myList[listValue+1]+'$'
-                            #call latex function
-                            picName = self.addEquationPicturePng(componentName +name,  latexString,  picsIndex)
-                            newString = '<img src="'+self.pictureSubDirectoryName+'/'+picName+'" ><br>\n'
-                            myList[listValue+1] = newString
-                            picsIndex = picsIndex + 1
-                         #turn list back into string   
-                        text += '<td>'+ (string.lstrip(string.join(myList))).encode('ascii','xmlcharrefreplace')+'</td>'    
+                    
+                    if string.count(item[title], '$') >1: 
+
+                        text += '<td> ' + self.checkTextForEquations(item[title], componentName+name+str(picsIndex))+ '</td>'
+                        picsIndex = picsIndex + 1    
                     else:
                         # add code to table
                         text += '<td>'+(item[title]).encode('ascii','xmlcharrefreplace')+'</td>'
@@ -433,7 +425,28 @@ class createHTMLDocuments(createDocuments):
             text +='</tr>\n'
         text += '\n</table>\n</div>\n</div>'
         return text
-        
+
+    ## check for latex code to convert Does multiple latex entries in one item.
+    # Converts to html compatible format.
+    def checkTextForEquations(self, textStringIn, name):
+        if  string.count(textStringIn, '$') >1:
+            #split string at $ signs
+            titleString = " " + textStringIn
+            myList = string.split(titleString,  '$')
+            # all 'even' occurances(index 1,3,5 etc as nos start at 0) in this string will be latex code, even if string starts with a $.
+            picsIndex = 0
+            for listValue in range(int(math.floor(len(myList)/2))):
+                latexString = '$' + myList[2*listValue+1]+'$'
+                #call latex function
+                picName = self.addEquationPicturePng(name,  latexString,  picsIndex)
+                newString = '<img src="'+self.pictureSubDirectoryName+'/'+picName+'" >\n'
+                myList[2*listValue+1] = newString
+                picsIndex = picsIndex + 1
+            textStringOut = (string.lstrip(string.join(myList))).encode('ascii','xmlcharrefreplace')
+        else:
+             textStringOut = textStringIn
+        return textStringOut
+
     ## Call latex code to convert latex to pictures in html   
     def addEquationPicturePng(self,  name,  value,  index):
         # add to pics sub-directory 
@@ -448,6 +461,8 @@ class createHTMLDocuments(createDocuments):
         #Todo: create equation pic from latex source.
         # create latex file.
         latexCode = "\\documentclass{article}\n"
+        latexCode += "\\usepackage[latin1]{inputenc}\n"
+        latexCode += "\\usepackage{amsfonts}\n"
         latexCode += "\\usepackage{amsmath}\n"
         latexCode += "\\usepackage{amsthm}\n"
         latexCode += "\\usepackage{amssymb}\n"
@@ -456,6 +471,7 @@ class createHTMLDocuments(createDocuments):
         latexCode += "\\begin{document}\n"
         latexCode += value + "\n"
         latexCode += "\\end{document}"
+        #print latexCode
         latexFileBase = picturePath + "/" + "temp"
         latexFileName = latexFileBase +".tex"
         latexFile = open(latexFileName, 'w')
@@ -466,9 +482,12 @@ class createHTMLDocuments(createDocuments):
         cwd = os.getcwd()
         os.chdir(picturePath)
         # run latex on file
+        ###TODO: There is osmething seriously wrong here, as this doesn't work:
+        #### error code does not print, it just crashed.
         #os.system('latex  '+ latexFileName)
         try:
-            retcode = subprocess.call('latex  '+ latexFileName + ">>temp.txt", shell=True)
+            retcode = subprocess.call('latex  '+ latexFileName+ ">>temp.txt" , shell=True)
+        
             if retcode < 0:
                 print >>sys.stderr, "Child was terminated by signal: latex file could not be run for creating " + pictureName, -retcode
             
@@ -484,7 +503,7 @@ class createHTMLDocuments(createDocuments):
             if retcode < 0:
                 print >>sys.stderr, "Child was terminated by signal", -retcode
             #else:
-                #print >>sys.stderr, "Picture created for ", pictureName
+               # print >>sys.stderr, "Picture created for ", pictureName
         except OSError, e:
             print >>sys.stderr, "Execution failed:", e 
 
@@ -510,7 +529,7 @@ class createHTMLDocuments(createDocuments):
         text += '<div id="'+self.div.componentInfo[2]+'">\n'
         # create picture
         pictureName = self.addEquationPicturePng(componentName,  value, 1)
-        text += '<img src="'+self.pictureSubDirectoryName+'/'+pictureName+'" align="top"><br>\n'
+        text += '<img src="'+self.pictureSubDirectoryName+'/'+pictureName+'" align="top"><br/>\n'
         text += '</div>\n</div>\n'
 
         return text
@@ -561,7 +580,7 @@ class createHTMLDocuments(createDocuments):
                 text +='<h3 align="center">\n'
                 
                 text +='<a name="'+unicode(meta.dictionary['Name'])+'">'+unicode(meta.dictionary['Name'])+'</a>\n'
-                text += '</h3>\n<br>\n'
+                text += '</h3>\n<br/>\n'
                 if meta.dictionary.has_key('Organisation'):
                     text += self.addSimpleComponentInfo('Organisation', unicode(meta.dictionary['Organisation']))
                 
@@ -576,8 +595,9 @@ class createHTMLDocuments(createDocuments):
                     text += self.addParentInfoDtd('Parent', 'Name', unicode(meta.dictionary['Parent']))
                 
                 text += self.addChildrenInfoDtd('Children', 'Parent', 'Name', (meta.dictionary['Name']).encode('ascii','xmlcharrefreplace'))
-                
-                text += self.addSimpleComponentInfo('Description', (meta.dictionary['Description']).encode('ascii','xmlcharrefreplace'))
+                #print "*****************"
+                #print meta.dictionary['Name'] + str(string.count(meta.dictionary['Description'], '$'))
+                text += self.addSimpleComponentInfo('Description', self.checkTextForEquations((meta.dictionary['Description']).encode('ascii','xmlcharrefreplace'),unicode(meta.dictionary['Name'])+'Description' ) )
                 # Next comes reference, if any
                 if meta.dictionary.has_key('Reference'):
                     refValue = unicode(meta.dictionary['Reference'])
@@ -587,6 +607,7 @@ class createHTMLDocuments(createDocuments):
                     text +=self.addExampleInfo('Example',  (meta.dictionary['Example']).encode('ascii','xmlcharrefreplace'))
                 #Then equation if any
                 if meta.dictionary.has_key('Equation'):
+                    #print "HAS EQUATION"
                     text +=self.addEquationInfo(unicode(meta.dictionary['Name']),  (meta.dictionary['Equation']).encode('ascii','xmlcharrefreplace'))
                 if meta.dictionary.has_key('Params'):
                 # then params if any
@@ -646,7 +667,7 @@ class createHTMLDocuments(createDocuments):
                 text +='<h3 align="center">\n'
                 
                 text +='<a name="'+meta.dictionary['info']['title']+'">'+meta.dictionary['info']['title']+'</a>\n'
-                text += '</h3>\n<br>\n'
+                text += '</h3>\n<br/>\n'
                 text += '<h4 align="center">Information</h4>\n'
                 if meta.dictionary['info'].has_key('creator'):
                     text += self.addSimpleComponentInfo('creator', meta.dictionary['info']['creator'])                
@@ -860,6 +881,9 @@ if __name__=='__main__':
         project.assignMetas()
         projectList.append(project)
         
+
+    # sort projects alphabetically
+    projectList.sort()
     #now create the HTML documents
     print "Now creating HTML documents in directory: " + os.path.realpath(options.documentPath)
     #turn Ext.webs into useful list

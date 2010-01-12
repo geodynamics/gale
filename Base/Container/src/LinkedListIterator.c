@@ -42,41 +42,31 @@
 
 const Type LinkedListIterator_Type = "LinkedListIterator";
 
-LinkedListIterator *_LinkedListIterator_New(
-		SizeT					_sizeOfSelf,
-		Type					type,
-		Stg_Class_DeleteFunction*	_delete,
-		Stg_Class_PrintFunction*	_print,
-		Stg_Class_CopyFunction*		_copy
-		)
+LinkedListIterator *_LinkedListIterator_New(  LINKEDLISTITERATOR_DEFARGS  )
 {
 	LinkedListIterator *self = NULL;
 
 	/** LinkedListIterator using Class_New, because  Memory module has been initialized */
 	
-	self = (LinkedListIterator*)_Stg_Class_New(
-		_sizeOfSelf,
-		type,
-		_delete,
-		_print, 
-		_copy );
+	self = (LinkedListIterator*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 	
 	return self;
 }
 
 LinkedListIterator *LinkedListIterator_New( LinkedList *list )
 {
+	/* Variables set in this function */
+	SizeT                      _sizeOfSelf = sizeof(LinkedListIterator);
+	Type                              type = LinkedListIterator_Type;
+	Stg_Class_DeleteFunction*      _delete = _LinkedListIterator_DeleteFunc;
+	Stg_Class_PrintFunction*        _print = _LinkedListIterator_PrintFunc;
+	Stg_Class_CopyFunction*          _copy = NULL;
+
 	
 	LinkedListIterator* self;
 	
 	assert( list );
-	self = _LinkedListIterator_New(
-			sizeof(LinkedListIterator),
-			LinkedListIterator_Type,
-			_LinkedListIterator_DeleteFunc,
-			_LinkedListIterator_PrintFunc,
-			NULL
-			);
+	self = _LinkedListIterator_New(  LINKEDLISTITERATOR_PASSARGS  );
 	/* General info */
 	
 	/* Virtual functions */
@@ -113,3 +103,5 @@ void _LinkedListIterator_PrintFunc( void *self, Stream *myStream )
 	Journal_Printf( myStream, "LinkedListIterator (ptr): (%p)\n", iterator );
 	Journal_Printf( myStream, "\tlist (ptr): (%p)\n", iterator->list );
 }
+
+

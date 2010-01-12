@@ -72,3 +72,5 @@ void PtrMapSuite( pcu_suite_t* suite ) {
    pcu_suite_setFixtures( suite, PtrMapSuite_Setup, PtrMapSuite_Teardown );
    pcu_suite_addTest( suite, PtrMapSuite_TestAppendFind );
 }
+
+

@@ -44,8 +44,8 @@
 **
 **/
 
-#ifndef __Base_IO_Dictionary_Entry_h__
-#define __Base_IO_Dictionary_Entry_h__
+#ifndef __StGermain_Base_IO_Dictionary_Entry_h__
+#define __StGermain_Base_IO_Dictionary_Entry_h__
 	
 	/** \def __Dictionary_Entry See Dictionary_Entry */
 	#define __Dictionary_Entry  \
@@ -96,6 +96,6 @@
 	/** Get an entry's originalSource */
 	Dictionary_Entry_Source Dictionary_Entry_GetSource( Dictionary_Entry* self );
 	
-#endif /* __Base_IO_Dictionary_Entry_h__ */
+#endif /* __StGermain_Base_IO_Dictionary_Entry_h__ */
 
 

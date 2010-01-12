@@ -42,7 +42,7 @@
 typedef struct {
    HierarchyTable*   hTable;
    HierarchyTable*   savedHierarchyTable;
-   unsigned int      rank;
+   int					rank;
 } HierarchyTableSuiteData;
 
 
@@ -176,3 +176,5 @@ void HierarchyTableSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, HierarchyTableSuite_TestPrintParents );
    pcu_suite_addTest( suite, HierarchyTableSuite_TestPrintChildren );
 }
+
+

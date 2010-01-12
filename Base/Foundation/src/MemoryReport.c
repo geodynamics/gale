@@ -61,10 +61,8 @@ MemoryReport* MemoryReport_New( ) {
 }
 	
 
-void _MemoryReport_Init( MemoryReport* memoryReport )
-{
-	char     reportQueryName[1000];
-	Index    ii=0;
+void _MemoryReport_Init( MemoryReport* memoryReport ) {
+	Index ii=0;
 
 	memoryReport->groupCount = 0;
 	memoryReport->groupSize = MEMORYREPORT_SIZE;
@@ -78,13 +76,11 @@ void _MemoryReport_Init( MemoryReport* memoryReport )
 	}
    
 	memoryReport->memoryManager = stgMemory;   /* Use this as the default, unless user overrides */
-	
 	memoryReport->reportField = MemoryField_New( "Report Query:" );
 }
 	
 
-void MemoryReport_Delete( MemoryReport* memoryReport )
-{
+void MemoryReport_Delete( MemoryReport* memoryReport ) {
 	Index i;
 	
 	MemoryField_Delete( memoryReport->reportField );
@@ -273,3 +269,5 @@ const char* _MemoryReport_GetValue( MemoryReport* memoryReport, MemoryReportGrou
 	}
 	return valueString;
 }
+
+

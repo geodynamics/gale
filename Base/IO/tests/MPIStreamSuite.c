@@ -184,3 +184,5 @@ void MPIStreamSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, MPIStreamSuite_TestWriteAllProcessors );
    pcu_suite_addTest( suite, MPIStreamSuite_TestPrintWithOffset );
 }
+
+

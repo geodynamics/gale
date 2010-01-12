@@ -46,19 +46,13 @@
 
 const Type LineFormatter_Type = "LineFormatter";
 
-LineFormatter* _LineFormatter_New(
-	SizeT 				_sizeOfSelf,
-	Type 				type,
-	Stg_Class_DeleteFunction*		_delete,
-	Stg_Class_PrintFunction*		_print,
-	Stg_Class_CopyFunction*		_copy, 
-	StreamFormatter_FormatFunction*	_format )
+LineFormatter* _LineFormatter_New(  LINEFORMATTER_DEFARGS  )
 {
 	LineFormatter* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(LineFormatter) );
-	self = (LineFormatter*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (LineFormatter*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
                                                                                 
 	_LineFormatter_Init( self, _format );
 
@@ -223,4 +217,6 @@ char* _LineFormatter_Format( void* formatter, const char* const fmt )
 	
 	return result;	
 }
+
+
 

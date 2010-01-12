@@ -60,23 +60,13 @@ static const int STREAM_CHILDREN_DELTA = 4;	/**< Number of streams to resize by 
 /** Returns True if the current process is allowed to print. */
 Bool _Stream_IsPrintingRank( Stream* stream );
 
-Stream* _Stream_New(
-	SizeT			_sizeOfSelf,
-	Type			type,
-	Stg_Class_DeleteFunction*	_delete,
-	Stg_Class_PrintFunction*	_print,
-	Stg_Class_CopyFunction*	_copy, 
-	Name			name,
-	Stream_PrintfFunction*	_printf,
-	Stream_WriteFunction*	_write,
-	Stream_DumpFunction*	_dump,
-	Stream_SetFileFunction*	_setFile )
+Stream* _Stream_New(  STREAM_DEFARGS  )
 {
 	Stream* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Stream) );
-	self = (Stream*)_Stg_Class_New( _sizeOfSelf, type, _delete, _print, _copy );
+	self = (Stream*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
                                                                                 
 	_Stream_Init( self, name, _printf, _write, _dump, _setFile );
 
@@ -324,6 +314,7 @@ SizeT Stream_Write( Stream *stream, void *data, SizeT elem_size, SizeT num_elems
 	}
 	return result;
 }
+
 Bool Stream_Dump( Stream *stream, void *data )
 {
 	Bool result;
@@ -364,6 +355,39 @@ Bool Stream_RedirectFile( Stream* stream, const char* const fileName ) {
 	return Stream_SetFile( stream, file );
 }
 
+Bool Stream_RedirectAllToFile( const char* const fileName ) {
+	char* infoStreamFilename;
+	char* debugStreamFilename;
+	char* dumpStreamFilename;
+	char* errorStreamFilename;
+
+	Stg_asprintf( &infoStreamFilename, "%s.info", fileName );
+	Stg_asprintf( &debugStreamFilename, "%s.debug", fileName );
+	Stg_asprintf( &dumpStreamFilename, "%s.dump", fileName );
+	Stg_asprintf( &errorStreamFilename, "%s.error", fileName );
+
+	if( Stream_RedirectFile( Journal_GetTypedStream( Info_Type ), infoStreamFilename ) &&
+		Stream_RedirectFile( Journal_GetTypedStream( Debug_Type ), debugStreamFilename ) &&
+		Stream_RedirectFile( Journal_GetTypedStream( Dump_Type ), dumpStreamFilename ) &&
+		Stream_RedirectFile( Journal_GetTypedStream( Error_Type ), errorStreamFilename ) ) {
+		
+		Stream_ClearCustomFormatters( Journal_GetTypedStream( Info_Type ) );
+		Stream_ClearCustomFormatters( Journal_GetTypedStream( Debug_Type ) );
+		Stream_ClearCustomFormatters( Journal_GetTypedStream( Dump_Type ) );
+		Stream_ClearCustomFormatters( Journal_GetTypedStream( Error_Type ) );
+
+		return True;
+	}
+	else
+		return False;
+}
+
+void Stream_PurgeAllRedirectedFiles( void ) {
+	Stream_CloseAndFreeFile( Journal_GetTypedStream( Info_Type ) );
+	Stream_CloseAndFreeFile( Journal_GetTypedStream( Debug_Type ) );
+	Stream_CloseAndFreeFile( Journal_GetTypedStream( Dump_Type ) );
+	Stream_CloseAndFreeFile( Journal_GetTypedStream( Error_Type ) );
+}
 
 Bool Stream_RedirectFileBranch( Stream* stream, const char* const fileName ) {
 	JournalFile* file;
@@ -717,3 +741,5 @@ Bool _Stream_IsPrintingRank( Stream* stream )
 
 	return True;
 }
+
+

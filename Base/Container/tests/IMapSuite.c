@@ -139,3 +139,5 @@ void IMapSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, IMapSuite_TestMap );
    pcu_suite_addTest( suite, IMapSuite_TestRemove );
 }
+
+

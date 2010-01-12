@@ -43,8 +43,8 @@
 
 
 typedef struct {
-   Stg_MemMonitor*   mm;
-   unsigned int      rank;   
+   Stg_MemMonitor*	mm;
+   int					rank;   
 } MemMonitorSuiteData;
 
 
@@ -167,3 +167,5 @@ void MemMonitorSuite( pcu_suite_t* suite ) {
    pcu_suite_addTest( suite, MemMonitorSuite_TestMonitor );
    #endif
 }
+
+

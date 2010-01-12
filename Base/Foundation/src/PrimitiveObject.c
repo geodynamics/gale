@@ -46,72 +46,212 @@
 
 const Type Stg_PrimitiveObject_Type = "Stg_PrimitiveObject";
 
-Stg_PrimitiveObject* Stg_PrimitiveObject_New_UnsignedChar( unsigned char value, Name name ) {
+Stg_PrimitiveObject* Stg_PrimitiveObject_New_UnsignedChar( unsigned char value_renamed, Name name ) {
+	/* Variables set in this function */
+	Stg_C_Primitive_Type  dataType = Stg_C_Primitive_Type_UnsignedChar;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	SizeT                             _sizeOfSelf = ZERO;
+	Type                                     type = ZERO;
+	Stg_Class_DeleteFunction*             _delete = ZERO;
+	Stg_Class_PrintFunction*               _print = ZERO;
+	Stg_Class_CopyFunction*                 _copy = ZERO;
+	AllocationType             nameAllocationType = ZERO;
+
 	Stg_C_Primitive v;
-	v.asUnsignedChar = value;
-	return _Stg_PrimitiveObject_New( Stg_C_Primitive_Type_UnsignedChar, v, name );
+	v.asUnsignedChar = value_renamed;
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_C_Primitive  value = v;
+
+	return _Stg_PrimitiveObject_New(  STG_PRIMITIVEOBJECT_PASSARGS  );
 }
-Stg_PrimitiveObject* Stg_PrimitiveObject_New_UnsignedShort( unsigned short value, Name name ) {
+Stg_PrimitiveObject* Stg_PrimitiveObject_New_UnsignedShort( unsigned short value_renamed, Name name ) {
+	/* Variables set in this function */
+	Stg_C_Primitive_Type  dataType = Stg_C_Primitive_Type_UnsignedShort;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	SizeT                             _sizeOfSelf = ZERO;
+	Type                                     type = ZERO;
+	Stg_Class_DeleteFunction*             _delete = ZERO;
+	Stg_Class_PrintFunction*               _print = ZERO;
+	Stg_Class_CopyFunction*                 _copy = ZERO;
+	AllocationType             nameAllocationType = ZERO;
+
 	Stg_C_Primitive v;
-	v.asUnsignedShort = value;
-	return _Stg_PrimitiveObject_New( Stg_C_Primitive_Type_UnsignedShort, v, name );
+	v.asUnsignedShort = value_renamed;
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_C_Primitive  value = v;
+
+	return _Stg_PrimitiveObject_New(  STG_PRIMITIVEOBJECT_PASSARGS  );
 }
-Stg_PrimitiveObject* Stg_PrimitiveObject_New_UnsignedInt( unsigned int value, Name name ) {
+Stg_PrimitiveObject* Stg_PrimitiveObject_New_UnsignedInt( unsigned int value_renamed, Name name ) {
+	/* Variables set in this function */
+	Stg_C_Primitive_Type  dataType = Stg_C_Primitive_Type_UnsignedInt;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	SizeT                             _sizeOfSelf = ZERO;
+	Type                                     type = ZERO;
+	Stg_Class_DeleteFunction*             _delete = ZERO;
+	Stg_Class_PrintFunction*               _print = ZERO;
+	Stg_Class_CopyFunction*                 _copy = ZERO;
+	AllocationType             nameAllocationType = ZERO;
+
 	Stg_C_Primitive v;
-	v.asUnsignedInt = value;
-	return _Stg_PrimitiveObject_New( Stg_C_Primitive_Type_UnsignedInt, v, name );
+	v.asUnsignedInt = value_renamed;
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_C_Primitive  value = v;
+
+	return _Stg_PrimitiveObject_New(  STG_PRIMITIVEOBJECT_PASSARGS  );
 }
-Stg_PrimitiveObject* Stg_PrimitiveObject_New_UnsignedLong( unsigned long value, Name name ) {
+Stg_PrimitiveObject* Stg_PrimitiveObject_New_UnsignedLong( unsigned long value_renamed, Name name ) {
+	/* Variables set in this function */
+	Stg_C_Primitive_Type  dataType = Stg_C_Primitive_Type_UnsignedLong;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	SizeT                             _sizeOfSelf = ZERO;
+	Type                                     type = ZERO;
+	Stg_Class_DeleteFunction*             _delete = ZERO;
+	Stg_Class_PrintFunction*               _print = ZERO;
+	Stg_Class_CopyFunction*                 _copy = ZERO;
+	AllocationType             nameAllocationType = ZERO;
+
 	Stg_C_Primitive v;
-	v.asUnsignedLong = value;
-	return _Stg_PrimitiveObject_New( Stg_C_Primitive_Type_UnsignedLong, v, name );
+	v.asUnsignedLong = value_renamed;
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_C_Primitive  value = v;
+
+	return _Stg_PrimitiveObject_New(  STG_PRIMITIVEOBJECT_PASSARGS  );
 }
-Stg_PrimitiveObject* Stg_PrimitiveObject_New_Char( char value, Name name ) {
+Stg_PrimitiveObject* Stg_PrimitiveObject_New_Char( char value_renamed, Name name ) {
+	/* Variables set in this function */
+	Stg_C_Primitive_Type  dataType = Stg_C_Primitive_Type_Char;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	SizeT                             _sizeOfSelf = ZERO;
+	Type                                     type = ZERO;
+	Stg_Class_DeleteFunction*             _delete = ZERO;
+	Stg_Class_PrintFunction*               _print = ZERO;
+	Stg_Class_CopyFunction*                 _copy = ZERO;
+	AllocationType             nameAllocationType = ZERO;
+
 	Stg_C_Primitive v;
-	v.asChar = value;
-	return _Stg_PrimitiveObject_New( Stg_C_Primitive_Type_Char, v, name );
+	v.asChar = value_renamed;
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_C_Primitive  value = v;
+
+	return _Stg_PrimitiveObject_New(  STG_PRIMITIVEOBJECT_PASSARGS  );
 }
-Stg_PrimitiveObject* Stg_PrimitiveObject_New_Short( short value, Name name ) {
+Stg_PrimitiveObject* Stg_PrimitiveObject_New_Short( short value_renamed, Name name ) {
+	/* Variables set in this function */
+	Stg_C_Primitive_Type  dataType = Stg_C_Primitive_Type_Short;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	SizeT                             _sizeOfSelf = ZERO;
+	Type                                     type = ZERO;
+	Stg_Class_DeleteFunction*             _delete = ZERO;
+	Stg_Class_PrintFunction*               _print = ZERO;
+	Stg_Class_CopyFunction*                 _copy = ZERO;
+	AllocationType             nameAllocationType = ZERO;
+
 	Stg_C_Primitive v;
-	v.asShort = value;
-	return _Stg_PrimitiveObject_New( Stg_C_Primitive_Type_Short, v, name );
+	v.asShort = value_renamed;
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_C_Primitive  value = v;
+
+	return _Stg_PrimitiveObject_New(  STG_PRIMITIVEOBJECT_PASSARGS  );
 }
-Stg_PrimitiveObject* Stg_PrimitiveObject_New_Int( int value, Name name ) {
+Stg_PrimitiveObject* Stg_PrimitiveObject_New_Int( int value_renamed, Name name ) {
+	/* Variables set in this function */
+	Stg_C_Primitive_Type  dataType = Stg_C_Primitive_Type_Int;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	SizeT                             _sizeOfSelf = ZERO;
+	Type                                     type = ZERO;
+	Stg_Class_DeleteFunction*             _delete = ZERO;
+	Stg_Class_PrintFunction*               _print = ZERO;
+	Stg_Class_CopyFunction*                 _copy = ZERO;
+	AllocationType             nameAllocationType = ZERO;
+
 	Stg_C_Primitive v;
-	v.asInt = value;
-	return _Stg_PrimitiveObject_New( Stg_C_Primitive_Type_Int, v, name );
+	v.asInt = value_renamed;
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_C_Primitive  value = v;
+
+	return _Stg_PrimitiveObject_New(  STG_PRIMITIVEOBJECT_PASSARGS  );
 }
-Stg_PrimitiveObject* Stg_PrimitiveObject_New_Long( long value, Name name ) {
+Stg_PrimitiveObject* Stg_PrimitiveObject_New_Long( long value_renamed, Name name ) {
+	/* Variables set in this function */
+	Stg_C_Primitive_Type  dataType = Stg_C_Primitive_Type_Long;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	SizeT                             _sizeOfSelf = ZERO;
+	Type                                     type = ZERO;
+	Stg_Class_DeleteFunction*             _delete = ZERO;
+	Stg_Class_PrintFunction*               _print = ZERO;
+	Stg_Class_CopyFunction*                 _copy = ZERO;
+	AllocationType             nameAllocationType = ZERO;
+
 	Stg_C_Primitive v;
-	v.asLong = value;
-	return _Stg_PrimitiveObject_New( Stg_C_Primitive_Type_Long, v, name );
+	v.asLong = value_renamed;
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_C_Primitive  value = v;
+
+	return _Stg_PrimitiveObject_New(  STG_PRIMITIVEOBJECT_PASSARGS  );
 }
-Stg_PrimitiveObject* Stg_PrimitiveObject_New_Float( float value, Name name ) {
+Stg_PrimitiveObject* Stg_PrimitiveObject_New_Float( float value_renamed, Name name ) {
+	/* Variables set in this function */
+	Stg_C_Primitive_Type  dataType = Stg_C_Primitive_Type_Float;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	SizeT                             _sizeOfSelf = ZERO;
+	Type                                     type = ZERO;
+	Stg_Class_DeleteFunction*             _delete = ZERO;
+	Stg_Class_PrintFunction*               _print = ZERO;
+	Stg_Class_CopyFunction*                 _copy = ZERO;
+	AllocationType             nameAllocationType = ZERO;
+
 	Stg_C_Primitive v;
-	v.asFloat = value;
-	return _Stg_PrimitiveObject_New( Stg_C_Primitive_Type_Float, v, name );
+	v.asFloat = value_renamed;
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_C_Primitive  value = v;
+
+	return _Stg_PrimitiveObject_New(  STG_PRIMITIVEOBJECT_PASSARGS  );
 }
-Stg_PrimitiveObject* Stg_PrimitiveObject_New_Double( double value, Name name ) {
+Stg_PrimitiveObject* Stg_PrimitiveObject_New_Double( double value_renamed, Name name ) {
+	/* Variables set in this function */
+	Stg_C_Primitive_Type  dataType = Stg_C_Primitive_Type_Double;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	SizeT                             _sizeOfSelf = ZERO;
+	Type                                     type = ZERO;
+	Stg_Class_DeleteFunction*             _delete = ZERO;
+	Stg_Class_PrintFunction*               _print = ZERO;
+	Stg_Class_CopyFunction*                 _copy = ZERO;
+	AllocationType             nameAllocationType = ZERO;
+
 	Stg_C_Primitive v;
-	v.asDouble = value;
-	return _Stg_PrimitiveObject_New( Stg_C_Primitive_Type_Double, v, name );
+	v.asDouble = value_renamed;
+	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
+	Stg_C_Primitive  value = v;
+
+	return _Stg_PrimitiveObject_New(  STG_PRIMITIVEOBJECT_PASSARGS  );
 }
 
-Stg_PrimitiveObject* _Stg_PrimitiveObject_New( 
-	Stg_C_Primitive_Type	dataType,
-	Stg_C_Primitive		value,
-	Name			name )
+Stg_PrimitiveObject* _Stg_PrimitiveObject_New(  STG_PRIMITIVEOBJECT_DEFARGS  )
 {
 	Stg_PrimitiveObject*  result;
 
-	result = (Stg_PrimitiveObject*)_Stg_Object_New(
-			sizeof(Stg_PrimitiveObject),
-			Stg_PrimitiveObject_Type,
-			_Stg_PrimitiveObject_Delete,
-			_Stg_PrimitiveObject_Print,
-			_Stg_PrimitiveObject_Copy,
-			name,
-			NON_GLOBAL );
+	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
+	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
+	   and so should be set to ZERO in any children of this class. */
+	_sizeOfSelf        = sizeof(Stg_PrimitiveObject);
+	type               = Stg_PrimitiveObject_Type;
+	_delete            = _Stg_PrimitiveObject_Delete;
+	_print             = _Stg_PrimitiveObject_Print;
+	_copy              = _Stg_PrimitiveObject_Copy;
+	nameAllocationType = NON_GLOBAL;
+
+	result = (Stg_PrimitiveObject*)_Stg_Object_New(  STG_OBJECT_PASSARGS  );
 	
 	_Stg_PrimitiveObject_Init( result, dataType, value );
 
@@ -226,4 +366,6 @@ void* _Stg_PrimitiveObject_Copy( void* primitive, void* dest, Bool deep, Name na
 	return newCopy;
 }
 	
+
+
 

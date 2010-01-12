@@ -94,3 +94,5 @@ int IMapIter_GetValue( const void* self ) {
    assert( ((IMapIter*)self)->valid && ((IMapIter*)self)->cur );
    return ((IMapIter*)self)->cur->val;
 }
+
+

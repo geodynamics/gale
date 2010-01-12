@@ -39,8 +39,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Automation_types_h__
-#define __Base_Automation_types_h__
+#ifndef __StGermain_Base_Automation_types_h__
+#define __StGermain_Base_Automation_types_h__
 
 typedef struct stgComponent stgComponent;
 typedef struct Comm Comm;
@@ -54,60 +54,14 @@ typedef struct Comm Comm;
 	typedef struct DocumentationComponentFactory    DocumentationComponentFactory;
 	typedef struct HierarchyTable                   HierarchyTable;
 	typedef struct Stg_CallGraph			Stg_CallGraph;
-	typedef struct _Variable			Variable;
-	typedef struct _Variable_Register		Variable_Register;
-	typedef struct VariableDumpStream		VariableDumpStream;
-	typedef struct _VariableCondition		VariableCondition;
-	typedef struct _SetVC				SetVC;
-	typedef struct _CompositeVC			CompositeVC;
-	typedef struct DynamicVC			DynamicVC;
-	typedef struct _VariableCondition_Register	VariableCondition_Register;
-	typedef struct _ConditionFunction		ConditionFunction;
-	typedef struct _ConditionFunction_Register	ConditionFunction_Register;
 
-	typedef struct _VariableAllVC_Entry		VariableAllVC_Entry;
-	typedef struct _VariableAllVC			VariableAllVC;
-	typedef Index					VariableAllVC_Entry_Index;
-
-	/* Variable_Register types */
-	typedef Index					Variable_Set_Index;
-	typedef Index					Variable_Index;
-	typedef Index					Dof_Index;
-	
-	/* VariableCondition_Register types */
-	typedef struct _VariableCondition_Register_Entry VariableCondition_Register_Entry;
-	
-	/* VariableCondition types */
-	typedef enum
-	{
-		VC_ValueType_Double = 1,
-		VC_ValueType_Int,
-		VC_ValueType_Short,
-		VC_ValueType_Char,
-		VC_ValueType_Ptr,
-		VC_ValueType_DoubleArray,
-		VC_ValueType_CFIndex
-	} VariableCondition_ValueType;
-	
 	typedef struct SearchCriteria_t{
 		Name type;
 		Name version;	
 	}SearchCriteria;
 
-	typedef Index					VariableCondition_Index;
-	typedef struct _VariableCondition_Value		VariableCondition_Value;
-	typedef struct _VariableCondition_Tuple		VariableCondition_Tuple;
-	typedef Index					VariableCondition_ValueIndex;
-	typedef Index					ConditionFunction_Index;
-	typedef Index					VariableCondition_VariableIndex;
-
-	typedef struct _SetVC_Entry			SetVC_Entry;
-	typedef Index					SetVC_Entry_Index;
-	
-	/* CompositeVC types */
-	typedef Index					CompositeVC_ItemIndex;
-	
 	typedef void* (Stg_Component_Constructor) ( Name );
 	typedef void (Stg_Component_LoadFromDict) ( void*, Dictionary*, Dictionary*, Stg_ObjectList* );
 
-#endif /* __Base_Automation_types_h__ */
+
+#endif /* __StGermain_Base_Automation_types_h__ */

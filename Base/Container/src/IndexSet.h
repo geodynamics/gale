@@ -45,8 +45,8 @@
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __Base_Container_IndexSet_h__
-#define __Base_Container_IndexSet_h__
+#ifndef __StGermain_Base_Container_IndexSet_h__
+#define __StGermain_Base_Container_IndexSet_h__
 	
 
 	/** Virtual function template */
@@ -92,14 +92,22 @@
 	void IndexSet_Init( IndexSet* self, IndexSet_Index size );
 	
 	/** IndexSet_New() implementation. */
-	IndexSet* _IndexSet_New( 
-		SizeT				_sizeOfSelf, 
-		Type				type,
-		Stg_Class_DeleteFunction*		_delete,
-		Stg_Class_PrintFunction*		_print, 
-		Stg_Class_CopyFunction*		_copy, 
-		IndexSet_DuplicateFunction*	_duplicate,
-		IndexSet_Index			size );
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define INDEXSET_DEFARGS \
+                STG_CLASS_DEFARGS, \
+                IndexSet_DuplicateFunction*  _duplicate, \
+                IndexSet_Index                     size
+
+	#define INDEXSET_PASSARGS \
+                STG_CLASS_PASSARGS, \
+	        _duplicate, \
+	        size      
+
+	IndexSet* _IndexSet_New(  INDEXSET_DEFARGS  );
 	
 	/** IndexSet_Init() implementation. */
 	void _IndexSet_Init( IndexSet* self, IndexSet_Index size );
@@ -187,4 +195,5 @@
 	/** Prints message and exits properly when bad access/write detected. */
 	void _IndexSet_Abort( IndexSet* indexSet, const char* const funcName, IndexSet_Index index );
 
-#endif /* __Base_Container_IndexSet_h__ */
+#endif /* __StGermain_Base_Container_IndexSet_h__ */
+

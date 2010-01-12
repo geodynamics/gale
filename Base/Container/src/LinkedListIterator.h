@@ -38,8 +38,8 @@
 **
 **/
 
-#ifndef __Base_Foundation__LinkedListIterator_h__
-#define __Base_Foundation__LinkedListIterator_h__
+#ifndef __StGermain_Base_Container_LinkedListIterator_h__
+#define __StGermain_Base_Container_LinkedListIterator_h__
 
 	/** Textual name for LinkedListIterator class. */
 	extern const Type LinkedListIterator_Type;
@@ -58,13 +58,18 @@
 	/** Constructor interface. */
 	LinkedListIterator* LinkedListIterator_New( LinkedList *list );
 	
-	LinkedListIterator *_LinkedListIterator_New(
-			SizeT					_sizeOfSelf,
-			Type					type,
-			Stg_Class_DeleteFunction*	_delete,
-			Stg_Class_PrintFunction*	_print,
-			Stg_Class_CopyFunction*		_copy
-			);
+	
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define LINKEDLISTITERATOR_DEFARGS \
+                STG_CLASS_DEFARGS
+
+	#define LINKEDLISTITERATOR_PASSARGS \
+                STG_CLASS_PASSARGS
+
+	LinkedListIterator *_LinkedListIterator_New(  LINKEDLISTITERATOR_DEFARGS  );
 	
 	/** Init interface. */
 	void _LinkedListIterator_Init( LinkedListIterator *self );
@@ -82,4 +87,5 @@
 		(it==NULL)?NULL:(it->curr == NULL)?NULL:((it->curr = it->curr->next)==NULL)?NULL:it->curr->data
 
 
-#endif /* __Base_Foundation__LinkedListIterator_h__ */
+#endif /* __StGermain_Base_Container_LinkedListIterator_h__ */
+

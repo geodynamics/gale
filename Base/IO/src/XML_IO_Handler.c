@@ -35,6 +35,8 @@
 #include "Dictionary_Entry_Value.h"
 #include "IO_Handler.h"
 #include "Journal.h"
+#include "JournalFile.h"
+#include "Stream.h"
 #include "PathUtils.h"
 #include <libxml/tree.h>
 #include "XML_IO_Handler.h"
@@ -162,9 +164,22 @@ static void _XML_IO_Handler_WriteParameter( XML_IO_Handler*, char*, Dictionary_E
 
 
 XML_IO_Handler* XML_IO_Handler_New( void ) {
-	return _XML_IO_Handler_New( sizeof(XML_IO_Handler), XML_IO_Handler_Type, _XML_IO_Handler_Delete, _XML_IO_Handler_Print, 
-		NULL, _XML_IO_Handler_ReadAllFromFile, _XML_IO_Handler_ReadAllFromFileForceSource, _XML_IO_Handler_ReadAllFromBuffer, _XML_IO_Handler_WriteAllToFile, _XML_IO_Handler_WriteEntryToFile, 
-		_XML_IO_Handler_SetListEncoding, _XML_IO_Handler_SetWritingPrecision, _XML_IO_Handler_SetWriteExplicitTypes );
+	/* Variables set in this function */
+	SizeT                                                           _sizeOfSelf = sizeof(XML_IO_Handler);
+	Type                                                                   type = XML_IO_Handler_Type;
+	Stg_Class_DeleteFunction*                                           _delete = _XML_IO_Handler_Delete;
+	Stg_Class_PrintFunction*                                             _print = _XML_IO_Handler_Print;
+	Stg_Class_CopyFunction*                                               _copy = NULL;
+	IO_Handler_ReadAllFromFileFunction*                        _readAllFromFile = _XML_IO_Handler_ReadAllFromFile;
+	IO_Handler_ReadAllFromFileForceSourceFunction*  _readAllFromFileForceSource = _XML_IO_Handler_ReadAllFromFileForceSource;
+	IO_Handler_ReadAllFromBufferFunction*                    _readAllFromBuffer = _XML_IO_Handler_ReadAllFromBuffer;
+	IO_Handler_WriteAllToFileFunction*                          _writeAllToFile = _XML_IO_Handler_WriteAllToFile;
+	XML_IO_Handler_WriteEntryToFileFunction*                  _writeEntryToFile = _XML_IO_Handler_WriteEntryToFile;
+	XML_IO_Handler_SetListEncodingFunction*                    _setListEncoding = _XML_IO_Handler_SetListEncoding;
+	XML_IO_Handler_SetWritingPrecisionFunction*            _setWritingPrecision = _XML_IO_Handler_SetWritingPrecision;
+	XML_IO_Handler_SetWriteExplicitTypesFunction*        _setWriteExplicitTypes = _XML_IO_Handler_SetWriteExplicitTypes;
+
+	return _XML_IO_Handler_New(  XML_IO_HANDLER_PASSARGS  );
 }
 
 XML_IO_Handler* XML_IO_Handler_New_Schema( XML_IO_Handler* old );
@@ -189,35 +204,13 @@ void XML_IO_Handler_Init( XML_IO_Handler* self ) {
 	_XML_IO_Handler_Init( self );
 }
 
-XML_IO_Handler* _XML_IO_Handler_New( 
-		SizeT						_sizeOfSelf, 
-		Type						type,
-		Stg_Class_DeleteFunction*				_delete,
-		Stg_Class_PrintFunction*				_print, 
-		Stg_Class_CopyFunction*				_copy, 
-		IO_Handler_ReadAllFromFileFunction*		_readAllFromFile,
-		IO_Handler_ReadAllFromFileForceSourceFunction*		_readAllFromFileForceSource,
-		IO_Handler_ReadAllFromBufferFunction*		_readAllFromBuffer,
-		IO_Handler_WriteAllToFileFunction*		_writeAllToFile,
-		XML_IO_Handler_WriteEntryToFileFunction*	_writeEntryToFile, 
-		XML_IO_Handler_SetListEncodingFunction*		_setListEncoding,
-		XML_IO_Handler_SetWritingPrecisionFunction*	_setWritingPrecision,
-		XML_IO_Handler_SetWriteExplicitTypesFunction*	_setWriteExplicitTypes )
+XML_IO_Handler* _XML_IO_Handler_New(  XML_IO_HANDLER_DEFARGS  )
 {
 	XML_IO_Handler* self;
 	
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(XML_IO_Handler) );
-	self = (XML_IO_Handler*)_IO_Handler_New( 
-		_sizeOfSelf, 
-		type,
-		_delete,
-		_print,
-		_copy, 
-		_readAllFromFile,
-		_readAllFromFileForceSource,
-		_readAllFromBuffer,
-		_writeAllToFile );
+	self = (XML_IO_Handler*)_IO_Handler_New(  IO_HANDLER_PASSARGS  );
 	
 	/* General info */
 	
@@ -534,11 +527,6 @@ void _XML_IO_Handler_AddSearchPath( void* xml_io_handler, char* path ) {
 	self->searchPaths[ self->searchPathsSize - 1 ] = StG_Strdup( path );
 }
 
-
-
-
-
-
 /** Read all parameters from a file implementation. See IO_Handler_ReadAllFromFile(). It will first check if the file
  * exists, and contains valid XML. */
 Bool _XML_IO_Handler_ReadAllFromFile( void* xml_io_handler, const char* filename, Dictionary* dictionary ) {
@@ -613,10 +601,10 @@ Bool _XML_IO_Handler_ReadAllFromFile( void* xml_io_handler, const char* filename
 		_XML_IO_Handler_AddSearchPath( self, STG_INCLUDE_PATH );
 	#endif
 
-
-	
 	/* open the file and check syntax */
 	if ( !(rootElement = _XML_IO_Handler_OpenCheckFile( self, filename )) ) {
+		if( self->currDoc )
+			xmlFreeDoc( self->currDoc );
 		return False;
 	}
 	
@@ -627,7 +615,8 @@ Bool _XML_IO_Handler_ReadAllFromFile( void* xml_io_handler, const char* filename
 	_XML_IO_Handler_ParseNodes( self, firstElement, NULL, IO_Handler_DefaultMergeType, NULL );
 	
 	/* free memory */
-	xmlFreeDoc( self->currDoc );
+	if( self->currDoc )
+		xmlFreeDoc( self->currDoc );
 	xmlCleanupParser();
 	
 	return True;
@@ -667,7 +656,8 @@ Bool _XML_IO_Handler_ReadAllFromFileForceSource( void* xml_io_handler, const cha
 	_XML_IO_Handler_ParseNodes( self, firstElement, NULL, Dictionary_MergeType_Replace, (char*) rootElement->doc->URL );
 	
 	/* free memory */
-	xmlFreeDoc( self->currDoc );
+	if( self->currDoc )
+		xmlFreeDoc( self->currDoc );
 	xmlCleanupParser();
 	
 	return True;
@@ -692,7 +682,8 @@ Bool _XML_IO_Handler_ReadAllFromBuffer( void* xml_io_handler, const char* buffer
 	_XML_IO_Handler_ParseNodes( self, rootElement, NULL, Dictionary_MergeType_Replace, NULL );
 	
 	/* free memory */
-	xmlFreeDoc( self->currDoc );
+	if( self->currDoc )
+		xmlFreeDoc( self->currDoc );
 	xmlCleanupParser();
 	
 	return True;
@@ -702,31 +693,46 @@ Bool _XML_IO_Handler_ReadAllFromBuffer( void* xml_io_handler, const char* buffer
  * \return a pointer to the root node if the file is valid, NULL otherwise. */
 static xmlNodePtr _XML_IO_Handler_OpenCheckFile( XML_IO_Handler* self, const char* filename )
 {
-	xmlChar      absolute[1024];
-	xmlNodePtr   cur = NULL;
+   xmlChar		absolute[1024];
+   xmlNodePtr	cur = NULL;
+   Bool			status = False;
 
-	if ( FindFileInPathList(
-		(char*)absolute,
-		(char*)filename,
-		self->searchPaths,
-		self->searchPathsSize ) )
-	{
-		_XML_IO_Handler_OpenFile( self, (char*)absolute );
-	}
+   if ( !FindFileInPathList(
+      (char*)absolute,
+      (char*)filename,
+      self->searchPaths,
+      self->searchPathsSize ) )
+   {
+      Journal_RPrintf( Journal_Register( Error_Type, XML_IO_Handler_Type ),
+      "Error: File %s doesn't exist, not readable, or not valid.\n", filename );
+      exit(EXIT_FAILURE);
+   } 
 
-	Journal_Firewall( self->currDoc != NULL,
-		Journal_Register( Error_Type, XML_IO_Handler_Type ),
-		"Error: File %s doesn't exist, not readable, or not valid.\n",
-		filename );
+   _XML_IO_Handler_OpenFile( self, (char*)absolute );
 
-	cur = xmlDocGetRootElement( self->currDoc );
-	Journal_Firewall( _XML_IO_Handler_Check( self, self->currDoc ),
-		Journal_Register( Error_Type, XML_IO_Handler_Type ),
-		"Error: File %s not valid/readable.\n",
-		filename );
+   if( self->currDoc == NULL ) {
+      Journal_RPrintf( Journal_Register( Error_Type, XML_IO_Handler_Type ),
+      "Error: File %s doesn't exist, not readable, or not valid.\n", filename );
+      exit(EXIT_FAILURE);
+   }
 
-	return cur;
-	 
+   if( self->currDoc != NULL ) {
+      cur = xmlDocGetRootElement( self->currDoc );
+      status = _XML_IO_Handler_Check( self, self->currDoc );
+
+      if( !status ) {
+         Journal_RPrintf( Journal_Register( Error_Type, XML_IO_Handler_Type ),
+         "Error: File %s not valid/readable.\n", filename );
+         exit(EXIT_FAILURE);
+      }
+
+      if( status == True )
+         return cur;
+      else
+         return NULL;
+   }
+   else 
+      return NULL; 
 }
 
 static xmlNodePtr _XML_IO_Handler_OpenCheckBuffer( XML_IO_Handler* self, const char* buffer ) {
@@ -747,6 +753,7 @@ static xmlNodePtr _XML_IO_Handler_OpenCheckBuffer( XML_IO_Handler* self, const c
 	return rootElement;
 }
 
+#if 0
 static void _processNode(xmlTextReaderPtr reader) {
 	const xmlChar *name, *value;
 
@@ -771,16 +778,18 @@ static void _processNode(xmlTextReaderPtr reader) {
 			printf(" %s\n", value);
 	}
 }
+#endif
 
 static void _XML_IO_Handler_ValidateFile( XML_IO_Handler* self, const char* filename ) {
+	#ifdef LIBXML_VERSION 
+	#if LIBXML_VERSION == 20631
 	xmlTextReaderPtr reader;
-	int ret, valid;
+	//int valid;
+	int ret;
 
 	reader = xmlNewTextReaderFilename( filename );
 
 	if ( reader != NULL ) {
-	#ifdef LIBXML_VERSION 
-	#if LIBXML_VERSION == 20631
 
 		xmlNodePtr cur = NULL;
 		cur = xmlDocGetRootElement( self->currDoc );
@@ -822,11 +831,12 @@ static void _XML_IO_Handler_ValidateFile( XML_IO_Handler* self, const char* file
 		if (ret !=0) {
 			fprintf( stderr, "%s : failed to parse\n", filename );
 		}
-	#endif
-	#endif
 	} else {
 		fprintf( stderr, "unable to open %s\n", filename );
 	}
+	#endif
+	#endif
+    //xmlFree ( reader );
 }
 
 static void _XML_IO_Handler_OpenFile( XML_IO_Handler* self, const char* filename ) {
@@ -853,21 +863,18 @@ static void _XML_IO_Handler_OpenBuffer( XML_IO_Handler* self, const char* buffer
 }
 
 Bool _XML_IO_Handler_Check( XML_IO_Handler* self, xmlDocPtr currDoc ) {
-	xmlNodePtr    rootElement = NULL;
-	xmlNodePtr    cur = NULL;
+	xmlNodePtr	rootElement = NULL;
 	
 	rootElement = xmlDocGetRootElement( self->currDoc );
-	if (rootElement == NULL) {
+	if ( !rootElement ) {
 		Journal_Printf(
 			Journal_Register( Error_Type, XML_IO_Handler_Type ),
 			"Error: empty document. Not parsing.\n" );
-		xmlFreeDoc( self->currDoc );
 		return False;
 	}
 	
 	/* check the namespace */
-	if( False == _XML_IO_Handler_CheckNameSpace( self, rootElement ) ) {
-		xmlFreeDoc( self->currDoc );
+	if( _XML_IO_Handler_CheckNameSpace( self, rootElement ) == False ) {
 		return False;
 	}
 	
@@ -879,7 +886,6 @@ Bool _XML_IO_Handler_Check( XML_IO_Handler* self, xmlDocPtr currDoc ) {
 			self->resource,
 			(const char*) rootElement->name, 
 			ROOT_NODE_NAME );
-		xmlFreeDoc( self->currDoc );
 		return False;
 	}
 	
@@ -970,6 +976,7 @@ Bool _XML_IO_Handler_CheckNameSpace( XML_IO_Handler* self, xmlNodePtr curNode )
 				}
 			}
 		}
+        xmlFree( nsArray );
 	}
 	
 	Memory_Free( correctNameSpace );
@@ -1040,7 +1047,8 @@ static void _XML_IO_Handler_ParseNodes( XML_IO_Handler* self, xmlNodePtr cur, Di
 				
 			_XML_IO_Handler_AddSearchPath( self, (char*)tmp );
 
-			Memory_Free( tmp );
+            xmlFree( path );
+			//free( tmp );
 		}
 		else if	( (0 == xmlStrcmp( cur->name, (const xmlChar *) INCLUDE_TAG ) ) &&
 			( cur->ns == self->currNameSpace ) )
@@ -1139,23 +1147,22 @@ static void _XML_IO_Handler_ParseElement( XML_IO_Handler* self, xmlNodePtr cur, 
 		( cur->ns == self->currNameSpace ) ) {
 		_XML_IO_Handler_ParseStruct( self, cur, parent, mergeType, source );
 	}
+    xmlFree( name );
 }
 
 static void _XML_IO_Handler_ParseComponents( XML_IO_Handler* self, xmlNodePtr cur, Dictionary_Entry_Value* parent, 
 					Dictionary_MergeType defaultMergeType, Dictionary_Entry_Source source )
 {
-	xmlChar* name = (xmlChar*) "name";
-	xmlNewProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*) name );
-	xmlSetProp( cur, (xmlChar*) NAME_ATTR, "components" );
+	xmlNewProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*) "name" );
+	xmlSetProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*)"components" );
 	_XML_IO_Handler_ParseStruct( self, cur, parent, defaultMergeType, source );
 }
 
 static void _XML_IO_Handler_ParsePlugins( XML_IO_Handler* self, xmlNodePtr cur, Dictionary_Entry_Value* parent, 
 					Dictionary_MergeType defaultMergeType, Dictionary_Entry_Source source )
 {
-	xmlChar* name = (xmlChar*) "name";
-	xmlNewProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*) name );
-	xmlSetProp( cur, (xmlChar*) NAME_ATTR, "plugins" );
+	xmlNewProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*) "name" );
+	xmlSetProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*)"plugins" );
 	_XML_IO_Handler_ParseList( self, cur, parent, defaultMergeType, source );
 }
 
@@ -1168,9 +1175,8 @@ static void _XML_IO_Handler_ParsePlugin( XML_IO_Handler* self, xmlNodePtr cur, D
 static void _XML_IO_Handler_ParseImport( XML_IO_Handler* self, xmlNodePtr cur, Dictionary_Entry_Value* parent, 
 					Dictionary_MergeType defaultMergeType, Dictionary_Entry_Source source )
 {
-	xmlChar* name = (xmlChar*) "name";
-	xmlNewProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*) name );
-	xmlSetProp( cur, (xmlChar*) NAME_ATTR, "import" );
+	xmlNewProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*) "name" );
+	xmlSetProp( cur, (xmlChar*) NAME_ATTR, (xmlChar*)"import" );
 	_XML_IO_Handler_ParseList( self, cur, parent, defaultMergeType, source );
 }
 
@@ -1191,8 +1197,6 @@ static void _XML_IO_Handler_ParseList( XML_IO_Handler* self, xmlNodePtr cur, Dic
 	xmlChar* childrenMergeTypeStr = xmlGetProp( cur, CHILDRENMERGETYPE_ATTR );
 	xmlChar* spaceStrippedName = NULL;
 	xmlChar* spaceStrippedSourceFile = NULL;
-	xmlChar* spaceStrippedMergeType = NULL;
-	xmlChar* spaceStrippedChildrenMergeType = NULL;
 	Dictionary_Entry_Value* newList = NULL;
 	Dictionary_MergeType mergeType = defaultMergeType;
 	Dictionary_MergeType childrenMergeType = Dictionary_MergeType_Append;
@@ -1382,6 +1386,7 @@ static void _XML_IO_Handler_ParseColumnDefinitions( XML_IO_Handler* self, xmlNod
 	ColumnInfo columnInfo[MAX_COLUMNS], int* const numColumnsPtr )
 {
 	char* stringPtr;
+
 	/* read any column definitions */
 	while ( (XML_ELEMENT_NODE == cur->type) &&
 		(0 == xmlStrcmp( cur->name, (const xmlChar *) COLUMN_DEFINITION_TAG ) ) &&
@@ -1438,11 +1443,11 @@ static char* _XML_IO_Handler_GetNextAsciiToken( XML_IO_Handler* self, xmlNodePtr
 
 /** parses a node containing struct info. */
 static void _XML_IO_Handler_ParseStruct( 
-		XML_IO_Handler*					self, 
-		xmlNodePtr					cur, 
-		Dictionary_Entry_Value*				parent, 
-		Dictionary_MergeType				defaultMergeType,
-		Dictionary_Entry_Source				source )
+	XML_IO_Handler*			self, 
+	xmlNodePtr					cur, 
+	Dictionary_Entry_Value*	parent, 
+	Dictionary_MergeType		defaultMergeType,
+	Dictionary_Entry_Source	source )
 {
 	xmlChar* name = xmlGetProp( cur, NAME_ATTR );
 	xmlChar* sourceFile = xmlGetProp( cur, SOURCEFILE_ATTR );
@@ -1450,8 +1455,6 @@ static void _XML_IO_Handler_ParseStruct(
 	xmlChar* childrenMergeTypeStr = xmlGetProp( cur, CHILDRENMERGETYPE_ATTR );
 	xmlChar* spaceStrippedName = NULL;
 	xmlChar* spaceStrippedSourceFile = NULL;
-	xmlChar* spaceStrippedMergeType = NULL;
-	xmlChar* spaceStrippedChildrenMergeType = NULL;
 	Dictionary_Entry_Value* newStruct = NULL;
 	Dictionary_MergeType mergeType = defaultMergeType;
 	Dictionary_MergeType childrenMergeType = IO_Handler_DefaultChildrenMergeType;
@@ -1515,7 +1518,6 @@ static void _XML_IO_Handler_ParseParameter(
 	Dictionary_Entry_Value_Type dictValueType = _XML_IO_Handler_GetDictValueType( self, (char*) type );
 	xmlChar* spaceStrippedName = NULL;
 	xmlChar* spaceStrippedSourceFile = NULL;
-	xmlChar* spaceStrippedMergeType = NULL;
 	xmlChar* spaceStrippedType = NULL;
 	xmlChar* strippedVal = NULL;
 	Dictionary_MergeType mergeType = defaultMergeType;
@@ -1792,7 +1794,8 @@ Bool _XML_IO_Handler_WriteAllToFile( void* xml_io_handler, const char* filename,
 	}
 	
 	/* Memory_Free memory */
-	xmlFreeDoc( self->currDoc );
+	if( self->currDoc )
+		xmlFreeDoc( self->currDoc );
 	/*xmlCleanupParser(); */
 	/* TODO if updating, xmlCleanupParser(); */
 	self->currDoc = NULL;
@@ -1863,16 +1866,16 @@ Bool _XML_IO_Handler_WriteEntryToFile( void* xml_io_handler, const char* filenam
 	/* write result to file */
 	if ( 0 < (fileSize = xmlSaveFormatFile( filename, self->currDoc, 1 )) ) {
 		Journal_Printf( stream, "Writing dictionary entry %s to file %s successfully concluded.\n", name, filename );
-	} else
-	{
+	}
+	else {
 		Journal_Printf( 
 			Journal_Register( Error_Type, XML_IO_Handler_Type ),
 			"Warning: failed to write dictionary entry %s to file %s.\n", 
 			name, 
 			filename );
 	}
-	
-	xmlFreeDoc( self->currDoc );
+	if( self->currDoc )	
+		xmlFreeDoc( self->currDoc );
 	/*xmlCleanupParser();*/
 	/* TODO if updating, xmlCleanupParser(); */
 	self->currDoc = NULL;
@@ -1896,7 +1899,7 @@ static void _XML_IO_Handler_WriteDictionary( XML_IO_Handler* self, Dictionary* d
 	for (index=0; index < dict->count; index++) {
 		Dictionary_Entry* currEntryPtr = dict->entryPtr[index];
 	
-		if ( strcmp(currEntryPtr->key, IMPORT_TAG) == 0 ) 
+		if ( strcmp(currEntryPtr->key, (const char*)IMPORT_TAG) == 0 ) 
 			_XML_IO_Handler_WriteNode( self, currEntryPtr->key, currEntryPtr->value, currEntryPtr->source, parent );
 	}
 
@@ -1904,7 +1907,7 @@ static void _XML_IO_Handler_WriteDictionary( XML_IO_Handler* self, Dictionary* d
 	for (index=0; index < dict->count; index++) {
 		Dictionary_Entry* currEntryPtr = dict->entryPtr[index];
 	
-		if ( strcmp(currEntryPtr->key, PLUGINS_TAG) == 0 ) 
+		if ( strcmp(currEntryPtr->key, (const char*)PLUGINS_TAG) == 0 ) 
 			_XML_IO_Handler_WriteNode( self, currEntryPtr->key, currEntryPtr->value, currEntryPtr->source, parent );
 	}
 
@@ -1912,7 +1915,7 @@ static void _XML_IO_Handler_WriteDictionary( XML_IO_Handler* self, Dictionary* d
 	for (index=0; index < dict->count; index++) {
 		Dictionary_Entry* currEntryPtr = dict->entryPtr[index];
 	
-		if ( ( strcmp(currEntryPtr->key, IMPORT_TAG) != 0 )  && ( strcmp(currEntryPtr->key, PLUGINS_TAG) != 0 ) )  
+		if ( ( strcmp(currEntryPtr->key, (const char*)IMPORT_TAG) != 0 )  && ( strcmp(currEntryPtr->key, (const char*)PLUGINS_TAG) != 0 ) )  
 			_XML_IO_Handler_WriteNode( self, currEntryPtr->key, currEntryPtr->value, currEntryPtr->source, parent );
 	}
 }
@@ -1947,10 +1950,10 @@ static void _XML_IO_Handler_WriteList( XML_IO_Handler* self, char* name, Diction
 
 	/* create and add list child node */
 	if ( NULL != name ) {
-		if ( strcmp(name, PLUGINS_TAG) == 0 ) {
+		if ( strcmp(name, (const char*)PLUGINS_TAG) == 0 ) {
 			newNode = xmlNewTextChild( parent, self->currNameSpace, PLUGINS_TAG, NULL );
 		}
-		else if ( strcmp(name, IMPORT_TAG) == 0 ) {
+		else if ( strcmp(name, (const char*)IMPORT_TAG) == 0 ) {
 			newNode = xmlNewTextChild( parent, self->currNameSpace, IMPORT_TAG, NULL );
 		}
 		else
@@ -2236,7 +2239,7 @@ static void _XML_IO_Handler_WriteStruct( XML_IO_Handler* self, char* name, Dicti
 
 	/* create and add struct child node*/
 	if ( NULL != name ) {
-		if ( strcmp(name, COMPONENTS_TAG) == 0 ) {
+		if ( strcmp(name, (const char*)COMPONENTS_TAG) == 0 ) {
 			newNode = xmlNewTextChild( parent, self->currNameSpace, COMPONENTS_TAG, NULL );
 		}
 		else
@@ -2275,10 +2278,10 @@ static void _XML_IO_Handler_WriteParameter( XML_IO_Handler* self, char* name, Di
 		"_XML_IO_Handler_WriteParameter called.\n");
 
 	/* add new child to parent, with correct value*/
-	if ( strcmp((char *)parent->name, PLUGINS_TAG) == 0 ) {
+	if ( strcmp((char *)parent->name, (const char*)PLUGINS_TAG) == 0 ) {
 		newNode = xmlNewTextChild( parent, self->currNameSpace, PLUGIN_TAG, (xmlChar*) Dictionary_Entry_Value_AsString( value ) );
 	}
-	else if ( strcmp((char *)parent->name, IMPORT_TAG) == 0 ) {
+	else if ( strcmp((char *)parent->name, (const char*)IMPORT_TAG) == 0 ) {
 		newNode = xmlNewTextChild( parent, self->currNameSpace, TOOLBOX_TAG, (xmlChar*) Dictionary_Entry_Value_AsString( value ) );
 	}
 	else {
@@ -2328,6 +2331,7 @@ static Dictionary_MergeType _XML_IO_Handler_GetMergeType( XML_IO_Handler* self, 
 				XML_IO_Handler_MergeTypeMap[defaultMergeType] );
 			mergeType = defaultMergeType;
 		}
+    Memory_Free( spaceStrippedMergeType );
 	}
 	else {
 		mergeType = defaultMergeType;
@@ -2343,3 +2347,5 @@ void XML_IO_Handler_LibXMLErrorHandler( void* ctx, const char* msg, ... ) {
    Stream_Printf( Journal_Register( Error_Type, XML_IO_Handler_Type ), msg, ap );
    va_end(ap);
 }
+
+
