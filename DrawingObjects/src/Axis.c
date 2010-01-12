@@ -223,7 +223,6 @@ void _lucAxis_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* vie
    GLdouble modelMatrix[16];
    GLdouble projMatrix[16];
    GLint    viewportArray[4];
-   double  wx = 20, wy = 20, wz = 0.1;
 
    glGetDoublev( GL_MODELVIEW_MATRIX, modelMatrix );
    glGetDoublev( GL_PROJECTION_MATRIX, projMatrix );

@@ -162,7 +162,7 @@ void _lucFeVariableSurface_AssignFromXML( void* drawingObject, Stg_ComponentFact
 			Stg_ComponentFactory_GetString( cf, self->name, "colour", "black" ),
 			Stg_ComponentFactory_GetBool( cf, self->name, "wireframe", False ),
 			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 1.0 ),
-			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "scaleHeight", 0.0 ) );
+			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "scaleHeight", 1.0 ) );
 }
 
 void _lucFeVariableSurface_Build( void* drawingObject, void* data ) {}

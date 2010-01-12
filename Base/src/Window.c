@@ -118,7 +118,8 @@ void _lucWindow_Init(
 		Bool                                               interactive,
 		Bool                                               continuous,
 		Bool                                               isTimedOut,
-		double                                             maxIdleTime ) 
+		double                                             maxIdleTime,
+      Bool                                               antialias ) 
 {
 	OutputFormat_Index   outputFormat_I;
 	WindowInteraction_Index windowInteraction_I;
@@ -129,6 +130,7 @@ void _lucWindow_Init(
     self->resized = False;
 	self->interactive = interactive;
 	self->continuous = continuous; 
+	self->antialias = antialias;
 
 	self->viewportInfoList = Memory_Alloc_Array( lucViewportInfo, viewportCount, "viewport info Array" );
 	memcpy( self->viewportInfoList, viewportInfoList, viewportCount * sizeof( lucViewportInfo ) );
@@ -316,7 +318,8 @@ void _lucWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* dat
 			interactive,
 			continuous,
 			Stg_ComponentFactory_GetBool( cf, self->name, "isTimedOut", False ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "maxIdleTime", 600.0 ) 
+			Stg_ComponentFactory_GetDouble( cf, self->name, "maxIdleTime", 600.0 ), 
+			Stg_ComponentFactory_GetBool( cf, self->name, "antialias", True )
 			);
 		
 	/* Free Memory */
@@ -392,10 +395,10 @@ void _lucWindow_Execute( void* window, void* data ) {
         	MPI_Bcast( &redisplay, 1, MPI_INT, MASTER, self->context->communicator );
       
 			/* Still events to process? delay redisplay until queue empty */
-			if (events <= 1)
+			if (events <= 1 && redisplay)
 			{
 				/* Redraw Window (Call virtual to display) */
-				if (redisplay) self->_displayWindow( self );
+				self->_displayWindow( self );
 				redisplay = False;
 			}
 		}
@@ -411,14 +414,15 @@ void _lucWindow_Execute( void* window, void* data ) {
 	
 	/* Stop idle timeout */
 	self->idleTime = 0;
-	
+
+   /* Clean up drawing objects */	
+	lucWindow_CleanUp( window, data );
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
 
 void _lucWindow_Destroy( void* window, void* data ) {
 	lucWindow*     self      = (lucWindow*)window;
 
-	lucWindow_CleanUp( window, data );
 	Memory_Free(self->title);
     lucDeleteFont(); 
 }
