@@ -170,14 +170,14 @@ void _GaussParticleLayout_AssignFromXML( void* gaussParticleLayout, Stg_Componen
 
    _PerCellParticleLayout_AssignFromXML( self, cf, data );
 
-	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
+	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0  );
 
-	defaultVal = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "gaussParticles", 2 );
+	defaultVal = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"gaussParticles", 2  );
 
-	particlesPerDim[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "gaussParticlesX", defaultVal );
-	particlesPerDim[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "gaussParticlesY", defaultVal );
-	if ( dim == 3 )
-		particlesPerDim[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "gaussParticlesZ", defaultVal );
+	particlesPerDim[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"gaussParticlesX", defaultVal  );
+	particlesPerDim[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"gaussParticlesY", defaultVal );
+	if ( dim == 3  )
+		particlesPerDim[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"gaussParticlesZ", defaultVal  );
 	else
 		particlesPerDim[ K_AXIS ] = 1;	
 
@@ -345,7 +345,7 @@ void GaussParticleLayout_GetAbscissaAndWeights1D( double* weight, double* abscis
 		default:
 			Journal_Firewall( 
 				pointCount <= 5, 
-				Journal_Register( Error_Type, GaussParticleLayout_Type ),
+				Journal_Register( Error_Type, (Name)GaussParticleLayout_Type  ),
 				"In func %s: Cannot give values for '%u' gauss points\n.", 
 				__func__, 
 				pointCount );

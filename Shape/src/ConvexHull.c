@@ -211,14 +211,14 @@ void _ConvexHull_AssignFromXML( void* convexHull, Stg_ComponentFactory* cf, void
 	
 	_Stg_Shape_AssignFromXML( self, cf, data );
 
-	optionsList = Dictionary_Get( dictionary, "verticies" );
+	optionsList = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"verticies"  );
 	Journal_Firewall( optionsList != NULL, 
-		Journal_Register( Error_Type, self->type ),
+		Journal_Register( Error_Type, (Name)self->type  ),
 		"In func %s: The list 'verticies' specifying the convexHull is NULL.\n", __func__);
 
 	vertexCount = Dictionary_Entry_Value_GetCount(optionsList);
 	Journal_Firewall( ( self->dim == 2 && vertexCount < 4 ) || ( self->dim == 3 && vertexCount < 5 ),
-		Journal_Register( Error_Type, self->type ),
+		Journal_Register( Error_Type, (Name)self->type  ),
 		"In func %s: Sorry, but we got lazy, you can only specify 3 (2D) or 4 (3D) points. " 
 		"Please feel free to hassle developers for this feature.\n", __func__);
 
@@ -232,13 +232,13 @@ void _ConvexHull_AssignFromXML( void* convexHull, Stg_ComponentFactory* cf, void
 		coord = vertexList[vertex_I];
 
 		/* Read Vertex */
-		coord[ I_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, "x"));
-		coord[ J_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, "y"));
+		coord[ I_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, (Dictionary_Entry_Key)"x") );
+		coord[ J_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, (Dictionary_Entry_Key)"y") );
 		
-		coord[ K_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, "z"));
+		coord[ K_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, (Dictionary_Entry_Key)"z"));
 		optionSet = optionSet->next;
 	}
-	Stream_UnIndent( stream );
+	Stream_UnIndent( stream  );
 
 
 	_ConvexHull_Init( self, vertexList, vertexCount);
@@ -300,7 +300,7 @@ double _ConvexHull_CalculateVolume( void* convexHull ) {
 }
 void _ConvecHull_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ) {
 	Stg_Shape* self = (Stg_Shape*)shape;
-	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }

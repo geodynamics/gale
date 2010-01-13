@@ -125,7 +125,7 @@ void SpaceFillerParticleLayoutSuite_TestSpaceFillerParticle( SpaceFillerParticle
 		Stg_Component_Initialise( swarm, 0, False );
 
 		Journal_Enable_AllTypedStream( True );
-		stream = Journal_Register( Info_Type, "TestSpaceFillerParticle" );
+		stream = Journal_Register( Info_Type, (Name)"TestSpaceFillerParticle"  );
 		Stream_RedirectFile( stream, "spaceFillerParticle.dat" );
 		Swarm_PrintParticleCoords_ByCell( swarm, stream );
 		Journal_Enable_AllTypedStream( False );

@@ -73,7 +73,7 @@ void StGermain_RectangularToSpherical(double* sphericalCoords, double* rectangul
 		theta_sin_solution1 = asin( Y/(RADIUS*sin(PHI)) );		/* Solution is between -PI/2 and PI/2 i.e. quadrant 1 and 4 */
 	}
 	else {
-		Stream* error = Journal_Register( Error_Type , __FILE__ );
+		Stream* error = Journal_Register( Error_Type , (Name)__FILE__  );
 		Journal_Printf( error, "Func %s does not work with dimension %u\n", __func__, dim );
 		exit(EXIT_FAILURE);
 	}

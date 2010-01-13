@@ -157,9 +157,9 @@ void _BelowCosinePlane_AssignFromXML( void* belowPlane, Stg_ComponentFactory* cf
 
 	_BelowPlane_AssignFromXML( self, cf, data );
 
-	amplitude = Stg_ComponentFactory_GetDouble( cf, self->name, "amplitude", 0.1 );
-	wavelength = Stg_ComponentFactory_GetDouble( cf, self->name, "wavelength", 2*M_PI );
-	phase = Stg_ComponentFactory_GetDouble( cf, self->name, "phase", 0.0 );
+	amplitude = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"amplitude", 0.1  );
+	wavelength = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"wavelength", 2*M_PI  );
+	phase = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"phase", 0.0  );
 
 	_BelowCosinePlane_Init( self, self->width, amplitude, wavelength, phase );
 }
@@ -233,7 +233,7 @@ double _BelowCosinePlane_CalculateVolume( void* belowPlane ) {
 }
 void _BelowCosinePlane_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ) {
 	Stg_Shape* self = (Stg_Shape*)shape;
-	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }

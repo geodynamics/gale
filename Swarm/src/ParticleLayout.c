@@ -132,9 +132,9 @@ void _ParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *
    ParticleLayout* self = (ParticleLayout*) particleLayout;
    AbstractContext* context=NULL;
 
-   context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-   if( !context )
-      context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+   context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+   if( !context  )
+      context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 
    _ParticleLayout_Init( self, context, GlobalCoordSystem, False );
 

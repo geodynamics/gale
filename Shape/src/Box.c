@@ -159,20 +159,20 @@ void _Box_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) {
 		*widthCharPtr = axisLetters[ dim_I ];
 
 		/* Check to see whether the user wants to specify the start and end explicitly */
-		if ( Dictionary_Get( dictionary, startKey ) && Dictionary_Get( dictionary, endKey ) ) {
-			start = Stg_ComponentFactory_GetDouble( cf, self->name, startKey, 0.0 );
-			end   = Stg_ComponentFactory_GetDouble( cf, self->name, endKey,   0.0 );
+		if ( Dictionary_Get( dictionary, (Dictionary_Entry_Key)startKey  ) && Dictionary_Get( dictionary, (Dictionary_Entry_Key)endKey )  ) {
+			start = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)startKey, 0.0  );
+			end   = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)endKey, 0.0  );
 
 			width[ dim_I ] = end - start;
 			self->centre[ dim_I ] = start + 0.5 * width[dim_I];
 		}
 		else 
-			width[ dim_I ] = Stg_ComponentFactory_GetDouble( cf, self->name, widthKey, 0.0 );
+			width[ dim_I ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)widthKey, 0.0 );
 	}
 
 	Memory_Free( startKey );
 	Memory_Free( endKey );
-	Memory_Free( widthKey );
+	Memory_Free( widthKey  );
 
 	_Box_Init( self, width );
 }
@@ -235,7 +235,7 @@ double _Box_CalculateVolume( void* shape ) {
 void _Box_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ) {
 	/* To be implemented */
 	Stg_Shape* self = (Stg_Shape*)shape;
-	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }

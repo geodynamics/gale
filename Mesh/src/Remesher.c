@@ -105,7 +105,7 @@ void _Remesher_Print( void* remesher, Stream* stream ) {
    Stream*		myStream;
 	
    /* Set the Journal for printing informations */
-   myStream = Journal_Register( InfoStream_Type, "RemesherStream" );
+   myStream = Journal_Register( InfoStream_Type, (Name)"RemesherStream"  );
 
    /* Print parent */
    _Stg_Component_Print( self, stream );
@@ -127,11 +127,11 @@ void _Remesher_AssignFromXML( void* remesher, Stg_ComponentFactory* cf, void* da
    assert( cf );
    assert( cf->componentDict );
 
-   context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-   if( !context )
-      context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+   context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+   if( !context  )
+      context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 
-   mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
+   mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"mesh", Mesh, True, data  );
 
 	_Remesher_Init ( self, context, mesh );
 }

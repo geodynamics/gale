@@ -114,11 +114,11 @@ void AllNodesVCSuite_TestAllNodesVC( AllNodesVCSuiteData* data ) {
 
    io_handler = XML_IO_Handler_New();
 
- 	stream = Journal_Register( Info_Type, "AllNodesVCStream" );
+ 	stream = Journal_Register( Info_Type, (Name)"AllNodesVCStream"  );
    Stream_RedirectFile( stream, "testAllNodesVC.dat" );
 
    dictionary = Dictionary_New();
-   Dictionary_Add(dictionary, "outputPath", Dictionary_Entry_Value_FromString("./output"));
+   Dictionary_Add( dictionary, (Dictionary_Entry_Key)"outputPath", Dictionary_Entry_Value_FromString("./output") );
 
 	/* Input file */
 	pcu_filename_input( "allVC.xml", input_file );
@@ -132,8 +132,8 @@ void AllNodesVCSuite_TestAllNodesVC( AllNodesVCSuiteData* data ) {
    nDomains = Mesh_GetDomainSize( mesh, MT_VERTEX );
 
    /* Create CF stuff */
-   quadCF = ConditionFunction_New(AllNodesVCSuite_quadratic, "quadratic");
-   conFunc_Register = ConditionFunction_Register_New();
+   quadCF = ConditionFunction_New( AllNodesVCSuite_quadratic, (Name)"quadratic");
+   conFunc_Register = ConditionFunction_Register_New( );
    ConditionFunction_Register_Add(conFunc_Register, quadCF);
 
 	/* Create variable register */
@@ -142,7 +142,7 @@ void AllNodesVCSuite_TestAllNodesVC( AllNodesVCSuiteData* data ) {
    /* Create variables */
    for (i = 0; i < 6; i++) {
 		array[i] = Memory_Alloc_Array( double, nDomains, "array[i]" );
-      var[i] = Variable_NewScalar( varName[i], NULL, Variable_DataType_Double, &nDomains, NULL, (void**)&array[i], 0 );
+      var[i] = Variable_NewScalar( varName[i], NULL, Variable_DataType_Double, (Index*)&nDomains, NULL, (void**)&array[i], 0  );
       Variable_Register_Add(variable_Register, var[i]);
    }
    array[6] = Memory_Alloc_Array( double, nDomains*5, "array[6]" );

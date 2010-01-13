@@ -93,7 +93,7 @@ void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) 
 	pcu_filename_input( "testSwarmParticleAdvectionSingleAttractor.xml", input_file );
 
 	cf = stgMainInitFromXML( input_file, data->comm, NULL );
-	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context"  );
 	Stream_Enable( cf->infoStream, False );
 	Stream_Enable( context->info, False );
 	Stream_Enable( context->verbose, False );
@@ -106,9 +106,9 @@ void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) 
 
 	KeyCall( context, context->constructExtensionsK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(context,context->constructExtensionsK), context );
 
-	swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
-	ExtensionManager_Add( swarm->particleExtensionMgr, "ParticleVelocity", sizeof(double[3]) );
-	ExtensionManager_Add( swarm->particleExtensionMgr, "ParticleColour", sizeof(double) );
+	swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"swarm"  );
+	ExtensionManager_Add( swarm->particleExtensionMgr, (Name)"ParticleVelocity", sizeof(double[3])  );
+	ExtensionManager_Add( swarm->particleExtensionMgr, (Name)"ParticleColour", sizeof(double)  );
 
 	Swarm_NewVectorVariable(
 		swarm,
@@ -166,10 +166,10 @@ void SingleAttractorSuite_SingleAttractor( DomainContext* context ) {
 	Particle_InCellIndex	cParticle_I;
 	Particle*				currParticle;
 	Index						dim_I;
-	Swarm*					swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
+	Swarm*					swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"swarm"  );
 	Coord						attractorPoint;
 	Mesh*						mesh;
-	Stream*					stream = Journal_Register( Info_Type, "particleUpdate" );
+	Stream*					stream = Journal_Register( Info_Type, (Name)"particleUpdate"  );
 	unsigned int			movementSpeedDivisor = 0;
 	int						movementSign = 1;
 	unsigned int			explosionPeriod = 20;
@@ -178,9 +178,9 @@ void SingleAttractorSuite_SingleAttractor( DomainContext* context ) {
 	Stream_RedirectFile( stream, "testSingleAttractor.dat" );
 
 	Stream_SetPrintingRank( stream, Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "procToWatch", 0 ) );
-	movementSpeedDivisor = Dictionary_GetDouble_WithDefault( context->dictionary, "movementSpeedDivisor", 10 );
+	movementSpeedDivisor = Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"movementSpeedDivisor", 10 );
 	
-	mesh = (Mesh*)LiveComponentRegister_Get( context->CF->LCRegister, "mesh-linear" );
+	mesh = (Mesh* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"mesh-linear"  );
 	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
 	for ( dim_I=0; dim_I < 3; dim_I++ ) {
 		attractorPoint[dim_I] = (maxCrd[dim_I] - minCrd[dim_I]) / 3;

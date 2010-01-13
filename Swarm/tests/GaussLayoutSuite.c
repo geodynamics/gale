@@ -135,7 +135,7 @@ void GaussLayoutSuite_TestDriver( GaussLayoutSuiteData* data, char* name,  char*
 		count = 0;
 
 		Journal_Enable_AllTypedStream( True );
-		stream = Journal_Register( Info_Type, name );
+		stream = Journal_Register( Info_Type, (Name)name  );
 		Stream_RedirectFile( stream, output );
 
 		/* Checks that the particule count on each cell are the same. */

@@ -106,7 +106,7 @@ void _Grid_Print( void* grid, Stream* stream ) {
 
 	/* Set the Journal for printing informations */
 	Stream* gridStream;
-	gridStream = Journal_Register( InfoStream_Type, "GridStream" );
+	gridStream = Journal_Register( InfoStream_Type, (Name)"GridStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "Grid (ptr): (%p)\n", self );

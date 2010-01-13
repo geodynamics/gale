@@ -63,11 +63,11 @@ void DofLayoutSuite_Teardown( DofLayoutSuiteData* data ) {
 void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 	char		expected_file[PCU_PATH_MAX];
 	int		procToWatch;
-	Stream*	stream = Journal_Register( Info_Type, "DofLayoutBasic" );	
+	Stream*	stream = Journal_Register( Info_Type, (Name)"DofLayoutBasic" );	
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
-	if( data->rank == procToWatch ) {
+	if( data->rank == procToWatch  ) {
 		DofLayout*				dof;
 		DofLayout*				destDof;
 		Variable_Register*	variableRegister;
@@ -86,7 +86,7 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 		/* Create variables */
 		for (var_I = 0; var_I < 6; var_I++) {
 			varArrays[var_I] = Memory_Alloc_Array_Unnamed( double, arraySize );
-			var[var_I] = Variable_NewScalar( varName[var_I], NULL, Variable_DataType_Double, &arraySize, NULL, (void**)&(varArrays[var_I]), variableRegister );
+			var[var_I] = Variable_NewScalar( varName[var_I], NULL, Variable_DataType_Double, (Index*)&arraySize, NULL, (void**)&(varArrays[var_I]), variableRegister  );
 			Stg_Component_Build( var[var_I], 0, False );
 			Stg_Component_Initialise( var[var_I], 0, False );
 		}
@@ -228,11 +228,11 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
 	char		expected_file[PCU_PATH_MAX];
 	int		procToWatch;
-	Stream*	stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
+	Stream*	stream = Journal_Register( Info_Type, (Name)"DofLayoutRemap" );	
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
-	if( data->rank == procToWatch ) {
+	if( data->rank == procToWatch  ) {
 		DofLayout*				dof;
 		double					dummyVar;
 		double*					dummyPtr = &dummyVar;
@@ -250,7 +250,7 @@ void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
 
 		/* Create variables */
 		for (i = 0; i < 6; i++) {
-			var[i] = Variable_NewScalar( varName[i], NULL, Variable_DataType_Double, &arraySize, NULL, (void**)&dummyPtr, 0 );
+			var[i] = Variable_NewScalar( varName[i], NULL, Variable_DataType_Double, (Index*)&arraySize, NULL, (void**)&dummyPtr, 0  );
 			Variable_Register_Add(variableRegister, var[i]);
 		}
 
@@ -299,11 +299,11 @@ void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
 void DofLayoutSuite_TestSaveAndLoad( DofLayoutSuiteData* data ) {
 	char		expected_file[PCU_PATH_MAX];
 	int		procToWatch;
-	Stream*	stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
+	Stream*	stream = Journal_Register( Info_Type, (Name)"DofLayoutRemap" );	
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 	
-	if( data->rank == procToWatch ) {
+	if( data->rank == procToWatch  ) {
 		DofLayout*				dof;
 		Variable_Register*	variableRegister;
 		Variable*				var[6];
@@ -320,7 +320,7 @@ void DofLayoutSuite_TestSaveAndLoad( DofLayoutSuiteData* data ) {
 		/* Create variables */
 		for (var_I = 0; var_I < 6; var_I++) {
 			varArrays[var_I] = Memory_Alloc_Array_Unnamed( double, arraySize );
-			var[var_I] = Variable_NewScalar( varName[var_I], NULL, Variable_DataType_Double, &arraySize, NULL, (void**)&(varArrays[var_I]), variableRegister );
+			var[var_I] = Variable_NewScalar( varName[var_I], NULL, Variable_DataType_Double, (Index*)&arraySize, NULL, (void**)&(varArrays[var_I]), variableRegister  );
 			Stg_Component_Build( var[var_I], 0, False );
 			Stg_Component_Initialise( var[var_I], 0, False );
 		}

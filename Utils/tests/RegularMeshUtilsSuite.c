@@ -95,11 +95,11 @@ void RegularMeshUtilsSuite_TestMeshUtils( RegularMeshUtilsSuiteData* data ) {
 	Stream*							stream; 	
 
 	Journal_Enable_NamedStream( Info_Type, CartesianGenerator_Type, False );
-	stream = Journal_Register( Info_Type, "RegularMeshUtilsStream" );
+	stream = Journal_Register( Info_Type, (Name)"RegularMeshUtilsStream" );
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
-	extensionMgr_Register = ExtensionManager_Register_New();
+	extensionMgr_Register = ExtensionManager_Register_New( );
 	mesh = RegularMeshUtilsSuite_buildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
 
 	if( data->rank == procToWatch ) {

@@ -68,12 +68,12 @@ void ComplexVectorMathSuite_Teardown( ComplexVectorMathSuiteData* data ) {
 
 void ComplexVectorMathSuite_TestComplexVectorMathBasic( ComplexVectorMathSuiteData* data ) {
 	unsigned	procToWatch;
-	Stream*	stream = Journal_Register( Info_Type, "VectorMathBasicStream" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"VectorMathBasicStream" );
 	char		expected_file[PCU_PATH_MAX];
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		CoordC	a, b, c;
 		CoordC	d = { {1.0, 1.0}, {1.0, 0.0}, {0.0, 1.0} };
 		CoordC	e = { {1.0, 0.0}, {2.0, 2.0}, {-3.0, -1.0} };
@@ -212,12 +212,12 @@ void ComplexVectorMathSuite_TestComplexVectorMathBasic( ComplexVectorMathSuiteDa
 
 void ComplexVectorMathSuite_TestComplexVectorMathOperations( ComplexVectorMathSuiteData* data ) {
 	unsigned	procToWatch;
-	Stream*	stream = Journal_Register( Info_Type, "VectorMathOperationsStream" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"VectorMathOperationsStream" );
 	char		expected_file[PCU_PATH_MAX];
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		#define STG_COMPLEXVECTOR_TOL 1e-16;
 		
 		Cmplx		i[] = {{1.00000000, 0.000000000},{0.00000000, 0.000000000},{0.000000000, 0.00000000}};
@@ -477,7 +477,7 @@ void ComplexVectorMathSuite_TestComplexVectorMathOperations( ComplexVectorMathSu
 		Journal_Printf( stream, "\n****************************\n");
 		Journal_Printf( stream, "Check StGermain_ComplexScalarTripleProduct \n");
 		
-		matrix = Memory_Alloc_2DArray( Cmplx, 3, 3, "matrix" );
+		matrix = Memory_Alloc_2DArray( Cmplx, 3, 3, (Name)"matrix"  );
 		
 		matrix[0][0][REAL_PART] = 1.0; 	matrix[0][0][IMAG_PART] = 1.0;
 		matrix[0][1][REAL_PART] = 2.0; 	matrix[0][1][IMAG_PART] = 0.0; 

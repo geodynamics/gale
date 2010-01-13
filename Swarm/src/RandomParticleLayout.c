@@ -163,8 +163,8 @@ void _RandomParticleLayout_AssignFromXML( void* randomParticleLayout, Stg_Compon
 
    _PerCellParticleLayout_AssignFromXML( self, cf, data );
 
-	cellParticleCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "cellParticleCount", 0 );
-	seed = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "seed", 13 );
+	cellParticleCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"cellParticleCount", 0  );
+	seed = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"seed", 13  );
 	
 	_RandomParticleLayout_Init( self, cellParticleCount, seed );
 }

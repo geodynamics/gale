@@ -173,9 +173,9 @@ void _MeshParticleLayout_AssignFromXML( void* meshParticleLayout, Stg_ComponentF
 
    _PerCellParticleLayout_AssignFromXML( self, cf, data );
 
-	cellParticleCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "cellParticleCount", 0 );
-	seed = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "seed", 13 );
-	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
+	cellParticleCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"cellParticleCount", 0  );
+	seed = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"seed", 13  );
+	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"mesh", Mesh, True, data  );
 
 	_MeshParticleLayout_Init( self, mesh, cellParticleCount, seed );
 

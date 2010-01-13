@@ -77,7 +77,7 @@ void DimensionMacrosSuite_Teardown( DimensionMacrosSuiteData* data ) {
 
 void DimensionMacrosSuite_TestDimensionMacros( DimensionMacrosSuiteData* data ) {
 	char		expected_file[PCU_PATH_MAX];
-	Stream*  stream = Journal_Register( Info_Type, "DimensionMacrosStream" );
+	Stream*  stream = Journal_Register( Info_Type, (Name)"DimensionMacrosStream"  );
 	IJK		coord;
    IJK		meshSize;
    Index		i, j, k;

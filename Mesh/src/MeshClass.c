@@ -131,7 +131,7 @@ void _Mesh_Print( void* mesh, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* meshStream;
-	meshStream = Journal_Register( InfoStream_Type, "MeshStream" );
+	meshStream = Journal_Register( InfoStream_Type, (Name)"MeshStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "Mesh (ptr): (%p)\n", self );
@@ -142,9 +142,9 @@ void _Mesh_AssignFromXML( void* mesh, Stg_ComponentFactory* cf, void* data ) {
 	Mesh*			self = (Mesh*)mesh;
    AbstractContext* context = NULL;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 
 	_Mesh_Init( self, context );
 }
@@ -527,16 +527,16 @@ Bool Mesh_HasExtension( void* mesh, const char* name ) {
 
 	assert( self );
 
-	return (ExtensionManager_GetHandle( self->info, name ) != -1) ?  True : False;
+	return (ExtensionManager_GetHandle( self->info, (Name)name ) != -1 ) ?  True : False;
 }
 
 void* _Mesh_GetExtension( void* mesh, const char* name ) {
 	Mesh* self = (Mesh*)mesh;
 
 	assert( self );
-	assert( ExtensionManager_GetHandle( self->info, name ) != -1 );
+	assert( ExtensionManager_GetHandle( self->info, (Name)name ) != -1  );
 
-	return ExtensionManager_Get( self->info, self, ExtensionManager_GetHandle( self->info, name ) );
+	return ExtensionManager_Get( self->info, self, ExtensionManager_GetHandle( self->info, (Name)name )  );
 }
 
 void* Mesh_GetTopologyData( void* mesh, MeshTopology_Dim dim ) {

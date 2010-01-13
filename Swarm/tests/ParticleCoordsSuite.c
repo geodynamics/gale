@@ -86,14 +86,14 @@ void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
 		pcu_filename_input( "testLineParticleLayout.xml", input_file );
 		cf = stgMainInitFromXML( input_file, data->comm, NULL );
 		stgMainBuildAndInitialise( cf );
-		context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+		context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context" );
 		dictionary = context->dictionary;
 
-		swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
+		swarm = (Swarm* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"swarm" );
 		pcu_check_true( swarm );
 
-		Journal_Enable_AllTypedStream( True );
-		stream = Journal_Register( Info_Type, "LinearParticleStream" );
+		Journal_Enable_AllTypedStream( True  );
+		stream = Journal_Register( Info_Type, (Name)"LinearParticleStream"  );
 		Stream_RedirectFile( stream, "linearParticle.dat" );
 		Swarm_PrintParticleCoords( swarm, stream );
 		Journal_Enable_AllTypedStream( False );

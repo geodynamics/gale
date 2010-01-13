@@ -158,15 +158,7 @@ void _UnionParticleLayout_AssignFromXML( void* unionParticleLayout, Stg_Componen
 
    _GlobalParticleLayout_AssignFromXML( self, cf, data );
 	
-	particleLayoutList = Stg_ComponentFactory_ConstructByList( 
-		cf, 
-		self->name, 
-		"ParticleLayoutList", 
-		Stg_ComponentFactory_Unlimited, 
-		GlobalParticleLayout, 
-		True, 
-		&particleLayoutCount,
-		data );
+	particleLayoutList = Stg_ComponentFactory_ConstructByList( cf, self->name, (Dictionary_Entry_Key)"ParticleLayoutList", Stg_ComponentFactory_Unlimited, GlobalParticleLayout, True, &particleLayoutCount, data  );
 
 	_UnionParticleLayout_Init( self, particleLayoutList, particleLayoutCount );
 }

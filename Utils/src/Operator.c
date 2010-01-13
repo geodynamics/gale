@@ -611,7 +611,7 @@ Operator* Operator_NewFromName(
 		numberOfOperands = 0;
 		_carryOut = NULL;
 		
-		Journal_Printf( Journal_Register( Error_Type, Operator_Type ), 
+		Journal_Printf( Journal_Register( Error_Type, (Name)Operator_Type  ), 
 				"In func %s: Error trying to create operator from name '%s'.\n",
 				__func__, name );
 		abort();

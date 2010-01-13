@@ -119,7 +119,7 @@ void _RegularRemesherCmpt_Print( void* remesher, Stream* stream ) {
    Stream*					myStream;
 	
    /* Set the Journal for printing informations */
-   myStream = Journal_Register( InfoStream_Type, "RegularRemesherCmptStream" );
+   myStream = Journal_Register( InfoStream_Type, (Name)"RegularRemesherCmptStream"  );
 
    /* Print parent */
    _Stg_Component_Print( self, stream );
@@ -145,32 +145,32 @@ void _RegularRemesherCmpt_AssignFromXML( void* remesher, Stg_ComponentFactory* c
    assert( cf );
 
 	regRemesh = RegularRemesher_New();
-   mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
+   mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"mesh", Mesh, True, data  );
    NewRemesher_SetMesh( regRemesh, mesh );
 
-   regRemesh->contactDepth = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth", 0 );
-   regRemesh->contactSize = Stg_ComponentFactory_GetDouble( cf, self->name, "contactSize", 0.0 );
-   regRemesh->diffuseCorners = Stg_ComponentFactory_GetBool( cf, self->name, "diffuseCorners", False );
-   regRemesh->diffuseSurface = Stg_ComponentFactory_GetBool( cf, self->name, "diffuseSurface", False );
-   regRemesh->diffusionCoef = Stg_ComponentFactory_GetDouble( cf, self->name, "diffusionCoef", 1.0 );
-   regRemesh->ctx = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+   regRemesh->contactDepth = Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"contactDepth", 0  );
+   regRemesh->contactSize = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"contactSize", 0.0  );
+   regRemesh->diffuseCorners = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"diffuseCorners", False  );
+   regRemesh->diffuseSurface = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"diffuseSurface", False  );
+   regRemesh->diffusionCoef = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"diffusionCoef", 1.0  );
+   regRemesh->ctx = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 
-   dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
-   list = Dictionary_Get( dict, "remeshDims" );
+   dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, (Dictionary_Entry_Key)self->name )  );
+   list = Dictionary_Get( dict, (Dictionary_Entry_Key)"remeshDims" );
    if( list ) {
 		nItms = Dictionary_Entry_Value_GetCount( list );
-		for( i_i = 0; i_i < nItms; i_i++ ) {
+		for( i_i = 0; i_i < nItms; i_i++  ) {
 			dim = Dictionary_Entry_Value_AsInt( 
 			Dictionary_Entry_Value_GetElement( list, i_i ) );
 			RegularRemesher_SetRemeshState( regRemesh, dim, True );
       }
    }
 
-   list = Dictionary_Get( dict, "staticWalls" );
+   list = Dictionary_Get( dict, (Dictionary_Entry_Key)"staticWalls" );
    if( list ) {
 		nItms = Dictionary_Entry_Value_GetCount( list );
 		assert( nItms % 2 == 0 );
-		for( i_i = 0; i_i < nItms; i_i += 2 ) {
+		for( i_i = 0; i_i < nItms; i_i += 2  ) {
 			dim = Dictionary_Entry_Value_AsInt( 
 			Dictionary_Entry_Value_GetElement( list, i_i ) );
 			wall = Dictionary_Entry_Value_AsInt( 

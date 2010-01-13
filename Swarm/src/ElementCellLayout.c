@@ -166,7 +166,7 @@ void _ElementCellLayout_AssignFromXML( void* elementCellLayout, Stg_ComponentFac
 
 	_CellLayout_AssignFromXML( self, cf, data );
 
-	mesh =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Mesh", Mesh,  True, data ) ;
+	mesh =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Mesh", Mesh, True, data  ) ;
 	
 	_ElementCellLayout_Init( self, mesh );
 }
@@ -177,7 +177,7 @@ void _ElementCellLayout_Build( void *elementCellLayout, void *data ){
 	Stg_Component_Build( self->mesh, NULL, False );
 
 	if( !Mesh_HasIncidence( self->mesh, Mesh_GetDimSize( self->mesh ), MT_VERTEX ) ) {
-		Stream* elementCellLayoutStream = Journal_Register( ErrorStream_Type, self->type );
+		Stream* elementCellLayoutStream = Journal_Register( ErrorStream_Type, (Name)self->type  );
 		Journal_Printf( elementCellLayoutStream, "Warning: Mesh not configured to build element node table. "
 			"Activating it now.\n" );
 		abort();
@@ -246,7 +246,7 @@ Cell_Index _ElementCellLayout_MapElementIdToCellId( void* elementCellLayout, uns
 	#ifdef CAUTIOUS
 	{
 		ElementCellLayout*      self = (ElementCellLayout*)elementCellLayout;
-		Stream* errorStr = Journal_Register( Error_Type, self->type );
+		Stream* errorStr = Journal_Register( Error_Type, (Name)self->type  );
 		Journal_Firewall( element_dI < Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ), errorStr, "Error - in %s(): User asked "
 			"for cell corresponding to element %d, but the mesh that this cell layout is based on only "
 			"has %d elements.\n", __func__, element_dI, Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ) );

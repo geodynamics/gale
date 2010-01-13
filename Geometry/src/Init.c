@@ -41,11 +41,11 @@
 #include <stdio.h>
 
 Bool StgDomainGeometry_Init( int* argc, char** argv[] ) {
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
 		
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Delaunay_Type, "0", (Stg_Component_DefaultConstructorFunction*)Delaunay_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), ParallelDelaunay_Type, "0", (Stg_Component_DefaultConstructorFunction*)ParallelDelaunay_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Delaunay_Type, (Name)"0", (Stg_Component_DefaultConstructorFunction*)Delaunay_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister( ), ParallelDelaunay_Type, "0", (Stg_Component_DefaultConstructorFunction*)ParallelDelaunay_DefaultNew );
 
 	RegisterParent( Delaunay_Type,               Stg_Component_Type );
 	RegisterParent( ParallelDelaunay_Type,       Delaunay_Type );

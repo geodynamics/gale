@@ -179,7 +179,7 @@ void _PythonShape_AssignFromXML( void* pythonShape, Stg_ComponentFactory* cf, vo
 
 	_Stg_Shape_AssignFromXML( self, cf, data );
 
-	conditionFunction = Stg_ComponentFactory_GetString( cf, self->name, "Function", "0" );
+	conditionFunction = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"Function", "0"  );
 
 	_PythonShape_Init( self, conditionFunction );
 }
@@ -241,7 +241,7 @@ Bool _PythonShape_IsCoordInside( void* pythonShape, Coord coord ) {
 	testConditionValue = PyMapping_GetItemString(pythonDictionary, PYTHONSHAPE_TEST_CONDITION_NAME);
 	Journal_Firewall( 
 			testConditionValue != NULL, 
-			Journal_Register( Error_Type, self->type), 
+			Journal_Register( Error_Type, (Name)self->type ), 
 			"In func %s: Cannot Evalutate Function '%s'.\n", __func__, self->testCondition );
 
 	return PyObject_IsTrue( testConditionValue );
@@ -253,7 +253,7 @@ double _PythonShape_CalculateVolume( void* pythonShape ) {
 }
 void _PythonShape_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
 	Stg_Shape* self = (Stg_Shape*)shape;
-	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }

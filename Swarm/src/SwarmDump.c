@@ -175,20 +175,12 @@ void _SwarmDump_AssignFromXML( void* swarmDump, Stg_ComponentFactory* cf, void* 
         Bool                    newFileEachTime;
         Index                   swarmCount;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !self->context  )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 
-        swarmList = Stg_ComponentFactory_ConstructByList( 
-                cf, 
-                self->name, 
-                "Swarm", 
-                Stg_ComponentFactory_Unlimited, 
-                Swarm, 
-                True, 
-                &swarmCount,
-                data ) ;
-        newFileEachTime = Stg_ComponentFactory_GetBool( cf, self->name, "newFileEachTime", True );
+        swarmList = Stg_ComponentFactory_ConstructByList( cf, self->name, (Dictionary_Entry_Key)"Swarm", Stg_ComponentFactory_Unlimited, Swarm, True, &swarmCount, data  ) ;
+        newFileEachTime = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"newFileEachTime", True  );
 
         _SwarmDump_Init( 
                         self,
@@ -225,7 +217,7 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
         SizeT             particleSize;
         Index             swarm_I;
         Swarm*            swarm;
-        Stream*           info = Journal_Register( Info_Type, self->type );
+        Stream*           info = Journal_Register( Info_Type, (Name)self->type  );
         Processor_Index   rank_I;
 
         Journal_DPrintf( info, "Proc %d: beginning Swarm binary checkpoint in %s():\n", self->swarmList[0]->myRank, __func__ );
@@ -304,7 +296,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
    int                     attribData;
    hsize_t                 count[2];
    Particle_Index          lParticle_I = 0;
-   Stream*                 errorStr = Journal_Register( Error_Type, self->type );
+   Stream*                 errorStr = Journal_Register( Error_Type, (Name)self->type  );
    SwarmVariable*          swarmVar;
    Index                   swarmVar_I;
    char                    dataSpaceName[1024];
@@ -373,7 +365,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
             sprintf( dataSpaceName, "/%s", swarmVar->name + strlen(swarm->name)+1 );
             if( swarmVar->variable->dataTypes[0] == Variable_DataType_Int ) {
                /* Allocate space for the values to be written to file */
-               int** value = Memory_Alloc_2DArray( int, swarm->particleLocalCount, swarmVar->dofCount, "swarmVariableValue" );
+               int** value = Memory_Alloc_2DArray( int, swarm->particleLocalCount, swarmVar->dofCount, (Name)"swarmVariableValue"  );
                
                #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
                fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_INT, fileSpace, props );
@@ -394,7 +386,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
             else if( swarmVar->variable->dataTypes[0] == Variable_DataType_Char) {
                char** value;
                /* Allocate space for the values to be written to file */
-               value = Memory_Alloc_2DArray( char, swarm->particleLocalCount, swarmVar->dofCount, "swarmVariableValue" );
+               value = Memory_Alloc_2DArray( char, swarm->particleLocalCount, swarmVar->dofCount, (Name)"swarmVariableValue"  );
                
                #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
                fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_CHAR, fileSpace, props );
@@ -415,7 +407,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
             else if( swarmVar->variable->dataTypes[0] == Variable_DataType_Float ) {
                float** value;
                /* Allocate space for the values to be written to file */
-               value = Memory_Alloc_2DArray( float, swarm->particleLocalCount, swarmVar->dofCount, "swarmVariableValue" );
+               value = Memory_Alloc_2DArray( float, swarm->particleLocalCount, swarmVar->dofCount, (Name)"swarmVariableValue"  );
                
                #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
                fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_FLOAT, fileSpace, props );
@@ -436,7 +428,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
             else {
                double** value;
                /* Allocate space for the values to be written to file */
-               value = Memory_Alloc_2DArray( double, swarm->particleLocalCount, swarmVar->dofCount, "swarmVariableValue" );
+               value = Memory_Alloc_2DArray( double, swarm->particleLocalCount, swarmVar->dofCount, (Name)"swarmVariableValue"  );
                
                #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
                fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_DOUBLE, fileSpace, props );

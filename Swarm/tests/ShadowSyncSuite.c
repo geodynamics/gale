@@ -96,7 +96,7 @@ void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
 	pcu_filename_input( "testSwarmParticleShadowSync.xml", input_file );
 
 	cf = stgMainInitFromXML( input_file, data->comm, NULL );
-	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context"  );
 	Stream_Enable( cf->infoStream, False );
 	Stream_Enable( context->info, False );
 	Stream_Enable( context->debug, False );
@@ -104,15 +104,15 @@ void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
 
 	dictionary = context->dictionary;
 	Journal_ReadFromDictionary( dictionary );
-	Dictionary_Add( dictionary, "procToWatch", Dictionary_Entry_Value_FromUnsignedInt( procToWatch ) );
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"procToWatch", Dictionary_Entry_Value_FromUnsignedInt( procToWatch )  );
 	componentDict = Dictionary_GetDictionary( dictionary, "components" );
 	assert( componentDict );
 
 	KeyCall( context, context->constructExtensionsK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(context,context->constructExtensionsK), context );
 
-	swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
-	ExtensionManager_Add( swarm->particleExtensionMgr, "ParticleVelocity", sizeof(double[3]) );
-	ExtensionManager_Add( swarm->particleExtensionMgr, "ParticleColour", sizeof(double) );
+	swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"swarm"  );
+	ExtensionManager_Add( swarm->particleExtensionMgr, (Name)"ParticleVelocity", sizeof(double[3])  );
+	ExtensionManager_Add( swarm->particleExtensionMgr, (Name)"ParticleColour", sizeof(double)  );
 
 	Swarm_NewVectorVariable(
 		swarm,
@@ -170,11 +170,11 @@ void ShadowSyncSuite_listDeleteFunction( void *a ){
 
 void ShadowSyncSuite_ValidateShadowing( DomainContext* context ) {
 	DomainContext	*self = context;
-	Swarm*			swarm = (Swarm*) LiveComponentRegister_Get( self->CF->LCRegister, "swarm" );
+	Swarm*			swarm = (Swarm*) LiveComponentRegister_Get( self->CF->LCRegister, (Name)"swarm" );
 
 	Swarm_UpdateAllParticleOwners( swarm );
 
-	if(swarm->nProc > 1) {
+	if(swarm->nProc > 1 ) {
 		int ii = 0, jj = 0;
 		ShadowInfo*			cellShadowInfo = CellLayout_GetShadowInfo( swarm->cellLayout );
 		ProcNbrInfo*		procNbrInfo = cellShadowInfo->procNbrInfo;

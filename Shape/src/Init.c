@@ -40,23 +40,23 @@
 Bool StgDomainShape_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister* componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
 
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
-	Stg_ComponentRegister_Add( componentRegister, Superellipsoid_Type, "0", _Superellipsoid_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, Box_Type,            "0", _Box_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, Everywhere_Type,     "0", _Everywhere_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, ConvexHull_Type,     "0", _ConvexHull_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, Sphere_Type,         "0", _Sphere_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, PolygonShape_Type,        "0", _PolygonShape_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, Union_Type,          "0", _Union_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, Intersection_Type,   "0", _Intersection_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, Cylinder_Type,       "0", _Cylinder_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, Superellipsoid_Type, (Name)"0", _Superellipsoid_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, Box_Type, (Name)"0", _Box_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, Everywhere_Type, (Name)"0", _Everywhere_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, ConvexHull_Type, (Name)"0", _ConvexHull_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, Sphere_Type, (Name)"0", _Sphere_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, PolygonShape_Type, (Name)"0", _PolygonShape_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, Union_Type, (Name)"0", _Union_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, Intersection_Type, (Name)"0", _Intersection_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, Cylinder_Type, (Name)"0", _Cylinder_DefaultNew  );
 	
-	Stg_ComponentRegister_Add( componentRegister, BelowPlane_Type,     "0", _BelowPlane_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, BelowCosinePlane_Type,     "0", _BelowCosinePlane_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, BelowPlane_Type, (Name)"0", _BelowPlane_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, BelowCosinePlane_Type, (Name)"0", _BelowCosinePlane_DefaultNew );
 	
 	#ifdef HAVE_PYTHON
-		Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), PythonShape_Type, "0", _PythonShape_DefaultNew );
+		Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister( ), PythonShape_Type, "0", _PythonShape_DefaultNew );
 		RegisterParent( PythonShape_Type, Stg_Shape_Type);
 	#endif
 

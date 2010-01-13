@@ -62,10 +62,10 @@ void VectorMathSuite_Teardown( VectorMathSuiteData* data ) {
 
 void VectorMathSuite_BasicTest( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "BasicTest" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"BasicTest" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		Coord a, b, c;
 		Coord d = { 1.0, 1.0, 1.0 };
 		Coord e = { 1.0, 2.0, -3.0 };
@@ -107,10 +107,10 @@ void VectorMathSuite_BasicTest( VectorMathSuiteData* data ) {
 
 void VectorMathSuite_CompleteTest( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "CompleteTest" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"CompleteTest" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		Coord a, b, c;
 		Index i;
 
@@ -148,10 +148,10 @@ void VectorMathSuite_CompleteTest( VectorMathSuiteData* data ) {
 
 void VectorMathSuite_TestVectorFunctions( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "CompleteTest" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"CompleteTest" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		double i[] = {1.0,0.0,0.0};
 		double j[] = {0.0,1.0,0.0};
 		double k[] = {0.0,0.0,1.0};
@@ -220,10 +220,10 @@ void VectorMathSuite_TestVectorFunctions( VectorMathSuiteData* data ) {
 
 void VectorMathSuite_TestMagnitudeFunction( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "MagnitudeFunction" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"MagnitudeFunction" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		double A[] = { 7.4, 2  ,   5  ,  1,  3 ,   -42};
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 		int d;
@@ -248,10 +248,10 @@ void VectorMathSuite_TestMagnitudeFunction( VectorMathSuiteData* data ) {
 
 void VectorMathSuite_TestDotProductFunction( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "DotProductFunction" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"DotProductFunction" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		double A[] = { 7.4, 2  ,   5  ,  1,  3 ,   -42};
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 		int d;
@@ -274,10 +274,10 @@ void VectorMathSuite_TestDotProductFunction( VectorMathSuiteData* data ) {
 
 void VectorMathSuite_TestCrossProductFunction( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "CrossProductFunction" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"CrossProductFunction" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		double A[] = { 7.4, 2  ,   5  ,  1,  3 ,   -42};
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 		double vector[6];
@@ -301,10 +301,10 @@ void VectorMathSuite_TestCrossProductFunction( VectorMathSuiteData* data ) {
 
 void VectorMathSuite_TestDistancePointsFunction( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "DistancePointsFunction" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"DistancePointsFunction" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		double A[] = { 7.4, 2  ,   5  ,  1,  3 ,   -42};
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 		int d;
@@ -327,10 +327,10 @@ void VectorMathSuite_TestDistancePointsFunction( VectorMathSuiteData* data ) {
 
 void VectorMathSuite_TestNormalToPlaneFunction( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "NormalToPlaneFunction" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"NormalToPlaneFunction" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		double A[] = { 7.4, 2  ,   5  ,  1,  3 ,   -42};
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 		double C[] = {23  , 5  , -14  , 32, -21,    78};
@@ -355,10 +355,10 @@ void VectorMathSuite_TestNormalToPlaneFunction( VectorMathSuiteData* data ) {
 
 void VectorMathSuite_TestCentroidFunction( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "CentroidFunction" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"CentroidFunction" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		double A[] = { 7.4, 2  ,   5  ,  1,  3 ,   -42};
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 		double C[] = {23  , 5  , -14  , 32, -21,    78};
@@ -386,10 +386,10 @@ void VectorMathSuite_TestCentroidFunction( VectorMathSuiteData* data ) {
 
 void VectorMathSuite_TestTriangleArea( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "TriangleArea" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"TriangleArea" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		double A[] = { 7.4, 2  ,   5  ,  1,  3 ,   -42};
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 		double C[] = {23  , 5  , -14  , 32, -21,    78};
@@ -413,10 +413,10 @@ void VectorMathSuite_TestTriangleArea( VectorMathSuiteData* data ) {
 
 void VectorMathSuite_TestNormalisationFunction( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "NormalisationFunction" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"NormalisationFunction" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		double A[] = { 7.4, 2  ,   5  ,  1,  3 ,   -42};
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 		double C[] = {23  , 5  , -14  , 32, -21,    78};
@@ -452,10 +452,10 @@ void VectorMathSuite_TestNormalisationFunction( VectorMathSuiteData* data ) {
 
 void VectorMathSuite_TestVectorCrossProductMagnitude( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "VectorCrossProductMagnitude" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"VectorCrossProductMagnitude" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		double A[] = { 7.4, 2  ,   5  ,  1,  3 ,   -42};
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 
@@ -480,10 +480,10 @@ void VectorMathSuite_TestVectorCrossProductMagnitude( VectorMathSuiteData* data 
 
 void VectorMathSuite_TestConvexQuadrilateralArea( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "ConvexQuadrilateralArea" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"ConvexQuadrilateralArea" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		double A[] = { 7.4, 2  ,   5  ,  1,  3 ,   -42};
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 		double C[] = {23  , 5  , -14  , 32, -21,    78};
@@ -510,17 +510,17 @@ void VectorMathSuite_TestConvexQuadrilateralArea( VectorMathSuiteData* data ) {
 
 void VectorMathSuite_TestScalarTripleProduct( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "ScalarTripleProduct" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"ScalarTripleProduct" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		double **matrix;
 
 		Stream_RedirectFile( stream, "testScalarTripleProduct.dat" );
 
 		Journal_Printf( stream, "****************************\n");
 		Journal_Printf( stream, "Check StGermain_ScalarTripleProduct \n");
-		matrix = Memory_Alloc_2DArray( double, 3, 3, "matrix" );
+		matrix = Memory_Alloc_2DArray( double, 3, 3, (Name)"matrix"  );
 		matrix[0][0] = 1.0; matrix[0][1] = 2.0 ; matrix[0][2] = 3.0;
 		matrix[1][0] = 4.0; matrix[1][1] = 5.0 ; matrix[1][2] = 6.0;
 		matrix[2][0] = 7.0; matrix[2][1] = 8.0 ; matrix[2][2] = 11.0;
@@ -540,10 +540,10 @@ void VectorMathSuite_TestScalarTripleProduct( VectorMathSuiteData* data ) {
 
 void VectorMathSuite_TestParallelPipedVolume( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "ParallelPipedVolume" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"ParallelPipedVolume" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		double A[] = { 7.4, 2  ,   5  ,  1,  3 ,   -42};
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 		double C[] = {23  , 5  , -14  , 32, -21,    78};
@@ -569,10 +569,10 @@ void VectorMathSuite_TestParallelPipedVolume( VectorMathSuiteData* data ) {
 
 void VectorMathSuite_TestAverageCoord( VectorMathSuiteData* data ) {
 	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
-	Stream*	stream = Journal_Register( Info_Type, "AverageCoord" );
+	Stream*	stream = Journal_Register( Info_Type, (Name)"AverageCoord" );
 	char		expected_file[PCU_PATH_MAX];	
 
-	if (data->rank == procToWatch) {
+	if (data->rank == procToWatch ) {
 		double A[] = { 7.4, 2  ,   5  ,  1,  3 ,   -42};
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
 		double C[] = {23  , 5  , -14  , 32, -21,    78};

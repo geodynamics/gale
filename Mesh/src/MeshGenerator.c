@@ -94,7 +94,7 @@ void _MeshGenerator_Print( void* meshGenerator, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* meshGeneratorStream;
-	meshGeneratorStream = Journal_Register( InfoStream_Type, "MeshGeneratorStream" );
+	meshGeneratorStream = Journal_Register( InfoStream_Type, (Name)"MeshGeneratorStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "MeshGenerator (ptr): (%p)\n", self );
@@ -113,42 +113,42 @@ void _MeshGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactory* cf
 	assert( cf );
 
 	/* Rip out the components structure as a dictionary. */
-	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
+	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, (Dictionary_Entry_Key)self->name )  );
 
 	/* Set the communicator to a default. */
 	MeshGenerator_SetMPIComm( self, MPI_COMM_WORLD );
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !self->context  )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 
 	/* Read the individual mesh if specified. */
-	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, False, data );
-	if( mesh )
+	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"mesh", Mesh, False, data );
+	if( mesh  )
 		MeshGenerator_AddMesh( self, mesh );
 
 	/* Read the mesh list, if it's there. */
-	meshList = Dictionary_Get( dict, "meshes" );
+	meshList = Dictionary_Get( dict, (Dictionary_Entry_Key)"meshes" );
 	if( meshList ) {
 		unsigned	nMeshes;
 		char*		name;
 		unsigned	m_i;
 
 		nMeshes = Dictionary_Entry_Value_GetCount( meshList );
-		for( m_i = 0; m_i < nMeshes; m_i++ ) {
+		for( m_i = 0; m_i < nMeshes; m_i++  ) {
 			Mesh*	mesh;
 
 			name = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( meshList, m_i ) );
-			mesh = Stg_ComponentFactory_ConstructByName( cf, name, Mesh, True, data );
+			mesh = Stg_ComponentFactory_ConstructByName( cf, (Name)name, Mesh, True, data  );
 			MeshGenerator_AddMesh( self, mesh );
 		}
 	}
 
 	/* Read dimensions and state. */
-	nDims = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "dims", 2 );
+	nDims = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"dims", 2  );
 	MeshGenerator_SetDimSize( self, nDims );
-	enabledDimsList = Dictionary_Get( dict, "enabledDims" );
-	enabledIncList = Dictionary_Get( dict, "enabledIncidence" );
+	enabledDimsList = Dictionary_Get( dict, (Dictionary_Entry_Key)"enabledDims"  );
+	enabledIncList = Dictionary_Get( dict, (Dictionary_Entry_Key)"enabledIncidence"  );
 
     /* Clear dims/incidence flags */
     unsigned    d_i;

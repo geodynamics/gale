@@ -165,13 +165,13 @@ void SwarmSuite_Teardown( SwarmSuiteData* data ) {
 void SwarmSuite_TestParticleSearch( SwarmSuiteData* data ) {
 	double	coord[3];
 	int		procToWatch = data->nProcs > 1 ? 1 : 0;
-	Stream*	stream = Journal_Register (Info_Type, "TestParticleSearch");
+	Stream*	stream = Journal_Register( Info_Type, (Name)"TestParticleSearch");
 	
 	if( data->rank == procToWatch ) {
 		if( data->nProcs == 1 ) {
 			coord[0] = 0.60*( data->maxCrds[0] - data->minCrds[0] );
 			coord[1] = 0.20*( data->maxCrds[1] - data->minCrds[1] );
-			coord[2] = 0.82*( data->maxCrds[2] - data->minCrds[2] );
+			coord[2] = 0.82*( data->maxCrds[2] - data->minCrds[2]  );
 			pcu_check_true( SwarmSuite_TestParticleSearchFunc( data->swarm, coord, stream ) );
 		
 			coord[0] = 0.20*( data->maxCrds[0] - data->minCrds[0] );
@@ -189,7 +189,7 @@ void SwarmSuite_TestParticleCoords( SwarmSuiteData* data ) {
 
 	if( data->rank == procToWatch ) {
 		Journal_Enable_AllTypedStream( True );
-		stream = Journal_Register (Info_Type, "TestParticleCorrds"); 
+		stream = Journal_Register( Info_Type, (Name)"TestParticleCorrds" ); 
 		Stream_RedirectFile( stream, "testParticleCoords.dat" );
 		Swarm_PrintParticleCoords( data->swarm, stream );
 		Journal_Printf( stream, "\n" );

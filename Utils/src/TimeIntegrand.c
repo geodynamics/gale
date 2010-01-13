@@ -97,7 +97,7 @@ void _TimeIntegrand_Init(
 	TimeIntegrand* self = (TimeIntegrand*)timeIntegrand;
 
    self->context        = context;
-	self->debug          = Journal_Register( Debug_Type, self->type );
+	self->debug          = Journal_Register( Debug_Type, (Name)self->type  );
 	self->variable       = variable;
 	self->dataCount      = dataCount;
 	self->timeIntegrator = timeIntegrator;
@@ -175,22 +175,14 @@ void _TimeIntegrand_AssignFromXML( void* timeIntegrand, Stg_ComponentFactory* cf
 	Bool                    allowFallbackToFirstOrder = False;
 	DomainContext*          context;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
-	if( !self->context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", DomainContext, False, data );
+	if( !self->context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  );
 	
-	variable       =  Stg_ComponentFactory_ConstructByKey( cf, self->name, Variable_Type,       Variable,       False, data ) ;
-	timeIntegrator =  Stg_ComponentFactory_ConstructByKey( cf, self->name, TimeIntegrator_Type, TimeIntegrator, True, data ) ;
-	initData = Stg_ComponentFactory_ConstructByList( 
-		cf, 
-		self->name, 
-		"data", 
-		Stg_ComponentFactory_Unlimited, 
-		Stg_Component, 
-		False, 
-		&dataCount, 
-		data );
-	allowFallbackToFirstOrder = Stg_ComponentFactory_GetBool( cf, self->name, "allowFallbackToFirstOrder", False );	
+	variable       =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)Variable_Type, Variable, False, data  ) ;
+	timeIntegrator =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)TimeIntegrator_Type, TimeIntegrator, True, data  ) ;
+	initData = Stg_ComponentFactory_ConstructByList( cf, self->name, (Dictionary_Entry_Key)"data", Stg_ComponentFactory_Unlimited, Stg_Component, False, &dataCount, data  );
+	allowFallbackToFirstOrder = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"allowFallbackToFirstOrder", False  );	
 
 	_TimeIntegrand_Init( self, context, timeIntegrator, variable, dataCount, initData, allowFallbackToFirstOrder );
 
@@ -238,7 +230,7 @@ void TimeIntegrand_FirstOrder( void* timeIntegrand, Variable* startValue, double
 	Index           array_I; 
 	Index           arrayCount;
 	Bool            successFlag = False;
-	Stream*         errorStream = Journal_Register( Error_Type, self->type );
+	Stream*         errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 	Journal_DPrintf( self->debug, "In func %s for %s '%s'\n", __func__, self->type, self->name );
 
@@ -247,8 +239,8 @@ void TimeIntegrand_FirstOrder( void* timeIntegrand, Variable* startValue, double
 	Variable_Update( startValue );
 	arrayCount     = variable->arraySize;
 
-	timeDeriv = Memory_Alloc_2DArray( double, arrayCount, componentCount, "Time Deriv" );
-	for( array_I = 0; array_I < arrayCount; array_I++ ) {
+	timeDeriv = Memory_Alloc_2DArray( double, arrayCount, componentCount, (Name)"Time Deriv" );
+	for( array_I = 0; array_I < arrayCount; array_I++  ) {
 		successFlag = TimeIntegrand_CalculateTimeDeriv( self, array_I, timeDeriv[array_I] );
 		Journal_Firewall( True == successFlag, errorStream,
 			"Error - in %s(), for TimeIntegrand \"%s\" of type %s: When trying to find time "
@@ -283,7 +275,7 @@ void TimeIntegrand_SecondOrder( void* timeIntegrand, Variable* startValue, doubl
 	Index           arrayCount;
 	double          startTime      = TimeIntegrator_GetTime( self->timeIntegrator );
 	Bool            successFlag = False;
-	Stream*         errorStream = Journal_Register( Error_Type, self->type );
+	Stream*         errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 	timeDeriv = Memory_Alloc_Array( double, componentCount, "Time Deriv" );
 	startData = Memory_Alloc_Array( double, componentCount, "StartData" );
@@ -356,7 +348,7 @@ void TimeIntegrand_FourthOrder( void* timeIntegrand, Variable* startValue, doubl
 	Index           arrayCount;
 	double          startTime      = TimeIntegrator_GetTime( self->timeIntegrator );
 	Bool            successFlag = False;
-	Stream*         errorStream = Journal_Register( Error_Type, self->type );
+	Stream*         errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 	timeDeriv      = Memory_Alloc_Array( double, componentCount, "Time Deriv" );
 	startData      = Memory_Alloc_Array( double, componentCount, "StartData" );
@@ -514,7 +506,7 @@ Bool _TimeIntegrand_AdvectionTimeDeriv( void* timeIntegrand, Index array_I, doub
 			( velocityField->dim == 3 && isinf(timeDeriv[2]) ) ) 
 	{
 		#if 0
-		Journal_Printf( Journal_Register( Error_Type, self->type ),
+		Journal_Printf( Journal_Register( Error_Type, (Name)self->type  ),
 			"Error in func '%s' for particle with index %u.\n\tPosition (%g, %g, %g)\n\tVelocity here is (%g, %g, %g)."
 			"\n\tInterpolation result is %s.\n",
 			__func__, array_I, coord[0], coord[1], coord[2], 

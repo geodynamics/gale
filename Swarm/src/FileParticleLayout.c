@@ -176,8 +176,8 @@ void _FileParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFacto
 
    _GlobalParticleLayout_AssignFromXML( self, cf, data );
 
-   filename = Stg_ComponentFactory_GetString( cf, self->name, "filename", "Swarm" );
-   checkpointfiles = Stg_ComponentFactory_GetInt( cf, self->name, "checkpointfiles", 1 );
+   filename = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"filename", "Swarm"  );
+   checkpointfiles = Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"checkpointfiles", 1  );
 
 #ifdef READ_HDF5
    /* if doing checkpoint restart, grab number of particles swarmdump previously stored against */
@@ -346,8 +346,8 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
      
    /* Allocate space to store arrays of dataspaces */   
    assert( swarm->swarmVariable_Register );  
-   self->fileData  = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, self->checkpointfiles, "fileData" );
-   self->fileSpace = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, self->checkpointfiles, "fileSpace" );
+   self->fileData  = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, self->checkpointfiles, (Name)"fileData"  );
+   self->fileSpace = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, self->checkpointfiles, (Name)"fileSpace" );
    /* set these spaces to null initially */
    for( jj = 0 ; jj < swarm->swarmVariable_Register->objects->count ; jj++)
       for( kk = 0 ; kk < self->checkpointfiles ; kk++){
@@ -359,7 +359,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
    for( ii = 1 ; ii <= self->checkpointfiles ; ii++ ){
       char*  filenameTemp = NULL;
       /* Open the swarm checkpointing file */
-      if(self->checkpointfiles == 1)
+      if(self->checkpointfiles == 1 )
          Stg_asprintf( &filenameTemp, "%s.h5", self->filename );
       else 
          Stg_asprintf( &filenameTemp, "%s.%dof%d.h5", self->filename, ii, self->checkpointfiles );
@@ -547,7 +547,7 @@ Index _FileParticleLayout_GetFileCountFromTimeInfoFile( void* _context ){
    AbstractContext*     context = (AbstractContext*)_context;
    char*                timeInfoFileName = NULL;
    char*                timeInfoFileNamePart = NULL;
-   Stream*              errorStr = Journal_Register( Error_Type, FileParticleLayout_Type );
+   Stream*              errorStr = Journal_Register( Error_Type, (Name)FileParticleLayout_Type  );
    hid_t                file, fileSpace, fileData;
    Index                checkpointnproc;
    

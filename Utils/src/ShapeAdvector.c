@@ -169,14 +169,14 @@ void _ShapeAdvector_AssignFromXML( void* shapeAdvector, Stg_ComponentFactory* cf
 	Bool					allowFallbackToFirstOrder = False;
 	DomainContext*		context;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", DomainContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  );
 
-	timeIntegrator = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TimeIntegrator", TimeIntegrator, True, data  ) ;
-	velocityField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField", FieldVariable, True, data  ) ;
-	shape = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Shape", Stg_Shape, True, data ) ;
-	allowFallbackToFirstOrder = Stg_ComponentFactory_GetBool( cf, self->name, "allowFallbackToFirstOrder", False );
+	timeIntegrator = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"TimeIntegrator", TimeIntegrator, True, data   ) ;
+	velocityField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"VelocityField", FieldVariable, True, data   ) ;
+	shape = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Shape", Stg_Shape, True, data  ) ;
+	allowFallbackToFirstOrder = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"allowFallbackToFirstOrder", False  );
 
 	_ShapeAdvector_Init( self, context, timeIntegrator, velocityField, shape, allowFallbackToFirstOrder );
 }

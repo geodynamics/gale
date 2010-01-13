@@ -115,7 +115,7 @@ void _Mesh_RegularAlgorithms_Print( void* algorithms, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* algorithmsStream;
-	algorithmsStream = Journal_Register( InfoStream_Type, "Mesh_RegularAlgorithmsStream" );
+	algorithmsStream = Journal_Register( InfoStream_Type, (Name)"Mesh_RegularAlgorithmsStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "Mesh_RegularAlgorithms (ptr): (%p)\n", self );
@@ -212,8 +212,8 @@ Bool Mesh_RegularAlgorithms_SearchElements( void* algorithms, double* point, uns
 	mesh = self->mesh;
 	nDims = Mesh_GetDimSize( mesh );
 	elGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
-						ExtensionManager_GetHandle( mesh->info, "elementGrid" ) );
-	for( d_i = 0; d_i < nDims; d_i++ ) {
+						ExtensionManager_GetHandle( mesh->info, (Name)"elementGrid" ) );
+	for( d_i = 0; d_i < nDims; d_i++  ) {
 		if( Num_Approx( point[d_i] - self->maxCrd[d_i], 0.0 ) )
 			inds[d_i] = elGrid->sizes[d_i] - 1;
 		else if( point[d_i] < self->minCrd[d_i] || point[d_i] > self->maxCrd[d_i] )

@@ -244,7 +244,7 @@ void _ParticleMovementHandler_Destroy( void* pCommsHandler, void *data ){
 void ParticleMovementHandler_HandleParticleMovementBetweenProcs( ParticleCommHandler* pCommsHandler ) {
 	ParticleMovementHandler*	self = (ParticleMovementHandler*)pCommsHandler;
 	double                  startTime = 0;
-	Stream*                 info = Journal_Register( Info_Type, self->type );
+	Stream*                 info = Journal_Register( Info_Type, (Name)self->type  );
 
 	Journal_DPrintfL( self->debug, 1, "In %s(), for swarm \"%s\":\n", __func__, self->swarm->name );
 	if ( 1 == self->swarm->nProc ) {
@@ -534,7 +534,7 @@ void ParticleMovementHandler_EnsureParticleCountLeavingDomainsEqualsCountEnterin
 		    1, MPI_UNSIGNED, MPI_SUM, 0, self->swarm->comm );
 
 	if ( 0 == self->swarm->myRank ) {
-		Stream*   errorStream = Journal_Register( Error_Type, self->type );
+		Stream*   errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 		Journal_Firewall( totalParticlesFoundEnteringDomains == self->globalParticlesOutsideDomainTotal,
 				  errorStream, "Error - in %s(): %d particles were found across all processors to be "

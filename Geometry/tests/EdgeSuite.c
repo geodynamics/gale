@@ -76,7 +76,7 @@ void EdgeSuite_TestEdge( EdgeSuiteData* data ) {
 		Triangle_Index	tri_I;
 		Edge_Index		edge_I;
 
-		stream = Journal_Register(Info_Type, "EdgeStream");
+		stream = Journal_Register( Info_Type, (Name)"EdgeStream" );
 		Stream_RedirectFile( stream, "testEdge.dat" );
  
 		tri[0][0] = 0;

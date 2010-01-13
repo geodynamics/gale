@@ -72,11 +72,11 @@ void StgDomain_Toolbox_Initialise( PluginsManager* pluginsManager, int* argc, ch
 void StgDomain_Toolbox_Finalise( PluginsManager* pluginsManager ) {
 	StgDomain_Finalise();
 	
-	Journal_RPrintf( Journal_Register( Info_Type, StgDomain_Toolbox_Type ), "Finalised: StGermain Domain Toolbox.\n" );
+	Journal_RPrintf( Journal_Register( Info_Type, (Name)StgDomain_Toolbox_Type  ), "Finalised: StGermain Domain Toolbox.\n" );
 }
 
 Index StgDomain_Toolbox_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, StgDomain_Toolbox_Type, "0", _StgDomain_Toolbox_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, StgDomain_Toolbox_Type, (Name)"0", _StgDomain_Toolbox_DefaultNew  );
 }
 
 

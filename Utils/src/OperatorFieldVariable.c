@@ -159,7 +159,7 @@ void _OperatorFieldVariable_Init( void* ofv, Name operatorName, Index fieldVaria
 	OperatorFieldVariable*	self = (OperatorFieldVariable*)ofv;
 	FieldVariable*				fieldVariable;
 	Index							fieldVariable_I;
-	Stream*						errorStream = Journal_Register( Error_Type, self->type );
+	Stream*						errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 	/* Create operator */
 	self->_operator = Operator_NewFromName( operatorName, fieldVariableList[0]->fieldComponentCount, self->dim );
@@ -205,17 +205,9 @@ void _OperatorFieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFac
 	/* Construct Parent */
 	_FieldVariable_AssignFromXML( self, cf, data );
 
-	operatorName = Stg_ComponentFactory_GetString( cf, self->name, "Operator", "" );
+	operatorName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"Operator", ""  );
 
-	fieldVariableList = Stg_ComponentFactory_ConstructByList( 
-		cf, 
-		self->name, 
-		"FieldVariables", 
-		Stg_ComponentFactory_Unlimited, 
-		FieldVariable, 
-		True, 
-		&fieldVariableCount,
-		data );
+	fieldVariableList = Stg_ComponentFactory_ConstructByList( cf, self->name, (Dictionary_Entry_Key)"FieldVariables", Stg_ComponentFactory_Unlimited, FieldVariable, True, &fieldVariableCount, data  );
 
 	_OperatorFieldVariable_Init( self, operatorName, fieldVariableCount, fieldVariableList );
 
@@ -274,7 +266,7 @@ InterpolationResult _OperatorFieldVariable_InterpolateValueAt( void* fieldVariab
 		case 2:
 			self->_interpolateValueAt = OperatorFieldVariable_BinaryInterpolationFunc; break;
 		default:
-			Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 					"Can't use func '%s' with fieldVariableCount = %d\n", __func__, self->fieldVariableCount );
 	}
 

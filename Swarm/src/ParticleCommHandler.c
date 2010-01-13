@@ -157,9 +157,9 @@ void* _ParticleCommHandler_Copy( void* particleCommHandler, void* dest, Bool dee
 void _ParticleCommHandler_AssignFromXML( void* pCommHandler, Stg_ComponentFactory* cf, void* data ){
 	ParticleCommHandler*	self	= (ParticleCommHandler*)pCommHandler;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !self->context  )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 }
 	
 void _ParticleCommHandler_Build( void* pCommsHandler, void *data ){
@@ -494,7 +494,7 @@ void _ParticleCommHandler_BeginSendingParticlesInShadowCellsToNbrs( ParticleComm
 	#if CAUTIOUS
 	Bool*                           cellsClearedForTransfer = NULL;
 	Neighbour_Index*                cellsClearedForTransferDests = NULL;
-	Stream*                         errorStream = Journal_Register( Error_Type, self->type );
+	Stream*                         errorStream = Journal_Register( Error_Type, (Name)self->type  );
 	#endif
 
 	Journal_DPrintfL( self->debug, 1, "In %s():\n", __func__ );

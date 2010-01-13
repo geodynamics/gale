@@ -147,7 +147,7 @@ void _AllNodesVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 	
 	/* Find dictionary entry */
 	if (self->_dictionaryEntryName)
-		vcDictVal = Dictionary_Get( dictionary, self->_dictionaryEntryName );
+		vcDictVal = Dictionary_Get( dictionary, (Dictionary_Entry_Key)self->_dictionaryEntryName  );
 	else {
 		vcDictVal = &_vcDictVal;
 		Dictionary_Entry_Value_InitFromStruct( vcDictVal, dictionary );
@@ -155,21 +155,21 @@ void _AllNodesVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 	
 	if (vcDictVal) {
 		/* Obtain the variable entries */
-		self->_entryCount = Dictionary_Entry_Value_GetCount(Dictionary_Entry_Value_GetMember(vcDictVal, "variables"));
+		self->_entryCount = Dictionary_Entry_Value_GetCount(Dictionary_Entry_Value_GetMember( vcDictVal, (Dictionary_Entry_Key)"variables") );
 		self->_entryTbl = Memory_Alloc_Array( AllNodesVC_Entry, self->_entryCount, "AllNodesVC->_entryTbl" );
-		varsVal = Dictionary_Entry_Value_GetMember(vcDictVal, "variables");
+		varsVal = Dictionary_Entry_Value_GetMember( vcDictVal, (Dictionary_Entry_Key)"variables");
 		
-		for (entry_I = 0; entry_I < self->_entryCount; entry_I++) {
+		for (entry_I = 0; entry_I < self->_entryCount; entry_I++ ) {
 			char*							valType;
 			Dictionary_Entry_Value*	valueEntry;
 			Dictionary_Entry_Value*	varDictListVal;
 			
 			varDictListVal = Dictionary_Entry_Value_GetElement(varsVal, entry_I);
-			valueEntry = Dictionary_Entry_Value_GetMember(varDictListVal, "value");
+			valueEntry = Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"value" );
 			
-			self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetMember(varDictListVal, "name"));
+			self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"name") );
 				
-			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(varDictListVal, "type"));
+			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"type") );
 
 			if (0 == strcasecmp(valType, "func")) {
 				char*	funcName = Dictionary_Entry_Value_AsString(valueEntry);
@@ -179,7 +179,7 @@ void _AllNodesVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 				cfIndex = ConditionFunction_Register_GetIndex( self->conFunc_Register, funcName);
 
 				if ( cfIndex == (unsigned)-1 ) {	
-					Stream*	errorStr = Journal_Register( Error_Type, self->type );
+					Stream*	errorStr = Journal_Register( Error_Type, (Name)self->type  );
 
 					Journal_Printf( errorStr, "Error- in %s: While parsing "
 						"definition of %s \"%s\", the cond. func. applied to "
@@ -231,7 +231,7 @@ void _AllNodesVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 			else {
 				/* Assume double */
 				Journal_Printf( 
-					Journal_Register( InfoStream_Type, "myStream" ), 
+					Journal_Register( InfoStream_Type, (Name)"myStream"  ), 
 					"Type to variable on variable condition not given, assuming double\n" );
 				self->_entryTbl[entry_I].value.type = VC_ValueType_Double;
 				self->_entryTbl[entry_I].value.as.typeDouble = Dictionary_Entry_Value_AsDouble( valueEntry );

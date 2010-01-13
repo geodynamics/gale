@@ -279,14 +279,14 @@ void _SwarmShapeVC_AssignFromXML( void* variableCondition, Stg_ComponentFactory*
 	void*					variable_Register = NULL;
 	AbstractContext*	context;
 
-	self = Stg_ComponentFactory_ConstructByName( cf, self->name, SwarmShapeVC, False, data );
+	self = Stg_ComponentFactory_ConstructByName( cf, (Name)self->name, SwarmShapeVC, False, data  );
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data );
 
 	variable_Register = context->variable_Register; 
-	assert( variable_Register );
+	assert( variable_Register  );
 	self->variable_Register = variable_Register;
 
 	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, NULL );
@@ -300,11 +300,11 @@ void _SwarmShapeVC_Build(  void* variableCondition, void* data ) {
 	
 	assert( context && Stg_Class_IsInstance( context, AbstractContext_Type ) );
 
-	self->_swarm = Stg_ComponentFactory_ConstructByKey( context->CF, self->name, "Swarm", Swarm,  True, 0  ) ; 
-	assert( self->_swarm );
+	self->_swarm = Stg_ComponentFactory_ConstructByKey( context->CF, self->name, (Dictionary_Entry_Key)"Swarm", Swarm, True, 0  ) ; 
+	assert( self->_swarm  );
 	
-	self->_shape = Stg_ComponentFactory_ConstructByKey( context->CF, self->name, "Shape", Stg_Shape,  True, 0 /* dummy */  ) ;
-	assert( self->_shape );
+	self->_shape = Stg_ComponentFactory_ConstructByKey( context->CF, self->name, (Dictionary_Entry_Key)"Shape", Stg_Shape, True, 0 /* dummy */  ) ;
+	assert( self->_shape  );
 
 	_VariableCondition_Build( self, data );
 
@@ -319,9 +319,9 @@ void _SwarmShapeVC_BuildSelf(  void* variableCondition, void* data /* for build 
 	assert( context && Stg_Class_IsInstance( context, AbstractContext_Type ) );
 
 	/* dave - 06.08.07 */
-	/*self->shapeName = Stg_ComponentFactory_GetString( context->CF, self->name, "Shape", "" );
+	/*self->shapeName = Stg_ComponentFactory_GetString( context->CF, self->name, (Dictionary_Entry_Key)"Shape", "" );
 */
-	/*Journal_Firewall( strlen( self->shapeName ) > 0, Journal_MyStream( Error_Type, self ),
+	/*Journal_Firewall( strlen( self->shapeName  ) > 0, Journal_MyStream( Error_Type, self ),
 			"You need to fill out the 'Shape' dictionary entry for this SwarmShapeVC.\n" );*/
 	/*assert( self->shapeName );*/
 	
@@ -354,7 +354,7 @@ void _SwarmShapeVC_ReadDictionary( void* variableCondition, void* dict /**/ ) {
 	
 	/* Find dictionary entry */
 	if (self->_dictionaryEntryName)
-		vcDictVal = Dictionary_Get(dictionary, self->_dictionaryEntryName);
+		vcDictVal = Dictionary_Get( dictionary, (Dictionary_Entry_Key)self->_dictionaryEntryName );
 	else {
 		vcDictVal = &_vcDictVal;
 		Dictionary_Entry_Value_InitFromStruct(vcDictVal, dictionary);
@@ -363,25 +363,25 @@ void _SwarmShapeVC_ReadDictionary( void* variableCondition, void* dict /**/ ) {
 	if (vcDictVal) {
 		/* Get Name of Shape from dictionary - Grab pointer to shape later on */
 		self->shapeName = StG_Strdup( 
-				Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(vcDictVal, "Shape" )) );
+				Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember( vcDictVal, (Dictionary_Entry_Key)"Shape" ))  );
 
 		/* Obtain the variable entries */
-		self->_entryCount = Dictionary_Entry_Value_GetCount(Dictionary_Entry_Value_GetMember(vcDictVal, "variables"));
+		self->_entryCount = Dictionary_Entry_Value_GetCount(Dictionary_Entry_Value_GetMember( vcDictVal, (Dictionary_Entry_Key)"variables") );
 		self->_entryTbl = Memory_Alloc_Array( SwarmShapeVC_Entry, self->_entryCount, "SwarmShapeVC->_entryTbl" );
-		varsVal = Dictionary_Entry_Value_GetMember(vcDictVal, "variables");
+		varsVal = Dictionary_Entry_Value_GetMember( vcDictVal, (Dictionary_Entry_Key)"variables");
 		
-		for (entry_I = 0; entry_I < self->_entryCount; entry_I++) {
+		for (entry_I = 0; entry_I < self->_entryCount; entry_I++ ) {
 			char*			valType;
 			Dictionary_Entry_Value*	valueEntry;
 			Dictionary_Entry_Value*	varDictListVal;
 			
 			varDictListVal = Dictionary_Entry_Value_GetElement(varsVal, entry_I);
-			valueEntry = Dictionary_Entry_Value_GetMember(varDictListVal, "value");
+			valueEntry = Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"value" );
 			
 			self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString(
-				Dictionary_Entry_Value_GetMember(varDictListVal, "name"));
+				Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"name") );
 				
-			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(varDictListVal, "type"));
+			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"type") );
 			if (0 == strcasecmp(valType, "func")) {
 				char*	funcName = Dictionary_Entry_Value_AsString(valueEntry);
 				Index	cfIndex;
@@ -389,7 +389,7 @@ void _SwarmShapeVC_ReadDictionary( void* variableCondition, void* dict /**/ ) {
 				self->_entryTbl[entry_I].value.type = VC_ValueType_CFIndex;
 				cfIndex = ConditionFunction_Register_GetIndex( self->conFunc_Register, funcName);
 				if ( cfIndex == (Index) -1 ) {	
-					Stream*	errorStr = Journal_Register( Error_Type, self->type );
+					Stream*	errorStr = Journal_Register( Error_Type, (Name)self->type  );
 
 					Journal_Printf( errorStr, "Error- in %s: While parsing "
 						"definition of swarmShapeVC \"%s\" (applies to shape \"%s\"), the cond. func. applied to "
@@ -445,7 +445,7 @@ void _SwarmShapeVC_ReadDictionary( void* variableCondition, void* dict /**/ ) {
 			else {
 				/* Assume double */
 				Journal_DPrintf( 
-					Journal_Register( InfoStream_Type, "myStream" ), 
+					Journal_Register( InfoStream_Type, (Name)"myStream"  ), 
 					"Type to variable on variable condition not given, assuming double\n" );
 				self->_entryTbl[entry_I].value.type = VC_ValueType_Double;
 				self->_entryTbl[entry_I].value.as.typeDouble = Dictionary_Entry_Value_AsDouble( valueEntry );
@@ -492,14 +492,14 @@ VariableCondition_VariableIndex _SwarmShapeVC_GetVariableCount(void* variableCon
 Variable_Index _SwarmShapeVC_GetVariableIndex(void* variableCondition, Index globalIndex, VariableCondition_VariableIndex varIndex) {
 	SwarmShapeVC*	self = (SwarmShapeVC*)variableCondition;
 	Variable_Index	searchedIndex = 0;
-	Stream*			errorStr = Journal_Register( Error_Type, self->type );
+	Stream*			errorStr = Journal_Register( Error_Type, (Name)self->type );
 	Name				varName;
 	Swarm*			swarm = self->_swarm;
 	char*				swarmVarName;
 
 	varName = self->_entryTbl[varIndex].varName;
 
-	swarmVarName = (char*)calloc( strlen(swarm->name) + 1 + strlen(varName) + 1, sizeof(char) );
+	swarmVarName = (char*)calloc( strlen(swarm->name) + 1 + strlen(varName ) + 1, sizeof(char) );
 	strcat( swarmVarName, swarm->name );
 	strcat( swarmVarName, "-" );
 	strcat( swarmVarName, varName );

@@ -206,11 +206,11 @@ void _LineParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFacto
 
    _GlobalParticleLayout_AssignFromXML( self, cf, data );
 
-	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
+	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0  );
 
 	/* Read list of verticies of each of the different line segments from the dictionary */
-	list = Dictionary_Get( dictionary, "verticies" );
-	vertexCount = Dictionary_Entry_Value_GetCount( list );
+	list = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"verticies" );
+	vertexCount = Dictionary_Entry_Value_GetCount( list  );
 	vertexList = Memory_Alloc_Array( Coord , vertexCount, "Vertex Array" );
 	memset( vertexList, 0, vertexCount * sizeof(Coord) );
 
@@ -219,10 +219,10 @@ void _LineParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFacto
 		entry = Dictionary_Entry_Value_GetElement( list, vertex_I );
 		coord = vertexList[vertex_I];
 		/* Read Vertex */
-		coord[ I_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, "x"));
-		coord[ J_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, "y"));
-		if (dim == 3 ) {
-			coord[ K_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, "z"));
+		coord[ I_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, (Dictionary_Entry_Key)"x") );
+		coord[ J_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, (Dictionary_Entry_Key)"y"));
+		if (dim == 3  ) {
+			coord[ K_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( entry, (Dictionary_Entry_Key)"z") );
 		}
 
 		/* Print Position */
@@ -230,7 +230,7 @@ void _LineParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFacto
 	}
 	Stream_UnIndent( stream );
 
-	totalInitialParticles = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "totalInitialParticles", 2 );
+	totalInitialParticles = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"totalInitialParticles", 2  );
 
 	_LineParticleLayout_Init( self, dim, vertexCount, vertexList );
 

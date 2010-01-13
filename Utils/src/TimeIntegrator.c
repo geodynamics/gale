@@ -110,10 +110,10 @@ void _TimeIntegrator_Init(
 	TimeIntegrator* self = (TimeIntegrator*)timeIntegrator;
 
 	self->context = (DomainContext*)context;
-	self->debug = Journal_Register( Debug_Type, self->type );
-	self->info = Journal_Register( Info_Type, self->type );
+	self->debug = Journal_Register( Debug_Type, (Name)self->type  );
+	self->info = Journal_Register( Info_Type, (Name)self->type );
 		
-	self->integrandRegister = NamedObject_Register_New();
+	self->integrandRegister = NamedObject_Register_New( );
 	self->order = order;
 	self->simultaneous = simultaneous;
 
@@ -187,15 +187,15 @@ void _TimeIntegrator_AssignFromXML( void* timeIntegrator, Stg_ComponentFactory* 
 	EntryPoint_Register*     entryPoint_Register;
 
 	/** Default for order changed to 2nd order (was 1st order) by Pat Sunter, 10 May 2006 */
-	order          = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "order", 2 );
-	simultaneous   = Stg_ComponentFactory_GetBool( cf, self->name, "simultaneous", False );
+	order          = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"order", 2  );
+	simultaneous   = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"simultaneous", False  );
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
-	if( !self->context )	
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", DomainContext, False, data );
+	if( !self->context  )	
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data );
 
 	entryPoint_Register = self->context->entryPoint_Register; 
-	assert( entryPoint_Register );
+	assert( entryPoint_Register  );
 
 	_TimeIntegrator_Init( self, order, simultaneous, entryPoint_Register, (AbstractContext*)self->context );
 }
@@ -241,7 +241,7 @@ void _TimeIntegrator_Execute( void* timeIntegrator, void* data ) {
 				self->_execute = _TimeIntegrator_ExecuteRK4; 
 			break;
 		default:
-			Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 					"%s '%s' cannot handle order %u\n", self->type, self->name, self->order );
 	}
 

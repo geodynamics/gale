@@ -148,7 +148,7 @@ void StGermain_RotateCoordinateAxis( double* rotatedVector, double* vector, Inde
 			rotatedVector[2] = -vector[0]*sin(theta) + vector[2]*cos(theta);
 			return;
 		default: {
-			Stream* error = Journal_Register( ErrorStream_Type, "VectorMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"VectorMath"  );
 			Journal_Printf( error, "Impossible axis to rotate around in %s.", __func__);
 			exit(EXIT_FAILURE);
 		}

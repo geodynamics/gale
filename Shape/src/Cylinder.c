@@ -157,17 +157,17 @@ void _Cylinder_AssignFromXML( void* cylinder, Stg_ComponentFactory* cf, void* da
 
 	_Stg_Shape_AssignFromXML( self, cf, data );
 	
-	radius = Stg_ComponentFactory_GetDouble( cf, self->name, "radius", 0.0 );
+	radius = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"radius", 0.0  );
 
-	start[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "startX", -BIG );
-	start[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "startY", -BIG );
-	start[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "startZ", -BIG );
-	end[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "endX", BIG );
-	end[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "endY", BIG );
-	end[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "endZ", BIG );
+	start[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"startX", -BIG  );
+	start[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"startY", -BIG  );
+	start[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"startZ", -BIG  );
+	end[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"endX", BIG  );
+	end[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"endY", BIG  );
+	end[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"endZ", BIG  );
 
-	perpendicularAxisName = Stg_ComponentFactory_GetString( cf, self->name, "alongAxis", "x" );
-	switch ( perpendicularAxisName[0] ) {
+	perpendicularAxisName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"alongAxis", "x" );
+	switch ( perpendicularAxisName[0]  ) {
 		case 'x': case 'X': case 'i': case 'I': case '0':
 			alongAxis = I_AXIS; break;
 		case 'y': case 'Y': case 'j': case 'J': case '1':
@@ -175,7 +175,7 @@ void _Cylinder_AssignFromXML( void* cylinder, Stg_ComponentFactory* cf, void* da
 		case 'z': case 'Z': case 'k': case 'K': case '2':
 			alongAxis = K_AXIS; break;
 		default:
-			Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 					"Cannot understand alongAxis '%s'\n", perpendicularAxisName );
 	}
 	

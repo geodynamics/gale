@@ -165,13 +165,13 @@ void _Intersection_AssignFromXML( void* intersection, Stg_ComponentFactory* cf, 
 	Dictionary_Entry_Value* optionsList;
 	Dictionary*             dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 	char*                   nameShape;
-	Stream*                 stream     = Journal_Register( Info_Type, CURR_MODULE_NAME );
+	Stream*                 stream     = Journal_Register( Info_Type, (Name)CURR_MODULE_NAME  );
 	
 	_Stg_Shape_AssignFromXML( self, cf, data );
 
-	optionsList = Dictionary_Get( dictionary, "shapes" );
+	optionsList = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"shapes"  );
 /*	Journal_Firewall( vertexList != NULL, 
-		Journal_Register( Error_Type, self->type ),
+		Journal_Register( Error_Type, (Name)self->type  ),
 		"In func %s: vertexList specifying the intersection is NULL.\n",
 		__func__);
 
@@ -195,16 +195,16 @@ void _Intersection_AssignFromXML( void* intersection, Stg_ComponentFactory* cf, 
 		nameShape = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( optionsList, shape_I));
 
 		if ( nameShape[0] == '!' ) {
-			shapeList[ shape_I ] =  Stg_ComponentFactory_ConstructByName( cf, &nameShape[1], Stg_Shape, True, data ) ;
+			shapeList[ shape_I ] =  Stg_ComponentFactory_ConstructByName( cf, (Name)&nameShape[1], Stg_Shape, True, data  ) ;
 			isComplement[ shape_I ] = True;
 		}
 		else {
-			shapeList[ shape_I ] =  Stg_ComponentFactory_ConstructByName( cf, nameShape, Stg_Shape, True, data ) ;
+			shapeList[ shape_I ] =  Stg_ComponentFactory_ConstructByName( cf, (Name)nameShape, Stg_Shape, True, data ) ;
 			isComplement[ shape_I ] = False;
 		}
 		
 	}
-	Stream_UnIndent( stream );
+	Stream_UnIndent( stream  );
 
 	_Intersection_Init( self, shapeList, shapeCount, isComplement );
 
@@ -278,7 +278,7 @@ double _Intersection_CalculateVolume( void* intersection ) {
 }
 void _Intersection_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
 	Stg_Shape* self = (Stg_Shape*)shape;
-	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }

@@ -109,7 +109,7 @@ void _Mesh_HexAlgorithms_Print( void* hexAlgorithms, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* hexAlgorithmsStream;
-	hexAlgorithmsStream = Journal_Register( InfoStream_Type, "Mesh_HexAlgorithmsStream" );
+	hexAlgorithmsStream = Journal_Register( InfoStream_Type, (Name)"Mesh_HexAlgorithmsStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "Mesh_HexAlgorithms (ptr): (%p)\n", self );

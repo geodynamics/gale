@@ -126,7 +126,7 @@ void _Mesh_Algorithms_Print( void* algorithms, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* algorithmsStream;
-	algorithmsStream = Journal_Register( InfoStream_Type, "Mesh_AlgorithmsStream" );
+	algorithmsStream = Journal_Register( InfoStream_Type, (Name)"Mesh_AlgorithmsStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "Mesh_Algorithms (ptr): (%p)\n", self );
@@ -137,9 +137,9 @@ void _Mesh_Algorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf,
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
    AbstractContext* context = NULL;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
    _Mesh_Algorithms_Init( self, context );
 }
 

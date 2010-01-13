@@ -116,7 +116,7 @@ void _MeshVariable_Print( void* meshVariable, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* meshVariableStream;
-	meshVariableStream = Journal_Register( InfoStream_Type, "MeshVariableStream" );
+	meshVariableStream = Journal_Register( InfoStream_Type, (Name)"MeshVariableStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "MeshVariable (ptr): (%p)\n", self );
@@ -135,36 +135,36 @@ void _MeshVariable_AssignFromXML( void* meshVariable, Stg_ComponentFactory* cf, 
 	void*					variableRegister = NULL;
 	void*					pointerRegister = NULL;
 	Name*					names = NULL;
-	Stream*				error = Journal_Register( Error_Type, self->type );
+	Stream*				error = Journal_Register( Error_Type, (Name)self->type );
 	Mesh*					mesh;
 	AbstractContext*	context;
 	
 	assert( self );
 
 	componentDict = cf->componentDict;
-	assert( componentDict );
+	assert( componentDict  );
 	thisComponentDict = Dictionary_GetDictionary( componentDict, self->name );
 	assert( thisComponentDict );
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data );
 	
 	/* Grab Registers */
 	variableRegister = context->variable_Register;
 	assert( variableRegister );
 	pointerRegister = context->pointer_Register;
-	assert( pointerRegister );
+	assert( pointerRegister  );
 
 	/* Construct the mesh. */
-	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
+	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"mesh", Mesh, True, data  );
 	MeshVariable_SetMesh( self, mesh );
 
 	/* Get the topological element we're intereseted in. */
-	self->topoDim = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "topologicalDim", 0 );
+	self->topoDim = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"topologicalDim", 0  );
 			
 	/* Get Type of Variable */
-	dataTypeName = Dictionary_GetString( thisComponentDict, "DataType" );
+	dataTypeName = Dictionary_GetString( thisComponentDict, (Dictionary_Entry_Key)"DataType"  );
 	if ( !strcasecmp( dataTypeName, "Double" ) )
 		dataTypes[0] = Variable_DataType_Double;
 	else if ( !strcasecmp( dataTypeName, "Float" ) )
@@ -179,7 +179,7 @@ void _MeshVariable_AssignFromXML( void* meshVariable, Stg_ComponentFactory* cf, 
 		Journal_Firewall( False, error, "Variable '%s' cannot understand data type '%s'\n", self->name, dataTypeName );
 
 	/* Get Rank of Variable - i.e. Scalar or Vector */
-	rankName = Dictionary_GetString( thisComponentDict, "Rank" );
+	rankName = Dictionary_GetString( thisComponentDict, (Dictionary_Entry_Key)"Rank"  );
 	if( !strcasecmp( rankName, "Scalar" ) ){
 		dataTypeCounts[0] = 1;
 	}
@@ -188,16 +188,16 @@ void _MeshVariable_AssignFromXML( void* meshVariable, Stg_ComponentFactory* cf, 
 		Index                   nameCount = 0;
 
 		/* Get Names from list */
-		if (( list = Dictionary_Get( thisComponentDict, "names" ) )) {
+		if (( list = Dictionary_Get( thisComponentDict, (Dictionary_Entry_Key)"names" ) )) {
 			Index entry_I;
 
-			nameCount = Dictionary_Entry_Value_GetCount( list );
+			nameCount = Dictionary_Entry_Value_GetCount( list  );
 			names = Memory_Alloc_Array( Name, nameCount, "Variable Names" );
 
 			for ( entry_I = 0 ; entry_I < nameCount ; entry_I++ )
 				names[ entry_I ] = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement(list, entry_I ) );
 		}
-		dataTypeCounts[0] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "VectorComponentCount", nameCount );
+		dataTypeCounts[0] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"VectorComponentCount", nameCount  );
 
 		Journal_Firewall( nameCount >= dataTypeCounts[0], error, "Variable '%s' has too few names in list for %d vector components.\n", self->name, dataTypeCounts[0] );
 	}

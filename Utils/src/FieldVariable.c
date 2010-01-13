@@ -208,16 +208,16 @@ void _FieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf
 	Dictionary_Entry_Value* feVarsList = NULL;
 	DomainContext*				context;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", DomainContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data );
 	
 	fV_Register = context->fieldVariable_Register; 
-	assert( fV_Register );
+	assert( fV_Register  );
 
-	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
+	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0  );
 
-	fieldComponentCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "fieldComponentCount", 0 );
+	fieldComponentCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"fieldComponentCount", 0  );
 
 	/* Decide whether this FieldVariable will be checkpointed & reloaded, based on the dictionary list 
 	   "fieldVariableToCheckpoint". NB may want to put this in the XML component definintion of a
@@ -226,9 +226,9 @@ void _FieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf
 	 */
 
 	/* Case insensitive search */
-	feVarsList = Dictionary_Get( cf->rootDict, "fieldVariablesToCheckpoint" );
-	if ( NULL == feVarsList ) {
-		feVarsList = Dictionary_Get( cf->rootDict, "FieldVariablesToCheckpoint" );
+	feVarsList = Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)"fieldVariablesToCheckpoint" );
+	if ( NULL == feVarsList  ) {
+		feVarsList = Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)"FieldVariablesToCheckpoint" );
 	}
 
 	if (feVarsList != NULL ) {
@@ -238,7 +238,7 @@ void _FieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf
 		char*                    fieldVariableName;
 	
 		isCheckpointedAndReloaded = False;
-		for ( var_I = 0; var_I < listLength; var_I++ ) {
+		for ( var_I = 0; var_I < listLength; var_I++  ) {
 			feVarDictValue = Dictionary_Entry_Value_GetElement( feVarsList, var_I );
 			fieldVariableName = Dictionary_Entry_Value_AsString( feVarDictValue ); 
 			if ( 0 == strcmp( self->name, fieldVariableName ) ) {
@@ -253,9 +253,9 @@ void _FieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf
 	}
    feVarsList = NULL;
    /** also include check to see if this fevariable should be saved for analysis purposes */ 
-   feVarsList = Dictionary_Get( cf->rootDict, "fieldVariablesToSave" );
-   if ( NULL == feVarsList ) {
-      feVarsList = Dictionary_Get( cf->rootDict, "FieldVariablesToSave" );
+   feVarsList = Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)"fieldVariablesToSave" );
+   if ( NULL == feVarsList  ) {
+      feVarsList = Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)"FieldVariablesToSave" );
    }
    if (feVarsList != NULL ) {
       Index                    listLength = Dictionary_Entry_Value_GetCount( feVarsList );
@@ -263,7 +263,7 @@ void _FieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf
       Dictionary_Entry_Value*  feVarDictValue = NULL;
       char*                    fieldVariableName;
    
-      for ( var_I = 0; var_I < listLength; var_I++ ) {
+      for ( var_I = 0; var_I < listLength; var_I++  ) {
          feVarDictValue = Dictionary_Entry_Value_GetElement( feVarsList, var_I );
          fieldVariableName = Dictionary_Entry_Value_AsString( feVarDictValue ); 
          if ( 0 == strcmp( self->name, fieldVariableName ) ) {

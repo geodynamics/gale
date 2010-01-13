@@ -26,23 +26,23 @@ void ShapeSuite_GeneratePoints( ShapeSuiteData* data, Dimension_Index dim, char*
 	unsigned						testCoordCount, index;
 	Name							outputPath;
 	Coord							coord;
-	Stream*						stream = Journal_Register( Info_Type, inputFileName );
+	Stream*						stream = Journal_Register( Info_Type, (Name)inputFileName );
 	char							xml_input[PCU_PATH_MAX];
 
-	Journal_Enable_AllTypedStream( False );
+	Journal_Enable_AllTypedStream( False  );
 
 	/* read in the xml input file */
 	pcu_filename_input( inputFileName, xml_input );
 	data->cf = cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
 	stgMainBuildAndInitialise( cf );
-	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, "context" ); 
+	context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context"  ); 
 
 	dictionary = context->dictionary;
-	outputPath = Dictionary_GetString( dictionary, "outputPath" );
+	outputPath = Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"outputPath"  );
 
 	Stream_RedirectFile_WithPrependedPath( stream, outputPath, "test.dat" );
-	shape = (Stg_Shape*) LiveComponentRegister_Get( context->CF->LCRegister, "shape" );
-	assert( shape );
+	shape = (Stg_Shape*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"shape" );
+	assert( shape  );
 
 	testCoordCount = Dictionary_GetUnsignedInt_WithDefault( dictionary, "testCoordCount", 10000 );
 

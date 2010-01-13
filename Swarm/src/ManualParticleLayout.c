@@ -92,7 +92,7 @@ void _ManualParticleLayout_Init( void* manualParticleLayout, Dictionary* diction
 	self->isConstructed = True;
 	self->dictionary    = dictionary;
 
-	manualParticlePositions = Dictionary_Get( self->dictionary, "manualParticlePositions" );
+	manualParticlePositions = Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"manualParticlePositions" );
 	self->totalInitialParticles = Dictionary_Entry_Value_GetCount( manualParticlePositions );
 	self->averageInitialParticlesPerCell = 0;
 }
@@ -100,7 +100,7 @@ void _ManualParticleLayout_Init( void* manualParticleLayout, Dictionary* diction
 void _ManualParticleLayout_Delete( void* manualParticleLayout ) {
 	ManualParticleLayout* self = (ManualParticleLayout*)manualParticleLayout;
 
-	_GlobalParticleLayout_Delete( self );
+	_GlobalParticleLayout_Delete( self  );
 }
 
 void _ManualParticleLayout_Print( void* manualParticleLayout, Stream* stream ) {
@@ -188,12 +188,12 @@ void _ManualParticleLayout_InitialiseParticle(
 	Dictionary*                 particlePositionDict    = NULL;
 	GlobalParticle*             particle                = (GlobalParticle*)_particle;
 
-	manualParticlePositions = Dictionary_Get( self->dictionary, "manualParticlePositions" );
+	manualParticlePositions = Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"manualParticlePositions"  );
 	particlePositionEntry = Dictionary_Entry_Value_GetElement( manualParticlePositions, newParticle_I );
 	particlePositionDict = Dictionary_Entry_Value_AsDictionary( particlePositionEntry );
-	particle->coord[I_AXIS] = Dictionary_GetDouble_WithDefault( particlePositionDict, "x", 0.0 );
-	particle->coord[J_AXIS] = Dictionary_GetDouble_WithDefault( particlePositionDict, "y", 0.0 );
-	particle->coord[K_AXIS] = Dictionary_GetDouble_WithDefault( particlePositionDict, "z", 0.0 );
+	particle->coord[I_AXIS] = Dictionary_GetDouble_WithDefault( particlePositionDict, (Dictionary_Entry_Key)"x", 0.0  );
+	particle->coord[J_AXIS] = Dictionary_GetDouble_WithDefault( particlePositionDict, (Dictionary_Entry_Key)"y", 0.0  );
+	particle->coord[K_AXIS] = Dictionary_GetDouble_WithDefault( particlePositionDict, (Dictionary_Entry_Key)"z", 0.0  );
 }
 
 

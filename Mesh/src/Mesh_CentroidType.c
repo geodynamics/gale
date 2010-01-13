@@ -110,7 +110,7 @@ void _Mesh_CentroidType_Print( void* centroidType, Stream* stream ) {
 	Mesh_CentroidType*	self = (Mesh_CentroidType*)centroidType;
 	Stream*			centroidTypeStream;
 
-	centroidTypeStream = Journal_Register( InfoStream_Type, "Mesh_CentroidTypeStream" );
+	centroidTypeStream = Journal_Register( InfoStream_Type, (Name)"Mesh_CentroidTypeStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "Mesh_CentroidType (ptr): (%p)\n", self );

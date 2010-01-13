@@ -46,8 +46,8 @@ void Dimension_3DTo1D_3_Func( Index dim0, Index dim1, Index dim2,
 	
 	#if DEBUG 
 	{
-		Stream* dimensionError = Journal_Register( Error_Type, "DimensionMacros" );
-		Journal_Firewall( (dim0 < dimSizes[0]), dimensionError, "Error: Given coordinate[0] value %d >= "
+		Stream* dimensionError = Journal_Register( Error_Type, (Name)"DimensionMacros" );
+		Journal_Firewall( (dim0 < dimSizes[0] ), dimensionError, "Error: Given coordinate[0] value %d >= "
 			"regionSize[0] %d\n", dim0, dimSizes[0] );
 		Journal_Firewall( (dim1 < dimSizes[1]), dimensionError, "Error: Given coordinate[1] value %d >= "
 			"regionSize[1] %d\n", dim1, dimSizes[1] );

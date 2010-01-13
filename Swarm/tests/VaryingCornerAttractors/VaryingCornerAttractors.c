@@ -28,14 +28,14 @@ void StGermain_VaryingCornerAttractors_UpdatePositions( DomainContext* context )
 	Particle_InCellIndex		cParticle_I;
 	Particle* 	        	currParticle;
 	Index				dim_I;
-	Swarm*                          swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
+	Swarm*                          swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"swarm"  );
 	Coord                           attractorPoint;
 	BlockGeometry*                  blockGeometry;
-	Stream*                         stream = Journal_Register( Debug_Type, "particleUpdate" );
+	Stream*                         stream = Journal_Register( Debug_Type, (Name)"particleUpdate" );
 	unsigned int                    movementSpeedDivisor = 10;
 	int                             movementSign = 1;
 	unsigned int                    cornerPeriod = 10;
-	unsigned int                    numCorners = (swarm->dim-1)*4;
+	unsigned int                    numCorners = (swarm->dim-1 )*4;
 	unsigned int                    explosionPeriod = numCorners*cornerPeriod;
 	Coord                           cornerCoords[8];
 	int                             modValue = 0;
@@ -43,7 +43,7 @@ void StGermain_VaryingCornerAttractors_UpdatePositions( DomainContext* context )
 
 	Stream_SetPrintingRank( stream, Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "procToWatch", 0 ) );
 	
-	blockGeometry = (BlockGeometry*) LiveComponentRegister_Get( context->CF->LCRegister, "geometry" );
+	blockGeometry = (BlockGeometry*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"geometry" );
 
 		/* Bottom left corner */
 	cornerCoords[0][I_AXIS] = blockGeometry->min[I_AXIS];
@@ -79,7 +79,7 @@ void StGermain_VaryingCornerAttractors_UpdatePositions( DomainContext* context )
 	cornerCoords[7][K_AXIS] = blockGeometry->max[K_AXIS];
 
 	/* calculate which corner */
-	modValue = (context->timeStep - 1) % (numCorners * cornerPeriod);
+	modValue = (context->timeStep - 1) % (numCorners * cornerPeriod );
 	cornerIndex = modValue / cornerPeriod;
 	memcpy( attractorPoint, cornerCoords[cornerIndex], 3 * sizeof(double) );
 	Journal_Printf( stream, "Calculated attractor point is at (%f,%f,%f):\n", attractorPoint[0], attractorPoint[1], attractorPoint[2] );
@@ -137,7 +137,7 @@ void StGermain_VaryingCornerAttractors_UpdatePositions( DomainContext* context )
 void _StGermain_VaryingCornerAttractors_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	DomainContext*   context;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  );
 	
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Solve, StGermain_VaryingCornerAttractors_UpdatePositions );
 }
@@ -156,8 +156,7 @@ void* _StGermain_VaryingCornerAttractors_DefaultNew( Name name ) {
 	}
 
 Index StGermain_VaryingCornerAttractors_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, StGermain_VaryingCornerAttractors_Type, "0",
-	_StGermain_VaryingCornerAttractors_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, StGermain_VaryingCornerAttractors_Type, (Name)"0", _StGermain_VaryingCornerAttractors_DefaultNew  );
 }
 
 

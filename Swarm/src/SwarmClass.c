@@ -147,7 +147,7 @@ void _Swarm_Init(
    void*				      ics )
 {
 	StandardParticle   particle;
-	Stream*            errorStream = Journal_Register( Error_Type, self->type );
+	Stream*            errorStream = Journal_Register( Error_Type, (Name)self->type  );
    LiveComponentRegister* lcReg = NULL; 	
 
 	self->debug = Stream_RegisterChild( Swarm_Debug, self->type );
@@ -576,43 +576,35 @@ void _Swarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	Variable_Register*      variable_Register        = NULL;
 	VariableCondition* 	ic            		 = NULL;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 
-	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
+	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0  );
 	
-	particleType = Stg_ComponentFactory_GetString( cf, self->name, "ParticleType", IntegrationPoint_Type );
+	particleType = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"ParticleType", IntegrationPoint_Type  );
 	
-	cellLayout =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  CellLayout_Type, CellLayout,  True, data ) ;
-	particleLayout =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  ParticleLayout_Type, ParticleLayout, True, data );
+	cellLayout =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)CellLayout_Type, CellLayout, True, data  ) ;
+	particleLayout =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)ParticleLayout_Type, ParticleLayout, True, data );
 	
 	extensionManagerRegister = extensionMgr_Register; 
 	assert( extensionManagerRegister );
 	variable_Register = context->variable_Register; 
-	assert( variable_Register );
+	assert( variable_Register  );
 	
 	cellParticleTblDelta = 
-		Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "cellParticleTblDelta", DEFAULT_CELL_PARTICLE_TBL_DELTA);
+		Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"cellParticleTblDelta", DEFAULT_CELL_PARTICLE_TBL_DELTA );
 	extraParticlesFactor = 
-		Stg_ComponentFactory_GetDouble( cf, self->name, "extraParticlesFactor", DEFAULT_EXTRA_PARTICLES_FACTOR );
+		Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"extraParticlesFactor", DEFAULT_EXTRA_PARTICLES_FACTOR );
 	
 	{
 		unsigned int count = 0;
 		int i = 0;
 		Stg_Component **components = NULL;
 
-		components = (Stg_Component**)Stg_ComponentFactory_ConstructByList( 
-			cf, 
-			self->name, 
-			"ParticleCommHandlers", 
-			Stg_ComponentFactory_Unlimited, 
-			ParticleCommHandler, 
-			False, 
-			&count, 
-			data );
+		components = (Stg_Component** )Stg_ComponentFactory_ConstructByList( cf, self->name, (Dictionary_Entry_Key)"ParticleCommHandlers", Stg_ComponentFactory_Unlimited, ParticleCommHandler, False, &count, data );
 
-		if( count == 0 ){
+		if( count == 0  ){
  			Journal_Printf( self->debug, "Warning: Swarm has 0 Communication handlers..!\n" );
  		}
  		else{
@@ -624,7 +616,7 @@ void _Swarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	}
 
 	/* construct the variable condition IC */
-	ic = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IC", VariableCondition, False, data );
+	ic = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"IC", VariableCondition, False, data  );
 	
 	_Swarm_Init( 
 			self, context,
@@ -967,7 +959,7 @@ void Swarm_UpdateParticleOwner( void* swarm, Particle_Index particle_I ) {
 		}	
 		#ifdef CAUTIOUS
 		else if ( newOwningCell >= self->cellDomainCount ) {	
-			Stream*    errorStream = Journal_Register( Error_Type, self->type );
+			Stream*    errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 			Journal_Firewall( 0, errorStream,
 				"Error - in %s(): particle %u's new domain cell calculated as "
@@ -1010,7 +1002,7 @@ void Swarm_DeleteParticle( void* swarm, Particle_Index particleToDelete_lI ) {
 	GlobalParticle*         lastParticle = NULL;	
 	GlobalParticle*         particleToDelete = NULL;	
 	SizeT                   particleSize = self->particleExtensionMgr->finalSize;
-	Stream*                 errorStr = Journal_Register( Error_Type, self->type );
+	Stream*                 errorStr = Journal_Register( Error_Type, (Name)self->type  );
 
 	Journal_Firewall( particleToDelete_lI < self->particleLocalCount, errorStr,
 		"Error- in %s(): particleToDelete_lI passed in (%u) is >= swarm's local particle count %u.\n",
@@ -1061,7 +1053,7 @@ void Swarm_DeleteParticleAndReplaceWithNew( void* swarm, Particle_Index particle
 	Swarm* 			self = (Swarm*)swarm;
 	Particle_InCellIndex    cParticle_I = 0;
 	GlobalParticle*         particleToDelete = NULL;	
-	Stream*                 errorStr = Journal_Register( Error_Type, self->type );
+	Stream*                 errorStr = Journal_Register( Error_Type, (Name)self->type  );
 	
 	Journal_Firewall( particleToDelete_lI < self->particleLocalCount, errorStr,
 		"Error- in %s(): particleToDelete_lI passed in (%u) is >= swarm's local particle count %u.\n",
@@ -1089,7 +1081,7 @@ void Swarm_AddParticleToCell( void* swarm, Cell_DomainIndex dCell_I, Particle_In
 	Particle_InCellIndex*	newCountPtr = &self->cellParticleCountTbl[dCell_I];
 	Particle_InCellIndex*	newSizePtr = &self->cellParticleSizeTbl[dCell_I];
 	#ifdef CAUTIOUS
-	Stream*                 errorStream = Journal_Register( Error_Type, self->type );
+	Stream*                 errorStream = Journal_Register( Error_Type, (Name)self->type  );
 	#endif
 
 	Journal_DPrintfL( self->debug, 3, "Adding particle %d to cell %d: cell's particle count now %d",
@@ -1121,7 +1113,7 @@ void Swarm_AddShadowParticleToShadowCell( void* swarm, Cell_DomainIndex dCell_I,
 	if( self->shadowTablesBuilt ){
 		Particle_InCellIndex*	newCountPtr = &self->shadowCellParticleCountTbl[dCell_I-self->cellLocalCount];
 		#ifdef CAUTIOUS
-		Stream*                 errorStream = Journal_Register( Error_Type, self->type );
+		Stream*                 errorStream = Journal_Register( Error_Type, (Name)self->type  );
 		#endif
 
 		Journal_DPrintfL( self->debug, 3, "Adding shadow particle %d to shadow cell %d: shadow cell's particle count now %d",
@@ -1381,7 +1373,7 @@ SwarmVariable* Swarm_NewScalarVariable(
 	if ( swarmVariable_Register ) 
 		variable_Register = swarmVariable_Register->variable_Register;
 	
-	name = Stg_Object_AppendSuffix( self, nameExt );
+	name = Stg_Object_AppendSuffix( self, (Name)nameExt  );
 	variable = Variable_New( 
 		name,
 		self->context,
@@ -1438,7 +1430,7 @@ SwarmVariable* Swarm_NewVectorVariable(
 	dataNames = Memory_Alloc_Array( Name, dataTypeCount, "dataNames" );
 	va_start( ap, dataTypeCount );
 	for( vector_I = 0; vector_I < dataTypeCount; vector_I++ ) {
-		dataNames[vector_I] = Stg_Object_AppendSuffix( self, (Name) va_arg( ap, Name ) );
+		dataNames[vector_I] = Stg_Object_AppendSuffix( self, (Name)(Name ) va_arg( ap, Name ) );
 	}
 	va_end( ap );
 	
@@ -1535,13 +1527,13 @@ void Swarm_CheckCoordsAreFinite( void* swarm ) {
 	Swarm*              self               = (Swarm*) swarm;
 	GlobalParticle*     particle;
 	double*             coord;
-	Stream*             errorStream        = Journal_Register( Error_Type, self->type );
+	Stream*             errorStream        = Journal_Register( Error_Type, (Name)self->type );
 	Dimension_Index     dim                = self->dim;
 	Particle_Index      particleLocalCount = self->particleLocalCount;
 	Particle_Index      lParticle_I;
 
 	for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) {
-		particle = (GlobalParticle*)Swarm_ParticleAt( self, lParticle_I );
+		particle = (GlobalParticle* )Swarm_ParticleAt( self, lParticle_I );
 		coord    = particle->coord;
 		
 		Journal_Firewall( 
@@ -1561,7 +1553,7 @@ void Swarm_AssignIndexWithinShape( void* swarm, void* _shape, Variable* variable
 
 	Journal_Firewall( 
 		self->particleLocalCount == variableToAssign->arraySize,
-		Journal_Register( Error_Type, self->type ),
+		Journal_Register( Error_Type, (Name)self->type  ),
 		"In func %s: Trying to assign to variable '%s' with a different number of values \
 		than the number of particles in swarm '%s'.\n",
 		__func__, variableToAssign->name, self->name );
