@@ -107,6 +107,9 @@ AbstractContext* _AbstractContext_New(  ABSTRACTCONTEXT_DEFARGS  ) {
 	self->stopTime = stopTime;
 	self->communicator = communicator;
 	
+	MPI_Comm_rank( self->communicator, &self->rank );
+	MPI_Comm_size( self->communicator, &self->nproc );
+		
 	return self;
 }
 
@@ -127,9 +130,6 @@ void _AbstractContext_Init( AbstractContext* self ) {
 	
 	/* General and Virtual info should already be set */
 	
-	/* AbstractContext info */
-	MPI_Comm_rank( self->communicator, &self->rank );
-	MPI_Comm_size( self->communicator, &self->nproc );
 	self->debug = debug;
 
 	Journal_Enable_TypedStream( DebugStream_Type, False );
@@ -349,7 +349,7 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 	AbstractContext* 	self = (AbstractContext*)context;
 	Dictionary_Entry_Value* dictEntryVal = NULL;
 	double			startTime, stopTime;
-	
+
 	Journal_Printf( self->debug, "In: %s\n", __func__ );
 
    /* the following just pauses at this point to allow time to attach a debugger.. useful for mpi debugging */
