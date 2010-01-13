@@ -165,9 +165,9 @@ void* _ConstitutiveMat_Refactored_Copy( void* constitutiveMatrix, void* dest, Bo
 	
 	/* TODO */ abort();
 	if (deep) {
-		newConstitutiveMat_Refactored->matrixData = Memory_Alloc_2DArray( double, self->columnSize, self->rowSize, self->name );
+		newConstitutiveMat_Refactored->matrixData = Memory_Alloc_2DArray( double, self->columnSize, self->rowSize, (Name)self->name );
 	}
-	return (void*)newConstitutiveMat_Refactored;
+	return (void* )newConstitutiveMat_Refactored;
 }
 
 void _ConstitutiveMat_Refactored_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) {
@@ -176,12 +176,12 @@ void _ConstitutiveMat_Refactored_AssignFromXML( void* constitutiveMatrix, Stg_Co
 	Materials_Register*				materialsRegister;
 	PICelleratorContext*				context;
 
-	context = (PICelleratorContext*)Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
+	context = (PICelleratorContext*)Stg_ComponentFactory_ConstructByName( cf, (Name)"context", PICelleratorContext, True, data );
 
 	materialsRegister = context->materials_Register;
-	assert( materialsRegister );
+	assert( materialsRegister  );
 
-	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
+	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0  );
 
 	_ConstitutiveMat_Refactored_Init( self, dim, context, materialsRegister );
 }
@@ -191,11 +191,11 @@ void _ConstitutiveMat_Refactored_Build( void* constitutiveMatrix, void* data ) {
 	Material_Index      material_I;
 	Material_Index      materialCount = Materials_Register_GetCount( self->materials_Register );
 	RheologyMaterial*   material;
-	Stream*             errorStream = Journal_Register( Error_Type, self->type );
+	Stream*             errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 	Journal_DPrintf( self->debug, "In %s - for matrix %s\n", __func__, self->name );
 
-	self->matrixData = Memory_Alloc_2DArray( double, self->columnSize, self->rowSize, self->name );
+	self->matrixData = Memory_Alloc_2DArray( double, self->columnSize, self->rowSize, (Name)self->name  );
 /*
         self->deriv = AllocArray2D( double, (self->dim + 1), (self->dim + 1) );
 */

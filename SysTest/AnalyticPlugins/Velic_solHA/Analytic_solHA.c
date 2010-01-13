@@ -107,17 +107,17 @@ void _Velic_solHA_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* c
 	/* Construct Parent */
 	_FieldTest_AssignFromXML( self, cf, data );
 
-	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_sigma", 1.0 );
-	eta = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_eta", 1.0 );
+	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solHA_sigma", 1.0  );
+	eta = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solHA_eta", 1.0  );
 
-	startX = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_startX", 0.1 );
-	endX   = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_endX", 0.7 );
+	startX = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solHA_startX", 0.1  );
+	endX   = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solHA_endX", 0.7  );
 
-	startY = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_startY", 0.2 );
-	endY   = Stg_ComponentFactory_GetRootDictDouble( cf, "solHA_endY", 0.6 );
+	startY = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solHA_startY", 0.2  );
+	endY   = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solHA_endY", 0.6 );
 
 	dx = 0.5 * (startX + endX);
-	dy = 0.5 * (startY + endY);
+	dy = 0.5 * (startY + endY );
 	x0 = endX - startX;
 	y0 = endY - startY;
 
@@ -146,7 +146,7 @@ void* _Velic_solHA_DefaultNew( Name name ) {
 }
 
 Index Underworld_Velic_solHA_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Velic_solHA_Type, "0", _Velic_solHA_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Velic_solHA_Type, (Name)"0", _Velic_solHA_DefaultNew  );
 }
 
 

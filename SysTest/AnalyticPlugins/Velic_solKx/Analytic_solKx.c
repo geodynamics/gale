@@ -119,42 +119,42 @@ void _Velic_solKx_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* c
 	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	/* Create Analytic Fields */
-	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data );
+	velocityField = Stg_ComponentFactory_ConstructByName( cf, (Name)"VelocityField", FeVariable, True, data  );
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, velocityField, Velic_solKx_VelocityFunction );
 
-	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data );
+	pressureField = Stg_ComponentFactory_ConstructByName( cf, (Name)"PressureField", FeVariable, True, data  );
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, Velic_solKx_PressureFunction );
 
-	viscosityField = Stg_ComponentFactory_ConstructByName( cf, "ViscosityField", FeVariable, False, data );
-	if ( viscosityField ) 
+	viscosityField = Stg_ComponentFactory_ConstructByName( cf, (Name)"ViscosityField", FeVariable, False, data );
+	if ( viscosityField  ) 
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, viscosityField, Velic_solKx_ViscosityFunction );
 
-	stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, False, data );
-	if ( stressField ) 
+	stressField = Stg_ComponentFactory_ConstructByName( cf, (Name)"StressField", FeVariable, False, data );
+	if ( stressField  ) 
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, stressField, Velic_solKx_StressFunction );
 
-	strainRateField = Stg_ComponentFactory_ConstructByName( cf, "StrainRateField", FeVariable, False, data );
-	if ( strainRateField  )
+	strainRateField = Stg_ComponentFactory_ConstructByName( cf, (Name)"StrainRateField", FeVariable, False, data );
+	if ( strainRateField   )
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, strainRateField, Velic_solKx_StrainRateFunction );
 
-	recoveredStrainRateField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStrainRateField", FeVariable, False, data );
-	if ( recoveredStrainRateField )
+	recoveredStrainRateField = Stg_ComponentFactory_ConstructByName( cf, (Name)"recoveredStrainRateField", FeVariable, False, data );
+	if ( recoveredStrainRateField  )
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStrainRateField, Velic_solKx_StrainRateFunction );
 
-	recoveredStressField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStressField", FeVariable, False, data );
-	if ( recoveredStressField )
+	recoveredStressField = Stg_ComponentFactory_ConstructByName( cf, (Name)"recoveredStressField", FeVariable, False, data );
+	if ( recoveredStressField  )
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStressField, Velic_solKx_StressFunction );
 
-	recoveredPressureField = Stg_ComponentFactory_ConstructByName( cf, "recoveredPressureField", FeVariable, False, data );
-	if ( recoveredPressureField )
+	recoveredPressureField = Stg_ComponentFactory_ConstructByName( cf, (Name)"recoveredPressureField", FeVariable, False, data );
+	if ( recoveredPressureField  )
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredPressureField, Velic_solKx_PressureFunction );
 
 
-	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solKx_sigma", 1.0 );
-	_m = Stg_ComponentFactory_GetRootDictDouble( cf, "wavenumberY", 1 );
+	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solKx_sigma", 1.0  );
+	_m = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"wavenumberY", 1  );
 	n = Stg_ComponentFactory_GetRootDictInt( cf, "wavenumberX", 1 );
-	twiceB = Stg_ComponentFactory_GetRootDictDouble( cf, "solKx_twiceB", 2.0 );
-	B = Stg_ComponentFactory_GetRootDictDouble( cf, "solKx_B", 0.5 * twiceB );
+	twiceB = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solKx_twiceB", 2.0  );
+	B = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solKx_B", 0.5 * twiceB  );
 
 	_Velic_solKx_Init( self, sigma, _m, B, n );
 
@@ -181,7 +181,7 @@ void* _Velic_solKx_DefaultNew( Name name ) {
 }
 
 Index Underworld_Velic_solKx_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Velic_solKx_Type, "0", _Velic_solKx_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Velic_solKx_Type, (Name)"0", _Velic_solKx_DefaultNew  );
 }
 
 

@@ -60,7 +60,7 @@ void Experimental_NodeTempProfile( PICelleratorContext* context ) {
 	Index                       lNode_I, newNodeID;
 	int                         startProfileNodeID; 
 	static Bool                 beenHere              = False;
-	Stream*                     stream                = Journal_Register( Info_Type, "TempNodeHeight" );
+	Stream*                     stream                = Journal_Register( Info_Type, (Name)"TempNodeHeight"  );
 	char*                       filename;
 	double*                     maxTempList = Memory_Alloc_Array( double, context->nproc, "Hold the max temperature of each array");
 	unsigned                    rootProc;
@@ -71,8 +71,8 @@ void Experimental_NodeTempProfile( PICelleratorContext* context ) {
 		tempFeName = Dictionary_GetString_WithDefault( context->dictionary, "TemperatureField", "TemperatureField" );
 		
 		/* Get TemperatureField FeVariable */
-		temperatureFe = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, tempFeName );
-		assert( temperatureFe );
+		temperatureFe = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)tempFeName );
+		assert( temperatureFe  );
 	
 		/* Set up stream */
 		Stg_asprintf( &filename, "CylinderNodeProfiling.%dof%d.dat", context->rank, context->nproc );
@@ -130,10 +130,10 @@ void Experimental_NodeTempProfile( PICelleratorContext* context ) {
 void _Experimental_CylinderNodeProfiling_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 
 	AbstractContext* context;
-	FeVariable*  temperatureField  = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data );
+	FeVariable*  temperatureField  = Stg_ComponentFactory_ConstructByName( cf, (Name)"TemperatureField", FeVariable, True, data  );
 	FeMesh* mesh     = temperatureField->feMesh;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Experimental_NodeTempProfile );
 }
 
@@ -162,8 +162,7 @@ void* _Experimental_CylinderNodeProfiling_DefaultNew( Name name ) {
 Index Experimental_CylinderNodeProfiling_Register( PluginsManager* pluginsManager ) {
 	Index result;
 
-	result = PluginsManager_Submit( pluginsManager, Experimental_CylinderNodeProfiling, "0",
-		_Experimental_CylinderNodeProfiling_DefaultNew );
+	result = PluginsManager_Submit( pluginsManager, Experimental_CylinderNodeProfiling, (Name)"0", _Experimental_CylinderNodeProfiling_DefaultNew  );
 
 	return result;
 }

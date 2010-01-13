@@ -57,9 +57,9 @@ const Type Underworld_Mobility_Type = "Underworld_Mobility";
 void _Underworld_Mobility_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*  context;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data ); 
 
-	Underworld_Mobility_PrintHeaderToFile( context );
+	Underworld_Mobility_PrintHeaderToFile( context  );
 	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, Underworld_Mobility_Setup );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput     , Underworld_Mobility_Dump );
 }
@@ -113,17 +113,17 @@ void* _Underworld_Mobility_DefaultNew( Name name ) {
 }
 
 Index Underworld_Mobility_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Underworld_Mobility_Type, "0", _Underworld_Mobility_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_Mobility_Type, (Name)"0", _Underworld_Mobility_DefaultNew );
 }
 
 void Underworld_Mobility_Setup( void* _context ) {
 	UnderworldContext*	context = (UnderworldContext*) _context;
-	Swarm*					gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
-	FeVariable*				velocityField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
+	Swarm*					gaussSwarm = (Swarm* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"gaussSwarm" );
+	FeVariable*				velocityField = (FeVariable* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"VelocityField" );
 
 	Underworld_Mobility* self;
 
-	self = (Underworld_Mobility*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_Mobility_Type );
+	self = (Underworld_Mobility* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_Mobility_Type  );
 
 	Journal_Firewall( gaussSwarm != NULL, Underworld_Error, "Cannot find gauss swarm. Cannot use %s.\n", CURR_MODULE_NAME );
 	Journal_Firewall( velocityField != NULL, Underworld_Error, "Cannot find velocityField. Cannot use %s.\n", CURR_MODULE_NAME );
@@ -135,7 +135,7 @@ void Underworld_Mobility_Setup( void* _context ) {
 /* Integrate Every Step and dump to file */
 void Underworld_Mobility_Dump( void* _context ) {
 	UnderworldContext*	context = (UnderworldContext*) _context;
-	Swarm*					gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+	Swarm*					gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"gaussSwarm"  );
 	Mesh*						mesh;
 	double					maxCrd[3], minCrd[3];
 	double					integral;
@@ -147,11 +147,9 @@ void Underworld_Mobility_Dump( void* _context ) {
 
 	Underworld_Mobility* self;
 
-	self = (Underworld_Mobility*)LiveComponentRegister_Get(
-		context->CF->LCRegister,
-		Underworld_Mobility_Type );
+	self = (Underworld_Mobility*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_Mobility_Type );
 
-	mesh = (Mesh*)self->velocitySquaredField->feMesh;
+	mesh = (Mesh* )self->velocitySquaredField->feMesh;
 	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
 	
 	/* Sum integral */

@@ -130,12 +130,12 @@ void _SmoothVelGradField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, v
    variable_Register = self->context->variable_Register;
    assert( variable_Register );
 
-   velField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField", FeVariable, True, data );
+   velField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"VelocityField", FeVariable, True, data  );
 
 	/*
    ** If we're using this field for non-linear feedback, we'll need to update it in between
    ** non-linear iterations. */
-   sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, "SLE", SystemLinearEquations, False, data );
+   sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"SLE", SystemLinearEquations, False, data  );
 
    _SmoothVelGradField_Init( self, variable_Register, velField, sle );
 }
@@ -174,7 +174,7 @@ void _SmoothVelGradField_Build( void* _self, void* data ) {
 
    /* Create Variable to store data */
    assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
-   tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
+   tmpName = Stg_Object_AppendSuffix( self, (Name)"DataVariable"  );
    self->dataVariable = Variable_NewVector(
       tmpName,
 		(AbstractContext*)self->context,	
@@ -196,7 +196,7 @@ void _SmoothVelGradField_Build( void* _self, void* data ) {
    Memory_Free( tmpName );
 
    /* Create Dof Layout */
-   tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
+   tmpName = Stg_Object_AppendSuffix( self, (Name)"DofLayout"  );
    self->dofLayout = DofLayout_New( tmpName, self->context, self->variable_Register, 0, self->feMesh );
    self->dofLayout->_numItemsInLayout = FeMesh_GetNodeDomainSize( self->feMesh );
    for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ ) {

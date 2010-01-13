@@ -83,13 +83,13 @@ void _Rheology_Init( void* rheology, PICelleratorContext* context )
 	Rheology* self = (Rheology*)rheology;
 
 	self->context = context;
-	self->debug = Journal_Register( Debug_Type, self->type ); /* TODO make child of Underworld_Debug */
+	self->debug = Journal_Register( Debug_Type, (Name)self->type ); /* TODO make child of Underworld_Debug */
 }
 
 void _Rheology_Delete( void* rheology ) {
 	Rheology*					self = (Rheology*)rheology;
 
-	_Stg_Component_Delete( self );
+	_Stg_Component_Delete( self  );
 }
 
 void _Rheology_Print( void* rheology, Stream* stream ) {}
@@ -105,9 +105,9 @@ void _Rheology_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* da
 	Rheology*            self = (Rheology*)rheology;
 	PICelleratorContext* context;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", PICelleratorContext, False, data );
-	if( !context ) 
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", PICelleratorContext, False, data );
+	if( !context  ) 
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", PICelleratorContext, True, data  );
 
 	_Rheology_Init( self, context );
 }

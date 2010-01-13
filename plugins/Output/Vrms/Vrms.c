@@ -57,9 +57,9 @@ const Type Underworld_Vrms_Type = "Underworld_Vrms";
 void _Underworld_Vrms_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	Underworld_Vrms*	self 		= (Underworld_Vrms*)component;
 
-	self->context       = (AbstractContext*)Stg_ComponentFactory_PluginConstructByKey( cf, self, "Context", UnderworldContext, True, data );
-	self->gaussSwarm    = Stg_ComponentFactory_PluginConstructByKey( cf, self, "GaussSwarm", Swarm, True, data );
-	self->velocityField = Stg_ComponentFactory_PluginConstructByKey( cf, self, "VelocityField", FeVariable, True, data );
+	self->context       = (AbstractContext*)Stg_ComponentFactory_PluginConstructByKey( cf, self, (Dictionary_Entry_Key)"Context", UnderworldContext, True, data  );
+	self->gaussSwarm    = Stg_ComponentFactory_PluginConstructByKey( cf, self, (Dictionary_Entry_Key)"GaussSwarm", Swarm, True, data  );
+	self->velocityField = Stg_ComponentFactory_PluginConstructByKey( cf, self, (Dictionary_Entry_Key)"VelocityField", FeVariable, True, data  );
 
 	/* Create new Field Variable */
 	self->velocitySquaredField = OperatorFeVariable_NewUnary( "VelocitySquaredField", (DomainContext*)self->context, self->velocityField, "VectorSquare" );
@@ -128,12 +128,12 @@ void* _Underworld_Vrms_DefaultNew( Name name ) {
 }
 
 Index Underworld_Vrms_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Underworld_Vrms_Type, "0", _Underworld_Vrms_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_Vrms_Type, (Name)"0", _Underworld_Vrms_DefaultNew );
 }
 
 /* Integrate Every Step and dump to file */
 void Underworld_Vrms_Dump( void* _context ) {
-	UnderworldContext*                   context       = (UnderworldContext*) _context;
+	UnderworldContext*                   context       = (UnderworldContext* ) _context;
 	Mesh*			   	     mesh;
 	double		    	  	     maxCrd[3], minCrd[3];
 	double                               integral;
@@ -143,9 +143,9 @@ void Underworld_Vrms_Dump( void* _context ) {
 
 	Underworld_Vrms* self;
 
-	self = (Underworld_Vrms*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_Vrms_Type );
+	self = (Underworld_Vrms*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_Vrms_Type );
 
-	mesh = (Mesh*)self->velocitySquaredField->feMesh;
+	mesh = (Mesh* )self->velocitySquaredField->feMesh;
 	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
 	
 	/* Sum integral */

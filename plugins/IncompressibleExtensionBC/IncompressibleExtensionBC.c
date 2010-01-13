@@ -86,44 +86,44 @@ const Type Underworld_IncompressibleExtensionBC_Type = "Underworld_Incompressibl
 	*/
 
 double GetLeftWallVelocity( UnderworldContext* context ) {
-	return Dictionary_GetDouble_WithDefault( context->dictionary,  "leftWallVelocity", 0.0 );
+	return Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"leftWallVelocity", 0.0 );
 }	
 
-double GetLeftWallShearVelocity( UnderworldContext* context ) {
-		return Dictionary_GetDouble_WithDefault( context->dictionary,  "leftWallShearVelocity", 0.0 );
+double GetLeftWallShearVelocity( UnderworldContext* context  ) {
+		return Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"leftWallShearVelocity", 0.0 );
 	}
 	
-double GetRightWallVelocity( UnderworldContext* context ) {
-		return Dictionary_GetDouble_WithDefault( context->dictionary,  "rightWallVelocity", 0.0 );
+double GetRightWallVelocity( UnderworldContext* context  ) {
+		return Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"rightWallVelocity", 0.0 );
 	}	
 	
-double GetRightWallShearVelocity( UnderworldContext* context ) {
-			return Dictionary_GetDouble_WithDefault( context->dictionary,  "rightWallShearVelocity", 0.0 );
+double GetRightWallShearVelocity( UnderworldContext* context  ) {
+			return Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"rightWallShearVelocity", 0.0 );
 }
 
 double GetBackWallVelocity( UnderworldContext* context ) {
-	if ( context->dim == 2 )
+	if ( context->dim == 2  )
 		return 0.0;
 	
-	return Dictionary_GetDouble_WithDefault( context->dictionary,  "backWallVelocity", 0.0 );
+	return Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"backWallVelocity", 0.0 );
 }
 double GetFrontWallVelocity( UnderworldContext* context ) {
-	if ( context->dim == 2 )
+	if ( context->dim == 2  )
 		return 0.0;
 	
-	return Dictionary_GetDouble_WithDefault( context->dictionary,  "frontWallVelocity", 0.0 );
+	return Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"frontWallVelocity", 0.0 );
 }
-double GetReferenceHeight( UnderworldContext* context ) {
-	return Dictionary_GetDouble_WithDefault( context->dictionary,  "constantHeight", 0.0 );
+double GetReferenceHeight( UnderworldContext* context  ) {
+	return Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"constantHeight", 0.0 );
 }
 
 double GetTopWallVelocity( UnderworldContext* context ) {
-	FeVariable*         velocityField = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
+	FeVariable*         velocityField = (FeVariable* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"VelocityField" );
 	double              y   = GetReferenceHeight( context );
 	double              V_a = GetRightWallVelocity( context );
 	double              V_b = GetLeftWallVelocity( context );
 	double              V_e = GetBackWallVelocity( context );
-	double              V_f = GetFrontWallVelocity( context );
+	double              V_f = GetFrontWallVelocity( context  );
 	double              V_c;
 	double              h_1;
 	XYZ                 min, max;
@@ -144,12 +144,12 @@ double GetTopWallVelocity( UnderworldContext* context ) {
 }
 
 double GetBottomWallVelocity( UnderworldContext* context ) {
-	FeVariable*         velocityField = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
+	FeVariable*         velocityField = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"VelocityField" );
 	double              y   = GetReferenceHeight( context );
 	double              V_a = GetRightWallVelocity( context );
 	double              V_b = GetLeftWallVelocity( context );
 	double              V_e = GetBackWallVelocity( context );
-	double              V_f = GetFrontWallVelocity( context );
+	double              V_f = GetFrontWallVelocity( context  );
 	double              V_d;
 	double              h_2;
 	XYZ                 min, max;
@@ -227,8 +227,8 @@ void IncompressibleExtensionBC_BottomCondition( Node_LocalIndex node_lI, Variabl
 }
 
 void Underworld_IncompressibleExtensionBC_Remesh( TimeIntegrator* timeIntegrator, IncExtBC* self ) {
-    FeVariable* velocityField = (FeVariable*) LiveComponentRegister_Get( self->context->CF->LCRegister, "VelocityField" );
-    FeVariable* pressureField = (FeVariable*) LiveComponentRegister_Get( self->context->CF->LCRegister, "PressureField" );
+    FeVariable* velocityField = (FeVariable*) LiveComponentRegister_Get( self->context->CF->LCRegister, (Name)"VelocityField" );
+    FeVariable* pressureField = (FeVariable* ) LiveComponentRegister_Get( self->context->CF->LCRegister, (Name)"PressureField"  );
     FeMesh *mesh;
     Grid *nodeGrid;
     double dt;
@@ -291,30 +291,30 @@ void Underworld_IncompressibleExtensionBC_Remesh( TimeIntegrator* timeIntegrator
 
 void _Underworld_IncompressibleExtensionBC_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data ) {
     IncExtBC* self = (IncExtBC*)_self;
-	UnderworldContext*  context  = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
+	UnderworldContext*  context  = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data );
 	ConditionFunction*  condFunc;
-   TimeIntegrator* timeIntegrator = (TimeIntegrator*)  LiveComponentRegister_Get( context->CF->LCRegister, "timeIntegrator" );
+   TimeIntegrator* timeIntegrator = (TimeIntegrator* )  LiveComponentRegister_Get( context->CF->LCRegister, (Name)"timeIntegrator"  );
 
         self->context   = context;
 
-	condFunc = ConditionFunction_New( IncompressibleExtensionBC_TopCondition, "IncompressibleExtensionBC_TopCondition" );
+	condFunc = ConditionFunction_New( IncompressibleExtensionBC_TopCondition, (Name)"IncompressibleExtensionBC_TopCondition"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( IncompressibleExtensionBC_BottomCondition, "IncompressibleExtensionBC_BottomCondition" );
+	condFunc = ConditionFunction_New( IncompressibleExtensionBC_BottomCondition, (Name)"IncompressibleExtensionBC_BottomCondition"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( IncompressibleExtensionBC_LeftCondition, "IncompressibleExtensionBC_LeftCondition" );
+	condFunc = ConditionFunction_New( IncompressibleExtensionBC_LeftCondition, (Name)"IncompressibleExtensionBC_LeftCondition"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( IncompressibleExtensionBC_LeftShearCondition, "IncompressibleExtensionBC_LeftShearCondition" );
+	condFunc = ConditionFunction_New( IncompressibleExtensionBC_LeftShearCondition, (Name)"IncompressibleExtensionBC_LeftShearCondition"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( IncompressibleExtensionBC_RightCondition, "IncompressibleExtensionBC_RightCondition" );
+	condFunc = ConditionFunction_New( IncompressibleExtensionBC_RightCondition, (Name)"IncompressibleExtensionBC_RightCondition"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( IncompressibleExtensionBC_RightShearCondition, "IncompressibleExtensionBC_RightShearCondition" );
+	condFunc = ConditionFunction_New( IncompressibleExtensionBC_RightShearCondition, (Name)"IncompressibleExtensionBC_RightShearCondition"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( IncompressibleExtensionBC_FrontCondition, "IncompressibleExtensionBC_FrontCondition" );
+	condFunc = ConditionFunction_New( IncompressibleExtensionBC_FrontCondition, (Name)"IncompressibleExtensionBC_FrontCondition"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( IncompressibleExtensionBC_BackCondition, "IncompressibleExtensionBC_BackCondition" );
+	condFunc = ConditionFunction_New( IncompressibleExtensionBC_BackCondition, (Name)"IncompressibleExtensionBC_BackCondition"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-        if( Stg_ComponentFactory_PluginGetBool( cf, self, "Remesh", False ) ) {
+        if( Stg_ComponentFactory_PluginGetBool( cf, self, (Dictionary_Entry_Key)"Remesh", False )  ) {
 	    TimeIntegrator_PrependFinishEP( 
 		timeIntegrator, "Underworld_IncompressibleExtensionBC_Remesh", Underworld_IncompressibleExtensionBC_Remesh, 
 		CURR_MODULE_NAME, self );
@@ -343,7 +343,7 @@ void* _Underworld_IncompressibleExtensionBC_DefaultNew( Name name ) {
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
 Index Underworld_IncompressibleExtensionBC_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
-	return PluginsManager_Submit( pluginsManager, Underworld_IncompressibleExtensionBC_Type, "0", _Underworld_IncompressibleExtensionBC_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_IncompressibleExtensionBC_Type, (Name)"0", _Underworld_IncompressibleExtensionBC_DefaultNew  );
 }
 
 

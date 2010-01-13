@@ -111,9 +111,9 @@ void _DensityField_AssignFromXML( void* densityField, Stg_ComponentFactory* cf, 
 
 	_ParticleFeVariable_AssignFromXML( self, cf, data );
 
-	buoyancyForceTerm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "BuoyancyForceTerm", BuoyancyForceTerm, True, data );
+	buoyancyForceTerm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"BuoyancyForceTerm", BuoyancyForceTerm, True, data );
 	variable_Register = self->context->variable_Register; 
-	assert( variable_Register );
+	assert( variable_Register  );
 
 	_DensityField_Init( self, buoyancyForceTerm, variable_Register );
 }
@@ -127,19 +127,12 @@ void _DensityField_Build( void* densityField, void* data ) {
 
   	/* Create Dof Layout */
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
-	tmpName = Stg_Object_AppendSuffix( self, "densityVariable" );
-	self->dataVariable = Variable_NewScalar( 	
-		tmpName,
-		(AbstractContext*)self->context,
-		Variable_DataType_Double, 
-		&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
-		NULL,
-		(void**)&self->data, 
-		variable_Register );
-	Memory_Free( tmpName );
+	tmpName = Stg_Object_AppendSuffix( self, (Name)"densityVariable"  );
+	self->dataVariable = Variable_NewScalar( tmpName, (AbstractContext*)self->context, Variable_DataType_Double, (Index*)&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, NULL, (void**)&self->data, variable_Register );
+	Memory_Free( tmpName  );
 	self->fieldComponentCount = 1;
 	
-	tmpName = Stg_Object_AppendSuffix( self, "densityDOF" );
+	tmpName = Stg_Object_AppendSuffix( self, (Name)"densityDOF"  );
 	self->dofLayout = DofLayout_New( tmpName, self->context, variable_Register, 0, self->feMesh );
 	self->dofLayout->_numItemsInLayout = FeMesh_GetNodeDomainSize( self->feMesh );
 	DofLayout_AddAllFromVariableArray( self->dofLayout, 1, &self->dataVariable );

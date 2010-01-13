@@ -145,16 +145,16 @@ void _StrainWeakening_Init(
 	/****** Setup Variables *****/
 
 	/* First check to see if a particle extension has already been created for this swarm */
-	self->particleExtHandle = ExtensionManager_GetHandle( swarm->particleExtensionMgr, StrainWeakening_Type );
+	self->particleExtHandle = ExtensionManager_GetHandle( swarm->particleExtensionMgr, (Name)StrainWeakening_Type );
 
 	/* If there isn't one then create the particle extension - otherwise just use the one already there*/
-	if ( self->particleExtHandle == (ExtensionInfo_Index) -1 ) {
+	if ( self->particleExtHandle == (ExtensionInfo_Index) -1  ) {
 		StandardParticle             particle;
 		StrainWeakening_ParticleExt* particleExt;
 
 		/* Add particle extension */
 		self->particleExtHandle = 
-			ExtensionManager_Add( swarm->particleExtensionMgr, StrainWeakening_Type, sizeof(StrainWeakening_ParticleExt) );	
+			ExtensionManager_Add( swarm->particleExtensionMgr, (Name)StrainWeakening_Type, sizeof(StrainWeakening_ParticleExt)  );	
 
 		particleExt = ExtensionManager_Get( swarm->particleExtensionMgr, &particle, self->particleExtHandle );
 
@@ -162,28 +162,20 @@ void _StrainWeakening_Init(
 		
 		
 		
-		self->postFailureWeakening = Swarm_NewScalarVariable(
-			swarm,
-			"PostFailureWeakening",
-			(ArithPointer) &particleExt->postFailureWeakening - (ArithPointer) &particle,
-			Variable_DataType_Double );
+		self->postFailureWeakening = Swarm_NewScalarVariable( swarm, (Name)"PostFailureWeakening", (ArithPointer) &particleExt->postFailureWeakening - (ArithPointer) &particle, Variable_DataType_Double  );
 		
-		self->postFailureWeakeningIncrement = Swarm_NewScalarVariable(
-			swarm,
-			"PostFailureWeakeningIncrement",
-			(ArithPointer) &particleExt->postFailureWeakeningIncrement - (ArithPointer) &particle,
-			Variable_DataType_Double );
+		self->postFailureWeakeningIncrement = Swarm_NewScalarVariable( swarm, (Name)"PostFailureWeakeningIncrement", (ArithPointer) &particleExt->postFailureWeakeningIncrement - (ArithPointer) &particle, Variable_DataType_Double  );
 	}
 	else {
 		Name variableName;
 
 		/* Get Variables already created */
-		variableName = Stg_Object_AppendSuffix( swarm, "PostFailureWeakening" );
+		variableName = Stg_Object_AppendSuffix( swarm, (Name)"PostFailureWeakening"  );
 		self->postFailureWeakening = SwarmVariable_Register_GetByName( swarm->swarmVariable_Register, variableName );
 		assert( self->postFailureWeakening );
 		Memory_Free( variableName );
 		
-		variableName = Stg_Object_AppendSuffix( swarm, "PostFailureWeakeningIncrement" );
+		variableName = Stg_Object_AppendSuffix( swarm, (Name)"PostFailureWeakeningIncrement"  );
 		self->postFailureWeakeningIncrement = SwarmVariable_Register_GetByName( swarm->swarmVariable_Register, variableName );
 		assert( self->postFailureWeakeningIncrement );
 		Memory_Free( variableName );
@@ -242,25 +234,19 @@ void _StrainWeakening_AssignFromXML( void* strainWeakening, Stg_ComponentFactory
 	/* Construct Parent */
 	_TimeIntegrand_AssignFromXML( self, cf, data );
 	
-	materialPointsSwarm     = Stg_ComponentFactory_ConstructByKey(
-		cf, 
-		self->name, 
-		"MaterialPointsSwarm", 
-		MaterialPointsSwarm, 
-		True,
-		data );
+	materialPointsSwarm     = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialPointsSwarm", MaterialPointsSwarm, True, data  );
 
-	healingRate                 = Stg_ComponentFactory_GetDouble( cf, self->name, "healingRate",              0.0 );
-	softeningStrain             = Stg_ComponentFactory_GetDouble( cf, self->name, "softeningStrain",          HUGE_VAL );
-	initialDamageFraction       = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageFraction",    0.0 );
-	initialDamageWavenumber     = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumber",  -1.0 );
-	initialDamageWavenumberSinI = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberSinI", -1.0 );
-	initialDamageWavenumberCosI = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberCosI", -1.0 );
-	initialDamageWavenumberSinK = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberSinK", -1.0 );
-	initialDamageWavenumberCosK = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageWavenumberCosK", -1.0 );
-	initialDamageFactor         = Stg_ComponentFactory_GetDouble( cf, self->name, "initialDamageFactor",       1.0 );
-	randomSeed                  = (long int) Stg_ComponentFactory_GetInt( cf, self->name, "randomSeed",        0 );
-	initialStrainShape          = Stg_ComponentFactory_ConstructByKey( cf, self->name, "initialStrainShape", Stg_Shape, False, data );
+	healingRate                 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"healingRate", 0.0  );
+	softeningStrain             = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"softeningStrain", HUGE_VAL  );
+	initialDamageFraction       = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"initialDamageFraction", 0.0  );
+	initialDamageWavenumber     = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"initialDamageWavenumber", -1.0  );
+	initialDamageWavenumberSinI = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"initialDamageWavenumberSinI", -1.0  );
+	initialDamageWavenumberCosI = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"initialDamageWavenumberCosI", -1.0  );
+	initialDamageWavenumberSinK = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"initialDamageWavenumberSinK", -1.0  );
+	initialDamageWavenumberCosK = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"initialDamageWavenumberCosK", -1.0  );
+	initialDamageFactor         = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"initialDamageFactor", 1.0 );
+	randomSeed                  = (long int ) Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"randomSeed", 0  );
+	initialStrainShape          = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"initialStrainShape", Stg_Shape, False, data  );
 
 	_StrainWeakening_Init(
 			self, 

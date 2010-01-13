@@ -198,10 +198,10 @@ void Trubitsyn2006_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I,
 	double*                coord;
 	double                 x; 
 	double                 y;
-	Trubitsyn2006*         self               = Stg_ComponentFactory_ConstructByName( context->CF, Trubitsyn2006_Type, Trubitsyn2006, True, context );
+	Trubitsyn2006*         self               = Stg_ComponentFactory_ConstructByName( context->CF, (Name)Trubitsyn2006_Type, Trubitsyn2006, True, context );
 	double                 T0                 = self->T0;
 	double                 Ra                 = self->Ra;
-	double                 v0                 = Trubitsyn2006_V0( self );
+	double                 v0                 = Trubitsyn2006_V0( self  );
 	XYZ                    min, max;
 	double                 eta;
 	double                 d_eta_dy;
@@ -230,7 +230,7 @@ void Trubitsyn2006_PressureIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 	FeMesh*                mesh               = PressureField->feMesh;
 	double*                pressure           = (double*) _result;
 	double*                coord;
-	Trubitsyn2006* self = Stg_ComponentFactory_ConstructByName( context->CF, Trubitsyn2006_Type, Trubitsyn2006, True, context );
+	Trubitsyn2006* self = Stg_ComponentFactory_ConstructByName( context->CF, (Name)Trubitsyn2006_Type, Trubitsyn2006, True, context  );
 	
 	/* Find coordinate of node */
 	coord = Mesh_GetVertex( mesh, node_lI );
@@ -247,15 +247,15 @@ void _Trubitsyn2006_AssignFromXML( void* analyticSolution, Stg_ComponentFactory*
 	/* Construct Parent */
 	_FieldTest_AssignFromXML( self, cf, data );
 
-	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString(pluginDict, "VelocityField"), FeVariable, True, data);
-	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString(pluginDict, "PressureField"), FeVariable, True, data);
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, (Dictionary_Entry_Key)"VelocityField" ), FeVariable, True, data);
+	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, (Dictionary_Entry_Key)"PressureField" ), FeVariable, True, data);
 
 	/* Add temperature initial condition */
-	condFunc = ConditionFunction_New( Trubitsyn2006_TemperatureIC, "Trubitsyn2006_TemperatureIC" );
+	condFunc = ConditionFunction_New( Trubitsyn2006_TemperatureIC, (Name)"Trubitsyn2006_TemperatureIC"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
   /* Add pressure initial condition */
-	condFunc = ConditionFunction_New( Trubitsyn2006_PressureIC, "Trubitsyn2006_PressureIC" );
+	condFunc = ConditionFunction_New( Trubitsyn2006_PressureIC, (Name)"Trubitsyn2006_PressureIC"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
 	/* Create Analytic Fields */
@@ -266,7 +266,7 @@ void _Trubitsyn2006_AssignFromXML( void* analyticSolution, Stg_ComponentFactory*
 */
 
 	/* Setup Viscosity Functions */
-	viscosityType = Stg_ComponentFactory_GetRootDictString( cf, "ViscosityType", "Isoviscous" );
+	viscosityType = Stg_ComponentFactory_GetRootDictString( cf, (Dictionary_Entry_Key)"ViscosityType", "Isoviscous"  );
 	if ( strcasecmp( viscosityType, "Isoviscous" ) == 0 ) {
 		self->viscosityFunc           = _Trubitsyn2006_ViscosityFunc_Isoviscous;
 		self->viscosityDerivativeFunc = _Trubitsyn2006_ViscosityDerivativeFunc_Isoviscous;
@@ -284,12 +284,12 @@ void _Trubitsyn2006_AssignFromXML( void* analyticSolution, Stg_ComponentFactory*
 		self->viscosityDerivativeFunc = _Trubitsyn2006_ViscosityDerivativeFunc_Model3;
 	}
 	else {
-		Journal_Printf( Journal_Register( Error_Type, self->type ), "Cannot understand viscosity type = '%s'\n", viscosityType );
+		Journal_Printf( Journal_Register( Error_Type, (Name)self->type  ), "Cannot understand viscosity type = '%s'\n", viscosityType );
 		abort();
 	}
 
-	self->Ra = Stg_ComponentFactory_GetRootDictDouble( cf, "Ra", 0.0 );
-	self->T0 = Stg_ComponentFactory_GetRootDictDouble( cf, "T0", 0.0 );
+	self->Ra = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"Ra", 0.0  );
+	self->T0 = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"T0", 0.0  );
 	self->wavenumberX = Stg_ComponentFactory_GetRootDictInt( cf, "wavenumberX", 1 );
 	self->wavenumberY = Stg_ComponentFactory_GetRootDictInt( cf, "wavenumberY", 1 );
 }
@@ -348,7 +348,7 @@ void* _Trubitsyn2006_DefaultNew( Name name ) {
 }
 
 Index Underworld_Trubitsyn2006_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Trubitsyn2006_Type, "0", _Trubitsyn2006_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Trubitsyn2006_Type, (Name)"0", _Trubitsyn2006_DefaultNew  );
 }
 
 

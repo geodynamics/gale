@@ -42,10 +42,10 @@ const Type Underworld_Shfl_Type = "Underworld_Shfl";
 void _Underworld_Shfl_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data ); 
 
 	/* Add functions to entry points */
-	Underworld_Shfl_Setup( context );
+	Underworld_Shfl_Setup( context  );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_Shfl_Output );
 }
 
@@ -98,7 +98,7 @@ void* _Underworld_Shfl_DefaultNew( Name name ) {
 }
 
 Index Underworld_Shfl_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Underworld_Shfl_Type, "0", _Underworld_Shfl_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_Shfl_Type, (Name)"0", _Underworld_Shfl_DefaultNew );
 }
 
 
@@ -109,13 +109,11 @@ void Underworld_Shfl_Setup( UnderworldContext* context ) {
 	FieldVariable*           temperatureField;
 	OperatorFeVariable*      advectiveHeatFluxField;
 	OperatorFeVariable*      temperatureTotalDerivField;
-	Swarm*					    gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+	Swarm*					    gaussSwarm = (Swarm* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"gaussSwarm" );
 
 	Underworld_Shfl* self;
 
-	self = (Underworld_Shfl*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_Shfl_Type );
+	self = (Underworld_Shfl* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_Shfl_Type  );
 	
 	StgFEM_FrequentOutput_PrintString( context, "Shfl" );
 
@@ -162,9 +160,7 @@ void Underworld_Shfl_Output( UnderworldContext* context ) {
 
 	temperatureField          			 = FieldVariable_Register_GetByName( fV_Register, "TemperatureField" );
 	
-	self = (Underworld_Shfl*)LiveComponentRegister_Get(
-				context->CF->LCRegister,
-				Underworld_Shfl_Type );
+	self = (Underworld_Shfl*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_Shfl_Type  );
 
 	/* get_layer value */
 	self->shfl = FeVariable_AveragePlane( self->dTField, J_AXIS, 1.0 );

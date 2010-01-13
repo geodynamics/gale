@@ -138,10 +138,10 @@ void _MultiRheologyMaterial_AssignFromXML( void* material, Stg_ComponentFactory*
 
 	_RheologyMaterial_AssignFromXML( self, cf, data );
 
-	multiRheologyList = Dictionary_Get( currDictionary, "MultiRheologies" );
+	multiRheologyList = Dictionary_Get( currDictionary, (Dictionary_Entry_Key)"MultiRheologies"  );
 	Journal_Firewall(
 		multiRheologyList != NULL,
-		Journal_Register( Error_Type, self->type ),
+		Journal_Register( Error_Type, (Name)self->type  ),
 		"Error in func '%s' for %s '%s': MultiRheologyMaterial rheology needs a rheology list.\n", 
 		__func__, self->type, self->name );
 	
@@ -171,11 +171,11 @@ void _MultiRheologyMaterial_AssignFromXML( void* material, Stg_ComponentFactory*
 				rheologyList_I, self->type, self->name, rheologyName );
 
 			rheologyListList[ rheologyList_I ][ rheology_I ] = 
-	Stg_ComponentFactory_ConstructByName( cf, rheologyName, Rheology, True, data ); 
+	Stg_ComponentFactory_ConstructByName( cf, (Name)rheologyName, Rheology, True, data ); 
 		}
 		Stream_UnIndent( stream );
 	}
-	Stream_UnIndent( stream );
+	Stream_UnIndent( stream  );
 	
 	_MultiRheologyMaterial_Init( 
 			self,

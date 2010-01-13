@@ -110,10 +110,10 @@ void _Velic_solKz_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* c
 	/* Construct Parent */
 	_FieldTest_AssignFromXML( self, cf, data );
 
-	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_sigma", 1.0 );
-	twiceB = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_twiceB", 2.0 );
-	B = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_B", 0.5 * twiceB );
-	m = Stg_ComponentFactory_GetRootDictDouble( cf, "solKz_m", 1 );
+	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solKz_sigma", 1.0  );
+	twiceB = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solKz_twiceB", 2.0  );
+	B = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solKz_B", 0.5 * twiceB  );
+	m = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solKz_m", 1  );
 	n = Stg_ComponentFactory_GetRootDictInt( cf, "solKz_n", 1 );
 
    km = M_PI * m;
@@ -143,7 +143,7 @@ void* _Velic_solKz_DefaultNew( Name name ) {
 }
 
 Index Underworld_Velic_solKz_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Velic_solKz_Type, "0", _Velic_solKz_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Velic_solKz_Type, (Name)"0", _Velic_solKz_DefaultNew  );
 }
 
 

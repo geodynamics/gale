@@ -56,11 +56,11 @@ const Type Underworld_Ra_Scaling_Type = "Underworld_Ra_Scaling_Type";
 
 void _Ra_CheckScalings_Func( void* context, void* ptrToContext ) {
   UnderworldContext*      self         = (UnderworldContext*) context;
-  ForceTerm* bfTerm         = (ForceTerm*)LiveComponentRegister_Get( self->CF->LCRegister, "buoyancyForceTerm" );
+  ForceTerm* bfTerm         = (ForceTerm*)LiveComponentRegister_Get( self->CF->LCRegister, (Name)"buoyancyForceTerm" );
 
   /* check the Rayleigh Number Scaling:
    * first check the RHS for the stokes SLE has a force term which uses Ra*/
-  if( bfTerm != NULL && (bfTerm->type == ThermalBuoyancyForceTerm_Type ) ) {
+  if( bfTerm != NULL && (bfTerm->type == ThermalBuoyancyForceTerm_Type )  ) {
     RheologyMaterial* material;
     Rheology* rheology;
     Materials_Register*     materials_Register = self->materials_Register;
@@ -87,10 +87,10 @@ void _Ra_CheckScalings_Func( void* context, void* ptrToContext ) {
     if( rheology->type == MaterialViscosity_Type && isValid ) { 
       eta0 = ((MaterialViscosity*)rheology)->eta0;
 
-      diffusivity   = Stg_ComponentFactory_GetDouble( self->CF, "defaultResidualForceTerm", "defaultDiffusivity", 1.0 );
-      gravity       = Stg_ComponentFactory_GetRootDictDouble( self->CF, "gravity", 1.0 );
+      diffusivity   = Stg_ComponentFactory_GetDouble( self->CF, "defaultResidualForceTerm", (Dictionary_Entry_Key)"defaultDiffusivity", 1.0  );
+      gravity       = Stg_ComponentFactory_GetRootDictDouble( self->CF, (Dictionary_Entry_Key)"gravity", 1.0 );
 
-      Ra_0 = (gravity * thermalExp)/(diffusivity * eta0 );
+      Ra_0 = (gravity * thermalExp)/(diffusivity * eta0  );
 			/* check if the Ra matches the viscosity, gravity, thermal expansivity and diffusivity of the problem */
       if( abs(Ra - Ra_0) > 1e-3 ) {
         Stg_asprintf( &errorMesg, "* Error - Your combination of diffusivity, gravity and eta0 (rheology) don't agree with your Ra:"
@@ -103,11 +103,11 @@ void _Ra_CheckScalings_Func( void* context, void* ptrToContext ) {
 }
 
 void _Underworld_Ra_Scaling_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
-   UnderworldContext* context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
+   UnderworldContext* context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data  ); 
 
-   Bool checkScaling = Stg_ComponentFactory_GetRootDictBool( cf, "Ra_ScalingCheck", True ); 
+   Bool checkScaling = Stg_ComponentFactory_GetRootDictBool( cf, (Dictionary_Entry_Key)"Ra_ScalingCheck", True ); 
 
-   if ( checkScaling ) {
+   if ( checkScaling  ) {
       EntryPoint_Append( Context_GetEntryPoint( context, AbstractContext_EP_Build ),
       "Underworld CheckScalings",
       _Ra_CheckScalings_Func,
@@ -131,7 +131,7 @@ void* _Underworld_Ra_Scaling_DefaultNew( Name name ) {
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
 Index Underworld_Ra_Scaling_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
-	return PluginsManager_Submit( pluginsManager, Underworld_Ra_Scaling_Type, "0", _Underworld_Ra_Scaling_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_Ra_Scaling_Type, (Name)"0", _Underworld_Ra_Scaling_DefaultNew  );
 }
 
 

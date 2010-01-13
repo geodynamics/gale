@@ -154,7 +154,7 @@ void MeshAdvectionCorrection_EulerDeformCorrection( FeVariable *artDField, doubl
 void MeshAdvectionCorrection( void* sle, void* data ) {
 	UnderworldContext*                                      context                 = (UnderworldContext*) data;
 	Underworld_MeshAdvectionCorrection_ContextExt*          plugin;
-	FeVariable*		velocityField 	= (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
+	FeVariable*		velocityField 	= (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"VelocityField"  );
 	double dt = context->dt;
 	double *artVelocity, *oldVelocity;
 	int lNodeCount;
@@ -198,32 +198,29 @@ void MeshAdvectionCorrection( void* sle, void* data ) {
 
 void _Underworld_MeshAdvectionCorrection_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*                                      context = 
-	Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
+	Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data ); 
 	Underworld_MeshAdvectionCorrection_ContextExt*       plugin;
-   AdvectionDiffusionSLE* energySLE = (AdvectionDiffusionSLE*) Stg_ComponentFactory_ConstructByName( cf, "EnergyEqn", UnderworldContext, True, data );
+   AdvectionDiffusionSLE* energySLE = (AdvectionDiffusionSLE* ) Stg_ComponentFactory_ConstructByName( cf, (Name)"EnergyEqn", UnderworldContext, True, data );
 	
 	Journal_DFirewall( 
-		(Bool)context, 
-		Journal_Register( Error_Type, Underworld_MeshAdvectionCorrection_Type ), 
+		(Bool )context, 
+		Journal_Register( Error_Type, (Name)Underworld_MeshAdvectionCorrection_Type  ), 
 		"No context found\n" );
 	Journal_DFirewall( 
 		(Bool)energySLE, 
-		Journal_Register( Error_Type, Underworld_MeshAdvectionCorrection_Type ), 
+		Journal_Register( Error_Type, (Name)Underworld_MeshAdvectionCorrection_Type  ), 
 		"The required energy SLE component has not been created or placed on the context.\n");	
 	
 	/* Add the extension to the context */
-	Underworld_MeshAdvectionCorrection_ContextExtHandle = ExtensionManager_Add(
-		context->extensionMgr, 
-		Underworld_MeshAdvectionCorrection_Type, 
-		sizeof( Underworld_MeshAdvectionCorrection_ContextExt ) );
+	Underworld_MeshAdvectionCorrection_ContextExtHandle = ExtensionManager_Add( context->extensionMgr, (Name)Underworld_MeshAdvectionCorrection_Type, sizeof( Underworld_MeshAdvectionCorrection_ContextExt )  );
 	plugin = ExtensionManager_Get( 
 		context->extensionMgr, 
 		context, 
 		Underworld_MeshAdvectionCorrection_ContextExtHandle );
 
-	if( Stg_ComponentFactory_GetRootDictBool( cf, "MeshAdvectionCorrection_UseArtDisplacementField", False) ) {
+	if( Stg_ComponentFactory_GetRootDictBool( cf, (Dictionary_Entry_Key)"MeshAdvectionCorrection_UseArtDisplacementField", False)  ) {
 		/* get the artificial displacement field */
-		plugin->artDisplacement = Stg_ComponentFactory_ConstructByName( cf, "ArtDisplacementField", FeVariable, True, data );
+		plugin->artDisplacement = Stg_ComponentFactory_ConstructByName( cf, (Name)"ArtDisplacementField", FeVariable, True, data );
 	}
 
 	/* Replace the energy SLE's execute with this one. Save the old value for use later. */
@@ -232,7 +229,7 @@ void _Underworld_MeshAdvectionCorrection_AssignFromXML( void* component, Stg_Com
 }
 
 /* This function will provide StGermain the abilty to instantiate (create) this codelet on demand. */
-void* _Underworld_MeshAdvectionCorrection_DefaultNew( Name name ) {
+void* _Underworld_MeshAdvectionCorrection_DefaultNew( Name name  ) {
 	return Codelet_New(
 			Underworld_MeshAdvectionCorrection_Type,
 			_Underworld_MeshAdvectionCorrection_DefaultNew,
@@ -247,11 +244,7 @@ void* _Underworld_MeshAdvectionCorrection_DefaultNew( Name name ) {
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
 Index Underworld_MeshAdvectionCorrection_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
-	return PluginsManager_Submit( 
-		pluginsManager, 
-		Underworld_MeshAdvectionCorrection_Type, 
-		"0", 
-		_Underworld_MeshAdvectionCorrection_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_MeshAdvectionCorrection_Type, (Name)"0", _Underworld_MeshAdvectionCorrection_DefaultNew  );
 }
 
 

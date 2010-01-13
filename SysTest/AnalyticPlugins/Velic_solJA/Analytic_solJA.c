@@ -104,35 +104,35 @@ void _Velic_solJA_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* c
 	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	/* Create Analytic Fields */
-	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data );
+	velocityField = Stg_ComponentFactory_ConstructByName( cf, (Name)"VelocityField", FeVariable, True, data  );
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, velocityField, Velic_solJA_VelocityFunction );
 
-	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data );
+	pressureField = Stg_ComponentFactory_ConstructByName( cf, (Name)"PressureField", FeVariable, True, data  );
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, Velic_solJA_PressureFunction );
 
-	stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, False, data );
-	if ( stressField )
+	stressField = Stg_ComponentFactory_ConstructByName( cf, (Name)"StressField", FeVariable, False, data );
+	if ( stressField  )
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, stressField, Velic_solJA_StressFunction );
 
-	strainRateField = Stg_ComponentFactory_ConstructByName( cf, "StrainRateField", FeVariable, False, data );
-	if ( strainRateField  ) {
+	strainRateField = Stg_ComponentFactory_ConstructByName( cf, (Name)"StrainRateField", FeVariable, False, data );
+	if ( strainRateField   ) {
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, strainRateField, Velic_solJA_StrainRateFunction );
 	}
 
-	recoveredStrainRateField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStrainRateField", FeVariable, False, data );
-	if ( recoveredStrainRateField )
+	recoveredStrainRateField = Stg_ComponentFactory_ConstructByName( cf, (Name)"recoveredStrainRateField", FeVariable, False, data );
+	if ( recoveredStrainRateField  )
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStrainRateField, Velic_solJA_StrainRateFunction );
 
-	recoveredStressField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStressField", FeVariable, False, data );
-	if ( recoveredStressField )
+	recoveredStressField = Stg_ComponentFactory_ConstructByName( cf, (Name)"recoveredStressField", FeVariable, False, data );
+	if ( recoveredStressField  )
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStressField, Velic_solJA_StressFunction );
 	
-	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solJA_sigma", 1.0 );
-	etaA = Stg_ComponentFactory_GetRootDictDouble( cf, "solJA_etaA", 100.0 );
-	etaB = Stg_ComponentFactory_GetRootDictDouble( cf, "solJA_etaB", 1.0 );
-	dx = Stg_ComponentFactory_GetRootDictDouble( cf, "solJA_dx", 0.4 );
-	x0 = Stg_ComponentFactory_GetRootDictDouble( cf, "solJA_x0", 0.2 );
-	zc = Stg_ComponentFactory_GetRootDictDouble( cf, "solJA_zc", 0.8 );
+	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solJA_sigma", 1.0  );
+	etaA = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solJA_etaA", 100.0  );
+	etaB = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solJA_etaB", 1.0  );
+	dx = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solJA_dx", 0.4  );
+	x0 = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solJA_x0", 0.2  );
+	zc = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solJA_zc", 0.8  );
 
 	_Velic_solJA_Init( self, sigma, etaA, etaB, dx, x0, zc );
 
@@ -159,7 +159,7 @@ void* _Velic_solJA_DefaultNew( Name name ) {
 }
 
 Index Underworld_Velic_solJA_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Velic_solJA_Type, "0", _Velic_solJA_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Velic_solJA_Type, (Name)"0", _Velic_solJA_DefaultNew  );
 }
 
 

@@ -55,7 +55,7 @@ const Type Underworld_VTKOutput_Type = "Underworld_VTKOutput";
 void _Underworld_VTKOutput_AssignFromXML( void* component, Stg_ComponentFactory* cf, void *data ) {
 	UnderworldContext* context;
 
-	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
+	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data  );
 
 	ContextEP_Append( context, AbstractContext_EP_Dump,
                           VTKOutput );
@@ -76,7 +76,7 @@ void* _Underworld_VTKOutput_DefaultNew( Name name ) {
 Index Underworld_VTKOutput_Register( PluginsManager* pluginsManager ) {
 	Journal_DPrintf( StgFEM_Debug, "In: %s( void* )\n", __func__ );
 	
-	return PluginsManager_Submit( pluginsManager, Underworld_VTKOutput_Type, "0", _Underworld_VTKOutput_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_VTKOutput_Type, (Name)"0", _Underworld_VTKOutput_DefaultNew  );
 }
 
 void VTKOutput_particles(IntegrationPointsSwarm*  picswarm, 
@@ -89,7 +89,7 @@ void VTKOutput_fields(void *context, int myRank, int nprocs);
 void VTKOutput( void* _context ) {
 	UnderworldContext*	context = (UnderworldContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
-	IntegrationPointsSwarm*	picIntegrationPoints = (IntegrationPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, "picIntegrationPoints" );
+	IntegrationPointsSwarm*	picIntegrationPoints = (IntegrationPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"picIntegrationPoints"  );
 
         int myRank, nprocs;
         MPI_Comm comm;
@@ -110,10 +110,8 @@ void VTKOutput( void* _context ) {
 
 	if(picIntegrationPoints) {
 	    VTKOutput_particles(picIntegrationPoints,
-				Dictionary_GetDouble_WithDefault
-				(dictionary,"defaultDiffusivity",1.0),
-				Dictionary_GetInt_WithDefault
-				(dictionary,"particleStepping",1),
+				Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"defaultDiffusivity", 1.0 ),
+				Dictionary_GetInt_WithDefault( dictionary, (Dictionary_Entry_Key)"particleStepping", 1 ),
 				context->outputPath, context->timeStep,
 				context->dim,myRank,nprocs);
 	}
@@ -191,14 +189,11 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
         material = (RheologyMaterial*) IntegrationPointsSwarm_GetMaterialOn( picswarm, integrationparticle );
         materialparticle = OneToOneMapper_GetMaterialPoint( picswarm->mapper, integrationparticle, &materialSwarm );
         
-        density=Dictionary_GetDouble_WithDefault( material->dictionary,
-                                                  "density", 0.0 );
-        alpha=Dictionary_GetDouble_WithDefault( material->dictionary,
-                                                "alpha", 0.0 );
+        density=Dictionary_GetDouble_WithDefault( material->dictionary, (Dictionary_Entry_Key)"density", 0.0  );
+        alpha=Dictionary_GetDouble_WithDefault( material->dictionary, (Dictionary_Entry_Key)"alpha", 0.0  );
 	material_index=material->index;
-        diffusivity=Dictionary_GetDouble_WithDefault
-          ( material->dictionary, "diffusivity", defaultDiffusivity );
-        rheology_register=(Rheology_Register*)material->rheology_Register;
+        diffusivity=Dictionary_GetDouble_WithDefault( material->dictionary, (Dictionary_Entry_Key)"diffusivity", defaultDiffusivity );
+        rheology_register=(Rheology_Register* )material->rheology_Register;
 
         if( rheology_register && strcmp( material->name, Material_Type ) )
            rheologyCount = Rheology_Register_GetCount( rheology_register );

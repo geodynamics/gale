@@ -62,8 +62,8 @@ void _Underworld_Nusselt_AssignFromXML( void* component, Stg_ComponentFactory* c
 	FieldVariable*				velocityField;
 	FieldVariable*				temperatureField;
 
-	self->context = (AbstractContext*)Stg_ComponentFactory_PluginConstructByKey( cf, self, "Context", UnderworldContext, True, data );
-	self->gaussSwarm = Stg_ComponentFactory_PluginConstructByKey( cf, self, "GaussSwarm", Swarm, True, data );
+	self->context = (AbstractContext*)Stg_ComponentFactory_PluginConstructByKey( cf, self, (Dictionary_Entry_Key)"Context", UnderworldContext, True, data  );
+	self->gaussSwarm = Stg_ComponentFactory_PluginConstructByKey( cf, self, (Dictionary_Entry_Key)"GaussSwarm", Swarm, True, data  );
 
 	StgFEM_FrequentOutput_PrintString( self->context, "Nusselt" );
 
@@ -157,13 +157,13 @@ void* _Underworld_Nusselt_DefaultNew( Name name ) {
 }
 
 Index Underworld_Nusselt_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Underworld_Nusselt_Type, "0", _Underworld_Nusselt_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_Nusselt_Type, (Name)"0", _Underworld_Nusselt_DefaultNew );
 }
 
 void Underworld_Nusselt_Output( UnderworldContext* context ) {
 	Underworld_Nusselt* self;
 
-	self = (Underworld_Nusselt*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_Nusselt_Type );
+	self = (Underworld_Nusselt* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_Nusselt_Type  );
 
 	/* This performs in integral given in the first half of equation 23 in 
 	 *  Moresi, L. N. and Solomatov, V. S.,  

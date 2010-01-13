@@ -137,26 +137,12 @@ void _RheologyMaterial_AssignFromXML( void* rheologyMaterial, Stg_ComponentFacto
 		rheologyList = NULL;
 	}
 	else {
-		rheologyList = Stg_ComponentFactory_ConstructByList( 
-			cf, 
-			self->name, 
-			"Rheology", 
-			Stg_ComponentFactory_Unlimited, 
-			Rheology, 
-			True, 
-			&rheologyCount,
-			data );
+		rheologyList = Stg_ComponentFactory_ConstructByList( cf, self->name, (Dictionary_Entry_Key)"Rheology", Stg_ComponentFactory_Unlimited, Rheology, True, &rheologyCount, data  );
 	}
 
-	compressible = Stg_ComponentFactory_ConstructByKey( 
-		cf, 
-		self->name, 
-		"Compressible", 
-		Compressible, 
-		False,
-		data ) ;
+	compressible = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Compressible", Compressible, False, data  ) ;
 
-	isCompressible = Stg_ComponentFactory_GetBool( cf, self->name, "isCompressible", False );
+	isCompressible = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"isCompressible", False  );
 
 	_RheologyMaterial_Init( self, rheologyList, rheologyCount, compressible, isCompressible );
 
@@ -189,7 +175,7 @@ void _RheologyMaterial_Init(
          Rheology_Register_Add( self->rheology_Register, rheologyList[ rheology_I ] );
    }
 
-	/*	self->debug = Journal_Register( Debug_Type, self->type ); /* TODO make child of Underworld_Debug */
+	/*	self->debug = Journal_Register( Debug_Type, (Name)self->type ); /* TODO make child of Underworld_Debug */
 }
 
 
@@ -197,7 +183,7 @@ void _RheologyMaterial_Delete( void* rheologyMaterial ) {
 	RheologyMaterial* self = (RheologyMaterial*)rheologyMaterial;
 
 	Stg_Class_Delete( self->rheology_Register );
-	_Material_Delete( self );
+	_Material_Delete( self  );
 }
 
 
@@ -302,7 +288,7 @@ Bool RheologyMaterial_IsNonLinear( void* rheologyMaterial ) {
 	
 	Journal_DFirewall( 
 			rheologyCount > 0, 
-			Journal_Register( Error_Type, self->type ), 
+			Journal_Register( Error_Type, (Name)self->type  ), 
 			"No rheologies registered on %s '%s'.\n", self->type, self->name ); 
 	
 	for( rheology_I = 0; rheology_I < rheologyCount ; rheology_I++ ) { 

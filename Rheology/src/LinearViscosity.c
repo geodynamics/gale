@@ -150,14 +150,14 @@ void _LinearViscosity_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, v
 	
 	_LinearViscosity_Init( 
 			self, 
-			Stg_ComponentFactory_GetDouble( cf, self->name, "C", 1.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "X", 1.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "Y", 1.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "Z", 1.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "XY", 1.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "XZ", 1.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "YZ", 1.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "XYZ", 1.0 ) );
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"C", 1.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"X", 1.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"Y", 1.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"Z", 1.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"XY", 1.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"XZ", 1.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"YZ", 1.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"XYZ", 1.0 )  );
 }
 
 void _LinearViscosity_ModifyConstitutiveMatrix( 

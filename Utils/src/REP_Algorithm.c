@@ -130,7 +130,7 @@ void _REP_Algorithm_Init( void* rep,
 
 #if PATCH_DEBUG
    char* filename;
-   self->myStream = Journal_Register( Info_Type, self->type );
+   self->myStream = Journal_Register( Info_Type, (Name)self->type  );
    Stg_asprintf( &filename, "FieldRecovery-Output.%dof%d.dat", context->rank, context->nproc );
    Stream_RedirectFile_WithPrependedPath( self->myStream, context->outputPath, filename );
    Memory_Free( filename );
@@ -150,16 +150,16 @@ void _REP_Algorithm_AssignFromXML( void* patchRecoveryFeVariable, Stg_ComponentF
    Dictionary*             dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
    Dictionary_Entry_Value* list;
    char*                   varName;
-   Stream*                 errorStream = Journal_Register( Error_Type, "_REP_Algorithm_Construct" );
+   Stream*                 errorStream = Journal_Register( Error_Type, (Name)"_REP_Algorithm_Construct"  );
    int field_I, listCount;
 
 	self->IPswarm         = NULL;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", UnderworldContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", UnderworldContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data  );
 
-  list = Dictionary_Get( dictionary, "RepFieldList" );
+  list = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"RepFieldList"  );
   Journal_Firewall(
 			list != NULL,
 			errorStream,
@@ -185,14 +185,14 @@ void _REP_Algorithm_AssignFromXML( void* patchRecoveryFeVariable, Stg_ComponentF
 	/* get all the rep fields from the dictionary */
 	for( field_I = 0 ; field_I < listCount ; field_I++ ) {
 		varName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( list, field_I ) );
-		self->repFieldList[ field_I ] = Stg_ComponentFactory_ConstructByName( cf, varName, RecoveredFeVariable, True, data );
+		self->repFieldList[ field_I ] = Stg_ComponentFactory_ConstructByName( cf, (Name)varName, RecoveredFeVariable, True, data  );
 	}
 
-	self->constitutiveMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ConstitutiveMatrix", ConstitutiveMatrix, True, data );
+	self->constitutiveMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ConstitutiveMatrix", ConstitutiveMatrix, True, data );
 
-	if(self->constitutiveMatrix) { 
+	if(self->constitutiveMatrix ) { 
     /* implicitly get from constitutiveMatrix dictionary */
-		self->IPswarm = Stg_ComponentFactory_ConstructByKey( cf, self->constitutiveMatrix->name, "Swarm", IntegrationPointsSwarm, True, data );
+		self->IPswarm = Stg_ComponentFactory_ConstructByKey( cf, self->constitutiveMatrix->name, (Dictionary_Entry_Key)"Swarm", IntegrationPointsSwarm, True, data  );
 
 		/* check if any of the repFields require the storeConstitutiveMatrix, if so turnOn */
 		for( field_I = 0 ; field_I < listCount ; field_I++ ) {
@@ -206,7 +206,7 @@ void _REP_Algorithm_AssignFromXML( void* patchRecoveryFeVariable, Stg_ComponentF
 	}
 	else {
     /* explicitly get from component dictionary */
-		self->IPswarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IntegrationPoints", IntegrationPointsSwarm, True, data );
+		self->IPswarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"IntegrationPoints", IntegrationPointsSwarm, True, data  );
 	}
 
   self->repFieldCount = listCount;
@@ -240,19 +240,19 @@ void _REP_Algorithm_Execute( void* patch, void* data ) {
    * are executed in the below functions 
    */
 	UnderworldContext* context = (UnderworldContext*)data;
-	REP_Algorithm* self = (REP_Algorithm*)LiveComponentRegister_Get( context->CF->LCRegister, NameOfPatch );
+	REP_Algorithm* self = (REP_Algorithm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)NameOfPatch );
 	double startTime;
 	int field_I;
 	assert( self );
 
 	/* TODO: Optimisation question. Is this a test and do function or a straigh do function */
    for( field_I = 0 ; field_I < Stg_ObjectList_Count( repRequiredRawFields_Reg ); field_I++ )
-      FeVariable_SyncShadowValues( (FeVariable*)Stg_ObjectList_At( repRequiredRawFields_Reg, field_I ) );
+      FeVariable_SyncShadowValues( (FeVariable* )Stg_ObjectList_At( repRequiredRawFields_Reg, field_I ) );
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
 	startTime = MPI_Wtime();
-	Journal_RPrintf( Journal_Register( Info_Type, "REP"),
+	Journal_RPrintf( Journal_Register( Info_Type, (Name)"REP" ),
 			"Start Recovery Method\n" );
 		
   /* Phases of the REP_Algorithm in this code */
@@ -270,7 +270,7 @@ void _REP_Algorithm_Execute( void* patch, void* data ) {
   /* 6: Perform a final sync for new proc boundary domain edge nodes */
     _REP_Algorithm_CommunicateBoundaries( self );
 
-		Journal_RPrintf( Journal_Register( Info_Type, "REP"),
+		Journal_RPrintf( Journal_Register( Info_Type, (Name)"REP" ),
 				"Time Taken for Recovery Method %f\n", MPI_Wtime()-startTime);
 }
 
@@ -419,20 +419,13 @@ void _REP_Algorithm_AssembleAllLocalElement( REP_Algorithm* self ) {
 	elFi_Mat = Memory_Alloc_Array( double**, repFieldCount, "localElement_FiPerField" );
 	p_pVec = Memory_Alloc_Array( double*, repFieldCount, "position polynomialPerField" );
 	/* Assume GNx this the same for all fields */
-	GNx = Memory_Alloc_2DArray( double, self->repFieldList[0]->dim, REP_MAXNODESPERPATCH, "GNx" );
+	GNx = Memory_Alloc_2DArray( double, self->repFieldList[0]->dim, REP_MAXNODESPERPATCH, (Name)"GNx" );
 	numberLocalElements = FeMesh_GetElementLocalSize( self->repFieldList[0]->feMesh );
 
-	for( field_I = 0 ; field_I < self->repFieldCount ; field_I++ ) {
+	for( field_I = 0 ; field_I < self->repFieldCount ; field_I++  ) {
 		/* TODO assumes constant nodesPerEl across domain */
-		elHi_Mat[field_I] = Memory_Alloc_3DArray( double,
-						self->repFieldList[field_I]->fieldComponentCount,
-						self->repFieldList[field_I]->dim * self->repFieldList[field_I]->nodesPerEl, 
-						self->repFieldList[field_I]->orderOfInterpolation,
-						"localElement_Hi" );
-		elFi_Mat[field_I] = Memory_Alloc_2DArray( double,
-						self->repFieldList[field_I]->fieldComponentCount,
-						self->repFieldList[field_I]->dim * self->repFieldList[field_I]->nodesPerEl,
-						"localElement_Fi");
+		elHi_Mat[field_I] = Memory_Alloc_3DArray( double, self->repFieldList[field_I]->fieldComponentCount, self->repFieldList[field_I]->dim * self->repFieldList[field_I]->nodesPerEl, self->repFieldList[field_I]->orderOfInterpolation, (Name)"localElement_Hi"  );
+		elFi_Mat[field_I] = Memory_Alloc_2DArray( double, self->repFieldList[field_I]->fieldComponentCount, self->repFieldList[field_I]->dim * self->repFieldList[field_I]->nodesPerEl, (Name)"localElement_Fi" );
 		p_pVec[field_I] = Memory_Alloc_Array( double, self->repFieldList[field_I]->orderOfInterpolation, "position polynomial" );
 	}
 
@@ -530,7 +523,7 @@ void _REP_Algorithm_Solver(double **array, double* bVec, int n) {
 	N = LDA = LDB = n;
 	dgesv_( &N, &NRHS, AT, &LDA, IPIV, bVec, &LDB, &info);
 
-	Journal_Firewall( info == 0, Journal_Register( Error_Type, "error_REP" ), "Error: In %s looks like the lapack solver (DGESV) died with the error code %d. Could be due to ill-conditioned matrix ... I advise that you manually print the results of the matrices that lapack uses or contact a developer.\n", __func__, info);
+	Journal_Firewall( info == 0, Journal_Register( Error_Type, (Name)"error_REP"  ), "Error: In %s looks like the lapack solver (DGESV) died with the error code %d. Could be due to ill-conditioned matrix ... I advise that you manually print the results of the matrices that lapack uses or contact a developer.\n", __func__, info);
 	Memory_Free(IPIV);
 	Memory_Free(AT);
 }

@@ -160,8 +160,8 @@ void _PressureTemperatureOutput_AssignFromXML( void* swarmOutput, Stg_ComponentF
 
 	_SwarmOutput_AssignFromXML( self, cf, data );
 
-	pressureField    = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField",    FeVariable, True, data ) ;
-	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TemperatureField", FeVariable, True, data ) ;
+	pressureField    = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureField", FeVariable, True, data  ) ;
+	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"TemperatureField", FeVariable, True, data  ) ;
 
 	_PressureTemperatureOutput_Init( self, pressureField, temperatureField );
 

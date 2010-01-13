@@ -187,9 +187,9 @@ void* _ConstitutiveMatrix_Copy( void* constitutiveMatrix, void* dest, Bool deep,
 
    /* TODO */ abort();
    if (deep) {
-      newConstitutiveMatrix->matrixData = Memory_Alloc_2DArray( double, self->columnSize, self->rowSize, self->name );
+      newConstitutiveMatrix->matrixData = Memory_Alloc_2DArray( double, self->columnSize, self->rowSize, (Name)self->name );
    }
-   return (void*)newConstitutiveMatrix;
+   return (void* )newConstitutiveMatrix;
 }
 
 void _ConstitutiveMatrix_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data ) {
@@ -199,9 +199,9 @@ void _ConstitutiveMatrix_AssignFromXML( void* constitutiveMatrix, Stg_ComponentF
 
    _StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
-   dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
+   dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0  );
 
-   storeConstitutiveMatrix = Stg_ComponentFactory_GetBool( cf, self->name, "storeConstitutiveMatrix", False );
+   storeConstitutiveMatrix = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"storeConstitutiveMatrix", False  );
 
    _ConstitutiveMatrix_Init( self, dim, storeConstitutiveMatrix );
 }
@@ -211,13 +211,13 @@ void _ConstitutiveMatrix_Build( void* constitutiveMatrix, void* data ) {
    Material_Index      material_I;
    Material_Index      materialCount = Materials_Register_GetCount( self->materials_Register );
    RheologyMaterial*   material;
-   Stream*             errorStream = Journal_Register( Error_Type, self->type );
+   Stream*             errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
    _StiffnessMatrixTerm_Build( self, data );
 
    Journal_DPrintf( self->debug, "In %s - for matrix %s\n", __func__, self->name );
 
-   self->matrixData = Memory_Alloc_2DArray( double, self->columnSize, self->rowSize, self->name );
+   self->matrixData = Memory_Alloc_2DArray( double, self->columnSize, self->rowSize, (Name)self->name  );
 /*
         self->deriv = AllocArray2D( double, (self->dim + 1), (self->dim + 1) );
 */

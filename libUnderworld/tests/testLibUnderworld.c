@@ -95,7 +95,7 @@ int main( int argc, char* argv[] ) {
 
 		printf( "Watching rank: %i\n", rank );
 		/* Testing entries in xmlSearchPaths */
-		testDirectory = Stg_ObjectList_Get( xmlSearchPaths,"StGermain" );
+		testDirectory = Stg_ObjectList_Get( xmlSearchPaths, (Name)"StGermain" );
 		if (testDirectory != NULL) {
 			printf("StGermain XML library Path found.\n");
 		}
@@ -103,12 +103,12 @@ int main( int argc, char* argv[] ) {
 			printf("StGermain XML library Path not found.\n"); 
 		}
 		/* For build in the same build directory */
-		if (strcmp((char*)LIB_DIR, (char*)testDirectory)) {
+		if (strcmp((char* )LIB_DIR, (char*)testDirectory)) {
 			printf("StgDomain XML library Path found.\n");
 		}
 		/* For build in separate directories */
 		else{
-			testDirectory = Stg_ObjectList_Get( xmlSearchPaths,"StgDomain" );
+			testDirectory = Stg_ObjectList_Get( xmlSearchPaths, (Name)"StgDomain" );
 			if (testDirectory != NULL) {
 				printf("StgDomain XML library Path found.\n");
 			}
@@ -116,12 +116,12 @@ int main( int argc, char* argv[] ) {
 				printf("StgDomain XML library Path not found.\n"); 
 			}
 		}
-		if (strcmp((char*)LIB_DIR, (char*)testDirectory)) {
+		if (strcmp((char* )LIB_DIR, (char*)testDirectory)) {
 			printf("StgFEM XML library Path found.\n");
 		}
 		/* For build in separate directories */
 		else{
-			testDirectory = Stg_ObjectList_Get( xmlSearchPaths,"StgFEM" );
+			testDirectory = Stg_ObjectList_Get( xmlSearchPaths, (Name)"StgFEM" );
 			if (testDirectory != NULL) {
 				printf("StgFEM XML library Path found.\n");
 			}
@@ -130,12 +130,12 @@ int main( int argc, char* argv[] ) {
 			}
 		}
 		/* For build in the same build directory */
-		if (strcmp((char*)LIB_DIR, (char*)testDirectory)) {
+		if (strcmp((char* )LIB_DIR, (char*)testDirectory)) {
 			printf("PICellerator XML library Path found.\n");
 		}
 		/* For build in separate directories */
 		else{
-			testDirectory = Stg_ObjectList_Get( xmlSearchPaths,"PICellerator" );
+			testDirectory = Stg_ObjectList_Get( xmlSearchPaths, (Name)"PICellerator" );
 			if (testDirectory != NULL) {
 				printf("PICellerator XML library Path found.\n");
 			}
@@ -144,12 +144,12 @@ int main( int argc, char* argv[] ) {
 			}
 		}
 		/* For build in the same build directory */
-		if (strcmp((char*)LIB_DIR, (char*)testDirectory)) {
+		if (strcmp((char* )LIB_DIR, (char*)testDirectory)) {
 			printf("Underworld XML library Path found.\n");
 		}
 		/* For build in separate directories */
 		else{
-			testDirectory = Stg_ObjectList_Get( xmlSearchPaths,"Underworld" );
+			testDirectory = Stg_ObjectList_Get( xmlSearchPaths, (Name)"Underworld" );
 			if (testDirectory != NULL) {
 				printf("Underworld XML library Path found.\n");
 			}
@@ -165,7 +165,7 @@ int main( int argc, char* argv[] ) {
 	StGermain_Finalise();
 	
 	/* Close off MPI */
-	MPI_Finalize();
+	MPI_Finalize( );
 
 	return 0; /* success */
 }

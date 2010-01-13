@@ -13,7 +13,7 @@
 ExtensionInfo_Index handle;
 
 double dt( void* class, PICelleratorContext* context ) {
-	return Dictionary_GetDouble_WithDefault( context->dictionary, "dt", 0.01 );
+	return Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"dt", 0.01  );
 }
 
 void MovingMeshTestVelBCs_IncreasingWithY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -58,7 +58,7 @@ void MovingMeshTestVelBCs_ToCentreY( Node_LocalIndex node_lI, Variable_Index var
 	centreInJ = ( max[J_AXIS] + min[J_AXIS] ) / 2;
 	coordJ_RelativeToCentreJ = coord[J_AXIS] - centreInJ;
 
-	toCentreJ_Max  = Dictionary_GetDouble_WithDefault( context->dictionary, "toCentreJ_Max", 1.0 );
+	toCentreJ_Max  = Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"toCentreJ_Max", 1.0 );
 	/* Need the -1 factor to "flip" so both above and below coords go towards the centre */
 	*result = (-1) * coordJ_RelativeToCentreJ / (boxHeight / 2) * toCentreJ_Max;
 }
@@ -68,13 +68,13 @@ void construct( PICelleratorContext* context ) {
 	MaterialPointsSwarm* materialSwarm;
 
 	/* Add original pos to particle */
-	materialSwarm = (MaterialPointsSwarm*) LiveComponentRegister_Get( context->CF->LCRegister, "materialSwarm" );
-	handle = ExtensionManager_Add( materialSwarm->particleExtensionMgr, CURR_MODULE_NAME, sizeof( Coord ) );
+	materialSwarm = (MaterialPointsSwarm* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialSwarm"  );
+	handle = ExtensionManager_Add( materialSwarm->particleExtensionMgr, (Name)CURR_MODULE_NAME, sizeof( Coord )  );
 
 	ConditionFunction_Register_Add( context->condFunc_Register,
-		ConditionFunction_New( MovingMeshTestVelBCs_IncreasingWithY, "MovingMeshTestVelBCs_IncreasingWithY" ) );
+		ConditionFunction_New( MovingMeshTestVelBCs_IncreasingWithY, (Name)"MovingMeshTestVelBCs_IncreasingWithY" )  );
 	ConditionFunction_Register_Add( context->condFunc_Register,
-		ConditionFunction_New( MovingMeshTestVelBCs_ToCentreY, "MovingMeshTestVelBCs_ToCentreY" ) );
+		ConditionFunction_New( MovingMeshTestVelBCs_ToCentreY, (Name)"MovingMeshTestVelBCs_ToCentreY" ) );
 
 	/* Need to do this so we can test the remesher handles incorrect BCs properly */	
 	stJournal->firewallProducesAssert = False; 
@@ -86,10 +86,10 @@ void storeOriginalPos( PICelleratorContext* context ) {
 	double*           originalCoord;
 	Particle_Index    lParticle_I;
 
-	materialSwarm = (MaterialPointsSwarm*) LiveComponentRegister_Get( context->CF->LCRegister, "materialSwarm" );
+	materialSwarm = (MaterialPointsSwarm* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialSwarm" );
 
 	for ( lParticle_I = 0 ; lParticle_I < materialSwarm->particleLocalCount ; lParticle_I++ ) {
-		particle = (GlobalParticle*) Swarm_ParticleAt( materialSwarm, lParticle_I );
+		particle = (GlobalParticle* ) Swarm_ParticleAt( materialSwarm, lParticle_I );
 		originalCoord = ExtensionManager_Get( materialSwarm->particleExtensionMgr, particle, handle );
 
 		memcpy( originalCoord, particle->coord, sizeof(Coord) );
@@ -115,7 +115,7 @@ void check( PICelleratorContext* context ) {
 		total time up to the start of this timestep */
 	double            time                 = context->currentTime + context->dt;
 	Dictionary*       dictionary           = context->dictionary;
-	Stream*           stream               = Journal_Register( Info_Type, CURR_MODULE_NAME );
+	Stream*           stream               = Journal_Register( Info_Type, (Name)CURR_MODULE_NAME  );
 	double            tolerance;
 	Dimension_Index   dim;
 
@@ -127,9 +127,9 @@ void check( PICelleratorContext* context ) {
 	dim = 2;
 	
 	/* Add original pos to particle */
-	materialSwarm = (MaterialPointsSwarm*) LiveComponentRegister_Get( context->CF->LCRegister, "materialSwarm" );
+	materialSwarm = (MaterialPointsSwarm*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialSwarm"  );
 
-	tolerance = Dictionary_GetDouble_WithDefault( dictionary, "tolerance", 1.0e-6 );
+	tolerance = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"tolerance", 1.0e-6  );
 
 	Journal_Printf( stream, "Timestep = %u: ", context->timeStep );
 
@@ -175,9 +175,9 @@ typedef struct {
 
 void _testMovingMesh_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	DomainContext* context;
-	Stream*                stream               = Journal_Register( Info_Type, CURR_MODULE_NAME );
+	Stream*                stream               = Journal_Register( Info_Type, (Name)CURR_MODULE_NAME  );
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  ); 
 
 	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, construct );
 	ContextEP_Append( context, AbstractContext_EP_Initialise, storeOriginalPos );
@@ -202,7 +202,7 @@ void* _testMovingMesh_DefaultNew( Name name ) {
 }
 
 Index testMovingMesh_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, testMovingMesh_Type, "0", _testMovingMesh_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, testMovingMesh_Type, (Name)"0", _testMovingMesh_DefaultNew  );
 }
 
 

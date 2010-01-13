@@ -42,10 +42,10 @@ const Type Underworld_Nusselt_deltaT_Type = "Underworld_Nusselt_deltaT";
 void _Underworld_Nusselt_deltaT_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data ); 
 
 	/* Add functions to entry points */
-	Underworld_Nusselt_deltaT_Setup( context );
+	Underworld_Nusselt_deltaT_Setup( context  );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_Nusselt_deltaT_Output );
 }
 
@@ -77,7 +77,7 @@ void* _Underworld_Nusselt_deltaT_DefaultNew( Name name ) {
 }
 
 Index Underworld_Nusselt_deltaT_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Underworld_Nusselt_deltaT_Type, "0", _Underworld_Nusselt_deltaT_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_Nusselt_deltaT_Type, (Name)"0", _Underworld_Nusselt_deltaT_DefaultNew );
 }
 
 
@@ -92,9 +92,7 @@ void Underworld_Nusselt_deltaT_Setup( UnderworldContext* context ) {
 
 	Underworld_Nusselt_deltaT* self;
 
-	self = (Underworld_Nusselt_deltaT*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_Nusselt_deltaT_Type );
+	self = (Underworld_Nusselt_deltaT* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_Nusselt_deltaT_Type  );
 	
 	StgFEM_FrequentOutput_PrintString( context, "Nu/DeltaT" );
 
@@ -137,9 +135,7 @@ void Underworld_Nusselt_deltaT_Output( UnderworldContext* context ) {
 	
 	temperatureField          = FieldVariable_Register_GetByName( fV_Register, "TemperatureField" );
 	
-	self = (Underworld_Nusselt_deltaT*)LiveComponentRegister_Get(
-				context->CF->LCRegister,
-				Underworld_Nusselt_deltaT_Type );
+	self = (Underworld_Nusselt_deltaT*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_Nusselt_deltaT_Type  );
 
 	/* get_layer value */
 	/*self->shfl = FeVariable_AverageTopLayer( self->dTField, context->gaussSwarm, NULL, J_AXIS ); */

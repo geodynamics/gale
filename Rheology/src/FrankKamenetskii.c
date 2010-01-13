@@ -120,21 +120,14 @@ void _FrankKamenetskii_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, 
 	_Rheology_AssignFromXML( self, cf, data );
 	
 	/* TODO: KeyFallback soon to be deprecated/updated */
-	temperatureField = Stg_ComponentFactory_ConstructByNameWithKeyFallback( 
-		cf, 
-		self->name, 
-		"TemperatureField", 
-		"TemperatureField", 
-		FeVariable, 
-		True,
-		data );
+	temperatureField = Stg_ComponentFactory_ConstructByNameWithKeyFallback( cf, self->name, (Name)"TemperatureField", (Dictionary_Entry_Key)"TemperatureField", FeVariable, True, data  );
 	/*temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TemperatureField", FeVariable, True ); */
 	
 	_FrankKamenetskii_Init( 
 			self, 
 			temperatureField,
-			Stg_ComponentFactory_GetDouble( cf, self->name, "eta0", 1.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "theta", 0.0 ) );
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"eta0", 1.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"theta", 0.0 )  );
 }
 
 void _FrankKamenetskii_Destroy( void* rheology, void* data ) {

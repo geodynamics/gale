@@ -154,15 +154,15 @@ void _StressField_AssignFromXML( void* stressField, Stg_ComponentFactory* cf, vo
 	/* Construct Parent */
 	_ParticleFeVariable_AssignFromXML( self, cf, data );
 
-	strainRateField =  Stg_ComponentFactory_ConstructByKey( cf,  self->name, "StrainRateField", FeVariable, True, data );
-	constitutiveMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ConstitutiveMatrix", ConstitutiveMatrix, True, data );
+	strainRateField =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"StrainRateField", FeVariable, True, data  );
+	constitutiveMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ConstitutiveMatrix", ConstitutiveMatrix, True, data );
 	variable_Register = self->context->variable_Register; 
-	assert( variable_Register );
+	assert( variable_Register  );
 
-	stressVariableName = Stg_ComponentFactory_GetString( cf, self->name, "StressVariable", "Stress" );
+	stressVariableName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"StressVariable", "Stress"  );
 	stressVariable = Variable_Register_GetByName( variable_Register, stressVariableName );
 
-   sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, "SLE", SystemLinearEquations, False, data );
+   sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"SLE", SystemLinearEquations, False, data  );
 
 	_StressField_Init( self, strainRateField, constitutiveMatrix, stressVariable, variable_Register, sle );
 }
@@ -196,7 +196,7 @@ void _StressField_Build( void* stressField, void* data ) {
 
 	/* Create Variable to store data */
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
-	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
+	tmpName = Stg_Object_AppendSuffix( self, (Name)"DataVariable"  );
 	self->dataVariable = Variable_NewVector(
 		tmpName,
 		(AbstractContext*)self->context,
@@ -215,7 +215,7 @@ void _StressField_Build( void* stressField, void* data ) {
 	Memory_Free( tmpName );
 	
 	/* Create Dof Layout */
-	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
+	tmpName = Stg_Object_AppendSuffix( self, (Name)"DofLayout"  );
 	self->dofLayout = DofLayout_New( tmpName, self->context, self->variable_Register, 0, self->feMesh );
 	self->dofLayout->_numItemsInLayout = FeMesh_GetNodeDomainSize( self->feMesh );
 	for( variable_I = 0; variable_I < self->fieldComponentCount ; variable_I++ ) {

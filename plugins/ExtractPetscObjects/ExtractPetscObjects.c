@@ -64,9 +64,9 @@ void _Underworld_ExtractPetscObjects_AssignFromXML( void* component, Stg_Compone
 {
 	UnderworldContext*  context;
 	
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data ); 
 	
-	Underworld_ExtractPetscObjects_PrintHeaderToFile( context );
+	Underworld_ExtractPetscObjects_PrintHeaderToFile( context  );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput     , Underworld_ExtractPetscObjects_Dump );
 }
 
@@ -85,7 +85,7 @@ void* _Underworld_ExtractPetscObjects_DefaultNew( Name name )
 
 Index Underworld_ExtractPetscObjects_Register( PluginsManager* pluginsManager ) 
 {
-	return PluginsManager_Submit( pluginsManager, Underworld_ExtractPetscObjects_Type, "0", _Underworld_ExtractPetscObjects_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_ExtractPetscObjects_Type, (Name)"0", _Underworld_ExtractPetscObjects_DefaultNew  );
 }
 
 
@@ -158,11 +158,11 @@ void Underworld_ExtractPetscObjects_Dump( void* _context )
 	comm = context->communicator;
 	
 	// get filename from problem description
-	probName = strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( context->dictionary, "ProbDescription" ) ));
+	probName = strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( context->dictionary, (Dictionary_Entry_Key)"ProbDescription" ) ));
 	printf("\n\n");
 	printf("**********************************************\n" );
 	printf("******     Extracting PetscObjects      ******\n" );
-	printf("**********************************************\n");
+	printf("**********************************************\n" );
 	printf("  ProbDescription: %s \n", probName );
 	
 	MPI_Get_processor_name( machine_name, &length);

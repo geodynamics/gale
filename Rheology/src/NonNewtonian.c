@@ -131,20 +131,13 @@ void _NonNewtonian_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void
 	_Rheology_AssignFromXML( self, cf, data );
 	
 	/* TODO: 'Keyfallback' soon to be deprecated/updated */
-	strainRateInvField = Stg_ComponentFactory_ConstructByNameWithKeyFallback( 
-		cf, 
-		self->name,
-                "StrainRateInvariantField", 
-		"StrainRateInvariantField", 
-		FeVariable, 
-		True,
-		data );
+	strainRateInvField = Stg_ComponentFactory_ConstructByNameWithKeyFallback( cf, self->name, (Name)"StrainRateInvariantField", (Dictionary_Entry_Key)"StrainRateInvariantField", FeVariable, True, data  );
 	/*strainRateInvField = Stg_ComponentFactory_ConstructByKey( cf, self->name,
 				"StrainRateInvariantField", FeVariable, True);*/
 	_NonNewtonian_Init( 
 			self,
 			strainRateInvField,
-			Stg_ComponentFactory_GetDouble( cf, self->name, "stressExponent", 1.0 ) );
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"stressExponent", 1.0 )  );
 }
 
 void _NonNewtonian_ModifyConstitutiveMatrix( 

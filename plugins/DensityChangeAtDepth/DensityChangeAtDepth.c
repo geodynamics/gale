@@ -74,7 +74,7 @@ void Underworld_DensityChange_Check( UnderworldContext* context ) {
 		return;
 
 	/* Get self (the plugin) */
-	Underworld_DensityChange* self = (Underworld_DensityChange*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_DensityChange_Type );
+	Underworld_DensityChange* self = (Underworld_DensityChange*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_DensityChange_Type  );
 
 	/* get centroid coordinate */
 	volume = Material_Volume( self->material, (IntegrationPointsSwarm*)self->swarm, centroid );
@@ -84,7 +84,7 @@ void Underworld_DensityChange_Check( UnderworldContext* context ) {
 	if( centroid[1] >= self->height ) {
 		self->bftExt->density = self->newDensity;
 		densityChangeIsDone = 1;
-		Journal_RPrintf( Journal_Register( Info_Type, "DensityChange" ), 
+		Journal_RPrintf( Journal_Register( Info_Type, (Name)"DensityChange"  ), 
 				"************** Density Change for material %s, new density is %g**************\n",
 				self->material->name, self->bftExt->density );
 	}
@@ -94,12 +94,12 @@ void Underworld_DensityChange_Setup( UnderworldContext* context ) {
 		/* Function pulls and checks user input from the xml file */
 	BuoyancyForceTerm*  bft = NULL;
 	BuoyancyForceTerm_MaterialExt* materialExt = NULL;;
-	Stream* stream = Journal_Register( Info_Type, "cows" );
+	Stream* stream = Journal_Register( Info_Type, (Name)"cows" );
 	Name   materialName = NULL;
 	int materialIndex;
 
 	/* Get self (the plugin) */
-	Underworld_DensityChange* self = (Underworld_DensityChange*)LiveComponentRegister_Get( context->CF->LCRegister, Underworld_DensityChange_Type ); 
+	Underworld_DensityChange* self = (Underworld_DensityChange* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_DensityChange_Type  ); 
 
 	/* Initialise plugin data */
 	self->bftExt = NULL;
@@ -109,13 +109,13 @@ void Underworld_DensityChange_Setup( UnderworldContext* context ) {
 	self->newDensity = 0;
 
 	/* Need buoyancy force term, to get density infomation from bft extension + the integration swarm */
-	bft = Stg_ComponentFactory_ConstructByName( context->CF, "buoyancyForceTerm", BuoyancyForceTerm, True, NULL );
+	bft = Stg_ComponentFactory_ConstructByName( context->CF, (Name)"buoyancyForceTerm", BuoyancyForceTerm, True, NULL  );
 
 	/* Read in input from root xml dictionary */
-	self->height = Dictionary_GetDouble_WithDefault( context->dictionary, "materialDensityChangeHeight", 0.5 );
-	self->newDensity = Dictionary_GetDouble_WithDefault( context->dictionary, "materialDensityNewDensity", 0.3 );
-	self->swarm = (IntegrationPointsSwarm*)bft->integrationSwarm;
-	materialName = Dictionary_GetString( context->dictionary, "materialDensityToChange" );
+	self->height = Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"materialDensityChangeHeight", 0.5  );
+	self->newDensity = Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"materialDensityNewDensity", 0.3 );
+	self->swarm = (IntegrationPointsSwarm* )bft->integrationSwarm;
+	materialName = Dictionary_GetString( context->dictionary, (Dictionary_Entry_Key)"materialDensityToChange"  );
 	self->material = Materials_Register_GetByName( self->swarm->materials_Register, materialName );
 
 	/* check if material index exists */
@@ -132,7 +132,7 @@ void Underworld_DensityChange_Setup( UnderworldContext* context ) {
 void _Underworld_DensityChange_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext* context;
 
-	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
+	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data  ); 
 
 	/* Add functions to entry points */
 	ContextEP_Append( context, AbstractContext_EP_Initialise, Underworld_DensityChange_Setup );
@@ -161,11 +161,7 @@ void* _Underworld_DensityChange_DefaultNew( Name name ) {
 }
 
 Index Underworld_DensityChangeAtDepth_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( 
-			pluginsManager, 
-			Underworld_DensityChange_Type, 
-			"0",
-			_Underworld_DensityChange_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_DensityChange_Type, (Name)"0", _Underworld_DensityChange_DefaultNew  );
 }
 
 

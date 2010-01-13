@@ -92,24 +92,20 @@ void _YieldRheology_Init( YieldRheology* self, StrainWeakening* strainWeakening,
 		 * with the YieldRheology_Type
 		 * We should then add the extension */
 		
-		handle = ExtensionManager_GetHandle( materialPointsSwarm->particleExtensionMgr, YieldRheology_Type );
+		handle = ExtensionManager_GetHandle( materialPointsSwarm->particleExtensionMgr, (Name)YieldRheology_Type );
 		
-		if ( handle == (ExtensionInfo_Index) -1 ) {
-			handle = ExtensionManager_Add(materialPointsSwarm->particleExtensionMgr, YieldRheology_Type, sizeof(Particle_Bool));
+		if ( handle == (ExtensionInfo_Index) -1  ) {
+			handle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, (Name)YieldRheology_Type, sizeof(Particle_Bool));
 
 			/* Adding variable for plotting purpose */
-			offset = (ArithPointer) 
+			offset = (ArithPointer ) 
 				ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, NULL, handle );
 
-			self->hasYieldedVariable = Swarm_NewScalarVariable(
-				materialPointsSwarm,
-				"HasYielded",
-				offset,
-				Variable_DataType_Char );
+			self->hasYieldedVariable = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"HasYielded", offset, Variable_DataType_Char  );
 		}
 		else {
 			/* if the variable has already been created - then just store the pointer */
-			Name hasYieldedVariableName = Stg_Object_AppendSuffix( materialPointsSwarm, "HasYielded" );
+			Name hasYieldedVariableName = Stg_Object_AppendSuffix( materialPointsSwarm, (Name)"HasYielded"  );
 			self->hasYieldedVariable = SwarmVariable_Register_GetByName( materialPointsSwarm->swarmVariable_Register, hasYieldedVariableName );
 			Memory_Free( hasYieldedVariableName );
 		}
@@ -148,23 +144,11 @@ void _YieldRheology_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, voi
 	
 	_Rheology_AssignFromXML( self, cf, data );
 
-	strainWeakening =  Stg_ComponentFactory_ConstructByKey( 
-		cf, 
-		self->name,  
-		"StrainWeakening", 
-		StrainWeakening,  
-		False,
-		data  ) ;
+	strainWeakening =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"StrainWeakening", StrainWeakening, False, data   ) ;
 
-	materialPoints =  Stg_ComponentFactory_ConstructByKey(  
-		cf,  
-		self->name,  
-		"MaterialPointsSwarm", 
-		MaterialPointsSwarm,  
-		False,
-		data  ) ;
+	materialPoints =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialPointsSwarm", MaterialPointsSwarm, False, data   ) ;
 
-   minVisc = Stg_ComponentFactory_GetDouble( cf, self->name, "minimumViscosity", 0.0 );
+   minVisc = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minimumViscosity", 0.0  );
    
 	_YieldRheology_Init( self, strainWeakening, materialPoints, minVisc );
 }

@@ -97,8 +97,7 @@ void _Pouliquen_etal_Init(
 	Pouliquen_etal_Particle*   particleExt;
 	StandardParticle          materialPoint;
 	
-	self->particleExtHandle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr,
-		Pouliquen_etal_Type, sizeof(Pouliquen_etal_Particle) );
+	self->particleExtHandle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, (Name)Pouliquen_etal_Type, sizeof(Pouliquen_etal_Particle) );
 		
 	/* Assign Pointers */
 	self->pressureField       = pressureField;
@@ -107,7 +106,7 @@ void _Pouliquen_etal_Init(
 	self->frictionCoefficient = frictionCoefficient;
 	self->minimumYieldStress  = minimumYieldStress;
 	
-	/* Strain softening of Friction - (linear weakening is assumed) */
+	/* Strain softening of Friction - (linear weakening is assumed ) */
 	/* needs a softening factor between +0 and 1 and a reference strain > 0 */
 	self->frictionCoefficientAfterSoftening = frictionCoefficientAfterSoftening;
 
@@ -128,30 +127,14 @@ void _Pouliquen_etal_Init(
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &materialPoint, self->particleExtHandle );
 	
 	/* Setup Variables for Visualisation */
-	self->brightness = Swarm_NewScalarVariable(
-		materialPointsSwarm,
-		"Pouliquen_etalBrightness",
-		(ArithPointer) &particleExt->brightness - (ArithPointer) &materialPoint,
-		Variable_DataType_Float );
+	self->brightness = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"Pouliquen_etalBrightness", (ArithPointer) &particleExt->brightness - (ArithPointer) &materialPoint, Variable_DataType_Float  );
 	
-	self->opacity = Swarm_NewScalarVariable(
-		materialPointsSwarm,
-		"Pouliquen_etalOpacity",
-		(ArithPointer) &particleExt->opacity - (ArithPointer) &materialPoint,
-		Variable_DataType_Float );
+	self->opacity = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"Pouliquen_etalOpacity", (ArithPointer) &particleExt->opacity - (ArithPointer) &materialPoint, Variable_DataType_Float  );
 	
-	self->diameter = Swarm_NewScalarVariable(
-		materialPointsSwarm,
-		"Pouliquen_etalDiameter",
-		(ArithPointer) &particleExt->diameter - (ArithPointer) &materialPoint,
-		Variable_DataType_Float );
+	self->diameter = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"Pouliquen_etalDiameter", (ArithPointer) &particleExt->diameter - (ArithPointer) &materialPoint, Variable_DataType_Float  );
 
 	/* The tensileFailure variable allows to check whether a materialPoint has failed in tensile mode or not */
-	self->tensileFailure = Swarm_NewScalarVariable(
-		materialPointsSwarm,
-		"Pouliquen_etalTensileFailure",
-		(ArithPointer) &particleExt->tensileFailure - (ArithPointer) &materialPoint,
-		Variable_DataType_Char );
+	self->tensileFailure = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"Pouliquen_etalTensileFailure", (ArithPointer) &particleExt->tensileFailure - (ArithPointer) &materialPoint, Variable_DataType_Char );
 
 }
 
@@ -176,7 +159,7 @@ void* _Pouliquen_etal_DefaultNew( Name name ) {
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
-	return (void*) _Pouliquen_etal_New(  POULIQUEN_ETAL_PASSARGS  );
+	return (void*) _Pouliquen_etal_New(  POULIQUEN_ETAL_PASSARGS   );
 }
 
 void _Pouliquen_etal_AssignFromXML( void* pouliquen_etal, Stg_ComponentFactory* cf, void* data ){
@@ -189,30 +172,30 @@ void _Pouliquen_etal_AssignFromXML( void* pouliquen_etal, Stg_ComponentFactory* 
 	_VonMises_AssignFromXML( self, cf, data );
 	
 	pressureField      = (FeVariable *) 
-			Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, True, data );
+			Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureField", FeVariable, True, data );
 			
-	strainRateInvField      = (FeVariable *) 
-			Stg_ComponentFactory_ConstructByKey( cf, self->name, "StrainRateInvariantField", FeVariable, True, data );
+	strainRateInvField      = (FeVariable * ) 
+			Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"StrainRateInvariantField", FeVariable, True, data );
 
-	materialPointsSwarm     = (MaterialPointsSwarm*)
-			Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialPointsSwarm", MaterialPointsSwarm, True, data );
+	materialPointsSwarm     = (MaterialPointsSwarm* )
+			Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialPointsSwarm", MaterialPointsSwarm, True, data  );
 		
 	_Pouliquen_etal_Init( self, 
 			pressureField,
 			strainRateInvField,
 			materialPointsSwarm, 
-			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficient", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficientAfterSoftening", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "grainDiameter", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "Io", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "rho_s", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "mu_2", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "mu_s", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "mu_2_afterSoftening", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "mu_s_afterSoftening", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "maxViscosity", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "minViscosity", 0.0 )  );
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minimumYieldStress", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"frictionCoefficient", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"frictionCoefficientAfterSoftening", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"grainDiameter", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"Io", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"rho_s", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"mu_2", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"mu_s", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"mu_2_afterSoftening", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"mu_s_afterSoftening", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxViscosity", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minViscosity", 0.0 )   );
 }
 
 void _Pouliquen_etal_Build( void* rheology, void* data ) {

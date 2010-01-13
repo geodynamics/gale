@@ -91,7 +91,7 @@ int Underworld_OutputForSPModel_InterpolateHeightInXZ( FeMesh* mesh, double* wan
 	}
 
 	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh,
-  	ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+  	ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" )  );
 
 	nodesPerFace = 4;
 	/* set up IJK parametrisation of nodes */
@@ -293,13 +293,10 @@ void Underworld_OutputForSPModelDo( UnderworldContext* context ) {
 }
 		
 Index Underworld_OutputForSPModel_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager,
-			Underworld_OutputForSPModel_Type,
-			"0",
-			_Underworld_OutputForSPModel_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_OutputForSPModel_Type, (Name)"0", _Underworld_OutputForSPModel_DefaultNew );
 }
 
-void* _Underworld_OutputForSPModel_DefaultNew( Name name ) {
+void* _Underworld_OutputForSPModel_DefaultNew( Name name  ) {
 	return Codelet_New( 
 			Underworld_OutputForSPModel_Type,
 			_Underworld_OutputForSPModel_DefaultNew,
@@ -312,7 +309,7 @@ void* _Underworld_OutputForSPModel_DefaultNew( Name name ) {
 }
 
 void _Underworld_OutputForSPModel_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
-	UnderworldContext* context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
+	UnderworldContext* context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data  );
 
 	outputTimestep = Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "OutputForSPModel_OutputTimestep", 10 );
 

@@ -91,19 +91,19 @@ Bool Underworld_Init( int* argc, char** argv[] ) {
 		Underworld_Rheology_Init( argc, argv );
 		Underworld_Utils_Init( argc, argv );
 	
-		Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
-		tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, "Context" ) );
-		Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), 0 );
+		Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+		tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, (Name)"Context" )  );
+		Stream_SetPrintingRank( Journal_Register( InfoStream_Type, (Name)"Context"  ), 0 );
 		Journal_Printf( /* DO NOT CHANGE OR REMOVE */
-			Journal_Register( InfoStream_Type, "Context" ), 
+			Journal_Register( InfoStream_Type, (Name)"Context"  ), 
 			"Underworld (Geodynamics framework) revision %s. Copyright (C) 2005 Monash Cluster Computing.\n", VERSION );
-		Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
-		Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
+		Stream_Flush( Journal_Register( InfoStream_Type, (Name)"Context" )  );
+		Stream_SetPrintingRank( Journal_Register( InfoStream_Type, (Name)"Context"  ), tmp );
 
 		/* Create Streams */
-		Underworld_Debug  = Journal_Register( Debug_Type, "Context" );
-		Underworld_Info   = Journal_Register( Info_Type,  "Context" );
-		Underworld_Error  = Journal_Register( Error_Type, "Context" );
+		Underworld_Debug  = Journal_Register( Debug_Type, (Name)"Context"  );
+		Underworld_Info   = Journal_Register( Info_Type, (Name)"Context"  );
+		Underworld_Error  = Journal_Register( Error_Type, (Name)"Context"  );
 	
 		/* Add the Underworld path to the global xml path dictionary */
 		directory = Memory_Alloc_Array( char, 400, "xmlDirectory" ) ;

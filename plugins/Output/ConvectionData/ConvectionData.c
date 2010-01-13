@@ -105,22 +105,20 @@ void Underworld_ConvectionData_Setup( void* _context ) {
 	FrankKamenetskii*           frankKamenetskii;
 	Rheology*                   rheology;
 	NonNewtonian*               nonNewtonian;
-   Swarm*					       gaussSwarm    = (Swarm*)     LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
-	FeVariable*				       velocityField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
+   Swarm*					       gaussSwarm    = (Swarm*)     LiveComponentRegister_Get( context->CF->LCRegister, (Name)"gaussSwarm" );
+	FeVariable*				       velocityField = (FeVariable* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"VelocityField"  );
 	char*  filename;
 
-	dataStream = Journal_Register( Info_Type, "ConvectionData Info Stream" );
+	dataStream = Journal_Register( Info_Type, (Name)"ConvectionData Info Stream"  );
 	Stream_SetPrintingRank( dataStream, 0 ); /** Only prints to main proccessor */
 	
-	self = (Underworld_ConvectionData*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_ConvectionData_Type );
+	self = (Underworld_ConvectionData*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_ConvectionData_Type );
 	
-	rheology = (Rheology*)Stg_ComponentFactory_ConstructByName( context->CF, "temperatureDependence", Rheology, False, 0 /* dummy */ );	
-	nonNewtonian = (NonNewtonian*)LiveComponentRegister_Get( context->CF->LCRegister, NonNewtonian_Type );
-        /* (NonNewtonian*)Stg_ComponentFactory_ConstructByName( context->CF, "nonNewtonian", NonNewtonian, True, 0 */ /* dummy */ /* );	*/
+	rheology = (Rheology* )Stg_ComponentFactory_ConstructByName( context->CF, (Name)"temperatureDependence", Rheology, False, 0 /* dummy */ );	
+	nonNewtonian = (NonNewtonian* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)NonNewtonian_Type );
+        /* (NonNewtonian* )Stg_ComponentFactory_ConstructByName( context->CF, (Name)"nonNewtonian", NonNewtonian, True, 0 */ /* dummy */ /* );	*/
 	(nonNewtonian == NULL) ?  (self->stressExponent = 1) :
-		       	(self->stressExponent = nonNewtonian->stressExponent) ;
+		       	(self->stressExponent = nonNewtonian->stressExponent ) ;
 
 	if( !strcmp( rheology->type, "FrankKamenetskii" ) ) {
 		frankKamenetskii = (FrankKamenetskii*)rheology; 
@@ -130,16 +128,14 @@ void Underworld_ConvectionData_Setup( void* _context ) {
 		frankKamenetskii=NULL;
 	}
 	
-	self->diffusivity = Stg_ComponentFactory_GetRootDictDouble( context->CF, "diffusivity", 1.0 );
-	self->horizontalDimOfConvecCell = Stg_ComponentFactory_GetRootDictDouble( context->CF, "horizontalDimOfConvecCell", 1.0 );
-	self->Ra = Stg_ComponentFactory_GetRootDictDouble( context->CF, "Ra", 1.0 );
+	self->diffusivity = Stg_ComponentFactory_GetRootDictDouble( context->CF, (Dictionary_Entry_Key)"diffusivity", 1.0  );
+	self->horizontalDimOfConvecCell = Stg_ComponentFactory_GetRootDictDouble( context->CF, (Dictionary_Entry_Key)"horizontalDimOfConvecCell", 1.0  );
+	self->Ra = Stg_ComponentFactory_GetRootDictDouble( context->CF, (Dictionary_Entry_Key)"Ra", 1.0 );
 	
 	self->eta0 = ( arrhenius != NULL ? arrhenius->eta0 : frankKamenetskii->eta0 );
         /*	self->stressExponent = nonNewtonian->stressExponent; */
 	self->rheologyName = rheology->type;/*( arrhenius != NULL ? StG_Strdup(arrhenius->type) : StG_Strdup(frankKamenetskii->type) ); */
-	self->boundaryLayersPlugin = (Underworld_BoundaryLayers*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_BoundaryLayers_Type );
+	self->boundaryLayersPlugin = (Underworld_BoundaryLayers* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_BoundaryLayers_Type  );
 	Journal_Firewall( self->boundaryLayersPlugin != NULL, Underworld_Error, "Error in %s. Cannot find the BoundaryLayers Plugin. Make sure <param>Underworld_BoundaryLayers</param> is in your plugins list\n");
 
 	Journal_Firewall( 
@@ -179,9 +175,7 @@ void Underworld_ConvectionData_Dump( void* _context ) {
 	double                     surfaceMobility;
 	double                     deltaViscosity;
 
-	self = (Underworld_ConvectionData*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_ConvectionData_Type );
+	self = (Underworld_ConvectionData*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_ConvectionData_Type  );
 
 	Journal_Printf( dataStream, "ID = %s_%.3g_%.3g_%.3g\n", self->rheologyName, self->stressExponent, self->eta0, self->Ra ); 
 
@@ -229,9 +223,7 @@ double Underworld_ConvectionData_XZPlaneVrms( UnderworldContext* context, double
 	TODO:PAT help:
 	   Here I would like to get the VelocitySquareField instead of getting the whole plugin
 	 */
-	self = (Underworld_ConvectionData*)LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_ConvectionData_Type );
+	self = (Underworld_ConvectionData*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_ConvectionData_Type  );
 	
 	/* Sum integral */
 	integral = FeVariable_IntegratePlane( self->velocitySquaredField, J_AXIS, yCoord_Of_XZPlane );
@@ -252,7 +244,7 @@ double Underworld_ConvectionData_XZPlaneVrms( UnderworldContext* context, double
 void _Underworld_ConvectionData_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*  context;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data  );
 
 	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, Underworld_ConvectionData_Setup );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_ConvectionData_Dump );
@@ -286,7 +278,7 @@ void* _Underworld_ConvectionData_DefaultNew( Name name ) {
 }
 
 Index Underworld_ConvectionData_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Underworld_ConvectionData_Type, "0", _Underworld_ConvectionData_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_ConvectionData_Type, (Name)"0", _Underworld_ConvectionData_DefaultNew  );
 }
 
 

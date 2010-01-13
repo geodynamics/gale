@@ -198,7 +198,7 @@ void DepthDependentAnalytic3D_TemperatureIC( Node_LocalIndex node_lI, Variable_I
 	FeMesh*                mesh               = temperatureField->feMesh;
 	double*                temperature        = (double*) _result;
 	double*                coord;
-	DepthDependentAnalytic3D*  self           = Stg_ComponentFactory_ConstructByName( context->CF, DepthDependentAnalytic3D_Type, DepthDependentAnalytic3D, True, context );
+	DepthDependentAnalytic3D*  self           = Stg_ComponentFactory_ConstructByName( context->CF, (Name)DepthDependentAnalytic3D_Type, DepthDependentAnalytic3D, True, context  );
 	
 	/* Find coordinate of node */
 	coord = Mesh_GetVertex( mesh, node_lI );
@@ -212,7 +212,7 @@ void DepthDependentAnalytic3D_PressureIC( Node_LocalIndex node_lI, Variable_Inde
 	FeMesh*                mesh               = PressureField->feMesh;
 	double*                pressure           = (double*) _result;
 	double*                coord;
-	DepthDependentAnalytic3D*  self           = Stg_ComponentFactory_ConstructByName( context->CF, DepthDependentAnalytic3D_Type, DepthDependentAnalytic3D, True, context );
+	DepthDependentAnalytic3D*  self           = Stg_ComponentFactory_ConstructByName( context->CF, (Name)DepthDependentAnalytic3D_Type, DepthDependentAnalytic3D, True, context  );
 	
 	/* Find coordinate of node */
 	coord = Mesh_GetVertex( mesh, node_lI );
@@ -229,11 +229,11 @@ void _DepthDependentAnalytic3D_AssignFromXML( void* analyticSolution, Stg_Compon
 	_FieldTest_AssignFromXML( self, cf, data );
 
 	/* Add temperature initial condition */
-	condFunc = ConditionFunction_New( DepthDependentAnalytic3D_TemperatureIC, "DepthDependentAnalytic3D_TemperatureIC" );
+	condFunc = ConditionFunction_New( DepthDependentAnalytic3D_TemperatureIC, (Name)"DepthDependentAnalytic3D_TemperatureIC"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	/* Add pressure initial condition */
-	condFunc = ConditionFunction_New( DepthDependentAnalytic3D_PressureIC, "DepthDependentAnalytic3D_PressureIC" );
+	condFunc = ConditionFunction_New( DepthDependentAnalytic3D_PressureIC, (Name)"DepthDependentAnalytic3D_PressureIC"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
 	/* Create Analytic Fields */
@@ -244,7 +244,7 @@ void _DepthDependentAnalytic3D_AssignFromXML( void* analyticSolution, Stg_Compon
 	self->_analyticSolutionList[3] = _DepthDependentAnalytic3D_ViscosityFunction;
 
 	/* Setup Viscosity Functions */
-	viscosityType = Stg_ComponentFactory_GetRootDictString( cf, "ViscosityType", "Isoviscous" );
+	viscosityType = Stg_ComponentFactory_GetRootDictString( cf, (Dictionary_Entry_Key)"ViscosityType", "Isoviscous"  );
 	if ( strcasecmp( viscosityType, "Isoviscous" ) == 0 ) {
 		self->viscosityFunc              = DepthDependentAnalytic3D_ViscosityFunc_Isoviscous;
 		self->viscosityDerivativeFunc    = DepthDependentAnalytic3D_ViscosityDerivativeFunc_Isoviscous;
@@ -266,8 +266,8 @@ void _DepthDependentAnalytic3D_AssignFromXML( void* analyticSolution, Stg_Compon
 		self->viscosity2ndDerivativeFunc = DepthDependentAnalytic3D_Viscosity2ndDerivativeFunc_Exponential2;
 	}
 
-	self->Ra = Stg_ComponentFactory_GetRootDictDouble( cf, "Ra", 0.0 );
-	self->V0 = Stg_ComponentFactory_GetRootDictDouble( cf, "V0", 0.0 );
+	self->Ra = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"Ra", 0.0  );
+	self->V0 = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"V0", 0.0  );
 }
 
 void _DepthDependentAnalytic3D_Build( void* analyticSolution, void* data ) {
@@ -298,7 +298,7 @@ void* _DepthDependentAnalytic3D_DefaultNew( Name name ) {
 }
 
 Index Underworld_DepthDependentAnalytic3D_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, DepthDependentAnalytic3D_Type, "0", _DepthDependentAnalytic3D_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, DepthDependentAnalytic3D_Type, (Name)"0", _DepthDependentAnalytic3D_DefaultNew  );
 }
 
 

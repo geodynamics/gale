@@ -158,20 +158,20 @@ void _RecoveredFeVariable_AssignFromXML( void* recFeVariable, Stg_ComponentFacto
    _BaseRecoveryFeVar_AssignFromXML( self, cf, data );
 
    /* assume there this always a stiffness matrix called k_matrix */
-   stiffnessMatrix = Stg_ComponentFactory_ConstructByName( cf, "k_matrix", StiffnessMatrix, True, data ); 
+   stiffnessMatrix = Stg_ComponentFactory_ConstructByName( cf, (Name)"k_matrix", StiffnessMatrix, True, data  ); 
 
-   recoverPressure = Stg_ComponentFactory_GetBool( cf, self->name, "recoverPressure", True ); 
-   if( recoverPressure == True ) {
-      rawPressureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "RawPressureField", FeVariable, True, data );
+   recoverPressure = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"recoverPressure", True ); 
+   if( recoverPressure == True  ) {
+      rawPressureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"RawPressureField", FeVariable, True, data );
       /* record the rawField that is required on the repRequired_RawField register */
-      if( (unsigned)-1 == Stg_ObjectList_GetIndex( repRequiredRawFields_Reg, rawPressureField->name ) )
+      if( (unsigned )-1 == Stg_ObjectList_GetIndex( repRequiredRawFields_Reg, rawPressureField->name ) )
          Stg_ObjectList_Append( repRequiredRawFields_Reg, rawPressureField );
    }
 
-   velGradField = Stg_ComponentFactory_ConstructByName( cf, "VelocityGradientsField", FeVariable, False, data );
+   velGradField = Stg_ComponentFactory_ConstructByName( cf, (Name)"VelocityGradientsField", FeVariable, False, data  );
 
-   refreshMeshConnectivity = Stg_ComponentFactory_GetBool( cf, self->name , "refreshMeshConnectivity", False );
-   recoverStrain = Stg_ComponentFactory_GetBool( cf, self->name , "recoverStrain", False );
+   refreshMeshConnectivity = Stg_ComponentFactory_GetBool( cf, self->name , (Dictionary_Entry_Key)"refreshMeshConnectivity", False  );
+   recoverStrain = Stg_ComponentFactory_GetBool( cf, self->name , (Dictionary_Entry_Key)"recoverStrain", False  );
 
    _RecoveredFeVariable_Init( self, stiffnessMatrix, rawPressureField, velGradField, refreshMeshConnectivity, recoverStrain );
 }
@@ -216,7 +216,7 @@ void _RecoveredFeVariable_Initialise( void* recFeVariable, void* data ) {
    Stg_Component_Initialise( self->dofLayout, data, False );
    Stg_Component_Initialise( self->velGradField, data, False );
 
-   self->pMatrix = Memory_Alloc_2DArray( double, self->fieldComponentCount, self->orderOfInterpolation , "P_Matrix");
+   self->pMatrix = Memory_Alloc_2DArray( double, self->fieldComponentCount, self->orderOfInterpolation , (Name)"P_Matrix" );
    self->CPmat = Memory_Alloc_2DArray( double, self->fieldComponentCount, self->orderOfInterpolation, "CP matrix, for strainRate only");
    self->tmpC  = Memory_Alloc_2DArray( double, self->fieldComponentCount, self->fieldComponentCount, "tmp C matrix, for strainRate only");
 
@@ -585,12 +585,12 @@ void RecoveredFeVariable_SetupWorkSpace( RecoveredFeVariable* self ) {
 	rowsInH = nodesInPatch * self->dim;
 
 	/* will be useful if AMR begins, currently assumes a static mesh */
-	self->patch_H    = Memory_Alloc_3DArray( double, dofThatExist, rowsInH, order , "H_Matrix");
-	self->patch_F    = Memory_Alloc_2DArray( double, dofThatExist, rowsInH, "F Vector");
+	self->patch_H    = Memory_Alloc_3DArray( double, dofThatExist, rowsInH, order , (Name)"H_Matrix" );
+	self->patch_F    = Memory_Alloc_2DArray( double, dofThatExist, rowsInH, (Name)"F Vector" );
 	self->H_t        = Memory_Alloc_2DArray( double, order, rowsInH/*rowsInH, dofThatExist*/, " H transpose");
-	self->AMat       = Memory_Alloc_3DArray( double, dofThatExist, order, order , "AMatrix");
-	self->bVec       = Memory_Alloc_2DArray( double, dofThatExist, order , "BVector");
-	self->tmpEl_H    = Memory_Alloc_2DArray( double, rowsInH, order , "tmp Element H");
+	self->AMat       = Memory_Alloc_3DArray( double, dofThatExist, order, order , (Name)"AMatrix" );
+	self->bVec       = Memory_Alloc_2DArray( double, dofThatExist, order , (Name)"BVector" );
+	self->tmpEl_H    = Memory_Alloc_2DArray( double, rowsInH, order , (Name)"tmp Element H" );
 	self->tmpEl_F    = Memory_Alloc_Array( double, rowsInH, "tmp Element H");
 }
 

@@ -79,9 +79,9 @@ void Underworld_VelicIC_Sinusoidal( Node_LocalIndex node_lI, Variable_Index var_
 	x = coord[ I_AXIS ] - min[ I_AXIS ];
 	y = coord[ J_AXIS ] - min[ J_AXIS ];
 
-	wavenumberX = Dictionary_GetInt_WithDefault( dictionary, "wavenumberX", 1 );
-	wavenumberY = Dictionary_GetDouble_WithDefault( dictionary, "wavenumberY", 1.0 );
-	sigma = Dictionary_GetDouble_WithDefault( dictionary, "sigma", 1.0 );
+	wavenumberX = Dictionary_GetInt_WithDefault( dictionary, (Dictionary_Entry_Key)"wavenumberX", 1  );
+	wavenumberY = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"wavenumberY", 1.0  );
+	sigma = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"sigma", 1.0 );
 	
 	assert( sigma > 0.0 );
 	assert( wavenumberY > 0.0 );
@@ -90,7 +90,7 @@ void Underworld_VelicIC_Sinusoidal( Node_LocalIndex node_lI, Variable_Index var_
 	kx = (double)wavenumberX * M_PI / Lx;
 	ky = (double)wavenumberY * M_PI;
 
-	*result = sigma * sin( ky * y ) * cos( kx * x );
+	*result = sigma * sin( ky * y ) * cos( kx * x  );
 }
 
 /* Works with SolB */
@@ -122,16 +122,16 @@ void Underworld_VelicIC_Hyperbolic( Node_LocalIndex node_lI, Variable_Index var_
 	x = coord[ I_AXIS ] - min[ I_AXIS ];
 	y = coord[ J_AXIS ] - min[ J_AXIS ];
 
-	wavenumberX = Dictionary_GetInt_WithDefault( dictionary, "wavenumberX", 1 );
-	wavenumberY = Dictionary_GetDouble_WithDefault( dictionary, "wavenumberY", 2.0 );
-	assert( wavenumberX != wavenumberY );
-	sigma = Dictionary_GetDouble_WithDefault( dictionary, "sigma", 1.0 );
+	wavenumberX = Dictionary_GetInt_WithDefault( dictionary, (Dictionary_Entry_Key)"wavenumberX", 1  );
+	wavenumberY = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"wavenumberY", 2.0 );
+	assert( wavenumberX != wavenumberY  );
+	sigma = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"sigma", 1.0 );
 
 	kn = wavenumberX * M_PI / L;
 /* 	 TODO: Re-write Mirko's code and/or Documentation so the input parameters for these ICs are less confusing */
 	km = wavenumberY / L;
 
-	*result = sigma * sinh( km * y ) * cos( kn * x );
+	*result = sigma * sinh( km * y ) * cos( kn * x  );
 }
 
 
@@ -140,11 +140,11 @@ void _Underworld_VelicIC_AssignFromXML( void* component, Stg_ComponentFactory* c
 	AbstractContext*        context;
 	ConditionFunction*      condFunc;
 
-	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  ); 
 	
-	condFunc = ConditionFunction_New( Underworld_VelicIC_Sinusoidal, "VelicIC_Sinusoidal");
+	condFunc = ConditionFunction_New( Underworld_VelicIC_Sinusoidal, (Name)"VelicIC_Sinusoidal" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( Underworld_VelicIC_Hyperbolic, "VelicIC_Hyperbolic");
+	condFunc = ConditionFunction_New( Underworld_VelicIC_Hyperbolic, (Name)"VelicIC_Hyperbolic" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 }	
 
@@ -163,7 +163,7 @@ void* _Underworld_VelicIC_DefaultNew( Name name ) {
 Index Underworld_VelicIC_Register( PluginsManager* pluginsManager ) {
 	Journal_DPrintf( StgFEM_Debug, "In: %s( void* )\n", __func__ );
 
-	return PluginsManager_Submit( pluginsManager, Underworld_VelicIC_Type, "0", _Underworld_VelicIC_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_VelicIC_Type, (Name)"0", _Underworld_VelicIC_DefaultNew  );
 }
 
 

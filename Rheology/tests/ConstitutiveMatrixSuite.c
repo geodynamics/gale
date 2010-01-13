@@ -39,9 +39,9 @@ void testConstitutiveMatrix( FiniteElementContext* context ) {
 	ConstitutiveMatrix*	constitutiveMatrix;
 
 	Journal_Enable_AllTypedStream( True );
-	stream = Journal_Register( Info_Type, "testConstitutiveMatrix" );
+	stream = Journal_Register( Info_Type, (Name)"testConstitutiveMatrix" );
  
-	constitutiveMatrix = (ConstitutiveMatrix*) LiveComponentRegister_Get( context->CF->LCRegister, "constitutiveMatrix" );
+	constitutiveMatrix = (ConstitutiveMatrix* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"constitutiveMatrix"  );
 
 	/* Create Constitutive Matrix */
 	Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, "output.dat" );
@@ -97,7 +97,7 @@ void ConstitutiveMatrixSuite_CartesianMatrix2D( ConstitutiveMatrixSuiteData* dat
 	/* read in the xml input file */
 	pcu_filename_input( "testConstitutiveMatrix_Cartesian2D.xml", xml_input );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context"  );
 	data->context = context;
 	dictionary = context->dictionary;
 

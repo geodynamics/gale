@@ -64,12 +64,12 @@ void XDMFGenerator_GenerateAll( void* _context ) {
    /** only the MASTER process writes to the file.  other processes send information to the MASTER where required **/   
    if(context->rank == MASTER) {
       Bool                 fileOpened;
-      Stream*              errorStream  = Journal_Register( Error_Type, CURR_MODULE_NAME );
+      Stream*              errorStream  = Journal_Register( Error_Type, (Name)CURR_MODULE_NAME  );
       char*                 filename;
       char*                outputPathString;
 
       /** Create Stream **/
-      stream = Journal_Register( InfoStream_Type, "XDMFOutputFile" );
+      stream = Journal_Register( InfoStream_Type, (Name)"XDMFOutputFile"  );
    
       /** Set auto flush on stream **/
       Stream_SetAutoFlush( stream, True );
@@ -121,8 +121,8 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
    Index                elementGlobalSize;
    Element_GlobalIndex  gElement_I;
 	Index                var_I = 0;
-   Bool                 saveCoords  = Dictionary_GetBool_WithDefault( context->dictionary, "saveCoordsWithFields", False );
-   Stream*              errorStream = Journal_Register( Error_Type, CURR_MODULE_NAME );
+   Bool                 saveCoords  = Dictionary_GetBool_WithDefault( context->dictionary, (Dictionary_Entry_Key)"saveCoordsWithFields", False  );
+   Stream*              errorStream = Journal_Register( Error_Type, (Name)CURR_MODULE_NAME );
    Name                 variableType = NULL;
    Name                 topologyType = NULL;
    unsigned             componentCount = LiveComponentRegister_GetCount(stgLiveComponentRegister);
@@ -130,7 +130,7 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
    Stg_Component*       stgComp;
 
    /** search for entire live component register for feMesh types  **/
-   for( compI = 0 ; compI < componentCount ; compI++){
+   for( compI = 0 ; compI < componentCount ; compI++ ){
       stgComp = LiveComponentRegister_At( stgLiveComponentRegister, compI );
       /* check that component is of type FeMesh, and that its element family is linear */
       if ( Stg_Class_IsInstance( stgComp, FeMesh_Type ) && !strcmp( ((FeMesh*)stgComp)->feElFamily, "linear" ) ) {
@@ -306,7 +306,7 @@ void _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream
    Name            swarmVarName;
    Name            variableType = NULL;
    Name            filename_part = NULL;
-   Stream*         errorStream  = Journal_Register( Error_Type, CURR_MODULE_NAME );
+   Stream*         errorStream  = Journal_Register( Error_Type, (Name)CURR_MODULE_NAME  );
 	const int       FINISHED_WRITING_TAG = 100;
 	MPI_Status      status;
    
