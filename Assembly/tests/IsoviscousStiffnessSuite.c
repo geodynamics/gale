@@ -36,25 +36,25 @@ void IsoviscousStiffness2D( IsoviscousStiffnessData* data ) {
 	char							*filename, *matrixName;
 	double						tolerance;
 	char							xml_input[PCU_PATH_MAX];
-	Stream*						infoStream = Journal_Register( Info_Type, CURR_MODULE_NAME );
+	Stream*						infoStream = Journal_Register( Info_Type, (Name)CURR_MODULE_NAME );
 	char							rFile[PCU_PATH_MAX];
 	int							err;
 
 	pcu_docstring( "This test compares a Stiffness matrix against a previously generated stiffness matrix"
 		"The stiffness matrix is generated from a 2D FEM model for an isoviscous fluid flow." 
-		"See testIsoviscous.xml for the actual xml used"	);
+		"See testIsoviscous.xml for the actual xml used"	 );
 
 	/* read in the xml input file */
 	pcu_filename_input( "IsoviscousStiffnessMatrix.xml", xml_input );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	context = (FiniteElementContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (FiniteElementContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context" );
 	data->context = context;
 	dictionary = context->dictionary;
 
 	stgMainBuildAndInitialise( cf );
 
 	/* Test is to check the relative error between an
-		 1) expected stiffness matrix, (made years ago)
+		 1 ) expected stiffness matrix, (made years ago)
 		 2) the current stiffness matrix.
 
 		 both matricies are built using only an Arrhenius rheology 
@@ -64,15 +64,15 @@ void IsoviscousStiffness2D( IsoviscousStiffnessData* data ) {
 	tolerance = Dictionary_GetDouble( dictionary, "StiffnessMatrixCompareTolerance" );
 
 	/* Get Matrix */
-	matrixName = Dictionary_GetString( dictionary, "CompareStiffnessMatrix" );
+	matrixName = Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"CompareStiffnessMatrix"  );
 	Journal_Printf( infoStream, "Comparing stiffness matrix '%s'\n", matrixName );
-	stiffnessMatrix = (StiffnessMatrix*) LiveComponentRegister_Get( context->CF->LCRegister, matrixName );
-	assert( stiffnessMatrix );
+	stiffnessMatrix = (StiffnessMatrix*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)matrixName );
+	assert( stiffnessMatrix  );
 
 	StiffnessMatrix_Assemble( stiffnessMatrix, False, NULL, context );
 
 	/* Get Stored Matrix from file */
-	filename = Dictionary_GetString( dictionary, "StiffnessMatrixCompareFilename" );
+	filename = Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"StiffnessMatrixCompareFilename"  );
 	Journal_Printf( infoStream, "Checking with file '%s'\n", filename );
 
 	pcu_filename_expected( filename, expected_file );
@@ -91,7 +91,7 @@ void IsoviscousStiffness2D( IsoviscousStiffnessData* data ) {
 
 	/* Check tolerance */
 	/*
-	stream = Journal_Register( Info_Type, "StiffnessMatrixComparison" );
+	stream = Journal_Register( Info_Type, (Name)"StiffnessMatrixComparison"  );
 	Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, "StiffnessMatrixCompare.dat" );
 	Journal_PrintValue( infoStream, tolerance );
 	Journal_Printf( stream, "Comparison between stiffness matrix '%s' %s with tolerance %4g.\n", 

@@ -146,7 +146,7 @@ void _SystemLinearEquations_Init(
 
 	self->makeConvergenceFile = makeConvergenceFile;
 	if ( self->makeConvergenceFile ) {
-		self->convergenceStream = Journal_Register( InfoStream_Type, "Convergence Info" );
+		self->convergenceStream = Journal_Register( InfoStream_Type, (Name)"Convergence Info"  );
 		Stg_asprintf( &filename, "Convergence.dat" );
 		Stream_RedirectFile_WithPrependedPath( self->convergenceStream, context->outputPath, filename );
 		Stream_SetPrintingRank( self->convergenceStream, 0 );
@@ -343,36 +343,36 @@ void _SystemLinearEquations_AssignFromXML( void* sle, Stg_ComponentFactory* cf, 
 	SNES                    nlSolver = NULL;
 	Name							optionsPrefix;
 	
-	solver = Stg_ComponentFactory_ConstructByKey( cf, self->name, SLE_Solver_Type, SLE_Solver, False, data ) ;
+	solver = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)SLE_Solver_Type, SLE_Solver, False, data  ) ;
 
-	makeConvergenceFile		= Stg_ComponentFactory_GetBool( cf, self->name, "makeConvergenceFile", False );
-	isNonLinear					= Stg_ComponentFactory_GetBool( cf, self->name, "isNonLinear", False );
-	nonLinearTolerance		= Stg_ComponentFactory_GetDouble( cf, self->name, "nonLinearTolerance", 0.01 );
-	nonLinearMaxIterations	= Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "nonLinearMaxIterations", 500 );
-	killNonConvergent			= Stg_ComponentFactory_GetBool( cf, self->name, "killNonConvergent", True );
-	nonLinearMinIterations 	= Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "nonLinearMinIterations", 1 );
-	nonLinearSolutionType	= Stg_ComponentFactory_GetString( cf, self->name, "nonLinearSolutionType", "default" );
-	optionsPrefix				= Stg_ComponentFactory_GetString( cf, self->name, "optionsPrefix", "" );
+	makeConvergenceFile		= Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"makeConvergenceFile", False  );
+	isNonLinear					= Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"isNonLinear", False  );
+	nonLinearTolerance		= Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"nonLinearTolerance", 0.01  );
+	nonLinearMaxIterations	= Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"nonLinearMaxIterations", 500  );
+	killNonConvergent			= Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"killNonConvergent", True  );
+	nonLinearMinIterations 	= Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"nonLinearMinIterations", 1  );
+	nonLinearSolutionType	= Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"nonLinearSolutionType", "default"  );
+	optionsPrefix				= Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"optionsPrefix", ""  );
 
 	/* Read some value for Picard */
-	self->picard_form_function_type = Stg_ComponentFactory_GetString( cf, self->name, "picard_FormFunctionType", "PicardFormFunction_KSPResidual" );
+	self->picard_form_function_type = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"picard_FormFunctionType", "PicardFormFunction_KSPResidual"  );
 
-	self->alpha				= Stg_ComponentFactory_GetDouble( cf, self->name, "picard_alpha", 1.0 );
-	self->rtol				= Stg_ComponentFactory_GetDouble( cf, self->name, "picard_rtol", 1.0e-8 );
-	self->abstol			= Stg_ComponentFactory_GetDouble( cf, self->name, "picard_atol", 1.0e-50 );        
-	self->xtol				= Stg_ComponentFactory_GetDouble( cf, self->name, "picard_xtol", 1.0e-8 );
-	self->picard_monitor	= Stg_ComponentFactory_GetBool( cf, self->name, "picard_ActivateMonitor", False );
+	self->alpha				= Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"picard_alpha", 1.0  );
+	self->rtol				= Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"picard_rtol", 1.0e-8  );
+	self->abstol			= Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"picard_atol", 1.0e-50  );        
+	self->xtol				= Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"picard_xtol", 1.0e-8  );
+	self->picard_monitor	= Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"picard_ActivateMonitor", False  );
 	
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", FiniteElementContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", FiniteElementContext, True, data );
 
 	entryPointRegister = context->entryPoint_Register;
 	assert( entryPointRegister );
 
-	if( isNonLinear ) {
+	if( isNonLinear  ) {
 		SNESCreate( context->communicator, &nlSolver );
-		self->linearSolveInitGuess = Stg_ComponentFactory_GetBool( cf, self->name, "linearSolveInitialGuess", False );
+		self->linearSolveInitGuess = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"linearSolveInitialGuess", False  );
 	}
 	
 	_SystemLinearEquations_Init( 
@@ -740,7 +740,7 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 	double                  tolerance       = self->nonLinearTolerance;
 	Iteration_Index         maxIterations   = self->nonLinearMaxIterations;
 	Bool                    converged;
-	Stream*                 errorStream     = Journal_Register( Error_Type, self->type );
+	Stream*                 errorStream     = Journal_Register( Error_Type, (Name)self->type  );
 	double					wallTime;
 	Iteration_Index         minIterations   = self->nonLinearMinIterations;
         SLE_Solver*             solver;
@@ -951,7 +951,7 @@ void SystemLinearEquations_SNESPicardFormalResidual( void *someSLE, Vec X, Vec F
 {
 	SystemLinearEquations *sle = (SystemLinearEquations*)someSLE;
     	SLE_Solver            *solver = (SLE_Solver*)sle->solver;
-	Stream*                 errorStream     = Journal_Register( Error_Type, sle->type );
+	Stream*                 errorStream     = Journal_Register( Error_Type, (Name)sle->type  );
 
 	Journal_Printf( errorStream, "    **** SystemLinearEquations_SNESPicardFormalResidual: This option is un-tested and does not yet function correctly. \n");
 	Journal_Printf( errorStream, "    **** Use the default form function or specify --components.XXX.picard_FormFunctionType=PicardFormFunction_KSPResidual instead. \n");
@@ -1333,7 +1333,7 @@ void SystemLinearEquations_SetToNonLinear( void* sle ) {
 				self->_sleFormFunction = SystemLinearEquations_SNESPicardFormalResidual;
 			}
 			else {
-				 Stream *errorStream = Journal_Register( Error_Type, self->type );
+				 Stream *errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 		                Journal_Printf( errorStream, "Unknown the Picard FormFunction type %s is unrecognised. .\n", self->picard_form_function_type );
 				Journal_Printf( errorStream, "Supported types include <PicardFormFunction_FormalResidual, PicardFormFunction_KSPResidual> \n" );

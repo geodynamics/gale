@@ -152,9 +152,9 @@ void _Energy_SLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data 
 	/* Construct Parent */
 	_SystemLinearEquations_AssignFromXML( self, cf, data );
 
-	stiffMat    =  Stg_ComponentFactory_ConstructByKey( cf, self->name, StiffnessMatrix_Type, StiffnessMatrix, True, data  ) ;
-	solutionVec =  Stg_ComponentFactory_ConstructByKey( cf, self->name, SolutionVector_Type,  SolutionVector,  True, data  ) ;
-	fVector     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, ForceVector_Type,     ForceVector,     True, data  ) ;
+	stiffMat    =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)StiffnessMatrix_Type, StiffnessMatrix, True, data   ) ;
+	solutionVec =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)SolutionVector_Type, SolutionVector, True, data   ) ;
+	fVector     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)ForceVector_Type, ForceVector, True, data   ) ;
 
 	_Energy_SLE_Init( self, stiffMat, solutionVec, fVector );
 }

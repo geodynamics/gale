@@ -150,9 +150,9 @@ double _ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, u
 						unsigned face_I, unsigned norm ) 
 {
 	ElementType*	self;
-	Stream*			error = Journal_Register( ErrorStream_Type, ElementType_Type );
+	Stream*			error = Journal_Register( ErrorStream_Type, (Name)ElementType_Type );
 
-	self = (ElementType*) elementType;
+	self = (ElementType* ) elementType;
 
 	Journal_Printf( error, "Error: the jacobian for this element type cannot be evaluated on the element surface" );
 	Journal_Printf( error, "(perhaps because the nodes are defined internally for the element).\n" );
@@ -514,7 +514,7 @@ void ElementType_Jacobian_AxisIndependent(
 	/* If GNi isn't passed in - then evaluate them for you */
 	if (_GNi == NULL) {
 		/* Using 3 here instead of dim so that you can pass in dim = 2 and use axes 0 and 2 for your jacobian */
-		GNi = Memory_Alloc_2DArray( double, 3, nodesPerEl, "Temporary GNi" );
+		GNi = Memory_Alloc_2DArray( double, 3, nodesPerEl, (Name)"Temporary GNi"  );
 		self->_evaluateShapeFunctionLocalDerivsAt( self, xi, GNi );
 	}
 	else GNi = _GNi;
@@ -602,7 +602,7 @@ double ElementType_JacobianDeterminant_AxisIndependent(
 	double detJac;
 
 	/* Using 3 here instead of dim so that you can pass in dim = 2 and use axes 0 and 2 for your jacobian */
-	jacobian = Memory_Alloc_2DArray( double, 3, 3, "Temporary Jacobian" );
+	jacobian = Memory_Alloc_2DArray( double, 3, 3, (Name)"Temporary Jacobian"  );
 
 	ElementType_Jacobian_AxisIndependent( elementType, _mesh, elId, xi, dim, jacobian, NULL, A_axis, B_axis, C_axis );
 	detJac = StGermain_MatrixDeterminant_AxisIndependent( jacobian, dim, A_axis, B_axis, C_axis );

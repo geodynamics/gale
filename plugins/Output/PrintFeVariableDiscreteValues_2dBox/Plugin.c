@@ -55,7 +55,7 @@ const char* PRINT_FE_VARIABLE_DISCRETE_VALUES_2D_BOX_TAG = "PrintFeVariableDiscr
 void _StgFEM_PrintFeVariableDiscreteValues_2dBox_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	FiniteElementContext* context;
 
-	context = (FiniteElementContext*)Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data ); 
+	context = (FiniteElementContext*)Stg_ComponentFactory_ConstructByName( cf, (Name)"context", FiniteElementContext, True, data  ); 
 	/* Add extensions to nodes, elements and the context */
 
 	/* Add extensions to functionality (entry points) */ 
@@ -77,12 +77,12 @@ void* _StgFEM_PrintFeVariableDiscreteValues_2dBox_DefaultNew( Name name ) {
 Index StgFEM_PrintFeVariableDiscreteValues_2dBox_Register( PluginsManager* pluginsManager ) {
 	Journal_DPrintf( StgFEM_Debug, "In: %s( void* )\n", __func__ );
 
-	return PluginsManager_Submit( pluginsManager, StgFEM_PrintFeVariableDiscreteValues_2dBox_Type, "0", _StgFEM_PrintFeVariableDiscreteValues_2dBox_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, StgFEM_PrintFeVariableDiscreteValues_2dBox_Type, (Name)"0", _StgFEM_PrintFeVariableDiscreteValues_2dBox_DefaultNew );
 }
 
 
 void PrintFeVariableDiscreteValues_2dBox( void* _context ) {
-	FiniteElementContext*			context = (FiniteElementContext*)_context;
+	FiniteElementContext*			context = (FiniteElementContext* )_context;
 	FeVariable*				currFeVar;
 	Stream*					stream;
 	Name					currFeVarName;
@@ -90,12 +90,12 @@ void PrintFeVariableDiscreteValues_2dBox( void* _context ) {
 	Dictionary_Entry_Value*			currFvParam=NULL;
 	Index					feVar_I=0;
 	Index					numFeVarsToPrint=0;
-	Stream*					warningStr = Journal_Register( Error_Type, CURR_MODULE_NAME );
+	Stream*					warningStr = Journal_Register( Error_Type, (Name)CURR_MODULE_NAME  );
 	
-	stream = Journal_Register( Info_Type, CURR_MODULE_NAME );
+	stream = Journal_Register( Info_Type, (Name)CURR_MODULE_NAME  );
 
-	feVarList = Dictionary_Get( context->dictionary, (char*)PRINT_FE_VARIABLE_DISCRETE_VALUES_2D_BOX_TAG );
-	if ( NULL == feVarList ) {
+	feVarList = Dictionary_Get( context->dictionary, (Dictionary_Entry_Key)(char*)PRINT_FE_VARIABLE_DISCRETE_VALUES_2D_BOX_TAG );
+	if ( NULL == feVarList  ) {
 		Journal_Printf( warningStr, "Warning - in %s: Plugin \"%s\" loaded, but no \"%s\" tag found "
 			"in dictionary. Not printing any FE vars.\n", __func__, CURR_MODULE_NAME, PRINT_FE_VARIABLE_DISCRETE_VALUES_2D_BOX_TAG );
 		return;

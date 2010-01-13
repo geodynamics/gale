@@ -74,10 +74,8 @@ void _StgFEM_PeakMemory_AssignFromXML( void* componment, Stg_ComponentFactory* c
 	/* Turn on the magical petsc logging */
 	PetscMemorySetGetMaximumUsage();
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
-	StgFEM_FrequentOutput* self = (StgFEM_FrequentOutput*)LiveComponentRegister_Get(
-                  context->CF->LCRegister,
-                  StgFEM_FrequentOutput_Type );
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data ); 
+	StgFEM_FrequentOutput* self = (StgFEM_FrequentOutput* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)StgFEM_FrequentOutput_Type  );
 
 	/* set the stupid stream column width so I don't get "..." behaviour */
 	self->columnWidth = 15;
@@ -111,7 +109,7 @@ void* _StgFEM_PeakMemory_DefaultNew( Name name ) {
 }
    
 Index StgFEM_PeakMemory_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, StgFEM_PeakMemory_Type, "0", _StgFEM_PeakMemory_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, StgFEM_PeakMemory_Type, (Name)"0", _StgFEM_PeakMemory_DefaultNew  );
 }
 
 

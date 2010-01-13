@@ -96,7 +96,7 @@ void _CompareFeVariableAgainstReferenceSolution_AssignFromXML( void* compareFeVa
 
 	Stream*                  myStream;
 
-	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  ); 
 	self->context = context;
 	self->cf = cf;
 
@@ -105,7 +105,7 @@ void _CompareFeVariableAgainstReferenceSolution_AssignFromXML( void* compareFeVa
 			CompareFeVariableAgainstReferenceSolution_TestAll, 
 			self );
 
-	self->alwaysOutputErrors = Dictionary_GetBool_WithDefault( cf->rootDict, "alwaysOutputErrors", False );
+	self->alwaysOutputErrors = Dictionary_GetBool_WithDefault( cf->rootDict, (Dictionary_Entry_Key)"alwaysOutputErrors", False  );
 
 	dictionary = Dictionary_GetDictionary( cf->rootDict, self->name );
 	Journal_Firewall(
@@ -128,34 +128,34 @@ void _CompareFeVariableAgainstReferenceSolution_AssignFromXML( void* compareFeVa
 	Journal_Printf(
 		Journal_MyStream( Info_Type, self ),
 		"%s: Using integration swarm %s\n", self->name, integrationSwarmName );
-	self->integrationSwarm = Stg_ComponentFactory_ConstructByName( cf, integrationSwarmName, Swarm, True, data ); 
+	self->integrationSwarm = Stg_ComponentFactory_ConstructByName( cf, (Name)integrationSwarmName, Swarm, True, data ); 
 
 	self->variables            = Stg_ObjectList_New();
 	self->tolerances           = Stg_ObjectList_New();
-	self->relativeErrorMeasure = Stg_ObjectList_New();
+	self->relativeErrorMeasure = Stg_ObjectList_New( );
 
-	varList = Dictionary_Get( dictionary, "variables" );
+	varList = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"variables" );
 	Journal_Firewall(
-		varList != NULL && Dictionary_Entry_Value_GetCount( varList ) > 0,
+		varList != NULL && Dictionary_Entry_Value_GetCount( varList  ) > 0,
 		Journal_MyStream( Error_Type, self ),
 		"In func %s - Specify FeVariables to compare in list \"variables\" for %s\n", __func__, self->name );
 
 	for ( var_I = 0; var_I < Dictionary_Entry_Value_GetCount( varList ); ++var_I ) {
 		varName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( varList, var_I ) );
-		feVarToTest = Stg_ComponentFactory_ConstructByName( cf, varName, FeVariable, True, data );
+		feVarToTest = Stg_ComponentFactory_ConstructByName( cf, (Name)varName, FeVariable, True, data  );
 		Journal_Printf(
 			Journal_MyStream( Info_Type, self ),
 			"%s: Comparing FeVariable %s\n", self->name, varName );
 
-		tmpName = Stg_Object_AppendSuffix( feVarToTest, "tolerance" );
-		tolerance = Dictionary_GetDouble_WithDefault( dictionary, tmpName, 0.005 );
+		tmpName = Stg_Object_AppendSuffix( feVarToTest, (Name)"tolerance"  );
+		tolerance = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)tmpName, 0.005  );
 
-		tmpName = Stg_Object_AppendSuffix( feVarToTest, "useRelativeErrorMeasure" );
-		relativeErrorMeasure = Dictionary_GetBool_WithDefault( dictionary, tmpName, False );
+		tmpName = Stg_Object_AppendSuffix( feVarToTest, (Name)"useRelativeErrorMeasure"  );
+		relativeErrorMeasure = Dictionary_GetBool_WithDefault( dictionary, (Dictionary_Entry_Key)tmpName, False  );
 		
 		Stg_ObjectList_Append( self->variables, feVarToTest );
-		Stg_ObjectList_Append( self->tolerances, Stg_PrimitiveObject_New_Double( tolerance, varName ) );
-		Stg_ObjectList_Append( self->relativeErrorMeasure, Stg_PrimitiveObject_New_Int( (relativeErrorMeasure)?1:0, varName ) );
+		Stg_ObjectList_Append( self->tolerances, Stg_PrimitiveObject_New_Double( tolerance, (Name)varName )  );
+		Stg_ObjectList_Append( self->relativeErrorMeasure, Stg_PrimitiveObject_New_Int( (relativeErrorMeasure)?1:0, (Name)varName )  );
 	}
 
 	/* Default is zero which means every time step */
@@ -200,11 +200,7 @@ void* _CompareFeVariableAgainstReferenceSolution_DefaultNew( Name name ) {
 
 
 Index StgFEM_CompareFeVariableAgainstReferenceSolution_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( 
-			pluginsManager, 
-			CompareFeVariableAgainstReferenceSolution_Type, 
-			"0", 
-			_CompareFeVariableAgainstReferenceSolution_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, CompareFeVariableAgainstReferenceSolution_Type, (Name)"0", _CompareFeVariableAgainstReferenceSolution_DefaultNew  );
 }
 
 
@@ -284,25 +280,11 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	/* Create a DataVariable for the Reference. This serves as the memory object is is linked to */
 	/* Likewise, for the rounded-off version of the "live" FeVar we are testing */
 	assert( Class_IsSuper( feVarToTest->feMesh->topo, IGraph ) );
-	tmpName = Stg_Object_AppendSuffix( feVarToTest, "Reference-DataVariable" );
-	tmpName2 = Stg_Object_AppendSuffix( feVarToTest, "Rounded-DataVariable" );
-	if ( scalar == 1 ) {
-		referenceDataVariable = Variable_NewScalar(
-			tmpName,
-			self->context,
-			Variable_DataType_Double,
-			&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
-			NULL,
-			(void**)NULL,
-			variable_Register );
-		roundedDataVariable = Variable_NewScalar(
-			tmpName2,
-			self->context,
-			Variable_DataType_Double,
-			&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
-			NULL,
-			(void**)NULL,
-			variable_Register );
+	tmpName = Stg_Object_AppendSuffix( feVarToTest, (Name)"Reference-DataVariable"  );
+	tmpName2 = Stg_Object_AppendSuffix( feVarToTest, (Name)"Rounded-DataVariable" );
+	if ( scalar == 1  ) {
+		referenceDataVariable = Variable_NewScalar( tmpName, self->context, Variable_DataType_Double, (Index*)&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains, NULL, (void**)NULL, variable_Register  );
+		roundedDataVariable = Variable_NewScalar( tmpName2, self->context, Variable_DataType_Double, (Index*)&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains, NULL, (void**)NULL, variable_Register  );
 	}
 	else {
 		Journal_Firewall( 
@@ -373,8 +355,8 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	Stg_Component_Initialise( roundedDataVariable, NULL, False );
 
 	/* Create Dof layout for this variable based on its own DataVariable */
-	tmpName = Stg_Object_AppendSuffix( feVarToTest, "Reference-DofLayout" );
-	tmpName2 = Stg_Object_AppendSuffix( feVarToTest, "Rounded-DofLayout" );
+	tmpName = Stg_Object_AppendSuffix( feVarToTest, (Name)"Reference-DofLayout"  );
+	tmpName2 = Stg_Object_AppendSuffix( feVarToTest, (Name)"Rounded-DofLayout"  );
 	referenceDofLayout = DofLayout_New( tmpName, (DomainContext*)self->context, variable_Register, Mesh_GetDomainSize( feVarToTest->feMesh, MT_VERTEX ), NULL );
 	roundedDofLayout = DofLayout_New( tmpName2, (DomainContext*)self->context, variable_Register, Mesh_GetDomainSize( feVarToTest->feMesh, MT_VERTEX ), NULL );
 
@@ -403,10 +385,10 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	Stg_Component_Initialise( roundedDofLayout, NULL, False );
 
 	if ( strlen( self->referenceFeVariableSuffix ) > 0 ) {
-		refName = Stg_Object_AppendSuffix( feVarToTest, self->referenceFeVariableSuffix );
+		refName = Stg_Object_AppendSuffix( feVarToTest, (Name)self->referenceFeVariableSuffix  );
 	}
 	else {
-		/* refName = Stg_Object_AppendSuffix( feVarToTest, "Reference" ); */
+		/* refName = Stg_Object_AppendSuffix( feVarToTest, (Name)"Reference"  ); */
 		/* We actually need the referenceFeVar initially to be called the same as feVarToTest,
 		 * so it reads the correct values - PatrickSunter, 9 Jun 2007 */ 
 		refName = StG_Strdup( feVarToTest->name );
@@ -422,7 +404,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 		False, /* Don't set the "test every timestep var", since we re-create this guy each timestep anyway*/
 		feVarToTest->fieldVariable_Register );
 
-	tmpName = Stg_Object_AppendSuffix( feVarToTest, "Rounded" );
+	tmpName = Stg_Object_AppendSuffix( feVarToTest, (Name)"Rounded"  );
 	roundedFeVar = FeVariable_New_FromTemplate( 
 		tmpName, 
 		(DomainContext*)self->context,
@@ -455,9 +437,9 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	 * refName is allocated */
 	if ( 0 == strcmp( feVarToTest->name, referenceFeVar->name ) ) {
 		Memory_Free( referenceFeVar->name );
-		referenceFeVar->name = Stg_Object_AppendSuffix( feVarToTest, "Reference" );
+		referenceFeVar->name = Stg_Object_AppendSuffix( feVarToTest, (Name)"Reference"  );
 	}
-	tmpName = Stg_Object_AppendSuffix( feVarToTest, "MagnitudeField" );
+	tmpName = Stg_Object_AppendSuffix( feVarToTest, (Name)"MagnitudeField"  );
 	refMagnitudeField = OperatorFeVariable_NewUnary( tmpName, (DomainContext*)self->context, referenceFeVar, "Magnitude" );
 	Memory_Free( tmpName );
 
@@ -478,15 +460,15 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	}
 	Memory_Free( nodalValues );
 
-	tmpName = Stg_Object_AppendSuffix( feVarToTest, "ErrorField" );
+	tmpName = Stg_Object_AppendSuffix( feVarToTest, (Name)"ErrorField"  );
 	errorField = OperatorFeVariable_NewBinary( tmpName, (DomainContext*)self->context, roundedFeVar, referenceFeVar, "Subtraction" );
 	Memory_Free( tmpName );
 
-	tmpName = Stg_Object_AppendSuffix( feVarToTest, "ErrorMagnitudeField" );
+	tmpName = Stg_Object_AppendSuffix( feVarToTest, (Name)"ErrorMagnitudeField"  );
 	errorMagnitudeField = OperatorFeVariable_NewUnary( tmpName, (DomainContext*)self->context, errorField, "Magnitude" );
 	Memory_Free( tmpName );
 
-	tmpName = Stg_Object_AppendSuffix( feVarToTest, "RelativeErrorMagnitudeField" );
+	tmpName = Stg_Object_AppendSuffix( feVarToTest, (Name)"RelativeErrorMagnitudeField"  );
 	relativeErrorMagnitudeField = OperatorFeVariable_NewBinary( tmpName, (DomainContext*)self->context, errorMagnitudeField, refMagnitudeField, "ScalarDivision" );
 	Memory_Free( tmpName );
 

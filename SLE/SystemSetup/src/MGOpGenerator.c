@@ -114,7 +114,7 @@ void _MGOpGenerator_Print( void* mgOpGenerator, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* mgOpGeneratorStream;
-	mgOpGeneratorStream = Journal_Register( InfoStream_Type, "MGOpGeneratorStream" );
+	mgOpGeneratorStream = Journal_Register( InfoStream_Type, (Name)"MGOpGeneratorStream"  );
 
 	assert( self && Stg_CheckType( self, MGOpGenerator ) );
 

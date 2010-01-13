@@ -68,7 +68,7 @@ void UpwindXiSuite_Test( UpwindXiSuiteData* data ) {
 	sprintf( outputFilename, "output_%2d.dat", rank );
 
 	Journal_Enable_TypedStream( InfoStream_Type, True );
-	dataStream = Journal_Register( Info_Type, "DataStream" );
+	dataStream = Journal_Register( Info_Type, (Name)"DataStream"  );
 	Stream_RedirectFile( dataStream, outputFilename );
 		
 	Journal_Printf( dataStream, "# File to compare code with Brooks, Hughes 1982 - Fig 3.3\n");

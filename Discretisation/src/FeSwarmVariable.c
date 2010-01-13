@@ -122,7 +122,7 @@ void _FeSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* 
 
 	_SwarmVariable_AssignFromXML( self, cf, data );
 
-	_FeSwarmVariable_Init( self, Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeVariable", FeVariable, True, data ) );
+	_FeSwarmVariable_Init( self, Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"FeVariable", FeVariable, True, data )  );
 }
 
 void _FeSwarmVariable_Build( void* swarmVariable, void* data ) {
@@ -154,7 +154,7 @@ void _FeSwarmVariable_ValueAt( void* swarmVariable, Particle_Index lParticle_I, 
 
 	/* check if the swarm is using a GlobalCoordSystem, if not FAIL */
 	Journal_Firewall( (swarm->particleLayout->coordSystem == GlobalCoordSystem), 
-		Journal_Register( Error_Type, "FeSwarmVariable" ),
+		Journal_Register( Error_Type, (Name)"FeSwarmVariable"  ),
 			"Error in function %s: FeSwarmVariables require swarms with GlobalCoordSystems\n"
 			"This FeSwarmVariable, %s, uses the swarm %s, which doesn't have a GlobalCoordSystem\n",
 			__func__, self->name, swarm->name );

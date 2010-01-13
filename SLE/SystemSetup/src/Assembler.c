@@ -130,7 +130,7 @@ void _Assembler_Print( void* assembler, Stream* stream ) {
 	assert( self && Stg_CheckType( self, Assembler ) );
 	
 	/* Set the Journal for printing informations */
-	assemblerStream = Journal_Register( InfoStream_Type, "AssemblerStream" );
+	assemblerStream = Journal_Register( InfoStream_Type, (Name)"AssemblerStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "Assembler (ptr): (%p)\n", self );

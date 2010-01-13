@@ -121,7 +121,7 @@ void _TrilinearElementType_Init( TrilinearElementType* self ) {
 	}
 
 	/* Set up the tetrahedral indices. */
-	self->tetInds = Memory_Alloc_2DArray( unsigned, 10, 4, "Mesh_HexType::tetInds" );
+	self->tetInds = Memory_Alloc_2DArray( unsigned, 10, 4, (Name)"Mesh_HexType::tetInds" );
 	self->tetInds[0][0] = 0; self->tetInds[0][1] = 1; self->tetInds[0][2] = 2; self->tetInds[0][3] = 4;
 	self->tetInds[1][0] = 1; self->tetInds[1][1] = 2; self->tetInds[1][2] = 3; self->tetInds[1][3] = 7;
 	self->tetInds[2][0] = 1; self->tetInds[2][1] = 4; self->tetInds[2][2] = 5; self->tetInds[2][3] = 7;
@@ -138,7 +138,7 @@ void _TrilinearElementType_Delete( void* elementType ) {
 	TrilinearElementType* self = (TrilinearElementType*)elementType;
 	
 	/* Stg_Class_Delete parent*/
-	_ElementType_Delete( self );
+	_ElementType_Delete( self  );
 }
 
 void _TrilinearElementType_Print( void* elementType, Stream* stream ) {
@@ -166,7 +166,7 @@ void _TrilinearElementType_Initialise( void* elementType, void *data ){
 	TrilinearElementType* 	self = (TrilinearElementType*)elementType;
 	unsigned**		faceNodes;
 
-	faceNodes = Memory_Alloc_2DArray( unsigned, 6, 4, "node indices for element faces" );
+	faceNodes = Memory_Alloc_2DArray( unsigned, 6, 4, (Name)"node indices for element faces"  );
 
 	faceNodes[0][0] = 0; faceNodes[0][1] = 1; faceNodes[0][2] = 4; faceNodes[0][3] = 5;
 	/* the top face */
@@ -179,7 +179,7 @@ void _TrilinearElementType_Initialise( void* elementType, void *data ){
 	self->faceNodes = faceNodes;
 
 	self->evaluatedShapeFunc = Memory_Alloc_Array( double, self->nodeCount, "evaluatedShapeFuncs" );
-	self->GNi = Memory_Alloc_2DArray( double, self->dim, self->nodeCount, "localShapeFuncDerivitives" );
+	self->GNi = Memory_Alloc_2DArray( double, self->dim, self->nodeCount, (Name)"localShapeFuncDerivitives"  );
 
 }
 	

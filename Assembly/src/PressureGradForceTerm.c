@@ -152,8 +152,8 @@ void _PressureGradForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory
 
 	_PressureGradForceTerm_Init(
 		self, 
-		Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, True, data ),
-		Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureGradField", FeVariable, True, data ) );
+		Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureField", FeVariable, True, data  ),
+		Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureGradField", FeVariable, True, data )  );
 }
 
 void _PressureGradForceTerm_Build( void* forceTerm, void* data ) {

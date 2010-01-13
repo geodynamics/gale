@@ -65,18 +65,13 @@ void CosineHillRotate_TemperatureFunction( void* analyticSolution, FeVariable* a
 
 void CosineHillRotate_TemperatureBC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	DomainContext*	context    = (DomainContext*)_context;
-	CosineHillRotate*  self       = Stg_ComponentFactory_ConstructByName( 
-		context->CF, 
-		CosineHillRotate_Type, 
-		CosineHillRotate, 
-		True,
-		0 );
+	CosineHillRotate*  self       = Stg_ComponentFactory_ConstructByName( context->CF, (Name)CosineHillRotate_Type, CosineHillRotate, True, 0 );
 	FeVariable*             feVariable = NULL;
 	FeMesh*			mesh       = NULL;
 	double*                 result     = (double*) _result;
 	double*                 coord;
 	
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
+	feVariable = (FeVariable* )FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	mesh       = feVariable->feMesh;
 	coord = Mesh_GetVertex( mesh, node_lI );
 
@@ -90,19 +85,19 @@ void _CosineHillRotate_AssignFromXML( void* analyticSolution, Stg_ComponentFacto
 
 	_AnalyticSolution_AssignFromXML( self, cf, data );
 
-	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
+	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, (Name)"TemperatureField", FeVariable, True, data  ); 
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->temperatureField, CosineHillRotate_TemperatureFunction );
 
 	/* Read values from dictionary */
-	self->hillHeight       = Stg_ComponentFactory_GetRootDictDouble( cf, "CosineHillHeight"  , 1.0 );
-	self->hillDiameter     = Stg_ComponentFactory_GetRootDictDouble( cf, "CosineHillDiameter", 1.0 );
-	self->rotationCentre[ I_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, "SolidBodyRotationCentreX" , 0.0 );
-	self->rotationCentre[ J_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, "SolidBodyRotationCentreY" , 0.0 );
-	self->rotationCentre[ K_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, "SolidBodyRotationCentreZ" , 0.0 );
+	self->hillHeight       = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"CosineHillHeight"  , 1.0  );
+	self->hillDiameter     = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"CosineHillDiameter", 1.0  );
+	self->rotationCentre[ I_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"SolidBodyRotationCentreX" , 0.0  );
+	self->rotationCentre[ J_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"SolidBodyRotationCentreY" , 0.0  );
+	self->rotationCentre[ K_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"SolidBodyRotationCentreZ" , 0.0  );
 
 	/* Create Condition Functions */
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
-	condFunc = ConditionFunction_New( CosineHillRotate_TemperatureBC, "Temperature_CosineHill" );
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  ); 
+	condFunc = ConditionFunction_New( CosineHillRotate_TemperatureBC, (Name)"Temperature_CosineHill"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 }
 
@@ -135,7 +130,7 @@ void* _CosineHillRotate_DefaultNew( Name name ) {
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
 Index StgFEM_CosineHillRotate_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
-	return PluginsManager_Submit( pluginsManager, CosineHillRotate_Type, "0", _CosineHillRotate_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, CosineHillRotate_Type, (Name)"0", _CosineHillRotate_DefaultNew  );
 }
 
 

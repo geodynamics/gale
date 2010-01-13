@@ -52,7 +52,7 @@
 #include <stdio.h>
 
 Bool StgFEM_SLE_ProvidedSystems_Finalise( void ) {
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
 	StgFEM_SLE_ProvidedSystems_Energy_Finalise();
 	StgFEM_SLE_ProvidedSystems_StokesFlow_Finalise();

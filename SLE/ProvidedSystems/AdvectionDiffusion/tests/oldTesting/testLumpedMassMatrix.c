@@ -152,7 +152,7 @@ int main( int argc, char* argv[] ) {
 	StgFEM_SLE_ProvidedSystems_AdvectionDiffusion_Init( &argc, &argv );
 	MPI_Barrier( CommWorld ); /* Ensures copyright info always come first in output */
 	
-	stream = Journal_Register (Info_Type, "myStream");
+	stream = Journal_Register( Info_Type, (Name)"myStream");
 
 	if( argc >= 2 ) {
 		procToWatch = atoi( argv[1] );
@@ -160,26 +160,26 @@ int main( int argc, char* argv[] ) {
 	else {
 		procToWatch = 0;
 	}
-	if( rank == procToWatch ) printf( "Watching rank: %i\n", rank );
+	if( rank == procToWatch  ) printf( "Watching rank: %i\n", rank );
 	
 	/* Read input */
 	dictionary = Dictionary_New();
-	Dictionary_Add( dictionary, "outputPath", Dictionary_Entry_Value_FromString( "./output" ) );
-	Dictionary_Add( dictionary, "rank", Dictionary_Entry_Value_FromUnsignedInt( rank ) );
-	Dictionary_Add( dictionary, "numProcessors", Dictionary_Entry_Value_FromUnsignedInt( numProcessors ) );
-	Dictionary_Add( dictionary, "gaussParticlesX", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
-	Dictionary_Add( dictionary, "gaussParticlesY", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"outputPath", Dictionary_Entry_Value_FromString( "./output" )  );
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"rank", Dictionary_Entry_Value_FromUnsignedInt( rank )  );
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"numProcessors", Dictionary_Entry_Value_FromUnsignedInt( numProcessors )  );
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"gaussParticlesX", Dictionary_Entry_Value_FromUnsignedInt( 2 )  );
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"gaussParticlesY", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
 	
 	bcList = Dictionary_Entry_Value_NewList();
-	currBC = Dictionary_Entry_Value_NewStruct();
-	Dictionary_Entry_Value_AddMember( currBC, "name", Dictionary_Entry_Value_FromString( "phi" ) );
-	Dictionary_Entry_Value_AddMember( currBC, "type", Dictionary_Entry_Value_FromString( "double" ) );
-	Dictionary_Entry_Value_AddMember( currBC, "value", Dictionary_Entry_Value_FromDouble( -1.0f ) );
+	currBC = Dictionary_Entry_Value_NewStruct( );
+	Dictionary_Entry_Value_AddMember( currBC, (Dictionary_Entry_Key)"name", Dictionary_Entry_Value_FromString( "phi" )  );
+	Dictionary_Entry_Value_AddMember( currBC, (Dictionary_Entry_Key)"type", Dictionary_Entry_Value_FromString( "double" )  );
+	Dictionary_Entry_Value_AddMember( currBC, (Dictionary_Entry_Key)"value", Dictionary_Entry_Value_FromDouble( -1.0f )  );
 	Dictionary_Entry_Value_AddElement( bcList, currBC );
 	currBC = Dictionary_Entry_Value_NewStruct();
-	Dictionary_Entry_Value_AddMember( currBC, "wall", Dictionary_Entry_Value_FromString( "left" ) );
-	Dictionary_Entry_Value_AddMember( currBC, "variables", bcList );
-	Dictionary_Add( dictionary, "boundaryCondition", currBC );
+	Dictionary_Entry_Value_AddMember( currBC, (Dictionary_Entry_Key)"wall", Dictionary_Entry_Value_FromString( "left" )  );
+	Dictionary_Entry_Value_AddMember( currBC, (Dictionary_Entry_Key)"variables", bcList  );
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"boundaryCondition", currBC  );
 
 	/* Create Context */
 	context = FiniteElementContext_New( "context", 0,0, MPI_COMM_WORLD, dictionary );
@@ -224,7 +224,7 @@ int main( int argc, char* argv[] ) {
 		False, False, False, fV_Register );
 	
 	/* Create Stream */
-	outputStream = Journal_Register( InfoStream_Type, CURR_MODULE_NAME );
+	outputStream = Journal_Register( InfoStream_Type, (Name)CURR_MODULE_NAME  );
 	Stream_RedirectFile( outputStream, "output/output.dat" );
 
 	/* Create Swarm */

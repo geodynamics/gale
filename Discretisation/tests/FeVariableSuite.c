@@ -162,9 +162,8 @@ FeVariable* BuildFeVariable_AsConstant( unsigned dim ) {
 	arraySize = Mesh_GetDomainSize( feMesh, MT_VERTEX );
 	arrayPtr = Memory_Alloc_Array_Unnamed( double, arraySize );
 
-	var = Variable_NewScalar( "pressure", NULL, Variable_DataType_Double, (unsigned*)&arraySize, NULL,
-	                          (void**)&arrayPtr, varReg );
-	Variable_Register_BuildAll( varReg );
+	var = Variable_NewScalar( "pressure", NULL, Variable_DataType_Double, (Index*)(unsigned*)&arraySize, NULL, (void**)&arrayPtr, varReg );
+	Variable_Register_BuildAll( varReg  );
 
 	dofs = DofLayout_New( "", NULL, varReg, 0, feMesh );
 	dofs->nBaseVariables = 1;

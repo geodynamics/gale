@@ -186,14 +186,14 @@ void _ForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* 
 	Stg_Component*				extraInfo;
 	ForceVector*				forceVector;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", FiniteElementContext, False, data );
 
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", FiniteElementContext, True, data  );
 
-	forceVector = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ForceVector", ForceVector,   True,  data ) ;
-	swarm       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",       Swarm,         True,  data ) ;
-	extraInfo   = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ExtraInfo",   Stg_Component, False, data ) ;
+	forceVector = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ForceVector", ForceVector, True, data  ) ;
+	swarm       = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", Swarm, True, data  ) ;
+	extraInfo   = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ExtraInfo", Stg_Component, False, data  ) ;
 
 	_ForceTerm_Init( self, context, forceVector, swarm, extraInfo );
 }
@@ -260,7 +260,7 @@ void _ForceTerm_AssembleElement(
 			double*                           elForceVecToAdd ) 
 {
 	ForceTerm* self        = (ForceTerm*)forceTerm;
-	Stream*    errorStream = Journal_Register( Error_Type, self->type );
+	Stream*    errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 	Journal_Printf( errorStream, "Error in func %s for %s '%s' - "
 			"This function is the default function which should never be called - "

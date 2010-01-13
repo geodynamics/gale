@@ -67,7 +67,7 @@ void FeVariable_ReadNodalValuesFromFile_SpecRidge2D( void* _feVariable, const ch
 	Index              currentFileLine = 0;
 	Coord              localGeometryMin;
 	Coord              localGeometryMax;
-	Stream*            debugStream = Journal_Register( Debug_Type, StgFEM_FeVariable_ImportExport_SpecRidge2D_Type );
+	Stream*            debugStream = Journal_Register( Debug_Type, (Name)StgFEM_FeVariable_ImportExport_SpecRidge2D_Type  );
 	FeMesh*		mesh = feVariable->feMesh;
 	MPI_Comm	comm;
 	unsigned	rank, nProcs;
@@ -98,7 +98,7 @@ void FeVariable_ReadNodalValuesFromFile_SpecRidge2D( void* _feVariable, const ch
 	}
 
 	if ( False == inputFile ) {
-		Stream*    errorStr = Journal_Register( Error_Type, feVariable->type );
+		Stream*    errorStr = Journal_Register( Error_Type, (Name)feVariable->type  );
 		Journal_Printf( errorStr, "Error- in %s(), for feVariable \"%s\": Couldn't find checkpoint file with "
 			"prefix \"%s\", timestep %d - thus full filename \"%s\" - aborting.\n", __func__, feVariable->name,
 			prefixStr, timeStep, filename );
@@ -206,7 +206,7 @@ void FeVariable_ReadNodalValuesFromFile_SpecRidge2D( void* _feVariable, const ch
 
 void FeVariable_SaveNodalValuesToFile_SpecRidge2D( void* _feVariable, const char* prefixStr, unsigned int timeStep ) {
 	FeVariable*      feVariable = (FeVariable*)_feVariable;
-	Stream*          errorStream = Journal_Register( Error_Type, StgFEM_FeVariable_ImportExport_SpecRidge2D_Type );
+	Stream*          errorStream = Journal_Register( Error_Type, (Name)StgFEM_FeVariable_ImportExport_SpecRidge2D_Type  );
 
 	Journal_Firewall( 0, errorStream, "Error - in %s(), for FeVariable \"%s\": function not implemented yet.\n",
 		__func__, feVariable->name );
@@ -216,7 +216,7 @@ void FeVariable_SaveNodalValuesToFile_SpecRidge2D( void* _feVariable, const char
 void _StgFEM_FeVariable_ImportExport_SpecRidge2D_AssignFromXML( void* componment, Stg_ComponentFactory* cf, void* data ) {
 	AbstractContext* context;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data );
 	
 }
 
@@ -240,8 +240,8 @@ void* _StgFEM_FeVariable_ImportExport_SpecRidge2D_DefaultNew( Name name ) {
 	return _Codelet_New(  CODELET_PASSARGS  );
 }
    
-Index StgFEM_FeVariable_ImportExport_SpecRidge2D_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, StgFEM_FeVariable_ImportExport_SpecRidge2D_Type, "0", _StgFEM_FeVariable_ImportExport_SpecRidge2D_DefaultNew );
+Index StgFEM_FeVariable_ImportExport_SpecRidge2D_Register( PluginsManager* pluginsManager  ) {
+	return PluginsManager_Submit( pluginsManager, StgFEM_FeVariable_ImportExport_SpecRidge2D_Type, (Name)"0", _StgFEM_FeVariable_ImportExport_SpecRidge2D_DefaultNew  );
 }
 
 

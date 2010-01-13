@@ -158,7 +158,7 @@ void _PETScMGSolver_Print( void* matrixSolver, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* matrixSolverStream;
-	matrixSolverStream = Journal_Register( InfoStream_Type, "PETScMGSolverStream" );
+	matrixSolverStream = Journal_Register( InfoStream_Type, (Name)"PETScMGSolverStream"  );
 
 	assert( self && Stg_CheckType( self, PETScMGSolver ) );
 
@@ -180,11 +180,11 @@ void _PETScMGSolver_AssignFromXML( void* matrixSolver, Stg_ComponentFactory* cf,
 
 	//_PETScMatrixSolver_AssignFromXML( self, cf, data );
 
-	pure = Stg_ComponentFactory_GetBool( cf, self->name, "pure", False );
-	nLevels = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "levels", 1 );
-	nCycles = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "cycles", 1 );
-	nDownIts = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "downIterations", 1 );
-	nUpIts = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "upIterations", 1 );
+	pure = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"pure", False  );
+	nLevels = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"levels", 1  );
+	nCycles = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"cycles", 1  );
+	nDownIts = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"downIterations", 1  );
+	nUpIts = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"upIterations", 1  );
 
 	self->pure = pure;
 	PETScMGSolver_SetLevels( self, nLevels );
@@ -192,8 +192,7 @@ void _PETScMGSolver_AssignFromXML( void* matrixSolver, Stg_ComponentFactory* cf,
 	PETScMGSolver_SetAllDownIterations( self, nDownIts );
 	PETScMGSolver_SetAllUpIterations( self, nUpIts );
 
-	self->opGen = Stg_ComponentFactory_ConstructByKey( cf, self->name, "opGenerator", MGOpGenerator, 
-							   True, data );
+	self->opGen = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"opGenerator", MGOpGenerator, True, data  );
 	MGOpGenerator_SetMatrixSolver( self->opGen, self );
 	MGOpGenerator_SetNumLevels( self->opGen, nLevels );
 }
@@ -501,7 +500,7 @@ void PETScMGSolver_UpdateMatrices( PETScMGSolver* self ) {
 	assert( self && Stg_CheckType( self, PETScMGSolver ) );
 	//assert( self->matrix && Stg_CheckType( self->matrix, PETScMatrix ) );
 
-	stream = Journal_Register( InfoStream_Type, "general" ); assert( stream );
+	stream = Journal_Register( InfoStream_Type, (Name)"general" ); assert( stream  );
 	Journal_Printf( stream, "Updating MG matrices ...\n" );
 
 	ec = KSPGetPC( self->mgData->ksp, &pc );

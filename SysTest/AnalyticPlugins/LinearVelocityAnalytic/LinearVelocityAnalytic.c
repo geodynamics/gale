@@ -86,7 +86,7 @@ void LinearVelocityAnalytic_GetCornerNodeVelocities(void* analyticSolution) {
 	Node_Index              globalNode_I;
 	Node_Index              ii;
 	
-	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" )  );
 
 	/* Find global indicies of nodes */
 	self->cornerNodeCount = 4;
@@ -176,8 +176,8 @@ void LinearVelocityAnalytic_VelocityGradientsFunction( void* analyticSolution, d
 	/* Transform the coordinate into a master coordinate system */
 	GetLocalCoords( self, coord, xi );
 
-	GNi = Memory_Alloc_2DArray( double, dim, self->cornerNodeCount, "GNi" );
-	GNx = Memory_Alloc_2DArray( double, dim, self->cornerNodeCount, "GNx" );
+	GNi = Memory_Alloc_2DArray( double, dim, self->cornerNodeCount, (Name)"GNi"  );
+	GNx = Memory_Alloc_2DArray( double, dim, self->cornerNodeCount, (Name)"GNx"  );
 
 	/* Get Shape Functions */
 	elementType = FeMesh_GetElementType( mesh, 0 );
@@ -324,7 +324,7 @@ void _LinearVelocityAnalytic_AssignFromXML( void* analyticSolution, Stg_Componen
 
 	_FieldTest_AssignFromXML( self, cf, data );
 
-	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, (Name)"VelocityField", FeVariable, True, data  ); 
 }
 
 void _LinearVelocityAnalytic_Build( void* analyticSolution, void* data ) {
@@ -373,7 +373,7 @@ void* _LinearVelocityAnalytic_DefaultNew( Name name ) {
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
 Index StgFEM_LinearVelocityAnalytic_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
-	return PluginsManager_Submit( pluginsManager, LinearVelocityAnalytic_Type, "0", _LinearVelocityAnalytic_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, LinearVelocityAnalytic_Type, (Name)"0", _LinearVelocityAnalytic_DefaultNew  );
 }
 
 

@@ -117,7 +117,7 @@ void _BilinearInnerElType_Init( BilinearInnerElType* self ) {
 		self->elLocalLength[dim_I] = self->maxElLocalCoord[dim_I] - self->minElLocalCoord[dim_I];
 	}
 
-	self->triInds = Memory_Alloc_2DArray( unsigned, 2, 3, "BilinearInnerElType::triInds" );
+	self->triInds = Memory_Alloc_2DArray( unsigned, 2, 3, (Name)"BilinearInnerElType::triInds" );
 	self->triInds[0][0] = 0; self->triInds[0][1] = 1; self->triInds[0][2] = 2;
 	self->triInds[1][0] = 1; self->triInds[1][1] = 3; self->triInds[1][2] = 2;
 }
@@ -126,7 +126,7 @@ void _BilinearInnerElType_Delete( void* elementType ) {
 	BilinearInnerElType* self = (BilinearInnerElType*)elementType;
 
 	/* Stg_Class_Delete parent */
-	_ElementType_Delete( self );
+	_ElementType_Delete( self  );
 }
 
 void _BilinearInnerElType_Print( void* elementType, Stream* stream ) {
@@ -223,7 +223,7 @@ void _BilinearInnerElType_SF_allLocalDerivs_allNodes( void* elementType, const d
 }
 
 int _BilinearInnerElType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* norm ) {
-	Stream*	errStream = Journal_Register( ErrorStream_Type, ElementType_Type );
+	Stream*	errStream = Journal_Register( ErrorStream_Type, (Name)ElementType_Type  );
 
 	Journal_Printf( errStream, "surface normal function not yet implemented for this element type.\n" );
 	assert( 0 );

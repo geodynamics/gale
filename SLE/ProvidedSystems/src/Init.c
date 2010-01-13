@@ -54,7 +54,7 @@
 /** Initialises the Linear Algebra package, then any init for this package
 such as streams etc */
 Bool StgFEM_SLE_ProvidedSystems_Init( int* argc, char** argv[] ) {
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
 	StgFEM_SLE_ProvidedSystems_Energy_Init( argc, argv );
 	StgFEM_SLE_ProvidedSystems_StokesFlow_Init( argc, argv );

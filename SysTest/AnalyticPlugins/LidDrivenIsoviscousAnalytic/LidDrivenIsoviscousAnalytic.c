@@ -130,8 +130,8 @@ void _LidDrivenIsoviscousAnalytic_AssignFromXML( void* analyticSolution, Stg_Com
 	_FieldTest_AssignFromXML( self, cf, data );
 
 	/* Set constants */
-	self->wavenumber = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "sinusoidalLidWavenumber", 1 );
-	LidDrivenIsoviscousAnalytic_CalculateConstants( self );
+	self->wavenumber = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"sinusoidalLidWavenumber", 1 );
+	LidDrivenIsoviscousAnalytic_CalculateConstants( self  );
 }
 
 void _LidDrivenIsoviscousAnalytic_Build( void* analyticSolution, void* data ) {
@@ -169,7 +169,7 @@ void* _LidDrivenIsoviscousAnalytic_DefaultNew( Name name ) {
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
 Index StgFEM_LidDrivenIsoviscousAnalytic_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
-	return PluginsManager_Submit( pluginsManager, LidDrivenIsoviscousAnalytic_Type, "0", _LidDrivenIsoviscousAnalytic_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, LidDrivenIsoviscousAnalytic_Type, (Name)"0", _LidDrivenIsoviscousAnalytic_DefaultNew  );
 }
 
 

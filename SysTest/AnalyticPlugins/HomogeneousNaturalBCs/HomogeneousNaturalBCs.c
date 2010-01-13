@@ -54,16 +54,11 @@ typedef struct {
 
 void HomogeneousNaturalBCs_Velocity_SkewToMesh( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	DomainContext*	context = (DomainContext*)_context;
-	HomogeneousNaturalBCs*  self    = Stg_ComponentFactory_ConstructByName( 
-		context->CF, 
-		HomogeneousNaturalBCs_Type, 
-		HomogeneousNaturalBCs, 
-		True,
-		0 );
+	HomogeneousNaturalBCs*  self    = Stg_ComponentFactory_ConstructByName( context->CF, (Name)HomogeneousNaturalBCs_Type, HomogeneousNaturalBCs, True, 0 );
 	double*                 result  = (double*) _result;
 	
 	result[ I_AXIS ] =  cos( self->angle );
-	result[ J_AXIS ] =  sin( self->angle );
+	result[ J_AXIS ] =  sin( self->angle  );
 }
 
 
@@ -78,18 +73,13 @@ void HomogeneousNaturalBCs_TemperatureFunction( void* analyticSolution, double* 
 	
 void HomogeneousNaturalBCs_TemperatureBC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	DomainContext*	context    = (DomainContext*)_context;
-	HomogeneousNaturalBCs*  self       = Stg_ComponentFactory_ConstructByName( 
-		context->CF, 
-		HomogeneousNaturalBCs_Type, 
-		HomogeneousNaturalBCs, 
-		True,
-		0 );
+	HomogeneousNaturalBCs*  self       = Stg_ComponentFactory_ConstructByName( context->CF, (Name)HomogeneousNaturalBCs_Type, HomogeneousNaturalBCs, True, 0 );
 	FeVariable*             feVariable = NULL;
 	FeMesh*			mesh       = NULL;
 	double*                 result     = (double*) _result;
 	double*                 coord;
 	
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
+	feVariable = (FeVariable* )FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	mesh       = feVariable->feMesh;
 	coord = Mesh_GetVertex( mesh, node_lI );
 
@@ -102,15 +92,15 @@ void _HomogeneousNaturalBCs_AssignFromXML( void* analyticSolution, Stg_Component
 
 	_FieldTest_AssignFromXML( self, cf, data );
 
-	self->angle = StGermain_DegreeToRadian (Stg_ComponentFactory_GetRootDictDouble( cf, "VelocitySkewAngle", 45.0 ) );
+	self->angle = StGermain_DegreeToRadian (Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"VelocitySkewAngle", 45.0 )  );
 
 	/* Create Condition Functions */
 /*
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  ); 
 */
-	condFunc = ConditionFunction_New( HomogeneousNaturalBCs_Velocity_SkewToMesh, "Velocity_SkewToMesh" );
+	condFunc = ConditionFunction_New( HomogeneousNaturalBCs_Velocity_SkewToMesh, (Name)"Velocity_SkewToMesh"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( HomogeneousNaturalBCs_TemperatureBC, "Temperature_StepFunction" );
+	condFunc = ConditionFunction_New( HomogeneousNaturalBCs_TemperatureBC, (Name)"Temperature_StepFunction"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 }
 
@@ -148,7 +138,7 @@ void* _HomogeneousNaturalBCs_DefaultNew( Name name ) {
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
 Index StgFEM_HomogeneousNaturalBCs_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
-	return PluginsManager_Submit( pluginsManager, HomogeneousNaturalBCs_Type, "0", _HomogeneousNaturalBCs_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, HomogeneousNaturalBCs_Type, (Name)"0", _HomogeneousNaturalBCs_DefaultNew  );
 }
 
 

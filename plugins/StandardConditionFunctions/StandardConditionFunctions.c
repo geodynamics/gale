@@ -55,126 +55,126 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
 	ConditionFunction*      condFunc;
 	Dictionary*		pluginDict	= Codelet_GetPluginDictionary( component, cf->rootDict );
 
-	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), AbstractContext, True, data );
+	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, (Dictionary_Entry_Key)"Context"  ), AbstractContext, True, data );
 	self->context = context;
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SolidBodyRotation, "Velocity_SolidBodyRotation" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SolidBodyRotation, (Name)"Velocity_SolidBodyRotation"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_PartialRotationX, "Velocity_PartialRotationX" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_PartialRotationX, (Name)"Velocity_PartialRotationX"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 		
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_PartialRotationY, "Velocity_PartialRotationY" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_PartialRotationY, (Name)"Velocity_PartialRotationY"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShear, "Velocity_SimpleShear" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShear, (Name)"Velocity_SimpleShear"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShearInverted, "Velocity_SimpleShearInverted" );
+        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShearInverted, (Name)"Velocity_SimpleShearInverted"  );
         ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Extension, "Velocity_Extension" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Extension, (Name)"Velocity_Extension"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_PartialLid_TopLayer, "Velocity_PartialLid_TopLayer" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_PartialLid_TopLayer, (Name)"Velocity_PartialLid_TopLayer"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Trigonometry, "Temperature_Trigonometry" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Trigonometry, (Name)"Temperature_Trigonometry"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearInterpolationLid, "Velocity_LinearInterpolationLid" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearInterpolationLid, (Name)"Velocity_LinearInterpolationLid"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Lid_RampWithCentralMax, "Velocity_Lid_RampWithCentralMax" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Lid_RampWithCentralMax, (Name)"Velocity_Lid_RampWithCentralMax"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearVelocityLeftWall, "LinearVelocityLeftWall" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearVelocityLeftWall, (Name)"LinearVelocityLeftWall"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearVelocityRightWall, "LinearVelocityRightWall" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearVelocityRightWall, (Name)"LinearVelocityRightWall"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SinusoidalLid, "Velocity_SinusoidalLid" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SinusoidalLid, (Name)"Velocity_SinusoidalLid"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_CornerOnly, "Velocity_Lid_CornerOnly" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_CornerOnly, (Name)"Velocity_Lid_CornerOnly"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TemperatureCosineHill, "Temperature_CosineHill" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TemperatureCosineHill, (Name)"Temperature_CosineHill"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConvectionBenchmark, "Temperature_ConvectionBenchmark" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConvectionBenchmark, (Name)"Temperature_ConvectionBenchmark"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation, "LinearWithSinusoidalPerturbation" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation, (Name)"LinearWithSinusoidalPerturbation"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_EdgeDriveConvectionIC, "EdgeDriveConvectionIC" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_EdgeDriveConvectionIC, (Name)"EdgeDriveConvectionIC"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ThermalEdgeDriveConvectionIC, "ThermalEdgeDriveConvectionIC" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ThermalEdgeDriveConvectionIC, (Name)"ThermalEdgeDriveConvectionIC"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_AnalyticalTemperatureIC, "AnalyticalTemperatureIC" );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_AnalyticalTemperatureIC, (Name)"AnalyticalTemperatureIC"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( Stg_FEM_VelicTemperatureIC, "VelicTemperatureIC");
+	condFunc = ConditionFunction_New( Stg_FEM_VelicTemperatureIC, (Name)"VelicTemperatureIC" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( Stg_FEM_VelicTemperatureIC_SolB, "VelicTemperatureIC_SolB");
+	condFunc = ConditionFunction_New( Stg_FEM_VelicTemperatureIC_SolB, (Name)"VelicTemperatureIC_SolB" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SinusoidalExtension, "SinusoidalExtension");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SinusoidalExtension, (Name)"SinusoidalExtension" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_StepFunction, "StepFunction");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_StepFunction, (Name)"StepFunction" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_MovingStepFunction, "MovingStepFunction");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_MovingStepFunction, (Name)"MovingStepFunction" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpecRidge3D, "SpecRidge3D");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpecRidge3D, (Name)"SpecRidge3D" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCX, "SpectralBCX");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCX, (Name)"SpectralBCX" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCY, "SpectralBCY");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCY, (Name)"SpectralBCY" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCZ, "SpectralBCZ");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCZ, (Name)"SpectralBCZ" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralPressureBCX, "SpectralPressureBCX");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralPressureBCX, (Name)"SpectralPressureBCX" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralPressureBCY, "SpectralPressureBCY");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralPressureBCY, (Name)"SpectralPressureBCY" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ErrorFunc, "ErrorFunc");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ErrorFunc, (Name)"ErrorFunc" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantVector, "ConstantVector");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantVector, (Name)"ConstantVector" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GaussianDistribution, "GaussianDistribution");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GaussianDistribution, (Name)"GaussianDistribution" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_1DGaussianDistribution, "1DGaussianDistribution");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_1DGaussianDistribution, (Name)"1DGaussianDistribution" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_HalfContainer, "HalfContainer");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_HalfContainer, (Name)"HalfContainer" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantValue, "ConstantValue");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantValue, (Name)"ConstantValue" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_DiagonalLine, "DiagonalLine");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_DiagonalLine, (Name)"DiagonalLine" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_DeltaFunction, "DeltaFunction");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_DeltaFunction, (Name)"DeltaFunction" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_InflowBottom, "InflowBottom");
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_InflowBottom, (Name)"InflowBottom" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GaussianTube, "GaussianTube");
+        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GaussianTube, (Name)"GaussianTube" );
         ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GravitationalPotential, "GravitationalPotential");
+        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GravitationalPotential, (Name)"GravitationalPotential" );
         ConditionFunction_Register_Add( condFunc_Register, condFunc );
 }
 
@@ -193,7 +193,7 @@ void* _StgFEM_StandardConditionFunctions_DefaultNew( Name name ) {
 Index StgFEM_StandardConditionFunctions_Register( PluginsManager* pluginsManager ) {
 	Journal_DPrintf( StgFEM_Debug, "In: %s( void* )\n", __func__ );
 
-	return PluginsManager_Submit( pluginsManager, StgFEM_StandardConditionFunctions_Type, "0", _StgFEM_StandardConditionFunctions_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, StgFEM_StandardConditionFunctions_Type, (Name)"0", _StgFEM_StandardConditionFunctions_DefaultNew  );
 }
 
 void StgFEM_StandardConditionFunctions_SolidBodyRotation( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -211,10 +211,10 @@ void StgFEM_StandardConditionFunctions_SolidBodyRotation( Node_LocalIndex node_l
 	mesh       = feVariable->feMesh;
 
 	/* Find Centre of Solid Body Rotation */
-	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreX", 0.0 );
-	centre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreY", 0.0 );
-	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreZ", 0.0 );
-	omega            = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationOmega",   1.0 );
+	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreX", 0.0  );
+	centre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreY", 0.0  );
+	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreZ", 0.0  );
+	omega            = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationOmega", 1.0  );
 
 	/* Find coordinate of node */
 	coord = Mesh_GetVertex( mesh, node_lI );
@@ -243,12 +243,12 @@ void StgFEM_StandardConditionFunctions_PartialRotationX( Node_LocalIndex node_lI
 	mesh       = feVariable->feMesh;
 
 	/* Find Centre of Solid Body Rotation */
-	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreX", 0.0 );
-	centre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreY", 0.0 );
-	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreZ", 0.0 );
-	size             = Dictionary_GetDouble_WithDefault( dictionary, "RadiusCylinder", 0.0 );
+	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreX", 0.0  );
+	centre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreY", 0.0  );
+	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreZ", 0.0  );
+	size             = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"RadiusCylinder", 0.0  );
 	size += 0.1;
-	omega            = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationOmega",   1.0 );
+	omega            = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationOmega", 1.0  );
 
 	/* Find coordinate of node */
 	coord = Mesh_GetVertex( mesh, node_lI );
@@ -281,12 +281,12 @@ void StgFEM_StandardConditionFunctions_PartialRotationY( Node_LocalIndex node_lI
 	mesh       = feVariable->feMesh;
 
 	/* Find Centre of Solid Body Rotation */
-	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreX", 0.0 );
-	centre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreY", 0.0 );
-	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreZ", 0.0 );
-	size             = Dictionary_GetDouble_WithDefault( dictionary, "RadiusCylinder", 0.0 );
+	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreX", 0.0  );
+	centre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreY", 0.0  );
+	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreZ", 0.0  );
+	size             = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"RadiusCylinder", 0.0  );
 	size += 0.1;
-	omega            = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationOmega",   1.0 );
+	omega            = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationOmega", 1.0  );
 
 	/* Find coordinate of node */
 	coord = Mesh_GetVertex( mesh, node_lI );
@@ -318,8 +318,8 @@ void StgFEM_StandardConditionFunctions_SimpleShear( Node_LocalIndex node_lI, Var
 	mesh       = feVariable->feMesh;
 
 	/* Find Centre of Solid Body Rotation */
-	centre = Dictionary_GetDouble_WithDefault( dictionary, "SimpleShearCentreY", 0.0 );
-	factor = Dictionary_GetDouble_WithDefault( dictionary, "SimpleShearFactor", 1.0 );
+	centre = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SimpleShearCentreY", 0.0  );
+	factor = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SimpleShearFactor", 1.0  );
 
 	/* Find coordinate of node */
 	coord = Mesh_GetVertex( mesh, node_lI );
@@ -342,8 +342,8 @@ void StgFEM_StandardConditionFunctions_SimpleShearInverted( Node_LocalIndex node
         mesh       = feVariable->feMesh;
 
         /* Find Centre of Solid Body Rotation */
-        centre = Dictionary_GetDouble_WithDefault( dictionary, "SimpleShearCentreY", 0.0 );
-        factor = Dictionary_GetDouble_WithDefault( dictionary, "SimpleShearFactor", 1.0 );
+        centre = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SimpleShearCentreY", 0.0  );
+        factor = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SimpleShearFactor", 1.0  );
 
         /* Find coordinate of node */
         coord = Mesh_GetVertex( mesh, node_lI );
@@ -368,8 +368,8 @@ void StgFEM_StandardConditionFunctions_Extension( Node_LocalIndex node_lI, Varia
 	mesh       = feVariable->feMesh;
 
 	/* Find Centre of Solid Body Rotation */
-	centre = Dictionary_GetDouble_WithDefault( dictionary, "ExtensionCentreX", 0.0 );
-	factor = Dictionary_GetDouble_WithDefault( dictionary, "ExtensionFactor", 1.0 );
+	centre = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"ExtensionCentreX", 0.0  );
+	factor = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"ExtensionFactor", 1.0  );
 
 	/* Find coordinate of node */
 	coord = Mesh_GetVertex( mesh, node_lI );
@@ -418,10 +418,10 @@ void StgFEM_StandardConditionFunctions_LinearInterpolationLid( Node_LocalIndex n
 
 	Mesh_GetGlobalCoordRange( mesh, min, max );
 	boxLength = max[I_AXIS] - min[I_AXIS];
-	leftHandSideValue = Dictionary_GetDouble_WithDefault( context->dictionary, "bcLeftHandSideValue", 0.0 );
-	rightHandSideValue = Dictionary_GetDouble_WithDefault( context->dictionary, "bcRightHandSideValue", 1.0 );
+	leftHandSideValue = Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"bcLeftHandSideValue", 0.0  );
+	rightHandSideValue = Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"bcRightHandSideValue", 1.0 );
 	gradient = (rightHandSideValue - leftHandSideValue) / boxLength;
-	(*velResult) = leftHandSideValue + gradient * (Mesh_GetVertex( mesh, node_lI )[I_AXIS] - min[I_AXIS] );
+	(*velResult ) = leftHandSideValue + gradient * (Mesh_GetVertex( mesh, node_lI )[I_AXIS] - min[I_AXIS] );
 }
 
 
@@ -458,7 +458,7 @@ void StgFEM_StandardConditionFunctions_LinearVelocityLeftWall( Node_LocalIndex n
 	velVar = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	mesh = velVar->feMesh;
 
-	maxvel = Dictionary_GetDouble_WithDefault( dictionary, "MaximumVelocity_Left", 0.0 );
+	maxvel = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"MaximumVelocity_Left", 0.0  );
 	Mesh_GetGlobalCoordRange( mesh, min, max );
 	gradient = maxvel/(min[1] - max[1]);
 	
@@ -477,7 +477,7 @@ void StgFEM_StandardConditionFunctions_LinearVelocityRightWall( Node_LocalIndex 
 	velVar = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	mesh = velVar->feMesh;
 
-	maxvel = Dictionary_GetDouble_WithDefault( dictionary, "MaximumVelocity_Right", 0.0 );
+	maxvel = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"MaximumVelocity_Right", 0.0  );
 	Mesh_GetGlobalCoordRange( mesh, min, max );
 	gradient = maxvel/(max[1] - min[1]);
 	 
@@ -496,9 +496,9 @@ void StgFEM_StandardConditionFunctions_SinusoidalLid( Node_LocalIndex node_lI, V
 	double          	wavenumber;
 	double			min[3], max[3];
 
-	wavenumber = Dictionary_GetDouble_WithDefault( context->dictionary, "sinusoidalLidWavenumber", 1 );
+	wavenumber = Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"sinusoidalLidWavenumber", 1 );
 	
-	velVar = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	velVar = (FeVariable* )FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	mesh = velVar->feMesh;
 
 	Mesh_GetGlobalCoordRange( mesh, min, max );
@@ -520,7 +520,7 @@ void StgFEM_StandardConditionFunctions_CornerOnly( Node_LocalIndex node_lI, Vari
 	velVar = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	feMesh = velVar->feMesh;
 	elGrid = *(Grid**)ExtensionManager_Get( feMesh->info, feMesh, 
-						ExtensionManager_GetHandle( feMesh->info, "elGrid" ) );
+						ExtensionManager_GetHandle( feMesh->info, (Name)"elGrid" )  );
 
 	node_gI = Mesh_DomainToGlobal( feMesh, MT_VERTEX, node_lI );
 	RegularMeshUtils_Node_1DTo3D( feMesh, node_gI, inds );
@@ -558,18 +558,18 @@ void StgFEM_StandardConditionFunctions_TemperatureCosineHill( Node_LocalIndex no
 	feMesh       = feVariable->feMesh;
 
 	/* Read values from dictionary */
-	hillHeight       = Dictionary_GetDouble_WithDefault( dictionary, "CosineHillHeight"  , 1.0 );
-	hillDiameter     = Dictionary_GetDouble_WithDefault( dictionary, "CosineHillDiameter", 1.0 );
-	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "CosineHillCentreX" , 0.0 );
-	centre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "CosineHillCentreY" , 0.0 );
-	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "CosineHillCentreZ" , 0.0 );
+	hillHeight       = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"CosineHillHeight"  , 1.0  );
+	hillDiameter     = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"CosineHillDiameter", 1.0  );
+	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"CosineHillCentreX" , 0.0  );
+	centre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"CosineHillCentreY" , 0.0  );
+	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"CosineHillCentreZ" , 0.0  );
 
 	if ( Dictionary_GetBool( dictionary, "RotateCosineHill" ) ) {
 		/* Assume solid body rotation */
-		rotationCentre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreX", 0.0 );
-		rotationCentre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreY", 0.0 );
-		rotationCentre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreZ", 0.0 );
-		omega                    = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationOmega",   1.0 );
+		rotationCentre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreX", 0.0  );
+		rotationCentre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreY", 0.0  );
+		rotationCentre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreZ", 0.0  );
+		omega                    = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationOmega", 1.0  );
 
 		StGermain_VectorSubtraction( centre, rotationCentre, centre, context->dim );
 		StGermain_RotateCoordinateAxis( centre, centre, K_AXIS, omega * context->currentTime );
@@ -603,17 +603,17 @@ void StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation( Node_Lo
 	nDims = Mesh_GetDimSize( feMesh );
 	Mesh_GetGlobalCoordRange( feMesh, min, max );
 
-	topLayerCoord = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalTempIC_TopLayerCoord", max[J_AXIS] );
-	bottomLayerCoord = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalTempIC_BottomLayerCoord", min[J_AXIS] );
+	topLayerCoord = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalTempIC_TopLayerCoord", max[J_AXIS]  );
+	bottomLayerCoord = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalTempIC_BottomLayerCoord", min[J_AXIS]  );
 
-	topLayerBC = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalTempIC_TopLayerBC", 0.0 );
-	bottomLayerBC = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalTempIC_BottomLayerBC", 1.0 );
+	topLayerBC = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalTempIC_TopLayerBC", 0.0  );
+	bottomLayerBC = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalTempIC_BottomLayerBC", 1.0  );
 	scaleFactor = bottomLayerBC - topLayerBC;
-	perturbationAmplitude = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalTempIC_PerturbationAmplitude", 0.1 );
+	perturbationAmplitude = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalTempIC_PerturbationAmplitude", 0.1  );
 	/* Note: these are both multiplied by pi, so wavenumber = 1 means the perturbation goes from 0 to pi, which is
 	 * half a full sin or cos cycle. Wavenumber = 3 means the range is 0 -> 3pi, or 1 and a half full cycles. */
-	horizontalWaveNumber = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalTempIC_HorizontalWaveNumber", 1.0 );
-	verticalWaveNumber = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalTempIC_VerticalWaveNumber", 1.0 );
+	horizontalWaveNumber = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalTempIC_HorizontalWaveNumber", 1.0  );
+	verticalWaveNumber = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalTempIC_VerticalWaveNumber", 1.0  );
 
 	coord = Mesh_GetVertex( feMesh, node_lI );
 
@@ -684,9 +684,9 @@ void Stg_FEM_VelicTemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, 
 	x = coord[ I_AXIS ] - min[ I_AXIS ];
 	y = coord[ J_AXIS ] - min[ J_AXIS ];
 
-	wavenumberX = Dictionary_GetInt_WithDefault( dictionary, "wavenumberX", 1 );
-	wavenumberY = Dictionary_GetDouble_WithDefault( dictionary, "wavenumberY", 1.0 );
-	sigma = Dictionary_GetDouble_WithDefault( dictionary, "sigma", 1.0 );
+	wavenumberX = Dictionary_GetInt_WithDefault( dictionary, (Dictionary_Entry_Key)"wavenumberX", 1  );
+	wavenumberY = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"wavenumberY", 1.0  );
+	sigma = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"sigma", 1.0 );
 	
 	assert( sigma > 0.0 );
 	assert( wavenumberY > 0.0 );
@@ -695,7 +695,7 @@ void Stg_FEM_VelicTemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, 
 	kx = (double)wavenumberX * M_PI / Lx;
 	ky = (double)wavenumberY * M_PI;
 
-	*result = sigma * sin( ky * y ) * cos( kx * x );
+	*result = sigma * sin( ky * y ) * cos( kx * x  );
 }
 
 /* IC from Mirko Velic. This is the IC temperature for his solB, from his Analytic Suite. Added 22-May-2006 */
@@ -727,16 +727,16 @@ void Stg_FEM_VelicTemperatureIC_SolB( Node_LocalIndex node_lI, Variable_Index va
 	x = coord[ I_AXIS ] - min[ I_AXIS ];
 	y = coord[ J_AXIS ] - min[ J_AXIS ];
 
-	wavenumberX = Dictionary_GetInt_WithDefault( dictionary, "wavenumberX", 1 );
-	wavenumberY = Dictionary_GetDouble_WithDefault( dictionary, "wavenumberY", 2.0 );
-	assert( wavenumberX != wavenumberY );
-	sigma = Dictionary_GetDouble_WithDefault( dictionary, "sigma", 1.0 );
+	wavenumberX = Dictionary_GetInt_WithDefault( dictionary, (Dictionary_Entry_Key)"wavenumberX", 1  );
+	wavenumberY = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"wavenumberY", 2.0 );
+	assert( wavenumberX != wavenumberY  );
+	sigma = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"sigma", 1.0 );
 
 	kn = wavenumberX * M_PI / L;
 /* 	 TODO: Re-write Mirko's code and/or Documentation so the input parameters for these ICs are less confusing */
 	km = wavenumberY / L;
 
-	*result = sigma * sinh( km * y ) * cos( kn * x );
+	*result = sigma * sinh( km * y ) * cos( kn * x  );
 }
 
 
@@ -810,8 +810,8 @@ void StgFEM_StandardConditionFunctions_EdgeDriveConvectionIC( Node_LocalIndex no
 	
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );        
 	mesh       = feVariable->feMesh;        
-	perturbationAmplitude = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalTempIC_PerturbationAmplitude", 0.1 );        
-	thermalAnomalyOffset = Dictionary_GetDouble_WithDefault( dictionary, "thermalAnomalyOffset", 0.0 );        
+	perturbationAmplitude = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalTempIC_PerturbationAmplitude", 0.1  );        
+	thermalAnomalyOffset = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"thermalAnomalyOffset", 0.0  );        
 	coord = Mesh_GetVertex( mesh, node_lI );
 	
 	/* eqn 1 from S.D.King & D.L. Anderson, "Edge-drive convection", EPSL 160 (1998) 289-296 */        
@@ -837,22 +837,22 @@ void StgFEM_StandardConditionFunctions_ThermalEdgeDriveConvectionIC( Node_LocalI
         mesh       = feVariable->feMesh;
         coord = Mesh_GetVertex( mesh, node_lI );
         
-	dim = Dictionary_GetInt_WithDefault( dictionary, "dim", 0.0 );
-        contStartX = Dictionary_GetDouble_WithDefault( dictionary, "contStartX", 0.0 );
-        contEndX = Dictionary_GetDouble_WithDefault( dictionary, "contEndX", 0.0 );
-        contStartY = Dictionary_GetDouble_WithDefault( dictionary, "contStartY", 0.0 );
-        contEndY = Dictionary_GetDouble_WithDefault( dictionary, "contEndY", 0.0 );
-        minY = Dictionary_GetDouble_WithDefault( dictionary, "minY", 0.0 );
-        maxY = Dictionary_GetDouble_WithDefault( dictionary, "maxY", 0.0 );
-	interiorTemp = Dictionary_GetDouble_WithDefault( dictionary, "interiorTemp", 1.0 );
-        if ( dim == 3 ) {
-                contStartZ = Dictionary_GetDouble_WithDefault( dictionary, "contStartZ", 0.0 );
-                contEndZ = Dictionary_GetDouble_WithDefault( dictionary, "contEndZ", 0.0 );
+	dim = Dictionary_GetInt_WithDefault( dictionary, (Dictionary_Entry_Key)"dim", 0.0  );
+        contStartX = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"contStartX", 0.0  );
+        contEndX = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"contEndX", 0.0  );
+        contStartY = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"contStartY", 0.0  );
+        contEndY = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"contEndY", 0.0  );
+        minY = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"minY", 0.0  );
+        maxY = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"maxY", 0.0  );
+	interiorTemp = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"interiorTemp", 1.0 );
+        if ( dim == 3  ) {
+                contStartZ = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"contStartZ", 0.0  );
+                contEndZ = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"contEndZ", 0.0 );
         }
 
         if(( coord[I_AXIS] >= contStartX && coord[ I_AXIS ] <= contEndX ) && ( coord[J_AXIS] >= contStartY && coord[ J_AXIS ] <= contEndY )) {
                 if ( dim == 3 ) {
-                        if ( coord[K_AXIS] >= contStartZ && coord[ K_AXIS ] <= contEndZ )
+                        if ( coord[K_AXIS] >= contStartZ && coord[ K_AXIS ] <= contEndZ  )
                                         *result = 0.0;
                         else
                                         *result = interiorTemp;
@@ -871,13 +871,13 @@ void StgFEM_StandardConditionFunctions_SinusoidalExtension( Node_LocalIndex node
 	double                  amplitude;
 	double                  phaseShift;
 
-	frequency  = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalExtensionFrequency", 1.0 );
-	vel0       = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalExtensionVelocity", 0.0 );
-	amplitude  = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalExtensionAmplitude", 0.0 );
-	phaseShift = Dictionary_GetDouble_WithDefault( dictionary, "SinusoidalExtensionPhaseShift", 0.0 );
+	frequency  = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalExtensionFrequency", 1.0  );
+	vel0       = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalExtensionVelocity", 0.0  );
+	amplitude  = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalExtensionAmplitude", 0.0  );
+	phaseShift = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalExtensionPhaseShift", 0.0 );
 
 
-	*result = vel0 + amplitude * cos( 2.0 * M_PI * frequency * (context->currentTime + context->dt - phaseShift ) );
+	*result = vel0 + amplitude * cos( 2.0 * M_PI * frequency * (context->currentTime + context->dt - phaseShift )  );
 }
 
 
@@ -902,16 +902,16 @@ void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Va
 	feMesh       = feVariable->feMesh;
 	coord      = Mesh_GetVertex( feMesh, node_lI );
 
-	offset = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionOffset", 0.0 );
-	/* value = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionValue", 0.0 ); */
+	offset = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionOffset", 0.0  );
+	/* value = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionValue", 0.0  ); */
 	dim = Dictionary_GetUnsignedInt_WithDefault( dictionary, "StepFunctionDim", 0 );
-	/* less = Dictionary_GetBool_WithDefault( dictionary, "StepFunctionLessThan", True ); */
-	left = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionLeftSide", 0.0 );
-	right = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionRightSide", 0.0 );
-	leftBegin = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionLeftBegin", 0.0 );
-	rightEnd = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionRightEnd", 0.0 );
-	grad = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionGradient", 0.0 );
-	useGrad = Dictionary_GetBool_WithDefault( dictionary, "StepFunctionUseGradient", False );
+	/* less = Dictionary_GetBool_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionLessThan", True  ); */
+	left = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionLeftSide", 0.0  );
+	right = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionRightSide", 0.0  );
+	leftBegin = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionLeftBegin", 0.0  );
+	rightEnd = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionRightEnd", 0.0  );
+	grad = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionGradient", 0.0  );
+	useGrad = Dictionary_GetBool_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionUseGradient", False );
 
 	/*if( less ) {
 		if( coord[dim] < offset ) {
@@ -926,7 +926,7 @@ void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Va
 	else {
 		if( coord[dim] > offset ) {
 			if( useGrad )
-				*result = (coord[dim] - offset)*grad;
+				*result = (coord[dim] - offset )*grad;
 			else
 				*result = value;
 		}
@@ -991,13 +991,13 @@ void StgFEM_StandardConditionFunctions_MovingStepFunction( int nodeInd, int varI
 
    /*
    ** Extract all the parameters we need from the dictionary. */
-   offsetLower = Dictionary_GetDouble_WithDefault( dict, "MovingStepFunctionOffsetLower", 0.0 );
-   offsetUpper = Dictionary_GetDouble_WithDefault( dict, "MovingStepFunctionOffsetUpper", 0.0 );
+   offsetLower = Dictionary_GetDouble_WithDefault( dict, (Dictionary_Entry_Key)"MovingStepFunctionOffsetLower", 0.0  );
+   offsetUpper = Dictionary_GetDouble_WithDefault( dict, (Dictionary_Entry_Key)"MovingStepFunctionOffsetUpper", 0.0  );
    dim = Dictionary_GetUnsignedInt_WithDefault( dict, "MovingStepFunctionDim", 0 );
-   left = Dictionary_GetDouble_WithDefault( dict, "MovingStepFunctionLeftSide", 0.0 );
-   right = Dictionary_GetDouble_WithDefault( dict, "MovingStepFunctionRightSide", 0.0 );
+   left = Dictionary_GetDouble_WithDefault( dict, (Dictionary_Entry_Key)"MovingStepFunctionLeftSide", 0.0  );
+   right = Dictionary_GetDouble_WithDefault( dict, (Dictionary_Entry_Key)"MovingStepFunctionRightSide", 0.0  );
    movingWall = Dictionary_GetString_WithDefault( dict, "MovingStepFunctionMovingWall", "lower" );
-   wallDepth = Dictionary_GetInt_WithDefault( dict, "MovingStepFunctionWallDepth", 0 );
+   wallDepth = Dictionary_GetInt_WithDefault( dict, (Dictionary_Entry_Key)"MovingStepFunctionWallDepth", 0  );
 
    /*
    ** Because we're dealing with a moving step function, we need to calculate
@@ -1066,13 +1066,13 @@ void StgFEM_StandardConditionFunctions_ConstantVector( Node_LocalIndex node_lI, 
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
 	
-	result[0] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueX", 0.0 );
-	result[1] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueY", 0.0 );
-  if (context->dim == 3 ) 
-    result[2] = Dictionary_GetDouble_WithDefault( dictionary, "ConstantValueZ", 0.0 );
+	result[0] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"ConstantValueX", 0.0  );
+	result[1] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"ConstantValueY", 0.0 );
+  if (context->dim == 3  ) 
+    result[2] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"ConstantValueZ", 0.0 );
 }
 
-/* 3D spec ridge top BC (for milestone 1 of magma project) 
+/* 3D spec ridge top BC (for milestone 1 of magma project ) 
  * to be applied to the top x-z plane of the domain */
 void StgFEM_StandardConditionFunctions_SpecRidge3D( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
@@ -1095,16 +1095,16 @@ void StgFEM_StandardConditionFunctions_SpecRidge3D( Node_LocalIndex node_lI, Var
 	feMesh     = feVariable->feMesh;
 	coord      = Mesh_GetVertex( feMesh, node_lI );
 
-	leftVal = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DLeftSide", 0.0 );
-	rightVal = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DRightSide", 0.0 );
-	xOffset1 = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DXOffset1", 0.0 );
-	xOffset2 = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DXOffset2", 0.0 );
-	yOffset1 = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DZOffset1", 0.0 );
-	yOffset2 = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DZOffset2", 0.0 );
-	xBegin = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DXBegin", 0.0 );
-	xEnd = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DXEnd", 0.0 );
-	zBegin = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DZBegin", 0.0 );
-	zEnd = Dictionary_GetDouble_WithDefault( dictionary, "SpecRidge3DZEnd", 0.0 );
+	leftVal = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SpecRidge3DLeftSide", 0.0  );
+	rightVal = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SpecRidge3DRightSide", 0.0  );
+	xOffset1 = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SpecRidge3DXOffset1", 0.0  );
+	xOffset2 = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SpecRidge3DXOffset2", 0.0  );
+	yOffset1 = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SpecRidge3DZOffset1", 0.0  );
+	yOffset2 = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SpecRidge3DZOffset2", 0.0  );
+	xBegin = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SpecRidge3DXBegin", 0.0  );
+	xEnd = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SpecRidge3DXEnd", 0.0  );
+	zBegin = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SpecRidge3DZBegin", 0.0  );
+	zEnd = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SpecRidge3DZEnd", 0.0 );
 
 	if( coord[0] < xBegin || coord[0] > xEnd ||
 	    coord[2] < zBegin || coord[2] > zEnd )
@@ -1113,7 +1113,7 @@ void StgFEM_StandardConditionFunctions_SpecRidge3D( Node_LocalIndex node_lI, Var
 	}
 	else if( coord[0] < xOffset1 )
 		*result = leftVal;
-	else if( coord[0] < xOffset2 && coord[2] > yOffset1 && coord[2] < yOffset2 )
+	else if( coord[0] < xOffset2 && coord[2] > yOffset1 && coord[2] < yOffset2  )
 		*result = leftVal;
 	else
 		*result = rightVal;
@@ -1280,13 +1280,13 @@ void StgFEM_StandardConditionFunctions_ErrorFunc( Node_LocalIndex node_lI, Varia
 	feMesh      = feVariable->feMesh;
 	coord       = Mesh_GetVertex( feMesh, node_lI );
 
-	dilate      = Dictionary_GetDouble_WithDefault( dictionary, "ErrorFuncDilate", 0.0 );
-	width       = Dictionary_GetDouble_WithDefault( dictionary, "ErrorFuncWidth", 0.0 );
+	dilate      = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"ErrorFuncDilate", 0.0  );
+	width       = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"ErrorFuncWidth", 0.0 );
 
 	if( coord[0] < -1.0*width ) {
 		*result = -1.0;
 	}
-	else if( coord[0] > width ) {
+	else if( coord[0] > width  ) {
 		*result = 1.0;
 	}
 	else {
@@ -1304,23 +1304,23 @@ void StgFEM_StandardConditionFunctions_GaussianDistribution( Node_LocalIndex nod
 	unsigned		nDims              = context->dim;
 	unsigned		dim_I;
 	double			orig[3];
-	double			sigma              = Dictionary_GetDouble_WithDefault( dictionary, "sigma", 1.0 );
-	double			gaussianScale      = Dictionary_GetDouble_WithDefault( dictionary, "GaussianScale", 1.0 );
-	double			background         = Dictionary_GetDouble_WithDefault( dictionary, "backgroundValue", 1.0 );
+	double			sigma              = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"sigma", 1.0  );
+	double			gaussianScale      = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianScale", 1.0  );
+	double			background         = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"backgroundValue", 1.0  );
 	double			distsq             = 0.0;
 
 	variableName = Dictionary_GetString_WithDefault( dictionary, "FieldVariable", "" );
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
 	coord = Mesh_GetVertex( feVariable->feMesh, node_lI );
 
-	orig[0] = Dictionary_GetDouble_WithDefault( dictionary, "x0", 0.0 );
-	orig[1] = Dictionary_GetDouble_WithDefault( dictionary, "y0", 0.0 );
-	orig[2] = Dictionary_GetDouble_WithDefault( dictionary, "z0", 0.0 );
+	orig[0] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"x0", 0.0  );
+	orig[1] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"y0", 0.0  );
+	orig[2] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"z0", 0.0 );
 
 	for( dim_I = 0; dim_I < nDims; dim_I++ )
 		distsq += ( coord[dim_I] - orig[dim_I] ) * ( coord[dim_I] - orig[dim_I] );
 
-	*result = gaussianScale * exp( -distsq / ( 2.0 * sigma * sigma ) ) + background;
+	*result = gaussianScale * exp( -distsq / ( 2.0 * sigma * sigma )  ) + background;
 }
 
 void StgFEM_StandardConditionFunctions_GravitationalPotential( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -1346,22 +1346,22 @@ void StgFEM_StandardConditionFunctions_1DGaussianDistribution( Node_LocalIndex n
 	Name			variableName;
 	double*			coord;
 	double			orig[3];
-	double			sigma              = Dictionary_GetDouble_WithDefault( dictionary, "sigma", 1.0 );
-	double			gaussianScale      = Dictionary_GetDouble_WithDefault( dictionary, "GaussianScale", 1.0 );
-	double			background         = Dictionary_GetDouble_WithDefault( dictionary, "backgroundValue", 1.0 );
+	double			sigma              = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"sigma", 1.0  );
+	double			gaussianScale      = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianScale", 1.0  );
+	double			background         = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"backgroundValue", 1.0  );
 	double			distsq             = 0.0;
 
 	variableName = Dictionary_GetString_WithDefault( dictionary, "FieldVariable", "" );
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
 	coord = Mesh_GetVertex( feVariable->feMesh, node_lI );
 
-	orig[0] = Dictionary_GetDouble_WithDefault( dictionary, "x0", 0.0 );
-	orig[1] = Dictionary_GetDouble_WithDefault( dictionary, "y0", 0.0 );
-	orig[2] = Dictionary_GetDouble_WithDefault( dictionary, "z0", 0.0 );
+	orig[0] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"x0", 0.0  );
+	orig[1] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"y0", 0.0  );
+	orig[2] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"z0", 0.0 );
 
 	distsq = ( coord[J_AXIS] - orig[J_AXIS] ) * ( coord[J_AXIS] - orig[J_AXIS] );
 
-	*result = gaussianScale * exp( -distsq / ( 2.0 * sigma * sigma ) ) + background;
+	*result = gaussianScale * exp( -distsq / ( 2.0 * sigma * sigma )  ) + background;
 }
 
 void StgFEM_StandardConditionFunctions_HalfContainer( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -1371,7 +1371,7 @@ void StgFEM_StandardConditionFunctions_HalfContainer( Node_LocalIndex node_lI, V
 	double*                 result             = (double*) _result;
 	Name			variableName;
 	double*			coord;
-	double			halfPoint          = Dictionary_GetDouble_WithDefault( dictionary, "halfPoint", 0.0 );
+	double			halfPoint          = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"halfPoint", 0.0  );
 
 	variableName = Dictionary_GetString_WithDefault( dictionary, "FieldVariable", "" );
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
@@ -1387,7 +1387,7 @@ void StgFEM_StandardConditionFunctions_ConstantValue( Node_LocalIndex node_lI, V
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-	double			value              = Dictionary_GetDouble_WithDefault( dictionary, "constantValue", 1.0 );
+	double			value              = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"constantValue", 1.0  );
 
 	*result = value;
 }
@@ -1396,7 +1396,7 @@ void StgFEM_StandardConditionFunctions_DiagonalLine( Node_LocalIndex node_lI, Va
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-	double			width              = Dictionary_GetDouble_WithDefault( dictionary, "lineWidth", 1.0 );
+	double			width              = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"lineWidth", 1.0  );
 	double*			coord;
 	Name			variableName;
 	FeVariable*             feVariable         = NULL;
@@ -1415,10 +1415,10 @@ void StgFEM_StandardConditionFunctions_DeltaFunction( Node_LocalIndex node_lI, V
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-	double			epsilon		   = Dictionary_GetDouble_WithDefault( dictionary, "deltaFunctionEpsilon", 0.001 );
+	double			epsilon		   = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"deltaFunctionEpsilon", 0.001  );
 	unsigned		dim		   = Dictionary_GetUnsignedInt_WithDefault( dictionary, "deltaFunctionDim", 0 );
-	double			centre		   = Dictionary_GetDouble_WithDefault( dictionary, "deltaFunctionCentre", 0.5 );
-	double			value		   = Dictionary_GetDouble_WithDefault( dictionary, "deltaFunctionValue", 1.0 );
+	double			centre		   = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"deltaFunctionCentre", 0.5  );
+	double			value		   = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"deltaFunctionValue", 1.0  );
 	double*			coord;
 	Name			variableName	   = Dictionary_GetString_WithDefault( dictionary, "DeltaFunctionFeVariable", "" );
 	FeVariable*		feVariable	   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
@@ -1442,7 +1442,7 @@ void StgFEM_StandardConditionFunctions_InflowBottom( Node_LocalIndex node_lI, Va
 	Mesh_GetGlobalCoordRange( mesh, min, max );
 	sideLength = max[1] - min[1];
 	wallLength = max[0] - min[0];
-	sideV = Dictionary_GetDouble_WithDefault( dictionary, "InflowSideVelocity", 1.0 );
+	sideV = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"InflowSideVelocity", 1.0  );
 
 	*result = 2.0 * sideV * sideLength / wallLength;
 }
@@ -1466,15 +1466,15 @@ void StgFEM_StandardConditionFunctions_GaussianTube( Node_LocalIndex node_lI, Va
         nDims = Mesh_GetDimSize( feMesh );
         Mesh_GetGlobalCoordRange( feMesh, min, max );
 
- 	a1 = Dictionary_GetDouble_WithDefault( dictionary, "GaussianTube_a1", 1.0 ); /* Scales the magnitude of the perturbation. */
-	c1 = Dictionary_GetDouble_WithDefault( dictionary, "GaussianTube_c1", 0.1 ); /* Controls the smoothing length. Smaller values produce less smoothing. */
+ 	a1 = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianTube_a1", 1.0  ); /* Scales the magnitude of the perturbation. */
+	c1 = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianTube_c1", 0.1  ); /* Controls the smoothing length. Smaller values produce less smoothing. */
 
-        a2 = Dictionary_GetDouble_WithDefault( dictionary, "GaussianTube_a2", 0.05 ); /* Controls ampltude of oscillations */
-        b2 = Dictionary_GetDouble_WithDefault( dictionary, "GaussianTube_b2", 6.28318530718 ); /* Controls frequency of oscillations */
-	c2 = Dictionary_GetDouble_WithDefault( dictionary, "GaussianTube_c2", 1.570796326795 ); /* Shifts oscillations */
+        a2 = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianTube_a2", 0.05  ); /* Controls ampltude of oscillations */
+        b2 = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianTube_b2", 6.28318530718  ); /* Controls frequency of oscillations */
+	c2 = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianTube_c2", 1.570796326795  ); /* Shifts oscillations */
 
-	y_shift = Dictionary_GetDouble_WithDefault( dictionary, "GaussianTube_y_origin", 0.0 );
-	z_shift = Dictionary_GetDouble_WithDefault( dictionary, "GaussianTube_z_origin", 0.0 );
+	y_shift = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianTube_y_origin", 0.0  );
+	z_shift = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianTube_z_origin", 0.0  );
 
         coord = Mesh_GetVertex( feMesh, node_lI );
 

@@ -109,7 +109,7 @@ void _RegularBilinear_Print( void* elementType, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* elementTypeStream;
-	elementTypeStream = Journal_Register( InfoStream_Type, "RegularBilinearStream" );
+	elementTypeStream = Journal_Register( InfoStream_Type, (Name)"RegularBilinearStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "RegularBilinear (ptr): (%p)\n", self );

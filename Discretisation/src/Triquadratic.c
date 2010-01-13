@@ -112,7 +112,7 @@ void _Triquadratic_Print( void* elementType, Stream* stream ) {
 
 	/* Set the Journal for printing informations */
 	Stream* elementTypeStream;
-	elementTypeStream = Journal_Register( InfoStream_Type, "TriquadraticStream" );
+	elementTypeStream = Journal_Register( InfoStream_Type, (Name)"TriquadraticStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "Triquadratic (ptr): (%p)\n", self );
@@ -129,7 +129,7 @@ void _Triquadratic_Initialise( void* elementType, void* data ) {
 	Triquadratic*	self 		= (Triquadratic*)elementType;
 	unsigned**	faceNodes;
 
-	faceNodes = Memory_Alloc_2DArray( unsigned, 6, 9, "node indices for element faces" );
+	faceNodes = Memory_Alloc_2DArray( unsigned, 6, 9, (Name)"node indices for element faces"  );
 
 	faceNodes[0][0] =  0; faceNodes[0][1] =  1; faceNodes[0][2] =  2;
 	faceNodes[0][3] =  9; faceNodes[0][4] = 10; faceNodes[0][5] = 11;
@@ -158,7 +158,7 @@ void _Triquadratic_Initialise( void* elementType, void* data ) {
 	self->faceNodes = faceNodes;
 
 	self->evaluatedShapeFunc = Memory_Alloc_Array( double, self->nodeCount, "evaluatedShapeFuncs" );
-	self->GNi = Memory_Alloc_2DArray( double, self->dim, self->nodeCount, "evaluatedShapeFuncDerivatives" );
+	self->GNi = Memory_Alloc_2DArray( double, self->dim, self->nodeCount, (Name)"evaluatedShapeFuncDerivatives"  );
 }
 
 void _Triquadratic_Execute( void* elementType, void* data ) {

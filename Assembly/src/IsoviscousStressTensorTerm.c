@@ -132,7 +132,7 @@ void _IsoviscousStressTensorTerm_AssignFromXML( void* matrixTerm, Stg_ComponentF
 	/* Construct Parent */
 	_StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
-	_IsoviscousStressTensorTerm_Init( self, Stg_ComponentFactory_GetDouble( cf, self->name, "viscosity", 1.0 ) );
+	_IsoviscousStressTensorTerm_Init( self, Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"viscosity", 1.0 )  );
 }
 
 void _IsoviscousStressTensorTerm_Build( void* matrixTerm, void* data ) {

@@ -42,11 +42,11 @@ void ContextSuite_TestContext( ContextSuiteData* data ) {
 	pcu_filename_input( "testContext.xml", xml_input );
 	
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	data->context = (FiniteElementContext*)LiveComponentRegister_Get( cf->LCRegister, "context" ); 
-	stgMainBuildAndInitialise(cf);
+	data->context = (FiniteElementContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context" ); 
+	stgMainBuildAndInitialise(cf );
 
 	dictionary = data->context->dictionary;
-	outputPath = Dictionary_GetString( dictionary, "outputPath" );
+	outputPath = Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"outputPath"  );
 
 	/* Run the test  ----------------------------------------------------------------------------------------------------*/
 	/* This is where we'd normally construct components if it was real main.
@@ -56,8 +56,8 @@ void ContextSuite_TestContext( ContextSuiteData* data ) {
 	if( data->context->rank == 0 ) 
 		Context_PrintConcise( data->context, data->context->verbose );
 
-	if ( True == Dictionary_GetBool_WithDefault( dictionary, "showJournalStatus", False ) ) {
-		Journal_PrintConcise();	
+	if ( True == Dictionary_GetBool_WithDefault( dictionary, (Dictionary_Entry_Key)"showJournalStatus", False ) ) {
+		Journal_PrintConcise( );	
 	}	
 
 	/* Building phase ---------------------------------------------------------------------------------------------------*/
@@ -71,7 +71,7 @@ void ContextSuite_TestContext( ContextSuiteData* data ) {
 	data->context->dtFactor = 1.0;
 
 	Journal_Enable_TypedStream( InfoStream_Type, True );
-	stream = Journal_Register( Info_Type, "testContext.xml"); 
+	stream = Journal_Register( Info_Type, (Name)"testContext.xml" ); 
 	data->context->info = stream;  /* Redirect output to test data stream */
 	Stream_RedirectFile_WithPrependedPath( stream, outputPath, "test.dat" );
 

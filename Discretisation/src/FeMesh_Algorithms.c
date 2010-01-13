@@ -108,7 +108,7 @@ void _FeMesh_Algorithms_Print( void* algorithms, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* algorithmsStream;
-	algorithmsStream = Journal_Register( InfoStream_Type, "FeMesh_AlgorithmsStream" );
+	algorithmsStream = Journal_Register( InfoStream_Type, (Name)"FeMesh_AlgorithmsStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "FeMesh_Algorithms (ptr): (%p)\n", self );

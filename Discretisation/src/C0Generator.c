@@ -107,7 +107,7 @@ void _C0Generator_Print( void* generator, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* generatorStream;
-	generatorStream = Journal_Register( InfoStream_Type, "C0GeneratorStream" );
+	generatorStream = Journal_Register( InfoStream_Type, (Name)"C0GeneratorStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "C0Generator (ptr): (%p)\n", self );
@@ -123,7 +123,7 @@ void _C0Generator_AssignFromXML( void* generator, Stg_ComponentFactory* cf, void
 
 	_MeshGenerator_AssignFromXML( self, cf, data );
 
-	elMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "elementMesh", Mesh, True, data );
+	elMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"elementMesh", Mesh, True, data  );
 	C0Generator_SetElementMesh( self, elMesh );
 }
 
@@ -155,11 +155,11 @@ void C0Generator_Generate( void* generator, void* _mesh ) {
 	C0Generator_BuildElementTypes( self, mesh );
 
 	elGrid = *(Grid**)ExtensionManager_Get( self->elMesh->info, self->elMesh, 
-					       ExtensionManager_GetHandle( self->elMesh->info, "elementGrid" ) );
-	ExtensionManager_Add( mesh->info, "elementGrid", sizeof(Grid*) );
-	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, 
-					     ExtensionManager_GetHandle( mesh->info, "elementGrid" ) );
-	*grid = Grid_New();
+					       ExtensionManager_GetHandle( self->elMesh->info, (Name)"elementGrid" )  );
+	ExtensionManager_Add( mesh->info, (Name)"elementGrid", sizeof(Grid*) );
+	grid = (Grid** )ExtensionManager_Get( mesh->info, mesh, 
+					     ExtensionManager_GetHandle( mesh->info, (Name)"elementGrid" ) );
+	*grid = Grid_New( );
 	Grid_SetNumDims( *grid, elGrid->nDims );
 	Grid_SetSizes( *grid, elGrid->sizes );
 }

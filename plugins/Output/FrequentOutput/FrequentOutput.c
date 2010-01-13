@@ -58,10 +58,10 @@ void _StgFEM_FrequentOutput_AssignFromXML( void* component, Stg_ComponentFactory
 	Stream*                            stream;
 	Name                               frequentOutputFilename;
 	Bool                               fileOpened;
-	Stream*                            errorStream  = Journal_Register( Error_Type, CURR_MODULE_NAME );
+	Stream*                            errorStream  = Journal_Register( Error_Type, (Name)CURR_MODULE_NAME  );
 	Dictionary*			   pluginDict	= Codelet_GetPluginDictionary( self, cf->rootDict );
 
-	context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, (Dictionary_Entry_Key)"Context"  ), AbstractContext, True, data );
 	self->context = context;
 	dictionary = context->dictionary;
 	
@@ -70,7 +70,7 @@ void _StgFEM_FrequentOutput_AssignFromXML( void* component, Stg_ComponentFactory
 	ContextEP_Append_AlwaysLast(   context, AbstractContext_EP_FrequentOutput, StgFEM_FrequentOutput_PrintNewLine );
 	
 	/* Create Stream */
-	stream = self->stream = Journal_Register( InfoStream_Type, "FrequentOutputFile" );
+	stream = self->stream = Journal_Register( InfoStream_Type, (Name)"FrequentOutputFile"  );
 
 	/* Set auto flush on stream */
 	Stream_SetAutoFlush( stream, True );
@@ -80,7 +80,7 @@ void _StgFEM_FrequentOutput_AssignFromXML( void* component, Stg_ComponentFactory
 
 	/* Open File */
 	if ( context->rank == MASTER ) {
-		if ( (context->loadFromCheckPoint == False) && (Dictionary_GetBool_WithDefault( context->dictionary, "visualOnly", False ) == False ) ) {
+		if ( (context->loadFromCheckPoint == False) && (Dictionary_GetBool_WithDefault( context->dictionary, (Dictionary_Entry_Key)"visualOnly", False ) == False )  ) {
 			/* Always overwrite the file if starting a new run */
 			fileOpened = Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, frequentOutputFilename );
 		}
@@ -125,16 +125,14 @@ void* _StgFEM_FrequentOutput_DefaultNew( Name name ) {
 }
 
 Index StgFEM_FrequentOutput_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, StgFEM_FrequentOutput_Type, "0", _StgFEM_FrequentOutput_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, StgFEM_FrequentOutput_Type, (Name)"0", _StgFEM_FrequentOutput_DefaultNew  );
 }
 
 void StgFEM_FrequentOutput_PrintString( void* _context, char* string ) {
 	AbstractContext*                   context = (AbstractContext*) _context;
 	Stream*                            stream;
 
-	StgFEM_FrequentOutput* self = (StgFEM_FrequentOutput*)LiveComponentRegister_Get( 
-									context->CF->LCRegister, 
-									StgFEM_FrequentOutput_Type );
+	StgFEM_FrequentOutput* self = (StgFEM_FrequentOutput*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)StgFEM_FrequentOutput_Type  );
 	stream     = self->stream;
 
 	/* Print some empty space at start */
@@ -149,9 +147,7 @@ void StgFEM_FrequentOutput_PrintDouble( void* _context, double value ) {
 	char*                              formatString;
 	Stream*                            stream;
 
-	StgFEM_FrequentOutput* self = (StgFEM_FrequentOutput*)LiveComponentRegister_Get( 
-									context->CF->LCRegister,
-									StgFEM_FrequentOutput_Type );
+	StgFEM_FrequentOutput* self = (StgFEM_FrequentOutput*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)StgFEM_FrequentOutput_Type  );
 
 	stream     = self->stream;
 
@@ -169,14 +165,12 @@ void StgFEM_FrequentOutput_PrintHeader( void* _context ) {
 	char*                              firstBorderString;
 	Stream*                            stream;
 
-	StgFEM_FrequentOutput* self = (StgFEM_FrequentOutput*)LiveComponentRegister_Get( 
-									context->CF->LCRegister, 
-									StgFEM_FrequentOutput_Type );
+	StgFEM_FrequentOutput* self = (StgFEM_FrequentOutput*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)StgFEM_FrequentOutput_Type );
 	
 	stream     = self->stream;
 
 	/* Print First Boarder with '#' in the front */
-	firstBorderString = StG_Strdup( self->borderString );
+	firstBorderString = StG_Strdup( self->borderString  );
 	firstBorderString[0] = '#';
 	Journal_Printf( stream, firstBorderString );
 	Memory_Free( firstBorderString );
@@ -197,9 +191,7 @@ void StgFEM_FrequentOutput_PrintNewLine( void* _context ) {
 	AbstractContext*                   context = (AbstractContext*) _context;
 	Stream*                            stream;
 
-	StgFEM_FrequentOutput* self = (StgFEM_FrequentOutput*)LiveComponentRegister_Get( 
-									context->CF->LCRegister, 
-									StgFEM_FrequentOutput_Type );
+	StgFEM_FrequentOutput* self = (StgFEM_FrequentOutput*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)StgFEM_FrequentOutput_Type  );
 	
 	stream     = self->stream;
 

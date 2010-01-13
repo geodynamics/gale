@@ -228,7 +228,7 @@ void _FeVariable_Init(
 	Bool			isReferenceSolution,
 	Bool			loadReferenceEachTimestep )
 {
-	Stream* errorStream = Journal_Register( Error_Type, self->type );
+	Stream* errorStream = Journal_Register( Error_Type, (Name)self->type  );
 	/** General and Virtual info should already be set */
 	
 	/** FeVariable info */
@@ -435,11 +435,11 @@ void _FeVariable_Build( void* variable, void* data ) {
 			this out.*/
 		numNodes = FeMesh_GetElementNodeSize(self->feMesh, 0);
 
-		self->GNx = Memory_Alloc_2DArray( double, dim, numNodes, "Global Shape Function Derivatives" );
+		self->GNx = Memory_Alloc_2DArray( double, dim, numNodes, (Name)"Global Shape Function Derivatives" );
 		
 		/** don't build the equation numbers for fields that aren't being solved for 
 		 * (ie: error and reference fields) */
-		if( !self->isReferenceSolution && self->buildEqNums ) {
+		if( !self->isReferenceSolution && self->buildEqNums  ) {
 			Stg_Component_Build( self->eqNum, data, False );
 		}
 
@@ -460,19 +460,19 @@ void _FeVariable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* 
 
 	_FieldVariable_AssignFromXML( self, cf, data );
 
-	feMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FEMesh", FeMesh, True, data );
-	geometryMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "GeometryMesh", FeMesh, False, data );
-	dofLayout = Stg_ComponentFactory_ConstructByKey( cf, self->name, DofLayout_Type, DofLayout, True, data );
+	feMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"FEMesh", FeMesh, True, data  );
+	geometryMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"GeometryMesh", FeMesh, False, data  );
+	dofLayout = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)DofLayout_Type, DofLayout, True, data  );
 
-	ic = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IC", VariableCondition, False, data );
-	bc = Stg_ComponentFactory_ConstructByKey( cf, self->name, "BC", VariableCondition, False, data );
-	linkedDofInfo = Stg_ComponentFactory_ConstructByKey( cf, self->name, "LinkedDofInfo", LinkedDofInfo, False, data );
+	ic = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"IC", VariableCondition, False, data  );
+	bc = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"BC", VariableCondition, False, data  );
+	linkedDofInfo = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"LinkedDofInfo", LinkedDofInfo, False, data  );
 
-	isReferenceSolution = Stg_ComponentFactory_GetBool( cf, self->name, "isReferenceSolution", False );
-	loadReferenceEachTimestep = Stg_ComponentFactory_GetBool( cf, self->name, "loadReferenceEachTimestep", False );
+	isReferenceSolution = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"isReferenceSolution", False  );
+	loadReferenceEachTimestep = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"loadReferenceEachTimestep", False  );
 
 	/** TODO: should really be a parameter */
-	self->removeBCs = Stg_ComponentFactory_GetBool( cf, self->name, "removeBCs", True );
+	self->removeBCs = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"removeBCs", True  );
 
 	_FeVariable_Init( self, feMesh, geometryMesh, dofLayout, bc, ic, linkedDofInfo, NULL, isReferenceSolution, loadReferenceEachTimestep );
 }
@@ -565,9 +565,9 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 	if( context ) {
    		/** also include check to see if this fevariable should be checkpointed, just incase it didn't go through the 
 		fieldvariable construct phase */ 
-		feVarsList = Dictionary_Get( context->dictionary, "fieldVariablesToCheckpoint" );
-		if ( NULL == feVarsList ) {
-		feVarsList = Dictionary_Get( context->dictionary, "FieldVariablesToCheckpoint" );
+		feVarsList = Dictionary_Get( context->dictionary, (Dictionary_Entry_Key)"fieldVariablesToCheckpoint" );
+		if ( NULL == feVarsList  ) {
+		feVarsList = Dictionary_Get( context->dictionary, (Dictionary_Entry_Key)"FieldVariablesToCheckpoint" );
 		}
 		if (feVarsList != NULL ) {
 			Index                    listLength = Dictionary_Entry_Value_GetCount( feVarsList );
@@ -575,7 +575,7 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 			Dictionary_Entry_Value*  feVarDictValue = NULL;
 			char*                    fieldVariableName;
    
-			for ( var_I = 0; var_I < listLength; var_I++ ) {
+			for ( var_I = 0; var_I < listLength; var_I++  ) {
 				feVarDictValue = Dictionary_Entry_Value_GetElement( feVarsList, var_I );
 				fieldVariableName = Dictionary_Entry_Value_AsString( feVarDictValue ); 
 				if ( 0 == strcmp( self->name, fieldVariableName ) ) {
@@ -587,9 +587,9 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 
 		feVarsList = NULL;
 		/** also include check to see if this fevariable should be saved for analysis purposes */ 
-		feVarsList = Dictionary_Get( context->dictionary, "fieldVariablesToSave" );
-		if ( NULL == feVarsList ) {
-			feVarsList = Dictionary_Get( context->dictionary, "FieldVariablesToSave" );	
+		feVarsList = Dictionary_Get( context->dictionary, (Dictionary_Entry_Key)"fieldVariablesToSave" );
+		if ( NULL == feVarsList  ) {
+			feVarsList = Dictionary_Get( context->dictionary, (Dictionary_Entry_Key)"FieldVariablesToSave" );	
 		}
 		if (feVarsList != NULL ) {
 			Index                    listLength = Dictionary_Entry_Value_GetCount( feVarsList );
@@ -597,7 +597,7 @@ void _FeVariable_Initialise( void* variable, void* data ) {
 			Dictionary_Entry_Value*  feVarDictValue = NULL;
 			char*                    fieldVariableName;
    
-			for ( var_I = 0; var_I < listLength; var_I++ ) {
+			for ( var_I = 0; var_I < listLength; var_I++  ) {
 				feVarDictValue = Dictionary_Entry_Value_GetElement( feVarsList, var_I );
 				fieldVariableName = Dictionary_Entry_Value_AsString( feVarDictValue ); 
 				if ( 0 == strcmp( self->name, fieldVariableName ) ) {
@@ -726,7 +726,7 @@ InterpolationResult _FeVariable_InterpolateValueAt( void* variable, double* glob
 	}
 	else if ( retValue == SHADOW ) {
 		if ( False == self->shadowValuesSynchronised ) {
-			Stream* warningStr = Journal_Register( Error_Type, self->type );
+			Stream* warningStr = Journal_Register( Error_Type, (Name)self->type  );
 			Journal_Printf( warningStr, "Warning - in %s: user asking to interpolate a value at "
 				"coord (%g,%g,%g), which is in shadow space, but "
 				"FeVariable_SyncShadowValues() hasn't been called yet.\n", 
@@ -986,7 +986,7 @@ void FeVariable_PrintLocalDiscreteValues_2dBox( void* variable, Stream* stream )
 	double			dx = 0;
 	double			dy = 0;
 	DofLayout*		dofLayout = self->dofLayout;
-	Stream*			eStream = Journal_Register( Error_Type, self->type );
+	Stream*			eStream = Journal_Register( Error_Type, (Name)self->type  );
 	Index			minLocalNodeX;
 	Index			minLocalNodeY;
 	Index			maxLocalNodeX;
@@ -998,8 +998,8 @@ void FeVariable_PrintLocalDiscreteValues_2dBox( void* variable, Stream* stream )
 	unsigned		*localOrigin, *localRange;
 	double			min[2], max[2];
 
-	if( ExtensionManager_GetHandle( self->feMesh->info, "vertexGrid" ) == (unsigned)-1 || 
-	    Mesh_GetDimSize( self->feMesh ) != 2 )
+	if( ExtensionManager_GetHandle( self->feMesh->info, (Name)"vertexGrid" ) == (unsigned)-1 || 
+	    Mesh_GetDimSize( self->feMesh ) != 2  )
 	  {
 		Journal_Printf( eStream, "Warning: %s called on variable \"%s\", but this isn't stored on a "
 			"regular 2D mesh - so just returning.\n", __func__, self->name );
@@ -1007,11 +1007,11 @@ void FeVariable_PrintLocalDiscreteValues_2dBox( void* variable, Stream* stream )
 	}
 
 	vertGrid = *(Grid**)ExtensionManager_Get( self->feMesh->info, self->feMesh, 
-					      ExtensionManager_GetHandle( self->feMesh->info, "vertexGrid" ) );
-	localOrigin = (unsigned*)ExtensionManager_Get( self->feMesh->info, self->feMesh, 
-						       ExtensionManager_GetHandle( self->feMesh->info, "localOrigin" ) );
-	localRange = (unsigned*)ExtensionManager_Get( self->feMesh->info, self->feMesh, 
-						      ExtensionManager_GetHandle( self->feMesh->info, "localRange" ) );
+					      ExtensionManager_GetHandle( self->feMesh->info, (Name)"vertexGrid" ) );
+	localOrigin = (unsigned* )ExtensionManager_Get( self->feMesh->info, self->feMesh, 
+						       ExtensionManager_GetHandle( self->feMesh->info, (Name)"localOrigin" ) );
+	localRange = (unsigned* )ExtensionManager_Get( self->feMesh->info, self->feMesh, 
+						      ExtensionManager_GetHandle( self->feMesh->info, (Name)"localRange" )  );
 
 	memcpy( inds, localOrigin, Mesh_GetDimSize( self->feMesh ) * sizeof(unsigned) );
 	insist( Mesh_GlobalToDomain( self->feMesh, MT_VERTEX, Grid_Project( vertGrid, inds ), &vertInd ), == True );
@@ -1135,7 +1135,7 @@ Bool FeVariable_InterpolateDerivativesAt( void* variable, double* globalCoord, d
 	else /** We found the coord is within a local or shadow element */ {
 		if ( elementCoordIn >= FeMesh_GetElementLocalSize( self->feMesh ) ) {
 			if ( False == self->shadowValuesSynchronised ) {
-				Stream* warningStr = Journal_Register( Error_Type, self->type );
+				Stream* warningStr = Journal_Register( Error_Type, (Name)self->type  );
 				Journal_Printf( warningStr, "Warning - in %s: user asking to interpolate derivatives "
 					"to coord (%g,%g,%g), which is in shadow space, but "
 					"FeVariable_SyncShadowValues() hasn't been called yet.\n", 
@@ -1714,7 +1714,7 @@ double FeVariable_AverageTopLayer( void* feVariable, void* swarm, Axis layerAxis
 	Grid*			elGrid;
 
 	elGrid = *(Grid**)ExtensionManager_Get( self->feMesh->info, self->feMesh, 
-						ExtensionManager_GetHandle( self->feMesh->info, "elementGrid" ) );
+						ExtensionManager_GetHandle( self->feMesh->info, (Name)"elementGrid" )  );
 
 	return FeVariable_AverageLayer( self, swarm, layerAxis, elGrid->sizes[1] - 1 );
 }
@@ -1744,7 +1744,7 @@ double FeVariable_AverageLayer( void* feVariable, void* swarm, Axis layerAxis, I
 
 	/** Calculate layer thickness.  This assumes the mesh is regular. */
 	vertGrid = *(Grid**)ExtensionManager_Get( self->feMesh->info, self->feMesh, 
-						  ExtensionManager_GetHandle( self->feMesh->info, "vertexGrid" ) );
+						  ExtensionManager_GetHandle( self->feMesh->info, (Name)"vertexGrid" )  );
 	inds = Memory_Alloc_Array_Unnamed( unsigned, Mesh_GetDimSize( self->feMesh ) );
 	for( d_i = 0; d_i < Mesh_GetDimSize( self->feMesh ); d_i++ ) {
 		if( d_i != layerAxis )
@@ -1958,7 +1958,7 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
 	int               myRank;
 	int               nProcs;
 	MPI_Status        status;
-   Stream*           errorStr = Journal_Register( Error_Type, self->type );
+   Stream*           errorStr = Journal_Register( Error_Type, (Name)self->type  );
    const int         FINISHED_WRITING_TAG = 100;
    int               confirmation = 0;
    MeshGenerator*    theGenerator;
@@ -2211,7 +2211,7 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 	unsigned		       nRanks;
 	int                nDims;
 	Bool               savedCoords = False;
-	Stream*            errorStr = Journal_Register( Error_Type, self->type );
+	Stream*            errorStr = Journal_Register( Error_Type, (Name)self->type  );
    MeshGenerator*    theGenerator;
 	
 #ifdef READ_HDF5
@@ -2488,7 +2488,7 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 
 void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, const char* feVarFilename, const char* meshFilename ){
 	FeVariable*							self = (FeVariable*)feVariable;
-   Stream*								errorStr = Journal_Register( Error_Type, self->type );   
+   Stream*								errorStr = Journal_Register( Error_Type, (Name)self->type  );   
 #ifdef READ_HDF5
    CartesianGenerator*				gen;
    C0Generator*						C0gen;
@@ -2642,10 +2642,10 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
 
    varReg = Variable_Register_New();
    if (self->fieldComponentCount == 1){
-      var = Variable_NewScalar( "interpolation_temp_scalar", (AbstractContext*)self->context, Variable_DataType_Double, &nDomainVerts, NULL, &arrayPtr, varReg );
+      var = Variable_NewScalar( "interpolation_temp_scalar", (AbstractContext*)self->context, Variable_DataType_Double, (Index*)&nDomainVerts, NULL, &arrayPtr, varReg );
    } else {
       unsigned var_I;
-		for( var_I = 0; var_I < self->fieldComponentCount; var_I++ )
+		for( var_I = 0; var_I < self->fieldComponentCount; var_I++  )
 			Stg_asprintf( &varName[var_I], "%s-loaded-Component-%d", self->name, var_I );
       var = Variable_NewVector( "interpolation_temp_vector", 
 											(AbstractContext*)self->context,

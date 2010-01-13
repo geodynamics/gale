@@ -49,7 +49,7 @@
 const Type StgFEM_CPUTime_Type = "StgFEM_CPUTime";
 
 void StgFEM_CPUTime_PrintTimeInfo( AbstractContext* context ) {
-	StgFEM_CPUTime* self = (StgFEM_CPUTime*)LiveComponentRegister_Get( context->CF->LCRegister, StgFEM_CPUTime_Type );
+	StgFEM_CPUTime* self = (StgFEM_CPUTime*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)StgFEM_CPUTime_Type  );
 
 	/* Print Current Time Taken */
 	StgFEM_FrequentOutput_PrintValue( context, MPI_Wtime() - self->initialTime );
@@ -59,12 +59,12 @@ void _StgFEM_CPUTime_AssignFromXML( void* componment, Stg_ComponentFactory* cf, 
 	StgFEM_CPUTime* self 		= (StgFEM_CPUTime*)componment;
 	Dictionary*	pluginDict	= Codelet_GetPluginDictionary( self, cf->rootDict );
 
-	self->context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, (Dictionary_Entry_Key)"Context"  ), AbstractContext, True, data );
 	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data ); 
 	
 	/* Initialise Timer */
-	self->initialTime = MPI_Wtime();
+	self->initialTime = MPI_Wtime( );
 
 	/* Print Header to file */
 	StgFEM_FrequentOutput_PrintString( self->context, "CPU_Time" );
@@ -93,7 +93,7 @@ void* _StgFEM_CPUTime_DefaultNew( Name name ) {
 }
    
 Index StgFEM_CPUTime_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, StgFEM_CPUTime_Type, "0", _StgFEM_CPUTime_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, StgFEM_CPUTime_Type, (Name)"0", _StgFEM_CPUTime_DefaultNew  );
 }
 
 

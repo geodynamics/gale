@@ -53,7 +53,7 @@
 #include <stdio.h>
 
 Bool StgFEM_Discretisation_Finalise( void ) {
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
 	Stream_IndentBranch( StgFEM_Debug );
 

@@ -61,7 +61,7 @@ void _LinearTemperatureField_AssignFromXML( void* analyticSolution, Stg_Componen
 
 	_AnalyticSolution_AssignFromXML( self, cf, data );
 
-	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, "TemperatureField", FeVariable, True, data ); 
+	self->temperatureField = Stg_ComponentFactory_ConstructByName( cf, (Name)"TemperatureField", FeVariable, True, data  ); 
 
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->temperatureField, LinearTemperatureField_TemperatureFunction );
 }
@@ -95,7 +95,7 @@ void* _LinearTemperatureField_DefaultNew( Name name ) {
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
 Index StgFEM_LinearTemperatureField_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
-	return PluginsManager_Submit( pluginsManager, LinearTemperatureField_Type, "0", _LinearTemperatureField_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, LinearTemperatureField_Type, (Name)"0", _LinearTemperatureField_DefaultNew  );
 }
 
 

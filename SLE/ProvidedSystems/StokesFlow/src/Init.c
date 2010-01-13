@@ -55,16 +55,16 @@ Stream* StgFEM_SLE_ProvidedSystems_StokesFlow_Debug = NULL;
 such as streams etc */
 Bool StgFEM_SLE_ProvidedSystems_StokesFlow_Init( int* argc, char** argv[] ) {
 
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
 	/* initialise this level's streams */
 	StgFEM_SLE_ProvidedSystems_StokesFlow_Debug = Stream_RegisterChild( StgFEM_SLE_Debug,
 		"ProvidedSystems_StokesFlow" );
 
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Stokes_SLE_Type , "0", _Stokes_SLE_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Stokes_SLE_UzawaSolver_Type , "0", _Stokes_SLE_UzawaSolver_DefaultNew );
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Stokes_SLE_PenaltySolver_Type , "0", Stokes_SLE_PenaltySolver_DefaultNew );  
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), UzawaPreconditionerTerm_Type , "0", _UzawaPreconditionerTerm_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Stokes_SLE_Type , (Name)"0", _Stokes_SLE_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister( ), Stokes_SLE_UzawaSolver_Type , "0", _Stokes_SLE_UzawaSolver_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Stokes_SLE_PenaltySolver_Type , (Name)"0", Stokes_SLE_PenaltySolver_DefaultNew );  
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister( ), UzawaPreconditionerTerm_Type , "0", _UzawaPreconditionerTerm_DefaultNew );
 
 	RegisterParent( Stokes_SLE_Type,               		SystemLinearEquations_Type );
 	RegisterParent( Stokes_SLE_PenaltySolver_Type, 		SLE_Solver_Type );

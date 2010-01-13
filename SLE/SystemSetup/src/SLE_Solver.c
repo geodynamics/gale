@@ -209,12 +209,12 @@ void _SLE_Solver_AssignFromXML( void* sleSolver, Stg_ComponentFactory* cf, void*
 	Bool            useStatSolve;
 	int             nStatReps;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", FiniteElementContext, False, data );
+	if( !self->context  )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", FiniteElementContext, True, data  );
 
-	useStatSolve = Stg_ComponentFactory_GetBool( cf, self->name, "statSolve", False );
-	nStatReps = Stg_ComponentFactory_GetInt( cf, self->name, "statReps", 0 );
+	useStatSolve = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"statSolve", False  );
+	nStatReps = Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"statReps", 0  );
 
 	_SLE_Solver_Init( self, useStatSolve, nStatReps );
 }

@@ -164,12 +164,12 @@ void _LinkedDofInfo_AssignFromXML( void* linkedDofInfo, Stg_ComponentFactory *cf
 
 	dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 	
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
-	if( !context ) 
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", DomainContext, False, data );
+	if( !context  ) 
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  );
 
-	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh",         Mesh,      True, data );
-	dofLayout = Stg_ComponentFactory_ConstructByKey( cf, self->name, DofLayout_Type, DofLayout, True, data );
+	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Mesh", Mesh, True, data  );
+	dofLayout = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)DofLayout_Type, DofLayout, True, data  );
 
 	_LinkedDofInfo_Init( self, context, mesh, dofLayout, dictionary ); 
 }
@@ -258,7 +258,7 @@ void _LinkedDofInfo_Build( void* linkedDofInfo, void* data ) {
 		}
 	}
 	
-	linkSpecs = Dictionary_Get( self->dictionary, "linkSpecifications" );
+	linkSpecs = Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"linkSpecifications" );
 
 	/* Note that the dictionary entry is optional - user may prefer to specify the sets
 	using the AddDofToSet and AddDofsToSet_FromIndexSet functions */
@@ -276,13 +276,13 @@ void _LinkedDofInfo_Build( void* linkedDofInfo, void* data ) {
 
 		numSpecs = Dictionary_Entry_Value_GetCount( linkSpecs );
 		
-		for ( linkSpec_I = 0; linkSpec_I < numSpecs; linkSpec_I++ ) {
+		for ( linkSpec_I = 0; linkSpec_I < numSpecs; linkSpec_I++  ) {
 			linkSpec = Dictionary_Entry_Value_GetElement( linkSpecs, linkSpec_I );
 			linkSpecDict = Dictionary_Entry_Value_AsDictionary( linkSpec );
-			nodalDof = Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Get( linkSpecDict, "dof" ) );
+			nodalDof = Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Get( linkSpecDict, (Dictionary_Entry_Key)"dof" ) );
 			
-			if ( nodalDof >= self->dofLayout->dofCounts[0] ) {
-				Stream*  warningStr = Journal_Register( Error_Type, self->type );
+			if ( nodalDof >= self->dofLayout->dofCounts[0]  ) {
+				Stream*  warningStr = Journal_Register( Error_Type, (Name)self->type  );
 
 				Journal_DPrintf( warningStr, "Warning- in %s: User requested a periodic BC on "
 					"dof %d, but only %d dofs are active. Ignoring.\n", __func__, nodalDof,
@@ -291,11 +291,11 @@ void _LinkedDofInfo_Build( void* linkedDofInfo, void* data ) {
 				continue;
 			}
 			
-			if ( ( wallVal = Dictionary_Get( linkSpecDict, "wall" ) ) ) {
+			if ( ( wallVal = Dictionary_Get( linkSpecDict, (Dictionary_Entry_Key)"wall" ) ) ) {
 				IndexSet*	indexSet = NULL;
-				char*		wallStr = Dictionary_Entry_Value_AsString( wallVal );
+				char*		wallStr = Dictionary_Entry_Value_AsString( wallVal  );
 				
-				dofSet = Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Get( linkSpecDict, "dofSet" ) );
+				dofSet = Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Get( linkSpecDict, (Dictionary_Entry_Key)"dofSet" )  );
 				
 				if ( 0 == strcmp( wallStr, "left" ) ) {
 					indexSet = RegularMeshUtils_CreateGlobalLeftSet( self->mesh );
@@ -316,7 +316,7 @@ void _LinkedDofInfo_Build( void* linkedDofInfo, void* data ) {
 					indexSet = RegularMeshUtils_CreateGlobalBackSet( self->mesh );
 				}
 				else {
-					Stream*	errorStr = Journal_Register( Error_Type, self->type );
+					Stream*	errorStr = Journal_Register( Error_Type, (Name)self->type  );
 					Journal_Printf( errorStr, "Error in %s: unknown wall string \"%s\" given. "
 						"Exiting.\n", __func__, wallStr );
 					exit(EXIT_FAILURE);
@@ -328,12 +328,12 @@ void _LinkedDofInfo_Build( void* linkedDofInfo, void* data ) {
 				
 				LinkedDofInfo_AddDofsToSet_FromIndexSet( self, dofSet, indexSet, nodalDof );
 			}
-			else if ( ( shapeVal = Dictionary_Get( linkSpecDict, "shape" ) ) ) {
+			else if ( ( shapeVal = Dictionary_Get( linkSpecDict, (Dictionary_Entry_Key)"shape" ) ) ) {
 				char*             shapeStr = Dictionary_Entry_Value_AsString( shapeVal );
 				Stg_Shape*        shape = NULL;
 				Node_LocalIndex   lNode_I = 0;
-				AbstractContext*  context = (AbstractContext*) data;
-				Stream*           errorStr = Journal_Register( Error_Type, self->type );
+				AbstractContext*  context = (AbstractContext* ) data;
+				Stream*           errorStr = Journal_Register( Error_Type, (Name)self->type  );
 
 				Journal_Firewall( context && Stg_Class_IsInstance( context, AbstractContext_Type ),
 					errorStr, "Error - in %s(): you've asked to create a Shape linked dof "
@@ -347,12 +347,12 @@ void _LinkedDofInfo_Build( void* linkedDofInfo, void* data ) {
 					"doesn't have a valid component factory to find the shape in.\n",
 					__func__, __func__ );
 
-				dofSet = Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Get( linkSpecDict, "dofSet" ) );
+				dofSet = Dictionary_Entry_Value_AsUnsignedInt( Dictionary_Get( linkSpecDict, (Dictionary_Entry_Key)"dofSet" ) );
 				while ( dofSet >= self->linkedDofSetsCount ) { 
-					LinkedDofInfo_AddDofSet( linkedDofInfo );
+					LinkedDofInfo_AddDofSet( linkedDofInfo  );
 				}
 				
-				shape = Stg_ComponentFactory_ConstructByName( context->CF, shapeStr, Stg_Shape, True, data );
+				shape = Stg_ComponentFactory_ConstructByName( context->CF, (Name)shapeStr, Stg_Shape, True, data  );
 				
 				for ( lNode_I = 0; lNode_I < Mesh_GetLocalSize( self->mesh, MT_VERTEX ); lNode_I++ ) {
 					if ( Stg_Shape_IsCoordInside( shape, Mesh_GetVertex( self->mesh, lNode_I ) ) ) {
@@ -360,8 +360,8 @@ void _LinkedDofInfo_Build( void* linkedDofInfo, void* data ) {
 					}
 				}	
 			}
-			else if ( ( wallPairVal = Dictionary_Get( linkSpecDict, "wallPair" ) ) ) {
-				char*		wallPairStr = Dictionary_Entry_Value_AsString( wallPairVal );
+			else if ( ( wallPairVal = Dictionary_Get( linkSpecDict, (Dictionary_Entry_Key)"wallPair" ) ) ) {
+				char*		wallPairStr = Dictionary_Entry_Value_AsString( wallPairVal  );
 				Index		dofSetStart_I = self->linkedDofSetsCount;
 				Index		dofSet_I = 0;
 				Index		numWallNodes;
@@ -386,7 +386,7 @@ void _LinkedDofInfo_Build( void* linkedDofInfo, void* data ) {
 					secondSet = RegularMeshUtils_CreateGlobalTopSet( self->mesh );
 				}
 				else {
-					Stream*	errorStr = Journal_Register( Error_Type, self->type );
+					Stream*	errorStr = Journal_Register( Error_Type, (Name)self->type  );
 					Journal_Printf( errorStr, "Error in %s: unknown wall pair string \"%s\" given. "
 						"Exiting.\n", __func__, wallPairStr );
 					exit(EXIT_FAILURE);
@@ -448,7 +448,7 @@ Index LinkedDofInfo_AddDofSet( void* linkedDofInfo ) {
 
 void LinkedDofInfo_AddDofToSet( void* linkedDofInfo, Index linkedDofSet_I, Node_Index node_I, Dof_Index nodeLocalDof_I ) {
 	LinkedDofInfo*	self = (LinkedDofInfo*)linkedDofInfo;
-	Stream*			errorStr = Journal_Register( Error_Type, self->type );
+	Stream*			errorStr = Journal_Register( Error_Type, (Name)self->type  );
 	
 	Journal_Firewall( node_I < self->dofLayout->_numItemsInLayout, errorStr, "Error- in %s: tried to add a dof at a "
 		"node that doesn't exist.\n", __func__ );
