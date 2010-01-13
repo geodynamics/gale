@@ -56,29 +56,29 @@
 Bool PICellerator_MaterialPoints_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister* componentsRegister = Stg_ComponentRegister_Get_ComponentRegister();
 
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
-	Stg_ComponentRegister_Add( componentsRegister, PICelleratorContext_Type,      "0", _PICelleratorContext_DefaultNew );
+	Stg_ComponentRegister_Add( componentsRegister, PICelleratorContext_Type, (Name)"0", _PICelleratorContext_DefaultNew  );
 
-	Stg_ComponentRegister_Add( componentsRegister, BackgroundParticleLayout_Type, "0", _BackgroundParticleLayout_DefaultNew );
+	Stg_ComponentRegister_Add( componentsRegister, BackgroundParticleLayout_Type, (Name)"0", _BackgroundParticleLayout_DefaultNew  );
 	
-	Stg_ComponentRegister_Add( componentsRegister, MappedParticleLayout_Type,     "0", _MappedParticleLayout_DefaultNew );
-	Stg_ComponentRegister_Add( componentsRegister, IntegrationPointsSwarm_Type,   "0", _IntegrationPointsSwarm_DefaultNew );
-	Stg_ComponentRegister_Add( componentsRegister, MaterialPointsSwarm_Type,      "0", _MaterialPointsSwarm_DefaultNew );
+	Stg_ComponentRegister_Add( componentsRegister, MappedParticleLayout_Type, (Name)"0", _MappedParticleLayout_DefaultNew  );
+	Stg_ComponentRegister_Add( componentsRegister, IntegrationPointsSwarm_Type, (Name)"0", _IntegrationPointsSwarm_DefaultNew  );
+	Stg_ComponentRegister_Add( componentsRegister, MaterialPointsSwarm_Type, (Name)"0", _MaterialPointsSwarm_DefaultNew  );
 	
-	Stg_ComponentRegister_Add( componentsRegister, MaterialFeVariable_Type,       "0", _MaterialFeVariable_DefaultNew );
-	Stg_ComponentRegister_Add( componentsRegister, Material_Type,                 "0", _Material_DefaultNew );
+	Stg_ComponentRegister_Add( componentsRegister, MaterialFeVariable_Type, (Name)"0", _MaterialFeVariable_DefaultNew  );
+	Stg_ComponentRegister_Add( componentsRegister, Material_Type, (Name)"0", _Material_DefaultNew  );
 	
-	Stg_ComponentRegister_Add( componentsRegister, CoincidentMapper_Type,         "0", _CoincidentMapper_DefaultNew );
-	Stg_ComponentRegister_Add( componentsRegister, GaussCoincidentMapper_Type,    "0", _GaussCoincidentMapper_DefaultNew );
-	Stg_ComponentRegister_Add( componentsRegister, GaussMapper_Type,              "0", _GaussMapper_DefaultNew );
+	Stg_ComponentRegister_Add( componentsRegister, CoincidentMapper_Type, (Name)"0", _CoincidentMapper_DefaultNew  );
+	Stg_ComponentRegister_Add( componentsRegister, GaussCoincidentMapper_Type, (Name)"0", _GaussCoincidentMapper_DefaultNew  );
+	Stg_ComponentRegister_Add( componentsRegister, GaussMapper_Type, (Name)"0", _GaussMapper_DefaultNew  );
 	
-	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvector_Type,            "0", _SwarmAdvector_DefaultNew );
-	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvectionInAPlane_Type,            "0", _SwarmAdvectionInAPlane_DefaultNew );
+	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvector_Type, (Name)"0", _SwarmAdvector_DefaultNew  );
+	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvectionInAPlane_Type, (Name)"0", _SwarmAdvectionInAPlane_DefaultNew  );
 
-	Stg_ComponentRegister_Add( componentsRegister, PeriodicBoundariesManager_Type,"0", _PeriodicBoundariesManager_DefaultNew );
+	Stg_ComponentRegister_Add( componentsRegister, PeriodicBoundariesManager_Type, (Name)"0", _PeriodicBoundariesManager_DefaultNew  );
 	
-	Stg_ComponentRegister_Add( componentsRegister, SwarmVariableField_Type,"0", _SwarmVariableField_DefaultNew );
+	Stg_ComponentRegister_Add( componentsRegister, SwarmVariableField_Type, (Name)"0", _SwarmVariableField_DefaultNew  );
 
 	/* Doing this in alphabetical order to match ls output */
 	RegisterParent( BackgroundParticleLayout_Type,  ParticleLayout_Type );

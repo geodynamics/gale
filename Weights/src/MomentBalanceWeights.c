@@ -100,7 +100,7 @@ void _MomentBalanceWeights_Init( void* momentBalanceWeights, WeightsCalculator* 
         self->freeBackupWeights = True;
     }
         
-    Journal_Firewall( self->dim == 2, Journal_Register( Error_Type, self->type ), "%s only works in 2D.\n", self->type );
+    Journal_Firewall( self->dim == 2, Journal_Register( Error_Type, (Name)self->type  ), "%s only works in 2D.\n", self->type );
         
 }
 
@@ -156,7 +156,7 @@ void _MomentBalanceWeights_AssignFromXML( void* momentBalanceWeights, Stg_Compon
 
     _WeightsCalculator_AssignFromXML( self, cf, data );
 
-    backupWeights =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "BackupWeights", WeightsCalculator, False, data );
+    backupWeights =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"BackupWeights", WeightsCalculator, False, data  );
 
     _MomentBalanceWeights_Init( self, backupWeights );
 }

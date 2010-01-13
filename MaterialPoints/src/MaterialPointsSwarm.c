@@ -157,10 +157,7 @@ void _MaterialPointsSwarm_Init(
 	self->material           = material;
 	self->materials_Register = materials_Register;
 	
-	self->particleCoordVariable = Swarm_NewVectorVariable(
-		self,
-		"Position",
-		GetOffsetOfMember( globalParticle, coord ),
+	self->particleCoordVariable = Swarm_NewVectorVariable( self, (Name)"Position", GetOffsetOfMember( globalParticle, coord ),
 		Variable_DataType_Double,
 		self->dim,
 		"PositionX",
@@ -169,7 +166,7 @@ void _MaterialPointsSwarm_Init(
    LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->particleCoordVariable->variable );
    LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->particleCoordVariable );
 
-	self->materialIndexVariable = Swarm_NewScalarVariable( self, "MaterialIndex", GetOffsetOfMember( particle , materialIndex ), Variable_DataType_Int ); /* Should be unsigned int */
+	self->materialIndexVariable = Swarm_NewScalarVariable( self, (Name)"MaterialIndex", GetOffsetOfMember( particle , materialIndex  ), Variable_DataType_Int ); /* Should be unsigned int */
    LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->materialIndexVariable->variable );
    LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->materialIndexVariable );
 
@@ -246,11 +243,11 @@ void _MaterialPointsSwarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, 
 
 	_Swarm_AssignFromXML( self, cf, data );
 
-	mesh             = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeMesh", FeMesh, True, data );
-	escapedRoutine   = Stg_ComponentFactory_ConstructByKey( cf, self->name, "EscapedRoutine",     EscapedRoutine,     False, data );
-	material         = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Material",           Material,           False, data );
+	mesh             = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"FeMesh", FeMesh, True, data  );
+	escapedRoutine   = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"EscapedRoutine", EscapedRoutine, False, data  );
+	material         = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Material", Material, False, data );
 
-	context = (PICelleratorContext*)self->context;
+	context = (PICelleratorContext* )self->context;
 	assert( Stg_CheckType( context, PICelleratorContext ) );
 	materials_Register = context->materials_Register; 
 	assert( materials_Register );
@@ -262,14 +259,14 @@ void _MaterialPointsSwarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, 
 			material,
 			materials_Register );
 
-	self->geomodHack = Dictionary_GetBool_WithDefault( cf->rootDict, "geomodHacks", False );
+	self->geomodHack = Dictionary_GetBool_WithDefault( cf->rootDict, (Dictionary_Entry_Key)"geomodHacks", False  );
 }
 
 void _MaterialPointsSwarm_Build( void* swarm, void* data ) {
 	MaterialPointsSwarm*	self = (MaterialPointsSwarm*) swarm;
 	int			commHandler_I;
 	Bool                    movementCommHandlerFound = False;
-	Stream*                 errorStream = Journal_Register( Error_Type, self->type );
+	Stream*                 errorStream = Journal_Register( Error_Type, (Name)self->type  );
 	int var_I;
 
 	_Swarm_Build( self, data );

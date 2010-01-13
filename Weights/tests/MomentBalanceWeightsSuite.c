@@ -51,7 +51,7 @@ void MomentBalanceWeightsSuite_Setup( MomentBalanceWeightsSuiteData* data ) {
 
    pcu_filename_input( "testMomentBalanceWeights.xml", xmlInputFilename );
    data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
-   data->context = (PICelleratorContext*) LiveComponentRegister_Get( data->cf->LCRegister, "context" );
+   data->context = (PICelleratorContext*) LiveComponentRegister_Get( data->cf->LCRegister, (Name)"context" );
    stgMainBuildAndInitialise( data->cf );
 } 
 
@@ -59,7 +59,7 @@ void MomentBalanceWeightsSuite_Teardown( MomentBalanceWeightsSuiteData* data ) {
    stgMainDestroy( data->cf );
 }
 
-void MomentBalanceWeightsSuite_TestConstantFunction( MomentBalanceWeightsSuiteData* data ) {
+void MomentBalanceWeightsSuite_TestConstantFunction( MomentBalanceWeightsSuiteData* data  ) {
    WeightsSuite_TestElementIntegral( data->context, "ConstantFunction", 1000,
       1e-10, /* --mean-tolerance */
       1e-10, /* --standardDeviation-tolerance */

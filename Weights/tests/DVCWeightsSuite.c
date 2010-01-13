@@ -124,7 +124,7 @@ void DVCWeightsSuite_TestConstructGrid( DVCWeightsSuiteData* data ) {
    fp=fopen(expectedGridFilename,"r");
    if(!fp){
      pcu_check_true(0);
-     Journal_Firewall( 0 , Journal_Register(Error_Type, "DVCWeightsSuite_TestConstructGrid"),"expected test File %s Not Found in function %s\n" ,expectedGridFilename, __func__);
+     Journal_Firewall( 0 , Journal_Register( Error_Type, (Name)"DVCWeightsSuite_TestConstructGrid" ),"expected test File %s Not Found in function %s\n" ,expectedGridFilename, __func__);
    }
    else{
      /* Print out the grid */
@@ -279,7 +279,7 @@ void DVCWeightsSuite_TestGetCentroids( DVCWeightsSuiteData* data ) {
    fp=fopen(expectedCentroidsFilename,"r");
    if(!fp){
      pcu_check_true(0);
-     Journal_Firewall( 0 , Journal_Register(Error_Type, "DVCWeightsSuite_TestGetCentroids"),"expected test File %s Not Found in function %s\n" ,expectedCentroidsFilename, __func__);
+     Journal_Firewall( 0 , Journal_Register( Error_Type, (Name)"DVCWeightsSuite_TestGetCentroids" ),"expected test File %s Not Found in function %s\n" ,expectedCentroidsFilename, __func__);
    }
    else{
      for (i = 0; i < data->nump; i++) {
@@ -346,7 +346,7 @@ void DVCWeightsSuite_TestConstructGrid2D( DVCWeightsSuiteData* data ) {
    fp=fopen(expectedGridFilename,"r");
    if(!fp){
      pcu_check_true(0);
-     Journal_Firewall( 0 , Journal_Register(Error_Type, "DVCWeightsSuite_TestConstructGrid2D"),"expected test File %s Not Found in function %s\n" ,expectedGridFilename, __func__);
+     Journal_Firewall( 0 , Journal_Register( Error_Type, (Name)"DVCWeightsSuite_TestConstructGrid2D" ),"expected test File %s Not Found in function %s\n" ,expectedGridFilename, __func__);
    }
    else{
      /* Print out the grid */
@@ -480,7 +480,7 @@ void DVCWeightsSuite_TestGetCentroids2D( DVCWeightsSuiteData* data ) {
     fp=fopen(expectedCentroidsFilename,"r");
    if(!fp){
      pcu_check_true(0);
-     Journal_Firewall( 0 , Journal_Register(Error_Type, "DVCWeightsSuite_TestGetCentroids2D"),"expected test File %s Not Found in function %s\n" ,expectedCentroidsFilename, __func__);
+     Journal_Firewall( 0 , Journal_Register( Error_Type, (Name)"DVCWeightsSuite_TestGetCentroids2D" ),"expected test File %s Not Found in function %s\n" ,expectedCentroidsFilename, __func__);
    }
    else{
 

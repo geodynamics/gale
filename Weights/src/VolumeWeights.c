@@ -131,8 +131,8 @@ void _VolumeWeights_AssignFromXML( void* weights, Stg_ComponentFactory* cf, void
 
     _WeightsCalculator_AssignFromXML( self, cf, data );
 
-    shape = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Shape", Stg_Shape, True, data );
-    mesh  = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", FeMesh, True, data );
+    shape = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Shape", Stg_Shape, True, data  );
+    mesh  = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Mesh", FeMesh, True, data  );
 /*
   Journal_Firewall(
   Stg_Class_IsInstance( shape, Sphere_Type ),
@@ -199,7 +199,7 @@ void _VolumeWeights_Calculate( void* weights, void* _swarm, Cell_LocalIndex lCel
     ** NOTE: Big assumption that the mesh is regular.
     */
     vertGrid = *(Grid**)ExtensionManager_Get( self->mesh->info, self->mesh, 
-                                              ExtensionManager_GetHandle( self->mesh->info, "vertexGrid" ) );
+                                              ExtensionManager_GetHandle( self->mesh->info, (Name)"vertexGrid" ) );
 	
     dx = 1.0 / (double)(vertGrid->sizes[0] - 1); /* size of an element */
     dy = 1.0 / (double)(vertGrid->sizes[1] - 1);
@@ -212,7 +212,7 @@ void _VolumeWeights_Calculate( void* weights, void* _swarm, Cell_LocalIndex lCel
 
     /* (V / np) * 4 / ( dx * dy * dz ) */
     /* Where 4 in the value of cellLocalVolume in 2D */
-    weight = (volume / (double)numberOfParticles) * ( self->cellLocalVolume / ( dx * dy * dz ) );
+    weight = (volume / (double)numberOfParticles) * ( self->cellLocalVolume / ( dx * dy * dz )  );
 
     WeightsCalculator_SetWeightsValueAllInCell( self, swarm, lCell_I, weight );
 }

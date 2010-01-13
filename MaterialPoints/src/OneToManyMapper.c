@@ -72,10 +72,7 @@ void _OneToManyMapper_Init( void* mapper, MaterialPointsSwarm* materialSwarm ) {
 	self->materialSwarm = materialSwarm;
 
 	ExtensionManager_SetLockDown( self->integrationSwarm->particleExtensionMgr, False );
-	self->refHandle = ExtensionManager_Add( 
-	    self->integrationSwarm->particleExtensionMgr,
-	    materialSwarm->name, 
-	    sizeof(OneToManyRef) );
+	self->refHandle = ExtensionManager_Add( self->integrationSwarm->particleExtensionMgr, (Name)materialSwarm->name, sizeof(OneToManyRef)  );
 	ExtensionManager_SetLockDown( self->integrationSwarm->particleExtensionMgr, True );
 }
 
@@ -108,13 +105,7 @@ void _OneToManyMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, voi
 	
 	_IntegrationPointMapper_AssignFromXML( self, cf, data );
 
-	materialSwarm = Stg_ComponentFactory_ConstructByKey( 
-				cf, 
-				self->name, 
-				MaterialPointsSwarm_Type, 
-				MaterialPointsSwarm,  
-				True,
-				data  );
+	materialSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)MaterialPointsSwarm_Type, MaterialPointsSwarm, True, data   );
 
 	_OneToManyMapper_Init( self, materialSwarm );
 

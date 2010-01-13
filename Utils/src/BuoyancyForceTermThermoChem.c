@@ -171,12 +171,12 @@ void _BuoyancyForceTermThermoChem_AssignFromXML( void* forceTerm, Stg_ComponentF
 	/* Construct Parent */
 	_ForceTerm_AssignFromXML( self, cf, data );
 
-	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TemperatureField", FeVariable, False, data ) ;
-	RaT = Stg_ComponentFactory_GetDouble( cf, self->name, "RaT", 0.0 );
-	RaC = Stg_ComponentFactory_GetDouble( cf, self->name, "RaC", 0.0 );
-	adjust = Stg_ComponentFactory_GetBool( cf, self->name, "adjust", False );
+	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"TemperatureField", FeVariable, False, data  ) ;
+	RaT = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"RaT", 0.0  );
+	RaC = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"RaC", 0.0  );
+	adjust = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"adjust", False );
 
-	context = (PICelleratorContext*)self->context;
+	context = (PICelleratorContext* )self->context;
 	assert( Stg_CheckType( context, PICelleratorContext ) );
 	materials_Register = context->materials_Register; 
 	assert( materials_Register );
@@ -209,7 +209,7 @@ void _BuoyancyForceTermThermoChem_Build( void* forceTerm, void* data ) {
 		material = Materials_Register_GetByIndex( materials_Register, material_I );
 		materialExt = ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
 
-		materialExt->density = Dictionary_GetDouble_WithDefault( material->dictionary, "density", 0.0 );
+		materialExt->density = Dictionary_GetDouble_WithDefault( material->dictionary, (Dictionary_Entry_Key)"density", 0.0  );
 	}
 	
 	/* Create Swarm Variables of each material swarm this ip swarm is mapped against */
@@ -217,7 +217,7 @@ void _BuoyancyForceTermThermoChem_Build( void* forceTerm, void* data ) {
 	self->densitySwarmVariables = Memory_Alloc_Array( MaterialSwarmVariable*, self->materialSwarmCount, "DensityVariables" );
 	
 	for ( materialSwarm_I = 0; materialSwarm_I < self->materialSwarmCount; ++materialSwarm_I ) {
-		name = Stg_Object_AppendSuffix( materialSwarms[materialSwarm_I], "Density" );
+		name = Stg_Object_AppendSuffix( materialSwarms[materialSwarm_I], (Name)"Density"  );
 		self->densitySwarmVariables[materialSwarm_I] = MaterialSwarmVariable_New( 
 				name,
 				(AbstractContext*) self->context,

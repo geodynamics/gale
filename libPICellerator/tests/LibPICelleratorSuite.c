@@ -26,28 +26,28 @@ void LibPICelleratorSuite_Teardown( LibPICelleratorSuiteData* data ) {
 
 void LibPICelleratorSuite_TestDirectoryStGermain( LibPICelleratorSuiteData* data ) {
     Stg_Object* testDirectoryStGermain;
-    testDirectoryStGermain = Stg_ObjectList_Get( Project_XMLSearchPaths, "StGermain" );
+    testDirectoryStGermain = Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain" );
     pcu_check_true( testDirectoryStGermain != NULL );
 }
 
-void LibPICelleratorSuite_TestDirectoryStgFEM( LibPICelleratorSuiteData * data ) {
+void LibPICelleratorSuite_TestDirectoryStgFEM( LibPICelleratorSuiteData * data  ) {
     Stg_Object* testDirectoryStGermain;
     Stg_Object* testDirectoryStgFEM;
 
-    testDirectoryStGermain = Stg_ObjectList_Get( Project_XMLSearchPaths, "StGermain" );
-    testDirectoryStgFEM= Stg_ObjectList_Get( Project_XMLSearchPaths, "StgFEM" );
+    testDirectoryStGermain = Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain"  );
+    testDirectoryStgFEM= Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StgFEM" );
 
-    pcu_check_true( ( strcmp((char*)LIB_DIR, (char*)testDirectoryStGermain) ) || ( testDirectoryStgFEM != NULL ) );
+    pcu_check_true( ( strcmp((char* )LIB_DIR, (char*)testDirectoryStGermain) ) || ( testDirectoryStgFEM != NULL ) );
 }
 
 void LibPICelleratorSuite_TestDirectoryPICellerator( LibPICelleratorSuiteData * data ) {
     Stg_Object* testDirectoryStGermain;
     Stg_Object* testDirectoryPICellerator;
 
-    testDirectoryStGermain = Stg_ObjectList_Get( Project_XMLSearchPaths, "StGermain" );
-    testDirectoryPICellerator= Stg_ObjectList_Get( Project_XMLSearchPaths, "PICellerator" );
+    testDirectoryStGermain = Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain"  );
+    testDirectoryPICellerator= Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"PICellerator" );
 
-    pcu_check_true( ( strcmp((char*)LIB_DIR, (char*)testDirectoryStGermain) ) || ( testDirectoryPICellerator != NULL ) );
+    pcu_check_true( ( strcmp((char* )LIB_DIR, (char*)testDirectoryStGermain) ) || ( testDirectoryPICellerator != NULL ) );
 }
 
 void LibPICelleratorSuite( pcu_suite_t* suite ) {

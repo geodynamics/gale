@@ -80,7 +80,7 @@ ParticleFeVariable* _ParticleFeVariable_New(  PARTICLEFEVARIABLE_DEFARGS  ) {
 
 void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm* swarm ) {
 	/* Create Vector */
-	self->assemblyVectorName = Stg_Object_AppendSuffix( self, "assemblyVector" );
+	self->assemblyVectorName = Stg_Object_AppendSuffix( self, (Name)"assemblyVector"  );
 	self->assemblyVector = ForceVector_New( 
 		self->assemblyVectorName,
 		(FiniteElementContext*) self->context,
@@ -90,7 +90,7 @@ void _ParticleFeVariable_Init( ParticleFeVariable* self, IntegrationPointsSwarm*
 		self->communicator );
 	self->assemblyTerm = ForceTerm_New( "assemblyTerm", (FiniteElementContext*) self->context, self->assemblyVector, (Swarm*)swarm, (Stg_Component*) self );
 
-	self->massMatrixName = Stg_Object_AppendSuffix( self, "massMatrix" );
+	self->massMatrixName = Stg_Object_AppendSuffix( self, (Name)"massMatrix"  );
 	self->massMatrix = ForceVector_New( 
 		self->massMatrixName,
 		(FiniteElementContext*) self->context,
@@ -143,11 +143,11 @@ void _ParticleFeVariable_AssignFromXML( void* materialFeVariable, Stg_ComponentF
 
 	_FieldVariable_AssignFromXML( self, cf, data );
 
-	swarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", IntegrationPointsSwarm, True, data );
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
-	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", FeMesh, True, data );
+	swarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", IntegrationPointsSwarm, True, data  );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", FiniteElementContext, False, data  );
+	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Mesh", FeMesh, True, data );
 
-	_FeVariable_Init( (FeVariable*)self, mesh, NULL, NULL, NULL, NULL, NULL, NULL, False, False );
+	_FeVariable_Init( (FeVariable* )self, mesh, NULL, NULL, NULL, NULL, NULL, NULL, False, False );
 	_ParticleFeVariable_Init( self, swarm );
 }
 
@@ -207,7 +207,7 @@ void _ParticleFeVariable_Execute( void* materialFeVariable, void* _ctx ) {
 
    if( ParticleFeVariable_curName >= ParticleFeVariable_nNames )
       ParticleFeVariable_curName = 0;
-   ParticleFeVariable_Update( LiveComponentRegister_Get( ctx->CF->LCRegister, ParticleFeVariable_names[ParticleFeVariable_curName++] ) );
+   ParticleFeVariable_Update( LiveComponentRegister_Get( ctx->CF->LCRegister, (Name)ParticleFeVariable_names[ParticleFeVariable_curName++] )  );
 }
 
 void _ParticleFeVariable_Destroy( void* materialFeVariable, void* data ) {

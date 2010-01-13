@@ -157,7 +157,7 @@ void _SwarmAdvectionInAPlane_AssignFromXML( void* swarmAdvector, Stg_ComponentFa
 	int							whichaxis;
 	_SwarmAdvector_AssignFromXML( self, cf, data );
 	/* Everything except whichaxis constructed by parent already */
-	whichaxis = Stg_ComponentFactory_GetInt( cf, self->name, "whichaxis",  1 );
+	whichaxis = Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"whichaxis", 1  );
 	_SwarmAdvectionInAPlane_Init( self, whichaxis );
 }
 
@@ -182,7 +182,7 @@ Bool _SwarmAdvectionInAPlane_TimeDeriv( void* swarmAdvector, Index array_I, doub
 			( self->swarm->dim == 3 && isinf(timeDeriv[2]) ) ) 
 	{
 		#if 0
-		Journal_Printf( Journal_Register( Error_Type, self->type ),
+		Journal_Printf( Journal_Register( Error_Type, (Name)self->type  ),
 			"Error in func '%s' for particle with index %u.\n\tPosition (%g, %g, %g)\n\tVelocity here is (%g, %g, %g)."
 			"\n\tInteropolation result is %u.\n",
 			__func__, array_I, coord[0], coord[1], coord[2], 

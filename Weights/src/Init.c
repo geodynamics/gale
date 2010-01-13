@@ -54,13 +54,13 @@
 Bool PICellerator_Weights_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister* componentsRegister = Stg_ComponentRegister_Get_ComponentRegister();
 
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
-	Stg_ComponentRegister_Add( componentsRegister, ConstantWeights_Type,          "0", _ConstantWeights_DefaultNew );
-	Stg_ComponentRegister_Add( componentsRegister, VolumeWeights_Type,            "0", _VolumeWeights_DefaultNew );
-	Stg_ComponentRegister_Add( componentsRegister, IterativeWeights_Type,         "0", _IterativeWeights_DefaultNew );
-	Stg_ComponentRegister_Add( componentsRegister, MomentBalanceWeights_Type,     "0", _MomentBalanceWeights_DefaultNew );
-	Stg_ComponentRegister_Add( componentsRegister, DVCWeights_Type,   			  "0", _DVCWeights_DefaultNew );
+	Stg_ComponentRegister_Add( componentsRegister, ConstantWeights_Type, (Name)"0", _ConstantWeights_DefaultNew  );
+	Stg_ComponentRegister_Add( componentsRegister, VolumeWeights_Type, (Name)"0", _VolumeWeights_DefaultNew  );
+	Stg_ComponentRegister_Add( componentsRegister, IterativeWeights_Type, (Name)"0", _IterativeWeights_DefaultNew  );
+	Stg_ComponentRegister_Add( componentsRegister, MomentBalanceWeights_Type, (Name)"0", _MomentBalanceWeights_DefaultNew  );
+	Stg_ComponentRegister_Add( componentsRegister, DVCWeights_Type, (Name)"0", _DVCWeights_DefaultNew  );
 	
 	RegisterParent( WeightsCalculator_Type,      Stg_Component_Type );
 	RegisterParent( ConstantWeights_Type,        WeightsCalculator_Type );

@@ -52,7 +52,7 @@ void IterativeWeightsSuite_Setup( IterativeWeightsSuiteData* data ) {
 
    pcu_filename_input( "testIterativeWeights.xml", xmlInputFilename );
    data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
-   data->context = (PICelleratorContext*)LiveComponentRegister_Get( data->cf->LCRegister, "context" );
+   data->context = (PICelleratorContext*)LiveComponentRegister_Get( data->cf->LCRegister, (Name)"context" );
    stgMainBuildAndInitialise( data->cf );
 } 
 
@@ -61,7 +61,7 @@ void IterativeWeightsSuite_Teardown( IterativeWeightsSuiteData* data ) {
    stgMainDestroy( data->cf );
 }
 
-void IterativeWeightsSuite_TestConstantFunction( IterativeWeightsSuiteData* data ) {
+void IterativeWeightsSuite_TestConstantFunction( IterativeWeightsSuiteData* data  ) {
    WeightsSuite_TestElementIntegral( data->context, "ConstantFunction", 1000,
       1e-10, /* --mean-tolerance */
       1e-10, /* --standardDeviation-tolerance */

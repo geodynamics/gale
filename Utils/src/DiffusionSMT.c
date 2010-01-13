@@ -175,12 +175,10 @@ void _DiffusionSMT_Build( void* matrixTerm, void* data ) {
 						self->materialExtHandle );
 
 	if ( cf ) {
-	    materialExt->diffusion = Stg_ComponentFactory_GetDouble(
-		cf, material->name, "diffusivity", 0.0 );
+	    materialExt->diffusion = Stg_ComponentFactory_GetDouble( cf, material->name, (Dictionary_Entry_Key)"diffusivity", 0.0  );
 	}
 	else {
-	    materialExt->diffusion = Dictionary_GetDouble_WithDefault(
-		material->dictionary, "diffusivity", 0.0 );
+	    materialExt->diffusion = Dictionary_GetDouble_WithDefault( material->dictionary, (Dictionary_Entry_Key)"diffusivity", 0.0  );
 	}
     }
 
@@ -191,7 +189,7 @@ void _DiffusionSMT_Build( void* matrixTerm, void* data ) {
 	MaterialSwarmVariable*, self->materialSwarmCount, "DiffusionVariables");
 
     for ( ii = 0; ii < self->materialSwarmCount; ++ii ) {
-	name = Stg_Object_AppendSuffix( materialSwarms[ii], "diffusivity" );
+	name = Stg_Object_AppendSuffix( materialSwarms[ii], (Name)"diffusivity"  );
 	self->diffusionSwarmVariables[ii] = MaterialSwarmVariable_New( 
 	    name, 
 	    (AbstractContext*) self->context, 
@@ -262,7 +260,7 @@ void _DiffusionSMT_AssembleElement(
     nodesPerEl = elementType->nodeCount;
 	
     /* allocate */
-    GNx = Memory_Alloc_2DArray( double, dim, nodesPerEl, "GNx" );
+    GNx = Memory_Alloc_2DArray( double, dim, nodesPerEl, (Name)"GNx"  );
 	
     cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
     cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];

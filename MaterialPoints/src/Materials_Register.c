@@ -125,14 +125,14 @@ ExtensionInfo_Index Materials_Register_AddMaterialExtension( void* materialsRegi
 	for ( material_I = 0 ; material_I < Materials_Register_GetCount( self ) ; material_I++) {
 		material = Materials_Register_GetByIndex( self, material_I );
 
-		result = ExtensionManager_Add( material->extensionMgr, type, extensionSize );
+		result = ExtensionManager_Add( material->extensionMgr, (Name)type, extensionSize );
 
-		if ( material_I == 0 )
+		if ( material_I == 0  )
 			firstResult = result;
 		else {
 			Journal_Firewall( 
 				firstResult == result, 
-				Journal_Register( Error_Type, self->type ),
+				Journal_Register( Error_Type, (Name)self->type  ),
 				"Material '%s' has a different number of extensions than eariler materials.\n", 
 				material->name );
 		}
@@ -162,7 +162,7 @@ void Materials_Register_AssignParticleProperties(
 	Particle_Index      lParticle_I;
 	Particle_Index      particleLocalCount = swarm->particleLocalCount;
 	Particle_Index      particleGlobalCount = 0;
-	Stream*             stream = Journal_Register( Info_Type, self->type );
+	Stream*             stream = Journal_Register( Info_Type, (Name)self->type  );
 	Processor_Index     formerStreamPrintingRank;
 	double              setupStartTime = 0;
 	double              setupTime = 0, tmin, tmax;
@@ -267,7 +267,7 @@ void Variable_SetValueFromDictionary( void* _variable, Index index, Dictionary* 
 			Variable_SetValueShort( variable, index, Dictionary_GetUnsignedInt( dictionary, variable->name ));
 			break;
 		case Variable_DataType_Int:
-			Variable_SetValueInt( variable, index, Dictionary_GetInt( dictionary, variable->name ));
+			Variable_SetValueInt( variable, index, Dictionary_GetInt( dictionary, (Dictionary_Entry_Key)variable->name ) );
 			break;
 		case Variable_DataType_Float:
 			Variable_SetValueFloat(  variable, index, Dictionary_GetDouble( dictionary, variable->name ));

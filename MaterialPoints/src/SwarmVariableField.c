@@ -135,11 +135,11 @@ void _SwarmVariableField_AssignFromXML( void* swarmVariableField, Stg_ComponentF
 	variable_Register = self->context->variable_Register; 
 
 	// TODO: just get the textual name here - see gLucifer's SwarmPlotter DrawignObject 
-	swarmVarName = Stg_ComponentFactory_GetString( cf, self->name, "swarmVariable", "" );
+	swarmVarName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"swarmVariable", ""  );
 
-	materialSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialSwarm", MaterialPointsSwarm, True, data );
-	integrationSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", IntegrationPointsSwarm, True, NULL );
-	assert( integrationSwarm );
+	materialSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialSwarm", MaterialPointsSwarm, True, data  );
+	integrationSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", IntegrationPointsSwarm, True, NULL );
+	assert( integrationSwarm  );
 
 	_SwarmVariableField_Init( self, variable_Register, swarmVarName, materialSwarm );
 }
@@ -148,25 +148,19 @@ void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {
 	SwarmVariableField*	      self	            = (SwarmVariableField*)swarmVariableField;
 	unsigned		               nDomainVerts      = Mesh_GetDomainSize( self->feMesh, MT_VERTEX );
 	SwarmVariable_Register*		swarmVar_Register	= self->materialSwarm->swarmVariable_Register;
-	Stream*				         errorStream		   = Journal_Register( Error_Type, self->type );
+	Stream*				         errorStream		   = Journal_Register( Error_Type, (Name)self->type  );
 	Name			               tmpName;
 
 	Stg_Component_Build( self->materialSwarm, data, False );
 	/* make this more flexible to handle vector values at each node - will have to get the num dofs from the XML
 	 * as other components are not necessarily built yet... dave. 03.10.07 */
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
-	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
-	self->dataVariable = Variable_NewScalar( tmpName,
-		(AbstractContext*)self->context,
-		Variable_DataType_Double,
-		&nDomainVerts,
-		NULL,
-		(void**)&self->data,
-		self->variable_Register );
-	Memory_Free( tmpName );
+	tmpName = Stg_Object_AppendSuffix( self, (Name)"DataVariable"  );
+	self->dataVariable = Variable_NewScalar( tmpName, (AbstractContext*)self->context, Variable_DataType_Double, (Index*)&nDomainVerts, NULL, (void**)&self->data, self->variable_Register );
+	Memory_Free( tmpName  );
 	self->fieldComponentCount = 1;
 
-	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
+	tmpName = Stg_Object_AppendSuffix( self, (Name)"DofLayout"  );
 	self->dofLayout = DofLayout_New( tmpName, self->context, self->variable_Register, 0, self->feMesh );
 
 	/* must build before adding the variable to the dof layout, dave. 04.10.07 */

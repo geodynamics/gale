@@ -245,24 +245,24 @@ void _PCDVC_AssignFromXML( void* pcdvc, Stg_ComponentFactory* cf, void *data ) {
 
     _DVCWeights_AssignFromXML( self, cf, data );
 
-    materialPointsSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaterialPointsSwarm", MaterialPointsSwarm, True, data );
-    Stream*  stream = Journal_Register( Info_Type, materialPointsSwarm->type );
+    materialPointsSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialPointsSwarm", MaterialPointsSwarm, True, data  );
+    Stream*  stream = Journal_Register( Info_Type, (Name)materialPointsSwarm->type  );
 	
 
-    stream = Journal_Register( Info_Type, materialPointsSwarm->type );
-    upT = Stg_ComponentFactory_GetDouble( cf, self->name, "upperT", 25 );
-    lowT = Stg_ComponentFactory_GetDouble( cf, self->name, "lowerT", 0.6 );
-    maxD = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "maxDeletions", 2);
-    maxS = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "maxSplits", 3);
-    splitInInterfaceCells  = Stg_ComponentFactory_GetBool( cf, self->name, "splitInInterfaceCells", False);
-    deleteInInterfaceCells = Stg_ComponentFactory_GetBool( cf, self->name, "deleteInInterfaceCells", False);
-    Inflow =  Stg_ComponentFactory_GetBool( cf, self->name, "Inflow", False);
-    Thresh = Stg_ComponentFactory_GetDouble( cf, self->name, "Threshold", 0.8 );
+    stream = Journal_Register( Info_Type, (Name)materialPointsSwarm->type  );
+    upT = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"upperT", 25  );
+    lowT = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"lowerT", 0.6  );
+    maxD = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"maxDeletions", 2 );
+    maxS = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"maxSplits", 3 );
+    splitInInterfaceCells  = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"splitInInterfaceCells", False );
+    deleteInInterfaceCells = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"deleteInInterfaceCells", False );
+    Inflow =  Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"Inflow", False );
+    Thresh = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"Threshold", 0.8  );
     //CentPosRatio is ratio of allowable distance of a centroid from generating particle to distance across a FEM cell.
     // I think the centroid distance idea is not ideal in the end...can create some weirdness...even thought the code "works"
     // after a while one can get wiggly lines in the cells...the centriods are close to the particles but its all
     // centred in the FEM cell.
-    CentPosRatio =  Stg_ComponentFactory_GetDouble( cf, self->name, "CentPosRatio", 0.01 );
+    CentPosRatio =  Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"CentPosRatio", 0.01  );
     // just getting the initial PPC for now...maybe could make this a separate parameter yet if needed.
     ParticlesPerCell = cf->getRootDictUnsignedInt( cf, "particlesPerCell", 25);
     if(upT < lowT){
@@ -317,7 +317,7 @@ MaterialPointRef* getIntParticleMaterialRef_PointingToMaterialParticle( Integrat
     IntegrationPoint* intTestParticle;
     MaterialPointRef*       ref;
     int i;
-    Stream*  stream = Journal_Register( Info_Type, intSwarm->type );
+    Stream*  stream = Journal_Register( Info_Type, (Name)intSwarm->type  );
     Journal_Printf( stream,"\n\n\e[31m\nOn Proc %d: In func %s(): WARNING!! If this function is being called, then some other module/component, somewhere, has messed up the mapping between the integration Swarm and the material Swarm\n\n", intSwarm->myRank, __func__);
     Journal_Printf( stream,"This function is potentially slow. Someone should fix the offending module so that it doesn not mess up the ordering\n\n");
     Journal_Printf( stream,"\e[0;32m");
@@ -793,7 +793,7 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 
     nump_orig = nump = cParticleCount = intSwarm->cellParticleCountTbl[lCell_I];
 
-    Journal_Firewall( nump , Journal_Register(Error_Type, "PCDVC"), "Error in %s: Problem has an under resolved cell (Cell Id = %d), add more particles to your model\n", __func__, lCell_I );
+    Journal_Firewall( nump , Journal_Register( Error_Type, (Name)"PCDVC" ), "Error in %s: Problem has an under resolved cell (Cell Id = %d), add more particles to your model\n", __func__, lCell_I );
 
     dx = (BBXMAX - BBXMIN)/numx;
     dy = (BBYMAX - BBYMIN)/numy;
@@ -955,7 +955,7 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
             free(bchain);
             free(pList);
             if(nump < 3){
-                Journal_Firewall( 0 , Journal_Register(Error_Type, "PCDVC"), "Something went horribly wrong in %s: Problem has an under resolved cell (Cell Id = %d), check or tune your population control parameters\n", __func__, lCell_I );
+                Journal_Firewall( 0 , Journal_Register( Error_Type, (Name)"PCDVC" ), "Something went horribly wrong in %s: Problem has an under resolved cell (Cell Id = %d), check or tune your population control parameters\n", __func__, lCell_I );
             }
             // init the data structures
             _DVCWeights_InitialiseStructs( &bchain, &pList, nump);
@@ -1106,7 +1106,7 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
         free(bchain);
         free(pList);
         if(nump < 3){
-            Journal_Firewall( 0 , Journal_Register(Error_Type, "PCDVC"), "Something went horribly wrong in %s: Problem has an under resolved cell (Cell Id = %d), check or tune your population control parameters\n", __func__, lCell_I );
+            Journal_Firewall( 0 , Journal_Register( Error_Type, (Name)"PCDVC" ), "Something went horribly wrong in %s: Problem has an under resolved cell (Cell Id = %d), check or tune your population control parameters\n", __func__, lCell_I );
         }
         // init the data structures
         _DVCWeights_InitialiseStructs( &bchain, &pList, nump);
@@ -1228,7 +1228,7 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 
     nump_orig = nump = cParticleCount = intSwarm->cellParticleCountTbl[lCell_I];
 
-    Journal_Firewall( nump , Journal_Register(Error_Type, "PCDVC"), "Error in %s: Problem has an under resolved cell (Cell Id = %d), add more particles to your model\n", __func__, lCell_I );
+    Journal_Firewall( nump , Journal_Register( Error_Type, (Name)"PCDVC" ), "Error in %s: Problem has an under resolved cell (Cell Id = %d), add more particles to your model\n", __func__, lCell_I );
 
     dx = (BBXMAX - BBXMIN)/numx;
     dy = (BBYMAX - BBYMIN)/numy;
@@ -1366,7 +1366,7 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
             free(pList);
             //printf("\e[33mnump is now %d splitCount = %d\n",nump,splitCount);printf("\e[0;37m");
             if(nump < 3){
-                Journal_Firewall( 0 , Journal_Register(Error_Type, "PCDVC"), "Something went horribly wrong in %s: Problem has an under resolved cell (Cell Id = %d), check or tune your population control parameters\n", __func__, lCell_I );
+                Journal_Firewall( 0 , Journal_Register( Error_Type, (Name)"PCDVC" ), "Something went horribly wrong in %s: Problem has an under resolved cell (Cell Id = %d), check or tune your population control parameters\n", __func__, lCell_I );
             }
             // init the data structures
             _DVCWeights_InitialiseStructs2D( &bchain, &pList, nump);		    	      
@@ -1521,7 +1521,7 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
         free(bchain);
         free(pList);
         if(nump < 3){
-            Journal_Firewall( 0 , Journal_Register(Error_Type, "PCDVC"), "Something went horribly wrong in %s: Problem has an under resolved cell (Cell Id = %d), check or tune your population control parameters\n", __func__, lCell_I );
+            Journal_Firewall( 0 , Journal_Register( Error_Type, (Name)"PCDVC" ), "Something went horribly wrong in %s: Problem has an under resolved cell (Cell Id = %d), check or tune your population control parameters\n", __func__, lCell_I );
         }
         particle = (IntegrationPoint**)malloc((nump)*sizeof(IntegrationPoint*));
         // init the data structures
@@ -1582,7 +1582,7 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
 void _PCDVC_Calculate( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ){
     Swarm* swarm = (Swarm*) _swarm;
     Dimension_Index dim = swarm->dim;
-    /* Stream*  stream = Journal_Register( Info_Type, swarm->type ); */
+    /* Stream*  stream = Journal_Register( Info_Type, (Name)swarm->type ); */
     PCDVC*             self            = (PCDVC*)  pcdvc;
     /* MaterialPointsSwarm* matSwarm =	(MaterialPointsSwarm*) self->materialPointsSwarm; */
     /* it might be nice to report the total deletions and splits as well as the final population here */
@@ -1590,7 +1590,7 @@ void _PCDVC_Calculate( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ){
        are being created and destroyed while maintaining some population that it has converged on */
 
 /*
-  if(lCell_I == 0){
+  if(lCell_I == 0 ){
   Journal_Printf( stream, "\nOn Proc %d: In func %s(): for swarm \"%s\" Population is %d\n", swarm->myRank, __func__, swarm->name, swarm->particleLocalCount );
   Journal_Printf( stream, "On Proc %d: In func %s(): for swarm \"%s\" Population is %d\n\n", matSwarm->myRank,__func__, matSwarm->name, matSwarm->particleLocalCount );
   }      

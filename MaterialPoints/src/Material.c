@@ -176,12 +176,12 @@ void _Material_AssignFromXML( void* material, Stg_ComponentFactory* cf, void* da
 	Materials_Register*	materials_Register;
 	PICelleratorContext*	context;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", PICelleratorContext, False, data );
-	if( !context ) 
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", PICelleratorContext, False, data );
+	if( !context  ) 
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", PICelleratorContext, True, data  );
 
 	materialDictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
-	shape =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Shape", Stg_Shape,  True, data  ) ;
+	shape =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Shape", Stg_Shape, True, data   ) ;
 	materials_Register = context->materials_Register;
 
 	_Material_Init( self, context, shape, materialDictionary, materials_Register );

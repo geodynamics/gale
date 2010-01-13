@@ -121,10 +121,10 @@ void compareAgainstReferenceSolution(PICelleratorContext* context, Stream* strea
 }
 
 void testElementIntegral_CircleInterface( PICelleratorContext* context, double* mean, double* standardDeviation ) {
-	Swarm*					integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "integrationSwarm" );
-	Swarm*					materialSwarm    = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialPoints" );
-	FeMesh*					mesh             = (FeMesh*) LiveComponentRegister_Get( context->CF->LCRegister, "linearMesh" );
-	WeightsCalculator*	weights          = (WeightsCalculator*) LiveComponentRegister_Get( context->CF->LCRegister, "weights" );
+	Swarm*					integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"integrationSwarm" );
+	Swarm*					materialSwarm    = (Swarm* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialPoints" );
+	FeMesh*					mesh             = (FeMesh* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"linearMesh" );
+	WeightsCalculator*	weights          = (WeightsCalculator* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"weights"  );
 	FeVariable*				feVariable;
 	Element_LocalIndex 	lElement_I       = 0;
 	double					analyticValue    = 0.0;
@@ -184,10 +184,10 @@ void testElementIntegral_CircleInterface( PICelleratorContext* context, double* 
 }
 
 void testElementIntegral_PolynomialFunction( PICelleratorContext* context, double* mean, double* standardDeviation ) {
-	Swarm*					integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "integrationSwarm" );
-	Swarm*					materialSwarm    = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialPoints" );
-	FeMesh*					mesh             = (FeMesh*) LiveComponentRegister_Get( context->CF->LCRegister, "linearMesh" );
-	WeightsCalculator*	weights          = (WeightsCalculator*) LiveComponentRegister_Get( context->CF->LCRegister, "weights" );
+	Swarm*					integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"integrationSwarm" );
+	Swarm*					materialSwarm    = (Swarm* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialPoints" );
+	FeMesh*					mesh             = (FeMesh* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"linearMesh" );
+	WeightsCalculator*	weights          = (WeightsCalculator* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"weights"  );
 	FeVariable*				feVariable;
 	Element_LocalIndex 	lElement_I       = 0;
 	double					analyticValue    = 0.0;
@@ -247,10 +247,10 @@ void testElementIntegral_PolynomialFunction( PICelleratorContext* context, doubl
 }
 
 void testElementIntegral_ExponentialInterface( PICelleratorContext* context, double* mean, double* standardDeviation ) {
-	Swarm*              integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "integrationSwarm" );
-	Swarm*              materialSwarm    = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialPoints" );
-	FeMesh* 	    mesh             = (FeMesh*) LiveComponentRegister_Get( context->CF->LCRegister, "linearMesh" );
-	WeightsCalculator*  weights          = (WeightsCalculator*) LiveComponentRegister_Get( context->CF->LCRegister, "weights" );
+	Swarm*              integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"integrationSwarm" );
+	Swarm*              materialSwarm    = (Swarm* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialPoints" );
+	FeMesh* 	    mesh             = (FeMesh* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"linearMesh" );
+	WeightsCalculator*  weights          = (WeightsCalculator* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"weights"  );
 	FeVariable*         feVariable;
 	Element_LocalIndex  lElement_I       = 0;
 	double              analyticValue    = 0.0;
@@ -313,7 +313,7 @@ void PCDVCSuite_Test( PCDVCSuiteData* data ) {
 	PICelleratorContext*	context;
 	Stg_ComponentFactory*	cf;
 	char			inputFile[PCU_PATH_MAX];
-	Stream*			stream           = Journal_Register( Info_Type, CURR_MODULE_NAME );
+	Stream*			stream           = Journal_Register( Info_Type, (Name)CURR_MODULE_NAME  );
 	double			mean;
 	double			standardDeviation;
 
