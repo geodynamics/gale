@@ -177,30 +177,30 @@ void _lucIsosurface_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf
 	/* Construct Parent */
 	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
-	isosurfaceField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IsosurfaceField", FieldVariable, True,  data );
-	colourMap       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap",       lucColourMap,  False, data );
-	colourField     = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourField",     FieldVariable, False, data );
-	maskField       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "MaskField",       FieldVariable, False, data );
+	isosurfaceField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"IsosurfaceField", FieldVariable, True, data  );
+	colourMap       = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ColourMap", lucColourMap, False, data  );
+	colourField     = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ColourField", FieldVariable, False, data  );
+	maskField       = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaskField", FieldVariable, False, data  );
 
-	defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolution", 64 );
-	resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionX", defaultResolution );
-	resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionY", defaultResolution );
-	resolution[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionZ", defaultResolution );
+	defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolution", 64  );
+	resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolutionX", defaultResolution  );
+	resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolutionY", defaultResolution  );
+	resolution[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolutionZ", defaultResolution  );
 
 	lucDrawingObjectMask_Construct( &mask, self->name, cf, data );
 
-	isovalue = Stg_ComponentFactory_GetDouble( cf, self->name, "isovalue", 0.0 );
+	isovalue = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"isovalue", 0.0  );
 	
 	_lucIsosurface_Init( 
 			self, 
 			isosurfaceField,
 			isovalue,
 			resolution,
-			Stg_ComponentFactory_GetBool( cf, self->name, "drawWalls", False ),
-			Stg_ComponentFactory_GetBool( cf, self->name, "wireframe", False ),
-			Stg_ComponentFactory_GetBool( cf, self->name, "cullFrontFace", False ),
-			Stg_ComponentFactory_GetBool( cf, self->name, "cullBackFace", False ),
-			Stg_ComponentFactory_GetString( cf, self->name, "colour", "White" ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"drawWalls", False  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"wireframe", False  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"cullFrontFace", False  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"cullBackFace", False  ),
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"colour", "White"  ),
 			colourMap,
 			colourField,
 			maskField,
@@ -243,7 +243,7 @@ void _lucIsosurface_Setup( void* drawingObject, void* _context ) {
 	}
 	
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
-	vertex = Memory_Alloc_3DArray( Vertex , nx, ny, nz , "Vertex array" );
+	vertex = Memory_Alloc_3DArray( Vertex , nx, ny, nz , (Name)"Vertex array" );
 
 	/* Sample Field in in regular grid */
 	for ( i = 0 ; i < nx ; i++ ) {
@@ -251,7 +251,7 @@ void _lucIsosurface_Setup( void* drawingObject, void* _context ) {
 			for ( k = 0 ; k < nz ; k++ ) {
 				pos[ I_AXIS ] = min[ I_AXIS ] + dx * (double) i;
 				pos[ J_AXIS ] = min[ J_AXIS ] + dy * (double) j;
-				pos[ K_AXIS ] = min[ K_AXIS ] + dz * (double) k;
+				pos[ K_AXIS ] = min[ K_AXIS ] + dz * (double ) k;
 
 				memcpy( vertex[i][j][k].pos, pos, 3 * sizeof(double) );
 

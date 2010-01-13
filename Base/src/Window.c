@@ -255,52 +255,36 @@ void _lucWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* dat
 	Bool                     continuousDefault;
 	Bool                     continuous;
 	
-	width = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "width", 400 );
-	height = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "height", 400 );
+	width = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"width", 400  );
+	height = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"height", 400  );
 
 	/* Get information about whether this window is interactive or not
 	 * All lucWindow objects will check in the root dictionary first to see if interactivity in general is turned on
 	 * Specific lucWindow objects can override this parameter in their own component structs */
-	interactiveDefault = Stg_ComponentFactory_GetRootDictBool( cf, "interactive", False );
-	interactive = Stg_ComponentFactory_GetBool( cf, self->name, "interactive", interactiveDefault );
+	interactiveDefault = Stg_ComponentFactory_GetRootDictBool( cf, (Dictionary_Entry_Key)"interactive", False  );
+	interactive = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"interactive", interactiveDefault  );
 
 	/* Get information about whether this window is in continuous mode or not */
-	continuousDefault = Stg_ComponentFactory_GetRootDictBool( cf, "continuous", False );
-	continuous = Stg_ComponentFactory_GetBool( cf, self->name, "continuous", continuousDefault );
+	continuousDefault = Stg_ComponentFactory_GetRootDictBool( cf, (Dictionary_Entry_Key)"continuous", False  );
+	continuous = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"continuous", continuousDefault  );
 
 	/* Grab information about what viewports are going to be plotting in this window */
 	viewportInfoList = lucWindow_ConstructViewportInfoList( self, cf, width, height, &viewportCount, data );
 
 	/* Grab a list of different output formats for this window to be dumped in */
-	outputFormatList = Stg_ComponentFactory_ConstructByList( 
-		cf, 
-		self->name, 
-		"OutputFormat", 
-		Stg_ComponentFactory_Unlimited, 
-		lucOutputFormat, 
-		False, 
-		&outputFormatCount, 
-		data );
+	outputFormatList = Stg_ComponentFactory_ConstructByList( cf, self->name, (Dictionary_Entry_Key)"OutputFormat", Stg_ComponentFactory_Unlimited, lucOutputFormat, False, &outputFormatCount, data  );
 			
 	/* Grab a list of interactions for the user to interact with this window */
-	windowInteractionList = Stg_ComponentFactory_ConstructByList( 
-		cf, 
-		self->name, 
-		"WindowInteraction", 
-		Stg_ComponentFactory_Unlimited, 
-		lucWindowInteraction, 
-		False, 
-		&windowInteractionCount,
-		data );
+	windowInteractionList = Stg_ComponentFactory_ConstructByList( cf, self->name, (Dictionary_Entry_Key)"WindowInteraction", Stg_ComponentFactory_Unlimited, lucWindowInteraction, False, &windowInteractionCount, data  );
 		
 	/* The window needs information about the context so that it can attach itself 
 	 * onto the AbstractContext_EP_DumpClass entry point. */
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context ) 
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !self->context  ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 
 
-	renderingEngine = Stg_ComponentFactory_ConstructByKey( cf, self->name, "RenderingEngine", lucRenderingEngine, True, data );
+	renderingEngine = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"RenderingEngine", lucRenderingEngine, True, data  );
 
 	_lucWindow_Init( 
 			self,
@@ -314,12 +298,12 @@ void _lucWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* dat
 			self->context,
 			width,
 			height,
-			Stg_ComponentFactory_GetString( cf, self->name, "backgroundColour", "white" ),
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"backgroundColour", "white"  ),
 			interactive,
 			continuous,
-			Stg_ComponentFactory_GetBool( cf, self->name, "isTimedOut", False ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "maxIdleTime", 600.0 ), 
-			Stg_ComponentFactory_GetBool( cf, self->name, "antialias", True )
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"isTimedOut", False  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxIdleTime", 600.0  ), 
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"antialias", True )
 			);
 		
 	/* Free Memory */
@@ -327,7 +311,7 @@ void _lucWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* dat
 	if ( windowInteractionList )
 		Memory_Free(windowInteractionList); 
 	if ( outputFormatList )
-		Memory_Free(outputFormatList); 
+		Memory_Free(outputFormatList ); 
 
 }
 
@@ -775,7 +759,7 @@ lucViewportInfo* lucWindow_ConstructViewportInfoList(
 
 	*viewportCount = 0;
 	
-	list = Dictionary_Get( dictionary, "Viewport" );
+	list = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"Viewport"  );
 	Journal_Firewall( list != NULL, lucError, "Cannot Find 'Viewport' for %s '%s'.\n", self->type, self->name );
 		
 	self->verticalCount = Dictionary_Entry_Value_GetCount( list );
@@ -810,12 +794,12 @@ lucViewportInfo* lucWindow_ConstructViewportInfoList(
 
 			/* Find viewport */
 			viewportName = StG_Strdup( charPtr );
-			currViewportInfo->viewport = Stg_ComponentFactory_ConstructByName( cf, viewportName, lucViewport, True, data ) ;
+			currViewportInfo->viewport = Stg_ComponentFactory_ConstructByName( cf, (Name)viewportName, lucViewport, True, data ) ;
 			Memory_Free( viewportName );
 
 			/* Setup viewport dimensions */
 			currViewportInfo->startx = horizontal_I * viewportWidth;
-			currViewportInfo->starty = (self->verticalCount - 1 - vertical_I) * viewportHeight;
+			currViewportInfo->starty = (self->verticalCount - 1 - vertical_I ) * viewportHeight;
 			currViewportInfo->width  = viewportWidth;
 			currViewportInfo->height = viewportHeight;
 

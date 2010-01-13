@@ -53,15 +53,15 @@
 Bool lucRenderingEngines_Init() {
 	Stg_ComponentRegister* componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
 
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
-	Stg_ComponentRegister_Add( componentRegister, lucRenderingEngineGL_Type,     "0", _lucRenderingEngineGL_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, lucRenderingEngineGL_Type, (Name)"0", _lucRenderingEngineGL_DefaultNew  );
 
 	/* Register Parents for type checking */
 	RegisterParent( lucRenderingEngineGL_Type,         lucRenderingEngine_Type );
 
   #ifdef HAVE_VTK
-	Stg_ComponentRegister_Add( componentRegister, lucRenderingEngineVTK_Type,     "0", _lucRenderingEngineVTK_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, lucRenderingEngineVTK_Type, (Name)"0", _lucRenderingEngineVTK_DefaultNew  );
 
 	/* Register Parents for type checking */
 	RegisterParent( lucRenderingEngineVTK_Type,         lucRenderingEngine_Type );

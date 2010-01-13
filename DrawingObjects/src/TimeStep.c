@@ -175,9 +175,9 @@ void _lucTimeStep_AssignFromXML( void* timeStep, Stg_ComponentFactory* cf, void*
 	Bool frame;
 	Bool currentTime;
 	
-	colourName  = Stg_ComponentFactory_GetString( cf, self->name, "colour", "Black") ;
-	frame  = Stg_ComponentFactory_GetBool( cf, self->name, "frame", True) ;
-	currentTime = Stg_ComponentFactory_GetBool( cf, self->name, "time", False) ;
+	colourName  = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"colour", "Black" ) ;
+	frame  = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"frame", True ) ;
+	currentTime = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"time", False ) ;
 
 	lucColour_FromString( &self->colour, colourName );
 	

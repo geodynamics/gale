@@ -57,19 +57,19 @@ lucInputFormat_Register* lucInputFormat_Register_Singleton = NULL;
 Bool lucBase_Init() {
 	Stg_ComponentRegister* componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
 
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
 	/* Set up streams */
-	lucInfo  = Journal_Register( InfoStream_Type, "lucInfo" );
-	lucDebug = Journal_Register( DebugStream_Type, "lucDebug" );
-	lucError = Journal_Register( ErrorStream_Type, "lucError" );	
-	lucInputFormat_Register_Singleton = lucInputFormat_Register_New();
+	lucInfo  = Journal_Register( InfoStream_Type, (Name)"lucInfo"  );
+	lucDebug = Journal_Register( DebugStream_Type, (Name)"lucDebug"  );
+	lucError = Journal_Register( ErrorStream_Type, (Name)"lucError" );	
+	lucInputFormat_Register_Singleton = lucInputFormat_Register_New( );
 	
-	Stg_ComponentRegister_Add( componentRegister, lucCamera_Type,     "0", _lucCamera_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucColourMap_Type,  "0", _lucColourMap_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucViewport_Type,   "0", _lucViewport_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucWindow_Type,     "0", _lucWindow_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucLight_Type,     "0", _lucLight_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, lucCamera_Type, (Name)"0", _lucCamera_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucColourMap_Type, (Name)"0", _lucColourMap_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucViewport_Type, (Name)"0", _lucViewport_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucWindow_Type, (Name)"0", _lucWindow_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucLight_Type, (Name)"0", _lucLight_DefaultNew  );
 
 	/* Register Parents for type checking */
 	RegisterParent( lucCamera_Type,            Stg_Component_Type );

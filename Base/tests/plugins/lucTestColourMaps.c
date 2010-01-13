@@ -52,7 +52,7 @@ void lucTestColourMaps_Function( AbstractContext* context ) {
 	Index            component_I;
 	Stg_ObjectList*  componentList = context->CF->LCRegister->componentList;
 	Stg_Component*   component;
-	Stream*          stream = Journal_Register( Info_Type, CURR_MODULE_NAME );
+	Stream*          stream = Journal_Register( Info_Type, (Name)CURR_MODULE_NAME  );
 
 	Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, "colourMap.txt" );
 
@@ -72,7 +72,7 @@ typedef struct {
 
 void _lucTestColourMaps_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	AbstractContext* context;
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  ); 
 	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, lucTestColourMaps_Function );
 }
 
@@ -89,7 +89,7 @@ void* _lucTestColourMaps_DefaultNew( Name name ) {
 }
 
 Index lucTestColourMaps_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, lucTestColourMaps_Type, "0", _lucTestColourMaps_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, lucTestColourMaps_Type, (Name)"0", _lucTestColourMaps_DefaultNew  );
 }
 
 

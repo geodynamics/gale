@@ -147,13 +147,13 @@ void _lucFieldVariableBorder_AssignFromXML( void* drawingObject, Stg_ComponentFa
 	/* Construct Parent */
 	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
-	fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "FieldVariable", FieldVariable, True, data );
+	fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"FieldVariable", FieldVariable, True, data  );
 	
 	_lucFieldVariableBorder_Init( 
 			self, 
 			fieldVariable, 
-			Stg_ComponentFactory_GetString( cf, self->name, "colour", "Black" ),
-			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 0.5 ) );
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"colour", "Black"  ),
+			(float) Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"lineWidth", 0.5 )  );
 
 }
 

@@ -50,13 +50,13 @@
 
 
 void lucTestCalculate( AbstractContext* context, lucWindow* window, lucViewport* viewport, lucPlottingObject* object ) {
-	Stream* stream = Journal_Register( Info_Type, CURR_MODULE_NAME );
+	Stream* stream = Journal_Register( Info_Type, (Name)CURR_MODULE_NAME  );
 
 	Journal_Printf( stream, "In func '%s' for object %s\n", __func__, object->name );
 }
 
 void lucTestDraw( AbstractContext* context, lucWindow* window, lucViewport* viewport, lucPlottingObject* object ) {
-	Stream* stream = Journal_Register( Info_Type, CURR_MODULE_NAME );
+	Stream* stream = Journal_Register( Info_Type, (Name)CURR_MODULE_NAME  );
 
 	Journal_Printf( stream, "In func '%s' for object %s\n", __func__, object->name );
 }
@@ -65,7 +65,7 @@ void lucTestPlottingObjects( AbstractContext* context ) {
 	lucBaseContextExtension* contextExt = ExtensionManager_Get( context->extensionMgr, context, lucBaseContextExtensionHandle );
 	lucPlottingObject*            plottingObject;
 	PlottingObject_Index          plottingObject_I;
-	Stream*                       stream = Journal_Register( Info_Type, CURR_MODULE_NAME );
+	Stream*                       stream = Journal_Register( Info_Type, (Name)CURR_MODULE_NAME  );
 
 	Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, "plottingObject.txt" );
 	lucPlottingObject_Register_PrintAllObjects( contextExt->plottingObject_Register, stream );

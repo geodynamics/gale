@@ -225,34 +225,34 @@ void _lucCamera_AssignFromXML( void* camera, Stg_ComponentFactory* cf, void* dat
 	lucStereoType          stereoType;
 	Name                   stereoTypeName;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context ) 
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !self->context  ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 	
   #define DTOR 0.0174532925
-	focalPoint[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "focalPointX", 0.0 );
-	focalPoint[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "focalPointY", 0.0 );
-	focalPoint[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "focalPointZ", 0.0 );
+	focalPoint[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"focalPointX", 0.0  );
+	focalPoint[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"focalPointY", 0.0  );
+	focalPoint[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"focalPointZ", 0.0  );
 
-	rotationCentre[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "rotationCentreX", 0.0 );
-	rotationCentre[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "rotationCentreY", 0.0 );
-	rotationCentre[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "rotationCentreZ", 0.0 );
+	rotationCentre[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"rotationCentreX", 0.0  );
+	rotationCentre[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"rotationCentreY", 0.0  );
+	rotationCentre[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"rotationCentreZ", 0.0  );
 
-	upDirection[I_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, "upDirectionX", 0.0 );
-	upDirection[J_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, "upDirectionY", 1.0 );
-	upDirection[K_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, "upDirectionZ", 0.0 );
+	upDirection[I_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"upDirectionX", 0.0  );
+	upDirection[J_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"upDirectionY", 1.0  );
+	upDirection[K_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"upDirectionZ", 0.0  );
 	
-	coord[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "coordX", 0.0 );
-	coord[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "coordY", 0.0 );
-	coord[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "coordZ", 1.0 );
+	coord[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"coordX", 0.0  );
+	coord[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"coordY", 0.0  );
+	coord[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"coordZ", 1.0  );
 
 	StGermain_VectorSubtraction( vectorFocusToCamera, coord, focalPoint, 3 );
    defaultFocalLength = StGermain_VectorMagnitude(vectorFocusToCamera, 3);
-	focalLength = Stg_ComponentFactory_GetDouble( cf, self->name, "focalLength", defaultFocalLength );
-	aperture = Stg_ComponentFactory_GetDouble( cf, self->name, "aperture", 45.0 );
+	focalLength = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"focalLength", defaultFocalLength  );
+	aperture = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"aperture", 45.0  );
 
 	/* Get Stereo Type */
-	stereoTypeName = Stg_ComponentFactory_GetString( cf, self->name, "stereoType", "lucMono" );
+	stereoTypeName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"stereoType", "lucMono"  );
 	if ( strcasecmp( stereoTypeName, "ToeIn" ) == 0 ) 
 		stereoType = lucStereoToeIn;
 	else if ( strcasecmp( stereoTypeName, "Asymmetric" ) == 0 ) 
@@ -260,9 +260,9 @@ void _lucCamera_AssignFromXML( void* camera, Stg_ComponentFactory* cf, void* dat
 	else 
 		stereoType = lucMono;
 
-	eyeSeparation  = Stg_ComponentFactory_GetDouble( cf, self->name, "eyeSeparation", focalLength / 30.0 );
+	eyeSeparation  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"eyeSeparation", focalLength / 30.0  );
 
-	centreFieldVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, "CentreFieldVariable", FieldVariable,False,data);
+	centreFieldVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"CentreFieldVariable", FieldVariable, False, data );
 
 	_lucCamera_Init( self, coord, focalPoint, rotationCentre, upDirection, focalLength, aperture, eyeSeparation, stereoType, centreFieldVariable );
 }

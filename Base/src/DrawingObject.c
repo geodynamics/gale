@@ -127,11 +127,11 @@ void* _lucDrawingObject_Copy( void* drawingObject, void* dest, Bool deep, Name n
 void _lucDrawingObject_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ) {
 	lucDrawingObject*        self            = (lucDrawingObject*) drawingObject ;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context ) 
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !self->context  ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data );
 	
-	_lucDrawingObject_Init( self );
+	_lucDrawingObject_Init( self  );
 }
 
 void _lucDrawingObject_Build( void* camera, void* data ) { }
@@ -203,10 +203,10 @@ void lucDrawingObject_CleanUp( void* drawingObject, void* context ) {
 void lucDrawingObjectMask_Construct( lucDrawingObjectMask* self, Name drawingObjectName, Stg_ComponentFactory* cf, void* mask ) {
 	Name                   maskTypeName;
 
-	self->value     = Stg_ComponentFactory_GetDouble( cf, drawingObjectName, "maskValue", 0.0 );
-	self->tolerance = Stg_ComponentFactory_GetDouble( cf, drawingObjectName, "maskTolerance", 0.001 );
+	self->value     = Stg_ComponentFactory_GetDouble( cf, drawingObjectName, (Dictionary_Entry_Key)"maskValue", 0.0  );
+	self->tolerance = Stg_ComponentFactory_GetDouble( cf, drawingObjectName, (Dictionary_Entry_Key)"maskTolerance", 0.001  );
 
-	maskTypeName = Stg_ComponentFactory_GetString( cf, drawingObjectName, "maskType", "GreaterThan" );
+	maskTypeName = Stg_ComponentFactory_GetString( cf, drawingObjectName, (Dictionary_Entry_Key)"maskType", "GreaterThan"  );
 	if ( strcasecmp( maskTypeName, "GreaterThan" ) == 0 ) 
 		self->type = GreaterThan;
 	else if ( strcasecmp( maskTypeName, "LesserThan" ) == 0 || strcasecmp( maskTypeName, "LessThan" ) == 0 )

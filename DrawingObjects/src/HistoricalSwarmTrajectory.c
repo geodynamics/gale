@@ -90,10 +90,7 @@ void _lucHistoricalSwarmTrajectory_Init(
 	self->historySteps	  = historySteps;
 	self->historyTime	  = historyTime;
 
-	self->particleExtHandle = ExtensionManager_Add( 	
-					swarm->particleExtensionMgr, 
-					self->type, 
-					sizeof( lucHistoricalSwarmTrajectory_ParticleExt ) + ( historySteps+3 )*sizeof( Coord ) );
+	self->particleExtHandle = ExtensionManager_Add( swarm->particleExtensionMgr, (Name)self->type, sizeof( lucHistoricalSwarmTrajectory_ParticleExt ) + ( historySteps+3 )*sizeof( Coord )  );
 	
 	lucColour_FromString( &self->colour, colourName );
 
@@ -159,11 +156,11 @@ void _lucHistoricalSwarmTrajectory_AssignFromXML( void* drawingObject, Stg_Compo
 	/* Construct Parent */
 	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
-	swarm         =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",     Swarm,        True,  data );
-	colourMap     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap", lucColourMap, False, data );
+	swarm         =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", Swarm, True, data  );
+	colourMap     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ColourMap", lucColourMap, False, data  );
 
-	historySteps  =  Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "historySteps", DEFAULT_STEPS );
-	historyTime   =  Stg_ComponentFactory_GetDouble     ( cf, self->name, "historyTime",  0 );
+	historySteps  =  Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"historySteps", DEFAULT_STEPS  );
+	historyTime   =  Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"historyTime", 0  );
 
 	Journal_Firewall(
 			swarm->particleLayout->coordSystem == GlobalCoordSystem,
@@ -178,8 +175,8 @@ void _lucHistoricalSwarmTrajectory_AssignFromXML( void* drawingObject, Stg_Compo
 			self, 
 			swarm,
 			colourMap,
-			Stg_ComponentFactory_GetString( cf, self->name, "colour", "black" ),
-			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 1.0 ),
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"colour", "black"  ),
+			(float) Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"lineWidth", 1.0  ),
 			historySteps,
 			historyTime );
 }

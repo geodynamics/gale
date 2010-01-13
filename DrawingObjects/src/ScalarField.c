@@ -128,7 +128,7 @@ void _lucScalarField_AssignFromXML( void* drawingObject, Stg_ComponentFactory* c
 	/* Construct Parent */
 	_lucScalarFieldCrossSection_AssignFromXML( self, cf, data );
 
-	_lucScalarField_Init(self, Stg_ComponentFactory_GetBool( cf, self->name, "useMesh", False ));
+	_lucScalarField_Init(self, Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"useMesh", False ) );
 }
 
 void _lucScalarField_BuildDisplayList( void* drawingObject, void* _context ) {

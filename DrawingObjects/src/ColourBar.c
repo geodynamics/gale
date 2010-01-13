@@ -169,19 +169,19 @@ void _lucColourBar_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf,
 	/* Construct Parent */
 	_lucDrawingObject_AssignFromXML( self, cf, data );
 
-	colourMap     =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "ColourMap", lucColourMap, True, data ) ;
+	colourMap     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ColourMap", lucColourMap, True, data  ) ;
 
     /* Default to 0 tick marks for linear, 1 for fixed centre, 2 for logarithmic scale */
     defaultTicks = 0;
     if (colourMap->centreOnFixedValue) defaultTicks = 1;
     if (colourMap->logScale) defaultTicks = 2;
-	ticks = Stg_ComponentFactory_GetUnsignedInt(cf, self->name, "ticks", defaultTicks );
+	ticks = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"ticks", defaultTicks );
     if (ticks > 9) ticks = 9;
 
     /* Load any provided intermediate tick values (tick1-9) */
-    for (i = 1; i < ticks+1; i++) {
+    for (i = 1; i < ticks+1; i++ ) {
         sprintf(tickLabel, "tick%d", i);
-		tickValues[i] = Stg_ComponentFactory_GetDouble( cf, self->name, tickLabel, colourMap->maximum + 1);
+		tickValues[i] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)tickLabel, colourMap->maximum + 1 );
 	}
     tickValues[0] = colourMap->minimum;
     tickValues[ticks+1] = colourMap->maximum;
@@ -189,15 +189,15 @@ void _lucColourBar_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf,
 	_lucColourBar_Init( 
 			self, 
 			colourMap,
-			Stg_ComponentFactory_GetDouble( cf, self->name, "lengthFactor", 0.8 ),
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "height",  10 ),
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "margin",  16 ),
-			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "borderWidth", 1 ) ,
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "precision", 2 ) ,
-			Stg_ComponentFactory_GetBool(cf, self->name, "scientific", False ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"lengthFactor", 0.8  ),
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"height", 10  ),
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"margin", 16  ),
+			(float) Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"borderWidth", 1  ) ,
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"precision", 2  ) ,
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"scientific", False  ),
    			ticks,
-			Stg_ComponentFactory_GetBool(cf, self->name, "printTickValue", True ),
-			(float) Stg_ComponentFactory_GetDouble(cf, self->name, "scaleValue", 1.0 ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"printTickValue", True  ),
+			(float) Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"scaleValue", 1.0  ),
             tickValues
 			);
 }

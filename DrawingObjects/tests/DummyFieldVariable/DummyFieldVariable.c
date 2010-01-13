@@ -115,8 +115,8 @@ void DummyFieldVariable_GetMinAndMaxGlobalCoords( void* fieldVariable, Coord min
 void _DummyFieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) {
 	FieldVariable* self = (FieldVariable*) fieldVariable;
 
-	self->fieldComponentCount = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "fieldComponentCount", 1 );
-	self->dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
+	self->fieldComponentCount = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"fieldComponentCount", 1  );
+	self->dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0 );
 	self->communicator = MPI_COMM_WORLD;
 }
 
@@ -143,9 +143,9 @@ void* _DummyFieldVariable_DefaultNew( Name name ) {
 	return _FieldVariable_New(  FIELDVARIABLE_PASSARGS  );
 }
 
-Index DummyFieldVariable_Register( PluginsManager* pluginsManager ) {
+Index DummyFieldVariable_Register( PluginsManager* pluginsManager  ) {
 	RegisterParent( DummyFieldVariable_Type, FieldVariable_Type );
-	return PluginsManager_Submit( pluginsManager, DummyFieldVariable_Type, "0", _DummyFieldVariable_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, DummyFieldVariable_Type, (Name)"0", _DummyFieldVariable_DefaultNew  );
 }
 
 

@@ -165,7 +165,7 @@ void _lucSwarmViewerBase_AssignFromXML( void* drawingObject, Stg_ComponentFactor
 	/* Construct Parent */
 	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
-	swarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", Swarm, True, data ) ;
+	swarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", Swarm, True, data  ) ;
 	
 	/* This drawing object will only work for swarms with Global Particle Layouts 
 	 *  HACK - Adding in check for Gauss particle Layout here because this can be global too */
@@ -178,25 +178,25 @@ void _lucSwarmViewerBase_AssignFromXML( void* drawingObject, Stg_ComponentFactor
 		swarm->particleLayout->name,
 		swarm->particleLayout->type );
 
-	colourVariableName  = Stg_ComponentFactory_GetString( cf, self->name, "ColourVariable", "" );
-	colourMap           =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap", lucColourMap, False, data );
-	opacityVariableName = Stg_ComponentFactory_GetString( cf, self->name, "OpacityVariable", "" );
-	maskVariableName = Stg_ComponentFactory_GetString( cf, self->name, "MaskVariable", "" );
+	colourVariableName  = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"ColourVariable", ""  );
+	colourMap           =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ColourMap", lucColourMap, False, data  );
+	opacityVariableName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"OpacityVariable", ""  );
+	maskVariableName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"MaskVariable", ""  );
 	
-	drawParticleNumber = Stg_ComponentFactory_GetBool( cf, self->name, "drawParticleNumber", False );
-	sameParticleColour = Stg_ComponentFactory_GetBool( cf, self->name, "sameParticleColour", False );
+	drawParticleNumber = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"drawParticleNumber", False  );
+	sameParticleColour = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"sameParticleColour", False  );
 
-	subSetEvery = Stg_ComponentFactory_GetInt( cf, self->name, "subSetEvery", 1 );
-	positionRange = Stg_ComponentFactory_GetBool( cf, self->name, "positionRange", False );
+	subSetEvery = Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"subSetEvery", 1  );
+	positionRange = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"positionRange", False  );
 
 	/* Memory allocation */
-       	minPosition[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "minPositionX", -100000.0 );
-	minPosition[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "minPositionY", -100000.0 );
-	minPosition[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "minPositionZ", -100000.0 );
+       	minPosition[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minPositionX", -100000.0  );
+	minPosition[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minPositionY", -100000.0  );
+	minPosition[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minPositionZ", -100000.0  );
 
-	maxPosition[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "maxPositionX", 100000.0 );
-	maxPosition[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "maxPositionY", 100000.0 );
-	maxPosition[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "maxPositionZ", 100000.0 );
+	maxPosition[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxPositionX", 100000.0  );
+	maxPosition[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxPositionY", 100000.0  );
+	maxPosition[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxPositionZ", 100000.0  );
 
 
 	lucDrawingObjectMask_Construct( &mask, self->name, cf, data );
@@ -204,7 +204,7 @@ void _lucSwarmViewerBase_AssignFromXML( void* drawingObject, Stg_ComponentFactor
 	_lucSwarmViewerBase_Init( 
 		self, 
 		swarm,
-		Stg_ComponentFactory_GetString( cf, self->name, "colour", "black" ),
+		Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"colour", "black"  ),
 		colourVariableName,
 		colourMap,
 		opacityVariableName,
@@ -227,7 +227,7 @@ void _lucSwarmViewerBase_Build( void* drawingObject, void* data ) {
 void _lucSwarmViewerBase_Initialise( void* drawingObject, void* data ) {
 	lucSwarmViewerBase*          self                   = (lucSwarmViewerBase*)drawingObject;
 	SwarmVariable_Register*  swarmVariable_Register = self->swarm->swarmVariable_Register;
-	Stream*                  errorStream               = Journal_Register( Error_Type, self->type );
+	Stream*                  errorStream               = Journal_Register( Error_Type, (Name)self->type  );
 	
 	/* Initialise Parent */
 	_lucOpenGLDrawingObject_Initialise( self, data );

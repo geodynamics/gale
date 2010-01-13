@@ -170,11 +170,11 @@ void* _lucWindowInteraction_DefaultNew( Name name ) {
 void _lucWindowInteraction_AssignFromXML( void* windowInteractor, Stg_ComponentFactory* cf, void* data ) {
 	lucWindowInteraction*          self        = windowInteractor;
 	
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context ) 
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !self->context  ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data );
 	
-	_lucWindowInteraction_Init( self );
+	_lucWindowInteraction_Init( self  );
 }
 
 void _lucWindowInteraction_Build( void* windowInteractor, void* data ) { }

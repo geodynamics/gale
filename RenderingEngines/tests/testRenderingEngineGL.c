@@ -115,7 +115,7 @@ int main( int argc, char* argv[] ) {
 		Context_PrintConcise( context, context->verbose );
 
 	/* Redirect OpenGL stream */
-	dummyOpenGLStream = Journal_Register( Info_Type, "DummyOpenGL" );
+	dummyOpenGLStream = Journal_Register( Info_Type, (Name)"DummyOpenGL"  );
 	Stream_RedirectFile_WithPrependedPath( dummyOpenGLStream, context->outputPath, "OpenGL.txt" );
 
 	/* Building phase ---------------------------------------------------------------------------------------------------*/

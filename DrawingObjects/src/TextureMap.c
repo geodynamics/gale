@@ -198,20 +198,20 @@ void _lucTextureMap_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf
 
 	_lucTextureMap_Init( 
 			self, 
-			Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "rank", (unsigned)-1 ) == MASTER,
-			Stg_ComponentFactory_GetString( cf, self->name, "image",        "" ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "bottomLeftX",  0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "bottomLeftY",  0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "bottomLeftZ",  0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "bottomRightX", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "bottomRightY", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "bottomRightZ", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "topRightX",    0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "topRightY",    0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "topRightZ",    0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "topLeftX",     0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "topLeftY",     0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "topLeftZ",     0.0 ) );
+			Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"rank", (unsigned)-1  ) == MASTER,
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"image", ""  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"bottomLeftX", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"bottomLeftY", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"bottomLeftZ", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"bottomRightX", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"bottomRightY", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"bottomRightZ", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"topRightX", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"topRightY", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"topRightZ", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"topLeftX", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"topLeftY", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"topLeftZ", 0.0 )  );
 }
 
 void _lucTextureMap_Build( void* drawingObject, void* data ) {}

@@ -109,10 +109,9 @@ void lucPlugin_VisualOnlyRun( Context* _context ) {
 
 	context->timeStep++;
 	context->restartTimestep++;
-	Dictionary_Set( context->dictionary, "restartTimestep",
-		Dictionary_Entry_Value_FromUnsignedInt( context->restartTimestep ) );
+	Dictionary_Set( context->dictionary, (Dictionary_Entry_Key)"restartTimestep", Dictionary_Entry_Value_FromUnsignedInt( context->restartTimestep ) );
 
-	while (1) {
+	while (1 ) {
 		/* If this checkpoint actually exists for this timestep, load it & possibly vis. it */
 		if ( True == AbstractContext_CheckPointExists( context, context->timeStep ) ) {
 			/* Note : always load timeInfo (currentTime) from file as we aren't solving anything,
@@ -204,7 +203,7 @@ void _lucPlugin_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* 
 
 	AbstractContext* context;
 
-	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, "Context" ), AbstractContext, True, data );
+	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, (Dictionary_Entry_Key)"Context"  ), AbstractContext, True, data );
 	self->context = context;
 	//glucifer_Init();
 
@@ -236,14 +235,14 @@ void _lucPlugin_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* 
 	   results.
 	   TODO: assumes the gLucifer plugin is loaded last to a certain extent.
 	   TODO: may want an option to only reload certain feVariables needed by visualisation */
-	if ( True == Dictionary_GetBool_WithDefault( context->dictionary, "visualOnlyOneTimestep", False ) ) {
-		Stream* errorStream = Journal_Register( Error_Type, LucPlugin_Type );
+	if ( True == Dictionary_GetBool_WithDefault( context->dictionary, (Dictionary_Entry_Key)"visualOnlyOneTimestep", False )  ) {
+		Stream* errorStream = Journal_Register( Error_Type, (Name)LucPlugin_Type  );
 		Journal_Firewall( context->loadFromCheckPoint == True, errorStream,
 			"Error - in %s(): can only use gLucifer visualOnlyOneTimestep option if "
 			"loadFromCheckPoint mode enabled.\n", __func__ );
 		ContextEP_Purge( context, AbstractContext_EP_Execute );
 	}	
-	if ( True == Dictionary_GetBool_WithDefault( context->dictionary, "visualOnly", False ) ) {
+	if ( True == Dictionary_GetBool_WithDefault( context->dictionary, (Dictionary_Entry_Key)"visualOnly", False )  ) {
 		ContextEP_ReplaceAll( context, AbstractContext_EP_Execute, lucPlugin_VisualOnlyRun );
 		
 	}	
@@ -275,8 +274,7 @@ Index lucPlugin_Register( PluginsManager* pluginsManager ) {
 	Index result;
 
 	glucifer_Init();
-	result = PluginsManager_Submit( pluginsManager, LucPlugin_Type, "0",
-		_lucPlugin_DefaultNew );
+	result = PluginsManager_Submit( pluginsManager, LucPlugin_Type, (Name)"0", _lucPlugin_DefaultNew  );
 
 	return result;
 }

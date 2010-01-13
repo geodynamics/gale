@@ -178,21 +178,21 @@ void _lucAxis_AssignFromXML( void* axis, Stg_ComponentFactory* cf, void* data ) 
          /* Construct Parent */
 	_lucDrawingObject_AssignFromXML( self, cf, data );
 
-	colourNameX  = Stg_ComponentFactory_GetString( cf, self->name, "colourX", "Red") ;
-	colourNameY  = Stg_ComponentFactory_GetString( cf, self->name, "colourY", "Green") ;
-	colourNameZ  = Stg_ComponentFactory_GetString( cf, self->name, "colourZ", "Blue") ;
+	colourNameX  = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"colourX", "Red" ) ;
+	colourNameY  = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"colourY", "Green" ) ;
+	colourNameZ  = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"colourZ", "Blue" ) ;
 	
 	lucColour_FromString( &self->colourX, colourNameX );	
 	lucColour_FromString( &self->colourY, colourNameY );
 	lucColour_FromString( &self->colourZ, colourNameZ );
 	
-	origin[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "originX", 20.0 );
-	origin[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "originY", 20.0 );
-	origin[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, "originZ", 0.25 );
+	origin[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"originX", 20.0  );
+	origin[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"originY", 20.0  );
+	origin[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"originZ", 0.25  );
 	
    _lucAxis_Init( self, 
 	               origin,
-			         Stg_ComponentFactory_GetDouble( cf, self->name, "length", 0.2 ),
+			         Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"length", 0.2  ),
          		   self->colourX,
 			         self->colourY,
          			self->colourZ);

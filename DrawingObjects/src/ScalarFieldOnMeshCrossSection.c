@@ -144,17 +144,17 @@ void _lucScalarFieldOnMeshCrossSection_AssignFromXML( void* drawingObject, Stg_C
 	/* Construct Parent */
 	_lucCrossSection_AssignFromXML( self, cf, data );
 
-	colourMap = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap", lucColourMap, True, data );
+	colourMap = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ColourMap", lucColourMap, True, data  );
 
 	/* Get Values with which to crop the cross section */
-	minCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "minCropX", -HUGE_VAL );
-	minCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "minCropY", -HUGE_VAL );
-	minCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "minCropZ", -HUGE_VAL );
-	maxCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropX", +HUGE_VAL );
-	maxCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropY", +HUGE_VAL );
-	maxCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropZ", +HUGE_VAL );
-	wireFrame = Stg_ComponentFactory_GetBool( cf, self->name, "wireFrame", False);
-   cullFace = Stg_ComponentFactory_GetBool( cf, self->name, "cullFace", True );
+	minCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minCropX", -HUGE_VAL  );
+	minCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minCropY", -HUGE_VAL  );
+	minCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minCropZ", -HUGE_VAL  );
+	maxCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxCropX", +HUGE_VAL  );
+	maxCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxCropY", +HUGE_VAL  );
+	maxCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxCropZ", +HUGE_VAL  );
+	wireFrame = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"wireFrame", False );
+   cullFace = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"cullFace", True  );
 	
 	_lucScalarFieldOnMeshCrossSection_Init( 
 			self, 
@@ -169,7 +169,7 @@ void _lucScalarFieldOnMeshCrossSection_Build( void* drawingObject, void* data ) 
 	lucScalarFieldOnMeshCrossSection*     self    = (lucScalarFieldOnMeshCrossSection*)drawingObject;
 	FeVariable*                     feVariable;
 	Mesh*                           mesh;
-	Stream*                         errorStream = Journal_Register( Error_Type, self->type );
+	Stream*                         errorStream = Journal_Register( Error_Type, (Name)self->type  );
 	
    /* Build field variable in parent */
    _lucCrossSection_Build(self, data);
@@ -184,10 +184,10 @@ void _lucScalarFieldOnMeshCrossSection_Build( void* drawingObject, void* data ) 
 	mesh = (Mesh*)feVariable->feMesh;
 
 	/* Store the Vertex Grid */
-	self->vertexGridHandle = ExtensionManager_GetHandle( mesh->info, "vertexGrid" );
+	self->vertexGridHandle = ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" );
 	if ( self->vertexGridHandle == (ExtensionInfo_Index)-1 )
 
-	Journal_Firewall( self->vertexGridHandle != (ExtensionInfo_Index)-1, errorStream,
+	Journal_Firewall( self->vertexGridHandle != (ExtensionInfo_Index )-1, errorStream,
 		"Error - in %s(): provided FieldVariable \"%s\" doesn't have a Vertex Grid.\n"
 		"Try visualising with lucScalarField instead.\n", __func__, self->fieldVariable->name );
 		

@@ -147,19 +147,19 @@ void _lucVectorArrowCrossSection_AssignFromXML( void* drawingObject, Stg_Compone
 	_lucCrossSection_AssignFromXML( self, cf, data );
    strcpy(self->fieldVariableName, "VectorVariable");
 
-	defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolution", 8 );
-	resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionX", defaultResolution );
-	resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionY", defaultResolution );
-	resolution[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionZ", defaultResolution );
+	defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolution", 8  );
+	resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolutionX", defaultResolution  );
+	resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolutionY", defaultResolution  );
+	resolution[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolutionZ", defaultResolution  );
 			
 	_lucVectorArrowCrossSection_Init( 
 			self, 
 			resolution,
-			Stg_ComponentFactory_GetDouble( cf, self->name, "arrowHeadSize", 0.3 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "maximum", 1.0 ),
-			Stg_ComponentFactory_GetBool( cf, self->name, "dynamicRange", True ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "lengthScale", 0.3 ),
-			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 1.0 ));
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"arrowHeadSize", 0.3  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maximum", 1.0  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"dynamicRange", True  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"lengthScale", 0.3  ),
+			(float) Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"lineWidth", 1.0 ) );
 }
 
 void _lucVectorArrowCrossSection_Build( void* drawingObject, void* data ) {
@@ -189,7 +189,7 @@ void _lucVectorArrowCrossSection_DrawCrossSection( void* drawingObject, Dimensio
 	Coord             localMax;
 	double            dA, dB;
 	double            scaleValue;
-	Stream*           errorStream = Journal_Register( Error_Type, self->type );
+	Stream*           errorStream = Journal_Register( Error_Type, (Name)self->type  );
 	
 	Journal_DPrintf( self->debugStream, "In %s():\n", __func__ );
 	Stream_Indent( self->debugStream );

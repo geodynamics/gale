@@ -248,19 +248,19 @@ void _lucEncoderLibavcodec_AssignFromXML( void* outputFormat, Stg_ComponentFacto
    self->transparent = False; /* Not supported */
    
 
-	window =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Window", lucWindow,  True, data  ) ;
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ) ;
+	window =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Window", lucWindow, True, data   ) ;
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  ) ;
         
 	_lucEncoderLibavcodec_Init( 
 			self,
 			window,
 			context->outputPath,
 			context->loadFromCheckPoint,
-			Stg_ComponentFactory_GetString( cf, self->name, "codec", "mpeg1video" ),
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "frameRate", 25 ),
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "bitRate", 400000),
-			Stg_ComponentFactory_GetBool( cf, self->name, "includeFrame0", False)
-			);
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"codec", "mpeg1video"  ),
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"frameRate", 25  ),
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"bitRate", 400000 ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"includeFrame0", False)
+			 );
 }
 
 void _lucEncoderLibavcodec_Build( void* outputFormat, void* data ) {}

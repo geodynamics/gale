@@ -138,7 +138,7 @@ void _lucCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* 
 	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
    /* Read the cross section string specification */
-   crossSectionStr = Stg_ComponentFactory_GetString( cf, self->name, "crossSection", "z=min");
+   crossSectionStr = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"crossSection", "z=min" );
 
    /* axis=value    : draw at this exact value on axis
     * axis=min      : draw at minimum of range on axis
@@ -187,7 +187,7 @@ void _lucCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* 
 
 	_lucCrossSection_Init( 
 			self, 
-			Stg_ComponentFactory_GetString( cf, self->name, "colour", "black" ),
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"colour", "black"  ),
          value,
          axis,
          interpolate	);
@@ -200,7 +200,7 @@ void _lucCrossSection_Build( void* drawingObject, void* data )
 	Stg_ComponentFactory* cf = context->CF;
 	
 	/* HACK - Get pointer to FieldVariable in build phase just to let FieldVariables be created in plugins */
-	self->fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, self->fieldVariableName, FieldVariable, False, data );
+	self->fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)self->fieldVariableName, FieldVariable, False, data  );
  	Stg_Component_Build( self->fieldVariable, data, False );
 }
 

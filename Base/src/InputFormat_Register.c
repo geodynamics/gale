@@ -121,7 +121,7 @@ lucInputFormat* lucInputFormat_Register_CreateFromFileName( void* inputFormat_Re
 	lucInputFormat_Register*                  self        = (lucInputFormat_Register*) inputFormat_Register;
 	Stg_Component_DefaultConstructorFunction* defaultNewFunctionPtr;
 	Name                                      extension;
-	Stream* errorStream = Journal_Register( Error_Type, lucInputFormat_Register_Type );
+	Stream* errorStream = Journal_Register( Error_Type, (Name)lucInputFormat_Register_Type  );
 
 	Journal_Firewall( imageName != NULL, errorStream, "In func '%s for %s Image file name %s cannot be found \n", 
 			__func__, self->type, imageName );

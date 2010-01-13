@@ -145,9 +145,9 @@ void _lucCarbonWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, voi
 	
 	_lucCarbonWindow_Init( 
 			self,
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "offsetX", 50 ),
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "offsetY", 50 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "maxIdleTime", 600.0 ) );
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"offsetX", 50  ),
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"offsetY", 50  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxIdleTime", 600.0 )  );
 }
 
 void _lucCarbonWindow_Build( void* window, void* data ) {
