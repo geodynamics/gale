@@ -473,7 +473,7 @@ SobolGenerator* SobolGenerator_NewFromTable( Name name ) {
 	/* Make sure that the number generators used from this function is smaller than the number in the table */
 	Journal_Firewall(
 		generatorIndex < sizeof(SobolGenerator_PolynomialDegree)/sizeof(unsigned int),
-		Journal_Register( Error_Type, SobolGenerator_Type ),
+		Journal_Register( Error_Type, (Name)SobolGenerator_Type  ),
 		"Error in func '%s' - Trying to instantiate a %dth SobolGenerator ('%s') using table, "
 		"but only %d initial directional numbers have been implemented. Please contact developers.\n",
 		__func__, generatorIndex + 1, name, sizeof(SobolGenerator_PolynomialDegree)/sizeof(unsigned int) );

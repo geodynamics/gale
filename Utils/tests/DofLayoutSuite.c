@@ -63,11 +63,11 @@ void DofLayoutSuite_Teardown( DofLayoutSuiteData* data ) {
 void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 	char		expected_file[PCU_PATH_MAX];
 	int		procToWatch;
-	Stream*	stream = Journal_Register( Info_Type, "DofLayoutBasic" );	
+	Stream*	stream = Journal_Register( Info_Type, (Name)"DofLayoutBasic" );	
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
-	if( data->rank == procToWatch ) {
+	if( data->rank == procToWatch  ) {
 		DofLayout*				dof;
 		DofLayout*				destDof;
 		Variable_Register*	variableRegister;
@@ -228,11 +228,11 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
 	char		expected_file[PCU_PATH_MAX];
 	int		procToWatch;
-	Stream*	stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
+	Stream*	stream = Journal_Register( Info_Type, (Name)"DofLayoutRemap" );	
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
-	if( data->rank == procToWatch ) {
+	if( data->rank == procToWatch  ) {
 		DofLayout*				dof;
 		double					dummyVar;
 		double*					dummyPtr = &dummyVar;
@@ -299,11 +299,11 @@ void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
 void DofLayoutSuite_TestSaveAndLoad( DofLayoutSuiteData* data ) {
 	char		expected_file[PCU_PATH_MAX];
 	int		procToWatch;
-	Stream*	stream = Journal_Register( Info_Type, "DofLayoutRemap" );	
+	Stream*	stream = Journal_Register( Info_Type, (Name)"DofLayoutRemap" );	
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 	
-	if( data->rank == procToWatch ) {
+	if( data->rank == procToWatch  ) {
 		DofLayout*				dof;
 		Variable_Register*	variableRegister;
 		Variable*				var[6];

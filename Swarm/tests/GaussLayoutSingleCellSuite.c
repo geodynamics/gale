@@ -83,7 +83,7 @@ void GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D( GaussLayoutSingleCellSui
 	char								expected_file[PCU_PATH_MAX];
 	
 	if( data->rank == procToWatch ) {	
-		stream = Journal_Register( Info_Type, "1ParticlePerDim_3D" );
+		stream = Journal_Register( Info_Type, (Name)"1ParticlePerDim_3D"  );
 		Stream_RedirectFile( stream, "1ParticlePerDim_3D.dat" );
 
 		nDims = 3;
@@ -147,7 +147,7 @@ void GaussLayoutSingleCellSuite_Test2ParticlesPerDim_3D( GaussLayoutSingleCellSu
 	char								expected_file[PCU_PATH_MAX];
 	
 	if( data->rank == procToWatch ) {	
-		stream = Journal_Register( Info_Type, "2ParticlesPerDim_3D" );
+		stream = Journal_Register( Info_Type, (Name)"2ParticlesPerDim_3D"  );
 		Stream_RedirectFile( stream, "2ParticlesPerDim_3D.dat" );
 
 		nDims = 3;
@@ -211,7 +211,7 @@ void GaussLayoutSingleCellSuite_Test3ParticlesPerDim_3D( GaussLayoutSingleCellSu
 	char								expected_file[PCU_PATH_MAX];
 
 	if( data->rank == procToWatch ) {	
-		stream = Journal_Register( Info_Type, "3ParticlesPerDim_3D" );
+		stream = Journal_Register( Info_Type, (Name)"3ParticlesPerDim_3D"  );
 		Stream_RedirectFile( stream, "3ParticlesPerDim_3D.dat" );
 
 		nDims = 3;

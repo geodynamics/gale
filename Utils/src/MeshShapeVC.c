@@ -289,7 +289,7 @@ void _MeshShapeVC_BuildSelf(  void* variableCondition, void* data /* for build p
 			"You need to fill out the 'Shape' dictionary entry for this MeshShapeVC.\n" );
 	assert( self->_mesh );
 
-	self->_shape =  Stg_ComponentFactory_ConstructByName(  context->CF,  self->shapeName, Stg_Shape,  True, 0 /* dummy */  ) ;
+	self->_shape =  Stg_ComponentFactory_ConstructByName( context->CF, (Name)self->shapeName, Stg_Shape, True, 0 /* dummy */   ) ;
 	
 	Stg_Component_Build( self->_mesh, data, False );
 	Stg_Component_Build( self->_shape, data, False );
@@ -310,7 +310,7 @@ void _MeshShapeVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 	
 	/* Find dictionary entry */
 	if (self->_dictionaryEntryName)
-		vcDictVal = Dictionary_Get(dictionary, self->_dictionaryEntryName);
+		vcDictVal = Dictionary_Get( dictionary, (Dictionary_Entry_Key)self->_dictionaryEntryName );
 	else {
 		vcDictVal = &_vcDictVal;
 		Dictionary_Entry_Value_InitFromStruct(vcDictVal, dictionary);
@@ -319,25 +319,25 @@ void _MeshShapeVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 	if (vcDictVal) {
 		/* Get Name of Shape from dictionary - Grab pointer to shape later on */
 		self->shapeName = StG_Strdup( 
-				Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(vcDictVal, "Shape" )) );
+				Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember( vcDictVal, (Dictionary_Entry_Key)"Shape" ))  );
 
 		/* Obtain the variable entries */
-		self->_entryCount = Dictionary_Entry_Value_GetCount(Dictionary_Entry_Value_GetMember(vcDictVal, "variables"));
+		self->_entryCount = Dictionary_Entry_Value_GetCount(Dictionary_Entry_Value_GetMember( vcDictVal, (Dictionary_Entry_Key)"variables") );
 		self->_entryTbl = Memory_Alloc_Array( MeshShapeVC_Entry, self->_entryCount, "MeshShapeVC->_entryTbl" );
-		varsVal = Dictionary_Entry_Value_GetMember(vcDictVal, "variables");
+		varsVal = Dictionary_Entry_Value_GetMember( vcDictVal, (Dictionary_Entry_Key)"variables");
 		
-		for (entry_I = 0; entry_I < self->_entryCount; entry_I++) {
+		for (entry_I = 0; entry_I < self->_entryCount; entry_I++ ) {
 			char*			valType;
 			Dictionary_Entry_Value*	valueEntry;
 			Dictionary_Entry_Value*	varDictListVal;
 			
 			varDictListVal = Dictionary_Entry_Value_GetElement(varsVal, entry_I);
-			valueEntry = Dictionary_Entry_Value_GetMember(varDictListVal, "value");
+			valueEntry = Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"value" );
 			
 			self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString(
-				Dictionary_Entry_Value_GetMember(varDictListVal, "name"));
+				Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"name") );
 				
-			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(varDictListVal, "type"));
+			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"type") );
 			if (0 == strcasecmp(valType, "func")) {
 				char*	funcName = Dictionary_Entry_Value_AsString(valueEntry);
 				Index	cfIndex;
@@ -345,7 +345,7 @@ void _MeshShapeVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 				self->_entryTbl[entry_I].value.type = VC_ValueType_CFIndex;
 				cfIndex = ConditionFunction_Register_GetIndex( self->conFunc_Register, funcName);
 				if ( cfIndex == (Index) -1 ) {	
-					Stream*	errorStr = Journal_Register( Error_Type, self->type );
+					Stream*	errorStr = Journal_Register( Error_Type, (Name)self->type  );
 
 					Journal_Printf( errorStr, "Error- in %s: While parsing "
 						"definition of MeshShapeVC \"%s\" (applies to shape \"%s\"), the cond. func. applied to "
@@ -401,7 +401,7 @@ void _MeshShapeVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 			else {
 				/* Assume double */
 				Journal_DPrintf( 
-					Journal_Register( InfoStream_Type, "myStream" ), 
+					Journal_Register( InfoStream_Type, (Name)"myStream"  ), 
 					"Type to variable on variable condition not given, assuming double\n" );
 				self->_entryTbl[entry_I].value.type = VC_ValueType_Double;
 				self->_entryTbl[entry_I].value.as.typeDouble = Dictionary_Entry_Value_AsDouble( valueEntry );
@@ -442,7 +442,7 @@ VariableCondition_VariableIndex _MeshShapeVC_GetVariableCount(void* variableCond
 Variable_Index _MeshShapeVC_GetVariableIndex(void* variableCondition, Index globalIndex, VariableCondition_VariableIndex varIndex) {
 	MeshShapeVC*        self          = (MeshShapeVC*)variableCondition;
 	Variable_Index  searchedIndex = 0;
-	Stream*         errorStr      = Journal_Register( Error_Type, self->type );
+	Stream*         errorStr      = Journal_Register( Error_Type, (Name)self->type  );
 	Name            varName;
 	
 	varName = self->_entryTbl[varIndex].varName;

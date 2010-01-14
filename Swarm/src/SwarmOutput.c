@@ -100,7 +100,7 @@ void _SwarmOutput_Init(
 	self->swarm                  = swarm;
 	self->baseFilename           = baseFilename;
 
-	handle = ExtensionManager_Add( swarm->particleExtensionMgr, SwarmOutput_Type, sizeof( int ) );
+	handle = ExtensionManager_Add( swarm->particleExtensionMgr, (Name)SwarmOutput_Type, sizeof( int )  );
 	swarmVariable = Swarm_NewScalarVariable( 
 			swarm,
 			"globalIndexVariable",
@@ -193,21 +193,21 @@ void _SwarmOutput_AssignFromXML( void* swarmOutput, Stg_ComponentFactory* cf, vo
 	Swarm*                  swarm;
 	Name                    baseFilename;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !self->context  )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 
-	swarm        =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Swarm", Swarm, True, data  ) ;
-	baseFilename = Stg_ComponentFactory_GetString( cf, self->name, "baseFilename", self->name );
+	swarm        =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", Swarm, True, data   ) ;
+	baseFilename = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"baseFilename", self->name  );
 
 	_SwarmOutput_Init( 
 			self,
 			(AbstractContext*)self->context,
 			swarm, 
 			baseFilename, 
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "columnWidth", 12 ), 
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "decimalLength", 6 ), 
-			Stg_ComponentFactory_GetString( cf, self->name, "borderString", "    " ) );
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"columnWidth", 12  ), 
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"decimalLength", 6  ), 
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"borderString", "    " )  );
 }
 
 void _SwarmOutput_Build( void* swarmOutput, void* data ) {
@@ -223,7 +223,7 @@ void _SwarmOutput_Initialise( void* swarmOutput, void* data ) {
 	Variable*        globalIndexVariable = self->globalIndexVariable;
 	Particle_Index   lParticle_I;
 	Name             filename;
-	Stream*          stream              = Journal_Register( Info_Type, SwarmOutput_Type );
+	Stream*          stream              = Journal_Register( Info_Type, (Name)SwarmOutput_Type  );
 
    /* re-enable printing from current rank process */
 	Stream_SetPrintingRank( stream, context->rank );
@@ -254,7 +254,7 @@ void _SwarmOutput_Execute( void* swarmOutput, void* data ) {
 	Variable*         globalIndexVariable = self->globalIndexVariable;
 	Particle_Index    lParticle_I;
 	Name              filename;
-	Stream*           stream              = Journal_Register( Info_Type, SwarmOutput_Type );
+	Stream*           stream              = Journal_Register( Info_Type, (Name)SwarmOutput_Type  );
 
    /* re-enable printing from current rank process */
 	Stream_SetPrintingRank( stream, context->rank );

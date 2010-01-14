@@ -156,7 +156,7 @@ void _OperatorSwarmVariable_Init( void* _swarmVariable, Name operatorName, Index
 	OperatorSwarmVariable*	self = (OperatorSwarmVariable*)_swarmVariable;
 	SwarmVariable*				swarmVariable;
 	Index							swarmVariable_I;
-	Stream*						errorStream = Journal_Register( Error_Type, self->type );
+	Stream*						errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 	self->_operator = Operator_NewFromName( operatorName, swarmVariableList[0]->dofCount, self->dim );
 	self->dofCount = self->_operator->resultDofs; /* reset value */
@@ -213,17 +213,17 @@ void _OperatorSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFac
 	_SwarmVariable_AssignFromXML( self, cf, data );
 	swarmVariable_Register = self->swarm->swarmVariable_Register;
 
-	operatorName = Stg_ComponentFactory_GetString( cf, self->name, "Operator", "" );
+	operatorName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"Operator", ""  );
 
-	list = Dictionary_Get( dictionary, "SwarmVariables" );
+	list = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"SwarmVariables" );
 
-	swarmVariableCount = ( list ? Dictionary_Entry_Value_GetCount(list) : 1 );
+	swarmVariableCount = ( list ? Dictionary_Entry_Value_GetCount(list) : 1  );
 	swarmVariableList = Memory_Alloc_Array( SwarmVariable*, swarmVariableCount, "SwarmVars" );
 
 	for ( swarmVariable_I = 0 ; swarmVariable_I < swarmVariableCount ; swarmVariable_I++ ) {
 		swarmVariableName = (list ? 
 				Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( list, swarmVariable_I ) ) :
-				Dictionary_GetString( dictionary, "SwarmVariable" ) );
+				Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"SwarmVariable" )  );
 
 		/* Check in swarmVariable_Register first before assuming in LiveComponentRegister */
 		Journal_PrintfL( cf->infoStream, 2, "Looking for SwarmVariable '%s' in swarmVariable_Register.\n",
@@ -233,7 +233,7 @@ void _OperatorSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFac
 		
 		if ( !swarmVariableList[swarmVariable_I] )
 			swarmVariableList[swarmVariable_I] = 
-				Stg_ComponentFactory_ConstructByName( cf, swarmVariableName, SwarmVariable, True, data );
+				Stg_ComponentFactory_ConstructByName( cf, (Name)swarmVariableName, SwarmVariable, True, data  );
 	}
 
 	_SwarmVariable_AssignFromXML( self, cf, data );
@@ -286,7 +286,7 @@ void _OperatorSwarmVariable_ValueAt( void* swarmVariable, Particle_Index lPartic
 		case 2:
 			self->_valueAt = _OperatorSwarmVariable_BinaryValueAt; break;
 		default:
-			Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 					"Can't use func '%s' with swarmVariableCount = %d\n", __func__, self->swarmVariableCount );
 	}
 

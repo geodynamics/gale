@@ -158,12 +158,12 @@ void _Superellipsoid_AssignFromXML( void* superellipsoid, Stg_ComponentFactory* 
 
 	_Stg_Shape_AssignFromXML( self, cf, data );
 
-	radius[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "radiusX", 1.0 );
-	radius[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "radiusY", 1.0 );
-	radius[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "radiusZ", 1.0 );
+	radius[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"radiusX", 1.0  );
+	radius[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"radiusY", 1.0  );
+	radius[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"radiusZ", 1.0  );
 
-	epsilon1 = Stg_ComponentFactory_GetDouble( cf, self->name, "epsilon1", 1.0 );
-	epsilon2 = Stg_ComponentFactory_GetDouble( cf, self->name, "epsilon2", 1.0 );
+	epsilon1 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"epsilon1", 1.0  );
+	epsilon2 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"epsilon2", 1.0  );
 
 	_Superellipsoid_Init( self, epsilon1, epsilon2, radius );
 }
@@ -230,7 +230,7 @@ double _Superellipsoid_CalculateVolume( void* superellipsoid ) {
 
 void _Superellipsoid_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
 	Stg_Shape* self = (Stg_Shape*)shape;
-	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }	

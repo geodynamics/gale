@@ -89,7 +89,7 @@ void OperatorFieldVariableSuite_Setup( OperatorFieldVariableSuiteData* data ) {
 	MPI_Comm_rank( data->comm, &data->rank );
 	MPI_Comm_size( data->comm, &data->nProcs );
 
-	data->stream = Journal_Register( Info_Type, "OperatorFieldVariableStream" );
+	data->stream = Journal_Register( Info_Type, (Name)"OperatorFieldVariableStream"  );
 	Stream_RedirectFile( data->stream, "operatorFieldVariable.dat" );
 }
 

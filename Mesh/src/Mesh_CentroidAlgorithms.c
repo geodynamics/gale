@@ -114,7 +114,7 @@ void _Mesh_CentroidAlgorithms_Print( void* _centroidAlgorithms, Stream* stream )
 	
 	/* Set the Journal for printing informations */
 	Stream* centroidAlgorithmsStream;
-	centroidAlgorithmsStream = Journal_Register( InfoStream_Type, "Mesh_CentroidAlgorithmsStream" );
+	centroidAlgorithmsStream = Journal_Register( InfoStream_Type, (Name)"Mesh_CentroidAlgorithmsStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "Mesh_CentroidAlgorithms (ptr): (%p)\n", self );

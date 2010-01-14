@@ -150,15 +150,15 @@ void _BelowPlane_AssignFromXML( void* belowPlane, Stg_ComponentFactory* cf, void
 
 	_Stg_Shape_AssignFromXML( self, cf, data );
 
-	offset = Stg_ComponentFactory_GetDouble( cf, self->name, "offset", 0.5 );
+	offset = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"offset", 0.5  );
 
-	minValue[ I_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, "minX", 0.0 );
-	minValue[ J_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, "minY", 0.0 );
-	minValue[ K_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, "minZ", 0.0 );
+	minValue[ I_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"minX", 0.0  );
+	minValue[ J_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"minY", 0.0  );
+	minValue[ K_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"minZ", 0.0  );
 
-	maxValue[ I_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, "maxX", 1.0 );
-	maxValue[ J_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, "maxY", 1.0 );
-	maxValue[ K_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, "maxZ", 1.0 );
+	maxValue[ I_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"maxX", 1.0  );
+	maxValue[ J_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"maxY", 1.0  );
+	maxValue[ K_AXIS ] = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"maxZ", 1.0  );
 
 	width[ I_AXIS ] = maxValue[ I_AXIS ] - minValue[ I_AXIS ] ;
 	width[ J_AXIS ] = maxValue[ J_AXIS ] - minValue[ J_AXIS ] ;
@@ -225,7 +225,7 @@ double _BelowPlane_CalculateVolume( void* belowPlane ) {
 
 void _BelowPlane_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
 	Stg_Shape* self = (Stg_Shape*)shape;
-	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }

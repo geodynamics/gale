@@ -181,11 +181,11 @@ void _PlaneParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFact
 	
 	_SpaceFillerParticleLayout_AssignFromXML( self, cf, data );
 
-	planeAxisString = Stg_ComponentFactory_GetString( cf, self->name, "planeAxis", "" );
-	planeCoord = Stg_ComponentFactory_GetDouble( cf, self->name, "planeCoord", 0.0 );
+	planeAxisString = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"planeAxis", ""  );
+	planeCoord = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"planeCoord", 0.0 );
 
 	/* Check to make sure that some value is given for plane axis */
-	Journal_Firewall( strlen( planeAxisString ) > 0, Journal_MyStream( Error_Type, self ),
+	Journal_Firewall( strlen( planeAxisString  ) > 0, Journal_MyStream( Error_Type, self ),
 		"Error for %s '%s': No axis given in param 'planeAxis'.\n", self->type, self->name );
 
 	/* Make axis case insensitive */

@@ -76,7 +76,7 @@ void SobolGeneratorSuite_TestSobolGenerator( SobolGeneratorSuiteData* data ) {
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {
-		stream = Journal_Register (Info_Type, "SobolGeneratorStream");
+		stream = Journal_Register( Info_Type, (Name)"SobolGeneratorStream" );
 		Stream_RedirectFile( stream, "testSobolGeneratorRightmostBit.dat" );
 	
 		Journal_Printf( stream, " *********************** Testing _SobolGenerator_FindRightmostZeroBit *******************\n" );

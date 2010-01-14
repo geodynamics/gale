@@ -50,7 +50,7 @@ void TensorArray_Identity(Dimension_Index dim, TensorArray tensorArray){
 	Dimension_Index index;
 	/* Check dimension */
 	if ( (dim != 2)&&(dim != 3) ) {		
-		Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+		Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  );
 		Journal_Printf( error, "Cannot get tensor value for dimension %d in %s.\n", dim, __func__);
 		Journal_Firewall( dim, error,
 			"In func '%s' don't understand dim = %u\n", __func__, dim );
@@ -72,7 +72,7 @@ void SymmetricTensor_Identity(Dimension_Index dim, SymmetricTensor symmetricTens
 	Dimension_Index index;
 	/* Check dimension */
 	if ( (dim != 2)&&(dim != 3) ) {		
-		Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+		Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  );
 		Journal_Printf( error, "Cannot get tensor value for dimension %d in %s.\n", dim, __func__);
 		Journal_Firewall( dim, error,
 			"In func '%s' don't understand dim = %u\n", __func__, dim );
@@ -109,7 +109,7 @@ switch (dim) {
             result[FT2D_11] = tensor[FT2D_11];
             break;
         default: {
-           	Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+           	Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  );
            	Journal_Printf( error, "Cannot read tensor for dimension %d in %s.\n", dim, __func__);
 			Journal_Firewall( dim, error,
 				"In func '%s' don't understand dim = %u\n", __func__, dim );;
@@ -122,7 +122,7 @@ void TensorArray_Add(TensorArray tensorA, TensorArray tensorB, Dimension_Index d
     Dimension_Index index;
 	
 	if ( (dim != 2)&&(dim != 3) ) {		
-			Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  );
 			Journal_Printf( error, "Cannot get tensor value for dimension %d in %s.\n", dim, __func__);
 			Journal_Firewall( dim, error,
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
@@ -139,7 +139,7 @@ void TensorArray_Subtract(	TensorArray tensorArrayA, TensorArray tensorArrayB, D
 	Dimension_Index index;
 	
 		if ( (dim != 2)&&(dim != 3) ) {		
-			Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  );
 			Journal_Printf( error, "Cannot get tensor value for dimension %d in %s.\n", dim, __func__);
 			Journal_Firewall( dim, error,
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
@@ -204,9 +204,9 @@ void TensorArray_MultiplyByTensorArray(	TensorArray tensorA, TensorArray tensorB
 							+	tensorA[FT2D_11] * tensorB[FT2D_11];
             return;
         default: {
-           Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+           Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  );
            Journal_Printf( error, "Cannot read tensor for dimension %d in %s.\n", dim, __func__);
-           	Journal_Firewall( dim, Journal_Register( Error_Type, "TensorMultMath" ),
+           	Journal_Firewall( dim, Journal_Register( Error_Type, (Name)"TensorMultMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );;
             }
     }
@@ -304,9 +304,9 @@ switch (dim) {
 							+	tensorArray[FT2D_11] * symmetricTensor[ST2D_11];
             return;
         default: {
-           Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+           Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  );
            Journal_Printf( error, "Cannot read tensor for dimension %d in %s.\n", dim, __func__);
-           	Journal_Firewall( dim, Journal_Register( Error_Type, "TensorMultMath" ),
+           	Journal_Firewall( dim, Journal_Register( Error_Type, (Name)"TensorMultMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );;
             }
 		}
@@ -349,7 +349,7 @@ void TensorArray_MultiplyByLeftVector(	TensorArray tensorArray, double* vector,
 					  + vector[1] * tensorArray[FT2D_11];		
 			return;
 		default: {
-			Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  );
 			Journal_Printf( error, "Cannot get tensor value for dimension %d in %s.\n", dim, __func__);
 			Journal_Firewall( dim, error,
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
@@ -384,7 +384,7 @@ void TensorArray_MultiplyByRightVector(	TensorArray tensorArray, double* vector,
 					  	tensorArray[FT2D_11] * vector[1];		
 			return;
 		default: {
-			Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  );
 			Journal_Printf( error, "Cannot get tensor value for dimension %d in %s.\n", dim, __func__);
 			Journal_Firewall( dim, error,
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
@@ -417,7 +417,7 @@ double TensorArray_CalcDeterminant(TensorArray tensorArray, Dimension_Index dim)
             return determinant;
             }
         default: {
- 			Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+ 			Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  );
 			Journal_Printf( error, "Cannot get tensor value for dimension %d in %s.\n", dim, __func__);
 			Journal_Firewall( dim, error,
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
@@ -445,12 +445,12 @@ void TensorArray_CalcInverseWithDeterminant(TensorArray tensor, double determina
 	/* Check if determinant is zero or close to zero*/
 	errorValue = STG_TENSORMULT_ERROR;
 	if (fabs(determinant) <= errorValue) {
-			Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  );
 			Journal_Printf( error, "Error in '%s', Cannot calculate inverse of singular tensorArray:\n", 
 							__func__); 
 			Journal_PrintTensorArray( error, tensor, dim);
 			Journal_Printf( error, "Determinant, %g is zero or near zero. \n", determinant);
-		Journal_Firewall( False, Journal_Register( ErrorStream_Type, "TensorMultMath" ),
+		Journal_Firewall( False, Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  ),
 				"In func '%s',TensorArray is singular, cannot divide by zero determinant, %g\n", __func__, determinant );
 		return;		
 	}
@@ -488,7 +488,7 @@ void TensorArray_CalcInverseWithDeterminant(TensorArray tensor, double determina
 				result[FT2D_11] = tensor[FT2D_00] / determinant;
 				break;
 			default: {
- 				Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+ 				Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  );
 				Journal_Printf( error, "Cannot get tensor value for dimension %d in %s.\n", dim, __func__);
 				Journal_Firewall( dim, error,
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
@@ -504,7 +504,7 @@ double TensorArray_DoubleContraction(TensorArray tensorA,TensorArray tensorB, Di
 	/** \[\sigma:\epsilon=\sum_{i=1}^{n}\sum_{i=1}^{n}\sigma_{ij}\epsilon_{ij}\]  */
 	/* Check dimension */
 	if ( (dim != 2)&&(dim != 3) ) {		
-		Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+		Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  );
 		Journal_Printf( error, "Cannot get tensor value for dimension %d in %s.\n", dim, __func__);
 		Journal_Firewall( dim, error,
 			"In func '%s' don't understand dim = %u\n", __func__, dim );
@@ -531,7 +531,7 @@ double SymmetricTensor_DoubleContraction(SymmetricTensor tensorA, SymmetricTenso
 	
 	/* Check dimension */
 	if ( (dim != 2)&&(dim != 3) ) {		
-		Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+		Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  );
 		Journal_Printf( error, "Cannot get tensor value for dimension %d in %s.\n", dim, __func__);
 		Journal_Firewall( dim, error,
 			"In func '%s' don't understand dim = %u\n", __func__, dim );
@@ -558,7 +558,7 @@ void NonSquareMatrix_Transpose( double** originalMatrix, Dimension_Index rowDimO
 	Dimension_Index colDimOrig, double** newMatrix ) {
 	Dimension_Index row_I, col_I;
 	if ((rowDimOrig <=0) || (colDimOrig <=0)) {
-        Stream* error = Journal_Register( ErrorStream_Type, "TensorMultMath" );
+        Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  );
 
 		Journal_Firewall( False, error,
 				"In func '%s' don't understand rows = %u or cols = %u\n", 
@@ -600,10 +600,10 @@ void NonSquareMatrix_CumulativeMultiplicationByNonSquareMatrix( double **AMatrix
   int row_I, col_I; /* location with resultMatrix  */
   int counter;      /* counter which facilitates the multiplication of AMatrix and BMatrix */
 	/** Error Checking Code */				 
-	Journal_Firewall( (colDimA == rowDimB), Journal_Register( ErrorStream_Type, "TensorMultMath" ),
+	Journal_Firewall( (colDimA == rowDimB), Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  ),
 			"In func '%s'  row dimension B, %u != column dimension A, %u\n", 
 		__func__, rowDimB, colDimA );
-	Journal_Firewall( (AMatrix && BMatrix && resultMatrix), Journal_Register( ErrorStream_Type, "TensorMultMath" ),
+	Journal_Firewall( (AMatrix && BMatrix && resultMatrix), Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  ),
 			"In func '%s', Input matrices: %s %s, or Output matrix: %s is NULL \n", 
 		__func__, AMatrix, BMatrix, resultMatrix);
 
@@ -635,10 +635,10 @@ void NonSquareMatrix_CumulativeMatrixVectorMultiplication( double** AMatrix, int
 		                               double* BVec, int rowsInB, double* resultVector ) {
   int row_I, col_I; /* counters through matrix rows and columns respectively */
 	/** Error Checking Code */  
-	Journal_Firewall( ( colsInA == rowsInB ), Journal_Register( ErrorStream_Type, "TensorMultMath" ),
+	Journal_Firewall( ( colsInA == rowsInB ), Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  ),
 		"In func '%s' column dimensions of A_Matrix = %d is not equal to the row dimensions of B_Vec = %d\n",
 		__func__, colsInA, rowsInB );
-	Journal_Firewall( (resultVector && AMatrix && BVec) , Journal_Register( ErrorStream_Type, "TensorMultMath" ),
+	Journal_Firewall( (resultVector && AMatrix && BVec) , Journal_Register( ErrorStream_Type, (Name)"TensorMultMath"  ),
 		"In func '%s', Input matrices: %p %p, or Output matrix: %p is NULL \n", 
 		__func__, AMatrix, BVec, resultVector);
 

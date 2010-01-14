@@ -115,7 +115,7 @@ TimeIntegrand_CalculateTimeDerivFunction* TimeIntegrationSuite_GetFunctionPtr( N
    else if ( strcasecmp( derivName, "Constant2" ) == 0 )
       return TimeIntegrationSuite_ConstantTimeDeriv2;
    else
-      Journal_Firewall( 0 , Journal_Register( Error_Type, CURR_MODULE_NAME ), "Don't understand DerivName '%s'\n", derivName  );
+      Journal_Firewall( 0 , Journal_Register( Error_Type, (Name)CURR_MODULE_NAME  ), "Don't understand DerivName '%s'\n", derivName  );
 
    return NULL;
 }
@@ -168,9 +168,9 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	char							expected_file[PCU_PATH_MAX];
 
 	dictionary = Dictionary_New();
-	Dictionary_Add(dictionary, "outputPath", Dictionary_Entry_Value_FromString("./output"));
-	Dictionary_Add(dictionary, "DerivName0", Dictionary_Entry_Value_FromString(_DerivName0));
-	Dictionary_Add(dictionary, "DerivName1", Dictionary_Entry_Value_FromString(_DerivName1));
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"outputPath", Dictionary_Entry_Value_FromString("./output") );
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"DerivName0", Dictionary_Entry_Value_FromString(_DerivName0) );
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"DerivName1", Dictionary_Entry_Value_FromString(_DerivName1) );
 
 	context = DomainContext_New( "context", 0, 0, MPI_COMM_WORLD, NULL );
 	cf = stgMainConstruct( dictionary, data->comm, context );
@@ -189,15 +189,15 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	timeIntegrandList[1]	= TimeIntegrand_New( "testTimeIntegrand1", context, timeIntegrator, variableList[1], 0, NULL, True );
 
 	Journal_Enable_AllTypedStream( True );
-	stream = Journal_Register( Info_Type, "EulerStream" );
+	stream = Journal_Register( Info_Type, (Name)"EulerStream"  );
 	Stream_RedirectFile( stream, _name );
 
 	Stream_Enable( timeIntegrator->info, False );
-	derivName = Dictionary_GetString( dictionary, "DerivName0" );
-	timeIntegrandList[0]->_calculateTimeDeriv = TimeIntegrationSuite_GetFunctionPtr( derivName );
+	derivName = Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"DerivName0" );
+	timeIntegrandList[0]->_calculateTimeDeriv = TimeIntegrationSuite_GetFunctionPtr( derivName  );
 	Journal_Printf( stream, "DerivName0 - %s\n", derivName );
-	derivName = Dictionary_GetString( dictionary, "DerivName1" );
-	timeIntegrandList[1]->_calculateTimeDeriv = TimeIntegrationSuite_GetFunctionPtr( derivName );
+	derivName = Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"DerivName1" );
+	timeIntegrandList[1]->_calculateTimeDeriv = TimeIntegrationSuite_GetFunctionPtr( derivName  );
 	Journal_Printf( stream, "DerivName1 - %s\n", derivName );
 
 	/* Print Stuff to file */
@@ -263,7 +263,7 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 					error += fabs( Variable_GetValueAtDouble( variable, array_I, 1 ) - 3.0 * array_I * ( 0.25 * pow( context->currentTime, 4.0 ) - pow( context->currentTime, 3.0 )/3.0));
 				}
 				else
-					Journal_Firewall( 0 , Journal_Register( Error_Type, CURR_MODULE_NAME ), "Don't understand _calculateTimeDeriv = %p\n", timeIntegrand->_calculateTimeDeriv );
+					Journal_Firewall( 0 , Journal_Register( Error_Type, (Name)CURR_MODULE_NAME  ), "Don't understand _calculateTimeDeriv = %p\n", timeIntegrand->_calculateTimeDeriv );
 			}
 		}
 	}

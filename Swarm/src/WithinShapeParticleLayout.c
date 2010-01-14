@@ -172,7 +172,7 @@ void _WithinShapeParticleLayout_AssignFromXML( void* withinShapeParticleLayout, 
 	
 	_SpaceFillerParticleLayout_AssignFromXML( self, cf, data );
 
-	shape = Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "shape", Stg_Shape,  True, data ) ;
+	shape = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"shape", Stg_Shape, True, data  ) ;
 
 	_WithinShapeParticleLayout_Init( self, shape );
 }

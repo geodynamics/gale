@@ -317,18 +317,18 @@ void _Delaunay_AssignFromXML( void* delaunay, Stg_ComponentFactory* cf, void* da
 
 	self = (Delaunay*) delaunay;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !self->context  )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data );
 	
 	pointerRegister = self->context->pointer_Register; 
 	
-	assert( pointerRegister );
+	assert( pointerRegister  );
 
-	points = Stg_ObjectList_Get( pointerRegister, "dataPoints" );
-	attr = Stg_ObjectList_Get( pointerRegister, "delaunayAttributes" );
+	points = Stg_ObjectList_Get( pointerRegister, (Name)"dataPoints"  );
+	attr = Stg_ObjectList_Get( pointerRegister, (Name)"delaunayAttributes"  );
 
-	numSites = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "numSites", 0 );
+	numSites = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"numSites", 0  );
 
 	_Delaunay_Init( self, points, attr, numSites, idOffset, cf->rootDict, True );
 

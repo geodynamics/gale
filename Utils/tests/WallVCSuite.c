@@ -121,11 +121,11 @@ void WallVCSuite_TestWallVC( WallVCSuiteData* data ) {
 
    io_handler = XML_IO_Handler_New();
 
- 	stream = Journal_Register( Info_Type, "WallVCStream" );
+ 	stream = Journal_Register( Info_Type, (Name)"WallVCStream"  );
    Stream_RedirectFile( stream, "testWallVC.dat" );
 
    dictionary = Dictionary_New();
-   Dictionary_Add(dictionary, "outputPath", Dictionary_Entry_Value_FromString("./output"));
+   Dictionary_Add( dictionary, (Dictionary_Entry_Key)"outputPath", Dictionary_Entry_Value_FromString("./output") );
 
 	/* Input file */
 	pcu_filename_input( "wallVC.xml", input_file );
@@ -139,9 +139,9 @@ void WallVCSuite_TestWallVC( WallVCSuiteData* data ) {
    nDomains = Mesh_GetDomainSize( mesh, MT_VERTEX );
 
 	/* Create CF stuff */
-	quadCF = ConditionFunction_New(WallVCSuite_quadratic, "quadratic");
-	expCF = ConditionFunction_New(WallVCSuite_exponential, "exponential");
-	conFunc_Register = ConditionFunction_Register_New();
+	quadCF = ConditionFunction_New( WallVCSuite_quadratic, (Name)"quadratic" );
+	expCF = ConditionFunction_New( WallVCSuite_exponential, (Name)"exponential");
+	conFunc_Register = ConditionFunction_Register_New( );
 	ConditionFunction_Register_Add(conFunc_Register, quadCF);
 	ConditionFunction_Register_Add(conFunc_Register, expCF);
 

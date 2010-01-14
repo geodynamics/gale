@@ -112,17 +112,9 @@ void  _GlobalParticleLayout_AssignFromXML( void* component, Stg_ComponentFactory
 
    _ParticleLayout_AssignFromXML( self, cf, data );
 
-   totalInitialParticles = Stg_ComponentFactory_GetUnsignedInt( 
-                  cf, 
-                  self->name, 
-                  "totalInitialParticles", 
-                  GlobalParticleLayout_Invalid );
+   totalInitialParticles = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"totalInitialParticles", GlobalParticleLayout_Invalid );
 
-   averageInitialParticlesPerCell = (double)Stg_ComponentFactory_GetUnsignedInt( 
-                  cf, 
-                  self->name, 
-                  "averageInitialParticlesPerCell", 
-                  GlobalParticleLayout_Invalid );
+   averageInitialParticlesPerCell = (double )Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"averageInitialParticlesPerCell", GlobalParticleLayout_Invalid  );
 
    _GlobalParticleLayout_Init( component, totalInitialParticles, averageInitialParticlesPerCell );
 }
@@ -193,7 +185,7 @@ void _GlobalParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm 
 			self->totalInitialParticles );
 	}
 	else {
-		Stream*     errorStream = Journal_Register( Error_Type, self->type );
+		Stream*     errorStream = Journal_Register( Error_Type, (Name)self->type  );
 		
 		Journal_Firewall( self->totalInitialParticles || self->averageInitialParticlesPerCell,
 			errorStream, "Error - in %s(), ParticleLayout \"%s\" (of type %s): neither "
@@ -240,7 +232,7 @@ void _GlobalParticleLayout_InitialiseParticles( void* particleLayout, void* _swa
 	Particle_Index          globalParticlesInitialisedCount=0;
 	Progress*		prog;
 	int                     nRanks;
-	Stream*                 errorStream = Journal_Register( Error_Type, self->type );
+	Stream*                 errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 	Journal_DPrintf( self->debug, "In %s(): for ParticleLayout \"%s\" (of type %s):\n",
 		__func__, self->name, self->type );

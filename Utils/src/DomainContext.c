@@ -114,7 +114,7 @@ void _DomainContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void
 	_AbstractContext_AssignFromXML( context, cf, data );
 
 	/* Check if we have been provided a constant to multiply our calculated dt values by. */
-	self->dtFactor = Dictionary_GetDouble_WithDefault( self->dictionary, "timestepFactor", 1.0 );
+	self->dtFactor = Dictionary_GetDouble_WithDefault( self->dictionary, (Dictionary_Entry_Key)"timestepFactor", 1.0  );
 	self->dim = Dictionary_GetUnsignedInt_WithDefault( self->dictionary, "dim", 2 );
 
 	_DomainContext_Init( self );

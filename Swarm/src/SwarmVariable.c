@@ -176,13 +176,13 @@ void _SwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf
 	Index					dofCount;
 	AbstractContext*	context;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 
-	swarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", Swarm, True, data );
-	variable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Variable", Variable, False, data );
-	dofCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "dofCount", 0 );
+	swarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", Swarm, True, data  );
+	variable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Variable", Variable, False, data  );
+	dofCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"dofCount", 0  );
 
 	_SwarmVariable_Init( self, context, swarm, variable, dofCount );
 }

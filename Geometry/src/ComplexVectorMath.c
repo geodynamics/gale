@@ -289,9 +289,9 @@ void StGermain_RotateCoordinateAxisComplex( Cmplx* vector,
 			Cmplx_Add(r_1, r_2, rotatedVector[2]) ;
 			return;
 		default: {
-			Stream* error = Journal_Register( ErrorStream_Type, "ComplexVectorMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"ComplexVectorMath"  );
 			Journal_Printf( error, "Impossible axis to rotate around in %s.", __func__);
-			Journal_Firewall( False, Journal_Register( Error_Type, "ComplexVectorMath" ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)"ComplexVectorMath"  ),
 				"Error in '%s':Impossible axis to rotate around. \n", __func__);
 		}
 	}
@@ -530,7 +530,7 @@ void ComplexVector_ToVector(CoordC complexVector, Dimension_Index dim, Coord vec
 	Dimension_Index index;
 	for (index = 0; index < dim; index++) {
 		if (complexVector[index][IMAG_PART] != 0.0) {
-			Journal_Firewall( False, Journal_Register( Error_Type, "ComplexVectorMath" ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)"ComplexVectorMath"  ),
 				"Error in '%s': Complex value in complex vector at index '%s' \n", __func__, index );
 		}
 		else {

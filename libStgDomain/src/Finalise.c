@@ -43,7 +43,7 @@
 
 Bool StgDomain_Finalise( void ) {
 	if( ToolboxesManager_IsInitialised( stgToolboxesManager, "StgDomain" ) ) {
-		Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+		Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 		
 		StgDomainSwarm_Finalise();
 		StgDomainUtils_Finalise();

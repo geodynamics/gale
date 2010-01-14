@@ -142,7 +142,7 @@ void _ContactVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 
    /* Find dictionary entry */
    if (self->_dictionaryEntryName)
-      vcDictVal = Dictionary_Get(dictionary, self->_dictionaryEntryName);
+      vcDictVal = Dictionary_Get( dictionary, (Dictionary_Entry_Key)self->_dictionaryEntryName );
    else
    {
       vcDictVal = &_vcDictVal;
@@ -150,7 +150,7 @@ void _ContactVC_ReadDictionary( void* variableCondition, void* dictionary ) {
    }
 
    if (vcDictVal) {
-      entryVal = Dictionary_Entry_Value_GetMember( vcDictVal, "deep" );
+      entryVal = Dictionary_Entry_Value_GetMember( vcDictVal, (Dictionary_Entry_Key)"deep" );
       if( entryVal )
          self->deep = Dictionary_Entry_Value_AsBool( entryVal );
    }
@@ -164,7 +164,7 @@ void _ContactVC_Delete(void* wallVC) {
    ContactVC*	self = (ContactVC*)wallVC;
 	
    /* Stg_Class_Delete parent */
-   _WallVC_Delete( self );
+   _WallVC_Delete( self  );
 }
 
 void _ContactVC_Destroy(void* wallVC, void* data) {
@@ -196,21 +196,21 @@ void _ContactVC_AssignFromXML( void* wallVC, Stg_ComponentFactory* cf, void* dat
 IndexSet* _ContactVC_GetSet(void* variableCondition) {
    ContactVC*				self = (ContactVC*)variableCondition;
    IndexSet*				set = NULL;
-   Stream*					warningStr = Journal_Register( Error_Type, self->type );
+   Stream*					warningStr = Journal_Register( Error_Type, (Name)self->type );
    unsigned					nDims;
    Grid*						vertGrid;
    CartesianGenerator*	gen;
 
    nDims = Mesh_GetDimSize( self->_mesh );
-   gen = (CartesianGenerator*)self->_mesh->generator;
+   gen = (CartesianGenerator* )self->_mesh->generator;
 
    if( strcmp( gen->type, CartesianGenerator_Type ) )
       abort();
-   vertGrid = *(Grid**)ExtensionManager_Get( self->_mesh->info, self->_mesh, ExtensionManager_GetHandle( self->_mesh->info, "vertexGrid" ) );
+   vertGrid = *(Grid**)ExtensionManager_Get( self->_mesh->info, self->_mesh, ExtensionManager_GetHandle( self->_mesh->info, (Name)"vertexGrid" ) );
 
    switch (self->_wall) {
       case WallVC_Wall_Front:
-         if ( nDims < 3 || !vertGrid->sizes[2] ) {
+         if ( nDims < 3 || !vertGrid->sizes[2]  ) {
             Journal_Printf( warningStr, "Warning - in %s: Can't build a %s wall VC "
                             "when mesh has no elements in the %s axis. Returning an empty set.\n", __func__,
                             WallVC_WallEnumToStr[self->_wall], "K" );

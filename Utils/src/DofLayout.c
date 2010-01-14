@@ -242,24 +242,24 @@ void _DofLayout_AssignFromXML( void* dofLayout, Stg_ComponentFactory* cf, void* 
 	thisComponentDict = Dictionary_GetDictionary( cf->componentDict, self->name );
 	assert( thisComponentDict );
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", DomainContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  );
 
 	/* Get the mesh. */
-	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
+	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"mesh", Mesh, True, data );
 
 	variableRegister = context->variable_Register; 
-	assert( variableRegister );
+	assert( variableRegister  );
 
-	if (( list = Dictionary_Get( thisComponentDict, "BaseVariables" ) )) {
+	if (( list = Dictionary_Get( thisComponentDict, (Dictionary_Entry_Key)"BaseVariables" ) ) ) {
 		Variable_Index	baseVariable_I    = 0;
 		Name				variableName;
 
-		baseVariableCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "BaseVariableCount", Dictionary_Entry_Value_GetCount( list ) );
+		baseVariableCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"BaseVariableCount", Dictionary_Entry_Value_GetCount( list ) );
 		Journal_Firewall(
-			baseVariableCount <= Dictionary_Entry_Value_GetCount( list ),
-			Journal_Register( Error_Type, self->type ),
+			baseVariableCount <= Dictionary_Entry_Value_GetCount( list  ),
+			Journal_Register( Error_Type, (Name)self->type  ),
 			"BaseVariableCount %u is too large for list given.\n", baseVariableCount );
 
 		baseVariableList = Memory_Alloc_Array( Variable*, baseVariableCount, "baseVariableList" );
@@ -271,7 +271,7 @@ void _DofLayout_AssignFromXML( void* dofLayout, Stg_ComponentFactory* cf, void* 
 			baseVariableList[ baseVariable_I ] = Variable_Register_GetByName( variableRegister, variableName );
 
 			if ( !baseVariableList[ baseVariable_I ] )
-				baseVariableList[ baseVariable_I ] = Stg_ComponentFactory_ConstructByName( cf, variableName, Variable, True, data );
+				baseVariableList[ baseVariable_I ] = Stg_ComponentFactory_ConstructByName( cf, (Name)variableName, Variable, True, data  );
 		}
 	}
 	
@@ -399,7 +399,7 @@ Dof_Index _DofLayout_AddVariable_ByName(void* dofLayout, Name varName) {
 	dof_I = Variable_Register_GetIndex( self->_variableRegister, varName );
 	Journal_Firewall( 
 		dof_I != (unsigned)-1,
-		Journal_Register( Error_Type, DofLayout_Type ),
+		Journal_Register( Error_Type, (Name)DofLayout_Type  ),
 		"Attempting to name a variable as a DOF that is not in the variable registry!\n" );
 	return _DofLayout_AddVariable_ByIndex( self, dof_I );
 }
@@ -434,9 +434,9 @@ void DofLayout_CopyValues( void* dofLayout, void* destDofLayout ) {
 	DofLayout*    dest = (DofLayout*)destDofLayout;
 	Index         ii = 0;
 	Dof_Index     dof_I = 0;
-	Stream*       error = Journal_Register( Error_Type, self->type );
+	Stream*       error = Journal_Register( Error_Type, (Name)self->type );
 	
-	Journal_Firewall( (self->_numItemsInLayout == dest->_numItemsInLayout), error,
+	Journal_Firewall( (self->_numItemsInLayout == dest->_numItemsInLayout ), error,
 		"Error: Number of items in source dof layout (%d) not equal to number of "
 		"items in destination dof layout (%d).\n",
 		self->_numItemsInLayout, dest->_numItemsInLayout );
@@ -553,9 +553,9 @@ void DofLayout_AddAllFromVariableArray( void* dofLayout, Variable_Index variable
 	Index           item_I;
 	Index           itemCount   = self->_numItemsInLayout;
 	Variable_Index  variable_I;
-	Stream*         errorStream = Journal_Register( Error_Type, self->type );
+	Stream*         errorStream = Journal_Register( Error_Type, (Name)self->type );
 
-	for( variable_I = 0; variable_I < variableCount ; variable_I++ ) {
+	for( variable_I = 0; variable_I < variableCount ; variable_I++  ) {
 		Journal_Firewall( variableArray[variable_I] != NULL, errorStream,
 				"In func %s for %s '%s' - Variable %d in array is NULL.\n", __func__, self->type, self->name, variable_I);
 		for( item_I = 0; item_I < itemCount ; item_I++ ) {

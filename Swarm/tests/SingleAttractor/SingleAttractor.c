@@ -28,19 +28,19 @@ void StGermain_SingleAttractor_UpdatePositions( DomainContext* context ) {
 	Particle_InCellIndex		cParticle_I;
 	Particle* 	        	currParticle;
 	Index				dim_I;
-	Swarm*                          swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
+	Swarm*                          swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"swarm"  );
 	Coord                           attractorPoint;
 	Mesh*				mesh;
-	Stream*                         stream = Journal_Register( Info_Type, "particleUpdate" );
+	Stream*                         stream = Journal_Register( Info_Type, (Name)"particleUpdate"  );
 	unsigned int                    movementSpeedDivisor = 0;
 	int                             movementSign = 1;
 	unsigned int                    explosionPeriod = 20;
 	double				minCrd[3], maxCrd[3];
 
 	Stream_SetPrintingRank( stream, Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "procToWatch", 0 ) );
-	movementSpeedDivisor = Dictionary_GetDouble_WithDefault( context->dictionary, "movementSpeedDivisor", 10 );
+	movementSpeedDivisor = Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"movementSpeedDivisor", 10 );
 	
-	mesh = (Mesh*)LiveComponentRegister_Get( context->CF->LCRegister, "mesh-linear" );
+	mesh = (Mesh* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"mesh-linear"  );
 	Mesh_GetGlobalCoordRange( mesh, minCrd, maxCrd );
 	for ( dim_I=0; dim_I < 3; dim_I++ ) {
 		attractorPoint[dim_I] = (maxCrd[dim_I] - minCrd[dim_I]) / 3;
@@ -97,9 +97,9 @@ void StGermain_SingleAttractor_UpdatePositions( DomainContext* context ) {
 void _StGermain_SingleAttractor_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	DomainContext*   context;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  );
 	Stream_SetPrintingRank( 
-		Journal_Register( Info_Type, "Context" ),
+		Journal_Register( Info_Type, (Name)"Context"  ),
 		Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "procToWatch", 0 ) );
 	
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Solve, StGermain_SingleAttractor_UpdatePositions );
@@ -119,7 +119,7 @@ void* _StGermain_SingleAttractor_DefaultNew( Name name ) {
 	}
 
 Index StGermain_SingleAttractor_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, StGermain_SingleAttractor_Type, "0", _StGermain_SingleAttractor_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, StGermain_SingleAttractor_Type, (Name)"0", _StGermain_SingleAttractor_DefaultNew  );
 }
 
 

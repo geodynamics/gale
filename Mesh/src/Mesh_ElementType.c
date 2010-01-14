@@ -87,7 +87,7 @@ void _Mesh_ElementType_Print( void* elementType, Stream* stream ) {
 	Mesh_ElementType*	self = (Mesh_ElementType*)elementType;
 	Stream*			elementTypeStream;
 
-	elementTypeStream = Journal_Register( InfoStream_Type, "Mesh_ElementTypeStream" );
+	elementTypeStream = Journal_Register( InfoStream_Type, (Name)"Mesh_ElementTypeStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "Mesh_ElementType (ptr): (%p)\n", self );

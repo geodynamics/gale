@@ -180,7 +180,7 @@ void _SpaceFillerParticleLayout_AssignFromXML( void* spaceFillerParticleLayout, 
 
    _GlobalParticleLayout_AssignFromXML( self, cf, data );
 
-   dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
+   dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0  );
 
    _SpaceFillerParticleLayout_Init( self, dim );
 }

@@ -136,7 +136,7 @@ void _Mesh_HexType_Print( void* elementType, Stream* stream ) {
 	Mesh_HexType*	self = (Mesh_HexType*)elementType;
 	Stream*			elementTypeStream;
 
-	elementTypeStream = Journal_Register( InfoStream_Type, "Mesh_HexTypeStream" );
+	elementTypeStream = Journal_Register( InfoStream_Type, (Name)"Mesh_HexTypeStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "Mesh_HexType (ptr): (%p)\n", self );

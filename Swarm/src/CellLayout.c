@@ -133,9 +133,9 @@ void _CellLayout_AssignFromXML( void* cellLayout, Stg_ComponentFactory *cf, void
 	CellLayout*			self = (CellLayout*)cellLayout;
 	AbstractContext*	context;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-   if( !context )
-      context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+   if( !context  )
+      context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 
 	_CellLayout_Init( self, context );
 }

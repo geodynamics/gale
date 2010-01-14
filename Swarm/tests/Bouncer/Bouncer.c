@@ -28,17 +28,17 @@ void StGermain_Bouncer_UpdatePositions( DomainContext* context ) {
 	Particle_InCellIndex		cParticle_I;
 	Particle* 	        	currParticle;
 	Index				dim_I;
-	Swarm*                          swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
+	Swarm*                          swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"swarm"  );
 	BlockGeometry*                  blockGeom;
-	Stream*                         stream = Journal_Register( Debug_Type, "particleUpdate" );
+	Stream*                         stream = Journal_Register( Debug_Type, (Name)"particleUpdate"  );
 	unsigned int                    movementSpeedDivisor = 5;
 	Particle_Index                  lParticle_I = 0;
 
 	Stream_SetPrintingRank( stream, Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "procToWatch", 0 ) );
 	
-	blockGeom = (BlockGeometry*) LiveComponentRegister_Get( context->CF->LCRegister, "geometry" );
+	blockGeom = (BlockGeometry*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"geometry" );
 
-	if ( context->timeStep == 1 ) {
+	if ( context->timeStep == 1  ) {
 		/* for each particle, set a random velocity */
 		for ( lParticle_I=0; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {
 			currParticle = (Particle*)Swarm_ParticleAt( swarm, lParticle_I );
@@ -96,7 +96,7 @@ void StGermain_Bouncer_UpdatePositions( DomainContext* context ) {
 void _StGermain_Bouncer_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	DomainContext*   context;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  );
 	
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Solve, StGermain_Bouncer_UpdatePositions );
 }
@@ -115,7 +115,7 @@ void* _StGermain_Bouncer_DefaultNew( Name name ) {
 	}
 
 Index StGermain_Bouncer_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, StGermain_Bouncer_Type, "0", _StGermain_Bouncer_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, StGermain_Bouncer_Type, (Name)"0", _StGermain_Bouncer_DefaultNew  );
 }
 
 

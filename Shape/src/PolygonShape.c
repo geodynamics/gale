@@ -166,19 +166,19 @@ void _PolygonShape_AssignFromXML( void* polygon, Stg_ComponentFactory* cf, void*
 	Dictionary_Entry_Value* optionsList;
 	Dictionary*             dictionary  = Dictionary_GetDictionary( cf->componentDict, self->name );
 	Stream*                 stream      = cf->infoStream;
-	Stream*                 errorStream = Journal_Register( Error_Type, self->type );
+	Stream*                 errorStream = Journal_Register( Error_Type, (Name)self->type  );
 	
 	_Stg_Shape_AssignFromXML( self, cf, data );
 
-	start[I_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, "startX", 0.0 );
-	end[I_AXIS]   = Stg_ComponentFactory_GetDouble( cf, self->name, "endX",   0.0 );
-	start[J_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, "startY", 0.0 );
-	end[J_AXIS]   = Stg_ComponentFactory_GetDouble( cf, self->name, "endY",   0.0 );
-	start[K_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, "startZ", 0.0 );
-	end[K_AXIS]   = Stg_ComponentFactory_GetDouble( cf, self->name, "endZ",   0.0 );
+	start[I_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"startX", 0.0  );
+	end[I_AXIS]   = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"endX", 0.0  );
+	start[J_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"startY", 0.0  );
+	end[J_AXIS]   = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"endY", 0.0  );
+	start[K_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"startZ", 0.0  );
+	end[K_AXIS]   = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"endZ", 0.0  );
 
-	perpendicularAxisName = Stg_ComponentFactory_GetString( cf, self->name, "perpendicularAxis", "z" );
-	switch ( perpendicularAxisName[0] ) {
+	perpendicularAxisName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"perpendicularAxis", "z" );
+	switch ( perpendicularAxisName[0]  ) {
 		case 'x': case 'X': case 'i': case 'I': case '0':
 			perpendicularAxis = I_AXIS; break;
 		case 'y': case 'Y': case 'j': case 'J': case '1':
@@ -186,19 +186,19 @@ void _PolygonShape_AssignFromXML( void* polygon, Stg_ComponentFactory* cf, void*
 		case 'z': case 'Z': case 'k': case 'K': case '2':
 			perpendicularAxis = K_AXIS; break;
 		default:
-			Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 					"Cannot understand perpendicularAxis '%s'\n", perpendicularAxisName );
 	}
 	if( self->dim == 3 && ( start[perpendicularAxis] == 0 && end[perpendicularAxis] == 0 ) ) {
-		Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+		Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 		"Problem with %s.\n"
 		"You've set the perpendicular axis to be %s, but you've not given the polygon any depth in that axis\n",
 	        self->name, perpendicularAxisName );
 	}	
 
-	optionsList = Dictionary_Get( dictionary, "verticies" );
+	optionsList = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"verticies" );
 	
-	vertexCount = Dictionary_Entry_Value_GetCount(optionsList);
+	vertexCount = Dictionary_Entry_Value_GetCount(optionsList );
 	Journal_Firewall( vertexCount >= 3, errorStream, 
 			"To few verticies given in trying to build shape '%s' named '%s'.\n"
 			"A polygon needs at least three verticies.\n",
@@ -214,11 +214,11 @@ void _PolygonShape_AssignFromXML( void* polygon, Stg_ComponentFactory* cf, void*
 		coord = vertexList[vertex_I];
 		/* Read Vertex */
 		if( perpendicularAxis != I_AXIS )
-			coord[ I_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, "x"));
-		if( perpendicularAxis != J_AXIS )
-			coord[ J_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, "y"));
-		if( perpendicularAxis != K_AXIS )
-			coord[ K_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, "z"));
+			coord[ I_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, (Dictionary_Entry_Key)"x"));
+		if( perpendicularAxis != J_AXIS  )
+			coord[ J_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, (Dictionary_Entry_Key)"y"));
+		if( perpendicularAxis != K_AXIS  )
+			coord[ K_AXIS ] = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, (Dictionary_Entry_Key)"z") );
 
 		/* Print Position */
 		Journal_PrintfL( stream, 2, "(%0.3g, %0.3g, %0.3g)\n", coord[I_AXIS], coord[J_AXIS], coord[K_AXIS] );
@@ -328,7 +328,7 @@ double _PolygonShape_CalculateVolume( void* polygon ) {
 
 void _PolygonShape_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
 	Stg_Shape* self = (Stg_Shape*)shape;
-	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }

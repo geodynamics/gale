@@ -133,7 +133,7 @@ void _CartesianGenerator_Init( CartesianGenerator* self ) {
 
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
 
-	stream = Journal_Register( Info_Type, self->type );
+	stream = Journal_Register( Info_Type, (Name)self->type  );
 	Stream_SetPrintingRank( stream, 0 );
 
 	self->comm = NULL;
@@ -174,7 +174,7 @@ void _CartesianGenerator_Print( void* meshGenerator, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* meshGeneratorStream;
-	meshGeneratorStream = Journal_Register( InfoStream_Type, "CartesianGeneratorStream" );
+	meshGeneratorStream = Journal_Register( InfoStream_Type, (Name)"CartesianGeneratorStream"  );
 
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
 
@@ -196,7 +196,7 @@ void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactor
 	unsigned*					size;
 	unsigned						shadowDepth;
 	Stream*						stream;
-	Stream*						errorStream = Journal_Register( Error_Type, self->type );
+	Stream*						errorStream = Journal_Register( Error_Type, (Name)self->type  );
 	unsigned						d_i;
 	unsigned						restartTimestep;
    AbstractContext*        context;	
@@ -208,56 +208,56 @@ void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactor
 	assert( cf );
 
    /* get the context which is required for filename determination */
-   context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ) ;
+   context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  ) ;
 
 	/* Call parent construct. */
 	_MeshGenerator_AssignFromXML( self, cf, data );
 
 	/* Rip out the components structure as a dictionary. */
-	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
+	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, (Dictionary_Entry_Key)self->name )  );
 
 	/* Read the sizes. */
-	sizeList = Dictionary_Get( dict, "size" );
+	sizeList = Dictionary_Get( dict, (Dictionary_Entry_Key)"size" );
 	assert( sizeList );
-	assert( Dictionary_Entry_Value_GetCount( sizeList ) >= self->nDims );
+	assert( Dictionary_Entry_Value_GetCount( sizeList ) >= self->nDims  );
 	size = Memory_Alloc_Array_Unnamed( unsigned, self->nDims );
 	for( d_i = 0; d_i < self->nDims; d_i++ ) {
 		tmp = Dictionary_Entry_Value_GetElement( sizeList, d_i );
 		rootKey = Dictionary_Entry_Value_AsString( tmp );
 
-		if( !Stg_StringIsNumeric( rootKey ) )
-			tmp = Dictionary_Get( cf->rootDict, rootKey );
-		size[d_i] = Dictionary_Entry_Value_AsUnsignedInt( tmp );
+		if( !Stg_StringIsNumeric( (char *)rootKey )  )
+			tmp = Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)rootKey );
+		size[d_i] = Dictionary_Entry_Value_AsUnsignedInt( tmp  );
 	}
 
 	/* Read decomposition restrictions. */
-	maxDecompDims = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "maxDecomposedDims", 0 );
+	maxDecompDims = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"maxDecomposedDims", 0  );
 
-	minList = Dictionary_Get( dict, "minDecompositions" );
-	if( minList ) {
+	minList = Dictionary_Get( dict, (Dictionary_Entry_Key)"minDecompositions" );
+	if( minList  ) {
 		minDecomp = AllocArray( unsigned, self->nDims );
 		for( d_i = 0; d_i < self->nDims; d_i++ ) {
 			tmp = Dictionary_Entry_Value_GetElement( minList, d_i );
 			rootKey = Dictionary_Entry_Value_AsString( tmp );
 
-			if( !Stg_StringIsNumeric( rootKey ) )
-				tmp = Dictionary_Get( cf->rootDict, rootKey );
-			minDecomp[d_i] = Dictionary_Entry_Value_AsUnsignedInt( tmp );
+			if( !Stg_StringIsNumeric( (char *)rootKey )  )
+				tmp = Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)rootKey );
+			minDecomp[d_i] = Dictionary_Entry_Value_AsUnsignedInt( tmp  );
 		}
 	}
 	else
 		minDecomp = NULL;
 
-	maxList = Dictionary_Get( dict, "maxDecompositions" );
-	if( maxList ) {
+	maxList = Dictionary_Get( dict, (Dictionary_Entry_Key)"maxDecompositions" );
+	if( maxList  ) {
 		maxDecomp = AllocArray( unsigned, self->nDims );
 		for( d_i = 0; d_i < self->nDims; d_i++ ) {
 			tmp = Dictionary_Entry_Value_GetElement( maxList, d_i );
 			rootKey = Dictionary_Entry_Value_AsString( tmp );
 
-			if( !Stg_StringIsNumeric( rootKey ) )
-				tmp = Dictionary_Get( cf->rootDict, rootKey );
-			maxDecomp[d_i] = Dictionary_Entry_Value_AsUnsignedInt( tmp );
+			if( !Stg_StringIsNumeric( (char *)rootKey )  )
+				tmp = Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)rootKey );
+			maxDecomp[d_i] = Dictionary_Entry_Value_AsUnsignedInt( tmp  );
 		}
 	}
 	else
@@ -267,22 +267,22 @@ void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactor
 	CartesianGenerator_SetTopologyParams( self, size, maxDecompDims, minDecomp, maxDecomp );
 
         /* Contact stuff. */
-        self->contactDepth[0][0] = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth-left", 0 );
-        self->contactDepth[0][1] = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth-right", 0 );
-        self->contactDepth[1][0] = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth-bottom", 0 );
-        self->contactDepth[1][1] = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth-top", 0 );
-        self->contactDepth[2][0] = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth-back", 0 );
-        self->contactDepth[2][1] = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth-front", 0 );
-        self->contactGeom[0] = Stg_ComponentFactory_GetDouble( cf, self->name, "contactGeometry-x", 0.0 );
-        self->contactGeom[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "contactGeometry-y", 0.0 );
-        self->contactGeom[2] = Stg_ComponentFactory_GetDouble( cf, self->name, "contactGeometry-z", 0.0 );
+        self->contactDepth[0][0] = Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"contactDepth-left", 0  );
+        self->contactDepth[0][1] = Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"contactDepth-right", 0  );
+        self->contactDepth[1][0] = Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"contactDepth-bottom", 0  );
+        self->contactDepth[1][1] = Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"contactDepth-top", 0  );
+        self->contactDepth[2][0] = Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"contactDepth-back", 0  );
+        self->contactDepth[2][1] = Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"contactDepth-front", 0  );
+        self->contactGeom[0] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"contactGeometry-x", 0.0  );
+        self->contactGeom[1] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"contactGeometry-y", 0.0  );
+        self->contactGeom[2] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"contactGeometry-z", 0.0  );
 
 	/* Read geometry. */
-	minList = Dictionary_Get( dict, "minCoord" );
-	maxList = Dictionary_Get( dict, "maxCoord" );
+	minList = Dictionary_Get( dict, (Dictionary_Entry_Key)"minCoord"  );
+	maxList = Dictionary_Get( dict, (Dictionary_Entry_Key)"maxCoord" );
 	if( minList && maxList ) {
 		assert( Dictionary_Entry_Value_GetCount( minList ) >= self->nDims );
-		assert( Dictionary_Entry_Value_GetCount( maxList ) >= self->nDims );
+		assert( Dictionary_Entry_Value_GetCount( maxList ) >= self->nDims  );
 		crdMin = Memory_Alloc_Array_Unnamed( double, 3 );
 		crdMax = Memory_Alloc_Array_Unnamed( double, 3 );
 		for( d_i = 0; d_i < self->nDims; d_i++ ) {
@@ -290,19 +290,19 @@ void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactor
 			tmp = Dictionary_Entry_Value_GetElement( minList, d_i );
 			rootKey = Dictionary_Entry_Value_AsString( tmp );
 
-			if( !Stg_StringIsNumeric( rootKey ) )
-				tmp = Dictionary_Get( cf->rootDict, rootKey );
-			crdMin[d_i] = Dictionary_Entry_Value_AsDouble( tmp );
+			if( !Stg_StringIsNumeric( (char *)rootKey )  )
+				tmp = Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)rootKey );
+			crdMin[d_i] = Dictionary_Entry_Value_AsDouble( tmp  );
 
 			tmp = Dictionary_Entry_Value_GetElement( maxList, d_i );
 			rootKey = Dictionary_Entry_Value_AsString( tmp );
 
-			if( !Stg_StringIsNumeric( rootKey ) )
-				tmp = Dictionary_Get( cf->rootDict, rootKey );
+			if( !Stg_StringIsNumeric( (char *)rootKey )  )
+				tmp = Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)rootKey );
 			crdMax[d_i] = Dictionary_Entry_Value_AsDouble( tmp );
 			/* test to ensure provided domain is valid */
 			maxVal =  (abs(crdMax[d_i]) > abs(crdMin[d_i])) ? abs(crdMax[d_i]) : abs(crdMin[d_i]);
-			if( maxVal == 0 ) maxVal = 1;  /* if maxVal is zero, then both numbers must be zero, set to one as next test will fail */
+			if( maxVal == 0  ) maxVal = 1;  /* if maxVal is zero, then both numbers must be zero, set to one as next test will fail */
          Journal_Firewall( ( ( (crdMax[d_i] - crdMin[d_i])/maxVal) > 1E-10 ), errorStream,
                      "\n\nError in %s for %s '%s'\n\n"
                      "Dimension of domain (min = %f, max = %f) for component number %u is not valid.\n\n", 
@@ -310,8 +310,8 @@ void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactor
                      crdMin[d_i], crdMax[d_i], d_i);
 		}
 
-		restartTimestep = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "restartTimestep", 0 );	
-		if( restartTimestep ) {
+		restartTimestep = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"restartTimestep", 0 );	
+		if( restartTimestep  ) {
          char*   meshReadFileName;
          char*   meshReadFileNamePart;
          self->readFromFile = True;
@@ -467,22 +467,19 @@ void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactor
 	}
 
 	/* Read and set shadow depth. */
-	shadowDepth = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "shadowDepth", 1 );
+	shadowDepth = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"shadowDepth", 1  );
 	CartesianGenerator_SetShadowDepth( self, shadowDepth );
 
 	/* Read regular flag. */
-	self->regular = Stg_ComponentFactory_GetBool( cf, self->name, "regular", True );
+	self->regular = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"regular", True  );
 
 	/* Read periodic flags. */
-	self->periodic[0] = Stg_ComponentFactory_GetBool( cf, self->name,
-							  "periodic_x", False );
-	self->periodic[1] = Stg_ComponentFactory_GetBool( cf, self->name,
-							  "periodic_y", False );
-	self->periodic[2] = Stg_ComponentFactory_GetBool( cf, self->name,
-							  "periodic_z", False );
+	self->periodic[0] = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"periodic_x", False  );
+	self->periodic[1] = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"periodic_y", False  );
+	self->periodic[2] = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"periodic_z", False  );
 
 	/* Read a general dictionary flag for which processor to watch. */
-	stream = Journal_Register( Info_Type, self->type );
+	stream = Journal_Register( Info_Type, (Name)self->type  );
 	Stream_SetPrintingRank( stream, Dictionary_GetUnsignedInt_WithDefault( cf->rootDict, "rankToWatch", 0 ) );
 
 	/* Free stuff. */
@@ -524,8 +521,8 @@ void CartesianGenerator_SetDimSize( void* meshGenerator, unsigned nDims ) {
 
 void CartesianGenerator_Generate( void* meshGenerator, void* _mesh, void* data ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-	Stream*			stream = Journal_Register( Info_Type, self->type );
-	Mesh*			mesh = (Mesh*)_mesh;
+	Stream*			stream = Journal_Register( Info_Type, (Name)self->type );
+	Mesh*			mesh = (Mesh* )_mesh;
 	Grid**			grid;
 	unsigned		*localRange, *localOrigin;
 	Bool			*periodic;
@@ -571,28 +568,28 @@ void CartesianGenerator_Generate( void* meshGenerator, void* _mesh, void* data )
 	}
 
 	/* Add extensions to the mesh and fill with cartesian information. */
-	ExtensionManager_Add( mesh->info, "vertexGrid", sizeof(Grid*) );
-	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
-	*grid = Grid_New();
+	ExtensionManager_Add( mesh->info, (Name)"vertexGrid", sizeof(Grid*) );
+	grid = (Grid** )ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" ) );
+	*grid = Grid_New( );
 	Grid_SetNumDims( *grid, self->vertGrid->nDims );
 	Grid_SetSizes( *grid, self->vertGrid->sizes );
 
-	ExtensionManager_Add( mesh->info, "elementGrid", sizeof(Grid*) );
-	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "elementGrid" ) );
-	*grid = Grid_New();
+	ExtensionManager_Add( mesh->info, (Name)"elementGrid", sizeof(Grid*) );
+	grid = (Grid** )ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, (Name)"elementGrid" ) );
+	*grid = Grid_New( );
 	Grid_SetNumDims( *grid, self->elGrid->nDims );
 	Grid_SetSizes( *grid, self->elGrid->sizes );
 
 	ExtensionManager_AddArray( mesh->info, "localOrigin", sizeof(unsigned), Mesh_GetDimSize( mesh ) );
-	localOrigin = (unsigned*)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "localOrigin" ) );
+	localOrigin = (unsigned*)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, (Name)"localOrigin" )  );
 	memcpy( localOrigin, self->origin, Mesh_GetDimSize( mesh ) * sizeof(unsigned) );
 
 	ExtensionManager_AddArray( mesh->info, "localRange", sizeof(unsigned), Mesh_GetDimSize( mesh ) );
-	localRange = (unsigned*)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "localRange" ) );
+	localRange = (unsigned*)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, (Name)"localRange" )  );
 	memcpy( localRange, self->range, Mesh_GetDimSize( mesh ) * sizeof(unsigned) );
 
 	ExtensionManager_AddArray( mesh->info, "periodic", sizeof(Bool), 3 );
-	periodic = (Bool*)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, "periodic" ));
+	periodic = (Bool*)ExtensionManager_Get( mesh->info, mesh, ExtensionManager_GetHandle( mesh->info, (Name)"periodic" ) );
 	memcpy( periodic, self->periodic, 3 * sizeof(Bool) );
 
 	Stream_UnIndent( stream );
@@ -643,7 +640,7 @@ void _CartesianGenerator_SetTopologyParams( void* meshGenerator, unsigned* sizes
 
 void _CartesianGenerator_GenElements( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-	Stream*			stream = Journal_Register( Info_Type, self->type );
+	Stream*			stream = Journal_Register( Info_Type, (Name)self->type  );
 	Grid*			grid;
 	unsigned		nEls;
 	unsigned*		els;
@@ -687,7 +684,7 @@ void _CartesianGenerator_GenElements( void* meshGenerator, IGraph* topo, Grid***
 
 void _CartesianGenerator_GenVertices( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-	Stream*			stream = Journal_Register( Info_Type, self->type );
+	Stream*			stream = Journal_Register( Info_Type, (Name)self->type  );
 	unsigned		rank;
 	Grid*			globalGrid;
 	Grid*			grid;
@@ -772,7 +769,7 @@ void _CartesianGenerator_GenVertices( void* meshGenerator, IGraph* topo, Grid***
 
 void _CartesianGenerator_GenEdges( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-	Stream*			stream = Journal_Register( Info_Type, self->type );
+	Stream*			stream = Journal_Register( Info_Type, (Name)self->type  );
 
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
 	assert( topo );
@@ -794,7 +791,7 @@ void _CartesianGenerator_GenEdges( void* meshGenerator, IGraph* topo, Grid*** gr
 
 void _CartesianGenerator_GenFaces( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-	Stream*			stream = Journal_Register( Info_Type, self->type );
+	Stream*			stream = Journal_Register( Info_Type, (Name)self->type  );
 	Grid*			globalGrid;
 	unsigned		nGlobalEls[2];
 	Grid*			grid;
@@ -897,7 +894,7 @@ void _CartesianGenerator_GenFaces( void* meshGenerator, IGraph* topo, Grid*** gr
 
 void _CartesianGenerator_GenElementVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-	Stream*			stream = Journal_Register( Info_Type, self->type );
+	Stream*			stream = Journal_Register( Info_Type, (Name)self->type  );
 	int			nDomainEls;
 	unsigned*		incEls;
 	unsigned*		dimInds;
@@ -973,7 +970,7 @@ void _CartesianGenerator_GenElementVertexInc( void* meshGenerator, IGraph* topo,
 
 void _CartesianGenerator_GenVolumeEdgeInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-	Stream*			stream = Journal_Register( Info_Type, self->type );
+	Stream*			stream = Journal_Register( Info_Type, (Name)self->type  );
 	unsigned		nIncEls;
 	unsigned*		incEls;
 	unsigned*		dimInds;
@@ -1050,7 +1047,7 @@ void _CartesianGenerator_GenVolumeEdgeInc( void* meshGenerator, IGraph* topo, Gr
 
 void _CartesianGenerator_GenVolumeFaceInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-	Stream*			stream = Journal_Register( Info_Type, self->type );
+	Stream*			stream = Journal_Register( Info_Type, (Name)self->type  );
 	unsigned		nIncEls;
 	unsigned*		incEls;
 	unsigned*		dimInds;
@@ -1105,7 +1102,7 @@ void _CartesianGenerator_GenVolumeFaceInc( void* meshGenerator, IGraph* topo, Gr
 
 void _CartesianGenerator_GenFaceVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-	Stream*			stream = Journal_Register( Info_Type, self->type );
+	Stream*			stream = Journal_Register( Info_Type, (Name)self->type  );
 	unsigned		nIncEls;
 	unsigned*		incEls;
 	unsigned*		dimInds;
@@ -1198,7 +1195,7 @@ void _CartesianGenerator_GenFaceVertexInc( void* meshGenerator, IGraph* topo, Gr
 
 void _CartesianGenerator_GenFaceEdgeInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-	Stream*			stream = Journal_Register( Info_Type, self->type );
+	Stream*			stream = Journal_Register( Info_Type, (Name)self->type  );
 	unsigned		nIncEls;
 	unsigned*		incEls;
 	unsigned*		dimInds;
@@ -1285,7 +1282,7 @@ void _CartesianGenerator_GenFaceEdgeInc( void* meshGenerator, IGraph* topo, Grid
 
 void _CartesianGenerator_GenEdgeVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
    CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
-   Stream*			stream = Journal_Register( Info_Type, self->type );
+   Stream*			stream = Journal_Register( Info_Type, (Name)self->type  );
    unsigned		nIncEls;
    unsigned*		incEls;
    unsigned*		dimInds;
@@ -1361,7 +1358,7 @@ void _CartesianGenerator_GenElementTypes( void* meshGenerator, Mesh* mesh ) {
 
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
 
-	stream = Journal_Register( Info_Type, self->type );
+	stream = Journal_Register( Info_Type, (Name)self->type  );
 	Journal_Printf( stream, "Generating element types...\n" );
 	Stream_Indent( stream );
 
@@ -1991,7 +1988,7 @@ void CartesianGenerator_GenBndVerts( CartesianGenerator* self, IGraph* topo, Gri
 }
 
 void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGraph* topo, Grid*** grids ) {
-   Stream*		stream = Journal_Register( Info_Type, self->type );
+   Stream*		stream = Journal_Register( Info_Type, (Name)self->type  );
    const Sync* sync;
    unsigned	nDims;
    unsigned	nVerts;
@@ -2110,12 +2107,12 @@ void CartesianGenerator_MapToDomain( CartesianGenerator* self, Sync* sync,
 
 #define MAX_LINE_LENGTH 1024
 void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* data ) {
-	Stream*			   stream = Journal_Register( Info_Type, self->type );
+	Stream*			   stream = Journal_Register( Info_Type, (Name)self->type );
 	Sync*			      sync;
 	AbstractContext* 	context = (AbstractContext*)data;
 	
 	assert( self );
-	assert( mesh );
+	assert( mesh  );
 
 	Journal_Printf( stream, "Generating geometry...\n" );
 	Stream_Indent( stream );
@@ -2258,7 +2255,7 @@ void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, con
    hid_t					attrib_id, group_id;
    herr_t				status;
    char*					verticeName;
-	Stream*			   errorStream = Journal_Register( Error_Type, self->type );   
+	Stream*			   errorStream = Journal_Register( Error_Type, (Name)self->type  );   
 
    /* Open the file and data set. */
    file = H5Fopen( filename, H5F_ACC_RDONLY, H5P_DEFAULT );

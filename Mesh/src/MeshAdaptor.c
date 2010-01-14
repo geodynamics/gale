@@ -88,7 +88,7 @@ void _MeshAdaptor_Print( void* adaptor, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* adaptorStream;
-	adaptorStream = Journal_Register( InfoStream_Type, "MeshAdaptorStream" );
+	adaptorStream = Journal_Register( InfoStream_Type, (Name)"MeshAdaptorStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "MeshAdaptor (ptr): (%p)\n", self );
@@ -101,11 +101,10 @@ void _MeshAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* 
 	_MeshGenerator_AssignFromXML( self, cf, data );
 
 	/* There could be either a generator or a mesh to use as a template.  Prefer the mesh. */
-	self->srcMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "sourceMesh", Mesh, False, data );
-	if( !self->srcMesh ) {
+	self->srcMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"sourceMesh", Mesh, False, data );
+	if( !self->srcMesh  ) {
 		/* Read the source generator. */
-		self->generator = Stg_ComponentFactory_ConstructByKey( cf, self->name, "sourceGenerator", 
-								       MeshGenerator, True, data );
+		self->generator = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"sourceGenerator", MeshGenerator, True, data  );
 	}
 }
 

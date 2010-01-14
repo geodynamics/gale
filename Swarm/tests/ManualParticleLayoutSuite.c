@@ -110,34 +110,34 @@ void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData
 		/* Dictionary Initialization */
 		dictionary = Dictionary_New();
 		particlePositionsList = Dictionary_Entry_Value_NewList();
-		Dictionary_Add( dictionary, "manualParticlePositions", particlePositionsList );
+		Dictionary_Add( dictionary, (Dictionary_Entry_Key)"manualParticlePositions", particlePositionsList );
 	
-		particlePositionEntry = Dictionary_Entry_Value_NewStruct();
+		particlePositionEntry = Dictionary_Entry_Value_NewStruct( );
 		Dictionary_Entry_Value_AddElement( particlePositionsList, particlePositionEntry );
-		Dictionary_Entry_Value_AddMember( particlePositionEntry, "x", Dictionary_Entry_Value_FromDouble( 0.4 ) );
-		Dictionary_Entry_Value_AddMember( particlePositionEntry, "y", Dictionary_Entry_Value_FromDouble( 0.3 ) );
-		Dictionary_Entry_Value_AddMember( particlePositionEntry, "z", Dictionary_Entry_Value_FromDouble( 0.2 ) );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, (Dictionary_Entry_Key)"x", Dictionary_Entry_Value_FromDouble( 0.4 )  );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, (Dictionary_Entry_Key)"y", Dictionary_Entry_Value_FromDouble( 0.3 )  );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, (Dictionary_Entry_Key)"z", Dictionary_Entry_Value_FromDouble( 0.2 ) );
 	
-		particlePositionEntry = Dictionary_Entry_Value_NewStruct();
+		particlePositionEntry = Dictionary_Entry_Value_NewStruct( );
 		Dictionary_Entry_Value_AddElement( particlePositionsList, particlePositionEntry );
-		Dictionary_Entry_Value_AddMember( particlePositionEntry, "x", Dictionary_Entry_Value_FromDouble( 0.7 ) );
-		Dictionary_Entry_Value_AddMember( particlePositionEntry, "y", Dictionary_Entry_Value_FromDouble( 0.6 ) );
-		Dictionary_Entry_Value_AddMember( particlePositionEntry, "z", Dictionary_Entry_Value_FromDouble( 0.5 ) );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, (Dictionary_Entry_Key)"x", Dictionary_Entry_Value_FromDouble( 0.7 )  );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, (Dictionary_Entry_Key)"y", Dictionary_Entry_Value_FromDouble( 0.6 )  );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, (Dictionary_Entry_Key)"z", Dictionary_Entry_Value_FromDouble( 0.5 ) );
 	
-		particlePositionEntry = Dictionary_Entry_Value_NewStruct();
+		particlePositionEntry = Dictionary_Entry_Value_NewStruct( );
 		Dictionary_Entry_Value_AddElement( particlePositionsList, particlePositionEntry );
-		Dictionary_Entry_Value_AddMember( particlePositionEntry, "x", Dictionary_Entry_Value_FromDouble( 0.8 ) );
-		Dictionary_Entry_Value_AddMember( particlePositionEntry, "y", Dictionary_Entry_Value_FromDouble( 0.1 ) );
-		Dictionary_Entry_Value_AddMember( particlePositionEntry, "z", Dictionary_Entry_Value_FromDouble( 0.3 ) );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, (Dictionary_Entry_Key)"x", Dictionary_Entry_Value_FromDouble( 0.8 )  );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, (Dictionary_Entry_Key)"y", Dictionary_Entry_Value_FromDouble( 0.1 )  );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, (Dictionary_Entry_Key)"z", Dictionary_Entry_Value_FromDouble( 0.3 ) );
 	
-		particlePositionEntry = Dictionary_Entry_Value_NewStruct();
+		particlePositionEntry = Dictionary_Entry_Value_NewStruct( );
 		Dictionary_Entry_Value_AddElement( particlePositionsList, particlePositionEntry );
-		Dictionary_Entry_Value_AddMember( particlePositionEntry, "x", Dictionary_Entry_Value_FromDouble( 0.9 ) );
-		Dictionary_Entry_Value_AddMember( particlePositionEntry, "y", Dictionary_Entry_Value_FromDouble( 0.4 ) );
-		Dictionary_Entry_Value_AddMember( particlePositionEntry, "z", Dictionary_Entry_Value_FromDouble( 0.1 ) );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, (Dictionary_Entry_Key)"x", Dictionary_Entry_Value_FromDouble( 0.9 )  );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, (Dictionary_Entry_Key)"y", Dictionary_Entry_Value_FromDouble( 0.4 )  );
+		Dictionary_Entry_Value_AddMember( particlePositionEntry, (Dictionary_Entry_Key)"z", Dictionary_Entry_Value_FromDouble( 0.1 ) );
 	
 		/* Init mesh */
-		extensionMgr_Register = ExtensionManager_Register_New();
+		extensionMgr_Register = ExtensionManager_Register_New( );
 		mesh = ManualParticleLayoutSuite_BuildMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register );
 	
 		/* Configure the element-cell-layout */
@@ -159,7 +159,7 @@ void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData
 		Stg_Component_Initialise( swarm, 0, False );
 
 		Journal_Enable_AllTypedStream( True );
-		stream = Journal_Register( Info_Type, "ManualParticle" );
+		stream = Journal_Register( Info_Type, (Name)"ManualParticle"  );
 
 		/* Print out the particles on all cells */
 		Stream_RedirectFile( stream, "testManualParticle.dat" );

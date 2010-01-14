@@ -84,7 +84,7 @@ void TensorMathSuite_TestSymmetricTensorVectorComponents( TensorMathSuiteData* d
 
 	if (data->rank == procToWatch) {
 		int		dim;
-		Stream*	stream = Journal_Register( InfoStream_Type, "SymmetricTensorVectorComponents" );
+		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"SymmetricTensorVectorComponents"  );
 		char		expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathSymmetricTensorVectorComponents.dat" );
@@ -108,9 +108,9 @@ void TensorMathSuite_TestJournalPrintTensorArray( TensorMathSuiteData* data ) {
 	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
-		double		**tensor = Memory_Alloc_2DArray( double , 5, 5, "Tensor" );
+		double		**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
 		TensorArray	tensorArray;
-		Stream*		stream = Journal_Register( InfoStream_Type, "JournalPrintTensorArray" );
+		Stream*		stream = Journal_Register( InfoStream_Type, (Name)"JournalPrintTensorArray"  );
 		char			expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathJournalPrintTensorArray.dat" );
@@ -140,7 +140,7 @@ void TensorMathSuite_TestTensorToTensorArrayFunction( TensorMathSuiteData* data 
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
 		TensorArray			tensorArray;
-		Stream*				stream = Journal_Register( InfoStream_Type, "TensorToTensorArrayFunction" );
+		Stream*				stream = Journal_Register( InfoStream_Type, (Name)"TensorToTensorArrayFunction"  );
 		char					expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathArrayFunction.dat" );
@@ -189,9 +189,9 @@ void TensorMathSuite_TestMathArrayToMatrix( TensorMathSuiteData* data ) {
 	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
-		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, "Tensor" );
+		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
 		TensorArray			tensorArray;
-		Stream*				stream = Journal_Register( InfoStream_Type, "TensorArrayToMatrix" );
+		Stream*				stream = Journal_Register( InfoStream_Type, (Name)"TensorArrayToMatrix"  );
 		char					expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathArrayToMatrix.dat" );
@@ -229,9 +229,9 @@ void TensorMathSuite_TestSymmetricTensorToMatrix( TensorMathSuiteData* data ) {
 	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
-		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, "Tensor" );
+		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
 		SymmetricTensor	symmTensor;
-		Stream*				stream = Journal_Register( InfoStream_Type, "SymmetricTensorToMatrix" );
+		Stream*				stream = Journal_Register( InfoStream_Type, (Name)"SymmetricTensorToMatrix"  );
 		char					expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathSymmetricTensorToMatrix.dat" );
@@ -275,11 +275,11 @@ void TensorMathSuite_TestGetAntisymmetricPart( TensorMathSuiteData* data ) {
 	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
-		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, "Tensor" );
+		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
 		TensorArray			tensorArray;
 		TensorArray			tensor2;
 		int					dim;
-		Stream*				stream = Journal_Register( InfoStream_Type, "GetAntisymmetricPart" );
+		Stream*				stream = Journal_Register( InfoStream_Type, (Name)"GetAntisymmetricPart"  );
 		char					expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathGetAntisymmetricPart.dat" );
@@ -317,11 +317,11 @@ void TensorMathSuite_TestGetSymmetricPart( TensorMathSuiteData* data ) {
 	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
-		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, "Tensor" );
+		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
 		SymmetricTensor	symmTensor;
 		TensorArray			tensorArray;
 		int					dim;
-		Stream*				stream = Journal_Register( InfoStream_Type, "GetSymmetricPart" );
+		Stream*				stream = Journal_Register( InfoStream_Type, (Name)"GetSymmetricPart"  );
 		char					expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathGetSymmetricPart.dat" );
@@ -359,11 +359,11 @@ void TensorMathSuite_Test2ndInvariant( TensorMathSuiteData* data ) {
 	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
-		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, "Tensor" );
+		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
 		SymmetricTensor	symmTensor;
 		TensorArray			tensorArray;
 		int					dim;
-		Stream*				stream = Journal_Register( InfoStream_Type, "2ndInvariant" );
+		Stream*				stream = Journal_Register( InfoStream_Type, (Name)"2ndInvariant"  );
 		char					expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMath2ndInvariant.dat" );
@@ -403,12 +403,12 @@ void TensorMathSuite_TestVectorTensorVector( TensorMathSuiteData* data ) {
 	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
-		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, "Tensor" );
+		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
 		TensorArray			tensorArray;
 		int					dim;
 		double				a[] = {2,3,6,-2,9.1};
 		double				b[] = {1,-3,2.6,-2.2,-1.91};
-		Stream*				stream = Journal_Register( InfoStream_Type, "VectorTensorVector" );
+		Stream*				stream = Journal_Register( InfoStream_Type, (Name)"VectorTensorVector"  );
 		char					expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathVectorTensorVector.dat" );
@@ -443,7 +443,7 @@ void TensorMathSuite_TestZeroTensor( TensorMathSuiteData* data ) {
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
 		TensorArray			tensor2;
-		Stream*				stream = Journal_Register( InfoStream_Type, "ZeroTensor" );
+		Stream*				stream = Journal_Register( InfoStream_Type, (Name)"ZeroTensor"  );
 		char					expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathZeroTensor.dat" );
@@ -469,9 +469,9 @@ void TensorMathSuite_TestMatrixDeterminant( TensorMathSuiteData* data ) {
 	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
-		double	**tensor = Memory_Alloc_2DArray( double , 5, 5, "Tensor" );
+		double	**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
 		double	determinant;
-		Stream*	stream = Journal_Register( InfoStream_Type, "MatrixDeterminant" );
+		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"MatrixDeterminant"  );
 		char		expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathMatrixDeterminant.dat" );
@@ -515,7 +515,7 @@ void TensorMathSuite_TestCubicSolver( TensorMathSuiteData* data ) {
 	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
-		Stream*	stream = Journal_Register( InfoStream_Type, "CubicSolver" );
+		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"CubicSolver"  );
 		char		expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathCubicSolver.dat" );
@@ -540,7 +540,7 @@ void TensorMathSuite_TestMappingFunctions( TensorMathSuiteData* data ) {
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
 		TensorArray			tensorArray;
-		Stream*				stream = Journal_Register( InfoStream_Type, "MappingFunctions" );
+		Stream*				stream = Journal_Register( InfoStream_Type, (Name)"MappingFunctions"  );
 		char					expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathMappingFunctions.dat" );
@@ -663,7 +663,7 @@ void TensorMathSuite_TestEigenVectorListSort( TensorMathSuiteData* data ) {
 
 	if (data->rank == procToWatch) {
 		Eigenvector	eigenvectorList[3];
-		Stream*		stream = Journal_Register( InfoStream_Type, "EigenVectorListSort" );
+		Stream*		stream = Journal_Register( InfoStream_Type, (Name)"EigenVectorListSort"  );
 		char			expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathEigenVectorListSort.dat" );
@@ -741,7 +741,7 @@ void TensorMathSuite_TestEigenVector1( TensorMathSuiteData* data ) {
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
 		Eigenvector			eigenvectorList[3];
-		Stream*				stream = Journal_Register( InfoStream_Type, "EigenVector1" );
+		Stream*				stream = Journal_Register( InfoStream_Type, (Name)"EigenVector1"  );
 		char					expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathEigenVector1.dat" );
@@ -781,7 +781,7 @@ void TensorMathSuite_TestEigenVector2( TensorMathSuiteData* data ) {
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
 		Eigenvector			eigenvectorList[3];
-		Stream*				stream = Journal_Register( InfoStream_Type, "EigenVector2" );
+		Stream*				stream = Journal_Register( InfoStream_Type, (Name)"EigenVector2"  );
 		char					expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathEigenVector2.dat" );
@@ -818,7 +818,7 @@ void TensorMathSuite_TestEigenVector3( TensorMathSuiteData* data ) {
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
 		Eigenvector			eigenvectorList[3];
-		Stream*				stream = Journal_Register( InfoStream_Type, "EigenVector3" );
+		Stream*				stream = Journal_Register( InfoStream_Type, (Name)"EigenVector3"  );
 		char					expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathEigenVector3.dat" );
@@ -864,7 +864,7 @@ void TensorMathSuite_TestEigenVector4( TensorMathSuiteData* data ) {
 		XYZ					rightHandSide;
 		XYZ					solution;
 		int					dim;
-		Stream*				stream = Journal_Register( InfoStream_Type, "EigenVector4" );
+		Stream*				stream = Journal_Register( InfoStream_Type, (Name)"EigenVector4"  );
 		char					expected_file[PCU_PATH_MAX];
 
 		Stream_RedirectFile( stream, "testTensorMathEigenVector4.dat" );

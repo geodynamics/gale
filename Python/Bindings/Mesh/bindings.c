@@ -64,7 +64,7 @@ char Mesh_Python_Print__name__[] = "Print";
 PyObject* Mesh_Python_Print( PyObject* self, PyObject* args ) {
 	PyObject*	pyMesh;
 	Mesh*		mesh;
-	Stream*		stream = Journal_Register (Info_Type, "myStream");
+	Stream*		stream = Journal_Register( Info_Type, (Name)"myStream" );
 	
 	/* Obtain arguements */
 	if( !PyArg_ParseTuple( args, "O:", &pyMesh ) ) {

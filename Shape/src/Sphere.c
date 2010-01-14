@@ -152,7 +152,7 @@ void _Sphere_AssignFromXML( void* sphere, Stg_ComponentFactory* cf, void* data )
 
 	_Stg_Shape_AssignFromXML( self, cf, data );
 
-	radius = Stg_ComponentFactory_GetDouble( cf, self->name, "radius", 0.0 );
+	radius = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"radius", 0.0  );
 
 	_Sphere_Init( self, radius );
 }

@@ -148,21 +148,21 @@ void _Stg_Shape_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data
 	Bool            invert        = False;
 	double          alpha, beta, gamma;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !self->context  )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 
-	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
+	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0  );
 	
-	centre[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "CentreX", 0.0 );
-	centre[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "CentreY", 0.0 );
-	centre[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "CentreZ", 0.0 );
+	centre[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"CentreX", 0.0  );
+	centre[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"CentreY", 0.0  );
+	centre[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"CentreZ", 0.0  );
 
-	invert = Stg_ComponentFactory_GetBool( cf, self->name, "invert", False );
+	invert = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"invert", False  );
 
-	alpha = Stg_ComponentFactory_GetDouble( cf, self->name, "alpha", 0.0 );
-	beta  = Stg_ComponentFactory_GetDouble( cf, self->name, "beta", 0.0 );
-	gamma = Stg_ComponentFactory_GetDouble( cf, self->name, "gamma", 0.0 );
+	alpha = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"alpha", 0.0  );
+	beta  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"beta", 0.0  );
+	gamma = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"gamma", 0.0  );
 
 	_Stg_Shape_Init( self, dim, centre, invert, alpha, beta, gamma );
 }

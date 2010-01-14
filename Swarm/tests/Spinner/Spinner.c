@@ -31,9 +31,9 @@ void StGermain_Spinner_UpdatePositions( DomainContext* context ) {
 	Particle_InCellIndex		cParticle_I;
 	Particle* 	        	currParticle;
 	Index				dim_I;
-	Swarm*                          swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
+	Swarm*                          swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"swarm"  );
 	BlockGeometry*                  blockGeom;
-	Stream*                         stream = Journal_Register( Debug_Type, "particleUpdate" );
+	Stream*                         stream = Journal_Register( Debug_Type, (Name)"particleUpdate"  );
 	unsigned int                    movementSpeedDivisor = 100;
 	double                          x, y;
 	Bool                            reverseMode = False;
@@ -48,9 +48,9 @@ void StGermain_Spinner_UpdatePositions( DomainContext* context ) {
 
 	Stream_SetPrintingRank( stream, Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "procToWatch", 0 ) );
 	
-	blockGeom = (BlockGeometry*) LiveComponentRegister_Get( context->CF->LCRegister, "geometry" );
+	blockGeom = (BlockGeometry*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"geometry" );
 
-	for ( lCell_I=0; lCell_I < swarm->cellLocalCount; lCell_I++ ) {
+	for ( lCell_I=0; lCell_I < swarm->cellLocalCount; lCell_I++  ) {
 		Journal_Printf( stream, "\tUpdating Particles positions in local cell %d:\n", lCell_I );
 		for ( cParticle_I=0; cParticle_I < swarm->cellParticleCountTbl[lCell_I]; cParticle_I++ ) {
 			Coord movementVector = {0,0,0};
@@ -95,7 +95,7 @@ void StGermain_Spinner_UpdatePositions( DomainContext* context ) {
 void _StGermain_Spinner_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	DomainContext*   context;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  );
 	
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Solve, StGermain_Spinner_UpdatePositions );
 }
@@ -114,7 +114,7 @@ void* _StGermain_Spinner_DefaultNew( Name name ) {
 	}
 
 Index StGermain_Spinner_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, StGermain_Spinner_Type, "0", _StGermain_Spinner_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, StGermain_Spinner_Type, (Name)"0", _StGermain_Spinner_DefaultNew  );
 }
 
 

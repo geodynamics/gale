@@ -169,7 +169,7 @@ double _Everywhere_CalculateVolume( void* everywhere ) {
 }	
 void _Everywhere_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
 	Stg_Shape* self = (Stg_Shape*)shape;
-	Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 
 	"Please inform underworld-dev@vpac.org you've received this error.\n", __func__ );
 }

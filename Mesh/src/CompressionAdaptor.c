@@ -124,7 +124,7 @@ void _CompressionAdaptor_Print( void* adaptor, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* adaptorStream;
-	adaptorStream = Journal_Register( InfoStream_Type, "CompressionAdaptorStream" );
+	adaptorStream = Journal_Register( InfoStream_Type, (Name)"CompressionAdaptorStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "CompressionAdaptor (ptr): (%p)\n", self );
@@ -140,10 +140,10 @@ void _CompressionAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf,
 	/* Call parent construct. */
 	_MeshAdaptor_AssignFromXML( self, cf, data );
 
-	self->compressionfactor = Stg_ComponentFactory_GetDouble( cf, self->name, "compressionfactor", 0.0 );
+	self->compressionfactor = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"compressionfactor", 0.0 );
 	if(self->compressionfactor == 0.0){
 		printf("cannot have a zero compression factor exiting program\n");
-		abort();
+		abort( );
 	}
 }
 
@@ -187,7 +187,7 @@ void CompressionAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 
 	/* Extract the cartesian information. */
 	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
-					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+					      ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" )  );
 	inds = AllocArray( unsigned, Mesh_GetDimSize( mesh ) );
         
 	//get factor b so that there is always a 1 to 1 relationship with the top position normally and top position when compressed

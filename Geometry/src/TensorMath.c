@@ -71,9 +71,9 @@ int TensorArray_TensorMap(Dimension_Index row_I, Dimension_Index col_I, Dimensio
 			return TensorMapFT2D[ row_I ][ col_I ];
 		}
 		default: {
-			Stream* error = Journal_Register( ErrorStream_Type, "TensorMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMath"  );
 			Journal_Printf( error, "Cannot get tensor value for dimension %d in %s.\n", dim, __func__);
-			Journal_Firewall( dim, Journal_Register( Error_Type, "TensorMath" ),
+			Journal_Firewall( dim, Journal_Register( Error_Type, (Name)"TensorMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
 		}
 		
@@ -94,9 +94,9 @@ int SymmetricTensor_TensorMap(Dimension_Index row_I, Dimension_Index col_I, Dime
 			return TensorMapST2D[ row_I ][ col_I ];
 		}
 		default: {
-			Stream* error = Journal_Register( ErrorStream_Type, "TensorMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMath"  );
 			Journal_Printf( error, "Cannot get tensor value for dimension %d in %s.\n", dim, __func__);
-			Journal_Firewall( dim, Journal_Register( Error_Type, "TensorMath" ),
+			Journal_Firewall( dim, Journal_Register( Error_Type, (Name)"TensorMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
 		}
 		
@@ -125,7 +125,7 @@ void StGermain_SymmetricTensor_ToTensorArray(SymmetricTensor symTensor, Dimensio
 			StGermain_SymmetricTensor_ToTensorArray2D(symTensor, fullTensor);
 			return;
 		default: {
-			Journal_Firewall( False, Journal_Register( Error_Type, "TensorMath" ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)"TensorMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
 		}
 	}
@@ -169,7 +169,7 @@ void TensorArray_ToMatrix( TensorArray tensor, Dimension_Index dim, double** mat
 		matrix[2][0] = tensor[FT3D_20];	matrix[2][1] = tensor[FT3D_21];	matrix[2][2] = tensor[FT3D_22];
 	}
 	else {
-		Journal_Firewall( False, Journal_Register( Error_Type, "TensorMath" ),
+		Journal_Firewall( False, Journal_Register( Error_Type, (Name)"TensorMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
 	}
 }
@@ -234,9 +234,9 @@ void TensorArray_GetAntisymmetricPart( TensorArray tensor, Dimension_Index dim, 
 			antiSymmetric[ TensorMapFT2D[0][0] ] = 0.0;
 			return;
 		default: {
-			Stream* error = Journal_Register( ErrorStream_Type, "TensorMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMath"  );
 			Journal_Printf( error, "Cannot store tensor for dimension %d in %s.\n", dim, __func__);
-			Journal_Firewall( False, Journal_Register( Error_Type, "TensorMath" ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)"TensorMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
 		}
 	}
@@ -285,9 +285,9 @@ void TensorArray_GetSymmetricPart( TensorArray tensor, Dimension_Index dim, Symm
 				0.5 * (tensor[ TensorMapFT3D[1][2] ] + tensor[ TensorMapFT3D[2][1] ]); 
 			return;
 		default: {
-			Stream* error = Journal_Register( ErrorStream_Type, "TensorMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMath"  );
 			Journal_Printf( error, "Cannot store tensor for dimension %d in %s.\n", dim, __func__);
-			Journal_Firewall( False, Journal_Register( Error_Type, "TensorMath" ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)"TensorMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
 		}
 	}
@@ -320,9 +320,9 @@ void TensorArray_GetTrace( TensorArray tensor, Dimension_Index dim, double *trac
 		*trace = tensor[FT3D_00] + tensor[FT3D_11] + tensor[FT3D_22];
 		break;
 		  default:{
-		Stream* error = Journal_Register( ErrorStream_Type, "TensorMath" );
+		Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMath"  );
 			Journal_Printf( error, "Cannot compute trace for tensor in dimension %d (in %s) since dim < 1.\n", dim, __func__);
-			Journal_Firewall( False, Journal_Register( Error_Type, "TensorMath" ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)"TensorMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
 			break;
 		}
@@ -342,9 +342,9 @@ void SymmetricTensor_GetTrace( SymmetricTensor symmTensor, Dimension_Index dim, 
 		*trace = symmTensor[ST3D_00] + symmTensor[ST3D_11] + symmTensor[ST3D_22];
 		break;
 	  default:{
-		Stream* error = Journal_Register( ErrorStream_Type, "TensorMath" );
+		Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMath"  );
 		Journal_Printf( error, "Cannot compute trace for symmetric tensor in dimension %d (in %s) since dim is not in the range [1, 3].\n", dim, __func__);
-		Journal_Firewall( False, Journal_Register( Error_Type, "TensorMath" ),
+		Journal_Firewall( False, Journal_Register( Error_Type, (Name)"TensorMath"  ),
 			"In func '%s' don't understand dim = %u\n", __func__, dim );
 		break;
 		  }
@@ -417,9 +417,9 @@ double TensorArray_2ndInvariant( TensorArray tensor, Dimension_Index dim ) {
 			invariant += tensor[0] * tensor[0];
 			break;
 		default: {
-			Stream* error = Journal_Register( ErrorStream_Type, "TensorMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMath"  );
 			Journal_Printf( error, "Cannot read tensor for dimension %d in %s.\n", dim, __func__);
-			Journal_Firewall( False, Journal_Register( Error_Type, "TensorMath" ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)"TensorMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
 		}
 	}
@@ -449,9 +449,9 @@ double SymmetricTensor_2ndInvariant( SymmetricTensor tensor, Dimension_Index dim
 				tensor[ TensorMapST2D[0][1] ] * tensor[ TensorMapST2D[1][0] ] ;
 			break;
 		default: {
-			Stream* error = Journal_Register( ErrorStream_Type, "TensorMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMath"  );
 			Journal_Printf( error, "Cannot read tensor for dimension %d in %s.\n", dim, __func__);
-			Journal_Firewall( False, Journal_Register( Error_Type, "TensorMath" ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)"TensorMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
 		}
 	}
@@ -487,9 +487,9 @@ double TensorArray_MultiplyByVectors( TensorArray tensor, double* a, double* b, 
 				a[1] * tensor[ FT2D_11 ] * b[1] ;
 			break;
 		default: {
-			Stream* error = Journal_Register( ErrorStream_Type, "TensorMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMath"  );
 			Journal_Printf( error, "Cannot read tensor for dimension %d in %s.\n", dim, __func__);
-			Journal_Firewall( False, Journal_Register( Error_Type, "TensorMath" ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)"TensorMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
 		}
 	}
@@ -525,9 +525,9 @@ void SymmetricTensor_ApplyOnVector( SymmetricTensor tensor, double* vector, Dime
 				tensor[ TensorMapST2D[1][1] ] * vector[1] ;
 			break;
 		default: {
-			Stream* error = Journal_Register( ErrorStream_Type, "TensorMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMath"  );
 			Journal_Printf( error, "Cannot read tensor for dimension %d in %s.\n", dim, __func__);
-			Journal_Firewall( False, Journal_Register( Error_Type, "TensorMath" ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)"TensorMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
 		}
 	}
@@ -562,9 +562,9 @@ double SymmetricTensor_MultiplyByVectors( SymmetricTensor tensor, double* a, dou
 				a[1] * tensor[ TensorMapST2D[1][1] ] * b[1] ;
 			break;
 		default: {
-			Stream* error = Journal_Register( ErrorStream_Type, "TensorMath" );
+			Stream* error = Journal_Register( ErrorStream_Type, (Name)"TensorMath"  );
 			Journal_Printf( error, "Cannot read tensor for dimension %d in %s.\n", dim, __func__);
-			Journal_Firewall( False, Journal_Register( Error_Type, "TensorMath" ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)"TensorMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
 		}
 	}
@@ -582,7 +582,7 @@ void SymmetricTensor_ToMatrix( SymmetricTensor tensor, Dimension_Index dim, doub
 		matrix[2][0] = tensor[ST3D_02];	matrix[2][1] = tensor[ST3D_12];	matrix[2][2] = tensor[ST3D_22];
 	}
 	else {
-		Journal_Firewall( False, Journal_Register( Error_Type, "TensorMath" ),
+		Journal_Firewall( False, Journal_Register( Error_Type, (Name)"TensorMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
 	}
 }
@@ -780,7 +780,7 @@ void SymmetricTensor_CalcAllEigenvectors3D( SymmetricTensor tensor, Eigenvector*
 
 
 void SymmetricTensor_CalcAllEigenvectorsJacobi( SymmetricTensor tensor, Dimension_Index dim, Eigenvector* eigenvectorList ){
-	double** matrix = Memory_Alloc_2DArray( double, dim, dim, "Matrix" );
+	double** matrix = Memory_Alloc_2DArray( double, dim, dim, (Name)"Matrix"  );
 		
 	SymmetricTensor_ToMatrix( tensor, dim, matrix);
 	Matrix_CalcAllEigenvectorsJacobi( matrix, dim, eigenvectorList );
@@ -928,9 +928,9 @@ double StGermain_MatrixDeterminant_AxisIndependent( double** matrix, Dimension_I
 				+ matrix[A_axis][C_axis] *
 					( matrix[B_axis][A_axis]*matrix[C_axis][B_axis] - matrix[B_axis][B_axis]*matrix[C_axis][A_axis] );
 		default: {
-			Stream* error = Journal_Register( Error_Type , CURR_MODULE_NAME );
+			Stream* error = Journal_Register( Error_Type , (Name)CURR_MODULE_NAME  );
 			Journal_Printf(error, "Function %s doesn't support dimension %d.\n", __func__, dim);
-			Journal_Firewall( False, Journal_Register( Error_Type, "TensorMath" ),
+			Journal_Firewall( False, Journal_Register( Error_Type, (Name)"TensorMath"  ),
 				"In func '%s' don't understand dim = %u\n", __func__, dim );
 		}
 	}
@@ -963,7 +963,7 @@ void CubicSolver_OnlyRealRoots( double a2, double a1, double a0, double* rootLis
 		rootList[1] = rootList[2] = -a2/3.0 - halfB;
 		return;
 	}
-	Journal_Firewall( D <= 0.0, Journal_Register( Error_Type, "CubicSolver" ),
+	Journal_Firewall( D <= 0.0, Journal_Register( Error_Type, (Name)"CubicSolver"  ),
 			"In func %s - Polynomial discrimanent %g is positive which means there are complex solutions.\nCannot solve equation x^3 + %.4f x^2 + %.4f x + %.4f = 0\n", __func__ , D, a2, a1, a0 );
 
 
@@ -1038,7 +1038,7 @@ void TensorArray_SolveSystem( TensorArray tensorArray, double* solution, double*
 		default: 
 			Journal_Firewall( 
 					False, 
-					Journal_Register( Error_Type, CURR_MODULE_NAME ),
+					Journal_Register( Error_Type, (Name)CURR_MODULE_NAME  ),
 					"Function %s - doesn't understand dim = %u\n", __func__, dim );
 	}
 }

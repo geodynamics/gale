@@ -112,7 +112,7 @@ void _MeshBoundaryShape_AssignFromXML( void* _self, Stg_ComponentFactory* cf, vo
    _MeshBoundaryShape_Init( self );
 
    /* Need a mesh with a cartesian generator. */
-   self->mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
+   self->mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"mesh", Mesh, True, data  );
 
    /* Read in the walls to have friction applied. */
    wallList = _Stg_ComponentFactory_GetDictionaryValue( cf, self->name, "walls", NULL );

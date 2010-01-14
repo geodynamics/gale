@@ -61,7 +61,7 @@ void _SwarmOutputSuite_SetDt( void* context, double dt ) {
 }
 
 void SwarmOutputSuite_MoveParticles( DomainContext* context ) {
-	Swarm*				swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
+	Swarm*				swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"swarm"  );
 	Particle_Index		lParticle_I;
 	GlobalParticle*	particle;
 	double				x,y;
@@ -106,11 +106,11 @@ void SwarmOutputSuite_TestSwarmOutput( SwarmOutputSuiteData* data ) {
 
 		pcu_filename_input( "testSwarmOutput.xml", input_file );
 		cf = stgMainInitFromXML( input_file, data->comm, NULL );
-		context = (DomainContext*) LiveComponentRegister_Get( cf->LCRegister, "context" );
+		context = (DomainContext*) LiveComponentRegister_Get( cf->LCRegister, (Name)"context" );
 		dictionary = context->dictionary;
 
 		Journal_ReadFromDictionary( dictionary );
-		stgMainBuildAndInitialise( cf );
+		stgMainBuildAndInitialise( cf  );
 
 		ContextEP_Append( context, AbstractContext_EP_Dt, SwarmOutputSuite_Dt );
 		ContextEP_Append( context, AbstractContext_EP_Step, SwarmOutputSuite_MoveParticles );
@@ -121,13 +121,13 @@ void SwarmOutputSuite_TestSwarmOutput( SwarmOutputSuiteData* data ) {
 		AbstractContext_Dump( context );
 		Stg_Component_Execute( context, 0, False );
 
-		particleLayout = (SpaceFillerParticleLayout*) LiveComponentRegister_Get( context->CF->LCRegister, "particleLayout" );
-		swarmOutput = (SwarmOutput*) LiveComponentRegister_Get( context->CF->LCRegister, "swarmOutput" );
-		swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
+		particleLayout = (SpaceFillerParticleLayout*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"particleLayout" );
+		swarmOutput = (SwarmOutput* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"swarmOutput" );
+		swarm = (Swarm* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"swarm" );
 
 		pcu_check_true( particleLayout->isConstructed && particleLayout->isBuilt && particleLayout->isInitialised );
 		pcu_check_true( swarmOutput->isConstructed && swarmOutput->isBuilt && swarmOutput->isInitialised );
-		pcu_check_true( swarm->isConstructed && swarm->isBuilt && swarm->isInitialised );
+		pcu_check_true( swarm->isConstructed && swarm->isBuilt && swarm->isInitialised  );
 
 		pcu_check_streq( swarm->name, swarmOutput->swarm->name );
 

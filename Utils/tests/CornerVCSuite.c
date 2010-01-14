@@ -125,11 +125,11 @@ void CornerVCSuite_TestCornerVC( CornerVCSuiteData* data ) {
 
    io_handler = XML_IO_Handler_New();
 
- 	stream = Journal_Register( Info_Type, "CornerVCStream" );
+ 	stream = Journal_Register( Info_Type, (Name)"CornerVCStream"  );
    Stream_RedirectFile( stream, "testCornerVC.dat" );
 
    dictionary = Dictionary_New();
-   Dictionary_Add(dictionary, "outputPath", Dictionary_Entry_Value_FromString("./output"));
+   Dictionary_Add( dictionary, (Dictionary_Entry_Key)"outputPath", Dictionary_Entry_Value_FromString("./output") );
 
 	/* Input file */
 	pcu_filename_input( "cornerVC.xml", input_file );

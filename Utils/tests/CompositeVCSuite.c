@@ -123,11 +123,11 @@ void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
 
    io_handler = XML_IO_Handler_New();
 
- 	stream = Journal_Register( Info_Type, "CompositeVCStream" );
+ 	stream = Journal_Register( Info_Type, (Name)"CompositeVCStream"  );
    Stream_RedirectFile( stream, "testCompositeVC.dat" );
 
    dictionary = Dictionary_New();
-   Dictionary_Add(dictionary, "outputPath", Dictionary_Entry_Value_FromString("./output"));
+   Dictionary_Add( dictionary, (Dictionary_Entry_Key)"outputPath", Dictionary_Entry_Value_FromString("./output") );
 
 	/* Input file */
 	pcu_filename_input( "wallVC.xml", input_file );
@@ -141,9 +141,9 @@ void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
    nDomains = Mesh_GetDomainSize( mesh, MT_VERTEX );
 
    /* Create CF stuff */
-	quadCF = ConditionFunction_New(CompositeVCSuite_quadratic, "quadratic");
-	expCF = ConditionFunction_New(CompositeVCSuite_exponential, "exponential");
-	conFunc_Register = ConditionFunction_Register_New();
+	quadCF = ConditionFunction_New( CompositeVCSuite_quadratic, (Name)"quadratic" );
+	expCF = ConditionFunction_New( CompositeVCSuite_exponential, (Name)"exponential");
+	conFunc_Register = ConditionFunction_Register_New( );
 	ConditionFunction_Register_Add(conFunc_Register, quadCF);
 	ConditionFunction_Register_Add(conFunc_Register, expCF);
 
@@ -254,11 +254,11 @@ void CompositeVCSuite_TestCompositeVCDictionary( CompositeVCSuiteData* data ) {
 
    io_handler = XML_IO_Handler_New();
 
- 	stream = Journal_Register( Info_Type, "CompositeVCDictionaryStream" );
+ 	stream = Journal_Register( Info_Type, (Name)"CompositeVCDictionaryStream"  );
    Stream_RedirectFile( stream, "testCompositeVCDictionary.dat" );
 
    dictionary = Dictionary_New();
-   Dictionary_Add(dictionary, "outputPath", Dictionary_Entry_Value_FromString("./output"));
+   Dictionary_Add( dictionary, (Dictionary_Entry_Key)"outputPath", Dictionary_Entry_Value_FromString("./output") );
 	
 	/* Input file */
 	pcu_filename_input( "compositeVC.xml", input_file );
@@ -272,9 +272,9 @@ void CompositeVCSuite_TestCompositeVCDictionary( CompositeVCSuiteData* data ) {
 	nDomains = Mesh_GetDomainSize( mesh, MT_VERTEX );
 
 	/* Create CF stuff */
-	quadCF = ConditionFunction_New(CompositeVCSuite_quadratic, "quadratic");
-	expCF = ConditionFunction_New(CompositeVCSuite_exponential, "exponential");
-	conFunc_Register = ConditionFunction_Register_New();
+	quadCF = ConditionFunction_New( CompositeVCSuite_quadratic, (Name)"quadratic" );
+	expCF = ConditionFunction_New( CompositeVCSuite_exponential, (Name)"exponential");
+	conFunc_Register = ConditionFunction_Register_New( );
 	ConditionFunction_Register_Add(conFunc_Register, quadCF);
 	ConditionFunction_Register_Add(conFunc_Register, expCF);
 

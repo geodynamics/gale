@@ -93,22 +93,22 @@ void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data
    SwarmVariable* posVariable;
    SwarmVariable* posVariableNew;
    Variable_Register* varReg = Variable_Register_New();
-   stream = Journal_Register (Info_Type, "SwarmDumpStream");
+   stream = Journal_Register( Info_Type, (Name)"SwarmDumpStream" );
    
    Journal_Enable_TypedStream( DebugStream_Type, False );
    Stream_EnableBranch( Swarm_Debug, False );
    
-   Stream_Enable( Journal_Register( Info_Type, ParticleCommHandler_Type ), False );
-   Stream_Enable( Journal_Register( Info_Type, SwarmDump_Type ), False );
+   Stream_Enable( Journal_Register( Info_Type, (Name)ParticleCommHandler_Type  ), False );
+   Stream_Enable( Journal_Register( Info_Type, (Name)SwarmDump_Type  ), False );
    
    pcu_filename_input( "testSwarmDump.xml", input_file );
    /* setup from XML */
    cf = stgMainInitFromXML( input_file, data->comm, NULL );
-   context = (DomainContext*) LiveComponentRegister_Get( cf->LCRegister, "context" );
+   context = (DomainContext*) LiveComponentRegister_Get( cf->LCRegister, (Name)"context" );
    
    dictionary = context->dictionary;
 
-   swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
+   swarm = (Swarm* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"swarm"  );
    /* create a swarmVariable, as this will be required for the HDF5 checkpointing (else it doesn't know about the required variable to save) */   
    posVariable = Swarm_NewVectorVariable(swarm, "Position", GetOffsetOfMember( integrationPoint, xi ),Variable_DataType_Double, swarm->dim, "PositionX", "PositionY", "PositionZ" );
    posVariable->isCheckpointedAndReloaded = True;
@@ -133,7 +133,7 @@ void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data
    fileParticleLayout = FileParticleLayout_New( "fileParticleLayout", NULL, GlobalCoordSystem, False, 0, 0.0, output_file, data->nProcs );
    Stg_Component_AssignFromXML( fileParticleLayout, cf, 0, False );
    
-   newSwarm = Swarm_New( "testSwarm2", (AbstractContext*)context, (ElementCellLayout*) LiveComponentRegister_Get( context->CF->LCRegister, "elementCellLayout" ),
+   newSwarm = Swarm_New( "testSwarm2", (AbstractContext*)context, (ElementCellLayout*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"elementCellLayout"  ),
 		fileParticleLayout, 3, sizeof(Particle), extensionMgr_Register, varReg, data->comm, NULL );
    /* as with for the swarmDump,  create a swarmVariable, as this will be required for the HDF5 checkpointing (else it doesn't know about the required variable to save) */   
    posVariableNew = Swarm_NewVectorVariable( newSwarm, "Position", GetOffsetOfMember( integrationPoint, xi ), Variable_DataType_Double, newSwarm->dim, "PositionX", "PositionY", "PositionZ" );
@@ -216,8 +216,8 @@ void SwarmDumpAndLoadSuite_UpdateParticlePositionsTowardsAttractor( DomainContex
    Particle_InCellIndex    cParticle_I;
    Particle*               currParticle;
    Index                   dim_I;
-   Mesh*                   mesh = (Mesh*) LiveComponentRegister_Get( context->CF->LCRegister, "mesh-linear" );
-   Swarm*                  swarm = (Swarm*) LiveComponentRegister_Get( context->CF->LCRegister, "swarm" );
+   Mesh*                   mesh = (Mesh*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"mesh-linear" );
+   Swarm*                  swarm = (Swarm* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"swarm"  );
    Coord                   attractorPoint;
    double                  minCrds[3], maxCrds[3];
 

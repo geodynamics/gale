@@ -152,10 +152,10 @@ void _TriSingleCellLayout_AssignFromXML( void *triSingleCellLayout, Stg_Componen
 
 	_CellLayout_AssignFromXML( self, cf, data );
 
-	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
+	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0 );
 	assert( dim );
 
-	_TriSingleCellLayout_Init( (TriSingleCellLayout*)self, cf->rootDict, dim );
+	_TriSingleCellLayout_Init( (TriSingleCellLayout* )self, cf->rootDict, dim );
 }
 	
 void _TriSingleCellLayout_Build( void* triSingleCellLayout, void* data ){

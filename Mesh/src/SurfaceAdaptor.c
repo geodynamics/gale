@@ -125,7 +125,7 @@ void _SurfaceAdaptor_Print( void* adaptor, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* adaptorStream;
-	adaptorStream = Journal_Register( InfoStream_Type, "SurfaceAdaptorStream" );
+	adaptorStream = Journal_Register( InfoStream_Type, (Name)"SurfaceAdaptorStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "SurfaceAdaptor (ptr): (%p)\n", self );
@@ -144,23 +144,23 @@ void _SurfaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, voi
 	_MeshAdaptor_AssignFromXML( self, cf, data );
 
 	/* Rip out the components structure as a dictionary. */
-	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
+	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, (Dictionary_Entry_Key)self->name )  );
 
         /* Check if we want to keep a certain depth at the bottom reserved for
            contact elements. */
-        self->contactDepth = Stg_ComponentFactory_GetInt( cf, self->name, "contactDepth", 0 );
+        self->contactDepth = Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"contactDepth", 0  );
 
 	/* What kind of surface do we want? */
-	surfaceType = Stg_ComponentFactory_GetString( cf, self->name, "surfaceType", "" );
+	surfaceType = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"surfaceType", ""  );
 	if( !strcmp( surfaceType, "wedge" ) ) {
 		self->surfaceType = SurfaceAdaptor_SurfaceType_Wedge;
-		self->info.wedge.offs[0] = Stg_ComponentFactory_GetDouble( cf, self->name, "beginOffset", 0.0 );
-		self->info.wedge.endOffs[0] = Stg_ComponentFactory_GetDouble( cf, self->name, "endOffset", 1.0 );
-		self->info.wedge.grad[0] = Stg_ComponentFactory_GetDouble( cf, self->name, "gradient", 0.5 );
+		self->info.wedge.offs[0] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"beginOffset", 0.0  );
+		self->info.wedge.endOffs[0] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"endOffset", 1.0  );
+		self->info.wedge.grad[0] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"gradient", 0.5  );
 		/* get the parameters for the z-axis */
-		self->info.wedge.offs[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "beginOffsetZ", 0.0 );
-		self->info.wedge.endOffs[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "endOffsetZ", 1.0 );
-		self->info.wedge.grad[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "gradientZ", 0.5 );
+		self->info.wedge.offs[1] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"beginOffsetZ", 0.0  );
+		self->info.wedge.endOffs[1] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"endOffsetZ", 1.0  );
+		self->info.wedge.grad[1] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"gradientZ", 0.5  );
 	}
 	else if( !strcmp( surfaceType, "sine" ) || !strcmp( surfaceType, "cosine" ) ) {
 		Dictionary_Entry_Value*	originList;
@@ -170,13 +170,13 @@ void _SurfaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, voi
 		else
 			self->surfaceType = SurfaceAdaptor_SurfaceType_Cosine;
 
-		originList = Dictionary_Get( dict, "origin" );
+		originList = Dictionary_Get( dict, (Dictionary_Entry_Key)"origin" );
 		if( originList ) {
 			unsigned	nDims;
 			unsigned	d_i;
 
 			nDims = Dictionary_Entry_Value_GetCount( originList );
-			for( d_i = 0; d_i < nDims; d_i++ ) {
+			for( d_i = 0; d_i < nDims; d_i++  ) {
 				Dictionary_Entry_Value*	val;
 
 				val = Dictionary_Entry_Value_GetElement( originList, d_i );
@@ -186,11 +186,11 @@ void _SurfaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, voi
 		else
 			memset( self->info.trig.origin, 0, sizeof(double) * 2 );
 
-		self->info.trig.amp = Stg_ComponentFactory_GetDouble( cf, self->name, "amplitude", 1.0 );
-		self->info.trig.freq = Stg_ComponentFactory_GetDouble( cf, self->name, "frequency", 1.0 );
+		self->info.trig.amp = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"amplitude", 1.0  );
+		self->info.trig.freq = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"frequency", 1.0 );
 	}
 	else
-		_SurfaceAdaptor_Init( self );
+		_SurfaceAdaptor_Init( self  );
 }
 
 void _SurfaceAdaptor_Build( void* adaptor, void* data ) {
@@ -259,7 +259,7 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 
 	/* Extract the cartesian information. */
 	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
-					      ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+					      ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" )  );
 	inds = AllocArray( unsigned, Mesh_GetDimSize( mesh ) );
 
 	/* Loop over domain nodes. */

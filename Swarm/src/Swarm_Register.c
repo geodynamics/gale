@@ -172,7 +172,7 @@ Swarm* Swarm_Register_Get( Swarm_Register* self, Name name )
 {
 	assert( self );
 	
-	return (Swarm*)Stg_ObjectList_Get( self->swarmList, name );
+	return (Swarm*)Stg_ObjectList_Get( self->swarmList, (Name)name  );
 }
 
 Swarm* Swarm_Register_At( void* swarmRegister, Index index ) {
@@ -214,9 +214,9 @@ void Swarm_Register_SaveAllRegisteredSwarms( Swarm_Register* self, void* context
 	Index                     swarmsToDumpCount = 0;
 	SwarmDump*                swarmDumper;
 	Swarm*                    swarm;
-	Stream*                   info = Journal_Register( Info_Type, self->type );
+	Stream*                   info = Journal_Register( Info_Type, (Name)self->type );
 
-	if ( swarmCount == 0 ) {
+	if ( swarmCount == 0  ) {
 		return;
 	}	
 	

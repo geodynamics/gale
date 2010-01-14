@@ -127,7 +127,7 @@ void _LinearSpaceAdaptor_Print( void* adaptor, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* adaptorStream;
-	adaptorStream = Journal_Register( InfoStream_Type, "LinearSpaceAdaptorStream" );
+	adaptorStream = Journal_Register( InfoStream_Type, (Name)"LinearSpaceAdaptorStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "LinearSpaceAdaptor (ptr): (%p)\n", self );
@@ -147,29 +147,29 @@ void _LinearSpaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf,
 	assert( self );
 	assert( cf );
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, True, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, True, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data );
 	self->loadFromCheckPoint = context->loadFromCheckPoint;
 
-	if( self->loadFromCheckPoint )
+	if( self->loadFromCheckPoint  )
 	  return;
 
 	/* Call parent construct. */
 	_MeshAdaptor_AssignFromXML( self, cf, data );
 
-	self->minX = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, "minX" ) );
-	self->maxX = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, "maxX" ) );
-	self->minY = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, "minY" ) );
-	self->maxY = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, "maxY" ) );
-	self->minZ = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, "minZ" ) );
-	self->maxZ = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, "maxZ" ) );
+	self->minX = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)"minX" )  );
+	self->maxX = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)"maxX" )  );
+	self->minY = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)"minY" )  );
+	self->maxY = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)"maxY" )  );
+	self->minZ = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)"minZ" )  );
+	self->maxZ = Dictionary_Entry_Value_AsDouble( Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)"maxZ" )  );
 
 	/* Read maping functions - X axis*/
-        optionsList = Dictionary_Get( dictionary, "mappingFunctionX" );
+        optionsList = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"mappingFunctionX" );
 
 	if( optionsList ) {
-	  segmentCount = Dictionary_Entry_Value_GetCount(optionsList);
+	  segmentCount = Dictionary_Entry_Value_GetCount(optionsList );
 	  self->nSegmentsx = segmentCount;
 
 	  self->tablex = Memory_Alloc_Array( segment , segmentCount, "mapping table x" );
@@ -178,8 +178,8 @@ void _LinearSpaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf,
 	  for ( segment_I = 0 ; segment_I < segmentCount ; segment_I++) { 
 	    optionSet = Dictionary_Entry_Value_GetElement(optionsList, segment_I );
 	    seg = &(self->tablex[segment_I]);
-	    seg->x = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, "point" ) );
-	    seg->y = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, "mappedTo" ) );
+	    seg->x = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, (Dictionary_Entry_Key)"point" )  );
+	    seg->y = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, (Dictionary_Entry_Key)"mappedTo" )  );
 	  }
 	  LinearSpaceAdaptor_FillTable( self->tablex, segmentCount );
 	} else {
@@ -188,10 +188,10 @@ void _LinearSpaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf,
 
 
 	/* Read maping functions - Y axis*/
-        optionsList = Dictionary_Get( dictionary, "mappingFunctionY" );
+        optionsList = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"mappingFunctionY" );
 	
 	if( optionsList ) {
-	  segmentCount = Dictionary_Entry_Value_GetCount(optionsList);
+	  segmentCount = Dictionary_Entry_Value_GetCount(optionsList );
 	  self->nSegmentsy = segmentCount;
 
 	  self->tabley = Memory_Alloc_Array( segment , segmentCount, "mapping table y" );
@@ -200,8 +200,8 @@ void _LinearSpaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf,
 	  for ( segment_I = 0; segment_I < segmentCount; segment_I++) { 
 	    optionSet = Dictionary_Entry_Value_GetElement(optionsList, segment_I );
 	    seg = &(self->tabley[segment_I]);
-	    seg->x = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, "point" ) );
-	    seg->y = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, "mappedTo" ) );
+	    seg->x = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, (Dictionary_Entry_Key)"point" )  );
+	    seg->y = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, (Dictionary_Entry_Key)"mappedTo" )  );
 	  }
 	  LinearSpaceAdaptor_FillTable( self->tabley, segmentCount );
 	} else {
@@ -210,10 +210,10 @@ void _LinearSpaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf,
 
 
 	/* Read maping functions - Z axis*/
-        optionsList = Dictionary_Get( dictionary, "mappingFunctionZ" );
+        optionsList = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"mappingFunctionZ" );
 	
 	if( optionsList ) {
-	  segmentCount = Dictionary_Entry_Value_GetCount(optionsList);
+	  segmentCount = Dictionary_Entry_Value_GetCount(optionsList );
 	  self->nSegmentsz = segmentCount;
 
 	  self->tablez = Memory_Alloc_Array( segment , segmentCount, "mapping table x" );
@@ -222,8 +222,8 @@ void _LinearSpaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf,
 	  for ( segment_I = 0 ; segment_I < segmentCount ; segment_I++) { 
 	    optionSet = Dictionary_Entry_Value_GetElement(optionsList, segment_I );
 	    seg = &(self->tablez[segment_I]);
-	    seg->x = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, "point" ) );
-	    seg->y = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, "mappedTo" ) );
+	    seg->x = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, (Dictionary_Entry_Key)"point" )  );
+	    seg->y = Dictionary_Entry_Value_AsDouble( Dictionary_Entry_Value_GetMember( optionSet, (Dictionary_Entry_Key)"mappedTo" )  );
 	  }
 	  LinearSpaceAdaptor_FillTable( self->tablez, segmentCount );
 	} else {

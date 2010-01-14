@@ -77,7 +77,7 @@ void ComplexMathSuite_TestComplexJournalPrintingMacro( ComplexMathSuiteData* dat
 		Cmplx		v = {1.5, -3};
 		Cmplx		i = {0, 1};
 		char		expected_file[PCU_PATH_MAX];
-		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathPrintingMacro" );
+		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"ComplexMathPrintingMacro"  );
 		Stream_RedirectFile( stream, "testComplexMathPrintingMacro.dat" );
 
 		Journal_Printf(stream, "----------------- Testing Complex Journal Printing Macro -----------------\n" );
@@ -103,7 +103,7 @@ void ComplexMathSuite_TestAddition( ComplexMathSuiteData* data ) {
 		Cmplx		y = {-1.5, 3};
 		Cmplx		dest = {0, 0};
 		char		expected_file[PCU_PATH_MAX];
-		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathAddition" );
+		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"ComplexMathAddition"  );
 		Stream_RedirectFile( stream, "testComplexMathAddition.dat" );
 
 		Journal_Printf(stream, "----------------- Testing Addition -----------------\n" );
@@ -128,7 +128,7 @@ void ComplexMathSuite_TestSubtraction( ComplexMathSuiteData* data ) {
 		Cmplx		y = {-1.5, 3};
 		Cmplx		dest = {0, 0};
 		char		expected_file[PCU_PATH_MAX];
-		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathSubtraction" );
+		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"ComplexMathSubtraction"  );
 		Stream_RedirectFile( stream, "testComplexMathSubtraction.dat" );
 
 		Journal_Printf(stream, "----------------- Testing Subtraction -----------------\n" );
@@ -153,7 +153,7 @@ void ComplexMathSuite_TestMultiplication( ComplexMathSuiteData* data ) {
 		Cmplx		y = {-1.5, 3};
 		Cmplx		dest = {0, 0};
 		char		expected_file[PCU_PATH_MAX];
-		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathMultiplication" );
+		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"ComplexMathMultiplication"  );
 		Stream_RedirectFile( stream, "testComplexMathMultiplication.dat" );
 
 		Journal_Printf(stream, "----------------- Testing Multiplication -----------------\n" );
@@ -178,7 +178,7 @@ void ComplexMathSuite_TestDivision( ComplexMathSuiteData* data ) {
 		Cmplx		y = {-1.5, 3};
 		Cmplx		dest = {0, 0};
 		char		expected_file[PCU_PATH_MAX];
-		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathDivision" );
+		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"ComplexMathDivision"  );
 		Stream_RedirectFile( stream, "testComplexMathDivision.dat" );
 
 		Journal_Printf(stream, "----------------- Testing Division -----------------\n" );
@@ -202,7 +202,7 @@ void ComplexMathSuite_TestRealNumber( ComplexMathSuiteData* data ) {
 		Cmplx		y = {-1.5, 3};
 		Cmplx		dest = {0, 0};
 		char		expected_file[PCU_PATH_MAX];
-		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathRealNumber" );
+		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"ComplexMathRealNumber"  );
 		Stream_RedirectFile( stream, "testComplexMathRealNumber.dat" );
 
 		Journal_Printf(stream, "----------------- Testing Real Number Math stuff -----------------\n" );
@@ -239,7 +239,7 @@ void ComplexMathSuite_TestConjugate( ComplexMathSuiteData* data ) {
 	if (data->rank == procToWatch) {
 		Cmplx		x = {1, 2};
 		char		expected_file[PCU_PATH_MAX];
-		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathConjugate" );
+		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"ComplexMathConjugate"  );
 		Stream_RedirectFile( stream, "testComplexMathConjugate.dat" );
 
 		Journal_Printf(stream, "----------------- Testing Conjugate -----------------\n" );
@@ -268,7 +268,7 @@ void ComplexMathSuite_TestPolar( ComplexMathSuiteData* data ) {
 		Cmplx		minus_i = {0, -1};
 		double	mod, theta;
 		char		expected_file[PCU_PATH_MAX];
-		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathPolar" );
+		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"ComplexMathPolar"  );
 		Stream_RedirectFile( stream, "testComplexMathPolar.dat" );
 
 		Journal_Printf(stream, "----------------- Testing Complex Polar Stuff -----------------\n" );
@@ -307,7 +307,7 @@ void ComplexMathSuite_TestPower( ComplexMathSuiteData* data ) {
 		Cmplx		y = {-1.5, 3};
 		Cmplx		dest = {0, 0};
 		char		expected_file[PCU_PATH_MAX];
-		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathPower" );
+		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"ComplexMathPower"  );
 		Stream_RedirectFile( stream, "testComplexMathPower.dat" );
 
 		Journal_Printf(stream, "----------------- Testing Complex to real Power Stuff -----------------\n" );
@@ -345,7 +345,7 @@ void ComplexMathSuite_TestBeautifulEquation( ComplexMathSuiteData* data ) {
 		Cmplx		ipi = {0, M_PI};
 		Cmplx		dest = {0, 0};
 		char		expected_file[PCU_PATH_MAX];
-		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathBeautifulEquation" );
+		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"ComplexMathBeautifulEquation"  );
 		Stream_RedirectFile( stream, "testComplexMathBeautifulEquation.dat" );
 
 		Journal_Printf(stream, "----------------- Testing The Most Beautiful Equation in Mathematics e^{i \\pi} + 1 = 0 -----------------\n" );
@@ -375,7 +375,7 @@ void ComplexMathSuite_TestExponential( ComplexMathSuiteData* data ) {
 		Cmplx		ipi = {0, M_PI};
 		Cmplx		dest = {0, 0};
 		char		expected_file[PCU_PATH_MAX];
-		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathExponential" );
+		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"ComplexMathExponential"  );
 		Stream_RedirectFile( stream, "testComplexMathExponential.dat" );
 
 		Journal_Printf(stream, "----------------- Testing Exponential -----------------\n" );
@@ -414,7 +414,7 @@ void ComplexMathSuite_TestCopyAndZero( ComplexMathSuiteData* data ) {
 		Cmplx		x = {1, 2};
 		Cmplx		dest = {0, 0};
 		char		expected_file[PCU_PATH_MAX];
-		Stream*	stream = Journal_Register( InfoStream_Type, "ComplexMathCopyAndZero" );
+		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"ComplexMathCopyAndZero"  );
 		Stream_RedirectFile( stream, "testComplexMathCopyAndZero.dat" );
 
 		Journal_Printf(stream, "----------------- Testing Copy and Zero -----------------\n" );
