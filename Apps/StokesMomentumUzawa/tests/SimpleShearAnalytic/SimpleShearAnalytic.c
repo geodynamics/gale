@@ -77,15 +77,15 @@ void _SimpleShearAnalytic_AssignFromXML( void* analyticSolution, Stg_ComponentFa
 
 	_AnalyticSolution_AssignFromXML( self, cf, data );
 
-	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
+	velocityField = Stg_ComponentFactory_ConstructByName( cf, (Name)"VelocityField", FeVariable, True, data  ); 
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, velocityField, SimpleShearAnalytic_VelocityFunction );
 	
-	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
+	pressureField = Stg_ComponentFactory_ConstructByName( cf, (Name)"PressureField", FeVariable, True, data  ); 
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, SimpleShearAnalytic_PressureFunction );
 	
 	/* Set constants */
-	self->centreY = Stg_ComponentFactory_GetRootDictDouble( cf, "simpleShearCentreY", 0.0 );
-	self->factor  = Stg_ComponentFactory_GetRootDictDouble( cf, "SimpleShearFactor", 1.0 );
+	self->centreY = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"simpleShearCentreY", 0.0  );
+	self->factor  = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"SimpleShearFactor", 1.0 );
 }
 
 void* _SimpleShearAnalytic_DefaultNew( Name name ) {
@@ -109,9 +109,9 @@ void* _SimpleShearAnalytic_DefaultNew( Name name ) {
 }
 
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
-Index StgFEM_SimpleShearAnalytic_Register( PluginsManager* pluginsManager ) {
+Index StgFEM_SimpleShearAnalytic_Register( PluginsManager* pluginsManager  ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
-	return PluginsManager_Submit( pluginsManager, SimpleShearAnalytic_Type, "0", _SimpleShearAnalytic_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, SimpleShearAnalytic_Type, (Name)"0", _SimpleShearAnalytic_DefaultNew  );
 }
 
 

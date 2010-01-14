@@ -133,7 +133,7 @@ void _MassMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, 
     /* Construct Parent */
     _StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
-    field = Stg_ComponentFactory_ConstructByKey( cf, self->name, "field", FeVariable, True, data ) ;
+    field = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"field", FeVariable, True, data  ) ;
 
     _MassMatrixTerm_Init( self, field );
 }

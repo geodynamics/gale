@@ -54,10 +54,10 @@ const Type StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_Type = "StgF
 
 void StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_PrintTimeInfo( AbstractContext* context ) {
 	StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve*	self;
-	Stokes_SLE*	sle  = (Stokes_SLE*) LiveComponentRegister_Get( context->CF->LCRegister, "stokesEqn");
-	SLE_Solver*	solver = (SLE_Solver*) LiveComponentRegister_Get( context->CF->LCRegister, "uzawa");
+	Stokes_SLE*	sle  = (Stokes_SLE*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"stokesEqn");
+	SLE_Solver*	solver = (SLE_Solver* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"uzawa");
 
-	self = (StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve*)LiveComponentRegister_Get( context->CF->LCRegister, StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_Type );
+	self = (StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_Type  );
 	
 	/* Print Current Average InnerIteration Time Taken */
 	StgFEM_FrequentOutput_PrintValue( context, solver->avgtimeinnerits);
@@ -80,7 +80,7 @@ void StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_PrintTimeInfo( Abs
 void _StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve* self = (StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve*)component;
 	AbstractContext* context;
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  ); 
 	self->context = context;
 		
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput ,StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_PrintTimeInfo );
@@ -88,7 +88,7 @@ void _StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_AssignFromXML( vo
 
 void _StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_Initialise( void* component, void* data ) {
 	StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve* self = (StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve*)component;
-	Stokes_SLE*  sle  = (Stokes_SLE*) LiveComponentRegister_Get( self->context->CF->LCRegister, "stokesEqn");
+	Stokes_SLE*  sle  = (Stokes_SLE*) LiveComponentRegister_Get( self->context->CF->LCRegister, (Name)"stokesEqn" );
 		
 	/*this isn't set to true before the initialise phase*/
 	
@@ -123,7 +123,7 @@ void* _StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_DefaultNew( Name
 }
    
 Index StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_Type, "0", _StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_Type, (Name)"0", _StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_DefaultNew  );
 }
 
 

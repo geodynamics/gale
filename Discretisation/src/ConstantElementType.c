@@ -177,7 +177,7 @@ to do this!
 void _ConstantElementType_SF_allLocalDerivs_allNodes( void* elementType, const double localCoord[],
 		double** const evaluatedDerivatives )
 {		
-	Stream* error = Journal_Register( ErrorStream_Type, ConstantElementType_Type );
+	Stream* error = Journal_Register( ErrorStream_Type, (Name)ConstantElementType_Type  );
 	/* all derivatives are zero*/
 	Journal_Printf( error, "Error: Trying take derivative of a constant shape function \n" );
 	assert( 0 );
@@ -196,7 +196,7 @@ void _ConstantElementType_ConvertGlobalCoordToElLocal(
 }
 
 int _ConstantElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
-	Stream*	errStream	= Journal_Register( ErrorStream_Type, ElementType_Type );
+	Stream*	errStream	= Journal_Register( ErrorStream_Type, (Name)ElementType_Type  );
 
 	Journal_Printf( errStream, "surface normal not defined for this element type.\n" );
 	assert( 0 );

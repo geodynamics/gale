@@ -208,16 +208,16 @@ void _Stokes_SLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data 
 	/* Construct Parent */
 	_SystemLinearEquations_AssignFromXML( self, cf, data );
 
-	kStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "StressTensorMatrix",    StiffnessMatrix, True, data );
-	gStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "GradientMatrix",        StiffnessMatrix, True, data );
-	dStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "DivergenceMatrix",      StiffnessMatrix, False, data );
-	cStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "CompressibilityMatrix", StiffnessMatrix, False, data );
+	kStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"StressTensorMatrix", StiffnessMatrix, True, data  );
+	gStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"GradientMatrix", StiffnessMatrix, True, data  );
+	dStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"DivergenceMatrix", StiffnessMatrix, False, data  );
+	cStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"CompressibilityMatrix", StiffnessMatrix, False, data  );
 
-	uSolnVec  =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityVector",        SolutionVector,  True, data );
-	pSolnVec  =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureVector",        SolutionVector,  True, data );
+	uSolnVec  =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"VelocityVector", SolutionVector, True, data  );
+	pSolnVec  =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureVector", SolutionVector, True, data  );
 
-	fForceVec =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ForceVector",           ForceVector,     True, data );
-	hForceVec =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ContinuityForceVector", ForceVector,     True, data );
+	fForceVec =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ForceVector", ForceVector, True, data  );
+	hForceVec =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ContinuityForceVector", ForceVector, True, data  );
 
 	_Stokes_SLE_Init( self, kStiffMat, gStiffMat, dStiffMat, cStiffMat, uSolnVec, pSolnVec, fForceVec, hForceVec );
 }

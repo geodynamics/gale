@@ -133,7 +133,7 @@ void _ShapeFeVariable_AssignFromXML( void* shapeFeVariable, Stg_ComponentFactory
 
 	_FeVariable_AssignFromXML( self, cf, data );
 
-	_ShapeFeVariable_Init( self, Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Shape", Stg_Shape,  True, data )  ) ;
+	_ShapeFeVariable_Init( self, Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Shape", Stg_Shape, True, data )   ) ;
 }
 
 void _ShapeFeVariable_Build( void* shapeFeVariable, void* data ) {

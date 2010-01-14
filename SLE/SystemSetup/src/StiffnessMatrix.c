@@ -182,11 +182,11 @@ void _StiffnessMatrix_Init(
 	void*                                            entryPoint_Register,
 	MPI_Comm                                         comm )
 {
-	Stream*		error = Journal_Register( ErrorStream_Type, self->type );
+	Stream*		error = Journal_Register( ErrorStream_Type, (Name)self->type  );
 	Stream*		stream;
 
 	/* General and Virtual info should already be set */
-	stream = Journal_Register( Info_Type, self->type );
+	stream = Journal_Register( Info_Type, (Name)self->type  );
 	Stream_SetPrintingRank( stream, 0 );
 	
 	/* StiffnessMatrix info */
@@ -394,25 +394,25 @@ void _StiffnessMatrix_AssignFromXML( void* stiffnessMatrix, Stg_ComponentFactory
 	Bool             isNonLinear;
 	Bool             allowZeroElementContributions;
 	
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
-	if( !self->context )
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", FiniteElementContext, False, data );
+	if( !self->context  )
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", FiniteElementContext, True, data  );
 
-	rowVar             = Stg_ComponentFactory_ConstructByKey( cf, self->name, "RowVariable",        FeVariable,    True, data );
-	colVar             = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColumnVariable",     FeVariable,    True, data );
-	fVector            = Stg_ComponentFactory_ConstructByKey( cf, self->name, "RHS",                ForceVector,   False, data );
-	applicationDepInfo = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ApplicationDepInfo", Stg_Component, False, data);
+	rowVar             = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"RowVariable", FeVariable, True, data  );
+	colVar             = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ColumnVariable", FeVariable, True, data  );
+	fVector            = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"RHS", ForceVector, False, data  );
+	applicationDepInfo = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ApplicationDepInfo", Stg_Component, False, data);
 	
 	entryPointRegister = self->context->entryPoint_Register; 
-	assert( entryPointRegister );
+	assert( entryPointRegister  );
 	
-	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
-	assert( dim );
+	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0 );
+	assert( dim  );
 
-	isNonLinear = Stg_ComponentFactory_GetBool( cf, self->name, "isNonLinear", False );
+	isNonLinear = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"isNonLinear", False  );
 
 	/* Default is to allow zero element contributions - to allow backward compatibility */
-	allowZeroElementContributions = Stg_ComponentFactory_GetBool( cf, self->name, "allowZeroElementContributions", True );
+	allowZeroElementContributions = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"allowZeroElementContributions", True  );
 
 	_StiffnessMatrix_Init( 
 		self, 
@@ -427,11 +427,11 @@ void _StiffnessMatrix_AssignFromXML( void* stiffnessMatrix, Stg_ComponentFactory
 		0 );
 
 	/* Do we need to use the transpose? */
-	self->transRHS = Stg_ComponentFactory_ConstructByKey( cf, self->name, "transposeRHS", ForceVector, False, data );
+	self->transRHS = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"transposeRHS", ForceVector, False, data  );
 
 	/* Read the matrix type from the dictionary. */
-/* 	self->shellMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "matrix", PETScShellMatrix, False, data ); */
-/* 	if( !self->shellMatrix ) { */
+/* 	self->shellMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"matrix", PETScShellMatrix, False, data ); */
+/* 	if( !self->shellMatrix  ) { */
 /* 		self->useShellMatrix = False; */
 /* 	} */
 /* 	else { */
@@ -441,8 +441,8 @@ void _StiffnessMatrix_AssignFromXML( void* stiffnessMatrix, Stg_ComponentFactory
 /* 	} */
 
 	/* Setup the stream. */
-	stream = Journal_Register( Info_Type, self->type );
-	if( Dictionary_GetBool_WithDefault( cf->rootDict, "watchAll", False ) == True )
+	stream = Journal_Register( Info_Type, (Name)self->type  );
+	if( Dictionary_GetBool_WithDefault( cf->rootDict, (Dictionary_Entry_Key)"watchAll", False ) == True  )
 		Stream_SetPrintingRank( stream, STREAM_ALL_RANKS );
 	else {
 		unsigned	rankToWatch;
@@ -895,7 +895,7 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 	Stream_IndentBranch( StgFEM_Debug );
 
 	Journal_Firewall( Stg_ObjectList_Count( self->stiffnessMatrixTermList ) != 0,
-			  Journal_Register(Error_Type, self->type),
+			  Journal_Register( Error_Type, (Name)self->type ),
 			  "Error in func %s for %s '%s' - No StiffnessMatrixTerms registered.\n", 
 			  __func__, self->type, self->name );
 
@@ -984,7 +984,7 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 			if (elStiffMatToAdd) Memory_Free( elStiffMatToAdd );
 			Journal_DPrintfL( self->debug, 2, "Reallocating elStiffMatToAdd to size %d*%d\n",
 					  *totalDofsThisElement[ROW_VAR], *totalDofsThisElement[COL_VAR] ); 
-			elStiffMatToAdd = Memory_Alloc_2DArray( double, *totalDofsThisElement[ROW_VAR], *totalDofsThisElement[COL_VAR], "elStiffMatToAdd" );
+			elStiffMatToAdd = Memory_Alloc_2DArray( double, *totalDofsThisElement[ROW_VAR], *totalDofsThisElement[COL_VAR], (Name)"elStiffMatToAdd"  );
 		}
 
 		/* Initialise the elStiffMat to zero */
@@ -2696,7 +2696,7 @@ void StiffnessMatrix_CheckElementAssembly(
 	Bool              atLeastOneNonZeroElementContributionEntry = False;
 	Index             elStiffMat_rowI = 0;
 	Index             elStiffMat_colI = 0;
-	Stream*           errorStream = Journal_Register( Error_Type, self->type );
+	Stream*           errorStream = Journal_Register( Error_Type, (Name)self->type );
 	
 	for ( elStiffMat_colI = 0; elStiffMat_colI < elStiffMatToAddColSize; elStiffMat_colI++ ) {
 		for ( elStiffMat_rowI = 0; elStiffMat_rowI < elStiffMatToAddColSize; elStiffMat_rowI++ ) {
@@ -2705,7 +2705,7 @@ void StiffnessMatrix_CheckElementAssembly(
 				break;
 			}	
 		}	
-		if ( atLeastOneNonZeroElementContributionEntry == True ) {
+		if ( atLeastOneNonZeroElementContributionEntry == True  ) {
 			break;
 		}	
 	}
@@ -2782,7 +2782,7 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 	assert( self && Stg_CheckType( self, StiffnessMatrix ) );
 	assert( self->rowVariable );
 
-	stream = Journal_Register( Info_Type, self->type );
+	stream = Journal_Register( Info_Type, (Name)self->type  );
 	Journal_Printf( stream, "Stiffness matrix: '%s'\n", self->name );
 	Stream_Indent( stream );
 	Journal_Printf( stream, "Calculating number of nonzero entries...\n" );

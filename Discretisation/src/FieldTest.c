@@ -149,32 +149,32 @@ void* _FieldTest_Copy( void* fieldTest, void* dest, Bool deep, Name nameExt, Ptr
 void _FieldTest_AssignFromXML( void* fieldTest, Stg_ComponentFactory* cf, void* data ) {
 	FieldTest*					self = (FieldTest*)fieldTest;
 	Dictionary*					dict = cf->rootDict;
-	Dictionary_Entry_Value*	dictEntryVal = Dictionary_Get( dict, "pluginData" );
-	Dictionary*					pluginDict =  Dictionary_Entry_Value_AsDictionary( dictEntryVal );
+	Dictionary_Entry_Value*	dictEntryVal = Dictionary_Get( dict, (Dictionary_Entry_Key)"pluginData" );
+	Dictionary*					pluginDict =  Dictionary_Entry_Value_AsDictionary( dictEntryVal  );
 	/* get the pluginDict from the xml, needed for rejig */
 	Dictionary*					pluginDict2	= Codelet_GetPluginDictionary( self, cf->rootDict );
 	Dictionary_Entry_Value*	fieldList;
-	Dictionary_Entry_Value*	swarmVarList = Dictionary_Get( dict, "NumericSwarmVariableNames" );
+	Dictionary_Entry_Value*	swarmVarList = Dictionary_Get( dict, (Dictionary_Entry_Key)"NumericSwarmVariableNames"  );
 	FieldVariable_Register*	fV_Register;
 	Index							feVariable_I/*, referenceFieldCount*/;
 	Index							swarmVar_I;
 	Name							fieldName;
 	Hook*							generateErrorFields;
 	Hook*							physicsTestHook;
-	Stream*						errStream = Journal_Register( Error_Type, "FieldTests" );
+	Stream*						errStream = Journal_Register( Error_Type, (Name)"FieldTests"  );
 
 	Journal_Firewall( pluginDict != NULL , errStream, "\nError in %s: No pluginData xml was defined ... aborting\n", __func__ );
 
-	self->context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict2, "Context" ), DomainContext, False, data );
+	self->context = Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict2, (Dictionary_Entry_Key)"Context"  ), DomainContext, False, data );
 	if( !self->context ) 
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  );
 
 	fV_Register = self->context->fieldVariable_Register;
 
-	fieldList = Dictionary_Get( pluginDict, "NumericFields" );
+	fieldList = Dictionary_Get( pluginDict, (Dictionary_Entry_Key)"NumericFields" );
 	self->fieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) / 2 : 0;
 
-	if( self->fieldCount ) {
+	if( self->fieldCount  ) {
 		self->numericFieldList   	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "numeric fields" );
 		self->referenceFieldList 	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "reference fields" );
 		self->errorFieldList     	= Memory_Alloc_Array( FeVariable*, self->fieldCount, "error fields" );
@@ -187,7 +187,7 @@ void _FieldTest_AssignFromXML( void* fieldTest, Stg_ComponentFactory* cf, void* 
 		}
 #if 0	
 		else {
-			fieldList = Dictionary_Get( pluginDict, "ReferenceFields" );
+			fieldList = Dictionary_Get( pluginDict, (Dictionary_Entry_Key)"ReferenceFields" );
 			referenceFieldCount = fieldList ? Dictionary_Entry_Value_GetCount( fieldList ) : assert(0);
 
 			for( feVariable_I = 0; feVariable_I < referenceFieldCount; feVariable_I++ ) {
@@ -198,11 +198,11 @@ void _FieldTest_AssignFromXML( void* fieldTest, Stg_ComponentFactory* cf, void* 
 
 		for( feVariable_I = 0; feVariable_I < self->fieldCount; feVariable_I++ ) {
 			/* read in the FeVariable from the tuple */
-			fieldName = ( fieldList ) ? 
+			fieldName = ( fieldList  ) ? 
 				    StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( fieldList, 2 * feVariable_I ) ) ):
-				    StG_Strdup( Dictionary_GetString( pluginDict, "FeVariable" ) );
+				    StG_Strdup( Dictionary_GetString( pluginDict, (Dictionary_Entry_Key)"FeVariable" ) );
 			
-			self->numericFieldList[feVariable_I] = (FeVariable*) FieldVariable_Register_GetByName( fV_Register, fieldName );
+			self->numericFieldList[feVariable_I] = (FeVariable* ) FieldVariable_Register_GetByName( fV_Register, fieldName );
 
 			if( !self->numericFieldList[feVariable_I] ) {
 				/* if the numericFieldList[x] can't be found in register 
@@ -210,8 +210,8 @@ void _FieldTest_AssignFromXML( void* fieldTest, Stg_ComponentFactory* cf, void* 
 					 skip this entry and take one off self->fieldCount 
 					 needed for simple regression test
 				 */
-				self->numericFieldList[feVariable_I] = Stg_ComponentFactory_ConstructByName( cf, fieldName, FeVariable, False, data ); 
-				if( self->numericFieldList[feVariable_I]==NULL ) { 
+				self->numericFieldList[feVariable_I] = Stg_ComponentFactory_ConstructByName( cf, (Name)fieldName, FeVariable, False, data ); 
+				if( self->numericFieldList[feVariable_I]==NULL  ) { 
 					self->fieldCount--; 
 					continue; 
 				}
@@ -224,32 +224,32 @@ void _FieldTest_AssignFromXML( void* fieldTest, Stg_ComponentFactory* cf, void* 
 		}
 	}
 
-	self->integrationSwarm 	= (Swarm*)LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "IntegrationSwarm" ) ) );
-	self->constantMesh     	= (FeMesh*)LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "ConstantMesh"     ) ) );
-	self->elementMesh      	= (FeMesh*)LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "ElementMesh"      ) ) );
+	self->integrationSwarm 	= (Swarm*)LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, (Dictionary_Entry_Key)"IntegrationSwarm" ) ) );
+	self->constantMesh     	= (FeMesh* )LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, (Dictionary_Entry_Key)"ConstantMesh"     ) ) );
+	self->elementMesh      	= (FeMesh* )LiveComponentRegister_Get( cf->LCRegister, Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, (Dictionary_Entry_Key)"ElementMesh"      ) ) );
 
 	self->swarmVarCount = swarmVarList ? Dictionary_Entry_Value_GetCount( swarmVarList ) : 0;
-	if( self->swarmVarCount ) {
+	if( self->swarmVarCount  ) {
 		self->swarmVarNameList = Memory_Alloc_Array( Name, self->swarmVarCount, "numeric swarm variable names" );
 	
 		for( swarmVar_I = 0; swarmVar_I < self->swarmVarCount; swarmVar_I++ ) {
 			self->swarmVarNameList[swarmVar_I] = ( swarmVarList ) ? 
 					StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( swarmVarList, swarmVar_I ) ) ):
-					StG_Strdup( Dictionary_GetString( pluginDict, "SwarmVariable" ) );
+					StG_Strdup( Dictionary_GetString( pluginDict, (Dictionary_Entry_Key)"SwarmVariable" )  );
 		}	
 	}
 	
-	self->referenceSolnPath     = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "referenceSolutionFilePath" ) ) );
-	self->normalise             = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "normaliseByAnalyticSolution" ) );
-	self->epsilon               = Dictionary_Entry_Value_AsDouble( Dictionary_Get( pluginDict, "epsilon" ) );
-	self->testTimestep          = Dictionary_GetInt_WithDefault( pluginDict, "testTimestep", 0 );
-	self->referenceSolnFromFile = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, "useReferenceSolutionFromFile" ) );
-	self->appendToAnalysisFile  = Dictionary_GetBool_WithDefault( pluginDict, "appendToAnalysisFile", False ) ;
+	self->referenceSolnPath     = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, (Dictionary_Entry_Key)"referenceSolutionFilePath" ) )  );
+	self->normalise             = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, (Dictionary_Entry_Key)"normaliseByAnalyticSolution" )  );
+	self->epsilon               = Dictionary_Entry_Value_AsDouble( Dictionary_Get( pluginDict, (Dictionary_Entry_Key)"epsilon" )  );
+	self->testTimestep          = Dictionary_GetInt_WithDefault( pluginDict, (Dictionary_Entry_Key)"testTimestep", 0  );
+	self->referenceSolnFromFile = Dictionary_Entry_Value_AsBool( Dictionary_Get( pluginDict, (Dictionary_Entry_Key)"useReferenceSolutionFromFile" )  );
+	self->appendToAnalysisFile  = Dictionary_GetBool_WithDefault( pluginDict, (Dictionary_Entry_Key)"appendToAnalysisFile", False  ) ;
 
 	/* for the physics test */
-	self->expectedFileName     = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedFileName" ) ) );
-	self->expectedFilePath     = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedFilePath" ) ) );
-	self->dumpExpectedFileName = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, "expectedOutputFileName" ) ) );
+	self->expectedFileName     = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, (Dictionary_Entry_Key)"expectedFileName" ) )  );
+	self->expectedFilePath     = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, (Dictionary_Entry_Key)"expectedFilePath" ) )  );
+	self->dumpExpectedFileName = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( pluginDict, (Dictionary_Entry_Key)"expectedOutputFileName" ) )  );
 	self->expectedPass     = False;
 
 	/* set up the entry point */
@@ -291,10 +291,10 @@ void _FieldTest_Build( void* fieldTest, void* data ) {
 	}*/
 
 	if( self->fieldCount ) {
-		self->gAnalyticSq = Memory_Alloc_2DArray( double, self->fieldCount, 9, "global reference solution squared" );
-		self->gErrorSq 	  = Memory_Alloc_2DArray( double, self->fieldCount, 9, "global L2 error squared" );
-		self->gError	  = Memory_Alloc_2DArray( double, self->fieldCount, 9, "global L2 error" );
-		self->gErrorNorm  = Memory_Alloc_2DArray( double, self->fieldCount, 9, "global L2 error normalised" );
+		self->gAnalyticSq = Memory_Alloc_2DArray( double, self->fieldCount, 9, (Name)"global reference solution squared"  );
+		self->gErrorSq 	  = Memory_Alloc_2DArray( double, self->fieldCount, 9, (Name)"global L2 error squared"  );
+		self->gError	  = Memory_Alloc_2DArray( double, self->fieldCount, 9, (Name)"global L2 error"  );
+		self->gErrorNorm  = Memory_Alloc_2DArray( double, self->fieldCount, 9, (Name)"global L2 error normalised"  );
 	}
 }
 
@@ -455,9 +455,9 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 	unsigned					nDomainVerts = Mesh_GetDomainSize( referenceMesh, MT_VERTEX );
 	static double*			arrayPtr;
 
-	tmpName = Stg_Object_AppendSuffix( numericField, "AnalyticVariable" );
+	tmpName = Stg_Object_AppendSuffix( numericField, (Name)"AnalyticVariable" );
 
-	if( componentsCount == 1 ) {
+	if( componentsCount == 1  ) {
 		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts );
 		baseVariable = Variable_NewScalar( tmpName, (AbstractContext*)self->context, Variable_DataType_Double, &nDomainVerts, NULL, (void**)&arrayPtr, variable_Register );
 	}
@@ -480,7 +480,7 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 	}
 	Memory_Free( tmpName );
 
-	tmpName = Stg_Object_AppendSuffix( numericField, "AnalyticDofLayout" );
+	tmpName = Stg_Object_AppendSuffix( numericField, (Name)"AnalyticDofLayout"  );
 
 	referenceDofLayout = DofLayout_New( tmpName, self->context, variable_Register, Mesh_GetDomainSize( referenceMesh, MT_VERTEX ), referenceMesh );
 
@@ -504,7 +504,7 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 
 	Memory_Free( tmpName );
 
-	tmpName = Stg_Object_AppendSuffix( numericField, "Analytic" );
+	tmpName = Stg_Object_AppendSuffix( numericField, (Name)"Analytic"  );
 
 	self->referenceFieldList[field_I] = FeVariable_New( tmpName, self->context, referenceMesh, referenceMesh, referenceDofLayout, NULL, NULL, NULL, 
 		Mesh_GetDimSize( referenceMesh ), False, False, False, context->fieldVariable_Register );
@@ -514,12 +514,12 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 
 	if( componentsCount > Mesh_GetDimSize( referenceMesh ) ) {
 		/* we're dealing with a tensor, so use invariant */
-		tmpName = Stg_Object_AppendSuffix( self->referenceFieldList[field_I], "Invariant" );
+		tmpName = Stg_Object_AppendSuffix( self->referenceFieldList[field_I], (Name)"Invariant"  );
 		self->referenceMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->context, self->referenceFieldList[field_I], "SymmetricTensor_Invariant" );
 		self->referenceMagFieldList[field_I]->context = context;
 	} else {
 		/* we're dealing with a vector, so use magnitude */
-		tmpName = Stg_Object_AppendSuffix( self->referenceFieldList[field_I], "Magnitude" );
+		tmpName = Stg_Object_AppendSuffix( self->referenceFieldList[field_I], (Name)"Magnitude"  );
 		self->referenceMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->context, self->referenceFieldList[field_I], "Magnitude" );
 		self->referenceMagFieldList[field_I]->context = context;
 	}
@@ -554,9 +554,9 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 	unsigned					nDomainVerts = Mesh_GetDomainSize( constantMesh, MT_VERTEX );
 	static void*			arrayPtr;
 
-	tmpName = Stg_Object_AppendSuffix( numericField, "ErrorVariable" );
+	tmpName = Stg_Object_AppendSuffix( numericField, (Name)"ErrorVariable" );
 
-	if( componentsCount == 1 ) {
+	if( componentsCount == 1  ) {
 		arrayPtr = Memory_Alloc_Array_Unnamed( double, nDomainVerts );
 		baseVariable = Variable_NewScalar( tmpName, (AbstractContext*)self->context, Variable_DataType_Double, &nDomainVerts, NULL, &arrayPtr, 
 						   variable_Register );
@@ -573,7 +573,7 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 	}
 	Memory_Free( tmpName );
 
-	tmpName = Stg_Object_AppendSuffix( numericField, "ErrorDofLayout" );
+	tmpName = Stg_Object_AppendSuffix( numericField, (Name)"ErrorDofLayout"  );
 
 	errorDofLayout = DofLayout_New( tmpName, self->context, variable_Register, Mesh_GetDomainSize( constantMesh, MT_VERTEX ), constantMesh );
 
@@ -599,7 +599,7 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 
 	Memory_Free( tmpName );
 
-	tmpName = Stg_Object_AppendSuffix( numericField, "Error" );
+	tmpName = Stg_Object_AppendSuffix( numericField, (Name)"Error"  );
 
 	self->errorFieldList[field_I] = FeVariable_New( tmpName, self->context, constantMesh, constantMesh, errorDofLayout, NULL, NULL, NULL, 
 		Mesh_GetDimSize( constantMesh ), False, False, False, context->fieldVariable_Register );
@@ -608,12 +608,12 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 
 	if( componentsCount > Mesh_GetDimSize( constantMesh ) ) {
 		/* we're dealing with a tensor, so use invariant */
-		tmpName = Stg_Object_AppendSuffix( self->errorFieldList[field_I], "Invariant" );
+		tmpName = Stg_Object_AppendSuffix( self->errorFieldList[field_I], (Name)"Invariant"  );
 		self->errorMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->context, self->errorFieldList[field_I], "SymmetricTensor_Invariant" );
 		self->errorMagFieldList[field_I]->context = context;
 	} else {
 		/* we're dealing with a vector, so use magnitude */
-		tmpName = Stg_Object_AppendSuffix( self->errorFieldList[field_I], "Magnitude" );
+		tmpName = Stg_Object_AppendSuffix( self->errorFieldList[field_I], (Name)"Magnitude"  );
 		self->errorMagFieldList[field_I] = OperatorFeVariable_NewUnary( tmpName, self->context, self->errorFieldList[field_I], "Magnitude" );
 		self->errorMagFieldList[field_I]->context = context;
 	}
@@ -942,7 +942,7 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 	DomainContext*	context = (DomainContext*)_context;
 	/* this a really dodgy way to get the self ptr, as will only work if the textual name is consistent with that in 
 	 * the XML - need to find a way to add an entry point which allows the self ptr to be passed as a void * */
-	//FieldTest* 		self 			= LiveComponentRegister_Get( context->CF->LCRegister, "NumericFields" );
+	//FieldTest* 		self 			= LiveComponentRegister_Get( context->CF->LCRegister, (Name)"NumericFields"  );
 	/* this is also a dodgy way to get the self ptr, as its obtained from a global variable */
 	FieldTest*		self = fieldTestSingleton;
 	FeVariable*		errorField;
@@ -967,7 +967,7 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 		/* append (or create if not found ) a file to report results */
 		double length, elementResI;
 		char* filename;
-		analysisStream = Journal_Register( Info_Type, self->type );
+		analysisStream = Journal_Register( Info_Type, (Name)self->type  );
 		Stg_asprintf( &filename, "%s-analysis.cvg", self->name );
 		Stream_AppendFile( analysisStream, filename );
 		Memory_Free( filename );
@@ -981,7 +981,7 @@ void FieldTest_GenerateErrFields( void* _context, void* data ) {
 			}
 		}
 		length = Dictionary_GetDouble( context->CF->rootDict, "maxX" ) - Dictionary_GetDouble( context->CF->rootDict, "minX" ) ;
-		elementResI = Dictionary_GetInt( context->CF->rootDict, "elementResI" );
+		elementResI = Dictionary_GetInt( context->CF->rootDict, (Dictionary_Entry_Key)"elementResI"  );
 		/* assume square resolution */
 		Journal_RPrintf( analysisStream, "\n%e ", length/elementResI );
 	}

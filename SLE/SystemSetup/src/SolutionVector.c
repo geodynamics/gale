@@ -195,11 +195,11 @@ void _SolutionVector_AssignFromXML( void* solutionVector, Stg_ComponentFactory* 
 	FeVariable*					feVariable = NULL;
 	FiniteElementContext*	context;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", FiniteElementContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", FiniteElementContext, True, data  );
 
-	feVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeVariable", FeVariable, True, data ) ;
+	feVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"FeVariable", FeVariable, True, data  ) ;
 	_SolutionVector_Init( self, context, MPI_COMM_WORLD, (FeVariable*)feVariable );
 }
 
@@ -536,7 +536,7 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 	Stream_Indent( self->debug );
 	for( proc_I=0; proc_I < nProc; proc_I++) {
 		if ( proc_I == myRank ) continue; 
-/* Journal_Printf( Journal_Register( Info_Type, "mpi" ),  "!!! line %d, proc_I %d: count = %u\n", __LINE__, proc_I, reqFromOthersCounts[proc_I] ); */
+/* Journal_Printf( Journal_Register( Info_Type, (Name)"mpi"  ),  "!!! line %d, proc_I %d: count = %u\n", __LINE__, proc_I, reqFromOthersCounts[proc_I] ); */
 		if ( reqFromOthersCounts[proc_I] > 0 ) {
 			Journal_DPrintfL( self->debug, 2, "Sending to proc %d the list of %d vector entry indices I want from it:\n"
 				"\t(tracking via reqFromOthersHandles[%d], tag %d)\n", proc_I,
@@ -572,7 +572,7 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 	reqValuesFromMe = Memory_Alloc_2DComplex( double, nProc, reqFromMeCounts, "reqValuesFromMe" );
 	for( proc_I=0; proc_I < nProc; proc_I++) {
 		if ( proc_I == myRank ) continue; 
-/* /Journal_Printf( Journal_Register( Info_Type, "mpi" ),  "!!! line %d, proc_I %d: count = %u\n", __LINE__, proc_I, reqFromMeCounts[proc_I] ); */
+/* /Journal_Printf( Journal_Register( Info_Type, (Name)"mpi"  ),  "!!! line %d, proc_I %d: count = %u\n", __LINE__, proc_I, reqFromMeCounts[proc_I] ); */
 		if ( reqFromMeCounts[proc_I] > 0 ) {
 			MPI_Recv( reqFromMe[proc_I], reqFromMeCounts[proc_I], MPI_UNSIGNED,
 				proc_I, VALUE_REQUEST_TAG, mpiComm, &status );

@@ -110,7 +110,7 @@ void _RegularTrilinear_Print( void* elementType, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* elementTypeStream;
-	elementTypeStream = Journal_Register( InfoStream_Type, "RegularTrilinearStream" );
+	elementTypeStream = Journal_Register( InfoStream_Type, (Name)"RegularTrilinearStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "RegularTrilinear (ptr): (%p)\n", self );

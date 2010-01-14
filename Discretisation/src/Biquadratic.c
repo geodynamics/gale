@@ -112,7 +112,7 @@ void _Biquadratic_Print( void* elementType, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* elementTypeStream;
-	elementTypeStream = Journal_Register( InfoStream_Type, "BiquadraticStream" );
+	elementTypeStream = Journal_Register( InfoStream_Type, (Name)"BiquadraticStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "Biquadratic (ptr): (%p)\n", self );
@@ -128,7 +128,7 @@ void _Biquadratic_Build( void* elementType, void* data ) {
 void _Biquadratic_Initialise( void* elementType, void* data ) {
 	Biquadratic*	self = (Biquadratic*)elementType;
 
-	self->faceNodes = Memory_Alloc_2DArray( unsigned, 4, 3, "node indices for element faces" );
+	self->faceNodes = Memory_Alloc_2DArray( unsigned, 4, 3, (Name)"node indices for element faces"  );
 
 	self->faceNodes[0][0] = 0; self->faceNodes[0][1] = 1; self->faceNodes[0][2] = 2;
 	self->faceNodes[1][0] = 6; self->faceNodes[1][1] = 7; self->faceNodes[1][2] = 8;
@@ -136,7 +136,7 @@ void _Biquadratic_Initialise( void* elementType, void* data ) {
 	self->faceNodes[3][0] = 2; self->faceNodes[3][1] = 5; self->faceNodes[3][2] = 8;
 
 	self->evaluatedShapeFunc = Memory_Alloc_Array( double, self->nodeCount, "evaluatedShapeFuncs" );
-	self->GNi = Memory_Alloc_2DArray( double, self->dim, self->nodeCount, "localShapeFuncDerivatives" );
+	self->GNi = Memory_Alloc_2DArray( double, self->dim, self->nodeCount, (Name)"localShapeFuncDerivatives"  );
 }
 
 void _Biquadratic_Execute( void* elementType, void* data ) {

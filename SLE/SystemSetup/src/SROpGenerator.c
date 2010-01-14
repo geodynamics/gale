@@ -117,7 +117,7 @@ void _SROpGenerator_Print( void* srOpGenerator, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* srOpGeneratorStream;
-	srOpGeneratorStream = Journal_Register( InfoStream_Type, "SROpGeneratorStream" );
+	srOpGeneratorStream = Journal_Register( InfoStream_Type, (Name)"SROpGeneratorStream"  );
 
 	assert( self && Stg_CheckType( self, SROpGenerator ) );
 
@@ -132,8 +132,7 @@ void _SROpGenerator_AssignFromXML( void* srOpGenerator, Stg_ComponentFactory* cf
 
 	assert( self && Stg_CheckType( self, SROpGenerator ) );
 
-	var = Stg_ComponentFactory_ConstructByKey( cf, self->name, "fineVariable", FeVariable, 
-						     True, data );
+	var = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"fineVariable", FeVariable, True, data  );
 	SROpGenerator_SetFineVariable( self, var );
 }
 
@@ -232,7 +231,7 @@ void SROpGenerator_GenMeshes( SROpGenerator* self ) {
 }
 
 void SROpGenerator_GenLevelMesh( SROpGenerator* self, unsigned level ) {
-	Stream*			errorStream = Journal_Register( ErrorStream_Type, "SROpGenerator::GenLevelMesh" );
+	Stream*			errorStream = Journal_Register( ErrorStream_Type, (Name)"SROpGenerator::GenLevelMesh"  );
 	Mesh			*fMesh, *cMesh;
 	CartesianGenerator	*fGen, *cGen;
 	unsigned		nDims;
@@ -277,7 +276,7 @@ void SROpGenerator_GenLevelMesh( SROpGenerator* self, unsigned level ) {
 }
 
 void SROpGenerator_GenLevelTopMap( SROpGenerator* self, unsigned level ) {
-	Stream*		errorStream = Journal_Register( ErrorStream_Type, "SROpGenerator::GenLevelTopMap" );
+	Stream*		errorStream = Journal_Register( ErrorStream_Type, (Name)"SROpGenerator::GenLevelTopMap"  );
 	Mesh		*fMesh, *cMesh;
 	unsigned	nDomainNodes;
 	unsigned	nLevels;

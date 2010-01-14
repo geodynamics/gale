@@ -56,14 +56,14 @@ such as streams etc */
 Bool StgFEM_SLE_Init( int* argc, char** argv[] ) {
 	int tmp;
 	
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
-	tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, "Context" ) );
-	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), 0 );
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, (Name)"Context" )  );
+	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, (Name)"Context"  ), 0 );
 	Journal_Printf( /* DO NOT CHANGE OR REMOVE */
-		Journal_Register( InfoStream_Type, "Context" ), 
+		Journal_Register( InfoStream_Type, (Name)"Context"  ), 
 		"StGermain SLE Library revision %s. Copyright (C) 2003-2005 VPAC.\n", VERSION );
-	Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
-	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
+	Stream_Flush( Journal_Register( InfoStream_Type, (Name)"Context" )  );
+	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, (Name)"Context"  ), tmp );
 	
 	//StgFEM_SLE_LinearAlgebra_Init( argc, argv );
 	StgFEM_SLE_SystemSetup_Init( argc, argv );

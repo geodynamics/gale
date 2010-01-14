@@ -73,12 +73,12 @@ void AdvDiffSteadyState1D_TemperatureFunction( void* analyticSolution, double* c
 
 void AdvDiffSteadyState1D_TemperatureBC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* temperature ){
 	DomainContext*	context    = (DomainContext*)_context;
-	AdvDiffSteadyState1D*   self       = Stg_ComponentFactory_ConstructByName( context->CF, AdvDiffSteadyState1D_Type, AdvDiffSteadyState1D, True, 0 /* dummy */ );
+	AdvDiffSteadyState1D*   self       = Stg_ComponentFactory_ConstructByName( context->CF, (Name)AdvDiffSteadyState1D_Type, AdvDiffSteadyState1D, True, 0 /* dummy */ );
 	FeVariable*             feVariable = NULL;
 	FeMesh*     mesh       = NULL;
 	double*                 coord;
 	
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
+	feVariable = (FeVariable* )FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	mesh       = feVariable->feMesh;
 	coord      = Mesh_GetVertex( mesh, node_lI );
 
@@ -135,14 +135,14 @@ void _AdvDiffSteadyState1D_AssignFromXML( void* analyticSolution, Stg_ComponentF
 
 	_FieldTest_AssignFromXML( self, cf, data );
 
-	self->residual = Stg_ComponentFactory_ConstructByName( cf, "defaultResidualForceTerm", AdvDiffResidualForceTerm, True, data );
+	self->residual = Stg_ComponentFactory_ConstructByName( cf, (Name)"defaultResidualForceTerm", AdvDiffResidualForceTerm, True, data  );
 
-	self->velocity = Stg_ComponentFactory_GetRootDictDouble( cf, "velocity", 1.0 );
-	self->A        = Stg_ComponentFactory_GetRootDictDouble( cf, "A", 1.0 );
-	self->B        = Stg_ComponentFactory_GetRootDictDouble( cf, "B", 0.0 );
-	self->c        = Stg_ComponentFactory_GetRootDictDouble( cf, "c", 0.0 );
+	self->velocity = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"velocity", 1.0  );
+	self->A        = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"A", 1.0  );
+	self->B        = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"B", 0.0  );
+	self->c        = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"c", 0.0  );
 	
-	condFunc = ConditionFunction_New( AdvDiffSteadyState1D_TemperatureBC, "AnalyticSolutionFunction" );
+	condFunc = ConditionFunction_New( AdvDiffSteadyState1D_TemperatureBC, (Name)"AnalyticSolutionFunction"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 }
@@ -170,7 +170,7 @@ void* _AdvDiffSteadyState1D_DefaultNew( Name name ) {
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
 Index StgFEM_AdvDiffSteadyState1D_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
-	return PluginsManager_Submit( pluginsManager, AdvDiffSteadyState1D_Type, "0", _AdvDiffSteadyState1D_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, AdvDiffSteadyState1D_Type, (Name)"0", _AdvDiffSteadyState1D_DefaultNew  );
 }
 
 

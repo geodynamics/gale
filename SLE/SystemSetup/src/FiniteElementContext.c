@@ -265,7 +265,7 @@ SystemLinearEquations* FiniteElementContext_GetSLE_Func( void* context, Name sle
 
 void _FiniteElementContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, void* data ){
 	FiniteElementContext *self = (FiniteElementContext*) context;
-	Stream*  errorStream = Journal_Register( Error_Type, self->type );
+	Stream*  errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 	_DomainContext_AssignFromXML( context, cf, data );
 
@@ -273,13 +273,12 @@ void _FiniteElementContext_AssignFromXML( void* context, Stg_ComponentFactory* c
 
 	self->dt = 0.0f;
 	self->prevTimestepDt = 0.0;
-	self->limitTimeStepIncreaseRate = Dictionary_GetBool_WithDefault( self->dictionary, "limitTimeStepIncreaseRate", False );
-	self->maxTimeStepIncreasePercentage = Dictionary_GetDouble_WithDefault( self->dictionary,
-		"maxTimeStepIncreasePercentage", 10.0 );
+	self->limitTimeStepIncreaseRate = Dictionary_GetBool_WithDefault( self->dictionary, (Dictionary_Entry_Key)"limitTimeStepIncreaseRate", False  );
+	self->maxTimeStepIncreasePercentage = Dictionary_GetDouble_WithDefault( self->dictionary, (Dictionary_Entry_Key)"maxTimeStepIncreasePercentage", 10.0  );
 	Journal_Firewall( self->maxTimeStepIncreasePercentage >= 0, errorStream,
 		"Error - in %s(): maxTimeStepIncreasePercentage must be >= 0\n", __func__ );
 
-	self->maxTimeStepSize = Dictionary_GetDouble_WithDefault( self->dictionary, "maxTimeStepSize", 0.0 );
+	self->maxTimeStepSize = Dictionary_GetDouble_WithDefault( self->dictionary, (Dictionary_Entry_Key)"maxTimeStepSize", 0.0 );
 
 	_FiniteElementContext_Init( self );
 }
@@ -288,7 +287,7 @@ void _FiniteElementContext_Build( void* context ) {
 	FiniteElementContext* self = (FiniteElementContext*)context;
 	SystemLinearEquations_Index sle_I;
 	
-	Stream_IndentBranch( StgFEM_Debug );
+	Stream_IndentBranch( StgFEM_Debug  );
 	Journal_DPrintf( self->debug, "In: %s()\n", __func__ );
 
 	/* build all the systems of linear equations */
@@ -435,7 +434,7 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
             Stg_asprintf( &feVarSaveFileName, "%s%s.%.5u.dat", feVarSaveFileNamePart, feVar->name, self->timeStep );
 #endif
             FeVariable_SaveToFile( feVar, feVarSaveFileName, 
-                   Dictionary_GetBool_WithDefault( self->dictionary, "saveCoordsWithFields", False ) );           
+                   Dictionary_GetBool_WithDefault( self->dictionary, (Dictionary_Entry_Key)"saveCoordsWithFields", False ) );           
 
             Memory_Free( feVarSaveFileName );
             Memory_Free( feVarSaveFileNamePart );
@@ -448,15 +447,15 @@ void _FiniteElementContext_SaveFeVariables( void* context ) {
 void _FiniteElementContext_SaveSwarms( void* context ) {
 
 	Swarm_Register_SaveAllRegisteredSwarms( 
-		Swarm_Register_GetSwarm_Register(), context );
+		Swarm_Register_GetSwarm_Register( ), context );
 
 }
 
 
 void _FiniteElementContext_SaveMesh( void* context ) {
    FiniteElementContext*   self;
-	Stream*                 info = Journal_Register( Info_Type, "Context" );
-   unsigned                componentCount = LiveComponentRegister_GetCount(stgLiveComponentRegister);
+	Stream*                 info = Journal_Register( Info_Type, (Name)"Context" );
+   unsigned                componentCount = LiveComponentRegister_GetCount(stgLiveComponentRegister );
    unsigned                compI;
    Stg_Component*          stgComp;
    FeMesh*                 mesh;
@@ -573,11 +572,11 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
    int                     buf_int[5];
    MPI_Status              status;
    int                     confirmation = 0;
-   Stream*                 errorStr = Journal_Register( Error_Type, self->type );
+   Stream*                 errorStr = Journal_Register( Error_Type, (Name)self->type );
    Element_LocalIndex      lElement_I;
    Element_GlobalIndex     gElement_I;
    Index                   maxNodes;
-   IArray*                 iarray = IArray_New();
+   IArray*                 iarray = IArray_New( );
    char*                   filename = NULL;
    char*                   meshSaveFileNamePart = NULL;
 

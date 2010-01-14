@@ -130,10 +130,10 @@ void _StgFEM_LidDrivenStokesAnalytic_AssignFromXML( void* codelet, Stg_Component
 	_FieldTest_AssignFromXML( self, cf, data );
 
 	/* Set constants */
-	*waveSpeed = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "sinusoidalLidWavenumber", 1 );
+	*waveSpeed = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"sinusoidalLidWavenumber", 1 );
 	self->n = *waveSpeed;
 	
-	StgFEM_LidDrivenStokesAnalytic_CalculateConstants( (FieldTest*)self );
+	StgFEM_LidDrivenStokesAnalytic_CalculateConstants( (FieldTest*)self  );
 }
 
 void _StgFEM_LidDrivenStokesAnalytic_Build( void* codelet, void* data ) {
@@ -174,7 +174,7 @@ void* _StgFEM_LidDrivenStokesAnalytic_DefaultNew( Name name ) {
 Index StgFEM_LidDrivenStokesAnalytic_Register( PluginsManager* pluginsManager ) {
 	Journal_DPrintf( StgFEM_Debug, "In: %s( void* )\n", __func__ ); 
 
-	return PluginsManager_Submit( pluginsManager, StgFEM_LidDrivenStokesAnalytic_Type, "0", _StgFEM_LidDrivenStokesAnalytic_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, StgFEM_LidDrivenStokesAnalytic_Type, (Name)"0", _StgFEM_LidDrivenStokesAnalytic_DefaultNew  );
 }
 
 

@@ -100,7 +100,7 @@ void _FeMesh_ElementType_Print( void* elementType, Stream* stream ) {
 	FeMesh_ElementType*	self = (FeMesh_ElementType*)elementType;
 	Stream*			elementTypeStream;
 
-	elementTypeStream = Journal_Register( InfoStream_Type, "FeMesh_ElementTypeStream" );
+	elementTypeStream = Journal_Register( InfoStream_Type, (Name)"FeMesh_ElementTypeStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "FeMesh_ElementType (ptr): (%p)\n", self );

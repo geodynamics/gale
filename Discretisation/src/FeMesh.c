@@ -90,7 +90,7 @@ void _FeMesh_Init( FeMesh* self, ElementType* elType, const char* family, Bool e
 
 	assert( self && Stg_CheckType( self, FeMesh ) );
 
-	stream = Journal_Register( Info_Type, self->type );
+	stream = Journal_Register( Info_Type, (Name)self->type  );
 	Stream_SetPrintingRank( stream, 0 );
 
 	self->feElType = elType;
@@ -122,7 +122,7 @@ void _FeMesh_Print( void* feMesh, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* feMeshStream;
-	feMeshStream = Journal_Register( InfoStream_Type, "FeMeshStream" );
+	feMeshStream = Journal_Register( InfoStream_Type, (Name)"FeMeshStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "FeMesh (ptr): (%p)\n", self );
@@ -136,8 +136,8 @@ void _FeMesh_AssignFromXML( void* feMesh, Stg_ComponentFactory* cf, void* data )
 
 	_Mesh_AssignFromXML( self, cf, data );
 
-	_FeMesh_Init( self, NULL, Stg_ComponentFactory_GetString( cf, self->name, "elementType", "linear" ), 
-		Stg_ComponentFactory_GetBool( cf, self->name, "isElementMesh", False ) );
+	_FeMesh_Init( self, NULL, Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"elementType", "linear"  ), 
+		Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"isElementMesh", False )  );
 }
 
 void _FeMesh_Build( void* feMesh, void* data ) {
@@ -147,7 +147,7 @@ void _FeMesh_Build( void* feMesh, void* data ) {
 
 	assert( self );
 
-	stream = Journal_Register( Info_Type, self->type );
+	stream = Journal_Register( Info_Type, (Name)self->type  );
 
 	_Mesh_Build( self, data );
 

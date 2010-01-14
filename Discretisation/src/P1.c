@@ -108,7 +108,7 @@ void _P1_Print( void* elementType, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* elementTypeStream;
-	elementTypeStream = Journal_Register( InfoStream_Type, "P1Stream" );
+	elementTypeStream = Journal_Register( InfoStream_Type, (Name)"P1Stream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "P1 (ptr): (%p)\n", self );
@@ -197,7 +197,7 @@ void P1_EvalLocalDerivs( void* elementType, const double* localCoord, double** d
 }
 
 int _P1_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
-	Stream* errStream = Journal_Register( ErrorStream_Type, ElementType_Type );
+	Stream* errStream = Journal_Register( ErrorStream_Type, (Name)ElementType_Type  );
 
 	Journal_Printf( errStream, "surface normal function not implemented for this element type.\n" );
 	assert( 0 );

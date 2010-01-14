@@ -147,7 +147,7 @@ void __AdvDiffResidualForceTerm_UpdateLocalMemory( AdvectionDiffusionSLE* sle ){
 		}
 	}
        
-	sle->advDiffResidualForceTerm->GNx = Memory_Alloc_2DArray(double, dim, max_elementNodeCount, "(SUPG): Global Shape Function Derivatives");
+	sle->advDiffResidualForceTerm->GNx = Memory_Alloc_2DArray( double, dim, max_elementNodeCount, (Name)"(SUPG): Global Shape Function Derivatives" );
 	sle->advDiffResidualForceTerm->phiGrad = Memory_Alloc_Array(double, dim, "(SUPG): Gradient of the Advected Scalar");
 	sle->advDiffResidualForceTerm->Ni = Memory_Alloc_Array(double, max_elementNodeCount, "(SUPG): Gradient of the Advected Scalar");
 	sle->advDiffResidualForceTerm->SUPGNi = Memory_Alloc_Array(double, max_elementNodeCount, "(SUPG): Upwinded Shape Function");
@@ -219,9 +219,9 @@ void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFacto
 	/* Construct Parent */
 	_ForceTerm_AssignFromXML( self, cf, data );
 
-	velocityField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField", FeVariable, True,  data );
-	diffusivityVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, "DiffusivityVariable", Variable,   False, data );
-	upwindParamFuncName = Stg_ComponentFactory_GetString( cf, self->name, "UpwindXiFunction", "Exact" );
+	velocityField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"VelocityField", FeVariable, True, data  );
+	diffusivityVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"DiffusivityVariable", Variable, False, data  );
+	upwindParamFuncName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"UpwindXiFunction", "Exact"  );
 
 	if ( strcasecmp( upwindParamFuncName, "DoublyAsymptoticAssumption" ) == 0 )
 		upwindFuncType = DoublyAsymptoticAssumption;
@@ -230,9 +230,9 @@ void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFacto
 	else if ( strcasecmp( upwindParamFuncName, "Exact" ) == 0 )
 		upwindFuncType = Exact;
 	else 
-		Journal_Firewall( False, Journal_Register( Error_Type, self->type ), "Cannot understand '%s'\n", upwindParamFuncName );
+		Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ), "Cannot understand '%s'\n", upwindParamFuncName );
 
-	defaultDiffusivity = Stg_ComponentFactory_GetDouble( cf, self->name, "defaultDiffusivity", 1.0 );
+	defaultDiffusivity = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"defaultDiffusivity", 1.0  );
 
 	_AdvDiffResidualForceTerm_Init( self, velocityField, diffusivityVariable, defaultDiffusivity, upwindFuncType );
 }

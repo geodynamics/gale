@@ -150,8 +150,8 @@ void _AdvDiffMulticorrector_AssignFromXML( void* solver, Stg_ComponentFactory* c
 	/* Construct Parent */
 	_SLE_Solver_AssignFromXML( self, cf, data );
 
-	gamma = Stg_ComponentFactory_GetDouble( cf, self->name, "gamma", 0.5 );
-	multiCorrectorIterations = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "multiCorrectorIterations", 2 );
+	gamma = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"gamma", 0.5  );
+	multiCorrectorIterations = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"multiCorrectorIterations", 2  );
 
 	_AdvDiffMulticorrector_Init( self, gamma, multiCorrectorIterations );
 
@@ -238,7 +238,7 @@ void ViewPETScVector( Vec vec, Stream* stream ) {
 	unsigned	entry_i;
 
 	if( !stream )
-		stream = Journal_Register( Info_Type, "tmp" );
+		stream = Journal_Register( Info_Type, (Name)"tmp"  );
 
 	VecGetLocalSize( vec, &size );
 	VecGetArray( vec, &array );
@@ -337,7 +337,7 @@ void AdvDiffMulticorrector_CalculatePhiDot( AdvDiffMulticorrector* self, Advecti
 	else if ( Stg_Class_IsInstance( massMatrix, StiffnessMatrix_Type ) )
 		_AdvDiffMulticorrector_CalculatePhiDot_Implicit( self, sle, deltaPhiDot );
 	else {
-		Journal_Firewall( False, Journal_Register( Error_Type, self->type ),
+		Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 				"Error in func '%s': Cannot understand type '%s' for mass matrix '%s'.\n",
 				__func__, massMatrix->name, massMatrix->type );
 	}

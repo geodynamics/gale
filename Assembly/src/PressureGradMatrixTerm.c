@@ -144,7 +144,7 @@ void _PressureGradMatrixTerm_AssignFromXML( void* matrixTerm, Stg_ComponentFacto
 	/* Construct Parent */
 	_StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
-	gradField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureGradField", FeVariable, True, data ) ;
+	gradField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureGradField", FeVariable, True, data  ) ;
 
 	_PressureGradMatrixTerm_Init( self, gradField );
 }

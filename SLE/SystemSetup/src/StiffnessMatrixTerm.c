@@ -196,13 +196,13 @@ void _StiffnessMatrixTerm_AssignFromXML( void* stiffnessMatrixTerm, Stg_Componen
 	StiffnessMatrix*           stiffnessMatrix;
    FiniteElementContext*      context;
    
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", FiniteElementContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", FiniteElementContext, True, data  );
 
-	stiffnessMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "StiffnessMatrix", StiffnessMatrix, True,  data ) ;
-	swarm           = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",           Swarm,           True,  data ) ;
-	extraInfo       = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ExtraInfo",       Stg_Component,   False, data );
+	stiffnessMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"StiffnessMatrix", StiffnessMatrix, True, data  ) ;
+	swarm           = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", Swarm, True, data  ) ;
+	extraInfo       = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ExtraInfo", Stg_Component, False, data  );
 
 	_StiffnessMatrixTerm_Init( self, context, stiffnessMatrix, swarm, extraInfo );
 }
@@ -267,7 +267,7 @@ void _StiffnessMatrixTerm_AssembleElement(
 			double**                          elStiffMatToAdd ) 
 {
 	StiffnessMatrixTerm* self        = (StiffnessMatrixTerm*)stiffnessMatrixTerm;
-	Stream*    errorStream = Journal_Register( Error_Type, self->type );
+	Stream*    errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 	Journal_Printf( errorStream, "Error in func %s for %s '%s' - "
 			"This function is the default function which should never be called - "

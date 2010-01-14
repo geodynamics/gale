@@ -208,7 +208,7 @@ void _LinearTriangleElementType_SF_allLocalDerivs_allNodes( void* elementType, c
 }
 
 int _LinearTriangularElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* norm ) {
-	Stream* errStream = Journal_Register( ErrorStream_Type, ElementType_Type );
+	Stream* errStream = Journal_Register( ErrorStream_Type, (Name)ElementType_Type  );
 
 	Journal_Printf( errStream, "surface normal function not yet implemented for this element type.\n" );
 	assert( 0 );

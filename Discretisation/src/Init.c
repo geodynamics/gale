@@ -58,20 +58,20 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister* componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
 	int tmp;
 	
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
-	tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, "Context" ) );
-	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), 0 );
-	Journal_Printf( /* DO NOT CHANGE OR REMOVE */ Journal_Register( InfoStream_Type, "Context" ), 
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	tmp = Stream_GetPrintingRank( Journal_Register( InfoStream_Type, (Name)"Context" )  );
+	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, (Name)"Context"  ), 0 );
+	Journal_Printf( /* DO NOT CHANGE OR REMOVE */ Journal_Register( InfoStream_Type, (Name)"Context"  ), 
 		"StGermain FEM Discretisation Framework revision %s. Copyright (C) 2003-2005 VPAC.\n", VERSION );
-	Stream_Flush( Journal_Register( InfoStream_Type, "Context" ) );
-	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, "Context" ), tmp );
+	Stream_Flush( Journal_Register( InfoStream_Type, (Name)"Context" )  );
+	Stream_SetPrintingRank( Journal_Register( InfoStream_Type, (Name)"Context"  ), tmp );
 	
 	/* initialise this level's streams */
-	StgFEM_Debug = Journal_Register( DebugStream_Type, "StgFEM" );
+	StgFEM_Debug = Journal_Register( DebugStream_Type, (Name)"StgFEM"  );
 	StgFEM_Discretisation_Debug = Stream_RegisterChild( StgFEM_Debug, "Discretisation" );
-	StgFEM_Warning = Journal_Register( ErrorStream_Type, "StgFEM" );
+	StgFEM_Warning = Journal_Register( ErrorStream_Type, (Name)"StgFEM" );
 
-	elementType_Register = ElementType_Register_New( "elementType_Register" );
+	elementType_Register = ElementType_Register_New( "elementType_Register"  );
 	ElementType_Register_Add( elementType_Register, (ElementType*)ConstantElementType_New( "constantElementType" ) );
 	ElementType_Register_Add( elementType_Register, (ElementType*)BilinearElementType_New( "bilinearElementType" ) );
 	ElementType_Register_Add( elementType_Register, (ElementType*)TrilinearElementType_New( "trilinearElementType" ) );
@@ -79,19 +79,19 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	ElementType_Register_Add( elementType_Register, (ElementType*)Biquadratic_New( "biquadraticElementType" ) );
 	ElementType_Register_Add( elementType_Register, (ElementType*)Triquadratic_New( "triquadraticElementType" ) );
 	
-	Stg_ComponentRegister_Add( componentRegister, FeVariable_Type, "0", _FeVariable_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, LinkedDofInfo_Type, "0", _LinkedDofInfo_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, OperatorFeVariable_Type, "0", _OperatorFeVariable_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, ShapeFeVariable_Type, "0", ShapeFeVariable_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, FeSwarmVariable_Type, "0", _FeSwarmVariable_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, FeMesh_Type, "0", _FeMesh_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, C0Generator_Type, "0", C0Generator_New );
-	Stg_ComponentRegister_Add( componentRegister, C2Generator_Type, "0", C2Generator_New );
+	Stg_ComponentRegister_Add( componentRegister, FeVariable_Type, (Name)"0", _FeVariable_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, LinkedDofInfo_Type, (Name)"0", _LinkedDofInfo_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, OperatorFeVariable_Type, (Name)"0", _OperatorFeVariable_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, ShapeFeVariable_Type, (Name)"0", ShapeFeVariable_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, FeSwarmVariable_Type, (Name)"0", _FeSwarmVariable_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, FeMesh_Type, (Name)"0", _FeMesh_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, C0Generator_Type, (Name)"0", C0Generator_New  );
+	Stg_ComponentRegister_Add( componentRegister, C2Generator_Type, (Name)"0", C2Generator_New  );
 /*
-	Stg_ComponentRegister_Add( componentRegister, P1Generator_Type, "0", P1Generator_New );
+	Stg_ComponentRegister_Add( componentRegister, P1Generator_Type, (Name)"0", P1Generator_New  );
 */
-	Stg_ComponentRegister_Add( componentRegister, Inner2DGenerator_Type, "0", Inner2DGenerator_New );
-	Stg_ComponentRegister_Add( componentRegister, FieldTest_Type, "0", _FieldTest_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, Inner2DGenerator_Type, (Name)"0", Inner2DGenerator_New  );
+	Stg_ComponentRegister_Add( componentRegister, FieldTest_Type, (Name)"0", _FieldTest_DefaultNew  );
 	
 	/** Register Parents for type checking */
 	RegisterParent( FeMesh_Algorithms_Type, Mesh_Algorithms_Type );

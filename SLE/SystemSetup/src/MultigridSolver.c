@@ -172,7 +172,7 @@ void _MultigridSolver_Print( void* matrixSolver, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* matrixSolverStream;
-	matrixSolverStream = Journal_Register( InfoStream_Type, "MultigridSolverStream" );
+	matrixSolverStream = Journal_Register( InfoStream_Type, (Name)"MultigridSolverStream"  );
 
 	assert( self && Stg_CheckType( self, MultigridSolver ) );
 
@@ -188,10 +188,9 @@ void _MultigridSolver_AssignFromXML( void* matrixSolver, Stg_ComponentFactory* c
 	assert( self && Stg_CheckType( self, MultigridSolver ) );
 	assert( cf );
 
-	nLevels = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "levels", 1 );
+	nLevels = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"levels", 1  );
 	MultigridSolver_SetLevels( self, nLevels );
-	self->opGen = Stg_ComponentFactory_ConstructByKey( cf, self->name, "opGenerator", MGOpGenerator, 
-							   True, data );
+	self->opGen = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"opGenerator", MGOpGenerator, True, data  );
 	MGOpGenerator_SetMatrixSolver( self->opGen, self );
 	MGOpGenerator_SetNumLevels( self->opGen, nLevels );
 }
@@ -201,8 +200,8 @@ void _MultigridSolver_Build( void* matrixSolver, void* data ) {
 
 	assert( self && Stg_CheckType( self, MultigridSolver ) );
 
-	self->stream = Journal_Register( InfoStream_Type, "general" );
-	if( self->opGen )
+	self->stream = Journal_Register( InfoStream_Type, (Name)"general" );
+	if( self->opGen  )
 		Stg_Component_Build( self->opGen, data, False );
 }
 

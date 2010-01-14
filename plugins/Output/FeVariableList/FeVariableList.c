@@ -59,23 +59,23 @@ void _StgFEM_FeVariableList_AssignFromXML( void* component, Stg_ComponentFactory
    Bool                            fileOpened;
    Bool                            PrintToFile;
    
-   self->context = context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+   self->context = context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
    dictionary  = context->dictionary;
       
    /* Create Stream */
-   stream = self->stream = Journal_Register( InfoStream_Type, "FeVariableList" );
+   stream = self->stream = Journal_Register( InfoStream_Type, (Name)"FeVariableList"  );
    
    /* Set auto flush on stream */
    Stream_SetAutoFlush( stream, True );
    
    /* Print to screen or to file? */
-   PrintToFile = Dictionary_GetBool_WithDefault( dictionary, "FeVariableListPrintToFile", True );
-   if(PrintToFile){
+   PrintToFile = Dictionary_GetBool_WithDefault( dictionary, (Dictionary_Entry_Key)"FeVariableListPrintToFile", True );
+   if(PrintToFile ){
           /* Get name of fevariable list file */
           fevariableListFilename = Dictionary_GetString_WithDefault( dictionary, "FeVariableListFilename", "FeVariables.list" );
           /* Open New File */
           if ( context->rank == MASTER ) {
-                  Stream* errorStream = Journal_Register( Error_Type, CURR_MODULE_NAME );
+                  Stream* errorStream = Journal_Register( Error_Type, (Name)CURR_MODULE_NAME  );
                   fileOpened          = Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, fevariableListFilename );
                   Journal_Firewall( fileOpened, errorStream,
                                   "Could not open file %s/%s. Possibly directory %s does not exist or is not writable.\n"
@@ -107,7 +107,7 @@ void* _StgFEM_FeVariableList_DefaultNew( Name name ) {
 }
 
 Index StgFEM_FeVariableList_Register( PluginsManager* pluginsManager ) {
-   return PluginsManager_Submit( pluginsManager, StgFEM_FeVariableList_Type, "0", _StgFEM_FeVariableList_DefaultNew );
+   return PluginsManager_Submit( pluginsManager, StgFEM_FeVariableList_Type, (Name)"0", _StgFEM_FeVariableList_DefaultNew  );
 }
 
 void StgFEM_FeVariableList_PrintVariables( void* _self, void* data ){

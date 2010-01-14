@@ -95,8 +95,8 @@ void ColumnViscosityAnalytic_TemperatureIC( Node_LocalIndex node_lI, Variable_In
 	x = coord[ I_AXIS ] - min[ I_AXIS ];
 	y = coord[ J_AXIS ] - min[ J_AXIS ];
 
-	wavenumberX = Dictionary_GetInt_WithDefault( dictionary, "wavenumberX", 1 );
-	wavenumberY = Dictionary_GetInt_WithDefault( dictionary, "wavenumberY", 1 );
+	wavenumberX = Dictionary_GetInt_WithDefault( dictionary, (Dictionary_Entry_Key)"wavenumberX", 1  );
+	wavenumberY = Dictionary_GetInt_WithDefault( dictionary, (Dictionary_Entry_Key)"wavenumberY", 1 );
 
 	kx = wavenumberX * M_PI/ L;
 	ky = wavenumberY * M_PI;
@@ -105,7 +105,7 @@ void ColumnViscosityAnalytic_TemperatureIC( Node_LocalIndex node_lI, Variable_In
 }
 
 void ColumnViscosityAnalytic_Constants( void* analyticSolution ) {
-	ColumnViscosityAnalytic* self = (ColumnViscosityAnalytic*) analyticSolution;
+	ColumnViscosityAnalytic* self = (ColumnViscosityAnalytic* ) analyticSolution;
 	double                  n, nx;
 	double t1,t2,t3,t4,t5,t6,t7,t8,t9,t10,t11,t12,t13,t14,t15,t16,t17,t18,t19,t20,t21,t22,t23,t24,t25,t26,t27,t28,t29,t30,t31,t32,t33,t34,t35,t36,t37,t38,t39,t40;
 	double t41,t42,t43,t44,t45,t46,t47,t48,t49,t50,t51,t52,t53,t54,t55,t56,t57,t58,t59,t60,t61,t62,t63,t64,t65,t66,t67,t68,t69,t70,t71,t72,t73,t74,t75,t76,t77,t78,t79,t80;
@@ -2574,24 +2574,24 @@ void _ColumnViscosityAnalytic_AssignFromXML( void* analyticSolution, Stg_Compone
 	/* Construct Parent */
 	_AnalyticSolution_AssignFromXML( self, cf, data );
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  ); 
 	
 	/* Create Analytic Fields */
-	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
-	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
-	self->stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, False, data ); 
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, (Name)"VelocityField", FeVariable, True, data  ); 
+	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, (Name)"PressureField", FeVariable, True, data  ); 
+	self->stressField = Stg_ComponentFactory_ConstructByName( cf, (Name)"StressField", FeVariable, False, data  ); 
 
 	/* Add condition function for temperature */
-	condFunc = ConditionFunction_New( ColumnViscosityAnalytic_TemperatureIC, "ColumnViscosityAnalytic_TemperatureIC" );
+	condFunc = ConditionFunction_New( ColumnViscosityAnalytic_TemperatureIC, (Name)"ColumnViscosityAnalytic_TemperatureIC"  );
 	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	/* Set up constants */
-	self->ZA = Stg_ComponentFactory_GetRootDictDouble( cf, "leftViscosity", 1.0 );
-	self->ZB = Stg_ComponentFactory_GetRootDictDouble( cf, "rightViscosity", 1.0 );
+	self->ZA = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"leftViscosity", 1.0  );
+	self->ZB = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"rightViscosity", 1.0  );
 
 	/* top layer viscosity */
-	self->xc = Stg_ComponentFactory_GetRootDictDouble( cf, "columnEnd", 0.5 );
-	ColumnViscosityAnalytic_Constants( self );
+	self->xc = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"columnEnd", 0.5 );
+	ColumnViscosityAnalytic_Constants( self  );
 }
 
 void _ColumnViscosityAnalytic_Build( void* analyticSolution, void* data ) {
@@ -2631,7 +2631,7 @@ void* _ColumnViscosityAnalytic_DefaultNew( Name name ) {
 }
 
 Index StgFEM_ColumnViscosityAnalytic_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, ColumnViscosityAnalytic_Type, "0", _ColumnViscosityAnalytic_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, ColumnViscosityAnalytic_Type, (Name)"0", _ColumnViscosityAnalytic_DefaultNew  );
 }
 
 

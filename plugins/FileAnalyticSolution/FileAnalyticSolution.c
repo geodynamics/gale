@@ -66,13 +66,13 @@ void _FileAnalyticSolution_AssignFromXML( void* analyticSolution, Stg_ComponentF
 	FeVariable*              feVarToTest;
 
 	_AnalyticSolution_AssignFromXML( self, cf, data );
-	varList = Dictionary_Get( cf->rootDict, self->name );
-	Journal_Firewall( varList != NULL, Journal_Register( Error_Type, self->type ), 
+	varList = Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)self->name  );
+	Journal_Firewall( varList != NULL, Journal_Register( Error_Type, (Name)self->type  ), 
 		"Error- in %s(): Can't find list in XML '%s'\n", __func__, self->name );
 
 	for ( var_I = 0; var_I < Dictionary_Entry_Value_GetCount( varList ); ++var_I ) {
 		varName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( varList, var_I ) );
-		feVarToTest = Stg_ComponentFactory_ConstructByName( cf, varName, FeVariable, True, data );
+		feVarToTest = Stg_ComponentFactory_ConstructByName( cf, (Name)varName, FeVariable, True, data  );
 	
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, feVarToTest, FileAnalyticSolution_DummyFunction );
 	}
@@ -127,7 +127,7 @@ void* _FileAnalyticSolution_DefaultNew( Name name ) {
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
 Index StgFEM_FileAnalyticSolution_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
-	return PluginsManager_Submit( pluginsManager, FileAnalyticSolution_Type, "0", _FileAnalyticSolution_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, FileAnalyticSolution_Type, (Name)"0", _FileAnalyticSolution_DefaultNew  );
 }
 
 

@@ -61,24 +61,24 @@ void _StgFEM_SwarmVariableList_AssignFromXML( void* component, Stg_ComponentFact
         Bool                            fileOpened;
         Bool                            PrintToFile;
 
-        self->context       = context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+        self->context       = context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data );
         dictionary          = context->dictionary;
-        self->swarmRegister = Swarm_Register_GetSwarm_Register();
+        self->swarmRegister = Swarm_Register_GetSwarm_Register( );
 
         /** create stream **/
-        stream = self->stream = Journal_Register( InfoStream_Type, "SwarmVariableList" );
+        stream = self->stream = Journal_Register( InfoStream_Type, (Name)"SwarmVariableList"  );
 
         /** set auto flush on stream **/
         Stream_SetAutoFlush( stream, True );
 
         /** print to screen or to file? **/
-        PrintToFile = Dictionary_GetBool_WithDefault( dictionary, "SwarmVariableListPrintToFile", True );
-        if(PrintToFile){
+        PrintToFile = Dictionary_GetBool_WithDefault( dictionary, (Dictionary_Entry_Key)"SwarmVariableListPrintToFile", True );
+        if(PrintToFile ){
                 /** get name of SwarmVariable list file **/
                 swarmVariableListFilename = Dictionary_GetString_WithDefault( dictionary, "SwarmVariableListFilename", "SwarmVariables.list" );
                 /** open new file **/
                 if ( context->rank == MASTER ) {
-                        Stream* errorStream = Journal_Register( Error_Type, CURR_MODULE_NAME );
+                        Stream* errorStream = Journal_Register( Error_Type, (Name)CURR_MODULE_NAME  );
                         fileOpened          = Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, swarmVariableListFilename );
                         Journal_Firewall( fileOpened, errorStream,
                                         "Could not open file %s/%s. Possibly directory %s does not exist or is not writable.\n"
@@ -110,7 +110,7 @@ void* _StgFEM_SwarmVariableList_DefaultNew( Name name ) {
 }
 
 Index StgFEM_SwarmVariableList_Register( PluginsManager* pluginsManager ) {
-        return PluginsManager_Submit( pluginsManager, StgFEM_SwarmVariableList_Type, "0", _StgFEM_SwarmVariableList_DefaultNew );
+        return PluginsManager_Submit( pluginsManager, StgFEM_SwarmVariableList_Type, (Name)"0", _StgFEM_SwarmVariableList_DefaultNew  );
 }
 
 void StgFEM_SwarmVariableList_PrintVariables( void* _self, void* data ){
@@ -138,9 +138,9 @@ void StgFEM_SwarmVariableList_PrintVariables( void* _self, void* data ){
    
    /** print swarm variables **/
    for(swarmcountindex = 0; swarmcountindex < swarmCount; ++swarmcountindex){
-          currentSwarm = (Swarm*)Stg_ComponentFactory_ConstructByName( context->CF, self->swarmRegister->swarmList->data[swarmcountindex]->name, Swarm, True, NULL );
+          currentSwarm = (Swarm*)Stg_ComponentFactory_ConstructByName( context->CF, (Name)self->swarmRegister->swarmList->data[swarmcountindex]->name, Swarm, True, NULL );
           variablecount = currentSwarm->swarmVariable_Register->objects->count;
-          for(countindex = 0; countindex < variablecount; ++countindex){
+          for(countindex = 0; countindex < variablecount; ++countindex ){
                   Journal_PrintString_WithLength( stream, currentSwarm->swarmVariable_Register->objects->data[ countindex ]->name, columnWidth );
                   Journal_PrintString_WithLength( stream, self->swarmRegister->swarmList->data[swarmcountindex]->name, columnWidth );
                   Journal_Printf( stream, "\n");

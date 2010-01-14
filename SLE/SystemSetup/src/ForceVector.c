@@ -228,10 +228,10 @@ void _ForceVector_AssignFromXML( void* forceVector, Stg_ComponentFactory* cf, vo
 
 	_SolutionVector_AssignFromXML( self, cf, data );
 	
-	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
+	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0 );
 
 	entryPointRegister = (void*)self->context->entryPoint_Register;
-	assert( entryPointRegister );
+	assert( entryPointRegister  );
 	
 	_ForceVector_Init( self, dim, entryPointRegister );
 }

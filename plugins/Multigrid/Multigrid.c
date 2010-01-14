@@ -91,8 +91,8 @@ void StgFEM_Multigrid_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void
 
     StgFEM_Multigrid_selfPointer = self;
 
-    self->sle = Stg_ComponentFactory_ConstructByName( cf, "stokesEqn", Stokes_SLE, True, data );
-    self->mgSolver = Stg_ComponentFactory_ConstructByName( cf, "mgSolver", PETScMGSolver, True, data );
+    self->sle = Stg_ComponentFactory_ConstructByName( cf, (Name)"stokesEqn", Stokes_SLE, True, data  );
+    self->mgSolver = Stg_ComponentFactory_ConstructByName( cf, (Name)"mgSolver", PETScMGSolver, True, data  );
 
     /* Replace the setup routine... hacky. */
     self->sle->solver->_solverSetup = StgFEM_Multigrid_SolverSetup;   
@@ -137,10 +137,7 @@ void* StgFEM_Multigrid_New( Name name ) {
 }
 
 Index StgFEM_Multigrid_Register( PluginsManager* mgr ) {
-    return PluginsManager_Submit( mgr,
-                                  StgFEM_Multigrid_Type,
-                                  "0",
-                                  StgFEM_Multigrid_New );
+    return PluginsManager_Submit( mgr, StgFEM_Multigrid_Type, (Name)"0", StgFEM_Multigrid_New  );
 }
 
 

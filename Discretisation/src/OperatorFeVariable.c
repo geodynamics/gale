@@ -60,7 +60,7 @@ OperatorFeVariable* OperatorFeVariable_NewUnary(
 	Name				operatorName )
 {
 	FeVariable*	feVariable = (FeVariable*) _feVariable;
-	Stream*		errorStream = Journal_Register( Error_Type, OperatorFeVariable_Type );
+	Stream*		errorStream = Journal_Register( Error_Type, (Name)OperatorFeVariable_Type  );
 
 	Journal_Firewall( feVariable != NULL, errorStream, "In func %s: Trying to operate on NULL field.\n", __func__ );
        	
@@ -93,7 +93,7 @@ OperatorFeVariable* OperatorFeVariable_NewUnary_OwnOperator(
 	Operator*		ownOperator )
 {
 	FeVariable*	feVariable = (FeVariable*) _feVariable;
-	Stream*		errorStream = Journal_Register( Error_Type, OperatorFeVariable_Type );
+	Stream*		errorStream = Journal_Register( Error_Type, (Name)OperatorFeVariable_Type  );
 
 	Journal_Firewall( feVariable != NULL, errorStream, "In func %s: Trying to operate on NULL field.\n", __func__ );
        	
@@ -127,7 +127,7 @@ OperatorFeVariable* OperatorFeVariable_NewBinary(
 	Name				operatorName )
 {
 	FeVariable*	feVariableList[2];
-	Stream*		errorStream = Journal_Register( Error_Type, OperatorFeVariable_Type );
+	Stream*		errorStream = Journal_Register( Error_Type, (Name)OperatorFeVariable_Type  );
 	
 	Journal_Firewall( _feVariable1 != NULL, errorStream, "In func %s: First field to operate on is NULL.\n", __func__ );
 	Journal_Firewall( _feVariable2 != NULL, errorStream, "In func %s: Second field to operate on is NULL.\n", __func__ );
@@ -228,7 +228,7 @@ void _OperatorFeVariable_Init( void* oFeVar, Name operatorName, Index feVariable
 	OperatorFeVariable*	self = (OperatorFeVariable*) oFeVar;
 	FeVariable*				feVariable;
 	Index						feVariable_I;
-	Stream*					errorStream = Journal_Register( Error_Type, self->type );
+	Stream*					errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 	/* Assign values to object */
 	self->feVariableCount = feVariableCount;
@@ -301,16 +301,16 @@ void _OperatorFeVariable_AssignFromXML( void* feVariable, Stg_ComponentFactory* 
 
 	fV_Register = self->context->fieldVariable_Register;
 
-	operatorName = Stg_ComponentFactory_GetString( cf, self->name, "Operator", "" );
+	operatorName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"Operator", ""  );
 
-	list = Dictionary_Get( dictionary, "FeVariables" );
+	list = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"FeVariables" );
 	
-	feVariableCount = ( list ? Dictionary_Entry_Value_GetCount(list) : 1 );
+	feVariableCount = ( list ? Dictionary_Entry_Value_GetCount(list) : 1  );
 	feVariableList = Memory_Alloc_Array( FeVariable*, feVariableCount, "FeVars" );
 
 	for ( feVariable_I = 0 ; feVariable_I < feVariableCount ; feVariable_I++ ) {
 		feVariableName = (list ?  Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( list, feVariable_I ) ) :
-			Dictionary_GetString( dictionary, "FeVariable" ) );
+			Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"FeVariable" )  );
 
 		/* Check in fV_Register first before assuming in LiveComponentRegister */
 		Journal_PrintfL( cf->infoStream, 2, "Looking for FeVariable '%s' in fieldVariable_Register.\n", feVariableName );
@@ -318,10 +318,10 @@ void _OperatorFeVariable_AssignFromXML( void* feVariable, Stg_ComponentFactory* 
 		
 		if ( !feVariableList[feVariable_I] )
 			feVariableList[feVariable_I] = 
-		Stg_ComponentFactory_ConstructByName( cf, feVariableName, FeVariable, True, data ); 
+		Stg_ComponentFactory_ConstructByName( cf, (Name)feVariableName, FeVariable, True, data ); 
 	}
 
-	_FeVariable_Init( (FeVariable*) self, feVariableList[0]->feMesh, feVariableList[0]->geometryMesh, feVariableList[0]->dofLayout, NULL, NULL, NULL, NULL, False, False );
+	_FeVariable_Init( (FeVariable* ) self, feVariableList[0]->feMesh, feVariableList[0]->geometryMesh, feVariableList[0]->dofLayout, NULL, NULL, NULL, NULL, False, False );
 	_OperatorFeVariable_Init( self, operatorName, feVariableCount, feVariableList, NULL );
 
 	Memory_Free( feVariableList );
@@ -330,7 +330,7 @@ void _OperatorFeVariable_AssignFromXML( void* feVariable, Stg_ComponentFactory* 
 void _OperatorFeVariable_Build( void* feVariable, void* data ) {
 	OperatorFeVariable*	self = (OperatorFeVariable*) feVariable;
 	Index						feVariable_I;
-	Stream*					errorStream = Journal_Register( Error_Type, self->type );
+	Stream*					errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
    _FieldVariable_Build( self, data );
    
@@ -385,9 +385,9 @@ void _OperatorFeVariable_Initialise( void* feVariable, void* data ) {
 		Stg_Component_Initialise( self->feVariableList[ feVariable_I ] , data, False );
 
    /* also include check to see if this fevariable should be checkpointed, just incase it didn't go through the fieldvariable construct phase */ 
-   feVarsList = Dictionary_Get( context->dictionary, "fieldVariablesToCheckpoint" );
-   if ( NULL == feVarsList ) {
-      feVarsList = Dictionary_Get( context->dictionary, "FieldVariablesToCheckpoint" );
+   feVarsList = Dictionary_Get( context->dictionary, (Dictionary_Entry_Key)"fieldVariablesToCheckpoint" );
+   if ( NULL == feVarsList  ) {
+      feVarsList = Dictionary_Get( context->dictionary, (Dictionary_Entry_Key)"FieldVariablesToCheckpoint" );
    }
    if (feVarsList != NULL ) {
       Index                    listLength = Dictionary_Entry_Value_GetCount( feVarsList );
@@ -395,7 +395,7 @@ void _OperatorFeVariable_Initialise( void* feVariable, void* data ) {
       Dictionary_Entry_Value*  feVarDictValue = NULL;
       char*                    fieldVariableName;
    
-      for ( var_I = 0; var_I < listLength; var_I++ ) {
+      for ( var_I = 0; var_I < listLength; var_I++  ) {
          feVarDictValue = Dictionary_Entry_Value_GetElement( feVarsList, var_I );
          fieldVariableName = Dictionary_Entry_Value_AsString( feVarDictValue ); 
          if ( 0 == strcmp( self->name, fieldVariableName ) ) {
@@ -407,9 +407,9 @@ void _OperatorFeVariable_Initialise( void* feVariable, void* data ) {
 
    feVarsList = NULL;
    /** also include check to see if this fevariable should be saved for analysis purposes */ 
-   feVarsList = Dictionary_Get( context->dictionary, "fieldVariablesToSave" );
-   if ( NULL == feVarsList ) {
-      feVarsList = Dictionary_Get( context->dictionary, "FieldVariablesToSave" );
+   feVarsList = Dictionary_Get( context->dictionary, (Dictionary_Entry_Key)"fieldVariablesToSave" );
+   if ( NULL == feVarsList  ) {
+      feVarsList = Dictionary_Get( context->dictionary, (Dictionary_Entry_Key)"FieldVariablesToSave" );
    }
    if (feVarsList != NULL ) {
       Index                    listLength = Dictionary_Entry_Value_GetCount( feVarsList );
@@ -417,7 +417,7 @@ void _OperatorFeVariable_Initialise( void* feVariable, void* data ) {
       Dictionary_Entry_Value*  feVarDictValue = NULL;
       char*                    fieldVariableName;
    
-      for ( var_I = 0; var_I < listLength; var_I++ ) {
+      for ( var_I = 0; var_I < listLength; var_I++  ) {
          feVarDictValue = Dictionary_Entry_Value_GetElement( feVarsList, var_I );
          fieldVariableName = Dictionary_Entry_Value_AsString( feVarDictValue ); 
          if ( 0 == strcmp( self->name, fieldVariableName ) ) {
@@ -440,9 +440,9 @@ void _OperatorFeVariable_Destroy( void* feVariable, void* data ) {
 
 void _OperatorFeVariable_SetFunctions( void* feVariable ) {
 	OperatorFeVariable* self = (OperatorFeVariable*) feVariable;
-	Stream*             error = Journal_Register( Error_Type, self->type );
+	Stream*             error = Journal_Register( Error_Type, (Name)self->type );
 
-	if ( self->useGradient ) {
+	if ( self->useGradient  ) {
 		Journal_Firewall( self->feVariableCount == 1, error, "Cannot use gradient operators for multiple variables.\n" );
 		self->_interpolateWithinElement = OperatorFeVariable_GradientInterpolationFunc;
 		self->_getValueAtNode = OperatorFeVariable_GradientValueAtNodeFunc;
@@ -536,7 +536,7 @@ InterpolationResult _OperatorFeVariable_InterpolateValueAt( void* variable, Coor
 		validToInterpolateInShadowSpace = _OperatorFeVariable_CheckIfValidToInterpolateInShadowSpace(self);	
 			
 		if ( False == validToInterpolateInShadowSpace ) {
-			Stream* warningStr = Journal_Register( Error_Type, self->type );
+			Stream* warningStr = Journal_Register( Error_Type, (Name)self->type  );
 			Journal_Printf( warningStr, "Warning - in %s, for OperatorFeVar \"%s\": user asking to "
 				"interpolate a value at "
 				"coord (%g,%g,%g), which is in shadow space, but "

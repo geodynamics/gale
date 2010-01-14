@@ -120,7 +120,7 @@ void _TrilinearInnerElType_Init( TrilinearInnerElType* self ) {
 	}
 
 	/* Set up the tetrahedral indices. */
-	self->tetInds = Memory_Alloc_2DArray( unsigned, 10, 4, "Mesh_HexType::tetInds" );
+	self->tetInds = Memory_Alloc_2DArray( unsigned, 10, 4, (Name)"Mesh_HexType::tetInds" );
 	self->tetInds[0][0] = 0; self->tetInds[0][1] = 1; self->tetInds[0][2] = 2; self->tetInds[0][3] = 4;
 	self->tetInds[1][0] = 1; self->tetInds[1][1] = 2; self->tetInds[1][2] = 3; self->tetInds[1][3] = 7;
 	self->tetInds[2][0] = 1; self->tetInds[2][1] = 4; self->tetInds[2][2] = 5; self->tetInds[2][3] = 7;
@@ -137,7 +137,7 @@ void _TrilinearInnerElType_Delete( void* elementType ) {
 	TrilinearInnerElType* self = (TrilinearInnerElType*)elementType;
 
 	/* Stg_Class_Delete parent*/
-	_ElementType_Delete( self );
+	_ElementType_Delete( self  );
 }
 
 void _TrilinearInnerElType_Print( void* elementType, Stream* stream ) {
@@ -308,7 +308,7 @@ void _TrilinearInnerElType_ConvertGlobalCoordToElLocal(
 }*/
 
 int _TrilinearInnerElType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
-	Stream* errStream = Journal_Register( ErrorStream_Type, ElementType_Type );
+	Stream* errStream = Journal_Register( ErrorStream_Type, (Name)ElementType_Type  );
 
 	Journal_Printf( errStream, "Surface normal function not yet implemented for this element type.\n" );
 	assert( 0 );

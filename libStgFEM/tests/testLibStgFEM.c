@@ -78,7 +78,7 @@ int main( int argc, char* argv[] ) {
 		Stg_Object* testDirectory;
 		printf( "Watching rank: %i\n", rank );
 		/* Testing entries in xmlDictionary */
-		testDirectory = Stg_ObjectList_Get( xmlSearchPaths,"StGermain" );
+		testDirectory = Stg_ObjectList_Get( xmlSearchPaths, (Name)"StGermain" );
 		if (testDirectory != NULL) {
 			printf("StGermain XML library Path found.\n");
 		}
@@ -86,12 +86,12 @@ int main( int argc, char* argv[] ) {
 			printf("StGermain XML library Path not found.\n"); 
 		}
 		/* For build in the same build directory */
-		if (strcmp((char*)LIB_DIR, (char*)testDirectory)) {
+		if (strcmp((char* )LIB_DIR, (char*)testDirectory)) {
 			printf("StgFEM XML library Path found.\n");
 		}
 		/* For build in separate directories */
 		else{
-			testDirectory = Stg_ObjectList_Get( xmlSearchPaths,"StgFEM" );
+			testDirectory = Stg_ObjectList_Get( xmlSearchPaths, (Name)"StgFEM" );
 			if (testDirectory != NULL) {
 				printf("StgFEM XML library Path found.\n");
 			}
@@ -106,7 +106,7 @@ int main( int argc, char* argv[] ) {
 	StGermain_Finalise();
 	
 	/* Close off MPI */
-	MPI_Finalize();
+	MPI_Finalize( );
 
 	return 0; /* success */
 }

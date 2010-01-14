@@ -233,7 +233,7 @@ void* _AdvectionDiffusionSLE_DefaultNew( Name name ) {
 
 void _AdvectionDiffusionSLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data ) {
 	AdvectionDiffusionSLE*	self = (AdvectionDiffusionSLE*) sle;
-	Stream*						error = Journal_Register( Error_Type, self->type );
+	Stream*						error = Journal_Register( Error_Type, (Name)self->type  );
 	FeVariable*					phiField;
 	ForceVector*				residual;
 	Stg_Component*				massMatrix;
@@ -252,13 +252,13 @@ void _AdvectionDiffusionSLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, 
 	assert( fieldVariable_Register );
 
 	/* Get Dependency Stg_Components */
-	phiField   =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "PhiField",   FeVariable,    True, data );
-	residual   =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Residual",   ForceVector,   True, data );
-	massMatrix =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "MassMatrix", Stg_Component, True, data );
+	phiField   =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PhiField", FeVariable, True, data  );
+	residual   =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Residual", ForceVector, True, data  );
+	massMatrix =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MassMatrix", Stg_Component, True, data  );
 
-	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
+	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0  );
 
-	courantFactor = Stg_ComponentFactory_GetDouble( cf, self->name, "courantFactor", 0.5 );
+	courantFactor = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"courantFactor", 0.5  );
 	Journal_Firewall( 0.0 < courantFactor && courantFactor <= 1.0, 
 		error, "In func %s: CourantFactor read in from dictionary = %2.4f - This must be from 0 - 1.\n", 
 		__func__, courantFactor );
@@ -420,7 +420,7 @@ void _AdvectionDiffusionSLE_Initialise( void* sle, void* data ) {
 	
 	Stg_Component_Initialise( self->phiDotField, data, False );
 
-/* 	Stream* stream = Journal_Register( Info_Type, self->type ); */
+/* 	Stream* stream = Journal_Register( Info_Type, (Name)self->type  ); */
 /* 	FeVariable_PrintLocalDiscreteValues( self->phiDotField, stream ); */
 	
 	if ( False == context->loadFromCheckPoint ) {

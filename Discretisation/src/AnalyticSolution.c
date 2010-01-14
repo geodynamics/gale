@@ -164,12 +164,12 @@ void _AnalyticSolution_AssignFromXML( void* analyticSolution, Stg_ComponentFacto
 	Swarm*            integrationSwarm;
 	Bool              verboseMode;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", DomainContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  );
 
-	integrationSwarm = Stg_ComponentFactory_ConstructByName( cf, "gaussSwarm", Swarm, True, data ); 
-	verboseMode = Stg_ComponentFactory_GetRootDictBool( cf, "analyticSolutionVerbose", False );
+	integrationSwarm = Stg_ComponentFactory_ConstructByName( cf, (Name)"gaussSwarm", Swarm, True, data  ); 
+	verboseMode = Stg_ComponentFactory_GetRootDictBool( cf, (Dictionary_Entry_Key)"analyticSolutionVerbose", False  );
 
 	_AnalyticSolution_Init( self, integrationSwarm, cf->LCRegister, context, verboseMode );
 }
@@ -358,13 +358,13 @@ void AnalyticSolution_TestAll( void* analyticSolution, void* data ) {
 
 void AnalyticSolution_RegisterFeVariableWithAnalyticFunction( void* analyticSolution, FeVariable* feVariable, AnalyticSolution_SolutionFunction* solutionFunction) {
 	AnalyticSolution* self    = (AnalyticSolution*) analyticSolution;
-	char*             tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic" );
+	char*             tmpName = Stg_Object_AppendSuffix( feVariable, (Name)"Analytic"  );
 
 	/* Add feVariable to list */
 	Stg_ObjectList_Append( self->feVariableList, feVariable );
 	/* Add function to list */
-	Stg_ObjectList_GlobalPointerAppend( self->analyticFeVariableFuncList, solutionFunction, tmpName );
-	Memory_Free( tmpName );	
+	Stg_ObjectList_GlobalPointerAppend( self->analyticFeVariableFuncList, solutionFunction, (Name)tmpName );
+	Memory_Free( tmpName  );	
 }
 
 
@@ -372,8 +372,8 @@ FeVariable* AnalyticSolution_RegisterFeVariableFromCF( void* analyticSolution, c
 	AnalyticSolution* self    = (AnalyticSolution*) analyticSolution;
 	FeVariable*       field;
 
-	field = Stg_ComponentFactory_ConstructByName( cf, fieldName, FeVariable, isEssential, data ); 
-	if ( field )
+	field = Stg_ComponentFactory_ConstructByName( cf, (Name)fieldName, FeVariable, isEssential, data ); 
+	if ( field  )
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, field, solutionFunction );
 
 	return field;
@@ -383,7 +383,7 @@ FeVariable* AnalyticSolution_RegisterFeVariableFromCF( void* analyticSolution, c
 void AnalyticSolution_BuildAllAnalyticFields( void* analyticSolution, void* data ) {
 	AnalyticSolution* self       = (AnalyticSolution*) analyticSolution;
 	FeVariable*       feVariable = NULL;
-	Stream*           errStream  = Journal_Register( Error_Type, "AnalyticSolution" );
+	Stream*           errStream  = Journal_Register( Error_Type, (Name)"AnalyticSolution"  );
 	unsigned          feVar_I, feVarCount;
 
 	feVarCount = Stg_ObjectList_Count( self->feVariableList );
@@ -440,8 +440,8 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 	Stg_Component_Build( feVariable->feMesh, NULL, False );
 
 	/* Create new data Variable */
-	tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic-DataVariable" );
-	if ( scalar ) {
+	tmpName = Stg_Object_AppendSuffix( feVariable, (Name)"Analytic-DataVariable" );
+	if ( scalar  ) {
 		Sync*	sync;
 
 		sync = Mesh_GetSync( feVariable->feMesh, MT_VERTEX );
@@ -490,7 +490,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 	dataVariable->allocateSelf = True;
 	
 	/* Create new dof layout */
-	tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic-DofLayout" );
+	tmpName = Stg_Object_AppendSuffix( feVariable, (Name)"Analytic-DofLayout"  );
 	dofLayout = DofLayout_New( tmpName, self->context, variable_Register, Mesh_GetDomainSize( feVariable->feMesh, MT_VERTEX ), NULL );
 	if ( scalar ) {
 		DofLayout_AddAllFromVariableArray( dofLayout, 1, &dataVariable );
@@ -513,7 +513,7 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 	Memory_Free( tmpName );
 
 	/* Create new FeVariable */
-	tmpName = Stg_Object_AppendSuffix( feVariable, "Analytic" );
+	tmpName = Stg_Object_AppendSuffix( feVariable, (Name)"Analytic"  );
 	analyticFeVariable = FeVariable_New( tmpName, self->context, feVariable->feMesh, feVariable->geometryMesh, dofLayout,
 		NULL, NULL, NULL, feVariable->dim, feVariable->isCheckpointedAndReloaded, 
 		False, False,
@@ -523,31 +523,31 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 	Stg_ObjectList_Append( self->analyticFeVariableList, analyticFeVariable );
 
 	/* Create Magnitude Field */
-	tmpName = Stg_Object_AppendSuffix( analyticFeVariable, "Magnitude" );
+	tmpName = Stg_Object_AppendSuffix( analyticFeVariable, (Name)"Magnitude"  );
 	analyticMagField = OperatorFeVariable_NewUnary( tmpName, self->context, analyticFeVariable, "Magnitude" );
 	Memory_Free( tmpName );
 
 	/* Create Error field - The the calculated field minus the analytic field */
-	tmpName = Stg_Object_AppendSuffix( feVariable, "ErrorField" );
+	tmpName = Stg_Object_AppendSuffix( feVariable, (Name)"ErrorField"  );
 	errorField = OperatorFeVariable_NewBinary( tmpName, self->context, feVariable, analyticFeVariable, "Subtraction" );
 	Memory_Free( tmpName );
 	
 	/* Create Error magnitude field */
-	tmpName = Stg_Object_AppendSuffix( feVariable, "ErrorMagnitudeField" );
+	tmpName = Stg_Object_AppendSuffix( feVariable, (Name)"ErrorMagnitudeField"  );
 	errorMagnitudeField = OperatorFeVariable_NewUnary( tmpName, self->context, errorField, "Magnitude" );
 	Memory_Free( tmpName );
 	Stg_ObjectList_Append( self->errorMagnitudeFieldList, errorMagnitudeField ); /* Add it to list */
 
 	/* Create Relative Error magnitude field - The magnitude of relative error */
-	tmpName = Stg_Object_AppendSuffix( feVariable, "RelativeErrorMagnitudeField" );
+	tmpName = Stg_Object_AppendSuffix( feVariable, (Name)"RelativeErrorMagnitudeField"  );
 	relativeErrorMagnitudeField = OperatorFeVariable_NewBinary( tmpName, self->context, errorMagnitudeField, analyticMagField, "ScalarDivision" );
 	Memory_Free( tmpName );
 	Stg_ObjectList_Append( self->relativeErrorMagnitudeFieldList, relativeErrorMagnitudeField ); /* Add it to list */
 
 	/* Create Stream for field to dump error information to */
-	tmpName = Stg_Object_AppendSuffix( feVariable, "ErrorFile" );
-	stream = Journal_Register( Dump_Type, tmpName );
-	Stg_ObjectList_GlobalPointerAppend( self->streamList, stream, tmpName );
+	tmpName = Stg_Object_AppendSuffix( feVariable, (Name)"ErrorFile"  );
+	stream = Journal_Register( Dump_Type, (Name)tmpName  );
+	Stg_ObjectList_GlobalPointerAppend( self->streamList, stream, (Name)tmpName  );
 	Stream_Enable( stream, True );
 	Stream_RedirectFile_WithPrependedPath( stream, self->context->outputPath, tmpName );
 	Memory_Free( tmpName );
@@ -555,9 +555,9 @@ FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVari
 	/* Get tolerance from dictionary */
 	count = Stg_ObjectList_Count( self->analyticFeVariableList );
 	self->toleranceList = Memory_Realloc_Array( self->toleranceList, double, count );
-	tmpName = Stg_Object_AppendSuffix( feVariable, "Tolerance" );
-	self->toleranceList[ count - 1 ] = Dictionary_GetDouble_WithDefault( self->context->dictionary, tmpName, 0.0 );
-	Memory_Free( tmpName );
+	tmpName = Stg_Object_AppendSuffix( feVariable, (Name)"Tolerance"  );
+	self->toleranceList[ count - 1 ] = Dictionary_GetDouble_WithDefault( self->context->dictionary, (Dictionary_Entry_Key)tmpName, 0.0 );
+	Memory_Free( tmpName  );
 
 	/* Add components to LiveComponentRegister so they will be visible to other components 
 	 * and will be built, initialised and  deleted */
@@ -591,11 +591,11 @@ FeVariable* AnalyticSolution_CreateAnalyticSymmetricTensorField( void* analyticS
 	analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField );
 
 	/* Create new dof layout */
-	tmpName = Stg_Object_AppendSuffix( analyticVectorField, "Analytic-DofLayout" );
+	tmpName = Stg_Object_AppendSuffix( analyticVectorField, (Name)"Analytic-DofLayout"  );
 	dofLayout = DofLayout_New( tmpName, self->context, self->context->variable_Register, Mesh_GetDomainSize( analyticVectorField->feMesh, MT_VERTEX ), NULL );
 
 	/* Create Invariant Field */
-	tmpName2 = Stg_Object_AppendSuffix( analyticVectorField, "Invariant" );
+	tmpName2 = Stg_Object_AppendSuffix( analyticVectorField, (Name)"Invariant"  );
 	analyticVectorInvField = OperatorFeVariable_NewUnary( tmpName2, self->context, analyticVectorField, "SymmetricTensor_Invariant" );
 
 	Memory_Free( tmpName );
@@ -632,7 +632,7 @@ InterpolationResult AnalyticSolution_InterpolateValueFromNormalFeVariable( void*
 }
 
 AnalyticSolution* AnalyticSolution_GetAnalyticSolution() {
-	Journal_Firewall( mySingleton != NULL , Journal_Register( Error_Type, "AnalyticSolution" ),
+	Journal_Firewall( mySingleton != NULL , Journal_Register( Error_Type, (Name)"AnalyticSolution"  ),
 		"Error in function %s: The Singleton Ptr is NULL, meaning the AnalyticSolution has not been created yet\n", __func__ );
 
 	return mySingleton;

@@ -143,8 +143,8 @@ void _ThermalBuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFact
 	/* Construct Parent */
 	_ForceTerm_AssignFromXML( self, cf, data );
 
-	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TemperatureField", FeVariable, True, data ) ;
-	rayleighNumber   = Stg_ComponentFactory_GetDouble( cf, self->name, "Ra", 0.0 );
+	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"TemperatureField", FeVariable, True, data  ) ;
+	rayleighNumber   = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"Ra", 0.0  );
 
 	_ThermalBuoyancyForceTerm_Init( self, temperatureField, rayleighNumber );
 }

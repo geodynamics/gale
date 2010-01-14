@@ -47,16 +47,16 @@ void StgFEM_Document_Register( AbstractContext* context ) {
 	Stream* componentListStream;
 
 	/* Print list of all components */
-	componentListStream = Journal_Register( Info_Type, "componentList" );
+	componentListStream = Journal_Register( Info_Type, (Name)"componentList"  );
 	Stream_RedirectFile_WithPrependedPath( componentListStream, context->outputPath, "ComponentList.txt" );
 	Stg_ComponentRegister_PrintAllTypes( Stg_ComponentRegister_Get_ComponentRegister(), componentListStream );
 
 	/* Print info for one component */
 	cf = DocumentationComponentFactory_New( );
 	Stream_RedirectFile_WithPrependedPath( cf->infoStream, context->outputPath, "Documentation.txt" );
-	DocumentationComponentFactory_DocumentType( cf, Dictionary_GetString( context->dictionary, "documentType" ) );
+	DocumentationComponentFactory_DocumentType( cf, Dictionary_GetString( context->dictionary, (Dictionary_Entry_Key)"documentType" ) );
 	
-	exit( EXIT_SUCCESS );
+	exit( EXIT_SUCCESS  );
 }
 
 

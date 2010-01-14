@@ -155,9 +155,9 @@ void _ElementType_Register_Print( void* elementType_Register, Stream* stream ) {
 void _ElementType_Register_AssignFromXML( void* elementType_Register, Stg_ComponentFactory *cf, void* data ){
 	ElementType_Register*	self = (ElementType_Register*)elementType_Register;
 	
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
-	if( !self->context ) 
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", DomainContext, False, data );
+	if( !self->context  ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  );
 }
 	
 void _ElementType_Register_Build( void* elementType_Register, void *data ){

@@ -59,7 +59,7 @@ int main( int argc, char* argv[] ) {
 	StGermain_Init( &argc, &argv );
 
 	/* Create Data File */
-	dataStream    = Journal_Register( Info_Type, "DataStream" );
+	dataStream    = Journal_Register( Info_Type, (Name)"DataStream"  );
 	Stream_RedirectFile( dataStream, dataFileName );
 
 	Journal_Printf( dataStream, "# File to compare code with Brooks, Hughes 1982 - Fig 3.3\n");

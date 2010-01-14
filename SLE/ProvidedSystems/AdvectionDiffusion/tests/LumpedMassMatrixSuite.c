@@ -145,22 +145,22 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 
 	/* Read input */
 	dictionary = Dictionary_New();
-	Dictionary_Add( dictionary, "outputPath", Dictionary_Entry_Value_FromString( "./output" ) );
-	Dictionary_Add( dictionary, "rank", Dictionary_Entry_Value_FromUnsignedInt( data->rank ) );
-	Dictionary_Add( dictionary, "numProcessors", Dictionary_Entry_Value_FromUnsignedInt( data->nProcs ) );
-	Dictionary_Add( dictionary, "gaussParticlesX", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
-	Dictionary_Add( dictionary, "gaussParticlesY", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"outputPath", Dictionary_Entry_Value_FromString( "./output" )  );
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"rank", Dictionary_Entry_Value_FromUnsignedInt( data->rank )  );
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"numProcessors", Dictionary_Entry_Value_FromUnsignedInt( data->nProcs )  );
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"gaussParticlesX", Dictionary_Entry_Value_FromUnsignedInt( 2 )  );
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"gaussParticlesY", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
 
 	bcList = Dictionary_Entry_Value_NewList();
-	currBC = Dictionary_Entry_Value_NewStruct();
-	Dictionary_Entry_Value_AddMember( currBC, "name", Dictionary_Entry_Value_FromString( "phi" ) );
-	Dictionary_Entry_Value_AddMember( currBC, "type", Dictionary_Entry_Value_FromString( "double" ) );
-	Dictionary_Entry_Value_AddMember( currBC, "value", Dictionary_Entry_Value_FromDouble( -1.0f ) );
+	currBC = Dictionary_Entry_Value_NewStruct( );
+	Dictionary_Entry_Value_AddMember( currBC, (Dictionary_Entry_Key)"name", Dictionary_Entry_Value_FromString( "phi" )  );
+	Dictionary_Entry_Value_AddMember( currBC, (Dictionary_Entry_Key)"type", Dictionary_Entry_Value_FromString( "double" )  );
+	Dictionary_Entry_Value_AddMember( currBC, (Dictionary_Entry_Key)"value", Dictionary_Entry_Value_FromDouble( -1.0f )  );
 	Dictionary_Entry_Value_AddElement( bcList, currBC );
 	currBC = Dictionary_Entry_Value_NewStruct();
-	Dictionary_Entry_Value_AddMember( currBC, "wall", Dictionary_Entry_Value_FromString( "left" ) );
-	Dictionary_Entry_Value_AddMember( currBC, "variables", bcList );
-	Dictionary_Add( dictionary, "boundaryCondition", currBC );
+	Dictionary_Entry_Value_AddMember( currBC, (Dictionary_Entry_Key)"wall", Dictionary_Entry_Value_FromString( "left" )  );
+	Dictionary_Entry_Value_AddMember( currBC, (Dictionary_Entry_Key)"variables", bcList  );
+	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"boundaryCondition", currBC  );
 
 	/* Create Context */
 	context = FiniteElementContext_New( "context", 0,0, data->comm, dictionary );

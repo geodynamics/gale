@@ -769,7 +769,7 @@ void _FeEquationNumber_BuildDestinationArray( FeEquationNumber* self ) {
    Index critPointsIHaveTotal = 0;
    CritPointInfo* critPointsToSend = NULL;
    Index critPointsToSendTotal = 0;
-   Stream* errorStream = Journal_Register( Error_Type, self->type );
+   Stream* errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
    Journal_DPrintfL( self->debug, 1, "In %s:\n",  __func__ );
    Stream_IndentBranch( StgFEM_Debug );
@@ -1597,8 +1597,8 @@ static void _FeEquationNumber_HandleNode( FeEquationNumber* self, const Node_Dom
 	
    Journal_DPrintfL( self->debug, 3, "In %s:",  __func__ );
 /*#if DEBUG*/
-   error = Journal_Register( Error_Type, self->type );
-   Journal_Firewall( (dNode_I < self->feMesh->nodeDomainCount), error, "Stuffup: %s() asked to operate on node %d, bigger "
+   error = Journal_Register( Error_Type, (Name)self->type );
+   Journal_Firewall( (dNode_I < self->feMesh->nodeDomainCount ), error, "Stuffup: %s() asked to operate on node %d, bigger "
                      "than domain count %d. Exiting.\n", __func__, dNode_I, self->feMesh->nodeDomainCount );
 /*#endif*/
 	
@@ -2364,7 +2364,7 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
 
    inc = IArray_New();
 
-   stream = Journal_Register( Info_Type, self->type );
+   stream = Journal_Register( Info_Type, (Name)self->type  );
    Stream_SetPrintingRank( stream, 0 );
 
    Journal_RPrintf( stream, "FeEquationNumber: '%s'\n", self->name );

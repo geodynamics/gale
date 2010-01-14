@@ -117,9 +117,9 @@ void _C2Generator_Print( void* meshGenerator, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* meshGeneratorStream;
-	meshGeneratorStream = Journal_Register( InfoStream_Type, "C2GeneratorStream" );
+	meshGeneratorStream = Journal_Register( InfoStream_Type, (Name)"C2GeneratorStream" );
 
-	assert( self );
+	assert( self  );
 
 	/* Print parent */
 	Journal_Printf( stream, "C2Generator (ptr): (%p)\n", self );
@@ -166,7 +166,7 @@ void C2Generator_SetTopologyParams( void* meshGenerator, unsigned* sizes,
 
 void C2Generator_GenElementVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	C2Generator*	self = (C2Generator*)meshGenerator;
-	Stream*		stream = Journal_Register( Info_Type, self->type );
+	Stream*		stream = Journal_Register( Info_Type, (Name)self->type  );
 	unsigned*	incEls;
 	unsigned*	dimInds;
 	unsigned	vertsPerEl;
@@ -287,7 +287,7 @@ void C2Generator_GenFaceVertexInc( void* meshGenerator, IGraph* topo, Grid*** gr
 	unsigned	verts[9];
 	unsigned*	dimInds		= Memory_Alloc_Array( unsigned, topo->nDims, "edgeDimensionIndices" );
 
-	stream = Journal_Register( Info_Type, self->type );
+	stream = Journal_Register( Info_Type, (Name)self->type  );
 	Journal_Printf( stream, "Generating face-vertex types...\n" );
 	Stream_Indent( stream );
 
@@ -397,7 +397,7 @@ void C2Generator_GenEdgeVertexInc( void* meshGenerator, IGraph* topo, Grid*** gr
 	unsigned	verts[3];
 	unsigned*	dimInds		= Memory_Alloc_Array( unsigned, topo->nDims, "edgeDimensionIndices" );
 
-	stream = Journal_Register( Info_Type, self->type );
+	stream = Journal_Register( Info_Type, (Name)self->type  );
 	Journal_Printf( stream, "Generating edge-vertex incidence...\n" );
 	Stream_Indent( stream );
 
@@ -471,7 +471,7 @@ void C2Generator_GenElementTypes( void* meshGenerator, Mesh* mesh ) {
 
 	assert( self );
 
-	stream = Journal_Register( Info_Type, self->type );
+	stream = Journal_Register( Info_Type, (Name)self->type  );
 	Journal_Printf( stream, "Generating element types...\n" );
 	Stream_Indent( stream );
 

@@ -105,7 +105,7 @@ void _Inner2DGenerator_Print( void* generator, Stream* stream ) {
 	
 	/* Set the Journal for printing informations */
 	Stream* generatorStream;
-	generatorStream = Journal_Register( InfoStream_Type, "Inner2DGeneratorStream" );
+	generatorStream = Journal_Register( InfoStream_Type, (Name)"Inner2DGeneratorStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "Inner2DGenerator (ptr): (%p)\n", self );
@@ -121,7 +121,7 @@ void _Inner2DGenerator_AssignFromXML( void* generator, Stg_ComponentFactory* cf,
 
 	_MeshGenerator_AssignFromXML( self, cf, data );
 
-	elMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "elementMesh", Mesh, True, data );
+	elMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"elementMesh", Mesh, True, data  );
 	Inner2DGenerator_SetElementMesh( self, elMesh );
 }
 
@@ -157,11 +157,11 @@ void Inner2DGenerator_Generate( void* generator, void* _mesh ) {
 	Inner2DGenerator_BuildElementTypes( self, mesh );
 
 	elGrid = *(Grid**)ExtensionManager_Get( self->elMesh->info, self->elMesh, 
-					       ExtensionManager_GetHandle( self->elMesh->info, "elementGrid" ) );
-	ExtensionManager_Add( mesh->info, "elementGrid", sizeof(Grid*) );
-	grid = (Grid**)ExtensionManager_Get( mesh->info, mesh, 
-					     ExtensionManager_GetHandle( mesh->info, "elementGrid" ) );
-	*grid = Grid_New();
+					       ExtensionManager_GetHandle( self->elMesh->info, (Name)"elementGrid" )  );
+	ExtensionManager_Add( mesh->info, (Name)"elementGrid", sizeof(Grid*) );
+	grid = (Grid** )ExtensionManager_Get( mesh->info, mesh, 
+					     ExtensionManager_GetHandle( mesh->info, (Name)"elementGrid" ) );
+	*grid = Grid_New( );
 	Grid_SetNumDims( *grid, elGrid->nDims );
 	Grid_SetSizes( *grid, elGrid->sizes );
 }

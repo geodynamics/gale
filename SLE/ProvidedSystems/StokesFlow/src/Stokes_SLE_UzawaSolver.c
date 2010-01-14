@@ -248,13 +248,13 @@ void _Stokes_SLE_UzawaSolver_AssignFromXML( void* solver, Stg_ComponentFactory* 
 
 	_SLE_Solver_AssignFromXML( self, cf, data );
 
-	tolerance            = Stg_ComponentFactory_GetDouble( cf, self->name, "tolerance", 1.0e-5 );
-	maxUzawaIterations   = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "maxIterations", 1000 );
-	minUzawaIterations   = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "minIterations", 1 );
-	useAbsoluteTolerance = Stg_ComponentFactory_GetBool( cf, self->name, "useAbsoluteTolerance", False );
-	monitor              = Stg_ComponentFactory_GetBool( cf, self->name, "monitor", False );
+	tolerance            = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"tolerance", 1.0e-5  );
+	maxUzawaIterations   = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"maxIterations", 1000  );
+	minUzawaIterations   = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"minIterations", 1  );
+	useAbsoluteTolerance = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"useAbsoluteTolerance", False  );
+	monitor              = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"monitor", False  );
 
-	preconditioner = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Preconditioner", StiffnessMatrix, False, data );
+	preconditioner = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Preconditioner", StiffnessMatrix, False, data  );
 
 	_Stokes_SLE_UzawaSolver_Init( self, preconditioner, maxUzawaIterations, minUzawaIterations, tolerance, useAbsoluteTolerance, monitor );
 
@@ -433,7 +433,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	double                  momentumEquationResidual;
 	
 	Iteration_Index         innerLoopIterations;
-	Stream*                 errorStream     = Journal_Register( Error_Type, Stokes_SLE_UzawaSolver_Type );
+	Stream*                 errorStream     = Journal_Register( Error_Type, (Name)Stokes_SLE_UzawaSolver_Type  );
 	
 	PetscInt		fVecSize, qTempVecSize, uVecSize, qVecSize;
 	PetscScalar		fVecNorm, qTempVecNorm, uVecNorm, rVecNorm, fTempVecNorm, uVecNormInf, qVecNorm, qVecNormInf;

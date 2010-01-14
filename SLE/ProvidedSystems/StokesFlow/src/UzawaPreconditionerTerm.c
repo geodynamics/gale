@@ -186,11 +186,11 @@ void _UzawaPreconditionerTerm_AssembleElement(
 	velocityDofCount = kRowCount * kMatrix->dim;
 
 	/* Allocate Memory */
-	gElementMatrix = Memory_Alloc_2DArray( double, velocityDofCount, pressureDofCount, "g element matrix" );
+	gElementMatrix = Memory_Alloc_2DArray( double, velocityDofCount, pressureDofCount, (Name)"g element matrix"  );
 	memset( gElementMatrix[0], 0, sizeof(double) * velocityDofCount * pressureDofCount );
-	kElementMatrix = Memory_Alloc_2DArray( double, velocityDofCount, velocityDofCount, "k element matrix" );
+	kElementMatrix = Memory_Alloc_2DArray( double, velocityDofCount, velocityDofCount, (Name)"k element matrix"  );
 	memset( kElementMatrix[0], 0, sizeof(double) * velocityDofCount * velocityDofCount );
-	kInverseG      = Memory_Alloc_2DArray( double, velocityDofCount, pressureDofCount, "[ diag(K) ]^-1 G" );
+	kInverseG      = Memory_Alloc_2DArray( double, velocityDofCount, pressureDofCount, (Name)"[ diag(K) ]^-1 G"  );
 
 	/* Assemble Element G */
 	StiffnessMatrix_AssembleElement( gMatrix, lElement_I, _sle, context, gElementMatrix );
@@ -223,7 +223,7 @@ void _UzawaPreconditionerTerm_AssembleElement(
 		double**               mElementMatrix;
 		StiffnessMatrix*       cMatrix        = sle->cStiffMat;
 		
-		mElementMatrix = Memory_Alloc_2DArray( double, pressureDofCount, pressureDofCount, "m element matrix" );
+		mElementMatrix = Memory_Alloc_2DArray( double, pressureDofCount, pressureDofCount, (Name)"m element matrix"  );
 		memset( mElementMatrix[0], 0, sizeof(double) * pressureDofCount * pressureDofCount );
 
 		StiffnessMatrix_AssembleElement( cMatrix, lElement_I, _sle, context, mElementMatrix );

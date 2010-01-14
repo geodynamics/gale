@@ -119,7 +119,7 @@ void _BilinearElementType_Init( BilinearElementType* self ) {
 		self->elLocalLength[dim_I] = self->maxElLocalCoord[dim_I] - self->minElLocalCoord[dim_I];
 	}
 
-	self->triInds = Memory_Alloc_2DArray( unsigned, dim, 3, "BilinearElementType::triInds" );
+	self->triInds = Memory_Alloc_2DArray( unsigned, dim, 3, (Name)"BilinearElementType::triInds" );
 	self->triInds[0][0] = 0; self->triInds[0][1] = 1; self->triInds[0][2] = 2;
 	self->triInds[1][0] = 1; self->triInds[1][1] = 3; self->triInds[1][2] = 2;
 }
@@ -128,7 +128,7 @@ void _BilinearElementType_Delete( void* elementType ) {
 	BilinearElementType* self = (BilinearElementType*)elementType;
 
 	/* Stg_Class_Delete parent */
-	_ElementType_Delete( self );
+	_ElementType_Delete( self  );
 }
 
 void _BilinearElementType_Print( void* elementType, Stream* stream ) {
@@ -167,7 +167,7 @@ void _BilinearElementType_AssignFromXML( void* elementType, Stg_ComponentFactory
 void _BilinearElementType_Initialise( void* elementType, void *data ){
 	BilinearElementType*	self	= (BilinearElementType*) elementType;
 
-	self->faceNodes = Memory_Alloc_2DArray( unsigned, 4, 2, "node indices for element faces" );
+	self->faceNodes = Memory_Alloc_2DArray( unsigned, 4, 2, (Name)"node indices for element faces"  );
 
 	self->faceNodes[0][0] = 0; self->faceNodes[0][1] = 1;
 	self->faceNodes[1][0] = 2; self->faceNodes[1][1] = 3;
@@ -194,7 +194,7 @@ void _BilinearElementType_Build( void* elementType, void *data ) {
 	BilinearElementType*	self	= (BilinearElementType*) elementType;
 
 	self->evaluatedShapeFunc = Memory_Alloc_Array( double, self->nodeCount, "evaluatedShapeFuncs" );
-	self->GNi = Memory_Alloc_2DArray( double, self->dim, self->nodeCount, "localShapeFuncDerivitives" );
+	self->GNi = Memory_Alloc_2DArray( double, self->dim, self->nodeCount, (Name)"localShapeFuncDerivitives"  );
 }
 
 /*
