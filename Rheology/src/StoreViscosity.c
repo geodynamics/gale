@@ -79,16 +79,12 @@ void _StoreVisc_Init(
 	/* Assign Pointers */
 	self->materialPointsSwarm = materialPointsSwarm;
 
-	self->particleExtHandle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, self->type, sizeof( StoreVisc_ParticleExt ) );
+	self->particleExtHandle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, (Name)self->type, sizeof( StoreVisc_ParticleExt )  );
 	
 	/* Add SwarmVariables for plotting */
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle, self->particleExtHandle );
 	
-	self->swarmVariable = Swarm_NewScalarVariable(
-		materialPointsSwarm,
-		"Viscosity",
-		(ArithPointer) &particleExt->effVisc - (ArithPointer) &particle,
-		Variable_DataType_Double );
+	self->swarmVariable = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"Viscosity", (ArithPointer) &particleExt->effVisc - (ArithPointer) &particle, Variable_DataType_Double );
 }
 
 void* _StoreVisc_DefaultNew( Name name ) {
@@ -109,7 +105,7 @@ void* _StoreVisc_DefaultNew( Name name ) {
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
-	return (void*) _StoreVisc_New(  STOREVISC_PASSARGS  );
+	return (void*) _StoreVisc_New(  STOREVISC_PASSARGS   );
 }
 
 void _StoreVisc_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
@@ -119,13 +115,7 @@ void _StoreVisc_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* d
 	/* Construct Parent */
 	_Rheology_AssignFromXML( self, cf, data );
 
-	materialPointsSwarm = Stg_ComponentFactory_ConstructByKey( 
-		cf, 
-		self->name, 
-		"MaterialPointsSwarm", 
-		MaterialPointsSwarm, 
-		True,
-		data );
+	materialPointsSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialPointsSwarm", MaterialPointsSwarm, True, data  );
 
 	_StoreVisc_Init( self, materialPointsSwarm );
 }

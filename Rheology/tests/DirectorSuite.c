@@ -54,11 +54,11 @@ double dt( UnderworldContext* context ) { return 0.05; }
 void _Director_Intermediate_Replace( void* director, Index lParticle_I ) {}
 
 void test( UnderworldContext* context ) {
-	Director*			director = (Director*)LiveComponentRegister_Get( context->CF->LCRegister, "director" );
+	Director*			director = (Director*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"director" );
 	Particle_Index		lParticle_I;
 	GlobalParticle*	particle;
 	double				time = context->currentTime + context->dt;
-	Swarm*				swarm	= (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialSwarm" );
+	Swarm*				swarm	= (Swarm* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialSwarm" );
 	XYZ					normal;
 	double				error = 0.0;
    double				angle = 0.5 * M_PI - atan(1.0/(2.0*time) );
@@ -68,7 +68,7 @@ void test( UnderworldContext* context ) {
    int ierr;
 
 	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
-		particle = (GlobalParticle*)Swarm_ParticleAt( swarm, lParticle_I );
+		particle = (GlobalParticle* )Swarm_ParticleAt( swarm, lParticle_I );
 		SwarmVariable_ValueAt( director->directorSwarmVariable, lParticle_I, normal );
       angleDirector = atan(-normal[1]/normal[0]);
 		error += fabs( angleDirector - angle );
@@ -83,7 +83,7 @@ void test( UnderworldContext* context ) {
 }
 
 void testRandom( UnderworldContext* context ) {
-	AlignmentSwarmVariable* alignment = (AlignmentSwarmVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "alignment" );
+	AlignmentSwarmVariable* alignment = (AlignmentSwarmVariable*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"alignment"  );
 	Director*               director;
 	Particle_Index          lParticle_I;
 	GlobalParticle*         particle;
@@ -160,7 +160,7 @@ void testRandom( UnderworldContext* context ) {
 #define ANGLE_ERROR 1e-7
 
 void testPerMaterial( UnderworldContext* context ) {
-	AlignmentSwarmVariable* alignment              = (AlignmentSwarmVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "alignment" );
+	AlignmentSwarmVariable* alignment              = (AlignmentSwarmVariable*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"alignment" );
 	Materials_Register*     materials_Register     = context->materials_Register;
 	Director*               director;
 	Particle_Index          lParticle_I;
@@ -174,7 +174,7 @@ void testPerMaterial( UnderworldContext* context ) {
 	
 	swarm = alignment->swarm;
 	director = alignment->director;
-	materialsCount = Materials_Register_GetCount( materials_Register);
+	materialsCount = Materials_Register_GetCount( materials_Register );
 	
 	/*  construct test for testDirectorPerMaterial.xml  */
 	/* assume a direction for each material and check that */
@@ -208,7 +208,7 @@ void testPerMaterial( UnderworldContext* context ) {
 }
 
 void testPerMaterial2( UnderworldContext* context ) {
-	AlignmentSwarmVariable* alignment              = (AlignmentSwarmVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "alignment" );
+	AlignmentSwarmVariable* alignment              = (AlignmentSwarmVariable*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"alignment" );
 	Materials_Register*     materials_Register     = context->materials_Register;
 	Director*               director;
 	Particle_Index          lParticle_I;
@@ -222,7 +222,7 @@ void testPerMaterial2( UnderworldContext* context ) {
 	
 	swarm = alignment->swarm;
 	director = alignment->director;
-	materialsCount = Materials_Register_GetCount( materials_Register);
+	materialsCount = Materials_Register_GetCount( materials_Register );
 	
 	matDirectionVectors = Memory_Alloc_Array(XYZ, DIR_TEST_NUM_MAT, "materialDirectionVectors");
 
@@ -273,7 +273,7 @@ void DirectorSuite_Test( DirectorSuiteData* data ) {
       the intermediate re-normalisation of the director vectors */
 	pcu_filename_input( "testDirector.xml", xml_input );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context"  );
 	Stream_Enable( context->info, False );
 	Stream_Enable( context->verbose, False );
 	Stream_Enable( context->debug, False );
@@ -281,7 +281,7 @@ void DirectorSuite_Test( DirectorSuiteData* data ) {
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, test );
 	EP_AppendClassHook( Context_GetEntryPoint( context, FiniteElementContext_EP_CalcDt ), dt, context );
 	stgMainBuildAndInitialise( cf );
-	director = (Director*) LiveComponentRegister_Get( context->CF->LCRegister, "director" );
+	director = (Director*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"director"  );
 	/* we disable the intermediate director step, which normalises the director.  this is done so that we can have an analytic solution, but a more inclusive test 
 	  would be a good idea */
 	director->_intermediate = _Director_Intermediate_Replace;
@@ -296,7 +296,7 @@ void DirectorSuite_TestRandom( DirectorSuiteData* data ) {
 
 	pcu_filename_input( "testDirectorRandom.xml", xml_input );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context"  );
 	Stream_Enable( context->info, False );
 	Stream_Enable( context->verbose, False );
 	Stream_Enable( context->debug, False );
@@ -314,7 +314,7 @@ void DirectorSuite_TestPerMaterial( DirectorSuiteData* data ) {
 
 	pcu_filename_input( "testDirectorPerMaterial.xml", xml_input );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context"  );
 	Stream_Enable( context->info, False );
 	Stream_Enable( context->verbose, False );
 	Stream_Enable( context->debug, False );
@@ -332,7 +332,7 @@ void DirectorSuite_TestPerMaterial2( DirectorSuiteData* data ) {
 
 	pcu_filename_input( "testDirectorPerMaterial2.xml", xml_input );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context"  );
 	Stream_Enable( context->info, False );
 	Stream_Enable( context->verbose, False );
 	Stream_Enable( context->debug, False );

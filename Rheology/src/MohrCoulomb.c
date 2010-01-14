@@ -144,19 +144,15 @@ void _MohrCoulomb_AssignFromXML( void* rheology, Stg_ComponentFactory* cf,
 	/* Make sure that there is strain weakening */
 	Journal_Firewall(
 		self->strainWeakening != NULL,
-		Journal_Register( Error_Type, self->type ),
+		Journal_Register( Error_Type, (Name)self->type  ),
 		"Error in func '%s' for %s '%s': MohrCoulomb rheology needs strain weakening.\n", 
 		__func__, self->type, self->name );
 	
-	materialPointsSwarm    = Stg_ComponentFactory_ConstructByKey( cf, self->name, 
-			"MaterialPointsSwarm", MaterialPointsSwarm, True, data );
-	pressureField          = Stg_ComponentFactory_ConstructByKey( cf, self->name,
-			"PressureField", FeVariable, True, data );
-	strainRateField = Stg_ComponentFactory_ConstructByKey( cf, self->name,
-			"StrainRateField", FeVariable, True, data );
+	materialPointsSwarm    = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialPointsSwarm", MaterialPointsSwarm, True, data  );
+	pressureField          = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureField", FeVariable, True, data  );
+	strainRateField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"StrainRateField", FeVariable, True, data  );
 
-	swarmStrainRate = Stg_ComponentFactory_ConstructByKey(
-	   cf, self->name, "swarmStrainRate", SwarmVariable, False, data );
+	swarmStrainRate = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"swarmStrainRate", SwarmVariable, False, data  );
 	
 	_MohrCoulomb_Init( 
 			self,
@@ -164,11 +160,11 @@ void _MohrCoulomb_AssignFromXML( void* rheology, Stg_ComponentFactory* cf,
 			strainRateField,
 			swarmStrainRate,
 			materialPointsSwarm, 
-			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesion", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesionAfterSoftening", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficient", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficientAfterSoftening", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ) );
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"cohesion", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"cohesionAfterSoftening", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"frictionCoefficient", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"frictionCoefficientAfterSoftening", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minimumYieldStress", 0.0 )  );
 }
 
 void _MohrCoulomb_Build( void* rheology, void* data ) {

@@ -75,7 +75,7 @@ void testVonMisesYielding_HasYielded(
 
 
 void Underworld_testVonMisesYielding_Check( FiniteElementContext* context ) {
-	Stream* stream = Journal_Register( Dump_Type, Underworld_testVonMisesYielding_Type );
+	Stream* stream = Journal_Register( Dump_Type, (Name)Underworld_testVonMisesYielding_Type );
 
    if(context->rank == 0){
       /* Don't do anything if nothing has yielded yet */
@@ -83,7 +83,7 @@ void Underworld_testVonMisesYielding_Check( FiniteElementContext* context ) {
          return;
       }
    
-      /* Set the stream to point to our output file (so we can do a diff on it later) */
+      /* Set the stream to point to our output file (so we can do a diff on it later ) */
       Stream_Enable( stream, True );
       Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, "testVonMisesYielding.dat" );
    
@@ -138,16 +138,16 @@ void VonMisesYieldingSuite_VonMises2D( VonMisesYieldingSuiteData* data ) {
 	/* read in the xml input file */
 	pcu_filename_input( "testVonMisesYieldCriterion.xml", xml_input );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context" );
 	dictionary = context->dictionary;
 
-	stgMainBuildAndInitialise( cf );
+	stgMainBuildAndInitialise( cf  );
 
 	/* get pointer to the mesh */
-	globalSelf.mesh = Stg_ComponentFactory_ConstructByName( cf, "linearMesh", FeMesh, True, NULL ); 
+	globalSelf.mesh = Stg_ComponentFactory_ConstructByName( cf, (Name)"linearMesh", FeMesh, True, NULL ); 
 	
 	/* Get a pointer the yield rheology that we are trying to test */
-	yieldRheology = (YieldRheology*) LiveComponentRegister_Get( context->CF->LCRegister, "yieldRheology" );
+	yieldRheology = (YieldRheology* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"yieldRheology"  );
 	
 	/* Store the pointer to the original 'HasYielded' function */
 	globalSelf.realHasYieldedFunction = yieldRheology->_hasYielded;

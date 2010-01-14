@@ -86,7 +86,7 @@ void _Velic_solHy_Init( Velic_solHy* self, double etaA, double etaB, double xc, 
 	if( (self->xc < 0.0) || self->xc > 1.0 ) 
 	      correctInput = False;	
 
-	Journal_Firewall( correctInput,  Journal_Register( Error_Type, "solHy_ErrorStream") ,
+	Journal_Firewall( correctInput,  Journal_Register( Error_Type, (Name)"solHy_ErrorStream" ) ,
 			"Error: In func %s. The input parameters you supplied to the analytic Solution are incorrect.\nValid range of xc values is [0,1]. Currently it is %f\n", __func__, self->xc );
 }
 
@@ -105,32 +105,32 @@ void _Velic_solHy_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* c
 	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	/* Create Analytic Fields */
-	velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data );
+	velocityField = Stg_ComponentFactory_ConstructByName( cf, (Name)"VelocityField", FeVariable, True, data  );
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, velocityField, Velic_solHy_VelocityFunction );
 
-	pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data );
+	pressureField = Stg_ComponentFactory_ConstructByName( cf, (Name)"PressureField", FeVariable, True, data  );
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, pressureField, Velic_solHy_PressureFunction );
 
-	stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, False, data );
-	if ( stressField )
+	stressField = Stg_ComponentFactory_ConstructByName( cf, (Name)"StressField", FeVariable, False, data );
+	if ( stressField  )
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, stressField, Velic_solHy_StressFunction );
 
-	strainRateField = Stg_ComponentFactory_ConstructByName( cf, "StrainRateField", FeVariable, False, data );
-	if ( strainRateField  ) {
+	strainRateField = Stg_ComponentFactory_ConstructByName( cf, (Name)"StrainRateField", FeVariable, False, data );
+	if ( strainRateField   ) {
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, strainRateField, Velic_solHy_StrainRateFunction );
 	}
 
-	recoveredStrainRateField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStrainRateField", FeVariable, False, data );
-	if ( recoveredStrainRateField )
+	recoveredStrainRateField = Stg_ComponentFactory_ConstructByName( cf, (Name)"recoveredStrainRateField", FeVariable, False, data );
+	if ( recoveredStrainRateField  )
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStrainRateField, Velic_solHy_StrainRateFunction );
 
-	recoveredStressField = Stg_ComponentFactory_ConstructByName( cf, "recoveredStressField", FeVariable, False, data );
-	if ( recoveredStressField )
+	recoveredStressField = Stg_ComponentFactory_ConstructByName( cf, (Name)"recoveredStressField", FeVariable, False, data );
+	if ( recoveredStressField  )
 		AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, recoveredStressField, Velic_solHy_StressFunction );
 	
-	etaA = Stg_ComponentFactory_GetRootDictDouble( cf, "solHy_etaA", 1.0 );
-	etaB = Stg_ComponentFactory_GetRootDictDouble( cf, "solHy_etaB", 2.0 );
-	xc = Stg_ComponentFactory_GetRootDictDouble( cf, "solHy_xc", 0.25 );
+	etaA = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solHy_etaA", 1.0  );
+	etaB = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solHy_etaB", 2.0  );
+	xc = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solHy_xc", 0.25  );
 	n = Stg_ComponentFactory_GetRootDictInt( cf, "solHy_n", 1 );
 
 	_Velic_solHy_Init( self, etaA, etaB, xc, n );
@@ -158,7 +158,7 @@ void* _Velic_solHy_DefaultNew( Name name ) {
 }
 
 Index Underworld_Velic_solHy_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Velic_solHy_Type, "0", _Velic_solHy_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Velic_solHy_Type, (Name)"0", _Velic_solHy_DefaultNew  );
 }
 
 

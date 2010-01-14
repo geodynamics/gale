@@ -122,17 +122,17 @@ void _DepthDependentViscosity_AssignFromXML( void* rheology, Stg_ComponentFactor
    FeMesh*          feMesh;
    Axis                      variationAxis          = 0;
    Name                      variationAxisName;
-   Stream*                   errorStream            = Journal_Register( Error_Type, self->type );
+   Stream*                   errorStream            = Journal_Register( Error_Type, (Name)self->type  );
 
    /* Construct Parent */
    _Rheology_AssignFromXML( self, cf, data );
 
-   feMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", FeMesh, True, data ) ;
+   feMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Mesh", FeMesh, True, data  ) ;
 
-   variationAxisName = Stg_ComponentFactory_GetString( cf, self->name, "variationAxis", "Y" );
+   variationAxisName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"variationAxis", "Y" );
 
    Journal_Firewall(
-         variationAxisName != NULL && strlen( variationAxisName ) >= 1,
+         variationAxisName != NULL && strlen( variationAxisName  ) >= 1,
          errorStream,
          "Error in func %s for %s '%s' - Bad 'variationAxis'\n",
          __func__, self->type, self->name );
@@ -155,10 +155,10 @@ void _DepthDependentViscosity_AssignFromXML( void* rheology, Stg_ComponentFactor
    _DepthDependentViscosity_Init(
          self,
          feMesh,
-         Stg_ComponentFactory_GetDouble( cf, self->name, "eta0", 1.0 ),
-         Stg_ComponentFactory_GetDouble( cf, self->name, "gamma", 0.0 ),
+         Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"eta0", 1.0  ),
+         Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"gamma", 0.0  ),
          variationAxis,
-         Stg_ComponentFactory_GetDouble( cf, self->name, "referencePoint", 0.0 ) );
+         Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"referencePoint", 0.0 )  );
 }
 
 void _DepthDependentViscosity_Destroy( void* rheology, void* data ) {

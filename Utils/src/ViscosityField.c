@@ -117,9 +117,9 @@ void _ViscosityField_AssignFromXML( void* viscosityField, Stg_ComponentFactory* 
 	/* Construct Parent */
 	_ParticleFeVariable_AssignFromXML( self, cf, data );
 
-	constitutiveMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ConstitutiveMatrix", ConstitutiveMatrix, True, data );
+	constitutiveMatrix = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ConstitutiveMatrix", ConstitutiveMatrix, True, data );
 	variable_Register = self->context->variable_Register; 
-	assert( variable_Register );
+	assert( variable_Register  );
 
 	_ViscosityField_Init( self, constitutiveMatrix, variable_Register );
 }
@@ -133,7 +133,7 @@ void _ViscosityField_Build( void* viscosityField, void* data ) {
 
 	/* Create Dof Layout */
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
-	tmpName = Stg_Object_AppendSuffix( self, "viscosityVariable" );
+	tmpName = Stg_Object_AppendSuffix( self, (Name)"viscosityVariable"  );
 	self->dataVariable = Variable_NewScalar( 	
 		tmpName,
 		(AbstractContext*)self->context,
@@ -145,7 +145,7 @@ void _ViscosityField_Build( void* viscosityField, void* data ) {
 	Memory_Free( tmpName );
 	self->fieldComponentCount = 1;
 	
-	tmpName = Stg_Object_AppendSuffix( self, "viscosityDOF" );
+	tmpName = Stg_Object_AppendSuffix( self, (Name)"viscosityDOF"  );
 	self->dofLayout = DofLayout_New( tmpName, self->context, self->variable_Register, 0, self->feMesh );
 	self->dofLayout->_numItemsInLayout = FeMesh_GetNodeDomainSize( self->feMesh );
 	DofLayout_AddAllFromVariableArray( self->dofLayout, 1, &self->dataVariable );

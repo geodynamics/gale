@@ -84,7 +84,7 @@ void _StoreStress_Init(
 	self->materialPointsSwarm = materialPointsSwarm;
 	self->strainRateField = strainRateField;
 
-	self->particleExtHandle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, self->type, sizeof( StoreStress_ParticleExt ) );
+	self->particleExtHandle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, (Name)self->type, sizeof( StoreStress_ParticleExt )  );
 	
 	/* Add SwarmVariables for plotting */
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle, self->particleExtHandle );
@@ -103,10 +103,7 @@ void _StoreStress_Init(
 		variableName[5] = StG_Strdup( "tau_yz" );
 	}
 	
-	self->materialPointsSwarmVariable = Swarm_NewVectorVariable(
-		materialPointsSwarm,
-		"StressTensor",
-		(ArithPointer) &particleExt->stress - (ArithPointer) &particle, 
+	self->materialPointsSwarmVariable = Swarm_NewVectorVariable( materialPointsSwarm, (Name)"StressTensor", (ArithPointer) &particleExt->stress - (ArithPointer) &particle, 
 		Variable_DataType_Double, 
 		StGermain_nSymmetricTensorVectorComponents(dim), 
 		variableName[0],variableName[1],variableName[2],
@@ -146,22 +143,9 @@ void _StoreStress_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void*
 	/* Construct Parent */
 	_Rheology_AssignFromXML( self, cf, data );
 
-	materialPointsSwarm = Stg_ComponentFactory_ConstructByKey( 
-		cf, 
-		self->name, 
-		"MaterialPointsSwarm", 
-		MaterialPointsSwarm, 
-		True,
-		data );
+	materialPointsSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialPointsSwarm", MaterialPointsSwarm, True, data  );
 	/* TODO : 'KeyFallback' soon to be deprecated/updated */
-	strainRateField = Stg_ComponentFactory_ConstructByNameWithKeyFallback( 
-		cf, 
-		self->name,
-                "StrainRateField", 
-		"StrainRateField", 
-		FeVariable, 
-		True,
-		data );
+	strainRateField = Stg_ComponentFactory_ConstructByNameWithKeyFallback( cf, self->name, (Name)"StrainRateField", (Dictionary_Entry_Key)"StrainRateField", FeVariable, True, data  );
 	/*
 	strainRateField = Stg_ComponentFactory_ConstructByKey( cf, self->name, 
 			"StrainRateField", FeVariable, True );

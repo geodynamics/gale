@@ -169,14 +169,14 @@ void _Underworld_SwarmOutput_AssignFromXML( void* uwSwarmOutput, Stg_ComponentFa
 	Dictionary_Entry_Value* list;
 	unsigned int            listCount, feVar_I;
 	char*                   varName;
-	Stream                  *errorStream = Journal_Register( Error_Type, "_Underworld_SwarmOutput_Construct" );
+	Stream                  *errorStream = Journal_Register( Error_Type, (Name)"_Underworld_SwarmOutput_Construct"  );
    FeVariable**            feVariableList;
 	
-	context      =  Stg_ComponentFactory_ConstructByName(  cf,  "context", PICelleratorContext,  True, data ) ;
-	materialSwarm = (MaterialPointsSwarm*)Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", MaterialPointsSwarm, True, data );
+	context      =  Stg_ComponentFactory_ConstructByName( cf, (Name)"context", PICelleratorContext, True, data ) ;
+	materialSwarm = (MaterialPointsSwarm* )Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", MaterialPointsSwarm, True, data  );
 	
 	/* Get all Swarms specified in input file, under swarms */
-	list = Dictionary_Get( dictionary, "FeVariables" );
+	list = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"FeVariables"  );
 	
 	Journal_Firewall(
 			list != NULL,
@@ -203,7 +203,7 @@ void _Underworld_SwarmOutput_AssignFromXML( void* uwSwarmOutput, Stg_ComponentFa
 
 	for( feVar_I = 0 ; feVar_I < listCount ; feVar_I++ ) {
 		varName = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( list, feVar_I ) );
-		feVariableList[ feVar_I ] = Stg_ComponentFactory_ConstructByName( cf, varName, FeVariable, True, data );
+		feVariableList[ feVar_I ] = Stg_ComponentFactory_ConstructByName( cf, (Name)varName, FeVariable, True, data  );
 	}
 
 	_Underworld_SwarmOutput_Init( self,

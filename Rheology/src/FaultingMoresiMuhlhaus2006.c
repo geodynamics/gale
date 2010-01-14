@@ -89,7 +89,7 @@ FaultingMoresiMuhlhaus2006* FaultingMoresiMuhlhaus2006_New(
 	/* Make sure that there is strain weakening */
 	Journal_Firewall(
 		strainWeakening != NULL,
-		Journal_Register( Error_Type, self->type ),
+		Journal_Register( Error_Type, (Name)self->type  ),
 		"Error in func '%s' for %s '%s': FaultingMoresiMuhlhaus2006 rheology needs strain weakening.\n", 
 		__func__, self->type, self->name );
 
@@ -157,8 +157,7 @@ void _FaultingMoresiMuhlhaus2006_Init(
 	
 	self->director                = director;
 	
-	self->particleExtHandle       = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr,
-			FaultingMoresiMuhlhaus2006_Type, sizeof(FaultingMoresiMuhlhaus2006_Particle) );	
+	self->particleExtHandle       = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, (Name)FaultingMoresiMuhlhaus2006_Type, sizeof(FaultingMoresiMuhlhaus2006_Particle) );	
 	
 	self->cohesion = cohesion;
 	self->frictionCoefficient = frictionCoefficient;
@@ -167,7 +166,7 @@ void _FaultingMoresiMuhlhaus2006_Init(
 	/* needs a softening factor between +0 and 1 and a reference strain > 0 */
 	self->cohesionAfterSoftening = cohesionAfterSoftening;
 	
-	/* Strain softening of Friction - (linear weakening is assumed) */
+	/* Strain softening of Friction - (linear weakening is assumed ) */
 	/* needs a softening factor between +0 and 1 and a reference strain > 0 */
 	self->frictionCoefficientAfterSoftening = frictionCoefficientAfterSoftening;
 
@@ -187,17 +186,10 @@ void _FaultingMoresiMuhlhaus2006_Init(
 
 	/* Add variables for viz purpose */
 
-	self->slipRate = Swarm_NewScalarVariable(
-			materialPointsSwarm,
-			"SlipRate",
-			(ArithPointer) &particleExt->slipRate - (ArithPointer) &materialPoint,
-			Variable_DataType_Double );
+	self->slipRate = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"SlipRate", (ArithPointer) &particleExt->slipRate - (ArithPointer) &materialPoint, Variable_DataType_Double  );
 
 	/* slip vector gives the orientation of the failure plane */ 
-	self->slip = Swarm_NewVectorVariable(
-			materialPointsSwarm,
-			"SlipVector",
-			(ArithPointer) &particleExt->slip - (ArithPointer) &materialPoint, 
+	self->slip = Swarm_NewVectorVariable( materialPointsSwarm, (Name)"SlipVector", (ArithPointer) &particleExt->slip - (ArithPointer) &materialPoint, 
 			Variable_DataType_Double, 
 			dim, 
 			"SlipVectorX",
@@ -205,42 +197,18 @@ void _FaultingMoresiMuhlhaus2006_Init(
 			"SlipVectorZ" );	
 	
 	/* Some visualisation parameters (brightness, opacity, length, thickness) */
-	self->brightness = Swarm_NewScalarVariable(
-			materialPointsSwarm,
-			"FaultingMoresiMuhlhaus2006Brightness",
-			(ArithPointer) &particleExt->brightness - (ArithPointer) &materialPoint,
-			Variable_DataType_Float );
+	self->brightness = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"FaultingMoresiMuhlhaus2006Brightness", (ArithPointer) &particleExt->brightness - (ArithPointer) &materialPoint, Variable_DataType_Float  );
 	
-	self->opacity = Swarm_NewScalarVariable(
-			materialPointsSwarm,
-			"FaultingMoresiMuhlhaus2006Opacity",
-			(ArithPointer) &particleExt->opacity - (ArithPointer) &materialPoint,
-			Variable_DataType_Float );
+	self->opacity = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"FaultingMoresiMuhlhaus2006Opacity", (ArithPointer) &particleExt->opacity - (ArithPointer) &materialPoint, Variable_DataType_Float  );
 	
-	self->length = Swarm_NewScalarVariable(
-			materialPointsSwarm,
-			"FaultingMoresiMuhlhaus2006Length",
-			(ArithPointer) &particleExt->length - (ArithPointer) &materialPoint,
-			Variable_DataType_Float );
+	self->length = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"FaultingMoresiMuhlhaus2006Length", (ArithPointer) &particleExt->length - (ArithPointer) &materialPoint, Variable_DataType_Float  );
 
-	self->thickness = Swarm_NewScalarVariable(
-			materialPointsSwarm,
-			"FaultingMoresiMuhlhaus2006Thickness",
-			(ArithPointer) &particleExt->thickness - (ArithPointer) &materialPoint,
-			Variable_DataType_Float );
+	self->thickness = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"FaultingMoresiMuhlhaus2006Thickness", (ArithPointer) &particleExt->thickness - (ArithPointer) &materialPoint, Variable_DataType_Float  );
 	
 	/* The tensileFailure variable allows to check whether a materialPoint has failed in tensile mode or not */
-	self->tensileFailure = Swarm_NewScalarVariable(
-			materialPointsSwarm,
-			"FaultingMoresiMuhlhaus2006TensileFailure",
-			(ArithPointer) &particleExt->tensileFailure - (ArithPointer) &materialPoint,
-			Variable_DataType_Char );
+	self->tensileFailure = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"FaultingMoresiMuhlhaus2006TensileFailure", (ArithPointer) &particleExt->tensileFailure - (ArithPointer) &materialPoint, Variable_DataType_Char  );
 	
-	self->fullySoftened = Swarm_NewScalarVariable(
-			materialPointsSwarm,
-			"FaultingMoresiMuhlhaus2006FullySoftened",
-			(ArithPointer) &particleExt->fullySoftened - (ArithPointer) &materialPoint,
-			Variable_DataType_Char );
+	self->fullySoftened = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"FaultingMoresiMuhlhaus2006FullySoftened", (ArithPointer) &particleExt->fullySoftened - (ArithPointer) &materialPoint, Variable_DataType_Char );
 	
 	self->updateOrientations  = updateOrientations;
 	self->isotropicCorrection = isotropicCorrection;
@@ -268,7 +236,7 @@ void* _FaultingMoresiMuhlhaus2006_DefaultNew( Name name ) {
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
-	return (void*) _FaultingMoresiMuhlhaus2006_New(  FAULTINGMORESIMUHLHAUS2006_PASSARGS  );
+	return (void*) _FaultingMoresiMuhlhaus2006_New(  FAULTINGMORESIMUHLHAUS2006_PASSARGS   );
 }
 
 void _FaultingMoresiMuhlhaus2006_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
@@ -285,19 +253,15 @@ void _FaultingMoresiMuhlhaus2006_AssignFromXML( void* rheology, Stg_ComponentFac
 	/* Make sure that there is strain weakening */
 	Journal_Firewall(
 		self->strainWeakening != NULL,
-		Journal_Register( Error_Type, self->type ),
+		Journal_Register( Error_Type, (Name)self->type  ),
 		"Error in func '%s' for %s '%s': FaultingMoresiMuhlhaus2006 rheology needs strain weakening.\n", 
 		__func__, self->type, self->name );
 	
-	context                = Stg_ComponentFactory_ConstructByName( cf, 
-			"context", FiniteElementContext, True, data );
-	materialPointsSwarm    = Stg_ComponentFactory_ConstructByKey( cf, self->name, 
-			"MaterialPointsSwarm", MaterialPointsSwarm, True, data );
-	pressureField          = Stg_ComponentFactory_ConstructByKey( cf, self->name,
-			"PressureField", FeVariable, True, data );
-	velocityGradientsField = Stg_ComponentFactory_ConstructByKey( cf, self->name,
-			"VelocityGradientsField", FeVariable, True, data );
-	director               =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Director", Director, True, data );
+	context                = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", FiniteElementContext, True, data  );
+	materialPointsSwarm    = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialPointsSwarm", MaterialPointsSwarm, True, data  );
+	pressureField          = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureField", FeVariable, True, data  );
+	velocityGradientsField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"VelocityGradientsField", FeVariable, True, data  );
+	director               =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Director", Director, True, data  );
 	
 	_FaultingMoresiMuhlhaus2006_Init( 
 			self,
@@ -306,15 +270,15 @@ void _FaultingMoresiMuhlhaus2006_AssignFromXML( void* rheology, Stg_ComponentFac
 			materialPointsSwarm,  
 			context,
 			director,
-			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesion", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesionAfterSoftening", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficient", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "frictionCoefficientAfterSoftening", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "minimumYieldStress", 0.0 ),
-			Stg_ComponentFactory_GetBool(   cf, self->name, "ignoreOldOrientation", False ),
-			Stg_ComponentFactory_GetBool(   cf, self->name, "updateOrientationAtMaxSoftness", True ),
-			Stg_ComponentFactory_GetBool( cf, self->name, "updateOrientations", True ),
-         Stg_ComponentFactory_GetBool( cf, self->name, "isotropicCorrection", False ));
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"cohesion", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"cohesionAfterSoftening", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"frictionCoefficient", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"frictionCoefficientAfterSoftening", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minimumYieldStress", 0.0  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"ignoreOldOrientation", False  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"updateOrientationAtMaxSoftness", True  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"updateOrientations", True  ),
+         Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"isotropicCorrection", False ) );
 }
 
 void _FaultingMoresiMuhlhaus2006_Build( void* rheology, void* data ) {

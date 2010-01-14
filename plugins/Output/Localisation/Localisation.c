@@ -60,10 +60,10 @@ const Type Underworld_Localisation_Type = "Underworld_Localisation";
 void _Underworld_Localisation_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
         UnderworldContext* context;
 
-        context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
+        context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data ); 
 
         /* Add functions to entry points */
-        Underworld_Localisation_Setup( context );
+        Underworld_Localisation_Setup( context  );
         ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_Localisation_Output );
 }
 
@@ -95,7 +95,7 @@ void* _Underworld_Localisation_DefaultNew( Name name ) {
 }
 
 Index Underworld_Localisation_Register( PluginsManager* pluginsManager ) {
-        return PluginsManager_Submit( pluginsManager, Underworld_Localisation_Type, "0", _Underworld_Localisation_DefaultNew );
+        return PluginsManager_Submit( pluginsManager, Underworld_Localisation_Type, (Name)"0", _Underworld_Localisation_DefaultNew );
 }
 
 void Underworld_Localisation_Setup( UnderworldContext* context ) {
@@ -107,21 +107,19 @@ void Underworld_Localisation_Setup( UnderworldContext* context ) {
         Index                    numberOfOperands;
         Operator*                ownOperator;
         Dimension_Index          dim;
-        Swarm*					      gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+        Swarm*					      gaussSwarm = (Swarm* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"gaussSwarm" );
 
         Underworld_Localisation* self;
 
         /* create datatype for MPI communications */
         Localisation_Create_MPI_Datatype();
         
-        self = (Underworld_Localisation*)LiveComponentRegister_Get(
-                                        context->CF->LCRegister,
-                                        Underworld_Localisation_Type );
+        self = (Underworld_Localisation* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_Localisation_Type  );
         
         StgFEM_FrequentOutput_PrintString( context, "Localisation" );
 
 	/* get localisation parameter */
-	self->deformationFactor = Dictionary_GetDouble_WithDefault( context->dictionary, "localisationDeformationFactor", 0.8 );
+	self->deformationFactor = Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"localisationDeformationFactor", 0.8  );
 
         Journal_Firewall( 
                         gaussSwarm != NULL, 
@@ -159,7 +157,7 @@ void Underworld_Localisation_Output( UnderworldContext* context ) {
         double   weightSoFar2;
         double   *min, *max;
         double   translate;
-        int meshSizeJ = Dictionary_GetInt_WithDefault( context->dictionary, "elementResJ", 1 );
+        int meshSizeJ = Dictionary_GetInt_WithDefault( context->dictionary, (Dictionary_Entry_Key)"elementResJ", 1  );
         int ii;
         int aa;
         int numPoints;
@@ -176,9 +174,7 @@ void Underworld_Localisation_Output( UnderworldContext* context ) {
 
         globPartInc = 0;
         
-        self = (Underworld_Localisation*)LiveComponentRegister_Get(
-                                context->CF->LCRegister,
-                                Underworld_Localisation_Type );
+        self = (Underworld_Localisation*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_Localisation_Type  );
 
         /* find the size of the domain */
         min = Memory_Alloc_Array_Unnamed( double, Mesh_GetDimSize( self->reducedStrainRateFieldInvariantRoot->feMesh ) );

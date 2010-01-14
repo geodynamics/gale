@@ -121,7 +121,7 @@ void _MaterialViscosity_AssignFromXML( void* rheology, Stg_ComponentFactory* cf,
 	/* Construct Parent */
 	_Rheology_AssignFromXML( self, cf, data );
 	
-	_MaterialViscosity_Init( self, Stg_ComponentFactory_GetDouble( cf, self->name, "eta0", 1.0 ) );
+	_MaterialViscosity_Init( self, Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"eta0", 1.0 )  );
 }
 
 

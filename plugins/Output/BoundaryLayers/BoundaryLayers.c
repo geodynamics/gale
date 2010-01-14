@@ -64,7 +64,7 @@ void _Underworld_BoundaryLayers_AssignFromXML( void* component, Stg_ComponentFac
 
 	/*printf("AKJFHQEIUH)@$UFKAJSDHRF\nKJASHRFOPUEH\nsaljkdh9\n9)#@$\n213\n\n"); The coordinates of the California Moon ??   */ 
 	
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data  ); 
 
 	/* Add functions to entry points */
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_BoundaryLayers_Output );
@@ -94,19 +94,17 @@ void* _Underworld_BoundaryLayers_DefaultNew( Name name ) {
 }
 
 Index Underworld_BoundaryLayers_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Underworld_BoundaryLayers_Type, "0", _Underworld_BoundaryLayers_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_BoundaryLayers_Type, (Name)"0", _Underworld_BoundaryLayers_DefaultNew );
 }
 
 void Underworld_BoundaryLayers_Setup( UnderworldContext* context ) {
 	Underworld_BoundaryLayers* self;
 	Dictionary*  dictionary = context->dictionary;
 
-	self = (Underworld_BoundaryLayers*)LiveComponentRegister_Get(
-						context->CF->LCRegister,
-						Underworld_BoundaryLayers_Type );
+	self = (Underworld_BoundaryLayers* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_BoundaryLayers_Type  );
 
 	self->internalTemperature = 0.5;
-	self->tolerance = Dictionary_GetDouble_WithDefault( dictionary, "BoundaryLayersTolerance", 0.0001 );
+	self->tolerance = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"BoundaryLayersTolerance", 0.0001  );
 	self->maxIterations = Dictionary_GetUnsignedInt_WithDefault( dictionary, "BoundaryLayersMaxIterations", 100 );
 	self->minIterations = Dictionary_GetUnsignedInt_WithDefault( dictionary, "BoundaryLayersMinIterations", 2 );
 
@@ -129,12 +127,8 @@ void Underworld_BoundaryLayers_Output( UnderworldContext* context ) {
 	double                     hotLayerThickness;
 	double                     coldLayerThickness;
 
-	self = (Underworld_BoundaryLayers*)LiveComponentRegister_Get(
-						context->CF->LCRegister,
-						Underworld_BoundaryLayers_Type );
-	nusseltPlugin = (Underworld_Nusselt*)LiveComponentRegister_Get(
-						context->CF->LCRegister,
-						Underworld_Nusselt_Type );	
+	self = (Underworld_BoundaryLayers*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_BoundaryLayers_Type );
+	nusseltPlugin = (Underworld_Nusselt* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_Nusselt_Type  );	
 
 	iteration_I             = 0;
 	maxIterations           = self->maxIterations;
@@ -180,11 +174,11 @@ double Underworld_BoundaryLayers_InternalTemperature( UnderworldContext* context
 	double              internalTemperature;
 	double              integral               = 0.0;
 	double              integralGlobal         = 0.0;
-	Swarm*              gaussSwarm             = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+	Swarm*              gaussSwarm             = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"gaussSwarm" );
 	IntegrationPoint*   particle;
 	double              bottomLayerHeight;
 	double              topLayerHeight;
-	FeVariable*         temperatureField       = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
+	FeVariable*         temperatureField       = (FeVariable* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"temperatureField"  );
 	FeMesh*		    mesh                   = temperatureField->feMesh;
 	Element_LocalIndex  lElement_I;
 	Node_LocalIndex    	nodeAtElementBottom;

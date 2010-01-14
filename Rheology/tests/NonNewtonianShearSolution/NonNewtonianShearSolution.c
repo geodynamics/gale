@@ -96,8 +96,8 @@ void NonNewtonianShearSolution_UpdateVelocityBC( NonNewtonianShearSolution* self
 
 void NonNewtonianShearSolution_VelocityBC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	FiniteElementContext *	         context       = (FiniteElementContext*)_context;
-	NonNewtonianShearSolution*   self          = (NonNewtonianShearSolution*) LiveComponentRegister_Get( context->CF->LCRegister, NonNewtonianShearSolution_Type );
-	double*                          result        = (double*) _result;
+	NonNewtonianShearSolution*   self          = (NonNewtonianShearSolution*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)NonNewtonianShearSolution_Type );
+	double*                          result        = (double* ) _result;
 
 	*result = self->velocityTopOfBox;
 }
@@ -111,33 +111,33 @@ void _NonNewtonianShearSolution_AssignFromXML( void* analyticSolution, Stg_Compo
 	context = Stg_CheckType( self->context, FiniteElementContext );
 	
 	ConditionFunction_Register_Add( context->condFunc_Register, 
-			ConditionFunction_New( NonNewtonianShearSolution_VelocityBC, "ShearTrigger") );	
+			ConditionFunction_New( NonNewtonianShearSolution_VelocityBC, (Name)"ShearTrigger")  );	
 
 	/* Create Analytic Velocity Field */
-	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data );
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, (Name)"VelocityField", FeVariable, True, data  );
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->velocityField, NonNewtonianShearSolution_VelocityFunction );
 
 	/* Create Analytic Strain Rate Field */
-	self->strainRateField = Stg_ComponentFactory_ConstructByName( cf, "StrainRateField", FeVariable, True, data );
+	self->strainRateField = Stg_ComponentFactory_ConstructByName( cf, (Name)"StrainRateField", FeVariable, True, data  );
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->strainRateField, NonNewtonianShearSolution_StrainRateFunction );
 
 	/* Create Analytic Stress Field */
-	self->stressField = Stg_ComponentFactory_ConstructByName( cf, "StressField", FeVariable, True, data );
+	self->stressField = Stg_ComponentFactory_ConstructByName( cf, (Name)"StressField", FeVariable, True, data  );
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->stressField, NonNewtonianShearSolution_StressFunction );
 
 	/* Create Analytic Viscosity Field */
-	self->viscosityField = Stg_ComponentFactory_ConstructByName( cf, "ViscosityField", FeVariable, True, data );
+	self->viscosityField = Stg_ComponentFactory_ConstructByName( cf, (Name)"ViscosityField", FeVariable, True, data  );
 	AnalyticSolution_RegisterFeVariableWithAnalyticFunction( self, self->viscosityField, NonNewtonianShearSolution_ViscosityFunction );
 
-	self->materialViscosity = Stg_ComponentFactory_ConstructByName( cf, "layerViscosity", MaterialViscosity, True, data );
+	self->materialViscosity = Stg_ComponentFactory_ConstructByName( cf, (Name)"layerViscosity", MaterialViscosity, True, data  );
 	self->nonNewtonianRheology = 
-		Stg_ComponentFactory_ConstructByName( cf, "nonNewtonianRheology", NonNewtonian, True, data );
-	self->mesh = Stg_ComponentFactory_ConstructByName( cf, "linearMesh", Mesh, True, data );
+		Stg_ComponentFactory_ConstructByName( cf, (Name)"nonNewtonianRheology", NonNewtonian, True, data  );
+	self->mesh = Stg_ComponentFactory_ConstructByName( cf, (Name)"linearMesh", Mesh, True, data  );
 
 	/* Set Velocity Stuff */
 	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ),
 			    NonNewtonianShearSolution_UpdateVelocityBC, self );
-	self->velocityTopOfBox = Stg_ComponentFactory_GetRootDictDouble( cf, "velocityTopOfBox", 0.5 );
+	self->velocityTopOfBox = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"velocityTopOfBox", 0.5  );
 }
 
 void _NonNewtonianShearSolution_Build( void* analyticSolution, void* data ) {
@@ -171,8 +171,7 @@ void* _NonNewtonianShearSolution_DefaultNew( Name name ) {
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
 Index Underworld_NonNewtonianShearSolution_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
-	return PluginsManager_Submit( pluginsManager, NonNewtonianShearSolution_Type, "0",
-		_NonNewtonianShearSolution_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, NonNewtonianShearSolution_Type, (Name)"0", _NonNewtonianShearSolution_DefaultNew  );
 }
 
 

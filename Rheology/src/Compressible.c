@@ -146,9 +146,9 @@ void _Compressible_AssignFromXML( void* compressible, Stg_ComponentFactory* cf, 
 
    _StiffnessMatrixTerm_AssignFromXML( self, cf, data );
 
-   geometryMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "GeometryMesh", FeMesh, True, data );
+   geometryMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"GeometryMesh", FeMesh, True, data );
 
-   context = (PICelleratorContext*)self->context;
+   context = (PICelleratorContext* )self->context;
    assert( Stg_CheckType( context, PICelleratorContext ) );
    materials_Register = context->materials_Register;
    assert( materials_Register );
@@ -157,7 +157,7 @@ void _Compressible_AssignFromXML( void* compressible, Stg_ComponentFactory* cf, 
          self,
          geometryMesh,
          materials_Register,
-         Stg_ComponentFactory_GetDouble( cf, self->name, "oneOnLambda", 10.0 ) );
+         Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"oneOnLambda", 10.0 )  );
 
    /* Make sure that we are using the correct type of swarm
     * SHOULDN'T THIS BEEN DONE AT THE STIFFNESSMATRIXTERM LEVEL? */

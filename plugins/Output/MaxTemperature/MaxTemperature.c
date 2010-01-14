@@ -56,9 +56,9 @@ void Underworld_MaxTemperature_Output( void* _context );
 void _Underworld_MaxTemperature_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	UnderworldContext*  context;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data );
 
-	Underworld_MaxTemperature_PrintHeaderToFile( context );
+	Underworld_MaxTemperature_PrintHeaderToFile( context  );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_MaxTemperature_Output );
 }
 
@@ -75,15 +75,15 @@ void* _Underworld_MaxTemperature_DefaultNew( Name name ) {
 }
 
 Index Underworld_MaxTemperature_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Underworld_MaxTemperature_Type, "0", _Underworld_MaxTemperature_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_MaxTemperature_Type, (Name)"0", _Underworld_MaxTemperature_DefaultNew );
 }
 
 void Underworld_MaxTemperature_Output( void* _context ) {
 	UnderworldContext* context       = (UnderworldContext*) _context;
-	FeVariable*        temperatureFe = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "TemperatureField" );
+	FeVariable*        temperatureFe = (FeVariable* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"TemperatureField" );
 	double             maxTemp;
 
-	maxTemp = _FeVariable_GetMaxGlobalFieldMagnitude( temperatureFe );
+	maxTemp = _FeVariable_GetMaxGlobalFieldMagnitude( temperatureFe  );
 	StgFEM_FrequentOutput_PrintValue( context, maxTemp );
 }
 

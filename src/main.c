@@ -71,7 +71,7 @@ int main( int argc, char* argv[] ) {
 	MPI_Comm_size( CommWorld, &numProcessors );
 	MPI_Comm_rank( CommWorld, &rank );
 	StGermain_Init( &argc, &argv );
-	stream = Journal_Register( Info_Type, Underworld_Type );
+	stream = Journal_Register( Info_Type, (Name)Underworld_Type );
 	#ifdef HAVE_PYTHON
 		Py_Initialize();
 	#endif	
@@ -79,7 +79,7 @@ int main( int argc, char* argv[] ) {
 	
 	/* Create the application's dictionary & read input */
 	dictionary = Dictionary_New();
-	ioHandler = XML_IO_Handler_New();
+	ioHandler = XML_IO_Handler_New( );
 	IO_Handler_ReadAllFromCommandLine( ioHandler, argc, argv, dictionary );
 	Journal_ReadFromDictionary( dictionary );
 

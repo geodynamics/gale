@@ -35,9 +35,7 @@ void testYieldCriterion_HasYielded(
 	Dimension_Index dim_I;
 
 	/* Get pointer to plugin struct */
-	self = (Underworld_testYieldCriterion*) LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_testYieldCriterion_Type );
+	self = (Underworld_testYieldCriterion*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_testYieldCriterion_Type  );
 
 	/* Call real 'HasYielded' function */
 	self->realHasYieldedFunction( 
@@ -66,13 +64,11 @@ double Underworld_testYieldCriterion_dt( FiniteElementContext* context ) {
 }
 
 void Underworld_testYieldCriterion_Check( FiniteElementContext* context ) {
-	Stream* stream = Journal_Register( Dump_Type, Underworld_testYieldCriterion_Type );
+	Stream* stream = Journal_Register( Dump_Type, (Name)Underworld_testYieldCriterion_Type );
 	Underworld_testYieldCriterion* self;
 
 	/* Get pointer to plugin struct */
-	self = (Underworld_testYieldCriterion*) LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_testYieldCriterion_Type );
+	self = (Underworld_testYieldCriterion* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_testYieldCriterion_Type );
 	assert( self );
 
 	/* Don't do anything if nothing has yielded yet */
@@ -83,7 +79,7 @@ void Underworld_testYieldCriterion_Check( FiniteElementContext* context ) {
 	/* Get Calculation to stop */
 	context->maxTimeSteps = context->timeStep;
 
-	/* Set the stream to point to our output file (so we can do a diff on it later) */
+	/* Set the stream to point to our output file (so we can do a diff on it later ) */
 	Stream_Enable( stream, True );
 	Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, "testYieldCriterion.dat" );
 
@@ -101,18 +97,16 @@ void _Underworld_testYieldCriterion_AssignFromXML( void* component, Stg_Componen
 	YieldRheology*          yieldRheology;
 	Underworld_testYieldCriterion* self;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", FiniteElementContext, True, data ); 
 
 	/* Get pointer to plugin struct */
-	self = (Underworld_testYieldCriterion*) LiveComponentRegister_Get(
-					context->CF->LCRegister,
-					Underworld_testYieldCriterion_Type );
+	self = (Underworld_testYieldCriterion* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_testYieldCriterion_Type  );
 
 	/* get pointer to the mesh */
-	self->mesh = Stg_ComponentFactory_ConstructByName( cf, "linearMesh", FeMesh, True, data ); 
+	self->mesh = Stg_ComponentFactory_ConstructByName( cf, (Name)"linearMesh", FeMesh, True, data ); 
 	
 	/* Get a pointer the yield rheology that we are trying to test */
-	yieldRheology = (YieldRheology*) LiveComponentRegister_Get( context->CF->LCRegister, "yieldRheology" );
+	yieldRheology = (YieldRheology* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"yieldRheology"  );
 	
 	/* Store the pointer to the original 'HasYielded' function */
 	self->realHasYieldedFunction = yieldRheology->_hasYielded;
@@ -153,7 +147,7 @@ void* _Underworld_testYieldCriterion_DefaultNew( Name name ) {
 	}
 
 Index Underworld_testYieldCriterion_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Underworld_testYieldCriterion_Type, "0", _Underworld_testYieldCriterion_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_testYieldCriterion_Type, (Name)"0", _Underworld_testYieldCriterion_DefaultNew  );
 }
 
 

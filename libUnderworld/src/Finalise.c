@@ -61,7 +61,7 @@ Bool Underworld_Finalise( void ) {
 		Underworld_Utils_Finalise();
 		Underworld_Rheology_Finalise();
 		
-		Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+		Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
 		return True;
 	} else {

@@ -120,12 +120,12 @@ void _NodalPressureField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, v
    variable_Register = self->variable_Register; 
    assert( variable_Register );
 
-   pressureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PressureField", FeVariable, True, data );
+   pressureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureField", FeVariable, True, data  );
 
    /*
    ** If we're using this field for non-linear feedback, we'll need to update it in between
    ** non-linear iterations. */
-   sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, "SLE", SystemLinearEquations, False, data );
+   sle = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"SLE", SystemLinearEquations, False, data  );
 
    _NodalPressureField_Init( self, variable_Register, pressureField, sle );
 
@@ -140,7 +140,7 @@ void _NodalPressureField_Build( void* _self, void* data ) {
 
    /* Create Variable to store data */
    assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
-   tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
+   tmpName = Stg_Object_AppendSuffix( self, (Name)"DataVariable"  );
    self->dataVariable = Variable_NewScalar(
       tmpName,
 		(AbstractContext*)self->context,
@@ -151,7 +151,7 @@ void _NodalPressureField_Build( void* _self, void* data ) {
       self->variable_Register );
 	
    /* Create Dof Layout */
-   tmpName2 = Stg_Object_AppendSuffix( self, "DofLayout" );
+   tmpName2 = Stg_Object_AppendSuffix( self, (Name)"DofLayout"  );
    self->dofLayout = DofLayout_New( tmpName2, self->context, self->variable_Register, 0, self->feMesh );
    self->dofLayout->_numItemsInLayout = FeMesh_GetNodeDomainSize( self->feMesh );
    for( node_I = 0; node_I < FeMesh_GetNodeDomainSize( self->feMesh ); node_I++ ) {

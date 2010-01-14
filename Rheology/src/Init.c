@@ -54,41 +54,41 @@
 Bool Underworld_Rheology_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister* componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
 
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
-	Stg_ComponentRegister_Add( componentRegister, ConstitutiveMatrixCartesian_Type, "0", _ConstitutiveMatrixCartesian_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, MaterialViscosity_Type,       "0", _MaterialViscosity_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, RheologyMaterial_Type,        "0", _RheologyMaterial_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, MultiRheologyMaterial_Type,   "0", _MultiRheologyMaterial_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, Compressible_Type,            "0", _Compressible_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, ConstitutiveMatrixCartesian_Type, (Name)"0", _ConstitutiveMatrixCartesian_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, MaterialViscosity_Type, (Name)"0", _MaterialViscosity_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, RheologyMaterial_Type, (Name)"0", _RheologyMaterial_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, MultiRheologyMaterial_Type, (Name)"0", _MultiRheologyMaterial_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, Compressible_Type, (Name)"0", _Compressible_DefaultNew  );
 
-	Stg_ComponentRegister_Add( componentRegister, Arrhenius_Type,               "0", _Arrhenius_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, FrankKamenetskii_Type,        "0", _FrankKamenetskii_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, NonNewtonian_Type,            "0", _NonNewtonian_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, LinearViscosity_Type,         "0", _LinearViscosity_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, DepthDependentViscosity_Type, "0", _DepthDependentViscosity_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, Anisotropic_Type,             "0", _Anisotropic_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, OrthotropicAligned_Type,      "0", _OrthotropicAligned_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, Orthotropic_Type,             "0", _Orthotropic_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, Arrhenius_Type, (Name)"0", _Arrhenius_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, FrankKamenetskii_Type, (Name)"0", _FrankKamenetskii_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, NonNewtonian_Type, (Name)"0", _NonNewtonian_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, LinearViscosity_Type, (Name)"0", _LinearViscosity_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, DepthDependentViscosity_Type, (Name)"0", _DepthDependentViscosity_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, Anisotropic_Type, (Name)"0", _Anisotropic_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, OrthotropicAligned_Type, (Name)"0", _OrthotropicAligned_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, Orthotropic_Type, (Name)"0", _Orthotropic_DefaultNew  );
 	
-	Stg_ComponentRegister_Add( componentRegister, VonMises_Type,                "0", _VonMises_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, Byerlee_Type,                 "0", _Byerlee_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, DruckerPrager_Type,           "0", _DruckerPrager_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, FaultingMoresiMuhlhaus2006_Type,             "0", _FaultingMoresiMuhlhaus2006_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, MohrCoulomb_Type,             "0", _MohrCoulomb_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, Pouliquen_etal_Type,          "0", _Pouliquen_etal_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, VonMises_Type, (Name)"0", _VonMises_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, Byerlee_Type, (Name)"0", _Byerlee_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, DruckerPrager_Type, (Name)"0", _DruckerPrager_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, FaultingMoresiMuhlhaus2006_Type, (Name)"0", _FaultingMoresiMuhlhaus2006_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, MohrCoulomb_Type, (Name)"0", _MohrCoulomb_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, Pouliquen_etal_Type, (Name)"0", _Pouliquen_etal_DefaultNew  );
 
-	Stg_ComponentRegister_Add( componentRegister, StrainWeakening_Type,         "0", _StrainWeakening_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, BuiterStrainWeakening_Type,   "0", _BuiterStrainWeakening_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, Director_Type,                "0", _Director_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, AlignmentSwarmVariable_Type,  "0", _AlignmentSwarmVariable_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, StrainWeakening_Type, (Name)"0", _StrainWeakening_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, BuiterStrainWeakening_Type, (Name)"0", _BuiterStrainWeakening_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, Director_Type, (Name)"0", _Director_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, AlignmentSwarmVariable_Type, (Name)"0", _AlignmentSwarmVariable_DefaultNew  );
 	
-	Stg_ComponentRegister_Add( componentRegister, ViscosityFieldRheology_Type,  "0", _ViscosityFieldRheology_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, ViscosityFieldRheology_Type, (Name)"0", _ViscosityFieldRheology_DefaultNew  );
 
-	Stg_ComponentRegister_Add( componentRegister, StoreStress_Type,             "0", _StoreStress_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, StoreVisc_Type,               "0", _StoreVisc_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, StoreStress_Type, (Name)"0", _StoreStress_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, StoreVisc_Type, (Name)"0", _StoreVisc_DefaultNew  );
 	
-	Stg_ComponentRegister_Add( componentRegister, ConstitutiveMatCartesian_Refactored_Type, "0", _ConstitutiveMatCartesian_Refactored_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, ConstitutiveMatCartesian_Refactored_Type, (Name)"0", _ConstitutiveMatCartesian_Refactored_DefaultNew  );
 
 	/* Register Parents for type checking */
 	RegisterParent( Rheology_Type,                Stg_Component_Type );

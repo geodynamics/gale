@@ -149,22 +149,20 @@ void _VonMises_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* da
 	/* Construct Parent */
 	_YieldRheology_AssignFromXML( self, cf, data );
 	
-	strainRateField = Stg_ComponentFactory_ConstructByKey(  
-			cf, self->name, "StrainRateField", FeVariable, False, data );
-	swarmStrainRate = Stg_ComponentFactory_ConstructByKey(
-	   cf, self->name, "swarmStrainRate", SwarmVariable, False, data );
+	strainRateField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"StrainRateField", FeVariable, False, data  );
+	swarmStrainRate = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"swarmStrainRate", SwarmVariable, False, data );
    Journal_Firewall( 
-			(strainRateField || self->swarmStrainRate), 
-			Journal_Register( Error_Type, self->type ), 
+			(strainRateField || self->swarmStrainRate ), 
+			Journal_Register( Error_Type, (Name)self->type  ), 
 			"\n Error in component type %s, name '%s'.\n Must specify a strainRateField OR a swarmStrainRate, but not both. \n", self->type, self->name ); 
 
 	_VonMises_Init( 
 			self, 
 			strainRateField,
 			swarmStrainRate,
-			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesion", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "cohesionAfterSoftening", 0.0 ),
-			Stg_ComponentFactory_GetBool(   cf, self->name, "strainRateSoftening", False ) );
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"cohesion", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"cohesionAfterSoftening", 0.0  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"strainRateSoftening", False )  );
 }
 
 void _VonMises_Destroy( void* rheology, void* data ){

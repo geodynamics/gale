@@ -80,10 +80,10 @@ Index Underworld_MaxVelocity_Register( PluginsManager* pluginsManager ) {
  * 		as it's final argument. This argument should define the functionality of the plugin
  */
 
-	return PluginsManager_Submit( pluginsManager, Underworld_MaxVelocity_Type, "0", _Underworld_MaxVelocity_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_MaxVelocity_Type, (Name)"0", _Underworld_MaxVelocity_DefaultNew );
 }
 
-void* _Underworld_MaxVelocity_DefaultNew( Name name ) {
+void* _Underworld_MaxVelocity_DefaultNew( Name name  ) {
 /*
  * 	Purpose:
  * 		Registers the 'key' StGermain functions that will be used by this plugin.
@@ -148,10 +148,10 @@ void _Underworld_MaxVelocity_AssignFromXML( void* plugin, Stg_ComponentFactory* 
 	UnderworldContext*  context;
 
 	/* Gather context from the ComponentFactory here */
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data );
 
 	/* Simple user defined function which belong to no EntryPoint */
-	Underworld_MaxVelocity_PrintHeaderToFile( context );
+	Underworld_MaxVelocity_PrintHeaderToFile( context  );
 
 	/* Append user defined function, Underworld_MaxVelocity_Output, onto the EntryPoint
 	 * AbstractContext_EP_FrequentOutput */
@@ -180,11 +180,11 @@ void Underworld_MaxVelocity_Output( void* _context ) {
  */
 
 	UnderworldContext* context       = (UnderworldContext*) _context;
-	FeVariable*        velocityFe    = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
+	FeVariable*        velocityFe    = (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"VelocityField" );
 	double             maxVel;
 
 	/* Find the max field component */
-	maxVel = _FeVariable_GetMaxGlobalFieldMagnitude( velocityFe );
+	maxVel = _FeVariable_GetMaxGlobalFieldMagnitude( velocityFe  );
 	/* Print to the FrequentOutput stream */
 	StgFEM_FrequentOutput_PrintValue( context, maxVel );
 }

@@ -93,7 +93,7 @@ void _Velic_solCx_Init( Velic_solCx* self, double etaA, double etaB, double xc, 
 	if( (self->xc < 0.0) || self->xc > 1.0 ) 
 	      correctInput = False;	
 
-	Journal_Firewall( correctInput,  Journal_Register( Error_Type, "solCx_ErrorStream") ,
+	Journal_Firewall( correctInput,  Journal_Register( Error_Type, (Name)"solCx_ErrorStream" ) ,
 			"Error: In func %s. The input parameters you supplied to the analytic Solution are incorrect.\nValid range of xc values is [0,1]. Currently it is %f\n", __func__, self->xc );
 }
 
@@ -119,9 +119,9 @@ void _Underworld_solCx_AssignFromXML( void* analyticSolution, Stg_ComponentFacto
 	/* Construct Parent */
 	_FieldTest_AssignFromXML( self, cf, data );
 
-	etaA = Stg_ComponentFactory_GetRootDictDouble( cf, "solCx_etaA", 1.0 );
-	etaB = Stg_ComponentFactory_GetRootDictDouble( cf, "solCx_etaB", 2.0 );
-	xc   = Stg_ComponentFactory_GetRootDictDouble( cf, "solCx_xc", 0.25 );
+	etaA = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solCx_etaA", 1.0  );
+	etaB = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solCx_etaB", 2.0  );
+	xc   = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solCx_xc", 0.25  );
 	n    = Stg_ComponentFactory_GetRootDictInt( cf, "solCx_n", 1 );
 
 	_Velic_solCx_Init( self,  etaA,  etaB,  xc, n);
@@ -148,7 +148,7 @@ void* _Underworld_solCx_DefaultNew( Name name ) {
 }
 
 Index Underworld_Velic_solCx_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Underworld_solCx_Type, "0", _Underworld_solCx_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_solCx_Type, (Name)"0", _Underworld_solCx_DefaultNew  );
 }
 
 

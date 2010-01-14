@@ -119,12 +119,12 @@ void _Anisotropic_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void*
    /* Construct Parent */
    _Rheology_AssignFromXML( self, cf, data );
 
-   director =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Director", Director,  True, data ) ;
+   director =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Director", Director, True, data  ) ;
 
    _Anisotropic_Init(
          self,
          director,
-         Stg_ComponentFactory_GetDouble( cf, self->name, "viscosityRatio", 1.0 ) );
+         Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"viscosityRatio", 1.0 )  );
 }
 
 void _Anisotropic_Destroy( void* _self, void* data ) {

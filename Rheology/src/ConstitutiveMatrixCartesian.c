@@ -100,7 +100,7 @@ void _ConstitutiveMatrixCartesian_Init(
       ConstitutiveMatrixCartesian*                 self )
 {
    self->rowSize = self->columnSize = StGermain_nSymmetricTensorVectorComponents( self->dim );
-   self->Dtilda_B = Memory_Alloc_2DArray( double, self->rowSize, self->dim, "D~ times B matrix" );
+   self->Dtilda_B = Memory_Alloc_2DArray( double, self->rowSize, self->dim, (Name)"D~ times B matrix" );
 
    if( self->dim == 2 ) {
       self->_setValue = _ConstitutiveMatrixCartesian2D_SetValueInAllEntries;
@@ -127,7 +127,7 @@ void _ConstitutiveMatrixCartesian_Init(
 void _ConstitutiveMatrixCartesian_Delete( void* constitutiveMatrix ) {
    ConstitutiveMatrixCartesian* self = (ConstitutiveMatrixCartesian*)constitutiveMatrix;
 
-   _ConstitutiveMatrix_Delete( self );
+   _ConstitutiveMatrix_Delete( self  );
 }
 
 void _ConstitutiveMatrixCartesian_Print( void* constitutiveMatrix, Stream* stream ) {
@@ -259,7 +259,7 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
    cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
 
    /* Determine whether this is the first solve for not */
-   Journal_Firewall( sle != NULL, Journal_Register( Error_Type, ConstitutiveMatrix_Type ),
+   Journal_Firewall( sle != NULL, Journal_Register( Error_Type, (Name)ConstitutiveMatrix_Type  ),
          "In func %s: SLE is NULL.\n", __func__ );
 
    /* Note: we may have deliberately set the previousSolutionExists flag to true in the
@@ -313,7 +313,7 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 		    double **matrixData;
 		    int ii, jj, kk;
 
-		    matrixData = Memory_Alloc_2DArray(double, self->columnSize, self->rowSize, self->name);
+		    matrixData = Memory_Alloc_2DArray( double, self->columnSize, self->rowSize, (Name)self->name );
 		    memset(matrixData[0], 0, self->columnSize*self->rowSize*sizeof(double));
 		    ref = OneToManyMapper_GetMaterialRef(((IntegrationPointsSwarm*)swarm)->mapper, particle);
 		    for(ii = 0; ii < ref->numParticles; ii++) {
@@ -726,10 +726,7 @@ void ConstitutiveMatrixCartesian_SetupParticleStorage( ConstitutiveMatrixCartesi
    materialSwarm = materialSwarms[0];
 
    /* add extension to material swarm */
-   self->storedConstHandle = ExtensionManager_Add(
-   materialSwarm->particleExtensionMgr,
-   self->type,
-   self->rowSize * self->columnSize * sizeof(double) );
+   self->storedConstHandle = ExtensionManager_Add( materialSwarm->particleExtensionMgr, (Name)self->type, self->rowSize * self->columnSize * sizeof(double)  );
 
    cMatrix = ExtensionManager_Get( materialSwarm->particleExtensionMgr, &particle, self->storedConstHandle );
 
@@ -738,13 +735,11 @@ void ConstitutiveMatrixCartesian_SetupParticleStorage( ConstitutiveMatrixCartesi
    if( self->dim == 2 ) {
       /* TODO: clean up this vector logic. The only reson there's an if is because
       *        * of the list of names the must be given as the final arguments to this function.  */
-      self->storedConstSwarmVar = Swarm_NewVectorVariable( materialSwarm, "ConstitutiveMatrix",
-      (ArithPointer)cMatrix - (ArithPointer)&particle,
+      self->storedConstSwarmVar = Swarm_NewVectorVariable( materialSwarm, (Name)"ConstitutiveMatrix", (ArithPointer)cMatrix - (ArithPointer)&particle,
       Variable_DataType_Double, self->rowSize * self->columnSize,
       "c00", "c01", "c02", "c10", "c11", "c12", "c20", "c21", "c22" );
    } else {
-      self->storedConstSwarmVar = Swarm_NewVectorVariable( materialSwarm, "ConstitutiveMatrix",
-      (ArithPointer)cMatrix - (ArithPointer)&particle,
+      self->storedConstSwarmVar = Swarm_NewVectorVariable( materialSwarm, (Name)"ConstitutiveMatrix", (ArithPointer)cMatrix - (ArithPointer)&particle,
       Variable_DataType_Double, self->rowSize * self->columnSize,
       "c00", "c01", "c02", "c03", "c04", "c05",
       "c10", "c11", "c12", "c13", "c14", "c15",

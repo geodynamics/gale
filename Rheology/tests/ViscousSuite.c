@@ -47,16 +47,16 @@ void ViscousSuite_ArrheniusStiffnessMatrix2D( ViscousSuiteData* data ) {
 	/* read in the xml input file */
 	pcu_filename_input( "testArrhenius2D.xml", xml_input );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context" );
 	data->context = context;
 	dictionary = context->dictionary;
 
 	stgMainBuildAndInitialise( cf );
 
 	/* Assemble */
-	stiffnessMatrix = (StiffnessMatrix*) LiveComponentRegister_Get( context->CF->LCRegister, "k_matrix" );
-	sle = (SystemLinearEquations*)       LiveComponentRegister_Get( context->CF->LCRegister, "stokesEqn" );
-	assert( stiffnessMatrix );
+	stiffnessMatrix = (StiffnessMatrix* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"k_matrix" );
+	sle = (SystemLinearEquations* )       LiveComponentRegister_Get( context->CF->LCRegister, (Name)"stokesEqn" );
+	assert( stiffnessMatrix  );
 	StiffnessMatrix_Assemble( stiffnessMatrix, False, sle, context );
 	stiffnessMatrix = stiffnessMatrix;
 
@@ -67,8 +67,8 @@ void ViscousSuite_ArrheniusStiffnessMatrix2D( ViscousSuiteData* data ) {
 		 both matricies are built using only an Arrhenius rheology 
 	 */
 
-	filename = Dictionary_GetString( dictionary, "StiffnessMatrixCompareFilename" );
-	tolerance = Dictionary_GetDouble_WithDefault( dictionary, "StiffnessMatrixCompareTolerance", 1e-4 );
+	filename = Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"StiffnessMatrixCompareFilename"  );
+	tolerance = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StiffnessMatrixCompareTolerance", 1e-4  );
 
 	pcu_filename_expected( filename, expected_file );
 	PetscViewerBinaryOpen( context->communicator, expected_file, FILE_MODE_READ, &expViewer );
@@ -129,16 +129,16 @@ void ViscousSuite_FrankKamenetskiiStiffnessMatrix2D( ViscousSuiteData* data ) {
 	/* read in the xml input file */
 	pcu_filename_input( "testFrankKamenetskii2D.xml", xml_input );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context" );
 	data->context = context;
 	dictionary = context->dictionary;
 
 	stgMainBuildAndInitialise( cf );
 
 	/* Assemble */
-	stiffnessMatrix = (StiffnessMatrix*) LiveComponentRegister_Get( context->CF->LCRegister, "k_matrix" );
-	sle = (SystemLinearEquations*)       LiveComponentRegister_Get( context->CF->LCRegister, "stokesEqn" );
-	assert( stiffnessMatrix );
+	stiffnessMatrix = (StiffnessMatrix* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"k_matrix" );
+	sle = (SystemLinearEquations* )       LiveComponentRegister_Get( context->CF->LCRegister, (Name)"stokesEqn" );
+	assert( stiffnessMatrix  );
 	StiffnessMatrix_Assemble( stiffnessMatrix, False, sle, context );
 	stiffnessMatrix = stiffnessMatrix;
 
@@ -149,8 +149,8 @@ void ViscousSuite_FrankKamenetskiiStiffnessMatrix2D( ViscousSuiteData* data ) {
 		 both matricies are built using only an Arrhenius rheology 
 	 */
 
-	filename = Dictionary_GetString( dictionary, "StiffnessMatrixCompareFilename" );
-	tolerance = Dictionary_GetDouble_WithDefault( dictionary, "StiffnessMatrixCompareTolerance", 1e-4 );
+	filename = Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"StiffnessMatrixCompareFilename"  );
+	tolerance = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StiffnessMatrixCompareTolerance", 1e-4  );
 
 	pcu_filename_expected( filename, expected_file );
 	PetscViewerBinaryOpen( context->communicator, expected_file, FILE_MODE_READ, &expViewer );
@@ -211,16 +211,16 @@ void ViscousSuite_MaterialViscosityStiffnessMatrix2D( ViscousSuiteData* data ) {
 	/* read in the xml input file */
 	pcu_filename_input( "testMaterialViscosity2D.xml", xml_input );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context" );
 	data->context = context;
 	dictionary = context->dictionary;
 
 	stgMainBuildAndInitialise( cf );
 
 	/* Assemble */
-	stiffnessMatrix = (StiffnessMatrix*) LiveComponentRegister_Get( context->CF->LCRegister, "k_matrix" );
-	sle = (SystemLinearEquations*)       LiveComponentRegister_Get( context->CF->LCRegister, "stokesEqn" );
-	assert( stiffnessMatrix );
+	stiffnessMatrix = (StiffnessMatrix* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"k_matrix" );
+	sle = (SystemLinearEquations* )       LiveComponentRegister_Get( context->CF->LCRegister, (Name)"stokesEqn" );
+	assert( stiffnessMatrix  );
 	StiffnessMatrix_Assemble( stiffnessMatrix, False, sle, context );
 	stiffnessMatrix = stiffnessMatrix;
 
@@ -231,8 +231,8 @@ void ViscousSuite_MaterialViscosityStiffnessMatrix2D( ViscousSuiteData* data ) {
 	 both matricies are built using only an Arrhenius rheology 
  */
 
-	filename = Dictionary_GetString( dictionary, "StiffnessMatrixCompareFilename" );
-	tolerance = Dictionary_GetDouble_WithDefault( dictionary, "StiffnessMatrixCompareTolerance", 1e-4 );
+	filename = Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"StiffnessMatrixCompareFilename"  );
+	tolerance = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StiffnessMatrixCompareTolerance", 1e-4  );
 
 	pcu_filename_expected( filename, expected_file );
 	PetscViewerBinaryOpen( context->communicator, expected_file, FILE_MODE_READ, &expViewer );
@@ -292,16 +292,16 @@ void ViscousSuite_ArrheniusStiffnessMatrix2D_DualMesh( ViscousSuiteData* data ) 
 	/* read in the xml input file */
 	pcu_filename_input( "testArrhenius2D-DualMesh.xml", xml_input );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context" );
 	data->context = context;
 	dictionary = context->dictionary;
 
 	stgMainBuildAndInitialise( cf );
 
 	/* Assemble */
-	stiffnessMatrix = (StiffnessMatrix*) LiveComponentRegister_Get( context->CF->LCRegister, "k_matrix" );
-	sle = (SystemLinearEquations*)       LiveComponentRegister_Get( context->CF->LCRegister, "stokesEqn" );
-	assert( stiffnessMatrix );
+	stiffnessMatrix = (StiffnessMatrix* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"k_matrix" );
+	sle = (SystemLinearEquations* )       LiveComponentRegister_Get( context->CF->LCRegister, (Name)"stokesEqn" );
+	assert( stiffnessMatrix  );
 	StiffnessMatrix_Assemble( stiffnessMatrix, False, sle, context );
 	stiffnessMatrix = stiffnessMatrix;
 
@@ -312,8 +312,8 @@ void ViscousSuite_ArrheniusStiffnessMatrix2D_DualMesh( ViscousSuiteData* data ) 
 		 both matricies are built using only an Arrhenius rheology 
 	 */
 
-	filename = Dictionary_GetString( dictionary, "StiffnessMatrixCompareFilename" );
-	tolerance = Dictionary_GetDouble_WithDefault( dictionary, "StiffnessMatrixCompareTolerance", 1e-4 );
+	filename = Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"StiffnessMatrixCompareFilename"  );
+	tolerance = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StiffnessMatrixCompareTolerance", 1e-4  );
 
 	pcu_filename_expected( filename, expected_file );
 	PetscViewerBinaryOpen( context->communicator, expected_file, FILE_MODE_READ, &expViewer );
@@ -374,16 +374,16 @@ void ViscousSuite_FrankKamenetskiiStiffnessMatrix2D_DualMesh( ViscousSuiteData* 
 	/* read in the xml input file */
 	pcu_filename_input( "testFrankKamenetskii2D-DualMesh.xml", xml_input );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
-	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, "context" );
+	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context" );
 	data->context = context;
 	dictionary = context->dictionary;
 
 	stgMainBuildAndInitialise( cf );
 
 	/* Assemble */
-	stiffnessMatrix = (StiffnessMatrix*) LiveComponentRegister_Get( context->CF->LCRegister, "k_matrix" );
-	sle = (SystemLinearEquations*)       LiveComponentRegister_Get( context->CF->LCRegister, "stokesEqn" );
-	assert( stiffnessMatrix );
+	stiffnessMatrix = (StiffnessMatrix* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"k_matrix" );
+	sle = (SystemLinearEquations* )       LiveComponentRegister_Get( context->CF->LCRegister, (Name)"stokesEqn" );
+	assert( stiffnessMatrix  );
 	StiffnessMatrix_Assemble( stiffnessMatrix, False, sle, context );
 	stiffnessMatrix = stiffnessMatrix;
 
@@ -394,8 +394,8 @@ void ViscousSuite_FrankKamenetskiiStiffnessMatrix2D_DualMesh( ViscousSuiteData* 
 		 both matricies are built using only an Arrhenius rheology 
 	 */
 
-	filename = Dictionary_GetString( dictionary, "StiffnessMatrixCompareFilename" );
-	tolerance = Dictionary_GetDouble_WithDefault( dictionary, "StiffnessMatrixCompareTolerance", 1e-4 );
+	filename = Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"StiffnessMatrixCompareFilename"  );
+	tolerance = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StiffnessMatrixCompareTolerance", 1e-4  );
 
 	pcu_filename_expected( filename, expected_file );
 	PetscViewerBinaryOpen( context->communicator, expected_file, FILE_MODE_READ, &expViewer );

@@ -79,7 +79,7 @@ const Type Underworld_BuoyancyIntegrals_Type = "Underworld_BuoyancyIntegrals";
 
 Index Underworld_BuoyancyIntegrals_Register( PluginsManager *pluginsManager ) 
 {
-	return PluginsManager_Submit( pluginsManager, Underworld_BuoyancyIntegrals_Type, "0", _Underworld_BuoyancyIntegrals_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_BuoyancyIntegrals_Type, (Name)"0", _Underworld_BuoyancyIntegrals_DefaultNew );
 }
 
 void* _Underworld_BuoyancyIntegrals_DefaultNew( Name name ) 
@@ -108,7 +108,7 @@ void _Underworld_BuoyancyIntegrals_CTX_Delete( void *component )
 {
 	Underworld_BuoyancyIntegrals_CTX  *ctx = (Underworld_BuoyancyIntegrals_CTX*)component;
 	
-	_Codelet_Delete( ctx );
+	_Codelet_Delete( ctx  );
 }
 
 void _Underworld_BuoyancyIntegrals_CTX_Destroy( void* component, void* data ) {
@@ -126,20 +126,18 @@ void _Underworld_BuoyancyIntegrals_AssignFromXML( void *component, Stg_Component
 	Underworld_BuoyancyIntegrals_CTX *ctx;
 	MaterialPointsSwarm *cob_swarm; /* center of buouyancy swarm */
 	
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data  ); 
 	
 	/* Add functions to entry points */
 	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, Underworld_BuoyancyIntegrals_Setup );
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, Underworld_BuoyancyIntegrals_Output );
 	
 	
-	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get(
-			context->CF->LCRegister,
-			Underworld_BuoyancyIntegrals_Type );
+	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_BuoyancyIntegrals_Type  );
 	
 	/* Look for a swarm to which we will assign the calculated center of buoyancy to */
 	ctx->cob_swarm = NULL;
-	cob_swarm = Stg_ComponentFactory_ConstructByName( cf, "center_buoyancy_swarm", MaterialPointsSwarm, False, data );
+	cob_swarm = Stg_ComponentFactory_ConstructByName( cf, (Name)"center_buoyancy_swarm", MaterialPointsSwarm, False, data );
 	if( cob_swarm != NULL ) {
 		ctx->cob_swarm = cob_swarm;
 	}
@@ -155,9 +153,7 @@ void Underworld_BuoyancyIntegrals_Setup( void *_context )
 	
 	
 	/* allocate memory */
-	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get(
-			context->CF->LCRegister,
-			Underworld_BuoyancyIntegrals_Type );
+	ctx = (Underworld_BuoyancyIntegrals_CTX* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_BuoyancyIntegrals_Type  );
 	
 	/* init values */
 	ctx->dim = Stg_ComponentFactory_GetRootDictInt( context->CF, "dim", -1 );
@@ -166,17 +162,17 @@ void Underworld_BuoyancyIntegrals_Setup( void *_context )
 	}
 	
 	
-	ctx->beta = Stg_ComponentFactory_GetRootDictDouble( context->CF, "alpha", -1 );
+	ctx->beta = Stg_ComponentFactory_GetRootDictDouble( context->CF, (Dictionary_Entry_Key)"alpha", -1 );
 	if( (int)ctx->beta == -1 ) {
-		printf("******************** ERROR ALPHA IS UNINITIALISED ******************************** \n");
+		printf("******************** ERROR ALPHA IS UNINITIALISED ******************************** \n" );
 	}
 	
-	ctx->gravity = Stg_ComponentFactory_GetRootDictDouble( context->CF, "gravity", -1 );
+	ctx->gravity = Stg_ComponentFactory_GetRootDictDouble( context->CF, (Dictionary_Entry_Key)"gravity", -1 );
 	if( (int)ctx->gravity == -1 ) {
-		printf("******************** ERROR GRAVITY IS UNINITIALISED ******************************** \n");
+		printf("******************** ERROR GRAVITY IS UNINITIALISED ******************************** \n" );
 	}
 	
-	ctx->y_b_initial = Stg_ComponentFactory_GetRootDictDouble( context->CF, "y_b_initial", -1 );
+	ctx->y_b_initial = Stg_ComponentFactory_GetRootDictDouble( context->CF, (Dictionary_Entry_Key)"y_b_initial", -1 );
 	if( (int)ctx->y_b_initial == -1 ) {
 		printf("********************* ERROR Y_B_INITIAL IS NOT SET *********************** \n");
 	}
@@ -184,11 +180,11 @@ void Underworld_BuoyancyIntegrals_Setup( void *_context )
 	ctx->int_w_bar_dt = ctx->y_b_initial;
 	
 	if (ctx->dim ==3){
-		shape = (Stg_Shape*)Stg_ComponentFactory_ConstructByName( context->CF, "cylinder", Stg_Shape, True, 0 /* dummy */ );
+		shape = (Stg_Shape* )Stg_ComponentFactory_ConstructByName( context->CF, (Name)"cylinder", Stg_Shape, True, 0 /* dummy */ );
 		ctx->x_b = shape->centre[0];
 		ctx->z_b = shape->centre[2];
 	} else if (ctx->dim==2){
-		shape = (Stg_Shape*)Stg_ComponentFactory_ConstructByName( context->CF, "disk", Stg_Shape, True, 0 /* dummy */ );
+		shape = (Stg_Shape* )Stg_ComponentFactory_ConstructByName( context->CF, (Name)"disk", Stg_Shape, True, 0 /* dummy */  );
 		ctx->x_b = shape->centre[0];
 	}
 	
@@ -294,13 +290,11 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	FeVariable *velocityField, *temperatureField;
 	Swarm* gaussSwarm;
 	
-	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get(
-			context->CF->LCRegister,
-			Underworld_BuoyancyIntegrals_Type );
+	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_BuoyancyIntegrals_Type );
 	
-	velocityField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "VelocityField" );
-	temperatureField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
-	gaussSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "gaussSwarm" );
+	velocityField = (FeVariable* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"VelocityField" );
+	temperatureField = (FeVariable* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"temperatureField" );
+	gaussSwarm = (Swarm* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"gaussSwarm" );
 
 	/* initialise values to compute */
 	*B = *w_bar = *y_b = -1.0;
@@ -323,7 +317,7 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	ngp = context->gaussSwarm->particleLocalCount;
 	cell_I = 0;
 	for( p = 0; p<ngp; p++ ) {
-		ip = (IntegrationPoint*)Swarm_ParticleInCellAt( context->gaussSwarm, cell_I, p );
+		ip = (IntegrationPoint* )Swarm_ParticleInCellAt( context->gaussSwarm, cell_I, p );
 		xi = ip->xi;
 		weight = ip->weight;
 		///*
@@ -336,7 +330,7 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	dim = ctx->dim;
 	elementType = FeMesh_GetElementType( velocityField->feMesh, 0 );
 	elementNodeCount = elementType->nodeCount;
-	GNx = Memory_Alloc_2DArray( double, dim, elementNodeCount, "Global Shape Function Derivatives for mayhem" );
+	GNx = Memory_Alloc_2DArray( double, dim, elementNodeCount, (Name)"Global Shape Function Derivatives for mayhem" );
 
 	mesh = temperatureField->feMesh;
 	
@@ -345,7 +339,7 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	_sum_vol = 0.0;
 	
 	ngp = gaussSwarm->particleLocalCount;
-	n_elements = FeMesh_GetElementLocalSize( mesh );
+	n_elements = FeMesh_GetElementLocalSize( mesh  );
 	//	printf("n_elements = %d \n", n_elements );
 	
 	for( e=0; e<n_elements; e++ ) {
@@ -430,11 +424,9 @@ void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
 
 	T = -66.99;
 	
-	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get(
-			context->CF->LCRegister,
-			Underworld_BuoyancyIntegrals_Type );
+	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_BuoyancyIntegrals_Type );
 	
-	temperatureField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
+	temperatureField = (FeVariable* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"temperatureField"  );
 	/* Get x_b, and z_b from xml */
 	/* "cylinder" z_b = CentreZ (0.5), x_b = CentreX (1.0) */
 	if (ctx->dim==3){
@@ -459,11 +451,11 @@ void assign_coords_to_swarm( double x_b, double y_b, double z_b, MaterialPointsS
 	int point_count;
 	GlobalParticle *particle;
 	Particle_Index lParticle_I;
-	Stream *errorStream = Journal_Register( Error_Type, "Underworld_BuoyancyIntegrals: assign_coords_to_swarm" );
+	Stream *errorStream = Journal_Register( Error_Type, (Name)"Underworld_BuoyancyIntegrals: assign_coords_to_swarm" );
 	/* int rank; */
 	
 	/* Cast to get parent */
-	swarm = (Swarm*)cob_swarm;
+	swarm = (Swarm* )cob_swarm;
 	
 	
 	/* check cob swarm only has one point */
@@ -503,11 +495,9 @@ void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context )
 	perform_integrals( context, &B, &w_bar, &y_b, &int_w_bar_dt );
 	eval_temperature( context, y_b, &temp_b );
 	
-	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get(
-			context->CF->LCRegister,
-			Underworld_BuoyancyIntegrals_Type );
+	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_BuoyancyIntegrals_Type );
 	
-	temperatureField = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "temperatureField" );
+	temperatureField = (FeVariable* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"temperatureField"  );
 	
 	StgFEM_FrequentOutput_PrintValue( context, B );
 	StgFEM_FrequentOutput_PrintValue( context, w_bar );

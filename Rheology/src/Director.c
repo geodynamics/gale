@@ -145,44 +145,37 @@ void _Director_Init(
 	/****** Setup Variables *****/
 
 	/* First check to see if a particle extension has already been created for this swarm */
-	self->particleExtHandle     = ExtensionManager_GetHandle( materialPointsSwarm->particleExtensionMgr, Director_Type );
+	self->particleExtHandle     = ExtensionManager_GetHandle( materialPointsSwarm->particleExtensionMgr, (Name)Director_Type );
 
 	/* If there isn't one then create the particle extension - otherwise just use the one already there*/
-	if ( self->particleExtHandle == (ExtensionInfo_Index) -1 ) {
+	if ( self->particleExtHandle == (ExtensionInfo_Index) -1  ) {
 		StandardParticle      particle;
 		Director_ParticleExt* particleExt;
 
 		/* Add particle extension */
 		self->particleExtHandle = 
-			ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, Director_Type, sizeof(Director_ParticleExt) );	
+			ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, (Name)Director_Type, sizeof(Director_ParticleExt)  );	
 
 		particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle, self->particleExtHandle );
 
-		self->directorSwarmVariable = Swarm_NewVectorVariable(
-			materialPointsSwarm,
-			"Director",
-			(ArithPointer) &particleExt->director - (ArithPointer) &particle,
+		self->directorSwarmVariable = Swarm_NewVectorVariable( materialPointsSwarm, (Name)"Director", (ArithPointer) &particleExt->director - (ArithPointer) &particle,
 			Variable_DataType_Double,
 			materialPointsSwarm->dim,
 			"DirectorX",
 			"DirectorY",
 			"DirectorZ" );
-		self->dontUpdateParticle = Swarm_NewScalarVariable(
-			materialPointsSwarm,
-			"dontUpdateParticle",
-			(ArithPointer) &particleExt->dontUpdateParticle - (ArithPointer) &particle,
-			Variable_DataType_Int );
+		self->dontUpdateParticle = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"dontUpdateParticle", (ArithPointer) &particleExt->dontUpdateParticle - (ArithPointer) &particle, Variable_DataType_Int  );
 	}
 	else {
 		Name variableName;
 
 		/* Get Variables already created */
-		variableName = Stg_Object_AppendSuffix( materialPointsSwarm, "Director" );
+		variableName = Stg_Object_AppendSuffix( materialPointsSwarm, (Name)"Director"  );
 		self->directorSwarmVariable = SwarmVariable_Register_GetByName( materialPointsSwarm->swarmVariable_Register, variableName );
 		assert( self->directorSwarmVariable );
 		Memory_Free( variableName );
 		/* Get Variables already created */
-		variableName = Stg_Object_AppendSuffix( materialPointsSwarm, "dontUpdateParticle" );
+		variableName = Stg_Object_AppendSuffix( materialPointsSwarm, (Name)"dontUpdateParticle"  );
 		self->dontUpdateParticle = SwarmVariable_Register_GetByName( materialPointsSwarm->swarmVariable_Register, variableName );
 		assert( self->dontUpdateParticle );
 		Memory_Free( variableName );
@@ -228,14 +221,12 @@ void _Director_AssignFromXML( void* director, Stg_ComponentFactory* cf, void* da
 	
 	/* Construct 'Director' stuff */
 	/* TODO: 'KeyFallback' soon to be deprecated/updated */
-        velGradField   = Stg_ComponentFactory_ConstructByNameWithKeyFallback(
-               cf, self->name, "VelocityGradientsField", "VelocityGradientsField", FeVariable, True, data );
+        velGradField   = Stg_ComponentFactory_ConstructByNameWithKeyFallback( cf, self->name, (Name)"VelocityGradientsField", (Dictionary_Entry_Key)"VelocityGradientsField", FeVariable, True, data  );
 	/*
 	velGradField   = Stg_ComponentFactory_ConstructByKey( 
 			cf, self->name, "VelocityGradientsField", FeVariable, True );
 	*/		
-	materialPointsSwarm = Stg_ComponentFactory_ConstructByKey( 
-			cf, self->name, "MaterialPointsSwarm", MaterialPointsSwarm, True, data );
+	materialPointsSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialPointsSwarm", MaterialPointsSwarm, True, data  );
 	
 	
 	/* Define the initial Direction type for the problem
@@ -243,7 +234,7 @@ void _Director_AssignFromXML( void* director, Stg_ComponentFactory* cf, void* da
 		Random direction,
 		a different direction per material.
 	*/
-	initialDirectionTypeName = Stg_ComponentFactory_GetString(cf, self->name, "initialDirectionType", "global");
+	initialDirectionTypeName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"initialDirectionType", "global" );
 	if (0 == strcasecmp(initialDirectionTypeName, "global")) {
 		initialDirectionType = INIT_DIR_GLOBAL;
 	}
@@ -254,7 +245,7 @@ void _Director_AssignFromXML( void* director, Stg_ComponentFactory* cf, void* da
 		initialDirectionType = INIT_DIR_PER_MAT;
 	}
 	else {
-			Journal_Firewall(False, Journal_Register(Error_Type, "Director" ), 
+			Journal_Firewall(False, Journal_Register( Error_Type, (Name)"Director"  ), 
 			"Error in '%s', do not understand initialDirectionType = %s\n."
 			" Options are: \"global\", \"random\" or \"perMaterial\" ", __func__, 
 			initialDirectionTypeName);		
@@ -265,11 +256,11 @@ void _Director_AssignFromXML( void* director, Stg_ComponentFactory* cf, void* da
 			velGradField,
 			materialPointsSwarm,
 			initialDirectionType,
-			Stg_ComponentFactory_GetDouble( cf, self->name, "initialDirectionX",    DIRECTOR_DEFAULT_DIR_X ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "initialDirectionY",    DIRECTOR_DEFAULT_DIR_Y ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "initialDirectionZ",    DIRECTOR_DEFAULT_DIR_Z ),
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "randomInitialDirectionSeed",  1 ),
-			Stg_ComponentFactory_GetBool( cf, self->name, "dontUpdate", False ) );
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"initialDirectionX", DIRECTOR_DEFAULT_DIR_X  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"initialDirectionY", DIRECTOR_DEFAULT_DIR_Y  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"initialDirectionZ", DIRECTOR_DEFAULT_DIR_Z  ),
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"randomInitialDirectionSeed", 1  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"dontUpdate", False )  );
 
 }
 
@@ -369,30 +360,18 @@ void _Director_Initialise( void* director, void* data ) {
 				material = Materials_Register_GetByIndex( 
 						self->materialPointsSwarm->materials_Register, 
 						material_I );
-				randomInitialDirections[material_I] = Dictionary_GetBool_WithDefault(
-						material->dictionary,
-						"randomInitialDirection", 
-						False);
+				randomInitialDirections[material_I] = Dictionary_GetBool_WithDefault( material->dictionary, (Dictionary_Entry_Key)"randomInitialDirection", False );
 				/* If no value is set, use default value from this file,
 				and not the (not-used) global value */ 
 				if ( randomInitialDirections[material_I] == False) {
 					materialDirectionVectors[ material_I ][0] = 
-						Dictionary_GetDouble_WithDefault( 
-							material->dictionary, 
-							"initialDirectionX", 
-							DIRECTOR_DEFAULT_DIR_X );
+						Dictionary_GetDouble_WithDefault( material->dictionary, (Dictionary_Entry_Key)"initialDirectionX", DIRECTOR_DEFAULT_DIR_X  );
 				
 					materialDirectionVectors[ material_I ][1] = 
-						Dictionary_GetDouble_WithDefault( 
-							material->dictionary, 
-							"initialDirectionY", 
-							DIRECTOR_DEFAULT_DIR_Y );				   		
+						Dictionary_GetDouble_WithDefault( material->dictionary, (Dictionary_Entry_Key)"initialDirectionY", DIRECTOR_DEFAULT_DIR_Y  );				   		
 				
 					materialDirectionVectors[ material_I ][2] = 
-						Dictionary_GetDouble_WithDefault( 
-							material->dictionary, 
-							"initialDirectionZ", 
-							DIRECTOR_DEFAULT_DIR_Z );
+						Dictionary_GetDouble_WithDefault( material->dictionary, (Dictionary_Entry_Key)"initialDirectionZ", DIRECTOR_DEFAULT_DIR_Z  );
 				}
 				else {
 					/* If no random seed set, then use global value ( which if 
@@ -464,7 +443,7 @@ void _Director_Initialise( void* director, void* data ) {
 			Memory_Free(randomInitialDirectionSeeds);
 		}
 		else {
-			Journal_Firewall(False, Journal_Register(Error_Type, "Director" ), 
+			Journal_Firewall(False, Journal_Register( Error_Type, (Name)"Director"  ), 
 			"Error in '%s', do not understand self->initialDirectionType = %u\n"
 			"initialDirectionType must match enumerated type, 'InitialDirectionType'"
 			"in Director.h\n", __func__, 
@@ -520,7 +499,7 @@ Bool _Director_TimeDerivative( void* director, Index lParticle_I, double* timeDe
 	if ( result == OTHER_PROC || result == OUTSIDE_GLOBAL || isinf(velGrad[0]) || isinf(velGrad[1]) || 
 		( self->materialPointsSwarm->dim == 3 && isinf(velGrad[2]) ) ) 
 	{
-		Journal_Printf( Journal_Register( Error_Type, self->type ),
+		Journal_Printf( Journal_Register( Error_Type, (Name)self->type  ),
 			"Error in func '%s' for particle with index %u.\n\tPosition (%g, %g, %g)\n\tVelGrad here is (%g, %g, %g)."
 			"\n\tInterpolation result is %s.\n",
 			__func__, lParticle_I, materialPoint->coord[0], materialPoint->coord[1], materialPoint->coord[2], 

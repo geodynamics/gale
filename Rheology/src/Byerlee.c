@@ -137,11 +137,9 @@ void _Byerlee_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* dat
    _VonMises_AssignFromXML( self, cf, data );
    /* TODO: "KeyFallback' soon to be deprecated/updated */
    /*
-   geometry = Stg_ComponentFactory_ConstructByNameWithKeyFallback(
-                        cf, self->name, "geometry", "BlockGeometry", BlockGeometry, True, data );
+   geometry = Stg_ComponentFactory_ConstructByNameWithKeyFallback( cf, self->name, (Name)"geometry", (Dictionary_Entry_Key)"BlockGeometry", BlockGeometry, True, data  );
    */
-   mesh     = Stg_ComponentFactory_ConstructByNameWithKeyFallback(
-                        cf, self->name, "mesh-linear", "FeMesh", FeMesh, True, data );
+   mesh     = Stg_ComponentFactory_ConstructByNameWithKeyFallback( cf, self->name, (Name)"mesh-linear", (Dictionary_Entry_Key)"FeMesh", FeMesh, True, data  );
    /*geometry = Stg_ComponentFactory_ConstructByKey(
          cf, self->name, "BlockGeometry", BlockGeometry, True );
    mesh     = Stg_ComponentFactory_ConstructByKey(
@@ -150,7 +148,7 @@ void _Byerlee_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* dat
    _Byerlee_Init(
          self,
          mesh,
-         Stg_ComponentFactory_GetDouble( cf, self->name, "depthCoefficient", 0.0  ) );
+         Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"depthCoefficient", 0.0  )  );
 }
 
 void _Byerlee_Destroy( void* rheology, void* data ) {

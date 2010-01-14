@@ -70,9 +70,9 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
   UnderworldContext*       context            = (UnderworldContext*)_context;
 
   Dictionary*              theDictionary      = context->dictionary;
-  FeVariable*    tempField   = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "TemperatureField" );
+  FeVariable*    tempField   = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"TemperatureField" );
   FeMesh*	           theMesh            = NULL;
-  double*                  result             = (double*) _result;
+  double*                  result             = (double* ) _result;
   Stg_Shape*               shape;
   Name                     shapeName;
   double*                  coord;
@@ -102,19 +102,19 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 
   theMesh = tempField->feMesh;
 
-  shapeSpecs = Dictionary_Get( theDictionary, "linearShapeIC" );
+  shapeSpecs = Dictionary_Get( theDictionary, (Dictionary_Entry_Key)"linearShapeIC" );
   numSpecs = Dictionary_Entry_Value_GetCount( shapeSpecs );
 
-  for( shapeSpec_I = 0; shapeSpec_I < numSpecs; shapeSpec_I++ ) {
+  for( shapeSpec_I = 0; shapeSpec_I < numSpecs; shapeSpec_I++  ) {
     shapeSpec = Dictionary_Entry_Value_GetElement( shapeSpecs, shapeSpec_I );
     shapeSpecDict = Dictionary_Entry_Value_AsDictionary( shapeSpec );
-    shapeName = Dictionary_Entry_Value_AsString( Dictionary_Get( shapeSpecDict, "Shape" ) );
+    shapeName = Dictionary_Entry_Value_AsString( Dictionary_Get( shapeSpecDict, (Dictionary_Entry_Key)"Shape" ) );
 
     /* Get the shape */
-    shape = (Stg_Shape*) LiveComponentRegister_Get( context->CF->LCRegister, shapeName );
+    shape = (Stg_Shape* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)shapeName );
 
-    Journal_Firewall( (Bool) shape, 
-		      Journal_Register( Error_Type, Underworld_ShapeFemIC_Type ), 
+    Journal_Firewall( (Bool ) shape, 
+		      Journal_Register( Error_Type, (Name)Underworld_ShapeFemIC_Type  ), 
 		      "Shape %s not found.\n", shapeName );
 
     /* Find coordinate of node */
@@ -122,43 +122,43 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 
     if( Stg_Shape_IsCoordInside( shape, coord ) ) {
 
-      setup = Dictionary_GetInt_WithDefault( shapeSpecDict, "setup", STD );
+      setup = Dictionary_GetInt_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"setup", STD );
 
-      switch( setup ) {
+      switch( setup  ) {
       case STD:
 	/* rotation angle */
-	az = Dictionary_GetDouble_WithDefault( shapeSpecDict, "rotation", 0.0 );
+	az = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"rotation", 0.0  );
 	/* gradient in each direction */
-	gx = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradientx", 0.0 );
-	gy = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradienty", 0.0 );
+	gx = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"gradientx", 0.0  );
+	gy = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"gradienty", 0.0  );
 	/* value of the field at origin */
-	T0 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "valueAtOrigin", 0.0 );
+	T0 = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"valueAtOrigin", 0.0 );
 
 	x = coord[I_AXIS];
 	y = coord[J_AXIS];
 	az = az/180.0*M_PI;
 
-	switch( theMesh->topo->nDims ) {
+	switch( theMesh->topo->nDims  ) {
 	case 2: 
 	  /* origin */
-	  ox = Dictionary_GetDouble_WithDefault( shapeSpecDict, "originx", 0.0 );
-	  oy = Dictionary_GetDouble_WithDefault( shapeSpecDict, "originy", 0.0 );
+	  ox = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"originx", 0.0  );
+	  oy = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"originy", 0.0 );
 	  /* rotations and translations */
 	  xp = (x-ox)*cos(az) - (y-oy)*sin(az);
-	  yp = (x-ox)*sin(az) + (y-oy)*cos(az);
+	  yp = (x-ox)*sin(az) + (y-oy)*cos(az );
 	  /* compute value at the point */
 	  *result = T0 + xp*gx + yp*gy; 
 	  break;
 	
 	case 3: 
-	  gz = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradientz", 0.0 );
-	  /* two points defining the rotational axis (3D case) First point is the origin */
-	  p1x = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p1x", 0.0 );
-	  p1y = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p1y", 0.0 );
-	  p1z = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p1z", 0.0 );
-	  p2x = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p2x", 0.0 );
-	  p2y = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p2y", 0.0 );
-	  p2z = Dictionary_GetDouble_WithDefault( shapeSpecDict, "p2z", 1.0 );
+	  gz = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"gradientz", 0.0 );
+	  /* two points defining the rotational axis (3D case ) First point is the origin */
+	  p1x = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"p1x", 0.0  );
+	  p1y = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"p1y", 0.0  );
+	  p1z = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"p1z", 0.0  );
+	  p2x = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"p2x", 0.0  );
+	  p2y = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"p2y", 0.0  );
+	  p2z = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"p2z", 1.0 );
 
 	  z   = coord[K_AXIS];
 
@@ -176,7 +176,7 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 	  d = sqrt( uy*uy + uz*uz );
 	  xp = cos(az)*( -uy*(y-p1y) - uz*(z-p1z) ) - sin(az)*( uz/d*(y-p1y) - uy/ux*(z-p1z) );
 	  yp = sin(az)*( -uy*(y-p1y) - uz*(z-p1z) ) + cos(az)*( uz/d*(y-p1y) - uy/ux*(z-p1z) );
-	  zp = d*uy/ux*(y-p1y) + d*uz/ux*(z-p1z);
+	  zp = d*uy/ux*(y-p1y) + d*uz/ux*(z-p1z );
 
 	  /* compute value at the point */
 	  *result = T0 + xp*gx + yp*gy + zp*gz; 
@@ -186,17 +186,17 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 
       case PM:
 	/* Advanced config */
-	ox1 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "originx1", 0.0 );
-	oy1 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "originy1", 0.0 );
-	gy1 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradienty1", 0.0 );
-	T1 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "valueAtOrigin1", 0.0 );
-	H1 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "height1", 0.0 );
+	ox1 = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"originx1", 0.0  );
+	oy1 = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"originy1", 0.0  );
+	gy1 = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"gradienty1", 0.0  );
+	T1 = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"valueAtOrigin1", 0.0  );
+	H1 = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"height1", 0.0  );
 
-	ox2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "originx2", 0.0 );
-	oy2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "originy2", 0.0 );
-	gy2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "gradienty2", 0.0 );
-	T2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "valueAtOrigin2", 0.0 );
-	H2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, "height2", 0.0 );
+	ox2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"originx2", 0.0  );
+	oy2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"originy2", 0.0  );
+	gy2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"gradienty2", 0.0  );
+	T2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"valueAtOrigin2", 0.0  );
+	H2 = Dictionary_GetDouble_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"height2", 0.0 );
 
 	x = coord[I_AXIS];
 	y = coord[J_AXIS];
@@ -224,7 +224,7 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
             
 	beta = (y - omuy) / (omly - omuy);
 
-	*result = (1-beta)*Tmu + beta*Tml;
+	*result = (1-beta )*Tmu + beta*Tml;
 	break;
       }
     }
@@ -245,9 +245,9 @@ void Underworld_SimpleShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 	meshVar = (MeshVariable*)Variable_Register_GetByIndex( context->variable_Register, var_I );
 	mesh = (FeMesh*)meshVar->mesh; assert( mesh != NULL );
 
-	shapeName = Dictionary_GetString( dictionary, "ShapeFemIC" );
-	shape = (Stg_Shape*) LiveComponentRegister_Get( context->CF->LCRegister, shapeName );
-	assert( shape );
+	shapeName = Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"ShapeFemIC" );
+	shape = (Stg_Shape* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)shapeName );
+	assert( shape  );
 
 	/* Find coordinate of node */
 	coord = Mesh_GetVertex( mesh, node_lI );
@@ -261,9 +261,9 @@ void Underworld_SimpleShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 void Underworld_GaussianIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	UnderworldContext*      context            = (UnderworldContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
-  FeVariable*    tempField   = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, "TemperatureField" );
+  FeVariable*    tempField   = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"TemperatureField" );
 	FeMesh*			mesh               = NULL;
-	double*                 result             = (double*) _result;
+	double*                 result             = (double* ) _result;
 	Stg_Shape*              shape;
 	Name                    shapeName;
 	double*                 coord;
@@ -273,14 +273,14 @@ void Underworld_GaussianIC( Node_LocalIndex node_lI, Variable_Index var_I, void*
 	
 	mesh       = tempField->feMesh;
 
-	amplitude = Dictionary_GetDouble_WithDefault( dictionary, "GaussianIC-Amplitude", 1.0 );
-	width = Dictionary_GetDouble_WithDefault( dictionary, "GaussianIC-Width", 1e-2 );
+	amplitude = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianIC-Amplitude", 1.0  );
+	width = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianIC-Width", 1e-2  );
 
-	shapeName = Dictionary_GetString( dictionary, "ShapeFemIC" );
-	shape = (Stg_Shape*) LiveComponentRegister_Get( context->CF->LCRegister, shapeName );
-	assert( shape );
+	shapeName = Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"ShapeFemIC" );
+	shape = (Stg_Shape* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)shapeName );
+	assert( shape  );
 	Journal_Firewall( !strcmp(shape->type, "Sphere") || !strcmp(shape->type, "Cylinder"),
-			Journal_Register( Error_Type, Underworld_ShapeFemIC_Type ),
+			Journal_Register( Error_Type, (Name)Underworld_ShapeFemIC_Type  ),
 			"Error in %s: You're applying the GaussianIC to a shape of type %s, which can't be done."
 			" It can only work on Sphere\' or \'Cylinder\' shapes\n", __func__,  shape->type );
 	/* Find coordinate of node */
@@ -307,13 +307,13 @@ void _Underworld_ShapeFemIC_AssignFromXML( void* component, Stg_ComponentFactory
 	ConditionFunction*      condFunc;
 	UnderworldContext*      context;
 
-	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data ); 
+	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data  ); 
 	
-	condFunc = ConditionFunction_New( Underworld_SimpleShapeIC, "Inside1_Outside0_ShapeIC" );
+	condFunc = ConditionFunction_New( Underworld_SimpleShapeIC, (Name)"Inside1_Outside0_ShapeIC"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( Underworld_GaussianIC, "GaussianIC" );
+	condFunc = ConditionFunction_New( Underworld_GaussianIC, (Name)"GaussianIC"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( Underworld_LinearShapeIC, "linearShapeIC" );
+	condFunc = ConditionFunction_New( Underworld_LinearShapeIC, (Name)"linearShapeIC"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 }
 
@@ -332,7 +332,7 @@ void* _Underworld_ShapeFemIC_DefaultNew( Name name ) {
 Index Underworld_ShapeFemIC_Register( PluginsManager* pluginsManager ) {
 	Journal_DPrintf( Underworld_Debug, "In: %s( void* )\n", __func__ );
 
-	return PluginsManager_Submit( pluginsManager, Underworld_ShapeFemIC_Type, "0", _Underworld_ShapeFemIC_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_ShapeFemIC_Type, (Name)"0", _Underworld_ShapeFemIC_DefaultNew  );
 }
 
 

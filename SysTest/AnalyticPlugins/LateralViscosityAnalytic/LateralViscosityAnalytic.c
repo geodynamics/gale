@@ -96,13 +96,13 @@ void LateralViscosityAnalytic_TemperatureIC( Node_LocalIndex node_lI, Variable_I
 	x = coord[ I_AXIS ] - min[ I_AXIS ];
 	y = coord[ J_AXIS ] - min[ J_AXIS ];
 
-	wavenumberX = Dictionary_GetInt_WithDefault( dictionary, "wavenumberX", 1 );
-	wavenumberY = Dictionary_GetInt_WithDefault( dictionary, "wavenumberY", 1 );
+	wavenumberX = Dictionary_GetInt_WithDefault( dictionary, (Dictionary_Entry_Key)"wavenumberX", 1  );
+	wavenumberY = Dictionary_GetInt_WithDefault( dictionary, (Dictionary_Entry_Key)"wavenumberY", 1 );
 
 	kx = wavenumberX * M_PI/ L;
 	ky = wavenumberY * M_PI;
 
-	*result = sin( ky * y ) * cos( kx * x );
+	*result = sin( ky * y ) * cos( kx * x  );
 }
 
 void _LateralViscosityAnalytic_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
@@ -407,13 +407,13 @@ void _LateralViscosityAnalytic_AssignFromXML( void* analyticSolution, Stg_Compon
 	_FieldTest_AssignFromXML( self, cf, data );
 
 	/* Add temperature initial condition */
-	condFunc = ConditionFunction_New( LateralViscosityAnalytic_TemperatureIC, "LateralViscosityAnalytic_TemperatureIC" );
+	condFunc = ConditionFunction_New( LateralViscosityAnalytic_TemperatureIC, (Name)"LateralViscosityAnalytic_TemperatureIC"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
 	/* Create Analytic Fields */
-	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, (Name)"VelocityField", FeVariable, True, data  ); 
 
-	self->beta = Stg_ComponentFactory_GetRootDictDouble( cf, "beta", 0.0 );
+	self->beta = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"beta", 0.0  );
 	self->wavenumberX = Stg_ComponentFactory_GetRootDictInt( cf, "wavenumberX", 1 );
 	self->wavenumberY = Stg_ComponentFactory_GetRootDictInt( cf, "wavenumberY", 1 );
 }
@@ -464,7 +464,7 @@ void* _LateralViscosityAnalytic_DefaultNew( Name name ) {
 }
 
 Index Underworld_LateralViscosityAnalytic_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, LateralViscosityAnalytic_Type, "0", _LateralViscosityAnalytic_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, LateralViscosityAnalytic_Type, (Name)"0", _LateralViscosityAnalytic_DefaultNew  );
 }
 
 

@@ -207,16 +207,16 @@ void UnderworldContext_AssignPointers( void* context, void* ptrToContext ) {
 		return;
 	
 #if 0
-	self->timeIntegrator = (TimeIntegrator*)  LiveComponentRegister_Get( self->CF->LCRegister, "timeIntegrator" );
+	self->timeIntegrator = (TimeIntegrator*)  LiveComponentRegister_Get( self->CF->LCRegister, (Name)"timeIntegrator" );
 
 	/* Get SLEs */
-	self->stokesSLE = (Stokes_SLE*)            LiveComponentRegister_Get( self->CF->LCRegister, "stokesEqn" );
-	self->energySLE = (AdvectionDiffusionSLE*) LiveComponentRegister_Get( self->CF->LCRegister, "EnergyEqn" );
-	self->compositionSLE = (AdvectionDiffusionSLE*) LiveComponentRegister_Get( self->CF->LCRegister, "CompositionEqn" );
-	self->constitutiveMatrix = (ConstitutiveMatrix*) LiveComponentRegister_Get( self->CF->LCRegister, "constitutiveMatrix" );
+	self->stokesSLE = (Stokes_SLE* )            LiveComponentRegister_Get( self->CF->LCRegister, (Name)"stokesEqn" );
+	self->energySLE = (AdvectionDiffusionSLE* ) LiveComponentRegister_Get( self->CF->LCRegister, (Name)"EnergyEqn" );
+	self->compositionSLE = (AdvectionDiffusionSLE* ) LiveComponentRegister_Get( self->CF->LCRegister, (Name)"CompositionEqn" );
+	self->constitutiveMatrix = (ConstitutiveMatrix* ) LiveComponentRegister_Get( self->CF->LCRegister, (Name)"constitutiveMatrix" );
 #endif
 	
-	Stream_UnIndentBranch( StgFEM_Debug );
+	Stream_UnIndentBranch( StgFEM_Debug  );
 }
 
 

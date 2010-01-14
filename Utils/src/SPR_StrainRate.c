@@ -147,15 +147,15 @@ void _SPR_StrainRate_Execute( void* patch, void* data ) {
    * are executed in the below functions 
    */
 	PICelleratorContext* context = (PICelleratorContext*)data;
-	SPR_StrainRate* self = (SPR_StrainRate*) LiveComponentRegister_Get( context->CF->LCRegister, NameOfPatch );
+	SPR_StrainRate* self = (SPR_StrainRate*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)NameOfPatch );
 	double startTime;
 	assert( self );
 
 	FeVariable_SyncShadowValues( self->rawField );
 	MPI_Barrier(MPI_COMM_WORLD);
 
-	startTime = MPI_Wtime();
-	Journal_RPrintf( Journal_Register( Info_Type, "REP"), "Start Recovery Method\n" );
+	startTime = MPI_Wtime( );
+	Journal_RPrintf( Journal_Register( Info_Type, (Name)"REP" ), "Start Recovery Method\n" );
 		
  	/* Phases of the SPR_StrainRate in this code */
 
@@ -168,7 +168,7 @@ void _SPR_StrainRate_Execute( void* patch, void* data ) {
  	/* 4: Perform a final sync for new proc boundary domain edge nodes */
 	FeVariable_SyncShadowValues( self );
 
-	Journal_RPrintf( Journal_Register( Info_Type, "REP"), "Time Taken for Recovery Method %f\n", MPI_Wtime()-startTime);
+	Journal_RPrintf( Journal_Register( Info_Type, (Name)"REP" ), "Time Taken for Recovery Method %f\n", MPI_Wtime()-startTime);
 }
 
 
@@ -185,9 +185,9 @@ void _SPR_StrainRate_AssembleSolveLocalPatchs( void* sprVar ) {
 	
 
 	/* Allocate memory to AMatrix and bVectors */
-	AMatrix = Memory_Alloc_2DArray( double, orderOfInterpolation, orderOfInterpolation, "A matrix" );
+	AMatrix = Memory_Alloc_2DArray( double, orderOfInterpolation, orderOfInterpolation, (Name)"A matrix"  );
   /* multiple bVectors are needed for each dof */
-	bVector = Memory_Alloc_2DArray( double, dofThatExist, orderOfInterpolation, "b Vector * dof" );
+	bVector = Memory_Alloc_2DArray( double, dofThatExist, orderOfInterpolation, (Name)"b Vector * dof"  );
 	patchCoeff = Memory_Alloc_Array( double, orderOfInterpolation * dofThatExist, "tmp coefficient array" );
 	
   nLocalNodes = FeMesh_GetNodeLocalSize( self->rawField->feMesh );
@@ -245,11 +245,11 @@ void _SPR_StrainRate_AssemblePatch( SPR_StrainRate* self, int node_I, double** A
 	/* 2) Memory Allocations + Initialisations */
 	scp_eps  = Memory_Alloc_Array( SymmetricTensor, nbrElCount, "StrainRate at superconvergent points" );
 
-	globalCoord = Memory_Alloc_2DArray( double, nbrElCount, self->dim, "Global Coords of superconvergent points" );
+	globalCoord = Memory_Alloc_2DArray( double, nbrElCount, self->dim, (Name)"Global Coords of superconvergent points"  );
 
-	pVec = Memory_Alloc_2DArray( double, nbrElCount, orderOfInterpolation, "Holds transformed global coord polynomials" );
+	pVec = Memory_Alloc_2DArray( double, nbrElCount, orderOfInterpolation, (Name)"Holds transformed global coord polynomials" );
 
-	/* 3) Now collect information, to go find each elements contribution to the patch 
+	/* 3 ) Now collect information, to go find each elements contribution to the patch 
    * So find the p vectors and strain-rate pseudo vectors for the Ax=b equation
    * */
 	for( nbrEl_I = 0 ; nbrEl_I < nbrElCount ; nbrEl_I++ ) {

@@ -76,7 +76,7 @@ void _Underworld_solS_Init( Underworld_solS* self, double _eta, int _n ) {
 	self->_n = _n;
 	
 	isCorrectInput = _checkInputParams( self );
-	Journal_Firewall( isCorrectInput , Journal_Register( Error_Type, "Underworld_solS" ),
+	Journal_Firewall( isCorrectInput , Journal_Register( Error_Type, (Name)"Underworld_solS"  ),
 			"Error in function %s: Bad Input parameters, solution check valid values in .tex documentation\n",
 			__func__ );
 }
@@ -104,13 +104,13 @@ void _Underworld_solS_AssignFromXML( void* analyticSolution, Stg_ComponentFactor
 	/* Construct Parent */
 	_FieldTest_AssignFromXML( self, cf, data );
 	
-	_eta = Stg_ComponentFactory_GetRootDictDouble( cf, "solS_eta", 1.0 );
+	_eta = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solS_eta", 1.0  );
 	_n = Stg_ComponentFactory_GetRootDictInt( cf, "sinusoidalLidWavenumber", 1 );
 
 	_Underworld_solS_Init( self, _eta, _n );
 
 	isCorrectInput = _checkInputParams( self );
-	Journal_Firewall( isCorrectInput , Journal_Register( Error_Type, "solS" ),
+	Journal_Firewall( isCorrectInput , Journal_Register( Error_Type, (Name)"solS"  ),
 			"Error in function %s: Bad Input parameters, solution check valid values in .tex documentation\n",
 			__func__ );
 }
@@ -142,7 +142,7 @@ void* _Underworld_solS_DefaultNew( Name name ) {
 }
 
 Index Underworld_Velic_solS_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Underworld_solS_Type, "0", _Underworld_solS_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_solS_Type, (Name)"0", _Underworld_solS_DefaultNew  );
 }
 
 

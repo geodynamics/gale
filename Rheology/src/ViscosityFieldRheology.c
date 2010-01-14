@@ -100,7 +100,7 @@ void _ViscosityFieldRheology_AssignFromXML( void* rheology, Stg_ComponentFactory
 	/* Construct Parent */
 	_Rheology_AssignFromXML( self, cf, data );
    
-	viscosityField = Stg_ComponentFactory_ConstructByName( cf, Stg_ComponentFactory_GetString( cf, self->name, "ViscosityField", "ViscosityField" ), FeVariable, True, data );
+	viscosityField = Stg_ComponentFactory_ConstructByName( cf, (Name)Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"ViscosityField", "ViscosityField"   ), FeVariable, True, data );
 	_ViscosityFieldRheology_Init( self, viscosityField );
 }
 

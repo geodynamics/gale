@@ -68,8 +68,7 @@ void _OrthotropicAligned_Init( OrthotropicAligned* self,
 /*	OrthotropicAligned_ParticleExt*   particleExt;
 	StandardParticle                  materialPoint;
 	
-	self->particleExtHandle       = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr,
-	                                                	OrthotropicAligned_Type, sizeof(OrthotropicAligned_ParticleExt) ); */
+	self->particleExtHandle       = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, (Name)OrthotropicAligned_Type, sizeof(OrthotropicAligned_ParticleExt) ); */
         self->viscosity1  = viscosity1;
 	self->viscosity2  = viscosity2;
 	self->viscosity3  = viscosity3;
@@ -96,7 +95,7 @@ void* _OrthotropicAligned_DefaultNew( Name name ) {
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
-	return (void*) _OrthotropicAligned_New(  ORTHOTROPICALIGNED_PASSARGS  );
+	return (void*) _OrthotropicAligned_New(  ORTHOTROPICALIGNED_PASSARGS   );
 }
 
 void _OrthotropicAligned_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
@@ -113,12 +112,12 @@ void _OrthotropicAligned_AssignFromXML( void* rheology, Stg_ComponentFactory* cf
 	_Rheology_AssignFromXML( self, cf, data );
 	
         /*	director =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "Director", Director,  True  ) ; */
-	viscosity1 = Stg_ComponentFactory_GetDouble( cf, self->name, "viscosity1",  True );
-	viscosity2 = Stg_ComponentFactory_GetDouble( cf, self->name, "viscosity2",  True );
-	viscosity3 = Stg_ComponentFactory_GetDouble( cf, self->name, "viscosity3",  True );
-	viscosity4 = Stg_ComponentFactory_GetDouble( cf, self->name, "viscosity4",  True );
-	viscosity5 = Stg_ComponentFactory_GetDouble( cf, self->name, "viscosity5",  True );
-	viscosity6 = Stg_ComponentFactory_GetDouble( cf, self->name, "viscosity6",  True );
+	viscosity1 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"viscosity1", True  );
+	viscosity2 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"viscosity2", True  );
+	viscosity3 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"viscosity3", True  );
+	viscosity4 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"viscosity4", True  );
+	viscosity5 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"viscosity5", True  );
+	viscosity6 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"viscosity6", True  );
 
 	_OrthotropicAligned_Init( 
 			self, 

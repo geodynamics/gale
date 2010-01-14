@@ -131,24 +131,24 @@ void _Orthotropic_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void*
          as follows:
          1 = x 2 = y 3 = z.
          *******************************************************************/
-	C11 = Stg_ComponentFactory_GetDouble( cf, self->name, "C11",  True );
-	C22 = Stg_ComponentFactory_GetDouble( cf, self->name, "C22",  True );
-	C33 = Stg_ComponentFactory_GetDouble( cf, self->name, "C33",  True );
-	C44 = Stg_ComponentFactory_GetDouble( cf, self->name, "C44",  True );
-	C55 = Stg_ComponentFactory_GetDouble( cf, self->name, "C55",  True );
-	C66 = Stg_ComponentFactory_GetDouble( cf, self->name, "C66",  True );
-	C12 = Stg_ComponentFactory_GetDouble( cf, self->name, "C12",  True );
-	C13 = Stg_ComponentFactory_GetDouble( cf, self->name, "C13",  True );
-	C23 = Stg_ComponentFactory_GetDouble( cf, self->name, "C23",  True );
-	n[0] = Stg_ComponentFactory_GetDouble( cf, self->name, "n1",  True );
-	n[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "n2",  True );
-	n[2] = Stg_ComponentFactory_GetDouble( cf, self->name, "n3",  True );
-	m[0] = Stg_ComponentFactory_GetDouble( cf, self->name, "m1",  True );
-	m[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "m2",  True );
-	m[2] = Stg_ComponentFactory_GetDouble( cf, self->name, "m3",  True );
-	q[0] = Stg_ComponentFactory_GetDouble( cf, self->name, "q1",  True );
-	q[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "q2",  True );
-	q[2] = Stg_ComponentFactory_GetDouble( cf, self->name, "q3",  True );
+	C11 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"C11", True  );
+	C22 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"C22", True  );
+	C33 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"C33", True  );
+	C44 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"C44", True  );
+	C55 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"C55", True  );
+	C66 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"C66", True  );
+	C12 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"C12", True  );
+	C13 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"C13", True  );
+	C23 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"C23", True  );
+	n[0] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"n1", True  );
+	n[1] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"n2", True  );
+	n[2] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"n3", True  );
+	m[0] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"m1", True  );
+	m[1] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"m2", True  );
+	m[2] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"m3", True  );
+	q[0] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"q1", True  );
+	q[1] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"q2", True  );
+	q[2] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"q3", True  );
 
 	_Orthotropic_Init( 
 			self, 

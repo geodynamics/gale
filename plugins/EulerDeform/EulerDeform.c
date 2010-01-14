@@ -51,7 +51,7 @@ ExtensionInfo_Index	EulerDeform_ContextHandle;
 
 
 Index Underworld_EulerDeform_Register( PluginsManager* pluginsMgr ) {
-	return PluginsManager_Submit( pluginsMgr, Underworld_EulerDeform_Type, "0", _Underworld_EulerDeform_DefaultNew );
+	return PluginsManager_Submit( pluginsMgr, Underworld_EulerDeform_Type, (Name)"0", _Underworld_EulerDeform_DefaultNew );
 }
 
 
@@ -72,7 +72,7 @@ void* _Underworld_EulerDeform_DefaultNew( Name name ) {
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
-	return _Codelet_New(  CODELET_PASSARGS  );
+	return _Codelet_New(  CODELET_PASSARGS   );
 }
 
 
@@ -87,20 +87,20 @@ void _Underworld_EulerDeform_AssignFromXML( void* component, Stg_ComponentFactor
 	Journal_DPrintf( Underworld_Debug, "In: %s( void* )\n", __func__ );
 
 	/* Retrieve context. */
-	uwCtx = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
-	ed->context = (AbstractContext*)uwCtx;
+	uwCtx = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data );
+	ed->context = (AbstractContext* )uwCtx;
 
 	/* Create new context. */
-	EulerDeform_ContextHandle = ExtensionManager_Add( uwCtx->extensionMgr, Underworld_EulerDeform_Type, sizeof(EulerDeform_Context) );
+	EulerDeform_ContextHandle = ExtensionManager_Add( uwCtx->extensionMgr, (Name)Underworld_EulerDeform_Type, sizeof(EulerDeform_Context)  );
 	edCtx = ExtensionManager_Get( uwCtx->extensionMgr, uwCtx, EulerDeform_ContextHandle );
 	memset( edCtx, 0, sizeof(EulerDeform_Context) );
 	edCtx->ctx = (AbstractContext*)uwCtx;
 
 	/* Get the time integrator. */
-	edCtx->timeIntegrator = Stg_ComponentFactory_ConstructByName( cf, "timeIntegrator", TimeIntegrator, True, data );
+	edCtx->timeIntegrator = Stg_ComponentFactory_ConstructByName( cf, (Name)"timeIntegrator", TimeIntegrator, True, data  );
 
 	/* Grab the ArtDisplacementField from the dictionary */
-	edCtx->artDField = Stg_ComponentFactory_ConstructByName( cf, "ArtDisplacementField", FeVariable, False, data );
+	edCtx->artDField = Stg_ComponentFactory_ConstructByName( cf, (Name)"ArtDisplacementField", FeVariable, False, data  );
 }
 
 
@@ -121,18 +121,18 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 	edCtx = ExtensionManager_Get( uwCtx->extensionMgr, uwCtx, EulerDeform_ContextHandle );
 
 	/* Get the dictionary. */
-	edDict = Dictionary_Get( uwCtx->dictionary, "EulerDeform" );
-	if( !edDict ) {
+	edDict = Dictionary_Get( uwCtx->dictionary, (Dictionary_Entry_Key)"EulerDeform" );
+	if( !edDict  ) {
 		return;
 	}
 
 	/* Read system list. */
-	sysLst = Dictionary_Entry_Value_GetMember( edDict, "systems" );
+	sysLst = Dictionary_Entry_Value_GetMember( edDict, (Dictionary_Entry_Key)"systems" );
 	if( sysLst ) {
 		unsigned	sys_i;
 
 		/* Allocate for systems. */
-		edCtx->nSystems = Dictionary_Entry_Value_GetCount( sysLst );
+		edCtx->nSystems = Dictionary_Entry_Value_GetCount( sysLst  );
 		edCtx->systems = Memory_Alloc_Array( EulerDeform_System, edCtx->nSystems, "EulerDeform->systems" );
 		memset( edCtx->systems, 0, sizeof(EulerDeform_System) * edCtx->nSystems );
 
@@ -150,42 +150,42 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 			assert( sysDict );
 
 			/* Read contents. */
-			meshName = Dictionary_GetString( sysDict, "mesh" );
-			remesherName = Dictionary_GetString( sysDict, "remesher" );
+			meshName = Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"mesh"  );
+			remesherName = Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"remesher"  );
 
 			if( strcmp( remesherName, "" ) )
-				sys->remesher = Stg_ComponentFactory_ConstructByName( uwCtx->CF, remesherName, Remesher, True, data );
-			name = Dictionary_GetString(sysDict, "displacementField");
+				sys->remesher = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)remesherName, Remesher, True, data  );
+			name = Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"displacementField" );
 
 			if(strcmp(name, ""))
-			    sys->dispField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, name, FeVariable, True, data );
+			    sys->dispField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)name, FeVariable, True, data  );
 			else
 			    sys->dispField = NULL;
 
-			velFieldName = Dictionary_GetString( sysDict, "VelocityField" );
-			sys->interval = Dictionary_GetInt_WithDefault( sysDict, "interval", -1 );
-			sys->wrapTop = Dictionary_GetBool_WithDefault( sysDict, "wrapTop", False );
-			sys->wrapBottom = Dictionary_GetBool_WithDefault( sysDict, "wrapBottom", False );
-			sys->wrapLeft = Dictionary_GetBool_WithDefault( sysDict, "wrapLeft", False );
-			sys->mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, meshName, Mesh, True, data );
+			velFieldName = Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"VelocityField"  );
+			sys->interval = Dictionary_GetInt_WithDefault( sysDict, (Dictionary_Entry_Key)"interval", -1  );
+			sys->wrapTop = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"wrapTop", False  );
+			sys->wrapBottom = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"wrapBottom", False  );
+			sys->wrapLeft = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"wrapLeft", False  );
+			sys->mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)meshName, Mesh, True, data  );
 			/* This line is currently not working, have to manually set the velocity field name.
 				This should be fixed once this plugin has been converted to a component. */
-			/*sys->velField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, velFieldName, FieldVariable, True, data );*/
-			sys->velField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, "VelocityField", FieldVariable, True, data );
+			/*sys->velField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)velFieldName, FieldVariable, True, data  );*/
+			sys->velField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)"VelocityField", FieldVariable, True, data  );
 
-			sys->staticTop = Dictionary_GetBool_WithDefault( sysDict, "staticTop", False );
-			sys->staticBottom = Dictionary_GetBool_WithDefault( sysDict, "staticBottom", False );
-			sys->staticLeft = Dictionary_GetBool_WithDefault( sysDict, "staticLeft", False );
-			sys->staticRight = Dictionary_GetBool_WithDefault( sysDict, "staticRight", False );
-			sys->staticFront = Dictionary_GetBool_WithDefault( sysDict, "staticFront", False );
-			sys->staticBack = Dictionary_GetBool_WithDefault( sysDict, "staticBack", False );
+			sys->staticTop = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"staticTop", False  );
+			sys->staticBottom = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"staticBottom", False  );
+			sys->staticLeft = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"staticLeft", False  );
+			sys->staticRight = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"staticRight", False  );
+			sys->staticFront = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"staticFront", False  );
+			sys->staticBack = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"staticBack", False  );
 			sys->staticSides = sys->staticTop || sys->staticBottom || sys->staticRight || sys->staticLeft || sys->staticFront || sys->staticBack;
 
-			sys->contactRight = Dictionary_GetBool_WithDefault( sysDict, "contactRight", False );
-			sys->contactLeft = Dictionary_GetBool_WithDefault( sysDict, "contactLeft", False );
+			sys->contactRight = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"contactRight", False  );
+			sys->contactLeft = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"contactLeft", False  );
 
 			/* Read the list of variables to interpolate. */
-			varLst = Dictionary_Entry_Value_GetMember( Dictionary_Entry_Value_GetElement( sysLst, sys_i ), "fields" );
+			varLst = Dictionary_Entry_Value_GetMember( Dictionary_Entry_Value_GetElement( sysLst, (Dictionary_Entry_Key)sys_i  ), "fields" );
 
 			if( varLst ) {
 				unsigned	var_i;
@@ -203,18 +203,18 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 					assert( varDict );
 
 					/* Get the field and its variable. */
-					varName = Dictionary_GetString( varDict, "field" );
-					sys->fields[var_i] = Stg_ComponentFactory_ConstructByName( uwCtx->CF, varName, FieldVariable, True, data ); 
+					varName = Dictionary_GetString( varDict, (Dictionary_Entry_Key)"field"  );
+					sys->fields[var_i] = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)varName, FieldVariable, True, data  ); 
 #if 0
-					varName = Dictionary_GetString( varDict, "variable" );
-					sys->vars[var_i] = Stg_ComponentFactory_ConstructByName( uwCtx->CF, varName, Variable, True, data ); 
+					varName = Dictionary_GetString( varDict, (Dictionary_Entry_Key)"variable"  );
+					sys->vars[var_i] = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)varName, Variable, True, data ); 
 #endif
 				}
 			}
 		}
 	}
 
-	for( sys_i = 0; sys_i < edCtx->nSystems; sys_i++ ) {
+	for( sys_i = 0; sys_i < edCtx->nSystems; sys_i++  ) {
 		EulerDeform_System*	sys = edCtx->systems + sys_i;
 
 		/* Create a time integrand for the mesh's coordinates. */
@@ -265,7 +265,7 @@ IndexSet* EulerDeform_CreateStaticSet(EulerDeform_System* sys, int dim) {
   IndexSet	*set;
   IJK			ijk;
 
-  grid = *(Grid**)ExtensionManager_Get ( sys->mesh->info, sys->mesh, ExtensionManager_GetHandle( sys->mesh->info, "vertexGrid" ) );
+  grid = *(Grid**)ExtensionManager_Get ( sys->mesh->info, sys->mesh, ExtensionManager_GetHandle( sys->mesh->info, (Name)"vertexGrid" )  );
 
   nNodes = Mesh_GetDomainSize( sys->mesh, MT_VERTEX );
   set = IndexSet_New( nNodes );
@@ -452,7 +452,7 @@ Bool EulerDeform_TimeDeriv( void* crdAdvector, Index arrayInd, double* timeDeriv
 	     ( velocityField->dim == 3 && isinf(timeDeriv[2]) ) ) 
 	{
 #if 0
-		Journal_Printf( Journal_Register( Error_Type, self->type ),
+		Journal_Printf( Journal_Register( Error_Type, (Name)self->type  ),
 				"Error in func '%s' for particle with index %u.\n\tPosition (%g, %g, %g)\n\tVelocity here is (%g, %g, %g)."
 				"\n\tInterpolation result is %s.\n",
 				__func__, array_I, coord[0], coord[1], coord[2], 
@@ -700,7 +700,7 @@ void EulerDeform_WrapTopSurface( EulerDeform_System* sys, double** oldCrds ) {
 	/* Loop over top internal surface. */
 	mesh = sys->mesh;
 	grm = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
-					     ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+					     ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" )  );
 	EulerDeform_TopInternalLoop( sys, grm, oldCrds, ijk, 0 );
 }
 

@@ -57,45 +57,45 @@
 const Type Underworld_MovingMesh_Type = "Underworld_MovingMesh";
 
 void _Underworld_MovingMesh_AssignFromXML( void* meshExtender, Stg_ComponentFactory* cf, void* data ) {
-	UnderworldContext*  context = Stg_ComponentFactory_ConstructByName( cf, "context", UnderworldContext, True, data );
+	UnderworldContext*  context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data );
 	MeshExtender*       self = (MeshExtender*) meshExtender;
 	Dimension_Index     dim_I = 0;
 	Dimension_Index     axisToRemeshOnTotal = 0;
 	
 	Journal_Firewall( 
-		(Bool)context, 
-		Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
+		(Bool )context, 
+		Journal_Register( Error_Type, (Name)Underworld_MovingMesh_Type  ), 
 		"No context found\n" );
 
 	self->context = (AbstractContext*)context;	
 	self->velocityField = context->velocityField;
 
 	Journal_Firewall( (Bool)self->velocityField, 
-			  Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
+			  Journal_Register( Error_Type, (Name)Underworld_MovingMesh_Type  ), 
 			  "The required velocity field component has not been created or placed on the context.\n");
 
 	self->remeshAccordingToAxis[I_AXIS] = 		
-		Dictionary_GetBool_WithDefault( context->dictionary, "remeshAccordingToIAxis", True );
+		Dictionary_GetBool_WithDefault( context->dictionary, (Dictionary_Entry_Key)"remeshAccordingToIAxis", True  );
 	self->remeshAccordingToAxis[J_AXIS] = 		
-		Dictionary_GetBool_WithDefault( context->dictionary, "remeshAccordingToJAxis", True );
-	if ( self->velocityField->dim == 2 ) {
+		Dictionary_GetBool_WithDefault( context->dictionary, (Dictionary_Entry_Key)"remeshAccordingToJAxis", True );
+	if ( self->velocityField->dim == 2  ) {
 		self->remeshAccordingToAxis[K_AXIS] = False;
 	}
 	else {
 		self->remeshAccordingToAxis[K_AXIS] = 		
-			Dictionary_GetBool_WithDefault( context->dictionary, "remeshAccordingToKAxis", True );
+			Dictionary_GetBool_WithDefault( context->dictionary, (Dictionary_Entry_Key)"remeshAccordingToKAxis", True );
 	}
 
 	axisToRemeshOnTotal = 0;
 	for ( dim_I = 0; dim_I < self->velocityField->dim; dim_I++ ) {
-		if ( self->remeshAccordingToAxis[dim_I] == True ) {
+		if ( self->remeshAccordingToAxis[dim_I] == True  ) {
 			axisToRemeshOnTotal++;
 		}
 	}
 
 	Journal_Firewall( 
 		axisToRemeshOnTotal > 0,
-		Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
+		Journal_Register( Error_Type, (Name)Underworld_MovingMesh_Type  ), 
 		"Error: in %s: you have disabled remeshing on all axis. Please set at least one axis to remesh on "
 		"using the remeshAccordingToIAxis, remeshAccordingToJAxis, remeshAccordingToKAxis dictionary "
 		"parameters, if you wish to use the remesher.\n",
@@ -117,8 +117,8 @@ void Underworld_MovingMesh_Build( void* meshExtender, void* data ) {
 
 	mesh = (Mesh*)self->velocityField->feMesh;
 
-	Journal_Firewall( ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) != (unsigned)-1, 
-			  Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
+	Journal_Firewall( ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" ) != (unsigned )-1, 
+			  Journal_Register( Error_Type, (Name)Underworld_MovingMesh_Type  ), 
 			  "Error: in %s: provided Velocity field's mesh doesn't have a regular decomposition.\n",
 			  __func__ );
 }
@@ -128,8 +128,8 @@ void Underworld_MovingMesh_Remesh( TimeIntegrator* timeIntegrator, MeshExtender*
 	FeVariable*           velocityField = self->velocityField;
 	Mesh*                 mesh          = (Mesh*) velocityField->feMesh;
 	unsigned	      rank;
-	Stream*               debug = Journal_Register( Debug_Type, Underworld_MovingMesh_Type );
-	Stream*               info = Journal_Register( Info_Type, self->type );
+	Stream*               debug = Journal_Register( Debug_Type, (Name)Underworld_MovingMesh_Type  );
+	Stream*               info = Journal_Register( Info_Type, (Name)self->type  );
 	double                remeshTime, remeshTimeStart, remeshTimeEnd;
 	Dimension_Index       dim_I = 0;
 	Dimension_Index       axisToRemeshOnTotal = 0;
@@ -158,7 +158,7 @@ void Underworld_MovingMesh_Remesh( TimeIntegrator* timeIntegrator, MeshExtender*
 
 	Journal_Firewall( 
 		axisToRemeshOnTotal > 0,
-		Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
+		Journal_Register( Error_Type, (Name)Underworld_MovingMesh_Type  ), 
 		"Error: in %s: you have disabled remeshing on all axis. Please set at least one axis to remesh on "
 		"using the remeshAccordingToIAxis, remeshAccordingToJAxis, remeshAccordingToKAxis dictionary "
 		"parameters, if you wish to use the remesher.\n",
@@ -170,22 +170,22 @@ void Underworld_MovingMesh_Remesh( TimeIntegrator* timeIntegrator, MeshExtender*
 	if ( self->context->timeStep > 1 ) {
 		Journal_Firewall( 
 			dt > 0.0,
-			Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
+			Journal_Register( Error_Type, (Name)Underworld_MovingMesh_Type  ), 
 			"Error- in %s: in timeStep %u, provided Context \"%s\"'s dt <= 0.\n",
 			__func__, self->context->timeStep, self->context->name );
 	}	
 	
 	remeshTimeStart = MPI_Wtime();
 
-	Journal_Firewall( ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) != (unsigned)-1, 
-			  Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
+	Journal_Firewall( ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" ) != (unsigned )-1, 
+			  Journal_Register( Error_Type, (Name)Underworld_MovingMesh_Type  ), 
 			  "Error: in %s: provided Velocity field's mesh doesn't have a regular decomposition.\n",
 			  __func__ );
 
 	/*
 	Journal_Firewall( 
 		True == Stg_Class_IsInstance( velocityField->feMesh->layout->elementLayout, ParallelPipedHexaEL_Type ),
-		Journal_Register( Error_Type, Underworld_MovingMesh_Type ), 
+		Journal_Register( Error_Type, (Name)Underworld_MovingMesh_Type  ), 
 		"Error: in %s: provided Velocity field's mesh doesn't have a %s elementLayout.\n",
 		__func__, ParallelPipedHexaEL_Type );
 	*/
@@ -261,7 +261,7 @@ void Underworld_MovingMesh_RemeshAccordingToSidewall_SingleAxis(
 	double                     newCoordInRemeshAxis = 0;
 	double                     tolerance;
 
-	Stream* debug = Journal_Register( Debug_Type, Underworld_MovingMesh_Type );
+	Stream* debug = Journal_Register( Debug_Type, (Name)Underworld_MovingMesh_Type  );
 
 	/*Journal_DPrintf( debug, "In %s(): for remeshAxis %c\n", __func__, IJKTopology_DimNumToDimLetter[remeshAxis] );*/
 	Stream_Indent( debug );	
@@ -270,7 +270,7 @@ void Underworld_MovingMesh_RemeshAccordingToSidewall_SingleAxis(
 	tolerance = (maxCrd[remeshAxis] - minCrd[remeshAxis]) * 1e-9;
 
 	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
-						  ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+						  ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" )  );
 
 	sideWallNodeCount = vertGrid->sizes[ otherAxisA ] * vertGrid->sizes[ otherAxisB ];
 	minGlobal = Memory_Alloc_Array( double, sideWallNodeCount, "min node coords" );
@@ -429,7 +429,7 @@ void Underworld_MovingMesh_CalculateMinOrMaxCoordsOnSidewall(
 	tolerance = (maxCrd[remeshAxis] - minCrd[remeshAxis]) * 1e-9;
 
 	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
-						  ExtensionManager_GetHandle( mesh->info, "vertexGrid" ) );
+						  ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" )  );
 
 	sideWallNodeCount = vertGrid->sizes[ otherAxisA ] * vertGrid->sizes[ otherAxisB ];
 	newWallCoordsInRemeshAxis = Memory_Alloc_Array( double, sideWallNodeCount, "newWallCoordsInRemeshAxis" );
@@ -469,9 +469,9 @@ void Underworld_MovingMesh_CalculateMinOrMaxCoordsOnSidewall(
 					Stg_Class_IsInstance( mesh->layout->elementLayout, ParallelPipedHexaEL_Type ) )
 				{
 					double                     differenceBetweenCurrAndPrev = 0;
-					Stream*    errorStream = Journal_Register( Error_Type, self->type );
+					Stream*    errorStream = Journal_Register( Error_Type, (Name)self->type );
 					differenceBetweenCurrAndPrev = fabs( newWallCoordsInRemeshAxis[ sideWallNode_I ]
-						- lastCalculatedNewWallCoordInRemeshAxis );
+						- lastCalculatedNewWallCoordInRemeshAxis  );
 
 					Journal_Firewall( differenceBetweenCurrAndPrev < tolerance,
 						errorStream,
@@ -557,7 +557,7 @@ void* _Underworld_MovingMesh_DefaultNew( Name name ) {
 /* This function is automatically run by StGermain when this plugin is loaded. The name must be "<plugin-name>_Register". */
 Index Underworld_MovingMesh_Register( PluginsManager* pluginsManager ) {
 	/* A plugin is only properly registered once it returns the handle provided when submitting a codelet to StGermain. */
-	return PluginsManager_Submit( pluginsManager, Underworld_MovingMesh_Type, "0", _Underworld_MovingMesh_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_MovingMesh_Type, (Name)"0", _Underworld_MovingMesh_DefaultNew  );
 }
 
 

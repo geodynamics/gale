@@ -122,15 +122,15 @@ void _BaseRecoveryFeVar_AssignFromXML( void* _self, Stg_ComponentFactory* cf, vo
   vr = self->context->variable_Register;
 
   /* get the initial field */
-  rawField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "RawField", FeVariable, True, data ); 
+  rawField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"RawField", FeVariable, True, data  ); 
 
   /* get the order of interpolation */
-  rawOrderOfInterpolation = Stg_ComponentFactory_GetInt( cf, self->name , "orderOfInterpolation", 1 );
+  rawOrderOfInterpolation = Stg_ComponentFactory_GetInt( cf, self->name , (Dictionary_Entry_Key)"orderOfInterpolation", 1  );
 
-  coeffInterpolation = Stg_ComponentFactory_GetBool( cf, self->name , "coeffInterpolation", True );
+  coeffInterpolation = Stg_ComponentFactory_GetBool( cf, self->name , (Dictionary_Entry_Key)"coeffInterpolation", True );
 
-  Journal_Firewall( (rawOrderOfInterpolation < 2 ) ,
-      Journal_Register( Error_Type, "BadNews" ),
+  Journal_Firewall( (rawOrderOfInterpolation < 2  ) ,
+      Journal_Register( Error_Type, (Name)"BadNews"  ),
       "Error in %s, the orderOfInterpolation must be: 1, higher order coefficients haven't been implemented. Currently it's %d\n"
       "The larger the number the orderOfInterpolation:\n"
       " * the more accurate the recoveredField\n"
@@ -158,7 +158,7 @@ void _BaseRecoveryFeVar_Build( void* _self, void* data ) {
 	componentsCount = self->orderOfInterpolation * self->fieldComponentCount;
   /* create an variable names - create an extra variableName for the dofLayout */
 	variableName = Memory_Alloc_Array( char*, componentsCount * sizeof(char*) + 1, "names");
-	tmpName = Stg_Object_AppendSuffix( self, self->name );
+	tmpName = Stg_Object_AppendSuffix( self, (Name)self->name  );
 
   /* setup the sync and the nodeDomainCount */
 	sync = Mesh_GetSync( self->feMesh, MT_VERTEX );

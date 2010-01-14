@@ -85,15 +85,15 @@ void _Underworld_solA_AssignFromXML( void* analyticSolution, Stg_ComponentFactor
 	/* Construct Parent */
 	_FieldTest_AssignFromXML( self, cf, data );
 
-	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, "solA_sigma", 1.0 );
-	Z = Stg_ComponentFactory_GetRootDictDouble( cf, "solA_Z", 1.0 );
-	wavenumberY = Stg_ComponentFactory_GetRootDictDouble( cf, "wavenumberY", 1.5 );
+	sigma = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solA_sigma", 1.0  );
+	Z = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"solA_Z", 1.0  );
+	wavenumberY = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"wavenumberY", 1.5  );
 	n = Stg_ComponentFactory_GetRootDictInt( cf, "wavenumberX", 1 );
 	
 	_Underworld_solA_Init( self, sigma, Z, wavenumberY, n );
 
 	isCorrectInput = solA_checkInputParams( self );
-	Journal_Firewall( isCorrectInput , Journal_Register( Error_Type, "solA" ),
+	Journal_Firewall( isCorrectInput , Journal_Register( Error_Type, (Name)"solA"  ),
 			"Error in function %s: Bad Input parameters, solution check valid values in .tex documentation\n",
 			__func__ );
 }
@@ -141,7 +141,7 @@ void* _Underworld_solA_DefaultNew( Name name ) {
 }
 
 Index Underworld_Velic_solA_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, Underworld_solA_Type, "0", _Underworld_solA_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, Underworld_solA_Type, (Name)"0", _Underworld_solA_DefaultNew  );
 }
 
 

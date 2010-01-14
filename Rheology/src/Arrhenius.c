@@ -124,18 +124,17 @@ void _Arrhenius_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* d
    _Rheology_AssignFromXML( self, cf, data );
 
    /* TODO: 'KeyFallback' soon to be deprecated/updated */
-   temperatureField = Stg_ComponentFactory_ConstructByNameWithKeyFallback(
-                        cf, self->name, "TemperatureField", "TemperatureField", FeVariable, True, data );
+   temperatureField = Stg_ComponentFactory_ConstructByNameWithKeyFallback( cf, self->name, (Name)"TemperatureField", (Dictionary_Entry_Key)"TemperatureField", FeVariable, True, data  );
    /*temperatureField = Stg_ComponentFactory_ConstructByKey(
          cf, self->name, "TemperatureField", FeVariable, True );*/
 
    _Arrhenius_Init(
          self,
          temperatureField,
-         Stg_ComponentFactory_GetDouble( cf, self->name, "eta0", 1.0 ),
-         Stg_ComponentFactory_GetDouble( cf, self->name, "activationEnergy", 0.0 ),
-         Stg_ComponentFactory_GetDouble( cf, self->name, "activationVolume", 0.0 ),
-         Stg_ComponentFactory_GetDouble( cf, self->name, "referenceTemperature", 1.0 ) );
+         Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"eta0", 1.0  ),
+         Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"activationEnergy", 0.0  ),
+         Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"activationVolume", 0.0  ),
+         Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"referenceTemperature", 1.0 )  );
 }
 
 void _Arrhenius_Destroy( void* _self, void* data ) {

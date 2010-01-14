@@ -131,8 +131,8 @@ void _AlignmentSwarmVariable_AssignFromXML( void* druckerPrager, Stg_ComponentFa
    _SwarmVariable_AssignFromXML( self, cf, data );
 
    /* AssignFromXML 'AlignmentSwarmVariable' stuff */
-   velocityField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField", FeVariable, True, data ) ;
-   director = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Director", Director, True, data ) ;
+   velocityField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"VelocityField", FeVariable, True, data  ) ;
+   director = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Director", Director, True, data  ) ;
 
    _AlignmentSwarmVariable_Init( self, velocityField, director );
 }
