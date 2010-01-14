@@ -140,7 +140,7 @@ void _MaterialFeVariable_AssignFromXML( void* materialFeVariable, Stg_ComponentF
 	MaterialFeVariable*	self = (MaterialFeVariable*) materialFeVariable;
 	Material*				material;
 	
-	material = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Material", Material, True, data );
+	material = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Material", Material, True, data  );
 
 	/* Construct Parent */
 	_ParticleFeVariable_AssignFromXML( self, cf, data );
@@ -161,7 +161,7 @@ void _MaterialFeVariable_Build( void* materialFeVariable, void* data ) {
 	if ( swarm->swarmVariable_Register )
 		variable_Register = swarm->swarmVariable_Register->variable_Register;
 
-	tmpName = Stg_Object_AppendSuffix( self, "DataVariable" );
+	tmpName = Stg_Object_AppendSuffix( self, (Name)"DataVariable"  );
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	self->dataVariable = Variable_NewScalar( 
 		tmpName,
@@ -174,7 +174,7 @@ void _MaterialFeVariable_Build( void* materialFeVariable, void* data ) {
 	Memory_Free( tmpName );
 	self->fieldComponentCount = 1;
 	
-	tmpName = Stg_Object_AppendSuffix( self, "DofLayout" );
+	tmpName = Stg_Object_AppendSuffix( self, (Name)"DofLayout"  );
 	self->dofLayout = DofLayout_New( tmpName, self->context, variable_Register, ((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, NULL );
 	DofLayout_AddAllFromVariableArray( self->dofLayout, 1, &self->dataVariable );
 	Memory_Free( tmpName );

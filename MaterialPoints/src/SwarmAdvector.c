@@ -214,9 +214,9 @@ void _SwarmAdvector_AssignFromXML( void* swarmAdvector, Stg_ComponentFactory* cf
 
 	_TimeIntegrand_AssignFromXML( self, cf, data );
 
-	velocityField      = Stg_ComponentFactory_ConstructByKey( cf, self->name, "VelocityField", FeVariable,  True, data );
-	swarm              = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm",  MaterialPointsSwarm, True, data );
-	periodicBCsManager = Stg_ComponentFactory_ConstructByKey( cf, self->name, "PeriodicBCsManager", PeriodicBoundariesManager, False, data );
+	velocityField      = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"VelocityField", FeVariable, True, data  );
+	swarm              = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", MaterialPointsSwarm, True, data  );
+	periodicBCsManager = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PeriodicBCsManager", PeriodicBoundariesManager, False, data  );
 
 	_SwarmAdvector_Init( self, velocityField, swarm, periodicBCsManager );
 }
@@ -273,7 +273,7 @@ Bool _SwarmAdvector_TimeDeriv( void* swarmAdvector, Index array_I, double* timeD
 			( self->swarm->dim == 3 && isinf(timeDeriv[2]) ) ) 
 	{
 		#if 0
-		Journal_Printf( Journal_Register( Error_Type, self->type ),
+		Journal_Printf( Journal_Register( Error_Type, (Name)self->type  ),
 			"Error in func '%s' for particle with index %u.\n\tPosition (%g, %g, %g)\n\tVelocity here is (%g, %g, %g)."
 			"\n\tInterpolation result is %s.\n",
 			__func__, array_I, coord[0], coord[1], coord[2], 

@@ -76,7 +76,7 @@ void _ManyToOneMapper_Init( void* mapper, MaterialPointsSwarm** materialSwarms, 
 	/* Each integration point will have a reference to a material particle (one for each swarm) */
 	ExtensionManager_SetLockDown( self->integrationSwarm->particleExtensionMgr, False );
 	for ( i = 0; i < self->materialSwarmCount; ++i ) {
-		ExtensionManager_Add( self->integrationSwarm->particleExtensionMgr, materialSwarms[i]->name, sizeof(MaterialPointRef) );
+		ExtensionManager_Add( self->integrationSwarm->particleExtensionMgr, (Name)materialSwarms[i]->name, sizeof(MaterialPointRef)  );
 	}
 	ExtensionManager_SetLockDown( self->integrationSwarm->particleExtensionMgr, True );
 }
@@ -129,18 +129,11 @@ void _ManyToOneMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, voi
 	
 	_IntegrationPointMapper_AssignFromXML( self, cf, data );
 
-	materialSwarms = (MaterialPointsSwarm**)Stg_ComponentFactory_ConstructByList( 
-		cf, 
-		self->name, 
-		IntegrationPointsSwarm_Type, 
-		Stg_ComponentFactory_Unlimited, 
-		IntegrationPointsSwarm,
-		True,
-		&(self->materialSwarmCount), data );
+	materialSwarms = (MaterialPointsSwarm**)Stg_ComponentFactory_ConstructByList( cf, self->name, (Dictionary_Entry_Key)IntegrationPointsSwarm_Type, Stg_ComponentFactory_Unlimited, IntegrationPointsSwarm, True, &(self->materialSwarmCount), data  );
 
 	Journal_Firewall( 
 		self->materialSwarmCount < 1,
-		Journal_Register( Error_Type, self->type ),
+		Journal_Register( Error_Type, (Name)self->type  ),
 		"In func %s, there must be at least one swarm in the material swarm list!\n", __func__ );
 
 	_ManyToOneMapper_Init( self, materialSwarms, self->materialSwarmCount );

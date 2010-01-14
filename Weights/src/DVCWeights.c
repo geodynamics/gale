@@ -168,10 +168,10 @@ void _DVCWeights_AssignFromXML( void* dvcWeights, Stg_ComponentFactory* cf, void
 
     _WeightsCalculator_AssignFromXML( self, cf, data );
 
-    defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolution", 10 );
-    resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionX", defaultResolution );
-    resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionY", defaultResolution );
-    resolution[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionZ", defaultResolution );
+    defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolution", 10  );
+    resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolutionX", defaultResolution  );
+    resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolutionY", defaultResolution  );
+    resolution[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolutionZ", defaultResolution  );
        
     _DVCWeights_Init( self, resolution );
 }
@@ -612,7 +612,7 @@ void _DVCWeights_InitialiseStructs( struct chain **bchain, struct particle **pLi
     int i;
     // init the data structures
     if( (*bchain = (struct chain *)malloc( nump*sizeof(struct chain ) )) == 0){
-        Journal_Firewall( 0 , Journal_Register(Error_Type, "DVC_Weights"), "No memory for bchain in '%s'\nCannot continue.\n", __func__);
+        Journal_Firewall( 0 , Journal_Register( Error_Type, (Name)"DVC_Weights" ), "No memory for bchain in '%s'\nCannot continue.\n", __func__);
     }
     // note that doing bchain[i]->new... doesn't work
     for(i=0;i<nump;i++){
@@ -622,7 +622,7 @@ void _DVCWeights_InitialiseStructs( struct chain **bchain, struct particle **pLi
         (*bchain)[i].new_bound_cells_malloced = DVC_INC;
     }
     if( (*pList = (struct particle *)malloc( nump*sizeof(struct particle ) )) == 0){
-        Journal_Firewall( 0 , Journal_Register(Error_Type, "DVC_Weights"),"No memory for pList in '%s'\nCannot continue.\n", __func__);
+        Journal_Firewall( 0 , Journal_Register( Error_Type, (Name)"DVC_Weights" ),"No memory for pList in '%s'\nCannot continue.\n", __func__);
     }
 
     /* Initialise all particle values to zero */
@@ -639,7 +639,7 @@ void _DVCWeights_InitialiseStructs2D( struct chain **bchain, struct particle2d *
     int i;
     // init the data structures
     if( (*bchain = (struct chain *)malloc( nump*sizeof(struct chain ) )) == 0){
-        Journal_Firewall( 0 , Journal_Register(Error_Type, "DVC_Weights"),"No memory for bchain in '%s'\nCannot continue.\n", __func__);
+        Journal_Firewall( 0 , Journal_Register( Error_Type, (Name)"DVC_Weights" ),"No memory for bchain in '%s'\nCannot continue.\n", __func__);
     }
     //
     for(i=0;i<nump;i++){
@@ -649,7 +649,7 @@ void _DVCWeights_InitialiseStructs2D( struct chain **bchain, struct particle2d *
         (*bchain)[i].new_bound_cells_malloced = DVC_INC;
     }
     if( (*pList = (struct particle2d *)malloc( nump*sizeof(struct particle2d ) )) == 0){
-        Journal_Firewall( 0 , Journal_Register(Error_Type, "DVC_Weights"),"No memory for pList in '%s'\nCannot continue.\n", __func__);
+        Journal_Firewall( 0 , Journal_Register( Error_Type, (Name)"DVC_Weights" ),"No memory for pList in '%s'\nCannot continue.\n", __func__);
     }
 
     /* Initialise all particle values to zero */
@@ -784,7 +784,7 @@ void _DVCWeights_Calculate3D( void* dvcWeights, void* _swarm, Cell_LocalIndex lC
 
     nump = cParticleCount = swarm->cellParticleCountTbl[lCell_I];
 
-    Journal_Firewall( nump , Journal_Register(Error_Type, "DVC_Weights"), "Error in %s: Problem has an under resolved cell (Cell Id = %d), add more particles to your model\n", __func__, lCell_I );
+    Journal_Firewall( nump , Journal_Register( Error_Type, (Name)"DVC_Weights" ), "Error in %s: Problem has an under resolved cell (Cell Id = %d), add more particles to your model\n", __func__, lCell_I );
 
     dx = (BBXMAX - BBXMIN)/numx;
     dy = (BBYMAX - BBYMIN)/numy;
@@ -868,7 +868,7 @@ void _DVCWeights_Calculate2D( void* dvcWeights, void* _swarm, Cell_LocalIndex lC
 
     nump = cParticleCount = swarm->cellParticleCountTbl[lCell_I];
 
-    Journal_Firewall( nump , Journal_Register(Error_Type, "DVC_Weights"), "Error in %s: Problem has an under resolved cell (Cell Id = %d), add more particles to your model\n", __func__, lCell_I );
+    Journal_Firewall( nump , Journal_Register( Error_Type, (Name)"DVC_Weights" ), "Error in %s: Problem has an under resolved cell (Cell Id = %d), add more particles to your model\n", __func__, lCell_I );
 
     dx = (BBXMAX - BBXMIN)/numx;
     dy = (BBYMAX - BBYMIN)/numy;

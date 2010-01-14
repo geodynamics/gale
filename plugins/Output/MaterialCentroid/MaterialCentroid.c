@@ -57,23 +57,23 @@ void MaterialCentroid( PICelleratorContext* context ) {
 	Coord                       centroid;
 	double                      volume;
 	static Bool                 beenHere              = False;
-	Stream*                     stream                = Journal_Register( Info_Type, "MaterialCentroid" );
+	Stream*                     stream                = Journal_Register( Info_Type, (Name)"MaterialCentroid" );
 
-	if (!beenHere) {
+	if (!beenHere ) {
 		Name                 swarmName;
 		Name                 materialName;
 		Name                 filename;
       Bool                 fileOpened;
-      Stream*              errorStream  = Journal_Register( Error_Type, CURR_MODULE_NAME );
+      Stream*              errorStream  = Journal_Register( Error_Type, (Name)CURR_MODULE_NAME  );
 
 		swarmName = Dictionary_GetString_WithDefault( context->dictionary, "MaterialCentroid_Swarm", "picIntegrationPoints" );
 		
 		/* Get Swarm */
-		swarm = (IntegrationPointsSwarm*) LiveComponentRegister_Get( context->CF->LCRegister, swarmName );
-		assert( swarm );
+		swarm = (IntegrationPointsSwarm*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)swarmName );
+		assert( swarm  );
 	
 		/* Get Material */
-		materialName = Dictionary_GetString( context->dictionary, "CentroidMaterial" );
+		materialName = Dictionary_GetString( context->dictionary, (Dictionary_Entry_Key)"CentroidMaterial"  );
 		material = Materials_Register_GetByName( swarm->materials_Register, materialName );
 		assert( material );
 		
@@ -113,7 +113,7 @@ void _PICellerator_MaterialCentroid_AssignFromXML( void* component, Stg_Componen
 
 	AbstractContext* context;
 
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  ); 
 	ContextEP_Append( context, AbstractContext_EP_FrequentOutput, MaterialCentroid );
 }
 
@@ -142,8 +142,7 @@ void* _PICellerator_MaterialCentroid_DefaultNew( Name name ) {
 Index PICellerator_MaterialCentroid_Register( PluginsManager* pluginsManager ) {
 	Index result;
 
-	result = PluginsManager_Submit( pluginsManager, PICellerator_MaterialCentroid_Type, "0",
-		_PICellerator_MaterialCentroid_DefaultNew );
+	result = PluginsManager_Submit( pluginsManager, PICellerator_MaterialCentroid_Type, (Name)"0", _PICellerator_MaterialCentroid_DefaultNew  );
 
 	return result;
 }

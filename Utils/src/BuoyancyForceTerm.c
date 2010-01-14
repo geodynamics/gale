@@ -173,26 +173,26 @@ void _BuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf
 	/* Construct Parent */
 	_ForceTerm_AssignFromXML( self, cf, data );
 
-	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
-	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TemperatureField", FeVariable, False, data ) ;
-	gravity = Stg_ComponentFactory_GetDouble( cf, self->name, "gravity", 0.0 );
-	adjust = Stg_ComponentFactory_GetBool( cf, self->name, "adjust", False );
+	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, (Dictionary_Entry_Key)self->name )  );
+	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"TemperatureField", FeVariable, False, data  ) ;
+	gravity = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"gravity", 0.0  );
+	adjust = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"adjust", False  );
 
-	direcList = Dictionary_Get( dict, "gravityDirection" );
+	direcList = Dictionary_Get( dict, (Dictionary_Entry_Key)"gravityDirection" );
 
 	if( direcList ) {
-		nDims = Dictionary_Entry_Value_GetCount( direcList );
+		nDims = Dictionary_Entry_Value_GetCount( direcList  );
 		direc = AllocArray( double, nDims );
 
 		for( d_i = 0; d_i < nDims; d_i++ ) {
 			tmp = Dictionary_Entry_Value_GetElement( direcList, d_i );
 			rootKey = Dictionary_Entry_Value_AsString( tmp );
 
-			if( !Stg_StringIsNumeric( rootKey ) )
-				tmp = Dictionary_Get( cf->rootDict, rootKey );
+			if( !Stg_StringIsNumeric( (char *)rootKey )  )
+				tmp = Dictionary_Get( cf->rootDict, (Dictionary_Entry_Key)rootKey );
 			direc[d_i] = Dictionary_Entry_Value_AsDouble( tmp );
 		}
-		if( nDims == 2 )
+		if( nDims == 2  )
 			Vec_Norm2D( direc, direc );
 		else
 			Vec_Norm3D( direc, direc );
@@ -237,8 +237,8 @@ void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 		material = Materials_Register_GetByIndex( materials_Register, material_I );
 		materialExt = ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
 
-		materialExt->density = Stg_ComponentFactory_GetDouble( cf, material->name, "density", 0.0 );
-		materialExt->alpha   = Stg_ComponentFactory_GetDouble( cf, material->name, "alpha",   0.0 );
+		materialExt->density = Stg_ComponentFactory_GetDouble( cf, material->name, (Dictionary_Entry_Key)"density", 0.0  );
+		materialExt->alpha   = Stg_ComponentFactory_GetDouble( cf, material->name, (Dictionary_Entry_Key)"alpha", 0.0  );
 	}
 	
 	/* Create Swarm Variables of each material swarm this ip swarm is mapped against */
@@ -247,7 +247,7 @@ void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 	self->alphaSwarmVariables   = Memory_Alloc_Array( MaterialSwarmVariable*, self->materialSwarmCount, "AlphaVariables" );
 	
 	for ( materialSwarm_I = 0; materialSwarm_I < self->materialSwarmCount; ++materialSwarm_I ) {
-		name = Stg_Object_AppendSuffix( materialSwarms[materialSwarm_I], "Density" );
+		name = Stg_Object_AppendSuffix( materialSwarms[materialSwarm_I], (Name)"Density"  );
 		self->densitySwarmVariables[materialSwarm_I] = MaterialSwarmVariable_New( 
 				name,
 				(AbstractContext*)self->context,
@@ -258,7 +258,7 @@ void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 				GetOffsetOfMember( *materialExt, density ) );
 		Memory_Free( name );
 
-		name = Stg_Object_AppendSuffix( materialSwarms[materialSwarm_I], "Alpha" );
+		name = Stg_Object_AppendSuffix( materialSwarms[materialSwarm_I], (Name)"Alpha"  );
 		self->alphaSwarmVariables[materialSwarm_I] = MaterialSwarmVariable_New( 
 				name,
 				(AbstractContext*)self->context,

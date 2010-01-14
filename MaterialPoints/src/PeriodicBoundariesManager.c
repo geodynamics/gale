@@ -126,7 +126,7 @@ void _PeriodicBoundariesManager_Init(
 	self->delta = 0;
 	self->size = 0;
 	self->boundaries = NULL;
-	self->debug = Journal_Register( Debug_Type, self->type );
+	self->debug = Journal_Register( Debug_Type, (Name)self->type  );
 }
 
 void _PeriodicBoundariesManager_AssignFromXML( void* periodicBCsManager, Stg_ComponentFactory* cf, void* data ) {
@@ -136,13 +136,13 @@ void _PeriodicBoundariesManager_AssignFromXML( void* periodicBCsManager, Stg_Com
 	Swarm*							swarm = NULL;
 	PICelleratorContext*			context;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", PICelleratorContext, False, data );
-	if( !context ) 
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", PICelleratorContext, False, data );
+	if( !context  ) 
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", PICelleratorContext, True, data  );
 
 	dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
-	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "mesh", Mesh, True, data );
-	swarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Swarm", Swarm, True, data );
+	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"mesh", Mesh, True, data  );
+	swarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", Swarm, True, data  );
 
 	_PeriodicBoundariesManager_Init( self, context, mesh, swarm, dictionary );
 }
@@ -228,7 +228,7 @@ void _PeriodicBoundariesManager_Build( void* periodicBCsManager, void* data ) {
 	self->boundaries = Memory_Alloc_Array( PeriodicBoundary, self->size, "PeriodicBoundariesManager->boundaries" );
 
 	if ( self->dictionary ) {
-		periodicBCsList = Dictionary_Get( self->dictionary, "PeriodicBoundaries" );
+		periodicBCsList = Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"PeriodicBoundaries" );
 		
 		/* Dictionary entry is optional - users may prefer to enter in code */
 		if ( periodicBCsList ) {
@@ -239,7 +239,7 @@ void _PeriodicBoundariesManager_Build( void* periodicBCsManager, void* data ) {
 			
 			numPeriodicBCs = Dictionary_Entry_Value_GetCount( periodicBCsList );
 
-			for ( periodicBC_I = 0; periodicBC_I < numPeriodicBCs; periodicBC_I++ ) {
+			for ( periodicBC_I = 0; periodicBC_I < numPeriodicBCs; periodicBC_I++  ) {
 				periodicBC = Dictionary_Entry_Value_GetElement( periodicBCsList, periodicBC_I );
 				perBCAxis = Dictionary_Entry_Value_AsString( periodicBC );
 

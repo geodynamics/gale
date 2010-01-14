@@ -179,11 +179,11 @@ void _IntegrationPointsSwarm_AssignFromXML( void* integrationPoints, Stg_Compone
 	/* This will also call _Swarm_Init */
 	_Swarm_AssignFromXML( self, cf, data );
 
-	mesh           = Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeMesh", FeMesh, True, data );
-	timeIntegrator = Stg_ComponentFactory_ConstructByKey( cf, self->name, "TimeIntegrator", TimeIntegrator, True, data );
-	weights        = Stg_ComponentFactory_ConstructByKey( cf, self->name, "WeightsCalculator", WeightsCalculator, False, data );
-	mapper         = Stg_ComponentFactory_ConstructByKey( cf, self->name, "IntegrationPointMapper", IntegrationPointMapper, True, data );
-	recalculateWeights = Stg_ComponentFactory_GetBool( cf, self->name, "recalculateWeights", True );
+	mesh           = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"FeMesh", FeMesh, True, data  );
+	timeIntegrator = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"TimeIntegrator", TimeIntegrator, True, data  );
+	weights        = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"WeightsCalculator", WeightsCalculator, False, data  );
+	mapper         = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"IntegrationPointMapper", IntegrationPointMapper, True, data  );
+	recalculateWeights = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"recalculateWeights", True  );
 
 	Journal_Firewall (
 			weights != NULL ||
@@ -234,19 +234,13 @@ void _IntegrationPointsSwarm_Init(
 	-- PatrickSunter 12 June 2006 */
 	self->isSwarmTypeToCheckPointAndReload = False;
 
-	self->weightVariable = Swarm_NewScalarVariable( 
-			self,
-			"Weight",
-			GetOffsetOfMember( particle , weight ), 
+	self->weightVariable = Swarm_NewScalarVariable( self, (Name)"Weight", GetOffsetOfMember( particle , weight  ), 
 			Variable_DataType_Double );
 
    LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->weightVariable );
    LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)self->weightVariable->variable );
 
-	self->localCoordVariable = Swarm_NewVectorVariable(
-		self,
-		"LocalElCoord",
-		GetOffsetOfMember( localParticle , xi ),
+	self->localCoordVariable = Swarm_NewVectorVariable( self, (Name)"LocalElCoord", GetOffsetOfMember( localParticle , xi ),
 		Variable_DataType_Double,
 		self->dim,
 		"Xi",
@@ -433,7 +427,7 @@ void IntegrationPointsSwarm_RemapIntegrationPointsAndRecalculateWeights( void* s
 		Journal_DPrintf( self->debug, "...weights updating finished - took %g secs.\n", weightsUpdateTime );
 	}	
 	else {
-		Stream* errorStream = Journal_Register( Error_Type, self->type );
+		Stream* errorStream = Journal_Register( Error_Type, (Name)self->type  );
 		Journal_Firewall( Stg_Class_IsInstance( self->mapper, GaussMapper_Type ) ||
 				  Stg_Class_IsInstance( self->mapper, GaussCoincidentMapper_Type ) ||
 				  !strcmp(self->mapper->type, "PCDVCGaussMapper"), errorStream,

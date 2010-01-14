@@ -57,14 +57,14 @@ void EscapedRoutineSuite_Setup( EscapedRoutineSuiteData* data ) {
 
    pcu_filename_input( "EscapedRoutineSuite.xml", xmlInputFilename );
    data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
-   data->context = (FiniteElementContext*) LiveComponentRegister_Get( data->cf->LCRegister, "context" );
-   data->swarm = (Swarm*) LiveComponentRegister_Get( data->context->CF->LCRegister, "swarm" );
-   data->escRoutine = (EscapedRoutine*) LiveComponentRegister_Get( data->context->CF->LCRegister, "escapedRoutine" );
+   data->context = (FiniteElementContext*) LiveComponentRegister_Get( data->cf->LCRegister, (Name)"context" );
+   data->swarm = (Swarm* ) LiveComponentRegister_Get( data->context->CF->LCRegister, (Name)"swarm" );
+   data->escRoutine = (EscapedRoutine* ) LiveComponentRegister_Get( data->context->CF->LCRegister, (Name)"escapedRoutine" );
 	stgMainBuildAndInitialise( data->cf );
 
    /* Use our test param to mark all the particles as not to be removed by default*/
    for ( lParticle_I=0; lParticle_I < data->swarm->particleLocalCount; lParticle_I++ ) {
-      ((Particle*)Swarm_ParticleAt( data->swarm, lParticle_I ))->toRemove = False;
+      ((Particle* )Swarm_ParticleAt( data->swarm, lParticle_I ))->toRemove = False;
    }
 } 
 

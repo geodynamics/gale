@@ -174,7 +174,7 @@ void _GaussCoincidentMapper_Map( void* mapper ) {
 
 #ifdef CAUTIOUS
     Index						dim_I;
-    Stream*						errorStream = Journal_Register( Error_Type, self->type );
+    Stream*						errorStream = Journal_Register( Error_Type, (Name)self->type  );
 #endif
     Stream*						debugStream = Swarm_Debug;
 	

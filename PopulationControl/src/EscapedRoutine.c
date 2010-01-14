@@ -114,7 +114,7 @@ void _EscapedRoutine_Init(
 	self->dim = dim;
 	self->particlesToRemoveDelta = particlesToRemoveDelta;
 
-	self->debug = Journal_Register( Debug_Type, EscapedRoutine_Type ); /* TODO Register Child */
+	self->debug = Journal_Register( Debug_Type, (Name)EscapedRoutine_Type ); /* TODO Register Child */
 	self->particlesToRemoveCount = 0;
 	self->particlesToRemoveAlloced = 0;
 }
@@ -127,7 +127,7 @@ void _EscapedRoutine_Delete( void* escapedRoutine ) {
 	EscapedRoutine* self = (EscapedRoutine*)escapedRoutine;
 	
 	/* Delete parent */
-	_Stg_Component_Delete( self );
+	_Stg_Component_Delete( self  );
 }
 
 void _EscapedRoutine_Print( void* escapedRoutine, Stream* stream ) {
@@ -152,12 +152,12 @@ void _EscapedRoutine_AssignFromXML( void* escapedRoutine, Stg_ComponentFactory* 
 	Particle_Index		particlesToRemoveDelta;
 	DomainContext*		context;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", DomainContext, False, data );
-	if( !context ) 
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", DomainContext, False, data );
+	if( !context  ) 
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  );
 
-	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
-	particlesToRemoveDelta = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "particlesToRemoveDelta", 20 );
+	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0  );
+	particlesToRemoveDelta = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"particlesToRemoveDelta", 20  );
 
 	_EscapedRoutine_Init( self, context, dim, particlesToRemoveDelta );
 }

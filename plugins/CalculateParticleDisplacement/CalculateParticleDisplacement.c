@@ -62,35 +62,28 @@ void _PICellerator_CalculateParticleDisplacement_AssignFromXML( void* component,
 	StandardParticle                      particle;
 	ParticleDisplacementInfo*             particleExt;
 	
-	context = (DomainContext*)Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data );
+	context = (DomainContext*)Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  );
 
 	ContextEP_Append( context, AbstractContext_EP_Initialise, _PICellerator_CalculateParticleDisplacement_StoreOriginalPos );
 	ContextEP_Append( context, AbstractContext_EP_Step, _PICellerator_CalculateParticleDisplacement_UpdateDisplacement );
 
 	/* Extend particle with original pos */
-	materialPointsSwarm = (MaterialPointsSwarm*) LiveComponentRegister_Get( context->CF->LCRegister, "materialSwarm" );
-	assert( materialPointsSwarm );
-	self->particleDisplacementInfo_Handle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, CURR_MODULE_NAME,
-		sizeof( ParticleDisplacementInfo ) );
+	materialPointsSwarm = (MaterialPointsSwarm*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialSwarm" );
+	assert( materialPointsSwarm  );
+	self->particleDisplacementInfo_Handle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, (Name)CURR_MODULE_NAME, sizeof( ParticleDisplacementInfo )  );
 
 	/* now register these guys as swarm variables */
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle,
 		self->particleDisplacementInfo_Handle );
 
-	self->particleOriginalCoordSwarmVariable = Swarm_NewVectorVariable(
-		materialPointsSwarm,
-		"OriginalCoord",
-		(ArithPointer) &particleExt->originalCoord - (ArithPointer) &particle,
+	self->particleOriginalCoordSwarmVariable = Swarm_NewVectorVariable( materialPointsSwarm, (Name)"OriginalCoord", (ArithPointer) &particleExt->originalCoord - (ArithPointer) &particle,
 		Variable_DataType_Double,
 		materialPointsSwarm->dim,
 		"OriginalCoordX",
 		"OriginalCoordY",
 		"OriginalCoordZ" );
 		
-	self->particleDisplacementSwarmVariable = Swarm_NewVectorVariable(
-		materialPointsSwarm,
-		"Displacement",
-		(ArithPointer) &particleExt->displacement - (ArithPointer) &particle,
+	self->particleDisplacementSwarmVariable = Swarm_NewVectorVariable( materialPointsSwarm, (Name)"Displacement", (ArithPointer) &particleExt->displacement - (ArithPointer) &particle,
 		Variable_DataType_Double,
 		materialPointsSwarm->dim,
 		"DisplacementX",
@@ -119,14 +112,13 @@ void _PICellerator_CalculateParticleDisplacement_StoreOriginalPos( PICelleratorC
 	ParticleDisplacementInfo*             particleDisplacementInfo; 
 	Particle_Index                        lParticle_I;
 
-	materialPointsSwarm = (MaterialPointsSwarm*) LiveComponentRegister_Get( context->CF->LCRegister, "materialSwarm" );
+	materialPointsSwarm = (MaterialPointsSwarm*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialSwarm" );
 	assert( materialPointsSwarm );
-	self = (CalculateParticleDisplacementPlugin*) LiveComponentRegister_Get( context->CF->LCRegister,
-		"PICellerator_CalculateParticleDisplacement" );
+	self = (CalculateParticleDisplacementPlugin* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"PICellerator_CalculateParticleDisplacement" );
 	assert( self );
 
 	for ( lParticle_I = 0 ; lParticle_I < materialPointsSwarm->particleLocalCount ; lParticle_I++ ) {
-		particle = (GlobalParticle*)Swarm_ParticleAt( materialPointsSwarm, lParticle_I );
+		particle = (GlobalParticle* )Swarm_ParticleAt( materialPointsSwarm, lParticle_I );
 		particleDisplacementInfo = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr,
 			particle, self->particleDisplacementInfo_Handle );
 		originalCoord = particleDisplacementInfo->originalCoord;
@@ -148,14 +140,13 @@ void _PICellerator_CalculateParticleDisplacement_UpdateDisplacement( PICellerato
 	Dimension_Index                       dim_I;
 
 	/* Add original pos to particle */
-	materialPointsSwarm = (MaterialPointsSwarm*) LiveComponentRegister_Get( context->CF->LCRegister, "materialSwarm" );
+	materialPointsSwarm = (MaterialPointsSwarm*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialSwarm" );
 	assert( materialPointsSwarm );
-	self = (CalculateParticleDisplacementPlugin*) LiveComponentRegister_Get( context->CF->LCRegister,
-		"PICellerator_CalculateParticleDisplacement" );
+	self = (CalculateParticleDisplacementPlugin* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"PICellerator_CalculateParticleDisplacement" );
 	assert( self );
 
 	for ( lParticle_I = 0 ; lParticle_I < materialPointsSwarm->particleLocalCount ; lParticle_I++ ) {
-		particle      = (GlobalParticle*)Swarm_ParticleAt( materialPointsSwarm, lParticle_I );
+		particle      = (GlobalParticle* )Swarm_ParticleAt( materialPointsSwarm, lParticle_I );
 		coord         = particle->coord;
 		particleDisplacementInfo = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, particle,
 			self->particleDisplacementInfo_Handle );
@@ -192,8 +183,7 @@ void* _PICellerator_CalculateParticleDisplacement_DefaultNew( Name name ) {
 Index PICellerator_CalculateParticleDisplacement_Register( PluginsManager* pluginsManager ) {
 	Index result;
 
-	result = PluginsManager_Submit( pluginsManager, PICellerator_CalculateParticleDisplacement_Type, "0",
-		_PICellerator_CalculateParticleDisplacement_DefaultNew );
+	result = PluginsManager_Submit( pluginsManager, PICellerator_CalculateParticleDisplacement_Type, (Name)"0", _PICellerator_CalculateParticleDisplacement_DefaultNew  );
 
 	return result;
 }

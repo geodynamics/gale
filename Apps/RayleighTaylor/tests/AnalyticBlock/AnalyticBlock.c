@@ -1727,12 +1727,12 @@ void _AnalyticBlock_AssignFromXML( void* analyticSolution, Stg_ComponentFactory*
 	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	/* Create Analytic Fields */
-	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
-	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, (Name)"VelocityField", FeVariable, True, data  ); 
+	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, (Name)"PressureField", FeVariable, True, data  ); 
 
-	self->startBlockX = Stg_ComponentFactory_GetRootDictDouble( cf, "startBlockX", 0.0 );
-	self->endBlockX = Stg_ComponentFactory_GetRootDictDouble( cf, "endBlockX", 0.0 );
-	self->startBlockY = Stg_ComponentFactory_GetRootDictDouble( cf, "startBlockY", 0.0 );
+	self->startBlockX = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"startBlockX", 0.0  );
+	self->endBlockX = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"endBlockX", 0.0  );
+	self->startBlockY = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"startBlockY", 0.0  );
 }
 
 void _AnalyticBlock_Build( void* analyticSolution, void* data ) {
@@ -1769,7 +1769,7 @@ void* _AnalyticBlock_DefaultNew( Name name ) {
 }
 
 Index _PICellerator_AnalyticBlock_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, AnalyticBlock_Type, "0", _AnalyticBlock_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, AnalyticBlock_Type, (Name)"0", _AnalyticBlock_DefaultNew  );
 }
 
 

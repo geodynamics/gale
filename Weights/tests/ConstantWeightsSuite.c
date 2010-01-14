@@ -92,10 +92,10 @@ void WeightsSuite_TestElementIntegral(
   	double					expectedMean,
   	double					expectedStdDev ) 
 {
-   Swarm*              integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "integrationSwarm" );
-   Swarm*              materialSwarm    = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialPoints" );
-   FeMesh*             mesh             = (FeMesh*) LiveComponentRegister_Get( context->CF->LCRegister, "linearMesh" );
-   WeightsCalculator*  weights          = (WeightsCalculator*) LiveComponentRegister_Get( context->CF->LCRegister, "weights" );
+   Swarm*              integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"integrationSwarm" );
+   Swarm*              materialSwarm    = (Swarm* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialPoints" );
+   FeMesh*             mesh             = (FeMesh* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"linearMesh" );
+   WeightsCalculator*  weights          = (WeightsCalculator* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"weights"  );
    FeVariable*         feVariable;
    Element_LocalIndex  lElement_I       = 0;
    double              analyticValue    = 0.0;
@@ -128,7 +128,7 @@ void WeightsSuite_TestElementIntegral(
 		MPI_COMM_WORLD,
 		context->fieldVariable_Register );
 
-   Journal_Firewall( (funcName!=NULL), Journal_Register( Error_Type, "ConstantWeightsSuite" ),
+   Journal_Firewall( (funcName!=NULL), Journal_Register( Error_Type, (Name)"ConstantWeightsSuite"  ),
       "Error, function name input to %s is NULL", __func__ );
 
    if ( strcasecmp( funcName, "ShapeFunction" ) == 0 ) {
@@ -166,7 +166,7 @@ void WeightsSuite_TestElementIntegral(
    }
    else 
       Journal_Firewall( False,
-            Journal_Register( Error_Type, "ConstantWeightsSuite" ),
+            Journal_Register( Error_Type, (Name)"ConstantWeightsSuite"  ),
             "Cannot understand function name '%s'\n", funcName );
 
    for ( loop_I = 0 ; loop_I < count ; loop_I++ ) {
@@ -204,7 +204,7 @@ void ConstantWeightsSuite_Setup( ConstantWeightsSuiteData* data ) {
 
    pcu_filename_input( "testConstantWeights.xml", xmlInputFilename );
    data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
-   data->context = (PICelleratorContext*)LiveComponentRegister_Get( data->cf->LCRegister, "context" );
+   data->context = (PICelleratorContext*)LiveComponentRegister_Get( data->cf->LCRegister, (Name)"context"  );
 	// Stg_ComponentFactory_BuildComponents( data->cf, NULL );
    
    stgMainBuildAndInitialise( data->cf );

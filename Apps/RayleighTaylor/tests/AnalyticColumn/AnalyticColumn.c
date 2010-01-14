@@ -301,16 +301,16 @@ void _AnalyticColumn_AssignFromXML( void* analyticSolution, Stg_ComponentFactory
 	_AnalyticSolution_AssignFromXML( self, cf, data );
 
 	/* Create Analytic Fields */
-	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, "VelocityField", FeVariable, True, data ); 
-	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, "PressureField", FeVariable, True, data ); 
+	self->velocityField = Stg_ComponentFactory_ConstructByName( cf, (Name)"VelocityField", FeVariable, True, data  ); 
+	self->pressureField = Stg_ComponentFactory_ConstructByName( cf, (Name)"PressureField", FeVariable, True, data  ); 
 
-	self->dim          = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
-	self->startColumnX = Stg_ComponentFactory_GetRootDictDouble( cf, "startColumnX", 0.0 );
-	self->endColumnX   = Stg_ComponentFactory_GetRootDictDouble( cf, "endColumnX", 0.0 );
-	self->startColumnZ = Stg_ComponentFactory_GetRootDictDouble( cf, "startColumnZ", 0.0 );
-	self->endColumnZ   = Stg_ComponentFactory_GetRootDictDouble( cf, "endColumnZ", 0.0 );
-	self->viscosity    = Stg_ComponentFactory_GetRootDictDouble( cf, "viscosity", 1.0 );
-	self->sigma        = Stg_ComponentFactory_GetRootDictDouble( cf, "sigma", 1.0 );
+	self->dim          = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0  );
+	self->startColumnX = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"startColumnX", 0.0  );
+	self->endColumnX   = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"endColumnX", 0.0  );
+	self->startColumnZ = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"startColumnZ", 0.0  );
+	self->endColumnZ   = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"endColumnZ", 0.0  );
+	self->viscosity    = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"viscosity", 1.0  );
+	self->sigma        = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"sigma", 1.0  );
 }
 
 void _AnalyticColumn_Build( void* analyticSolution, void* data ) {
@@ -347,7 +347,7 @@ void* _AnalyticColumn_DefaultNew( Name name ) {
 }
 
 Index _PICellerator_AnalyticColumn_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, AnalyticColumn_Type, "0", _AnalyticColumn_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, AnalyticColumn_Type, (Name)"0", _AnalyticColumn_DefaultNew  );
 }
 
 

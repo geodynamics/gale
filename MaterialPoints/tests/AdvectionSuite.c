@@ -56,10 +56,10 @@ void AdvectionSuite_Teardown( AdvectionSuiteData* data ) {
 }
 
 double dt( void* class, PICelleratorContext* context ) {
-	return Dictionary_GetDouble_WithDefault( context->dictionary, "dt", 0.01 );
+	return Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"dt", 0.01 );
 }
 
-void check( PICelleratorContext* context ) {
+void check( PICelleratorContext* context  ) {
 	MaterialPointsSwarm*   materialPointsSwarm;
 	GlobalParticle*   particle;
 	double*           originalCoord;
@@ -83,10 +83,10 @@ void check( PICelleratorContext* context ) {
 	double		  theta;
 
 	/* Add original pos to particle */
-	materialPointsSwarm = (MaterialPointsSwarm*) LiveComponentRegister_Get( context->CF->LCRegister, "materialPointsSwarm" );
+	materialPointsSwarm = (MaterialPointsSwarm*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialPointsSwarm" );
 
 	for ( lParticle_I = 0 ; lParticle_I < materialPointsSwarm->particleLocalCount ; lParticle_I++ ) {
-		particle      = (GlobalParticle*)Swarm_ParticleAt( materialPointsSwarm, lParticle_I );
+		particle      = (GlobalParticle* )Swarm_ParticleAt( materialPointsSwarm, lParticle_I );
 		coord         = particle->coord;
 		originalCoord = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, particle, handle );
 
@@ -132,8 +132,8 @@ void AdvectionSuite_TestEuler( AdvectionSuiteData* data ) {
 	context = (PICelleratorContext*)_PICelleratorContext_DefaultNew( "context" );
 	cf = stgMainInitFromXML( filename, MPI_COMM_WORLD, context );
 
-	matSwarm = (MaterialPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialPointsSwarm" );
-	handle = ExtensionManager_Add( matSwarm->particleExtensionMgr, CURR_MODULE_NAME, sizeof(Coord) );
+	matSwarm = (MaterialPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialPointsSwarm"  );
+	handle = ExtensionManager_Add( matSwarm->particleExtensionMgr, (Name)CURR_MODULE_NAME, sizeof(Coord)  );
 
 	Stg_ComponentFactory_BuildComponents( cf, NULL );
 	Stg_ComponentFactory_InitialiseComponents( cf, NULL );
@@ -165,8 +165,8 @@ void AdvectionSuite_TestRK2( AdvectionSuiteData* data ) {
 	context = (PICelleratorContext*)_PICelleratorContext_DefaultNew( "context" );
 	cf = stgMainInitFromXML( filename, MPI_COMM_WORLD, context );
 
-	matSwarm = (MaterialPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialPointsSwarm" );
-	handle = ExtensionManager_Add( matSwarm->particleExtensionMgr, CURR_MODULE_NAME, sizeof(Coord) );
+	matSwarm = (MaterialPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialPointsSwarm"  );
+	handle = ExtensionManager_Add( matSwarm->particleExtensionMgr, (Name)CURR_MODULE_NAME, sizeof(Coord)  );
 
 	Stg_ComponentFactory_BuildComponents( cf, NULL );
 	Stg_ComponentFactory_InitialiseComponents( cf, NULL );
@@ -198,8 +198,8 @@ void AdvectionSuite_TestRK4( AdvectionSuiteData* data ) {
 	context = (PICelleratorContext*)_PICelleratorContext_DefaultNew( "context" );
 	cf = stgMainInitFromXML( filename, MPI_COMM_WORLD, context );
 
-	matSwarm = (MaterialPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, "materialPointsSwarm" );
-	handle = ExtensionManager_Add( matSwarm->particleExtensionMgr, CURR_MODULE_NAME, sizeof(Coord) );
+	matSwarm = (MaterialPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialPointsSwarm"  );
+	handle = ExtensionManager_Add( matSwarm->particleExtensionMgr, (Name)CURR_MODULE_NAME, sizeof(Coord)  );
 
 	Stg_ComponentFactory_BuildComponents( cf, NULL );
 	Stg_ComponentFactory_InitialiseComponents( cf, NULL );

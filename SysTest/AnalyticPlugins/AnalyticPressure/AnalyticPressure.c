@@ -64,10 +64,10 @@ void _AnalyticPressure_AssignFromXML( void* _self, Stg_ComponentFactory* cf, voi
   _FieldTest_AssignFromXML( self, cf, data );
 
     /* Create Analytic Fields */
-  self->density  = Stg_ComponentFactory_GetDouble( cf, "layer", "density", 0.0 );
-  self->gravity  = Stg_ComponentFactory_GetRootDictDouble( cf, "gravity", 0 );
-  self->maxY     = Stg_ComponentFactory_GetRootDictDouble( cf, "maxY", 0 );
-  self->minY     = Stg_ComponentFactory_GetRootDictDouble( cf, "minY", 0 );
+  self->density  = Stg_ComponentFactory_GetDouble( cf, "layer", (Dictionary_Entry_Key)"density", 0.0  );
+  self->gravity  = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"gravity", 0  );
+  self->maxY     = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"maxY", 0  );
+  self->minY     = Stg_ComponentFactory_GetRootDictDouble( cf, (Dictionary_Entry_Key)"minY", 0  );
 }
 
 void _AnalyticPressure_Build( void* _self, void* data ) {
@@ -102,7 +102,7 @@ void* _AnalyticPressure_DefaultNew( Name name ) {
 }
 
 Index PICellerator_AnalyticPressure_Register( PluginsManager* pluginsManager ) {
-  return PluginsManager_Submit( pluginsManager, AnalyticPressure_Type, "0", _AnalyticPressure_DefaultNew );
+  return PluginsManager_Submit( pluginsManager, AnalyticPressure_Type, (Name)"0", _AnalyticPressure_DefaultNew  );
 }
 
 

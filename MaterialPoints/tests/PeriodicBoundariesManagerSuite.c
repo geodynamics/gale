@@ -67,7 +67,7 @@ void PeriodicBoundariesManagerSuite_Setup( PeriodicBoundariesManagerSuiteData* d
    pcu_filename_input( "testPeriodicBoundariesManager.xml", xmlInputFilename );
    data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
 	stgMainBuildAndInitialise( data->cf );
-   data->context = (PICelleratorContext*)LiveComponentRegister_Get( data->cf->LCRegister, "context" );
+   data->context = (PICelleratorContext*)LiveComponentRegister_Get( data->cf->LCRegister, (Name)"context" );
 } 
 
 
@@ -83,12 +83,12 @@ void PeriodicBoundariesManagerSuite_TestAdvectOverLeftBoundary( PeriodicBoundari
    GlobalParticle*            currParticle;
    Particle_Index             lParticle_I;
 
-   swarm = (Swarm*) LiveComponentRegister_Get( data->context->CF->LCRegister, "swarm" );
-   perBCsManager = (PeriodicBoundariesManager*) LiveComponentRegister_Get( data->context->CF->LCRegister, "perBCsManager" );
+   swarm = (Swarm* ) LiveComponentRegister_Get( data->context->CF->LCRegister, (Name)"swarm" );
+   perBCsManager = (PeriodicBoundariesManager* ) LiveComponentRegister_Get( data->context->CF->LCRegister, (Name)"perBCsManager" );
 
    for ( timeStep=1; timeStep <= 10; timeStep++ ) {
       UpdateParticlePositionsToLeft( swarm );
-      for ( lParticle_I = 0; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
+      for ( lParticle_I = 0; lParticle_I < swarm->particleLocalCount ; lParticle_I++  ) {
          PeriodicBoundariesManager_UpdateParticle( perBCsManager, lParticle_I );
       }
       Swarm_UpdateAllParticleOwners( swarm );
@@ -117,10 +117,10 @@ void UpdateParticlePositionsToLeft( Swarm* swarm ) {
    Particle_InCellIndex    cParticle_I;
    GlobalParticle*         currParticle;
    Index                   dim_I;
-   Stream*                 debugStream = Journal_Register( Debug_Type, "UpdateParticlesLeft" );
+   Stream*                 debugStream = Journal_Register( Debug_Type, (Name)"UpdateParticlesLeft" );
 
    Stream_Indent( debugStream );
-   for ( lCell_I=0; lCell_I < swarm->cellLocalCount; lCell_I++ ) {
+   for ( lCell_I=0; lCell_I < swarm->cellLocalCount; lCell_I++  ) {
       Journal_Printf( debugStream, "Updating Particles positions in local cell %d:\n", lCell_I );
       for ( cParticle_I=0; cParticle_I < swarm->cellParticleCountTbl[lCell_I]; cParticle_I++ ) {
          Coord movementVector = {0,0,0};

@@ -113,17 +113,11 @@ void _IntegrationPointMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* 
 	IntegrationPointsSwarm*	integrationSwarm;
 	PICelleratorContext*		context;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", PICelleratorContext, False, data );
-	if( !context ) 
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", PICelleratorContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", PICelleratorContext, False, data );
+	if( !context  ) 
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", PICelleratorContext, True, data  );
 
-	integrationSwarm = Stg_ComponentFactory_ConstructByKey( 
-		cf, 
-		self->name, 
-		IntegrationPointsSwarm_Type, 
-		IntegrationPointsSwarm,
-		True,
-		data );
+	integrationSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)IntegrationPointsSwarm_Type, IntegrationPointsSwarm, True, data  );
 	
 	_IntegrationPointMapper_Init( self, context, integrationSwarm );
 }

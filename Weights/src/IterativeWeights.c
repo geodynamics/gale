@@ -98,7 +98,7 @@ void _IterativeWeights_Init( void* iterativeWeights, WeightsCalculator* initialW
     self->tolerance = tolerance;
     self->alpha = alpha;
 	
-    Journal_Firewall( self->dim == 2, Journal_Register( Error_Type, self->type ), "%s only works in 2D.\n", self->type );
+    Journal_Firewall( self->dim == 2, Journal_Register( Error_Type, (Name)self->type  ), "%s only works in 2D.\n", self->type );
 }
 
 /*------------------------------------------------------------------------------------------------------------------------
@@ -162,11 +162,11 @@ void _IterativeWeights_AssignFromXML( void* iterativeWeights, Stg_ComponentFacto
 
     _ConstantWeights_AssignFromXML( self, cf, data );
 
-    initialWeights =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "InitialWeights", WeightsCalculator, False, data );
+    initialWeights =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"InitialWeights", WeightsCalculator, False, data  );
 
-    maxIterations = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "maxIterations", 10 );
-    tolerance     = Stg_ComponentFactory_GetDouble( cf, self->name, "tolerance", 0.01 );
-    alpha         = Stg_ComponentFactory_GetDouble( cf, self->name, "alpha", 0.8 ); /* 0.8 is default in Dufour p. 65 */
+    maxIterations = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"maxIterations", 10  );
+    tolerance     = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"tolerance", 0.01  );
+    alpha         = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"alpha", 0.8  ); /* 0.8 is default in Dufour p. 65 */
 	
     _IterativeWeights_Init( self, initialWeights, maxIterations, tolerance, alpha );
 }

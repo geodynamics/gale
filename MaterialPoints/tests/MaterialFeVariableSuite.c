@@ -50,7 +50,7 @@ void MaterialFeVariableSuite_Setup( MaterialFeVariableSuiteData* data ) {
 
    pcu_filename_input( "testMaterialFeVariable.xml", xmlInputFilename );
    data->cf = stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD, NULL );
-	data->context = (PICelleratorContext*)LiveComponentRegister_Get( data->cf->LCRegister, "context" );
+	data->context = (PICelleratorContext*)LiveComponentRegister_Get( data->cf->LCRegister, (Name)"context" );
 	stgMainBuildAndInitialise( data->cf );
 
 	stgMainLoop( data->cf );
@@ -72,11 +72,11 @@ void MaterialFeVariableSuite_TestVolume( MaterialFeVariableSuiteData* data ) {
    double              volumeFEM;
    Coord               centroid;
 
-   materialFeVariable = (MaterialFeVariable*) LiveComponentRegister_Get( data->context->CF->LCRegister, "materialFeVariable" );
-   gaussSwarm = (Swarm*) LiveComponentRegister_Get( data->context->CF->LCRegister, "gaussSwarm" );
+   materialFeVariable = (MaterialFeVariable* ) LiveComponentRegister_Get( data->context->CF->LCRegister, (Name)"materialFeVariable" );
+   gaussSwarm = (Swarm* ) LiveComponentRegister_Get( data->context->CF->LCRegister, (Name)"gaussSwarm" );
 
    assert(materialFeVariable);
-   assert(gaussSwarm);
+   assert(gaussSwarm );
 
    material = materialFeVariable->material;
    swarm = materialFeVariable->picIntegrationPoints;

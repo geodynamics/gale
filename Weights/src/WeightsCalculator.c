@@ -120,11 +120,11 @@ void _WeightsCalculator_AssignFromXML( void* weightsCalculator, Stg_ComponentFac
     WeightsCalculator*   self          = (WeightsCalculator*) weightsCalculator;
     Dimension_Index      dim;
 
-    self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", FiniteElementContext, False, data );
-    if( !self->context ) 
-        self->context = Stg_ComponentFactory_ConstructByName( cf, "context", FiniteElementContext, True, data );
+    self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", FiniteElementContext, False, data );
+    if( !self->context  ) 
+        self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", FiniteElementContext, True, data  );
 
-    dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dim", 0 );
+    dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0  );
 
     _WeightsCalculator_Init( self, dim );
 }
@@ -176,7 +176,7 @@ void WeightsCalculator_CalculateAll( void* weightsCalculator, void* _swarm ) {
     double               nextCompletionRatioToPrint=0;
     Cell_Index           nextCompletedCellCountToPrint=0;
     Cell_Index           nextPlusOneCompletedCellCountToPrint=0;
-    Stream*              stream = Journal_Register( Info_Type, self->type );
+    Stream*              stream = Journal_Register( Info_Type, (Name)self->type  );
     Processor_Index      formerStreamPrintingRank = 0;
 
     Journal_RPrintf( stream, "In func %s(): for swarm \"%s\"\n", __func__, swarm->name );
@@ -364,7 +364,7 @@ double WeightsCalculator_TestConstraintOverCell( void* weightsCalculator, void* 
     Stream_UnIndent( swarm->debug );
 
     Journal_Firewall( dim == 2 ? constraintCount == order + 1 : constraintCount*2 == (order + 1)*(order + 2) , 
-                      Journal_Register( Error_Type, swarm->type ),
+                      Journal_Register( Error_Type, (Name)swarm->type  ),
                       "In func %s: Number of constraints %u incorrect for dimension %u which should be %u\n", 
                       __func__ , dim == 2 ? order + 1 : (order + 1)*(order + 2)/2 );
 
@@ -449,7 +449,7 @@ void WeightsCalculator_CheckEmptyCell( void* weightsCalculator, void* _swarm, Ce
     Particle_InCellIndex         cParticleCount  = swarm->cellParticleCountTbl[lCell_I];        
 
     if ( cParticleCount == 0 ) {
-        Journal_Firewall( cParticleCount, Journal_Register( Error_Type, self->type ),
+        Journal_Firewall( cParticleCount, Journal_Register( Error_Type, (Name)self->type  ),
                           "Error in func '%s' for %s '%s' and %s '%s' - Cell %u has no particles.\n"
                           "You must either add more initial particles or add population control.\n",
                           __func__, self->type, self->name, swarm->type, swarm->name, lCell_I );

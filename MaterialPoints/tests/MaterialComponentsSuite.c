@@ -180,20 +180,20 @@ void MaterialComponentsSuite_Setup( MaterialComponentsSuiteData* data ) {
 
    /* Set up the dictionaries, and set some sample properties for testing */
    data->matDict1 = Dictionary_New();
-   Dictionary_Add( data->matDict1, "testSwarm-matProp1", Dictionary_Entry_Value_FromUnsignedInt( 1 ) );
-   Dictionary_Add( data->matDict1, "testSwarm-matProp2", Dictionary_Entry_Value_FromDouble( 1.1 ) );
-   Dictionary_Add( data->matDict1, "testSwarm-matProp3", Dictionary_Entry_Value_FromBool( False ) );
-   data->matDict2 = Dictionary_New();
-   Dictionary_Add( data->matDict2, "testSwarm-matProp1", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
-   Dictionary_Add( data->matDict2, "testSwarm-matProp2", Dictionary_Entry_Value_FromDouble( 2.2 ) );
-   Dictionary_Add( data->matDict2, "testSwarm-matProp3", Dictionary_Entry_Value_FromBool( True ) );
-   Dictionary_Add( data->matDict2, "testSwarm-matProp4", Dictionary_Entry_Value_FromBool( True ) );
+   Dictionary_Add( data->matDict1, (Dictionary_Entry_Key)"testSwarm-matProp1", Dictionary_Entry_Value_FromUnsignedInt( 1 )  );
+   Dictionary_Add( data->matDict1, (Dictionary_Entry_Key)"testSwarm-matProp2", Dictionary_Entry_Value_FromDouble( 1.1 )  );
+   Dictionary_Add( data->matDict1, (Dictionary_Entry_Key)"testSwarm-matProp3", Dictionary_Entry_Value_FromBool( False ) );
+   data->matDict2 = Dictionary_New( );
+   Dictionary_Add( data->matDict2, (Dictionary_Entry_Key)"testSwarm-matProp1", Dictionary_Entry_Value_FromUnsignedInt( 2 )  );
+   Dictionary_Add( data->matDict2, (Dictionary_Entry_Key)"testSwarm-matProp2", Dictionary_Entry_Value_FromDouble( 2.2 )  );
+   Dictionary_Add( data->matDict2, (Dictionary_Entry_Key)"testSwarm-matProp3", Dictionary_Entry_Value_FromBool( True )  );
+   Dictionary_Add( data->matDict2, (Dictionary_Entry_Key)"testSwarm-matProp4", Dictionary_Entry_Value_FromBool( True )  );
 
    /* Now update the svRegister to match the material properties */
-	data->matPropVar1 = Swarm_NewScalarVariable( data->mpSwarm, "matProp1", GetOffsetOfMember( particle , matProp1 ), Variable_DataType_Int );
-	data->matPropVar2 = Swarm_NewScalarVariable( data->mpSwarm, "matProp2", GetOffsetOfMember( particle , matProp2 ), Variable_DataType_Double );
-	data->matPropVar3 = Swarm_NewScalarVariable( data->mpSwarm, "matProp3", GetOffsetOfMember( particle , matProp3 ), Variable_DataType_Int );
-	data->matPropVar4 = Swarm_NewScalarVariable( data->mpSwarm, "matProp4", GetOffsetOfMember( particle , matProp4 ), Variable_DataType_Int );
+	data->matPropVar1 = Swarm_NewScalarVariable( data->mpSwarm, (Name)"matProp1", GetOffsetOfMember( particle , matProp1  ), Variable_DataType_Int );
+	data->matPropVar2 = Swarm_NewScalarVariable( data->mpSwarm, (Name)"matProp2", GetOffsetOfMember( particle , matProp2  ), Variable_DataType_Double );
+	data->matPropVar3 = Swarm_NewScalarVariable( data->mpSwarm, (Name)"matProp3", GetOffsetOfMember( particle , matProp3  ), Variable_DataType_Int );
+	data->matPropVar4 = Swarm_NewScalarVariable( data->mpSwarm, (Name)"matProp4", GetOffsetOfMember( particle , matProp4  ), Variable_DataType_Int );
 
    data->mat1 = Material_New( "mat1", NULL, data->shape1, data->matDict1, data->mRegister );
    data->mat2 = Material_New( "mat2", NULL, data->shape2, data->matDict2, data->mRegister );
