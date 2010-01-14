@@ -56,38 +56,38 @@
 Bool lucOutputFormats_Init() {
 	Stg_ComponentRegister* componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
 
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
-	Stg_ComponentRegister_Add( componentRegister, lucOutputPPM_Type,      "0", _lucOutputPPM_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, lucOutputPPM_Type, (Name)"0", _lucOutputPPM_DefaultNew  );
 	RegisterParent( lucOutputPPM_Type,         lucOutputFormat_Type );
 
 	#ifdef HAVE_GL2PS
-	  Stg_ComponentRegister_Add( componentRegister, lucOutputVECTOR_Type,      "0", _lucOutputVECTOR_DefaultNew );
+	  Stg_ComponentRegister_Add( componentRegister, lucOutputVECTOR_Type, (Name)"0", _lucOutputVECTOR_DefaultNew  );
 	  RegisterParent( lucOutputVECTOR_Type,         lucOutputFormat_Type );
 	#endif
 
 	#ifdef HAVE_LIBPNG
-	   Stg_ComponentRegister_Add( componentRegister, lucOutputPNG_Type,      "0", _lucOutputPNG_DefaultNew );
+	   Stg_ComponentRegister_Add( componentRegister, lucOutputPNG_Type, (Name)"0", _lucOutputPNG_DefaultNew  );
 	   RegisterParent( lucOutputPNG_Type,         lucOutputFormat_Type );
 	#endif	
 	
 	#ifdef HAVE_LIBJPEG
-    	Stg_ComponentRegister_Add( componentRegister, lucOutputJPEG_Type,     "0", _lucOutputJPEG_DefaultNew );
+    	Stg_ComponentRegister_Add( componentRegister, lucOutputJPEG_Type, (Name)"0", _lucOutputJPEG_DefaultNew  );
     	RegisterParent( lucOutputJPEG_Type,        lucOutputFormat_Type );
     #endif
     
     #ifdef HAVE_TIFF
-    	Stg_ComponentRegister_Add( componentRegister, lucOutputTIFF_Type,     "0", _lucOutputTIFF_DefaultNew );
+    	Stg_ComponentRegister_Add( componentRegister, lucOutputTIFF_Type, (Name)"0", _lucOutputTIFF_DefaultNew  );
     	RegisterParent( lucOutputTIFF_Type,        lucOutputFormat_Type );
     #endif
     
     #ifdef HAVE_LIBFAME	
-    	Stg_ComponentRegister_Add( componentRegister, lucEncoderLibfame_Type, "0", _lucEncoderLibfame_DefaultNew );
+    	Stg_ComponentRegister_Add( componentRegister, lucEncoderLibfame_Type, (Name)"0", _lucEncoderLibfame_DefaultNew  );
     	RegisterParent( lucEncoderLibfame_Type,    lucOutputFormat_Type );
     #endif
     
     #ifdef HAVE_LIBAVCODEC	
-    	Stg_ComponentRegister_Add( componentRegister, lucEncoderLibavcodec_Type, "0", _lucEncoderLibavcodec_DefaultNew );
+    	Stg_ComponentRegister_Add( componentRegister, lucEncoderLibavcodec_Type, (Name)"0", _lucEncoderLibavcodec_DefaultNew  );
     	RegisterParent( lucEncoderLibavcodec_Type,    lucOutputFormat_Type );
 		avcodec_init();
 		avcodec_register_all();

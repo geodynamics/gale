@@ -231,27 +231,27 @@ void _lucLight_AssignFromXML( void* light, Stg_ComponentFactory* cf, void* data 
 	Name                    materialName;
 	float                   lmodel_ambient[4]; 
 	
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context ) 
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !self->context  ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data );
 
-	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING );
 
 	/* Spot values */
-	spotCutOff = Stg_ComponentFactory_GetDouble( cf, self->name, "spotCutOff", 180.0 );
-	spotDirection[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "spotDirectionX", 0.0 );
-	spotDirection[2] = Stg_ComponentFactory_GetDouble( cf, self->name, "spotDirectionY", 0.0 );
-	spotDirection[3] = Stg_ComponentFactory_GetDouble( cf, self->name, "spotDirectionZ", -1.0 );
+	spotCutOff = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"spotCutOff", 180.0  );
+	spotDirection[1] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"spotDirectionX", 0.0  );
+	spotDirection[2] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"spotDirectionY", 0.0  );
+	spotDirection[3] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"spotDirectionZ", -1.0  );
 
         
 	/* Ambient values*/
-	lmodel_ambient[0] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambR", 0.2 );
-	lmodel_ambient[1] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambG", 0.2 );
-	lmodel_ambient[2] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambB", 0.2 );
-	lmodel_ambient[3] = Stg_ComponentFactory_GetDouble( cf, self->name, "ambA", 1.0 );
+	lmodel_ambient[0] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"ambR", 0.2  );
+	lmodel_ambient[1] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"ambG", 0.2  );
+	lmodel_ambient[2] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"ambB", 0.2  );
+	lmodel_ambient[3] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"ambA", 1.0  );
 
 
-	modelName = Stg_ComponentFactory_GetString( cf, self->name, "model", "TwoSide" );
+	modelName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"model", "TwoSide"  );
 	if ( strcasecmp( modelName, "Ambient" ) == 0 ) {
 		model = GL_LIGHT_MODEL_AMBIENT;
 		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
@@ -265,13 +265,13 @@ void _lucLight_AssignFromXML( void* light, Stg_ComponentFactory* cf, void* data 
 		glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);	
 	}
 
-	position[0]  = Stg_ComponentFactory_GetDouble( cf, self->name, "posX", LUC_LIGHT_DEFAULT_POS_X );
-	position[1]  = Stg_ComponentFactory_GetDouble( cf, self->name, "posY", LUC_LIGHT_DEFAULT_POS_Y );
-	position[2]  = Stg_ComponentFactory_GetDouble( cf, self->name, "posZ", LUC_LIGHT_DEFAULT_POS_Z );
-        position[3]  = Stg_ComponentFactory_GetDouble( cf, self->name, "posW", LUC_LIGHT_DEFAULT_POS_W );
+	position[0]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"posX", LUC_LIGHT_DEFAULT_POS_X  );
+	position[1]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"posY", LUC_LIGHT_DEFAULT_POS_Y  );
+	position[2]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"posZ", LUC_LIGHT_DEFAULT_POS_Z  );
+        position[3]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"posW", LUC_LIGHT_DEFAULT_POS_W  );
 
 	/*HACK - Got to retrieve */
-	materialName = Stg_ComponentFactory_GetString( cf, self->name, "material", "lucMono" );
+	materialName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"material", "lucMono"  );
 
 
 	lucLight_Init( self, index, model, material, position, lmodel_ambient, spotCutOff, spotDirection);

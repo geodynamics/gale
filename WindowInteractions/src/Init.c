@@ -53,13 +53,13 @@
 Bool lucWindowInteractions_Init() {
 	Stg_ComponentRegister* componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
 
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
-	Stg_ComponentRegister_Add( componentRegister, lucFieldValueInteraction_Type, "0", _lucFieldValueInteraction_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucMeshViewerInteraction_Type, "0", _lucMeshViewerInteraction_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucSwarmViewerInteraction_Type, "0", _lucSwarmViewerInteraction_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucColourBarInteraction_Type, "0", _lucColourBarInteraction_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucLightInteraction_Type, "0", _lucLightInteraction_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, lucFieldValueInteraction_Type, (Name)"0", _lucFieldValueInteraction_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucMeshViewerInteraction_Type, (Name)"0", _lucMeshViewerInteraction_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucSwarmViewerInteraction_Type, (Name)"0", _lucSwarmViewerInteraction_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucColourBarInteraction_Type, (Name)"0", _lucColourBarInteraction_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucLightInteraction_Type, (Name)"0", _lucLightInteraction_DefaultNew  );
 
 
 

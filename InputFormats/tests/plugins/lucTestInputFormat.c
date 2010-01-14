@@ -63,7 +63,7 @@ void glucifer_lucTestInputFormat( DomainContext* context ) {
 	FILE*           file;
 	int             i, j;
 
-	imageName = Dictionary_GetString( context->dictionary, "imageName" );
+	imageName = Dictionary_GetString( context->dictionary, (Dictionary_Entry_Key)"imageName"  );
 
 	inputFormat = lucInputFormat_Register_CreateFromFileName( lucInputFormat_Register_Singleton, imageName );
 	pixelData = lucInputFormat_Input( inputFormat, imageName, &width, &height );
@@ -81,7 +81,7 @@ void glucifer_lucTestInputFormat( DomainContext* context ) {
 
 void _lucTestInputFormat_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	DomainContext* context;
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", DomainContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  ); 
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Initialise, glucifer_lucTestInputFormat );
 }
 
@@ -110,8 +110,7 @@ void* _lucTestInputFormat_DefaultNew( Name name ) {
 Index lucTestInputFormat_Register( PluginsManager* pluginsManager ) {
 	Index result;
 
-	result = PluginsManager_Submit( pluginsManager, TestInputFormat_Type, "0",
-		_lucTestInputFormat_DefaultNew );
+	result = PluginsManager_Submit( pluginsManager, TestInputFormat_Type, (Name)"0", _lucTestInputFormat_DefaultNew  );
 
 	return result;
 }

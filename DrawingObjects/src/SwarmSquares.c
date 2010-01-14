@@ -153,17 +153,17 @@ void _lucSwarmSquares_AssignFromXML( void* drawingObject, Stg_ComponentFactory* 
 	/* Construct Parent */
 	_lucSwarmViewerBase_AssignFromXML( self, cf, data );
 	
-	colourMap     =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "ColourMap", lucColourMap,      False, data  ) ;
-	colourVariableName = Stg_ComponentFactory_GetString( cf, self->name, "ColourVariable", "" );
+	colourMap     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ColourMap", lucColourMap, False, data   ) ;
+	colourVariableName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"ColourVariable", ""  );
 
 	_lucSwarmSquares_Init( 
 			self,
 			colourVariableName,
 			colourMap,
-			Stg_ComponentFactory_GetString( cf, self->name, "NormalVariable", "" ),
-			Stg_ComponentFactory_GetString( cf, self->name, "PlaneVectorVariable", "" ),
-			Stg_ComponentFactory_GetString( cf, self->name, "LengthVariable", "" ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "length", 0.2 ) );
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"NormalVariable", ""  ),
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"PlaneVectorVariable", ""  ),
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"LengthVariable", ""  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"length", 0.2 )  );
 }
 
 void _lucSwarmSquares_Build( void* drawingObject, void* data ) {}

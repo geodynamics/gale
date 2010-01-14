@@ -159,27 +159,27 @@ void _lucScalarFieldCrossSection_AssignFromXML( void* drawingObject, Stg_Compone
 	/* Construct Parent */
 	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
-	fieldVariableName = Stg_ComponentFactory_GetString( cf, self->name, "FieldVariable", "defaultName" );
+	fieldVariableName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"FieldVariable", "defaultName"  );
 
 	/* This variable is now construct in build phase.
 	   fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "FieldVariable", FieldVariable, True ) ;
 	*/
 
 
-	colourMap = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap", lucColourMap, True, data ) ;
+	colourMap = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ColourMap", lucColourMap, True, data  ) ;
 
-	defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolution", 128 );
-	resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionX", defaultResolution );
-	resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionY", defaultResolution );
-	resolution[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionZ", defaultResolution );
+	defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolution", 128  );
+	resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolutionX", defaultResolution  );
+	resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolutionY", defaultResolution  );
+	resolution[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolutionZ", defaultResolution  );
 			
 	/* Get Values with which to crop the cross section */
-	minCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "minCropX", -HUGE_VAL );
-	minCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "minCropY", -HUGE_VAL );
-	minCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "minCropZ", -HUGE_VAL );
-	maxCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropX", +HUGE_VAL );
-	maxCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropY", +HUGE_VAL );
-	maxCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropZ", +HUGE_VAL );
+	minCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minCropX", -HUGE_VAL  );
+	minCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minCropY", -HUGE_VAL  );
+	minCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minCropZ", -HUGE_VAL  );
+	maxCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxCropX", +HUGE_VAL  );
+	maxCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxCropY", +HUGE_VAL  );
+	maxCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxCropZ", +HUGE_VAL  );
 	
 	_lucScalarFieldCrossSection_Init( 
 			self, 
@@ -195,10 +195,10 @@ void _lucScalarFieldCrossSection_Build( void* drawingObject, void* data ) {
 	lucScalarFieldCrossSection*     self        = (lucScalarFieldCrossSection*)drawingObject;
 	AbstractContext*                context     = self->context;
 	Stg_ComponentFactory*           cf          = context->CF;
-	Stream*                         errorStream = Journal_Register( Error_Type, self->type );
+	Stream*                         errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 	/* HACK - Get pointer to FieldVariable in build phase just to let FieldVariables be created in plugins */
-	self->fieldVariable = Stg_ComponentFactory_ConstructByName( cf, self->fieldVariableName, FieldVariable, True, data ); 
+	self->fieldVariable = Stg_ComponentFactory_ConstructByName( cf, (Name)self->fieldVariableName, FieldVariable, True, data  ); 
 	Journal_Firewall( self->fieldVariable->fieldComponentCount == 1, errorStream,
 		"Error - in %s(): provided FieldVariable \"%s\" has %u components - but %s Component "
 		"can only visualise FieldVariables with 1 component. Did you mean to visualise the "

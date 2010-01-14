@@ -243,19 +243,19 @@ void _lucEncoderLibfame_AssignFromXML( void* outputFormat, Stg_ComponentFactory*
 	/* Construct Parent */
 	lucOutputFormat_InitAll( self, "mpeg" );
 
-	window =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Window", lucWindow,  True, data  ) ;
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ) ;
+	window =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Window", lucWindow, True, data   ) ;
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  ) ;
 
 	_lucEncoderLibfame_Init( 
 			self,
 			window,
 			context->outputPath,
 			context->loadFromCheckPoint,
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "keyframe", 4 ),
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "quality", 93 ),
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "framesPerSecond", 30 ),
-			Stg_ComponentFactory_GetString( cf, self->name, "profile", "profile/mpeg1" ),
-			Stg_ComponentFactory_GetBool( cf, self->name, "includeFrame0", False) );
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"keyframe", 4  ),
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"quality", 93  ),
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"framesPerSecond", 30  ),
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"profile", "profile/mpeg1"  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"includeFrame0", False)  );
 }
 
 void _lucEncoderLibfame_Build( void* outputFormat, void* data ) {}

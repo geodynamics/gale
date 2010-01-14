@@ -116,16 +116,16 @@ void _DummySwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactor
 	Variable*               variable;
 	Index                   dofCount;
 
-	swarm = Stg_ComponentFactory_ConstructByName( cf, "swarm", Swarm, True, data ) ;
-	variable = Stg_ComponentFactory_ConstructByName( cf, "variable", Variable, False, data ) ;
+	swarm = Stg_ComponentFactory_ConstructByName( cf, (Name)"swarm", Swarm, True, data  ) ;
+	variable = Stg_ComponentFactory_ConstructByName( cf, (Name)"variable", Variable, False, data  ) ;
 
 	/* Check if this component has it's own component dictionary */
 	if ( Dictionary_GetDictionary( cf->componentDict, self->name ) ) {
-		dofCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "dofCount", 0 );
+		dofCount = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"dofCount", 0  );
 	}
 	/* if it doesn't, then just get the value from the root dictionary */
 	else {
-		dofCount = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, "dofCount", 0 );
+		dofCount = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dofCount", 0  );
 	}
 
  	DummySwarmVariable_Init( self, swarm, variable, dofCount );
@@ -154,7 +154,7 @@ void* _DummySwarmVariable_DefaultNew( Name name_renamed ) {
 
 Index DummySwarmVariable_Register( PluginsManager* pluginsManager ) {
 	RegisterParent( DummySwarmVariable_Type, SwarmVariable_Type );
-	return PluginsManager_Submit( pluginsManager, DummySwarmVariable_Type, "0", _DummySwarmVariable_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, DummySwarmVariable_Type, (Name)"0", _DummySwarmVariable_DefaultNew  );
 }
 
 

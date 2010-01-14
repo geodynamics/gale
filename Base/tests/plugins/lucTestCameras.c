@@ -183,15 +183,15 @@ void lucTestThisCamera( AbstractContext* context, lucCamera* camera, Stream* str
 void lucTestAllCameras( AbstractContext* context ) {
 	lucCamera*                    stereo;
 	lucCamera*                    frontOn;
-	Stream*                       stream = Journal_Register( Info_Type, CURR_MODULE_NAME );
+	Stream*                       stream = Journal_Register( Info_Type, (Name)CURR_MODULE_NAME );
 
-	if ( context->rank == 0 )
+	if ( context->rank == 0  )
 		Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, "camera.txt" );
 	Stream_SetPrintingRank( stream, 0 );
 
 	/* Note: this func gets added to construct extensions... may it should be changed to take in the tummy too? */
-	frontOn = Stg_ComponentFactory_ConstructByName( context->CF, "frontOn", lucCamera, True, 0 /* dummy */ ); 
-	stereo = Stg_ComponentFactory_ConstructByName( context->CF, "stereo", lucCamera, True, 0 /* dummy */ ); 
+	frontOn = Stg_ComponentFactory_ConstructByName( context->CF, (Name)"frontOn", lucCamera, True, 0 /* dummy */  ); 
+	stereo = Stg_ComponentFactory_ConstructByName( context->CF, (Name)"stereo", lucCamera, True, 0 /* dummy */  ); 
 	Stg_Class_Print( frontOn, stream );
 	Stg_Class_Print( stereo, stream );
 	lucTestThisCamera( context, frontOn, stream );
@@ -205,7 +205,7 @@ typedef struct {
 
 void _lucTestCameras_AssignFromXML( void* components, Stg_ComponentFactory* cf, void* data ) {
 	AbstractContext* context;
-	context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ); 
+	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  ); 
 	ContextEP_Append( context, AbstractContext_EP_AssignFromXMLExtensions, lucTestAllCameras );
 }
 
@@ -222,7 +222,7 @@ void* _lucTestCameras_DefaultNew( Name name ) {
 }
 
 Index lucTestCameras_Register( PluginsManager* pluginsManager ) {
-	return PluginsManager_Submit( pluginsManager, lucTestCameras_Type, "0", _lucTestCameras_DefaultNew );
+	return PluginsManager_Submit( pluginsManager, lucTestCameras_Type, (Name)"0", _lucTestCameras_DefaultNew  );
 }
 
 

@@ -165,20 +165,20 @@ void _lucMeshViewer_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf
 	/* Construct Parent */
 	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 	
-	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Mesh", Mesh, True, data );
+	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Mesh", Mesh, True, data  );
 
-	self->nodeNumbers = Stg_ComponentFactory_GetBool( cf, self->name, "nodeNumbers", False);
-	self->elementNumbers = Stg_ComponentFactory_GetBool( cf, self->name, "elementNumbers", False);
-	self->displayNodes = Stg_ComponentFactory_GetBool( cf, self->name, "displayNodes", False);
+	self->nodeNumbers = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"nodeNumbers", False );
+	self->elementNumbers = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"elementNumbers", False );
+	self->displayNodes = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"displayNodes", False );
 
 	_lucMeshViewer_Init( 
 			self, 
 		        mesh,
-			Stg_ComponentFactory_GetString( cf, self->name, "localColour", "black" ),
-			Stg_ComponentFactory_GetString( cf, self->name, "shadowColour", "blue" ),
-			Stg_ComponentFactory_GetString( cf, self->name, "vacantColour", "Grey" ),
-	        (float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 1.0 )
-			);
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"localColour", "black"  ),
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"shadowColour", "blue"  ),
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"vacantColour", "Grey"  ),
+	        (float) Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"lineWidth", 1.0 )
+			 );
 }
 
 void _lucMeshViewer_Build( void* drawingObject, void* data ) {
@@ -561,14 +561,14 @@ void lucMeshViewer_BuildEdges( lucMeshViewer* self ) {
 	assert( self );
 	
 	self->nEdges = Mesh_GetLocalSize( self->mesh, MT_EDGE );
-	self->edges = Memory_Alloc_2DArray( unsigned, self->nEdges, 2, "edges" );
+	self->edges = Memory_Alloc_2DArray( unsigned, self->nEdges, 2, (Name)"edges" );
 
 	for( e_i = 0; e_i < self->nEdges; e_i++ ) {
 		/* Find node IDs for each edge */
 		
 	}
 		
-	nVerts = Mesh_GetLocalSize( );
+	nVerts = Mesh_GetLocalSize(  );
 	done = AllocArray( Bool, nVerts );
 #endif
 }

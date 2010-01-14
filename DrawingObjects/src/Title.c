@@ -181,14 +181,14 @@ void _lucTitle_AssignFromXML( void* title, Stg_ComponentFactory* cf, void* data 
          /* Construct Parent */
 	_lucDrawingObject_AssignFromXML( self, cf, data );
 
-	colourName  = Stg_ComponentFactory_GetString( cf, self->name, "colour", "Black") ;
+	colourName  = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"colour", "Black" ) ;
 	
 	lucColour_FromString( &self->colour, colourName );
 
 	lucTitle_InitAll( self, 
-			Stg_ComponentFactory_GetString( cf, self->name, "string", "" ),
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"string", ""  ),
 		        self->colour,
-			Stg_ComponentFactory_GetInt( cf, self->name, "yPos", 20 ) );
+			Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"yPos", 20 )  );
 			
 }
 

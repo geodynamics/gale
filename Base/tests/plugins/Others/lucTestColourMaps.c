@@ -51,7 +51,7 @@
 void lucTestColourMaps( void* _context, void* _buffer ) {
 	AbstractContext* context = (AbstractContext*) _context;
 	lucBaseContextExtension* contextExt = ExtensionManager_Get( context->extensionMgr, context, lucBaseContextExtensionHandle );
-	Stream* stream = Journal_Register( Info_Type, CURR_MODULE_NAME );
+	Stream* stream = Journal_Register( Info_Type, (Name)CURR_MODULE_NAME  );
 
 	Stream_RedirectFile_WithPrependedPath( stream, context->outputPath, "colourMap.txt" );
 

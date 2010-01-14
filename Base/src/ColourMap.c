@@ -265,22 +265,22 @@ void* _lucColourMap_DefaultNew( Name name ) {
 void _lucColourMap_AssignFromXML( void* colourMap, Stg_ComponentFactory* cf, void* data ) {
 	lucColourMap* self             = (lucColourMap*) colourMap;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context ) 
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !self->context  ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 
 	_lucColourMap_Init( 
 			self, 
-			Stg_ComponentFactory_GetString( cf, self->name, "colours", "Blue;White;Red"), 
-			Stg_ComponentFactory_GetDouble( cf, self->name, "minimum", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "maximum", 1.0 ),
-			Stg_ComponentFactory_GetBool( cf, self->name, "logScale", False ),
-			Stg_ComponentFactory_GetBool( cf, self->name, "dynamicRange", False ),
-			Stg_ComponentFactory_GetBool( cf, self->name, "centreOnFixedValue", False ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "centringValue", 0.0 )
-	);
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"colours", "Blue;White;Red" ), 
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minimum", 0.0  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maximum", 1.0  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"logScale", False  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"dynamicRange", False  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"centreOnFixedValue", False  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"centringValue", 0.0 )
+	 );
 
-    self->discrete = Stg_ComponentFactory_GetBool( cf, self->name, "discrete", False );
+    self->discrete = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"discrete", False  );
 }
 
 void _lucColourMap_Build( void* colourMap, void* data ) { }
@@ -383,7 +383,7 @@ void lucColourMap_GetColourFromScaledValue( void* colourMap, float scaledValue, 
 void lucColourMap_SetMinMax( void* colourMap, double min, double max ) {
 	lucColourMap* self       = colourMap;
 	double        tolerance  = 1e-10;
-    Stream*       stream     = Journal_Register( InfoStream_Type, self->type );
+    Stream*       stream     = Journal_Register( InfoStream_Type, (Name)self->type );
 	/* Shift max and min if they are too close */
 	if (fabs(min - max) < tolerance) {	
 		max += tolerance;
@@ -394,7 +394,7 @@ void lucColourMap_SetMinMax( void* colourMap, double min, double max ) {
 	self->minimum = min;
 	self->maximum = max;
 	if(self->logScale){
-	   if(self->minimum <= FLT_MIN ) {
+	   if(self->minimum <= FLT_MIN  ) {
 	      self->minimum =  FLT_MIN;
 	      Journal_DPrintf( stream, "\n WARNING: Field used for logscale colourmap possibly contains non-positive values. \n" );
 	   }

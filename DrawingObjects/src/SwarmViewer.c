@@ -149,9 +149,9 @@ void _lucSwarmViewer_AssignFromXML( void* drawingObject, Stg_ComponentFactory* c
 	
 	_lucSwarmViewer_Init( 
 		self, 
-		(float) Stg_ComponentFactory_GetDouble( cf, self->name, "pointSize",      1.0 ),
-		(Bool ) Stg_ComponentFactory_GetBool(   cf, self->name, "pointSmoothing", 0 )
-	  );
+		(float) Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"pointSize", 1.0  ),
+		(Bool ) Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"pointSmoothing", 0 )
+	   );
 }
 
 void _lucSwarmViewer_Build( void* drawingObject, void* data ) {

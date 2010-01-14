@@ -186,7 +186,7 @@ void _lucRenderingEngineTest_CompositeViewport(
 
 void RenderingEngineTest_Register( AbstractContext* context ) {
 	Stg_ComponentRegister* componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
-	Stg_ComponentRegister_Add( componentRegister, lucRenderingEngineTest_Type,     "0", _lucRenderingEngineTest_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, lucRenderingEngineTest_Type, (Name)"0", _lucRenderingEngineTest_DefaultNew  );
 	RegisterParent( lucRenderingEngineTest_Type, lucRenderingEngine_Type );
 }
 

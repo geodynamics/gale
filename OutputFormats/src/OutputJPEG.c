@@ -137,7 +137,7 @@ void _lucOutputJPEG_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf,
 
 	_lucOutputJPEG_Init( 
 			self,
-			Stg_ComponentFactory_GetInt( cf, self->name, "quality", 93 ) );
+			Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"quality", 93 )  );
 }
 
 void _lucOutputJPEG_Build( void* outputFormat, void* data ) {}

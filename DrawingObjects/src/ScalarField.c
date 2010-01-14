@@ -146,9 +146,9 @@ void _lucScalarField_AssignFromXML( void* drawingObject, Stg_ComponentFactory* c
 
 	_lucScalarField_Init( 
 			self, 
-			Stg_ComponentFactory_GetBool( cf, self->name, "cullFace", True ) );
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"cullFace", True )  );
 
-        self->useMesh = Stg_ComponentFactory_GetBool( cf, self->name, "useMesh", False );
+        self->useMesh = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"useMesh", False  );
 }
 
 void _lucScalarField_Build( void* drawingObject, void* data ) {

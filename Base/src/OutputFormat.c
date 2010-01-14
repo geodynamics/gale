@@ -133,9 +133,9 @@ void* _lucOutputFormat_Copy( void* outputFormat, void* dest, Bool deep, Name nam
 void _lucOutputFormat_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ) {
 	lucOutputFormat* self        = outputFormat;
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context ) 
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !self->context  ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 }
 void _lucOutputFormat_Build( void* outputFormat, void* data ) { }
 void _lucOutputFormat_Initialise( void* outputFormat, void* data ) { }

@@ -151,9 +151,9 @@ void _lucX11Window_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* 
 				
 	_lucX11Window_Init( 
 			self,
-			Stg_ComponentFactory_GetString( cf, self->name, "host", "localhost" ),
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "displayNumber", 0 ),
-			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "displayScreen", 0 ) );
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"host", "localhost"  ),
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"displayNumber", 0  ),
+			Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"displayScreen", 0 )  );
 			
 			
 }

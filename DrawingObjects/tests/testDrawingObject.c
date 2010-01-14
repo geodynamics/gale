@@ -83,7 +83,7 @@ int main( int argc, char* argv[] ) {
 	StGermain_Init( &argc, &argv );
 	lucBase_Init();
 	/* Add lucWindow as default window for this test */
-	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), lucDefaultWindow_Type, "0", _lucWindow_DefaultNew );
+	Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), lucDefaultWindow_Type, (Name)"0", _lucWindow_DefaultNew );
 	lucWindowing_Init();
 	lucRenderingEngines_Init();
 	lucOutputFormats_Init();
@@ -99,7 +99,7 @@ int main( int argc, char* argv[] ) {
 	dictionary = Dictionary_New();
 
 	/* Read input */
-	ioHandler = XML_IO_Handler_New();
+	ioHandler = XML_IO_Handler_New( );
 	IO_Handler_ReadAllFromCommandLine( ioHandler, argc, argv, dictionary );
 	Journal_ReadFromDictionary( dictionary );
 
@@ -112,7 +112,7 @@ int main( int argc, char* argv[] ) {
 
 	/* Redirect OpenGL stream */
 	sprintf( filename, "OpenGL.%d.txt", rank );
-	dummyOpenGLStream = Journal_Register( Info_Type, "DummyOpenGL" );
+	dummyOpenGLStream = Journal_Register( Info_Type, (Name)"DummyOpenGL"  );
 	Stream_RedirectFile_WithPrependedPath( dummyOpenGLStream, context->outputPath, filename );
 
 	/* Building phase ---------------------------------------------------------------------------------------------------*/

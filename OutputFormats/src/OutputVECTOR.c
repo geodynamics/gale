@@ -81,7 +81,7 @@ void _lucOutputVECTOR_Init( lucOutputVECTOR* self, Stg_ComponentFactory* cf ){
 	Name             formatName;
 	Index            buffersize;
 	
-	formatName = Stg_ComponentFactory_GetString( cf, self->name, "Format", "ps" );
+	formatName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"Format", "ps"  );
 
 	if ( strcasecmp( formatName, "ps" ) == 0 ) {
 		self->format            = "ps";
@@ -111,14 +111,14 @@ void _lucOutputVECTOR_Init( lucOutputVECTOR* self, Stg_ComponentFactory* cf ){
 			    pdf  -  portable document format \n \n", \
 			formatName);	
 
-	buffersize = Stg_ComponentFactory_GetInt( cf, self->name, "Buffersize", 4096*4096 );
+	buffersize = Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"Buffersize", 4096*4096 );
 	self->buffersize = buffersize;
 }
 
 void _lucOutputVECTOR_Delete( void* outputFormat ) {
 	lucOutputVECTOR*  self = (lucOutputVECTOR*)outputFormat;
 
-	_lucOutputFormat_Delete( self );
+	_lucOutputFormat_Delete( self  );
 }
 
 void _lucOutputVECTOR_Print( void* outputFormat, Stream* stream ) {
@@ -163,9 +163,9 @@ void* _lucOutputVECTOR_DefaultNew( Name name ) {
 
 void _lucOutputVECTOR_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ){
 	lucOutputVECTOR*  self = (lucOutputVECTOR*)outputFormat;
-	AbstractContext* context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data ) ;
+	AbstractContext* context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data ) ;
 	
-	if(context->rank == MASTER)
+	if(context->rank == MASTER )
 		Journal_Firewall( context->nproc == 1, Journal_MyStream( Error_Type, self ), "\n \n     Vector outputting is not supported in parallel.\n     Please choose an alternate output format.\n\n");
 
 	_lucOutputVECTOR_Init( self, cf );

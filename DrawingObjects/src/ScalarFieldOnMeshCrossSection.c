@@ -163,27 +163,27 @@ void _lucScalarFieldOnMeshCrossSection_AssignFromXML( void* drawingObject, Stg_C
 	/* Construct Parent */
 	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
-	fieldVariableName = Stg_ComponentFactory_GetString( cf, self->name, "FieldVariable", "defaultName" );
+	fieldVariableName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"FieldVariable", "defaultName"  );
 	
 	/* This variable is now constructed in the build phase 	
 	fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "FieldVariable", FieldVariable, True ) ;
 	*/
 	
-	colourMap = Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap", lucColourMap, True, data );
+	colourMap = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ColourMap", lucColourMap, True, data  );
 
-	crossSectionName = Stg_ComponentFactory_GetString( cf, self->name, "crossSection", "" );
+	crossSectionName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"crossSection", ""  );
 	if ( sscanf( crossSectionName, "%c=%d", &axisChar, &value ) == 2 ) {
 		if ( toupper( axisChar ) >= 'X' )
 			axis = toupper( axisChar ) - 'X';
 	}
 
 	/* Get Values with which to crop the cross section */
-	minCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "minCropX", -HUGE_VAL );
-	minCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "minCropY", -HUGE_VAL );
-	minCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "minCropZ", -HUGE_VAL );
-	maxCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropX", +HUGE_VAL );
-	maxCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropY", +HUGE_VAL );
-	maxCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, "maxCropZ", +HUGE_VAL );
+	minCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minCropX", -HUGE_VAL  );
+	minCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minCropY", -HUGE_VAL  );
+	minCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minCropZ", -HUGE_VAL  );
+	maxCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxCropX", +HUGE_VAL  );
+	maxCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxCropY", +HUGE_VAL  );
+	maxCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxCropZ", +HUGE_VAL  );
 	
 	_lucScalarFieldOnMeshCrossSection_Init( 
 			self, 
@@ -199,12 +199,12 @@ void _lucScalarFieldOnMeshCrossSection_Build( void* drawingObject, void* data ) 
 	lucScalarFieldOnMeshCrossSection*     self    = (lucScalarFieldOnMeshCrossSection*)drawingObject;
 	FeVariable*                     feVariable;
 	Mesh*                           mesh;
-	Stream*                         errorStream = Journal_Register( Error_Type, self->type );
+	Stream*                         errorStream = Journal_Register( Error_Type, (Name)self->type  );
 	
 
 	/* HACK - Get pointer to FieldVariable in build phase just to let FieldVariables be created in plugins */
-	feVariable =  Stg_ComponentFactory_ConstructByName( self->context->CF, self->fieldVariableName, FeVariable, True, 0 /* dummy */ );
-	self->fieldVariable = (FieldVariable*) feVariable;
+	feVariable =  Stg_ComponentFactory_ConstructByName( self->context->CF, (Name)self->fieldVariableName, FeVariable, True, 0 /* dummy */ );
+	self->fieldVariable = (FieldVariable* ) feVariable;
 
 	Journal_Firewall( self->fieldVariable->fieldComponentCount == 1, errorStream,
 		"Error - in %s(): provided FieldVariable \"%s\" has %u components - but %s Component "
@@ -216,10 +216,10 @@ void _lucScalarFieldOnMeshCrossSection_Build( void* drawingObject, void* data ) 
 	mesh    = (Mesh*) feVariable->feMesh;
 
 	/* Store the Vertex Grid */
-	self->vertexGridHandle = ExtensionManager_GetHandle( mesh->info, "vertexGrid" );
+	self->vertexGridHandle = ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" );
 	if ( self->vertexGridHandle == (ExtensionInfo_Index)-1 )
 
-	Journal_Firewall( self->vertexGridHandle != (ExtensionInfo_Index)-1, errorStream,
+	Journal_Firewall( self->vertexGridHandle != (ExtensionInfo_Index )-1, errorStream,
 		"Error - in %s(): provided FieldVariable \"%s\" doesn't have a Vertex Grid.\n"
 		"Try visualising with lucScalarField instead.\n", __func__, self->fieldVariable->name );
 		

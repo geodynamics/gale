@@ -19,7 +19,7 @@ lucCrossSection* lucCrossSection_Read( Stg_ComponentFactory* cf, Name component)
    self->interpolate = False;
 
    /* Read the cross section string specification from xml */
-   crossSectionStr = Stg_ComponentFactory_GetString( cf, component, "crossSection", "z=min");
+   crossSectionStr = Stg_ComponentFactory_GetString( cf, component, (Dictionary_Entry_Key)"crossSection", "z=min" );
 
    /* axis=value    : draw at this exact value on axis
     * axis=min      : draw at minimum of range on axis

@@ -158,24 +158,24 @@ void _lucContour_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, v
 	/* Construct Parent */
 	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
-	fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "FieldVariable", FieldVariable, True,  data );
-	colourMap     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap",     lucColourMap,  False, data );
+	fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"FieldVariable", FieldVariable, True, data  );
+	colourMap     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ColourMap", lucColourMap, False, data  );
 
-	showValues = Stg_ComponentFactory_GetBool( cf, self->name, "showValues", True );
-	defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolution", 8 );
-	resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionX", defaultResolution );
-	resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionY", defaultResolution );
-	resolution[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, "resolutionZ", defaultResolution );
+	showValues = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"showValues", True  );
+	defaultResolution = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolution", 8  );
+	resolution[ I_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolutionX", defaultResolution  );
+	resolution[ J_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolutionY", defaultResolution  );
+	resolution[ K_AXIS ] = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"resolutionZ", defaultResolution  );
 			
 	_lucContour_Init( 
 			self, 
 			fieldVariable,
 			colourMap,
-			Stg_ComponentFactory_GetString( cf, self->name, "colour", "black" ),
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"colour", "black"  ),
 			resolution,
-			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 1.0 ),
+			(float) Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"lineWidth", 1.0  ),
       showValues,
-			Stg_ComponentFactory_GetDouble( cf, self->name, "interval", 0.33 ) ) ;
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"interval", 0.33 )  ) ;
 }
 
 void _lucContour_Build( void* drawingObject, void* data ) {}
@@ -285,7 +285,7 @@ void lucContour_DrawContour(
 	dA = (max[ aAxis ] - min[ aAxis ])/(double) (resolutionA - 1);
 	dB = (max[ bAxis ] - min[ bAxis ])/(double) (resolutionB - 1);
 
-	array = Memory_Alloc_2DArray( double , resolutionA, resolutionB, "Field Values");
+	array = Memory_Alloc_2DArray( double , resolutionA, resolutionB, (Name)"Field Values" );
 	for ( i = 0, pos[ aAxis ] = min[ aAxis ] ; i < resolutionA ; i++, pos[aAxis] += dA ) {
 		for ( j = 0, pos[bAxis] = min[ bAxis ] ; j < resolutionB ; j++, pos[bAxis] += dB ) {
 			if (pos[aAxis] > max[ aAxis ]) 

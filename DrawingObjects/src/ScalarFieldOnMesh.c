@@ -142,7 +142,7 @@ void _lucScalarFieldOnMesh_AssignFromXML( void* drawingObject, Stg_ComponentFact
 
 	_lucScalarFieldOnMesh_Init( 
 			self, 
-			Stg_ComponentFactory_GetBool( cf, self->name, "cullFace", True ) );
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"cullFace", True )  );
 }
 
 void _lucScalarFieldOnMesh_Build( void* drawingObject, void* data ) {

@@ -54,32 +54,32 @@
 Bool lucDrawingObjects_Init() {
 	Stg_ComponentRegister* componentRegister = Stg_ComponentRegister_Get_ComponentRegister();
 
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
 
-	Stg_ComponentRegister_Add( componentRegister, lucColourBar_Type,               "0", _lucColourBar_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucFieldVariableBorder_Type,     "0", _lucFieldVariableBorder_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucIsosurface_Type,              "0", _lucIsosurface_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucScalarFieldCrossSection_Type, "0", _lucScalarFieldCrossSection_DefaultNew);
-	Stg_ComponentRegister_Add( componentRegister, lucScalarField_Type,             "0", _lucScalarField_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucVectorArrowCrossSection_Type, "0", _lucVectorArrowCrossSection_DefaultNew);
-	Stg_ComponentRegister_Add( componentRegister, lucVectorArrows_Type,            "0", _lucVectorArrows_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucTextureMap_Type,              "0", _lucTextureMap_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucContour_Type,                 "0", _lucContour_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucFeVariableSurface_Type,       "0", _lucFeVariableSurface_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucSwarmViewer_Type,             "0", _lucSwarmViewer_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucSwarmVectors_Type,            "0", _lucSwarmVectors_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucSwarmSquares_Type,            "0", _lucSwarmSquares_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucHistoricalSwarmTrajectory_Type,"0", _lucHistoricalSwarmTrajectory_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucEigenvectorsCrossSection_Type, "0", _lucEigenvectorsCrossSection_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucEigenvectors_Type,             "0", _lucEigenvectors_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucSwarmRGBColourViewer_Type,     "0", _lucSwarmRGBColourViewer_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucMeshViewer_Type,               "0", _lucMeshViewer_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucTitle_Type,                    "0", _lucTitle_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucAxis_Type,                      "0", _lucAxis_DefaultNew );
-        Stg_ComponentRegister_Add( componentRegister, lucTimeStep_Type,                      "0", _lucTimeStep_DefaultNew );
-	Stg_ComponentRegister_Add( componentRegister, lucScalarFieldOnMeshCrossSection_Type, "0", _lucScalarFieldOnMeshCrossSection_DefaultNew);
-	Stg_ComponentRegister_Add( componentRegister, lucScalarFieldOnMesh_Type,             "0", _lucScalarFieldOnMesh_DefaultNew);
+	Stg_ComponentRegister_Add( componentRegister, lucColourBar_Type, (Name)"0", _lucColourBar_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucFieldVariableBorder_Type, (Name)"0", _lucFieldVariableBorder_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucIsosurface_Type, (Name)"0", _lucIsosurface_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucScalarFieldCrossSection_Type, (Name)"0", _lucScalarFieldCrossSection_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, lucScalarField_Type, (Name)"0", _lucScalarField_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucVectorArrowCrossSection_Type, (Name)"0", _lucVectorArrowCrossSection_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, lucVectorArrows_Type, (Name)"0", _lucVectorArrows_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucTextureMap_Type, (Name)"0", _lucTextureMap_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucContour_Type, (Name)"0", _lucContour_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucFeVariableSurface_Type, (Name)"0", _lucFeVariableSurface_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucSwarmViewer_Type, (Name)"0", _lucSwarmViewer_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucSwarmVectors_Type, (Name)"0", _lucSwarmVectors_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucSwarmSquares_Type, (Name)"0", _lucSwarmSquares_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucHistoricalSwarmTrajectory_Type, (Name)"0", _lucHistoricalSwarmTrajectory_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucEigenvectorsCrossSection_Type, (Name)"0", _lucEigenvectorsCrossSection_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucEigenvectors_Type, (Name)"0", _lucEigenvectors_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucSwarmRGBColourViewer_Type, (Name)"0", _lucSwarmRGBColourViewer_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucMeshViewer_Type, (Name)"0", _lucMeshViewer_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucTitle_Type, (Name)"0", _lucTitle_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucAxis_Type, (Name)"0", _lucAxis_DefaultNew  );
+        Stg_ComponentRegister_Add( componentRegister, lucTimeStep_Type, (Name)"0", _lucTimeStep_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, lucScalarFieldOnMeshCrossSection_Type, (Name)"0", _lucScalarFieldOnMeshCrossSection_DefaultNew );
+	Stg_ComponentRegister_Add( componentRegister, lucScalarFieldOnMesh_Type, (Name)"0", _lucScalarFieldOnMesh_DefaultNew );
 	
 
 	/* Register Parents for type checking */

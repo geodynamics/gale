@@ -148,9 +148,9 @@ void _lucSwarmRGBColourViewer_AssignFromXML( void* drawingObject, Stg_ComponentF
 	/* Construct Parent */
 	_lucSwarmViewer_AssignFromXML( self, cf, data );
 
-	colourRedVariableName   = Stg_ComponentFactory_GetString( cf, self->name, "ColourRedVariable", "" );
-	colourGreenVariableName = Stg_ComponentFactory_GetString( cf, self->name, "ColourGreenVariable", "" );
-	colourBlueVariableName  = Stg_ComponentFactory_GetString( cf, self->name, "ColourBlueVariable", "" );
+	colourRedVariableName   = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"ColourRedVariable", ""  );
+	colourGreenVariableName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"ColourGreenVariable", ""  );
+	colourBlueVariableName  = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"ColourBlueVariable", ""  );
 	
 	_lucSwarmRGBColourViewer_Init( 
 			self, 
@@ -164,7 +164,7 @@ void _lucSwarmRGBColourViewer_Build( void* drawingObject, void* data ) {}
 void _lucSwarmRGBColourViewer_Initialise( void* drawingObject, void* data ) {
 	lucSwarmRGBColourViewer*	self                   = (lucSwarmRGBColourViewer*)drawingObject;
 	SwarmVariable_Register*  	swarmVariable_Register = self->swarm->swarmVariable_Register;
-	Stream*                  	errorStr               = Journal_Register( Error_Type, self->type );
+	Stream*                  	errorStr               = Journal_Register( Error_Type, (Name)self->type  );
 
 	_lucSwarmViewer_Initialise( self, data );
 

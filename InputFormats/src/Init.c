@@ -53,7 +53,7 @@
 Bool lucInputFormats_Init() {
 	/*Stg_ComponentRegister* componentRegister = Stg_ComponentRegister_Get_ComponentRegister();*/
 
-	Journal_Printf( Journal_Register( DebugStream_Type, "Context" ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
+	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
 	lucInputFormat_Register_Add( lucInputFormat_Register_Singleton, ".ppm", lucInputPPM_Type, "0", _lucInputPPM_DefaultNew );
 	RegisterParent( lucInputPPM_Type,         lucInputFormat_Type );

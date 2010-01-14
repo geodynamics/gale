@@ -132,9 +132,9 @@ void* _lucInputFormat_Copy( void* inputFormat, void* dest, Bool deep, Name nameE
 void _lucInputFormat_AssignFromXML( void* inputFormat, Stg_ComponentFactory* cf, void* data ) {
 	lucInputFormat*        self               = (lucInputFormat*) inputFormat; 
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context ) 
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !self->context  ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 }
 void _lucInputFormat_Build( void* inputFormat, void* data ) { }
 void _lucInputFormat_Initialise( void* inputFormat, void* data ) { }

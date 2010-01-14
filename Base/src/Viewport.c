@@ -257,32 +257,16 @@ void _lucViewport_AssignFromXML( void* viewport, Stg_ComponentFactory* cf, void*
 
 	/* TODO Construct Parent */
 
-	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !self->context ) 
-		self->context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !self->context  ) 
+		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 
-	camera =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "Camera", lucCamera, True, data ) ;
+	camera =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Camera", lucCamera, True, data  ) ;
 
-	drawingObjectList = Stg_ComponentFactory_ConstructByList( 
-		cf, 
-		self->name, 
-		"DrawingObject", 
-		Stg_ComponentFactory_Unlimited, 
-		lucDrawingObject, 
-		True, 
-		&drawingObjectCount,
-		data );
+	drawingObjectList = Stg_ComponentFactory_ConstructByList( cf, self->name, (Dictionary_Entry_Key)"DrawingObject", Stg_ComponentFactory_Unlimited, lucDrawingObject, True, &drawingObjectCount, data  );
 	
 	/* Grab a list of lights for this viewport */
-	lightList = Stg_ComponentFactory_ConstructByList( 
-		cf, 
-		self->name, 
-		"Light", 
-		Stg_ComponentFactory_Unlimited, 
-		lucLight, 
-		False, 
-		&lightCount,
-		data );
+	lightList = Stg_ComponentFactory_ConstructByList( cf, self->name, (Dictionary_Entry_Key)"Light", Stg_ComponentFactory_Unlimited, lucLight, False, &lightCount, data  );
 
 	_lucViewport_Init(
 			self,
@@ -291,15 +275,15 @@ void _lucViewport_AssignFromXML( void* viewport, Stg_ComponentFactory* cf, void*
 			drawingObjectCount,
 			lightList,
 			lightCount,
-			Stg_ComponentFactory_GetBool( cf, self->name, "drawTitle", True ),
-			Stg_ComponentFactory_GetBool( cf, self->name, "drawTime", False ),
-			Stg_ComponentFactory_GetBool( cf, self->name, "compositeEachObject", False ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "nearClipPlane", 0.1 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "farClipPlane", 40.0 ) );
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"drawTitle", True  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"drawTime", False  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"compositeEachObject", False  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"nearClipPlane", 0.1  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"farClipPlane", 40.0 ) );
 
 	Memory_Free( drawingObjectList );
         if(lightList)
-		Memory_Free( lightList );
+		Memory_Free( lightList  );
 }
 
 void _lucViewport_Build( void* camera, void* data ) { }

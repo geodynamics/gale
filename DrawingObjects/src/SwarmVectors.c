@@ -158,12 +158,12 @@ void _lucSwarmVectors_AssignFromXML( void* drawingObject, Stg_ComponentFactory* 
 
 	_lucSwarmVectors_Init( 
 			self,
-			Stg_ComponentFactory_GetString( cf, self->name, "DirectionVariable", "" ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "arrowHeadSize", 0.5 ),
-			Stg_ComponentFactory_GetString( cf, self->name, "ThicknessVariable", "" ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "thickness", 1.0 ),
-			Stg_ComponentFactory_GetString( cf, self->name, "LengthVariable", "" ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, "length", 0.2 ) );
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"DirectionVariable", ""  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"arrowHeadSize", 0.5  ),
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"ThicknessVariable", ""  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"thickness", 1.0  ),
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"LengthVariable", ""  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"length", 0.2 )  );
 }
 
 void _lucSwarmVectors_Build( void* drawingObject, void* data ) {

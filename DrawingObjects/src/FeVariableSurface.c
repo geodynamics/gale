@@ -152,17 +152,17 @@ void _lucFeVariableSurface_AssignFromXML( void* drawingObject, Stg_ComponentFact
 	/* Construct Parent */
 	_lucDrawingObject_AssignFromXML( self, cf, data );
 
-	feVariable    =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "FeVariable", FieldVariable, True,  data );
-	colourMap     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "ColourMap",  lucColourMap,  False, data );
+	feVariable    =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"FeVariable", FieldVariable, True, data  );
+	colourMap     =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ColourMap", lucColourMap, False, data  );
 	
 	_lucFeVariableSurface_Init( 
 			self, 
 			feVariable,
 			colourMap,
-			Stg_ComponentFactory_GetString( cf, self->name, "colour", "black" ),
-			Stg_ComponentFactory_GetBool( cf, self->name, "wireframe", False ),
-			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "lineWidth", 1.0 ),
-			(float) Stg_ComponentFactory_GetDouble( cf, self->name, "scaleHeight", 0.0 ) );
+			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"colour", "black"  ),
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"wireframe", False  ),
+			(float) Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"lineWidth", 1.0  ),
+			(float) Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"scaleHeight", 0.0 )  );
 }
 
 void _lucFeVariableSurface_Build( void* drawingObject, void* data ) {}

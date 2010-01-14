@@ -96,8 +96,8 @@ int main( int argc, char* argv[] ) {
 	if( rank == 0 ) 
 		Context_PrintConcise( context, context->verbose );
 
-	if ( True == Dictionary_GetBool_WithDefault( dictionary, "showJournalStatus", False ) ) {
-		Journal_PrintConcise();	
+	if ( True == Dictionary_GetBool_WithDefault( dictionary, (Dictionary_Entry_Key)"showJournalStatus", False ) ) {
+		Journal_PrintConcise( );	
 	}			
 
 	/* Building phase ---------------------------------------------------------------------------------------------------*/
