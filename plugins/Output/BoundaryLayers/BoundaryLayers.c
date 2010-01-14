@@ -178,7 +178,7 @@ double Underworld_BoundaryLayers_InternalTemperature( UnderworldContext* context
 	IntegrationPoint*   particle;
 	double              bottomLayerHeight;
 	double              topLayerHeight;
-	FeVariable*         temperatureField       = (FeVariable* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"temperatureField"  );
+	FeVariable*         temperatureField       = (FeVariable* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"TemperatureField"  );
 	FeMesh*		    mesh                   = temperatureField->feMesh;
 	Element_LocalIndex  lElement_I;
 	Node_LocalIndex    	nodeAtElementBottom;
