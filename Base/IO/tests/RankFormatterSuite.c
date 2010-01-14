@@ -71,7 +71,7 @@ void RankFormatterSuite_TestPrintWithRank( RankFormatterSuiteData* data ) {
       Stg_asprintf( &prefixStr, "%d: ", data->myRank );
    }
 
-   myInfo = Journal_Register( Info_Type, "MyInfo" );
+   myInfo = Journal_Register( Info_Type, (Name)"MyInfo"  );
    Stream_AddFormatter( myInfo, RankFormatter_New() );
    Stream_SetPrintingRank( myInfo, STREAM_ALL_RANKS );
    Stream_RedirectFile( myInfo, testOutFilename );

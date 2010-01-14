@@ -77,7 +77,7 @@ void LinkedListSuite_DataPrintFunction( void *nodeData, void *args )
 	Stream *myStream = NULL;
 	
 	assert (nodeData);
-	myStream = Journal_Register( InfoStream_Type, "LinkedListStream" );
+	myStream = Journal_Register( InfoStream_Type, (Name)"LinkedListStream"  );
 
 	Journal_Printf( myStream, "\t%d\n", *(int*)nodeData );
 }

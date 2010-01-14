@@ -75,11 +75,11 @@ void MPIStreamSuite_TestWriteAllProcessors( MPIStreamSuiteData* data ) {
    Dictionary_AddFromUnsignedInt( data->dict, "journal-mpi-offset.MPIStream.one", 100 );
    Journal_ReadFromDictionary( data->dict );
 
-   stream1 = Journal_Register( MPIStream_Type, "one" );
+   stream1 = Journal_Register( MPIStream_Type, (Name)"one" );
    pcu_check_true( STREAM_ALL_RANKS == Stream_GetPrintingRank( stream1 ) );
 
    /* Write half the alphabet to each process */
-   for ( ii = 0; ii < PER_RANK_COUNT; ++ii ) {
+   for ( ii = 0; ii < PER_RANK_COUNT; ++ii  ) {
       dataArray[ii] = 'a' + PER_RANK_COUNT * data->rank + ii;
    }
    
@@ -131,7 +131,7 @@ void MPIStreamSuite_TestPrintWithOffset( MPIStreamSuiteData* data ) {
    Dictionary_AddFromString( data->dict, "journal-file.MPIStream.two", testMPIFilename );
    Journal_ReadFromDictionary( data->dict );
 
-   stream2 = Journal_Register( MPIStream_Type, "two" );
+   stream2 = Journal_Register( MPIStream_Type, (Name)"two" );
    pcu_check_true( STREAM_ALL_RANKS == Stream_GetPrintingRank( stream2 ) );
 
    for( ii=0; ii <10*(data->rank+1); ii++ ) {
@@ -139,7 +139,7 @@ void MPIStreamSuite_TestPrintWithOffset( MPIStreamSuiteData* data ) {
    }
    rankPrintString[10*(data->rank+1)] = '\0';
 
-   stringLength = 10*(data->rank+1);
+   stringLength = 10*(data->rank+1 );
 
    MPIStream_SetOffset( stream2, stringLength*sizeof(char), data->comm );
 

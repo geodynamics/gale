@@ -177,10 +177,10 @@ void AbstractContextSuite_Setup( AbstractContextSuiteData* data ) {
 
    data->dict = Dictionary_New();
 
-   Dictionary_Add( data->dict, "outputPath", Dictionary_Entry_Value_FromString( "output" ) );
-   Dictionary_Add( data->dict, "checkpointEvery", Dictionary_Entry_Value_FromUnsignedInt( 5 ) );
-   Dictionary_Add( data->dict, "dumpEvery", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
-   Dictionary_Add( data->dict, "maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( 10 ) );
+   Dictionary_Add( data->dict, (Dictionary_Entry_Key)"outputPath", Dictionary_Entry_Value_FromString( "output" )  );
+   Dictionary_Add( data->dict, (Dictionary_Entry_Key)"checkpointEvery", Dictionary_Entry_Value_FromUnsignedInt( 5 )  );
+   Dictionary_Add( data->dict, (Dictionary_Entry_Key)"dumpEvery", Dictionary_Entry_Value_FromUnsignedInt( 2 )  );
+   Dictionary_Add( data->dict, (Dictionary_Entry_Key)"maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( 10 )  );
    
    cf = Stg_ComponentFactory_New( data->dict, NULL );
 
@@ -307,14 +307,14 @@ void AbstractContextSuite_TestRestartFromCheckpoint( AbstractContextSuiteData* d
 
    data->dict = Dictionary_New();
 
-   Dictionary_Add( data->dict, "outputPath", Dictionary_Entry_Value_FromString( "output" ) );
-   Dictionary_Add( data->dict, "checkpointEvery", Dictionary_Entry_Value_FromUnsignedInt( 5 ) );
-   Dictionary_Add( data->dict, "dumpEvery", Dictionary_Entry_Value_FromUnsignedInt( 2 ) );
-   Dictionary_Add( data->dict, "maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( 10 ) );
+   Dictionary_Add( data->dict, (Dictionary_Entry_Key)"outputPath", Dictionary_Entry_Value_FromString( "output" )  );
+   Dictionary_Add( data->dict, (Dictionary_Entry_Key)"checkpointEvery", Dictionary_Entry_Value_FromUnsignedInt( 5 )  );
+   Dictionary_Add( data->dict, (Dictionary_Entry_Key)"dumpEvery", Dictionary_Entry_Value_FromUnsignedInt( 2 )  );
+   Dictionary_Add( data->dict, (Dictionary_Entry_Key)"maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( 10 )  );
 
    /* ReBuild the context */
-   Dictionary_Set( data->dict, "maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( 20 ) );
-   Dictionary_Set( data->dict, "restartTimestep", Dictionary_Entry_Value_FromUnsignedInt( 5 ) );
+   Dictionary_Set( data->dict, (Dictionary_Entry_Key)"maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( 20 )  );
+   Dictionary_Set( data->dict, (Dictionary_Entry_Key)"restartTimestep", Dictionary_Entry_Value_FromUnsignedInt( 5 )  );
    MPI_Comm_dup( MPI_COMM_WORLD, &CommWorld );
    cf = Stg_ComponentFactory_New( data->dict, NULL );
 

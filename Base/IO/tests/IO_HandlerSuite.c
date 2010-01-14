@@ -80,8 +80,8 @@ void IO_HandlerSuite_Setup( IO_HandlerSuiteData* data ) {
 
    data->io_handler = XML_IO_Handler_New();
    /* We don't want output in the tests by default */
-   Stream_Enable( Journal_Register( Debug_Type, XML_IO_Handler_Type ), False );
-   Stream_Enable( Journal_Register( Info_Type, XML_IO_Handler_Type ), False );
+   Stream_Enable( Journal_Register( Debug_Type, (Name)XML_IO_Handler_Type  ), False );
+   Stream_Enable( Journal_Register( Info_Type, (Name)XML_IO_Handler_Type  ), False );
    data->dict1 = Dictionary_New();
    data->dict2 = Dictionary_New();
    data->testDD   = Memory_Alloc_Unnamed( DictionarySuite_TestDictData );
@@ -384,12 +384,12 @@ void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
       pcu_check_true( Dictionary_Entry_Value_Type_List == data->dict2->entryPtr[0]->value->type );
       for (ii=0; ii < list1EntryCount; ii++ ) {
          dev = Dictionary_Entry_Value_GetElement( data->dict2->entryPtr[0]->value, ii );
-         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember( dev, "0" ) );
-         pcu_check_true( intVal == list1Vals[ii][0] );
-         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember( dev, "1" ) );
-         pcu_check_true( intVal == list1Vals[ii][1] );
-         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember( dev, "2" ) );
-         pcu_check_true( intVal == list1Vals[ii][2] );
+         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember( dev, (Dictionary_Entry_Key)"0" ) );
+         pcu_check_true( intVal == list1Vals[ii][0]  );
+         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember( dev, (Dictionary_Entry_Key)"1" ) );
+         pcu_check_true( intVal == list1Vals[ii][1]  );
+         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember( dev, (Dictionary_Entry_Key)"2" ) );
+         pcu_check_true( intVal == list1Vals[ii][2]  );
       }
       pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[1],
          (Dictionary_Entry_Key)list2Name) );
@@ -397,20 +397,15 @@ void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
          data->dict2->entryPtr[1]->value->type );
       for (ii=0; ii < list2EntryCount; ii++ ) {
          dev = Dictionary_Entry_Value_GetElement( data->dict2->entryPtr[1]->value, ii );
-         strVal = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetMember(
-            dev, (Dictionary_Entry_Key)list2CompNames[0] ) );
+         strVal = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetMember( dev, (Dictionary_Entry_Key)(Dictionary_Entry_Key)list2CompNames[0] )  );
          pcu_check_streq( list2StringVals[ii], strVal );
-         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember(
-            dev, (Dictionary_Entry_Key)list2CompNames[1] ) );
-         pcu_check_true( intVal == list2CoordVals[ii][0] );
-         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember(
-            dev, (Dictionary_Entry_Key)list2CompNames[2] ) );
-         pcu_check_true( intVal == list2CoordVals[ii][1] );
-         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember(
-            dev, (Dictionary_Entry_Key)list2CompNames[3] ) );
-         pcu_check_true( intVal == list2CoordVals[ii][2] );
-         boolVal = Dictionary_Entry_Value_AsBool( Dictionary_Entry_Value_GetMember(
-            dev, (Dictionary_Entry_Key)list2CompNames[4] ) );
+         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember( dev, (Dictionary_Entry_Key)(Dictionary_Entry_Key)list2CompNames[1] ) );
+         pcu_check_true( intVal == list2CoordVals[ii][0]  );
+         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember( dev, (Dictionary_Entry_Key)(Dictionary_Entry_Key)list2CompNames[2] ) );
+         pcu_check_true( intVal == list2CoordVals[ii][1]  );
+         intVal = Dictionary_Entry_Value_AsInt( Dictionary_Entry_Value_GetMember( dev, (Dictionary_Entry_Key)(Dictionary_Entry_Key)list2CompNames[3] ) );
+         pcu_check_true( intVal == list2CoordVals[ii][2]  );
+         boolVal = Dictionary_Entry_Value_AsBool( Dictionary_Entry_Value_GetMember( dev, (Dictionary_Entry_Key)(Dictionary_Entry_Key)list2CompNames[4] ) );
          pcu_check_true( boolVal == list2BoolVals[ii] );
       }
    }
@@ -420,7 +415,7 @@ void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
 }
 
 
-void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data ) {
+void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data  ) {
    Index          ii;
    char**         xmlTestFilenames;
    int            argc;
@@ -521,10 +516,10 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    pcu_check_true( Dictionary_Entry_Value_Type_Struct == structDev->type );
    pcu_check_true( struct1_OrigParamCount == Dictionary_Entry_Value_GetCount( structDev ) );
    for (ii=0; ii < struct1_OrigParamCount; ii++ ) {
-      elementDev = Dictionary_Entry_Value_GetMember( structDev, (Dictionary_Entry_Key)paramNames2[ii] );
+      elementDev = Dictionary_Entry_Value_GetMember( structDev, (Dictionary_Entry_Key)(Dictionary_Entry_Key)paramNames2[ii] );
       pcu_check_true( paramVals2[ii] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
    }
-   Dictionary_Empty( data->dict2 );
+   Dictionary_Empty( data->dict2  );
 
    /* Sub-test 2: with mergeType as "append", the 2 structs should be 2 separate entries */
    pcu_filename_input( "testXML-dupKeys-2.xml", xmlTestFilename2 );
@@ -537,8 +532,8 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    pcu_check_true( Dictionary_Entry_Value_Type_Struct == structDev->type );
    pcu_check_true( struct1_OrigParamCount == Dictionary_Entry_Value_GetCount( structDev ) );
    for (ii=0; ii < struct1_OrigParamCount; ii++ ) {
-      elementDev = Dictionary_Entry_Value_GetMember( structDev, (Dictionary_Entry_Key)paramNames[ii] );
-      pcu_check_true( paramVals[ii] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
+      elementDev = Dictionary_Entry_Value_GetMember( structDev, (Dictionary_Entry_Key)(Dictionary_Entry_Key)paramNames[ii] );
+      pcu_check_true( paramVals[ii] == Dictionary_Entry_Value_AsUnsignedInt( elementDev )  );
    }
    /* Second entry should be struct2 */
    pcu_check_true( Dictionary_Entry_Compare( data->dict2->entryPtr[1], (Dictionary_Entry_Key)struct1Name) );
@@ -546,10 +541,10 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    pcu_check_true( Dictionary_Entry_Value_Type_Struct == structDev->type );
    pcu_check_true( struct1_OrigParamCount == Dictionary_Entry_Value_GetCount( structDev ) );
    for (ii=0; ii < struct1_OrigParamCount; ii++ ) {
-      elementDev = Dictionary_Entry_Value_GetMember( structDev, (Dictionary_Entry_Key)paramNames[ii] );
+      elementDev = Dictionary_Entry_Value_GetMember( structDev, (Dictionary_Entry_Key)(Dictionary_Entry_Key)paramNames[ii] );
       pcu_check_true( paramVals2[ii] == Dictionary_Entry_Value_AsUnsignedInt( elementDev ) );
    }
-   Dictionary_Empty( data->dict2 );
+   Dictionary_Empty( data->dict2  );
 
    /* Sub-test 3.1: with mergeType as "merge", structs to be merged.
     * However, default childrenMergeType is "append", so all entries added */
@@ -608,10 +603,10 @@ void IO_HandlerSuite_TestReadNonExistent( IO_HandlerSuiteData* data ) {
    char		expectedErrorMsg[MAXLINE];
 
    Stg_asprintf( &errorFilename, "./errorMsg-NonExist-%d.txt", data->rank );
-   Stream_RedirectFile( Journal_Register( Error_Type, XML_IO_Handler_Type ), errorFilename );
-   Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
+   Stream_RedirectFile( Journal_Register( Error_Type, (Name)XML_IO_Handler_Type  ), errorFilename );
+   Stream_ClearCustomFormatters( Journal_Register( Error_Type, (Name)XML_IO_Handler_Type ) );
 
-   if (0 == data->rank) {
+   if (0 == data->rank ) {
 		#ifdef DEBUG
 			pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, notExistFilename, data->dict2 ) );
 		#else
@@ -636,10 +631,10 @@ void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
    pcu_filename_input( "Invalid.xml", invalidXMLFilename );
    pcu_filename_expected( errorFilename, expectedErrorFilename );
 
-   Stream_RedirectFile( Journal_Register( Error_Type, XML_IO_Handler_Type ), errorFilename );
-   Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
+   Stream_RedirectFile( Journal_Register( Error_Type, (Name)XML_IO_Handler_Type  ), errorFilename );
+   Stream_ClearCustomFormatters( Journal_Register( Error_Type, (Name)XML_IO_Handler_Type ) );
 
-   if ( 0 == data->rank ) {
+   if ( 0 == data->rank  ) {
 		#ifdef DEBUG
 			pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, invalidXMLFilename, data->dict2 ) );
 		#else
@@ -659,10 +654,10 @@ void IO_HandlerSuite_TestReadWrongNS( IO_HandlerSuiteData* data ) {
    pcu_filename_input( "WrongNS.xml", wrongNS_XMLFilename );
    pcu_filename_expected( errorFilename, expectedErrorFilename );
 
-   Stream_RedirectFile( Journal_Register( Error_Type, XML_IO_Handler_Type ), errorFilename );
-   Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
+   Stream_RedirectFile( Journal_Register( Error_Type, (Name)XML_IO_Handler_Type  ), errorFilename );
+   Stream_ClearCustomFormatters( Journal_Register( Error_Type, (Name)XML_IO_Handler_Type ) );
 
-   if ( 0 == data->rank ) {
+   if ( 0 == data->rank  ) {
 		#ifdef DEBUG
 			pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, wrongNS_XMLFilename, data->dict2 ) );
 		#else
@@ -682,10 +677,10 @@ void IO_HandlerSuite_TestReadWrongRootNode( IO_HandlerSuiteData* data ) {
    pcu_filename_input( "WrongRootNode.xml", wrongRootNode_XMLFilename );
    pcu_filename_expected( errorFilename, expectedErrorFilename );
 
-   Stream_RedirectFile( Journal_Register( Error_Type, XML_IO_Handler_Type ), errorFilename );
-   Stream_ClearCustomFormatters( Journal_Register( Error_Type, XML_IO_Handler_Type ) );
+   Stream_RedirectFile( Journal_Register( Error_Type, (Name)XML_IO_Handler_Type  ), errorFilename );
+   Stream_ClearCustomFormatters( Journal_Register( Error_Type, (Name)XML_IO_Handler_Type ) );
 
-   if ( 0 == data->rank ) {
+   if ( 0 == data->rank  ) {
 		#ifdef DEBUG
 			pcu_check_assert( IO_Handler_ReadAllFromFile( data->io_handler, wrongRootNode_XMLFilename, data->dict2 ) );
 		#else

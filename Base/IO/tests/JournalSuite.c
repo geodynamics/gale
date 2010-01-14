@@ -99,11 +99,11 @@ void JournalSuite_TestRegister( JournalSuiteData* data ) {
    testJournal = stJournal;
    stJournal = data->savedJournal;
 
-   myInfo = Journal_Register( Info_Type, "MyInfo" );
-   myDebug = Journal_Register( Debug_Type, "MyDebug" );
-   myDump = Journal_Register( Dump_Type, "MyDump" );
-   myError = Journal_Register( Error_Type, "MyError" );
-   allNew = Journal_Register( "New_Type", "allNew" );
+   myInfo = Journal_Register( Info_Type, (Name)"MyInfo"  );
+   myDebug = Journal_Register( Debug_Type, (Name)"MyDebug"  );
+   myDump = Journal_Register( Dump_Type, (Name)"MyDump"  );
+   myError = Journal_Register( Error_Type, (Name)"MyError"  );
+   allNew = Journal_Register( "New_Type", (Name)"allNew"  );
 
    /* Check the streams themselves were created properly */
    /* Including Louis' requirement that they default to have printingRank 0 */
@@ -130,11 +130,11 @@ void JournalSuite_TestRegister( JournalSuiteData* data ) {
    pcu_check_true( STREAM_ALL_RANKS == Stream_GetPrintingRank( allNew ));
 
    /* Now check they were inserted in Journal hierarchy correctly */
-   pcu_check_true( Stg_ObjectList_Get( Journal_GetTypedStream(Info_Type)->_children, "MyInfo" ) == myInfo );
-   pcu_check_true( Stg_ObjectList_Get( Journal_GetTypedStream(Debug_Type)->_children, "MyDebug" ) == myDebug );
-   pcu_check_true( Stg_ObjectList_Get( Journal_GetTypedStream(Dump_Type)->_children, "MyDump" ) == myDump );
-   pcu_check_true( Stg_ObjectList_Get( Journal_GetTypedStream(Error_Type)->_children, "MyError" ) == myError );
-   pcu_check_true( Stg_ObjectList_Get( Journal_GetTypedStream("New_Type")->_children, "allNew" ) == allNew );
+   pcu_check_true( Stg_ObjectList_Get( Journal_GetTypedStream(Info_Type)->_children, (Name)"MyInfo" ) == myInfo );
+   pcu_check_true( Stg_ObjectList_Get( Journal_GetTypedStream(Debug_Type )->_children, "MyDebug" ) == myDebug );
+   pcu_check_true( Stg_ObjectList_Get( Journal_GetTypedStream(Dump_Type)->_children, (Name)"MyDump" ) == myDump );
+   pcu_check_true( Stg_ObjectList_Get( Journal_GetTypedStream(Error_Type )->_children, "MyError" ) == myError );
+   pcu_check_true( Stg_ObjectList_Get( Journal_GetTypedStream("New_Type")->_children, (Name)"allNew" ) == allNew  );
 
    /* Ok, restore the testing journal */
    stJournal = testJournal;
@@ -146,7 +146,7 @@ void JournalSuite_TestRegister2( JournalSuiteData* data ) {
    Stream* register2Test;
    
    register2Stream = Journal_Register2( Info_Type, "Component", "Instance" );
-   register2Test   = Journal_Register(  Info_Type, "Component.Instance"    );
+   register2Test   = Journal_Register( Info_Type, (Name)"Component.Instance"    );
 
    pcu_check_true( register2Stream == register2Test );
 }
@@ -164,12 +164,12 @@ void JournalSuite_TestPrintBasics( JournalSuiteData* data ) {
    pcu_check_true( Stream_IsEnable( Journal_GetTypedStream(Info_Type)) == True );
    pcu_check_true( Stream_IsEnable( Journal_GetTypedStream(Debug_Type)) == False );
    pcu_check_true( Stream_IsEnable( Journal_GetTypedStream(Dump_Type)) == False );
-   pcu_check_true( Stream_IsEnable( Journal_GetTypedStream(Error_Type)) == True ) ;
+   pcu_check_true( Stream_IsEnable( Journal_GetTypedStream(Error_Type)) == True  ) ;
 
-   myInfo = Journal_Register( InfoStream_Type, "MyInfo");
-   myDebug = Journal_Register( DebugStream_Type, "MyDebug" );
-   myDump = Journal_Register( Dump_Type, "MyDump" );
-   myError = Journal_Register( ErrorStream_Type, "MyError" );
+   myInfo = Journal_Register( InfoStream_Type, (Name)"MyInfo" );
+   myDebug = Journal_Register( DebugStream_Type, (Name)"MyDebug"  );
+   myDump = Journal_Register( Dump_Type, (Name)"MyDump"  );
+   myError = Journal_Register( ErrorStream_Type, (Name)"MyError"  );
 
    Journal_Printf( myInfo, "%s\n", "HELLOInfo" );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
@@ -213,7 +213,7 @@ void JournalSuite_TestPrintfL( JournalSuiteData* data ) {
    #define     MAXLINE 1000
    char        outLine[MAXLINE];
 
-   myStream = Journal_Register( InfoStream_Type, "myComponent");
+   myStream = Journal_Register( InfoStream_Type, (Name)"myComponent" );
    Journal_PrintfL( myStream, 1, "Hello\n" );
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
    pcu_check_streq( outLine, "Hello\n" );
@@ -234,7 +234,7 @@ void JournalSuite_TestDPrintf( JournalSuiteData* data ) {
    #define     MAXLINE 1000
    char        outLine[MAXLINE];
 
-   myInfo = Journal_Register( InfoStream_Type, "MyInfo");
+   myInfo = Journal_Register( InfoStream_Type, (Name)"MyInfo" );
    Journal_DPrintf( myInfo, "DPrintf\n" );
    #ifdef DEBUG
    pcu_check_true(         fgets( outLine, MAXLINE, data->testStdOutFile ));
@@ -253,7 +253,7 @@ void JournalSuite_TestPrintChildStreams( JournalSuiteData* data ) {
    char        outLine[MAXLINE];
 
   /* Make sure the hierarchy works*/
-   myStream = Journal_Register( InfoStream_Type, "myComponent");
+   myStream = Journal_Register( InfoStream_Type, (Name)"myComponent" );
    childStream1 = Stream_RegisterChild( myStream, "child1" );
    childStream2 = Stream_RegisterChild( childStream1, "child2" );
 
@@ -300,47 +300,41 @@ void JournalSuite_TestReadFromDictionary( JournalSuiteData* data ) {
    const char* testNewTypeFilename1 = "./testJournal-out1.txt";
    const char* testNewTypeFilename2 = "./testJournal-out2.txt";
 
-   infoTest1 = Journal_Register( Info_Type, "test1" );
-   infoTest2 = Journal_Register( Info_Type, "test2" );
-   debugTest1 = Journal_Register( Debug_Type, "test1" );
-   debugTest2 = Journal_Register( Debug_Type, "test2" );
-   dumpTest1 = Journal_Register( Dump_Type, "test1" );
-   dumpTest2 = Journal_Register( Dump_Type, "test2" );
+   infoTest1 = Journal_Register( Info_Type, (Name)"test1"  );
+   infoTest2 = Journal_Register( Info_Type, (Name)"test2"  );
+   debugTest1 = Journal_Register( Debug_Type, (Name)"test1"  );
+   debugTest2 = Journal_Register( Debug_Type, (Name)"test2"  );
+   dumpTest1 = Journal_Register( Dump_Type, (Name)"test1"  );
+   dumpTest2 = Journal_Register( Dump_Type, (Name)"test2"  );
 
-   Dictionary_Add( testDict, "journal.debug.test1", Dictionary_Entry_Value_FromBool(  True ));
-   Dictionary_Add( testDict, "journal.dump.test1", Dictionary_Entry_Value_FromBool(  True ));
-   Dictionary_Add( testDict, "journal.info.test2", Dictionary_Entry_Value_FromBool( False ));
-   Dictionary_Add( testDict, "journal.info.test2", Dictionary_Entry_Value_FromBool( False ));
-   Dictionary_Add( testDict, "journal.info.test1.new1", Dictionary_Entry_Value_FromBool(  True ));
-   Dictionary_Add( testDict, "journal.info.test1.new2", Dictionary_Entry_Value_FromBool(  False ));
-   Dictionary_Add( testDict, "journal-level.info.test1.new1",
-      Dictionary_Entry_Value_FromUnsignedInt( 3 ));
-   Dictionary_Add( testDict, "journal.newtype", Dictionary_Entry_Value_FromBool(  True ));
-   Dictionary_Add( testDict, "journal-file.newtype",
-      Dictionary_Entry_Value_FromString( testNewTypeFilename1 ));
-   Dictionary_Add( testDict, "journal-file.newtype.other",
-      Dictionary_Entry_Value_FromString( testNewTypeFilename2 ));
-   Dictionary_Add( testDict, "journal-rank.info.propertiestest1",
-      Dictionary_Entry_Value_FromUnsignedInt( 0 ));
-   Dictionary_Add( testDict, "journal-rank.info.propertiestest2",
-      Dictionary_Entry_Value_FromUnsignedInt( 5 ));
-   Dictionary_Add( testDict, "journal-autoflush.info.propertiestest1",
-      Dictionary_Entry_Value_FromBool( False ));
+   Dictionary_Add( testDict, (Dictionary_Entry_Key)"journal.debug.test1", Dictionary_Entry_Value_FromBool(  True ) );
+   Dictionary_Add( testDict, (Dictionary_Entry_Key)"journal.dump.test1", Dictionary_Entry_Value_FromBool(  True ) );
+   Dictionary_Add( testDict, (Dictionary_Entry_Key)"journal.info.test2", Dictionary_Entry_Value_FromBool( False ) );
+   Dictionary_Add( testDict, (Dictionary_Entry_Key)"journal.info.test2", Dictionary_Entry_Value_FromBool( False ) );
+   Dictionary_Add( testDict, (Dictionary_Entry_Key)"journal.info.test1.new1", Dictionary_Entry_Value_FromBool(  True ) );
+   Dictionary_Add( testDict, (Dictionary_Entry_Key)"journal.info.test1.new2", Dictionary_Entry_Value_FromBool(  False ) );
+   Dictionary_Add( testDict, (Dictionary_Entry_Key)"journal-level.info.test1.new1", Dictionary_Entry_Value_FromUnsignedInt( 3 ) );
+   Dictionary_Add( testDict, (Dictionary_Entry_Key)"journal.newtype", Dictionary_Entry_Value_FromBool(  True ) );
+   Dictionary_Add( testDict, (Dictionary_Entry_Key)"journal-file.newtype", Dictionary_Entry_Value_FromString( testNewTypeFilename1 ) );
+   Dictionary_Add( testDict, (Dictionary_Entry_Key)"journal-file.newtype.other", Dictionary_Entry_Value_FromString( testNewTypeFilename2 ) );
+   Dictionary_Add( testDict, (Dictionary_Entry_Key)"journal-rank.info.propertiestest1", Dictionary_Entry_Value_FromUnsignedInt( 0 ) );
+   Dictionary_Add( testDict, (Dictionary_Entry_Key)"journal-rank.info.propertiestest2", Dictionary_Entry_Value_FromUnsignedInt( 5 ) );
+   Dictionary_Add( testDict, (Dictionary_Entry_Key)"journal-autoflush.info.propertiestest1", Dictionary_Entry_Value_FromBool( False ));
 
    Journal_ReadFromDictionary( testDict );
 
    pcu_check_true( True == debugTest1->_enable );
    pcu_check_true( True == dumpTest1->_enable );
-   pcu_check_true( False == infoTest2->_enable );
+   pcu_check_true( False == infoTest2->_enable  );
 
-   newTest1 = Journal_Register( Info_Type, "test1.new1" );
-   newTest2 = Journal_Register( Info_Type, "test1.new2" );
+   newTest1 = Journal_Register( Info_Type, (Name)"test1.new1"  );
+   newTest2 = Journal_Register( Info_Type, (Name)"test1.new2" );
    pcu_check_true( True == newTest1->_enable );
    pcu_check_true( False == newTest2->_enable );
    pcu_check_true( 3 == newTest1->_level );
    
    /* Just do the rest of this test with 1 proc to avoid parallel I/O problems */
-   if ( data->rank==0 ) {
+   if ( data->rank==0  ) {
       FILE*       testNewTypeFile1;
       FILE*       testNewTypeFile2;
       #define     MAXLINE 1000
@@ -348,8 +342,8 @@ void JournalSuite_TestReadFromDictionary( JournalSuiteData* data ) {
 
       /* We do actually need to do some printing to the newtype streams, as the filename isn't stored
        *  on the CFile or JournalFile struct*/
-      fileTest1 = Journal_Register( "newtype", "hello" );
-      fileTest2 = Journal_Register( "newtype", "other" );
+      fileTest1 = Journal_Register( "newtype", (Name)"hello"  );
+      fileTest2 = Journal_Register( "newtype", (Name)"other"  );
       Journal_Printf( fileTest1, "yay!\n" );
       Journal_Printf( fileTest2, "double yay!\n" );
       Stream_Flush( fileTest1 );
@@ -361,8 +355,8 @@ void JournalSuite_TestReadFromDictionary( JournalSuiteData* data ) {
       pcu_check_true(         fgets( outLine, MAXLINE, testNewTypeFile2 ));
       pcu_check_streq( outLine, "double yay!\n" );
 
-      propTest1 = Journal_Register( Info_Type, "propertiestest1" );
-      propTest2 = Journal_Register( Info_Type, "propertiestest2" );
+      propTest1 = Journal_Register( Info_Type, (Name)"propertiestest1"  );
+      propTest2 = Journal_Register( Info_Type, (Name)"propertiestest2" );
       pcu_check_true( 0 == Stream_GetPrintingRank( propTest1 ));
       pcu_check_true( 5 == Stream_GetPrintingRank( propTest2 ));
       pcu_check_true( False == Stream_GetAutoFlush( propTest1 ));
@@ -376,15 +370,15 @@ void JournalSuite_TestReadFromDictionary( JournalSuiteData* data ) {
 }
 
 
-void JournalSuite_TestPrintString_WithLength( JournalSuiteData* data ) {
-   Stream*      myStream    = Journal_Register( Info_Type, "TestStream" );
+void JournalSuite_TestPrintString_WithLength( JournalSuiteData* data  ) {
+   Stream*      myStream    = Journal_Register( Info_Type, (Name)"TestStream" );
    char*        string        = "helloWorldHowDoYouDo";
    int          char_I;
    const char*  stringLengthTestFilename = "testJournalPrintStringWithLength.txt" ;
    char         expectedFilename[PCU_PATH_MAX];
 
    /* Just do this test with rank 0 */
-   if (data->rank != 0) return;
+   if (data->rank != 0 ) return;
 
    Stream_RedirectFile( myStream, stringLengthTestFilename );
 
@@ -401,7 +395,7 @@ void JournalSuite_TestPrintString_WithLength( JournalSuiteData* data ) {
 
 
 void JournalSuite_TestShortcuts( JournalSuiteData* data ) {
-   Stream*      myStream    = Journal_Register( Info_Type, "TestStream" );
+   Stream*      myStream    = Journal_Register( Info_Type, (Name)"TestStream"  );
    char*        string        = "helloWorldHowDoYouDo";
    double       doubleValue   = 3142e20;
    double       floatValue    = 2.173425;
@@ -436,11 +430,11 @@ void JournalSuite_TestShortcuts( JournalSuiteData* data ) {
 void JournalSuite_TestFirewall( JournalSuiteData* data ) {
    Stream*      myInfo = NULL;
 
-   myInfo = Journal_Register( Info_Type, "MyInfo" );
+   myInfo = Journal_Register( Info_Type, (Name)"MyInfo" );
 
    stJournal->firewallProducesAssert = True;
 
-   /* We expect nothing to happen on this first run - in effect the test would "fail" if an uncaught assert()
+   /* We expect nothing to happen on this first run - in effect the test would "fail" if an uncaught assert( )
     *  terminated the program */   
    Journal_Firewall( 1, myInfo, "Firewall\n" );
    /* We can use pcu_check_assert to make sure a pcu_assert is generated. This is actually quite important

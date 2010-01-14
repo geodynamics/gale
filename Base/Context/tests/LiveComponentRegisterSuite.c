@@ -108,24 +108,24 @@ void LiveComponentRegisterSuite_TestGet( LiveComponentRegisterSuiteData* data ) 
    LiveComponentRegister_Add( data->lcRegister, (Stg_Component*) vecVar[1] );
    LiveComponentRegister_Add( data->lcRegister, (Stg_Component*) vecVar[2] );
 
-   tempVar = (Variable*) LiveComponentRegister_Get( data->lcRegister, "Scalar" );
+   tempVar = (Variable*) LiveComponentRegister_Get( data->lcRegister, (Name)"Scalar" );
    pcu_check_true( tempVar == var );
 
-   tempVar = (Variable*) LiveComponentRegister_Get( data->lcRegister, "Three" );
+   tempVar = (Variable* ) LiveComponentRegister_Get( data->lcRegister, (Name)"Three" );
    pcu_check_true( tempVar == vec );
 
-   tempVar = (Variable*) LiveComponentRegister_Get( data->lcRegister, "a" );
+   tempVar = (Variable* ) LiveComponentRegister_Get( data->lcRegister, (Name)"a" );
    pcu_check_true( tempVar == vecVar[0] );
 
-   tempVar = (Variable*) LiveComponentRegister_Get( data->lcRegister, "b" );
+   tempVar = (Variable* ) LiveComponentRegister_Get( data->lcRegister, (Name)"b" );
    pcu_check_true( tempVar == vecVar[1] );
 
-   tempVar = (Variable*) LiveComponentRegister_Get( data->lcRegister, "c" );
+   tempVar = (Variable* ) LiveComponentRegister_Get( data->lcRegister, (Name)"c" );
    pcu_check_true( tempVar == vecVar[2] );
 }
 
 
-void LiveComponentRegisterSuite( pcu_suite_t* suite ) {
+void LiveComponentRegisterSuite( pcu_suite_t* suite  ) {
    pcu_suite_setData( suite, LiveComponentRegisterSuiteData );
    pcu_suite_setFixtures( suite, LiveComponentRegisterSuite_Setup, LiveComponentRegisterSuite_Teardown );
    pcu_suite_addTest( suite, LiveComponentRegisterSuite_TestGet );

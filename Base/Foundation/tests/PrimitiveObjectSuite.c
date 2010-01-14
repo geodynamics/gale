@@ -58,18 +58,18 @@ void PrimitiveObjectSuite_TestPrimObjects( PrimitiveObjectSuiteData* data ) {
 
    list = Stg_ObjectList_New();
 
-   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_UnsignedChar( 'a', "char item" ) );
-   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_UnsignedShort( 123, "short item" ) );
-   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_UnsignedInt( 456, "int item" ) );
-   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_UnsignedLong( 789, "long item" ) );
-   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_Char( 'a', "char item" ) );
-   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_Short( -123, "short item" ) );
-   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_Int( -456, "int item" ) );
-   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_Long( -789, "long item" ) );
-   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_Float( 1.2f, "float item" ) );
-   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_Double( 2.4, "double item" ) );
+   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_UnsignedChar( 'a', (Name)"char item" )  );
+   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_UnsignedShort( 123, (Name)"short item" )  );
+   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_UnsignedInt( 456, (Name)"int item" )  );
+   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_UnsignedLong( 789, (Name)"long item" )  );
+   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_Char( 'a', (Name)"char item" )  );
+   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_Short( -123, (Name)"short item" )  );
+   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_Int( -456, (Name)"int item" )  );
+   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_Long( -789, (Name)"long item" )  );
+   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_Float( 1.2f, (Name)"float item" )  );
+   Stg_ObjectList_Append( list, Stg_PrimitiveObject_New_Double( 2.4, (Name)"double item" ) );
 
-   primObject = (Stg_PrimitiveObject*)Stg_ObjectList_At( list, 0 );
+   primObject = (Stg_PrimitiveObject* )Stg_ObjectList_At( list, 0 );
    pcu_check_true( primObject->dataType == Stg_C_Primitive_Type_UnsignedChar );
    pcu_check_true( primObject->value.asUnsignedChar == 'a' );
    primObject = (Stg_PrimitiveObject*)Stg_ObjectList_At( list, 1 );

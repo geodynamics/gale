@@ -114,7 +114,7 @@ AbstractContext* _AbstractContext_New(  ABSTRACTCONTEXT_DEFARGS  ) {
 }
 
 void _AbstractContext_Init( AbstractContext* self ) {
-	Stream* debug = Journal_Register( DebugStream_Type, AbstractContext_Type );
+	Stream* debug = Journal_Register( DebugStream_Type, (Name)AbstractContext_Type  );
 	char buf[80];
 
 #ifdef READ_HDF5
@@ -144,15 +144,15 @@ void _AbstractContext_Init( AbstractContext* self ) {
 			self->nproc,
 			self->rank );
 	}
-	self->info = Journal_Register( InfoStream_Type, AbstractContext_Type );
-	self->verbose = Journal_Register( InfoStream_Type, AbstractContext_Type_Verbose );
+	self->info = Journal_Register( InfoStream_Type, (Name)AbstractContext_Type  );
+	self->verbose = Journal_Register( InfoStream_Type, (Name)AbstractContext_Type_Verbose  );
 	sprintf( buf, "journal.info.%s", AbstractContext_Type_Verbose );
 
-	if( !Dictionary_Get( self->dictionary, buf ) ) {
+	if( !Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)buf )  ) {
 		Journal_Enable_NamedStream( InfoStream_Type, AbstractContext_Type_Verbose, False );
 	}
 	/* Turn off the journal warning debug stream by default: even if debug is enabled in general */
-	if( !Dictionary_Get( self->dictionary, "journal.debug.DictionaryWarning" ) ) {
+	if( !Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"journal.debug.DictionaryWarning" )  ) {
 		Journal_Enable_NamedStream( DebugStream_Type, "DictionaryWarning", False );
 	}
 	
@@ -372,17 +372,17 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 	self->outputPath = StG_Strdup( Dictionary_Entry_Value_AsString( 
 		Dictionary_GetDefault( self->dictionary, "outputPath", Dictionary_Entry_Value_FromString( "./" ) ) ) );
 	
-   if( Dictionary_Get( self->dictionary, "checkpointReadPath" ) ) {
-      self->checkpointReadPath = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( self->dictionary, "checkpointReadPath" ) ) );
+   if( Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"checkpointReadPath" )  ) {
+      self->checkpointReadPath = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"checkpointReadPath" ) ) );
    }
    else {
-      self->checkpointReadPath = StG_Strdup( self->outputPath );
+      self->checkpointReadPath = StG_Strdup( self->outputPath  );
    }
-   if( Dictionary_Get( self->dictionary, "checkpointWritePath" ) ) {
-      self->checkpointWritePath = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( self->dictionary, "checkpointWritePath" ) ) );
+   if( Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"checkpointWritePath" )  ) {
+      self->checkpointWritePath = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"checkpointWritePath" ) ) );
    }
    else {
-      self->checkpointWritePath = StG_Strdup( self->outputPath );
+      self->checkpointWritePath = StG_Strdup( self->outputPath  );
    }
 
 	self->checkpointAppendStep = Dictionary_Entry_Value_AsBool( 
@@ -436,10 +436,10 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 		int         adjustedYear;
 		int         adjustedMonth;
 
-		Stream* s = Journal_Register( Info_Type, XML_IO_Handler_Type );
+		Stream* s = Journal_Register( Info_Type, (Name)XML_IO_Handler_Type );
 
 		/* Avoid confusing messages from XML_IO_Handler...turn it off temporarily */
-		Bool isEnabled = Stream_IsEnable( s );
+		Bool isEnabled = Stream_IsEnable( s  );
 		Stream_EnableSelfOnly( s, False );
 
 		ioHandler = XML_IO_Handler_New();
@@ -472,17 +472,17 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 	/* Note: these try for deprecated keys "start", "end" and "stop" as well as new ones "startTime" and
 		"stopTime" - Main.PatrickSunter - 4 November 2004 */
 	startTime = stopTime = 0;
-	dictEntryVal = Dictionary_Get( self->dictionary, "start" );
-	if ( NULL == dictEntryVal ) {
+	dictEntryVal = Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"start" );
+	if ( NULL == dictEntryVal  ) {
 		dictEntryVal = Dictionary_GetDefault( self->dictionary, "startTime",
 			Dictionary_Entry_Value_FromDouble( startTime ) );
 	}
 	self->startTime = Dictionary_Entry_Value_AsDouble( dictEntryVal );
 
-	dictEntryVal = Dictionary_Get( self->dictionary, "end" );
-	if ( NULL == dictEntryVal ) {
-		dictEntryVal = Dictionary_Get( self->dictionary, "stop" );
-		if ( NULL == dictEntryVal ) {
+	dictEntryVal = Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"end" );
+	if ( NULL == dictEntryVal  ) {
+		dictEntryVal = Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"stop" );
+		if ( NULL == dictEntryVal  ) {
 			dictEntryVal = Dictionary_GetDefault( self->dictionary, "stopTime",
 				Dictionary_Entry_Value_FromDouble( stopTime ) );
 		}
@@ -491,8 +491,8 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 
 	/* maxTimeSteps of 0 means no maximum applied */
 	/* Note: these try for deprecated key "maxLoops" as well as new one "maxTimeSteps" - Main.PatrickSunter - 4 November 2004 */
-	dictEntryVal = Dictionary_Get( self->dictionary, "maxLoops" );
-	if ( NULL == dictEntryVal ) {
+	dictEntryVal = Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"maxLoops" );
+	if ( NULL == dictEntryVal  ) {
 		dictEntryVal = Dictionary_GetDefault( self->dictionary, "maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( 0 ) );
 	}
 	self->maxTimeSteps = Dictionary_Entry_Value_AsUnsignedInt( dictEntryVal );
@@ -520,7 +520,7 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 	}
 
 	/* Check if we have been provided a constant to multiply our calculated dt values by. */
-	self->dtFactor = Dictionary_GetDouble_WithDefault( self->dictionary, "timestepFactor", 1.0 );
+	self->dtFactor = Dictionary_GetDouble_WithDefault( self->dictionary, (Dictionary_Entry_Key)"timestepFactor", 1.0  );
 
    /* this defines all the entryPoints, eg, self->constructK, etc...
       so it must go before we start KeyCall */
@@ -540,8 +540,8 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 	if( self->rank == 0 ) 
 		Context_PrintConcise( self, self->verbose );
 
-	if ( True == Dictionary_GetBool_WithDefault( self->dictionary, "showJournalStatus", False ) ) {
-		Journal_PrintConcise();	
+	if ( True == Dictionary_GetBool_WithDefault( self->dictionary, (Dictionary_Entry_Key)"showJournalStatus", False ) ) {
+		Journal_PrintConcise( );	
 	}	
 }
 
@@ -889,7 +889,7 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( void* _context, Index timeStep
 	char*                  timeInfoFileName = NULL;
 	char*                  timeInfoFileNamePart = NULL;
 	FILE*                  timeInfoFile;		
-	Stream*                errorStr = Journal_Register( Error_Type, self->type );
+	Stream*                errorStr = Journal_Register( Error_Type, (Name)self->type  );
 
 #ifdef READ_HDF5
 	hid_t             file, fileSpace, fileData;
@@ -959,7 +959,7 @@ void _AbstractContext_SaveTimeInfo( void* _context ) {
 	FILE*                  timeInfoFile = NULL;
 	char*                  timeInfoFileName = NULL;
    char*                  timeInfoFileNamePart = NULL;
-	Stream*                errorStr = Journal_Register( Error_Type, self->type );
+	Stream*                errorStr = Journal_Register( Error_Type, (Name)self->type  );
 #ifdef WRITE_HDF5
 	hid_t                  file, fileSpace, fileData, props;
 	hsize_t                count;

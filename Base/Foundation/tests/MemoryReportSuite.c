@@ -112,13 +112,13 @@ void MemoryReportSuite_AllocGroupOne( MemoryReportSuiteData* data ) {
    data->strB_alloc++;
    data->strB_total += sizeof(StructB)*3;
 
-   data->array2d = Memory_Alloc_2DArray( StructC, 4, 5, "GroupOne" );
+   data->array2d = Memory_Alloc_2DArray( StructC, 4, 5, (Name)"GroupOne" );
    data->strC_alloc++;
-   data->strC_total += Memory_Length_2DArray( sizeof(StructC), 4, 5 );
+   data->strC_total += Memory_Length_2DArray( sizeof(StructC ), 4, 5 );
 
-   data->array3d = Memory_Alloc_3DArray( StructA, 2, 3, 4, "GroupOne" );
+   data->array3d = Memory_Alloc_3DArray( StructA, 2, 3, 4, (Name)"GroupOne" );
    data->strA_alloc++;
-   data->strA_total += Memory_Length_3DArray( sizeof(StructA), 2, 3, 4 );
+   data->strA_total += Memory_Length_3DArray( sizeof(StructA ), 2, 3, 4 );
 
    data->array4d = Memory_Alloc_4DArray_Unnamed( StructB, 5, 4, 3, 2 );
    data->strB_alloc++;
