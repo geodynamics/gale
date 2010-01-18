@@ -314,7 +314,7 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 	}
 
 	/* Now setup the material properties */
-   if(  False == context->loadFromCheckPoint ) {
+   if(  False == context->loadSwarmsFromCheckpoint ) {
 
       /* Beforehand, set each particle to have UNDEFINED_MATERIAL */
       for ( lParticle_I = 0; lParticle_I < self->particleLocalCount; lParticle_I++ ) {
@@ -336,7 +336,7 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 
 	/** if loading from checkpoint, particle materials etc have already been loaded in Swarm_Build() - */ 
 	/** possibly need to check for empty cells (and populate) if performing a interpolation restart */
-   if ( True == context->loadFromCheckPoint ){
+   if ( True == context->loadSwarmsFromCheckpoint ){
       if ( (True == self->isSwarmTypeToCheckPointAndReload) && (True == context->interpolateRestart) ) {	   
          Particle_InCellIndex cParticle_I         = 0;
          Particle_InCellIndex particle_I          = 0;

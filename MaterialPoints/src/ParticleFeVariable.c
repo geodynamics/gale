@@ -197,9 +197,8 @@ void _ParticleFeVariable_Initialise( void* materialFeVariable, void* data ) {
 	Variable_Update( self->dataVariable );
 	/* If loading from CP, _don't_ recalculate the field as we've already just loaded it!
 		-- PatrickSunter 22 Nov 2006 */
-	if ( !(context && (True == context->loadFromCheckPoint)  ) ) {
+	if ( False == context->loadFromCheckPoint )
 		ParticleFeVariable_Update( self );
-	}
 }
 
 void _ParticleFeVariable_Execute( void* materialFeVariable, void* _ctx ) {

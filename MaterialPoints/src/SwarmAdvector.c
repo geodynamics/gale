@@ -239,7 +239,8 @@ void _SwarmAdvector_Initialise( void* swarmAdvector, void* data ) {
    Stg_Component_Initialise( self->swarm, data, False );
 	if ( self->periodicBCsManager )
 		Stg_Component_Initialise( self->periodicBCsManager, data, False );
-	_TimeIntegrand_Initialise( self, data );
+   if ( self->context->loadSwarmsFromCheckpoint == False )
+      _TimeIntegrand_Initialise( self, data );
 }
 
 void _SwarmAdvector_Execute( void* swarmAdvector, void* data ) {
