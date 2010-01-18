@@ -6,7 +6,7 @@ from config import Package, packages, cc
 #
 
 options = [
-    ('--prefix', 'prefix', 'Installation prefix.', None),
+    ('--prefix', 'prefix', 'Installation prefix. (currently disabled)', None),
     ('--build-dir', 'build_dir', 'Sandbox location.', 'build'),
     ('--with-debugging', 'with_debugging', 'Build with debugging', 1, 'int'),
     ('--with-warnings', 'with_warnings', 'Print all warnings at compile time', 1, 'int'),
