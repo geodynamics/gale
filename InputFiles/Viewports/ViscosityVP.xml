@@ -17,6 +17,7 @@
 			<param name="Type">lucColourMap</param>
 			<param name="colours">Green Brown Grey Purple DarkBlue</param>
 			<param name="dynamicRange">true</param>
+			<param name="logScale">true</param>
 		</struct>
 		<!-- Drawing Objects -->
 		<struct name="viscosityMap">
