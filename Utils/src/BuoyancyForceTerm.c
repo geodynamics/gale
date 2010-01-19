@@ -53,6 +53,7 @@
 
 #include "types.h"
 #include "BuoyancyForceTerm.h"
+#include "HydrostaticTerm.h"
 #include "MaterialSwarmVariable.h"
 
 #include <assert.h>
@@ -70,13 +71,15 @@ BuoyancyForceTerm* BuoyancyForceTerm_New(
 	FeVariable*					temperatureField,
 	double						gravity,
 	Bool							adjust,
-	Materials_Register*		materials_Register )
+	Materials_Register*		materials_Register,
+        HydrostaticTerm*                                hydrostaticTerm )
 {
 	BuoyancyForceTerm* self = (BuoyancyForceTerm*) _BuoyancyForceTerm_DefaultNew( name );
 
 	self->isConstructed = True;
 	_ForceTerm_Init( self, context, forceVector, integrationSwarm, NULL );
-	_BuoyancyForceTerm_Init( self, temperatureField, gravity, adjust, materials_Register );
+	_BuoyancyForceTerm_Init( self, temperatureField, gravity, adjust, materials_Register,
+                                 hydrostaticTerm );
 
 	return self;
 }
@@ -106,7 +109,8 @@ void _BuoyancyForceTerm_Init(
 	FeVariable*				temperatureField,
 	double					gravity,
 	Bool						adjust,
-	Materials_Register*	materials_Register )
+	Materials_Register*	materials_Register,
+        HydrostaticTerm*                        hydrostaticTerm )
 {
 	BuoyancyForceTerm* self = (BuoyancyForceTerm*)forceTerm;
 
@@ -115,6 +119,7 @@ void _BuoyancyForceTerm_Init(
 	self->gHat		  = NULL;
 	self->adjust              = adjust;
 	self->materials_Register  = materials_Register;
+        self->hydrostaticTerm     = hydrostaticTerm;
 }
 
 void _BuoyancyForceTerm_Delete( void* forceTerm ) {
@@ -169,6 +174,7 @@ void _BuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf
 	double*						direc;
 	unsigned						d_i;
 	PICelleratorContext*		context;
+        HydrostaticTerm*                                    hydrostaticTerm;
 
 	/* Construct Parent */
 	_ForceTerm_AssignFromXML( self, cf, data );
@@ -199,14 +205,17 @@ void _BuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf
 	}
 	else
 		direc = NULL;
+	self->gHat = direc;
 
 	context = (PICelleratorContext*)self->context;
 	assert( Stg_CheckType( context, PICelleratorContext ) );
 	materials_Register = context->materials_Register;
 	assert( materials_Register );
 
-	_BuoyancyForceTerm_Init( self, temperatureField, gravity, adjust, materials_Register );
-	self->gHat = direc;
+	hydrostaticTerm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "HydrostaticTerm", HydrostaticTerm, False, data ) ;
+
+	_BuoyancyForceTerm_Init( self, temperatureField, gravity, adjust,
+                                 materials_Register, hydrostaticTerm );
 }
 
 void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
@@ -338,6 +347,7 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 #endif
 	FeVariable*                      temperatureField   = self->temperatureField;
 	double                           temperature        = 0.0;
+        double                           background_density = 0.0;
 	double*				 gHat;
 	unsigned			d_i;
 
@@ -373,6 +383,7 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 	}
 
 	for( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
+          Coord coord;
 		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
 		xi       = particle->xi;
 
@@ -394,10 +405,16 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 		material = IntegrationPointsSwarm_GetMaterialOn( (IntegrationPointsSwarm*) swarm, particle );
 		materialExt = ExtensionManager_Get( material->extensionMgr, material, self->materialExtHandle );
 */
+                if(self->hydrostaticTerm)
+                  {
+                    FeMesh_CoordLocalToGlobal(mesh, cell_I, xi, coord);
+                    background_density=HydrostaticTerm_Density(self->hydrostaticTerm,coord);
+                  }
 
 		/* Calculate Force */
 		gravity = BuoyancyForceTerm_CalcGravity( self, (Swarm*)swarm, lElement_I, particle );
-		force = density * gravity * (1.0 - alpha * temperature);
+                force=gravity*(density*(1.0-alpha*temperature)
+                               - background_density);
 		factor = detJac * particle->weight * adjustFactor * force;
 
 		/* Apply force in the correct direction */

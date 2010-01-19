@@ -71,7 +71,8 @@
 		ExtensionInfo_Index							materialExtHandle; \
 		MaterialSwarmVariable**						densitySwarmVariables; \
 		MaterialSwarmVariable**						alphaSwarmVariables; \
-		Index												materialSwarmCount;
+		Index												materialSwarmCount;\
+                HydrostaticTerm*                                    hydrostaticTerm;
 
 	struct BuoyancyForceTerm { __BuoyancyForceTerm };
 
@@ -83,7 +84,8 @@
 		FeVariable*					temperatureField,
 		double						gravity,
 		Bool							adjust,
-		Materials_Register*		materials_Register );
+		Materials_Register*		materials_Register,
+                HydrostaticTerm*                                    hydrostaticTerm);
 
 	
 	#ifndef ZERO

@@ -13,7 +13,7 @@
 	<param name="Parent">FeVariable</param>
 	<param name="Reference"></param>
 	<param name="Summary"></param>
-	<param name="Description"><![CDATA[An abstract class which maps particle variables onto a mesh through the operator $\\hat{\\phi} = \frac{\\sum_{n}N(\\zeta)\\phi(\\zeta)}{\\sum_{n}N(\\zeta)}$<br/>, where $\\hat{\\phi}$ is the new mesh variable, $N$ are shape functions and $\\phi$ is a particle value. <br/>This class sets up a domain-wide massMatrix (really a vector), forceVector and solutionVector. The massMatrix is the denominator of the equation, while the foceVector is the numerator. <br>This variable is evaluated at the end of the Solve_EP]]></param>
+	<param name="Description"><![CDATA[An abstract class which maps particle variables onto a mesh through the operator $\\hat{\\phi} = \\frac{\\sum_{n}N(\\zeta)\\phi(\\zeta)}{\\sum_{n}N(\\zeta)}$<br/>, where $\\hat{\\phi}$ is the new mesh variable, $N$ are shape functions and $\\phi$ is a particle value. <br/>This class sets up a domain-wide massMatrix (really a vector), forceVector and solutionVector. The massMatrix is the denominator of the equation, while the foceVector is the numerator. <br>This variable is evaluated at the end of the Solve_EP]]></param>
 
 	<list name="Params">
 	</list>

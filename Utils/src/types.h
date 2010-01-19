@@ -58,6 +58,7 @@
 	typedef struct BuoyancyForceTerm                BuoyancyForceTerm;
 	typedef struct BuoyancyForceTermThermoChem      BuoyancyForceTermThermoChem;
         typedef struct DiffusionSMT DiffusionSMT;
+        typedef struct HydrostaticTerm      HydrostaticTerm;
         typedef struct PCDVC                        	PCDVC;
 
 #endif 

@@ -49,6 +49,7 @@
 	#include "BuoyancyForceTermThermoChem.h"
         #include "DiffusionSMT.h"
 	#include "MaterialSwarmVariable.h"
+	#include "HydrostaticTerm.h"
 
 	#include "Init.h"
 	#include "Finalise.h"
