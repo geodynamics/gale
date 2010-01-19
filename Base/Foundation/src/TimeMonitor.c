@@ -64,7 +64,7 @@ void Stg_TimeMonitor_SetTimerWatchCriteria( double ratioOfTotalTime ) {
 	Stg_TimerWatchCriteria = ratioOfTotalTime;
 }
 
-Stg_TimeMonitor* Stg_TimeMonitor_New( char* tag, Bool criteria, Bool print, int comm ) {
+Stg_TimeMonitor* Stg_TimeMonitor_New( char* tag, Bool criteria, Bool print, MPI_Comm comm ) {
 	Stg_TimeMonitor* tm;
 	
 	tm = Memory_Alloc_Unnamed( Stg_TimeMonitor );

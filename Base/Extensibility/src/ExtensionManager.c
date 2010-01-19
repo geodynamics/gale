@@ -678,7 +678,7 @@ ExtensionInfo_Index ExtensionManager_AddClassPtrArray(
 	return ExtensionManager_AddExtensionInfo( extension, newExtInfo );
 }
 
-ExtensionInfo_Index ExtensionManager_GetHandle( void* extension, Name extensionName ) {
+ExtensionInfo_Index ExtensionManager_GetHandle( void* extension, const Name extensionName ) {
 	ExtensionManager*			self = (ExtensionManager*)extension;
 	ExtensionInfo_Index			result = 0;
 	ExtensionInfo_Index			offset_I;

@@ -131,7 +131,7 @@ void _CFile_Print( void* cfile, Stream* stream )
 }
 
 	
-Bool _CFile_Open( void* file, char* fileName )
+Bool _CFile_Open( void* file, const char* const fileName )
 {
 	CFile* self = (CFile*) file;
 	FILE* filePtr;
@@ -151,7 +151,7 @@ Bool _CFile_Open( void* file, char* fileName )
 	return True;	
 }
 	
-Bool _CFile_Append( void* file, char* fileName )
+Bool _CFile_Append( void* file, const char* const fileName )
 {
 	CFile* self = (CFile*) file;
 	FILE* filePtr;

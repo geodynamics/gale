@@ -70,8 +70,8 @@ void RankFormatter_Init( RankFormatter* self )
 	self->_print = _RankFormatter_Print;
 	self->_copy = _LineFormatter_Copy;
 
-	_LineFormatter_Init( (LineFormatter*)self, _LineFormatter_Format );
-	_RankFormatter_Init( self, _LineFormatter_Format );
+	_LineFormatter_Init( (LineFormatter*)self, (StreamFormatter_FormatFunction*)_LineFormatter_Format );
+	_RankFormatter_Init( self, (StreamFormatter_FormatFunction*)_LineFormatter_Format );
 }
 
 RankFormatter* _RankFormatter_New(  RANKFORMATTER_DEFARGS  )

@@ -629,9 +629,9 @@ void IO_HandlerSuite_TestReadNonExistent( IO_HandlerSuiteData* data ) {
 
 
 void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
-   char			invalidXMLFilename[PCU_PATH_MAX];
-   char			expectedErrorFilename[PCU_PATH_MAX];
-   const char*	errorFilename = "errorMsg-Invalid.txt";
+   char              invalidXMLFilename[PCU_PATH_MAX];
+   char              expectedErrorFilename[PCU_PATH_MAX];
+   const Name       errorFilename = "errorMsg-Invalid.txt";
 
    pcu_filename_input( "Invalid.xml", invalidXMLFilename );
    pcu_filename_expected( errorFilename, expectedErrorFilename );
@@ -652,9 +652,9 @@ void IO_HandlerSuite_TestReadInvalid( IO_HandlerSuiteData* data ) {
 
 
 void IO_HandlerSuite_TestReadWrongNS( IO_HandlerSuiteData* data ) {
-   char			wrongNS_XMLFilename[PCU_PATH_MAX];
-   char			expectedErrorFilename[PCU_PATH_MAX];
-   const char*	errorFilename = "errorMsg-wrongNS.txt";
+   char              wrongNS_XMLFilename[PCU_PATH_MAX];
+   char              expectedErrorFilename[PCU_PATH_MAX];
+   const Name       errorFilename = "errorMsg-wrongNS.txt";
 
    pcu_filename_input( "WrongNS.xml", wrongNS_XMLFilename );
    pcu_filename_expected( errorFilename, expectedErrorFilename );
@@ -675,9 +675,9 @@ void IO_HandlerSuite_TestReadWrongNS( IO_HandlerSuiteData* data ) {
 
 
 void IO_HandlerSuite_TestReadWrongRootNode( IO_HandlerSuiteData* data ) {
-   char			wrongRootNode_XMLFilename[PCU_PATH_MAX];
-   char			expectedErrorFilename[PCU_PATH_MAX];
-   const char*	errorFilename = "./errorMsg-wrongRootNode.txt";
+   char          wrongRootNode_XMLFilename[PCU_PATH_MAX];
+   char          expectedErrorFilename[PCU_PATH_MAX];
+   const Name   errorFilename = "./errorMsg-wrongRootNode.txt";
 
    pcu_filename_input( "WrongRootNode.xml", wrongRootNode_XMLFilename );
    pcu_filename_expected( errorFilename, expectedErrorFilename );

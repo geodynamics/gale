@@ -238,7 +238,7 @@ void EntryPointSuite_TestRun( EntryPointSuiteData* data ) {
 
 void EntryPointSuite_TestPrintConcise( EntryPointSuiteData* data ) {
    Stream*        stream = NULL;
-   const char*    testFilename = "testEP-PrintConcise.txt";
+   const Name    testFilename = "testEP-PrintConcise.txt";
 
    data->ep = EntryPoint_New( "testEntryPoint", EntryPoint_VoidPtr_CastType );
    EntryPoint_Append( data->ep, "TestHook0", (void*)TestHook0, "testCode" );

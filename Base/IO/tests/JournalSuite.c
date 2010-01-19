@@ -380,7 +380,7 @@ void JournalSuite_TestPrintString_WithLength( JournalSuiteData* data ) {
    Stream*      myStream    = Journal_Register( Info_Type, "TestStream" );
    char*        string        = "helloWorldHowDoYouDo";
    int          char_I;
-   const char*  stringLengthTestFilename = "testJournalPrintStringWithLength.txt" ;
+   const Name  stringLengthTestFilename = "testJournalPrintStringWithLength.txt" ;
    char         expectedFilename[PCU_PATH_MAX];
 
    /* Just do this test with rank 0 */
@@ -410,7 +410,7 @@ void JournalSuite_TestShortcuts( JournalSuiteData* data ) {
    char         charValue     = 'V';
    double       doubleArray[] = { 10.23, 393.1, -89, 1231 };        
    Index        uintArray[]   = { 10, 2021, 231, 2, 3, 4, 55 };
-   const char*  shortcutTestFilename = "./testJournalPrintShortcuts.txt" ;
+   const Name  shortcutTestFilename = "./testJournalPrintShortcuts.txt" ;
    char         expectedFilename[PCU_PATH_MAX];
 
    /* Testing String Printing Shortcuts */

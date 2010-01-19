@@ -81,10 +81,10 @@
 	void _LinkedListIterator_PrintFunc( void *, Stream * );
 	
 	#define LinkedListIterator_First( it ) \
-		(it==NULL)?NULL:(it->list == NULL)?NULL:((it->curr = it->list->head)==NULL)?NULL:it->curr->data
+                ((it==NULL)?NULL:(it->list == NULL)?NULL:((it->curr = it->list->head)==NULL)?NULL:it->curr->data)
 
 	#define LinkedListIterator_Next( it ) \
-		(it==NULL)?NULL:(it->curr == NULL)?NULL:((it->curr = it->curr->next)==NULL)?NULL:it->curr->data
+                ((it==NULL)?NULL:(it->curr == NULL)?NULL:((it->curr = it->curr->next)==NULL)?NULL:it->curr->data)
 
 
 #endif /* __StGermain_Base_Container_LinkedListIterator_h__ */

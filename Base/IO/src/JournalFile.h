@@ -121,7 +121,7 @@
 	 **
 	 ** @param journalFile An instance of a JournalFile sub-class.
 	 **/
-	Bool JournalFile_Open( void* journalFile, const char* const fileName );
+	Bool JournalFile_Open( void* journalFile, const Name fileName );
 	
 	
 	/** Reopen a file for writing. It will use the previous name it was opened with.
@@ -138,7 +138,7 @@
 	 **
 	 ** @param journalFile An instance of a JournalFile sub-class.
 	 **/
-	Bool JournalFile_Append( void* journalFile, const char* const fileName );
+	Bool JournalFile_Append( void* journalFile, const Name fileName );
 
 	/** Close a file. If successful, returns True.
 	 **

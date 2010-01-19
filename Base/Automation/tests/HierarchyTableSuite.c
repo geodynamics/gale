@@ -119,7 +119,7 @@ void HierarchyTableSuite_TestIsChild( HierarchyTableSuiteData* data ) {
 
 void HierarchyTableSuite_TestPrintParents( HierarchyTableSuiteData* data ) {
    Stream*           stream = Journal_Register( Info_Type, "testStream" );
-   const char* const testFilename = "testHTable-PrintParents.txt";
+   const Name testFilename = "testHTable-PrintParents.txt";
 
    if (data->rank==0) {
       Stream_RedirectFile( stream, testFilename );
@@ -145,7 +145,7 @@ void HierarchyTableSuite_TestPrintParents( HierarchyTableSuiteData* data ) {
 
 void HierarchyTableSuite_TestPrintChildren( HierarchyTableSuiteData* data ) {
    Stream*     stream = Journal_Register( Info_Type, "testStream" );
-   const char* const testFilename = "testHTable-PrintChildren.txt";
+   const Name testFilename = "testHTable-PrintChildren.txt";
 
    if (data->rank==0) {
       Stream_RedirectFile( stream, testFilename );

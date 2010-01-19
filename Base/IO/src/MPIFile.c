@@ -60,7 +60,7 @@ JournalFile* MPIFile_New()
 	return (JournalFile*)_MPIFile_New(  MPIFILE_PASSARGS  );
 }
 
-JournalFile* MPIFile_New2( const char* const fileName )
+JournalFile* MPIFile_New2( const Name fileName )
 {
 	JournalFile* result = MPIFile_New();
 

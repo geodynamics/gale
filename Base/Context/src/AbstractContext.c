@@ -912,7 +912,7 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( void* _context, Index timeStep
 	#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	fileData = H5Dopen( file, "/currentTime" );
 	#else
-	fileData = H5Dopen( file, "/currentTime", H5P_DEFAULT );
+	fileData = H5Dopen2( file, "/currentTime", H5P_DEFAULT );
 	#endif
 	fileSpace = H5Dget_space( fileData );
 	   
@@ -925,7 +925,7 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( void* _context, Index timeStep
 	#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	fileData = H5Dopen( file, "/Dt" );
 	#else
-	fileData = H5Dopen( file, "/Dt", H5P_DEFAULT );
+	fileData = H5Dopen2( file, "/Dt", H5P_DEFAULT );
 	#endif
 	fileSpace = H5Dget_space( fileData );
 	   
@@ -995,7 +995,7 @@ void _AbstractContext_SaveTimeInfo( void* _context ) {
 	#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	fileData = H5Dcreate( file, "/currentTime", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
 	#else
-	fileData = H5Dcreate( file, "/currentTime", H5T_NATIVE_DOUBLE, fileSpace,
+	fileData = H5Dcreate2( file, "/currentTime", H5T_NATIVE_DOUBLE, fileSpace,
 	                            H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 	#endif
 	      
@@ -1010,7 +1010,8 @@ void _AbstractContext_SaveTimeInfo( void* _context ) {
 	#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	fileData = H5Dcreate( file, "/Dt", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
 	#else
-	fileData = H5Dcreate( file, "/Dt", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+	fileData = H5Dcreate2( file, "/Dt", H5T_NATIVE_DOUBLE, fileSpace,
+	                            H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 	#endif
 	      
 	props = H5Pcreate( H5P_DATASET_XFER );
@@ -1025,7 +1026,7 @@ void _AbstractContext_SaveTimeInfo( void* _context ) {
 	#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	fileData = H5Dcreate( file, "/nproc", H5T_NATIVE_INT, fileSpace, H5P_DEFAULT );
 	#else
-	fileData = H5Dcreate( file, "/nproc", H5T_NATIVE_INT, fileSpace,
+	fileData = H5Dcreate2( file, "/nproc", H5T_NATIVE_INT, fileSpace,
 	                            H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 	#endif
 	      

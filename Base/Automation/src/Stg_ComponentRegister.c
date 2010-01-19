@@ -133,8 +133,8 @@ void _Stg_ComponentRegister_Print( void* componentRegister, Stream* stream )
 /* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 int Stg_ComponentRegister_AddFunc( 
 		Stg_ComponentRegister *self,
-		Name componentType,
-		Name version,
+		const Name componentType,
+		const Name version,
 		Stg_Component_DefaultConstructorFunction *func,
 		Stg_Component_MetaAsDictionaryFunction* metadata )
 {

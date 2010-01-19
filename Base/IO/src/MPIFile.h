@@ -60,7 +60,7 @@
 	JournalFile* MPIFile_New();
 
 	/** Creates a new MPIFile, opening the file given by fileName. Returns NULL if system is unable to open the given file. */
-	JournalFile* MPIFile_New2( const char* const fileName );
+	JournalFile* MPIFile_New2( const Name fileName );
 
 	/** Initialises an instance of MPIFile. Will not open any files. */
 	void MPIFile_Init( MPIFile* self );

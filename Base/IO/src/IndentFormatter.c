@@ -65,7 +65,7 @@ StreamFormatter* IndentFormatter_New()
 	return (StreamFormatter*)_IndentFormatter_New(  INDENTFORMATTER_PASSARGS  );
 }
 
-StreamFormatter* IndentFormatter_New2( char _character )
+StreamFormatter* IndentFormatter_New2( const char _character )
 {
 	/* Variables set in this function */
 	SizeT                            _sizeOfSelf = sizeof(IndentFormatter);
@@ -86,7 +86,7 @@ void IndentFormatter_Init( IndentFormatter* self )
 	self->_print = _IndentFormatter_Print;
 	self->_copy = _IndentFormatter_Copy;
 	
-	_IndentFormatter_Init( self, _LineFormatter_Format, IndentFormatter_IndentChar );
+	_IndentFormatter_Init( self, (StreamFormatter_FormatFunction*)_LineFormatter_Format, IndentFormatter_IndentChar );
 }
 
 IndentFormatter* _IndentFormatter_New(  INDENTFORMATTER_DEFARGS  )

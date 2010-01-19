@@ -91,7 +91,7 @@ void _JournalFile_Print( void* journalFile, Stream* stream )
         Journal_Printf( stream, "\tfileHandle (ptr): %p\n", self->fileHandle );
 }
 
-Bool JournalFile_Open( void* file, const char* const fileName )
+Bool JournalFile_Open( void* file, const Name fileName )
 {
 	JournalFile* self = (JournalFile*)file;
 	
@@ -121,7 +121,7 @@ Bool JournalFile_Reopen( void* journalFile ) {
 	return result;
 }
 
-Bool JournalFile_Append( void* file, const char* const fileName ) {
+Bool JournalFile_Append( void* file, const Name fileName ) {
 	JournalFile* self = (JournalFile*)file;
 	
 	Bool result = self->_append( self, fileName );

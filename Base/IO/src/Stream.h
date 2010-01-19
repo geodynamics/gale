@@ -145,24 +145,24 @@
 
 	/** Opens a registers a file for this stream if not already opened and assigns it for output
 	    Defaults CFile for now. TODO for next io commit */
-	Bool Stream_RedirectFile( Stream* stream, const char* const fileName );
+	Bool Stream_RedirectFile( Stream* stream, const Name fileName );
 
 	/** Opens a registers a file for all the stream if not already opened and assigns it for output
 	    Defaults CFile for now. TODO for next io commit */
-	Bool Stream_RedirectAllToFile( const char* const fileName );
+	Bool Stream_RedirectAllToFile( const Name fileName );
 
 	/** Purges all redirected stream files */
 	void Stream_PurgeAllRedirectedFiles( void );
 
 	/** Opens a registers a file for this stream if not already opened and assigns it for output for whole branch */
-	Bool Stream_RedirectFileBranch( Stream* stream, const char* const fileName );
+	Bool Stream_RedirectFileBranch( Stream* stream, const Name fileName );
 
 	/** Opens and registers a file for this stream if not already opened, goes to end of file and assigns it for output
 	    Defaults CFile for now. TODO for next io commit */
-	Bool Stream_AppendFile( Stream* stream, const char* const fileName );
+	Bool Stream_AppendFile( Stream* stream, const Name fileName );
 	
 	/** Opens a registers a file for this stream if not alreconst ady opened and assigns it for output for whole branch */
-	Bool Stream_RedirectFileBranch( Stream* stream, const char* const fileName );
+	Bool Stream_RedirectFileBranch( Stream* stream, const Name fileName );
 
 	/** Sets the file which the stream is directed to, returning True if successful.
 	 ** This function may fail if an unusable file type is given to the stream. */

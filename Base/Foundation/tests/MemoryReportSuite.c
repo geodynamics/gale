@@ -37,7 +37,7 @@
 
 #include "pcu/pcu.h"
 #include "StGermain/Base/Foundation/Foundation.h"
-#include "StGermain/Base/Foundation/forwardDecl.h" /* For Journal stuff */
+#include "StGermain/Base/IO/IO.h" /* For Journal stuff */
 #include "MemoryReportSuite.h"
 
 struct StructA
@@ -200,9 +200,10 @@ Memory* MemoryReportSuite_SaveStgMemoryAndCreateTemp( MemoryReportSuiteData* dat
    /* Save the main stgMemory struct, and create a special one for this test */
    data->savedStgMemory = stgMemory;
    stgMemory = Memory_Init();
-   stgMemory->infoStream = Stg_Class_Copy( (Stream*)Journal_GetTypedStream( Info_Type ), 0, True, 0, 0 );
-   stgMemory->debugStream = Stg_Class_Copy( (Stream*)Journal_GetTypedStream( Debug_Type ), 0, True, 0, 0 );
-   stgMemory->errorStream = Stg_Class_Copy( (Stream*)Journal_GetTypedStream( Error_Type ), 0, True, 0, 0 );
+
+   stgMemory->infoStream = Stg_Class_Copy( (Stream*)Journal_GetTypedStream( Info_Type ), NULL, True, NULL, NULL );
+   stgMemory->debugStream = Stg_Class_Copy( (Stream*)Journal_GetTypedStream( Debug_Type ), NULL, True, NULL, NULL );
+   stgMemory->errorStream = Stg_Class_Copy( (Stream*)Journal_GetTypedStream( Error_Type ), NULL, True, NULL, NULL );
    Journal_Enable_TypedStream( Info_Type, True );
    return stgMemory;
 }
