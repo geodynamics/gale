@@ -81,7 +81,7 @@ FeMesh_ElementType* _FeMesh_ElementType_New(  FEMESH_ELEMENTTYPE_DEFARGS  ) {
 void _FeMesh_ElementType_Init( FeMesh_ElementType* self ) {
 	assert( self && Stg_CheckType( self, FeMesh_ElementType ) );
 
-	_Mesh_HexType_Init( self );
+	_Mesh_HexType_Init( (Mesh_HexType*)self );
 }
 
 

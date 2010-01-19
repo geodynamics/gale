@@ -217,7 +217,7 @@ void _FeMesh_Build( void* feMesh, void* data ) {
 
 	if( self->elementMesh ) {
 		Stg_Class_Delete( self->algorithms );
-		self->algorithms = FeMesh_Algorithms_New( "", NULL );
+		self->algorithms = (Mesh_Algorithms*)FeMesh_Algorithms_New( "", NULL );
 		Mesh_Algorithms_SetMesh( self->algorithms, self );
 		Mesh_Algorithms_Update( self->algorithms );
 

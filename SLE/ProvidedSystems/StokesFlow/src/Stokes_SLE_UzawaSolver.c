@@ -962,12 +962,12 @@ void _Stokes_SLE_UzawaSolver_GetRhs( void *stokesSLE, void *solver, Vec rhs )
 	KSP ksp_A11;
 
 	/* check operations will be valid */
-	if (sle->dStiffMat!=NULL) {   SETERRQ( PETSC_ERR_SUP, "A21 must be NULL" ); }
-	if (A11_solver==NULL){    SETERRQ( PETSC_ERR_ARG_NULL, "vel_solver is NULL" ); }
-        if (A12==NULL){           SETERRQ( PETSC_ERR_ARG_NULL, "A12 is NULL" ); }
-        if (b1==NULL){       SETERRQ( PETSC_ERR_ARG_NULL, "b1 is NULL" ); }
-        if (b2==NULL){       SETERRQ( PETSC_ERR_ARG_NULL, "b2 is NULL" ); }
-        if (u_star==NULL){   SETERRQ( PETSC_ERR_ARG_NULL, "u* is NULL" ); }
+	if (sle->dStiffMat!=NULL) {   SETERRABORT( sle->comm, PETSC_ERR_SUP, "A21 must be NULL" ); }
+	if (A11_solver==NULL){    SETERRABORT( sle->comm, PETSC_ERR_ARG_NULL, "vel_solver is NULL" ); }
+        if (A12==NULL){           SETERRABORT( sle->comm, PETSC_ERR_ARG_NULL, "A12 is NULL" ); }
+        if (b1==NULL){       SETERRABORT( sle->comm, PETSC_ERR_ARG_NULL, "b1 is NULL" ); }
+        if (b2==NULL){       SETERRABORT( sle->comm, PETSC_ERR_ARG_NULL, "b2 is NULL" ); }
+        if (u_star==NULL){   SETERRABORT( sle->comm, PETSC_ERR_ARG_NULL, "u* is NULL" ); }
 
 	/* Extract petsc objects */
 	ksp_A11 = A11_solver;
@@ -1000,13 +1000,13 @@ void _Stokes_SLE_UzawaSolver_FormResidual( void *stokesSLE, void *solver, Vec r 
 	PetscInt r_N, x2_N;
 
         /* check operations will be valid */
-	if (A11_solver==NULL){   SETERRQ( PETSC_ERR_ARG_NULL, "vel_solver is NULL" ); }
-        if (sle->dStiffMat!=NULL) {  SETERRQ( PETSC_ERR_SUP, "A21 must be NULL" ); }
-        if (A12==NULL){          SETERRQ( PETSC_ERR_ARG_NULL, "A12 is NULL" ); }
-        if (x2==NULL){         SETERRQ( PETSC_ERR_ARG_NULL, "x2 is NULL" ); }
-        if (u_star==NULL){     SETERRQ( PETSC_ERR_ARG_NULL, "u* is NULL" ); }
-        if (f_star==NULL){     SETERRQ( PETSC_ERR_ARG_NULL, "f* is NULL" ); }
-	if (q_star==NULL) {    SETERRQ( PETSC_ERR_ARG_NULL, "q* is NULL" ); }
+	if (A11_solver==NULL){   SETERRABORT( sle->comm, PETSC_ERR_ARG_NULL, "vel_solver is NULL" ); }
+        if (sle->dStiffMat!=NULL) {  SETERRABORT( sle->comm, PETSC_ERR_SUP, "A21 must be NULL" ); }
+        if (A12==NULL){          SETERRABORT( sle->comm, PETSC_ERR_ARG_NULL, "A12 is NULL" ); }
+        if (x2==NULL){         SETERRABORT( sle->comm, PETSC_ERR_ARG_NULL, "x2 is NULL" ); }
+        if (u_star==NULL){     SETERRABORT( sle->comm, PETSC_ERR_ARG_NULL, "u* is NULL" ); }
+        if (f_star==NULL){     SETERRABORT( sle->comm, PETSC_ERR_ARG_NULL, "f* is NULL" ); }
+	if (q_star==NULL) {    SETERRABORT( sle->comm, PETSC_ERR_ARG_NULL, "q* is NULL" ); }
 
 	A22 = PETSC_NULL;
 	if (sle->cStiffMat!=NULL) {
@@ -1021,7 +1021,7 @@ void _Stokes_SLE_UzawaSolver_FormResidual( void *stokesSLE, void *solver, Vec r 
 	VecGetSize( r, &r_N );
 	VecGetSize( x2, &x2_N );
 	if (r_N!=x2_N) {
-		SETERRQ2( PETSC_ERR_ARG_SIZ, "Solution vector for pressure (N=%D) is not compatible with residual vector (N=%D)", x2_N, r_N );
+          SETERRABORT( sle->comm, PETSC_ERR_ARG_SIZ, "Solution vector for pressure is not compatible with residual vector" );
 	}	
 	
 	/* r = f_hat - (G^T K^{-1} G - M) p */

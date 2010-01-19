@@ -57,18 +57,28 @@ double Stokes_SLE_UpdateDt( Stokes_SLE* self, FiniteElementContext* context ) {
 	FeVariable*             velFeVar      = NULL;
 	double			localDt;
 	double			globalDt;
+        Dictionary*             dictionary = context->dictionary;
+        double factor;
 	
-	velFeVar = self->uSolnVec->feVariable;
-	velMax = FieldVariable_GetMaxGlobalFieldMagnitude( velFeVar );
+        globalDt=Dictionary_GetDouble_WithDefault(dictionary,"dt",0.0);
+        
+        if(globalDt==0.0)
+          {
+            velFeVar = self->uSolnVec->feVariable;
+            velMax = FieldVariable_GetMaxGlobalFieldMagnitude( velFeVar );
+            
+            Journal_DPrintf( self->debug, "In func %s for SLE '%s' - Maximum global magnitude for field '%s' = %g.\n",
+                             __func__, self->name, velFeVar->name, velMax );
+            
+            FeVariable_GetMinimumSeparation( velFeVar, &minSeparation, minSeparationEachDim );
+            
+            factor=Dictionary_GetDouble_WithDefault(dictionary,"dtFactor",1.0);
+            localDt = factor*0.5 * minSeparation / velMax;
 
-	Journal_DPrintf( self->debug, "In func %s for SLE '%s' - Maximum global magnitude for field '%s' = %g.\n",
-		__func__, self->name, velFeVar->name, velMax );
+            printf("dt %g %g %g %g\n",localDt,factor,minSeparation,velMax);
 
-	FeVariable_GetMinimumSeparation( velFeVar, &minSeparation, minSeparationEachDim );
-
-	localDt = 0.5 * minSeparation / velMax;
-	MPI_Allreduce( &localDt, &globalDt, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD );
-
+            MPI_Allreduce( &localDt, &globalDt, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD );
+          }
 	return globalDt;
 }
 

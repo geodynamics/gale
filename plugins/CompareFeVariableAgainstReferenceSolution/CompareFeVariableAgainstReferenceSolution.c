@@ -117,7 +117,7 @@ void _CompareFeVariableAgainstReferenceSolution_AssignFromXML( void* compareFeVa
 	Journal_Printf(
 		Journal_MyStream( Info_Type, self ),
 		"%s: Using reference path %s\n", self->name, referencePath );
-	if ( referencePath[ strlen(referencePath) ] == (int)"/" ) {
+	if ( referencePath[ strlen(referencePath) ] == (int)'/' ) {
 		self->referencePath = StG_Strdup( referencePath );
 	} 
 	else {	

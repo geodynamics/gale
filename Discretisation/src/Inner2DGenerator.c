@@ -384,7 +384,7 @@ void Inner2DGenerator_BuildElementTypes( Inner2DGenerator* self, FeMesh* mesh ) 
 	for( e_i = 0; e_i < nDomainEls; e_i++ )
 		mesh->elTypeMap[e_i] = 0;
 
-	algs = Mesh_CentroidAlgorithms_New( "", NULL );
+	algs = (Mesh_Algorithms*)Mesh_CentroidAlgorithms_New( "", NULL );
 	Mesh_CentroidAlgorithms_SetElementMesh( algs, self->elMesh );
 	Mesh_SetAlgorithms( mesh, algs );
 }

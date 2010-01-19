@@ -390,7 +390,7 @@ void C2Generator_GenFaceVertexInc( void* meshGenerator, IGraph* topo, Grid*** gr
 
 void C2Generator_GenEdgeVertexInc( void* meshGenerator, IGraph* topo, Grid*** grids ) {
 	C2Generator*	self 		= (C2Generator*)meshGenerator;
-	Sync*		sync		= IGraph_GetDomain( topo, MT_EDGE );
+	const Sync*	sync		= IGraph_GetDomain( topo, MT_EDGE );
 	Stream*		stream;
 	unsigned	edge_i;
 	unsigned	gEdge;

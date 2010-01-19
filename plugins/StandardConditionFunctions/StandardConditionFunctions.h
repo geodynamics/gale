@@ -62,8 +62,11 @@ Index StgFEM_StandardConditionFunctions_Register( PluginsManager* pluginsManager
 void StgFEM_StandardConditionFunctions_SolidBodyRotation( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 void StgFEM_StandardConditionFunctions_PartialRotationX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 void StgFEM_StandardConditionFunctions_PartialRotationY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
+void StgFEM_StandardConditionFunctions_TaperedRotationX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
+void StgFEM_StandardConditionFunctions_TaperedRotationY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 void StgFEM_StandardConditionFunctions_SimpleShear( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 void StgFEM_StandardConditionFunctions_SimpleShearInverted( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
+void StgFEM_StandardConditionFunctions_ShearZ( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 void StgFEM_StandardConditionFunctions_Extension( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 void StgFEM_StandardConditionFunctions_PartialLid_TopLayer( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) ;
 void StgFEM_StandardConditionFunctions_LinearInterpolationLid( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) ;
@@ -82,7 +85,13 @@ void StgFEM_StandardConditionFunctions_SinusoidalExtension( Node_LocalIndex node
 void StgFEM_StandardConditionFunctions_EdgeDriveConvectionIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
 void StgFEM_StandardConditionFunctions_ThermalEdgeDriveConvectionIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
 void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
-void StgFEM_StandardConditionFunctions_MovingStepFunction( int nodeInd, int varInd, void* _ctx, void* _result );
+void StG_FEM_StandardConditionFunctions_StepFunctionProduct1( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
+void StG_FEM_StandardConditionFunctions_StepFunctionProduct2( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
+void StG_FEM_StandardConditionFunctions_StepFunctionProduct3( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
+void StG_FEM_StandardConditionFunctions_StepFunctionProduct4( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
+void StgFEM_StandardConditionFunctions_TemperatureProfile( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
+void StG_FEM_StandardConditionFunctions_Gaussian( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
+void StgFEM_StandardConditionFunctions_MovingStepFunction( Node_LocalIndex nodeInd, Variable_Index varInd, void* _ctx, void* _result );
 void StgFEM_StandardConditionFunctions_SpecRidge3D( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 void StgFEM_StandardConditionFunctions_SpectralBCX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 void StgFEM_StandardConditionFunctions_SpectralBCY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
@@ -96,6 +105,10 @@ void StgFEM_StandardConditionFunctions_LinearVelocityRightWall( Node_LocalIndex 
 
 void StgFEM_StandardConditionFunctions_ConvectionBenchmark( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) ;
 void StgFEM_StandardConditionFunctions_ConstantVector( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
+void StgFEM_StandardConditionFunctions_ConstantVelocity( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
+void StgFEM_StandardConditionFunctions_ERF( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
+void StgFEM_StandardConditionFunctions_ERFC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
+void StgFEM_StandardConditionFunctions_RubberSheet( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
 
 void StgFEM_StandardConditionFunctions_GaussianDistribution( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
 void StgFEM_StandardConditionFunctions_GravitationalPotential( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );

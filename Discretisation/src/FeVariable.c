@@ -420,16 +420,6 @@ void _FeVariable_Build( void* variable, void* data ) {
 
 		dim = Mesh_GetDimSize(self->feMesh);
 		/** allocate GNx here */
-#if 0
-/* WTF? This is NOT the way to do this!!!! */
-		if( !strcmp( self->feMesh->name, "linearMesh" ) ) {
-			numNodes = ( dim == 2 ) ? 4 : 8;
-		}
-		else if( !strcmp( self->feMesh->name, "quadraticMesh" ) ) {
-			numNodes = ( dim == 2 ) ? 9 : 27;
-		} 
-		else { numNodes = 0; } /** for constantMesh type */
-#endif
 		/* At least this will work for meshes with names other
 			than those listed above. I spent three hours finding
 			this out.*/
@@ -2009,8 +1999,8 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
          group_id  = H5Gopen(file, "/");
          attrib_id = H5Acreate(group_id, "checkpoint file version", H5T_STD_I32BE, attribData_id, H5P_DEFAULT);
       #else
-         group_id  = H5Gopen(file, "/", H5P_DEFAULT);
-         attrib_id = H5Acreate(group_id, "checkpoint file version", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
+         group_id  = H5Gopen2(file, "/", H5P_DEFAULT);
+         attrib_id = H5Acreate2(group_id, "checkpoint file version", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
       #endif
       H5Awrite(attrib_id, H5T_NATIVE_INT, &attribData);
       H5Aclose(attrib_id);
@@ -2025,8 +2015,8 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
          group_id  = H5Gopen(file, "/");
          attrib_id = H5Acreate(group_id, "dimensions", H5T_STD_I32BE, attribData_id, H5P_DEFAULT);
       #else
-         group_id  = H5Gopen(file, "/", H5P_DEFAULT);
-         attrib_id = H5Acreate(group_id, "dimensions", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
+         group_id  = H5Gopen2(file, "/", H5P_DEFAULT);
+         attrib_id = H5Acreate2(group_id, "dimensions", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
       #endif
       H5Awrite(attrib_id, H5T_NATIVE_INT, &attribData);
       H5Aclose(attrib_id);
@@ -2050,8 +2040,8 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
             group_id  = H5Gopen(file, "/");
             attrib_id = H5Acreate(group_id, "mesh resolution", H5T_STD_I32BE, attribData_id, H5P_DEFAULT);
          #else
-            group_id  = H5Gopen(file, "/", H5P_DEFAULT);
-            attrib_id = H5Acreate(group_id, "mesh resolution", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
+            group_id  = H5Gopen2(file, "/", H5P_DEFAULT);
+            attrib_id = H5Acreate2(group_id, "mesh resolution", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
          #endif
          H5Awrite(attrib_id, H5T_NATIVE_INT, sizes);
          H5Aclose(attrib_id);
@@ -2068,7 +2058,7 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
       #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
       fileData  = H5Dcreate( file, "/data", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
       #else
-      fileData  = H5Dcreate( file, "/data", H5T_NATIVE_DOUBLE, fileSpace,
+      fileData  = H5Dcreate2( file, "/data", H5T_NATIVE_DOUBLE, fileSpace,
                                   H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
       #endif
 	} else {
@@ -2082,7 +2072,7 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
       #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
       fileData  = H5Dopen( file, "/data" );
       #else
-      fileData  = H5Dopen( file, "/data", H5P_DEFAULT );
+      fileData  = H5Dopen2( file, "/data", H5P_DEFAULT );
       #endif
       /** get the filespace handle */
       fileSpace = H5Dget_space(fileData);
@@ -2253,7 +2243,7 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
       group_id  = H5Gopen(file, "/");
       attrib_id = H5Aopen_name(group_id, "checkpoint file version");
    #else
-      group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+      group_id  = H5Gopen2(file, "/", H5P_DEFAULT);
       attrib_id = H5Aopen(group_id, "checkpoint file version", H5P_DEFAULT);
    #endif
    /** if this attribute does not exist (attrib_id < 0) then we assume FeCHECKPOINT_V1 and continue without checking attributes */
@@ -2358,7 +2348,7 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
    #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	fileData = H5Dopen( file, "/data" );
    #else
-	fileData = H5Dopen( file, "/data", H5P_DEFAULT );
+	fileData = H5Dopen2( file, "/data", H5P_DEFAULT );
    #endif
 	fileSpace = H5Dget_space( fileData );
    
@@ -2520,7 +2510,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
       group_id  = H5Gopen(file, "/");
       attrib_id = H5Aopen_name(group_id, "checkpoint file version");
    #else
-      group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+      group_id  = H5Gopen2(file, "/", H5P_DEFAULT);
       attrib_id = H5Aopen(group_id, "checkpoint file version", H5P_DEFAULT);
    #endif
    /** if this attribute does not exist (attrib_id < 0) then we assume MeshCHECKPOINT_V1 which is not supported  */
@@ -2564,7 +2554,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
       fileData = H5Dopen( file, "/min" );
    #else
-      fileData = H5Dopen( file, "/min", H5P_DEFAULT );
+      fileData = H5Dopen2( file, "/min", H5P_DEFAULT );
    #endif
    H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &crdMin );
    H5Dclose( fileData );
@@ -2573,7 +2563,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
       fileData = H5Dopen( file, "/max" );
    #else
-      fileData = H5Dopen( file, "/max", H5P_DEFAULT );
+      fileData = H5Dopen2( file, "/max", H5P_DEFAULT );
    #endif
    H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &crdMax );
    H5Dclose( fileData );
@@ -2589,7 +2579,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
    /** use the element size read in from the checkpoint file for the new mesh generator */
    CartesianGenerator_SetTopologyParams( gen, (unsigned*)res, 0, NULL, NULL );
 	/** use the feVariable's mesh's generator's crdMin and crdMax (which have been previously read in from checkpointed mesh file  */
-   CartesianGenerator_SetGeometryParams( gen, (double*)&crdMin, (double*)&crdMax );
+   CartesianGenerator_SetGeometryParams( gen, crdMin, crdMax );
    /** set it so that the generator does not read in the mesh from a file - we will 
               explicitly do this after we build the feMesh using the provided mesh checkpoint file */
    gen->readFromFile = False;
@@ -2642,7 +2632,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
 
    varReg = Variable_Register_New();
    if (self->fieldComponentCount == 1){
-      var = Variable_NewScalar( "interpolation_temp_scalar", (AbstractContext*)self->context, Variable_DataType_Double, (Index*)&nDomainVerts, NULL, &arrayPtr, varReg );
+     var = Variable_NewScalar( "interpolation_temp_scalar", (AbstractContext*)self->context, Variable_DataType_Double, (Index*)&nDomainVerts, NULL, (void **)(&arrayPtr), varReg );
    } else {
       unsigned var_I;
 		for( var_I = 0; var_I < self->fieldComponentCount; var_I++  )

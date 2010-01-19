@@ -676,7 +676,7 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	dataSet = H5Dopen( inputFile, "/size" );
 #else
-	dataSet = H5Dopen( inputFile, "/size", H5P_DEFAULT );
+	dataSet = H5Dopen2( inputFile, "/size", H5P_DEFAULT );
 #endif
 	H5Dread( dataSet, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, H5P_DEFAULT, sizes );
 	nx = sizes[0];
@@ -700,7 +700,7 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	dataSet = H5Dopen( inputFile, "/data" );
 #else
-	dataSet = H5Dopen( inputFile, "/data", H5P_DEFAULT );
+	dataSet = H5Dopen2( inputFile, "/data", H5P_DEFAULT );
 #endif
 	dataSpace = H5Dget_space( dataSet );
 	start[0] = 0;

@@ -67,12 +67,20 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_PartialRotationY, (Name)"Velocity_PartialRotationY"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShear, (Name)"Velocity_SimpleShear"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShearInverted, (Name)"Velocity_SimpleShearInverted"  );
-        ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Extension, (Name)"Velocity_Extension"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TaperedRotationX, (Name)"TaperedRotationX" );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+		
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TaperedRotationY, (Name)"TaperedRotationY" );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShear, (Name)"Velocity_SimpleShear" );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShearInverted, (Name)"Velocity_SimpleShearInverted" );
+        ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ShearZ, (Name)"ShearZ" );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Extension, (Name)"Velocity_Extension" );
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_PartialLid_TopLayer, (Name)"Velocity_PartialLid_TopLayer"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
@@ -123,8 +131,38 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_StepFunction, (Name)"StepFunction" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_MovingStepFunction, (Name)"MovingStepFunction" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct1, (Name)"StepFunctionProduct1");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct2, (Name)"StepFunctionProduct2");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct3, (Name)"StepFunctionProduct3");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct4, (Name)"StepFunctionProduct4");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TemperatureProfile, (Name)"TemperatureProfile");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_Gaussian, (Name)"Gaussian");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_ERF,
+                                         (Name)"ERF");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_ERFC,
+                                         (Name)"ERFC");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_RubberSheet,
+                                         (Name)"RubberSheet");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_MovingStepFunction, (Name)"MovingStepFunction");
+	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpecRidge3D, (Name)"SpecRidge3D" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
@@ -196,6 +234,347 @@ Index StgFEM_StandardConditionFunctions_Register( PluginsManager* pluginsManager
 	return PluginsManager_Submit( pluginsManager, StgFEM_StandardConditionFunctions_Type, (Name)"0", _StgFEM_StandardConditionFunctions_DefaultNew  );
 }
 
+
+#ifdef NO_ERF
+
+/* Copied from the OpenBSD iplementation of erf.c
+   (src/lib/libm/src/erf.c and src/lib/libm/src/math_private.h).
+   Modified to only work on 32 bit little endian machines.
+   This is just a hack for Windows machines. */
+
+/* @(#)s_erf.c 5.1 93/09/24 */
+/*
+ * ====================================================
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice 
+ * is preserved.
+ * ====================================================
+ */
+
+/* double erf(double x)
+ * double erfc(double x)
+ *                           x
+ *                    2      |\
+ *     erf(x)  =  ---------  | exp(-t*t)dt
+ *                  sqrt(pi) \| 
+ *                           0
+ *
+ *     erfc(x) =  1-erf(x)
+ *  Note that 
+ *              erf(-x) = -erf(x)
+ *              erfc(-x) = 2 - erfc(x)
+ *
+ * Method:
+ *      1. For |x| in [0, 0.84375]
+ *          erf(x)  = x + x*R(x^2)
+ *          erfc(x) = 1 - erf(x)           if x in [-.84375,0.25]
+ *                  = 0.5 + ((0.5-x)-x*R)  if x in [0.25,0.84375]
+ *         where R = P/Q where P is an odd poly of degree 8 and
+ *         Q is an odd poly of degree 10.
+ *                                               -57.90
+ *                      | R - (erf(x)-x)/x | <= 2
+ *      
+ *
+ *         Remark. The formula is derived by noting
+ *          erf(x) = (2/sqrt(pi))*(x - x^3/3 + x^5/10 - x^7/42 + ....)
+ *         and that
+ *          2/sqrt(pi) = 1.128379167095512573896158903121545171688
+ *         is close to one. The interval is chosen because the fix
+ *         point of erf(x) is near 0.6174 (i.e., erf(x)=x when x is
+ *         near 0.6174), and by some experiment, 0.84375 is chosen to
+ *         guarantee the error is less than one ulp for erf.
+ *
+ *      2. For |x| in [0.84375,1.25], let s = |x| - 1, and
+ *         c = 0.84506291151 rounded to single (24 bits)
+ *              erf(x)  = sign(x) * (c  + P1(s)/Q1(s))
+ *              erfc(x) = (1-c)  - P1(s)/Q1(s) if x > 0
+ *                        1+(c+P1(s)/Q1(s))    if x < 0
+ *              |P1/Q1 - (erf(|x|)-c)| <= 2**-59.06
+ *         Remark: here we use the taylor series expansion at x=1.
+ *              erf(1+s) = erf(1) + s*Poly(s)
+ *                       = 0.845.. + P1(s)/Q1(s)
+ *         That is, we use rational approximation to approximate
+ *                      erf(1+s) - (c = (single)0.84506291151)
+ *         Note that |P1/Q1|< 0.078 for x in [0.84375,1.25]
+ *         where 
+ *              P1(s) = degree 6 poly in s
+ *              Q1(s) = degree 6 poly in s
+ *
+ *      3. For x in [1.25,1/0.35(~2.857143)], 
+ *              erfc(x) = (1/x)*exp(-x*x-0.5625+R1/S1)
+ *              erf(x)  = 1 - erfc(x)
+ *         where 
+ *              R1(z) = degree 7 poly in z, (z=1/x^2)
+ *              S1(z) = degree 8 poly in z
+ *
+ *      4. For x in [1/0.35,28]
+ *              erfc(x) = (1/x)*exp(-x*x-0.5625+R2/S2) if x > 0
+ *                      = 2.0 - (1/x)*exp(-x*x-0.5625+R2/S2) if -6<x<0
+ *                      = 2.0 - tiny                (if x <= -6)
+ *              erf(x)  = sign(x)*(1.0 - erfc(x)) if x < 6, else
+ *              erf(x)  = sign(x)*(1.0 - tiny)
+ *         where
+ *              R2(z) = degree 6 poly in z, (z=1/x^2)
+ *              S2(z) = degree 7 poly in z
+ *
+ *      Note1:
+ *         To compute exp(-x*x-0.5625+R/S), let s be a single
+ *         precision number and s := x; then
+ *              -x*x = -s*s + (s-x)*(s+x)
+ *              exp(-x*x-0.5626+R/S) = 
+ *                      exp(-s*s-0.5625)*exp((s-x)*(s+x)+R/S);
+ *      Note2:
+ *         Here 4 and 5 make use of the asymptotic series
+ *                        exp(-x*x)
+ *              erfc(x) ~ ---------- * ( 1 + Poly(1/x^2) )
+ *                        x*sqrt(pi)
+ *         We use rational approximation to approximate
+ *              g(s)=f(1/x^2) = log(erfc(x)*x) - x*x + 0.5625
+ *         Here is the error bound for R1/S1 and R2/S2
+ *              |R1/S1 - f(x)|  < 2**(-62.57)
+ *              |R2/S2 - f(x)|  < 2**(-61.52)
+ *
+ *      5. For inf > x >= 28
+ *              erf(x)  = sign(x) *(1 - tiny)  (raise inexact)
+ *              erfc(x) = tiny*tiny (raise underflow) if x > 0
+ *                      = 2 - tiny if x<0
+ *
+ *      7. Special case:
+ *              erf(0)  = 0, erf(inf)  = 1, erf(-inf) = -1,
+ *              erfc(0) = 1, erfc(inf) = 0, erfc(-inf) = 2, 
+ *                 erfc/erf(NaN) is NaN
+ */
+
+/*  Assume little endian, 32 bit machines  */
+
+typedef int int32_t;
+typedef unsigned int u_int32_t;
+
+typedef union
+{
+  double value;
+  struct
+  {
+    u_int32_t lsw;
+    u_int32_t msw;
+  } parts;
+} ieee_double_shape_type;
+
+/* Get the more significant 32 bit int from a double.  */
+
+#define GET_HIGH_WORD(i,d)                                      \
+do {                                                            \
+  ieee_double_shape_type gh_u;                                  \
+  gh_u.value = (d);                                             \
+  (i) = gh_u.parts.msw;                                         \
+} while (0)
+
+/* Set the less significant 32 bits of a double from an int.  */
+
+#define SET_LOW_WORD(d,v)                                       \
+do {                                                            \
+  ieee_double_shape_type sl_u;                                  \
+  sl_u.value = (d);                                             \
+  sl_u.parts.lsw = (v);                                         \
+  (d) = sl_u.value;                                             \
+} while (0)
+
+
+static const double
+tiny        = 1e-300,
+half=  5.00000000000000000000e-01, /* 0x3FE00000, 0x00000000 */
+one =  1.00000000000000000000e+00, /* 0x3FF00000, 0x00000000 */
+two =  2.00000000000000000000e+00, /* 0x40000000, 0x00000000 */
+        /* c = (float)0.84506291151 */
+erx =  8.45062911510467529297e-01, /* 0x3FEB0AC1, 0x60000000 */
+/*
+ * Coefficients for approximation to  erf on [0,0.84375]
+ */
+efx =  1.28379167095512586316e-01, /* 0x3FC06EBA, 0x8214DB69 */
+efx8=  1.02703333676410069053e+00, /* 0x3FF06EBA, 0x8214DB69 */
+pp0  =  1.28379167095512558561e-01, /* 0x3FC06EBA, 0x8214DB68 */
+pp1  = -3.25042107247001499370e-01, /* 0xBFD4CD7D, 0x691CB913 */
+pp2  = -2.84817495755985104766e-02, /* 0xBF9D2A51, 0xDBD7194F */
+pp3  = -5.77027029648944159157e-03, /* 0xBF77A291, 0x236668E4 */
+pp4  = -2.37630166566501626084e-05, /* 0xBEF8EAD6, 0x120016AC */
+qq1  =  3.97917223959155352819e-01, /* 0x3FD97779, 0xCDDADC09 */
+qq2  =  6.50222499887672944485e-02, /* 0x3FB0A54C, 0x5536CEBA */
+qq3  =  5.08130628187576562776e-03, /* 0x3F74D022, 0xC4D36B0F */
+qq4  =  1.32494738004321644526e-04, /* 0x3F215DC9, 0x221C1A10 */
+qq5  = -3.96022827877536812320e-06, /* 0xBED09C43, 0x42A26120 */
+/*
+ * Coefficients for approximation to  erf  in [0.84375,1.25] 
+ */
+pa0  = -2.36211856075265944077e-03, /* 0xBF6359B8, 0xBEF77538 */
+pa1  =  4.14856118683748331666e-01, /* 0x3FDA8D00, 0xAD92B34D */
+pa2  = -3.72207876035701323847e-01, /* 0xBFD7D240, 0xFBB8C3F1 */
+pa3  =  3.18346619901161753674e-01, /* 0x3FD45FCA, 0x805120E4 */
+pa4  = -1.10894694282396677476e-01, /* 0xBFBC6398, 0x3D3E28EC */
+pa5  =  3.54783043256182359371e-02, /* 0x3FA22A36, 0x599795EB */
+pa6  = -2.16637559486879084300e-03, /* 0xBF61BF38, 0x0A96073F */
+qa1  =  1.06420880400844228286e-01, /* 0x3FBB3E66, 0x18EEE323 */
+qa2  =  5.40397917702171048937e-01, /* 0x3FE14AF0, 0x92EB6F33 */
+qa3  =  7.18286544141962662868e-02, /* 0x3FB2635C, 0xD99FE9A7 */
+qa4  =  1.26171219808761642112e-01, /* 0x3FC02660, 0xE763351F */
+qa5  =  1.36370839120290507362e-02, /* 0x3F8BEDC2, 0x6B51DD1C */
+qa6  =  1.19844998467991074170e-02, /* 0x3F888B54, 0x5735151D */
+/*
+ * Coefficients for approximation to  erfc in [1.25,1/0.35]
+ */
+ra0  = -9.86494403484714822705e-03, /* 0xBF843412, 0x600D6435 */
+ra1  = -6.93858572707181764372e-01, /* 0xBFE63416, 0xE4BA7360 */
+ra2  = -1.05586262253232909814e+01, /* 0xC0251E04, 0x41B0E726 */
+ra3  = -6.23753324503260060396e+01, /* 0xC04F300A, 0xE4CBA38D */
+ra4  = -1.62396669462573470355e+02, /* 0xC0644CB1, 0x84282266 */
+ra5  = -1.84605092906711035994e+02, /* 0xC067135C, 0xEBCCABB2 */
+ra6  = -8.12874355063065934246e+01, /* 0xC0545265, 0x57E4D2F2 */
+ra7  = -9.81432934416914548592e+00, /* 0xC023A0EF, 0xC69AC25C */
+sa1  =  1.96512716674392571292e+01, /* 0x4033A6B9, 0xBD707687 */
+sa2  =  1.37657754143519042600e+02, /* 0x4061350C, 0x526AE721 */
+sa3  =  4.34565877475229228821e+02, /* 0x407B290D, 0xD58A1A71 */
+sa4  =  6.45387271733267880336e+02, /* 0x40842B19, 0x21EC2868 */
+sa5  =  4.29008140027567833386e+02, /* 0x407AD021, 0x57700314 */
+sa6  =  1.08635005541779435134e+02, /* 0x405B28A3, 0xEE48AE2C */
+sa7  =  6.57024977031928170135e+00, /* 0x401A47EF, 0x8E484A93 */
+sa8  = -6.04244152148580987438e-02, /* 0xBFAEEFF2, 0xEE749A62 */
+/*
+ * Coefficients for approximation to  erfc in [1/.35,28]
+ */
+rb0  = -9.86494292470009928597e-03, /* 0xBF843412, 0x39E86F4A */
+rb1  = -7.99283237680523006574e-01, /* 0xBFE993BA, 0x70C285DE */
+rb2  = -1.77579549177547519889e+01, /* 0xC031C209, 0x555F995A */
+rb3  = -1.60636384855821916062e+02, /* 0xC064145D, 0x43C5ED98 */
+rb4  = -6.37566443368389627722e+02, /* 0xC083EC88, 0x1375F228 */
+rb5  = -1.02509513161107724954e+03, /* 0xC0900461, 0x6A2E5992 */
+rb6  = -4.83519191608651397019e+02, /* 0xC07E384E, 0x9BDC383F */
+sb1  =  3.03380607434824582924e+01, /* 0x403E568B, 0x261D5190 */
+sb2  =  3.25792512996573918826e+02, /* 0x40745CAE, 0x221B9F0A */
+sb3  =  1.53672958608443695994e+03, /* 0x409802EB, 0x189D5118 */
+sb4  =  3.19985821950859553908e+03, /* 0x40A8FFB7, 0x688C246A */
+sb5  =  2.55305040643316442583e+03, /* 0x40A3F219, 0xCEDF3BE6 */
+sb6  =  4.74528541206955367215e+02, /* 0x407DA874, 0xE79FE763 */
+sb7  = -2.24409524465858183362e+01; /* 0xC03670E2, 0x42712D62 */
+
+double
+erf(double x) 
+{
+        int32_t hx,ix,i;
+        double R,S,P,Q,s,y,z,r;
+        GET_HIGH_WORD(hx,x);
+        ix = hx&0x7fffffff;
+        if(ix>=0x7ff00000) {                /* erf(nan)=nan */
+            i = ((u_int32_t)hx>>31)<<1;
+            return (double)(1-i)+one/x;        /* erf(+-inf)=+-1 */
+        }
+
+        if(ix < 0x3feb0000) {                /* |x|<0.84375 */
+            if(ix < 0x3e300000) {         /* |x|<2**-28 */
+                if (ix < 0x00800000) 
+                    return 0.125*(8.0*x+efx8*x);  /*avoid underflow */
+                return x + efx*x;
+            }
+            z = x*x;
+            r = pp0+z*(pp1+z*(pp2+z*(pp3+z*pp4)));
+            s = one+z*(qq1+z*(qq2+z*(qq3+z*(qq4+z*qq5))));
+            y = r/s;
+            return x + x*y;
+        }
+        if(ix < 0x3ff40000) {                /* 0.84375 <= |x| < 1.25 */
+            s = fabs(x)-one;
+            P = pa0+s*(pa1+s*(pa2+s*(pa3+s*(pa4+s*(pa5+s*pa6)))));
+            Q = one+s*(qa1+s*(qa2+s*(qa3+s*(qa4+s*(qa5+s*qa6)))));
+            if(hx>=0) return erx + P/Q; else return -erx - P/Q;
+        }
+        if (ix >= 0x40180000) {                /* inf>|x|>=6 */
+            if(hx>=0) return one-tiny; else return tiny-one;
+        }
+        x = fabs(x);
+        s = one/(x*x);
+        if(ix< 0x4006DB6E) {        /* |x| < 1/0.35 */
+            R=ra0+s*(ra1+s*(ra2+s*(ra3+s*(ra4+s*(
+                                ra5+s*(ra6+s*ra7))))));
+            S=one+s*(sa1+s*(sa2+s*(sa3+s*(sa4+s*(
+                                sa5+s*(sa6+s*(sa7+s*sa8)))))));
+        } else {        /* |x| >= 1/0.35 */
+            R=rb0+s*(rb1+s*(rb2+s*(rb3+s*(rb4+s*(
+                                rb5+s*rb6)))));
+            S=one+s*(sb1+s*(sb2+s*(sb3+s*(sb4+s*(
+                                sb5+s*(sb6+s*sb7))))));
+        }
+        z  = x;  
+        SET_LOW_WORD(z,0);
+        r  =  exp(-z*z-0.5625)*exp((z-x)*(z+x)+R/S);
+        if(hx>=0) return one-r/x; else return  r/x-one;
+}
+
+double
+erfc(double x) 
+{
+        int32_t hx,ix;
+        double R,S,P,Q,s,y,z,r;
+        GET_HIGH_WORD(hx,x);
+        ix = hx&0x7fffffff;
+        if(ix>=0x7ff00000) {                        /* erfc(nan)=nan */
+                                                /* erfc(+-inf)=0,2 */
+            return (double)(((u_int32_t)hx>>31)<<1)+one/x;
+        }
+
+        if(ix < 0x3feb0000) {                /* |x|<0.84375 */
+            if(ix < 0x3c700000)          /* |x|<2**-56 */
+                return one-x;
+            z = x*x;
+            r = pp0+z*(pp1+z*(pp2+z*(pp3+z*pp4)));
+            s = one+z*(qq1+z*(qq2+z*(qq3+z*(qq4+z*qq5))));
+            y = r/s;
+            if(hx < 0x3fd00000) {          /* x<1/4 */
+                return one-(x+x*y);
+            } else {
+                r = x*y;
+                r += (x-half);
+                return half - r ;
+            }
+        }
+        if(ix < 0x3ff40000) {                /* 0.84375 <= |x| < 1.25 */
+            s = fabs(x)-one;
+            P = pa0+s*(pa1+s*(pa2+s*(pa3+s*(pa4+s*(pa5+s*pa6)))));
+            Q = one+s*(qa1+s*(qa2+s*(qa3+s*(qa4+s*(qa5+s*qa6)))));
+            if(hx>=0) {
+                z  = one-erx; return z - P/Q; 
+            } else {
+                z = erx+P/Q; return one+z;
+            }
+        }
+        if (ix < 0x403c0000) {                /* |x|<28 */
+            x = fabs(x);
+            s = one/(x*x);
+            if(ix< 0x4006DB6D) {        /* |x| < 1/.35 ~ 2.857143*/
+                R=ra0+s*(ra1+s*(ra2+s*(ra3+s*(ra4+s*(
+                                ra5+s*(ra6+s*ra7))))));
+                S=one+s*(sa1+s*(sa2+s*(sa3+s*(sa4+s*(
+                                sa5+s*(sa6+s*(sa7+s*sa8)))))));
+            } else {                        /* |x| >= 1/.35 ~ 2.857143 */
+                if(hx<0&&ix>=0x40180000) return two-tiny;/* x < -6 */
+                R=rb0+s*(rb1+s*(rb2+s*(rb3+s*(rb4+s*(
+                                rb5+s*rb6)))));
+                S=one+s*(sb1+s*(sb2+s*(sb3+s*(sb4+s*(
+                                sb5+s*(sb6+s*sb7))))));
+            }
+            z  = x;
+            SET_LOW_WORD(z,0);
+            r  =  exp(-z*z-0.5625)*
+                        exp((z-x)*(z+x)+R/S);
+            if(hx>0) return r/x; else return two-r/x;
+        } else {
+            if(hx>0) return tiny*tiny; else return two-tiny;
+        }
+}
+
+#endif
+
+
 void StgFEM_StandardConditionFunctions_SolidBodyRotation( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
@@ -247,7 +626,6 @@ void StgFEM_StandardConditionFunctions_PartialRotationX( Node_LocalIndex node_lI
 	centre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreY", 0.0  );
 	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreZ", 0.0  );
 	size             = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"RadiusCylinder", 0.0  );
-	size += 0.1;
 	omega            = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationOmega", 1.0  );
 
 	/* Find coordinate of node */
@@ -285,7 +663,6 @@ void StgFEM_StandardConditionFunctions_PartialRotationY( Node_LocalIndex node_lI
 	centre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreY", 0.0  );
 	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreZ", 0.0  );
 	size             = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"RadiusCylinder", 0.0  );
-	size += 0.1;
 	omega            = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationOmega", 1.0  );
 
 	/* Find coordinate of node */
@@ -293,15 +670,96 @@ void StgFEM_StandardConditionFunctions_PartialRotationY( Node_LocalIndex node_lI
 
 	/* Find vector from centre to node */
 	StGermain_VectorSubtraction( vector, coord, centre, 2 );
-
-	/*if (context->currentTime > 1.33e-6)
-	  omega=0.0;*/
 	
 	if ((vector[ I_AXIS ]*vector[ I_AXIS ]+vector[ J_AXIS ]*vector[ J_AXIS ])<=size*size)
 		*result =  omega * vector[ I_AXIS ];
 	else 
 		*result = 0.0;
 }
+
+
+void StgFEM_StandardConditionFunctions_TaperedRotationX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	DomainContext*	context            = (DomainContext*)_context;
+	Dictionary*             dictionary         = context->dictionary;
+	FeVariable*             feVariable         = NULL;
+	FeMesh*			mesh               = NULL;
+	double*                 result             = (double*) _result;
+	double*                 coord;
+	Coord                   centre;
+	Coord                   vector;
+	double                  omega;
+	double			size, r, taper;
+
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	mesh       = feVariable->feMesh;
+
+	/* Find Centre of Solid Body Rotation */
+	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreX", 0.0 );
+	centre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreY", 0.0 );
+	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreZ", 0.0 );
+	size             = Dictionary_GetDouble_WithDefault( dictionary, "RadiusCylinder", 0.0 );
+	omega            = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationOmega",   1.0 );
+
+	taper            = Dictionary_GetDouble_WithDefault( dictionary, "TaperedRadius",   0.0 );
+
+	/* Find coordinate of node */
+	coord = Mesh_GetVertex( mesh, node_lI );
+
+	/* Find vector from centre to node */
+	StGermain_VectorSubtraction( vector, coord, centre, 2 );
+
+        r=sqrt(vector[ I_AXIS ]*vector[ I_AXIS ]
+               +vector[ J_AXIS ]*vector[ J_AXIS ]);
+	if (r<=size)
+          *result = -omega * vector[ J_AXIS ];
+	else if(r<=taper)
+          *result = -omega * vector[ J_AXIS ]*(taper-r)/(taper-size);
+        else
+          *result = 0;
+}
+
+void StgFEM_StandardConditionFunctions_TaperedRotationY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	DomainContext*	context            = (DomainContext*)_context;
+	Dictionary*             dictionary         = context->dictionary;
+	FeVariable*             feVariable         = NULL;
+	FeMesh*			mesh               = NULL;
+	double*                 result             = (double*) _result;
+	double*                 coord;
+	Coord                   centre;
+	Coord                   vector;
+	double                  omega;
+	double			size, r, taper;
+
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	mesh       = feVariable->feMesh;
+
+	/* Find Centre of Solid Body Rotation */
+	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreX", 0.0 );
+	centre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreY", 0.0 );
+	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreZ", 0.0 );
+	size             = Dictionary_GetDouble_WithDefault( dictionary, "RadiusCylinder", 0.0 );
+	omega            = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationOmega",   1.0 );
+
+	taper            = Dictionary_GetDouble_WithDefault( dictionary, "TaperedRadius",   0.0 );
+
+	/* Find coordinate of node */
+	coord = Mesh_GetVertex( mesh, node_lI );
+
+	/* Find vector from centre to node */
+	StGermain_VectorSubtraction( vector, coord, centre, 2 );
+
+
+        r=sqrt(vector[ I_AXIS ]*vector[ I_AXIS ]
+               +vector[ J_AXIS ]*vector[ J_AXIS ]);
+	if (r<=size)
+          *result = omega * vector[ I_AXIS ];
+	else if(r<=taper)
+          *result = omega * vector[ I_AXIS ]*(taper-r)/(taper-size);
+        else
+          *result = 0;
+}
+
+
 
 
 void StgFEM_StandardConditionFunctions_SimpleShear( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -325,6 +783,29 @@ void StgFEM_StandardConditionFunctions_SimpleShear( Node_LocalIndex node_lI, Var
 	coord = Mesh_GetVertex( mesh, node_lI );
 
 	*result = factor * (coord[ J_AXIS ] - centre);
+}
+
+void StgFEM_StandardConditionFunctions_ShearZ( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	DomainContext*	context            = (DomainContext*)_context;
+	Dictionary*             dictionary         = context->dictionary;
+	FeVariable*             feVariable         = NULL;
+	FeMesh*			mesh               = NULL;
+	double*                 result             = (double*) _result;
+	double*                 coord;
+	double                  centre;
+	double                  factor;
+	
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	mesh       = feVariable->feMesh;
+
+	/* Find Centre of Solid Body Rotation */
+	centre = Dictionary_GetDouble_WithDefault( dictionary, "ShearZCentre", 0.0 );
+	factor = Dictionary_GetDouble_WithDefault( dictionary, "ShearZFactor", 1.0 );
+
+	/* Find coordinate of node */
+	coord = Mesh_GetVertex( mesh, node_lI );
+
+	*result = factor * (coord[ K_AXIS ] - centre);
 }
 
 void StgFEM_StandardConditionFunctions_SimpleShearInverted( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
@@ -777,7 +1258,7 @@ void StgFEM_StandardConditionFunctions_AnalyticalTemperatureIC( Node_LocalIndex 
 	u0 = pow( lambda , 7.0/3.0 )/ pow(1 + lambda*lambda*lambda*lambda, 2.0/3.0) * pow(0.5*RaT/sqrt(M_PI) , 2.0/3.0);
 
 	/* Vertical velocity of the upwelling and downwellings - Modified from Van Keken to match Turcotte and Shubert */
-	v0 = u0; //lambda;
+	v0 = u0; /*lambda; */
 	
 	/* Total rate of heat flow out of the top of the cell per unit distance along the axis of the roll - Equation A3 */
 	Q = 2.0 * sqrt(M_1_PI * lambda/u0);
@@ -888,86 +1369,185 @@ void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Va
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
         double*                 coord;
-	double                  offset;
-	/* double                  value; */
+	double                  lower_offset, upper_offset;
+	double                  value, lower_value, upper_value;
 	unsigned		dim;
-	/* Bool			less; */
-	double			left;
-	double			right;
-	double			grad;
-	Bool			useGrad;
-	double			leftBegin, rightEnd;
 
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	feMesh       = feVariable->feMesh;
 	coord      = Mesh_GetVertex( feMesh, node_lI );
 
-	offset = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionOffset", 0.0  );
-	/* value = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionValue", 0.0  ); */
+	lower_offset = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionLowerOffset", 0.0 );
+	upper_offset = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionUpperOffset", lower_offset );
+	value = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionValue", 0.0 );
 	dim = Dictionary_GetUnsignedInt_WithDefault( dictionary, "StepFunctionDim", 0 );
-	/* less = Dictionary_GetBool_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionLessThan", True  ); */
-	left = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionLeftSide", 0.0  );
-	right = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionRightSide", 0.0  );
-	leftBegin = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionLeftBegin", 0.0  );
-	rightEnd = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionRightEnd", 0.0  );
-	grad = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionGradient", 0.0  );
-	useGrad = Dictionary_GetBool_WithDefault( dictionary, (Dictionary_Entry_Key)"StepFunctionUseGradient", False );
 
-	/*if( less ) {
-		if( coord[dim] < offset ) {
-			if( useGrad )
-				*result = (offset - coord[dim])*grad;
-			else
-				*result = value;
-		}
-		else
-			*result = 0;
-	}
-	else {
-		if( coord[dim] > offset ) {
-			if( useGrad )
-				*result = (coord[dim] - offset )*grad;
-			else
-				*result = value;
-		}
-		else
-			*result = 0;
-	}*/
-	/*
-	 * have changed the step function such that it takes two different input values, one for each side
-	 * of the offset - dave, 24.05.07
-	 */
-	if( coord[dim] < leftBegin || coord[dim] > rightEnd ) {
-		*result = 0.0;
-	}
-	else if( coord[dim] < offset ) {
-		if( useGrad )
-			*result = (offset - coord[dim])*grad;
-		else
-			*result = left;
-	}
-	else if( coord[dim] >= offset ) {
-		if( useGrad )
-			*result = (coord[dim] - offset)*grad;
-		else
-			*result = right;
-	}
+        lower_value = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionLowerValue", 0.0 );
+        upper_value = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionUpperValue", value );
 
-/*         if(coord[0] < 5.0) */
-/*           { */
-/*             *result=0; */
-/*           } */
-/*         else if(coord[0] < 15.0) */
-/*           { */
-/*             *result=value*((coord[0]-5.0)/10); */
-/*           } */
-/*         else */
-/*           { */
-/*             *result=value; */
-/*           } */
+        if(dim==3)
+          {
+            dim=0;
+            coord=&(context->currentTime);
+          }
+
+        if(coord[dim] < lower_offset) {
+          *result=lower_value;
+        } else if(coord[dim] < upper_offset) {
+          *result=lower_value + 
+            (upper_value-lower_value)
+            *(coord[dim] - lower_offset)/(upper_offset-lower_offset);
+        } else {
+          *result=upper_value;
+        }
 }
 
-void StgFEM_StandardConditionFunctions_MovingStepFunction( int nodeInd, int varInd, void* _ctx, void* _result ) {
+
+void StG_FEM_StandardConditionFunctions_StepFunctionProduct1( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             feVariable         = NULL;
+	FeMesh*     mesh               = NULL;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+        double*                 coord;
+	double                  start, end;
+	double                  value;
+	unsigned		dim;
+
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	mesh       = feVariable->feMesh;
+	coord      = Mesh_GetVertex( mesh, node_lI );
+
+	start = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct1Start", 0.0 );
+	end = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct1End", 0.0 );
+	value = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct1Value", 0.0 );
+	dim = Dictionary_GetUnsignedInt_WithDefault( dictionary, "StepFunctionProduct1Dim", 0 );
+
+        if( coord[dim] > start && coord[dim] < end ) {
+          *result = value;
+        }
+        else {
+          *result = 0;
+        }
+}
+
+void StG_FEM_StandardConditionFunctions_StepFunctionProduct2( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             feVariable         = NULL;
+	FeMesh*     mesh               = NULL;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+        double*                 coord;
+	double                  start, end;
+	double                  value;
+	unsigned		dim;
+
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	mesh       = feVariable->feMesh;
+	coord      = Mesh_GetVertex( mesh, node_lI );
+
+	start = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct2Start", 0.0 );
+	end = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct2End", 0.0 );
+	value = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct2Value", 0.0 );
+	dim = Dictionary_GetUnsignedInt_WithDefault( dictionary, "StepFunctionProduct2Dim", 0 );
+
+        if( coord[dim] > start && coord[dim] < end ) {
+          *result = value;
+        }
+        else {
+          *result = 0;
+        }
+}
+
+
+void StG_FEM_StandardConditionFunctions_StepFunctionProduct3( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             feVariable         = NULL;
+	FeMesh*     mesh               = NULL;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+        double*                 coord;
+	double                  start, end;
+	double                  value;
+	unsigned		dim;
+
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	mesh       = feVariable->feMesh;
+	coord      = Mesh_GetVertex( mesh, node_lI );
+
+	start = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct3Start", 0.0 );
+	end = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct3End", 0.0 );
+	value = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct3Value", 0.0 );
+	dim = Dictionary_GetUnsignedInt_WithDefault( dictionary, "StepFunctionProduct3Dim", 1 );
+
+        if( coord[dim] > start && coord[dim] < end ) {
+          *result = value;
+        }
+        else {
+          *result = 0;
+        }
+}
+
+void StG_FEM_StandardConditionFunctions_StepFunctionProduct4( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             feVariable         = NULL;
+	FeMesh*     mesh               = NULL;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+        double*                 coord;
+	double                  start, end;
+	double                  value;
+	unsigned		dim;
+
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	mesh       = feVariable->feMesh;
+	coord      = Mesh_GetVertex( mesh, node_lI );
+
+	start = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct4Start", 0.0 );
+	end = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct4End", 0.0 );
+	value = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct4Value", 0.0 );
+	dim = Dictionary_GetUnsignedInt_WithDefault( dictionary, "StepFunctionProduct4Dim", 1 );
+
+        if( coord[dim] > start && coord[dim] < end ) {
+          *result = value;
+        }
+        else {
+          *result = 0;
+        }
+}
+
+/* A Gaussian GaussianHeight*exp(-((GaussianCenter-x)/GaussianWidth)^2) */
+
+void StG_FEM_StandardConditionFunctions_Gaussian
+( Node_LocalIndex node_lI, Variable_Index var_I, void* _context,
+  void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             feVariable         = NULL;
+	FeMesh*     mesh               = NULL;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+        double*                 coord;
+	double                  center, width, height;
+	unsigned		dim;
+
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	mesh       = feVariable->feMesh;
+	coord      = Mesh_GetVertex( mesh, node_lI );
+
+        center = Dictionary_GetDouble_WithDefault( dictionary,
+                                                   "GaussianCenter", 0.0 );
+	width = Dictionary_GetDouble_WithDefault( dictionary,
+                                                  "GaussianWidth", 1.0 );
+	height = Dictionary_GetDouble_WithDefault( dictionary,
+                                                   "GaussianHeight", 1.0 );
+	dim = Dictionary_GetUnsignedInt_WithDefault( dictionary,
+                                                     "GaussianDim", 0 );
+
+        *result=height*exp(-(center-coord[dim])*(center-coord[dim])
+                           /(width*width));
+}
+
+void StgFEM_StandardConditionFunctions_MovingStepFunction( Node_LocalIndex nodeInd, Variable_Index varInd, void* _ctx, void* _result ) {
    FiniteElementContext* ctx = (FiniteElementContext*)_ctx;
    FeVariable* velField;
    FeMesh* mesh;
@@ -1117,6 +1697,193 @@ void StgFEM_StandardConditionFunctions_SpecRidge3D( Node_LocalIndex node_lI, Var
 		*result = leftVal;
 	else
 		*result = rightVal;
+}
+
+void StgFEM_StandardConditionFunctions_TemperatureProfile( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+  FiniteElementContext *	context            = (FiniteElementContext*)_context;
+  FeVariable*             feVariable         = NULL;
+  FeMesh*     mesh               = NULL;
+  Dictionary*             dictionary         = context->dictionary;
+  double*                 result             = (double*) _result;
+  double*                 coord;
+  double                  T_0, H_0, dH, H, H_m, A, B, C, x_min, x_max, y_max, T_m, xc, dum;
+  /* G.Ito 10/08 added variables x_min, x_max, T_m, Xc, to do variation in x
+     and limit maximum T */
+  
+  feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+  mesh       = feVariable->feMesh;
+  coord      = Mesh_GetVertex( mesh, node_lI );
+  
+  T_0 = Dictionary_GetDouble_WithDefault( dictionary, "TemperatureProfileTop", 0.0 );
+  T_m = Dictionary_GetDouble_WithDefault( dictionary, "TemperatureProfileMax", 10000.0 );
+  H_0 = Dictionary_GetDouble_WithDefault( dictionary, "TemperatureProfileH0", -1.0 );
+  H_m = Dictionary_GetDouble_WithDefault( dictionary, "TemperatureProfileHm", 1.0e+8 );
+  dH = Dictionary_GetDouble_WithDefault( dictionary, "TemperatureProfiledH", 0.0 );     
+  A = Dictionary_GetDouble_WithDefault( dictionary, "TemperatureProfileLinearCoefficient", 0.0 );
+  B = Dictionary_GetDouble_WithDefault( dictionary, "TemperatureProfileExponentialCoefficient1", 0.0 );
+  C = Dictionary_GetDouble_WithDefault( dictionary, "TemperatureProfileExponentialCoefficient2", 0.0 );
+  y_max = Dictionary_GetDouble_WithDefault( dictionary, "maxY", 0.0 );
+  x_max = Dictionary_GetDouble_WithDefault( dictionary, "maxX", 0.0 );
+  x_min = Dictionary_GetDouble_WithDefault( dictionary, "minX", 0.0 );
+  xc = Dictionary_GetDouble_WithDefault( dictionary, "ExtensionCentreX", 0.0 );
+  
+  if (H_0<0.0)
+    {
+      if(coord[1]>y_max)
+        {
+          *result=T_0;
+        }
+      else
+        {
+          *result=T_0 + A*(y_max-coord[1]) + B*(1-exp(-C*(y_max-coord[1])));
+        }
+    }
+  else
+    {
+      if(coord[1]>=y_max)
+        {
+          *result=T_0;
+        }
+      else
+        {
+          H=H_0 + 2*fabs(coord[0]-xc)/(x_max-x_min)*dH;
+          if (H>H_m) H=H_m;
+          
+          dum=T_0 + ((T_m-T_0)/H)*(y_max-coord[1])
+            + B*(1-exp(-C*(y_max-coord[1])));
+          if (dum>T_m) dum=T_m;
+          *result=dum;
+        }
+    }
+
+}
+
+void StgFEM_StandardConditionFunctions_ERF( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             feVariable         = NULL;
+	FeMesh*			feMesh               = NULL;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+        double*                 coord;
+	double                  width, scale, dilate, offset, constant;
+	unsigned		dim;
+
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+	feMesh       = feVariable->feMesh;
+	coord      = Mesh_GetVertex( feMesh, node_lI );
+
+	width = Dictionary_GetDouble_WithDefault( dictionary, "ERFWidth", 0.0 );
+	offset= Dictionary_GetDouble_WithDefault(dictionary, "ERFOffset",0.0 );
+	constant=Dictionary_GetDouble_WithDefault(dictionary,"ERFConstant",0.0);
+        scale = Dictionary_GetDouble_WithDefault( dictionary, "ERFScale", 1.0 );
+	dilate = Dictionary_GetDouble_WithDefault( dictionary,"ERFDilate",1.0 );
+	dim = Dictionary_GetUnsignedInt_WithDefault( dictionary, "ERFDim", 0 );
+
+        if(dim==3)
+          {
+            dim=0;
+            coord=&(context->currentTime);
+          }
+
+        if(coord[dim]+offset < -width && width!=0)
+          *result=constant-scale;
+        else if(coord[dim]+offset > width && width!=0)
+          *result=constant+scale;
+        else
+          *result=constant+scale*erf((coord[dim]+offset)/dilate);
+}
+
+void StgFEM_StandardConditionFunctions_ERFC(Node_LocalIndex node_lI,
+                                            Variable_Index var_I,
+                                            void* _context, void* _result ) {
+	FiniteElementContext *	context            = (FiniteElementContext*)_context;
+	FeVariable*             feVariable         = NULL;
+	FeMesh*			feMesh               = NULL;
+	Dictionary*             dictionary         = context->dictionary;
+	double*                 result             = (double*) _result;
+        double*                 coord;
+	double                  width, scale, dilate, offset, constant;
+	unsigned		dim;
+
+	feVariable = (FeVariable*)FieldVariable_Register_GetByName
+          ( context->fieldVariable_Register, "VelocityField" );
+	feMesh       = feVariable->feMesh;
+	coord      = Mesh_GetVertex( feMesh, node_lI );
+
+	width = Dictionary_GetDouble_WithDefault(dictionary, "ERFCWidth", 0.0 );
+	offset= Dictionary_GetDouble_WithDefault(dictionary, "ERFCOffset",0.0 );
+	constant=Dictionary_GetDouble_WithDefault(dictionary,"ERFCConstant",0.0);
+        scale = Dictionary_GetDouble_WithDefault(dictionary, "ERFCScale", 1.0 );
+	dilate = Dictionary_GetDouble_WithDefault(dictionary,"ERFCDilate",1.0 );
+	dim = Dictionary_GetUnsignedInt_WithDefault(dictionary, "ERFCDim", 0 );
+
+        if(dim==3)
+          {
+            dim=0;
+            coord=&(context->currentTime);
+          }
+
+        if(coord[dim]+offset < -width && width!=0)
+          *result=constant-scale;
+        else if(coord[dim]+offset > width && width!=0)
+          *result=constant+scale;
+        else
+          *result=constant+scale*erfc((coord[dim]+offset)/dilate);
+}
+
+void StgFEM_StandardConditionFunctions_RubberSheet( Node_LocalIndex node_lI,
+                                                    Variable_Index var_I,
+                                                    void* _context,
+                                                    void* _result )
+{
+  FiniteElementContext *	context            = (FiniteElementContext*)_context;
+  FeVariable*             feVariable         = NULL;
+  FeMesh*			feMesh               = NULL;
+  Dictionary*             dictionary         = context->dictionary;
+  double*                 result             = (double*) _result;
+  double*                 coord;
+  double                  lower_offset, upper_offset;
+  double                  lower_value, upper_value, time;
+  unsigned		dim;
+
+  feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+  feMesh       = feVariable->feMesh;
+  coord      = Mesh_GetVertex( feMesh, node_lI );
+
+  lower_offset = Dictionary_GetDouble_WithDefault( dictionary,
+                                                   "RubberSheetLowerOffset",
+                                                   0.0 );
+  upper_offset = Dictionary_GetDouble_WithDefault( dictionary,
+                                                   "RubberSheetUpperOffset",
+                                                   lower_offset );
+  dim = Dictionary_GetUnsignedInt_WithDefault( dictionary,
+                                               "RubberSheetDim", 0 );
+
+  lower_value = Dictionary_GetDouble_WithDefault( dictionary,
+                                                  "RubberSheetLowerValue",
+                                                  0.0 );
+  upper_value = Dictionary_GetDouble_WithDefault( dictionary,
+                                                  "RubberSheetUpperValue",
+                                                  0.0 );
+
+  time=context->currentTime;
+
+  if(coord[dim] < lower_offset + lower_value*time)
+    {
+      *result=lower_value;
+    }
+  else if(coord[dim] < upper_offset + upper_value*time)
+    {
+      double min[3], max[3];
+      Mesh_GetGlobalCoordRange( feMesh, min, max );
+      *result=lower_value + 
+        (upper_value-lower_value)
+        *(coord[dim] - min[dim])/(max[dim]-min[dim]);
+    }
+  else
+    {
+      *result=upper_value;
+    }
 }
 
 /* get the BC's from the analytic solution as stored on the relevant FeVariable */
