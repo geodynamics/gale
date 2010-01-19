@@ -70,6 +70,8 @@ ParticleFeVariable* _ParticleFeVariable_New(  PARTICLEFEVARIABLE_DEFARGS  ) {
 	   and so should be set to ZERO in any children of this class. */
 	nameAllocationType = NON_GLOBAL;
 	_syncShadowValues  = _FeVariable_SyncShadowValues;
+	_getMinGlobalFieldMagnitude = _FeVariable_GetMinGlobalFieldMagnitude;
+	_getMaxGlobalFieldMagnitude = _FeVariable_GetMaxGlobalFieldMagnitude;
 
 	self = (ParticleFeVariable*) _FeVariable_New(  FEVARIABLE_PASSARGS  );
 

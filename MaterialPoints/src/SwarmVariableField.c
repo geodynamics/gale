@@ -135,9 +135,9 @@ void _SwarmVariableField_AssignFromXML( void* swarmVariableField, Stg_ComponentF
 	variable_Register = self->context->variable_Register; 
 
 	// TODO: just get the textual name here - see gLucifer's SwarmPlotter DrawignObject 
-	swarmVarName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"swarmVariable", ""  );
+	swarmVarName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"swarmVariable", "" );
 
-	materialSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialSwarm", MaterialPointsSwarm, True, data  );
+	materialSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialSwarm", MaterialPointsSwarm, True, data );
 	integrationSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", IntegrationPointsSwarm, True, NULL );
 	assert( integrationSwarm  );
 
@@ -157,7 +157,7 @@ void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	tmpName = Stg_Object_AppendSuffix( self, (Name)"DataVariable"  );
 	self->dataVariable = Variable_NewScalar( tmpName, (AbstractContext*)self->context, Variable_DataType_Double, (Index*)&nDomainVerts, NULL, (void**)&self->data, self->variable_Register );
-	Memory_Free( tmpName  );
+	Memory_Free( tmpName );
 	self->fieldComponentCount = 1;
 
 	tmpName = Stg_Object_AppendSuffix( self, (Name)"DofLayout"  );
