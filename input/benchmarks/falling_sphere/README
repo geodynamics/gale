@@ -1,0 +1,7 @@
+To run the three testcases
+
+  Gale sphere_in_cylinder.xml --elementResI=16 --elementResJ=32 --elementResK=16 --outputPath="./sphere_cylinder_32_4_8"
+
+  Gale sphere_in_cylinder.xml --elementResI=32 --elementResJ=64 --elementResK=32 --outputPath="./sphere_cylinder_64_4_8"
+
+  Gale sphere_in_cylinder.xml --elementResI=32 --elementResJ=128 --elementResK=64 --outputPath="./sphere_cylinder_128_4_8"
