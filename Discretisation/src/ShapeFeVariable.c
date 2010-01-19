@@ -67,6 +67,8 @@ void* ShapeFeVariable_DefaultNew( Name name ) {
 	Stg_Component_ExecuteFunction*                                 _execute = _ShapeFeVariable_Execute;
 	Stg_Component_DestroyFunction*                                 _destroy = _ShapeFeVariable_Destroy;
 	FieldVariable_InterpolateValueAtFunction*           _interpolateValueAt = _FeVariable_InterpolateValueAt;
+	FieldVariable_GetValueFunction*             _getMinGlobalFieldMagnitude = _FeVariable_GetMinGlobalFieldMagnitude;
+	FieldVariable_GetValueFunction*             _getMaxGlobalFieldMagnitude = _FeVariable_GetMaxGlobalFieldMagnitude;
 	FieldVariable_GetCoordFunction*                _getMinAndMaxLocalCoords = _FeVariable_GetMinAndMaxLocalCoords;
 	FieldVariable_GetCoordFunction*               _getMinAndMaxGlobalCoords = _FeVariable_GetMinAndMaxGlobalCoords;
 	FeVariable_InterpolateWithinElementFunction*  _interpolateWithinElement = _FeVariable_InterpolateNodeValuesToElLocalCoord;
@@ -74,8 +76,6 @@ void* ShapeFeVariable_DefaultNew( Name name ) {
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType                             nameAllocationType = ZERO;
-	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = ZERO;
-	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
 	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
 
 	return (ShapeFeVariable*) _ShapeFeVariable_New(  SHAPEFEVARIABLE_PASSARGS  );
