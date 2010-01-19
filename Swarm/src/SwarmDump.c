@@ -320,8 +320,8 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
       group_id  = H5Gopen(file, "/");
       attrib_id = H5Acreate(group_id, "Swarm Particle Count", H5T_STD_I32BE, attribData_id, H5P_DEFAULT);
    #else
-      group_id  = H5Gopen(file, "/", H5P_DEFAULT);
-      attrib_id = H5Acreate(group_id, "Swarm Particle Count", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
+      group_id  = H5Gopen2(file, "/", H5P_DEFAULT);
+      attrib_id = H5Acreate2(group_id, "Swarm Particle Count", H5T_STD_I32BE, attribData_id, H5P_DEFAULT, H5P_DEFAULT);
    #endif
    H5Awrite(attrib_id, H5T_NATIVE_INT, &attribData);
    H5Aclose(attrib_id);
@@ -370,7 +370,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
                #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
                fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_INT, fileSpace, props );
                #else
-               fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_INT, fileSpace,
+               fileData = H5Dcreate2( file, dataSpaceName, H5T_NATIVE_INT, fileSpace,
                                       H5P_DEFAULT, props, H5P_DEFAULT );
                #endif
                
@@ -391,7 +391,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
                #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
                fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_CHAR, fileSpace, props );
                #else
-               fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_CHAR, fileSpace,
+               fileData = H5Dcreate2( file, dataSpaceName, H5T_NATIVE_CHAR, fileSpace,
                                       H5P_DEFAULT, props, H5P_DEFAULT );
                #endif
                
@@ -412,7 +412,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
                #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
                fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_FLOAT, fileSpace, props );
                #else
-               fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_FLOAT, fileSpace,
+               fileData = H5Dcreate2( file, dataSpaceName, H5T_NATIVE_FLOAT, fileSpace,
                                       H5P_DEFAULT, props, H5P_DEFAULT );
                #endif
                
@@ -433,7 +433,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename )
                #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
                fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_DOUBLE, fileSpace, props );
                #else
-               fileData = H5Dcreate( file, dataSpaceName, H5T_NATIVE_DOUBLE, fileSpace,
+               fileData = H5Dcreate2( file, dataSpaceName, H5T_NATIVE_DOUBLE, fileSpace,
                                       H5P_DEFAULT, props, H5P_DEFAULT );
                #endif          
                

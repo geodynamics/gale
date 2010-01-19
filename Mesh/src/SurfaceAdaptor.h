@@ -49,6 +49,8 @@
 	/** SurfaceAdaptor class contents */
 	typedef enum {
 		SurfaceAdaptor_SurfaceType_Wedge, 
+		SurfaceAdaptor_SurfaceType_Plateau, 
+		SurfaceAdaptor_SurfaceType_Topo_Data, 
 		SurfaceAdaptor_SurfaceType_Sine, 
 		SurfaceAdaptor_SurfaceType_Cosine, 
 		SurfaceAdaptor_SurfaceType_Invalid
@@ -62,6 +64,16 @@
 	} SurfaceAdaptor_WedgeInfo;
 
 	typedef struct {
+          double	x1, x2, x3, x4, z1, z2, z3, z4, height;
+	} SurfaceAdaptor_PlateauInfo;
+
+	typedef struct {
+          int nx,nz;
+          double minX, maxX, minZ, maxZ, dx, dz;
+          double *heights;
+	} SurfaceAdaptor_Topo_DataInfo;
+
+	typedef struct {
 		double	origin[2];
 		double	amp;
 		double	freq;
@@ -69,6 +81,8 @@
 
 	typedef union {
 		SurfaceAdaptor_WedgeInfo	wedge;
+		SurfaceAdaptor_PlateauInfo	plateau;
+                SurfaceAdaptor_Topo_DataInfo    topo_data;
 		SurfaceAdaptor_TrigInfo		trig;
 	} SurfaceAdaptor_SurfaceInfo;
 
@@ -132,6 +146,10 @@
 	double SurfaceAdaptor_Wedge2D( SurfaceAdaptor* self, Mesh* mesh, 
 				     unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
 	double SurfaceAdaptor_Wedge3D( SurfaceAdaptor* self, Mesh* mesh, 
+				     unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
+	double SurfaceAdaptor_Plateau( SurfaceAdaptor* self, Mesh* mesh, 
+				     unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
+	double SurfaceAdaptor_Topo_Data( SurfaceAdaptor* self, Mesh* mesh, 
 				     unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
 	double SurfaceAdaptor_Sine( SurfaceAdaptor* self, Mesh* mesh, 
 				    unsigned* globalSize, unsigned vertex, unsigned* vertexInds );

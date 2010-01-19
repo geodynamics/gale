@@ -258,7 +258,7 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
          group_id  = H5Gopen(file, "/");
          attrib_id = H5Aopen_name(group_id, "Swarm Particle Count");
       #else
-         group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+         group_id  = H5Gopen2(file, "/", H5P_DEFAULT);
          attrib_id = H5Aopen(group_id, "Swarm Particle Count", H5P_DEFAULT);
       #endif
        Journal_Firewall( attrib_id > 0,
@@ -350,9 +350,9 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
    self->fileSpace = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, self->checkpointfiles, (Name)"fileSpace" );
    /* set these spaces to null initially */
    for( jj = 0 ; jj < swarm->swarmVariable_Register->objects->count ; jj++)
-      for( kk = 0 ; kk < self->checkpointfiles ; kk++){
-         self->fileData [jj][kk] = NULL;
-         self->fileSpace[jj][kk] = NULL;
+      for( kk = 0 ; kk < swarm->checkpointfiles ; kk++){
+         self->fileData [jj][kk] = 0;
+         self->fileSpace[jj][kk] = 0;
       }
       
    /* Open the files */
@@ -379,7 +379,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
          group_id  = H5Gopen(file[ii-1], "/");
          attrib_id = H5Aopen_name(group_id, "Swarm Particle Count");
       #else
-         group_id  = H5Gopen(file[ii-1], "/", H5P_DEFAULT);
+         group_id  = H5Gopen2(file[ii-1], "/", H5P_DEFAULT);
          attrib_id = H5Aopen(group_id, "Swarm Particle Count", H5P_DEFAULT);
       #endif
       status = H5Aread(attrib_id, H5T_NATIVE_INT, &nParticles);
@@ -398,7 +398,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
                #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
                   self->fileData[swarmVar_I][ii-1]  = H5Dopen( file[ii-1], dataSpaceName );
                #else
-                  self->fileData[swarmVar_I][ii-1]  = H5Dopen( file[ii-1], dataSpaceName, H5P_DEFAULT );
+                  self->fileData[swarmVar_I][ii-1]  = H5Dopen2( file[ii-1], dataSpaceName, H5P_DEFAULT );
                #endif
                   self->fileSpace[swarmVar_I][ii-1] = H5Dget_space( self->fileData[swarmVar_I][ii-1] );
                

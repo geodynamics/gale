@@ -145,7 +145,8 @@ void _MeshGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactory* cf
 	}
 
 	/* Read dimensions and state. */
-	nDims = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"dims", 2  );
+	nDims = Stg_ComponentFactory_GetUnsignedInt( cf, self->name,  (Dictionary_Entry_Key)"dim", 2 );
+	nDims = Stg_ComponentFactory_GetUnsignedInt( cf, self->name,  (Dictionary_Entry_Key)"dims", nDims );
 	MeshGenerator_SetDimSize( self, nDims );
 	enabledDimsList = Dictionary_Get( dict, (Dictionary_Entry_Key)"enabledDims"  );
 	enabledIncList = Dictionary_Get( dict, (Dictionary_Entry_Key)"enabledIncidence"  );

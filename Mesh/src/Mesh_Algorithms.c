@@ -693,10 +693,11 @@ Bool Mesh_Algorithms_SearchGeneral( void* algorithms, double* point,
 Bool Mesh_Algorithms_SearchWithTree( void* _self, double* pnt, unsigned* dim, unsigned* el ) {
    Mesh_Algorithms* self = (Mesh_Algorithms*)_self;
    int nEls, *els;
-   unsigned curDim, curEl;
+   unsigned curEl;
 	int curRank;
    int nLocals, owner;
    int ii;
+   MeshTopology_Dim curDim;
 
    *dim = Mesh_GetDimSize( self->mesh );
    MPI_Comm_size( MPI_COMM_WORLD, &curRank );

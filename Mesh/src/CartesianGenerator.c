@@ -341,7 +341,7 @@ void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactor
          #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	         fileData = H5Dopen( file, "/min" );
          #else
-	         fileData = H5Dopen( file, "/min", H5P_DEFAULT );
+	         fileData = H5Dopen2( file, "/min", H5P_DEFAULT );
          #endif
 	         H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, crdMin );
 	         H5Dclose( fileData );
@@ -350,7 +350,7 @@ void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactor
          #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	         fileData = H5Dopen( file, "/max" );
          #else
-	         fileData = H5Dopen( file, "/max", H5P_DEFAULT );
+	         fileData = H5Dopen2( file, "/max", H5P_DEFAULT );
          #endif
 	         H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, crdMax );
 	         H5Dclose( fileData );
@@ -360,7 +360,7 @@ void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactor
             group_id  = H5Gopen(file, "/");
             attrib_id = H5Aopen_name(group_id, "checkpoint file version");
          #else
-            group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+            group_id  = H5Gopen2(file, "/", H5P_DEFAULT);
             attrib_id = H5Aopen(group_id, "checkpoint file version", H5P_DEFAULT);
          #endif
 
@@ -380,7 +380,7 @@ void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactor
                   self->readFromFile = False;
                else
                   Journal_Firewall( 
-                     NULL, 
+                     0, 
                      errorStream,
                      "\n\nError in %s for %s '%s'\n"
                      "Size of mesh (%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u,%u).\n\n"
@@ -397,7 +397,7 @@ void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactor
                   self->readFromFile = False;
                else
                   Journal_Firewall( 
-                     NULL, 
+                     0, 
                      errorStream,
                      "\n\nError in %s for %s '%s'\n"
                      "Size of mesh (%u,%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u,%u,%u).\n\n"
@@ -2091,7 +2091,8 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGra
 	Stream_UnIndent( stream );
 }
 
-void CartesianGenerator_MapToDomain( CartesianGenerator* self, Sync* sync, 
+void CartesianGenerator_MapToDomain( CartesianGenerator* self,
+                                     const Sync* sync, 
 				     unsigned nIncEls, unsigned* incEls )
 {
 	unsigned	inc_i;
@@ -2265,7 +2266,7 @@ void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, con
       group_id  = H5Gopen(file, "/");
       attrib_id = H5Aopen_name(group_id, "checkpoint file version");
    #else
-      group_id  = H5Gopen(file, "/", H5P_DEFAULT);
+      group_id  = H5Gopen2(file, "/", H5P_DEFAULT);
       attrib_id = H5Aopen(group_id, "checkpoint file version", H5P_DEFAULT);
    #endif
    /** if this attribute does not exist (attrib_id < 0) then we assume MeshCHECKPOINT_V1 and continue without checking attributes */
@@ -2358,7 +2359,7 @@ void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, con
    #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
    fileData = H5Dopen( file, verticeName );
    #else
-   fileData = H5Dopen( file, verticeName, H5P_DEFAULT );
+   fileData = H5Dopen2( file, verticeName, H5P_DEFAULT );
    #endif
    fileSpace = H5Dget_space( fileData );
    Memory_Free( verticeName );

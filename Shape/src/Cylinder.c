@@ -166,8 +166,9 @@ void _Cylinder_AssignFromXML( void* cylinder, Stg_ComponentFactory* cf, void* da
 	end[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"endY", BIG  );
 	end[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"endZ", BIG  );
 
-	perpendicularAxisName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"alongAxis", "x" );
-	switch ( perpendicularAxisName[0]  ) {
+	perpendicularAxisName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"perpendicularAxis", "x" );
+	perpendicularAxisName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"alongAxis", perpendicularAxisName );
+	switch ( perpendicularAxisName[0] ) {
 		case 'x': case 'X': case 'i': case 'I': case '0':
 			alongAxis = I_AXIS; break;
 		case 'y': case 'Y': case 'j': case 'J': case '1':

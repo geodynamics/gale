@@ -522,7 +522,7 @@ double* Mesh_GetVertex( void* mesh, unsigned domain ) {
 	return self->verts[domain];
 }
 
-Bool Mesh_HasExtension( void* mesh, const char* name ) {
+Bool Mesh_HasExtension( void* mesh, const Name name ) {
 	Mesh* self = (Mesh*)mesh;
 
 	assert( self );
@@ -530,7 +530,7 @@ Bool Mesh_HasExtension( void* mesh, const char* name ) {
 	return (ExtensionManager_GetHandle( self->info, (Name)name ) != -1 ) ?  True : False;
 }
 
-void* _Mesh_GetExtension( void* mesh, const char* name ) {
+void* _Mesh_GetExtension( void* mesh, const Name name ) {
 	Mesh* self = (Mesh*)mesh;
 
 	assert( self );

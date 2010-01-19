@@ -86,6 +86,9 @@ void AllNodesVCSuite_Setup( AllNodesVCSuiteData* data ) {
 void AllNodesVCSuite_Teardown( AllNodesVCSuiteData* data ) {
 }
 
+/* Prototype because I can not find the prototype in any headers. */
+Mesh* buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg );
+
 void AllNodesVCSuite_TestAllNodesVC( AllNodesVCSuiteData* data ) {
 	unsigned								nDomains;
 	unsigned								nDims = 3;

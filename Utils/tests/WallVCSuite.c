@@ -88,6 +88,8 @@ void WallVCSuite_Setup( WallVCSuiteData* data ) {
 
 void WallVCSuite_Teardown( WallVCSuiteData* data ) {
 }
+/* Prototype because I can not find the prototype in any headers. */
+Mesh* buildMesh( unsigned nDims, unsigned* size, double* minCrds, double* maxCrds, ExtensionManager_Register* emReg );
 
 void WallVCSuite_TestWallVC( WallVCSuiteData* data ) {
 	unsigned								nDomains;
