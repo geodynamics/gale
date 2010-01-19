@@ -447,9 +447,9 @@ void lucMeshViewer_RenderLocal( void* drawingObject ) {
 
 	/* Pick the correct dimension. */
 	if( Mesh_GetDimSize( mesh ) == 3 )
-		vertexFunc = glVertex3dv;
+          vertexFunc =(vertexFuncType*) glVertex3dv;
 	else
-		vertexFunc = glVertex2dv;
+          vertexFunc = (vertexFuncType*) glVertex2dv;
 
 
 	/* Set color. */

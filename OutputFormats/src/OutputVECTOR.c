@@ -214,7 +214,7 @@ void _lucOutputVECTOR_Output( void* outputFormat, lucWindow* window, AbstractCon
 	/* return to glRenderMode(GL_RENDER), and complete writing output file */
 	state = gl2psEndPage();
 	if(state == 5)
-		Journal_Printf( Journal_MyStream( Error_Type, self ), "\nError. Insufficient GL feedback buffer size. \ 
+		Journal_Printf( Journal_MyStream( Error_Type, self ), "\nError. Insufficient GL feedback buffer size. \
 								       \nConsider increasing the OutputVECTOR buffersize. \
 								      \nVector image will not be created correctly.\n\n" );
 
