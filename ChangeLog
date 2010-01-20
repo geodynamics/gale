@@ -1,7 +1,7 @@
 ChangeLog for Underworld-1.4
 
 * New configuration step in installation process, './configure.py -h' for help.
-* Changes to the XML user interface, see manual for details.
+* Changes to the XML user interface, see the file XMLChanges_1.4 for details.
 * Multigrid solver is now available. 
 * Superconvergent Patch Recovery (SPR) Method is now available.
 * Significant checkpointing improvements, hdf5 format is now the standard format, see manual for details.

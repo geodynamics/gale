@@ -64,6 +64,8 @@ To run tests:
 * The test, PCDVCSuite, fails under optimised mode on 32-bit machines.
 * Significant warnings are produced in compile.... don't be alarmed, we are working on them.
 
+Please see XMLChanges_1.4, for details of important input file change for this release
+
 ========================
   CONTACT INFORMATION
 ========================
