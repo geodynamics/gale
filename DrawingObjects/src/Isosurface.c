@@ -963,16 +963,16 @@ void lucIsosurface_DrawWalls( lucIsosurface* self, Vertex ***array ) {
 	int nz = self->resolution[ K_AXIS ];
 	int i, j, k;
 	Vertex ** points;
-	Vertex * midVerticies;
+	Vertex * midVertices;
 	char order;
 
 	/* Allocate Memory */
 	points = Memory_Alloc_Array( Vertex* , 8, "array for marching squares");
-	midVerticies = Memory_Alloc_Array( Vertex , 4, "array for marching squares");
-	points[LEFT] = &midVerticies[0];
-	points[RIGHT] = &midVerticies[1];
-	points[TOP] = &midVerticies[2];
-	points[BOTTOM] = &midVerticies[3];
+	midVertices = Memory_Alloc_Array( Vertex , 4, "array for marching squares");
+	points[LEFT] = &midVertices[0];
+	points[RIGHT] = &midVertices[1];
+	points[TOP] = &midVertices[2];
+	points[BOTTOM] = &midVertices[3];
 	
 	for ( i = 0 ; i < nx - 1 ; i++ ) {
 		for ( j = 0 ; j < ny - 1 ; j++ ) {
@@ -1015,7 +1015,7 @@ void lucIsosurface_DrawWalls( lucIsosurface* self, Vertex ***array ) {
 		}
 	}
 	Memory_Free( points );
-	Memory_Free( midVerticies );
+	Memory_Free( midVertices );
 }
 
 void lucIsosurface_SetupPointsX( Vertex** points, Vertex*** array, Index i, Index j, Index k ){
