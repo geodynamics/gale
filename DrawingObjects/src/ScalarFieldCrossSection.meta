@@ -23,7 +23,7 @@
 		<param name="Name">resolution</param>
 		<param name="Type">UnsignedInt</param>
 		<param name="Default">128</param>
-		<param name="Description">The default value for the resolutionX, resolutionY and resolutionZ. If these values aren't set the sampling grid will be uniform with this number of verticies in each direction.</param>
+		<param name="Description">The default value for the resolutionX, resolutionY and resolutionZ. If these values aren't set the sampling grid will be uniform with this number of vertices in each direction.</param>
 	</struct>
 	<struct>
 		<param name="Name">resolutionX</param>

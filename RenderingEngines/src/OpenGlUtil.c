@@ -681,7 +681,7 @@ void luc_DrawVector( Dimension_Index dim , double* pos, double* vector, double s
 		i.e. head size of 1.0, means that B -> A, 
 		     head size of 0.0, means that B ->C */
 
-	/* ASCII art describing verticies for arrow 
+	/* ASCII art describing vertices for arrow 
 	                                D
 	                                |\
 	                                | \

@@ -21,7 +21,7 @@
 		<param name="Name">resolution</param>
 		<param name="Type">UnsignedInt</param>
 		<param name="Default">64</param>
-		<param name="Description">The default value for the resolutionX, resolutionY and resolutionZ. If these values aren't set the sampling grid will be uniform with this number of verticies in each direction.</param>
+		<param name="Description">The default value for the resolutionX, resolutionY and resolutionZ. If these values aren't set the sampling grid will be uniform with this number of vertices in each direction.</param>
 	</struct>
 	<struct>
 		<param name="Name">resolutionX</param>
@@ -81,7 +81,7 @@
 		<param name="Name">maskType</param>
 		<param name="Type">String</param>
 		<param name="Default">GreaterThan</param>
-		<param name="Description">When testing whether to draw a triangle in the surface - this mask compares the value of a field at the verticies of the triangle and compares it to a value. This is the nature of the comparison. It can be "GreaterThan", "LessThan" or "EqualTo".</param>
+		<param name="Description">When testing whether to draw a triangle in the surface - this mask compares the value of a field at the vertices of the triangle and compares it to a value. This is the nature of the comparison. It can be "GreaterThan", "LessThan" or "EqualTo".</param>
 	</struct>
 	<struct>
 		<param name="Name">maskValue</param>
@@ -108,7 +108,7 @@
 		<param name="Essential">No</param>
 		<param name="Name">ColourMap</param>
 		<param name="Type">lucColourMap</param>
-		<param name="Description">You may colour each of the verticies of the isosurface with a colour map if you specify it here. This will override the 'colour' given as a parameter.</param>
+		<param name="Description">You may colour each of the vertices of the isosurface with a colour map if you specify it here. This will override the 'colour' given as a parameter.</param>
 	</struct>
 
 	<struct>
