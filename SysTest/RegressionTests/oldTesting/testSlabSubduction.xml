@@ -32,7 +32,7 @@
 		<struct name="slabPerturbation">
 			<param name="Type">PolygonShape</param>
 			<param name="startZ"> 1.25 </param>  <param name="endZ"> 2.75  </param>
-			<list name="verticies">
+			<list name="vertices">
 				<asciidata>
 					<columnDefinition name = "x" type="double"/>
 					<columnDefinition name = "y" type="double"/>

@@ -81,7 +81,7 @@ appropriate parameters and their values if you use this xml from production runs
 		</struct> 
 		<struct name="shapeA">
 			<param name="Type">PolygonShape</param>
-			<list name="verticies">
+			<list name="vertices">
 				<asciidata>
 					<columnDefinition name = "x" type="double"/>
 					<columnDefinition name = "y" type="double"/>
@@ -104,7 +104,7 @@ appropriate parameters and their values if you use this xml from production runs
 		<struct name="shapeB">
 			<param name="Type">PolygonShape</param>
 
-			<list name="verticies">
+			<list name="vertices">
 				<asciidata>
 					<columnDefinition name = "x" type="double"/>
 					<columnDefinition name = "y" type="double"/>
@@ -127,7 +127,7 @@ appropriate parameters and their values if you use this xml from production runs
 		<struct name="shapeC">
 			<param name="Type">PolygonShape</param>
 
-			<list name="verticies">
+			<list name="vertices">
 				<asciidata>
 					<columnDefinition name = "x" type="double"/>
 					<columnDefinition name = "y" type="double"/>
@@ -150,7 +150,7 @@ appropriate parameters and their values if you use this xml from production runs
 
 		<struct name="HeatShape">
 			<param name="Type">PolygonShape</param>
-			<list name="verticies">
+			<list name="vertices">
 				<asciidata>
 					<columnDefinition name = "x" type="double"/>
 					<columnDefinition name = "y" type="double"/>

@@ -38,7 +38,7 @@
 
 		<struct name="shapeB">
 			<param name="Type">PolygonShape</param>
-			<list name="verticies">
+			<list name="vertices">
 				<asciidata>
 					<columnDefinition name = "x" type="double"/>
 					<columnDefinition name = "y" type="double"/>

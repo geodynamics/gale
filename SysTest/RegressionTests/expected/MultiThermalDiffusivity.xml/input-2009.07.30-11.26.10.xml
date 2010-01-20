@@ -432,7 +432,7 @@
     </element>
     <element type="struct" name="shapeA">
       <element type="param" name="Type">PolygonShape</element>
-      <element type="list" name="verticies">
+      <element type="list" name="vertices">
         <asciidata>
 
 <columnDefinition name="x" paramType="string"/>
@@ -457,7 +457,7 @@
     </element>
     <element type="struct" name="shapeB">
       <element type="param" name="Type">PolygonShape</element>
-      <element type="list" name="verticies">
+      <element type="list" name="vertices">
         <asciidata>
 
 <columnDefinition name="x" paramType="string"/>
@@ -482,7 +482,7 @@
     </element>
     <element type="struct" name="shapeC">
       <element type="param" name="Type">PolygonShape</element>
-      <element type="list" name="verticies">
+      <element type="list" name="vertices">
         <asciidata>
 
 <columnDefinition name="x" paramType="string"/>
@@ -507,7 +507,7 @@
     </element>
     <element type="struct" name="HeatShape">
       <element type="param" name="Type">PolygonShape</element>
-      <element type="list" name="verticies">
+      <element type="list" name="vertices">
         <asciidata>
 
 <columnDefinition name="x" paramType="string"/>
