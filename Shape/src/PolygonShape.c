@@ -196,12 +196,12 @@ void _PolygonShape_AssignFromXML( void* polygon, Stg_ComponentFactory* cf, void*
 	        self->name, perpendicularAxisName );
 	}	
 
-	optionsList = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"verticies" );
+	optionsList = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"vertices" );
 	
 	vertexCount = Dictionary_Entry_Value_GetCount(optionsList );
 	Journal_Firewall( vertexCount >= 3, errorStream, 
-			"To few verticies given in trying to build shape '%s' named '%s'.\n"
-			"A polygon needs at least three verticies.\n",
+			"To few vertices given in trying to build shape '%s' named '%s'.\n"
+			"A polygon needs at least three vertices.\n",
 			self->type, self->name );
 
 	/* Allocate space */
@@ -263,7 +263,7 @@ void _PolygonShape_Destroy( void* polygon, void* data ) {
 */
 /* Algorithm describe Paul Bourke's page http://astronomy.swin.edu.au/~pbourke/geometry/insidepoly/ (see solution 2)
  *
- * Algorithm works by summing the angles between the test coordinate and each pair of verticies that make up an edge 
+ * Algorithm works by summing the angles between the test coordinate and each pair of vertices that make up an edge 
  * in the polygon. An inside point will give an angle of 2pi and and outside point will give an angle of 0 */
 
 Bool _PolygonShape_IsCoordInside( void* polygon, Coord coord ) {
@@ -289,7 +289,7 @@ Bool _PolygonShape_IsCoordInside( void* polygon, Coord coord ) {
 		return False;	
 
 	for ( vertex_I = 0 ; vertex_I < vertexCount ; vertex_I++ ) {
-		/* Get verticies of current edge */
+		/* Get vertices of current edge */
 		startVertex = vertexList[ vertex_I ];
 		endVertex   = vertexList[ (vertex_I + 1) % vertexCount ];
 

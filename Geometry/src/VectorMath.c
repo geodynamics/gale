@@ -345,7 +345,7 @@ void StGermain_NormalToPlane( double* normal, double* pos0, double* pos1, double
 }
 
 #define ONE_THIRD 0.3333333333333333333
-/** Calculates the position vector to the centroid of a triangle whose verticies are given by position vectors 
+/** Calculates the position vector to the centroid of a triangle whose vertices are given by position vectors 
 Position vectors have to be of size dim doubles */
 void StGermain_TriangleCentroid( double* centroid, double* pos0, double* pos1, double* pos2, Index dim) {
 
@@ -366,7 +366,7 @@ void StGermain_TriangleCentroid( double* centroid, double* pos0, double* pos1, d
 	}
 }
 
-/** Calculates the area of a triangle whose verticies are given by position vectors 
+/** Calculates the area of a triangle whose vertices are given by position vectors 
 Position vectors have to be of size dim doubles 
 Only works for dim == 2 or dim == 3
 */
@@ -391,7 +391,7 @@ double StGermain_TriangleArea( double* pos0, double* pos1, double* pos2, Index d
 /** StGermain_ConvexQuadrilateralArea - See Eric W. Weisstein. "Quadrilateral." 
  * From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/Quadrilateral.html
  * Area = \frac{1}{2}| p \times q | where p and q are diagonals of a convex polygon
- * This function will not work for dim > 3 and verticies have to be given in a winding direction
+ * This function will not work for dim > 3 and vertices have to be given in a winding direction
 */
 double StGermain_ConvexQuadrilateralArea( double* vertexCoord1, double* vertexCoord2, double* vertexCoord3, double* vertexCoord4, Dimension_Index dim ) {
 	Coord diagonal1;	
@@ -445,7 +445,7 @@ void StGermain_AverageCoord( double* coord, double** coordList, Index count, Dim
 	/* Initialise */
 	coord[ I_AXIS ] = coord[ J_AXIS ] = coord[ K_AXIS ] = 0.0;
 
-	/* Sum verticies */
+	/* Sum vertices */
 	for ( coord_I = 0 ; coord_I < count ; coord_I++ ) {
 		coord[ I_AXIS ] += coordList[ coord_I ][ I_AXIS ];
 		coord[ J_AXIS ] += coordList[ coord_I ][ J_AXIS ];

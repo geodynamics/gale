@@ -211,10 +211,10 @@ void _ConvexHull_AssignFromXML( void* convexHull, Stg_ComponentFactory* cf, void
 	
 	_Stg_Shape_AssignFromXML( self, cf, data );
 
-	optionsList = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"verticies"  );
+	optionsList = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"vertices"  );
 	Journal_Firewall( optionsList != NULL, 
 		Journal_Register( Error_Type, (Name)self->type  ),
-		"In func %s: The list 'verticies' specifying the convexHull is NULL.\n", __func__);
+		"In func %s: The list 'vertices' specifying the convexHull is NULL.\n", __func__);
 
 	vertexCount = Dictionary_Entry_Value_GetCount(optionsList);
 	Journal_Firewall( ( self->dim == 2 && vertexCount < 4 ) || ( self->dim == 3 && vertexCount < 5 ),

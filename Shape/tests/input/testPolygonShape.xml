@@ -8,7 +8,7 @@
 		<struct name="shape">
 			<param name="Type">PolygonShape</param>
 			<param name="startZ">0.3</param>
-			<list name="verticies">
+			<list name="vertices">
 				<asciidata>
 					<columnDefinition name = "x" type="double"/>
 					<columnDefinition name = "y" type="double"/>

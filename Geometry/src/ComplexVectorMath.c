@@ -474,7 +474,7 @@ void StGermain_ComplexVectorNormalise(Cmplx* vector, Index dim) {
 
 #define STGERMAIN_COMPLEXVECTOR_ONE_THIRD 0.3333333333333333333
 
-/** StGermain_ComplexTriangleCentroid Calculates the position vector to the centroid of a triangle whose verticies are given by position vectors 
+/** StGermain_ComplexTriangleCentroid Calculates the position vector to the centroid of a triangle whose vertices are given by position vectors 
 Position vectors have to be of size dim Cmplx */
 void StGermain_ComplexTriangleCentroid( Cmplx* centroid, Cmplx* pos0, Cmplx* pos1, Cmplx* pos2, Index dim) {
 	Cmplx tmp;

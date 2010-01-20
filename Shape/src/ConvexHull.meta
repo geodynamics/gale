@@ -29,7 +29,7 @@
 <![CDATA[
 	<struct name="shape">
 		<param name="Type">ConvexHull</param>
-		<list name="verticies">
+		<list name="vertices">
 			<asciidata>
 				<columnDefinition name = "x" type="double"/>
 				<columnDefinition name = "y" type="double"/>
@@ -45,7 +45,7 @@
 	<!-- In 3D -->
 	<struct name="shape">
 		<param name="Type">ConvexHull</param>
-		<list name="verticies">
+		<list name="vertices">
 			<asciidata>
 				<columnDefinition name = "x" type="double"/>
 				<columnDefinition name = "y" type="double"/>

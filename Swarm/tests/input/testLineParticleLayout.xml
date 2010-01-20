@@ -10,7 +10,7 @@
 		<struct name="particleLayout">
 			<param name="Type">LineParticleLayout</param>
 			<param name="totalInitialParticles">20</param>
-			<list name="verticies">
+			<list name="vertices">
 				<asciidata>
 					<columnDefinition name = "x" type="double"/>
 					<columnDefinition name = "y" type="double"/>
