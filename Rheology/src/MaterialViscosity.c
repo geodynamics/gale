@@ -55,6 +55,7 @@
 #include "ConstitutiveMatrix.h"
 
 #include <assert.h>
+#include <string.h>
 
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type MaterialViscosity_Type = "MaterialViscosity";

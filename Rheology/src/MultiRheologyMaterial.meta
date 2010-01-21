@@ -13,7 +13,7 @@
 	<param name="Parent">RheologyMaterial</param>
 	<param name="Reference">...</param>
 	<param name="Summary">...</param>
-	<param name="Description">This allows for multiple rheologies to be applied to a material. The resultant isotropic material will have a effective viscosity defined as $\frac{1}{n_{eff}} = \\sum_{i=0}^n \frac{1}{n_{i}}$, where $n_i$ is the isotropic vicosities of the input rheologies. <br/><br/>
+<param name="Description">This allows for multiple rheologies to be applied to a material. The resultant isotropic material will have a effective viscosity defined as $\\frac{1}{n_{eff}} = \\sum_{i=0}^n \\frac{1}{n_{i}}$, where $n_i$ is the isotropic vicosities of the input rheologies. <br/><br/>
 The input rheologies must be defined in a rheology list, see example</param>
 
 	<list name="Params">

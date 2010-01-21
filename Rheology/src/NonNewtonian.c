@@ -69,10 +69,24 @@ NonNewtonian* _NonNewtonian_New(  NONNEWTONIAN_DEFARGS  )
 	return self;
 }
 
-void _NonNewtonian_Init( NonNewtonian* self, FeVariable* strainRateInvField, double stressExponent ) {
+void _NonNewtonian_Init( NonNewtonian* self, FeVariable* strainRateInvField,
+                         FeVariable* temperatureField,
+                         double n,
+                         double T_0,
+                         double A,
+                         double refStrainRate,
+                         double minViscosity,
+                         double maxViscosity) {
 
 	self->strainRateInvField = strainRateInvField;
-	self->stressExponent = stressExponent;
+	self->temperatureField = temperatureField;
+
+	self->n = n;
+	self->T_0 = T_0;
+	self->A = A;
+	self->refStrainRate = refStrainRate;
+	self->minViscosity = minViscosity;
+	self->maxViscosity = maxViscosity;
 
 	Rheology_SetToNonLinear( self );
 }
@@ -125,19 +139,47 @@ void* _NonNewtonian_DefaultNew( Name name ) {
 
 void _NonNewtonian_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	NonNewtonian*  self = (NonNewtonian*)rheology;
-	FeVariable*    strainRateInvField;
+	FeVariable    *strainRateInvField, *temperatureField;
+        double refStrainRate;
+	Stream* errorStream = Journal_Register( Error_Type,
+                                                NonNewtonian_Type );
 
 	/* Construct Parent */
 	_Rheology_AssignFromXML( self, cf, data );
 	
 	/* TODO: 'Keyfallback' soon to be deprecated/updated */
-	strainRateInvField = Stg_ComponentFactory_ConstructByNameWithKeyFallback( cf, self->name, (Name)"StrainRateInvariantField", (Dictionary_Entry_Key)"StrainRateInvariantField", FeVariable, True, data  );
-	/*strainRateInvField = Stg_ComponentFactory_ConstructByKey( cf, self->name,
-				"StrainRateInvariantField", FeVariable, True);*/
+	strainRateInvField = Stg_ComponentFactory_ConstructByNameWithKeyFallback( 
+		cf, 
+		self->name,
+                (Name)"StrainRateInvariantField", 
+		(Name)"StrainRateInvariantField", 
+		FeVariable, 
+		True,
+		data );
+	temperatureField = Stg_ComponentFactory_ConstructByKey(
+		cf, 
+		self->name,
+                "TemperatureField", 
+		FeVariable, 
+		True,
+		data );
+
+        refStrainRate=Stg_ComponentFactory_GetDouble( cf, self->name,
+                                                      "refStrainRate", 0.0 );
+        if(refStrainRate==0.0)
+          Journal_Firewall(0,errorStream,
+                           "refStrainRate must be set to a non-zero number in a NonNewtonian rheology");
+
 	_NonNewtonian_Init( 
 			self,
 			strainRateInvField,
-			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"stressExponent", 1.0 )  );
+                        temperatureField,
+			Stg_ComponentFactory_GetDouble( cf, self->name, "n", 1.0 ), 
+			Stg_ComponentFactory_GetDouble( cf, self->name, "T_0", 1.0 ), 
+			Stg_ComponentFactory_GetDouble( cf, self->name, "A", 1.0 ), 
+                        refStrainRate,
+			Stg_ComponentFactory_GetDouble( cf, self->name, "minViscosity", 0.0 ) ,
+			Stg_ComponentFactory_GetDouble( cf, self->name, "maxViscosity", 0.0 ) );
 }
 
 void _NonNewtonian_ModifyConstitutiveMatrix( 
@@ -150,23 +192,51 @@ void _NonNewtonian_ModifyConstitutiveMatrix(
 {
 	NonNewtonian*	              self              = (NonNewtonian*) rheology;
 	double                        strainRateInv;
+	double                        minVis;
+	double                        maxVis;
 	double                        viscosity;
-	double                        n;
+	double                        n, T_0, A, T;
+	Stream* errorStream = Journal_Register( Error_Type,
+                                                NonNewtonian_Type );
 
-	/* Don't want to yield on the first ever solve */
-	if ( !constitutiveMatrix->previousSolutionExists )
-		return;
+	n = self->n;
+        T_0=self->T_0;
+        A=self->A;
+	minVis = self->minViscosity;
+	maxVis = self->maxViscosity;
 
-	/* Calculate Parameters */
-	FeVariable_InterpolateWithinElement( self->strainRateInvField, lElement_I, xi, &strainRateInv );
-	n = self->stressExponent;
-	if ( fabs( n - 1.0 ) < 1.0e-10 )
-		return;
+        FeVariable_InterpolateWithinElement(self->temperatureField,
+                                            lElement_I,xi,&T);
+        Journal_Firewall(n!=0 && T!=0 && A!=0,errorStream,
+                         "Error in NonNewtonian: T, n, and A must all be non-zero:\n\tT=%g\n\tn=%g\n\tA=%g\n",T,n,A);
 
-	/* Calculate New Viscosity */
-	viscosity = ConstitutiveMatrix_GetIsotropicViscosity( constitutiveMatrix );
-	viscosity = pow(2.0 * strainRateInv, 1.0/n - 1.0) * pow(viscosity,1.0/n);
-	ConstitutiveMatrix_SetIsotropicViscosity( constitutiveMatrix, viscosity );
+        viscosity=exp(T_0/(n*T))/(2*A);
+
+	if ( fabs( n - 1.0 ) > 1.0e-10 )
+          {
+            if ( !constitutiveMatrix->previousSolutionExists )
+              /* on the first ever solve, use a ref strainrate */
+              {
+                strainRateInv = self->refStrainRate;
+              }
+            else
+              {
+                /* Calculate Parameters */
+                FeVariable_InterpolateWithinElement(self->strainRateInvField,
+                                                    lElement_I,xi,&strainRateInv);
+              }
+            /* Calculate New Viscosity */
+            viscosity*= pow(strainRateInv,1.0/n - 1.0);
+          }
+        if(maxVis!=0 && viscosity>maxVis)
+          {
+            viscosity=maxVis;
+          }
+        if(minVis!=0 && viscosity<minVis)
+          {
+            viscosity=minVis;
+          }
+	ConstitutiveMatrix_SetIsotropicViscosity(constitutiveMatrix,viscosity);
 }
 
 

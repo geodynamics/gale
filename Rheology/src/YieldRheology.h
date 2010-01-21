@@ -162,6 +162,8 @@
 		if ( (self)->hasYieldedParticleExtHandle != (ExtensionInfo_Index) -1 ) \
 		* (Particle_Bool*) ExtensionManager_Get( (materialPointsSwarm)->particleExtensionMgr, (materialPoint), (self)->hasYieldedParticleExtHandle ) \
 			= (Particle_Bool) (flag)
+	#define YieldRheology_GetParticleFlag( self, materialPointsSwarm, materialPoint )\
+                (* (Particle_Bool*) ExtensionManager_Get( (materialPointsSwarm)->particleExtensionMgr, (materialPoint), (self)->hasYieldedParticleExtHandle ))
 	
 #endif
 

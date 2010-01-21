@@ -53,6 +53,8 @@
 	#include "SmoothVelGradField.h"
 	#include "ViscosityField.h"
 	#include "DensityField.h"
+	#include "DivergenceForce.h"
+        #include "MixedStabiliserTerm.h"
 	#include "PressureTemperatureOutput.h"
 	#include "Underworld_SwarmOutput.h"
 	#include "RadiogenicHeatingTerm.h"
@@ -61,6 +63,7 @@
    #include "SPR_StrainRate.h"
    #include "REP_Algorithm.h"
    #include "RecoveredFeVariable.h"
+        #include "StressBC.h"
 	#include "Init.h"
 	#include "Finalise.h"
 #endif 

@@ -57,7 +57,15 @@
 		/* Virtual functions go here */ \
 		/* Material Parameters */\
 		FeVariable*                                         strainRateInvField;                      \
-		double                                              stressExponent;  
+		FeVariable*                                         temperatureField;                      \
+		double                                              n;                           \
+		double                                              T_0;                           \
+		double                                              A;                           \
+       		double                                              refStrainRate;  \
+       		double                                              minViscosity;  \
+       		double                                              maxViscosity;  \
+
+
 
 	struct NonNewtonian { __NonNewtonian };
 	

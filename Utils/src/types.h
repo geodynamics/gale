@@ -55,6 +55,38 @@
 	typedef struct SmoothVelGradField SmoothVelGradField;
 	typedef struct ViscosityField                ViscosityField;
 	typedef struct DensityField                  DensityField;
+        typedef struct DivergenceForce DivergenceForce;
+	typedef struct MixedStabiliserTerm           MixedStabiliserTerm;
+        typedef struct StressBC                      StressBC;
+
+typedef enum
+  {
+    StressBC_Double,
+    StressBC_ConditionFunction,
+    StressBC_HydrostaticTerm
+  } StressBC_Types;
+
+typedef struct
+{
+  StressBC_Types type;
+  double DoubleValue;
+  Index CFIndex;
+  Axis axis;
+  HydrostaticTerm *hydrostaticTerm;
+} StressBC_Entry;
+
+/* Wall types */
+typedef enum
+  {
+    Wall_Back,
+    Wall_Left,
+    Wall_Bottom,
+    Wall_Right,
+    Wall_Top,
+    Wall_Front,
+    Wall_Size
+  } Wall;
+
    typedef struct BaseRecoveryFeVar     BaseRecoveryFeVar;
    typedef struct SPR_StrainRate SPR_StrainRate;
    typedef struct REP_Algorithm         REP_Algorithm;	

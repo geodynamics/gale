@@ -46,6 +46,7 @@
 #include <PICellerator/PICellerator.h>
 #include <Underworld/Underworld.h>
 #include "VTKOutput.h"
+#include <PICellerator/Utils/HydrostaticTerm.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -57,7 +58,12 @@ void _Underworld_VTKOutput_AssignFromXML( void* component, Stg_ComponentFactory*
 
 	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data  );
 
-	ContextEP_Append( context, AbstractContext_EP_Dump,
+        /* Run after the solve, but before time integration
+           (e.g. advection).  This gives us data that is always valid.
+           It also simplifies intepretation because we do not have to
+           separate mesh deformation from what the solver gave us. */
+
+	ContextEP_Append( context, AbstractContext_EP_Solve,
                           VTKOutput );
 }
 
@@ -82,46 +88,44 @@ Index Underworld_VTKOutput_Register( PluginsManager* pluginsManager ) {
 void VTKOutput_particles(IntegrationPointsSwarm*  picswarm, 
                          double defaultDiffusivity,
                          int stepping,
-                         char *outputPath, int timeStep, int dim, int myRank,
-                         int nprocs);
-void VTKOutput_fields(void *context, int myRank, int nprocs);
+                         char *outputPath, const int timeStep,
+                         int dim, int myRank, int nprocs);
+void VTKOutput_fields(void *context, int myRank, int nprocs,
+                      const int timeStep);
 
 void VTKOutput( void* _context ) {
 	UnderworldContext*	context = (UnderworldContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	IntegrationPointsSwarm*	picIntegrationPoints = (IntegrationPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"picIntegrationPoints"  );
 
-        int myRank, nprocs;
-        MPI_Comm comm;
-
-	if(picIntegrationPoints)
-	    comm = Comm_GetMPIComm( Mesh_GetCommTopology( picIntegrationPoints->mesh, MT_VERTEX ) );
-	else
-	    comm = MPI_COMM_WORLD;
-
-	MPI_Comm_rank( comm, (int*)&myRank );
-        MPI_Comm_size( comm, (int*)&nprocs );
-
-        /* Only dump if at the right time step. */
-        if(!context->dumpEvery || context->timeStep % context->dumpEvery != 0)
+        /* Only dump if at the right time step.  We use timeStep-1,
+           because we are outputing after a solve, but before
+           advection.  So timeStep-1 makes more sense in terms of when
+           the simulation looks like this. */
+        if((context->timeStep-1) % context->dumpEvery != 0)
           return;
 	
         /* Write the particles and then all of the fields. */
 
-	if(picIntegrationPoints) {
-	    VTKOutput_particles(picIntegrationPoints,
-				Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"defaultDiffusivity", 1.0 ),
-				Dictionary_GetInt_WithDefault( dictionary, (Dictionary_Entry_Key)"particleStepping", 1 ),
-				context->outputPath, context->timeStep,
-				context->dim,myRank,nprocs);
-	}
-        VTKOutput_fields(context,myRank,nprocs);
+        if(Dictionary_GetBool_WithDefault(dictionary,"VTKOutput_Particles",
+                                          True))
+          VTKOutput_particles(context->picIntegrationPoints,
+                              Dictionary_GetDouble_WithDefault
+                              (dictionary,"defaultDiffusivity",1.0),
+                              Dictionary_GetInt_WithDefault
+                              (dictionary,"particleStepping",1),
+                              context->outputPath, context->timeStep-1,
+                              context->dim,context->rank,context->nproc);
+        if(Dictionary_GetBool_WithDefault(dictionary,"VTKOutput_Fields",
+                                          True))
+          VTKOutput_fields(context,context->rank,context->nproc,
+                           context->timeStep-1);
 }
 
 void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
                          double defaultDiffusivity,
                          int stepping, char *outputPath,
-                         int timeStep, int dim, int myRank, int nprocs) {
+                         const int timeStep, int dim, int myRank, int nprocs) {
   double *coord;
   int iteration, i;
   Particle_Index          num_particles = picswarm->particleLocalCount;
@@ -144,12 +148,24 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
   fp=fopen(filename,"w");
   Memory_Free( filename );
 
+  if(fp==NULL)
+    {
+      fprintf(stderr,"WARNING: Can not open particle file for rank %d step %d\n",myRank,
+              timeStep);
+      return;
+    }
   /* Open the parallel control file */
   if(myRank==0)
     {
       Stg_asprintf( &filename, "%s/particles.%05d.pvtu", outputPath, timeStep);
       pfp=fopen(filename,"w");
       Memory_Free( filename );
+
+      if(pfp==NULL)
+        {
+          fprintf(stderr,"FATAL ERROR: Can not open master particle file for step %d",timeStep);
+          abort();
+        }
     }
       
   /* Write a header */
@@ -174,15 +190,18 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
   
   /* We need many iterations, because the values are written
      separately from the coordinates. */
-  for(iteration=0; iteration<9; ++iteration)
+  for(iteration=0; iteration<10; ++iteration)
     {
       /* Loop over all of the particles */
       for ( lParticle_I = 0 ; lParticle_I < num_particles ;
             lParticle_I+=stepping ){
-        double yielding, viscosity, density, alpha, diffusivity;
+        double postFailureStrain, viscosity, density, alpha, diffusivity;
+        int currently_yielding;
         Material_Index material_index;
         SymmetricTensor stress;
-        double normal[3];
+        BuoyancyForceTerm_MaterialExt*   materialExt;
+        Material *extension_info;
+        XYZ normal;
         
         IntegrationPoint* integrationparticle = (IntegrationPoint*)Swarm_ParticleAt( picswarm, lParticle_I );
         
@@ -201,9 +220,11 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
            rheologyCount = 0;
         
         coord = materialparticle->coord;
-        yielding=0;
+        postFailureStrain=0;
         viscosity=0;
+        currently_yielding=0;
         SymmetricTensor_Zero(stress);
+        normal[0]=normal[1]=normal[2]=0;
         
         /* First print out only the coordinates. */
         if(iteration==0)
@@ -219,23 +240,22 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
         else
           {
             /* Loop over all of the rheologies for a particle. */
-             memset( normal, 0, 3 * sizeof(double) );
+                  
             for( rheology_I = 0; rheology_I < rheologyCount ; rheology_I++ ) { 
               rheology = (YieldRheology*)Rheology_Register_GetByIndex( rheology_register, rheology_I ); 
-
-              /* Get yielding information */
-/*
-              if(!strcmp(rheology->type, "DruckerPrager") || 
-                 !strcmp(rheology->type, "VonMises") ||
-                 !strcmp(rheology->type, "FaultingMoresiMuhlhaus2006") ||
-                 !strcmp(rheology->type, "MohrCoulomb"))
+                
+              /* Get postFailureStrain and current_yielding information */
+              if(Stg_Class_IsInstance(rheology,YieldRheology_Type)
+                 && rheology->strainWeakening)
                 {
-                  yielding=StrainWeakening_CalcRatio(rheology->strainWeakening,
-                                                     materialparticle);
+                  postFailureStrain=
+                    StrainWeakening_GetPostFailureWeakening
+                    (rheology->strainWeakening,materialparticle);
+                  currently_yielding=YieldRheology_GetParticleFlag
+                    (rheology,materialSwarm,materialparticle);
                 }
-*/
               /* Get viscosity */
-              if(!strcmp(rheology->type,"StoreVisc"))
+              if(Stg_Class_IsInstance(rheology,StoreVisc_Type))
                 {
                   StoreVisc* self = (StoreVisc*) rheology;
                   StoreVisc_ParticleExt* particleExt;
@@ -244,7 +264,7 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
                   viscosity=particleExt->effVisc;
                 }
               /* Get stress */
-              if(!strcmp(rheology->type,"StoreStress"))
+              if(Stg_Class_IsInstance(rheology,StoreStress_Type))
                 {
                   StoreStress* self = (StoreStress*) rheology;
                   StoreStress_ParticleExt* particleExt;
@@ -260,10 +280,15 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
                       stress[5]=particleExt->stress[5];
                     }
                 }
-              if(!strcmp(rheology->type, "FaultingMoresiMuhlhaus2006")) {
-                 Director* director = ((FaultingMoresiMuhlhaus2006*)rheology)->director;
-                 Director_GetNormal( director, materialparticle, normal );
-              }
+
+              if(Stg_Class_IsInstance(rheology,Anisotropic_Type))
+                {
+                  Anisotropic* self = (Anisotropic*) rheology;
+                  XYZ normal;
+                  Director_GetNormal(self->director,materialparticle,normal);
+                }
+
+
             }
             switch(iteration)
               {
@@ -271,7 +296,7 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
                 fprintf(fp,"%lf ",viscosity);
                 break;
               case 2:
-                fprintf(fp,"%lf ",yielding);
+                fprintf(fp,"%lf ",postFailureStrain);
                 break;
               case 3:
                 if(dim==2)
@@ -300,8 +325,19 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
               case 7:
                 fprintf(fp,"%lf ",diffusivity);
                 break;
-                 case 8:
-                    fprintf(fp, "%lf %lf %lf ", normal[0], normal[1], normal[2]);
+              case 8:
+                fprintf(fp,"%d ",currently_yielding);
+                break;
+              case 9:
+                if(dim==2)
+                  {
+                    fprintf(fp,"%lf %lf 0.0 ",normal[0],normal[1]);
+                  }
+                else
+                  {
+                    fprintf(fp,"%lf %lf %lf ",normal[0],normal[1],normal[2]);
+                  }
+                break;
               }
           }
       }
@@ -320,9 +356,9 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
           break;
         case 1:
           fprintf(fp,"\n        </DataArray>\n");
-          fprintf(fp,"        <DataArray type=\"Float64\" Name=\"Yielding_fraction\" format=\"ascii\">\n");
+          fprintf(fp,"        <DataArray type=\"Float64\" Name=\"Post_Failure_Strain\" format=\"ascii\">\n");
           if(myRank==0)
-            fprintf(pfp,"        <PDataArray type=\"Float64\" Name=\"Yielding_fraction\" format=\"ascii\"/>\n");
+            fprintf(pfp,"        <PDataArray type=\"Float64\" Name=\"Post_Failure_Strain\" format=\"ascii\"/>\n");
           break;
         case 2:
           fprintf(fp,"\n        </DataArray>\n");
@@ -356,11 +392,17 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
           break;
         case 7:
           fprintf(fp,"\n        </DataArray>\n");
-          fprintf(fp,"        <DataArray type=\"Float64\" Name=\"Director_Normals\" format=\"ascii\" NumberOfComponents=\"3\">\n");
+          fprintf(fp,"        <DataArray type=\"Int32\" Name=\"Currently_Yielding\" format=\"ascii\">\n");
           if(myRank==0)
-            fprintf(pfp,"        <PDataArray type=\"Float64\" Name=\"Director_Normals\" format=\"ascii\" NumberOfComponents=\"3\"/>\n");
+            fprintf(pfp,"        <PDataArray type=\"Int32\" Name=\"Currently_Yielding\" format=\"ascii\"/>\n");
           break;
         case 8:
+          fprintf(fp,"\n        </DataArray>\n");
+          fprintf(fp,"        <DataArray type=\"Float64\" Name=\"Orientation\" format=\"ascii\" NumberOfComponents=\"3\">\n");
+          if(myRank==0)
+            fprintf(pfp,"        <PDataArray type=\"Float64\" Name=\"Orientation\" format=\"ascii\" NumberOfComponents=\"3\"/>\n");
+          break;
+        case 9:
           fprintf(fp,"\n        </DataArray>\n");
           fprintf(fp,"      </PointData>\n");
           fprintf(fp,"      <CellData>\n");
@@ -421,10 +463,9 @@ void VTKOutput_print_coords(FILE *fp, FeMesh *feMesh, Grid *grid, int nDims,
 }
 
 
-/* Pressure is stored on cell centers, while everything else is stored
-   on cell vertices.  So we have to make two different files, one for
-   pressure, and one for everything else. */
-void VTKOutput_fields(void *context, int myRank, int nprocs) {
+/* Everything is stored on cell vertices. */
+void VTKOutput_fields(void *context, int myRank, int nprocs,
+                      const int timeStep) {
   
   FiniteElementContext*     self = (FiniteElementContext*) context;
   Index var_I;
@@ -432,47 +473,81 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
   int nDims, i;
   int lower[3], upper[3], p_lower[3], p_upper[3];
 
-  Name field_filename, pressure_filename;
-  FILE *fp, *field_fp, *pressure_fp, *pfp, *pfield_fp, *ppressure_fp;
+  HydrostaticTerm *hydrostaticTerm;
+  Name field_filename;
+  FILE *field_fp, *pfield_fp;
 
-  /* We need to save the grids to be used later when printing out the
-     pressure coordinates and to map between 1D and 3D indices for the
-     values. */
+  Dictionary_Entry_Value* field_list;
+  int field_list_size;
+
+  /* We need to save the grids to map between 1D and 3D indices for
+     the values. */
   Grid *elGrid, *vertGrid;
 
+  hydrostaticTerm =
+    (HydrostaticTerm*)LiveComponentRegister_Get(self->CF->LCRegister,
+                                                "hydrostaticTerm" );
   /* Open the file */
 
-  Stg_asprintf( &pressure_filename, "%s/pressure.%d.%05d.vts",
-                self->outputPath,myRank,
-                self->timeStep);
+  field_list=Dictionary_Get(self->dictionary, "VTKOutput_FieldList" );
+  if(field_list)
+    {
+      field_list_size=Dictionary_Entry_Value_GetCount(field_list);
+      Journal_Firewall(field_list_size>=0,
+                       Journal_Register( Error_Type, self->type ),
+                       "The list of fields in VTKOutput_FieldList is %d but must not be negative.\n",
+                       field_list_size );
+    }
+
   Stg_asprintf( &field_filename, "%s/fields.%d.%05d.vts", self->outputPath,
-                myRank, self->timeStep);
-
+                myRank, timeStep);
   field_fp=fopen(field_filename,"w");
-  pressure_fp=fopen(pressure_filename,"w");
-
-  Memory_Free( pressure_filename );
   Memory_Free( field_filename );
+
+  if(field_fp==NULL)
+    {
+      fprintf(stderr,"WARNING: Can not open fields file for rank %d step %d\n",
+              myRank,timeStep);
+      return;
+    }
 
   /* Print out the parallel control files if rank==0 */
   if(myRank==0)
     {
-      Stg_asprintf( &pressure_filename, "%s/pressure.%05d.pvts",
-                    self->outputPath,
-                    self->timeStep);
       Stg_asprintf( &field_filename, "%s/fields.%05d.pvts", self->outputPath,
-                    self->timeStep);
+                    timeStep);
       pfield_fp=fopen(field_filename,"w");
-      ppressure_fp=fopen(pressure_filename,"w");
-      Memory_Free( pressure_filename );
       Memory_Free( field_filename );
+      if(pfield_fp==NULL)
+        {
+          fprintf(stderr,
+                  "FATAL ERROR: Can not open master fields file for step %d\n",
+                  timeStep);
+          abort();
+        }
     }
+
+  /* First, update the fields that are derived from particles.  This
+     is needed to get an accurate pressure, because it needs the
+     stresses. */
+
+  for ( var_I = 0; var_I < self->fieldVariable_Register->objects->count;
+        var_I++ ) {
+    FieldVariable* fieldVar;
+    fieldVar = FieldVariable_Register_GetByIndex( self->fieldVariable_Register,
+                                                  var_I );
+    if (Stg_Class_IsInstance( fieldVar, ParticleFeVariable_Type ))
+      {
+        ParticleFeVariable_Update( fieldVar );
+      }
+  }
 
   /* First, output the coordinates.  We have to do a huge song and
      dance just to get the extents of the mesh. */
 
   for ( var_I = 0; var_I < self->fieldVariable_Register->objects->count;
         var_I++ ) {
+    int fields;
     FieldVariable* fieldVar;
     fieldVar = FieldVariable_Register_GetByIndex( self->fieldVariable_Register,
                                                   var_I );
@@ -485,11 +560,6 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
 
       feVar=(FeVariable*)fieldVar;
 
-      if(!strcmp(feVar->name,"HeightField"))
-        continue;
-
-      if(!strcmp(feVar->name,"VelocityField") && self->timeStep==0)
-        FeVariable_SyncShadowValues(feVar);
       if(!header_printed)
         {
           Mesh *mesh;
@@ -499,7 +569,7 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
           gen=((CartesianGenerator *)(mesh->generator));
           /* If we got the surface adaptor instead of the cartesian
              mesh generator, go to the mesh generator.  */
-          if(!strcmp(gen->type,"SurfaceAdaptor") || !strcmp(gen->type,"FieldVariableSurfaceAdaptor"))
+          if(!strcmp(gen->type,"SurfaceAdaptor"))
             gen=(CartesianGenerator *)((SurfaceAdaptor *)(gen))->generator;
 
           elGrid=gen->elGrid;
@@ -513,7 +583,7 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
               p_lower[i]=gen->origin[i];
               p_upper[i]=p_lower[i]+gen->range[i];
 
-              /* The grid is split up by elements, so for the pressure
+              /* The grid is split up by elements, so for the element
                  grid, we simply add the ghost zones.  Ghost zones are
                  only added at the top, not the bottom. */
               if(p_upper[i]!=gen->elGrid->sizes[i])
@@ -536,17 +606,8 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
       <CellData></CellData>\n",
                   lower[0],upper[0]-1,lower[1],upper[1]-1,lower[2],upper[2]-1,
                   lower[0],upper[0]-1,lower[1],upper[1]-1,lower[2],upper[2]-1);
-          fprintf(pressure_fp,"<?xml version=\"1.0\"?>\n\
-<VTKFile type=\"StructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n\
-  <StructuredGrid WholeExtent=\"%d %d %d %d %d %d\">\n\
-    <Piece Extent=\"%d %d %d %d %d %d\">\n\
-      <CellData></CellData>\n",
-                  p_lower[0],p_upper[0]-1,p_lower[1],p_upper[1]-1,
-                  p_lower[2],p_upper[2]-1,
-                  p_lower[0],p_upper[0]-1,p_lower[1],p_upper[1]-1,
-                  p_lower[2],p_upper[2]-1);
 
-          /* Write the coordinates for the fields, but not the pressure */
+          /* Write the coordinates for the fields */
           VTKOutput_print_coords(field_fp, feVar->feMesh, gen->vertGrid, nDims,
                                  lower, upper);
           fprintf(field_fp,"      <PointData Scalars=\"StrainRateInvariantField\" Vectors=\"VelocityField\" Tensors=\"Stress\">\n");
@@ -574,39 +635,26 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
       <PDataArray type=\"Float64\" NumberOfComponents=\"3\"/>\n\
     </PPoints>\n\
     <PPointData Scalars=\"StrainRateInvariantField\" Vectors=\"VelocityField\" Tensors=\"Stress\">\n",global[0]-1,global[1]-1,global[2]-1);
-              fprintf(ppressure_fp,"<?xml version=\"1.0\"?>\n\
-<VTKFile type=\"PStructuredGrid\" version=\"0.1\" byte_order=\"LittleEndian\">\n \
-  <PStructuredGrid GhostLevel=\"0\" WholeExtent=\"0 %d 0 %d 0 %d\">\n\
-    <PCellData></PCellData>\n\
-    <PPoints>\n\
-      <PDataArray type=\"Float64\" NumberOfComponents=\"3\"/>\n\
-    </PPoints>\n\
-    <PPointData Scalars=\"PressureField\">\n",
-                      global[0]-2,global[1]-2,p_global[2]-1);
             }
           header_printed=1;
         }
-
-      /* Write the coordinates for the pressure, and set the
-         appropriate file pointer to output for this variable. */
-      if(!strcmp(feVar->name,"PressureField") && !strcmp(feVar->feMesh->name, "constantMesh")){
-        VTKOutput_print_coords(pressure_fp, feVar->feMesh, elGrid, nDims,
-                               p_lower, p_upper);
-        fprintf(pressure_fp,"      <PointData Scalars=\"PressureField\">\n");
-        fp=pressure_fp;
-        pfp=ppressure_fp;
-        low=p_lower;
-        up=p_upper;
-        grid=elGrid;
-      } else {
-        fp=field_fp;
-        pfp=pfield_fp;
-        low=lower;
-        up=upper;
-        grid=vertGrid;
-      }
       
-      /* Finally, output the fields.  For now, just output every field */
+      /* Finally, output the fields. */
+      
+      /* Check whether the field is in the field list */
+      if(field_list)
+        {
+          for(fields=0; fields<field_list_size; ++fields)
+            {
+              if(!strcmp(Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetElement(field_list,fields)),
+                         fieldVar->name))
+                {
+                  break;
+                }
+            }
+          if(fields==field_list_size)
+            continue;
+        }
 
       dofAtEachNodeCount = feVar->fieldComponentCount;
 
@@ -615,25 +663,25 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
           /* Scalars */
         case 2:
         case 3:
-          fprintf(fp,"        <DataArray type=\"Float64\" Name=\"%s\" format=\"ascii\">\n",feVar->name);
+          fprintf(field_fp,"        <DataArray type=\"Float64\" Name=\"%s\" format=\"ascii\">\n",feVar->name);
           if(myRank==0)
-            fprintf(pfp,"      <PDataArray type=\"Float64\" Name=\"%s\" format=\"ascii\"/>\n",feVar->name);
+            fprintf(pfield_fp,"      <PDataArray type=\"Float64\" Name=\"%s\" format=\"ascii\"/>\n",feVar->name);
           break;
           /* Vectors */
         case 4:
         case 9:
-          fprintf(fp,"        <DataArray type=\"Float64\" Name=\"%s\" format=\"ascii\" NumberOfComponents=\"3\">\n",feVar->name);
+          fprintf(field_fp,"        <DataArray type=\"Float64\" Name=\"%s\" format=\"ascii\" NumberOfComponents=\"3\">\n",feVar->name);
           if(myRank==0)
-            fprintf(pfp,"      <PDataArray type=\"Float64\" Name=\"%s\" format=\"ascii\" NumberOfComponents=\"3\"/>\n",feVar->name);
+            fprintf(pfield_fp,"      <PDataArray type=\"Float64\" Name=\"%s\" format=\"ascii\" NumberOfComponents=\"3\"/>\n",feVar->name);
           break;
           /* Rank 2 Tensors */
         case 6:
         case 8:
         case 18:
         case 27:
-          fprintf(fp,"        <DataArray type=\"Float64\" Name=\"%s\" format=\"ascii\" NumberOfComponents=\"9\">\n",feVar->name);
+          fprintf(field_fp,"        <DataArray type=\"Float64\" Name=\"%s\" format=\"ascii\" NumberOfComponents=\"9\">\n",feVar->name);
           if(myRank==0)
-            fprintf(pfp,"      <PDataArray type=\"Float64\" Name=\"%s\" format=\"ascii\" NumberOfComponents=\"9\"/>\n",feVar->name);
+            fprintf(pfield_fp,"      <PDataArray type=\"Float64\" Name=\"%s\" format=\"ascii\" NumberOfComponents=\"9\"/>\n",feVar->name);
           break;
           /* Unknown */
         default:
@@ -643,15 +691,15 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
           abort();
         }
 
-      for(ijk[2]=low[2];ijk[2]<up[2];++ijk[2])
-        for(ijk[1]=low[1];ijk[1]<up[1];++ijk[1])
-          for(ijk[0]=low[0];ijk[0]<up[0];++ijk[0])
+      for(ijk[2]=lower[2];ijk[2]<upper[2];++ijk[2])
+        for(ijk[1]=lower[1];ijk[1]<upper[1];++ijk[1])
+          for(ijk[0]=lower[0];ijk[0]<upper[0];++ijk[0])
             {
               double variableValues[MAX_FIELD_COMPONENTS];	
               Dof_Index          dof_I;
               unsigned local;
               Mesh_GlobalToDomain(feVar->feMesh,MT_VERTEX,
-                                  Grid_Project(grid,ijk),&local);
+                                  Grid_Project(vertGrid,ijk),&local);
               FeVariable_GetValueAtNode(feVar,local,variableValues);
                                         
               switch(dofAtEachNodeCount*nDims)
@@ -663,28 +711,78 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
                 case 3:
                 case 9:
                 case 27:
-                  for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {
-                    fprintf(fp, "%.15g ", variableValues[dof_I] );
-                  }
+                  /* Special case the pressure */
+                  if(!strcmp(feVar->name,"PressureField"))
+                    {
+                      double p;
+                      /* First add the trace of the stress */
+                      int stress_I;
+
+                      for(stress_I = 0;
+                          stress_I<self->fieldVariable_Register->objects->count;
+                          stress_I++ ) {
+                        FieldVariable* stressVar;
+                        stressVar =
+                          FieldVariable_Register_GetByIndex(self->fieldVariable_Register,
+                                                            stress_I );
+                        if(!strcmp(stressVar->name,"StressField"))
+                          {
+                            if (Stg_Class_IsInstance( stressVar,
+                                                      FeVariable_Type ))
+                              {
+                                FeVariable* sVar;
+                                double stressValues[MAX_FIELD_COMPONENTS];	
+                                sVar=(FeVariable*)stressVar;
+                                
+                                FeVariable_GetValueAtNode(sVar,local,stressValues);
+                                if(nDims==2)
+                                  {
+                                    p=(stressValues[0]+stressValues[1])/2;
+                                  }
+                                else
+                                  {
+                                    p=(stressValues[0]+stressValues[1]
+                                       +stressValues[2])/3;
+                                  }
+                              }
+                            break;
+                          }
+                      }
+                      /* Next add the hydrostatic term */
+                      if(hydrostaticTerm)
+                        {
+                          double *coord;
+                          coord=Mesh_GetVertex(feVar->feMesh,local);
+                          p+=HydrostaticTerm_Pressure(hydrostaticTerm,coord);
+                        }
+                      p+=variableValues[0];
+                      fprintf(field_fp, "%.15g ", p );
+                    }
+                  else
+                    {
+                      for ( dof_I = 0; dof_I < dofAtEachNodeCount; dof_I++ ) {
+                        fprintf(field_fp, "%.15g ", variableValues[dof_I] );
+                      }
+                    }
                   break;
                 case 4:
-                  fprintf(fp, "%.15g %.15g 0", variableValues[0],
+                  fprintf(field_fp, "%.15g %.15g 0", variableValues[0],
                           variableValues[1] );
                   break;
                 case 6:
                   /* Ordering is xx, yy, xy */
-                  fprintf(fp, "%.15g %.15g 0 %.15g %.15g 0 0 0 0 ",
+                  fprintf(field_fp, "%.15g %.15g 0 %.15g %.15g 0 0 0 0 ",
                           variableValues[0], variableValues[2],
                           variableValues[2], variableValues[1]);
                   break;
                 case 8:
-                  fprintf(fp, "%.15g %.15g 0 %.15g %.15g 0 0 0 0 ",
+                  fprintf(field_fp, "%.15g %.15g 0 %.15g %.15g 0 0 0 0 ",
                           variableValues[0], variableValues[1],
                           variableValues[2], variableValues[3]);
                   break;
                 case 18:
                   /* Ordering is xx, yy, zz, xy, xz, yz */
-                  fprintf(fp, "%.15g %.15g %.15g %.15g %.15g %.15g %.15g %.15g %.15g ",
+                  fprintf(field_fp, "%.15g %.15g %.15g %.15g %.15g %.15g %.15g %.15g %.15g ",
                           variableValues[0], variableValues[3],
                           variableValues[4], variableValues[3],
                           variableValues[1], variableValues[5],
@@ -692,44 +790,29 @@ void VTKOutput_fields(void *context, int myRank, int nprocs) {
                           variableValues[2]);
                   break;
                 }
-              fprintf(fp, "\n" );
+              fprintf(field_fp, "\n" );
             }
-      fprintf(fp,"        </DataArray>\n");
+      fprintf(field_fp,"        </DataArray>\n");
     }
   }
-  fprintf(pressure_fp,"      </PointData>\n    </Piece>\n\
-  </StructuredGrid>\n\
-</VTKFile>\n");
   fprintf(field_fp,"      </PointData>\n    </Piece>\n\
   </StructuredGrid>\n\
 </VTKFile>\n");
-  fclose(pressure_fp);
   fclose(field_fp);
 
   if(myRank==0)
     {
-      fprintf(ppressure_fp,"      </PPointData>\n");
       fprintf(pfield_fp,"      </PPointData>\n");
       for(i=0;i<nprocs;++i)
         {
           fprintf(pfield_fp,"    <Piece Extent=\"%d %d %d %d %d %d\"\n\
              Source=\"fields.%d.%05d.vts\"/>\n",lower[0],upper[0]-1,
                   lower[1],upper[1]-1,lower[2],upper[2]-1,
-                  i,self->timeStep);
-          fprintf(ppressure_fp,"    <Piece Extent=\"%d %d %d %d %d %d\"\n\
-             Source=\"pressure.%d.%05d.vts\"/>\n",p_lower[0],p_upper[0]-1,
-                  p_lower[1],p_upper[1]-1,p_lower[2],p_upper[2]-1,
-                  i,self->timeStep);
+                  i,timeStep);
         }
-      fprintf(ppressure_fp,"  </PStructuredGrid>\n\
-</VTKFile>\n");
       fprintf(pfield_fp,"  </PStructuredGrid>\n\
 </VTKFile>\n");
-      fclose(ppressure_fp);
       fclose(pfield_fp);
      }
 
 }
-     
-
-
