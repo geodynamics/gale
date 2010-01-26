@@ -406,9 +406,9 @@ unsigned Mesh_GetOwner( void* mesh, MeshTopology_Dim dim, unsigned remote ) {
 void Mesh_GetSharers(
 	void*					mesh,
 	MeshTopology_Dim	dim,
-	unsigned				shared, 
-	unsigned*			nSharers,
-	unsigned**			sharers )
+	int				shared, 
+	int*			nSharers,
+	const int**			sharers )
 {
 	Mesh*	self = (Mesh*)mesh;
 

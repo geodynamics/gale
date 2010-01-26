@@ -350,7 +350,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
    self->fileSpace = Memory_Alloc_2DArray( hid_t, swarm->swarmVariable_Register->objects->count, self->checkpointfiles, (Name)"fileSpace" );
    /* set these spaces to null initially */
    for( jj = 0 ; jj < swarm->swarmVariable_Register->objects->count ; jj++)
-      for( kk = 0 ; kk < swarm->checkpointfiles ; kk++){
+      for( kk = 0 ; kk < self->checkpointfiles ; kk++){
          self->fileData [jj][kk] = 0;
          self->fileSpace[jj][kk] = 0;
       }
@@ -565,7 +565,7 @@ Index _FileParticleLayout_GetFileCountFromTimeInfoFile( void* _context ){
    #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
    fileData = H5Dopen( file, "/nproc" );
    #else
-   fileData = H5Dopen( file, "/nproc", H5P_DEFAULT );
+   fileData = H5Dopen2( file, "/nproc", H5P_DEFAULT );
    #endif
    fileSpace = H5Dget_space( fileData );
       
