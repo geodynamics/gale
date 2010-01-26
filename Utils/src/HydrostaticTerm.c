@@ -103,7 +103,7 @@ HydrostaticTerm* _HydrostaticTerm_New( HYDROSTATICTERM_DEFARGS )
   HydrostaticTerm* self;
   
   /* Allocate memory */
-  assert( sizeOfSelf >= sizeof(HydrostaticTerm) );
+  assert( _sizeOfSelf >= sizeof(HydrostaticTerm) );
   self = (HydrostaticTerm*)_Stg_Component_New(STG_COMPONENT_PASSARGS);
 
   return self;
