@@ -56,50 +56,36 @@
 		__ForceTerm \
 		Stg_Shape*                                 domainShape;    \
                 FeMesh*                                    geometryMesh; \
-                StressBC_Entry                             force; \
-                FiniteElementContext*                      context; \
+                StressBC_Entry                             force;
 
 	struct DivergenceForce { __DivergenceForce };
 
-	DivergenceForce* DivergenceForce_New( 
-		Name                                                name,
-		ForceVector*                                        forceVector,
-                Swarm* integrationSwarm,
-                Stg_Shape* domainShape,
-                FeMesh* geometryMesh,
-                StressBC_Entry force,
-                FiniteElementContext* context);
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
-	DivergenceForce* _DivergenceForce_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		ForceTerm_AssembleElementFunction*                  _assembleElement,		
-		Name                                                name,
-                FiniteElementContext*                               context);
+	#define DIVERGENCEFORCE_DEFARGS \
+                FORCETERM_DEFARGS
+
+	#define DIVERGENCEFORCE_PASSARGS \
+                FORCETERM_PASSARGS
+
+        DivergenceForce* _DivergenceForce_New( DIVERGENCEFORCE_DEFARGS);
 	
 	void DivergenceForce_InitAll( 
 		void*                                               forceTerm,
+                FiniteElementContext*	context,
 		ForceVector*                                        forceVector,
 		Swarm*                                              integrationSwarm,
                 Stg_Shape* domainShape,
                 FeMesh* geometryMesh,
-                StressBC_Entry force,
-                FiniteElementContext* context);
+                StressBC_Entry force);
 
 	void _DivergenceForce_Delete( void* forceTerm );
 	void _DivergenceForce_Print( void* forceTerm, Stream* stream );
 
 	void* _DivergenceForce_DefaultNew( Name name ) ;
-void _DivergenceForce_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
+        void _DivergenceForce_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
 	void _DivergenceForce_Build( void* forceTerm, void* data ) ;
 	void _DivergenceForce_Initialise( void* forceTerm, void* data ) ;
 	void _DivergenceForce_Execute( void* forceTerm, void* data ) ;

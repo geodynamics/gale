@@ -66,7 +66,6 @@ const Type DruckerPrager_Type = "DruckerPrager";
 /* Public Constructor */
 DruckerPrager* DruckerPrager_New(
 	Name                  name,
-	AbstractContext*      context,
 	StrainWeakening*      strainWeakening, 
 	MaterialPointsSwarm*  materialPointsSwarm, 
 	double                minVisc, 
@@ -79,14 +78,40 @@ DruckerPrager* DruckerPrager_New(
 	SwarmVariable*        swarmPressure,
 	double                minimumYieldStress,
 	double                frictionCoefficient,
-	double                frictionCoefficientAfterSoftening )
+	double                frictionCoefficientAfterSoftening,
+        double                boundaryCohesion,
+        double                boundaryCohesionAfterSoftening,
+        double                boundaryFrictionCoefficient,
+        double                boundaryFrictionCoefficientAfterSoftening,
+        Bool                  boundaryTop,
+        Bool                  boundaryBottom,
+        Bool                  boundaryLeft,
+        Bool                  boundaryRight,
+        Bool                  boundaryFront,
+        Bool                  boundaryBack,
+        HydrostaticTerm*      hydrostaticTerm)
 {
    DruckerPrager* self = (DruckerPrager*) _DruckerPrager_DefaultNew( name );
 
-   _Rheology_Init( self, (PICelleratorContext*)context );
+   _Rheology_Init( self, (PICelleratorContext*)self->context );
    _YieldRheology_Init( (YieldRheology*)self, strainWeakening, materialPointsSwarm, minVisc ); 
    _VonMises_Init( (VonMises*)self, strainRateField, swarmStrainRate, cohesion, cohesionAfterSoftening, strainRateSoftening );
-   _DruckerPrager_Init( self, pressureField, swarmPressure, materialPointsSwarm, minimumYieldStress, frictionCoefficient, frictionCoefficientAfterSoftening );
+   _DruckerPrager_Init( self, pressureField, swarmPressure,
+                        materialPointsSwarm,
+                        frictionCoefficient,
+                        frictionCoefficientAfterSoftening,
+                        boundaryCohesion,
+                        boundaryCohesionAfterSoftening,
+                        boundaryFrictionCoefficient,
+                        boundaryFrictionCoefficientAfterSoftening,
+                        boundaryBottom,
+                        boundaryTop,
+                        boundaryLeft,
+                        boundaryRight,
+                        boundaryFront,
+                        boundaryBack,
+                        minimumYieldStress,
+                        hydrostaticTerm );
    self->isConstructed = True;
    return self;
 }
@@ -110,8 +135,6 @@ void _DruckerPrager_Init(
 		FeVariable*                                        pressureField,
 		SwarmVariable*                                     swarmPressure,
 		MaterialPointsSwarm*                               materialPointsSwarm,
-		FiniteElementContext*     context,
-		double                                             minimumYieldStress,
 		double                                             frictionCoefficient,
 		double                                             frictionCoefficientAfterSoftening,
                 double                    boundaryCohesion,
@@ -223,7 +246,6 @@ void _DruckerPrager_AssignFromXML( void* druckerPrager, Stg_ComponentFactory* cf
 			pressureField,
 			swarmPressure,
 			materialPointsSwarm, 
-			context,
 			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"frictionCoefficient", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"frictionCoefficientAfterSoftening", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"boundaryCohesion", 0.0 ),
@@ -361,7 +383,7 @@ double _DruckerPrager_GetYieldCriterion(
 
         cell_I=CellLayout_MapElementIdToCellId(materialPointsSwarm->cellLayout,
                                                lElement_I );
-        FeMesh_CoordLocalToGlobal(pressureField->feMesh, cell_I, xi, coord);
+        FeMesh_CoordLocalToGlobal(self->pressureField->feMesh, cell_I, xi, coord);
         if(self->hydrostaticTerm)
           {
             pressure+=HydrostaticTerm_Pressure(self->hydrostaticTerm,coord);
@@ -380,12 +402,12 @@ double _DruckerPrager_GetYieldCriterion(
 	
 
         /* Big song and dance to see if we are at a boundary that we care about */
-        elGrid = *(Grid**)ExtensionManager_Get(pressureField->feMesh->info,
-                                               pressureField->feMesh,
-                                               ExtensionManager_GetHandle(pressureField->feMesh->info, "elementGrid" ) );
+        elGrid = *(Grid**)ExtensionManager_Get(self->pressureField->feMesh->info,
+                                               self->pressureField->feMesh,
+                                               ExtensionManager_GetHandle(self->pressureField->feMesh->info, "elementGrid" ) );
   
-        element_gI = FeMesh_ElementDomainToGlobal( pressureField->feMesh, lElement_I );
-        RegularMeshUtils_Element_1DTo3D( pressureField->feMesh, element_gI, inds );
+        element_gI = FeMesh_ElementDomainToGlobal( self->pressureField->feMesh, lElement_I );
+        RegularMeshUtils_Element_1DTo3D( self->pressureField->feMesh, element_gI, inds );
   
         inside_boundary=(self->boundaryBottom && inds[1]==0)
           || (self->boundaryTop && inds[1]==elGrid->sizes[1]-1)
@@ -440,6 +462,9 @@ double _DruckerPrager_GetYieldCriterion(
   /* Make sure frictionalStrength is above the minimum */
   if ( frictionalStrength < minimumYieldStress*factor) 
     frictionalStrength = minimumYieldStress*factor;
+
+  self->yieldCriterion = frictionalStrength;
+  self->curFrictionCoef = effectiveFrictionCoefficient*factor;
 
   return frictionalStrength;
 }

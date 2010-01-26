@@ -109,7 +109,7 @@ void VTKOutput( void* _context ) {
 
         if(Dictionary_GetBool_WithDefault(dictionary,"VTKOutput_Particles",
                                           True))
-          VTKOutput_particles(context->picIntegrationPoints,
+          VTKOutput_particles(picIntegrationPoints,
                               Dictionary_GetDouble_WithDefault
                               (dictionary,"defaultDiffusivity",1.0),
                               Dictionary_GetInt_WithDefault

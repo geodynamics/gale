@@ -62,7 +62,7 @@ void NonNewtonianShearSolution_StressFunction( void* analyticSolution, double* c
 	/* Get Parameters */
 	Mesh_GetGlobalCoordRange( self->mesh, min, max );
 	eta = self->materialViscosity->eta0;
-	n = self->nonNewtonianRheology->stressExponent;
+	n = self->nonNewtonianRheology->n;
 	height = max[J_AXIS] - min[J_AXIS];
 
 	/* Calculate stress - without considering cohesion */
@@ -84,7 +84,7 @@ void NonNewtonianShearSolution_ViscosityFunction( void* analyticSolution, double
 	
 	/* Get Parameters */
 	eta0 = self->materialViscosity->eta0;
-	n = self->nonNewtonianRheology->stressExponent;
+	n = self->nonNewtonianRheology->n;
 	Mesh_GetGlobalCoordRange( self->mesh, min, max );
 	height = max[J_AXIS] - min[J_AXIS];
 

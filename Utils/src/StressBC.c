@@ -24,7 +24,7 @@
 **	David Stegman, Postdoctoral Fellow, Monash University. (david.stegman@sci.monash.edu.au)
 **	Wendy Sharples, PhD Student, Monash University (wendy.sharples@sci.monash.edu.au)
 **
-**  Modified 2006 by Walter Landry (California Institute of Technology)
+**  Modified 2006-2010 by Walter Landry (California Institute of Technology)
 **
 **  This library is free software; you can redistribute it and/or
 **  modify it under the terms of the GNU Lesser General Public
@@ -70,87 +70,57 @@ extern const char* WallEnumToStr[Wall_Size];
 
 StressBC* StressBC_New( 
 		Name                                      name,
+                FiniteElementContext*	context,
 		ForceVector*                              forceVector,
 		Swarm*                                    integrationSwarm,
-                ConditionFunction_Register*               conFunc_Register,
-                FiniteElementContext*                     context)
+                ConditionFunction_Register*               conFunc_Register)
 {
 	StressBC* self = (StressBC*) _StressBC_DefaultNew( name );
 
 	StressBC_InitAll( 
 			self,
+                        context,
 			forceVector,
 			integrationSwarm,
-                        conFunc_Register,
-                        context);
+                        conFunc_Register);
 
 	return self;
 }
 
 /* Creation implementation / Virtual constructor */
-StressBC* _StressBC_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		ForceTerm_AssembleElementFunction*                  _assembleElement,		
-                ConditionFunction_Register*			    conFunc_Register,
-		Name                                                name,
-                FiniteElementContext*                               context)
+StressBC* _StressBC_New( STRESSBC_DEFARGS)
 {
 	StressBC* self;
 	
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(StressBC) );
-	self = (StressBC*) _ForceTerm_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_assembleElement,
-		name );
+	self = (StressBC*) _ForceTerm_New( FORCETERM_PASSARGS);
 	
-        self->conFunc_Register=conFunc_Register;
-        self->context=context;
+        self->conFunc_Register=condFunc_Register;
 	
 	return self;
 }
 
 void _StressBC_Init( 
 		StressBC*                                  self, 
-                ConditionFunction_Register*		   conFunc_Register,
-                FiniteElementContext*                      context)
+                ConditionFunction_Register*		   conFunc_Register)
 {
-        self->numEntries        = 0;
-        self->conFunc_Register=conFunc_Register;
-        self->context=context;
+  self->isConstructed    = True;
+  self->numEntries        = 0;
+  self->conFunc_Register=conFunc_Register;
 }
 
 void StressBC_InitAll( 
 		void*                                               forceTerm,
+                FiniteElementContext*	context,
 		ForceVector*                                        forceVector,
 		Swarm*                                              integrationSwarm,
-                ConditionFunction_Register*			    conFunc_Register,
-                FiniteElementContext*                      context)
+                ConditionFunction_Register*			    conFunc_Register)
 {
 	StressBC* self = (StressBC*) forceTerm;
 
-	ForceTerm_InitAll( self, forceVector, integrationSwarm, NULL );
-	_StressBC_Init( self, conFunc_Register, context );
+	_ForceTerm_Init( self, context, forceVector, integrationSwarm, NULL );
+	_StressBC_Init( self, conFunc_Register );
 }
 
 void _StressBC_Delete( void* forceTerm ) {
@@ -166,35 +136,33 @@ void _StressBC_Print( void* forceTerm, Stream* stream ) {
 }
 
 void* _StressBC_DefaultNew( Name name ) {
-	return (void*)_StressBC_New( 
-		sizeof(StressBC), 
-		StressBC_Type,
-		_StressBC_Delete,
-		_StressBC_Print,
-		NULL,
-		_StressBC_DefaultNew,
-		_StressBC_Construct,
-		_StressBC_Build,
-		_StressBC_Initialise,
-		_StressBC_Execute,
-		_StressBC_Destroy,
-		_StressBC_AssembleElement,
-                NULL,
-		name,
-                NULL);
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(BuoyancyForceTerm);
+	Type                                                      type = BuoyancyForceTerm_Type;
+	Stg_Class_DeleteFunction*                              _delete = _BuoyancyForceTerm_Delete;
+	Stg_Class_PrintFunction*                                _print = _BuoyancyForceTerm_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _BuoyancyForceTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _BuoyancyForceTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _BuoyancyForceTerm_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _BuoyancyForceTerm_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _BuoyancyForceTerm_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _BuoyancyForceTerm_Destroy;
+	ForceTerm_AssembleElementFunction*            _assembleElement = _BuoyancyForceTerm_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*)_StressBC_New( STRESSBC_PASSARGS);
 }
 
-void _StressBC_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
+void _StressBC_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
 	StressBC*          self             = (StressBC*)forceTerm;
-        FiniteElementContext* context;
 
 	/* Construct Parent */
-	_ForceTerm_Construct( self, cf, data );
+	_ForceTerm_AssignFromXML( self, cf, data );
 
-        context = (FiniteElementContext*)Stg_ComponentFactory_ConstructByName
-          ( cf, "context", FiniteElementContext, True, data ) ;
-
-	_StressBC_Init( self, context->condFunc_Register, context );
+	_StressBC_Init( self, condFunc_Register );
         {
           char*	wallStr;
 		

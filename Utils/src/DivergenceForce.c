@@ -62,91 +62,63 @@
 const Type DivergenceForce_Type = "DivergenceForce";
 
 DivergenceForce* DivergenceForce_New(Name name,
+                                     FiniteElementContext*	context,
                                      ForceVector* forceVector,
                                      Swarm* integrationSwarm,
                                      Stg_Shape* domainShape,
                                      FeMesh* geometryMesh,
-                                     StressBC_Entry force,
-                                     FiniteElementContext* context)
+                                     StressBC_Entry force)
 {
 	DivergenceForce* self = (DivergenceForce*) _DivergenceForce_DefaultNew( name );
 
 	DivergenceForce_InitAll( 
 			self,
+                        context,
 			forceVector,
 			integrationSwarm,
                         domainShape,
                         geometryMesh,
-                        force,
-                        context);
+                        force);
 
 	return self;
 }
 
 /* Creation implementation / Virtual constructor */
-DivergenceForce* _DivergenceForce_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-		ForceTerm_AssembleElementFunction*                  _assembleElement,		
-		Name                                                name,
-                FiniteElementContext*                               context)
+DivergenceForce* _DivergenceForce_New( DIVERGENCEFORCE_DEFARGS)
 {
 	DivergenceForce* self;
 	
 	/* Allocate memory */
 	assert( sizeOfSelf >= sizeof(DivergenceForce) );
-	self = (DivergenceForce*) _ForceTerm_New( 
-		sizeOfSelf, 
-		type, 
-		_delete, 
-		_print, 
-		_copy,
-		_defaultConstructor,
-		_construct,
-		_build, 
-		_initialise,
-		_execute,
-		_destroy,
-		_assembleElement,
-		name );
-        self->context=context;
+	self = (DivergenceForce*) _ForceTerm_New( FORCETERM_PASSARGS);
 	
 	return self;
 }
 
 void _DivergenceForce_Init(DivergenceForce* self,
                            Stg_Shape* domainShape, FeMesh *geometryMesh,
-                           StressBC_Entry force,
-                           FiniteElementContext* context)
+                           StressBC_Entry force)
 {
-	self->domainShape=domainShape;
-        self->geometryMesh=geometryMesh;
-        self->force=force;
-        self->context=context;
+  self->isConstructed    = True;
+
+  self->domainShape=domainShape;
+  self->geometryMesh=geometryMesh;
+  self->force=force;
 }
 
 void DivergenceForce_InitAll( 
 		void*                                               forceTerm,
+                FiniteElementContext*	context,
 		ForceVector*                                        forceVector,
 		Swarm*                                              integrationSwarm,
                 Stg_Shape* domainShape,
                 FeMesh* geometryMesh,
-                StressBC_Entry force,
-                FiniteElementContext* context)
+                StressBC_Entry force)
 {
 	DivergenceForce* self = (DivergenceForce*) forceTerm;
 
-	ForceTerm_InitAll( self, forceVector, integrationSwarm, NULL );
-	_DivergenceForce_Init( self, domainShape, geometryMesh, force, context);
+	_ForceTerm_Init( self, context, forceVector, integrationSwarm, NULL );
+	_DivergenceForce_Init( self, domainShape, geometryMesh, force);
 }
 
 void _DivergenceForce_Delete( void* forceTerm ) {
@@ -164,37 +136,36 @@ void _DivergenceForce_Print( void* forceTerm, Stream* stream ) {
 }
 
 void* _DivergenceForce_DefaultNew( Name name ) {
-	return (void*)_DivergenceForce_New( 
-		sizeof(DivergenceForce), 
-		DivergenceForce_Type,
-		_DivergenceForce_Delete,
-		_DivergenceForce_Print,
-		NULL,
-		_DivergenceForce_DefaultNew,
-		_DivergenceForce_Construct,
-		_DivergenceForce_Build,
-		_DivergenceForce_Initialise,
-		_DivergenceForce_Execute,
-		_DivergenceForce_Destroy,
-		_DivergenceForce_AssembleElement,
-		name,
-                NULL);
+	/* Variables set in this function */
+	SizeT                                              _sizeOfSelf = sizeof(BuoyancyForceTerm);
+	Type                                                      type = BuoyancyForceTerm_Type;
+	Stg_Class_DeleteFunction*                              _delete = _BuoyancyForceTerm_Delete;
+	Stg_Class_PrintFunction*                                _print = _BuoyancyForceTerm_Print;
+	Stg_Class_CopyFunction*                                  _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _BuoyancyForceTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _BuoyancyForceTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _BuoyancyForceTerm_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _BuoyancyForceTerm_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _BuoyancyForceTerm_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _BuoyancyForceTerm_Destroy;
+	ForceTerm_AssembleElementFunction*            _assembleElement = _BuoyancyForceTerm_AssembleElement;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*)_DivergenceForce_New( DIVERGENCEFORCE_PASSARGS);
 }
 
-void _DivergenceForce_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
+void _DivergenceForce_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
 	DivergenceForce*          self             = (DivergenceForce*)forceTerm;
 	Dictionary*		dict;
         Stg_Shape* domainShape=NULL;
         FeMesh* geometryMesh=NULL;
         StressBC_Entry force;
         char *type;
-        FiniteElementContext* context;
 
 	/* Construct Parent */
-	_ForceTerm_Construct( self, cf, data );
-
-        context = (FiniteElementContext*)Stg_ComponentFactory_ConstructByName
-          ( cf, "context", FiniteElementContext, True, data ) ;
+	_ForceTerm_AssignFromXML( self, cf, data );
 
 	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
 	domainShape =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "DomainShape", Stg_Shape,  True, data  ) ;
@@ -213,7 +184,7 @@ void _DivergenceForce_Construct( void* forceTerm, Stg_ComponentFactory* cf, void
             
             Index cfIndex;
             cfIndex = ConditionFunction_Register_GetIndex
-              ( context->condFunc_Register, funcName);
+              ( condFunc_Register, funcName);
             force.type = StressBC_ConditionFunction;
             if ( cfIndex == (unsigned)-1 ) {	
               Stream*	errorStr = Journal_Register( Error_Type, self->type );
@@ -224,7 +195,7 @@ void _DivergenceForce_Construct( void* forceTerm, Stg_ComponentFactory* cf, void
                               __func__, funcName );
               Journal_Printf( errorStr, "(Available functions in the C.F. register are: ");	
               ConditionFunction_Register_PrintNameOfEachFunc
-                ( context->condFunc_Register, errorStr );
+                ( condFunc_Register, errorStr );
               Journal_Printf( errorStr, ")\n");	
               assert(0);
             }
@@ -249,7 +220,7 @@ void _DivergenceForce_Construct( void* forceTerm, Stg_ComponentFactory* cf, void
         
         geometryMesh=Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "GeometryMesh", FeMesh,  True, data  ) ;
         
-	_DivergenceForce_Init( self, domainShape, geometryMesh, force, context);
+	_DivergenceForce_Init( self, domainShape, geometryMesh, force);
 }
 
 void _DivergenceForce_Build( void* forceTerm, void* data ) {
@@ -315,7 +286,7 @@ void _DivergenceForce_AssembleElement( void* forceTerm,
                we don't use the variable number and that one
                is always going to exist. */
             ConditionFunction_Apply
-              (self->context->condFunc_Register->_cf[self->force.CFIndex],
+              (condFunc_Register->_cf[self->force.CFIndex],
                elementNodes[eNode_I],0,self->context,&force);
             break;
           }

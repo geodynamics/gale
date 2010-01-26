@@ -83,11 +83,6 @@
                 Bool                                                boundaryRight; \
                 Bool                                                boundaryFront; \
                 Bool                                                boundaryBack; \
-		/* Stored values that are calculated once for each particle */ \
-                double                                              trace; \
-		TensorArray                                         currentVelocityGradient;               \
-		double                                              currentPressure;                       \
-		double                                              strainRateSecondInvariant;                   \
                 HydrostaticTerm*                                    hydrostaticTerm; \
       double curFrictionCoef;
 
@@ -97,7 +92,6 @@
    /* Public Constructor */
    DruckerPrager* DruckerPrager_New(
       Name                  name,
-      AbstractContext*      context,
       StrainWeakening*      strainWeakening,
       MaterialPointsSwarm*  materialPointsSwarm,
       double                minVisc,
@@ -121,10 +115,6 @@
       Bool                                                boundaryRight,
       Bool                                                boundaryFront,
       Bool                                                boundaryBack,
-      double                                              trace,
-      TensorArray                                         currentVelocityGradient,
-      double                                              currentPressure,
-      double                                              strainRateSecondInvariant,
       HydrostaticTerm*                                    hydrostaticTerm);
 
    /** Private Constructor: This will accept all the virtual functions for this class as arguments. */
@@ -149,13 +139,24 @@
    void _DruckerPrager_Initialise( void* rheology, void* data ) ;
    void _DruckerPrager_Destroy( void* rheology, void* data ) ;
    void _DruckerPrager_Init(
-         DruckerPrager*                                     self,
-         FeVariable*                                        pressureField,
-         SwarmVariable*                                     swarmPressure,
-         MaterialPointsSwarm*                               materialPointsSwarm,
-         double                                             minimumYieldStress,
-         double                                             frictionCoefficient,
-         double                                             frictionCoefficientAfterSoftening );
+		DruckerPrager*                                     self,
+		FeVariable*                                        pressureField,
+		SwarmVariable*                                     swarmPressure,
+		MaterialPointsSwarm*                               materialPointsSwarm,
+		double                                             frictionCoefficient,
+		double                                             frictionCoefficientAfterSoftening,
+                double                    boundaryCohesion,
+                double                    boundaryCohesionAfterSoftening,
+                double                    boundaryFrictionCoefficient,
+                double                    boundaryFrictionCoefficientAfterSoftening,
+                Bool                      boundaryBottom,
+                Bool                      boundaryTop,
+                Bool                      boundaryLeft,
+                Bool                      boundaryRight,
+                Bool                      boundaryFront,
+                Bool                      boundaryBack,
+                double                    minimumYieldStress,
+                HydrostaticTerm*          hydrostaticTerm );
 
 
    /* 'YieldRheology' implementations */

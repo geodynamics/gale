@@ -51,34 +51,31 @@ extern const Type MixedStabiliserTerm_Type;
 
 struct MixedStabiliserTerm { __MixedStabiliserTerm };
 
-MixedStabiliserTerm* _MixedStabiliserTerm_New( 
-   SizeT                                               sizeOfSelf,  
-   Type                                                type,
-   Stg_Class_DeleteFunction*                           _delete,
-   Stg_Class_PrintFunction*                            _print,
-   Stg_Class_CopyFunction*                             _copy, 
-   Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-   Stg_Component_ConstructFunction*                    _construct,
-   Stg_Component_BuildFunction*                        _build,
-   Stg_Component_InitialiseFunction*                   _initialise,
-   Stg_Component_ExecuteFunction*                      _execute,
-   Stg_Component_DestroyFunction*                      _destroy,
-   StiffnessMatrixTerm_AssembleElementFunction*        _assembleElement,
-   Name                                                name );
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
+
+	#define MIXEDSTABILISERTERM_DEFARGS \
+                STIFFNESSMATRIXTERM_DEFARGS
+
+	#define MIXEDSTABILISERTERM_PASSARGS \
+                STIFFNESSMATRIXTERM_PASSARGS
+
+        MixedStabiliserTerm* _MixedStabiliserTerm_New( MIXEDSTABILISERTERM_DEFARGS);
 
 void _MixedStabiliserTerm_Init( MixedStabiliserTerm* self );
 
 void _MixedStabiliserTerm_Delete( void* _self );
 
-void MixedStabiliserTerm_Construct( void* _self, Stg_ComponentFactory* cf, void* data );
-void MixedStabiliserTerm_Build( void* _self, void* data );
-void MixedStabiliserTerm_Initialise( void* _self, void* data );
-void MixedStabiliserTerm_Execute( void* _self, void* data );
-void MixedStabiliserTerm_Destroy( void* _self, void* data );
+void _MixedStabiliserTerm_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data );
+void _MixedStabiliserTerm_Build( void* _self, void* data );
+void _MixedStabiliserTerm_Initialise( void* _self, void* data );
+void _MixedStabiliserTerm_Execute( void* _self, void* data );
+void _MixedStabiliserTerm_Destroy( void* _self, void* data );
 
 void* _MixedStabiliserTerm_DefaultNew( Name name );
 
-void MixedStabiliserTerm_AssembleElement( void* _self,
+void _MixedStabiliserTerm_AssembleElement( void* _self,
 					  StiffnessMatrix* stiffMat,
 					  int elementIndex,
 					  SystemLinearEquations* _sle,
