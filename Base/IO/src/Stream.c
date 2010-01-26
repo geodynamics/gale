@@ -355,7 +355,7 @@ Bool Stream_RedirectFile( Stream* stream, const Name fileName ) {
 	return Stream_SetFile( stream, file );
 }
 
-Bool Stream_RedirectAllToFile( const char* const fileName ) {
+Bool Stream_RedirectAllToFile( const Name fileName ) {
 	char* infoStreamFilename;
 	char* debugStreamFilename;
 	char* dumpStreamFilename;
