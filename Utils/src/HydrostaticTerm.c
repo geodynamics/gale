@@ -98,68 +98,14 @@ HydrostaticTerm* HydrostaticTerm_New(Name name,
 }
 
 /* Creation implementation / Virtual constructor */
-HydrostaticTerm* _HydrostaticTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-                double upper_density,
-                double upper_alpha,
-                double lower_density,
-                double lower_alpha,
-                double height,
-                double material_boundary,
-                double T_0,
-                double linear_coefficient,
-                double exponential_coefficient1,
-                double exponential_coefficient2,
-                double gravity,
-                double v,
-                double width,
-                AbstractContext *context,
-		Name                                                name )
+HydrostaticTerm* _HydrostaticTerm_New( HYDROSTATICTERM_DEFARGS )
 {
   HydrostaticTerm* self;
   
   /* Allocate memory */
   assert( sizeOfSelf >= sizeof(HydrostaticTerm) );
-  self = (HydrostaticTerm*)_Stg_Component_New(sizeOfSelf,
-                                              type, 
-                                              _delete,
-                                              _print,
-                                              _copy,
-                                              _defaultConstructor,
-                                              _construct,
-                                              _build,
-                                              _initialise,
-                                              _execute,
-                                              _destroy,
-                                              name,
-                                              NON_GLOBAL );
+  self = (HydrostaticTerm*)_Stg_Component_New(STG_COMPONENT_PASSARGS);
 
-  /* Virtual info */
-  
-  self->upper_density=upper_density;
-  self->upper_alpha=upper_alpha;
-  self->lower_density=lower_density;
-  self->lower_alpha=lower_alpha;
-  self->height=height;
-  self->material_boundary=material_boundary;
-  self->T_0=T_0;
-  self->linear_coefficient=linear_coefficient;
-  self->exponential_coefficient1=exponential_coefficient1;
-  self->exponential_coefficient2=exponential_coefficient2;
-  self->gravity=gravity;
-  self->v=v;
-  self->width=width;
-  self->context=context;
   return self;
 }
 
@@ -238,29 +184,34 @@ void _HydrostaticTerm_Print( void* forceTerm, Stream* stream ) {
 }
 
 void* _HydrostaticTerm_DefaultNew( Name name ) {
-	return (void*)_HydrostaticTerm_New( 
-		sizeof(HydrostaticTerm), 
-		HydrostaticTerm_Type,
-		_HydrostaticTerm_Delete,
-		_HydrostaticTerm_Print,
-		NULL,
-		_HydrostaticTerm_DefaultNew,
-		_HydrostaticTerm_Construct,
-		_HydrostaticTerm_Build,
-		_HydrostaticTerm_Initialise,
-		_HydrostaticTerm_Execute,
-		_HydrostaticTerm_Destroy,
-                0,0,0,0,0,0,0,0,0,0,0,0,0,NULL,
-		name );
+	SizeT                                                 _sizeOfSelf = sizeof(HydrostaticTerm);
+	Type                                                         type = HydrostaticTerm_Type;
+	Stg_Class_DeleteFunction*                                 _delete = _HydrostaticTerm_Delete;
+	Stg_Class_PrintFunction*                                   _print = _HydrostaticTerm_Print;
+	Stg_Class_CopyFunction*                                     _copy = NULL;
+	Stg_Component_DefaultConstructorFunction*     _defaultConstructor = _HydrostaticTerm_DefaultNew;
+	Stg_Component_ConstructFunction*                       _construct = _HydrostaticTerm_AssignFromXML;
+	Stg_Component_BuildFunction*                               _build = _HydrostaticTerm_Build;
+	Stg_Component_InitialiseFunction*                     _initialise = _HydrostaticTerm_Initialise;
+	Stg_Component_ExecuteFunction*                           _execute = _HydrostaticTerm_Execute;
+	Stg_Component_DestroyFunction*                           _destroy = _HydrostaticTerm_Destroy;
+
+	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
+	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+
+	return (void*)_HydrostaticTerm_New( HYDROSTATICTERM_PASSARGS);
 }
 
-void _HydrostaticTerm_Construct( void* forceTerm, Stg_ComponentFactory* cf,
+void _HydrostaticTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf,
                                  void* data ) {
   HydrostaticTerm* self = (HydrostaticTerm*)forceTerm;
   double upper_density,upper_alpha,lower_density,lower_alpha,height,
     material_boundary,T_0,linear_coefficient,exponential_coefficient1,
     exponential_coefficient2,gravity,v,width;
   AbstractContext *context;
+
+  /* Construct Parent */
+  Stg_Component_AssignFromXML( self, cf, data, False );
 
   context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
 

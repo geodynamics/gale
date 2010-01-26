@@ -107,7 +107,8 @@
 		FeVariable*          temperatureField,
 		double               gravity,
 		Bool                 adjust,
-		Materials_Register*  materials_Register );
+		Materials_Register*  materials_Register,
+                HydrostaticTerm*     hydrostaticTerm );
 	
 	void _BuoyancyForceTerm_Delete( void* forceTerm );
 

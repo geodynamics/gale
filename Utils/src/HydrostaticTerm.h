@@ -72,51 +72,18 @@
 
 	struct HydrostaticTerm { __HydrostaticTerm };
 
-	HydrostaticTerm* HydrostaticTerm_New( 
-		Name                                                name,
-                double upper_density,
-                double upper_alpha,
-                double lower_density,
-                double lower_alpha,
-                double height,
-                double material_boundary,
-                double T_0,
-                double linear_coefficient,
-                double exponential_coefficient1,
-                double exponential_coefficient2,
-                double gravity,
-                double v,
-                double width,
-                AbstractContext *context);
+	#ifndef ZERO
+	#define ZERO 0
+	#endif
 
-	HydrostaticTerm* _HydrostaticTerm_New( 
-		SizeT                                               sizeOfSelf,  
-		Type                                                type,
-		Stg_Class_DeleteFunction*                           _delete,
-		Stg_Class_PrintFunction*                            _print,
-		Stg_Class_CopyFunction*                             _copy, 
-		Stg_Component_DefaultConstructorFunction*           _defaultConstructor,
-		Stg_Component_ConstructFunction*                    _construct,
-		Stg_Component_BuildFunction*                        _build,
-		Stg_Component_InitialiseFunction*                   _initialise,
-		Stg_Component_ExecuteFunction*                      _execute,
-		Stg_Component_DestroyFunction*                      _destroy,
-                double upper_density,
-                double upper_alpha,
-                double lower_density,
-                double lower_alpha,
-                double height,
-                double material_boundary,
-                double T_0,
-                double linear_coefficient,
-                double exponential_coefficient1,
-                double exponential_coefficient2,
-                double gravity,
-                double v,
-                double width,
-                AbstractContext *context,
-		Name                                                name );
-	
+	#define HYDROSTATICTERM_DEFARGS \
+                STG_COMPONENT_DEFARGS
+
+	#define HYDROSTATICTERM_PASSARGS \
+                STG_COMPONENT_PASSARGS
+
+	HydrostaticTerm* _HydrostaticTerm_New(  HYDROSTATICTERM_DEFARGS  );
+
         void HydrostaticTerm_InitAll(void* forceTerm,
                                      double upper_density,
                                      double upper_alpha,
@@ -137,9 +104,9 @@
 	void _HydrostaticTerm_Print( void* forceTerm, Stream* stream );
 
 	void* _HydrostaticTerm_DefaultNew( Name name ) ;
-        void _HydrostaticTerm_Construct( void* forceTerm,
-                                         Stg_ComponentFactory* cf,
-                                         void* data ) ;
+        void _HydrostaticTerm_AssignFromXML( void* forceTerm,
+                                             Stg_ComponentFactory* cf,
+                                             void* data ) ;
 	void _HydrostaticTerm_Build( void* forceTerm, void* data ) ;
 	void _HydrostaticTerm_Initialise( void* forceTerm, void* data ) ;
 	void _HydrostaticTerm_Execute( void* forceTerm, void* data ) ;
