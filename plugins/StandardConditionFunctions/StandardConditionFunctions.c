@@ -68,19 +68,19 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TaperedRotationX, (Name)"TaperedRotationX" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 		
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TaperedRotationY, (Name)"TaperedRotationY" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShear, (Name)"Velocity_SimpleShear" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
         condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShearInverted, (Name)"Velocity_SimpleShearInverted" );
-        ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+        ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ShearZ, (Name)"ShearZ" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Extension, (Name)"Velocity_Extension" );
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_PartialLid_TopLayer, (Name)"Velocity_PartialLid_TopLayer"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
@@ -132,37 +132,37 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct1, (Name)"StepFunctionProduct1");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct2, (Name)"StepFunctionProduct2");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct3, (Name)"StepFunctionProduct3");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct4, (Name)"StepFunctionProduct4");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TemperatureProfile, (Name)"TemperatureProfile");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_Gaussian, (Name)"Gaussian");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_ERF,
                                          (Name)"ERF");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_ERFC,
                                          (Name)"ERFC");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_RubberSheet,
                                          (Name)"RubberSheet");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_MovingStepFunction, (Name)"MovingStepFunction");
-	ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpecRidge3D, (Name)"SpecRidge3D" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
