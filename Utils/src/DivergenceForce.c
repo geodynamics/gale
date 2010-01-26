@@ -89,7 +89,7 @@ DivergenceForce* _DivergenceForce_New( DIVERGENCEFORCE_DEFARGS)
 	DivergenceForce* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(DivergenceForce) );
+	assert( _sizeOfSelf >= sizeof(DivergenceForce) );
 	self = (DivergenceForce*) _ForceTerm_New( FORCETERM_PASSARGS);
 	
 	return self;

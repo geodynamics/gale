@@ -93,7 +93,7 @@ StressBC* _StressBC_New( STRESSBC_DEFARGS)
 	StressBC* self;
 	
 	/* Allocate memory */
-	assert( sizeOfSelf >= sizeof(StressBC) );
+	assert( _sizeOfSelf >= sizeof(StressBC) );
 	self = (StressBC*) _ForceTerm_New( FORCETERM_PASSARGS);
 	
         self->conFunc_Register=condFunc_Register;
