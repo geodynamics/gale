@@ -169,10 +169,10 @@ class Package:
         # If this package was required and it failed print out a message.
         if not self.result and self.required:
             print
+            print '****  ERROR ****'
             print 'Failed to locate required package %s.'%self.name
             print 'Details in \'config.log\''
-            print
-            self.env.Exit()
+            self.env.UWExit()
 
         # If successful, update the original environment.
         if self.result:
