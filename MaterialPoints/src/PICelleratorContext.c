@@ -139,7 +139,7 @@ void _PICelleratorContext_Delete( void* context ) {
 }
 
 void _PICelleratorContext_Destroy( void *component, void* context ) {
-	PICelleratorContext* self = (PICelleratorContext*)context;
+	PICelleratorContext* self = (PICelleratorContext*)component;
 	
 	_FiniteElementContext_Destroy( self );
 }
