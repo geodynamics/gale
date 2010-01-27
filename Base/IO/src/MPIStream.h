@@ -88,7 +88,7 @@
 
 
 	/** Printf() implementation. */
-	SizeT _MPIStream_Printf( Stream* stream, char *fmt, va_list args );
+	SizeT _MPIStream_Printf( Stream* stream, const char *fmt, va_list args );
 	
 	/** Write() implementation. */
 	SizeT _MPIStream_Write( Stream* stream, void *data, SizeT elem_size, SizeT num_elems );

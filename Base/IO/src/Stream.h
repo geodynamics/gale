@@ -51,7 +51,7 @@
 	/** Textual name for Stream class. */
 	extern const Type Stream_Type;
 
-	typedef SizeT (Stream_PrintfFunction) (Stream* object, char* fmt, va_list args);
+	typedef SizeT (Stream_PrintfFunction) (Stream* object, const char* fmt, va_list args);
 	typedef SizeT (Stream_WriteFunction) (Stream* object, void* data, SizeT elem_size, SizeT num_elems);
 	typedef Bool (Stream_DumpFunction) (Stream* object, void* data);
 	typedef Bool (Stream_SetFileFunction) ( Stream* object, JournalFile* file );

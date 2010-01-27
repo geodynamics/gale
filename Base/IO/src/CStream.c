@@ -110,7 +110,7 @@ void _CStream_Print( void* cStream, Stream* stream ) {
 		
 }
 	
-SizeT _CStream_Printf( Stream* stream, char *fmt, va_list args )
+SizeT _CStream_Printf( Stream* stream, const char *fmt, va_list args )
 {
 	CStream* self = (CStream*)stream;
 	SizeT    printResult;

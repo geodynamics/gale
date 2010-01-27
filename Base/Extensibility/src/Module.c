@@ -123,8 +123,6 @@ void _Module_Init(
 	int                             fullPathLength = 0;
 	int                             length;
 	Index                           dir_i;
-	XML_IO_Handler*	                ioHandler;
-	const char*	                metadata;
 #endif
 	
 	stream =  Journal_Register( Info_Type, self->type );
@@ -211,9 +209,6 @@ void _Module_Delete( void* module ) {
 void _Module_Print( void* module, Stream* stream ) {
 	Module* self = (Module*)module;
 
-#ifndef NOSHARED
-	Dictionary* depList;
-#endif
 	Index count = 0;
 	Index i;
 	const char* version;

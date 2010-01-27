@@ -101,7 +101,7 @@ void _BinaryStream_Print( void* BinaryStream, Stream* stream ) {
 		
 }
 	
-SizeT _BinaryStream_Printf( Stream* stream, char *fmt, va_list args )
+SizeT _BinaryStream_Printf( Stream* stream, const char *fmt, va_list args )
 {
 	/* TODO? */
 	return False;

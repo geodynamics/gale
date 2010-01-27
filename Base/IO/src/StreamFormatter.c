@@ -108,7 +108,7 @@ void* _StreamFormatter_Copy( void* streamFormatter, void* dest, Bool deep, Name 
 }
 
 
-char* StreamFormatter_Format( void* formatter, const char* const fmt )
+const char* StreamFormatter_Format( void* formatter, const char* const fmt )
 {
 	StreamFormatter* self = (StreamFormatter*)formatter;
 	return self->_format( self, fmt );

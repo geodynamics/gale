@@ -58,8 +58,8 @@
 	char* StG_Strdup( const char* const str );
 
 	/** StGermain's version of asprintf which allocates enough space for a string before printing to it */
-	int Stg_asprintf( char** string, char* format, ... ) ;
-	int Stg_vasprintf( char** string, char* format, va_list ap ) ;
+	int Stg_asprintf( char** string, const char* format, ... ) ;
+	int Stg_vasprintf( char** string, const char* format, va_list ap ) ;
 
 	/** Check to see whether string is empty or only has white space */
 	Bool Stg_StringIsEmpty( char* string ) ;

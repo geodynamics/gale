@@ -263,8 +263,8 @@ SizeT Stream_Printf( Stream *stream, const char const *fmt, va_list args )
 {
 	int i;
 	SizeT result;
-	char* lastFormat;
-	char* currentFormat;
+	const char* lastFormat;
+	const char* currentFormat;
 
 	if ( stream->_file == NULL ) {
 		return 0;

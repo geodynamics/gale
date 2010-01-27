@@ -56,7 +56,7 @@
 	/* The following terms are parameters that have been passed into this function but are being set before being passed onto the parent */
 	/* This means that any values of these parameters that are passed into this function are not passed onto the parent function
 	   and so should be set to ZERO in any children of this class. */
-	nameAllocationType = NON_GLOBAL;
+	AllocationType nameAllocationType = NON_GLOBAL;
 
 const Type Codelet_Type = "Codelet";
 

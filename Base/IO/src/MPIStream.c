@@ -114,7 +114,7 @@ void _MPIStream_Print( void* mpiStream, Stream* stream ) {
 		
 }
 	
-SizeT _MPIStream_Printf( Stream* stream, char *fmt, va_list args )
+SizeT _MPIStream_Printf( Stream* stream, const char *fmt, va_list args )
 {
 	MPIStream* self = (MPIStream*)stream;
 	MPI_Status status;

@@ -41,6 +41,7 @@
 #include "Variable_Register.h"
 #include "VariableCondition.h"
 #include "VariableAllVC.h"
+#include "ConditionFunction_Register.h"
 
 #include <string.h>
 #include <assert.h>

@@ -41,6 +41,7 @@ def build_suite_runner(env, target, hdrs, objs, **kw):
     src = """#include <stdlib.h>
 #include <mpi.h>
 #include <pcu/pcu.h>
+#include <unistd.h>
 %s
 %s
 

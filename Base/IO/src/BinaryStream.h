@@ -85,7 +85,7 @@
 
 
 	/** Printf() implementation. */
-	SizeT _BinaryStream_Printf( Stream* stream, char *fmt, va_list args );
+	SizeT _BinaryStream_Printf( Stream* stream, const char *fmt, va_list args );
 	
 	/** Write() implementation. */
 	SizeT _BinaryStream_Write( Stream* stream, void *data, SizeT elem_size, SizeT num_elems );

@@ -122,7 +122,7 @@ char* StG_Strdup( const char* const str ) {
 }
 
 
-int Stg_vasprintf( char** string, char* format, va_list ap ) {
+int Stg_vasprintf( char** string, const char* format, va_list ap ) {
 	int       allocStringSize = 100;
 	int       sizeOfString;
 
@@ -169,7 +169,7 @@ int Stg_vasprintf( char** string, char* format, va_list ap ) {
 }
 
 
-int Stg_asprintf( char** string, char* format, ... ) {
+int Stg_asprintf( char** string, const char* format, ... ) {
 	int       sizeOfString;
 	va_list   ap;
 	

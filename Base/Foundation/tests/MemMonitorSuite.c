@@ -38,7 +38,7 @@
 
 #include "pcu/pcu.h"
 #include "StGermain/Base/Foundation/Foundation.h"
-#include "StGermain/Base/Foundation/forwardDecl.h" /* For Journal stuff */
+#include "StGermain/Base/IO/IO.h" /* For Journal stuff */
 #include "MemMonitorSuite.h"
 
 

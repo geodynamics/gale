@@ -30,6 +30,7 @@
 
 #include "pcu/pcu.h"
 #include "StGermain/Base/Foundation/Foundation.h"
+#include "StGermain/Base/IO/IO.h"
 #include "ObjectListSuite.h"
 
 const Type DummyClass_Type = "DummyClass_Type";
