@@ -162,7 +162,7 @@ void _UnderworldContext_Delete( void* context ) {
 }
 
 void _UnderworldContext_Destroy( void *component, void* context ) {
-	UnderworldContext* self = (UnderworldContext*)context;
+	UnderworldContext* self = (UnderworldContext*)component;
 	
 	_PICelleratorContext_Destroy( self, self );
 }
