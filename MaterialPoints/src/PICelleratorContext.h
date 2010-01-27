@@ -107,7 +107,7 @@
 	void _PICelleratorContext_Delete( void* context );
 
 	/* Destroy implementation */	
-	void _PICelleratorContext_Destroy( void* context );
+	void _PICelleratorContext_Destroy( void *component, void* context );
 
 	/* Print implementation */
 	void _PICelleratorContext_Print( void* context, Stream* stream );

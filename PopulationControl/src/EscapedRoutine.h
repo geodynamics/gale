@@ -141,6 +141,6 @@
 	void EscapedRoutine_SortParticleList( void* escapedRoutine );
 
 	void EscapedRoutine_RemoveParticles( void* escapedRoutine, Swarm* swarm );
-
+        int _EscapedRoutine_CompareParticles( const void* _aParticleInfo, const void* _bParticleInfo );
 #endif 
 

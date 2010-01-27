@@ -160,7 +160,7 @@ void _DiffusionSMT_Build( void* matrixTerm, void* data ) {
     _StiffnessMatrixTerm_Build( self, data );
 
     /* Get Component Factory if we can */
-    context = self->context;
+    context = (AbstractContext*)(self->context);
     cf = context->CF;
 
     /* Sort out material extension stuff */

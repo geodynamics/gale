@@ -116,7 +116,7 @@ void EscapedRoutineSuite_TestInitialiseParticleList( EscapedRoutineSuiteData* da
    
    /* Fill the list with some initial random data */
    for ( pToRemove_I=0; pToRemove_I < data->escRoutine->particlesToRemoveAlloced; pToRemove_I++ ) {
-      data->escRoutine->particlesToRemoveList[pToRemove_I] == pToRemove_I*2;
+      data->escRoutine->particlesToRemoveList[pToRemove_I] = pToRemove_I*2;
    }
 
    EscapedRoutine_InitialiseParticleList( data->escRoutine );
@@ -167,7 +167,7 @@ void EscapedRoutineSuite_TestRemoveParticles( EscapedRoutineSuiteData* data ) {
    /* First set up the particles to remove list, and manually mark these */
    for ( pToRemove_I=0; pToRemove_I < pToRemoveCount; pToRemove_I++ ) {
       EscapedRoutine_SetParticleToRemove( data->escRoutine, data->swarm, pToRemoveList[pToRemove_I] );
-      ((Particle*)Swarm_ParticleAt( data->swarm, pToRemoveList[pToRemove_I] ))->toRemove == True; 
+      ((Particle*)Swarm_ParticleAt( data->swarm, pToRemoveList[pToRemove_I] ))->toRemove = True; 
    }
    pcu_check_true( data->escRoutine->particlesToRemoveCount == pToRemoveCount );
 
