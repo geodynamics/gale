@@ -84,13 +84,16 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, OperatorFeVariable_Type, (Name)"0", _OperatorFeVariable_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, ShapeFeVariable_Type, (Name)"0", ShapeFeVariable_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, FeSwarmVariable_Type, (Name)"0", _FeSwarmVariable_DefaultNew  );
-	Stg_ComponentRegister_Add( componentRegister, FeMesh_Type, (Name)"0", _FeMesh_DefaultNew  );
-	Stg_ComponentRegister_Add( componentRegister, C0Generator_Type, (Name)"0", C0Generator_New  );
-	Stg_ComponentRegister_Add( componentRegister, C2Generator_Type, (Name)"0", C2Generator_New  );
+	Stg_ComponentRegister_Add( componentRegister, FeMesh_Type, (Name)"0",
+                                   (Stg_Component_DefaultConstructorFunction*)_FeMesh_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, C0Generator_Type, (Name)"0",
+                                   (Stg_Component_DefaultConstructorFunction*)C0Generator_New  );
+	Stg_ComponentRegister_Add( componentRegister, C2Generator_Type, (Name)"0",
+                                   (Stg_Component_DefaultConstructorFunction*)C2Generator_New  );
 /*
 	Stg_ComponentRegister_Add( componentRegister, P1Generator_Type, (Name)"0", P1Generator_New  );
 */
-	Stg_ComponentRegister_Add( componentRegister, Inner2DGenerator_Type, (Name)"0", Inner2DGenerator_New  );
+	Stg_ComponentRegister_Add( componentRegister, Inner2DGenerator_Type, (Name)"0", (Stg_Component_DefaultConstructorFunction*)Inner2DGenerator_New  );
 	Stg_ComponentRegister_Add( componentRegister, FieldTest_Type, (Name)"0", _FieldTest_DefaultNew  );
 	
 	/** Register Parents for type checking */

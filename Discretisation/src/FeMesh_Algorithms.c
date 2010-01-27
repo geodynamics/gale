@@ -177,7 +177,7 @@ Bool FeMesh_Algorithms_SearchWithTree( void* _self, double* pnt, unsigned* dim, 
       return False;
 
    *el = nLocals;
-   elType = (FeMesh_ElementType*)Mesh_GetElementType( self->mesh, 0 );
+   elType = Mesh_GetElementType( self->mesh, 0 );
    for( ii = 0; ii < nEls; ii++ ) {
       if( FeMesh_ElementType_ElementHasPoint( elType, els[ii], pnt, &curDim, &curEl ) ) {
          if( curEl >= nLocals ) {

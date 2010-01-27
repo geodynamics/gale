@@ -54,7 +54,7 @@
 		/* Virtual info */			\
 							\
 		/* FeMesh info */			\
-		char*			feElFamily;	\
+		const char*			feElFamily;	\
 		ElementType*		feElType;	\
 		Bool		elementMesh;		\
 		IArray*	inc;

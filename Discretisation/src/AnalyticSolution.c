@@ -164,9 +164,9 @@ void _AnalyticSolution_AssignFromXML( void* analyticSolution, Stg_ComponentFacto
 	Swarm*            integrationSwarm;
 	Bool              verboseMode;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", DomainContext, False, data );
+	context = (AbstractContext*)(Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", DomainContext, False, data ));
 	if( !context  )
-		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  );
+          context = (AbstractContext*)(Stg_ComponentFactory_ConstructByName( cf, (Name)"context", DomainContext, True, data  ));
 
 	integrationSwarm = Stg_ComponentFactory_ConstructByName( cf, (Name)"gaussSwarm", Swarm, True, data  ); 
 	verboseMode = Stg_ComponentFactory_GetRootDictBool( cf, (Dictionary_Entry_Key)"analyticSolutionVerbose", False  );
