@@ -113,7 +113,7 @@ void _ConstitutiveMatrix_Init(
    Stg_CheckType( self->context, PICelleratorContext );
 
    self->materials_Register  = ((PICelleratorContext*)self->context)->materials_Register;
-   Journal_Firewall( self->materials_Register==NULL,
+   Journal_Firewall( self->materials_Register!=NULL,
       Journal_MyStream( Error_Type, self ),
       "Error - in %s(): \n no materials_Register found \n" , __func__ );
    
