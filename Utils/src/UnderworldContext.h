@@ -98,7 +98,7 @@
 	void _UnderworldContext_Delete( void* context );
 	
 	/* Destroy implmentation  */
-	void _UnderworldContext_Destroy( void* context );
+	void _UnderworldContext_Destroy( void *component, void* context );
 
 	/* Print implementation */
 	void _UnderworldContext_Print( void* context, Stream* stream );

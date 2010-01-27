@@ -295,7 +295,8 @@ void _Underworld_IncompressibleExtensionBC_AssignFromXML( void* _self, Stg_Compo
 	ConditionFunction*  condFunc;
    TimeIntegrator* timeIntegrator = (TimeIntegrator* )  LiveComponentRegister_Get( context->CF->LCRegister, (Name)"timeIntegrator"  );
 
-        self->context   = context;
+        self->context   = (AbstractContext*)context;
+        self->ctx   = context;
 
 	condFunc = ConditionFunction_New( IncompressibleExtensionBC_TopCondition, (Name)"IncompressibleExtensionBC_TopCondition"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );

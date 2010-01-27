@@ -135,7 +135,7 @@ void _MixedStabiliserTerm_Destroy( void* _self, void* data ) {
 
 void _MixedStabiliserTerm_AssembleElement( void* _self,
 					  StiffnessMatrix* stiffMat,
-					  int elementIndex,
+					  Element_LocalIndex elementIndex,
 					  SystemLinearEquations* _sle,
 					  FiniteElementContext* ctx,
 					  double** elStiffMat )

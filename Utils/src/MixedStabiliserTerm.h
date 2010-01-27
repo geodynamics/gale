@@ -77,7 +77,7 @@ void* _MixedStabiliserTerm_DefaultNew( Name name );
 
 void _MixedStabiliserTerm_AssembleElement( void* _self,
 					  StiffnessMatrix* stiffMat,
-					  int elementIndex,
+					  Element_LocalIndex elementIndex,
 					  SystemLinearEquations* _sle,
 					  FiniteElementContext* ctx,
 					  double** elStiffMat );

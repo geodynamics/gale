@@ -255,7 +255,7 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
                             Dictionary_GetDouble( uwCtx->dictionary, "minX");
                           
 			/* Read the list of variables to interpolate. */
-			varLst = Dictionary_Entry_Value_GetMember( Dictionary_Entry_Value_GetElement( sysLst, (Dictionary_Entry_Key)sys_i  ), "fields" );
+			varLst = Dictionary_Entry_Value_GetMember( Dictionary_Entry_Value_GetElement( sysLst, sys_i  ), "fields" );
 
 			if( varLst ) {
 				unsigned	var_i;

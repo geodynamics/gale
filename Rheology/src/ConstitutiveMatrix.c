@@ -110,12 +110,10 @@ void _ConstitutiveMatrix_Init(
       self->name,
       self->integrationSwarm->name );
 
-   Journal_Firewall( Stg_CheckType( self->context, PICelleratorContext ),
-      Journal_MyStream( Error_Type, self ),
-      "Error - in %s(): \n context is type %s,  not type PICelleratorContext as required.\n" , __func__, self->context->type );
+   Stg_CheckType( self->context, PICelleratorContext );
 
    self->materials_Register  = ((PICelleratorContext*)self->context)->materials_Register;
-   Journal_Firewall( self->materials_Register,
+   Journal_Firewall( self->materials_Register==NULL,
       Journal_MyStream( Error_Type, self ),
       "Error - in %s(): \n no materials_Register found \n" , __func__ );
    
