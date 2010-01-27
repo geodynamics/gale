@@ -35,6 +35,22 @@ env = Environment(ENV=os.environ)
 env.Tool('config', toolpath=['config'], options=options)
 
 #
+# Definition of our error function
+#
+
+def UWExit( self ):
+   print '\n'
+   print '************************************'
+   print 'If you require help, send the files:'
+   print '\tconfig.log'
+   print '\tconfig.cfg'
+   print 'to: underworld-users@vpac.org'
+   print '************************************'
+   env.Exit()
+
+env.AddMethod( UWExit )
+
+#
 # Declare which packages we're going to use.
 #
 
@@ -103,8 +119,10 @@ if not (GetOption('help') or GetOption('clean')):
 	#env.AppendUnique(LINKFLAGS=['-static'])
 	Package.static = True
     else:
+        print 
+        print '****  ERROR ****'
         print 'Invalid option \'--lib-type\''
-        sys.exit()
+        env.UWExit()
 
     env.ConfigurePackage(packages.libXML2)
     env.ConfigurePackage(packages.MPI)
@@ -124,11 +142,12 @@ if not (GetOption('help') or GetOption('clean')):
             res = env.ConfigurePackage(packages.OpenGL).result
             if not res:
                 print
+                print '****  ERROR ****'
                 print 'Need either OSMesa or OpenGL in order to use gLucifer'
                 print 'but neither could be found.'
-                print 'Details in \'config/config2/config.log\''
+                print 'Details in \'config.log\''
                 print
-                env.Exit()
+                env.UWExit()
 
         # Need an extra CPPDEFINE for gLucifer.
         env.AppendUnique(CPPDEFINES=['HAVE_GL'])
@@ -149,11 +168,12 @@ if not (GetOption('help') or GetOption('clean')):
 
         if not (res or sdl):
             print
+            print '****  ERROR ****'
             print 'Need a windowing system for gLucifer, one of either SDL,'
             print 'X11, Carbon or OSMesa. None of these could be found.'
-            print 'Details in \'config/config2/config.log\''
+            print 'Details in \'config.log\''
             print
-            env.Exit()
+            env.UWExit()
 
         # Add auxilliary gLucifer packages.
         if env.get('with_png'):
