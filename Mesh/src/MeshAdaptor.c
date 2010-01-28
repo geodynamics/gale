@@ -110,15 +110,19 @@ void _MeshAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* 
 
 void _MeshAdaptor_Build( void* _adaptor, void* data ) {
    MeshAdaptor*      self = (MeshAdaptor*)_adaptor;
-   Stg_Component_Build( self->generator, data, False );
-   Stg_Component_Build( self->srcMesh, data, False );
+   if(self->generator)
+     Stg_Component_Build( self->generator, data, False );
+   if(self->srcMesh)
+     Stg_Component_Build( self->srcMesh, data, False );
    _MeshGenerator_Build( self, data );
 }
 
 void _MeshAdaptor_Initialise( void* _adaptor, void* data ) {
    MeshAdaptor*      self = (MeshAdaptor*)_adaptor;
-   Stg_Component_Initialise( self->generator, data, False );
-   Stg_Component_Initialise( self->srcMesh, data, False );
+   if(self->generator)
+     Stg_Component_Initialise( self->generator, data, False );
+   if(self->srcMesh)
+     Stg_Component_Initialise( self->srcMesh, data, False );
    _MeshGenerator_Initialise( self, data );
    
 }
@@ -129,8 +133,10 @@ void _MeshAdaptor_Execute( void* adaptor, void* data ) {
 
 void _MeshAdaptor_Destroy( void* _adaptor, void* data ) {
    MeshAdaptor*      self = (MeshAdaptor*)_adaptor;
-   Stg_Component_Destroy( self->generator, data, False );
-   Stg_Component_Destroy( self->srcMesh, data, False );
+   if(self->generator)
+     Stg_Component_Destroy( self->generator, data, False );
+   if(self->srcMesh)
+     Stg_Component_Destroy( self->srcMesh, data, False );
    _MeshGenerator_Destroy( self, data );
 }
 
