@@ -91,7 +91,7 @@
 	void _StressBC_Print( void* forceTerm, Stream* stream );
 
 	void* _StressBC_DefaultNew( Name name ) ;
-        void _StressBC_Construct( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
+        void _StressBC_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) ;
 	void _StressBC_Build( void* forceTerm, void* data ) ;
 	void _StressBC_Initialise( void* forceTerm, void* data ) ;
 	void _StressBC_Execute( void* forceTerm, void* data ) ;

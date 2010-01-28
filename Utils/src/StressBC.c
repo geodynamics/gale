@@ -137,18 +137,18 @@ void _StressBC_Print( void* forceTerm, Stream* stream ) {
 
 void* _StressBC_DefaultNew( Name name ) {
 	/* Variables set in this function */
-	SizeT                                              _sizeOfSelf = sizeof(BuoyancyForceTerm);
-	Type                                                      type = BuoyancyForceTerm_Type;
-	Stg_Class_DeleteFunction*                              _delete = _BuoyancyForceTerm_Delete;
-	Stg_Class_PrintFunction*                                _print = _BuoyancyForceTerm_Print;
+	SizeT                                              _sizeOfSelf = sizeof(StressBC);
+	Type                                                      type = StressBC_Type;
+	Stg_Class_DeleteFunction*                              _delete = _StressBC_Delete;
+	Stg_Class_PrintFunction*                                _print = _StressBC_Print;
 	Stg_Class_CopyFunction*                                  _copy = NULL;
-	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _BuoyancyForceTerm_DefaultNew;
-	Stg_Component_ConstructFunction*                    _construct = _BuoyancyForceTerm_AssignFromXML;
-	Stg_Component_BuildFunction*                            _build = _BuoyancyForceTerm_Build;
-	Stg_Component_InitialiseFunction*                  _initialise = _BuoyancyForceTerm_Initialise;
-	Stg_Component_ExecuteFunction*                        _execute = _BuoyancyForceTerm_Execute;
-	Stg_Component_DestroyFunction*                        _destroy = _BuoyancyForceTerm_Destroy;
-	ForceTerm_AssembleElementFunction*            _assembleElement = _BuoyancyForceTerm_AssembleElement;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _StressBC_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _StressBC_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _StressBC_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _StressBC_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _StressBC_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _StressBC_Destroy;
+	ForceTerm_AssembleElementFunction*            _assembleElement = _StressBC_AssembleElement;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;

@@ -83,7 +83,6 @@ void _MixedStabiliserTerm_Init( MixedStabiliserTerm* self ) {
    self->picSwarm = NULL;
    self->storeVisc = NULL;
    self->Ni = NULL;
-   self->GNx = NULL;
    self->elStiffMat = NULL;
 }
 
@@ -92,8 +91,6 @@ void _MixedStabiliserTerm_Delete( void* _self ) {
 
    if( self->Ni )
       Memory_Free( self->Ni );
-   if( self->GNx )
-      Memory_Free( self->GNx );
    if( self->elStiffMat )
       Memory_Free( self->elStiffMat );
 

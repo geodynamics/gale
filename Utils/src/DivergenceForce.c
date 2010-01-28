@@ -137,18 +137,18 @@ void _DivergenceForce_Print( void* forceTerm, Stream* stream ) {
 
 void* _DivergenceForce_DefaultNew( Name name ) {
 	/* Variables set in this function */
-	SizeT                                              _sizeOfSelf = sizeof(BuoyancyForceTerm);
-	Type                                                      type = BuoyancyForceTerm_Type;
-	Stg_Class_DeleteFunction*                              _delete = _BuoyancyForceTerm_Delete;
-	Stg_Class_PrintFunction*                                _print = _BuoyancyForceTerm_Print;
+	SizeT                                              _sizeOfSelf = sizeof(DivergenceForce);
+	Type                                                      type = DivergenceForce_Type;
+	Stg_Class_DeleteFunction*                              _delete = _DivergenceForce_Delete;
+	Stg_Class_PrintFunction*                                _print = _DivergenceForce_Print;
 	Stg_Class_CopyFunction*                                  _copy = NULL;
-	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _BuoyancyForceTerm_DefaultNew;
-	Stg_Component_ConstructFunction*                    _construct = _BuoyancyForceTerm_AssignFromXML;
-	Stg_Component_BuildFunction*                            _build = _BuoyancyForceTerm_Build;
-	Stg_Component_InitialiseFunction*                  _initialise = _BuoyancyForceTerm_Initialise;
-	Stg_Component_ExecuteFunction*                        _execute = _BuoyancyForceTerm_Execute;
-	Stg_Component_DestroyFunction*                        _destroy = _BuoyancyForceTerm_Destroy;
-	ForceTerm_AssembleElementFunction*            _assembleElement = _BuoyancyForceTerm_AssembleElement;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _DivergenceForce_DefaultNew;
+	Stg_Component_ConstructFunction*                    _construct = _DivergenceForce_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _DivergenceForce_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _DivergenceForce_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _DivergenceForce_Execute;
+	Stg_Component_DestroyFunction*                        _destroy = _DivergenceForce_Destroy;
+	ForceTerm_AssembleElementFunction*            _assembleElement = _DivergenceForce_AssembleElement;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
