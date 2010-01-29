@@ -196,7 +196,7 @@ void _lucX11Window_Execute( void* window, void* data ) {
 	if (self->interactive && self->isMaster)
     {
 		glXMakeCurrent( self->display, self->win, self->glxcontext);
-        XSetInputFocus(self->display, self->win, RevertToParent, CurrentTime);
+      //XSetInputFocus(self->display, self->win, RevertToParent, CurrentTime);
     }
     else 
         glXMakeCurrent( self->display, self->glxpmap, self->glxcontext);
@@ -220,7 +220,8 @@ void _lucX11Window_Destroy( void* window, void* data ) {
 	XFree( self->vi );
 	self->vi = 0;
 
-	glXDestroyContext( self->display,  self->glxcontext);
+	if (self->glxcontext) 
+	   glXDestroyContext( self->display,  self->glxcontext);
 	self->glxcontext = 0;
 
 	XSetCloseDownMode( self->display,  DestroyAll);
@@ -318,15 +319,15 @@ void _lucX11Window_Resize( void* window ) {
     /* Master window resized? Create new background pixmap of required size */
     if (self->interactive && !self->isMaster)
     {
-    	lucX11Window_CloseBackgroundWindow( self );
-   		lucX11Window_CreateBackgroundWindow( self );
+      lucX11Window_CloseBackgroundWindow( self );
+      lucX11Window_CreateBackgroundWindow( self );
     }
 
 	/* Close window and create background window if switched out of interactive mode */
 	if (!self->interactive)
 	{
-		lucX11Window_CloseInteractiveWindow( self );
-		lucX11Window_CreateBackgroundWindow( self );
+      lucX11Window_CloseInteractiveWindow( self );
+      lucX11Window_CreateBackgroundWindow( self );
 		self->quitEventLoop = True;
 	}
 
@@ -567,7 +568,6 @@ void lucX11Window_CloseInteractiveWindow( lucX11Window* self ) {
 
 	XDestroyWindow( self->display , self->win );
 	self->win = 0;
-    self->glxcontext = NULL;
 
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
@@ -580,7 +580,6 @@ void lucX11Window_CloseBackgroundWindow( lucX11Window* self ) {
 	self->glxpmap = 0;
 	XFreePixmap(self->display, self->pmap);
 	self->pmap = 0;
-    self->glxcontext = NULL;
 
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
