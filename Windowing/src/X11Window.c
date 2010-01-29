@@ -339,8 +339,9 @@ Bool lucX11Window_CreateDisplay( void* window )  {
 	static int configuration[] = { GLX_DOUBLEBUFFER, GLX_RGBA, GLX_DEPTH_SIZE, 16,
 			GLX_STENCIL_SIZE, 1, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, None};
 	static int alphaConfiguration[] = { GLX_DOUBLEBUFFER, GLX_RGBA, GLX_DEPTH_SIZE, 16,
-			GLX_STENCIL_SIZE, 1, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, GLX_ALPHA_SIZE, 1, None};
-	
+			GLX_STENCIL_SIZE, 1, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, GLX_ALPHA_SIZE, 1, None}; 
+   int* config = alphaConfiguration;
+
 	/*********************** Create Display ******************************/
 	self->display = XOpenDisplay(NULL);
 	if (self->display == NULL) {
@@ -368,14 +369,17 @@ Bool lucX11Window_CreateDisplay( void* window )  {
 	}
 
 	/* find an OpenGL-capable display - trying different configurations if nessesary */
-	self->vi = glXChooseVisual(self->display, DefaultScreen(self->display), &alphaConfiguration[0]);
+   /* Note: only attempt to get double buffered visuals when in interactive mode */
+   self->vi = NULL;
+   if (self->interactive)
+   	self->vi = glXChooseVisual(self->display, DefaultScreen(self->display), config);
 	self->doubleBuffer = True;
 	if (self->vi == NULL) {
 		Journal_Printf( lucError, "In func %s: Couldn't open RGBA Double Buffer display\n", __func__);
-		self->vi = glXChooseVisual( self->display, DefaultScreen( self->display), &alphaConfiguration[1]);
+		self->vi = glXChooseVisual( self->display, DefaultScreen( self->display), config + 1);
 		self->doubleBuffer = False;
 	}
-	if (self->vi == NULL) {
+	if (self->interactive && self->vi == NULL) {
 		Journal_Printf( lucError, "In func %s: Couldn't open RGBA display\n", __func__);
 		self->vi = glXChooseVisual(self->display, DefaultScreen(self->display), &configuration[0]);
 		self->doubleBuffer = True;
@@ -392,7 +396,6 @@ Bool lucX11Window_CreateDisplay( void* window )  {
 
 	return True;
 }
-
 
 Bool lucX11Window_CreateContext( void* window, Bool direct )  {
 	lucX11Window*  self      = (lucX11Window*)window;
