@@ -567,14 +567,18 @@ Bool Mesh_Algorithms_SearchWithFullIncidence( void* algorithms, double* point,
  * If it is required could be enabled with a flag or in another function,
  * eg: Mesh_Algorithms_SearchBruteForce, so it doesn't do this by default
  * Plotting IsoSurface in one instance spends 30 seconds here searching for a ~1 second rendering job */
-#if 0   
+
+/* 1-Feb-2010: Re-enabling it because with distorted elements the
+   point may not be inside the incident elements of the nearest
+   vertex.  Yes, this really happens. */
+
 	/* Brute force, search every element in turn (last resort). */
 	nEls = Mesh_GetDomainSize( mesh, nDims );
 	for( e_i = 0; e_i < nEls; e_i++ ) {
 		if( Mesh_ElementHasPoint( mesh, e_i, point, dim, ind ) )
 			return True;
 	}
-#endif
+
 	return False;
 }
 
