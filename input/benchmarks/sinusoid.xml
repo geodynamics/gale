@@ -16,10 +16,6 @@
       <param name="Type">StgFEM_StandardConditionFunctions</param>
       <param name="Context">context</param>
     </struct>
-    <struct>
-      <param name="Type">Underworld_VTKOutput</param>
-      <param name="Context">context</param>
-    </struct>
   </plugins>
   <struct name="components">
     <struct name="context">
