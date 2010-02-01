@@ -4,11 +4,27 @@
     <toolbox>Underworld</toolbox>
   </import>
   <plugins>
-    <plugin>Underworld_EulerDeform</plugin>
-    <plugin>StgFEM_StandardConditionFunctions</plugin>
-    <plugin>Underworld_VTKOutput</plugin>
+    <struct>
+      <param name="Type">Underworld_EulerDeform</param>
+      <param name="Context">context</param>
+    </struct>
+    <struct>
+      <param name="Type">Underworld_VTKOutput</param>
+      <param name="Context">context</param>
+    </struct>
+    <struct>
+      <param name="Type">StgFEM_StandardConditionFunctions</param>
+      <param name="Context">context</param>
+    </struct>
+    <struct>
+      <param name="Type">Underworld_VTKOutput</param>
+      <param name="Context">context</param>
+    </struct>
   </plugins>
   <struct name="components">
+    <struct name="context">
+      <param name="Type">UnderworldContext</param>
+    </struct>
     <struct name="mesh-linear">
       <param name="Type">FeMesh</param>
       <param name="elementType">linear</param>
