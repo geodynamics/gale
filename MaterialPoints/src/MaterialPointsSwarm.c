@@ -430,31 +430,7 @@ void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
          Memory_Free( particleCPUID );
       }
 	/* TODO: print info / debug message */
-	}
-#if 0
-	else {
-		Particle_Index          lParticle_I=0;
-		MaterialPoint*		matPoint=NULL;
-
-		/* Beforehand, set each particle to have UNDEFINED_MATERIAL */
-		for ( lParticle_I = 0; lParticle_I < self->particleLocalCount; lParticle_I++ ) {
-			matPoint = (MaterialPoint*)Swarm_ParticleAt( self, lParticle_I );
-			matPoint->materialIndex = UNDEFINED_MATERIAL;
-		}
-		/* Now setup the material properties */
-		if ( self->material == NULL ) {
-			/* Do it by the layout of all known materials */
-			Materials_Register_SetupSwarm( self->materials_Register, self );
-		}
-		else {
-			Material_Layout( self->material, self );
-			Materials_Register_AssignParticleProperties( 
-					self->materials_Register, 
-					self, 
-					self->swarmVariable_Register->variable_Register );
-		}
-	}
-#endif
+   }
 }
 void _MaterialPointsSwarm_Execute( void* swarm, void* data ) {
 	MaterialPointsSwarm*	self = (MaterialPointsSwarm*)swarm;
