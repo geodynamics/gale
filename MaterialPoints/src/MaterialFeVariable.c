@@ -163,15 +163,8 @@ void _MaterialFeVariable_Build( void* materialFeVariable, void* data ) {
 
 	tmpName = Stg_Object_AppendSuffix( self, (Name)"DataVariable"  );
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
-	self->dataVariable = Variable_NewScalar( 
-		tmpName,
-		(AbstractContext*)self->context,
-		Variable_DataType_Double, 
-		&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
-		NULL,
-		(void**)&self->data, 
-		variable_Register );
-	Memory_Free( tmpName );
+	self->dataVariable = Variable_NewScalar( tmpName, (AbstractContext*)self->context, Variable_DataType_Double, (Index*)&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, NULL, (void**)&self->data, variable_Register );
+	Memory_Free( tmpName  );
 	self->fieldComponentCount = 1;
 	
 	tmpName = Stg_Object_AppendSuffix( self, (Name)"DofLayout"  );
