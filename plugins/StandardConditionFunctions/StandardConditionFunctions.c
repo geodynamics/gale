@@ -178,6 +178,26 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
         ConditionFunction_Register_Add( condFunc_Register, condFunc );
 }
 
+void _StgFEM_StandardConditionFunctions_Destroy( void* _self, void* data ) {
+   /* This function will totally clean the condFunc_Register
+    *
+    * This could be trouble some if other code adds or deletes condition functions on this register
+    */
+
+   unsigned *refCount = &(condFunc_Register->count);
+
+   /* first check if there are things still on the condFunc_Register, if so .... */
+   if( *refCount != 0 ) {
+      while( *refCount != 0 ) {
+
+         _ConditionFunction_Delete( condFunc_Register->_cf[ *refCount-1 ] );
+         condFunc_Register->_cf[ *refCount-1 ] = NULL;
+
+         *refCount = *refCount - 1;
+      }
+   }
+   _Codelet_Destroy( _self, data );
+}
 void* _StgFEM_StandardConditionFunctions_DefaultNew( Name name ) {
 	return Codelet_New(
 		StgFEM_StandardConditionFunctions_Type,
@@ -186,7 +206,7 @@ void* _StgFEM_StandardConditionFunctions_DefaultNew( Name name ) {
 		_Codelet_Build,
 		_Codelet_Initialise,
 		_Codelet_Execute,
-		_Codelet_Destroy,
+		_StgFEM_StandardConditionFunctions_Destroy,
 		name );
 }
 
@@ -967,7 +987,7 @@ void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Va
 /*           } */
 }
 
-void StgFEM_StandardConditionFunctions_MovingStepFunction( int nodeInd, int varInd, void* _ctx, void* _result ) {
+void StgFEM_StandardConditionFunctions_MovingStepFunction( Node_LocalIndex nodeInd, Variable_Index varInd, void* _ctx, void* _result ) {
    FiniteElementContext* ctx = (FiniteElementContext*)_ctx;
    FeVariable* velField;
    FeMesh* mesh;
@@ -975,7 +995,8 @@ void StgFEM_StandardConditionFunctions_MovingStepFunction( int nodeInd, int varI
    double* result = (double*)_result;
    double* coord, offsetLower, offsetUpper, left, right;
    double *wallCrd, pos;
-   int dim, wallDepth, ijk[3];
+   int dim, wallDepth;
+   unsigned ijk[3];
    char* movingWall;
    Grid* grid;
 
@@ -1004,7 +1025,7 @@ void StgFEM_StandardConditionFunctions_MovingStepFunction( int nodeInd, int varI
    ** from where the offset should be applied. */
    grid = *(Grid**)Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
    assert( grid );
-   memset( ijk, 0, 3 * sizeof(int) );
+   memset( ijk, 0, 3 * sizeof(unsigned) );
    if( !strcmp( movingWall, "lower" ) ) {
       ijk[dim] = wallDepth;
       wallCrd = Mesh_GetVertex( mesh, Grid_Project( grid, ijk ) );
