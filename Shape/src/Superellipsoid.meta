@@ -14,7 +14,7 @@
 	<param name="Reference">...</param>
 	<param name="Summary">...</param>
 	<param name="Description">This creates a superellipsoid shape given in the equation.  </param>
-	<param name="Equation">$ f(x,y,z) = \\Big\\lbrace (\frac{x}{r_x})^{\frac{1}{e_1}} + (\frac{y}{r_y})^{\frac{1}{e_1}}$ in 2D, $\\left[(\frac{x}{r_x})^{\frac{1}{e_2}} + (\frac{y}{r_y})^{\frac{1}{e_2}}\right]^{\frac{e_2}{e_1}} +(\frac{z}{r_z})^{\frac{1}{e_1}}$  in 3D. $\\Big\rbrace$  A point is deemed inside the shape if $f \\leq 1$</param>
+	<param name="Equation">$ f(x,y,z) = \Big\lbrace (\frac{x}{r_x})^{\frac{1}{e_1}} + (\frac{y}{r_y})^{\frac{1}{e_1}}$ in 2D, $\left[(\frac{x}{r_x})^{\frac{1}{e_2}} + (\frac{y}{r_y})^{\frac{1}{e_2}}\right]^{\frac{e_2}{e_1}} +(\frac{z}{r_z})^{\frac{1}{e_1}}$  in 3D. $\Big\rbrace$  A point is deemed inside the shape if $f \leq 1$</param>
 	<!--Now the interesting stuff-->
 
 	<list name="Params">
