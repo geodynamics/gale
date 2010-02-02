@@ -95,6 +95,9 @@
 	/** Exactly what to do to unload the plugin */
 	Bool _PluginsManager_UnloadPlugin( void* pluginsManager, Module* plugin );
 
+   /** unload all plugins, this includes dlclosing when dynamic libs are used */
+   Bool PluginsManager_UnloadAll( void* pluginsManager );
+
 	/** Remove all plugins from register */
    void PluginsManager_RemoveAllFromComponentRegister( void* pluginsManager );
 	

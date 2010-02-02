@@ -230,6 +230,9 @@ void _AbstractContext_Delete( void* abstractContext ) {
 	AbstractContext* self = (AbstractContext*)abstractContext;
 
 	Stg_Class_Delete( self->variable_Register );
+
+   /* unload all dynamic plugins */
+	PluginsManager_UnloadAll( self->plugins );
 	
 	/* Stg_Class_Delete parent */
 	_Stg_Component_Delete( self );
