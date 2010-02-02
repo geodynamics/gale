@@ -14,7 +14,7 @@
 	<param name="Reference">...</param>
 	<param name="Summary">...</param>
 	<param name="Description">An approximation to the Arrhenius temperature dependent rheology.</param>
-	<param name="Equation">$\eta = \eta_0 \exp\\left(-\theta T\right)$</param>
+	<param name="Equation">$\eta = \eta_0 \exp\left(-\theta T\right)$</param>
 
 	<!--Now the interesting stuff-->
 

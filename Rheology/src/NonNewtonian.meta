@@ -14,7 +14,7 @@
 	<param name="Reference">...</param>
 	<param name="Summary">...</param>
 	<param name="Description">Models rheology with dislocation creep (non-Newtonian Stress Dependent viscosity)</param>
-	<param name="Equation">Constitutive Equation: $\eta = \eta_{0} \tau^{1-n}$.\\* How this is implemented in the code: $\eta = (2\\dot\epsilon)^\frac{1-n}{n} \eta_{0}^\frac{1}{n}$</param>
+	<param name="Equation">Constitutive Equation: $\eta = \eta_{0} \tau^{1-n}$.\* How this is implemented in the code: $\eta = (2\dot\epsilon)^\frac{1-n}{n} \eta_{0}^\frac{1}{n}$</param>
 
 	<!--Now the interesting stuff-->
 	<list name="Params">
@@ -31,7 +31,7 @@
 			<param name="Essential">True</param>
 			<param name="Name">StrainRateInvariantField</param>
 			<param name="Type">FeVariable</param>
-			<param name="Description">The field that provides the $\\dot\epsilon$ in the equation above.</param>
+			<param name="Description">The field that provides the $\dot\epsilon$ in the equation above.</param>
 		</struct>
 	</list>
 

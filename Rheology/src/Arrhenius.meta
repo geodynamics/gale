@@ -14,7 +14,7 @@
 	<param name="Reference">...</param>
 	<param name="Summary">...</param>
 	<param name="Description">A temperature dependent rheology.</param>
-	<param name="Equation">$\eta = \eta_0 \exp \\left( \frac {E + V d} {T + T_0} \right)$</param>
+	<param name="Equation">$\eta = \eta_0 \exp \left( \frac {E + V d} {T + T_0} \right)$</param>
 
 	<!--Now the interesting stuff-->
 	<list name="Params">

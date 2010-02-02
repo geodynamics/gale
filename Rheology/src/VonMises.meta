@@ -43,7 +43,7 @@
 			<param name="Essential">True</param>
 			<param name="Name">StrainRateField</param>
 			<param name="Type">FeVariable</param>
-			<param name="Description">The field that provides the $\\dot\epsilon$ in the equation above.</param>
+			<param name="Description">The field that provides the $\dot\epsilon$ in the equation above.</param>
 		</struct>
 	</list>
 
