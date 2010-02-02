@@ -135,7 +135,8 @@ void testElementIntegral_CircleInterface( PICelleratorContext* context, double* 
 	Index						loop_I;
 	Index						count            = Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "SampleSize", 5000 );
 	void*						data;
-
+		      IntegrationPoint* intParticle;
+		      MaterialPoint*  materialPoint;
 	/* Create FeVariable */
 	feVariable = FeVariable_New_Full(
 		"feVariable",
@@ -164,14 +165,27 @@ void testElementIntegral_CircleInterface( PICelleratorContext* context, double* 
 		_Swarm_InitialiseParticles( materialSwarm, data );
 
 		_IntegrationPointsSwarm_UpdateHook( NULL, integrationSwarm );
+		/* The following function should not be called here as it is already called ultimately via the above function */
+		/* calling this function again causes a first iteration in Lloyd's algorithm for the Voronoi cells which we don't want here */
+		//WeightsCalculator_CalculateCell( weights, integrationSwarm, lElement_I );
+		if(loop_I%10 == 0){
+		      int i;
+
+		      for(i=0;i<integrationSwarm->cellParticleCountTbl[0];i++){
+			    intParticle  =  (IntegrationPoint*)Swarm_ParticleInCellAt( integrationSwarm, 0, i );
+			    materialPoint = (MaterialPoint*)Swarm_ParticleInCellAt( materialSwarm, 0, i );
+			    //printf("In %s M(%10.7lf %10.7lf) I(%10.7lf %10.7lf) W(%.4lf) particle layout type %s: point %d in cell %d\n",__func__,materialPoint->coord[0], materialPoint->coord[1],
+			//	   intParticle->xi[0], intParticle->xi[1], intParticle->weight, materialSwarm->particleLayout->type, i, 0);
 		
-		WeightsCalculator_CalculateCell( weights, integrationSwarm, lElement_I );
+			    //printf("%lf %lf\n",intParticle->xi[0],intParticle->xi[1]);
+		      }
+                }
 
 		/* Evaluate Integral */
 		integral = FeVariable_IntegrateElement( feVariable, integrationSwarm, lElement_I );
 
 		/* Calculate Error */
-		error = fabs( integral - analyticValue )/fabs( analyticValue );
+		error = fabs( ( integral - analyticValue )/( analyticValue ) );
 		errorSum += error;
 		errorSquaredSum += error*error;
 	}
@@ -179,7 +193,7 @@ void testElementIntegral_CircleInterface( PICelleratorContext* context, double* 
 	/* Calculate Mean and Standard Deviation */
 	*mean = errorSum / (double) count;
 	*standardDeviation = sqrt( errorSquaredSum / (double) count - *mean * *mean );
-
+	printf("In %s: Mean %lf SD %lf Sol %lf Count = %d\n", __func__, *mean, *standardDeviation, analyticValue,   count);
 	Stg_Component_Destroy( feVariable, NULL, True );
 }
 
@@ -227,8 +241,9 @@ void testElementIntegral_PolynomialFunction( PICelleratorContext* context, doubl
 		_Swarm_InitialiseParticles( materialSwarm, data );
 
 		_IntegrationPointsSwarm_UpdateHook( NULL, integrationSwarm );
-		
-		WeightsCalculator_CalculateCell( weights, integrationSwarm, lElement_I );
+		/* The following function should not be called here as it is already called ultimately via the above function */
+		/* calling this function again causes a first iteration in Lloyd's algorithm for the Voronoi cells which we don't want here */
+		//WeightsCalculator_CalculateCell( weights, integrationSwarm, lElement_I );
 
 		/* Evaluate Integral */
 		integral = FeVariable_IntegrateElement( feVariable, integrationSwarm, lElement_I );
@@ -242,7 +257,7 @@ void testElementIntegral_PolynomialFunction( PICelleratorContext* context, doubl
 	/* Calculate Mean and Standard Deviation */
 	*mean = errorSum / (double) count;
 	*standardDeviation = sqrt( errorSquaredSum / (double) count - *mean * *mean );
-
+	printf("In %s: Mean %lf SD %lf Sol %lf\n", __func__, *mean, *standardDeviation, analyticValue);
 	Stg_Component_Destroy( feVariable, NULL, True );
 }
 
@@ -290,8 +305,9 @@ void testElementIntegral_ExponentialInterface( PICelleratorContext* context, dou
 		_Swarm_InitialiseParticles( materialSwarm, data );
 
 		_IntegrationPointsSwarm_UpdateHook( NULL, integrationSwarm );
-		
-		WeightsCalculator_CalculateCell( weights, integrationSwarm, lElement_I );
+		/* The following function should not be called here as it is already called ultimately via the above function */
+		/* calling this function again causes a first iteration in Lloyd's algorithm for the Voronoi cells which we don't want here */
+		//WeightsCalculator_CalculateCell( weights, integrationSwarm, lElement_I );
 
 		/* Evaluate Integral */
 		integral = FeVariable_IntegrateElement( feVariable, integrationSwarm, lElement_I );
@@ -305,7 +321,7 @@ void testElementIntegral_ExponentialInterface( PICelleratorContext* context, dou
 	/* Calculate Mean and Standard Deviation */
 	*mean = errorSum / (double) count;
 	*standardDeviation = sqrt( errorSquaredSum / (double) count - *mean * *mean );
-
+	printf("In %s: Mean %lf SD %lf Sol %lf\n", __func__, *mean, *standardDeviation, analyticValue);
 	Stg_Component_Destroy( feVariable, NULL, True );
 }
 
