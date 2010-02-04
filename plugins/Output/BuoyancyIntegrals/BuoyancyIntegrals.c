@@ -293,7 +293,7 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_BuoyancyIntegrals_Type );
 	
 	velocityField = (FeVariable* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"VelocityField" );
-	temperatureField = (FeVariable* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"temperatureField" );
+	temperatureField = (FeVariable* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"TemperatureField" );
 	gaussSwarm = (Swarm* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"gaussSwarm" );
 
 	/* initialise values to compute */
@@ -426,7 +426,7 @@ void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
 	
 	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_BuoyancyIntegrals_Type );
 	
-	temperatureField = (FeVariable* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"temperatureField"  );
+	temperatureField = (FeVariable* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"TemperatureField"  );
 	/* Get x_b, and z_b from xml */
 	/* "cylinder" z_b = CentreZ (0.5), x_b = CentreX (1.0) */
 	if (ctx->dim==3){
@@ -497,7 +497,7 @@ void Underworld_BuoyancyIntegrals_Output( UnderworldContext *context )
 	
 	ctx = (Underworld_BuoyancyIntegrals_CTX*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_BuoyancyIntegrals_Type );
 	
-	temperatureField = (FeVariable* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"temperatureField"  );
+	temperatureField = (FeVariable* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"TemperatureField"  );
 	
 	StgFEM_FrequentOutput_PrintValue( context, B );
 	StgFEM_FrequentOutput_PrintValue( context, w_bar );

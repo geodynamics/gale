@@ -77,7 +77,7 @@
 			<!--
 			Define the 3D column
 			-->
-			<list name="verticies">
+			<list name="vertices">
 				<asciidata>
 					<columnDefinition name = "x" type="double"/>
 					<columnDefinition name = "y" type="double"/>

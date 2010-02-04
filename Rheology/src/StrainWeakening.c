@@ -242,11 +242,11 @@ void _StrainWeakening_AssignFromXML( void* strainWeakening, Stg_ComponentFactory
 	materialPointsSwarm     = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialPointsSwarm", MaterialPointsSwarm, True, data  );
 
 	healingRate                 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"healingRate", 0.0  );
-	initialSofteningStrain  = Stg_ComponentFactory_GetDouble( cf, self->name, "initialSofteningStrain", 0 );
+	initialSofteningStrain  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"initialSofteningStrain", 0 );
         /* Backwards compatibility.  Look at softeningStrain and
            finalSofteningStrain. */
-	finalSofteningStrain    = Stg_ComponentFactory_GetDouble( cf, self->name, "softeningStrain",   HUGE_VAL );
-	finalSofteningStrain    = Stg_ComponentFactory_GetDouble( cf, self->name, "finalSofteningStrain", finalSofteningStrain );
+	finalSofteningStrain    = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"softeningStrain",   HUGE_VAL );
+	finalSofteningStrain    = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"finalSofteningStrain", finalSofteningStrain );
 	initialDamageFraction       = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"initialDamageFraction", 0.0  );
 	initialDamageWavenumber     = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"initialDamageWavenumber", -1.0  );
 	initialDamageWavenumberSinI = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"initialDamageWavenumberSinI", -1.0  );

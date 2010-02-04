@@ -11,7 +11,7 @@
 		<struct name="CrustBlock">
 		 	<param name="Type">PolygonShape</param>
        			<param name="perpendicularAxis">y</param>
-			<list name="verticies">
+			<list name="vertices">
 				<asciidata>
 	       				<columnDefinition name = "x" type="double"/>
 					<columnDefinition name = "y" type="double"/>
