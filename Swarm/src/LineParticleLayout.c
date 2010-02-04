@@ -208,8 +208,8 @@ void _LineParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFacto
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0  );
 
-	/* Read list of verticies of each of the different line segments from the dictionary */
-	list = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"verticies" );
+	/* Read list of vertices of each of the different line segments from the dictionary */
+	list = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"vertices" );
 	vertexCount = Dictionary_Entry_Value_GetCount( list  );
 	vertexList = Memory_Alloc_Array( Coord , vertexCount, "Vertex Array" );
 	memset( vertexList, 0, vertexCount * sizeof(Coord) );
