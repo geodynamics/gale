@@ -1,0 +1,80 @@
+========================
+  README File
+========================
+
+Includes an installation guide, known bugs and contact information
+
+========================
+  Installation Guide
+========================
+
+------------------------
+1. Dependencies
+------------------------
+
+  libXML2
+  MPI
+  PETSc
+  HDF5
+
+  For visualisation (optional):
+  X11 ( for desktop machines ) or OSMesa (for cluster or machines without displays) or SDL
+  libPNG or libJPEG
+  libFAME
+
+for more details see the http://www.underworldproject.org/documentation/Dependencies.html
+
+------------------------
+2. Configuration
+------------------------
+
+To configure:
+
+  ./configure.py
+
+Available options can be listed with:
+
+  ./configure.py --help
+
+------------------------
+3. Build
+------------------------
+
+To build:
+
+  ./scons.py
+
+To rebuild as fast as possible (note that this is
+not garaunteed to produce a consistent build):
+
+  ./fast-scons.py
+
+To run tests:
+
+  ./scons.py check             ... runs unit-tests & low resolution integration tests 
+  ./scons.py check-convergence ... runs only convergence tests
+  ./scons.py check-complete    ... runs all tests (recommended for cluster installs)
+  ./scons.py -h                ... for help on the checks available
+
+
+========================
+  KNOWN ISSUES
+========================
+
+* The test, PCDVCSuite, fails under optimised mode on 32-bit machines.
+* Significant warnings are produced in compile.... don't be alarmed, we are working on them.
+
+Please see XMLChanges_1.4, for details of important input file change for this release
+
+========================
+  CONTACT INFORMATION
+========================
+Mains web page:
+  http://www.underworldproject.org/
+  
+Email groups:
+   underworld-users@vpac.org    ... user group
+   underworld-dev@vpac.org      ... developer group
+  
+
+Julian Giordani (18 Jan 2010)

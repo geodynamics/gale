@@ -6,7 +6,7 @@ from config import Package, packages, cc
 #
 
 options = [
-    ('--prefix', 'prefix', 'Installation prefix.', None),
+    ('--prefix', 'prefix', 'Installation prefix. (currently disabled)', None),
     ('--build-dir', 'build_dir', 'Sandbox location.', 'build'),
     ('--with-debugging', 'with_debugging', 'Build with debugging', 1, 'int'),
     ('--with-warnings', 'with_warnings', 'Print all warnings at compile time', 1, 'int'),
@@ -133,29 +133,27 @@ if not (GetOption('help') or GetOption('clean')):
         # Need an extra CPPDEFINE for gLucifer.
         env.AppendUnique(CPPDEFINES=['HAVE_GL'])
 
-        # If we're on Darwin go for a native windowing system first.
+        # X11 available?
         res = osm;  #Use osmesa for windowing if found
+        if not res and env.get('with_x11'):
+            res = env.ConfigurePackage(packages.X11, required=False).result
+
+        # Try for Carbon if on Darwin...
         if not res and platform.system() == 'Darwin' and env.get('with_carbon'):
             res = env.ConfigurePackage(packages.Carbon, required=False).result
 
-        # Then SDL. SDL is always compatible with others, so allow configure regardless
-        #if not res: 
-        #    res = env.ConfigurePackage(packages.SDL, required=False).result
+        # Try for SDL. SDL is always compatible with others, so allow configure regardless
         sdl = 0
         if env.get('with_sdl'):
             sdl = env.ConfigurePackage(packages.SDL, required=False).result
 
-         # Then X11.
-        if not res:
-            if env.get('with_x11'):
-                res = env.ConfigurePackage(packages.X11, required=False).result
-            if not (res or sdl):
-                print
-                print 'Need a windowing system for gLucifer, one of either SDL,'
-                print 'X11, Carbon or OSMesa. None of these could be found.'
-                print 'Details in \'config/config2/config.log\''
-                print
-                env.Exit()
+        if not (res or sdl):
+            print
+            print 'Need a windowing system for gLucifer, one of either SDL,'
+            print 'X11, Carbon or OSMesa. None of these could be found.'
+            print 'Details in \'config/config2/config.log\''
+            print
+            env.Exit()
 
         # Add auxilliary gLucifer packages.
         if env.get('with_png'):

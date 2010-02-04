@@ -206,19 +206,22 @@ sub runTests {
 	print "$command";
 	&executeCommandline( $command );
 
-	# check error stream for error result
-	open( ERROR, "<$stderr" );
-	my $line;
-	foreach $line (<ERROR>) {
-		if( $line =~ m/[E|e]rror/ ) {
-			close(ERROR); 
-			die ("\n\n### ERROR ###\nError in runtime: see $stderr or $stdout - stopped" ); 
-		}
-	}
+	# check error stream for error result and produce warning
+   my $rm_stderr = 1;
+   open( ERROR, "<$stderr" );
+   my $line;
+   foreach $line (<ERROR>) {
+      if( $line =~ m/[E|e]rror/ ) {
+         close(ERROR); 
+         warn ("\n\n### Warning ###\nError reported in runtime: see $stderr - stopped" ); 
+         $rm_stderr=0;
+         last; # break out of the foreach loop
+      }
+   }
 
-	# if no error close file and delete it
-	close(ERROR); 
-	$command = "rm $stderr"; &executeCommandline($command);
+   # if no error close file and delete it
+   close(ERROR); 
+   if( $rm_stderr ) { $command = "rm $stderr"; &executeCommandline($command); }
 
 	# removing help.xml
 	$command = "rm help.xml";

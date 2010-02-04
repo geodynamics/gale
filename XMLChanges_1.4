@@ -1,0 +1,84 @@
+﻿XML Input File changes for Underworld 1.4
+==============================================
+
+
+===================================================
+1. User must specify the “context” of the model 
+===================================================
+This must be done first before other components are read into the dictionary, otherwise the simulation will halt in it's 'read from input file' phase. To perform this add:
+
+<struct name=”component” mergeType=”merge”>
+	<struct name=”context”>
+		<param name=”Type”>UnderworldContext</param>
+	</struct>
+</struct>
+
+We recommend this be included directly after <list name=”import”>...</list>
+
+===================================================
+2. Plugins are now defined in XML as components are
+===================================================
+
+To general syntax for adding a plugin is now:
+   <list name="plugins" mergeType="merge">
+       <struct>
+           <param name="Type">PlugingName</param>
+           <param name="Context">context</param>
+           ...
+       </struct>
+   </list>
+where the '...' represents arguments to pass into the plugin.
+
+So what was, as of Underworld 1.2
+	<list name="plugins" mergeType="merge">
+		<!-- Output Plugins -->
+		<param>StgFEM_FrequentOutput</param>	
+		<param>Underworld_Vrms</param>	
+		<param>StgFEM_CPUTime</param>
+	</list>
+
+Is now:
+	<list name="plugins" mergeType="merge">
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>
+			<param name="Context">context</param>
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>
+			<param name="Context">context</param>
+			<param name="GaussSwarm">gaussSwarm</param>
+			<param name="VelocityField">VelocityField</param>
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>
+			<param name="Context">context</param>
+		</struct>
+	</list>
+
+This adds verbosity to the plugins and requires the user to know what parameters to pass to a plugin. As with the “Components”, parameters passed in are error checked and the code will halt and report a problem if invalid parameters are found. This change is necessary for the code restructure of late 2009.
+
+==============================================
+3. Verticies ---- > Vertices
+==============================================
+The code now uses the correct spelling 'vertices' to define a list containing multiple vertex points. The previous, incorrect spelling was 'verticies'. Please check that your Shape definitions are consistent with this.
+
+==============================================
+4. Declaring gLucifer
+==============================================
+If creating gLucifer visualisation and NOT including the template <include>glucifer/window.xml</include>, one must define 
+
+<param name=”lucPluginContext”>context</param>
+<list name=”plugins” mergeType=”merge”>
+  <struct>
+    <param name=”Type”>lucPlugin</param>
+    <param name=”Context”>lucPluginContext</param>
+  </struct>
+</list>
+
+(see the file gLucifer/ModelComponents/window.xml as an example)
+
+
+See any .xml in the Underworld/InputFiles/ for examples of these changes.
+
+
+ 
