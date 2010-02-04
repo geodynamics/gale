@@ -61,22 +61,17 @@ void DictionaryCheckSuite_TestCheckKeys( DictionaryCheckSuiteData* data ) {
    char              expectedFilename[PCU_PATH_MAX];
    const char*       errMessage = "Component dictionary must have unique names\n";
    
-   Stream_RedirectFile(Journal_Register( Error_Type, "DictionaryCheck"), testFilename1 );
-   Stream_SetPrintingRank(Journal_Register( Error_Type, "DictionaryCheck"), 0 );
-   Stream_ClearCustomFormatters( Journal_Register( Error_Type, "DictionaryCheck") );
+   Stream_RedirectFile(Journal_Register( Error_Type, (Name)"DictionaryCheck" ), testFilename1 );
+   Stream_SetPrintingRank(Journal_Register( Error_Type, (Name)"DictionaryCheck" ), 0 );
+   Stream_ClearCustomFormatters( Journal_Register( Error_Type, (Name)"DictionaryCheck")  );
 
    /* Create a set of Dictionary entries */
    /* For dictionary */
-   Dictionary_Add( dictionary, "test_dict_string",
-      Dictionary_Entry_Value_FromString( "hello" ) );
-   Dictionary_Add( dictionary, "test_dict_double",
-      Dictionary_Entry_Value_FromDouble( 45.567 ) );
-   Dictionary_Add( dictionary, "test_dict_string",
-      Dictionary_Entry_Value_FromString( "goodbye" ) );   
-   Dictionary_Add( dictionary, "test_dict_string",
-      Dictionary_Entry_Value_FromString( "hello" ) );
-   Dictionary_Add( dictionary, "test_dict_string2",
-      Dictionary_Entry_Value_FromString( "hello" ) );
+   Dictionary_Add( dictionary, (Dictionary_Entry_Key)"test_dict_string", Dictionary_Entry_Value_FromString( "hello" )  );
+   Dictionary_Add( dictionary, (Dictionary_Entry_Key)"test_dict_double", Dictionary_Entry_Value_FromDouble( 45.567 )  );
+   Dictionary_Add( dictionary, (Dictionary_Entry_Key)"test_dict_string", Dictionary_Entry_Value_FromString( "goodbye" )  );   
+   Dictionary_Add( dictionary, (Dictionary_Entry_Key)"test_dict_string", Dictionary_Entry_Value_FromString( "hello" )  );
+   Dictionary_Add( dictionary, (Dictionary_Entry_Key)"test_dict_string2", Dictionary_Entry_Value_FromString( "hello" )  );
    
    CheckDictionaryKeys(dictionary,  errMessage);
 
@@ -87,15 +82,12 @@ void DictionaryCheckSuite_TestCheckKeys( DictionaryCheckSuiteData* data ) {
    }
 
    /* For dictionary2 */
-   Dictionary_Add( dictionary2, "test_dict_string",
-      Dictionary_Entry_Value_FromString( "hello" ) );
-   Dictionary_Add( dictionary2, "test_dict_double",
-      Dictionary_Entry_Value_FromDouble( 45.567 ) );
-   Dictionary_Add( dictionary2, "test_dict_stuff",
-      Dictionary_Entry_Value_FromString( "hello") );
+   Dictionary_Add( dictionary2, (Dictionary_Entry_Key)"test_dict_string", Dictionary_Entry_Value_FromString( "hello" )  );
+   Dictionary_Add( dictionary2, (Dictionary_Entry_Key)"test_dict_double", Dictionary_Entry_Value_FromDouble( 45.567 )  );
+   Dictionary_Add( dictionary2, (Dictionary_Entry_Key)"test_dict_stuff", Dictionary_Entry_Value_FromString( "hello")  );
 
    /* Call DictionaryCheck function */
-   Stream_RedirectFile(Journal_Register( Error_Type, "DictionaryCheck"), testFilename2 );
+   Stream_RedirectFile(Journal_Register( Error_Type, (Name)"DictionaryCheck" ), testFilename2 );
    CheckDictionaryKeys(dictionary2, errMessage);
 
    /* This file expected to be empty */

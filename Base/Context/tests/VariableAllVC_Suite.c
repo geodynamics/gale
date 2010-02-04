@@ -66,17 +66,17 @@ void VariableAllVC_Suite_CreateDictEntries( VariableAllVC_SuiteData* data ) {
    varList = Dictionary_Entry_Value_NewList();
    varValue = Dictionary_Entry_Value_NewStruct();
 
-   Dictionary_Entry_Value_AddMember( varValue, "name", Dictionary_Entry_Value_FromString( "test" ) );
-   Dictionary_Entry_Value_AddMember( varValue, "type", Dictionary_Entry_Value_FromString( "double" ) );
-   Dictionary_Entry_Value_AddMember( varValue, "value", Dictionary_Entry_Value_FromDouble( TEST_CONDVALUE ) );
+   Dictionary_Entry_Value_AddMember( varValue, (Dictionary_Entry_Key)"name", Dictionary_Entry_Value_FromString( "test" )  );
+   Dictionary_Entry_Value_AddMember( varValue, (Dictionary_Entry_Key)"type", Dictionary_Entry_Value_FromString( "double" )  );
+   Dictionary_Entry_Value_AddMember( varValue, (Dictionary_Entry_Key)"value", Dictionary_Entry_Value_FromDouble( TEST_CONDVALUE )  );
 
    Dictionary_Entry_Value_AddElement( varList, varValue );
-   Dictionary_Entry_Value_AddMember( info, "variables", varList );
-   Dictionary_Add( data->dict, data->vcKey, info );
+   Dictionary_Entry_Value_AddMember( info, (Dictionary_Entry_Key)"variables", varList  );
+   Dictionary_Add( data->dict, (Dictionary_Entry_Key)data->vcKey, info );
 }
 
 
-void VariableAllVC_Suite_Setup( VariableAllVC_SuiteData* data ) {
+void VariableAllVC_Suite_Setup( VariableAllVC_SuiteData* data  ) {
    data->arraySize = 10;
    data->testArray = Memory_Alloc_Array( double, data->arraySize, "test" );
 

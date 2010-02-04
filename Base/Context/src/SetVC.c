@@ -144,16 +144,16 @@ void _SetVC_ReadDictionary( void* setVC, void* dictionary ) {
 	
 	/* Find dictionary entry */
 	if (self->_dictionaryEntryName)
-		vcDictVal = Dictionary_Get( dictionary, self->_dictionaryEntryName );
+		vcDictVal = Dictionary_Get( dictionary, (Dictionary_Entry_Key)self->_dictionaryEntryName  );
 	else {
 		vcDictVal = &_vcDictVal;
 		Dictionary_Entry_Value_InitFromStruct( vcDictVal, dictionary );
 	}
 	
 	if (vcDictVal) {
-		Dictionary_Entry_Value*		setVal = Dictionary_Entry_Value_GetMember( vcDictVal, "indices" );
+		Dictionary_Entry_Value*		setVal = Dictionary_Entry_Value_GetMember( vcDictVal, (Dictionary_Entry_Key)"indices"  );
 		Index				indexCnt = Dictionary_Entry_Value_AsUnsignedInt( 
-							Dictionary_Entry_Value_GetMember( vcDictVal, "indexCount" ) );
+							Dictionary_Entry_Value_GetMember( vcDictVal, (Dictionary_Entry_Key)"indexCount" )  );
 		Index				i, cnt;
 		
 		self->_vcset = IndexSet_New( indexCnt );
@@ -164,8 +164,8 @@ void _SetVC_ReadDictionary( void* setVC, void* dictionary ) {
 				Dictionary_Entry_Value_GetElement( setVal, i ) ) );
 		
 		/* Obtain the variable entries */
-		varsVal = Dictionary_Entry_Value_GetMember(vcDictVal, "variables");
-		self->_entryCount = Dictionary_Entry_Value_GetCount( varsVal );
+		varsVal = Dictionary_Entry_Value_GetMember( vcDictVal, (Dictionary_Entry_Key)"variables");
+		self->_entryCount = Dictionary_Entry_Value_GetCount( varsVal  );
 		self->_entryTbl = Memory_Alloc_Array( SetVC_Entry, self->_entryCount, "SetVC->_entryTbl");
 		
 		for (entry_I = 0; entry_I < self->_entryCount; entry_I++) {
@@ -174,12 +174,12 @@ void _SetVC_ReadDictionary( void* setVC, void* dictionary ) {
 			Dictionary_Entry_Value*	varDictListVal;
 			
 			varDictListVal = Dictionary_Entry_Value_GetElement(varsVal, entry_I);
-			valueEntry = Dictionary_Entry_Value_GetMember(varDictListVal, "value");
+			valueEntry = Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"value" );
 			
 			self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString(
-				Dictionary_Entry_Value_GetMember(varDictListVal, "name"));
+				Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"name") );
 				
-			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(varDictListVal, "type"));
+			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"type") );
 
 			if (!strcasecmp(valType, "func")) {
 				char*	funcName = Dictionary_Entry_Value_AsString(valueEntry);
@@ -225,7 +225,7 @@ void _SetVC_ReadDictionary( void* setVC, void* dictionary ) {
 			}
 			else {
 				/* Assume double */
-				Journal_DPrintf( Journal_Register( InfoStream_Type, "myStream" ), 
+				Journal_DPrintf( Journal_Register( InfoStream_Type, (Name)"myStream"  ), 
 					"Type to variable on variable condition not given, assuming double\n" );
 				self->_entryTbl[entry_I].value.type = VC_ValueType_Double;
 				self->_entryTbl[entry_I].value.as.typeDouble = Dictionary_Entry_Value_AsDouble( valueEntry );

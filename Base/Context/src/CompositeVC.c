@@ -157,7 +157,7 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
 	if( dictionary && !self->hasReadDictionary ) {
 		Dictionary_Entry_Value*	vcList;
 		
-		vcList = Dictionary_Get( dictionary, "independentVCList" );
+		vcList = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"independentVCList" );
 
 		if( vcList ) {
 			Index	count;
@@ -165,15 +165,15 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
 			
 			count = Dictionary_Entry_Value_GetCount(vcList);
 
-			for (entry_I = 0; entry_I < count; entry_I++) {
+			for (entry_I = 0; entry_I < count; entry_I++ ) {
 				Dictionary_Entry_Value*	vcEntry;
 				Type			type;
 				Dictionary*		dictionary;
 				VariableCondition*	vc;
 				
 				vcEntry = Dictionary_Entry_Value_GetElement(vcList, entry_I);
-				type = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(vcEntry, "type"));
-				dictionary = Dictionary_Entry_Value_AsDictionary(vcEntry);
+				type = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember( vcEntry, (Dictionary_Entry_Key)"type"));
+				dictionary = Dictionary_Entry_Value_AsDictionary(vcEntry );
 				vc = VariableCondition_Register_CreateNew( self->context, variableCondition_Register, self->variable_Register, 
 					self->conFunc_Register, type, dictionary, self->data );
 				vc->cf = self->cf;
@@ -188,7 +188,7 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
 				*/
 			}
 		}
-		vcList = Dictionary_Get( dictionary, "vcList" );
+		vcList = Dictionary_Get( dictionary, (Dictionary_Entry_Key)"vcList" );
 
 		if( vcList ) {
 			Index	count;
@@ -196,15 +196,15 @@ void _CompositeVC_ReadDictionary( void* compositeVC, void* dictionary ) {
 			
 			count = Dictionary_Entry_Value_GetCount(vcList);
 
-			for (entry_I = 0; entry_I < count; entry_I++) {
+			for (entry_I = 0; entry_I < count; entry_I++ ) {
 				Dictionary_Entry_Value*	vcEntry;
 				Type			type;
 				Dictionary*		dictionary;
 				VariableCondition*	vc;
 				
 				vcEntry = Dictionary_Entry_Value_GetElement(vcList, entry_I);
-				type = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember(vcEntry, "type"));
-				dictionary = Dictionary_Entry_Value_AsDictionary(vcEntry);
+				type = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember( vcEntry, (Dictionary_Entry_Key)"type"));
+				dictionary = Dictionary_Entry_Value_AsDictionary(vcEntry );
 				vc = VariableCondition_Register_CreateNew( self->context, variableCondition_Register, self->variable_Register, 
 					self->conFunc_Register, type, dictionary, self->data );
 				vc->_readDictionary( vc, dictionary );
@@ -228,21 +228,21 @@ void _CompositeVC_AssignFromXML( void* compositeVC, Stg_ComponentFactory* cf, vo
 		later on when using the fucked up 'ReadDictionary' function. */
 	self->cf = cf;
 
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Context", AbstractContext, False, data );
-	if( !context )
-		context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data );
 	
 	variableRegister = context->variable_Register;
 	assert( variableRegister );
 	conditionFunctionRegister = condFunc_Register; 
-	assert( conditionFunctionRegister );
+	assert( conditionFunctionRegister  );
 	
-	vcName = Stg_ComponentFactory_GetString( cf, self->name, "vcName", self->name );
+	vcName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"vcName", self->name );
 
-	if ( cf->rootDict )
+	if ( cf->rootDict  )
 		vcDict = Dictionary_GetDictionary( cf->rootDict, vcName );
 
-	initData = Stg_ComponentFactory_ConstructByKey( cf, self->name, "Data", Stg_Component, False, data );
+	initData = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Data", Stg_Component, False, data  );
 	
 	_VariableCondition_Init( self, context, variableRegister, conditionFunctionRegister, vcDict );
 	_CompositeVC_Init( self, initData );

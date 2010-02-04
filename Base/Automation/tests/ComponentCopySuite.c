@@ -132,8 +132,8 @@ void* Stg_ComponentA_Copy( void* class, void* dest, Bool deep, Name nameExt, Ptr
 void Stg_ComponentA_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	Stg_ComponentA* self = (Stg_ComponentA*)component;
 
-	self->b =  Stg_ComponentFactory_ConstructByName(  cf,  "b", Stg_ComponentB,  True, data  ) ;
-	self->c =  Stg_ComponentFactory_ConstructByName(  cf,  "c", Stg_ComponentC,  True, data  ) ;
+	self->b =  Stg_ComponentFactory_ConstructByName( cf, (Name)"b", Stg_ComponentB, True, data   ) ;
+	self->c =  Stg_ComponentFactory_ConstructByName( cf, (Name)"c", Stg_ComponentC, True, data   ) ;
 }
 void Stg_ComponentA_Build( void* component, void* data ) {
 	Stg_ComponentA* self = (Stg_ComponentA*)component;
@@ -285,7 +285,7 @@ void* Stg_ComponentC_Copy( void* class, void* dest, Bool deep, Name nameExt, Ptr
 void Stg_ComponentC_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	Stg_ComponentC* self = (Stg_ComponentC*)component;
 
-	self->b =  Stg_ComponentFactory_ConstructByName(  cf,  "b", Stg_ComponentB,  True, data  ) ;
+	self->b =  Stg_ComponentFactory_ConstructByName( cf, (Name)"b", Stg_ComponentB, True, data   ) ;
 }
 void Stg_ComponentC_Build( void* component, void* data ) {
 	Stg_ComponentC* self = (Stg_ComponentC*)component;
@@ -330,27 +330,19 @@ void ComponentCopySuite_TestCopy( ComponentCopySuiteData* data ) {
 
    Stg_ComponentFactory* cf;
 
-   Stg_ComponentRegister_Add( 
-      Stg_ComponentRegister_Get_ComponentRegister(), 
-      Stg_ComponentA_Type, 
-      "0", 
-      (Stg_Component_DefaultConstructorFunction*)Stg_ComponentA_NewDefault );
+   Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Stg_ComponentA_Type, (Name)"0", (Stg_Component_DefaultConstructorFunction*)Stg_ComponentA_NewDefault );
 
    Stg_ComponentRegister_Add( 
-      Stg_ComponentRegister_Get_ComponentRegister(), 
+      Stg_ComponentRegister_Get_ComponentRegister( ), 
       Stg_ComponentB_Type,
       "0",
       (Stg_Component_DefaultConstructorFunction*)Stg_ComponentB_NewDefault );
 
-   Stg_ComponentRegister_Add( 
-      Stg_ComponentRegister_Get_ComponentRegister(), 
-      Stg_ComponentC_Type,
-      "0",
-      (Stg_Component_DefaultConstructorFunction*)Stg_ComponentC_NewDefault );
+   Stg_ComponentRegister_Add( Stg_ComponentRegister_Get_ComponentRegister(), Stg_ComponentC_Type, (Name)"0", (Stg_Component_DefaultConstructorFunction*)Stg_ComponentC_NewDefault );
 
    /* Creating a dictionary of components */
    componentsDictionary = Dictionary_New();
-   componentDict = Dictionary_New();
+   componentDict = Dictionary_New( );
    Dictionary_AddFromString( componentDict, "Type", "Stg_ComponentA" );
    Dictionary_AddFromDictionary( componentsDictionary, "a", componentDict );
    componentDict = Dictionary_New();
@@ -368,14 +360,14 @@ void ComponentCopySuite_TestCopy( ComponentCopySuiteData* data ) {
    Stg_ComponentFactory_CreateComponents( cf );
    Stg_ComponentFactory_ConstructComponents( cf, 0 /* dummy */ );
 
-   a = (Stg_ComponentA*)LiveComponentRegister_Get( cf->LCRegister, "a" );
+   a = (Stg_ComponentA*)LiveComponentRegister_Get( cf->LCRegister, (Name)"a" );
    
    /* "Stg_Components creation" */
    pcu_check_true(
       a != NULL &&
       a->b != NULL &&
       a->c != NULL &&
-      a->b == a->c->b );
+      a->b == a->c->b  );
 
    aCopy = Stg_Class_Copy( a, NULL, True, "_dup", NULL );
 

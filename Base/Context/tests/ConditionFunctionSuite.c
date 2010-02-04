@@ -64,7 +64,7 @@ void ConditionFunctionSuite_TestApply( ConditionFunctionSuiteData* data ) {
    ConditionFunction*	cf;
    double               result;
 
-   cf = ConditionFunction_New(func, "quadratic");
+   cf = ConditionFunction_New( func, (Name)"quadratic" );
 
    ConditionFunction_Apply(cf, 4, 2, NULL, &result);
    pcu_check_true( TEST_CF_RESULT == result );

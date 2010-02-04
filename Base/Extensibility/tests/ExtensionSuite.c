@@ -120,19 +120,19 @@ void ExtensionSuite_TestOfStruct( ExtensionSuiteData* data ) {
 
    /* Build the extensionMgr */
    extensionMgr = ExtensionManager_New_OfStruct( "Node", sizeof(BaseClass) );
-   ExtensionManager_Add( extensionMgr, Type0, sizeof(ExtensionStruct0) );     numExtensions++;
-   ExtensionManager_Add( extensionMgr, Temp0, sizeof(ExtensionStruct1) );     numExtensions++;
-   ExtensionManager_Add( extensionMgr, Pres0, sizeof(ExtensionStruct2) );     numExtensions++;
-   ExtensionManager_Add( extensionMgr, BC_Set0, sizeof(ExtensionStruct3) );   numExtensions++;
-   ExtensionManager_Add( extensionMgr, Weight0, sizeof(ExtensionStruct4) );   numExtensions++;
-   ExtensionManager_Add( extensionMgr, Type1, sizeof(ExtensionStruct0) );     numExtensions++;
-   ExtensionManager_Add( extensionMgr, Temp1, sizeof(ExtensionStruct1) );     numExtensions++;
-   ExtensionManager_Add( extensionMgr, Pres1, sizeof(ExtensionStruct2) );     numExtensions++;
-   ExtensionManager_Add( extensionMgr, BC_Set1, sizeof(ExtensionStruct3) );   numExtensions++;
-   ExtensionManager_Add( extensionMgr, Weight1, sizeof(ExtensionStruct4) );   numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Type0, sizeof(ExtensionStruct0)  );     numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Temp0, sizeof(ExtensionStruct1)  );     numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Pres0, sizeof(ExtensionStruct2)  );     numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)BC_Set0, sizeof(ExtensionStruct3)  );   numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Weight0, sizeof(ExtensionStruct4)  );   numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Type1, sizeof(ExtensionStruct0)  );     numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Temp1, sizeof(ExtensionStruct1)  );     numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Pres1, sizeof(ExtensionStruct2)  );     numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)BC_Set1, sizeof(ExtensionStruct3)  );   numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Weight1, sizeof(ExtensionStruct4) );   numExtensions++;
 
    /* "Is the initial size correct" */
-   pcu_check_true( extensionMgr->initialSize == sizeof(BaseClass) );
+   pcu_check_true( extensionMgr->initialSize == sizeof(BaseClass)  );
 
    /* Is the first offset at the correct position */
    pcu_check_true( ExtensionInfo_At( extensionMgr->extInfos, 0 )->offset == sizeof(BaseClass) );
@@ -171,43 +171,43 @@ void ExtensionSuite_TestOfStruct( ExtensionSuiteData* data ) {
    pcu_check_true( ((ArithPointer)&nBC_Set0->dd - (ArithPointer)n) == sizeof(BaseClass) + size0 + size1 + size2 );
 
    nWeight0 = (ExtensionStruct4*)ExtensionManager_Get( extensionMgr, n,
-      ExtensionManager_GetHandle( extensionMgr, "Weight0" ));
+      ExtensionManager_GetHandle( extensionMgr, (Name)"Weight0" ));
    /* Is offset correct */
    pcu_check_true( ((ArithPointer)&nWeight0->wf - (ArithPointer)n) == 
          sizeof(BaseClass) + size0 + size1 + size2 + size3 );
 
-   nType1 = (ExtensionStruct0*)ExtensionManager_Get( extensionMgr, n,
-      ExtensionManager_GetHandle( extensionMgr, "Type1" ) );
+   nType1 = (ExtensionStruct0* )ExtensionManager_Get( extensionMgr, n,
+      ExtensionManager_GetHandle( extensionMgr, (Name)"Type1" ) );
    /* Is offset correct */
    pcu_check_true( ((ArithPointer)&nType1->type - (ArithPointer)n) == 
          sizeof(BaseClass) + size0 + size1 + size2 + size3 + size4 );
 
-   nTemp1 = (ExtensionStruct1*)ExtensionManager_Get( extensionMgr, n,
-      ExtensionManager_GetHandle( extensionMgr, "Temp1" ) );
+   nTemp1 = (ExtensionStruct1* )ExtensionManager_Get( extensionMgr, n,
+      ExtensionManager_GetHandle( extensionMgr, (Name)"Temp1" ) );
    /* Is offset correct */
    pcu_check_true( ((ArithPointer)&nTemp1->temp - (ArithPointer)n) == 
          sizeof(BaseClass) + size0 + size1 + size2 + size3 + size4 + size0 );
 
-   nPres1 = (ExtensionStruct2*)ExtensionManager_Get( extensionMgr, n,
-      ExtensionManager_GetHandle( extensionMgr, "Pres1" ) );
+   nPres1 = (ExtensionStruct2* )ExtensionManager_Get( extensionMgr, n,
+      ExtensionManager_GetHandle( extensionMgr, (Name)"Pres1" ) );
    /* Is offset correct */
    pcu_check_true( ((ArithPointer)&nPres1->pres - (ArithPointer)n) == 
          sizeof(BaseClass) + size0 + size1 + size2 + size3 + size4 + size0 + size1 );
 
-   nBC_Set1 = (ExtensionStruct3*)ExtensionManager_Get( extensionMgr, n,
-      ExtensionManager_GetHandle( extensionMgr, "BC_Set1" ) );
+   nBC_Set1 = (ExtensionStruct3* )ExtensionManager_Get( extensionMgr, n,
+      ExtensionManager_GetHandle( extensionMgr, (Name)"BC_Set1" ) );
    /* Is offset correct */
    pcu_check_true( ((ArithPointer)&nBC_Set1->dd - (ArithPointer)n) == 
          sizeof(BaseClass) + size0 + size1 + size2 + size3 + size4 + size0 + size1 + size2 );
 
-   nWeight1 = (ExtensionStruct4*)ExtensionManager_Get( extensionMgr, n,
-      ExtensionManager_GetHandle( extensionMgr, "Weight1" ) );
+   nWeight1 = (ExtensionStruct4* )ExtensionManager_Get( extensionMgr, n,
+      ExtensionManager_GetHandle( extensionMgr, (Name)"Weight1" ) );
    /* Is offset correct */
    pcu_check_true( ((ArithPointer)&nWeight1->wf - (ArithPointer)n) == 
          sizeof(BaseClass) + size0 + size1 + size2 + size3 + size4 + size0 + size1 + size2 + size3 );
 
    for( ii = 0; ii < ArraySize; ii++ ) {
-      n = (BaseClass*)ExtensionManager_At( extensionMgr, nArray, ii );
+      n = (BaseClass* )ExtensionManager_At( extensionMgr, nArray, ii );
       
       n->x = 1.0f;
       n->y = 2.0f;
@@ -218,12 +218,12 @@ void ExtensionSuite_TestOfStruct( ExtensionSuiteData* data ) {
       nTemp0 = (ExtensionStruct1*)ExtensionManager_Get( extensionMgr, n, 1 );
       nPres0 = (ExtensionStruct2*)ExtensionManager_Get( extensionMgr, n, 2 );
       nBC_Set0 = (ExtensionStruct3*)ExtensionManager_Get( extensionMgr, n, 3 );
-      nWeight0 = (ExtensionStruct4*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "Weight0" ) );
-      nType1 = (ExtensionStruct0*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "Type1" ) );
-      nTemp1 = (ExtensionStruct1*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "Temp1" ) );
-      nPres1 = (ExtensionStruct2*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "Pres1" ) );
-      nBC_Set1 = (ExtensionStruct3*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "BC_Set1" ) );
-      nWeight1 = (ExtensionStruct4*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "Weight1" ) );
+      nWeight0 = (ExtensionStruct4*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"Weight0" ) );
+      nType1 = (ExtensionStruct0* )ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"Type1" ) );
+      nTemp1 = (ExtensionStruct1* )ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"Temp1" ) );
+      nPres1 = (ExtensionStruct2* )ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"Pres1" ) );
+      nBC_Set1 = (ExtensionStruct3* )ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"BC_Set1" ) );
+      nWeight1 = (ExtensionStruct4* )ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"Weight1" ) );
 
       nType0->type = 5;
       nTemp0->temp = 6.0f;
@@ -244,18 +244,18 @@ void ExtensionSuite_TestOfStruct( ExtensionSuiteData* data ) {
    }
 
    for( ii = 0; ii < ArraySize; ii++ ) {
-      n = (BaseClass*)ExtensionManager_At( extensionMgr, nArray, ii );
+      n = (BaseClass* )ExtensionManager_At( extensionMgr, nArray, ii );
 
       nType0 = (ExtensionStruct0*)ExtensionManager_Get( extensionMgr, n, 0 );
       nTemp0 = (ExtensionStruct1*)ExtensionManager_Get( extensionMgr, n, 1 );
       nPres0 = (ExtensionStruct2*)ExtensionManager_Get( extensionMgr, n, 2 );
       nBC_Set0 = (ExtensionStruct3*)ExtensionManager_Get( extensionMgr, n, 3 );
-      nWeight0 = (ExtensionStruct4*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "Weight0" ) );
-      nType1 = (ExtensionStruct0*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "Type1" ) );
-      nTemp1 = (ExtensionStruct1*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "Temp1" ) );
-      nPres1 = (ExtensionStruct2*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "Pres1" ) );
-      nBC_Set1 = (ExtensionStruct3*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "BC_Set1" ) );
-      nWeight1 = (ExtensionStruct4*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "Weight1" ) );
+      nWeight0 = (ExtensionStruct4*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"Weight0" ) );
+      nType1 = (ExtensionStruct0* )ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"Type1" ) );
+      nTemp1 = (ExtensionStruct1* )ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"Temp1" ) );
+      nPres1 = (ExtensionStruct2* )ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"Pres1" ) );
+      nBC_Set1 = (ExtensionStruct3* )ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"BC_Set1" ) );
+      nWeight1 = (ExtensionStruct4* )ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"Weight1" ) );
 
       pcu_check_true( n->x == 1.0f );
       pcu_check_true( n->y == 2.0f );
@@ -277,7 +277,7 @@ void ExtensionSuite_TestOfStruct( ExtensionSuiteData* data ) {
       pcu_check_true( nBC_Set1->dd == 17 );
       pcu_check_true( nBC_Set1->cc == 18 );
       pcu_check_true( nBC_Set1->bc == 19 );
-      pcu_check_true( nWeight1->wf == 20.0f );
+      pcu_check_true( nWeight1->wf == 20.0f  );
    }
    
    /* Stg_Class_Delete stuff */
@@ -315,19 +315,19 @@ void ExtensionSuite_TestOfExistingObject( ExtensionSuiteData* data ) {
    /* Build the extensionMgr */
    n = Memory_Alloc_Unnamed( BaseClass );
    extensionMgr = ExtensionManager_New_OfExistingObject( "Node", n );
-   ExtensionManager_Add( extensionMgr, Type0, sizeof(ExtensionStruct0) );      numExtensions++;
-   ExtensionManager_Add( extensionMgr, Temp0, sizeof(ExtensionStruct1) );      numExtensions++;
-   ExtensionManager_Add( extensionMgr, Pres0, sizeof(ExtensionStruct2) );      numExtensions++; 
-   ExtensionManager_Add( extensionMgr, BC_Set0, sizeof(ExtensionStruct3) );   numExtensions++;
-   ExtensionManager_Add( extensionMgr, Weight0, sizeof(ExtensionStruct4) );   numExtensions++;
-   ExtensionManager_Add( extensionMgr, Type1, sizeof(ExtensionStruct0) );      numExtensions++;
-   ExtensionManager_Add( extensionMgr, Temp1, sizeof(ExtensionStruct1) );      numExtensions++;
-   ExtensionManager_Add( extensionMgr, Pres1, sizeof(ExtensionStruct2) );      numExtensions++;
-   ExtensionManager_Add( extensionMgr, BC_Set1, sizeof(ExtensionStruct3) );   numExtensions++;
-   ExtensionManager_Add( extensionMgr, Weight1, sizeof(ExtensionStruct4) );   numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Type0, sizeof(ExtensionStruct0)  );      numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Temp0, sizeof(ExtensionStruct1)  );      numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Pres0, sizeof(ExtensionStruct2)  );      numExtensions++; 
+   ExtensionManager_Add( extensionMgr, (Name)BC_Set0, sizeof(ExtensionStruct3)  );   numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Weight0, sizeof(ExtensionStruct4)  );   numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Type1, sizeof(ExtensionStruct0)  );      numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Temp1, sizeof(ExtensionStruct1)  );      numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Pres1, sizeof(ExtensionStruct2)  );      numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)BC_Set1, sizeof(ExtensionStruct3)  );   numExtensions++;
+   ExtensionManager_Add( extensionMgr, (Name)Weight1, sizeof(ExtensionStruct4) );   numExtensions++;
 
    /* Is the initial size correct */
-   pcu_check_true( extensionMgr->initialSize == 0 );
+   pcu_check_true( extensionMgr->initialSize == 0  );
 
    /* Is the first offset at the correct position */
    pcu_check_true( ExtensionInfo_At( extensionMgr->extInfos, 0 )->offset == 0 );
@@ -374,28 +374,28 @@ void ExtensionSuite_TestOfExistingObject( ExtensionSuiteData* data ) {
    nBC_Set0->cc = 10;
    nBC_Set0->bc = 11;
    
-   nWeight0 = (ExtensionStruct4*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "Weight0" ) );
+   nWeight0 = (ExtensionStruct4*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"Weight0" ) );
    /* Is offset correct */
    pcu_check_true(
       ((ArithPointer)&nWeight0->wf - (ArithPointer)extensionMgr->_extensionsToExisting) ==
          size0 + size1 + size2 + size3 );
    nWeight0->wf = 12.0f;
    
-   nType1 = (ExtensionStruct0*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "Type1" ) );
+   nType1 = (ExtensionStruct0* )ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"Type1" ) );
    /* Is offset correct */
    pcu_check_true(
       ((ArithPointer)&nType1->type - (ArithPointer)extensionMgr->_extensionsToExisting) ==
          size0 + size1 + size2 + size3 + size4 );
    nType1->type = 13;
    
-   nTemp1 = (ExtensionStruct1*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "Temp1" ) );
+   nTemp1 = (ExtensionStruct1* )ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"Temp1" ) );
    /* Is offset correct */
    pcu_check_true(
       ((ArithPointer)&nTemp1->temp - (ArithPointer)extensionMgr->_extensionsToExisting) ==
          size0 + size1 + size2 + size3 + size4 + size0 );
    nTemp1->temp = 14.0f;
    
-   nPres1 = (ExtensionStruct2*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "Pres1" ) );
+   nPres1 = (ExtensionStruct2* )ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"Pres1" ) );
    /* Is offset correct */
    pcu_check_true(
       ((ArithPointer)&nPres1->pres - (ArithPointer)extensionMgr->_extensionsToExisting) ==
@@ -403,7 +403,7 @@ void ExtensionSuite_TestOfExistingObject( ExtensionSuiteData* data ) {
    nPres1->pres = 15.0f;
    nPres1->flag = 16;
    
-   nBC_Set1 = (ExtensionStruct3*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "BC_Set1" ) );
+   nBC_Set1 = (ExtensionStruct3* )ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"BC_Set1" ) );
    /* Is offset correct */
    pcu_check_true(
       ((ArithPointer)&nBC_Set1->dd - (ArithPointer)extensionMgr->_extensionsToExisting) ==
@@ -413,10 +413,10 @@ void ExtensionSuite_TestOfExistingObject( ExtensionSuiteData* data ) {
    nBC_Set1->bc = 19;
    
    /* Is offset correct */
-   nWeight1 = (ExtensionStruct4*)ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, "Weight1" ) );
+   nWeight1 = (ExtensionStruct4* )ExtensionManager_Get( extensionMgr, n, ExtensionManager_GetHandle( extensionMgr, (Name)"Weight1" ) );
    pcu_check_true(
       ((ArithPointer)&nWeight1->wf - (ArithPointer)extensionMgr->_extensionsToExisting) ==
-         size0 + size1 + size2 + size3 + size4 + size0 + size1 + size2 + size3 );
+         size0 + size1 + size2 + size3 + size4 + size0 + size1 + size2 + size3  );
 
    nWeight1->wf = 20.0f;
    
@@ -468,19 +468,19 @@ void ExtensionSuite_TestAddArrayToExistingObject( ExtensionSuiteData* data ) {
    baseObject = Memory_Alloc( BaseClass, "BaseObject" );
    objExtension = ExtensionManager_New_OfExistingObject( "obj", baseObject );
 
-   ExtensionManager_Add( objExtension, Type0, sizeof(ExtensionStruct0) );
+   ExtensionManager_Add( objExtension, (Name)Type0, sizeof(ExtensionStruct0)  );
    ExtensionManager_AddArray( objExtension, Temp0, sizeof(ExtensionStruct1), 10 );
    
    {
       objType0 = (ExtensionStruct0*)ExtensionManager_Get(
          objExtension, 
          baseObject, 
-         ExtensionManager_GetHandle( objExtension, "Type0" ) );
+         ExtensionManager_GetHandle( objExtension, (Name)"Type0" ) );
       
-      objTemp0 = (ExtensionStruct1*)ExtensionManager_Get( 
+      objTemp0 = (ExtensionStruct1* )ExtensionManager_Get( 
          objExtension, 
          baseObject, 
-         ExtensionManager_GetHandle( objExtension, "Temp0" ) );
+         ExtensionManager_GetHandle( objExtension, (Name)"Temp0" ) );
 
       objType0->type = 'a';
       for ( ii = 0; ii < 10; ++ii ) {
@@ -488,10 +488,10 @@ void ExtensionSuite_TestAddArrayToExistingObject( ExtensionSuiteData* data ) {
       }
    }
 
-   objTemp0 = (ExtensionStruct1*)ExtensionManager_Get( 
+   objTemp0 = (ExtensionStruct1* )ExtensionManager_Get( 
       objExtension, 
       baseObject, 
-      ExtensionManager_GetHandle( objExtension, "Temp0" ) );
+      ExtensionManager_GetHandle( objExtension, (Name)"Temp0" ) );
 
    for ( ii = 0; ii < 10; ++ii ) {
       pcu_check_true( objTemp0[ii].temp == ii );
@@ -502,7 +502,7 @@ void ExtensionSuite_TestAddArrayToExistingObject( ExtensionSuiteData* data ) {
 }
 
 
-void ExtensionSuite_TestExtendOfExtendedArray( ExtensionSuiteData* data ) {
+void ExtensionSuite_TestExtendOfExtendedArray( ExtensionSuiteData* data  ) {
    ExtensionManager*       structExtension=NULL;
    ExtensionManager*       arrayExtension=NULL;
    BaseClass*              nArray=NULL;
@@ -516,7 +516,7 @@ void ExtensionSuite_TestExtendOfExtendedArray( ExtensionSuiteData* data ) {
 
    structExtension = ExtensionManager_New_OfStruct( "Node", sizeof(BaseClass) );
 
-   ExtensionManager_Add( structExtension, Type0, sizeof(ExtensionStruct0) );
+   ExtensionManager_Add( structExtension, (Name)Type0, sizeof(ExtensionStruct0)  );
    ExtensionManager_AddArray( structExtension, Temp0, sizeof(ExtensionStruct1), 10 );
    
    nArray = (BaseClass*)ExtensionManager_Malloc( structExtension, ArraySize );
@@ -526,57 +526,57 @@ void ExtensionSuite_TestExtendOfExtendedArray( ExtensionSuiteData* data ) {
 
    /* Since the nArray is already allocated, this function should realloc it to put the extended array
     * at the end */
-   ExtensionManager_Add( arrayExtension, Pres0, sizeof(ExtensionStruct2) );
+   ExtensionManager_Add( arrayExtension, (Name)Pres0, sizeof(ExtensionStruct2) );
 
-   for ( array_I = 0; array_I < ArraySize; ++array_I ) {
+   for ( array_I = 0; array_I < ArraySize; ++array_I  ) {
       current = ExtensionManager_At( structExtension, nArray, array_I );
 
       nType0 = (ExtensionStruct0*)ExtensionManager_Get(
          structExtension,
          current,
-         ExtensionManager_GetHandle( structExtension, "Type0" ) );
-      nTemp0 = (ExtensionStruct1*)ExtensionManager_Get(
+         ExtensionManager_GetHandle( structExtension, (Name)"Type0" ) );
+      nTemp0 = (ExtensionStruct1* )ExtensionManager_Get(
          structExtension,
          current,
-         ExtensionManager_GetHandle( structExtension, "Temp0" ) );
+         ExtensionManager_GetHandle( structExtension, (Name)"Temp0" ) );
 
       nType0->type = 'a';
       for ( ii = 0; ii < 10; ++ii ) {
          nTemp0[ii].temp = (double)((array_I * 10) + ii);
       }
       
-      nPres0 = (ExtensionStruct2*)ExtensionManager_Get(
+      nPres0 = (ExtensionStruct2* )ExtensionManager_Get(
          arrayExtension,
          ExtensionManager_At( arrayExtension, nArray, array_I ),
-         ExtensionManager_GetHandle( arrayExtension, "Pres0" ) );
+         ExtensionManager_GetHandle( arrayExtension, (Name)"Pres0" ) );
       
       nPres0->pres = (double)array_I;
       nPres0->flag = 'b';
    }
    
-   for ( array_I = 0; array_I < ArraySize; ++array_I ) {
+   for ( array_I = 0; array_I < ArraySize; ++array_I  ) {
       current = ExtensionManager_At( structExtension, nArray, array_I );
       nType0 = (ExtensionStruct0*)ExtensionManager_Get(
          structExtension,
          current,
-         ExtensionManager_GetHandle( structExtension, "Type0" ) );
-      nTemp0 = (ExtensionStruct1*)ExtensionManager_Get(
+         ExtensionManager_GetHandle( structExtension, (Name)"Type0" ) );
+      nTemp0 = (ExtensionStruct1* )ExtensionManager_Get(
          structExtension,
          current,
-         ExtensionManager_GetHandle( structExtension, "Temp0" ) );
+         ExtensionManager_GetHandle( structExtension, (Name)"Temp0" ) );
 
       pcu_check_true( nType0->type == 'a' );
       for ( ii = 0; ii < 10; ++ii ) {
          pcu_check_true( nTemp0[ii].temp == (double)((array_I * 10) + ii) );
       }
 
-      nPres0 = (ExtensionStruct2*)ExtensionManager_Get(
+      nPres0 = (ExtensionStruct2* )ExtensionManager_Get(
          arrayExtension,
          ExtensionManager_At( arrayExtension, nArray, array_I ),
-         ExtensionManager_GetHandle( arrayExtension, "Pres0" ) );
+         ExtensionManager_GetHandle( arrayExtension, (Name)"Pres0" ) );
    
       pcu_check_true( nPres0->pres == (double)array_I );
-      pcu_check_true( nPres0->flag == 'b' );
+      pcu_check_true( nPres0->flag == 'b'  );
    }
 
    ExtensionManager_Free( structExtension, nArray );
@@ -604,7 +604,7 @@ void ExtensionSuite_TestCopyExtendedArray( ExtensionSuiteData* data ) {
 
    structExtension = ExtensionManager_New_OfStruct( "Node", sizeof(BaseClass) );
 
-   ExtensionManager_Add( structExtension, Type0, sizeof(ExtensionStruct0) );
+   ExtensionManager_Add( structExtension, (Name)Type0, sizeof(ExtensionStruct0)  );
    ExtensionManager_AddArray( structExtension, Temp0, sizeof(ExtensionStruct1), 10 );
    
    nArray = (BaseClass*)ExtensionManager_Malloc( structExtension, ArraySize );
@@ -614,29 +614,29 @@ void ExtensionSuite_TestCopyExtendedArray( ExtensionSuiteData* data ) {
 
    /* Since the nArray is already allocated, this function should realloc it to put the extended array
     * at the end */
-   ExtensionManager_Add( arrayExtension, Pres0, sizeof(ExtensionStruct2) );
+   ExtensionManager_Add( arrayExtension, (Name)Pres0, sizeof(ExtensionStruct2) );
 
-   for ( array_I = 0; array_I < ArraySize; ++array_I ) {
+   for ( array_I = 0; array_I < ArraySize; ++array_I  ) {
       current = ExtensionManager_At( structExtension, nArray, array_I );
 
       nType0 = (ExtensionStruct0*)ExtensionManager_Get(
          structExtension,
          current,
-         ExtensionManager_GetHandle( structExtension, "Type0" ) );
-      nTemp0 = (ExtensionStruct1*)ExtensionManager_Get(
+         ExtensionManager_GetHandle( structExtension, (Name)"Type0" ) );
+      nTemp0 = (ExtensionStruct1* )ExtensionManager_Get(
          structExtension,
          current,
-         ExtensionManager_GetHandle( structExtension, "Temp0" ) );
+         ExtensionManager_GetHandle( structExtension, (Name)"Temp0" ) );
 
       nType0->type = 'a';
       for ( ii = 0; ii < 10; ++ii ) {
          nTemp0[ii].temp = (double)((array_I * 10) + ii);
       }
       
-      nPres0 = (ExtensionStruct2*)ExtensionManager_Get(
+      nPres0 = (ExtensionStruct2* )ExtensionManager_Get(
          arrayExtension,
          ExtensionManager_At( arrayExtension, nArray, array_I ),
-         ExtensionManager_GetHandle( arrayExtension, "Pres0" ) );
+         ExtensionManager_GetHandle( arrayExtension, (Name)"Pres0" ) );
       
       nPres0->pres = (double)array_I;
       nPres0->flag = 'b';
@@ -644,7 +644,7 @@ void ExtensionSuite_TestCopyExtendedArray( ExtensionSuiteData* data ) {
 
    /* Copy time! */
    
-   copyMap = PtrMap_New( 1 );
+   copyMap = PtrMap_New( 1  );
    arrayExtensionCopy = Stg_Class_Copy( arrayExtension, NULL, True, "_dup", copyMap );
    structExtensionCopy = Stg_Class_Copy( structExtension, NULL, True, "_dup", copyMap );
    nArrayCopy = PtrMap_Find( copyMap, arrayExtension->_array );
@@ -657,24 +657,24 @@ void ExtensionSuite_TestCopyExtendedArray( ExtensionSuiteData* data ) {
       nType0 = (ExtensionStruct0*)ExtensionManager_Get(
          arrayExtensionCopy,
          current,
-         ExtensionManager_GetHandle( structExtension, "Type0" ) );
-      nTemp0 = (ExtensionStruct1*)ExtensionManager_Get(
+         ExtensionManager_GetHandle( structExtension, (Name)"Type0" ) );
+      nTemp0 = (ExtensionStruct1* )ExtensionManager_Get(
          arrayExtensionCopy,
          current,
-         ExtensionManager_GetHandle( structExtension, "Temp0" ) );
+         ExtensionManager_GetHandle( structExtension, (Name)"Temp0" ) );
    
       pcu_check_true( nType0->type == 'a' );
       for ( ii = 0; ii < 10; ++ii ) {
          pcu_check_true( nTemp0[ii].temp == (double)((array_I * 10) + ii) );
       }
 
-      nPres0 = (ExtensionStruct2*)ExtensionManager_Get(
+      nPres0 = (ExtensionStruct2* )ExtensionManager_Get(
          arrayExtension,
          ExtensionManager_At( arrayExtension, nArray, array_I ),
-         ExtensionManager_GetHandle( arrayExtension, "Pres0" ) );
+         ExtensionManager_GetHandle( arrayExtension, (Name)"Pres0" ) );
    
       pcu_check_true( nPres0->pres == (double)array_I );
-      pcu_check_true( nPres0->flag == 'b' );
+      pcu_check_true( nPres0->flag == 'b'  );
    }
 
    ExtensionManager_Free( structExtension, nArray );

@@ -249,7 +249,7 @@ void EntryPointSuite_TestPrintConcise( EntryPointSuiteData* data ) {
    
    pcu_check_true( data->ep->hooks->count == 5 );
 
-   stream = Journal_Register( InfoStream_Type, EntryPoint_Type );
+   stream = Journal_Register( InfoStream_Type, (Name)EntryPoint_Type  );
    Stream_RedirectFile( stream, testFilename );
    EntryPoint_PrintConcise( data->ep, stream );
 
@@ -366,7 +366,7 @@ void EntryPointSuite_TestMinMax( EntryPointSuiteData* data ) {
    double      result;
    Stream*     stream;
 
-   stream = Journal_Register( InfoStream_Type, "myStream" );
+   stream = Journal_Register( InfoStream_Type, (Name)"myStream"  );
    Stream_Enable( stream, False );
 
    data->ep = EntryPoint_New( testEpName, EntryPoint_Maximum_VoidPtr_CastType );

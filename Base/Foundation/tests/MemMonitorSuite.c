@@ -50,7 +50,7 @@ typedef struct {
 
 void MemMonitorSuite_Setup( MemMonitorSuiteData* data ) {
    Journal_Enable_TypedStream( Info_Type, True );
-   Stream_Enable( Journal_Register( Info_Type, Stg_MemMonitor_InfoStreamName ), True );
+   Stream_Enable( Journal_Register( Info_Type, (Name)Stg_MemMonitor_InfoStreamName  ), True );
 
    data->mm = NULL;
    MPI_Comm_rank( MPI_COMM_WORLD, &data->rank );
@@ -78,7 +78,7 @@ void MemMonitorSuite_TestMonitor( MemMonitorSuiteData* data ) {
    
    Stg_MemMonitor_SetMemoryWatchCriteria( 0.2 );
    if (data->rank==0) {
-      Stream_RedirectFile( Journal_Register( Info_Type, Stg_MemMonitor_InfoStreamName ), memoryReportOutputFilename );
+      Stream_RedirectFile( Journal_Register( Info_Type, (Name)Stg_MemMonitor_InfoStreamName  ), memoryReportOutputFilename );
    }
 
    /* Don't create the MM until now, so we can control the total memory for testing purposes */

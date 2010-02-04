@@ -47,133 +47,133 @@
 /* Info parts --------------------------------------------------------------------------------------------------------------------*/
 
 char* Stg_Meta_GetType( Dictionary* dictionary ) {
-	Dictionary* info = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "info" ) );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( info, "title" ) );
+	Dictionary* info = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"info" )  );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( info, (Dictionary_Entry_Key)"title" ) );
 }
 
-char* Stg_Meta_GetCreator( Dictionary* dictionary ) {
-	Dictionary* info = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "info" ) );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( info, "creator" ) );
+char* Stg_Meta_GetCreator( Dictionary* dictionary  ) {
+	Dictionary* info = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"info" )  );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( info, (Dictionary_Entry_Key)"creator" ) );
 }
 
-char* Stg_Meta_GetPublisher( Dictionary* dictionary ) {
-	Dictionary* info = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "info" ) );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( info, "publisher" ) );
+char* Stg_Meta_GetPublisher( Dictionary* dictionary  ) {
+	Dictionary* info = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"info" )  );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( info, (Dictionary_Entry_Key)"publisher" ) );
 }
 
-char* Stg_Meta_GetRights( Dictionary* dictionary ) {
-	Dictionary* info = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "info" ) );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( info, "rights" ) );
+char* Stg_Meta_GetRights( Dictionary* dictionary  ) {
+	Dictionary* info = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"info" )  );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( info, (Dictionary_Entry_Key)"rights" ) );
 }
 
-char* Stg_Meta_GetSource( Dictionary* dictionary ) {
-	Dictionary* info = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "info" ) );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( info, "source" ) );
+char* Stg_Meta_GetSource( Dictionary* dictionary  ) {
+	Dictionary* info = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"info" )  );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( info, (Dictionary_Entry_Key)"source" ) );
 }
 
-char* Stg_Meta_GetSubject( Dictionary* dictionary ) {
-	Dictionary* info = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "info" ) );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( info, "subject" ) );
+char* Stg_Meta_GetSubject( Dictionary* dictionary  ) {
+	Dictionary* info = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"info" )  );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( info, (Dictionary_Entry_Key)"subject" ) );
 }
 
-char* Stg_Meta_GetDescription( Dictionary* dictionary ) {
-	Dictionary* info = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "info" ) );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( info, "description" ) );
+char* Stg_Meta_GetDescription( Dictionary* dictionary  ) {
+	Dictionary* info = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"info" )  );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( info, (Dictionary_Entry_Key)"description" ) );
 }
 
 
 /* Code parts --------------------------------------------------------------------------------------------------------------------*/
 
-char* Stg_Meta_GetExampleDocumentation( Dictionary* dictionary ) {
-	Dictionary* code = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "code" ) );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( code, "example-documentation" ) );
+char* Stg_Meta_GetExampleDocumentation( Dictionary* dictionary  ) {
+	Dictionary* code = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"code" )  );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( code, (Dictionary_Entry_Key)"example-documentation" ) );
 }
 
-char* Stg_Meta_GetExampleCode( Dictionary* dictionary ) {
-	Dictionary* code = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "code" ) );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( code, "example-code" ) );
+char* Stg_Meta_GetExampleCode( Dictionary* dictionary  ) {
+	Dictionary* code = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"code" )  );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( code, (Dictionary_Entry_Key)"example-code" ) );
 }
 
-char* Stg_Meta_GetInherits( Dictionary* dictionary ) {
-	Dictionary* code = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "code" ) );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( code, "inherits" ) );
+char* Stg_Meta_GetInherits( Dictionary* dictionary  ) {
+	Dictionary* code = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"code" )  );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( code, (Dictionary_Entry_Key)"inherits" ) );
 }
 
 
 /* Implements parts --------------------------------------------------------------------------------------------------------------*/
 
-char* Stg_Meta_GetReference( Dictionary* dictionary ) {
-	Dictionary* implements = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "implements" ) );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( implements, "reference" ) );
+char* Stg_Meta_GetReference( Dictionary* dictionary  ) {
+	Dictionary* implements = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"implements" )  );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( implements, (Dictionary_Entry_Key)"reference" ) );
 }
 
-char* Stg_Meta_GetEquation( Dictionary* dictionary ) {
-	Dictionary* implements = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "implements"  ) );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( implements, "equation" ) );
+char* Stg_Meta_GetEquation( Dictionary* dictionary  ) {
+	Dictionary* implements = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"implements"  )  );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( implements, (Dictionary_Entry_Key)"equation" ) );
 }
 
 
 /* Parameter parts ---------------------------------------------------------------------------------------------------------------*/
 
-Index Stg_Meta_GetParameterCount( Dictionary* dictionary ) {
-	Dictionary* parameters = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "parameters" ) );
-	return Dictionary_GetCount( parameters );
+Index Stg_Meta_GetParameterCount( Dictionary* dictionary  ) {
+	Dictionary* parameters = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"parameters" ) );
+	return Dictionary_GetCount( parameters  );
 }
 
 char* Stg_Meta_GetParameterName( Dictionary* dictionary, Index i ) {
-	Dictionary* parameters = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "parameters" ) );
+	Dictionary* parameters = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"parameters" )  );
 	Dictionary* parameter = Dictionary_Entry_Value_AsDictionary( Dictionary_GetByIndex( parameters, i )  );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( parameter, "name" ) );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( parameter, (Dictionary_Entry_Key)"name" )  );
 }
 
 char* Stg_Meta_GetParameterType( Dictionary* dictionary, Index i ) {
-	Dictionary* parameters = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "parameters" ) );
+	Dictionary* parameters = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"parameters" )  );
 	Dictionary* parameter = Dictionary_Entry_Value_AsDictionary( Dictionary_GetByIndex( parameters, i )  );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( parameter, "type" ) );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( parameter, (Dictionary_Entry_Key)"type" )  );
 }
 
 char* Stg_Meta_GetParameterDefault( Dictionary* dictionary, Index i ) {
-	Dictionary* parameters = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "parameters" ) );
+	Dictionary* parameters = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"parameters" )  );
 	Dictionary* parameter = Dictionary_Entry_Value_AsDictionary( Dictionary_GetByIndex( parameters, i )  );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( parameter, "default" ) );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( parameter, (Dictionary_Entry_Key)"default" )  );
 }
 
 char* Stg_Meta_GetParameterDocumentation( Dictionary* dictionary, Index i ) {
-	Dictionary* parameters = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "parameters" ) );
+	Dictionary* parameters = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"parameters" )  );
 	Dictionary* parameter = Dictionary_Entry_Value_AsDictionary( Dictionary_GetByIndex( parameters, i )  );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( parameter, "documentation" ) );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( parameter, (Dictionary_Entry_Key)"documentation" ) );
 }
 
 
 /* Association parts -------------------------------------------------------------------------------------------------------------*/
 
-Index Stg_Meta_GetAssociationCount( Dictionary* dictionary ) {
-	Dictionary* associations = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "associations" ) );
-	return Dictionary_GetCount( associations );
+Index Stg_Meta_GetAssociationCount( Dictionary* dictionary  ) {
+	Dictionary* associations = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"associations" ) );
+	return Dictionary_GetCount( associations  );
 }
 
 char* Stg_Meta_GetAssociationName( Dictionary* dictionary, Index i ) {
-	Dictionary* associations = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "associations" ) );
+	Dictionary* associations = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"associations" )  );
 	Dictionary* association = Dictionary_Entry_Value_AsDictionary( Dictionary_GetByIndex( associations, i )  );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( association, "name" ) );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( association, (Dictionary_Entry_Key)"name" )  );
 }
 
 char* Stg_Meta_GetAssociationType( Dictionary* dictionary, Index i ) {
-	Dictionary* associations = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "associations" ) );
+	Dictionary* associations = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"associations" )  );
 	Dictionary* association = Dictionary_Entry_Value_AsDictionary( Dictionary_GetByIndex( associations, i )  );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( association, "type" ) );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( association, (Dictionary_Entry_Key)"type" )  );
 }
 
 char* Stg_Meta_GetAssociationNillable( Dictionary* dictionary, Index i ) {
-	Dictionary* associations = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "associations" ) );
+	Dictionary* associations = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"associations" )  );
 	Dictionary* association = Dictionary_Entry_Value_AsDictionary( Dictionary_GetByIndex( associations, i )  );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( association, "nillable" ) );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( association, (Dictionary_Entry_Key)"nillable" )  );
 }
 
 char* Stg_Meta_GetAssociationDocumentation( Dictionary* dictionary, Index i ) {
-	Dictionary* associations = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, "associations" ) );
+	Dictionary* associations = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( dictionary, (Dictionary_Entry_Key)"associations" )  );
 	Dictionary* association = Dictionary_Entry_Value_AsDictionary( Dictionary_GetByIndex( associations, i )  );
-	return Dictionary_Entry_Value_AsString( Dictionary_Get( association, "documentation" ) );
+	return Dictionary_Entry_Value_AsString( Dictionary_Get( association, (Dictionary_Entry_Key)"documentation" )  );
 }
 
 /* Print function ----------------------------------------------------------------------------------------------------------------*/

@@ -104,7 +104,7 @@ void SetVC_Suite_Setup( SetVC_SuiteData* data ) {
    IO_Handler_ReadAllFromFile( io_handler, setVC_XMLFilename, data->dict );
    
    /* Create CF stuff */
-   data->quadCF = ConditionFunction_New( quadratic, "quadratic" );
+   data->quadCF = ConditionFunction_New( quadratic, (Name)"quadratic"  );
    ConditionFunction_Register_Add( data->conFunc_Register, data->quadCF );
    
    /* Create variables */

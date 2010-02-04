@@ -119,12 +119,12 @@ void VariableDumpStreamSuite_TestDump( VariableDumpStreamSuiteData* data ) {
       Variable_SetValueAtDouble( vec, i, 2, 5.6 );
    }
 
-   dumpStream = Journal_Register( VariableDumpStream_Type, "scalar dump" );
+   dumpStream = Journal_Register( VariableDumpStream_Type, (Name)"scalar dump"  );
    VariableDumpStream_SetVariable( dumpStream, var, 1, 0, scalarDumpFilename );
    pcu_check_true( Journal_Dump( dumpStream, NULL ) );
    Stream_Flush( dumpStream );
 
-   dumpStream2 = Journal_Register( VariableDumpStream_Type, "vector dump" );
+   dumpStream2 = Journal_Register( VariableDumpStream_Type, (Name)"vector dump"  );
    VariableDumpStream_SetVariable( dumpStream2, vec, 1, 0, vectorDumpFilename );
    pcu_check_true( Journal_Dump( dumpStream2, NULL ) );
    Stream_Flush( dumpStream2 );
