@@ -213,17 +213,17 @@ void _lucIsosurface_Execute( void* drawingObject, void* data ) {}
 void _lucIsosurface_Destroy( void* drawingObject, void* data ) {}
 
 void _lucIsosurface_Setup( void* drawingObject, void* _context ) {
-	lucIsosurface*             self = (lucIsosurface*)drawingObject;
-	DomainContext*             context = (DomainContext*) _context;
-	FieldVariable*             isosurfaceField = self->isosurfaceField;
-	int                        i, j, k;
-	int                        nx, ny, nz;
-	double                     dx, dy, dz;
-	Vertex***                  vertex;
-	Coord                      pos;
-	Coord                      min;
-	Coord                      max;
-	Dimension_Index            dim             = context->dim;
+	lucIsosurface*           self            = (lucIsosurface*)drawingObject;
+	DomainContext*   context         = (DomainContext*) _context;
+	FieldVariable*           isosurfaceField = self->isosurfaceField;
+	int                      i, j, k;
+	int                      nx, ny, nz;
+	double                   dx, dy, dz;
+	Vertex***                vertex;
+	Coord                    pos;
+	Coord                    min;
+	Coord                    max;
+	Dimension_Index          dim             = context->dim;
 
 	lucOpenGLDrawingObject_SyncShadowValues( self, self->isosurfaceField );
 
@@ -254,7 +254,7 @@ void _lucIsosurface_Setup( void* drawingObject, void* _context ) {
 				pos[ K_AXIS ] = min[ K_AXIS ] + dz * (double ) k;
 
 				memcpy( vertex[i][j][k].pos, pos, 3 * sizeof(double) );
-
+				
 				if ( i == 0 )
 					pos[ I_AXIS ] = min[ I_AXIS ] + 0.001 * dx; 
 				if ( j == 0 )
@@ -267,10 +267,7 @@ void _lucIsosurface_Setup( void* drawingObject, void* _context ) {
 					pos[ J_AXIS ] = max[ J_AXIS ] - 0.001 * dy;
 				if ( k == nz - 1 )
 					pos[ K_AXIS ] = max[ K_AXIS ] - 0.001 * dz;
-
-            if (!FieldVariable_InterpolateValueAt( isosurfaceField, pos, &vertex[i][j][k].value ))
-               /* FieldVariable_InterpolateValueAt returns OTHER_PROC if point not found in mesh, so zero value */
-               vertex[i][j][k].value = 0;
+				FieldVariable_InterpolateValueAt( isosurfaceField, pos, &vertex[i][j][k].value );
 			}
 		}
 	}
@@ -368,8 +365,7 @@ void _lucIsosurface_BuildDisplayList( void* drawingObject, void* _context ) {
 	else 
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );	
 
-	/* Set up Face Culling - default is no culling so surface visible from both sides */
-	glDisable( GL_CULL_FACE );
+	/* Set up Face Culling */
 	if (self->cullBackFace) {
 		if (self->cullFrontFace) 
 			glCullFace( GL_FRONT_AND_BACK );
@@ -393,7 +389,8 @@ void _lucIsosurface_BuildDisplayList( void* drawingObject, void* _context ) {
 	else if ( colourMap ) 
 		lucColourMap_CalibrateFromFieldVariable( colourMap, self->isosurfaceField );
 
-	glFrontFace(GL_CCW);
+
+	glFrontFace(GL_CW);
 	glBegin(GL_TRIANGLES);
 
 	if ( ! self->colourMap || ! colourField ) {
@@ -419,15 +416,14 @@ void _lucIsosurface_BuildDisplayList( void* drawingObject, void* _context ) {
 		glVertex3dv(currentTriangle->pos1);
 		
 		/* Plot Second Vertex */
+		lucIsosurface_GetColourForPos( self, currentTriangle->pos3, min, max, fudgeFactor );
+		glNormal3dv(currentTriangle->normal3);
+		glVertex3dv(currentTriangle->pos3);	
+		
+		/* Plot Third Vertex */
 		lucIsosurface_GetColourForPos( self, currentTriangle->pos2, min, max, fudgeFactor );
 		glNormal3dv(currentTriangle->normal2);
 		glVertex3dv(currentTriangle->pos2);
-
-		/* Plot Third Vertex */
-		lucIsosurface_GetColourForPos( self, currentTriangle->pos3, min, max, fudgeFactor );
-		glNormal3dv(currentTriangle->normal3);
-		glVertex3dv(currentTriangle->pos3);
-
 	}
 	glEnd();
 }
@@ -909,7 +905,6 @@ void lucIsosurface_Normals( lucIsosurface* self, Vertex*** vertex ) {
 					                              vertex[i][j][k-1].value, vertex[i][j][k].value, vertex[i][j][k+1].value,
 					                              vertex[i][j][k-1].pos[2], vertex[i][j][k].pos[2], vertex[i][j][k+1].pos[2]);
 				}														
-
 				StGermain_VectorNormalise(vertex[i][j][k].normal, 3);	
 			}
 		}
@@ -968,16 +963,16 @@ void lucIsosurface_DrawWalls( lucIsosurface* self, Vertex ***array ) {
 	int nz = self->resolution[ K_AXIS ];
 	int i, j, k;
 	Vertex ** points;
-	Vertex * midVerticies;
+	Vertex * midVertices;
 	char order;
 
 	/* Allocate Memory */
 	points = Memory_Alloc_Array( Vertex* , 8, "array for marching squares");
-	midVerticies = Memory_Alloc_Array( Vertex , 4, "array for marching squares");
-	points[LEFT] = &midVerticies[0];
-	points[RIGHT] = &midVerticies[1];
-	points[TOP] = &midVerticies[2];
-	points[BOTTOM] = &midVerticies[3];
+	midVertices = Memory_Alloc_Array( Vertex , 4, "array for marching squares");
+	points[LEFT] = &midVertices[0];
+	points[RIGHT] = &midVertices[1];
+	points[TOP] = &midVertices[2];
+	points[BOTTOM] = &midVertices[3];
 	
 	for ( i = 0 ; i < nx - 1 ; i++ ) {
 		for ( j = 0 ; j < ny - 1 ; j++ ) {
@@ -1020,7 +1015,7 @@ void lucIsosurface_DrawWalls( lucIsosurface* self, Vertex ***array ) {
 		}
 	}
 	Memory_Free( points );
-	Memory_Free( midVerticies );
+	Memory_Free( midVertices );
 }
 
 void lucIsosurface_SetupPointsX( Vertex** points, Vertex*** array, Index i, Index j, Index k ){
@@ -1069,8 +1064,8 @@ void lucIsosurface_AddWallTriangle( lucIsosurface* self, int a , int b, int c, V
 	
 	if (order == gLucifer_CCW) {
 		memcpy( self->triangleList[n].pos1, points[a]->pos, 3*sizeof(double) );
-		memcpy( self->triangleList[n].pos3, points[c]->pos, 3*sizeof(double) );
-		memcpy( self->triangleList[n].pos2, points[b]->pos, 3*sizeof(double) );
+		memcpy( self->triangleList[n].pos2, points[c]->pos, 3*sizeof(double) );
+		memcpy( self->triangleList[n].pos3, points[b]->pos, 3*sizeof(double) );
 	}
 	else {
 		memcpy( self->triangleList[n].pos1, points[a]->pos, 3*sizeof(double) );
@@ -1078,7 +1073,7 @@ void lucIsosurface_AddWallTriangle( lucIsosurface* self, int a , int b, int c, V
 		memcpy( self->triangleList[n].pos3, points[c]->pos, 3*sizeof(double) );
 	}
 
-	/* Calculate Normal */ 
+	/* Calculate Normal */
 	StGermain_NormalToPlane( self->triangleList[n].normal1 , 
 		self->triangleList[n].pos1, self->triangleList[n].pos2, self->triangleList[n].pos3 );
 

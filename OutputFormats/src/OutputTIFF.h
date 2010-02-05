@@ -85,7 +85,7 @@
 	void _lucOutputTIFF_Execute( void* outputFormat, void* data );
 	void _lucOutputTIFF_Destroy( void* outputFormat, void* data ) ;
 	
-	void _lucOutputTIFF_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) ;
+	void _lucOutputTIFF_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) ;
 
 #endif
 

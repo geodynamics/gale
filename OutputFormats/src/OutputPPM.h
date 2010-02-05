@@ -86,7 +86,7 @@
 	void _lucOutputPPM_Execute( void* outputFormat, void* data );
 	void _lucOutputPPM_Destroy( void* outputFormat, void* data ) ;
 	
-	void _lucOutputPPM_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) ;
+	void _lucOutputPPM_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) ;
 
 #endif
 

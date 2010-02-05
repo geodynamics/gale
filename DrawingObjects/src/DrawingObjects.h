@@ -52,7 +52,6 @@
 #include "ColourBar.h"
 #include "FieldVariableBorder.h"
 #include "Isosurface.h"
-#include "CrossSection.h"
 #include "ScalarFieldCrossSection.h"
 #include "ScalarField.h"
 #include "VectorArrowCrossSection.h"

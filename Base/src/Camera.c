@@ -83,7 +83,7 @@ void* _lucCamera_DefaultNew( Name name ) {
 	Type                                                      type = lucCamera_Type;
 	Stg_Class_DeleteFunction*                              _delete = _lucCamera_Delete;
 	Stg_Class_PrintFunction*                                _print = _lucCamera_Print;
-	Stg_Class_CopyFunction*                                  _copy = _Stg_Class_Copy;
+	Stg_Class_CopyFunction*                                  _copy = _lucCamera_Copy;
 	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _lucCamera_DefaultNew;
 	Stg_Component_ConstructFunction*                    _construct = _lucCamera_AssignFromXML;
 	Stg_Component_BuildFunction*                            _build = _lucCamera_Build;
@@ -141,9 +141,7 @@ void _lucCamera_Init(
 	/* Store Original Values */
 	self->needsToDraw   = True;
 	self->buffer        = lucLeft;
-	//self->originalCamera = lucCamera_Copy( self );
-   self->originalCamera = _lucCamera_DefaultNew( "CameraCopy" );
-	_lucCamera_Copy( self, self->originalCamera );
+	self->originalCamera = lucCamera_Copy( self );
 }
 
 void _lucCamera_Delete( void* camera ) {
@@ -191,9 +189,11 @@ void _lucCamera_Print( void* camera, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void _lucCamera_Copy( void* camera, void* dest ) {
+void* _lucCamera_Copy( void* camera, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	lucCamera* self        = camera;
-	lucCamera* newCamera   = dest;
+	lucCamera* newCamera;
+
+	newCamera = _Stg_Component_Copy( self, dest, deep, nameExt, ptrMap );
 
 	newCamera->originalCamera      = NULL;
    newCamera->centreFieldVariable = NULL;
@@ -209,6 +209,8 @@ void _lucCamera_Copy( void* camera, void* dest ) {
 	newCamera->buffer        = self->buffer;
 	newCamera->stereoType    = self->stereoType;
 	newCamera->needsToDraw   = self->needsToDraw;
+
+	return (void*) newCamera;
 }
 
 void _lucCamera_AssignFromXML( void* camera, Stg_ComponentFactory* cf, void* data ) {
@@ -218,8 +220,7 @@ void _lucCamera_AssignFromXML( void* camera, Stg_ComponentFactory* cf, void* dat
 	Coord                  rotationCentre;
 	XYZ                    upDirection;
 	FieldVariable*         centreFieldVariable;
-   Coord                   vectorFocusToCamera;
-	double                 focalLength, defaultFocalLength;
+	double                 focalLength;
 	double                 aperture;
 	double                 eyeSeparation;
 	lucStereoType          stereoType;
@@ -242,13 +243,12 @@ void _lucCamera_AssignFromXML( void* camera, Stg_ComponentFactory* cf, void* dat
 	upDirection[J_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"upDirectionY", 1.0  );
 	upDirection[K_AXIS] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"upDirectionZ", 0.0  );
 	
+	focalLength = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"focalLength", 0.0  );
+
 	coord[I_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"coordX", 0.0  );
 	coord[J_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"coordY", 0.0  );
 	coord[K_AXIS]  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"coordZ", 1.0  );
 
-	StGermain_VectorSubtraction( vectorFocusToCamera, coord, focalPoint, 3 );
-   defaultFocalLength = StGermain_VectorMagnitude(vectorFocusToCamera, 3);
-	focalLength = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"focalLength", defaultFocalLength  );
 	aperture = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"aperture", 45.0  );
 
 	/* Get Stereo Type */
@@ -260,7 +260,7 @@ void _lucCamera_AssignFromXML( void* camera, Stg_ComponentFactory* cf, void* dat
 	else 
 		stereoType = lucMono;
 
-	eyeSeparation  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"eyeSeparation", focalLength / 30.0  );
+	eyeSeparation  = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"eyeSeparation", 0.2  );
 
 	centreFieldVariable = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"CentreFieldVariable", FieldVariable, False, data );
 
@@ -356,8 +356,7 @@ void lucCamera_Reset( void* camera ) {
 	lucCamera* self                = camera;
 	lucCamera* originalCamera      = self->originalCamera;
 	
-   _lucCamera_Copy( originalCamera, self );
-	//Stg_Class_Copy( originalCamera, self, False, NULL, NULL );
+	Stg_Class_Copy( originalCamera, self, False, NULL, NULL );
 	self->originalCamera = originalCamera;
 	self->needsToDraw = True;
 }
@@ -467,12 +466,11 @@ void lucCamera_ChangeFocalPoint( void* camera, Pixel_Index startx, Pixel_Index s
 	lucCamera*      self = (lucCamera*) camera;
 	XYZ             leftDirection;
 	Dimension_Index dim_I;
-   double adjust = self->focalLength / 200.0;
 
 	lucCamera_GetLeftDirection( camera, leftDirection );
 	for ( dim_I = 0 ; dim_I < 3 ; dim_I++ ) {
-		self->focalPoint[ dim_I ] += adjust * ((double)xpos - (double)startx) * leftDirection[ dim_I ];
-		self->focalPoint[ dim_I ] -= adjust * ((double)ypos - (double)starty) * self->upDirection[ dim_I ];
+		self->focalPoint[ dim_I ] += 0.01 * ((double)xpos - (double)startx) * leftDirection[ dim_I ];
+		self->focalPoint[ dim_I ] -= 0.01 * ((double)ypos - (double)starty) * self->upDirection[ dim_I ];
 	}
 
 	self->needsToDraw = True;

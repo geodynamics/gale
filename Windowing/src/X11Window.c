@@ -256,6 +256,7 @@ Bool _lucX11Window_EventProcessor( void* window ) {
 	lucX11Window*  self = (lucX11Window*)window;
 	KeySym         ks;
 	XEvent         event;
+	Atom           wmDeleteWindow;
 	static unsigned int button = 0;
 	static Bool visible = True;
 	Bool redisplay = True;
@@ -338,17 +339,8 @@ Bool lucX11Window_CreateDisplay( void* window )  {
 	static int configuration[] = { GLX_DOUBLEBUFFER, GLX_RGBA, GLX_DEPTH_SIZE, 16,
 			GLX_STENCIL_SIZE, 1, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, None};
 	static int alphaConfiguration[] = { GLX_DOUBLEBUFFER, GLX_RGBA, GLX_DEPTH_SIZE, 16,
-			GLX_STENCIL_SIZE, 1, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, GLX_ALPHA_SIZE, 1, None}; 
-	static int aaConfiguration[] = { GLX_DOUBLEBUFFER, GLX_RGBA, GLX_DEPTH_SIZE, 16,
-			GLX_STENCIL_SIZE, 1, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, GLX_ALPHA_SIZE, 1, 
-         /* Multisample anti-aliasing */
-        GLX_SAMPLE_BUFFERS, 1, GLX_SAMPLES, 4,
-       /* Enable accumulation buffer  /
-        	GLX_ACCUM_RED_SIZE, 1, GLX_ACCUM_GREEN_SIZE, 1, GLX_ACCUM_BLUE_SIZE, 1, GLX_ACCUM_ALPHA_SIZE, 1, None}; */
-         None};
-   int* config;
-   if (self->antialias) config = aaConfiguration; else config = alphaConfiguration;
-
+			GLX_STENCIL_SIZE, 1, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, GLX_ALPHA_SIZE, 1, None};
+	
 	/*********************** Create Display ******************************/
 	self->display = XOpenDisplay(NULL);
 	if (self->display == NULL) {
@@ -376,11 +368,11 @@ Bool lucX11Window_CreateDisplay( void* window )  {
 	}
 
 	/* find an OpenGL-capable display - trying different configurations if nessesary */
-	self->vi = glXChooseVisual(self->display, DefaultScreen(self->display), config);
+	self->vi = glXChooseVisual(self->display, DefaultScreen(self->display), &alphaConfiguration[0]);
 	self->doubleBuffer = True;
 	if (self->vi == NULL) {
 		Journal_Printf( lucError, "In func %s: Couldn't open RGBA Double Buffer display\n", __func__);
-		self->vi = glXChooseVisual( self->display, DefaultScreen( self->display), config + 1);
+		self->vi = glXChooseVisual( self->display, DefaultScreen( self->display), &alphaConfiguration[1]);
 		self->doubleBuffer = False;
 	}
 	if (self->vi == NULL) {
@@ -519,16 +511,14 @@ void lucX11Window_CreateInteractiveWindow( void* window ) {
 	if (wmHints) XFree(wmHints);
 	
     /* Setup timer */
-	if (self->isTimedOut)
-    {
-        parent = (lucWindow*)window;	/* Save parent ref for signal handler... */
-        signal(SIGALRM, lucX11Window_Timer);
-        struct itimerval timerval;
-        timerval.it_value.tv_sec	= 1;
-        timerval.it_value.tv_usec	= 0;
-        timerval.it_interval = timerval.it_value;
-        setitimer(ITIMER_REAL, &timerval, NULL);
-    }
+    parent = (lucWindow*)window;	/* Save parent ref for signal handler... */
+    signal(SIGALRM, lucX11Window_Timer);
+    struct itimerval timerval;
+    timerval.it_value.tv_sec	= 1;
+    timerval.it_value.tv_usec	= 0;
+    timerval.it_interval = timerval.it_value;
+    setitimer(ITIMER_REAL, &timerval, NULL);
+
 	lucDebug_PrintFunctionEnd( self, 1 );
 }	
 

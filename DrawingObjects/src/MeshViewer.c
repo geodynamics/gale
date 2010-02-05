@@ -86,25 +86,19 @@ lucMeshViewer* _lucMeshViewer_New(  LUCMESHVIEWER_DEFARGS  )
 }
 
 void _lucMeshViewer_Init( 
-      lucMeshViewer*                                            self,
+                lucMeshViewer*                                            self,
 		Mesh*                                                     mesh,
 		Name                                                      localColourName,
 		Name                                                      shadowColourName,
 		Name                                                      vacantColourName,
-		float                                                     lineWidth,
-      char*                                                     skipEdges )
+		float                                                        lineWidth )
 {
-   self->mesh  = mesh;
-   lucColour_FromString( &self->localColour, localColourName );
-   lucColour_FromString( &self->shadowColour, shadowColourName );
-   lucColour_FromString( &self->vacantColour, vacantColourName );
-   self->lineWidth = lineWidth;
-
-   /* Specify axis-aligned mesh edges that should not be plotted with character string representing axis */
-   if (strchr(skipEdges, 'x') || strchr(skipEdges, 'X')) self->skipXedges = True; else self->skipXedges = False;
-   if (strchr(skipEdges, 'y') || strchr(skipEdges, 'Y')) self->skipYedges = True; else self->skipYedges = False;
-   if (strchr(skipEdges, 'z') || strchr(skipEdges, 'Z')) self->skipZedges = True; else self->skipZedges = False;
-
+	self->mesh  = mesh;
+	lucColour_FromString( &self->localColour, localColourName );
+	lucColour_FromString( &self->shadowColour, shadowColourName );
+	lucColour_FromString( &self->vacantColour, vacantColourName );
+    self->lineWidth = lineWidth;
+	
 	assert( Stg_Class_IsInstance( mesh, Mesh_Type ) );
 
 	self->renderEdges = NULL;
@@ -183,8 +177,7 @@ void _lucMeshViewer_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf
 			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"localColour", "black"  ),
 			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"shadowColour", "blue"  ),
 			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"vacantColour", "Grey"  ),
-	        (float) Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"lineWidth", 1.0 ),
-         Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"skipEdges", "")
+	        (float) Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"lineWidth", 1.0 )
 			 );
 }
 
@@ -440,16 +433,14 @@ void lucMeshViewer_RenderLocal( void* drawingObject ) {
 	assert( self->renderEdges );
 
 	/* Shortcuts. */
-	glDisable(GL_LIGHTING); 
-	glDisable(GL_LINE_SMOOTH); 
-   /*glDisable(GL_DEPTH_TEST); /* depth testing and line smoothing do not work well together */
+	glDisable(GL_LIGHTING); /* lighting is just not set up correctly */
 	mesh = self->mesh;
 
 	/* Pick the correct dimension. */
 	if( Mesh_GetDimSize( mesh ) == 3 )
-          vertexFunc =(vertexFuncType*) glVertex3dv;
+		vertexFunc = glVertex3dv;
 	else
-          vertexFunc = (vertexFuncType*) glVertex2dv;
+		vertexFunc = glVertex2dv;
 
 
 	/* Set color. */
@@ -470,8 +461,6 @@ void lucMeshViewer_RenderLocal( void* drawingObject ) {
 
 	/* Render edges */
 	self->renderEdges( self, vertexFunc );
-
-   glEnable(GL_DEPTH_TEST); 
 
 /* For now we are doing any text printing in the Draw call as fonts have their own display lists and coord system */
 #if 0
@@ -604,15 +593,8 @@ void lucMeshViewer_RenderEdges_WithInc( lucMeshViewer* self, vertexFuncType* ver
 		incVerts = IArray_GetPtr( inc );
 		assert( nIncVerts == 2 );
 
-		//vertexFunc( Mesh_GetVertex( self->mesh, incVerts[0] ) );
-		//vertexFunc( Mesh_GetVertex( self->mesh, incVerts[1] ) );
-      double *vertex1, *vertex2;
-		vertex1 = Mesh_GetVertex( self->mesh, incVerts[0] );
-		vertex2 = Mesh_GetVertex( self->mesh, incVerts[1] );
-      if (!EdgeSkip(self, vertex1, vertex2)) {
-   		vertexFunc(vertex1);
-	   	vertexFunc(vertex2); 
-	   }
+		vertexFunc( Mesh_GetVertex( self->mesh, incVerts[0] ) );
+		vertexFunc( Mesh_GetVertex( self->mesh, incVerts[1] ) );
 	}
     glEnd();
 	glEnable(GL_LIGHTING);
@@ -632,35 +614,11 @@ void lucMeshViewer_RenderEdges( lucMeshViewer* self, vertexFuncType* vertexFunc 
 	glDisable(GL_LIGHTING);
 	glBegin( GL_LINES );
 	for( e_i = 0; e_i < nEdges; e_i++ ) {
-		//vertexFunc( Mesh_GetVertex( self->mesh, edges[e_i][0] ) );
-		//vertexFunc( Mesh_GetVertex( self->mesh, edges[e_i][1] ) );
-      double *vertex1, *vertex2;
-		vertex1 = Mesh_GetVertex( self->mesh, edges[e_i][0] );
-		vertex2 = Mesh_GetVertex( self->mesh, edges[e_i][1] );
-      if (!EdgeSkip(self, vertex1, vertex2)) {
-   		vertexFunc(vertex1);
-	   	vertexFunc(vertex2); 
-	   }
+		vertexFunc( Mesh_GetVertex( self->mesh, edges[e_i][0] ) );
+		vertexFunc( Mesh_GetVertex( self->mesh, edges[e_i][1] ) );
 	}
 	glEnd();
 	glEnable(GL_LIGHTING);
-}
-
-Bool EdgeSkip(lucMeshViewer* self, double* v1, double* v2)
-{  
-   /* Skip where Y+Z unchanging (x-axis aligned horizontal edges) */
-   if (self->skipXedges && v1[J_AXIS] == v2[J_AXIS] && v1[K_AXIS] == v2[K_AXIS])
-      return True;
-
-   /* Skip where X+Z unchanging (y-axis aligned vertical edges) */
-   if (self->skipYedges && v1[I_AXIS] == v2[I_AXIS] && v1[K_AXIS] == v2[K_AXIS])
-      return True;
-
-   /* Skip where X+Y unchanging (z-axis aligned horizontal edges) */
-   if (self->skipZedges && v1[I_AXIS] == v2[I_AXIS] && v1[J_AXIS] == v2[J_AXIS])
-      return True;
-
-   return False;
 }
 
 

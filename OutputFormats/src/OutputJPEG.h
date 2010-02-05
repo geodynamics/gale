@@ -87,7 +87,7 @@
 	void _lucOutputJPEG_Execute( void* outputFormat, void* data );
 	void _lucOutputJPEG_Destroy( void* outputFormat, void* data ) ;
 	
-	void _lucOutputJPEG_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) ;
+	void _lucOutputJPEG_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) ;
 
 #endif
 

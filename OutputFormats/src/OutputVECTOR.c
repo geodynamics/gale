@@ -171,7 +171,7 @@ void _lucOutputVECTOR_AssignFromXML( void* outputFormat, Stg_ComponentFactory* c
 	_lucOutputVECTOR_Init( self, cf );
 	
 	/* Construct Parent */
-	_lucOutputFormat_AssignFromXML( outputFormat, cf, data);
+	lucOutputFormat_InitAll( self, self->format);
 	
 }
 
@@ -180,7 +180,7 @@ void _lucOutputVECTOR_Initialise( void* outputFormat, void* data ) {}
 void _lucOutputVECTOR_Execute( void* outputFormat, void* data ) {}
 void _lucOutputVECTOR_Destroy( void* outputFormat, void* data ) {}
 
-void _lucOutputVECTOR_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) {
+void _lucOutputVECTOR_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) {
 	lucOutputVECTOR* self       = (lucOutputVECTOR*) outputFormat;
 	Pixel_Index   width        = window->width;
 	Pixel_Index   height       = window->height;
@@ -214,7 +214,7 @@ void _lucOutputVECTOR_Output( void* outputFormat, lucWindow* window, AbstractCon
 	/* return to glRenderMode(GL_RENDER), and complete writing output file */
 	state = gl2psEndPage();
 	if(state == 5)
-		Journal_Printf( Journal_MyStream( Error_Type, self ), "\nError. Insufficient GL feedback buffer size. \
+		Journal_Printf( Journal_MyStream( Error_Type, self ), "\nError. Insufficient GL feedback buffer size. \ 
 								       \nConsider increasing the OutputVECTOR buffersize. \
 								      \nVector image will not be created correctly.\n\n" );
 

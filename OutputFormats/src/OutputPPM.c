@@ -126,9 +126,7 @@ void _lucOutputPPM_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, 
 	lucOutputPPM*  self = (lucOutputPPM*)outputFormat;
 
 	/* Construct Parent */
-   self->extension = "ppm";
-	_lucOutputFormat_AssignFromXML( outputFormat, cf, data);
-   self->transparent = False; /* Not supported */
+	lucOutputFormat_InitAll( self, "ppm" );
 
 	_lucOutputPPM_Init( self );
 }
@@ -138,8 +136,7 @@ void _lucOutputPPM_Initialise( void* outputFormat, void* data ) {}
 void _lucOutputPPM_Execute( void* outputFormat, void* data ) {}
 void _lucOutputPPM_Destroy( void* outputFormat, void* data ) {}
 
-void _lucOutputPPM_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixData ) {
-   lucPixel* pixelData = (lucPixel*)pixData;
+void _lucOutputPPM_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) {
 	lucOutputPPM*  self         = (lucOutputPPM*)outputFormat;
 	Pixel_Index    windowWidth  = window->width;
 	Pixel_Index    windowHeight = window->height;

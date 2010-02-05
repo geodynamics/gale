@@ -59,6 +59,14 @@
 #include <glu.h>
 #include <string.h>
 
+#ifdef HAVE_TIFF
+#include <tiffio.h>
+#endif
+
+#ifdef HAVE_LIBJPEG
+#include <jpeglib.h>
+#endif
+
 #ifndef MASTER
 	#define MASTER 0
 #endif
@@ -78,6 +86,12 @@ lucTextureMap* _lucTextureMap_New(  LUCTEXTUREMAP_DEFARGS  )
 				
 	return self;
 }
+
+Bool IsPowerOfTwo (int value)
+{
+  return (value & -value) == value;
+}
+
 
 void _lucTextureMap_Init( 
 	lucTextureMap*                                               self,
@@ -120,6 +134,12 @@ void _lucTextureMap_Init(
 	/* Open and read Image */	
 	self->inputFormat = lucInputFormat_Register_CreateFromFileName( lucInputFormat_Register_Singleton, imageName );		
 	self->pixelData = lucInputFormat_Input( self->inputFormat, imageName, &self->imageWidth, &self->imageHeight );
+	
+	Journal_Firewall( IsPowerOfTwo (self->imageWidth) && IsPowerOfTwo (self->imageHeight),
+			Journal_MyStream( Error_Type, self ), 
+			"In func '%s for %s '%s'\n"
+			"Image dimensions (%u x %u) are not in powers of 2 - Cannot create OpenGL texture map.\n", 
+			__func__, self->type, self->name, self->imageWidth, self->imageHeight );
 }
 
 void _lucTextureMap_Delete( void* drawingObject ) {
@@ -272,7 +292,6 @@ void _lucTextureMap_BuildDisplayList( void* drawingObject, void* _context ) {
 	glFlush();
 
 	glDisable(GL_TEXTURE_2D);
-	glEnable(GL_BLEND);
 }
 
 

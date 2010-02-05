@@ -19,12 +19,7 @@
 
 
 <list name="Params">
-	<struct>
-		<param name="Name">transparent</param>
-		<param name="Type">Bool</param>
-		<param name="Default">False</param>
-		<param name="Description">Output with transparent alpha channel, only works if format supports RGBA data</param>
-	</struct>
+
 </list>
 
 <list name="Dependencies">

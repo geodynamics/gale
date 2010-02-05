@@ -118,8 +118,7 @@ void _lucWindow_Init(
 		Bool                                               interactive,
 		Bool                                               continuous,
 		Bool                                               isTimedOut,
-		double                                             maxIdleTime,
-      Bool                                               antialias ) 
+		double                                             maxIdleTime ) 
 {
 	OutputFormat_Index   outputFormat_I;
 	WindowInteraction_Index windowInteraction_I;
@@ -130,7 +129,6 @@ void _lucWindow_Init(
     self->resized = False;
 	self->interactive = interactive;
 	self->continuous = continuous; 
-	self->antialias = antialias;
 
 	self->viewportInfoList = Memory_Alloc_Array( lucViewportInfo, viewportCount, "viewport info Array" );
 	memcpy( self->viewportInfoList, viewportInfoList, viewportCount * sizeof( lucViewportInfo ) );
@@ -301,9 +299,8 @@ void _lucWindow_AssignFromXML( void* window, Stg_ComponentFactory* cf, void* dat
 			Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"backgroundColour", "white"  ),
 			interactive,
 			continuous,
-			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"isTimedOut", False  ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxIdleTime", 600.0  ), 
-			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"antialias", True )
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"isTimedOut", True  ),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxIdleTime", 600.0 ) 
 			);
 		
 	/* Free Memory */
@@ -379,10 +376,10 @@ void _lucWindow_Execute( void* window, void* data ) {
         	MPI_Bcast( &redisplay, 1, MPI_INT, MASTER, self->context->communicator );
       
 			/* Still events to process? delay redisplay until queue empty */
-			if (events <= 1 && redisplay)
+			if (events <= 1)
 			{
 				/* Redraw Window (Call virtual to display) */
-				self->_displayWindow( self );
+				if (redisplay) self->_displayWindow( self );
 				redisplay = False;
 			}
 		}
@@ -398,15 +395,14 @@ void _lucWindow_Execute( void* window, void* data ) {
 	
 	/* Stop idle timeout */
 	self->idleTime = 0;
-
-   /* Clean up drawing objects */	
-	lucWindow_CleanUp( window, data );
+	
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
 
 void _lucWindow_Destroy( void* window, void* data ) {
 	lucWindow*     self      = (lucWindow*)window;
 
+	lucWindow_CleanUp( window, data );
 	Memory_Free(self->title);
     lucDeleteFont(); 
 }
@@ -470,7 +466,6 @@ void lucWindow_Dump( void* window, AbstractContext* context ) {
 	Pixel_Index    width        = self->width;
 	Pixel_Index    height       = self->height;
 	lucPixel*      imageBuffer  = NULL;
-	lucAlphaPixel* imageAlphaBuffer  = NULL;
 	Stream*        errorStream  = Journal_MyStream( Error_Type, self );
 
 	lucDebug_PrintFunctionBegin( self, 1 );
@@ -478,19 +473,15 @@ void lucWindow_Dump( void* window, AbstractContext* context ) {
 	/* Allocate Memory */
 	imageBuffer = Memory_Alloc_Array( lucPixel, width * height, "Pixels" );
 	Journal_Firewall( imageBuffer != NULL, errorStream, "In func %s: Cannot allocate array.", __func__ );
-	imageAlphaBuffer = Memory_Alloc_Array( lucAlphaPixel, width * height, "Pixels" );
-	Journal_Firewall( imageAlphaBuffer != NULL, errorStream, "In func %s: Cannot allocate array.", __func__ );
 
 	/* Grab Pixels from window */
-	lucRenderingEngine_GetPixelData( self->renderingEngine, self, imageBuffer, False );
-	lucRenderingEngine_GetPixelData( self->renderingEngine, self, imageAlphaBuffer, True );
+	lucRenderingEngine_GetPixelData( self->renderingEngine, self, imageBuffer );
 
 	/* Output in different formats that the user gives */
-	lucOutputFormat_Register_OutputAll( self->outputFormat_Register, self, context, imageBuffer, imageAlphaBuffer);
+	lucOutputFormat_Register_OutputAll( self->outputFormat_Register, self, context, imageBuffer );
 	
 	/* Free memory */
 	Memory_Free( imageBuffer );
-	Memory_Free( imageAlphaBuffer );
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
 

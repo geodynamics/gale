@@ -50,6 +50,7 @@
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
+#include <glucifer/Base/CrossSection.h>
 
 #include "types.h"
 #include "OpenGLDrawingObject.h"
@@ -91,6 +92,19 @@ void _lucEigenvectors_Print( void* drawingObject, Stream* stream ) {
 	_lucEigenvectorsCrossSection_Print( self, stream );
 }
 
+void* _lucEigenvectors_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) {
+	lucEigenvectors*  self = (lucEigenvectors*)drawingObject;
+	lucEigenvectors* newDrawingObject;
+
+	newDrawingObject = _lucEigenvectorsCrossSection_Copy( self, dest, deep, nameExt, ptrMap );
+
+	/* TODO */
+	abort();
+
+	return (void*) newDrawingObject;
+}
+
+
 void* _lucEigenvectors_DefaultNew( Name name ) {
 	/* Variables set in this function */
 	SizeT                                                     _sizeOfSelf = sizeof(lucEigenvectors);
@@ -100,13 +114,13 @@ void* _lucEigenvectors_DefaultNew( Name name ) {
 	Stg_Class_CopyFunction*                                         _copy = NULL;
 	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucEigenvectors_DefaultNew;
 	Stg_Component_ConstructFunction*                           _construct = _lucEigenvectors_AssignFromXML;
-	Stg_Component_BuildFunction*                                   _build = _lucEigenvectorsCrossSection_Build;
-	Stg_Component_InitialiseFunction*                         _initialise = _lucEigenvectorsCrossSection_Initialise;
-	Stg_Component_ExecuteFunction*                               _execute = _lucEigenvectorsCrossSection_Execute;
-	Stg_Component_DestroyFunction*                               _destroy = _lucEigenvectorsCrossSection_Destroy;
-	lucDrawingObject_SetupFunction*                                _setup = _lucOpenGLDrawingObject_Setup;
-	lucDrawingObject_DrawFunction*                                  _draw = _lucOpenGLDrawingObject_Draw;
-	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucOpenGLDrawingObject_CleanUp;
+	Stg_Component_BuildFunction*                                   _build = _lucEigenvectors_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucEigenvectors_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucEigenvectors_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucEigenvectors_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucEigenvectors_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucEigenvectors_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucEigenvectors_CleanUp;
 	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucEigenvectors_BuildDisplayList;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
@@ -124,22 +138,46 @@ void _lucEigenvectors_AssignFromXML( void* drawingObject, Stg_ComponentFactory* 
 	_lucEigenvectors_Init( self );
 }
 
+void _lucEigenvectors_Build( void* drawingObject, void* data ) {}
+void _lucEigenvectors_Initialise( void* drawingObject, void* data ) {}
+void _lucEigenvectors_Execute( void* drawingObject, void* data ) {}
+void _lucEigenvectors_Destroy( void* drawingObject, void* data ) {}
+
+void _lucEigenvectors_Setup( void* drawingObject, void* _context ) {
+	lucEigenvectors*       self            = (lucEigenvectors*)drawingObject;
+	
+	_lucEigenvectorsCrossSection_Setup( self, _context );
+}
+
+void _lucEigenvectors_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
+	lucEigenvectors*       self            = (lucEigenvectors*)drawingObject;
+
+	_lucEigenvectorsCrossSection_Draw( self, window, viewportInfo, _context );
+}
+
+void _lucEigenvectors_CleanUp( void* drawingObject, void* _context ) {
+	lucEigenvectors*       self            = (lucEigenvectors*)drawingObject;
+	
+	_lucEigenvectorsCrossSection_CleanUp( self, _context );
+}
+	
 void _lucEigenvectors_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucEigenvectors*       self            = (lucEigenvectors*)drawingObject;
 	DomainContext* context         = (DomainContext*) _context;
 	Dimension_Index        dim             = context->dim;
+   lucCrossSection          crossSection;
 
 	if ( dim == 2 )
    {
-      _lucEigenvectorsCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, K_AXIS, False), dim);
+      _lucEigenvectorsCrossSection_DrawCrossSection( self, dim, lucCrossSection_Set(&crossSection, 0.0, K_AXIS, False));
 	}
 	else 
    {
 		double dz = 1/(double)self->resolution[ K_AXIS ];
-      self->axis = K_AXIS;
-      self->interpolate = True;
-		for ( self->value = 0.0 ; self->value < 1.0+dz ; self->value += dz) {
-		   _lucEigenvectorsCrossSection_DrawCrossSection( self, dim );
+      crossSection.axis = K_AXIS;
+      crossSection.interpolate = True;
+		for ( crossSection.value = 0.0 ; crossSection.value < 1.0+dz ; crossSection.value += dz) {
+		   _lucEigenvectorsCrossSection_DrawCrossSection( self, dim, &crossSection);
 		}
 	}
 }

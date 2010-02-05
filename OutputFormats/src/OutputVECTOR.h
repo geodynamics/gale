@@ -88,7 +88,7 @@
 	void _lucOutputVECTOR_Execute( void* outputFormat, void* data );
 	void _lucOutputVECTOR_Destroy( void* outputFormat, void* data ) ;
 	
-	void _lucOutputVECTOR_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) ;
+	void _lucOutputVECTOR_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) ;
 
 #endif
 

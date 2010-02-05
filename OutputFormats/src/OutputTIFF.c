@@ -130,9 +130,7 @@ void _lucOutputTIFF_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf,
 	lucOutputTIFF*  self = (lucOutputTIFF*)outputFormat;
 
 	/* Construct Parent */
-   self->extension = "tiff";
-	_lucOutputFormat_AssignFromXML( outputFormat, cf, data);
-   self->transparent = False; /* Not supported */
+	lucOutputFormat_InitAll( self, "tiff" );
 
 	_lucOutputTIFF_Init( self );
 }
@@ -142,7 +140,7 @@ void _lucOutputTIFF_Initialise( void* outputFormat, void* data ) {}
 void _lucOutputTIFF_Execute( void* outputFormat, void* data ) {}
 void _lucOutputTIFF_Destroy( void* outputFormat, void* data ) {}
 
-void _lucOutputTIFF_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) {
+void _lucOutputTIFF_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) {
 	lucOutputTIFF*              self         = (lucOutputTIFF*) outputFormat;
 	Pixel_Index                 width        = window->width;
 	Pixel_Index                 height       = window->height;
@@ -167,7 +165,7 @@ void _lucOutputTIFF_Output( void* outputFormat, lucWindow* window, AbstractConte
 	TIFFSetField(file, TIFFTAG_ROWSPERSTRIP, 1);
 	TIFFSetField(file, TIFFTAG_IMAGEDESCRIPTION, window->name );
 	
-	linePtr = (lucPixel*)pixelData;
+	linePtr = pixelData;
 	for ( line_I = height - 1;  line_I != (Pixel_Index) -1 ;  line_I--) {
 		if (TIFFWriteScanline(file, linePtr, line_I, 0) < 0) {
 			TIFFClose(file);

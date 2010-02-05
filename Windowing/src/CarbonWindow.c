@@ -264,42 +264,15 @@ void lucCarbonWindow_CreateWindow( void* window ) {
 			  { kEventClassWindow, kEventWindowBoundsChanged },
 			  { kEventClassWindow, kEventWindowResizeCompleted},
 			};
-
-   /* OpenGL attributes */
-	static GLint attributes[] =	
+	static GLint 		attributes[] =	/* OpenGL attributes */
 			{
-			    AGL_RGBA,
-			    AGL_RED_SIZE,           8,
-                AGL_GREEN_SIZE,         8,
-                AGL_BLUE_SIZE,          8,
-                AGL_ALPHA_SIZE,         8,
-                AGL_DOUBLEBUFFER,
-                AGL_DEPTH_SIZE,         16,
-                AGL_STENCIL_SIZE,       1,
-			    AGL_NONE
+			  AGL_RGBA,
+			  AGL_GREEN_SIZE, 1,
+			  AGL_DOUBLEBUFFER,
+			  AGL_DEPTH_SIZE, 16,
+              AGL_STENCIL_SIZE, 1,
+			  AGL_NONE
 			};
-	static GLint aaAttributes[] =	
-			{
-			    AGL_RGBA,
-			    AGL_RED_SIZE,           8,
-                AGL_GREEN_SIZE,         8,
-                AGL_BLUE_SIZE,          8,
-                AGL_ALPHA_SIZE,         8,
-                AGL_DOUBLEBUFFER,
-                AGL_DEPTH_SIZE,         16,
-                AGL_STENCIL_SIZE,       1,
-               /* Enables MSAA */
-               AGL_SAMPLE_BUFFERS_ARB, 1,
-               AGL_SAMPLES_ARB, 4,
-                /* Enable accumulation buffer /              
-                AGL_ACCUM_RED_SIZE,     8,
-                AGL_ACCUM_GREEN_SIZE,   8,
-                AGL_ACCUM_BLUE_SIZE,    8,
-                AGL_ACCUM_ALPHA_SIZE,   8,*/
-			    AGL_NONE
-			};
-   int* attribs;
-   if (self->antialias) attribs = aaAttributes; else attribs = attributes;
 
 	lucDebug_PrintFunctionBegin( self, 1 );
 
@@ -320,10 +293,8 @@ void lucCarbonWindow_CreateWindow( void* window ) {
 		self->handler = NewEventHandlerUPP(lucCarbonWindow_EventHandler);
 		InstallWindowEventHandler(self->window, self->handler, sizeof(events) / sizeof(events[0]), events, self, 0L);
 		
-	    if (self->isTimedOut) {
-    		self->timerHandler = NewEventLoopIdleTimerUPP(lucCarbonWindow_IdleTimer);
-	    	InstallEventLoopIdleTimer(GetMainEventLoop(), kEventDurationSecond * 2, kEventDurationSecond * 1, self->timerHandler, self, &self->timer);
-        }
+		self->timerHandler = NewEventLoopIdleTimerUPP(lucCarbonWindow_IdleTimer);
+		InstallEventLoopIdleTimer(GetMainEventLoop(), kEventDurationSecond * 2, kEventDurationSecond * 1, self->timerHandler, self, &self->timer);
 		
 		GetCurrentProcess(&psn);
 		/* this is a secret undocumented Mac function that allows code that isn't part of a bundle to be a foreground operation */
@@ -336,7 +307,7 @@ void lucCarbonWindow_CreateWindow( void* window ) {
 	}
 	
 	/* Create the OpenGL context and bind it to the window or pixelbuffer.  */
-	format = aglChoosePixelFormat(NULL, 0, attribs);
+	format = aglChoosePixelFormat(NULL, 0, attributes);
 	self->graphicsContext = NULL;
 	self->graphicsContext = aglCreateContext(format, NULL);
 	assert( self->graphicsContext );
@@ -362,10 +333,8 @@ void lucCarbonWindow_DestroyWindow( void* window ) {
 	if ( self->window )
 	{
 		DisposeEventHandlerUPP( self->handler ); 
-    	if (self->isTimedOut) {
-    		if (self->timer != NULL) RemoveEventLoopTimer( self->timer );
-    		DisposeEventLoopIdleTimerUPP( self->timerHandler ); 
-        }
+		if (self->timer != NULL) RemoveEventLoopTimer( self->timer );
+		DisposeEventLoopIdleTimerUPP( self->timerHandler ); 
 		DisposeWindow( self->window );
 	}
 	else

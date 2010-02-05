@@ -49,7 +49,7 @@
 
 	extern const Type lucOutputFormat_Type;
 
-	typedef void (lucOutputFormat_OutputFunction) ( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData );
+	typedef void (lucOutputFormat_OutputFunction) ( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData );
 
 	#define __lucOutputFormat                                         \
 		__Stg_Component                                           \
@@ -57,8 +57,7 @@
 		/* Virtual Functions */ \
 		lucOutputFormat_OutputFunction*                    _output;                  \
 		/* Other Info */   \
-		Name                                               extension;  \
-      Bool                                               transparent;
+		Name                                               extension;
 
 	struct lucOutputFormat {__lucOutputFormat};
 
@@ -77,19 +76,23 @@
 
 	lucOutputFormat* _lucOutputFormat_New(  LUCOUTPUTFORMAT_DEFARGS  );
 
+	void lucOutputFormat_InitAll( 
+		void*                                              outputFormat,
+		Name                                               extension );
+
 	void _lucOutputFormat_Delete( void* outputFormat ) ;
 	void _lucOutputFormat_Print( void* outputFormat, Stream* stream ) ;
 	void* _lucOutputFormat_Copy( void* outputFormat, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 
 	void* _lucOutputFormat_DefaultNew( Name name ) ;
-   void _lucOutputFormat_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ) ;
+void _lucOutputFormat_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucOutputFormat_Build( void* outputFormat, void* data );
 	void _lucOutputFormat_Initialise( void* outputFormat, void* data );
 	void _lucOutputFormat_Execute( void* outputFormat, void* data );
 	void _lucOutputFormat_Destroy( void* outputFormat, void* data );
 
 	/* +++ Public Functions +++ */
-	void lucOutputFormat_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) ;
+	void lucOutputFormat_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) ;
 
 	Name lucOutputFormat_GetImageFilename( void* outputFormat, lucWindow* window, void* _context ) ;
 	FILE* lucOutputFormat_OpenFile( void* outputFormat, lucWindow* window, void* _context, const char *mode ) ;

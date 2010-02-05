@@ -143,8 +143,7 @@ void _lucOSMesaWindow_Initialise( void* window, void* data ) {
 
 	/* Init OSMesa display buffer */
 	self->pixelBuffer = Memory_Alloc_Array( lucAlphaPixel, self->width * self->height, "OSMesa pixelBuffer" );
-    /* 24 bit depth, 1 bit stencil, no accum */
-	self->osMesaContext = OSMesaCreateContextExt( OSMESA_RGBA, 24, 1, 0, NULL); 
+	self->osMesaContext = OSMesaCreateContextExt( OSMESA_RGBA, 16, 1, 0, NULL); /* 16 bit depth, 1 bit stencil */
 
 	OSMesaMakeCurrent( self->osMesaContext, self->pixelBuffer, GL_UNSIGNED_BYTE, self->width, self->height );
 

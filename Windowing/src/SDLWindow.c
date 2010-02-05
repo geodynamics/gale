@@ -38,7 +38,6 @@
 *+		Stevan Quenette
 *+		Patrick Sunter
 *+		Greg Watson
-*+		Owen Kaluza
 *+
 ** $Id: SDLWindow.c 740 2007-10-11 08:05:31Z SteveQuenette $
 ** 
@@ -175,8 +174,7 @@ void _lucSDLWindow_Initialise( void* window, void* data ) {
      *** For this to work, OSMesa must be linked without/before any other OpenGL implementations. */
   #ifdef HAVE_OSMESA
     Journal_Printf( Journal_MyStream( Info_Type, self ), "*** Using OSMesa library for OpenGL graphics in SDL Window ***.\n" );
-    /* 24 bit depth, 1 bit stencil, 8 bit accum */
-    self->osMesaContext = OSMesaCreateContextExt( GL_RGBA, 24, 1, 8, NULL );
+    self->osMesaContext = OSMesaCreateContextExt( GL_RGBA, 16, 1, 0, NULL );    /* 16 bit depth, 1 bit stencil */
     if (!self->osMesaContext) {
         Journal_Printf( lucError, "In func %s: OSMesaCreateContext failed!\n", __func__);
         abort();
@@ -187,12 +185,20 @@ void _lucSDLWindow_Initialise( void* window, void* data ) {
         self->sdlFlags = SDL_RESIZABLE | SDL_SWSURFACE;
   #else
     self->sdlFlags = SDL_OPENGL | SDL_RESIZABLE;
+    /* set opengl attributes */
+    SDL_GL_SetAttribute(SDL_GL_RED_SIZE,        8);
+    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,      8);
+    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,       8);
+    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE,      8);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,      16);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE,    1);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,    1);
   #endif
 
     /* Create display */	
     lucSDLWindow_CreateWindow(self);
     
-    if (self->interactive && self->isMaster && self->isTimedOut)
+    if (self->interactive && self->isMaster)
         /* Install 1sec idle timer */
         self->timer = SDL_AddTimer(1000, lucSDLWindow_IdleTimer, self);
 
@@ -202,6 +208,9 @@ void _lucSDLWindow_Initialise( void* window, void* data ) {
 
 	/* Run the parent function to init window... */
 	_lucWindow_Initialise(window, data);	
+
+	/* Refresh display */
+	//_lucSDLWindow_Display(window);
 }
 
 void _lucSDLWindow_Execute( void* window, void* data ) {
@@ -214,7 +223,7 @@ void _lucSDLWindow_Execute( void* window, void* data ) {
     Journal_DPrintfL( lucDebug, 2, "OSMesa make current %d,%d\n", self->width, self->height);
   #else
     /* Clear background */
-	self->renderingEngine->_clear(self, window, True);
+		self->renderingEngine->_clear(self, window, False);
   #endif
 	/* Run the parent function to execute the window... */
 	_lucWindow_Execute(window, data);	
@@ -224,9 +233,9 @@ void _lucSDLWindow_Destroy( void* window, void* data ) {
 	lucSDLWindow*   self = (lucSDLWindow*)window;
 
 	/* Run the parent function to destroy window... */
-	_lucWindow_Destroy(self, data);
+	_lucWindow_Destroy(window, data);
 
-    lucSDLWindow_DeleteWindow(self);
+    lucSDLWindow_DeleteWindow(window);
 
   #ifdef HAVE_OSMESA
     /* destroy the context */
@@ -243,19 +252,17 @@ void _lucSDLWindow_Display( void* window ) {
 	lucSDLWindow*        self = (lucSDLWindow*) window; 
 
 	/* Run the parent function to display window... */
-	lucWindow_Display(self);	
+	lucWindow_Display(window);	
 
   #ifdef HAVE_OSMESA
 	/* Render in SDL using OSMesa output buffer */
     if (self->interactive)
     {
-        /* Clear window background */
         SDL_PixelFormat *fmt = self->screen->format;
         lucColour *c = &self->backgroundColour;
         SDL_FillRect(self->screen, NULL, SDL_MapRGBA(fmt, (Uint8)(c->red * 255), (Uint8)(c->green * 255), 
                                                           (Uint8)(c->blue * 255), (Uint8)(c->opacity * 255)));
         Journal_DPrintfL( lucDebug, 2, "SDL BLIT SURFACE src %d,%d to dst %d,%d\n\n", self->buffer->w, self->buffer->h, self->screen->w, self->screen->h);
-        /* Blit OSMesa output to SDL window */
     	SDL_BlitSurface(self->buffer,NULL,self->screen,NULL);
 	    SDL_Flip(self->screen);
     }
@@ -410,26 +417,6 @@ void lucSDLWindow_CreateWindow( void* window ) {
    	}
 	OSMesaPixelStore(OSMESA_Y_UP,0);
     if (!self->interactive || !self->isMaster) return;  /* No SDL window required */
-  #else
-    /* set opengl attributes */
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE,        8);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE,      8);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE,       8);
-    SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE,      8);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE,      16);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE,    1);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER,    1);
-   if (self->antialias) {
-       /* Enable accumulation buffer /
-       SDL_GL_SetAttribute(SDL_GL_ACCUM_RED_SIZE,  8);
-       SDL_GL_SetAttribute(SDL_GL_ACCUM_GREEN_SIZE,8);
-       SDL_GL_SetAttribute(SDL_GL_ACCUM_BLUE_SIZE, 8);
-       SDL_GL_SetAttribute(SDL_GL_ACCUM_ALPHA_SIZE,8);
-       */
-      /* Enable 4xsample Antialiasing */
-      SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-      SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-   }
   #endif
 
     /* Create our rendering surface */
@@ -465,6 +452,7 @@ void lucSDLWindow_DeleteWindow(void *window) {
         if (SDL_useCount < 1)
         { 
             SDL_FreeSurface(self->screen);
+            SDL_Quit();
             screen = NULL;
         }
     }

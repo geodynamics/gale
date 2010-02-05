@@ -52,7 +52,7 @@
 	<struct>
 		<param name="Name">isTimedOut</param>
 		<param name="Type">Bool</param>
-		<param name="Default">False</param>
+		<param name="Default">True</param>
 		<param name="Description">If True, and interactive mode is on, the window will time out after maxIdleTime seconds have elapsed (default is 600).</param>
 	</struct>
 
@@ -62,12 +62,7 @@
 		<param name="Default">600.0</param>
 		<param name="Description">The maximum time (in seconds) that the window can be open without user input. This is so that the user is warned when running the program with interactive turned on but without being aware.</param>
 	</struct>
-	<struct>
-		<param name="Name">antialias</param>
-		<param name="Type">Bool</param>
-		<param name="Default">True</param>
-		<param name="Description">If True multisample anti-aliasing will be enabled where the hardware and graphics library allows it. This effectively smooths the edges of lines and polygons for a much nicer looking output. Set to False to disable anti-aliasing. Not available for OSMesa windows, to reduce aliasing in OSMesa, render a larger window and downsample manually.</param>
-	</struct>
+
 </list>
 
 <list name="Dependencies">

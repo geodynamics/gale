@@ -53,15 +53,12 @@
 	#define __lucViewport                                         \
 		__Stg_Component                                           \
 		AbstractContext*				   context; 		     \
-      lucCamera*                                         camera;                   \
-      lucDrawingObject_Register*                         drawingObject_Register;   \
-      lucLight_Register*                         	      light_Register;           \
-      lucLight*                                          defaultLight;             \
+		lucCamera*                                         camera;                   \
+		lucDrawingObject_Register*                         drawingObject_Register;   \
+		lucLight_Register*                         	   light_Register;           \
+		lucLight*                                          defaultLight;             \
 		double                                             nearClipPlane;            \
 		double                                             farClipPlane;             \
-		double                                             scaleX;              \
-		double                                             scaleY;              \
-		double                                             scaleZ;              \
 		Bool                                               drawTitle;                \
 		Bool                                               drawTime;                 \
 		Bool                                               compositeEachObject;
@@ -74,15 +71,12 @@
 		lucDrawingObject**                                 drawingObjectList,
 		DrawingObject_Index                                drawingObjectCount,
 		lucLight**                                         lightList,
-      Light_Index                                        lightCount,
-      Bool                                               drawTitle,
+	        Light_Index                                        lightCount,
+        	Bool                                               drawTitle,
 		Bool                                               drawTime,
 		Bool                                               compositeEachObject,
 		double                                             nearClipPlane,
-		double                                             farClipPlane,
-		double                                             scaleX,
-		double                                             scaleY,
-		double                                             scaleZ );
+		double                                             farClipPlane );
 
 	
 	#ifndef ZERO
@@ -97,12 +91,25 @@
 
 	lucViewport* _lucViewport_New(  LUCVIEWPORT_DEFARGS  );
 
+	void lucViewport_InitAll( 
+		void*                                              viewport,
+		lucCamera*                                         camera, 
+		lucDrawingObject**                                 drawingObjectList,
+		DrawingObject_Index                                drawingObjectCount,
+		lucLight**                                         lightList,
+	        Light_Index                                        lightCount,
+		Bool                                               drawTitle,
+		Bool                                               drawTime,
+		Bool                                               compositeEachObject,
+		double                                             nearClipPlane,
+		double                                             farClipPlane );
+
 	void _lucViewport_Delete( void* viewport ) ;
 	void _lucViewport_Print( void* viewport, Stream* stream ) ;
 	void* _lucViewport_Copy( void* viewport, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 
 	void* _lucViewport_DefaultNew( Name name ) ;
-   void _lucViewport_AssignFromXML( void* viewport, Stg_ComponentFactory* cf, void* data ) ;
+void _lucViewport_AssignFromXML( void* viewport, Stg_ComponentFactory* cf, void* data ) ;
 	void _lucViewport_Build( void* viewport, void* data );
 	void _lucViewport_Initialise( void* viewport, void* data );
 	void _lucViewport_Execute( void* viewport, void* data );

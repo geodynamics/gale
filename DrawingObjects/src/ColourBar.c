@@ -282,7 +282,6 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 
 	/* Set up 2D Viewer the size of the viewport */
 	lucViewport2d(True, viewportInfo);
-   glDisable(GL_MULTISAMPLE); /* Looks best without anti-aliasing */
 
 	lucSetFontCharset(FONT_SMALL);
 	
@@ -370,7 +369,6 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
     }
 
     /* Draw Colour Bar */
-   glDisable(GL_CULL_FACE);
     for ( pixel_I = 0 ; pixel_I < length ; pixel_I++ ) {
         value = ((float)pixel_I / length);
         lucColourMap_SetOpenGLColourFromScaledValue( colourMap, value);
@@ -387,7 +385,6 @@ void _lucColourBar_Draw( void* drawingObject, lucWindow* window, lucViewportInfo
 
 	/* Restore the viewport */
 	lucViewport2d(False, viewportInfo);
-   glEnable(GL_MULTISAMPLE);
 }
 
 void _lucColourBar_CleanUp( void* drawingObject, void* _context ) {

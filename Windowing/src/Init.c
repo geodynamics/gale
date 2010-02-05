@@ -67,47 +67,49 @@ Bool lucWindowing_Init() {
 
 	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 
-    /* Order of priority for default output window: SDL, OSMesa, X11, Carbon, VTK */
+    /* Order of priority for default output window: OSMesa, X11, SDL, Carbon */
     /* SDL will work with OSMesa to allow on/off-screen rendering so if present is first choice */
     /* If OSMesa is linked, Carbon and X11 will NOT work as they depend on the system OpenGL */
     /* library, which OSMesa replaces. */ 
 
-	#ifdef HAVE_SDL
-		Stg_ComponentRegister_Add( componentRegister, lucSDLWindow_Type, (Name)"0", _lucSDLWindow_DefaultNew  );
-		RegisterParent( lucSDLWindow_Type, lucWindow_Type );
-		if ( !Stg_ComponentRegister_Get( componentRegister, lucDefaultWindow_Type, "0" ) )
-			Stg_ComponentRegister_Add( componentRegister, lucDefaultWindow_Type, (Name)"0", _lucSDLWindow_DefaultNew  );		
-	#endif		
-	
 	#ifdef HAVE_OSMESA  
+		#ifdef HAVE_SDL
+			Stg_ComponentRegister_Add( componentRegister, lucSDLWindow_Type, (Name)"0", _lucSDLWindow_DefaultNew  );
+			RegisterParent( lucSDLWindow_Type, lucWindow_Type );
+			if ( !Stg_ComponentRegister_Get( componentRegister, lucDefaultWindow_Type, "0" ) )
+				Stg_ComponentRegister_Add( componentRegister, lucDefaultWindow_Type, (Name)"0", _lucSDLWindow_DefaultNew  );		
+		#endif		
 		Stg_ComponentRegister_Add( componentRegister, lucOSMesaWindow_Type, (Name)"0", _lucOSMesaWindow_DefaultNew  );
 		RegisterParent( lucOSMesaWindow_Type, lucWindow_Type );
 		if ( !Stg_ComponentRegister_Get( componentRegister, lucDefaultWindow_Type, "0" ) )
 			Stg_ComponentRegister_Add( componentRegister, lucDefaultWindow_Type, (Name)"0", _lucOSMesaWindow_DefaultNew  );
+	#else
+		#ifdef HAVE_X11
+			Stg_ComponentRegister_Add( componentRegister, lucX11Window_Type, (Name)"0", _lucX11Window_DefaultNew  );
+			RegisterParent( lucX11Window_Type, lucWindow_Type );
+			if ( !Stg_ComponentRegister_Get( componentRegister, lucDefaultWindow_Type, "0" ) )
+				Stg_ComponentRegister_Add( componentRegister, lucDefaultWindow_Type, (Name)"0", _lucX11Window_DefaultNew  );
+		#endif	
+
+		#ifdef HAVE_SDL
+			Stg_ComponentRegister_Add( componentRegister, lucSDLWindow_Type, (Name)"0", _lucSDLWindow_DefaultNew  );
+			RegisterParent( lucSDLWindow_Type, lucWindow_Type );
+			if ( !Stg_ComponentRegister_Get( componentRegister, lucDefaultWindow_Type, "0" ) )
+				Stg_ComponentRegister_Add( componentRegister, lucDefaultWindow_Type, (Name)"0", _lucSDLWindow_DefaultNew  );		
+		#endif		
 	#endif
-	
-	#ifdef HAVE_X11
-		Stg_ComponentRegister_Add( componentRegister, lucX11Window_Type, (Name)"0", _lucX11Window_DefaultNew  );
-		RegisterParent( lucX11Window_Type, lucWindow_Type );
-		if ( !Stg_ComponentRegister_Get( componentRegister, lucDefaultWindow_Type, "0" ) )
-			Stg_ComponentRegister_Add( componentRegister, lucDefaultWindow_Type, (Name)"0", _lucX11Window_DefaultNew  );
-	#endif	
 
 	#ifdef HAVE_CARBON
+	#ifdef __LP64__ /* Carbon does not support 64-bit, compile with -m32 */
+		Journal_Printf( Journal_Register( ErrorStream_Type, (Name)"Context"  ), "CarbonWindow not available on 64bit compile\n", __func__ ); 
+	#else
 		Stg_ComponentRegister_Add( componentRegister, lucCarbonWindow_Type, (Name)"0", _lucCarbonWindow_DefaultNew  );
 		RegisterParent( lucCarbonWindow_Type, lucWindow_Type );
 		if ( !Stg_ComponentRegister_Get( componentRegister, lucDefaultWindow_Type, "0" ) )
 			Stg_ComponentRegister_Add( componentRegister, lucDefaultWindow_Type, (Name)"0", _lucCarbonWindow_DefaultNew  );
-
 	#endif
-		
-	#ifdef HAVE_VTK
-		Stg_ComponentRegister_Add( componentRegister, lucVTKWindow_Type, (Name)"0", _lucVTKWindow_DefaultNew  );
-		RegisterParent( lucVTKWindow_Type, lucWindow_Type );
-		if ( !Stg_ComponentRegister_Get( componentRegister, lucDefaultWindow_Type, "0" ) )
-			Stg_ComponentRegister_Add( componentRegister, lucDefaultWindow_Type, (Name)"0", _lucVTKWindow_DefaultNew  );		
-	#endif	
-	
+	#endif
+
 	return True;
 }
 

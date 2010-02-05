@@ -75,11 +75,19 @@
 
 	void _lucEigenvectors_Delete( void* drawingObject ) ;
 	void _lucEigenvectors_Print( void* drawingObject, Stream* stream ) ;
+	void* _lucEigenvectors_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) ;
 
 	/* 'Stg_Component' implementations */
 	void* _lucEigenvectors_DefaultNew( Name name ) ;
 	void _lucEigenvectors_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data );
-
+	void _lucEigenvectors_Build( void* drawingObject, void* data ) ;
+	void _lucEigenvectors_Initialise( void* drawingObject, void* data ) ;
+	void _lucEigenvectors_Execute( void* drawingObject, void* data );
+	void _lucEigenvectors_Destroy( void* drawingObject, void* data ) ;
+	
+	void _lucEigenvectors_Setup( void* drawingObject, void* _context ) ;
+	void _lucEigenvectors_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) ;
+	void _lucEigenvectors_CleanUp( void* drawingObject, void* _context ) ;
 	void _lucEigenvectors_BuildDisplayList( void* drawingObject, void* _context ) ;
 
 #endif

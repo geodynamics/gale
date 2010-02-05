@@ -53,7 +53,7 @@
 	#define __lucAxis                              \
 		__lucOpenGLDrawingObject \
 		Coord                               origin;\
-		float 				                  length;\
+		float 				    length;\
 		lucColour                           colourX;\
 		lucColour                           colourY;\
 		lucColour                           colourZ;
@@ -62,13 +62,14 @@
 
 	/** Constructors */
 	lucAxis* lucAxis_New( 
-		Name                                name,
-		Coord                               origin,
-		float 						            length,
-		lucColour                           colourX,
-		lucColour                           colourY,
-		lucColour                           colourZ);
+		Name                                               name,
+		Coord                                              origin,
+		float 						   length,
+		lucColour                                          colourX,
+		lucColour                                          colourY,
+		lucColour                                          colourZ);
 
+	
 	#ifndef ZERO
 	#define ZERO 0
 	#endif
@@ -80,6 +81,23 @@
                 LUCOPENGLDRAWINGOBJECT_PASSARGS
 
 	lucAxis* _lucAxis_New(  LUCAXIS_DEFARGS  );
+
+	void lucAxis_InitAll( 
+		void*                                              axis,
+		Coord                                              origin,
+		float                                              length, 
+		lucColour                                          colourX,
+		lucColour                                          colourY,
+		lucColour                                          colourZ);
+
+	void _lucAxis_Init( 
+		void*                                              axis,
+		Coord                                              origin,
+		float 						   length, 
+		lucColour                                          colourX,
+		lucColour                                          colourY,
+		lucColour                                          colourZ);
+
 
 	void _lucAxis_Setup( void* drawingObject, void* _context );
 		

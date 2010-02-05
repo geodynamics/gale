@@ -58,7 +58,7 @@
 #include <glucifer/RenderingEngines/RenderingEngines.h>
 
 #include "types.h"
-#include "CrossSection.h"
+#include "OpenGLDrawingObject.h"
 #include "ScalarFieldOnMeshCrossSection.h"
 
 #include <assert.h>
@@ -77,38 +77,53 @@ lucScalarFieldOnMeshCrossSection* _lucScalarFieldOnMeshCrossSection_New(  LUCSCA
 
 	/* Call private constructor of parent - this will set virtual functions of parent and continue up the hierarchy tree. At the beginning of the tree it will allocate memory of the size of object and initialise all the memory to zero. */
 	assert( _sizeOfSelf >= sizeof(lucScalarFieldOnMeshCrossSection) );
-	self = (lucScalarFieldOnMeshCrossSection*) _lucCrossSection_New(  LUCCROSSSECTION_PASSARGS  );
+	self = (lucScalarFieldOnMeshCrossSection*) _lucOpenGLDrawingObject_New(  LUCOPENGLDRAWINGOBJECT_PASSARGS  );
 	
 	return self;
 }
 
 void _lucScalarFieldOnMeshCrossSection_Init( 
 		lucScalarFieldOnMeshCrossSection*                            self,
+		Name                                                         fieldVariableName,
 		lucColourMap*                                                colourMap,
+		Node_Index                                                   crossSection_I,
+		Axis                                                         crossSectionAxis,
 		XYZ                                                          minCropValues,
-		XYZ                                                          maxCropValues,
-      Bool                                                         wireFrame, 
-		Bool                                                         cullFace )
+		XYZ                                                          maxCropValues ) 
 {
+//	self->fieldVariable = fieldVariable;
+	self->fieldVariableName = fieldVariableName;
 	self->colourMap = colourMap;
-	self->cullFace = cullFace;
-	self->wireFrame = wireFrame;
+	self->crossSection_I = crossSection_I;
+	self->crossSectionAxis = crossSectionAxis;
 	memcpy( self->minCropValues, minCropValues, sizeof(XYZ) );
 	memcpy( self->maxCropValues, maxCropValues, sizeof(XYZ) );
-   self->flipNormals = False;
 }
 
 void _lucScalarFieldOnMeshCrossSection_Delete( void* drawingObject ) {
 	lucScalarFieldOnMeshCrossSection*  self = (lucScalarFieldOnMeshCrossSection*)drawingObject;
 
-	_lucCrossSection_Delete( self );
+	_lucOpenGLDrawingObject_Delete( self );
 }
 
 void _lucScalarFieldOnMeshCrossSection_Print( void* drawingObject, Stream* stream ) {
 	lucScalarFieldOnMeshCrossSection*  self = (lucScalarFieldOnMeshCrossSection*)drawingObject;
 
-	_lucCrossSection_Print( self, stream );
+	_lucOpenGLDrawingObject_Print( self, stream );
 }
+
+void* _lucScalarFieldOnMeshCrossSection_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) {
+	lucScalarFieldOnMeshCrossSection*  self = (lucScalarFieldOnMeshCrossSection*)drawingObject;
+	lucScalarFieldOnMeshCrossSection* newDrawingObject;
+
+	newDrawingObject = _lucOpenGLDrawingObject_Copy( self, dest, deep, nameExt, ptrMap );
+
+	/* TODO */
+	abort();
+
+	return (void*) newDrawingObject;
+}
+
 
 void* _lucScalarFieldOnMeshCrossSection_DefaultNew( Name name ) {
 	/* Variables set in this function */
@@ -124,8 +139,8 @@ void* _lucScalarFieldOnMeshCrossSection_DefaultNew( Name name ) {
 	Stg_Component_ExecuteFunction*                               _execute = _lucScalarFieldOnMeshCrossSection_Execute;
 	Stg_Component_DestroyFunction*                               _destroy = _lucScalarFieldOnMeshCrossSection_Destroy;
 	lucDrawingObject_SetupFunction*                                _setup = _lucScalarFieldOnMeshCrossSection_Setup;
-	lucDrawingObject_DrawFunction*                                  _draw = _lucCrossSection_Draw;
-	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucOpenGLDrawingObject_CleanUp;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucScalarFieldOnMeshCrossSection_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucScalarFieldOnMeshCrossSection_CleanUp;
 	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucScalarFieldOnMeshCrossSection_BuildDisplayList;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
@@ -137,14 +152,30 @@ void* _lucScalarFieldOnMeshCrossSection_DefaultNew( Name name ) {
 void _lucScalarFieldOnMeshCrossSection_AssignFromXML( void* drawingObject, Stg_ComponentFactory* cf, void* data ){
 	lucScalarFieldOnMeshCrossSection*     self = (lucScalarFieldOnMeshCrossSection*)drawingObject;
 	lucColourMap*    colourMap;
+	char             axisChar;
+	Node_Index       value               = 0;
+	Axis             axis                = 0;
+	Name             crossSectionName;
+	Name             fieldVariableName;
 	XYZ              minCropValues;
 	XYZ              maxCropValues;
-   Bool             wireFrame, cullFace;
 
 	/* Construct Parent */
-	_lucCrossSection_AssignFromXML( self, cf, data );
+	_lucOpenGLDrawingObject_AssignFromXML( self, cf, data );
 
+	fieldVariableName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"FieldVariable", "defaultName"  );
+	
+	/* This variable is now constructed in the build phase 	
+	fieldVariable =  Stg_ComponentFactory_ConstructByKey( cf, self->name, "FieldVariable", FieldVariable, True ) ;
+	*/
+	
 	colourMap = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ColourMap", lucColourMap, True, data  );
+
+	crossSectionName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"crossSection", ""  );
+	if ( sscanf( crossSectionName, "%c=%d", &axisChar, &value ) == 2 ) {
+		if ( toupper( axisChar ) >= 'X' )
+			axis = toupper( axisChar ) - 'X';
+	}
 
 	/* Get Values with which to crop the cross section */
 	minCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minCropX", -HUGE_VAL  );
@@ -153,16 +184,15 @@ void _lucScalarFieldOnMeshCrossSection_AssignFromXML( void* drawingObject, Stg_C
 	maxCropValues[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxCropX", +HUGE_VAL  );
 	maxCropValues[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxCropY", +HUGE_VAL  );
 	maxCropValues[ K_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxCropZ", +HUGE_VAL  );
-	wireFrame = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"wireFrame", False );
-   cullFace = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"cullFace", True  );
 	
 	_lucScalarFieldOnMeshCrossSection_Init( 
 			self, 
+			fieldVariableName,
 			colourMap,
+			value,
+			axis,
 			minCropValues,
-			maxCropValues,
-         wireFrame,
-         cullFace );
+			maxCropValues );
 }
 
 void _lucScalarFieldOnMeshCrossSection_Build( void* drawingObject, void* data ) {
@@ -171,8 +201,10 @@ void _lucScalarFieldOnMeshCrossSection_Build( void* drawingObject, void* data ) 
 	Mesh*                           mesh;
 	Stream*                         errorStream = Journal_Register( Error_Type, (Name)self->type  );
 	
-   /* Build field variable in parent */
-   _lucCrossSection_Build(self, data);
+
+	/* HACK - Get pointer to FieldVariable in build phase just to let FieldVariables be created in plugins */
+	feVariable =  Stg_ComponentFactory_ConstructByName( self->context->CF, (Name)self->fieldVariableName, FeVariable, True, 0 /* dummy */ );
+	self->fieldVariable = (FieldVariable* ) feVariable;
 
 	Journal_Firewall( self->fieldVariable->fieldComponentCount == 1, errorStream,
 		"Error - in %s(): provided FieldVariable \"%s\" has %u components - but %s Component "
@@ -180,8 +212,8 @@ void _lucScalarFieldOnMeshCrossSection_Build( void* drawingObject, void* data ) 
 		"magnitude of the given field?\n", __func__, self->fieldVariable->name,
 		self->fieldVariable->fieldComponentCount, self->type );
 
-   feVariable = (FeVariable*)self->fieldVariable;
-	mesh = (Mesh*)feVariable->feMesh;
+	Stg_Component_Build( feVariable, data, False );
+	mesh    = (Mesh*) feVariable->feMesh;
 
 	/* Store the Vertex Grid */
 	self->vertexGridHandle = ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" );
@@ -204,174 +236,98 @@ void _lucScalarFieldOnMeshCrossSection_Setup( void* drawingObject, void* _contex
 	_lucOpenGLDrawingObject_Setup( self, _context );
 }
 	
+void _lucScalarFieldOnMeshCrossSection_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
+	lucScalarFieldOnMeshCrossSection*       self            = (lucScalarFieldOnMeshCrossSection*)drawingObject;
+	_lucOpenGLDrawingObject_Draw( self, window, viewportInfo, _context );
+}
+
+
+void _lucScalarFieldOnMeshCrossSection_CleanUp( void* drawingObject, void* _context ) {
+	lucScalarFieldOnMeshCrossSection*       self            = (lucScalarFieldOnMeshCrossSection*)drawingObject;
+	_lucOpenGLDrawingObject_CleanUp( self, _context );
+}
+
 void _lucScalarFieldOnMeshCrossSection_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucScalarFieldOnMeshCrossSection*       self            = (lucScalarFieldOnMeshCrossSection*)drawingObject;
-	lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, GL_CCW);
+	lucScalarFieldOnMeshCrossSection_DrawCrossSection( self, self->crossSection_I, self->crossSectionAxis );
 }
 
-void lucScalarFieldOnMeshCrossSection_PlotColouredNode( void* drawingObject, MeshVertex* vert) {
+void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, Node_LocalIndex crossSection_I, Axis axis ) {
 	lucScalarFieldOnMeshCrossSection*       self            = (lucScalarFieldOnMeshCrossSection*)drawingObject;
+	FeVariable*          fieldVariable = (FeVariable*) self->fieldVariable;
+	Mesh*                mesh          = (Mesh*) fieldVariable->feMesh;
+	Axis                 aAxis;
+	Axis                 bAxis;
+	Grid*                vertGrid;
+	IJK                  node_ijk;
+	float                normal[3];
+	Node_GlobalIndex     node_gI;
+	Node_DomainIndex     node_dI_1, node_dI_2;
+	Node_DomainIndex     nDomainNodes;
 
-	/* Get colour for vertex */
-	lucColourMap_SetOpenGLColourFromValue( self->colourMap, vert->value);
-
-   if (!self->wireFrame && self->fieldVariable->dim == 3)
-      glNormal3dv(vert->normal);
-
-	/* Plot vertex */
-	if ( self->fieldVariable->dim == 2 )
-		glVertex2dv( vert->pos );
-	else 
-		glVertex3dv( vert->pos );
-}
-
-Bool lucMeshVertex_SumNormal( double normal[3], MeshVertex* v1, MeshVertex* v2, MeshVertex* v3, Bool flip) {
-   /* Utility function for calculating per vertex normals, pass vertices of four triangles
-    * surrounding the vertex you want to calculate the normal for and they will be summed */
-   double tempnormal[3];
-   if (v1 == NULL || v2 == NULL || v3 == NULL) return False;
-   StGermain_NormalToPlane( tempnormal, v1->pos, v2->pos, v3->pos);
-   if (flip == False) {
-      normal[0] += tempnormal[0];
-      normal[1] += tempnormal[1];
-      normal[2] += tempnormal[2];
-   } else {
-      normal[0] -= tempnormal[0];
-      normal[1] -= tempnormal[1];
-      normal[2] -= tempnormal[2];
-   }
-   return True;
-}
-
-void lucScalarFieldOnMeshCrossSection_DrawCrossSection( void* drawingObject, int direction ) {
-   lucScalarFieldOnMeshCrossSection*       self            = (lucScalarFieldOnMeshCrossSection*)drawingObject;
-   FeVariable*          fieldVariable = (FeVariable*) self->fieldVariable;
-   Mesh*                mesh          = (Mesh*) fieldVariable->feMesh;
-   Node_LocalIndex      crossSection_I = self->value;
-   Grid*                vertGrid;
-   IJK                  node_ijk;
-   Node_GlobalIndex     node_gI;
-   Node_DomainIndex     node_dI;
-   Node_DomainIndex     nDomainNodes;
-   int i,j;
-
+	glDisable(GL_LIGHTING);
+	
+	/* Get Axis Directions */
+	aAxis = ( axis == I_AXIS ? J_AXIS : I_AXIS );
+	bAxis = ( axis == K_AXIS ? J_AXIS : K_AXIS );
+	
 	vertGrid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, self->vertexGridHandle );
 	
 	Journal_DPrintfL( self->debugStream, 2, 
 			"%s called on field %s, with axis of cross section as %d, crossSection_I as %d\n",
-			__func__, fieldVariable->name, self->axis, crossSection_I );
+			__func__, fieldVariable->name, axis, crossSection_I );
 	
+	/* Create normal */
+	normal[axis]  = 1.0;
+	normal[aAxis] = 0.0;
+	normal[bAxis] = 0.0;
+	glNormal3fv( normal );
+
 	nDomainNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
 
-   /* set polygon face winding */
-	glFrontFace(direction); 
-   /* Visible from both sides? */
-	if ( self->cullFace )
-      glEnable(GL_CULL_FACE);
-	else
-      glDisable(GL_CULL_FACE);
-
-   if (self->wireFrame) {
-      /* Edges only */
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	   glDisable(GL_LINE_SMOOTH);
-	   glDisable(GL_LIGHTING);
-   } else {
-      /* Filled */
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	   glEnable(GL_LIGHTING);
-   }
-
-	/* Get mesh cross section vertices */
-   MeshVertex* vertices[ vertGrid->sizes[ self->axis1 ] ] [ vertGrid->sizes[ self->axis2 ] ];
-	node_ijk[ self->axis ] = crossSection_I;
-	for ( i = 0 ; i < vertGrid->sizes[ self->axis1 ]; i++ ) {
-      node_ijk[ self->axis1 ] = i;
-	   for ( j = 0 ; j < vertGrid->sizes[ self->axis2 ]; j++ ) {
-         node_ijk[ self->axis2 ] = j;
+	/* Plots cross section */
+	node_ijk[ axis ] = crossSection_I;
+	for ( node_ijk[ aAxis ] = 0 ; node_ijk[ aAxis ] < vertGrid->sizes[ aAxis ] - 1 ; node_ijk[ aAxis ]++ ) {
+		glBegin(GL_QUAD_STRIP);
+		for ( node_ijk[ bAxis ] = 0 ; node_ijk[ bAxis ] < vertGrid->sizes[ bAxis ] ; node_ijk[ bAxis ]++ ) {
 			node_gI = Grid_Project( vertGrid, node_ijk );
 			/* Get Local Node Index */
-			if( !Mesh_GlobalToDomain( mesh, MT_VERTEX, node_gI, &node_dI ) || node_dI >= nDomainNodes ) {
-            vertices[i][j] = NULL; /* Flag not on this proc */
-            continue;
-         }
+			if( !Mesh_GlobalToDomain( mesh, MT_VERTEX, node_gI, &node_dI_1 ) || node_dI_1 >= nDomainNodes ){
+				continue;
+			}
+			
+			node_ijk[ aAxis ]++;
+			node_gI = Grid_Project( vertGrid, node_ijk );
+			/* Get Local Node Index */
+			if( !Mesh_GlobalToDomain( mesh, MT_VERTEX, node_gI, &node_dI_2 ) || node_dI_2 >= nDomainNodes ){
+				continue;
+			}
+			lucScalarFieldOnMeshCrossSection_PlotColouredNode( self, node_dI_1 );
+			lucScalarFieldOnMeshCrossSection_PlotColouredNode( self, node_dI_2 );
+			node_ijk[ aAxis ]--;
 
-         vertices[i][j] = Memory_Alloc(MeshVertex, "Mesh Vertex");
-         FeVariable_GetValueAtNode( fieldVariable, node_dI, &vertices[i][j]->value  );
-		   memcpy( &vertices[i][j]->pos, fieldVariable->feMesh->verts[node_dI], 3 * sizeof(double) );
-         vertices[i][j]->normal[0] = vertices[i][j]->normal[1] = vertices[i][j]->normal[2] = 0; /* Zero normal */
+			/* TODO Cropping */
 		}
-	}
-
-   /* Calc normals for irregular meshes per vertex by averaging four surrounding triangle normals */
-   if (!self->wireFrame && self->fieldVariable->dim == 3) { 
-      for ( i = 0 ; i < vertGrid->sizes[ self->axis1 ]; i++ ) {
-         for ( j = 0 ; j < vertGrid->sizes[ self->axis2 ]; j++ ) {
-            /* Get sum of normal vectors */
-            if (vertices[i][j] ==  NULL) continue;
-
-            if (i > 0) {
-               if (j > 0) 
-                  /* Look back in both axis  \|  */
-                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i-1][j], vertices[i][j-1], self->flipNormals);
-
-               if (j < vertGrid->sizes[ self->axis2 ] - 1) 
-                  /* Look back in self->axis1, forward in self->axis2  /|  */
-                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i][j+1], vertices[i-1][j], self->flipNormals);
-            }
-
-            if (i <  vertGrid->sizes[ self->axis1 ] - 1) {
-               if (j > 0) 
-                  /* Look forward in self->axis1, back in self->axis2  |/  */
-                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i][j-1], vertices[i+1][j], self->flipNormals);
-
-               if (j < vertGrid->sizes[ self->axis2 ] - 1) 
-                  /* Look forward both axis  |\  */
-                  lucMeshVertex_SumNormal(vertices[i][j]->normal, vertices[i][j], vertices[i+1][j], vertices[i][j+1], self->flipNormals);
-            }
-
-            StGermain_VectorNormalise(vertices[i][j]->normal, 3);
-         }
-      }
-   } else {
-      /* Default plane normal */
-      double normal[3]; 
-      normal[self->axis1] = 0.0;
-      normal[self->axis2] = 0.0;
-      normal[self->axis] = 1.0;
-      if (self->flipNormals == True) normal[self->axis] = -1.0;
-      glNormal3dv(normal);
-   }
-
-   /* Plot quad strip vertices */
-	for ( i = 0 ; i < vertGrid->sizes[ self->axis1 ]; i++ ) {
-		glBegin(GL_QUAD_STRIP);
-	   for ( j = 0 ; j < vertGrid->sizes[ self->axis2 ]; j++ ) {
-         if (vertices[i][j] !=  NULL) {
-            if (i+1 < vertGrid->sizes[ self->axis1 ] && vertices[i+1][j] != NULL) {
-               lucScalarFieldOnMeshCrossSection_PlotColouredNode( self, vertices[i][j]);
-               lucScalarFieldOnMeshCrossSection_PlotColouredNode( self, vertices[i+1][j]);
-			      /* TODO Cropping - implement cropping for all in generic CrossSection object? */
-            }
-            Memory_Free(vertices[i][j]);
-         }
-      }
 		glEnd();
-   }
-
-   glEnable(GL_LIGHTING);
-   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-   glEnable(GL_CULL_FACE);
-   glFrontFace(GL_CCW);
-
-   /* Plot normals - for debugging /
-	for ( i = 0 ; i < vertGrid->sizes[ self->axis1 ]; i++ ) {
-	   for ( j = 0 ; j < vertGrid->sizes[ self->axis2 ]; j++ ) {
-         if (vertices[i][j] !=  NULL) {
-            luc_DrawNormalVector( vertices[i][j]->pos, vertices[i][j]->normal, 1000.0);
-            Memory_Free(vertices[i][j]);
-         }
-      }
-   }*/
+	}
+	glEnable(GL_LIGHTING);
 }
+
+void lucScalarFieldOnMeshCrossSection_PlotColouredNode( void* drawingObject, Node_LocalIndex lNode_I ) {
+	lucScalarFieldOnMeshCrossSection*       self            = (lucScalarFieldOnMeshCrossSection*)drawingObject;
+	FeVariable*    fieldVariable = (FeVariable*) self->fieldVariable;
+	lucColourMap*  cmap          = self->colourMap;
+	double         quantity;
+
+	/* Get colour for vertex */
+	FeVariable_GetValueAtNode( fieldVariable, lNode_I, &quantity );
+	lucColourMap_SetOpenGLColourFromValue( cmap, quantity );
+	
+	/* Plot vertex */
+	if ( fieldVariable->dim == 2 )
+		glVertex2dv( fieldVariable->feMesh->verts[lNode_I] );
+	else 
+		glVertex3dv( fieldVariable->feMesh->verts[lNode_I] );
+}
+
 

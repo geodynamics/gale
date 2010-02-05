@@ -85,21 +85,18 @@ lucOutputFormat* _lucOutputFormat_New(  LUCOUTPUTFORMAT_DEFARGS  )
 
 void _lucOutputFormat_Init( 
 		lucOutputFormat*                                   self, 
-		Name                                               extension,
-		Bool                                               transparent )
+		Name                                               extension )
 {
 	self->extension     = StG_Strdup( extension );
-   self->transparent = transparent;
 }
 
-void lucOutputFormat_New( 
+void lucOutputFormat_InitAll( 
 		void*                                              outputFormat,
-		Name                                               extension,
-		Bool                                               transparent )
+		Name                                               extension )
 {
 	lucOutputFormat* self        = outputFormat;
 
-	_lucOutputFormat_Init( self, extension, transparent );
+	_lucOutputFormat_Init( self, extension );
 }
 
 	
@@ -135,22 +132,18 @@ void* _lucOutputFormat_Copy( void* outputFormat, void* dest, Bool deep, Name nam
 
 void _lucOutputFormat_AssignFromXML( void* outputFormat, Stg_ComponentFactory* cf, void* data ) {
 	lucOutputFormat* self        = outputFormat;
-   Bool transparent = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"transparent", False );
 
 	self->context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
 	if( !self->context  ) 
 		self->context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
-
-	_lucOutputFormat_Init( self, self->extension, transparent );
 }
-
 void _lucOutputFormat_Build( void* outputFormat, void* data ) { }
 void _lucOutputFormat_Initialise( void* outputFormat, void* data ) { }
 void _lucOutputFormat_Execute( void* outputFormat, void* data ) { }
 void _lucOutputFormat_Destroy( void* outputFormat, void* data ) { }
 
 
-void lucOutputFormat_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) {
+void lucOutputFormat_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) {
 	lucOutputFormat*        self               = (lucOutputFormat*) outputFormat;
 
 	if ( context->rank != MASTER )

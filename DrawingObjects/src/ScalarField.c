@@ -51,6 +51,7 @@
 
 #include <glucifer/Base/Base.h>
 #include <glucifer/RenderingEngines/RenderingEngines.h>
+#include <glucifer/Base/CrossSection.h>
 
 #include "types.h"
 #include "OpenGLDrawingObject.h"
@@ -81,9 +82,11 @@ lucScalarField* _lucScalarField_New(  LUCSCALARFIELD_DEFARGS  )
 	return self;
 }
 
-void _lucScalarField_Init(lucScalarField* self, Bool useMesh)
+void _lucScalarField_Init( 
+		lucScalarField*                                              self,
+		Bool                                                         cullFace )
 {
-   self->useMesh = useMesh;
+	self->cullFace = cullFace;
 }
 
 void _lucScalarField_Delete( void* drawingObject ) {
@@ -98,6 +101,19 @@ void _lucScalarField_Print( void* drawingObject, Stream* stream ) {
 	_lucScalarFieldCrossSection_Print( self, stream );
 }
 
+void* _lucScalarField_Copy( void* drawingObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap) {
+	lucScalarField*  self = (lucScalarField*)drawingObject;
+	lucScalarField* newDrawingObject;
+
+	newDrawingObject = _lucScalarFieldCrossSection_Copy( self, dest, deep, nameExt, ptrMap );
+
+	/* TODO */
+	abort();
+
+	return (void*) newDrawingObject;
+}
+
+
 void* _lucScalarField_DefaultNew( Name name ) {
 	/* Variables set in this function */
 	SizeT                                                     _sizeOfSelf = sizeof(lucScalarField);
@@ -107,13 +123,13 @@ void* _lucScalarField_DefaultNew( Name name ) {
 	Stg_Class_CopyFunction*                                         _copy = NULL;
 	Stg_Component_DefaultConstructorFunction*         _defaultConstructor = _lucScalarField_DefaultNew;
 	Stg_Component_ConstructFunction*                           _construct = _lucScalarField_AssignFromXML;
-	Stg_Component_BuildFunction*                                   _build = _lucScalarFieldCrossSection_Build;
-	Stg_Component_InitialiseFunction*                         _initialise = _lucScalarFieldCrossSection_Initialise;
-	Stg_Component_ExecuteFunction*                               _execute = _lucScalarFieldCrossSection_Execute;
-	Stg_Component_DestroyFunction*                               _destroy = _lucScalarFieldCrossSection_Destroy;
-	lucDrawingObject_SetupFunction*                                _setup = _lucScalarFieldCrossSection_Setup;
-	lucDrawingObject_DrawFunction*                                  _draw = _lucOpenGLDrawingObject_Draw;
-	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucOpenGLDrawingObject_CleanUp;
+	Stg_Component_BuildFunction*                                   _build = _lucScalarField_Build;
+	Stg_Component_InitialiseFunction*                         _initialise = _lucScalarField_Initialise;
+	Stg_Component_ExecuteFunction*                               _execute = _lucScalarField_Execute;
+	Stg_Component_DestroyFunction*                               _destroy = _lucScalarField_Destroy;
+	lucDrawingObject_SetupFunction*                                _setup = _lucScalarField_Setup;
+	lucDrawingObject_DrawFunction*                                  _draw = _lucScalarField_Draw;
+	lucDrawingObject_CleanUpFunction*                            _cleanUp = _lucScalarField_CleanUp;
 	lucOpenGLDrawingObject_BuildDisplayListFunction*    _buildDisplayList = _lucScalarField_BuildDisplayList;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
@@ -128,44 +144,89 @@ void _lucScalarField_AssignFromXML( void* drawingObject, Stg_ComponentFactory* c
 	/* Construct Parent */
 	_lucScalarFieldCrossSection_AssignFromXML( self, cf, data );
 
-	_lucScalarField_Init(self, Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"useMesh", False ) );
+	_lucScalarField_Init( 
+			self, 
+			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"cullFace", True )  );
+
+        self->useMesh = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"useMesh", False  );
+}
+
+void _lucScalarField_Build( void* drawingObject, void* data ) {
+	lucScalarField*  self = (lucScalarField*)drawingObject;
+
+	/* Call parent function */
+	_lucScalarFieldCrossSection_Build( self, data );
+}
+void _lucScalarField_Initialise( void* drawingObject, void* data ) {
+	lucScalarField*  self = (lucScalarField*)drawingObject;
+
+	/* Call parent function */
+	_lucScalarFieldCrossSection_Initialise( self, data );
+}
+void _lucScalarField_Execute( void* drawingObject, void* data ) {}
+void _lucScalarField_Destroy( void* drawingObject, void* data ) {}
+
+void _lucScalarField_Setup( void* drawingObject, void* _context ) {
+	lucScalarField*          self          = (lucScalarField*)drawingObject;
+	
+	_lucScalarFieldCrossSection_Setup( self, _context );
+}
+	
+void _lucScalarField_Draw( void* drawingObject, lucWindow* window, lucViewportInfo* viewportInfo, void* _context ) {
+	lucScalarField*          self          = (lucScalarField*)drawingObject;
+	
+	_lucScalarFieldCrossSection_Draw( self, window, viewportInfo, _context );
+}
+
+void _lucScalarField_CleanUp( void* drawingObject, void* _context ) {
+	lucScalarField*          self          = (lucScalarField*)drawingObject;
+	
+	_lucScalarFieldCrossSection_CleanUp( self, _context );
 }
 
 void _lucScalarField_BuildDisplayList( void* drawingObject, void* _context ) {
 	lucScalarField*          self          = (lucScalarField*)drawingObject;
 	DomainContext*   context       = (DomainContext*) _context;
 
+   lucCrossSection          crossSection;
+
 	if (context->dim == 2) 
    {
+
        if( self->useMesh )
           lucScalarField_DrawWithMesh( self );
        else {
-          lucScalarFieldCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, K_AXIS, False), GL_CCW);
+          lucScalarFieldCrossSection_DrawCrossSection( self, lucCrossSection_Set(&crossSection, 0.0, K_AXIS, False));
        }
 	}
 	else 
    {
-		/* Cross sections at minimums, default winding for faces */
-		lucScalarFieldCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, I_AXIS, True), GL_CCW);
-		lucScalarFieldCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, J_AXIS, True), GL_CCW);
-		lucScalarFieldCrossSection_DrawCrossSection( lucCrossSection_Set(self, 0.0, K_AXIS, True), GL_CCW);
+		if ( self->cullFace ) glEnable(GL_CULL_FACE);
+	
+		glFrontFace(GL_CCW);
+		lucScalarFieldCrossSection_DrawCrossSection( self, lucCrossSection_Set(&crossSection, 0.0, I_AXIS, True));
+		lucScalarFieldCrossSection_DrawCrossSection( self, lucCrossSection_Set(&crossSection, 1.0, J_AXIS, True));
+		lucScalarFieldCrossSection_DrawCrossSection( self, lucCrossSection_Set(&crossSection, 0.0, K_AXIS, True));
 
-		/* Cross sections at maximums, reverse winding for faces */
-		lucScalarFieldCrossSection_DrawCrossSection( lucCrossSection_Set(self, 1.0, I_AXIS, True), GL_CW);
-		lucScalarFieldCrossSection_DrawCrossSection( lucCrossSection_Set(self, 1.0, J_AXIS, True), GL_CW);
-		lucScalarFieldCrossSection_DrawCrossSection( lucCrossSection_Set(self, 1.0, K_AXIS, True), GL_CW);
+		glFrontFace(GL_CW);
+		lucScalarFieldCrossSection_DrawCrossSection( self, lucCrossSection_Set(&crossSection, 1.0, I_AXIS, True));
+		lucScalarFieldCrossSection_DrawCrossSection( self, lucCrossSection_Set(&crossSection, 0.0, J_AXIS, True));
+		lucScalarFieldCrossSection_DrawCrossSection( self, lucCrossSection_Set(&crossSection, 1.0, K_AXIS, True));
+
+		glDisable(GL_CULL_FACE);
 	}
 }
 
 void lucScalarField_DrawWithMesh( lucScalarField* self ) {
-   FeVariable* var = (FeVariable*)self->fieldVariable;
-   FeMesh* mesh = var->feMesh;
-   lucColourMap* cmap = self->colourMap;
-   IArray* inc;
-   double value;
-   unsigned nElements;
-   double xi[3], vertex[3];
-   int ii, jj, kk;
+   FeVariable*		var = (FeVariable*)self->fieldVariable;
+   FeMesh*			mesh = var->feMesh;
+   lucColourMap*	cmap = self->colourMap;
+   IArray*			inc;
+   double			value;
+   unsigned			/* nodes,*/ nElements/*, curNode */;
+   /* int nodeMap[4] = {0, 1, 3, 2}; */
+   double			xi[3], vertex[3];
+   int				ii, jj, kk;
 
    lucOpenGLDrawingObject_SyncShadowValues( self, self->fieldVariable );
    glDisable( GL_LIGHTING );

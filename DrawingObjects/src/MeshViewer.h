@@ -77,10 +77,7 @@
 		Bool                    		nodeNumbers;		\
 		Bool                    		elementNumbers;		\
 		Bool                    		displayNodes;				\
-		float                         lineWidth;        \
-		Bool				skipXedges;			\
-		Bool				skipYedges;			\
-		Bool				skipZedges;			\
+		float                                              lineWidth;
 
 	struct lucMeshViewer { __lucMeshViewer };
 
@@ -130,7 +127,6 @@
 	void lucMeshViewer_BuildEdges( lucMeshViewer* self );
 	void lucMeshViewer_RenderEdges_WithInc( lucMeshViewer* self, vertexFuncType* vertexFunc );
 	void lucMeshViewer_RenderEdges( lucMeshViewer* self, vertexFuncType* vertexFunc );
-   Bool EdgeSkip(lucMeshViewer* self, double* v1, double* v2);
 
         void lucMeshViewer_PrintAllNodesNumber( void* drawingObject );
 

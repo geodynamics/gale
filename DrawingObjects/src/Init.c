@@ -60,7 +60,6 @@ Bool lucDrawingObjects_Init() {
 	Stg_ComponentRegister_Add( componentRegister, lucColourBar_Type, (Name)"0", _lucColourBar_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, lucFieldVariableBorder_Type, (Name)"0", _lucFieldVariableBorder_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, lucIsosurface_Type, (Name)"0", _lucIsosurface_DefaultNew  );
-	Stg_ComponentRegister_Add( componentRegister, lucCrossSection_Type, (Name)"0", _lucCrossSection_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, lucScalarFieldCrossSection_Type, (Name)"0", _lucScalarFieldCrossSection_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, lucScalarField_Type, (Name)"0", _lucScalarField_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, lucVectorArrowCrossSection_Type, (Name)"0", _lucVectorArrowCrossSection_DefaultNew );
@@ -78,22 +77,22 @@ Bool lucDrawingObjects_Init() {
 	Stg_ComponentRegister_Add( componentRegister, lucMeshViewer_Type, (Name)"0", _lucMeshViewer_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, lucTitle_Type, (Name)"0", _lucTitle_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, lucAxis_Type, (Name)"0", _lucAxis_DefaultNew  );
-   Stg_ComponentRegister_Add( componentRegister, lucTimeStep_Type, (Name)"0", _lucTimeStep_DefaultNew  );
+        Stg_ComponentRegister_Add( componentRegister, lucTimeStep_Type, (Name)"0", _lucTimeStep_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, lucScalarFieldOnMeshCrossSection_Type, (Name)"0", _lucScalarFieldOnMeshCrossSection_DefaultNew );
 	Stg_ComponentRegister_Add( componentRegister, lucScalarFieldOnMesh_Type, (Name)"0", _lucScalarFieldOnMesh_DefaultNew );
 	
 
 	/* Register Parents for type checking */
 	RegisterParent( lucOpenGLDrawingObject_Type,             lucDrawingObject_Type );
-	RegisterParent( lucCrossSection_Type,                    lucOpenGLDrawingObject_Type );
-	RegisterParent( lucScalarFieldCrossSection_Type,         lucCrossSection_Type );
-	RegisterParent( lucScalarFieldOnMeshCrossSection_Type,   lucCrossSection_Type );
-	RegisterParent( lucVectorArrowCrossSection_Type,         lucCrossSection_Type );
-	RegisterParent( lucEigenvectorsCrossSection_Type,        lucCrossSection_Type );
+	RegisterParent( lucScalarFieldCrossSection_Type,         lucOpenGLDrawingObject_Type );
 	RegisterParent( lucScalarField_Type,                     lucScalarFieldCrossSection_Type );	
-	RegisterParent( lucScalarFieldOnMesh_Type,  	 	         lucScalarFieldOnMeshCrossSection_Type );
+	RegisterParent( lucScalarFieldOnMeshCrossSection_Type,   lucOpenGLDrawingObject_Type );
+	RegisterParent( lucScalarFieldOnMesh_Type,  	 	 lucScalarFieldOnMeshCrossSection_Type );
+	RegisterParent( lucVectorArrowCrossSection_Type,         lucOpenGLDrawingObject_Type );
 	RegisterParent( lucVectorArrows_Type,                    lucVectorArrowCrossSection_Type );
+	RegisterParent( lucEigenvectorsCrossSection_Type,        lucOpenGLDrawingObject_Type );
 	RegisterParent( lucEigenvectors_Type,                    lucEigenvectorsCrossSection_Type );
+	
 	
 	RegisterParent( lucColourBar_Type,                       lucDrawingObject_Type );
 	RegisterParent( lucFieldVariableBorder_Type,             lucOpenGLDrawingObject_Type );

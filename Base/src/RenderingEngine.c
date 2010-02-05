@@ -154,12 +154,12 @@ void lucRenderingEngine_Clear( void* renderingEngine,  lucWindow* window, Bool c
 	lucDebug_PrintFunctionEnd( self, 2 );
 }
 
-void lucRenderingEngine_GetPixelData( void* renderingEngine, lucWindow* window, void* pixelData, Bool withAlpha ) {
+void lucRenderingEngine_GetPixelData( void* renderingEngine, lucWindow* window, lucPixel* pixelData ) {
 	lucRenderingEngine*   self       = (lucRenderingEngine*) renderingEngine ;
 	
 	lucDebug_PrintFunctionBegin( self, 2 );
 
-	self->_getPixelData( self, window, pixelData, withAlpha );
+	self->_getPixelData( self, window, pixelData );
 
 	lucDebug_PrintFunctionEnd( self, 2 );
 }

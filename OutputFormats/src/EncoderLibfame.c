@@ -241,9 +241,7 @@ void _lucEncoderLibfame_AssignFromXML( void* outputFormat, Stg_ComponentFactory*
 	AbstractContext*    context;
 
 	/* Construct Parent */
-   self->extension = "mpeg";
-	_lucOutputFormat_AssignFromXML( outputFormat, cf, data);
-   self->transparent = False; /* Not supported */
+	lucOutputFormat_InitAll( self, "mpeg" );
 
 	window =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Window", lucWindow, True, data   ) ;
 	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  ) ;
@@ -265,7 +263,7 @@ void _lucEncoderLibfame_Initialise( void* outputFormat, void* data ) {}
 void _lucEncoderLibfame_Execute( void* outputFormat, void* data ) {}
 void _lucEncoderLibfame_Destroy( void* outputFormat, void* data ) {}
 
-void _lucEncoderLibfame_Output( void* outputFormat, lucWindow* window, AbstractContext* context, void* pixelData ) {
+void _lucEncoderLibfame_Output( void* outputFormat, lucWindow* window, AbstractContext* context, lucPixel* pixelData ) {
 	lucEncoderLibfame*            self            = (lucEncoderLibfame*) outputFormat;
 	Pixel_Index                   width           = window->width;
 	unsigned int                  quarterpixels   = self->quarterpixels;

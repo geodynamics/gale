@@ -89,7 +89,6 @@
 		Pixel_Index							startx;							\
 		Pixel_Index							starty;							\
 		char*								title;            	  			\
-		Bool                       antialias;                    \
 			
 	struct lucWindow {__lucWindow};
 

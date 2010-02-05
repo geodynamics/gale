@@ -100,9 +100,6 @@ void lucPrintString(const char* str)
 	if (fontcharset > FONT_LARGE || fontcharset < FONT_FIXED)		/* Character set valid? */
 		fontcharset = FONT_FIXED;	
 
-   	glDisable( GL_CULL_FACE );
-	   glDisable( GL_LIGHTING );
-
     glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_2D);				 					/* Enable Texture Mapping */
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -140,47 +137,52 @@ void lucPrint(int x, int y, const char *str)
 
 void lucPrint3d(double x, double y, double z, const char *str)
 {
-   /* Calculate projected screen coords in viewport */
-   GLdouble modelMatrix[16];
-   GLdouble projMatrix[16];
-   GLint    viewportArray[4];
-   double  xPos, yPos, depth;
+    /* Calculate projected screen coords in viewport */
+   	GLdouble modelMatrix[16];
+	GLdouble projMatrix[16];
+	GLint    viewportArray[4];
+	double  xPos, yPos, depth;
 
-   glGetDoublev( GL_MODELVIEW_MATRIX, modelMatrix );
-   glGetDoublev( GL_PROJECTION_MATRIX, projMatrix );
-   glGetIntegerv( GL_VIEWPORT, viewportArray );
+	glGetDoublev( GL_MODELVIEW_MATRIX, modelMatrix );
+	glGetDoublev( GL_PROJECTION_MATRIX, projMatrix );
+	glGetIntegerv( GL_VIEWPORT, viewportArray );
 
-   gluProject(x, y, z, 
-      modelMatrix, projMatrix, viewportArray,
-      &xPos, &yPos, &depth	);
+	gluProject(x, y, z, 
+		modelMatrix,
+		projMatrix,
+		viewportArray,
+		&xPos,
+		&yPos,
+		&depth
+	);
 
-   /* Switch to ortho view with 1 unit = 1 pixel and print using calculated screen coords */
-   glMatrixMode(GL_PROJECTION);
-   glPushMatrix();
-   glLoadIdentity();
+    /* Switch to ortho view with 1 unit = 1 pixel and print using calculated screen coords */
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
 
-   glOrtho((GLfloat) 0.0, viewportArray[2], viewportArray[3], 0.0, -1.0f,1.0f);
+	glOrtho((GLfloat) 0.0, viewportArray[2], viewportArray[3], 0.0, -1.0f,1.0f);
 
-   glMatrixMode(GL_MODELVIEW);
-   glPushMatrix();
-   glLoadIdentity();   
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();   
 
-   glDisable( GL_DEPTH_TEST );
+    glDisable( GL_DEPTH_TEST );
 
-   /* Print at calculated position, compensating for viewport offset */
-   int xs, ys;
-   xs = (int)(xPos - viewportArray[0]);
-   ys = (int)(viewportArray[3] - yPos - viewportArray[1]);
-   if (depth <= 1.0 && xs > 0 && ys > 0 && xs < viewportArray[2] && ys < viewportArray[3]) 
-      lucPrint(xs, ys, str);  /* Print if in view */
+    /* Print at calculated position, compensating for viewport offset */
+    int xs, ys;
+    xs = (int)(xPos - viewportArray[0]);
+    ys = (int)(viewportArray[3] - yPos - viewportArray[1]);
+    if (depth <= 1.0 && xs > 0 && ys > 0 && xs < viewportArray[2] && ys < viewportArray[3]) 
+        lucPrint(xs, ys, str);  /* Print if in view */
 
-   /* Restore state */
-   glPopMatrix();
-   glMatrixMode(GL_PROJECTION);
-   glPopMatrix();
-   glMatrixMode(GL_MODELVIEW);
+    /* Restore state */
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
 
-   glEnable( GL_DEPTH_TEST );
+	glEnable( GL_DEPTH_TEST );
 }
 
 void lucSetFontCharset(int charset)
@@ -241,10 +243,12 @@ void lucBuildFont(int glyphsize, int columns, int startidx, int stopidx)
 	float glyphX = 1 / divX;	/* Width & height of a glyph in texture coords */
 	float glyphY = 1 / divY;
 	GLfloat cx, cy;         /* the character coordinates in our texture */
-    if (startidx == 0) yoffset = 0;
+
+	if (startidx == 0)
+		yoffset = 0;
 	glBindTexture(GL_TEXTURE_2D, texture);
-	for (i = 0; i < (stopidx - startidx); i++)
-	{
+
+	for (i = 0; i < (stopidx - startidx); i++) {
 		cx = (float) (i % columns) / divX;
 		cy = yoffset + (float) (i / columns) / divY;
 		glNewList(fontbase + startidx + i, GL_COMPILE);
@@ -362,7 +366,7 @@ void lucViewportInfo_SetOpenGLCamera( lucViewportInfo* viewportInfo ) {
 	
 	/*Declarations for the lucStereoAsymetric part*/
 	double ratio, radians, wd2, ndfl;
-	double left, right, top, bottom;
+	double left, right, top, bottom, near=0.1, far=1000;
 	#define DTOR 0.0174532925
 	GLenum pname = GL_STEREO;
 	GLboolean stereo_enabled;
@@ -413,7 +417,7 @@ void lucViewportInfo_SetOpenGLCamera( lucViewportInfo* viewportInfo ) {
 				right = ratio * wd2 - 0.5* camera->eyeSeparation * ndfl;
 				top = wd2;
 				bottom = -wd2;
-				glFrustum(left, right, bottom, top, viewport->nearClipPlane, viewport->farClipPlane);
+				glFrustum(left, right, bottom, top, near, far);
 		
 				glMatrixMode(GL_MODELVIEW);
 				/*glDrawBuffer(GL_BACK_RIGHT);*/
@@ -436,7 +440,7 @@ void lucViewportInfo_SetOpenGLCamera( lucViewportInfo* viewportInfo ) {
 				right = ratio * wd2 + 0.5* camera->eyeSeparation * ndfl;
 				top = wd2;
 				bottom = -wd2;
-				glFrustum(left, right, bottom, top, viewport->nearClipPlane, viewport->farClipPlane);
+				glFrustum(left, right, bottom, top, near, far);
 		
 				glMatrixMode(GL_MODELVIEW);
 				glDrawBuffer(GL_BACK);
@@ -456,14 +460,6 @@ void lucViewportInfo_SetOpenGLCamera( lucViewportInfo* viewportInfo ) {
 		/*	abort();*/
 			break;
 	}
-
-   /* Apply scaling factors */
-   if (viewport->scaleX != 1.0 || viewport->scaleY != 1.0 || viewport->scaleZ != 1.0) {
-      glScalef(viewport->scaleX, viewport->scaleY, viewport->scaleZ);
-      /* Enable automatic rescaling of normal vectors when scaling is turned on */
-      //glEnable(GL_RESCALE_NORMAL);
-      glEnable(GL_NORMALIZE);
-   } 
 }
 
 void luc_OpenGlSquare( Dimension_Index dim, double* pos, double* normal, double* orientation, double width) {
@@ -674,226 +670,112 @@ void luc_OpenGlCircle( Dimension_Index dim, double* pos, double* normal, double 
 
 }
 
-void luc_DrawVector3d( double* pos, double* vector, double scale, double headSize, int segment_count )
-{
-    /* Length of the drawn vector = vector magnitude * scaling factor */
-    float length = scale * StGermain_VectorMagnitude( vector, 3 );
-    static int segments;    /* Saves segment count */
-    static float *x_coords, *y_coords;  /* Saves arrays of x,y points on circle for set segment count */
-
-    /* Recalc required? Only done first time called and when segment count changes */
-    if (segments != segment_count)
-    {
-        /* Calculate unit circle points when divided into specified segments
-         * and store in static variable to re-use every time a vector with the
-         * same segment count is drawn */
-        segments = segment_count;
-        if (x_coords != NULL) Memory_Free(x_coords);
-        if (y_coords != NULL) Memory_Free(y_coords);
-
-    	x_coords = Memory_Alloc_Array( float, (segment_count + 1), "Unit Circle X Coords" );
-    	y_coords = Memory_Alloc_Array( float, (segment_count + 1), "Unit Circle Y Coords" );
-
-        GLfloat angle; 
-        //fprintf(stderr, "Vector Arrow -- Point %f,%f,%f\n", C[0], C[1], C[2]);
-        // Loop around in a circle and specify even points along the circle
-        // as the vertices for the triangle fan cone, cone base and arrow shaft
-        float angle_inc = 2*M_PI / (float)segment_count;
-        int idx;
-        for(idx = 0; idx <= segments; idx++)
-        {
-            angle = angle_inc * (float)idx;
-            // Calculate x and y position of the next vertex and cylinder normals (unit circle coords)
-            x_coords[idx] = sin(angle);
-            y_coords[idx] = cos(angle);
-        }
-    }
-    
-    /* Render a 3d arrow, cone with base for head, cylinder for shaft */
-    glDisable(GL_CULL_FACE);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    /* Radius of head */
-    double radius = 0.8 * headSize * length;
-
-    glPushMatrix();
-    /* Vector is centered on pos[x,y,z]
-     * Translate to the point of arrow -> position + vector/2 */
-    glTranslated(pos[0] + scale * 0.5 * vector[0], 
-                 pos[1] + scale * 0.5 * vector[1], 
-                 pos[2] + scale * 0.5 * vector[2]);
-
-    //Rotate to orient the cone
-    //...Want to align our z-axis to point along arrow vector: 
-    // axis of rotation = (z x vec) cosine of angle = (z . vec)
-    double z[3] = {0.0, 0.0, 1.0}, axis[3];
-    double rangle;
-    StGermain_VectorCrossProduct( axis, z, vector );
-    rangle = acos(StGermain_VectorDotProduct( z, vector, 3 ));
-    rangle = StGermain_RadianToDegree( rangle );
-    glRotated(rangle, axis[0], axis[1], axis[2]);
-    //fprintf(stderr, "Axis %f,%f,%f angle %f\n", axis[0], axis[1], axis[2], rangle);
-
-    //Translate back from point by size of arrowhead
-    //thus our working coordinate system origin is at the base of head with z-axis aligned with head
-    glTranslated(0.0, 0.0, -radius*2);
-
-    /* Render the arrowhead cone and base with two triangle fans */
-    /* Don't bother drawing head for tiny vectors */
-    double normal[3];
-    if ( radius >= 1.0e-10 ) 
-    {
-        /* Pinnacle vertex is at point of arrow */
-        double pinnacle[3] = {0, 0, radius * 2};
-
-        /* First pair of vertices on circle define a triangle when combined with pinnacle */
-        double vertex0[3] = {radius * x_coords[0], radius * y_coords[0], 0.0};
-        double vertex1[3] = {radius * x_coords[1], radius * y_coords[1], 0.0};
-        
-        /* Set normal for first triangle */
-        StGermain_NormalToPlane( normal, pinnacle, vertex0, vertex1);
-
-        int i;
-        for (i=0; i<2; i++)
-        {
-            glBegin(GL_TRIANGLE_FAN);
-            //Pinnacle vertex of cone / centre of base circle
-            glNormal3dv(normal);
-            glVertex3dv(pinnacle);
-
-            //Subsequent vertices describe outer edges of cone base
-            int v;
-            for (v=0; v <= segments; v++)
-            {
-                /* Calc next vertex from unit circle normal */
-                vertex1[0] = radius * x_coords[v];
-                vertex1[1] = radius * y_coords[v];
-
-                if (i==0 && v > 0)
-                {
-                    StGermain_NormalToPlane( normal, pinnacle, vertex0, vertex1);
-                    glNormal3dv(normal);
-                }
-                
-                /* Draw vertex */
-                glVertex2dv(vertex1);
-
-                /* Save previous vertex */
-		        memcpy( vertex0, vertex1, sizeof(double) * 3 );
-            }
-            glEnd();
-            
-            //Flatten cone for circle base -> set common point to share z-coord
-            pinnacle[2] = 0;
-            //Normal for back of cone
-            normal[0] = 0; normal[1] = 0; normal[2] = -1;
-        }
-    }
-
-    /* Render a cylinder quad strip for shaft */
-    glBegin(GL_QUAD_STRIP);
-    int v;
-    double shaft_vertex[3][3];
-    for (v=0; v <= segments; v++)
-    {
-        /* Top of shaft */
-        shaft_vertex[0][0] = 0.2 * radius * x_coords[v];
-        shaft_vertex[0][1] = 0.2 * radius * y_coords[v];
-        shaft_vertex[0][2] = 0.0;
-        /* Base of shaft */
-        shaft_vertex[1][0] = shaft_vertex[0][0];
-        shaft_vertex[1][1] = shaft_vertex[0][1];
-        shaft_vertex[1][2] = -length + radius*2; /* Shaft length to base = vector length - head size */
-
-        normal[0] = -x_coords[v]; normal[1] = -y_coords[v]; normal[2] = 0;
-        glNormal3dv(normal);
-        glVertex3dv(shaft_vertex[0]);
-        glVertex3dv(shaft_vertex[1]);
-        //fprintf(stderr, " idx %d vertex %f,%f,%f --> ", v, shaft_vertex[0][0], shaft_vertex[0][1], shaft_vertex[0][2]);
-        //fprintf(stderr, "%f,%f,%f\n", shaft_vertex[1][0], shaft_vertex[1][1], shaft_vertex[1][2]);
-    }
-    glEnd();
-    
-    glPopMatrix();
-}
+#define OFFSET2D	0.01
 
 void luc_DrawVector( Dimension_Index dim , double* pos, double* vector, double scale, double headSize ) {
-	if ( dim == 2 ) {
-   	double pos3d[3], vector3d[3];
-      pos3d[0] = pos[0]; pos3d[1] = pos[1]; pos3d[2] = 0.0;
-      vector3d[0] = vector[0]; vector3d[1] = vector[1]; vector3d[2] = 0.0;
-      luc_DrawVector3d(pos3d, vector3d, scale, headSize, 16.0);
-	}
-	else 
-      luc_DrawVector3d(pos, vector, scale, headSize, 16.0);
-}
+	Coord A, B, C;
+	Dimension_Index dim_I;
 
-//Leaving this here for now as is a useful debugging function for plotting visable surface normals
-#define DEG2RAD (M_PI/180.0)
-#define RAD2DEG (180.0/M_PI)
-#define crossProduct(a,b,c) \
-   (a)[0] = (b)[1] * (c)[2] - (c)[1] * (b)[2]; \
-   (a)[1] = (b)[2] * (c)[0] - (c)[2] * (b)[0]; \
-   (a)[2] = (b)[0] * (c)[1] - (c)[0] * (b)[1];
-
-#define vecmag(v) \
-   sqrt((v)[0] * (v)[0] + (v)[1] * (v)[1] + (v)[2] * (v)[2])
-#define dotProduct(v,q) \
-   ((v)[0] * (q)[0] + \
-   (v)[1] * (q)[1] + \
-   (v)[2] * (q)[2])
-
-#define vectorSubtract(a, b, c) \
-   (a)[0] = (b)[0] - (c)[0]; \
-   (a)[1] = (b)[1] - (c)[1]; \
-   (a)[2] = (b)[2] - (c)[2]; \
-/* Debugging function, draws a small white/red line representing normal */
-void luc_DrawNormalVector( double* pos, double* vector, double scale )
-{
 	glDisable(GL_LIGHTING);
-    /* Length of the drawn vector = vector magnitude * scaling factor */
-    double length = scale * sqrt(dotProduct(vector,vector));
+	/* headSize = |BC|/|AC|: 
+		i.e. head size of 1.0, means that B -> A, 
+		     head size of 0.0, means that B ->C */
 
-    glPushMatrix();
-    /* Vector is centered on pos[x,y,z]
-     * Translate to the point of arrow -> position + vector/2 */
-    glTranslated(pos[0] + scale * 0.5 * vector[0], 
-                 pos[1] + scale * 0.5 * vector[1], 
-                 pos[2] + scale * 0.5 * vector[2]);
+	/* ASCII art describing vertices for arrow 
+	                                D
+	                                |\
+	                                | \
+	                                |  \
+	A                  O           B|   \
+	--------------------------------|    > C
+	                                |   /
+	                                |  /
+	                                | /
+	                                |/
+	                                E  
+	*/
 
-    //Rotate to orient the cone
-    //...Want to align our z-axis to point along arrow vector: 
-    // axis of rotation = (z x vec) cosine of angle = (z . vec)
-    double z[3] = {0.0, 0.0, 1.0}, axis[3];
-    double rangle;
-    crossProduct( axis, z, vector );
-    rangle = acos(dotProduct( z, vector ));
-    rangle = RAD2DEG * rangle;
-    glRotated(rangle, axis[0], axis[1], axis[2]);
-    //fprintf(stderr, "Axis %f,%f,%f angle %f radius %f\n", axis[0], axis[1], axis[2], rangle, radius);
+	for ( dim_I = 0 ; dim_I < dim ; dim_I++ ) {
+		A[ dim_I ] = pos[ dim_I ] - scale * 0.5 * vector[ dim_I ];
+		C[ dim_I ] = pos[ dim_I ] + scale * 0.5 * vector[ dim_I ];
 
-    //Translate back from point by half length
-    //thus our working coordinate system origin is halfway down vec with z-axis aligned with head
-    glTranslated(0.0, 0.0, -length*0.5);
+		B[ dim_I ] = A[ dim_I ] * headSize + C[ dim_I ] * (1.0 - headSize);
+	}
+	if ( dim == 2 ) 
+		A[ K_AXIS ] = B[ K_AXIS ] = C[ K_AXIS ] = OFFSET2D;
 
-   /* Render vector as two lines, blue base, red at tip */
-   glColor3f(1.0, 0.0, 0.0);
-   glBegin(GL_LINES);
-      glVertex3d(0, 0, 0);
-      glVertex3d(0, 0, length*0.5);
-   glEnd();
+	/* Draw Line */
+	glBegin(GL_LINES);
+		glVertex3dv( A );
+		glVertex3dv( B );
+	glEnd();
+			
 
-   glColor3f(0.0, 0.0, 1.0);
-   glBegin(GL_LINES);
-      glVertex3d(0, 0, 0);
-      glVertex3d(0, 0, -length*0.5);
-   glEnd();
+	/* Draw Arrow Head */
+	if ( dim == 2 ) {
+		glBegin(GL_TRIANGLES);
+			glVertex3dv( C );
+			/* Vertex D */
+			glVertex3d(
+				B[ I_AXIS ] + 0.8 * headSize * scale * vector[1], 
+				B[ J_AXIS ] - 0.8 * headSize * scale * vector[0], 
+				OFFSET2D );
+			/* Vertex E */
+			glVertex3d(
+				B[ I_AXIS ] - 0.8 * headSize * scale * vector[1], 
+				B[ J_AXIS ] + 0.8 * headSize * scale * vector[0], 
+				OFFSET2D );
+		glEnd();
+	}
+	else {
+		double radius = 0.8 * headSize * scale * StGermain_VectorMagnitude( vector, dim );
+		double vector_polar[3], vector_rect[3];
+		double normal_polar[3], normal_rect[3];
+		int theta;
 
-   glPopMatrix();
+		/* Don't bother drawing head for tiny vectors */
+		if ( radius < 1.0e-10 )
+			return;
+
+		/* normalise vector */
+		memcpy( normal_rect, vector, sizeof(double) * 3 );
+		StGermain_VectorNormalise( normal_rect, dim );
+	
+		/* Convert Normal into spherical coordinates */
+		StGermain_RectangularToSpherical( normal_polar, normal_rect, 3 );
+	
+		glBegin(GL_TRIANGLE_FAN);
+			/* Vertex C - Point of the triangle fan */
+			glVertex3dv( C );
+
+			for ( theta = 0 ; theta <= 360 ; theta += 1 ) {
+				/* Find vector from centre of circle to edge of circle */
+				vector_polar[0] = radius;
+				vector_polar[1] = StGermain_DegreeToRadian( theta );
+				vector_polar[2] = atan(			-1.0/
+							(tan(normal_polar[2])*cos( normal_polar[1] - vector_polar[1] ) ) );
+
+				/* Correct for arctan domain */
+				if ( vector_polar[2] < 0.0 )
+					vector_polar[2] += M_PI;
+				
+				/*Convert back to cartesian coordinates */
+				StGermain_SphericalToRectangular( vector_rect, vector_polar, 3 );
+				
+				/* Find position vectors of edge of circle */
+				vector_rect[0] += B[0];
+				vector_rect[1] += B[1];
+				vector_rect[2] += B[2];
+				
+				/* Plot them */
+				glVertex3dv( vector_rect );
+			}
+		glEnd();
+	}
+	
 	glEnable(GL_LIGHTING);
 }
 
-#define OFFSET2D 0.01
 
 void luc_DrawRod( Dimension_Index dim , double* pos, double* vector, double scale ) {
 	double magnitude;

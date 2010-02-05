@@ -91,7 +91,7 @@
 
 	void _lucRenderingEngineVTK_Render( void* renderingEngine, lucWindow* window, AbstractContext* context ) ;
 	void _lucRenderingEngineVTK_Clear( void* renderingEngine, lucWindow* window, Bool clearAll ) ;
-	void _lucRenderingEngineVTK_GetPixelData( void* renderingEngine, lucWindow* window, void* buffer, Bool withAlpha) ;
+	void _lucRenderingEngineVTK_GetPixelData( void* renderingEngine, lucWindow* window, lucPixel* buffer ) ;
 
 	void lucRenderingEngineVTK_DrawTitle( void* renderingEngine, lucWindow* window, lucViewportInfo* viewportInfo ) ;
 
