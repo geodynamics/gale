@@ -303,10 +303,10 @@ void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactor
 			/* test to ensure provided domain is valid */
 			maxVal =  (abs(crdMax[d_i]) > abs(crdMin[d_i])) ? abs(crdMax[d_i]) : abs(crdMin[d_i]);
 			if( maxVal == 0  ) maxVal = 1;  /* if maxVal is zero, then both numbers must be zero, set to one as next test will fail */
-         Journal_Firewall( ( ( (crdMax[d_i] - crdMin[d_i])/maxVal) > 1E-10 ), errorStream,
+         Journal_Firewall( ( ( (crdMax[d_i] - crdMin[d_i])/maxVal) > 1E-10 || d_i==J_AXIS), errorStream,
                      "\n\nError in %s for %s '%s'\n\n"
-                     "Dimension of domain (min = %f, max = %f) for component number %u is not valid.\n\n", 
-                     __func__, self->type, self->name, 
+                     "Dimension of domain (min = %f, max = %f) for component number %u is not valid.\n\n",
+                     __func__, self->type, self->name,
                      crdMin[d_i], crdMax[d_i], d_i);
 		}
 
