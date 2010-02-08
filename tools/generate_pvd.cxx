@@ -9,7 +9,7 @@
 
      g++ generate_pvd.cxx -o generate_pvd -lboost_system -lboost_filesystem -static
 
-   Usage: generate_pvd START END STEP
+   Usage: generate_pvd NAME TYPE START END STEP
 
    This will output two files, fields.pvd and particles.pvd.  Put them
    in the same directory as the other fields and particle files.  In
@@ -47,42 +47,40 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-  if(argc<3)
+  if(argc<5)
     {
       cerr << "Not enough arguments\n"
-           << "Usage: generate_pvd [start] [end] [step]\n";
+           << "Usage: generate_pvd [name] [type] [start] [end] [step]\n";
       exit(1);
     }
-  int start=atoi(argv[1]);
-  int end=atoi(argv[2]);
-  int step=1;
-  if(argc>3)
-    step=atoi(argv[3]);
-  
-  fs::ofstream particles("particles.pvd"), fields("fields.pvd");
+  string name(argv[1]);
+  string suffix(argv[2]);
+  if(suffix!="u" && suffix!="s")
+    {
+      cerr << "Wrong suffix: " << suffix << "\n"
+           << "Only 'u' and 's' allowed\n";
+      exit(1);
+    }
 
-  particles << "<?xml version=\"1.0\"?>\n"
-            << "<VTKFile type=\"Collection\" version=\"0.1\">\n"
-            << "  <Collection>\n";
-  fields << "<?xml version=\"1.0\"?>\n"
-         << "<VTKFile type=\"Collection\" version=\"0.1\">\n"
-         << "  <Collection>\n";
+  int start=atoi(argv[3]);
+  int end=atoi(argv[4]);
+  int step=1;
+  if(argc>5)
+    step=atoi(argv[5]);
+  
+  fs::ofstream pvd(name+".pvd");
+
+  pvd << "<?xml version=\"1.0\"?>\n"
+      << "<VTKFile type=\"Collection\" version=\"0.1\">\n"
+      << "  <Collection>\n";
   for(int i=start; i<=end; i+=step)
     {
-      particles << "    <DataSet timestep=\"" << i
-                << "\" file=\"particles.";
-      particles.width(5);
-      particles.fill('0');
-      particles << i << ".pvtu\"/>\n";
-
-      fields << "    <DataSet timestep=\"" << i
-              << "\" file=\"fields.";
-      fields.width(5);
-      fields.fill('0');
-      fields << i << ".pvts\"/>\n";
+      pvd << "    <DataSet timestep=\"" << i
+          << "\" file=\"" << name << ".";
+      pvd.width(5);
+      pvd.fill('0');
+      pvd << i << ".pvt" << suffix << "\"/>\n";
     }
-  particles << "  </Collection>\n"
-            << "</VTKFile>\n";
-  fields << "  </Collection>\n"
-         << "</VTKFile>\n";
+  pvd << "  </Collection>\n"
+      << "</VTKFile>\n";
 }
