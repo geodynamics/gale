@@ -85,7 +85,7 @@ Index Underworld_VTKOutput_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, Underworld_VTKOutput_Type, (Name)"0", _Underworld_VTKOutput_DefaultNew  );
 }
 
-void VTKOutput_particles(IntegrationPointsSwarm*  picswarm, 
+void VTKOutput_particles(Swarm* swarm, 
                          double defaultDiffusivity,
                          int stepping,
                          char *outputPath, const int timeStep,
@@ -94,41 +94,62 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
                       const int timeStep);
 
 void VTKOutput( void* _context ) {
-	UnderworldContext*	context = (UnderworldContext*)_context;
-	Dictionary*             dictionary         = context->dictionary;
-	IntegrationPointsSwarm*	picIntegrationPoints = (IntegrationPointsSwarm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"picIntegrationPoints"  );
+  UnderworldContext* context = (UnderworldContext*)_context;
+  Dictionary* dictionary = context->dictionary;
 
-        /* Only dump if at the right time step.  We use timeStep-1,
-           because we are outputing after a solve, but before
-           advection.  So timeStep-1 makes more sense in terms of when
-           the simulation looks like this. */
-        if((context->timeStep-1) % context->dumpEvery != 0)
-          return;
+  /* Only dump if at the right time step.  We use timeStep-1, because
+     we are outputing after a solve, but before advection.  So
+     timeStep-1 makes more sense in terms of when the simulation looks
+     like this. */
+  if((context->timeStep-1) % context->dumpEvery != 0)
+    return;
 	
-        /* Write the particles and then all of the fields. */
 
-        if(Dictionary_GetBool_WithDefault(dictionary,"VTKOutput_Particles",
-                                          True))
-          VTKOutput_particles(picIntegrationPoints,
+  /* Write the particles and then all of the fields. */
+  
+  if(Dictionary_GetBool_WithDefault(dictionary,"VTKOutput_Particles",
+                                    True))
+    {
+      Name swarmName;
+      Swarm* swarm;
+      Dictionary_Entry_Value* swarm_list;
+      int swarm_list_size, s;
+      swarm_list=Dictionary_Get(dictionary, "VTKOutput_SwarmList" );
+
+      if(!swarm_list)
+        {
+          swarm_list=Dictionary_Entry_Value_NewList();
+          Dictionary_Entry_Value_AddElement(swarm_list,Dictionary_Entry_Value_FromString("picIntegrationPoints"));
+        }
+      swarm_list_size=Dictionary_Entry_Value_GetCount(swarm_list);
+      for(s=0;s<swarm_list_size;++s)
+        {
+          swarmName=Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetElement(swarm_list,s));
+          swarm=(Swarm*)LiveComponentRegister_Get(context->CF->LCRegister,
+                                                  swarmName);
+
+          VTKOutput_particles(swarm,
                               Dictionary_GetDouble_WithDefault
                               (dictionary,"defaultDiffusivity",1.0),
                               Dictionary_GetInt_WithDefault
                               (dictionary,"particleStepping",1),
                               context->outputPath, context->timeStep-1,
                               context->dim,context->rank,context->nproc);
-        if(Dictionary_GetBool_WithDefault(dictionary,"VTKOutput_Fields",
-                                          True))
-          VTKOutput_fields(context,context->rank,context->nproc,
-                           context->timeStep-1);
+        }
+    }
+  if(Dictionary_GetBool_WithDefault(dictionary,"VTKOutput_Fields",
+                                    True))
+    VTKOutput_fields(context,context->rank,context->nproc,
+                     context->timeStep-1);
 }
 
-void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
+void VTKOutput_particles(Swarm* swarm,
                          double defaultDiffusivity,
                          int stepping, char *outputPath,
                          const int timeStep, int dim, int myRank, int nprocs) {
   double *coord;
   int iteration, i;
-  Particle_Index          num_particles = picswarm->particleLocalCount;
+  Particle_Index          num_particles = swarm->particleLocalCount;
   Particle_Index          lParticle_I;
   
   RheologyMaterial*       material;
@@ -144,7 +165,8 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
   Name filename;
   
   /* Open the processor specific output file */
-  Stg_asprintf(&filename,"%s/particles.%d.%05d.vtu",outputPath,myRank,timeStep);
+  Stg_asprintf(&filename,"%s/%s.%d.%05d.vtu",outputPath,swarm->name,myRank,
+               timeStep);
   fp=fopen(filename,"w");
   Memory_Free( filename );
 
@@ -157,7 +179,7 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
   /* Open the parallel control file */
   if(myRank==0)
     {
-      Stg_asprintf( &filename, "%s/particles.%05d.pvtu", outputPath, timeStep);
+      Stg_asprintf( &filename, "%s/%s.%05d.pvtu", outputPath, swarm->name, timeStep);
       pfp=fopen(filename,"w");
       Memory_Free( filename );
 
@@ -203,23 +225,36 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
         Material *extension_info;
         XYZ normal;
         
-        IntegrationPoint* integrationparticle = (IntegrationPoint*)Swarm_ParticleAt( picswarm, lParticle_I );
+        if(Stg_Class_IsInstance(swarm,IntegrationPointsSwarm_Type))
+          {
+            IntegrationPoint* integrationparticle = (IntegrationPoint*)Swarm_ParticleAt( ((IntegrationPointsSwarm*)swarm), lParticle_I );
         
-        material = (RheologyMaterial*) IntegrationPointsSwarm_GetMaterialOn( picswarm, integrationparticle );
-        materialparticle = OneToOneMapper_GetMaterialPoint( picswarm->mapper, integrationparticle, &materialSwarm );
+            material = (RheologyMaterial*) IntegrationPointsSwarm_GetMaterialOn( ((IntegrationPointsSwarm*)swarm), integrationparticle );
+            materialparticle = OneToOneMapper_GetMaterialPoint( ((IntegrationPointsSwarm*)swarm)->mapper, integrationparticle, &materialSwarm );
         
-        density=Dictionary_GetDouble_WithDefault( material->dictionary, (Dictionary_Entry_Key)"density", 0.0  );
-        alpha=Dictionary_GetDouble_WithDefault( material->dictionary, (Dictionary_Entry_Key)"alpha", 0.0  );
-	material_index=material->index;
-        diffusivity=Dictionary_GetDouble_WithDefault( material->dictionary, (Dictionary_Entry_Key)"diffusivity", defaultDiffusivity );
-        rheology_register=(Rheology_Register* )material->rheology_Register;
+            density=Dictionary_GetDouble_WithDefault( material->dictionary, (Dictionary_Entry_Key)"density", 0.0  );
+            alpha=Dictionary_GetDouble_WithDefault( material->dictionary, (Dictionary_Entry_Key)"alpha", 0.0  );
+            diffusivity=Dictionary_GetDouble_WithDefault( material->dictionary, (Dictionary_Entry_Key)"diffusivity", defaultDiffusivity );
 
-        if( rheology_register && strcmp( material->name, Material_Type ) )
-           rheologyCount = Rheology_Register_GetCount( rheology_register );
-        else
-           rheologyCount = 0;
+            material_index=material->index;
+            rheology_register=(Rheology_Register* )material->rheology_Register;
         
-        coord = materialparticle->coord;
+            if( rheology_register && strcmp( material->name, Material_Type ) )
+              rheologyCount = Rheology_Register_GetCount( rheology_register );
+            else
+              rheologyCount = 0;
+            coord = materialparticle->coord;
+          }
+        else
+          {
+            GlobalParticle *particle;
+            particle=(GlobalParticle *)Swarm_ParticleAt(swarm,lParticle_I);
+            coord = particle->coord;
+            material_index=0;
+            density=alpha=0;
+            diffusivity=defaultDiffusivity;
+            rheologyCount=0;
+          }
         postFailureStrain=0;
         viscosity=0;
         currently_yielding=0;
@@ -429,8 +464,8 @@ void VTKOutput_particles(IntegrationPointsSwarm*  picswarm,
     {
       fprintf(pfp,"        </PPointData>\n");
       for(i=0;i<nprocs;++i)
-        fprintf(pfp,"    <Piece Source=\"particles.%d.%05d.vtu\"/>\n",
-                i,timeStep);
+        fprintf(pfp,"    <Piece Source=\"%s.%d.%05d.vtu\"/>\n",
+                swarm->name,i,timeStep);
       fprintf(pfp,"  </PUnstructuredGrid>\n\
 </VTKFile>\n");
       fclose(pfp);
