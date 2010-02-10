@@ -61,7 +61,8 @@
 		double                                              cohesionAfterSoftening;               \
 		Bool                                                strainRateSoftening;                  \
                 SymmetricTensor                                     stress;\
-                double                                              stressInv;
+                double                                              stressInv; \
+                double                                              strainRateSecondInvariant;
 
 	struct VonMises { __VonMises };
 

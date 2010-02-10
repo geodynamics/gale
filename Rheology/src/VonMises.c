@@ -230,6 +230,8 @@ double _VonMises_GetYieldIndicator(
 {
 	VonMises*                         self             = (VonMises*) rheology;
 	SymmetricTensor                   strainRate;
+        int i;
+        double stressTrace, strainRateTrace;
 	
 	/* Get Strain Rate */
 	if( self->strainRateField ) {
@@ -243,8 +245,27 @@ double _VonMises_GetYieldIndicator(
 	}
 
 	/* Get Stress */
-	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, strainRate, self->stress );
-	self->stressInv = SymmetricTensor_2ndInvariant( self->stress, constitutiveMatrix->dim );
+	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, strainRate,
+                                            self->stress );
+        SymmetricTensor_GetTrace(self->stress, constitutiveMatrix->dim,
+                                 &stressTrace);
+        SymmetricTensor_GetTrace(strainRate, constitutiveMatrix->dim,
+                                 &strainRateTrace);
+
+        for(i=0;i<constitutiveMatrix->dim;++i)
+          {
+            strainRate[TensorMapST3D[i][i]]-=
+              strainRateTrace/constitutiveMatrix->dim;
+            self->stress[TensorMapST3D[i][i]]-=
+              stressTrace/constitutiveMatrix->dim;
+          }
+
+        /* Save the strain rate invariant */
+        self->strainRateSecondInvariant=
+          SymmetricTensor_2ndInvariant( strainRate, constitutiveMatrix->dim );
+
+	self->stressInv = 
+          SymmetricTensor_2ndInvariant( self->stress, constitutiveMatrix->dim );
 
         self->yieldIndicator = self->stressInv;
 

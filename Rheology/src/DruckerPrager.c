@@ -345,14 +345,8 @@ double _DruckerPrager_GetYieldCriterion(
 	double                            frictionCoefficient;
 	double                            frictionCoefficientAfterSoftening;
 	double                            minimumYieldStress;
-	double                            strainWeakeningRatio;
 	double                            effectiveCohesion;
 	double                            effectiveFrictionCoefficient;
-	double                            phi;
-	double                            sinphi;
-	double                            oneOverDenominator;
-	double                            dpFrictionCoefficient;
-	double                            dpCohesion;
 	double                            frictionalStrength;
 	double                            pressure;
 	DruckerPrager_Particle*           particleExt;
@@ -479,15 +473,14 @@ void _DruckerPrager_HasYielded(
 		double                           yieldIndicator )
 {
    DruckerPrager* self = (DruckerPrager*)rheology;
-   double viscosity = ConstitutiveMatrix_GetIsotropicViscosity( constitutiveMatrix );
+   double old_viscosity = ConstitutiveMatrix_GetIsotropicViscosity( constitutiveMatrix );
+   double viscosity = yieldCriterion/(2*self->strainRateSecondInvariant);
 
-   _VonMises_HasYielded(
-      self, constitutiveMatrix, materialPointsSwarm, lElement_I, materialPoint,
-      yieldCriterion, yieldIndicator );
+   ConstitutiveMatrix_SetIsotropicViscosity( constitutiveMatrix, viscosity );
 
    if( constitutiveMatrix->sle && constitutiveMatrix->sle->nlFormJacobian ) {
 
-      constitutiveMatrix->derivs[8] += viscosity * self->curFrictionCoef / yieldIndicator;
+      constitutiveMatrix->derivs[8] += old_viscosity * self->curFrictionCoef / yieldIndicator;
 
    }
 
