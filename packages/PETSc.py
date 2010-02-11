@@ -149,7 +149,7 @@ class PETSc(Package):
             print 'position independant code enabled. Either rebuild PETSc'
             print 'with the configuration option \'--with-pic=1\' if you are'
             print 'sure you need shared libraries, or reconfigure StGermain'
-            print 'with the \'--shared-libs=0\' option.\n'
+            print 'with the \'--lib-type=static\' option.\n'
             sys.exit()
             return False
 
