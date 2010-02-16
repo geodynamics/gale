@@ -45,5 +45,9 @@ def runTests():
     print message
     FILE.close()
 
+    if failed > 0:
+        sys.exit(1)
+    else:
+        sys.exit(0)
 
 runTests()
