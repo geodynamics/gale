@@ -60,6 +60,10 @@
 #include <string.h>
 
 
+#ifndef MASTER
+	#define MASTER 0
+#endif
+
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type lucEncoderLibfame_Type = "lucEncoderLibfame";
 
@@ -97,6 +101,9 @@ void _lucEncoderLibfame_Init(
 	fame_yuv_t*              fameyuv;
 	Name                     filename;
 	Index                    i;
+
+   /* Output should only run on root node */
+	if (self->context->rank != MASTER) return;
 
 	/* Initialise the inlcudeFrame0 parameter */
 	self->includeFrame0 = includeFrame0;
@@ -151,7 +158,6 @@ void _lucEncoderLibfame_Init(
 	fameparameters->total_frames = 0;
 
 	/* Open Output File */
-	
 	Stg_asprintf( &filename, "%s/%s.mpeg", outputPath, window->name );
 	
 	if(!loadFromCheckPoint ) 
@@ -172,25 +178,27 @@ void _lucEncoderLibfame_Delete( void* outputFormat ) {
 	lucEncoderLibfame*  self         = (lucEncoderLibfame*)outputFormat;
 	unsigned int        framebytes;
 
+   /* Output should only run on root node */
+	if (self->context->rank == MASTER) {
+      /* Finish writing mpeg and close file*/
+      framebytes = fame_close(self->famecontext);
+      fwrite(self->buffer, framebytes, 1, self->stream);
+      fflush(self->stream);
+      fclose(self->stream);
 
-	/* Finish writing mpeg and close file*/
-	framebytes = fame_close(self->famecontext);
-	fwrite(self->buffer, framebytes, 1, self->stream);
-	fflush(self->stream);
-	fclose(self->stream);
+      /* Free Memory */
+      Memory_Free( self->fameyuv->y );
+      Memory_Free( self->fameyuv->u );
+      Memory_Free( self->fameyuv->v );
 
-	/* Free Memory */
-	Memory_Free( self->fameyuv->y );
-	Memory_Free( self->fameyuv->u );
-	Memory_Free( self->fameyuv->v );
-
-	Memory_Free( self->fameyuv );
-	Memory_Free( self->famestatistics );
-	Memory_Free( self->fameparameters );
-	Memory_Free( self->buffer );
-	
-	Memory_Free( self->coding );
-	Memory_Free( self->profile );
+      Memory_Free( self->fameyuv );
+      Memory_Free( self->famestatistics );
+      Memory_Free( self->fameparameters );
+      Memory_Free( self->buffer );
+      
+      Memory_Free( self->coding );
+      Memory_Free( self->profile );
+   }
 
 	_lucOutputFormat_Delete( self );
 }
