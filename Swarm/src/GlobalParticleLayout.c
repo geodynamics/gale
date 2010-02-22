@@ -311,11 +311,14 @@ void _GlobalParticleLayout_InitialiseParticles( void* particleLayout, void* _swa
 	MPI_Allreduce( &swarm->particleLocalCount, &globalParticlesInitialisedCount, 1, MPI_UNSIGNED, MPI_SUM, swarm->comm );
 	Journal_Firewall( globalParticlesInitialisedCount == self->totalInitialParticles, errorStream,
 		"Error - in %s() - for GlobalParticleLayout \"%s\", of type %s: after initialising particles, "
-		"actual global count of particles initialised was %u, whereas requested global total "
-		"totalInitialParticles was %u. If actual is < requested, it means some particles were not "
-		"identified by any processor as inside their domain. If actual > requested, it means that "
-		"some particles were identified by _multiple_ processors as belonging to their domain. Both "
-		"these states are erroneous.\n",
+		"actual global count of particles initialised was %u, whereas the user requested global total "
+		"totalInitialParticles was %u.\n"
+      "If actual is < requested, it means some particles were not identified by any processor as "
+      "inside their domain.\n"
+      "This is usually caused because some particles are outside the mesh domain.\n"
+      "If actual > requested, it means that some particles were identified by _multiple_ processors "
+      "as belonging to their domain.\n"
+      "Both these states are erroneous.\n",
 		__func__, self->name, self->type, globalParticlesInitialisedCount, self->totalInitialParticles );
 
 	Stream_UnIndentBranch( Swarm_Debug );
