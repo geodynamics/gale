@@ -431,16 +431,16 @@ double SurfaceAdaptor_Topo_Data( SurfaceAdaptor* self, Mesh* mesh,
                                  unsigned* globalSize, unsigned vertex,
                                  unsigned* vertexInds )
 {
-  int i,j,k;
-  double deltax,deltay;
+  int i,k,ip,kp;
+  double dx,dz;
 
   i=floor((mesh->verts[vertex][0] - self->info.topo_data.minX)
           /self->info.topo_data.dx + 0.5);
-  j=floor((mesh->verts[vertex][2] - self->info.topo_data.minZ)
+  k=floor((mesh->verts[vertex][2] - self->info.topo_data.minZ)
           /self->info.topo_data.dz + 0.5);
 
   if(i<0 || i>self->info.topo_data.nx-1
-     || j<0 || j>self->info.topo_data.nz-1)
+     || k<0 || k>self->info.topo_data.nz-1)
     {
       printf("Coordinate not covered by the topography file: %g %g\n\tminX: %g\n\tmaxX: %g\n\tminZ: %g\n\tmaxZ: %g\n\tnx: %d\n\tnz: %d\n",
              mesh->verts[vertex][0],
@@ -454,7 +454,25 @@ double SurfaceAdaptor_Topo_Data( SurfaceAdaptor* self, Mesh* mesh,
       abort();
     }
 
-  return self->info.topo_data.heights[i+self->info.topo_data.nx*j];
+  /* Interpolate the height */
+  ip=i+1;
+  kp=k+1;
+  if(ip>self->info.topo_data.nx-1)
+    ip=i;
+  if(kp>self->info.topo_data.nz-1)
+    kp=k;
+
+  dx=(mesh->verts[vertex][0]
+      - (i*self->info.topo_data.dx+self->info.topo_data.minX))
+    /self->info.topo_data.dx;
+  dz=(mesh->verts[vertex][2]
+      - (k*self->info.topo_data.dz+self->info.topo_data.minZ))
+    /self->info.topo_data.dz;
+
+  return self->info.topo_data.heights[i+self->info.topo_data.nx*k]*(1-dx)*(1-dz)
+    + self->info.topo_data.heights[i+self->info.topo_data.nx*kp]*(1-dx)*dz
+    + self->info.topo_data.heights[ip+self->info.topo_data.nx*k]*dx*(1-dz)
+    + self->info.topo_data.heights[ip+self->info.topo_data.nx*kp]*dx*dz;
 }
 
 double SurfaceAdaptor_Sine( SurfaceAdaptor* self, Mesh* mesh, 
