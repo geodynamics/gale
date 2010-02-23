@@ -10,7 +10,7 @@ options = [
     ('--build-dir', 'build_dir', 'Sandbox location.', 'build'),
     ('--with-debugging', 'with_debugging', 'Build with debugging', 1, 'int'),
     ('--with-warnings', 'with_warnings', 'Print all warnings at compile time', 1, 'int'),
-    ('--lib-type', 'lib_type', 'Library type (shared or static)', 'shared'),
+    ('--lib-type', 'lib_type', 'Library type (shared or static)', 'static'),
     ('--cc', 'CC', 'C compiler', None),
     ('--cflags', 'CFLAGS', 'Flags for the C compiler', None),
     ('--with-glucifer', 'with_glucifer', 'Enable gLucifer', 1, 'int'),
