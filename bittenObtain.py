@@ -54,8 +54,7 @@ u = ui.ui()
 for dep in deps:
 	os.chdir(cwd)
 	try:
-		print dep[0], '-->', dep[1], '...'
-		hg.clone( u, dep[0], dep[1] );
+		hg.clone( u, dep[0], dep[1], '--quiet' );
 	except util.Abort, e:
 		c = ConfigParser.ConfigParser()
 		try:
