@@ -746,6 +746,7 @@ lucViewportInfo* lucWindow_ConstructViewportInfoList(
 	lucViewportInfo*        currViewportInfo;
 	Dictionary*             dictionary              = Dictionary_GetDictionary( cf->componentDict, self->name );
 	Name                    viewportName[16];
+   char*                   savePtr;
 
 	*viewportCount = 0;
 	
@@ -763,11 +764,11 @@ lucViewportInfo* lucWindow_ConstructViewportInfoList(
 		/* Find number of horizontal layers */
 		horizontalCount = 0;
 		char* horizVPstr_ptr = horizontalVP_String;
-		charPtr = strtok( horizVPstr_ptr , breakChars );
+		charPtr = strtok_r( horizVPstr_ptr , breakChars, &savePtr);
 		while ( charPtr != NULL ) {
 			viewportName[horizontalCount] = StG_Strdup( charPtr );
 			horizontalCount++;
-			charPtr = strtok( NULL , breakChars );
+			charPtr = strtok_r( NULL , breakChars, &savePtr);
          if (horizontalCount == 16) {
             /* Maximum 8 viewports across in single window */
             if (charPtr != NULL)
