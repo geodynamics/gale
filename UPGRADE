@@ -1,0 +1,359 @@
+Upgrading Gale from 1.4.x to 1.5
+--------------------------------
+
+At the beginning, before the line
+
+  <struct name="components">
+
+Add
+
+  <import>
+    <toolbox>Underworld</toolbox>
+  </import>
+  <plugins>
+    <struct>
+      <param name="Type">Underworld_EulerDeform</param>
+      <param name="Context">context</param>
+    </struct>
+    <struct>
+      <param name="Type">Underworld_VTKOutput</param>
+      <param name="Context">context</param>
+    </struct>
+    <struct>
+      <param name="Type">StgFEM_StandardConditionFunctions</param>
+      <param name="Context">context</param>
+    </struct>
+  </plugins>
+
+---------------
+
+After the line
+
+  <struct name="components">
+
+Remove
+
+    <struct name="conditionFunctions">
+      <param name="Type">StgFEM_StandardConditionFunctions</param>
+    </struct>
+
+and add
+
+    <struct name="context">
+      <param name="Type">UnderworldContext</param>
+    </struct>
+
+---------------
+
+After the lines
+
+    <struct name="linearMesh-generator">
+      <param name="Type">CartesianGenerator</param>
+      <param name="mesh">mesh-linear</param>
+      <param name="dim">dim</param>
+      <param name="shadowDepth">shadowDepth</param>
+
+add
+
+      <param name="regular">False</param>
+
+---------------
+
+After the lines
+
+    <struct name="backgroundLayout">
+      <param name="Type">BackgroundParticleLayout</param>
+    </struct>
+
+add
+
+    <struct name="gaussMSwarmMovementHandler">
+      <param name="Type">ParticleMovementHandler</param>
+    </struct>
+
+---------------
+
+After the lines
+
+    <struct name="gaussMaterialSwarm">
+      <param name="Type">MaterialPointsSwarm</param>
+      <param name="CellLayout">cellLayout</param>
+      <param name="ParticleLayout">backgroundLayout</param>
+      <param name="FeMesh">mesh-linear</param>
+
+add
+
+      <list name="ParticleCommHandlers">
+        <param>gaussMSwarmMovementHandler</param>
+      </list>
+
+---------------
+
+After the lines
+
+    <struct name="materialSwarmParticleLayout">
+      <param name="Type">MeshParticleLayout</param>
+      <param name="mesh">mesh-linear</param>
+      <param name="cellParticleCount">particlesPerCell</param>
+    </struct>
+
+add
+
+    <struct name="pMovementHandler">
+      <param name="Type">ParticleMovementHandler</param>
+    </struct>
+    <struct name="pShadowSync">
+      <param name="Type">ParticleShadowSync</param>
+    </struct>
+
+---------------
+
+After the lines
+
+    <struct name="materialSwarm">
+      <param name="Type">MaterialPointsSwarm</param>
+      <param name="CellLayout">elementCellLayout</param>
+      <param name="ParticleLayout">materialSwarmParticleLayout</param>
+      <param name="FeMesh">mesh-linear</param>
+
+add
+
+      <list name="ParticleCommHandlers">
+        <param>pMovementHandler</param>
+        <param>pShadowSync</param>
+      </list>
+
+---------------
+
+Remove
+
+    <struct name="splittingRoutine">
+      <param name="Type">ReseedSplitting</param>
+      <param name="idealParticleCount">particlesPerCell</param>
+    </struct>
+
+
+---------------
+
+In the struct
+
+    <struct name="g_matrix">
+
+change
+
+      <param name="RHS">cont_force</param>
+
+to
+
+      <param name="RHS">mom_force</param>
+      <param name="transposeRHS">cont_force</param>
+
+---------------
+
+Change the struct
+
+    <struct name="uzawa">
+      <param name="Type">Stokes_SLE_UzawaSolver</param>
+      <param name="Preconditioner">preconditioner</param>
+      <param name="tolerance">linearTolerance</param>
+      <param name="maxIterations">5000</param>
+    </struct>
+
+to
+
+    <struct name="uzawa">
+      <param name="Type">Stokes_SLE_UzawaSolver</param>
+      <param name="velocitySolver">matrixSolver</param>
+      <param name="Preconditioner">preconditioner</param>
+      <param name="tolerance">linearTolerance</param>
+      <param name="monitor">false</param>
+      <param name="maxIterations">5000</param>
+      <param name="minIterations">1</param>
+    </struct>
+
+---------------
+
+Change the struct
+
+    <struct name="velocityRemesher">
+      <param name="Type">StripRemesher</param>
+      <param name="mesh">mesh-linear</param>
+      <param name="meshType">regular</param>
+      <list name="dim">
+        <param>true</param>
+        <param>true</param>
+        <param>true</param>
+      </list>
+    </struct>
+
+to
+
+    <struct name="velocityRemesher">
+      <param name="Type">RegularRemesherCmpt</param>
+      <param name="mesh">mesh-linear</param>
+      <list name="remeshDims">
+        <param>0</param>
+        <param>1</param>
+        <param>2</param>
+      </list>
+    </struct>
+
+---------------
+
+If you are using DruckerPrager, then add the line
+
+      <param name="StrainRateField">StrainRateField</param>
+
+---------------
+
+Remove
+
+  <list name="plugins">
+    <param>Underworld_EulerDeform</param>
+    <param>Underworld_VTKOutput</param>
+  </list>
+
+and add
+
+  <list name="FieldVariablesToCheckpoint">
+    <param>VelocityField</param>
+    <param>PressureField</param>
+  </list>
+
+============================================================
+
+To upgrade your files from Gale 1.3 or 1.3.1 to 1.4, you need to take
+out the mesh-contant structs at the beginning.
+
+    <struct name="mesh-constant">
+      <param name="Type">FeMesh</param>
+      <param name="elementType">constant</param>
+    </struct>
+    <struct name="constantMesh-generator">
+      <param name="Type">C0Generator</param>
+      <param name="mesh">mesh-constant</param>
+      <param name="elementMesh">mesh-linear</param>
+    </struct>
+
+Next, replace the references "mesh-constant" in "pressure",
+"pressureDofLayout", and "PressureField" with "mesh-linear".
+
+Remove the nodal pressures
+
+    <struct name="nodalPressure">
+      <param name="Type">MeshVariable</param>
+      <param name="mesh">mesh-linear</param>
+      <param name="Rank">Scalar</param>
+      <param name="DataType">Double</param>
+    </struct>
+    <struct name="nodalPressureDofLayout">
+      <param name="Type">DofLayout</param>
+      <param name="mesh">mesh-linear</param>
+      <list name="BaseVariables">
+        <param>nodalPressure</param>
+      </list>
+    </struct>
+    <struct name="NodalPressureField">
+      <param name="Type">FeVariable</param>
+      <param name="FEMesh">mesh-linear</param>
+      <param name="DofLayout">nodalPressureDofLayout</param>
+      <param name="LinkedDofInfo">nodalPressureLinkedDofs</param>
+    </struct>
+
+Replace the reference to NodalPressureField in any of your MohrCoulomb
+rheologies to PressureField.  At the same time, you need to rename all
+of the MohrCoulomb structs to DruckerPrager.
+
+Remove the "pressureRemesher" struct
+
+    <struct name="pressureRemesher">
+      <param name="Type">CellRemesher</param>
+      <param name="mesh">mesh-constant</param>
+      <param name="meshType">regular</param>
+      <param name="dim">3</param>
+      <param name="cellMesh">mesh-linear</param>
+    </struct>
+
+Remove any references to UnderworldDumpSwarm.
+
+In EulerDeform, remove the constant mesh remesher
+
+      <struct>
+        <param name="mesh">mesh-constant</param>
+        <param name="remesher">pressureRemesher</param>
+        <param name="velocityField">VelocityField</param>
+        <list name="fields">
+          <struct>
+            <param name="field">PressureField</param>
+            <param name="variable">pressure</param>
+          </struct>
+        </list>
+      </struct>
+
+and add PressureField to the linear mesh remesher.  So it would look like
+
+      <struct>
+        <param name="mesh">mesh-linear</param>
+        <param name="remesher">velocityRemesher</param>
+        <param name="velocityField">VelocityField</param>
+        <param name="wrapTop">True</param>
+        <list name="fields">
+          <struct>
+            <param name="field">VelocityField</param>
+            <param name="variable">velocity</param>
+          </struct>
+          <struct>
+            <param name="field">PressureField</param>
+            <param name="variable">pressure</param>
+          </struct>
+        </list>
+      </struct>
+
+Add the stabilization term right after "stokesEqn"
+
+    <struct name="c_matrix">
+      <param name="Type">StiffnessMatrix</param>
+      <param name="RowVariable">PressureField</param>
+      <param name="ColumnVariable">PressureField</param>
+      <param name="RHS">cont_force</param>
+      <param name="allowZeroElementContributions">True</param>
+    </struct>
+    <struct name="mixedStabiliser">
+      <param name="Type">MixedStabiliserTerm</param>
+      <param name="Swarm">gaussSwarm</param>
+      <param name="picSwarm">picIntegrationPoints</param>
+      <param name="storeVisc">storeViscosity</param>
+      <param name="StiffnessMatrix">c_matrix</param>
+    </struct>
+
+You may also want to add a HydrostaticTerm.  See the manual for details.
+
+============================================================
+
+Migrating from 1.2.x to 1.3
+---------------------------
+You will need to add some components for nodal pressures.  Specifically, add
+
+    <struct name="nodalPressure">
+      <param name="Type">MeshVariable</param>
+      <param name="mesh">mesh-linear</param>
+      <param name="Rank">Scalar</param>
+      <param name="DataType">Double</param>
+    </struct>
+    <struct name="nodalPressureDofLayout">
+      <param name="Type">DofLayout</param>
+      <param name="mesh">mesh-linear</param>
+      <list name="BaseVariables">
+        <param>nodalPressure</param>
+      </list>
+    </struct>
+    <struct name="NodalPressureField">
+      <param name="Type">FeVariable</param>
+      <param name="FEMesh">mesh-linear</param>
+      <param name="DofLayout">nodalPressureDofLayout</param>
+      <param name="LinkedDofInfo">nodalPressureLinkedDofs</param>
+    </struct>
+
+Then, in any yielding components or frictional boudaries which require
+a pressure field, you must use the NodalPressureField instead of the
+PressureField.
