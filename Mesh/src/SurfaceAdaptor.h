@@ -86,6 +86,12 @@
 		SurfaceAdaptor_TrigInfo		trig;
 	} SurfaceAdaptor_SurfaceInfo;
 
+        typedef double (SurfaceAdaptor_DeformFunc)( SurfaceAdaptor_SurfaceInfo* self,
+                                                    Mesh* mesh,
+                                                    unsigned* globalSize,
+                                                    unsigned vertex,
+                                                    unsigned* vertexInds);
+
 	#define __SurfaceAdaptor				\
 		/* General info */				\
 		__MeshAdaptor					\
@@ -93,9 +99,12 @@
 		/* Virtual info */				\
 								\
 		/* SurfaceAdaptor info */			\
-		SurfaceAdaptor_SurfaceType	surfaceType;	\
-		SurfaceAdaptor_SurfaceInfo	info;           \
-		int                             contactDepth;
+		SurfaceAdaptor_SurfaceType	topSurfaceType;	\
+		SurfaceAdaptor_SurfaceType	bottomSurfaceType;	\
+		SurfaceAdaptor_SurfaceInfo	top_info;       \
+		SurfaceAdaptor_SurfaceInfo	bottom_info;    \
+                SurfaceAdaptor_DeformFunc       *topDeformFunc; \
+                SurfaceAdaptor_DeformFunc       *bottomDeformFunc;
 
 
 	struct SurfaceAdaptor { __SurfaceAdaptor };
@@ -143,17 +152,15 @@
 	** Private Member functions
 	*/
 
-	double SurfaceAdaptor_Wedge2D( SurfaceAdaptor* self, Mesh* mesh, 
+	double SurfaceAdaptor_Wedge( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
 				     unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
-	double SurfaceAdaptor_Wedge3D( SurfaceAdaptor* self, Mesh* mesh, 
+	double SurfaceAdaptor_Plateau( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
 				     unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
-	double SurfaceAdaptor_Plateau( SurfaceAdaptor* self, Mesh* mesh, 
+	double SurfaceAdaptor_Topo_Data( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
 				     unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
-	double SurfaceAdaptor_Topo_Data( SurfaceAdaptor* self, Mesh* mesh, 
-				     unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
-	double SurfaceAdaptor_Sine( SurfaceAdaptor* self, Mesh* mesh, 
+	double SurfaceAdaptor_Sine( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
 				    unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
-	double SurfaceAdaptor_Cosine( SurfaceAdaptor* self, Mesh* mesh, 
+	double SurfaceAdaptor_Cosine( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
 				      unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
 
 #endif /* __StgDomain_Mesh_SurfaceAdaptor_h__ */

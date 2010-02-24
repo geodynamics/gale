@@ -39,6 +39,7 @@
 
 #include <StgDomain/Geometry/Geometry.h>
 #include <StgDomain/Shape/Shape.h>
+#include <StgDomain/Mesh/Mesh.h>
 
 #include "types.h"
 #include "shortcuts.h"
@@ -52,11 +53,6 @@
 #include "MeshAdaptor.h"
 #include "SurfaceAdaptor.h"
 #include "Remesher.h"
-
-
-typedef double (SurfaceAdaptor_DeformFunc)( SurfaceAdaptor* self, Mesh* mesh,
-					    unsigned* globalSize, unsigned vertex, unsigned* vertexInds);
-
 
 /* Textual name of this class */
 const Type SurfaceAdaptor_Type = "SurfaceAdaptor";
@@ -104,8 +100,11 @@ SurfaceAdaptor* _SurfaceAdaptor_New(  SURFACEADAPTOR_DEFARGS  ) {
 }
 
 void _SurfaceAdaptor_Init( SurfaceAdaptor* self ) {
-	self->surfaceType = SurfaceAdaptor_SurfaceType_Invalid;
-	memset( &self->info, 0, sizeof(SurfaceAdaptor_SurfaceInfo) );
+	self->topSurfaceType = SurfaceAdaptor_SurfaceType_Invalid;
+	self->bottomSurfaceType = SurfaceAdaptor_SurfaceType_Invalid;
+	memset( &self->top_info, 0, sizeof(SurfaceAdaptor_SurfaceInfo ));
+	memset( &self->bottom_info, 0, sizeof(SurfaceAdaptor_SurfaceInfo));
+        self->topDeformFunc=self->bottomDeformFunc=NULL;
 }
 
 
@@ -132,10 +131,17 @@ void _SurfaceAdaptor_Print( void* adaptor, Stream* stream ) {
 	_MeshAdaptor_Print( self, stream );
 }
 
+void _SurfaceAdaptor_AssignFromXML_Surface(Stg_ComponentFactory* cf,
+                                           Name name,
+                                           SurfaceAdaptor_SurfaceType *surfaceType,
+                                           Dictionary* dict,
+                                           SurfaceAdaptor_SurfaceInfo *info,
+                                           SurfaceAdaptor_DeformFunc **deformFunc,
+                                           char *surface);
+
 void _SurfaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
 	SurfaceAdaptor*	self = (SurfaceAdaptor*)adaptor;
 	Dictionary*	dict;
-	char*		surfaceType;
 
 	assert( self );
 	assert( cf );
@@ -146,99 +152,210 @@ void _SurfaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, voi
 	/* Rip out the components structure as a dictionary. */
 	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, (Dictionary_Entry_Key)self->name )  );
 
-        /* Check if we want to keep a certain depth at the bottom reserved for
-           contact elements. */
-        self->contactDepth = Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"contactDepth", 0  );
+        self->topDeformFunc=self->bottomDeformFunc=NULL;
+        char surface[100];
+        _SurfaceAdaptor_AssignFromXML_Surface(cf,self->name,
+                                              &(self->topSurfaceType),
+                                              dict,
+                                              &(self->top_info),
+                                              &(self->topDeformFunc),
+                                              strcpy(surface,"top"));
+        _SurfaceAdaptor_AssignFromXML_Surface(cf,self->name,
+                                              &(self->bottomSurfaceType),
+                                              dict,
+                                              &(self->bottom_info),
+                                              &(self->bottomDeformFunc),
+                                              strcpy(surface,"bottom"));
+}
 
-	/* What kind of surface do we want? */
-	surfaceType = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"surfaceType", ""  );
-	if( !strcmp( surfaceType, "wedge" ) ) {
-		self->surfaceType = SurfaceAdaptor_SurfaceType_Wedge;
-		self->info.wedge.offs[0] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"beginOffset", 0.0  );
-		self->info.wedge.endOffs[0] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"endOffset", 1.0  );
-		self->info.wedge.grad[0] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"gradient", 0.5  );
-		/* get the parameters for the z-axis */
-		self->info.wedge.offs[1] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"beginOffsetZ", 0.0  );
-		self->info.wedge.endOffs[1] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"endOffsetZ", 1.0  );
-		self->info.wedge.grad[1] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"gradientZ", 0.5  );
-	}
-	else if( !strcmp( surfaceType, "plateau" ) ) {
-		self->surfaceType = SurfaceAdaptor_SurfaceType_Plateau;
-		self->info.plateau.x1 = Stg_ComponentFactory_GetDouble( cf, self->name, "x1", 0.0 );
-		self->info.plateau.x2 = Stg_ComponentFactory_GetDouble( cf, self->name, "x2", 0.0 );
-		self->info.plateau.x3 = Stg_ComponentFactory_GetDouble( cf, self->name, "x3", 0.0 );
-		self->info.plateau.x4 = Stg_ComponentFactory_GetDouble( cf, self->name, "x4", 0.0 );
-		self->info.plateau.z1 = Stg_ComponentFactory_GetDouble( cf, self->name, "z1", 0.0 );
-		self->info.plateau.z2 = Stg_ComponentFactory_GetDouble( cf, self->name, "z2", 0.0 );
-		self->info.plateau.z3 = Stg_ComponentFactory_GetDouble( cf, self->name, "z3", 0.0 );
-		self->info.plateau.z4 = Stg_ComponentFactory_GetDouble( cf, self->name, "z4", 0.0 );
-		self->info.plateau.height = Stg_ComponentFactory_GetDouble( cf, self->name, "height", 0.0 );
-	}
-	else if( !strcmp( surfaceType, "topo_data" ) ) {
-                FILE *fp;
-                char* surfaceName;
-                int i,j,ii,jj;
-                surfaceName = Stg_ComponentFactory_GetString( cf, self->name, "surfaceName", "ascii_topo" );
-		self->info.topo_data.nx = Stg_ComponentFactory_GetInt( cf, self->name, "nx", 0 );
-		self->info.topo_data.nz = Stg_ComponentFactory_GetInt( cf, self->name, "nz", 0 );
-	        self->info.topo_data.minX = Stg_ComponentFactory_GetDouble( cf, self->name, "minX", 0 );
-	        self->info.topo_data.minZ = Stg_ComponentFactory_GetDouble( cf, self->name, "minZ", 0 );
-	        self->info.topo_data.maxX = Stg_ComponentFactory_GetDouble( cf, self->name, "maxX", 0 );
-	        self->info.topo_data.maxZ = Stg_ComponentFactory_GetDouble( cf, self->name, "maxZ", 0 );
-                self->info.topo_data.dx=
-                  (self->info.topo_data.maxX-self->info.topo_data.minX)
-                  /(self->info.topo_data.nx-1);
-                self->info.topo_data.dz=
-                  (self->info.topo_data.maxZ-self->info.topo_data.minZ)
-                  /(self->info.topo_data.nz-1);
-                self->info.topo_data.heights=
-                  malloc(sizeof(double)*self->info.topo_data.nx
-                         *self->info.topo_data.nz);
-		self->surfaceType = SurfaceAdaptor_SurfaceType_Topo_Data;
-                fp=fopen(surfaceName,"r");
-                if(!fp)
-                  {
-                    printf("Can not open the file %s\n",surfaceName);
-                    abort();
-                  }
-                for(i=0;i<self->info.topo_data.nx;++i)
-                  for(j=0;j<self->info.topo_data.nz;++j)
-                    {
-                      float h;
-                      fscanf(fp,"%d %d %f",&ii,&jj,&h);
-                      self->info.topo_data.heights[ii+self->info.topo_data.nx*jj]=h;
-                    }
-                fclose(fp);
-	}
-	else if( !strcmp( surfaceType, "sine" ) || !strcmp( surfaceType, "cosine" ) ) {
-		Dictionary_Entry_Value*	originList;
+void _SurfaceAdaptor_AssignFromXML_Surface(Stg_ComponentFactory* cf,
+                                           Name name,
+                                           SurfaceAdaptor_SurfaceType *surfaceType,
+                                           Dictionary* dict,
+                                           SurfaceAdaptor_SurfaceInfo *info,
+                                           SurfaceAdaptor_DeformFunc **deformFunc,
+                                           char *surface)
+{
+  char temp[100];
+  char *surfaceName;
+  strcpy(temp,surface);
+  /* What kind of surface do we want? */
+  surfaceName = 
+    Stg_ComponentFactory_GetString( cf, name,
+                                    (Dictionary_Entry_Key)strcat(temp,"SurfaceType"), ""  );
+  if( !strcmp( surfaceName, "wedge" ) ) {
+    *surfaceType = SurfaceAdaptor_SurfaceType_Wedge;
+    *deformFunc = SurfaceAdaptor_Wedge ;
+    strcpy(temp,surface);
+    info->wedge.offs[0] =
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      (Dictionary_Entry_Key)strcat(temp,"BeginOffset"), 0.0  );
+    strcpy(temp,surface);
+    info->wedge.endOffs[0] =
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      (Dictionary_Entry_Key)strcat(temp,"EndOffset"), 1.0  );
+    strcpy(temp,surface);
+    info->wedge.grad[0] = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      (Dictionary_Entry_Key)strcat(temp,"Gradient"), 0.5  );
+    /* get the parameters for the z-axis */
+    strcpy(temp,surface);
+    info->wedge.offs[1] = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      (Dictionary_Entry_Key)strcat(temp,"BeginOffsetZ"), 0.0  );
+    strcpy(temp,surface);
+    info->wedge.endOffs[1] = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      (Dictionary_Entry_Key)strcat(temp,"EndOffsetZ"), 1.0  );
+    strcpy(temp,surface);
+    info->wedge.grad[1] = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      (Dictionary_Entry_Key)strcat(temp,"GradientZ"), 0.5  );
+  }
+  else if( !strcmp( surfaceName, "plateau" ) ) {
+    *surfaceType = SurfaceAdaptor_SurfaceType_Plateau;
+    *deformFunc = SurfaceAdaptor_Plateau;
+    strcpy(temp,surface);
+    info->plateau.x1 =
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      strcat(temp,"X1"), 0.0 );
+    strcpy(temp,surface);
+    info->plateau.x2 = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      strcat(temp,"X2"), 0.0 );
+    strcpy(temp,surface);
+    info->plateau.x3 = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      strcat(temp,"X3"), 0.0 );
+    strcpy(temp,surface);
+    info->plateau.x4 = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      strcat(temp,"X4"), 0.0 );
+    strcpy(temp,surface);
+    info->plateau.z1 = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      strcat(temp,"Z1"), 0.0 );
+    strcpy(temp,surface);
+    info->plateau.z2 = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      strcat(temp,"Z2"), 0.0 );
+    strcpy(temp,surface);
+    info->plateau.z3 = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      strcat(temp,"Z3"), 0.0 );
+    strcpy(temp,surface);
+    info->plateau.z4 = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      strcat(temp,"Z4"), 0.0 );
+    strcpy(temp,surface);
+    info->plateau.height =
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      strcat(temp,"Height"), 0.0 );
+  }
+  else if( !strcmp( surfaceName, "topo_data" ) ) {
+    FILE *fp;
+    char* surfaceFileName;
+    int i,j,ii,jj;
+    *surfaceType = SurfaceAdaptor_SurfaceType_Topo_Data;
+    *deformFunc = SurfaceAdaptor_Topo_Data;
+    strcpy(temp,surface);
+    surfaceFileName =
+      Stg_ComponentFactory_GetString( cf, name,
+                                      strcat(temp,"SurfaceName"),
+                                      "ascii_topo" );
+    strcpy(temp,surface);
+    info->topo_data.nx =
+      Stg_ComponentFactory_GetInt( cf, name,
+                                   strcat(temp,"Nx"), 0 );
+    strcpy(temp,surface);
+    info->topo_data.nz = 
+      Stg_ComponentFactory_GetInt( cf, name,
+                                   strcat(temp,"Nz"), 0 );
+    strcpy(temp,surface);
+    info->topo_data.minX = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      strcat(temp,"MinX"), 0 );
+    strcpy(temp,surface);
+    info->topo_data.minZ = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      strcat(temp,"MinZ"), 0 );
+    strcpy(temp,surface);
+    info->topo_data.maxX = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      strcat(temp,"MaxX"), 0 );
+    strcpy(temp,surface);
+    info->topo_data.maxZ =
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      strcat(temp,"MaxZ"), 0 );
+    info->topo_data.dx=
+      (info->topo_data.maxX-info->topo_data.minX)
+      /(info->topo_data.nx-1);
+    info->topo_data.dz=
+      (info->topo_data.maxZ-info->topo_data.minZ)
+      /(info->topo_data.nz-1);
+    info->topo_data.heights=
+      malloc(sizeof(double)*info->topo_data.nx
+             *info->topo_data.nz);
+    fp=fopen(surfaceFileName,"r");
+    if(!fp)
+      {
+        printf("Can not open the file %s\n",surfaceFileName);
+        abort();
+      }
+    for(i=0;i<info->topo_data.nx;++i)
+      for(j=0;j<info->topo_data.nz;++j)
+        {
+          float h;
+          fscanf(fp,"%d %d %f",&ii,&jj,&h);
+          info->topo_data.heights[ii+info->topo_data.nx*jj]=h;
+        }
+    fclose(fp);
+  }
+  else if( !strcmp( surfaceName, "sine" )
+           || !strcmp( surfaceName, "cosine" ) ) {
+    Dictionary_Entry_Value*	originList;
 
-		if( !strcmp( surfaceType, "sine" ) )
-			self->surfaceType = SurfaceAdaptor_SurfaceType_Sine;
-		else
-			self->surfaceType = SurfaceAdaptor_SurfaceType_Cosine;
+    if( !strcmp( surfaceName, "sine" ) )
+      {
+        *surfaceType = SurfaceAdaptor_SurfaceType_Sine;
+        *deformFunc = SurfaceAdaptor_Sine;
+      }
+    else
+      {
+        *surfaceType = SurfaceAdaptor_SurfaceType_Cosine;
+        *deformFunc = SurfaceAdaptor_Cosine;
+      }
+    strcpy(temp,surface);
+    originList =
+      Dictionary_Get( dict, (Dictionary_Entry_Key)strcat(temp,"Origin") );
+    if( originList ) {
+      unsigned	nDims;
+      unsigned	d_i;
 
-		originList = Dictionary_Get( dict, (Dictionary_Entry_Key)"origin" );
-		if( originList ) {
-			unsigned	nDims;
-			unsigned	d_i;
+      nDims = Dictionary_Entry_Value_GetCount( originList );
+      for( d_i = 0; d_i < nDims; d_i++  ) {
+        Dictionary_Entry_Value*	val;
 
-			nDims = Dictionary_Entry_Value_GetCount( originList );
-			for( d_i = 0; d_i < nDims; d_i++  ) {
-				Dictionary_Entry_Value*	val;
+        val = Dictionary_Entry_Value_GetElement( originList, d_i );
+        info->trig.origin[d_i] = Dictionary_Entry_Value_AsDouble( val );
+      }
+    }
+    else
+      memset( info->trig.origin, 0, sizeof(double) * 2 );
 
-				val = Dictionary_Entry_Value_GetElement( originList, d_i );
-				self->info.trig.origin[d_i] = Dictionary_Entry_Value_AsDouble( val );
-			}
-		}
-		else
-			memset( self->info.trig.origin, 0, sizeof(double) * 2 );
-
-		self->info.trig.amp = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"amplitude", 1.0  );
-		self->info.trig.freq = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"frequency", 1.0 );
-	}
-	else
-		_SurfaceAdaptor_Init( self  );
+    strcpy(temp,surface);
+    info->trig.amp =
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      (Dictionary_Entry_Key)strcat(temp,"Amplitude"), 1.0  );
+    strcpy(temp,surface);
+    info->trig.freq =
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      (Dictionary_Entry_Key)strcat(temp,"Frequency"), 1.0 );
+  }
+  else
+    Journal_Firewall(!strcmp(surfaceName,""),Journal_Register( Error_Type, name ),
+                     "Unknown type of surface for SurfaceAdaptor: %s\n",
+                     surfaceName);
 }
 
 void _SurfaceAdaptor_Build( void* adaptor, void* data ) {
@@ -273,7 +390,6 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 	SurfaceAdaptor* self = (SurfaceAdaptor*)adaptor;
 	Mesh* mesh = (Mesh*)_mesh;
 	const Sync* sync;
-	SurfaceAdaptor_DeformFunc* deformFunc;
 	Grid *grid;
 	unsigned* inds;
 	unsigned n_i;
@@ -288,28 +404,6 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 	if( mesh->topo->nDims != 2 && mesh->topo->nDims != 3 )
 		return;
 
-	/* What kind of surface do we want? */
-	switch( self->surfaceType ) {
-	case SurfaceAdaptor_SurfaceType_Wedge:
-		if ( mesh->topo->nDims == 3 ) { deformFunc = SurfaceAdaptor_Wedge3D ; }
-		else { deformFunc = SurfaceAdaptor_Wedge2D; }
-		break;
-	case SurfaceAdaptor_SurfaceType_Plateau:
-		deformFunc = SurfaceAdaptor_Plateau;
-		break;
-	case SurfaceAdaptor_SurfaceType_Topo_Data:
-		deformFunc = SurfaceAdaptor_Topo_Data;
-		break;
-	case SurfaceAdaptor_SurfaceType_Sine:
-		deformFunc = SurfaceAdaptor_Sine;
-		break;
-	case SurfaceAdaptor_SurfaceType_Cosine:
-		deformFunc = SurfaceAdaptor_Cosine;
-		break;
-	default:
-		break;
-	};
-
 	/* Extract the cartesian information. */
 	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
 					      ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" )  );
@@ -318,23 +412,30 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 	/* Loop over domain nodes. */
 	sync = IGraph_GetDomain( mesh->topo, MT_VERTEX );
 	for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
-		unsigned	gNode;
-		double		height;
-                double deform;
+		unsigned gNode;
+		double percentage, min_height, max_height;
+                double topDeform=0.0;
+                double bottomDeform=0.0;
 
 		gNode = Sync_DomainToGlobal( sync, n_i );
 		Grid_Lift( grid, gNode, inds );
 
-		/* Check if we're inside the contact depth. */
-		if( inds[1] <= self->contactDepth )
-		   continue;
-
 		/* Calculate a height percentage. */
-		height = (double)(inds[1] - self->contactDepth) / (double)(grid->sizes[1] - 1);
+		percentage = (double)(inds[1]) / (double)(grid->sizes[1] - 1);
 
 		/* Deform this node. */
-                deform = deformFunc( self, mesh, grid->sizes, n_i, inds);
-		mesh->verts[n_i][1] += height * deform;
+                if(self->topDeformFunc)
+                  topDeform = self->topDeformFunc( &(self->top_info), mesh,
+                                                   grid->sizes, n_i, inds);
+                if(self->bottomDeformFunc)
+                  bottomDeform =
+                    self->bottomDeformFunc(&(self->bottom_info),mesh,
+                                           grid->sizes, n_i, inds);
+                min_height=((CartesianGenerator*)self->generator)->crdMin[1] + bottomDeform;
+                max_height=((CartesianGenerator*)self->generator)->crdMax[1] + topDeform;
+
+		mesh->verts[n_i][1] = percentage * (max_height - min_height)
+                  + min_height;
 	}
 
 	/* Free resources. */
@@ -346,167 +447,181 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 ** Private Functions
 */
 
-double SurfaceAdaptor_Wedge2D( SurfaceAdaptor* self, Mesh* mesh, 
-			     unsigned* globalSize, unsigned vertex, unsigned* vertexInds )
+double SurfaceAdaptor_Wedge( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
+                             unsigned* globalSize, unsigned vertex,
+                             unsigned* vertexInds )
 {
-   if( mesh->verts[vertex][0] >= self->info.wedge.offs[0] ) {
-      if( mesh->verts[vertex][0] >= self->info.wedge.endOffs[0] )
-         return (self->info.wedge.endOffs[0] - self->info.wedge.offs[0]) * self->info.wedge.grad[0];
-      else
-         return (mesh->verts[vertex][0] - self->info.wedge.offs[0]) * self->info.wedge.grad[0];
-   }
-   else 
-      return 0.0;
+  if ( mesh->topo->nDims != 3 )
+    {
+      if( mesh->verts[vertex][0] >= info->wedge.offs[0] )
+        {
+          if( mesh->verts[vertex][0] >= info->wedge.endOffs[0] )
+            return (info->wedge.endOffs[0] - info->wedge.offs[0])
+              * info->wedge.grad[0];
+          else
+            return (mesh->verts[vertex][0] - info->wedge.offs[0])
+              * info->wedge.grad[0];
+        }
+      else 
+        return 0.0;
+    }
+  else
+    {
+      if( mesh->verts[vertex][0] >= info->wedge.offs[0] )
+        {
+          if( mesh->verts[vertex][0] >= info->wedge.endOffs[0] )
+            {
+              return (info->wedge.endOffs[0] - info->wedge.offs[0])
+                * info->wedge.grad[0]
+                + (mesh->verts[vertex][2] - info->wedge.offs[1])
+                * info->wedge.grad[1];
+            }
+          else
+            {
+              return (mesh->verts[vertex][0] - info->wedge.offs[0])
+                * info->wedge.grad[0]
+                + (mesh->verts[vertex][2] - info->wedge.offs[1])
+                * info->wedge.grad[1];
+            }
+        }
+      else 
+        return 0.0;
+    }
 }
 
-double SurfaceAdaptor_Wedge3D( SurfaceAdaptor* self, Mesh* mesh, 
-			     unsigned* globalSize, unsigned vertex, unsigned* vertexInds )
-{
-   if( mesh->verts[vertex][0] >= self->info.wedge.offs[0] ) {
-      if( mesh->verts[vertex][0] >= self->info.wedge.endOffs[0] ) {
-         return (self->info.wedge.endOffs[0] - self->info.wedge.offs[0]) * self->info.wedge.grad[0] + 
-					 (mesh->verts[vertex][2] - self->info.wedge.offs[1]) * self->info.wedge.grad[1];
-			} else {
-         return (mesh->verts[vertex][0] - self->info.wedge.offs[0]) * self->info.wedge.grad[0] +
-					 (mesh->verts[vertex][2] - self->info.wedge.offs[1]) * self->info.wedge.grad[1];
-			}
-   }
-   else 
-      return 0.0;
-}
-double SurfaceAdaptor_Plateau( SurfaceAdaptor* self, Mesh* mesh, 
+double SurfaceAdaptor_Plateau( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
                                unsigned* globalSize, unsigned vertex,
                                unsigned* vertexInds )
 {
   double x_factor, z_factor;
   x_factor =1;
   z_factor=1;
-  if( mesh->verts[vertex][0] < self->info.plateau.x1
-      || mesh->verts[vertex][0] > self->info.plateau.x4)
+  if( mesh->verts[vertex][0] < info->plateau.x1
+      || mesh->verts[vertex][0] > info->plateau.x4)
     {
       x_factor=0;
     }
-  else if( mesh->verts[vertex][0] <= self->info.plateau.x2)
+  else if( mesh->verts[vertex][0] <= info->plateau.x2)
     {
-      x_factor=(mesh->verts[vertex][0] - self->info.plateau.x1)
-        /(self->info.plateau.x2 - self->info.plateau.x1);
+      x_factor=(mesh->verts[vertex][0] - info->plateau.x1)
+        /(info->plateau.x2 - info->plateau.x1);
     }
-  else if( mesh->verts[vertex][0] <= self->info.plateau.x3)
+  else if( mesh->verts[vertex][0] <= info->plateau.x3)
     {
       x_factor=1;
     }
-  else if( mesh->verts[vertex][0] <= self->info.plateau.x4)
+  else if( mesh->verts[vertex][0] <= info->plateau.x4)
     {
-      x_factor=(self->info.plateau.x4 - mesh->verts[vertex][0])
-        /(self->info.plateau.x4 - self->info.plateau.x3);
+      x_factor=(info->plateau.x4 - mesh->verts[vertex][0])
+        /(info->plateau.x4 - info->plateau.x3);
     }
 
   if(mesh->topo->nDims==3)
     {
-      if( mesh->verts[vertex][2] < self->info.plateau.z1
-          || mesh->verts[vertex][2] > self->info.plateau.z4)
+      if( mesh->verts[vertex][2] < info->plateau.z1
+          || mesh->verts[vertex][2] > info->plateau.z4)
         {
           z_factor=0;
         }
-      else if( mesh->verts[vertex][2] <= self->info.plateau.z2)
+      else if( mesh->verts[vertex][2] <= info->plateau.z2)
         {
-          z_factor=(mesh->verts[vertex][2] - self->info.plateau.z1)
-            /(self->info.plateau.z2 - self->info.plateau.z1);
+          z_factor=(mesh->verts[vertex][2] - info->plateau.z1)
+            /(info->plateau.z2 - info->plateau.z1);
         }
-      else if( mesh->verts[vertex][2] <= self->info.plateau.z3)
+      else if( mesh->verts[vertex][2] <= info->plateau.z3)
         {
           z_factor=1;
         }
-      else if( mesh->verts[vertex][2] <= self->info.plateau.z4)
+      else if( mesh->verts[vertex][2] <= info->plateau.z4)
         {
-          z_factor=(self->info.plateau.z4 - mesh->verts[vertex][2])
-            /(self->info.plateau.z4 - self->info.plateau.z3);
+          z_factor=(info->plateau.z4 - mesh->verts[vertex][2])
+            /(info->plateau.z4 - info->plateau.z3);
         }
     }
 
-  return x_factor*z_factor*self->info.plateau.height;
+  return x_factor*z_factor*info->plateau.height;
 }
 
-double SurfaceAdaptor_Topo_Data( SurfaceAdaptor* self, Mesh* mesh, 
+double SurfaceAdaptor_Topo_Data( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
                                  unsigned* globalSize, unsigned vertex,
                                  unsigned* vertexInds )
 {
   int i,k,ip,kp;
   double dx,dz;
 
-  i=floor((mesh->verts[vertex][0] - self->info.topo_data.minX)
-          /self->info.topo_data.dx + 0.5);
-  k=floor((mesh->verts[vertex][2] - self->info.topo_data.minZ)
-          /self->info.topo_data.dz + 0.5);
+  i=floor((mesh->verts[vertex][0] - info->topo_data.minX)
+          /info->topo_data.dx + 0.5);
+  k=floor((mesh->verts[vertex][2] - info->topo_data.minZ)
+          /info->topo_data.dz + 0.5);
 
-  if(i<0 || i>self->info.topo_data.nx-1
-     || k<0 || k>self->info.topo_data.nz-1)
+  if(i<0 || i>info->topo_data.nx-1
+     || k<0 || k>info->topo_data.nz-1)
     {
       printf("Coordinate not covered by the topography file: %g %g\n\tminX: %g\n\tmaxX: %g\n\tminZ: %g\n\tmaxZ: %g\n\tnx: %d\n\tnz: %d\n",
              mesh->verts[vertex][0],
              mesh->verts[vertex][2],
-             self->info.topo_data.minX,
-             self->info.topo_data.maxX,
-             self->info.topo_data.minZ,
-             self->info.topo_data.maxZ,
-             self->info.topo_data.nx,
-             self->info.topo_data.nz);
+             info->topo_data.minX,
+             info->topo_data.maxX,
+             info->topo_data.minZ,
+             info->topo_data.maxZ,
+             info->topo_data.nx,
+             info->topo_data.nz);
       abort();
     }
 
   /* Interpolate the height */
   ip=i+1;
   kp=k+1;
-  if(ip>self->info.topo_data.nx-1)
+  if(ip>info->topo_data.nx-1)
     ip=i;
-  if(kp>self->info.topo_data.nz-1)
+  if(kp>info->topo_data.nz-1)
     kp=k;
 
   dx=(mesh->verts[vertex][0]
-      - (i*self->info.topo_data.dx+self->info.topo_data.minX))
-    /self->info.topo_data.dx;
+      - (i*info->topo_data.dx+info->topo_data.minX))
+    /info->topo_data.dx;
   dz=(mesh->verts[vertex][2]
-      - (k*self->info.topo_data.dz+self->info.topo_data.minZ))
-    /self->info.topo_data.dz;
+      - (k*info->topo_data.dz+info->topo_data.minZ))
+    /info->topo_data.dz;
 
-  return self->info.topo_data.heights[i+self->info.topo_data.nx*k]*(1-dx)*(1-dz)
-    + self->info.topo_data.heights[i+self->info.topo_data.nx*kp]*(1-dx)*dz
-    + self->info.topo_data.heights[ip+self->info.topo_data.nx*k]*dx*(1-dz)
-    + self->info.topo_data.heights[ip+self->info.topo_data.nx*kp]*dx*dz;
+  return info->topo_data.heights[i+info->topo_data.nx*k]*(1-dx)*(1-dz)
+    + info->topo_data.heights[i+info->topo_data.nx*kp]*(1-dx)*dz
+    + info->topo_data.heights[ip+info->topo_data.nx*k]*dx*(1-dz)
+    + info->topo_data.heights[ip+info->topo_data.nx*kp]*dx*dz;
 }
 
-double SurfaceAdaptor_Sine( SurfaceAdaptor* self, Mesh* mesh, 
+double SurfaceAdaptor_Sine( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
 			    unsigned* globalSize, unsigned vertex, unsigned* vertexInds )
 {
 	double	dx, dy;
 	double	rad;
 
-	dx = mesh->verts[vertex][0] - self->info.trig.origin[0];
+	dx = mesh->verts[vertex][0] - info->trig.origin[0];
 	rad = dx * dx;
 	if( mesh->topo->nDims == 3 ) {
-		dy = mesh->verts[vertex][1] - self->info.trig.origin[1];
+		dy = mesh->verts[vertex][1] - info->trig.origin[1];
 		rad += dy * dy;
 	}
 	rad = sqrt( rad );
 
-	return self->info.trig.amp * sin( self->info.trig.freq * rad );
+	return info->trig.amp * sin( info->trig.freq * rad );
 }
 
-double SurfaceAdaptor_Cosine( SurfaceAdaptor* self, Mesh* mesh, 
+double SurfaceAdaptor_Cosine( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
 			      unsigned* globalSize, unsigned vertex, unsigned* vertexInds )
 {
 	double	dx, dz;
 	double	rad;
 
-	dx = mesh->verts[vertex][0] - self->info.trig.origin[0];
+	dx = mesh->verts[vertex][0] - info->trig.origin[0];
 	rad = dx * dx;
 	if( mesh->topo->nDims == 3 ) {
-		dz = mesh->verts[vertex][2] - self->info.trig.origin[2];
+		dz = mesh->verts[vertex][2] - info->trig.origin[2];
 		rad += dz * dz;
 	}
 	rad = sqrt( rad );
 
-	return self->info.trig.amp * cos( self->info.trig.freq * rad );
+	return info->trig.amp * cos( info->trig.freq * rad );
 }
 
 
