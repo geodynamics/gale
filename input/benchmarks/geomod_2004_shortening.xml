@@ -482,13 +482,13 @@
       <param name="Type">SurfaceAdaptor</param>
       <param name="mesh">mesh-linear</param>
       <param name="sourceGenerator">linearMesh-generator</param>
-      <param name="surfaceType">wedge</param>
-      <list name="origin">
+      <param name="topSurfaceType">wedge</param>
+      <list name="topOrigin">
         <param>0.0</param>
       </list>
-      <param name="beginOffset">.3</param>
-      <param name="endOffset">100</param>
-      <param name="gradient">0.1763269807</param>
+      <param name="topBeginOffset">.3</param>
+      <param name="topEndOffset">100</param>
+      <param name="topGradient">0.1763269807</param>
     </struct>
 
     <struct name="escapedRoutine">

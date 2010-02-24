@@ -398,22 +398,6 @@
       </list>
     </struct>
 
-    <!-- <struct name="surfaceAdaptor"> -->
-    <!--   <param name="Type">SurfaceAdaptor</param> -->
-    <!--   <param name="mesh">mesh-linear</param> -->
-    <!--   <param name="sourceGenerator">linearMesh-generator</param> -->
-    <!--   <param name="surfaceType">plateau</param> -->
-    <!--   <param name="x1">0.0</param> -->
-    <!--   <param name="x2">0.3</param> -->
-    <!--   <param name="x3">1.7</param> -->
-    <!--   <param name="x4">2.0</param> -->
-    <!--   <param name="z1">0</param> -->
-    <!--   <param name="z2">0.1</param> -->
-    <!--   <param name="z3">0.2</param> -->
-    <!--   <param name="z4">0.3</param> -->
-    <!--   <param name="height">0.1</param> -->
-    <!-- </struct> -->
-
     <struct name="surfaceAdaptor">
       <param name="Type">SurfaceAdaptor</param>
       <param name="mesh">mesh-linear</param>

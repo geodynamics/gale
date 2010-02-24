@@ -402,12 +402,12 @@
       <param name="Type">SurfaceAdaptor</param>
       <param name="mesh">mesh-linear</param>
       <param name="sourceGenerator">linearMesh-generator</param>
-      <param name="surfaceType">sine</param>
-      <list name="origin">
+      <param name="topSurfaceType">sine</param>
+      <list name="topOrigin">
         <param>0.0</param>
       </list>
-      <param name="amplitude">0.1</param>
-      <param name="frequency">6.28318530718</param>
+      <param name="topAmplitude">0.1</param>
+      <param name="topFrequency">6.28318530718</param>
     </struct>
   </struct>
 

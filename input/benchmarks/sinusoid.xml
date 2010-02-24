@@ -384,12 +384,12 @@
       <param name="Type">SurfaceAdaptor</param>
       <param name="mesh">mesh-linear</param>
       <param name="sourceGenerator">linearMesh-generator</param>
-      <param name="surfaceType">cosine</param>
-      <list name="origin">
+      <param name="topSurfaceType">cosine</param>
+      <list name="topOrigin">
         <param>0.0</param>
       </list>
-      <param name="amplitude">0.01</param>
-      <param name="frequency">6.28318530718</param>
+      <param name="topAmplitude">0.01</param>
+      <param name="topFrequency">6.28318530718</param>
     </struct>
     <struct name="escapedRoutine">
       <param name="Type">EscapedRoutine</param>
