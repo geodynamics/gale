@@ -949,7 +949,9 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
 
     /* Shrink wrap the top/bottom surface. */
     if( sys->wrapTop )
-      EulerDeform_WrapTopSurface( sys, oldCrds );
+      EulerDeform_WrapSurface( sys, oldCrds, 1 );
+    if( sys->wrapBottom )
+      EulerDeform_WrapSurface( sys, oldCrds, 0 );
 
     /* Swap old coordinates back in temporarily. */
     newCrds = sys->mesh->verts;
@@ -1037,7 +1039,7 @@ void EulerDeform_InterpVar( FieldVariable* field, Variable* var, Mesh* mesh, dou
 }
 
 
-void EulerDeform_WrapTopSurface( EulerDeform_System* sys, double** oldCrds ) {
+void EulerDeform_WrapSurface( EulerDeform_System* sys, double** oldCrds, int top ) {
 	IJK	ijk;
 	Grid*	grm;
 	Mesh*	mesh;
@@ -1049,23 +1051,10 @@ void EulerDeform_WrapTopSurface( EulerDeform_System* sys, double** oldCrds ) {
 	mesh = sys->mesh;
 	grm = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
 					     ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" )  );
-	EulerDeform_TopInternalLoop( sys, grm, oldCrds, ijk, 0 );
+	EulerDeform_InternalLoop( sys, grm, oldCrds, ijk, 0, top );
 }
 
 #if 0
-void EulerDeform_WrapBottomSurface( EulerDeform_System* sys, double** oldCrds ) {
-	IJK	ijk;
-	GRM	grm;
-
-	assert( sys );
-	assert( oldCrds );
-
-	/* Loop over top internal surface. */
-	RegMesh_Generalise( sys->mesh, &grm );
-	EulerDeform_BottomInternalLoop( sys, &grm, oldCrds, ijk, 0 );
-}
-
-
 void EulerDeform_WrapLeftSurface( EulerDeform_System* sys, double** oldCrds ) {
 	IJK	ijk;
 	GRM	grm;
@@ -1190,7 +1179,7 @@ Bool _EulerDeform_QuadZInterp( double** crds, const double* pnt, double* val ) {
 #endif
 
 
-void EulerDeform_TopInternalLoop( EulerDeform_System* sys, Grid* grm, double** oldCrds, unsigned* ijk, unsigned curDim ) {
+void EulerDeform_InternalLoop( EulerDeform_System* sys, Grid* grm, double** oldCrds, unsigned* ijk, unsigned curDim, int top ) {
 	unsigned	nDims;
 	XYZ		newCrd, oldCrd;
 	double*		crds[4];
@@ -1199,15 +1188,25 @@ void EulerDeform_TopInternalLoop( EulerDeform_System* sys, Grid* grm, double** o
 	Mesh*		mesh;
 	unsigned	nLocalNodes;
 	unsigned	ind;
+        double          fudge_factor;
+        
+        /* fudge_factor nudges the coordinate inside the mesh a little
+           to avoid failed interpolations */
+        fudge_factor=1.0e-10;
 
 	if( curDim < grm->nDims ) {
 		if( curDim == 1 ) {
-			ijk[1] = grm->sizes[curDim] - 1;
-			EulerDeform_TopInternalLoop( sys, grm, oldCrds, ijk, curDim + 1 );
+                        if(top) {
+                          ijk[1] = grm->sizes[curDim] - 1;
+                        }
+                        else {
+                          ijk[0]=0;
+                        }
+			EulerDeform_InternalLoop( sys, grm, oldCrds, ijk, curDim + 1, top );
 		}
 		else {
 			for( ijk[curDim] = 0; ijk[curDim] < grm->sizes[curDim]; ijk[curDim]++ ) {
-				EulerDeform_TopInternalLoop( sys, grm, oldCrds, ijk, curDim + 1 );
+                          EulerDeform_InternalLoop( sys, grm, oldCrds, ijk, curDim + 1, top );
 			}
 		}
 	}
@@ -1260,7 +1259,14 @@ void EulerDeform_TopInternalLoop( EulerDeform_System* sys, Grid* grm, double** o
 #else
 			_EulerDeform_LineInterp(crds, newCrd, 0, 1, &mesh->verts[centerInd][1] );
 #endif
-                          mesh->verts[centerInd][1] *= (1.0-1.0e-10);
+                        if((mesh->verts[centerInd][1]>0) ^ top)
+                          {
+                            mesh->verts[centerInd][1] *= 1+fudge_factor;
+                          }
+                        else
+                          {
+                            mesh->verts[centerInd][1] *= 1-fudge_factor;
+                          }
                         }
 		}
 		else if( grm->nDims == 3 ) {
@@ -1308,8 +1314,15 @@ void EulerDeform_TopInternalLoop( EulerDeform_System* sys, Grid* grm, double** o
 				memcpy( crds[3], oldCrds[ind], nDims * sizeof(double) );
 
 				if( _EulerDeform_QuadYInterp( crds, newCrd, &mesh->verts[centerInd][1] ) ) {
-					mesh->verts[centerInd][1] *= (1.0-1.0e-10);
-					return;
+                                  if((mesh->verts[centerInd][1]>0) ^ top)
+                                    {
+                                      mesh->verts[centerInd][1] *= 1+fudge_factor;
+                                    }
+                                  else
+                                    {
+                                      mesh->verts[centerInd][1] *= 1-fudge_factor;
+                                    }
+                                  return;
 				}
 			}
 
@@ -1332,8 +1345,15 @@ void EulerDeform_TopInternalLoop( EulerDeform_System* sys, Grid* grm, double** o
 
 				ijk[2]--;
 				if( _EulerDeform_QuadYInterp( crds, newCrd, &mesh->verts[centerInd][1] ) ) {
-					mesh->verts[centerInd][1] *= (1.0-1.0e-10);
-					return;
+                                  if((mesh->verts[centerInd][1]>0) ^ top)
+                                    {
+                                      mesh->verts[centerInd][1] *= 1+fudge_factor;
+                                    }
+                                  else
+                                    {
+                                      mesh->verts[centerInd][1] *= 1-fudge_factor;
+                                    }
+                                  return;
 				}
 			}
 
@@ -1356,8 +1376,15 @@ void EulerDeform_TopInternalLoop( EulerDeform_System* sys, Grid* grm, double** o
 
 				ijk[0]--;
 				if( _EulerDeform_QuadYInterp( crds, newCrd, &mesh->verts[centerInd][1] ) ) {
-					mesh->verts[centerInd][1] *= (1.0-1.0e-10);
-					return;
+                                  if((mesh->verts[centerInd][1]>0) ^ top)
+                                    {
+                                      mesh->verts[centerInd][1] *= 1+fudge_factor;
+                                    }
+                                  else
+                                    {
+                                      mesh->verts[centerInd][1] *= 1-fudge_factor;
+                                    }
+                                  return;
 				}
 			}
 
@@ -1380,8 +1407,15 @@ void EulerDeform_TopInternalLoop( EulerDeform_System* sys, Grid* grm, double** o
 
 				ijk[0]--; ijk[2]--;
 				if( _EulerDeform_QuadYInterp( crds, newCrd, &mesh->verts[centerInd][1] ) ) {
-					mesh->verts[centerInd][1] *= (1.0-1.0e-10);
-					return;
+                                  if((mesh->verts[centerInd][1]>0) ^ top)
+                                    {
+                                      mesh->verts[centerInd][1] *= 1+fudge_factor;
+                                    }
+                                  else
+                                    {
+                                      mesh->verts[centerInd][1] *= 1-fudge_factor;
+                                    }
+                                  return;
 				}
 			}
 
@@ -1394,155 +1428,6 @@ void EulerDeform_TopInternalLoop( EulerDeform_System* sys, Grid* grm, double** o
 }
 
 #if 0
-void EulerDeform_BottomInternalLoop( EulerDeform_System* sys, GRM* grm, Coord* oldCrds, unsigned* ijk, unsigned curDim ) {
-	if( curDim < grm->nDims ) {
-		if( curDim == 1 ) {
-			ijk[1] = 0;
-			EulerDeform_BottomInternalLoop( sys, grm, oldCrds, ijk, curDim + 1 );
-		}
-		else {
-			for( ijk[curDim] = 0; ijk[curDim] < grm->nNodes[curDim]; ijk[curDim]++ ) {
-				EulerDeform_BottomInternalLoop( sys, grm, oldCrds, ijk, curDim + 1 );
-			}
-		}
-	}
-	else {
-		if( grm->nDims == 2 ) {
-			XYZ		newCrd, oldCrd;
-			unsigned	centerInd;
-			Mesh*		mesh = sys->mesh;
-
-			/* Skip corners. */
-			if( (ijk[0] == 0 || ijk[0] == grm->nNodes[0] - 1) && 
-			    (ijk[1] == 0 || ijk[1] == grm->nNodes[1] - 1))
-			{
-				return;
-			}
-
-			/* Get old and new coordinate. */
-			GRM_Project( grm, ijk, &centerInd );
-			newCrd[0] = mesh->nodeCoord[centerInd][0];
-			newCrd[1] = mesh->nodeCoord[centerInd][1];
-			oldCrd[0] = oldCrds[centerInd][0];
-			oldCrd[1] = oldCrds[centerInd][1];
-
-			/* Are we left or right? */
-			if( newCrd[0] < oldCrd[0] ) {
-				XYZ		leftCrd;
-				unsigned	leftInd;
-				double		a0, a1;
-
-				/* Get left old coord. */
-				ijk[0]--;
-				GRM_Project( grm, ijk, &leftInd );
-				ijk[0]++;
-				leftCrd[0] = oldCrds[leftInd][0];
-				leftCrd[1] = oldCrds[leftInd][1];
-
-				/* Calc barycenter. */
-				a1 = (newCrd[0] - leftCrd[0]) / (oldCrd[0] - leftCrd[0]);
-				a0 = 1.0 - a1;
-				mesh->nodeCoord[centerInd][1] = (a0 * leftCrd[1] + a1 * oldCrd[1])*(1.0+ 1e-10);
-			}
-			else {
-				XYZ		rightCrd;
-				unsigned	rightInd;
-				double		a0, a1;
-
-				/* Get right old coord. */
-				ijk[0]++;
-				GRM_Project( grm, ijk, &rightInd );
-				ijk[0]--;
-				rightCrd[0] = oldCrds[rightInd][0];
-				rightCrd[1] = oldCrds[rightInd][1];
-
-				/* Calc barycenter. */
-				a1 = (newCrd[0] - oldCrd[0]) / (rightCrd[0] - oldCrd[0]);
-				a0 = 1.0 - a1;
-				mesh->nodeCoord[centerInd][1] = (a0 * oldCrd[1] + a1 * rightCrd[1])*(1.0 + 1e-10);
-			}
-		}
-		else if( grm->nDims == 3 ) {
-			XYZ		newCrd, oldCrd;
-			Coord		crds[4];
-			unsigned	centerInd;
-			Mesh*		mesh = sys->mesh;
-			unsigned	ind;
-
-			/* Skip corners. */
-			if( (ijk[0] == 0 || ijk[0] == grm->nNodes[0] - 1) && 
-			    (ijk[1] == 0 || ijk[1] == grm->nNodes[1] - 1) && 
-			    (ijk[2] == 0 || ijk[2] == grm->nNodes[2] - 1))
-			{
-				return;
-			}
-
-			/* Get old and new coordinate. */
-			GRM_Project( grm, ijk, &centerInd );
-			newCrd[0] = mesh->nodeCoord[centerInd][0];
-			newCrd[1] = mesh->nodeCoord[centerInd][1];
-			newCrd[2] = mesh->nodeCoord[centerInd][2];
-			oldCrd[0] = oldCrds[centerInd][0];
-			oldCrd[1] = oldCrds[centerInd][1];
-			oldCrd[2] = oldCrds[centerInd][2];
-
-			/* Figure out what qudrant we're in. */
-			if( ijk[0] > 0 && ijk[2] > 0 ) {
-				ijk[0]--; ijk[2]--;	GRM_Project( grm, ijk, &ind ); memcpy( crds[0], oldCrds[ind], sizeof(Coord) );
-				ijk[0]++;		GRM_Project( grm, ijk, &ind ); memcpy( crds[1], oldCrds[ind], sizeof(Coord) );
-				ijk[0]--; ijk[2]++;	GRM_Project( grm, ijk, &ind ); memcpy( crds[2], oldCrds[ind], sizeof(Coord) );
-				ijk[0]++;		GRM_Project( grm, ijk, &ind ); memcpy( crds[3], oldCrds[ind], sizeof(Coord) );
-				if( _EulerDeform_QuadYInterp( crds, newCrd, &mesh->nodeCoord[centerInd][1] ) ) {
-                                  mesh->nodeCoord[centerInd][1] *=(1.0+1e-10);
-					return;
-				}
-			}
-
-			if( ijk[0] > 0 && ijk[2] < grm->nNodes[2] - 1 ) {
-				ijk[0]--;		GRM_Project( grm, ijk, &ind ); memcpy( crds[0], oldCrds[ind], sizeof(Coord) );
-				ijk[0]++;		GRM_Project( grm, ijk, &ind ); memcpy( crds[1], oldCrds[ind], sizeof(Coord) );
-				ijk[0]--; ijk[2]++;	GRM_Project( grm, ijk, &ind ); memcpy( crds[2], oldCrds[ind], sizeof(Coord) );
-				ijk[0]++;		GRM_Project( grm, ijk, &ind ); memcpy( crds[3], oldCrds[ind], sizeof(Coord) );
-				ijk[2]--;
-				if( _EulerDeform_QuadYInterp( crds, newCrd, &mesh->nodeCoord[centerInd][1] ) ) {
-					mesh->nodeCoord[centerInd][1] *=(1.0+1e-10);
-					return;
-				}
-			}
-
-			if( ijk[0] < grm->nNodes[0] - 1 && ijk[2] > 0 ) {
-				ijk[2]--;		GRM_Project( grm, ijk, &ind ); memcpy( crds[0], oldCrds[ind], sizeof(Coord) );
-				ijk[0]++;		GRM_Project( grm, ijk, &ind ); memcpy( crds[1], oldCrds[ind], sizeof(Coord) );
-				ijk[0]--; ijk[2]++;	GRM_Project( grm, ijk, &ind ); memcpy( crds[2], oldCrds[ind], sizeof(Coord) );
-				ijk[0]++;		GRM_Project( grm, ijk, &ind ); memcpy( crds[3], oldCrds[ind], sizeof(Coord) );
-				ijk[0]--;
-				if( _EulerDeform_QuadYInterp( crds, newCrd, &mesh->nodeCoord[centerInd][1] ) ) {
-					mesh->nodeCoord[centerInd][1] *=(1.0+1e-10);
-					return;
-				}
-			}
-
-			if( ijk[0] < grm->nNodes[0] - 1 && ijk[2] < grm->nNodes[2] - 1 ) {
-				GRM_Project( grm, ijk, &ind ); memcpy( crds[0], oldCrds[ind], sizeof(Coord) );
-				ijk[0]++;		GRM_Project( grm, ijk, &ind ); memcpy( crds[1], oldCrds[ind], sizeof(Coord) );
-				ijk[0]--; ijk[2]++;	GRM_Project( grm, ijk, &ind ); memcpy( crds[2], oldCrds[ind], sizeof(Coord) );
-				ijk[0]++;		GRM_Project( grm, ijk, &ind ); memcpy( crds[3], oldCrds[ind], sizeof(Coord) );
-				ijk[0]--; ijk[2]--;
-				if( _EulerDeform_QuadYInterp( crds, newCrd, &mesh->nodeCoord[centerInd][1] ) ) {
-					mesh->nodeCoord[centerInd][1] *=(1.0+1e-10);
-					return;
-				}
-			}
-
-			assert( 0 );
-		}
-		else {
-			assert( 0 );
-		}
-	}
-}
-
-
 void EulerDeform_LeftInternalLoop( EulerDeform_System* sys, GRM* grm, Coord* oldCrds, unsigned* ijk, unsigned curDim ) {
 	if( curDim < grm->nDims ) {
 		if( curDim == 0 ) {
