@@ -418,14 +418,20 @@
       <param name="Type">SurfaceAdaptor</param>
       <param name="mesh">mesh-linear</param>
       <param name="sourceGenerator">linearMesh-generator</param>
-      <param name="surfaceType">topo_data</param>
-      <param name="surfaceName">input/cookbook/test.topo</param>
-      <param name="nx">32</param>
-      <param name="nz">12</param>
-      <param name="minX">minX</param>
-      <param name="maxX">maxX</param>
-      <param name="minZ">minZ</param>
-      <param name="maxZ">maxZ</param>
+      <param name="topSurfaceType">topo_data</param>
+      <param name="topSurfaceName">input/cookbook/test.topo</param>
+      <param name="topNx">32</param>
+      <param name="topNz">12</param>
+      <param name="topMinX">minX</param>
+      <param name="topMaxX">maxX</param>
+      <param name="topMinZ">minZ</param>
+      <param name="topMaxZ">maxZ</param>
+
+      <param name="bottomSurfaceType">wedge</param>
+      <param name="bottomBeginOffset">0</param>
+      <param name="bottomEndOffset">1.0</param>
+      <param name="bottomGradient">-0.1</param>
+      <param name="bottomGradientZ">0.0</param>
     </struct>
 
   </struct>
