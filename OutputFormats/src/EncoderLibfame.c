@@ -249,6 +249,7 @@ void _lucEncoderLibfame_AssignFromXML( void* outputFormat, Stg_ComponentFactory*
 	AbstractContext*    context;
 
 	/* Construct Parent */
+	_lucOutputFormat_AssignFromXML( outputFormat, cf, data);
 	lucOutputFormat_InitAll( self, "mpeg" );
 
 	window =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Window", lucWindow, True, data   ) ;
