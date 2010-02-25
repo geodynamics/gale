@@ -404,7 +404,7 @@ Stream* Journal_GetTypedStream( const Type type )
 	{
 		/* Make a default stream for this name. */
 		typedStream = CStream_New( type );
-		Stream_Enable( typedStream, True );
+		Stream_Enable( typedStream, False );
 		Stream_SetLevel( typedStream, 1 );
 		Stream_SetFile( typedStream, stJournal->stdOut );
 
@@ -713,7 +713,7 @@ void Journal_SetupDefaultTypedStreams() {
 
 	/* info */
 	typedStream = CStream_New( Info_Type );
-	Stream_Enable( typedStream, True );
+	Stream_Enable( typedStream, False );
 	Stream_SetLevel( typedStream, 1 );
 	Stream_SetFile( typedStream, stJournal->stdOut );
 	Stream_SetAutoFlush( typedStream, True );
@@ -750,14 +750,14 @@ void Journal_SetupDefaultTypedStreams() {
 	
 	/* mpi stream */
 	typedStream = MPIStream_New( MPIStream_Type );
-	Stream_Enable( typedStream, True );
+	Stream_Enable( typedStream, False );
 	Stream_SetLevel( typedStream, 1 );
 	Journal_RegisterTypedStream( typedStream );
 	/* MPI Streams need to print from all ranks */
 
 	/* binary stream */
 	typedStream = BinaryStream_New( BinaryStream_Type );
-	Stream_Enable( typedStream, True );
+	Stream_Enable( typedStream, False );
 	Stream_SetLevel( typedStream, 1 );
 	Journal_RegisterTypedStream( typedStream );
 }

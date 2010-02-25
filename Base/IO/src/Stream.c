@@ -88,7 +88,7 @@ void _Stream_Init(
 	self->_dump = _dump;
 	self->_setFile = _setFile;
 	
-	self->_enable = True;
+	self->_enable = False;
 	self->_level = 1;
 	self->_file = NULL;
 	self->_printingRank = STREAM_ALL_RANKS;

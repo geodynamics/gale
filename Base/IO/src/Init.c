@@ -90,7 +90,7 @@ Bool BaseIO_Init( int* argc, char** argv[] )
 
 	/* The LiveDebug stream */
 	LiveDebug = Journal_Register( Info_Type, LiveDebugName );
-	Stream_Enable( LiveDebug, True );
+	Stream_Enable( LiveDebug, False );
 	Stream_SetLevel( LiveDebug, 1 );
 
 	/* General streams. */

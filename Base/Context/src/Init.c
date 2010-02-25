@@ -65,7 +65,7 @@ Bool BaseContext_Init( int* argc, char** argv[] ) {
 	VariableCondition_Register_Add( variableCondition_Register, VariableAllVC_Type, VariableAllVC_Factory );
 
 	typedStream = VariableDumpStream_New( VariableDumpStream_Type );
-	Stream_Enable( typedStream, True );
+	Stream_Enable( typedStream, False );
 	Stream_SetLevel( typedStream, 1 );
 	Stream_SetFile( typedStream, stJournal->stdOut );
 	
