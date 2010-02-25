@@ -220,6 +220,57 @@ and add
     <param>PressureField</param>
   </list>
 
+---------------
+
+If you are using SurfaceAdaptor, you will need to capitalize and
+preface everything describing the surface with "top".  So the struct
+
+    <struct name="surfaceAdaptor">
+      <param name="Type">SurfaceAdaptor</param>
+      <param name="mesh">mesh-linear</param>
+      <param name="sourceGenerator">linearMesh-generator</param>
+      <param name="surfaceType">plateau</param>
+      <param name="x1">300000</param>
+      <param name="x2">350000</param>
+      <param name="x3">650000</param>
+      <param name="x4">700000</param>
+      <param name="z1">200000</param>
+      <param name="z2">250000</param>
+      <param name="z3">750000</param>
+      <param name="z4">800000</param>
+      <param name="height">3030.3030303</param>
+    </struct>
+
+becomes
+
+    <struct name="surfaceAdaptor">
+      <param name="Type">SurfaceAdaptor</param>
+      <param name="mesh">mesh-linear</param>
+      <param name="sourceGenerator">linearMesh-generator</param>
+      <param name="topSurfaceType">plateau</param>
+      <param name="topX1">300000</param>
+      <param name="topX2">350000</param>
+      <param name="topX3">650000</param>
+      <param name="topX4">700000</param>
+      <param name="topZ1">200000</param>
+      <param name="topZ2">250000</param>
+      <param name="topZ3">750000</param>
+      <param name="topZ4">800000</param>
+      <param name="topHeight">3030.3030303</param>
+    </struct>
+
+---------------
+
+If you create a shape with SurfaceAdaptor, you must have material
+covering that region.  It is ok if you specify a region larger than
+what the SurfaceAdaptor covers.  Only the region specified by
+SurfaceAdaptor will get filled.  In previous releases, a shape created
+with a SurfaceAdaptor was implicitly filled.
+
+---------------
+
+Then spelling of "verticies" has been corrected to "vertices".
+
 ============================================================
 
 To upgrade your files from Gale 1.3 or 1.3.1 to 1.4, you need to take
