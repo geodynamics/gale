@@ -859,14 +859,19 @@ void _AbstractContext_Execute_Hook( void* _context ) {
 
 void _AbstractContext_Step( void* _context, double dt ) {
 	AbstractContext* self = (AbstractContext*)_context;
+        Bool enabled;
 	
 	/* This will make it clear where the timestep starts when several procs
 	 * running. Figure this 1 synchronisation is ok since we are likely to
 	 * have just synchronised while calculating timestep anyway. */
 	MPI_Barrier( self->communicator );
 	Journal_DPrintf( self->debug, "In: %s\n", __func__ );
+
+        enabled=Stream_IsEnable(self->info);
+        Stream_Enable(self->info,True);
 	Journal_RPrintf( self->info, "TimeStep = %d, Start time = %.6g + %.6g prev timeStep dt\n",
 		self->timeStep, self->currentTime, dt );
+        Stream_Enable(self->info,enabled);
 
 	if (self->loadFromCheckPoint) {
 		Journal_RPrintf( self->info, "TimeStep since job restart = %d\n", self->timeStepSinceJobRestart );
