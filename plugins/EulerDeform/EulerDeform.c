@@ -932,10 +932,11 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
 
     /* If a remesh interval is requested, check now. */
     if( sys->interval > 0 && edCtx->ctx->timeStep % sys->interval > 0 ) {
-      printf( "*** EulerDeform: Not remeshing this timestep.\n" );
+      Journal_Printf( Underworld_Info,
+                      "*** EulerDeform: Not remeshing this timestep.\n" );
       continue;
     }
-    printf( "*** EulerDeform: Remeshing.\n" );
+    Journal_Printf( Underworld_Info, "*** EulerDeform: Remeshing.\n" );
 
     /* Store old coordinates. */
     nDomainNodes = FeMesh_GetNodeDomainSize( sys->mesh );
