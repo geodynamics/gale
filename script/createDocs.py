@@ -110,7 +110,7 @@ def createListDictionary(arg1, arg2, arg3, arg4, directoryPath, docPath, docData
     dictionary['htmlFooter'] =  "footer.html"
     dictionary['htmlStylesheet'] =  "customdoxygen.css"
     dictionary['htmlImagesPath'] = "doxyimage/"
-    dictionary['projectNumber'] = 'Bleeding Edge'
+    dictionary['projectNumber'] = '1.4'
     dictionary['configNew'] =  "Doxyfile.new"
     dictionary['htmlDir'] = "html/"
     return dictionary
