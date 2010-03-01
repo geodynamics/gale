@@ -408,7 +408,7 @@ void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Eleme
                     coord1=Mesh_GetVertex(mesh,elementNodes[2]);
 
                     dx=coord1[0]-coord0[0];
-                    dy=coord1[1]-coord0[1];
+                    dy=-(coord1[1]-coord0[1]);
 
                     elForceVec[eNode_I*nodeDofCount + I_AXIS]+=
                       stress*dy/overcount;
