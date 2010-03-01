@@ -281,7 +281,7 @@ void _MeshShapeVC_Build(  void* variableCondition, void* data ) {
 /****************** VariableCondition Virtual Functions ******************/
 void _MeshShapeVC_BuildSelf(  void* variableCondition, void* data /* for build phase */ ) {
 	MeshShapeVC*         self    = (MeshShapeVC*)variableCondition;
-	AbstractContext* context = (AbstractContext*) data;
+	AbstractContext* context = (AbstractContext*) self->context;
 
 	assert( context && Stg_Class_IsInstance( context, AbstractContext_Type ) );
 	assert( self->shapeName );
