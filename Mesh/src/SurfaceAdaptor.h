@@ -53,6 +53,7 @@
 		SurfaceAdaptor_SurfaceType_Topo_Data, 
 		SurfaceAdaptor_SurfaceType_Sine, 
 		SurfaceAdaptor_SurfaceType_Cosine, 
+		SurfaceAdaptor_SurfaceType_Cylinder,
 		SurfaceAdaptor_SurfaceType_Invalid
 	} SurfaceAdaptor_SurfaceType;
 
@@ -79,11 +80,19 @@
 		double	freq;
 	} SurfaceAdaptor_TrigInfo;
 
+	typedef struct {
+		double	origin[2];
+                double  minX, maxX;
+		double	r;
+                Bool    sign;
+	} SurfaceAdaptor_CylinderInfo;
+
 	typedef union {
 		SurfaceAdaptor_WedgeInfo	wedge;
 		SurfaceAdaptor_PlateauInfo	plateau;
                 SurfaceAdaptor_Topo_DataInfo    topo_data;
 		SurfaceAdaptor_TrigInfo		trig;
+		SurfaceAdaptor_CylinderInfo	cylinder;
 	} SurfaceAdaptor_SurfaceInfo;
 
         typedef double (SurfaceAdaptor_DeformFunc)( SurfaceAdaptor_SurfaceInfo* self,
@@ -162,6 +171,10 @@
 				    unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
 	double SurfaceAdaptor_Cosine( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
 				      unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
+        double SurfaceAdaptor_Cylinder( SurfaceAdaptor_SurfaceInfo *info,
+                                        Mesh* mesh, 
+                                        unsigned* globalSize, unsigned vertex,
+                                        unsigned* vertexInds );
 
 #endif /* __StgDomain_Mesh_SurfaceAdaptor_h__ */
 

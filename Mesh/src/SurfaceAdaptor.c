@@ -351,6 +351,35 @@ void _SurfaceAdaptor_AssignFromXML_Surface(Stg_ComponentFactory* cf,
     info->trig.freq =
       Stg_ComponentFactory_GetDouble( cf, name,
                                       (Dictionary_Entry_Key)strcat(temp,"Frequency"), 1.0 );
+  } else if( !strcmp( surfaceName, "cylinder" ) ) {
+    *surfaceType = SurfaceAdaptor_SurfaceType_Cylinder;
+    *deformFunc = SurfaceAdaptor_Cylinder ;
+    strcpy(temp,surface);
+    info->cylinder.origin[0] =
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      (Dictionary_Entry_Key)strcat(temp,"X0"), 0.0  );
+    strcpy(temp,surface);
+    info->cylinder.origin[1] =
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      (Dictionary_Entry_Key)strcat(temp,"Y0"), 0.0  );
+    strcpy(temp,surface);
+    info->cylinder.r = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      (Dictionary_Entry_Key)strcat(temp,"Radius"), 0.0  );
+    strcpy(temp,surface);
+    info->cylinder.minX = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      (Dictionary_Entry_Key)strcat(temp,"MinX"),
+                                      info->cylinder.origin[0] - info->cylinder.r);
+    strcpy(temp,surface);
+    info->cylinder.maxX = 
+      Stg_ComponentFactory_GetDouble( cf, name,
+                                      (Dictionary_Entry_Key)strcat(temp,"MaxX"),
+                                      info->cylinder.origin[0] + info->cylinder.r);
+    strcpy(temp,surface);
+    info->cylinder.sign = 
+      Stg_ComponentFactory_GetBool( cf, name,
+                                      (Dictionary_Entry_Key)strcat(temp,"Sign"), True  );
   }
   else
     Journal_Firewall(!strcmp(surfaceName,""),Journal_Register( Error_Type, name ),
@@ -622,6 +651,31 @@ double SurfaceAdaptor_Cosine( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh,
 	rad = sqrt( rad );
 
 	return info->trig.amp * cos( info->trig.freq * rad );
+}
+
+double SurfaceAdaptor_Cylinder( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
+                                unsigned* globalSize, unsigned vertex,
+                                unsigned* vertexInds )
+{
+  double x, x0, minX, maxX, y0, r;
+
+  x = mesh->verts[vertex][0];
+  x0= info->cylinder.origin[0];
+  minX=info->cylinder.minX;
+  maxX=info->cylinder.maxX;
+
+  y0= info->cylinder.origin[1];
+  r = info->cylinder.r;
+  if(x<minX)
+    {
+      x=minX;
+    }
+  else if(x>maxX)
+    {
+      x=maxX;
+    }
+  return info->cylinder.sign ? y0+sqrt(r*r-(x-x0)*(x-x0))
+    : y0-sqrt(r*r-(x-x0)*(x-x0));
 }
 
 
