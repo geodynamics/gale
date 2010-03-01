@@ -16,6 +16,10 @@
       <param name="Type">StgFEM_StandardConditionFunctions</param>
       <param name="Context">context</param>
     </struct>
+    <struct>
+      <param name="Type">Underworld_SurfaceProcess</param>
+      <param name="Context">context</param>
+    </struct>
   </plugins>
   <struct name="components">
     <struct name="context">
@@ -568,6 +572,9 @@
   </struct>
   <struct name="SurfaceProcess">
     <param name="mesh">mesh-linear</param>
+    <param name="VelocityField">VelocityField</param>
+    <param name="diffusionCoefficient">1.0e1</param>
+<!--   <param name="diffusionCoefficient">1.0e-9</param> -->
   </struct>
   <struct name="velocityBCs">
     <param name="type">CompositeVC</param>
@@ -650,9 +657,6 @@
 
   <param name="linearTolerance">1.0e-7</param>
   <param name="nonLinearTolerance">1.0e-3</param>
-
-  <param name="diffusionCoefficient">1.0e1</param>
-<!--   <param name="diffusionCoefficient">1.0e-9</param> -->
 
   <param name="journal.info">True</param>
   <param name="journal.debug">True</param>
