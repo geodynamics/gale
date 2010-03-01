@@ -56,12 +56,4 @@
 
 	void EulerDeform_WrapLeftSurface( EulerDeform_System* sys, double** oldCrds );
 
-	void EulerDeform_TopInternalLoop( EulerDeform_System* sys, Grid* grm, double** oldCrds, unsigned* ijk, unsigned curDim );
-
-#if 0
-	void EulerDeform_BottomInternalLoop( EulerDeform_System* sys, Grid* grm, double** oldCrds, unsigned* ijk, unsigned curDim );
-
-	void EulerDeform_LeftInternalLoop( EulerDeform_System* sys, Grid* grm, double** oldCrds, unsigned* ijk, unsigned curDim );
-#endif
-
 #endif
