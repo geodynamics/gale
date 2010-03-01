@@ -269,6 +269,26 @@ with a SurfaceAdaptor was implicitly filled.
 
 ---------------
 
+If you used the Gale_SurfaceProcess plugin, it has been renamed to
+Underworld_SurfaceProcess.  You need to specify it at the beginning
+like all of the other plugins
+
+    <struct>
+      <param name="Type">Underworld_SurfaceProcess</param>
+      <param name="Context">context</param>
+    </struct>
+
+Also, you need to put the diffusionCoefficient into the SurfaceProcess
+struct.  An example would be
+
+  <struct name="SurfaceProcess">
+    <param name="mesh">mesh-linear</param>
+    <param name="VelocityField">VelocityField</param>
+    <param name="diffusionCoefficient">1.0e1</param>
+  </struct>
+
+---------------
+
 Then spelling of "verticies" has been corrected to "vertices".
 
 ============================================================
