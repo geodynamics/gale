@@ -63,10 +63,13 @@ def runTests():
     message = ''
     message += "--------------------------------------------------------\n" + \
           "[SYS] StgFEM Normal-Res Integration Tests:\n" + \
-          "[SYS]      Total Passes: (" + str(passed) + "/" + str(len( commands )) + ")\n" \
-          "[SYS]      Failed Commands:\n"
-    for command in failed_commands:
-        message += "[SYS]            " + command + "\n"
+          "[SYS]      Total Passes: (" + str(passed) + "/" + str(len( commands )) + ")\n"
+
+    if( len(failed_commands) > 0 ):
+        message += "[SYS]      Failed Commands:\n"
+        for command in failed_commands:
+            message += "[SYS]            " + command + "\n"
+
     message += "--------------------------------------------------------\n"
     FILE.write( message )
     print message
