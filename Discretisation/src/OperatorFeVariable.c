@@ -182,7 +182,7 @@ OperatorFeVariable* OperatorFeVariable_New(
 
 	self->isConstructed = True;
 	_FieldVariable_Init( (FieldVariable*)self, context, feVariableCount, dim, isCheckpointedAndReloaded, communicator, fieldVariable_Register );                                                                                                          
-   _FeVariable_Init( (FeVariable*)self, feMesh, geometryMesh, dofLayout, bcs, ics, linkedDofInfo, templateFeVariable, False, False );
+   _FeVariable_Init( (FeVariable*)self, feMesh, geometryMesh, dofLayout, bcs, ics, linkedDofInfo, templateFeVariable, True, False );
 	_OperatorFeVariable_Init( self, operatorName, feVariableCount, feVariableList, ownOperator );
 
 	return self;
@@ -321,7 +321,7 @@ void _OperatorFeVariable_AssignFromXML( void* feVariable, Stg_ComponentFactory* 
 		Stg_ComponentFactory_ConstructByName( cf, (Name)feVariableName, FeVariable, True, data ); 
 	}
 
-	_FeVariable_Init( (FeVariable* ) self, feVariableList[0]->feMesh, feVariableList[0]->geometryMesh, feVariableList[0]->dofLayout, NULL, NULL, NULL, NULL, False, False );
+	_FeVariable_Init( (FeVariable* ) self, feVariableList[0]->feMesh, feVariableList[0]->geometryMesh, feVariableList[0]->dofLayout, NULL, NULL, NULL, NULL, True, False );
 	_OperatorFeVariable_Init( self, operatorName, feVariableCount, feVariableList, NULL );
 
 	Memory_Free( feVariableList );

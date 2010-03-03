@@ -402,21 +402,20 @@ void _FeVariable_Build( void* variable, void* data ) {
 
 		/** build the BCs */
 		Stg_Component_Build( self->feMesh, data, False );
-		Stg_Component_Build( self->dofLayout, data, False );
-		if ( self->bcs ){
-			Stg_Component_Build( self->bcs, data, False );
-		}
+		if ( self->dofLayout ) Stg_Component_Build( self->dofLayout, data, False );
+		if ( self->bcs       ) Stg_Component_Build( self->bcs,       data, False );
+		
 		/** only bother building the ics specified via XML/construct if we are not in restart mode
 		  - otherwise, we will use the checkpointed values anyway */
 		if ( self->ics && !(context && (True == context->loadFromCheckPoint) ) ) {
 			Stg_Component_Build( self->ics, data, False );
 		}
-		if ( self->linkedDofInfo ) {
-			Stg_Component_Build( self->linkedDofInfo, data, False );
-		}
+
+		if ( self->linkedDofInfo )	Stg_Component_Build( self->linkedDofInfo, data, False );
+
 
 		/** Extract component count. */
-		self->fieldComponentCount = self->dofLayout->_totalVarCount;
+		if ( self->dofLayout ) self->fieldComponentCount = self->dofLayout->_totalVarCount;
 
 		dim = Mesh_GetDimSize(self->feMesh);
 		/** allocate GNx here */
