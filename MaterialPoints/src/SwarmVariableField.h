@@ -53,7 +53,7 @@
 	/** SwarmVariableField class contents */
 	#define __SwarmVariableField \
 		/* General info */ \
-		__ParticleFeVariable; \
+		__ParticleFeVariable \
 		/* Virtual info */ \
 		/* SwarmVariableField info */ \
 		unsigned		dofCount;     		\
