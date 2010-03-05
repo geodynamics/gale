@@ -633,9 +633,8 @@
   <param name="nonLinearTolerance">1.0e-3</param>
   <param name="boundaryHeight">0.001</param>
 
-  <param name="journal.info">True</param>
-  <param name="journal.debug">True</param>
-  <param name="journal-level.info">2</param>
-  <param name="journal-level.debug">2</param>
-  <param name="diffusionCoefficient">1.0e-8</param>
+  <!-- <param name="journal.info">True</param> -->
+  <!-- <param name="journal.debug">True</param> -->
+  <!-- <param name="journal-level.info">2</param> -->
+  <!-- <param name="journal-level.debug">2</param> -->
 </StGermainData>

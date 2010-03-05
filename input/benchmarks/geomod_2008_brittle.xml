@@ -319,10 +319,10 @@
     </struct>
     <struct name="uzawa">
       <param name="Type">Stokes_SLE_UzawaSolver</param>
-p      <param name="velocitySolver">matrixSolver</param>
+      <param name="velocitySolver">matrixSolver</param>
       <param name="Preconditioner">preconditioner</param>
       <param name="tolerance">linearTolerance</param>
-p      <param name="monitor">false</param>
+      <param name="monitor">false</param>
       <param name="maxIterations">5000</param>
       <param name="minIterations">1</param>
     </struct>
@@ -551,9 +551,6 @@ p      <param name="monitor">false</param>
       </struct>
     </list>
   </struct>
-  <struct name="SurfaceProcess">
-    <param name="mesh">mesh-linear</param>
-  </struct>
   <struct name="velocityBCs">
     <param name="type">CompositeVC</param>
     <list name="vcList">
@@ -605,9 +602,6 @@ p      <param name="monitor">false</param>
             <param name="name">vx</param>
             <param name="type">func</param>
             <param name="value">StepFunction</param>
-<!--             <param name="type">double</param> -->
-<!--             <param name="value">6.94444444444e4</param> -->
-<!--             <param name="value">6.94444444444e-6</param> -->
           </struct>
           <struct>
             <param name="name">vy</param>
@@ -643,9 +637,6 @@ p      <param name="monitor">false</param>
   <param name="StepFunctionUpperValue">0</param>
   <param name="StepFunctionLowerOffset">0.23</param>
   <param name="StepFunctionUpperOffset">0.23</param>
-
-  <param name="diffusionCoefficient">1.0e1</param>
-<!--   <param name="diffusionCoefficient">1.0e-9</param> -->
 
   <param name="journal.info">True</param>
   <param name="journal.debug">True</param>

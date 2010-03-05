@@ -553,9 +553,6 @@
       </struct>
     </list>
   </struct>
-  <struct name="SurfaceProcess">
-    <param name="mesh">mesh-linear</param>
-  </struct>
   <struct name="velocityBCs">
     <param name="type">CompositeVC</param>
     <list name="vcList">
@@ -637,9 +634,6 @@
 
   <param name="linearTolerance">1.0e-7</param>
   <param name="nonLinearTolerance">1.0e-3</param>
-
-  <param name="diffusionCoefficient">1.0e1</param>
-<!--   <param name="diffusionCoefficient">1.0e-9</param> -->
 
   <param name="journal.info">True</param>
   <param name="journal.debug">True</param>
