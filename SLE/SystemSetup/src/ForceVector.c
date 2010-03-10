@@ -248,7 +248,7 @@ void _ForceVector_Build( void* forceVector, void* data ) {
 	
 	/* update the size depending on our now built feVariable */
 	self->localSize = self->feVariable->eqNum->localEqNumsOwnedCount;
-	assert( self->localSize );
+	/* assert( self->localSize ); */
 	
 	/* Allocate the vector */
 	Journal_DPrintfL( self->debug, 2, "Allocating the L.A. Force Vector with %d local entries.\n", self->localSize );
