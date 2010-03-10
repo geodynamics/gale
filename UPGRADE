@@ -289,6 +289,10 @@ struct.  An example would be
 
 ---------------
 
+ShapeVC has been renamed to MeshShapeVC.
+
+---------------
+
 Then spelling of "verticies" has been corrected to "vertices".
 
 ============================================================
