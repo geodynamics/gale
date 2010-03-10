@@ -203,6 +203,11 @@ void _AdvDiffMulticorrector_Solve( void* solver, void* _sle ) {
 
 	Journal_DPrintf( sle->debug, "In func %s:\n", __func__ );
 
+        /* First apply BC's */
+
+        FeVariable_ApplyBCs( sle->phiVector->feVariable, self->context );
+        FeVariable_ApplyBCs( sle->phiDotVector->feVariable, self->context );
+
 	/* Put mesh data onto vectors */
 	SolutionVector_LoadCurrentFeVariableValuesOntoVector( sle->phiVector );
 	SolutionVector_LoadCurrentFeVariableValuesOntoVector( sle->phiDotVector );
