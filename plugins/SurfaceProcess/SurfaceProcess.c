@@ -64,6 +64,8 @@ void Underworld_SurfaceProcess_Execute( TimeIntegrand* crdAdvector,
   Grid* grid;
   Mesh* mesh;
   unsigned nDims;
+  Node_LocalIndex n_i;
+  unsigned nNodes;
 
   assert( spCtx );
   
@@ -82,15 +84,11 @@ void Underworld_SurfaceProcess_Execute( TimeIntegrand* crdAdvector,
   if( nDims != 2 )
     abort();
 
-  Node_LocalIndex n_i;
-  unsigned nNodes;
-      
-  IJK ijk;
-      
   nNodes = FeMesh_GetNodeLocalSize( mesh);
       
   for( n_i = 0; n_i < nNodes; n_i++ )
     {
+      IJK ijk;
       RegularMeshUtils_Node_1DTo3D
         ( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
                   
