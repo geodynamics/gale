@@ -831,6 +831,8 @@ void EulerDeform_Remesh_Corner(Mesh *mesh, int corner, int inside,
     }
 }
 
+void EulerDeform_WrapSurface( EulerDeform_System* sys, double** oldCrds, int top );
+
 void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx ) {
   Mesh_Algorithms	*tmpAlgs, *oldAlgs;
   unsigned	sys_i;
@@ -1039,6 +1041,7 @@ void EulerDeform_InterpVar( FieldVariable* field, Variable* var, Mesh* mesh, dou
 	FreeArray( newVals );
 }
 
+void EulerDeform_InternalLoop( EulerDeform_System* sys, Grid* grm, double** oldCrds, unsigned* ijk, unsigned curDim, int top );
 
 void EulerDeform_WrapSurface( EulerDeform_System* sys, double** oldCrds, int top ) {
 	IJK	ijk;
@@ -1201,7 +1204,7 @@ void EulerDeform_InternalLoop( EulerDeform_System* sys, Grid* grm, double** oldC
                           ijk[1] = grm->sizes[curDim] - 1;
                         }
                         else {
-                          ijk[0]=0;
+                          ijk[1]=0;
                         }
 			EulerDeform_InternalLoop( sys, grm, oldCrds, ijk, curDim + 1, top );
 		}
