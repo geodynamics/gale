@@ -118,7 +118,6 @@ Bool Underworld_Init( int* argc, char** argv[] ) {
 	
 		ModulesManager_AddDirectory( "Underworld", LIB_DIR );
 
-		ToolboxesManager_SetInitialised( stgToolboxesManager, "Underworld" );
 		return True;
 	}
 	return False;
