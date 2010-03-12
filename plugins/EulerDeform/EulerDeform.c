@@ -973,8 +973,10 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
     if(sys->floatRightTop)
       EulerDeform_FloatRightTop(sys,grid,newCrds);
 
-    /* Create an artificial displacement field from the nodal displacements between newCrds and oldCrds.
-     * This displacement is currently used to correct the advDiffEqn's nodal velocity input */
+    /* Create an artificial displacement field from the nodal
+     * displacements between newCrds and oldCrds.  This displacement
+     * is currently used to correct the advDiffEqn's nodal velocity
+     * input */
     if( edCtx->artDField ) {
       double artDis[3]; /* temporary displacement vector */
 
