@@ -83,7 +83,6 @@ Bool PICellerator_Init( int* argc, char** argv[] ) {
 		/* Add the plugin path to the global plugin list */
 		ModulesManager_AddDirectory( "PICellerator", LIB_DIR );
 
-		ToolboxesManager_SetInitialised( stgToolboxesManager, "PICellerator" );
 		return True;
 	}
 	return False;
