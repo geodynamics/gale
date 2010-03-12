@@ -62,7 +62,6 @@ Bool StgDomain_Init( int* argc, char** argv[] ) {
 		StgDomainUtils_Init( argc, argv );
 		StgDomainSwarm_Init( argc, argv );
 
-		ToolboxesManager_SetInitialised( stgToolboxesManager, "StgDomain" );
 		return True;
 	}
 	return False;
