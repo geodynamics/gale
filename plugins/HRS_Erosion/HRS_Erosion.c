@@ -61,7 +61,7 @@ ExtensionInfo_Index	Underworld_HRS_Erosion_ContextHandle;
 static double a_mean_old=0;
 static double next_t_erosion=0;
 static double t_erosion=0;
-static int first_erosion_flag = 1;
+static double last_erosion_t=0;
 
 void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
                                         Underworld_HRS_Erosion_Context* spCtx)
@@ -81,8 +81,10 @@ void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
   IJK ijk_right;
   IJK ijk_left;
   Bool on_top, on_right, found;
-  double x_right, y_right, x_left, y_left, temp, base_height, threshold;
+  double x_right, y_right, x_left, y_left, temp,
+    base_height, fudge_factor;
 
+  fudge_factor=1.01;
   assert( spCtx );
   
   dt = spCtx->ctx->dt;
@@ -91,6 +93,8 @@ void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
   t_erosion = t_erosion + dt;
   comm = Comm_GetMPIComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
 		
+  /* Handle erosion times */
+
   if(next_t_erosion < first_t_erosion) {
     next_t_erosion = first_t_erosion;
   }
@@ -100,17 +104,15 @@ void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
 
   next_t_erosion = next_t_erosion + DT;
 
-  if(first_erosion_flag) {
-    DT = t_erosion;
-    first_erosion_flag = 0;
-  }
+  DT = t_erosion-last_erosion_t;
+
+  last_erosion_t=t_erosion;
 
   nDims = Mesh_GetDimSize( mesh );
   grid =
     *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
                                    ExtensionManager_GetHandle( mesh->info, 
                                                                "vertexGrid" ) );
-    
   if( nDims != 2 )
     abort();
 
@@ -137,8 +139,8 @@ void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
   MPI_Allreduce( &y_right, &temp, 1, MPI_DOUBLE, MPI_MIN, comm );
   y_right=temp;
 
-  /* Get the coordinates for where the left side rises above the base
-     height */
+  /* Get the coordinates on the left for where the height rises above
+     the base height */
   base_height=DBL_MAX;
 
   if(on_top)
@@ -174,7 +176,7 @@ void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
                      ijk_left[0],ijk_left[1]);
               abort();
             }
-          if(mesh->verts[n_left][1]>base_height+threshold)
+          if(mesh->verts[n_left][1]>base_height*fudge_factor)
             {
               found=True;
               x_left=mesh->verts[n_left][0];
