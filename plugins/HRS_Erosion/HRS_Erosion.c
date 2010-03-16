@@ -157,7 +157,7 @@ void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
 
       if(!Mesh_GlobalToDomain
          (mesh,MT_VERTEX,
-          RegularMeshUtils_Node_3DTo1D(mesh,ijk_left),&n_left)) 
+          RegularMeshUtils_Node_3DTo1D(mesh,ijk_left),&n_left))
         {
           printf("Can not map to local domain %d %d\n",
                  ijk_left[0],ijk_left[1]);
@@ -170,7 +170,7 @@ void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
           ijk_left[0]=i;
           if(!Mesh_GlobalToDomain
              (mesh,MT_VERTEX,
-              RegularMeshUtils_Node_3DTo1D(mesh,ijk_left),&n_left)) 
+              RegularMeshUtils_Node_3DTo1D(mesh,ijk_left),&n_left))
             {
               printf("Can not map to local domain %d %d\n",
                      ijk_left[0],ijk_left[1]);
@@ -238,8 +238,7 @@ void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
           RegularMeshUtils_Node_1DTo3D
             ( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, n_i ), ijk );
 					
-          if(ijk[1]==grid->sizes[1]-1
-             && ijk[0]!=0 && ijk[0]!=grid->sizes[0]-1) 
+          if(ijk[1]==grid->sizes[1]-1)
             {
               double y_old,delta_v, v[3];
               double x; 
