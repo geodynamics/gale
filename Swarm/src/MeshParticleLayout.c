@@ -203,7 +203,6 @@ void _MeshParticleLayout_Execute( void* meshParticleLayout, void* data ) {
 	
 void _MeshParticleLayout_Destroy( void* meshParticleLayout, void* data ) {
    MeshParticleLayout* self = (MeshParticleLayout*)meshParticleLayout;
-   Stg_Component_Destroy( self->mesh, NULL, False );
 
    _PerCellParticleLayout_Destroy( self, data );
 }
