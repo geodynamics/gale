@@ -2,7 +2,8 @@ import checks
 
 def apply_cc(env, cc):
     if cc in ['gcc']:
-        env.Tool(cc)
+        pass
+        #env.Tool(cc)
     elif cc == 'xlc':
         pass
 

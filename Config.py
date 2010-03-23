@@ -52,7 +52,7 @@ def PrintSummary(env):
     if not (GetOption('help') or GetOption('clean')):
         print ''
         print 'C compiler:     %s'%repr(env['CC'])
-        print 'C flags:        %s'%repr(env.get('CFLAGS', []) + env.get('CCFLAGS', []))
+        print 'C flags:        %s'%env.subst('$CFLAGS $CCFLAGS')
         print 'C preprocessor: %s'%repr(env.get('CPPDEFINES'))
         print ''
 
