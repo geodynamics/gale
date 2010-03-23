@@ -61,7 +61,8 @@ void TimeMonitorSuite_TestTimingPeriod( TimeMonitorSuiteData* data ) {
    sleep( 2 );
    Stg_TimeMonitor_End( tm, &tmData );
 
-   pcu_check_true( ( 2.95 < tmData.totalSinceInit ) && ( tmData.totalSinceInit < 3.05 ) );
+	printf( "Total Since Init: %f\n", tmData.totalSinceInit );
+   pcu_check_true( ( (double)2.95 < tmData.totalSinceInit ) && ( tmData.totalSinceInit < (double)5.05 ) );
    pcu_check_true( ( 1.95 < tmData.dt ) && ( tmData.dt < 2.05 ) );
    pcu_check_true( ( 1.95 < tmData.aveProcDt ) && ( tmData.aveProcDt < 2.05 ) );
    percentOfTotalCalc = tmData.aveProcDt / tmData.totalSinceInit * 100;

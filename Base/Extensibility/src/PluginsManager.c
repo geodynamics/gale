@@ -121,11 +121,23 @@ Bool _PluginsManager_LoadPlugin( void* pluginsManager, Module* plugin ) {
 	return True;
 }
 
+Bool PluginsManager_UnloadAll( void* pluginsManager ) {
+	PluginsManager* self = (PluginsManager*)pluginsManager;
+   Module* module = NULL;
+
+   while( self->modules->count ) {
+      module = (Module*)Stg_ObjectList_At( self->modules, self->modules->count - 1 ); /* reverse order deletion */
+      _PluginsManager_UnloadPlugin( self, module );
+   }
+
+   return True;
+}
 Bool _PluginsManager_UnloadPlugin( void* pluginsManager, Module* plugin ) {
 	PluginsManager* self = (PluginsManager*)pluginsManager;
 
-	ModulesManager_Unload( self );
-	
+   Module_UnLoad( plugin );
+   self->modules->count--;
+
 	return True;
 }
 

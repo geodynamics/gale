@@ -1,6 +1,7 @@
 
 import stgDtd
 import stgMetaXsd
+import string
 
 def dtd2MetaXsd( xml_text ):
 	# Parse DTD
@@ -44,7 +45,7 @@ def dtdDict2metaXsdDict( stgDtdDict ):
 	meta["info"]["rights"] = stgDtdDict["License"]
 	meta["info"]["source"] = stgDtdDict["Location"]
 	meta["info"]["subject"] = stgDtdDict["Project"]
-	meta["info"]["description"] = stgDtdDict["Description"]
+	meta["info"]["description"] = stgDtdDict["Description"].replace('\\','\\\\')
 
 	# Code...
 	meta["code"] = {}
@@ -69,7 +70,7 @@ def dtdDict2metaXsdDict( stgDtdDict ):
 		pass
 	try:
 		if stgDtdDict["Equation"] != '...':
-			meta["implements"]["equation"] = stgDtdDict["Equation"]
+			meta["implements"]["equation"] = stgDtdDict["Equation"].replace('\\','\\\\')
 	except KeyError:
 		pass
 
@@ -107,7 +108,7 @@ def dtdDict2metaXsdDict( stgDtdDict ):
 			except KeyError:
 				pass
 			try:
-				p["documentation"] = param["Description"]
+				p["documentation"] = param["Description"].replace('\\','\\\\')
 			except KeyError:
 				pass
 			meta["parameters"].append( p )
@@ -130,7 +131,7 @@ def dtdDict2metaXsdDict( stgDtdDict ):
 			except KeyError:
 				a["nillable"] = "false"
 			try:
-				a["documentation"] = assoc["Description"]
+				a["documentation"] = assoc["Description"].replace('\\','\\\\')
 			except KeyError:
 				pass
 			meta["associations"].append( a )

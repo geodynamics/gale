@@ -13,7 +13,7 @@ def findProjectDirectories(mainDirectory):
     projectNames = os.listdir(directory)
     # remove items from list that are not projects:
     # known examples: config, DOC, Doc, doc
-    directoryValues = ['config', 'DOC', 'doc', 'Doc', '.hg', 'DOXYGEN', 'build', 'script', '.sconf_temp', 'scons']
+    directoryValues = ['config', 'DOC', 'doc', 'Doc', '.hg', 'DOXYGEN', 'build', 'script', '.sconf_temp', 'scons', 'sconf_temp']
     for value in directoryValues:
         if (projectNames.count(value) > 0) :
             projectNames.remove(value)
@@ -110,7 +110,7 @@ def createListDictionary(arg1, arg2, arg3, arg4, directoryPath, docPath, docData
     dictionary['htmlFooter'] =  "footer.html"
     dictionary['htmlStylesheet'] =  "customdoxygen.css"
     dictionary['htmlImagesPath'] = "doxyimage/"
-    dictionary['projectNumber'] = 'Bleeding Edge'
+    dictionary['projectNumber'] = '1.4'
     dictionary['configNew'] =  "Doxyfile.new"
     dictionary['htmlDir'] = "html/"
     return dictionary

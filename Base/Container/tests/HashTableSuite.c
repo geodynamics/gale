@@ -223,7 +223,7 @@ void HashTableSuite_TestInsertPointers( HashTableSuiteData* data ) {
    /* This is a basic check that the number of collisions was within reason. Perhaps a stricter
     *  mathematical calc should really be performed here */
    /* Hash table has 255 places, only inserted 100 entries, therefore not many collisions expected */
-   pcu_check_true( sum <= (data->ptrTable->count * 0.3) );
+   pcu_check_true( sum <= (int)(data->ptrTable->count * 0.4) );
    
    /* Now parse the tree, and check the actual entries - note they won't necessarily be in same 'order'
     * while being parsed */

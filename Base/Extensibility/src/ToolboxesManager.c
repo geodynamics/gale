@@ -85,30 +85,19 @@ ToolboxesManager* _ToolboxesManager_New(  TOOLBOXESMANAGER_DEFARGS  )
 void _ToolboxesManager_Init( void* toolboxesManager, int* argc, char*** argv ) {
 	ToolboxesManager*         self = (ToolboxesManager*)toolboxesManager;
 	
+   self->initTB = Stg_ObjectList_New();
 	self->argc = argc;
 	self->argv = argv;
-	self->_initialisedSize = 8;
-	self->initialised = Memory_Alloc_Array( char*, self->_initialisedSize, ToolboxesManager_Type );
-	self->_initialisedCount = 0;
 }
 
 
 void _ToolboxesManager_Delete( void* toolboxesManager ) {
-	ToolboxesManager*         self = (ToolboxesManager*)toolboxesManager;
-  unsigned count;
+   ToolboxesManager*         self = (ToolboxesManager*)toolboxesManager;
+   int ii, originalListSize;
 
-  /* free all strings, defining loaded Toolboxes */
-  for( count = 0 ; count < self->_initialisedCount ; count++ ) {
-    Memory_Free( self->initialised[count] );
-  }
-	Memory_Free( self->initialised );
-	self->_initialisedSize = 0;
-	self->_initialisedCount = 0;
-	self->initialised = 0;
-	
 	Stg_ObjectList_DeleteAllObjects( self->codelets );
 	Stg_Class_Delete( self->codelets );
-	ModulesManager_Unload( self ); 
+	ModulesManager_Unload( self );  /* this will unload all toolboxes implicitly */
 	Stg_Class_Delete( self->modules );
 	
 	/* Delete parent */
@@ -121,13 +110,13 @@ void _ToolboxesManager_Print( void* toolboxesManager, Stream* stream ) {
 	/* General info */
 	Journal_Printf( (void*) stream, "Toolboxes (ptr): %p\n", self );
 	
-	if( self->_initialisedCount > 0 ) {
+	if( Stg_ObjectList_Count(self->initTB) > 0 ) {
 		Index i;
 		
 		Journal_Printf( stream, "Initialised Modules:\n" );
 		Stream_Indent( stream );
-		for( i = 0; i < self->_initialisedCount; ++i ) {
-			Journal_Printf( stream, "%s\n", self->initialised[i] );
+		for( i = 0; i < Stg_ObjectList_Count(self->initTB) ; ++i ) {
+			Journal_Printf( stream, "%s\n", self->initTB->data[i]->name );
 		}
 		Stream_UnIndent( stream );
 	}
@@ -150,16 +139,26 @@ Dictionary_Entry_Value* _ToolboxesManager_GetToolboxesList( void* toolboxesManag
 Bool _ToolboxesManager_LoadToolbox( void* toolboxesManager, Module* toolbox ) {
 	ToolboxesManager* self = (ToolboxesManager*)toolboxesManager;
 	
-	((Toolbox*)toolbox)->Initialise( self, self->argc, self->argv );
-	((Toolbox*)toolbox)->Register( self );
-    
+   /* if not Loaded call the Initialise() and Register() */
+   if( !Stg_ObjectList_Get( self->initTB, toolbox->name ) ) {
+
+      ((Toolbox*)toolbox)->Initialise( self, self->argc, self->argv );
+      ((Toolbox*)toolbox)->Register( self );
+
+      Stg_ObjectList_Append( self->initTB, toolbox );
+   }
 	return True;
 }
 
 Bool _ToolboxesManager_UnloadToolbox( void* toolboxesManager, Module* toolbox ) {
 	ToolboxesManager* self = (ToolboxesManager*)toolboxesManager;
 	
-	((Toolbox*)toolbox)->Finalise( self );
+   if( Stg_ObjectList_Get( self->initTB, toolbox->name ) ) {
+      ((Toolbox*)toolbox)->Finalise( self );
+
+      /* remove the toolbox from the initTB list, but don't actually Delete it's memory */
+      Stg_ObjectList_Remove( self->initTB, toolbox->name, KEEP );
+   }
     
 	return True;
 }
@@ -173,35 +172,13 @@ Name _ToolboxesManager_GetModuleName( void* toolboxesManager, Dictionary_Entry_V
 	return Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( moduleVal, entry_I ) );
 }
 
-Index ToolboxesManager_SetInitialised( void* initRegister, char* label ) {
-	ToolboxesManager* self = (ToolboxesManager*)initRegister;
-	
-	if( self->_initialisedCount == self->_initialisedSize ) {
-		Index oldSize = self->_initialisedSize;
-		char** tmp;
-		
-		self->_initialisedSize += 8;
-		tmp = Memory_Alloc_Array( char*, self->_initialisedSize, ToolboxesManager_Type );
-		memcpy( tmp, self->initialised, sizeof( char* ) * oldSize );
-		Memory_Free( self->initialised );
-		self->initialised = tmp;
-	}
-	
-	self->initialised[self->_initialisedCount] = StG_Strdup( label );
-	self->_initialisedCount += 1;
-	return self->_initialisedCount - 1;
-}
-
 Bool ToolboxesManager_IsInitialised( void* initRegister, char* label ) {
 	ToolboxesManager* self = (ToolboxesManager*)initRegister;
-	Index i;
-	
-	for( i = 0; i < self->_initialisedCount; i++ ) {
-		if( strcmp( label, self->initialised[i] ) == 0 ) {
-			return True;
-		}
-	}
-	return False;
+
+   if( Stg_ObjectList_Get( self->initTB, label ) )
+      return True;
+   else
+      return False;
 }
 
 

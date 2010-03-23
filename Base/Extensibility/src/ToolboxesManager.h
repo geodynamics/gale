@@ -45,20 +45,18 @@
 	/* Textual name of this class */
 	extern const Type ToolboxesManager_Type;
 
-	
 	/* Toolboxes info */
-	#define __ToolboxesManager \
-		/* General info */ \
-		__ModulesManager \
-		\
-		/* Virtual info */ \
-		\
-		/* Toolboxes info */ \
-		int*       argc; \
-		char***    argv; \
-		char**     initialised; \
-		Index      _initialisedSize; \
-		Index      _initialisedCount;
+   #define __ToolboxesManager \
+      /* General info */ \
+      __ModulesManager \
+      \
+      /* Virtual info */ \
+      \
+      /* Toolboxes info */ \
+      Stg_ObjectList *initTB; /* list of initialised toolboxes */ \
+      int*       argc; \
+      char***    argv;
+		
 		
 	struct ToolboxesManager { __ToolboxesManager };
 	
@@ -110,10 +108,6 @@
 
 	#define ToolboxesManager_Submit ModulesManager_Submit
 
-	/** Let StGermain know that the "Init" function of a module has been called. This exists to handle the case where a module
-	   is linked into a binary and the user attempts to module load the module too. */
-	Index ToolboxesManager_SetInitialised( void* toolboxesManager, char* label );
-	
 	/** This exists to handle the case where a module is linked into a binary and the user attempts to module load the module too. 
 	   Its expected at modules will check to see if they have been inited already before doing initialisation work in the init 
 	   function. */
