@@ -573,8 +573,8 @@
   <struct name="SurfaceProcess">
     <param name="mesh">mesh-linear</param>
     <param name="VelocityField">VelocityField</param>
-    <param name="diffusionCoefficient">1.0e1</param>
-<!--   <param name="diffusionCoefficient">1.0e-9</param> -->
+    <param name="diffusionCoefficient">1.0e4</param>
+<!--   <param name="diffusionCoefficient">1.0e-6</param> -->
   </struct>
   <struct name="velocityBCs">
     <param name="type">CompositeVC</param>
@@ -657,10 +657,9 @@
 
   <param name="linearTolerance">1.0e-7</param>
   <param name="nonLinearTolerance">1.0e-3</param>
-  <param name="dtFactor">0.1</param>
 
-  <param name="journal.info">True</param>
-  <param name="journal.debug">True</param>
-  <param name="journal-level.info">2</param>
-  <param name="journal-level.debug">2</param>
+  <!-- <param name="journal.info">True</param> -->
+  <!-- <param name="journal.debug">True</param> -->
+  <!-- <param name="journal-level.info">2</param> -->
+  <!-- <param name="journal-level.debug">2</param> -->
 </StGermainData>
