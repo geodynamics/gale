@@ -14,7 +14,7 @@
 	<param name="Reference">...</param>
 	<param name="Summary">...</param>
 	<param name="Description">An approximation to the Arrhenius temperature dependent rheology.</param>
-        <param name="Equation">$\\eta = \\eta_0 \\exp\\left(-\\theta T\\right)$</param>
+	<param name="Equation">$\eta = \eta_0 \exp\left(-\theta T\right)$</param>
 
 	<!--Now the interesting stuff-->
 
@@ -23,13 +23,13 @@
 			<param name="Name">eta0</param>
 			<param name="Type">Double</param>
 			<param name="Default">1.0</param>
-			<param name="Description">This is the $\\eta_0$ in the equation in the description.</param>
+			<param name="Description">This is the $\eta_0$ in the equation in the description.</param>
 		</struct>
 		<struct>
 			<param name="Name">theta</param>
 			<param name="Type">Double</param>
 			<param name="Default">0.0</param>
-			<param name="Description">This is the $\\theta$ in the equation in the description.</param>
+			<param name="Description">This is the $\theta$ in the equation in the description.</param>
 		</struct>
 	</list>
 
