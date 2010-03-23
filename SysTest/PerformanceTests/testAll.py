@@ -35,13 +35,21 @@ def runTests():
     message = ''
     message += "--------------------------------------------------------\n" + \
           "[SYS] StgFEM Convergence Tests:\n" + \
-          "[SYS]      Total Passes: (" + str(passed) + "/" + str(len( commands )) + ")\n" \
-          "[SYS]      Failed Commands:\n"
-    for command in failed_commands:
-        message += "[SYS]            " + command + "\n"
+          "[SYS]      Total Passes: (" + str(passed) + "/" + str(len( commands )) + ")\n" 
+
+    if( len(failed_commands) > 0 ):
+        message += "[SYS]      Failed Commands:\n"
+        for command in failed_commands:
+            message += "[SYS]            " + command + "\n"
+
     message += "--------------------------------------------------------\n"
     FILE.write( message )
     print message
     FILE.close()
+
+    if failed > 0:
+        sys.exit(1)
+    else:
+        sys.exit(0)
 
 runTests()

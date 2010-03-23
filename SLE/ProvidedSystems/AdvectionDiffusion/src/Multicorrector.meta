@@ -22,7 +22,7 @@
 			<param name="Name">gamma</param>
 			<param name="Type">Double</param>
 			<param name="Default">0.5</param>
-			<param name="Description">Factor used to calculate generalised mass matrix. If $\\gamma$ is 1/2, this is the trapezoidal rule.</param>
+			<param name="Description">Factor used to calculate generalised mass matrix. If $\gamma$ is 1/2, this is the trapezoidal rule.</param>
 		</struct>
 		<struct>
 			<param name="Name">multiCorrectorIterations</param>

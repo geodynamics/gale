@@ -80,7 +80,6 @@ Bool StgFEM_Init( int* argc, char** argv[] ) {
 		/* Add the plugin path to the global plugin list */
 		ModulesManager_AddDirectory( "StgFEM", LIB_DIR );
 
-		ToolboxesManager_SetInitialised( stgToolboxesManager, "StgFEM" );
 		return True;
 	}
 	return False;

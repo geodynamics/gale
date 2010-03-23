@@ -36,7 +36,7 @@
 			<param name="Essential">True</param>
 			<param name="Name">PhiField</param>
 			<param name="Type">FeVariable</param>
-			<param name="Description">The field, refered to as $\\phi$, to which the advection and diffusion is taking place.</param>
+			<param name="Description">The field, refered to as $\phi$, to which the advection and diffusion is taking place.</param>
 		</struct>
 		<struct>
 			<param name="Essential">True</param>
