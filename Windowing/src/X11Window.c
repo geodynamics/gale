@@ -196,7 +196,7 @@ void _lucX11Window_Execute( void* window, void* data ) {
 	if (self->interactive && self->isMaster)
     {
 		glXMakeCurrent( self->display, self->win, self->glxcontext);
-        XSetInputFocus(self->display, self->win, RevertToParent, CurrentTime);
+      //XSetInputFocus(self->display, self->win, RevertToParent, CurrentTime);
     }
     else 
         glXMakeCurrent( self->display, self->glxpmap, self->glxcontext);
@@ -220,7 +220,8 @@ void _lucX11Window_Destroy( void* window, void* data ) {
 	XFree( self->vi );
 	self->vi = 0;
 
-	glXDestroyContext( self->display,  self->glxcontext);
+	if (self->glxcontext) 
+	   glXDestroyContext( self->display,  self->glxcontext);
 	self->glxcontext = 0;
 
 	XSetCloseDownMode( self->display,  DestroyAll);
@@ -318,15 +319,15 @@ void _lucX11Window_Resize( void* window ) {
     /* Master window resized? Create new background pixmap of required size */
     if (self->interactive && !self->isMaster)
     {
-    	lucX11Window_CloseBackgroundWindow( self );
-   		lucX11Window_CreateBackgroundWindow( self );
+      lucX11Window_CloseBackgroundWindow( self );
+      lucX11Window_CreateBackgroundWindow( self );
     }
 
 	/* Close window and create background window if switched out of interactive mode */
 	if (!self->interactive)
 	{
-		lucX11Window_CloseInteractiveWindow( self );
-		lucX11Window_CreateBackgroundWindow( self );
+      lucX11Window_CloseInteractiveWindow( self );
+      lucX11Window_CreateBackgroundWindow( self );
 		self->quitEventLoop = True;
 	}
 
@@ -339,8 +340,9 @@ Bool lucX11Window_CreateDisplay( void* window )  {
 	static int configuration[] = { GLX_DOUBLEBUFFER, GLX_RGBA, GLX_DEPTH_SIZE, 16,
 			GLX_STENCIL_SIZE, 1, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, None};
 	static int alphaConfiguration[] = { GLX_DOUBLEBUFFER, GLX_RGBA, GLX_DEPTH_SIZE, 16,
-			GLX_STENCIL_SIZE, 1, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, GLX_ALPHA_SIZE, 1, None};
-	
+			GLX_STENCIL_SIZE, 1, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1, GLX_BLUE_SIZE, 1, GLX_ALPHA_SIZE, 1, None}; 
+   int* config = alphaConfiguration;
+
 	/*********************** Create Display ******************************/
 	self->display = XOpenDisplay(NULL);
 	if (self->display == NULL) {
@@ -368,14 +370,17 @@ Bool lucX11Window_CreateDisplay( void* window )  {
 	}
 
 	/* find an OpenGL-capable display - trying different configurations if nessesary */
-	self->vi = glXChooseVisual(self->display, DefaultScreen(self->display), &alphaConfiguration[0]);
+   /* Note: only attempt to get double buffered visuals when in interactive mode */
+   self->vi = NULL;
+   if (self->interactive)
+   	self->vi = glXChooseVisual(self->display, DefaultScreen(self->display), config);
 	self->doubleBuffer = True;
 	if (self->vi == NULL) {
 		Journal_Printf( lucError, "In func %s: Couldn't open RGBA Double Buffer display\n", __func__);
-		self->vi = glXChooseVisual( self->display, DefaultScreen( self->display), &alphaConfiguration[1]);
+		self->vi = glXChooseVisual( self->display, DefaultScreen( self->display), config + 1);
 		self->doubleBuffer = False;
 	}
-	if (self->vi == NULL) {
+	if (self->interactive && self->vi == NULL) {
 		Journal_Printf( lucError, "In func %s: Couldn't open RGBA display\n", __func__);
 		self->vi = glXChooseVisual(self->display, DefaultScreen(self->display), &configuration[0]);
 		self->doubleBuffer = True;
@@ -392,7 +397,6 @@ Bool lucX11Window_CreateDisplay( void* window )  {
 
 	return True;
 }
-
 
 Bool lucX11Window_CreateContext( void* window, Bool direct )  {
 	lucX11Window*  self      = (lucX11Window*)window;
@@ -564,7 +568,6 @@ void lucX11Window_CloseInteractiveWindow( lucX11Window* self ) {
 
 	XDestroyWindow( self->display , self->win );
 	self->win = 0;
-    self->glxcontext = NULL;
 
 	lucDebug_PrintFunctionEnd( self, 1 );
 }
@@ -577,7 +580,6 @@ void lucX11Window_CloseBackgroundWindow( lucX11Window* self ) {
 	self->glxpmap = 0;
 	XFreePixmap(self->display, self->pmap);
 	self->pmap = 0;
-    self->glxcontext = NULL;
 
 	lucDebug_PrintFunctionEnd( self, 1 );
 }

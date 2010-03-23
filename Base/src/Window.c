@@ -745,8 +745,8 @@ lucViewportInfo* lucWindow_ConstructViewportInfoList(
 	lucViewportInfo*        viewportInfoList        = Memory_Alloc_Array( lucViewportInfo, 1, "viewportInfoArray" );
 	lucViewportInfo*        currViewportInfo;
 	Dictionary*             dictionary              = Dictionary_GetDictionary( cf->componentDict, self->name );
-	Name                    viewportName;
-	char*                   bufferPtr;
+	Name                    viewportName[16];
+   char*                   savePtr;
 
 	*viewportCount = 0;
 	
@@ -762,11 +762,19 @@ lucViewportInfo* lucWindow_ConstructViewportInfoList(
 		horizontalVP_String = StG_Strdup( Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( list, vertical_I ) ) );
 	
 		/* Find number of horizontal layers */
-		horizontalCount = 1;
-		charPtr = strpbrk( horizontalVP_String, breakChars );
+		horizontalCount = 0;
+		char* horizVPstr_ptr = horizontalVP_String;
+		charPtr = strtok_r( horizVPstr_ptr , breakChars, &savePtr);
 		while ( charPtr != NULL ) {
-			charPtr = strpbrk( charPtr + 1 , breakChars );
+			viewportName[horizontalCount] = StG_Strdup( charPtr );
 			horizontalCount++;
+			charPtr = strtok_r( NULL , breakChars, &savePtr);
+         if (horizontalCount == 16) {
+            /* Maximum 8 viewports across in single window */
+            if (charPtr != NULL)
+   			   Journal_Printf( lucError, "Error in func '%s' - too many viewports in window %s, maximum = 16 wide.\n", __func__, self->name);
+            break; 
+         }
 		}
 		
 		/* Sum up total number of viewports */
@@ -779,22 +787,18 @@ lucViewportInfo* lucWindow_ConstructViewportInfoList(
 		viewportWidth = div( width, horizontalCount ).quot;
 
 		/* Read String to get colour map */
-		charPtr = strtok_r( horizontalVP_String, breakChars, &bufferPtr );
 		for ( horizontal_I = 0 ; horizontal_I < horizontalCount ; horizontal_I++ ) {
 			currViewportInfo = &viewportInfoList[ total_I ];
 
 			/* Find viewport */
-			viewportName = StG_Strdup( charPtr );
-			currViewportInfo->viewport = Stg_ComponentFactory_ConstructByName( cf, (Name)viewportName, lucViewport, True, data ) ;
-			Memory_Free( viewportName );
+			currViewportInfo->viewport = Stg_ComponentFactory_ConstructByName( cf, viewportName[horizontal_I], lucViewport, True, data ) ;
+			Memory_Free( viewportName[horizontal_I] );
 
 			/* Setup viewport dimensions */
 			currViewportInfo->startx = horizontal_I * viewportWidth;
 			currViewportInfo->starty = (self->verticalCount - 1 - vertical_I ) * viewportHeight;
 			currViewportInfo->width  = viewportWidth;
 			currViewportInfo->height = viewportHeight;
-
-			charPtr = strtok_r( NULL, breakChars, &bufferPtr );
 
 			total_I++;
 		}
