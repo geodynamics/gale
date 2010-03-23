@@ -14,7 +14,7 @@
 	<param name="Reference">...</param>
 	<param name="Summary">...</param>
 	<param name="Description">Defines a cosine shape, with the region less than the function included</param>
-	<param name="Equation">$y \\leq a_0 + b_0sin( (2\\pi/T) x + \\phi)$ </param>
+	<param name="Equation">$y \leq a_0 + b_0sin( (2\pi/T) x + \phi)$ </param>
 
 	<!--Now the interesting stuff-->
 
@@ -35,7 +35,7 @@
 			<param name="Name">phase</param>
 			<param name="Type">Double</param>
 			<param name="Default">0.0</param>
-			<param name="Description">$ \\phi $ in the equation</param>
+			<param name="Description">$ \phi $ in the equation</param>
 		</struct>
 	</list>
 

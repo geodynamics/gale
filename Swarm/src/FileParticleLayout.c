@@ -400,7 +400,29 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
                #else
                   self->fileData[swarmVar_I][ii-1]  = H5Dopen2( file[ii-1], dataSpaceName, H5P_DEFAULT );
                #endif
-                  self->fileSpace[swarmVar_I][ii-1] = H5Dget_space( self->fileData[swarmVar_I][ii-1] );
+               /* if we cannot find the specified dataSpace, try again using the old naming convention */
+               if(self->fileData[swarmVar_I][ii-1] < 0){
+                  sprintf( dataSpaceName, "/%s", swarmVar->name );
+                  
+                  #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+                     self->fileData[swarmVar_I][ii-1]  = H5Dopen( file[ii-1], dataSpaceName );
+                  #else
+                     self->fileData[swarmVar_I][ii-1]  = H5Dopen2( file[ii-1], dataSpaceName, H5P_DEFAULT );
+                  #endif
+               }
+               /* if we still cannot find the specified dataSpace, there is a problem */
+               if(self->fileData[swarmVar_I][ii-1] < 0)
+                     Journal_Firewall( 
+                        NULL, 
+                        self->errorStream,
+                        "\n\nError in %s for %s '%s' \n Cannot open dataSpace for checkpointed swarmvariable (%s) that requries reloading.\n  Checkpoint files may be invalid.\n\n", 
+                        __func__, 
+                        self->type, 
+                        self->name,
+                        swarmVar->name );
+
+               
+               self->fileSpace[swarmVar_I][ii-1] = H5Dget_space( self->fileData[swarmVar_I][ii-1] );
                
                Variable_Update( swarmVar->variable );
             }
