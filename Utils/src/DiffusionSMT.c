@@ -133,11 +133,10 @@ void* _DiffusionSMT_DefaultNew( Name name ) {
 
 void _DiffusionSMT_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, void* data ) {
     DiffusionSMT*            self             = (DiffusionSMT*)matrixTerm;
-    PICelleratorContext*     context;
+    PICelleratorContext*     context	      = (PICelleratorContext*)self->context;
 
     /* Construct Parent */
     _StiffnessMatrixTerm_AssignFromXML( self, cf, data );
-    context = (PICelleratorContext*)self->context;
 
     _DiffusionSMT_Init( self );
 
@@ -160,8 +159,10 @@ void _DiffusionSMT_Build( void* matrixTerm, void* data ) {
     _StiffnessMatrixTerm_Build( self, data );
 
     /* Get Component Factory if we can */
-    context = (AbstractContext*)(self->context);
-    cf = context->CF;
+    if ( Stg_Class_IsInstance( data, AbstractContext_Type ) ) {
+	context = (AbstractContext*) data;
+	cf = context->CF;
+    }
 
     /* Sort out material extension stuff */
     self->materialExtHandle = Materials_Register_AddMaterialExtension(

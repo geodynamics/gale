@@ -1268,7 +1268,10 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
     }
     _DVCWeights_CreateVoronoi2D( &bchain, &pList, &cells, dx, dy, nump, numx, numy, BBXMIN, BBXMAX, BBYMIN, BBYMAX);
     _DVCWeights_GetCentroids2D( cells, pList,numy,numx,nump,da);
-
+/*     for(k=0;k<nump;k++){ */
+/* 	  printf("In %s O(%10.7lf %10.7lf) C(%10.7lf %10.7lf) W(%.4lf)\n", __func__, pList[k].x, pList[k].y, pList[k].cx, pList[k].cy, pList[k].w); */
+/*     } */
+      
     /************************************/
     /************************************/
     /*    Start 2D Population Control   */
@@ -1560,6 +1563,9 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
         particle[i]->weight = pList[i].w;
 
     }	
+    /* for(k=0;k<nump;k++){ */
+/* 	  printf("::In %s O(%10.7lf %10.7lf) C(%10.7lf %10.7lf) W(%.4lf)\n", __func__, pList[k].x, pList[k].y, pList[k].cx, pList[k].cy, pList[k].w); */
+/*     } */
     for(k=0;k<nump;k++){
         free(bchain[k].new_claimed_cells);
         free(bchain[k].new_bound_cells);

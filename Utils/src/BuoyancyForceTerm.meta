@@ -13,8 +13,8 @@
 	<param name="Parent">ForceTerm</param>
 	<param name="Reference">...</param>
 	<param name="Summary">...</param>
-<param name="Description">This adds a force term for themo-chemical convection, where the fluid is driven my both the thermal expansivity ($\\alpha$) as well as the density ($\\rho$). Both 'alpha' and 'density' are required as parameters for each material.</param>
-<param name="Equation">$\\rho g \\left( 1 - \\alpha T \\right)$</param>
+	<param name="Description">This adds a force term for themo-chemical convection, where the fluid is driven my both the thermal expansivity ($\alpha$) as well as the density ($\rho$). Both 'alpha' and 'density' are required as parameters for each material.</param>
+	<param name="Equation">$\rho g \left( 1 - \alpha T \right)$</param>
 
 	<!--Now the interesting stuff-->
 

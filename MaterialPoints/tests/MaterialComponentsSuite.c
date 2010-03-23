@@ -71,6 +71,7 @@ typedef struct {
    Variable_Register*            svRegister;
    ExtensionManager_Register*    eRegister;
    Materials_Register*           mRegister;
+	LiveComponentRegister*			lcRegister;
    Dictionary*                   matDict1;
    Dictionary*                   matDict2;
    Stg_Shape*                    shape1;
@@ -147,6 +148,7 @@ void MaterialComponentsSuite_Setup( MaterialComponentsSuiteData* data ) {
    Particle*         matPoint;
    Particle          particle;
 
+	data->lcRegister = LiveComponentRegister_New();
    data->svRegister = Variable_Register_New();
    data->eRegister = ExtensionManager_Register_New();
    data->mRegister = Materials_Register_New();
@@ -215,6 +217,7 @@ void MaterialComponentsSuite_Teardown( MaterialComponentsSuiteData* data ) {
    _Stg_Component_Delete( data->cellLayout );
    _Stg_Component_Delete( data->particleLayout );
    _Stg_Component_Delete( data->feMesh );
+	Stg_Class_Delete( data->lcRegister );
    Stg_Class_Delete( data->eRegister );
    Stg_Class_Delete( data->svRegister );
    Stg_Class_Delete( data->mRegister );
