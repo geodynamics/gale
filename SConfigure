@@ -208,6 +208,6 @@ env.SaveConfig()
 print
 print '***************************************'
 print '* Successfully configured.            *'
-print '* Now run \'./scons.py\' to build.      *'
+print '* Now run \'./scons\' to build.      *'
 print '***************************************'
 print

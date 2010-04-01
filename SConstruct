@@ -1,4 +1,4 @@
-import sys, os, subprocess, platform
+import sys, os, platform
 
 EnsureSConsVersion(0, 98)
 
@@ -34,6 +34,7 @@ env["INST_BUILD_DIR"] = env["build_dir"]
 env["INST_PREFIX"] = env["prefix"]
 env.Default(env["build_dir"])
 
+
 # Add the build directory's include path.
 env.AppendUnique(CPPPATH=env['build_dir'] + '/include')
 
@@ -53,18 +54,7 @@ if not env['shared_libs']:
     env.AppendUnique(CPPDEFINES=['NOSHARED'])
 
 # Need to extract some kind of hg version number.
-subp = subprocess.Popen("hg identify",
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
-                        shell=True)
-out, err = subp.communicate()
-res = subp.wait()
-if res:
-    print "Failed to extract hg revision number."
-    hg_ver = 'unknown'
-else:
-    hg_ver = out.split()[0].strip()
-env.AppendUnique(CPPDEFINES=[("VERSION", env["ESCAPE"]('"' + hg_ver + '"'))])
+env.AppendUnique(CPPDEFINES=[("VERSION", env["ESCAPE"]('"' + 'unknown' + '"'))])
 
 # Need to insert some 'HAVE_*' definitions based on what packages we
 # found during configuration.
@@ -126,7 +116,7 @@ if env['with_glucifer']:
 #
 
 if env['static_libs']:
-    env.Program('bin/StGermain',
+    env.Program('bin/Gale',
                 ['StGermain/src/main.c',
                  File(env['build_dir'] + '/StGermain/stg_static_modules.c').abspath])
 
