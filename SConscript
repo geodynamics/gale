@@ -245,12 +245,6 @@ if env['static_libs']:
     env.Install(env['prefix'] + '/lib', l)
 
 #
-# create Underworld executable -> it's just a copy of StGermain executable
-#
-
-env.Command('../bin/Underworld', '../bin/StGermain', 'cp $SOURCES $TARGET')
-
-#
 # Test runner program.
 #
 
