@@ -1,0 +1,99 @@
+These are generic installation instuctions.  Gale has been tested on
+workstations running Mac OS X, Windows XP SP2, Debian Lenny and
+Squeeze, and Ubuntu Hardy Heron.  There are platform specific
+instructions for some of these platforms (e.g. INSTALL.MACOSX for
+Mac).
+
+
+Dependencies
+------------
+
+In order to install Gale, you must have the headers and development
+libraries for
+
+        - MPI
+        - PETSc 3.0.0
+        - libxml2
+
+You must also have python 2.2.1 or greater installed.  If you do not
+already have MPI, then in many cases PETSc can install a version for
+you.  Installing PETSc also requires a Blas/Lapack implementation.
+
+Generally, the most difficult part is installing PETSc.
+
+Configure
+---------
+
+The first step in installing Gale is running the script
+"configure.sh".  This script examines your system, looking for
+dependencies.  If you are lucky, configure.sh will be able to find
+everything.  But many times, you will have to tell "configure.sh"
+where different packages are.  For example, suppose you installed
+PETSc in /opt/goodies/petsc.  Then you can tell "configure.sh" where
+PETSc is with the --petsc-dir option
+
+  ./configure.sh --petsc-dir=/opt/goodies/petsc
+
+PETSc has a mechanism for letting multiple installations of PETSc
+coexist in a single directory (PETSC_ARCH).  If you have multiple
+installations, Gale will use the first one it finds. To override that
+guess, specify PETSC_ARCH with the option --petsc-arch
+
+  ./configure.sh --petsc-dir=/opt/goodies/petsc --petsc-arch=linux-gnu
+
+configure.sh also checks the environment variables PETSC_DIR and
+PETSC_ARCH.
+
+For the other dependencies, configure.sh accepts the options
+
+  --libxml2-inc-dir
+  --libxml2-lib-dir
+
+  --mpi-dir
+  --mpi-inc-dir
+  --mpi-lib-dir
+
+There are more options for advanced use.  To get a list of all
+available options, invoke configure.sh with --help
+
+  ./configure.sh --help
+
+configure.sh saves a copy of everything it does in "config.log".
+When sending in bug reports, always include a copy of "config.log".
+
+After a successful configure, the results are written into
+"config.cfg".  You can manually tune the parameters there, but it will
+be overwritten if you run configure again.
+
+Building
+--------
+
+Once you have configured successfully, run SCons
+
+  ./scons
+
+This will build all of the libraries and header files that are needed
+for Gale.  If you want to run a parallel build because your machine
+has two processors
+
+  ./scons -j 2
+
+The binary will be in
+
+  build/bin/Gale
+
+Testing
+-------
+
+There are a number of cookbook examples.  To run the yielding model type
+
+  bin/Gale input/cookbook/yielding.xml
+
+For some MPI implementations, you may have to speficy the complete
+path to the input file
+
+  bin/Gale /home/juser/gale/input/cookbook/yielding.xml
+
+If you find any bugs, please send a meesage to
+
+  cig-long@geodynamics.org

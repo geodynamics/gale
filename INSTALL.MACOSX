@@ -1,0 +1,37 @@
+Mac OS X
+--------
+
+We have not tested Gale with fink.  We recommend that you install the
+developer tools.  You must become a member of ADC in order to get them
+(it is free).
+
+  http://developer.apple.com/
+
+Once those are installed, you have to install petsc.  Petsc will
+download mpi for you.  So once you have gotten the petsc tarball from
+the website (3.0.0), unpack it and cd into the directory.  Configure
+it with
+
+  export PETSC_DIR=$PWD
+  config/configure.py --download-mpich=1 --with-external-packages-dir=/path/to/install/mpich
+  
+This may take a little while.  You can install it elsewhere by giving
+a different argument to --prefix.  When it is done, petsc will tell
+you to set PETSC_ARCH.  It will probably be something like
+
+  export PETSC_ARCH=darwin8.6.0-c-real-debug
+
+Then run
+
+  make all
+  make install
+
+to build and install petsc.
+
+To build Gale, cd into the Gale directory and run
+
+  configure.py --with-mpi-dir=/path/to/install/mpich/mpich2-1.0.3
+  make
+  make install
+
+and the binary will be in bin/Gale.
