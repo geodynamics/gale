@@ -1,0 +1,215 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{graphicx}
+\date{}
+\begin{document}
+
+\section{Memory}
+The memory module is design to aid development and debugging of programs in the StGermain framework by providing common allocation routines and recording statistical information on memory allocation. It allows the logical grouping of allocations by type and name, as well as records handy information such as the file, function and line number an allocation was made from.
+
+Although \texttt{malloc()} in standard C provides a good general interface in memory allocation, it is often too simplistic to be used in computational codes where a lot of allocations demand matricies, 3D arrays or other advanced array structures. It also lacks useful statistical information of the allocatinos which could be used when debugging or benchmarking code.
+
+The Memory module in StGermain extends the memory management interface in C to include these addtional features to help the development process. It introduces new allocation routines which can create 1D to 4D array structures. Allocations are also tagged with the data type being created, the memory space used, the location in code which it was called from, and optionally a name to associate with. These statistics can be summarised in a print out or searched and filtered to produce useful information when debugging a system.
+
+For performance, the statistics recording option of the Memory module can be switched off both at the run-time level or at compilation level to produce optimised programs without changing any source code.
+
+\subsection{Basic Array Allocation}
+Basic array allocations create array structures that allow the use of "[]" brackets to access its contents. They are the dynamic equivalent of statically decleared arrays in C.
+\begin{table}[h]
+  \begin{tabular}{|p{13.3cm}|}
+    \hline \multicolumn{1}{|c|}{\textbf{Function}} \\ \hline
+    \texttt{\textit{Type}* Memory\_Alloc( \textit{Type}, Name name )} \\ \hline
+    \texttt{\textit{Type}* Memory\_Alloc\_Array( \textit{Type}, Index arrayLength, Name name )} \\ \hline
+    \texttt{\textit{Type}** Memory\_Alloc\_2DArray( \textit{Type}, Index xLength, Index yLength, Name name )} \\ \hline
+    \texttt{\textit{Type}*** Memory\_Alloc\_3DArray( \textit{Type}, Index xLength, Index yLength, Index zLength, Name name )} \\ \hline
+    \texttt{\textit{Type}**** Memory\_Alloc\_4DArray( \textit{Type}, Index xLength, Index yLength, Index zLength, Index wLength, Name name )} \\ \hline
+    \texttt{\textit{Type}* Memory\_Alloc\_Unnamed( \textit{Type} )} \\ \hline
+    \texttt{\textit{Type}* Memory\_Alloc\_Array\_Unnamed( \textit{Type}, Index arrayLength )} \\ \hline
+    \texttt{\textit{Type}** Memory\_Alloc\_2DArray\_Unnamed( \textit{Type}, Index xLength, Index yLength )} \\ \hline
+    \texttt{\textit{Type}*** Memory\_Alloc\_3DArray\_Unnamed( \textit{Type}, Index xLength, Index yLength, Index zLength )} \\ \hline
+    \texttt{\textit{Type}**** Memory\_Alloc\_4DArray\_Unnamed( \textit{Type}, Index xLength, Index yLength, Index zLength, Index wLength )} \\ \hline
+  \end{tabular}
+\end{table}
+
+Allocation functions in the Memory module require a \texttt{\textit{Type}} to be specified as an argument. This can be any primitive data type, pointers, structs or typedefs. The allocation function will automatically cast the result into the appropriate data type to be used.
+
+\subsection{Complex Array Allocation}
+Complex arrays are multi-dimensional arrays designed to conserve memory space
+by allocating each length of a dimension to a custom value.
+
+For example, a 1000 by 1000 matrix can allocated as a 2D array. However in this
+particular calculation, only the first row uses the full 1000 items in the
+matrix whilst the others use only 10 items on average. If the number of items
+used in each row was known, then a conservative memory allocation can be
+created instead with a Complex 2D array where the number of items in each row
+are set to the number of items used. This reduces the memory usage of the code
+and allows it to become a more scalable program.
+
+\begin{table}[h]
+  \begin{tabular}{|p{13.3cm}|}
+    \hline \multicolumn{1}{|c|}{\textbf{2D Functions}} \\ \hline
+    \texttt{\textit{Type}** Memory\_Alloc\_2DComplex( \textit{Type}, Index xLength, Index* yLengths, Name name )} \\ \hline
+    \texttt{\textit{Type}** Memory\_Alloc\_2DComplex\_Unnamed( \textit{Type}, Index xLength, Index* yLengths )} \\ \hline
+  \end{tabular}
+\end{table}
+
+\begin{table}[h]
+  \begin{tabular}{|p{13.3cm}|}
+    \hline \multicolumn{1}{|c|}{\textbf{3D Functions}} \\ \hline
+    \texttt{Index** Memory\_Alloc\_3DSetup( Index xLength, Index* yLengths )} \\ \hline
+    \texttt{\textit{Type}*** Memory\_Alloc\_3DComplex( \textit{Type}, Index xLength, Index* yLengths, Index** zLengths, Name name )} \\ \hline
+    \texttt{\textit{Type}*** Memory\_Alloc\_3DComplex\_Unnamed( Index** setupPtr, \textit{Type}, Index xLength, Index* yLengths )} \\ \hline
+  \end{tabular}
+\end{table}
+
+StGermain includes complex allocations for 2D and 3D arrays. In the 3D case, the \texttt{Memory\_Alloc\_3DSetup()} function is used to create an indexing matrix used for both allocating the custom size of the array and as well as the iterating limits in loop statements.
+
+\subsection{Multi-dimensional Arrays in 1D Form}
+A performance increase can be achieved by allocating and accessing a multi-dimensional array within a 1D array. The overhead of memory pointer headers are also removed, so memory space usage is also more efficient.
+
+Accessing macros have been created to make using such arrays more convienent.
+\begin{table}[h]
+  \begin{tabular}{|p{13.3cm}|}
+    \hline \multicolumn{1}{|c|}{\textbf{Function}} \\ \hline
+    \texttt{\textit{Type}* Memory\_Alloc\_2DArrayAs1D( \textit{Type}, Index xLength, Index yLength, Name name )} \\ \hline
+    \texttt{\textit{Type}* Memory\_Alloc\_2DArrayAs1D\_Unnamed( \textit{Type}, Index xLength, Index yLength )} \\ \hline
+    \texttt{\textit{Type}* Memory\_Access2D( array2D, x, y, yLength )} \\ \hline
+  \end{tabular}
+\end{table}
+
+\begin{table}[h]
+  \begin{tabular}{|p{13.3cm}|}
+    \hline \multicolumn{1}{|c|}{\textbf{Function}} \\ \hline
+    \texttt{\textit{Type}* Memory\_Alloc\_3DArrayAs1D( \textit{Type}, Index xLength, Index yLength, Index zLength, Name name )} \\ \hline
+    \texttt{\textit{Type}* Memory\_Alloc\_3DArrayAs1D\_Unnamed( \textit{Type}, Index xLength, Index yLength, Index zLength )} \\ \hline
+    \texttt{\textit{Type}* Memory\_Access3D( array2D, x, y, z, yLength, zLength )} \\ \hline
+  \end{tabular}
+\end{table}
+
+\begin{table}[h]
+  \begin{tabular}{|p{13.3cm}|}
+    \hline \multicolumn{1}{|c|}{\textbf{Function}} \\ \hline
+    \texttt{\textit{Type}* Memory\_Alloc\_4DArrayAs1D( \textit{Type}, Index xLength, Index yLength, Index zLength, Index wLength, Name name )} \\ \hline
+    \texttt{\textit{Type}* Memory\_Alloc\_4DArrayAs1D\_Unnamed( \textit{Type}, Index xLength, Index yLength, Index zLength, Index wLength )} \\ \hline
+    \texttt{\textit{Type}* Memory\_Access4D( array2D, x, y, z, w, yLength, zLength, wLength )} \\ \hline
+  \end{tabular}
+\end{table}
+
+\subsection{Byte-wise Allocation}
+It is still possible to create allocations with a integer number of bytes. 
+The purpose of these functions are to maintain compatibility with the original 
+\texttt{malloc()} interface and still allow statistical recording of allocations.
+
+\begin{table}[h]
+  \begin{tabular}{|p{13.3cm}|}
+    \hline \multicolumn{1}{|c|}{\textbf{Function}} \\ \hline
+    \texttt{void* Memory\_Alloc\_Bytes( SizeT size, Type type, Name name )} \\ \hline
+    \texttt{void* Memory\_Alloc\_Bytes\_Unnamed( SizeT size, Type type )} \\ \hline
+    \texttt{void* Memory\_Alloc\_Array\_Bytes( SizeT size, Index arrayLength, Type type, Name name )} \\ \hline
+    \texttt{void* Memory\_Alloc\_Array\_Bytes\_Unnamed( SizeT size, Index arrayLength, Type type )} \\ \hline
+  \end{tabular}
+\end{table}
+
+\subsection{Memory Deallocation}
+All allocations made with the Memory module in StGermain should be 
+deallocated with \texttt{Memory\_Free()}.
+
+\begin{table}[h]
+  \begin{tabular}{|p{13.3cm}|}
+    \hline \multicolumn{1}{|c|}{\textbf{Function}} \\ \hline
+    \texttt{void Memory\_Free( void* ptr )} \\ \hline
+  \end{tabular}
+\end{table}
+
+This will free the memory used by the pointer and update the statistics 
+database if enabled.
+
+\subsection{Resizing Allocations}
+Wrappers have been written for the realloc function to allow easy size changes to alloctions dynamically. Note that these realloc wrappers still behave in the same way that the C \texttt{realloc()} function does. If a \texttt{NULL} is given as an argument to resize, a \texttt{malloc()} instead occurs and creates a new allocation. In such situations, \texttt{Name\_Invalid} is given as the default name for his allocation.
+
+\begin{table}[h]
+  \begin{tabular}{|p{13.3cm}|}
+    \hline \multicolumn{1}{|c|}{\textbf{Function}} \\ \hline
+    \texttt{\textit{Type}* Memory\_Realloc( void* ptr, SizeT newSize )} \\ \hline
+    \texttt{\textit{Type}* Memory\_Realloc\_Array( void* ptr, \textit{Type}, Index newLength )} \\ \hline
+    \texttt{\textit{Type}** Memory\_Realloc\_2DArray( void* ptr, \textit{Type}, Index newX, Index newY )} \\ \hline
+    \texttt{\textit{Type}*** Memory\_Realloc\_3DArray( void* ptr, \textit{Type}, Index newX, Index newY, Index newZ )} \\ \hline
+    \texttt{\textit{Type}* Memory\_Realloc\_2DArrayAs1D( void* ptr, \textit{Type}, Index oldX, Index oldY, Index newX, Index newY )} \\ \hline
+    \texttt{\textit{Type}* Memory\_Realloc\_3DArrayAs1D( void* ptr, \textit{Type}, Index oldX, Index oldY, Index oldZ, Index newX, Index newY, Index newZ )} \\ \hline
+  \end{tabular}
+\end{table}
+
+{\bf Notes}
+\begin{itemize}
+\item For 2D and 3D allocations, the integrity of the data in the pointer is only kept if the dimensions are made larger and not smaller.
+\item \texttt{Memory\_Realloc()} is used to resize single instances which is a rare operation to perform. This function is made to be compatible with the C interface and an Array allocation is perferred if possible.
+\end{itemize}
+
+\subsection{Enabling Statistic Recording}
+By default, statistical recording in the Memory module is {\bf disabled} so that no processing overhead is introduced. To enable statistical recording, you must change the configuration settings in StGermain. Re-configure StGermain to include the \texttt{\textbf{memory\_stats}} option. You may still use all of the module's allocation, reallocation and deallocation routines while the statistics recording is disabled.
+
+To avoid recompiling StGermain to switch between options, you may switch off statistics recording during run-time as well. Note that this implies that the \verb:memory_stats: options was used to configure StGermain.
+
+\subsection{Displaying Statistics}
+While the memory module is turned on, information such as the type of the allocation, size of data, length of array, file, function and line number is recored for each allocation call.
+
+\begin{table}[h]
+  \begin{tabular}{|p{13.3cm}|}
+    \hline \multicolumn{1}{|c|}{\textbf{Function}} \\ \hline
+    \texttt{void Memory\_Print()} \\ \hline
+    \texttt{void Memory\_Print\_Summary()} \\ \hline
+  \end{tabular}
+\end{table}
+
+These functions display a summary of the information in the database to the "Memory" Info stream in StGermain. \verb:Memory_Print_Summary(): will also print a record of each pointer allocated at level 2 printing.
+
+\subsection{Memory Leaks}
+Memory leaks are allocations which have been forgotten and do not get properly deallocated when the program finishes. In software development, memory leaks tend to return and haunt programmers in the form of bugs and exploits.
+
+\begin{table}[h]
+  \begin{tabular}{|p{13.3cm}|}
+    \hline \multicolumn{1}{|c|}{\textbf{Function}} \\ \hline
+    \texttt{void Memory\_Print\_Leak()} \\ \hline
+  \end{tabular}
+\end{table}
+
+This function is useful while debugging programs as it displays the number of known allocations in the system which has currently not been deallocated. Good programming practice would suggest software to be written without memory leaks to reduce the possibility of bugs in code.
+
+\subsection{Displaying Groups and Sub-groups}
+It is also possible to display summaries of types, names, files and functions.
+
+\begin{table}[h]
+  \begin{tabular}{|p{13.3cm}|}
+    \hline \multicolumn{1}{|c|}{\textbf{Function}} \\ \hline
+    \texttt{void Memory\_Print\_Type( \textit{Type} )} \\ \hline
+    \texttt{void Memory\_Print\_Type\_Name( \textit{Type}, Name name )} \\ \hline
+    \texttt{void Memory\_Print\_File( char* fileName )} \\ \hline
+    \texttt{void Memory\_Print\_File\_Function( char* fileName, char* funcName )} \\ \hline
+  \end{tabular}
+\end{table}
+
+These functions are useful for both debugging and measurement, to analyse the amount of resources used by code.
+
+\subsection{Displaying a Pointer}
+A handy function to use for debugging is \texttt{Memory\_Print\_Pointer()}.
+
+\begin{table}[h]
+  \begin{tabular}{|p{13.3cm}|}
+    \hline \multicolumn{1}{|c|}{\textbf{Function}} \\ \hline
+    \texttt{void Memory\_Print\_Pointer( void* ptr )} \\ \hline
+  \end{tabular}
+\end{table}
+
+Any currently allocated memory block created by the Memory module given to this function will give a print out of all details of this pointer. It is sometimes also possible to call this function from gdb, depending on your system, settings and current position in gdb.
+
+\subsection{Further Notes}
+\begin{itemize}
+\item The memory module only records infomation while it is \textbf{enabled}.
+\item All memory module functions should be called \textbf{after} \texttt{StGermain\_Init()} and \textbf{before} \texttt{StGermain\_Finalise()}.
+\item The module has been designed for development and debugging purposes. Where performance is an issue, it should be disabled.
+\item This module is {\bf NOT} thread safe. Future development may include thread safe capabilities through the use of semaphores.
+\item In general, give meaningful allocation names as oppose to using \texttt{Unnamed} allocations. Although this increases the length of code you'll write, the ability to catgorise the allocations you create will help you analyse your code in the future.
+\item Use the Unnamed allocations only for temporary objects that have little complexity. These are usually local function allocations where the scope of the object(s) exists only for that function. For example, a temporary char buffer used for string maniplation within a certain function.
+\item Replace all \texttt{malloc()} / \texttt{free()} calls in your code to use the Memory module equivalents. Remember that when the memory module is disabled, it will not have any performance impact to the allocations you create.
+\end{itemize}
+
+\end{document}

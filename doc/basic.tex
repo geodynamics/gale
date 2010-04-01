@@ -1,0 +1,76 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{graphicx}
+\date{}
+\begin{document}
+
+\section{Overview}
+\label{ov}
+\begin{description}
+\item [StGermain] Handles low level operations, e.g. memory managment.
+\item [StgFEM] Provides interfaces and implementations to finite element based
+  operations.
+\item [PICellerator] Provides routines for handling particle-based integration.
+  This includes such things as population control and parallel management.
+\item [Underworld] Primarily constituted by material rheologies for use with
+  the underlying components.
+\item [gLucifer] A visualisation utility providing parallel rendering, allowing
+  for visualisation of large data sets.
+\end{description}
+See \ref{com} for a more complete list of functionality.
+
+\subsection{StGermain}
+\label{ov:stgermain}
+StGermain provides a suite of components and utilities used as a foundation for
+the other higher level packages (e.g. StgFEM). The functionality provided by
+StGermain is suited primarily to high-performance scientific applications. This
+includes (but not limited to):
+\begin{itemize}
+\item memory management/profiling, 
+\item basic container classes (e.g. hash tables, binary trees), 
+\item XML input manipulation, 
+\item mesh representation and construction, 
+\item basic particle managment routines and
+\item low level parallelisation in interfaces.
+\end{itemize}
+
+\subsection{StgFEM}
+\label{ov:stgfem}
+StgFEM provides a set of routines more focused on finite element applications.
+\begin{itemize}
+\item element types (e.g. linear, bilinear, etc.)
+\item parallel equation number calculation, 
+\item linear algebra interfaces, 
+\item matrix and vector interfaces
+\item multigrid solvers, 
+\item a set of existing solvers (e.g. advection/diffusion, energy)
+\end{itemize}
+
+\subsection{PICellerator}
+\label{ov:pic}
+\begin{itemize}
+\item storage of material properties on particles, 
+\item population control (e.g. particle splitting and removal), 
+\item particle based integration routines
+\end{itemize}
+
+\subsection{Underworld}
+\label{ov:underworld}
+Going to chat to the guys at Monash for an accurate desciription of this one.
+
+\subsection{gLucifer}
+\label{ov:glu}
+Same as above; I don't really know what each part of gLucifer is for.
+
+\section{Coding Conventions}
+\label{cc}
+Describe the phases we use (construct, build, initialise, execute).
+
+Describe entry points, pulgins, components, objects.
+
+Detail the code layout, e.g. src and test directories
+
+The major components discussed thus far all 
+Describe the object oriented C style of coding. Include conventions like
+underbar prefix for private functions, etc.
+
+\end{document}
