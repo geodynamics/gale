@@ -216,10 +216,10 @@ void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
   const double h=spCtx->h;
   double S=tan(a_mean_old);
 
-  /* alpha_calculated=(alpha1+atan((2.*vT./W1.^2 - 2*K*ka*W1^(h*m-1)*S^n/(h*m+1))*dt)) */
+  /* alpha_calculated=(alpha1+atan((2.*vT./W1.^2 - 2*K*ka^m*W1^(h*m-1)*S^n/(h*m+1))*dt)) */
   double alpha_calculated=
     (a_mean_old+atan((2*vT/pow(W,2)
-                      - (2*K*ka*pow(W,(h*m-1))*pow(S,n))/(h*m+1))*DT));
+                      - (2*K*pow(ka,m)*pow(W,(h*m-1))*pow(S,n))/(h*m+1))*DT));
 
   /* At the end of this calculation, we need a variable called alpha_calculated (in radians): */
 				
