@@ -68,7 +68,7 @@ void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
 {
   double				dt;
   FeVariable *velocity;
-  double K = spCtx->K;
+  const double K = spCtx->K;
   Grid* grid;
   Mesh* mesh;
   unsigned nDims;
@@ -77,7 +77,7 @@ void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
   MPI_Comm comm;
   double DT = spCtx->DT;
   double first_t_erosion = spCtx->first_t_erosion;
-  double vT = spCtx->vT;
+  const double vT = spCtx->vT;
   IJK ijk_right;
   IJK ijk_left;
   Bool on_top, on_right, found;
@@ -210,10 +210,10 @@ void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
 				
   /* Insert equation here and calculate new slope: */
 
-  const double m=0.4; 
-  const double n=1; 
-  const double ka=4;
-  const double h=1.4; 
+  const double m=spCtx->m; 
+  const double n=spCtx->n; 
+  const double ka=spCtx->ka;
+  const double h=spCtx->h;
   double S=tan(a_mean_old);
 
   /* alpha_calculated=(alpha1+atan((2.*vT./W1.^2 - 2*K*ka*W1^(h*m-1)*S^n/(h*m+1))*dt)) */
@@ -356,6 +356,10 @@ void _Underworld_HRS_Erosion_AssignFromXML( void* component,
   spCtx->DT = Dictionary_GetDouble(spDict, "dt_erosion");
   spCtx->first_t_erosion = Dictionary_GetDouble(spDict, "first_t_erosion");
   spCtx->vT = Dictionary_GetDouble(spDict, "vT");
+  spCtx->m = Dictionary_GetDouble(spDict, "m");
+  spCtx->n = Dictionary_GetDouble(spDict, "n");
+  spCtx->ka = Dictionary_GetDouble(spDict, "ka");
+  spCtx->h = Dictionary_GetDouble(spDict, "h");
 }
 
 void _Underworld_HRS_Erosion_Build( void* codelet, void* data ) {

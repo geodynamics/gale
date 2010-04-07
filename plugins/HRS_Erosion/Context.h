@@ -32,6 +32,10 @@
 		double			DT;
 		double			first_t_erosion;
 		double			vT;
+		double			m;
+		double			n;
+		double			ka;
+		double			h;
                 FeVariable*             v;
 		AbstractContext*        ctx;
                 TimeIntegrator*         timeIntegrator;
