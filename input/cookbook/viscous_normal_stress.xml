@@ -204,6 +204,7 @@
       <param name="maxDeletions">3</param>
       <param name="maxSplits">3</param>
       <param name="MaterialPointsSwarm">materialSwarm</param>
+      <param name="Inflow">True</param>
     </struct>
     <struct name="localLayout">
       <param name="Type">MappedParticleLayout</param>
