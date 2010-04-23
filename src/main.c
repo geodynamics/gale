@@ -71,7 +71,7 @@ int main( int argc, char* argv[] ) {
 	MPI_Comm_size( CommWorld, &numProcessors );
 	MPI_Comm_rank( CommWorld, &rank );
 	StGermain_Init( &argc, &argv );
-	stream = Journal_Register( Info_Type, (Name)Underworld_Type );
+	stream = Journal_Register( DebugStream_Type, (Name)Underworld_Type );
 	#ifdef HAVE_PYTHON
 		Py_Initialize();
 	#endif	
