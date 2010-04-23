@@ -214,13 +214,13 @@ void Swarm_Register_SaveAllRegisteredSwarms( Swarm_Register* self, void* context
 	Index                     swarmsToDumpCount = 0;
 	SwarmDump*                swarmDumper;
 	Swarm*                    swarm;
-	Stream*                   info = Journal_Register( Info_Type, (Name)self->type );
+	Stream*                   debug = Journal_Register( DebugStream_Type, (Name)self->type );
 
 	if ( swarmCount == 0  ) {
 		return;
 	}	
 	
-	Journal_Printf( info, "In %s(): about to save the swarms to disk:\n", __func__ );
+	Journal_Printf( debug, "In %s(): about to save the swarms to disk:\n", __func__ );
 
 	swarmList = Memory_Alloc_Array_Unnamed( Swarm*, swarmCount ); 
 
@@ -232,11 +232,11 @@ void Swarm_Register_SaveAllRegisteredSwarms( Swarm_Register* self, void* context
 	}
 	
 	if ( swarmsToDumpCount == 0 ) {
-		Journal_Printf( info, "found 0 swarms that need to be checkpointed -> nothing to do\n",
+		Journal_Printf( debug, "found 0 swarms that need to be checkpointed -> nothing to do\n",
 			swarmsToDumpCount );
 	}
 	else {
-		Journal_Printf( info, "\t(found %u swarms that need to be checkpointed)\n",
+		Journal_Printf( debug, "\t(found %u swarms that need to be checkpointed)\n",
 			swarmsToDumpCount );
 
 		/* Create new SwarmDump object to check point the swarms
@@ -249,7 +249,7 @@ void Swarm_Register_SaveAllRegisteredSwarms( Swarm_Register* self, void* context
 	}
 
 	Memory_Free( swarmList );
-	Journal_Printf( info, "%s: saving of swarms completed.\n", __func__ );
+	Journal_Printf( debug, "%s: saving of swarms completed.\n", __func__ );
 }
 
 
