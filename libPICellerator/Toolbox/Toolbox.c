@@ -71,7 +71,7 @@ void PICellerator_Toolbox_Initialise( PluginsManager* pluginsManager, int* argc,
 void PICellerator_Toolbox_Finalise( PluginsManager* pluginsManager ) {
 	PICellerator_Finalise();
 	
-	Journal_RPrintf( Journal_Register( Info_Type, (Name)PICellerator_Toolbox_Type  ), "Finalised: PICellerator Toolbox.\n" );
+	Journal_RPrintf( Journal_Register( DebugStream_Type, (Name)PICellerator_Toolbox_Type  ), "Finalised: PICellerator Toolbox.\n" );
 }
 
 Index PICellerator_Toolbox_Register( PluginsManager* pluginsManager ) {
