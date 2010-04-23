@@ -237,7 +237,8 @@ The code was originally developed by the Victorian Partnership for Advanced
  Garrett Ito, 
 \color none
 Noah Fay, Neil de Laplante, Matthieu Quinquis, Patrice Rey, Lara O'Dwyer,
- Louise Kellogg, and Laetitia Le Pourhiet
+ Louise Kellogg, Laetitia Le Pourhiet, Leonardo Da Cruz, Jolante Van Wijk,
+ Tristan Salles, Mark Fleharty, Taichi Sato, and Lester Anderson
 \color inherit
  provided valuable user testing.
  The Gale team requests that in your oral presentations and in your papers
@@ -319,37 +320,14 @@ www.geodynamics.org/cig/workinggroups/long/workshops/2005/issues
 
 .
  At that workshop, members of the tectonics community advocated that CIG
- develop a new open-source software package based on the Arbitrary Lagrangian
- Eulerian (ALE) method for solving tectonic problems.
- The ALE method, as it is implemented in the tectonics community, was developed
- primarily at Dalhousie University in Canada.
- It solves a Stokes flow problem on an Eulerian grid and uses a Lagrangian
- grid to track material properties and to integrate strain.
- This method has seen a great deal of use in crustal and lithospheric deformatio
-n problems such as orogenesis, rifting, and subduction, as well as in coupling
- to surface erosion models, and has been employed for deeper mantle dynamics
- problems.
- Gale is an open-source code that we hope will be at least as useful as
- SOPALE and MicroFEM 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Fullsack"
-
-\end_inset
-
- for addressing these research areas
+ develop a new open-source software package for solving tectonic problems.
+ Existing private codes have seen a great deal of use in crustal and lithospheri
+c deformation problems such as orogenesis, rifting, and subduction.
+ They have also been coupled with surface erosion models, as well as being
+ employed for deeper mantle dynamics problems.
+ Gale is an open-source code that is intended to cover these research areas
 \color none
 , with the addition of 3D capability.
- In the future, Gale will run benchmarks such as extension and shortening,
- as well as the traditional subduction model as shown in Fig.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:General-subduction-model"
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Standard
@@ -380,91 +358,6 @@ key "Citcom"
 .
  Walter Landry of CIG and Luke Hodkinson of VPAC are the primary developers
  of the Gale-specific components.
- Roger Buck, Robert Bialas, and Gus Correa of Lamont-Doherty Earth Observatory,
- Columbia University, provided valuable user testing.
-\end_layout
-
-\begin_layout Standard
-\noindent
-\align center
-\begin_inset Float figure
-placement H
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:General-subduction-model"
-
-\end_inset
-
-General subduction model from 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Fullsack"
-
-\end_inset
-
-.
- The basic subduction model can be modified by introducing isostasy and/or
- boundary mass fluxes.
- (a) Flexural or local isostasy.
- Every Eulerian column is displaced by the corresponding local or flexural
- deflection 
-\emph on
-w
-\emph default
- of the base.
- (b) Mass fluxes crossing the boundaries may be: (1) the tectonic flux 
-\emph on
-t
-\emph default
-
-\begin_inset Formula $^{\text{+}}$
-\end_inset
-
- into the domain, due to tectonic convergence; (2) the deposition flux 
-\begin_inset Formula $\text{e}^{+}$
-\end_inset
-
- onto the domain, due to surface processes; (3) the deposition flux 
-\begin_inset Formula $\text{e}^{-}$
-\end_inset
-
- from the domain, due to surface processes; (4) the crustal subduction flux
- 
-\begin_inset Formula $\text{cs}^{-}$
-\end_inset
-
- from the domain, due to the entrainment of crustal material from the subducting
- plate.
- 
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\noindent
-\align center
-\begin_inset Graphics
-	filename images/GALE_image1.eps
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Chapter
@@ -3870,7 +3763,14 @@ reference "sub:Artificial-Compressibility"
 
 ).
  The magnitude of this structure is small, so you can ignore it for now.
- Later, in Section , you will remove it by adding a 
+ Later, in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Hydrostatic-Term"
+
+\end_inset
+
+, you will remove it by adding a 
 \family typewriter
 HydrostaticTerm
 \family default
@@ -4427,80 +4327,63 @@ and add the variables to the end of the file (just before
 
 \end_deeper
 \begin_layout Enumerate
-Finally, you must alter the way that Gale creates particles.
- The inflow boundary condition will naturally create a space devoid of particles.
- Gale then creates new particles to fill that void.
- Normally, Gale looks at nearby particles and replicates them.
- However, nearby material may have already changed a little from the boundary,
- so replicating them may not give the new particles the correct properties.
+Finally, when Gale knows that there is an inflow condition, it is more careful
+ when creating particles.
+ This slows down the code a little, so it is not enabled by default.
+ To enable this, modify the 
+\family typewriter
+PCDVC
+\family default
+ struct by adding the line
 \end_layout
 
 \begin_deeper
-\begin_layout Standard
-To fix that, create a thin layer next to the boundary where material is
- created anew.
- To do that, first create this shape
-\end_layout
-
 \begin_layout LyX-Code
-<struct name="leftBoundaryShape">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">Box</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="startX">minX</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="endX">0.1</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="startY">minY</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="endY">maxY</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="startZ">minZ</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="endZ">maxZ</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
+<param name="Inflow">True</param>
 \end_layout
 
 \begin_layout Standard
-and then instruct the particle splitting routine to use this shape by adding
- 
+after the lines
 \end_layout
 
 \begin_layout LyX-Code
-<param name="originalParticleShape">leftBoundaryShape</param>
-\end_layout
-
-\begin_layout Standard
-after
+<struct name="weights">
 \end_layout
 
 \begin_layout LyX-Code
-<struct name="splittingRoutine">
+  <param name="Type">PCDVC</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="Type">ReseedSplitting</param>
+  <param name="resolutionX">10</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="idealParticleCount">particlesPerCell</param>
+  <param name="resolutionY">10</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="resolutionZ">10</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="lowerT">0.6</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="upperT">25</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="maxDeletions">3</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="maxSplits">3</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="MaterialPointsSwarm">materialSwarm</param>
 \end_layout
 
 \end_deeper
@@ -4559,272 +4442,6 @@ name "fig:Strain-inflow"
 \end_inset
 
 Strain rate invariant and velocities with inflow/outflow boundaries
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-Viscous Material with Inflow/Outflow and Fixed Internal
-\begin_inset Newline newline
-\end_inset
-
- Degrees of Freedom
-\end_layout
-
-\begin_layout Standard
-Some problems do not lend themselves to simple, rectangular domains.
- In these cases, it may be convenient to have the simulation cover a regular
- domain but then fix some internal degrees of freedom.
- This example modifies the inflow/outflow example in Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Viscous-In-Outflow"
-
-\end_inset
-
- to force the flow to be straight in from the side as in Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Inflow/Outflow-Boundary-with"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-\noindent
-\align center
-\begin_inset Float figure
-placement H
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/inflow_fixed.eps
-	width 80col%
-
-\end_inset
-
-
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Inflow/Outflow-Boundary-with"
-
-\end_inset
-
-Inflow/Outflow Boundary with Fixed Internal Degrees of Freedom
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This could be the first step in constructing a pipe that injects flow into
- the bulk material.
- To finish the pipe, you need to create a region around the inflow, perhaps
- of a different material, that has zero velocity.
- In this example, we will only do this first step.
- Creating the entire pipe is left as an exercise to the reader.
-\end_layout
-
-\begin_layout Enumerate
-Copy 
-\family typewriter
-my_viscous_inflow.xml
-\family default
- to 
-\family typewriter
-my_viscous_fixed.xml
-\family default
-.
-\end_layout
-
-\begin_layout Enumerate
-Create a shape for the fixed region
-\end_layout
-
-\begin_deeper
-\begin_layout LyX-Code
-<struct name="fixedShape">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">Box</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="startX">minX</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="endX">0.5</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="startY">StepFunctionProduct3Start</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="endY">StepFunctionProduct3End</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="startZ">minZ</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="endZ">maxZ</param> 
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\end_deeper
-\begin_layout Enumerate
-Add a ShapeVC to the list of velocity conditions
-\end_layout
-
-\begin_deeper
-\begin_layout LyX-Code
-<struct>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="type">ShapeVC</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Shape">fixedShape</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <list name="variables">
-\end_layout
-
-\begin_layout LyX-Code
-    <struct>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="name">vx</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="type">double</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="value">StepFunctionProduct3Value</param>
-\end_layout
-
-\begin_layout LyX-Code
-    </struct>
-\end_layout
-
-\begin_layout LyX-Code
-    <struct>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="name">vy</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="type">double</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="value">0.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-    </struct>
-\end_layout
-
-\begin_layout LyX-Code
-  </list>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\end_deeper
-\begin_layout Standard
-A worked example is in 
-\family typewriter
-input/cookbook/viscous_fixed.xml
-\family default
-.
- Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Strain-fixed"
-
-\end_inset
-
- shows the strain rate invariant and velocity (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Visualization-with-ParaView"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Standard
-\noindent
-\align center
-\begin_inset Float figure
-placement H
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/Paraview_viscous_fixed.png
-	width 100col%
-
-\end_inset
-
-
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Strain-fixed"
-
-\end_inset
-
-Strain rate invariant and velocities with inflow/outflow and fixed internal
- degrees of freedom
 \end_layout
 
 \end_inset
@@ -4999,71 +4616,67 @@ the line
 
 \end_deeper
 \begin_layout Enumerate
-For the inflow/outflow boundary, you also need to create a boundary shape
- where particles are created anew.
- So add a bottom boundary shape component
+As in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Viscous-In-Outflow"
+
+\end_inset
+
+, for an inflow condition, you need to modify the 
+\family typewriter
+PCDVC
+\family default
+ struct by adding the line
 \end_layout
 
 \begin_deeper
 \begin_layout LyX-Code
-<struct name="bottomBoundaryShape">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">Box</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="startX">minX</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="endX">maxX</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="startY">minY</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="endY">0.05</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="startZ">minZ</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="endZ">maxZ</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
+<param name="Inflow">True</param>
 \end_layout
 
 \begin_layout Standard
-and then instruct the particle splitting routine to use this shape by adding
- 
+after the lines
 \end_layout
 
 \begin_layout LyX-Code
-<param name="originalParticleShape">bottomBoundaryShape</param>
-\end_layout
-
-\begin_layout Standard
-after
+<struct name="weights">
 \end_layout
 
 \begin_layout LyX-Code
-<struct name="splittingRoutine">
+  <param name="Type">PCDVC</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="Type">ReseedSplitting</param>
+  <param name="resolutionX">10</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="idealParticleCount">particlesPerCell</param>
+  <param name="resolutionY">10</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="resolutionZ">10</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="lowerT">0.6</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="upperT">25</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="maxDeletions">3</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="maxSplits">3</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="MaterialPointsSwarm">materialSwarm</param>
 \end_layout
 
 \end_deeper
