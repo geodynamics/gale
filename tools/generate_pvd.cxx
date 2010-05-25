@@ -11,13 +11,25 @@
 
    Usage: generate_pvd NAME TYPE START END STEP
 
-   This will output two files, fields.pvd and particles.pvd.  Put them
-   in the same directory as the other fields and particle files.  In
-   paraview, open the pvd files.  You will be able use the movie
-   controls (play, pause, step forward/backward, jump to
-   beginning/end) to examine the time series.
+   NAME will, in general, be either 'fields' or
+   'picIntegrationPoints'.  If you create and output other swarms,
+   then use those names.
 
-**  Copyright (C) 2009, California Institute of Technology
+   TYPE is either 's' for structured (e.g. fields) or 'u' for
+   unstructured (e.g. picIntegrationPoints'.
+
+   For example
+
+     generate_pvd fields s 0 100 10
+
+   will generate fields.pvd.  That file starts at t=0 and includes
+   every 10'th step up to and including 100.  Put the pvd file in the
+   same directory as your other output files.  Open it with Paraview,
+   and you should be able to use the movie controls (play, pause, step
+   forward/backward, jump to beginning/end) to examine the time
+   series.
+
+**  Copyright (C) 2009, 2010, California Institute of Technology
 
 **  This software is free software; you can redistribute it and/or
 **  modify it under the terms of the GNU General Public License as
