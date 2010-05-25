@@ -416,6 +416,7 @@
       <param name="boundaryFrictionCoefficientAfterSoftening">0.34432761329</param>
       <param name="boundaryBottom">True</param>
       <param name="boundaryRight">True</param>
+      <param name="minimumViscosity">minimumViscosity</param>
     </struct>
     <struct name="sandViscosity">
       <param name="Type">MaterialViscosity</param>
@@ -452,6 +453,7 @@
       <param name="boundaryFrictionCoefficientAfterSoftening">0.34432761329</param>
       <param name="boundaryBottom">True</param>
       <param name="boundaryRight">True</param>
+      <param name="minimumViscosity">minimumViscosity</param>
     </struct>
     <struct name="beadsViscosity">
       <param name="Type">MaterialViscosity</param>
@@ -657,6 +659,7 @@
 
   <param name="linearTolerance">1.0e-7</param>
   <param name="nonLinearTolerance">1.0e-3</param>
+  <param name="minimumViscosity">5e-8</param>
 
   <!-- <param name="journal.info">True</param> -->
   <!-- <param name="journal.debug">True</param> -->

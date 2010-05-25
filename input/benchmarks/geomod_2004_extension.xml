@@ -402,6 +402,7 @@
       <param name="cohesionAfterSoftening">0.1</param>
       <param name="frictionCoefficient">0.726542528005</param>
       <param name="frictionCoefficientAfterSoftening">0.600860619027</param>
+      <param name="minimumViscosity">minimumViscosity</param>
     </struct>
     <struct name="pdmsViscosity">
       <param name="Type">MaterialViscosity</param>
@@ -587,4 +588,5 @@
   <param name="journal.debug">True</param>
   <param name="journal-level.info">2</param>
   <param name="journal-level.debug">2</param>
+  <param name="minimumViscosity">5e-8</param>
 </StGermainData>
