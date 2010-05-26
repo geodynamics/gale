@@ -1862,7 +1862,7 @@ MPI
 \end_layout
 
 \begin_layout Itemize
-PETSc 2.3.2 (not 2.3.3!)
+PETSc 3.0 (not 3.1!)
 \end_layout
 
 \begin_layout Itemize
@@ -1912,41 +1912,173 @@ Source Code Repository (Experts Only)
 Advanced users and software developers may be interested in downloading
  the latest Gale source code directly from the CIG source code repository,
  instead of using the prepared source package.
- To check whether you have a subversion client installed on your machine,
+ To check whether you have a Mercurial client installed on your machine,
  type:
 \end_layout
 
 \begin_layout LyX-Code
-svn
+hg
 \end_layout
 
 \begin_layout Standard
-You should get a response that looks something like this:
+You should get a help message that starts with:
 \end_layout
 
 \begin_layout LyX-Code
-Type `svn help' for usage.
+Mercurial Distributed SCM
+\end_layout
+
+\begin_layout LyX-Code
+...
 \end_layout
 
 \begin_layout Standard
-Otherwise, you will need to download and install a Subversion client, available
- at the Subversion Website 
+Otherwise, you will need to download and install a Mercurial client, available
+ at the Mercurial Website 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
-subversion.tigris.org/project_packages.html
+mercurial.selenic.com
 \end_layout
 
 \end_inset
 
 .
- Then the code can be checked out with the following command: 
+ Then the code can be checked out with the following commands: 
 \end_layout
 
 \begin_layout LyX-Code
-svn checkout http://geodynamics.org/svn/cig/long/3D/Gale/trunk Gale
+hg clone http://geodynamics.org/hg/long/3D/gale gale
+\end_layout
+
+\begin_layout LyX-Code
+hg clone http://geodynamics.org/hg/long/3D/gale/PICellerator gale/PICellerator
+\end_layout
+
+\begin_layout LyX-Code
+hg clone http://geodynamics.org/hg/long/3D/gale/StGermain gale/StGermain
+\end_layout
+
+\begin_layout LyX-Code
+hg clone http://geodynamics.org/hg/long/3D/gale/StgDomain gale/StgDomain
+\end_layout
+
+\begin_layout LyX-Code
+hg clone http://geodynamics.org/hg/long/3D/gale/StgFEM gale/StgFEM 
+\end_layout
+
+\begin_layout LyX-Code
+hg clone http://geodynamics.org/hg/long/3D/gale/Underworld gale/Underworld
+\end_layout
+
+\begin_layout LyX-Code
+hg clone http://geodynamics.org/hg/long/3D/gale/config gale/config
+\end_layout
+
+\begin_layout LyX-Code
+hg clone http://geodynamics.org/hg/long/3D/gale/gLucifer gale/gLucifer
+\end_layout
+
+\begin_layout Standard
+You can then update your checkout with the commands
+\end_layout
+
+\begin_layout LyX-Code
+cd gale
+\end_layout
+
+\begin_layout LyX-Code
+hg pull
+\end_layout
+
+\begin_layout LyX-Code
+hg up
+\end_layout
+
+\begin_layout LyX-Code
+cd PICellerator
+\end_layout
+
+\begin_layout LyX-Code
+hg pull
+\end_layout
+
+\begin_layout LyX-Code
+hg up
+\end_layout
+
+\begin_layout LyX-Code
+cd ../StGermain
+\end_layout
+
+\begin_layout LyX-Code
+hg pull
+\end_layout
+
+\begin_layout LyX-Code
+hg up
+\end_layout
+
+\begin_layout LyX-Code
+cd ../StgDomain
+\end_layout
+
+\begin_layout LyX-Code
+hg pull
+\end_layout
+
+\begin_layout LyX-Code
+hg up
+\end_layout
+
+\begin_layout LyX-Code
+cd ../StgFEM
+\end_layout
+
+\begin_layout LyX-Code
+hg pull
+\end_layout
+
+\begin_layout LyX-Code
+hg up
+\end_layout
+
+\begin_layout LyX-Code
+cd ../Underworld
+\end_layout
+
+\begin_layout LyX-Code
+hg pull
+\end_layout
+
+\begin_layout LyX-Code
+hg up
+\end_layout
+
+\begin_layout LyX-Code
+cd ../config
+\end_layout
+
+\begin_layout LyX-Code
+hg pull
+\end_layout
+
+\begin_layout LyX-Code
+hg up
+\end_layout
+
+\begin_layout LyX-Code
+cd ../gLucifer
+\end_layout
+
+\begin_layout LyX-Code
+hg pull
+\end_layout
+
+\begin_layout LyX-Code
+hg up 
 \end_layout
 
 \begin_layout LyX-Code
@@ -2027,7 +2159,7 @@ If you downloaded binaries for your platform, you can run the Gale executable
 \end_layout
 
 \begin_layout LyX-Code
-./Gale_1_4_1  input/cookbook/yielding.xml
+./Gale_1_5_0 input/cookbook/yielding.xml
 \end_layout
 
 \begin_layout Standard
@@ -2051,27 +2183,27 @@ TimeStep = 3, Time = 0.0321333
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 4, Time = 0.0427394
+TimeStep = 4, Time = 0.0427393
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 5, Time = 0.0532924
+TimeStep = 5, Time = 0.0532923
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 6, Time = 0.0637926
+TimeStep = 6, Time = 0.0637925
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 7, Time = 0.0742401
+TimeStep = 7, Time = 0.0742399
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 8, Time = 0.0846354
+TimeStep = 8, Time = 0.0846353
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 9, Time = 0.0949795
+TimeStep = 9, Time = 0.0949793
 \end_layout
 
 \begin_layout Standard
@@ -2083,70 +2215,21 @@ output
 \end_layout
 
 \begin_layout Standard
-If you do not specify an input file, you will get an error like
+If you do not specify an input file, you will get no output.
+ If Gale cannot find the file, you will get an error:
 \end_layout
 
 \begin_layout LyX-Code
 
 \size small
-Error in _AbstractContext_New: The dictionary is empty, meaning no input
- parameters have been fed
-\end_layout
-
-\begin_layout LyX-Code
-
-\size small
-into your program.
- Perhaps you have forgotten to pass any input files ( or command-line arguments
- ) in.
-\end_layout
-
-\begin_layout LyX-Code
-
-\size small
-Gale: build/StGermain/Base/IO/src/Journal.c:603: Journal_Firewall: Assertion
- `expression' failed.
-\end_layout
-
-\begin_layout LyX-Code
-
-\size small
-p0_27845:  p4_error: interrupt SIGx: 6 
-\end_layout
-
-\begin_layout LyX-Code
-
-\end_layout
-
-\begin_layout Standard
-If Gale cannot find the file, you will get a different error:
-\end_layout
-
-\begin_layout LyX-Code
-
-\size small
-Error: File input/cookbook/yielding.xml doesn't exist, not readable, or not
- valid.
-\end_layout
-
-\begin_layout LyX-Code
-
-\size small
-Gale: build/StGermain/Base/IO/src/Journal.c:603: Journal_Firewall: Assertion
- `expression' failed.
-\end_layout
-
-\begin_layout LyX-Code
-
-\size small
-p0_16810:  p4_error: interrupt SIGx: 6
+Error: File input/cookbook/foo.xml doesn't exist, not readable, or not valid.
 \end_layout
 
 \begin_layout Standard
 Due to quirks in some implementations of MPI, you may have to specify the
  complete path to the input file (e.g., 
 \family typewriter
-./Gale_1_4_1 /home/juser/gale/input/cookbook/yielding.xml
+./Gale_1_5_0 /home/juser/gale/input/cookbook/yielding.xml
 \family default
 ).
 \end_layout
@@ -2240,7 +2323,7 @@ One solution is to use a direct solver instead of GMRES.
 \end_layout
 
 \begin_layout LyX-Code
-./Gale_1_4_1  input/cookbook/yielding.xml -pc_type lu -ksp_type preonly
+./Gale_1_5_0  input/cookbook/yielding.xml -pc_type lu -ksp_type preonly
 \end_layout
 
 \begin_layout Standard
@@ -2270,8 +2353,35 @@ Once that is done, enabling it is again just appending a few arguments to
 \end_layout
 
 \begin_layout LyX-Code
-./Gale_1_4_1  input/cookbook/yielding.xml -mat_type aijmumps -ksp_type pre
- only -pc_type lu
+./Gale_1_5_0  input/cookbook/yielding.xml -pc_factor_mat_solver_package mumps
+ 
+\backslash
+
+\end_layout
+
+\begin_layout LyX-Code
+-ksp_type preonly -pc_type lu -mat_mumps_icntl_14 100
+\end_layout
+
+\begin_layout Standard
+Note that this is different from previous versions of Gale.
+ Petsc changed the syntax for calling Mumps solvers.
+ Also, Mumps changed the default amount of memory it allocates.
+ This is not an issue for small simulations, but larger simulations can
+ easily run out of memory.
+ The option 
+\begin_inset Quotes sld
+\end_inset
+
+
+\family typewriter
+-mat_mumps_icntl_14 100
+\family default
+
+\begin_inset Quotes sld
+\end_inset
+
+ tells Mumps to allocate more memory.
 \end_layout
 
 \begin_layout Subsection
@@ -2286,7 +2396,7 @@ You can also change the default values of the input file without modifying
 \end_layout
 
 \begin_layout LyX-Code
-./Gale_1_4_1  input/cookbook/yielding.xml --maxTimeSteps=20
+./Gale_1_5_0  input/cookbook/yielding.xml --maxTimeSteps=20
 \end_layout
 
 \begin_layout Standard
@@ -2297,7 +2407,7 @@ You can append any number of modified parameters in one unbroken line (here
 \begin_layout LyX-Code
 
 \size small
-./Gale_1_4_1  input/cookbook/yielding.xml --maxTimeSteps=20 --dim=3 --elementResI=
+./Gale_1_5_0  input/cookbook/yielding.xml --maxTimeSteps=20 --dim=3 --elementResI=
 64 
 \begin_inset Newline newline
 \end_inset
@@ -2469,6 +2579,13 @@ tools/
  material.
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
 Visualization with ParaView
 \begin_inset CommandInset label
@@ -2494,7 +2611,7 @@ input/cookbook/yielding.xml
 \begin_layout Enumerate
 
 \color none
-Start Paraview and open new data: 
+Start Paraview and open a new data file: 
 \family sans
 File
 \family default
@@ -2881,7 +2998,7 @@ Now you can look at the particles.
  Starting over, open 
 \family typewriter
 \color none
-particles.00009.pvtu
+picIntegrationPoints.00009.pvtu
 \family default
  and click on the green ``Apply'' button.
 \end_layout
@@ -2947,6 +3064,182 @@ status open
 \align center
 \begin_inset Graphics
 	filename images/Paraview_particles_yielding.png
+	lyxscale 50
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Now we will visualize a 3D simulation.
+ Run Gale with the input file 
+\family typewriter
+input/cookbook/viscous_extension3D.xml
+\family default
+ and open 
+\family typewriter
+fields.00009.ptvs
+\family default
+.
+ Paraview will display an outline of the 3D volume.
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename images/Paraview_3D_outline.png
+	lyxscale 50
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Click on the button near the top center labeled 
+\begin_inset Quotes sld
+\end_inset
+
+Outline
+\begin_inset Quotes srd
+\end_inset
+
+ and change it to 
+\begin_inset Quotes sld
+\end_inset
+
+Surface
+\begin_inset Quotes srd
+\end_inset
+
+.
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename images/Paraview_3D_surface_button.png
+	lyxscale 50
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Next click on the button near the top left labeled 
+\begin_inset Quotes sld
+\end_inset
+
+Solid Color
+\begin_inset Quotes srd
+\end_inset
+
+ and change it to 
+\begin_inset Quotes sld
+\end_inset
+
+StrainRateInvariantField
+\begin_inset Quotes srd
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename images/Paraview_3D_color_button.png
+	lyxscale 50
+	scale 50
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+You can now rotate it by clicking and holding with button 1 on your mouse.
+ You can zoom in and out by clicking and holding button 2, and translate
+ by clicking and holding button 3.
+\end_layout
+
+\begin_deeper
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename images/Paraview_3D_rotate.png
 	lyxscale 50
 	scale 50
 
