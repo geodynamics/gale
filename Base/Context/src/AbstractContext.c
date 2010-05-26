@@ -872,8 +872,8 @@ void _AbstractContext_Step( void* _context, double dt ) {
 
         enabled=Stream_IsEnable(self->info);
         Stream_Enable(self->info,True);
-	Journal_RPrintf( self->info, "TimeStep = %d, Start time = %.6g + %.6g prev timeStep dt\n",
-		self->timeStep, self->currentTime, dt );
+	Journal_RPrintf( self->info, "TimeStep = %d, Time = %.6g\n",
+		self->timeStep-1, self->currentTime, dt );
         Stream_Enable(self->info,enabled);
 
 	if (self->loadFromCheckPoint) {
