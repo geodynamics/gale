@@ -79,7 +79,8 @@ status open
 \begin_layout Plain Layout
 \noindent
 \begin_inset Graphics
-	filename gale_cover.pdf
+	filename gale_cover.png
+	lyxscale 30
 	width 75page%
 
 \end_inset
@@ -105,7 +106,7 @@ Walter Landry and Luke Hodkinson
 \begin_inset Newline newline
 \end_inset
 
-Version 1.4.1
+Version 1.5.0
 \end_layout
 
 \begin_layout Date
