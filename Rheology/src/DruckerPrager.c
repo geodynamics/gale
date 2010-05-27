@@ -77,7 +77,7 @@ DruckerPrager* DruckerPrager_New(
 	FeVariable*           pressureField,
 	SwarmVariable*        swarmPressure,
 	double                minimumYieldStress,
-	double                minimumViscosity,
+	double                maxStrainRate,
 	double                frictionCoefficient,
 	double                frictionCoefficientAfterSoftening,
         double                boundaryCohesion,
@@ -112,7 +112,7 @@ DruckerPrager* DruckerPrager_New(
                         boundaryFront,
                         boundaryBack,
                         minimumYieldStress,
-                        minimumViscosity,
+                        maxStrainRate,
                         hydrostaticTerm );
    self->isConstructed = True;
    return self;
@@ -150,7 +150,7 @@ void _DruckerPrager_Init(
                 Bool                      boundaryFront,
                 Bool                      boundaryBack,
                 double                    minimumYieldStress,
-                double                    minimumViscosity,
+                double                    maxStrainRate,
                 HydrostaticTerm*          hydrostaticTerm )
 {
 	DruckerPrager_Particle*   particleExt;
@@ -162,7 +162,7 @@ void _DruckerPrager_Init(
 	self->pressureField       = pressureField;
 	self->frictionCoefficient = frictionCoefficient;
 	self->minimumYieldStress  = minimumYieldStress;
-	self->minimumViscosity    = minimumViscosity;
+	self->maxStrainRate    = maxStrainRate;
 	self->swarmPressure       = swarmPressure;
 	
 	/* Strain softening of Cohesion and friction - (linear
@@ -181,7 +181,7 @@ void _DruckerPrager_Init(
         self->boundaryBack=boundaryBack;
 
 	self->minimumYieldStress = minimumYieldStress;
-	self->minimumViscosity = minimumViscosity;
+	self->maxStrainRate = maxStrainRate;
         self->hydrostaticTerm=hydrostaticTerm;
 
 	/* Update Drawing Parameters */
@@ -264,7 +264,7 @@ void _DruckerPrager_AssignFromXML( void* druckerPrager, Stg_ComponentFactory* cf
                         Stg_ComponentFactory_GetBool(  cf,  self->name, (Dictionary_Entry_Key)"boundaryFront", False ),
                         Stg_ComponentFactory_GetBool(  cf,  self->name, (Dictionary_Entry_Key)"boundaryBack", False ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minimumYieldStress", 0.0 ),
-			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minimumViscosity", 0.0),
+			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"maxStrainRate", 0.0),
                         Stg_ComponentFactory_ConstructByKey( cf, self->name, 
                                                              (Dictionary_Entry_Key)"HydrostaticTerm", HydrostaticTerm, False, data ) );
 }
@@ -351,7 +351,7 @@ double _DruckerPrager_GetYieldCriterion(
 	double                            frictionCoefficient;
 	double                            frictionCoefficientAfterSoftening;
 	double                            minimumYieldStress;
-	double                            minimumViscosity;
+	double                            maxStrainRate;
 	double                            effectiveCohesion;
 	double                            effectiveFrictionCoefficient;
 	double                            frictionalStrength;
@@ -371,7 +371,7 @@ double _DruckerPrager_GetYieldCriterion(
 	frictionCoefficient                = self->frictionCoefficient;
 	frictionCoefficientAfterSoftening  = self->frictionCoefficientAfterSoftening;
 	minimumYieldStress                 = self->minimumYieldStress;
-	minimumViscosity                   = self->minimumViscosity;
+	maxStrainRate                   = self->maxStrainRate;
 	
 	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 
@@ -481,18 +481,18 @@ void _DruckerPrager_HasYielded(
 		double                           yieldIndicator )
 {
    DruckerPrager* self = (DruckerPrager*)rheology;
-   double old_viscosity = ConstitutiveMatrix_GetIsotropicViscosity( constitutiveMatrix );
-   double viscosity = yieldCriterion/(2*self->strainRateSecondInvariant);
+   double strainRate=self->strainRateSecondInvariant;
+   double viscosity;
 
-   if(viscosity<self->minimumViscosity)
-     viscosity=self->minimumViscosity;
+   if(self->maxStrainRate>0 && strainRate>self->maxStrainRate)
+     strainRate=self->maxStrainRate;
+   viscosity = yieldCriterion/(2*strainRate);
 
    ConstitutiveMatrix_SetIsotropicViscosity( constitutiveMatrix, viscosity );
 
    if( constitutiveMatrix->sle && constitutiveMatrix->sle->nlFormJacobian ) {
-
+     double old_viscosity = ConstitutiveMatrix_GetIsotropicViscosity( constitutiveMatrix );
       constitutiveMatrix->derivs[8] += old_viscosity * self->curFrictionCoef / yieldIndicator;
-
    }
 
 }

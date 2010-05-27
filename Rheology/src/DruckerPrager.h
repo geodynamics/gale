@@ -71,7 +71,7 @@
       FeVariable*                                         pressureField;                         \
       SwarmVariable*                                      swarmPressure;                         \
       double                                              minimumYieldStress;                    \
-      double                                              minimumViscosity;                      \
+      double                                              maxStrainRate;                      \
       double                                              frictionCoefficient;                   \
       double                                              frictionCoefficientAfterSoftening;     \
 		double                                              boundaryCohesion;                              \
@@ -104,7 +104,7 @@
       FeVariable*           pressureField,
       SwarmVariable*        swarmPressure,
       double                minimumYieldStress,
-      double                minimumViscosity,
+      double                maxStrainRate,
       double                frictionCoefficient,
       double                frictionCoefficientAfterSoftening,
       double                                              boundaryCohesion,
@@ -158,7 +158,7 @@
                 Bool                      boundaryFront,
                 Bool                      boundaryBack,
                 double                    minimumYieldStress,
-                double                    minimumViscosity,
+                double                    maxStrainRate,
                 HydrostaticTerm*          hydrostaticTerm );
 
 
