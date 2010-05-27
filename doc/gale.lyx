@@ -2428,7 +2428,7 @@ When writing
  files in parallel (see Sections 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:.dat-ASCII-Files"
+reference "sec:Checkpoint Files"
 
 \end_inset
 
@@ -2513,11 +2513,8 @@ dumpEvery
 
 \begin_layout Standard
 then the VTK files will only be created every 25 time steps.
- Similarly, to change the frequency of creating the 
-\family typewriter
-.dat
-\family default
- files, you need to change the parameter 
+ Similarly, to change the frequency of checkpoints, you need to change the
+ parameter 
 \family typewriter
 checkpointEvery
 \family default
@@ -2571,13 +2568,13 @@ www.llnl.gov/visit
 \end_layout
 
 \begin_layout Standard
-Another option is to use the Matlab scripts in the 
+Another option is to use the scripts in the 
 \family typewriter
 tools/
 \family default
- directory.
- These scripts only work in 2D and only when running simulations with yielding
- material.
+ directory to convert the VTK files into CSV format.
+ Then the data can be easily manipulated with standard tools like Python
+ or Matlab.
 \end_layout
 
 \begin_layout Standard
@@ -2588,7 +2585,7 @@ tools/
 \end_layout
 
 \begin_layout Subsection
-Visualization with ParaView
+Basic Visualization with ParaView
 \begin_inset CommandInset label
 LatexCommand label
 name "sub:Visualization-with-ParaView"
@@ -2601,7 +2598,7 @@ name "sub:Visualization-with-ParaView"
 \begin_layout Standard
 
 \color none
-These instructions are for Paraview version 3.4.0.
+These instructions are for Paraview version 3.6.0.
  To visualize step 10 of 
 \family typewriter
 input/cookbook/yielding.xml
@@ -3256,141 +3253,161 @@ status open
 
 \end_deeper
 \begin_layout Subsection
-Visualization with Matlab or Octave
+Visualizing Movies with Paraview
 \end_layout
 
 \begin_layout Standard
-
-\color none
-Gale includes a number of Matlab visualization scripts in the 
+To create a movie, with Paraview, you need to create a special 
 \family typewriter
-tools/
+pvd
 \family default
- directory.
- The scripts also work with Octave, a free Matlab clone.
- However, they only work for 2D runs with yielding rheologies.
- To use these scripts, 
+ file that stitches all of the individual frames together.
+ You can do this with the utility 
+\family typewriter
+tools/generate_pvd
+\family default
+.
+ You generally invoke it as
 \end_layout
 
-\begin_layout Enumerate
-
-\color none
-Navigate into the 
-\family typewriter
-tools/
-\family default
- directory 
-\end_layout
-
-\begin_layout Enumerate
-
-\color none
-Modify 
-\family typewriter
-fname
-\family default
- in 
-\family typewriter
-PlotGaleOutput.m
-\family default
- to point to the output directory
-\end_layout
-
-\begin_layout Enumerate
-
-\color none
-Change 
-\family typewriter
-step
-\family default
- to the time step
-\end_layout
-
-\begin_layout Enumerate
-
-\color none
-Start Matlab or Octave and type
-\end_layout
-
-\begin_deeper
 \begin_layout LyX-Code
-PlotGaleOutput
+generate_pvd NAME TYPE START END STEP
 \end_layout
 
-\begin_layout Enumerate
-Using Octave to visualize the last step of 
+\begin_layout Standard
+where 
 \family typewriter
-input/cookbook/yielding.xml
+NAME
 \family default
- results in
-\end_layout
-
-\begin_deeper
-\begin_layout Standard
-\noindent
-\align center
-\begin_inset Graphics
-	filename images/Octave_fig1.png
-	lyxscale 75
-	scale 75
-
+ is usually either 
+\begin_inset Quotes sld
 \end_inset
 
-
-\begin_inset VSpace defskip
+fields
+\begin_inset Quotes srd
 \end_inset
 
-
-\begin_inset Graphics
-	filename images/Octave_fig2.png
-	lyxscale 75
-	scale 75
-
+ or 
+\begin_inset Quotes sld
 \end_inset
 
-
-\begin_inset Newpage newpage
+picIntegrationPoints
+\begin_inset Quotes srd
 \end_inset
 
-
-\end_layout
-
-\end_deeper
-\begin_layout Enumerate
-Using Matlab results in
-\end_layout
-
-\begin_deeper
-\begin_layout Standard
-\noindent
-\align center
-\begin_inset Graphics
-	filename images/Matlab_fig111.png
-	scale 75
-
-\end_inset
-
-
-\begin_inset VSpace defskip
-\end_inset
-
-
+, depending on whether you want to animate the fields or the particles.
+ If you create your own swarm of particles, then they will have their own
+ VTK files, and you would use that name with 
+\family typewriter
+generate_pvd
+\family default
+.
+ 
 \end_layout
 
 \begin_layout Standard
-\noindent
+
+\family typewriter
+TYPE
+\family default
+ is either '
+\family typewriter
+u
+\family default
+' for unstructured (particles), or '
+\family typewriter
+s
+\family default
+' for unstructured (fields).
+ START is the time of the first time step, END is the last step, and STEP
+ is the step size between successive frames.
+ So the command
+\end_layout
+
+\begin_layout LyX-Code
+generate_pvd picIntegrationPoints u 0 100 10
+\end_layout
+
+\begin_layout Standard
+will generate 
+\family typewriter
+picIntegrationPoints.pvd
+\family default
+.
+ That file starts at t=0 and includes every 10'th step up to and including
+ 100.
+ So to animate the post yielding strain in 
+\family typewriter
+input/viscous_extension3D.xml
+\family default
+, you would run, from the top directory,
+\end_layout
+
+\begin_layout LyX-Code
+generate_pvd fields t fields -s s 0 9
+\end_layout
+
+\begin_layout Standard
+Loading up 
+\family typewriter
+fields.pvd
+\family default
+ in Paraview gives you access to the movie buttons
+\end_layout
+
+\begin_layout Standard
 \align center
 \begin_inset Graphics
-	filename images/Matlab_fig112.png
-	width 75col%
+	filename images/Paraview_movie_controls.png
 
 \end_inset
 
 
 \end_layout
 
-\end_deeper
-\end_deeper
+\begin_layout Subsection
+Generating CSV files
+\end_layout
+
+\begin_layout Standard
+The script 
+\family typewriter
+tools/vtk2csv.py
+\family default
+ converts VTK files to a simple comma separated format.
+ To run it, you must have Paraview installed.
+ Included with the Paraview installation is a utility 
+\family typewriter
+pvpython
+\family default
+.
+ This is a version of Python set up to automatically have access to all
+ of the Paraview libraries.
+ It takes any number of VTK files on input and outputs corresponding CSV
+ files.
+ So to convert the file 
+\family typewriter
+fields.00009.pvts
+\family default
+ and all associated 
+\family typewriter
+vts
+\family default
+ files, you run it as
+\end_layout
+
+\begin_layout LyX-Code
+pvpython vtk2csk.py fields.00009.pvts
+\end_layout
+
+\begin_layout Standard
+and it will output 
+\family typewriter
+fields.00009.csv
+\family default
+.
+\end_layout
+
 \begin_layout Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -9427,7 +9444,7 @@ reference "sec:.vtk-Files-(Visualization)"
 checkPointEvery How often to write the .dat files (see Sections 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:.dat-ASCII-Files"
+reference "sec:Checkpoint Files"
 
 \end_inset
 
@@ -18229,7 +18246,7 @@ reference "sub:Variables"
  This will print out more information than you need about the components,
  the solvers, and the number of iterations.
  In addition, you can get even more information about the solvers from PETSc
- by appending the 
+ by appending 
 \begin_inset Quotes sld
 \end_inset
 
@@ -18256,9 +18273,8 @@ name "cha:Output-File-Format"
 \end_layout
 
 \begin_layout Standard
-Gale outputs four types of files.
- VTK files are recommended, as they are the most comprehensive and best
- maintained.
+Gale outputs two types of files: VTK files for data analysis and visualization,
+ and checkpointing files for restarting a run.
 \end_layout
 
 \begin_layout Section
@@ -18384,11 +18400,23 @@ The
 \family typewriter
 Underworld_VTKOutput
 \family default
- plugin is activated by adding the line
+ plugin is activated by adding the lines
 \end_layout
 
 \begin_layout LyX-Code
-    <param>Underworld_VTKOutput</param> 
+<struct>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">Underworld_VTKOutput</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Context">context</param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
 \end_layout
 
 \begin_layout Standard
@@ -18464,216 +18492,23 @@ particleStepping
 \begin_layout Section
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:.dat-ASCII-Files"
+name "sec:Checkpoint Files"
 
 \end_inset
 
 
 \family typewriter
-.dat
+Checkpoint
 \family default
- ASCII Files
+ Files: .h5 and .xmf
 \end_layout
 
 \begin_layout Standard
-The first type are ASCII files with 
-\family typewriter
-.dat
-\family default
- extensions.
- Inside each 
-\family typewriter
-.dat
-\family default
- file are several columns of data.
- For example, 
-\family typewriter
-PressureField.00001.dat
-\family default
- might have
-\end_layout
-
-\begin_layout LyX-Code
-
-\family typewriter
-0 0.0312539624080715 0.0109361134145122 0 -9.81467103200287
-\end_layout
-
-\begin_layout LyX-Code
-
-\family typewriter
-1 0.0937630718938361 0.0109356986189374 0 17.7373201951569
-\end_layout
-
-\begin_layout LyX-Code
-
-\family typewriter
-2 0.156270066350344 0.0109368543031399 0 -37.0281780188199
-\end_layout
-
-\begin_layout LyX-Code
-
-\family typewriter
-3 0.218780947570009 0.0109343376815161 0 45.6263762140766
-\end_layout
-
-\begin_layout LyX-Code
-
-\family typewriter
-4 0.28128858838265 0.010937987088561 0 -65.2132484518426 
-\end_layout
-
-\begin_layout LyX-Code
-...
-\end_layout
-
-\begin_layout Standard
-The first column (0,1,2,3, ...) is the node number, and the second, third,
- and fourth columns are the 
-\begin_inset Formula $x$
-\end_inset
-
-, 
-\begin_inset Formula $y$
-\end_inset
-
-, and 
-\begin_inset Formula $z$
-\end_inset
-
- coordinates (2D runs still have 
-\begin_inset Formula $z$
-\end_inset
-
- data that can be ignored).
- The last column(s) show the value.
- The five different types of variables and the order of components are
-\end_layout
-
-\begin_layout Description
-Scalar Value
-\end_layout
-
-\begin_layout Description
-Vector 2D: x y
-\begin_inset Newline newline
-\end_inset
-
-3D: x, y, z
-\end_layout
-
-\begin_layout Description
-Tensor 2D: xx, xy, yx, yy
-\begin_inset Newline newline
-\end_inset
-
-3D: xx, xy, xz, yx, yy, yz, zx, zy, zz
-\end_layout
-
-\begin_layout Description
-Symmetric
-\begin_inset space ~
-\end_inset
-
-Tensor 2D: xx, yy, xy
-\begin_inset Newline newline
-\end_inset
-
-3D: xx, yy, zz, xy, xz, yz
-\end_layout
-
-\begin_layout Description
-AntiSymmetric
-\begin_inset space ~
-\end_inset
-
-Tensor 2D: xx, xy, yx, yy
-\begin_inset Newline newline
-\end_inset
-
-3D: xx, xy, xz, yx, yy, yz, zx, zy, zz (note that xx, yy, and zz are identical
- to zero)
-\end_layout
-
-\begin_layout Standard
-The complete list of output files per time step with the default components
- (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Basic-Components"
-
-\end_inset
-
-) is
-\end_layout
-
-\begin_layout Description
-Scalar Pressure, StrainRateInvariant, VelocityMagnitude, VelocityGradientsInvari
-ant
-\end_layout
-
-\begin_layout Description
-Vector Velocity
-\end_layout
-
-\begin_layout Description
-Tensor VelocityGradients
-\end_layout
-
-\begin_layout Description
-Symmetric
-\begin_inset space ~
-\end_inset
-
-Tensor StrainRate
-\end_layout
-
-\begin_layout Description
-Antisymmetric
-\begin_inset space ~
-\end_inset
-
-Tensor Vorticity
-\end_layout
-
-\begin_layout Standard
-There will also be a timeInfo file, which records the start time and step
- size for that time step.
- So to get the time at the end of the step, you need to add the two numbers.
- The materialSwarm files are described in Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:.dat-Binary-Files"
-
-\end_inset
-
-.
- 
-\end_layout
-
-\begin_layout Section
-
-\family typewriter
-.dat
-\family default
- Binary Files 
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:.dat-Binary-Files"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-These are the 
-\family typewriter
-materialSwarm.*.dat
-\family default
- files.
- They are only useful for checkpointing (though checkpointing does not currently
- work) and have a machine-dependent format.
+These files are mostly useful for checkpointing.
+ They have the bare minimum needed to restart the run: velocity, pressure,
+ mesh, and particles.
+ If you want a derived quantity like strain rate, it is better to use the
+ VTK files.
 \end_layout
 
 \begin_layout Chapter
