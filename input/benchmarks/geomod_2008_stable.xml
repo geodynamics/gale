@@ -338,7 +338,6 @@
       <param name="PressureVector">solutionPressure</param>
       <param name="ForceVector">mom_force</param>
       <param name="ContinuityForceVector">cont_force</param>
-      <param name="killNonConvergent">false</param>
       <param name="nonLinearMaxIterations">nonLinearMaxIterations</param>
       <param name="nonLinearTolerance">nonLinearTolerance</param>
       <param name="makeConvergenceFile">false</param>
