@@ -31,8 +31,6 @@
 #  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 #  02110-1301 USA
 
-# Convert a serial vtk xml file to csv and delete the vtk file
-
 def decode(vtk_file):
     import xml.etree.ElementTree as ElementTree
     root = ElementTree.parse(vtk_file)
