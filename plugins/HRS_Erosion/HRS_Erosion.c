@@ -142,6 +142,8 @@ void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
   /* Get the coordinates on the left for where the height rises above
      the base height */
   base_height=DBL_MAX;
+  y_left=DBL_MAX;
+  x_left=DBL_MAX;
 
   if(on_top)
     {
@@ -194,6 +196,9 @@ void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
   x_left=temp;
   MPI_Allreduce( &y_left, &temp, 1, MPI_DOUBLE, MPI_MIN, comm );
   y_left=temp;
+  MPI_Allreduce( &base_height, &temp, 1, MPI_DOUBLE, MPI_MIN, comm );
+  base_height=temp;
+
 
   /* Leave if no one found the rise */
 
