@@ -53,6 +53,7 @@
 #include "ConstitutiveMatrix.h"
 
 #include <assert.h>
+#include <float.h>
 
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type NonNewtonian_Type = "NonNewtonian";
@@ -73,6 +74,7 @@ void _NonNewtonian_Init( NonNewtonian* self, FeVariable* strainRateInvField,
                          FeVariable* temperatureField,
                          double n,
                          double T_0,
+                         double T_melt,
                          double A,
                          double refStrainRate,
                          double minViscosity,
@@ -83,6 +85,7 @@ void _NonNewtonian_Init( NonNewtonian* self, FeVariable* strainRateInvField,
 
 	self->n = n;
 	self->T_0 = T_0;
+	self->T_melt = T_melt;
 	self->A = A;
 	self->refStrainRate = refStrainRate;
 	self->minViscosity = minViscosity;
@@ -176,6 +179,7 @@ void _NonNewtonian_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void
                         temperatureField,
 			Stg_ComponentFactory_GetDouble( cf, self->name, "n", 1.0 ), 
 			Stg_ComponentFactory_GetDouble( cf, self->name, "T_0", 1.0 ), 
+			Stg_ComponentFactory_GetDouble( cf, self->name, "T_melt", DBL_MAX ), 
 			Stg_ComponentFactory_GetDouble( cf, self->name, "A", 1.0 ), 
                         refStrainRate,
 			Stg_ComponentFactory_GetDouble( cf, self->name, "minViscosity", 0.0 ) ,
@@ -195,12 +199,13 @@ void _NonNewtonian_ModifyConstitutiveMatrix(
 	double                        minVis;
 	double                        maxVis;
 	double                        viscosity;
-	double                        n, T_0, A, T;
+	double                        n, T_0, T_melt, A, T;
 	Stream* errorStream = Journal_Register( Error_Type,
                                                 NonNewtonian_Type );
 
 	n = self->n;
         T_0=self->T_0;
+        T_melt=self->T_melt;
         A=self->A;
 	minVis = self->minViscosity;
 	maxVis = self->maxViscosity;
@@ -236,6 +241,10 @@ void _NonNewtonian_ModifyConstitutiveMatrix(
           {
             viscosity=minVis;
           }
+
+        if(T>T_melt)
+          viscosity=minVis;
+
 	ConstitutiveMatrix_SetIsotropicViscosity(constitutiveMatrix,viscosity);
 }
 

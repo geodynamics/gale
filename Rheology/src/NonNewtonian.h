@@ -60,6 +60,7 @@
 		FeVariable*                                         temperatureField;                      \
 		double                                              n;                           \
 		double                                              T_0;                           \
+		double                                              T_melt;                        \
 		double                                              A;                           \
        		double                                              refStrainRate;  \
        		double                                              minViscosity;  \
