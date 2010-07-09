@@ -87,6 +87,8 @@
 		double                                 initialDamageWavenumberCosK;           \
 		double                                 initialDamageFactor;               \
 		Stg_Shape*                             initialStrainShape;                \
+		Stg_Shape*                             strainLimitedShape;                \
+                double                                 strainLimit; \
 		long int                               randomSeed;
 				
 	struct StrainWeakening { __StrainWeakening };
@@ -106,7 +108,9 @@
 		double                                             initialDamageWavenumberCosK,
 		double                                             initialDamageFactor,
 		long int                                           randomSeed,
-		Stg_Shape*                                         initialStrainShape );
+		Stg_Shape*                                         initialStrainShape,
+		Stg_Shape*                                         strainLimitedShape,
+		double                                             strainLimit );
  
 	/** Private Constructor: This will accept all the virtual functions for this class as arguments. */
 	
@@ -138,7 +142,9 @@
 		double                                             initialDamageWavenumberCosK,
 		double                                             initialDamageFactor,
 		long int                                           randomSeed,
-		Stg_Shape*                                         initialStrainShape  );
+		Stg_Shape*                                         initialStrainShape,
+		Stg_Shape*                                         strainLimitedShape,
+		double                                             strainLimit  );
 	
 	/* 'Stg_Component' implementations */
 	void* _StrainWeakening_DefaultNew( Name name ) ;

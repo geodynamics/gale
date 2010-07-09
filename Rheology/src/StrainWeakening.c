@@ -77,7 +77,10 @@ StrainWeakening* StrainWeakening_New(
 		double                                             initialDamageWavenumberCosK,
 		double                                             initialDamageFactor,
 		long int                                           randomSeed,
-		Stg_Shape*                                         initialStrainShape )
+                Stg_Shape*                                         initialStrainShape,
+                Stg_Shape*                                         strainLimitedShape,
+                double                                             strainLimit
+                                     )
 {
    StrainWeakening* self = (StrainWeakening*) _StrainWeakening_DefaultNew( name );
 
@@ -95,7 +98,9 @@ StrainWeakening* StrainWeakening_New(
 	    initialDamageWavenumberCosK,
 	    initialDamageFactor,
 	    randomSeed,
-	    initialStrainShape );
+	    initialStrainShape,
+            strainLimitedShape,
+            strainLimit);
    self->isConstructed = True;
    return self;
 }
@@ -129,7 +134,9 @@ void _StrainWeakening_Init(
 		double                                             initialDamageWavenumberCosK,
 		double                                             initialDamageFactor,
 		long int                                           randomSeed,
-		Stg_Shape*                                         initialStrainShape )
+		Stg_Shape*                                         initialStrainShape,
+                Stg_Shape*                                         strainLimitedShape,
+		double                                             strainLimit )
 {
 	/* Assign Values */
 	self->swarm                    = swarm;
@@ -145,6 +152,8 @@ void _StrainWeakening_Init(
 	self->initialDamageFactor         = initialDamageFactor;
 	self->randomSeed                  = randomSeed;
 	self->initialStrainShape          = initialStrainShape;
+	self->strainLimitedShape          = strainLimitedShape;
+	self->strainLimit                 = strainLimit;
 	
 	/****** Setup Variables *****/
 
@@ -235,6 +244,8 @@ void _StrainWeakening_AssignFromXML( void* strainWeakening, Stg_ComponentFactory
 	double                  initialDamageFactor;
 	long int                randomSeed;
 	Stg_Shape*              initialStrainShape;
+	Stg_Shape*              strainLimitedShape;
+	double                  strainLimit;
 
 	/* Construct Parent */
 	_TimeIntegrand_AssignFromXML( self, cf, data );
@@ -256,6 +267,8 @@ void _StrainWeakening_AssignFromXML( void* strainWeakening, Stg_ComponentFactory
 	initialDamageFactor         = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"initialDamageFactor", 1.0 );
 	randomSeed                  = (long int ) Stg_ComponentFactory_GetInt( cf, self->name, (Dictionary_Entry_Key)"randomSeed", 0  );
 	initialStrainShape          = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"initialStrainShape", Stg_Shape, False, data  );
+	strainLimitedShape          = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"strainLimitedShape", Stg_Shape, False, data  );
+	strainLimit                 = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"strainLimit", 0.0 );
 
 	_StrainWeakening_Init(
 			self, 
@@ -271,7 +284,9 @@ void _StrainWeakening_AssignFromXML( void* strainWeakening, Stg_ComponentFactory
 			initialDamageWavenumberCosK, 
 			initialDamageFactor,
 			randomSeed,
-			initialStrainShape );
+			initialStrainShape,
+                        strainLimitedShape,
+                        strainLimit);
 }
 
 void _StrainWeakening_Build( void* strainWeakening, void* data ) {
@@ -283,6 +298,7 @@ void _StrainWeakening_Build( void* strainWeakening, void* data ) {
    Stg_Component_Build( self->postFailureWeakeningIncrement, data, False );
    Stg_Component_Build( self->postFailureWeakening, data, False );
    if( self->initialStrainShape ) Stg_Component_Build( self->initialStrainShape, data, False );
+   if( self->strainLimitedShape ) Stg_Component_Build( self->strainLimitedShape, data, False );
    Stg_Component_Build( self->swarm, data, False );
    /* The postFailureWeakening doesn't need to be built here because it has already been
     * built in the TimeIntegrand class
@@ -306,6 +322,7 @@ void _StrainWeakening_Destroy( void* _self, void* data ) {
    Stg_Component_Destroy( self->postFailureWeakeningIncrement, data, False );
    Stg_Component_Destroy( self->postFailureWeakening, data, False );
    if( self->initialStrainShape ) Stg_Component_Destroy( self->initialStrainShape, data, False );
+   if( self->strainLimitedShape ) Stg_Component_Destroy( self->strainLimitedShape, data, False );
    Stg_Component_Destroy( self->swarm, data, False );
 
    /* Destroy Parent */
@@ -338,6 +355,7 @@ void _StrainWeakening_Initialise( void* strainWeakening, void* data ) {
       Stg_Component_Initialise( self->postFailureWeakeningIncrement, data, False );
       Stg_Component_Initialise( self->postFailureWeakening, data, False );
       if( self->initialStrainShape ) Stg_Component_Initialise( self->initialStrainShape, data, False );
+      if( self->strainLimitedShape ) Stg_Component_Initialise( self->strainLimitedShape, data, False );
 
       /* Update variables */
       Variable_Update( positionVariable );
@@ -430,10 +448,20 @@ void _StrainWeakening_MakeValuesPositive( void* timeIntegrator, void* strainWeak
 
 	Variable_Update( self->variable );
 	
+
+
+
 	particleCount = self->variable->arraySize;
 	
 	for ( lParticle_I = 0 ; lParticle_I < particleCount ; lParticle_I++ ) {
 		value = Variable_GetPtrDouble( self->variable, lParticle_I );
+                if ( self->strainLimitedShape)
+                  {
+                    double* coord;
+                    coord = Variable_GetPtrDouble( self->swarm->particleCoordVariable->variable, lParticle_I );
+                    if ( Stg_Shape_IsCoordInside( self->strainLimitedShape, coord ))
+                      *value=self->strainLimit;
+                  }
 		if (*value < 0.0)
 			*value = 0.0;
 	}
@@ -454,8 +482,7 @@ double _StrainWeakening_CalcIncrementIsotropic(
 	double                         healingRate      = self->healingRate;
 	double                         viscosity        = ConstitutiveMatrix_GetIsotropicViscosity( constitutiveMatrix );
 	double 						   postFailureWeakening;
-	
-	
+
 	particleExt = ExtensionManager_Get( self->swarm->particleExtensionMgr, particle, self->particleExtHandle );
 	postFailureWeakening = particleExt->postFailureWeakening;
 	
