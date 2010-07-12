@@ -120,6 +120,7 @@ void _RadiogenicHeatingTerm_Build( void* forceTerm, void* data ) {
 	Dictionary_Entry_Value*              list;
 	Dictionary_Entry_Value*              entry;
 	Materials_Register*                  materials_Register = self->materials_Register;
+	Stream*                              errorStream = Journal_Register( Error_Type, (Name)self->type  );
 
 	_ForceTerm_Build( self, data );
 
@@ -132,8 +133,10 @@ void _RadiogenicHeatingTerm_Build( void* forceTerm, void* data ) {
 
 		/* Get List of Heating Elements from material's dictionary */
 		list = Dictionary_Get( material->dictionary, (Dictionary_Entry_Key)"heatingElements" );
+                Journal_Firewall(list!=NULL,errorStream,"Every material must have a heatingElements term.\nThe material '%s' does not have one.",
+                                 material->name);
   		heatingElementCount = Dictionary_Entry_Value_GetCount( list  );
-     	materialExt->heatingElementList = Memory_Alloc_Array( HeatingElement, heatingElementCount, "Heating Element" );
+                materialExt->heatingElementList = Memory_Alloc_Array( HeatingElement, heatingElementCount, "Heating Element" );
   		memset( materialExt->heatingElementList, 0, heatingElementCount * sizeof(HeatingElement) );
   		materialExt->heatingElementCount = heatingElementCount;
   	
