@@ -3483,7 +3483,7 @@ input/cookbook/template.xml
  There are two things in the template file, however, that might need modificatio
 n: the force of gravity, which by default is set to 1 (if you are using
  cgs, for example, the force of gravity must be changed to 980), and the
- normal velocities on all boundaries except the top, which are set to zero.
+ normal velocity on all boundaries except the top, which are set to zero.
  Beyond that, you only need to specify where to place materials.
 \end_layout
 
@@ -3961,7 +3961,7 @@ name "fig:Strain-viscous-extension"
 
 \end_inset
 
-Strain rate invariant and velocities of viscous material in extension
+Strain rate invariant and velocity of viscous material in extension
 \end_layout
 
 \end_inset
@@ -4260,7 +4260,7 @@ name "fig:Strain-complex"
 
 \end_inset
 
-Strain rate invariant and velocities with complex boundaries
+Strain rate invariant and velocity with complex boundaries
 \end_layout
 
 \end_inset
@@ -4294,8 +4294,8 @@ reference "fig:Inflow/Outflow-Boundary"
 
 .
  The current example is not intended to be geologically realistic in any
- sense, but is meant to illustrate the enormous flexibility we have in the
- development of complex boundary conditions.
+ sense, but is meant to illustrate the flexibility we have in the development
+ of complex boundary conditions.
 \end_layout
 
 \begin_layout Standard
@@ -4380,7 +4380,7 @@ wrapTop
 
 \end_deeper
 \begin_layout Enumerate
-Now specify the velocities on the boundaries using the 
+Now specify the velocity on the boundaries using the 
 \family typewriter
 StepFunctionProduct
 \family default
@@ -4663,7 +4663,7 @@ name "fig:Strain-inflow"
 
 \end_inset
 
-Strain rate invariant and velocities with inflow/outflow boundaries
+Strain rate invariant and velocity with inflow/outflow boundaries
 \end_layout
 
 \end_inset
@@ -5068,7 +5068,7 @@ name "fig:Strain-viscous-normal-stress"
 
 \end_inset
 
-Strain rate invariant and velocities of viscous material in extension with
+Strain rate invariant and velocity of viscous material in extension with
  a normal stress boundary
 \end_layout
 
@@ -5149,7 +5149,7 @@ name "fig:Strain-deformable-bottom"
 
 \end_inset
 
-Strain rate invariant and velocities of viscous material with a deformable
+Strain rate invariant and velocity of viscous material with a deformable
  bottom boundary
 \end_layout
 
@@ -5271,11 +5271,11 @@ SurfaceAdaptor
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="surfaceType">sine</param>
+  <param name="topSurfaceType">sine</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <list name="origin">
+  <list name="topOrigin">
 \end_layout
 
 \begin_layout LyX-Code
@@ -5287,11 +5287,11 @@ SurfaceAdaptor
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="amplitude">0.1</param>
+  <param name="topAmplitude">0.1</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="frequency">6.28318530718</param>
+  <param name="topFrequency">6.28318530718</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -5354,11 +5354,519 @@ name "fig:Strain-initial-deformed"
 
 \end_inset
 
-Strain rate invariant and velocities with initially deformed upper boundary
+Strain rate invariant and velocity with initially deformed upper boundary
 \end_layout
 
 \end_inset
 
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Viscous Material with Fixed, Deformed Bottom Boundary
+\end_layout
+
+\begin_layout Standard
+This example deforms the bottom boundary and keeps it fixed.
+ We will set the left half of the boundary to follow a circle, while the
+ right half will still be flat.
+ Then, the boundary condition for the velocity is set to move the material
+ in from the left and out through the bottom as in Figure .
+ This is meant to approximate one slab subducting under another.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/deformed_bottom.eps
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Geometry-deformed-bottom"
+
+\end_inset
+
+Geometry and boundary conditions for the fixed, deformed bottom boundary
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Copy 
+\family typewriter
+myviscous_inflow.xml
+\family default
+ to 
+\family typewriter
+myviscous_deformed_bottom.xml
+\end_layout
+
+\begin_layout Enumerate
+Add a 
+\family typewriter
+SurfaceAdaptor
+\family default
+ component for the bottom boundary:
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<struct name="surfaceAdaptor">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">SurfaceAdaptor</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="mesh">mesh-linear</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="sourceGenerator">linearMesh-generator</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="bottomSurfaceType">cylinder</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="bottomX0">SolidBodyRotationCentreX</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="bottomY0">SolidBodyRotationCentreY</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="bottomRadius">InnerRadiusCylinder</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="bottomMinX">CylinderMinX</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="bottomMaxX">CylinderMaxX</param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Replace the left boundary condition for the velocity
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<struct>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="type">WallVC</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="wall">left</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="variables">
+\end_layout
+
+\begin_layout LyX-Code
+    <struct>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="name">vx</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="type">func</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="value">StepFunctionProduct3</param>
+\end_layout
+
+\begin_layout LyX-Code
+    </struct>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout Standard
+with
+\end_layout
+
+\begin_layout LyX-Code
+<struct>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="type">WallVC</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="wall">left</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="variables">
+\end_layout
+
+\begin_layout LyX-Code
+    <struct>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="name">vx</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="type">func</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="value">Velocity_PartialRotationX</param>
+\end_layout
+
+\begin_layout LyX-Code
+    </struct>
+\end_layout
+
+\begin_layout LyX-Code
+    <struct>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="name">vy</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="type">func</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="value">Velocity_PartialRotationY</param>
+\end_layout
+
+\begin_layout LyX-Code
+    </struct>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Replace the bottom boundary condition
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<struct>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="type">WallVC</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="wall">bottom</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="variables">
+\end_layout
+
+\begin_layout LyX-Code
+    <struct>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="name">vy</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="type">func</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="value">StepFunctionProduct2</param>
+\end_layout
+
+\begin_layout LyX-Code
+    </struct>
+\end_layout
+
+\begin_layout LyX-Code
+    <struct>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="name">vx</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="type">func</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="value">StepFunctionProduct1</param>
+\end_layout
+
+\begin_layout LyX-Code
+    </struct>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout Standard
+with
+\end_layout
+
+\begin_layout LyX-Code
+<struct>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="type">WallVC</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="wall">bottom</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="variables">
+\end_layout
+
+\begin_layout LyX-Code
+    <struct>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="name">vx</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="type">func</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="value">Velocity_PartialRotationX</param>
+\end_layout
+
+\begin_layout LyX-Code
+    </struct>
+\end_layout
+
+\begin_layout LyX-Code
+    <struct>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="name">vy</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="type">func</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="value">Velocity_PartialRotationY</param>
+\end_layout
+
+\begin_layout LyX-Code
+    </struct>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Finally, replace the 
+\family typewriter
+StepFunction
+\family default
+ variables
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+  <param name="StepFunctionProduct3Start">0.1</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="StepFunctionProduct3End">0.2</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="StepFunctionProduct3Value">1</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="StepFunctionProduct1Start">0.9</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="StepFunctionProduct1End">1.1</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="StepFunctionProduct1Value">1.0</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="StepFunctionProduct2Start">0.9</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="StepFunctionProduct2End">1.1</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="StepFunctionProduct2Value">-1.0</param>
+\end_layout
+
+\begin_layout Standard
+with rotation variables
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="SolidBodyRotationOmega">-1</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="SolidBodyRotationCentreX">0</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="SolidBodyRotationCentreY">-3</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="InnerRadiusCylinder">3.15</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="CylinderMinX">0</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="CylinderMaxX">0.960468635615</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="RadiusCylinder">3.35</param>
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+A worked example is in input/cookbook/viscous_deformed_bottom.xml.
+ Figure shows the strain rate invariant and velocity.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/Paraview_deformed_bottom.png
+	lyxscale 75
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Strain-deformed-bottom"
+
+\end_inset
+
+Strain rate invariant and velocity for a deformed bottom boundary
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
 
 \end_layout
 
@@ -5892,7 +6400,7 @@ name "fig:Strain-multiple"
 
 \end_inset
 
-Strain rate invariant and velocities with multiple viscous materials
+Strain rate invariant and velocity with multiple viscous materials
 \end_layout
 
 \end_inset
@@ -6227,7 +6735,7 @@ name "fig:strain-yield"
 
 \end_inset
 
-Strain rate invariant and velocities of yielding material in extension
+Strain rate invariant and velocity of yielding material in extension
 \end_layout
 
 \end_inset
@@ -6993,7 +7501,7 @@ name "fig:Temperature-and-velocity"
 
 \end_inset
 
-Temperature and velocities for the thermal convection example
+Temperature and velocity for the thermal convection example
 \end_layout
 
 \end_inset
@@ -8535,16 +9043,6 @@ Note the critical line
 
 \begin_layout Standard
 that makes the top surface conform to the simulation.
- Other options (
-\family typewriter
-wrapBottom
-\family default
-, 
-\family typewriter
-wrapLeft
-\family default
-) are available, but untested.
- 
 \end_layout
 
 \begin_layout Standard
