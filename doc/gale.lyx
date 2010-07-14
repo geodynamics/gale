@@ -1,4 +1,4 @@
-#LyX 1.6.5 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.6 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -775,16 +775,11 @@ reference "eq:body force"
 
 \begin_layout Standard
 \begin_inset Formula \begin{equation}
-\frac{DT}{Dt}\equiv\frac{\partial T}{\partial t}+v\cdot\nabla T=\kappa\nabla^{2}T+Q,\label{eq:energy}\end{equation}
+\frac{\partial T}{\partial t}+v\cdot\nabla T=\kappa\nabla^{2}T+Q,\label{eq:energy}\end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\frac{D}{Dt}$
-\end_inset
-
- is the material time derivative (taken at a point moving with respect to
- the fluid), 
 \begin_inset Formula $T$
 \end_inset
 
@@ -1821,23 +1816,11 @@ Gale works on a variety of computational platforms and has been tested on
 \end_layout
 
 \begin_layout Itemize
-Mac OS X 10.4.6 (G4, G5, and Intel)
+Mac OS X 10.4.6 (Intel)
 \end_layout
 
 \begin_layout Itemize
-Windows 2000 and XP SP2
-\end_layout
-
-\begin_layout Itemize
-RedHat Fedora Core 5 (x86)
-\end_layout
-
-\begin_layout Itemize
-OpenSuse 10.0 (x86)
-\end_layout
-
-\begin_layout Itemize
-Gentoo (x86)
+Windows Vista
 \end_layout
 
 \begin_layout Itemize
@@ -1845,8 +1828,8 @@ Debian stable (x86 and AMD64), testing (x86 and AMD64), and unstable (x86)
 \end_layout
 
 \begin_layout Standard
-Gale has also been tested on clusters running Redhat 7.2 (x86) and RedHat
- Enterprise Linux 3 (EM64T).
+Gale has also been tested on clusters running RedHat Enterprise Linux 3
+ (EM64T).
 \end_layout
 
 \begin_layout Subsection
@@ -1874,7 +1857,8 @@ libxml2
 You must also have python 2.2.1 or greater installed.
  If you do not already have MPI, then in many cases PETSc can install a
  version for you.
- Installing PETSc also requires a Blas/Lapack implementation.
+ Installing PETSc also requires a Blas/Lapack implementation, which, again,
+ PETSc can install for you.
 \end_layout
 
 \begin_layout Subsection
@@ -2345,7 +2329,6 @@ In parallel, the analogous approach would be to use Mumps, a parallel direct
 \end_inset
 
  when configuring.
- The PETSc installation on TACC Lonestar has been installed with Mumps.
 \end_layout
 
 \begin_layout Standard
@@ -2393,7 +2376,7 @@ Command-Line Parameters
 You can also change the default values of the input file without modifying
  that file by appending arguments.
  For example, to change only the number of time steps from the default value
- 10 to value 20, use the following command
+ of 10 to 20, use the following command
 \end_layout
 
 \begin_layout LyX-Code
@@ -2414,63 +2397,6 @@ You can append any number of modified parameters in one unbroken line (here
 \end_inset
 
 --elementResJ=64 --elementResK=64 --particlesPerCell=60 --dumpEvery=10
-\end_layout
-
-\begin_layout Subsection
-Parallel Issues
-\end_layout
-
-\begin_layout Standard
-When writing 
-\family typewriter
-.dat
-\family default
- files in parallel (see Sections 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Checkpoint Files"
-
-\end_inset
-
- and 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:.dat-Binary-Files"
-
-\end_inset
-
-), all of the processors have to cooperate.
- This is because the 
-\family typewriter
-.dat
-\family default
- files are single files that have information from every processor.
- Gale uses file locking to ensure this cooperation.
- However, on some parallel file systems, this can be problematic.
- The only known solution at this point is to turn off checkpointing by setting
- the 
-\family typewriter
-checkpointEvery
-\family default
- parameter to 0.
- 
-\end_layout
-
-\begin_layout Standard
-The VTK files do not suffer from this problem.
- However, the VTK files may contain a large amount of data.
- Writing all of that information to disk may slow down your computation
- significantly.
- The easiest way to tell if this is the case is to remove the line
-\end_layout
-
-\begin_layout LyX-Code
-<param>Underworld_VTKOutput</param>
-\end_layout
-
-\begin_layout Standard
-If this makes a big difference, then you can output less frequently or output
- fewer particles.
 \end_layout
 
 \begin_layout Section
@@ -2598,7 +2524,7 @@ name "sub:Visualization-with-ParaView"
 \begin_layout Standard
 
 \color none
-These instructions are for Paraview version 3.6.0.
+These instructions are for Paraview version 3.6.1.
  To visualize step 10 of 
 \family typewriter
 input/cookbook/yielding.xml
@@ -3483,26 +3409,11 @@ particlesPerCell
 \end_layout
 
 \begin_layout Standard
-In addition, you need to vary the scaling factor for time steps (
+In addition, you may need to vary the scaling factor for time steps (
 \family typewriter
 dtFactor
 \family default
 ).
- For problems with inflow boundaries (see Sections 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Viscous-In-Outflow"
-
-\end_inset
-
- and 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Flux-Boundary-Conditions"
-
-\end_inset
-
-), you must vary the size of the boundary box.
  Depending on the boundary conditions, you may need to vary the size of
  the box (
 \family typewriter
@@ -4781,7 +4692,7 @@ reference "sec:Viscous-Material-in"
  the velocity.
  A normal stress boundary condition simulates the effect of material below
  the material pushing up, supporting the material in the box.
- Then, when material piles up, material will overcome the stress boundary
+ Then, when material piles up, gravity forces will overcome the stress boundary
  and flow out of the simulation.
  Conversely, if material is thinned out, the stress boundary will push new
  material into the simulation.
@@ -5159,6 +5070,87 @@ name "fig:Strain-viscous-normal-stress"
 
 Strain rate invariant and velocities of viscous material in extension with
  a normal stress boundary
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Viscous Material with Deformable Bottom Boundary
+\end_layout
+
+\begin_layout Standard
+The previous example can be modified so that, instead of having material
+ flow through the bottom boundary, the boundary itself deforms.
+ You can do this by changing the one line
+\end_layout
+
+\begin_layout LyX-Code
+<param name="staticBottom">True</param>
+\end_layout
+
+\begin_layout Standard
+to
+\end_layout
+
+\begin_layout LyX-Code
+<param name="wrapBottom">True</param>
+\end_layout
+
+\begin_layout Standard
+A worked example is in 
+\family typewriter
+input/cookbook/viscous_bottom.xml
+\family default
+.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Strain-deformable-bottom"
+
+\end_inset
+
+ shows the strain rate invariant and velocity.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/Paraview_bottom.png
+	lyxscale 75
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Strain-deformable-bottom"
+
+\end_inset
+
+Strain rate invariant and velocities of viscous material with a deformable
+ bottom boundary
 \end_layout
 
 \end_inset
@@ -7150,7 +7142,7 @@ reference "fig:Temperature-and-velocity"
 
 \end_inset
 
- is mostly because the viscosity is higher everywhere.
+ are mostly because the viscosity is higher everywhere.
 \end_layout
 
 \begin_layout LyX-Code
@@ -7586,9 +7578,9 @@ Software Components of Gale
 \begin_layout Standard
 Gale makes use of several physics libraries, including StGermain, StgFEM,
  PiCellerator, and UnderWorld.
- These are proven, capable, open-source finite element method libraries
- written by the Victorian Partnership for Advanced Computing (VPAC) and
- Louis Moresi's group at Monash University (see Fig 
+ These are open-source finite element method libraries written by the Victorian
+ Partnership for Advanced Computing (VPAC) and Louis Moresi's group at Monash
+ University (see Fig 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Mapping-between-MicroFEM"
