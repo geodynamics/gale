@@ -72,6 +72,7 @@
       SwarmVariable*                                      swarmPressure;                         \
       double                                              minimumYieldStress;                    \
       double                                              minimumViscosity;                      \
+      double                                              maxStrainRate;                      \
       double                                              frictionCoefficient;                   \
       double                                              frictionCoefficientAfterSoftening;     \
 		double                                              boundaryCohesion;                              \
@@ -105,6 +106,7 @@
       SwarmVariable*        swarmPressure,
       double                minimumYieldStress,
       double                minimumViscosity,
+      double                maxStrainRate,
       double                frictionCoefficient,
       double                frictionCoefficientAfterSoftening,
       double                                              boundaryCohesion,
@@ -159,6 +161,7 @@
                 Bool                      boundaryBack,
                 double                    minimumYieldStress,
                 double                    minimumViscosity,
+                double                    maxStrainRate,
                 HydrostaticTerm*          hydrostaticTerm );
 
 
