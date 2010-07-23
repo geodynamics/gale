@@ -422,8 +422,8 @@
   <param name="minX">0.0f</param>
   <param name="minY">0.0f</param>
   <param name="minZ">0.0f</param>
-  <param name="maxX">1.0f</param>
-  <param name="maxY">1.0f</param>
+  <param name="maxX">8.0f</param>
+  <param name="maxY">8.0f</param>
   <param name="maxZ">0.5f</param>
   <param name="elementResI">64</param>
   <param name="elementResJ">64</param>
