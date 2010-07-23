@@ -219,6 +219,10 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
                                          (Name)"WarsTemperature");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
+	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_Quadratic,
+                                         (Name)"Quadratic");
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+
 }
 
 void _StgFEM_StandardConditionFunctions_Destroy( void* _self, void* data ) {
@@ -2322,6 +2326,29 @@ void StgFEM_StandardConditionFunctions_WarsTemperature( Node_LocalIndex node_lI,
   if(coord[0]>WarsStart)
     h=WarsHeight;
   *result=WarsTBottom + ((coord[1]-h)/(maxY-h))*(WarsTTop-WarsTBottom);
+}
+
+void StgFEM_StandardConditionFunctions_Quadratic( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+{
+  FiniteElementContext *	context            = (FiniteElementContext*)_context;
+  FeVariable*             feVariable         = NULL;
+  FeMesh*     mesh               = NULL;
+  Dictionary*             dictionary         = context->dictionary;
+  double*                 result             = (double*) _result;
+  double*                 coord;
+  int                     dim;
+  double                  a, b, c;
+  
+  feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+  mesh       = feVariable->feMesh;
+  coord      = Mesh_GetVertex( mesh, node_lI );
+  
+  dim = Dictionary_GetInt( dictionary, "Quadratic_Dim");
+  a = Dictionary_GetDouble( dictionary, "Quadratic_Constant");
+  b = Dictionary_GetDouble( dictionary, "Quadratic_Linear");
+  c = Dictionary_GetDouble( dictionary, "Quadratic_Quadratic");
+
+  *result= a + coord[dim]*(b + c*coord[dim]);
 }
 
 
