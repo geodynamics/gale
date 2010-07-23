@@ -120,5 +120,7 @@ void StgFEM_StandardConditionFunctions_DeltaFunction( Node_LocalIndex node_lI, V
 
 void StgFEM_StandardConditionFunctions_InflowBottom( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
 void StgFEM_StandardConditionFunctions_GaussianTube( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
+void StgFEM_StandardConditionFunctions_WarsTemperature( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
+
 
 #endif	

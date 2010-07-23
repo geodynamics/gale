@@ -214,6 +214,11 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
 
         condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GravitationalPotential, (Name)"GravitationalPotential" );
         ConditionFunction_Register_Add( condFunc_Register, condFunc );
+
+	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_WarsTemperature,
+                                         (Name)"WarsTemperature");
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+
 }
 
 void _StgFEM_StandardConditionFunctions_Destroy( void* _self, void* data ) {
@@ -2285,6 +2290,38 @@ void StgFEM_StandardConditionFunctions_GaussianTube( Node_LocalIndex node_lI, Va
 	}
 
 
+}
+
+
+void StgFEM_StandardConditionFunctions_WarsTemperature( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+{
+  FiniteElementContext *	context            = (FiniteElementContext*)_context;
+  FeVariable*             feVariable         = NULL;
+  FeMesh*     mesh               = NULL;
+  Dictionary*             dictionary         = context->dictionary;
+  double*                 result             = (double*) _result;
+  double*                 coord;
+  double                  EAEnd, WarsStart, WarsHeight, WarsTTop,
+    WarsTBottom, h, maxY;
+  
+  feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+  mesh       = feVariable->feMesh;
+  coord      = Mesh_GetVertex( mesh, node_lI );
+  
+  EAEnd = Dictionary_GetDouble( dictionary, "EAEnd");
+  WarsStart = Dictionary_GetDouble( dictionary, "WarsStart");
+  WarsHeight = Dictionary_GetDouble( dictionary, "WarsHeight");
+  WarsTTop = Dictionary_GetDouble( dictionary, "WarsTTop");
+  WarsTBottom = Dictionary_GetDouble( dictionary, "WarsTBottom");     
+  maxY=Dictionary_GetDouble( dictionary, "maxY");
+
+
+  h=WarsHeight*(coord[0]-EAEnd)/(WarsStart-EAEnd);
+  if(coord[0]<EAEnd)
+    h=0;
+  if(coord[0]>WarsStart)
+    h=WarsHeight;
+  *result=WarsTBottom + ((coord[1]-h)/(maxY-h))*(WarsTTop-WarsTBottom);
 }
 
 
