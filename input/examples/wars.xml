@@ -1,0 +1,911 @@
+<?xml version="1.0"?>
+<!-- A model of the West Antartica Rift System (WARS) as used in 
+
+  The transition from diffuse to focused extension: Modeled evolution
+                  of the West Antarctic Rift system
+                  Audrey D. Huerta, Dennis L. Harry
+  Earth and Planetary Science Letters 255 (2007) 133 – 147
+-->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+  <import>
+    <toolbox>Underworld</toolbox>
+  </import>
+  <plugins>
+    <struct>
+      <param name="Type">Underworld_EulerDeform</param>
+      <param name="Context">context</param>
+    </struct>
+    <struct>
+      <param name="Type">Underworld_VTKOutput</param>
+      <param name="Context">context</param>
+    </struct>
+    <struct>
+      <param name="Type">StgFEM_StandardConditionFunctions</param>
+      <param name="Context">context</param>
+    </struct>
+  </plugins>
+  <struct name="components">
+    <struct name="context">
+      <param name="Type">UnderworldContext</param>
+    </struct>
+    <struct name="mesh-linear">
+      <param name="Type">FeMesh</param>
+      <param name="elementType">linear</param>
+    </struct>
+    <struct name="linearMesh-generator">
+      <param name="Type">CartesianGenerator</param>
+      <param name="mesh">mesh-linear</param>
+      <param name="dim">dim</param>
+      <param name="shadowDepth">shadowDepth</param>
+      <param name="regular">False</param>
+      <list name="size">
+        <param>elementResI</param>
+        <param>elementResJ</param>
+        <param>elementResK</param>
+      </list>
+      <list name="minCoord">
+        <param>minX</param>
+        <param>minY</param>
+        <param>minZ</param>
+      </list>
+      <list name="maxCoord">
+        <param>maxX</param>
+        <param>maxY</param>
+        <param>maxZ</param>
+      </list>
+    </struct>
+    <struct name="velocity">
+      <param name="Type">MeshVariable</param>
+      <param name="mesh">mesh-linear</param>
+      <param name="Rank">Vector</param>
+      <param name="DataType">Double</param>
+      <param name="VectorComponentCount">dim</param>
+      <list name="names">
+        <param>vx</param>
+        <param>vy</param>
+        <param>vz</param>
+      </list>
+    </struct>
+    <struct name="velocityBCs">
+      <param name="Type">CompositeVC</param>
+      <param name="Data">mesh-linear</param>
+    </struct>
+    <struct name="velocityICs">
+      <param name="Type">CompositeVC</param>
+      <param name="Data">mesh-linear</param>
+    </struct>
+    <struct name="velocityDofLayout">
+      <param name="Type">DofLayout</param>
+      <param name="mesh">mesh-linear</param>
+      <param name="BaseVariableCount">dim</param>
+      <list name="BaseVariables">
+        <param>vx</param>
+        <param>vy</param>
+        <param>vz</param>
+      </list>
+    </struct>
+    <struct name="VelocityField">
+      <param name="Type">FeVariable</param>
+      <param name="FEMesh">mesh-linear</param>
+      <param name="DofLayout">velocityDofLayout</param>
+      <param name="BC">velocityBCs</param>
+      <param name="IC">velocityICs</param>
+      <param name="LinkedDofInfo">velocityLinkedDofs</param>
+    </struct>
+    <struct name="VelocityMagnitudeField">
+      <param name="Type">OperatorFeVariable</param>
+      <param name="Operator">Magnitude</param>
+      <param name="FeVariable">VelocityField</param>
+    </struct>
+    <struct name="VelocityGradientsField">
+      <param name="Type">OperatorFeVariable</param>
+      <param name="Operator">Gradient</param>
+      <param name="FeVariable">VelocityField</param>
+    </struct>
+    <struct name="VelocityGradientsInvariantField">
+      <param name="Type">OperatorFeVariable</param>
+      <param name="Operator">TensorInvariant</param>
+      <param name="FeVariable">VelocityGradientsField</param>
+    </struct>
+    <struct name="StrainRateField">
+      <param name="Type">OperatorFeVariable</param>
+      <param name="Operator">TensorSymmetricPart</param>
+      <param name="FeVariable">VelocityGradientsField</param>
+    </struct>
+    <struct name="VorticityField">
+      <param name="Type">OperatorFeVariable</param>
+      <param name="Operator">TensorAntisymmetricPart</param>
+      <param name="FeVariable">VelocityGradientsField</param>
+    </struct>
+    <struct name="StrainRateInvariantField">
+      <param name="Type">OperatorFeVariable</param>
+      <param name="Operator">SymmetricTensor_Invariant</param>
+      <param name="FeVariable">StrainRateField</param>
+    </struct>
+    <struct name="pressure">
+      <param name="Type">MeshVariable</param>
+      <param name="mesh">mesh-linear</param>
+      <param name="Rank">Scalar</param>
+      <param name="DataType">Double</param>
+    </struct>
+    <struct name="pressureDofLayout">
+      <param name="Type">DofLayout</param>
+      <param name="mesh">mesh-linear</param>
+      <list name="BaseVariables">
+        <param>pressure</param>
+      </list>
+    </struct>
+    <struct name="PressureField">
+      <param name="Type">FeVariable</param>
+      <param name="FEMesh">mesh-linear</param>
+      <param name="DofLayout">pressureDofLayout</param>
+      <param name="LinkedDofInfo">pressureLinkedDofs</param>
+    </struct>
+    <struct name="StressField">
+      <param name="Type">StressField</param>
+      <param name="StrainRateField">StrainRateField</param>
+      <param name="Context">context</param>
+      <param name="ConstitutiveMatrix">constitutiveMatrix</param>
+      <param name="Swarm">picIntegrationPoints</param>
+      <param name="Mesh">mesh-linear</param>
+      <param name="IC">stressICs</param>
+    </struct> 
+    <struct name="ViscosityField">
+      <param name="Type">ViscosityField</param>
+      <param name="Context">context</param>
+      <param name="Swarm">picIntegrationPoints</param>
+      <param name="Mesh">mesh-linear</param>
+      <param name="ConstitutiveMatrix">constitutiveMatrix</param>
+    </struct>
+    <struct name="cellLayout">
+      <param name="Type">SingleCellLayout</param>
+    </struct>
+    <struct name="particleLayout">
+      <param name="Type">GaussParticleLayout</param>
+    </struct>
+    <struct name="gaussSwarm">
+      <param name="Type">IntegrationPointsSwarm</param>
+      <param name="CellLayout">cellLayout</param>
+      <param name="ParticleLayout">particleLayout</param>
+      <param name="FeMesh">mesh-linear</param>
+      <param name="TimeIntegrator">timeIntegrator</param>
+      <param name="IntegrationPointMapper">gaussMapper</param>
+    </struct>
+    <struct name="gaussMapper">
+      <param name="Type">GaussMapper</param>
+      <param name="IntegrationPointsSwarm">gaussSwarm</param>
+      <param name="MaterialPointsSwarm">gaussMaterialSwarm</param>
+    </struct>
+    <struct name="backgroundLayout">
+      <param name="Type">BackgroundParticleLayout</param>
+    </struct>
+    <struct name="gaussMSwarmMovementHandler">
+      <param name="Type">ParticleMovementHandler</param>
+    </struct>
+    <struct name="gaussMaterialSwarm">
+      <param name="Type">MaterialPointsSwarm</param>
+      <param name="CellLayout">cellLayout</param>
+      <param name="ParticleLayout">backgroundLayout</param>
+      <param name="FeMesh">mesh-linear</param>
+      <list name="ParticleCommHandlers">
+        <param>gaussMSwarmMovementHandler</param>
+      </list>
+    </struct>
+    <struct name="timeIntegrator">
+      <param name="Type">TimeIntegrator</param>
+      <param name="order">1</param>
+      <param name="simultaneous">t</param>
+      <param name="Context">context</param>
+    </struct>
+    <struct name="elementCellLayout">
+      <param name="Type">ElementCellLayout</param>
+      <param name="Mesh">mesh-linear</param>
+    </struct>
+    <struct name="weights">
+      <param name="Type">PCDVC</param>
+      <param name="resolutionX">10</param>
+      <param name="resolutionY">10</param>
+      <param name="resolutionZ">10</param>
+      <param name="lowerT">0.6</param>
+      <param name="upperT">25</param>
+      <param name="maxDeletions">3</param>
+      <param name="maxSplits">3</param>
+      <param name="MaterialPointsSwarm">materialSwarm</param>
+      <param name="Inflow">True</param>
+    </struct>
+    <struct name="localLayout">
+      <param name="Type">MappedParticleLayout</param>
+    </struct>
+    <struct name="picIntegrationPoints">
+      <param name="Type">IntegrationPointsSwarm</param>
+      <param name="CellLayout">elementCellLayout</param>
+      <param name="ParticleLayout">localLayout</param>
+      <param name="FeMesh">mesh-linear</param>
+      <param name="WeightsCalculator">weights</param>
+      <param name="TimeIntegrator">timeIntegrator</param>
+      <param name="IntegrationPointMapper">mapper</param>
+    </struct>
+    <struct name="mapper">
+      <param name="Type">CoincidentMapper</param>
+      <param name="IntegrationPointsSwarm">picIntegrationPoints</param>
+      <param name="MaterialPointsSwarm">materialSwarm</param>
+    </struct>
+    <struct name="materialSwarmParticleLayout">
+      <param name="Type">MeshParticleLayout</param>
+      <param name="cellParticleCount">particlesPerCell</param>
+      <param name="mesh">mesh-linear</param>
+    </struct>
+    <struct name="pMovementHandler">
+      <param name="Type">ParticleMovementHandler</param>
+    </struct>
+    <struct name="pShadowSync">
+      <param name="Type">ParticleShadowSync</param>
+    </struct>
+    <struct name="materialSwarm">
+      <param name="Type">MaterialPointsSwarm</param>
+      <param name="CellLayout">elementCellLayout</param>
+      <param name="ParticleLayout">materialSwarmParticleLayout</param>
+      <param name="FeMesh">mesh-linear</param>
+      <list name="ParticleCommHandlers">
+        <param>pMovementHandler</param>
+        <param>pShadowSync</param>
+      </list>
+      <param name="SplittingRoutine">splittingRoutine</param>
+      <param name="RemovalRoutine">removalRoutine</param>
+      <param name="EscapedRoutine">escapedRoutine</param>
+    </struct>
+    <struct name="materialSwarmAdvector">
+      <param name="Type">SwarmAdvector</param>
+      <param name="Swarm">materialSwarm</param>
+      <param name="TimeIntegrator">timeIntegrator</param>
+      <param name="VelocityField">VelocityField</param>
+      <param name="PeriodicBCsManager">periodicBCsManager</param>
+      <param name="allowFallbackToFirstOrder">True</param>
+    </struct>
+    <struct name="solutionVelocity">
+      <param name="Type">SolutionVector</param>
+      <param name="FeVariable">VelocityField</param>
+    </struct>
+    <struct name="solutionPressure">
+      <param name="Type">SolutionVector</param>
+      <param name="FeVariable">PressureField</param>
+    </struct>
+    <struct name="mom_force">
+      <param name="Type">ForceVector</param>
+      <param name="FeVariable">VelocityField</param>
+      <param name="ExtraInfo">context</param>
+    </struct>
+    <struct name="cont_force">
+      <param name="Type">ForceVector</param>
+      <param name="FeVariable">PressureField</param>
+      <param name="ExtraInfo">context</param>
+    </struct>
+    <struct name="k_matrix">
+      <param name="Type">StiffnessMatrix</param>
+      <param name="RowVariable">VelocityField</param>
+      <param name="ColumnVariable">VelocityField</param>
+      <param name="RHS">mom_force</param>
+      <param name="allowZeroElementContributions">False</param>
+    </struct>
+    <struct name="constitutiveMatrix">
+      <param name="Type">ConstitutiveMatrixCartesian</param>
+      <param name="Swarm">picIntegrationPoints</param>
+      <param name="StiffnessMatrix">k_matrix</param>
+    </struct>
+    <struct name="g_matrix">
+      <param name="Type">StiffnessMatrix</param>
+      <param name="RowVariable">VelocityField</param>
+      <param name="ColumnVariable">PressureField</param>
+      <param name="RHS">mom_force</param>
+      <param name="transposeRHS">cont_force</param>
+      <param name="allowZeroElementContributions">False</param>
+    </struct>
+    <struct name="gradientStiffnessMatrixTerm">
+      <param name="Type">GradientStiffnessMatrixTerm</param>
+      <param name="Swarm">gaussSwarm</param>
+      <param name="StiffnessMatrix">g_matrix</param>
+    </struct>
+    <struct name="preconditioner">
+      <param name="Type">StiffnessMatrix</param>
+      <param name="RowVariable">PressureField</param>
+      <param name="ColumnVariable">PressureField</param>
+      <param name="RHS">cont_force</param>
+      <param name="allowZeroElementContributions">True</param>
+    </struct>
+    <struct name="preconditionerTerm">
+      <param name="Type">UzawaPreconditionerTerm</param>
+      <param name="Swarm">picIntegrationPoints</param>
+      <param name="StiffnessMatrix">preconditioner</param>
+    </struct>
+    <struct name="uzawa">
+      <param name="Type">Stokes_SLE_UzawaSolver</param>
+      <param name="velocitySolver">matrixSolver</param>
+      <param name="Preconditioner">preconditioner</param>
+      <param name="tolerance">linearTolerance</param>
+      <param name="monitor">false</param>
+      <param name="maxIterations">5000</param>
+      <param name="minIterations">1</param>
+    </struct>
+    <struct name="stokesEqn">
+      <param name="Type">Stokes_SLE</param>
+      <param name="SLE_Solver">uzawa</param>
+      <param name="Context">context</param>
+      <param name="StressTensorMatrix">k_matrix</param>
+      <param name="GradientMatrix">g_matrix</param>
+      <param name="DivergenceMatrix"></param>
+      <param name="CompressibilityMatrix">c_matrix</param>
+      <param name="VelocityVector">solutionVelocity</param>
+      <param name="PressureVector">solutionPressure</param>
+      <param name="ForceVector">mom_force</param>
+      <param name="ContinuityForceVector">cont_force</param>
+      <param name="killNonConvergent">false</param>
+      <param name="nonLinearMaxIterations">nonLinearMaxIterations</param>
+      <param name="nonLinearMinIterations">nonLinearMinIterations</param>
+      <param name="nonLinearTolerance">nonLinearTolerance</param>
+      <param name="makeConvergenceFile">false</param>
+      <param name="isNonLinear">true</param>
+    </struct>
+    <struct name="c_matrix">
+      <param name="Type">StiffnessMatrix</param>
+      <param name="RowVariable">PressureField</param>
+      <param name="ColumnVariable">PressureField</param>
+      <param name="RHS">cont_force</param>
+      <param name="allowZeroElementContributions">True</param>
+    </struct>
+    <struct name="mixedStabiliser">
+      <param name="Type">MixedStabiliserTerm</param>
+      <param name="Swarm">gaussSwarm</param>
+      <param name="picSwarm">picIntegrationPoints</param>
+      <param name="storeVisc">storeViscosity</param>
+      <param name="StiffnessMatrix">c_matrix</param>
+    </struct>
+    <struct name="buoyancyForceTerm">
+      <param name="Type">BuoyancyForceTerm</param>
+      <param name="ForceVector">mom_force</param>
+      <param name="TemperatureField">TemperatureField</param>
+      <param name="Swarm">picIntegrationPoints</param>
+      <param name="HydrostaticTerm">hydrostaticTerm</param>
+      <param name="gravity">9.81</param>
+    </struct>
+    <struct name="background">
+      <param name="Type">Everywhere</param>
+    </struct>
+    <struct name="escapedRoutine">
+      <param name="Type">EscapedRoutine</param>
+      <param name="idealParticleCount">0</param>
+    </struct>
+    <struct name="velocityRemesher">
+      <param name="Type">RegularRemesherCmpt</param>
+      <param name="mesh">mesh-linear</param>
+      <list name="remeshDims">
+        <param>0</param>
+        <param>1</param>
+        <param>2</param>
+      </list>
+    </struct>
+    <struct name="storeViscosity">
+      <param name="Type">StoreVisc</param>
+      <param name="MaterialPointsSwarm">materialSwarm</param>
+    </struct>
+    <struct name="storeStress">
+      <param name="Type">StoreStress</param>
+      <param name="MaterialPointsSwarm">materialSwarm</param>
+    </struct>
+
+<!--============== END "BASIC COMPONENTS" =================-->
+    <struct name="hydrostaticTerm">
+      <param name="Type">HydrostaticTerm</param>
+      <param name="upperDensity">2850</param>
+      <param name="upperAlpha">3.1e-5</param>
+      <param name="lowerDensity">3300</param>
+      <param name="lowerAlpha">3.1e-5</param>
+      <param name="height">maxY</param>
+      <param name="T_0">273</param>
+      <param name="linearCoefficient">TemperatureGradient</param>
+      <param name="materialBoundary">crustBottom</param>
+      <param name="gravity">9.81</param>
+    </struct>
+
+    <struct name="backgroundShape">
+      <param name="Type">Everywhere</param>
+    </struct>
+
+   <struct name="boxShape">
+      <param name="Type">Box</param>
+      <param name="startX">minX</param>
+      <param name="endX">maxX</param>
+      <param name="startY">minY</param>
+      <param name="endY">maxY</param>
+      <param name="startZ">minZ</param>
+      <param name="endZ">maxZ</param>
+    </struct>
+
+    <struct name="surfaceAdaptor">
+      <param name="Type">SurfaceAdaptor</param>
+      <param name="mesh">mesh-linear</param>
+      <param name="sourceGenerator">linearMesh-generator</param>
+      <param name="bottomSurfaceType">plateau</param>
+      <param name="bottomX1">EAEnd</param>
+      <param name="bottomX2">WarsStart</param>
+      <param name="bottomX3">maxX</param>
+      <param name="bottomX4">maxX</param>
+      <param name="bottomHeight">WarsHeight</param>
+    </struct>
+
+<!-- ============== Crust  ================  -->
+<!-- The precise shape of the crust is not known, because the width of
+     WARS and the width of the transition from WARS to EA is not
+     given.  We use
+
+     WARS = 360 km
+     transition = 60 km
+
+     For the crustal thickness, we use 39 km everywhere, or a height
+     of 180 km - 39 km = 141 km.
+
+     We also assume that the crust has uniform heating throughout of
+     1.1e-6 W m^-3
+
+     Given the specific heat of 875 J kg^-1 C^-1, that means a heating of
+
+     1.1e-6 W/m^-3 
+     _________________________________   = 4.41102756891e-13 C s^-1
+     875 J kg^-1 C^-1  *  2850 kg m^-3
+
+     The coefficient of thermal expansion alpha = 3.1e-5 C^-1
+
+     Given the thermal conductivity of 2.5 W m^-1 C^-1, then the
+     thermal diffusivity kappa
+
+     kappa =         2.5 W m^-1 C^-1
+             _______________________________  = 1.00250626566e-6 m^2 s^-1
+             2850 kg m^-3 * 875 J kg^-1 C^-1
+
+     For the crust, T_0 = Q/R = 219e3 / 8.31 = 26353.7906137
+
+     A = A'^(1/n) = (5e-18 s-1 Pa^-2.4)^(1/2.4)
+                  = 6.18354466027e-8 s^-1/2.4 Pa^-1
+     
+-->
+
+    <struct name="crustShape">
+      <param name="Type">Box</param>
+      <param name="startX">minX</param>
+      <param name="endX">maxX</param>
+      <param name="startY">crustBottom</param>
+      <param name="endY">maxY</param>
+      <param name="startZ">minZ</param>
+      <param name="endZ">maxZ</param>
+    </struct>
+
+    <struct name="crustViscosity">
+      <param name="Type">NonNewtonian</param>
+      <param name="StrainRateInvariantField">StrainRateInvariantField</param>
+      <param name="TemperatureField">TemperatureField</param>
+      <param name="n">2.4</param>
+      <param name="T_0">26353.7906137</param>
+      <!-- <param name="A">6.18354466027e-8</param> -->
+      <param name="A">13.3220431236</param> <!-- 6.18354466027e-8*(1e20)^(1/2.4) -->
+      <!-- <param name="refStrainRate">1.5e-16</param> -->
+      <param name="refStrainRate">1.5e4</param>
+      <!-- <param name="minViscosity">1.0e-2</param> -->
+      <!-- <param name="maxViscosity">1.0e20</param> -->
+    </struct>
+
+   <struct name="crust">
+     <param name="Type">RheologyMaterial</param>
+     <param name="Shape">crustShape</param>
+     <param name="density">2850</param>
+     <param name="alpha">3.1e-5</param>
+     <!-- <param name="diffusivity">1.0e-6</param> -->
+     <param name="diffusivity">1.0e14</param>
+     <list name="heatingElements">
+       <struct>
+         <!-- <param name="Q">4.41102756891e-13</param> -->
+         <param name="Q">4.41102756891e7</param>
+         <param name="lambda">0.0</param>
+       </struct>
+     </list>
+     <list name="Rheology">
+       <param>crustViscosity</param>
+       <param>yielding</param>
+       <param>storeViscosity</param>
+       <param>storeStress</param>
+     </list>
+   </struct>
+
+
+
+<!-- ============== Mantle  ================  -->
+<!-- 
+     The coefficient of thermal expansion alpha = 3.1e-5 C^-1
+
+     Given the thermal conductivity of 3.4 W m^-1 C^-1, then the
+     thermal diffusivity kappa
+
+     kappa =         3.4 W m^-1 C^-1
+             ________________________________  =  8.24242424242e-7 m^2 s^-1
+             3300 kg m^-3 * 1250 J kg^-1 C^-1
+
+     For the crust, T_0 = Q/R = 498e3 / 8.31 = 59927.7978339
+
+     A = A'^(1/n) = (4e-25 s-1 Pa^-4.5)^(1/4.5)
+                  =  3.78647900946e-6 s^-1/4.5 Pa^-1
+     
+-->
+
+    <struct name="mantleShape">
+      <param name="Type">Intersection</param>
+      <list name="shapes">
+        <param>boxShape</param>
+       <param>!crustShape</param>
+      </list>
+    </struct>
+
+    <struct name="mantleViscosity">
+      <param name="Type">NonNewtonian</param>
+      <param name="StrainRateInvariantField">StrainRateInvariantField</param>
+      <param name="TemperatureField">TemperatureField</param>
+      <param name="n">4.5</param>
+      <param name="T_0">59927.7978339</param>
+      <param name="A">3.78647900946e-6</param>
+      <param name="A">0.105361027689</param>
+      <!-- <param name="refStrainRate">1.5e-16</param> -->
+      <param name="refStrainRate">1.5e4</param>
+      <!-- <param name="minViscosity">1.0e-2</param> -->
+      <!-- <param name="maxViscosity">1.0e20</param> -->
+    </struct>
+
+    <struct name="mantleViscous">
+      <param name="Type">RheologyMaterial</param>
+      <param name="Shape">mantleShape</param>
+      <param name="density">3300</param>
+      <param name="alpha">3.1e-5</param>
+      <!-- <param name="diffusivity">8.24242424242e-7</param> -->
+      <param name="diffusivity">8.24242424242e13</param>
+      <list name="heatingElements">
+        <struct>
+          <param name="Q">0</param>
+          <param name="lambda">0.0</param>
+        </struct>
+      </list>
+      <list name="Rheology">
+        <param>mantleViscosity</param>
+        <param>yielding</param>
+        <param>storeViscosity</param>
+        <param>storeStress</param>
+      </list>
+    </struct>
+
+<!-- ============== Strain Weakening  ================  -->
+
+<!-- In the paper, the yielding relation is s_yield = S + B'z, with no
+     strain weakening.
+
+     To figure out what the cohesion and phi are
+
+    sqrt(J2) = Ap + B
+
+    where
+
+    A=sin(phi)
+    B=cos(phi) * cohesion
+
+    for hydrostatics, p=rho g z
+
+    => Ap = A rho g z = sin(phi) rho g z
+
+    => B' = sin(phi) rho g
+
+    => sin(phi) = B'/(rho g)
+       cohesion = S/cos(phi)
+
+    => cohesion = S/sqrt(1-(B'/(rho g))^2)
+       tan(phi) = (B'/(rho g)) * cohesion/S
+
+    The numbers we have are
+
+    S = 60e6 Pa
+    B'= 11e6 Pa/km = 11e3 Pa/m
+    rho = 2850 (crust)
+    g = 9.81
+
+    => cohesion = 60e6 / sqrt(1-(11e3/(2850 * 9.81))^2)
+                = 6.52634888202e7
+       tan(phi) = 11e3/(2850 * 9.81) * 6.5263e7/6e7
+                = 0.427954752593
+    -->
+
+    <struct name="strainWeakening">
+      <param name="Type">StrainWeakening</param>
+      <param name="TimeIntegrator">timeIntegrator</param>
+      <param name="MaterialPointsSwarm">materialSwarm</param>
+      <param name="initialSofteningStrain">0.0</param>
+      <param name="finalSofteningStrain">0.1</param>
+    </struct>
+    <struct name="yielding">
+      <param name="Type">DruckerPrager</param>
+      <param name="PressureField">PressureField</param>
+      <param name="VelocityGradientsField">VelocityGradientsField</param>
+      <param name="MaterialPointsSwarm">materialSwarm</param>
+      <param name="Context">context</param>
+      <param name="StrainRateField">StrainRateField</param>
+      <param name="StrainWeakening">strainWeakening</param>
+      <param name="cohesion">6.52634888202e7</param>
+      <param name="cohesionAfterSoftening">6.52634888202e7</param>
+      <param name="frictionCoefficient">0.427954752593</param>
+      <param name="frictionCoefficientAfterSoftening">0.427954752593</param>
+      <param name="HydrostaticTerm">hydrostaticTerm</param>
+    </struct>
+
+
+<!-- ============== Stress  BC on bottom =====================  -->
+    <struct name="stressBC">
+      <param name="Type">StressBC</param>
+      <param name="ForceVector">mom_force</param>
+      <param name="Swarm">picIntegrationPoints</param>
+      <param name="wall">top</param>
+      <param name="y_type">HydrostaticTerm</param>
+      <param name="y_value">hydrostaticTerm</param>
+    </struct>
+
+<!-- ============== Temperature Components  =====================  -->
+    <struct name="temperature">
+      <param name="Type">MeshVariable</param>
+      <param name="Rank">Scalar</param>
+      <param name="DataType">Double</param>
+      <param name="mesh">mesh-linear</param>
+    </struct>
+    <struct name="temperatureBCs">
+      <param name="Type">CompositeVC</param>
+      <param name="Data">mesh-linear</param>
+    </struct>
+    <struct name="temperatureICs">
+      <param name="Type">CompositeVC</param>
+      <param name="Data">mesh-linear</param>
+    </struct>
+    <struct name="temperatureDofLayout">
+      <param name="Type">DofLayout</param>
+      <param name="mesh">mesh-linear</param>
+      <list name="BaseVariables">
+        <param>temperature</param>
+      </list>
+    </struct>
+    <struct name="TemperatureField">
+      <param name="Type">FeVariable</param>
+      <param name="FEMesh">mesh-linear</param>
+      <param name="DofLayout">temperatureDofLayout</param>
+      <param name="BC">temperatureBCs</param>
+      <param name="IC">temperatureICs</param>
+      <param name="LinkedDofInfo">temperatureLinkedDofs</param>
+    </struct>
+    <struct name="TemperatureGradientsField">
+      <param name="Type">OperatorFeVariable</param>
+      <param name="Operator">Gradient</param>
+      <param name="FeVariable">TemperatureField</param>
+    </struct>
+
+    <!-- Energy Equation -->
+    <struct name="residual">
+      <param name="Type">ForceVector</param>
+      <param name="FeVariable">TemperatureField</param>
+    </struct>
+    <struct name="massMatrix">
+      <param name="Type">ForceVector</param>
+      <param name="FeVariable">TemperatureField</param>
+    </struct>
+    <struct name="predictorMulticorrector">
+      <param name="Type">AdvDiffMulticorrector</param>
+    </struct>
+    <struct name="EnergyEqn">
+      <param name="Type">AdvectionDiffusionSLE</param>
+      <param name="SLE_Solver">predictorMulticorrector</param>
+      <param name="Context">context</param>
+      <param name="PhiField">TemperatureField</param>
+      <param name="Residual">residual</param>
+      <param name="MassMatrix">massMatrix</param>
+      <param name="courantFactor">0.25</param>
+    </struct>
+    <struct name="lumpedMassMatrixForceTerm">
+      <param name="Type">LumpedMassMatrixForceTerm</param>
+      <param name="Swarm">gaussSwarm</param>
+      <param name="ForceVector">massMatrix</param>
+    </struct>
+    <struct name="defaultResidualForceTerm">
+      <param name="Type">AdvDiffResidualForceTerm</param>
+      <param name="Swarm">gaussSwarm</param>
+      <param name="ForceVector">residual</param>
+      <param name="ExtraInfo">EnergyEqn</param>
+      <param name="VelocityField">VelocityField</param>
+      <param name="defaultDiffusivity">defaultDiffusivity</param>
+      <param name="UpwindXiFunction">Exact</param>
+    </struct>
+    <struct name="internalHeatingTerm">
+      <param name="Type">RadiogenicHeatingTerm</param>
+      <param name="ForceVector">residual</param>
+      <param name="Swarm">picIntegrationPoints</param>
+    </struct>
+
+  </struct>
+
+<!--  ====the end of component section====  -->
+
+<!-- ============== Mesh  ====================  -->
+ <struct name="EulerDeform">
+    <list name="systems">
+      <struct>
+        <param name="mesh">mesh-linear</param>
+        <param name="remesher">velocityRemesher</param>
+        <param name="velocityField">VelocityField</param>
+        <param name="wrapTop">True</param>
+        <param name="wrapBottom">True</param>
+        <list name="fields">
+         <struct>
+           <param name="field">VelocityField</param>
+           <param name="variable">velocity</param>
+         </struct>
+          <struct>
+            <param name="field">PressureField</param>
+            <param name="variable">pressure</param>
+          </struct>
+        </list>
+      </struct>
+    </list>
+  </struct>
+
+ <!-- ============== Velocity BCs ====================  -->
+  <struct name="velocityBCs">
+    <param name="type">CompositeVC</param>
+    <list name="vcList">
+      <struct>
+        <param name="type">WallVC</param>
+        <param name="wall">left</param>
+        <list name="variables">
+          <struct>
+            <param name="name">vx</param>
+            <param name="type">double</param>
+            <param name="value">0</param>
+          </struct>
+          <struct>
+            <param name="name">vy</param>
+            <param name="type">double</param>
+            <param name="value">0</param>
+          </struct>
+        </list>
+      </struct>
+
+      <struct>
+        <param name="type">WallVC</param>
+        <param name="wall">right</param>
+        <list name="variables">
+          <struct>
+            <param name="name">vx</param>
+            <param name="type">double</param>
+            <param name="value">2.21968543886e10</param> <!-- 2.21968543886e-10 = 7 km/Myr.  Scaling of 1e20 -->
+          </struct>
+
+
+          <!-- <struct> -->
+          <!--   <param name="name">vy</param> -->
+          <!--   <param name="type">double</param> -->
+          <!--   <param name="value">0</param> -->
+          <!-- </struct> -->
+
+
+        </list>
+      </struct>
+
+
+      <!-- <struct> -->
+      <!--   <param name="type">WallVC</param> -->
+      <!--   <param name="wall">bottom</param> -->
+      <!--   <list name="variables"> -->
+      <!--     <struct> -->
+      <!--       <param name="name">vy</param> -->
+      <!--       <param name="type">double</param> -->
+      <!--       <param name="value">0</param> -->
+      <!--     </struct> -->
+      <!--   </list> -->
+      <!-- </struct> -->
+
+
+    </list>
+  </struct>
+
+<!-- ============== Temperature BCs ===============  -->
+  <struct name="temperatureBCs">
+    <param name="type">CompositeVC</param>
+    <list name="vcList">
+      <struct>
+        <param name="type">WallVC</param>
+        <param name="wall">top</param>
+        <list name="variables">
+          <struct>
+            <param name="name">temperature</param>
+            <param name="type">double</param>
+            <param name="value">273</param>
+          </struct>
+        </list>
+      </struct>
+      <struct>
+        <param name="type">WallVC</param>
+        <param name="wall">bottom</param>
+        <list name="variables">
+          <struct>
+            <param name="name">temperature</param>
+            <param name="type">double</param>
+            <param name="value">1573</param>
+          </struct>
+        </list>
+      </struct>
+    </list>
+  </struct>
+
+<!-- ============== Temperature ICs =====================  -->
+  <struct name="temperatureICs">
+    <param name="type">CompositeVC</param>
+    <list name="vcList">
+      <struct>
+        <param name="type">AllNodesVC</param>
+        <list name="variables">
+          <struct>
+            <param name="name">temperature</param>
+            <param name="type">func</param>
+            <param name="value">WarsTemperature</param>
+          </struct>
+        </list>
+      </struct>
+    </list>
+  </struct>
+
+<!-- ================= PARAMETERS ======================= -->
+  <list name="FieldVariablesToCheckpoint">
+    <param>VelocityField</param>
+    <param>PressureField</param>
+  </list>
+  <param name="maxTimeSteps">150</param>
+  <param name="outputEvery">1</param>
+  <param name="dumpEvery">2</param>
+  <param name="outputPath">output_wars</param>
+  <param name="dim">2</param>
+  <param name="shadowDepth">1</param>
+  <param name="minX">0.0f</param>
+  <param name="minY">0.0f</param>
+  <param name="minZ">0.0f</param>
+  <param name="maxX">1500000.0f</param>
+  <param name="maxY">180000.0f</param>
+  <param name="maxZ">2500.0f</param>
+  <param name="elementResI">120</param>
+  <param name="elementResJ">36</param>
+  <param name="elementResK">5</param>
+  <param name="allowUnbalancing">True</param>
+  <param name="buildNodeNeighbourTbl">True</param>
+  <param name="buildElementNeighbourTbl">True</param>
+  <param name="particlesPerCell">30</param>
+  <param name="seed">13</param>
+  <param name="gaussParticlesX">2</param>
+  <param name="gaussParticlesY">2</param>
+  <param name="gaussParticlesZ">2</param>
+  
+  <param name="WarsTTop">273</param>
+  <param name="WarsTBottom">1573</param>
+
+  <param name="EAEnd">1080000</param>
+  <param name="WarsStart">1140000</param>
+  <param name="WarsHeight">30000</param>
+  <param name="crustBottom">141000</param>
+
+  <!-- This implies that the gradient in the EA zone is 1300/180 km.
+       Need to update this each time we change the temperature of the
+       boundary or the height of the box. -->
+  <param name="TemperatureGradient">7.22222222222e-3</param>
+
+  <param name="dtFactor">0.5</param>
+  <param name="linearTolerance">1.0e-5</param>
+  <param name="nonLinearTolerance">1.0e-2</param>
+
+ <param name="journal.info">True</param>
+ <param name="journal.debug">True</param>
+ <param name="journal-level.info">2</param> 
+ <param name="journal-level.debug">2</param>
+</StGermainData>
