@@ -1,7 +1,7 @@
 %!PS-Adobe-2.0 EPSF-2.0
 %%Title: divergence_3D_error.eps
-%%Creator: gnuplot 4.2 patchlevel 2 
-%%CreationDate: Thu Mar 26 13:31:25 2009
+%%Creator: gnuplot 4.4 patchlevel 0
+%%CreationDate: Thu Jul 22 15:41:45 2010
 %%DocumentFonts: (atend)
 %%BoundingBox: 50 50 410 302
 %%EndComments
@@ -9,8 +9,8 @@
 /gnudict 256 dict def
 gnudict begin
 %
-% The following 6 true/false flags may be edited by hand if required
-% The unit line width may also be changed
+% The following true/false flags may be edited by hand if desired.
+% The unit line width and grayscale image gamma correction may also be changed.
 %
 /Color true def
 /Blacktext false def
@@ -19,9 +19,11 @@ gnudict begin
 /Landscape false def
 /Level1 false def
 /Rounded false def
+/ClipToBoundingBox false def
 /TransparentPatterns false def
 /gnulinewidth 5.000 def
 /userlinewidth gnulinewidth def
+/Gamma 1.0 def
 %
 /vshift -46 def
 /dl1 {
@@ -44,16 +46,24 @@ systemdict /pdfmark known not {
 SDict begin [
   /Title (divergence_3D_error.eps)
   /Subject (gnuplot plot)
-  /Creator (gnuplot 4.2 patchlevel 2 )
-  /Author (Walter Landry,,,)
+  /Creator (gnuplot 4.4 patchlevel 0)
+  /Author (boo)
 %  /Producer (gnuplot)
 %  /Keywords ()
-  /CreationDate (Thu Mar 26 13:31:25 2009)
+  /CreationDate (Thu Jul 22 15:41:45 2010)
   /DOCINFO pdfmark
 end
 } ifelse
+/doclip {
+  ClipToBoundingBox {
+    newpath 50 50 moveto 410 50 lineto 410 302 lineto 50 302 lineto closepath
+    clip
+  } if
+} def
 %
-% Gnuplot Prolog Version 4.2 (August 2006)
+% Gnuplot Prolog Version 4.4 (January 2010)
+%
+%/SuppressPDFMark true def
 %
 /M {moveto} bind def
 /L {lineto} bind def
@@ -63,6 +73,7 @@ end
 /Z {closepath} bind def
 /C {setrgbcolor} bind def
 /f {rlineto fill} bind def
+/Gshow {show} def   % May be redefined later in the file to support UTF-8
 /vpt2 vpt 2 mul def
 /hpt2 hpt 2 mul def
 /Lshow {currentpoint stroke M 0 vshift R 
@@ -303,7 +314,7 @@ end
   ColR ColG ColB setrgbcolor} def
 /BoxColFill {gsave Rec PolyFill} def
 /PolyFill {gsave Density fill grestore grestore} def
-/h {rlineto rlineto rlineto gsave fill grestore} bind def
+/h {rlineto rlineto rlineto gsave closepath fill grestore} bind def
 %
 % PostScript Level 1 Pattern Fill routine for rectangles
 % Usage: x y w h s a XX PatternFill
@@ -424,6 +435,7 @@ end
 %%EndProlog
 gnudict begin
 gsave
+doclip
 50 50 translate
 0.050 0.050 scale
 0 setgray
@@ -431,221 +443,223 @@ newpath
 (Helvetica) findfont 140 scalefont setfont
 1.000 UL
 LTb
-966 420 M
+1022 448 M
 63 0 V
-5933 0 R
+5904 0 R
 -63 0 V
-882 420 M
+938 448 M
 ( 0.0001) Rshow
 1.000 UL
 LTb
-966 867 M
+1022 892 M
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 1128 M
+1022 1151 M
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 1313 M
+1022 1336 M
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 1457 M
+1022 1479 M
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 1575 M
+1022 1595 M
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 1674 M
+-5936 99 R
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 1760 M
+-5936 85 R
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 1836 M
+-5936 76 R
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 1904 M
+-5936 67 R
 63 0 V
-5933 0 R
+5904 0 R
 -63 0 V
--6017 0 R
+-5988 0 R
 ( 0.001) Rshow
 1.000 UL
 LTb
-966 2351 M
+1022 2366 M
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 2612 M
+1022 2626 M
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 2797 M
+1022 2810 M
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 2941 M
+1022 2953 M
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 3059 M
+1022 3070 M
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 3158 M
+-5936 98 R
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 3244 M
+-5936 86 R
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 3320 M
+-5936 75 R
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 3388 M
+-5936 68 R
 63 0 V
-5933 0 R
+5904 0 R
 -63 0 V
--6017 0 R
+-5988 0 R
 ( 0.01) Rshow
 1.000 UL
 LTb
-966 3835 M
+1022 3840 M
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 4096 M
+1022 4100 M
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 4281 M
+1022 4284 M
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 4425 M
+1022 4427 M
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 4543 M
+1022 4544 M
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 4642 M
+-5936 99 R
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 4728 M
+-5936 85 R
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 4804 M
+-5936 76 R
 31 0 V
-5965 0 R
+5936 0 R
 -31 0 V
-966 4872 M
+-5936 67 R
 63 0 V
-5933 0 R
+5904 0 R
 -63 0 V
--6017 0 R
+-5988 0 R
 ( 0.1) Rshow
 1.000 UL
 LTb
-966 420 M
+1022 448 M
 0 63 V
-0 4389 R
+0 4360 R
 0 -63 V
-966 280 M
+0 -4500 R
 ( 0) Cshow
 1.000 UL
 LTb
-2165 420 M
+2215 448 M
 0 63 V
-0 4389 R
+0 4360 R
 0 -63 V
-0 -4529 R
+0 -4500 R
 ( 50) Cshow
 1.000 UL
 LTb
-3364 420 M
+3409 448 M
 0 63 V
-0 4389 R
+0 4360 R
 0 -63 V
-0 -4529 R
+0 -4500 R
 ( 100) Cshow
 1.000 UL
 LTb
-4564 420 M
+4602 448 M
 0 63 V
-0 4389 R
+0 4360 R
 0 -63 V
-0 -4529 R
+0 -4500 R
 ( 150) Cshow
 1.000 UL
 LTb
-5763 420 M
+5796 448 M
 0 63 V
-0 4389 R
+0 4360 R
 0 -63 V
-0 -4529 R
+0 -4500 R
 ( 200) Cshow
 1.000 UL
 LTb
-6962 420 M
+6989 448 M
 0 63 V
-0 4389 R
+0 4360 R
 0 -63 V
-0 -4529 R
+0 -4500 R
 ( 250) Cshow
 1.000 UL
 LTb
 1.000 UL
 LTb
-966 4872 N
-966 420 L
-5996 0 V
-0 4452 V
--5996 0 V
+1022 4871 N
+0 -4423 V
+5967 0 V
+0 4423 V
+-5967 0 V
 Z stroke
 LCb setrgbcolor
-140 2646 M
-currentpoint gsave translate 90 rotate 0 0 M
+196 2659 M
+currentpoint gsave translate -270 rotate 0 0 M
 (Maximum StrainRate Error) Cshow
 grestore
 LTb
 LCb setrgbcolor
-3964 70 M
+4005 98 M
 (Particles per Cell) Cshow
 LTb
 1.000 UP
 1.000 UL
 LTb
+% Begin plot #1
 1.000 UP
 1.000 UL
 LT0
-1686 3645 M
-719 -715 V
-3844 2331 L
-6722 1884 L
-1686 3645 Pls
-2405 2930 Pls
-3844 2331 Pls
-6722 1884 Pls
+1738 3652 M
+716 -761 V
+3886 2347 L
+6750 1935 L
+1738 3652 Pls
+2454 2891 Pls
+3886 2347 Pls
+6750 1935 Pls
+% End plot #1
 1.000 UL
 LTb
-966 4872 N
-966 420 L
-5996 0 V
-0 4452 V
--5996 0 V
+1022 4871 N
+0 -4423 V
+5967 0 V
+0 4423 V
+-5967 0 V
 Z stroke
 1.000 UP
 1.000 UL

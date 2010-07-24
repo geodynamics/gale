@@ -548,6 +548,40 @@ where
  is the viscosity.
 \end_layout
 
+\begin_layout Standard
+Note that equation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:simple momentum conservation"
+
+\end_inset
+
+ has no dependence on the magnitude of the velocity.
+ Rather, only the derivative of the velocity comes into play.
+ This means that, in the absence of boundary conditions, you can take a
+ valid solution, add 
+\begin_inset Formula $10^{40}$
+\end_inset
+
+ to all of the velocity components, and you will still have a valid solution.
+ In practice, if you do not specify the velocity somewhere, the code will
+ have problems finding a solution.
+\end_layout
+
+\begin_layout Standard
+This means that, in 2D, you must specify 
+\begin_inset Formula $v_{x}$
+\end_inset
+
+ and 
+\begin_inset Formula $v_{y}$
+\end_inset
+
+ for at least in one point in your simulation (it does not have to be the
+ same point).
+ 
+\end_layout
+
 \begin_layout Subsection
 Gravity
 \end_layout
@@ -1070,8 +1104,50 @@ Scaling it this way means that you do not have to scale the length or stresses.
  You also do not have to scale the density or gravity, since they only appear
  when multiplied by each other.
  The main things you have to change are the viscosities and velocities.
- For thermal simulations, you also have to scale the thermal diffusivity.
- 
+ For thermal simulations, you also have to scale the thermal diffusivity
+ and heat production rate.
+ If you are using the 
+\family typewriter
+NonNewtonian
+\family default
+ Rheology (see Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:NonNewtonian"
+
+\end_inset
+
+), you have to scale 
+\family typewriter
+A
+\family default
+, 
+\family typewriter
+refStrainRate
+\family default
+, 
+\family typewriter
+minViscosity
+\family default
+, and 
+\family typewriter
+maxViscosity
+\family default
+.
+ Note that the scaling for 
+\family typewriter
+A
+\family default
+ is non-trivial.
+ It has units of 
+\begin_inset Formula $s^{-1/n}Pa^{-1}$
+\end_inset
+
+, so in this case 
+\begin_inset Formula $A_{new}=A_{old}\left(10^{25}\right)^{1/n}$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Subsubsection
@@ -2268,6 +2344,187 @@ Advanced Usage
 \end_layout
 
 \begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Yield-Fix"
+
+\end_inset
+
+Drucker-Prager Rheology
+\end_layout
+
+\begin_layout Standard
+The Drucker-Prager rheology models a material that is rigid until the shear
+ stress reaches a breaking, or yield, stress.
+ Once the material yields, Gale modifies the viscosity of the material such
+ that, given the strains applied to the material, the induced stress will
+ now equal the yield stress.
+ Unfortunately, there are two problems with this.
+\end_layout
+
+\begin_layout Enumerate
+This is a numerical process, so the viscosity may be set too low.
+ If the viscosity is too low, then the material will slip too easily, and
+ there may be problems with convergence.
+\end_layout
+
+\begin_layout Enumerate
+There is no length scale inherent in this method.
+ So as you increase resolution, you will get finer and finer faults.
+ This would not be too much of a problem if you just got the same faults,
+ but more finely resolved.
+ But what happens is that you tend to get more and more faults everywhere.
+ The algorithm never converges to a single answer, and so it is difficult
+ to say whether any results you get are reasonable.
+\end_layout
+
+\begin_layout Standard
+Gale has two ways of solving this problem.
+ One is to just set the minimum viscosity.
+ This robustly solves the first problem.
+ It also, in a sense, solves the second problem.
+ Consider a model problem where two blocks are sliding against each other
+ as in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Two-blocks-sliding"
+
+\end_inset
+
+.
+ If the yielding stress only depends on cohesion, then a length scale naturally
+ comes out
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+L_{\eta_{min}}=\frac{\eta_{min}v}{C},\]
+
+\end_inset
+
+ where 
+\begin_inset Formula $\eta_{min}$
+\end_inset
+
+ is the minimum viscosity, 
+\begin_inset Formula $v$
+\end_inset
+
+ is the velocity of the sliding blocks, and 
+\begin_inset Formula $C$
+\end_inset
+
+ is the cohesion.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement h
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/yielding.pdf
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Two-blocks-sliding"
+
+\end_inset
+
+Two blocks sliding past each other with a yielding region between them.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For a general Drucker-Prager rheology, though, the yield stress depends
+ on the pressure as well.
+ In that case, as you look at material deeper and deeper in the earth, where
+ the pressure, and hence yield stress, is higher, then the length scale
+ will get shorter and shorter.
+ If you set 
+\begin_inset Formula $\eta_{min}$
+\end_inset
+
+ such that, at the surface, you get a reasonable length scale for your resolutio
+n, then the length scale will be much smaller and unresolved in the mantle.
+\end_layout
+
+\begin_layout Standard
+So the other solution Gale provides is to set a maximum strain rate.
+ It does this by looking at what the strain rate is, and making sure that
+ the viscosity is not set so low such that the strain rate will exceed the
+ maximum strain rate.
+ This provides a length scale even more simply
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+L_{\dot{\epsilon}_{max}}=\dot{\frac{v}{\dot{\epsilon}_{max}}}.\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In practice, both of these quantities may need to be set.
+ A minimum viscosity may assist in taming irregularities arising from activities
+ on the surface, such as landslides.
+ A maximum strain rate, in the mean time, will assist in ensuring that the
+ code is convergent.
+ Both of these numbers are used for the Drucker-Prager benchmark (Section
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Drucker-Prager"
+
+\end_inset
+
+), and the Geomod benchmarks (Sections 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Geomod-2004"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Geomod-2008"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Subsection
 Direct Solvers
 \end_layout
 
@@ -2397,6 +2654,41 @@ You can append any number of modified parameters in one unbroken line (here
 \end_inset
 
 --elementResJ=64 --elementResK=64 --particlesPerCell=60 --dumpEvery=10
+\end_layout
+
+\begin_layout Subsection
+Checkpointing
+\end_layout
+
+\begin_layout Standard
+Gale can save the state of the simulation so that it can be restarted from
+ that point.
+ To save the state for every time step, add the line
+\end_layout
+
+\begin_layout LyX-Code
+<param name="checkpointEvery">1</param>
+\end_layout
+
+\begin_layout Standard
+to the variables at the end of the input file or add
+\end_layout
+
+\begin_layout LyX-Code
+--checkpointEvery=1
+\end_layout
+
+\begin_layout Standard
+to the command line.
+ To restart from step 5, add
+\end_layout
+
+\begin_layout LyX-Code
+--restartTimestep=5
+\end_layout
+
+\begin_layout Standard
+to the command line.
 \end_layout
 
 \begin_layout Section
@@ -3526,7 +3818,7 @@ at the beginning of the file, and before the lines
 \begin_layout Standard
 The template file is indented to make it easier to notice if you add a component
  in the middle of another component.
- This is solely for the benefit of users.
+ This is solely for the benefit of humans.
  Gale does not pay attention to indentation when reading the files.
 \end_layout
 
@@ -5376,7 +5668,14 @@ This example deforms the bottom boundary and keeps it fixed.
  We will set the left half of the boundary to follow a circle, while the
  right half will still be flat.
  Then, the boundary condition for the velocity is set to move the material
- in from the left and out through the bottom as in Figure .
+ in from the left and out through the bottom as in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Geometry-deformed-bottom"
+
+\end_inset
+
+.
  This is meant to approximate one slab subducting under another.
 \end_layout
 
@@ -7526,7 +7825,7 @@ Power Law Creep
 
 \begin_layout Standard
 A common approximation for the rheology of rocks is power law creep.
- This example shows how to implement this with the NonNewtonian rheologies.
+ This example shows how to implement this with the NonNewtonian rheology.
 \end_layout
 
 \begin_layout Enumerate
@@ -15255,7 +15554,16 @@ where
 
  are different from 2D and 3D.
  In 2D, Drucker-Prager and Mohr-Coulomb are identical.
- Specifically,
+ Specifically, if we write the Mohr-Coulomb yield stress as
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+\sigma_{MC}=C'+\sigma_{\bot}\tan\phi',\]
+
+\end_inset
+
+ then
 \end_layout
 
 \begin_layout Standard
@@ -15322,6 +15630,78 @@ minimumYieldStress
 \end_layout
 
 \begin_layout Standard
+When reducing the viscosity, if the second invariant of the strain rate
+ tensor 
+\begin_inset Formula $\dot{\epsilon}$
+\end_inset
+
+ is greater than 
+\family typewriter
+maximumStrainRate
+\family default
+ (
+\begin_inset Formula $\dot{\epsilon}_{max}$
+\end_inset
+
+) and 
+\begin_inset Formula $\dot{\epsilon}_{max}\neq0$
+\end_inset
+
+, then Drucker-Prager sets the new viscosity to 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+\eta_{new}=\frac{Ap+B}{\sqrt{\dot{\epsilon}_{max}}}.\]
+
+\end_inset
+
+ Otherwise, Drucker-Prager sets the new viscosity such that the stress will
+ equal the yield stress
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+\eta_{new}=\frac{Ap+B}{\sqrt{\dot{\epsilon}}}.\]
+
+\end_inset
+
+After that, if 
+\begin_inset Formula $\eta_{new}$
+\end_inset
+
+ is less than 
+\family typewriter
+minimumViscosity
+\family default
+, then 
+\begin_inset Formula $\eta_{new}$
+\end_inset
+
+ is set to 
+\family typewriter
+minimumViscosity
+\family default
+.
+ See Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Yield-Fix"
+
+\end_inset
+
+ for more details on how to use 
+\family typewriter
+maxStrainRate
+\family default
+ and 
+\family typewriter
+minimumViscosity
+\family default
+.
+\end_layout
+
+\begin_layout Standard
 Also, the Drucker-Prager implementation allows you to specify that material
  near the boundary will have different yielding properties.
  This is useful for simulating frictional boundaries.
@@ -15379,7 +15759,7 @@ reference "sec:HydrostaticTerm"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="16" columns="2">
+<lyxtabular version="3" rows="18" columns="2">
 <features>
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
@@ -15498,6 +15878,46 @@ minimumYieldStress
 
 \begin_layout Plain Layout
 0 (see above)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+minimumViscosity
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+maxStrainRate
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0
 \end_layout
 
 \end_inset
@@ -16324,7 +16744,7 @@ Let's assume you wish to have material flow across the boundary instead
  A simple example would be like Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:General-subduction-model"
+reference "fig:Strain-deformed-bottom"
 
 \end_inset
 
@@ -16338,8 +16758,8 @@ reference "fig:General-subduction-model"
 The boundaries do not move.
 
 \series default
- For the slab subduction model, you need to ensure that neither the bottom
- nor left boundaries move.
+ For this model, you need to ensure that, while the material moves, neither
+ the bottom nor left boundaries move.
  Do this by specifying
 \end_layout
 
@@ -16388,35 +16808,25 @@ reference "sub:Velocity-Boundary-Conditions"
 \begin_layout Enumerate
 
 \series bold
-A region where new particles are created, not split from existing particles.
+Special parameter for population control.
 
 \series default
- When Gale advects material near an inflowing boundary, this leaves a vacuum.
- Normally, Gale creates new particles by cloning nearby particles.
- However, if the cloned particles have already undergone evolution (e.g.,
- they were strained), then the new particles would no longer be pristine.
- To fix this, you can specify regions where particles should be created
- anew by adding something like
+ You must specifically tell Gale that you are running a simulation where
+ particles may be created by inflow.
+ This is done by specifying
 \end_layout
 
 \begin_deeper
 \begin_layout LyX-Code
-
-\family typewriter
-<param name="originalParticleShape">leftBoundaryShape</param>
+<param name="Inflow">True</param>
 \end_layout
 
 \begin_layout Standard
-to the 
+in the 
 \family typewriter
-ReseedSplitting
+PCDVC
 \family default
  struct.
- An example of this is in the sample input file 
-\family typewriter
-subduction.xml
-\family default
-.
 \end_layout
 
 \end_deeper
@@ -16691,135 +17101,6 @@ StressBC
 \end_layout
 
 \begin_layout Subsection
-Kinetic Friction Boundary Conditions
-\end_layout
-
-\begin_layout Standard
-Kinetic friction looks like a stress boundary condition that depends on
- the normal stress on the boundary.
- To be exact, kinetic friction applies a force
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula \[
-F=friction\_value*\sigma_{nn}\]
-
-\end_inset
-
- in the direction 
-\begin_inset Formula $\overrightarrow{v}_{boundary}-\overrightarrow{v}$
-\end_inset
-
-, where 
-\begin_inset Formula $\overrightarrow{v}$
-\end_inset
-
- is the velocity of the material on the boundary, 
-\begin_inset Formula $\overrightarrow{v}_{boundary}$
-\end_inset
-
- is the velocity of the boundary, and 
-\begin_inset Formula $\sigma_{nn}$
-\end_inset
-
- is the normal stress.
- This force is recomputed during every non-linear iteration to maintain
- self consistency.
-\end_layout
-
-\begin_layout Standard
-Kinetic friction is a component, so it must be inside the list of components
- (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Components"
-
-\end_inset
-
-), not outside the list like the velocity boundary conditions.
- As an example, to add kinetic friction to a non-moving boundary you would
- add the component
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="kineticFriction">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">KineticFriction</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ForceVector">mom_force</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Swarm">picIntegrationPoints</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="wall">bottom</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="StressField">StressField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="PressureField">PressureField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="VelocityField">VelocityField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="friction_type">double</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="friction_value">0.5</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="vx_type">double</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="vx_value">0.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct> 
-\end_layout
-
-\begin_layout Standard
-You can also use the standard condition functions to specify the friction
- values (e.g., if the boundary has spatially varying friction coefficients)
- and boundary velocity values.
- You have to be careful that the boundary velocities match that of the actual
- applied velocity boundary conditions.
- So, for example, if you change your bottom boundary condition so that it
- moves at a velocity 
-\family typewriter
-1
-\family default
- in the 
-\family typewriter
-x
-\family default
- direction, you need to remember to change 
-\family typewriter
-vx_value
-\family default
- to 
-\family typewriter
-1
-\family default
-.
-\end_layout
-
-\begin_layout Subsection
 Temperature Boundary Conditions
 \begin_inset CommandInset label
 LatexCommand label
@@ -16956,7 +17237,7 @@ reference "sub:Temperature-Boundary-Conditions"
  You can fix the internal degrees of freedom for the areas outside of your
  irregular domain with a 
 \family typewriter
-ShapeVC
+MeshShapeVC
 \family default
 .
  It works very similar to 
@@ -16973,7 +17254,7 @@ WallVC
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="type">ShapeVC</param>
+  <param name="type">MeshShapeVC</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -17047,6 +17328,39 @@ WallVC
 ShapeVC
 \family default
 .
+\end_layout
+
+\begin_layout Standard
+There is one important drawback to using a 
+\family typewriter
+MeshShapeVC
+\family default
+.
+ 
+\family typewriter
+MeshShapeVC
+\family default
+ constrains mesh points defined by a shape initially.
+ However, if the mesh deforms, then 
+\family typewriter
+MeshShapeVC
+\family default
+ will still constrain the 
+\color red
+same
+\color inherit
+ points on the grid.
+ Figure XXX shows how, even if the points in the MeshShapeVC is held fixed,
+ the mesh itself can deform.
+ The only way to really prevent the mesh from deforming is to use static
+ sides (see Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:EulerDeform"
+
+\end_inset
+
+) everywhere.
 \end_layout
 
 \begin_layout Section
@@ -18058,7 +18372,7 @@ force_value If ``force_type'' is ``double,'' then this must be a number.
 \end_layout
 
 \begin_layout Section
-Deformed Upper Boundary
+Deformed Upper and Lower Boundaries
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:Deformed-Upper-Boundary"
@@ -18073,12 +18387,12 @@ Normally, Gale starts the simulation in a rectangular box.
  As the simulation proceeds, the boundaries can become distorted, in particular
  the upper boundary.
  However, you can also configure Gale to start with an initially deformed
- upper boundary by adding a 
+ upper or lower boundary by adding a 
 \family typewriter
 SurfaceAdaptor
 \family default
  component.
- A simple example is to make the surface a sinusoid
+ A simple example is to make the top a sinusoid
 \end_layout
 
 \begin_layout LyX-Code
@@ -18098,11 +18412,11 @@ SurfaceAdaptor
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="surfaceType">cosine</param>
+  <param name="topSurfaceType">cosine</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <list name="origin">
+  <list name="topOrigin">
 \end_layout
 
 \begin_layout LyX-Code
@@ -18114,11 +18428,11 @@ SurfaceAdaptor
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="amplitude">0.1</param>
+  <param name="topAmplitude">0.1</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="frequency">6.28318530718</param>
+  <param name="topFrequency">6.28318530718</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -18147,16 +18461,126 @@ h=h_{0}+amplitude*\cos\left(x*frequency\right),\]
 \end_layout
 
 \begin_layout Standard
-The other supported functions are 
+Note that many of the variables are prefaced with 
+\begin_inset Quotes sld
+\end_inset
+
+top
+\begin_inset Quotes srd
+\end_inset
+
+.
+ You can also use 
+\begin_inset Quotes sld
+\end_inset
+
+bottom
+\begin_inset Quotes srd
+\end_inset
+
+ there, and thus modify the height of the bottom boundary.
+ So if you modified the example above to 
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="surfaceAdaptor">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">SurfaceAdaptor</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="mesh">mesh-linear</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="sourceGenerator">cartesianGenerator</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="topSurfaceType">cosine</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="topOrigin">
+\end_layout
+
+\begin_layout LyX-Code
+    <param>0.0</param>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="topAmplitude">0.1</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="topFrequency">6.28318530718</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="bottomSurfaceType">cosine</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="bottomOrigin">
+\end_layout
+
+\begin_layout LyX-Code
+    <param>0.0</param>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="bottomAmplitude">0.1</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="bottomFrequency">6.28318530718</param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout Standard
+then the top and bottom will follow similar curves.
+\end_layout
+
+\begin_layout Standard
+The other supported surface types are 
 \family typewriter
 sine
 \family default
- and 
+, 
 \family typewriter
 wedge
 \family default
+, 
+\family typewriter
+cylinder
+\family default
+, 
+\family typewriter
+plateau
+\family default
+ and 
+\family typewriter
+topo_data
+\family default
 .
- Function 
+ 
 \family typewriter
 sine
 \family default
@@ -18165,7 +18589,7 @@ sine
 cosine
 \family default
  example above.
- Function 
+ 
 \family typewriter
 wedge
 \family default
@@ -18188,13 +18612,211 @@ h_{0}+gradient\left(x-offset\right) & x>offset\end{array}\right..\]
 
 \end_inset
 
- If you want to implement your own surface functions, look in
+
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+cylinder
+\family default
+ takes 6 arguments: 
+\family typewriter
+X0
+\family default
+, 
+\family typewriter
+Y0
+\family default
+, 
+\family typewriter
+Radius
+\family default
+, 
+\family typewriter
+MinX
+\family default
+, 
+\family typewriter
+MaxX
+\family default
+, and 
+\family typewriter
+Sign
+\family default
+.
+ If we define
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+\begin{array}{c}
+x'\equiv\max\left(\min\left(x,MaxX\right),MinX\right)\\
+d\equiv\sqrt{Radius^{2}-(x-x')^{2}}\end{array},\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+then the height is set to 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+h=\left\{ \begin{array}{cc}
+h_{0}+Y0+d & Sign=true\\
+h_{0}+Y0-d & Sign=false\end{array}\right..\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+plateau
+\family default
+ takes up to 9 arguments: 
+\family typewriter
+X1
+\family default
+, 
+\family typewriter
+X2
+\family default
+, 
+\family typewriter
+X3
+\family default
+, 
+\family typewriter
+X4
+\family default
+, 
+\family typewriter
+Z1
+\family default
+, 
+\family typewriter
+Z2
+\family default
+, 
+\family typewriter
+Z3
+\family default
+, 
+\family typewriter
+Z4
+\family default
+, and 
+\family typewriter
+Height
+\family default
+.
+ In 2D, it sets the height as shown in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Height-of-plateau"
+
+\end_inset
+
+.
+ In 3D, an equivalent thing is done in z, so you end up with a rectangular
+ plateau.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/plateau.pdf
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Height-of-plateau"
+
+\end_inset
+
+Height of plateau as a function of the parameters
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+topo_data
+\family default
+ reads in an ascii file with the name from 
+\family typewriter
+SurfaceName
+\family default
+ (
+\begin_inset Quotes sld
+\end_inset
+
+ascii_topo
+\begin_inset Quotes srd
+\end_inset
+
+ by default).
+ The file has a grid with 
+\family typewriter
+Nx*Nz
+\family default
+ points covering the area from (
+\family typewriter
+MinX
+\family default
+,
+\family typewriter
+MinY
+\family default
+) to (
+\family typewriter
+MaxX
+\family default
+,
+\family typewriter
+MaxY
+\family default
+).
+ Gale then interpolates the heights from that grid to its own grid.
+\end_layout
+
+\begin_layout Standard
+If you want to implement your own surface functions, look in
 \end_layout
 
 \begin_layout LyX-Code
 
 \family typewriter
-src/StGermain/Discretisation/Mesh/src/SurfaceAdaptor.c
+src/StgDomain/Mesh/src/SurfaceAdaptor.c
 \end_layout
 
 \begin_layout Section
@@ -19829,6 +20451,17 @@ Another possible artifact is that we do not simulate an infinitely long
 \end_layout
 
 \begin_layout Standard
+Since we do not precisely track the surface of the sphere, there is some
+ ambiguity as to where the sphere ends and the background medium begins.
+ The sphere viscosity is 100 and the background viscosity is 1, so we decide,
+ somewhat arbitrarily, to define the sphere to be those cells where the
+ viscosity is greater than 99.
+ Also, because we are simulating a high viscosity sphere rather than a completel
+y rigid sphere, the velocity inside the sphere is not uniform.
+ The error bars indicate the variation in velocity across the sphere.
+\end_layout
+
+\begin_layout Standard
 The errors in the computed velocity compared to the Faxen solution are plotted
  in Figure 
 \begin_inset CommandInset ref
@@ -19882,9 +20515,6 @@ reference "fig:Error-in-velocity"
 \end_inset
 
 ), the error decreases.
- Since we are simulating a high viscosity sphere rather than a completely
- rigid sphere, the velocity inside the sphere is not uniform.
- The error bars indicate the variation in velocity across the sphere.
  
 \end_layout
 
@@ -20195,7 +20825,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/inclusion_r8_p.png
+	filename images/inclusion_pressure.png
 	width 100col%
 
 \end_inset
@@ -20268,8 +20898,8 @@ reference "fig:Scaled-pressure-error"
 
 \end_inset
 
- plots the error scaled with resolution, and we can see that the error scales
- linearly with resolution.
+ zooms in on the error farther out, and we can see that the error scales
+ continues to reduce with resolution.
  This gives us confidence that, at least away from the inclusion, the code
  is giving the right answer.
  This kind of result, where the solution is bad close to the surface, but
@@ -20294,7 +20924,8 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/inclusion_r8_p_error.png
+	filename images/inclusion_error.png
+	lyxscale 75
 	width 100col%
 
 \end_inset
@@ -20356,7 +20987,8 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/inclusion_r8_p_scaled_error.png
+	filename images/inclusion_error_zoom.png
+	lyxscale 70
 	width 100col%
 
 \end_inset
@@ -20381,13 +21013,7 @@ reference "fig:Pressure-Error"
 
 \end_inset
 
-, but with the error scaled with 
-\begin_inset Formula $h$
-\end_inset
-
-.
- So the medium-resolution error is multiplied by 2 and the high-resolution
- error is multiplied by 4.
+, but zoomed in on a part a little away from the inclusion.
 \end_layout
 
 \end_inset
@@ -20884,6 +21510,12 @@ Maximum error in the strain rate invariant for the 3D Divergence benchmark
 \end_layout
 
 \begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Drucker-Prager"
+
+\end_inset
+
 Drucker-Prager
 \end_layout
 
