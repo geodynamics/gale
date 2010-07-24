@@ -45,9 +45,6 @@
 /* Temporarily needed until EP shortcuts are fixed */
 #define  CURR_MODULE_NAME "AbstractContextSuite"
 
-/* need to allocate memory for this stream */
-Stream* stream;
-
 #define __TestContext \
 	__AbstractContext \
 	unsigned int	buildHookCalled; \
