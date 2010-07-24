@@ -25,7 +25,7 @@ typedef struct {
 } Underworld_testVonMisesYielding;
 
 /* define global vars .... that's very ugly, but it's only a pcu test */
-Underworld_testVonMisesYielding globalSelf;
+Underworld_testVonMisesYielding VMYS_globalSelf;
 
 typedef struct {
 } VonMisesYieldingSuiteData;
@@ -55,7 +55,7 @@ void testVonMisesYielding_HasYielded(
 	Dimension_Index dim_I;
 
 	/* Call real 'HasYielded' function */
-	globalSelf.realHasYieldedFunction( 
+	VMYS_globalSelf.realHasYieldedFunction( 
 			yieldRheology, constitutiveMatrix, materialPointsSwarm, lElement_I, materialPoint, yieldCriterion, yieldIndicator );
 
 	/* Don't output information if this is the first non-linear iteration */
@@ -64,12 +64,12 @@ void testVonMisesYielding_HasYielded(
 	}
 
 	/* Store information */
-	globalSelf.hasYielded = True;
+	VMYS_globalSelf.hasYielded = True;
 	for ( dim_I = 0 ; dim_I < constitutiveMatrix->dim ; dim_I++ ) {
-		if ( materialPoint->coord[ dim_I ] < globalSelf.min[ dim_I ] )
-			globalSelf.min[ dim_I ] = materialPoint->coord[ dim_I ];
-		if ( materialPoint->coord[ dim_I ] > globalSelf.max[ dim_I ] )
-			globalSelf.max[ dim_I ] = materialPoint->coord[ dim_I ];
+		if ( materialPoint->coord[ dim_I ] < VMYS_globalSelf.min[ dim_I ] )
+			VMYS_globalSelf.min[ dim_I ] = materialPoint->coord[ dim_I ];
+		if ( materialPoint->coord[ dim_I ] > VMYS_globalSelf.max[ dim_I ] )
+			VMYS_globalSelf.max[ dim_I ] = materialPoint->coord[ dim_I ];
 	}
 }
 
@@ -79,7 +79,7 @@ void Underworld_testVonMisesYielding_Check( FiniteElementContext* context ) {
 
    if(context->rank == 0){
       /* Don't do anything if nothing has yielded yet */
-      if ( !globalSelf.hasYielded ) {
+      if ( !VMYS_globalSelf.hasYielded ) {
          return;
       }
    
@@ -90,10 +90,10 @@ void Underworld_testVonMisesYielding_Check( FiniteElementContext* context ) {
       Journal_Printf( stream, "Material yielded at time %12.4g (step %u) within:\n", context->currentTime, context->timeStep ); 
    
       /* Output information */
-      Journal_Printf( stream, "\tx: %12.4g - %12.4g\n", globalSelf.min[ I_AXIS ], globalSelf.max[ I_AXIS ] );
-      Journal_Printf( stream, "\ty: %12.4g - %12.4g\n", globalSelf.min[ J_AXIS ], globalSelf.max[ J_AXIS ] );
+      Journal_Printf( stream, "\tx: %12.4g - %12.4g\n", VMYS_globalSelf.min[ I_AXIS ], VMYS_globalSelf.max[ I_AXIS ] );
+      Journal_Printf( stream, "\ty: %12.4g - %12.4g\n", VMYS_globalSelf.min[ J_AXIS ], VMYS_globalSelf.max[ J_AXIS ] );
       if ( context->dim == 3 ) {
-         Journal_Printf( stream, "\tz: %12.4g - %12.4g\n", globalSelf.min[ K_AXIS ], globalSelf.max[ K_AXIS ] );
+         Journal_Printf( stream, "\tz: %12.4g - %12.4g\n", VMYS_globalSelf.min[ K_AXIS ], VMYS_globalSelf.max[ K_AXIS ] );
       }
       Stream_CloseAndFreeFile( stream );
    }
@@ -105,25 +105,25 @@ void Underworld_testVonMisesYielding_Check_Sync( FiniteElementContext* context )
    
    /* get true global max/min */
 
-   MPI_Allreduce( &globalSelf.min[ I_AXIS ], &mins[I_AXIS], 1, MPI_DOUBLE, MPI_MIN, context->communicator );
-   MPI_Allreduce( &globalSelf.min[ J_AXIS ], &mins[J_AXIS], 1, MPI_DOUBLE, MPI_MIN, context->communicator );
+   MPI_Allreduce( &VMYS_globalSelf.min[ I_AXIS ], &mins[I_AXIS], 1, MPI_DOUBLE, MPI_MIN, context->communicator );
+   MPI_Allreduce( &VMYS_globalSelf.min[ J_AXIS ], &mins[J_AXIS], 1, MPI_DOUBLE, MPI_MIN, context->communicator );
    if ( context->dim == 3 )
-      MPI_Allreduce( &globalSelf.min[ K_AXIS ], &mins[K_AXIS], 1, MPI_DOUBLE, MPI_MIN, context->communicator );
+      MPI_Allreduce( &VMYS_globalSelf.min[ K_AXIS ], &mins[K_AXIS], 1, MPI_DOUBLE, MPI_MIN, context->communicator );
 
-   MPI_Allreduce( &globalSelf.max[ I_AXIS ], &maxs[I_AXIS], 1, MPI_DOUBLE, MPI_MAX, context->communicator );
-   MPI_Allreduce( &globalSelf.max[ J_AXIS ], &maxs[J_AXIS], 1, MPI_DOUBLE, MPI_MAX, context->communicator );
+   MPI_Allreduce( &VMYS_globalSelf.max[ I_AXIS ], &maxs[I_AXIS], 1, MPI_DOUBLE, MPI_MAX, context->communicator );
+   MPI_Allreduce( &VMYS_globalSelf.max[ J_AXIS ], &maxs[J_AXIS], 1, MPI_DOUBLE, MPI_MAX, context->communicator );
    if ( context->dim == 3 )
-      MPI_Allreduce( &globalSelf.max[ K_AXIS ], &maxs[K_AXIS], 1, MPI_DOUBLE, MPI_MAX, context->communicator );
+      MPI_Allreduce( &VMYS_globalSelf.max[ K_AXIS ], &maxs[K_AXIS], 1, MPI_DOUBLE, MPI_MAX, context->communicator );
    
    /* now set to these values */
-   globalSelf.min[ I_AXIS ] = mins[ I_AXIS ];
-   globalSelf.min[ J_AXIS ] = mins[ J_AXIS ];
+   VMYS_globalSelf.min[ I_AXIS ] = mins[ I_AXIS ];
+   VMYS_globalSelf.min[ J_AXIS ] = mins[ J_AXIS ];
    if ( context->dim == 3 )
-      globalSelf.min[ K_AXIS ] = mins[ K_AXIS ];
-   globalSelf.max[ I_AXIS ] = maxs[ I_AXIS ];
-   globalSelf.max[ J_AXIS ] = maxs[ J_AXIS ];
+      VMYS_globalSelf.min[ K_AXIS ] = mins[ K_AXIS ];
+   VMYS_globalSelf.max[ I_AXIS ] = maxs[ I_AXIS ];
+   VMYS_globalSelf.max[ J_AXIS ] = maxs[ J_AXIS ];
    if ( context->dim == 3 )
-      globalSelf.max[ K_AXIS ] = maxs[ K_AXIS ];
+      VMYS_globalSelf.max[ K_AXIS ] = maxs[ K_AXIS ];
 }
 
 
@@ -144,13 +144,13 @@ void VonMisesYieldingSuite_VonMises2D( VonMisesYieldingSuiteData* data ) {
 	stgMainBuildAndInitialise( cf  );
 
 	/* get pointer to the mesh */
-	globalSelf.mesh = Stg_ComponentFactory_ConstructByName( cf, (Name)"linearMesh", FeMesh, True, NULL ); 
+	VMYS_globalSelf.mesh = Stg_ComponentFactory_ConstructByName( cf, (Name)"linearMesh", FeMesh, True, NULL ); 
 	
 	/* Get a pointer the yield rheology that we are trying to test */
 	yieldRheology = (YieldRheology* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"yieldRheology"  );
 	
 	/* Store the pointer to the original 'HasYielded' function */
-	globalSelf.realHasYieldedFunction = yieldRheology->_hasYielded;
+	VMYS_globalSelf.realHasYieldedFunction = yieldRheology->_hasYielded;
 
 	/* Reset this function pointer with our own */
 	yieldRheology->_hasYielded = testVonMisesYielding_HasYielded;
@@ -159,12 +159,12 @@ void VonMisesYieldingSuite_VonMises2D( VonMisesYieldingSuiteData* data ) {
 	ContextEP_Append( context, AbstractContext_EP_Step, Underworld_testVonMisesYielding_Check );
 	EP_AppendClassHook( Context_GetEntryPoint( context, FiniteElementContext_EP_CalcDt ), Underworld_testVonMisesYielding_dt, context );
 
-	globalSelf.min[ I_AXIS ] =  HUGE_VAL;
-	globalSelf.min[ J_AXIS ] =  HUGE_VAL;
-	globalSelf.min[ K_AXIS ] =  HUGE_VAL;
-	globalSelf.max[ I_AXIS ] = -HUGE_VAL;
-	globalSelf.max[ J_AXIS ] = -HUGE_VAL;
-	globalSelf.max[ K_AXIS ] = -HUGE_VAL;
+	VMYS_globalSelf.min[ I_AXIS ] =  HUGE_VAL;
+	VMYS_globalSelf.min[ J_AXIS ] =  HUGE_VAL;
+	VMYS_globalSelf.min[ K_AXIS ] =  HUGE_VAL;
+	VMYS_globalSelf.max[ I_AXIS ] = -HUGE_VAL;
+	VMYS_globalSelf.max[ J_AXIS ] = -HUGE_VAL;
+	VMYS_globalSelf.max[ K_AXIS ] = -HUGE_VAL;
 
 	stgMainLoop( cf );
 

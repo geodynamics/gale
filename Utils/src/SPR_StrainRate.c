@@ -15,7 +15,7 @@
 #include <string.h>
 
 const Type SPR_StrainRate_Type = "SPR_StrainRate";
-char*  NameOfPatch;
+char*  SPR_NameOfPatch;
 
 
 SPR_StrainRate* SPR_StrainRate_New(
@@ -121,7 +121,7 @@ void _SPR_StrainRate_Init( SPR_StrainRate* self ) {
 	/* Setup basic pointers and functionPtrs that are specific to problem spec  */
    ContextEP_Append_AlwaysLast( self->context, "stokesEqn-execute", _SPR_StrainRate_Execute );
 
-	NameOfPatch = self->name;
+	SPR_NameOfPatch = self->name;
 }
 
 void _SPR_StrainRate_AssignFromXML( void* sprVar, Stg_ComponentFactory* cf, void* data ) {
@@ -147,7 +147,7 @@ void _SPR_StrainRate_Execute( void* patch, void* data ) {
    * are executed in the below functions 
    */
 	PICelleratorContext* context = (PICelleratorContext*)data;
-	SPR_StrainRate* self = (SPR_StrainRate*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)NameOfPatch );
+	SPR_StrainRate* self = (SPR_StrainRate*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)SPR_NameOfPatch );
 	double startTime;
 	assert( self );
 
