@@ -44,7 +44,7 @@ def UWExit( self ):
    print 'If you require help, send the files:'
    print '\tconfig.log'
    print '\tconfig.cfg (if it exists)'
-   print 'to: underworld-users@vpac.org'
+   print 'to: cig-long@geodynamics.org'
    print '************************************'
    env.Exit()
 
