@@ -149,6 +149,14 @@
       <param name="Swarm">picIntegrationPoints</param>
       <param name="Mesh">mesh-linear</param>
       <param name="ConstitutiveMatrix">constitutiveMatrix</param>
+    </struct> 
+    <struct name="DensityField">
+      <param name="Type">DensityField</param>
+      <param name="Context">context</param>
+      <param name="Swarm">picIntegrationPoints</param>
+      <param name="Mesh">mesh-linear</param>
+      <param name="BuoyancyForceTerm">buoyancyForceTerm</param>
+      <param name="ConstitutiveMatrix">constitutiveMatrix</param>
     </struct>
     <struct name="cellLayout">
       <param name="Type">SingleCellLayout</param>
@@ -330,7 +338,6 @@
       <param name="PressureVector">solutionPressure</param>
       <param name="ForceVector">mom_force</param>
       <param name="ContinuityForceVector">cont_force</param>
-      <param name="nonLinearMinIterations">nonLinearMinIterations</param>
       <param name="nonLinearMaxIterations">nonLinearMaxIterations</param>
       <param name="nonLinearTolerance">nonLinearTolerance</param>
       <param name="makeConvergenceFile">false</param>
@@ -349,9 +356,142 @@
       <param name="storeVisc">storeViscosity</param>
       <param name="StiffnessMatrix">c_matrix</param>
     </struct>
-    <struct name="background">
+    <struct name="buoyancyForceTerm">
+      <param name="Type">BuoyancyForceTerm</param>
+      <param name="ForceVector">mom_force</param>
+      <param name="Swarm">picIntegrationPoints</param>
+      <param name="gravity">9.81</param>
+    </struct>
+    <struct name="backgroundShape">
       <param name="Type">Everywhere</param>
     </struct>
+    <struct name="beadsShape">
+      <param name="Type">Box</param>
+      <param name="startX">minX</param>
+      <param name="endX">maxX</param>
+      <param name="startY">0.005</param>
+      <param name="endY">0.01</param>
+      <param name="startZ">minZ</param>
+      <param name="endZ">maxZ</param>
+    </struct>
+    <struct name="sandShape">
+      <param name="Type">Intersection</param>
+      <list name="shapes">
+        <param>backgroundShape</param>
+        <param>!beadsShape</param>
+      </list>
+    </struct>
+
+    <struct name="sandStrainWeakening">
+      <param name="Type">StrainWeakening</param>
+      <param name="TimeIntegrator">timeIntegrator</param>
+      <param name="MaterialPointsSwarm">materialSwarm</param>
+      <param name="initialSofteningStrain">0.5</param>
+      <param name="finalSofteningStrain">1.0</param>
+      <param name="initialDamageFraction">0.0</param>
+      <param name="initialDamageWavenumber">0.5</param>
+      <param name="initialDamageFactor">0.5</param>
+      <param name="healingRate">0.0</param>
+    </struct>
+    <struct name="sandYielding">
+      <param name="Type">DruckerPrager</param>
+      <param name="PressureField">PressureField</param>
+      <param name="VelocityGradientsField">VelocityGradientsField</param>
+      <param name="MaterialPointsSwarm">materialSwarm</param>
+      <param name="Context">context</param>
+      <param name="StrainWeakening">sandStrainWeakening</param>
+      <param name="StrainRateField">StrainRateField</param>
+      <param name="cohesion">10.0</param>
+      <param name="cohesionAfterSoftening">0.01</param>
+      <param name="frictionCoefficient">0.726542528005</param>
+      <param name="frictionCoefficientAfterSoftening">0.600860619027</param>
+      <param name="boundaryCohesion">0.01</param>
+      <param name="boundaryCohesionAfterSoftening">0.01</param>
+      <param name="boundaryFrictionCoefficient">0.34432761329</param>
+      <param name="boundaryFrictionCoefficientAfterSoftening">0.34432761329</param>
+      <param name="boundaryBottom">True</param>
+      <param name="boundaryRight">True</param>
+      <param name="minimumViscosity">minimumViscosity</param>
+    </struct>
+    <struct name="sandViscosity">
+      <param name="Type">MaterialViscosity</param>
+      <param name="eta0">1.0e2</param>
+<!--       <param name="eta0">1.0e12</param> -->
+    </struct>
+
+    <struct name="beadsStrainWeakening">
+      <param name="Type">StrainWeakening</param>
+      <param name="TimeIntegrator">timeIntegrator</param>
+      <param name="MaterialPointsSwarm">materialSwarm</param>
+      <param name="initialSofteningStrain">0.5</param>
+      <param name="finalSofteningStrain">1.0</param>
+      <param name="initialDamageFraction">0.0</param>
+      <param name="initialDamageWavenumber">0.5</param>
+      <param name="initialDamageFactor">0.5</param>
+      <param name="healingRate">0.0</param>
+    </struct>
+    <struct name="beadsYielding">
+      <param name="Type">DruckerPrager</param>
+      <param name="PressureField">PressureField</param>
+      <param name="VelocityGradientsField">VelocityGradientsField</param>
+      <param name="MaterialPointsSwarm">materialSwarm</param>
+      <param name="Context">context</param>
+      <param name="StrainWeakening">beadsStrainWeakening</param>
+      <param name="StrainRateField">StrainRateField</param>
+      <param name="cohesion">10.0</param>
+      <param name="cohesionAfterSoftening">0.01</param>
+      <param name="frictionCoefficient">0.404026225835</param>
+      <param name="frictionCoefficientAfterSoftening">0.363970234266</param>
+      <param name="boundaryCohesion">0.01</param>
+      <param name="boundaryCohesionAfterSoftening">0.01</param>
+      <param name="boundaryFrictionCoefficient">0.34432761329</param>
+      <param name="boundaryFrictionCoefficientAfterSoftening">0.34432761329</param>
+      <param name="boundaryBottom">True</param>
+      <param name="boundaryRight">True</param>
+      <param name="minimumViscosity">minimumViscosity</param>
+    </struct>
+    <struct name="beadsViscosity">
+      <param name="Type">MaterialViscosity</param>
+      <param name="eta0">1.0e2</param>
+<!--       <param name="eta0">1.0e12</param> -->
+    </struct>
+
+    <struct name="sand">
+      <param name="Type">RheologyMaterial</param>
+      <param name="Shape">sandShape</param>
+      <param name="density">1560</param>
+      <list name="Rheology">
+        <param>sandViscosity</param>
+        <param>sandYielding</param>
+        <param>storeViscosity</param>
+        <param>storeStress</param>
+      </list>
+    </struct>
+    <struct name="beads">
+      <param name="Type">RheologyMaterial</param>
+      <param name="Shape">beadsShape</param>
+      <param name="density">1480</param>
+      <list name="Rheology">
+        <param>beadsViscosity</param>
+        <param>beadsYielding</param>
+        <param>storeViscosity</param>
+        <param>storeStress</param>
+      </list>
+    </struct>
+
+    <struct name="surfaceAdaptor">
+      <param name="Type">SurfaceAdaptor</param>
+      <param name="mesh">mesh-linear</param>
+      <param name="sourceGenerator">linearMesh-generator</param>
+      <param name="topSurfaceType">wedge</param>
+      <list name="topOrigin">
+        <param>0.0</param>
+      </list>
+      <param name="topBeginOffset">.3</param>
+      <param name="topEndOffset">100</param>
+      <param name="topGradient">0.1763269807</param>
+    </struct>
+
     <struct name="escapedRoutine">
       <param name="Type">EscapedRoutine</param>
       <param name="idealParticleCount">0</param>
@@ -365,20 +505,6 @@
         <param>2</param>
       </list>
     </struct>
-
-    <struct name="boxShape">
-      <param name="Type">Box</param>
-      <param name="startX">minX</param>
-      <param name="endX">maxX</param>
-      <param name="startY">minY</param>
-      <param name="endY">maxY</param>
-      <param name="startZ">minZ</param>
-      <param name="endZ">maxZ</param>
-    </struct>
-    <struct name="backgroundViscosity">
-      <param name="Type">MaterialViscosity</param>
-      <param name="eta0">1.0</param>
-    </struct>
     <struct name="storeViscosity">
       <param name="Type">StoreVisc</param>
       <param name="MaterialPointsSwarm">materialSwarm</param>
@@ -387,75 +513,6 @@
       <param name="Type">StoreStress</param>
       <param name="MaterialPointsSwarm">materialSwarm</param>
     </struct>
-
-    <struct name="sphereShape">
-      <param name="Type">Sphere</param>
-      <param name="CentreX">0.0</param>
-      <param name="CentreY">0.0</param>
-      <param name="radius">0.01</param>
-    </struct>
-
-    <struct name="sphereViscosity">
-      <param name="Type">MaterialViscosity</param>
-      <param name="eta0">0.0001</param>
-    </struct>
-
-    <struct name="sphereViscous">
-      <param name="Type">RheologyMaterial</param>
-      <param name="Shape">sphereShape</param>
-      <param name="density">density</param>
-      <list name="Rheology">
-        <param>sphereViscosity</param>
-        <param>storeViscosity</param>
-        <param>storeStress</param>
-      </list>
-    </struct>
-
-    <struct name="nonSphereShape">
-      <param name="Type">Intersection</param>
-      <list name="shapes">
-        <param>boxShape</param>
-        <param>!sphereShape</param>
-      </list>
-    </struct>
-
-    <struct name="strainWeakening">
-      <param name="Type">StrainWeakening</param>
-      <param name="TimeIntegrator">timeIntegrator</param>
-      <param name="MaterialPointsSwarm">materialSwarm</param>
-      <param name="finalSofteningStrain">0.1</param>
-      <param name="initialDamageFraction">0.0</param>
-      <param name="initialDamageWavenumber">0.5</param>
-      <param name="initialDamageFactor">0.5</param>
-      <param name="healingRate">0.0</param>
-    </struct>
-    <struct name="yielding">
-      <param name="Type">DruckerPrager</param>
-      <param name="PressureField">PressureField</param>
-      <param name="VelocityGradientsField">VelocityGradientsField</param>
-      <param name="MaterialPointsSwarm">materialSwarm</param>
-      <param name="Context">context</param>
-      <param name="StrainWeakening">strainWeakening</param>
-      <param name="StrainRateField">StrainRateField</param>
-      <param name="cohesion">cohesion</param>
-      <param name="cohesionAfterSoftening">cohesionAfterSoftening</param>
-      <param name="frictionCoefficient">frictionCoefficient</param>
-      <param name="frictionCoefficientAfterSoftening">frictionCoefficient</param>
-      <param name="minimumViscosity">minimumViscosity</param>
-      <param name="maxStrainRate">maxStrainRate</param>
-    </struct>
-    <struct name="crust">
-      <param name="Type">RheologyMaterial</param>
-      <param name="Shape">nonSphereShape</param>
-      <param name="density">density</param>
-      <list name="Rheology">
-        <param>backgroundViscosity</param>
-        <param>yielding</param>
-        <param>storeViscosity</param>
-        <param>storeStress</param>
-      </list>
-    </struct>
-
   </struct>
 
   <list name="FieldVariablesToCheckpoint">
@@ -463,20 +520,20 @@
     <param>PressureField</param>
   </list>
   <param name="timeIntegratorOrder">1</param>
-  <param name="maxTimeSteps">1</param>
+  <param name="maxTimeSteps">5000</param>
   <param name="outputEvery">1</param>
   <param name="dumpEvery">1</param>
-  <param name="outputPath">./drucker_prager</param>
+  <param name="outputPath">./output.geomod_shortening</param>
   <param name="dim">2</param>
   <param name="shadowDepth">1</param>
   <param name="minX">0.0f</param>
   <param name="minY">0.0f</param>
   <param name="minZ">0.0f</param>
-  <param name="maxX">1.0f</param>
-  <param name="maxY">1.0f</param>
-  <param name="maxZ">0.3f</param>
-  <param name="elementResI">64</param>
-  <param name="elementResJ">64</param>
+  <param name="maxX">0.40f</param>
+  <param name="maxY">0.035f</param>
+  <param name="maxZ">1.0f</param>
+  <param name="elementResI">128</param>
+  <param name="elementResJ">32</param>
   <param name="elementResK">4</param>
   <param name="allowUnbalancing">True</param>
   <param name="buildNodeNeighbourTbl">True</param>
@@ -494,6 +551,9 @@
         <param name="remesher">velocityRemesher</param>
         <param name="velocityField">VelocityField</param>
         <param name="wrapTop">True</param>
+        <param name="staticRight">True</param>
+        <param name="staticRightBottom">True</param>
+        <param name="floatRightTop">True</param>
         <list name="fields">
           <struct>
             <param name="field">VelocityField</param>
@@ -539,6 +599,13 @@
           <struct>
             <param name="name">vx</param>
             <param name="type">double</param>
+            <!-- 2.5 cm/hr -->
+            <param name="value">6.94444444444e4</param>
+<!--             <param name="value">6.94444444444e-6</param> -->
+          </struct>
+          <struct>
+            <param name="name">vy</param>
+            <param name="type">double</param>
             <param name="value">0.0</param>
           </struct>
         </list>
@@ -550,7 +617,12 @@
           <struct>
             <param name="name">vx</param>
             <param name="type">double</param>
-            <param name="value">-1.0</param>
+            <param name="value">0</param>
+          </struct>
+          <struct>
+            <param name="name">vy</param>
+            <param name="type">double</param>
+            <param name="value">0</param>
           </struct>
         </list>
       </struct>
@@ -559,28 +631,30 @@
         <param name="wall">bottom</param>
         <list name="variables">
           <struct>
+            <param name="name">vx</param>
+            <param name="type">double</param>
+            <param name="value">6.94444444444e4</param>
+<!--             <param name="value">6.94444444444e-6</param> -->
+          </struct>
+          <struct>
             <param name="name">vy</param>
             <param name="type">double</param>
-            <param name="value">0.0</param>
+            <param name="value">0</param>
           </struct>
         </list>
       </struct>
     </list>
   </struct>
-  <param name="nonLinearTolerance">1.0e-3</param>
+
   <param name="linearTolerance">1.0e-7</param>
-  <param name="nonLinearMinIterations">100</param>
+  <param name="nonLinearTolerance">1.0e-3</param>
+  <param name="minimumViscosity">5e-8</param>
+  <param name="nonLinearMaxIterations">1000</param>
 
-  <param name="cohesion">1.0e-6</param>
-  <param name="cohesionAfterSoftening">1.0e-10</param>
-  <param name="frictionCoefficient">1.0</param>
-  <param name="density">1.0</param>
+  <param name="checkpointEvery">100</param>
 
-  <!-- <param name="minimumViscosity">1.0e-4</param> -->
-  <param name="maxStrainRate">100</param>
-
-  <param name="journal.info">True</param>
-  <param name="journal.debug">True</param>
-  <param name="journal-level.info">2</param>
-  <param name="journal-level.debug">2</param>
+  <!-- <param name="journal.info">True</param> -->
+  <!-- <param name="journal.debug">True</param> -->
+  <!-- <param name="journal-level.info">2</param> -->
+  <!-- <param name="journal-level.debug">2</param> -->
 </StGermainData>

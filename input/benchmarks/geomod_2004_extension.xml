@@ -401,6 +401,7 @@
       <param name="cohesionAfterSoftening">0.1</param>
       <param name="frictionCoefficient">0.726542528005</param>
       <param name="frictionCoefficientAfterSoftening">0.600860619027</param>
+      <param name="minimumViscosity">minimumViscosity</param>
       <param name="maxStrainRate">maxStrainRate</param>
     </struct>
     <struct name="pdmsViscosity">
@@ -576,7 +577,7 @@
 <!--   <param name="StepFunctionValue">6.94444444444e-6</param> -->
   <param name="StepFunctionDim">0</param>
   <param name="StepFunctionLessThan">False</param>
-<!--   <param name="checkpointEvery">1</param> -->
+  <param name="checkpointEvery">100</param>
   <param name="mgLevels">2</param>
   <param name="dtFactor">1.0</param>
   <param name="linearTolerance">1.0e-7</param>
@@ -587,5 +588,6 @@
   <param name="journal.debug">True</param>
   <param name="journal-level.info">2</param>
   <param name="journal-level.debug">2</param>
+  <param name="minimumViscosity">1.0e-4</param>
   <param name="maxStrainRate">5e8</param>
 </StGermainData>

@@ -412,6 +412,7 @@
       <param name="boundaryBottom">True</param>
       <param name="boundaryRight">True</param>
       <param name="minimumViscosity">minimumViscosity</param>
+      <param name="maxStrainRate">maxStrainRate</param>
     </struct>
     <struct name="quartzViscosity">
       <param name="Type">MaterialViscosity</param>
@@ -449,6 +450,7 @@
       <param name="boundaryBottom">True</param>
       <param name="boundaryRight">True</param>
       <param name="minimumViscosity">minimumViscosity</param>
+      <param name="maxStrainRate">maxStrainRate</param>
     </struct>
     <struct name="corundumViscosity">
       <param name="Type">MaterialViscosity</param>
@@ -635,7 +637,10 @@
 
   <param name="linearTolerance">1.0e-7</param>
   <param name="nonLinearTolerance">1.0e-3</param>
-  <param name="minimumViscosity">5e-8</param>
+  <param name="minimumViscosity">1e-6</param>
+  <param name="maxStrainRate">5e6</param>
+
+  <param name="checkpointEvery">100</param>
 
   <param name="journal.info">True</param>
   <param name="journal.debug">True</param>
