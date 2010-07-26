@@ -488,7 +488,7 @@
       <param name="A">13.3220431236</param> <!-- 6.18354466027e-8*(1e20)^(1/2.4) -->
       <!-- <param name="refStrainRate">1.5e-16</param> -->
       <param name="refStrainRate">1.5e4</param>
-      <!-- <param name="minViscosity">1.0e-2</param> -->
+      <param name="minViscosity">1.0e3</param>
       <!-- <param name="maxViscosity">1.0e20</param> -->
     </struct>
 
@@ -548,11 +548,11 @@
       <param name="TemperatureField">TemperatureField</param>
       <param name="n">4.5</param>
       <param name="T_0">59927.7978339</param>
-      <param name="A">3.78647900946e-6</param>
+      <!-- <param name="A">3.78647900946e-6</param> -->
       <param name="A">0.105361027689</param>
       <!-- <param name="refStrainRate">1.5e-16</param> -->
       <param name="refStrainRate">1.5e4</param>
-      <!-- <param name="minViscosity">1.0e-2</param> -->
+      <param name="minViscosity">1.0e3</param>
       <!-- <param name="maxViscosity">1.0e20</param> -->
     </struct>
 
@@ -636,11 +636,12 @@
       <param name="frictionCoefficient">0.427954752593</param>
       <param name="frictionCoefficientAfterSoftening">0.427954752593</param>
       <param name="HydrostaticTerm">hydrostaticTerm</param>
+      <param name="minimumViscosity">minimumViscosity</param>
     </struct>
 
 
-<!-- ============== Stress  BC on bottom =====================  -->
-    <struct name="stressBC">
+<!-- ============== Stress  BC on top and bottom =====================  -->
+    <struct name="topStressBC">
       <param name="Type">StressBC</param>
       <param name="ForceVector">mom_force</param>
       <param name="Swarm">picIntegrationPoints</param>
@@ -648,6 +649,17 @@
       <param name="y_type">HydrostaticTerm</param>
       <param name="y_value">hydrostaticTerm</param>
     </struct>
+
+    <!-- <struct name="bottomStressBC"> -->
+    <!--   <param name="Type">StressBC</param> -->
+    <!--   <param name="ForceVector">mom_force</param> -->
+    <!--   <param name="Swarm">picIntegrationPoints</param> -->
+    <!--   <param name="wall">bottom</param> -->
+    <!--   <param name="y_type">HydrostaticTerm</param> -->
+    <!--   <param name="y_value">hydrostaticTerm</param> -->
+    <!--   <param name="bottomDensity">3139.0821</param> -->
+    <!-- </struct> -->
+    <!-- 3139.0821 = 3300 * (1- 3.1e-5 * 1573) -->
 
 <!-- ============== Temperature Components  =====================  -->
     <struct name="temperature">
@@ -766,11 +778,11 @@
             <param name="type">double</param>
             <param name="value">0</param>
           </struct>
-          <struct>
-            <param name="name">vy</param>
-            <param name="type">double</param>
-            <param name="value">0</param>
-          </struct>
+          <!-- <struct> -->
+          <!--   <param name="name">vy</param> -->
+          <!--   <param name="type">double</param> -->
+          <!--   <param name="value">0</param> -->
+          <!-- </struct> -->
         </list>
       </struct>
 
@@ -807,6 +819,18 @@
       <!--     </struct> -->
       <!--   </list> -->
       <!-- </struct> -->
+
+      <struct>
+        <param name="type">WallVC</param>
+        <param name="wall">top</param>
+        <list name="variables">
+          <struct>
+            <param name="name">vy</param>
+            <param name="type">double</param>
+            <param name="value">0</param>
+          </struct>
+        </list>
+      </struct>
 
 
     </list>
@@ -863,7 +887,7 @@
     <param>VelocityField</param>
     <param>PressureField</param>
   </list>
-  <param name="maxTimeSteps">150</param>
+  <param name="maxTimeSteps">10000</param>
   <param name="outputEvery">1</param>
   <param name="dumpEvery">2</param>
   <param name="outputPath">output_wars</param>
@@ -903,9 +927,10 @@
   <param name="dtFactor">0.5</param>
   <param name="linearTolerance">1.0e-5</param>
   <param name="nonLinearTolerance">1.0e-2</param>
+  <param name="minimumViscosity">1.0</param>
 
- <param name="journal.info">True</param>
- <param name="journal.debug">True</param>
- <param name="journal-level.info">2</param> 
- <param name="journal-level.debug">2</param>
+ <!-- <param name="journal.info">True</param> -->
+ <!-- <param name="journal.debug">True</param> -->
+ <!-- <param name="journal-level.info">2</param> -->
+ <!-- <param name="journal-level.debug">2</param> -->
 </StGermainData>
