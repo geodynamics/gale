@@ -1,0 +1,57 @@
+Linux
+-----
+
+First build mpich.  Get the tarball
+
+  mpich2-1.0.5p4.tar.gz
+
+from the buildbots.  Configure with
+
+  ./configure --prefix=$HOME --with-pm=gforker --enable-fast --disable-f77 --disable-f90 --disable-cxx
+
+Set your path
+
+  export PATH=$HOME/bin:$PATH
+
+Then get Petsc 3.0.0 and configure with
+
+  ./configure --with-fortran=0 --with-x=0 --download-c-blas-lapack=1 --with-shared=0 --with-debugging=0
+
+Then get Gale and configure with
+
+  ./configure.sh --with-debugging=0
+
+The final link for Gale will still pull in shared versions of libxml2.
+Copy that link line, remove the -lxml2 flag, and add
+
+  /usr/lib/libxml2.a /usr/lib/libz.a
+
+at the end.  Running ldd on the executable on a 64 bit system gives
+
+$ ldd build/bin/Gale 
+	linux-vdso.so.1 =>  (0x00007fffaddfe000)
+	libm.so.6 => /lib/libm.so.6 (0x00007f42fbca9000)
+	libdl.so.2 => /lib/libdl.so.2 (0x00007f42fbaa5000)
+	libpthread.so.0 => /lib/libpthread.so.0 (0x00007f42fb889000)
+	librt.so.1 => /lib/librt.so.1 (0x00007f42fb680000)
+	libc.so.6 => /lib/libc.so.6 (0x00007f42fb31e000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007f42fbf2a000)
+
+which are all libaries provided by the kernel.
+
+MAC
+---
+
+Same as Linux, but you do not have to change the libxml2 flag.
+libxml2 comes standard on the Mac.
+
+Windows
+-------
+Same as the Mac.  In the end, you will have to copy a number of dll's:
+
+  cygwin1.dll
+  cygxml2-2.dll
+  cygz.dll
+  cyggcc_s-1.dll
+  cygiconv-2.dll
+
