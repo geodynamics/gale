@@ -204,7 +204,7 @@ Computational Infrastructure for Geodynamics (CIG) is making this source
  A number of individuals have contributed a significant portion of their
  careers toward the development of Gale.
  It is essential that you recognize these individuals in the normal scientific
- practice by making appropriate acknowledgements.
+ practice by making appropriate acknowledgments.
  
 \end_layout
 
@@ -2356,7 +2356,7 @@ Drucker-Prager Rheology
 \begin_layout Standard
 The Drucker-Prager rheology models a material that is rigid until the shear
  stress reaches a breaking, or yield, stress.
- Once the material yields, Gale modifies the viscosity of the material such
+ Once the material yields, Gale reduces the viscosity of the material such
  that, given the strains applied to the material, the induced stress will
  now equal the yield stress.
  Unfortunately, there are two problems with this.
@@ -2376,6 +2376,15 @@ There is no length scale inherent in this method.
  But what happens is that you tend to get more and more faults everywhere.
  The algorithm never converges to a single answer, and so it is difficult
  to say whether any results you get are reasonable.
+ Moreover, if the size of your faults is always only a few points, you may
+ get a systematic error in the fault angles 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Shear angles"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -2499,7 +2508,7 @@ In practice, both of these quantities may need to be set.
  on the surface, such as landslides.
  A maximum strain rate, in the mean time, will assist in ensuring that the
  code is convergent.
- Both of these numbers are used for the Drucker-Prager benchmark (Section
+ Both of these parameters are used for the Drucker-Prager benchmark (Section
  
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -2626,6 +2635,81 @@ Note that this is different from previous versions of Gale.
 \end_layout
 
 \begin_layout Subsection
+Multigrid
+\end_layout
+
+\begin_layout Standard
+For very large problems and 3D problems in general, the direct solver may
+ not work well.
+ In that case, you can try multigrid.
+ To do that, add the plugin
+\end_layout
+
+\begin_layout LyX-Code
+<struct>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">StgFEM_Multigrid</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Context">context</param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout Standard
+to the beginning of the file, and add the components
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="mgSolver">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type"> PETScMGSolver </param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="levels"> mgLevels </param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="opGenerator"> mgOpGenerator </param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="mgOpGenerator">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type"> SROpGenerator </param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="fineVariable"> VelocityField </param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout Standard
+You may have to modify 
+\family typewriter
+mgLevels
+\family default
+ for your problem.
+\end_layout
+
+\begin_layout Subsection
 Command-Line Parameters
 \end_layout
 
@@ -2689,6 +2773,51 @@ to the command line.
 
 \begin_layout Standard
 to the command line.
+\end_layout
+
+\begin_layout Subsection
+Debugging Input Files
+\end_layout
+
+\begin_layout Standard
+It can often happen that you set up an input file incorrectly and try to
+ run it, but Gale never gets far enough to tell you what you did wrong.
+ The first thing you should do is to turn on verbose output as in Section
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Verbosity-Options"
+
+\end_inset
+
+.
+ That way, you can look at the residual for the linear and non-linear solvers.
+ If the residuals go up and down, even after a number of iterations, then
+ the solver will probably not converge.
+ On the other hand, if the residuals go steadily down, you can determine
+ whether you should try different input parameters or just wait longer.
+\end_layout
+
+\begin_layout Standard
+Even with that, you may not know what to fix.
+ For example, you may have unwittingly set the minimum viscosity for a yielding
+ material to be too low.
+ If the non-linear solver never converges, then you will not be able to
+ see that you specified too low of a minimum viscosity.
+ One way to get around this is to temporarily set the tolerance for the
+ non-linear solver (
+\family typewriter
+nonLinearTolerance
+\family default
+) to be very large.
+ Another way is to set the maximum number of non-linear iterations (
+\family typewriter
+nonLinearMaxIterations
+\family default
+) to be relatively small.
+ Then Gale will produce output that, while it may not be a good solution
+ to the Stokes equations, nevertheless gives you clues on how to fix the
+ input file.
 \end_layout
 
 \begin_layout Section
@@ -3641,11 +3770,10 @@ Gale makes a number of approximations.
  Before trusting any results you get from Gale, you must vary a number of
  parameters to insure that the results are not an artifact of Gale's approximati
 ons.
- The most important parameter is the resolution.
 \end_layout
 
 \begin_layout Standard
-In Gale, there are two kinds of resolution: grid and particles.
+The most obvious parameter to vary is the mesh resolution.
  The grid is where the Stokes equations are solved, and defines the resolution
  of everything in the ``fields'' output files (e.g., velocity, pressure, strain
  rate, etc.).
@@ -3665,14 +3793,70 @@ elementResK
 \end_layout
 
 \begin_layout Standard
-The particles carry material information.
+But sometimes the mesh resolution is not the principal source of error.
+ For example, for the 2D Divergence benchmark (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Divergence"
+
+\end_inset
+
+), the principal source of error is the tolerance in the linear solver.
+ This is because the solution can be represented exactly on even a tiny
+ grid, so the determining factor is just how well the equations are solved
+ on the mesh.
+ To vary the tolerance for the linear solve, change the parameter 
+\family typewriter
+linearTolerance
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+Similarly, the tolerance for the non-linear solve may determine the overall
+ error.
+ You can set that tolerance with the parameter 
+\family typewriter
+nonLinearTolerance
+\family default
+.
+ You still have to be careful, though, because the solver can still settle
+ on a wrong solution as in the Drucker-Prager benchmark (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Drucker-Prager"
+
+\end_inset
+
+).
+ The initial solution always gives a yielding angle of 
+\begin_inset Formula $45^{\circ}$
+\end_inset
+
+.
+ Only after a number of iterations does the solution finally move to the
+ correct angle.
+ To fix this, you can set 
+\family typewriter
+nonLinearMinIterations
+\family default
+.
+\end_layout
+
+\begin_layout Standard
+The number of particles can also determine the error, as in the 3D Divergence
+ benchmark (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Divergence"
+
+\end_inset
+
+).
+ There is a more or less constant number of particles per mesh element.
  If you have a smooth velocity field, but a complex particle properties
- field, you need a greater ratio of particles to grid points.
- The resolution of the particles is expressed in terms of the number of
- particles per grid cell.
- So increasing the grid resolution automatically increases the particle
- resolution proportionately.
- To further modify the particle resolution, change the parameter 
+ field, you may need more particles for each element.
+ To set the particle resolution, change the parameter 
 \family typewriter
 particlesPerCell
 \family default
@@ -3680,34 +3864,49 @@ particlesPerCell
 \end_layout
 
 \begin_layout Standard
-In other words, for every simulation you need to vary the grid resolution
- (
+When using a yielding rheology, you should vary 
 \family typewriter
-elementResI
+minimumViscosity
 \family default
-, 
+ and 
 \family typewriter
-elementResJ
+maxStrainRate
 \family default
-, 
-\family typewriter
-elementResK
-\family default
-) and the particles resolution (
-\family typewriter
-particlesPerCell
-\family default
+ (see Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Yield-Fix"
+
+\end_inset
+
 ).
 \end_layout
 
 \begin_layout Standard
-In addition, you may need to vary the scaling factor for time steps (
-\family typewriter
-dtFactor
-\family default
-).
- Depending on the boundary conditions, you may need to vary the size of
- the box (
+For some problems where you are comparing against a solution over an infinite
+ domain (e.g.
+ Sections 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Falling-Sphere"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Circular-Inclusion"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Relaxation-of-Topography"
+
+\end_inset
+
+), then you may need to vary the size of the box (
 \family typewriter
 minX
 \family default
@@ -3732,21 +3931,34 @@ maxY
 maxZ
 \family default
 ).
- Finally, vary the tolerance for each linear and nonlinear iteration (
+ Finally, you may need to vary the scaling factor for time steps (
 \family typewriter
-linearTolerance
+dtFactor
 \family default
- and 
-\family typewriter
-nonlinearTolerance
-\family default
+) (see Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Variables"
+
+\end_inset
+
 ).
 \end_layout
 
 \begin_layout Standard
 How much to vary the various parameters depends upon each parameter.
- In general, changing each parameter by a factor of two should give you
- a good enough idea of how much the simulation depends on that parameter.
+ For some parameters, such as the resolution, changing it by a factor of
+ two is often good enough to tell whether your error depends on resolution.
+ For others, such as the tolerance for the solver, you may want to vary
+ it by a factor of ten (e.g.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Divergence_2D_error"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Chapter
@@ -4268,7 +4480,7 @@ Strain rate invariant and velocity of viscous material in extension
 
 \begin_layout Standard
 The structure in the strain rate invariant arises from the artificial compressib
-ilty (see Section 
+ility (see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:Artificial-Compressibility"
@@ -8012,20 +8224,22 @@ The previous chapter gave examples on how to make simple problems with simple
 ) should be as easy as changing the various parameters to the right number.
  In practice, it can be quite difficult, because you may have to change
  many different parameters at once to ensure a stable solution.
- To make that transition easier, start with the sample input files in 
+ To make that transition easier, there is a sample input file in 
 \family typewriter
-input/examples/tibet.xml
+input/examples/dike.xml
 \family default
- and 
-\family typewriter
-input/examples/tibet3D.xml
-\family default
+ which has a rough model of a magmatic dike 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Dike"
+
+\end_inset
+
 .
- The first file simulates a Tibetan scale plateau under extension in 2D.
  A schematic of the simulation is shown in Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:Schematic-of-extension"
+reference "fig:Schematic-of-dike"
 
 \end_inset
 
@@ -8044,7 +8258,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/tibet_setup.eps
+	filename images/dike.pdf
 
 \end_inset
 
@@ -8054,11 +8268,11 @@ status open
 \begin_layout Plain Layout
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:Schematic-of-extension"
+name "fig:Schematic-of-dike"
 
 \end_inset
 
-Schematic of extension example
+Schematic of dike example
 \end_layout
 
 \end_inset
@@ -8072,135 +8286,61 @@ Schematic of extension example
 \end_layout
 
 \begin_layout Standard
-The height of the crust in the center is set to approximately isostatically
- compensate for the thicker crust.
- There is also a nonlinear temperature gradient, going from 273 K at the
- surface to 1333 K at the bottom.
+\noindent
+The right and left sides are pulled at a constant rate.
+ The region that is modeled is fixed, so material flows in from the bottom
+ and out through the sides.
+ The top layer is a low viscosity 'air' layer that flows in and out of the
+ simulation as time progresses.
+ The dike region is a region of constant divergence, so material is created
+ there 
+\shape italic
+ab nihilo
+\shape default
+.
+ This is to model a magma chamber that is fed from small channels from far
+ away.
 \end_layout
 
 \begin_layout Standard
-The crust has a density of 
-\begin_inset Formula $2800kg/m^{3}$
+There is also a nonlinear temperature gradient, going from 
+\begin_inset Formula $273^{\circ}$
 \end_inset
 
-, a coefficient of thermal expansivity (
-\begin_inset Formula $\alpha$
+ K at the surface to 
+\begin_inset Formula $1473^{\circ}$
 \end_inset
 
-) of 
-\begin_inset Formula $3\cdot10^{-5}K^{-1}$
+ K at the bottom.
+ The dike is set to 
+\begin_inset Formula $1500^{\circ}$
 \end_inset
 
-, a thermal diffusivity of 
-\begin_inset Formula $10^{-6}m^{2}/s$
-\end_inset
-
-, a radiogenic heating rate (
-\begin_inset Formula $Q$
-\end_inset
-
-) of 
-\begin_inset Formula $10^{-12}K/s$
-\end_inset
-
-, and a radiogenic decay timescale (
-\begin_inset Formula $\lambda$
-\end_inset
-
-) of 
-\begin_inset Formula $0s$
-\end_inset
-
-.
- The crust's viscosity is modeled with a Frank-Kamenetskii temperature dependent
- viscosity (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Frank-Kamenetskii"
-
-\end_inset
-
-), with the viscosity going from 
-\begin_inset Formula $10^{25}kg\, m^{-1}s^{-1}$
-\end_inset
-
- at the surface to 
-\begin_inset Formula $10^{20}kg\, m^{-1}s^{-1}$
-\end_inset
-
- at the bottom.
- The crust's yielding behavior is modeled with a Drucker-Prager rheology,
- with an internal angle of friction of 
-\begin_inset Formula $30$
-\end_inset
-
- degrees and a cohesion of 
-\begin_inset Formula $4.4\cdot10^{6}kg\, m^{-1}s^{-2}$
-\end_inset
-
- weakening to 
-\begin_inset Formula $4\cdot10^{5}kg\, m^{-1}s^{-2}$
-\end_inset
-
-.
+ K.
+ The temperature is fixed to the background and does not advect.
 \end_layout
 
 \begin_layout Standard
-The mantle has a density of 
-\begin_inset Formula $3300kg/m^{3}$
-\end_inset
-
-, a coefficient of thermal expansivity (
-\begin_inset Formula $\alpha$
-\end_inset
-
-) of 
-\begin_inset Formula $3\cdot10^{-5}K^{-1}$
-\end_inset
-
-, a thermal diffusivity of 
-\begin_inset Formula $10^{-6}m^{2}/s$
-\end_inset
-
-, and radiogenic heating rate (
-\begin_inset Formula $Q$
-\end_inset
-
-) of 
-\begin_inset Formula $8.48\cdot10^{-13}K/s$
-\end_inset
-
-, and a radiogenic decay timescale (
-\begin_inset Formula $\lambda$
-\end_inset
-
-) of 
-\begin_inset Formula $0s$
-\end_inset
-
-.
- The mantle is assumed to be purely viscous with the same parameters as
- the crust.
+The mantle is modeled with a temperature and strain dependent non-newtonian
+ viscosity and a Drucker-Prager plasticity.
+ 
 \end_layout
 
 \begin_layout Standard
 Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:tibet2D"
+reference "fig:dike-strain"
 
 \end_inset
 
- shows the strain rate invariant after the model has extended 5.4 km.
- The resolution is 2048
+ shows the integrated strain of a model after 100 steps.
+ The resolution is 120
 \begin_inset Formula $\times$
 \end_inset
 
-512, and we used a direct solver (Mumps).
- The most prominent faults occur near the edge of the plateau, although
- smaller faults occur throughout the crust.
- The depth of the faults is limited by the relatively low viscosity deeper
- in the crust.
+36, and we used a direct solver on a laptop.
+ There are three prominent faults which propagate out from the dike region.
  
 \end_layout
 
@@ -8213,7 +8353,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/tibet2D.png
+	filename images/dike_strain.png
 	lyxscale 50
 	width 100col%
 
@@ -8228,125 +8368,15 @@ status open
 \begin_layout Plain Layout
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:tibet2D"
+name "fig:dike-strain"
 
 \end_inset
 
-Strain rate invariant for the 2D Tibetan scale extension model after 5.4
- km of extension.
+Integrated strain for the dike model
 \end_layout
 
 \end_inset
 
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The 3D input file models a region 1000km
-\begin_inset Formula $\times$
-\end_inset
-
-1000km.
- Topography is imported from a data file.
- Underneath, the crust extends further down 32 km, and the mantle is 68
- km thick beyond that.
- The location of the input file is hard coded in 
-\end_layout
-
-\begin_layout LyX-Code
-
-\family typewriter
-src/StGermain/Discretisation/Mesh/src/SurfaceAdaptor.c
-\end_layout
-
-\begin_layout Standard
-It needs a data file 
-\family typewriter
-ascii_topo
-\family default
-.
- This file is very large, so it is not distributed with Gale.
- You may download the file used to make the picture at 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-geodynamics.org/~walter/ascii_topo
-\end_layout
-
-\end_inset
-
-.
- It covers a region of the Tibetan plateau under extension.
- The material properties are the same as in the 2D case.
-\end_layout
-
-\begin_layout Standard
-Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:tibet3D"
-
-\end_inset
-
- shows the strain rate invariant after the model has extended 16 km.
- The resolution is 128
-\begin_inset Formula $\times$
-\end_inset
-
-128
-\begin_inset Formula $\times$
-\end_inset
-
-16, and we used an iterative solver (GMRES).
- The fault locations are determined by the variations in topography.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-placement H
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/tibet3D.png
-	lyxscale 50
-	width 100col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:tibet3D"
-
-\end_inset
-
-Strain rate invariant for the 3D Tibetan scale extension model after 16
- km of extension
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -10230,17 +10260,10 @@ reference "sec:.vtk-Files-(Visualization)"
 \end_layout
 
 \begin_layout Description
-checkPointEvery How often to write the .dat files (see Sections 
+checkPointEvery How often to write the checkpoint files (see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Checkpoint Files"
-
-\end_inset
-
- and 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:.dat-Binary-Files"
 
 \end_inset
 
@@ -10252,7 +10275,7 @@ outputPath The directory to put output files in.
  Due to quirks in MPI, you may need to specify this as a full path (e.g.,
  
 \family typewriter
-/home/juser/simulatons/myoutput
+/home/juser/simulations/myoutput
 \family default
 ) rather than a relative path (
 \family typewriter
@@ -14743,7 +14766,9 @@ When setting the viscosity for the first solve, the strain rate has not
 \end_layout
 
 \begin_layout Standard
-You may also set maximum and minimum values for the resulting viscosity.
+You may set maximum and minimum values for the resulting viscosity.
+ If the temperature is greater than the melting temperature, then the viscosity
+ is just set to the minimumViscosity.
 \end_layout
 
 \begin_layout Standard
@@ -15041,6 +15066,23 @@ randomSeed A random number seed used when computing which particles are
 initialStrainShape If defined, the initial random strain will only occur
  within this shape (outside the shape the initial random strain will be
  zero).
+\end_layout
+
+\begin_layout Description
+strainLimitedShape If defined, the strain within this shape will not grow
+ beyond 
+\family typewriter
+strainLimit
+\family default
+.
+\end_layout
+
+\begin_layout Description
+strainLimit The maximum amount of strain allowed within 
+\family typewriter
+strainLimitedShape
+\family default
+.
 \end_layout
 
 \begin_layout Standard
@@ -17205,6 +17247,800 @@ temperature
 </struct>
 \end_layout
 
+\begin_layout Subsection
+Deformed Upper and Lower Boundaries
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Deformed-Upper-Boundary"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Normally, Gale starts the simulation in a rectangular box.
+ As the simulation proceeds, the boundaries can become distorted, in particular
+ the upper boundary.
+ However, you can also configure Gale to start with an initially deformed
+ upper or lower boundary by adding a 
+\family typewriter
+SurfaceAdaptor
+\family default
+ component.
+ A simple example is to make the top a sinusoid
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="surfaceAdaptor">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">SurfaceAdaptor</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="mesh">mesh-linear</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="sourceGenerator">cartesianGenerator</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="topSurfaceType">cosine</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="topOrigin">
+\end_layout
+
+\begin_layout LyX-Code
+    <param>0.0</param>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="topAmplitude">0.1</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="topFrequency">6.28318530718</param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout Standard
+This sets the height of the surface to
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+h=h_{0}+amplitude*\cos\left(x*frequency\right),\]
+
+\end_inset
+
+ where 
+\begin_inset Formula $h_{0}$
+\end_inset
+
+ is the original height.
+\end_layout
+
+\begin_layout Standard
+Note that many of the variables are prefaced with 
+\begin_inset Quotes sld
+\end_inset
+
+top
+\begin_inset Quotes srd
+\end_inset
+
+.
+ You can also use 
+\begin_inset Quotes sld
+\end_inset
+
+bottom
+\begin_inset Quotes srd
+\end_inset
+
+ there, and thus modify the height of the bottom boundary.
+ So if you modified the example above to 
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="surfaceAdaptor">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">SurfaceAdaptor</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="mesh">mesh-linear</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="sourceGenerator">cartesianGenerator</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="topSurfaceType">cosine</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="topOrigin">
+\end_layout
+
+\begin_layout LyX-Code
+    <param>0.0</param>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="topAmplitude">0.1</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="topFrequency">6.28318530718</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="bottomSurfaceType">cosine</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="bottomOrigin">
+\end_layout
+
+\begin_layout LyX-Code
+    <param>0.0</param>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="bottomAmplitude">0.1</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="bottomFrequency">6.28318530718</param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout Standard
+then the top and bottom will follow similar curves.
+\end_layout
+
+\begin_layout Standard
+The other supported surface types are 
+\family typewriter
+sine
+\family default
+, 
+\family typewriter
+wedge
+\family default
+, 
+\family typewriter
+cylinder
+\family default
+, 
+\family typewriter
+plateau
+\family default
+ and 
+\family typewriter
+topo_data
+\family default
+.
+ 
+\family typewriter
+sine
+\family default
+ takes the same arguments as the 
+\family typewriter
+cosine
+\family default
+ example above.
+ 
+\family typewriter
+wedge
+\family default
+ takes two arguments, 
+\family typewriter
+offset
+\family default
+ and 
+\family typewriter
+gradient
+\family default
+, and sets the height to
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+h=\left\{ \begin{array}{cc}
+h_{0} & x<offset\\
+h_{0}+gradient\left(x-offset\right) & x>offset\end{array}\right..\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+cylinder
+\family default
+ takes 6 arguments: 
+\family typewriter
+X0
+\family default
+, 
+\family typewriter
+Y0
+\family default
+, 
+\family typewriter
+Radius
+\family default
+, 
+\family typewriter
+MinX
+\family default
+, 
+\family typewriter
+MaxX
+\family default
+, and 
+\family typewriter
+Sign
+\family default
+.
+ If we define
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+\begin{array}{c}
+x'\equiv\max\left(\min\left(x,MaxX\right),MinX\right)\\
+d\equiv\sqrt{Radius^{2}-(x-x')^{2}}\end{array},\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+then the height is set to 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+h=\left\{ \begin{array}{cc}
+h_{0}+Y0+d & Sign=true\\
+h_{0}+Y0-d & Sign=false\end{array}\right..\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+plateau
+\family default
+ takes up to 9 arguments: 
+\family typewriter
+X1
+\family default
+, 
+\family typewriter
+X2
+\family default
+, 
+\family typewriter
+X3
+\family default
+, 
+\family typewriter
+X4
+\family default
+, 
+\family typewriter
+Z1
+\family default
+, 
+\family typewriter
+Z2
+\family default
+, 
+\family typewriter
+Z3
+\family default
+, 
+\family typewriter
+Z4
+\family default
+, and 
+\family typewriter
+Height
+\family default
+.
+ In 2D, it sets the height as shown in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Height-of-plateau"
+
+\end_inset
+
+.
+ In 3D, an equivalent thing is done in z, so you end up with a rectangular
+ plateau.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/plateau.pdf
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Height-of-plateau"
+
+\end_inset
+
+Height of plateau as a function of the parameters
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+topo_data
+\family default
+ reads in an ascii file with the name from 
+\family typewriter
+SurfaceName
+\family default
+ (
+\begin_inset Quotes sld
+\end_inset
+
+ascii_topo
+\begin_inset Quotes srd
+\end_inset
+
+ by default).
+ The file has a grid with 
+\family typewriter
+Nx*Nz
+\family default
+ points covering the area from (
+\family typewriter
+MinX
+\family default
+,
+\family typewriter
+MinY
+\family default
+) to (
+\family typewriter
+MaxX
+\family default
+,
+\family typewriter
+MaxY
+\family default
+).
+ Gale then interpolates the heights from that grid to its own grid.
+\end_layout
+
+\begin_layout Standard
+If you want to implement your own surface functions, look in
+\end_layout
+
+\begin_layout LyX-Code
+
+\family typewriter
+src/StgDomain/Mesh/src/SurfaceAdaptor.c
+\end_layout
+
+\begin_layout Subsection
+Erosion
+\end_layout
+
+\begin_layout Standard
+Gale has two different models for modeling erosion.
+ After Gale computes a solution to the Stokes flow, both of these work by
+ modifying the velocity of the top nodes of the mesh.
+ So it does not keep track of where material comes from and where it goes.
+\end_layout
+
+\begin_layout Subsubsection
+Diffusion
+\end_layout
+
+\begin_layout Standard
+This plugin applies a diffusive operator to the top.
+ Specifically,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+\frac{\partial y}{\partial t}=-diffusionCoefficient\frac{\partial^{2}y}{\partial x^{2}}.\]
+
+\end_inset
+
+ You enable diffusion by adding the plugin 
+\family typewriter
+SurfaceProcess
+\family default
+.
+\end_layout
+
+\begin_layout Subsubsection
+HRS Erosion
+\end_layout
+
+\begin_layout Standard
+This plugin applies the erosion law as described in Hilley and Strecker
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "HRS"
+
+\end_inset
+
+.
+ In particular, it forces the slope to be
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+\alpha=\overline{a}_{old}+\tan^{-1}\left(2vTW^{-2}-\frac{\left(2Kk{}_{a}^{m}\right)W^{hm-1}S^{n}}{\left(hm+1\right)dt_{erosion}}\right),\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+where
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \begin{eqnarray*}
+S & \equiv & \tan^{-1}\left(\overline{a}_{old}\right),\\
+\overline{a} & \equiv & \left(y_{max}-y_{0}\right)/W,\end{eqnarray*}
+
+\end_inset
+
+
+\begin_inset Formula $W$
+\end_inset
+
+, 
+\begin_inset Formula $y_{max}$
+\end_inset
+
+ and 
+\begin_inset Formula $y_{0}$
+\end_inset
+
+ are determined by the geometry as in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Geometry-for-HRS"
+
+\end_inset
+
+, and 
+\begin_inset Formula $vT$
+\end_inset
+
+, 
+\begin_inset Formula $K$
+\end_inset
+
+, 
+\begin_inset Formula $k_{a}$
+\end_inset
+
+, 
+\begin_inset Formula $h$
+\end_inset
+
+, 
+\begin_inset Formula $m$
+\end_inset
+
+, 
+\begin_inset Formula $n$
+\end_inset
+
+, and 
+\begin_inset Formula $dt_{erosion}$
+\end_inset
+
+ are specified by the input file.
+ Erosion is only applied at intervals of 
+\begin_inset Formula $dt_{erosion}$
+\end_inset
+
+ and does not start eroding until after 
+\family typewriter
+first_t_erosion
+\family default
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/HRS.pdf
+	width 50col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Geometry-for-HRS"
+
+\end_inset
+
+Geometry for HRS Erosion
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="8" columns="2">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Defaults
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+vT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+K
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ka
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+h
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+m
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+dt_erosion
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+first_t_erosion
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -17350,8 +18186,8 @@ MeshShapeVC
 same
 \color inherit
  points on the grid.
- Figure XXX shows how, even if the points in the MeshShapeVC is held fixed,
- the mesh itself can deform.
+ These points will be at a different location in space, so the constraint
+ is now operating on a different area.
  The only way to really prevent the mesh from deforming is to use static
  sides (see Section 
 \begin_inset CommandInset ref
@@ -18372,454 +19208,6 @@ force_value If ``force_type'' is ``double,'' then this must be a number.
 \end_layout
 
 \begin_layout Section
-Deformed Upper and Lower Boundaries
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Deformed-Upper-Boundary"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Normally, Gale starts the simulation in a rectangular box.
- As the simulation proceeds, the boundaries can become distorted, in particular
- the upper boundary.
- However, you can also configure Gale to start with an initially deformed
- upper or lower boundary by adding a 
-\family typewriter
-SurfaceAdaptor
-\family default
- component.
- A simple example is to make the top a sinusoid
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="surfaceAdaptor">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">SurfaceAdaptor</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="mesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="sourceGenerator">cartesianGenerator</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="topSurfaceType">cosine</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <list name="topOrigin">
-\end_layout
-
-\begin_layout LyX-Code
-    <param>0.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-  </list>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="topAmplitude">0.1</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="topFrequency">6.28318530718</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-
-\end_layout
-
-\begin_layout Standard
-This sets the height of the surface to
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula \[
-h=h_{0}+amplitude*\cos\left(x*frequency\right),\]
-
-\end_inset
-
- where 
-\begin_inset Formula $h_{0}$
-\end_inset
-
- is the original height.
-\end_layout
-
-\begin_layout Standard
-Note that many of the variables are prefaced with 
-\begin_inset Quotes sld
-\end_inset
-
-top
-\begin_inset Quotes srd
-\end_inset
-
-.
- You can also use 
-\begin_inset Quotes sld
-\end_inset
-
-bottom
-\begin_inset Quotes srd
-\end_inset
-
- there, and thus modify the height of the bottom boundary.
- So if you modified the example above to 
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="surfaceAdaptor">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">SurfaceAdaptor</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="mesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="sourceGenerator">cartesianGenerator</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="topSurfaceType">cosine</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <list name="topOrigin">
-\end_layout
-
-\begin_layout LyX-Code
-    <param>0.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-  </list>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="topAmplitude">0.1</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="topFrequency">6.28318530718</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="bottomSurfaceType">cosine</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <list name="bottomOrigin">
-\end_layout
-
-\begin_layout LyX-Code
-    <param>0.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-  </list>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="bottomAmplitude">0.1</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="bottomFrequency">6.28318530718</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-
-\end_layout
-
-\begin_layout Standard
-then the top and bottom will follow similar curves.
-\end_layout
-
-\begin_layout Standard
-The other supported surface types are 
-\family typewriter
-sine
-\family default
-, 
-\family typewriter
-wedge
-\family default
-, 
-\family typewriter
-cylinder
-\family default
-, 
-\family typewriter
-plateau
-\family default
- and 
-\family typewriter
-topo_data
-\family default
-.
- 
-\family typewriter
-sine
-\family default
- takes the same arguments as the 
-\family typewriter
-cosine
-\family default
- example above.
- 
-\family typewriter
-wedge
-\family default
- takes two arguments, 
-\family typewriter
-offset
-\family default
- and 
-\family typewriter
-gradient
-\family default
-, and sets the height to
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula \[
-h=\left\{ \begin{array}{cc}
-h_{0} & x<offset\\
-h_{0}+gradient\left(x-offset\right) & x>offset\end{array}\right..\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-cylinder
-\family default
- takes 6 arguments: 
-\family typewriter
-X0
-\family default
-, 
-\family typewriter
-Y0
-\family default
-, 
-\family typewriter
-Radius
-\family default
-, 
-\family typewriter
-MinX
-\family default
-, 
-\family typewriter
-MaxX
-\family default
-, and 
-\family typewriter
-Sign
-\family default
-.
- If we define
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula \[
-\begin{array}{c}
-x'\equiv\max\left(\min\left(x,MaxX\right),MinX\right)\\
-d\equiv\sqrt{Radius^{2}-(x-x')^{2}}\end{array},\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-then the height is set to 
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula \[
-h=\left\{ \begin{array}{cc}
-h_{0}+Y0+d & Sign=true\\
-h_{0}+Y0-d & Sign=false\end{array}\right..\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-plateau
-\family default
- takes up to 9 arguments: 
-\family typewriter
-X1
-\family default
-, 
-\family typewriter
-X2
-\family default
-, 
-\family typewriter
-X3
-\family default
-, 
-\family typewriter
-X4
-\family default
-, 
-\family typewriter
-Z1
-\family default
-, 
-\family typewriter
-Z2
-\family default
-, 
-\family typewriter
-Z3
-\family default
-, 
-\family typewriter
-Z4
-\family default
-, and 
-\family typewriter
-Height
-\family default
-.
- In 2D, it sets the height as shown in Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Height-of-plateau"
-
-\end_inset
-
-.
- In 3D, an equivalent thing is done in z, so you end up with a rectangular
- plateau.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/plateau.pdf
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Height-of-plateau"
-
-\end_inset
-
-Height of plateau as a function of the parameters
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-topo_data
-\family default
- reads in an ascii file with the name from 
-\family typewriter
-SurfaceName
-\family default
- (
-\begin_inset Quotes sld
-\end_inset
-
-ascii_topo
-\begin_inset Quotes srd
-\end_inset
-
- by default).
- The file has a grid with 
-\family typewriter
-Nx*Nz
-\family default
- points covering the area from (
-\family typewriter
-MinX
-\family default
-,
-\family typewriter
-MinY
-\family default
-) to (
-\family typewriter
-MaxX
-\family default
-,
-\family typewriter
-MaxY
-\family default
-).
- Gale then interpolates the heights from that grid to its own grid.
-\end_layout
-
-\begin_layout Standard
-If you want to implement your own surface functions, look in
-\end_layout
-
-\begin_layout LyX-Code
-
-\family typewriter
-src/StgDomain/Mesh/src/SurfaceAdaptor.c
-\end_layout
-
-\begin_layout Section
 Standard Condition Functions
 \begin_inset CommandInset label
 LatexCommand label
@@ -19322,6 +19710,12 @@ x_{c} & \equiv & ExtensionCentreX.\end{eqnarray*}
 \end_layout
 
 \begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Verbosity-Options"
+
+\end_inset
+
 Verbosity Options
 \end_layout
 
@@ -19612,15 +20006,13 @@ name "sec:Checkpoint Files"
 \family typewriter
 Checkpoint
 \family default
- Files: .h5 and .xmf
+ Files: .h5, .dat and .xmf
 \end_layout
 
 \begin_layout Standard
 These files are mostly useful for checkpointing.
- They have the bare minimum needed to restart the run: velocity, pressure,
- mesh, and particles.
- If you want a derived quantity like strain rate, it is better to use the
- VTK files.
+ They are in a machine dependent format and have the bare minimum needed
+ to restart the run.
 \end_layout
 
 \begin_layout Chapter
@@ -19651,7 +20043,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="13" columns="2">
+<lyxtabular version="3" rows="7" columns="2">
 <features>
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
@@ -19680,7 +20072,7 @@ Benchmark Section
 \begin_inset Text
 
 \begin_layout Plain Layout
-Stokes solver in 2D
+Stokes solver and interpolate between particles and mesh in 2D
 \end_layout
 
 \end_inset
@@ -19695,17 +20087,38 @@ reference "sec:Circular-Inclusion"
 
 \end_inset
 
-, 
+,
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Relaxation-of-Topography"
 
 \end_inset
 
-,  
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Divergence"
+
+\end_inset
+
+ , 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Drucker-Prager"
+
+\end_inset
+
+, 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Geomod-2004"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Geomod-2008"
 
 \end_inset
 
@@ -19720,7 +20133,7 @@ reference "sec:Geomod-2004"
 \begin_inset Text
 
 \begin_layout Plain Layout
-Stokes solver in 3D
+Stokes solver and interpolate between particles and mesh in 3D
 \end_layout
 
 \end_inset
@@ -19735,69 +20148,10 @@ reference "sec:Falling-Sphere"
 
 \end_inset
 
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Interpolation of viscosities from particles to the mesh in 2D
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Circular-Inclusion"
-
-\end_inset
-
 , 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Relaxation-of-Topography"
-
-\end_inset
-
-,  
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Geomod-2004"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Interpolation of viscosities from particles to the mesh in 3D
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Falling-Sphere"
+reference "sec:Divergence"
 
 \end_inset
 
@@ -19823,20 +20177,6 @@ Time stepping
 \begin_layout Plain Layout
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Falling-Sphere"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Circular-Inclusion"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
 reference "sec:Relaxation-of-Topography"
 
 \end_inset
@@ -19848,7 +20188,14 @@ reference "sec:Geomod-2004"
 
 \end_inset
 
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Geomod-2008"
 
+\end_inset
+
+ 
 \end_layout
 
 \end_inset
@@ -19888,128 +20235,10 @@ reference "sec:Geomod-2004"
 
 \end_inset
 
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Internal constraints
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Falling-Sphere"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-No-slip boundary conditions
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Falling-Sphere"
-
-\end_inset
-
 , 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Geomod-2004"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Non-zero velocity boundary conditions
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Circular-Inclusion"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Geomod-2004"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Free slip boundary conditions
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Circular-Inclusion"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Relaxation-of-Topography"
+reference "sec:Geomod-2008"
 
 \end_inset
 
@@ -20046,6 +20275,13 @@ reference "sec:Geomod-2004"
 
 \end_inset
 
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Geomod-2008"
+
+\end_inset
+
 
 \end_layout
 
@@ -20068,7 +20304,21 @@ Drucker Prager rheology in 2D
 \begin_layout Plain Layout
 \begin_inset CommandInset ref
 LatexCommand ref
+reference "sec:Drucker-Prager"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
 reference "sec:Geomod-2004"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Geomod-2008"
 
 \end_inset
 
@@ -20339,7 +20589,6 @@ where
  is the viscosity of the sphere.
  For our case, the background medium's viscosity is 1 and the sphere's viscosity
  is 100, so the correction is about 1%.
- This turns out to be smaller than other effects for the cases we ran.
 \end_layout
 
 \begin_layout Standard
@@ -20510,12 +20759,14 @@ reference "fig:Error-in-velocity"
 ) of 0.5, 0.25, 0.125, and 0.0625.
  Because of the symmetries of the problem we only have to simulate a quarter
  of the domain.
- As we increase the resolution (decrease 
+ As 
 \begin_inset Formula $h$
 \end_inset
 
-), the error decreases.
- 
+ decreases, the error decreases.
+ It does not decrease linearly with h, suggesting that some other factor
+ is contributing to the error (e.g.
+ the finite viscosity of the sphere).
 \end_layout
 
 \begin_layout Standard
@@ -20547,75 +20798,8 @@ name "fig:Error-in-velocity"
 
 \end_inset
 
-Error in computed velocity vs.
+Relative Error in computed velocity vs.
  resolution
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Scaling the error with resolution gives Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Scaled-error-velocity"
-
-\end_inset
-
-.
- The error scales linearly with resolution, giving us confidence that we
- can accurately solve this problem.
-\end_layout
-
-\begin_layout Standard
-\noindent
-\align center
-\begin_inset Float figure
-placement H
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/Sphere_Scaled_Error.eps
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Scaled-error-velocity"
-
-\end_inset
-
-As in Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Error-in-velocity"
-
-\end_inset
-
-, but with the error scaled with 
-\begin_inset Formula $h$
-\end_inset
-
-.
- So the higher resolution errors are multiplied by 2, 4, and 8.
 \end_layout
 
 \end_inset
@@ -21072,30 +21256,23 @@ t_{r}=\frac{4\pi\eta}{gL},\]
 \end_layout
 
 \begin_layout Standard
-In our case, we simulate a medium with finite depth and finite height.
+In our case, we simulate a medium with non-infinite depth (depth=L) and
+ a sinusoid with a non-zero amplitude (
+\begin_inset Formula $A=0.01$
+\end_inset
+
+).
  The internal fields decay exponentially with depth with a length scale
  of 
-\begin_inset Formula $L/2\pi.$
+\begin_inset Formula $L/2\pi$
 \end_inset
 
- The error in the solution due to a finite height is of order 
-\begin_inset Formula $\left(2\pi A/L\right)^{2},$
+, giving an error of 0.2%.
+ A non-zero amplitude creates errors of order 
+\begin_inset Formula $\left(2\pi A/L\right)^{2}$
 \end_inset
 
- where 
-\begin_inset Formula $A$
-\end_inset
-
- is the amplitude of the sinusoid.
- We use 
-\begin_inset Formula $L=1$
-\end_inset
-
- and 
-\begin_inset Formula $A=0.01,$
-\end_inset
-
- giving errors of order 0.2% and 0.4%.
+, which in this case is 0.4%.
 \end_layout
 
 \begin_layout Standard
@@ -21111,12 +21288,12 @@ reference "fig:Strain-topo"
 
 \end_inset
 
- shows the results of a low-resolution run.
- Even this run is not particularly small (128
+ shows the results of a high-resolution run.
+ This run is relatively large (512
 \begin_inset Formula $\times$
 \end_inset
 
-256), because we need fairly high resolution to be able to accurately resolve
+1024), because we need fairly high resolution to be able to accurately resolve
  the small (1%) height difference.
  Also note that we use symmetry to only simulate half of the wavelength.
  
@@ -21216,10 +21393,6 @@ Error in the height at the trough
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -21611,17 +21784,27 @@ reference "fig:Mohr-Coulomb-setup"
  to find incipient faults.
  We do not take any time steps, removing any confounding effects they may
  cause.
+ We made the weak region have a resolvable size, because faults arising
+ from unresolved weak regions always tend to be at 
+\begin_inset Formula $45^{\circ}$
+\end_inset
+
+ 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "Shear angles"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
-
-\begin_layout Plain Layout
-
-\end_layout
 
 \begin_layout Plain Layout
 \align center
@@ -21667,35 +21850,194 @@ Numerical Results
 Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:Mohr-Coulomb-sri"
+reference "fig:Drucker-resolution"
 
 \end_inset
 
- shows the results for three different resolutions for 
+ shows the results for two different resolutions for 
 \begin_inset Formula $\varphi=45\textdegree$
 \end_inset
 
 .
- There is not much difference between the medium (256
-\begin_inset Formula $\times$
-\end_inset
+ The uncertainties in measuring the fault angle are far larger than the
+ differences between the two resolutions.
+\end_layout
 
-256) and high (512
-\begin_inset Formula $\times$
-\end_inset
-
-512) resolution results, suggesting that we have sufficient resolution.
- Figure 
+\begin_layout Standard
+On the other hand, Figure 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:Mohr-Coulomb-comparison"
+reference "fig:Drucker-maxStrainRate"
+
+\end_inset
+
+ shows results for when we vary the maximum strain rate.
+ If the maximum strain rate is too low, then the fault angles are no longer
+ correct.
+ Setting the maximum strain rate to a more moderate value (10), on the other
+ hand, does not seem to affect the fault angle for this case.
+ However, if we look at a different friction coefficient in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Drucker-maxStrainRate-37"
+
+\end_inset
+
+, then the fault angles are wrong.
+\end_layout
+
+\begin_layout Standard
+Similarly, Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Drucker-minViscosity"
+
+\end_inset
+
+ shows results for when you vary the minimum viscosity.
+ With a very high minimum viscosity, faults do not develop.
+ With a little lower setting, faults do develop, but not at the correct
+ angle.
+ With a still lower setting, the angles become correct, but the structure
+ still differs markedly from the result with unconstrained minimum viscosity.
+ It is only with the lowest setting that the structure converges to the
+ unconstrained answer.
+\end_layout
+
+\begin_layout Standard
+Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Drucker-angles"
 
 \end_inset
 
  shows a plot of the numerical vs.
- analytic results for several different angles for medium resolution.
+ analytic results for several different angles.
  This gives us confidence that, at least in compression in 2D, our Drucker-Prage
 r implementation gives the correct results.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/drucker_resolution.png
+	lyxscale 25
+	width 50col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Drucker-resolution"
+
+\end_inset
+
+Strain rate invariant for the yielding experiment with 
+\begin_inset Formula $\varphi=45\textdegree$
+\end_inset
+
+ with two different resolutions: 128
+\begin_inset Formula $\times$
+\end_inset
+
+128 and 256
+\begin_inset Formula $\times$
+\end_inset
+
+256.
+ Any differences in the fault angle between the two resolutions are swamped
+ by uncertainties in determining the overall angle of faulting.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/drucker_maxStrainRate.png
+	lyxscale 25
+	width 75col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Drucker-maxStrainRate"
+
+\end_inset
+
+Strain rate invariant for the yielding experiment with three different 
+\family typewriter
+maxStrainRate
+\family default
+'s: 1, 10, 
+\begin_inset Formula $\infty$
+\end_inset
+
+.
+ The resolution for all three cases is 256
+\begin_inset Formula $\times$
+\end_inset
+
+256.
+ The highest strain rate observed in the case for an infinite 
+\family typewriter
+maxStrainRate
+\family default
+ is 74.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -21705,13 +22047,65 @@ sideways false
 status open
 
 \begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/drucker_maxStrainRate37.png
+	lyxscale 25
+	width 50col%
+
+\end_inset
+
 
 \end_layout
 
 \begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Drucker-maxStrainRate-37"
+
+\end_inset
+
+Strain rate invariant for the yielding experiment with 
+\family typewriter
+maxStrainRate
+\family default
+'s of 10 and 
+\begin_inset Formula $\infty$
+\end_inset
+
+ but with a friction angle 
+\begin_inset Formula $\varphi=37^{\circ}$
+\end_inset
+
+.
+ The resolution for both cases is 256
+\begin_inset Formula $\times$
+\end_inset
+
+256.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/Mohr_coulomb_resolutions.png
+	filename images/drucker_minViscosity.png
 	lyxscale 25
 	width 100col%
 
@@ -21726,29 +22120,36 @@ status open
 \begin_layout Plain Layout
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:Mohr-Coulomb-sri"
+name "fig:Drucker-minViscosity"
 
 \end_inset
 
-Strain rate invariant for the shortening experiment with 
-\begin_inset Formula $\varphi=45\textdegree$
+Strain rate invariant for the yielding experiment with four different
+\family typewriter
+ minimumViscosity
+\family default
+'s:
+\begin_inset Formula $10^{-5}$
 \end_inset
 
- with three different resolutions: 128
+, 
+\begin_inset Formula $10^{-6}$
+\end_inset
+
+, 
+\begin_inset Formula $10^{-7}$
+\end_inset
+
+, 
+\begin_inset Formula $10^{-8}$
+\end_inset
+
+.
+ The resolution for all three cases is 256
 \begin_inset Formula $\times$
 \end_inset
 
-128, 256
-\begin_inset Formula $\times$
-\end_inset
-
-256, and 512
-\begin_inset Formula $\times$
-\end_inset
-
-512.
- Any differences between the medium and high resolution runs are swamped
- by uncertainties in determining the overall angle of faulting.
+256.
 \end_layout
 
 \end_inset
@@ -21763,6 +22164,7 @@ Strain rate invariant for the shortening experiment with
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -21770,7 +22172,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/mohr_coulomb_angles.eps
+	filename images/drucker_angles.eps
 
 \end_inset
 
@@ -21783,12 +22185,13 @@ status open
 \begin_layout Plain Layout
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:Mohr-Coulomb-comparison"
+name "fig:Drucker-angles"
 
 \end_inset
 
 Numerical vs analytic results for fault angles as a function of internal
  angle of friction.
+ 
 \end_layout
 
 \end_inset
@@ -21864,7 +22267,73 @@ Like half of the codes in the benchmark, boundary friction was not included.
 \end_layout
 
 \begin_layout Standard
+Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Extension-vis-sri"
+
+\end_inset
+
+ shows the results for different values of 
+\family typewriter
+minimumViscosity
+\family default
+ and 
+\family typewriter
+maxStrainRate
+\family default
+ (see Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Yield-Fix"
+
+\end_inset
+
+).
+ Runs with a minimum viscosity of 
+\begin_inset Formula $10^{4}$
+\end_inset
+
+ and a maximum strain rate of 
+\begin_inset Formula $5\cdot10^{-4}$
+\end_inset
+
+ do not lose any significant details while improving solver performance.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:extension-convergence"
+
+\end_inset
+
+ shows the results for different resolutions.
+ The code is still not quite convergent, probably because we chose 
+\family typewriter
+maxStrainRate
+\family default
+ such that it did not lose any details on the 512
+\begin_inset Formula $\times$
+\end_inset
+
+128 grid.
+\end_layout
+
+\begin_layout Standard
+A comparison against the other codes is in Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Comparison-extension"
+
+\end_inset
+
+.
+ While it is difficult to perform exact comparisons, Gale produces similar
+ fault patterns.
+\end_layout
+
+\begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -21913,32 +22382,151 @@ key "Buiter et al Numerical Sandbox"
 \end_layout
 
 \begin_layout Standard
-A comparison against the other codes is in Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Comparison-extension"
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
 
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/extension_vis_sri.png
+	lyxscale 25
+	width 90col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Extension-vis-sri"
+
+\end_inset
+
+Strain rate invariant for the extension model for varying 
+\begin_inset Formula $\eta_{min}$
+\end_inset
+
+ and 
+\begin_inset Formula $\dot{\epsilon}_{max}$
 \end_inset
 
 .
- While it is difficult to perform exact comparisons, Gale produces similar
- fault patterns.
- It is interesting to note that this qualitative comparison holds true even
- though the code is not exactly convergent.
- For example, Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:extension-convergence"
+ From top to bottom, they are: 
+\begin_inset Formula $\eta_{min}=10^{5}$
+\end_inset
+
+, 
+\begin_inset Formula $\dot{\epsilon}_{max}=5\cdot10^{-4}$
+\end_inset
+
+; 
+\begin_inset Formula $\eta_{min}=10^{5}$
+\end_inset
+
+, 
+\begin_inset Formula $\dot{\epsilon}_{max}=2\cdot10^{-3}$
+\end_inset
+
+; 
+\begin_inset Formula $\eta_{min}=10^{4}$
+\end_inset
+
+, 
+\begin_inset Formula $\dot{\epsilon}_{max}=5\cdot10^{-4}$
+\end_inset
+
+; 
+\begin_inset Formula $\eta_{min}=10^{4}$
+\end_inset
+
+, 
+\begin_inset Formula $\dot{\epsilon}_{max}=2\cdot10^{-3}$
+\end_inset
+
+; 
+\begin_inset Formula $\eta_{min}=10^{3}$
+\end_inset
+
+, 
+\begin_inset Formula $\dot{\epsilon}_{max}=5\cdot10^{-4}$
+\end_inset
+
+; 
+\begin_inset Formula $\eta_{min}=10^{3}$
+\end_inset
+
+, 
+\begin_inset Formula $\dot{\epsilon}_{max}=2\cdot10^{-3}$
+\end_inset
+
+;
+\end_layout
 
 \end_inset
 
- shows a run with varying resolution.
- Changing the resolution alters the details, but, after a certain minimum
- resolution, does not change the character of the solution.
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/extension_resolution.png
+	lyxscale 50
+	width 90col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:extension-convergence"
+
+\end_inset
+
+Strain rate invariant for the extension model after 5 cm of extension for
+ four different resolutions: 128x16, 256x32, 512x64, and 1024x128.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -22013,49 +22601,6 @@ key "Buiter et al Numerical Sandbox"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/extension_sensitivity.pdf
-	lyxscale 50
-	width 90col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:extension-convergence"
-
-\end_inset
-
-Strain rate invariant for the extension model after 5 cm of extension for
- four different resolutions: (a) 128x16, (b) 256x32, (c) 512x64, and (d)
- 1024x128.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
 \begin_inset Newpage newpage
 \end_inset
 
@@ -22086,28 +22631,33 @@ input/benchmarks/shortening.xml
 \end_layout
 
 \begin_layout Standard
-Like most of the codes in the benchmark, we applied diffusion (diffusion
- coefficient 
-\begin_inset Formula $10^{-6}m^{2}\, s^{-1}$
+As with the extension benchmark, we used values of 
+\begin_inset Formula $10^{4}$
 \end_inset
 
-) to the top surface to smooth steep slope angles.
- This lies within the range used in calculations by the other codes (LAPEX-2D:
- 
-\begin_inset Formula $10^{-6}m^{2}\, s^{-1}$
+ for
+\family typewriter
+ minimumViscosity
+\family default
+ and 
+\begin_inset Formula $5\cdot10^{-4}$
 \end_inset
 
-, Microfem: unspecified, Sopale: 
-\begin_inset Formula $10^{-9}m^{2}\, s^{-1}$
-\end_inset
-
-).
- Again, the exact background viscosity is not prescribed by the benchmark,
- so we have used 
-\begin_inset Formula $10^{12}Pa\cdot s$
-\end_inset
-
+ for 
+\family typewriter
+maxStrainRate
+\family default
 .
+ Unlike some of the other codes in the benchmark, we did not apply diffusion
+ to the top surface.
+ Without diffusion, steep slope angles develop, leading to landslides.
+ Landslides occur over a very short time and length scale, posing particular
+ difficulties for solvers.
+ The 
+\family typewriter
+minimumViscosity
+\family default
+ setting moderated these landslides, so explicit diffusion was not needed.
 \end_layout
 
 \begin_layout Standard
@@ -22184,6 +22734,7 @@ reference "fig:shortening-convergence"
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -22257,6 +22808,7 @@ key "Buiter et al Numerical Sandbox"
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -22264,7 +22816,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/shortening_sensitivity.pdf
+	filename images/shortening_resolution.png
 	lyxscale 50
 	width 100col%
 
@@ -22374,6 +22926,15 @@ We modeled the wedge using a relatively low viscosity (
 
 ) air layer on top.
  This low viscosity region does not, for the most part, affect the dynamics.
+ We did not set 
+\family typewriter
+minimumViscosity
+\family default
+ or 
+\family typewriter
+maxStrainRate
+\family default
+.
 \end_layout
 
 \begin_layout Standard
@@ -22436,23 +22997,11 @@ reference "fig:Stable_particles"
  The bulk translates with almost no deformation, although, as expected,
  the tip deforms.
  The odd structures at the tip are below the grid resolution.
- Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Stable_unstable"
-
-\end_inset
-
- shows a simulation when we reduce the boundary friction to 
-\begin_inset Formula $1\textdegree$
-\end_inset
-
-.
- The wedge quickly becomes unstable and collapses.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -22493,6 +23042,7 @@ Set up for the stable wedge benchmark.
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -22526,15 +23076,11 @@ name "fig:Stable_sri"
 Strain rate invariant for the stable wedge benchmark within the wedge.
  Outside the wedge, the strain rates are large because of the air's low
  viscosity.
- The resolution is 512x128, and the wedge has translated 4 cm.
+ The resolution is 256x64, and the wedge has translated 4 cm.
 \end_layout
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -22545,6 +23091,7 @@ Strain rate invariant for the stable wedge benchmark within the wedge.
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -22572,65 +23119,10 @@ name "fig:Stable_particles"
 \end_inset
 
 Material particles for the stable wedge benchmark.
- The deformation at the tip is caused by a finite boundary cohesion, although
- the actual structure is not resolved.
- The resolution is 512x128, and the wedge has translated 4 cm.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/Stable_wedge_unstable.png
-	lyxscale 50
-	width 100col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Stable_unstable"
-
-\end_inset
-
-Strain rate invariant and velocity arrows for the stable wedge benchmark,
- but with the boundary friction angle reduced to 
-\begin_inset Formula $1\textdegree$
-\end_inset
-
-.
- Note that the strain rates are much higher than in Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Stable_sri"
-
-\end_inset
-
-.
- The wedge collapses almost immediately.
- The resolution is 512x128, and the wedge has translated 0.17 cm.
+ Deformation at the tip is caused by a finite boundary cohesion.
+ The odd structure at the tip is the result of the finite air viscosity,
+ although the actual structure is not well resolved.
+ The resolution is 256x64, and the wedge has translated 4 cm.
 \end_layout
 
 \end_inset
@@ -22659,54 +23151,33 @@ reference "fig:Unstable-setup"
 .
  There are three layers of sand, with the middle layer being a little heavier
  and sticking a little more to the boundary.
- Otherwise it is identical.
  Figures 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:unstable_sri_128"
+reference "fig:unstable_sri"
 
 \end_inset
 
 , 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:unstable_sri_256"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:unstable_sri_512"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:unstable_particles_128"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:unstable_particles_256"
+reference "fig:unstable_particles"
 
 \end_inset
 
 , and 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:unstable_particles_512"
+reference "fig:unstable_strain"
 
 \end_inset
 
- show results at different times and different resolutions.
+ show results for different resolutions.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -22747,19 +23218,15 @@ Set up for the unstable shortening benchmark.
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/Geomod2008_unstable_sri128x32.png
-	lyxscale 50
+	filename images/Geomod2008_unstable_sri.png
 	width 100col%
 
 \end_inset
@@ -22773,60 +23240,24 @@ status open
 \begin_layout Plain Layout
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:unstable_sri_128"
+name "fig:unstable_sri"
 
 \end_inset
 
-Strain rate invariant for the unstable shortening benchmark with a resolution
- of 128x32.
- The snapshots are taken at 0, 2.5, 5, 7.5, and 10 cm of shortening.
-\end_layout
-
+Strain rate invariant for the unstable shortening benchmark at 10 cm of
+ shortening with resolutions of 128
+\begin_inset Formula $\times$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
+32, 256
+\begin_inset Formula $\times$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/Geomod2008_unstable_sri256x64.png
-	lyxscale 50
-	width 100col%
-
+64, and 512
+\begin_inset Formula $\times$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:unstable_sri_256"
-
-\end_inset
-
-Strain rate invariant for the unstable shortening benchmark with a resolution
- of 256x64.
- The snapshots are taken at 0, 2.5, 5, 7.5, and 10 cm of shortening.
+128.
 \end_layout
 
 \end_inset
@@ -22841,6 +23272,7 @@ Strain rate invariant for the unstable shortening benchmark with a resolution
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -22848,8 +23280,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/Geomod2008_unstable_sri512x128.png
-	lyxscale 50
+	filename images/Geomod2008_unstable_particles.png
 	width 100col%
 
 \end_inset
@@ -22863,13 +23294,24 @@ status open
 \begin_layout Plain Layout
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:unstable_sri_512"
+name "fig:unstable_particles"
 
 \end_inset
 
-Strain rate invariant for the unstable shortening benchmark with a resolution
- of 512x128.
- The snapshots are taken at 0, 2.5, 5, 7.5, and 10 cm of shortening.
+Material particles for the unstable shortening benchmark at 10 cm of shortening
+ with resolutions of 128
+\begin_inset Formula $\times$
+\end_inset
+
+32, 256
+\begin_inset Formula $\times$
+\end_inset
+
+64, and 512
+\begin_inset Formula $\times$
+\end_inset
+
+128.
 \end_layout
 
 \end_inset
@@ -22884,6 +23326,7 @@ Strain rate invariant for the unstable shortening benchmark with a resolution
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -22891,8 +23334,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/Geomod2008_unstable_particles128x32.png
-	lyxscale 50
+	filename images/Geomod2008_unstable_strain.png
 	width 100col%
 
 \end_inset
@@ -22906,99 +23348,24 @@ status open
 \begin_layout Plain Layout
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:unstable_particles_128"
+name "fig:unstable_strain"
 
 \end_inset
 
-Material particles for the unstable shortening benchmark with a resolution
- of 128x32.
- The snapshots are taken at 0, 2.5, 5, 7.5, and 10 cm of shortening.
-\end_layout
-
+Integrated strain for the unstable shortening benchmark at 10 cm of shortening
+ with resolutions of 128
+\begin_inset Formula $\times$
 \end_inset
 
-
-\end_layout
-
+32, 256
+\begin_inset Formula $\times$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/Geomod2008_unstable_particles256x64.png
-	lyxscale 50
-	width 100col%
-
+64, and 512
+\begin_inset Formula $\times$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:unstable_particles_256"
-
-\end_inset
-
-Material particles for the unstable shortening benchmark with a resolution
- of 256x64.
- The snapshots are taken at 0, 2.5, 5, 7.5, and 10 cm of shortening.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/Geomod2008_unstable_particles512x128.png
-	lyxscale 50
-	width 100col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:unstable_particles_512"
-
-\end_inset
-
-Material particles for the unstable shortening benchmark with a resolution
- of 512x128.
- The snapshots are taken at 0, 2.5, 5, 7.5, and 10 cm of shortening.
+128.
 \end_layout
 
 \end_inset
@@ -23031,50 +23398,30 @@ reference "fig:Brittle_setup"
  Figures 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:brittle_sri_128"
+reference "fig:brittle_sri"
 
 \end_inset
 
 , 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:brittle_sri_256"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:brittle_sri_512"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:brittle_particles_128"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:brittle_particles_256"
+reference "fig:brittle_particles"
 
 \end_inset
 
 , and 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:brittle_particles_512"
+reference "fig:brittle_strain"
 
 \end_inset
 
- show results at different times and different resolutions.
+ show results for different resolutions.
 \end_layout
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -23115,6 +23462,7 @@ Set up for the brittle shortening benchmark.
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -23122,8 +23470,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/Geomod2008_brittle_sri128x32.png
-	lyxscale 50
+	filename images/Geomod2008_brittle_sri.png
 	width 100col%
 
 \end_inset
@@ -23137,13 +23484,24 @@ status open
 \begin_layout Plain Layout
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:brittle_sri_128"
+name "fig:brittle_sri"
 
 \end_inset
 
-Strain rate invariant for the brittle shortening benchmark with a resolution
- of 128x32.
- The snapshots are taken at 0, 2.5, 5, 7.5, and 10 cm of shortening.
+Strain rate invariant for the brittle shortening benchmark at 10 cm of shortenin
+g with resolutions of 128
+\begin_inset Formula $\times$
+\end_inset
+
+32, 256
+\begin_inset Formula $\times$
+\end_inset
+
+64, and 512
+\begin_inset Formula $\times$
+\end_inset
+
+128.
 \end_layout
 
 \end_inset
@@ -23158,6 +23516,7 @@ Strain rate invariant for the brittle shortening benchmark with a resolution
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -23165,8 +23524,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/Geomod2008_brittle_sri256x64.png
-	lyxscale 50
+	filename images/Geomod2008_brittle_particles.png
 	width 100col%
 
 \end_inset
@@ -23180,13 +23538,24 @@ status open
 \begin_layout Plain Layout
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:brittle_sri_256"
+name "fig:brittle_particles"
 
 \end_inset
 
-Strain rate invariant for the brittle shortening benchmark with a resolution
- of 256x64.
- The snapshots are taken at 0, 2.5, 5, 7.5, and 10 cm of shortening.
+Material particles for the brittle shortening benchmark at 10 cm of shortening
+ with resolutions of 128
+\begin_inset Formula $\times$
+\end_inset
+
+32, 256
+\begin_inset Formula $\times$
+\end_inset
+
+64, and 512
+\begin_inset Formula $\times$
+\end_inset
+
+128.
 \end_layout
 
 \end_inset
@@ -23201,6 +23570,7 @@ Strain rate invariant for the brittle shortening benchmark with a resolution
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -23208,8 +23578,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/Geomod2008_brittle_sri512x128.png
-	lyxscale 50
+	filename images/Geomod2008_brittle_strain.png
 	width 100col%
 
 \end_inset
@@ -23223,142 +23592,24 @@ status open
 \begin_layout Plain Layout
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:brittle_sri_512"
+name "fig:brittle_strain"
 
 \end_inset
 
-Strain rate invariant for the brittle shortening benchmark with a resolution
- of 512x128.
- The snapshots are taken at 0, 2.5, 5, 7.5, and 10 cm of shortening.
-\end_layout
-
+Integrated strain for the brittle shortening benchmark at 10 cm of shortening
+ with resolutions of 128
+\begin_inset Formula $\times$
 \end_inset
 
-
-\end_layout
-
+32, 256
+\begin_inset Formula $\times$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/Geomod2008_brittle_particles128x32.png
-	lyxscale 50
-	width 100col%
-
+64, and 512
+\begin_inset Formula $\times$
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:brittle_particles_128"
-
-\end_inset
-
-Material particles for the brittle shortening benchmark with a resolution
- of 128x32.
- The snapshots are taken at 0, 2.5, 5, 7.5, and 10 cm of shortening.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/Geomod2008_brittle_particles256x64.png
-	lyxscale 50
-	width 100col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:brittle_particles_256"
-
-\end_inset
-
-Material particles for the brittle shortening benchmark with a resolution
- of 256x64.
- The snapshots are taken at 0, 2.5, 5, 7.5, and 10 cm of shortening.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/Geomod2008_brittle_particles512x128.png
-	lyxscale 50
-	width 100col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:brittle_particles_512"
-
-\end_inset
-
-Material particles for the brittle shortening benchmark with a resolution
- of 512x128.
- The snapshots are taken at 0, 2.5, 5, 7.5, and 10 cm of shortening.
+128.
 \end_layout
 
 \end_inset
@@ -24232,12 +24483,15 @@ key "Buiter et al Numerical Sandbox"
 
 \end_inset
 
-Buiter, Susanne J.H., and Andrey Yu.
- Babeyko, Susan Ellis, Taras V.
- Gerya, Boris J.P.
- Kaus, Antje Kellner, Guido Schreurs, and Yasuhiro Yamada (2006), The numerical
- sandbox: comparison of model results for a shortening and an extension
- experiment, 
+Buiter, S.J.H., and A.Y.
+ Babeyko, S.
+ Ellis, T.V.
+ Gerya, B.J.P.
+ Kaus, A.
+ Kellner, G.
+ Schreurs, and Y.
+ Yamada (2006), The numerical sandbox: comparison of model results for a
+ shortening and an extension experiment, 
 \emph on
 Analogue and Numerical Modelling of Crustal-Scale Processes
 \emph default
@@ -24245,7 +24499,8 @@ Analogue and Numerical Modelling of Crustal-Scale Processes
 \emph on
 253
 \emph default
-, edited by S.J.H Buiter and G.
+, edited by S.J.H.
+ Buiter and G.
  Schreurs, pp.
  29-64, Geological Society, London, Special Publications, doi: 10.1144/GSL.SP.2006.2
 53.01.02.
@@ -24280,7 +24535,7 @@ key "FD Stokes"
 
 \end_inset
 
- Deubelbeiss, Yolanda, and Boris J.P.
+ Deubelbeiss, Y., and B.J.P.
  Kaus (2007), A comparison of finite difference formultions for the Stokes
  equations in presence of strongly varying viscosity, poster presented at
  2007 AGU.
@@ -24367,6 +24622,72 @@ Dahlen, F.A.
  Res., 89
 \shape default
 , B12, 10125-10133
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "18"
+key "Shear angles"
+
+\end_inset
+
+Kaus, B.J.P.
+ (2009), Factors that control the angle of shear bands in geodynamic numerical
+ models of brittle deformation, 
+\shape italic
+Tectonophysics
+\shape default
+, 
+\shape italic
+484
+\shape default
+, 36-47
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "19"
+key "Dike"
+
+\end_inset
+
+Buck, W.R., L.L.
+ Lavier, and A.N.B.
+ Poliakov (2005), Modes of faulting at mid-ocean ridges, 
+\shape italic
+Nature
+\shape default
+, 
+\shape italic
+434
+\shape default
+, 719-723
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+label "20"
+key "HRS"
+
+\end_inset
+
+Hilley, G.E.
+ and M.R.
+ Strecker (2004), Growth and erosion of fold-and-thrust belts with an applicatio
+n to the Aconcagua fold-and-thrust belt, Argentina, 
+\shape italic
+J.
+ Geophys.
+ Res.
+\shape default
+, 
+\shape italic
+109
+\shape default
+, B01410, doi:10.1029/2002JB002282 
 \end_layout
 
 \end_body
