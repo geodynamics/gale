@@ -87,7 +87,7 @@ Testing
 
 There are a number of cookbook examples.  To run the yielding model type
 
-  bin/Gale input/cookbook/yielding.xml
+  build/bin/Gale input/cookbook/yielding.xml
 
 For some MPI implementations, you may have to speficy the complete
 path to the input file

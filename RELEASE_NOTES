@@ -1,0 +1,321 @@
+1.5.0
+----------------------------------
+
+* The input file format has changed.  See UPGRADE for how to upgrade
+  your input files.
+
+* The code from Underworld has been merged in and Gale now uses
+  Underworld's build system.
+
+* Checkpoint and restart works.
+
+* Multigrid is available as an optional solver.
+
+* The bottom of the mesh can now be deformed. 
+
+* There is a new script to convert VTK files to CSV (comma separated
+  values), which can be easily read by a number of programs.
+
+* There is a new program to generate VTK movie files.
+
+* A new example of a dike was added, and the tibet models removed.
+
+* The Drucker-Prager rheology now has two parameters,
+  minimumViscosity and maxStrainRate, which greatly improve the
+  robustness and speed.
+
+* The NonNewtonian rheology now has a melting temperature, above which
+  the viscosity is constant and independent of strain.
+
+* Inflow boundary conditions work a little better.
+
+* StrainWeakening now takes a shape strainLimitedShape and a parameter
+  strainLimit.
+
+* HRS_Erosion, a new surface process, has been added.
+
+* A number of StandardConditionFunctions have been added.
+
+1.4.1
+----------------------------------
+
+* A bug that only shows up in 3D parallel runs with a free surface has
+  been fixed.
+
+* A bug in how stress boundary conditions are computed with
+  hydrostatic terms has been fixed.
+
+* The TemperatureProfile Standard condition function now allows
+  variations of the temperature in the x-direction.
+
+* NonNewtonian, a power law creep rheology, has been cleaned up,
+  tested, and documented.
+
+The current goals are:
+
+  * Merge Gale back with the VPAC code.  This should give Gale multigrid
+    solvers, restart capability, and improved PETSc compatibility.
+  * Deformed lower boundaries
+  * Interface with custom surface process models in parallel
+  * User-specified non-uniform mesh spacing.
+
+1.4.0
+----------------------------------
+
+* Gale now uses linear pressure elements.  This solves a number of
+  problems with stability and robustness, and makes the code much
+  faster to boot.  Constant pressure elements are no longer supported,
+  and the accompanying NodalPressure variables will no longer work.
+  This will require modifying your input files.  See the file UPGRADE
+  for step-by-step instructions.
+
+* The Mohr-Coulomb rheology has been removed.  Please use
+  Drucker-Prager instead.  Mohr-Coulomb and Drucker-Prager are the
+  same in 2D, and Mohr-Coulomb never really worked in 3D.
+
+* VTK Output now occurs after a Stokes solve, but before any advection
+  or strain integration.
+
+* Drucker-Prager can optionally implement a frictional boundary layer.
+
+* The output of the current time and timestep has been clarified.
+
+* The Paraview examples have been updated to version 3.4.0.
+
+* The documentation details how to modify Standard Condition
+  Functions.
+
+* Results for the Geomod 2008 benchmarks are in the manual.
+
+* Divergent flow has been added, along with one example and a
+  benchmark test case.
+
+* The yielding fraction in the particle vtk output has been replaced
+  by the post failure strain.  The yielding fraction can be derived
+  from the post failure strain, but not vice-versa.
+
+* There is a new field in the particle vtk output,
+  "Currently_Yielding", which is 0 or 1 depending on whether the
+  material is yielding on that time step.
+
+* Erf and Erfc have been added as Standard Condition Functions, and
+  AnalyticalTemperatureIC now works with Windows 32 bit.
+
+* A bug in how rotation is applied to shapes has been fixed.
+
+* The StepFunction Standard Condition Function now works in time or
+  space.
+
+* The TemperatureProfile Standard Condition Function is now documented.
+
+* EulerDeform is now more flexible in specifying how the boundary
+  moves.
+
+* The DumpSwarm output method has been removed.  It was a maintenance
+  burden, and all of the information is available through the VTK
+  files.  This also means that it is no longer possible to visualize
+  the results with a spreadsheet like Excel.
+
+* The documentation has been updated to use Paraview 3.4.0.
+
+The current goals are:
+
+  * Merge Gale back with the VPAC code.  This should give Gale multigrid
+    solvers, restart capability, and improved PETSc compatibility.
+  * Deformed lower boundaries
+  * Interface with custom surface process models in parallel
+  * User-specified non-uniform mesh spacing.
+
+1.3.0
+----------------------------------
+
+* Nodal pressures have been introduced, eliminating the even-odd
+  instability seen in the regular pressure solution.  These pressures
+  are now used for calculating yielding and friction.  This will
+  require anyone using those features to make some minor changes to their
+  input files (see the file MIGRATION for details).
+* Results for all of the Geomod 2004 benchmarks are now included and
+  described in the manual.
+* The vtk output for particles now includes a material index, making
+  it easy to distinguish between materials with the same properties
+  for visualization.
+* Fixing internal degrees of freedom with ShapeVC's is now better
+  documented in the manual, including tips on how to use them for
+  boundary conditions.
+* It is now possible to specify both the upper and lower values for
+  StepFunction.
+* A bug has been fixed in the diffusion example for surface processes.
+* Some bugs in the static and kinetic friction boundary conditions
+  have been fixed, and they are now thoroughly tested and benchmarked.
+* A minor bug in the Mohr Coulomb yielding model has been fixed.  It
+  has also been made more robust and now works with stiff materials.
+* A number of memory bugs have been fixed.
+
+The current goals are:
+
+  * Merge Gale back with the VPAC code.  This should give Gale multigrid
+    solvers, restart capability, and improved PETSc compatibility.
+  * Better normal stress boundary conditions
+  * Deformed lower boundaries
+  * Interface with custom surface process models in parallel
+  * Implement the Geomod 2008 benchmarks
+
+1.2.2
+----------------------------------
+* Several high precision benchmarks have been incorporated as tests for Gale.
+* The vtk output plugin now uses the parallel xml format, easing
+  visualization of runs with large numbers of processors.
+* The ordering of tensor values in the vtk output has been fixed.
+* There is a rough implementation of static and kinetic friction boundary
+  conditions.
+* The location of the input files has been reorganized.
+* StrainWeakening now takes an initialSofteningStrain and
+  FinalSofteningStrain.  Previously, initialSofteningStrain was hard
+  coded to be zero and "finalSofteningStrain" was just
+  "softeningStrain".  Using the old name "softeningStrain" will still
+  work.
+
+The current goals are to work on
+
+  * Cleanup friction boundary conditions
+  * Better normal stress boundary conditions
+  * Deformed lower boundaries
+  * Interface with custom surface process models in parallel
+
+1.2.1
+----------------------------------
+* Thermal problems are now documented, including a cookbook example.
+* Normal stress boundaries which simulate the effect of a supporting
+  material now work and are documented.
+* Interfacing with custom surface process models works in serial.
+* You may now affect the time step chosen by Gale with the parameter dtFactor.
+* There is now a ShearZ function in the list of Standard Condition Functions.
+* A bug that prevented the windows binary from working has been fixed.
+* A bug in stress boundary conditions which caused applied stresses to
+  be too large by a factor of 2 or 4 has been fixed.
+* A bug where Gale would run out of memory if reading large input
+  files has been fixed.
+* Gale is known to work, although not necessarily scale, up to 512 processors.
+
+The current goals are to work on
+
+  * Frictional boundary conditions
+  * Deformed lower boundaries
+  * Interface with custom surface process models in parallel
+
+1.2.0
+----------------------------------
+* Gale has been shown to scale to at least 128 processors
+* The VTKOutput and DumpSwarm output plugins work in parallel.
+* Gale defaults to installing in the current directory.  So the
+  binary is in bin/Gale
+* The --with-petsc-arch and --with-libxml-libdir options work
+* The windows binary may not work completely with all of the sample
+  input files.
+
+While this release should be useful to many researchers, we continue
+to work on
+
+  * Isostasy
+  * Interface with custom surface process models
+  * Deformed lower boundaries
+  * Frictional boundary conditions
+  * More documentation on thermal problems
+
+1.1.1
+----------------------------------
+This latest release features a number of bug fixes and improved
+documentation.
+
+1.1.0
+----------------------------------
+   * Gale is known to work in parallel with two processors
+   * A bug preventing 3D runs on some machines was fixed.
+   * A memory leak preventing long runs was fixed.
+   * The documentation has been significantly improved, with eight
+     cookbook examples with supporting diagrams added.
+   * The subduction example is more realistic.
+   * There are a number of Matlab visualization scripts generously
+     donated by Boris Kaus
+   * We now have binaries for 32 bit x86 Linux, 64 bit AMD Linux,
+     32 bit Windows, PPC Mac, and Intel Mac.
+
+While this release should be useful to many researchers, we continue
+to work on
+
+  * Interfacing custom surface process models
+  * Frictional boundary conditions
+  * Deformed lower boundaries
+  * Improved parallel performance
+
+
+1.0.0
+----------------------------------
+  * Deformed Upper boundaries are now supported.
+
+  * Narrow faults now work well.
+
+  * Stress boundary conditions are now supported, although it may be a
+    little flaky.
+
+  * Parallel works better, but is still a bit flaky
+
+  * Binaries are available for Windows, Mac, and Linux.
+
+  * There is now an example of relaxation of topography.
+
+  * The documentation has been significantly improved.
+
+While this release should be useful to many researchers, we continue
+development.  Specifically, we will be working on
+
+  * Interfacing custom surface process models
+  * Frictional boundary conditions
+  * Deformed lower boundaries
+
+
+0.9.0
+----------------------------------
+  * There are now examples of extension, shortening, and subduction
+    that work in 2D and 3D.
+
+  * Inflow and outflow boundaries are now supported.
+
+  * A straightforward Mohr-Coulomb yielding model is now available.
+
+  * Parallel is a bit flaky and may or may not work for you.
+
+  * Narrow faults may have numerical problems
+
+  * Binaries are available for Windows, Mac, and Linux.
+
+This release is almost feature complete.  At this point, the only
+significant steps from here to 1.0 are
+
+  * Stress Boundaries
+  * Miscellaneous bug fixes
+  * Improved documentation
+  * More thorough testing
+
+0.2.0
+----------------------------------
+  * The simple-extension.xml example should work in 2D and 3D.  The
+    other input files have not been tested.
+
+  * Binaries are available for Windows, Mac, and Linux.
+
+  * Documentation has been improved, though there is still much work
+    to do.
+
+  * The parallel capabilities of the code are temporarily broken.
+
+This is a beta release, so do not be surprised if you find bugs.
+
+0.1.0
+----------------------------------
+This is an alpha release, so it is mostly of interest to developers.
+While the installation has been tested on a number of different
+machines, if you have an odd machine that you want supported, then it
+would be useful if you could try installing Gale now.  Otherwise, if
+you just want to run the code, it may be better to wait for a stable
+release.
