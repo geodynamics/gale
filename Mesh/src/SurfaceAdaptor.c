@@ -270,7 +270,7 @@ void _SurfaceAdaptor_AssignFromXML_Surface(Stg_ComponentFactory* cf,
     strcpy(temp,surface);
     info->topo_data.nz = 
       Stg_ComponentFactory_GetInt( cf, name,
-                                   strcat(temp,"Nz"), 0 );
+                                   strcat(temp,"Nz"), 1 );
     strcpy(temp,surface);
     info->topo_data.minX = 
       Stg_ComponentFactory_GetDouble( cf, name,
@@ -578,45 +578,74 @@ double SurfaceAdaptor_Topo_Data( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh,
   int i,k,ip,kp;
   double dx,dz;
 
-  i=floor((mesh->verts[vertex][0] - info->topo_data.minX)
-          /info->topo_data.dx + 0.5);
-  k=floor((mesh->verts[vertex][2] - info->topo_data.minZ)
-          /info->topo_data.dz + 0.5);
-
-  if(i<0 || i>info->topo_data.nx-1
-     || k<0 || k>info->topo_data.nz-1)
+  if(mesh->topo->nDims==3)
     {
-      printf("Coordinate not covered by the topography file: %g %g\n\tminX: %g\n\tmaxX: %g\n\tminZ: %g\n\tmaxZ: %g\n\tnx: %d\n\tnz: %d\n",
-             mesh->verts[vertex][0],
-             mesh->verts[vertex][2],
-             info->topo_data.minX,
-             info->topo_data.maxX,
-             info->topo_data.minZ,
-             info->topo_data.maxZ,
-             info->topo_data.nx,
-             info->topo_data.nz);
-      abort();
+      i=floor((mesh->verts[vertex][0] - info->topo_data.minX)
+              /info->topo_data.dx + 0.5);
+      k=floor((mesh->verts[vertex][2] - info->topo_data.minZ)
+              /info->topo_data.dz + 0.5);
+
+      if(i<0 || i>info->topo_data.nx-1
+         || k<0 || k>info->topo_data.nz-1)
+        {
+          printf("Coordinate not covered by the topography file: %g %g\n\tminX: %g\n\tmaxX: %g\n\tminZ: %g\n\tmaxZ: %g\n\tnx: %d\n\tnz: %d\n",
+                 mesh->verts[vertex][0],
+                 mesh->verts[vertex][2],
+                 info->topo_data.minX,
+                 info->topo_data.maxX,
+                 info->topo_data.minZ,
+                 info->topo_data.maxZ,
+                 info->topo_data.nx,
+                 info->topo_data.nz);
+          abort();
+        }
+
+      /* Interpolate the height */
+      ip=i+1;
+      kp=k+1;
+      if(ip>info->topo_data.nx-1)
+        ip=i;
+      if(kp>info->topo_data.nz-1)
+        kp=k;
+
+      dx=(mesh->verts[vertex][0]
+          - (i*info->topo_data.dx+info->topo_data.minX))
+        /info->topo_data.dx;
+      dz=(mesh->verts[vertex][2]
+          - (k*info->topo_data.dz+info->topo_data.minZ))
+        /info->topo_data.dz;
+
+      return info->topo_data.heights[i+info->topo_data.nx*k]*(1-dx)*(1-dz)
+        + info->topo_data.heights[i+info->topo_data.nx*kp]*(1-dx)*dz
+        + info->topo_data.heights[ip+info->topo_data.nx*k]*dx*(1-dz)
+        + info->topo_data.heights[ip+info->topo_data.nx*kp]*dx*dz;
     }
+  else
+    {
+      i=floor((mesh->verts[vertex][0] - info->topo_data.minX)
+              /info->topo_data.dx + 0.5);
+      if(i<0 || i>info->topo_data.nx-1)
+        {
+          printf("Coordinate not covered by the topography file: %g\n\tminX: %g\n\tmaxX: %g\n\tnx: %d\n\n",
+                 mesh->verts[vertex][0],
+                 info->topo_data.minX,
+                 info->topo_data.maxX,
+                 info->topo_data.nx);
+          abort();
+        }
 
-  /* Interpolate the height */
-  ip=i+1;
-  kp=k+1;
-  if(ip>info->topo_data.nx-1)
-    ip=i;
-  if(kp>info->topo_data.nz-1)
-    kp=k;
+      /* Interpolate the height */
+      ip=i+1;
+      if(ip>info->topo_data.nx-1)
+        ip=i;
 
-  dx=(mesh->verts[vertex][0]
-      - (i*info->topo_data.dx+info->topo_data.minX))
-    /info->topo_data.dx;
-  dz=(mesh->verts[vertex][2]
-      - (k*info->topo_data.dz+info->topo_data.minZ))
-    /info->topo_data.dz;
+      dx=(mesh->verts[vertex][0]
+          - (i*info->topo_data.dx+info->topo_data.minX))
+        /info->topo_data.dx;
 
-  return info->topo_data.heights[i+info->topo_data.nx*k]*(1-dx)*(1-dz)
-    + info->topo_data.heights[i+info->topo_data.nx*kp]*(1-dx)*dz
-    + info->topo_data.heights[ip+info->topo_data.nx*k]*dx*(1-dz)
-    + info->topo_data.heights[ip+info->topo_data.nx*kp]*dx*dz;
+      return info->topo_data.heights[i]*(1-dx)
+        + info->topo_data.heights[ip]*dx;
+    }
 }
 
 double SurfaceAdaptor_Sine( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
