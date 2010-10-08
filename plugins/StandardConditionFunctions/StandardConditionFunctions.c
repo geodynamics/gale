@@ -223,6 +223,10 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
                                          (Name)"Quadratic");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
+	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File1,
+                                         (Name)"File1");
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+
 }
 
 void _StgFEM_StandardConditionFunctions_Destroy( void* _self, void* data ) {
@@ -2351,5 +2355,83 @@ void StgFEM_StandardConditionFunctions_Quadratic( Node_LocalIndex node_lI, Varia
   *result= a + coord[dim]*(b + c*coord[dim]);
 }
 
+int Binary_Search(double *data, int s, int e, double value);
+
+void StgFEM_StandardConditionFunctions_File1( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+{
+  FiniteElementContext *	context            = (FiniteElementContext*)_context;
+  FeVariable*             feVariable         = NULL;
+  FeMesh*     mesh               = NULL;
+  Dictionary*             dictionary         = context->dictionary;
+  double*                 result             = (double*) _result;
+  double*                 coord;
+  int                     dim, i;
+  char *filename;
+  int N;
+  int result_index;
+  double factor;
+  static double *coords=NULL;
+  static double *data=NULL;
+  feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
+  mesh       = feVariable->feMesh;
+  coord      = Mesh_GetVertex( mesh, node_lI );
+  
+  dim = Dictionary_GetInt( dictionary, "File1_Dim");
+  filename = Dictionary_GetString( dictionary, "File1_Name");
+  N = Dictionary_GetInt( dictionary, "File1_N");
+
+  Journal_Firewall(dim>=0 && dim<3,
+                   Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_File1"),
+                   "File1_Dim must be either 0, 1, or 2, but was set to %d",dim);
+  Journal_Firewall(N>0,
+                   Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_File1"),
+                   "File1_N must be greater than zero, but was set to %d.",N);
+  if(data==NULL)
+    {
+      
+      FILE *fp=fopen(filename,"r");
+      Journal_Firewall(filename!=NULL,
+                       Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_File1"),
+                       "Bad filename for File1_Name.  Could not open %s",filename);
+      data=(double *)malloc(N*sizeof(double));
+      coords=(double *)malloc(N*sizeof(double));
+
+      Journal_Firewall(data!=NULL && coords!=NULL,
+                       Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_File1"),
+                       "Could not allocate enough memory for File1");
+      for(i=0;i<N;++i)
+        fscanf(fp,"%lf %lf",coords+i,data+i);
+    }
+
+  Journal_Firewall(!(coord[dim]<coords[0] || coord[dim]>coords[N-1]),
+                   Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_File1"),
+                   "The range in the file '%s' does not cover this value %g\nIt only covers %g to %g.\n",
+                   filename,coord[dim],coords[0],coords[1]);
+
+  result_index=Binary_Search(coords,0,N-1,coord[dim]);
+  factor=(coords[result_index+1]-coord[dim])
+    / (coords[result_index+1]-coords[result_index]);
+  
+  *result=data[result_index]*factor + data[result_index+1]*(factor-1);
+}
 
 
+int Binary_Search(double *data, int s, int e, const double value)
+{
+  int start, end, midpoint;
+
+  start=s;
+  end=e;
+  midpoint=e;
+  
+  midpoint=(end-start)/2 + start;
+  while(start!=midpoint)
+    {
+      if(data[midpoint]>=value)
+        end=midpoint;
+      else
+        start=midpoint;
+      midpoint=(end-start)/2 + start;
+    }
+  return start;
+}
