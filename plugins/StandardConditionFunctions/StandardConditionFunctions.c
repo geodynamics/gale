@@ -2412,7 +2412,7 @@ void StgFEM_StandardConditionFunctions_File1( Node_LocalIndex node_lI, Variable_
   factor=(coords[result_index+1]-coord[dim])
     / (coords[result_index+1]-coords[result_index]);
   
-  *result=data[result_index]*factor + data[result_index+1]*(factor-1);
+  *result=data[result_index]*factor + data[result_index+1]*(1-factor);
 }
 
 
