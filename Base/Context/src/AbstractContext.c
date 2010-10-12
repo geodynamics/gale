@@ -358,6 +358,10 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
    /* the following just pauses at this point to allow time to attach a debugger.. useful for mpi debugging */
    sleep( Dictionary_Entry_Value_AsUnsignedInt(Dictionary_GetDefault( self->dictionary, "pauseToAttachDebugger", Dictionary_Entry_Value_FromUnsignedInt( 0 )) ) ); 
       
+   /* this defines all the entryPoints, eg, self->constructK, etc...
+      so it must go before we start KeyCall */
+   _AbstractContext_Init( self );
+
 	/* Main input parameters */
 	self->frequentOutputEvery = Dictionary_Entry_Value_AsUnsignedInt( 
 		Dictionary_GetDefault( self->dictionary, "outputEvery", Dictionary_Entry_Value_FromUnsignedInt( 1 ) ) );
@@ -524,10 +528,6 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 
 	/* Check if we have been provided a constant to multiply our calculated dt values by. */
 	self->dtFactor = Dictionary_GetDouble_WithDefault( self->dictionary, (Dictionary_Entry_Key)"timestepFactor", 1.0  );
-
-   /* this defines all the entryPoints, eg, self->constructK, etc...
-      so it must go before we start KeyCall */
-   _AbstractContext_Init( self );
 
 	/* construct entry point */
 	KeyCall( self, self->constructK, EntryPoint_2VoidPtr_CallCast* )( KeyHandle( self, self->constructK ), self, self );
