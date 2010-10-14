@@ -59,6 +59,7 @@
                 StressBC_Entry                           _entryTbl[3]; \
                 int                                      numEntries; \
 		ConditionFunction_Register*		 conFunc_Register; \
+                double                                   bottom_density; \
 
 	struct StressBC { __StressBC };
 

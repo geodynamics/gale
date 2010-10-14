@@ -189,7 +189,9 @@ void _StressBC_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* d
         _StressBC_GetValues(cf,self,"x",data);
         _StressBC_GetValues(cf,self,"y",data);
         _StressBC_GetValues(cf,self,"z",data);
-          
+
+        self->bottom_density=
+          Stg_ComponentFactory_GetDouble(cf,self->name,"bottomDensity",0.0);
 }
 
 /* Gets the actual values used by the StressBC (e.g. a float or a function). */
@@ -308,6 +310,7 @@ void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Eleme
   IArray *incidence;
   int elementNodeCount;
   int *elementNodes;
+  double *coord;
 
   FeVariable* velocityField = NULL;
   velocityField = (FeVariable*)FieldVariable_Register_GetByName
@@ -383,15 +386,33 @@ void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Eleme
                                         0,self->context,&stress);
                 break;
               case StressBC_HydrostaticTerm:
-                stress=
-                  -HydrostaticTerm_Pressure(self->_entryTbl[entry_I].hydrostaticTerm,
-                                            Mesh_GetVertex(mesh,elementNodes[eNode_I]));
-                if(self->_wall!=Wall_Top)
+                if(self->_wall!=Wall_Top && self->_wall!=Wall_Bottom)
                   {
                     Stream* errorStr=Journal_Register( Error_Type, self->type );
-                    Journal_Firewall(0,errorStr,"You can only apply a HydrostaticTerm StressBC to the top wall.\nYou applied it to the %s wall",WallVC_WallEnumToStr[self->_wall]);
+                    Journal_Firewall(0,errorStr,"You can only apply a HydrostaticTerm StressBC to the top or bottom wall.\nYou applied it to the %s wall",WallVC_WallEnumToStr[self->_wall]);
                   }
 
+                coord=Mesh_GetVertex(mesh,elementNodes[eNode_I]);
+                stress=
+                  -HydrostaticTerm_Pressure(self->_entryTbl[entry_I].hydrostaticTerm,
+                                            coord);
+                /* For the bottom, we need to add in the effects of
+                   material outside the mesh. */
+
+                if(self->_wall==Wall_Bottom)
+                  {
+                    Coord bottom;
+                    double dy;
+                    bottom[0]=coord[0];
+                    bottom[1]=0;
+                    bottom[2]=coord[2];
+                    dy=bottom[1] - coord[1];
+                    stress+=HydrostaticTerm_Pressure(self->_entryTbl[entry_I].hydrostaticTerm,bottom);
+                    stress-=self->bottom_density
+                      * self->_entryTbl[entry_I].hydrostaticTerm->gravity
+                      * dy;
+                  }
+                    
                 if(dim==2)
                   {
                     double dx, dy, *coord0, *coord1;
