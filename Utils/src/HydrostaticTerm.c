@@ -69,6 +69,8 @@ HydrostaticTerm* HydrostaticTerm_New(Name name,
                                      double height,
                                      double material_boundary,
                                      double T_0,
+                                     double T_max,
+                                     double T_max_depth,
                                      double linear_coefficient,
                                      double exponential_coefficient1,
                                      double exponential_coefficient2,
@@ -87,6 +89,8 @@ HydrostaticTerm* HydrostaticTerm_New(Name name,
                                 height,
                                 material_boundary,
                                 T_0,
+                                T_max,
+                                T_max_depth,
                                 linear_coefficient,
                                 exponential_coefficient1,
                                 exponential_coefficient2,
@@ -117,6 +121,8 @@ void _HydrostaticTerm_Init(HydrostaticTerm* self,
                            double height,
                            double material_boundary,
                            double T_0,
+                           double T_max,
+                           double T_max_depth,
                            double linear_coefficient,
                            double exponential_coefficient1,
                            double exponential_coefficient2,
@@ -134,6 +140,8 @@ void _HydrostaticTerm_Init(HydrostaticTerm* self,
   self->height=height;
   self->material_boundary=material_boundary;
   self->T_0=T_0;
+  self->T_max=T_max;
+  self->T_max_depth=T_max_depth;
   self->linear_coefficient=linear_coefficient;
   self->exponential_coefficient1=exponential_coefficient1;
   self->exponential_coefficient2=exponential_coefficient2;
@@ -151,6 +159,8 @@ void HydrostaticTerm_InitAll(void* forceTerm,
                              double height,
                              double material_boundary,
                              double T_0,
+                             double T_max,
+                             double T_max_depth,
                              double linear_coefficient,
                              double exponential_coefficient1,
                              double exponential_coefficient2,
@@ -168,6 +178,8 @@ void HydrostaticTerm_InitAll(void* forceTerm,
                          height,
                          material_boundary,
                          T_0,
+                         T_max,
+                         T_max_depth,
                          linear_coefficient,
                          exponential_coefficient1,
                          exponential_coefficient2,
@@ -206,7 +218,8 @@ void _HydrostaticTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf,
                                  void* data ) {
   HydrostaticTerm* self = (HydrostaticTerm*)forceTerm;
   double upper_density,upper_alpha,lower_density,lower_alpha,height,
-    material_boundary,T_0,linear_coefficient,exponential_coefficient1,
+    material_boundary,T_0,T_max,T_max_depth,linear_coefficient,
+    exponential_coefficient1,
     exponential_coefficient2,gravity,v,width;
   AbstractContext *context;
 
@@ -226,6 +239,8 @@ void _HydrostaticTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf,
   material_boundary=
     Stg_ComponentFactory_GetDouble(cf,self->name,"materialBoundary",0.0);
   T_0=Stg_ComponentFactory_GetDouble(cf,self->name,"T_0",0.0);
+  T_max=Stg_ComponentFactory_GetDouble(cf,self->name,"T_max",0.0);
+  T_max_depth=Stg_ComponentFactory_GetDouble(cf,self->name,"T_max_depth",0.0);
   linear_coefficient=
     Stg_ComponentFactory_GetDouble(cf,self->name,"linearCoefficient",0.0);
   exponential_coefficient1=
@@ -244,6 +259,8 @@ void _HydrostaticTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf,
                          height,
                          material_boundary,
                          T_0,
+                         T_max,
+                         T_max_depth,
                          linear_coefficient,
                          exponential_coefficient1,
                          exponential_coefficient2,
@@ -288,6 +305,29 @@ void HydrostaticTerm_Current_Heights(void* forceTerm, double *current_height,
   *current_height=current_thickness + *current_boundary;
 }
 
+double HydrostaticTerm_Temperature(void* forceTerm, Coord coord)
+{
+  HydrostaticTerm *self=(HydrostaticTerm *)forceTerm;
+  double h=self->height-coord[1];
+  double T;
+
+  if(h<0)
+    {
+      T=self->T_0;
+    }
+  else if(self->T_max_depth!=0 && h>self->T_max_depth)
+    {
+      T=self->T_max;
+    }
+  else
+    {
+      T=self->T_0 + self->linear_coefficient*h
+        + self->exponential_coefficient1
+        *(1-exp(-self->exponential_coefficient2*h));
+    }
+  return T;
+}
+
 double HydrostaticTerm_Density( void* forceTerm, Coord coord)
 {
   HydrostaticTerm *self=(HydrostaticTerm *)forceTerm;
@@ -296,19 +336,9 @@ double HydrostaticTerm_Density( void* forceTerm, Coord coord)
   double current_height, current_boundary;
 
   HydrostaticTerm_Current_Heights(self,&current_height,&current_boundary);
-  /* printf("Time %g %g %g\n",current_height,current_boundary,self->context->currentTime); */
 
   /* First, get the temperature */
-  if(h<0)
-    {
-      T=self->T_0;
-    }
-  else
-    {
-      T=self->T_0 + self->linear_coefficient*h
-        + self->exponential_coefficient1
-        *(1-exp(-self->exponential_coefficient2*h));
-    }
+  T=HydrostaticTerm_Temperature(forceTerm, coord);
 
   /* Then, get the density */
   if(coord[1]>current_height)
@@ -375,15 +405,32 @@ double HydrostaticTerm_Pressure( void* forceTerm, Coord coord)
                                             self->T_0,
                                             self->linear_coefficient,
                                             self->exponential_coefficient1,
-                                            self->exponential_coefficient2)
-        + HydrostaticTerm_Pressure_Analytic(self->lower_density, self->gravity,
-                                            h,
-                                            self->lower_alpha,
-                                            self->T_0,
-                                            self->linear_coefficient,
-                                            self->exponential_coefficient1,
                                             self->exponential_coefficient2);
+      /* Add in the contribution from where the temperature is constant */
+      if(self->T_max_depth!=0 && h>self->T_max_depth)
+        {
+          p+=self->lower_density*self->gravity*(h-self->T_max_depth)
+            *(1-self->lower_alpha*self->T_max);
+          h=self->T_max_depth;
+        }
+      /* Add in the last part of the analytic term.  Note that h may
+         have been adjusted to T_max_depth */
+      p+=HydrostaticTerm_Pressure_Analytic(self->lower_density, self->gravity,
+                                           h,
+                                           self->lower_alpha,
+                                           self->T_0,
+                                           self->linear_coefficient,
+                                           self->exponential_coefficient1,
+                                           self->exponential_coefficient2);
     }
   return p;
 }
 
+double HydrostaticTerm_Pressure_Bottom( void* forceTerm)
+{
+  HydrostaticTerm *self=(HydrostaticTerm *)forceTerm;
+  Coord coord;
+
+  coord[1]=self->height;
+  return HydrostaticTerm_Pressure(self,coord);
+}

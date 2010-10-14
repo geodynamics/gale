@@ -60,6 +60,8 @@
                 double height; \
                 double material_boundary; \
                 double T_0; \
+                double T_max; \
+                double T_max_depth; \
                 double linear_coefficient; \
                 double exponential_coefficient1; \
                 double exponential_coefficient2; \
@@ -92,6 +94,8 @@
                                      double height,
                                      double material_boundary,
                                      double T_0,
+                                     double T_max,
+                                     double T_max_depth,
                                      double linear_coefficient,
                                      double exponential_coefficient1,
                                      double exponential_coefficient2,
@@ -113,5 +117,6 @@
 	void _HydrostaticTerm_Destroy( void* forceTerm, void* data ) ;
         double HydrostaticTerm_Density( void* forceTerm, Coord coord);
         double HydrostaticTerm_Pressure( void* forceTerm, Coord coord);
+        double HydrostaticTerm_Pressure_Bottom( void* forceTerm);
 
 #endif
