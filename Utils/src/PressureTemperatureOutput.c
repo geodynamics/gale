@@ -208,11 +208,16 @@ void _PressureTemperatureOutput_PrintHeader( void* swarmOutput, Stream* stream, 
 
 void _PressureTemperatureOutput_PrintData( void* swarmOutput, Stream* stream, Particle_Index lParticle_I, void* context ){
 	PressureTemperatureOutput*	self                = (PressureTemperatureOutput*)swarmOutput;
+         FiniteElementContext*          fe_context          = (FiniteElementContext*) context;
 	Swarm*                      swarm               = self->swarm;
 	GlobalParticle*           particle            = (GlobalParticle*)Swarm_ParticleAt( swarm, lParticle_I );
 	double*                     coord               = particle->coord;
+        HydrostaticTerm *hydrostaticTerm;
 	double                      pressure;
 	double                      temperature;
+
+       hydrostaticTerm =
+       (HydrostaticTerm*)LiveComponentRegister_Get(fe_context->CF->LCRegister,"hydrostaticTerm" );
 
 	Journal_Firewall(
 		swarm->particleLayout->coordSystem == GlobalCoordSystem,
@@ -223,6 +228,9 @@ void _PressureTemperatureOutput_PrintData( void* swarmOutput, Stream* stream, Pa
 
 	FieldVariable_InterpolateValueAt( self->pressureField,    coord, &pressure );
 	FieldVariable_InterpolateValueAt( self->temperatureField, coord, &temperature );
+                 if(hydrostaticTerm){
+                          pressure+=HydrostaticTerm_Pressure(hydrostaticTerm,coord);
+                    }
 	
 	SwarmOutput_PrintValue( self, stream, pressure );
 	SwarmOutput_PrintValue( self, stream, temperature );
