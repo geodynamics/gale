@@ -1,4 +1,4 @@
-#LyX 1.6.6 created this file. For more info see http://www.lyx.org/
+#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
 \lyxformat 345
 \begin_document
 \begin_header
@@ -106,7 +106,7 @@ Walter Landry and Luke Hodkinson
 \begin_inset Newline newline
 \end_inset
 
-Version 1.5.0
+Version 1.6.0
 \end_layout
 
 \begin_layout Date
@@ -2462,10 +2462,6 @@ Two blocks sliding past each other with a yielding region between them.
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
 
@@ -4024,7 +4020,11 @@ at the beginning of the file, and before the lines
 \end_layout
 
 \begin_layout LyX-Code
-<list name="plugins">
+
+\end_layout
+
+\begin_layout LyX-Code
+<list name="FieldVariablesToCheckpoint">
 \end_layout
 
 \begin_layout Standard
@@ -10363,6 +10363,11 @@ dt The size of the time step.
 \end_layout
 
 \begin_layout Description
+maxTimeStepSize The maximum size of the time step.
+ This limit is applied after dtFactor and dt.
+\end_layout
+
+\begin_layout Description
 seed A random number seed used when placing new particles.
  You should never need to change this variable, since changing it should
  not affect the simulation.
@@ -13208,7 +13213,7 @@ BelowPlane
 \end_layout
 
 \begin_layout LyX-Code
-  <list name="verticies">
+  <list name="vertices">
 \end_layout
 
 \begin_layout LyX-Code
@@ -13512,7 +13517,7 @@ This is primarily a two-dimensional shape.
 \end_layout
 
 \begin_layout LyX-Code
-      <list name="verticies">
+      <list name="vertices">
 \end_layout
 
 \begin_layout LyX-Code
@@ -14713,7 +14718,7 @@ This is a strain rate dependent rheology.
 
 \begin_layout Standard
 \begin_inset Formula \[
-\dot{\varepsilon}=\left(A\tau\right)^{n}\exp\left(-T_{0}/T\right),\]
+\dot{\varepsilon}=A\tau^{n}\exp\left(-T_{0}/T\right),\]
 
 \end_inset
 
@@ -14749,7 +14754,7 @@ This is a strain rate dependent rheology.
 
 \begin_layout Standard
 \begin_inset Formula \[
-\eta=\frac{\dot{\varepsilon}^{\frac{1}{n}-1}\exp\left(T_{0}/nT\right)}{2A}.\]
+\eta=\frac{\dot{\varepsilon}^{\frac{1}{n}-1}\exp\left(T_{0}/nT\right)}{2A^{\frac{1}{n}}}.\]
 
 \end_inset
 
@@ -14779,7 +14784,7 @@ You may set maximum and minimum values for the resulting viscosity.
 
 
 \begin_inset Tabular
-<lyxtabular version="3" rows="7" columns="2">
+<lyxtabular version="3" rows="8" columns="2">
 <features>
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
@@ -14838,6 +14843,29 @@ T_0
 
 \begin_layout Plain Layout
 0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+T_melt
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\infty$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -17130,6 +17158,64 @@ StressBC
 \end_layout
 
 \begin_layout Standard
+If the bottom boundary can move (that is, you have not set 
+\family typewriter
+StaticBottom
+\family default
+ in 
+\family typewriter
+EulerDeform
+\family default
+ and 
+\begin_inset Formula $v_{y}\neq0$
+\end_inset
+
+), and the material outside the simulation is different from inside, then
+ you must also set a StressBC on the bottom.
+ For this, you must also set 
+\family typewriter
+bottomDensity
+\family default
+, giving something like
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="stressBCTop">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">StressBC</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="ForceVector">mom_force</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Swarm">picIntegrationPoints</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="wall">bottom</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="y_type">HydrostaticTerm</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="y_value">hydrostaticTerm</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="bottomDensity">3000</param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout Standard
 Note that you must not have a separate 
 \family typewriter
 StressBC
@@ -17469,13 +17555,17 @@ cosine
 \family typewriter
 wedge
 \family default
- takes two arguments, 
+ takes three arguments, 
 \family typewriter
-offset
+BeginOffset
 \family default
- and 
+, 
 \family typewriter
-gradient
+EndOffset
+\family default
+, and 
+\family typewriter
+Gradient
 \family default
 , and sets the height to
 \end_layout
@@ -17483,8 +17573,9 @@ gradient
 \begin_layout Standard
 \begin_inset Formula \[
 h=\left\{ \begin{array}{cc}
-h_{0} & x<offset\\
-h_{0}+gradient\left(x-offset\right) & x>offset\end{array}\right..\]
+h_{0} & x<BeginOffset\\
+h_{0}+Gradient\left(x-BeginOffset\right) & BeginOffset<x<EndOffset\\
+h_{0}+Gradient\left(EndOffset-BeginOffset\right) & x>EndOffset\end{array}\right..\]
 
 \end_inset
 
@@ -17999,7 +18090,7 @@ m
 \begin_inset Text
 
 \begin_layout Plain Layout
-dt_erosion
+dt_erosion
 \end_layout
 
 \end_inset
@@ -18029,6 +18120,394 @@ first_t_erosion
 
 \begin_layout Plain Layout
 -
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Solver Parameters
+\end_layout
+
+\begin_layout Standard
+There are a number of parameters that control solver behavior.
+ Pseudo-code for how it works is
+\end_layout
+
+\begin_layout LyX-Code
+for (i=0; i<=nonLinearMaxIterations; ++i)
+\end_layout
+
+\begin_layout LyX-Code
+  {
+\end_layout
+
+\begin_layout LyX-Code
+    for(j=0; j<=maxIterations; ++j)
+\end_layout
+
+\begin_layout LyX-Code
+      {
+\end_layout
+
+\begin_layout LyX-Code
+        Apply one linear iteration;
+\end_layout
+
+\begin_layout LyX-Code
+        if(monitor)
+\end_layout
+
+\begin_layout LyX-Code
+          print out residual and cpu time;
+\end_layout
+
+\begin_layout LyX-Code
+        if(j>=minIterations)
+\end_layout
+
+\begin_layout LyX-Code
+          {
+\end_layout
+
+\begin_layout LyX-Code
+            if((useAbsoluteTolerance
+\end_layout
+
+\begin_layout LyX-Code
+                && absolute_residual<tolerance)
+\end_layout
+
+\begin_layout LyX-Code
+               || (!useAbsoluteTolerance
+\end_layout
+
+\begin_layout LyX-Code
+                   && relative_residual<tolerance))
+\end_layout
+
+\begin_layout LyX-Code
+              break;
+\end_layout
+
+\begin_layout LyX-Code
+          }
+\end_layout
+
+\begin_layout LyX-Code
+      }
+\end_layout
+
+\begin_layout LyX-Code
+    compute non-linear_residual;
+\end_layout
+
+\begin_layout LyX-Code
+    if(i>=nonLinearMinIterations
+\end_layout
+
+\begin_layout LyX-Code
+       && non-linear_residual<nonLinearTolerance)
+\end_layout
+
+\begin_layout LyX-Code
+      break;
+\end_layout
+
+\begin_layout LyX-Code
+    if(i==nonLinearMaxIterations && killNonConvergent)
+\end_layout
+
+\begin_layout LyX-Code
+      abort();
+\end_layout
+
+\begin_layout LyX-Code
+  }
+\end_layout
+
+\begin_layout Standard
+The linear iteration step is described more fully in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Uzawa-Algorithm"
+
+\end_inset
+
+.
+ The parameters for the linear solve are set in the 
+\family typewriter
+Stokes_SLE_UzawaSolver
+\family default
+ component
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="2">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Defaults
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tolerance
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $10^{-5}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+maxIterations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1000
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+minIterations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+useAbsoluteTolerance
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+False
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+monitor
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+False
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Note that in all of the example input files, 
+\family typewriter
+tolerance
+\family default
+ is set equal to the global parameter 
+\family typewriter
+linearTolerance
+\family default
+.
+ The parameters for the non-linear solve are set in the 
+\family typewriter
+Stokes_SLE
+\family default
+ component
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Defaults
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nonLinearTolerance
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $10^{-2}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nonLinearMaxIterations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+500
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+nonLinearMinIterations
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+1
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+killNonConvergent
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+True
 \end_layout
 
 \end_inset
@@ -19669,7 +20148,7 @@ StepFunctionProduct4 These are the same as StepFunctionProduct1 except that
 \begin_layout Description
 Gaussian 
 \begin_inset Formula \[
-f(x,y,z)=\left(GaussianHeight\right)\exp\left[-\left(\frac{GaussianCenter-coord[dim]}{GaussianWidth}\right)^{2}\right]\]
+f(x,y,z)=\left(GaussianHeight\right)\exp\left[-\left(\frac{GaussianCenter-coord[GaussianDim]}{GaussianWidth}\right)^{2}\right]\]
 
 \end_inset
 
