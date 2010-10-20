@@ -215,7 +215,7 @@ void _NonNewtonian_ModifyConstitutiveMatrix(
         Journal_Firewall(n!=0 && T!=0 && A!=0,errorStream,
                          "Error in NonNewtonian: T, n, and A must all be non-zero:\n\tT=%g\n\tn=%g\n\tA=%g\n",T,n,A);
 
-        viscosity=exp(T_0/(n*T))/(2*A);
+        viscosity=exp(T_0/(n*T))*pow(A,-1/n)/2;
 
 	if ( fabs( n - 1.0 ) > 1.0e-10 )
           {
