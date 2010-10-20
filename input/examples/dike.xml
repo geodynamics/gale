@@ -548,7 +548,7 @@
       <param name="n">3.0</param>
       <param name="T_0">1473</param>
       <param name="T_melt">1480</param>
-      <param name="A">1.0e-12</param>
+      <param name="A">1.0e-36</param>
       <param name="refStrainRate">1.0e22</param>
       <param name="minViscosity">1.0e-2</param>
       <param name="maxViscosity">1.0e3</param>
