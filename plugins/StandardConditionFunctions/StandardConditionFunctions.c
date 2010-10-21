@@ -226,6 +226,33 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File1,
                                          (Name)"File1");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File2,
+                                         (Name)"File2");
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File3,
+                                         (Name)"File3");
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File4,
+                                         (Name)"File4");
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File5,
+                                         (Name)"File5");
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File6,
+                                         (Name)"File6");
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File7,
+                                         (Name)"File7");
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File8,
+                                         (Name)"File8");
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File9,
+                                         (Name)"File9");
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File10,
+                                         (Name)"File10");
+	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 }
 
@@ -2359,6 +2386,56 @@ int Binary_Search(double *data, int s, int e, double value);
 
 void StgFEM_StandardConditionFunctions_File1( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
 {
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,1);
+}
+
+void StgFEM_StandardConditionFunctions_File2( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+{
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,2);
+}
+
+void StgFEM_StandardConditionFunctions_File3( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+{
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,3);
+}
+
+void StgFEM_StandardConditionFunctions_File4( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+{
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,4);
+}
+
+void StgFEM_StandardConditionFunctions_File5( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+{
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,5);
+}
+
+void StgFEM_StandardConditionFunctions_File6( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+{
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,6);
+}
+
+void StgFEM_StandardConditionFunctions_File7( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+{
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,7);
+}
+
+void StgFEM_StandardConditionFunctions_File8( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+{
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,8);
+}
+
+void StgFEM_StandardConditionFunctions_File9( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+{
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,9);
+}
+
+void StgFEM_StandardConditionFunctions_File10( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+{
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,10);
+}
+
+void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result, int file_num )
+{
   FiniteElementContext *	context            = (FiniteElementContext*)_context;
   FeVariable*             feVariable         = NULL;
   FeMesh*     mesh               = NULL;
@@ -2376,35 +2453,44 @@ void StgFEM_StandardConditionFunctions_File1( Node_LocalIndex node_lI, Variable_
   mesh       = feVariable->feMesh;
   coord      = Mesh_GetVertex( mesh, node_lI );
   
-  dim = Dictionary_GetInt( dictionary, "File1_Dim");
-  filename = Dictionary_GetString( dictionary, "File1_Name");
-  N = Dictionary_GetInt( dictionary, "File1_N");
+  char fileN_number[10], fileN_dim[15], fileN_name[15], fileN_N[15];
+  sprintf(fileN_number,"File%d",file_num);
+  sprintf(fileN_dim,"File%d_Dim",file_num);
+  sprintf(fileN_name,"File%d_Name",file_num);
+  sprintf(fileN_N,"File%d_N",file_num);
+
+  dim = Dictionary_GetInt( dictionary, fileN_dim);
+  filename = Dictionary_GetString( dictionary, fileN_name);
+  N = Dictionary_GetInt( dictionary, fileN_N);
 
   Journal_Firewall(dim>=0 && dim<3,
-                   Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_File1"),
-                   "File1_Dim must be either 0, 1, or 2, but was set to %d",dim);
+                   Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
+                   "%s must be either 0, 1, or 2, but was set to %d",
+                   fileN_dim,dim);
   Journal_Firewall(N>0,
-                   Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_File1"),
-                   "File1_N must be greater than zero, but was set to %d.",N);
+                   Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
+                   "%s must be greater than zero, but was set to %d.",
+                   fileN_N,N);
   if(data==NULL)
     {
       
       FILE *fp=fopen(filename,"r");
       Journal_Firewall(filename!=NULL,
-                       Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_File1"),
-                       "Bad filename for File1_Name.  Could not open %s",filename);
+                       Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
+                       "Bad filename for %s.  Could not open %s",
+                       fileN_name,filename);
       data=(double *)malloc(N*sizeof(double));
       coords=(double *)malloc(N*sizeof(double));
 
       Journal_Firewall(data!=NULL && coords!=NULL,
-                       Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_File1"),
-                       "Could not allocate enough memory for File1");
+                       Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
+                       "Could not allocate enough memory for %s",file_num);
       for(i=0;i<N;++i)
         fscanf(fp,"%lf %lf",coords+i,data+i);
     }
 
   Journal_Firewall(!(coord[dim]<coords[0] || coord[dim]>coords[N-1]),
-                   Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_File1"),
+                   Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
                    "The range in the file '%s' does not cover this value %g\nIt only covers %g to %g.\n",
                    filename,coord[dim],coords[0],coords[1]);
 
