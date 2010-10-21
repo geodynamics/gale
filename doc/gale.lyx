@@ -4778,6 +4778,143 @@ Strain rate invariant and velocity with complex boundaries
 \end_layout
 
 \begin_layout Section
+Viscous Material with Boundary Conditions Read From a File
+\end_layout
+
+\begin_layout Standard
+You may want to specify custom boundary conditions that are not already
+ implemented.
+ For this, you can set boundary conditions using date from a file.
+ For this example, we will replace the sharp step function with an smoother
+ approximation.
+ The data is in the file 
+\family typewriter
+input/cookbook/velocities
+\family default
+.
+ To get Gale to use it:
+\end_layout
+
+\begin_layout Enumerate
+Copy 
+\family typewriter
+myviscous_extension.xml
+\family default
+ to 
+\family typewriter
+myviscous_file.xml
+\end_layout
+
+\begin_layout Enumerate
+Modify the bottom boundary condition of WallVC to
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<struct>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="type">WallVC</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="wall">bottom</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="variables">
+\end_layout
+
+\begin_layout LyX-Code
+    <struct>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="name">vy</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="type">double</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="value">0.0</param>
+\end_layout
+
+\begin_layout LyX-Code
+    </struct>
+\end_layout
+
+\begin_layout LyX-Code
+    <struct>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="name">vx</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="type">func</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="value">File1</param>
+\end_layout
+
+\begin_layout LyX-Code
+    </struct>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Specify the particulars of the file by adding the variables
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<param name="File1_Name">velocities</param>
+\end_layout
+
+\begin_layout LyX-Code
+<param name="File1_Dim">0</param>
+\end_layout
+
+\begin_layout LyX-Code
+<param name="File1_N">102</param>
+\end_layout
+
+\begin_layout Standard
+to the end of the file (just before 
+\family typewriter
+</StGermain
+\family default
+Data
+\family typewriter
+>
+\family default
+).
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+There is a fully worked out example in 
+\family typewriter
+input/cookbook/viscous_file.xml
+\family default
+.
+\end_layout
+
+\begin_layout Section
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:Viscous-In-Outflow"
@@ -10363,6 +10500,20 @@ dt The size of the time step.
 \end_layout
 
 \begin_layout Description
+defaultDiffusivity This is the default diffusivity for all materials.
+ It also indirectly sets the time step.
+ See Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Temperature-components"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Description
 maxTimeStepSize The maximum size of the time step.
  This limit is applied after dtFactor and dt.
 \end_layout
@@ -12139,6 +12290,17 @@ reference "sec:Materials"
 \end_inset
 
 ).
+ Gale also uses 
+\family typewriter
+defaultDiffusivity
+\family default
+ when computing the time step.
+ Specifically, it uses the smaller the time step from the Stokes solve and
+ 
+\begin_inset Formula $courantFactor*dx*dx/defaultDiffusity$
+\end_inset
+
+ (dx is the smallest grid spacing).
 \end_layout
 
 \begin_layout Standard
@@ -20188,6 +20350,43 @@ x_{c} & \equiv & ExtensionCentreX.\end{eqnarray*}
 
 \end_layout
 
+\begin_layout Description
+File1,...,File10 This reads 
+\family typewriter
+File1_N
+\family default
+ elements from 
+\family typewriter
+File1_Name
+\family default
+.
+ The format is two columns, with the first column being the coordinate along
+ the direction 
+\family typewriter
+File1_Dim
+\family default
+ and the second being the value.
+ The coordinates must be sorted and increasing.
+ Gale linearly interpolates between values as necessary.
+ So a file with the two lines
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+
+\family typewriter
+0 10
+\begin_inset Newline newline
+\end_inset
+
+100 20
+\end_layout
+
+\begin_layout Standard
+will create a linear gradient between 0 and 100.
+\end_layout
+
+\end_deeper
 \begin_layout Section
 \begin_inset CommandInset label
 LatexCommand label
