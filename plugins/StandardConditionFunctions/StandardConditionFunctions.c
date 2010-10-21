@@ -2465,26 +2465,26 @@ void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_
 
   Journal_Firewall(dim>=0 && dim<3,
                    Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
-                   "%s must be either 0, 1, or 2, but was set to %d",
+                   "%s must be either 0, 1, or 2, but was set to %d\n",
                    fileN_dim,dim);
   Journal_Firewall(N>0,
                    Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
-                   "%s must be greater than zero, but was set to %d.",
+                   "%s must be greater than zero, but was set to %d.\n",
                    fileN_N,N);
   if(data==NULL)
     {
       
       FILE *fp=fopen(filename,"r");
-      Journal_Firewall(filename!=NULL,
+      Journal_Firewall(fp!=NULL,
                        Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
-                       "Bad filename for %s.  Could not open %s",
+                       "Bad filename for %s.  Could not open %s\n",
                        fileN_name,filename);
       data=(double *)malloc(N*sizeof(double));
       coords=(double *)malloc(N*sizeof(double));
 
       Journal_Firewall(data!=NULL && coords!=NULL,
                        Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
-                       "Could not allocate enough memory for %s",file_num);
+                       "Could not allocate enough memory for %s\n",file_num);
       for(i=0;i<N;++i)
         fscanf(fp,"%lf %lf",coords+i,data+i);
     }
