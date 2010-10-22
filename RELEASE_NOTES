@@ -1,3 +1,21 @@
+1.6.0
+----------------------------------
+
+* Then meaning of the 'A' parameter in NonNewtonian has changed to
+  match what is commonly seen in the literature.  See UPGRADE for more
+  details.
+
+* There is a new family of StandardConditionFunction's named
+  File1,...,File10 that allow you to read in a function from a file.
+
+* HydrostaticTerm now has a maximum temperature, useful if you are
+  incorporating the asthenosphere in your simulations.
+
+* topo_data now works in 2D
+
+* StressBC's can now handle having a different material underneath the
+  computational region.
+
 1.5.0
 ----------------------------------
 
