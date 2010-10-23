@@ -2220,7 +2220,7 @@ If you downloaded binaries for your platform, you can run the Gale executable
 \end_layout
 
 \begin_layout LyX-Code
-./Gale_1_5_0 input/cookbook/yielding.xml
+./Gale-1_6_0 input/cookbook/yielding.xml
 \end_layout
 
 \begin_layout Standard
@@ -2290,7 +2290,7 @@ Error: File input/cookbook/foo.xml doesn't exist, not readable, or not valid.
 Due to quirks in some implementations of MPI, you may have to specify the
  complete path to the input file (e.g., 
 \family typewriter
-./Gale_1_5_0 /home/juser/gale/input/cookbook/yielding.xml
+./Gale-1_6_0 /home/juser/gale/input/cookbook/yielding.xml
 \family default
 ).
 \end_layout
@@ -2570,7 +2570,7 @@ One solution is to use a direct solver instead of GMRES.
 \end_layout
 
 \begin_layout LyX-Code
-./Gale_1_5_0  input/cookbook/yielding.xml -pc_type lu -ksp_type preonly
+./Gale-1_6_0  input/cookbook/yielding.xml -pc_type lu -ksp_type preonly
 \end_layout
 
 \begin_layout Standard
@@ -2599,7 +2599,7 @@ Once that is done, enabling it is again just appending a few arguments to
 \end_layout
 
 \begin_layout LyX-Code
-./Gale_1_5_0  input/cookbook/yielding.xml -pc_factor_mat_solver_package mumps
+./Gale-1_6_0  input/cookbook/yielding.xml -pc_factor_mat_solver_package mumps
  
 \backslash
 
@@ -2717,7 +2717,7 @@ You can also change the default values of the input file without modifying
 \end_layout
 
 \begin_layout LyX-Code
-./Gale_1_5_0  input/cookbook/yielding.xml --maxTimeSteps=20
+./Gale-1_6_0  input/cookbook/yielding.xml --maxTimeSteps=20
 \end_layout
 
 \begin_layout Standard
@@ -2728,7 +2728,7 @@ You can append any number of modified parameters in one unbroken line (here
 \begin_layout LyX-Code
 
 \size small
-./Gale_1_5_0  input/cookbook/yielding.xml --maxTimeSteps=20 --dim=3 --elementResI=
+./Gale-1_6_0  input/cookbook/yielding.xml --maxTimeSteps=20 --dim=3 --elementResI=
 64 
 \begin_inset Newline newline
 \end_inset
