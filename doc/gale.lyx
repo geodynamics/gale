@@ -2491,7 +2491,7 @@ So the other solution Gale provides is to set a maximum strain rate.
 
 \begin_layout Standard
 \begin_inset Formula \[
-L_{\dot{\epsilon}_{max}}=\dot{\frac{v}{\dot{\epsilon}_{max}}}.\]
+L_{\dot{\epsilon}_{max}}=\frac{v}{\dot{\epsilon}_{max}}.\]
 
 \end_inset
 
@@ -2769,6 +2769,32 @@ to the command line.
 
 \begin_layout Standard
 to the command line.
+\end_layout
+
+\begin_layout Standard
+Note that the example input files do not, by default, save and restore the
+ temperature.
+ To enable that, add the line
+\end_layout
+
+\begin_layout LyX-Code
+  <param>TemperatureField</param>
+\end_layout
+
+\begin_layout Standard
+after the lines
+\end_layout
+
+\begin_layout LyX-Code
+<list name="FieldVariablesToCheckpoint">
+\end_layout
+
+\begin_layout LyX-Code
+  <param>VelocityField</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param>PressureField</param>
 \end_layout
 
 \begin_layout Subsection
@@ -3687,7 +3713,7 @@ input/viscous_extension3D.xml
 \end_layout
 
 \begin_layout LyX-Code
-generate_pvd fields t fields -s s 0 9
+generate_pvd fields s 0 9
 \end_layout
 
 \begin_layout Standard
