@@ -47,6 +47,8 @@
 #include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
 #include "StgFEM/SLE/SystemSetup/SystemSetup.h"
+#include <PICellerator/PICellerator.h>
+#include <Underworld/Underworld.h>
 
 #include "types.h"
 #include "AdvectionDiffusionSLE.h"
@@ -81,31 +83,27 @@ double AdvDiffResidualForceTerm_UpwindDiffusivity(
 	
 	Cell_Index                 cell_I;
 	IntegrationPoint*          particle;
-	Variable*                  diffusivityVariable = self->diffusivityVariable;
 	Particle_Index             lParticle_I;
 	double                     averageDiffusivity;
 	Particle_InCellIndex       cParticle_I;
 	Particle_InCellIndex       particleCount;
-
 	
 	/* Compute the average diffusivity */
 	/* Find Number of Particles in Element */
-	cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
-	particleCount = swarm->cellParticleCountTbl[ cell_I ];
+	cell_I = CellLayout_MapElementIdToCellId( self->picSwarm->cellLayout, lElement_I );
+	particleCount = self->picSwarm->cellParticleCountTbl[ cell_I ];
 
 	/* Average diffusivity for element */
-	if ( diffusivityVariable ) {
-		averageDiffusivity = 0.0;
-		for ( cParticle_I = 0 ; cParticle_I < particleCount ; cParticle_I++ ) {
-			lParticle_I = swarm->cellParticleTbl[lElement_I][cParticle_I];
-			particle    = (IntegrationPoint*)Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
-			averageDiffusivity += self->_getDiffusivityFromIntPoint( self, particle );
-		}
-		averageDiffusivity /= (double)particleCount;
-	}
-	else {
-		averageDiffusivity = self->defaultDiffusivity;
-	}
+        averageDiffusivity = 0.0;
+        for ( cParticle_I = 0 ; cParticle_I < particleCount ; cParticle_I++ ) {
+          lParticle_I = self->picSwarm->cellParticleTbl[cell_I][cParticle_I];
+          particle = (IntegrationPoint*) Swarm_ParticleAt( self->picSwarm, lParticle_I );
+
+          averageDiffusivity +=
+            IntegrationPointMapper_GetDoubleFromMaterial(((IntegrationPointsSwarm *)self->picSwarm)->mapper, particle, self->materialExtHandle,
+		    offsetof(AdvDiffResidualForceTerm_MaterialExt, diffusivity));
+        }
+        averageDiffusivity /= (double)particleCount;
 	
 	if (sle->maxDiffusivity < averageDiffusivity)
 		sle->maxDiffusivity = averageDiffusivity;

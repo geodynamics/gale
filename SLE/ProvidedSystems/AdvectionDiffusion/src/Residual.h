@@ -50,6 +50,10 @@
 	/** Textual name of this class */
 	extern const Type AdvDiffResidualForceTerm_Type;
 
+        typedef struct {
+          double diffusivity;
+        } AdvDiffResidualForceTerm_MaterialExt;
+
 	/** AdvDiffResidualForceTerm class contents */
 	#define __AdvDiffResidualForceTerm \
 		/* General info */ \
@@ -64,10 +68,14 @@
 		double*																SUPGNi; \
 		IArray																*incarray; \
 		\
+		void*				materials_Register; \
+		ExtensionInfo_Index				materialExtHandle; \
+		Swarm*						picSwarm; \
+		void**				diffusivitySwarmVariables; \
+		Index												materialSwarmCount;\
 		/* AdvDiffResidualForceTerm info */ \
 		FeVariable*															velocityField; \
 		double																defaultDiffusivity; \
-		Variable*															diffusivityVariable; \
 		AdvDiffResidualForceTerm_UpwindParamFuncType				upwindParamType;
 
 	struct AdvDiffResidualForceTerm { __AdvDiffResidualForceTerm };	
@@ -83,8 +91,9 @@
 		Swarm*														integrationSwarm,
 		Stg_Component*												sle, 
 		FeVariable*													velocityField,
-		Variable*													diffusivityVariable,
 		double														defaultDiffusivity,
+		Swarm*						picSwarm,
+		void*		materials_Register,
 		AdvDiffResidualForceTerm_UpwindParamFuncType		upwindFuncType );
 
 	
@@ -105,8 +114,9 @@
 	void _AdvDiffResidualForceTerm_Init(
    	void*                                        residual,
    	FeVariable*                                  velocityField,
-   	Variable*                                    diffusivityVariable,
    	double                                       defaultDiffusivity,
+        Swarm*						picSwarm,
+        void*  materials_Register,
    	AdvDiffResidualForceTerm_UpwindParamFuncType upwindFuncType );
 	
 	void _AdvDiffResidualForceTerm_Delete( void* residual );
