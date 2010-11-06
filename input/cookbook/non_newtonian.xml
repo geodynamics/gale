@@ -529,6 +529,7 @@
     <struct name="defaultResidualForceTerm">
       <param name="Type">AdvDiffResidualForceTerm</param>
       <param name="Swarm">gaussSwarm</param>
+      <param name="picSwarm">picIntegrationPoints</param>
       <param name="ForceVector">residual</param>
       <param name="ExtraInfo">EnergyEqn</param>
       <param name="VelocityField">VelocityField</param>
