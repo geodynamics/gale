@@ -234,7 +234,7 @@ void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFacto
 		Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ), "Cannot understand '%s'\n", upwindParamFuncName );
 
 	defaultDiffusivity = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"defaultDiffusivity", 1.0  );
-	picSwarm       = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"picSwarm", Swarm, True, data  ) ;
+	picSwarm       = Stg_ComponentFactory_ConstructByName( cf, (Name)"picIntegrationPoints", IntegrationPointsSwarm, True, data  ) ;
 	materials_Register = ((PICelleratorContext*)(self->context))->materials_Register;
 
 	_AdvDiffResidualForceTerm_Init( self, velocityField, defaultDiffusivity,
