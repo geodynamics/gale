@@ -1,3 +1,9 @@
+1.6.1
+----------------------------------
+
+* This release fixes a serious bug where the thermal diffusivities of
+  different materials were being ignored.
+
 1.6.0
 ----------------------------------
 
