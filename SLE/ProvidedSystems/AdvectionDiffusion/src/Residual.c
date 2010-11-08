@@ -55,6 +55,7 @@
 
 #include <assert.h>
 #include <string.h>
+#include <stddef.h>
 
 /* Textual name of this class */
 const Type AdvDiffResidualForceTerm_Type = "AdvDiffResidualForceTerm";
@@ -421,6 +422,7 @@ void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 
 		/* Get Diffusivity */
 		diffusivity = IntegrationPointMapper_GetDoubleFromMaterial(((IntegrationPointsSwarm *)swarm)->mapper, particle, self->materialExtHandle,
+
 		    offsetof(AdvDiffResidualForceTerm_MaterialExt, diffusivity));
 
 		/* Add to element residual */

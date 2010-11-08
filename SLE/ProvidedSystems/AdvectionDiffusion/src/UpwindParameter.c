@@ -41,6 +41,7 @@
 
 #include <math.h>
 #include <assert.h>
+#include <stddef.h>
 
 #include "mpi.h"
 #include <StGermain/StGermain.h>
