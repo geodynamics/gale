@@ -8200,7 +8200,15 @@ Power Law Creep
 
 \begin_layout Standard
 A common approximation for the rheology of rocks is power law creep.
- This example shows how to implement this with the NonNewtonian rheology.
+ This example shows how to implement this with the NonNewtonian rheology
+ as described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:NonNewtonian"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Enumerate
