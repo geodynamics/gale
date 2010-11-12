@@ -2,7 +2,10 @@
 ----------------------------------
 
 * This release fixes a serious bug where the thermal diffusivities of
-  different materials were being ignored.
+  different materials were being ignored in versions since 1.5.0.
+
+* A bug preventing the use of StandardConditionFunctions in StressBC's
+  have been fixed.
 
 1.6.0
 ----------------------------------
