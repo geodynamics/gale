@@ -70,6 +70,7 @@ Bool StgFEM_Init( int* argc, char** argv[] ) {
 		StgFEM_Discretisation_Init( argc, argv );
 		StgFEM_SLE_Init( argc, argv );
 		StgFEM_Assembly_Init( argc, argv );
+                StgFEM_StandardConditionFunctions_Init( argc, argv );
 
 		/* Add the StgFEM path to the global xml path dictionary */
 		directory = Memory_Alloc_Array( char, 200, "xmlDirectory" ) ;

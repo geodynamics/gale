@@ -294,6 +294,13 @@ Index StgFEM_StandardConditionFunctions_Register( PluginsManager* pluginsManager
 	return PluginsManager_Submit( pluginsManager, StgFEM_StandardConditionFunctions_Type, (Name)"0", _StgFEM_StandardConditionFunctions_DefaultNew  );
 }
 
+Bool StgFEM_StandardConditionFunctions_Init( int* argc, char** argv[] ) {
+  Stg_ComponentRegister* componentsRegister = Stg_ComponentRegister_Get_ComponentRegister();
+  Stg_ComponentRegister_Add(componentsRegister,
+                            StgFEM_StandardConditionFunctions_Type, (Name)"0",
+                            _StgFEM_StandardConditionFunctions_DefaultNew );
+  RegisterParent( StgFEM_StandardConditionFunctions_Type, Stg_Component_Type );
+}
 
 #ifdef NO_ERF
 
