@@ -300,6 +300,7 @@ Bool StgFEM_StandardConditionFunctions_Init( int* argc, char** argv[] ) {
                             StgFEM_StandardConditionFunctions_Type, (Name)"0",
                             _StgFEM_StandardConditionFunctions_DefaultNew );
   RegisterParent( StgFEM_StandardConditionFunctions_Type, Stg_Component_Type );
+  return True;
 }
 
 #ifdef NO_ERF
@@ -2390,6 +2391,8 @@ void StgFEM_StandardConditionFunctions_Quadratic( Node_LocalIndex node_lI, Varia
 }
 
 int Binary_Search(double *data, int s, int e, double value);
+
+void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result, int file_num );
 
 void StgFEM_StandardConditionFunctions_File1( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
 {
