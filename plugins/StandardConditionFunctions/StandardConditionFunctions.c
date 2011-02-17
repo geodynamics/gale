@@ -2392,59 +2392,89 @@ void StgFEM_StandardConditionFunctions_Quadratic( Node_LocalIndex node_lI, Varia
 
 int Binary_Search(double *data, int s, int e, double value);
 
-void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result, int file_num );
+void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result, int file_num, double *coords, double *data);
 
 void StgFEM_StandardConditionFunctions_File1( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
 {
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,1);
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,1,
+                                          coords,data);
 }
 
 void StgFEM_StandardConditionFunctions_File2( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
 {
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,2);
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,2,
+                                          coords,data);
 }
 
 void StgFEM_StandardConditionFunctions_File3( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
 {
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,3);
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,3,
+                                          coords,data);
 }
 
 void StgFEM_StandardConditionFunctions_File4( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
 {
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,4);
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,4,
+                                          coords,data);
 }
 
 void StgFEM_StandardConditionFunctions_File5( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
 {
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,5);
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,5,
+                                          coords,data);
 }
 
 void StgFEM_StandardConditionFunctions_File6( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
 {
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,6);
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,6,
+                                          coords,data);
 }
 
 void StgFEM_StandardConditionFunctions_File7( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
 {
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,7);
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,7,
+                                          coords,data);
 }
 
 void StgFEM_StandardConditionFunctions_File8( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
 {
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,8);
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,8,
+                                          coords,data);
 }
 
 void StgFEM_StandardConditionFunctions_File9( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
 {
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,9);
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,9,
+                                          coords,data);
 }
 
 void StgFEM_StandardConditionFunctions_File10( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
 {
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,10);
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,10,
+                                          coords,data);
 }
 
-void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result, int file_num )
+void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result, int file_num, double *coords, double *data)
 {
   FiniteElementContext *	context            = (FiniteElementContext*)_context;
   FeVariable*             feVariable         = NULL;
@@ -2457,8 +2487,6 @@ void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_
   int N;
   int result_index;
   double factor;
-  static double *coords=NULL;
-  static double *data=NULL;
   feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
   mesh       = feVariable->feMesh;
   coord      = Mesh_GetVertex( mesh, node_lI );
