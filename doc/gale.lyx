@@ -2698,11 +2698,40 @@ to the beginning of the file, and add the components
 \end_layout
 
 \begin_layout Standard
-You may have to modify 
+You have to modify 
 \family typewriter
 mgLevels
 \family default
  for your problem.
+ Also, when you invoke Gale on the command line, add the options
+\end_layout
+
+\begin_layout LyX-Code
+--mgLevels=3
+\end_layout
+
+\begin_layout LyX-Code
+-mg_levels_ksp_type fgmres
+\end_layout
+
+\begin_layout LyX-Code
+-mg_levels_ksp_max_it 8
+\end_layout
+
+\begin_layout LyX-Code
+-mg_levels_pc_type bjacobi
+\end_layout
+
+\begin_layout LyX-Code
+-mg_coarse_pc_factor_mat_solver_package mumps
+\end_layout
+
+\begin_layout LyX-Code
+-mg_level_0_pc_factor_mat_solver_package mumps
+\end_layout
+
+\begin_layout LyX-Code
+-mg_coarse_pc_type lu -mg_level_0_pc_type lu
 \end_layout
 
 \begin_layout Subsection
@@ -8430,6 +8459,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename images/dike.pdf
+	width 100col%
 
 \end_inset
 
@@ -12700,6 +12730,9 @@ CentreZ\end{array}\right)\right)R,\]
 \end_inset
 
  which it uses in the formulas below.
+ Note that the rotation is around the center of the shape.
+ So, for example, a box will rotate around the center of the box, not one
+ of its corners.
 \end_layout
 
 \begin_layout Standard
