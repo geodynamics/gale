@@ -20181,7 +20181,11 @@ f(x,y,z) & = & SinusoidalTempIC\_TopLayerBC\\
 
 \end_inset
 
+if 
+\begin_inset Formula $0\leq y_{scaled}\leq1$
+\end_inset
 
+, and 0 otherwise.
 \end_layout
 
 \begin_layout Description
