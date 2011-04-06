@@ -20164,20 +20164,20 @@ LinearWithSinusoidalPerturbation If you scale the
 \begin_inset Formula $y$
 \end_inset
 
- coordinate
+ coordinate 
 \begin_inset Formula \[
-y_{scaled}=\left(y-y_{min}\right)/\left(y_{max}-y_{min}\right),\]
+y_{scaled}=\frac{\left(y-SinusoidalTempIC\_BottomLayerCoord\right)}{SinusoidalTempIC\_TopLayerCoord-SinusoidalTempIC\_BottomLayerCoord},\]
 
 \end_inset
 
- then this returns 
+then this returns 
 \begin_inset Formula \[
 \begin{array}{ccc}
 f(x,y,z) & = & SinusoidalTempIC\_TopLayerBC\\
- &  & +\left(SinusoidalTempIC\_TopLayerBC-SinusoidalTempIC\_TopLayerBC\right)\left(1-y_{scaled}\right)\\
+ &  & -\left(SinusoidalTempIC\_TopLayerBC-SinusoidalTempIC\_BottomLayerBC\right)\left(1-y_{scaled}\right)\\
  &  & +SinusoidalTempIC\_PerturbationAmplitude\\
- &  & *\left(\cos\left(\pi x*SinusoidalTempIC\_HorizontalWaveNumber\right)\right.\\
- &  & +\left.sin\left(\pi ySinusoidalTempIC\_VerticalWaveNumber\right)\right)\end{array}.\]
+ &  & *\left(\cos\left(\pi x_{scaled}*SinusoidalTempIC\_HorizontalWaveNumber\right)\right.\\
+ &  & *\left.sin\left(\pi y_{scaled}SinusoidalTempIC\_VerticalWaveNumber\right)\right)\end{array}.\]
 
 \end_inset
 
