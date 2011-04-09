@@ -562,6 +562,7 @@
   <list name="FieldVariablesToCheckpoint">
     <param>VelocityField</param>
     <param>PressureField</param>
+    <param>TemperatureField</param>
   </list>
   <param name="maxTimeSteps">1000</param>
   <param name="outputEvery">1</param>
