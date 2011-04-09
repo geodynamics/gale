@@ -2482,24 +2482,45 @@ void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_
   Dictionary*             dictionary         = context->dictionary;
   double*                 result             = (double*) _result;
   double*                 coord;
-  int                     dim, i;
+  int                     dim, dim2, dim3, i, j, k;
   char *filename;
-  int N;
-  int result_index;
-  double factor;
+  int N, N2, N3, ndims;
+  int result_index, result_index2, result_index3;
+  double factor, factor2, factor3;
   feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
   mesh       = feVariable->feMesh;
   coord      = Mesh_GetVertex( mesh, node_lI );
   
-  char fileN_number[10], fileN_dim[15], fileN_name[15], fileN_N[15];
+  char fileN_number[10], fileN_dim[15], fileN_dim2[15], fileN_dim3[15],
+    fileN_name[128], fileN_N[15], fileN_N2[15], fileN_N3[15];
   sprintf(fileN_number,"File%d",file_num);
   sprintf(fileN_dim,"File%d_Dim",file_num);
+  sprintf(fileN_dim2,"File%d_Dim2",file_num);
+  sprintf(fileN_dim3,"File%d_Dim3",file_num);
   sprintf(fileN_name,"File%d_Name",file_num);
   sprintf(fileN_N,"File%d_N",file_num);
+  sprintf(fileN_N2,"File%d_N2",file_num);
+  sprintf(fileN_N3,"File%d_N3",file_num);
 
-  dim = Dictionary_GetInt( dictionary, fileN_dim);
   filename = Dictionary_GetString( dictionary, fileN_name);
   N = Dictionary_GetInt( dictionary, fileN_N);
+  dim = Dictionary_GetInt( dictionary, fileN_dim);
+  N2 = Dictionary_GetInt_WithDefault( dictionary, fileN_N2,-1);
+  N3 = Dictionary_GetInt_WithDefault( dictionary, fileN_N3,-1);
+
+  if(N2==-1)
+    ndims=1;
+  else if(N3==-1)
+    ndims=2;
+  else
+    ndims=3;
+
+  if(ndims>1)
+    {
+      dim2 = Dictionary_GetInt( dictionary, fileN_dim2);
+      if(ndims>2)
+        dim3 = Dictionary_GetInt( dictionary, fileN_dim3);
+    }
 
   Journal_Firewall(dim>=0 && dim<3,
                    Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
@@ -2517,28 +2538,109 @@ void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_
                        Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
                        "Bad filename for %s.  Could not open %s\n",
                        fileN_name,filename);
-      data=(double *)malloc(N*sizeof(double));
-      coords=(double *)malloc(N*sizeof(double));
+
+      /* In 1D, data and coords are simple 1D arrays.  In 2D, data is
+         a 2D arrays, and coord is still a 1D array, with the first N
+         elements being the coordinates in the Dim direction, and the
+         next N2 elements being the coordinates in the Dim2
+         dirction.  Similarly in 3D.  */
+      if(ndims==1)
+        {
+          data=(double *)malloc(N*sizeof(double));
+          coords=(double *)malloc(N*sizeof(double));
+        }
+      else if(ndims==2)
+        {
+          data=(double *)malloc(N*N2*sizeof(double));
+          coords=(double *)malloc((N+N2)*sizeof(double));
+        }
+      else
+        {
+          data=(double *)malloc(N*N2*N3*sizeof(double));
+          coords=(double *)malloc((N+N2+N3)*sizeof(double));
+        }
 
       Journal_Firewall(data!=NULL && coords!=NULL,
                        Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
                        "Could not allocate enough memory for %s\n",file_num);
-      for(i=0;i<N;++i)
-        fscanf(fp,"%lf %lf",coords+i,data+i);
+      if(ndims==1)
+        {
+          for(i=0;i<N;++i)
+            fscanf(fp,"%lf %lf",coords+i,data+i);
+        }
+      else if(ndims==2)
+        {
+          for(i=0;i<N;++i)
+            for(j=0;j<N2;++j)
+              {
+                fscanf(fp,"%lf %lf %lf",coords+i,coords+N+j,data+i+N*j);
+                /* printf("output %d %d %g %g %g\n", */
+                /*        i,j,coords[i],coords[N+j],data[i+N*j]); */
+              }
+        }
+      else if(ndims==3)
+        {
+          for(i=0;i<N;++i)
+            for(j=0;j<N2;++j)
+              for(k=0;k<N3;++k)
+                fscanf(fp,"%lf %lf %lf %lf",coords+i,coords+N+j,coords+N+N2+k,
+                       data+i+N*(j+N2*k));
+        }
     }
 
   Journal_Firewall(!(coord[dim]<coords[0] || coord[dim]>coords[N-1]),
                    Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
-                   "The range in the file '%s' does not cover this value %g\nIt only covers %g to %g.\n",
-                   filename,coord[dim],coords[0],coords[1]);
+                   "The range in the file '%s' does not cover this value %g\nIt only covers %g to %g in the %d direction.\n",
+                   filename,coord[dim],coords[0],coords[N-1],dim);
+  if(ndims>1)
+    Journal_Firewall(!(coord[dim2]<coords[N] || coord[dim2]>coords[N+N2-1]),
+                     Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
+                     "The range in the file '%s' does not cover this value %g\nIt only covers %g to %g in the %d direction.\n",
+                     filename,coord[dim2],coords[N],coords[N+N2-1],dim2);
+  if(ndims>2)
+    Journal_Firewall(!(coord[dim3]<coords[N+N2] || coord[dim3]>coords[N+N2+N3-1]),
+                     Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
+                     "The range in the file '%s' does not cover this value %g\nIt only covers %g to %g in the %d direction.\n",
+                     filename,coord[dim3],coords[N+N2],coords[N+N2+N3-1],dim2);
 
-  result_index=Binary_Search(coords,0,N-1,coord[dim]);
-  factor=(coords[result_index+1]-coord[dim])
-    / (coords[result_index+1]-coords[result_index]);
-  
-  *result=data[result_index]*factor + data[result_index+1]*(1-factor);
+  i=Binary_Search(coords,0,N-1,coord[dim]);
+  factor=(coords[i+1]-coord[dim])/(coords[i+1]-coords[i]);
+    
+  if(ndims>1)
+    {
+      j=Binary_Search(coords,N,N+N2-1,coord[dim2]);
+      factor2=(coords[j+1]-coord[dim2])/(coords[j+1]-coords[j]);
+      j=j-N;
+      if(ndims>2)
+        {
+          k=Binary_Search(coords,N,N+N2+N3-1,coord[dim3]);
+          factor3=(coords[k+1]-coord[dim3])/(coords[k+1]-coords[k]);
+          k=k-N-N2;
+        }
+    }
+
+  switch(ndims)
+    {
+    case 1:
+      *result=data[i]*factor + data[i+1]*(1-factor);
+      break;
+    case 2:
+      *result=factor*(factor2*data[i+N*j] + (1-factor2)*data[i+N*(j+1)])
+        + (1-factor)*(factor2*data[i+1+N*j] + (1-factor2)*data[i+1+N*(j+1)]);
+      break;
+    case 3:
+      *result=factor*(factor2*(factor3*data[i+N*(j+N2*k)]
+                               + (1-factor3)*data[i+N*(j+N2*(k+1))])
+                      + (1-factor2)*(factor3*data[i+N*((j+1)+N2*k)]
+                                     + (1-factor3)*data[i+N*((j+1)+N2*(k+1))]))
+        + (1-factor)*(factor2*(factor3*data[i+1+N*(j+N2*k)]
+                               + (1-factor3)*data[i+1+N*(j+N2*(k+1))])
+                      + (1-factor2)*(factor3*data[i+1+N*((j+1)+N2*k)]
+                                     + (1-factor3)*data[i+1+N*((j+1)+N2*(k+1))]));
+      break;
+    }
 }
-
+    
 
 int Binary_Search(double *data, int s, int e, const double value)
 {
@@ -2546,8 +2648,6 @@ int Binary_Search(double *data, int s, int e, const double value)
 
   start=s;
   end=e;
-  midpoint=e;
-  
   midpoint=(end-start)/2 + start;
   while(start!=midpoint)
     {
