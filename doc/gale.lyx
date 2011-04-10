@@ -2801,29 +2801,15 @@ to the command line.
 \end_layout
 
 \begin_layout Standard
-Note that the example input files do not, by default, save and restore the
- temperature.
- To enable that, add the line
-\end_layout
+Not all of the example input files save and restore the temperature.
+ To enable that, see Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Temperature-components"
 
-\begin_layout LyX-Code
-  <param>TemperatureField</param>
-\end_layout
+\end_inset
 
-\begin_layout Standard
-after the lines
-\end_layout
-
-\begin_layout LyX-Code
-<list name="FieldVariablesToCheckpoint">
-\end_layout
-
-\begin_layout LyX-Code
-  <param>VelocityField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param>PressureField</param>
+.
 \end_layout
 
 \begin_layout Subsection
@@ -8220,6 +8206,200 @@ Temperature and velocity for the thermal convection example
 \begin_layout Section
 \begin_inset CommandInset label
 LatexCommand label
+name "sec:Initial-Conditions-File"
+
+\end_inset
+
+Thermal Convection with Initial Conditions from a File
+\end_layout
+
+\begin_layout Standard
+There are a number of different functions that you can use as initial conditions
+ for the temperature (see Appendix 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Standard-Condition-Functions"
+
+\end_inset
+
+).
+ This example shows how to use data from a file as your initial condition.
+ The data used for this file is in 
+\family typewriter
+input/cookbook/temperature
+\family default
+, and sets the initial temperature inside the box to
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+1+0.05\cos(6x)\cos(10y).\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+Copy 
+\family typewriter
+mythermal.xml
+\family default
+ to 
+\family typewriter
+mythermal_file.xml
+\family default
+.
+\end_layout
+
+\begin_layout Enumerate
+In the 
+\family typewriter
+temperatureICs
+\family default
+ struct, change the lines
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<struct>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="name">temperature</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="type">double</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="value">1.0</param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct> 
+\end_layout
+
+\begin_layout Standard
+to
+\end_layout
+
+\begin_layout LyX-Code
+<struct>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="name">temperature</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="type">func</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="value">File1</param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct> 
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Add in the lines
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<param name="File1_Name">input/cookbook/temperatures</param>
+\end_layout
+
+\begin_layout LyX-Code
+<param name="File1_Dim">0</param>
+\end_layout
+
+\begin_layout LyX-Code
+<param name="File1_N">202</param>
+\end_layout
+
+\begin_layout LyX-Code
+<param name="File1_Dim2">1</param>
+\end_layout
+
+\begin_layout LyX-Code
+<param name="File1_N2">37</param>
+\end_layout
+
+\begin_layout Standard
+at the end of the file, just before 
+\family typewriter
+</StGermainData>
+\family default
+.
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+A worked example is in thermal_file.xml.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Thermal_file"
+
+\end_inset
+
+ shows the temperature and velocity at the end of the calculation.
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename images/Paraview_thermal_file.png
+	lyxscale 75
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Thermal_file"
+
+\end_inset
+
+Temperature and velocity when using temperature initial data from a file.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
 name "sec:Power-Law-Creep"
 
 \end_inset
@@ -12328,6 +12508,31 @@ To configure Gale to use and evolve the temperature, you need to add the
 
 \begin_layout LyX-Code
 
+\end_layout
+
+\begin_layout Standard
+You also need to enable checkpointing for the temperature by adding the
+ line
+\end_layout
+
+\begin_layout LyX-Code
+  <param>TemperatureField</param>
+\end_layout
+
+\begin_layout Standard
+after the lines
+\end_layout
+
+\begin_layout LyX-Code
+<list name="FieldVariablesToCheckpoint">
+\end_layout
+
+\begin_layout LyX-Code
+  <param>VelocityField</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param>PressureField</param>
 \end_layout
 
 \begin_layout Standard
