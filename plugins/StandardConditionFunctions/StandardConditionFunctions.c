@@ -2392,14 +2392,14 @@ void StgFEM_StandardConditionFunctions_Quadratic( Node_LocalIndex node_lI, Varia
 
 int Binary_Search(double *data, int s, int e, double value);
 
-void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result, int file_num, double *coords, double *data);
+void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result, int file_num, double **coords, double **data);
 
 void StgFEM_StandardConditionFunctions_File1( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
 {
   static double *coords=NULL;
   static double *data=NULL;
   StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,1,
-                                          coords,data);
+                                          &coords,&data);
 }
 
 void StgFEM_StandardConditionFunctions_File2( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
@@ -2407,7 +2407,7 @@ void StgFEM_StandardConditionFunctions_File2( Node_LocalIndex node_lI, Variable_
   static double *coords=NULL;
   static double *data=NULL;
   StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,2,
-                                          coords,data);
+                                          &coords,&data);
 }
 
 void StgFEM_StandardConditionFunctions_File3( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
@@ -2415,7 +2415,7 @@ void StgFEM_StandardConditionFunctions_File3( Node_LocalIndex node_lI, Variable_
   static double *coords=NULL;
   static double *data=NULL;
   StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,3,
-                                          coords,data);
+                                          &coords,&data);
 }
 
 void StgFEM_StandardConditionFunctions_File4( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
@@ -2423,7 +2423,7 @@ void StgFEM_StandardConditionFunctions_File4( Node_LocalIndex node_lI, Variable_
   static double *coords=NULL;
   static double *data=NULL;
   StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,4,
-                                          coords,data);
+                                          &coords,&data);
 }
 
 void StgFEM_StandardConditionFunctions_File5( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
@@ -2431,7 +2431,7 @@ void StgFEM_StandardConditionFunctions_File5( Node_LocalIndex node_lI, Variable_
   static double *coords=NULL;
   static double *data=NULL;
   StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,5,
-                                          coords,data);
+                                          &coords,&data);
 }
 
 void StgFEM_StandardConditionFunctions_File6( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
@@ -2439,7 +2439,7 @@ void StgFEM_StandardConditionFunctions_File6( Node_LocalIndex node_lI, Variable_
   static double *coords=NULL;
   static double *data=NULL;
   StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,6,
-                                          coords,data);
+                                          &coords,&data);
 }
 
 void StgFEM_StandardConditionFunctions_File7( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
@@ -2447,7 +2447,7 @@ void StgFEM_StandardConditionFunctions_File7( Node_LocalIndex node_lI, Variable_
   static double *coords=NULL;
   static double *data=NULL;
   StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,7,
-                                          coords,data);
+                                          &coords,&data);
 }
 
 void StgFEM_StandardConditionFunctions_File8( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
@@ -2455,7 +2455,7 @@ void StgFEM_StandardConditionFunctions_File8( Node_LocalIndex node_lI, Variable_
   static double *coords=NULL;
   static double *data=NULL;
   StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,8,
-                                          coords,data);
+                                          &coords,&data);
 }
 
 void StgFEM_StandardConditionFunctions_File9( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
@@ -2463,7 +2463,7 @@ void StgFEM_StandardConditionFunctions_File9( Node_LocalIndex node_lI, Variable_
   static double *coords=NULL;
   static double *data=NULL;
   StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,9,
-                                          coords,data);
+                                          &coords,&data);
 }
 
 void StgFEM_StandardConditionFunctions_File10( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
@@ -2471,10 +2471,10 @@ void StgFEM_StandardConditionFunctions_File10( Node_LocalIndex node_lI, Variable
   static double *coords=NULL;
   static double *data=NULL;
   StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,10,
-                                          coords,data);
+                                          &coords,&data);
 }
 
-void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result, int file_num, double *coords, double *data)
+void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result, int file_num, double **coords, double **data)
 {
   FiniteElementContext *	context            = (FiniteElementContext*)_context;
   FeVariable*             feVariable         = NULL;
@@ -2530,9 +2530,8 @@ void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_
                    Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
                    "%s must be greater than zero, but was set to %d.\n",
                    fileN_N,N);
-  if(data==NULL)
+  if(*data==NULL)
     {
-      
       FILE *fp=fopen(filename,"r");
       Journal_Firewall(fp!=NULL,
                        Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
@@ -2546,36 +2545,34 @@ void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_
          dirction.  Similarly in 3D.  */
       if(ndims==1)
         {
-          data=(double *)malloc(N*sizeof(double));
-          coords=(double *)malloc(N*sizeof(double));
+          *data=(double *)malloc(N*sizeof(double));
+          *coords=(double *)malloc(N*sizeof(double));
         }
       else if(ndims==2)
         {
-          data=(double *)malloc(N*N2*sizeof(double));
-          coords=(double *)malloc((N+N2)*sizeof(double));
+          *data=(double *)malloc(N*N2*sizeof(double));
+          *coords=(double *)malloc((N+N2)*sizeof(double));
         }
       else
         {
-          data=(double *)malloc(N*N2*N3*sizeof(double));
-          coords=(double *)malloc((N+N2+N3)*sizeof(double));
+          *data=(double *)malloc(N*N2*N3*sizeof(double));
+          *coords=(double *)malloc((N+N2+N3)*sizeof(double));
         }
 
-      Journal_Firewall(data!=NULL && coords!=NULL,
+      Journal_Firewall(*data!=NULL && *coords!=NULL,
                        Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
                        "Could not allocate enough memory for %s\n",file_num);
       if(ndims==1)
         {
           for(i=0;i<N;++i)
-            fscanf(fp,"%lf %lf",coords+i,data+i);
+            fscanf(fp,"%lf %lf",*coords+i,*data+i);
         }
       else if(ndims==2)
         {
           for(i=0;i<N;++i)
             for(j=0;j<N2;++j)
               {
-                fscanf(fp,"%lf %lf %lf",coords+i,coords+N+j,data+i+N*j);
-                /* printf("output %d %d %g %g %g\n", */
-                /*        i,j,coords[i],coords[N+j],data[i+N*j]); */
+                fscanf(fp,"%lf %lf %lf",*coords+i,*coords+N+j,*data+i+N*j);
               }
         }
       else if(ndims==3)
@@ -2583,38 +2580,39 @@ void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_
           for(i=0;i<N;++i)
             for(j=0;j<N2;++j)
               for(k=0;k<N3;++k)
-                fscanf(fp,"%lf %lf %lf %lf",coords+i,coords+N+j,coords+N+N2+k,
-                       data+i+N*(j+N2*k));
+                fscanf(fp,"%lf %lf %lf %lf",*coords+i,*coords+N+j,*coords+N+N2+k,
+                       *data+i+N*(j+N2*k));
         }
+      fclose(fp);
     }
 
-  Journal_Firewall(!(coord[dim]<coords[0] || coord[dim]>coords[N-1]),
+  Journal_Firewall(!(coord[dim]<(*coords)[0] || coord[dim]>(*coords)[N-1]),
                    Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
                    "The range in the file '%s' does not cover this value %g\nIt only covers %g to %g in the %d direction.\n",
-                   filename,coord[dim],coords[0],coords[N-1],dim);
+                   filename,coord[dim],(*coords)[0],(*coords)[N-1],dim);
   if(ndims>1)
-    Journal_Firewall(!(coord[dim2]<coords[N] || coord[dim2]>coords[N+N2-1]),
+    Journal_Firewall(!(coord[dim2]<(*coords)[N] || coord[dim2]>(*coords)[N+N2-1]),
                      Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
                      "The range in the file '%s' does not cover this value %g\nIt only covers %g to %g in the %d direction.\n",
-                     filename,coord[dim2],coords[N],coords[N+N2-1],dim2);
+                     filename,coord[dim2],(*coords)[N],(*coords)[N+N2-1],dim2);
   if(ndims>2)
-    Journal_Firewall(!(coord[dim3]<coords[N+N2] || coord[dim3]>coords[N+N2+N3-1]),
+    Journal_Firewall(!(coord[dim3]<(*coords)[N+N2] || coord[dim3]>(*coords)[N+N2+N3-1]),
                      Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_FileN"),
                      "The range in the file '%s' does not cover this value %g\nIt only covers %g to %g in the %d direction.\n",
-                     filename,coord[dim3],coords[N+N2],coords[N+N2+N3-1],dim2);
+                     filename,coord[dim3],(*coords)[N+N2],(*coords)[N+N2+N3-1],dim2);
 
-  i=Binary_Search(coords,0,N-1,coord[dim]);
-  factor=(coords[i+1]-coord[dim])/(coords[i+1]-coords[i]);
+  i=Binary_Search(*coords,0,N-1,coord[dim]);
+  factor=((*coords)[i+1]-coord[dim])/((*coords)[i+1]-(*coords)[i]);
     
   if(ndims>1)
     {
-      j=Binary_Search(coords,N,N+N2-1,coord[dim2]);
-      factor2=(coords[j+1]-coord[dim2])/(coords[j+1]-coords[j]);
+      j=Binary_Search(*coords,N,N+N2-1,coord[dim2]);
+      factor2=((*coords)[j+1]-coord[dim2])/((*coords)[j+1]-(*coords)[j]);
       j=j-N;
       if(ndims>2)
         {
-          k=Binary_Search(coords,N,N+N2+N3-1,coord[dim3]);
-          factor3=(coords[k+1]-coord[dim3])/(coords[k+1]-coords[k]);
+          k=Binary_Search(*coords,N,N+N2+N3-1,coord[dim3]);
+          factor3=((*coords)[k+1]-coord[dim3])/((*coords)[k+1]-(*coords)[k]);
           k=k-N-N2;
         }
     }
@@ -2622,21 +2620,21 @@ void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_
   switch(ndims)
     {
     case 1:
-      *result=data[i]*factor + data[i+1]*(1-factor);
+      *result=(*data)[i]*factor + (*data)[i+1]*(1-factor);
       break;
     case 2:
-      *result=factor*(factor2*data[i+N*j] + (1-factor2)*data[i+N*(j+1)])
-        + (1-factor)*(factor2*data[i+1+N*j] + (1-factor2)*data[i+1+N*(j+1)]);
+      *result=factor*(factor2*(*data)[i+N*j] + (1-factor2)*(*data)[i+N*(j+1)])
+        + (1-factor)*(factor2*(*data)[i+1+N*j] + (1-factor2)*(*data)[i+1+N*(j+1)]);
       break;
     case 3:
-      *result=factor*(factor2*(factor3*data[i+N*(j+N2*k)]
-                               + (1-factor3)*data[i+N*(j+N2*(k+1))])
-                      + (1-factor2)*(factor3*data[i+N*((j+1)+N2*k)]
-                                     + (1-factor3)*data[i+N*((j+1)+N2*(k+1))]))
-        + (1-factor)*(factor2*(factor3*data[i+1+N*(j+N2*k)]
-                               + (1-factor3)*data[i+1+N*(j+N2*(k+1))])
-                      + (1-factor2)*(factor3*data[i+1+N*((j+1)+N2*k)]
-                                     + (1-factor3)*data[i+1+N*((j+1)+N2*(k+1))]));
+      *result=factor*(factor2*(factor3*(*data)[i+N*(j+N2*k)]
+                               + (1-factor3)*(*data)[i+N*(j+N2*(k+1))])
+                      + (1-factor2)*(factor3*(*data)[i+N*((j+1)+N2*k)]
+                                     + (1-factor3)*(*data)[i+N*((j+1)+N2*(k+1))]))
+        + (1-factor)*(factor2*(factor3*(*data)[i+1+N*(j+N2*k)]
+                               + (1-factor3)*(*data)[i+1+N*(j+N2*(k+1))])
+                      + (1-factor2)*(factor3*(*data)[i+1+N*((j+1)+N2*k)]
+                                     + (1-factor3)*(*data)[i+1+N*((j+1)+N2*(k+1))]));
       break;
     }
 }
