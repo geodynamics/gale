@@ -20500,6 +20500,11 @@ StepFunction This function returns a ramp function in the axis prescribed
 \end_inset
 
 .
+ You can also define a step function in time with by setting 
+\begin_inset Formula $StepFunctionDim=3$
+\end_inset
+
+.
  Defining some convenient constants 
 \begin_inset Formula \[
 \begin{array}{ccc}
