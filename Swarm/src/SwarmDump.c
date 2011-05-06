@@ -217,11 +217,11 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
         SizeT             particleSize;
         Index             swarm_I;
         Swarm*            swarm;
-        Stream*           info = Journal_Register( Info_Type, (Name)self->type  );
+        Stream*           debug = Journal_Register( Debug_Type, (Name)self->type  );
         Processor_Index   rank_I;
 
-        Journal_DPrintf( info, "Proc %d: beginning Swarm binary checkpoint in %s():\n", self->swarmList[0]->myRank, __func__ );
-        Stream_Indent( info );
+        Journal_DPrintf( debug, "Proc %d: beginning Swarm binary checkpoint in %s():\n", self->swarmList[0]->myRank, __func__ );
+        Stream_Indent( debug );
         
         for ( swarm_I = 0 ; swarm_I < self->swarmCount ; swarm_I++ ) {
                 char*			swarmSaveFileName      = NULL;
@@ -251,7 +251,7 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
                 #ifdef DEBUG
                    for ( rank_I = 0; rank_I < swarm->nProc; rank_I++ ) {
                            if ( swarm->myRank == rank_I ) {
-                                   Journal_DPrintf( info, "Proc %d: for swarm \"%s\", dumping its %u particles of size %u bytes "
+                                   Journal_DPrintf( debug, "Proc %d: for swarm \"%s\", dumping its %u particles of size %u bytes "
                                            "each (= %g bytes total) to file %s\n", swarm->myRank, swarm->name, particleLocalCount,
                                            particleSize, (float)(particleLocalCount * particleSize), swarmSaveFileName );
                            }       
@@ -269,8 +269,8 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
                 Memory_Free( swarmSaveFileNamePart2 );
 
         }
-        Stream_UnIndent( info );
-        Journal_DPrintf( info, "Proc %d: finished Swarm binary checkpoint.\n", self->swarmList[0]->myRank );
+        Stream_UnIndent( debug );
+        Journal_DPrintf( debug, "Proc %d: finished Swarm binary checkpoint.\n", self->swarmList[0]->myRank );
 }
 
 void _SwarmDump_Destroy( void* swarmDump, void* data ) {
