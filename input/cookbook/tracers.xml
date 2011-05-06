@@ -588,6 +588,6 @@
   <param name="CylinderMinX">0</param>
   <param name="CylinderMaxX">0.960468635615</param>
   <param name="RadiusCylinder">3.35</param>
-  <param name="journal.info">True</param>
+  <!-- <param name="journal.info">True</param> -->
 
 </StGermainData>
