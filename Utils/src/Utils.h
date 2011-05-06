@@ -55,7 +55,7 @@
 	#include "DensityField.h"
 	#include "DivergenceForce.h"
         #include "MixedStabiliserTerm.h"
-	#include "PressureTemperatureOutput.h"
+	#include "TracerOutput.h"
 	#include "Underworld_SwarmOutput.h"
 	#include "RadiogenicHeatingTerm.h"
 	#include "XDMFGenerator.h"

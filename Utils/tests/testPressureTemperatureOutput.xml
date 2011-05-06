@@ -22,7 +22,7 @@
 			<param name="totalInitialParticles">5</param>
 		</struct>
 		<struct name="swarmOutput">
-			<param name="Type">PressureTemperatureOutput</param>
+			<param name="Type">TracerOutput</param>
 			<param name="Swarm">swarm</param>
 			<param name="PressureField">PressureField</param>
 			<param name="TemperatureField">TemperatureField</param>

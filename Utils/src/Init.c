@@ -69,7 +69,7 @@ Bool Underworld_Utils_Init( int* argc, char** argv[] ) {
 	Journal_Printf( Journal_Register( DebugStream_Type, (Name)"Context"  ), "In: %s\n", __func__ ); /* DO NOT CHANGE OR REMOVE */
 	
 	Stg_ComponentRegister_Add( componentRegister, UnderworldContext_Type, (Name)"0", _UnderworldContext_DefaultNew  );
-	Stg_ComponentRegister_Add( componentRegister, PressureTemperatureOutput_Type, (Name)"0", _PressureTemperatureOutput_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, TracerOutput_Type, (Name)"0", _TracerOutput_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, Underworld_SwarmOutput_Type, (Name)"0", _Underworld_SwarmOutput_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, RadiogenicHeatingTerm_Type, (Name)"0", _RadiogenicHeatingTerm_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, StressField_Type , (Name)"0", _StressField_DefaultNew  );
@@ -85,7 +85,7 @@ Bool Underworld_Utils_Init( int* argc, char** argv[] ) {
                                    (Name)"0", _StressBC_DefaultNew );
 
 	RegisterParent( UnderworldContext_Type,       	    PICelleratorContext_Type );
-	RegisterParent( PressureTemperatureOutput_Type,     SwarmOutput_Type );
+	RegisterParent( TracerOutput_Type,     SwarmOutput_Type );
 	RegisterParent( Underworld_SwarmOutput_Type,        SwarmOutput_Type );
 	RegisterParent( RadiogenicHeatingTerm_Type,         ForceTerm_Type );
 	RegisterParent( StressField_Type,                   ParticleFeVariable_Type );

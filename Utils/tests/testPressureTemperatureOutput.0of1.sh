@@ -6,4 +6,4 @@ until test -r ${TEST_SCRIPT} ; do
 done
 . ${TEST_SCRIPT}
 
-runAndHandleSystemTestStdLocations "Underworld testPressureTemperatureOutput.xml" "$0" "$@"
+runAndHandleSystemTestStdLocations "Underworld testTracerOutput.xml" "$0" "$@"
