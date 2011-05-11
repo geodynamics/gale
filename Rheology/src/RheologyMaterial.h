@@ -119,7 +119,7 @@
 	#define RheologyMaterial_DeepCopy( self ) \
 		(RheologyMaterial*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 
-	void* _RheologyMaterial_Copy( void* rheologyMaterial, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _RheologyMaterial_Copy( const void* rheologyMaterial, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' implementations */
 	void _RheologyMaterial_Build( void* rheologyMaterial, void* data );

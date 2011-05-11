@@ -169,7 +169,7 @@ void _StrainWeakening_Init(
 		self->particleExtHandle = 
 			ExtensionManager_Add( swarm->particleExtensionMgr, (Name)StrainWeakening_Type, sizeof(StrainWeakening_ParticleExt)  );	
 
-		particleExt = ExtensionManager_Get( swarm->particleExtensionMgr, &particle, self->particleExtHandle );
+		particleExt = (StrainWeakening_ParticleExt*)ExtensionManager_Get( swarm->particleExtensionMgr, &particle, self->particleExtHandle );
 
 		/*Add variables for vizualization / analysis purposes */
 		
@@ -180,7 +180,7 @@ void _StrainWeakening_Init(
 		self->postFailureWeakeningIncrement = Swarm_NewScalarVariable( swarm, (Name)"PostFailureWeakeningIncrement", (ArithPointer) &particleExt->postFailureWeakeningIncrement - (ArithPointer) &particle, Variable_DataType_Double  );
 	}
 	else {
-		Name variableName;
+		char* variableName;
 
 		/* Get Variables already created */
 		variableName = Stg_Object_AppendSuffix( swarm, (Name)"PostFailureWeakening"  );
@@ -202,7 +202,7 @@ void _StrainWeakening_Init(
 	/* Add function to entry point which is called at the end of the time integration steps - 
 	 * this will make all the negative values zero */
 	TimeIntegrator_AppendFinishEP( self->timeIntegrator,
-		"StrainWeakening_MakeValuesPositive", _StrainWeakening_MakeValuesPositive, self->name, self );
+                                       "StrainWeakening_MakeValuesPositive", (void*)_StrainWeakening_MakeValuesPositive, self->name, self );
 
 }
 
@@ -483,7 +483,7 @@ double _StrainWeakening_CalcIncrementIsotropic(
 	double                         viscosity        = ConstitutiveMatrix_GetIsotropicViscosity( constitutiveMatrix );
 	double 						   postFailureWeakening;
 
-	particleExt = ExtensionManager_Get( self->swarm->particleExtensionMgr, particle, self->particleExtHandle );
+	particleExt = (StrainWeakening_ParticleExt*)ExtensionManager_Get( self->swarm->particleExtensionMgr, particle, self->particleExtHandle );
 	postFailureWeakening = particleExt->postFailureWeakening;
 	
 	if (beta < 0.0)
@@ -502,7 +502,7 @@ double StrainWeakening_CalcRatio( void* strainWeakening, void* particle ) {
 	if ( self == NULL ) 
 		return 0.0;
 
-	particleExt = ExtensionManager_Get( self->swarm->particleExtensionMgr, particle, self->particleExtHandle );
+	particleExt = (StrainWeakening_ParticleExt*)ExtensionManager_Get( self->swarm->particleExtensionMgr, particle, self->particleExtHandle );
 
 	if ( particleExt->postFailureWeakening < 0.0 ) 
 		particleExt->postFailureWeakening = 0.0;
@@ -530,7 +530,7 @@ void StrainWeakening_AssignIncrement(
 	StrainWeakening*             self   = (StrainWeakening*) strainWeakening;
 	StrainWeakening_ParticleExt* particleExt;
 
-	particleExt = ExtensionManager_Get( swarm->particleExtensionMgr, particle, self->particleExtHandle );
+	particleExt = (StrainWeakening_ParticleExt*)ExtensionManager_Get( swarm->particleExtensionMgr, particle, self->particleExtHandle );
 	
 	particleExt->postFailureWeakeningIncrement = 
 		self->_calcIncrement( self, constitutiveMatrix, swarm, lElement_I, particle, yieldCriterion, yieldIndicator );
@@ -540,7 +540,7 @@ double StrainWeakening_GetPostFailureWeakening( void* strainWeakening, void* par
 	StrainWeakening*             self   = (StrainWeakening*) strainWeakening;
 	StrainWeakening_ParticleExt* particleExt;
 
-	particleExt = ExtensionManager_Get( self->swarm->particleExtensionMgr, particle, self->particleExtHandle );
+	particleExt = (StrainWeakening_ParticleExt*)ExtensionManager_Get( self->swarm->particleExtensionMgr, particle, self->particleExtHandle );
 
 	return particleExt->postFailureWeakening;
 }

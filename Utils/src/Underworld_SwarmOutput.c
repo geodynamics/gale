@@ -116,7 +116,7 @@ void _Underworld_SwarmOutput_Print( void* uwSwarmOutput, Stream* stream ) {
 	_SwarmOutput_Print( self, stream );
 }
 
-void* _Underworld_SwarmOutput_Copy( void* uwSwarmOutput, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Underworld_SwarmOutput_Copy( const void* uwSwarmOutput, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Underworld_SwarmOutput*	self = (Underworld_SwarmOutput*)uwSwarmOutput;
 	Underworld_SwarmOutput*	newUnderworld_SwarmOutput;
 	

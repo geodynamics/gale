@@ -159,7 +159,7 @@ void _ConstitutiveMat_Refactored_Print( void* constitutiveMatrix, Stream* stream
 }
 
 
-void* _ConstitutiveMat_Refactored_Copy( void* constitutiveMatrix, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ConstitutiveMat_Refactored_Copy( const void* constitutiveMatrix, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	ConstitutiveMat_Refactored*	self = (ConstitutiveMat_Refactored*)constitutiveMatrix;
 	ConstitutiveMat_Refactored*	newConstitutiveMat_Refactored;
 	

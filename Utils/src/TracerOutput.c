@@ -124,7 +124,7 @@ void _TracerOutput_Print( void* swarmOutput, Stream* stream ) {
   _SwarmOutput_Print( self, stream );
 }
 
-void* _TracerOutput_Copy( void* swarmOutput, void* dest, Bool deep,
+void* _TracerOutput_Copy( const void* swarmOutput, void* dest, Bool deep,
                           Name nameExt, PtrMap* ptrMap ) {
   TracerOutput*	self = (TracerOutput*)swarmOutput;
   TracerOutput*	newTracerOutput;

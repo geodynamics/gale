@@ -70,7 +70,7 @@ RheologyMaterial* RheologyMaterial_New(
 	Rheology_Index			rheologyCount,
 	Compressible*			compressible )
 {
-	RheologyMaterial* self = _RheologyMaterial_DefaultNew( name );
+  RheologyMaterial* self = (RheologyMaterial*)_RheologyMaterial_DefaultNew( name );
 
 	self->isConstructed = True;
 	_Material_Init( self, context, shape, materialDictionary, materialRegister );
@@ -190,7 +190,7 @@ void _RheologyMaterial_Delete( void* rheologyMaterial ) {
 void _RheologyMaterial_Print( void* rheologyMaterial, Stream* stream ) {}
 
 
-void* _RheologyMaterial_Copy( void* rheologyMaterial, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _RheologyMaterial_Copy( const void* rheologyMaterial, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	RheologyMaterial*	self = (RheologyMaterial*)rheologyMaterial;
 
 	/* TODO */ abort();

@@ -120,7 +120,7 @@ void* _DepthDependentViscosity_DefaultNew( Name name ) {
 void _DepthDependentViscosity_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
    DepthDependentViscosity*  self                   = (DepthDependentViscosity*)rheology;
    FeMesh*          feMesh;
-   Axis                      variationAxis          = 0;
+   Axis                      variationAxis          = (Axis)0;
    Name                      variationAxisName;
    Stream*                   errorStream            = Journal_Register( Error_Type, (Name)self->type  );
 

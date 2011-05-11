@@ -74,7 +74,7 @@ MultiRheologyMaterial* MultiRheologyMaterial_New(
 	Rheology_Index*		rheologyCountList, 
 	Index						rheologyListCount ) 
 {
-	MultiRheologyMaterial* self = _MultiRheologyMaterial_DefaultNew( name );
+  MultiRheologyMaterial* self = (MultiRheologyMaterial*)_MultiRheologyMaterial_DefaultNew( name );
 
 	self->isConstructed = True;
 	_Material_Init( self, context, shape, materialDictionary, materialRegister );

@@ -83,7 +83,7 @@ void _TracerOutput_Print( void* swarmOutput, Stream* stream );
   (TracerOutput*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 #define TracerOutput_DeepCopy( self )                                   \
   (TracerOutput*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-void* _TracerOutput_Copy( void* swarmOutput, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+void* _TracerOutput_Copy( const void* swarmOutput, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 void* _TracerOutput_DefaultNew( Name name ) ;
 void _TracerOutput_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

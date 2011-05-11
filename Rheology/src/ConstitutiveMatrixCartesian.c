@@ -279,7 +279,7 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 
    /* Loop over points to build Stiffness Matrix */
    for ( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
-      particle = (void*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
+     particle = (IntegrationPoint*)Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
 
       /* Calculate Determinant of Jacobian and Shape Function Global Derivatives */
       ElementType_ShapeFunctionsGlobalDerivs(
@@ -721,14 +721,14 @@ void ConstitutiveMatrixCartesian_SetupParticleStorage( ConstitutiveMatrixCartesi
 
    /* get material swram mapped to the integration points,
    *      * currently only one material point is mapped 26 FEB 09 */
-   materialSwarms = IntegrationPointMapper_GetMaterialPointsSwarms( swarm->mapper, &materialSwarmCount );
+   materialSwarms = IntegrationPointMapper_GetMaterialPointsSwarms( swarm->mapper, (Index*)(&materialSwarmCount) );
    assert( materialSwarmCount < 2 );
    materialSwarm = materialSwarms[0];
 
    /* add extension to material swarm */
    self->storedConstHandle = ExtensionManager_Add( materialSwarm->particleExtensionMgr, (Name)self->type, self->rowSize * self->columnSize * sizeof(double)  );
 
-   cMatrix = ExtensionManager_Get( materialSwarm->particleExtensionMgr, &particle, self->storedConstHandle );
+   cMatrix = (double*)ExtensionManager_Get( materialSwarm->particleExtensionMgr, &particle, self->storedConstHandle );
 
 #if 0
    /*This isn't needed so I've disabled it, 2Dec09, JG*/

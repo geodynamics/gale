@@ -104,7 +104,7 @@
 		(Rheology*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define Rheology_DeepCopy( self ) \
 		(Rheology*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _Rheology_Copy( void* rheology, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Rheology_Copy( const void* rheology, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' implementations */
 	void* _Rheology_DefaultNew( Name name ) ;

@@ -45,6 +45,10 @@
 
 const Type Underworld_solA_Type = "Underworld_Velic_solA";
 
+void _Velic_solutionA( double* pos, 
+		double sigma, double Z, int n, double km,
+                       double* velocity, double* pressure, double* Tstress, double* strainRate );
+
 void Underworld_solA_PressureFunction( void* analyticSolution, double* coord, double* pressure ) {
 	Underworld_solA* self = (Underworld_solA*) analyticSolution;
 	
@@ -117,7 +121,7 @@ Bool solA_checkInputParams( Underworld_solA* self ) {
 	return ( 
 		( self->sigma > 0.0 ) && ( self->Z > 0.0 ) &&
 		( self->km > 0.0 )    && ( self->n > 0 )  
-	);
+                 ) ? True : False;
 }
 
 void* _Underworld_solA_DefaultNew( Name name ) {

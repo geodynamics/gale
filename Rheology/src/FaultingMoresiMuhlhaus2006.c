@@ -182,7 +182,7 @@ void _FaultingMoresiMuhlhaus2006_Init(
 	EP_PrependClassHook( Context_GetEntryPoint( context, AbstractContext_EP_DumpClass ),
 			_FaultingMoresiMuhlhaus2006_UpdateDrawParameters, self );
 
-	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &materialPoint, self->particleExtHandle );
+	particleExt = (FaultingMoresiMuhlhaus2006_Particle*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &materialPoint, self->particleExtHandle );
 
 	/* Add variables for viz purpose */
 
@@ -518,7 +518,7 @@ double _FaultingMoresiMuhlhaus2006_GetYieldIndicator(
 	
 	Director_GetNormal( self->director, materialPoint, normal );
 	
-	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
+	particleExt = (FaultingMoresiMuhlhaus2006_Particle*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 
 	if ( self->tryingOldOrientation ) {
 		sigma_ns = SymmetricTensor_MultiplyByVectors( stress, normal, particleExt->slip, dim );
@@ -556,7 +556,7 @@ double _FaultingMoresiMuhlhaus2006_GetYieldCriterion(
 	double                               sigma_nn;
 	FaultingMoresiMuhlhaus2006_Particle* particleExt;
 		
-	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
+	particleExt = (FaultingMoresiMuhlhaus2006_Particle*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 		
 	/* Calculate frictional strength */
 	effectiveFrictionCoefficient = _FaultingMoresiMuhlhaus2006_EffectiveFrictionCoefficient( self, materialPoint );
@@ -605,7 +605,7 @@ void _FaultingMoresiMuhlhaus2006_HasYielded(
         else
            ConstitutiveMatrix_SetSecondViscosity( constitutiveMatrix, -corr, normal );
 
-	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
+	particleExt = (FaultingMoresiMuhlhaus2006_Particle*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 	particleExt->slipRate = self->storedSlipRateValue;
 	
 	/* Set a flag to tell the director that particles which have failed don't need to have their normal updated */
@@ -627,7 +627,7 @@ Bool _FaultingMoresiMuhlhaus2006_OldOrientationStillSoftening( void* rheology, M
 	
 	Director_GetNormal( self->director, materialPoint, normal );
 
-	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
+	particleExt = (FaultingMoresiMuhlhaus2006_Particle*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 	n = normal;
 	s = particleExt->slip;
 	 
@@ -679,7 +679,7 @@ Bool _FaultingMoresiMuhlhaus2006_OldOrientationStillSoftening( void* rheology, M
 	
 	/* LM: No, I don't think this is true ... in this case we keep the orientation unless it hardens as well */
 			
-	return (dVparalleldXperpendicular1 < dVparalleldXperpendicular); // ? True : !self->updateOrientations;
+	return (dVparalleldXperpendicular1 < dVparalleldXperpendicular) ? True : False; // ? True : !self->updateOrientations;
 }
 
 double* _FaultingMoresiMuhlhaus2006_UpdateNormalDirection( void* rheology, MaterialPointsSwarm* materialPointsSwarm, void* materialPoint, Dimension_Index dim ) {
@@ -697,7 +697,7 @@ double* _FaultingMoresiMuhlhaus2006_UpdateNormalDirection( void* rheology, Mater
 	
 	normalDirector = Director_GetNormalPtr( self->director, materialPoint);
 	
-	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
+	particleExt = (FaultingMoresiMuhlhaus2006_Particle*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 	
 	/* This function is specific for pristine materials -- 
 	 * We don't need to calculate it for failure in old orientations */
@@ -896,7 +896,7 @@ void _FaultingMoresiMuhlhaus2006_StoreCurrentParameters(
 	Dimension_Index                      dim                = constitutiveMatrix->dim;
 	FaultingMoresiMuhlhaus2006_Particle* particleExt;
 	
-	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
+	particleExt = (FaultingMoresiMuhlhaus2006_Particle*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 	particleExt->slipRate = 0.0;
 	
 	FeVariable_InterpolateWithinElement( self->pressureField, lElement_I, xi, &self->currentPressure );	

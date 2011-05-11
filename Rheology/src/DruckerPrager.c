@@ -193,7 +193,7 @@ void _DruckerPrager_Init(
 	EP_PrependClassHook( Context_GetEntryPoint( self->context, AbstractContext_EP_DumpClass ),
 								_DruckerPrager_UpdateDrawParameters, self );
 	
-	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &materialPoint, self->particleExtHandle );
+	particleExt = (DruckerPrager_Particle*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &materialPoint, self->particleExtHandle );
 	
 	/* Setup Variables for Visualisation */
 	self->brightness = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"DruckerPragerBrightness", (ArithPointer) &particleExt->brightness - (ArithPointer) &materialPoint, Variable_DataType_Float  );
@@ -381,7 +381,7 @@ double _DruckerPrager_GetYieldCriterion(
 	minimumViscosity                   = self->minimumViscosity;
 	maxStrainRate                      = self->maxStrainRate;
 	
-	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
+	particleExt = (DruckerPrager_Particle*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 
         if( self->pressureField )
           FeVariable_InterpolateWithinElement( self->pressureField, lElement_I, xi, &pressure );
@@ -419,12 +419,14 @@ double _DruckerPrager_GetYieldCriterion(
         element_gI = FeMesh_ElementDomainToGlobal( self->pressureField->feMesh, lElement_I );
         RegularMeshUtils_Element_1DTo3D( self->pressureField->feMesh, element_gI, inds );
   
-        inside_boundary=(self->boundaryBottom && inds[1]==0)
-          || (self->boundaryTop && inds[1]==elGrid->sizes[1]-1)
-          || (self->boundaryLeft && inds[0]==0)
-          || (self->boundaryRight && inds[0]==elGrid->sizes[0]-1)
-          || (dim==3 && ((self->boundaryBack && inds[2]==0)
-                         || (self->boundaryFront && inds[2]==elGrid->sizes[2]-1)));
+        inside_boundary=
+          ((self->boundaryBottom && inds[1]==0)
+           || (self->boundaryTop && inds[1]==elGrid->sizes[1]-1)
+           || (self->boundaryLeft && inds[0]==0)
+           || (self->boundaryRight && inds[0]==elGrid->sizes[0]-1)
+           || (dim==3 && ((self->boundaryBack && inds[2]==0)
+                          || (self->boundaryFront && inds[2]==elGrid->sizes[2]-1))))
+          ? True : False;
 
         effectiveFrictionCoefficient =
           _DruckerPrager_EffectiveFrictionCoefficient( self, materialPoint,

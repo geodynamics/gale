@@ -122,7 +122,7 @@ void Underworld_DensityChange_Setup( UnderworldContext* context ) {
 	if( self->material==NULL ) {
 		printf("Error\nCounld find the material with index %d\n", materialIndex ); exit(0);
 	}
-	materialExt = ExtensionManager_Get( self->material->extensionMgr, self->material, bft->materialExtHandle );
+	materialExt = (BuoyancyForceTerm_MaterialExt*)ExtensionManager_Get( self->material->extensionMgr, self->material, bft->materialExtHandle );
 	Journal_RPrintf( stream, "Will change %s's density at height %g from %g to %g\n", 
 			self->material->name, self->height, materialExt->density, self->newDensity );
 

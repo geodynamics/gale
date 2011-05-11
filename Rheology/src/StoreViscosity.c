@@ -82,7 +82,7 @@ void _StoreVisc_Init(
 	self->particleExtHandle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, (Name)self->type, sizeof( StoreVisc_ParticleExt )  );
 	
 	/* Add SwarmVariables for plotting */
-	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle, self->particleExtHandle );
+	particleExt = (StoreVisc_ParticleExt*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle, self->particleExtHandle );
 	
 	self->swarmVariable = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"Viscosity", (ArithPointer) &particleExt->effVisc - (ArithPointer) &particle, Variable_DataType_Double );
 }
@@ -173,7 +173,7 @@ void _StoreVisc_ModifyConstitutiveMatrix(
 #endif
                           
 	/* Get Parameters From Material Extension */
-	particleExt          = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
+	particleExt          = (StoreVisc_ParticleExt*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 
 	particleExt->effVisc =  ConstitutiveMatrix_GetIsotropicViscosity(constitutiveMatrix);
 	

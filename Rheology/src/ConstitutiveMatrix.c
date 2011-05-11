@@ -179,7 +179,7 @@ void _ConstitutiveMatrix_Print( void* constitutiveMatrix, Stream* stream ) {
 }
 
 
-void* _ConstitutiveMatrix_Copy( void* constitutiveMatrix, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ConstitutiveMatrix_Copy( const void* constitutiveMatrix, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
    ConstitutiveMatrix*  self = (ConstitutiveMatrix*)constitutiveMatrix;
    ConstitutiveMatrix*  newConstitutiveMatrix;
 
@@ -297,7 +297,7 @@ void ConstitutiveMatrix_Assemble(
 
   if( self->storeConstitutiveMatrix ) {
     /* copy the recently calculated self->matrixData, the constitutive matrix, onto the particle extension */
-    double* cMatrix = ExtensionManager_Get( materialSwarm->particleExtensionMgr, materialPoint, self->storedConstHandle );
+    double* cMatrix = (double*)ExtensionManager_Get( materialSwarm->particleExtensionMgr, materialPoint, self->storedConstHandle );
     Index row_I, rowSize = self->rowSize;
     Index columnSize = self->columnSize;
 
@@ -324,7 +324,7 @@ void ConstitutiveMatrix_AssembleMaterialPoint(void *constitutiveMatrix, int elem
 
   if( self->storeConstitutiveMatrix ) {
     /* copy the recently calculated self->matrixData, the constitutive matrix, onto the particle extension */
-    double* cMatrix = ExtensionManager_Get( matSwarm->particleExtensionMgr, matPoint, self->storedConstHandle );
+    double* cMatrix = (double*)ExtensionManager_Get( matSwarm->particleExtensionMgr, matPoint, self->storedConstHandle );
     Index row_I, rowSize = self->rowSize;
     Index columnSize = self->columnSize;
 
@@ -400,7 +400,7 @@ void ConstitutiveMatrix_GetStoredMatrixOnParticle(
    ConstitutiveMatrix* self   = (ConstitutiveMatrix*)constitutiveMatrix;
   ExtensionInfo_Index handle = self->storedConstHandle;
 
-  double* ext = _OneToOneMapper_GetExtensionOn(
+  double* ext = (double*)_OneToOneMapper_GetExtensionOn(
       ((IntegrationPointsSwarm*)self->integrationSwarm)->mapper,
       particle, handle );
 

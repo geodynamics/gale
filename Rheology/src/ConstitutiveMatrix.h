@@ -120,7 +120,7 @@
 		(ConstitutiveMatrix*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define ConstitutiveMatrix_DeepCopy( self ) \
 		(ConstitutiveMatrix*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _ConstitutiveMatrix_Copy( void* constitutiveMatrix, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ConstitutiveMatrix_Copy( const void* constitutiveMatrix, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Functions */
 	void _ConstitutiveMatrix_AssignFromXML( void* constitutiveMatrix, Stg_ComponentFactory* cf, void* data );

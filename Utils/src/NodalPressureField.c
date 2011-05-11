@@ -67,7 +67,7 @@ void* _NodalPressureField_DefaultNew( Name name ) {
 	ParticleFeVariable_ValueAtParticleFunction*            _valueAtParticle = _NodalPressureField_ValueAtParticle;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType                             nameAllocationType = ZERO;
+	AllocationType                             nameAllocationType = (AllocationType)ZERO;
 	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = ZERO;
 	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
 	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
@@ -95,7 +95,7 @@ void _NodalPressureField_Print( void* _self, Stream* stream ) {
    _ParticleFeVariable_Print( self, stream );
 }
 
-void* _NodalPressureField_Copy( void* _self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _NodalPressureField_Copy( const void* _self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
    abort();
 }
 
@@ -133,18 +133,18 @@ void _NodalPressureField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, v
 
 void _NodalPressureField_Build( void* _self, void* data ) {
    NodalPressureField* self = (NodalPressureField*) _self;
-   Name tmpName, tmpName2;
+   char *tmpName, *tmpName2;
    Node_DomainIndex  node_I;
 
    Stg_Component_Build( self->feMesh, data, False );
 
    /* Create Variable to store data */
    assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
-   tmpName = Stg_Object_AppendSuffix( self, (Name)"DataVariable"  );
+   tmpName = Stg_Object_AppendSuffix( self, "DataVariable"  );
    self->dataVariable = Variable_NewScalar( tmpName, (AbstractContext*)self->context, Variable_DataType_Double, (Index*)&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, NULL, (void**)&self->data, self->variable_Register  );
 	
    /* Create Dof Layout */
-   tmpName2 = Stg_Object_AppendSuffix( self, (Name)"DofLayout"  );
+   tmpName2 = Stg_Object_AppendSuffix( self, "DofLayout"  );
    self->dofLayout = DofLayout_New( tmpName2, self->context, self->variable_Register, 0, self->feMesh );
    self->dofLayout->_numItemsInLayout = FeMesh_GetNodeDomainSize( self->feMesh );
    for( node_I = 0; node_I < FeMesh_GetNodeDomainSize( self->feMesh ); node_I++ ) {

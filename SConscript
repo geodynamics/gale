@@ -165,10 +165,10 @@ if env['static_libs']:
         n = n[:-6]
         reg_c += 'extern void (%s_MetaAsDictionary)();\n'%n
         reg_c += 'extern void (%s_GetName)();\n'%n
-        reg_c += 'extern void (%s_Register)();\n'%n
+        reg_c += 'extern void (%s_Register)(PluginsManager* pluginsManager);\n'%n
         if n.find('Toolbox') != -1:
-            reg_c += 'extern void (%s_Initialise)();\n'%n
-            reg_c += 'extern void (%s_Finalise)();\n'%n
+            reg_c += 'extern void (%s_Initialise)(PluginsManager* pluginsManager, int * argc, char *** argv);\n'%n
+            reg_c += 'extern void (%s_Finalise)(PluginsManager* pluginsManager);\n'%n
     reg_c += '\n'
 
     reg_c += 'void underworld_register_static_modules() {\n'
@@ -250,7 +250,7 @@ if env['static_libs']:
 env.PCUTest('tests/testUnderworld', suites,
             PCU_LIBHEADERS="#include <StGermain/StGermain.h>\n#include <StgDomain/StgDomain.h>\n" \
                 "#include <StgFEM/StgFEM.h>\n#include <PICellerator/PICellerator.h>\n" \
-                "#include <Underworld/Underworld.h>", 
+                "#include <Underworld/Underworld.h>\nextern void underworld_register_static_modules();\nextern void picellerator_register_static_modules();\nextern void stgfem_register_static_modules();\nextern void stgdomain_register_static_modules();",
             PCU_SETUP="StGermain_Init(&argc, &argv);\nStgDomain_Init(&argc, &argv);\n" \
                 "StgFEM_Init(&argc, &argv);\nPICellerator_Init(&argc, &argv);\n" \
                 "Underworld_Init(&argc, &argv);\n\n" \

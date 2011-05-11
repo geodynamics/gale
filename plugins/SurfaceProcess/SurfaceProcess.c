@@ -207,7 +207,7 @@ void _Underworld_SurfaceProcess_AssignFromXML( void* component,
                           Underworld_SurfaceProcess_Type, 
                           sizeof(Underworld_SurfaceProcess_Context) );
 
-  spCtx = ExtensionManager_Get( uwCtx->extensionMgr, uwCtx,
+  spCtx = (Underworld_SurfaceProcess_Context*)ExtensionManager_Get( uwCtx->extensionMgr, uwCtx,
                                 Underworld_SurfaceProcess_ContextHandle );
   memset( spCtx, 0, sizeof(Underworld_SurfaceProcess_Context) );
   spCtx->ctx = (AbstractContext*)uwCtx;
@@ -244,7 +244,7 @@ void _Underworld_SurfaceProcess_Build( void* codelet, void* data ) {
 	assert( UnderworldCtx );
 
 	/* Get the context. */
-	spCtx = ExtensionManager_Get( UnderworldCtx->extensionMgr, UnderworldCtx, Underworld_SurfaceProcess_ContextHandle );
+	spCtx = (Underworld_SurfaceProcess_Context*)ExtensionManager_Get( UnderworldCtx->extensionMgr, UnderworldCtx, Underworld_SurfaceProcess_ContextHandle );
 
 	if( !spCtx->mesh )
 		return;
@@ -254,7 +254,7 @@ void _Underworld_SurfaceProcess_Build( void* codelet, void* data ) {
            values. */
 	TimeIntegrator_AppendSetupEP( spCtx->timeIntegrator, 
 					"Underworld_SurfaceProcess_Execute", 
-					Underworld_SurfaceProcess_Execute, 
+                                      (void*)Underworld_SurfaceProcess_Execute, 
 					"SurfaceProcess", 
 					spCtx );
 }

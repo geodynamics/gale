@@ -60,7 +60,7 @@
 
 	void _SPR_StrainRate_Print( void* sprVar, Stream* stream );
 
-	void* _SPR_StrainRate_Copy( void* sprVar, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _SPR_StrainRate_Copy( const void* sprVar, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _SPR_StrainRate_Init( SPR_StrainRate* self );
 

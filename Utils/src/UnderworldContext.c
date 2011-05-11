@@ -67,7 +67,7 @@ UnderworldContext* UnderworldContext_New(
 	MPI_Comm		communicator,
 	Dictionary*	dictionary )
 {
-	UnderworldContext* self = _UnderworldContext_DefaultNew( name );
+  UnderworldContext* self = (UnderworldContext*)_UnderworldContext_DefaultNew( name );
 
 	self->isConstructed = True;
 	_AbstractContext_Init( (AbstractContext*) self );

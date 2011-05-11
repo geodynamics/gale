@@ -94,7 +94,7 @@ void _Rheology_Delete( void* rheology ) {
 
 void _Rheology_Print( void* rheology, Stream* stream ) {}
 
-void* _Rheology_Copy( void* rheology, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Rheology_Copy( const void* rheology, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Rheology*	self = (Rheology*)rheology;
 
 	/* TODO */ abort();

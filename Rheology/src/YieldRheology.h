@@ -120,7 +120,7 @@
 		(YieldRheology*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define YieldRheology_DeepCopy( self ) \
 		(YieldRheology*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _YieldRheology_Copy( void* rheology, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _YieldRheology_Copy( const void* rheology, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' implementations */
 	void* _YieldRheology_DefaultNew( Name name ) ;

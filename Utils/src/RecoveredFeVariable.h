@@ -115,7 +115,7 @@
 
 	void _RecoveredFeVariable_Print( void* recFeVariable, Stream* stream );
 
-	void* _RecoveredFeVariable_Copy( void* recFeVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _RecoveredFeVariable_Copy( const void* recFeVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _RecoveredFeVariable_AssignFromXML( void* recFeVariable, Stg_ComponentFactory* cf, void* data );
 

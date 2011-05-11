@@ -110,7 +110,7 @@ void _Underworld_Ra_Scaling_AssignFromXML( void* component, Stg_ComponentFactory
    if ( checkScaling  ) {
       EntryPoint_Append( Context_GetEntryPoint( context, AbstractContext_EP_Build ),
       "Underworld CheckScalings",
-      _Ra_CheckScalings_Func,
+                         (void*)_Ra_CheckScalings_Func,
       Underworld_Ra_Scaling_Type );
    }
 }

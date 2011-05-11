@@ -168,7 +168,7 @@ void MeshAdvectionCorrection( void* sle, void* data ) {
 			"artificial nodal velocities" );
 
 	/* get the plugin from the context */
-	plugin = ExtensionManager_Get( 
+	plugin = (Underworld_MeshAdvectionCorrection_ContextExt*)ExtensionManager_Get( 
 		context->extensionMgr, 
 		context, 
 		Underworld_MeshAdvectionCorrection_ContextExtHandle );
@@ -203,17 +203,17 @@ void _Underworld_MeshAdvectionCorrection_AssignFromXML( void* component, Stg_Com
    AdvectionDiffusionSLE* energySLE = (AdvectionDiffusionSLE* ) Stg_ComponentFactory_ConstructByName( cf, (Name)"EnergyEqn", UnderworldContext, True, data );
 	
 	Journal_DFirewall( 
-		(Bool )context, 
+		context!=NULL, 
 		Journal_Register( Error_Type, (Name)Underworld_MeshAdvectionCorrection_Type  ), 
 		"No context found\n" );
 	Journal_DFirewall( 
-		(Bool)energySLE, 
+		energySLE!=NULL, 
 		Journal_Register( Error_Type, (Name)Underworld_MeshAdvectionCorrection_Type  ), 
 		"The required energy SLE component has not been created or placed on the context.\n");	
 	
 	/* Add the extension to the context */
 	Underworld_MeshAdvectionCorrection_ContextExtHandle = ExtensionManager_Add( context->extensionMgr, (Name)Underworld_MeshAdvectionCorrection_Type, sizeof( Underworld_MeshAdvectionCorrection_ContextExt )  );
-	plugin = ExtensionManager_Get( 
+	plugin = (Underworld_MeshAdvectionCorrection_ContextExt*)ExtensionManager_Get( 
 		context->extensionMgr, 
 		context, 
 		Underworld_MeshAdvectionCorrection_ContextExtHandle );

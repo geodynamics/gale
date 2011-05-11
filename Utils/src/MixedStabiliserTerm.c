@@ -223,7 +223,7 @@ void _MixedStabiliserTerm_AssembleElement( void* _self,
         OneToOneMapper_GetMaterialPoint( swarm->mapper,
                                          integrationPoint, &mSwarm );
       particleExt=
-        ExtensionManager_Get( mSwarm->particleExtensionMgr,
+        (StoreVisc_ParticleExt*)ExtensionManager_Get( mSwarm->particleExtensionMgr,
                               materialparticle,
                               self->storeVisc->particleExtHandle );
 

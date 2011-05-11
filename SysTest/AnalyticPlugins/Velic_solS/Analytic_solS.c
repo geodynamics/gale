@@ -118,7 +118,7 @@ void _Underworld_solS_AssignFromXML( void* analyticSolution, Stg_ComponentFactor
 Bool _checkInputParams( Underworld_solS* self ) {
 	return ( 
 		( self->_eta > 0.0 ) && ( self->_n > 0.0 )
-	);
+                 ) ? True : False;
 }
 
 void* _Underworld_solS_DefaultNew( Name name ) {

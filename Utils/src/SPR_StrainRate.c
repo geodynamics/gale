@@ -40,7 +40,7 @@ SPR_StrainRate* SPR_StrainRate_New(
 	int							rawOrderOfInterpolation,
 	Bool							coeffInterpolation )
 {
-   SPR_StrainRate* self = _SPR_StrainRate_DefaultNew( name );
+  SPR_StrainRate* self = (SPR_StrainRate*)_SPR_StrainRate_DefaultNew( name );
 
 	self->isConstructed = True;
    _FieldVariable_Init( (FieldVariable*)self, context, fieldComponentCount, dim, isCheckpointedAndReloaded, communicator, fV_Register );
@@ -66,7 +66,7 @@ void* _SPR_StrainRate_DefaultNew( Name name ) {
 	Stg_Component_DestroyFunction*                        _destroy = _SPR_StrainRate_Destroy;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType                                         nameAllocationType = ZERO;
+	AllocationType                                         nameAllocationType = (AllocationType)ZERO;
 	FieldVariable_InterpolateValueAtFunction*             _interpolateValueAt = ZERO;
 	FieldVariable_GetValueFunction*               _getMinGlobalFieldMagnitude = ZERO;
 	FieldVariable_GetValueFunction*               _getMaxGlobalFieldMagnitude = ZERO;
@@ -110,7 +110,7 @@ void _SPR_StrainRate_Print( void* sprVar, Stream* stream ) {
 }
 
 
-void* _SPR_StrainRate_Copy( void* sprVar, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _SPR_StrainRate_Copy( const void* sprVar, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
    return NULL;
 }
 

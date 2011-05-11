@@ -64,7 +64,7 @@ void _DensityField_Print( void* densityField, Stream* stream ) {
 	Journal_PrintPointer( stream, self->buoyancyForceTerm );
 }
 
-void* _DensityField_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _DensityField_Copy( const void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	DensityField*	self = (DensityField*)feVariable;
 	DensityField*	newDensityField;
 	
@@ -96,7 +96,7 @@ void* _DensityField_DefaultNew( Name name ) {
 	ParticleFeVariable_ValueAtParticleFunction*            _valueAtParticle = _DensityField_ValueAtParticle;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType                             nameAllocationType = ZERO;
+	AllocationType                             nameAllocationType = (AllocationType)ZERO;
 	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = ZERO;
 	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
 	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
@@ -121,7 +121,7 @@ void _DensityField_AssignFromXML( void* densityField, Stg_ComponentFactory* cf, 
 void _DensityField_Build( void* densityField, void* data ) {
 	DensityField*			self = (DensityField*) densityField;
 	Variable_Register*	variable_Register = (Variable_Register*) self->variable_Register;
-	Name						tmpName;
+	char*						tmpName;
 
 	Stg_Component_Build( self->buoyancyForceTerm, data, False );
 
@@ -169,7 +169,7 @@ void _DensityField_ValueAtParticle( void* densityField, IntegrationPointsSwarm* 
 	
 	/* Calculate density from particle material */
 	material = IntegrationPointsSwarm_GetMaterialOn( (IntegrationPointsSwarm*)swarm, particle );
-	materialExt = ExtensionManager_Get( material->extensionMgr, material, self->buoyancyForceTerm->materialExtHandle );
+	materialExt = (BuoyancyForceTerm_MaterialExt*)ExtensionManager_Get( material->extensionMgr, material, self->buoyancyForceTerm->materialExtHandle );
 	*density = materialExt->density;
 }
 

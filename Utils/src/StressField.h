@@ -51,7 +51,7 @@
 
 	void _StressField_Print( void* variable, Stream* stream );
 
-	void* _StressField_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _StressField_Copy( const void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _StressField_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data );
 

@@ -129,7 +129,7 @@ void _RadiogenicHeatingTerm_Build( void* forceTerm, void* data ) {
 
 	for ( material_I = 0 ; material_I < Materials_Register_GetCount( materials_Register ) ; material_I++) {
 		material = Materials_Register_GetByIndex( materials_Register, material_I );
-		materialExt = ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
+		materialExt = (RadiogenicHeatingTerm_MaterialExt*)ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
 
 		/* Get List of Heating Elements from material's dictionary */
 		list = Dictionary_Get( material->dictionary, (Dictionary_Entry_Key)"heatingElements" );
@@ -203,7 +203,7 @@ void _RadiogenicHeatingTerm_AssembleElement( void* forceTerm, ForceVector* force
 
 		/* Get parameters */
 		material = IntegrationPointsSwarm_GetMaterialOn( (IntegrationPointsSwarm*)swarm, particle );
-		materialExt = ExtensionManager_Get( material->extensionMgr, material, self->materialExtHandle );
+		materialExt = (RadiogenicHeatingTerm_MaterialExt*)ExtensionManager_Get( material->extensionMgr, material, self->materialExtHandle );
 		
 		/* Check if this material has heating term */
 		heatingElementCount = materialExt->heatingElementCount;

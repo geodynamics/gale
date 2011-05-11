@@ -71,7 +71,7 @@ ConstitutiveMatCartesian_Refactored* ConstitutiveMatCartesian_Refactored_New(
 	PICelleratorContext*		context,
 	Materials_Register*		materials_Register )
 {
-	ConstitutiveMatCartesian_Refactored* self = _ConstitutiveMatCartesian_Refactored_DefaultNew( name );
+  ConstitutiveMatCartesian_Refactored* self = (ConstitutiveMatCartesian_Refactored*)_ConstitutiveMatCartesian_Refactored_DefaultNew( name );
 
 	self->isConstructed = True;
 	_ConstitutiveMat_Refactored_Init( self, dim, context, materials_Register );

@@ -77,7 +77,7 @@ void* _RecoveredFeVariable_DefaultNew( Name name ) {
 	Stg_Component_DestroyFunction*                        _destroy = _RecoveredFeVariable_Destroy;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType                                         nameAllocationType = ZERO;
+	AllocationType                                         nameAllocationType = (AllocationType)ZERO;
 	FieldVariable_InterpolateValueAtFunction*             _interpolateValueAt = ZERO;
 	FieldVariable_GetValueFunction*               _getMinGlobalFieldMagnitude = ZERO;
 	FieldVariable_GetValueFunction*               _getMaxGlobalFieldMagnitude = ZERO;
@@ -120,7 +120,7 @@ void _RecoveredFeVariable_Print( void* recFeVariable, Stream* stream ) {
 	/* RecoveredFeVariable info */
 }
 
-void* _RecoveredFeVariable_Copy( void* recFeVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _RecoveredFeVariable_Copy( const void* recFeVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	abort();
 }
 

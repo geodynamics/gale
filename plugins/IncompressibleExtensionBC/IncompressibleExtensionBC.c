@@ -260,7 +260,7 @@ void Underworld_IncompressibleExtensionBC_Remesh( TimeIntegrator* timeIntegrator
 
     numNodes = FeMesh_GetNodeLocalSize(mesh);
     for(ii = 0; ii < numNodes; ii++) {
-		Grid_Lift(nodeGrid, FeMesh_NodeDomainToGlobal(mesh, ii), nodeInds);
+      Grid_Lift(nodeGrid, FeMesh_NodeDomainToGlobal(mesh, ii), (unsigned*)nodeInds);
 		Mesh_GetVertex(mesh, ii)[0] = minCrd[0] + ((double)nodeInds[0])*nodeWidth[0];
 		Mesh_GetVertex(mesh, ii)[1] = minCrd[1] + ((double)nodeInds[1])*nodeWidth[1];
     }
@@ -279,10 +279,10 @@ void Underworld_IncompressibleExtensionBC_Remesh( TimeIntegrator* timeIntegrator
 
 	    numNodes = FeMesh_GetNodeLocalSize(pmesh);
 	    for(ii = 0; ii < numNodes; ii++) {
-		Grid_Lift(pnodeGrid, FeMesh_NodeDomainToGlobal(pmesh, ii), nodeInds);
+		Grid_Lift(pnodeGrid, FeMesh_NodeDomainToGlobal(pmesh, ii), (unsigned*)nodeInds);
 		nodeInds[0] *= 2;
 		nodeInds[1] *= 2;
-		insist(FeMesh_NodeGlobalToDomain(mesh, Grid_Project(nodeGrid, nodeInds), &lind), != 0);
+		insist(FeMesh_NodeGlobalToDomain(mesh, Grid_Project(nodeGrid, (unsigned*)nodeInds), (unsigned*)(&lind)), != 0);
 		memcpy(Mesh_GetVertex(pmesh, ii), Mesh_GetVertex(mesh, lind), 2*sizeof(double));
 	    }
 	}
@@ -317,7 +317,7 @@ void _Underworld_IncompressibleExtensionBC_AssignFromXML( void* _self, Stg_Compo
 
         if( Stg_ComponentFactory_PluginGetBool( cf, self, (Dictionary_Entry_Key)"Remesh", False )  ) {
 	    TimeIntegrator_PrependFinishEP( 
-		timeIntegrator, "Underworld_IncompressibleExtensionBC_Remesh", Underworld_IncompressibleExtensionBC_Remesh, 
+                                           timeIntegrator, "Underworld_IncompressibleExtensionBC_Remesh", (void*)Underworld_IncompressibleExtensionBC_Remesh, 
 		CURR_MODULE_NAME, self );
 	}
 }

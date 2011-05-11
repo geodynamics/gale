@@ -69,7 +69,7 @@ void _ViscosityField_Print( void* viscosityField, Stream* stream ) {
 }
 
 
-void* _ViscosityField_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ViscosityField_Copy( const void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	ViscosityField*	self = (ViscosityField*)feVariable;
 	ViscosityField*	newViscosityField;
 	
@@ -101,7 +101,7 @@ void* _ViscosityField_DefaultNew( Name name ) {
 	ParticleFeVariable_ValueAtParticleFunction*            _valueAtParticle = _ViscosityField_ValueAtParticle;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType                             nameAllocationType = ZERO;
+	AllocationType                             nameAllocationType = (AllocationType)ZERO;
 	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = ZERO;
 	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
 	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
@@ -126,7 +126,7 @@ void _ViscosityField_AssignFromXML( void* viscosityField, Stg_ComponentFactory* 
 
 void _ViscosityField_Build( void* viscosityField, void* data ) {
 	ViscosityField* self = (ViscosityField*) viscosityField;
-	Name              tmpName;
+	char*              tmpName;
 
 	Stg_Component_Build( self->feMesh, data, False );
 	Stg_Component_Build( self->constitutiveMatrix, data, False );

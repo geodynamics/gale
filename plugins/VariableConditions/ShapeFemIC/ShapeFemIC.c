@@ -113,7 +113,7 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
     /* Get the shape */
     shape = (Stg_Shape* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)shapeName );
 
-    Journal_Firewall( (Bool ) shape, 
+    Journal_Firewall( shape!=NULL, 
 		      Journal_Register( Error_Type, (Name)Underworld_ShapeFemIC_Type  ), 
 		      "Shape %s not found.\n", shapeName );
 

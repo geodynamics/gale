@@ -89,7 +89,7 @@ void _StressField_Print( void* stressField, Stream* stream ) {
 	Journal_PrintPointer( stream, self->constitutiveMatrix );
 }
 
-void* _StressField_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _StressField_Copy( const void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	StressField*	self = (StressField*)feVariable;
 	StressField*	newStressField;
 	
@@ -122,7 +122,7 @@ void* _StressField_DefaultNew( Name name ) {
 	ParticleFeVariable_ValueAtParticleFunction*            _valueAtParticle = _StressField_ValueAtParticle_Recalculate;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType                             nameAllocationType = ZERO;
+	AllocationType                             nameAllocationType = (AllocationType)ZERO;
 	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = ZERO;
 	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
 	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
@@ -169,8 +169,8 @@ void _StressField_AssignFromXML( void* stressField, Stg_ComponentFactory* cf, vo
 
 void _StressField_Build( void* stressField, void* data ) {
 	StressField* self = (StressField*) stressField;
-	Name              tmpName;
-	Name              variableName[6];
+	char*              tmpName;
+	char*              variableName[6];
 	Dimension_Index   dim = self->constitutiveMatrix->dim;
 	Variable_Index variable_I;
 	Node_DomainIndex  node_I;
@@ -202,7 +202,7 @@ void _StressField_Build( void* stressField, void* data ) {
 		(AbstractContext*)self->context,
 		Variable_DataType_Double, 
 		self->fieldComponentCount,
-		&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
+		(Index*)(&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains), 
 		NULL,
 		(void**)&self->data, 
 		self->variable_Register,

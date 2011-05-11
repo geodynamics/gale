@@ -60,7 +60,7 @@
 
 	void _SmoothVelGradField_Print( void* _self, Stream* stream );
 
-	void* _SmoothVelGradField_Copy( void* _self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _SmoothVelGradField_Copy( const void* _self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _SmoothVelGradField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data );
 

@@ -91,7 +91,7 @@
 		(Underworld_SwarmOutput*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define Underworld_SwarmOutput_DeepCopy( self ) \
 		(Underworld_SwarmOutput*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _Underworld_SwarmOutput_Copy( void* swarmOutput, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Underworld_SwarmOutput_Copy( const void* swarmOutput, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Underworld_SwarmOutput_DefaultNew( Name name ) ;
    void _Underworld_SwarmOutput_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

@@ -5,7 +5,7 @@
 #include <PICellerator/PICellerator.h>
 #include "types.h"
 
-const char* WallEnumToStr[Wall_Size] = {
+Name WallEnumToStr[Wall_Size] = {
        "back",
        "left",
        "bottom",

@@ -124,7 +124,7 @@ void _Pouliquen_etal_Init(
 	EP_PrependClassHook( Context_GetEntryPoint( self->context, AbstractContext_EP_DumpClass ),
 								_Pouliquen_etal_UpdateDrawParameters, self );
 	
-	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &materialPoint, self->particleExtHandle );
+	particleExt = (Pouliquen_etal_Particle*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &materialPoint, self->particleExtHandle );
 	
 	/* Setup Variables for Visualisation */
 	self->brightness = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"Pouliquen_etalBrightness", (ArithPointer) &particleExt->brightness - (ArithPointer) &materialPoint, Variable_DataType_Float  );
@@ -282,7 +282,7 @@ double _Pouliquen_etal_GetYieldCriterion(
 	Pouliquen_etal_Particle*          particleExt;
 	double                            strainRateInv;
 	
-	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
+	particleExt = (Pouliquen_etal_Particle*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 
 	FeVariable_InterpolateWithinElement( self->pressureField, lElement_I, xi, &pressure );
 	FeVariable_InterpolateWithinElement( self->strainRateInvField, lElement_I, xi, &strainRateInv );
@@ -435,7 +435,7 @@ void _Pouliquen_etal_HasYielded(
 
 	strainWeakeningRatio = StrainWeakening_CalcRatio( self->strainWeakening, materialPoint );
 
-	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
+	particleExt = (Pouliquen_etal_Particle*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 
 	if (fabs(particleExt->strainRateInv) <1.0e-10)
 		particleExt->strainRateInv = 1.0e-10;

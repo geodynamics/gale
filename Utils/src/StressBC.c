@@ -66,7 +66,7 @@
 /* Textual name of this class */
 const Type StressBC_Type = "StressBC";
 
-extern const char* WallEnumToStr[Wall_Size];
+extern Name WallEnumToStr[Wall_Size];
 
 StressBC* StressBC_New( 
 		Name                                      name,

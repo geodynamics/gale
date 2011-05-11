@@ -26,7 +26,7 @@
 #ifndef __Underworld_plugins_EulerDeform_EulerDeform_h__
 #define __Underworld_plugins_EulerDeform_EulerDeform_h__
 
-	extern const char*	EULERDEFORM_PLUGIN_TAG;
+	extern Name	EULERDEFORM_PLUGIN_TAG;
 
 
 	Index Underworld_EulerDeform_Register( PluginsManager* pluginsMgr );

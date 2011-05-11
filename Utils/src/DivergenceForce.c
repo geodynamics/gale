@@ -269,7 +269,7 @@ void _DivergenceForce_AssembleElement( void* forceTerm,
   Mesh_GetIncidence(mesh, Mesh_GetDimSize(mesh), lElement_I,
                     MT_VERTEX,incidence);
   elementNodeCount=IArray_GetSize(incidence);
-  elementNodes=IArray_GetPtr(incidence);
+  elementNodes=(Node_DomainIndex*)IArray_GetPtr(incidence);
   
   for( eNode_I = 0 ; eNode_I < elementNodeCount; eNode_I++ ) {
     if(Stg_Shape_IsCoordInside(self->domainShape,

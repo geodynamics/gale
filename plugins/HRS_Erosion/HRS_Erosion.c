@@ -122,8 +122,8 @@ void Underworld_HRS_Erosion_Execute( TimeIntegrand* crdAdvector,
 
   RegularMeshUtils_Node_1DTo3D
     ( mesh, Mesh_DomainToGlobal( mesh, MT_VERTEX, nNodes-1 ), ijk_right );
-  on_top=(ijk_right[1]==grid->sizes[1]-1);
-  on_right=(ijk_right[0]==grid->sizes[0]-1);
+  on_top=(ijk_right[1]==grid->sizes[1]-1) ? True : False;
+  on_right=(ijk_right[0]==grid->sizes[0]-1) ? True : False;
   if(on_top && on_right)
     {
       x_right=mesh->verts[nNodes-1][0];
@@ -331,7 +331,7 @@ void _Underworld_HRS_Erosion_AssignFromXML( void* component,
                           Underworld_HRS_Erosion_Type, 
                           sizeof(Underworld_HRS_Erosion_Context) );
 
-  spCtx = ExtensionManager_Get( uwCtx->extensionMgr, uwCtx,
+  spCtx = (Underworld_HRS_Erosion_Context*)ExtensionManager_Get( uwCtx->extensionMgr, uwCtx,
                                 Underworld_HRS_Erosion_ContextHandle );
   memset( spCtx, 0, sizeof(Underworld_HRS_Erosion_Context) );
   spCtx->ctx = (AbstractContext*)uwCtx;
@@ -376,7 +376,7 @@ void _Underworld_HRS_Erosion_Build( void* codelet, void* data ) {
 	assert( UnderworldCtx );
 
 	/* Get the context. */
-	spCtx = ExtensionManager_Get( UnderworldCtx->extensionMgr, UnderworldCtx, Underworld_HRS_Erosion_ContextHandle );
+	spCtx = (Underworld_HRS_Erosion_Context*)ExtensionManager_Get( UnderworldCtx->extensionMgr, UnderworldCtx, Underworld_HRS_Erosion_ContextHandle );
 
 	if( !spCtx->mesh )
 		return;
@@ -386,7 +386,7 @@ void _Underworld_HRS_Erosion_Build( void* codelet, void* data ) {
            values. */
 	TimeIntegrator_AppendSetupEP( spCtx->timeIntegrator, 
 					"Underworld_HRS_Erosion_Execute", 
-					Underworld_HRS_Erosion_Execute, 
+                                      (void*)Underworld_HRS_Erosion_Execute, 
 					"HRS_Erosion", 
 					spCtx );
 }

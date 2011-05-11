@@ -105,7 +105,7 @@ void _YieldRheology_Init( YieldRheology* self, StrainWeakening* strainWeakening,
 		}
 		else {
 			/* if the variable has already been created - then just store the pointer */
-			Name hasYieldedVariableName = Stg_Object_AppendSuffix( materialPointsSwarm, (Name)"HasYielded"  );
+			char* hasYieldedVariableName = Stg_Object_AppendSuffix( materialPointsSwarm, (Name)"HasYielded"  );
 			self->hasYieldedVariable = SwarmVariable_Register_GetByName( materialPointsSwarm->swarmVariable_Register, hasYieldedVariableName );
 			Memory_Free( hasYieldedVariableName );
 		}
@@ -129,7 +129,7 @@ void _YieldRheology_Delete( void* rheology ) {
 
 void _YieldRheology_Print( void* rheology, Stream* stream ) {}
 
-void* _YieldRheology_Copy( void* rheology, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _YieldRheology_Copy( const void* rheology, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	YieldRheology*	self = (YieldRheology*)rheology;
 
 	/* TODO */ abort();

@@ -178,7 +178,7 @@ void _BaseRecoveryFeVar_Build( void* _self, void* data ) {
 												NULL, 
 												(void**)NULL,
 												variable_Register,
-												variableName );
+                                            (const char**)variableName );
 
 	for( variable_I = 0; variable_I < dataVariable->dataTypeCounts[0]; variable_I++ )
 		dataVariable->components[variable_I]->allocateSelf = True;

@@ -116,7 +116,7 @@ Bool solB_checkInputParams( Underworld_solB* self ) {
 	return ( 
 			( self->sigma > 0.0 ) && ( self->Z > 0.0 ) &&
 			( self->km > 0.0 )    && ( self->n > 0 )  
-		);
+                 ) ? True : False;
 }
 void* _Underworld_solB_DefaultNew( Name name ) {
 	/* Variables set in this function */

@@ -162,7 +162,7 @@ void VTKOutput_particles(Swarm* swarm,
   YieldRheology*      rheology; 
  
   FILE *fp, *pfp;
-  Name filename;
+  char* filename;
   
   /* Open the processor specific output file */
   Stg_asprintf(&filename,"%s/%s.%d.%05d.vtu",outputPath,swarm->name,myRank,
@@ -295,7 +295,7 @@ void VTKOutput_particles(Swarm* swarm,
                   StoreVisc* self = (StoreVisc*) rheology;
                   StoreVisc_ParticleExt* particleExt;
                   particleExt=
-                    ExtensionManager_Get( materialSwarm->particleExtensionMgr, materialparticle, self->particleExtHandle );
+                    (StoreVisc_ParticleExt*)ExtensionManager_Get( materialSwarm->particleExtensionMgr, materialparticle, self->particleExtHandle );
                   viscosity=particleExt->effVisc;
                 }
               /* Get stress */
@@ -304,7 +304,7 @@ void VTKOutput_particles(Swarm* swarm,
                   StoreStress* self = (StoreStress*) rheology;
                   StoreStress_ParticleExt* particleExt;
                   particleExt=
-                    ExtensionManager_Get( materialSwarm->particleExtensionMgr, materialparticle, self->particleExtHandle );
+                    (StoreStress_ParticleExt*)ExtensionManager_Get( materialSwarm->particleExtensionMgr, materialparticle, self->particleExtHandle );
                   stress[0]=particleExt->stress[0];
                   stress[1]=particleExt->stress[1];
                   stress[2]=particleExt->stress[2];
@@ -509,7 +509,7 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
   int lower[3], upper[3], p_lower[3], p_upper[3];
 
   HydrostaticTerm *hydrostaticTerm;
-  Name field_filename;
+  char* field_filename;
   FILE *field_fp, *pfield_fp;
 
   Dictionary_Entry_Value* field_list;

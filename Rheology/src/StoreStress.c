@@ -74,7 +74,7 @@ void _StoreStress_Init(
 	MaterialPointsSwarm*	materialPointsSwarm,
 	FeVariable*				strainRateField )
 {
-	Name                       variableName[6];
+	char*                       variableName[6];
 	StandardParticle           particle;
 	StoreStress_ParticleExt*   particleExt;
 	Index                      variable_I;
@@ -87,7 +87,7 @@ void _StoreStress_Init(
 	self->particleExtHandle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, (Name)self->type, sizeof( StoreStress_ParticleExt )  );
 	
 	/* Add SwarmVariables for plotting */
-	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle, self->particleExtHandle );
+	particleExt = (StoreStress_ParticleExt*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle, self->particleExtHandle );
 
 	if ( dim == 2 ) {
 		variableName[0] = StG_Strdup( "tau_xx" );
@@ -208,7 +208,7 @@ void _StoreStress_ModifyConstitutiveMatrix(
 	if ( !constitutiveMatrix->previousSolutionExists )
 	  return;
 
-	particleExt      = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
+	particleExt      = (StoreStress_ParticleExt*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 
 	FeVariable_InterpolateWithinElement( self->strainRateField, lElement_I, xi, strainRate );
 	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, strainRate, particleExt->stress );

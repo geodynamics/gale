@@ -156,7 +156,7 @@ void _Director_Init(
 		self->particleExtHandle = 
 			ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, (Name)Director_Type, sizeof(Director_ParticleExt)  );	
 
-		particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle, self->particleExtHandle );
+		particleExt = (Director_ParticleExt*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle, self->particleExtHandle );
 
 		self->directorSwarmVariable = Swarm_NewVectorVariable( materialPointsSwarm, (Name)"Director", (ArithPointer) &particleExt->director - (ArithPointer) &particle,
 			Variable_DataType_Double,
@@ -167,7 +167,7 @@ void _Director_Init(
 		self->dontUpdateParticle = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"dontUpdateParticle", (ArithPointer) &particleExt->dontUpdateParticle - (ArithPointer) &particle, Variable_DataType_Int  );
 	}
 	else {
-		Name variableName;
+		char* variableName;
 
 		/* Get Variables already created */
 		variableName = Stg_Object_AppendSuffix( materialPointsSwarm, (Name)"Director"  );
@@ -184,7 +184,7 @@ void _Director_Init(
 	self->variable = self->directorSwarmVariable->variable;
 
 	TimeIntegrator_AppendSetupEP( self->timeIntegrator,
-		"Director_UpdateVariables", Director_UpdateVariables,  self->name, self );
+                                      "Director_UpdateVariables", (void*)Director_UpdateVariables,  self->name, self );
 }
 
 void* _Director_DefaultNew( Name name ) {

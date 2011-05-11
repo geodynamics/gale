@@ -123,8 +123,8 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
 	Index                var_I = 0;
    Bool                 saveCoords  = Dictionary_GetBool_WithDefault( context->dictionary, (Dictionary_Entry_Key)"saveCoordsWithFields", False  );
    Stream*              errorStream = Journal_Register( Error_Type, (Name)CURR_MODULE_NAME );
-   Name                 variableType = NULL;
-   Name                 topologyType = NULL;
+   char*                variableType = NULL;
+   char*                topologyType = NULL;
    unsigned             componentCount = LiveComponentRegister_GetCount(stgLiveComponentRegister);
    unsigned             compI;
    Stg_Component*       stgComp;
@@ -138,7 +138,7 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
          feMesh = (FeMesh*)stgComp;
 
          nDims             = Mesh_GetDimSize( mesh );
-         totalVerts        = Mesh_GetGlobalSize( mesh, 0 );
+         totalVerts        = Mesh_GetGlobalSize( mesh, (MeshTopology_Dim)0 );
          elementGlobalSize = FeMesh_GetElementGlobalSize(mesh);
 
          /* get connectivity array size */
@@ -214,9 +214,9 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
                if( Stg_Class_IsInstance( feVar->feMesh->generator, MeshAdaptor_Type))        feVarMesh = feVar->feMesh;
                /** make sure that the fevariable femesh is the same as that used above for the geometry definition, if so proceed **/
                if( feVarMesh == feMesh ){
-                     Name   centering = NULL;
+                 char*   centering = NULL;
                      Index  offset = 0;
-                     Index  meshSize = Mesh_GetGlobalSize( feVar->feMesh, 0 );
+                     Index  meshSize = Mesh_GetGlobalSize( feVar->feMesh, (MeshTopology_Dim)0 );
                      Index  dofCountIndex;
                      Index  dofAtEachNodeCount;
 
@@ -303,9 +303,9 @@ void _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream
    Index           ii;
    Swarm*          currentSwarm;
    SwarmVariable*  swarmVar;
-   Name            swarmVarName;
-   Name            variableType = NULL;
-   Name            filename_part = NULL;
+   char*           swarmVarName;
+   char*           variableType = NULL;
+   char*           filename_part = NULL;
    Stream*         errorStream  = Journal_Register( Error_Type, (Name)CURR_MODULE_NAME  );
 	const int       FINISHED_WRITING_TAG = 100;
 	MPI_Status      status;

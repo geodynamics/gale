@@ -67,7 +67,7 @@
 		BoundaryNodesInfo*         boundaryNodesInfo; \
 		ConstitutiveMatrix*        constitutiveMatrix; \
 		/* Entry Point Setup */ \
-		Name                       recoveryEPName; \
+		char*                       recoveryEPName; \
 		EntryPoint*                recoveryEP; \
 		EntryPoint_Register*       entryPoint_Register; \
 		/* General crap */ \
@@ -104,7 +104,7 @@
 	#define REP_Algorithm_DeepCopy( self ) \
 		(REP_Algorithm*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _REP_Algorithm_Copy( void* rep, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _REP_Algorithm_Copy( const void* rep, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	/* Private Functions */
 	void _REP_Algorithm_Init( void* rep,
@@ -139,7 +139,13 @@
 	void _REP_Algorithm_DoBoundaries( RecoveredFeVariable* self, int lNodeID, BoundaryNodesInfo* bNodeInfo );
 
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 	void dgesv_( int* N, int* NRHS, double* AT, int* LDA, int* IPIV, double* bVec, int* LDB, int* info);
-
+#ifdef __cplusplus
+}
+#endif
 #endif
 

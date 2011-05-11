@@ -53,7 +53,7 @@
 
 	void _NodalPressureField_Print( void* _self, Stream* stream );
 
-	void* _NodalPressureField_Copy( void* _self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _NodalPressureField_Copy( const void* _self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _NodalPressureField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, void* data ) ;
 

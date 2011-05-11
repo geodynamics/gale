@@ -74,7 +74,7 @@ void* _SmoothVelGradField_DefaultNew( Name name ) {
 	ParticleFeVariable_ValueAtParticleFunction*            _valueAtParticle = _SmoothVelGradField_ValueAtParticle;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType                             nameAllocationType = ZERO;
+	AllocationType                             nameAllocationType = (AllocationType)ZERO;
 	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = ZERO;
 	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
 	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
@@ -102,7 +102,7 @@ void _SmoothVelGradField_Print( void* _self, Stream* stream ) {
    _ParticleFeVariable_Print( self, stream );
 }
 
-void* _SmoothVelGradField_Copy( void* _self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _SmoothVelGradField_Copy( const void* _self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
    abort();
 }
 
@@ -142,8 +142,8 @@ void _SmoothVelGradField_AssignFromXML( void* _self, Stg_ComponentFactory* cf, v
 
 void _SmoothVelGradField_Build( void* _self, void* data ) {
    SmoothVelGradField* self = (SmoothVelGradField*) _self;
-   Name tmpName;
-   Name variableName[9];
+   char* tmpName;
+   char* variableName[9];
    Variable_Index variable_I;
    Node_DomainIndex  node_I;
    int dim;
@@ -180,7 +180,7 @@ void _SmoothVelGradField_Build( void* _self, void* data ) {
 		(AbstractContext*)self->context,	
       Variable_DataType_Double, 
       self->fieldComponentCount,
-      &((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
+      (Index*)(&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains), 
       NULL,
       (void**)&self->data, 
       self->variable_Register,
