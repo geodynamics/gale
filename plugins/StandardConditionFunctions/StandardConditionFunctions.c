@@ -254,8 +254,35 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
   condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File10,
                                    "File10");
   ConditionFunction_Register_Add(condFunc_Register,condFunc);
-  condFunc=ConditionFunction_New(StgFEM_StandardConditionFunctions_Equation,
-                                 "Equation");
+  condFunc=ConditionFunction_New(StgFEM_StandardConditionFunctions_Equation1,
+                                 "Equation1");
+  ConditionFunction_Register_Add(condFunc_Register,condFunc);
+  condFunc=ConditionFunction_New(StgFEM_StandardConditionFunctions_Equation2,
+                                 "Equation2");
+  ConditionFunction_Register_Add(condFunc_Register,condFunc);
+  condFunc=ConditionFunction_New(StgFEM_StandardConditionFunctions_Equation3,
+                                 "Equation3");
+  ConditionFunction_Register_Add(condFunc_Register,condFunc);
+  condFunc=ConditionFunction_New(StgFEM_StandardConditionFunctions_Equation4,
+                                 "Equation4");
+  ConditionFunction_Register_Add(condFunc_Register,condFunc);
+  condFunc=ConditionFunction_New(StgFEM_StandardConditionFunctions_Equation5,
+                                 "Equation5");
+  ConditionFunction_Register_Add(condFunc_Register,condFunc);
+  condFunc=ConditionFunction_New(StgFEM_StandardConditionFunctions_Equation6,
+                                 "Equation6");
+  ConditionFunction_Register_Add(condFunc_Register,condFunc);
+  condFunc=ConditionFunction_New(StgFEM_StandardConditionFunctions_Equation7,
+                                 "Equation7");
+  ConditionFunction_Register_Add(condFunc_Register,condFunc);
+  condFunc=ConditionFunction_New(StgFEM_StandardConditionFunctions_Equation8,
+                                 "Equation8");
+  ConditionFunction_Register_Add(condFunc_Register,condFunc);
+  condFunc=ConditionFunction_New(StgFEM_StandardConditionFunctions_Equation9,
+                                 "Equation9");
+  ConditionFunction_Register_Add(condFunc_Register,condFunc);
+  condFunc=ConditionFunction_New(StgFEM_StandardConditionFunctions_Equation10,
+                                 "Equation10");
   ConditionFunction_Register_Add(condFunc_Register,condFunc);
 }
 
@@ -2661,7 +2688,119 @@ int Binary_Search(double *data, int s, int e, const double value)
   return start;
 }
 
-void StgFEM_StandardConditionFunctions_Equation( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+void StgFEM_StandardConditionFunctions_EquationN(Node_LocalIndex node_lI,
+                                                 Variable_Index var_I,
+                                                 void* _context,
+                                                 void* _result,
+                                                 std::string equation_string,
+                                                 const int equation_number);
+
+void StgFEM_StandardConditionFunctions_Equation1(Node_LocalIndex node_lI,
+                                                 Variable_Index var_I,
+                                                 void* _context,
+                                                 void* _result)
+{
+  static std::string equation_string;
+  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+                                              equation_string,1);
+}
+
+void StgFEM_StandardConditionFunctions_Equation2(Node_LocalIndex node_lI,
+                                                 Variable_Index var_I,
+                                                 void* _context,
+                                                 void* _result)
+{
+  static std::string equation_string;
+  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+                                              equation_string,2);
+}
+
+void StgFEM_StandardConditionFunctions_Equation3(Node_LocalIndex node_lI,
+                                                 Variable_Index var_I,
+                                                 void* _context,
+                                                 void* _result)
+{
+  static std::string equation_string;
+  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+                                              equation_string,3);
+}
+
+void StgFEM_StandardConditionFunctions_Equation4(Node_LocalIndex node_lI,
+                                                 Variable_Index var_I,
+                                                 void* _context,
+                                                 void* _result)
+{
+  static std::string equation_string;
+  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+                                              equation_string,4);
+}
+
+void StgFEM_StandardConditionFunctions_Equation5(Node_LocalIndex node_lI,
+                                                 Variable_Index var_I,
+                                                 void* _context,
+                                                 void* _result)
+{
+  static std::string equation_string;
+  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+                                              equation_string,5);
+}
+
+void StgFEM_StandardConditionFunctions_Equation6(Node_LocalIndex node_lI,
+                                                 Variable_Index var_I,
+                                                 void* _context,
+                                                 void* _result)
+{
+  static std::string equation_string;
+  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+                                              equation_string,6);
+}
+
+void StgFEM_StandardConditionFunctions_Equation7(Node_LocalIndex node_lI,
+                                                 Variable_Index var_I,
+                                                 void* _context,
+                                                 void* _result)
+{
+  static std::string equation_string;
+  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+                                              equation_string,7);
+}
+
+void StgFEM_StandardConditionFunctions_Equation8(Node_LocalIndex node_lI,
+                                                 Variable_Index var_I,
+                                                 void* _context,
+                                                 void* _result)
+{
+  static std::string equation_string;
+  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+                                              equation_string,8);
+}
+
+void StgFEM_StandardConditionFunctions_Equation9(Node_LocalIndex node_lI,
+                                                 Variable_Index var_I,
+                                                 void* _context,
+                                                 void* _result)
+{
+  static std::string equation_string;
+  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+                                              equation_string,9);
+}
+
+void StgFEM_StandardConditionFunctions_Equation10(Node_LocalIndex node_lI,
+                                                  Variable_Index var_I,
+                                                  void* _context,
+                                                  void* _result)
+{
+  static std::string equation_string;
+  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+                                              equation_string,10);
+}
+
+void StgFEM_StandardConditionFunctions_EquationN(Node_LocalIndex node_lI,
+                                                 Variable_Index var_I,
+                                                 void* _context,
+                                                 void* _result,
+                                                 std::string equation_string,
+                                                 const int equation_number) 
 {
   FiniteElementContext *context=(FiniteElementContext*)_context;
   FeVariable *feVariable=(FeVariable*)FieldVariable_Register_GetByName
@@ -2669,9 +2808,19 @@ void StgFEM_StandardConditionFunctions_Equation( Node_LocalIndex node_lI, Variab
   FeMesh *mesh(feVariable->feMesh);
   Dictionary *dictionary=context->dictionary;
   double *coord=Mesh_GetVertex(mesh,node_lI);
-  char *equation_string=Dictionary_GetString(dictionary,"Equation");
   double *result=(double*)_result;
 
+  if(equation_string.empty())
+    {
+      std::stringstream ss;
+      ss << "Equation" << equation_number;
+      equation_string=std::string(Dictionary_GetString(dictionary,
+                                                       ss.str().c_str()));
+      Journal_Firewall(!equation_string.empty(),
+                       Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_EquationN"),
+                       "The equation given for %s is empty.",
+                       ss.str().c_str());
+    }
   try
     {
       mu::Parser p;
@@ -2687,8 +2836,6 @@ void StgFEM_StandardConditionFunctions_Equation( Node_LocalIndex node_lI, Variab
     {
       Journal_Firewall(false,
                        Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_Equation"),
-                       "%s\n",e.GetMsg().c_str());
+                       "Error when parsing equation: %s\n",e.GetMsg().c_str());
     }
-
-
 }
