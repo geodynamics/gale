@@ -76,7 +76,7 @@ void _VolumeWeights_Print( void* weights, Stream* stream );
     (VolumeWeights*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 #define VolumeWeights_DeepCopy( self )                                  \
     (VolumeWeights*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-void* _VolumeWeights_Copy( void* weights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+void* _VolumeWeights_Copy( const void* weights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
         
 void* _VolumeWeights_DefaultNew( Name name ) ;
 void _VolumeWeights_AssignFromXML( void* weights, Stg_ComponentFactory* cf, void* data ) ;

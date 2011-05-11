@@ -79,7 +79,7 @@
 	*/
 	void _Materials_Register_Delete( void* _materialsRegister ) ;
 	void _Materials_Register_Print( void* _materialsRegister, Stream* stream ) ;
-	void* _Materials_Register_Copy( void* _materialsRegister, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Materials_Register_Copy( const void* _materialsRegister, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions

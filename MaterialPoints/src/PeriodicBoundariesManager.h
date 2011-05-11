@@ -117,7 +117,7 @@
 
 	void _PeriodicBoundariesManager_Print( void* context, Stream* stream );
 
-	void* _PeriodicBoundariesManager_Copy( void* periodicBCsManager, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _PeriodicBoundariesManager_Copy( const void* periodicBCsManager, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _PeriodicBoundariesManager_Build( void* periodicBCsManager, void* data );
 

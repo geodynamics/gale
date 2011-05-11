@@ -94,7 +94,7 @@ void _DiffusionSMT_Init( void* matrixTerm ) {
 
 void _DiffusionSMT_Delete( void* matrixTerm ) {
     DiffusionSMT* self = (DiffusionSMT*)matrixTerm;
-    int ii;
+    Index ii;
 
     for(ii = 0; ii < self->materialSwarmCount; ii++)
 	Stg_Class_Delete( self->diffusionSwarmVariables[ii] );
@@ -147,14 +147,14 @@ void _DiffusionSMT_AssignFromXML( void* matrixTerm, Stg_ComponentFactory* cf, vo
 void _DiffusionSMT_Build( void* matrixTerm, void* data ) {
     DiffusionSMT*             self             = (DiffusionSMT*)matrixTerm;
     AbstractContext*                 context;
-    Stg_ComponentFactory*            cf;
+    Stg_ComponentFactory*            cf=NULL;
     Materials_Register*              materials_Register = self->materials_Register;
     IntegrationPointsSwarm*          swarm = (IntegrationPointsSwarm*)self->integrationSwarm;
     MaterialPointsSwarm**            materialSwarms;
     DiffusionSMT_MaterialExt*   materialExt;
-    Name                             name;
+    char*                            name;
     Material*                        material;
-    int ii;
+    Index ii;
 
     _StiffnessMatrixTerm_Build( self, data );
 
@@ -172,8 +172,8 @@ void _DiffusionSMT_Build( void* matrixTerm, void* data ) {
 
     for ( ii = 0 ; ii < Materials_Register_GetCount( materials_Register ) ; ii++) {
 	material = Materials_Register_GetByIndex( materials_Register, ii );
-	materialExt = ExtensionManager_GetFunc( material->extensionMgr, material,
-						self->materialExtHandle );
+	materialExt = (DiffusionSMT_MaterialExt*)ExtensionManager_GetFunc( material->extensionMgr, material,
+                                                                           self->materialExtHandle );
 
 	if ( cf ) {
 	    materialExt->diffusion = Stg_ComponentFactory_GetDouble( cf, material->name, (Dictionary_Entry_Key)"diffusivity", 0.0  );
@@ -208,7 +208,7 @@ void _DiffusionSMT_Build( void* matrixTerm, void* data ) {
 
 void _DiffusionSMT_Initialise( void* matrixTerm, void* data ) {
     DiffusionSMT*             self             = (DiffusionSMT*)matrixTerm;
-    int ii;
+    Index ii;
 
     _StiffnessMatrixTerm_Initialise( self, data );
 
@@ -222,7 +222,7 @@ void _DiffusionSMT_Execute( void* matrixTerm, void* data ) {
 
 void _DiffusionSMT_Destroy( void* matrixTerm, void* data ) {
     DiffusionSMT*             self             = (DiffusionSMT*)matrixTerm;
-    int ii;
+    Index ii;
     _StiffnessMatrixTerm_Destroy( matrixTerm, data );
     for ( ii = 0; ii < self->materialSwarmCount; ++ii )
       Stg_Component_Destroy( self->diffusionSwarmVariables[ii], data, False );
@@ -274,8 +274,7 @@ void _DiffusionSMT_AssembleElement(
 
 	material = IntegrationPointsSwarm_GetMaterialOn(
 	    (IntegrationPointsSwarm*) swarm, currIntegrationPoint );
-	materialExt = ExtensionManager_Get(
-	    material->extensionMgr, material, self->materialExtHandle );
+	materialExt = (DiffusionSMT_MaterialExt*)ExtensionManager_Get(material->extensionMgr, material, self->materialExtHandle );
 
 	xi = currIntegrationPoint->xi;
 	weight = currIntegrationPoint->weight;

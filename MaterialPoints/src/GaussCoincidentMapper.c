@@ -71,7 +71,7 @@ GaussCoincidentMapper* GaussCoincidentMapper_New(
 	IntegrationPointsSwarm*		integrationSwarm,
 	MaterialPointsSwarm*			materialSwarm )
 {
-	GaussCoincidentMapper* self = _GaussCoincidentMapper_DefaultNew( name );
+  GaussCoincidentMapper* self = (GaussCoincidentMapper*)_GaussCoincidentMapper_DefaultNew( name );
 
 	self->isConstructed = True;
 	_IntegrationPointMapper_Init( self, context, integrationSwarm );
@@ -134,7 +134,7 @@ void _GaussCoincidentMapper_Print( void* mapper, Stream* stream ) {
 	_IntegrationPointMapper_Print( self, stream );
 }
 
-void* _GaussCoincidentMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _GaussCoincidentMapper_Copy( const void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	return _IntegrationPointMapper_Copy( mapper, dest, deep, nameExt, ptrMap );
 }
 
@@ -174,7 +174,7 @@ void _GaussCoincidentMapper_Map( void* mapper ) {
 
 #ifdef CAUTIOUS
     Index						dim_I;
-    Stream*						errorStream = Journal_Register( Error_Type, (Name)self->type  );
+    Stream*						errorStream = Journal_Register( Error_Type, self->type  );
 #endif
     Stream*						debugStream = Swarm_Debug;
 	

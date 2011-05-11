@@ -60,9 +60,9 @@ void MaterialCentroid( PICelleratorContext* context ) {
 	Stream*                     stream                = Journal_Register( Info_Type, (Name)"MaterialCentroid" );
 
 	if (!beenHere ) {
-		Name                 swarmName;
-		Name                 materialName;
-		Name                 filename;
+		char*                swarmName;
+		char*                materialName;
+		char*                filename;
       Bool                 fileOpened;
       Stream*              errorStream  = Journal_Register( Error_Type, (Name)CURR_MODULE_NAME  );
 

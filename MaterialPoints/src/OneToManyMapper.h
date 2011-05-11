@@ -97,7 +97,7 @@ void _OneToManyMapper_Init( void* mapper, MaterialPointsSwarm* materialSwarm );
 		(OneToManyMapper*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define OneToManyMapper_DeepCopy( self ) \
 		(OneToManyMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _OneToManyMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _OneToManyMapper_Copy( const void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void _OneToManyMapper_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data );
 	void _OneToManyMapper_Build( void* mapper, void* data ) ;

@@ -43,7 +43,7 @@ const Type VolumeWeights_Type = "VolumeWeights";
 ** Constructors
 */
 VolumeWeights* VolumeWeights_New( Name name, Dimension_Index dim, Stg_Shape* shape, FeMesh* mesh ) {
-	VolumeWeights *self = _VolumeWeights_DefaultNew( name );
+  VolumeWeights *self = (VolumeWeights*)_VolumeWeights_DefaultNew( name );
 
 	self->isConstructed = True;
 	_WeightsCalculator_Init( self, dim );
@@ -95,7 +95,7 @@ void _VolumeWeights_Print( void* weights, Stream* stream ) {
 
 
 
-void* _VolumeWeights_Copy( void* weights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _VolumeWeights_Copy( const void* weights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
     VolumeWeights*	self = (VolumeWeights*)weights;
     VolumeWeights*	newVolumeWeights;
 	

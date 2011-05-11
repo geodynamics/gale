@@ -102,7 +102,7 @@ extern const Type WeightsCalculator_Type;
 	    (WeightsCalculator*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define WeightsCalculator_DeepCopy( self )                              \
 	    (WeightsCalculator*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _WeightsCalculator_Copy( void* self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _WeightsCalculator_Copy( const void* self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
         
 	void _WeightsCalculator_AssignFromXML( void* self, Stg_ComponentFactory* cf, void* data ) ;
 	void _WeightsCalculator_Build( void* self, void* data ) ;

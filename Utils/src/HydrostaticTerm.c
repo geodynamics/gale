@@ -331,7 +331,6 @@ double HydrostaticTerm_Temperature(void* forceTerm, Coord coord)
 double HydrostaticTerm_Density( void* forceTerm, Coord coord)
 {
   HydrostaticTerm *self=(HydrostaticTerm *)forceTerm;
-  double h=self->height-coord[1];
   double T, density, alpha;
   double current_height, current_boundary;
 

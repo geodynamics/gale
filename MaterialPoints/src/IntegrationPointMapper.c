@@ -99,11 +99,11 @@ void _IntegrationPointMapper_Print( void* mapper, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void* _IntegrationPointMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _IntegrationPointMapper_Copy( const void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	IntegrationPointMapper* self = (IntegrationPointMapper*)mapper;
 	IntegrationPointMapper* newCopy = (IntegrationPointMapper*)_Stg_Component_Copy( self, dest, deep, nameExt, ptrMap );
 
-	newCopy->integrationSwarm = Stg_Class_Copy( self->integrationSwarm, NULL, deep, nameExt, ptrMap );
+	newCopy->integrationSwarm = (IntegrationPointsSwarm*)(Stg_Class_Copy( self->integrationSwarm, NULL, deep, nameExt, ptrMap ));
 
 	return newCopy;
 }

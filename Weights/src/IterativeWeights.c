@@ -124,7 +124,7 @@ void _IterativeWeights_Print( void* iterativeWeights, Stream* stream ) {
 
 
 
-void* _IterativeWeights_Copy( void* iterativeWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _IterativeWeights_Copy( const void* iterativeWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
     IterativeWeights*	self = (IterativeWeights*)iterativeWeights;
     IterativeWeights*	newIterativeWeights;
 	

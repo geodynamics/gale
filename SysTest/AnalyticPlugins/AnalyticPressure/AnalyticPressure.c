@@ -102,7 +102,7 @@ void* _AnalyticPressure_DefaultNew( Name name ) {
 }
 
 Index PICellerator_AnalyticPressure_Register( PluginsManager* pluginsManager ) {
-  return PluginsManager_Submit( pluginsManager, AnalyticPressure_Type, (Name)"0", _AnalyticPressure_DefaultNew  );
+  return PluginsManager_Submit( pluginsManager, AnalyticPressure_Type, "0", _AnalyticPressure_DefaultNew  );
 }
 
 

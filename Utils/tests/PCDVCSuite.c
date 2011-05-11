@@ -102,7 +102,7 @@ void PCDVCSuite_Setup( PCDVCSuiteData* data ) {
 void PCDVCSuite_Teardown( PCDVCSuiteData* data ) {
 }
 
-void compareAgainstReferenceSolution(PICelleratorContext* context, Stream* stream, double mean, double standardDeviation, char* expFile) {
+void compareAgainstReferenceSolution(PICelleratorContext* context, Stream* stream, double mean, double standardDeviation, Name expFile) {
 	double 	meanTolerance, stdDevTolerance;
 	double 	expectedMean, expectedStdDev;
 	char		expectedFile[PCU_PATH_MAX];
@@ -124,7 +124,6 @@ void testElementIntegral_CircleInterface( PICelleratorContext* context, double* 
 	Swarm*					integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"integrationSwarm" );
 	Swarm*					materialSwarm    = (Swarm* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialPoints" );
 	FeMesh*					mesh             = (FeMesh* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"linearMesh" );
-	WeightsCalculator*	weights          = (WeightsCalculator* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"weights"  );
 	FeVariable*				feVariable;
 	Element_LocalIndex 	lElement_I       = 0;
 	double					analyticValue    = 0.0;
@@ -134,7 +133,7 @@ void testElementIntegral_CircleInterface( PICelleratorContext* context, double* 
 	double					errorSum         = 0.0;
 	Index						loop_I;
 	Index						count            = Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "SampleSize", 5000 );
-	void*						data;
+	void*						data=NULL;
 		      IntegrationPoint* intParticle;
 		      MaterialPoint*  materialPoint;
 	/* Create FeVariable */
@@ -169,7 +168,7 @@ void testElementIntegral_CircleInterface( PICelleratorContext* context, double* 
 		/* calling this function again causes a first iteration in Lloyd's algorithm for the Voronoi cells which we don't want here */
 		//WeightsCalculator_CalculateCell( weights, integrationSwarm, lElement_I );
 		if(loop_I%10 == 0){
-		      int i;
+		      Index i;
 
 		      for(i=0;i<integrationSwarm->cellParticleCountTbl[0];i++){
 			    intParticle  =  (IntegrationPoint*)Swarm_ParticleInCellAt( integrationSwarm, 0, i );
@@ -201,7 +200,6 @@ void testElementIntegral_PolynomialFunction( PICelleratorContext* context, doubl
 	Swarm*					integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"integrationSwarm" );
 	Swarm*					materialSwarm    = (Swarm* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialPoints" );
 	FeMesh*					mesh             = (FeMesh* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"linearMesh" );
-	WeightsCalculator*	weights          = (WeightsCalculator* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"weights"  );
 	FeVariable*				feVariable;
 	Element_LocalIndex 	lElement_I       = 0;
 	double					analyticValue    = 0.0;
@@ -211,7 +209,7 @@ void testElementIntegral_PolynomialFunction( PICelleratorContext* context, doubl
 	double					errorSum         = 0.0;
 	Index						loop_I;
 	Index						count            = Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "SampleSize", 5000 );
-	void*						data;
+	void*						data=NULL;
 
 	/* Create FeVariable */
 	feVariable = FeVariable_New_Full(
@@ -265,7 +263,6 @@ void testElementIntegral_ExponentialInterface( PICelleratorContext* context, dou
 	Swarm*              integrationSwarm = (Swarm*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"integrationSwarm" );
 	Swarm*              materialSwarm    = (Swarm* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialPoints" );
 	FeMesh* 	    mesh             = (FeMesh* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"linearMesh" );
-	WeightsCalculator*  weights          = (WeightsCalculator* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"weights"  );
 	FeVariable*         feVariable;
 	Element_LocalIndex  lElement_I       = 0;
 	double              analyticValue    = 0.0;
@@ -275,7 +272,7 @@ void testElementIntegral_ExponentialInterface( PICelleratorContext* context, dou
 	double              errorSum         = 0.0;
 	Index               loop_I;
 	Index               count            = Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "SampleSize", 5000 );
-	void*               data;
+	void*               data=NULL;
 
 	/* Create FeVariable */
 	feVariable = FeVariable_New_Full(
@@ -336,21 +333,21 @@ void PCDVCSuite_Test( PCDVCSuiteData* data ) {
 	pcu_filename_input( "testPCDVC.xml", inputFile );
 
    /* rejigged this test to clean up after each run */
-	context = _PICelleratorContext_DefaultNew( "context" );
+	context = (PICelleratorContext*)_PICelleratorContext_DefaultNew( "context" );
 	cf = stgMainInitFromXML( inputFile, MPI_COMM_WORLD, context );
 	stgMainBuildAndInitialise( cf );
 	testElementIntegral_CircleInterface( context, &mean, &standardDeviation );
 	compareAgainstReferenceSolution(context, stream, mean, standardDeviation, "testPCDVC_CircleInterface.expected" );
 	stgMainDestroy( cf );
 
-   context = _PICelleratorContext_DefaultNew( "context" );
+        context = (PICelleratorContext*)_PICelleratorContext_DefaultNew( "context" );
 	cf = stgMainInitFromXML( inputFile, MPI_COMM_WORLD, context );
 	stgMainBuildAndInitialise( cf );
 	testElementIntegral_PolynomialFunction( context, &mean, &standardDeviation );
 	compareAgainstReferenceSolution(context, stream, mean, standardDeviation, "testPCDVC_PolynomialFunction.expected" );
 	stgMainDestroy( cf );
 
-   context = _PICelleratorContext_DefaultNew( "context" );
+        context = (PICelleratorContext*)_PICelleratorContext_DefaultNew( "context" );
 	cf = stgMainInitFromXML( inputFile, MPI_COMM_WORLD, context );
 	stgMainBuildAndInitialise( cf );
 	testElementIntegral_ExponentialInterface( context, &mean, &standardDeviation );

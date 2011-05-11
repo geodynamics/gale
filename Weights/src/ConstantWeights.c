@@ -64,7 +64,7 @@ const Type ConstantWeights_Type = "ConstantWeights";
 */
 
 ConstantWeights* ConstantWeights_New( Name name, int dim ) {
-    ConstantWeights *self = _ConstantWeights_DefaultNew( name );
+  ConstantWeights *self = (ConstantWeights*)_ConstantWeights_DefaultNew( name );
 
     self->isConstructed = True;
     _WeightsCalculator_Init( self, dim );
@@ -115,7 +115,7 @@ void _ConstantWeights_Print( void* constantWeights, Stream* stream ) {
 
 
 
-void* _ConstantWeights_Copy( void* constantWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ConstantWeights_Copy( const void* constantWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
     ConstantWeights*    self = (ConstantWeights*)constantWeights;
     ConstantWeights*    newConstantWeights;
         

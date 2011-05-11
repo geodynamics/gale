@@ -79,7 +79,7 @@ SwarmAdvectionInAPlane* SwarmAdvectionInAPlane_New(
 		PeriodicBoundariesManager*                 periodicBCsManager )
 {
 	SwarmAdvectionInAPlane* self = (SwarmAdvectionInAPlane*) _SwarmAdvectionInAPlane_DefaultNew( name );
-	int whichaxis;
+	int whichaxis=0;
 	
 	/* 	SwarmAdvectionInAPlane_InitAll */
 	_TimeIntegrand_Init( self, context, timeIntegrator, swarm->particleCoordVariable->variable, 0, NULL,
@@ -116,7 +116,7 @@ void _SwarmAdvectionInAPlane_Init( SwarmAdvectionInAPlane* self, int whichaxis )
 ** Virtual functions
 */
 
-void* _SwarmAdvectionInAPlane_Copy( void* swarmAdvector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _SwarmAdvectionInAPlane_Copy( const void* swarmAdvector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	SwarmAdvectionInAPlane*	self = (SwarmAdvectionInAPlane*)swarmAdvector;
 	SwarmAdvectionInAPlane*	newSwarmAdvectionInAPlane;
 	

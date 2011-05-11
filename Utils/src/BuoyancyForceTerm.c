@@ -227,7 +227,7 @@ void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 	IntegrationPointsSwarm*          swarm              = (IntegrationPointsSwarm*)self->integrationSwarm;
 	MaterialPointsSwarm**            materialSwarms;
 	Index                            materialSwarm_I;
-	Name                             name;
+	char*                            name;
 	Stg_ComponentFactory*            cf;
 
 	cf = self->context->CF;
@@ -244,7 +244,7 @@ void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 			sizeof(BuoyancyForceTerm_MaterialExt) );
 	for ( material_I = 0 ; material_I < Materials_Register_GetCount( materials_Register ) ; material_I++) {
 		material = Materials_Register_GetByIndex( materials_Register, material_I );
-		materialExt = ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
+		materialExt = (BuoyancyForceTerm_MaterialExt*)ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
 
 		materialExt->density = Stg_ComponentFactory_GetDouble( cf, material->name, (Dictionary_Entry_Key)"density", 0.0  );
 		materialExt->alpha   = Stg_ComponentFactory_GetDouble( cf, material->name, (Dictionary_Entry_Key)"alpha", 0.0  );

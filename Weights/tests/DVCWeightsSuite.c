@@ -109,7 +109,7 @@ void DVCWeightsSuite_Teardown( DVCWeightsSuiteData* data ) {
 void DVCWeightsSuite_TestConstructGrid( DVCWeightsSuiteData* data ) {
    FILE *fp;
    unsigned int   ii=0;
-   const char*    gridFilename = "DVCWeightsSuite_testConstructGrid.txt";
+   Name    gridFilename = "DVCWeightsSuite_testConstructGrid.txt";
    char           expectedGridFilename[PCU_PATH_MAX];
    //int passed=0;
    char line[100];
@@ -179,7 +179,7 @@ void DVCWeightsSuite_TestResetGrid( DVCWeightsSuiteData* data ) {
 
 
 void _DVCWeightsSuite_InitialiseParticleCoords( DVCWeightsSuiteData* data ) {
-   int            i;
+   Index            i;
 
    /*Initialise particle coords */
 
@@ -229,7 +229,7 @@ void _DVCWeightsSuite_InitialiseParticleCoords( DVCWeightsSuiteData* data ) {
 
 
 void DVCWeightsSuite_TestCreateVoronoi( DVCWeightsSuiteData* data ) {
-   int            i;
+   Index            i;
 
    _DVCWeights_ConstructGrid(&data->cells, data->numz, data->numy, data->numx, BBXMIN,BBYMIN,BBZMIN,BBXMAX,BBYMAX,BBZMAX);		
    _DVCWeights_InitialiseStructs( &data->bchain, &data->pList, data->nump);
@@ -259,7 +259,7 @@ void DVCWeightsSuite_TestCreateVoronoi( DVCWeightsSuiteData* data ) {
 void DVCWeightsSuite_TestGetCentroids( DVCWeightsSuiteData* data ) {
    FILE *fp;
    unsigned int   i;
-   const char*    centroidsFilename = "DVCWeightsSuite_testGetCentroids.txt";
+   Name    centroidsFilename = "DVCWeightsSuite_testGetCentroids.txt";
    char           expectedCentroidsFilename[PCU_PATH_MAX];
    char line[100];
    float x,y,z,dx,dy,dz;
@@ -333,7 +333,7 @@ void DVCWeightsSuite_TestDistanceSquared( DVCWeightsSuiteData* data ) {
 void DVCWeightsSuite_TestConstructGrid2D( DVCWeightsSuiteData* data ) {
    FILE *fp;
    unsigned int   ii=0;
-   const char*    gridFilename = "DVCWeightsSuite_testConstructGrid2D.txt";
+   Name    gridFilename = "DVCWeightsSuite_testConstructGrid2D.txt";
    char           expectedGridFilename[PCU_PATH_MAX];
    char line[100];
    float x,y,dx,dy;
@@ -394,7 +394,7 @@ void DVCWeightsSuite_TestResetGrid2D( DVCWeightsSuiteData* data ) {
 }
 
 void _DVCWeightsSuite_InitialiseParticleCoords2D( DVCWeightsSuiteData* data ) {
-   int i;
+   Index i;
 
    /*Initialise particle coords */
    i=0;
@@ -432,7 +432,7 @@ void _DVCWeightsSuite_InitialiseParticleCoords2D( DVCWeightsSuiteData* data ) {
 
 
 void DVCWeightsSuite_TestCreateVoronoi2D( DVCWeightsSuiteData* data ) {
-   int i;
+   Index i;
 
    _DVCWeights_ConstructGrid2D(&data->cells2D,data->numy,data->numx, BBXMIN,BBYMIN,BBXMAX,BBYMAX);
    _DVCWeights_InitialiseStructs2D( &data->bchain2D, &data->pList2D, data->nump2D);
@@ -462,7 +462,7 @@ void DVCWeightsSuite_TestCreateVoronoi2D( DVCWeightsSuiteData* data ) {
 void DVCWeightsSuite_TestGetCentroids2D( DVCWeightsSuiteData* data ) {
    FILE *fp;
    unsigned int   i;
-   const char*    centroidsFilename = "DVCWeightsSuite_testGetCentroids2D.txt";
+   Name    centroidsFilename = "DVCWeightsSuite_testGetCentroids2D.txt";
    char           expectedCentroidsFilename[PCU_PATH_MAX];
    char line[100];
    float x,y,dx,dy;

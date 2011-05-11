@@ -55,7 +55,7 @@ void AdvectionSuite_Setup( AdvectionSuiteData* data ) {
 void AdvectionSuite_Teardown( AdvectionSuiteData* data ) {
 }
 
-double dt( void* class, PICelleratorContext* context ) {
+double dt( void* dd, PICelleratorContext* context ) {
 	return Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"dt", 0.01 );
 }
 
@@ -88,7 +88,7 @@ void check( PICelleratorContext* context  ) {
 	for ( lParticle_I = 0 ; lParticle_I < materialPointsSwarm->particleLocalCount ; lParticle_I++ ) {
 		particle      = (GlobalParticle* )Swarm_ParticleAt( materialPointsSwarm, lParticle_I );
 		coord         = particle->coord;
-		originalCoord = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, particle, handle );
+		originalCoord = (double*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, particle, handle );
 
 		currentRadius  = StGermain_VectorMagnitude( coord, 2 );
 		originalRadius = StGermain_VectorMagnitude( originalCoord, 2 );
@@ -140,7 +140,7 @@ void AdvectionSuite_TestEuler( AdvectionSuiteData* data ) {
 
 	for( particle_i = 0; particle_i < matSwarm->particleLocalCount; particle_i++ ) {
 		particle = (GlobalParticle*)Swarm_ParticleAt( matSwarm, particle_i );
-		origCoord = ExtensionManager_Get( matSwarm->particleExtensionMgr, particle, handle );
+		origCoord = (double*)ExtensionManager_Get( matSwarm->particleExtensionMgr, particle, handle );
 		memcpy( origCoord, particle->coord, sizeof(Coord) );
 	}
 
@@ -173,7 +173,7 @@ void AdvectionSuite_TestRK2( AdvectionSuiteData* data ) {
 
 	for( particle_i = 0; particle_i < matSwarm->particleLocalCount; particle_i++ ) {
 		particle = (GlobalParticle*)Swarm_ParticleAt( matSwarm, particle_i );
-		origCoord = ExtensionManager_Get( matSwarm->particleExtensionMgr, particle, handle );
+		origCoord = (double*)ExtensionManager_Get( matSwarm->particleExtensionMgr, particle, handle );
 		memcpy( origCoord, particle->coord, sizeof(Coord) );
 	}
 
@@ -206,7 +206,7 @@ void AdvectionSuite_TestRK4( AdvectionSuiteData* data ) {
 
 	for( particle_i = 0; particle_i < matSwarm->particleLocalCount; particle_i++ ) {
 		particle = (GlobalParticle*)Swarm_ParticleAt( matSwarm, particle_i );
-		origCoord = ExtensionManager_Get( matSwarm->particleExtensionMgr, particle, handle );
+		origCoord = (double*)ExtensionManager_Get( matSwarm->particleExtensionMgr, particle, handle );
 		memcpy( origCoord, particle->coord, sizeof(Coord) );
 	}
 

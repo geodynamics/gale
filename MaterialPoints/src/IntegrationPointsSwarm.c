@@ -258,7 +258,7 @@ void _IntegrationPointsSwarm_Init(
 				timeIntegrator,
 				"MaterialPointsSwarm_Update", /* Needs to be after a the material update */
 				"IntegrationPointsSwarm_Update",
-				_IntegrationPointsSwarm_UpdateHook,
+				(Func_Ptr)_IntegrationPointsSwarm_UpdateHook,
 				self->name,
 				self );
 	}
@@ -286,7 +286,7 @@ void _IntegrationPointsSwarm_Print( void* integrationPoints, Stream* stream ) {
 	_Swarm_Print( self, stream );
 }
 
-void* _IntegrationPointsSwarm_Copy( void* integrationPoints, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _IntegrationPointsSwarm_Copy( const void* integrationPoints, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	IntegrationPointsSwarm*	self = (IntegrationPointsSwarm*)integrationPoints;
 	IntegrationPointsSwarm*	newIntegrationPointsSwarm;
 	

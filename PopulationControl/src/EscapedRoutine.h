@@ -112,7 +112,7 @@
 	#define EscapedRoutine_DeepCopy( self ) \
 		(EscapedRoutine*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 
-	void* _EscapedRoutine_Copy( void* escapedRoutine, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _EscapedRoutine_Copy( const void* escapedRoutine, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void _EscapedRoutine_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ); 
 

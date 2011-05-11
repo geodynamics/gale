@@ -96,7 +96,7 @@
 	#define ConstantWeights_DeepCopy( self ) \
 		(ConstantWeights*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 
-	void* _ConstantWeights_Copy( void* constantWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ConstantWeights_Copy( const void* constantWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
         
 	void* _ConstantWeights_DefaultNew( Name name );
 

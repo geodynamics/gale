@@ -73,7 +73,7 @@ void _PICellerator_CalculateParticleDisplacement_AssignFromXML( void* component,
 	self->particleDisplacementInfo_Handle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, (Name)CURR_MODULE_NAME, sizeof( ParticleDisplacementInfo )  );
 
 	/* now register these guys as swarm variables */
-	particleExt = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle,
+	particleExt = (ParticleDisplacementInfo*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &particle,
 		self->particleDisplacementInfo_Handle );
 
 	self->particleOriginalCoordSwarmVariable = Swarm_NewVectorVariable( materialPointsSwarm, (Name)"OriginalCoord", (ArithPointer) &particleExt->originalCoord - (ArithPointer) &particle,
@@ -119,7 +119,7 @@ void _PICellerator_CalculateParticleDisplacement_StoreOriginalPos( PICelleratorC
 
 	for ( lParticle_I = 0 ; lParticle_I < materialPointsSwarm->particleLocalCount ; lParticle_I++ ) {
 		particle = (GlobalParticle* )Swarm_ParticleAt( materialPointsSwarm, lParticle_I );
-		particleDisplacementInfo = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr,
+		particleDisplacementInfo = (ParticleDisplacementInfo*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr,
 			particle, self->particleDisplacementInfo_Handle );
 		originalCoord = particleDisplacementInfo->originalCoord;
 
@@ -148,7 +148,7 @@ void _PICellerator_CalculateParticleDisplacement_UpdateDisplacement( PICellerato
 	for ( lParticle_I = 0 ; lParticle_I < materialPointsSwarm->particleLocalCount ; lParticle_I++ ) {
 		particle      = (GlobalParticle* )Swarm_ParticleAt( materialPointsSwarm, lParticle_I );
 		coord         = particle->coord;
-		particleDisplacementInfo = ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, particle,
+		particleDisplacementInfo = (ParticleDisplacementInfo*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, particle,
 			self->particleDisplacementInfo_Handle );
 		originalCoord = particleDisplacementInfo->originalCoord;	
 
@@ -183,7 +183,7 @@ void* _PICellerator_CalculateParticleDisplacement_DefaultNew( Name name ) {
 Index PICellerator_CalculateParticleDisplacement_Register( PluginsManager* pluginsManager ) {
 	Index result;
 
-	result = PluginsManager_Submit( pluginsManager, PICellerator_CalculateParticleDisplacement_Type, (Name)"0", _PICellerator_CalculateParticleDisplacement_DefaultNew  );
+	result = PluginsManager_Submit( pluginsManager, PICellerator_CalculateParticleDisplacement_Type, "0", _PICellerator_CalculateParticleDisplacement_DefaultNew  );
 
 	return result;
 }

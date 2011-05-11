@@ -84,7 +84,7 @@ void _Materials_Register_Print( void* _materialsRegister, Stream* stream ) {
 	_NamedObject_Register_Print( self, stream );
 }
 
-void* _Materials_Register_Copy( void* _materialsRegister, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Materials_Register_Copy( const void* _materialsRegister, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Materials_Register* self                   = (Materials_Register*) _materialsRegister;
 	Materials_Register* newMaterials_Register;
 
@@ -125,7 +125,7 @@ ExtensionInfo_Index Materials_Register_AddMaterialExtension( void* materialsRegi
 	for ( material_I = 0 ; material_I < Materials_Register_GetCount( self ) ; material_I++) {
 		material = Materials_Register_GetByIndex( self, material_I );
 
-		result = ExtensionManager_Add( material->extensionMgr, (Name)type, extensionSize );
+		result = ExtensionManager_Add( material->extensionMgr, (char*)type, extensionSize );
 
 		if ( material_I == 0  )
 			firstResult = result;
@@ -148,7 +148,7 @@ void _Materials_Register_LayoutGeometry( void* materialsRegister, void* swarm ) 
 	
 	for ( material_I = 0 ; material_I < Materials_Register_GetCount( self ) ; material_I++) {
 		material = Materials_Register_GetByIndex( self, material_I );
-		Material_Layout( material, swarm );
+		Material_Layout( material, (MaterialPointsSwarm*)swarm );
 	}
 }
 

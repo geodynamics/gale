@@ -99,7 +99,7 @@
 		(SwarmAdvectionInAPlane*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define SwarmAdvectionInAPlane_DeepCopy( self ) \
 		(SwarmAdvectionInAPlane*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _SwarmAdvectionInAPlane_Copy( void* materialSwarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _SwarmAdvectionInAPlane_Copy( const void* materialSwarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _SwarmAdvectionInAPlane_DefaultNew( Name name ) ;
 void _SwarmAdvectionInAPlane_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

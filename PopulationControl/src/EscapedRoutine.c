@@ -137,7 +137,7 @@ void _EscapedRoutine_Print( void* escapedRoutine, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 }
 
-void* _EscapedRoutine_Copy( void* escapedRoutine, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _EscapedRoutine_Copy( const void* escapedRoutine, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	EscapedRoutine*	self = (EscapedRoutine*)escapedRoutine;
 	EscapedRoutine*	newEscapedRoutine;
 	

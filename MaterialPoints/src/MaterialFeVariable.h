@@ -76,7 +76,7 @@
 	void* _MaterialFeVariable_DefaultNew( Name name );
 	void _MaterialFeVariable_Delete( void* variable );
 	void _MaterialFeVariable_Print( void* variable, Stream* stream );
-	void* _MaterialFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _MaterialFeVariable_Copy( const void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _MaterialFeVariable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data );
 	void _MaterialFeVariable_Build( void* variable, void* data );

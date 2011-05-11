@@ -70,7 +70,7 @@ PeriodicBoundariesManager* PeriodicBoundariesManager_New(
 	Swarm*					swarm,
 	Dictionary*				dictionary )
 {
-	PeriodicBoundariesManager* self = _PeriodicBoundariesManager_DefaultNew( name );
+  PeriodicBoundariesManager* self = (PeriodicBoundariesManager*)_PeriodicBoundariesManager_DefaultNew( name );
 
 	self->isConstructed = True;
 	_PeriodicBoundariesManager_Init( self, context, mesh, swarm, dictionary );
@@ -178,7 +178,7 @@ void _PeriodicBoundariesManager_Print( void* perBCsManager, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void* _PeriodicBoundariesManager_Copy( void* periodicBCsManager, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _PeriodicBoundariesManager_Copy( const void* periodicBCsManager, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	PeriodicBoundariesManager*	self = (PeriodicBoundariesManager*)periodicBCsManager;
 	PeriodicBoundariesManager*	newPeriodicBCsManager;
 	PtrMap*							map = ptrMap;
@@ -189,7 +189,7 @@ void* _PeriodicBoundariesManager_Copy( void* periodicBCsManager, void* dest, Boo
 		ownMap = True;
 	}
 
-	newPeriodicBCsManager = _Stg_Class_Copy( self, dest, deep, nameExt, map );
+	newPeriodicBCsManager = (PeriodicBoundariesManager*)_Stg_Class_Copy( self, dest, deep, nameExt, map );
 
 	newPeriodicBCsManager->count = self->count;
 	newPeriodicBCsManager->size = self->size;
@@ -263,7 +263,7 @@ void _PeriodicBoundariesManager_Build( void* periodicBCsManager, void* data ) {
 		for ( dim_I = 0 ; dim_I < self->swarm->dim ; dim_I++ ) {
 			/* Add boundaries straight from mesh generator */
 			if ( cartesianGenerator->periodic[ dim_I ] ) 
-				PeriodicBoundariesManager_AddPeriodicBoundary( self, dim_I );
+                          PeriodicBoundariesManager_AddPeriodicBoundary( self, (Axis)dim_I );
 		}		
 	}
 }

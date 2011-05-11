@@ -95,7 +95,7 @@
 	#define CoincidentMapper_DeepCopy( self ) \
 		(CoincidentMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 
-	void* _CoincidentMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _CoincidentMapper_Copy( const void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _CoincidentMapper_DefaultNew( Name name );
 

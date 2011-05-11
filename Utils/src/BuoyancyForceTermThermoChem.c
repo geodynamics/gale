@@ -193,7 +193,7 @@ void _BuoyancyForceTermThermoChem_Build( void* forceTerm, void* data ) {
 	IntegrationPointsSwarm*          swarm              = (IntegrationPointsSwarm*)self->integrationSwarm;
 	MaterialPointsSwarm**            materialSwarms;
 	Index                            materialSwarm_I;
-	Name                             name;
+	char*                            name;
 
 	_ForceTerm_Build( self, data );
 
@@ -207,7 +207,7 @@ void _BuoyancyForceTermThermoChem_Build( void* forceTerm, void* data ) {
 			sizeof(BuoyancyForceTermThermoChem_MaterialExt) );
 	for ( material_I = 0 ; material_I < Materials_Register_GetCount( materials_Register ) ; material_I++) {
 		material = Materials_Register_GetByIndex( materials_Register, material_I );
-		materialExt = ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
+		materialExt = (BuoyancyForceTermThermoChem_MaterialExt*)ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
 
 		materialExt->density = Dictionary_GetDouble_WithDefault( material->dictionary, (Dictionary_Entry_Key)"density", 0.0  );
 	}
@@ -333,7 +333,7 @@ void _BuoyancyForceTermThermoChem_AssembleElement( void* forceTerm, ForceVector*
 			FeVariable_InterpolateFromMeshLocalCoord( temperatureField, mesh, lElement_I, xi, &temperature );
 
 		material = IntegrationPointsSwarm_GetMaterialOn( (IntegrationPointsSwarm*) swarm, particle );
-		materialExt = ExtensionManager_Get( material->extensionMgr, material, self->materialExtHandle );
+		materialExt = (BuoyancyForceTermThermoChem_MaterialExt*)ExtensionManager_Get( material->extensionMgr, material, self->materialExtHandle );
 
 		/* Calculate Force */
 		RaT = BuoyancyForceTermThermoChem_CalcRaT( self, (Swarm*)swarm, lElement_I, particle );

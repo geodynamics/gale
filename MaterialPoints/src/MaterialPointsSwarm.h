@@ -113,7 +113,7 @@
 		(MaterialPointsSwarm*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define MaterialPointsSwarm_DeepCopy( self ) \
 		(MaterialPointsSwarm*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _MaterialPointsSwarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _MaterialPointsSwarm_Copy( const void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _MaterialPointsSwarm_DefaultNew( Name name ) ;
 

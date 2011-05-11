@@ -137,7 +137,7 @@ PCDVC* PCDVC_New(
 	int						ParticlesPerCell,
 	double					Threshold )
 {
-    PCDVC *self = _PCDVC_DefaultNew( name );
+  PCDVC *self = (PCDVC*)_PCDVC_DefaultNew( name );
 
     self->isConstructed = True;
     _WeightsCalculator_Init( self, dim );
@@ -202,7 +202,7 @@ void _PCDVC_Print( void* pcdvc, Stream* stream ) {
 
 
 
-void* _PCDVC_Copy( void* pcdvc, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _PCDVC_Copy( const void* pcdvc, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
     PCDVC*	self = (PCDVC*)pcdvc;
     PCDVC*	newPCDVC;
 	
@@ -315,8 +315,8 @@ void _PCDVC_Execute( void* pcdvc, void* data ) {
    If this function is being called ever, then some other module/component somewhere has messed up the mapping between the integration Swarm and the material Swarm*/
 MaterialPointRef* getIntParticleMaterialRef_PointingToMaterialParticle( IntegrationPointsSwarm*  intSwarm, Particle_Index matLastParticle_IndexOnCPU ){
     IntegrationPoint* intTestParticle;
-    MaterialPointRef*       ref;
-    int i;
+    MaterialPointRef*       ref=NULL;
+    Index i;
     Stream*  stream = Journal_Register( Info_Type, (Name)intSwarm->type  );
     Journal_Printf( stream,"\n\n\e[31m\nOn Proc %d: In func %s(): WARNING!! If this function is being called, then some other module/component, somewhere, has messed up the mapping between the integration Swarm and the material Swarm\n\n", intSwarm->myRank, __func__);
     Journal_Printf( stream,"This function is potentially slow. Someone should fix the offending module so that it doesn not mess up the ordering\n\n");
@@ -849,12 +849,12 @@ void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
     /************************************/
     /************************************/
 
-    int *VCsize;
-    int **particleVoronoiCellList;
-    int *count; // count of how many cells each particle owns in the Voronoi diagram.
+    int *VCsize=NULL;
+    int **particleVoronoiCellList=NULL;
+    int *count=NULL; // count of how many cells each particle owns in the Voronoi diagram.
     int flag =0;
     double FEMCEllspan = BBXMAX - BBXMIN;
-    double dist;
+    double dist=0;
     if(Inflow){
         for(i=0;i<nump_orig;i++){
             dist = (pList[i].cx - pList[i].x)*(pList[i].cx - pList[i].x) + (pList[i].cy - pList[i].y)*(pList[i].cy - pList[i].y) + (pList[i].cz - pList[i].z)*(pList[i].cz - pList[i].z);
@@ -1284,12 +1284,12 @@ void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) {
     /************************************/
     /************************************/
 //	if(0){
-    int *VCsize;
-    int **particleVoronoiCellList;
-    int *count; // count of how many cells each particle owns in the Voronoi diagram.
+    int *VCsize=NULL;
+    int **particleVoronoiCellList=NULL;
+    int *count=NULL; // count of how many cells each particle owns in the Voronoi diagram.
     int flag =0;
     double FEMCEllspan = BBXMAX - BBXMIN;
-    double dist;
+    double dist=0;
     if(Inflow){
         for(i=0;i<nump_orig;i++){
             dist = (pList[i].x-pList[i].cx)*(pList[i].x-pList[i].cx)+(pList[i].y-pList[i].cy)*(pList[i].y-pList[i].cy);;

@@ -40,7 +40,7 @@ void _MappedParticleLayout_Print( void* particleLayout, Stream* stream );
     (MappedParticleLayout*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 #define MappedParticleLayout_DeepCopy( self )                           \
     (MappedParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-void* _MappedParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+void* _MappedParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 void* _MappedParticleLayout_DefaultNew( Name name );
 void  _MappedParticleLayout_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );

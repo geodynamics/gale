@@ -61,7 +61,7 @@
 const Type MaterialPointsSwarm_Type = "MaterialPointsSwarm";
 
 MaterialPointsSwarm* MaterialPointsSwarm_New(
-      Name                                  name,
+      Name                                 name,
       AbstractContext*                      context,
       void*                                 cellLayout,
       void*                                 particleLayout,
@@ -194,7 +194,7 @@ void _MaterialPointsSwarm_Print( void* swarm, Stream* stream ) {
 	_Swarm_Print( self, stream );
 }
 
-void* _MaterialPointsSwarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _MaterialPointsSwarm_Copy( const void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	MaterialPointsSwarm*	self = (MaterialPointsSwarm*)swarm;
 	MaterialPointsSwarm*	newMaterialPointsSwarm;
 	
@@ -264,10 +264,10 @@ void _MaterialPointsSwarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, 
 
 void _MaterialPointsSwarm_Build( void* swarm, void* data ) {
 	MaterialPointsSwarm*	self = (MaterialPointsSwarm*) swarm;
-	int			commHandler_I;
+	unsigned int			commHandler_I;
 	Bool                    movementCommHandlerFound = False;
 	Stream*                 errorStream = Journal_Register( Error_Type, (Name)self->type  );
-	int var_I;
+	Index var_I;
 
 	_Swarm_Build( self, data );
 
@@ -299,7 +299,7 @@ void _MaterialPointsSwarm_Build( void* swarm, void* data ) {
 void _MaterialPointsSwarm_Initialise( void* swarm, void* data ) {
 	MaterialPointsSwarm*	self 	= (MaterialPointsSwarm*) swarm;
 	AbstractContext* 	context = (AbstractContext*)self->context;
-	Index            	var_I	= 0;
+	Index            var_I	= 0;
 	Particle_Index          lParticle_I=0;
 	MaterialPoint*		matPoint=NULL;
 
@@ -439,7 +439,7 @@ void _MaterialPointsSwarm_Execute( void* swarm, void* data ) {
 }
 void _MaterialPointsSwarm_Destroy( void* swarm, void* data ) {
 	MaterialPointsSwarm*	self = (MaterialPointsSwarm*)swarm;
-   int var_I;
+   Index var_I;
 	
 	Stg_Component_Destroy( self->mesh, data , False );
 	if( self->escapedRoutine != NULL) Stg_Component_Destroy( self->escapedRoutine, data , False );

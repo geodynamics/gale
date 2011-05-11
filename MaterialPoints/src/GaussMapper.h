@@ -68,7 +68,7 @@
 	#define GaussMapper_DeepCopy( self ) \
 		(GaussMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 
-	void* _GaussMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _GaussMapper_Copy( const void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _GaussMapper_DefaultNew( Name name );
 

@@ -95,7 +95,7 @@
 	#define GaussCoincidentMapper_DeepCopy( self ) \
 		(GaussCoincidentMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 
-	void* _GaussCoincidentMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _GaussCoincidentMapper_Copy( const void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _GaussCoincidentMapper_DefaultNew( Name name );
 

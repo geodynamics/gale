@@ -94,7 +94,7 @@ void _GaussMapper_Print( void* mapper, Stream* stream ) {
 	_OneToOneMapper_Print( self, stream );
 }
 
-void* _GaussMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _GaussMapper_Copy( const void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	return _IntegrationPointMapper_Copy( mapper, dest, deep, nameExt, ptrMap );
 }
 

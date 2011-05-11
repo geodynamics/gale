@@ -134,7 +134,7 @@
 		(IntegrationPointsSwarm*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define IntegrationPointsSwarm_DeepCopy( self ) \
 		(IntegrationPointsSwarm*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _IntegrationPointsSwarm_Copy( void* integrationPoints, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _IntegrationPointsSwarm_Copy( const void* integrationPoints, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void _IntegrationPointsSwarm_Build( void* integrationPoints, void* data ) ;
 	void _IntegrationPointsSwarm_Initialise( void* integrationPoints, void* data ) ;

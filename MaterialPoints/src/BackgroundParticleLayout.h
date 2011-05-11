@@ -40,7 +40,7 @@ void _BackgroundParticleLayout_Print( void* particleLayout, Stream* stream );
     (BackgroundParticleLayout*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 #define BackgroundParticleLayout_DeepCopy( self )                       \
     (BackgroundParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-void* _BackgroundParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+void* _BackgroundParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 void* _BackgroundParticleLayout_DefaultNew( Name name );
 void  _BackgroundParticleLayout_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );

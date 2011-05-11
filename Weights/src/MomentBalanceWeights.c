@@ -65,7 +65,7 @@ const Type MomentBalanceWeights_Type = "MomentBalanceWeights";
 */
 
 MomentBalanceWeights* MomentBalanceWeights_New( Name name, Dimension_Index dim, WeightsCalculator* backupWeights ) {
-	MomentBalanceWeights* self = _MomentBalanceWeights_DefaultNew( name );
+  MomentBalanceWeights* self = (MomentBalanceWeights*)_MomentBalanceWeights_DefaultNew( name );
 
 	self->isConstructed = True;
 	_WeightsCalculator_Init( self, dim );
@@ -122,7 +122,7 @@ void _MomentBalanceWeights_Print( void* momentBalanceWeights, Stream* stream ) {
     _WeightsCalculator_Print( self, stream );
 }
 
-void* _MomentBalanceWeights_Copy( void* momentBalanceWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _MomentBalanceWeights_Copy( const void* momentBalanceWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
     MomentBalanceWeights*       self = (MomentBalanceWeights*)momentBalanceWeights;
     MomentBalanceWeights*       newMomentBalanceWeights;
         

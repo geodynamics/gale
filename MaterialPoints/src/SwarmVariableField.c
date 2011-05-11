@@ -116,10 +116,10 @@ void* _SwarmVariableField_DefaultNew( Name name ) {
 	ParticleFeVariable_ValueAtParticleFunction*            _valueAtParticle = (ParticleFeVariable_ValueAtParticleFunction*)_SwarmVariableField_ValueAtParticle;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType                             nameAllocationType = ZERO;
-	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = ZERO;
-	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
-	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
+	AllocationType                             nameAllocationType = (AllocationType)ZERO;
+	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = NULL;
+	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = NULL;
+	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = NULL;
 
 	return (void*)_SwarmVariableField_New(  SWARMVARIABLEFIELD_PASSARGS  );
 }
@@ -149,7 +149,7 @@ void _SwarmVariableField_Build( void* swarmVariableField, void* data ) {
 	unsigned		               nDomainVerts      = Mesh_GetDomainSize( self->feMesh, MT_VERTEX );
 	SwarmVariable_Register*		swarmVar_Register	= self->materialSwarm->swarmVariable_Register;
 	Stream*				         errorStream		   = Journal_Register( Error_Type, (Name)self->type  );
-	Name			               tmpName;
+	char*			               tmpName;
 
 	Stg_Component_Build( self->materialSwarm, data, False );
 	/* make this more flexible to handle vector values at each node - will have to get the num dofs from the XML

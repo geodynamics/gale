@@ -253,7 +253,7 @@ void _DVCWeights_Print( void* dvcWeights, Stream* stream );
     (DVCWeights*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 #define DVCWeights_DeepCopy( self )                                     \
     (DVCWeights*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-void* _DVCWeights_Copy( void* dvcWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+void* _DVCWeights_Copy( const void* dvcWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
         
 void* _DVCWeights_DefaultNew( Name name ) ;
 

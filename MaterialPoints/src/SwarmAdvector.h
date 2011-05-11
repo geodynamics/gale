@@ -105,7 +105,7 @@
 		(SwarmAdvector*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define SwarmAdvector_DeepCopy( self ) \
 		(SwarmAdvector*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _SwarmAdvector_Copy( void* materialSwarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _SwarmAdvector_Copy( const void* materialSwarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _SwarmAdvector_DefaultNew( Name name ) ;
 void _SwarmAdvector_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

@@ -68,7 +68,7 @@ ManyToOneMapper* _ManyToOneMapper_New(  MANYTOONEMAPPER_DEFARGS  ) {
 
 void _ManyToOneMapper_Init( void* mapper, MaterialPointsSwarm** materialSwarms, Index materialSwarmCount ) {
 	ManyToOneMapper*	self = (ManyToOneMapper*)mapper;
-	int					i;
+	unsigned int					i;
 
 	self->materialSwarms = materialSwarms;
 	self->materialSwarmCount = materialSwarmCount;
@@ -76,7 +76,7 @@ void _ManyToOneMapper_Init( void* mapper, MaterialPointsSwarm** materialSwarms, 
 	/* Each integration point will have a reference to a material particle (one for each swarm) */
 	ExtensionManager_SetLockDown( self->integrationSwarm->particleExtensionMgr, False );
 	for ( i = 0; i < self->materialSwarmCount; ++i ) {
-		ExtensionManager_Add( self->integrationSwarm->particleExtensionMgr, (Name)materialSwarms[i]->name, sizeof(MaterialPointRef)  );
+		ExtensionManager_Add( self->integrationSwarm->particleExtensionMgr, materialSwarms[i]->name, sizeof(MaterialPointRef)  );
 	}
 	ExtensionManager_SetLockDown( self->integrationSwarm->particleExtensionMgr, True );
 }
@@ -89,7 +89,7 @@ void _ManyToOneMapper_Delete( void* mapper ) {
 
 void _ManyToOneMapper_Print( void* mapper, Stream* stream ) {
 	ManyToOneMapper*	self = (ManyToOneMapper*)mapper;
-	int					i;
+	unsigned int					i;
 
 	_IntegrationPointMapper_Print( self, stream );
 	if ( self->materialSwarms != NULL ) {
@@ -101,14 +101,14 @@ void _ManyToOneMapper_Print( void* mapper, Stream* stream ) {
 	}
 }
 
-void* _ManyToOneMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ManyToOneMapper_Copy( const void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	ManyToOneMapper* self = (ManyToOneMapper*)mapper;
 	ManyToOneMapper* newCopy;
 	
 	newCopy = (ManyToOneMapper*)_IntegrationPointMapper_Copy( self, dest, deep, nameExt, ptrMap );
 
 	if ( self->materialSwarms != NULL ) {
-		newCopy->materialSwarms = PtrMap_Find( ptrMap, self->materialSwarms );
+          newCopy->materialSwarms = (MaterialPointsSwarm**)PtrMap_Find( ptrMap, self->materialSwarms );
 
 		if ( newCopy->materialSwarms == NULL ) {
 			newCopy->materialSwarms = Memory_Alloc_Array( MaterialPointsSwarm*, self->materialSwarmCount, "componentList" );
@@ -141,7 +141,7 @@ void _ManyToOneMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, voi
 
 void _ManyToOneMapper_Build( void* mapper, void* data ) {
 	ManyToOneMapper*	self = (ManyToOneMapper*)mapper;
-	int					i;
+	unsigned int					i;
 
 	_IntegrationPointMapper_Build( mapper, data );
 	
@@ -152,7 +152,7 @@ void _ManyToOneMapper_Build( void* mapper, void* data ) {
 
 void _ManyToOneMapper_Initialise( void* mapper, void* data ) {
 	ManyToOneMapper*	self = (ManyToOneMapper*)mapper;
-	int					i;
+	unsigned int					i;
 
 	_IntegrationPointMapper_Initialise( mapper, data );
 
@@ -166,7 +166,7 @@ void _ManyToOneMapper_Execute( void* mapper, void* data ) {
 
 void _ManyToOneMapper_Destroy( void* mapper, void* data ) {
 	ManyToOneMapper*	self = (ManyToOneMapper*)mapper;
-	int					i;
+	unsigned int					i;
 
 	for ( i = 0; i < self->materialSwarmCount; ++i ) {
 		Stg_Component_Destroy( self->materialSwarms[i], data, False );

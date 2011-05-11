@@ -136,14 +136,14 @@ void _SwarmAdvector_Init(
 
 
 	TimeIntegrator_AppendSetupEP( self->timeIntegrator,  
-			"SwarmAdvector_AdvectionSetup", SwarmAdvector_AdvectionSetup,  self->name, self );
+                                      "SwarmAdvector_AdvectionSetup", (Func_Ptr)SwarmAdvector_AdvectionSetup,  self->name, self );
 	TimeIntegrator_PrependFinishEP( self->timeIntegrator,
-			"SwarmAdvector_AdvectionFinish", SwarmAdvector_AdvectionFinish,  self->name, self );
+			"SwarmAdvector_AdvectionFinish", (Func_Ptr)SwarmAdvector_AdvectionFinish,  self->name, self );
 	TimeIntegrator_InsertBeforeFinishEP( 
 		self->timeIntegrator,
 		"IntegrationPointsSwarm_Update", /* Must before this */
 		"MaterialPointsSwarm_Update", 
-		_MaterialPointsSwarm_UpdateHook, 
+		(Func_Ptr)_MaterialPointsSwarm_UpdateHook, 
 		swarm->name, 
 		swarm );
 			
@@ -170,7 +170,7 @@ void _SwarmAdvector_Print( void* swarmAdvector, Stream* stream ) {
 }
 
 
-void* _SwarmAdvector_Copy( void* swarmAdvector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _SwarmAdvector_Copy( const void* swarmAdvector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	SwarmAdvector*	self = (SwarmAdvector*)swarmAdvector;
 	SwarmAdvector*	newSwarmAdvector;
 	

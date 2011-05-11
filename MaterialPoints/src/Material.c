@@ -67,7 +67,7 @@ Material* Material_New(
 	Dictionary*				materialDictionary,
 	Materials_Register*	materialRegister )
 {
-	Material* self = _Material_DefaultNew( name );
+  Material* self = (Material*)_Material_DefaultNew( name );
 
 	self->isConstructed = True;
 	_Material_Init( self, context, shape, materialDictionary, materialRegister );
@@ -156,11 +156,11 @@ void _Material_Print( void* material, Stream* stream ) {
 }
 
 
-void* _Material_Copy( void* material, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Material_Copy( const void* material, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Material* self = (Material*) material;
 	Material* newMaterial;
 
-	newMaterial = _Stg_Component_Copy( self, dest, deep, nameExt, ptrMap );
+	newMaterial = (Material*)_Stg_Component_Copy( self, dest, deep, nameExt, ptrMap );
 
 	newMaterial->dictionary = self->dictionary;
 	newMaterial->index      = self->index;

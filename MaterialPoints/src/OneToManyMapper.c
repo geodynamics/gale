@@ -72,7 +72,7 @@ void _OneToManyMapper_Init( void* mapper, MaterialPointsSwarm* materialSwarm ) {
 	self->materialSwarm = materialSwarm;
 
 	ExtensionManager_SetLockDown( self->integrationSwarm->particleExtensionMgr, False );
-	self->refHandle = ExtensionManager_Add( self->integrationSwarm->particleExtensionMgr, (Name)materialSwarm->name, sizeof(OneToManyRef)  );
+	self->refHandle = ExtensionManager_Add( self->integrationSwarm->particleExtensionMgr, materialSwarm->name, sizeof(OneToManyRef)  );
 	ExtensionManager_SetLockDown( self->integrationSwarm->particleExtensionMgr, True );
 }
 
@@ -89,7 +89,7 @@ void _OneToManyMapper_Print( void* mapper, Stream* stream ) {
 	Stg_Class_Print( self->materialSwarm, stream );
 	Stream_UnIndent( stream );
 }
-void* _OneToManyMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _OneToManyMapper_Copy( const void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	OneToManyMapper* self = (OneToManyMapper*)mapper;
 	OneToManyMapper* newCopy;
 	
@@ -170,8 +170,8 @@ double _OneToManyMapper_GetDoubleFromExtension(void* mapper, void* intPoint, Ext
 
     ref = OneToManyMapper_GetMaterialRef(mapper, intPoint);
     for(ii = 0; ii < ref->numParticles; ii++) {
-	c = *(double*)(MaterialPointsSwarm_GetExtensionAt(self->materialSwarm, ref->particleInds[ii], extHandle) + offs);
-	v += ((double)ref->weights[ii])*c;
+      c = *(double*)(MaterialPointsSwarm_GetExtensionAt(self->materialSwarm, ref->particleInds[ii], extHandle) + offs);
+      v += ((double)ref->weights[ii])*c;
     }
 
     return v;
@@ -185,8 +185,8 @@ double _OneToManyMapper_GetDoubleFromMaterial(void* mapper, void* intPoint, Exte
 
     ref = OneToManyMapper_GetMaterialRef(mapper, intPoint);
     for(ii = 0; ii < ref->numParticles; ii++) {
-	c = *(double*)(MaterialPointsSwarm_GetMaterialExtensionAt(self->materialSwarm, ref->particleInds[ii], extHandle) + offs);
-	v += ((double)ref->weights[ii])*c;
+      c = *(double*)(MaterialPointsSwarm_GetMaterialExtensionAt(self->materialSwarm, ref->particleInds[ii], extHandle) + offs);
+      v += ((double)ref->weights[ii])*c;
     }
 
     return v;

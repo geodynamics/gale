@@ -100,7 +100,7 @@ extern const Type MomentBalanceWeights_Type;
 
 	void _MomentBalanceWeights_Init( void* momentBalanceWeights, WeightsCalculator* backupWeights );
 
-	void* _MomentBalanceWeights_Copy( void* momentBalanceWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _MomentBalanceWeights_Copy( const void* momentBalanceWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
         
 	void* _MomentBalanceWeights_DefaultNew( Name name );
 

@@ -95,7 +95,7 @@
 	#define ManyToOneMapper_DeepCopy( self ) \
 		(ManyToOneMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 
-	void* _ManyToOneMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ManyToOneMapper_Copy( const void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _ManyToOneMapper_DefaultNew( Name name );
 

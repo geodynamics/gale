@@ -105,7 +105,7 @@ void _WeightsCalculator_Print( void* weightsCalculator, Stream* stream ) {
 }
 
 
-void* _WeightsCalculator_Copy( void* weightsCalculator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _WeightsCalculator_Copy( const void* weightsCalculator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
     WeightsCalculator*  self = (WeightsCalculator*)weightsCalculator;
     WeightsCalculator*  newWeightsCalculator;
         

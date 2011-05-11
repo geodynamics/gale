@@ -55,7 +55,7 @@ MappedParticleLayout* MappedParticleLayout_New(
 	Bool					weightsInitialisedAtStartup )
 {
 
-   MappedParticleLayout* self = _MappedParticleLayout_DefaultNew( name ); 
+  MappedParticleLayout* self = (MappedParticleLayout*)_MappedParticleLayout_DefaultNew( name ); 
 
    _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
    _MappedParticleLayout_Init( self );
@@ -96,7 +96,7 @@ void _MappedParticleLayout_Print( void* particleLayout, Stream* stream ) {
 	
 }
 
-void* _MappedParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _MappedParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
     MappedParticleLayout*		self = (MappedParticleLayout*)particleLayout;
     MappedParticleLayout*		newMappedParticleLayout;
 	

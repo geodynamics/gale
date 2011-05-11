@@ -64,7 +64,7 @@ PICelleratorContext* PICelleratorContext_New(
 	MPI_Comm		communicator,
 	Dictionary*	dictionary )
 {
-	PICelleratorContext* self = _PICelleratorContext_DefaultNew( name );
+  PICelleratorContext* self = (PICelleratorContext*)_PICelleratorContext_DefaultNew( name );
 
 	self->isConstructed = True;
 	_AbstractContext_Init( (AbstractContext*) self );

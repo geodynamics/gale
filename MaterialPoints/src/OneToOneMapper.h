@@ -97,7 +97,7 @@
 	#define OneToOneMapper_DeepCopy( self ) \
 		(OneToOneMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 
-	void* _OneToOneMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _OneToOneMapper_Copy( const void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void _OneToOneMapper_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data );
 

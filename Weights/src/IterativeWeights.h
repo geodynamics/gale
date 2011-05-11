@@ -96,7 +96,7 @@
 	#define IterativeWeights_DeepCopy( self ) \
 		(IterativeWeights*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 
-	void* _IterativeWeights_Copy( void* iterativeWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _IterativeWeights_Copy( const void* iterativeWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
         
 	void* _IterativeWeights_DefaultNew( Name name );
 

@@ -106,7 +106,7 @@ void WeightsSuite_TestElementIntegral(
    double              mean;
    double              standardDeviation;
    Index               loop_I;
-   void*               data;
+   void*               data=NULL;
    double              differenceMean, differenceStdDev;   
 
    /* Create FeVariable */

@@ -95,7 +95,7 @@ void _MaterialFeVariable_Print( void* materialFeVariable, Stream* stream ) {
 	Journal_PrintPointer( stream, self->material );
 }
 
-void* _MaterialFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _MaterialFeVariable_Copy( const void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	MaterialFeVariable*	self = (MaterialFeVariable*)feVariable;
 	MaterialFeVariable*	newMaterialFeVariable;
 	
@@ -128,10 +128,10 @@ void* _MaterialFeVariable_DefaultNew( Name name ) {
 	ParticleFeVariable_ValueAtParticleFunction*            _valueAtParticle = _MaterialFeVariable_ValueAtParticle;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType                             nameAllocationType = ZERO;
-	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = ZERO;
-	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = ZERO;
-	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
+	AllocationType                             nameAllocationType = (AllocationType)ZERO;
+	FieldVariable_GetValueFunction*   _getMinGlobalFieldMagnitude = NULL;
+	FieldVariable_GetValueFunction*   _getMaxGlobalFieldMagnitude = NULL;
+	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = NULL;
 
 	return (void*) _MaterialFeVariable_New(  MATERIALFEVARIABLE_PASSARGS  );
 }
@@ -151,7 +151,7 @@ void _MaterialFeVariable_AssignFromXML( void* materialFeVariable, Stg_ComponentF
 void _MaterialFeVariable_Build( void* materialFeVariable, void* data ) {
 	MaterialFeVariable* self = (MaterialFeVariable*) materialFeVariable;
 	IntegrationPointsSwarm* swarm;
-	Name tmpName;
+	char *tmpName;
 	Variable_Register* variable_Register = NULL;
 
 	Stg_Component_Build( self->feMesh, data, False );
@@ -161,13 +161,13 @@ void _MaterialFeVariable_Build( void* materialFeVariable, void* data ) {
 	if ( swarm->swarmVariable_Register )
 		variable_Register = swarm->swarmVariable_Register->variable_Register;
 
-	tmpName = Stg_Object_AppendSuffix( self, (Name)"DataVariable"  );
+	tmpName = Stg_Object_AppendSuffix( self, "DataVariable"  );
 	assert( Class_IsSuper( self->feMesh->topo, IGraph ) );
 	self->dataVariable = Variable_NewScalar( 
 		tmpName,
 		(AbstractContext*)self->context,
 		Variable_DataType_Double, 
-		&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
+		(Index*)(&((IGraph*)self->feMesh->topo)->remotes[MT_VERTEX]->nDomains),
 		NULL,
 		(void**)&self->data, 
 		variable_Register );
@@ -209,7 +209,7 @@ void _MaterialFeVariable_ValueAtParticle(
 	double*                 particleValue )
 {
 	MaterialFeVariable* self = (MaterialFeVariable*) materialFeVariable;
-	*particleValue = (double) ( self->material->index == IntegrationPointsSwarm_GetMaterialIndexOn( swarm, particle ) );
+	*particleValue = (double) ( self->material->index == IntegrationPointsSwarm_GetMaterialIndexOn( swarm, (IntegrationPoint*)particle ) );
 }
 
 

@@ -52,7 +52,7 @@ BackgroundParticleLayout* BackgroundParticleLayout_New( Name name,
    CoordSystem      coordSystem, 
    Bool             weightsInitialisedAtStartup ) {
 
-   BackgroundParticleLayout* self = _BackgroundParticleLayout_DefaultNew( name );
+  BackgroundParticleLayout* self = (BackgroundParticleLayout*)_BackgroundParticleLayout_DefaultNew( name );
 
    _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
    _BackgroundParticleLayout_Init( self );
@@ -93,7 +93,7 @@ void _BackgroundParticleLayout_Print( void* particleLayout, Stream* stream ) {
 	
 }
 
-void* _BackgroundParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _BackgroundParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
     BackgroundParticleLayout*		self = (BackgroundParticleLayout*)particleLayout;
     BackgroundParticleLayout*		newBackgroundParticleLayout;
 	

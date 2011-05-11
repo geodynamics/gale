@@ -146,7 +146,7 @@
 	#define IntegrationPointMapper_DeepCopy( self ) \
 		(IntegrationPointMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 
-	void* _IntegrationPointMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _IntegrationPointMapper_Copy( const void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void _IntegrationPointMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, void* data );
 

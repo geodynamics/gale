@@ -26,7 +26,7 @@ void LibPICelleratorSuite_Teardown( LibPICelleratorSuiteData* data ) {
 
 void LibPICelleratorSuite_TestDirectoryStGermain( LibPICelleratorSuiteData* data ) {
     Stg_Object* testDirectoryStGermain;
-    testDirectoryStGermain = Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain" );
+    testDirectoryStGermain = (Stg_Object*)Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain" );
     pcu_check_true( testDirectoryStGermain != NULL );
 }
 
@@ -34,8 +34,8 @@ void LibPICelleratorSuite_TestDirectoryStgFEM( LibPICelleratorSuiteData * data  
     Stg_Object* testDirectoryStGermain;
     Stg_Object* testDirectoryStgFEM;
 
-    testDirectoryStGermain = Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain"  );
-    testDirectoryStgFEM= Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StgFEM" );
+    testDirectoryStGermain = (Stg_Object*)Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain"  );
+    testDirectoryStgFEM= (Stg_Object*)Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StgFEM" );
 
     pcu_check_true( ( strcmp((char* )LIB_DIR, (char*)testDirectoryStGermain) ) || ( testDirectoryStgFEM != NULL ) );
 }
@@ -44,8 +44,8 @@ void LibPICelleratorSuite_TestDirectoryPICellerator( LibPICelleratorSuiteData * 
     Stg_Object* testDirectoryStGermain;
     Stg_Object* testDirectoryPICellerator;
 
-    testDirectoryStGermain = Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain"  );
-    testDirectoryPICellerator= Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"PICellerator" );
+    testDirectoryStGermain = (Stg_Object*)Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain"  );
+    testDirectoryPICellerator= (Stg_Object*)Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"PICellerator" );
 
     pcu_check_true( ( strcmp((char* )LIB_DIR, (char*)testDirectoryStGermain) ) || ( testDirectoryPICellerator != NULL ) );
 }

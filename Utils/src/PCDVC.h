@@ -149,7 +149,7 @@ void _PCDVC_Print( void* pcdvc, Stream* stream );
     (PCDVC*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 #define PCDVC_DeepCopy( self )                                  \
     (PCDVC*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-void* _PCDVC_Copy( void* pcdvc, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+void* _PCDVC_Copy( const void* pcdvc, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
         
 void* _PCDVC_DefaultNew( Name name ) ;
 

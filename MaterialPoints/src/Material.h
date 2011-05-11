@@ -98,7 +98,7 @@
 
 	void _Material_Print( void* material, Stream* stream );
 
-	void* _Material_Copy( void* material, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Material_Copy( const void* material, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _Material_Build( void* material, void* data );
 

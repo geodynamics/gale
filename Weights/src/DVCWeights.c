@@ -80,7 +80,7 @@ const Type DVCWeights_Type = "DVCWeights";
 ** Constructors
 */
 DVCWeights* DVCWeights_New( Name name, Dimension_Index dim, int *res ) {
-	DVCWeights *self = _DVCWeights_DefaultNew( name );
+  DVCWeights *self = (DVCWeights*)_DVCWeights_DefaultNew( name );
 
 	self->isConstructed = True;
 	_WeightsCalculator_Init( self, dim );
@@ -131,7 +131,7 @@ void _DVCWeights_Print( void* dvcWeights, Stream* stream ) {
 
 
 
-void* _DVCWeights_Copy( void* dvcWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _DVCWeights_Copy( const void* dvcWeights, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
     DVCWeights* self = (DVCWeights*)dvcWeights;
     DVCWeights* newDVCWeights;
         
@@ -502,7 +502,7 @@ void _DVCWeights_ConstructGrid(struct cell **cell_list, int n, int m, int l,
     int i,j,k;
     double dx,dy,dz,Dx,Dy,Dz,X,Y,Z;
 
-    cells = malloc(n*m*l*sizeof(struct cell));
+    cells = (struct cell*)malloc(n*m*l*sizeof(struct cell));
     for(i=0;i<l*m*n;i++){
         cells[i].S = -2;
         cells[i].N = -2;
@@ -559,7 +559,7 @@ void _DVCWeights_ConstructGrid2D(struct cell2d **cell_list, int m, int l,
     int i,j;
     double dx,dy,Dx,Dy,X,Y;
 
-    cells = malloc(m*l*sizeof(struct cell));
+    cells = (struct cell2d*)malloc(m*l*sizeof(struct cell));
     for(i=0;i<l*m;i++){
         cells[i].S = -2;
         cells[i].N = -2;

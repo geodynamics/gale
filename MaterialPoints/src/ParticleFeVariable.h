@@ -63,16 +63,16 @@
 		ParticleFeVariable_ValueAtParticleFunction*	_valueAtParticle; \
 		\
 		/* ParticleFeVariable info */ \
-		double*													data; \
-		Variable*												dataVariable; \
-		Name														assemblyVectorName; \
-		ForceVector*											assemblyVector; \
-		ForceTerm*												assemblyTerm; \
-		Name														massMatrixName; \
-		ForceVector*											massMatrix; \
-		ForceTerm*												massMatrixForceTerm; \
-		int														currentParticleIndex; \
-		Bool														useDeriv; 
+		double*									data; \
+		Variable*								dataVariable; \
+		char*									assemblyVectorName; \
+		ForceVector*								assemblyVector; \
+		ForceTerm*								assemblyTerm; \
+		char*									massMatrixName; \
+		ForceVector*								massMatrix; \
+		ForceTerm*								massMatrixForceTerm; \
+		int									currentParticleIndex; \
+		Bool									useDeriv; 
 		
 	struct ParticleFeVariable { __ParticleFeVariable };
 
@@ -98,7 +98,7 @@
 
 	void _ParticleFeVariable_Print( void* variable, Stream* stream );
 
-	void* _ParticleFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ParticleFeVariable_Copy( const void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _ParticleFeVariable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data );
 

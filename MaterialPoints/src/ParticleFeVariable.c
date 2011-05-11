@@ -56,7 +56,7 @@
 
 const Type ParticleFeVariable_Type = "ParticleFeVariable";
 
-char* ParticleFeVariable_names[10];
+Name ParticleFeVariable_names[10];
 int ParticleFeVariable_nNames = 0;
 int ParticleFeVariable_curName = 0;
 
@@ -131,7 +131,7 @@ void _ParticleFeVariable_Print( void* materialFeVariable, Stream* stream ) {
 	/* ParticleFeVariable info */
 }
 
-void* _ParticleFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ParticleFeVariable_Copy( const void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	abort();
 	
 	return NULL;

@@ -73,7 +73,7 @@ void _OneToOneMapper_Init( void* mapper, MaterialPointsSwarm* materialSwarm ) {
 	self->materialSwarm = materialSwarm;
 
 	ExtensionManager_SetLockDown( self->integrationSwarm->particleExtensionMgr, False );
-	self->materialRefHandle = ExtensionManager_Add( self->integrationSwarm->particleExtensionMgr, (Name)materialSwarm->name, sizeof(MaterialPointRef)  );
+	self->materialRefHandle = ExtensionManager_Add( self->integrationSwarm->particleExtensionMgr, materialSwarm->name, sizeof(MaterialPointRef)  );
 	ExtensionManager_SetLockDown( self->integrationSwarm->particleExtensionMgr, True );
 }
 
@@ -92,7 +92,7 @@ void _OneToOneMapper_Print( void* mapper, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void* _OneToOneMapper_Copy( void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _OneToOneMapper_Copy( const void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	OneToOneMapper* self = (OneToOneMapper*)mapper;
 	OneToOneMapper* newCopy;
 	
