@@ -104,7 +104,7 @@ void Progress_SetStream( void* _self, Stream* strm ) {
 }
 
 
-void Progress_SetTitle( void* _self, const char* str ) {
+void Progress_SetTitle( void* _self, Name str ) {
    Progress* self = (Progress*)_self;
 
    if( self->title )
@@ -113,7 +113,7 @@ void Progress_SetTitle( void* _self, const char* str ) {
 }
 
 
-void Progress_SetPrefix( void* _self, const char* str ) {
+void Progress_SetPrefix( void* _self, Name str ) {
    Progress* self = (Progress*)_self;
 
    if( self->preStr )
@@ -205,7 +205,7 @@ Bool Progress_CalcStatus( Progress* self ) {
    self->nBars = (int)(frac * (float)(self->width - 7));
    self->nSpaces = self->width - 7 - self->nBars;
 
-   return (self->perc != oldPerc || self->nBars != oldnBars);
+   return (self->perc != oldPerc || self->nBars != oldnBars) ? True : False;
 }
 
 

@@ -202,7 +202,7 @@ Bool _DocumentationComponentFactory_GetRootDictBool( void* cf, Dictionary_Entry_
 	return Default;
 }	
 
-char* _DocumentationComponentFactory_GetRootDictString( void* cf, Dictionary_Entry_Key key, const char* const Default ) {
+char* _DocumentationComponentFactory_GetRootDictString( void* cf, Dictionary_Entry_Key key, Name const Default ) {
 	DocumentationComponentFactory* self = (DocumentationComponentFactory*) cf;
 	Journal_Printf( self->infoStream, "Root Dictionary Parameter - Key '%s' - Type 'string' - ", key );
 	Journal_PrintString( self->infoStream, Default );

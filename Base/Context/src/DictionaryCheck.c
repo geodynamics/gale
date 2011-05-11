@@ -49,17 +49,17 @@
 
 
 
-void CheckDictionaryKeys( Dictionary* dictionary, const char* errorMessage)
+void CheckDictionaryKeys( Dictionary* dictionary, Name errorMessage)
 {
 	Dictionary_Index index_I, index_J;
 	/* Put in the Journal_Firewall stream */
 	Stream* errStream = Journal_Register( Error_Type, "DictionaryCheck");
-	int errCount;
-	int** keyIndexArray;
+	Index errCount;
+	Index** keyIndexArray;
 	Index errIndex = 0;
 	Bool  alreadyFoundRepeat = False;
 
-	keyIndexArray = Memory_Alloc_2DArray( int, ((dictionary->count)*(dictionary->count - 1)), 
+	keyIndexArray = Memory_Alloc_2DArray( Index, ((dictionary->count)*(dictionary->count - 1)), 
 					2, "Key Index Array" );
 	/* Iterate through the whole dictionary*/
 	errCount = 0;

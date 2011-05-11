@@ -149,13 +149,13 @@ SizeT _MPIStream_Printf( Stream* stream, const char *fmt, va_list args )
 	return 0;
 }
 	
-SizeT _MPIStream_Write( Stream* stream, void *data, SizeT elem_size, SizeT num_elems )
+SizeT _MPIStream_Write( Stream* stream, const void *data, SizeT elem_size, SizeT num_elems )
 {
 	MPIStream* self = (MPIStream*)stream;
 	MPI_Status status;
 	int   writeResult;
 	
-	writeResult = MPI_File_write( *(MPI_File*)(self->_file->fileHandle), data, num_elems * elem_size,
+	writeResult = MPI_File_write( *(MPI_File*)(self->_file->fileHandle), (void*)data, num_elems * elem_size,
 		 			MPI_BYTE, &status );
 
 	if (writeResult != MPI_SUCCESS) {
@@ -174,7 +174,7 @@ SizeT _MPIStream_Write( Stream* stream, void *data, SizeT elem_size, SizeT num_e
 	return num_elems;
 }
 	
-Bool _MPIStream_Dump( Stream* stream, void *data )
+Bool _MPIStream_Dump( Stream* stream, const void *data )
 {
 	/* No specific dumping mechanism, can create in derived classes */
 	return False;

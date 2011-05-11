@@ -49,7 +49,7 @@
 	/** Textual name for StreamFormatter class. */
 	extern const Type StreamFormatter_Type;
 
-	typedef const char* (StreamFormatter_FormatFunction) ( void* formatter, const char* const fmt );
+	typedef Name (StreamFormatter_FormatFunction) ( void* formatter, const char* const fmt );
 
 	/** \def __StreamFormatter See StreamFormatter */
 	#define __StreamFormatter \
@@ -91,11 +91,11 @@
 	void _StreamFormatter_Print( void* formatter, Stream* stream );
 	
 	/** Copy interface. */	
-	void* _StreamFormatter_Copy( void* streamFormatter, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _StreamFormatter_Copy( const void* streamFormatter, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 
 
 	/** Formats a Printf() output string. */
-	const char* StreamFormatter_Format( void* formatter, const char* const fmt );
+	Name StreamFormatter_Format( void* formatter, const char* const fmt );
 
 
 	extern StreamFormatter_Buffer* stgStreamFormatter_Buffer;

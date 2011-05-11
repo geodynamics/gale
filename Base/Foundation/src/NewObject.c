@@ -60,7 +60,7 @@ void _NewObject_Copy( void* self, const void* op ) {
    NewObject_SetName( self, ((NewObject*)op)->name );
 }
 
-void NewObject_SetName( void* _self, const char* name ) {
+void NewObject_SetName( void* _self, Name name ) {
    NewObject* self = (NewObject*)_self;
    int len;
    assert( self );
@@ -71,7 +71,7 @@ void NewObject_SetName( void* _self, const char* name ) {
       strcpy( self->name, name );
 }
 
-const char* NewObject_GetName( void* self ) {
+Name NewObject_GetName( void* self ) {
    assert( self );
 
    return ((NewObject*)self)->name;

@@ -63,7 +63,7 @@
 	JournalFile* CFile_New();
 
 	/** Creates a new CFile, opening the file given by fileName. Returns NULL if system is unable to open the given file. */
-	JournalFile* CFile_New2( char* fileName );
+	JournalFile* CFile_New2( Name fileName );
 
 	/** Creates a new binary CFile with no opened file. JournalFile_Open() must be called. */
 	JournalFile* CFileBinary_New();
@@ -99,10 +99,10 @@
 	
 	
 	/** Implementation for Open function. */
-	Bool _CFile_Open( void* file, const char* const fileName );
+	Bool _CFile_Open( void* file, Name const fileName );
 
 	/** Implementation for Append function. */
-	Bool _CFile_Append( void* file, const char* const fileName );
+	Bool _CFile_Append( void* file, Name const fileName );
 
 	/** Implementation for Close function. */
 	Bool _CFile_Close( void* file );

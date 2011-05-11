@@ -91,10 +91,10 @@
 	
 	
 	/** Implementation for Open function. */
-	Bool _MPIFile_Open( void* file, const char* const fileName );
+	Bool _MPIFile_Open( void* file, Name const fileName );
 
 	/** Implementation for Append function. */
-	Bool _MPIFile_Append( void* file, const char* const fileName );
+	Bool _MPIFile_Append( void* file, Name const fileName );
 
 	/** Implementation for Close function. */
 	Bool _MPIFile_Close( void* file );

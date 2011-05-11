@@ -63,7 +63,7 @@ void MemMonitorSuite_Teardown( MemMonitorSuiteData* data ) {
 
 
 void MemMonitorSuite_TestMonitor( MemMonitorSuiteData* data ) {
-   char*          memoryReportOutputFilename = "./MemMonitorSuite_TestOutput.txt";
+   Name memoryReportOutputFilename = "./MemMonitorSuite_TestOutput.txt";
    char*          a;
    char*          b;
    char*          c;
@@ -71,7 +71,7 @@ void MemMonitorSuite_TestMonitor( MemMonitorSuiteData* data ) {
    char*          e;
    char*          f;
    MemMonitorData mmData;
-   int            totalMemAtTestStart;
+   Index            totalMemAtTestStart;
    int            expMemDiff;
    double         expPercentChange;
    Bool           expCritResult = False;
@@ -97,7 +97,7 @@ void MemMonitorSuite_TestMonitor( MemMonitorSuiteData* data ) {
    pcu_check_true( mmData.avgProcMemDiff == mmData.memDiff );
    expPercentChange = expMemDiff / (double)totalMemAtTestStart*100; 
    pcu_check_true( fabs( expPercentChange - mmData.percentChange ) < 0.1 );
-   expCritResult = fabs(expPercentChange/100) >= 0.2;
+   expCritResult = (fabs(expPercentChange/100) >= 0.2 ? True : False);
    pcu_check_true( mmData.criterionPassed == expCritResult );
 
    MemoryField_UpdateAsSumOfSubFields( stgMemory->types );
@@ -113,7 +113,7 @@ void MemMonitorSuite_TestMonitor( MemMonitorSuiteData* data ) {
    pcu_check_true( mmData.avgProcMemDiff == mmData.memDiff );
    expPercentChange = expMemDiff / (double)totalMemAtTestStart*100; 
    pcu_check_true( fabs( expPercentChange - mmData.percentChange ) < 0.1 );
-   expCritResult = fabs(expPercentChange/100) >= 0.2;
+   expCritResult = (fabs(expPercentChange/100) >= 0.2 ? True : False);
    pcu_check_true( mmData.criterionPassed == expCritResult );
 
    MemoryField_UpdateAsSumOfSubFields( stgMemory->types );
@@ -131,7 +131,7 @@ void MemMonitorSuite_TestMonitor( MemMonitorSuiteData* data ) {
    /* Percent should be negative this time */
    expPercentChange = expMemDiff / (double)totalMemAtTestStart*100; 
    pcu_check_true( fabs( expPercentChange - mmData.percentChange ) < 0.1 );
-   expCritResult = fabs(expPercentChange/100) >= 0.2;
+   expCritResult = (fabs(expPercentChange/100) >= 0.2 ? True : False);
    pcu_check_true( mmData.criterionPassed == expCritResult );
 
    MemoryField_UpdateAsSumOfSubFields( stgMemory->types );
@@ -147,7 +147,7 @@ void MemMonitorSuite_TestMonitor( MemMonitorSuiteData* data ) {
    pcu_check_true( mmData.avgProcMemDiff == mmData.memDiff );
    expPercentChange = expMemDiff / (double)totalMemAtTestStart*100; 
    pcu_check_true( fabs( expPercentChange - mmData.percentChange ) < 0.1 );
-   expCritResult = fabs(expPercentChange/100) >= 0.2;
+   expCritResult = (fabs(expPercentChange/100) >= 0.2 ? True : False);
    pcu_check_true( mmData.criterionPassed == expCritResult );
 
    Memory_Free( b );

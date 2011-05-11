@@ -62,7 +62,7 @@ MemoryReport* MemoryReport_New( ) {
 	
 
 void _MemoryReport_Init( MemoryReport* memoryReport ) {
-	Index ii=0;
+	int ii=0;
 
 	memoryReport->groupCount = 0;
 	memoryReport->groupSize = MEMORYREPORT_SIZE;
@@ -117,7 +117,7 @@ void MemoryReport_AddGroup( MemoryReport* memoryReport, MemoryReportGroup group 
 	memoryReport->groupCount++;
 }
 
-void MemoryReport_AddCondition( MemoryReport* memoryReport, MemoryReportGroup group, const char* condition )
+void MemoryReport_AddCondition( MemoryReport* memoryReport, MemoryReportGroup group, Name condition )
 {
 	/* Add this group if it does not already exist. */
 	if ( MemoryReport_Find_Group( memoryReport->groupCount, memoryReport->groups, group ) < 0 ) {
@@ -187,7 +187,7 @@ void MemoryReport_Print( void* memoryReport )
 	//}
 	
 	// TODO: replace reportField->value with a name representative of conditions
-	MemoryField_PrintSummary( self->reportField, "~Report~", (MEMORYFIELD_ALL-MEMORYFIELD_PEAK) );
+	MemoryField_PrintSummary( self->reportField, "~Report~", (MemoryFieldColumn)(MEMORYFIELD_ALL-MEMORYFIELD_PEAK) );
 }
 
 
@@ -198,7 +198,7 @@ void MemoryReport_Print_Helper( void *memoryPointer, void* memoryReport ) {
 	MemoryField*   subField = NULL;
 	Bool           valid;             /* Whether a memory pointer record matches the conditions. */
 	Index          iGroup, iCondition;/* Iterators. */
-	const char*    valueStr = NULL;
+	Name    valueStr = NULL;
 
 	assert ( memPtr );
 
@@ -250,8 +250,8 @@ int MemoryReport_Find_Group( int numGroups, MemoryReportGroup* groups, MemoryRep
 }
 
 
-const char* _MemoryReport_GetValue( MemoryReport* memoryReport, MemoryReportGroup reportGroup, MemoryPointer* memPtr ) {
-	const char* valueString = NULL;
+Name _MemoryReport_GetValue( MemoryReport* memoryReport, MemoryReportGroup reportGroup, MemoryPointer* memPtr ) {
+	Name valueString = NULL;
 
 	switch ( reportGroup ) {
 		case MEMORYREPORT_TYPE:

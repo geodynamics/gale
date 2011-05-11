@@ -52,10 +52,10 @@
 	struct ClassHook { __ClassHook };
 	
 	/* Create a new ClassHook */
-	ClassHook* ClassHook_New( Name name, Func_Ptr funcPtr, char* addedBy, void* reference );
+	ClassHook* ClassHook_New( Name name, Func_Ptr funcPtr, Name addedBy, void* reference );
 	
 	/* Initialise an ClassHook */
-	void ClassHook_Init( void* hook, Name name, Func_Ptr funcPtr, char* addedBy, void* reference );
+	void ClassHook_Init( void* hook, Name name, Func_Ptr funcPtr, Name addedBy, void* reference );
 	
 	/* Creation implementation */
 	
@@ -66,7 +66,7 @@
 	#define CLASSHOOK_DEFARGS \
                 STG_OBJECT_DEFARGS, \
                 Func_Ptr    funcPtr, \
-                char*       addedBy, \
+                Name       addedBy, \
                 void*     reference
 
 	#define CLASSHOOK_PASSARGS \
@@ -78,7 +78,7 @@
 	ClassHook* _ClassHook_New(  CLASSHOOK_DEFARGS  );
 	
 	/* Initialisation implementation */
-	void _ClassHook_Init( ClassHook* self, Func_Ptr funcPtr, char* addedBy, void* reference );
+	void _ClassHook_Init( ClassHook* self, Func_Ptr funcPtr, Name addedBy, void* reference );
 	
 	
 	/* Stg_Class_Delete implementation */
@@ -93,7 +93,7 @@
 	#define ClassHook_DeepCopy( self ) \
 		(ClassHook*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _ClassHook_Copy( void* hook, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ClassHook_Copy( const void* hook, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 #endif /* __StGermain_Base_Extensibility_ClassHook_h__ */
 

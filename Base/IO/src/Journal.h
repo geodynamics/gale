@@ -70,19 +70,19 @@
 	extern const Type DumpStream_Type;	/**< \deprecated Dump stream. */
 	extern const Type ErrorStream_Type;	/**< \deprecated Error stream. */
 
-	extern const char* JOURNAL_DELIMITER;
-	extern const char* JOURNAL_KEY;
-	extern const char* JOURNAL_ENABLE_KEY;
-	extern const char* JOURNAL_ENABLE_BRANCH_KEY;
-	extern const char* JOURNAL_LEVEL_KEY;
-	extern const char* JOURNAL_LEVEL_BRANCH_KEY;
-	extern const char* JOURNAL_FILE_KEY;
-	extern const char* JOURNAL_RANK_KEY;
-	extern const char* JOURNAL_FLUSH_KEY;
-	extern const char* JOURNAL_MPI_OFFSET_KEY;
+	extern Name JOURNAL_DELIMITER;
+	extern Name JOURNAL_KEY;
+	extern Name JOURNAL_ENABLE_KEY;
+	extern Name JOURNAL_ENABLE_BRANCH_KEY;
+	extern Name JOURNAL_LEVEL_KEY;
+	extern Name JOURNAL_LEVEL_BRANCH_KEY;
+	extern Name JOURNAL_FILE_KEY;
+	extern Name JOURNAL_RANK_KEY;
+	extern Name JOURNAL_FLUSH_KEY;
+	extern Name JOURNAL_MPI_OFFSET_KEY;
 
-	extern const char* JOURNAL_ON;
-	extern const char* JOURNAL_OFF;
+	extern Name JOURNAL_ON;
+	extern Name JOURNAL_OFF;
 
 	/** \def __Journal See Journal. */
 	#define __Journal \
@@ -124,7 +124,7 @@
 	 **
 	 ** It is possible to provide a dotted-decimal name to retrive a sub stream.
 	 **/
-	Stream* Journal_Register( const Type streamType, const Name name );	
+	Stream* Journal_Register( const Type streamType, Name name );	
 	
 	/** Designed for components to have their own stream.
 	 ** If the instance does not exist, a new stream is created as a duplicate of the typed stream.
@@ -132,14 +132,14 @@
 	 ** @param componentType The type of the component
 	 ** @param componentName The name of the component
 	 **/
-	Stream* Journal_Register2( const Type streamType, const Type componentType, const Name componentName );	
+	Stream* Journal_Register2( const Type streamType, const Type componentType, Name componentName );	
 
 	/** Shortcut for objects and components to retrive their own stream */
 	#define Journal_MyStream( streamType, component ) \
 		Journal_Register2( (streamType), (component)->type, (component)->name )
 
 	/** Returns a registered file from the system. If the file does not exist, NULL is returned. */
-	JournalFile* Journal_GetFile( const Name fileName );
+	JournalFile* Journal_GetFile( Name fileName );
 
 	/** Registers a file with the Journal system. If the argument is NULL, no operation is performed. */
 	void Journal_RegisterFile( JournalFile* newFile );
@@ -159,19 +159,19 @@
 	 ** If enabling, this will enable all parent streams to ensure output is possible.
 	 ** Dotted-decimal notation is available to access sub streams. 
 	 **/
-	void Journal_Enable_NamedStream( const Type type, const Name name, Bool enable );
+	void Journal_Enable_NamedStream( const Type type, Name name, Bool enable );
 
 	/** Prints a summary of the status of each stream in Journal */
 	void Journal_PrintConcise();
 
 	/** Performs a printf() with the given stream. */
-	int Journal_Printf( void* _stream, const char* const fmt, ... );
+	int Journal_Printf( void* _stream, Name fmt, ... );
 
 	/** Performs a printf() with the given stream and level of printing.
 	 **
 	 ** Output is only produced if the stream's level of printing is equal or greater.
 	 **/
-	int Journal_PrintfL( void* _stream, JournalLevel level, const char* const fmt, ... );
+	int Journal_PrintfL( void* _stream, JournalLevel level, Name fmt, ... );
 	
 	#ifdef DEBUG
 		/** Performs a Journal_Printf() only if DEBUG is defined. */
@@ -205,7 +205,7 @@
 	 **/
 	/* 
 	int Journal_Firewall_Func( int expression, char* expressionText, 
-		const char* file, const char* func, int line, void* stream, char* fmt, ... );
+		Name file, const char* func, int line, void* stream, char* fmt, ... );
 	*/
 	
 	/** Macro for calling Journal_Firewall()
@@ -223,7 +223,7 @@
 	*/
 	
 	/* Temporary revert back to old protoype to avoid compilation issues. Need to fix. */
-	int Journal_Firewall( int expression, void* stream, const char* const fmt, ... );
+	int Journal_Firewall( int expression, void* stream, Name fmt, ... );
 	
 	#ifdef DEBUG
 		/** Performs a Journal_Firewall() only if DEBUG is defined. */
@@ -241,13 +241,13 @@
 	 ** @param elem_size The size of each element in the block.
 	 ** @param num_elems The number of elements in this array.
 	 **/
-	SizeT Journal_Write( void* stream, void* data, SizeT elem_size, SizeT num_elems );
+	SizeT Journal_Write( void* stream, const void* data, SizeT elem_size, SizeT num_elems );
 
 	/** Performs a dump depending on the implemenation of the given stream. */
-	Bool Journal_Dump( void* stream, void* data );
+	Bool Journal_Dump( void* stream, const void* data );
 
-	int Journal_RPrintf ( void* _stream, const char* const fmt, ... );
-	int Journal_RPrintfL ( void* _stream, JournalLevel level, const char* const fmt, ... );
+	int Journal_RPrintf ( void* _stream, Name const fmt, ... );
+	int Journal_RPrintfL ( void* _stream, JournalLevel level, Name const fmt, ... );
 
 	/** Set up the default type streams expected throughout StGermain */
 	void Journal_SetupDefaultTypedStreams();

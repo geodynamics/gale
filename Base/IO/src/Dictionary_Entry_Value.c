@@ -51,7 +51,7 @@ static void Dictionary_Entry_Value_SetValueUnsignedInt( Dictionary_Entry_Value* 
 static void Dictionary_Entry_Value_SetValueInt( Dictionary_Entry_Value* self, unsigned int value );
 static void Dictionary_Entry_Value_SetValueDouble( Dictionary_Entry_Value* self, double value );
 static void Dictionary_Entry_Value_SetValueUnsignedLong( Dictionary_Entry_Value* self, unsigned long value );
-static void Dictionary_Entry_Value_SetValueString( Dictionary_Entry_Value* self, const char* const value );
+static void Dictionary_Entry_Value_SetValueString( Dictionary_Entry_Value* self, Name const value );
 static void Dictionary_Entry_Value_SetValueBool( Dictionary_Entry_Value* self, Bool value );
 static void Dictionary_Entry_Value_SetValueNewStruct( Dictionary_Entry_Value* self);
 static void Dictionary_Entry_Value_SetValueStruct( Dictionary_Entry_Value* self, void* value );
@@ -132,7 +132,7 @@ static void Dictionary_Entry_Value_SetValueUnsignedLong( Dictionary_Entry_Value*
 	self->type = Dictionary_Entry_Value_Type_UnsignedLong;
 }
 
-Dictionary_Entry_Value* Dictionary_Entry_Value_FromString( const char* const value ) {
+Dictionary_Entry_Value* Dictionary_Entry_Value_FromString( Name const value ) {
 	Dictionary_Entry_Value* self = Memory_Alloc( Dictionary_Entry_Value, "Entry Value String" );
 	
 	Dictionary_Entry_Value_InitFromString( self, value );
@@ -140,12 +140,12 @@ Dictionary_Entry_Value* Dictionary_Entry_Value_FromString( const char* const val
 	return self;
 }
 	
-void Dictionary_Entry_Value_InitFromString( Dictionary_Entry_Value* self, const char* const value ) {
+void Dictionary_Entry_Value_InitFromString( Dictionary_Entry_Value* self, Name const value ) {
 	Dictionary_Entry_Value_SetValueString( self, value );
 	self->next = 0;
 }
 
-static void Dictionary_Entry_Value_SetValueString( Dictionary_Entry_Value* self, const char* const value ) {
+static void Dictionary_Entry_Value_SetValueString( Dictionary_Entry_Value* self, Name const value ) {
 	self->as.typeString = StG_Strdup( value );
 	self->type = Dictionary_Entry_Value_Type_String;
 }
@@ -758,19 +758,19 @@ char* Dictionary_Entry_Value_AsString( Dictionary_Entry_Value* self ) {
 
 Bool Dictionary_Entry_Value_AsBool( Dictionary_Entry_Value* self ) {
 	if( !self ) {
-		return 0;
+          return False;
 	}
 	
 	switch( self->type ) {
 		case Dictionary_Entry_Value_Type_Struct:
 			/* Do nothing (later will print a warning) */
-			return 0;
+			return False;
 		case Dictionary_Entry_Value_Type_List:
 			/* returns the first element as an unsigned int */
 			if (self->as.typeList->first) {
 				return Dictionary_Entry_Value_AsBool( self->as.typeList->first );
 			} else {	
-				return 0;
+				return False;
 			}	
 		case Dictionary_Entry_Value_Type_String:
 			if( !strcmp( "1", self->as.typeString ) ) {
@@ -1195,7 +1195,7 @@ Dictionary_Entry_Value* Dictionary_Entry_Value_Copy(
 			}
 			else {
 				Dictionary* copiedDict;
-				copiedDict = Stg_Class_Copy( self->as.typeStruct,
+				copiedDict = (Dictionary*)Stg_Class_Copy( self->as.typeStruct,
 					NULL, True, NULL, NULL );
 				copy = Dictionary_Entry_Value_FromStruct( copiedDict );
 			}

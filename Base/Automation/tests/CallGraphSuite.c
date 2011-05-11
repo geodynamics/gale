@@ -64,8 +64,8 @@ void CallGraphSuite_TestPushPopBasics( CallGraphSuiteData* data ) {
    Stg_CallGraph_Init( &cg1 );
    
    /* Test 2: Can we push the first call on the stack? */
-   Stg_CallGraph_Push( cg0, TestFunc1, TestFunc1_Type );
-   Stg_CallGraph_Push( &cg1, TestFunc1, TestFunc1_Type );
+   Stg_CallGraph_Push( cg0, (void*)TestFunc1, TestFunc1_Type );
+   Stg_CallGraph_Push( &cg1, (void*)TestFunc1, TestFunc1_Type );
    pcu_check_true( 
       cg0->_stack && 
       !cg0->_stack->pop && 
@@ -117,15 +117,15 @@ void CallGraphSuite_TestFuncParentNameHandling( CallGraphSuiteData* data ) {
    cg2 = Stg_CallGraph_New();
    
    /* Test 4: Ensure that each function pointer - parent pointer - name is a unique entry */
-   Stg_CallGraph_Push( cg2, TestFunc1, TestFunc1_Type ); /* p0: f:1 n:1  Should add */
-   Stg_CallGraph_Push( cg2, TestFunc2, TestFunc2_Type ); /* p1: f:2 n:2  Should add */
+   Stg_CallGraph_Push( cg2, (void*)TestFunc1, TestFunc1_Type ); /* p0: f:1 n:1  Should add */
+   Stg_CallGraph_Push( cg2, (void*)TestFunc2, TestFunc2_Type ); /* p1: f:2 n:2  Should add */
    Stg_CallGraph_Pop( cg2 );
-   Stg_CallGraph_Push( cg2, TestFunc2, TestFunc2_Type ); /* p1: f:2 n:2  Should increment */
+   Stg_CallGraph_Push( cg2, (void*)TestFunc2, TestFunc2_Type ); /* p1: f:2 n:2  Should increment */
    Stg_CallGraph_Pop( cg2 );
-   Stg_CallGraph_Push( cg2, TestFunc1, TestFunc2_Type ); /* p1: f:1 n:2  Should add (recursive case) */
+   Stg_CallGraph_Push( cg2, (void*)TestFunc1, TestFunc2_Type ); /* p1: f:1 n:2  Should add (recursive case) */
    Stg_CallGraph_Pop( cg2 );
-   Stg_CallGraph_Push( cg2, TestFunc2, TestFunc1_Type ); /* p1: f:2 n:1  Should add */
-   Stg_CallGraph_Push( cg2, TestFunc1, TestFunc1_Type ); /* p2: f:1 n:1  Should add */
+   Stg_CallGraph_Push( cg2, (void*)TestFunc2, TestFunc1_Type ); /* p1: f:2 n:1  Should add */
+   Stg_CallGraph_Push( cg2, (void*)TestFunc1, TestFunc1_Type ); /* p2: f:1 n:1  Should add */
    Stg_CallGraph_Pop( cg2 );
    Stg_CallGraph_Pop( cg2 );
    Stg_CallGraph_Pop( cg2 );
@@ -149,9 +149,9 @@ void CallGraphSuite_TestFuncParentNameHandling( CallGraphSuiteData* data ) {
 
 void CallGraphSuite_TestTableRealloc( CallGraphSuiteData* data ) {
    Stg_CallGraph*	cg3;
-   int  		count=0;
+   Index  		count=0;
    Index		size=0;
-   int  		ii=0;
+   Index  		ii=0;
 
    cg3 = Stg_CallGraph_New();
    /* Test 5: Force a realloc of the table */
@@ -159,7 +159,7 @@ void CallGraphSuite_TestTableRealloc( CallGraphSuiteData* data ) {
    size = cg3->_tableSize;
    for( ii = 0; ii < count; ii++ ) {
       /* Use "i" as a unique string (unique pointer value)... don't try to print! */
-     Stg_CallGraph_Push( cg3, TestFunc1, (Name)(NULL + ii) );
+     Stg_CallGraph_Push( cg3, (void*)TestFunc1, NULL);
    }
    pcu_check_true( cg3->_tableCount == count && cg3->_tableSize == (size * 2) ); 
 
@@ -177,11 +177,11 @@ void CallGraphSuite_TestCopy( CallGraphSuiteData* data ) {
    count = (int)((double)1.5 * cg3->_tableSize);
    for( ii = 0; ii < count; ii++ ) {
       /* Use "i" as a unique string (unique pointer value)... don't try to print! */
-     Stg_CallGraph_Push( cg3, TestFunc1, (Name)(NULL + ii) );
+     Stg_CallGraph_Push( cg3, (void*)TestFunc1, NULL);
    }
 
    /* Shallow copying not yet implemented */
-   cg3deep = Stg_Class_Copy( cg3, 0, True, 0, 0 );
+   cg3deep = (Stg_CallGraph*)Stg_Class_Copy( cg3, 0, True, 0, 0 );
    pcu_check_true(
       cg3->_tableCount == cg3deep->_tableCount &&
       cg3->_tableSize == cg3deep->_tableSize &&

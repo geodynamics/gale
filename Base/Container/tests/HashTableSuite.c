@@ -77,21 +77,21 @@ void ptrPrintFunction( void *entry, void *stream ){
 	Journal_Printf( (Stream*)stream, "\t\t(ptr)%p\n", (void*)entry );
 }
 
-void checkFunction( void *entry, void *arg ){
+void checkFunction( const void *entry, void *arg ){
    int*     wordFoundArray = (int*)arg;
    Index    ii;
 	
 	assert( entry );
 
    for (ii=0; ii<NumWords_Global; ii++) {
-	   if ( 0 == strcmp( entry, WordList_Global[ii] ) ) {
+     if ( 0 == strcmp( (Name)entry, WordList_Global[ii] ) ) {
          wordFoundArray[ii] = True;
          break;
       }
    }
 }
 
-void checkPtrFunction( void *entry, void *arg ){
+void checkPtrFunction( const void *entry, void *arg ){
    DataRef*    dataRefs = (DataRef*)arg;
    Index       ii;
 	

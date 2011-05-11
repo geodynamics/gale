@@ -203,11 +203,11 @@ void _Stg_ObjectList_Print( void* objectList, struct Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void* _Stg_ObjectList_Copy( void* namedObjectList, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _Stg_ObjectList_Copy( const void* namedObjectList, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	Stg_ObjectList*	self = (Stg_ObjectList*) namedObjectList;
 	Stg_ObjectList*	newObjectList;
 	
-	newObjectList = _Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
+	newObjectList = (Stg_ObjectList*)_Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	newObjectList->_append = self->_append;
 	newObjectList->_prepend = self->_prepend;
@@ -245,7 +245,7 @@ void* _Stg_ObjectList_Copy( void* namedObjectList, void* dest, Bool deep, Name n
 			"ObjectList->data" );
 		
 		for( obj_I = 0; obj_I < newObjectList->count; obj_I++ ) {
-			newObjectList->data[obj_I] = Stg_Class_Copy( self->data[obj_I], NULL, deep, nameExt, ptrMap );
+                  newObjectList->data[obj_I] = (Stg_Object*)Stg_Class_Copy( self->data[obj_I], NULL, deep, nameExt, ptrMap );
 		}
 	}
 	
@@ -421,7 +421,7 @@ Index Stg_ObjectList_InsertBefore( void* objectList, Name reference, void* objec
 	return self->_insertBefore( self, reference, objectPtr );	
 }
 
-Index Stg_ObjectList_ClassInsertBefore( void* objectList, Name reference, void* objectPtr, Name name ) {
+Index Stg_ObjectList_ClassInsertBefore( void* objectList, Name reference, void* objectPtr, const char* name ) {
 	Stg_ObjectList* self = (Stg_ObjectList*) objectList;
 	
 	return Stg_ObjectList_InsertBefore( self, reference, Stg_ObjectAdaptor_NewOfClass( objectPtr, name, True, False ) );
@@ -444,7 +444,7 @@ Index Stg_ObjectList_PointerInsertBefore(
 		Stg_ObjectAdaptor_NewOfPointer( objectPtr, name, True, False, ptrDelete, ptrPrint, ptrCopy ) );
 }
 
-Index Stg_ObjectList_GlobalPointerInsertBefore( void* objectList, Name reference, void* objectPtr, Name name ) {
+Index Stg_ObjectList_GlobalPointerInsertBefore( void* objectList, Name reference, void* objectPtr, const char* name ) {
 	Stg_ObjectList* self = (Stg_ObjectList*) objectList;
 	
 	return Stg_ObjectList_InsertBefore( 
@@ -474,7 +474,7 @@ void Stg_ObjectList_InsertAtIndex( void* objects, Index index, void* objectPtr )
 	self->_insertAtIndex( self, index, objectPtr );
 }
 
-Index Stg_ObjectList_ClassInsertAfter( void* objectList, Name reference, void* objectPtr, Name name ) {
+Index Stg_ObjectList_ClassInsertAfter( void* objectList, Name reference, void* objectPtr, const char* name ) {
 	Stg_ObjectList* self = (Stg_ObjectList*) objectList;
 	
 	return Stg_ObjectList_InsertAfter( self, reference, Stg_ObjectAdaptor_NewOfClass( objectPtr, name, True, False ) );
@@ -497,7 +497,7 @@ Index Stg_ObjectList_PointerInsertAfter(
 		Stg_ObjectAdaptor_NewOfPointer( objectPtr, name, True, False, ptrDelete, ptrPrint, ptrCopy ) );
 }
 
-Index Stg_ObjectList_GlobalPointerInsertAfter( void* objectList, Name reference, void* objectPtr, Name name ) {
+Index Stg_ObjectList_GlobalPointerInsertAfter( void* objectList, Name reference, void* objectPtr, const char* name ) {
 	Stg_ObjectList* self = (Stg_ObjectList*) objectList;
 	
 	return Stg_ObjectList_InsertAfter( 
@@ -512,14 +512,14 @@ Index Stg_ObjectList_Remove( void* objectList, Name reference, ReplacementOption
 	return self->_remove( self, reference, option );
 }
 
-Index Stg_ObjectList_GetIndex( void* objectList, const Name toGet ) {
+Index Stg_ObjectList_GetIndex( void* objectList, Name toGet ) {
 	Stg_ObjectList* self = (Stg_ObjectList*) objectList;
 
 	return self->_getIndex( self, toGet );
 }
 
 
-void* Stg_ObjectList_Get( void* objectList, const Name objectName ) {
+void* Stg_ObjectList_Get( void* objectList, Name objectName ) {
 	Stg_ObjectList* self = (Stg_ObjectList*) objectList;
 
 	return self->_get( self, objectName );
@@ -728,7 +728,7 @@ Index _Stg_ObjectList_Remove( void* namedObjectList, Name reference, Replacement
 }
 
 
-Index _Stg_ObjectList_GetIndex( void* namedObjectList, const Name toGet ) {
+Index _Stg_ObjectList_GetIndex( void* namedObjectList, Name toGet ) {
 	Stg_ObjectList* self = (Stg_ObjectList*) namedObjectList;
 	Index objectIndex;
 	
@@ -744,7 +744,7 @@ Index _Stg_ObjectList_GetIndex( void* namedObjectList, const Name toGet ) {
 }
 
 
-void* _Stg_ObjectList_Get( void* objectList, const Name toGet ) {
+void* _Stg_ObjectList_Get( void* objectList, Name toGet ) {
         Stg_ObjectList* self = (Stg_ObjectList*) objectList;
         Index objectIndex;
                                                                                                                                     

@@ -66,10 +66,10 @@
 	
 	
 	/** Create a new SimpleExtensionInfo */
-	SimpleExtensionInfo* SimpleExtensionInfo_New( const Name name, SizeT size, Index count );
+	SimpleExtensionInfo* SimpleExtensionInfo_New( Name name, SizeT size, Index count );
 	
 	/** Initialise an SimpleExtensionInfo */
-	void SimpleExtensionInfo_Init( void* simpleExtensionInfo, const Name name, SizeT size, Index count );
+	void SimpleExtensionInfo_Init( void* simpleExtensionInfo, Name name, SizeT size, Index count );
 	
 	/* Creation implementation */
 	
@@ -95,7 +95,7 @@
 	void _SimpleExtensionInfo_Print( void* simpleExtensionInfo, Stream* stream );
 	
 	/** Class_Copy() implementation: derivatives should call this in their implementation */
-	void* _SimpleExtensionInfo_Copy( void* simpleExtensionInfo, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _SimpleExtensionInfo_Copy( const void* simpleExtensionInfo, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _SimpleExtensionInfo_DataCopy( 
 		void* extensionInfo, 

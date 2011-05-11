@@ -37,8 +37,8 @@
 #include <libcsoap/soap-client.h>
 
 
-const char* Regresstor_URN = "urn:Regresstor";			/* The name of the web service class */
-const char* Regresstor_EndRunMethod = "endRun";
+Name Regresstor_URN = "urn:Regresstor";			/* The name of the web service class */
+Name Regresstor_EndRunMethod = "endRun";
 
 /* Index Positions to the paramter array */
 #define RunID			0
@@ -48,7 +48,7 @@ const char* Regresstor_EndRunMethod = "endRun";
 #define Parameter_Num_Pos	2
 
 /* The parameter names to the submit build function */
-const char* parameterNames[Parameter_Num_Pos] = {
+Name parameterNames[Parameter_Num_Pos] = {
 	"RunID",
 	"URL" };
 

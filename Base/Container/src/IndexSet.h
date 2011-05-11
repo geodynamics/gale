@@ -124,7 +124,7 @@
 	#define IndexSet_DeepCopy( self ) \
 		(IndexSet*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _IndexSet_Copy( void* indexSet, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _IndexSet_Copy( const void* indexSet, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/** "Add" an index - i.e., set a particular index into the set's value as
 	True. If true already, value is unchanged. */
@@ -193,7 +193,7 @@
 	void _IndexSet_Duplicate( void* indexSet, void* newIndexSet );
 	
 	/** Prints message and exits properly when bad access/write detected. */
-	void _IndexSet_Abort( IndexSet* indexSet, const char* const funcName, IndexSet_Index index );
+	void _IndexSet_Abort( IndexSet* indexSet, Name const funcName, IndexSet_Index index );
 
 #endif /* __StGermain_Base_Container_IndexSet_h__ */
 

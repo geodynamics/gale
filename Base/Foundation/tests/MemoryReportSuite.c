@@ -267,10 +267,10 @@ void MemoryReportSuite_FreeTestMemoryObjects( MemoryReportSuiteData* data ) {
 
 /*Test 1: MemoryReport: (Type), where file is this test*/
 void MemoryReportSuite_TestReportPrintsOne( MemoryReportSuiteData* data ) {
-   char*          memoryReportOutputFilename = "./MemoryReportSuite_TestOutput-1.txt";
+   Name memoryReportOutputFilename="./MemoryReportSuite_TestOutput-1.txt";
    Memory*        tempMemoryManager;   
 
-   Stream_RedirectFile( stgMemory->infoStream, memoryReportOutputFilename );
+   Stream_RedirectFile((Stream*)stgMemory->infoStream,memoryReportOutputFilename);
 
    tempMemoryManager = MemoryReportSuite_SaveStgMemoryAndCreateTemp( data );
    MemoryReportSuite_AllocTestMemoryObjects( data );
@@ -352,10 +352,10 @@ void MemoryReportSuite_TestReportPrintsOne( MemoryReportSuiteData* data ) {
 
 /*Test 2: MemoryReport: (Type), where name=Test1*/
 void MemoryReportSuite_TestReportPrintsTwo( MemoryReportSuiteData* data ) {
-   char*          memoryReportOutputFilename = "./MemoryReportSuite_TestOutput-2.txt";
+   Name memoryReportOutputFilename = "./MemoryReportSuite_TestOutput-2.txt";
    Memory*        tempMemoryManager;   
    
-   Stream_RedirectFile( stgMemory->infoStream, memoryReportOutputFilename );
+   Stream_RedirectFile((Stream*)stgMemory->infoStream,memoryReportOutputFilename);
 
    tempMemoryManager = MemoryReportSuite_SaveStgMemoryAndCreateTemp( data );
    MemoryReportSuite_AllocTestMemoryObjects( data );
@@ -425,10 +425,10 @@ void MemoryReportSuite_TestReportPrintsTwo( MemoryReportSuiteData* data ) {
 
 /*Test 3: MemoryReport: (Func), where file= this file */
 void MemoryReportSuite_TestReportPrintsThree( MemoryReportSuiteData* data ) {
-   char*          memoryReportOutputFilename = "./MemoryReportSuite_TestOutput-3.txt";
+   Name memoryReportOutputFilename="./MemoryReportSuite_TestOutput-3.txt";
    Memory*        tempMemoryManager;   
    
-   Stream_RedirectFile( stgMemory->infoStream, memoryReportOutputFilename );
+   Stream_RedirectFile((Stream*)stgMemory->infoStream,memoryReportOutputFilename);
 
    tempMemoryManager = MemoryReportSuite_SaveStgMemoryAndCreateTemp( data );
    MemoryReportSuite_AllocTestMemoryObjects( data );
@@ -501,10 +501,10 @@ void MemoryReportSuite_TestReportPrintsThree( MemoryReportSuiteData* data ) {
 
 /*Test 4: MemoryReport: (File), where type=StructA and name=Test2 */
 void MemoryReportSuite_TestReportPrintsFour( MemoryReportSuiteData* data ) {
-   char*          memoryReportOutputFilename = "./MemoryReportSuite_TestOutput-4.txt";
+   Name memoryReportOutputFilename="./MemoryReportSuite_TestOutput-4.txt";
    Memory*        tempMemoryManager;   
    
-   Stream_RedirectFile( stgMemory->infoStream, memoryReportOutputFilename );
+   Stream_RedirectFile((Stream*)stgMemory->infoStream,memoryReportOutputFilename);
 
    tempMemoryManager = MemoryReportSuite_SaveStgMemoryAndCreateTemp( data );
    MemoryReportSuite_AllocTestMemoryObjects( data );

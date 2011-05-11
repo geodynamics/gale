@@ -109,11 +109,11 @@ void _VariableDumpStream_Print( void* cStream, Stream* stream ) {
 	Journal_Printf( stream, "numItems: %d\n", self->numItems );
 }
 
-void* _VariableDumpStream_Copy( void* variableDumpStream, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _VariableDumpStream_Copy( const void* variableDumpStream, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	VariableDumpStream*	self = (VariableDumpStream*)variableDumpStream;
 	VariableDumpStream*	newVariableDumpStream;
 	
-	newVariableDumpStream = _Stream_Copy( self, dest, deep, nameExt, ptrMap );
+	newVariableDumpStream = (VariableDumpStream*)_Stream_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	/* HACK */
 	/* TODO: this should actually copy the data, i think... */
@@ -125,10 +125,10 @@ void* _VariableDumpStream_Copy( void* variableDumpStream, void* dest, Bool deep,
 	return newVariableDumpStream;
 }
 
-Bool _VariableDumpStream_Dump( Stream* stream, void* _loop )
+Bool _VariableDumpStream_Dump( Stream* stream, const void* _loop )
 {
 	VariableDumpStream* self = (VariableDumpStream*)stream;
-	int varI, typeI;
+	Index varI, typeI;
 	int* loop = (int*)_loop;
 	float tmp;
 	
@@ -172,7 +172,7 @@ Bool _VariableDumpStream_Dump( Stream* stream, void* _loop )
 	return True;
 }
 
-void VariableDumpStream_SetVariable( void* stream, Variable* data, int numItems, unsigned int dumpEvery, const Name const fileName )
+void VariableDumpStream_SetVariable( void* stream, Variable* data, int numItems, unsigned int dumpEvery, Name fileName )
 {
 	VariableDumpStream* self = (VariableDumpStream*)stream;
 	JournalFile* file;
@@ -187,7 +187,7 @@ void VariableDumpStream_SetVariable( void* stream, Variable* data, int numItems,
 		file = CFile_New2( fileName );
 		Journal_RegisterFile( file );
 	}
-	Stream_SetFile( stream, file );
+	Stream_SetFile( (Stream*)stream, file );
 }
 
 

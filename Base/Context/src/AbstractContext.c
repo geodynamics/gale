@@ -158,7 +158,7 @@ void _AbstractContext_Init( AbstractContext* self ) {
 	
 	/* Set up the registers and managers */
 	self->variable_Register = Variable_Register_New();
-	self->extensionMgr = ExtensionManager_New_OfExistingObject( self->type, self );
+	self->extensionMgr = ExtensionManager_New_OfExistingObject( (char*)(self->type), self );
 	ExtensionManager_Register_Add( extensionMgr_Register, self->extensionMgr );
 	self->pointer_Register = Stg_ObjectList_New();
 	self->plugins = PluginsManager_New();
@@ -166,30 +166,30 @@ void _AbstractContext_Init( AbstractContext* self ) {
 	/* Build the entryPoint table */
 	self->entryPoint_Register = EntryPoint_Register_New(); 
 	/* For the construct EP, override the run function such that the context/ptrToContext remain in sync in the loop. */
-	self->constructK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_AssignFromXML, EntryPoint_2VoidPtr_CastType ) );
+	self->constructK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_AssignFromXML, EntryPoint_2VoidPtr_CastType ) );
 	AbstractContext_GetEntryPoint( self, AbstractContext_EP_AssignFromXML )->_getRun = _AbstractContext_Construct_EP_GetRun;
 	AbstractContext_GetEntryPoint( self, AbstractContext_EP_AssignFromXML )->run = EntryPoint_GetRun( AbstractContext_GetEntryPoint( self, AbstractContext_EP_AssignFromXML ) );
 
-	self->constructExtensionsK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_AssignFromXMLExtensions, EntryPoint_VoidPtr_CastType ) );
-	self->buildK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_Build, EntryPoint_VoidPtr_CastType ) );
-	self->initialiseK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_Initialise, EntryPoint_VoidPtr_CastType ) );
-	self->executeK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_Execute, EntryPoint_VoidPtr_CastType ) );
-	self->destroyK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_Destroy, EntryPoint_VoidPtr_CastType ) );
-	self->destroyExtensionsK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_DestroyExtensions, EntryPoint_VoidPtr_CastType ) );
+	self->constructExtensionsK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_AssignFromXMLExtensions, EntryPoint_VoidPtr_CastType ) );
+	self->buildK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_Build, EntryPoint_VoidPtr_CastType ) );
+	self->initialiseK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_Initialise, EntryPoint_VoidPtr_CastType ) );
+	self->executeK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_Execute, EntryPoint_VoidPtr_CastType ) );
+	self->destroyK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_Destroy, EntryPoint_VoidPtr_CastType ) );
+	self->destroyExtensionsK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_DestroyExtensions, EntryPoint_VoidPtr_CastType ) );
 	
-	self->dtK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_Dt, ContextEntryPoint_Dt_CastType ) );
-	self->stepK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_Step, ContextEntryPoint_Step_CastType ) );
-	self->updateClassK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_UpdateClass, EntryPoint_Class_VoidPtr_CastType ) );
-	self->solveK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_Solve, EntryPoint_VoidPtr_CastType ) );
-	self->postSolveK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_PostSolvePreUpdate, EntryPoint_VoidPtr_CastType ) );
-	self->syncK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_Sync, EntryPoint_VoidPtr_CastType ) );
-	self->frequentOutputK =	Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_FrequentOutput, EntryPoint_VoidPtr_CastType ) );
-	self->dumpK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_Dump, EntryPoint_VoidPtr_CastType ) );
-	self->dumpClassK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_DumpClass, EntryPoint_Class_VoidPtr_CastType ) );
-	self->saveK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_Save, EntryPoint_VoidPtr_CastType ) );
-	self->saveClassK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_SaveClass, EntryPoint_Class_VoidPtr_CastType ) );
-	self->dataSaveK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_DataSave, EntryPoint_VoidPtr_CastType ) );
-	self->dataSaveClassK = Context_AddEntryPoint( self, ContextEntryPoint_New( AbstractContext_EP_DataSaveClass, EntryPoint_Class_VoidPtr_CastType ) );
+	self->dtK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_Dt, ContextEntryPoint_Dt_CastType ) );
+	self->stepK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_Step, ContextEntryPoint_Step_CastType ) );
+	self->updateClassK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_UpdateClass, EntryPoint_Class_VoidPtr_CastType ) );
+	self->solveK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_Solve, EntryPoint_VoidPtr_CastType ) );
+	self->postSolveK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_PostSolvePreUpdate, EntryPoint_VoidPtr_CastType ) );
+	self->syncK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_Sync, EntryPoint_VoidPtr_CastType ) );
+	self->frequentOutputK =	Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_FrequentOutput, EntryPoint_VoidPtr_CastType ) );
+	self->dumpK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_Dump, EntryPoint_VoidPtr_CastType ) );
+	self->dumpClassK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_DumpClass, EntryPoint_Class_VoidPtr_CastType ) );
+	self->saveK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_Save, EntryPoint_VoidPtr_CastType ) );
+	self->saveClassK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_SaveClass, EntryPoint_Class_VoidPtr_CastType ) );
+	self->dataSaveK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_DataSave, EntryPoint_VoidPtr_CastType ) );
+	self->dataSaveClassK = Context_AddEntryPoint( self, ContextEntryPoint_New( (char*)AbstractContext_EP_DataSaveClass, EntryPoint_Class_VoidPtr_CastType ) );
 	
 	/* add initial hooks */
    /* don't need now Stg_ComponentFactory_ConstructComponents, 13Nov09 JG, plan to rejig the context
@@ -660,7 +660,7 @@ EntryPoint_Index AbstractContext_AddEntryPoint(
 }
 
 
-EntryPoint* AbstractContext_GetEntryPoint( void* abstractContext, const Name entryPointName ) {
+EntryPoint* AbstractContext_GetEntryPoint( void* abstractContext, Name entryPointName ) {
 	AbstractContext*	self = (AbstractContext*)abstractContext;
 	EntryPoint_Index	ep_I;
 
@@ -712,13 +712,13 @@ void AbstractContext_Step( void* context, double dt ) {
 }
 
 
-void AbstractContext_WarnIfNoHooks( void* context, EntryPoint_Index epIndex, const char* caller ) {
+void AbstractContext_WarnIfNoHooks( void* context, EntryPoint_Index epIndex, Name caller ) {
 	AbstractContext* self = (AbstractContext*)context;
 	EntryPoint_WarnIfNoHooks( EntryPoint_Register_At( self->entryPoint_Register, epIndex ), caller );
 }
 
 
-void AbstractContext_ErrorIfNoHooks( void* context, EntryPoint_Index epIndex, const char* caller ) {
+void AbstractContext_ErrorIfNoHooks( void* context, EntryPoint_Index epIndex, Name caller ) {
 	AbstractContext* self = (AbstractContext*)context;
 	EntryPoint_ErrorIfNoHooks( EntryPoint_Register_At( self->entryPoint_Register, epIndex ), caller );
 }
@@ -1071,7 +1071,7 @@ void _AbstractContext_SaveTimeInfo( void* _context ) {
 
 
 Bool AbstractContext_CheckPointExists( void* context, Index timeStep ) {
-	AbstractContext*       self = context;	
+  AbstractContext*       self = (AbstractContext*)context;	
 	char*                  timeInfoFileName = NULL;
 	char*                  timeInfoFileNamePart = NULL;   
 	struct stat            statInfo;
@@ -1097,7 +1097,7 @@ Bool AbstractContext_CheckPointExists( void* context, Index timeStep ) {
 }
 
 char* Context_GetCheckPointReadPrefixString( void* context ) {
-	AbstractContext*	self = context;	
+  AbstractContext*	self = (AbstractContext*)context;	
 	char*					readPathString = NULL;
 
    if ( self->checkpointAppendStep ) {
@@ -1120,7 +1120,7 @@ char* Context_GetCheckPointReadPrefixString( void* context ) {
 }
 
 char* Context_GetCheckPointWritePrefixString( void* context ) {
-	AbstractContext*	self = context;	
+  AbstractContext*	self = (AbstractContext*)context;	
 	char*					writePathString = NULL;
 
    if ( self->checkpointAppendStep ) {

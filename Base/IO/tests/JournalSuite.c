@@ -297,8 +297,8 @@ void JournalSuite_TestReadFromDictionary( JournalSuiteData* data ) {
    Stream*     fileTest2;
    Stream*     propTest1;
    Stream*     propTest2;
-   const char* testNewTypeFilename1 = "./testJournal-out1.txt";
-   const char* testNewTypeFilename2 = "./testJournal-out2.txt";
+   Name testNewTypeFilename1 = "./testJournal-out1.txt";
+   Name testNewTypeFilename2 = "./testJournal-out2.txt";
 
    infoTest1 = Journal_Register( Info_Type, (Name)"test1"  );
    infoTest2 = Journal_Register( Info_Type, (Name)"test2"  );
@@ -372,7 +372,7 @@ void JournalSuite_TestReadFromDictionary( JournalSuiteData* data ) {
 
 void JournalSuite_TestPrintString_WithLength( JournalSuiteData* data  ) {
    Stream*      myStream    = Journal_Register( Info_Type, (Name)"TestStream" );
-   char*        string        = "helloWorldHowDoYouDo";
+   Name        string        = "helloWorldHowDoYouDo";
    int          char_I;
    const Name  stringLengthTestFilename = "testJournalPrintStringWithLength.txt" ;
    char         expectedFilename[PCU_PATH_MAX];
@@ -396,7 +396,7 @@ void JournalSuite_TestPrintString_WithLength( JournalSuiteData* data  ) {
 
 void JournalSuite_TestShortcuts( JournalSuiteData* data ) {
    Stream*      myStream    = Journal_Register( Info_Type, (Name)"TestStream"  );
-   char*        string        = "helloWorldHowDoYouDo";
+   Name        string        = "helloWorldHowDoYouDo";
    double       doubleValue   = 3142e20;
    double       floatValue    = 2.173425;
    int          intValue      = 3;

@@ -46,7 +46,7 @@
 
 
 const Type RankFormatter_Type = "RankFormatter";
-const char* PREPEND = ": ";
+Name PREPEND = ": ";
 
 
 StreamFormatter* RankFormatter_New()

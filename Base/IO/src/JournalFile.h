@@ -59,8 +59,8 @@
 	extern const Type JournalFile_Type;
 
 	typedef JournalFile* (JournalFile_Constructor) (void);
-	typedef Bool (JournalFile_OpenFunction) (void* file, const char* const fileName );
-	typedef Bool (JournalFile_AppendFunction) (void* file, const char* const fileName );
+	typedef Bool (JournalFile_OpenFunction) (void* file, Name const fileName );
+	typedef Bool (JournalFile_AppendFunction) (void* file, Name const fileName );
 	typedef Bool (JournalFile_CloseFunction) (void* file );
 	typedef Bool (JournalFile_FlushFunction) (void* file );
 		

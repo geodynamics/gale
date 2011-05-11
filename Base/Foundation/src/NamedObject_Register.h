@@ -80,7 +80,7 @@
 	
 	void _NamedObject_Register_Print( void* nameObjectRegister, struct Stream* stream );
 	
-	void* _NamedObject_Register_Copy( void* namedObjectRegister, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _NamedObject_Register_Copy( const void* namedObjectRegister, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	
 	/* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

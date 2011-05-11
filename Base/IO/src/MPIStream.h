@@ -91,10 +91,10 @@
 	SizeT _MPIStream_Printf( Stream* stream, const char *fmt, va_list args );
 	
 	/** Write() implementation. */
-	SizeT _MPIStream_Write( Stream* stream, void *data, SizeT elem_size, SizeT num_elems );
+	SizeT _MPIStream_Write( Stream* stream, const void *data, SizeT elem_size, SizeT num_elems );
 	
 	/** Dump() implementation. Performs no operation for MPIStreams. */
-	Bool _MPIStream_Dump( Stream* stream, void *data );
+	Bool _MPIStream_Dump( Stream* stream, const void *data );
 	
 	/** SetFile() implementation. */
 	Bool _MPIStream_SetFile( Stream* stream, JournalFile* file );

@@ -74,7 +74,7 @@ void VariableDumpStreamSuite_TestDump( VariableDumpStreamSuiteData* data ) {
    Variable*      vec;
    Stream*        dumpStream = NULL;
    Stream*        dumpStream2 = NULL;
-   int            i;
+   Index            i;
    const Name     scalarDumpFilename = "./scalardump.dat" ;
    const Name     vectorDumpFilename = "./vectordump.dat" ;
    FILE*          scalarDumpFile = NULL;

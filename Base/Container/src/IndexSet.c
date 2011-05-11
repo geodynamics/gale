@@ -165,7 +165,7 @@ void _IndexSet_Print( void* indexSet, Stream* stream ) {
 }
 
 
-void* _IndexSet_Copy( void* indexSet, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _IndexSet_Copy( const void* indexSet, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	IndexSet*	self = (IndexSet*)indexSet;
 	IndexSet*	newIndexSet;
 	
@@ -232,15 +232,15 @@ Bool IndexSet_IsMember( void* indexSet, Index index ) {
 
 IndexSet_Index IndexSet_GetIndexOfNthMember( void* indexSet, const Index nthMember ) {
 	IndexSet*		self = (IndexSet*)indexSet;
-	int		membersSoFar = -1;
+	Index		membersSoFar = 0;
 	IndexSet_Index	index_I;
 	
 	for( index_I = 0; index_I < self->size; index_I++ ) {
 		if( IS_MEMBER( self, index_I ) ) {
-			membersSoFar++;
 			if ( nthMember == membersSoFar ) {
 				return index_I;
 			}
+			membersSoFar++;
 		}
 	}
 

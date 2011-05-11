@@ -97,7 +97,7 @@
 	void _IndentFormatter_Print( void* formatter, Stream* stream );
 
 	/** Copy implementation. */
-	void* _IndentFormatter_Copy( void* indentFormatter, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _IndentFormatter_Copy( const void* indentFormatter, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 
 
 	/** Set the value of indentation. */

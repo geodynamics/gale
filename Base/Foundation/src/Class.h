@@ -51,14 +51,14 @@
 	/* Child classes must define these abstract functions */
 	typedef void (Stg_Class_DeleteFunction)	( void* _class );
 	typedef void (Stg_Class_PrintFunction)	( void* _class, struct Stream* stream );
-	typedef void* (Stg_Class_CopyFunction)	( void* _class, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	typedef void* (Stg_Class_CopyFunction)	( const void* _class, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 
 	/** \def __Stg_Class information */
 	#define __Stg_Class \
 		/* General info */ 					\
 		SizeT				_sizeOfSelf;		/**< Size of the final class type */ \
 		Bool				_deleteSelf;		/**< True it is to be deallocated in Delete */ \
-		Type				type;			/**< Global const char* to string of class' name */ \
+		Type				type;			/**< Global Name to string of class' name */ \
 		unsigned			nRefs;			/* Reference counting. */ \
 									\
 		/* Virtual info */ 					\
@@ -107,14 +107,14 @@
 	/** Generic copy function caller */
 	void* Stg_Generic_Copy( 
 		Stg_Class_CopyFunction* copyFunc,
-		void* _class, 
+		const void* _class, 
 		void* dest, 
 		Bool deep, 
 		Name nameExt, 
 		struct PtrMap* ptrMap );
 	
 	/** Copy a class. */
-	void* Stg_Class_Copy( void* _class, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* Stg_Class_Copy( const void* _class, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 
 	/** Delete interface. */
 	void _Stg_Class_Delete( void* _class );
@@ -123,7 +123,7 @@
 	void _Stg_Class_Print( void* _class, struct Stream* stream );
 	
 	/** Coy interface. */
-	void* _Stg_Class_Copy( void* _class, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _Stg_Class_Copy( const void* _class, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	
 	/* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

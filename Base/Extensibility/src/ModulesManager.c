@@ -66,7 +66,7 @@ const Type ModulesManager_Type = "ModulesManager";
 void SingleRegister();
 
 
-const char* Codelet_GetMetadata();
+Name Codelet_GetMetadata();
 
 /* Define memory for global pointer to moduleDirectories */
 Stg_ObjectList*  moduleDirectories = NULL;	
@@ -335,7 +335,7 @@ Bool ModulesManager_LoadModule( void* modulesManager, Name moduleName ) {
 		char* name;
 
 		name = Stg_Meta_GetAssociationType( metadata, dep_I );
-		Journal_Firewall( (Bool)name, stream, "Module name/type not found in dependency/associations meta entry\n" );
+		Journal_Firewall( name!=NULL, stream, "Module name/type not found in dependency/associations meta entry\n" );
 
 		if( !ModulesManager_LoadModule( self, name ) ) {
 			Journal_Printf( stream, "Dependency %s failed to load\n", name );
@@ -359,7 +359,7 @@ Bool ModulesManager_LoadModule( void* modulesManager, Name moduleName ) {
 Bool ModulesManager_UnloadModule( void* modulesManager, Name moduleName ) {
 	ModulesManager* self = (ModulesManager*)modulesManager;
 	
-	if( self->_unloadModule( self, Stg_ObjectList_Get( self->modules, moduleName ) ) ) {
+	if( self->_unloadModule( self, (Module*)Stg_ObjectList_Get( self->modules, moduleName ) ) ) {
 		if( Stg_ObjectList_Remove( self->modules, moduleName, DELETE ) ) {
 			return True;
 		}
@@ -377,7 +377,7 @@ void ModulesManager_Unload( void* modulesManager ) {
 	}
 }
 
-void ModulesManager_AddDirectory( Name name, char* directory ) {
+void ModulesManager_AddDirectory( Name name, Name directory ) {
 	Bool				found;
 	Index				i;
 	
@@ -389,7 +389,7 @@ void ModulesManager_AddDirectory( Name name, char* directory ) {
 	/* Check that the directory isn't already added */
 	found = False;
 	for( i =  0; i < moduleDirectories->count; i++ ){
-		if( strcmp( directory, Stg_ObjectList_ObjectAt( moduleDirectories, i ) ) == 0 ) {
+          if( strcmp( directory, (Name)Stg_ObjectList_ObjectAt( moduleDirectories, i ) ) == 0 ) {
 			found = True;
 		}
 	}
@@ -430,12 +430,12 @@ Index ModulesManager_Submit(
 			defaultNew,
 			Codelet_MetaAsDictionary );
 	
-		codeletInstance = defaultNew( codeletName );
+		codeletInstance = defaultNew( (char*)codeletName );
 		result = Stg_ObjectList_Append( self->codelets, codeletInstance );
 
 		/* only submit if not a toolbox */
 		if( LiveComponentRegister_GetLiveComponentRegister() && strcmp( self->type, ToolboxesManager_Type ) ) {
-			LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), codeletInstance );
+                  LiveComponentRegister_Add( LiveComponentRegister_GetLiveComponentRegister(), (Stg_Component*)codeletInstance );
 		}
 		
 		return result;
@@ -446,7 +446,7 @@ Index ModulesManager_Submit(
 		/* Otherwise since this Codelet has already been added to the global ComponentRegister,
 		 * but not to this ModulesManager instance, then just instantiate another Codelet instance
 		 * and add it to this ModulesManager's codelet array. */
-		codeletInstance = defaultNew( codeletName );
+          codeletInstance = defaultNew( (char*)codeletName );
 		result = Stg_ObjectList_Append( self->codelets, codeletInstance );
 		
 		return result;
@@ -468,7 +468,7 @@ Module* ModulesManager_CreateModule( void* modulesManager, Name name, Stg_Object
 
 void ModulesManager_ConstructModules( void* modulesManager, Stg_ComponentFactory* cf, void* data ) {
 	ModulesManager* self = (ModulesManager*)modulesManager;
-	int i;
+	Index i;
 
 	for( i = 0; i < self->codelets->count; ++i ) {
 		Stg_Component_AssignFromXML( self->codelets->data[i], cf, data, False );

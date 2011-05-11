@@ -54,7 +54,7 @@ const Type ClassPtrExtensionInfo_Type = "ClassPtrExtensionInfo";
 
 
 /** allocate and initialise a new ClassPtrExtensionInfo. */
-ClassPtrExtensionInfo* ClassPtrExtensionInfo_New( const Name name, Stg_Class_CopyFunction* copyFunc, Index count ) {
+ClassPtrExtensionInfo* ClassPtrExtensionInfo_New( Name name, Stg_Class_CopyFunction* copyFunc, Index count ) {
 	/* Variables set in this function */
 	SizeT                            _sizeOfSelf = sizeof(ClassPtrExtensionInfo);
 	Type                                    type = ClassPtrExtensionInfo_Type;
@@ -71,7 +71,7 @@ ClassPtrExtensionInfo* ClassPtrExtensionInfo_New( const Name name, Stg_Class_Cop
 }
 
 
-void ClassPtrExtensionInfo_Init( void* arrayExtensionInfo, const Name name, Stg_Class_CopyFunction* copyFunc, Index count ) {
+void ClassPtrExtensionInfo_Init( void* arrayExtensionInfo, Name name, Stg_Class_CopyFunction* copyFunc, Index count ) {
 	ClassPtrExtensionInfo* self = (ClassPtrExtensionInfo*)arrayExtensionInfo;
 
 	/* General info */
@@ -86,7 +86,7 @@ void ClassPtrExtensionInfo_Init( void* arrayExtensionInfo, const Name name, Stg_
 	self->_dataCopy = _ClassPtrExtensionInfo_DataCopy;
 	
 	/* ClassPtrExtensionInfo info */
-	_ClassPtrExtensionInfo_Init( self, (Name)name, copyFunc, count );
+	_ClassPtrExtensionInfo_Init( self, name, copyFunc, count );
 }
 
 
@@ -148,12 +148,12 @@ void _ClassPtrExtensionInfo_Print( void* arrayExtensionInfo, Stream* stream ) {
 }
 
 
-void* _ClassPtrExtensionInfo_Copy( void* extensionInfo, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap  ) {
+void* _ClassPtrExtensionInfo_Copy( const void* extensionInfo, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap  ) {
 	ClassPtrExtensionInfo*	self = (ClassPtrExtensionInfo*)extensionInfo;
 	ClassPtrExtensionInfo*	newClassPtrExtensionInfo;
 
 	/* Copy parent */
-	newClassPtrExtensionInfo = _ExtensionInfo_Copy( self, dest, deep, nameExt, ptrMap );
+	newClassPtrExtensionInfo = (ClassPtrExtensionInfo*)_ExtensionInfo_Copy( self, dest, deep, nameExt, ptrMap );
 
 	newClassPtrExtensionInfo->copyFunc = self->copyFunc;
 	
@@ -171,7 +171,7 @@ void* _ClassPtrExtensionInfo_DataCopy(
 	ClassPtrExtensionInfo* self = (ClassPtrExtensionInfo*) extensionInfo;
 	ClassPtrExtensionInfo_PtrClass* srcArray = (ClassPtrExtensionInfo_PtrClass*)source;
 	ClassPtrExtensionInfo_PtrClass* destArray = (ClassPtrExtensionInfo_PtrClass*)dest;
-	int item_I;
+	Index item_I;
 
 	for ( item_I = 0; item_I < self->count; ++item_I ) {
 		destArray[item_I].ptr = Stg_Generic_Copy( self->copyFunc, srcArray[item_I].ptr, NULL, deep, nameExt, ptrMap );

@@ -102,12 +102,12 @@ void _LineFormatter_Print( void* formatter, Stream* stream )
 	/* print _newLine and _tag */
 }
 
-void* _LineFormatter_Copy( void* lineFormatter, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _LineFormatter_Copy( const void* lineFormatter, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	LineFormatter*	self = (LineFormatter*)lineFormatter;
 	LineFormatter*	newLineFormatter;
 	
 	/* Create new instance. Copy virtual info */
-	newLineFormatter = _StreamFormatter_Copy( self, dest, deep, nameExt, ptrMap );
+	newLineFormatter = (LineFormatter*)_StreamFormatter_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	/* Copy member info. */
 	newLineFormatter->_newLine = self->_newLine;
@@ -121,11 +121,11 @@ void* _LineFormatter_Copy( void* lineFormatter, void* dest, Bool deep, Name name
 	return newLineFormatter;
 }
 
-const char* _LineFormatter_Format( void* formatter, const char* fmt )
+Name _LineFormatter_Format( void* formatter, const char* fmt )
 {
 	LineFormatter* self = (LineFormatter*)formatter;
 	char* result;
-	char* currentLine;
+	Name currentLine;
 	int numInsert;
 	int fmtLength;
 	int prependLength;
@@ -133,7 +133,7 @@ const char* _LineFormatter_Format( void* formatter, const char* fmt )
 
 			
 	char* destPtr;
-	const char* srcPtr;
+	Name srcPtr;
 		
 	#if DEBUG
 		assert( self );

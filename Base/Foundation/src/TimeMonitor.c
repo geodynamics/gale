@@ -64,11 +64,11 @@ void Stg_TimeMonitor_SetTimerWatchCriteria( double ratioOfTotalTime ) {
 	Stg_TimerWatchCriteria = ratioOfTotalTime;
 }
 
-Stg_TimeMonitor* Stg_TimeMonitor_New( char* tag, Bool criteria, Bool print, MPI_Comm comm ) {
+Stg_TimeMonitor* Stg_TimeMonitor_New( Name tag, Bool criteria, Bool print, MPI_Comm comm ) {
 	Stg_TimeMonitor* tm;
 	
 	tm = Memory_Alloc_Unnamed( Stg_TimeMonitor );
-	tm->tag = Memory_Alloc_Bytes_Unnamed( strlen( tag ) + 1, Stg_TimeMonitor_TagType );
+	tm->tag = (char*)Memory_Alloc_Bytes_Unnamed( strlen( tag ) + 1, Stg_TimeMonitor_TagType );
 	strcpy( tm->tag, tag );
 	tm->criteria = criteria;
 	tm->print = print;
@@ -138,7 +138,7 @@ double Stg_TimeMonitor_End( Stg_TimeMonitor* tm, TimeMonitorData* tmData ) {
 
 	tmData->criterionPassed = False;
 	if ( tm->criteria ) {
-		tmData->criterionPassed = tm->t2 > (Stg_TimerWatchCriteria * tmData->totalSinceInit);
+          tmData->criterionPassed = tm->t2 > (Stg_TimerWatchCriteria * tmData->totalSinceInit) ? True : False;
 	}
 
 	if( tm->print && (rank == 0) && ((tm->criteria == False) || tmData->criterionPassed )) {

@@ -136,7 +136,7 @@
 	
 	/** Add a directory to the list of prefixes it will try if the "dlopen" fails on a module. It won't add the same dir
 	    twice. */
-	void ModulesManager_AddDirectory( Name name, char* directory );
+	void ModulesManager_AddDirectory( Name name, Name directory );
 	
 	Index ModulesManager_Submit( 
 			void* modulesManager, 

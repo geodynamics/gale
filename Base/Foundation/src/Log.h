@@ -29,8 +29,8 @@
 
 void stg_log_printf( const char *format, ... );
 
-void stg_profile_EntryPoint( char ep_name[], char hk_name[], double time );
-void stg_profile_Func( char func_name[], double time );
+void stg_profile_EntryPoint(const char *ep_name, const char *hk_name,double time);
+void stg_profile_Func( const char *func_name, double time );
 
 
 #endif

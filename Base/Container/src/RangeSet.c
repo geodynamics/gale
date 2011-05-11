@@ -113,7 +113,7 @@ void _RangeSet_Print( void* rangeSet, Stream* stream ) {
 	_Stg_Class_Print( self, stream );
 }
 
-void* _RangeSet_Copy( void* rangeSet, void* destProc_I, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _RangeSet_Copy( const void* rangeSet, void* destProc_I, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	RangeSet*	self = (RangeSet*)rangeSet;
 	RangeSet*	newRangeSet;
 	unsigned	nInds, *inds;
@@ -280,7 +280,7 @@ Bool RangeSet_HasIndex( void* rangeSet, unsigned index ) {
 	node = BTree_FindNode( self->btree, &rng );
 
 	if( node )
-		return RangeSet_Range_HasIndex( node->data, index );
+          return RangeSet_Range_HasIndex( (RangeSet_Range*)(node->data), index );
 	else
 		return False;
 }

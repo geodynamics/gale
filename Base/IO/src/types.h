@@ -42,7 +42,7 @@
 #define __StGermain_Base_IO_types_h__
 	
 	/* Dicitonary internal types */
-	typedef char*				Dictionary_Entry_Key;
+	typedef Name			Dictionary_Entry_Key;
 	typedef char*				Dictionary_Entry_Source;
 	typedef enum {
 		Dictionary_Entry_Value_Type_String,

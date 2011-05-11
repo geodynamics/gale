@@ -77,19 +77,19 @@ const Type DumpStream_Type = "dump";
 const Type ErrorStream_Type = "error";
 
 /* Parsing constants for Dictionary reading. */
-const char* JOURNAL_DELIMITER = ".";
-const char* JOURNAL_KEY = "journal";
-const char* JOURNAL_ENABLE_KEY = "journal";
-const char* JOURNAL_ENABLE_BRANCH_KEY = "journal-enable-branch";
-const char* JOURNAL_LEVEL_KEY = "journal-level";
-const char* JOURNAL_LEVEL_BRANCH_KEY = "journal-level-branch";
-const char* JOURNAL_FILE_KEY = "journal-file";
-const char* JOURNAL_RANK_KEY = "journal-rank";
-const char* JOURNAL_FLUSH_KEY = "journal-autoflush";
-const char* JOURNAL_MPI_OFFSET_KEY = "journal-mpi-offset";
+Name JOURNAL_DELIMITER = ".";
+Name JOURNAL_KEY = "journal";
+Name JOURNAL_ENABLE_KEY = "journal";
+Name JOURNAL_ENABLE_BRANCH_KEY = "journal-enable-branch";
+Name JOURNAL_LEVEL_KEY = "journal-level";
+Name JOURNAL_LEVEL_BRANCH_KEY = "journal-level-branch";
+Name JOURNAL_FILE_KEY = "journal-file";
+Name JOURNAL_RANK_KEY = "journal-rank";
+Name JOURNAL_FLUSH_KEY = "journal-autoflush";
+Name JOURNAL_MPI_OFFSET_KEY = "journal-mpi-offset";
 
-const char* JOURNAL_ON = "on";
-const char* JOURNAL_OFF = "off";
+Name JOURNAL_ON = "on";
+Name JOURNAL_OFF = "off";
 
 
 static const int JOURNAL_START_SIZE = 16;	/**< Initial size of lists in Journal. */
@@ -99,7 +99,7 @@ static const int JOURNAL_DELTA_SIZE = 8;	/**< Number of elements to extend by fo
 /** Retrieves the given named stream. Dotted-decimal notation may be used to get sub streams.
  ** If the stream does not exists, a new stream is created from the parent stream.
  **/
-Stream* Journal_GetNamedStream( Stream* typedStream, const Name name );
+Stream* Journal_GetNamedStream( Stream* typedStream, Name name );
 
 
 Journal* Journal_New()
@@ -138,7 +138,7 @@ void Journal_Delete() {
 }
 
 void Journal_Purge() {
-	int i;
+	Index i;
 	
 	Stg_ObjectList_DeleteAllObjects( stJournal->_typedStreams );
 
@@ -414,7 +414,7 @@ Stream* Journal_GetTypedStream( const Type type )
 	return typedStream;
 }
 
-Stream* Journal_GetNamedStream( Stream* typedStream, const Name name )
+Stream* Journal_GetNamedStream( Stream* typedStream, Name name )
 {
 	Stream* currentStream ;
 	char* nameCopy;
@@ -441,7 +441,7 @@ Stream* Journal_GetNamedStream( Stream* typedStream, const Name name )
 	return currentStream;
 }
 
-Stream* Journal_Register( const Type type, const Name name )
+Stream* Journal_Register( const Type type, Name name )
 {
 	Stream* typedStream = NULL;
 	Stream* namedStream = NULL;
@@ -452,7 +452,7 @@ Stream* Journal_Register( const Type type, const Name name )
 	return namedStream;
 }
 
-Stream* Journal_Register2( const Type streamType, const Type componentType, const Name componentName ) {
+Stream* Journal_Register2( const Type streamType, const Type componentType, Name componentName ) {
 	Stream* componentStream;
 	Stream* instanceStream;
 	componentStream = Journal_Register( streamType, componentType );
@@ -461,7 +461,7 @@ Stream* Journal_Register2( const Type streamType, const Type componentType, cons
 	return instanceStream;
 }
 
-JournalFile* Journal_GetFile( const Name fileName )
+JournalFile* Journal_GetFile( Name fileName )
 {
 	return (JournalFile*) Stg_ObjectList_Get( stJournal->_files, fileName );
 }
@@ -499,7 +499,7 @@ void Journal_Enable_AllTypedStream( Bool enable )
 	Journal_Enable_TypedStream( Error_Type, enable );
 }
 
-void Journal_Enable_NamedStream( const Type type, const Name name, Bool enable )
+void Journal_Enable_NamedStream( const Type type, Name name, Bool enable )
 {
 	Stream* stream = Journal_Register( type, name );
 	Stream_Enable( stream, enable );
@@ -508,7 +508,7 @@ void Journal_Enable_NamedStream( const Type type, const Name name, Bool enable )
 void Journal_PrintConcise()
 {
 	Stream* stream;
-	int i;
+	Index i;
 	
 	if ( stJournal == NULL )
 	{
@@ -538,7 +538,7 @@ void Journal_PrintConcise()
 	Journal_Printf( stream, "\n" );
 }
 
-int Journal_Printf( void* _stream, const char* const fmt, ... )
+int Journal_Printf( void* _stream, Name fmt, ... )
 {
 	int result;
 	Stream* stream = (Stream*)_stream;
@@ -559,7 +559,7 @@ int Journal_Printf( void* _stream, const char* const fmt, ... )
 	return result;
 }
 
-int Journal_PrintfL( void* _stream, JournalLevel level, const char* const fmt, ... )
+int Journal_PrintfL( void* _stream, JournalLevel level, Name fmt, ... )
 {
 	int result;
 	Stream* stream = (Stream*)_stream;
@@ -580,9 +580,9 @@ int Journal_PrintfL( void* _stream, JournalLevel level, const char* const fmt, .
 }
 /*
 int Journal_Firewall_Func( int expression, char* expressionText, 
-	const char* file, const char* func, int line, void* _stream, char* fmt, ... )
+	Name file, const char* func, int line, void* _stream, char* fmt, ... )
 */
-int Journal_Firewall( int expression, void* _stream, const char* const fmt, ... )
+int Journal_Firewall( int expression, void* _stream, Name fmt, ... )
 {
 	int result = 0;
 	Stream* stream = (Stream*)_stream;
@@ -642,14 +642,14 @@ int Journal_Firewall( int expression, void* _stream, const char* const fmt, ... 
 	return result;	
 }
 
-SizeT Journal_Write( void* _stream, void* data, SizeT elem_size, SizeT num_elems )
+SizeT Journal_Write( void* _stream, const void* data, SizeT elem_size, SizeT num_elems )
 {
 	Stream* stream = (Stream*)_stream;
 
 	return Stream_Write( stream, data, elem_size, num_elems );
 }
 
-Bool Journal_Dump( void* _stream, void* data )
+Bool Journal_Dump( void* _stream, const void* data )
 {
 	Stream* stream = (Stream*)_stream;
 
@@ -658,7 +658,7 @@ Bool Journal_Dump( void* _stream, void* data )
 
 
 /* Only rank 0 will print to stream */
-int Journal_RPrintf ( void* _stream, const char* const fmt, ... )
+int Journal_RPrintf ( void* _stream, Name const fmt, ... )
 {
 	Stream* stream = (Stream*)_stream;
 	int result, init_stream_rank;
@@ -683,7 +683,7 @@ int Journal_RPrintf ( void* _stream, const char* const fmt, ... )
 }
 
 /* Only rank 0 will print to stream */
-int Journal_RPrintfL ( void* _stream, JournalLevel level, const char* const fmt, ... )
+int Journal_RPrintfL ( void* _stream, JournalLevel level, Name const fmt, ... )
 {
         Stream* stream = (Stream*)_stream;
         int result, init_stream_rank;

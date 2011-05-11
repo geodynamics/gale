@@ -92,11 +92,11 @@
 	#define LineFormatter_DeepCopy( self ) \
 		(LineFormatter*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _LineFormatter_Copy( void* lineFormatter, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _LineFormatter_Copy( const void* lineFormatter, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 
 
 	/** Formats a output string of printf by prepending a tag in front of every line detected. */
-	const char* _LineFormatter_Format( void* formatter, const char* const fmt );
+	Name _LineFormatter_Format( void* formatter, const char* const fmt );
 
 
 #endif /* __StGermain_Base_IO_LineFormatter_h__ */

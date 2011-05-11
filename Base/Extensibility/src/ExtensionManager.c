@@ -375,16 +375,16 @@ void _ExtensionManager_Print( void* extension, Stream* stream ) {
 }
 
 
-void* _ExtensionManager_Copy( void* extensionManager, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ExtensionManager_Copy( const void* extensionManager, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	ExtensionManager*	self = (ExtensionManager*)extensionManager;
 	ExtensionManager*	newExtensionManager;
 	PtrMap*			map = ptrMap;
-	int item_I;
-	int ext_I;
+	Index item_I;
+	Index ext_I;
 	void* data;
 	ExtensionInfo* srcInfo;
 
-	newExtensionManager = _Stg_Object_Copy( self, dest, deep, nameExt, map );
+	newExtensionManager = (ExtensionManager*)_Stg_Object_Copy( self, dest, deep, nameExt, map );
 	
 	newExtensionManager->initialSize = self->initialSize;
 	newExtensionManager->finalSize = self->finalSize;
@@ -522,11 +522,11 @@ void* _ExtensionManager_Copy( void* extensionManager, void* dest, Bool deep, Nam
 	}
 
 	newExtensionManager->itemSize = self->itemSize;
-	newExtensionManager->em = Stg_Class_Copy( self->em, NULL, deep, nameExt, ptrMap );
+	newExtensionManager->em = (ExtensionManager*)Stg_Class_Copy( self->em, NULL, deep, nameExt, ptrMap );
 	newExtensionManager->count = self->count;
 
 	/* Must be copied after all the data ptrs have been appended to map */
-	newExtensionManager->objToExtensionMapper = Stg_Class_Copy( self->objToExtensionMapper, NULL, deep, nameExt, ptrMap );
+	newExtensionManager->objToExtensionMapper = (HashTable*)Stg_Class_Copy( self->objToExtensionMapper, NULL, deep, nameExt, ptrMap );
 	
 	/* must be copied last bacause of array case */
 	newExtensionManager->extInfos = (ExtensionInfoList*)Stg_Class_Copy( self->extInfos, NULL, deep, nameExt, ptrMap );
@@ -776,19 +776,19 @@ SizeT ExtensionManager_SizeFunc( void* extension ) {
 Bool ExtensionManager_OfExistingFunc( void* extension ) {
 	ExtensionManager*			self = (ExtensionManager*)extension;
 
-	return ExtensionManager_OfExistingMacro( self );
+	return ExtensionManager_OfExistingMacro( self ) ? True : False;
 }
 
 Bool ExtensionManager_OfArrayFunc( void* extension ) {
 	ExtensionManager*			self = (ExtensionManager*)extension;
 
-	return ExtensionManager_OfArrayMacro( self );
+	return ExtensionManager_OfArrayMacro( self ) ? True : False;
 }
 
 Bool ExtensionManager_OfExtendedArrayFunc( void* extension ) {
 	ExtensionManager*			self = (ExtensionManager*)extension;
 
-	return ExtensionManager_OfExtendedArrayMacro( self );
+	return ExtensionManager_OfExtendedArrayMacro( self ) ? True : False;
 }
 
 SizeT ExtensionManager_GetFinalSizeFunc( void* extension ) {
@@ -853,8 +853,8 @@ void* ExtensionManager_CopyAllocation(
 	Bool ownMap = False;
 	void* srcCurrent;
 	void* destCurrent;
-	int item_I;
-	int ext_I;
+	Index item_I;
+	Index ext_I;
 
 	ArithPointer offset;
 

@@ -14,7 +14,7 @@ typedef struct {
 void ProgressSuite_TestSetStream( ProgressSuiteData* data ) {
    Progress_SetStream( data->prog, NULL );
    pcu_check_true( data->prog->strm == NULL );
-   Progress_SetStream( data->prog, (void*)1 );
+   Progress_SetStream( data->prog, (Stream*)1 );
    pcu_check_true( data->prog->strm == (void*)1 );
    Progress_SetStream( data->prog, NULL );
 }

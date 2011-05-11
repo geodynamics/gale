@@ -99,7 +99,7 @@ extern const Type DynamicVC_Type;
 	#define DynamicVC_Copy( self )						\
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 
-	void* _DynamicVC_Copy( void* vc, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _DynamicVC_Copy( const void* vc, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 
 	void _DynamicVC_AssignFromXML( void* vc, Stg_ComponentFactory* cf, void* data );
 

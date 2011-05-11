@@ -244,7 +244,9 @@ void _CompositeVC_AssignFromXML( void* compositeVC, Stg_ComponentFactory* cf, vo
 
 	initData = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Data", Stg_Component, False, data  );
 	
-	_VariableCondition_Init( self, context, variableRegister, conditionFunctionRegister, vcDict );
+	_VariableCondition_Init( self, context,
+                                 (Variable_Register*)variableRegister,
+                                 (ConditionFunction_Register*)conditionFunctionRegister, vcDict );
 	_CompositeVC_Init( self, initData );
 }
 
@@ -320,7 +322,7 @@ void _CompositeVC_Print(void* compositeVC, Stream* stream) {
 }
 
 
-void* _CompositeVC_Copy( void* compositeVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _CompositeVC_Copy( const void* compositeVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	CompositeVC*	self = (CompositeVC*)compositeVC;
 	CompositeVC*	newCompositeVC;
 	PtrMap*		map = ptrMap;
@@ -340,7 +342,7 @@ void* _CompositeVC_Copy( void* compositeVC, void* dest, Bool deep, Name nameExt,
 	newCompositeVC->data = self->data;
 	
 	if( deep ) {
-		if( (newCompositeVC->itemTbl = PtrMap_Find( map, self->itemTbl )) == NULL && self->itemTbl ) {
+          if( (newCompositeVC->itemTbl = (VariableCondition**)PtrMap_Find( map, self->itemTbl )) == NULL && self->itemTbl ) {
 			Index	item_I;
 			
 			newCompositeVC->itemTbl = Memory_Alloc_Array( VariableCondition*, newCompositeVC->_size, "CompositeCV->itemTbl" );
@@ -351,13 +353,13 @@ void* _CompositeVC_Copy( void* compositeVC, void* dest, Bool deep, Name nameExt,
 			PtrMap_Append( map, newCompositeVC->itemTbl, self->itemTbl );
 		}
 		
-		if( (newCompositeVC->iOwnTbl = PtrMap_Find( map, self->iOwnTbl )) == NULL && self->iOwnTbl ) {
+          if( (newCompositeVC->iOwnTbl = (Bool*)PtrMap_Find( map, self->iOwnTbl )) == NULL && self->iOwnTbl ) {
 			newCompositeVC->iOwnTbl = Memory_Alloc_Array( Bool, newCompositeVC->_size, "CompositeCV->iOwnTbl" );
 			memcpy( newCompositeVC->iOwnTbl, self->iOwnTbl, sizeof(Bool) * newCompositeVC->_size );
 			PtrMap_Append( map, newCompositeVC->iOwnTbl, self->iOwnTbl );
 		}
 		
-		if( (newCompositeVC->attachedSets = PtrMap_Find( map, self->attachedSets )) == NULL && self->attachedSets ) {
+          if( (newCompositeVC->attachedSets = (IndexSet**)PtrMap_Find( map, self->attachedSets )) == NULL && self->attachedSets ) {
 			Index	item_I;
 			
 			self->attachedSets = Memory_Alloc_Array( IndexSet*, newCompositeVC->itemCount, "CompositeCV->attachedSets" );

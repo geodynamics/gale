@@ -90,7 +90,7 @@
 	void _Toolbox_Print( void* toolbox, Stream* stream );
 
 	/* MangleName implementation */
-	char* _Toolbox_MangleName( char* name );
+	char* _Toolbox_MangleName( Name name );
 
 	/** Get the function pointer the to the toolbox's register function */
 	Toolbox_RegisterFunction* Toolbox_GetRegisterFunc( void* toolbox );

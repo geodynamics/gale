@@ -157,10 +157,8 @@ Variable* Variable_NewScalar(
 
 	Variable*			self;
 	SizeT					dataOffsets[] = { 0 };
-	Variable_DataType	dataTypes[] = { 0 };		/* Init value later */
+	Variable_DataType	dataTypes[] = { dataType };		/* Init value later */
 	Index					dataTypeCounts[] = { 1 };
-	
-	dataTypes[0] = dataType;
 	
 	self = _Variable_New(  VARIABLE_PASSARGS  );
 
@@ -201,23 +199,24 @@ Variable* Variable_NewVector(
 
 	Variable*			self;
 	SizeT					dataOffsets[] = { 0 };
-	Variable_DataType	dataTypes[] = { 0 }; /* Init later... */
+	Variable_DataType	dataTypes[] = { dataType }; /* Init later... */
 	Index					dataTypeCounts[] = { 0 }; /* Init later... */
-	Name*					dataNames;
+	char**					dNames;
+        Name* dataNames;
 	Index					vector_I;
 	va_list				ap;
 
-	dataTypes[0] = dataType;
 	dataTypeCounts[0] = dataTypeCount;
 
-	dataNames = Memory_Alloc_Array( Name, dataTypeCount, "dataNames" );
+	dNames = Memory_Alloc_Array( char*, dataTypeCount, "dataNames" );
 
 	va_start( ap, vr );
 	for( vector_I = 0; vector_I < dataTypeCount; vector_I++ ) {
-		dataNames[vector_I] = va_arg( ap, Name );
+		dNames[vector_I] = va_arg( ap, char* );
 	}
 	va_end( ap );
 	
+        dataNames=(Name*)dNames;
 	self = _Variable_New(  VARIABLE_PASSARGS  );
 
 	self->isConstructed = True;
@@ -237,7 +236,7 @@ Variable* Variable_NewVector2(
 	Variable_ArraySizeFunc*	arraySizeFunc,
 	void**						arrayPtrPtr,
 	Variable_Register*		vr,
-	char**						dataNames )
+	Name*						dataNames )
 {
 	/* Variables set in this function */
 	SizeT                                              _sizeOfSelf = sizeof(Variable);
@@ -245,7 +244,7 @@ Variable* Variable_NewVector2(
 	Stg_Class_DeleteFunction*                              _delete = _Variable_Delete;
 	Stg_Class_PrintFunction*                                _print = _Variable_Print;
 	Stg_Class_CopyFunction*                                  _copy = _Variable_Copy;
-	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void*)_Variable_DefaultNew;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (Stg_Component_DefaultConstructorFunction*)_Variable_DefaultNew;
 	Stg_Component_ConstructFunction*                    _construct = _Variable_AssignFromXML;
 	Stg_Component_BuildFunction*                            _build = _Variable_Build;
 	Stg_Component_InitialiseFunction*                  _initialise = _Variable_Initialise;
@@ -259,10 +258,9 @@ Variable* Variable_NewVector2(
 
 	Variable*			self;
 	SizeT					dataOffsets[] = { 0 };
-	Variable_DataType	dataTypes[] = { 0 };
+	Variable_DataType	dataTypes[] = { dataType };
 	Index					dataTypeCounts[] = { 0 };
 
-	dataTypes[0] = dataType;
 	dataTypeCounts[0] = dataTypeCount;
 
 	self = _Variable_New(  VARIABLE_PASSARGS  );
@@ -372,11 +370,10 @@ void _Variable_Init(
 			for( component_I = 0; component_I < self->offsetCount; component_I++ ) {
 				if( dataNames[component_I] ) {
 					SizeT					componentOffsets[] = { 0 };
-					Variable_DataType	componentTypes[] = { 0 };
+					Variable_DataType	componentTypes[] = { self->dataTypes[component_I] };
 					Index					componentTypeCounts[] = { 0 };
 
 					componentOffsets[0] = self->offsets[component_I];
-					componentTypes[0] = self->dataTypes[component_I];
 					componentTypeCounts[0] = self->dataTypeCounts[component_I];
 					
 					/* Assumption: components are scalar or vector, but cannot be complex */
@@ -407,7 +404,7 @@ void _Variable_Init(
 					 * yet. As a consequence we have to manually work out the vector's indecis offsets. Ouch
 					 * only from a code-maintenance point of view. */
 					SizeT					componentOffsets[] = { 0 }; /* Init later... */
-					Variable_DataType	componentTypes[] = { 0 }; /* Init later... */
+					Variable_DataType	componentTypes[] = { self->dataTypes[0] };
 					Index					componentTypeCounts[] = { 1 };
 				
 					componentOffsets[0] = 
@@ -422,7 +419,6 @@ void _Variable_Init(
 							0,
 							Journal_Register( Error_Type, Variable_Type ),
 							"Vector is of a non-builtin type\n" ) );
-					componentTypes[0] = self->dataTypes[0];
 
 					/* Assumption: vector-components are scalar, but cannot be complex */
 					self->components[vector_I] = Variable_New( 
@@ -518,7 +514,7 @@ void _Variable_Print( void* variable, Stream* stream ) {
 }
 
 
-void* _Variable_Copy( void* variable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Variable_Copy( const void* variable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Variable*	self = (Variable*)variable;
 	Variable*	newVariable;
 	PtrMap*		map = ptrMap;
@@ -538,26 +534,26 @@ void* _Variable_Copy( void* variable, void* dest, Bool deep, Name nameExt, PtrMa
 	/* single valued members */
 	
 	if( deep ) {
-		if( (newVariable->offsets = PtrMap_Find( map, self->offsets )) == NULL && self->offsets != NULL ) {
+          if( (newVariable->offsets = (SizeT*)PtrMap_Find( map, self->offsets )) == NULL && self->offsets != NULL ) {
 			newVariable->offsets = Memory_Alloc_Array( SizeT, newVariable->offsetCount, "Variable->offsets" );
 			memcpy( newVariable->offsets, self->offsets, sizeof(SizeT) * newVariable->offsetCount );
 			PtrMap_Append( map, self->offsets, newVariable->offsets );
 		}
 		
-		if( (newVariable->dataTypes = PtrMap_Find( map, self->dataTypes )) == NULL && self->offsets != NULL ) {
+          if( (newVariable->dataTypes = (Variable_DataType*)PtrMap_Find( map, self->dataTypes )) == NULL && self->offsets != NULL ) {
 			newVariable->dataTypes = Memory_Alloc_Array( Variable_DataType, newVariable->offsetCount, "Variable->dataTypes" );
 			memcpy( newVariable->dataTypes, self->dataTypes, sizeof(Variable_DataType) * newVariable->offsetCount );
 			PtrMap_Append( map, self->dataTypes, newVariable->dataTypes );
 		}
 		
-		if( (newVariable->dataTypeCounts = PtrMap_Find( map, self->dataTypeCounts )) == NULL && self->dataTypeCounts != NULL ) {
+          if( (newVariable->dataTypeCounts = (Index*)PtrMap_Find( map, self->dataTypeCounts )) == NULL && self->dataTypeCounts != NULL ) {
 			newVariable->dataTypeCounts = Memory_Alloc_Array( Index, newVariable->offsetCount, "Variable->dataTypeCounts" );
 			memcpy( newVariable->dataTypeCounts, self->dataTypeCounts, sizeof(Index) * newVariable->offsetCount );
 			PtrMap_Append( map, self->dataTypeCounts, newVariable->dataTypeCounts );
 		}
 		
 		if ( self->structSizePtr != NULL ) {
-			if( (newVariable->structSizePtr = PtrMap_Find( map, self->structSizePtr )) == NULL ) {
+                  if( (newVariable->structSizePtr = (SizeT*)PtrMap_Find( map, self->structSizePtr )) == NULL ) {
 				newVariable->structSizePtr = Memory_Alloc_Array( 
 					SizeT, 
 					1, 
@@ -571,7 +567,7 @@ void* _Variable_Copy( void* variable, void* dest, Bool deep, Name nameExt, PtrMa
 		}
 		
 		if ( self->arraySizePtr != NULL ) {
-			if( (newVariable->arraySizePtr = PtrMap_Find( map, self->arraySizePtr )) == NULL ) {
+                  if( (newVariable->arraySizePtr = (Index*)PtrMap_Find( map, self->arraySizePtr )) == NULL ) {
 				newVariable->arraySizePtr = Memory_Alloc_Array(
 					Index,
 					1,
@@ -584,26 +580,30 @@ void* _Variable_Copy( void* variable, void* dest, Bool deep, Name nameExt, PtrMa
 			newVariable->arraySizeFunc = NULL;
 		}
 		if ( self->arraySizeFunc != NULL ) {
-			if( (newVariable->arraySizeFunc = PtrMap_Find( map, self->arraySizeFunc )) == NULL ) {
-				newVariable->arraySizeFunc = Memory_Alloc_Array(
-					Variable_ArraySizeFunc,
-					1,
-					"Variable->arraySizeFunc" );
-				memcpy( newVariable->arraySizeFunc, self->arraySizeFunc, sizeof(Index) );
-				PtrMap_Append( map, self->arraySizeFunc, newVariable->arraySizeFunc );
-			}
+                  if( (newVariable->arraySizeFunc =
+                       (Variable_ArraySizeFunc*)PtrMap_Find( map, (void*)self->arraySizeFunc )) == NULL ) {
+                    newVariable->arraySizeFunc = (Variable_ArraySizeFunc*)
+                      Memory_Alloc_Array(void*,
+                                         1,
+                                         "Variable->arraySizeFunc" );
+                    memcpy((void*)newVariable->arraySizeFunc,
+                           (void*)self->arraySizeFunc, sizeof(Index) );
+                    PtrMap_Append(map,
+                                  (void*)(self->arraySizeFunc),
+                                  (void*)(newVariable->arraySizeFunc));
+                  }
 		}
 		else {
 			newVariable->arraySizeFunc = NULL;
 		}
 		
-		if( (newVariable->dataSizes = PtrMap_Find( map, self->dataSizes )) == NULL && self->dataSizes != NULL ) {
+		if( (newVariable->dataSizes = (SizeT*)PtrMap_Find( map, self->dataSizes )) == NULL && self->dataSizes != NULL ) {
 			newVariable->dataSizes = Memory_Alloc_Array( SizeT, newVariable->offsetCount, "Variable->dataSizes" );
 			memcpy( newVariable->dataSizes, self->dataSizes, sizeof(SizeT) * newVariable->offsetCount );
 			PtrMap_Append( map, self->dataSizes, newVariable->dataSizes );
 		}
 
-		if( (newVariable->arrayPtrPtr = PtrMap_Find( map, self->arrayPtrPtr )) == NULL && self->arrayPtrPtr != NULL ) {	
+		if( (newVariable->arrayPtrPtr = (void**)PtrMap_Find( map, self->arrayPtrPtr )) == NULL && self->arrayPtrPtr != NULL ) {	
 			if( (newVariable->arrayPtr = PtrMap_Find( map, self->arrayPtr )) == NULL && self->arrayPtr != NULL ) {
 				Index memoryToAllocSize = _Variable_GetNewArraySize( self ) * self->structSize;
 				newVariable->arrayPtr = Memory_Alloc_Bytes( 
@@ -622,7 +622,7 @@ void* _Variable_Copy( void* variable, void* dest, Bool deep, Name nameExt, PtrMa
 			memcpy( newVariable->arrayPtr, self->arrayPtr, _Variable_GetNewArraySize(self) * self->structSize );
 		}
 		
-		if( (newVariable->components = PtrMap_Find( map, self->components )) == NULL && self->components != NULL ) {
+		if( (newVariable->components = (Variable**)PtrMap_Find( map, self->components )) == NULL && self->components != NULL ) {
 			Index	comp_I;
 			
 			if( newVariable->offsetCount == 1 && newVariable->dataTypeCounts[0] > 1 ) {
@@ -666,7 +666,7 @@ void* _Variable_Copy( void* variable, void* dest, Bool deep, Name nameExt, PtrMa
 		}
 
 		if ( self->vr ) {
-			newVariable->vr = Stg_Class_Copy( self->vr, NULL, deep, nameExt, map );
+                  newVariable->vr = (Variable_Register*)Stg_Class_Copy( self->vr, NULL, deep, nameExt, map );
 		}
 	}
 	else {
@@ -833,7 +833,7 @@ void _Variable_Execute( void* variable, void* data ) {
 void _Variable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* data ) {
 	Variable*			self = (Variable*) variable;
 	SizeT					dataOffsets[] = { 0 };
-	Variable_DataType	dataTypes[] = { 0 };		/* Init value later */
+	Variable_DataType	dataTypes[] = { Variable_DataType_Size };
 	Index					dataTypeCounts[] = { 1 };
 	Dictionary*			componentDict = NULL;
 	Dictionary*			thisComponentDict = NULL;
@@ -843,7 +843,7 @@ void _Variable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* da
 	unsigned int*		count = NULL;
 	void*					variableRegister = NULL;
 	void*					pointerRegister = NULL;
-	Name*					names = NULL;
+	char**					names = NULL;
 	Stream*				error = Journal_Register( Error_Type, self->type );
 	AbstractContext*	context;	
 	
@@ -868,7 +868,7 @@ void _Variable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* da
 			
 	/* Get Pointer to number of elements in array */
 	countName = Dictionary_GetString( thisComponentDict, "Count" );
-	count = Stg_ObjectList_Get( pointerRegister, countName );
+	count = (unsigned*)Stg_ObjectList_Get( pointerRegister, countName );
 	//assert( count );
 	
 	/* Get Type of Variable */
@@ -900,7 +900,7 @@ void _Variable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* da
 			Index entry_I;
 
 			nameCount = Dictionary_Entry_Value_GetCount( list );
-			names = Memory_Alloc_Array( Name, nameCount, "Variable Names" );
+			names = Memory_Alloc_Array( char*, nameCount, "Variable Names" );
 
 			for ( entry_I = 0 ; entry_I < nameCount ; entry_I++ )
 				names[ entry_I ] = Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement(list, entry_I ) );
@@ -919,14 +919,14 @@ void _Variable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* da
 		dataOffsets,
 		dataTypes,
 		dataTypeCounts, 
-		names, 
+		(Name*)names, 
 		0, 
 		count, 
 		NULL,	/* Note: don't support arraySize being calculated from a Func Ptr through
 		Construct() Yet - PatrickSunter, 29 Jun 2007 */ 
 		(void**)&self->arrayPtr,
 		True,
-		variableRegister );
+		(Variable_Register*)variableRegister );
 
 	/* Clean Up */
 	if (names)
@@ -935,7 +935,7 @@ void _Variable_AssignFromXML( void* variable, Stg_ComponentFactory* cf, void* da
 	
 void _Variable_Destroy( void* variable, void* data ) {
 	Variable* self = (Variable*)variable;
-   int ii;
+   Index ii;
 
    for( ii = 0 ; ii < self->subVariablesCount ; ii++ ) {
       Stg_Component_Destroy( self->components[ii], data, False );
@@ -989,7 +989,7 @@ void Variable_SetValue( void* variable, Index array_I, void* value ) {
 	ArithPointer*	vPtr;
 	Index				component_I;
 	
-	vPtr = value;
+	vPtr = (ArithPointer*)value;
 	for( component_I = 0; component_I < self->offsetCount; component_I++ ) {
 		memcpy( _Variable_GetPtr( self, array_I, component_I, 0 ), (void*)vPtr, self->dataSizes[component_I] );
 		
@@ -1003,7 +1003,7 @@ void Variable_GetValue( void* variable, Index array_I, void* value ) {
 	ArithPointer*	vPtr;
 	Index		component_I;
 	
-	vPtr = value;
+	vPtr = (ArithPointer*)value;
 	for( component_I = 0; component_I < self->offsetCount; component_I++ ) {
 		memcpy( (void*)vPtr, _Variable_GetPtr( self, array_I, component_I, 0 ), self->dataSizes[component_I] );
 		
@@ -1034,7 +1034,7 @@ void Variable_SetValueDoubleAll( void* variable, double value ) {
 }
 		
 
-void Variable_SaveToFileAsDoubles( void* variable, char* filename ) {
+void Variable_SaveToFileAsDoubles( void* variable, Name filename ) {
 	Variable* self       = (Variable*)  variable;
 	Index     arraySize  = self->arraySize;
 	Index     array_I;
@@ -1062,7 +1062,7 @@ void Variable_SaveToFileAsDoubles( void* variable, char* filename ) {
 }
 
 
-void Variable_ReadFromFileAsDoubles( void* variable, char* filename ) {
+void Variable_ReadFromFileAsDoubles( void* variable, Name filename ) {
 	Variable* self       = (Variable*)  variable;
 	Index     arraySize  = self->arraySize;
 	Index     array_I;
@@ -1139,7 +1139,7 @@ double Variable_ValueCompare( void* variable, void* _comparison ) {
 
 /** Checks whether || variable - comparison || / || variable || < tolerance */
 Bool Variable_ValueCompareWithinTolerance( void* variable, void* comparison, double tolerance ) {
-	return ( Variable_ValueCompare( variable, comparison ) < tolerance );
+  return ( Variable_ValueCompare( variable, comparison ) < tolerance ? True : False);
 }
 
 

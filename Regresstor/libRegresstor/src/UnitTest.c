@@ -7,7 +7,7 @@
 
 
 
-UnitTest* UnitTest_New( char* url, char* runID, char* unitName, char* testName ) {
+UnitTest* UnitTest_New( Name url, Name runID, Name unitName, Name testName ) {
 	UnitTest* result;
 
 	result = (UnitTest*)malloc( sizeof(UnitTest) );

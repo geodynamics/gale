@@ -128,7 +128,7 @@
 	#define IndexMap_DeepCopy( self ) \
 		(IndexMap*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _IndexMap_Copy( void* indexMap, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _IndexMap_Copy( const void* indexMap, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------

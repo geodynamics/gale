@@ -529,7 +529,7 @@ void ExtensionSuite_TestExtendOfExtendedArray( ExtensionSuiteData* data  ) {
    ExtensionManager_Add( arrayExtension, (Name)Pres0, sizeof(ExtensionStruct2) );
 
    for ( array_I = 0; array_I < ArraySize; ++array_I  ) {
-      current = ExtensionManager_At( structExtension, nArray, array_I );
+     current = (BaseClass*)ExtensionManager_At( structExtension, nArray, array_I );
 
       nType0 = (ExtensionStruct0*)ExtensionManager_Get(
          structExtension,
@@ -555,7 +555,7 @@ void ExtensionSuite_TestExtendOfExtendedArray( ExtensionSuiteData* data  ) {
    }
    
    for ( array_I = 0; array_I < ArraySize; ++array_I  ) {
-      current = ExtensionManager_At( structExtension, nArray, array_I );
+     current = (BaseClass*)ExtensionManager_At( structExtension, nArray, array_I );
       nType0 = (ExtensionStruct0*)ExtensionManager_Get(
          structExtension,
          current,
@@ -617,7 +617,7 @@ void ExtensionSuite_TestCopyExtendedArray( ExtensionSuiteData* data ) {
    ExtensionManager_Add( arrayExtension, (Name)Pres0, sizeof(ExtensionStruct2) );
 
    for ( array_I = 0; array_I < ArraySize; ++array_I  ) {
-      current = ExtensionManager_At( structExtension, nArray, array_I );
+     current = (BaseClass*)ExtensionManager_At( structExtension, nArray, array_I );
 
       nType0 = (ExtensionStruct0*)ExtensionManager_Get(
          structExtension,
@@ -645,14 +645,14 @@ void ExtensionSuite_TestCopyExtendedArray( ExtensionSuiteData* data ) {
    /* Copy time! */
    
    copyMap = PtrMap_New( 1  );
-   arrayExtensionCopy = Stg_Class_Copy( arrayExtension, NULL, True, "_dup", copyMap );
-   structExtensionCopy = Stg_Class_Copy( structExtension, NULL, True, "_dup", copyMap );
-   nArrayCopy = PtrMap_Find( copyMap, arrayExtension->_array );
+   arrayExtensionCopy = (ExtensionManager*)Stg_Class_Copy( arrayExtension, NULL, True, "_dup", copyMap );
+   structExtensionCopy = (ExtensionManager*)Stg_Class_Copy( structExtension, NULL, True, "_dup", copyMap );
+   nArrayCopy = (BaseClass*)PtrMap_Find( copyMap, arrayExtension->_array );
 
    pcu_check_true( nArrayCopy != NULL && nArrayCopy == arrayExtensionCopy->_array );
 
    for ( array_I = 0; array_I < ArraySize; ++array_I ) {
-      current = ExtensionManager_At( arrayExtensionCopy, nArrayCopy, array_I );
+     current = (BaseClass*)ExtensionManager_At( arrayExtensionCopy, nArrayCopy, array_I );
 
       nType0 = (ExtensionStruct0*)ExtensionManager_Get(
          arrayExtensionCopy,

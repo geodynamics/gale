@@ -70,10 +70,10 @@
 	
 	
 	/** Create a new ClassPtrExtensionInfo */
-	ClassPtrExtensionInfo* ClassPtrExtensionInfo_New( const Name name, Stg_Class_CopyFunction* copyFunc, Index count );
+	ClassPtrExtensionInfo* ClassPtrExtensionInfo_New( Name name, Stg_Class_CopyFunction* copyFunc, Index count );
 	
 	/** Initialise an ClassPtrExtensionInfo */
-	void ClassPtrExtensionInfo_Init( void* arrayExtensionInfo, const Name name, Stg_Class_CopyFunction* copyFunc, Index count );
+	void ClassPtrExtensionInfo_Init( void* arrayExtensionInfo, Name name, Stg_Class_CopyFunction* copyFunc, Index count );
 	
 	/* Creation implementation */
 	
@@ -101,7 +101,7 @@
 	void _ClassPtrExtensionInfo_Print( void* arrayExtensionInfo, Stream* stream );
 	
 	/** Class_Copy() implementation: derivatives should call this in their implementation */
-	void* _ClassPtrExtensionInfo_Copy( void* extensionInfo, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ClassPtrExtensionInfo_Copy( const void* extensionInfo, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 
 	void* _ClassPtrExtensionInfo_DataCopy(

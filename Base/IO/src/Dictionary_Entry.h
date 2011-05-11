@@ -49,7 +49,7 @@
 	
 	/** \def __Dictionary_Entry See Dictionary_Entry */
 	#define __Dictionary_Entry  \
-		Dictionary_Entry_Key		key; \
+		char*		key; \
 		Dictionary_Entry_Value*		value; \
 		Dictionary_Entry_Source		source;
 

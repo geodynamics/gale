@@ -94,7 +94,7 @@ static void forEachLiveComponent( Stream* stream, ForEachFunc* forEach ) {
 			}
 		}
 		if( componentType && !found ) {
-			Stg_ObjectList_PointerAppend( uniqueComponentTypes, componentType, 0, 0, 0, 0 );
+                  Stg_ObjectList_PointerAppend( uniqueComponentTypes, (void*)componentType, 0, 0, 0, 0 );
 		}
 	}
 
@@ -140,7 +140,7 @@ static void printRightsListItem( Stream* stream, Type componentType ) {
 		/* i.e. if not null and not an empty string print the value else default */
 }
 
-
+void register_static_modules();
 int main( int argc, char* argv[] ) {
 	/* StGermain standard bits & pieces */
 	MPI_Comm						CommWorld;

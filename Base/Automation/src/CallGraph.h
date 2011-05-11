@@ -42,9 +42,9 @@
 	/* Templates of virtual functions */
 	typedef struct {
 		void*			functionPtr;
-		Type			name;			/* assume its a const char* (i.e. we just need to copy ptr */
+		Type			name;			/* assume its a Name (i.e. we just need to copy ptr */
 		void*			parentPtr;
-		Type			parentName;		/* assume its a const char* (i.e. we just need to copy ptr */
+		Type			parentName;		/* assume its a Name (i.e. we just need to copy ptr */
 		double			time;
 		SizeT			memory;
 		Index			called;
@@ -54,7 +54,7 @@
 	typedef struct __Stg_CallGraph_Stack _Stg_CallGraph_Stack;
 	struct __Stg_CallGraph_Stack {
 		void*			functionPtr;
-		Type			name;			/* assume its a const char* (i.e. we just need to copy ptr */
+		Type			name;			/* assume its a Name (i.e. we just need to copy ptr */
 		double			time;
 		SizeT			memory;
 		Index			entry_I;
@@ -115,7 +115,7 @@
 	void _Stg_CallGraph_Print( void* callGraph, Stream* stream );
 	
 	/* Copy implementation */
-	void* _Stg_CallGraph_Copy( void* callGraph, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _Stg_CallGraph_Copy( const void* callGraph, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	
 	/* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

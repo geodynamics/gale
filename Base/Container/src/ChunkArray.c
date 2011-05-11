@@ -173,7 +173,7 @@ ChunkArray_CreateChunk
         int  i = 0;
 
         chunkArray->maxChunkEntries += CHUNK_ARRAY_DELTA;
-        chunkArray->chunks = realloc(chunkArray->chunks, sizeof(Chunk)*chunkArray->maxChunkEntries );
+          chunkArray->chunks = (Chunk*)realloc(chunkArray->chunks, sizeof(Chunk)*chunkArray->maxChunkEntries );
 
         assert(chunkArray->chunks);
     	memset(&chunkArray->chunks[chunkArray->maxChunkEntries-CHUNK_ARRAY_DELTA], 0, sizeof(Chunk)*CHUNK_ARRAY_DELTA);
@@ -186,8 +186,8 @@ ChunkArray_CreateChunk
 
     {
         int        idx     = 0;
-        int        i       = 0;
-        int        j       = 0;
+        Index        i       = 0;
+        Index        j       = 0;
         
         idx = pos;
 
@@ -228,11 +228,11 @@ ChunkArray_NewObjectFunc
     char                        *result     = NULL;
     int                objectID    = ChunkArray_NewObjectIDFunc(elementSize, chunkArray);
     int                chunkID     = objectID >> 16;
-    int                arrayIdx    = objectID & TWO_EXP16;
+    Index                arrayIdx    = objectID & TWO_EXP16;
 
     if(chunkID < chunkArray->maxChunkEntries && chunkArray->chunks[chunkID].numFree != INVALID){
         if(arrayIdx < chunkArray->numElementsPerChunk*chunkArray->elementSize){
-            result = (void*) ChunkArray_ObjectAt(chunkArray, objectID);
+            result = (char*) ChunkArray_ObjectAt(chunkArray, objectID);
         }
         else{
             assert(0);
@@ -392,7 +392,7 @@ ChunkArray_DeleteObjectID
 )
 {
     int chunkID  = objectId >> 16;
-    int arrayIdx = objectId & TWO_EXP16;
+    Index arrayIdx = objectId & TWO_EXP16;
     char         *objPtr  = NULL;
         
     if(chunkID < chunkArray->maxChunkEntries && chunkArray->chunks[chunkID].numFree != INVALID){
@@ -482,7 +482,7 @@ label:  shrinkChunkArray = 1;
                 assert(0);
             }
             
-            chunkArray->chunks = realloc(chunkArray->chunks, sizeof(Chunk)*(chunkArray->maxChunkEntries));
+              chunkArray->chunks = (Chunk*)realloc(chunkArray->chunks, sizeof(Chunk)*(chunkArray->maxChunkEntries));
 
             chunkArray->chunkToUse = ChunkArray_GetChunkWithFreeSlots(chunkArray);
             

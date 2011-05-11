@@ -50,7 +50,7 @@
 const Type ContextEntryPoint_Type = "ContextEntryPoint";
 
 
-ContextEntryPoint* ContextEntryPoint_New( const Name name, unsigned int castType ) {
+ContextEntryPoint* ContextEntryPoint_New( Name name, unsigned int castType ) {
 	/* Variables set in this function */
 	SizeT                       _sizeOfSelf = sizeof(ContextEntryPoint);
 	Type                               type = ContextEntryPoint_Type;

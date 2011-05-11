@@ -109,7 +109,7 @@ void _Stream_Init(
 
 void _Stream_Delete( void* stream )
 {
-	int i;
+	Index i;
 	
 	Stream* self = (Stream*)stream;
 	
@@ -219,12 +219,12 @@ void Stream_PrintConcise( void* stream, Stream* paramStream )
 }
 
 
-void* _Stream_Copy( void* stream, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _Stream_Copy( const void* stream, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	Stream*		self = (Stream*)stream;
 	Stream*		newStream;
 	unsigned	i;
 	
-	newStream = _Stg_Object_Copy( self, dest, deep, nameExt, ptrMap );
+	newStream = (Stream*)_Stg_Object_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	newStream->_printf = self->_printf;
 	newStream->_write = self->_write;
@@ -251,7 +251,7 @@ void* _Stream_Copy( void* stream, void* dest, Bool deep, Name nameExt, struct Pt
 	
 	IndentFormatter_SetIndent( newStream->_indent, self->_indent->_indent );
 	for ( i = 0; i < self->_formatterCount; ++i ) {
-		Stream_AddFormatter( newStream, Stg_Class_Copy( self->_formatter[i], 0, deep, nameExt, ptrMap ) );
+          Stream_AddFormatter( newStream, (StreamFormatter*)Stg_Class_Copy( self->_formatter[i], 0, deep, nameExt, ptrMap ) );
 		/**set stream for formatter */
 	}
 	
@@ -259,12 +259,12 @@ void* _Stream_Copy( void* stream, void* dest, Bool deep, Name nameExt, struct Pt
 }
 
 
-SizeT Stream_Printf( Stream *stream, const char const *fmt, va_list args )
+SizeT Stream_Printf( Stream *stream, const char *fmt, va_list args )
 {
-	int i;
+	Index i;
 	SizeT result;
-	const char* lastFormat;
-	const char* currentFormat;
+	Name lastFormat;
+	Name currentFormat;
 
 	if ( stream->_file == NULL ) {
 		return 0;
@@ -292,7 +292,7 @@ SizeT Stream_Printf( Stream *stream, const char const *fmt, va_list args )
 	}
 	return result;
 }
-SizeT Stream_Write( Stream *stream, void *data, SizeT elem_size, SizeT num_elems )
+SizeT Stream_Write( Stream *stream, const void *data, SizeT elem_size, SizeT num_elems )
 {
 	SizeT result;
 
@@ -315,7 +315,7 @@ SizeT Stream_Write( Stream *stream, void *data, SizeT elem_size, SizeT num_elems
 	return result;
 }
 
-Bool Stream_Dump( Stream *stream, void *data )
+Bool Stream_Dump( Stream *stream, const void *data )
 {
 	Bool result;
 	
@@ -430,7 +430,7 @@ Bool Stream_SetFile( Stream* stream, JournalFile* file )
 Bool Stream_SetFileBranch( Stream* stream, JournalFile* file )
 {
 	Bool result = False;
-	int i;
+	Index i;
 	
 	if ( file == NULL )
 	{
@@ -465,7 +465,7 @@ Bool Stream_IsEnable( void* stream )
 		return self->_enable;
 	}
 	
-	return self->_enable && Stream_IsEnable( self->_parent );
+	return (self->_enable && Stream_IsEnable( self->_parent )) ? True : False;
 }
 
 void Stream_Enable( void* stream, Bool enable )
@@ -481,7 +481,7 @@ void Stream_Enable( void* stream, Bool enable )
 }
 void Stream_EnableBranch( void* stream, Bool enable )
 {
-	int i;
+	Index i;
 	Stream* self = (Stream*) stream;
 	
 	self->_enable = enable;
@@ -511,7 +511,7 @@ int Stream_GetPrintingRank( void* stream )
 
 void Stream_SetPrintingRankBranch( void* stream, int rank )
 {
-	int i;
+	Index i;
 	Stream* self = (Stream*) stream;
 	
 	self->_printingRank = rank;
@@ -536,7 +536,7 @@ Bool Stream_GetAutoFlush( void* stream )
 
 void Stream_SetAutoFlushBranch( void* stream, Bool autoFlush )
 {
-	int i;
+	Index i;
 	Stream* self = (Stream*) stream;
 	
 	self->_autoFlush = autoFlush;
@@ -550,7 +550,7 @@ void Stream_SetAutoFlushBranch( void* stream, Bool autoFlush )
 Bool Stream_IsPrintableLevel( void* stream, JournalLevel level )
 {
 	Stream* self = (Stream*) stream;
-	return (self->_level >= level);
+	return (self->_level >= level) ? True : False;
 }
 	
 void Stream_SetLevel( void* stream, JournalLevel level )
@@ -560,7 +560,7 @@ void Stream_SetLevel( void* stream, JournalLevel level )
 }
 void Stream_SetLevelBranch( void* stream, JournalLevel level )
 {
-	int i;
+	Index i;
 	Stream* self = (Stream*) stream;
 	
 	self->_level = level;	
@@ -598,7 +598,7 @@ void Stream_ZeroIndent( void* stream )
 
 void Stream_SetIndentBranch( void* stream, Index indent )
 {
-	int i;
+	Index i;
 	Stream* self = (Stream*) stream;
 	
 	IndentFormatter_SetIndent( self->_indent, indent );
@@ -610,7 +610,7 @@ void Stream_SetIndentBranch( void* stream, Index indent )
 }
 void Stream_IndentBranch( void* stream )
 {
-	int i;
+	Index i;
 	Stream* self = (Stream*) stream;
 	
 	IndentFormatter_Increment( self->_indent );
@@ -622,7 +622,7 @@ void Stream_IndentBranch( void* stream )
 }
 void Stream_UnIndentBranch( void* stream )
 {
-	int i;
+	Index i;
 	Stream* self = (Stream*) stream;
 	
 	IndentFormatter_Decrement( self->_indent );
@@ -634,7 +634,7 @@ void Stream_UnIndentBranch( void* stream )
 }
 void Stream_ZeroIndentBranch( void* stream )
 {
-	int i;
+	Index i;
 	Stream* self = (Stream*) stream;
 	
 	IndentFormatter_Zero( self->_indent );
@@ -678,7 +678,7 @@ void Stream_ClearCustomFormatters( void* stream ) {
 }
 
 
-void Stream_SetCurrentInfo( void* stream, const char* const currentSource, const char* const currentFunction, int line )
+void Stream_SetCurrentInfo( void* stream, Name const currentSource, const char* const currentFunction, int line )
 {
 	Stream* self = (Stream*)stream;
 
@@ -699,10 +699,10 @@ Stream* Stream_RegisterChild( void* stream, Name name )
 	
 	if ( child == NULL )
 	{
-		child = Stg_Class_Copy( self, 0, True, 0, 0 );
-		Stg_Object_SetName( child, name );
-		child->_parent = self;
-		Stg_ObjectList_Append( self->_children, child );
+          child = (Stream*)Stg_Class_Copy( self, 0, True, 0, 0 );
+          Stg_Object_SetName( child, name );
+          child->_parent = self;
+          Stg_ObjectList_Append( self->_children, child );
 	}
 	
 	return child;

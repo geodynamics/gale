@@ -82,13 +82,13 @@ Bool Dictionary_GetBool_WithDefault( Dictionary* dictionary, Dictionary_Entry_Ke
 		Dictionary_Entry_Value_FromBool( defaultVal ) ) );
 }
 
-char* Dictionary_GetString_WithDefault( Dictionary* dictionary, Dictionary_Entry_Key key, const char* const defaultVal ) {
+char* Dictionary_GetString_WithDefault( Dictionary* dictionary, Dictionary_Entry_Key key, Name const defaultVal ) {
 	return	Dictionary_Entry_Value_AsString( 
 		Dictionary_GetDefault( dictionary, key, 
 		Dictionary_Entry_Value_FromString( defaultVal ) ) );
 }
 
-char* Dictionary_GetString_WithPrintfDefault( Dictionary* dictionary, Dictionary_Entry_Key key, char* format, ... ) {
+char* Dictionary_GetString_WithPrintfDefault( Dictionary* dictionary, Dictionary_Entry_Key key, Name format, ... ) {
 	char*     returnString;
 	char*     defaultVal;
 	va_list   ap;
@@ -107,7 +107,7 @@ char* Dictionary_GetString_WithPrintfDefault( Dictionary* dictionary, Dictionary
 
 	return returnString;
 }
-Bool Stream_RedirectFile_WithPrependedPath( Stream* stream, char* prependedPath, char* filename ) {
+Bool Stream_RedirectFile_WithPrependedPath( Stream* stream, Name prependedPath, const char* filename ) {
 	Bool result;
 
 	/* Check to make sure output path is emtpy */ 
@@ -123,7 +123,7 @@ Bool Stream_RedirectFile_WithPrependedPath( Stream* stream, char* prependedPath,
 
 	return result;
 }
-Bool Stream_AppendFile_WithPrependedPath( Stream* stream, char* prependedPath, char* filename ) {
+Bool Stream_AppendFile_WithPrependedPath( Stream* stream, Name prependedPath, const char* filename ) {
 	Bool result;
 
 	/* Check to make sure output path is emtpy */ 
@@ -139,20 +139,20 @@ Bool Stream_AppendFile_WithPrependedPath( Stream* stream, char* prependedPath, c
 
 	return result;
 }
-void Journal_PrintString_WithLength( Stream* stream, char* string, int length ) {
+void Journal_PrintString_WithLength( Stream* stream, Name string, int length ) {
 	size_t      stringLength = strlen( string ) ;
-	char*       breakInMiddle = "...";
+	Name       breakInMiddle = "...";
 	size_t      lengthOfBreak = strlen( breakInMiddle );
 
 	if ( length <= 0 )
 		return;
 	/* If length given is exeedingly short - then print initial */
-	else if ( lengthOfBreak >= length ) {
+	else if ( lengthOfBreak >= (unsigned)length ) {
 		Journal_Printf( stream, "%c", string[0] );
 		Journal_Write( stream, breakInMiddle, sizeof( char ), length - 1 );
 	}
 	/* Shorten String if nessesary */
-	else if ( stringLength > length ) {
+	else if ( stringLength > (unsigned)length ) {
 		int charsBeforeBreak = (int) ((float)length * 0.5) - 1;
 		int charsAfterBreak  = length - charsBeforeBreak - lengthOfBreak;
 

@@ -176,7 +176,7 @@
 	#define ExtensionManager_DeepCopy( self ) \
 		(ExtensionManager*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _ExtensionManager_Copy( void* extensionManager, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ExtensionManager_Copy( const void* extensionManager, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	/** For original data which was a class or or complex struct which requires its own copy function */
 	void ExtensionManager_SetDataCopyFunc( void* extensionManager, Stg_Class_CopyFunction* dataCopyFunc );
@@ -188,7 +188,7 @@
 
 	ExtensionInfo_Index ExtensionManager_AddArray( 
 		void* extension, 
-		const Name offsetName, 
+		Name offsetName, 
 		SizeT size, 
 		Index count );
 
@@ -197,7 +197,7 @@
 	
 	ExtensionInfo_Index ExtensionManager_AddClassPtrArray(
 		void* extension, 
-		const Name offsetName, 
+		Name offsetName, 
 		Stg_Class_CopyFunction* copyFunc,
 		Index count );
 

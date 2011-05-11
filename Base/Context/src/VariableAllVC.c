@@ -62,14 +62,14 @@ VariableCondition* VariableAllVC_Factory(
 	Dictionary*							dictionary,
 	void*									data )
 {
-	return (VariableCondition*)VariableAllVC_New( defaultVariableAllVCName, context, NULL, variable_Register, conFunc_Register, dictionary, data );
+  return (VariableCondition*)VariableAllVC_New( (char*)defaultVariableAllVCName, context, NULL, variable_Register, conFunc_Register, dictionary, data );
 }
 
 
 VariableAllVC*	VariableAllVC_New(
 	Name									name,
 	AbstractContext*					context,
-	Name									_dictionaryEntryName, 
+	char*									_dictionaryEntryName, 
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register,
 	Dictionary*							dictionary,
@@ -334,7 +334,7 @@ void _VariableAllVC_Print( void* allElementsVC, Stream* stream ) {
 }
 
 
-void* _VariableAllVC_Copy( void* allElementsVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _VariableAllVC_Copy( const void* allElementsVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	VariableAllVC*		self = (VariableAllVC*)allElementsVC;
 	VariableAllVC*		newVariableAllVC;
 	PtrMap*			map = ptrMap;
@@ -353,7 +353,7 @@ void* _VariableAllVC_Copy( void* allElementsVC, void* dest, Bool deep, Name name
 	if( deep ) {
 		newVariableAllVC->data = Stg_Class_Copy( self->data, NULL, deep, nameExt, map );
 		
-		if( (newVariableAllVC->_entryTbl = PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
+		if( (newVariableAllVC->_entryTbl = (VariableAllVC_Entry*)PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
 			newVariableAllVC->_entryTbl = Memory_Alloc_Array( VariableAllVC_Entry, newVariableAllVC->_entryCount, "VariableAllVC->_entryTbl");
 			memcpy( newVariableAllVC->_entryTbl, self->_entryTbl, sizeof(VariableAllVC_Entry) * newVariableAllVC->_entryCount );
 			PtrMap_Append( map, newVariableAllVC->_entryTbl, self->_entryTbl );

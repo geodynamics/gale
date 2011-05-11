@@ -151,7 +151,7 @@ int AbsArray_GetSize( const void* _self ) {
 const int* AbsArray_GetPtr( const void* _self ) {
    AbsArray* self = Class_Cast( _self, AbsArray );
 
-   return self->ptr;
+   return (const int*)(self->ptr);
 }
 
 

@@ -143,7 +143,7 @@
 	void Dictionary_PrintConcise( void* dictionary, Stream* stream );
 	
 	/** Implementation of Stg_Class_Copy() */
-	void* _Dictionary_Copy( void* indexMap, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _Dictionary_Copy( const void* indexMap, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 
 	/** Empty the Dictionary's entry list and re-set count to zero.
 	 *   Will also call Delete() on each entry currently in the dictionary.

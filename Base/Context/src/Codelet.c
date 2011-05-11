@@ -101,7 +101,7 @@ void  _Codelet_Print( void* codelet, Stream* stream ) {
 	Journal_Printf( stream, "Codelet: %s, Type %s\n", self->name, self->type );
 	_Stg_Component_Print( self, stream );
 }
-void* _Codelet_Copy( void* codelet, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Codelet_Copy( const void* codelet, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	return _Stg_Component_Copy( codelet, dest, deep, nameExt, ptrMap );
 }
 

@@ -61,7 +61,7 @@
 	extern Stg_ObjectList* Project_XMLSearchPaths;
 	
 	/* additional class function ptr typedefs */
-	typedef Bool (XML_IO_Handler_WriteEntryToFileFunction) ( void* xml_io_handler, const char* filename,
+	typedef Bool (XML_IO_Handler_WriteEntryToFileFunction) ( void* xml_io_handler, Name filename,
 		Dictionary_Entry_Key name, Dictionary_Entry_Value* value, Dictionary_Entry_Source source );
 	typedef void (XML_IO_Handler_SetListEncodingFunction) ( void* xml_io_handler, ListEncoding listEncoding );
 	typedef void (XML_IO_Handler_SetWritingPrecisionFunction) ( void* xml_io_handler, int dictionaryEntryType,
@@ -93,7 +93,7 @@
 		int					tokeniserCalls; \
 		ListEncoding		listEncoding; \
 		Stg_ObjectList*	typeKeywords; /**< Maps strings to dictionary types. */\
-		char*					TYPE_KEYWORDS[Dictionary_Entry_Value_Num_Types + 1]; \
+		Name					TYPE_KEYWORDS[Dictionary_Entry_Value_Num_Types + 1]; \
 		unsigned int		writingPrecision[Dictionary_Entry_Value_Num_Types + 1]; \
 		unsigned int		writingFieldWidth[Dictionary_Entry_Value_Num_Types + 1]; \
 		unsigned int		WRITING_FIELD_EXTRAS[Dictionary_Entry_Value_Num_Types + 1]; \
@@ -153,37 +153,37 @@
 	extern void XML_IO_Handler_SetWritingPrecision( void* xml_io_handler, int dictionaryEntryType, int value );
 	extern void _XML_IO_Handler_SetWritingPrecision( void* xml_io_handler, int dictionaryEntryType, int value );
 	
-	void _XML_IO_Handler_AddNameSpace( void* io_handler, char* location, char* version );
+	void _XML_IO_Handler_AddNameSpace( void* io_handler, Name location, const char* version );
 	
 	extern Bool _XML_IO_Handler_CheckNameSpace( XML_IO_Handler* self, xmlNodePtr curNode );
 	
 	/** Read a dictionary entry of a given name from file */
-	extern Bool _XML_IO_Handler_ReadAllFromFile( void* xml_io_handler, const char* filename, Dictionary* dictionary );
+	extern Bool _XML_IO_Handler_ReadAllFromFile( void* xml_io_handler, Name filename, Dictionary* dictionary );
 	
 	/** Read a dictionary entry of a given name from file and force the source file info to be added to the
 	 *  Dictionary_Entry */
-	extern Bool _XML_IO_Handler_ReadAllFromFileForceSource(void* xml_io_handler, const char* filename, Dictionary* dictionary);
+	extern Bool _XML_IO_Handler_ReadAllFromFileForceSource(void* xml_io_handler, Name filename, Dictionary* dictionary);
 
 	/** Read a dictionary entry of a given name from buffer */
-	extern Bool _XML_IO_Handler_ReadAllFromBuffer( void* xml_io_handler, const char* buffer, Dictionary* dictionary );
+	extern Bool _XML_IO_Handler_ReadAllFromBuffer( void* xml_io_handler, Name buffer, Dictionary* dictionary );
 	
 	/** Write a given dictionary entry to file */
 	/** Write a given dictionary entry to file */
 	/* TODO: option to choose between overwrite / update ? */
-	extern Bool _XML_IO_Handler_WriteAllToFile(void* xml_io_handler, const char* filename, Dictionary* dictionary );
+	extern Bool _XML_IO_Handler_WriteAllToFile(void* xml_io_handler, Name filename, Dictionary* dictionary );
 	
 	/* TODO: option to choose between overwrite / update ? */
-	extern Bool XML_IO_Handler_WriteEntryToFile( void* xml_io_handler, const char* filename, Dictionary_Entry_Key name, 
+	extern Bool XML_IO_Handler_WriteEntryToFile( void* xml_io_handler, Name filename, Dictionary_Entry_Key name, 
 		Dictionary_Entry_Value* value, Dictionary_Entry_Source source );
 	
-	extern Bool _XML_IO_Handler_WriteEntryToFile( void* xml_io_handler, const char* filename, Dictionary_Entry_Key name,
+	extern Bool _XML_IO_Handler_WriteEntryToFile( void* xml_io_handler, Name filename, Dictionary_Entry_Key name,
 		Dictionary_Entry_Value* value, Dictionary_Entry_Source source );
 
 	void XML_IO_Handler_AddDirectory( Name name, char* directory ); 
 
 	/** A function to handle errors produced by libXML through the Stg Stream system. Should be hooked
 	 *  up using xmlSetGenericErrorFunc(), e.g. at the Init() stage. */
-	void XML_IO_Handler_LibXMLErrorHandler( void* ctx, const char* msg, ... );
+	void XML_IO_Handler_LibXMLErrorHandler( void* ctx, Name msg, ... );
 
 #endif /* __StGermain_Base_IO_XML_IO_Handler_h__ */
 

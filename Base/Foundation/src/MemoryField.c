@@ -51,7 +51,7 @@ const Name Memory_IgnoreName = "Memory_IgnoreName";
 const Index MEMORYFIELD_DELTA = 4;	/**< Number of fields to extend by when array resizes. */
 
 
-MemoryField* MemoryField_New( const char* value ) {
+MemoryField* MemoryField_New( Name value ) {
 	MemoryField* result = (MemoryField*) malloc( sizeof(MemoryField) );
 	_MemoryField_Init( result, value );
 
@@ -59,7 +59,7 @@ MemoryField* MemoryField_New( const char* value ) {
 }
 
 
-void _MemoryField_Init( MemoryField* memoryField, const char* value ) {
+void _MemoryField_Init( MemoryField* memoryField, Name value ) {
 	if ( value ) {
 		memoryField->value = (char*)malloc( (strlen(value) + 1) * sizeof(char) );
 		strcpy( memoryField->value, value );
@@ -99,7 +99,7 @@ void MemoryField_Delete( MemoryField* memoryField ) {
 }
 	
 
-MemoryField* MemoryField_Register( MemoryField* memoryField, const char* subValue ) {
+MemoryField* MemoryField_Register( MemoryField* memoryField, Name subValue ) {
 	Index i;
 	
 	/* Search cache first for localisation. */
@@ -202,7 +202,7 @@ void MemoryField_Print( MemoryField* memoryField, MemoryFieldColumn columns,
 }
 
 
-void MemoryField_PrintHeader( const char* fieldName, MemoryFieldColumn columns,
+void MemoryField_PrintHeader( Name fieldName, MemoryFieldColumn columns,
 		unsigned int valueFieldWidth )
 {
 	if ( columns & MEMORYFIELD_VALUE ) {
@@ -228,12 +228,12 @@ void MemoryField_PrintHeader( const char* fieldName, MemoryFieldColumn columns,
 }
 
 
-void MemoryField_PrintSummary( MemoryField* memoryField, const char* tableTitle, MemoryFieldColumn cols ) {
+void MemoryField_PrintSummary( MemoryField* memoryField, Name tableTitle, MemoryFieldColumn cols ) {
 	Index             i;
 	MemoryFieldColumn colsNoVal;
 	unsigned int      nameFieldWidth = 0;
 
-	colsNoVal = MEMORYFIELD_ALL - MEMORYFIELD_VALUE;
+	colsNoVal = (MemoryFieldColumn)(MEMORYFIELD_ALL - MEMORYFIELD_VALUE);
 
 	if ( MemoryField_StringCompare( memoryField->value, Memory_IgnoreName ) == 0 ) {
 		return;
@@ -245,8 +245,11 @@ void MemoryField_PrintSummary( MemoryField* memoryField, const char* tableTitle,
 		Journal_Printf( stgMemory->infoStream, "%s\n", memoryField->value );
 
 		Stream_Indent( stgMemory->infoStream );
-		MemoryField_PrintHeader( NULL, (cols & colsNoVal), 0 );
-		MemoryField_Print( memoryField, (cols & colsNoVal), 0 );
+		MemoryField_PrintHeader(NULL,
+                                        (MemoryFieldColumn)(cols & colsNoVal),
+                                        0 );
+		MemoryField_Print(memoryField,
+                                  (MemoryFieldColumn)(cols & colsNoVal), 0 );
 
 		Stream_Indent( stgMemory->infoStream );
 		
@@ -286,7 +289,7 @@ void MemoryField_Sort( MemoryField* memoryField ) {
 }
 
 
-int MemoryField_StringCompare( const char* s1, const char* s2 ) {
+int MemoryField_StringCompare( Name s1, const char* s2 ) {
 	if ( s1 && s2 ) {
 		return strcmp( s1, s2 );
 	}

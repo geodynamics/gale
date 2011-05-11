@@ -62,7 +62,7 @@
 		/** This is a function type to be provided by the user, which can be applied to each node on the tree later on.
 		 * The first argument is the data stored inside a node and the second argument can be a single argument or a 
 		 * struct of arguments that need to be passed to the user-supplied function */
-	typedef void	(HashTable_parseFunction)			( void *, void * );
+	typedef void	(HashTable_parseFunction)			( const void *, void * );
 
 	/** \def HashTable_Entry see __HashTable_Entry */
 	#define __HashTable_Entry \
@@ -70,7 +70,7 @@
 		unsigned int 			hash; \
 		const void 			*key; \
 		size_t 				keyLength; \
-		void				*data; \
+		const void			*data; \
 		size_t				dataSize;	
 
 	struct HashTable_Entry { __HashTable_Entry };
@@ -138,11 +138,11 @@
 		/** Class print function */
 	void _HashTable_PrintFunc ( void *ht, Stream* stream );
 
-	void* _HashTable_CopyFunc( void* source, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _HashTable_CopyFunc( const void* source, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	/** Public functions */
 	/** Inserts a new entry into the hashTable  */
-	int HashTable_InsertEntry ( HashTable *ht, const void *voidKey, unsigned int keyLen, void *data, SizeT dataSize );
+	int HashTable_InsertEntry ( HashTable *ht, const void *voidKey, unsigned int keyLen, const void *data, SizeT dataSize );
 		
 	/** Public functions */
 	/** Inserts a new entry into the hashTable copying the data with the copy function if any */

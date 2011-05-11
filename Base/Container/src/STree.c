@@ -169,7 +169,7 @@ void STree_Remove( void* _self, const void* itm ) {
       cur->right->left = cur->left;
    }
    else if ( self->flip ) {
-      STreeNode *last = cur->left, *preLast;
+      STreeNode *last = cur->left, *preLast=NULL;
       while ( last->right ) {
 	 preLast = last;
 	 last = last->right;
@@ -181,7 +181,7 @@ void STree_Remove( void* _self, const void* itm ) {
       self->flip = 0;
    }
    else {
-      STreeNode *last = cur->right, *preLast;
+      STreeNode *last = cur->right, *preLast=NULL;
       while ( last->left ) {
 	 preLast = last;
 	 last = last->left;

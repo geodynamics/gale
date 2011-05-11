@@ -40,6 +40,7 @@
 #include "StGermain/Base/Foundation/Foundation.h"
 #include "StGermain/Base/IO/IO.h"
 #include "PathUtilsSuite.h"
+#include "sys/stat.h"
 
 typedef struct {
    int rank;
@@ -75,9 +76,9 @@ void PathUtilsSuite_TestPathJoin( PathUtilsSuiteData* data ) {
 void PathUtilsSuite_TestFindFile( PathUtilsSuiteData* data ) {
    char*       searchPaths = NULL;
    char        fullPath[1024];
-   const char* subDir = "./testSubDir";
-   const char* subDirFilename = "./testSubDir/subDirTest.xml";
-   const char* currDirFilename = "./currDirTest.xml";
+   Name subDir = "./testSubDir";
+   Name subDirFilename = "./testSubDir/subDirTest.xml";
+   Name currDirFilename = "./currDirTest.xml";
 
 
    Stg_asprintf( &searchPaths, ".:%s:/does/not/exist", subDir );

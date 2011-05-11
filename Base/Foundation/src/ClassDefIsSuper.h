@@ -18,7 +18,7 @@
 #define MEMBER( type, name )
 
 #define _CLASSISSUPERBEGIN( pre, className ) \
-   Bool pre##className##_IsSuper( const char* type ) {
+   Bool pre##className##_IsSuper( Name type ) {
 #define CLASSISSUPERBEGIN( pre, className ) \
    _CLASSISSUPERBEGIN( pre, className )
 #define _CLASSISSUPEREND( pre, className ) \

@@ -95,11 +95,11 @@ void _StreamFormatter_Print( void* formatter, Stream* stream )
 	printf( "\t_stream (ptr): %p\n", (void*)self->_stream );
 }
 
-void* _StreamFormatter_Copy( void* streamFormatter, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _StreamFormatter_Copy( const void* streamFormatter, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	StreamFormatter*	self = (StreamFormatter*)streamFormatter;
 	StreamFormatter*	newStreamFormatter;
 	
-	newStreamFormatter = _Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
+	newStreamFormatter = (StreamFormatter*)_Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	newStreamFormatter->_format = self->_format;
 	newStreamFormatter->_stream = NULL;
@@ -108,7 +108,7 @@ void* _StreamFormatter_Copy( void* streamFormatter, void* dest, Bool deep, Name 
 }
 
 
-const char* StreamFormatter_Format( void* formatter, const char* const fmt )
+Name StreamFormatter_Format( void* formatter, const char* const fmt )
 {
 	StreamFormatter* self = (StreamFormatter*)formatter;
 	return self->_format( self, fmt );

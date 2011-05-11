@@ -47,10 +47,10 @@
 	/*struct Stg_Component_DefaultConstructorFunction;*/
 	#define __Stg_ComponentRegisterElement \
 		__Stg_Object						\
-		Type								componentType; \
+		char*								componentType; \
 		Stg_Component_DefaultConstructorFunction*			defaultConstructor; \
 		Stg_Component_MetaAsDictionaryFunction*                         metadata; \
-		Name								version;
+		char*								version;
 
 	struct Stg_ComponentRegisterElement{ __Stg_ComponentRegisterElement };
 
@@ -128,8 +128,8 @@
 	/* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	int Stg_ComponentRegister_AddFunc( 
 			Stg_ComponentRegister *self,
-			const Name componentType,
-			const Name version,
+			Name componentType,
+			Name version,
 			Stg_Component_DefaultConstructorFunction *func,
 			Stg_Component_MetaAsDictionaryFunction* metadata );
 
@@ -178,7 +178,7 @@
 
 	/* Functions for iterating through the component element list ---------------------------------------------------*/
    int Stg_ComponentRegister_GetCount( void* componentRegister );
-   Stg_ComponentRegisterElement* Stg_ComponentRegister_GetByIndex( void* componentRegister, int index );
+   Stg_ComponentRegisterElement* Stg_ComponentRegister_GetByIndex( void* componentRegister, Index index );
 
 	/** Obtain the component type from the component list element */
 	Type Stg_ComponentRegisterElement_GetType( Stg_ComponentRegisterElement* element );

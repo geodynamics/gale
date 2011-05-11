@@ -44,7 +44,7 @@
 #ifndef __StGermain_Base_IO_Finalise_h__
 #define __StGermain_Base_IO_Finalise_h__
 	
-	Bool IO_Finalise( void );
+	Bool BaseIO_Finalise( void );
 	
 #endif /* __StGermain_Base_IO_Finalise_h__ */
 

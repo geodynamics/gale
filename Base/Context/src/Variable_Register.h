@@ -96,7 +96,7 @@
 	
 	void	_Variable_Register_Print(void* variable_Register, Stream* stream);
 
-	void*	_Variable_Register_Copy( void* vr, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void*	_Variable_Register_Copy( const void* vr, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Macros

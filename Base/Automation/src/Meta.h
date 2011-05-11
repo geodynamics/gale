@@ -66,5 +66,5 @@
 	char* Stg_Meta_GetAssociationType( Dictionary* dictionary, Index i );
 	char* Stg_Meta_GetAssociationNillable( Dictionary* dictionary, Index i );
 	char* Stg_Meta_GetAssociationDocumentation( Dictionary* dictionary, Index i );
-	
+        void Stg_Meta_Print( Dictionary* dictionary, Stream* stream );
 #endif /* __StGermain_Base_Automation_Stg_ComponentMeta_h__ */

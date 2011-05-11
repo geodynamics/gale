@@ -118,7 +118,7 @@ FILE* _get_file_pointer_log_printf( void )
 	return fp;
 }
 
-void stg_profile_EntryPoint( char ep_name[], char hk_name[], double time )
+void stg_profile_EntryPoint( const char *ep_name, const char *hk_name, double time )
 { 
 #ifdef ENABLE_STGERMAIN_LOG
 	int len_ep, len_hk;
@@ -157,7 +157,7 @@ void stg_profile_EntryPoint( char ep_name[], char hk_name[], double time )
 }
 
 
-void stg_profile_Func( char func_name[], double time )
+void stg_profile_Func( const char *func_name, double time )
 {
 #ifdef ENABLE_STGERMAIN_LOG
         int len_ep;

@@ -56,7 +56,7 @@ Stg_PrimitiveObject* Stg_PrimitiveObject_New_UnsignedChar( unsigned char value_r
 	Stg_Class_DeleteFunction*             _delete = ZERO;
 	Stg_Class_PrintFunction*               _print = ZERO;
 	Stg_Class_CopyFunction*                 _copy = ZERO;
-	AllocationType             nameAllocationType = ZERO;
+	AllocationType             nameAllocationType = GLOBAL;
 
 	Stg_C_Primitive v;
 	v.asUnsignedChar = value_renamed;
@@ -75,7 +75,7 @@ Stg_PrimitiveObject* Stg_PrimitiveObject_New_UnsignedShort( unsigned short value
 	Stg_Class_DeleteFunction*             _delete = ZERO;
 	Stg_Class_PrintFunction*               _print = ZERO;
 	Stg_Class_CopyFunction*                 _copy = ZERO;
-	AllocationType             nameAllocationType = ZERO;
+	AllocationType             nameAllocationType = GLOBAL;
 
 	Stg_C_Primitive v;
 	v.asUnsignedShort = value_renamed;
@@ -94,7 +94,7 @@ Stg_PrimitiveObject* Stg_PrimitiveObject_New_UnsignedInt( unsigned int value_ren
 	Stg_Class_DeleteFunction*             _delete = ZERO;
 	Stg_Class_PrintFunction*               _print = ZERO;
 	Stg_Class_CopyFunction*                 _copy = ZERO;
-	AllocationType             nameAllocationType = ZERO;
+	AllocationType             nameAllocationType = GLOBAL;
 
 	Stg_C_Primitive v;
 	v.asUnsignedInt = value_renamed;
@@ -113,7 +113,7 @@ Stg_PrimitiveObject* Stg_PrimitiveObject_New_UnsignedLong( unsigned long value_r
 	Stg_Class_DeleteFunction*             _delete = ZERO;
 	Stg_Class_PrintFunction*               _print = ZERO;
 	Stg_Class_CopyFunction*                 _copy = ZERO;
-	AllocationType             nameAllocationType = ZERO;
+	AllocationType             nameAllocationType = GLOBAL;
 
 	Stg_C_Primitive v;
 	v.asUnsignedLong = value_renamed;
@@ -132,7 +132,7 @@ Stg_PrimitiveObject* Stg_PrimitiveObject_New_Char( char value_renamed, Name name
 	Stg_Class_DeleteFunction*             _delete = ZERO;
 	Stg_Class_PrintFunction*               _print = ZERO;
 	Stg_Class_CopyFunction*                 _copy = ZERO;
-	AllocationType             nameAllocationType = ZERO;
+	AllocationType             nameAllocationType = GLOBAL;
 
 	Stg_C_Primitive v;
 	v.asChar = value_renamed;
@@ -151,7 +151,7 @@ Stg_PrimitiveObject* Stg_PrimitiveObject_New_Short( short value_renamed, Name na
 	Stg_Class_DeleteFunction*             _delete = ZERO;
 	Stg_Class_PrintFunction*               _print = ZERO;
 	Stg_Class_CopyFunction*                 _copy = ZERO;
-	AllocationType             nameAllocationType = ZERO;
+	AllocationType             nameAllocationType = GLOBAL;
 
 	Stg_C_Primitive v;
 	v.asShort = value_renamed;
@@ -170,7 +170,7 @@ Stg_PrimitiveObject* Stg_PrimitiveObject_New_Int( int value_renamed, Name name )
 	Stg_Class_DeleteFunction*             _delete = ZERO;
 	Stg_Class_PrintFunction*               _print = ZERO;
 	Stg_Class_CopyFunction*                 _copy = ZERO;
-	AllocationType             nameAllocationType = ZERO;
+	AllocationType             nameAllocationType = GLOBAL;
 
 	Stg_C_Primitive v;
 	v.asInt = value_renamed;
@@ -189,7 +189,7 @@ Stg_PrimitiveObject* Stg_PrimitiveObject_New_Long( long value_renamed, Name name
 	Stg_Class_DeleteFunction*             _delete = ZERO;
 	Stg_Class_PrintFunction*               _print = ZERO;
 	Stg_Class_CopyFunction*                 _copy = ZERO;
-	AllocationType             nameAllocationType = ZERO;
+	AllocationType             nameAllocationType = GLOBAL;
 
 	Stg_C_Primitive v;
 	v.asLong = value_renamed;
@@ -208,7 +208,7 @@ Stg_PrimitiveObject* Stg_PrimitiveObject_New_Float( float value_renamed, Name na
 	Stg_Class_DeleteFunction*             _delete = ZERO;
 	Stg_Class_PrintFunction*               _print = ZERO;
 	Stg_Class_CopyFunction*                 _copy = ZERO;
-	AllocationType             nameAllocationType = ZERO;
+	AllocationType             nameAllocationType = GLOBAL;
 
 	Stg_C_Primitive v;
 	v.asFloat = value_renamed;
@@ -227,7 +227,7 @@ Stg_PrimitiveObject* Stg_PrimitiveObject_New_Double( double value_renamed, Name 
 	Stg_Class_DeleteFunction*             _delete = ZERO;
 	Stg_Class_PrintFunction*               _print = ZERO;
 	Stg_Class_CopyFunction*                 _copy = ZERO;
-	AllocationType             nameAllocationType = ZERO;
+	AllocationType             nameAllocationType = GLOBAL;
 
 	Stg_C_Primitive v;
 	v.asDouble = value_renamed;
@@ -274,7 +274,7 @@ void _Stg_PrimitiveObject_Delete( void* primitive ) {
 
 void _Stg_PrimitiveObject_Print( void* primitive, struct Stream* stream ) {
 	Stg_PrimitiveObject* self = (Stg_PrimitiveObject*)primitive;
-	char* typeString;
+	Name typeString;
 
 	switch( self->dataType ) {
 		case Stg_C_Primitive_Type_UnsignedChar:
@@ -354,7 +354,7 @@ void _Stg_PrimitiveObject_Print( void* primitive, struct Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void* _Stg_PrimitiveObject_Copy( void* primitive, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _Stg_PrimitiveObject_Copy( const void* primitive, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	Stg_PrimitiveObject* self = (Stg_PrimitiveObject*)primitive;
 	Stg_PrimitiveObject* newCopy;
 

@@ -76,7 +76,7 @@
 
 	void  _Codelet_Delete( void* codelet );
 	void  _Codelet_Print( void* codelet, Stream* stream );
-	void* _Codelet_Copy( void* codelet, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Codelet_Copy( const void* codelet, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void  _Codelet_Build( void* codelet, void* data );
 	void  _Codelet_Initialise( void* codelet, void* data );

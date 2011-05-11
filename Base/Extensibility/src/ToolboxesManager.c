@@ -93,7 +93,6 @@ void _ToolboxesManager_Init( void* toolboxesManager, int* argc, char*** argv ) {
 
 void _ToolboxesManager_Delete( void* toolboxesManager ) {
    ToolboxesManager*         self = (ToolboxesManager*)toolboxesManager;
-   int ii, originalListSize;
 
 	Stg_ObjectList_DeleteAllObjects( self->codelets );
 	Stg_Class_Delete( self->codelets );
@@ -172,7 +171,7 @@ Name _ToolboxesManager_GetModuleName( void* toolboxesManager, Dictionary_Entry_V
 	return Dictionary_Entry_Value_AsString( Dictionary_Entry_Value_GetElement( moduleVal, entry_I ) );
 }
 
-Bool ToolboxesManager_IsInitialised( void* initRegister, char* label ) {
+Bool ToolboxesManager_IsInitialised( void* initRegister, Name label ) {
 	ToolboxesManager* self = (ToolboxesManager*)initRegister;
 
    if( Stg_ObjectList_Get( self->initTB, label ) )

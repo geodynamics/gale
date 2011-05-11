@@ -43,6 +43,6 @@
 	
 	void Context_DictionaryCheck( Dictionary* dictionary );
 	
-	void CheckDictionaryKeys(Dictionary* dictionary, const char* errorMessage);
+	void CheckDictionaryKeys(Dictionary* dictionary, Name errorMessage);
 	
 #endif /* __StGermain_Base_Context_DictionaryCheck_h__ */

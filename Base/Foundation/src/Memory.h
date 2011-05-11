@@ -474,9 +474,9 @@
 	void* _Memory_Alloc_Func(
 		SizeT size,
 		Type type,
-		const char* const name,
-		const char* fileName,
-		const char* funcName,
+		Name const name,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 
 	/** \internal Allocates a 1D array. */
@@ -485,8 +485,8 @@
 		Index arrayLength,
 		Type type,
 		Name name,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 	
 	/** \internal Allocates a 2D array. */
@@ -496,8 +496,8 @@
 		Index yLength,
 		Type type,
 		Name name,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 	
 	/** \internal Allocates a 3D Array. */
@@ -508,8 +508,8 @@
 		Index zLength,
 		Type type,
 		Name name,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 	
 	/** \internal Allocates a 4D Array. */
@@ -521,8 +521,8 @@
 		Index wLength,
 		Type type,
 		Name name,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 
 	/** \internal Allocates a 2D array from a 1D array. Use in conjunction with the Memory_Access2D marco. */
@@ -532,8 +532,8 @@
 		Index yLength,
 		Type type,
 		Name name,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 
 	/** \internal Allocates a 3D array from a 1D array. Use in conjunction with the Memory_Access3D marco. */
@@ -544,8 +544,8 @@
 		Index zLength,
 		Type type,
 		Name name,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 
 	/** \internal Allocates a 4D array from a 1D array. Use in conjunction with the Memory_Access4D marco. */
@@ -557,8 +557,8 @@
 		Index wLength,
 		Type type,
 		Name name,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 
 	/** \internal Allocates a 2D complex array. Each array in the 2nd dimension may have varying lengths.
@@ -571,8 +571,8 @@
 		Index* yLengths,
 		Type type,
 		Name name,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 
 	/** \internal Allocates a 2D complex array used to represent 3rd dimension lengths in a 3D complex array.
@@ -582,8 +582,8 @@
 	Index** _Memory_Alloc_3DSetup_Func(
 		Index xLength,
 		Index* yLengths,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 
 	/** \internal Allocates a 3D complex array. Each array in the 2nd and 3rd dimension may have varying lengths.
@@ -598,8 +598,8 @@
 		Index** zLengths,
 		Type type,
 		Name name,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 
 
@@ -608,8 +608,8 @@
 		void* ptr,
 		SizeT newSize,
 		Type type,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 
 	/** \internal Resizes a 1D array. */
@@ -618,8 +618,8 @@
 		SizeT itemSize, 
 		Index newLength,
 		Type type,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 
 	/** \internal Resizes a 2D array. */
@@ -631,8 +631,8 @@
 		Index newX, 
 		Index newY,
 		Type type,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 
 	/** \internal Resizes a 3D array. */
@@ -646,8 +646,8 @@
 		Index newY, 
 		Index newZ,
 		Type type,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 
 	/** \internal Resizes a 2D array in 1D form. */
@@ -659,8 +659,8 @@
 		Index newX, 
 		Index newY,
 		Type type,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 
 	/** \internal Resizes a 3D array in 1D form. */
@@ -674,8 +674,8 @@
 		Index newY, 
 		Index newZ,
 		Type type,
-		const char* fileName,
-		const char* funcName,
+		Name fileName,
+		Name funcName,
 		int lineNumber );
 
 

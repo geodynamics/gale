@@ -40,7 +40,7 @@
 	extern const Type SetVC_Type;
 	
 	#define __SetVC_Entry \
-		Name							varName; \
+		char*							varName; \
 		VariableCondition_Value	value; \
 		
 	struct _SetVC_Entry { __SetVC_Entry };
@@ -73,7 +73,7 @@
 	SetVC* SetVC_New(
 		Name									name,
 		AbstractContext*					context,
-		Name									_dictionaryEntryName, 
+		char*									_dictionaryEntryName, 
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register,
 		Dictionary*							dictionary );
@@ -111,7 +111,7 @@
 	#define SetVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
-	void* _SetVC_Copy( void* setVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _SetVC_Copy( const void* setVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Macros

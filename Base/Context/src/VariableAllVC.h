@@ -78,7 +78,7 @@
 	VariableAllVC* VariableAllVC_New(
 		Name									name,
 		AbstractContext*					context,
-		Name									_dictionaryEntryName, 
+		char*									_dictionaryEntryName, 
 		Variable_Register*				variable_Register, 
 		ConditionFunction_Register*	conFunc_Register,
 		Dictionary*							dictionary,
@@ -117,7 +117,7 @@
 	#define VariableAllVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
-	void* _VariableAllVC_Copy( void* allElementsVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _VariableAllVC_Copy( const void* allElementsVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	void _VariableAllVC_Build( void* allElementsVC, void* data );
 	

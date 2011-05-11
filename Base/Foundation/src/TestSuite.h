@@ -54,7 +54,7 @@
 	typedef Bool (TestSuite_TestFunc)( TestSuite* suite );
 
 	typedef struct {
-		const char*		name;
+		Name		name;
 		TestSuite_TestFunc*	func;
 	} TestSuite_Test;
 
@@ -104,7 +104,7 @@
 		(TestSuite*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define TestSuite_DeepCopy( self ) \
 		(TestSuite*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _TestSuite_Copy( void* testSuite, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _TestSuite_Copy( const void* testSuite, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions

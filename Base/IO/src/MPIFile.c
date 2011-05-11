@@ -116,7 +116,7 @@ void _MPIFile_Print( void* cfile, Stream* stream )
 }
 
 	
-Bool _MPIFile_Open( void* file, const char* const fileName )
+Bool _MPIFile_Open( void* file, Name const fileName )
 {
 	MPIFile*   self = (MPIFile*) file;
 	int        fileOpenResult = 0;
@@ -144,7 +144,7 @@ Bool _MPIFile_Open( void* file, const char* const fileName )
 	return True;	
 }
 	
-Bool _MPIFile_Append( void* file, const char* const fileName )
+Bool _MPIFile_Append( void* file, Name const fileName )
 {
 	MPIFile*   self = (MPIFile*) file;
 	int        fileOpenResult = 0;

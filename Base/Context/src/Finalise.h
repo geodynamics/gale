@@ -41,6 +41,6 @@
 #ifndef __StGermain_Base_Context_Finalise_h__
 #define __StGermain_Base_Context_Finalise_h__
 	
-	Bool Context_Finalise( void );
+	Bool BaseContext_Finalise( void );
 	
 #endif /* __StGermain_Base_Context_Finalise_h__ */

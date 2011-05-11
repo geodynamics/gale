@@ -51,12 +51,12 @@
 
 const Type Toolbox_Type = "Toolbox";
 
-static const char* TOOLBOX_REGISTER_SUFFIX = "_Register";
-static const char* TOOLBOX_INITIALISE_SUFFIX = "_Initialise";
-static const char* TOOLBOX_FINALISE_SUFFIX = "_Finalise";
-static const char* TOOLBOX_MODULE_SUFFIX = "_Toolbox";
+static Name TOOLBOX_REGISTER_SUFFIX = "_Register";
+static Name TOOLBOX_INITIALISE_SUFFIX = "_Initialise";
+static Name TOOLBOX_FINALISE_SUFFIX = "_Finalise";
+static Name TOOLBOX_MODULE_SUFFIX = "_Toolbox";
 #ifdef MEMORY_STATS
-	static const char* TOOLBOX_MANGLEDNAME = "mangledName";
+	static Name TOOLBOX_MANGLEDNAME = "mangledName";
 #endif
 
 Toolbox* Toolbox_New( Name name, Stg_ObjectList* directories ) {
@@ -130,7 +130,7 @@ void _Toolbox_Print( void* toolbox, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-char* _Toolbox_MangleName( char* name ) {
+char* _Toolbox_MangleName( Name name ) {
 	char* mangledName = Memory_Alloc_Array( char, strlen( name ) + strlen( TOOLBOX_MODULE_SUFFIX ) + 1, TOOLBOX_MANGLEDNAME );
 	sprintf( mangledName, "%s%s", name, TOOLBOX_MODULE_SUFFIX );
 	return mangledName;

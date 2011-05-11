@@ -142,7 +142,7 @@
 	  * This constructor is a shortcut to create a Variable of a scalar in an array. The stride/struct size is the size
 	  * of the dataType. There is no casting. */
 	Variable* Variable_NewScalar( 
-		Name								name,
+                                     Name								name,
 		AbstractContext*				context,
 		Variable_DataType				dataType,
 		Index*							arraySizePtr,
@@ -159,7 +159,7 @@
 	  * optional and are specified via the variable arguement list at the end. A 0 value signifies no name for the associated
 	  * vector component. The stride/struct size is the size of the dataType. There is no casting.*/
 	Variable* Variable_NewVector( 
-		Name								name,
+                                     Name								name,
 		AbstractContext*				context,
 		Variable_DataType				dataType,
 		Index								dataTypeCount,
@@ -170,7 +170,7 @@
 		... 						/* vector component names */ );
 
 	Variable* Variable_NewVector2( 
-		Name								name,
+                                      Name								name,
 		AbstractContext*				context,
 		Variable_DataType				dataType,
 		Index								dataTypeCount,
@@ -178,7 +178,7 @@
 		Variable_ArraySizeFunc*		arraySizeFunc,
 		void**							arrayPtrPtr,
 		Variable_Register*			vr,
-		char**							dataNames );
+		Name*							dataNames );
 	
 	/** Constructor interface. */
 	
@@ -247,7 +247,7 @@
 	#define Variable_DeepCopy( self ) \
 		(Variable*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _Variable_Copy( void* variable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Variable_Copy( const void* variable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/** Build implementation */
 	void _Variable_Build( void* variable, void* data );
@@ -1187,9 +1187,9 @@
 	/** Sets value to all entries in array of variable */
 	void Variable_SetValueDoubleAll( void* variable, double value ) ;
 
-	void Variable_SaveToFileAsDoubles( void* variable, char* filename );
+	void Variable_SaveToFileAsDoubles( void* variable, Name filename );
 
-	void Variable_ReadFromFileAsDoubles( void* variable, char* filename );
+	void Variable_ReadFromFileAsDoubles( void* variable, Name filename );
 	
 	/** Returns || variable - comparison || / || variable ||, 
 	  * where ||x|| indicates the Euclidean Norm which is the square root of the sum of the squares for each component in x

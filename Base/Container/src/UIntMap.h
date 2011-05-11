@@ -91,7 +91,7 @@
 		(Mesh*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define UIntMap_DeepCopy( self ) \
 		(Mesh*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _UIntMap_Copy( void* map, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _UIntMap_Copy( const void* map, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions

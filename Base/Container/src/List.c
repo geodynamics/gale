@@ -49,7 +49,7 @@ const Type List_Type = "List";
 ** Constructors
 */
 
-List* List_New( Name name ) {
+List* List_New() {
 	/* Variables set in this function */
 	SizeT                      _sizeOfSelf = sizeof(List);
 	Type                              type = List_Type;
@@ -240,9 +240,9 @@ Bool List_Exists( void* list, void* data ) {
 void List_Expand( List* self ) {
 	self->maxItems += self->delta;
 	if( !self->items )
-		self->items = Memory_Alloc_Array_Bytes( self->itemSize, self->maxItems, "", "List::items" );
+          self->items = (Stg_Byte*)Memory_Alloc_Array_Bytes( self->itemSize, self->maxItems, "", "List::items" );
 	else
-		self->items = Memory_Realloc_Array_Bytes( self->items, self->itemSize, self->maxItems );
+          self->items = (Stg_Byte*)Memory_Realloc_Array_Bytes( self->items, self->itemSize, self->maxItems );
 }
 
 void List_Contract( List* self ) {
@@ -254,7 +254,7 @@ void List_Contract( List* self ) {
 	if( !self->maxItems )
 		KillArray( self->items );
 	else
-		self->items = Memory_Realloc_Array_Bytes( self->items, self->itemSize, self->maxItems );
+          self->items = (Stg_Byte*)Memory_Realloc_Array_Bytes( self->items, self->itemSize, self->maxItems );
 }
 
 void List_Destruct( List* self ) {

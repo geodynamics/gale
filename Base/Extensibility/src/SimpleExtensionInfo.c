@@ -54,7 +54,7 @@ const Type SimpleExtensionInfo_Type = "SimpleExtensionInfo";
 
 
 /** allocate and initialise a new SimpleExtensionInfo. */
-SimpleExtensionInfo* SimpleExtensionInfo_New( const Name name, SizeT size, Index count ) {
+SimpleExtensionInfo* SimpleExtensionInfo_New( Name name, SizeT size, Index count ) {
 	/* Variables set in this function */
 	SizeT                            _sizeOfSelf = sizeof(SimpleExtensionInfo);
 	Type                                    type = SimpleExtensionInfo_Type;
@@ -70,7 +70,7 @@ SimpleExtensionInfo* SimpleExtensionInfo_New( const Name name, SizeT size, Index
 }
 
 
-void SimpleExtensionInfo_Init( void* simpleExtensionInfo, const Name name, SizeT size, Index count ) {
+void SimpleExtensionInfo_Init( void* simpleExtensionInfo, Name name, SizeT size, Index count ) {
 	SimpleExtensionInfo* self = (SimpleExtensionInfo*)simpleExtensionInfo;
 
 	/* General info */
@@ -145,7 +145,7 @@ void _SimpleExtensionInfo_Print( void* simpleExtensionInfo, Stream* stream ) {
 }
 
 
-void* _SimpleExtensionInfo_Copy( void* simpleExtensionInfo, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap  ) {
+void* _SimpleExtensionInfo_Copy( const void* simpleExtensionInfo, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap  ) {
 	SimpleExtensionInfo*	self = (SimpleExtensionInfo*)simpleExtensionInfo;
 	SimpleExtensionInfo*	newSimpleExtensionInfo;
 		
@@ -155,7 +155,7 @@ void* _SimpleExtensionInfo_Copy( void* simpleExtensionInfo, void* dest, Bool dee
 		"Attempting to \"%s\" copy a pointer of value NULL\n", SimpleExtensionInfo_Type );
 	
 	/* Copy parent */
-	newSimpleExtensionInfo = _ExtensionInfo_Copy( self, dest, deep, nameExt, ptrMap );
+	newSimpleExtensionInfo = (SimpleExtensionInfo*)_ExtensionInfo_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	return newSimpleExtensionInfo;
 }

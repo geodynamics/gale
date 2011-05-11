@@ -61,13 +61,13 @@ void Variable_RegisterSuite_TestAddGet( Variable_RegisterSuiteData* data ) {
    #define STRUCT_SIZE	4
    double			array[ARRAY_SIZE];
    Index			   arraySize = ARRAY_SIZE;
-   char*			   name[10] = {"testVar0", "testVar1", "testVar2", "testVar3",
+   Name			   name[10] = {"testVar0", "testVar1", "testVar2", "testVar3",
                   "testVar4", "testVar5", "testVar6", "testVar7",
                   "testVar8", "testVar9"};
    Index		   	i;
 
    for (i = 0; i < 10; i++) {
-      var[i] = Variable_NewVector( name[i], NULL, Variable_DataType_Double, 4, &arraySize, NULL, (void**)&array, 0 );
+     var[i] = Variable_NewVector( (char*)(name[i]), NULL, Variable_DataType_Double, 4, &arraySize, NULL, (void**)&array, 0 );
    }
 
    for (i = 0; i < 10; i++)

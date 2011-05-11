@@ -114,8 +114,8 @@ void Stg_Class_Print( void* _class, struct Stream* stream ) {
 void _Stg_Class_Print( void* _class, struct Stream* stream ) {
 	Stg_Class* self = (Stg_Class*)_class;
 	
-	Journal_Firewall( (Bool)stream, stream, "Attempting to Print to stream that is NULL\n" );
-	Journal_Firewall( (Bool)self, stream, "Attempting to Print class that is NULL\n" );
+	Journal_Firewall( stream!=NULL, stream, "Attempting to Print to stream that is NULL\n" );
+	Journal_Firewall( self!=NULL, stream, "Attempting to Print class that is NULL\n" );
 	
 	Journal_Printf( stream, "Stg_Class (ptr): %p\n", self );
 	Stream_Indent( stream );
@@ -130,7 +130,7 @@ void _Stg_Class_Print( void* _class, struct Stream* stream ) {
 
 void* Stg_Generic_Copy( 
 	Stg_Class_CopyFunction* copyFunc,
-	void* obj, 
+	const void* obj, 
 	void* dest, 
 	Bool deep, 
 	Name nameExt, 
@@ -146,7 +146,7 @@ void* Stg_Generic_Copy(
 	if ( copyFunc == NULL ) {
 		/* TODO: change to Journal */
 		printf( "Warning: attempting to copy a class with no copy method, return 'self'.\n" );
-		return obj;
+		return (void*)obj;
 	}
 
 	if( !ptrMap ) {
@@ -171,8 +171,8 @@ void* Stg_Generic_Copy(
 	return (void*)newObj;
 }
 
-void* Stg_Class_Copy( void* class, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
-	Stg_Class* self = (Stg_Class*)class;
+void* Stg_Class_Copy( const void* clss, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+	Stg_Class* self = (Stg_Class*)clss;
 	
 	if ( !self ) {
 		return NULL;
@@ -181,10 +181,10 @@ void* Stg_Class_Copy( void* class, void* dest, Bool deep, Name nameExt, struct P
 		return NULL;
 	}
 
-	return Stg_Generic_Copy( self->_copy, class, dest, deep, nameExt, ptrMap );
+	return Stg_Generic_Copy( self->_copy, clss, dest, deep, nameExt, ptrMap );
 }
 
-void* _Stg_Class_Copy( void* _class, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _Stg_Class_Copy( const void* _class, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	Stg_Class*	self = (Stg_Class*)_class;
 	Stg_Class*	newClass;
 	

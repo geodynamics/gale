@@ -71,7 +71,7 @@ void ListSuite_TestAppend( ListSuiteData* data ) {
 
    pcu_check_true( data->list->nItems == NUM_ITEMS );
    for( idx = 0; idx < NUM_ITEMS; idx++ ) {
-      pcu_check_true( *(int*)List_GetItem( data->list, idx ) == idx );
+      pcu_check_true( *(unsigned*)List_GetItem( data->list, idx ) == idx );
    }
 }
 
@@ -85,7 +85,7 @@ void ListSuite_TestPrepend( ListSuiteData* data ) {
 
    pcu_check_true( data->list->nItems == NUM_ITEMS );
    for( idx = 0; idx < NUM_ITEMS; idx++ ) {
-      pcu_check_true( *(int*)List_GetItem( data->list, idx ) == ((NUM_ITEMS-1) - idx) );
+      pcu_check_true( *(unsigned*)List_GetItem( data->list, idx ) == ((NUM_ITEMS-1) - idx) );
    }
 }
 
@@ -105,10 +105,10 @@ void ListSuite_TestInsert( ListSuiteData* data ) {
    pcu_check_true( data->list->nItems == NUM_ITEMS );
 
    for( idx = 0; idx < NUM_ITEMS/2; idx++ ) {
-      pcu_check_true( *(int*)List_GetItem( data->list, idx ) == idx );
+      pcu_check_true( *(unsigned*)List_GetItem( data->list, idx ) == idx );
    }
    for( idx = NUM_ITEMS/2; idx < NUM_ITEMS; idx++ ) {
-      pcu_check_true( *(int*)List_GetItem( data->list, idx ) == ((NUM_ITEMS-1) - (idx - NUM_ITEMS/2)) );
+      pcu_check_true( *(unsigned*)List_GetItem( data->list, idx ) == ((NUM_ITEMS-1) - (idx - NUM_ITEMS/2)) );
    }
 }
 
@@ -143,7 +143,7 @@ void ListSuite_TestRemove( ListSuiteData* data ) {
    listIndex=0;
    for( idx = 0; idx < NUM_ITEMS; idx++ ) {
       if ( idx % 2 == 1 ) {
-         pcu_check_true( *(int*)List_GetItem( data->list, listIndex ) == idx );
+         pcu_check_true( *(unsigned*)List_GetItem( data->list, listIndex ) == idx );
          listIndex++;
       }
    }

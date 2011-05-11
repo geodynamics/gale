@@ -70,7 +70,7 @@ void _Memory_Print_AllocsAboveThreshold_Helper( void* memoryPointer, void* args 
 
 	if ( memPtr->ptr != NULL && memPtr->status != MEMORY_POINTER_RELEASED ) {
 		if ( memPtr->totalSize > threshold && memPtr->stamp >= begin && memPtr->stamp <= end ) {
-			MemoryPointer_Print( memPtr, MEMORYPOINTER_NAME | MEMORYPOINTER_TOTALSIZE );
+                  MemoryPointer_Print( memPtr, (MemoryPointerColumn)(MEMORYPOINTER_NAME | MEMORYPOINTER_TOTALSIZE) );
 		}
 	}
 }
@@ -85,11 +85,11 @@ void Stg_MemMonitor_SetMemoryWatchCriteria( double ratioOfTotalMemory ) {
 	Stg_MemoryWatchCriteria = ratioOfTotalMemory;
 }
 
-Stg_MemMonitor* Stg_MemMonitor_New( char* tag, Bool criteria, Bool print, MPI_Comm comm ) {
+Stg_MemMonitor* Stg_MemMonitor_New(Name tag, Bool criteria, Bool print, MPI_Comm comm ) {
 	Stg_MemMonitor* mm;
 	
 	mm = Memory_Alloc_Unnamed( Stg_MemMonitor );
-	mm->tag = Memory_Alloc_Bytes_Unnamed( strlen( tag ) + 1, Stg_MemMonitor_TagType );
+	mm->tag = (char*)Memory_Alloc_Bytes_Unnamed( strlen( tag ) + 1, Stg_MemMonitor_TagType );
 	strcpy( mm->tag, tag );
 	mm->criteria = criteria;
 	mm->print = print;

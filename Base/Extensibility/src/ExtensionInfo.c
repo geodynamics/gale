@@ -43,7 +43,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <string.h>
-
+#include <limits.h>
 
 /* Class Administration members ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -136,12 +136,12 @@ void _ExtensionInfo_Print( void* extensionInfo, Stream* stream ) {
 	Journal_Printf( (void*)stream, "\thandle: %u\n", self->handle );
 }
 
-void* _ExtensionInfo_Copy( void* extensionInfo, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap  ) {
+void* _ExtensionInfo_Copy( const void* extensionInfo, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap  ) {
 	ExtensionInfo*		self = (ExtensionInfo*)extensionInfo;
 	ExtensionInfo*		newExtensionInfo;
 	
 	/* Copy parent */
-	newExtensionInfo = _Stg_Object_Copy( self, dest, deep, nameExt, ptrMap );
+	newExtensionInfo = (ExtensionInfo*)_Stg_Object_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	newExtensionInfo->_dataCopy = self->_dataCopy;
 	newExtensionInfo->key = self->key;
@@ -153,7 +153,7 @@ void* _ExtensionInfo_Copy( void* extensionInfo, void* dest, Bool deep, Name name
 	newExtensionInfo->offset = self->offset;
 	newExtensionInfo->handle = self->handle;	
 
-	newExtensionInfo->extensionManager = Stg_Class_Copy( self->extensionManager, NULL, deep, nameExt, ptrMap );
+	newExtensionInfo->extensionManager = (ExtensionManager*)Stg_Class_Copy( self->extensionManager, NULL, deep, nameExt, ptrMap );
 
 	if ( self->data ) {
 		newExtensionInfo->data = PtrMap_Find( ptrMap, self->data );
@@ -276,7 +276,7 @@ void ExtensionInfo_Register(
 			Journal_Register( ErrorStream_Type, ExtensionInfo_Type ), 
 			"Attempting to register an ExtensionInfo with an ExtensionManager that is NULL\n" );
 	Journal_DFirewall( 
-			self->handle != -1,  
+			self->handle != (unsigned)(-1),  
 			Journal_Register( ErrorStream_Type, ExtensionInfo_Type ), 
 			"Attempting to register an ExtensionInfo with a handle that is invalid\n" );
 	

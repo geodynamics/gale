@@ -96,11 +96,11 @@ typedef struct NewObject NewObject;
 	typedef unsigned long			MemoryOpStamp;
 	
 
-	typedef char*				Name;			/**< A string used for names. */
+	typedef const char*				Name;			/**< A string used for names. */
 	#define					Name_Invalid	0	/**< An invalid or empty name. */
 	
 	/** Unique ID of a type/class. (runtime-proc persistance). Pointer used as ID. Must point to a valid string. */
-	typedef char*				Type;
+	typedef Name				Type;
 	#define					Type_Invalid	0	/**< An invalid or empty type. */
 	
 

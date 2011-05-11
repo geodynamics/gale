@@ -133,8 +133,8 @@ void _Stg_ComponentRegister_Print( void* componentRegister, Stream* stream )
 /* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 int Stg_ComponentRegister_AddFunc( 
 		Stg_ComponentRegister *self,
-		const Name componentType,
-		const Name version,
+		Name componentType,
+		Name version,
 		Stg_Component_DefaultConstructorFunction *func,
 		Stg_Component_MetaAsDictionaryFunction* metadata )
 {
@@ -185,7 +185,7 @@ Stg_Component_DefaultConstructorFunction* Stg_ComponentRegister_Get(
 {
 	assert( self );
    /* Get the element object */
-	Stg_ComponentRegisterElement *element = Stg_ObjectList_Get(self->constructors, componentType); 
+	Stg_ComponentRegisterElement *element = (Stg_ComponentRegisterElement*)Stg_ObjectList_Get(self->constructors, componentType); 
 	if ( element )
       /* Return the constructor function pointer */
 	   return element->defaultConstructor;
@@ -224,9 +224,9 @@ Dictionary* Stg_ComponentRegister_GetMetadata(
 {
 	Stg_ComponentRegisterElement *element = NULL;
 	assert( self );
-	element = Stg_ObjectList_Get(self->constructors, componentType); 
+	element = (Stg_ComponentRegisterElement*)Stg_ObjectList_Get(self->constructors, componentType); 
 	if( element ){
-		return (void*) element->metadata();
+		return (Dictionary*) element->metadata();
 	}
 
 	return NULL;
@@ -274,7 +274,7 @@ void _Stg_ComponentRegisterElement_Delete( void* self )
       _Stg_Class_Delete( element ); /* element's parent is a class so delete it */
 	}
 }
-Stg_ComponentRegisterElement* Stg_ComponentRegister_GetByIndex( void* componentRegister, int index ) {
+Stg_ComponentRegisterElement* Stg_ComponentRegister_GetByIndex( void* componentRegister, Index index ) {
 	Stg_ComponentRegister* self = (Stg_ComponentRegister*)componentRegister;
    assert(index < self->constructors->count);
 	return (Stg_ComponentRegisterElement*)self->constructors->data[index]; 

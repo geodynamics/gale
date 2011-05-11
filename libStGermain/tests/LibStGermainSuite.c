@@ -50,7 +50,7 @@ void LibStGermainSuite_Teardown( LibStGermainSuiteData* data ) {
 void LibStGermainSuite_TestXMLLibraryPath( LibStGermainSuiteData* data ) {
    Stg_Object* testDirectory;
    /* Testing entries in xmlDictionary */
-   testDirectory = Stg_ObjectList_Get( Project_XMLSearchPaths,"StGermain" );
+   testDirectory = (Stg_Object*)Stg_ObjectList_Get( Project_XMLSearchPaths,"StGermain" );
    pcu_check_true(testDirectory != NULL);
 }
 

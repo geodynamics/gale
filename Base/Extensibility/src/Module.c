@@ -71,14 +71,13 @@ void* Module_MapStaticSymbol(Module *self, const char *sym);
 
 const Type Module_Type = "Module";
 
-static const char* MODULE_SUFFIX = "module.";
-static const char* MODULE_GETMETADATA_SUFFIX = "_MetaAsDictionary";
-static const char* MODULE_GETNAME_SUFFIX = "_GetName";
-static const char* MODULE_GETVERSION_SUFFIX = "_GetVersion";
+static Name MODULE_GETMETADATA_SUFFIX = "_MetaAsDictionary";
+static Name MODULE_GETNAME_SUFFIX = "_GetName";
+static Name MODULE_GETVERSION_SUFFIX = "_GetVersion";
 
 #ifdef MEMORY_STATS
-	static const char* MODULE_FILENAME = "fileName";
-	static const char* MODULE_SYMBOLNAME = "symbolName";
+	static Name MODULE_FILENAME = "fileName";
+	static Name MODULE_SYMBOLNAME = "symbolName";
 #endif
 
 #ifdef NOSHARED
@@ -211,7 +210,7 @@ void _Module_Print( void* module, Stream* stream ) {
 
 	Index count = 0;
 	Index i;
-	const char* version;
+	Name version;
 
 	Journal_RPrintf( stream, "Module: %s\n", self->name );
 	Stream_Indent( stream );
@@ -243,7 +242,7 @@ Dictionary* Module_GetMetadata( void* module ) {
 	return self->_meta;
 }
 
-const char* Module_GetName( void* module ) {
+Name Module_GetName( void* module ) {
 	Module* self = (Module*)module;
 
 	if ( self->GetName ) {
@@ -252,7 +251,7 @@ const char* Module_GetName( void* module ) {
 	return self->name;
 }
 
-const char* Module_GetVersion( void* module ) {
+Name Module_GetVersion( void* module ) {
 	Module* self = (Module*)module;
 
 	if ( self->GetVersion ) {
@@ -262,7 +261,7 @@ const char* Module_GetVersion( void* module ) {
 }
 
 
-void* Module_LoadSymbol( void* module, const char* suffix ) {
+void* Module_LoadSymbol( void* module, Name suffix ) {
 	Module* self = (Module*)module;
 	char*   mangledName;
 	char*   symbolText;

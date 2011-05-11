@@ -7,7 +7,7 @@
 #define CLASSCONSTRUCT( pre, className ) \
    _CLASSCONSTRUCT( pre, className )
 #define _CLASSISSUPER( pre, className ) \
-   Bool pre##className##_IsSuper( const char* type );
+   Bool pre##className##_IsSuper( Name type );
 #define CLASSISSUPER( pre, className ) \
    _CLASSISSUPER( pre, className )
 

@@ -57,8 +57,7 @@
 	the object itself_ - the ObjectAdaptor wrapper takes responsibility for this */
 	typedef void  (Stg_ObjectAdaptor_DeletePointerFunction)	( void* ptr );
 	typedef void  (Stg_ObjectAdaptor_PrintPointerFunction)	( void* ptr, struct Stream* stream );
-	typedef void* (Stg_ObjectAdaptor_CopyPointerFunction)	( 
-									void*					ptr, 
+	typedef void* (Stg_ObjectAdaptor_CopyPointerFunction)	( const void*					ptr, 
 									void*					dest,
 									Bool					deep,
 									Name					nameExt, 
@@ -165,7 +164,7 @@
 	void _Stg_ObjectAdaptor_Print( void* objectAdaptor, struct Stream* stream );
 	
 	/* Stg_Class_Copy() implementation */
-	void* _Stg_ObjectAdaptor_Copy( void* objectAdaptor, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _Stg_ObjectAdaptor_Copy( const void* objectAdaptor, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 		
 
 	/* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

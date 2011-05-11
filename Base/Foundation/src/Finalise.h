@@ -43,6 +43,6 @@
 #ifndef __StGermain_Base_Foundation_Finalise_h__
 #define __StGermain_Base_Foundation_Finalise_h__
 	
-	Bool Foundation_Finalise( void );
+	Bool BaseFoundation_Finalise( void );
 	
 #endif /* __StGermain_Base_Foundation_Finalise_h__ */

@@ -61,7 +61,7 @@ VariableCondition* DynamicVC_Factory(
 	Dictionary*							dict, 
 	void*									data )
 {
-	return (VariableCondition*)DynamicVC_New( defaultDynamicVCName, context, varReg, conFuncReg, dict );
+  return (VariableCondition*)DynamicVC_New( (char*)defaultDynamicVCName, context, varReg, conFuncReg, dict );
 }
 
 DynamicVC* DynamicVC_New(
@@ -167,7 +167,7 @@ void _DynamicVC_Print( void* vc, Stream* stream ) {
 	_VariableCondition_Print( vc );
 }
 
-void* _DynamicVC_Copy( void* vc, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _DynamicVC_Copy( const void* vc, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	return NULL;
 }
 

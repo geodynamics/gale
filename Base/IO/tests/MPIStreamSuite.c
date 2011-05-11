@@ -63,7 +63,7 @@ void MPIStreamSuite_Teardown( MPIStreamSuiteData* data ) {
 void MPIStreamSuite_TestWriteAllProcessors( MPIStreamSuiteData* data ) {
    Index          ii;
    Stream*        stream1;
-   const char*    testMPIFilename = "./test-mpi1.txt";
+   Name    testMPIFilename = "./test-mpi1.txt";
    FILE*          testMPIFile;
    char           outLine[MAXLINE];
    char           compString[MAXLINE];
@@ -88,7 +88,7 @@ void MPIStreamSuite_TestWriteAllProcessors( MPIStreamSuiteData* data ) {
    Stream_Flush( stream1 );
 
    /* Now build up the comparison string. Depends on how many processes are running. */
-   for (rank_I=0; rank_I < data->numProcs; rank_I++ ) {
+   for (rank_I=0; rank_I < (unsigned)(data->numProcs); rank_I++ ) {
       for ( ii = 0; ii < PER_RANK_COUNT; ++ii ) {
          compString[PER_RANK_COUNT*rank_I+ii] = 'a' + PER_RANK_COUNT*rank_I + ii;
       }
@@ -97,9 +97,9 @@ void MPIStreamSuite_TestWriteAllProcessors( MPIStreamSuiteData* data ) {
 
    /* Do the following since in parallel on some systems, the file
     * doesn't get re-opened at the start automatically. */
-   for ( rank_I = 0; rank_I < data->numProcs; rank_I++ ) {
+   for ( rank_I = 0; rank_I < (unsigned)(data->numProcs); rank_I++ ) {
       MPI_Barrier( data->comm );
-      if ( rank_I == data->rank ) {
+      if ( rank_I == (unsigned)(data->rank) ) {
          testMPIFile = fopen( testMPIFilename, "r" );
          rewind( testMPIFile );
       }
@@ -118,13 +118,13 @@ void MPIStreamSuite_TestWriteAllProcessors( MPIStreamSuiteData* data ) {
 
 void MPIStreamSuite_TestPrintWithOffset( MPIStreamSuiteData* data ) {
    Stream*     stream2;
-   const char* testMPIFilename = "./test-mpi2.txt";
+   Name testMPIFilename = "./test-mpi2.txt";
    FILE*       testMPIFile;
    char        outLine[MAXLINE];
    char        rankPrintString[MAXLINE];
    char        compString[MAXLINE];
-   Index       rank_I;
-   Index       ii;
+   int         rank_I;
+   int         ii;
    Index       startPoint = 0;
    unsigned    stringLength=0;
 

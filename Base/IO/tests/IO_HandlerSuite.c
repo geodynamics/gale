@@ -46,10 +46,10 @@
 #include "IO_HandlerSuite.h"
 
 
-const char* IO_HandlerSuite_XMLStartString1 = "<?xml version=\"1.0\"?>\n";
-const char* IO_HandlerSuite_XMLStartString2 = "<StGermainData xmlns=\"http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003\">\n";
-const char* IO_HandlerSuite_XMLEndString = "</StGermainData>\n";
-const char* IO_HandlerSuite_XMLEmptyDataString = "<StGermainData xmlns=\"http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003\"/>\n";
+Name IO_HandlerSuite_XMLStartString1 = "<?xml version=\"1.0\"?>\n";
+Name IO_HandlerSuite_XMLStartString2 = "<StGermainData xmlns=\"http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003\">\n";
+Name IO_HandlerSuite_XMLEndString = "</StGermainData>\n";
+Name IO_HandlerSuite_XMLEmptyDataString = "<StGermainData xmlns=\"http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003\"/>\n";
 
 typedef struct {
    XML_IO_Handler*                  io_handler;
@@ -62,7 +62,7 @@ typedef struct {
 } IO_HandlerSuiteData;
 
 
-void _IO_HandlerSuite_CreateTestXMLFile( const char* testXMLFilename, const char* entriesString ) {
+void _IO_HandlerSuite_CreateTestXMLFile( Name testXMLFilename, const char* entriesString ) {
    FILE*         testFile = NULL;
    testFile = fopen(testXMLFilename, "w");
    fwrite( IO_HandlerSuite_XMLStartString1, sizeof(char), strlen( IO_HandlerSuite_XMLStartString1 ), testFile );
@@ -101,8 +101,8 @@ void IO_HandlerSuite_Teardown( IO_HandlerSuiteData* data ) {
 /* Just populate a test dictionary, write it out to a file, read it back in again to a different dict, and check all the values are the same */
 void IO_HandlerSuite_TestWriteReadNormalEntries( IO_HandlerSuiteData* data ) {
    Index         ii;
-   const char*   xmlTestFilename = "xmlTest.xml";
-   Index         rank_I=0;
+   Name   xmlTestFilename = "xmlTest.xml";
+   int         rank_I=0;
 
    DictionarySuite_PopulateDictWithTestValues( data->dict1, data->testDD );
 
@@ -135,8 +135,8 @@ void IO_HandlerSuite_TestWriteReadNormalEntries( IO_HandlerSuiteData* data ) {
 /* Similar to above test, except using the function to write just one entry at a time */
 void IO_HandlerSuite_TestWriteReadNormalSingleEntry( IO_HandlerSuiteData* data ) {
    Index          ii;
-   const char*    fileName = "singleEntry.xml";
-   Index          rank_I=0;
+   Name    fileName = "singleEntry.xml";
+   int          rank_I=0;
 
    DictionarySuite_PopulateDictWithTestValues( data->dict1, data->testDD );
 
@@ -169,11 +169,11 @@ void IO_HandlerSuite_TestWriteReadNormalSingleEntry( IO_HandlerSuiteData* data )
 
 /* Similar to above test, except test we can write out an empty Dictionary, then read in */
 void IO_HandlerSuite_TestWriteReadEmpty( IO_HandlerSuiteData* data ) {
-   const char*    xmlTestFilename = "empty.xml";
+   Name    xmlTestFilename = "empty.xml";
    FILE*          testFile = NULL;
    const int      MAXLINE = 1000;
    char*          xmlLine = NULL;
-   Index          rank_I;
+   int          rank_I;
 
    if (data->rank == 0) {
       IO_Handler_WriteAllToFile( data->io_handler, xmlTestFilename, data->dict1 );
@@ -213,7 +213,7 @@ void IO_HandlerSuite_TestWriteReadEmpty( IO_HandlerSuiteData* data ) {
 /* In this case, want to make sure the types are written explicitly into the output, so will
  * check against expected text. */
 void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
-   const char*    testFilename = "xmlTest-explicittypes.xml";
+   Name    testFilename = "xmlTest-explicittypes.xml";
    char*          explicitTypesExpectedFilename = NULL;
 
    Dictionary_Empty( data->dict1 );
@@ -237,11 +237,11 @@ void IO_HandlerSuite_TestWriteExplicitTypes( IO_HandlerSuiteData* data ) {
 
 
 void IO_HandlerSuite_TestReadWhitespaceEntries( IO_HandlerSuiteData* data ) {
-   const char*       testFilename = "xmlTest-whitespaces.xml";
+   Name       testFilename = "xmlTest-whitespaces.xml";
    char*             whiteSpacesEntry = NULL;
-   const char*       testKey = "spacedKey";
-   const char*       testValString = "spacedVal";
-   Index             rank_I;
+   Name       testKey = "spacedKey";
+   Name       testValString = "spacedVal";
+   int             rank_I;
 
    if( data->rank==0 ) {
       Stg_asprintf( &whiteSpacesEntry, "<param name=\"    %s   \"> \t %s \n\t</param>\n", testKey, testValString );
@@ -274,18 +274,18 @@ void IO_HandlerSuite_TestReadWhitespaceEntries( IO_HandlerSuiteData* data ) {
 /* Note: it'd be good to use the PCU input fule capabilities, but unfortunately Scons glob doesn't seem to support
  * subdirectories currently. */
 void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
-   const char*       testFilename = "xmlTest-include.xml";
-   const char*       testIncludedFilename = "xmlTest-included.xml";
-   const char*       testSearchPathSubdir = "./testXML-subdir";
-   const char*       testIncludedFilenameSP = "xmlTest-includedSP.xml";
+   Name       testFilename = "xmlTest-include.xml";
+   Name       testIncludedFilename = "xmlTest-included.xml";
+   Name       testSearchPathSubdir = "./testXML-subdir";
+   Name       testIncludedFilenameSP = "xmlTest-includedSP.xml";
    char*             subdirIncludedFilenameSP = NULL;
-   const char*       testKey = "regularKey";
-   const char*       testValString = "regularVal";
-   const char*       testKeyInc = "keyInc";
-   const char*       testValStringInc = "valInc";
-   const char*       testKeyIncSP = "keyIncSP";
-   const char*       testValStringIncSP = "valIncSP";
-   Index             rank_I;
+   Name       testKey = "regularKey";
+   Name       testValString = "regularVal";
+   Name       testKeyInc = "keyInc";
+   Name       testValStringInc = "valInc";
+   Name       testKeyIncSP = "keyIncSP";
+   Name       testValStringIncSP = "valIncSP";
+   int             rank_I;
 
    Stg_asprintf( &subdirIncludedFilenameSP, "%s/%s", testSearchPathSubdir, testIncludedFilenameSP );
 
@@ -352,16 +352,16 @@ void IO_HandlerSuite_TestReadIncludedFile( IO_HandlerSuiteData* data ) {
 void IO_HandlerSuite_TestReadRawDataEntries( IO_HandlerSuiteData* data ) {
    Index             ii;
    char*             testFilename=NULL;
-   const char*       list1Name = "bcs";
-   const int         list1EntryCount = 2;
+   Name       list1Name = "bcs";
+   const unsigned    list1EntryCount = 2;
    const int         list1Vals[2][3] = { {1, 3, 6}, {2, 9, 14} };
-   const char*       list2Name = "boundary_conditions2";
-   const int         list2EntryCount = 3;
-   const char*       list2CompNames[5] = {"side", "xval", "yval", "zval", "active"};
-   const char*       list2StringVals[3] = {"top", "bottom", "left"};
+   Name       list2Name = "boundary_conditions2";
+   const unsigned    list2EntryCount = 3;
+   Name       list2CompNames[5] = {"side", "xval", "yval", "zval", "active"};
+   Name       list2StringVals[3] = {"top", "bottom", "left"};
    const int         list2CoordVals[3][3] = { {4,5,8}, {3,5,9}, {9,3,4} };
    const Bool        list2BoolVals[3] = { True, False, True };
-   Index             rank_I;
+   int             rank_I;
 
    testFilename = Memory_Alloc_Array_Unnamed( char, pcu_filename_inputLen( "xmlTest-rawData.xml" ) );
    pcu_filename_input( "xmlTest-rawData.xml", testFilename );
@@ -420,8 +420,8 @@ void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data  ) {
    char**         xmlTestFilenames;
    int            argc;
    char**         argv;
-   int            fakeParamArgsCount = 2;
-   Index          rank_I;
+   unsigned       fakeParamArgsCount = 2;
+   int            rank_I;
    
    DictionarySuite_PopulateDictWithTestValues( data->dict1, data->testDD );
 
@@ -474,7 +474,7 @@ void IO_HandlerSuite_TestReadAllFromCommandLine( IO_HandlerSuiteData* data  ) {
       Memory_Free( xmlTestFilenames[ii] );
    }
    Memory_Free( xmlTestFilenames );
-   for ( ii=0; ii < argc; ii++ ) {
+   for ( ii=0; ii < (unsigned)argc; ii++ ) {
       Memory_Free( argv[ii] );
    }
    Memory_Free( argv );
@@ -490,10 +490,10 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
    char                    xmlTestFilename2[PCU_PATH_MAX];
    char                    xmlTestFilename3_1[PCU_PATH_MAX];
    char                    xmlTestFilename3_2[PCU_PATH_MAX];
-   const char*             struct1Name = "structOne";
-   const int               struct1_OrigParamCount = 2;
-   const char*             paramNames[2] = { "paramOne", "paramTwo" };
-   const char*             paramNames2[2] = { "2nd-paramOne", "2nd-paramTwo" };
+   Name             struct1Name = "structOne";
+   const unsigned          struct1_OrigParamCount = 2;
+   Name             paramNames[2] = { "paramOne", "paramTwo" };
+   Name             paramNames2[2] = { "2nd-paramOne", "2nd-paramTwo" };
    const unsigned int      paramVals[2] = { 1, 2 };
    const unsigned int      paramVals2[2] = { 3, 4 };
    Dictionary_Entry_Value* structDev = NULL;
@@ -596,7 +596,7 @@ void IO_HandlerSuite_TestReadDuplicateEntryKeys( IO_HandlerSuiteData* data ) {
 
 void IO_HandlerSuite_TestReadNonExistent( IO_HandlerSuiteData* data ) {
    char*		errorFilename;
-   char*		notExistFilename = "I_Dont_Exist.xml";
+   Name		notExistFilename = "I_Dont_Exist.xml";
    FILE*		errorFile;
    #define	MAXLINE 1000
    char		errorLine[MAXLINE];

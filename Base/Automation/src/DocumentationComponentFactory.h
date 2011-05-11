@@ -96,7 +96,7 @@
 	int _DocumentationComponentFactory_GetRootDictInt( void* cf, Dictionary_Entry_Key key, const int defaultVal ) ;
 	unsigned int _DocumentationComponentFactory_GetRootDictUnsignedInt( void* cf, Dictionary_Entry_Key key, const unsigned int defaultVal);
 	Bool _DocumentationComponentFactory_GetRootDictBool( void* cf, Dictionary_Entry_Key key, const Bool defaultVal ) ;
-	char* _DocumentationComponentFactory_GetRootDictString( void* cf, Dictionary_Entry_Key key, const char* defaultVal ) ;
+	char* _DocumentationComponentFactory_GetRootDictString( void* cf, Dictionary_Entry_Key key, Name defaultVal ) ;
 
 	Stg_Component* _DocumentationComponentFactory_ConstructByName( 
 		void*			componentFactory, 

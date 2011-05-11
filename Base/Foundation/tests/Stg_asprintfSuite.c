@@ -46,7 +46,7 @@ void Stg_asprintfSuite_Teardown( Stg_asprintfSuiteData* data ) {
 }
 
 void Stg_asprintfSuite_TestPrint( Stg_asprintfSuiteData* data ) {
-	const char*  fiftyBytes = "01234567890123456789012345678901234567890123456789";
+	Name  fiftyBytes = "01234567890123456789012345678901234567890123456789";
 	char*        testString;
 	char*        testStringPtr;
    unsigned int offset=0;

@@ -12,8 +12,8 @@
 #include <libcsoap/soap-client.h>
 #include <libxml/xmlIO.h>
 
-const char* Regresstor_URN = "urn:Regresstor";			/* The name of the web service class */
-const char* Regresstor_SubmitCheckMethod = "submitCheck";       /* The name of the web service function */
+Name Regresstor_URN = "urn:Regresstor";			/* The name of the web service class */
+Name Regresstor_SubmitCheckMethod = "submitCheck";       /* The name of the web service function */
 
 UnitTest* stgRegressionTest = 0;
 
@@ -23,7 +23,7 @@ Regresstor_HandlePtr prevSegvHandler;
 Regresstor_HandlePtr prevBusHandler;
 
 /* Interface functions */
-void RegressionTest_Init_Func( char* url, char* runID, char* unitName, char* testName ) {
+void RegressionTest_Init_Func( Name url, char* runID, char* unitName, char* testName ) {
 
 	stgRegressionTest = UnitTest_New( url, runID, unitName, testName );
 

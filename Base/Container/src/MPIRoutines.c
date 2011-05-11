@@ -106,7 +106,7 @@ void MPIArray_Gather( unsigned arraySize, void* array,
 		}
 
 		if( netSize )
-			tmpArray = Memory_Alloc_Array_Bytes_Unnamed( itemSize, netSize, "unknown" );
+                  tmpArray = (Stg_Byte*)Memory_Alloc_Array_Bytes_Unnamed( itemSize, netSize, "unknown" );
 		else
 			tmpArray = NULL;
 	}
@@ -229,7 +229,7 @@ void MPIArray_Alltoall( unsigned* arraySizes, void** arrays,
 	}
 
 	if( netSize )
-		tmpDstArray1D = Memory_Alloc_Array_Bytes_Unnamed( itemSize, netSize, "unknown" );
+          tmpDstArray1D = (unsigned*)Memory_Alloc_Array_Bytes_Unnamed( itemSize, netSize, "unknown" );
 	else
 		tmpDstArray1D = NULL;
 
@@ -336,7 +336,7 @@ void Array_2DTo1D( unsigned nBlocks, unsigned* sizes, void** srcArrays,
 			tmpArray = Memory_Alloc_Array_Bytes_Unnamed( itemSize, netSize, "" );
 
 			for( b_i = 0; b_i < nBlocks; b_i++ ) {
-				dest = tmpArray;
+                          dest = (char*)tmpArray;
 				dest += (tmpDisps[b_i] * itemSize);
 				memcpy( dest, srcArrays[b_i], itemSize * sizes[b_i] );
 			}

@@ -118,7 +118,7 @@
 		unsigned int				saveDataEvery; \
 		double						checkpointAtTimeInc; \
 		double						nextCheckpointTime; \
-		Name							experimentName; \
+		char*							experimentName; \
 		char*							outputPath; \
 		char*							checkpointReadPath; \
 		char*							checkpointWritePath; \
@@ -237,7 +237,7 @@
 	
 	EntryPoint_Index AbstractContext_AddEntryPoint( void* abstractContext, void* entryPoint );
 	
-	EntryPoint* AbstractContext_GetEntryPoint( void* abstractContext, const Name entryPointName ); 
+	EntryPoint* AbstractContext_GetEntryPoint( void* abstractContext, Name entryPointName ); 
 	
 	/* Runs the AbstractContext_EP_FrequentOutput Entry Point */
 	void AbstractContext_FrequentOutput( void* context ) ;
@@ -265,10 +265,10 @@
 	void AbstractContext_Step( void* context, double dt );
 	
 	/* function to warn if no hooks to an entrypoint defined */
-	void AbstractContext_WarnIfNoHooks( void* context, EntryPoint_Index epIndex, const char* caller );
+	void AbstractContext_WarnIfNoHooks( void* context, EntryPoint_Index epIndex, Name caller );
 	
 	/* function to error if no hooks to an entrypoint defined */
-	void AbstractContext_ErrorIfNoHooks( void* context, EntryPoint_Index epIndex, const char* caller );
+	void AbstractContext_ErrorIfNoHooks( void* context, EntryPoint_Index epIndex, Name caller );
 	
 	Bool AbstractContext_CheckPointExists( void* context, Index timeStep );
 

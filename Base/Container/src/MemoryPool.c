@@ -92,12 +92,12 @@ void _MemoryPool_Init( MemoryPool* self ){
 	assert( self->numMemChunks == 1 );
 
 	self->chunks = (MemChunk*)Memory_Alloc_Bytes_Unnamed( sizeof(MemChunk)*self->numMemChunks, "char*" );
-	self->chunks[self->numMemChunks-1].memory = Memory_Alloc_Bytes_Unnamed( self->elementSize * self->numElements, "char" );
+	self->chunks[self->numMemChunks-1].memory = (char*)Memory_Alloc_Bytes_Unnamed( self->elementSize * self->numElements, "char" );
 	memset( self->chunks[self->numMemChunks-1].memory, 0, self->elementSize * self->numElements );
 	self->chunks[self->numMemChunks-1].numFree = self->numElements;
 	self->chunks[self->numMemChunks-1].maxFree = self->numElements;
 
-	self->pool = Memory_Alloc_Bytes_Unnamed( sizeof( char* ) * self->numElements, "char*" );
+	self->pool = (char**)Memory_Alloc_Bytes_Unnamed( sizeof( char* ) * self->numElements, "char*" );
 	memset( self->pool, 0, sizeof(char*) * self->numElements );
 	
 	for( i=0; i<self->numElements; i++ ){
@@ -177,7 +177,7 @@ label:	index = memPool->numElementsFree - 1;
 		goto label;
 	}
 
-	result = (void*)(memPool->pool[--memPool->numElementsFree]);
+	result = (char*)(memPool->pool[--memPool->numElementsFree]);
 
 	for( i=0; i<memPool->numMemChunks; i++ ){
 		int numObjs = 0;
@@ -215,14 +215,14 @@ Bool MemoryPool_DeleteObject( MemoryPool *memPool, void *object )
 			memset( (char*)object, 0, memPool->elementSize );
 			memPool->pool[memPool->numElementsFree++] = (char*)object;
 			MemoryPool_Shrink( memPool );
-			return 1;
+			return True;
 		}
 		else{
-			return 0;
+			return False;
 		}
 	}
 	else{
-		return 0;
+		return False;
 	}
 }
 
@@ -238,12 +238,12 @@ void MemoryPool_Extend( MemoryPool *memPool )
 	memPool->chunks = (MemChunk*)Memory_Realloc( memPool->chunks, sizeof(MemChunk)*memPool->numMemChunks );
 	assert( memPool->chunks );
 
-	memPool->chunks[memPool->numMemChunks-1].memory = Memory_Alloc_Bytes_Unnamed( memPool->elementSize * memPool->delta, "int" );
+	memPool->chunks[memPool->numMemChunks-1].memory = (char*)Memory_Alloc_Bytes_Unnamed( memPool->elementSize * memPool->delta, "int" );
 	memset( memPool->chunks[memPool->numMemChunks-1].memory, 0, memPool->elementSize * memPool->delta );
 	memPool->chunks[memPool->numMemChunks-1].numFree = memPool->delta;
 	memPool->chunks[memPool->numMemChunks-1].maxFree = memPool->delta;
 
-	newPool = Memory_Alloc_Bytes_Unnamed( sizeof(char*) * (memPool->numElements+memPool->delta), "char*" );
+	newPool = (char**)Memory_Alloc_Bytes_Unnamed( sizeof(char*) * (memPool->numElements+memPool->delta), "char*" );
 	assert( newPool );
 
 	memcpy( newPool+memPool->delta, memPool->pool, sizeof(char*)*memPool->numElements );
@@ -265,7 +265,7 @@ void MemoryPool_Extend( MemoryPool *memPool )
 void MemoryPool_Shrink( MemoryPool *memPool )
 {
 	int i = 0;
-	Bool deleteFlag = 0;
+	Bool deleteFlag = False;
 	int chunkIdx = 0;
 	char **newPool = (char**)0;
 	int eCounter = 0;
@@ -289,7 +289,7 @@ void MemoryPool_Shrink( MemoryPool *memPool )
 		int numObjs = 0;
 		numObjs = memPool->chunks[chunkIdx].maxFree*memPool->elementSize;
 
-		newPool = Memory_Alloc_Bytes_Unnamed( sizeof(char*) * (memPool->numElements-memPool->chunks[chunkIdx].maxFree), "char*" );
+		newPool = (char**)Memory_Alloc_Bytes_Unnamed( sizeof(char*) * (memPool->numElements-memPool->chunks[chunkIdx].maxFree), "char*" );
 
 		eCounter = 0;
 		for( i=0; i<memPool->numElements; i++ ){

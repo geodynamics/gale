@@ -143,11 +143,11 @@ void _Stg_Component_Print( void* component, Stream* stream ) {
 	Journal_Printf( (void*) stream, "\tdestroy function name: %s\n", self->destroyType );
 }
 
-void* _Stg_Component_Copy( void* component, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _Stg_Component_Copy( const void* component, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	Stg_Component*	self = (Stg_Component*)component;
 	Stg_Component*	newComponent;
 	
-	newComponent = _Stg_Object_Copy( component, dest, deep, nameExt, ptrMap );
+	newComponent = (Stg_Component*)_Stg_Object_Copy( component, dest, deep, nameExt, ptrMap );
 	
 	/* Virtual methods */
 	newComponent->_defaultConstructor = self->_defaultConstructor;
@@ -437,10 +437,11 @@ void Stg_Component_SetupStreamFromDictionary( void* component, Dictionary* dicti
 			streamType = strtok( NULL, JOURNAL_DELIMITER );
 
 			if ( streamType == NULL ) {
-				streamType = Info_Type;
+                          stream = Journal_MyStream( Info_Type, self );
 			}
-
-			stream = Journal_MyStream( streamType, self );
+                        else {
+                          stream = Journal_MyStream( streamType, self );
+                        }
 
 			valid = True;
 			if ( strcmp( operation, JOURNAL_ENABLE_KEY ) == 0 ) {

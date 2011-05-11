@@ -119,18 +119,18 @@ void _NamedObject_Register_Print( void* namedObjectRegister, struct Stream* stre
 }
 
 
-void* _NamedObject_Register_Copy( void* namedObjectRegister, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _NamedObject_Register_Copy( const void* namedObjectRegister, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	NamedObject_Register*	self = (NamedObject_Register*)namedObjectRegister;
 	NamedObject_Register*	newNamedObjectRegister;
 	
-	newNamedObjectRegister = _Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
+	newNamedObjectRegister = (NamedObject_Register*)_Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	Journal_Firewall( 
 		deep, 
 		Journal_Register( Error_Type, NamedObject_Register_Type ), 
 		"Shallow copy not yet implemented\n" );
 	if( deep ) {
-		newNamedObjectRegister->objects = Stg_Class_Copy( self->objects, NULL, deep, nameExt, ptrMap );
+          newNamedObjectRegister->objects = (Stg_ObjectList*)Stg_Class_Copy( self->objects, NULL, deep, nameExt, ptrMap );
 	}
 	
 	return newNamedObjectRegister;

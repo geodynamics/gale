@@ -42,7 +42,7 @@
 #include <string.h>
 #include <math.h>
 #include <assert.h>
-
+#include <limits.h>
 
 /* Textual name of this class */
 const Type IndexMap_Type = "IndexMap";
@@ -165,7 +165,7 @@ void _IndexMap_Print( void* indexMap, Stream* stream ) {
 }
 
 
-void* _IndexMap_Copy( void* indexMap, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _IndexMap_Copy( const void* indexMap, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	IndexMap*	self = (IndexMap*)indexMap;
 	IndexMap*	newIndexMap;
 	PtrMap*		map = ptrMap;
@@ -176,7 +176,7 @@ void* _IndexMap_Copy( void* indexMap, void* dest, Bool deep, Name nameExt, struc
 		ownMap = True;
 	}
 	
-	newIndexMap = _Stg_Class_Copy( self, dest, deep, nameExt, map );
+	newIndexMap = (IndexMap*)_Stg_Class_Copy( self, dest, deep, nameExt, map );
 	
 	newIndexMap->dictionary = self->dictionary;
 	newIndexMap->delta = self->delta;
@@ -184,7 +184,7 @@ void* _IndexMap_Copy( void* indexMap, void* dest, Bool deep, Name nameExt, struc
 	newIndexMap->tupleCnt = self->tupleCnt;
 	
 	if( deep ) {
-		if( (newIndexMap->tupleTbl = PtrMap_Find( map, self->tupleTbl )) == NULL && self->tupleTbl ) {
+          if( (newIndexMap->tupleTbl = (IndexMapTuple*)PtrMap_Find( map, self->tupleTbl )) == NULL && self->tupleTbl ) {
 			newIndexMap->tupleTbl = Memory_Alloc_Array( IndexMapTuple, self->maxTuples, "IndexMap->tupleTbl" );
 			memcpy( newIndexMap->tupleTbl, self->tupleTbl, sizeof(IndexMapTuple) * self->maxTuples );
 			PtrMap_Append( map, self->tupleTbl, newIndexMap->tupleTbl );
@@ -210,9 +210,9 @@ void IndexMap_Append( void* indexMap, Index key, Index idx ) {
 	IndexMap*		self = (IndexMap*)indexMap;
 	unsigned		newTupleCnt;
 	
-	assert( self && key != -1 && idx != -1 );
+	assert( self && key != (unsigned)(-1) && idx != (unsigned)(-1) );
 	
-	if( IndexMap_Find( self, key ) != -1 ) {
+	if( IndexMap_Find( self, key ) != (unsigned)(-1) ) {
 		return;
 	}
 	
@@ -245,14 +245,14 @@ Index IndexMap_Find( void* indexMap, Index key ) {
 	
 	assert( self );
 	
-	if( key != -1 ) {
+	if( key != (unsigned)(-1) ) {
 		for( tuple_I = 0; tuple_I < self->tupleCnt; tuple_I++ ) {
 			if( self->tupleTbl[tuple_I].key == key )
 				return self->tupleTbl[tuple_I].idx;
 		}
 	}
 	
-	return -1;
+	return (unsigned)(-1);
 }
 
 

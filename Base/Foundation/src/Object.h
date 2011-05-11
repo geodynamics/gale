@@ -52,7 +52,7 @@
 		/* Virtual info */ \
 		\
 		/* Stg_Object info */ \
-		Name				name; \
+		char*				name; \
 		AllocationType			nameAllocationType;
 	
 	struct _Stg_Object { __Stg_Object };
@@ -89,14 +89,14 @@
 	void _Stg_Object_Print( void* object, struct Stream* stream );
 	
 	/** Copy interface. */
-	void* _Stg_Object_Copy( void* object, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _Stg_Object_Copy( const void* object, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	
 	/* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 	
 	
 	/** Sets the name of the object. */
-	void Stg_Object_SetName( void* object, const Name name );
+	void Stg_Object_SetName( void* object, const char* name );
 	
 	
 	/** \internal Get the object name. */
@@ -111,7 +111,7 @@
 	
 	/** Function which simply tacks on a suffix to an object's name of form "ObjectName-Suffix" 
 	 *  Pointer returned must be free'd */
-	Name Stg_Object_AppendSuffix( void* object, Name suffix ) ;
+	char* Stg_Object_AppendSuffix( void* object, Name suffix ) ;
 	
 	/* Private member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 #endif /* __StGermain_Base_Foundation_Object_h__ */

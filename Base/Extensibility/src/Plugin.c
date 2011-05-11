@@ -52,9 +52,9 @@
 
 const Type Plugin_Type = "Plugin";
 
-static const char* PLUGIN_REGISTER_SUFFIX = "_Register";
+static Name PLUGIN_REGISTER_SUFFIX = "_Register";
 #ifdef MEMORY_STATS
-	static const char* PLUGIN_MANGLEDNAME = "mangledName";
+	static Name PLUGIN_MANGLEDNAME = "mangledName";
 #endif
 
 
@@ -123,7 +123,7 @@ void _Plugin_Print( void* plugin, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-char* _Plugin_MangleName( char* name ) {
+char* _Plugin_MangleName( Name name ) {
 	char* mangledName = Memory_Alloc_Array( char, strlen( name ) + 1, PLUGIN_MANGLEDNAME );
 	sprintf( mangledName, "%s", name );
 	return mangledName;

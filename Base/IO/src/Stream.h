@@ -51,9 +51,9 @@
 	/** Textual name for Stream class. */
 	extern const Type Stream_Type;
 
-	typedef SizeT (Stream_PrintfFunction) (Stream* object, const char* fmt, va_list args);
-	typedef SizeT (Stream_WriteFunction) (Stream* object, void* data, SizeT elem_size, SizeT num_elems);
-	typedef Bool (Stream_DumpFunction) (Stream* object, void* data);
+	typedef SizeT (Stream_PrintfFunction) (Stream* object, Name fmt, va_list args);
+	typedef SizeT (Stream_WriteFunction) (Stream* object, const void* data, SizeT elem_size, SizeT num_elems);
+	typedef Bool (Stream_DumpFunction) (Stream* object, const void* data);
 	typedef Bool (Stream_SetFileFunction) ( Stream* object, JournalFile* file );
 
 	/** Indicates all ranks should print. */
@@ -132,16 +132,16 @@
 	void Stream_PrintConcise( void* stream, Stream* paramStream );
 
 	/** Copy interface. */	
-	void* _Stream_Copy( void* stream, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _Stream_Copy( const void* stream, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	/** Performs a printf() on the given stream. */
-	SizeT Stream_Printf( Stream* stream, const char* const fmt, va_list args );
+	SizeT Stream_Printf( Stream* stream, Name const fmt, va_list args );
 
 	/** Performs a write() on the given stream. */
-	SizeT Stream_Write( Stream* stream, void* data, SizeT elem_size, SizeT num_elems );
+	SizeT Stream_Write( Stream* stream, const void* data, SizeT elem_size, SizeT num_elems );
 
 	/** Performs a dump opertion on the given stream. */
-	Bool Stream_Dump( Stream* stream, void* data );
+	Bool Stream_Dump( Stream* stream, const void* data );
 
 	/** Opens a registers a file for this stream if not already opened and assigns it for output
 	    Defaults CFile for now. TODO for next io commit */
@@ -263,8 +263,8 @@
 	 **/
 	void Stream_SetCurrentInfo(
 		void* stream,
-		const char* const currentSource,
-		const char* const currentFunction,
+		Name const currentSource,
+		Name const currentFunction,
 		int line );
 	
 	/** Retrives a sub stream of the given name. If stream does not exist, a new sub stream is created and returned.

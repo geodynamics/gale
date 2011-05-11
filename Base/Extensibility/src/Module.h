@@ -40,12 +40,12 @@
 #define __StGermain_Base_Extensibility_Module_h__
 	
 	/* The prototype for the virtual functions in a module */
-	typedef char*       (Module_MangleNameFunction)         ( char* name );
+	typedef char*       (Module_MangleNameFunction)    ( Name name );
 
 	/* Meta data stuff */
 	typedef Dictionary* (Module_GetMetadataFunction)        ( void );
-	typedef const char* (Module_GetNameFunction)            ( void );
-	typedef const char* (Module_GetVersionFunction)         ( void );
+	typedef Name (Module_GetNameFunction)            ( void );
+	typedef Name (Module_GetVersionFunction)         ( void );
 	
 	/** Textual name of this class */
 	extern const Type Module_Type;
@@ -102,15 +102,15 @@
 
 	Dictionary* Module_GetMetadata( void* module );
 
-	const char* Module_GetName( void* module );
+	Name Module_GetName( void* module );
 
-	const char* Module_GetVersion( void* module );
+	Name Module_GetVersion( void* module );
 
 	/** Return the mangled (symbol and file) name. Note: result needs to be freed */
 	char* Module_MangledName( void* module );
 
 	/** Load a specific symbol of the module, where the symbol is prefixed by the module name */
-	void* Module_LoadSymbol( void* module, const char* suffix );
+	void* Module_LoadSymbol( void* module, Name suffix );
 
 	/** Un load the module */
 	void Module_UnLoad( void* module );

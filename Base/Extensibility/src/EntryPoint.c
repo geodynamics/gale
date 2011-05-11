@@ -61,7 +61,7 @@ static const Type _EntryPoint_Run_Type = "EntryPoint->Run";
 /** allocate and initialise a new EntryPoint.
  * \param name textual name of the entry point (useful if its to be stored in a list).
  * \return the allocated entry point. */
-EntryPoint* EntryPoint_New( const Name name, unsigned int castType ) {
+EntryPoint* EntryPoint_New( Name name, unsigned int castType ) {
 	/* Variables set in this function */
 	SizeT                       _sizeOfSelf = sizeof(EntryPoint);
 	Type                               type = EntryPoint_Type;
@@ -77,7 +77,7 @@ EntryPoint* EntryPoint_New( const Name name, unsigned int castType ) {
 }
 
 /** Initialise an existing entry point. See EntryPoint_New() for argument descriptions. */
-void EntryPoint_Init( void* entryPoint, const Name name, unsigned int castType ) {
+void EntryPoint_Init( void* entryPoint, Name name, unsigned int castType ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 
 	/* General info */
@@ -91,7 +91,7 @@ void EntryPoint_Init( void* entryPoint, const Name name, unsigned int castType )
 	self->_copy = _EntryPoint_Copy;
 	self->_getRun = _EntryPoint_GetRun;
 	_Stg_Class_Init( (Stg_Class*)self );
-	_Stg_Object_Init( (Stg_Object*)self, (Name) name, GLOBAL );
+	_Stg_Object_Init( (Stg_Object*)self, name, GLOBAL );
 	
 	/* EntryPoint info */
 	_EntryPoint_Init( self, castType );
@@ -174,7 +174,7 @@ void _EntryPoint_Print( void* entryPoint, Stream* stream ) {
 }
 
 
-void* _EntryPoint_Copy( void* entryPoint, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _EntryPoint_Copy( const void* entryPoint, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	EntryPoint*	self = (EntryPoint*)entryPoint;
 	EntryPoint*	newEntryPoint;
 	PtrMap*		map = ptrMap;
@@ -185,7 +185,7 @@ void* _EntryPoint_Copy( void* entryPoint, void* dest, Bool deep, Name nameExt, P
 		ownMap = True;
 	}
 	
-	newEntryPoint = _Stg_Object_Copy( self, dest, deep, nameExt, map );
+	newEntryPoint = (EntryPoint*)_Stg_Object_Copy( self, dest, deep, nameExt, map );
 	
 	/* Virtual methods */
 	newEntryPoint->_getRun = self->_getRun;
@@ -199,7 +199,7 @@ void* _EntryPoint_Copy( void* entryPoint, void* dest, Bool deep, Name nameExt, P
 		if( newEntryPoint->hooks ) {
 			if( self->alwaysFirstHook ) {
 				if( nameExt ) {
-					Name	tmpName;
+					char*	tmpName;
 					
 					tmpName = Memory_Alloc_Array( char, strlen( Stg_Object_GetName( self->alwaysFirstHook ) ) + strlen( nameExt ) + 1, "tmpName" );
 					strcpy( tmpName, Stg_Object_GetName( self->alwaysFirstHook ) );
@@ -218,7 +218,7 @@ void* _EntryPoint_Copy( void* entryPoint, void* dest, Bool deep, Name nameExt, P
 			
 			if( self->alwaysLastHook ) {
 				if( nameExt ) {
-					Name	tmpName;
+					char*	tmpName;
 					
 					tmpName = Memory_Alloc_Array( char, strlen( Stg_Object_GetName( self->alwaysLastHook ) ) + strlen( nameExt ) + 1, "tmpName" );
 					strcpy( tmpName, Stg_Object_GetName( self->alwaysLastHook ) );
@@ -705,21 +705,21 @@ void EntryPoint_PrintConcise( void* entryPoint, Stream* stream ) {
 }
 
 
-void EntryPoint_Prepend( void* entryPoint, Name name, Func_Ptr funcPtr, char* addedBy ) {
+void EntryPoint_Prepend( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 	Hook* hook = Hook_New( name, funcPtr , addedBy );
 
 	_EntryPoint_PrependHook( self, hook );
 }
 
-void EntryPoint_Prepend_AlwaysFirst( void* entryPoint, Name name, Func_Ptr funcPtr, Hook_AddedBy addedBy ) {
+void EntryPoint_Prepend_AlwaysFirst( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 	Hook* hook = Hook_New( name, funcPtr, addedBy );
 
 	_EntryPoint_PrependHook_AlwaysFirst( self, hook );
 }
 
-void EntryPoint_Append( void* entryPoint, Name name, Func_Ptr funcPtr, Hook_AddedBy addedBy ) {
+void EntryPoint_Append( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 	Hook* hook = Hook_New( name, funcPtr, addedBy );
 
@@ -727,7 +727,7 @@ void EntryPoint_Append( void* entryPoint, Name name, Func_Ptr funcPtr, Hook_Adde
 }
 
 
-void EntryPoint_Append_AlwaysLast( void* entryPoint, Name name, Func_Ptr funcPtr, Hook_AddedBy addedBy ) {
+void EntryPoint_Append_AlwaysLast( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 	Hook* hook = Hook_New( name, funcPtr, addedBy );
 
@@ -735,7 +735,7 @@ void EntryPoint_Append_AlwaysLast( void* entryPoint, Name name, Func_Ptr funcPtr
 }
 
 
-void EntryPoint_InsertBefore( void* entryPoint, Name hookToInsertBefore, Name name, Func_Ptr funcPtr, char* addedBy ) {
+void EntryPoint_InsertBefore( void* entryPoint, Name hookToInsertBefore, Name name, Func_Ptr funcPtr, Name addedBy ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 	Hook* hook = Hook_New( name, funcPtr , addedBy );
 
@@ -743,7 +743,7 @@ void EntryPoint_InsertBefore( void* entryPoint, Name hookToInsertBefore, Name na
 }
 
 
-void EntryPoint_InsertAfter( void* entryPoint, Name hookToInsertAfter, Name name, Func_Ptr funcPtr, char* addedBy ) {
+void EntryPoint_InsertAfter( void* entryPoint, Name hookToInsertAfter, Name name, Func_Ptr funcPtr, Name addedBy ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 	Hook* hook = Hook_New( name, funcPtr , addedBy );
 
@@ -751,7 +751,7 @@ void EntryPoint_InsertAfter( void* entryPoint, Name hookToInsertAfter, Name name
 }
 
 
-void EntryPoint_ReplaceAll( void* entryPoint, Name name, Func_Ptr funcPtr, char* addedBy ) {
+void EntryPoint_ReplaceAll( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 	Hook* hook = Hook_New( name, funcPtr , addedBy );
 
@@ -759,14 +759,14 @@ void EntryPoint_ReplaceAll( void* entryPoint, Name name, Func_Ptr funcPtr, char*
 }
 
 
-void EntryPoint_Replace( void* entryPoint, Name hookToReplace, Name name, Func_Ptr funcPtr, char* addedBy ) {
+void EntryPoint_Replace( void* entryPoint, Name hookToReplace, Name name, Func_Ptr funcPtr, Name addedBy ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 	Hook* hook = Hook_New( name, funcPtr , addedBy );
 
 	_EntryPoint_ReplaceHook( self, hookToReplace, hook );
 }
 
-void EntryPoint_PrependClassHook( void* entryPoint, Name name, Func_Ptr funcPtr, char* addedBy, void* reference ) {
+void EntryPoint_PrependClassHook( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy, void* reference ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 	Hook* hook = (Hook*)ClassHook_New( name, funcPtr, addedBy, reference );
 
@@ -777,7 +777,7 @@ void EntryPoint_PrependClassHook_AlwaysFirst(
 	void* entryPoint, 
 	Name name, 
 	Func_Ptr funcPtr, 
-	char* addedBy, 
+	Name addedBy, 
 	void* reference ) {
 	
 	EntryPoint* self = (EntryPoint*)entryPoint;
@@ -786,7 +786,7 @@ void EntryPoint_PrependClassHook_AlwaysFirst(
 	_EntryPoint_PrependHook_AlwaysFirst( self, hook );
 }
 	
-void EntryPoint_AppendClassHook( void* entryPoint, Name name, Func_Ptr funcPtr, char* addedBy, void* reference ) {
+void EntryPoint_AppendClassHook( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy, void* reference ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 	Hook* hook = (Hook*)ClassHook_New( name, funcPtr, addedBy, reference );
 
@@ -798,7 +798,7 @@ void EntryPoint_AppendClassHook_AlwaysLast(
 	void* entryPoint, 
 	Name name, 
 	Func_Ptr funcPtr, 
-	char* addedBy, 
+	Name addedBy, 
 	void* reference ) {
 
 	EntryPoint* self = (EntryPoint*)entryPoint;
@@ -812,7 +812,7 @@ void EntryPoint_InsertClassHookBefore(
 	Name hookToInsertBefore, 
 	Name name, 
 	Func_Ptr funcPtr, 
-	char* addedBy, 
+	Name addedBy, 
 	void* reference ) {
 	
 	EntryPoint* self = (EntryPoint*)entryPoint;
@@ -827,7 +827,7 @@ void EntryPoint_InsertClassHookAfter(
 	Name hookToInsertAfter, 
 	Name name, 
 	Func_Ptr funcPtr, 
-	char* addedBy, 
+	Name addedBy, 
 	void* reference ) {
 
 	EntryPoint* self = (EntryPoint*)entryPoint;
@@ -841,7 +841,7 @@ void EntryPoint_ReplaceClassHook(
 	Name hookToReplace, 
 	Name name, 
 	Func_Ptr funcPtr, 
-	char* addedBy, 
+	Name addedBy, 
 	void* reference ) {
 	
 	EntryPoint* self = (EntryPoint*)entryPoint;
@@ -850,7 +850,7 @@ void EntryPoint_ReplaceClassHook(
 	_EntryPoint_ReplaceHook( self, hookToReplace, hook );
 }
 	
-void EntryPoint_ReplaceAllClassHook( void* entryPoint, Name name, Func_Ptr funcPtr, char* addedBy, void* reference ) {
+void EntryPoint_ReplaceAllClassHook( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy, void* reference ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 	Hook* hook = (Hook*)ClassHook_New( name, funcPtr, addedBy, reference );
 
@@ -887,7 +887,7 @@ void EntryPoint_Purge( void* entryPoint ) {
 }
 
 
-void EntryPoint_WarnIfNoHooks( void* entryPoint, const char* parentFunction ) {
+void EntryPoint_WarnIfNoHooks( void* entryPoint, Name parentFunction ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 
 	Journal_Firewall( 
@@ -905,7 +905,7 @@ void EntryPoint_WarnIfNoHooks( void* entryPoint, const char* parentFunction ) {
 }
 
 
-void EntryPoint_ErrorIfNoHooks( void* entryPoint, const char* parentFunction ) {
+void EntryPoint_ErrorIfNoHooks( void* entryPoint, Name parentFunction ) {
 	EntryPoint* self = (EntryPoint*)entryPoint;
 
 	Journal_Firewall( 

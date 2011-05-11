@@ -86,7 +86,7 @@
 	void _Plugin_Print( void* plugin, Stream* stream );
 
 	/* MangleName implementation */
-	char* _Plugin_MangleName( char* name );
+	char* _Plugin_MangleName( Name name );
 
 	/** Get the function pointer the to the plugin's register function */
 	Plugin_RegisterFunction* Plugin_GetRegisterFunc( void* plugin );

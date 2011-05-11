@@ -465,7 +465,7 @@ void DictionarySuite_TestReadAllParamFromCommandLine( DictionarySuiteData* data 
       pcu_check_true( Dictionary_Entry_Value_Compare( expectedVals[ii], data->dict->entryPtr[ii]->value ));
    }
 
-   for (ii=0; ii < argc; ii++) {
+   for (ii=0; ii < (unsigned)argc; ii++) {
       Memory_Free( argv[ii] );
    }
    Memory_Free( argv );

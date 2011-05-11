@@ -76,7 +76,7 @@ void MPIRoutinesSuite_TestArrayConv( MPIRoutinesSuiteData* data ) {
        dst2D[1][0] == 2 && dst2D[1][1] == 3 && dst2D[1][2] == 4 && dst2D[1][3] == 5 && 
        dst2D[2][0] == 6 );
 
-   Array_2DTo1D( nBlocks, sizes, (void**)dst2D, (void*)&dst1D, sizeof(unsigned), &disps );
+   Array_2DTo1D( nBlocks, sizes, (void**)dst2D, (void**)&dst1D, sizeof(unsigned), &disps );
    pcu_check_true( dst1D[0] == 0 && dst1D[1] == 1 && dst1D[2] == 2 && dst1D[3] == 3 && 
        dst1D[4] == 4 && dst1D[5] == 5 && dst1D[6] == 6 && 
        disps[0] == 0 && disps[1] == 2 && disps[2] == 6 );
@@ -87,7 +87,7 @@ void MPIRoutinesSuite_TestArrayConv( MPIRoutinesSuiteData* data ) {
    pcu_check_true( dst2D[0][0] == 0 && dst2D[0][1] == 1 && 
        dst2D[2][0] == 2 );
 
-   Array_2DTo1D( nBlocks, sizes, (void**)dst2D, (void*)&dst1D, sizeof(unsigned), &disps );
+   Array_2DTo1D( nBlocks, sizes, (void**)dst2D, (void**)&dst1D, sizeof(unsigned), &disps );
    pcu_check_true( dst1D[0] == 0 && dst1D[1] == 1 && dst1D[2] == 2 && 
        disps[0] == 0 && disps[1] == 2 && disps[2] == 2 );
 
@@ -126,8 +126,8 @@ void MPIRoutinesSuite_TestGather( MPIRoutinesSuiteData* data ) {
    unsigned     src[200];
    unsigned*    dstSizes = NULL;
    unsigned**   dstArrays = NULL;
-   Index        ii;
-   Index        watch;
+   int        ii;
+   int        watch;
 
    fillArray( src, size, data->rank );
 
@@ -177,7 +177,7 @@ void MPIRoutinesSuite_TestAllgather( MPIRoutinesSuiteData* data ) {
    unsigned    src[200];
    unsigned*   dstSizes;
    unsigned**  dstArrays;
-   Index       ii;
+   int       ii;
 
    fillArray( src, size, data->rank );
 
@@ -221,7 +221,7 @@ void MPIRoutinesSuite_TestAlltoall_1D( MPIRoutinesSuiteData* data ) {
    unsigned**  srcArrays;
    unsigned*   dstSizes;
    unsigned**  dstArrays;
-   Index       procNum;
+   int       procNum;
    unsigned    procMulti = 100;
 
    srcSizes = Memory_Alloc_Array_Unnamed( unsigned, data->nProcs );
@@ -256,7 +256,7 @@ void MPIRoutinesSuite_TestAlltoall_2D( MPIRoutinesSuiteData* data ) {
    unsigned**  srcArrays;
    unsigned*   dstSizes;
    unsigned**  dstArrays;
-   Index       procNum;
+   int       procNum;
    Index       ii;
    unsigned    procMulti = 100;
    Index       SecondDimSize=10;

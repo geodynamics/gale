@@ -20,10 +20,10 @@
 #include "PathUtils.h"
 
 
-static const char*      joiner = "/";
+static Name      joiner = "/";
 
 
-void FindFile( char* fullPath, const char* filename, const char* searchPaths ) {
+void FindFile( char* fullPath, Name filename, const char* searchPaths ) {
 	char*   spaths;
 	char*   pos;
 	FILE*   f;
@@ -128,13 +128,13 @@ char* ExpandEnvironmentVariables( char* string ) {
 	char* variableEnd;		/* ptr to position after end of variable text */
 	char* nameBegin;		/* ptr to where name of variable starts */
 	char* nameEnd;			/* ptr to position of the last character in variable name */
-	char* endChars = NULL;	/* list of characters which indicate an end of variable */
+	Name endChars = NULL;	/* list of characters which indicate an end of variable */
 
 	char* current;			/* current position in string */
 	char* endOfString;		/* pointer to end of string */
 
 	char envName[256];		/* name of environment variable */
-	char* envValue;			/* the value of the environment variable */
+	Name envValue;		/* the value of the environment variable */
 
 	int length;			/* current length of result string */
 	int nameLength;			/* length of the variable name */
@@ -234,7 +234,7 @@ char* ExpandEnvironmentVariables( char* string ) {
 			envValue = "";
 		}
 
-		if ( strlen( envValue ) > ( variableEnd - variableBegin ) ) {
+		if ( strlen( envValue ) > (unsigned)( variableEnd - variableBegin ) ) {
 			length += strlen( envValue ) - ( variableEnd - variableBegin );
 			result = Memory_Realloc_Array( result, char, length + 1 );
 		}
@@ -268,7 +268,7 @@ char* ExpandEnvironmentVariables( char* string ) {
 	return result;
 }
 
-char* ParentDirectory( const char* path ) {
+char* ParentDirectory( Name path ) {
 	char* result;
 	int i, length;
 
@@ -300,7 +300,7 @@ char* ParentDirectory( const char* path ) {
 	return NULL;
 }
 
-Bool Stg_CreateDirectory( const char* path ) {
+Bool Stg_CreateDirectory( Name path ) {
 	assert( path );
 	
 	if ( ! Stg_DirectoryExists( path ) ) {
@@ -322,28 +322,28 @@ Bool Stg_CreateDirectory( const char* path ) {
 		ret = mkdir( path, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH );
 #endif
 
-		return ret == 0;
+		return (ret == 0) ? True : False;
 	}
 
 	return True;
 }
 
-Bool Stg_FileExists( const char* path ) {
+Bool Stg_FileExists( Name path ) {
 	struct stat info;
 	assert( path );
 	if ( stat( path, &info ) < 0 ) {
 		return False;
 	}
-        return (info.st_mode & S_IFREG);
+        return (info.st_mode & S_IFREG) ? True : False;
 }
 
-Bool Stg_DirectoryExists( const char* path ) {
+Bool Stg_DirectoryExists( Name path ) {
 	struct stat info;
 	assert( path );
 	if ( stat( path, &info ) < 0 ) {
 		return False;
 	}
-        return (info.st_mode & S_IFDIR);
+        return (info.st_mode & S_IFDIR) ? True : False;
 }
 
 

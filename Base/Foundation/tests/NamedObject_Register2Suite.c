@@ -65,12 +65,12 @@ void NamedObject_RegisterSuite2_Setup( NamedObject_RegisterSuite2Data* data ) {
 
    data->reg = NamedObject_Register_New();
    data->testObjectsCount = 5;
-   data->testObjectNames = malloc(sizeof(char*) * data->testObjectsCount);
-   data->testObjects = malloc(sizeof(Stg_Object*) * data->testObjectsCount);
+   data->testObjectNames = (char**)malloc(sizeof(char*) * data->testObjectsCount);
+   data->testObjects = (Stg_Object**)malloc(sizeof(Stg_Object*) * data->testObjectsCount);
 
    letter='a';
    for (ii=0; ii < data->testObjectsCount; ii++ ) {
-      data->testObjectNames[ii] = malloc(sizeof(char) * 2 );
+     data->testObjectNames[ii] = (char*)malloc(sizeof(char) * 2 );
       sprintf( data->testObjectNames[ii], "%c", letter );
       letter++;
       data->testObjects[ii] = TestObject2_New( data->testObjectNames[ii] );

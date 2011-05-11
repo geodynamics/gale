@@ -39,11 +39,11 @@ const double	Num_Epsilon = 1e-12;
 
 
 Bool Num_Approx( double var, double val ) {
-	return (var >= val - Num_Epsilon && var <= val + Num_Epsilon);
+  return (var >= val - Num_Epsilon && var <= val + Num_Epsilon) ? True : False;
 }
 
 Bool Num_InRange( double var, double low, double upp ) {
-	return (var >= low - Num_Epsilon && var <= upp + Num_Epsilon);
+  return (var >= low - Num_Epsilon && var <= upp + Num_Epsilon) ? True : False;
 }
 
 

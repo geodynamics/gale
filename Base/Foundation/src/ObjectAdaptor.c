@@ -188,7 +188,7 @@ void _Stg_ObjectAdaptor_Init(
 	}
 	
 	Journal_Firewall( 
-		(Bool)self->dataPtr, 
+		self->dataPtr!=NULL, 
 		Journal_Register( Error_Type, Stg_ObjectAdaptor_Type ), 
 		"Constructing a Stg_ObjectAdaptor where there the data pointer is NULL is illegal.\n" );
 	if( self->isGlobal ) {
@@ -254,11 +254,11 @@ void _Stg_ObjectAdaptor_Print( void* objectAdaptor, struct Stream* stream ) {
 }
 
 
-void* _Stg_ObjectAdaptor_Copy( void* objectAdaptor, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _Stg_ObjectAdaptor_Copy( const void* objectAdaptor, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	Stg_ObjectAdaptor* self = (Stg_ObjectAdaptor*)objectAdaptor;
 	Stg_ObjectAdaptor* newTuple;
 
-	newTuple = _Stg_Object_Copy( self, dest, deep, nameExt, ptrMap );
+	newTuple = (Stg_ObjectAdaptor*)_Stg_Object_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	newTuple->isGlobal = self->isGlobal;
 	newTuple->isStgClass = self->isStgClass;

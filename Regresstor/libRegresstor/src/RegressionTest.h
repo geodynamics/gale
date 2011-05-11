@@ -3,7 +3,7 @@
 #ifndef __Regresstor_RegressionTest_h__
 #define __Regresstor_RegressionTest_h__
 
-void RegressionTest_Init_Func( char* url, char* runID, char* unitName, char* testName );
+void RegressionTest_Init_Func( Name url, char* runID, char* unitName, char* testName );
 void RegressionTest_Finalise_Func();
 void RegressionTest_Check_Func( UnitTest* self, int expression, void* stream, char* subTestName, char* description );
 

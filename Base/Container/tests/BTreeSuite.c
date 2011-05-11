@@ -131,7 +131,7 @@ void BTreeSuite_TestInsert( BTreeSuiteData* data ) {
 
    /* Inserting data into the Tree\n */
    for(ii=0; ii<NUM_DATA; ii++){
-      array[ii] = malloc(sizeof(int));
+     array[ii] = (int*)malloc(sizeof(int));
       *array[ii] = NUM_DATA - ii;
       BTree_InsertNode(data->numList, (void*)array[ii], sizeof(int));
    }
@@ -161,7 +161,7 @@ void BTreeSuite_TestDelete( BTreeSuiteData* data ) {
 
    /* Inserting data into the Tree\n */
    for(ii=0; ii<NUM_DATA; ii++){
-      array[ii] = malloc(sizeof(int));
+     array[ii] = (int*)malloc(sizeof(int));
       *array[ii] = NUM_DATA - ii;
       BTree_InsertNode(data->numList, (void*)array[ii], sizeof(int));
    }
@@ -197,7 +197,7 @@ void BTreeSuite_TestFindNode( BTreeSuiteData* data ) {
 
    /* Inserting data into the Tree\n */
    for(ii=0; ii<NUM_DATA/2; ii++){
-      array[ii] = malloc(sizeof(int));
+     array[ii] = (int*)malloc(sizeof(int));
       *array[ii] = NUM_DATA - ii;
       BTree_InsertNode(data->numList, (void*)array[ii], sizeof(int));
    }

@@ -146,7 +146,7 @@ void _HashTable_DeleteFunc( void *ht )
 {
 	HashTable *self = NULL;
 	HashTable_Entry *he = NULL, *heTemp = NULL;
-	int i = 0;
+	Index i = 0;
 
 	self = (HashTable*)ht;
 	assert (self);
@@ -179,13 +179,13 @@ void _HashTable_DeleteFunc( void *ht )
 	_Stg_Class_Delete( self );
 }
 
-void* _HashTable_CopyFunc( void* source, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _HashTable_CopyFunc( const void* source, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	HashTable* self = (HashTable*)source;
 	HashTable* newTable;
 	HashTable_Index* hi;
 	void* key;
 
-	newTable = _Stg_Class_Copy( self, NULL, deep, nameExt, ptrMap ) ;
+	newTable = (HashTable*)_Stg_Class_Copy( self, NULL, deep, nameExt, ptrMap ) ;
 
 	newTable->hashFunction = self->hashFunction;
 	newTable->dataCopyFunction = self->dataCopyFunction;
@@ -200,7 +200,7 @@ void* _HashTable_CopyFunc( void* source, void* dest, Bool deep, Name nameExt, Pt
 	memset( newTable->entries, 0, sizeof( HashTable_Entry* ) * (self->max+1) );
 
 	for ( hi = HashTable_First( self ); hi; hi = HashTable_Next( hi ) ) {
-		void* dataPtr = PtrMap_Find( ptrMap, hi->curr->data );
+		const void* dataPtr = PtrMap_Find( ptrMap, hi->curr->data );
 		if ( dataPtr == NULL ) {
 			if ( self->dataCopyFunction ) {
 				/* data copy */
@@ -349,7 +349,7 @@ unsigned int hashStringFunction( const void *voidKey, const unsigned int keyLen 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
 */
-int HashTable_InsertEntry ( HashTable *ht, const void *voidKey, unsigned int keyLen, void *data, SizeT dataSize )
+int HashTable_InsertEntry ( HashTable *ht, const void *voidKey, unsigned int keyLen, const void *data, SizeT dataSize )
 {
 	unsigned int hash = 0;
 	HashTable_Entry *he = NULL, **hep = NULL;
@@ -501,7 +501,7 @@ int HashTable_DeleteEntry( HashTable* ht, const void *voidKey, unsigned int keyL
 		*hep = he->next;
 		ht->count--;
 		if( ht->dataDeleteFunction ){
-			ht->dataDeleteFunction( he->data );
+                  ht->dataDeleteFunction( (void*)(he->data) );
 		}
 		else{
 			/* Leaving the data inside the entry */
@@ -525,7 +525,7 @@ void HashTable_ParseTable( HashTable *ht, HashTable_parseFunction *parseFunction
 {
 	HashTable *self = NULL;
 	HashTable_Entry *he = NULL;
-	int i = 0;
+	Index i = 0;
 
 	self = (HashTable*)ht;
 	assert( self );

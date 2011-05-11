@@ -48,7 +48,7 @@
 const Type Hook_Type = "Hook";
 
 /** allocate and initialise a new Hook. */
-Hook* Hook_New( Name name, Func_Ptr funcPtr, char* addedBy ) {
+Hook* Hook_New( Name name, Func_Ptr funcPtr, Name addedBy ) {
 	/* Variables set in this function */
 	SizeT                      _sizeOfSelf = sizeof(Hook);
 	Type                              type = Hook_Type;
@@ -62,7 +62,7 @@ Hook* Hook_New( Name name, Func_Ptr funcPtr, char* addedBy ) {
 	return _Hook_New(  HOOK_PASSARGS  );
 }
 
-void Hook_Init( void* hook, Name name, Func_Ptr funcPtr, char* addedBy ) {
+void Hook_Init( void* hook, Name name, Func_Ptr funcPtr, const char* addedBy ) {
 	Hook* self = (Hook*)hook;
 
 	/* General info */
@@ -106,7 +106,7 @@ Hook* _Hook_New(  HOOK_DEFARGS  )
 }
 
 
-void _Hook_Init( Hook* self, Func_Ptr funcPtr, char* addedBy ) {
+void _Hook_Init( Hook* self, Func_Ptr funcPtr, Name addedBy ) {
 	/* General and Virtual info should already be set */
 	
 	/* Hook info */
@@ -142,17 +142,17 @@ void _Hook_Print( void* hook, Stream* stream ) {
 }
 
 
-void* _Hook_Copy( void* hook, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Hook_Copy( const void* hook, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Hook*	self = (Hook*)hook;
 	Hook*	newHook;
 	
-	newHook = _Stg_Object_Copy( self, dest, deep, nameExt, ptrMap );
+	newHook = (Hook*)_Stg_Object_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	newHook->funcPtr = self->funcPtr;
 	
 	if( self->addedBy ) {
 		if( nameExt ) {
-			Name	tmpName;
+			char*	tmpName;
 			
 			tmpName = Memory_Alloc_Array( char, strlen( self->addedBy ) + strlen( nameExt ) + 1, "newHook->addedBy" );
 			strcpy( tmpName, self->addedBy );

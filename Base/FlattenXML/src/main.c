@@ -49,7 +49,7 @@ int main( int argc, char* argv[] )
 	XML_IO_Handler*			ioHandler;
 	Stream*				msgs;
 
-	char* 				outputFilename = DEFAULT_OUTPUT_FILE;
+	char* 				outputFilename=NULL;
 
 	int ii;
 
@@ -66,11 +66,10 @@ int main( int argc, char* argv[] )
 			if ( strlen( outputFilename ) < 1 ) {
 				Journal_Printf( msgs, "Invalid outputfile name: %s\n", outputFilename );
 				Journal_Printf( msgs, "Exiting...\n" );
-				Stg_Class_Delete( dictionary );
 				StGermainBase_Finalise();
 				return 1;
 			}
-			argv[ii] = " "; /* remove it from the arg list */
+			argv[ii][0] = '\0'; /* remove it from the arg list */
 		}
 	}
 
@@ -80,7 +79,10 @@ int main( int argc, char* argv[] )
 	ioHandler = XML_IO_Handler_New();
 	IO_Handler_ReadAllFromCommandLine( ioHandler, argc, argv, dictionary );
 
-	IO_Handler_WriteAllToFile( ioHandler, outputFilename, dictionary );
+	IO_Handler_WriteAllToFile( ioHandler,
+                                   outputFilename!=NULL ? outputFilename :
+                                   DEFAULT_OUTPUT_FILE,
+                                   dictionary );
 
 	Stg_Class_Delete( dictionary );
 	Stg_Class_Delete( ioHandler );

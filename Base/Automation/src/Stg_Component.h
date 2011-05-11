@@ -76,11 +76,11 @@
 		Bool													isInitialised; \
 		Bool													hasExecuted; \
 		Bool													isDestroyed; \
-		Type													constructType; \
-		Type													buildType; \
-		Type													initialiseType; \
-		Type													executeType; \
-		Type													destroyType;
+		char*													constructType; \
+		char*													buildType; \
+		char*													initialiseType; \
+		char*													executeType; \
+		char*													destroyType;
 	struct Stg_Component { __Stg_Component };
 
 
@@ -126,7 +126,7 @@
 	/* Print boundary condition layout implementation */
 	void _Stg_Component_Print( void* component, Stream* stream );
 	
-	void* _Stg_Component_Copy( void* component, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _Stg_Component_Copy( const void* component, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	
 	/* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -172,7 +172,7 @@
 	/** Disowns the component from the current source, leaving the Live Stg_Component Register to 
 	    destroy it */
 	#define Stg_Component_Disown( component ) \
-		( Memory_CountGet( component ) > 1 ? Memory_CountDec( component ) : Stg_Class_Delete( component ) )
+( Memory_CountGet( component ) > 1 ? Memory_CountDec( component ) : (Stg_Class_Delete( component ),0) )
 
 	void Stg_Component_SetupStreamFromDictionary( void* component, Dictionary* dictionary );
 

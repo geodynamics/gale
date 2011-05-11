@@ -64,7 +64,7 @@ void DummyPointer_Print( void* ptr, struct Stream* stream ) {
    Journal_Printf( stream, "value: %i\n", *(int*)ptr );
 }
 
-void* DummyPointer_Copy( void* ptr, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* DummyPointer_Copy( const void* ptr, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
    int* newInt;
    
    newInt = Memory_Alloc_Unnamed( int );
@@ -116,10 +116,10 @@ void ObjectListSuite_Teardown( ObjectListSuiteData* data ) {
 /* Test 2: Can we append the first entry? */
 void ObjectListSuite_TestAppend( ObjectListSuiteData* data ) {
 
-   Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"a"  );
-   Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"a"  );
-   Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"a", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"a"  );
+   Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), "a"  );
+   Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), "a"  );
+   Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), "a", 0, DummyPointer_Print, DummyPointer_Copy  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), "a"  );
 
    pcu_check_true(
       data->addPtr0 == Stg_ObjectList_Get( data->ol0, (Name)"a"  ) &&
@@ -142,12 +142,12 @@ void ObjectListSuite_TestPrepend( ObjectListSuiteData* data ) {
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"a"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"a"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"a", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"a"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"a"  );
 
    Stg_ObjectList_ClassPrepend(  data->ol0, (data->addPtr0 = DummyClass_New()), "b" );
    Stg_ObjectList_ClassPrepend( &data->ol1, (data->addPtr1 = DummyClass_New()), "b" );
    Stg_ObjectList_PointerPrepend(  data->ol2, (data->addPtr2 = DummyPointer_New()), "b", 0, DummyPointer_Print, DummyPointer_Copy );
-   Stg_ObjectList_GlobalPointerPrepend(  data->ol3, (data->addPtr3 = (void*)DummyFunc2), "b" );
+   Stg_ObjectList_GlobalPointerPrepend(  data->ol3, (data->addPtr3 = (int*)DummyFunc2), "b" );
 
    pcu_check_true(
       data->addPtr0 == Stg_ObjectList_Get( data->ol0, (Name)"b"  ) &&
@@ -177,11 +177,11 @@ void ObjectListSuite_TestInsertBefore( ObjectListSuiteData* data ) {
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"b"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"b"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"b", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"b"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"b"  );
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"a"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"a"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"a", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"a"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"a"  );
 
    Stg_ObjectList_ClassInsertBefore(  data->ol0, "a", (data->addPtr0 = DummyClass_New()), "c" );
    Stg_ObjectList_ClassInsertBefore( &data->ol1, "a", (data->addPtr1 = DummyClass_New()), "c" );
@@ -193,7 +193,7 @@ void ObjectListSuite_TestInsertBefore( ObjectListSuiteData* data ) {
       0, 
       DummyPointer_Print, 
       DummyPointer_Copy );
-   Stg_ObjectList_GlobalPointerInsertBefore(  data->ol3, "a", (data->addPtr3 = (void*)DummyFunc3), "c" );
+   Stg_ObjectList_GlobalPointerInsertBefore(  data->ol3, "a", (data->addPtr3 = (int*)DummyFunc3), "c" );
 
    pcu_check_true(
       data->addPtr0 == Stg_ObjectList_Get( data->ol0, (Name)"c"  ) &&
@@ -227,15 +227,15 @@ void ObjectListSuite_TestInsertAfter( ObjectListSuiteData* data ) {
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"b"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"b"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"b", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"b"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"b"  );
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"c"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"c"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"c", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"c"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"c"  );
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"a"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"a"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"a", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"a"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"a"  );
 
    Stg_ObjectList_ClassInsertAfter(  data->ol0, "c", (data->addPtr0 = DummyClass_New()), "d" );
    Stg_ObjectList_ClassInsertAfter( &data->ol1, "c", (data->addPtr1 = DummyClass_New()), "d" );
@@ -248,7 +248,7 @@ void ObjectListSuite_TestInsertAfter( ObjectListSuiteData* data ) {
       0, 
       DummyPointer_Print, 
       DummyPointer_Copy );
-   Stg_ObjectList_GlobalPointerInsertAfter(  data->ol3, "c", (data->addPtr3 = (void*)DummyFunc4), "d" );
+   Stg_ObjectList_GlobalPointerInsertAfter(  data->ol3, "c", (data->addPtr3 = (int*)DummyFunc4), "d" );
 
    pcu_check_true(
       data->addPtr0 == Stg_ObjectList_Get( data->ol0, (Name)"d"  ) &&
@@ -286,24 +286,24 @@ void ObjectListSuite_TestReplace( ObjectListSuiteData* data ) {
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"b"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"b"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"b", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"b"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"b"  );
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"c"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"c"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"c", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"c"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"c"  );
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"d"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"d"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"d", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"d"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"d"  );
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"a"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"a"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"a", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"a"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"a"  );
 
    Stg_ObjectList_ClassReplace(  data->ol0, "d", DELETE, (data->addPtr0 = DummyClass_New()), "e" );
    Stg_ObjectList_ClassReplace( &data->ol1, "d", DELETE, (data->addPtr1 = DummyClass_New()), "e" );
    Stg_ObjectList_PointerReplace( data->ol2, "d", DELETE, (data->addPtr2 = DummyPointer_New()), (Name)"e", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerReplace( data->ol3, (Name)"d", DELETE, (data->addPtr3 = (void*)DummyFunc5), (Name)"e"  );
+   Stg_ObjectList_GlobalPointerReplace( data->ol3, (Name)"d", DELETE, (data->addPtr3 = (int*)DummyFunc5), (Name)"e"  );
    pcu_check_true(
       data->addPtr0 == Stg_ObjectList_Get( data->ol0, (Name)"e"  ) &&
       data->addPtr0 == Stg_ObjectList_ObjectAt( data->ol0, 2 ) &&
@@ -340,19 +340,19 @@ void ObjectListSuite_TestRemove( ObjectListSuiteData* data ) {
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"b"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"b"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"b", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"b"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"b"  );
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"c"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"c"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"c", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"c"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"c"  );
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"e"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"e"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"e", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"e"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"e"  );
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"a"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"a"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"a", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"a"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"a"  );
 
    Stg_ObjectList_Remove( data->ol0, (Name)"c", DELETE  );
    Stg_ObjectList_Remove( &data->ol1, (Name)"c", DELETE  );
@@ -387,15 +387,15 @@ void ObjectListSuite_TestReplaceAll( ObjectListSuiteData* data ) {
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"b"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"b"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"b", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"b"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"b"  );
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"e"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"e"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"e", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"e"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"e"  );
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"a"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"a"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"a", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"a"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"a"  );
 
    Stg_ObjectList_ClassReplaceAll( data->ol0, DELETE, (data->addPtr0 = DummyClass_New()), (Name)"f"  );
    Stg_ObjectList_ClassReplaceAll( &data->ol1, DELETE, (data->addPtr1 = DummyClass_New()), (Name)"f"  );
@@ -407,7 +407,7 @@ void ObjectListSuite_TestReplaceAll( ObjectListSuiteData* data ) {
       0, 
       DummyPointer_Print, 
       DummyPointer_Copy );
-   Stg_ObjectList_GlobalPointerReplaceAll(  data->ol3, DELETE, (data->addPtr3 = (void*)DummyFunc6), "f" );
+   Stg_ObjectList_GlobalPointerReplaceAll(  data->ol3, DELETE, (data->addPtr3 = (int*)DummyFunc6), "f" );
    pcu_check_true(
       data->addPtr0 == Stg_ObjectList_Get( data->ol0, (Name)"f"  ) &&
       data->addPtr0 == Stg_ObjectList_ObjectAt( data->ol0, 0 ) &&
@@ -439,12 +439,12 @@ void ObjectListSuite_TestCopy( ObjectListSuiteData* data ) {
    Stg_ObjectList_ClassAppend( data->ol0, (data->addPtr0 = DummyClass_New()), (Name)"f"  );
    Stg_ObjectList_ClassAppend( &data->ol1, (data->addPtr1 = DummyClass_New()), (Name)"f"  );
    Stg_ObjectList_PointerAppend( data->ol2, (data->addPtr2 = DummyPointer_New()), (Name)"f", 0, DummyPointer_Print, DummyPointer_Copy  );
-   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (void*)DummyFunc1), (Name)"f"  );
+   Stg_ObjectList_GlobalPointerAppend( data->ol3, (data->addPtr3 = (int*)DummyFunc1), (Name)"f"  );
 
-   ol0deep = Stg_Class_Copy(  data->ol0, 0, True, 0, 0 );
-   ol1deep = Stg_Class_Copy( &data->ol1, 0, True, 0, 0 );
-   ol2deep = Stg_Class_Copy(  data->ol2, 0, True, 0, 0 );
-   ol3deep = Stg_Class_Copy(  data->ol3, 0, True, 0, 0 );
+   ol0deep = (Stg_ObjectList*)Stg_Class_Copy(  data->ol0, 0, True, 0, 0 );
+   ol1deep = (Stg_ObjectList*)Stg_Class_Copy( &data->ol1, 0, True, 0, 0 );
+   ol2deep = (Stg_ObjectList*)Stg_Class_Copy(  data->ol2, 0, True, 0, 0 );
+   ol3deep = (Stg_ObjectList*)Stg_Class_Copy(  data->ol3, 0, True, 0, 0 );
 
    pcu_check_true(
       strcmp( Stg_Object_GetName( (Stg_Object*)Stg_ObjectList_At( ol0deep, 0 ) ), "f" ) == 0 &&

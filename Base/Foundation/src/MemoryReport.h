@@ -84,7 +84,7 @@
 	void MemoryReport_AddGroup( MemoryReport* memoryReport, MemoryReportGroup group );
 	
 	/** Adds a condition where a field has to match a given value. If group does not exist, it will be automatically added. */
-	void MemoryReport_AddCondition( MemoryReport* memoryReport, MemoryReportGroup group, const char* condition );
+	void MemoryReport_AddCondition( MemoryReport* memoryReport, MemoryReportGroup group, Name condition );
 	
 	void MemoryReport_SetCustomMemoryManager( void* memoryReport, Memory* memoryManager );
 
@@ -93,7 +93,7 @@
 	
 	void MemoryReport_Print_Helper( void *memoryPointer, void* memoryReport );
 
-   const char* _MemoryReport_GetValue( MemoryReport* memoryReport, MemoryReportGroup reportGroup, MemoryPointer* memPtr );
+   Name _MemoryReport_GetValue( MemoryReport* memoryReport, MemoryReportGroup reportGroup, MemoryPointer* memPtr );
 		
 #endif /* __StGermain_Base_Foundation_MemoryReport_h__ */
 

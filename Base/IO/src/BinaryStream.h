@@ -88,15 +88,15 @@
 	SizeT _BinaryStream_Printf( Stream* stream, const char *fmt, va_list args );
 	
 	/** Write() implementation. */
-	SizeT _BinaryStream_Write( Stream* stream, void *data, SizeT elem_size, SizeT num_elems );
+	SizeT _BinaryStream_Write( Stream* stream, const void *data, SizeT elem_size, SizeT num_elems );
 	
 	/** Dump() implementation. Performs no operation for BinaryStreams. */
-	Bool _BinaryStream_Dump( Stream* stream, void *data );
+	Bool _BinaryStream_Dump( Stream* stream, const void *data );
 	
 	/** SetFile() implementation. */
 	Bool _BinaryStream_SetFile( Stream* stream, JournalFile* file );
 	
-	SizeT BinaryStream_WriteAllProcessors( Name filename, void *data, SizeT elem_size, SizeT num_elems, MPI_Comm communicator ) ;
+	void BinaryStream_WriteAllProcessors( Name filename, void *data, SizeT elem_size, SizeT num_elems, MPI_Comm communicator ) ;
 	
 #endif /* __IO_BinaryStreamFile_h__ */
 

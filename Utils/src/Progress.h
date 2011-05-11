@@ -63,8 +63,8 @@ void _Progress_Delete( void* self );
 void _Progress_Print( void* self, Stream* stream );
 
 void Progress_SetStream( void* self, Stream* strm );
-void Progress_SetTitle( void* self, const char* str );
-void Progress_SetPrefix( void* self, const char* str );
+void Progress_SetTitle( void* self, Name str );
+void Progress_SetPrefix( void* self, Name str );
 void Progress_SetRange( void* self, int start, int end );
 void Progress_Restart( void* self );
 void Progress_Update( void* self );

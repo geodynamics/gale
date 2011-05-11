@@ -191,7 +191,7 @@
 	#define VariableCondition_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
-	void* _VariableCondition_Copy( void* variableCondition, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _VariableCondition_Copy( const void* variableCondition, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	
 	/*--------------------------------------------------------------------------------------------------------------------------

@@ -50,9 +50,9 @@
 	extern const Type Error_Type;
 	extern const Type Debug_Type;
 	
-	int Journal_Printf( void*, char*, ... );
-	int Journal_PrintfL( void*, unsigned int, char*, ... );
-	int Journal_Firewall( int expression, void* stream, char* fmt, ... );
+	int Journal_Printf( void*, Name, ... );
+	int Journal_PrintfL( void*, unsigned int, Name, ... );
+	int Journal_Firewall( int expression, void* stream, Name fmt, ... );
 	
 	#ifdef DEBUG
 		#define Journal_DPrintf Journal_Printf

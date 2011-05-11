@@ -197,7 +197,7 @@ void PtrMap_Append( void* ptrMap, void* key, void* ptr ) {
 }
 
 
-void* PtrMap_Find( void* ptrMap, void* key ) {
+void* PtrMap_Find( void* ptrMap, const void* key ) {
 	PtrMap*			self = (PtrMap*)ptrMap;
 	unsigned		tuple_I;
 	

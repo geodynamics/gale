@@ -111,7 +111,7 @@
 	/** This exists to handle the case where a module is linked into a binary and the user attempts to module load the module too. 
 	   Its expected at modules will check to see if they have been inited already before doing initialisation work in the init 
 	   function. */
-	Bool ToolboxesManager_IsInitialised( void* toolboxesManager, char* label );
+	Bool ToolboxesManager_IsInitialised( void* toolboxesManager, Name label );
 
 #endif /* __StGermain_Base_Extensibility_ToolboxesManager_h__ */
 

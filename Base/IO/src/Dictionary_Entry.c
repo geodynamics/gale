@@ -87,11 +87,11 @@ void Dictionary_Entry_InitWithSource( Dictionary_Entry* self, Dictionary_Entry_K
 
 void Dictionary_Entry_Delete( Dictionary_Entry* self )
 {
-	Memory_Free( self->key );
-	Dictionary_Entry_Value_Delete( self->value );
-	if( self->source != NULL )
-		Memory_Free( self->source );
-	Memory_Free( self );
+  Memory_Free( self->key );
+  Dictionary_Entry_Value_Delete( self->value );
+  if( self->source != NULL )
+    Memory_Free( self->source );
+  Memory_Free( self );
 }
 
 void Dictionary_Entry_Print( Dictionary_Entry* self, Stream* stream )
@@ -104,25 +104,26 @@ void Dictionary_Entry_Print( Dictionary_Entry* self, Stream* stream )
 
 Bool Dictionary_Entry_Compare( Dictionary_Entry* self, Dictionary_Entry_Key key )
 {
-	return !strcmp( self->key, key );
+  return (!strcmp( self->key, key )) ? True : False;
 }
 
 Bool Dictionary_Entry_CompareWithSource( Dictionary_Entry* self, Dictionary_Entry_Key key, Dictionary_Entry_Source source )
 {
-	if( self->source == NULL )
-	{
-		if( source == NULL )
-			return !strcmp( self->key, key );
-		else
-			return False;
-	}
-	else
-	{
-		if( source == NULL )
-			return False;
-		else
-			return ( !strcmp( self->key, key ) && !strcmp( self->source, source ) ); 
-	}
+  if( self->source == NULL )
+    {
+      if( source == NULL )
+        return (!strcmp( self->key, key )) ? True : False;
+      else
+        return False;
+    }
+  else
+    {
+      if( source == NULL )
+        return False;
+      else
+        return (!strcmp(self->key,key) && !strcmp(self->source,source))
+          ? True : False;
+    }
 }
 
 void Dictionary_Entry_Set( Dictionary_Entry* self, Dictionary_Entry_Value* value )

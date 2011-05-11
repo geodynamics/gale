@@ -59,7 +59,7 @@ void DictionaryCheckSuite_TestCheckKeys( DictionaryCheckSuiteData* data ) {
    const Name       testFilename1 = "testDictionaryCheck-1.txt";
    const Name       testFilename2 = "testDictionaryCheck-2.txt";
    char              expectedFilename[PCU_PATH_MAX];
-   const char*       errMessage = "Component dictionary must have unique names\n";
+   Name       errMessage = "Component dictionary must have unique names\n";
    
    Stream_RedirectFile(Journal_Register( Error_Type, (Name)"DictionaryCheck" ), testFilename1 );
    Stream_SetPrintingRank(Journal_Register( Error_Type, (Name)"DictionaryCheck" ), 0 );

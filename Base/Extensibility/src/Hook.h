@@ -53,10 +53,10 @@
 	struct Hook { __Hook };
 	
 	/* Create a new Hook */
-	Hook* Hook_New( Name name, Func_Ptr funcPtr, char* addedBy );
+	Hook* Hook_New( Name name, Func_Ptr funcPtr, Name addedBy );
 	
 	/* Initialise an Hook */
-	void Hook_Init( void* hook, Name name, Func_Ptr funcPtr, char* addedBy );
+	void Hook_Init( void* hook, Name name, Func_Ptr funcPtr, Name addedBy );
 	
 	/* Creation implementation */
 	
@@ -67,7 +67,7 @@
 	#define HOOK_DEFARGS \
                 STG_OBJECT_DEFARGS, \
                 Func_Ptr  funcPtr, \
-                char*     addedBy
+                Name     addedBy
 
 	#define HOOK_PASSARGS \
                 STG_OBJECT_PASSARGS, \
@@ -77,7 +77,7 @@
 	Hook* _Hook_New(  HOOK_DEFARGS  );
 	
 	/* Initialisation implementation */
-	void _Hook_Init( Hook* self, Func_Ptr funcPtr, char* addedBy );
+	void _Hook_Init( Hook* self, Func_Ptr funcPtr, Name addedBy );
 	
 	
 	/* Stg_Class_Delete implementation */
@@ -92,7 +92,7 @@
 	#define Hook_DeepCopy( self ) \
 		(Hook*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _Hook_Copy( void* hook, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Hook_Copy( const void* hook, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 #endif /* __StGermain_Base_Extensibility_Hook_h__ */
 

@@ -190,7 +190,7 @@ static void _Stg_CallGraph_Copy_Stack_Deep( _Stg_CallGraph_Stack** dst, _Stg_Cal
 	if( dst && !src ) {
 		*dst = src;
 	}
-	else if( dst && (*dst = PtrMap_Find( map, src )) == NULL ) {
+	else if( dst && (*dst = (_Stg_CallGraph_Stack*)PtrMap_Find( map, src )) == NULL ) {
 		*dst = Memory_Alloc( _Stg_CallGraph_Stack, "Stg_CallGraph->_stack" );
 		(*dst)->functionPtr = src->functionPtr;
 		(*dst)->name = src->name;
@@ -214,7 +214,7 @@ static void _Stg_CallGraph_Copy_Stack_Shallow( _Stg_CallGraph_Stack** dst, _Stg_
 	_Stg_CallGraph_Copy_Stack_ShallowIncr( *dst );
 }
 
-void* _Stg_CallGraph_Copy( void* callGraph, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _Stg_CallGraph_Copy( const void* callGraph, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	Stg_CallGraph*	self = (Stg_CallGraph*)callGraph;
 	Stg_CallGraph*	newCallGraph;
 	PtrMap*		map = ptrMap;
@@ -225,14 +225,14 @@ void* _Stg_CallGraph_Copy( void* callGraph, void* dest, Bool deep, Name nameExt,
 		ownMap = True;
 	}
 	
-	newCallGraph = _Stg_Class_Copy( callGraph, dest, deep, nameExt, ptrMap );
+	newCallGraph = (Stg_CallGraph*)_Stg_Class_Copy( callGraph, dest, deep, nameExt, ptrMap );
 	
 	/* Virtual methods */
 	newCallGraph->_tableSize = self->_tableSize;
 	newCallGraph->_tableCount = self->_tableCount;
 
 	if( deep ) {
-		if( self->table && (newCallGraph->table = PtrMap_Find( map, self->table )) == NULL ) {
+          if( self->table && (newCallGraph->table = (_Stg_CallGraph_Entry*)PtrMap_Find( map, self->table )) == NULL ) {
 			newCallGraph->table = Memory_Alloc_Array( _Stg_CallGraph_Entry, newCallGraph->_tableSize, 
 				"Stg_CallGraph->table" );
 			_Stg_CallGraph_Copy_Table( newCallGraph->table, self->table, newCallGraph->_tableSize, 

@@ -115,8 +115,8 @@
 	void                    Dictionary_Entry_Value_InitFromUnsignedLong( Dictionary_Entry_Value* self, unsigned long value );
 	
 	/** Create a value from a string */
-	Dictionary_Entry_Value* Dictionary_Entry_Value_FromString( const char* const value );
-	void                    Dictionary_Entry_Value_InitFromString( Dictionary_Entry_Value* self, const char* const value );
+	Dictionary_Entry_Value* Dictionary_Entry_Value_FromString( Name const value );
+	void                    Dictionary_Entry_Value_InitFromString( Dictionary_Entry_Value* self, Name const value );
 	
 	/** Create a dictionary entry value of the specified type from the specified string */
 	Dictionary_Entry_Value* Dictionary_Entry_Value_FromStringTo( char* value, char type );

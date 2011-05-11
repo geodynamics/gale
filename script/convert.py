@@ -156,13 +156,13 @@ def metaXsdDict2stgCodeHeader():
 
 	return s
 
-# The purpose of this function is to write C code that creates a const char* for the component type name and the xml meta data
+# The purpose of this function is to write C code that creates a Name for the component type name and the xml meta data
 def metaXsdDict2stgStrings( xsdDict ):
 	s = ''
 
 	# The Name of the component
-	s += 'const char* ' + safecvar( xsdDict["info"]["title"] ) +  '_Name = "' + safecval( xsdDict["info"]["title"] ) + '";\n'
-	s += 'const char* ' + safecvar( xsdDict["info"]["title"] ) +  '_GetName() {\n'
+	s += 'Name ' + safecvar( xsdDict["info"]["title"] ) +  '_Name = "' + safecval( xsdDict["info"]["title"] ) + '";\n'
+	s += 'Name ' + safecvar( xsdDict["info"]["title"] ) +  '_GetName() {\n'
 	s += '\treturn ' + safecvar( xsdDict["info"]["title"] ) +  '_Name;\n'
 	s += '}\n'
 	s += '\n'
@@ -171,12 +171,12 @@ def metaXsdDict2stgStrings( xsdDict ):
 	xsdDoc = stgMetaXsd.createXML( xsdDict )
 	xsdTxt = xsdDoc.toprettyxml()
 	xsdTxt = safecval( xsdTxt )	
-	s += 'const char* ' + safecvar( xsdDict["info"]["title"] ) +  '_Meta = "' + xsdTxt + '";\n'
-	s += 'const char* ' + safecvar( xsdDict["info"]["title"] ) +  '_GetMetadata() {\n'
+	s += 'Name ' + safecvar( xsdDict["info"]["title"] ) +  '_Meta = "' + xsdTxt + '";\n'
+	s += 'Name ' + safecvar( xsdDict["info"]["title"] ) +  '_GetMetadata() {\n'
 	s += '\treturn ' + safecvar( xsdDict["info"]["title"] ) +  '_Meta;\n'
 	s += '}\n'
 	# The _Type variant exists because of macro used for ComponentRegister_Add does a stringify on the Component_Type argument
-	s += 'const char* ' + safecvar( xsdDict["info"]["title"] ) +  '_Type_GetMetadata() {\n'
+	s += 'Name ' + safecvar( xsdDict["info"]["title"] ) +  '_Type_GetMetadata() {\n'
 	s += '\treturn ' + safecvar( xsdDict["info"]["title"] ) +  '_Meta;\n'
 	s += '}\n'
 

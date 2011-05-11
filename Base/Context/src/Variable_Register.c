@@ -155,11 +155,11 @@ void _Variable_Register_Print(void* variable_Register, Stream* stream)
 	_Stg_Class_Print(self, variable_RegisterStream);
 }
 
-void* _Variable_Register_Copy( void* vr, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Variable_Register_Copy( const void* vr, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 
 	Variable_Register* self = (Variable_Register*)vr;
 	Variable_Register* newVariableRegister;
-	int ii;
+	Index ii;
 
 	newVariableRegister = (Variable_Register*)_Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
 	PtrMap_Append( ptrMap, self, newVariableRegister );
@@ -170,8 +170,8 @@ void* _Variable_Register_Copy( void* vr, void* dest, Bool deep, Name nameExt, Pt
 	memset(newVariableRegister->_variable, 0, sizeof(Variable*)*self->_size);
 
 	for ( ii = 0; ii < self->count; ++ii ) {
-		if ( (newVariableRegister->_variable[ii] = PtrMap_Find( ptrMap, self->_variable[ii] )) == NULL ) {
-			newVariableRegister->_variable[ii] = Stg_Class_Copy( self->_variable[ii], NULL, deep, nameExt, ptrMap );
+          if ( (newVariableRegister->_variable[ii] = (Variable*)PtrMap_Find( ptrMap, self->_variable[ii] )) == NULL ) {
+            newVariableRegister->_variable[ii] = (Variable*)Stg_Class_Copy( self->_variable[ii], NULL, deep, nameExt, ptrMap );
 		}
 	}
 

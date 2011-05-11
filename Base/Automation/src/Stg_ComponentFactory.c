@@ -185,7 +185,7 @@ void Stg_ComponentFactory_CreateComponents( Stg_ComponentFactory *self ) {
 	Dictionary_Entry*                      componentDictEntry           = NULL;
 	Dictionary*                            currComponentDict            = NULL;
 	Type                                   componentType                = NULL;
-	Name                                   componentName                = NULL;
+	char*                                  componentName                = NULL;
 	Stg_Component_DefaultConstructorFunction*  componentConstructorFunction;
 	Index                                  component_I;
 	Stream*                                stream;
@@ -226,7 +226,7 @@ void Stg_ComponentFactory_CreateComponents( Stg_ComponentFactory *self ) {
 					Stg_ComponentRegister_Get_ComponentRegister(), componentType, "0" );
 
 			/* Add to register */
-			LiveComponentRegister_Add( self->LCRegister, componentConstructorFunction( componentName ) );
+			LiveComponentRegister_Add( self->LCRegister, (Stg_Component*)componentConstructorFunction( componentName ) );
 		}
 
 		/* now add the rest of the components */	
@@ -258,7 +258,7 @@ void Stg_ComponentFactory_CreateComponents( Stg_ComponentFactory *self ) {
 					Stg_ComponentRegister_Get_ComponentRegister(), componentType, "0" );
 
 			/* Add to register */
-			LiveComponentRegister_Add( self->LCRegister, componentConstructorFunction( componentName ) );
+			LiveComponentRegister_Add( self->LCRegister, (Stg_Component*)componentConstructorFunction( componentName ) );
 		}
 
 		Stream_UnIndent( stream );
@@ -605,11 +605,11 @@ Bool _Stg_ComponentFactory_GetRootDictBool( void* cf, Dictionary_Entry_Key key, 
 	assert( self->rootDict );
 	return Dictionary_GetBool_WithDefault( self->rootDict, key, defaultVal );
 }	
-char* Stg_ComponentFactory_GetRootDictString( void* cf, Dictionary_Entry_Key key, const char* const defaultVal ) {
+char* Stg_ComponentFactory_GetRootDictString( void* cf, Dictionary_Entry_Key key, Name const defaultVal ) {
 	Stg_ComponentFactory*    self              = (Stg_ComponentFactory*)cf;
 	return self->getRootDictString( self, key, defaultVal );
 }
-char* _Stg_ComponentFactory_GetRootDictString( void* cf, Dictionary_Entry_Key key, const char* const defaultVal ) {
+char* _Stg_ComponentFactory_GetRootDictString( void* cf, Dictionary_Entry_Key key, Name const defaultVal ) {
 	Stg_ComponentFactory*    self              = (Stg_ComponentFactory*)cf;
 
 	Journal_PrintfL( self->infoStream, 2, "Getting string from root dictionary with key '%s' and default value '%s'\n",
@@ -681,7 +681,7 @@ Stg_Component* _Stg_ComponentFactory_ConstructByName( void* cf, Name componentNa
 
 Stg_Component* _Stg_ComponentFactory_ConstructByKey( 
 		void*			cf, 
-		Name			parentComponentName, 
+		Name		parentComponentName, 
 		Dictionary_Entry_Key	componentKey,
 		Type			type, 
 		Bool 			isEssential,
@@ -737,7 +737,7 @@ Stg_Component* _Stg_ComponentFactory_PluginConstructByKey(
 	Stg_Component*				plugin = (Stg_Component*)codelet;
 	Dictionary*					thisPluginDict = NULL;
 	Dictionary*					pluginDict = (Dictionary*)Dictionary_Get( self->rootDict, "plugins" );
-	Name							componentName, redirect, pluginType;
+	char							*componentName, *redirect, *pluginType;
 	Dictionary_Entry_Value*	componentEntryVal;
 	Index							pluginIndex;
 	Stream*						errorStream = Journal_Register( Error_Type, self->type );
@@ -782,7 +782,7 @@ Dictionary_Entry_Value* _Stg_ComponentFactory_PluginGetDictionaryValue( void* cf
 	Stg_Component*	          plugin	       = (Stg_Component*)codelet;
 	Dictionary*		          thisPluginDict = NULL;
 	Dictionary*		          pluginDict     = (Dictionary*)Dictionary_Get( self->rootDict, "plugins" );
-	Name			             pluginType;
+	char*			             pluginType;
 	Index		pluginIndex;
 	Dictionary_Entry_Value* returnVal;
 	Bool                    usedDefault       = False;
@@ -911,7 +911,7 @@ Bool Stg_ComponentFactory_PluginGetBool( void* cf, void *codelet, Dictionary_Ent
                                                                 Dictionary_Entry_Value_FromBool( defaultVal ) ) );
 }
 
-char* Stg_ComponentFactory_PluginGetString( void* cf, void* codelet, Dictionary_Entry_Key key, const char* const defaultVal ) {
+char* Stg_ComponentFactory_PluginGetString( void* cf, void* codelet, Dictionary_Entry_Key key, Name const defaultVal ) {
 	return Dictionary_Entry_Value_AsString( 
             _Stg_ComponentFactory_PluginGetDictionaryValue( cf, codelet, key,
                                                             Dictionary_Entry_Value_FromString( defaultVal ) ) );

@@ -61,11 +61,11 @@
 	extern const Type Error_Type;
 	extern const Type Debug_Type;
 	
-	Stream* Journal_Register( const char*, const char* );
+	Stream* Journal_Register( Name, const char* );
 	
-	int Journal_Printf( void*, char*, ... );
-	int Journal_PrintfL( void*, unsigned int, char*, ... );
-	int Journal_Firewall( int expression, void* stream, char* fmt, ... );
+	int Journal_Printf( void*, Name, ... );
+	int Journal_PrintfL( void*, unsigned int, Name, ... );
+	int Journal_Firewall( int expression, void* stream, Name fmt, ... );
 	
 	#ifdef DEBUG
 		#define Journal_DPrintf Journal_Printf
@@ -78,7 +78,7 @@
 	
 	struct PtrMap* PtrMap_New( unsigned );	
 	void PtrMap_Append( void* ptrMap, void* key, void* ptr );
-	void* PtrMap_Find( void* ptrMap, void* key );
+	void* PtrMap_Find( void* ptrMap, const void* key );
 	
 	
 	/* Forward Declaration of BTree ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

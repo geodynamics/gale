@@ -49,7 +49,7 @@
 const Type ClassHook_Type = "ClassHook";
 
 /** allocate and initialise a new ClassHook. */
-ClassHook* ClassHook_New( Name name, Func_Ptr funcPtr, char* addedBy, void* reference ) {
+ClassHook* ClassHook_New( Name name, Func_Ptr funcPtr, Name addedBy, void* reference ) {
 	/* Variables set in this function */
 	SizeT                      _sizeOfSelf = sizeof(ClassHook);
 	Type                              type = ClassHook_Type;
@@ -63,7 +63,7 @@ ClassHook* ClassHook_New( Name name, Func_Ptr funcPtr, char* addedBy, void* refe
 	return _ClassHook_New(  CLASSHOOK_PASSARGS  );
 }
 
-void ClassHook_Init( void* hook, Name name, Func_Ptr funcPtr, char* addedBy, void* reference ) {
+void ClassHook_Init( void* hook, Name name, Func_Ptr funcPtr, const char* addedBy, void* reference ) {
 	ClassHook* self = (ClassHook*)hook;
 
 	/* General info */
@@ -106,7 +106,7 @@ ClassHook* _ClassHook_New(  CLASSHOOK_DEFARGS  )
 }
 
 
-void _ClassHook_Init( ClassHook* self, Func_Ptr funcPtr, char* addedBy, void* reference ) {
+void _ClassHook_Init( ClassHook* self, Func_Ptr funcPtr, Name addedBy, void* reference ) {
 	/* General and Virtual info should already be set */
 	
 	/* ClassHook info */
@@ -139,11 +139,11 @@ void _ClassHook_Print( void* hook, Stream* stream ) {
 }
 
 
-void* _ClassHook_Copy( void* hook, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ClassHook_Copy( const void* hook, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	ClassHook*	self = (ClassHook*)hook;
 	ClassHook*	newClassHook;
 	
-	newClassHook = _Hook_Copy( self, dest, deep, nameExt, ptrMap );
+	newClassHook = (ClassHook*)_Hook_Copy( self, dest, deep, nameExt, ptrMap );
 
 	newClassHook->reference = Stg_Class_Copy( self->reference, dest, deep, nameExt, ptrMap );
 	

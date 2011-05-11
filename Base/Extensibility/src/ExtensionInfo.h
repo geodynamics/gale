@@ -120,7 +120,7 @@
 	void _ExtensionInfo_Print( void* extensionInfo, Stream* stream );
 	
 	/** Class_Copy() implementation: derivatives should call this in their implementation */
-	void* _ExtensionInfo_Copy( void* extensionInfo, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ExtensionInfo_Copy( const void* extensionInfo, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	
 	/* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

@@ -62,7 +62,7 @@
 			void*                cf, 
 			Name                 componentName, 
 			Dictionary_Entry_Key key, 
-			const char*          defaultVal ) ;
+			Name          defaultVal ) ;
 
 	
 	typedef double (Stg_ComponentFactory_GetRootDictDoubleFunc) (
@@ -84,7 +84,7 @@
 	typedef char* (Stg_ComponentFactory_GetRootDictStringFunc) ( 
 			void*                cf, 
 			Dictionary_Entry_Key key, 
-			const char*          defaultVal ) ;
+			Name          defaultVal ) ;
 
 	typedef Stg_Component* (Stg_ComponentFactory_ConstructByNameFunc) ( 
 			void*                cf, 
@@ -257,8 +257,8 @@
 	unsigned int _Stg_ComponentFactory_GetRootDictUnsignedInt( void* cf, Dictionary_Entry_Key key, const unsigned int defaultVal);
 	Bool Stg_ComponentFactory_GetRootDictBool( void* cf, Dictionary_Entry_Key key, const Bool defaultVal ) ;
 	Bool _Stg_ComponentFactory_GetRootDictBool( void* cf, Dictionary_Entry_Key key, const Bool defaultVal ) ;
-	char* Stg_ComponentFactory_GetRootDictString( void* cf, Dictionary_Entry_Key key, const char* defaultVal ) ;
-	char* _Stg_ComponentFactory_GetRootDictString( void* cf, Dictionary_Entry_Key key, const char* defaultVal ) ;
+	char* Stg_ComponentFactory_GetRootDictString( void* cf, Dictionary_Entry_Key key, Name defaultVal ) ;
+	char* _Stg_ComponentFactory_GetRootDictString( void* cf, Dictionary_Entry_Key key, Name defaultVal ) ;
 
 	#define Stg_ComponentFactory_ConstructByName( cf, componentName, type, isEssential, data ) \
 		(type*) ( (Stg_ComponentFactory*) cf )->constructByName( cf, componentName, type ## _Type, isEssential, data )
@@ -269,7 +269,7 @@
 			cf, parentComponentName, componentKey, type ## _Type, isEssential, data )
 	Stg_Component* _Stg_ComponentFactory_ConstructByKey( 
 		void*			cf, 
-		Name			parentComponentName, 
+		Name		parentComponentName, 
 		Dictionary_Entry_Key	componentKey, 
 		Type			type, 
 		Bool			isEssential,
@@ -292,7 +292,7 @@
 
 	Bool Stg_ComponentFactory_PluginGetBool( void* cf, void *codelet, Dictionary_Entry_Key key, Bool defaultVal );
 
-        char* Stg_ComponentFactory_PluginGetString( void* cf, void* codelet, Dictionary_Entry_Key key, const char* const defaultVal );
+        char* Stg_ComponentFactory_PluginGetString( void* cf, void* codelet, Dictionary_Entry_Key key, Name const defaultVal );
 
 	#define Stg_ComponentFactory_ConstructByNameWithKeyFallback( \
 		cf, parentComponentName, componentTrialName, componentFallbackKey, type, isEssential, data ) \
@@ -314,8 +314,8 @@
 
 	Stg_Component** _Stg_ComponentFactory_ConstructByList( 
 		void*			cf, 
-		Name			parentComponentName, 
-		Name			listName, 
+		Type			parentComponentName, 
+		Type			listName, 
 		unsigned int		maxComponents,
 		Type			type,
 		Bool			isEssential,

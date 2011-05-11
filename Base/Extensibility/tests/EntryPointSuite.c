@@ -370,20 +370,20 @@ void EntryPointSuite_TestMinMax( EntryPointSuiteData* data ) {
    Stream_Enable( stream, False );
 
    data->ep = EntryPoint_New( testEpName, EntryPoint_Maximum_VoidPtr_CastType );
-   EntryPoint_Append( data->ep, "TestHook0", Return1, "testMinMaxFunc" );
-   EntryPoint_Append( data->ep, "TestHook1", Return89, "testMinMaxFunc" );
-   EntryPoint_Append( data->ep, "TestHook2", ReturnNeg43, "testMinMaxFunc" );
-   EntryPoint_Append( data->ep, "TestHook3", ReturnZero, "testMinMaxFunc" );
+   EntryPoint_Append( data->ep, "TestHook0", (void*)Return1, "testMinMaxFunc" );
+   EntryPoint_Append( data->ep, "TestHook1", (void*)Return89, "testMinMaxFunc" );
+   EntryPoint_Append( data->ep, "TestHook2", (void*)ReturnNeg43,"testMinMaxFunc");
+   EntryPoint_Append( data->ep, "TestHook3", (void*)ReturnZero, "testMinMaxFunc");
    result = ((EntryPoint_Maximum_VoidPtr_CallCast*) data->ep->run)( data->ep, stream );
    pcu_check_true( result == 89.0 );
    Stg_Class_Delete( data->ep );
 
    /* Get Minimum of Values */
    data->ep = EntryPoint_New( testEpName, EntryPoint_Minimum_VoidPtr_CastType );
-   EntryPoint_Append( data->ep, "TestHook0", Return1, "testMinMaxFunc" );
-   EntryPoint_Append( data->ep, "TestHook1", Return89, "testMinMaxFunc" );
-   EntryPoint_Append( data->ep, "TestHook2", ReturnNeg43, "testMinMaxFunc" );
-   EntryPoint_Append( data->ep, "TestHook3", ReturnZero, "testMinMaxFunc" );
+   EntryPoint_Append( data->ep, "TestHook0", (void*)Return1, "testMinMaxFunc" );
+   EntryPoint_Append( data->ep, "TestHook1", (void*)Return89, "testMinMaxFunc" );
+   EntryPoint_Append( data->ep, "TestHook2", (void*)ReturnNeg43,"testMinMaxFunc");
+   EntryPoint_Append( data->ep, "TestHook3", (void*)ReturnZero,"testMinMaxFunc" );
    result = ((EntryPoint_Minimum_VoidPtr_CallCast*) data->ep->run)( data->ep, stream );
    pcu_check_true( result == -43 );
 }

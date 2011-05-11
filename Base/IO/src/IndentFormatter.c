@@ -139,11 +139,11 @@ void _IndentFormatter_Print( void* formatter, Stream* stream )
 	_LineFormatter_Print( formatter, stream );
 }
 
-void* _IndentFormatter_Copy( void* indentFormatter, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _IndentFormatter_Copy( const void* indentFormatter, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	IndentFormatter*	self = (IndentFormatter*)indentFormatter;
 	IndentFormatter*	newIndentFormatter;
 	
-	newIndentFormatter = _LineFormatter_Copy( self, dest, deep, nameExt, ptrMap );
+	newIndentFormatter = (IndentFormatter*)_LineFormatter_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	IndentFormatter_SetIndent( newIndentFormatter, self->_indent );
 	
@@ -184,7 +184,7 @@ void IndentFormatter_Zero( void* formatter)
 
 void IndentFormatter_MakeTag( IndentFormatter* formatter )
 {
-	int i;
+	Index i;
 	
 	/* Release previous tag if existing. */
 	if ( formatter->_tag != NULL )

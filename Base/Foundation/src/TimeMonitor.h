@@ -62,7 +62,7 @@ void Stg_TimeMonitor_Initialise();
 void Stg_TimeMonitor_Finalise();
 void Stg_TimeMonitor_SetTimerWatchCriteria( double ratioOfTotalTime );
 
-Stg_TimeMonitor* Stg_TimeMonitor_New( char* tag, Bool criteria, Bool print, MPI_Comm comm );
+Stg_TimeMonitor* Stg_TimeMonitor_New( Name tag, Bool criteria, Bool print, MPI_Comm comm );
 void Stg_TimeMonitor_Delete( Stg_TimeMonitor* tm );
 
 void Stg_TimeMonitor_Begin( Stg_TimeMonitor* tm );

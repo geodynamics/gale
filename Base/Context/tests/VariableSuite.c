@@ -64,7 +64,7 @@ typedef struct {
 
 void VariableSuite_Setup( VariableSuiteData* data ) {
    Particle                tmpParticle;
-   Name                    pNames[] = { "mass", "force", "info" };
+   const char*                    pNames[] = { "mass", "force", "info" };
    SizeT                   pOffsets[] = { 0, 0, 0 };   /* Init later... */
    Variable_DataType       pDataTypes[] = {
                               Variable_DataType_Int,
@@ -85,7 +85,7 @@ void VariableSuite_Setup( VariableSuiteData* data ) {
    data->vr = Variable_Register_New();
    Variable_NewScalar( "temperature", NULL, Variable_DataType_Double, &data->aSize[0], NULL, (void**)&data->temperature, data->vr );
    Variable_NewVector( "velocity", NULL, Variable_DataType_Double, 3, &data->aSize[1], NULL, (void**)&data->velocity, data->vr, "vx", "vy", "vz" );
-   Variable_New( "particle", NULL, 3, pOffsets, pDataTypes, pDtCounts, pNames, &pSize, &data->aSize[2], NULL, (void**)&data->particle, data->vr );
+   Variable_New( "particle", NULL, 3, pOffsets, pDataTypes, pDtCounts, (Name*)pNames, &pSize, &data->aSize[2], NULL, (void**)&data->particle, data->vr );
    
    /* Build phase ---------------------------------------------------------------------------------------------------*/
    data->temperature = Memory_Alloc_Array( double, data->aSize[0], "temperature" );
@@ -222,7 +222,7 @@ void VariableSuite_TestVariable_Char( VariableSuiteData* data ) {
    Variable* var;
    Variable* vec;
    Variable* vecVar[3];
-   int i, j;
+   Index i, j;
 
    array = Memory_Alloc_Array( char, length, "test" );
    structArray = Memory_Alloc_Array( Triple, length, "test" );
@@ -307,7 +307,7 @@ void VariableSuite_TestVariable_Double( VariableSuiteData* data ) {
    Variable* vec;
    Variable* vecVar[3];
 
-   int i, j;
+   Index i, j;
 
    array = Memory_Alloc_Array( double, length, "test" );
    structArray = Memory_Alloc_Array( Triple, length, "test" );
@@ -393,7 +393,7 @@ void VariableSuite_TestVariable_Float( VariableSuiteData* data ) {
    Variable* vec;
    Variable* vecVar[3];
 
-   int i, j;
+   Index i, j;
 
    array = Memory_Alloc_Array( float, length, "test" );
    structArray = Memory_Alloc_Array( Triple, length, "test" );
@@ -481,7 +481,7 @@ void VariableSuite_TestVariable_Int( VariableSuiteData* data ) {
    Variable* vec;
    Variable* vecVar[3];
 
-   int i, j;
+   Index i, j;
 
    array = Memory_Alloc_Array( int, length, "test" );
    structArray = Memory_Alloc_Array( Triple, length, "test" );
@@ -570,7 +570,7 @@ void VariableSuite_TestVariable_Short( VariableSuiteData* data ) {
    Variable* vec;
    Variable* vecVar[3];
 
-   int i, j;
+   Index i, j;
 
    array = Memory_Alloc_Array( short, length, "test" );
    structArray = Memory_Alloc_Array( Triple, length, "test" );
@@ -695,12 +695,12 @@ void VariableSuite_TestVariableCopy( VariableSuiteData* data ) {
 		SizeT dataOffsets[] = { 0, 0 };
 		Variable_DataType dataTypes[] = { Variable_DataType_Float, Variable_DataType_Char };
 		Index dataTypeCounts[] = { 1, 1 };
-		Name dataNames[] = { "complexY", "complexZ" };
+		const char* dataNames[] = { "complexY", "complexZ" };
 		
 		dataOffsets[0] = (ArithPointer)&tmp.y - (ArithPointer)&tmp;
 		dataOffsets[1] = (ArithPointer)&tmp.z - (ArithPointer)&tmp;
 
-		Variable_New( "Complex", NULL, 2, dataOffsets, dataTypes, dataTypeCounts, dataNames, &(ctx1->complexStuffSize), &(ctx1->stuffCount), NULL, (void**)&(ctx1->stuff), ctx1->vr );
+		Variable_New( "Complex", NULL, 2, dataOffsets, dataTypes, dataTypeCounts, (Name*)dataNames, &(ctx1->complexStuffSize), &(ctx1->stuffCount), NULL, (void**)&(ctx1->stuff), ctx1->vr );
 	}
 
 	Variable_Register_BuildAll( ctx1->vr );
@@ -718,7 +718,7 @@ void VariableSuite_TestVariableCopy( VariableSuiteData* data ) {
       Variable_SetValueAtDouble( vector, ii, 2, (double)ii );
    }
    for ( ii = 0; ii < ctx1->stuffCount; ++ii ) {
-      ComplexStuff* stuff = Variable_GetStructPtr( complexStuff, ii );
+     ComplexStuff* stuff = (ComplexStuff*)Variable_GetStructPtr( complexStuff, ii );
       stuff->y = (float)ii;
       stuff->z = '0' + ii;
    }
@@ -741,7 +741,7 @@ void VariableSuite_TestVariableCopy( VariableSuiteData* data ) {
 	PtrMap_Append( ptrMap, ctx1->stuff, ctx2->stuff );
 
    /* Doing a copy of the whole Variable Register, should trigger a copy of the values in all the variables */
-	ctx2->vr = Stg_Class_Copy( ctx1->vr, NULL, True, NULL, ptrMap );
+	ctx2->vr = (Variable_Register*)Stg_Class_Copy( ctx1->vr, NULL, True, NULL, ptrMap );
 
    /* test equality of copy */
    for ( ii = 0; ii < ctx1->scalarCount; ++ii ) {

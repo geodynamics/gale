@@ -126,7 +126,7 @@ void _IO_Handler_Print( void* io_handler, Stream* stream ) {
 
 
 /** Read a dictionary entry of a given name from file */
-Bool IO_Handler_ReadAllFromFile( void* io_handler, const char* filename, Dictionary* dictionary )
+Bool IO_Handler_ReadAllFromFile( void* io_handler, Name filename, Dictionary* dictionary )
 {
 	IO_Handler* self = (IO_Handler*) io_handler;
 	Index chr_I;
@@ -151,7 +151,7 @@ Bool IO_Handler_ReadAllFromFile( void* io_handler, const char* filename, Diction
 }
 
 /** Read a dictionary entry of a given name from file, include source files in dictionary_Entries. */
-Bool IO_Handler_ReadAllFromFileForceSource( void* io_handler, const char* filename, Dictionary* dictionary )
+Bool IO_Handler_ReadAllFromFileForceSource( void* io_handler, Name filename, Dictionary* dictionary )
 {
 	IO_Handler* self = (IO_Handler*) io_handler;
 	Index chr_I;
@@ -176,7 +176,7 @@ Bool IO_Handler_ReadAllFromFileForceSource( void* io_handler, const char* filena
 }
 
 /** Read a dictionary entry of a given name from file */
-Bool IO_Handler_ReadAllFromBuffer( void* io_handler, const char* buffer, Dictionary* dictionary )
+Bool IO_Handler_ReadAllFromBuffer( void* io_handler, Name buffer, Dictionary* dictionary )
 {
 	IO_Handler* self = (IO_Handler*) io_handler;
 
@@ -184,7 +184,7 @@ Bool IO_Handler_ReadAllFromBuffer( void* io_handler, const char* buffer, Diction
 }
 
 /** write a given dictionary entry to file */
-Bool IO_Handler_WriteAllToFile(void* io_handler, const char* filename, Dictionary* dictionary )
+Bool IO_Handler_WriteAllToFile(void* io_handler, Name filename, Dictionary* dictionary )
 {
 	IO_Handler* self = (IO_Handler*) io_handler;
 	return self->_writeAllToFile( self, filename, dictionary );
@@ -353,7 +353,7 @@ Dictionary_Entry_Value* IO_Handler_DictSetAddValueWithSource(
 Index IO_Handler_ReadAllFilesFromCommandLine( void* ioHandler, int argc, char* argv[], Dictionary* dictionary ) {
 	IO_Handler* self          = (IO_Handler*) ioHandler;
 	Stream*     errorStream   = Journal_Register( Error_Type, CURR_MODULE_NAME );
-	Index       arg_I;
+	int       arg_I;
 	char*       filename;
 	char*       extension;
 	Bool        result;
@@ -388,7 +388,7 @@ Index IO_Handler_ReadAllFilesFromCommandLine( void* ioHandler, int argc, char* a
 Index IO_Handler_ReadAllFilesFromCommandLineForceSource( void* ioHandler, int argc, char* argv[], Dictionary* dictionary ) {
 	IO_Handler* self          = (IO_Handler*) ioHandler;
 	Stream*     errorStream   = Journal_Register( Error_Type, CURR_MODULE_NAME );
-	Index       arg_I;
+	int       arg_I;
 	char*       filename;
 	char*       extension;
 	Bool        result;
@@ -421,7 +421,7 @@ Index IO_Handler_ReadAllFilesFromCommandLineForceSource( void* ioHandler, int ar
 
 void _get_XML(void* ioHandler, char* argv[], int argc) {
 	IO_Handler* self          = (IO_Handler*) ioHandler;
-	Index arg_I;
+	int arg_I;
 	int schema=0;
 	char* name;
 	char* option;
@@ -431,9 +431,9 @@ void _get_XML(void* ioHandler, char* argv[], int argc) {
 		option = strrchr( name, '-' );
 		if ( schema == 1 ) { 
 			if ( self->schema==NULL ) {
-				self->schema = malloc( strlen( argv[ arg_I ] ) +1 );
-				strcpy( self->schema, argv[ arg_I ] );
-				schema=0;
+                          self->schema=(char*)malloc( strlen( argv[arg_I] ) +1 );
+                          strcpy( self->schema, argv[ arg_I ] );
+                          schema=0;
 			}
 		}
 		if ( option != NULL ) {

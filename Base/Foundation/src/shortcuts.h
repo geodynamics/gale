@@ -60,37 +60,37 @@
 
 
 #define AllocArray( type, size )					\
-	((size) ? Memory_Alloc_Array_Unnamed( type, size ) : NULL)
+  ((size) ? Memory_Alloc_Array_Unnamed( type, size ) : (type*)NULL)
 
 #define AllocNamedArray( type, size, name )				\
-	((size) ? Memory_Alloc_Array( type, size, name ) : NULL)
+	((size) ? Memory_Alloc_Array( type, size, name ) : (type*)NULL)
 
 #define AllocArray2D( type, size0, size1 )						\
-	((size0 && size1) ? Memory_Alloc_2DArray_Unnamed( type, size0, size1 ) : NULL)
+	((size0 && size1) ? Memory_Alloc_2DArray_Unnamed( type, size0, size1 ) : (type**)NULL)
 
 #define AllocNamedArray2D( type, size0, size1, name )					\
-	((size0 && size1) ? Memory_Alloc_2DArray( type, size0, size1, name ) : NULL)
+	((size0 && size1) ? Memory_Alloc_2DArray( type, size0, size1, name ) : (type**)NULL)
 
 #define AllocComplex2D( type, base, sizes )						\
-	((base && sizes) ? Memory_Alloc_2DComplex_Unnamed( type, base, sizes ) : NULL)
+	((base && sizes) ? Memory_Alloc_2DComplex_Unnamed( type, base, sizes ) : (type**)NULL)
 
 #define AllocNamedComplex2D( type, base, sizes, name )					\
-	((base && sizes) ? Memory_Alloc_2DComplex( type, base, sizes, name ) : NULL)
+	((base && sizes) ? Memory_Alloc_2DComplex( type, base, sizes, name ) : (type**)NULL)
 
 #define ReallocArray( ptr, type, size )					\
 	((ptr) ? ((size) ? Memory_Realloc_Array( ptr, type, size ) : 	\
-		  (Memory_Free( ptr ), NULL)) : 			\
-	 (size) ? Memory_Alloc_Array_Unnamed( type, size ) : NULL)
+		  (Memory_Free( ptr ), (type*)NULL)) : 			\
+	 (size) ? Memory_Alloc_Array_Unnamed( type, size ) : (type*)NULL)
 
 #define ReallocNamedArray( ptr, type, size, name )			\
 	((ptr) ? ((size) ? Memory_Realloc_Array( ptr, type, size ) : 	\
-		  (Memory_Free( ptr ), NULL)) : 			\
-	 ((size) ? Memory_Alloc_Array( type, size, name ) : NULL))
+		  (Memory_Free( ptr ), (type*)NULL)) : 			\
+	 ((size) ? Memory_Alloc_Array( type, size, name ) : (type*)NULL))
 
 #define ReallocArray2D( ptr, type, size0, size1 )						\
 	((ptr) ? ((size0 && size1) ? Memory_Realloc_2DArray( ptr, type, size0, size1 ) :	\
-		  (Memory_Free( ptr ), NULL)) : 						\
-	 (size0 && size1) ? Memory_Alloc_2DArray_Unnamed( type, size0, size1 ) : NULL)
+		  (Memory_Free( ptr ), (type**)NULL)) :                 \
+         (size0 && size1) ? Memory_Alloc_2DArray_Unnamed( type, size0, size1 ) : (type**)NULL)
 
 
 #define FreeArray( ptr )			\

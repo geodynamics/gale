@@ -110,7 +110,7 @@ void _TestSuite_Print( void* testSuite, struct Stream* stream ) {
 	_Stg_Class_Print( self, stream );
 }
 
-void* _TestSuite_Copy( void* testSuite, void* destProc_I, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _TestSuite_Copy( const void* testSuite, void* destProc_I, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 #if 0
 	TestSuite*	self = (TestSuite*)testSuite;
 	TestSuite*	newTestSuite;

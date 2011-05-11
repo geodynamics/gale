@@ -106,5 +106,6 @@
 	LiveComponentRegister* LiveComponentRegister_GetLiveComponentRegister();
 
 	void LiveComponentRegister_PrintSimilar( void* liveComponentRegister, Name name, Stream* stream, unsigned int number ) ;
+        void LiveComponentRegister_DestroyAll( void* lcReg );
 #endif /* __StGermain_Base_Automation_LiveComponentRegister_h__ */
 

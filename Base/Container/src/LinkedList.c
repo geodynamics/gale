@@ -379,5 +379,3 @@ void *LinkedList_ReturnNodeDataAtFunc( LinkedList *list, int index )
 	}
 	return NULL;
 }
-
-

@@ -91,7 +91,7 @@
 		(RangeSet*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define RangeSet_DeepCopy( self )				\
 		(RangeSet*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _RangeSet_Copy( void* rangeSet, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _RangeSet_Copy( const void* rangeSet, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions

@@ -120,10 +120,10 @@
 	struct EntryPoint { __EntryPoint };
 	
 	/** Create a new EntryPoint */
-	EntryPoint* EntryPoint_New( const Name name, unsigned int castType );
+	EntryPoint* EntryPoint_New( Name name, unsigned int castType );
 	
 	/** Initialise an existing EntryPoint */
-	void EntryPoint_Init( void* entryPoint, const Name name, unsigned int castType );
+	void EntryPoint_Init( void* entryPoint, Name name, unsigned int castType );
 	
 	/** Creation implementation */
 	
@@ -158,7 +158,7 @@
 	#define EntryPoint_DeepCopy( self ) \
 		(EntryPoint*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _EntryPoint_Copy( void* entryPoint, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _EntryPoint_Copy( const void* entryPoint, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* VIRTUAL FUNCTIONS */
 
@@ -207,39 +207,39 @@
 	void EntryPoint_PrintConcise( void* entryPoint, Stream* stream );
 	
 	/** Prepend a new Hook function at the start of an entry point's list of hooks to run. */
-	void EntryPoint_Prepend( void* entryPoint, Name name, Func_Ptr funcPtr, char* addedBy );
+	void EntryPoint_Prepend( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy );
 	
 	/** Prepend a new Hook function at the start of an entry point's list of hooks to run, specifying it
 	should always remain the first hook. */
-	void EntryPoint_Prepend_AlwaysFirst( void* entryPoint, Name name, Func_Ptr funcPtr, char* addedBy );
+	void EntryPoint_Prepend_AlwaysFirst( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy );
 	
 	/** Add a new Func_Ptr to an entry point, at the end of the current list of hooks. If there is a hook
 	already specified to always come last, the new hook will be appended to come just before it. */
-	void EntryPoint_Append( void* entryPoint, Name name, Func_Ptr funcPtr, char* addedBy );
+	void EntryPoint_Append( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy );
 	
 	/** Add a new Func_Ptr to an entry point, at the end of the list of hooks - and make
 	sure the entry point is always kept at the end. If this is called twice on
 	the same entry point, an assert results. */
-	void EntryPoint_Append_AlwaysLast( void* entryPoint, Name name, Func_Ptr funcPtr, char* addedBy );
+	void EntryPoint_Append_AlwaysLast( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy );
 
 	/** Add a new Hook function to an entry point, just before the specified hookToInsertBefore in the list of hooks.
 	 * If the specified hook to insert before doesn't exist, then asserts with an error. */
-	void EntryPoint_InsertBefore( void* entryPoint, Name hookToInsertBefore, Name name, Func_Ptr funcPtr, char* addedBy );
+	void EntryPoint_InsertBefore( void* entryPoint, Name hookToInsertBefore, Name name, Func_Ptr funcPtr, Name addedBy );
 	
 	/** Add a new Hook function to an entry point, just after the specified hookToInsertAfter in the list of hooks.
 	 * If the specified hook to insert after doesn't exist, then asserts with an error. */
-	void EntryPoint_InsertAfter( void* entryPoint, Name hookToInsertAfter, Name name, Func_Ptr funcPtr, char* addedBy );
+	void EntryPoint_InsertAfter( void* entryPoint, Name hookToInsertAfter, Name name, Func_Ptr funcPtr, Name addedBy );
 	
 	/** Replace a specific named hook with a new hook function.
 	 * If the specified hook to replace doesn't exist, then asserts with an error. */
-	void EntryPoint_Replace( void* entryPoint, Name hookToReplace, Name name, Func_Ptr funcPtr, char* addedBy );
+	void EntryPoint_Replace( void* entryPoint, Name hookToReplace, Name name, Func_Ptr funcPtr, Name addedBy );
 	
 	/** Replace all existing hooks of an entry point with a new hook. */
-	void EntryPoint_ReplaceAll( void* entryPoint, Name name, Func_Ptr funcPtr, char* addedBy );
+	void EntryPoint_ReplaceAll( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy );
 
 
 	/** Prepend a new Hook function at the start of an entry point's list of hooks to run. */
-	void EntryPoint_PrependClassHook( void* entryPoint, Name name, Func_Ptr funcPtr, char* addedBy, void* reference );
+	void EntryPoint_PrependClassHook( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy, void* reference );
 	
 	/** Prepend a new Hook function at the start of an entry point's list of hooks to run, specifying it
 	should always remain the first hook. */
@@ -247,12 +247,12 @@
 		void* entryPoint, 
 		Name name, 
 		Func_Ptr funcPtr, 
-		char* addedBy, 
+		Name addedBy, 
 		void* reference );
 	
 	/** Add a new Func_Ptr to an entry point, at the end of the current list of hooks. If there is a hook
 	already specified to always come last, the new hook will be appended to come just before it. */
-	void EntryPoint_AppendClassHook( void* entryPoint, Name name, Func_Ptr funcPtr, char* addedBy, void* reference );
+	void EntryPoint_AppendClassHook( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy, void* reference );
 	
 	/** Add a new Func_Ptr to an entry point, at the end of the list of hooks - and make
 	sure the entry point is always kept at the end. If this is called twice on
@@ -261,7 +261,7 @@
 		void* entryPoint, 
 		Name name, 
 		Func_Ptr funcPtr, 
-		char* addedBy, 
+		Name addedBy, 
 		void* reference );
 
 	/** Add a new Hook function to an entry point, just before the specified hookToInsertBefore in the list of hooks.
@@ -271,7 +271,7 @@
 		Name hookToInsertBefore, 
 		Name name, 
 		Func_Ptr funcPtr, 
-		char* addedBy, 
+		Name addedBy, 
 		void* reference );
 	
 	/** Add a new Hook function to an entry point, just after the specified hookToInsertAfter in the list of hooks.
@@ -281,7 +281,7 @@
 		Name hookToInsertAfter, 
 		Name name, 
 		Func_Ptr funcPtr, 
-		char* addedBy, 
+		Name addedBy, 
 		void* reference );
 	
 	/** Replace a specific named hook with a new hook function.
@@ -291,11 +291,11 @@
 		Name hookToReplace, 
 		Name name, 
 		Func_Ptr funcPtr, 
-		char* addedBy, 
+		Name addedBy, 
 		void* reference );
 	
 	/** Replace all existing hooks of an entry point with a new hook. */
-	void EntryPoint_ReplaceAllClassHook( void* entryPoint, Name name, Func_Ptr funcPtr, char* addedBy, void* reference );
+	void EntryPoint_ReplaceAllClassHook( void* entryPoint, Name name, Func_Ptr funcPtr, Name addedBy, void* reference );
 
 
 	/** Removes a hook from an entry point
@@ -305,9 +305,9 @@
 	/** "Purge" the entry point of all existing hooks, leaving it blank. */
 	void EntryPoint_Purge( void* entryPoint );
 	
-	void EntryPoint_WarnIfNoHooks( void* entryPoint, const char* parentFunction );
+	void EntryPoint_WarnIfNoHooks( void* entryPoint, Name parentFunction );
 
-	void EntryPoint_ErrorIfNoHooks( void* entryPoint, const char* parentFunction );
+	void EntryPoint_ErrorIfNoHooks( void* entryPoint, Name parentFunction );
 	
 #endif /* __StGermain_Base_Extensibility_EntryPoint_h__ */
 

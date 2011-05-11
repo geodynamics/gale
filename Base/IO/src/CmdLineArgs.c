@@ -35,8 +35,8 @@
 
 void stgRemoveCmdLineArg( int* argc, char** argv[], int index ) {
 	if( index > 0 && index < *argc ) {
-		Index i;
-		void* tmpPtr = (*argv)[index];
+		int i;
+		char* tmpPtr = (*argv)[index];
 
 		for( i = index; i < *argc - 1; i++ ) {
 			(*argv)[i] = (*argv)[i+1];
@@ -49,13 +49,13 @@ void stgRemoveCmdLineArg( int* argc, char** argv[], int index ) {
 
 
 char* stgParseHelpCmdLineArg( int* argc, char** argv[] ) {
-	Index                   arg_I;
+	int                   arg_I;
 
 	/* Loop over all the arguments from command line and reads all arguments of form "--help topic" */
 	for( arg_I = 1 ; arg_I < *argc; arg_I++ ) {
 		char*                   valueString = 0;
 		char*                   argumentString = (*argv)[arg_I];
-		const char*             preceedingString = "--help";
+		Name             preceedingString = "--help";
 		unsigned int            preceedingStringLength = strlen( preceedingString );
 
 		/* Check is string has preceeding string is "--help" if not then continue in loop */
@@ -79,13 +79,13 @@ char* stgParseHelpCmdLineArg( int* argc, char** argv[] ) {
 }
 
 char* stgParseListCmdLineArg( int* argc, char** argv[] ) {
-	Index                   arg_I;
+	int                   arg_I;
 
 	/* Loop over all the arguments from command line and reads all arguments of form "--help topic" */
 	for( arg_I = 1 ; arg_I < *argc; arg_I++ ) {
 		char*                   valueString = 0;
 		char*                   argumentString = (*argv)[arg_I];
-		const char*             preceedingString = "--list";
+		Name             preceedingString = "--list";
 		unsigned int            preceedingStringLength = strlen( preceedingString );
 
 		/* Check is string has preceeding string is "--list" if not then continue in loop */
@@ -111,13 +111,13 @@ char* stgParseListCmdLineArg( int* argc, char** argv[] ) {
 }
 
 char* stgParseListAllCmdLineArg( int* argc, char** argv[] ) {
-	Index                   arg_I;
+	int                   arg_I;
 
 	/* Loop over all the arguments from command line and reads all arguments of form "--help topic" */
 	for( arg_I = 1 ; arg_I < *argc; arg_I++ ) {
 		char*                   valueString = 0;
 		char*                   argumentString = (*argv)[arg_I];
-		const char*             preceedingString = "--list-all";
+		Name             preceedingString = "--list-all";
 		unsigned int            preceedingStringLength = strlen( preceedingString );
 
 		/* Check is string has preceeding string is "--list" if not then continue in loop */

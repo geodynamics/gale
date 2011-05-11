@@ -30,7 +30,7 @@ void* pcu_memdup( const void* buf, int len ) {
 }
 
 char* pcu_strdup( const char* str ) {
-   return str ? pcu_memdup( str, strlen( str ) + 1 ) : NULL;
+   return str ? (char*)pcu_memdup( str, strlen( str ) + 1 ) : NULL;
 }
 
 

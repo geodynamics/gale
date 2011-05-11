@@ -173,7 +173,7 @@ void Dictionary_Empty( void* dictionary ) {
 }
 
 
-void* _Dictionary_Copy( void* dictionary, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _Dictionary_Copy( const void* dictionary, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	Dictionary*      self = (Dictionary*) dictionary;
 	Dictionary_Index index;
 	Dictionary*	 newDict;
@@ -184,7 +184,7 @@ void* _Dictionary_Copy( void* dictionary, void* dest, Bool deep, Name nameExt, s
 		ownMap = True;
 	}
 
-	newDict = _Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
+	newDict = (Dictionary*)_Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
 
 	newDict->add = self->add;
 	newDict->addWithSource = self->addWithSource;
@@ -200,7 +200,7 @@ void* _Dictionary_Copy( void* dictionary, void* dest, Bool deep, Name nameExt, s
 		newDict->debugStream = self->debugStream;
 	}
 	else {
-		newDict->debugStream = Stg_Class_Copy( self->debugStream, NULL, deep, nameExt, ptrMap );
+          newDict->debugStream = (Stream*)Stg_Class_Copy( self->debugStream, NULL, deep, nameExt, ptrMap );
 	}
 
 	newDict->entryPtr = Memory_Alloc_Array( Dictionary_Entry*, self->size, "Dictionary->entryPtr" );
@@ -263,30 +263,30 @@ Dictionary_Entry_Value* Dictionary_GetByIndex( void* dictionary, Dictionary_Inde
 }
 
 Dictionary_Entry* Dictionary_GetEntry( void* dictionary, Dictionary_Entry_Key key ) {
-	Dictionary* self = dictionary;
-	Dictionary_Index index;
-	Dictionary_Index count;
+  Dictionary* self = (Dictionary*)dictionary;
+  Dictionary_Index index;
+  Dictionary_Index count;
 
-	/* Be less sensitive to whether the dictionary is NULL... yields nicer user code */
-	count = self ? self->count : 0;
+  /* Be less sensitive to whether the dictionary is NULL... yields nicer user code */
+  count = self ? self->count : 0;
 	
-	for( index = 0; index < count; index++ ) {
-		if( Dictionary_Entry_Compare( self->entryPtr[index], key ) != 0 ) {
-			return self->entryPtr[index];
-		}
-	}
-	return NULL;
+  for( index = 0; index < count; index++ ) {
+    if( Dictionary_Entry_Compare( self->entryPtr[index], key ) != 0 ) {
+      return self->entryPtr[index];
+    }
+  }
+  return NULL;
 }
 
 Dictionary_Entry* Dictionary_GetEntryByIndex( void* dictionary, Dictionary_Index index) {
-	Dictionary* self = dictionary;
+  Dictionary* self = (Dictionary*)dictionary;
 
-	/* Be less sensitive to whether the dictionary is NULL... yields nicer user code */
-	/* Check that self->entryPtr[index] is NOT NULL */
-	if( !self || !self->entryPtr[index] )
-		return NULL;
-	else
-		return self->entryPtr[index];
+  /* Be less sensitive to whether the dictionary is NULL... yields nicer user code */
+  /* Check that self->entryPtr[index] is NOT NULL */
+  if( !self || !self->entryPtr[index] )
+    return NULL;
+  else
+    return self->entryPtr[index];
 }
 
 Index Dictionary_GetCount( void* dictionary ) {
@@ -669,7 +669,7 @@ void Dictionary_ParseCommandLineParam( void* self, char* paramString, char* valu
 				/* Entry found. Ensure its a struct */
 				structDictionary = Dictionary_Entry_Value_AsDictionary( ev );
 				Journal_Firewall( 
-					(Bool)structDictionary, 
+					structDictionary==NULL, 
 					Journal_Register( Error_Type, Dictionary_Type ), 
 					"Command line argument \"%s\" parsed as struct, and is in dictionary, but not as a struct",
 						structString );
@@ -699,7 +699,7 @@ void Dictionary_ParseCommandLineParam( void* self, char* paramString, char* valu
 			/* Make sure there is a right bracket in the string */
 			rbracket2 = strchr( indexString, ']' );
 			Journal_Firewall( 
-				(Bool)rbracket2, 
+				rbracket2==NULL, 
 				Journal_Register( Error_Type, Dictionary_Type ), 
 				"Command line argument \"%s\" parsed as list but missing closing \']\'.",
 					listString );
@@ -784,7 +784,7 @@ void Dictionary_ParseCommandLineParam( void* self, char* paramString, char* valu
 				
 					item = Dictionary_Entry_Value_GetElement( ev, index );
 					Journal_Firewall( 
-						(Bool)item, 
+						item==NULL, 
 						Journal_Register( Error_Type, Dictionary_Type ), 
 						"Command line argument \"%s\" parsed as list, requesting index \"%u\", "\
 						"but that index does not exist.",
@@ -806,8 +806,8 @@ void Dictionary_ParseCommandLineParam( void* self, char* paramString, char* valu
 }
 
 void Dictionary_ReadAllParamFromCommandLine( void* dictionary, int argc, char* argv[] ) {
-	Index                   arg_I;
-	const char*             preceedingString = "--";
+	int                     arg_I;
+	Name             preceedingString = "--";
 	char*                   argumentString;
 	char*                   paramString;
 	char*                   valueString;

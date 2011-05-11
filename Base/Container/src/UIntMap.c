@@ -114,7 +114,7 @@ void _UIntMap_Print( void* generator, Stream* stream ) {
 	_Stg_Class_Print( self, stream );
 }
 
-void* _UIntMap_Copy( void* generator, void* destProc_I, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _UIntMap_Copy( const void* generator, void* destProc_I, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 #if 0
 	UIntMap*	self = (UIntMap*)generator;
 	UIntMap*	newUIntMap;

@@ -124,13 +124,13 @@ SizeT _CStream_Printf( Stream* stream, const char *fmt, va_list args )
 	return printResult;
 }
 	
-SizeT _CStream_Write( Stream* stream, void *data, SizeT elem_size, SizeT num_elems )
+SizeT _CStream_Write( Stream* stream, const void *data, SizeT elem_size, SizeT num_elems )
 {
 	CStream* self = (CStream*)stream;
 	return fwrite( data, elem_size, num_elems, (FILE*) (self->_file->fileHandle) );
 }
 	
-Bool _CStream_Dump( Stream* stream, void *data )
+Bool _CStream_Dump( Stream* stream, const void *data )
 {
 	/* Traditional C does not have a dumping function. Hence, CStream performs no operation here. */
 	return False;

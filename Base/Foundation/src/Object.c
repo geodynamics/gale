@@ -74,11 +74,14 @@ void _Stg_Object_Init( Stg_Object* self, Name name, AllocationType nameAllocatio
 	
 	/* Stg_Object info */
 	if( !name || strlen( name ) == 0 ) {
-		Stg_asprintf( &self->name, "%s-%u", _Stg_Object_Unnamed, _Stg_Object_Counter );
-		_Stg_Object_Counter += 1;
+          char *tmp_name;
+          Stg_asprintf(&tmp_name,"%s-%u",_Stg_Object_Unnamed,_Stg_Object_Counter);
+          self->name=tmp_name;
+          _Stg_Object_Counter += 1;
 	}
 	else if ( GLOBAL == nameAllocationType ) {
-		self->name = name;
+          /* This is a bit unsafe */
+          self->name = (char*)name;
 	}
 	else {
 		self->name = StG_Strdup( name );
@@ -92,7 +95,7 @@ void _Stg_Object_Delete( void* object ) {
 	Stg_Object* self = (Stg_Object*)object;
 	
 	if ( GLOBAL != self->nameAllocationType )
-		Memory_Free( self->name );
+          Memory_Free( self->name );
 
 	/* Delete parent class */
 	_Stg_Class_Delete( self );
@@ -118,21 +121,23 @@ void _Stg_Object_Print( void* object, struct Stream* stream) {
 	Stream_UnIndent( stream );
 }
 
-void* _Stg_Object_Copy( void* object, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _Stg_Object_Copy( const void* object, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	Stg_Object*	self = (Stg_Object*)object;
 	Stg_Object*	newObject;
 	
-	newObject = _Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
+	newObject = (Stg_Object*)_Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	/* TODO: if we are not deep copying we should not copy the name, just the pointer.  There
 	 * is a problem with this; will try to fix it later. */
 	
 	if( nameExt ) {
 		unsigned	nameLen = strlen( self->name );
-		
-		newObject->name = Memory_Alloc_Array_Unnamed( char, nameLen + strlen( nameExt ) + 1 );
-		memcpy( newObject->name, self->name, nameLen );
-		strcpy( newObject->name + nameLen, nameExt );
+                char *tmp_name;
+                tmp_name=
+                  Memory_Alloc_Array_Unnamed(char,nameLen+strlen(nameExt)+1);
+		memcpy( tmp_name, self->name, nameLen );
+		strcpy( tmp_name + nameLen, nameExt );
+                newObject->name=tmp_name;
 	}
 	else {
 		newObject->name = StG_Strdup( self->name );
@@ -147,18 +152,18 @@ void* _Stg_Object_Copy( void* object, void* dest, Bool deep, Name nameExt, struc
 /* Public member functions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-void Stg_Object_SetName( void* object, const Name name )
+void Stg_Object_SetName( void* object, Name name )
 {
 	Stg_Object* self = (Stg_Object*)object;
 	
 	if ( GLOBAL == self->nameAllocationType )
 	{
-		self->name = name;
+          self->name = (char*)name;
 	}
 	else
 	{
-		Memory_Free( self->name );
-		self->name = StG_Strdup( name );
+          Memory_Free( self->name );
+          self->name = StG_Strdup( name );
 	}
 }
 
@@ -172,9 +177,9 @@ Name _Stg_Object_GetNameFunc( void* object ) {
 	return _Stg_Object_GetNameMacro( self );
 }
 
-Name Stg_Object_AppendSuffix( void* object, Name suffix ) {
+char * Stg_Object_AppendSuffix( void* object, Name suffix ) {
 	Stg_Object* self = (Stg_Object*)object;
-	Name        name;
+	char *name;
 
 	Stg_asprintf( &name, "%s-%s", _Stg_Object_GetNameMacro( self ), suffix );
 

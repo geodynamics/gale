@@ -91,10 +91,10 @@
 	SizeT _CStream_Printf( Stream* stream, const char *fmt, va_list args );
 	
 	/** Write() implementation. */
-	SizeT _CStream_Write( Stream* stream, void *data, SizeT elem_size, SizeT num_elems );
+	SizeT _CStream_Write( Stream* stream, const void *data, SizeT elem_size, SizeT num_elems );
 	
 	/** Dump() implementation. Performs no operation for CStreams. */
-	Bool _CStream_Dump( Stream* stream, void *data );
+	Bool _CStream_Dump( Stream* stream, const void *data );
 	
 	/** SetFile() implementation. */
 	Bool _CStream_SetFile( Stream* stream, JournalFile* file );

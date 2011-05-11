@@ -73,8 +73,8 @@
 	typedef Index (Stg_ObjectList_InsertBeforeFunction) ( void* objects,  Name reference, void* objectPtr );
 	typedef Index (Stg_ObjectList_InsertAfterFunction) ( void* objects,  Name reference, void* objectPtr );
 	typedef Index (Stg_ObjectList_RemoveFunction) ( void* objects,  Name reference, ReplacementOption option );
-	typedef Index (Stg_ObjectList_GetIndexFunction) ( void* objects, const Name toGet );
-	typedef void* (Stg_ObjectList_GetFunction) ( void* objects, const Name toGet );
+	typedef Index (Stg_ObjectList_GetIndexFunction) ( void* objects, Name toGet );
+	typedef void* (Stg_ObjectList_GetFunction) ( void* objects, Name toGet );
 	typedef void  (Stg_ObjectList_AllocMoreMemoryFunction) ( void* objects );
 	typedef void (Stg_ObjectList_InsertAtIndexFunction) ( void* objects, Index index, void* objectPtr );
 	typedef void (Stg_ObjectList_RemoveByIndexFunction) ( void* objects, Index index, ReplacementOption option );
@@ -83,8 +83,8 @@
 	/** Textual name of this class */
 	extern const Type Stg_ObjectList_Type;
 
-	extern const int DEFAULT_LIST_INITIAL_SIZE;
-	extern const int DEFAULT_LIST_DELTA;
+	static const int DEFAULT_LIST_INITIAL_SIZE = 8;
+	static const int DEFAULT_LIST_DELTA = 8;
 
 	/** \def __ObjectList See ObjectList */
 	#define __Stg_ObjectList \
@@ -185,7 +185,7 @@
 	void _Stg_ObjectList_Print( void* objectList, struct Stream* stream );
 	
 	/** Copy implementation */
-	void* _Stg_ObjectList_Copy( void* namedObjectList, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _Stg_ObjectList_Copy( const void* namedObjectList, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	
 	
@@ -290,7 +290,7 @@
 	Index Stg_ObjectList_InsertBefore( void* objectList, Name reference, void* objectPtr );
 	
 	/** Insert class before a specific entry */
-	Index Stg_ObjectList_ClassInsertBefore( void* objectList, Name reference, void* objectPtr, Name name );
+	Index Stg_ObjectList_ClassInsertBefore( void* objectList, Name reference, void* objectPtr, const char* name );
 	
 	/** Insert pointer before a specific entry */
 	Index Stg_ObjectList_PointerInsertBefore( 
@@ -303,7 +303,7 @@
 		Stg_ObjectAdaptor_CopyPointerFunction*		ptrCopy );
 	
 	/** Insert global pointer before a specific entry */
-	Index Stg_ObjectList_GlobalPointerInsertBefore( void* objectList, Name reference, void* objectPtr, Name name );
+	Index Stg_ObjectList_GlobalPointerInsertBefore( void* objectList, Name reference, void* objectPtr, const char* name );
 	
 	/** Insert object at a specific Index */	
 	void Stg_ObjectList_InsertAtIndex( void* objects, Index index, void* objectPtr );
@@ -312,7 +312,7 @@
 	Index Stg_ObjectList_InsertAfter( void* objectList, Name reference, void* objectPtr );
 	
 	/** Insert class after a specific entry */ 
-	Index Stg_ObjectList_ClassInsertAfter( void* objectList, Name reference, void* objectPtr, Name name );
+	Index Stg_ObjectList_ClassInsertAfter( void* objectList, Name reference, void* objectPtr, const char* name );
 	
 	/** Insert pointer after a specific entry */ 
 	Index Stg_ObjectList_PointerInsertAfter( 
@@ -325,16 +325,16 @@
 		Stg_ObjectAdaptor_CopyPointerFunction*		ptrCopy );
 	
 	/** Insert global pointer after a specific entry */ 
-	Index Stg_ObjectList_GlobalPointerInsertAfter( void* objectList, Name reference, void* objectPtr, Name name );
+	Index Stg_ObjectList_GlobalPointerInsertAfter( void* objectList, Name reference, void* objectPtr, const char* name );
 	
 	/** Removes object from list */
 	Index Stg_ObjectList_Remove( void* objectList, Name reference, ReplacementOption option ) ;
 	
 	/** Find an object's index in the list, by name. Returns (unsigned)-1 if not found. */
-	Index Stg_ObjectList_GetIndex( void* objectList, const Name toGet );
+	Index Stg_ObjectList_GetIndex( void* objectList, Name toGet );
 	
 	/** Get an object's ptr from the list, by name. Returns NULL if not found. */
-	void* Stg_ObjectList_Get( void* objectList, const Name toGet );
+	void* Stg_ObjectList_Get( void* objectList, Name toGet );
 	
 	/** Deletes all the objects in the list. */
 	void Stg_ObjectList_DeleteAllObjects( void* objectList );

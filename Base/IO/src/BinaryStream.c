@@ -107,14 +107,14 @@ SizeT _BinaryStream_Printf( Stream* stream, const char *fmt, va_list args )
 	return False;
 }
 	
-SizeT _BinaryStream_Write( Stream* stream, void *data, SizeT elem_size, SizeT num_elems )
+SizeT _BinaryStream_Write( Stream* stream, const void *data, SizeT elem_size, SizeT num_elems )
 {
 	BinaryStream* self = (BinaryStream*)stream;
 	
-	return fwrite( data, elem_size, num_elems, self->_file->fileHandle );
+	return fwrite(data,elem_size,num_elems,(FILE*)(self->_file->fileHandle));
 }
 	
-Bool _BinaryStream_Dump( Stream* stream, void *data )
+Bool _BinaryStream_Dump( Stream* stream, const void *data )
 {
 	/* No specific dumping mechanism, can create in derived classes */
 	return False;
@@ -130,7 +130,7 @@ Bool _BinaryStream_SetFile( Stream* stream, JournalFile* file )
 	return False;
 }
 
-SizeT BinaryStream_WriteAllProcessors( Name filename, void *data, SizeT elem_size, SizeT num_elems, MPI_Comm comm ) {
+void BinaryStream_WriteAllProcessors( Name filename, void *data, SizeT elem_size, SizeT num_elems, MPI_Comm comm ) {
 	Stream*    stream = Journal_Register( BinaryStream_Type, BinaryStream_Type );
 	MPI_Status status;
 	int        rank;

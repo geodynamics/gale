@@ -88,17 +88,17 @@
 	struct MemoryField { __MemoryField };
 
 	/** Creates a new MemoryField with a value from a field. */
-	MemoryField* MemoryField_New( const char* value );
+	MemoryField* MemoryField_New( Name value );
 	
 	/** Initialises a MemoryField. */
-	void _MemoryField_Init( MemoryField* memoryField, const char* value );
+	void _MemoryField_Init( MemoryField* memoryField, Name value );
 	
 	/** Deallocates memory from a MemoryField. */
 	void MemoryField_Delete( MemoryField* memoryField );
 
 
 	/** Registers a sub MemoryField with this instance with the given value. If value exists, the existing field is returned. */
-	MemoryField* MemoryField_Register( MemoryField* memoryField, const char* subValue );
+	MemoryField* MemoryField_Register( MemoryField* memoryField, Name subValue );
 	
 	/** Updates the statisical information of this field. Should only be used for leaf fields. */
    /* Note the "bytes" argument is an int, since it can be negative if a ptr has just been
@@ -120,17 +120,17 @@
 	 **
 	 ** @param columns A Bit flag of The fields to be displayed.
 	 **/
-	void MemoryField_PrintHeader( const char* fieldName, MemoryFieldColumn columns,
+	void MemoryField_PrintHeader( Name fieldName, MemoryFieldColumn columns,
 		unsigned int valueFieldWidth );
 	
 	/** Displays a summary of this field and its children. */
-	void MemoryField_PrintSummary( MemoryField* memoryField, const char* tableTitle, MemoryFieldColumn cols  );
+	void MemoryField_PrintSummary( MemoryField* memoryField, Name tableTitle, MemoryFieldColumn cols  );
 
 	/** Sorts the children of this field lexographically in ascending order. */
 	void MemoryField_Sort( MemoryField* memoryField );
 
 	/** Compares two strings which can potentially NULL, lexographically. NULLs are considered smallest. */
-	int MemoryField_StringCompare( const char* s1, const char* s2 );
+	int MemoryField_StringCompare( Name s1, Name s2 );
 	
 	unsigned int _MemoryField_CalcLongestSubFieldNameLen( MemoryField* memoryField );
 

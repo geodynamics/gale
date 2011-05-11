@@ -135,12 +135,12 @@ void pcu_source_unpack( pcu_source_t* src, void* buf ) {
 
    len = *(int*)tmp;
    tmp += sizeof(int);
-   src->type = pcu_memdup( tmp, len );
+   src->type = (char*)pcu_memdup( tmp, len );
    tmp += len;
 
    len = *(int*)tmp;
    tmp += sizeof(int);
-   src->file = pcu_memdup( tmp, len );
+   src->file = (char*)pcu_memdup( tmp, len );
 
    tmp += len;
    src->line = *(int*)tmp;
@@ -148,13 +148,13 @@ void pcu_source_unpack( pcu_source_t* src, void* buf ) {
 
    len = *(int*)tmp;
    tmp += sizeof(int);
-   src->expr = pcu_memdup( tmp, len );
+   src->expr = (char*)pcu_memdup( tmp, len );
    tmp += len;
 
    len = *(int*)tmp;
    tmp += sizeof(int);
    if( len ) {
-      src->msg = pcu_memdup( tmp, len );
+      src->msg = (char*)pcu_memdup( tmp, len );
       tmp += len;
    }
 

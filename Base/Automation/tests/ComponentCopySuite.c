@@ -61,9 +61,9 @@ Type Stg_ComponentA_Type = "Stg_ComponentA";
 Type Stg_ComponentB_Type = "Stg_ComponentB";
 Type Stg_ComponentC_Type = "Stg_ComponentC";
 
-const char* Stg_ComponentA_Type_GetMetadata() { return  ""; }
-const char* Stg_ComponentB_Type_GetMetadata() { return  ""; }
-const char* Stg_ComponentC_Type_GetMetadata() { return  ""; }
+Name Stg_ComponentA_Type_GetMetadata() { return  ""; }
+Name Stg_ComponentB_Type_GetMetadata() { return  ""; }
+Name Stg_ComponentC_Type_GetMetadata() { return  ""; }
 
 
 #define __Stg_ComponentA \
@@ -73,9 +73,9 @@ const char* Stg_ComponentC_Type_GetMetadata() { return  ""; }
 struct Stg_ComponentA { __Stg_ComponentA };
 
 void* Stg_ComponentA_NewDefault( Name name );
-void Stg_ComponentA_Delete( void* class );
-void Stg_ComponentA_Print( void* class, Stream* s );
-void* Stg_ComponentA_Copy( void* self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+void Stg_ComponentA_Delete( void*  );
+void Stg_ComponentA_Print( void* , Stream* s );
+void* Stg_ComponentA_Copy( const void* self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 void Stg_ComponentA_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );
 void Stg_ComponentA_Build( void* component, void* data );
 void Stg_ComponentA_Initialise( void* component, void* data );
@@ -100,16 +100,16 @@ void* Stg_ComponentA_NewDefault( Name name )
 
 	return _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 }
-void Stg_ComponentA_Delete( void* class ) {
-	Stg_ComponentA* self = (Stg_ComponentA*)class;
+void Stg_ComponentA_Delete( void* clss ) {
+	Stg_ComponentA* self = (Stg_ComponentA*)clss;
 	
 	Stg_Class_Delete( self->c );
 	Stg_Class_Delete( self->b );
 
 	_Stg_Component_Delete( self );
 }
-void Stg_ComponentA_Print( void* class, Stream* s ) {
-	Stg_ComponentA* self = (Stg_ComponentA*)class;
+void Stg_ComponentA_Print( void* clss, Stream* s ) {
+	Stg_ComponentA* self = (Stg_ComponentA*)clss;
 
 	Journal_Printf(
 		s,
@@ -117,15 +117,15 @@ void Stg_ComponentA_Print( void* class, Stream* s ) {
 	Stg_Class_Print( self->b, s );
 	Stg_Class_Print( self->c, s );
 }
-void* Stg_ComponentA_Copy( void* class, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-	Stg_ComponentA* self = (Stg_ComponentA*)class;
+void* Stg_ComponentA_Copy( const void* clss, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+	Stg_ComponentA* self = (Stg_ComponentA*)clss;
 	Stg_ComponentA* newCopy;
 	
-	newCopy = _Stg_Component_Copy( self, dest, deep, nameExt, ptrMap );
+	newCopy = (Stg_ComponentA*)_Stg_Component_Copy( self, dest, deep, nameExt, ptrMap );
 	PtrMap_Append( ptrMap, self, newCopy );
 	
-	newCopy->b = Stg_Class_Copy( self->b, dest, deep, nameExt, ptrMap );
-	newCopy->c = Stg_Class_Copy( self->c, dest, deep, nameExt, ptrMap );
+	newCopy->b = (Stg_ComponentB*)Stg_Class_Copy( self->b, dest, deep, nameExt, ptrMap );
+	newCopy->c = (Stg_ComponentC*)Stg_Class_Copy( self->c, dest, deep, nameExt, ptrMap );
 	
 	return newCopy;
 }
@@ -159,9 +159,9 @@ Dictionary* Stg_ComponentA_Type_MetaAsDictionary() {
 struct Stg_ComponentB { __Stg_ComponentB };
 
 void* Stg_ComponentB_NewDefault( Name name );
-void Stg_ComponentB_Delete( void* class );
-void Stg_ComponentB_Print( void* class, Stream* s );
-void* Stg_ComponentB_Copy( void* self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+void Stg_ComponentB_Delete( void* );
+void Stg_ComponentB_Print( void* , Stream* s );
+void* Stg_ComponentB_Copy( const void* self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 void Stg_ComponentB_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );
 void Stg_ComponentB_Build( void* component, void* data );
 void Stg_ComponentB_Initialise( void* component, void* data );
@@ -186,23 +186,23 @@ void* Stg_ComponentB_NewDefault( Name name )
 
 	return _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 }
-void Stg_ComponentB_Delete( void* class ) {
-	Stg_ComponentB* self = (Stg_ComponentB*)class;
+void Stg_ComponentB_Delete( void* clss ) {
+	Stg_ComponentB* self = (Stg_ComponentB*)clss;
 	
 	_Stg_Component_Delete( self );
 }
-void Stg_ComponentB_Print( void* class, Stream* s ) {
-	Stg_ComponentB* self = (Stg_ComponentB*)class;
+void Stg_ComponentB_Print( void* clss, Stream* s ) {
+	Stg_ComponentB* self = (Stg_ComponentB*)clss;
 
 	Journal_Printf(
 		s,
 		"%s %s %d,\n", self->name, self->type, Memory_CountGet( self ) );
 }
-void* Stg_ComponentB_Copy( void* class, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-	Stg_ComponentB* self = (Stg_ComponentB*)class;
+void* Stg_ComponentB_Copy( const void* clss, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+	Stg_ComponentB* self = (Stg_ComponentB*)clss;
 	Stg_ComponentB* newCopy;
 	
-	newCopy = _Stg_Component_Copy( self, dest, deep, nameExt, ptrMap );
+	newCopy = (Stg_ComponentB*)_Stg_Component_Copy( self, dest, deep, nameExt, ptrMap );
 	PtrMap_Append( ptrMap, self, newCopy );
 	
 	return newCopy;
@@ -229,9 +229,9 @@ Dictionary* Stg_ComponentB_Type_MetaAsDictionary() {
 struct Stg_ComponentC { __Stg_ComponentC };
 
 void* Stg_ComponentC_NewDefault( Name name );
-void Stg_ComponentC_Delete( void* class );
-void Stg_ComponentC_Print( void* class, Stream* s );
-void* Stg_ComponentC_Copy( void* self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+void Stg_ComponentC_Delete( void* clss );
+void Stg_ComponentC_Print( void* clss, Stream* s );
+void* Stg_ComponentC_Copy( const void* self, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 void Stg_ComponentC_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );
 void Stg_ComponentC_Build( void* component, void* data );
 void Stg_ComponentC_Initialise( void* component, void* data );
@@ -256,29 +256,29 @@ void* Stg_ComponentC_NewDefault( Name name )
 
 	return _Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 }
-void Stg_ComponentC_Delete( void* class ) {
-	Stg_ComponentC* self = (Stg_ComponentC*)class;
+void Stg_ComponentC_Delete( void* clss ) {
+	Stg_ComponentC* self = (Stg_ComponentC*)clss;
 	
 	Stg_Class_Delete( self->b );
 
 	_Stg_Component_Delete( self );
 }
-void Stg_ComponentC_Print( void* class, Stream* s ) {
-	Stg_ComponentC* self = (Stg_ComponentC*)class;
+void Stg_ComponentC_Print( void* clss, Stream* s ) {
+	Stg_ComponentC* self = (Stg_ComponentC*)clss;
 
 	Journal_Printf(
 		s,
 		"%s %s %d,\n", self->name, self->type, Memory_CountGet( self ) );
 	Stg_Class_Print( self->b, s );
 }
-void* Stg_ComponentC_Copy( void* class, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-	Stg_ComponentC* self = (Stg_ComponentC*)class;
+void* Stg_ComponentC_Copy( const void* clss, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+	Stg_ComponentC* self = (Stg_ComponentC*)clss;
 	Stg_ComponentC* newCopy;
 	
-	newCopy = _Stg_Component_Copy( self, dest, deep, nameExt, ptrMap );
+	newCopy = (Stg_ComponentC*)_Stg_Component_Copy( self, dest, deep, nameExt, ptrMap );
 	PtrMap_Append( ptrMap, self, newCopy );
 
-	newCopy->b = Stg_Class_Copy( self->b, dest, deep, nameExt, ptrMap );
+	newCopy->b = (Stg_ComponentB*)Stg_Class_Copy( self->b, dest, deep, nameExt, ptrMap );
 
 	return newCopy;
 }
@@ -369,7 +369,7 @@ void ComponentCopySuite_TestCopy( ComponentCopySuiteData* data ) {
       a->c != NULL &&
       a->b == a->c->b  );
 
-   aCopy = Stg_Class_Copy( a, NULL, True, "_dup", NULL );
+   aCopy = (Stg_ComponentA*)Stg_Class_Copy( a, NULL, True, "_dup", NULL );
 
    /* Disown the copy. Why? Because main() doesn't own the original neither.
     * The instance counting then matches up.

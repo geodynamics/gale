@@ -45,7 +45,7 @@
 #include <ctype.h>
 #include <math.h>
 
-const char* StG_BoolToStringMap[2] = { "False", "True" };
+Name StG_BoolToStringMap[2] = { "False", "True" };
 
 
 double StG_RoundDoubleToNSigFigs( double value, unsigned int nSigFigs ) {
@@ -108,7 +108,7 @@ unsigned int StG_IntegerLength( int number ) {
 	
 
 
-char* StG_Strdup( const char* const str ) {
+char* StG_Strdup( Name const str ) {
 	int length;
 	char* result;
 
@@ -122,7 +122,7 @@ char* StG_Strdup( const char* const str ) {
 }
 
 
-int Stg_vasprintf( char** string, const char* format, va_list ap ) {
+int Stg_vasprintf( char** string, Name format, va_list ap ) {
 	int       allocStringSize = 100;
 	int       sizeOfString;
 
@@ -169,7 +169,7 @@ int Stg_vasprintf( char** string, const char* format, va_list ap ) {
 }
 
 
-int Stg_asprintf( char** string, const char* format, ... ) {
+int Stg_asprintf( char** string, Name format, ... ) {
 	int       sizeOfString;
 	va_list   ap;
 	
@@ -180,7 +180,7 @@ int Stg_asprintf( char** string, const char* format, ... ) {
 	return sizeOfString;
 }
 
-Bool Stg_StringIsEmpty( char* string ) {
+Bool Stg_StringIsEmpty( Name string ) {
 	size_t     length;
 	const char whiteSpaceChars[] = " \t\n";
 
@@ -199,7 +199,7 @@ Bool Stg_StringIsEmpty( char* string ) {
 	return False;
 }
 
-Bool Stg_StringIsNumeric( char* string ) {
+Bool Stg_StringIsNumeric( Name string ) {
 	size_t         length;
 	Index          char_I;
 	char           ch;
@@ -258,7 +258,7 @@ Bool Stg_StringIsNumeric( char* string ) {
 /** This function calculates the of the longest matching subsequence between string1 and string2.
  *  A subsequence of a string is when all the characters of the subsequence appear in order within the string,
  *  but possibly with gaps between occurrences of each character. */
-unsigned int Stg_LongestMatchingSubsequenceLength( char* string1, char* string2, Bool caseSensitive ) {
+unsigned int Stg_LongestMatchingSubsequenceLength( Name string1, const char* string2, Bool caseSensitive ) {
 	size_t         stringLength1 = strlen( string1 );
 	size_t         stringLength2 = strlen( string2 );
 	unsigned int** lmsArray;
@@ -280,7 +280,7 @@ unsigned int Stg_LongestMatchingSubsequenceLength( char* string1, char* string2,
 		for ( charString2_I = 1 ; charString2_I <= stringLength2 ; charString2_I++ ) {
 			charString2 = string2[ charString2_I - 1 ];
 
-			areEqual = ( caseSensitive ? charString1 == charString2 :  tolower( charString1 ) == tolower( charString2 ) );
+			areEqual = ( caseSensitive ? charString1 == charString2 :  tolower( charString1 ) == tolower( charString2 ) ) ? True : False;
 
 			/* If the two characters are equal then this character is the last in the longest subsequence of 
 			 * string1[0 ... charString1_I - 1 ] and string2[0 ... charString2_I - 1 ] therefore the length is 

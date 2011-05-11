@@ -210,7 +210,7 @@ void _VariableCondition_Print(void* variableCondition) {
 }
 
 
-void* _VariableCondition_Copy( void* variableCondition, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _VariableCondition_Copy( const void* variableCondition, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	VariableCondition*	self = (VariableCondition*)variableCondition;
 	VariableCondition*	newVariableCondition;
 	PtrMap*			map = ptrMap;
@@ -243,19 +243,19 @@ void* _VariableCondition_Copy( void* variableCondition, void* dest, Bool deep, N
 	if( deep ) {
 		newVariableCondition->_set = (IndexSet*)Stg_Class_Copy( self->_set, NULL, deep, nameExt, map );
 		
-		if( (newVariableCondition->indexTbl = PtrMap_Find( map, self->indexTbl )) == NULL && self->indexTbl ) {
+		if( (newVariableCondition->indexTbl = (Index*)PtrMap_Find( map, self->indexTbl )) == NULL && self->indexTbl ) {
 			newVariableCondition->indexTbl = (Index*)Memory_Alloc_Array( Index, newVariableCondition->indexCount, "VariableCondition->indexTbl" );
 			memcpy( newVariableCondition->indexTbl, self->indexTbl, sizeof(Index) * newVariableCondition->indexCount );
 			PtrMap_Append( map, newVariableCondition->indexTbl, self->indexTbl );
 		}
 		
-		if( (newVariableCondition->vcVarCountTbl = PtrMap_Find( map, self->vcVarCountTbl )) == NULL && self->vcVarCountTbl ) {
+		if( (newVariableCondition->vcVarCountTbl = (VariableCondition_VariableIndex*)PtrMap_Find( map, self->vcVarCountTbl )) == NULL && self->vcVarCountTbl ) {
 			newVariableCondition->vcVarCountTbl = Memory_Alloc_Array( VariableCondition_VariableIndex, newVariableCondition->indexCount, "VC->vcVarCountTbl" );
 			memcpy( newVariableCondition->vcVarCountTbl, self->vcVarCountTbl, sizeof(VariableCondition_VariableIndex) * newVariableCondition->indexCount );
 			PtrMap_Append( map, newVariableCondition->vcVarCountTbl, self->vcVarCountTbl );
 		}
 		
-		if( (newVariableCondition->vcTbl = PtrMap_Find( map, self->vcTbl )) == NULL && self->vcTbl ) {
+		if( (newVariableCondition->vcTbl = (VariableCondition_Tuple**)PtrMap_Find( map, self->vcTbl )) == NULL && self->vcTbl ) {
 			Index	idx_I;
 			
 			newVariableCondition->vcTbl = Memory_Alloc_2DComplex( VariableCondition_Tuple, newVariableCondition->indexCount, newVariableCondition->vcVarCountTbl, "VC->vcTbl" );
@@ -265,7 +265,7 @@ void* _VariableCondition_Copy( void* variableCondition, void* dest, Bool deep, N
 			PtrMap_Append( map, newVariableCondition->vcTbl, self->vcTbl );
 		}
 		
-		if( (newVariableCondition->valueTbl = PtrMap_Find( map, self->valueTbl )) == NULL && self->valueTbl ) {
+		if( (newVariableCondition->valueTbl = (VariableCondition_Value*)PtrMap_Find( map, self->valueTbl )) == NULL && self->valueTbl ) {
 			newVariableCondition->valueTbl = Memory_Alloc_Array( VariableCondition_Value, newVariableCondition->valueCount, "VC->valueTbl" );
 			memcpy( newVariableCondition->valueTbl, self->valueTbl, sizeof(VariableCondition_Value) * newVariableCondition->indexCount );
 			PtrMap_Append( map, newVariableCondition->valueTbl, self->valueTbl );

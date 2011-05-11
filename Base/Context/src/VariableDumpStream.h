@@ -90,7 +90,7 @@
 	void _VariableDumpStream_Print( void* vStream, Stream* stream );
 
 	/** Dumps the variable. */ 
-	Bool _VariableDumpStream_Dump( Stream* stream, void* loop );
+	Bool _VariableDumpStream_Dump( Stream* stream, const void* loop );
 	
 	/** Copy interface. */
 	#define VariableDumpStream_Copy( self ) \
@@ -98,10 +98,10 @@
 	#define VariableDumpStream_DeepCopy( self ) \
 		(VariableDumpStream*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _VariableDumpStream_Copy( void* variableDumpStream, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _VariableDumpStream_Copy( const void* variableDumpStream, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 
 	/** Sets the information that this stream dumps. */
-	void VariableDumpStream_SetVariable( void* stream, Variable* data, int numItems, unsigned int dumpEvery, const Name const fileName );
+	void VariableDumpStream_SetVariable( void* stream, Variable* data, int numItems, unsigned int dumpEvery, Name fileName );
 	
 	
 #endif /* __Context_VariableDumpStreamFile_h__ */

@@ -106,7 +106,7 @@ void PtrSetSuite_TestUnion( PtrSetSuiteData* data ) {
       Set_Insert( data->setB, &data->dataArray[ptr_I] );
    }
 
-   setC = Set_Union( data->setA, data->setB );
+   setC = (Set*)Set_Union( data->setA, data->setB );
    Set_Traverse( setC, markArray, data );
    
    for( ptr_I = 0; ptr_I < NUM_ITEMS*1/4; ptr_I++ ) {
@@ -132,7 +132,7 @@ void PtrSetSuite_TestIntersection( PtrSetSuiteData* data ) {
       Set_Insert( data->setB, &data->dataArray[ptr_I] );
    }
 
-   setC = Set_Intersection( data->setA, data->setB );
+   setC = (Set*)Set_Intersection( data->setA, data->setB );
    Set_Traverse( setC, markArray, data );
    
    for( ptr_I = 0; ptr_I < NUM_ITEMS*3/8; ptr_I++ ) {
@@ -158,7 +158,7 @@ void PtrSetSuite_TestSubtraction( PtrSetSuiteData* data ) {
       Set_Insert( data->setB, &data->dataArray[ptr_I] );
    }
 
-   setC = Set_Subtraction( data->setA, data->setB );
+   setC = (Set*)Set_Subtraction( data->setA, data->setB );
    Set_Traverse( setC, markArray, data );
    
    for( ptr_I = 0; ptr_I < NUM_ITEMS*1/4; ptr_I++ ) {

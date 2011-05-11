@@ -43,7 +43,7 @@
 	#include <stdarg.h>
 
 	/** Global map from a Boolean's enum value to a string: for printing purposes */
-	extern const char* StG_BoolToStringMap[2];
+	extern Name StG_BoolToStringMap[2];
 	
 	/** Rounds a double to the specified number of significant figures */
 	double StG_RoundDoubleToNSigFigs( double value, unsigned int nSigFigs );
@@ -55,22 +55,22 @@
 	unsigned int StG_IntegerLength( int number );
 
 	/** StGermain's version of strdup() which uses Memory Module */
-	char* StG_Strdup( const char* const str );
+	char* StG_Strdup( Name const str );
 
 	/** StGermain's version of asprintf which allocates enough space for a string before printing to it */
-	int Stg_asprintf( char** string, const char* format, ... ) ;
-	int Stg_vasprintf( char** string, const char* format, va_list ap ) ;
+	int Stg_asprintf( char** string, Name format, ... ) ;
+	int Stg_vasprintf( char** string, Name format, va_list ap ) ;
 
 	/** Check to see whether string is empty or only has white space */
-	Bool Stg_StringIsEmpty( char* string ) ;
+	Bool Stg_StringIsEmpty( Name string ) ;
 
 	/** Check to see whether string is can be considered to be a number - 
 	 * allows digits, plus and minus signs, and scientific notation */
-	Bool Stg_StringIsNumeric( char* string ) ;
+	Bool Stg_StringIsNumeric( Name string ) ;
 
 	/** This function calculates the of the longest matching subsequence between string1 and string2.
 	 *  A subsequence of a string is when all the characters of the subsequence appear in order within the string,
 	 *  but possibly with gaps between occurrences of each character. */
-	unsigned int Stg_LongestMatchingSubsequenceLength( char* string1, char* string2, Bool caseSensitive ) ;
+	unsigned int Stg_LongestMatchingSubsequenceLength( Name string1, const char* string2, Bool caseSensitive ) ;
 
 #endif /* __StGermain_Base_Foundation_CommonRoutines_h__ */

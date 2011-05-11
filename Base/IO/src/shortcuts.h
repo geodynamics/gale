@@ -104,19 +104,19 @@
 	
 	Bool	Dictionary_GetBool_WithDefault( Dictionary* dictionary, Dictionary_Entry_Key key, const Bool defaultVal );
 
-	char*	Dictionary_GetString_WithDefault( Dictionary* dictionary, Dictionary_Entry_Key key, const char* const defaultVal );
+	char*	Dictionary_GetString_WithDefault( Dictionary* dictionary, Dictionary_Entry_Key key, Name const defaultVal );
 
 	/** Wrapper to Dictionary_GetString_WithDefault which creates a string using sprintf */
-	char* Dictionary_GetString_WithPrintfDefault( Dictionary* dictionary, Dictionary_Entry_Key key, char* format, ... ) ;
+	char* Dictionary_GetString_WithPrintfDefault( Dictionary* dictionary, Dictionary_Entry_Key key, Name format, ... ) ;
 
 
 	/** Redirects file and puts 'prependedPath' in front of the filename 
 	 * e.g. Stream_RedirectFile_WithPrependedPath( stream, "./output", "file.dat" ) redirects to './output/file.dat' */
-	Bool Stream_RedirectFile_WithPrependedPath( Stream* stream, char* prependedPath, char* filename ) ;
-	Bool Stream_AppendFile_WithPrependedPath( Stream* stream, char* prependedPath, char* filename ) ;
+	Bool Stream_RedirectFile_WithPrependedPath( Stream* stream, Name prependedPath, const char* filename ) ;
+	Bool Stream_AppendFile_WithPrependedPath( Stream* stream, Name prependedPath, const char* filename ) ;
 
 	/** Prints a string with a certain maximum length - it truncates it in the middle with an ellipsis if it is too long */
-	void Journal_PrintString_WithLength( Stream* stream, char* string, int length ) ;
+	void Journal_PrintString_WithLength( Stream* stream, Name string, int length ) ;
 		
 	/* shortcuts for printing names and values */
 	#define Journal_PrintValue( stream, value ) 	\

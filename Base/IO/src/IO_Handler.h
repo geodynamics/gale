@@ -44,12 +44,12 @@
 	/* Function pointer interface for inherited classes to use */
 	typedef void (IO_Handler_DeleteFunction) (void* io_handler);
 	typedef void (IO_Handler_PrintFunction) (void* io_handler);
-	typedef Bool (IO_Handler_ReadAllFromFileFunction) (void* io_handler, const char* filename, Dictionary* dictionary );
-	typedef Bool (IO_Handler_ReadAllFromFileForceSourceFunction) (void* io_handler, const char* filename, Dictionary* dictionary );
-	typedef Bool (IO_Handler_ReadAllFromBufferFunction) (void* io_handler, const char* buffer, Dictionary* dictionary );
-	typedef Bool (IO_Handler_WriteAllToFileFunction) (void* io_handler, const char* filename, Dictionary* dictionary );
+	typedef Bool (IO_Handler_ReadAllFromFileFunction) (void* io_handler, Name filename, Dictionary* dictionary );
+	typedef Bool (IO_Handler_ReadAllFromFileForceSourceFunction) (void* io_handler, Name filename, Dictionary* dictionary );
+	typedef Bool (IO_Handler_ReadAllFromBufferFunction) (void* io_handler, Name buffer, Dictionary* dictionary );
+	typedef Bool (IO_Handler_WriteAllToFileFunction) (void* io_handler, Name filename, Dictionary* dictionary );
 	typedef Bool (IO_Handler_DictSetAddValueFunction)
-		( void* io_handler, const char* filename, Dictionary* dictionary, Dictionary_MergeType mergeType );
+		( void* io_handler, Name filename, Dictionary* dictionary, Dictionary_MergeType mergeType );
 	
 	/** Textual name for IO_Handler class */
 	extern const Type IO_Handler_Type;
@@ -113,17 +113,17 @@
 	extern void _IO_Handler_Print( void* io_handler, Stream* stream );
 	
 	/** Read a dictionary entry of a given name from file */
-	extern Bool IO_Handler_ReadAllFromFile( void* io_handler, const char* filename, Dictionary* dictionary );
+	extern Bool IO_Handler_ReadAllFromFile( void* io_handler, Name filename, Dictionary* dictionary );
 	
 	/** Read a dictionary entry of a given name from file, force it to include source file where applicable. */
-	extern Bool IO_Handler_ReadAllFromFileForceSource( void* io_handler, const char* filename, Dictionary* dictionary );
+	extern Bool IO_Handler_ReadAllFromFileForceSource( void* io_handler, Name filename, Dictionary* dictionary );
 	
 	/** Read a dictionary entry of a given name from buffer */
-	extern Bool IO_Handler_ReadAllFromBuffer( void* io_handler, const char* buffer, Dictionary* dictionary );
+	extern Bool IO_Handler_ReadAllFromBuffer( void* io_handler, Name buffer, Dictionary* dictionary );
 	
 	/** Write a given dictionary entry to file */
 	/* TODO: option to overwrite / update */
-	extern Bool IO_Handler_WriteAllToFile( void* io_handler, const char* filename, Dictionary* dictionary );
+	extern Bool IO_Handler_WriteAllToFile( void* io_handler, Name filename, Dictionary* dictionary );
 	
 	/** Set/add entry to dictionary given parent */
 	extern Dictionary_Entry_Value* IO_Handler_DictSetAddValue( 

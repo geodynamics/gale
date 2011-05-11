@@ -122,7 +122,7 @@
 	#define CompositeVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
-	void* _CompositeVC_Copy( void* compositeVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _CompositeVC_Copy( const void* compositeVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Macros

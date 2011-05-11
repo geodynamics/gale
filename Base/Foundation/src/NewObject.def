@@ -11,7 +11,7 @@ VOIDOVERRIDE( Init, void, (void* self), (self) )
 VOIDOVERRIDE( Destruct, void, (void* self), (self) )
 VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
 
-METHOD( SetName, void, (void* self, const char* name), (self, name) )
-METHOD( GetName, const char*, (void* self), (self) )
+METHOD( SetName, void, (void* self, Name name), (self, name) )
+METHOD( GetName, Name, (void* self), (self) )
 
 MEMBER( char*, name )

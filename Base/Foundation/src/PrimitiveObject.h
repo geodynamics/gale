@@ -123,7 +123,7 @@
 	void _Stg_PrimitiveObject_Print( void* objectAdaptor, struct Stream* stream );
 	
 	/* Stg_Class_Copy() implementation */
-	void* _Stg_PrimitiveObject_Copy( void* objectAdaptor, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _Stg_PrimitiveObject_Copy( const void* objectAdaptor, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 		
 	
 #endif /* __StGermain_Base_Foundation_PrimitiveObject_h__ */

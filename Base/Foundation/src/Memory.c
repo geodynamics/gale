@@ -110,7 +110,7 @@ void Memory_Relocate_3DArrayData(
 	_Memory_OutOfMemoryErrorFunc( __func__, __LINE__, size )
 
 /** Display an out of memory error after an alloc call */
-void _Memory_OutOfMemoryErrorFunc( const char* func, int line, SizeT size );
+void _Memory_OutOfMemoryErrorFunc( Name func, int line, SizeT size );
 
 
 int compareFunction_NodeData_To_NodeData (void *nodeData1, void *nodeData2){
@@ -224,9 +224,9 @@ void Memory_Delete()
 void* _Memory_Alloc_Func(
 	SizeT size,
 	Type type,
-	const char* const name,
-	const char* fileName,
-	const char* funcName,
+	Name const name,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	Pointer result;
@@ -249,8 +249,8 @@ void* _Memory_Alloc_Array_Func(
 	Index arrayLength,
 	Type type,
 	Name name,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	Pointer result;
@@ -276,8 +276,8 @@ void* _Memory_Alloc_2DArray_Func(
 	Index yLength,
 	Type type,
 	Name name,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	Pointer result;
@@ -314,8 +314,8 @@ void* _Memory_Alloc_3DArray_Func(
 	Index zLength,
 	Type type,
 	Name name,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	Pointer result;
@@ -353,8 +353,8 @@ void* _Memory_Alloc_4DArray_Func(
 	Index wLength,
 	Type type,
 	Name name,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	Pointer		result;
@@ -438,8 +438,8 @@ void* _Memory_Alloc_2DArrayAs1D_Func(
 	Index yLength,
 	Type type,
 	Name name,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	Pointer result;
@@ -467,8 +467,8 @@ void* _Memory_Alloc_3DArrayAs1D_Func(
 	Index zLength,
 	Type type,
 	Name name,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	Pointer result;
@@ -499,8 +499,8 @@ void* _Memory_Alloc_4DArrayAs1D_Func(
 	Index wLength,
 	Type type,
 	Name name,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	Pointer result;
@@ -539,8 +539,8 @@ void* _Memory_Alloc_2DComplex_Func(
 	Index* yLengths,
 	Type type,
 	Name name,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	Pointer		result;
@@ -599,8 +599,8 @@ void* _Memory_Alloc_2DComplex_Func(
 Index** _Memory_Alloc_3DSetup_Func(
 	Index xLength,
 	Index* yLengths,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	Index** result;
@@ -630,8 +630,8 @@ void* _Memory_Alloc_3DComplex_Func(
 	Index** zLengths,
 	Type type,
 	Name name,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	Pointer		result;
@@ -729,8 +729,8 @@ void* _Memory_Realloc_Func(
 	void* ptr, 
 	SizeT newSize,
 	Type type,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	MemoryPointer* memoryPointer;
@@ -796,8 +796,8 @@ void* _Memory_Realloc_Array_Func(
 	SizeT itemSize, 
 	Index newLength,
 	Type type,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	MemoryPointer* memoryPointer;
@@ -881,8 +881,8 @@ void* _Memory_Realloc_2DArray_Func(
 	Index newX, 
 	Index newY,
 	Type type,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	#ifdef MEMORY_STATS
@@ -968,8 +968,8 @@ void* _Memory_Realloc_3DArray_Func(
 	Index newY, 
 	Index newZ,
 	Type type,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	#ifdef MEMORY_STATS
@@ -1059,8 +1059,8 @@ void* _Memory_Realloc_2DArrayAs1D_Func(
 	Index newX, 
 	Index newY,
 	Type type,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	#ifdef MEMORY_STATS
@@ -1136,8 +1136,8 @@ void* _Memory_Realloc_3DArrayAs1D_Func(
 	Index newY, 
 	Index newZ,
 	Type type,
-	const char* fileName,
-	const char* funcName,
+	Name fileName,
+	Name funcName,
 	int lineNumber )
 {
 	#ifdef MEMORY_STATS
@@ -1848,7 +1848,7 @@ void _Memory_InternalFree( void* ptr ) {
 }
 
 
-void _Memory_OutOfMemoryErrorFunc( const char* func, int line, SizeT size ) {
+void _Memory_OutOfMemoryErrorFunc( Name func, int line, SizeT size ) {
 	Journal_Firewall(
 		0,
 		Journal_Register( Error_Type, "Memory" ),

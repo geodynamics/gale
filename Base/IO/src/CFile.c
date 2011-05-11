@@ -73,7 +73,7 @@ JournalFile* CFileBinary_New()
 }
 
 
-JournalFile* CFile_New2( char* fileName )
+JournalFile* CFile_New2( Name fileName )
 {
 	JournalFile* result = CFile_New();
 
@@ -131,7 +131,7 @@ void _CFile_Print( void* cfile, Stream* stream )
 }
 
 	
-Bool _CFile_Open( void* file, const char* const fileName )
+Bool _CFile_Open( void* file, Name const fileName )
 {
 	CFile* self = (CFile*) file;
 	FILE* filePtr;
@@ -151,7 +151,7 @@ Bool _CFile_Open( void* file, const char* const fileName )
 	return True;	
 }
 	
-Bool _CFile_Append( void* file, const char* const fileName )
+Bool _CFile_Append( void* file, Name const fileName )
 {
 	CFile* self = (CFile*) file;
 	FILE* filePtr;
@@ -175,7 +175,7 @@ Bool _CFile_Close( void* file )
 	CFile* self = (CFile*) file;
 	if ( self->fileHandle != NULL )
 	{
-		return fclose(  (FILE*) self->fileHandle ) == 0;
+          return fclose(  (FILE*) self->fileHandle ) == 0 ? True : False;
 	}
 	return False;
 }
@@ -185,7 +185,7 @@ Bool _CFile_Flush( void* file )
 	CFile* self = (CFile*) file;
 	if ( self->fileHandle != NULL )
 	{
-		return fflush( (FILE*) self->fileHandle ) == 0;	
+          return fflush( (FILE*) self->fileHandle ) == 0 ? True : False;
 	}
 	return False;
 }

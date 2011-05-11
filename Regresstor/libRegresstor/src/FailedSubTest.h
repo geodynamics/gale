@@ -11,7 +11,7 @@ struct FailedSubTest {
 	__FailedSubTest
 };
 
-FailedSubTest* FailedSubTest_New( char* subTestName );
+FailedSubTest* FailedSubTest_New( Name subTestName );
 
 void FailedSubTest_Delete( FailedSubTest* self );
 

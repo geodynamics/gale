@@ -77,7 +77,8 @@ Stg_ComponentFactory* stgMainConstruct( Dictionary* dictionary, MPI_Comm communi
 		context->CF = cf;
 		context->dictionary = dictionary;
 		context->communicator = communicator;
-		LiveComponentRegister_Add( cf->LCRegister, (void*)context );
+		LiveComponentRegister_Add( cf->LCRegister,
+                                           (Stg_Component*)context );
 	}
 
 	/* Instantion phase -------------------------------------------------------------------------------------------------*/

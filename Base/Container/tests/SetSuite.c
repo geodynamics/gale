@@ -132,7 +132,7 @@ void SetSuite_TestUnion( SetSuiteData* data ) {
       Set_Insert( data->setB, &int_I );
    }
 
-   setC = Set_Union( data->setA, data->setB );
+   setC = (Set*)Set_Union( data->setA, data->setB );
    Set_Traverse( setC, markArray, data );
    
    for( int_I = 0; int_I < NUM_ITEMS*1/4; int_I++ ) {
@@ -158,7 +158,7 @@ void SetSuite_TestIntersection( SetSuiteData* data ) {
       Set_Insert( data->setB, &int_I );
    }
 
-   setC = Set_Intersection( data->setA, data->setB );
+   setC = (Set*)Set_Intersection( data->setA, data->setB );
    Set_Traverse( setC, markArray, data );
    
    for( int_I = 0; int_I < NUM_ITEMS*3/8; int_I++ ) {
@@ -184,7 +184,7 @@ void SetSuite_TestSubtraction( SetSuiteData* data ) {
       Set_Insert( data->setB, &int_I );
    }
 
-   setC = Set_Subtraction( data->setA, data->setB );
+   setC = (Set*)Set_Subtraction( data->setA, data->setB );
    Set_Traverse( setC, markArray, data );
    
    for( int_I = 0; int_I < NUM_ITEMS*1/4; int_I++ ) {
