@@ -46,214 +46,217 @@
 #include <StgFEM/StgFEM.h>
 #include <assert.h>
 #include "StandardConditionFunctions.h"
+#include "muParser.h"
 
 const Type StgFEM_StandardConditionFunctions_Type = "StgFEM_StandardConditionFunctions";
 
 void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
-	Codelet*		self		= (Codelet*)component;
-	AbstractContext*        context;
-	ConditionFunction*      condFunc;
-	Dictionary*		pluginDict	= Codelet_GetPluginDictionary( component, cf->rootDict );
+  Codelet*		self		= (Codelet*)component;
+  AbstractContext*        context;
+  ConditionFunction*      condFunc;
+  Dictionary*		pluginDict	= Codelet_GetPluginDictionary( component, cf->rootDict );
 
-	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, (Dictionary_Entry_Key)"Context"  ), AbstractContext, True, data );
-	self->context = context;
+  context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, Dictionary_GetString( pluginDict, (Dictionary_Entry_Key)"Context"  ), AbstractContext, True, data );
+  self->context = context;
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SolidBodyRotation, (Name)"Velocity_SolidBodyRotation"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SolidBodyRotation, "Velocity_SolidBodyRotation"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_PartialRotationX, (Name)"Velocity_PartialRotationX"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_PartialRotationX, "Velocity_PartialRotationX"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 		
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_PartialRotationY, (Name)"Velocity_PartialRotationY"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_PartialRotationY, "Velocity_PartialRotationY"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TaperedRotationX, (Name)"TaperedRotationX" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TaperedRotationX, "TaperedRotationX" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 		
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TaperedRotationY, (Name)"TaperedRotationY" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TaperedRotationY, "TaperedRotationY" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShear, (Name)"Velocity_SimpleShear" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShearInverted, (Name)"Velocity_SimpleShearInverted" );
-        ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ShearZ, (Name)"ShearZ" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Extension, (Name)"Velocity_Extension" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShear, "Velocity_SimpleShear" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SimpleShearInverted, "Velocity_SimpleShearInverted" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ShearZ, "ShearZ" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Extension, "Velocity_Extension" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_PartialLid_TopLayer, (Name)"Velocity_PartialLid_TopLayer"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_PartialLid_TopLayer, "Velocity_PartialLid_TopLayer"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Trigonometry, (Name)"Temperature_Trigonometry"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearInterpolationLid, (Name)"Velocity_LinearInterpolationLid"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Trigonometry, "Temperature_Trigonometry"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearInterpolationLid, "Velocity_LinearInterpolationLid"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Lid_RampWithCentralMax, (Name)"Velocity_Lid_RampWithCentralMax"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Lid_RampWithCentralMax, "Velocity_Lid_RampWithCentralMax"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearVelocityLeftWall, (Name)"LinearVelocityLeftWall"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearVelocityLeftWall, "LinearVelocityLeftWall"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearVelocityRightWall, (Name)"LinearVelocityRightWall"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearVelocityRightWall, "LinearVelocityRightWall"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SinusoidalLid, (Name)"Velocity_SinusoidalLid"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SinusoidalLid, "Velocity_SinusoidalLid"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_CornerOnly, (Name)"Velocity_Lid_CornerOnly"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TemperatureCosineHill, (Name)"Temperature_CosineHill"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_CornerOnly, "Velocity_Lid_CornerOnly"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TemperatureCosineHill, "Temperature_CosineHill"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConvectionBenchmark, (Name)"Temperature_ConvectionBenchmark"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConvectionBenchmark, "Temperature_ConvectionBenchmark"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation, (Name)"LinearWithSinusoidalPerturbation"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_EdgeDriveConvectionIC, (Name)"EdgeDriveConvectionIC"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation, "LinearWithSinusoidalPerturbation"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_EdgeDriveConvectionIC, "EdgeDriveConvectionIC"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ThermalEdgeDriveConvectionIC, (Name)"ThermalEdgeDriveConvectionIC"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ThermalEdgeDriveConvectionIC, "ThermalEdgeDriveConvectionIC"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_AnalyticalTemperatureIC, (Name)"AnalyticalTemperatureIC"  );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( Stg_FEM_VelicTemperatureIC, (Name)"VelicTemperatureIC" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New( Stg_FEM_VelicTemperatureIC_SolB, (Name)"VelicTemperatureIC_SolB" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_AnalyticalTemperatureIC, "AnalyticalTemperatureIC"  );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( Stg_FEM_VelicTemperatureIC, "VelicTemperatureIC" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( Stg_FEM_VelicTemperatureIC_SolB, "VelicTemperatureIC_SolB" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SinusoidalExtension, (Name)"SinusoidalExtension" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SinusoidalExtension, "SinusoidalExtension" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_StepFunction, (Name)"StepFunction" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_StepFunction, "StepFunction" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct1, (Name)"StepFunctionProduct1");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct1, "StepFunctionProduct1");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct2, (Name)"StepFunctionProduct2");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct2, "StepFunctionProduct2");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct3, (Name)"StepFunctionProduct3");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct3, "StepFunctionProduct3");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct4, (Name)"StepFunctionProduct4");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_StepFunctionProduct4, "StepFunctionProduct4");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TemperatureProfile, (Name)"TemperatureProfile");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TemperatureProfile, "TemperatureProfile");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_Gaussian, (Name)"Gaussian");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StG_FEM_StandardConditionFunctions_Gaussian, "Gaussian");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_ERF,
-                                         (char*)"ERF");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_ERF,
+                                   (char*)"ERF");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_ERFC,
-                                         (char*)"ERFC");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_ERFC,
+                                   (char*)"ERFC");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_RubberSheet,
-                                         (char*)"RubberSheet");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_RubberSheet,
+                                   (char*)"RubberSheet");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_MovingStepFunction, (Name)"MovingStepFunction");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_MovingStepFunction, "MovingStepFunction");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpecRidge3D, (Name)"SpecRidge3D" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpecRidge3D, "SpecRidge3D" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCX, (Name)"SpectralBCX" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCX, "SpectralBCX" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCY, (Name)"SpectralBCY" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCY, "SpectralBCY" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCZ, (Name)"SpectralBCZ" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCZ, "SpectralBCZ" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralPressureBCX, (Name)"SpectralPressureBCX" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralPressureBCX, "SpectralPressureBCX" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralPressureBCY, (Name)"SpectralPressureBCY" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralPressureBCY, "SpectralPressureBCY" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ErrorFunc, (Name)"ErrorFunc" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ErrorFunc, "ErrorFunc" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantVector, (Name)"ConstantVector" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantVector, "ConstantVector" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GaussianDistribution, (Name)"GaussianDistribution" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GaussianDistribution, "GaussianDistribution" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_1DGaussianDistribution, (Name)"1DGaussianDistribution" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_1DGaussianDistribution, "1DGaussianDistribution" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_HalfContainer, (Name)"HalfContainer" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_HalfContainer, "HalfContainer" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantValue, (Name)"ConstantValue" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ConstantValue, "ConstantValue" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_DiagonalLine, (Name)"DiagonalLine" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_DiagonalLine, "DiagonalLine" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_DeltaFunction, (Name)"DeltaFunction" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_DeltaFunction, "DeltaFunction" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_InflowBottom, (Name)"InflowBottom" );
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_InflowBottom, "InflowBottom" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GaussianTube, (Name)"GaussianTube" );
-        ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GaussianTube, "GaussianTube" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-        condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GravitationalPotential, (Name)"GravitationalPotential" );
-        ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_GravitationalPotential, "GravitationalPotential" );
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_WarsTemperature,
-                                         (char*)"WarsTemperature");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_WarsTemperature,
+                                   "WarsTemperature");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_Quadratic,
-                                         (char*)"Quadratic");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_Quadratic,
+                                   "Quadratic");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File1,
-                                         (char*)"File1");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File2,
-                                         (char*)"File2");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File3,
-                                         (char*)"File3");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File4,
-                                         (char*)"File4");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File5,
-                                         (char*)"File5");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File6,
-                                         (char*)"File6");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File7,
-                                         (char*)"File7");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File8,
-                                         (char*)"File8");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File9,
-                                         (char*)"File9");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File10,
-                                         (char*)"File10");
-	ConditionFunction_Register_Add( condFunc_Register, condFunc );
-
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File1,
+                                   "File1");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File2,
+                                   "File2");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File3,
+                                   "File3");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File4,
+                                   "File4");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File5,
+                                   "File5");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File6,
+                                   "File6");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File7,
+                                   "File7");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File8,
+                                   "File8");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File9,
+                                   "File9");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File10,
+                                   "File10");
+  ConditionFunction_Register_Add(condFunc_Register,condFunc);
+  condFunc=ConditionFunction_New(StgFEM_StandardConditionFunctions_Equation,
+                                 "Equation");
+  ConditionFunction_Register_Add(condFunc_Register,condFunc);
 }
 
 void _StgFEM_StandardConditionFunctions_Destroy( void* _self, void* data ) {
@@ -2656,4 +2659,36 @@ int Binary_Search(double *data, int s, int e, const double value)
       midpoint=(end-start)/2 + start;
     }
   return start;
+}
+
+void StgFEM_StandardConditionFunctions_Equation( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+{
+  FiniteElementContext *context=(FiniteElementContext*)_context;
+  FeVariable *feVariable=(FeVariable*)FieldVariable_Register_GetByName
+    (context->fieldVariable_Register, "VelocityField");
+  FeMesh *mesh(feVariable->feMesh);
+  Dictionary *dictionary=context->dictionary;
+  double *coord=Mesh_GetVertex(mesh,node_lI);
+  char *equation_string=Dictionary_GetString(dictionary,"Equation");
+  double *result=(double*)_result;
+
+  try
+    {
+      mu::Parser p;
+      p.DefineVar("x", coord); 
+      p.DefineVar("y", coord+1); 
+      p.DefineVar("z", coord+2); 
+      p.DefineVar("t", &(context->currentTime));
+      p.SetExpr(equation_string);
+
+      *result=p.Eval();
+    }
+  catch (mu::Parser::exception_type &e)
+    {
+      Journal_Firewall(false,
+                       Journal_Register( Error_Type,"StgFEM_StandardConditionFunctions_Equation"),
+                       "%s\n",e.GetMsg().c_str());
+    }
+
+
 }

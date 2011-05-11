@@ -132,6 +132,7 @@ void StgFEM_StandardConditionFunctions_File7( Node_LocalIndex node_lI, Variable_
 void StgFEM_StandardConditionFunctions_File8( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
 void StgFEM_StandardConditionFunctions_File9( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
 void StgFEM_StandardConditionFunctions_File10( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
+void StgFEM_StandardConditionFunctions_Equation( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result );
 
 
 #endif	
