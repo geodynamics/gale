@@ -86,7 +86,7 @@
 
 	void _FeSwarmVariable_Print( void* _swarmVariable, Stream* stream );
 
-	void* _FeSwarmVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _FeSwarmVariable_Copy( const void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Implementations */
 	void* _FeSwarmVariable_DefaultNew( Name name );

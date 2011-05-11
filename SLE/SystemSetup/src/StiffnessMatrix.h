@@ -91,7 +91,7 @@
 		EntryPoint_Register*                              entryPoint_Register;            \
 		Stg_ObjectList*                                   stiffnessMatrixTermList;        \
 		FeEntryPoint*                                     assembleStiffnessMatrix;        \
-		Name                                              _assembleStiffnessMatrixEPName; \
+		char*                                              _assembleStiffnessMatrixEPName; \
 		MPI_Comm                                          comm;                           \
 		Index                                             rowLocalSize;                   \
 		Index                                             colLocalSize;                   \
@@ -193,7 +193,7 @@
 	#define StiffnessMatrix_DeepCopy( self ) \
 		(StiffnessMatrix*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _StiffnessMatrix_Copy( void* stiffnessMatrix, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _StiffnessMatrix_Copy( const void* stiffnessMatrix, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* Build */
 	void _StiffnessMatrix_Build( void* stiffnessMatrix, void* data );

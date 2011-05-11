@@ -86,9 +86,9 @@ FeEquationNumber* buildEqNum() {
    arrayPtrs[0] = Memory_Alloc_Array_Unnamed( double, arraySize );
    arrayPtrs[1] = Memory_Alloc_Array_Unnamed( double, arraySize );
    vars[0] = Variable_New( "one", NULL, 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
-		&dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs, varReg );
+                           (Name*)(&dataNames), &structSize, (unsigned*)&arraySize, NULL, arrayPtrs, varReg );
    vars[1] = Variable_New( "two", NULL, 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
-		&dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs + 1, varReg );
+                           (Name*)(&dataNames), &structSize, (unsigned*)&arraySize, NULL, arrayPtrs + 1, varReg );
 
    dofs = DofLayout_New( "", NULL, varReg, 0, feMesh );
    dofs->nBaseVariables = 2;
@@ -154,9 +154,9 @@ FeEquationNumber* buildEqNumBCs() {
    arrayPtrs[0] = Memory_Alloc_Array_Unnamed( double, arraySize );
    arrayPtrs[1] = Memory_Alloc_Array_Unnamed( double, arraySize );
    vars[0] = Variable_New( "one", NULL, 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
-		&dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs, varReg );
+                           (Name*)(&dataNames), &structSize, (unsigned*)&arraySize, NULL, arrayPtrs, varReg );
 	vars[1] = Variable_New( "two", NULL, 1, &dataOffs, &dataType, (unsigned*)&nDataTypes, 
-		&dataNames, &structSize, (unsigned*)&arraySize, NULL, arrayPtrs + 1, varReg );
+                                (Name*)(&dataNames), &structSize, (unsigned*)&arraySize, NULL, arrayPtrs + 1, varReg );
 
    dofs = DofLayout_New( "", NULL, varReg, 0, feMesh );
    dofs->nBaseVariables = 2;
@@ -217,7 +217,7 @@ void FeEquationNumberSuite_TestLocal( FeEquationNumberSuiteData* data ) {
       if( dof_i < nDofs )
 	 break;
    }
-   pcu_check_true( n_i == Mesh_GetLocalSize( feMesh, 0 ) );
+   pcu_check_true( n_i == Mesh_GetLocalSize( feMesh, (MeshTopology_Dim)0 ) );
 
    FreeObject( eqNum );
 }
@@ -263,7 +263,7 @@ void FeEquationNumberSuite_TestShadow( FeEquationNumberSuiteData* data ) {
       else
 	 curEqNum += 2;
    }
-   pcu_check_true( n_i == Mesh_GetDomainSize( feMesh, 0 ) );
+   pcu_check_true( n_i == Mesh_GetDomainSize( feMesh, (MeshTopology_Dim)0 ) );
 
    FreeObject( eqNum );
 }

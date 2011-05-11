@@ -82,7 +82,7 @@ void* _TrilinearElementType_DefaultNew( Name name ) {
 }
 
 TrilinearElementType* TrilinearElementType_New( Name name ) {
-	TrilinearElementType* self = _TrilinearElementType_DefaultNew( name );
+  TrilinearElementType* self = (TrilinearElementType*)_TrilinearElementType_DefaultNew( name );
 
 	self->isConstructed = True;
 	_ElementType_Init( (ElementType*)self, _TrilinearElementType_NodeCount );

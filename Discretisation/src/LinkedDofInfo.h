@@ -125,7 +125,7 @@
 	#define LinkedDofInfo_DeepCopy( self ) \
 		(LinkedDofInfo*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _LinkedDofInfo_Copy( void* linkedDofInfo, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _LinkedDofInfo_Copy( const void* linkedDofInfo, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _LinkedDofInfo_Build( void* linkedDofInfo, void* data );
 

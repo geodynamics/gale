@@ -51,6 +51,7 @@
 
 /** Initialises the Linear Algebra package, then any init for this package
 such as streams etc */
+Bool StgFEM_StandardConditionFunctions_Init( int * argc, char ** argv[] );
 Bool StgFEM_Init( int* argc, char** argv[] ) {
 	/* This init function tells StGermain of all the component types, etc this module contributes. Because it can be linked at compile
 	   time or linked in by a toolbox at runtime, we need to make sure it isn't run twice (compiled in and loaded through a toolbox.*/

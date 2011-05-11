@@ -73,7 +73,7 @@ void _SolutionVector_ShareValuesNotStoredLocally(
 	double*					localSolnVecValues );
 
 SolutionVector* SolutionVector_New( Name name, FiniteElementContext* context, MPI_Comm comm, FeVariable* feVariable ) {
-	SolutionVector* self = _SolutionVector_DefaultNew( name );
+  SolutionVector* self = (SolutionVector*)_SolutionVector_DefaultNew( name );
 
 	self->isConstructed = True;
 	_SolutionVector_Init( self, context, comm, feVariable );
@@ -156,7 +156,7 @@ void _SolutionVector_Print( void* solutionVector, Stream* stream ) {
 }
 
 
-void* _SolutionVector_Copy( void* solutionVector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _SolutionVector_Copy( const void* solutionVector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	SolutionVector*	self = (SolutionVector*)solutionVector;
 	SolutionVector*	newSolutionVector;
 	PtrMap*		map = ptrMap;
@@ -167,7 +167,7 @@ void* _SolutionVector_Copy( void* solutionVector, void* dest, Bool deep, Name na
 		ownMap = True;
 	}
 	
-	newSolutionVector = _Stg_Component_Copy( self, dest, deep, nameExt, map );
+	newSolutionVector = (SolutionVector*)_Stg_Component_Copy( self, dest, deep, nameExt, map );
 	
 	/* TODO: copy vector? */
 	newSolutionVector->vector = self->vector;
@@ -756,7 +756,7 @@ void SolutionVector_LoadCurrentFeVariableValuesOntoVector( void* solutionVector 
 			value = DofLayout_GetValueDouble( feVar->dofLayout, node_lI, dof_I );
 			insertionIndex = feVar->eqNum->destinationArray[node_lI][dof_I];
 			//Vector_InsertEntries( self->vector, 1, &insertionIndex, &value );
-			VecSetValues( self->vector, 1, &insertionIndex, &value, INSERT_VALUES );
+			VecSetValues( self->vector, 1, (PetscInt*)(&insertionIndex), &value, INSERT_VALUES );
 		}	
 	}
 

@@ -176,7 +176,7 @@ void Inner2DGenerator_SetElementMesh( void* generator, void* mesh ) {
 
 	assert( self && Stg_CheckType( self, Inner2DGenerator ) );
 
-	self->elMesh = mesh;
+	self->elMesh = (Mesh*)mesh;
 }
 
 
@@ -203,7 +203,7 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 	elMesh = self->elMesh;
 	nDims = Mesh_GetDimSize( elMesh );
 	elTopo = Mesh_GetTopology( elMesh );
-	elSync = Mesh_GetSync( elMesh, nDims );
+	elSync = Mesh_GetSync( elMesh, (MeshTopology_Dim)nDims );
 
 	topo = Mesh_GetTopology( mesh );
 	MeshTopology_SetComm( topo, MeshTopology_GetComm( elTopo ) );
@@ -272,7 +272,7 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 	topo->shadDepth = elTopo->shadDepth;
 
 	/* Build the incidence. */
-	nDomainEls = Mesh_GetDomainSize( elMesh, nDims );
+	nDomainEls = Mesh_GetDomainSize( elMesh, (MeshTopology_Dim)nDims );
 	if( nDims == 2 ) {
 		nIncEls = 3;
 		incEls = MemArray( unsigned, 3, Inner2DGenerator_Type );
@@ -315,7 +315,7 @@ void Inner2DGenerator_BuildGeometry( Inner2DGenerator* self, FeMesh* mesh ) {
 
 	elMesh = self->elMesh;
 	nDims = Mesh_GetDimSize( elMesh );
-	nDomainEls = Mesh_GetDomainSize( elMesh, nDims );
+	nDomainEls = Mesh_GetDomainSize( elMesh, (MeshTopology_Dim)nDims );
 
 	if( nDims == 2 ) {
 		mesh->verts = AllocArray2D( double, nDomainEls * 3, nDims );

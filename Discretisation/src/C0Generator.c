@@ -174,7 +174,7 @@ void C0Generator_SetElementMesh( void* generator, void* mesh ) {
 
 	assert( self && Stg_CheckType( self, C0Generator ) );
 
-	self->elMesh = mesh;
+	self->elMesh = (Mesh*)mesh;
 }
 
 
@@ -197,7 +197,7 @@ void C0Generator_BuildTopology( C0Generator* self, FeMesh* mesh ) {
 	elMesh = self->elMesh;
 	nDims = Mesh_GetDimSize( elMesh );
 	elTopo = Mesh_GetTopology( elMesh );
-	elSync = Mesh_GetSync( elMesh, nDims );
+	elSync = Mesh_GetSync( elMesh, (MeshTopology_Dim)nDims );
 
 	topo = Mesh_GetTopology( mesh );
 	MeshTopology_SetComm( topo, MeshTopology_GetComm( elTopo ) );
@@ -206,13 +206,13 @@ void C0Generator_BuildTopology( C0Generator* self, FeMesh* mesh ) {
 	IGraph_SetDomain( topo, MT_VERTEX, elSync );
 	topo->shadDepth = elTopo->shadDepth;
 
-	nDomainEls = Mesh_GetDomainSize( elMesh, nDims );
+	nDomainEls = Mesh_GetDomainSize( elMesh, (MeshTopology_Dim)nDims );
 	nIncEls = AllocArray( unsigned, nDomainEls );
 	incEls = AllocArray2D( unsigned, nDomainEls, 1 );
 	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
 		nIncEls[e_i] = 1;
 		incEls[e_i][0] = e_i;
-		IGraph_SetIncidence( topo, nDims, e_i, MT_VERTEX, nIncEls[e_i], incEls[e_i] );
+		IGraph_SetIncidence( topo, nDims, e_i, MT_VERTEX, nIncEls[e_i], (int*)(incEls[e_i]) );
 	}
 	FreeArray( nIncEls );
 	FreeArray( incEls );
@@ -233,7 +233,7 @@ void C0Generator_BuildGeometry( C0Generator* self, FeMesh* mesh ) {
 
 	elMesh = self->elMesh;
 	nDims = Mesh_GetDimSize( elMesh );
-	nDomainEls = Mesh_GetDomainSize( elMesh, nDims );
+	nDomainEls = Mesh_GetDomainSize( elMesh, (MeshTopology_Dim)nDims );
 	mesh->verts = AllocArray2D( double, nDomainEls, nDims );
 	centroid = AllocArray( double, nDims );
 	for( e_i = 0; e_i < nDomainEls; e_i++ ) {

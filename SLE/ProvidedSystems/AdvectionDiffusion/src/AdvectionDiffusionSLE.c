@@ -142,7 +142,7 @@ void _AdvectionDiffusionSLE_Init(
 		/* Create a specific name for the calcDt hook */
 		char* tmpName = Memory_Alloc_Array_Unnamed( char, strlen(self->name) + 7 + 1 );
 		sprintf( tmpName, "%s_CalcDt", self->name );
-		EntryPoint_AppendClassHook( self->context->calcDtEP, tmpName, AdvectionDiffusionSLE_CalculateDt, self->type, self );
+		EntryPoint_AppendClassHook( self->context->calcDtEP, tmpName, (void*)AdvectionDiffusionSLE_CalculateDt, self->type, self );
 		//EP_AppendClassHook( self->context->calcDtEP, AdvectionDiffusionSLE_CalculateDt, self );
 		Memory_Free( tmpName );
 	}
@@ -194,11 +194,11 @@ void _AdvectionDiffusionSLE_Print( void* sle, Stream* stream ) {
 }
 
 
-void* _AdvectionDiffusionSLE_Copy( void* _sle, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _AdvectionDiffusionSLE_Copy( const void* _sle, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	AdvectionDiffusionSLE*	self = (AdvectionDiffusionSLE*) _sle;
 	AdvectionDiffusionSLE*	newSLE;
 	
-	newSLE = _SystemLinearEquations_Copy( self, dest, deep, nameExt, ptrMap );
+	newSLE = (AdvectionDiffusionSLE*)_SystemLinearEquations_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	/* TODO: Copy Method */
 	abort();
@@ -225,7 +225,7 @@ void* _AdvectionDiffusionSLE_DefaultNew( Name name ) {
 	SystemLinearEquations_MG_SelectStiffMatsFunc*        _mgSelectStiffMats = _SystemLinearEquations_MG_SelectStiffMats;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType                                            nameAllocationType = ZERO;
+	AllocationType                                            nameAllocationType = (AllocationType)ZERO;
 	SystemLinearEquations_UpdateSolutionOntoNodesFunc*  _updateSolutionOntoNodes = ZERO;
 
 	return (void*) _AdvectionDiffusionSLE_New(  ADVECTIONDIFFUSIONSLE_PASSARGS  );
@@ -307,7 +307,7 @@ void _AdvectionDiffusionSLE_Build( void* sle, void* data ) {
 		Stg_Component_Build( self->phiField->feMesh, NULL, False );
 
 		assert( Class_IsSuper( self->phiField->feMesh->topo, IGraph ) );
-		nodeDomainCountPtr = &((IGraph*)self->phiField->feMesh->topo)->remotes[MT_VERTEX]->nDomains;
+		nodeDomainCountPtr = (unsigned*)(&((IGraph*)self->phiField->feMesh->topo)->remotes[MT_VERTEX]->nDomains);
 
  		/* must create unique names otherwise multiple instances of this component
 		* will index incorrect instances of this component's data */

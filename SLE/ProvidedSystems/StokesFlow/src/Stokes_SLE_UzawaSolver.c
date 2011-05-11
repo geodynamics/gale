@@ -92,7 +92,7 @@ Stokes_SLE_UzawaSolver* Stokes_SLE_UzawaSolver_New(
 		Bool                                        useAbsoluteTolerance,
                 Bool                                        monitor )
 {		
-	Stokes_SLE_UzawaSolver* self = _Stokes_SLE_UzawaSolver_DefaultNew( name );
+  Stokes_SLE_UzawaSolver* self = (Stokes_SLE_UzawaSolver*)_Stokes_SLE_UzawaSolver_DefaultNew( name );
 
 	Stokes_SLE_UzawaSolver_InitAll( self, useStatSolve, statReps, preconditioner, maxUzawaIterations, minUzawaIterations, tolerance, useAbsoluteTolerance, monitor );
 
@@ -172,11 +172,11 @@ void _Stokes_SLE_UzawaSolver_Print( void* solver, Stream* stream ) {
 }
 
 
-void* _Stokes_SLE_UzawaSolver_Copy( void* stokesSleUzawaSolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Stokes_SLE_UzawaSolver_Copy( const void* stokesSleUzawaSolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Stokes_SLE_UzawaSolver* self = (Stokes_SLE_UzawaSolver*)stokesSleUzawaSolver;
 	Stokes_SLE_UzawaSolver*	newStokesSleUzawaSolver;
 	
-	newStokesSleUzawaSolver = _SLE_Solver_Copy( self, dest, deep, nameExt, ptrMap );
+	newStokesSleUzawaSolver = (Stokes_SLE_UzawaSolver*)_SLE_Solver_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	newStokesSleUzawaSolver->velSolver           = self->velSolver;
 	newStokesSleUzawaSolver->pcSolver            = self->pcSolver;
@@ -551,7 +551,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 	
 	KSPSetTolerances( velSolver, self->tolerance, PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT );
 	KSPSolve( velSolver, fVec, vStarVec );
-	KSPGetIterationNumber( velSolver, &innerLoopIterations );
+	KSPGetIterationNumber( velSolver, (PetscInt*)(&innerLoopIterations) );
 	
 	Journal_DPrintfL( self->debug, 2, "Fhat inner solution: Number of iterations: %d\n", innerLoopIterations );
 	
@@ -731,7 +731,7 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 		self->inneritsinitialtime = 0;
 		self->inneritsendtime = 0;
 		
-		KSPGetIterationNumber( velSolver, &innerLoopIterations );
+		KSPGetIterationNumber( velSolver, (PetscInt*)(&innerLoopIterations) );
 		/* add the inner loop iterations to the total inner iterations */
 		self->totalnuminnerits = self->totalnuminnerits + innerLoopIterations;
 		

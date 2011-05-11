@@ -50,7 +50,7 @@
 
 const Type StgFEM_PrintFeVariableDiscreteValues_2dBox_Type = "StgFEM_PrintFeVariableDiscreteValues_2dBox";
 
-const char* PRINT_FE_VARIABLE_DISCRETE_VALUES_2D_BOX_TAG = "PrintFeVariableDiscreteValues_2dBox";
+Name PRINT_FE_VARIABLE_DISCRETE_VALUES_2D_BOX_TAG = "PrintFeVariableDiscreteValues_2dBox";
 
 void _StgFEM_PrintFeVariableDiscreteValues_2dBox_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	FiniteElementContext* context;

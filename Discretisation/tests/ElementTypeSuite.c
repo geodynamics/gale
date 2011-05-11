@@ -126,8 +126,8 @@ void ElementTypeSuite_TestLinear2D( ElementTypeSuiteData* data ) {
 		_ElementType_ConvertGlobalCoordToElLocal( elType, feMesh, el, gCoord, lCoord );
 		ElementType_EvaluateShapeFunctionsAt( elType, lCoord, Ni );
 
-		Mesh_GetIncidence( feMesh, dim, el, MT_VERTEX, inc );
-		elNodes = IArray_GetPtr( inc );
+		Mesh_GetIncidence( feMesh, (MeshTopology_Dim)dim, el, MT_VERTEX, inc );
+		elNodes = (unsigned*)IArray_GetPtr( inc );
 		memset( gCoord_fromLocal, 0, sizeof( double ) * dim );
 		for( elNode_i = 0; elNode_i < elNodeCount; elNode_i++ ) {
 			gCoord_fromLocal[I_AXIS] += Ni[elNode_i] * feMesh->verts[elNodes[elNode_i]][I_AXIS];
@@ -174,8 +174,8 @@ void ElementTypeSuite_TestLinear3D( ElementTypeSuiteData* data ) {
 		_ElementType_ConvertGlobalCoordToElLocal( elType, feMesh, el, gCoord, lCoord );
 		ElementType_EvaluateShapeFunctionsAt( elType, lCoord, Ni );
 
-		Mesh_GetIncidence( feMesh, dim, el, MT_VERTEX, inc );
-		elNodes = IArray_GetPtr( inc );
+		Mesh_GetIncidence( feMesh, (MeshTopology_Dim)dim, el, MT_VERTEX, inc );
+		elNodes = (unsigned*)IArray_GetPtr( inc );
 		memset( gCoord_fromLocal, 0, sizeof( double ) * dim );
 		for( elNode_i = 0; elNode_i < elNodeCount; elNode_i++ ) {
 			gCoord_fromLocal[I_AXIS] += Ni[elNode_i] * feMesh->verts[elNodes[elNode_i]][I_AXIS];
@@ -223,8 +223,8 @@ void ElementTypeSuite_TestQuadratic2D( ElementTypeSuiteData* data ) {
 		_ElementType_ConvertGlobalCoordToElLocal( elType, feMesh, el, gCoord, lCoord );
 		ElementType_EvaluateShapeFunctionsAt( elType, lCoord, Ni );
 
-		Mesh_GetIncidence( feMesh, dim, el, MT_VERTEX, inc );
-		elNodes = IArray_GetPtr( inc );
+		Mesh_GetIncidence( feMesh, (MeshTopology_Dim)dim, el, MT_VERTEX, inc );
+		elNodes = (unsigned*)IArray_GetPtr( inc );
 		memset( gCoord_fromLocal, 0, sizeof( double ) * dim );
 		for( elNode_i = 0; elNode_i < elNodeCount; elNode_i++ ) {
 			gCoord_fromLocal[I_AXIS] += Ni[elNode_i] * feMesh->verts[elNodes[elNode_i]][I_AXIS];
@@ -271,8 +271,8 @@ void ElementTypeSuite_TestQuadratic3D( ElementTypeSuiteData* data ) {
 		_ElementType_ConvertGlobalCoordToElLocal( elType, feMesh, el, gCoord, lCoord );
 		ElementType_EvaluateShapeFunctionsAt( elType, lCoord, Ni );
 
-		Mesh_GetIncidence( feMesh, dim, el, MT_VERTEX, inc );
-		elNodes = IArray_GetPtr( inc );
+		Mesh_GetIncidence( feMesh, (MeshTopology_Dim)dim, el, MT_VERTEX, inc );
+		elNodes = (unsigned*)IArray_GetPtr( inc );
 		memset( gCoord_fromLocal, 0, sizeof( double ) * dim );
 		for( elNode_i = 0; elNode_i < elNodeCount; elNode_i++ ) {
 			gCoord_fromLocal[I_AXIS] += Ni[elNode_i] * feMesh->verts[elNodes[elNode_i]][I_AXIS];

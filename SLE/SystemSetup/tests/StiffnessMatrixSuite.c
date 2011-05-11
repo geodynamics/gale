@@ -92,7 +92,7 @@ FeVariable* buildFeVar() {
    feVar = FeVariable_New( "velocity", NULL, feMesh, NULL, dofs, bcs, NULL, NULL, 2, True, 
 		False, False, fieldReg );
 
-   for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, 0 ); n_i++ ) {
+   for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, (MeshTopology_Dim)0 ); n_i++ ) {
       /*const double pi=acos(-1.0);*/
       double* pos = Mesh_GetVertex( feMesh, n_i );
 

@@ -201,7 +201,7 @@
 	#define FeEquationNumber_DeepCopy( self ) \
 		(FeEquationNumber*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _FeEquationNumber_Copy( void* feEquationNumber, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _FeEquationNumber_Copy( const void* feEquationNumber, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	/** The "Build" phase for the equation number information. Calculates the 
 	domain and global Dof and unconstrained Dof totals, and builds the

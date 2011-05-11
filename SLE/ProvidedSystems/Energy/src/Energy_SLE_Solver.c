@@ -140,11 +140,11 @@ void _Energy_SLE_Solver_Print( void* solver, Stream* stream ) {
 }
 
 
-void* _Energy_SLE_Solver_Copy( void* standardSleSolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Energy_SLE_Solver_Copy( const void* standardSleSolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Energy_SLE_Solver*	self = (Energy_SLE_Solver*)standardSleSolver;
 	Energy_SLE_Solver*	newEnergySleSolver;
 
-	newEnergySleSolver = _SLE_Solver_Copy( self, dest, deep, nameExt, ptrMap );
+	newEnergySleSolver = (Energy_SLE_Solver*)_SLE_Solver_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	newEnergySleSolver->matrixSolver = self->matrixSolver;
 	
@@ -246,7 +246,7 @@ void _Energy_SLE_Solver_Solve( void* sleSolver, void* standardSLE ) {
 	KSPSolve( self->matrixSolver,
 		    ((ForceVector*) sle->forceVectors->data[0])->vector, 
 		    ((SolutionVector*) sle->solutionVectors->data[0])->vector );
-	KSPGetIterationNumber( self->matrixSolver, &iterations );
+	KSPGetIterationNumber( self->matrixSolver, (PetscInt*)(&iterations) );
 
 	Journal_DPrintf( self->debug, "Solved after %u iterations.\n", iterations );
 	Stream_UnIndentBranch( StgFEM_SLE_ProvidedSystems_Energy_Debug );

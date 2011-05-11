@@ -109,7 +109,7 @@ FeVariable* BuildFeVariable_AsPosition( unsigned dim ) {
 	fieldReg = FieldVariable_Register_New();
 	feVar = FeVariable_New( "velocity", NULL, feMesh, NULL, dofs, NULL, NULL, NULL, dim, True, False, False, fieldReg );
 
-	for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, 0 ); n_i++ ) {
+	for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, (MeshTopology_Dim)0 ); n_i++ ) {
 		double* pos = Mesh_GetVertex( feMesh, n_i );
 		Variable_SetValue( var, n_i, pos );
 	}
@@ -179,7 +179,7 @@ FeVariable* BuildFeVariable_AsConstant( unsigned dim ) {
 	fieldReg = FieldVariable_Register_New();
 	feVar = FeVariable_New( "pressure", NULL, feMesh, NULL, dofs, NULL, NULL, NULL, dim, True, False, False, fieldReg );
 
-	for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, 0 ); n_i++ ) {
+	for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, (MeshTopology_Dim)0 ); n_i++ ) {
 		Variable_SetValue( var, n_i, constant );
 	}
 
@@ -227,10 +227,10 @@ void FeVariableSuite_Interpolate( FeVariableSuiteData* data ) {
 	InterpolationResult	interpRes;
 	unsigned		dim_i;
 
-	for( el_i = 0; el_i < Mesh_GetDomainSize( feVar->feMesh, 3 ); el_i++ ) {
-		Mesh_GetIncidence( feVar->feMesh, 3, el_i, MT_VERTEX, inc );
+	for( el_i = 0; el_i < Mesh_GetDomainSize( feVar->feMesh, (MeshTopology_Dim)3 ); el_i++ ) {
+          Mesh_GetIncidence( feVar->feMesh, (MeshTopology_Dim)3, el_i, MT_VERTEX, inc );
 		nVerts = IArray_GetSize( inc );
-		verts = IArray_GetPtr( inc );
+		verts = (unsigned*)IArray_GetPtr( inc );
 
 		for( vert_i = 0; vert_i < nVerts; vert_i++ ) {
 			vert = Mesh_GetVertex( feVar->feMesh, verts[vert_i] );

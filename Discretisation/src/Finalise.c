@@ -49,6 +49,7 @@
 #include "Finalise.h"
 
 #include "FeVariable.h"
+#include <petsc.h>
 
 #include <stdio.h>
 

@@ -116,7 +116,7 @@ void _MultigridSolver_Init( MultigridSolver* self ) {
 	assert( self && Stg_CheckType( self, MultigridSolver ) );
 
 	/* these initialisations previously done in the MatrixSolver_Init func */
-	self->mgData = malloc( sizeof( MGSolver_PETScData ) );
+	self->mgData = (MGSolver_PETScData*)malloc( sizeof( MGSolver_PETScData ) );
 
 	self->mgData->comm = MPI_COMM_WORLD;
 	KSPCreate( MPI_COMM_WORLD, &self->mgData->ksp );
@@ -142,7 +142,7 @@ void _MultigridSolver_Init( MultigridSolver* self ) {
 	self->rnorm = 0.0;
 	self->useInitial = False;
 	//self->outerSolver = NULL;
-	self->outerSolver = malloc( sizeof( MGSolver_PETScData ) );
+	self->outerSolver = (MGSolver_PETScData*)malloc( sizeof( MGSolver_PETScData ) );
 	self->outerSolver->ksp = PETSC_NULL;
 	self->outerSolver->matrix = PETSC_NULL;
 	self->outerSolver->inversion = PETSC_NULL;
@@ -351,7 +351,7 @@ MGSolver_Status _GetSolveStatus( MGSolver_PETScData* mgData ) {
 		rnorm = _GetResidualNorm( mgData );
 		KSPGetIterationNumber( mgData->ksp, &curIt );
 		//PETScMatrixSolver_SetNormType( self, MultigridSolver_NormType_Preconditioned );
-		KSPSetNormType( mgData->ksp, MultigridSolver_NormType_Preconditioned );
+		KSPSetNormType( mgData->ksp, (KSPNormType)MultigridSolver_NormType_Preconditioned );
 		ec = KSPDefaultConverged( mgData->ksp, curIt, (PetscScalar)rnorm, &reason, PETSC_NULL );
 		CheckPETScError( ec );
 	}
@@ -360,7 +360,7 @@ MGSolver_Status _GetSolveStatus( MGSolver_PETScData* mgData ) {
 		CheckPETScError( ec );
 	}
 
-	return reason;
+	return (MGSolver_Status)reason;
 }
 
 /* end of functions formerly defined in the PETScMatrixSolver class */
@@ -414,8 +414,8 @@ void MultigridSolver_Setup( void* matrixSolver, void* rhs, void* solution ) {
 	assert( self && Stg_CheckType( self, MultigridSolver ) );
 
 	//_MatrixSolver_Setup( self, rhs, solution );
-	self->mgData->curRHS = rhs;
-	self->mgData->curSolution = solution;
+	self->mgData->curRHS = (struct _p_Vec*)rhs;
+	self->mgData->curSolution = (struct _p_Vec*)solution;
 	self->mgData->expiredResidual = True;
 
 	/* Need to rebuild the operators? */
@@ -526,10 +526,10 @@ void MultigridSolver_SetLevels( void* matrixSolver, unsigned nLevels ) {
 		MultigridSolver_Level*	level = self->levels + l_i;
 
 		//level->downSolver = NULL;
-		level->downSolver = malloc( sizeof( MGSolver_PETScData ) );
+		level->downSolver = (MGSolver_PETScData*)malloc( sizeof( MGSolver_PETScData ) );
 		level->nDownIts = 1;
 		//level->upSolver = NULL;
-		level->upSolver = malloc( sizeof( MGSolver_PETScData ) );
+		level->upSolver = (MGSolver_PETScData*)malloc( sizeof( MGSolver_PETScData ) );
 		level->nUpIts = l_i ? 1 : 0;
 		level->nCycles = 1;
 
@@ -604,7 +604,7 @@ void MultigridSolver_SetLevelDownSolver( void* matrixSolver, unsigned levelInd, 
 		if( level->downSolver->curSolution != PETSC_NULL ) VecDestroy( level->downSolver->curSolution );
 		free( level->downSolver );
 	}
-	level->downSolver = solver;
+	level->downSolver = (MGSolver_PETScData*)solver;
 	//if( solver )
 	//	Stg_Class_AddRef( solver );
 }
@@ -640,7 +640,7 @@ void MultigridSolver_SetLevelUpSolver( void* matrixSolver, unsigned levelInd, vo
 		if( level->upSolver->curSolution != PETSC_NULL ) VecDestroy( level->upSolver->curSolution );
 		free( level->upSolver );
 	}
-	level->upSolver = solver;
+	level->upSolver = (MGSolver_PETScData*)solver;
 	//if( solver )
 	//	Stg_Class_AddRef( solver );
 }
@@ -1067,7 +1067,7 @@ void MultigridSolver_UpdateWorkVectors( MultigridSolver* self ) {
 
 MGSolver_PETScData* MultigridSolver_CreateOuterSolver( MultigridSolver* self, Mat matrix ) {
 	//MatrixSolver*	outerSolver;
-	MGSolver_PETScData* 	outerSolver = malloc( sizeof(MGSolver_PETScData) );
+  MGSolver_PETScData* 	outerSolver = (MGSolver_PETScData*)malloc( sizeof(MGSolver_PETScData) );
 	PC			pc;
 
 	/*
@@ -1089,14 +1089,14 @@ MGSolver_PETScData* MultigridSolver_CreateOuterSolver( MultigridSolver* self, Ma
 	KSPSetOperators( outerSolver->ksp, matrix, matrix, DIFFERENT_NONZERO_PATTERN );
 	KSPSetTolerances( outerSolver->ksp, PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT, (PetscInt)3 );
 	KSPSetInitialGuessNonzero( outerSolver->ksp, (PetscTruth)True );
-	KSPSetNormType( outerSolver->ksp, MultigridSolver_NormType_Preconditioned );
+	KSPSetNormType( outerSolver->ksp, (KSPNormType)MultigridSolver_NormType_Preconditioned );
 
 	return outerSolver;
 }
 
 MGSolver_PETScData* MultigridSolver_CreateSmoother( MultigridSolver* self, Mat matrix ) {
 	//MatrixSolver*	smoother;
-	MGSolver_PETScData* smoother = malloc( sizeof( MGSolver_PETScData ) );
+  MGSolver_PETScData* smoother = (MGSolver_PETScData*)malloc( sizeof( MGSolver_PETScData ) );
 	//unsigned	nBlocks;
 	//KSP*		ksps;
 	PC		pc;

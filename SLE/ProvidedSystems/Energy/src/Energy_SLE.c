@@ -69,7 +69,7 @@ Energy_SLE* Energy_SLE_New(
 	SolutionVector*			solutionVec,
 	ForceVector*				fVector )
 {
-	Energy_SLE* self = _Energy_SLE_DefaultNew( name );
+  Energy_SLE* self = (Energy_SLE*)_Energy_SLE_DefaultNew( name );
 
 	self->isConstructed = True;
 	_SystemLinearEquations_Init( self, solver, NULL, context, False, isNonLinear, nonLinearTolerance,

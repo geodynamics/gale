@@ -62,7 +62,7 @@
 		__FeVariable \
 		\
 		/* Other info */ \
-		char*				operatorName; \
+		Name				operatorName; \
 		Operator*		_operator; \
 		Index				feVariableCount; \
 		FeVariable**	feVariableList; \
@@ -137,7 +137,7 @@
 
 	void _OperatorFeVariable_Print( void* _feVariable, Stream* stream );
 
-	void* _OperatorFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _OperatorFeVariable_Copy( const void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Implementations */
 	void _OperatorFeVariable_AssignFromXML( void* feVariable, Stg_ComponentFactory* cf, void* data );

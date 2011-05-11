@@ -56,7 +56,7 @@
 const Type LinkedDofInfo_Type = "LinkedDofInfo";
 
 LinkedDofInfo* LinkedDofInfo_New( Name name, DomainContext* context, void* mesh, DofLayout* dofLayout, Dictionary* dictionary ) {
-	LinkedDofInfo* self = _LinkedDofInfo_DefaultNew( name );
+  LinkedDofInfo* self = (LinkedDofInfo*)_LinkedDofInfo_DefaultNew( name );
 
 	self->isConstructed = True;	
 	_LinkedDofInfo_Init( self, context, mesh, dofLayout, dictionary );
@@ -184,7 +184,7 @@ void _LinkedDofInfo_Destroy( void* linkedDofInfo, void *data ){
 	Memory_Free( self->eqNumsOfLinkedDofs );
 }
 
-void* _LinkedDofInfo_Copy( void* linkedDofInfo, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _LinkedDofInfo_Copy( const void* linkedDofInfo, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	LinkedDofInfo*	self = (LinkedDofInfo*)linkedDofInfo;
 	LinkedDofInfo*	newLinkedDofInfo;
 	PtrMap*			map = ptrMap;
@@ -195,7 +195,7 @@ void* _LinkedDofInfo_Copy( void* linkedDofInfo, void* dest, Bool deep, Name name
 		ownMap = True;
 	}
 	
-	newLinkedDofInfo = _Stg_Class_Copy( self, dest, deep, nameExt, map );
+	newLinkedDofInfo = (LinkedDofInfo*)_Stg_Class_Copy( self, dest, deep, nameExt, map );
 	
 	/* Virtual methods */
 	newLinkedDofInfo->linkedDofSetsCount = self->linkedDofSetsCount;
@@ -206,7 +206,7 @@ void* _LinkedDofInfo_Copy( void* linkedDofInfo, void* dest, Bool deep, Name name
 		newLinkedDofInfo->dofLayout = (DofLayout*)Stg_Class_Copy( self->dofLayout, NULL, deep, nameExt, map );
 		newLinkedDofInfo->mesh = (Mesh*)Stg_Class_Copy( self->mesh, NULL, deep, nameExt, map );
 
-		if ( (newLinkedDofInfo->linkedDofTbl = PtrMap_Find( map, self->linkedDofTbl )) == NULL && self->linkedDofTbl ) {
+		if ( (newLinkedDofInfo->linkedDofTbl = (int**)PtrMap_Find( map, self->linkedDofTbl )) == NULL && self->linkedDofTbl ) {
 			Node_Index	node_I;
 			Dof_Index	dof_I;
 			newLinkedDofInfo->linkedDofTbl = Memory_Alloc_2DComplex( int, self->dofLayout->_numItemsInLayout, self->dofLayout->dofCounts, "linkedDofInfo->linkedDofTbl" );
@@ -218,7 +218,7 @@ void* _LinkedDofInfo_Copy( void* linkedDofInfo, void* dest, Bool deep, Name name
 			}
 			PtrMap_Append( map, self->linkedDofTbl, newLinkedDofInfo->linkedDofTbl );
 		}
-		if ( (newLinkedDofInfo->eqNumsOfLinkedDofs = PtrMap_Find( map, self->eqNumsOfLinkedDofs )) == NULL && self->eqNumsOfLinkedDofs ) {	
+		if ( (newLinkedDofInfo->eqNumsOfLinkedDofs = (int*)PtrMap_Find( map, self->eqNumsOfLinkedDofs )) == NULL && self->eqNumsOfLinkedDofs ) {	
 			newLinkedDofInfo->eqNumsOfLinkedDofs = Memory_Alloc_Array( int, self->linkedDofSetsCount, "linkedDofInfo->eqNumsOfLinkedDofs" );
 			memcpy( newLinkedDofInfo->eqNumsOfLinkedDofs, self->eqNumsOfLinkedDofs, self->linkedDofSetsCount * sizeof(int) );
 			PtrMap_Append( map, self->eqNumsOfLinkedDofs, newLinkedDofInfo->eqNumsOfLinkedDofs );

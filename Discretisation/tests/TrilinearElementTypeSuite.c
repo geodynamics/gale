@@ -95,11 +95,11 @@ void TrilinearElementTypeSuite_TestShape( TrilinearElementTypeSuiteData* data ) 
    Stg_Component_Initialise( mesh, data, True );
 
    nDims = Mesh_GetDimSize( mesh );
-   nEls = Mesh_GetDomainSize( mesh, nDims );
+   nEls = Mesh_GetDomainSize( mesh, (MeshTopology_Dim)nDims );
    inc = IArray_New();
 
    for( e_i = 0; e_i < nEls; e_i++ ) {
-		Mesh_GetIncidence( mesh, nDims, e_i, 0, inc );
+     Mesh_GetIncidence( mesh, (MeshTopology_Dim)nDims, e_i, (MeshTopology_Dim)0, inc );
       nVerts = IArray_GetSize( inc );
       verts = IArray_GetPtr( inc );
 

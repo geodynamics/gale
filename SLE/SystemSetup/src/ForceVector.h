@@ -68,7 +68,7 @@
 		Dimension_Index			dim;  \
 		EntryPoint_Register*		entryPoint_Register;  \
 		FeEntryPoint*				assembleForceVector;  \
-		Name							_assembleForceVectorEPName;  \
+		char*							_assembleForceVectorEPName;  \
 		Stg_ObjectList*			forceTermList;  \
 		Stg_Component*				applicationDepExtraInfo; /**< Default is NULL: passed to elForceVec during assembly */\
 		Assembler*					bcAsm;  \
@@ -118,7 +118,7 @@
 	#define ForceVector_DeepCopy( self ) \
 		(ForceVector*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 
-	void* _ForceVector_Copy( void* forceVector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ForceVector_Copy( const void* forceVector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Functions */
 	void* _ForceVector_DefaultNew( Name name );

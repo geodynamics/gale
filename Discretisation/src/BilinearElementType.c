@@ -60,7 +60,7 @@ const Type BilinearElementType_Type = "BilinearElementType";
 #define _BilinearElementType_NodeCount 4
 
 BilinearElementType* BilinearElementType_New( Name name ) {
-	BilinearElementType* self = _BilinearElementType_DefaultNew( name );
+  BilinearElementType* self = (BilinearElementType*)_BilinearElementType_DefaultNew( name );
 
 	self->isConstructed = True;
 	_ElementType_Init( (ElementType*)self, _BilinearElementType_NodeCount );

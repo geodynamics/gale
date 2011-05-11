@@ -140,7 +140,7 @@ void _StiffnessMatrixTerm_Print( void* stiffnessMatrixTerm, Stream* stream ) {
 }
 
 
-void* _StiffnessMatrixTerm_Copy( void* stiffnessMatrixTerm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _StiffnessMatrixTerm_Copy( const void* stiffnessMatrixTerm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	StiffnessMatrixTerm*	self = (StiffnessMatrixTerm*)stiffnessMatrixTerm;
 	StiffnessMatrixTerm*	newStiffnessMatrixTerm;
 	PtrMap*		map = ptrMap;
@@ -151,7 +151,7 @@ void* _StiffnessMatrixTerm_Copy( void* stiffnessMatrixTerm, void* dest, Bool dee
 		ownMap = True;
 	}
 	
-	newStiffnessMatrixTerm = _Stg_Component_Copy( self, dest, deep, nameExt, map );
+	newStiffnessMatrixTerm = (StiffnessMatrixTerm*)_Stg_Component_Copy( self, dest, deep, nameExt, map );
 	
 	newStiffnessMatrixTerm->extraInfo = self->extraInfo;
 	if( deep ) {

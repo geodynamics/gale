@@ -113,7 +113,7 @@ PETScMGSolver* _PETScMGSolver_New(  PETSCMGSOLVER_DEFARGS  ) {
 void _PETScMGSolver_Init( PETScMGSolver* self ) {
 	assert( self && Stg_CheckType( self, PETScMGSolver ) );
 
-	self->mgData = malloc( sizeof( MGSolver_PETScData ) );
+	self->mgData = (MGSolver_PETScData*)malloc( sizeof( MGSolver_PETScData ) );
 
 	/* from the depreciated MatrixSolver_Init func */
 	self->mgData->comm = MPI_COMM_WORLD;
@@ -255,8 +255,8 @@ void PETScMGSolver_Setup( void* matrixSolver, void* rhs, void* solution ) {
 	wallTime = MPI_Wtime();
 		
 	//_MatrixSolver_Setup( self, rhs, solution );
-	self->mgData->curRHS = rhs;
-	self->mgData->curSolution = solution;
+	self->mgData->curRHS = (struct _p_Vec*)rhs;
+	self->mgData->curSolution = (struct _p_Vec*)solution;
 	self->mgData->expiredResidual = True;
 
    	PetscPrintf( PETSC_COMM_WORLD, "_MatrixSolver_Setup %g\n", MPI_Wtime() - wallTime);

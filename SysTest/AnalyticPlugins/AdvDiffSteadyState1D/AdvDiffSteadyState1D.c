@@ -82,7 +82,7 @@ void AdvDiffSteadyState1D_TemperatureBC( Node_LocalIndex node_lI, Variable_Index
 	mesh       = feVariable->feMesh;
 	coord      = Mesh_GetVertex( mesh, node_lI );
 
-	AdvDiffSteadyState1D_TemperatureFunction( self, coord, temperature );
+	AdvDiffSteadyState1D_TemperatureFunction( self, coord, (double*)temperature );
 }
 
 

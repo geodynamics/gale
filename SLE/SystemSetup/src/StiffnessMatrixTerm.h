@@ -113,7 +113,7 @@
 		(StiffnessMatrixTerm*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define StiffnessMatrixTerm_DeepCopy( self ) \
 		(StiffnessMatrixTerm*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _StiffnessMatrixTerm_Copy( void* stiffnessMatrixTerm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _StiffnessMatrixTerm_Copy( const void* stiffnessMatrixTerm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Functions */
 	void* _StiffnessMatrixTerm_DefaultNew( Name name );

@@ -117,7 +117,7 @@ void _AnalyticSolution_Init( AnalyticSolution* self, Swarm* integrationSwarm, Li
 
 	/* Add functions to entry points */
 	EntryPoint_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_UpdateClass ), 
-			self->type, AnalyticSolution_Update, self->type, self );
+                                    self->type, (void*)AnalyticSolution_Update, self->type, self );
 	EP_AppendClassHook( Context_GetEntryPoint( context, AbstractContext_EP_DumpClass ), 
 			AnalyticSolution_TestAll, self );
 
@@ -152,7 +152,7 @@ void _AnalyticSolution_Print( void* analyticSolution, Stream* stream ) {
 	
 }
 
-void* _AnalyticSolution_Copy( void* analyticSolution, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _AnalyticSolution_Copy( const void* analyticSolution, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	abort();
 	return NULL;
 }
@@ -363,7 +363,7 @@ void AnalyticSolution_RegisterFeVariableWithAnalyticFunction( void* analyticSolu
 	/* Add feVariable to list */
 	Stg_ObjectList_Append( self->feVariableList, feVariable );
 	/* Add function to list */
-	Stg_ObjectList_GlobalPointerAppend( self->analyticFeVariableFuncList, solutionFunction, (Name)tmpName );
+	Stg_ObjectList_GlobalPointerAppend( self->analyticFeVariableFuncList, (void*)solutionFunction, (Name)tmpName );
 	Memory_Free( tmpName  );	
 }
 
@@ -420,16 +420,16 @@ void AnalyticSolution_BuildAllAnalyticFields( void* analyticSolution, void* data
 
 FeVariable* AnalyticSolution_CreateAnalyticField( void* analyticSolution, FeVariable* feVariable ) {
 	AnalyticSolution*                            self = (AnalyticSolution*) analyticSolution;
-	Name                                         tmpName;
+	char*                                        tmpName;
 	FeVariable*                                  analyticFeVariable;
 	Variable*                                    dataVariable;
 	DofLayout*                                   dofLayout;
 	Variable_Register*                           variable_Register = self->context->variable_Register;
 	Dof_Index                                    componentsCount   = feVariable->fieldComponentCount;
-	Name                                         variableName[9];
+	char*                                        variableName[9];
 	Variable_Index                               variable_I;
 	Node_DomainIndex                             node_I;
-	Bool                                         scalar             = ( componentsCount == 1 );
+	Bool scalar=(componentsCount==1) ? True : False;
 	OperatorFeVariable*                          analyticMagField;
 	OperatorFeVariable*                          errorField;
 	OperatorFeVariable*                          errorMagnitudeField;
@@ -575,28 +575,28 @@ FeVariable* AnalyticSolution_CreateAnalyticVectorField( void* analyticSolution, 
 }
 
 FeVariable* AnalyticSolution_CreateAnalyticSymmetricTensorField( void* analyticSolution, FeVariable* vectorField ) {
-	AnalyticSolution*		self = (AnalyticSolution*) analyticSolution;
-	FeVariable*				analyticVectorField;
-	OperatorFeVariable*	analyticVectorInvField;
-	Name						tmpName, tmpName2;
-	DofLayout*				dofLayout;
+  AnalyticSolution*		self = (AnalyticSolution*) analyticSolution;
+  FeVariable*				analyticVectorField;
+  OperatorFeVariable*	analyticVectorInvField;
+  char					*tmpName, *tmpName2;
+  DofLayout*				dofLayout;
 
-	analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField );
+  analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField );
 
-	/* Create new dof layout */
-	tmpName = Stg_Object_AppendSuffix( analyticVectorField, (Name)"Analytic-DofLayout"  );
-	dofLayout = DofLayout_New( tmpName, self->context, self->context->variable_Register, Mesh_GetDomainSize( analyticVectorField->feMesh, MT_VERTEX ), NULL );
+  /* Create new dof layout */
+  tmpName = Stg_Object_AppendSuffix( analyticVectorField, (Name)"Analytic-DofLayout"  );
+  dofLayout = DofLayout_New( tmpName, self->context, self->context->variable_Register, Mesh_GetDomainSize( analyticVectorField->feMesh, MT_VERTEX ), NULL );
 
-	/* Create Invariant Field */
-	tmpName2 = Stg_Object_AppendSuffix( analyticVectorField, (Name)"Invariant"  );
-	analyticVectorInvField = OperatorFeVariable_NewUnary( tmpName2, self->context, analyticVectorField, "SymmetricTensor_Invariant" );
+  /* Create Invariant Field */
+  tmpName2 = Stg_Object_AppendSuffix( analyticVectorField, (Name)"Invariant"  );
+  analyticVectorInvField = OperatorFeVariable_NewUnary( tmpName2, self->context, analyticVectorField, "SymmetricTensor_Invariant" );
 
-	Memory_Free( tmpName );
-	Memory_Free( tmpName2 );
+  Memory_Free( tmpName );
+  Memory_Free( tmpName2 );
 
-	LiveComponentRegister_Add( self->LC_Register, (Stg_Component*) analyticVectorInvField );
+  LiveComponentRegister_Add( self->LC_Register, (Stg_Component*) analyticVectorInvField );
 
-	return analyticVectorField;
+  return analyticVectorField;
 }
 
 FeVariable* AnalyticSolution_GetFeVariableFromAnalyticFeVariable( void* analyticSolution, FeVariable* analyticFeVariable ) {

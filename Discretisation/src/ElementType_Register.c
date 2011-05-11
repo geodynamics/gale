@@ -58,7 +58,7 @@ const Type ElementType_Register_Type = "ElementType_Register";
 ElementType_Register* elementType_Register = 0;
 
 ElementType_Register* ElementType_Register_New( Name name ) {
-	ElementType_Register* self = ElementType_Register_DefaultNew( name );
+  ElementType_Register* self = (ElementType_Register*)ElementType_Register_DefaultNew( name );
 
 	self->isConstructed = True;
 	_ElementType_Register_Init( self );

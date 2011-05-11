@@ -80,7 +80,7 @@ FeVariable* FeVariable_New_FromTemplate(
 	Bool							loadReferenceEachTimestep,
 	FieldVariable_Register*	fV_Register )
 {
-	FeVariable*	templateFeVariable = _templateFeVariable;
+  FeVariable*	templateFeVariable = (FeVariable*)_templateFeVariable;
 	FeVariable*	newFeVariable = NULL;
 	
 	newFeVariable = FeVariable_New_Full(
@@ -160,7 +160,7 @@ FeVariable* FeVariable_New_Full(
 	MPI_Comm						communicator,
 	FieldVariable_Register*	fieldVariable_Register )		
 {
-	FeVariable* self = _FeVariable_DefaultNew( name );
+  FeVariable* self = (FeVariable*)_FeVariable_DefaultNew( name );
 
 	self->isConstructed = True;
 	_FieldVariable_Init( (FieldVariable*)self, context, fieldComponentCount, dim, isCheckpointedAndReloaded, communicator, fieldVariable_Register );
@@ -252,7 +252,7 @@ void _FeVariable_Init(
 			self->eqNum = self->templateFeVariable->eqNum;
 		}
 		else {
-			self->eqNum = FeEquationNumber_New( defaultFeVariableFeEquationNumberName, self->context, self->feMesh, self->dofLayout, self->bcs, linkedDofInfo );
+                  self->eqNum = FeEquationNumber_New( defaultFeVariableFeEquationNumberName, self->context, self->feMesh, self->dofLayout, self->bcs, (LinkedDofInfo*)linkedDofInfo );
 			self->eqNum->removeBCs = self->removeBCs;
 		}
 	}
@@ -330,7 +330,7 @@ void _FeVariable_Print( void* variable, Stream* stream ) {
 	}
 }
 
-void* _FeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _FeVariable_Copy( const void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	FeVariable*	self = (FeVariable*)feVariable;
 	FeVariable*	newFeVariable;
 	PtrMap*		map = ptrMap;
@@ -341,7 +341,7 @@ void* _FeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, P
 		ownMap = True;
 	}
 	
-	newFeVariable = _FieldVariable_Copy( self, dest, deep, nameExt, map );
+	newFeVariable = (FeVariable*)_FieldVariable_Copy( self, dest, deep, nameExt, map );
 
 	newFeVariable->templateFeVariable = self->templateFeVariable;
 	
@@ -1183,7 +1183,7 @@ void FeVariable_InterpolateDerivatives_WithGNx( void* _feVariable, Element_Local
 
 	FeMesh_GetElementNodes( self->feMesh, lElement_I, self->inc );
 	nInc = IArray_GetSize( self->inc );
-	inc = IArray_GetPtr( self->inc );
+	inc = (unsigned*)IArray_GetPtr( self->inc );
 
 		/** Interpolate derivative from nodes */
         for ( elLocalNode_I = 0 ; elLocalNode_I < nInc ; elLocalNode_I++) {
@@ -1224,7 +1224,7 @@ void FeVariable_InterpolateValue_WithNi( void* _feVariable, Element_LocalIndex l
 
 	FeMesh_GetElementNodes( self->feMesh, lElement_I, self->inc );
 	nInc = IArray_GetSize( self->inc );
-	inc = IArray_GetPtr( self->inc );
+	inc = (unsigned*)IArray_GetPtr( self->inc );
 
 	for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
 		/** Interpolate derivative from nodes */
@@ -1542,7 +1542,7 @@ void _FeVariable_InterpolateNodeValuesToElLocalCoord( void* feVariable, Element_
 
 	FeMesh_GetElementNodes( self->feMesh, element_lI, self->inc );
 	nInc = IArray_GetSize( self->inc );
-	inc = IArray_GetPtr( self->inc );
+	inc = (unsigned*)IArray_GetPtr( self->inc );
 
 	/** Gets number of degrees of freedom - assuming it is the same throughout the mesh */
 	dofCountThisNode = self->dofLayout->dofCounts[lNode_I];
@@ -1727,7 +1727,7 @@ double FeVariable_AverageLayer( void* feVariable, void* swarm, Axis layerAxis, I
 	double			heights[2];
 	unsigned		localInd[2], globalInd[2];
 	double			*min, *max;
-	unsigned		d_i;
+	int		d_i;
 	
 	integral = FeVariable_IntegrateLayer( self, swarm, layerAxis, layerIndex );
 
@@ -1935,7 +1935,7 @@ void FeVariable_ImportExportInfo_Delete( void* ptr ) {
 	/** Nothing to do - the ObjectAdaptor will take care of deleting the actual struct itself */
 }
 
-void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoords ) {
+void FeVariable_SaveToFile( void* feVariable, Name filename, Bool saveCoords ) {
 	FeVariable*       self = (FeVariable*)feVariable;
 	Node_LocalIndex   lNode_I;
 	Node_GlobalIndex  gNode_I;
@@ -2047,7 +2047,7 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
          H5Gclose(group_id);
          H5Sclose(attribData_id);
       }       
-      size[0] = Mesh_GetGlobalSize( self->feMesh, 0 );;
+      size[0] = Mesh_GetGlobalSize( self->feMesh, (MeshTopology_Dim)0 );;
       size[1] = dofAtEachNodeCount;
       if( saveCoords )
          size[1] += self->dim;
@@ -2184,7 +2184,7 @@ void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoo
 
 #define MAX_LINE_LENGTH_DEFINE 1024
 
-void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
+void FeVariable_ReadFromFile( void* feVariable, Name filename ) {
 	FeVariable*        self = (FeVariable*)feVariable;
 	Node_LocalIndex    lNode_I = 0;
 	Node_GlobalIndex   gNode_I = 0;
@@ -2364,7 +2364,7 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 	   count[1] += self->dim;
 	   
    memSpace = H5Screate_simple( 2, count, NULL );
-   totalNodes = Mesh_GetGlobalSize( self->feMesh, 0 );
+   totalNodes = Mesh_GetGlobalSize( self->feMesh, (MeshTopology_Dim)0 );
    buf = Memory_Alloc_Array( double, count[1], "fileBuffer" );
 
    Journal_Firewall( (maxSize[0] == totalNodes), errorStr,
@@ -2475,7 +2475,7 @@ void FeVariable_ReadFromFile( void* feVariable, const char* filename ) {
 	FeVariable_SyncShadowValues( self );
 }
 
-void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, const char* feVarFilename, const char* meshFilename ){
+void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, Name feVarFilename, const char* meshFilename ){
 	FeVariable*							self = (FeVariable*)feVariable;
    Stream*								errorStr = Journal_Register( Error_Type, (Name)self->type  );   
 #ifdef READ_HDF5
@@ -2497,7 +2497,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, c
 	double*								value;
 	unsigned								nDomainVerts;
 	static double*						arrayPtr;
-   Name									varName[9];
+   char*									varName[9];
 
    /** Open the file and data set. */
 	file = H5Fopen( meshFilename, H5F_ACC_RDONLY, H5P_DEFAULT );

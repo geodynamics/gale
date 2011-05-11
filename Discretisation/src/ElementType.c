@@ -271,7 +271,7 @@ void _ElementType_ConvertGlobalCoordToElLocal(
 
 	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), element, MT_VERTEX, self->inc );
 	nInc = IArray_GetSize( self->inc );
-	inc = IArray_GetPtr( self->inc );
+	inc = (unsigned*)IArray_GetPtr( (self->inc) );
 
 	/* Initial guess for element local coordinate is in the centre of the element - ( 0.0, 0.0, 0.0 ) */
 	memset( elLocalCoord, 0, dim*sizeof(double) );
@@ -378,7 +378,7 @@ void ElementType_ShapeFunctionsGlobalDerivs(
 
 	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elId, MT_VERTEX, self->inc );
 	nInc = IArray_GetSize( self->inc );
-	inc = IArray_GetPtr( self->inc );
+	inc = (unsigned*)IArray_GetPtr((self->inc) );
 	
 	/*
 	If constant shape function gets passed in here, getLocalDeriv will
@@ -396,7 +396,7 @@ void ElementType_ShapeFunctionsGlobalDerivs(
 	/* unroll this bugger cause we do it all the time */
 	if( dim == 2 ) {
 		jac[0][0] = jac[0][1] = jac[1][0] = jac[1][1] = 0.0;
-		for( n=0; n<nodesPerEl; n++){	
+		for( n=0; n<(int)nodesPerEl; n++){	
 			nodeCoord = Mesh_GetVertex( mesh, inc[n] );
 			jac[0][0] = jac[0][0] + GNi[0][n] * nodeCoord[0];
 			jac[0][1] = jac[0][1] + GNi[0][n] * nodeCoord[1];
@@ -410,7 +410,7 @@ void ElementType_ShapeFunctionsGlobalDerivs(
 		jac[0][0] = jac[0][1] = jac[0][2] = 0.0;
 		jac[1][0] = jac[1][1] = jac[1][2] = 0.0;
 		jac[2][0] = jac[2][1] = jac[2][2] = 0.0;
-		for( n=0; n<nodesPerEl; n++){	
+		for( n=0; n<(int)nodesPerEl; n++){	
 			nodeCoord = Mesh_GetVertex( mesh, inc[n] );
 			jac[0][0] = jac[0][0] + GNi[0][n] * nodeCoord[0];
 			jac[0][1] = jac[0][1] + GNi[0][n] * nodeCoord[1];
@@ -475,7 +475,7 @@ void ElementType_ShapeFunctionsGlobalDerivs(
 	
 	/* get global derivs Ni_x, Ni_y and Ni_z if dim == 3 */
 	for( dx=0; dx<dim; dx++ ) {
-		for( n=0; n<nodesPerEl; n++ ) {
+          for( n=0; n<(int)nodesPerEl; n++ ) {
 			
 			globalSF_DerivVal = 0.0;
 			for(dxi=0; dxi<dim; dxi++) {
@@ -509,7 +509,7 @@ void ElementType_Jacobian_AxisIndependent(
 
 	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elId, MT_VERTEX, self->inc );
 	nInc = IArray_GetSize( self->inc );
-	inc = IArray_GetPtr( self->inc );
+	inc = (unsigned*)IArray_GetPtr((self->inc) );
 	
 	/* If GNi isn't passed in - then evaluate them for you */
 	if (_GNi == NULL) {
@@ -622,7 +622,7 @@ void ElementType_GetFaceNodes( void* elementType, Mesh* mesh, unsigned element_I
 	assert( mesh && Stg_CheckType( mesh, FeMesh ) );
 
 	FeMesh_GetElementNodes( mesh, element_I, self->inc );
-	inc = IArray_GetPtr( self->inc );
+	inc = (unsigned*)IArray_GetPtr((self->inc) );
 
 	for( node_i = 0; node_i < nNodes; node_i++ )
 		nodes[node_i] = inc[self->faceNodes[face_I][node_i]];

@@ -178,7 +178,7 @@ OperatorFeVariable* OperatorFeVariable_New(
 	MPI_Comm													communicator,
 	FieldVariable_Register*								fieldVariable_Register )
 {
-	OperatorFeVariable* self = _OperatorFeVariable_DefaultNew( name );
+  OperatorFeVariable* self = (OperatorFeVariable*)_OperatorFeVariable_DefaultNew( name );
 
 	self->isConstructed = True;
 	_FieldVariable_Init( (FieldVariable*)self, context, feVariableCount, dim, isCheckpointedAndReloaded, communicator, fieldVariable_Register );                                                                                                          
@@ -266,11 +266,11 @@ void _OperatorFeVariable_Print( void* _feVariable, Stream* stream ) {
 
 }
 
-void* _OperatorFeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _OperatorFeVariable_Copy( const void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	OperatorFeVariable*	self = (OperatorFeVariable*)feVariable;
 	OperatorFeVariable*	newOperatorFeVariable;
 	
-	newOperatorFeVariable = _FeVariable_Copy( self, dest, deep, nameExt, ptrMap );
+	newOperatorFeVariable = (OperatorFeVariable*)_FeVariable_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	newOperatorFeVariable->_operator = self->_operator;
 	newOperatorFeVariable->feVariableCount = self->feVariableCount;

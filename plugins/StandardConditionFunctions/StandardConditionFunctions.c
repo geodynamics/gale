@@ -150,15 +150,15 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_ERF,
-                                         (Name)"ERF");
+                                         (char*)"ERF");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_ERFC,
-                                         (Name)"ERFC");
+                                         (char*)"ERFC");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_RubberSheet,
-                                         (Name)"RubberSheet");
+                                         (char*)"RubberSheet");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_MovingStepFunction, (Name)"MovingStepFunction");
@@ -216,42 +216,42 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
         ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_WarsTemperature,
-                                         (Name)"WarsTemperature");
+                                         (char*)"WarsTemperature");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_Quadratic,
-                                         (Name)"Quadratic");
+                                         (char*)"Quadratic");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File1,
-                                         (Name)"File1");
+                                         (char*)"File1");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File2,
-                                         (Name)"File2");
+                                         (char*)"File2");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File3,
-                                         (Name)"File3");
+                                         (char*)"File3");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File4,
-                                         (Name)"File4");
+                                         (char*)"File4");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File5,
-                                         (Name)"File5");
+                                         (char*)"File5");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File6,
-                                         (Name)"File6");
+                                         (char*)"File6");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File7,
-                                         (Name)"File7");
+                                         (char*)"File7");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File8,
-                                         (Name)"File8");
+                                         (char*)"File8");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File9,
-                                         (Name)"File9");
+                                         (char*)"File9");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File10,
-                                         (Name)"File10");
+                                         (char*)"File10");
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
 }

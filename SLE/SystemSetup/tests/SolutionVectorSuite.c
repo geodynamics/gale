@@ -94,7 +94,7 @@ FeVariable* SolutionVectorSuite_buildFeVar() {
    feVar = FeVariable_New( "velocity", NULL, feMesh, NULL, dofs, bcs, NULL, NULL, 2, True, 
 		False, False, fieldReg );
 
-   for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, 0 ); n_i++ ) {
+   for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, (MeshTopology_Dim)0 ); n_i++ ) {
       /*const double pi=acos(-1.0);*/
       double* pos = Mesh_GetVertex( feMesh, n_i );
 
@@ -146,11 +146,11 @@ void SolutionVectorSuite_TestSolutionVector( SolutionVectorSuiteData* data ) {
 
 	mesh = feVar->feMesh;
 	nDims = Mesh_GetDimSize( mesh );
-	nEls = Mesh_GetDomainSize( mesh, nDims );
+	nEls = Mesh_GetDomainSize( mesh, (MeshTopology_Dim)nDims );
 	incArray = IArray_New();
 
 	for( e_i = 0; e_i < nEls; e_i++ ) {
-		Mesh_GetIncidence( mesh, nDims, e_i, 0, incArray );
+		Mesh_GetIncidence( mesh, (MeshTopology_Dim)nDims, e_i, (MeshTopology_Dim)0, incArray );
 		nVerts = IArray_GetSize( incArray );
 		verts = IArray_GetPtr( incArray );
 		for( v_i = 0; v_i < nVerts; v_i++ ) {

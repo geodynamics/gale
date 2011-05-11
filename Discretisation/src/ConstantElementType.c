@@ -55,7 +55,7 @@ const Type ConstantElementType_Type = "ConstantElementType";
 #define _ConstantElementType_NodeCount 1
 
 ConstantElementType* ConstantElementType_New( Name name ) {
-	ConstantElementType* self = ConstantElementType_DefaultNew( name );
+  ConstantElementType* self = (ConstantElementType*)ConstantElementType_DefaultNew( name );
 
 	self->isConstructed = True;	
 	_ElementType_Init( (ElementType*)self, _ConstantElementType_NodeCount );

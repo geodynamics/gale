@@ -106,11 +106,11 @@ void _FeSwarmVariable_Print( void* _swarmVariable, Stream* stream ) {
 	Journal_PrintPointer( stream, self->feVariable );
 }
 
-void* _FeSwarmVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _FeSwarmVariable_Copy( const void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	FeSwarmVariable*	self = (FeSwarmVariable*)swarmVariable;
 	FeSwarmVariable*	newFeSwarmVariable;
 	
-	newFeSwarmVariable = _SwarmVariable_Copy( self, dest, deep, nameExt, ptrMap );
+	newFeSwarmVariable = (FeSwarmVariable*)_SwarmVariable_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	newFeSwarmVariable->feVariable = self->feVariable;
 	

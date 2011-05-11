@@ -76,11 +76,11 @@ ForceVector* ForceVector_New(
 	void*							entryPoint_Register,
 	MPI_Comm						comm )		
 {
-	ForceVector* self = _ForceVector_DefaultNew( name );
+  ForceVector* self = (ForceVector*)_ForceVector_DefaultNew( name );
 
 	self->isConstructed = True;
 	_SolutionVector_Init( (SolutionVector*)self, context, comm, feVariable ); 
-	_ForceVector_Init( self, dim, entryPoint_Register );
+	_ForceVector_Init( self, dim, (EntryPoint_Register*)entryPoint_Register );
 
 	return self;
 }
@@ -125,7 +125,7 @@ void _ForceVector_Init( void* forceVector, Dimension_Index dim, EntryPoint_Regis
 	self->debug = Stream_RegisterChild( StgFEM_SLE_SystemSetup_Debug, self->type );
 	
 	/* Create Entry Point for assembleForceVector */
-	Stg_asprintf( &self->_assembleForceVectorEPName, "%s-%s", self->name, ForceVector_assembleForceVectorStr );
+	Stg_asprintf( (char**)(&self->_assembleForceVectorEPName), "%s-%s", self->name, ForceVector_assembleForceVectorStr );
 	self->assembleForceVector = FeEntryPoint_New( self->_assembleForceVectorEPName, FeEntryPoint_AssembleForceVector_CastType );
 	EntryPoint_Register_Add( self->entryPoint_Register, self->assembleForceVector );	
 
@@ -171,7 +171,7 @@ void _ForceVector_Print( void* forceVector, Stream* stream ) {
 }
 
 
-void* _ForceVector_Copy( void* forceVector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ForceVector_Copy( const void* forceVector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	ForceVector*	self = (ForceVector*)forceVector;
 	ForceVector*	newForceVector;
 	PtrMap*		map = ptrMap;
@@ -182,7 +182,7 @@ void* _ForceVector_Copy( void* forceVector, void* dest, Bool deep, Name nameExt,
 		ownMap = True;
 	}
 	
-	newForceVector = _SolutionVector_Copy( self, dest, deep, nameExt, map );
+	newForceVector = (ForceVector*)_SolutionVector_Copy( self, dest, deep, nameExt, map );
 	
 	/* TODO: copy vector? */
 	newForceVector->entryPoint_Register = self->entryPoint_Register;
@@ -194,9 +194,9 @@ void* _ForceVector_Copy( void* forceVector, void* dest, Bool deep, Name nameExt,
 			if( nameExt ) {
 				unsigned	nameLen = strlen( self->_assembleForceVectorEPName );
 				
-				newForceVector->_assembleForceVectorEPName = Memory_Alloc_Bytes_Unnamed( nameLen + strlen( nameExt ) + 1, "FV->vecEPName" );
-				memcpy( newForceVector->_assembleForceVectorEPName, self->_assembleForceVectorEPName, nameLen );
-				strcpy( newForceVector->_assembleForceVectorEPName + nameLen, nameExt );
+				newForceVector->_assembleForceVectorEPName = (char*)Memory_Alloc_Bytes_Unnamed( nameLen + strlen( nameExt ) + 1, "FV->vecEPName" );
+				memcpy( (char*)(newForceVector->_assembleForceVectorEPName), self->_assembleForceVectorEPName, nameLen );
+				strcpy( (char*)(newForceVector->_assembleForceVectorEPName) + nameLen, nameExt );
 			}
 			else {
 				newForceVector->_assembleForceVectorEPName = StG_Strdup( self->_assembleForceVectorEPName );
@@ -233,7 +233,7 @@ void _ForceVector_AssignFromXML( void* forceVector, Stg_ComponentFactory* cf, vo
 	entryPointRegister = (void*)self->context->entryPoint_Register;
 	assert( entryPointRegister  );
 	
-	_ForceVector_Init( self, dim, entryPointRegister );
+	_ForceVector_Init( self, dim, (EntryPoint_Register*)entryPointRegister );
 }
 
 void _ForceVector_Build( void* forceVector, void* data ) {
@@ -345,7 +345,7 @@ void ForceVector_PrintElementForceVector(
 	incArray = IArray_New();
 	FeMesh_GetElementNodes( feMesh, element_lI, incArray );
 	nInc = IArray_GetSize( incArray );
-	inc = IArray_GetPtr( incArray );
+	inc = (unsigned*)IArray_GetPtr( incArray );
 	dofsPerNode = dofLayout->dofCounts[inc[0]];
 	nodesThisEl = nInc;
 
@@ -412,7 +412,7 @@ void ForceVector_GlobalAssembly_General( void* forceVector ) {
 		
 			FeMesh_GetElementNodes( feVar->feMesh, element_lI, self->inc );
 			nInc = IArray_GetSize( self->inc );
-			inc = IArray_GetPtr( self->inc );
+			inc = (unsigned*)IArray_GetPtr( self->inc );
 			nodeCountCurrElement = nInc;
 			/* Get the local node ids */
 			nodeIdsInCurrElement = inc;
@@ -544,7 +544,7 @@ Bool ForceVector_BCAsm_RowR( void* forceVec, Assembler* assm ) {
 				       assm->rowNodeInd, 
 				       assm->rowDofInd );
 	//Vector_AddEntries( ((ForceVector*)forceVec)->vector, 1, &assm->rowEq, &bc );
-	VecSetValues( ((ForceVector*)forceVec)->vector, 1, &assm->rowEq, &bc, ADD_VALUES );
+	VecSetValues( ((ForceVector*)forceVec)->vector, 1, (PetscInt*)(&assm->rowEq), &bc, ADD_VALUES );
 	return True;
 }
 

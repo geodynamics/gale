@@ -54,7 +54,7 @@
 		/* Virtual info */			\
 							\
 		/* FeMesh info */			\
-		const char*			feElFamily;	\
+		Name			feElFamily;	\
 		ElementType*		feElType;	\
 		Bool		elementMesh;		\
 		IArray*	inc;
@@ -80,7 +80,7 @@
 
 	FeMesh* FeMesh_New( Name name, AbstractContext* context );
 	FeMesh* _FeMesh_New(  FEMESH_DEFARGS  );
-	void _FeMesh_Init( FeMesh* self, ElementType* elType, const char* family, Bool elementMesh );
+	void _FeMesh_Init( FeMesh* self, ElementType* elType, Name family, Bool elementMesh );
    FeMesh* _FeMesh_DefaultNew( Name name );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
@@ -99,7 +99,7 @@
 	** Public functions
 	*/
 
-	void FeMesh_SetElementFamily( void* feMesh, const char* family );
+	void FeMesh_SetElementFamily( void* feMesh, Name family );
 	void FeMesh_SetElementType( void* feMesh, ElementType* elType );
 
 	ElementType* FeMesh_GetElementType( void* feMesh, unsigned element );

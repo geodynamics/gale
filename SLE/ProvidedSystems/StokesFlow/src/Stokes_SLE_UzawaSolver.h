@@ -155,7 +155,7 @@
 	#define Stokes_SLE_UzawaSolver_DeepCopy( self ) \
 		(SLE_Solver*)Class_DeepCopy( self, NULL, True, NULL, NULL )
 	
-	void* _Stokes_SLE_UzawaSolver_Copy( void* stokesSleUzawaSolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Stokes_SLE_UzawaSolver_Copy( const void* stokesSleUzawaSolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	/** Stg_Component_Build() implementations: allocates the 2 MatrixSolvers and additional Vectors */
 	void _Stokes_SLE_UzawaSolver_Build( void* solver, void* stokesSLE );

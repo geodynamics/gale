@@ -85,7 +85,7 @@ FeMesh* _FeMesh_New(  FEMESH_DEFARGS  ) {
 	return self;
 }
 
-void _FeMesh_Init( FeMesh* self, ElementType* elType, const char* family, Bool elementMesh ) {
+void _FeMesh_Init( FeMesh* self, ElementType* elType, Name family, Bool elementMesh ) {
 	Stream*	stream;
 
 	assert( self && Stg_CheckType( self, FeMesh ) );
@@ -269,7 +269,7 @@ void FeMesh_SetElementType( void* feMesh, ElementType* elType ) {
 	self->feElType = elType;
 }
 
-void FeMesh_SetElementFamily( void* feMesh, const char* family ) {
+void FeMesh_SetElementFamily( void* feMesh, Name family ) {
 	FeMesh*	self = (FeMesh*)feMesh;
 
 	assert( self );
@@ -381,7 +381,7 @@ void FeMesh_CoordLocalToGlobal( void* feMesh, unsigned element, double* local, d
 	elType = FeMesh_GetElementType( self, element );
 	FeMesh_GetElementNodes( self, element, self->inc );
 	nElNodes = IArray_GetSize( self->inc );
-	elNodes = IArray_GetPtr( self->inc );
+	elNodes = (unsigned*)IArray_GetPtr( self->inc );
 	basis = AllocArray( double, nElNodes );
 	ElementType_EvaluateShapeFunctionsAt( elType, local, basis );
 

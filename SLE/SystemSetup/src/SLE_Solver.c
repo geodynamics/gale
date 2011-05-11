@@ -118,7 +118,7 @@ void SLE_Solver_InitAll( void* sleSolver, Bool useStatSolve, int statReps ) {
 	_SLE_Solver_Init( (SLE_Solver*) sleSolver, useStatSolve, statReps );
 }
 
-void* _SLE_Solver_Copy( void* sleSolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _SLE_Solver_Copy( const void* sleSolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	SLE_Solver*		self = (SLE_Solver*)sleSolver;
 	SLE_Solver*		newSleSolver;
 	PtrMap*			map = ptrMap;
@@ -129,7 +129,7 @@ void* _SLE_Solver_Copy( void* sleSolver, void* dest, Bool deep, Name nameExt, Pt
 		ownMap = True;
 	}
 	
-	newSleSolver = _Stg_Component_Copy( self, dest, deep, nameExt, map );
+	newSleSolver = (SLE_Solver*)_Stg_Component_Copy( self, dest, deep, nameExt, map );
 	
 	/* virtual functions */
 	newSleSolver->_solverSetup  = self->_solverSetup;
@@ -157,18 +157,18 @@ void* _SLE_Solver_Copy( void* sleSolver, void* dest, Bool deep, Name nameExt, Pt
 	newSleSolver->previoustimestep = self->previoustimestep;
 	
 	if( deep ) {
-		if( (newSleSolver->debug = PtrMap_Find( map, self->debug )) == NULL ) {
-			newSleSolver->debug = Stg_Class_Copy( self->debug, NULL, deep, nameExt, map );
+          if( (newSleSolver->debug = (Stream*)PtrMap_Find( map, self->debug )) == NULL ) {
+			newSleSolver->debug = (Stream*)Stg_Class_Copy( self->debug, NULL, deep, nameExt, map );
 			PtrMap_Append( map, self->debug, newSleSolver->debug );
 		}
-		if( (newSleSolver->extensionManager = PtrMap_Find( map, self->extensionManager )) == NULL ) {
-			newSleSolver->extensionManager = Stg_Class_Copy( self->extensionManager, NULL, deep, nameExt, map );
+          if( (newSleSolver->extensionManager = (ExtensionManager*)PtrMap_Find( map, self->extensionManager )) == NULL ) {
+			newSleSolver->extensionManager = (ExtensionManager*)Stg_Class_Copy( self->extensionManager, NULL, deep, nameExt, map );
 			PtrMap_Append( map, self->extensionManager, newSleSolver->extensionManager );
 		}
 	}
 	else {
 		newSleSolver->debug = self->debug;
-		newSleSolver->extensionManager = Stg_Class_Copy( self->extensionManager, NULL, deep, nameExt, map );
+		newSleSolver->extensionManager = (ExtensionManager*)Stg_Class_Copy( self->extensionManager, NULL, deep, nameExt, map );
 	}
 	
 	if( ownMap ) {

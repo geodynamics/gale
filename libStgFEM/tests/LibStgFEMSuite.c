@@ -23,7 +23,7 @@ void LibStgFEMSuite_Teardown( LibStgFEMSuiteData* data ) {
 
 void LibStgFEMSuite_DirectoryStGermain( LibStgFEMSuiteData* data ) {
     Stg_Object* testDirectoryStGermain;
-    testDirectoryStGermain = Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain" );
+    testDirectoryStGermain = (Stg_Object*)Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain" );
     pcu_check_true( testDirectoryStGermain != NULL );
 }
 
@@ -31,8 +31,8 @@ void LibStgFEMSuite_DirectoryStgFEM( LibStgFEMSuiteData * data  ) {
     Stg_Object* testDirectoryStGermain;
     Stg_Object* testDirectoryStgFEM;
 
-    testDirectoryStGermain = Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain"  );
-    testDirectoryStgFEM= Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StgFEM" );
+    testDirectoryStGermain = (Stg_Object*)Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain"  );
+    testDirectoryStgFEM= (Stg_Object*)Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StgFEM" );
 
     pcu_check_true( ( strcmp((char* )LIB_DIR, (char*)testDirectoryStGermain) ) || ( testDirectoryStgFEM != NULL ) );
 }

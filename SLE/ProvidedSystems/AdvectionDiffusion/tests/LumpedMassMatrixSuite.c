@@ -87,7 +87,7 @@ FeMesh* LumpedMassMatrixSuite_buildFeMesh( unsigned nDims, unsigned* size, doubl
 	FeMesh_SetElementFamily( feMesh, "linear" );
 
 	Mesh_SetTopologyDataSize( feMesh, MT_VERTEX, sizeof(Node) );
-	Mesh_SetTopologyDataSize( feMesh, nDims, sizeof(Element) );
+	Mesh_SetTopologyDataSize( feMesh, (MeshTopology_Dim)nDims, sizeof(Element) );
 
 	Stg_Component_Build( feMesh, NULL, False );
 	Stg_Component_Initialise( feMesh, NULL, False );
@@ -176,7 +176,7 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 	
 	feMesh = (FeMesh*) LumpedMassMatrixSuite_buildFeMesh( nDims, meshSize, minCrds, maxCrds, extensionMgr_Register, elementType_Register );
 	nDomainVerts = Mesh_GetDomainSize( feMesh, MT_VERTEX );
-	nodes = Mesh_GetTopologyData( feMesh, MT_VERTEX );
+	nodes = (Node*)Mesh_GetTopologyData( feMesh, MT_VERTEX );
 	
 	/* Create variable register */
 	variableRegister = Variable_Register_New();
@@ -197,7 +197,7 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 	/* Create Swarm */
 	if ( 3 == dim ) 
 		dimExists[K_AXIS] = True;
-	singleCellLayout= (CellLayout*)SingleCellLayout_New( "SingleCellLayout", (AbstractContext*)context, dimExists, NULL, NULL );
+	singleCellLayout= (CellLayout*)SingleCellLayout_New( "SingleCellLayout", (AbstractContext*)context, (Bool*)dimExists, NULL, NULL );
 	gaussParticleLayout = (ParticleLayout*)GaussParticleLayout_New( "GaussParticleLayout", NULL, LocalCoordSystem, True, dim, particlesPerDim );
 	swarm = Swarm_New( "gaussSwarm", (AbstractContext*)context, singleCellLayout, gaussParticleLayout,
 		dim, sizeof(IntegrationPoint), extensionMgr_Register, context->variable_Register, MPI_COMM_WORLD, NULL );

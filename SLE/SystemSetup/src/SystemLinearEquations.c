@@ -67,7 +67,7 @@ SystemLinearEquations* SystemLinearEquations_New(
 	EntryPoint_Register*		entryPoint_Register,
 	MPI_Comm						comm )
 {
-	SystemLinearEquations* self = _SystemLinearEquations_DefaultNew( name );
+  SystemLinearEquations* self = (SystemLinearEquations*)_SystemLinearEquations_DefaultNew( name );
 
 	self->isConstructed = True;
 	_SystemLinearEquations_Init(
@@ -204,14 +204,14 @@ void _SystemLinearEquations_Init(
 	self->executeEP = EntryPoint_New( self->executeEPName, EntryPoint_2VoidPtr_CastType );
 
 	/* Add default hooks to Execute E.P. */
-	EntryPoint_Append( self->executeEP, "BC_Setup", SystemLinearEquations_BC_Setup, self->type);
-	EntryPoint_Append( self->executeEP, "LM_Setup", SystemLinearEquations_LM_Setup, self->type);
-	EntryPoint_Append( self->executeEP, "IntegrationSetup", SystemLinearEquations_IntegrationSetup, self->type );
-	EntryPoint_Append( self->executeEP, "ZeroAllVectors", SystemLinearEquations_ZeroAllVectors, self->type);
-	EntryPoint_Append( self->executeEP, "MatrixSetup", SystemLinearEquations_MatrixSetup, self->type);
-	EntryPoint_Append( self->executeEP, "VectorSetup", SystemLinearEquations_VectorSetup, self->type);
-	EntryPoint_Append( self->executeEP, "ExecuteSolver", SystemLinearEquations_ExecuteSolver, self->type);
-	EntryPoint_Append( self->executeEP, "UpdateSolutionOntoNodes",SystemLinearEquations_UpdateSolutionOntoNodes,self->type);
+	EntryPoint_Append( self->executeEP, "BC_Setup", (void*)SystemLinearEquations_BC_Setup, self->type);
+	EntryPoint_Append( self->executeEP, "LM_Setup", (void*)SystemLinearEquations_LM_Setup, self->type);
+	EntryPoint_Append( self->executeEP, "IntegrationSetup", (void*)SystemLinearEquations_IntegrationSetup, self->type );
+	EntryPoint_Append( self->executeEP, "ZeroAllVectors", (void*)SystemLinearEquations_ZeroAllVectors, self->type);
+	EntryPoint_Append( self->executeEP, "MatrixSetup", (void*)SystemLinearEquations_MatrixSetup, self->type);
+	EntryPoint_Append( self->executeEP, "VectorSetup", (void*)SystemLinearEquations_VectorSetup, self->type);
+	EntryPoint_Append( self->executeEP, "ExecuteSolver", (void*)SystemLinearEquations_ExecuteSolver, self->type);
+	EntryPoint_Append( self->executeEP, "UpdateSolutionOntoNodes",(void*)SystemLinearEquations_UpdateSolutionOntoNodes,self->type);
 
 	/* Create Integration Setup EP */
 	Stg_asprintf( &self->integrationSetupEPName, "%s-integrationSetup", self->name );
@@ -257,7 +257,7 @@ void _SystemLinearEquations_Print( void* sle, Stream* stream ) {
 	Stg_Class_Print( self->solver, stream );
 }
 
-void* _SystemLinearEquations_Copy( void* sle, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _SystemLinearEquations_Copy( const void* sle, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	SystemLinearEquations*	self = (SystemLinearEquations*)sle;
 	SystemLinearEquations*	newSLE;
 	PtrMap*			map = ptrMap;
@@ -268,7 +268,7 @@ void* _SystemLinearEquations_Copy( void* sle, void* dest, Bool deep, Name nameEx
 		ownMap = True;
 	}
 	
-	newSLE = _Stg_Component_Copy( sle, dest, deep, nameExt, map );
+	newSLE = (SystemLinearEquations*)_Stg_Component_Copy( sle, dest, deep, nameExt, map );
 	
 	/* Virtual methods */
 	newSLE->_LM_Setup = self->_LM_Setup;
@@ -284,8 +284,8 @@ void* _SystemLinearEquations_Copy( void* sle, void* dest, Bool deep, Name nameEx
 		newSLE->stiffnessMatrices = (StiffnessMatrixList*)Stg_Class_Copy( self->stiffnessMatrices, NULL, deep, nameExt, map );
 		newSLE->forceVectors = (ForceVectorList*)Stg_Class_Copy( self->forceVectors, NULL, deep, nameExt, map );
 		newSLE->solutionVectors = (SolutionVectorList*)Stg_Class_Copy( self->solutionVectors, NULL, deep, nameExt, map );
-		if( (newSLE->extensionManager = PtrMap_Find( map, self->extensionManager )) == NULL ) {
-			newSLE->extensionManager = Stg_Class_Copy( self->extensionManager, NULL, deep, nameExt, map );
+		if( (newSLE->extensionManager = (ExtensionManager*)PtrMap_Find( map, self->extensionManager )) == NULL ) {
+                  newSLE->extensionManager = (ExtensionManager*)Stg_Class_Copy( self->extensionManager, NULL, deep, nameExt, map );
 			PtrMap_Append( map, self->extensionManager, newSLE->extensionManager );
 		}
 	}
@@ -388,7 +388,7 @@ void _SystemLinearEquations_AssignFromXML( void* sle, Stg_ComponentFactory* cf, 
 		nonLinearMinIterations,
 		nonLinearSolutionType,
 		optionsPrefix,
-		entryPointRegister,
+		(EntryPoint_Register*)entryPointRegister,
 		MPI_COMM_WORLD );
 
 	VecCreate( self->comm, &self->X );
@@ -853,7 +853,7 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 		}
 			
 		/* Check if residual is below tolerance */
-		converged = (residual < tolerance);
+		converged = (residual < tolerance) ? True : False;
 		
 		Journal_Printf(self->info,"Non linear solver - Residual %.8e; Tolerance %.4e%s%s - %6.6e (secs)\n\n", residual, tolerance, 
 			(converged) ? " - Converged" : " - Not converged",
@@ -918,27 +918,27 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 
 }
 
-void SystemLinearEquations_AddNonLinearSetupEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func ) {
+void SystemLinearEquations_AddNonLinearSetupEP( void* sle, Name name, EntryPoint_2VoidPtr_Cast func ) {
 	SystemLinearEquations* self = (SystemLinearEquations*)sle;
 
 	SystemLinearEquations_SetToNonLinear( self );
-	EntryPoint_Append( self->nlSetupEP, (char*)name, func, self->type );
+	EntryPoint_Append( self->nlSetupEP, (char*)name, (void*)func, self->type );
 }
 
-void SystemLinearEquations_AddPostNonLinearEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func ) {
+void SystemLinearEquations_AddPostNonLinearEP( void* sle, Name name, EntryPoint_2VoidPtr_Cast func ) {
 	SystemLinearEquations* self = (SystemLinearEquations*)sle;
 
-	EntryPoint_Append( self->postNlEP, (char*)name, func, self->type );
+	EntryPoint_Append( self->postNlEP, (char*)name, (void*)func, self->type );
 }
 
 void SystemLinearEquations_AddNonLinearConvergedEP( void* sle,
-						    const char* name,
+						    Name name,
 						    EntryPoint_2VoidPtr_Cast func )
 {
 	SystemLinearEquations* self = (SystemLinearEquations*)sle;
 
 	SystemLinearEquations_SetToNonLinear( self );
-	EntryPoint_Append( self->nlConvergedEP, (char*)name, func, self->type );
+	EntryPoint_Append( self->nlConvergedEP, (char*)name, (void*)func, self->type );
 }
 
 /*
@@ -1275,11 +1275,11 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
 
 ///////////////
 
-void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func ) {
+void SystemLinearEquations_AddNonLinearEP( void* sle, Name name, EntryPoint_2VoidPtr_Cast func ) {
 	SystemLinearEquations* self = (SystemLinearEquations*)sle;
 
 	SystemLinearEquations_SetToNonLinear( self );
-	EntryPoint_Append( self->nlEP, (char*)name, func, self->type );
+	EntryPoint_Append( self->nlEP, (char*)name, (void*)func, self->type );
 }
 
 
@@ -1311,11 +1311,11 @@ void SystemLinearEquations_SetToNonLinear( void* sle ) {
 			context = self->context;
 
 			nonLinearInitHook = Hook_New( "NewtonInitialise", 
-						SystemLinearEquations_NewtonInitialise, self->name );
+						(void*)SystemLinearEquations_NewtonInitialise, self->name );
 			_EntryPoint_PrependHook_AlwaysFirst( Context_GetEntryPoint( context, AbstractContext_EP_Solve ), 
 								nonLinearInitHook );
 			nonLinearFinaliseHook = Hook_New( "NewtonFinalise",
-						SystemLinearEquations_NewtonFinalise, self->name );
+						(void*)SystemLinearEquations_NewtonFinalise, self->name );
 			_EntryPoint_AppendHook_AlwaysLast( Context_GetEntryPoint( context, AbstractContext_EP_Solve ), 
 						nonLinearFinaliseHook );
 			self->_execute = SystemLinearEquations_NewtonExecute;

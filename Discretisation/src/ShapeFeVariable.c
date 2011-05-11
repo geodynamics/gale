@@ -75,7 +75,7 @@ void* ShapeFeVariable_DefaultNew( Name name ) {
 	FeVariable_GetValueAtNodeFunction*                      _getValueAtNode = _FeVariable_GetValueAtNode;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType                             nameAllocationType = ZERO;
+	AllocationType                             nameAllocationType = (AllocationType)ZERO;
 	FeVariable_SyncShadowValuesFunc*            _syncShadowValues = ZERO;
 
 	return (ShapeFeVariable*) _ShapeFeVariable_New(  SHAPEFEVARIABLE_PASSARGS  );
@@ -120,7 +120,7 @@ void _ShapeFeVariable_Print( void* _shapeFeVariable, Stream* stream ) {
 	Journal_PrintPointer( stream, self->shape );
 }
 
-void* _ShapeFeVariable_Copy( void* shapeFeVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ShapeFeVariable_Copy( const void* shapeFeVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	/* ShapeFeVariable*	self = (ShapeFeVariable*)shapeFeVariable; */
 	ShapeFeVariable* newShapeFeVariable;
 	

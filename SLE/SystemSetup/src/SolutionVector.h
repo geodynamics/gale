@@ -115,7 +115,7 @@
 	#define SolutionVector_DeepCopy( self ) \
 		(ForceVector*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _SolutionVector_Copy( void* solutionVector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _SolutionVector_Copy( const void* solutionVector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void _SolutionVector_Build( void* solutionVector, void* data );
 	

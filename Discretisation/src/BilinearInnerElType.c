@@ -59,7 +59,7 @@ const Type BilinearInnerElType_Type = "BilinearInnerElType";
 #define _BilinearInnerElType_NodeCount 3
 
 BilinearInnerElType* BilinearInnerElType_New( Name name ) {
-	BilinearInnerElType* self = BilinearInnerElType_DefaultNew( name );
+  BilinearInnerElType* self = (BilinearInnerElType*)BilinearInnerElType_DefaultNew( name );
 
 	self->isConstructed = True;	
 	_ElementType_Init( (ElementType*)self, _BilinearInnerElType_NodeCount );

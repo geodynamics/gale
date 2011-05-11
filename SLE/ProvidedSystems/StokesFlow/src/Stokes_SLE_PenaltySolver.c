@@ -140,11 +140,11 @@ void _Stokes_SLE_PenaltySolver_Print( void* solver, Stream* stream ) {
 }
 
 
-void* _Stokes_SLE_PenaltySolver_Copy( void* stokesSlePenaltySolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Stokes_SLE_PenaltySolver_Copy( const void* stokesSlePenaltySolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Stokes_SLE_PenaltySolver* self = (Stokes_SLE_PenaltySolver*)stokesSlePenaltySolver;
 	Stokes_SLE_PenaltySolver*	newStokesSlePenaltySolver;
 	
-	newStokesSlePenaltySolver = _SLE_Solver_Copy( self, dest, deep, nameExt, ptrMap );
+	newStokesSlePenaltySolver = (Stokes_SLE_PenaltySolver*)_SLE_Solver_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	return (void*) newStokesSlePenaltySolver;
 }

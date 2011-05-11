@@ -216,7 +216,7 @@ void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFacto
 	Name														upwindParamFuncName;
 	double													defaultDiffusivity;
 	Materials_Register*		materials_Register;
-	AdvDiffResidualForceTerm_UpwindParamFuncType	upwindFuncType = 0;
+	AdvDiffResidualForceTerm_UpwindParamFuncType	upwindFuncType = (AdvDiffResidualForceTerm_UpwindParamFuncType)0;
         Swarm *picSwarm;
 
 	/* Construct Parent */
@@ -235,7 +235,7 @@ void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFacto
 		Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ), "Cannot understand '%s'\n", upwindParamFuncName );
 
 	defaultDiffusivity = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"defaultDiffusivity", 1.0  );
-	picSwarm       = Stg_ComponentFactory_ConstructByName( cf, (Name)"picIntegrationPoints", IntegrationPointsSwarm, True, data  ) ;
+	picSwarm       = (Swarm*)Stg_ComponentFactory_ConstructByName( cf, (Name)"picIntegrationPoints", IntegrationPointsSwarm, True, data  ) ;
 	materials_Register = ((PICelleratorContext*)(self->context))->materials_Register;
 
 	_AdvDiffResidualForceTerm_Init( self, velocityField, defaultDiffusivity,
@@ -248,12 +248,12 @@ void _AdvDiffResidualForceTerm_Build( void* residual, void* data ) {
 	AdvDiffResidualForceTerm_MaterialExt*   materialExt;
 	Material_Index                   material_I;
 	Material*                        material;
-	Materials_Register*              materials_Register = self->materials_Register;
+	Materials_Register*              materials_Register = (Materials_Register*)(self->materials_Register);
 	IntegrationPointsSwarm*          swarm              = (IntegrationPointsSwarm*)self->picSwarm;
 	MaterialPointsSwarm**            materialSwarms;
 	Index                            materialSwarm_I;
 	Stg_ComponentFactory*            cf;
-	Name                             name;
+	char*                            name;
 
 	cf = self->context->CF;
 
@@ -268,7 +268,7 @@ void _AdvDiffResidualForceTerm_Build( void* residual, void* data ) {
 			sizeof(AdvDiffResidualForceTerm_MaterialExt) );
 	for ( material_I = 0 ; material_I < Materials_Register_GetCount( materials_Register ) ; material_I++) {
 		material = Materials_Register_GetByIndex( materials_Register, material_I );
-		materialExt = ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
+		materialExt = (AdvDiffResidualForceTerm_MaterialExt*)ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
 
 		materialExt->diffusivity = Stg_ComponentFactory_GetDouble( cf, material->name,
                                                                            (Dictionary_Entry_Key)"diffusivity",
@@ -277,7 +277,7 @@ void _AdvDiffResidualForceTerm_Build( void* residual, void* data ) {
 	
 	/* Create Swarm Variables of each material swarm this ip swarm is mapped against */
 	materialSwarms = IntegrationPointMapper_GetMaterialPointsSwarms( swarm->mapper, &(self->materialSwarmCount) );
-	self->diffusivitySwarmVariables = Memory_Alloc_Array( MaterialSwarmVariable*, self->materialSwarmCount, "DiffusivityVariables" );
+	self->diffusivitySwarmVariables = (void**)Memory_Alloc_Array( MaterialSwarmVariable*, self->materialSwarmCount, "DiffusivityVariables" );
 	
 	for ( materialSwarm_I = 0; materialSwarm_I < self->materialSwarmCount; ++materialSwarm_I ) {
 		name = Stg_Object_AppendSuffix( materialSwarms[materialSwarm_I], (Name)"Diffusivity"  );
@@ -286,7 +286,7 @@ void _AdvDiffResidualForceTerm_Build( void* residual, void* data ) {
 				(AbstractContext*)self->context,
 				materialSwarms[materialSwarm_I], 
 				1, 
-				self->materials_Register, 
+				(Materials_Register*)self->materials_Register, 
 				self->materialExtHandle, 
 				GetOffsetOfMember( *materialExt, diffusivity ) );
 		Memory_Free( name );

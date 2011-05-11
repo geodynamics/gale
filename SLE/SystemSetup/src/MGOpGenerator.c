@@ -57,7 +57,7 @@ MGOpGenerator* _MGOpGenerator_New(  MGOPGENERATOR_DEFARGS  ) {
 	self = (MGOpGenerator*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
 
 	/* stuff previously housed in the MatrixSolver class */
-	self->solver = malloc( sizeof( MGSolver_PETScData ) );
+	self->solver = (MGSolver_PETScData*)malloc( sizeof( MGSolver_PETScData ) );
 	self->solver->ksp = PETSC_NULL;
 	self->solver->matrix = PETSC_NULL;
 	self->solver->inversion = PETSC_NULL;

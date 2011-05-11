@@ -82,7 +82,7 @@ void* _TrilinearInnerElType_DefaultNew( Name name ) {
 }
 
 TrilinearInnerElType* TrilinearInnerElType_New( Name name ) {
-	TrilinearInnerElType* self = _TrilinearInnerElType_DefaultNew( name );
+  TrilinearInnerElType* self = (TrilinearInnerElType*)_TrilinearInnerElType_DefaultNew( name );
 
 	self->isConstructed = True;
 	_ElementType_Init( (ElementType*)self, _TrilinearInnerElType_NodeCount );

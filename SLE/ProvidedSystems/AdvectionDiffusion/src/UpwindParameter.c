@@ -125,7 +125,7 @@ double AdvDiffResidualForceTerm_UpwindDiffusivity(
 	incArray = self->incarray;
 	FeMesh_GetElementNodes( mesh, lElement_I, incArray );
 	nInc = IArray_GetSize( incArray );
-	inc = IArray_GetPtr( incArray );
+	inc = (unsigned*)IArray_GetPtr( incArray );
 	
 	
 	nodeIndex_LeastValues = inc[0];

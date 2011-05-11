@@ -264,13 +264,13 @@ void Assembler_LoopMatrixElement( void* assembler, unsigned element ) {
 	rowDofs = rowVar->dofLayout;			assert( rowDofs );
 	colDofs = colVar->dofLayout;			assert( colDofs );
 	nDims = Mesh_GetDimSize( rowMesh );		assert( nDims );
-	Mesh_GetIncidence( rowMesh, nDims, element, MT_VERTEX, self->rowInc );
+	Mesh_GetIncidence( rowMesh, (MeshTopology_Dim)nDims, element, MT_VERTEX, self->rowInc );
 	nRowElNodes = IArray_GetSize( self->rowInc );
-	rowElNodes = IArray_GetPtr( self->rowInc );
+	rowElNodes = (unsigned*)IArray_GetPtr( self->rowInc );
 	Mesh_GetIncidence( colMesh, Mesh_GetDimSize( colMesh ), element, MT_VERTEX, 
 			   self->colInc );
 	nColElNodes = IArray_GetSize( self->colInc );
-	colElNodes = IArray_GetPtr( self->colInc );
+	colElNodes = (unsigned*)IArray_GetPtr( self->colInc );
 	assert( FeMesh_GetElementLocalSize( rowMesh ) == FeMesh_GetElementLocalSize( colMesh ) );
 	assert( nDims == Mesh_GetDimSize( colMesh ) );
 	assert( rowEqNum->locationMatrix );

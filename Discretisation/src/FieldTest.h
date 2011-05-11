@@ -151,7 +151,7 @@
 	#define FieldTest_DeepCopy( self ) \
 		(FieldTest*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _FieldTest_Copy( void* fieldTest, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _FieldTest_Copy( const void* fieldTest, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* Build implementation */
 	void _FieldTest_Build( void* fieldTest, void* data );

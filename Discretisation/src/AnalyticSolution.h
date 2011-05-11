@@ -114,7 +114,7 @@
 	#define AnalyticSolution_DeepCopy( self ) \
 		(AnalyticSolution*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _AnalyticSolution_Copy( void* analyticSolution, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _AnalyticSolution_Copy( const void* analyticSolution, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* Build implementation */
 	void _AnalyticSolution_Build( void* analyticSolution, void* data );

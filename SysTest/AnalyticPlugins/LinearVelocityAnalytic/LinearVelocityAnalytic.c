@@ -90,16 +90,16 @@ void LinearVelocityAnalytic_GetCornerNodeVelocities(void* analyticSolution) {
 
 	/* Find global indicies of nodes */
 	self->cornerNodeCount = 4;
-	nodeMapper[0] = Grid_ProjectIJK_MinMax( vertGrid, 0, 0, 0 );
-	nodeMapper[1] = Grid_ProjectIJK_MinMax( vertGrid, 1, 0, 0 );
-	nodeMapper[2] = Grid_ProjectIJK_MinMax( vertGrid, 0, 1, 0 );
-	nodeMapper[3] = Grid_ProjectIJK_MinMax( vertGrid, 1, 1, 0 );
+	nodeMapper[0] = Grid_ProjectIJK_MinMax( vertGrid, False, False, False );
+	nodeMapper[1] = Grid_ProjectIJK_MinMax( vertGrid, True, False, False );
+	nodeMapper[2] = Grid_ProjectIJK_MinMax( vertGrid, False, True, False );
+	nodeMapper[3] = Grid_ProjectIJK_MinMax( vertGrid, True, True, False );
 	if ( dim == 3 ) {
 		self->cornerNodeCount = 8;
-		nodeMapper[4] = Grid_ProjectIJK_MinMax( vertGrid, 0, 0, 1 );
-		nodeMapper[5] = Grid_ProjectIJK_MinMax( vertGrid, 1, 0, 1 );
-		nodeMapper[6] = Grid_ProjectIJK_MinMax( vertGrid, 0, 1, 1 );
-		nodeMapper[7] = Grid_ProjectIJK_MinMax( vertGrid, 1, 1, 1 );
+		nodeMapper[4] = Grid_ProjectIJK_MinMax( vertGrid, False, False, True );
+		nodeMapper[5] = Grid_ProjectIJK_MinMax( vertGrid, True, False, True );
+		nodeMapper[6] = Grid_ProjectIJK_MinMax( vertGrid, False, True, True );
+		nodeMapper[7] = Grid_ProjectIJK_MinMax( vertGrid, True, True, True );
 	}
 
 	/* Loop over corner nodes */

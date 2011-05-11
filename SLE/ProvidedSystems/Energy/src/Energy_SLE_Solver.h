@@ -109,7 +109,7 @@
 	#define Energy_SLE_Solver_DeepCopy( self ) \
 		(Energy_SLE_Solver*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _Energy_SLE_Solver_Copy( void* standardSleSolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Energy_SLE_Solver_Copy( const void* standardSleSolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	/* Stg_Component_Build() implementation */
 	void _Energy_SLE_Solver_Build( void* sleSolver, void* standardSLE );

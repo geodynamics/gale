@@ -151,7 +151,7 @@ void _ForceTerm_Print( void* forceTerm, Stream* stream ) {
 }
 
 
-void* _ForceTerm_Copy( void* forceTerm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ForceTerm_Copy( const void* forceTerm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	ForceTerm*	self = (ForceTerm*)forceTerm;
 	ForceTerm*	newForceTerm;
 	PtrMap*		map = ptrMap;
@@ -162,7 +162,7 @@ void* _ForceTerm_Copy( void* forceTerm, void* dest, Bool deep, Name nameExt, Ptr
 		ownMap = True;
 	}
 	
-	newForceTerm = _Stg_Component_Copy( self, dest, deep, nameExt, map );
+	newForceTerm = (ForceTerm*)_Stg_Component_Copy( self, dest, deep, nameExt, map );
 	
 	newForceTerm->extraInfo = self->extraInfo;
 	if( deep ) {

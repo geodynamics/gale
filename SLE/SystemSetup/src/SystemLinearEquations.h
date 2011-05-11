@@ -102,9 +102,9 @@
 		SolutionVectorList*											solutionVectors; \
 		SLE_Solver*														solver; \
 		FiniteElementContext*										context; \
-		Name																executeEPName; \
+		char*																executeEPName; \
 		EntryPoint*														executeEP; \
-		Name																integrationSetupEPName; \
+		char*																integrationSetupEPName; \
 		EntryPoint*														integrationSetupEP; \
 		EntryPoint_Register*											entryPoint_Register; \
 		\
@@ -153,9 +153,9 @@
 		SystemLinearEquations_SetFFunc*							_setFFunc; \
 		SystemLinearEquations_ConfigureNonlinearSolver*		_configureNLSolverFunc; \
 		SystemLinearEquations_SetFFunc*							_updateOldFields; \
-		Name																optionsPrefix; \
+		char*																optionsPrefix; \
 		/* parameter and methods relevant to PICARD */ \
-		Name																picard_form_function_type; \
+		char*																picard_form_function_type; \
 		double															alpha; \
 		double															rtol,ttol,xtol,abstol; \
 		Bool																picard_monitor; \
@@ -231,7 +231,7 @@
 	#define SystemLinearEquations_DeepCopy( self ) \
 		(SystemLinearEquations*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 		
-	void* _SystemLinearEquations_Copy( void* sle, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _SystemLinearEquations_Copy( const void* sle, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* +++ Virtual Functions +++ */
 	void* _SystemLinearEquations_DefaultNew( Name name ) ;
@@ -330,11 +330,11 @@
 
 	void SystemLinearEquations_NonLinearExecute( void* sle, void* data );
 
-	void SystemLinearEquations_AddNonLinearSetupEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func );
+	void SystemLinearEquations_AddNonLinearSetupEP( void* sle, Name name, EntryPoint_2VoidPtr_Cast func );
 
-	void SystemLinearEquations_AddNonLinearEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func );
+	void SystemLinearEquations_AddNonLinearEP( void* sle, Name name, EntryPoint_2VoidPtr_Cast func );
 
-	void SystemLinearEquations_AddPostNonLinearEP( void* sle, const char* name, EntryPoint_2VoidPtr_Cast func );
+	void SystemLinearEquations_AddPostNonLinearEP( void* sle, Name name, EntryPoint_2VoidPtr_Cast func );
 
 	void SystemLinearEquations_SetToNonLinear( void* sle );
 

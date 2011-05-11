@@ -57,7 +57,7 @@
 		__Codelet
 	} StgFEM_PrintFeVariableDiscreteValues;
 
-	extern const char* PRINT_FE_VARIABLE_DISCRETE_VALUES_TAG;
+	extern Name PRINT_FE_VARIABLE_DISCRETE_VALUES_TAG;
 	
 	Index _StgFEM_PrintFeVariableDiscreteValues_Register( PluginsManager* pluginsManager );
 	void PrintFeVariableDiscreteValues( void* _context );

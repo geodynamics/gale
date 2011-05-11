@@ -92,14 +92,14 @@ void C2GeneratorSuite_TestElementVertexInc( C2GeneratorSuiteData* data ) {
 	unsigned	gNode0, gNode1, gNode2;
 	int		checkNodes;
 
-	for( el_i = 0; el_i < Mesh_GetLocalSize( data->mesh, dim ); el_i++ ) {
+	for( el_i = 0; el_i < Mesh_GetLocalSize( data->mesh, (MeshTopology_Dim)dim ); el_i++ ) {
 		gEl = Sync_DomainToGlobal( elSync, el_i );
 		Grid_Lift( elGrid, gEl, dimInds );
 		dimInds[0] *= 2; dimInds[1] *= 2; dimInds[2] *= 2;
 
 		MeshTopology_GetIncidence( (IGraph*)data->mesh->topo, dim, el_i, MT_VERTEX, inc );
 		nIncVerts = IArray_GetSize( inc );
-		incVerts = IArray_GetPtr( inc );
+		incVerts = (unsigned*)IArray_GetPtr( inc );
 
 		pcu_check_true( nIncVerts == 27 );
 
@@ -335,7 +335,7 @@ void C2GeneratorSuite_TestEdgeVertexInc( C2GeneratorSuiteData* data ) {
 
 		MeshTopology_GetIncidence( (IGraph*)data->mesh->topo, MT_EDGE, edge_i, MT_VERTEX, inc );
 		nIncVerts = IArray_GetSize( inc );
-		incVerts = IArray_GetPtr( inc );
+		incVerts = (unsigned*)IArray_GetPtr( inc );
 
 		pcu_check_true( nIncVerts == 3 );
 
@@ -460,7 +460,7 @@ void C2GeneratorSuite_TestFaceVertexInc( C2GeneratorSuiteData* data ) {
 
 		MeshTopology_GetIncidence( (IGraph*)data->mesh->topo, MT_FACE, face_i, MT_VERTEX, inc );
 		nIncVerts = IArray_GetSize( inc );
-		incVerts = IArray_GetPtr( inc );
+		incVerts = (unsigned*)IArray_GetPtr( inc );
 
 		pcu_check_true( nIncVerts == 9 );
 

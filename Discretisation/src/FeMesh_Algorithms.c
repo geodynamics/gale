@@ -116,7 +116,7 @@ void _FeMesh_Algorithms_Print( void* algorithms, Stream* stream ) {
 }
 
 void _FeMesh_Algorithms_AssignFromXML( void* algorithms, Stg_ComponentFactory* cf, void* data ) {
-   _FeMesh_Algorithms_Init( algorithms );
+  _FeMesh_Algorithms_Init( (FeMesh_Algorithms*)algorithms );
 }
 
 void _FeMesh_Algorithms_Build( void* algorithms, void* data ) {
@@ -142,7 +142,7 @@ Bool _FeMesh_Algorithms_Search( void* algorithms, double* point,
 {
 	FeMesh_Algorithms*	self = (FeMesh_Algorithms*)algorithms;
 
-	return FeMesh_Algorithms_SearchWithTree( self, point, dim, ind );
+	return FeMesh_Algorithms_SearchWithTree( self, point, (unsigned*)dim, ind );
 }
 
 Bool _FeMesh_Algorithms_SearchElements( void* algorithms, double* point, 
@@ -172,16 +172,16 @@ Bool FeMesh_Algorithms_SearchWithTree( void* _self, double* pnt, unsigned* dim, 
 
    *dim = Mesh_GetDimSize( self->mesh );
    MPI_Comm_size( MPI_COMM_WORLD, &curRank );
-   nLocals = Mesh_GetLocalSize( self->mesh, *dim );
+   nLocals = Mesh_GetLocalSize( self->mesh, (MeshTopology_Dim)(*dim) );
    if( !SpatialTree_Search( self->tree, pnt, &nEls, &els ) )
       return False;
 
    *el = nLocals;
    elType = Mesh_GetElementType( self->mesh, 0 );
    for( ii = 0; ii < nEls; ii++ ) {
-      if( FeMesh_ElementType_ElementHasPoint( elType, els[ii], pnt, &curDim, &curEl ) ) {
-         if( curEl >= nLocals ) {
-            owner = Mesh_GetOwner( self->mesh, curDim, curEl - nLocals );
+     if( FeMesh_ElementType_ElementHasPoint( elType, els[ii], pnt, (MeshTopology_Dim*)(&curDim), &curEl ) ) {
+       if( curEl >= (unsigned)nLocals ) {
+         owner = Mesh_GetOwner( self->mesh, (MeshTopology_Dim)curDim, curEl - nLocals );
             owner = Comm_RankLocalToGlobal( self->mesh->topo->comm, owner );
             if( owner <= curRank ) {
                curRank = owner;

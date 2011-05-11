@@ -201,7 +201,7 @@ Bool PressureGradMatrixTerm_RowCB( PressureGradMatrixTerm* self, Assembler* assm
 
 Bool PressureGradMatrixTerm_ColCB( PressureGradMatrixTerm* self, Assembler* assm ) {
 	if( assm->rowDofInd != assm->colDofInd )
-		return;
+          return False;
 
 	self->elStiffMat[assm->rowInd][assm->colInd] += 
 		assm->shapeFuncs[assm->rowElNodeInd] * 

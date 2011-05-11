@@ -110,7 +110,7 @@
 	#define Stokes_SLE_PenaltySolver_DeepCopy( self ) \
 		(SLE_Solver*)Class_DeepCopy( self, NULL, True, NULL, NULL )
 	
-	void* _Stokes_SLE_PenaltySolver_Copy( void* stokesSlePenaltySolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Stokes_SLE_PenaltySolver_Copy( const void* stokesSlePenaltySolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	/** Stg_Component_Build() implementations: allocates the 2 MatrixSolvers and additional Vectors */
 	void _Stokes_SLE_PenaltySolver_Build( void* solver, void* stokesSLE );

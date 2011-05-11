@@ -60,8 +60,8 @@
 	typedef void (FeVariable_SyncShadowValuesFunc)( void* feVariable );
 	
 	/* Function prototypes for import / export */
-	typedef void (FeVariable_ReadNodalValuesFromFile_Function) (void* feVariable, const char* prefixStr, unsigned int timeStep );
-	typedef void (FeVariable_IO_File_Function) (void* feVariable, const char* fileName, Bool saveCoords );
+	typedef void (FeVariable_ReadNodalValuesFromFile_Function) (void* feVariable, Name prefixStr, unsigned int timeStep );
+	typedef void (FeVariable_IO_File_Function) (void* feVariable, Name fileName, Bool saveCoords );
 
 	/* A global list of import/export info objects - can be added to later by plugins. Needs to be initialised in
 	 * FeDiscretisation_Init() */
@@ -233,7 +233,7 @@
 	#define FeVariable_DeepCopy( self ) \
 		(FeVariable*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _FeVariable_Copy( void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _FeVariable_Copy( const void* feVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/** Stg_Component_Build() implementation */
 	void _FeVariable_Build( void* variable, void* data );
@@ -310,17 +310,17 @@
 	void FeVariable_PrintLocalDiscreteValues_2dBox( void* variable, Stream* stream );
 
 	/** Saves the current mesh coordinates, and value of each dof in the feVariable, to file */
-	void FeVariable_SaveToFile( void* feVariable, const char* filename, Bool saveCoords );
+	void FeVariable_SaveToFile( void* feVariable, Name filename, Bool saveCoords );
 
 	/** Reads in everything to initialise a built FeVariable from a file */
-	void FeVariable_ReadFromFile( void* feVariable, const char* filename );
+	void FeVariable_ReadFromFile( void* feVariable, Name filename );
 
 	/** Reads in everything to initialise a built FeVariable from a file. 
 	    This function also performs required interpolation where simulation 
 	    mesh resolution does not match file mesh resolution
 	    you must provide the feVariable which is being initialised, the filename of the checkpointed feVariable
 	    from which interpolation is being performed, and its corresponding mesh filename */
-	void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, const char* feVarFilename, const char* meshFilename );
+	void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, Name feVarFilename, const char* meshFilename );
 
 	/** Evaluates Spatial Derivatives using shape functions */
 	Bool FeVariable_InterpolateDerivativesAt( void* variable, double* globalCoord, double* value );

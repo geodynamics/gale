@@ -58,7 +58,7 @@
 const Type FeEntryPoint_Type = "FeEntryPoint";
 
 
-FeEntryPoint* FeEntryPoint_New( const Name name, unsigned int castType ) {
+FeEntryPoint* FeEntryPoint_New( Name name, unsigned int castType ) {
 	/* Variables set in this function */
 	SizeT                       _sizeOfSelf = sizeof(FeEntryPoint);
 	Type                               type = FeEntryPoint_Type;

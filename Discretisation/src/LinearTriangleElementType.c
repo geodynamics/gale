@@ -56,7 +56,7 @@ const Type LinearTriangleElementType_Type = "LinearTriangleElementType";
 #define _LinearTriangleElementType_NodeCount 3
 
 LinearTriangleElementType* LinearTriangleElementType_New( Name name ) {
-	LinearTriangleElementType* self = _LinearTriangleElementType_DefaultNew( name );
+  LinearTriangleElementType* self = (LinearTriangleElementType*)_LinearTriangleElementType_DefaultNew( name );
 
 	self->isConstructed = True;
 	_ElementType_Init( (ElementType*)self, _LinearTriangleElementType_NodeCount );

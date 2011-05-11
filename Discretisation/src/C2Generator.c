@@ -187,7 +187,7 @@ void C2Generator_GenElementVertexInc( void* meshGenerator, IGraph* topo, Grid***
 	nDomainEls = Sync_GetNumDomains( IGraph_GetDomain( topo, nDims ) );
 	incEls = Memory_Alloc_Array_Unnamed( unsigned, vertsPerEl );
 	dimInds = Memory_Alloc_Array_Unnamed( unsigned, topo->nDims );
-	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
+	for( e_i = 0; e_i < (unsigned)nDomainEls; e_i++ ) {
 		unsigned	gInd = Sync_DomainToGlobal( IGraph_GetDomain( topo, nDims ), e_i );
 		unsigned	curNode = 0;
 
@@ -268,7 +268,7 @@ void C2Generator_GenElementVertexInc( void* meshGenerator, IGraph* topo, Grid***
 			}
 		}
 		CartesianGenerator_MapToDomain( (CartesianGenerator*)self, IGraph_GetDomain( topo, 0), vertsPerEl, incEls );
-		IGraph_SetIncidence( topo, topo->nDims, e_i, MT_VERTEX, vertsPerEl, incEls );
+		IGraph_SetIncidence( topo, topo->nDims, e_i, MT_VERTEX, vertsPerEl, (int*)incEls );
 	}
 
 	FreeArray( incEls );
@@ -291,7 +291,7 @@ void C2Generator_GenFaceVertexInc( void* meshGenerator, IGraph* topo, Grid*** gr
 	Journal_Printf( stream, "Generating face-vertex types...\n" );
 	Stream_Indent( stream );
 
-	for( face_i = 0; face_i < topo->remotes[MT_FACE]->nDomains; face_i++ ) {
+	for( face_i = 0; face_i < (unsigned)(topo->remotes[MT_FACE]->nDomains); face_i++ ) {
 		gFace = Sync_DomainToGlobal( topo->remotes[MT_FACE], face_i );
 
 		if( gFace < grids[2][0]->nPoints ) {
@@ -377,7 +377,7 @@ void C2Generator_GenFaceVertexInc( void* meshGenerator, IGraph* topo, Grid*** gr
 		}
 
 		CartesianGenerator_MapToDomain( (CartesianGenerator*)self, (Sync*)IGraph_GetDomain( topo, MT_VERTEX ), 9, verts );
-		IGraph_SetIncidence( topo, MT_FACE, face_i, MT_VERTEX, 9, verts );
+		IGraph_SetIncidence( topo, MT_FACE, face_i, MT_VERTEX, 9, (int*)verts );
 	}
 
 	Memory_Free( dimInds );	
@@ -401,7 +401,7 @@ void C2Generator_GenEdgeVertexInc( void* meshGenerator, IGraph* topo, Grid*** gr
 	Journal_Printf( stream, "Generating edge-vertex incidence...\n" );
 	Stream_Indent( stream );
 
-	for( edge_i = 0; edge_i < Sync_GetNumDomains( sync ); edge_i++ ) {
+	for( edge_i = 0; edge_i < (unsigned)Sync_GetNumDomains( sync ); edge_i++ ) {
 		gEdge = Sync_DomainToGlobal( sync, edge_i );
 
 		if( gEdge < grids[1][0]->nPoints ) {
@@ -451,7 +451,7 @@ void C2Generator_GenEdgeVertexInc( void* meshGenerator, IGraph* topo, Grid*** gr
 		}
 
 		CartesianGenerator_MapToDomain( (CartesianGenerator*)self, (Sync*)IGraph_GetDomain( topo, MT_VERTEX ), 3, verts );
-		IGraph_SetIncidence( topo, MT_EDGE, edge_i, MT_VERTEX, 3, verts );
+		IGraph_SetIncidence( topo, MT_EDGE, edge_i, MT_VERTEX, 3, (int*)verts );
 	}
 
 	Memory_Free( dimInds );

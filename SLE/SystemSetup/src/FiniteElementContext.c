@@ -75,7 +75,7 @@ FiniteElementContext* FiniteElementContext_New(
 	MPI_Comm		communicator,
 	Dictionary*	dictionary )
 {
-	FiniteElementContext* self = FiniteElementContext_DefaultNew( name );
+  FiniteElementContext* self = (FiniteElementContext*)FiniteElementContext_DefaultNew( name );
 
 	self->isConstructed = True;
 	_AbstractContext_Init( (AbstractContext*) self );
@@ -140,39 +140,39 @@ void _FiniteElementContext_Init( FiniteElementContext* self ) {
 	EntryPoint_Prepend( 
 		Context_GetEntryPoint( self, AbstractContext_EP_Build ),
 		"_FiniteElementContext_Build", 
-		_FiniteElementContext_Build, 
+		(void*)_FiniteElementContext_Build, 
 		FiniteElementContext_Type );
 	EntryPoint_Prepend( 
 		Context_GetEntryPoint( self, AbstractContext_EP_Initialise ),
 		"_FiniteElementContext_Initialise", 
-		_FiniteElementContext_Initialise, 
+		(void*)_FiniteElementContext_Initialise, 
 		FiniteElementContext_Type );
 	EntryPoint_Append( 
 		Context_GetEntryPoint( self, AbstractContext_EP_Solve ),
 		"_FiniteElementContext_Solve", 
-		_FiniteElementContext_Solve, 
+		(void*)_FiniteElementContext_Solve, 
 		FiniteElementContext_Type );
 	EntryPoint_Append( 
 		Context_GetEntryPoint( self, AbstractContext_EP_Solve ),
 		"_FiniteElementContext_PostSolve", 
-		_FiniteElementContext_PostSolve, 
+		(void*)_FiniteElementContext_PostSolve, 
 		FiniteElementContext_Type );
 	EntryPoint_Append( 
 		Context_GetEntryPoint( self, AbstractContext_EP_Dt ),
 		"_FiniteElementContext_GetDt", 
-		_FiniteElementContext_GetDt, 
+		(void*)_FiniteElementContext_GetDt, 
 		FiniteElementContext_Type );
 
 	EntryPoint_Append(
 		Context_GetEntryPoint( self, AbstractContext_EP_Save ),
 		"_FiniteElementContext_SaveFeVariables",
-		_FiniteElementContext_SaveFeVariables,
+		(void*)_FiniteElementContext_SaveFeVariables,
 		FiniteElementContext_Type );
 
 	EntryPoint_Append(
 		Context_GetEntryPoint( self, AbstractContext_EP_DataSave ),
 		"_FiniteElementContext_SaveFeVariables",
-		_FiniteElementContext_SaveFeVariables,
+		(void*)_FiniteElementContext_SaveFeVariables,
 		FiniteElementContext_Type );
 	/* The FEM context needs to save gauss swarms so they can be re-loaded for restart later.
 	   This will automatically save material point swarms too if PICellerator is used.
@@ -180,19 +180,19 @@ void _FiniteElementContext_Init( FiniteElementContext* self ) {
 	EntryPoint_Append(
 		Context_GetEntryPoint( self, AbstractContext_EP_Save ),
 		"_FiniteElementContext_SaveSwarms",
-		_FiniteElementContext_SaveSwarms,
+		(void*)_FiniteElementContext_SaveSwarms,
 		FiniteElementContext_Type );
 
 	EntryPoint_Append(
 		Context_GetEntryPoint( self, AbstractContext_EP_Save ),
 		"_FiniteElementContext_SaveMesh",
-		_FiniteElementContext_SaveMesh,
+		(void*)_FiniteElementContext_SaveMesh,
 		FiniteElementContext_Type );
 
 	EntryPoint_Append(
 		Context_GetEntryPoint( self, AbstractContext_EP_DataSave ),
 		"_FiniteElementContext_SaveMesh",
-		_FiniteElementContext_SaveMesh,
+		(void*)_FiniteElementContext_SaveMesh,
 		FiniteElementContext_Type );
 }
 
@@ -691,7 +691,7 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
        
       /* Write vertex coords to file */   
       /* Create our output space and data objects. */
-      totalVerts = Mesh_GetGlobalSize( mesh, 0 );
+      totalVerts = Mesh_GetGlobalSize( mesh, (MeshTopology_Dim)0 );
       size[0] = (hsize_t)totalVerts;
       size[1] = (hsize_t)nDims;
       

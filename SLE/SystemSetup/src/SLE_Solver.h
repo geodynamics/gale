@@ -144,7 +144,7 @@
 	/* --- Virtual function implementations --- */
 	
 	/** Class Virtual Functions Implementations */
-	void* _SLE_Solver_Copy( void* sleSolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _SLE_Solver_Copy( const void* sleSolver, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _SLE_Solver_Delete( void* sleSolver );
 

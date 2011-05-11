@@ -114,7 +114,7 @@
 
 	void _AdvectionDiffusionSLE_Print( void* sle, Stream* stream );
 
-	void* _AdvectionDiffusionSLE_Copy( void* sle, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _AdvectionDiffusionSLE_Copy( const void* sle, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	/** Virtual Functions from "Stg_Component" Class */
 	void* _AdvectionDiffusionSLE_DefaultNew( Name name );

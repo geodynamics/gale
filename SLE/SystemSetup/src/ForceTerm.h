@@ -119,7 +119,7 @@
 	#define ForceTerm_DeepCopy( self ) \
 		(ForceTerm*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 
-	void* _ForceTerm_Copy( void* forceTerm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ForceTerm_Copy( const void* forceTerm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Functions */
 	void* _ForceTerm_DefaultNew( Name name );

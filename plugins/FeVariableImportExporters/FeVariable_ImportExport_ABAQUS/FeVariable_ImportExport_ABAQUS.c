@@ -47,10 +47,10 @@
 #include <string.h>
 
 const Type   StgFEM_FeVariable_ImportExport_ABAQUS_Type = "StgFEM_FeVariable_ImportExport_ABAQUS";
-const char*  ABAQUS_ImportExportType = "ABAQUS";
+Name  ABAQUS_ImportExportType = "ABAQUS";
 
 
-void FeVariable_ReadNodalValuesFromFile_ABAQUS( void* _feVariable, const char* prefixStr, unsigned int timeStep ) {
+void FeVariable_ReadNodalValuesFromFile_ABAQUS( void* _feVariable, Name prefixStr, unsigned int timeStep ) {
 	FeVariable*        feVariable = (FeVariable*)_feVariable;
 	char*              filename;
 	Node_LocalIndex    lNode_I = 0;
@@ -98,7 +98,7 @@ void FeVariable_ReadNodalValuesFromFile_ABAQUS( void* _feVariable, const char* p
 		}
 	}
 
-	if ( False == inputFile ) {
+	if ( NULL==inputFile ) {
 		Stream*    errorStr = Journal_Register( Error_Type, (Name)feVariable->type  );
 		Journal_Printf( errorStr, "Error- in %s(), for feVariable \"%s\": Couldn't find checkpoint file with "
 			"prefix \"%s\", timestep %d - thus full filename \"%s\" - aborting.\n", __func__, feVariable->name,
@@ -201,7 +201,7 @@ void FeVariable_ReadNodalValuesFromFile_ABAQUS( void* _feVariable, const char* p
 }			
 
 
-void FeVariable_SaveNodalValuesToFile_ABAQUS( void* _feVariable, const char* prefixStr, unsigned int timeStep ) {
+void FeVariable_SaveNodalValuesToFile_ABAQUS( void* _feVariable, Name prefixStr, unsigned int timeStep ) {
 	FeVariable*      feVariable = (FeVariable*)_feVariable;
 	Stream*          errorStream = Journal_Register( Error_Type, (Name)StgFEM_FeVariable_ImportExport_ABAQUS_Type  );
 

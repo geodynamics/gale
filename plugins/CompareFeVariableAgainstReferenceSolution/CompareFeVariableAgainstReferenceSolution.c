@@ -227,7 +227,7 @@ void CompareFeVariableAgainstReferenceSolution_TestAll( void* compareFeVariable,
 		feVarToTest = (FeVariable*)Stg_ObjectList_At( self->variables, var_I );
 		tolerance = ((Stg_PrimitiveObject*)Stg_ObjectList_At( self->tolerances, var_I ))->value.asDouble;
 		relativeErrorMeasure = ((Stg_PrimitiveObject*)Stg_ObjectList_At( self->relativeErrorMeasure, var_I ))->value.asInt;
-		CompareFeVariableAgainstReferenceSolution_TestVariable( self, feVarToTest, tolerance, relativeErrorMeasure );
+		CompareFeVariableAgainstReferenceSolution_TestVariable( self, feVarToTest, tolerance, relativeErrorMeasure ? True : False );
 	}
 }
 
@@ -237,8 +237,8 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	Variable_Register*       variable_Register;
 	Variable*                referenceDataVariable;
 	Variable*                roundedDataVariable;
-	Name                     referenceVariableName[9];
-	Name                     roundedVariableName[9];
+	char*                    referenceVariableName[9];
+	char*                    roundedVariableName[9];
 	Variable_Index           variable_I;
 	DofLayout*               referenceDofLayout;
 	DofLayout*               roundedDofLayout;
@@ -269,7 +269,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 	variable_Register = self->context->variable_Register;
 
 	componentsCount = feVarToTest->fieldComponentCount;
-	scalar = componentsCount == 1;
+	scalar = (componentsCount == 1) ? True : False;
 
 	/* Ok:- here, we know that the reference, or benchmark, FeVariable that we are
 	comparing against may have been rounded off already, and we don't want to give
@@ -310,7 +310,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 				self->context,
 				Variable_DataType_Double,
 				componentsCount,
-				&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
+				(Index*)(&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains), 
 				NULL,
 				(void**)NULL,
 				variable_Register,
@@ -329,7 +329,7 @@ void CompareFeVariableAgainstReferenceSolution_TestVariable( void* compareFeVari
 				self->context,
 				Variable_DataType_Double,
 				componentsCount,
-				&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains, 
+				(Index*)(&((IGraph*)feVarToTest->feMesh->topo)->remotes[MT_VERTEX]->nDomains), 
 				NULL,
 				(void**)NULL,
 				variable_Register,

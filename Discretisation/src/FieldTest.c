@@ -141,7 +141,7 @@ void _FieldTest_Print( void* fieldTest, Stream* stream ) {
 	
 }
 
-void* _FieldTest_Copy( void* fieldTest, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _FieldTest_Copy( const void* fieldTest, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	abort();
 	return NULL;
 }
@@ -158,7 +158,7 @@ void _FieldTest_AssignFromXML( void* fieldTest, Stg_ComponentFactory* cf, void* 
 	FieldVariable_Register*	fV_Register;
 	Index							feVariable_I/*, referenceFieldCount*/;
 	Index							swarmVar_I;
-	Name							fieldName;
+	char*							fieldName;
 	Hook*							generateErrorFields;
 	Hook*							physicsTestHook;
 	Stream*						errStream = Journal_Register( Error_Type, (Name)"FieldTests"  );
@@ -253,12 +253,12 @@ void _FieldTest_AssignFromXML( void* fieldTest, Stg_ComponentFactory* cf, void* 
 	self->expectedPass     = False;
 
 	/* set up the entry point */
-	generateErrorFields = Hook_New( "Generate error fields hook", FieldTest_GenerateErrFields, self->name );
+	generateErrorFields = Hook_New( "Generate error fields hook", (void*)FieldTest_GenerateErrFields, self->name );
 	_EntryPoint_AppendHook( Context_GetEntryPoint( self->context, AbstractContext_EP_FrequentOutput ), generateErrorFields );
 
 	/* entry point for the fisix test func */
 	if( strlen(self->expectedFileName) > 1 ) {
-		physicsTestHook = Hook_New( "Physics test hook", FieldTest_EvaluatePhysicsTest, self->name );
+          physicsTestHook = Hook_New( "Physics test hook", (void*)FieldTest_EvaluatePhysicsTest, self->name );
 		_EntryPoint_AppendHook( Context_GetEntryPoint( self->context, AbstractContext_EP_FrequentOutput ), physicsTestHook );
 	}
 
@@ -443,9 +443,9 @@ void FieldTest_BuildAnalyticField( void* fieldTest, Index field_I ) {
 	FeMesh*					referenceMesh = numericField->feMesh;
 	DomainContext*			context = self->context;
 	Variable_Register*	variable_Register	= context->variable_Register;
-	Name						tmpName;
+	char*						tmpName;
 	Dof_Index				componentsCount = numericField->fieldComponentCount;
-	Name						varName[9];
+	char*						varName[9];
 	unsigned					var_I;
 	unsigned					node_I;
 	Variable*				variable;
@@ -543,9 +543,9 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 	FeVariable*				numericField = self->numericFieldList[field_I];
 	DomainContext*			context = self->context;
 	Variable_Register*	variable_Register	= context->variable_Register;
-	Name						tmpName;
+	char*						tmpName;
 	Dof_Index				componentsCount = numericField->fieldComponentCount;
-	Name						varName[9];
+	char*						varName[9];
 	unsigned					var_I;
 	unsigned					node_I;
 	Variable*				variable;

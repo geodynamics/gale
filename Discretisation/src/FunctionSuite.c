@@ -58,7 +58,7 @@ void StgFEM_InterpolateValue_WithNi( void* _feVariable, Element_LocalIndex lElem
 
 	FeMesh_GetElementNodes( self->feMesh, lElement_I, self->inc );
 	nInc = IArray_GetSize( self->inc );
-	inc = IArray_GetPtr( self->inc );
+	inc = (unsigned*)IArray_GetPtr( self->inc );
 
 	for ( dof_I = 0; dof_I < dofCount; dof_I++ ) {
 		dofVariable = DofLayout_GetVariable( self->dofLayout, 0, dof_I );
@@ -90,7 +90,7 @@ void StgFEM_InterpolateDerivatives_WithGNx( void* _feVariable, Element_LocalInde
 
 	FeMesh_GetElementNodes( self->feMesh, lElement_I, self->inc );
 	nInc = IArray_GetSize( self->inc );
-	inc = IArray_GetPtr( self->inc );
+	inc = (unsigned*)IArray_GetPtr( self->inc );
 
 	for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
 		dofVariable  = DofLayout_GetVariable( self->dofLayout, 0, dof_I );
