@@ -90,7 +90,8 @@ FileParticleLayout* _FileParticleLayout_New(  FILEPARTICLELAYOUT_DEFARGS  )
    self = (FileParticleLayout*)_GlobalParticleLayout_New(  GLOBALPARTICLELAYOUT_PASSARGS  );
 
    /* set default attributes */
-   self->filename = filename;
+   /* Unsafe */
+   self->filename = (char*)filename;
    self->checkpointfiles = checkpointfiles;
 
    return self;
@@ -131,7 +132,7 @@ void _FileParticleLayout_Print( void* particleLayout, Stream* stream ) {
 }
 
 
-void* _FileParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _FileParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
    FileParticleLayout*	self = (FileParticleLayout*)particleLayout;
    FileParticleLayout*	newFileParticleLayout;
    

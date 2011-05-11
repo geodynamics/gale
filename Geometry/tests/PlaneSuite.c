@@ -61,7 +61,7 @@ void PlaneSuite_Teardown( PlaneSuiteData* data ) {
 }
 
 void PlaneSuite_TestDistanceToPoint( PlaneSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 	
    if( data->rank == procToWatch ) {
 		Coord axisA = { 1.0, 0.3, 0.0 };
@@ -77,7 +77,7 @@ void PlaneSuite_TestDistanceToPoint( PlaneSuiteData* data ) {
 }
 
 void PlaneSuite_TestPointIsInFront( PlaneSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 	
    if( data->rank == procToWatch ) {
 		Coord axisA = { 1.0, 0.3, 0.0 };

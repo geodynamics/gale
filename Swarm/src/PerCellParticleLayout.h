@@ -104,7 +104,7 @@
 	#define PerCellParticleLayout_DeepCopy( self ) \
 		(PerCellParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _PerCellParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _PerCellParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
    void _PerCellParticleLayout_Destroy( void* particleLayout, void* data );
    void _PerCellParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data );
 	

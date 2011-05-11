@@ -89,7 +89,7 @@ Swarm* Swarm_New(
    MPI_Comm                              comm,
    void*				                       ics ) 
 {
-   Swarm* self = _Swarm_DefaultNew( name ); 
+  Swarm* self = (Swarm*)_Swarm_DefaultNew( name ); 
 
    _Swarm_Init( 
       self, context,
@@ -127,7 +127,7 @@ Swarm* _Swarm_New(  SWARM_DEFARGS  )
 	self->nSwarmVars = 0;
 	self->swarmVars = NULL;
 	self->owningCellVariable = NULL;
-   self->ics = ics;
+        self->ics = (VariableCondition*)ics;
 
 	return self;
 }
@@ -342,7 +342,7 @@ void _Swarm_Print( void* swarm, Stream* stream ) {
 }
 
 
-void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Swarm_Copy( const void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Swarm*		self = (Swarm*)swarm;
 	Swarm*		newSwarm;
 	PtrMap*		map = ptrMap;
@@ -353,7 +353,7 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 		ownMap = True;
 	}
 	
-	newSwarm = _Stg_Component_Copy( self, dest, deep, nameExt, map );
+	newSwarm = (Swarm*)_Stg_Component_Copy( self, dest, deep, nameExt, map );
 	PtrMap_Append( map, self, newSwarm );
 	
 	newSwarm->myRank = self->myRank;
@@ -381,7 +381,7 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 		newSwarm->commHandlerList = (Stg_ObjectList*)Stg_Class_Copy( self->commHandlerList, NULL, deep, nameExt, map );
 		
 		/* Arrays */
-		if( (newSwarm->cellPointCountTbl = PtrMap_Find( map, self->cellPointCountTbl )) == NULL ) {
+		if( (newSwarm->cellPointCountTbl = (Cell_PointIndex*)PtrMap_Find( map, self->cellPointCountTbl )) == NULL ) {
 			if( self->cellPointCountTbl ) {
 				newSwarm->cellPointCountTbl = Memory_Alloc_Array( Cell_PointIndex, newSwarm->cellDomainCount, "Swarm->cellPointCountTbl" );
 				memcpy( newSwarm->cellPointCountTbl, self->cellPointCountTbl, newSwarm->cellDomainCount * sizeof( Cell_PointIndex ) );
@@ -392,7 +392,7 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 			}
 		}
 		
-		if( (newSwarm->cellPointTbl = PtrMap_Find( map, self->cellPointTbl )) == NULL ) {
+		if( (newSwarm->cellPointTbl = (double****)PtrMap_Find( map, self->cellPointTbl )) == NULL ) {
 			if( newSwarm->cellPointCountTbl && self->cellPointTbl ) {
 				Index	cell_I;
 				
@@ -407,7 +407,7 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 			}
 		}
 		
-		if( (newSwarm->cellParticleCountTbl = PtrMap_Find( map, self->cellParticleCountTbl )) == NULL ) {
+		if( (newSwarm->cellParticleCountTbl = (Particle_InCellIndex*)PtrMap_Find( map, self->cellParticleCountTbl )) == NULL ) {
 			if( self->cellParticleCountTbl ) {
 				newSwarm->cellParticleCountTbl = Memory_Alloc_Array( Particle_InCellIndex, newSwarm->cellDomainCount, "Swarm->cellParticleCountTbl" );
 				memcpy( newSwarm->cellParticleCountTbl, self->cellParticleCountTbl, newSwarm->cellDomainCount * sizeof( Particle_InCellIndex ) );
@@ -418,7 +418,7 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 			}
 		}
 		
-		if( (newSwarm->cellParticleSizeTbl = PtrMap_Find( map, self->cellParticleSizeTbl )) == NULL ) {
+		if( (newSwarm->cellParticleSizeTbl = (Particle_InCellIndex*)PtrMap_Find( map, self->cellParticleSizeTbl )) == NULL ) {
 			if( self->cellParticleSizeTbl ) {
 				newSwarm->cellParticleSizeTbl = Memory_Alloc_Array( Particle_InCellIndex, newSwarm->cellDomainCount, "Swarm->cellParticleSizeTbl" );
 				memcpy( newSwarm->cellParticleSizeTbl, self->cellParticleSizeTbl, newSwarm->cellDomainCount * sizeof( Particle_InCellIndex ) );
@@ -429,7 +429,7 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 			}
 		}
 		
-		if( (newSwarm->cellParticleTbl = PtrMap_Find( map, self->cellParticleTbl )) == NULL ) {
+		if( (newSwarm->cellParticleTbl = (Particle_Index**)PtrMap_Find( map, self->cellParticleTbl )) == NULL ) {
 			if( newSwarm->cellParticleCountTbl && self->cellParticleTbl ) {
 				Index	cell_I;
 				
@@ -450,7 +450,7 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 			}
 		}
 		
-		if( (newSwarm->particles = PtrMap_Find( map, self->particles )) == NULL ) {
+		if( (newSwarm->particles = (Particle*)PtrMap_Find( map, self->particles )) == NULL ) {
 			if( self->particles ) {
 				newSwarm->particles = (Particle_List)ExtensionManager_Malloc( newSwarm->particleExtensionMgr, newSwarm->particlesArraySize );
 				memcpy( newSwarm->particles, self->particles, newSwarm->particlesArraySize * ExtensionManager_GetFinalSize( newSwarm->particleExtensionMgr ) );
@@ -464,7 +464,7 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 		/*shadow info*/
 		if( self->shadowTablesBuilt ){
 
-			if( (newSwarm->shadowCellParticleCountTbl = PtrMap_Find( map, self->shadowCellParticleCountTbl )) == NULL ) {
+                  if( (newSwarm->shadowCellParticleCountTbl = (Particle_InCellIndex*)PtrMap_Find( map, self->shadowCellParticleCountTbl )) == NULL ) {
 				if( self->shadowCellParticleCountTbl ) {
 					newSwarm->shadowCellParticleCountTbl = Memory_Alloc_Array( Particle_InCellIndex, newSwarm->cellDomainCount, "Swarm->shadowCellParticleCountTbl" );
 					memcpy( newSwarm->shadowCellParticleCountTbl, self->shadowCellParticleCountTbl, newSwarm->cellDomainCount * sizeof( Particle_InCellIndex ) );
@@ -475,7 +475,7 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 				}
 			}
 		
-			if( (newSwarm->shadowCellParticleTbl = PtrMap_Find( map, self->shadowCellParticleTbl )) == NULL ) {
+                  if( (newSwarm->shadowCellParticleTbl = (Particle_Index**)PtrMap_Find( map, self->shadowCellParticleTbl )) == NULL ) {
 				if( newSwarm->shadowCellParticleCountTbl && self->shadowCellParticleTbl ) {
 					Index	cell_I;
 				
@@ -498,7 +498,7 @@ void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptr
 				}
 			}
 		
-			if( (newSwarm->shadowParticles = PtrMap_Find( map, self->shadowParticles )) == NULL ) {
+                  if( (newSwarm->shadowParticles = (Particle*)PtrMap_Find( map, self->shadowParticles )) == NULL ) {
 				if( self->shadowParticles ) {
 					newSwarm->shadowParticles = (Particle_List)ExtensionManager_Malloc( newSwarm->particleExtensionMgr, newSwarm->shadowParticleCount);
 					memcpy( newSwarm->shadowParticles, self->shadowParticles,
@@ -599,7 +599,7 @@ void _Swarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	
 	{
 		unsigned int count = 0;
-		int i = 0;
+		unsigned i = 0;
 		Stg_Component **components = NULL;
 
 		components = (Stg_Component** )Stg_ComponentFactory_ConstructByList( cf, self->name, (Dictionary_Entry_Key)"ParticleCommHandlers", Stg_ComponentFactory_Unlimited, ParticleCommHandler, False, &count, data );
@@ -626,7 +626,7 @@ void _Swarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, void* data ) {
          sizeof(IntegrationPoint),
 			cellParticleTblDelta,
 			extraParticlesFactor,
-			extensionManagerRegister,
+			(ExtensionManager_Register*)extensionManagerRegister,
 			variable_Register,
 			context->communicator,
 			ic );
@@ -829,7 +829,7 @@ void _Swarm_BuildParticles( void* swarm, void* data ) {
 
 void _Swarm_BuildShadowParticles( void* swarm ) {
 	Swarm*			self = (Swarm*)swarm;
-	int i = 0;
+	unsigned i = 0;
 	
 	self->shadowTablesBuilt = True;
 
@@ -913,7 +913,7 @@ void Swarm_UpdateAllParticleOwners( void* swarm ) {
 		/*Stg_Component_Execute( self->particleCommunicationHandler[0], NULL, True );
 		Stg_Component_Execute( self->particleCommunicationHandler[1], NULL, True );*/
 		{
-			int ii;
+			unsigned ii;
 			for( ii=0; ii<self->commHandlerList->count; ii++ ){
 				ParticleCommHandler *pComm = NULL;
 
@@ -1182,9 +1182,9 @@ Particle_Index Swarm_FindClosestParticle( void* _swarm, Dimension_Index dim, dou
 	closestParticle_I = swarm->cellParticleTbl[ lCell_I ][ cParticle_I ];
 
 	/* Find neighbours to this cell - TODO This Assumes ElementCellLayout */
-	Mesh_GetIncidence( ((ElementCellLayout*)swarm->cellLayout)->mesh, dim, lCell_I, dim, swarm->incArray );
+	Mesh_GetIncidence( ((ElementCellLayout*)swarm->cellLayout)->mesh, (MeshTopology_Dim)dim, lCell_I, (MeshTopology_Dim)dim, swarm->incArray );
 	neighbourCount = IArray_GetSize( swarm->incArray );
-	neighbourList = IArray_GetPtr( swarm->incArray );
+	neighbourList = (NeighbourIndex*)IArray_GetPtr( swarm->incArray );
 
 	/* Loop over neighbours */
 	for ( neighbour_I = 0 ; neighbour_I < neighbourCount ; neighbour_I++ ) {
@@ -1313,7 +1313,7 @@ void Swarm_PrintParticleCoords_ByCell( void* swarm, Stream* stream ) {
 void Swarm_GetCellMinMaxCoords( void* swarm, Cell_DomainIndex cell_I, Coord min, Coord max ) {
 	Swarm*              self     =  (Swarm*) swarm;
 	Dimension_Index		  dim_I;
-	int                 dim      = self->dim;
+	unsigned                 dim      = self->dim;
 	Cell_PointIndex		  cPoint_I;
 	double*             currCoord;
 
@@ -1344,10 +1344,10 @@ SwarmVariable* Swarm_NewScalarVariable(
 		Variable_DataType               dataType )
 {
 	Swarm*                   self              = (Swarm*) swarm;
-	Name                     name;
+	char*                    name;
 	Variable*                variable;
 	SizeT                    dataOffsets[]     = { 0 };		/* Init value later */
-	Variable_DataType        dataTypes[]       = { 0 };		/* Init value later */
+	Variable_DataType        dataTypes[]       = { (Variable_DataType)0 };		/* Init value later */
 	Index                    dataTypeCounts[]  = { 1 };
 	SwarmVariable*           swarmVariable;
 	Variable_Register*       variable_Register      = NULL;
@@ -1408,11 +1408,11 @@ SwarmVariable* Swarm_NewVectorVariable(
 	Swarm*                   self             = (Swarm*) _swarm;
 	Variable*                variable;
 	SizeT                    dataOffsets[]    = { 0 };	/* Init later... */
-	Variable_DataType	     dataTypes[]      = { 0 };	/* Init later... */	
+	Variable_DataType	     dataTypes[]      = { (Variable_DataType)0 };	/* Init later... */	
 	Index                    dataTypeCounts[] = { 0 };	/* Init later... */	
-	Name*                    dataNames;
+	char**                   dataNames;
 	Index                    vector_I;
-	Name                     name;
+	char*                    name;
 	SwarmVariable*           swarmVariable;
 	Variable_Register*       variable_Register      = NULL;
 	SwarmVariable_Register*  swarmVariable_Register = NULL;
@@ -1427,7 +1427,7 @@ SwarmVariable* Swarm_NewVectorVariable(
 	Stg_asprintf( &name, "%s-%s", self->name, nameExt );
 
 	/* Get names of extra variables */
-	dataNames = Memory_Alloc_Array( Name, dataTypeCount, "dataNames" );
+	dataNames = Memory_Alloc_Array( char*, dataTypeCount, "dataNames" );
 	va_start( ap, dataTypeCount );
 	for( vector_I = 0; vector_I < dataTypeCount; vector_I++ ) {
 		dataNames[vector_I] = Stg_Object_AppendSuffix( self, (Name)(Name ) va_arg( ap, Name ) );
@@ -1447,7 +1447,7 @@ SwarmVariable* Swarm_NewVectorVariable(
 		dataOffsets, 
 		dataTypes, 
 		dataTypeCounts, 
-		dataNames,
+		(Name*)dataNames,
 		&self->particleExtensionMgr->finalSize,
 		&self->particleLocalCount,
 		NULL,
@@ -1482,7 +1482,7 @@ void Swarm_Realloc( void* swarm ) {
 	Swarm*         self               = (Swarm*) swarm;
 	Particle_Index particleLocalCount = self->particleLocalCount;
 	Particle_Index delta              = self->particlesArrayDelta;
-	int v_i;
+	unsigned v_i;
 
 	if ( !self->expanding && particleLocalCount <= self->particlesArraySize - delta ) {
 		/* Decrease size of array if necessary */
@@ -1498,7 +1498,7 @@ void Swarm_Realloc( void* swarm ) {
 	}
 
 	/* Do realloc */
-	self->particles = Memory_Realloc_Array_Bytes(
+	self->particles = (Particle*)Memory_Realloc_Array_Bytes(
 			self->particles,
 			self->particleExtensionMgr->finalSize,
 			self->particlesArraySize );

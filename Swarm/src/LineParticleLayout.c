@@ -174,11 +174,11 @@ void _LineParticleLayout_Print( void* particleLayout, Stream* stream ) {
 }
 
 
-void* _LineParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _LineParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	LineParticleLayout*		self                    = (LineParticleLayout*)particleLayout;
 	LineParticleLayout*		newLineParticleLayout;
 	
-	newLineParticleLayout = _GlobalParticleLayout_Copy( self, dest, deep, nameExt, ptrMap );
+	newLineParticleLayout = (LineParticleLayout*)_GlobalParticleLayout_Copy( self, dest, deep, nameExt, ptrMap );
 
 	/*memcpy( newLineParticleLayout->startCoord, self->startCoord, sizeof(Coord) );*/
 	/*memcpy( newLineParticleLayout->endCoord, self->endCoord, sizeof(Coord) );*/
@@ -256,7 +256,7 @@ void _LineParticleLayout_Destroy( void* particleLayout, void* data ) {
 void _LineParticleLayout_InitialiseParticle( void* particleLayout, void* _swarm, Particle_Index newParticle_I, void* _particle )
 {
 	LineParticleLayout*        self             = (LineParticleLayout*)particleLayout;
-	Axis                       axis_I;
+	unsigned                   axis_I;
 	Index                      segment_I;
 	double                     lengthFromVertex = self->dx * (double) newParticle_I;
 	double                     factor;

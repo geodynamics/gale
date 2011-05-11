@@ -56,7 +56,7 @@ const Type Mesh_HexType_Type = "Mesh_HexType";
 ** Constructors
 */
 
-Mesh_HexType* Mesh_HexType_New( Name name ) {
+Mesh_HexType* Mesh_HexType_New() {
 	/* Variables set in this function */
 	SizeT                                                    _sizeOfSelf = sizeof(Mesh_HexType);
 	Type                                                            type = Mesh_HexType_Type;
@@ -152,7 +152,7 @@ void Mesh_HexType_Update( void* hexType ) {
 
 	nDims = Mesh_GetDimSize( self->mesh );
 	for( d_i = 0; d_i < nDims; d_i++ ) {
-		if( Class_IsSuper( self->mesh->topo, IGraph ) && (!Mesh_GetGlobalSize( self->mesh, d_i ) || !Mesh_HasIncidence( self->mesh, nDims, d_i )) ) {
+		if( Class_IsSuper( self->mesh->topo, IGraph ) && (!Mesh_GetGlobalSize( self->mesh, (MeshTopology_Dim)d_i ) || !Mesh_HasIncidence( self->mesh, (MeshTopology_Dim)nDims, (MeshTopology_Dim)d_i )) ) {
 			break;
 		}
 	}
@@ -198,9 +198,8 @@ double Mesh_HexType_GetMinimumSeparation( void* hexType, unsigned elInd, double*
 	unsigned*		map = NULL;
 	double			curSep = 0.0;
 	double*			dimSep = NULL;
-	unsigned			nInc = 0;
-	unsigned			e_i;
-	int				*inc = NULL;
+	unsigned		e_i, nInc = 0;
+	int			*inc = NULL;
 
 	assert( self );
 	assert( elInd < Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ) );
@@ -214,7 +213,7 @@ double Mesh_HexType_GetMinimumSeparation( void* hexType, unsigned elInd, double*
 
 	dimSep = AllocArray( double, Mesh_GetDimSize( self->mesh ) );
 
-	for( e_i = 0; e_i > Mesh_GetDimSize( self->mesh ); e_i++ )
+	for( e_i = 0; e_i > (unsigned)Mesh_GetDimSize( self->mesh ); e_i++ )
 		dimSep[e_i] = 0.0;
 
 	Mesh_GetIncidence( self->mesh, Mesh_GetDimSize( self->mesh ), elInd, MT_VERTEX, self->incArray );

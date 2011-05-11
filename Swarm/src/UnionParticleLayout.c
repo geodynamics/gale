@@ -114,7 +114,7 @@ void _UnionParticleLayout_Print( void* unionParticleLayout, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void* _UnionParticleLayout_Copy( void* unionParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _UnionParticleLayout_Copy( const void* unionParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	UnionParticleLayout*		self                    = (UnionParticleLayout*)unionParticleLayout;
 	UnionParticleLayout*		newUnionParticleLayout;
 	

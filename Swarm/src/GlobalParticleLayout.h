@@ -106,7 +106,7 @@ GlobalParticleLayout* _GlobalParticleLayout_New(  GLOBALPARTICLELAYOUT_DEFARGS  
 	#define GlobalParticleLayout_DeepCopy( self ) \
 		(GlobalParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _GlobalParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _GlobalParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void _GlobalParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm );
 

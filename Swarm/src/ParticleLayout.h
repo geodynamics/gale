@@ -105,7 +105,7 @@ void _ParticleLayout_Destroy( void* particleLayout, void* data );
 #define ParticleLayout_DeepCopy( self )                                 \
     (ParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-void* _ParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+void* _ParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 void _ParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data );
 	
 /** Setup the particle tables in a Swarm Class, both local and shadow values.

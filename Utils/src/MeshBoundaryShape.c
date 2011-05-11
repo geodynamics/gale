@@ -71,7 +71,7 @@ MeshBoundaryShape* MeshBoundaryShape_New( Name name ) {
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
 	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
 
-   return (void*) _MeshBoundaryShape_New(  MESHBOUNDARYSHAPE_PASSARGS  );
+   return _MeshBoundaryShape_New(  MESHBOUNDARYSHAPE_PASSARGS  );
 }
 
 MeshBoundaryShape* _MeshBoundaryShape_New(  MESHBOUNDARYSHAPE_DEFARGS  ) {

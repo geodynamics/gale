@@ -90,7 +90,7 @@ PythonShape* _PythonShape_New(  PYTHONSHAPE_DEFARGS  )
 	return self;
 }
 
-void _PythonShape_Init( void* pythonShape, char* conditionFunction ) {
+void _PythonShape_Init( void* pythonShape, Name conditionFunction ) {
 	PythonShape* self = (PythonShape*)pythonShape;
 	
 	Stg_asprintf( &self->testCondition, "%s = %s", PYTHONSHAPE_TEST_CONDITION_NAME, conditionFunction );
@@ -139,7 +139,7 @@ void _PythonShape_Print( void* pythonShape, Stream* stream ) {
 
 
 
-void* _PythonShape_Copy( void* pythonShape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _PythonShape_Copy( const void* pythonShape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	PythonShape*	self = (PythonShape*)pythonShape;
 	PythonShape*	newPythonShape;
 	

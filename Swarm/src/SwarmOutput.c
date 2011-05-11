@@ -57,7 +57,7 @@ SwarmOutput* SwarmOutput_New(
 		unsigned int                                       decimalLength,
 		char*                                              borderString )		
 {
-	SwarmOutput* self = _SwarmOutput_DefaultNew( name );
+  SwarmOutput* self = (SwarmOutput*)_SwarmOutput_DefaultNew( name );
 
 	_SwarmOutput_Init( self, context, swarm, baseFilename, columnWidth, decimalLength, borderString );
 	return self;
@@ -140,7 +140,7 @@ void _SwarmOutput_Print( void* _swarmOutput, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void* _SwarmOutput_Copy( void* swarmOutput, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _SwarmOutput_Copy( const void* swarmOutput, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	SwarmOutput*	self = (SwarmOutput*)swarmOutput;
 	SwarmOutput*	newSwarmOutput;
 	PtrMap*			map = ptrMap;
@@ -151,7 +151,7 @@ void* _SwarmOutput_Copy( void* swarmOutput, void* dest, Bool deep, Name nameExt,
 		ownMap = True;
 	}
 	
-	newSwarmOutput = _Stg_Component_Copy( self, dest, deep, nameExt, map );
+	newSwarmOutput = (SwarmOutput*)_Stg_Component_Copy( self, dest, deep, nameExt, map );
 	
 	newSwarmOutput->_printHeader               = self->_printHeader;
 	newSwarmOutput->_printData                 = self->_printData  ;
@@ -222,7 +222,7 @@ void _SwarmOutput_Initialise( void* swarmOutput, void* data ) {
 	Swarm*           swarm               = self->swarm;
 	Variable*        globalIndexVariable = self->globalIndexVariable;
 	Particle_Index   lParticle_I;
-	Name             filename;
+	char*            filename;
 	Stream*          stream              = Journal_Register( Info_Type, (Name)SwarmOutput_Type  );
 
    /* re-enable printing from current rank process */
@@ -253,7 +253,7 @@ void _SwarmOutput_Execute( void* swarmOutput, void* data ) {
 	Swarm*            swarm               = self->swarm;
 	Variable*         globalIndexVariable = self->globalIndexVariable;
 	Particle_Index    lParticle_I;
-	Name              filename;
+	char*             filename;
 	Stream*           stream              = Journal_Register( Info_Type, (Name)SwarmOutput_Type  );
 
    /* re-enable printing from current rank process */
@@ -356,7 +356,7 @@ void _SwarmOutput_SetGlobalIndicies( void* swarmOutput, void* data ) {
 	}
 }
 
-void SwarmOutput_PrintString( void* swarmOutput, Stream* stream, char* string ) {
+void SwarmOutput_PrintString( void* swarmOutput, Stream* stream, Name string ) {
 	SwarmOutput*	  self                = (SwarmOutput*)     swarmOutput;
 
 	Journal_Printf( stream, "%s", self->borderString );

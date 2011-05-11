@@ -281,7 +281,7 @@ void _ParallelDelaunay_Print( void* pd, Stream* stream )
 	Journal_Printf( stream, "ParallelDelaunay (ptr): (%p)\n", self );
 }
 
-void *_ParallelDelaunay_Copy( void* pd, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap )
+void *_ParallelDelaunay_Copy( const void* pd, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap )
 {
 	return NULL;
 }
@@ -376,12 +376,12 @@ void _ParallelDelaunay_Build( void* pd, void* data ) {
 			CoordF **procCoords = NULL;
 			int *procCoordCounter = NULL;
 
-			procCoordCounter = malloc( sizeof(int)*numProcs );
+			procCoordCounter = (int*)malloc( sizeof(int)*numProcs );
 			memset( procCoordCounter, 0, sizeof(int)*numProcs );
 
-			procCoords = malloc( sizeof( CoordF* ) * numProcs );
+			procCoords = (float (**)[3])malloc( sizeof( CoordF* ) * numProcs );
 			for( i=MASTER_PROC+1; i<numProcs; i++ ){
-				procCoords[i] = malloc( sizeof(CoordF) * self->processorLoad[i] );
+                          procCoords[i] = (float (*)[3])malloc( sizeof(CoordF) * self->processorLoad[i] );
 				memset( procCoords[i], 0, sizeof( CoordF ) * self->processorLoad[i] );
 			}
 
@@ -695,25 +695,25 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 			int *procVoronoiCounter = NULL;
 			int *procNumNeighboursCounter = NULL;
 
-			procVoronoiCounter = malloc( sizeof( int ) * pd->numProcs );
+			procVoronoiCounter = (int*)malloc( sizeof( int ) * pd->numProcs );
 			memset( procVoronoiCounter, 0, sizeof( int ) * pd->numProcs );
 			
-			procNumNeighboursCounter = malloc( sizeof( int ) * pd->numProcs );
+			procNumNeighboursCounter = (int*)malloc( sizeof( int ) * pd->numProcs );
 			memset( procNumNeighboursCounter, 0, sizeof( int ) * pd->numProcs );
 
-			procVoronoi = malloc( sizeof( float* ) * pd->numProcs ); memset( procVoronoi, 0, sizeof(float*)*pd->numProcs );
-			procNumNeighbours = malloc( sizeof( int* ) * pd->numProcs ); memset( procNumNeighbours, 0, sizeof(int*)*pd->numProcs );
+			procVoronoi = (float**)malloc( sizeof( float* ) * pd->numProcs ); memset( procVoronoi, 0, sizeof(float*)*pd->numProcs );
+			procNumNeighbours = (int**)malloc( sizeof( int* ) * pd->numProcs ); memset( procNumNeighbours, 0, sizeof(int*)*pd->numProcs );
 
 			for( i=MASTER_PROC+1; i<pd->numProcs; i++ ){
 
 				if( pd->attributes->CalculateVoronoiSurfaceArea ){
-					procVoronoi[i] = malloc( sizeof(float)*pd->processorLoad[i] );
+                                  procVoronoi[i] = (float*)malloc( sizeof(float)*pd->processorLoad[i] );
 					memset( procVoronoi[i], 0, sizeof( float ) * pd->processorLoad[i] );
 					MPI_Recv( procVoronoi[i], pd->processorLoad[i], MPI_FLOAT, i, VORONOI_AREA_TAG, (*pd->comm), &st );
 				}
 
 				if( pd->attributes->FindNeighbours ){
-					procNumNeighbours[i] = malloc( sizeof(int)*pd->processorLoad[i] );
+                                  procNumNeighbours[i] = (int*)malloc( sizeof(int)*pd->processorLoad[i] );
 					memset( procNumNeighbours[i], 0, sizeof(int) * pd->processorLoad[i] );
 					MPI_Recv( procNumNeighbours[i], pd->processorLoad[i], MPI_INT, i, NUM_NEIGHBOUR_TAG, (*pd->comm), &st );
 				}
@@ -786,17 +786,17 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 			int *procNeighboursCounter = NULL;
 			int *procNumNeighboursCount = NULL;
 
-			procVoronoiSidesCounter = malloc( sizeof( int ) * pd->numProcs );
+			procVoronoiSidesCounter = (int*)malloc( sizeof( int ) * pd->numProcs );
 			memset( procVoronoiSidesCounter, 0, sizeof( int ) * pd->numProcs );
 			
-			procNeighboursCounter = malloc( sizeof( int ) * pd->numProcs );
+			procNeighboursCounter = (int*)malloc( sizeof( int ) * pd->numProcs );
 			memset( procNeighboursCounter, 0, sizeof( int ) * pd->numProcs );
 			
-			procNumNeighboursCount = malloc( sizeof( int ) * pd->numProcs );
+			procNumNeighboursCount = (int*)malloc( sizeof( int ) * pd->numProcs );
 			memset( procNumNeighboursCount, 0, sizeof( int ) * pd->numProcs );
 
-			procVoronoiSides = malloc( sizeof( float* ) * pd->numProcs ); memset( procVoronoiSides, 0, sizeof(float*)*pd->numProcs );
-			procNeighbours = malloc( sizeof( unsigned int* ) * pd->numProcs ); memset( procNeighbours, 0, sizeof(unsigned int*)*pd->numProcs );
+			procVoronoiSides = (float**)malloc( sizeof( float* ) * pd->numProcs ); memset( procVoronoiSides, 0, sizeof(float*)*pd->numProcs );
+			procNeighbours = (float**)malloc( sizeof( unsigned int* ) * pd->numProcs ); memset( procNeighbours, 0, sizeof(unsigned int*)*pd->numProcs );
 
 			for( i=0; i<pd->numInputSites; i++ ){
 				procNumNeighboursCount[pd->processor[i]]+=pd->numNeighbours[pd->initialOrder[i]];
@@ -804,13 +804,13 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 
 			for( i=MASTER_PROC+1; i<pd->numProcs; i++ ){
 				if( pd->attributes->CalculateVoronoiSides ){
-					procVoronoiSides[i] = malloc( sizeof(float)*procNumNeighboursCount[i] );
+                                  procVoronoiSides[i] = (float*)malloc( sizeof(float)*procNumNeighboursCount[i] );
 					memset( procVoronoiSides[i], 0, sizeof( float ) * procNumNeighboursCount[i] );
 					MPI_Recv( procVoronoiSides[i], procNumNeighboursCount[i], MPI_FLOAT, i, VORONOI_SIDES_TAG, (*pd->comm), &st );
 				}
 
 				if( pd->attributes->FindNeighbours ){
-					procNeighbours[i] = malloc( sizeof(unsigned int)*procNumNeighboursCount[i] );
+                                  procNeighbours[i] = (float*)malloc( sizeof(unsigned int)*procNumNeighboursCount[i] );
 					memset( procNeighbours[i], 0, sizeof(unsigned int) * procNumNeighboursCount[i] );
 					MPI_Recv( procNeighbours[i], procNumNeighboursCount[i], MPI_INT, i, NEIGHBOURS_TAG, (*pd->comm), &st );
 				}
@@ -830,7 +830,7 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 					if( pd->attributes->FindNeighbours ){
 						memcpy( (pd->neighbours[pd->initialOrder[j]]), (pd->localTriangulation->neighbours[count]),
 								sizeof(int)*pd->localTriangulation->numNeighbours[count] );
-						for( i=0; i<pd->numNeighbours[pd->initialOrder[j]]; i++ ){
+						for( i=0; i<(int)(pd->numNeighbours[pd->initialOrder[j]]); i++ ){
 							pd->neighbours[pd->initialOrder[j]][i] = 
 								pd->initialOrder[ParallelDelaunay_TranslateLocalToGlobal(pd, pd->neighbours[pd->initialOrder[j]][i])];
 						}
@@ -850,7 +850,7 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 								sizeof(int)*pd->numNeighbours[order] );
 						procNeighboursCounter[proc]+=pd->numNeighbours[order];
 
-						for( i=0; i<pd->numNeighbours[pd->initialOrder[j]]; i++ ){
+						for( i=0; i<(int)(pd->numNeighbours[pd->initialOrder[j]]); i++ ){
 							pd->neighbours[pd->initialOrder[j]][i] = pd->initialOrder[pd->neighbours[pd->initialOrder[j]][i]];
 						}
 					}
@@ -891,7 +891,7 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 			for( i=0; i<pd->numLocalSites; i++ ){
 				sum+=pd->localTriangulation->numNeighbours[i];
 				
-				for( j=0; j<pd->localTriangulation->numNeighbours[i]; j++ ){
+				for( j=0; j<(int)(pd->localTriangulation->numNeighbours[i]); j++ ){
 					pd->localTriangulation->neighbours[i][j] = ParallelDelaunay_TranslateLocalToGlobal( pd, pd->localTriangulation->neighbours[i][j] );
 				}
 			}
@@ -954,7 +954,7 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 		
 			stride = j;
 			for( i=MASTER_PROC+1; i<pd->numProcs; i++ ){
-				unsigned int *temp = malloc( sizeof(unsigned int)*triCountArray[i]*3 );
+                          unsigned int *temp = (unsigned*)malloc( sizeof(unsigned int)*triCountArray[i]*3 );
 					MPI_Recv( temp, triCountArray[i]*3, MPI_INT, i, DATA_TAG, MPI_COMM_WORLD, &st );					
 				for(j=0; j<triCountArray[i]*3; j+=3){
 					memcpy( pd->triangleIndices[stride++], &(temp[j]), sizeof(int)*3 );
@@ -1004,7 +1004,7 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 				}
 				
 				for( i=0; i<pd->numInputSites; i++ ){
-					for( j=0; j<pd->numNeighbours[i]; j++ ){
+                                  for( j=0; j<(int)(pd->numNeighbours[i]); j++ ){
 						triangles[0] = -1;
 						triangles[1] = -1;
 						counter = 0;
@@ -1020,7 +1020,7 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 							
 							found = 0;
 							for( m=0; m<3; m++ ){
-								if( pd->triangleNeighbours[triangles[0]][m] == triangles[1] ) found = 1;
+                                                          if( pd->triangleNeighbours[triangles[0]][m] == (unsigned)(triangles[1]) ) found = 1;
 							}
 							if( !found ){
 								pd->triangleNeighbours[triangles[0]][triangleNeighboursCount[triangles[0]]++] = triangles[1];
@@ -1030,7 +1030,7 @@ void ParallelDelaunay_GatherTriangulation( ParallelDelaunay *pd )
 						
 							found = 0;
 							for( m=0; m<3; m++ ){
-								if( pd->triangleNeighbours[triangles[1]][m] == triangles[0] ) found = 1;
+                                                          if( pd->triangleNeighbours[triangles[1]][m] == (unsigned)(triangles[0]) ) found = 1;
 							}
 							if( !found ){
 								pd->triangleNeighbours[triangles[1]][triangleNeighboursCount[triangles[1]]++] = triangles[0];
@@ -1205,7 +1205,7 @@ QuadEdgeRef ParallelDelaunayFindLowestQuadEdge( ParallelDelaunay *pd, MPI_Comm *
 			MPI_Wait( &r, &s );
 			LinkedList_InsertNode( list, (void*)ldi, sizeof( QuadEdgeRef* ) );
 			
-			if (RightOf(ORG(ldi), rdi)){
+			if (RightOf((Site*)ORG(ldi), rdi)){
 				rdi = ONEXT(SYM(rdi));
 				localBreak = 1;
 			}
@@ -1219,7 +1219,7 @@ QuadEdgeRef ParallelDelaunayFindLowestQuadEdge( ParallelDelaunay *pd, MPI_Comm *
 			MPI_Wait( &r, &s );
 			LinkedList_InsertNode( list, (void*)rdi, sizeof( QuadEdgeRef* ) );
 			
-			if (LeftOf(ORG(rdi), ldi)){
+			if (LeftOf((Site*)ORG(rdi), ldi)){
 				ldi = LNEXT(ldi);
 				localBreak = 1;
 			}
@@ -1300,8 +1300,8 @@ void ParallelDelaunayMerge( ParallelDelaunay *pd, MPI_Comm *comm, int rank )
 		
 		while(1){
 			localBreak = 0;
-			if (RightOf(DEST(rcand), basel)){
-				while (InCircle(DEST(basel), ORG(basel), DEST(rcand), DEST(OPREV(rcand)))){
+			if (RightOf((Site*)DEST(rcand), basel)){
+				while (InCircle((Site*)DEST(basel), (Site*)ORG(basel), (Site*)DEST(rcand), (Site*)DEST(OPREV(rcand)))){
 					QuadEdgeRef t = OPREV(rcand);
 
 					DeleteQuadEdge(d->qp, rcand);
@@ -1309,7 +1309,7 @@ void ParallelDelaunayMerge( ParallelDelaunay *pd, MPI_Comm *comm, int rank )
 				}
 			}
 			
-			if (!RightOf(DEST(rcand), basel)) localBreak = 1;
+			if (!RightOf((Site*)DEST(rcand), basel)) localBreak = 1;
 
 			MPI_Isend( &localBreak, 1, MPI_INT, rank, BREAK_TAG, *comm, &r );
 			MPI_Recv( &(globalBreak), 1, MPI_INT, rank, BREAK_TAG, *comm, &s );
@@ -1324,9 +1324,9 @@ void ParallelDelaunayMerge( ParallelDelaunay *pd, MPI_Comm *comm, int rank )
 			lcand = ParallelDelaunayRecvEdge( pd, rank, comm );
 			MPI_Wait( &r, &s );
 
-			if ( !RightOf(DEST(lcand), basel) ||
-				( RightOf(DEST(rcand), basel) && 
-				InCircle(DEST(lcand), ORG(lcand), ORG(rcand), DEST(rcand)))){
+			if ( !RightOf((Site*)DEST(lcand), basel) ||
+				( RightOf((Site*)DEST(rcand), basel) && 
+				InCircle((Site*)DEST(lcand), (Site*)ORG(lcand), (Site*)ORG(rcand), (Site*)DEST(rcand)))){
 			
 				baselPrev = basel;
 				basel = MakeQuadEdge(d->qp);
@@ -1364,8 +1364,8 @@ void ParallelDelaunayMerge( ParallelDelaunay *pd, MPI_Comm *comm, int rank )
 		
 		while(1){
 			localBreak = 0;
-			if (RightOf(DEST(lcand), basel)){
-				while (InCircle(DEST(basel), ORG(basel), DEST(lcand), DEST(ONEXT(lcand)))){
+			if (RightOf((Site*)DEST(lcand), basel)){
+				while (InCircle((Site*)DEST(basel), (Site*)ORG(basel), (Site*)DEST(lcand), (Site*)DEST(ONEXT(lcand)))){
 					QuadEdgeRef t = ONEXT(lcand);
 					
 					DeleteQuadEdge(d->qp, lcand);
@@ -1373,7 +1373,7 @@ void ParallelDelaunayMerge( ParallelDelaunay *pd, MPI_Comm *comm, int rank )
 				}
 			}
 			
-			if (!RightOf(DEST(lcand), basel)) localBreak = 1;
+			if (!RightOf((Site*)DEST(lcand), basel)) localBreak = 1;
 
 			MPI_Isend( &localBreak, 1, MPI_INT, rank, BREAK_TAG, *comm, &r );
 			MPI_Recv( &(globalBreak), 1, MPI_INT, rank, BREAK_TAG, *comm, &s );
@@ -1388,9 +1388,9 @@ void ParallelDelaunayMerge( ParallelDelaunay *pd, MPI_Comm *comm, int rank )
 			rcand = ParallelDelaunayRecvEdge( pd, rank, comm );
 			MPI_Wait( &r, &s );
 
-			if ( !RightOf(DEST(lcand), basel) ||
-				( RightOf(DEST(rcand), basel) && 
-				InCircle(DEST(lcand), ORG(lcand), ORG(rcand), DEST(rcand)))){
+			if ( !RightOf((Site*)DEST(lcand), basel) ||
+				( RightOf((Site*)DEST(rcand), basel) && 
+				InCircle((Site*)DEST(lcand), (Site*)ORG(lcand), (Site*)ORG(rcand), (Site*)DEST(rcand)))){
 				
 				baselPrev = basel;
 				basel = MakeQuadEdge(d->qp);

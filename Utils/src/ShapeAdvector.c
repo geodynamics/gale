@@ -149,7 +149,7 @@ void _ShapeAdvector_Print( void* shapeAdvector, Stream* stream ) {
 }
 
 
-void* _ShapeAdvector_Copy( void* shapeAdvector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ShapeAdvector_Copy( const void* shapeAdvector, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	ShapeAdvector*	self = (ShapeAdvector*)shapeAdvector;
 	ShapeAdvector*	newShapeAdvector;
 	

@@ -106,7 +106,7 @@ void _BelowPlane_Print( void* belowPlane, Stream* stream ) {
 	_Stg_Shape_Print( self, stream );
 }
 
-void* _BelowPlane_Copy( void* belowPlane, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _BelowPlane_Copy( const void* belowPlane, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	BelowPlane*	self = (BelowPlane*)belowPlane;
 	BelowPlane*	newBelowPlane;
 	

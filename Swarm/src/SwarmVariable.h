@@ -121,7 +121,7 @@
 	void _SwarmVariable_Initialise( void* swarmVariable, void* data );
 	
 	/* Copy */
-	void* _SwarmVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _SwarmVariable_Copy( const void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/** Interface to determine the value of the swarm at a specific particle. */
 	#define SwarmVariable_ValueAt( swarmVariable, lParticle_I, value ) \

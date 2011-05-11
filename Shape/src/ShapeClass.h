@@ -101,7 +101,7 @@ Stg_Shape* _Stg_Shape_New(  STG_SHAPE_DEFARGS  );
 		(Stg_Shape*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define Stg_Shape_DeepCopy( self ) \
 		(Stg_Shape*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _Stg_Shape_Copy( void* shape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Stg_Shape_Copy( const void* shape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	/* 'Stg_Component' Virtual Function Implementations */
 	void _Stg_Shape_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

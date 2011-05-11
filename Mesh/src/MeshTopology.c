@@ -43,7 +43,7 @@ void _MeshTopology_Init( void* _self ) {
    MeshTopology* self = (MeshTopology*)_self;
 
    _NewClass_Init( self );
-   self->nDims = 0;
+   self->nDims = (MeshTopology_Dim)0;
    self->nTDims = 0;
    self->shadDepth = 0;
    self->comm = NULL;

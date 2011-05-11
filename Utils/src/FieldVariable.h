@@ -72,7 +72,7 @@
 	} InterpolationResult;
 	
 	/** Mapping to convert an interpolation result to a string for debug purposes */
-	extern const char* InterpolationResultToStringMap[4];
+	extern Name InterpolationResultToStringMap[4];
 	
 	typedef InterpolationResult	(FieldVariable_InterpolateValueAtFunction) ( void* fieldVariable, Coord coord, double* value );
 	typedef double	(FieldVariable_GetValueFunction) ( void* fieldVariable );
@@ -169,7 +169,7 @@
 	void _FieldVariable_Initialise( void* fieldVariable, void* data ) ;
 	
 	/* Copy */
-	void* _FieldVariable_Copy( void* fieldVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _FieldVariable_Copy( const void* fieldVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/** Interface to determine the value of the field at a specific co-ordinate in space.
 	Return status determines whether operation was successful - i.e. whether the given

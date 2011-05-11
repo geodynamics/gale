@@ -341,7 +341,7 @@ void _AllNodesVC_Print( void* allNodesVC, Stream* stream ) {
 }
 
 
-void* _AllNodesVC_Copy( void* allNodesVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _AllNodesVC_Copy( const void* allNodesVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	AllNodesVC*		self = (AllNodesVC*)allNodesVC;
 	AllNodesVC*		newAllNodesVC;
 	PtrMap*			map = ptrMap;
@@ -360,7 +360,7 @@ void* _AllNodesVC_Copy( void* allNodesVC, void* dest, Bool deep, Name nameExt, s
 	if( deep ) {
 		newAllNodesVC->mesh = (Mesh*)Stg_Class_Copy( self->mesh, NULL, deep, nameExt, map );
 		
-		if( (newAllNodesVC->_entryTbl = PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
+		if( (newAllNodesVC->_entryTbl = (AllNodesVC_Entry*)PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
 			newAllNodesVC->_entryTbl = Memory_Alloc_Array( AllNodesVC_Entry, newAllNodesVC->_entryCount, "AllNodesVC->_entryTbl");
 			memcpy( newAllNodesVC->_entryTbl, self->_entryTbl, sizeof(AllNodesVC_Entry) * newAllNodesVC->_entryCount );
 			PtrMap_Append( map, newAllNodesVC->_entryTbl, self->_entryTbl );

@@ -201,7 +201,7 @@ void CompressionAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 
 	/* Loop over domain nodes. */
 	sync = IGraph_GetDomain( mesh->topo, MT_VERTEX );
-	for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
+	for( n_i = 0; n_i < (unsigned)Sync_GetNumDomains( sync ); n_i++ ) {
 		gNode = Sync_DomainToGlobal( sync, n_i );
 		Grid_Lift( grid, gNode, inds );
 

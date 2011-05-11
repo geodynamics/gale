@@ -129,7 +129,7 @@
 	#define CellLayout_DeepCopy( self ) \
 		(CellLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _CellLayout_Copy( void* cellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _CellLayout_Copy( const void* cellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _CellLayout_AssignFromXML( void* cellLayout, Stg_ComponentFactory *cf, void* data );	
 	

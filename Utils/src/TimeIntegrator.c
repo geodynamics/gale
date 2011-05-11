@@ -55,7 +55,7 @@ TimeIntegrator* TimeIntegrator_New(
 	EntryPoint_Register*	entryPoint_Register,
 	AbstractContext*		context )
 {
-	TimeIntegrator* self = _TimeIntegrator_DefaultNew( name );
+  TimeIntegrator* self = (TimeIntegrator*)_TimeIntegrator_DefaultNew( name );
 
 	self->isConstructed = True;
 	_TimeIntegrator_Init( self, order, simultaneous, entryPoint_Register, context );
@@ -118,8 +118,8 @@ void _TimeIntegrator_Init(
 	self->simultaneous = simultaneous;
 
 	/* Entry Point Stuff */
-	Stg_asprintf( &self->_setupEPName, "%s-Setup", self->name );
-	Stg_asprintf( &self->_finishEPName, "%s-Finish", self->name );
+	Stg_asprintf( (char**)(&self->_setupEPName), "%s-Setup", self->name );
+	Stg_asprintf( (char**)(&self->_finishEPName), "%s-Finish", self->name );
 	self->setupEP  = EntryPoint_New( self->_setupEPName,  EntryPoint_VoidPtr_CastType );
 	self->finishEP = EntryPoint_New( self->_finishEPName, EntryPoint_VoidPtr_CastType );
 
@@ -169,7 +169,7 @@ void _TimeIntegrator_Print( void* timeIntegrator, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void* _TimeIntegrator_Copy( void* timeIntegrator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _TimeIntegrator_Copy( const void* timeIntegrator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	TimeIntegrator*	self = (TimeIntegrator*)timeIntegrator;
 	TimeIntegrator*	newTimeIntegrator;
 	
@@ -536,14 +536,14 @@ void TimeIntegrator_Setup( void* timeIntegrator ) {
 	}		
 }
 
-void TimeIntegrator_AppendSetupEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, char* addedBy, void* data ) {
+void TimeIntegrator_AppendSetupEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, Name addedBy, void* data ) {
 	TimeIntegrator* self = (TimeIntegrator*)timeIntegrator;
 
 	EntryPoint_Append( self->setupEP, name, funcPtr, addedBy );
 	Stg_ObjectList_Append( self->setupData, data );
 }
 
-void TimeIntegrator_PrependSetupEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, char* addedBy, void* data ) {
+void TimeIntegrator_PrependSetupEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, Name addedBy, void* data ) {
 	TimeIntegrator* self = (TimeIntegrator*)timeIntegrator;
 
 	EntryPoint_Prepend( self->setupEP, name, funcPtr, addedBy );
@@ -568,14 +568,14 @@ void TimeIntegrator_Finalise( void* timeIntegrator ) {
 	}
 }
 
-void TimeIntegrator_AppendFinishEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, char* addedBy, void* data ) {
+void TimeIntegrator_AppendFinishEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, Name addedBy, void* data ) {
 	TimeIntegrator*        self            = (TimeIntegrator*)timeIntegrator;
 
 	EntryPoint_Append( self->finishEP, name, funcPtr, addedBy );
 	Stg_ObjectList_Append( self->finishData, data );
 }
 
-void TimeIntegrator_PrependFinishEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, char* addedBy, void* data ) {
+void TimeIntegrator_PrependFinishEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, Name addedBy, void* data ) {
 	TimeIntegrator*        self            = (TimeIntegrator*)timeIntegrator;
 
 	EntryPoint_Prepend( self->finishEP, name, funcPtr, addedBy );
@@ -587,7 +587,7 @@ void TimeIntegrator_InsertBeforeFinishEP(
 	Name hookToInsertBefore,
 	Name name, 
 	Func_Ptr funcPtr, 
-	char* addedBy, 
+	Name addedBy, 
 	void* data ) 
 {
 	TimeIntegrator*        self            = (TimeIntegrator*)timeIntegrator;
@@ -609,7 +609,7 @@ void TimeIntegrator_InsertAfterFinishEP(
 	Name hookToInsertAfter, 
 	Name name, 
 	Func_Ptr funcPtr, 
-	char* addedBy, 
+	Name addedBy, 
 	void* data ) 
 {
 	TimeIntegrator*        self            = (TimeIntegrator*)timeIntegrator;

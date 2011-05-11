@@ -61,7 +61,7 @@ void VectorMathSuite_Teardown( VectorMathSuiteData* data ) {
 }
 
 void VectorMathSuite_BasicTest( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"BasicTest" );
 	char		expected_file[PCU_PATH_MAX];	
 
@@ -106,7 +106,7 @@ void VectorMathSuite_BasicTest( VectorMathSuiteData* data ) {
 }
 
 void VectorMathSuite_CompleteTest( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"CompleteTest" );
 	char		expected_file[PCU_PATH_MAX];	
 
@@ -147,7 +147,7 @@ void VectorMathSuite_CompleteTest( VectorMathSuiteData* data ) {
 }
 
 void VectorMathSuite_TestVectorFunctions( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"CompleteTest" );
 	char		expected_file[PCU_PATH_MAX];	
 
@@ -219,7 +219,7 @@ void VectorMathSuite_TestVectorFunctions( VectorMathSuiteData* data ) {
 }
 
 void VectorMathSuite_TestMagnitudeFunction( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"MagnitudeFunction" );
 	char		expected_file[PCU_PATH_MAX];	
 
@@ -247,7 +247,7 @@ void VectorMathSuite_TestMagnitudeFunction( VectorMathSuiteData* data ) {
 }
 
 void VectorMathSuite_TestDotProductFunction( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"DotProductFunction" );
 	char		expected_file[PCU_PATH_MAX];	
 
@@ -273,7 +273,7 @@ void VectorMathSuite_TestDotProductFunction( VectorMathSuiteData* data ) {
 }
 
 void VectorMathSuite_TestCrossProductFunction( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"CrossProductFunction" );
 	char		expected_file[PCU_PATH_MAX];	
 
@@ -300,7 +300,7 @@ void VectorMathSuite_TestCrossProductFunction( VectorMathSuiteData* data ) {
 }
 
 void VectorMathSuite_TestDistancePointsFunction( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"DistancePointsFunction" );
 	char		expected_file[PCU_PATH_MAX];	
 
@@ -326,7 +326,7 @@ void VectorMathSuite_TestDistancePointsFunction( VectorMathSuiteData* data ) {
 }
 
 void VectorMathSuite_TestNormalToPlaneFunction( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"NormalToPlaneFunction" );
 	char		expected_file[PCU_PATH_MAX];	
 
@@ -354,7 +354,7 @@ void VectorMathSuite_TestNormalToPlaneFunction( VectorMathSuiteData* data ) {
 }
 
 void VectorMathSuite_TestCentroidFunction( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"CentroidFunction" );
 	char		expected_file[PCU_PATH_MAX];	
 
@@ -385,7 +385,7 @@ void VectorMathSuite_TestCentroidFunction( VectorMathSuiteData* data ) {
 }
 
 void VectorMathSuite_TestTriangleArea( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"TriangleArea" );
 	char		expected_file[PCU_PATH_MAX];	
 
@@ -412,7 +412,7 @@ void VectorMathSuite_TestTriangleArea( VectorMathSuiteData* data ) {
 }
 
 void VectorMathSuite_TestNormalisationFunction( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"NormalisationFunction" );
 	char		expected_file[PCU_PATH_MAX];	
 
@@ -451,7 +451,7 @@ void VectorMathSuite_TestNormalisationFunction( VectorMathSuiteData* data ) {
 }
 
 void VectorMathSuite_TestVectorCrossProductMagnitude( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"VectorCrossProductMagnitude" );
 	char		expected_file[PCU_PATH_MAX];	
 
@@ -479,7 +479,7 @@ void VectorMathSuite_TestVectorCrossProductMagnitude( VectorMathSuiteData* data 
 }
 
 void VectorMathSuite_TestConvexQuadrilateralArea( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"ConvexQuadrilateralArea" );
 	char		expected_file[PCU_PATH_MAX];	
 
@@ -509,7 +509,7 @@ void VectorMathSuite_TestConvexQuadrilateralArea( VectorMathSuiteData* data ) {
 }
 
 void VectorMathSuite_TestScalarTripleProduct( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"ScalarTripleProduct" );
 	char		expected_file[PCU_PATH_MAX];	
 
@@ -539,7 +539,7 @@ void VectorMathSuite_TestScalarTripleProduct( VectorMathSuiteData* data ) {
 }
 
 void VectorMathSuite_TestParallelPipedVolume( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"ParallelPipedVolume" );
 	char		expected_file[PCU_PATH_MAX];	
 
@@ -568,7 +568,7 @@ void VectorMathSuite_TestParallelPipedVolume( VectorMathSuiteData* data ) {
 }
 
 void VectorMathSuite_TestAverageCoord( VectorMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int	procToWatch = data->nProcs >=2 ? 1 : 0;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"AverageCoord" );
 	char		expected_file[PCU_PATH_MAX];	
 

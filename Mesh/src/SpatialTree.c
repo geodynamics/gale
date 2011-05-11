@@ -110,7 +110,7 @@ void SpatialTree_SetMesh( void* _self, void* mesh ) {
    SpatialTree* self = Class_Cast( _self, SpatialTree );
 
    SpatialTree_Clear( self );
-   self->mesh = mesh;
+   self->mesh = (Mesh*)mesh;
 }
 
 void SpatialTree_Rebuild( void* _self ) {
@@ -131,7 +131,7 @@ void SpatialTree_Rebuild( void* _self ) {
    self->max = Class_Array( self, double, self->nDims );
 
    Mesh_GetDomainCoordRange( self->mesh, self->min, self->max );
-   nVerts = Mesh_GetDomainSize( self->mesh, 0 );
+   nVerts = Mesh_GetDomainSize( self->mesh, (MeshTopology_Dim)0 );
    verts = Class_Array( self, int, nVerts );
    for( ii = 0; ii < nVerts; ii++ )
       verts[ii] = ii;
@@ -234,7 +234,7 @@ void SpatialTree_SplitNode( SpatialTree* self, void* node, void** parent,
 
 	 newNode = GETNODECHILDREN( self, node )[ii];
 	 newNodePtr = GETNODECHILDREN( self, node ) + ii;
-	 SpatialTree_SplitNode( self, newNode, newNodePtr, subMin, subMax,
+	 SpatialTree_SplitNode( self, newNode, (void**)newNodePtr, subMin, subMax,
 				subSizes[ii], subSets[ii] );
       }
 
@@ -278,14 +278,16 @@ void SpatialTree_BuildElements( SpatialTree* self, int nVerts, int* verts,
 
    maxEls = 0;
    for( ii = 0; ii < nVerts; ii++ )
-      maxEls += Mesh_GetIncidenceSize( self->mesh, 0, verts[ii], self->nDims );
+      maxEls += Mesh_GetIncidenceSize(self->mesh,(MeshTopology_Dim)0,
+                                      verts[ii],(MeshTopology_Dim)(self->nDims));
 
    curEls = Class_Array( self, int, maxEls );
 
    inc = IArray_New();
    maxEls = 0;
    for( ii = 0; ii < nVerts; ii++ ) {
-      Mesh_GetIncidence( self->mesh, 0, verts[ii], self->nDims, inc );
+      Mesh_GetIncidence(self->mesh,(MeshTopology_Dim)0,verts[ii],
+                        (MeshTopology_Dim)(self->nDims),inc);
       nIncEls = IArray_GetSize( inc );
       incEls = IArray_GetPtr( inc );
       for( jj = 0; jj < nIncEls; jj++ ) {

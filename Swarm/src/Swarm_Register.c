@@ -152,7 +152,7 @@ Index Swarm_Register_Add( Swarm_Register* self, void* swarm )
 
 void Swarm_Register_RemoveIndex( Swarm_Register* self, unsigned int index )
 {
-   int swarm_i = 0;
+   unsigned swarm_i = 0;
 	assert( self );
 	/* The third argument controls if the Delete phase is run or not in this function
 	 * KEEP = Don't run delete

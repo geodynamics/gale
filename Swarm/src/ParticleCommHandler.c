@@ -147,7 +147,7 @@ void _ParticleCommHandler_Print( void* pCommsHandler, Stream* stream ) {
 }
 
 
-void* _ParticleCommHandler_Copy( void* particleCommHandler, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ParticleCommHandler_Copy( const void* particleCommHandler, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 
 	// TODO: put back in.
 	assert(0);
@@ -206,7 +206,7 @@ void _ParticleCommHandler_AllocateOutgoingParticlesArrays( ParticleCommHandler* 
 				"ParticleCommHandler->shadowParticlesLeavingMeHandles[]" );
 			particlesArrayBytes = self->swarm->particleExtensionMgr->finalSize * 
 				self->shadowParticlesLeavingMeTotalCounts[nbr_I];
-			self->shadowParticlesLeavingMe[nbr_I] = Memory_Alloc_Bytes( particlesArrayBytes,
+			self->shadowParticlesLeavingMe[nbr_I] = (Particle*)Memory_Alloc_Bytes( particlesArrayBytes,
 				"Particle", "ParticleCommHandler->shadowParticlesLeavingMe[]" );
 		}
 	}
@@ -289,7 +289,7 @@ void _ParticleCommHandler_AllocateIncomingParticlesArrays( ParticleCommHandler* 
 			/* allocate particles recv array to right size */
 			incomingViaShadowArrayBytes = self->swarm->particleExtensionMgr->finalSize * 
 				self->particlesArrivingFromNbrShadowCellsTotalCounts[nbr_I];
-			self->particlesArrivingFromNbrShadowCells[nbr_I] = Memory_Alloc_Bytes( incomingViaShadowArrayBytes,
+			self->particlesArrivingFromNbrShadowCells[nbr_I] = (Particle*)Memory_Alloc_Bytes( incomingViaShadowArrayBytes,
 				"Particle", "particleCommHandler->particlesArrivingFromNbrShadowCells[]" );
 		}
 	}

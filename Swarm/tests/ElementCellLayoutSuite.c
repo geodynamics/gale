@@ -125,7 +125,7 @@ void ElementCellLayoutSuite_TestElementCellLayout( ElementCellLayoutSuiteData* d
 	GlobalParticle			testParticle;
 		
 	if( data->rank == procToWatch ) {
-		for( element = 0; element < Mesh_GetLocalSize( data->mesh, data->nDims ); element++ ) {
+          for( element = 0; element < Mesh_GetLocalSize( data->mesh, (MeshTopology_Dim)(data->nDims) ); element++ ) {
 			Cell_PointIndex	count;
 			double***			cellPoints;
 	

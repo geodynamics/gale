@@ -861,7 +861,7 @@ IndexSet* RegularMeshUtils_CreateContactTopSet( void* _mesh, int lowDepth, int u
    assert( Mesh_GetDimSize( mesh ) == 2 );
 
    grid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
-   nNodes = Mesh_GetDomainSize( mesh, 0 );
+   nNodes = Mesh_GetDomainSize( mesh, (MeshTopology_Dim)0 );
    set = IndexSet_New( nNodes );
 
 /*
@@ -875,7 +875,7 @@ IndexSet* RegularMeshUtils_CreateContactTopSet( void* _mesh, int lowDepth, int u
    bottom = grid->sizes[1] - 1;
    top = grid->sizes[1] - 1;
    for( ii = 0; ii < nNodes; ii++ ) {
-      Grid_Lift( grid, Mesh_DomainToGlobal( mesh, 0, ii ), ijk );
+     Grid_Lift( grid, Mesh_DomainToGlobal( mesh, (MeshTopology_Dim)0, ii ), (unsigned*)ijk );
       if( ijk[0] >= left && ijk[0] <= right && ijk[1] >= bottom && ijk[1] <= top )
 	 IndexSet_Add( set, ii );
    }
@@ -895,7 +895,7 @@ IndexSet* RegularMeshUtils_CreateContactBottomSet( void* _mesh, int lowDepth, in
    assert( Mesh_GetDimSize( mesh ) == 2 );
 
    grid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
-   nNodes = Mesh_GetDomainSize( mesh, 0 );
+   nNodes = Mesh_GetDomainSize( mesh, (MeshTopology_Dim)0 );
    set = IndexSet_New( nNodes );
 
 /*
@@ -909,10 +909,11 @@ IndexSet* RegularMeshUtils_CreateContactBottomSet( void* _mesh, int lowDepth, in
    bottom = 0;
    top = inDepth;
    for( ii = 0; ii < nNodes; ii++ ) {
-      Grid_Lift( grid, Mesh_DomainToGlobal( mesh, 0, ii ), ijk );
-      if( ijk[0] >= left && ijk[0] <= right && ijk[1] >= bottom && ijk[1] <= top ) {
-	 IndexSet_Add( set, ii );
-      }
+     Grid_Lift(grid,Mesh_DomainToGlobal(mesh,(MeshTopology_Dim)0,ii ),
+               (unsigned*)ijk );
+     if( ijk[0] >= left && ijk[0] <= right && ijk[1] >= bottom && ijk[1] <= top ) {
+       IndexSet_Add( set, ii );
+     }
    }
 
    return set;
@@ -930,7 +931,7 @@ IndexSet* RegularMeshUtils_CreateContactLeftSet( void* _mesh, int lowDepth, int 
    assert( Mesh_GetDimSize( mesh ) == 2 );
 
    grid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
-   nNodes = Mesh_GetDomainSize( mesh, 0 );
+   nNodes = Mesh_GetDomainSize( mesh, (MeshTopology_Dim)0 );
    set = IndexSet_New( nNodes );
 
 /*
@@ -944,7 +945,8 @@ IndexSet* RegularMeshUtils_CreateContactLeftSet( void* _mesh, int lowDepth, int 
    bottom = lowDepth;
    top = grid->sizes[1] - 1 - uppDepth;
    for( ii = 0; ii < nNodes; ii++ ) {
-      Grid_Lift( grid, Mesh_DomainToGlobal( mesh, 0, ii ), ijk );
+     Grid_Lift( grid, Mesh_DomainToGlobal( mesh, (MeshTopology_Dim)0, ii ),
+                (unsigned*)ijk );
       if( ijk[0] >= left && ijk[0] <= right && ijk[1] >= bottom && ijk[1] <= top )
 	 IndexSet_Add( set, ii );
    }
@@ -964,7 +966,7 @@ IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int lowDepth, int
    assert( Mesh_GetDimSize( mesh ) == 2 );
 
    grid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
-   nNodes = Mesh_GetDomainSize( mesh, 0 );
+   nNodes = Mesh_GetDomainSize( mesh, (MeshTopology_Dim)0 );
    set = IndexSet_New( nNodes );
 
 /*
@@ -978,7 +980,8 @@ IndexSet* RegularMeshUtils_CreateContactRightSet( void* _mesh, int lowDepth, int
    bottom = lowDepth;
    top = grid->sizes[1] - 1- uppDepth;
    for( ii = 0; ii < nNodes; ii++ ) {
-      Grid_Lift( grid, Mesh_DomainToGlobal( mesh, 0, ii ), ijk );
+     Grid_Lift( grid, Mesh_DomainToGlobal( mesh, (MeshTopology_Dim)0, ii ),
+                (unsigned*)ijk );
       if( ijk[0] >= left && ijk[0] <= right && ijk[1] >= bottom && ijk[1] <= top )
 	 IndexSet_Add( set, ii );
    }
@@ -1016,7 +1019,7 @@ Node_DomainIndex RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex( void* _
 	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), refElement_dI, MT_VERTEX, 
 			   inc );
 	currElementNodeCount = IArray_GetSize( inc );
-	currElementNodes = IArray_GetPtr( inc );
+	currElementNodes = (Node_DomainIndex*)IArray_GetPtr( inc );
 
 	/* Find index of reference node within reference element */
 	for( refNode_eI = 0; refNode_eI < currElementNodeCount; refNode_eI++ ) {

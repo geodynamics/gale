@@ -102,7 +102,7 @@
 		(LineParticleLayout*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define LineParticleLayout_DeepCopy( self ) \
 		(LineParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _LineParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _LineParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Stuff */
 	void* _LineParticleLayout_DefaultNew( Name name ) ;

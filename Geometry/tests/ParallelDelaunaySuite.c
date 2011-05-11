@@ -173,11 +173,11 @@ void ParallelDelaunaySuite_TestIrregular( ParallelDelaunaySuiteData* data ) {
 				qsort( dNeighbours, d->numNeighbours[j], sizeof( int ), CompareFunction );
 				qsort( pdNeighbours, pd->numNeighbours[j], sizeof( int ), CompareFunction );
 
-				for( k = 0; k < d->numNeighbours[j]; k++ ) {
+				for( k = 0; k < (int)(d->numNeighbours[j]); k++ ) {
 					if( dNeighbours[k] != pdNeighbours[k] )
 						continue;
 
-					for( m = 0; m < d->numNeighbours[j]; m++ ) {
+					for( m = 0; m < (int)(d->numNeighbours[j]); m++ ) {
 						if( d->neighbours[j][k] == pd->neighbours[j][m] )
 							if( fabs( d->voronoiSides[j][k] - pd->voronoiSides[j][m] ) > EPS )
 								voronoiSideTest = 0;
@@ -253,11 +253,11 @@ void ParallelDelaunaySuite_TestRegular( ParallelDelaunaySuiteData* data ) {
 				qsort( dNeighbours, d->numNeighbours[j], sizeof( int ), CompareFunction );
 				qsort( pdNeighbours, pd->numNeighbours[j], sizeof( int ), CompareFunction );
 
-				for( k = 0; k < d->numNeighbours[j]; k++ ) {
+				for( k = 0; k < (int)(d->numNeighbours[j]); k++ ) {
 					if( dNeighbours[k] != pdNeighbours[k] )
 						continue;
 
-					for( m = 0; m < d->numNeighbours[j]; m++ ) {
+					for( m = 0; m < (int)(d->numNeighbours[j]); m++ ) {
 						if( d->neighbours[j][k] == pd->neighbours[j][m] )
 							if( fabs( d->voronoiSides[j][k] - pd->voronoiSides[j][m] ) > EPS )
 								voronoiSideTest = 0;

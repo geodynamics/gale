@@ -95,7 +95,7 @@
 		(UnionParticleLayout*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define UnionParticleLayout_DeepCopy( self ) \
 		(UnionParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _UnionParticleLayout_Copy( void* unionParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _UnionParticleLayout_Copy( const void* unionParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Stuff */
 	void* _UnionParticleLayout_DefaultNew( Name name ) ;

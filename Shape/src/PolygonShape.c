@@ -111,7 +111,7 @@ void _PolygonShape_Print( void* polygon, Stream* stream ) {
 
 
 
-void* _PolygonShape_Copy( void* polygon, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _PolygonShape_Copy( const void* polygon, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	PolygonShape*	self = (PolygonShape*)polygon;
 	PolygonShape*	newPolygonShape;
 	

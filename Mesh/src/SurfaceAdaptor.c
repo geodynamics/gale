@@ -294,8 +294,8 @@ void _SurfaceAdaptor_AssignFromXML_Surface(Stg_ComponentFactory* cf,
       (info->topo_data.maxZ-info->topo_data.minZ)
       /(info->topo_data.nz-1);
     info->topo_data.heights=
-      malloc(sizeof(double)*info->topo_data.nx
-             *info->topo_data.nz);
+      (double*)malloc(sizeof(double)*info->topo_data.nx
+                      *info->topo_data.nz);
     fp=fopen(surfaceFileName,"r");
     if(!fp)
       {
@@ -440,7 +440,7 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 
 	/* Loop over domain nodes. */
 	sync = IGraph_GetDomain( mesh->topo, MT_VERTEX );
-	for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
+	for( n_i = 0; n_i < (unsigned)Sync_GetNumDomains( sync ); n_i++ ) {
 		unsigned gNode;
 		double percentage, min_height, max_height;
                 double topDeform=0.0;

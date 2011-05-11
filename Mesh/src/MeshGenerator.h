@@ -104,7 +104,7 @@
 		(Mesh*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define MeshGenerator_DeepCopy( self ) \
 		(Mesh*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _MeshGenerator_Copy( void* meshGenerator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _MeshGenerator_Copy( const void* meshGenerator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _MeshGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactory* cf, void* data );
 	void _MeshGenerator_Build( void* meshGenerator, void* data );

@@ -178,11 +178,11 @@ void _OperatorFieldVariable_Init( void* ofv, Name operatorName, Index fieldVaria
 	}
 }
 
-void* _OperatorFieldVariable_Copy( void* fieldVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _OperatorFieldVariable_Copy( const void* fieldVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	OperatorFieldVariable*	self = (OperatorFieldVariable*)fieldVariable;
 	OperatorFieldVariable*	newOperatorFieldVariable;
 	
-	newOperatorFieldVariable = _FieldVariable_Copy( self, dest, deep, nameExt, ptrMap );
+	newOperatorFieldVariable = (OperatorFieldVariable*)_FieldVariable_Copy( self, dest, deep, nameExt, ptrMap );
 	newOperatorFieldVariable->_operator = self->_operator;
 	newOperatorFieldVariable->fieldVariableCount = self->fieldVariableCount;
 	

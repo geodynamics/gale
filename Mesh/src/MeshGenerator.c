@@ -223,7 +223,7 @@ void _MeshGenerator_Destroy( void* meshGenerator, void* data ) {
 
 void MeshGenerator_SetFullIncidence( void* meshGenerator ) {
 	MeshGenerator* self = (MeshGenerator*)meshGenerator;
-	int d_i, d_j;
+	unsigned d_i, d_j;
 
 	assert( self );
 
@@ -293,7 +293,7 @@ void MeshGenerator_AddMesh( void* meshGenerator, void* mesh ) {
 	}
 
 	/* Add the new mesh. */
-	self->meshes[self->nMeshes - 1] = mesh;
+	self->meshes[self->nMeshes - 1] = (Mesh*)mesh;
 	((Mesh*)mesh)->generator = self;
 }
 

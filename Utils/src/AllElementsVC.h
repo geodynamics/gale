@@ -117,7 +117,7 @@
 	#define AllElementsVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
-	void* _AllElementsVC_Copy( void* allElementsVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _AllElementsVC_Copy( const void* allElementsVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	void _AllElementsVC_Build( void* allElementsVC, void* data );
 	

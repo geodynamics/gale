@@ -59,7 +59,7 @@
 		MeshShapeVC_Entry*		_entryTbl;            \
 		Mesh*							_mesh;                \
 		Stg_Shape*					_shape;               \
-		Name							shapeName;
+		char*							shapeName;
 
 	struct MeshShapeVC { __MeshShapeVC };
 
@@ -103,7 +103,7 @@
 
 	void _MeshShapeVC_Print( void* shapeVC, Stream* stream );
 
-	void* _MeshShapeVC_Copy( void* shapeVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _MeshShapeVC_Copy( const void* shapeVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 
 	void _MeshShapeVC_Destroy( void* shapeVC, void* data);
 

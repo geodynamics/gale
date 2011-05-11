@@ -47,7 +47,7 @@
 const Type WallVC_Type = "WallVC";
 const Name defaultWallVCName = "defaultWallVCName";
 
-const char* WallVC_WallEnumToStr[WallVC_Wall_Size] = {
+Name WallVC_WallEnumToStr[WallVC_Wall_Size] = {
 	"back",
 	"left",
 	"bottom",
@@ -383,7 +383,7 @@ void _WallVC_Print(void* wallVC, Stream* stream)
 }
 
 
-void* _WallVC_Copy( void* wallVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _WallVC_Copy( const void* wallVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	WallVC*		self = (WallVC*)wallVC;
 	WallVC*		newWallVC;
 	PtrMap*		map = ptrMap;
@@ -403,7 +403,7 @@ void* _WallVC_Copy( void* wallVC, void* dest, Bool deep, Name nameExt, struct Pt
 	if( deep ) {
 		newWallVC->_mesh = (Mesh*)Stg_Class_Copy( self->_mesh, NULL, deep, nameExt, map );
 		
-		if( (newWallVC->_entryTbl = PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
+		if( (newWallVC->_entryTbl = (WallVC_Entry*)PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
 			newWallVC->_entryTbl = Memory_Alloc_Array( WallVC_Entry, newWallVC->_entryCount, "WallVC->_entryTbl");
 			memcpy( newWallVC->_entryTbl, self->_entryTbl, sizeof(WallVC_Entry) * newWallVC->_entryCount );
 			PtrMap_Append( map, newWallVC->_entryTbl, self->_entryTbl );

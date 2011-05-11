@@ -80,7 +80,7 @@ void TensorMathSuite_Teardown( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_TestSymmetricTensorVectorComponents( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		int		dim;
@@ -105,7 +105,7 @@ void TensorMathSuite_TestSymmetricTensorVectorComponents( TensorMathSuiteData* d
 }
 
 void TensorMathSuite_TestJournalPrintTensorArray( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		double		**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
@@ -135,7 +135,7 @@ void TensorMathSuite_TestJournalPrintTensorArray( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_TestTensorToTensorArrayFunction( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
@@ -186,7 +186,7 @@ void TensorMathSuite_TestTensorToTensorArrayFunction( TensorMathSuiteData* data 
 }
 
 void TensorMathSuite_TestMathArrayToMatrix( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
@@ -226,7 +226,7 @@ void TensorMathSuite_TestMathArrayToMatrix( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_TestSymmetricTensorToMatrix( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
@@ -272,7 +272,7 @@ void TensorMathSuite_TestSymmetricTensorToMatrix( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_TestGetAntisymmetricPart( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
@@ -314,7 +314,7 @@ void TensorMathSuite_TestGetAntisymmetricPart( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_TestGetSymmetricPart( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
@@ -356,7 +356,7 @@ void TensorMathSuite_TestGetSymmetricPart( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_Test2ndInvariant( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
@@ -400,7 +400,7 @@ void TensorMathSuite_Test2ndInvariant( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_TestVectorTensorVector( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		double				**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
@@ -438,7 +438,7 @@ void TensorMathSuite_TestVectorTensorVector( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_TestZeroTensor( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
@@ -466,7 +466,7 @@ void TensorMathSuite_TestZeroTensor( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_TestMatrixDeterminant( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		double	**tensor = Memory_Alloc_2DArray( double , 5, 5, (Name)"Tensor"  );
@@ -512,7 +512,7 @@ void TensorMathSuite_TestMatrixDeterminant( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_TestCubicSolver( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		Stream*	stream = Journal_Register( InfoStream_Type, (Name)"CubicSolver"  );
@@ -535,7 +535,7 @@ void TensorMathSuite_TestCubicSolver( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_TestMappingFunctions( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
@@ -659,7 +659,7 @@ void TensorMathSuite_TestMappingFunctions( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_TestEigenVectorListSort( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		Eigenvector	eigenvectorList[3];
@@ -736,7 +736,7 @@ void TensorMathSuite_TestEigenVectorListSort( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_TestEigenVector1( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
@@ -776,7 +776,7 @@ void TensorMathSuite_TestEigenVector1( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_TestEigenVector2( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
@@ -813,7 +813,7 @@ void TensorMathSuite_TestEigenVector2( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_TestEigenVector3( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
@@ -855,7 +855,7 @@ void TensorMathSuite_TestEigenVector3( TensorMathSuiteData* data ) {
 }
 
 void TensorMathSuite_TestEigenVector4( TensorMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
@@ -900,10 +900,10 @@ void TensorMathSuite_TestEigenVector4( TensorMathSuiteData* data ) {
 
 		rightHandSide[0] = 24;
 		rightHandSide[1] = 35;
-		Journal_PrintArray( stream, rightHandSide, dim );
+		Journal_PrintArray( stream, rightHandSide, (unsigned)dim );
 
 		TensorArray_SolveSystem( tensorArray, solution, rightHandSide, dim );
-		Journal_PrintArray( stream, solution, dim );
+		Journal_PrintArray( stream, solution, (unsigned)dim );
 
 		dim = 3;
 		tensorArray[ FT3D_00 ] = 10;
@@ -920,10 +920,10 @@ void TensorMathSuite_TestEigenVector4( TensorMathSuiteData* data ) {
 		rightHandSide[0] = 24;
 		rightHandSide[1] = 35;
 		rightHandSide[2] = 45;
-		Journal_PrintArray( stream, rightHandSide, dim );
+		Journal_PrintArray( stream, rightHandSide, (unsigned)dim );
 
 		TensorArray_SolveSystem( tensorArray, solution, rightHandSide, dim );
-		Journal_PrintArray( stream, solution, dim );
+		Journal_PrintArray( stream, solution, (unsigned)dim );
 
 		pcu_filename_expected( "testTensorMathEigenVector4.expected", expected_file );
 		pcu_check_fileEq( "testTensorMathEigenVector4.dat", expected_file );

@@ -109,7 +109,7 @@ void _Mesh_ElementType_GetCentroid( void* elementType, unsigned element, double*
 	mesh = self->mesh;
 	nDims = Mesh_GetDimSize( mesh );
 	inc = IArray_New();
-	Mesh_GetIncidence( mesh, nDims, element, MT_VERTEX, inc );
+	Mesh_GetIncidence(mesh,(MeshTopology_Dim)nDims,element,MT_VERTEX,inc);
 	nIncVerts = (unsigned)IArray_GetSize( inc );
 	incVerts = IArray_GetPtr( inc );
 
@@ -137,7 +137,7 @@ void Mesh_ElementType_SetMesh( void* elementType, void* mesh ) {
 	assert( self && Stg_CheckType( self, Mesh_ElementType ) );
 	assert( !mesh || Stg_CheckType( mesh, Mesh ) );
 
-	self->mesh = mesh;
+	self->mesh = (Mesh*)mesh;
 	Mesh_ElementType_Update( self );
 }
 

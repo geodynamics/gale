@@ -101,7 +101,7 @@ void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
 	XML_IO_Handler*					io_handler;
 	unsigned								nDims = 3;
 	unsigned								meshSize[3] = {3, 3, 3};
-   unsigned								procToWatch;
+        int								procToWatch;
 	double								minCrds[3] = {0.0, 0.0, 0.0};
 	double								maxCrds[3] = {1.0, 1.0, 1.0};
 	Mesh*									mesh;
@@ -114,9 +114,9 @@ void CompositeVCSuite_TestCompositeVC( CompositeVCSuiteData* data ) {
 	ConditionFunction_Register*	conFunc_Register;
 	ExtensionManager_Register*		extensionMgr_Register;
    double*								array[7];
-   char*									vcKey[] = {"WallVC_Front", "WallVC_Back", "WallVC_Left", "WallVC_Right", "WallVC_Top", "WallVC_Bottom"};
-   char*									vcKeyName[] = {"WallVC_FrontName", "WallVC_BackName", "WallVC_LeftName", "WallVC_RightName", "WallVC_TopName", "WallVC_BottomName"};
-   char*									varName[] = {"x", "y", "z", "vx", "vy", "vz", "temp"};
+   Name									vcKey[] = {"WallVC_Front", "WallVC_Back", "WallVC_Left", "WallVC_Right", "WallVC_Top", "WallVC_Bottom"};
+   Name									vcKeyName[] = {"WallVC_FrontName", "WallVC_BackName", "WallVC_LeftName", "WallVC_RightName", "WallVC_TopName", "WallVC_BottomName"};
+   Name									varName[] = {"x", "y", "z", "vx", "vy", "vz", "temp"};
 	char									input_file[PCU_PATH_MAX];
 	char									expected_file[PCU_PATH_MAX];
    unsigned								nDomains;
@@ -235,7 +235,7 @@ void CompositeVCSuite_TestCompositeVCDictionary( CompositeVCSuiteData* data ) {
 	XML_IO_Handler*					io_handler;
 	unsigned								nDims = 3;
 	unsigned								meshSize[3] = {2, 2, 2};
-	unsigned								procToWatch;
+	int								procToWatch;
 	double								minCrds[3] = {0.0, 0.0, 0.0};
 	double								maxCrds[3] = {1.0, 1.0, 1.0};
 	Mesh*									mesh;
@@ -247,7 +247,7 @@ void CompositeVCSuite_TestCompositeVCDictionary( CompositeVCSuiteData* data ) {
 	ConditionFunction_Register*	conFunc_Register;
 	ExtensionManager_Register*		extensionMgr_Register;
 	double*								array[7];
-	char*									varName[] = {"x", "y", "z", "vx", "vy", "vz", "temp"};
+	Name									varName[] = {"x", "y", "z", "vx", "vy", "vz", "temp"};
 	char									input_file[PCU_PATH_MAX];
 	char									expected_file[PCU_PATH_MAX];
 	unsigned								nDomains;

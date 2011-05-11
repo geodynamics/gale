@@ -86,7 +86,7 @@
 		(Mesh*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define Decomp_Sync_Negotiate_DeepCopy( self ) \
 		(Mesh*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _Decomp_Sync_Negotiate_Copy( void* negotiate, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Decomp_Sync_Negotiate_Copy( const void* negotiate, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _Decomp_Sync_Negotiate_AssignFromXML( void* negotiate, Stg_ComponentFactory* cf, void* data );
 	void _Decomp_Sync_Negotiate_Build( void* negotiate, void* data );

@@ -125,9 +125,9 @@ void _RegularRemesher_Remesh( void* _self ) {
    assert( self->mesh );
 
    mesh = self->mesh;
-   meshSync = Mesh_GetSync( mesh, 0 );
+   meshSync = Mesh_GetSync( mesh, (MeshTopology_Dim)0 );
    nDims = Mesh_GetDimSize( mesh );
-   nVerts = Mesh_GetLocalSize( mesh, 0 );
+   nVerts = Mesh_GetLocalSize( mesh, (MeshTopology_Dim)0 );
    vGrid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
    inds = Class_Array( self, int, nDims );
 
@@ -170,7 +170,7 @@ void _RegularRemesher_Remesh( void* _self ) {
             ind = Sync_DomainToGlobal( meshSync, v_i );
             Grid_Lift( vGrid, ind, (unsigned*)inds );
             center = inds[d_i];
-            if( center == 0 || center == vGrid->sizes[d_i] - 1 ) {
+            if( center == 0 || center == (int)(vGrid->sizes[d_i] - 1) ) {
 
                /* If we're inside the contact depth range, we need to make
                   sure the side coordinates are aligned. */
@@ -187,10 +187,10 @@ void _RegularRemesher_Remesh( void* _self ) {
 	       }
                if( inds[d_j] < gen->contactDepth[d_j][0] )
                   inds[d_j] = gen->contactDepth[d_j][0];
-               else if( inds[d_j] > vGrid->sizes[d_j] - gen->contactDepth[d_j][1] - 1 )
+               else if( inds[d_j] > (int)(vGrid->sizes[d_j] - gen->contactDepth[d_j][1] - 1 ))
                   inds[d_j] = vGrid->sizes[d_j] - gen->contactDepth[d_j][1] - 1;
                Mesh_GetVertex( mesh, v_i )[d_i] =
-                  Mesh_GetVertex( mesh, Grid_Project( vGrid, inds ) )[d_i];
+                 Mesh_GetVertex( mesh, Grid_Project( vGrid, (unsigned*)inds ) )[d_i];
             }
          }
       }
@@ -209,7 +209,7 @@ void _RegularRemesher_Remesh( void* _self ) {
 	 ind = Sync_DomainToGlobal( meshSync, v_i );
 	 Grid_Lift( vGrid, ind, (unsigned*)inds );
 	 center = inds[d_i];
-	 if( center == 0 || center == vGrid->sizes[d_i] - 1 )
+	 if( center == 0 || center == (int)(vGrid->sizes[d_i] - 1 ))
 	    continue;
 
 	 inds[d_i] = 0;
@@ -238,7 +238,7 @@ void _RegularRemesher_Remesh( void* _self ) {
                      gen->contactGeom[d_i];
                }
             }
-            else if( center >= vGrid->sizes[d_i] - gen->contactDepth[d_i][1] - 1 ) {
+            else if( center >= (int)(vGrid->sizes[d_i] - gen->contactDepth[d_i][1] - 1 )) {
                mesh->verts[v_i][d_i] = rightCrd;
                if( gen->contactDepth[d_i][1] ) {
                   mesh->verts[v_i][d_i] -=
@@ -311,13 +311,13 @@ void _RegularRemesher_Remesh( void* _self ) {
 
       inds[0] = vGrid->sizes[0] - 1;
       inds[1] = vGrid->sizes[1] - 1;
-      nodeIndex = Grid_Project( vGrid, inds );
+      nodeIndex = Grid_Project( vGrid, (unsigned*)inds );
       nodeVert = Mesh_GetVertex( mesh, nodeIndex );
       inds[0]--;
-      innerIndex = Grid_Project( vGrid, inds );
+      innerIndex = Grid_Project( vGrid, (unsigned*)inds );
       innerVert = Mesh_GetVertex( mesh, innerIndex );
       inds[0]--;
-      inner2Index = Grid_Project( vGrid, inds );
+      inner2Index = Grid_Project( vGrid, (unsigned*)inds );
       inner2Vert = Mesh_GetVertex( mesh, inner2Index );
 
 /*
@@ -464,7 +464,7 @@ void _RegularRemesher_Remesh( void* _self ) {
             MatSetValues( A, 1, &ii, 3, cols, matVals, ADD_VALUES );
 
          inds[0] = ii;
-         nodeIndex = Grid_Project( vGrid, inds );
+         nodeIndex = Grid_Project( vGrid, (unsigned*)inds );
          if( ii == 0 ) {
             rhs = vecVals[0] * Mesh_GetVertex( mesh, nodeIndex + 1 )[1] +
                vecVals[1] * Mesh_GetVertex( mesh, nodeIndex )[1] + 
@@ -493,8 +493,8 @@ void _RegularRemesher_Remesh( void* _self ) {
       KSPSolve( ksp, b, x );
 
       VecGetArray( x, &soln );
-      for( inds[0] = 0; inds[0] < vGrid->sizes[0]; inds[0]++ ) {
-         nodeIndex = Grid_Project( vGrid, inds );
+      for( inds[0] = 0; inds[0] < (int)(vGrid->sizes[0]); inds[0]++ ) {
+         nodeIndex = Grid_Project( vGrid, (unsigned*)inds );
          mesh->verts[nodeIndex][1] = soln[inds[0]];
       }
       VecRestoreArray( x, &soln );
@@ -570,12 +570,12 @@ void RegularRemesher_Build( void* _self ) {
 
    mesh = self->mesh;
    Stg_Component_Build( mesh, NULL, False );
-   meshSync = Mesh_GetSync( mesh, 0 );
+   meshSync = Mesh_GetSync( mesh, (MeshTopology_Dim)0 );
    meshDecomp = Sync_GetDecomp( meshSync );
    vGrid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
    nDims = Mesh_GetDimSize( mesh );
    self->nDims = nDims;
-   nVerts = Mesh_GetLocalSize( mesh, 0 );
+   nVerts = Mesh_GetLocalSize( mesh, (MeshTopology_Dim)0 );
    inds = Class_Array( self, int, nDims );
 
    if( !self->syncs ) {
@@ -613,7 +613,7 @@ void RegularRemesher_Build( void* _self ) {
 	    ind = Sync_DomainToGlobal( meshSync, v_i );
 	    Grid_Lift( vGrid, ind, (unsigned*)inds );
 	    if( (w_i == 0 && inds[d_i] == 0) || 
-		(w_i == 1 && inds[d_i] == vGrid->sizes[d_i] - 1) )
+		(w_i == 1 && inds[d_i] == (int)(vGrid->sizes[d_i] - 1)) )
 	    {
 	       ISet_Insert( wallSet, v_i );
 	    }

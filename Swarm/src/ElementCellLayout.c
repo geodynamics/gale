@@ -48,7 +48,7 @@
 const Type ElementCellLayout_Type = "ElementCellLayout";
 
 ElementCellLayout* ElementCellLayout_New( Name name, AbstractContext* context, void* mesh ) { 
-	ElementCellLayout* self = _ElementCellLayout_DefaultNew( name );
+  ElementCellLayout* self = (ElementCellLayout*)_ElementCellLayout_DefaultNew( name );
 
 	self->isConstructed = True;
 	_CellLayout_Init( (CellLayout*)self, context );
@@ -133,7 +133,7 @@ void _ElementCellLayout_Print( void* elementCellLayout, Stream* stream ) {
 }
 
 
-void* _ElementCellLayout_Copy( void* elementCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ElementCellLayout_Copy( const void* elementCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	ElementCellLayout*	self = (ElementCellLayout*)elementCellLayout;
 	ElementCellLayout*	newElementCellLayout;
 	PtrMap*			map = ptrMap;
@@ -144,7 +144,7 @@ void* _ElementCellLayout_Copy( void* elementCellLayout, void* dest, Bool deep, N
 		ownMap = True;
 	}
 	
-	newElementCellLayout = _CellLayout_Copy( self, dest, deep, nameExt, ptrMap );
+	newElementCellLayout = (ElementCellLayout*)_CellLayout_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	if( deep ) {
 		newElementCellLayout->mesh = (Mesh*)Stg_Class_Copy( self->mesh, NULL, deep, nameExt, map );
@@ -262,7 +262,7 @@ Bool _ElementCellLayout_IsInCell( void* elementCellLayout, Cell_Index cellIndex,
 	GlobalParticle*	        particle = (GlobalParticle*)_particle;
 	unsigned		elDim, elInd;
 
-	return Mesh_ElementHasPoint( self->mesh, cellIndex, particle->coord, &elDim, &elInd );
+	return Mesh_ElementHasPoint( self->mesh, cellIndex, particle->coord, (MeshTopology_Dim*)(&elDim), &elInd );
 }
 
 Cell_Index _ElementCellLayout_CellOf( void* elementCellLayout, void* _particle ) {
@@ -305,7 +305,7 @@ void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self ) {
 	unsigned	n_i;
 
 	nDims = Mesh_GetDimSize( self->mesh );
-	comm = Mesh_GetCommTopology( self->mesh, nDims );
+	comm = Mesh_GetCommTopology( self->mesh, (MeshTopology_Dim)nDims );
 	Comm_GetNeighbours( comm, &nIncProcs, &incProcs );
 
 	/* Extract neighbouring proc information. */
@@ -321,20 +321,20 @@ void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self ) {
 		self->cellShadowInfo.procShadowCnt = AllocArray( unsigned, nIncProcs );
 		memset( self->cellShadowInfo.procShadowCnt, 0, nIncProcs * sizeof(unsigned) );
 	}
-	for( n_i = 0; n_i < Mesh_GetSharedSize( self->mesh, nDims ); n_i++ ) {
+	for( n_i = 0; n_i < Mesh_GetSharedSize( self->mesh, (MeshTopology_Dim)nDims ); n_i++ ) {
 		int	nSharers;
 		const int*	sharers;
-		unsigned	s_i;
+		int	s_i;
 
-		Mesh_GetSharers( self->mesh, nDims, n_i, 
+		Mesh_GetSharers( self->mesh, (MeshTopology_Dim)nDims, n_i, 
 				 &nSharers, &sharers );
 		for( s_i = 0; s_i < nSharers; s_i++ )
 			self->cellShadowInfo.procShadowedCnt[sharers[s_i]]++;
 	}
-	for( n_i = 0; n_i < Mesh_GetRemoteSize( self->mesh, nDims ); n_i++ ) {
+	for( n_i = 0; n_i < Mesh_GetRemoteSize( self->mesh, (MeshTopology_Dim)nDims ); n_i++ ) {
 		unsigned	owner;
 
-		owner = Mesh_GetOwner( self->mesh, nDims, n_i );
+		owner = Mesh_GetOwner( self->mesh, (MeshTopology_Dim)nDims, n_i );
 		self->cellShadowInfo.procShadowCnt[owner]++;
 	}
 
@@ -347,29 +347,29 @@ void ElementCellLayout_BuildShadowInfo( ElementCellLayout* self ) {
 		memset( self->cellShadowInfo.procShadowedCnt, 0, nIncProcs * sizeof(unsigned) );
 		memset( self->cellShadowInfo.procShadowCnt, 0, nIncProcs * sizeof(unsigned) );
 	}
-	for( n_i = 0; n_i < Mesh_GetSharedSize( self->mesh, nDims ); n_i++ ) {
+	for( n_i = 0; n_i < Mesh_GetSharedSize( self->mesh, (MeshTopology_Dim)nDims ); n_i++ ) {
 		unsigned	local;
 		unsigned	curInd;
 		int	        nSharers;
 		const int*	        sharers;
-		unsigned	s_i;
+		int	s_i;
 
-		local = Mesh_SharedToLocal( self->mesh, nDims, n_i );
+		local = Mesh_SharedToLocal( self->mesh, (MeshTopology_Dim)nDims, n_i );
 
-		Mesh_GetSharers( self->mesh, nDims, n_i, 
+		Mesh_GetSharers( self->mesh, (MeshTopology_Dim)nDims, n_i, 
 				 &nSharers, &sharers );
 		for( s_i = 0; s_i < nSharers; s_i++ ) {
 			curInd = self->cellShadowInfo.procShadowedCnt[sharers[s_i]]++;
 			self->cellShadowInfo.procShadowedTbl[sharers[s_i]][curInd] = local;
 		}
 	}
-	for( n_i = 0; n_i < Mesh_GetRemoteSize( self->mesh, nDims ); n_i++ ) {
+	for( n_i = 0; n_i < Mesh_GetRemoteSize( self->mesh, (MeshTopology_Dim)nDims ); n_i++ ) {
 		unsigned	domain;
 		unsigned	curInd;
 		unsigned	owner;
 
-		domain = Mesh_GetLocalSize( self->mesh, nDims ) + n_i;
-		owner = Mesh_GetOwner( self->mesh, nDims, n_i );
+		domain = Mesh_GetLocalSize( self->mesh, (MeshTopology_Dim)nDims ) + n_i;
+		owner = Mesh_GetOwner( self->mesh, (MeshTopology_Dim)nDims, n_i );
 		curInd = self->cellShadowInfo.procShadowCnt[owner]++;
 		self->cellShadowInfo.procShadowTbl[owner][curInd] = domain;
 	}

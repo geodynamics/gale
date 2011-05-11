@@ -85,11 +85,11 @@ void _LinearRegression_Print( void* _linearRegression, Stream* stream ) {
 	Journal_PrintValue( stream, self->correlationCoefficient );
 }
 
-void* _LinearRegression_Copy( void* linearRegression, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _LinearRegression_Copy( const void* linearRegression, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	LinearRegression*	self = (LinearRegression*)linearRegression;
 	LinearRegression*	newLinearRegression;
 	
-	newLinearRegression = _Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
+	newLinearRegression = (LinearRegression*)_Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
 				
 	return (void*)newLinearRegression;
 }

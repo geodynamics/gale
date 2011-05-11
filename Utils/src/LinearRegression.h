@@ -99,7 +99,7 @@
 
 	void _LinearRegression_Delete( void* linearRegression ) ;
 	void _LinearRegression_Print( void* _linearRegression, Stream* stream ) ;
-	void* _LinearRegression_Copy( void* linearRegression, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
+	void* _LinearRegression_Copy( const void* linearRegression, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 
 	/* Based on least squares proceedure described in
 	 * Eric W. Weisstein. "Least Squares Fitting." From MathWorld--A Wolfram Web Resource.

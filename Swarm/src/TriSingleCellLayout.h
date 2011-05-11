@@ -102,7 +102,7 @@ given mesh layout.
 	#define TriSingleCellLayout_DeepCopy( self ) \
 		(TriSingleCellLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _TriSingleCellLayout_Copy( void* triSingleCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _TriSingleCellLayout_Copy( const void* triSingleCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _TriSingleCellLayout_AssignFromXML( void *triSingleCellLayout, Stg_ComponentFactory *cf, void* data );
 	

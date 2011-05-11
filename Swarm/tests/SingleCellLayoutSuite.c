@@ -62,7 +62,7 @@ void SingleCellLayoutSuite_Setup( SingleCellLayoutSuiteData* data ) {
 
 	data->dimExists[0] = True; data->dimExists[1] = True; data->dimExists[2] = True;
 	/* Configure the single-cell-layout */
-	data->singleCellLayout = SingleCellLayout_New( "singleCellLayout", NULL, data->dimExists, NULL, NULL );
+	data->singleCellLayout = SingleCellLayout_New( "singleCellLayout", NULL, (Bool*)(data->dimExists), NULL, NULL );
 }
 
 void SingleCellLayoutSuite_Teardown( SingleCellLayoutSuiteData* data ) {

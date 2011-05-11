@@ -115,7 +115,7 @@
 	#define AllNodesVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
-	void* _AllNodesVC_Copy( void* allNodesVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _AllNodesVC_Copy( const void* allNodesVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	void _AllNodesVC_Build( void* allNodesVC, void* data );
 	

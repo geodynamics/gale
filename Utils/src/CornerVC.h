@@ -42,7 +42,7 @@
 
 	extern const Type CornerVC_Type;
 
-	extern const char* CornerVC_CornerEnumToStr[CornerVC_Corner_Size];
+	extern Name CornerVC_CornerEnumToStr[CornerVC_Corner_Size];
 	
 	#define __CornerVC_Entry \
 		Name							varName; \
@@ -120,7 +120,7 @@
 	#define CornerVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
-	void* _CornerVC_Copy( void* cornerVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _CornerVC_Copy( const void* cornerVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	void _CornerVC_Build(  void* cornerVC, void* data );
 	

@@ -50,7 +50,7 @@ void _IGraph_Init( void* _self ) {
    IGraph* self = (IGraph*)_self;
 
    _MeshTopology_Init( self );
-   self->nDims = 0;
+   self->nDims = (MeshTopology_Dim)0;
    self->nTDims = 0;
    self->shadDepth = 0;
    self->comm = NULL;
@@ -787,7 +787,7 @@ void IGraph_ClearDims( void* _self ) {
    Class_Free( self, self->nIncEls );
    Class_Free( self, self->incEls );
 
-   self->nDims = 0;
+   self->nDims = (MeshTopology_Dim)0;
    self->nTDims = 0;
    self->shadDepth = 0;
    self->locals = NULL;

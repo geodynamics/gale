@@ -119,7 +119,7 @@ void _RandomParticleLayout_Print( void* randomParticleLayout, Stream* stream ) {
 }
 
 
-void* _RandomParticleLayout_Copy( void* randomParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _RandomParticleLayout_Copy( const void* randomParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	RandomParticleLayout*		self = (RandomParticleLayout*)randomParticleLayout;
 	RandomParticleLayout*		newRandomParticleLayout;
 	

@@ -90,7 +90,7 @@
 	#define GaussBorderParticleLayout_DeepCopy( self ) \
 		(GaussBorderParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _GaussBorderParticleLayout_Copy( void* gaussBorderParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _GaussBorderParticleLayout_Copy( const void* gaussBorderParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _GaussBorderParticleLayout_DefaultNew( Name name );
 	void  _GaussBorderParticleLayout_AssignFromXML( void* gaussBorderParticleLayout, Stg_ComponentFactory* cf, void* data );

@@ -93,7 +93,7 @@
 	/** Stg_Class Virtual Functions */
 	void _SobolGenerator_Delete( void* sobolGenerator ) ;
 	void _SobolGenerator_Print( void* sobolGenerator, Stream* stream ) ;
-	void* _SobolGenerator_Copy( void* sobolGenerator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
+	void* _SobolGenerator_Copy( const void* sobolGenerator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 	
 	/** +++ Private Functions +++ **/
 	Bit_Index _SobolGenerator_FindRightmostZeroBit( unsigned int number ) ;

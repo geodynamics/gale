@@ -75,7 +75,7 @@ void* ParticleShadowSync_DefaultNew( Name name )
 	Bool                                                  initFlag = False;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType                                                                                        nameAllocationType = ZERO;
+	AllocationType                                                                                        nameAllocationType = (AllocationType)ZERO;
 	ParticleCommHandler_AllocateOutgoingCountArrays*                                            _allocateOutgoingCountArrays = ZERO;
 	ParticleCommHandler_AllocateOutgoingParticleArrays*                                      _allocateOutgoingParticleArrays = ZERO;
 	ParticleCommHandler_FreeOutgoingArrays*                                                              _freeOutgoingArrays = ZERO;
@@ -115,7 +115,7 @@ ParticleShadowSync* ParticleShadowSync_New(
 	Bool                                                  initFlag = True;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType                                                                                        nameAllocationType = ZERO;
+	AllocationType                                                                                        nameAllocationType = (AllocationType)ZERO;
 	ParticleCommHandler_AllocateOutgoingCountArrays*                                            _allocateOutgoingCountArrays = ZERO;
 	ParticleCommHandler_AllocateOutgoingParticleArrays*                                      _allocateOutgoingParticleArrays = ZERO;
 	ParticleCommHandler_FreeOutgoingArrays*                                                              _freeOutgoingArrays = ZERO;
@@ -212,7 +212,7 @@ void _ParticleShadowSync_Print( void* pCommsHandler, Stream* stream ) {
 }
 
 
-void* _ParticleShadowSync_CopyFunc( void* particleMovementHandler, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ParticleShadowSync_CopyFunc( const void* particleMovementHandler, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	
 	return _ParticleCommHandler_Copy( particleMovementHandler, dest, deep,
 		   nameExt, ptrMap );
@@ -288,7 +288,7 @@ void _ParticleShadowSync_FinishReceiveOfIncomingParticleCounts( ParticleCommHand
 	ShadowInfo*		        cellShadowInfo = CellLayout_GetShadowInfo( self->swarm->cellLayout );
 	ProcNbrInfo*		        procNbrInfo = cellShadowInfo->procNbrInfo;
 	Neighbour_Index		        nbr_I;
-	int i = 0;
+	unsigned i = 0;
 
 	self->swarm->shadowParticleCount = 0;
 	/* TODO: may be worth converting the below into an MPI_Test loop */
@@ -321,7 +321,7 @@ void _ParticleShadowSync_BeginReceiveOfIncomingParticles( ParticleCommHandler* p
 	long                           incomingViaShadowArrayBytes = 0;
 	Neighbour_Index		        nbr_I;
 	Processor_Index			proc_I;
-	int i = 0;
+	unsigned i = 0;
 	char* recvLocation  = NULL;
 
 	self->particlesArrivingFromNbrShadowCellsHandles = Memory_Alloc_Array_Unnamed( MPI_Request*, procNbrInfo->procNbrCnt );
@@ -329,7 +329,7 @@ void _ParticleShadowSync_BeginReceiveOfIncomingParticles( ParticleCommHandler* p
 		self->particlesArrivingFromNbrShadowCellsHandles[i] = Memory_Alloc_Array_Unnamed( MPI_Request, 1 );
 	}
 
-	self->swarm->shadowParticles = Memory_Realloc( self->swarm->shadowParticles,
+	self->swarm->shadowParticles = (Particle*)Memory_Realloc( self->swarm->shadowParticles,
 			self->swarm->particleExtensionMgr->finalSize*(self->swarm->shadowParticleCount) );
 	
 	recvLocation = (char*)self->swarm->shadowParticles;
@@ -359,7 +359,7 @@ void _ParticleShadowSync_FinishReceiveOfIncomingParticles( ParticleCommHandler* 
 	ShadowInfo*		        cellShadowInfo = CellLayout_GetShadowInfo( self->swarm->cellLayout );
 	ProcNbrInfo*		        procNbrInfo = cellShadowInfo->procNbrInfo;
 	Neighbour_Index		        nbr_I;
-	int i = 0, j = 0;
+	unsigned i = 0, j = 0;
 	int shadowParticleCounter;
 	int shadowCell = 0;
 
@@ -391,7 +391,7 @@ void _ParticleShadowSync_SendShadowParticles( ParticleCommHandler *self )
 	ShadowInfo*		        cellShadowInfo = CellLayout_GetShadowInfo( self->swarm->cellLayout );
 	ProcNbrInfo*		        procNbrInfo = cellShadowInfo->procNbrInfo;
 	Processor_Index			proc_I;
-	int i = 0, j = 0, k = 0, cell = 0;
+	unsigned i = 0, j = 0, k = 0, cell = 0;
 	unsigned int	arrayIndex = 0;
 	long			arraySize = 0;
 	unsigned int	pIndex = 0;
@@ -407,7 +407,7 @@ void _ParticleShadowSync_SendShadowParticles( ParticleCommHandler *self )
 			self->shadowParticlesLeavingMeHandles[i] = Memory_Alloc_Array_Unnamed( MPI_Request, 1 );
 
 			arraySize =  self->swarm->particleExtensionMgr->finalSize * self->shadowParticlesLeavingMeTotalCounts[i];
-			self->shadowParticlesLeavingMe[i] = Memory_Alloc_Bytes( arraySize, "Particle", "pCommHandler->outgoingPArray" );
+			self->shadowParticlesLeavingMe[i] = (Particle*)Memory_Alloc_Bytes( arraySize, "Particle", "pCommHandler->outgoingPArray" );
 			memset( self->shadowParticlesLeavingMe[i], 0, arraySize );
 
 			arrayIndex = 0;

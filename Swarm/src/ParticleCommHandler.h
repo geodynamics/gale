@@ -187,7 +187,7 @@
 	#define ParticleCommHandler_DeepCopy( self ) \
 		(ParticleCommHandler*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _ParticleCommHandler_Copy( void* particleCommHandler, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ParticleCommHandler_Copy( const void* particleCommHandler, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/** Stg_Class_Delete() implementation */
 	void _ParticleCommHandler_Delete(void* pCommsHandler );

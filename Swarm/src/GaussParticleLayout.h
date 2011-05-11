@@ -96,7 +96,7 @@ GaussParticleLayout* GaussParticleLayout_New(
 	#define GaussParticleLayout_DeepCopy( self ) \
 		(GaussParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _GaussParticleLayout_Copy( void* gaussParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _GaussParticleLayout_Copy( const void* gaussParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _GaussParticleLayout_DefaultNew( Name name );
 	void  _GaussParticleLayout_AssignFromXML( void* gaussParticleLayout, Stg_ComponentFactory* cf, void* data );

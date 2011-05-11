@@ -86,7 +86,7 @@ typedef void (Operator_CarryOutBinaryOperationFunction) ( void* operatorObject, 
 
 	void _Operator_Delete(void* operatorObject) ;
 	void _Operator_Print(void* operatorObject, Stream* stream) ;
-	void* _Operator_Copy( void* operatorObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
+	void* _Operator_Copy( const void* operatorObject, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 
 	/* Carry Out Wrapper functions */
 	void Operator_CarryOutUnaryOperation( void* operatorObject, double* operand0, double* result ) ;

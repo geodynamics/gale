@@ -127,7 +127,7 @@ void _Stg_Shape_Print( void* superellipsoid, Stream* stream ) {
 
 }
 
-void* _Stg_Shape_Copy( void* shape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Stg_Shape_Copy( const void* shape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Stg_Shape*	self = (Stg_Shape*) shape;
 	Stg_Shape*	newStg_Shape;
 	
@@ -211,7 +211,8 @@ Bool Stg_Shape_IsCoordInside( void* shape, Coord coord ) {
 	 *
 	 * bitwise xor is used because ^^ (logical) is not ansi-c
 	 */
-	return (self->invert != 0) ^ (self->_isCoordInside( self, coord ) != 0);
+	return ((self->invert != 0) ^ (self->_isCoordInside( self, coord ) != 0))
+          ? True : False;
 }	
 
 double Stg_Shape_CalculateVolume( void* shape ) {

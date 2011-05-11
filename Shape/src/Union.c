@@ -112,7 +112,7 @@ void _Union_Print( void* combination, Stream* stream ) {
 	_Stg_Shape_Print( self, stream );
 }
 
-void* _Union_Copy( void* combination, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Union_Copy( const void* combination, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Union*	self = (Union*)combination;
 	Union*	newUnion;
 	
@@ -255,7 +255,7 @@ Bool _Union_IsCoordInside( void* combination, Coord coord ) {
 
 		
 		if ( self->isComplement[ shape_I ] )
-			value = !value;
+                  value = (!value) ? True : False;
 			
 		if ( value )
 			return True;

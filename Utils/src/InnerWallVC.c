@@ -46,7 +46,7 @@
 const Type InnerWallVC_Type = "InnerWallVC";
 const Name defaultInnerWallVCName = "defaultInnerWallVCName";
 
-const char* InnerWallVC_InnerWallEnumToStr[InnerWallVC_InnerWall_Size] = {
+Name InnerWallVC_InnerWallEnumToStr[InnerWallVC_InnerWall_Size] = {
 	"back",
 	"left",
 	"bottom",
@@ -386,7 +386,7 @@ void _InnerWallVC_Print(void* innerWallVC, Stream* stream)
 }
 
 
-void* _InnerWallVC_Copy( void* innerWallVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _InnerWallVC_Copy( const void* innerWallVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	InnerWallVC*		self = (InnerWallVC*)innerWallVC;
 	InnerWallVC*		newInnerWallVC;
 	PtrMap*		map = ptrMap;
@@ -406,7 +406,7 @@ void* _InnerWallVC_Copy( void* innerWallVC, void* dest, Bool deep, Name nameExt,
 	if( deep ) {
 		newInnerWallVC->_mesh = (Mesh*)Stg_Class_Copy( self->_mesh, NULL, deep, nameExt, map );
 		
-		if( (newInnerWallVC->_entryTbl = PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
+		if( (newInnerWallVC->_entryTbl = (InnerWallVC_Entry*)PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
 			newInnerWallVC->_entryTbl = Memory_Alloc_Array( InnerWallVC_Entry, newInnerWallVC->_entryCount, "InnerWallVC->_entryTbl");
 			memcpy( newInnerWallVC->_entryTbl, self->_entryTbl, sizeof(InnerWallVC_Entry) * newInnerWallVC->_entryCount );
 			PtrMap_Append( map, newInnerWallVC->_entryTbl, self->_entryTbl );

@@ -99,7 +99,7 @@
 	#define ParticleShadowSync_DeepCopy( self ) \
 		(ParticleShadowSync*)ParticleShadowSync_CopyFunc( self, NULL, True, NULL, NULL )
 	
-	void* _ParticleShadowSync_CopyFunc( void* ParticleShadowSync, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ParticleShadowSync_CopyFunc( const void* ParticleShadowSync, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/** Stg_Class_Delete() implementation */
 	void _ParticleShadowSync_Delete(void* pCommsHandler );

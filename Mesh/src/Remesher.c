@@ -142,7 +142,7 @@ void _Remesher_Build( void* remesher, void* data ) {
    assert( self );
    assert( self->mesh );
 
-   Stg_Component_Build( self->remeshFunc, data, False );   
+   Stg_Component_Build( (void*)(self->remeshFunc), data, False );   
    Stg_Component_Build( self->mesh, data, False );   
 }
 
@@ -151,7 +151,7 @@ void _Remesher_Initialise( void* remesher, void* data ) {
 
    assert( self );
 
-   Stg_Component_Initialise( self->remeshFunc, data, False );   
+   Stg_Component_Initialise( (void*)(self->remeshFunc), data, False );   
    Stg_Component_Initialise( self->mesh, data, False );   
 }
 
@@ -167,7 +167,7 @@ void _Remesher_Destroy( void* remesher, void* data ) {
 
    assert( self );
 
-   Stg_Component_Destroy( self->remeshFunc, data, False );   
+   Stg_Component_Destroy( (void*)(self->remeshFunc), data, False );   
 }
 
 /* Public Functions */

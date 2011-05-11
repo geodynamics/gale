@@ -158,9 +158,8 @@ void Mesh_RegularAlgorithms_SetMesh( void* algorithms, void* mesh ) {
 
 void Mesh_RegularAlgorithms_Update( void* algorithms ) {
 	Mesh_RegularAlgorithms*	self = (Mesh_RegularAlgorithms*)algorithms;
-	unsigned		nDims;
+	unsigned		nDims, ii;
 	Grid*			eGrid;
-	int			ii;
 
 	assert( self && Stg_CheckType( self, Mesh_RegularAlgorithms ) );
 	assert( self->mesh );
@@ -228,7 +227,7 @@ Bool Mesh_RegularAlgorithms_SearchElements( void* algorithms, double* point, uns
 	}
 
 	*elInd = Grid_Project( elGrid, inds );
-	return Mesh_GlobalToDomain( mesh, nDims, *elInd, elInd );
+	return Mesh_GlobalToDomain(mesh,(MeshTopology_Dim)nDims,*elInd,elInd);
 }
 
 double _Mesh_RegularAlgorithms_GetMinimumSeparation( void* algorithms, void* _mesh, double* perDim ) {

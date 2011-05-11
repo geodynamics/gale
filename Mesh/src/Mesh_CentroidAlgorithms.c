@@ -181,28 +181,30 @@ unsigned Mesh_CentroidAlgorithms_NearestVertex( void* centroidAlgorithms, double
 	assert( self );
 
 	if( Mesh_SearchElements( self->elMesh, point, &elInd ) ) {
-		unsigned	nInc, *inc;
-
-		nDims = Mesh_GetDimSize( self->mesh );
-		Mesh_GetIncidence( self->elMesh, Mesh_GetDimSize( self->mesh ), elInd, MT_VERTEX, 
-				   self->incArray );
-		nInc = IArray_GetSize( self->incArray );
-		inc = (unsigned*)IArray_GetPtr( self->incArray );
-		near = inc[0];
-		vert = Mesh_GetVertex( self->mesh, inc[0] );
-		nearDist = Vec_Sep( nDims, vert, point );
-		for( inc_i = 1; inc_i < nInc; inc_i++ ) {
-			vert = Mesh_GetVertex( self->mesh, inc[inc_i] );
-			dist = Vec_Sep( nDims, vert, point );
-			if( dist < nearDist ) {
-				near = inc[inc_i];
-				nearDist = dist;
-			}
-		}
-		return near;
+          unsigned	nInc, *inc;
+          
+          nDims = Mesh_GetDimSize( self->mesh );
+          Mesh_GetIncidence(self->elMesh,
+                            Mesh_GetDimSize( self->mesh ),
+                            elInd, MT_VERTEX, 
+                            self->incArray );
+          nInc = IArray_GetSize( self->incArray );
+          inc = (unsigned*)IArray_GetPtr( self->incArray );
+          near = inc[0];
+          vert = Mesh_GetVertex( self->mesh, inc[0] );
+          nearDist = Vec_Sep( nDims, vert, point );
+          for( inc_i = 1; inc_i < nInc; inc_i++ ) {
+            vert = Mesh_GetVertex( self->mesh, inc[inc_i] );
+            dist = Vec_Sep( nDims, vert, point );
+            if( dist < nearDist ) {
+              near = inc[inc_i];
+              nearDist = dist;
+            }
+          }
+          return near;
 	}
 	else
-		return _Mesh_Algorithms_NearestVertex( self, point );
+          return _Mesh_Algorithms_NearestVertex( self, point );
 }
 
 Bool Mesh_CentroidAlgorithms_Search( void* centroidAlgorithms, double* point, 
@@ -256,7 +258,7 @@ void Mesh_CentroidAlgorithms_SetElementMesh( void* centroidAlgorithms, void* mes
 
 	assert( self && Stg_CheckType( self, Mesh_CentroidAlgorithms ) );
 
-	self->elMesh = mesh;
+	self->elMesh = (Mesh*)mesh;
 }
 
 

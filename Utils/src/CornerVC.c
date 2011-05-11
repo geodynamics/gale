@@ -47,7 +47,7 @@
 const Type CornerVC_Type = "CornerVC";
 const Name defaultCornerVCName = "defaultCornerVCName";
 /* List of corner names */
-const char* CornerVC_CornerEnumToStr[CornerVC_Corner_Size] = {
+Name CornerVC_CornerEnumToStr[CornerVC_Corner_Size] = {
    "bottomLeftFront",
    "bottomRightFront",
    "topLeftFront",
@@ -384,7 +384,7 @@ void _CornerVC_Print(void* cornerVC, Stream* stream) {
 }
 
 
-void* _CornerVC_Copy( void* cornerVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _CornerVC_Copy( const void* cornerVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
    CornerVC*       self = (CornerVC*)cornerVC;
    CornerVC*       newCornerVC;
    PtrMap*         map = ptrMap;
@@ -404,7 +404,7 @@ void* _CornerVC_Copy( void* cornerVC, void* dest, Bool deep, Name nameExt, struc
    if( deep ) {
       newCornerVC->_mesh = (Mesh*)Stg_Class_Copy( self->_mesh, NULL, deep, nameExt, map );
 		
-      if( (newCornerVC->_entryTbl = PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
+      if( (newCornerVC->_entryTbl = (CornerVC_Entry*)PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
 	 newCornerVC->_entryTbl = Memory_Alloc_Array( CornerVC_Entry, newCornerVC->_entryCount, "CornerVC->_entryTbl");
 	 memcpy( newCornerVC->_entryTbl, self->_entryTbl, sizeof(CornerVC_Entry) * newCornerVC->_entryCount );
 	 PtrMap_Append( map, newCornerVC->_entryTbl, self->_entryTbl );

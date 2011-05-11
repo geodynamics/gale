@@ -63,7 +63,7 @@ void TensorMultMathSuite_Teardown( TensorMultMathSuiteData* data ) {
 }
 
 void TensorMultMathSuite_TestTensorArrayIdentity( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		TensorArray	tensorArray;
@@ -91,7 +91,7 @@ void TensorMultMathSuite_TestTensorArrayIdentity( TensorMultMathSuiteData* data 
 }
 
 void TensorMultMathSuite_TestSymmetricTensorIdentity( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
@@ -120,7 +120,7 @@ void TensorMultMathSuite_TestSymmetricTensorIdentity( TensorMultMathSuiteData* d
 }
 
 void TensorMultMathSuite_TestTensorArrayTranspose( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		TensorArray	tensorArray, tensorResult;
@@ -158,7 +158,7 @@ void TensorMultMathSuite_TestTensorArrayTranspose( TensorMultMathSuiteData* data
 }
 
 void TensorMultMathSuite_TestTensorArrayAdd( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		TensorArray	tensorArray, tensorArray2, tensorResult;
@@ -205,7 +205,7 @@ void TensorMultMathSuite_TestTensorArrayAdd( TensorMultMathSuiteData* data ) {
 }
 
 void TensorMultMathSuite_TestTensorArraySubstract( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		TensorArray	tensorArray, tensorArray2, tensorResult;
@@ -252,7 +252,7 @@ void TensorMultMathSuite_TestTensorArraySubstract( TensorMultMathSuiteData* data
 }
 
 void TensorMultMathSuite_TestTensorArrayMultiplyByTensorArray( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		TensorArray	tensorArray, tensorArray2, tensorResult;
@@ -300,7 +300,7 @@ void TensorMultMathSuite_TestTensorArrayMultiplyByTensorArray( TensorMultMathSui
 }
 
 void TensorMultMathSuite_TestTensorArrayMultiplyByRightTranspose( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensorResult;
@@ -342,7 +342,7 @@ void TensorMultMathSuite_TestTensorArrayMultiplyByRightTranspose( TensorMultMath
 }
 
 void TensorMultMathSuite_TestTensorArrayMultiplyByLeftTranspose( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensorResult;
@@ -384,7 +384,7 @@ void TensorMultMathSuite_TestTensorArrayMultiplyByLeftTranspose( TensorMultMathS
 }
 
 void TensorMultMathSuite_TestTensorArrayMultiplyBySymmetricTensor( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor;
@@ -431,7 +431,7 @@ void TensorMultMathSuite_TestTensorArrayMultiplyBySymmetricTensor( TensorMultMat
 }
 
 void TensorMultMathSuite_TestTensorArrayMultiplyByLeftVector( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		XYZ					vector, vectorResult;
@@ -477,7 +477,7 @@ void TensorMultMathSuite_TestTensorArrayMultiplyByLeftVector( TensorMultMathSuit
 }
 
 void TensorMultMathSuite_TestTensorArrayMultiplyByRightVector( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		XYZ					vector, vectorResult;
@@ -523,7 +523,7 @@ void TensorMultMathSuite_TestTensorArrayMultiplyByRightVector( TensorMultMathSui
 }
 
 void TensorMultMathSuite_TestCalcDeterminant( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		TensorArray			tensorArray;
@@ -565,7 +565,7 @@ void TensorMultMathSuite_TestCalcDeterminant( TensorMultMathSuiteData* data ) {
 }
 
 void TensorMultMathSuite_TestCalcInverseWithDeterminant( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		TensorArray			tensorArray, tensorResult, tensorCompare, tensorDiff;
@@ -666,7 +666,7 @@ void TensorMultMathSuite_TestCalcInverseWithDeterminant( TensorMultMathSuiteData
 }
 
 void TensorMultMathSuite_TestCalcInverse( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		TensorArray			tensorArray, tensorResult, tensorCompare, tensorDiff;
@@ -767,7 +767,7 @@ void TensorMultMathSuite_TestCalcInverse( TensorMultMathSuiteData* data ) {
 }
 
 void TensorMultMathSuite_TestTensorArrayDoubleContraction( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		TensorArray			tensorArray, tensorArray2;
@@ -818,7 +818,7 @@ void TensorMultMathSuite_TestTensorArrayDoubleContraction( TensorMultMathSuiteDa
 }
 
 void TensorMultMathSuite_TestSymmetricTensorDoubleContraction( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		SymmetricTensor	symmTensor, symmTensor2;
@@ -864,7 +864,7 @@ void TensorMultMathSuite_TestSymmetricTensorDoubleContraction( TensorMultMathSui
 }
 
 void TensorMultMathSuite_TestPrintNonSquareMatrix( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		double	**nonSquareMatrixA, **nonSquareMatrixB;
@@ -913,7 +913,7 @@ void TensorMultMathSuite_TestPrintNonSquareMatrix( TensorMultMathSuiteData* data
 }
 
 void TensorMultMathSuite_TestNonSquareMatrixTranspose( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		double	**nonSquareMatrixA, **nonSquareMatrixB;
@@ -963,7 +963,7 @@ void TensorMultMathSuite_TestNonSquareMatrixTranspose( TensorMultMathSuiteData* 
 }
 
 void TensorMultMathSuite_TestMultiplicationByNonSquareMatrix( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		double	**nonSquareMatrixA, **nonSquareMatrixB;
@@ -1016,7 +1016,7 @@ void TensorMultMathSuite_TestMultiplicationByNonSquareMatrix( TensorMultMathSuit
 }
 
 void TensorMultMathSuite_TestMatrixVectorMultiplication( TensorMultMathSuiteData* data ) {
-	unsigned procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if (data->rank == procToWatch) {
 		XYZ		vector;

@@ -92,7 +92,7 @@
 		(TriGaussParticleLayout*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define TriGaussParticleLayout_DeepCopy( self ) \
 		(TriGaussParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _TriGaussParticleLayout_Copy( void* triGaussParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _TriGaussParticleLayout_Copy( const void* triGaussParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void* _TriGaussParticleLayout_DefaultNew( Name name );
 	void  _TriGaussParticleLayout_AssignFromXML( void* triGaussParticleLayout, Stg_ComponentFactory* cf, void* data );

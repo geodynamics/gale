@@ -113,11 +113,11 @@ void _ParticleLayout_Print( void* particleLayout, Stream* stream ) {
 }
 
 
-void* _ParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
     ParticleLayout*		self = (ParticleLayout*)particleLayout;
     ParticleLayout*		newParticleLayout;
 	
-    newParticleLayout = _Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
+    newParticleLayout = (ParticleLayout*)_Stg_Class_Copy( self, dest, deep, nameExt, ptrMap );
 	
     /* Virtual methods */
     newParticleLayout->_setInitialCounts = self->_setInitialCounts;

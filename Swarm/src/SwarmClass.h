@@ -126,7 +126,7 @@
 		/** Particle Communication handler */ \
 		\
 		Stg_ObjectList                  *commHandlerList; \
-		int				nSwarmVars; \
+		Index				nSwarmVars; \
 		SwarmVariable			**swarmVars; \
 		\
 		VariableCondition*		ics; \
@@ -230,7 +230,7 @@
 	#define Swarm_DeepCopy( self ) \
 		(Swarm*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _Swarm_Copy( void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Swarm_Copy( const void* swarm, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Swarm_DefaultNew( Name name );
 	void _Swarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, void* data );

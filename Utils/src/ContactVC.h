@@ -107,7 +107,7 @@
 	#define ContactVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
-	void* _ContactVC_Copy( void* wallVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _ContactVC_Copy( const void* wallVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	void _ContactVC_Build(  void* wallVC, void* data );
 	

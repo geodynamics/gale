@@ -60,7 +60,7 @@ SwarmDump* SwarmDump_New(
 	Index		swarmCount,
 	Bool		newFileEachTime )
 {
-	SwarmDump* self = _SwarmDump_DefaultNew( name );
+  SwarmDump* self = (SwarmDump*)_SwarmDump_DefaultNew( name );
 
 	_SwarmDump_Init( self, context, swarmList, swarmCount, newFileEachTime );
 	return self;
@@ -127,7 +127,7 @@ void _SwarmDump_Print( void* _swarmDump, Stream* stream ) {
         Stream_UnIndent( stream );
 }
 
-void* _SwarmDump_Copy( void* swarmDump, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _SwarmDump_Copy( const void* swarmDump, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
         SwarmDump*      self = (SwarmDump*)swarmDump;
         SwarmDump*      newSwarmDump;
         PtrMap*                 map = ptrMap;
@@ -138,7 +138,7 @@ void* _SwarmDump_Copy( void* swarmDump, void* dest, Bool deep, Name nameExt, Ptr
                 ownMap = True;
         }
         
-        newSwarmDump = _Stg_Component_Copy( self, dest, deep, nameExt, map );
+        newSwarmDump = (SwarmDump*)_Stg_Component_Copy( self, dest, deep, nameExt, map );
         memcpy( newSwarmDump->swarmList, self->swarmList, self->swarmCount * sizeof(Swarm*) );
         newSwarmDump->swarmCount = self->swarmCount;
 
@@ -284,7 +284,7 @@ void SwarmDump_Execute( void* swarmDump, void* context ) {
 }
 
 #ifdef WRITE_HDF5
-void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename ) {
+void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, Name filename ) {
    hid_t                   file, fileSpace, fileData;
    hid_t                   memSpace;
    hid_t                   props;

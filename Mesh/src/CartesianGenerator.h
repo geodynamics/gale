@@ -230,8 +230,8 @@
 	void CartesianGenerator_Destruct( CartesianGenerator* self );
 	void CartesianGenerator_DestructTopology( CartesianGenerator* self );
 	void CartesianGenerator_DestructGeometry( CartesianGenerator* self );
-	void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, const char* filename );
-	void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, const char* filename );
+	void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, Name filename );
+	void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, Name filename );
 
 #endif /* __StgDomain_Mesh_CartesianGenerator_h__ */
 

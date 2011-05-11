@@ -90,7 +90,7 @@
 		(RandomParticleLayout*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define RandomParticleLayout_DeepCopy( self ) \
 		(RandomParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _RandomParticleLayout_Copy( void* randomParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _RandomParticleLayout_Copy( const void* randomParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Stuff */
 	void* _RandomParticleLayout_DefaultNew( Name name ) ;

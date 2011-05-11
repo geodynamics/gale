@@ -108,7 +108,7 @@ void _TimeIntegrand_Init(
 		(TimeIntegrand*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define TimeIntegrand_DeepCopy( self ) \
 		(TimeIntegrand*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _TimeIntegrand_Copy( void* timeIntegrator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _TimeIntegrand_Copy( const void* timeIntegrator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Functions */
 	void* _TimeIntegrand_DefaultNew( Name name ) ;

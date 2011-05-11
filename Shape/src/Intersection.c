@@ -113,7 +113,7 @@ void _Intersection_Print( void* intersection, Stream* stream ) {
 
 
 
-void* _Intersection_Copy( void* intersection, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Intersection_Copy( const void* intersection, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Intersection*	self = (Intersection*)intersection;
 	Intersection*	newIntersection;
 	
@@ -264,7 +264,7 @@ Bool _Intersection_IsCoordInside( void* intersection, Coord coord ) {
 
 		
 		if ( self->isComplement[ shape_I ] )
-			value = !value;
+                  value = (!value) ? True : False;
 			
 		if ( ! value )
 			return False;

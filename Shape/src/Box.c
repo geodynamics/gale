@@ -102,7 +102,7 @@ void _Box_Print( void* shape, Stream* stream ) {
 	_Stg_Shape_Print( self, stream );
 }
 
-void* _Box_Copy( void* shape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Box_Copy( const void* shape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Box*	self = (Box*)shape;
 	Box*	newBox;
 	
@@ -142,12 +142,12 @@ void _Box_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) {
 	Dictionary*          dictionary    = Dictionary_GetDictionary( cf->componentDict, self->name );
 	XYZ                  width;
 	double               start, end;
-	Dictionary_Entry_Key startKey      = StG_Strdup("startX");
-	Dictionary_Entry_Key endKey        = StG_Strdup("endX");
-	Dictionary_Entry_Key widthKey      = StG_Strdup("widthX");
-	char*                startCharPtr  = strchr( startKey, 'X' );
-	char*                endCharPtr    = strchr( endKey, 'X' );
-	char*                widthCharPtr  = strchr( widthKey, 'X' );
+	char* startKey      = StG_Strdup("startX");
+	char* endKey        = StG_Strdup("endX");
+	char* widthKey      = StG_Strdup("widthX");
+	char*                startCharPtr  = (char*)strchr( startKey, 'X' );
+	char*                endCharPtr    = (char*)strchr( endKey, 'X' );
+	char*                widthCharPtr  = (char*)strchr( widthKey, 'X' );
 	char                 axisLetters[] = {'X','Y','Z'};
 	Dimension_Index      dim_I;
 

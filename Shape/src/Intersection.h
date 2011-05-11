@@ -91,7 +91,7 @@
 		(Intersection*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define Intersection_DeepCopy( self ) \
 		(Intersection*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _Intersection_Copy( void* intersection, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Intersection_Copy( const void* intersection, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Intersection_DefaultNew( Name name ) ;
 	void _Intersection_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

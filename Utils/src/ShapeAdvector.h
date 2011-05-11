@@ -99,7 +99,7 @@
 	#define ShapeAdvector_DeepCopy( self ) \
 		(ShapeAdvector*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 
-	void* _ShapeAdvector_Copy( void* materialPoints, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ShapeAdvector_Copy( const void* materialPoints, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _ShapeAdvector_DefaultNew( Name name );
 

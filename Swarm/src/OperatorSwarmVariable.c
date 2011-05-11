@@ -94,7 +94,7 @@ OperatorSwarmVariable* OperatorSwarmVariable_New(
 	Index										swarmVariableCount,
 	SwarmVariable**						swarmVariableList )
 {
-	OperatorSwarmVariable* self = _OperatorSwarmVariable_DefaultNew( name );
+  OperatorSwarmVariable* self = (OperatorSwarmVariable*)_OperatorSwarmVariable_DefaultNew( name );
 
 	self->isConstructed = True;
 	_SwarmVariable_Init( (SwarmVariable*)self, context, swarmVariableList[0]->swarm, NULL, 0 );
@@ -177,11 +177,11 @@ void _OperatorSwarmVariable_Init( void* _swarmVariable, Name operatorName, Index
 	}
 }
 
-void* _OperatorSwarmVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _OperatorSwarmVariable_Copy( const void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	OperatorSwarmVariable*	self = (OperatorSwarmVariable*)swarmVariable;
 	OperatorSwarmVariable*	newOperatorSwarmVariable;
 	
-	newOperatorSwarmVariable = _SwarmVariable_Copy( self, dest, deep, nameExt, ptrMap );
+	newOperatorSwarmVariable = (OperatorSwarmVariable*)_SwarmVariable_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	newOperatorSwarmVariable->_operator              = self->_operator;
 	newOperatorSwarmVariable->swarmVariableCount     = self->swarmVariableCount;

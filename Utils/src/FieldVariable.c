@@ -45,7 +45,7 @@
 
 const Type FieldVariable_Type = "FieldVariable";
 
-const char* InterpolationResultToStringMap[4] = { "OTHER_PROC", "LOCAL", "SHADOW", "OUTSIDE_GLOBAL" };
+Name InterpolationResultToStringMap[4] = { "OTHER_PROC", "LOCAL", "SHADOW", "OUTSIDE_GLOBAL" };
 
 FieldVariable* FieldVariable_New(		
 	Name													name,
@@ -160,14 +160,14 @@ void _FieldVariable_Init(
 
 	if (self != NULL && fV_Register != NULL) {	
 	   /* Prevent the same field from being added more than once */
-	   if( NamedObject_Register_GetIndex( fV_Register, self->name ) == -1 )
+          if( NamedObject_Register_GetIndex( fV_Register, self->name ) == (Index)(-1) )
 	      FieldVariable_Register_Add( fV_Register, self );
 	}	
 
 	self->extensionMgr = ExtensionManager_New_OfExistingObject( self->name, self );
 }
 
-void* _FieldVariable_Copy( void* fieldVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _FieldVariable_Copy( const void* fieldVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	FieldVariable*	self = (FieldVariable*)fieldVariable;
 	FieldVariable*	newFieldVariable;
 	PtrMap*			map = ptrMap;
@@ -178,7 +178,7 @@ void* _FieldVariable_Copy( void* fieldVariable, void* dest, Bool deep, Name name
 		ownMap = True;
 	}
 	
-	newFieldVariable = _Stg_Component_Copy( self, dest, deep, nameExt, map );
+	newFieldVariable = (FieldVariable*)_Stg_Component_Copy( self, dest, deep, nameExt, map );
 	
 	newFieldVariable->_interpolateValueAt        = self->_interpolateValueAt;
 	newFieldVariable->_getMinAndMaxLocalCoords   = self->_getMinAndMaxLocalCoords;
@@ -190,7 +190,7 @@ void* _FieldVariable_Copy( void* fieldVariable, void* dest, Bool deep, Name name
 	newFieldVariable->communicator               = self->communicator;
 	newFieldVariable->fieldVariable_Register     =  self->fieldVariable_Register;
 
-	newFieldVariable->extensionMgr               = Stg_Class_Copy( self->extensionMgr, NULL, deep, nameExt, map );
+	newFieldVariable->extensionMgr               = (ExtensionManager*)Stg_Class_Copy( self->extensionMgr, NULL, deep, nameExt, map );
 	
 	if( ownMap ) {
 		Stg_Class_Delete( map );

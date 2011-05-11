@@ -136,7 +136,7 @@ void _SpaceFillerParticleLayout_Print( void* spaceFillerParticleLayout, Stream* 
 	Stream_UnIndent( stream );
 }
 
-void* _SpaceFillerParticleLayout_Copy( void* spaceFillerParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _SpaceFillerParticleLayout_Copy( const void* spaceFillerParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	SpaceFillerParticleLayout*		self                    = (SpaceFillerParticleLayout*)spaceFillerParticleLayout;
 	SpaceFillerParticleLayout*		newSpaceFillerParticleLayout;
 	
@@ -193,7 +193,7 @@ void _SpaceFillerParticleLayout_Execute( void* spaceFillerParticleLayout, void* 
 }
 void _SpaceFillerParticleLayout_Destroy( void* spaceFillerParticleLayout, void* data ) {	
    SpaceFillerParticleLayout* self = (SpaceFillerParticleLayout*)spaceFillerParticleLayout;
-   int dim_I;
+   unsigned dim_I;
    
    for ( dim_I = 0 ; dim_I < self->dim ; dim_I++ ) 
       Stg_Class_Delete( self->sobolGenerator[ dim_I ] );

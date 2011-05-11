@@ -81,7 +81,7 @@ Mesh* _Mesh_New(  MESH_DEFARGS  ) {
 
 void _Mesh_Init( Mesh* self, AbstractContext* context ) {
    self->context = context;
-	self->topo = (MeshTopology*)IGraph_New( "" );
+	self->topo = (MeshTopology*)IGraph_New();
 	self->verts = NULL;
 
 	self->vars = List_New();
@@ -173,7 +173,7 @@ void _Mesh_Build( void* mesh, void* data ) {
 		unsigned	size;
 
 		if( !UIntMap_Map( self->topoDataSizes, d_i, &size ) || !size ||
-		    !Mesh_GetDomainSize( self, d_i ) )
+		    !Mesh_GetDomainSize( self, (MeshTopology_Dim)d_i ) )
 		{
 			self->topoDataInfos[d_i] = NULL;
 			self->topoDatas[d_i] = NULL;
@@ -182,7 +182,7 @@ void _Mesh_Build( void* mesh, void* data ) {
 
 		sprintf( name, "topoData(%d)", d_i );
 		self->topoDataInfos[d_i] = ExtensionManager_New_OfStruct( name, size );
-		self->topoDatas[d_i] = (void*)ExtensionManager_Malloc( self->topoDataInfos[d_i], Mesh_GetDomainSize( self, d_i ) );
+		self->topoDatas[d_i] = (void*)ExtensionManager_Malloc( self->topoDataInfos[d_i], Mesh_GetDomainSize( self, (MeshTopology_Dim)d_i ) );
 	}
 
 	/*
@@ -208,7 +208,7 @@ void _Mesh_Execute( void* mesh, void* data ) {
 
 void _Mesh_Destroy( void* mesh, void* data ) {
    Mesh*		self = (Mesh*)mesh;
-	unsigned	d_i;
+   unsigned	d_i;
 
    Mesh_Destruct( self );
    Stg_Component_Destroy( self->algorithms, NULL, False );
@@ -216,12 +216,12 @@ void _Mesh_Destroy( void* mesh, void* data ) {
    Stg_Class_Delete( self->vars );
    Stg_Class_Delete( self->topoDataSizes );
 
-	for( d_i = 0; d_i < Mesh_GetDimSize( self ); d_i++ ) {
-		if( self->topoDataInfos[d_i] )	
-			Stg_Class_Delete( self->topoDataInfos[d_i] );
-		if( self->topoDatas[d_i] )
-			Memory_Free( self->topoDatas[d_i] );
-	}
+   for( d_i = 0; d_i < (unsigned)Mesh_GetDimSize( self ); d_i++ ) {
+     if( self->topoDataInfos[d_i] )	
+       Stg_Class_Delete( self->topoDataInfos[d_i] );
+     if( self->topoDatas[d_i] )
+       Memory_Free( self->topoDatas[d_i] );
+   }
    Memory_Free( self->topoDataInfos );
    Memory_Free( self->topoDatas );
 
@@ -238,7 +238,7 @@ void Mesh_SetExtensionManagerRegister( void* mesh, void* extMgrReg ) {
 
 	assert( self );
 
-	self->emReg = extMgrReg;
+	self->emReg = (ExtensionManager_Register*)extMgrReg;
 	if( extMgrReg )
 		ExtensionManager_Register_Add( extMgrReg, self->info );
 }
@@ -257,7 +257,7 @@ void Mesh_SetGenerator( void* mesh, void* generator ) {
 	assert( self );
 
 	Mesh_Destruct( self );
-	self->generator = generator;
+	self->generator = (MeshGenerator*)generator;
 }
 
 void Mesh_SetAlgorithms( void* mesh, void* algorithms ) {
@@ -275,7 +275,7 @@ void Mesh_SetAlgorithms( void* mesh, void* algorithms ) {
 	FreeObject( self->algorithms );
 	if( algorithms ) {
 		assert( Stg_CheckType( algorithms, Mesh_Algorithms ) );
-		self->algorithms = algorithms;
+		self->algorithms = (Mesh_Algorithms*)algorithms;
 	}
 	else
 		self->algorithms = Mesh_Algorithms_New( "", NULL );
@@ -283,13 +283,13 @@ void Mesh_SetAlgorithms( void* mesh, void* algorithms ) {
 	Mesh_Algorithms_SetMesh( self->algorithms, self );
 }
 
-unsigned Mesh_GetDimSize( void* mesh ) {
+MeshTopology_Dim Mesh_GetDimSize( void* mesh ) {
 	Mesh*	self = (Mesh*)mesh;
 
 	assert( self );
 	assert( self->topo );
 
-	return self->topo->nDims;
+	return (MeshTopology_Dim)(self->topo->nDims);
 }
 
 unsigned Mesh_GetGlobalSize( void* mesh, MeshTopology_Dim dim ) {
@@ -365,7 +365,7 @@ Bool Mesh_GlobalToDomain( void* mesh, MeshTopology_Dim dim, unsigned global, uns
 	assert( self );
 	assert( self->topo );
 
-	return Sync_TryGlobalToDomain( IGraph_GetDomain( self->topo, dim ), global, domain );
+	return Sync_TryGlobalToDomain( IGraph_GetDomain( self->topo, dim ), global, (int*)domain );
 }
 
 unsigned Mesh_DomainToGlobal( void* mesh, MeshTopology_Dim dim, unsigned domain ) {
@@ -383,7 +383,7 @@ Bool Mesh_LocalToShared( void* mesh, MeshTopology_Dim dim, unsigned domain, unsi
 	assert( self );
 	assert( self->topo );
 
-	return Sync_TryLocalToShared( IGraph_GetDomain( self->topo, dim ), domain, shared );
+	return Sync_TryLocalToShared( IGraph_GetDomain( self->topo, dim ), domain, (int*)shared );
 }
 
 unsigned Mesh_SharedToLocal( void* mesh, MeshTopology_Dim dim, unsigned shared ) {
@@ -527,14 +527,14 @@ Bool Mesh_HasExtension( void* mesh, const Name name ) {
 
 	assert( self );
 
-	return (ExtensionManager_GetHandle( self->info, (Name)name ) != -1 ) ?  True : False;
+	return (ExtensionManager_GetHandle( self->info, (Name)name ) != (unsigned)(-1) ) ?  True : False;
 }
 
 void* _Mesh_GetExtension( void* mesh, const Name name ) {
 	Mesh* self = (Mesh*)mesh;
 
 	assert( self );
-	assert( ExtensionManager_GetHandle( self->info, (Name)name ) != -1  );
+	assert( ExtensionManager_GetHandle( self->info, (Name)name ) != (unsigned)(-1)  );
 
 	return ExtensionManager_Get( self->info, self, ExtensionManager_GetHandle( self->info, (Name)name )  );
 }
@@ -596,7 +596,7 @@ void Mesh_DeformationUpdate( void* mesh ) {
 
 	assert( self );
 
-	if( Mesh_GetDomainSize( self, 0 ) ) {
+	if( Mesh_GetDomainSize( self, (MeshTopology_Dim)0 ) ) {
 		self->minSep = Mesh_Algorithms_GetMinimumSeparation( self->algorithms, self->minAxialSep );
 		Mesh_Algorithms_GetLocalCoordRange( self->algorithms, self->minLocalCrd, self->maxLocalCrd );
 		Mesh_Algorithms_GetDomainCoordRange( self->algorithms, self->minDomainCrd, self->maxDomainCrd );
@@ -613,9 +613,9 @@ void Mesh_Sync( void* mesh ) {
 
 	assert( self );
 
-	sync = Mesh_GetSync( self, 0 );
+	sync = Mesh_GetSync( self, (MeshTopology_Dim)0 );
 	nDims = Mesh_GetDimSize( self );
-	nLocals = Mesh_GetLocalSize( self, 0 );
+	nLocals = Mesh_GetLocalSize( self, (MeshTopology_Dim)0 );
 	Sync_SyncArray( sync, self->verts[0], nDims * sizeof(double), self->verts[nLocals], nDims * sizeof(double), nDims * sizeof(double) );
 
 	/* TODO

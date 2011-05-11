@@ -123,11 +123,11 @@ void _WithinShapeParticleLayout_Print( void* withinShapeParticleLayout, Stream* 
 }
 
 
-void* _WithinShapeParticleLayout_Copy( void* withinShapeParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _WithinShapeParticleLayout_Copy( const void* withinShapeParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	WithinShapeParticleLayout*		self                    = (WithinShapeParticleLayout*)withinShapeParticleLayout;
 	WithinShapeParticleLayout*		newWithinShapeParticleLayout;
 	
-	newWithinShapeParticleLayout = _SpaceFillerParticleLayout_Copy( self, dest, deep, nameExt, ptrMap );
+	newWithinShapeParticleLayout = (WithinShapeParticleLayout*)_SpaceFillerParticleLayout_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	if ( deep ) {
 		newWithinShapeParticleLayout->shape = (Stg_Shape*)Stg_Class_Copy( self->shape, NULL, deep, nameExt, ptrMap );

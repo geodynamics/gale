@@ -205,7 +205,7 @@ void _Mesh_Algorithms_Update( void* algorithms ) {
 	nDims = Mesh_GetDimSize( self->mesh );
 	for( d_i = 0; d_i < nDims; d_i++ ) {
 	   if( Class_IsSuper( self->mesh->topo, IGraph ) &&
-	       (!Mesh_GetGlobalSize( self->mesh, d_i ) || !Mesh_HasIncidence( self->mesh, nDims, d_i )) )
+	       (!Mesh_GetGlobalSize( self->mesh, (MeshTopology_Dim)d_i ) || !Mesh_HasIncidence( self->mesh, (MeshTopology_Dim)nDims, (MeshTopology_Dim)d_i )) )
 	   {
 			break;
 	   }
@@ -250,7 +250,7 @@ Bool _Mesh_Algorithms_SearchElements( void* algorithms, double* point,
 	assert( elInd );
 
 	mesh = self->mesh;
-	if( Mesh_Algorithms_Search( self, point, &dim, &ind ) ) {
+	if(Mesh_Algorithms_Search(self,point,(MeshTopology_Dim*)(&dim),&ind)) {
 		unsigned	nDims;
 
 		nDims = Mesh_GetDimSize( mesh );
@@ -262,21 +262,31 @@ Bool _Mesh_Algorithms_SearchElements( void* algorithms, double* point,
 			unsigned	inc_i;
 
 			/* Must have required incidence for this to work. */
-			assert( Mesh_HasIncidence( mesh, dim, nDims ) );
+			assert(Mesh_HasIncidence(mesh,(MeshTopology_Dim)dim,
+                                                 (MeshTopology_Dim)nDims));
 
-			nLocalEls = Mesh_GetLocalSize( mesh, nDims );
-			Mesh_GetIncidence( mesh, dim, ind, nDims, self->incArray );
+			nLocalEls = Mesh_GetLocalSize(mesh,
+                                                      (MeshTopology_Dim)nDims);
+			Mesh_GetIncidence( mesh, (MeshTopology_Dim)dim,
+                                           ind, (MeshTopology_Dim)nDims,
+                                           self->incArray );
 			nInc = IArray_GetSize( self->incArray );
 			inc = (unsigned*)IArray_GetPtr( self->incArray );
 			assert( nInc );
-			lowest = Mesh_DomainToGlobal( mesh, nDims, inc[0] );
+			lowest = Mesh_DomainToGlobal(mesh,
+                                                     (MeshTopology_Dim)nDims,
+                                                     inc[0] );
 			for( inc_i = 1; inc_i < nInc; inc_i++ ) {
-				global = Mesh_DomainToGlobal( mesh, nDims, inc[inc_i] );
-				if( global < lowest )
-					lowest = global;
+                          global=Mesh_DomainToGlobal(mesh,
+                                                     (MeshTopology_Dim)nDims,
+                                                     inc[inc_i] );
+                          if( global < lowest )
+                            lowest = global;
 			}
 
-			insist( Mesh_GlobalToDomain( mesh, nDims, lowest, elInd), == True );
+			insist( Mesh_GlobalToDomain(mesh,
+                                                    (MeshTopology_Dim)nDims,
+                                                    lowest, elInd), == True );
 		}
 		else
 			*elInd = ind;
@@ -305,7 +315,8 @@ double _Mesh_Algorithms_GetMinimumSeparation( void* algorithms, double* perDim )
 		dimSep = NULL;
 
 	minSep = HUGE_VAL;
-	nDomainEls = Mesh_GetDomainSize( mesh, Mesh_GetDimSize( mesh ) );
+	nDomainEls=
+          Mesh_GetDomainSize(mesh,Mesh_GetDimSize(mesh));
 	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
 		Mesh_ElementType*	elType;
 		double			curSep;
@@ -340,11 +351,12 @@ void _Mesh_Algorithms_GetLocalCoordRange( void* algorithms, double* min, double*
 
 	mesh = self->mesh;
 	nDims = Mesh_GetDimSize( mesh );
-	nEls = Mesh_GetLocalSize( mesh, nDims );
+	nEls = Mesh_GetLocalSize( mesh, (MeshTopology_Dim)nDims );
 	memcpy( min, Mesh_GetVertex( mesh, 0 ), nDims * sizeof(double) );
 	memcpy( max, Mesh_GetVertex( mesh, 0 ), nDims * sizeof(double) );
 	for( e_i = 0; e_i < nEls; e_i++ ) {
-		Mesh_GetIncidence( mesh, nDims, e_i, 0, self->incArray );
+		Mesh_GetIncidence( mesh, (MeshTopology_Dim)nDims,
+                                   e_i, (MeshTopology_Dim)0, self->incArray );
 		nVerts = IArray_GetSize( self->incArray );
 		verts = (unsigned*)IArray_GetPtr( self->incArray );
 		for( v_i = 0; v_i < nVerts; v_i++ ) {
@@ -408,7 +420,7 @@ void _Mesh_Algorithms_GetGlobalCoordRange( void* algorithms, double* min, double
 
 	comm = Comm_GetMPIComm( Mesh_GetCommTopology( mesh, MT_VERTEX ) );
 	Mesh_Algorithms_GetLocalCoordRange( self, localMin, localMax );
-	for( d_i = 0; d_i < Mesh_GetDimSize( mesh ); d_i++ ) {
+	for( d_i = 0; d_i < (unsigned)Mesh_GetDimSize( mesh ); d_i++ ) {
 		MPI_Allreduce( localMin + d_i, min + d_i, 1, MPI_DOUBLE, MPI_MIN, comm );
 		MPI_Allreduce( localMax + d_i, max + d_i, 1, MPI_DOUBLE, MPI_MAX, comm );
 	}
@@ -533,7 +545,8 @@ Bool Mesh_Algorithms_SearchWithFullIncidence( void* algorithms, double* point,
 
 	assert( self );
 	assert( self->mesh );
-	assert( Mesh_HasIncidence( self->mesh, MT_VERTEX, Mesh_GetDimSize( self->mesh ) ) );
+	assert(Mesh_HasIncidence(self->mesh,MT_VERTEX,
+                                 Mesh_GetDimSize(self->mesh)));
 	assert( dim );
 	assert( ind );
 
@@ -552,7 +565,8 @@ Bool Mesh_Algorithms_SearchWithFullIncidence( void* algorithms, double* point,
 	nearVert = Mesh_NearestVertex( mesh, point );
 
 	/* Get vertex/element incidence. */
-	Mesh_GetIncidence( mesh, MT_VERTEX, nearVert, nDims, self->incArray );
+	Mesh_GetIncidence( mesh, MT_VERTEX, (MeshTopology_Dim)nearVert,
+                           (MeshTopology_Dim)nDims, self->incArray );
 	nInc = IArray_GetSize( self->incArray );
 	inc = (unsigned*)IArray_GetPtr( self->incArray );
 
@@ -573,7 +587,7 @@ Bool Mesh_Algorithms_SearchWithFullIncidence( void* algorithms, double* point,
    vertex.  Yes, this really happens. */
 
 	/* Brute force, search every element in turn (last resort). */
-	nEls = Mesh_GetDomainSize( mesh, nDims );
+	nEls = Mesh_GetDomainSize( mesh, (MeshTopology_Dim)nDims );
 	for( e_i = 0; e_i < nEls; e_i++ ) {
 		if( Mesh_ElementHasPoint( mesh, e_i, point, dim, ind ) )
 			return True;
@@ -597,7 +611,8 @@ Bool Mesh_Algorithms_SearchWithMinIncidence( void* algorithms, double* point,
 
 	assert( self );
 	assert( self->mesh );
-	assert( Mesh_HasIncidence( self->mesh, MT_VERTEX, Mesh_GetDimSize( self->mesh ) ) );
+	assert(Mesh_HasIncidence(self->mesh, MT_VERTEX,
+                                 Mesh_GetDimSize(self->mesh)));
 	assert( dim );
 	assert( ind );
 
@@ -616,7 +631,8 @@ Bool Mesh_Algorithms_SearchWithMinIncidence( void* algorithms, double* point,
 	nearVert = Mesh_NearestVertex( mesh, point );
 
 	/* Get vertex/element incidence. */
-	Mesh_GetIncidence( mesh, MT_VERTEX, nearVert, nDims, self->incArray );
+	Mesh_GetIncidence( mesh, MT_VERTEX, nearVert, (MeshTopology_Dim)nDims,
+                           self->incArray );
 	nInc = IArray_GetSize( self->incArray );
 	inc = (unsigned*)IArray_GetPtr( self->incArray );
 
@@ -626,33 +642,36 @@ Bool Mesh_Algorithms_SearchWithMinIncidence( void* algorithms, double* point,
 		if( Mesh_ElementHasPoint( mesh, inc[inc_i], point, dim, ind ) ) {
 			unsigned	global;
 
-			global = Mesh_DomainToGlobal( mesh, nDims, inc[inc_i] );
+			global=Mesh_DomainToGlobal(mesh,(MeshTopology_Dim)nDims,
+                                                   inc[inc_i]);
 			if( global < lowest )
 				lowest = global;
 		}
 	}
 	if( lowest != (unsigned)-1 ) {
-		insist( Mesh_GlobalToDomain( mesh, nDims, lowest, ind ), == True );
-		*dim = nDims;
+		insist(Mesh_GlobalToDomain(mesh,(MeshTopology_Dim)nDims,
+                                           lowest, ind ), == True );
+		*dim = (MeshTopology_Dim)nDims;
 		return True;
 	}
 
 	/* Brute force, search every element in turn (last resort). */
 	lowest = (unsigned)-1;
-	nEls = Mesh_GetDomainSize( mesh, nDims );
+	nEls = Mesh_GetDomainSize( mesh, (MeshTopology_Dim)nDims );
 	for( e_i = 0; e_i < nEls; e_i++ ) {
-		if( Mesh_ElementHasPoint( mesh, e_i, point, dim, ind ) ) {
-			unsigned	global;
-
-			global = Mesh_DomainToGlobal( mesh, nDims, e_i );
-			if( global < lowest )
-				lowest = global;
-		}
+          if( Mesh_ElementHasPoint( mesh, e_i, point, dim, ind ) ) {
+            unsigned	global;
+            
+            global = Mesh_DomainToGlobal( mesh, (MeshTopology_Dim)nDims, e_i );
+            if( global < lowest )
+              lowest = global;
+          }
 	}
 	if( lowest != (unsigned)-1 ) {
-		insist( Mesh_GlobalToDomain( mesh, nDims, lowest, ind ), == True );
-		*dim = nDims;
-		return True;
+          insist(Mesh_GlobalToDomain(mesh,(MeshTopology_Dim)nDims,lowest,ind),
+                 ==True);
+          *dim = (MeshTopology_Dim)nDims;
+          return True;
 	}
 
 	return False;
@@ -685,7 +704,7 @@ Bool Mesh_Algorithms_SearchGeneral( void* algorithms, double* point,
 	}
 
 	/* Brute force, search every element in turn. */
-	nEls = Mesh_GetDomainSize( mesh, nDims );
+	nEls = Mesh_GetDomainSize( mesh, (MeshTopology_Dim)nDims );
 	for( e_i = 0; e_i < nEls; e_i++ ) {
 		if( Mesh_ElementHasPoint( mesh, e_i, point, dim, ind ) )
 			return True;
@@ -705,14 +724,14 @@ Bool Mesh_Algorithms_SearchWithTree( void* _self, double* pnt, unsigned* dim, un
 
    *dim = Mesh_GetDimSize( self->mesh );
    MPI_Comm_size( MPI_COMM_WORLD, &curRank );
-   nLocals = Mesh_GetLocalSize( self->mesh, *dim );
+   nLocals=Mesh_GetLocalSize(self->mesh,(MeshTopology_Dim)(*dim));
    if( !SpatialTree_Search( self->tree, pnt, &nEls, &els ) )
       return False;
 
    *el = nLocals;
    for( ii = 0; ii < nEls; ii++ ) {
       if( Mesh_ElementHasPoint( self->mesh, els[ii], pnt, &curDim, &curEl ) ) {
-	 if( curEl >= nLocals ) {
+        if( curEl >= (unsigned)nLocals ) {
 	    owner = Mesh_GetOwner( self->mesh, curDim, curEl - nLocals );
 	    owner = Comm_RankLocalToGlobal( self->mesh->topo->comm, owner );
 	    if( owner <= curRank ) {

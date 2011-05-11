@@ -95,7 +95,7 @@ void _Everywhere_Print( void* everywhere, Stream* stream ) {
 	_Stg_Shape_Print( self, stream );
 }
 
-void* _Everywhere_Copy( void* everywhere, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Everywhere_Copy( const void* everywhere, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Everywhere*	self = (Everywhere*)everywhere;
 	Everywhere*	newEverywhere;
 	

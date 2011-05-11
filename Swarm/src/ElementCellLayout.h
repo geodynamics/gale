@@ -98,7 +98,7 @@
 	#define ElementCellLayout_DeepCopy( self ) \
 		(ElementCellLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _ElementCellLayout_Copy( void* elementCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ElementCellLayout_Copy( const void* elementCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _ElementCellLayout_AssignFromXML( void *elementCellLayout, Stg_ComponentFactory *cf, void* data );
 	

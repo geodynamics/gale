@@ -109,7 +109,7 @@
 	#define ParticleMovementHandler_DeepCopy( self ) \
 		(ParticleMovementHandler*)ParticleMovementHandler_CopyFunc( self, NULL, True, NULL, NULL )
 	
-	void* _ParticleMovementHandler_CopyFunc( void* ParticleMovementHandler, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ParticleMovementHandler_CopyFunc( const void* ParticleMovementHandler, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/** Stg_Class_Delete() implementation */
 	void _ParticleMovementHandler_Delete(void* pCommsHandler );

@@ -120,7 +120,7 @@ void _TriGaussParticleLayout_Print( void* triGaussParticleLayout, Stream* stream
 }
 
 
-void* _TriGaussParticleLayout_Copy( void* triGaussParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _TriGaussParticleLayout_Copy( const void* triGaussParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	TriGaussParticleLayout*		self = (TriGaussParticleLayout*)triGaussParticleLayout;
 	TriGaussParticleLayout*		newTriGaussParticleLayout;
 	

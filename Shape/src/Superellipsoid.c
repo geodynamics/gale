@@ -112,7 +112,7 @@ void _Superellipsoid_Print( void* superellipsoid, Stream* stream ) {
 
 
 
-void* _Superellipsoid_Copy( void* superellipsoid, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Superellipsoid_Copy( const void* superellipsoid, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Superellipsoid*	self = (Superellipsoid*)superellipsoid;
 	Superellipsoid*	newSuperellipsoid;
 	
@@ -220,7 +220,7 @@ Bool _Superellipsoid_IsCoordInside( void* superellipsoid, Coord coord ) {
 			+ pow( z*z, 1.0/epsilon1 );
 
 	/* Return True if coord is inside and False otherwise */
-	return ( insideOutsideValue <= 1.0 );
+	return ( insideOutsideValue <= 1.0 ) ? True : False;
 }
 
 double _Superellipsoid_CalculateVolume( void* superellipsoid ) {

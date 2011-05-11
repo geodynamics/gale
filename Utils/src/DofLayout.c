@@ -163,7 +163,7 @@ void _DofLayout_Print(void* dofLayout, Stream* stream) {
 }
 
 
-void* _DofLayout_Copy( void* dofLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _DofLayout_Copy( const void* dofLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	DofLayout*	self = (DofLayout*)dofLayout;
 	DofLayout*	newDofLayout;
 	PtrMap*		map = ptrMap;
@@ -181,7 +181,7 @@ void* _DofLayout_Copy( void* dofLayout, void* dest, Bool deep, Name nameExt, Ptr
 	newDofLayout->_totalVarCount = self->_totalVarCount;
 	
 	if( deep ) {
-		if( (newDofLayout->_variableEnabledSets = PtrMap_Find( map, self->_variableEnabledSets )) == NULL && self->_variableEnabledSets ) {
+          if( (newDofLayout->_variableEnabledSets = (IndexSet**)PtrMap_Find( map, self->_variableEnabledSets )) == NULL && self->_variableEnabledSets ) {
 			Index	set_I;
 			
 			newDofLayout->_variableEnabledSets = Memory_Alloc_Array( IndexSet*, newDofLayout->_totalVarCount, "DofLayout->_variableEnabledSets" );
@@ -191,19 +191,19 @@ void* _DofLayout_Copy( void* dofLayout, void* dest, Bool deep, Name nameExt, Ptr
 			PtrMap_Append( map, self->_variableEnabledSets, newDofLayout->_variableEnabledSets );
 		}
 		
-		if( (newDofLayout->_varIndicesMapping = PtrMap_Find( map, self->_varIndicesMapping )) == NULL && self->_varIndicesMapping ) {
+          if( (newDofLayout->_varIndicesMapping = (Variable_Index*)PtrMap_Find( map, self->_varIndicesMapping )) == NULL && self->_varIndicesMapping ) {
 			newDofLayout->_varIndicesMapping = Memory_Alloc_Array( Variable_Index, newDofLayout->_totalVarCount, "DofLayout->_varIndicesMapping" );
 			memcpy( newDofLayout->_varIndicesMapping, self->_varIndicesMapping, sizeof(Variable_Index) * newDofLayout->_totalVarCount );
 			PtrMap_Append( map, self->_varIndicesMapping, newDofLayout->_varIndicesMapping );
 		}
 		
-		if( (newDofLayout->dofCounts = PtrMap_Find( map, self->dofCounts )) == NULL && self->dofCounts ) {
+          if( (newDofLayout->dofCounts = (Dof_Index*)PtrMap_Find( map, self->dofCounts )) == NULL && self->dofCounts ) {
 			newDofLayout->dofCounts = Memory_Alloc_Array( Index, newDofLayout->_numItemsInLayout, "DofLayout->dofCounts" );
 			memcpy( newDofLayout->dofCounts, self->dofCounts, sizeof(Index) * newDofLayout->_numItemsInLayout );
 			PtrMap_Append( map, self->dofCounts, newDofLayout->dofCounts );
 		}
 		
-		if( (newDofLayout->varIndices = PtrMap_Find( map, self->varIndices )) == NULL && self->varIndices ) {
+          if( (newDofLayout->varIndices = (Variable_Index**)PtrMap_Find( map, self->varIndices )) == NULL && self->varIndices ) {
 			Index	idx_I;
 			
 			newDofLayout->varIndices = Memory_Alloc_2DComplex( Variable_Index, newDofLayout->_numItemsInLayout, self->dofCounts, "DofLayout->varIndices" );
@@ -275,7 +275,7 @@ void _DofLayout_AssignFromXML( void* dofLayout, Stg_ComponentFactory* cf, void* 
 		}
 	}
 	
-	_DofLayout_Init( self, context, variableRegister, 0, baseVariableCount, baseVariableList, mesh );
+	_DofLayout_Init( self, context, (Variable_Register*)variableRegister, 0, baseVariableCount, baseVariableList, mesh );
 }
 
 void _DofLayout_Build( void* dofLayout, void* data ) {

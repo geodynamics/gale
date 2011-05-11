@@ -59,15 +59,18 @@ int MeshSuite_findOwner( Mesh* mesh, int vert ) {
 	inc = IArray_New();
 
 	nDims = Mesh_GetDimSize( mesh );
-	Mesh_GetIncidence( mesh, 0, vert, nDims, inc );
-	lowest = Mesh_DomainToGlobal( mesh, nDims, IArray_GetPtr( inc )[0] );
+	Mesh_GetIncidence(mesh,(MeshTopology_Dim)0,vert,(MeshTopology_Dim)nDims,
+                          inc);
+	lowest = Mesh_DomainToGlobal( mesh, (MeshTopology_Dim)nDims,
+                                      IArray_GetPtr( inc )[0] );
 	for( ii = 1; ii < IArray_GetSize( inc ); ii++ ) {
-		cur = Mesh_DomainToGlobal( mesh, nDims, IArray_GetPtr( inc )[ii] );
+		cur = Mesh_DomainToGlobal( mesh, (MeshTopology_Dim)nDims,
+                                           IArray_GetPtr( inc )[ii] );
 		if( cur < lowest )
 			lowest = cur;
 	}
    NewClass_Delete( inc );
-   Mesh_GlobalToDomain( mesh, nDims, lowest, &lowest );
+   Mesh_GlobalToDomain(mesh,(MeshTopology_Dim)nDims,lowest,(unsigned*)(&lowest));
 
    return lowest;
 }
@@ -89,7 +92,7 @@ void MeshSuite_TestMeshNearVert1D( MeshSuiteData* data ) {
 	CartesianGenerator*	gen;
 	Mesh*						mesh;
 	int						nDims;
-	int						sizes[3];
+	unsigned					sizes[3];
 	double					minCrd[3];
 	double					maxCrd[3];
 	int						nInc, *inc;
@@ -105,7 +108,7 @@ void MeshSuite_TestMeshNearVert1D( MeshSuiteData* data ) {
 	gen = CartesianGenerator_New( "", NULL );
 	MeshGenerator_SetDimSize( gen, nDims );
 	CartesianGenerator_SetShadowDepth( gen, 1 );
-	CartesianGenerator_SetTopologyParams( gen, sizes, 0, NULL, NULL );
+	CartesianGenerator_SetTopologyParams(gen,sizes,0,NULL,NULL);
 	CartesianGenerator_SetGeometryParams( gen, minCrd, maxCrd );
 
 	mesh = Mesh_New( "", NULL );
@@ -113,16 +116,16 @@ void MeshSuite_TestMeshNearVert1D( MeshSuiteData* data ) {
 	Stg_Component_Build( mesh, NULL, False );
 	incArray = IArray_New();
 
-	for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, nDims ); e_i++ ) {
-		Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, incArray );
-		nInc = IArray_GetSize( incArray );
-		inc = IArray_GetPtr( incArray );
-		for( inc_i = 0; inc_i < nInc; inc_i++ ) {
-			vert = Mesh_GetVertex( mesh, inc[inc_i] );
-			if( !Mesh_NearestVertex( mesh, vert ) == inc[inc_i] ) break;
-      }
+	for(e_i=0;e_i<(int)Mesh_GetDomainSize(mesh,(MeshTopology_Dim)nDims);e_i++) {
+          Mesh_GetIncidence(mesh,(MeshTopology_Dim)nDims,e_i,MT_VERTEX,incArray);
+          nInc = IArray_GetSize( incArray );
+          inc = IArray_GetPtr( incArray );
+          for( inc_i = 0; inc_i < nInc; inc_i++ ) {
+            vert = Mesh_GetVertex( mesh, inc[inc_i] );
+            if( !Mesh_NearestVertex( mesh, vert ) == inc[inc_i] ) break;
+          }
 	}
-   pcu_check_true( e_i == Mesh_GetDomainSize( mesh, nDims ) );
+        pcu_check_true(e_i==(int)Mesh_GetDomainSize(mesh,(MeshTopology_Dim)nDims));
 
 	NewClass_Delete( incArray );
 
@@ -134,7 +137,7 @@ void MeshSuite_TestMeshNearVert2D( MeshSuiteData* data ) {
 	CartesianGenerator*	gen;
 	Mesh*						mesh;
 	int						nDims;
-	int						sizes[3];
+	unsigned					sizes[3];
 	double					minCrd[3];
 	double					maxCrd[3];
 	int						nInc, *inc;
@@ -158,8 +161,8 @@ void MeshSuite_TestMeshNearVert2D( MeshSuiteData* data ) {
 	Stg_Component_Build( mesh, NULL, False );
 	incArray = IArray_New();
 
-	for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, nDims ); e_i++ ) {
-		Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, incArray );
+	for( e_i = 0; e_i < (int)Mesh_GetDomainSize( mesh, (MeshTopology_Dim)nDims ); e_i++ ) {
+		Mesh_GetIncidence( mesh, (MeshTopology_Dim)nDims, e_i, MT_VERTEX, incArray );
  		nInc = IArray_GetSize( incArray );
 		inc = IArray_GetPtr( incArray );
 		for( inc_i = 0; inc_i < nInc; inc_i++ ) {
@@ -167,7 +170,7 @@ void MeshSuite_TestMeshNearVert2D( MeshSuiteData* data ) {
 			if( !Mesh_NearestVertex( mesh, vert ) == inc[inc_i] ) break;
 		}
 	}
-	pcu_check_true( e_i == Mesh_GetDomainSize( mesh, nDims ) );
+	pcu_check_true( e_i == (int)Mesh_GetDomainSize( mesh, (MeshTopology_Dim)nDims ) );
 
 	NewClass_Delete( incArray );
 
@@ -179,7 +182,7 @@ void MeshSuite_TestMeshNearVert3D( MeshSuiteData* data ) {
 	CartesianGenerator*	gen;
 	Mesh*						mesh;
 	int						nDims;
-	int						sizes[3];
+	unsigned					sizes[3];
 	double					minCrd[3];
 	double					maxCrd[3];
 	int						nInc, *inc;
@@ -203,8 +206,8 @@ void MeshSuite_TestMeshNearVert3D( MeshSuiteData* data ) {
 	Stg_Component_Build( mesh, NULL, False );
 	incArray = IArray_New();
 
-	for( e_i = 0; e_i < Mesh_GetDomainSize( mesh, nDims ); e_i++ ) {
-		Mesh_GetIncidence( mesh, nDims, e_i, MT_VERTEX, incArray );
+	for( e_i = 0; e_i < (int)Mesh_GetDomainSize( mesh, (MeshTopology_Dim)nDims ); e_i++ ) {
+		Mesh_GetIncidence( mesh, (MeshTopology_Dim)nDims, e_i, MT_VERTEX, incArray );
 		nInc = IArray_GetSize( incArray );
 		inc = IArray_GetPtr( incArray );
 		for( inc_i = 0; inc_i < nInc; inc_i++ ) {
@@ -212,7 +215,7 @@ void MeshSuite_TestMeshNearVert3D( MeshSuiteData* data ) {
 			if( !Mesh_NearestVertex( mesh, vert ) == inc[inc_i] ) break;
 		}
 	}
-	pcu_check_true( e_i == Mesh_GetDomainSize( mesh, nDims ) );
+	pcu_check_true( e_i == (int)Mesh_GetDomainSize( mesh, (MeshTopology_Dim)nDims ) );
 
 	NewClass_Delete( incArray );
 
@@ -224,7 +227,7 @@ void MeshSuite_TestMeshSearch( MeshSuiteData* data ) {
 	CartesianGenerator*	gen;
 	Mesh*						mesh;
 	int						nDims;
-	int						sizes[3];
+	unsigned					sizes[3];
 	double					minCrd[3];
 	double					maxCrd[3];
 	int						el;
@@ -244,13 +247,14 @@ void MeshSuite_TestMeshSearch( MeshSuiteData* data ) {
 	Mesh_SetGenerator( mesh, gen );
 	Stg_Component_Build( mesh, NULL, False );
 
-	for( ii = 0; ii < Mesh_GetLocalSize( mesh, 0 ); ii++ ) {
-		if( !Mesh_SearchElements( mesh, Mesh_GetVertex( mesh, ii ), &el ) )
+	for( ii = 0; ii < (int)Mesh_GetLocalSize( mesh, (MeshTopology_Dim)0 ); ii++ ) {
+		if( !Mesh_SearchElements( mesh, Mesh_GetVertex( mesh, ii ),
+                                          (unsigned*)(&el) ) )
 			break;
 		if( el != MeshSuite_findOwner( mesh, ii ) )
 			break;
 	}
-	pcu_check_true( ii == Mesh_GetLocalSize( mesh, 0 ) );
+	pcu_check_true(ii==(int)Mesh_GetLocalSize( mesh, (MeshTopology_Dim)0 ) );
 }
 
 void MeshSuite( pcu_suite_t* suite ) {

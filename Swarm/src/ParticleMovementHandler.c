@@ -72,7 +72,7 @@ void *ParticleMovementHandler_DefaultNew( Name name )
 	Bool                                       useGlobalFallbackCommStrategy = False;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType                                                                                        nameAllocationType = ZERO;
+	AllocationType                                                                                        nameAllocationType = (AllocationType)ZERO;
 	ParticleCommHandler_AllocateOutgoingCountArrays*                                            _allocateOutgoingCountArrays = ZERO;
 	ParticleCommHandler_AllocateOutgoingParticleArrays*                                      _allocateOutgoingParticleArrays = ZERO;
 	ParticleCommHandler_FreeOutgoingArrays*                                                              _freeOutgoingArrays = ZERO;
@@ -112,7 +112,7 @@ ParticleMovementHandler* ParticleMovementHandler_New(
 	Bool                                                  initFlag = True;
 
 	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType                                                                                        nameAllocationType = ZERO;
+	AllocationType                                                                                        nameAllocationType = (AllocationType)ZERO;
 	ParticleCommHandler_AllocateOutgoingCountArrays*                                            _allocateOutgoingCountArrays = ZERO;
 	ParticleCommHandler_AllocateOutgoingParticleArrays*                                      _allocateOutgoingParticleArrays = ZERO;
 	ParticleCommHandler_FreeOutgoingArrays*                                                              _freeOutgoingArrays = ZERO;
@@ -205,7 +205,7 @@ void _ParticleMovementHandler_Print( void* pCommsHandler, Stream* stream ) {
 }
 
 
-void* _ParticleMovementHandler_CopyFunc( void* particleMovementHandler, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ParticleMovementHandler_CopyFunc( const void* particleMovementHandler, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	
 	return _ParticleCommHandler_Copy( particleMovementHandler, dest, deep,
 		   nameExt, ptrMap );
@@ -434,7 +434,7 @@ void ParticleMovementHandler_ShareAndUpdateParticlesThatHaveMovedOutsideDomains(
 
 		particlesLeavingDomainSizeBytes = self->swarm->particleExtensionMgr->finalSize
 			* maxGlobalParticlesOutsideDomainCount;
-		particlesLeavingMyDomain = Memory_Alloc_Bytes( particlesLeavingDomainSizeBytes, "Particle",
+		particlesLeavingMyDomain = (Particle*)Memory_Alloc_Bytes( particlesLeavingDomainSizeBytes, "Particle",
 			"particlesLeavingMyDomain" );
 
 		// TODO: investigate doing this with an MPI_Indexed datatype instead...
@@ -461,7 +461,7 @@ void ParticleMovementHandler_ShareAndUpdateParticlesThatHaveMovedOutsideDomains(
 		Stream_UnIndentBranch( Swarm_Debug );
 
 		/* allocate the big global receive buffer */
-		globalParticlesLeavingDomains = Memory_Alloc_Bytes( particlesLeavingDomainSizeBytes * self->swarm->nProc,
+		globalParticlesLeavingDomains = (Particle*)Memory_Alloc_Bytes( particlesLeavingDomainSizeBytes * self->swarm->nProc,
 			"Particle", "globalParticlesLeavingDomains" );
 
 		Journal_DPrintfL( self->debug, 2, "Getting the global array of particles leaving domains\n" );

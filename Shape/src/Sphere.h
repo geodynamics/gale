@@ -88,7 +88,7 @@
 		(Sphere*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define Sphere_DeepCopy( self ) \
 		(Sphere*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _Sphere_Copy( void* sphere, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Sphere_Copy( const void* sphere, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Sphere_DefaultNew( Name name ) ;
 	void _Sphere_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

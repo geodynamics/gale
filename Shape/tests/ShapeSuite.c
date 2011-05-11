@@ -17,7 +17,7 @@ void ShapeSuite_Teardown( ShapeSuiteData* data ) {
    stgMainDestroy( data->cf );
 }
 
-void ShapeSuite_GeneratePoints( ShapeSuiteData* data, Dimension_Index dim, char* inputFileName ) {
+void ShapeSuite_GeneratePoints( ShapeSuiteData* data, Dimension_Index dim, Name inputFileName ) {
 /** Test Definition: */
 	Stg_ComponentFactory*	cf;
 	DomainContext*				context = NULL;

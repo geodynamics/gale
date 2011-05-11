@@ -90,7 +90,7 @@
 		(ConvexHull*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define ConvexHull_DeepCopy( self ) \
 		(ConvexHull*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _ConvexHull_Copy( void* convexHull, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ConvexHull_Copy( const void* convexHull, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _ConvexHull_DefaultNew( Name name ) ;
 	void _ConvexHull_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

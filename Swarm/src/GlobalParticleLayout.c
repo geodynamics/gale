@@ -135,7 +135,7 @@ void _GlobalParticleLayout_Print( void* particleLayout, Stream* stream ) {
 }
 
 
-void* _GlobalParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _GlobalParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	GlobalParticleLayout*		self = (GlobalParticleLayout*)particleLayout;
 	GlobalParticleLayout*		newGlobalParticleLayout;
 	

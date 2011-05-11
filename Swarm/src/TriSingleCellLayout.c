@@ -134,11 +134,11 @@ void _TriSingleCellLayout_Print( void* triSingleCellLayout, Stream* stream ) {
 }
 
 
-void* _TriSingleCellLayout_Copy( void* triSingleCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _TriSingleCellLayout_Copy( const void* triSingleCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	TriSingleCellLayout*	self = (TriSingleCellLayout*)triSingleCellLayout;
 	TriSingleCellLayout*	newTriSingleCellLayout;
 	
-	newTriSingleCellLayout = _CellLayout_Copy( self, dest, deep, nameExt, ptrMap );
+	newTriSingleCellLayout = (TriSingleCellLayout*)_CellLayout_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	newTriSingleCellLayout->dictionary = self->dictionary;
 	newTriSingleCellLayout->dim = self->dim;
@@ -245,7 +245,7 @@ Cell_Index _TriSingleCellLayout_MapElementIdToCellId( void* cellLayout, Element_
 
 Bool _TriSingleCellLayout_IsInCell( void* triSingleCellLayout, Cell_Index cellIndex, void* particle ) {
 	assert( 0 );
-	return 0;
+	return False;
 }
 
 

@@ -42,7 +42,7 @@
 
 	extern const Type WallVC_Type;
 	
-	extern const char* WallVC_WallEnumToStr[WallVC_Wall_Size];
+	extern Name WallVC_WallEnumToStr[WallVC_Wall_Size];
 	
 	#define __WallVC_Entry \
 		Name							varName; \
@@ -122,7 +122,7 @@
 	#define WallVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
-	void* _WallVC_Copy( void* wallVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _WallVC_Copy( const void* wallVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	void _WallVC_Build(  void* wallVC, void* data );
 	

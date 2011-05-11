@@ -91,7 +91,7 @@
 		(Superellipsoid*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define Superellipsoid_DeepCopy( self ) \
 		(Superellipsoid*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _Superellipsoid_Copy( void* superellipsoid, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Superellipsoid_Copy( const void* superellipsoid, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Superellipsoid_DefaultNew( Name name ) ;
 	void _Superellipsoid_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

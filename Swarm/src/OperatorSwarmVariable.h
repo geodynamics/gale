@@ -123,7 +123,7 @@
 
 	void _OperatorSwarmVariable_Print( void* _swarmVariable, Stream* stream );
 
-	void* _OperatorSwarmVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _OperatorSwarmVariable_Copy( const void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 
 	void _OperatorSwarmVariable_AssignFromXML( void* swarmVariable, Stg_ComponentFactory* cf, void* data );
 

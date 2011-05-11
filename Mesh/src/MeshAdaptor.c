@@ -147,7 +147,7 @@ void _MeshAdaptor_Destroy( void* _adaptor, void* data ) {
 void MeshAdaptor_SetGenerator( void* adaptor, void* generator ) {
 	MeshAdaptor*	self = (MeshAdaptor*)adaptor;
 
-	self->generator = generator;
+	self->generator = (MeshGenerator*)generator;
 	if( self->generator )
 		self->srcMesh = NULL;
 }

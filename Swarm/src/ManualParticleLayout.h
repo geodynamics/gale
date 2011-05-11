@@ -89,7 +89,7 @@
 		(ManualParticleLayout*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define ManualParticleLayout_DeepCopy( self ) \
 		(ManualParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _ManualParticleLayout_Copy( void* manualParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _ManualParticleLayout_Copy( const void* manualParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Stuff */
 	void* _ManualParticleLayout_DefaultNew( Name name ) ;

@@ -81,7 +81,7 @@
 		(Everywhere*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define Everywhere_DeepCopy( self ) \
 		(Everywhere*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _Everywhere_Copy( void* everywhere, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Everywhere_Copy( const void* everywhere, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Everywhere_DefaultNew( Name name ) ;
 	void _Everywhere_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

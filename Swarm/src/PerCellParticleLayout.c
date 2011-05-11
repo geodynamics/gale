@@ -104,7 +104,7 @@ void _PerCellParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFa
    _PerCellParticleLayout_Init( self );
 }
 
-void* _PerCellParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _PerCellParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	PerCellParticleLayout*		self = (PerCellParticleLayout*)particleLayout;
 	PerCellParticleLayout*		newPerCellParticleLayout;
 	

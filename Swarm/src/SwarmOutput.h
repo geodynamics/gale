@@ -105,7 +105,7 @@
 	
 	void _SwarmOutput_Delete( void* swarmOutput ) ;
 	void _SwarmOutput_Print( void* _swarmOutput, Stream* stream ) ;
-	void* _SwarmOutput_Copy( void* swarmOutput, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _SwarmOutput_Copy( const void* swarmOutput, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	#define SwarmOutput_Copy( self ) \
 		(SwarmOutput*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
@@ -125,7 +125,7 @@
 	void SwarmOutput_PrintData( void* swarmOutput, Stream* stream, Particle_Index lParticle_I, void* context ) ;
 
 	void _SwarmOutput_SetGlobalIndicies( void* swarmOutput, void* data ) ;
-	void SwarmOutput_PrintString( void* swarmOutput, Stream* stream, char* string ) ;
+	void SwarmOutput_PrintString( void* swarmOutput, Stream* stream, Name string ) ;
 	void SwarmOutput_PrintDouble( void* swarmOutput, Stream* stream, double value ) ;
 	void SwarmOutput_PrintTuple( void* swarmOutput, Stream* stream, double* value, Index size );
 	#define SwarmOutput_PrintValue( swarmOutput, stream, value )\

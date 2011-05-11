@@ -80,7 +80,7 @@
 
 	PythonShape* _PythonShape_New(  PYTHONSHAPE_DEFARGS  );
 	
-	void _PythonShape_Init( void* pythonShape, char* conditionFunction ) ;
+	void _PythonShape_Init( void* pythonShape, Name conditionFunction ) ;
 	void PythonShape_InitAll( 
 		void*                                 pythonShape, 
 		Dimension_Index                       dim, 
@@ -97,7 +97,7 @@
 		(PythonShape*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define PythonShape_DeepCopy( self ) \
 		(PythonShape*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _PythonShape_Copy( void* pythonShape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _PythonShape_Copy( const void* pythonShape, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _PythonShape_DefaultNew( Name name ) ;
 	void _PythonShape_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

@@ -91,7 +91,7 @@
 		(Union*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define Union_DeepCopy( self ) \
 		(Union*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _Union_Copy( void* combination, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Union_Copy( const void* combination, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Union_DefaultNew( Name name ) ;
 	void _Union_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

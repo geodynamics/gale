@@ -175,7 +175,7 @@ void ShadowSyncSuite_ValidateShadowing( DomainContext* context ) {
 	Swarm_UpdateAllParticleOwners( swarm );
 
 	if(swarm->nProc > 1 ) {
-		int ii = 0, jj = 0;
+		unsigned ii = 0, jj = 0;
 		ShadowInfo*			cellShadowInfo = CellLayout_GetShadowInfo( swarm->cellLayout );
 		ProcNbrInfo*		procNbrInfo = cellShadowInfo->procNbrInfo;
 		
@@ -189,7 +189,7 @@ void ShadowSyncSuite_ValidateShadowing( DomainContext* context ) {
 
 			{
 				Neighbour_Index		        nbr_I;
-				int i = 0, j = 0;
+				unsigned i = 0, j = 0;
 				int shadowCell = 0;
 
 				for ( nbr_I=0; nbr_I < procNbrInfo->procNbrCnt; nbr_I++ ) {
@@ -204,7 +204,7 @@ void ShadowSyncSuite_ValidateShadowing( DomainContext* context ) {
 						for( j=0; j<swarm->shadowCellParticleCountTbl[shadowCell]; j++ ){
 							
 							req = MemoryPool_NewObject( MPI_Request, requestPool );
-							particle = MemoryPool_NewObjectFunc( swarm->particleExtensionMgr->finalSize, particlePool );
+							particle = (char*)MemoryPool_NewObjectFunc( swarm->particleExtensionMgr->finalSize, particlePool );
 							LinkedList_InsertNode( list, req, sizeof(void*) );
 							LinkedList_InsertNode( particleList, particle, sizeof(void*) );
 						
@@ -217,9 +217,9 @@ void ShadowSyncSuite_ValidateShadowing( DomainContext* context ) {
 
 			{
 				Neighbour_Index		        nbr_I;
-				int i = 0, j = 0;
+				unsigned i = 0, j = 0;
 				int shadowedCell = 0;
-				char *array = malloc( swarm->particleExtensionMgr->finalSize );
+				char *array = (char*)malloc( swarm->particleExtensionMgr->finalSize );
 
 				for ( nbr_I=0; nbr_I < procNbrInfo->procNbrCnt; nbr_I++ ) {
 					for( i=0; i<cellShadowInfo->procShadowedCnt[nbr_I]; i++ ){
@@ -261,7 +261,7 @@ void ShadowSyncSuite_ValidateShadowing( DomainContext* context ) {
 					for( ii=0; ii<procNbrInfo->procNbrCnt; ii++ ){
 						for( jj=0; jj<cellShadowInfo->procShadowCnt[ii]; jj++ ){
 							int shadowCell = 0;
-							int kk = 0;
+							unsigned kk = 0;
 
 							shadowCell = cellShadowInfo->procShadowTbl[ii][jj];
 							for( kk=0; kk<swarm->shadowCellParticleCountTbl[shadowCell]; kk++ ){

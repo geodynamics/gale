@@ -94,7 +94,7 @@
 		(SingleCellLayout*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define SingleCellLayout_DeepCopy( self ) \
 		(SingleCellLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _SingleCellLayout_Copy( void* singleCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _SingleCellLayout_Copy( const void* singleCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Class Info */
 	void* _SingleCellLayout_DefaultNew( Name name );

@@ -136,7 +136,7 @@
 	#define DofLayout_DeepCopy( self ) \
 		(DofLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	
-	void* _DofLayout_Copy( void* dofLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _DofLayout_Copy( const void* dofLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/** Stg_Component_AssignFromXML() implementation */
 	void _DofLayout_AssignFromXML( void* dofLayout, Stg_ComponentFactory* cf, void* data );

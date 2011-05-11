@@ -92,7 +92,7 @@
 		(Cylinder*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define Cylinder_DeepCopy( self ) \
 		(Cylinder*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _Cylinder_Copy( void* cylinder, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Cylinder_Copy( const void* cylinder, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Cylinder_DefaultNew( Name name ) ;
 	void _Cylinder_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

@@ -95,7 +95,7 @@ WithinShapeParticleLayout* _WithinShapeParticleLayout_New(  WITHINSHAPEPARTICLEL
 		(WithinShapeParticleLayout*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define WithinShapeParticleLayout_DeepCopy( self ) \
 		(WithinShapeParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _WithinShapeParticleLayout_Copy( void* withinShapeParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _WithinShapeParticleLayout_Copy( const void* withinShapeParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Stuff */
 	void* _WithinShapeParticleLayout_DefaultNew( Name name ) ;

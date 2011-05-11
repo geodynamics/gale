@@ -146,7 +146,7 @@ void _MeshShapeVC_Destroy( void* variableCondition, void* data ) {
 		Memory_Free(self->_entryTbl);
 
 	if ( self->shapeName )
-		Memory_Free( self->shapeName );
+          Memory_Free( self->shapeName );
 	
 	/* Stg_Class_Delete parent */
 	_VariableCondition_Destroy( self, data );
@@ -230,7 +230,7 @@ void _MeshShapeVC_Print(void* variableCondition, Stream* stream) {
 }
 
 
-void* _MeshShapeVC_Copy( void* variableCondition, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _MeshShapeVC_Copy( const void* variableCondition, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	MeshShapeVC*        self           = (MeshShapeVC*)variableCondition;
 	MeshShapeVC*        newMeshShapeVC;
 	PtrMap*         map            = ptrMap;
@@ -250,7 +250,7 @@ void* _MeshShapeVC_Copy( void* variableCondition, void* dest, Bool deep, Name na
 	if( deep ) {
 		newMeshShapeVC->_mesh = (Mesh*)Stg_Class_Copy( self->_mesh, NULL, deep, nameExt, map );
 		
-		if( (newMeshShapeVC->_entryTbl = PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
+		if( (newMeshShapeVC->_entryTbl = (MeshShapeVC_Entry*)PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
 			newMeshShapeVC->_entryTbl = Memory_Alloc_Array( MeshShapeVC_Entry, newMeshShapeVC->_entryCount, "MeshShapeVC->_entryTbl");
 			memcpy( newMeshShapeVC->_entryTbl, self->_entryTbl, sizeof(MeshShapeVC_Entry) * newMeshShapeVC->_entryCount );
 			PtrMap_Append( map, newMeshShapeVC->_entryTbl, self->_entryTbl );

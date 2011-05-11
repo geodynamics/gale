@@ -68,7 +68,7 @@ void ComplexMathSuite_Teardown( ComplexMathSuiteData* data ) {
 }
 
 void ComplexMathSuite_TestComplexJournalPrintingMacro( ComplexMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if (data->rank == procToWatch) {
 		Cmplx		x = {1, 2};
@@ -96,7 +96,7 @@ void ComplexMathSuite_TestComplexJournalPrintingMacro( ComplexMathSuiteData* dat
 }
 
 void ComplexMathSuite_TestAddition( ComplexMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if (data->rank == procToWatch) {
 		Cmplx		x = {1, 2};
@@ -121,7 +121,7 @@ void ComplexMathSuite_TestAddition( ComplexMathSuiteData* data ) {
 }
 
 void ComplexMathSuite_TestSubtraction( ComplexMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if (data->rank == procToWatch) {
 		Cmplx		x = {1, 2};
@@ -146,7 +146,7 @@ void ComplexMathSuite_TestSubtraction( ComplexMathSuiteData* data ) {
 }
 
 void ComplexMathSuite_TestMultiplication( ComplexMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if (data->rank == procToWatch) {
 		Cmplx		x = {1, 2};
@@ -171,7 +171,7 @@ void ComplexMathSuite_TestMultiplication( ComplexMathSuiteData* data ) {
 }
 
 void ComplexMathSuite_TestDivision( ComplexMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if (data->rank == procToWatch) {
 		Cmplx		x = {1, 2};
@@ -196,7 +196,7 @@ void ComplexMathSuite_TestDivision( ComplexMathSuiteData* data ) {
 }
 
 void ComplexMathSuite_TestRealNumber( ComplexMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if (data->rank == procToWatch) {
 		Cmplx		y = {-1.5, 3};
@@ -234,7 +234,7 @@ void ComplexMathSuite_TestRealNumber( ComplexMathSuiteData* data ) {
 }
 
 void ComplexMathSuite_TestConjugate( ComplexMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if (data->rank == procToWatch) {
 		Cmplx		x = {1, 2};
@@ -257,7 +257,7 @@ void ComplexMathSuite_TestConjugate( ComplexMathSuiteData* data ) {
 }
 
 void ComplexMathSuite_TestPolar( ComplexMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if (data->rank == procToWatch) {
 		Cmplx		x = {1, 2};
@@ -300,7 +300,7 @@ void ComplexMathSuite_TestPolar( ComplexMathSuiteData* data ) {
 }
 
 void ComplexMathSuite_TestPower( ComplexMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if (data->rank == procToWatch) {
 		Cmplx		x = {1, 2};
@@ -337,7 +337,7 @@ void ComplexMathSuite_TestPower( ComplexMathSuiteData* data ) {
 }
 
 void ComplexMathSuite_TestBeautifulEquation( ComplexMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if (data->rank == procToWatch) {
 		Cmplx		i = {0, 1};
@@ -367,7 +367,7 @@ void ComplexMathSuite_TestBeautifulEquation( ComplexMathSuiteData* data ) {
 }
 
 void ComplexMathSuite_TestExponential( ComplexMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if (data->rank == procToWatch) {
 		Cmplx		x = {1, 2};
@@ -408,7 +408,7 @@ void ComplexMathSuite_TestExponential( ComplexMathSuiteData* data ) {
 }
 
 void ComplexMathSuite_TestCopyAndZero( ComplexMathSuiteData* data ) {
-	unsigned	procToWatch = data->nProcs >=2 ? 1 : 0;
+	int procToWatch = data->nProcs >=2 ? 1 : 0;
 	
 	if (data->rank == procToWatch) {
 		Cmplx		x = {1, 2};

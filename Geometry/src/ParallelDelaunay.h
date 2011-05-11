@@ -132,7 +132,7 @@
 	/** Stg_Class_Print() implementation */
 	void _ParallelDelaunay_Print( void* pd, Stream* stream );
 	
-	void *_ParallelDelaunay_Copy( void* pd, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void *_ParallelDelaunay_Copy( const void* pd, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void _ParallelDelaunay_AssignFromXML( void* pd, Stg_ComponentFactory* cf, void* data );
 	

@@ -140,7 +140,7 @@ void _SwarmVariable_Print( void* _swarmVariable, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void* _SwarmVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _SwarmVariable_Copy( const void* swarmVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	SwarmVariable*	self = (SwarmVariable*)swarmVariable;
 	SwarmVariable*	newSwarmVariable;
 	PtrMap*			map = ptrMap;
@@ -151,7 +151,7 @@ void* _SwarmVariable_Copy( void* swarmVariable, void* dest, Bool deep, Name name
 		ownMap = True;
 	}
 	
-	newSwarmVariable = _Stg_Component_Copy( self, dest, deep, nameExt, map );
+	newSwarmVariable = (SwarmVariable*)_Stg_Component_Copy( self, dest, deep, nameExt, map );
 	
 	newSwarmVariable->_valueAt						= self->_valueAt;
 	newSwarmVariable->_getMinGlobalMagnitude	= self->_getMinGlobalMagnitude;

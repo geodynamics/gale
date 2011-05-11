@@ -126,7 +126,7 @@ void _MeshVariable_Print( void* meshVariable, Stream* stream ) {
 void _MeshVariable_AssignFromXML( void* meshVariable, Stg_ComponentFactory* cf, void* data ) {
 	MeshVariable*		self = (MeshVariable*)meshVariable;
 	SizeT					dataOffsets[] = { 0 };
-	Variable_DataType	dataTypes[] = { 0 };		/* Init value later */
+	Variable_DataType	dataTypes[] = { (Variable_DataType)0 };		/* Init value later */
 	Index					dataTypeCounts[] = { 1 };
 	Dictionary*			componentDict = NULL;
 	Dictionary*			thisComponentDict = NULL;
@@ -161,7 +161,7 @@ void _MeshVariable_AssignFromXML( void* meshVariable, Stg_ComponentFactory* cf, 
 	MeshVariable_SetMesh( self, mesh );
 
 	/* Get the topological element we're intereseted in. */
-	self->topoDim = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"topologicalDim", 0  );
+	self->topoDim = (MeshTopology_Dim)Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"topologicalDim", 0  );
 			
 	/* Get Type of Variable */
 	dataTypeName = Dictionary_GetString( thisComponentDict, (Dictionary_Entry_Key)"DataType"  );
@@ -204,7 +204,7 @@ void _MeshVariable_AssignFromXML( void* meshVariable, Stg_ComponentFactory* cf, 
 	else
 		Journal_Firewall( False, error, "Variable '%s' cannot understand rank '%s'\n", self->name, rankName );
 
-	_Variable_Init( (Variable*)self, context, 1, dataOffsets, dataTypes, dataTypeCounts, names, 0, NULL, _MeshVariable_GetMeshArraySize, (void**)&self->arrayPtr, True, variableRegister );
+	_Variable_Init( (Variable*)self, context, 1, dataOffsets, dataTypes, dataTypeCounts, names, 0, NULL, _MeshVariable_GetMeshArraySize, (void**)&self->arrayPtr, True, (Variable_Register*)variableRegister );
 
 	/* Clean Up */
 	if (names)

@@ -86,36 +86,36 @@ Operator* _Operator_New(  OPERATOR_DEFARGS  )
 }
 
 
-void _Operator_Delete(void* operator) {
-	Operator* self = (Operator*) operator;
+void _Operator_Delete(void* op) {
+	Operator* self = (Operator*) op;
 	
 	/* Stg_Class_Delete parent class */
 	_Stg_Class_Delete( self );
 }
 
-void _Operator_Print(void* operator, Stream* stream) {
+void _Operator_Print(void* op, Stream* stream) {
   /*Operator* self = (Operator*) operator; */
 
 	abort();
 }
 
-void* _Operator_Copy( void* operator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Operator_Copy( const void* op, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
   /*Operator* self = (Operator*) operator; */
 	abort();
 }
 
 
 /* Carry Out Operators */
-void Operator_CarryOutUnaryOperation( void* operator, double* operand0, double* result ) {
-	Operator* self            = (Operator*) operator;
+void Operator_CarryOutUnaryOperation( void* op, double* operand0, double* result ) {
+	Operator* self            = (Operator*) op;
 
 	Operator_FirewallUnary( self );
 			
 	(*(Operator_CarryOutUnaryOperationFunction*) (self->_carryOut))( self, operand0, result );
 }
 
-void Operator_CarryOutBinaryOperation( void* operator, double* operand0, double* operand1, double* result ) {
-	Operator* self            = (Operator*) operator;
+void Operator_CarryOutBinaryOperation( void* op, double* operand0, double* operand1, double* result ) {
+	Operator* self            = (Operator*) op;
 
 	Operator_FirewallBinary( self );
 
@@ -128,8 +128,8 @@ void Operator_CarryOutBinaryOperation( void* operator, double* operand0, double*
 #define SQUARE_VECTOR3D( vector ) \
 	( vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2] )
 
-void Operator_VectorSquare( void* operator, double* operand0, double* result ) {
-	Operator* self            = (Operator*) operator;
+void Operator_VectorSquare( void* op, double* operand0, double* result ) {
+	Operator* self            = (Operator*) op;
 
 	Operator_FirewallUnary( self );
 	Operator_FirewallResultDofs( self, 1 );
@@ -147,8 +147,8 @@ void Operator_VectorSquare( void* operator, double* operand0, double* result ) {
 	}
 }
 
-void Operator_Magnitude( void* operator, double* operand0, double* result ) {
-	Operator* self            = (Operator*) operator;
+void Operator_Magnitude( void* op, double* operand0, double* result ) {
+	Operator* self            = (Operator*) op;
 	Index     val_I;
 
 	Operator_FirewallUnary( self );
@@ -176,16 +176,16 @@ void Operator_Magnitude( void* operator, double* operand0, double* result ) {
 	}
 }
 
-void Operator_TensorSymmetricPart( void* operator, double* operand0, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_TensorSymmetricPart( void* op, double* operand0, double* result ) {
+	Operator* self = (Operator*) op;
 
 	Operator_FirewallUnary( self );
 	
 	TensorArray_GetSymmetricPart( operand0, self->dim, result );
 }
 
-void Operator_SymmetricTensor_Invariant( void* operator, double* operand0, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_SymmetricTensor_Invariant( void* op, double* operand0, double* result ) {
+	Operator* self = (Operator*) op;
 
 	Operator_FirewallUnary( self );
 	Operator_FirewallResultDofs( self, 1 );
@@ -193,16 +193,16 @@ void Operator_SymmetricTensor_Invariant( void* operator, double* operand0, doubl
 	*result = SymmetricTensor_2ndInvariant( operand0, self->dim );
 }
 
-void Operator_TensorAntisymmetricPart( void* operator, double* operand0, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_TensorAntisymmetricPart( void* op, double* operand0, double* result ) {
+	Operator* self = (Operator*) op;
 
 	Operator_FirewallUnary( self );
 		
 	TensorArray_GetAntisymmetricPart( operand0, self->dim, result );
 }
 
-void Operator_SymmetricTensor_GetNegAverageTrace( void* operator, double* operand0, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_SymmetricTensor_GetNegAverageTrace( void* op, double* operand0, double* result ) {
+	Operator* self = (Operator*) op;
 	
 	Operator_FirewallUnary( self );
 	Operator_FirewallResultDofs( self, 1 );
@@ -212,8 +212,8 @@ void Operator_SymmetricTensor_GetNegAverageTrace( void* operator, double* operan
 	*result = -1.0 * (*result) / self->dim ;
 }
 
-void Operator_SymmetricTensor_MakeDeviatoric( void* operator, double* operand0, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_SymmetricTensor_MakeDeviatoric( void* op, double* operand0, double* result ) {
+	Operator* self = (Operator*) op;
 	double meanStress;
 	
 	Operator_FirewallUnary( self );
@@ -236,8 +236,8 @@ void Operator_SymmetricTensor_MakeDeviatoric( void* operator, double* operand0, 
 	}
 }
 
-void Operator_Tensor_GetNegAverageTrace( void* operator, double* operand0, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_Tensor_GetNegAverageTrace( void* op, double* operand0, double* result ) {
+	Operator* self = (Operator*) op;
 	
 	Operator_FirewallUnary( self );
 	Operator_FirewallResultDofs( self, 1 );
@@ -248,8 +248,8 @@ void Operator_Tensor_GetNegAverageTrace( void* operator, double* operand0, doubl
 }
 
 
-void Operator_Scalar_Negative( void* operator, double* operand0, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_Scalar_Negative( void* op, double* operand0, double* result ) {
+	Operator* self = (Operator*) op;
 	
 	Operator_FirewallUnary( self );
 	Operator_FirewallResultDofs( self, 1 );
@@ -258,8 +258,8 @@ void Operator_Scalar_Negative( void* operator, double* operand0, double* result 
 }
 	
 
-void Operator_TakeFirstComponent( void* operator, double* operand0, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_TakeFirstComponent( void* op, double* operand0, double* result ) {
+	Operator* self = (Operator*) op;
 
 	Operator_FirewallUnary( self );
 	Operator_FirewallResultDofs( self, 1 );
@@ -267,8 +267,8 @@ void Operator_TakeFirstComponent( void* operator, double* operand0, double* resu
 
 	*result = operand0[0];
 }
-void Operator_TakeSecondComponent( void* operator, double* operand0, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_TakeSecondComponent( void* op, double* operand0, double* result ) {
+	Operator* self = (Operator*) op;
 
 	Operator_FirewallUnary( self );
 	Operator_FirewallResultDofs( self, 1 );
@@ -276,8 +276,8 @@ void Operator_TakeSecondComponent( void* operator, double* operand0, double* res
 
 	*result = operand0[1];
 }
-void Operator_TakeThirdComponent( void* operator, double* operand0, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_TakeThirdComponent( void* op, double* operand0, double* result ) {
+	Operator* self = (Operator*) op;
 
 	Operator_FirewallUnary( self );
 	Operator_FirewallResultDofs( self, 1 );
@@ -285,8 +285,8 @@ void Operator_TakeThirdComponent( void* operator, double* operand0, double* resu
 
 	*result = operand0[2];
 }
-void Operator_TakeFourthComponent( void* operator, double* operand0, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_TakeFourthComponent( void* op, double* operand0, double* result ) {
+	Operator* self = (Operator*) op;
 	
 	Operator_FirewallUnary( self );
 	Operator_FirewallResultDofs( self, 1 );
@@ -294,8 +294,8 @@ void Operator_TakeFourthComponent( void* operator, double* operand0, double* res
 
 	*result = operand0[3];
 }
-void Operator_TakeFifthComponent( void* operator, double* operand0, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_TakeFifthComponent( void* op, double* operand0, double* result ) {
+	Operator* self = (Operator*) op;
 
 	Operator_FirewallUnary( self );
 	Operator_FirewallResultDofs( self, 1 );
@@ -305,8 +305,8 @@ void Operator_TakeFifthComponent( void* operator, double* operand0, double* resu
 }
 
 /** Binary Operator Functions */
-void Operator_Addition( void* operator, double* operand0, double* operand1, double* result){
-	Operator* self = (Operator*) operator;
+void Operator_Addition( void* op, double* operand0, double* operand1, double* result){
+	Operator* self = (Operator*) op;
 
 	Operator_FirewallBinary( self );
 	Operator_FirewallEqualOperandAndResultDofs( self );
@@ -332,8 +332,8 @@ void Operator_Addition( void* operator, double* operand0, double* operand1, doub
 	}
 }
 
-void Operator_Subtraction( void* operator, double* operand0, double* operand1, double* result){
-	Operator* self = (Operator*) operator;
+void Operator_Subtraction( void* op, double* operand0, double* operand1, double* result){
+	Operator* self = (Operator*) op;
 	
 	Operator_FirewallBinary( self );
 	Operator_FirewallEqualOperandAndResultDofs( self );
@@ -359,8 +359,8 @@ void Operator_Subtraction( void* operator, double* operand0, double* operand1, d
 	}
 }
 
-void Operator_ScalarMultiplication( void* operator, double* operand0, double* operand1, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_ScalarMultiplication( void* op, double* operand0, double* operand1, double* result ) {
+	Operator* self = (Operator*) op;
 	
 	Operator_FirewallBinary( self );
 	Operator_FirewallResultDofs( self, 1 );
@@ -370,8 +370,8 @@ void Operator_ScalarMultiplication( void* operator, double* operand0, double* op
 }
 
 
-void Operator_ScalarDivision( void* operator, double* operand0, double* operand1, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_ScalarDivision( void* op, double* operand0, double* operand1, double* result ) {
+	Operator* self = (Operator*) op;
 
 	Operator_FirewallBinary( self );
 	Operator_FirewallResultDofs( self, 1 );
@@ -380,8 +380,8 @@ void Operator_ScalarDivision( void* operator, double* operand0, double* operand1
 	*result = (*operand0) / (*operand1);
 }
 
-void Operator_VectorScale( void* operator, double* operand0, double* operand1, double* result){
-	Operator* self = (Operator*) operator;
+void Operator_VectorScale( void* op, double* operand0, double* operand1, double* result){
+	Operator* self = (Operator*) op;
 	
 	Operator_FirewallBinary( self );
 
@@ -400,8 +400,8 @@ void Operator_VectorScale( void* operator, double* operand0, double* operand1, d
 	}
 }
 
-void Operator_Rounding( void* operator, double* operand0, double* result ) {
-	Operator*     self = (Operator*) operator;
+void Operator_Rounding( void* op, double* operand0, double* result ) {
+	Operator*     self = (Operator*) op;
 	/* TODO: read this in from somewhere instead of just hard-coding it.... */
 	unsigned int  nSigFigsToRoundTo = 6;
 	Index         val_I;
@@ -414,8 +414,8 @@ void Operator_Rounding( void* operator, double* operand0, double* result ) {
 }
 
 
-void Operator_HorizontalDivergence( void* operator, double* velocityGradient, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_HorizontalDivergence( void* op, double* velocityGradient, double* result ) {
+	Operator* self = (Operator*) op;
 
 	Operator_FirewallUnary( self );
 	Operator_FirewallResultDofs( self, 1 );
@@ -423,8 +423,8 @@ void Operator_HorizontalDivergence( void* operator, double* velocityGradient, do
 	*result = velocityGradient[0] + velocityGradient[8];
 }
 
-void Operator_VerticalVorticity( void* operator, double* velocityGradient, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_VerticalVorticity( void* op, double* velocityGradient, double* result ) {
+	Operator* self = (Operator*) op;
 
 	Operator_FirewallUnary( self );
 	Operator_FirewallResultDofs( self, 1 );	
@@ -432,16 +432,16 @@ void Operator_VerticalVorticity( void* operator, double* velocityGradient, doubl
 	*result = velocityGradient[2] - velocityGradient[6];
 }
 
-void Operator_Divergence( void* operator, double* velocityGradient, double* result ) {
-	Operator* self = (Operator*) operator;
+void Operator_Divergence( void* op, double* velocityGradient, double* result ) {
+	Operator* self = (Operator*) op;
 	
 	Operator_FirewallUnary( self );
 
 	TensorArray_GetTrace( velocityGradient, self->dim, result );
 }
 
-void Operator_SymmetricTensorInnerProduct( void* operator, double* operand0, double* operand1, double* result ) {
-	Operator* self = (Operator*)operator;
+void Operator_SymmetricTensorInnerProduct( void* op, double* operand0, double* operand1, double* result ) {
+	Operator* self = (Operator*)op;
 	
 	Operator_FirewallBinary( self );
 
@@ -456,8 +456,8 @@ void Operator_SymmetricTensorInnerProduct( void* operator, double* operand0, dou
 	}
 }
 
-void Operator_TensorInvariant( void* operator, double* operand0, double* result ) {
-	Operator* self = (Operator*)operator;
+void Operator_TensorInvariant( void* op, double* operand0, double* result ) {
+	Operator* self = (Operator*)op;
 
 	Operator_FirewallUnary( self );
 
@@ -465,8 +465,8 @@ void Operator_TensorInvariant( void* operator, double* operand0, double* result 
 	*result = TensorArray_2ndInvariant( operand0, self->dim );
 }
 
-void Operator_ScalarByVectorMultiplication( void* operator, double* operand0, double* operand1, double* result ) {
-	Operator*     self = (Operator*) operator;
+void Operator_ScalarByVectorMultiplication( void* op, double* operand0, double* operand1, double* result ) {
+	Operator*     self = (Operator*) op;
 	Index         val_I;
 
 	Operator_FirewallUnary( self );
@@ -489,122 +489,122 @@ Operator* Operator_NewFromName(
 	if ( ! strcasecmp( name, "VectorSquare" ) ) {
 		resultDofs = 1;
 		numberOfOperands = 1;
-		_carryOut = Operator_VectorSquare;
+		_carryOut = (Func_Ptr)Operator_VectorSquare;
 	}
 	else if ( ! strcasecmp( name, "Magnitude" ) ) {
 		resultDofs = 1;
 		numberOfOperands = 1;
-		_carryOut = Operator_Magnitude;
+		_carryOut = (Func_Ptr)Operator_Magnitude;
 	}
 	else if ( ! strcasecmp( name, "TensorSymmetricPart" ) ) {
 		resultDofs = StGermain_nSymmetricTensorVectorComponents( dim );
 		numberOfOperands = 1;
-		_carryOut = Operator_TensorSymmetricPart;
+		_carryOut = (Func_Ptr)Operator_TensorSymmetricPart;
 	}
 	else if ( ! strcasecmp( name, "TensorAntisymmetricPart" ) ) { 
 		resultDofs = dim * dim;
 		numberOfOperands = 1;
-		_carryOut = Operator_TensorAntisymmetricPart;
+		_carryOut = (Func_Ptr)Operator_TensorAntisymmetricPart;
 	}
 	else if ( ! strcasecmp( name, "SymmetricTensor_Invariant" ) ){ 
 		resultDofs = 1;
 		numberOfOperands = 1;
-		_carryOut = Operator_SymmetricTensor_Invariant;
+		_carryOut = (Func_Ptr)Operator_SymmetricTensor_Invariant;
 	}
 	else if ( ! strcasecmp( name, "SymmetricTensor_NegAverageTrace" ) ){ 
 		resultDofs = 1;
 		numberOfOperands = 1;
-		_carryOut = Operator_SymmetricTensor_GetNegAverageTrace;
+		_carryOut = (Func_Ptr)Operator_SymmetricTensor_GetNegAverageTrace;
 	}
 	else if ( ! strcasecmp( name, "Scalar_Negative" ) ){ 
 		resultDofs = 1;
 		numberOfOperands = 1;
-		_carryOut = Operator_Scalar_Negative;
+		_carryOut = (Func_Ptr)Operator_Scalar_Negative;
 	}
 	else if ( ! strcasecmp( name, "Tensor_NegAverageTrace" ) ){ 
 		resultDofs = 1;
 		numberOfOperands = 1;
-		_carryOut = Operator_Tensor_GetNegAverageTrace;
+		_carryOut = (Func_Ptr)Operator_Tensor_GetNegAverageTrace;
 	}
 	else if ( ! strcasecmp( name, "SymmetricTensor_MakeDeviatoric" ) ){ 
 		resultDofs = operandDofs;
 		numberOfOperands = 1;
-		_carryOut = Operator_SymmetricTensor_MakeDeviatoric;
+		_carryOut = (Func_Ptr)Operator_SymmetricTensor_MakeDeviatoric;
 	}
 	else if ( ! strcasecmp( name, "TakeFirstComponent" ) ) {
 		resultDofs = 1;
 		numberOfOperands = 1;
-		_carryOut = Operator_TakeFirstComponent;
+		_carryOut = (Func_Ptr)Operator_TakeFirstComponent;
 	}
 	else if ( ! strcasecmp( name, "TakeSecondComponent" ) ){ 
 		resultDofs = 1;
 		numberOfOperands = 1;
-		_carryOut = Operator_TakeSecondComponent;
+		_carryOut = (Func_Ptr)Operator_TakeSecondComponent;
 	}
 	else if ( ! strcasecmp( name, "TakeThirdComponent" ) ){ 
 		resultDofs = 1;
 		numberOfOperands = 1;
-		_carryOut = Operator_TakeThirdComponent;
+		_carryOut = (Func_Ptr)Operator_TakeThirdComponent;
 	}
 	else if ( ! strcasecmp( name, "Addition" ) ) {
 		resultDofs = operandDofs;
 		numberOfOperands = 2;
-		_carryOut = Operator_Addition;
+		_carryOut = (Func_Ptr)Operator_Addition;
 	}
 	else if ( ! strcasecmp( name, "Subtraction" ) ){ 
 		resultDofs = operandDofs;
 		numberOfOperands = 2;
-		_carryOut = Operator_Subtraction;
+		_carryOut = (Func_Ptr)Operator_Subtraction;
 	}
 	else if ( ! strcasecmp( name, "ScalarMultiplication" ) ){ 
 		resultDofs = 1;
 		numberOfOperands = 2;
-		_carryOut = Operator_ScalarMultiplication;
+		_carryOut = (Func_Ptr)Operator_ScalarMultiplication;
 	}
 	else if ( ! strcasecmp( name, "ScalarDivision" ) ){ 
 		resultDofs = 1;
 		numberOfOperands = 2;
-		_carryOut = Operator_ScalarDivision;
+		_carryOut = (Func_Ptr)Operator_ScalarDivision;
 	}
 	else if ( ! strcasecmp( name, "VectorScale" ) ){ 
 		resultDofs = dim;
 		numberOfOperands = 2;
-		_carryOut = Operator_VectorScale;
+		_carryOut = (Func_Ptr)Operator_VectorScale;
 	} 
 	else if ( ! strcasecmp( name, "Rounding" ) ){ 
 		resultDofs = operandDofs;
 		numberOfOperands = 1;
-		_carryOut = Operator_Rounding;
+		_carryOut = (Func_Ptr)Operator_Rounding;
 	} 
 	else if ( ! strcasecmp( name, "TensorInnerProduct" ) ){ 
 		resultDofs = 1;
 		numberOfOperands = 2;
-		_carryOut = Operator_SymmetricTensorInnerProduct;
+		_carryOut = (Func_Ptr)Operator_SymmetricTensorInnerProduct;
 	}
 	else if ( ! strcasecmp( name, "TensorInvariant" ) ){ 
 		resultDofs = 1;
 		numberOfOperands = 1;
-		_carryOut = Operator_TensorInvariant;
+		_carryOut = (Func_Ptr)Operator_TensorInvariant;
 	}
 	else if ( ! strcasecmp( name, "HorizontalDivergence" ) ){ 
 		resultDofs = 1;
 		numberOfOperands = 1;
-		_carryOut = Operator_HorizontalDivergence;
+		_carryOut = (Func_Ptr)Operator_HorizontalDivergence;
 	}
 	else if ( ! strcasecmp( name, "VerticalVorticity" ) ){ 
 		resultDofs = 1;
 		numberOfOperands = 1;
-		_carryOut = Operator_VerticalVorticity;
+		_carryOut = (Func_Ptr)Operator_VerticalVorticity;
 	}
 	else if ( ! strcasecmp( name, "Divergence" ) ){ 
 		resultDofs = 1;
 		numberOfOperands = 1;
-		_carryOut = Operator_Divergence;
+		_carryOut = (Func_Ptr)Operator_Divergence;
 	}
 	else if ( ! strcasecmp( name, "ScalarByVectorMultiplication" ) ){
 		resultDofs = dim;
 		numberOfOperands = 2;
-		_carryOut = Operator_ScalarByVectorMultiplication;
+		_carryOut = (Func_Ptr)Operator_ScalarByVectorMultiplication;
 	}
 	else {
 		resultDofs = 0;

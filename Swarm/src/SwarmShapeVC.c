@@ -150,7 +150,7 @@ void _SwarmShapeVC_Destroy( void* variableCondition, void* data ) {
 		Memory_Free(self->_entryTbl);
 
 	if ( self->shapeName )
-		Memory_Free( self->shapeName );
+          Memory_Free( self->shapeName );
 	
 	/* Stg_Class_Delete parent */
 	_VariableCondition_Destroy( self, data );
@@ -234,7 +234,7 @@ void _SwarmShapeVC_Print(void* variableCondition, Stream* stream) {
 }
 
 
-void* _SwarmShapeVC_Copy( void* variableCondition, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _SwarmShapeVC_Copy( const void* variableCondition, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	SwarmShapeVC*   self           = (SwarmShapeVC*)variableCondition;
 	SwarmShapeVC*   newSwarmShapeVC;
 	PtrMap*         map            = ptrMap;
@@ -254,7 +254,7 @@ void* _SwarmShapeVC_Copy( void* variableCondition, void* dest, Bool deep, Name n
 	if( deep ) {
 		newSwarmShapeVC->_swarm = (Swarm*)Stg_Class_Copy( self->_swarm, NULL, deep, nameExt, map );
 		
-		if( (newSwarmShapeVC->_entryTbl = PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
+		if( (newSwarmShapeVC->_entryTbl = (SwarmShapeVC_Entry*)PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
 			newSwarmShapeVC->_entryTbl = Memory_Alloc_Array( SwarmShapeVC_Entry, newSwarmShapeVC->_entryCount, "SwarmShapeVC->_entryTbl");
 			memcpy( newSwarmShapeVC->_entryTbl, self->_entryTbl, sizeof(SwarmShapeVC_Entry) * newSwarmShapeVC->_entryCount );
 			PtrMap_Append( map, newSwarmShapeVC->_entryTbl, self->_entryTbl );
@@ -287,9 +287,9 @@ void _SwarmShapeVC_AssignFromXML( void* variableCondition, Stg_ComponentFactory*
 
 	variable_Register = context->variable_Register; 
 	assert( variable_Register  );
-	self->variable_Register = variable_Register;
+	self->variable_Register = (Variable_Register*)variable_Register;
 
-	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, NULL );
+	_VariableCondition_Init( self, context, (Variable_Register*)variable_Register, (ConditionFunction_Register*)conFunc_Register, NULL );
 	
 	self->dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
 }

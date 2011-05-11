@@ -264,7 +264,7 @@ void LinearSpaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
   Mesh*				mesh = (Mesh*)_mesh;
   const Sync*			sync;
   double			x;
-  Index   			n_i;
+  int   			n_i;
 
   /* Build base mesh, which is assumed to be cartesian. */
   MeshGenerator_Generate( self->generator, mesh, data );

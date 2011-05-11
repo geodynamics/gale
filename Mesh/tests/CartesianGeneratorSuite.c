@@ -90,7 +90,8 @@ void CartesianGeneratorSuite_TestElementVertexInc( CartesianGeneratorSuiteData* 
 	unsigned	gNode0, gNode1, gNode2;
 	int		checkNodes;
 
-	for( el_i = 0; el_i < Mesh_GetLocalSize( data->mesh, dim ); el_i++ ) {
+	for(el_i=0;el_i<Mesh_GetLocalSize(data->mesh,(MeshTopology_Dim)dim);
+            el_i++ ) {
 		gEl = Sync_DomainToGlobal( elSync, el_i );
 		Grid_Lift( elGrid, gEl, dimInds );	
 
@@ -194,7 +195,7 @@ void CartesianGeneratorSuite_TestEdgeVertexInc( CartesianGeneratorSuiteData* dat
 	Grid_SetNumDims( edgeGrid_2, dim );
 	Grid_SetSizes( edgeGrid_2, sizes );
 
-	for( edge_i = 0; edge_i < Sync_GetNumDomains( edgeSync ); edge_i++ ) {
+	for(edge_i=0;edge_i<(unsigned)Sync_GetNumDomains(edgeSync);edge_i++) {
 		gEdge = Sync_DomainToGlobal( edgeSync, edge_i );
 
 		MeshTopology_GetIncidence( (IGraph*)data->mesh->topo, MT_EDGE, edge_i, MT_VERTEX, inc );
@@ -292,7 +293,9 @@ void CartesianGeneratorSuite_TestFaceVertexInc( CartesianGeneratorSuiteData* dat
 	Grid_SetNumDims( faceGrid_2, dim );
 	Grid_SetSizes( faceGrid_2, sizes );
 
-	for( face_i = 0; face_i < ((IGraph*)data->mesh->topo)->remotes[MT_FACE]->nDomains; face_i++ ) {
+	for(face_i = 0;
+            face_i<(unsigned)(((IGraph*)data->mesh->topo)->remotes[MT_FACE]->nDomains);
+            face_i++ ) {
 		gFace = Sync_DomainToGlobal( faceSync, face_i );
 
 		MeshTopology_GetIncidence( (IGraph*)data->mesh->topo, MT_FACE, face_i, MT_VERTEX, inc );

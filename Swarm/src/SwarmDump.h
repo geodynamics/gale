@@ -88,7 +88,7 @@
 	
 	void _SwarmDump_Delete( void* swarmDump ) ;
 	void _SwarmDump_Print( void* _swarmDump, Stream* stream ) ;
-	void* _SwarmDump_Copy( void* swarmDump, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _SwarmDump_Copy( const void* swarmDump, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	#define SwarmDump_Copy( self ) \
 		(SwarmDump*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
@@ -102,7 +102,7 @@
 	/** Virtual Function Wrappers */
 	void SwarmDump_Execute( void* swarmDump, void* context ) ;
 #ifdef WRITE_HDF5
-	void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, const char* filename );
+	void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, Name filename );
 #endif
 
 #endif /* __StgDomain_Swarm_SwarmDump_h__ */

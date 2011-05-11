@@ -95,7 +95,7 @@
 		(BelowCosinePlane*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define BelowCosinePlane_DeepCopy( self ) \
 		(BelowCosinePlane*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _BelowCosinePlane_Copy( void* belowPlane, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _BelowCosinePlane_Copy( const void* belowPlane, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _BelowCosinePlane_DefaultNew( Name name ) ;
 	void _BelowCosinePlane_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

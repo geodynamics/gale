@@ -336,7 +336,7 @@ void _AllElementsVC_Print( void* allElementsVC, Stream* stream ) {
 }
 
 
-void* _AllElementsVC_Copy( void* allElementsVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+void* _AllElementsVC_Copy( const void* allElementsVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
 	AllElementsVC*		self = (AllElementsVC*)allElementsVC;
 	AllElementsVC*		newAllElementsVC;
 	PtrMap*			map = ptrMap;
@@ -355,7 +355,7 @@ void* _AllElementsVC_Copy( void* allElementsVC, void* dest, Bool deep, Name name
 	if( deep ) {
 		newAllElementsVC->mesh = (Mesh*)Stg_Class_Copy( self->mesh, NULL, deep, nameExt, map );
 		
-		if( (newAllElementsVC->_entryTbl = PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
+		if( (newAllElementsVC->_entryTbl = (AllElementsVC_Entry*)PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
 			newAllElementsVC->_entryTbl = Memory_Alloc_Array( AllElementsVC_Entry, newAllElementsVC->_entryCount, "AllElementsVC->_entryTbl");
 			memcpy( newAllElementsVC->_entryTbl, self->_entryTbl, sizeof(AllElementsVC_Entry) * newAllElementsVC->_entryCount );
 			PtrMap_Append( map, newAllElementsVC->_entryTbl, self->_entryTbl );

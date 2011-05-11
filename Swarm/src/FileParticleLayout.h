@@ -50,7 +50,7 @@
 	#define __FileParticleLayout \
 		__GlobalParticleLayout \
 		\
-		Name                                             filename;    \
+		char*                                             filename;    \
 		Stream*                                          errorStream; \
 		hid_t** fileData; \
 		hid_t** fileSpace; \
@@ -109,7 +109,7 @@
 		(FileParticleLayout*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define FileParticleLayout_DeepCopy( self ) \
 		(FileParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _FileParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _FileParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Stuff */
 	void* _FileParticleLayout_DefaultNew( Name name ) ;

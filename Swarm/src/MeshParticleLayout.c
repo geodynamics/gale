@@ -125,7 +125,7 @@ void _MeshParticleLayout_Print( void* meshParticleLayout, Stream* stream ) {
 }
 
 
-void* _MeshParticleLayout_Copy( void* meshParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _MeshParticleLayout_Copy( const void* meshParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	MeshParticleLayout*		self = (MeshParticleLayout*)meshParticleLayout;
 	MeshParticleLayout*		newMeshParticleLayout;
 	
@@ -232,10 +232,10 @@ void _MeshParticleLayout_InitialiseParticlesOfCell( void* meshParticleLayout, vo
 	assert( nDims == 2 || nDims == 3 );
 
 	inc = IArray_New();
-	Mesh_GetIncidence( self->mesh, nDims, cell_I, MT_VERTEX, 
+	Mesh_GetIncidence( self->mesh, (MeshTopology_Dim)nDims, cell_I, MT_VERTEX, 
 			   inc );
 	nNodes = IArray_GetSize( inc );
-	incNodes = IArray_GetPtr( inc );
+	incNodes = (unsigned*)IArray_GetPtr( inc );
 
 	for ( cParticle_I = 0; cParticle_I < particlesThisCell; cParticle_I++ ) {	
 		particle = (GlobalParticle*)Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );

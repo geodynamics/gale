@@ -176,7 +176,7 @@ void _SingleCellLayout_Print( void* singleCellLayout, Stream* stream ) {
 }
 
 
-void* _SingleCellLayout_Copy( void* singleCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _SingleCellLayout_Copy( const void* singleCellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	SingleCellLayout*	self = (SingleCellLayout*)singleCellLayout;
 	SingleCellLayout*	newSingleCellLayout;
 	PtrMap*			map = ptrMap;
@@ -187,7 +187,7 @@ void* _SingleCellLayout_Copy( void* singleCellLayout, void* dest, Bool deep, Nam
 		ownMap = True;
 	}
 	
-	newSingleCellLayout = _CellLayout_Copy( self, dest, deep, nameExt, ptrMap );
+	newSingleCellLayout = (SingleCellLayout*)_CellLayout_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	newSingleCellLayout->dimExists[0] = self->dimExists[0];
 	newSingleCellLayout->dimExists[1] = self->dimExists[1];
@@ -201,7 +201,7 @@ void* _SingleCellLayout_Copy( void* singleCellLayout, void* dest, Bool deep, Nam
 	newSingleCellLayout->pointCount = self->pointCount;
 	
 	if( deep ) {
-		if( (newSingleCellLayout->cellPointCoords = PtrMap_Find( map, self->cellPointCoords )) == NULL && self->cellPointCoords ) {
+          if( (newSingleCellLayout->cellPointCoords = (double**)PtrMap_Find( map, self->cellPointCoords )) == NULL && self->cellPointCoords ) {
 			unsigned	p_i;
 
 			newSingleCellLayout->cellPointCoords = Memory_Alloc_2DArray( double, newSingleCellLayout->pointCount, 3, (Name)"SingleCellLayout->cellPoints" );
@@ -235,7 +235,7 @@ void _SingleCellLayout_AssignFromXML( void* singleCellLayout, Stg_ComponentFacto
 
 	dimExists[ I_AXIS ] = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"dimExistsI", True  );
 	dimExists[ J_AXIS ] = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"dimExistsJ", True  );
-	dimExists[ K_AXIS ] = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"dimExistsK", (dim == 3)  );
+	dimExists[ K_AXIS ] = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"dimExistsK", (dim == 3) ? True : False  );
 
 	min[ I_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minX", -1.0  );
 	min[ J_AXIS ] = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"minY", -1.0  );
@@ -303,7 +303,7 @@ void _SingleCellLayout_InitialiseGlobalCellPointPositions( SingleCellLayout* sel
 	Cell_PointIndex	point_I = 0;
 	Coord		tempCoord;
 	double*		currPointCoord = NULL;
-	Index		i, j, k;	/* loop iterators for each dimension */
+	int		i, j, k;	/* loop iterators for each dimension */
 	
 	tempCoord[0] = self->min[I_AXIS];
 	tempCoord[1] = self->min[J_AXIS];

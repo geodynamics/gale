@@ -42,7 +42,7 @@
 
 	extern const Type InnerWallVC_Type;
 	
-	extern const char* InnerWallVC_InnerWallEnumToStr[InnerWallVC_InnerWall_Size];
+	extern Name InnerWallVC_InnerWallEnumToStr[InnerWallVC_InnerWall_Size];
 	
 	#define __InnerWallVC_Entry \
 		Name				varName; \
@@ -119,7 +119,7 @@
 	#define InnerWallVC_Copy( self ) \
 		(VariableCondition*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	
-	void* _InnerWallVC_Copy( void* innerWallVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _InnerWallVC_Copy( const void* innerWallVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 	
 	void _InnerWallVC_Build(  void* innerWallVC, void* data );
 	

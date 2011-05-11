@@ -63,7 +63,7 @@ GaussBorderParticleLayout* GaussBorderParticleLayout_New(
    Dimension_Index dim, 
    Particle_InCellIndex* particlesPerDim ) {
 
-	GaussBorderParticleLayout* self = _GaussBorderParticleLayout_DefaultNew( name );
+  GaussBorderParticleLayout* self = (GaussBorderParticleLayout*)_GaussBorderParticleLayout_DefaultNew( name );
 
    _ParticleLayout_Init( self, context, coordSystem, weightsInitialisedAtStartup );
    _PerCellParticleLayout_Init( self );
@@ -124,7 +124,7 @@ void _GaussBorderParticleLayout_Print( void* gaussBorderParticleLayout, Stream* 
 }
 
 
-void* _GaussBorderParticleLayout_Copy( void* gaussBorderParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _GaussBorderParticleLayout_Copy( const void* gaussBorderParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	GaussBorderParticleLayout*	self = (GaussBorderParticleLayout*)gaussBorderParticleLayout;
 	GaussBorderParticleLayout*	newGaussBorderParticleLayout;
 	

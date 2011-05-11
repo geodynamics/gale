@@ -95,7 +95,7 @@
 		(PolygonShape*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define PolygonShape_DeepCopy( self ) \
 		(PolygonShape*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _PolygonShape_Copy( void* polygon, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _PolygonShape_Copy( const void* polygon, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _PolygonShape_DefaultNew( Name name ) ;
 	void _PolygonShape_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

@@ -122,7 +122,7 @@ void* _PlaneParticleLayout_DefaultNew( Name name ) {
 	Particle_Index                                             totalInitialParticles = 0;
 	double                                            averageInitialParticlesPerCell = 0.0;
 	Dimension_Index                                                              dim = 0;
-	Axis                                                                   planeAxis = 0;
+	Axis                                                                   planeAxis = (Axis)0;
 	double                                                                planeCoord = 0;
 
    return (void*)_PlaneParticleLayout_New(  PLANEPARTICLELAYOUT_PASSARGS  );
@@ -160,11 +160,11 @@ void _PlaneParticleLayout_Print( void* particleLayout, Stream* stream ) {
 }
 
 
-void* _PlaneParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _PlaneParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	PlaneParticleLayout*		self                    = (PlaneParticleLayout*)particleLayout;
 	PlaneParticleLayout*		newPlaneParticleLayout;
 	
-	newPlaneParticleLayout = _SpaceFillerParticleLayout_Copy( self, dest, deep, nameExt, ptrMap );
+	newPlaneParticleLayout = (PlaneParticleLayout*)_SpaceFillerParticleLayout_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	newPlaneParticleLayout->planeAxis  = self->planeAxis;
 	newPlaneParticleLayout->planeCoord = self->planeCoord;
@@ -193,7 +193,7 @@ void _PlaneParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFact
 	Journal_Firewall( planeAxisString[0] >= 'X' && planeAxisString[0] <= 'Z', Journal_MyStream( Error_Type, self ),
 		"Error for %s '%s': Incorrect axis '%c' given for param 'planeAxis'.\n", self->type, self->name,planeAxisString[0]);
 
-	planeAxis = planeAxisString[0] - 'X';
+	planeAxis = (Axis)(planeAxisString[0] - 'X');
 
 	_PlaneParticleLayout_Init( self, planeAxis, planeCoord );
 	

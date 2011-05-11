@@ -54,8 +54,8 @@
 		NamedObject_Register*	integrandRegister; \
 		unsigned int				order; \
 		Bool							simultaneous; \
-		Name							_setupEPName; \
-		Name							_finishEPName; \
+		char*							_setupEPName; \
+		char*							_finishEPName; \
 		EntryPoint*					setupEP; \
 		Stg_ObjectList*			setupData; \
 		EntryPoint*					finishEP; \
@@ -99,7 +99,7 @@
 		(TimeIntegrator*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define TimeIntegrator_DeepCopy( self ) \
 		(TimeIntegrator*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _TimeIntegrator_Copy( void* timeIntegrator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _TimeIntegrator_Copy( const void* timeIntegrator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Virtual Functions */
 	void* _TimeIntegrator_DefaultNew( Name name ) ;
@@ -126,19 +126,19 @@
 		( (TimeIntegrand*) NamedObject_Register_GetByIndex( ((TimeIntegrator*)self)->integrandRegister, index ) )
 
 	void TimeIntegrator_Setup( void* timeIntegrator ) ;
-	void TimeIntegrator_AppendSetupEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, char* addedBy, void* data ) ;
-	void TimeIntegrator_PrependSetupEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, char* addedBy, void* data ) ;
+	void TimeIntegrator_AppendSetupEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, Name addedBy, void* data ) ;
+	void TimeIntegrator_PrependSetupEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, Name addedBy, void* data ) ;
 
 	void TimeIntegrator_Finalise( void* timeIntegrator ) ;
-	void TimeIntegrator_AppendFinishEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, char* addedBy, void* data ) ;
-	void TimeIntegrator_PrependFinishEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, char* addedBy, void* data ) ;
+	void TimeIntegrator_AppendFinishEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, Name addedBy, void* data ) ;
+	void TimeIntegrator_PrependFinishEP( void* timeIntegrator, Name name, Func_Ptr funcPtr, Name addedBy, void* data ) ;
 
 	void TimeIntegrator_InsertBeforeFinishEP( 
 			void* timeIntegrator, 
 			Name hookToInsertBefore,
 			Name name, 
 			Func_Ptr funcPtr, 
-			char* addedBy, 
+			Name addedBy, 
 			void* data );
 
 	void TimeIntegrator_InsertAfterFinishEP( 
@@ -146,7 +146,7 @@
 			Name hookToInsertAfter, 
 			Name name, 
 			Func_Ptr funcPtr, 
-			char* addedBy, 
+			Name addedBy, 
 			void* data );
 	
 	void TimeIntegrator_SetTime( void* timeIntegrator, double time ) ;

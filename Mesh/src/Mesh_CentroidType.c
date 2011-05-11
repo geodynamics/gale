@@ -55,7 +55,7 @@ const Type Mesh_CentroidType_Type = "Mesh_CentroidType";
 ** Constructors
 */
 
-Mesh_CentroidType* Mesh_CentroidType_New( Name name ) {
+Mesh_CentroidType* Mesh_CentroidType_New() {
 	/* Variables set in this function */
 	SizeT                                                    _sizeOfSelf = sizeof(Mesh_CentroidType);
 	Type                                                            type = Mesh_CentroidType_Type;
@@ -150,7 +150,9 @@ void Mesh_CentroidType_GetCentroid( void* centroidType, unsigned element, double
 
 	assert( self && Stg_CheckType( self, Mesh_CentroidType ) );
 
-	Mesh_GetIncidence( self->mesh, Mesh_GetDimSize( self->mesh ), element, MT_VERTEX, 
+	Mesh_GetIncidence( self->mesh,
+                           Mesh_GetDimSize( self->mesh ),
+                           element, MT_VERTEX, 
 			   self->incArray );
 	assert( IArray_GetSize( self->incArray ) == 1 );
 	inc = IArray_GetPtr( self->incArray );
@@ -168,7 +170,7 @@ void Mesh_CentroidType_SetElementMesh( void* centroidType, void* mesh ) {
 	assert( self && Stg_CheckType( self, Mesh_CentroidType ) );
 	assert( !mesh || Stg_CheckType( mesh, Mesh ) );
 
-	self->elMesh = mesh;
+	self->elMesh = (Mesh*)mesh;
 }
 
 

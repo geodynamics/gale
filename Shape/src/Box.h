@@ -87,7 +87,7 @@
 		(Box*) Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define Box_DeepCopy( self ) \
 		(Box*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _Box_Copy( void* box, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _Box_Copy( const void* box, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void* _Box_DefaultNew( Name name ) ;
 	void _Box_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data ) ;

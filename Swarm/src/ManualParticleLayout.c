@@ -118,7 +118,7 @@ void _ManualParticleLayout_Print( void* manualParticleLayout, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void* _ManualParticleLayout_Copy( void* manualParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ManualParticleLayout_Copy( const void* manualParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	ManualParticleLayout*		self                    = (ManualParticleLayout*)manualParticleLayout;
 	ManualParticleLayout*		newManualParticleLayout;
 	

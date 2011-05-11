@@ -375,7 +375,7 @@ void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactor
          H5Aclose(attrib_id);
    
          if(self->nDims == 2){
-            if( !( (size[0] == res[0]) && (size[1] == res[1]) )){
+           if(!((size[0]==(unsigned)(res[0])) && (size[1]==(unsigned)(res[1])))){
                if (context->interpolateRestart)
                   self->readFromFile = False;
                else
@@ -392,7 +392,8 @@ void _CartesianGenerator_AssignFromXML( void* meshGenerator, Stg_ComponentFactor
                      (unsigned int) size[0], (unsigned int) size[1]);
             }
          } else {
-            if( !( (size[0] == res[0]) && (size[1] == res[1]) && (size[2] == res[2]) )){
+           if(!((size[0]==(unsigned)(res[0])) && (size[1]==(unsigned)(res[1]))
+                && (size[2]==(unsigned)(res[2])))){
                if (context->interpolateRestart)
                   self->readFromFile = False;
                else
@@ -540,15 +541,15 @@ void CartesianGenerator_Generate( void* meshGenerator, void* _mesh, void* data )
 
 		Journal_Printf( stream, "Target mesh: '%s'\n", mesh->name );
 		Journal_Printf( stream, "Global element size: %d", self->elGrid->sizes[0] );
-		for( d_i = 1; d_i < self->elGrid->nDims; d_i++ )
+		for( d_i = 1; d_i < (unsigned)(self->elGrid->nDims); d_i++ )
 			Journal_Printf( stream, "x%d", self->elGrid->sizes[d_i] );
 		Journal_Printf( stream, "\n" );
 		Journal_Printf( stream, "Local offset of rank %d: %d", stream->_printingRank, self->origin[0] );
-		for( d_i = 1; d_i < self->elGrid->nDims; d_i++ )
+		for( d_i = 1; d_i < (unsigned)(self->elGrid->nDims); d_i++ )
 			Journal_Printf( stream, "x%d", self->origin[d_i] );
 		Journal_Printf( stream, "\n" );
 		Journal_Printf( stream, "Local range of rank %d: %d", stream->_printingRank, self->range[0] );
-		for( d_i = 1; d_i < self->elGrid->nDims; d_i++ )
+		for( d_i = 1; d_i < (unsigned)(self->elGrid->nDims); d_i++ )
 			Journal_Printf( stream, "x%d", self->range[d_i] );
 		Journal_Printf( stream, "\n" );
 
@@ -564,7 +565,7 @@ void CartesianGenerator_Generate( void* meshGenerator, void* _mesh, void* data )
 		CartesianGenerator_GenElementTypes( self, mesh );
 	}
 	else {
-		MeshTopology_SetNumDims( mesh->topo, 0 );
+          MeshTopology_SetNumDims( mesh->topo, 0 );
 	}
 
 	/* Add extensions to the mesh and fill with cartesian information. */
@@ -645,7 +646,7 @@ void _CartesianGenerator_GenElements( void* meshGenerator, IGraph* topo, Grid***
 	unsigned		nEls;
 	unsigned*		els;
 	unsigned*		dimInds;
-	unsigned		d_i, e_i;
+	unsigned	d_i, e_i;
 
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
 	assert( topo );
@@ -672,7 +673,7 @@ void _CartesianGenerator_GenElements( void* meshGenerator, IGraph* topo, Grid***
 		els[e_i] = Grid_Project( self->elGrid, dimInds );
 	}
 
-	IGraph_SetLocalElements( topo, grid->nDims, nEls, els );
+	IGraph_SetLocalElements( topo, grid->nDims, nEls, (int*)els );
 	FreeArray( els );
 	FreeArray( dimInds );
 	FreeObject( grid );
@@ -693,7 +694,7 @@ void _CartesianGenerator_GenVertices( void* meshGenerator, IGraph* topo, Grid***
 	unsigned		nRemotes/*, *remotes*/;
 	unsigned		*dstArray, *dstCount;
 	unsigned		*dimInds, *rankInds;
-	unsigned		d_i, e_i;
+	unsigned	d_i, e_i;
 
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
 	assert( topo );
@@ -753,7 +754,7 @@ void _CartesianGenerator_GenVertices( void* meshGenerator, IGraph* topo, Grid***
 	MeshTopology_SetLocalElements( topo, 0, nLocals, locals );
 	MeshTopology_SetRemoteElements( topo, 0, nRemotes, remotes );
 */
-	IGraph_SetElements( topo, 0, nLocals, locals );
+	IGraph_SetElements( topo, 0, nLocals, (int*)locals );
 	FreeArray( locals );
 /*
 	FreeArray( remotes );
@@ -880,7 +881,7 @@ void _CartesianGenerator_GenFaces( void* meshGenerator, IGraph* topo, Grid*** gr
 		els[nEls[0] + nEls[1] + e_i] = nGlobalEls[0] + nGlobalEls[1] + Grid_Project( globalGrid, dimInds );
 	}
 
-	IGraph_SetElements( topo, MT_FACE, nEls[0] + nEls[1] + nEls[2], els );
+	IGraph_SetElements(topo,MT_FACE, nEls[0] + nEls[1] + nEls[2],(int*)els);
 
 	FreeArray( dimInds );
 	FreeArray( els );
@@ -915,7 +916,7 @@ void _CartesianGenerator_GenElementVertexInc( void* meshGenerator, IGraph* topo,
 	nDomainEls = Sync_GetNumDomains( sync );
 	incEls = Memory_Alloc_Array_Unnamed( unsigned, vertsPerEl );
 	dimInds = Memory_Alloc_Array_Unnamed( unsigned, topo->nDims );
-	for( e_i = 0; e_i < nDomainEls; e_i++ ) {
+	for( e_i = 0; e_i < (unsigned)nDomainEls; e_i++ ) {
 		unsigned	gInd = Sync_DomainToGlobal( sync, e_i );
 		unsigned	curNode = 0;
 
@@ -957,7 +958,8 @@ void _CartesianGenerator_GenElementVertexInc( void* meshGenerator, IGraph* topo,
 
 		CartesianGenerator_MapToDomain( self, (Sync*)IGraph_GetDomain( topo, 0 ), 
 						vertsPerEl, incEls );
-		IGraph_SetIncidence( topo, topo->nDims, e_i, MT_VERTEX, vertsPerEl, incEls );
+		IGraph_SetIncidence( topo, topo->nDims, e_i, MT_VERTEX,
+                                     vertsPerEl, (int*)incEls );
 	}
 
 	FreeArray( incEls );
@@ -986,7 +988,7 @@ void _CartesianGenerator_GenVolumeEdgeInc( void* meshGenerator, IGraph* topo, Gr
 
 	incEls = Memory_Alloc_Array_Unnamed( unsigned, 12 );
 	dimInds = Memory_Alloc_Array_Unnamed( unsigned, topo->nDims );
-	for( e_i = 0; e_i < topo->remotes[3]->nDomains; e_i++ ) {
+	for( e_i = 0; e_i < (unsigned)(topo->remotes[3]->nDomains); e_i++ ) {
 		unsigned	gInd = Sync_DomainToGlobal( topo->remotes[3], e_i );
 
 		nIncEls = 12;
@@ -1034,7 +1036,7 @@ void _CartesianGenerator_GenVolumeEdgeInc( void* meshGenerator, IGraph* topo, Gr
 
 		CartesianGenerator_MapToDomain( self, (Sync*)IGraph_GetDomain( topo, 1 ), 
 						nIncEls, incEls );
-		IGraph_SetIncidence( topo, topo->nDims, e_i, 1, nIncEls, incEls );
+		IGraph_SetIncidence(topo,topo->nDims,e_i,1,nIncEls,(int*)incEls);
 	}
 
 	FreeArray( incEls );
@@ -1063,7 +1065,7 @@ void _CartesianGenerator_GenVolumeFaceInc( void* meshGenerator, IGraph* topo, Gr
 
 	incEls = Memory_Alloc_Array_Unnamed( unsigned, 6 );
 	dimInds = Memory_Alloc_Array_Unnamed( unsigned, topo->nDims );
-	for( e_i = 0; e_i < topo->remotes[MT_VOLUME]->nDomains; e_i++ ) {
+	for(e_i=0;e_i<(unsigned)(topo->remotes[MT_VOLUME]->nDomains);e_i++) {
 		unsigned	gInd = Sync_DomainToGlobal( topo->remotes[MT_VOLUME], e_i );
 
 		nIncEls = 6;
@@ -1089,7 +1091,7 @@ void _CartesianGenerator_GenVolumeFaceInc( void* meshGenerator, IGraph* topo, Gr
 
 		CartesianGenerator_MapToDomain( self, (Sync*)IGraph_GetDomain( topo, 2 ), 
 						nIncEls, incEls );
-		IGraph_SetIncidence( topo, topo->nDims, e_i, 2, nIncEls, incEls );
+		IGraph_SetIncidence(topo,topo->nDims,e_i,2,nIncEls,(int*)incEls);
 	}
 
 	FreeArray( incEls );
@@ -1118,7 +1120,7 @@ void _CartesianGenerator_GenFaceVertexInc( void* meshGenerator, IGraph* topo, Gr
 
 	incEls = Memory_Alloc_Array_Unnamed( unsigned, 4 );
 	dimInds = Memory_Alloc_Array_Unnamed( unsigned, topo->nDims );
-	for( e_i = 0; e_i < topo->remotes[MT_FACE]->nDomains; e_i++ ) {
+	for(e_i=0;e_i<(unsigned)(topo->remotes[MT_FACE]->nDomains);e_i++) {
 		unsigned	gInd = Sync_DomainToGlobal( topo->remotes[MT_FACE], e_i );
 
 		nIncEls = 4;
@@ -1182,7 +1184,7 @@ void _CartesianGenerator_GenFaceVertexInc( void* meshGenerator, IGraph* topo, Gr
 
 		CartesianGenerator_MapToDomain( self, (Sync*)IGraph_GetDomain( topo, 0 ), 
 						nIncEls, incEls );
-		IGraph_SetIncidence( topo, 2, e_i, 0, nIncEls, incEls );
+		IGraph_SetIncidence( topo, 2, e_i, 0, nIncEls, (int*)incEls );
 	}
 
 	FreeArray( incEls );
@@ -1211,7 +1213,7 @@ void _CartesianGenerator_GenFaceEdgeInc( void* meshGenerator, IGraph* topo, Grid
 
 	incEls = Memory_Alloc_Array_Unnamed( unsigned, 4 );
 	dimInds = Memory_Alloc_Array_Unnamed( unsigned, topo->nDims );
-	for( e_i = 0; e_i < topo->remotes[MT_FACE]->nDomains; e_i++ ) {
+	for( e_i = 0; e_i < (unsigned)(topo->remotes[MT_FACE]->nDomains);e_i++ ) {
 		unsigned	gInd = Sync_DomainToGlobal( topo->remotes[MT_FACE], e_i );
 
 		nIncEls = 4;
@@ -1269,7 +1271,7 @@ void _CartesianGenerator_GenFaceEdgeInc( void* meshGenerator, IGraph* topo, Grid
 
 		CartesianGenerator_MapToDomain( self, (Sync*)IGraph_GetDomain( topo, 1 ), 
 						nIncEls, incEls );
-		IGraph_SetIncidence( topo, 2, e_i, 1, nIncEls, incEls );
+		IGraph_SetIncidence( topo, 2, e_i, 1, nIncEls, (int*)incEls );
 	}
 
 	FreeArray( incEls );
@@ -1299,7 +1301,7 @@ void _CartesianGenerator_GenEdgeVertexInc( void* meshGenerator, IGraph* topo, Gr
 	sync = IGraph_GetDomain( topo, 1 );
 	incEls = MemArray( unsigned, 2, CartesianGenerator_Type );
 	dimInds = MemArray( unsigned, topo->nDims, CartesianGenerator_Type );
-	for( e_i = 0; e_i < Sync_GetNumDomains( sync ); e_i++ ) {
+	for( e_i = 0; e_i < (unsigned)Sync_GetNumDomains( sync ); e_i++ ) {
 		unsigned	gInd = Sync_DomainToGlobal( sync, e_i );
 
 		nIncEls = 2;
@@ -1339,7 +1341,8 @@ void _CartesianGenerator_GenEdgeVertexInc( void* meshGenerator, IGraph* topo, Gr
 
 		CartesianGenerator_MapToDomain( self, (Sync*)IGraph_GetDomain( topo, 0 ), 
 						nIncEls, incEls );
-		IGraph_SetIncidence( topo, MT_EDGE, e_i, MT_VERTEX, nIncEls, incEls );
+		IGraph_SetIncidence( topo, MT_EDGE, e_i, MT_VERTEX, nIncEls,
+                                     (int*)incEls );
 	}
 
 	FreeArray( incEls );
@@ -1366,7 +1369,7 @@ void _CartesianGenerator_GenElementTypes( void* meshGenerator, Mesh* mesh ) {
 	mesh->elTypes = Memory_Alloc_Array( Mesh_ElementType*, mesh->nElTypes, "Mesh::elTypes" );
 	mesh->elTypes[0] = (Mesh_ElementType*)Mesh_HexType_New();
 	Mesh_ElementType_SetMesh( mesh->elTypes[0], mesh );
-	nDomainEls = Mesh_GetDomainSize( mesh, Mesh_GetDimSize( mesh ) );
+	nDomainEls = Mesh_GetDomainSize(mesh,Mesh_GetDimSize(mesh));
 	mesh->elTypeMap = Memory_Alloc_Array( unsigned, nDomainEls, "Mesh::elTypeMap" );
 	for( e_i = 0; e_i < nDomainEls; e_i++ )
 		mesh->elTypeMap[e_i] = 0;
@@ -1480,7 +1483,7 @@ void CartesianGenerator_BuildDecomp( CartesianGenerator* self ) {
 			bestPos = p_i;
 		}
 	}
-	assert( bestPos != -1 );
+	assert( bestPos != (unsigned)(-1) );
 
 	/* Allocate for results. */
 	self->origin = Memory_Alloc_Array( unsigned, self->elGrid->nDims, "CartesianGenerator::origin" );
@@ -1550,7 +1553,7 @@ void CartesianGenerator_BuildDecomp( CartesianGenerator* self ) {
 	self->comm = Comm_New();
 	NewClass_AddRef( self->comm );
 	Comm_SetMPIComm( self->comm, self->mpiComm );
-	Comm_SetNeighbours( self->comm, nNbrs, nbrs );
+	Comm_SetNeighbours( self->comm, nNbrs, (int*)nbrs );
 	FreeArray( nbrs );
 }
 
@@ -1622,7 +1625,7 @@ void CartesianGenerator_RecurseDecomps( CartesianGenerator* self,
 void CartesianGenerator_GenTopo( CartesianGenerator* self, IGraph* topo ) {
 	Grid***		grids;
 	const Comm* comm;
-	unsigned	d_i, d_j;
+	int	d_i, d_j;
 
 	assert( self );
 	assert( topo );
@@ -1743,15 +1746,15 @@ void CartesianGenerator_GenTopo( CartesianGenerator* self, IGraph* topo ) {
 	}
 
 	/* Complete all required relations. */
-	for( d_i = 0; d_i < self->nDims; d_i++ ) {
-		for( d_j = d_i + 1; d_j <= self->nDims; d_j++ ) {
-			if( !self->enabledInc[d_i][d_j] )
-				continue;
+	for( d_i = 0; d_i < (int)(self->nDims); d_i++ ) {
+          for( d_j = d_i + 1; d_j <= (int)(self->nDims); d_j++ ) {
+            if( !self->enabledInc[d_i][d_j] )
+              continue;
 
-			IGraph_InvertIncidence( topo, d_i, d_j );
-		}
+            IGraph_InvertIncidence( topo, d_i, d_j );
+          }
 	}
-	for( d_i = 0; d_i <= self->nDims; d_i++ ) {
+	for( d_i = 0; d_i <= (int)(self->nDims); d_i++ ) {
 		if( self->enabledInc[d_i][d_i] ) {
 			if( d_i == 0 )
 				CartesianGenerator_CompleteVertexNeighbours( self, topo, grids );
@@ -1767,9 +1770,9 @@ void CartesianGenerator_GenTopo( CartesianGenerator* self, IGraph* topo ) {
 	/* Free allocated grids. */
 	grids[topo->nDims][0] = NULL;
 	for( d_i = 1; d_i < topo->nDims; d_i++ ) {
-		unsigned	d_j;
+		int	d_j;
 
-		for( d_j = 0; d_j < topo->nTDims; d_j++ )
+		for( d_j = 0; d_j < (topo->nTDims); d_j++ )
 			FreeObject( grids[d_i][d_j] );
 	}
 	FreeArray( grids );
@@ -1838,7 +1841,7 @@ void CartesianGenerator_GenEdges2D( CartesianGenerator* self, IGraph* topo, Grid
 		els[nEls[0] + e_i] = nGlobalEls + Grid_Project( globalGrid, dimInds );
 	}
 
-	IGraph_SetElements( topo, MT_EDGE, nEls[0] + nEls[1], els );
+	IGraph_SetElements( topo, MT_EDGE, nEls[0] + nEls[1], (int*)els );
 
 	FreeArray( dimInds );
 	FreeArray( els );
@@ -1944,7 +1947,7 @@ void CartesianGenerator_GenEdges3D( CartesianGenerator* self, IGraph* topo, Grid
 		els[nEls[0] + nEls[1] + e_i] = nGlobalEls[0] + nGlobalEls[1] + Grid_Project( globalGrid, dimInds );
 	}
 
-	IGraph_SetElements( topo, MT_EDGE, nEls[0] + nEls[1] + nEls[2], els );
+	IGraph_SetElements( topo, MT_EDGE, nEls[0] + nEls[1] + nEls[2],(int*)els);
 
 	FreeArray( dimInds );
 	FreeArray( els );
@@ -1972,9 +1975,9 @@ void CartesianGenerator_GenBndVerts( CartesianGenerator* self, IGraph* topo, Gri
 	nVerts = Sync_GetNumDomains( sync );
 	for( v_i = 0; v_i < nVerts; v_i++ ) {
 		global = Sync_DomainToGlobal( sync, v_i );
-		Grid_Lift( grids[0][0], global, inds );
+		Grid_Lift( grids[0][0], global, (unsigned*)inds );
 		for( d_i = 0; d_i < nDims; d_i++ ) {
-			if( inds[d_i] == 0 || inds[d_i] == grids[0][0]->sizes[d_i] - 1 )
+                  if( inds[d_i] == 0 || (unsigned)(inds[d_i]) == grids[0][0]->sizes[d_i] - 1 )
 				break;
 		}
 		if( d_i < nDims )
@@ -2018,7 +2021,7 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGra
 		if( inds[0] > 0 ) {
 			inds[0]--;
 			domain = Grid_Project( grids[0][0], inds );
-			if( Sync_TryGlobalToDomain( sync, domain, &domain ) ) {
+			if(Sync_TryGlobalToDomain(sync,domain,(int*)(&domain))) {
 				nbrs[v_i][nNbrs[v_i]] = domain;
 				nNbrs[v_i]++;
 			}
@@ -2028,7 +2031,7 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGra
 		if( inds[0] < grids[0][0]->sizes[0] - 1 ) {
 			inds[0]++;
 			domain = Grid_Project( grids[0][0], inds );
-			if( Sync_TryGlobalToDomain( sync, domain, &domain ) ) {
+			if(Sync_TryGlobalToDomain(sync,domain,(int*)(&domain))) {
 				nbrs[v_i][nNbrs[v_i]] = domain;
 				nNbrs[v_i]++;
 			}
@@ -2039,7 +2042,8 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGra
 			if( inds[1] > 0 ) {
 				inds[1]--;
 				domain = Grid_Project( grids[0][0], inds );
-				if( Sync_TryGlobalToDomain( sync, domain, &domain ) ) {
+				if(Sync_TryGlobalToDomain(sync,domain,
+                                                          (int*)(&domain))) {
 					nbrs[v_i][nNbrs[v_i]] = domain;
 					nNbrs[v_i]++;
 				}
@@ -2049,7 +2053,8 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGra
 			if( inds[1] < grids[0][0]->sizes[1] - 1 ) {
 				inds[1]++;
 				domain = Grid_Project( grids[0][0], inds );
-				if( Sync_TryGlobalToDomain( sync, domain, &domain ) ) {
+				if(Sync_TryGlobalToDomain(sync,domain,
+                                                          (int*)(&domain))) {
 					nbrs[v_i][nNbrs[v_i]] = domain;
 					nNbrs[v_i]++;
 				}
@@ -2060,7 +2065,8 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGra
 				if( inds[2] > 0 ) {
 					inds[2]--;
 					domain = Grid_Project( grids[0][0], inds );
-					if( Sync_TryGlobalToDomain( sync, domain, &domain ) ) {
+					if(Sync_TryGlobalToDomain(sync,domain,
+                                                                  (int*)(&domain))) {
 						nbrs[v_i][nNbrs[v_i]] = domain;
 						nNbrs[v_i]++;
 					}
@@ -2070,7 +2076,8 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGra
 				if( inds[2] < grids[0][0]->sizes[2] - 1 ) {
 					inds[2]++;
 					domain = Grid_Project( grids[0][0], inds );
-					if( Sync_TryGlobalToDomain( sync, domain, &domain ) ) {
+					if(Sync_TryGlobalToDomain(sync,domain,
+                                                                  (int*)(&domain))) {
 						nbrs[v_i][nNbrs[v_i]] = domain;
 						nNbrs[v_i]++;
 					}
@@ -2079,7 +2086,8 @@ void CartesianGenerator_CompleteVertexNeighbours( CartesianGenerator* self, IGra
 			}
 		}
 
-		IGraph_SetIncidence( topo, MT_VERTEX, v_i, MT_VERTEX, nNbrs[v_i], nbrs[v_i] );
+		IGraph_SetIncidence(topo,MT_VERTEX,v_i,MT_VERTEX,nNbrs[v_i],
+                                    (int*)(nbrs[v_i]));
 	}
 
 	FreeArray( nNbrs );
@@ -2146,7 +2154,7 @@ void CartesianGenerator_GenGeom( CartesianGenerator* self, Mesh* mesh, void* dat
       Grid*			      grid;
       unsigned*		   inds;
       double*			   steps;
-      unsigned          d_i;
+      int          d_i;
 
       /* Build grid and space for indices. */
       grid = self->vertGrid;
@@ -2176,14 +2184,14 @@ void CartesianGenerator_CalcGeom( CartesianGenerator* self, Mesh* mesh, Sync* sy
 	unsigned        	gNode;
 
 	/* Loop over domain nodes. */
-	for( n_i = 0; n_i < Sync_GetNumDomains( sync ); n_i++ ) {
+	for( n_i = 0; n_i < (unsigned)Sync_GetNumDomains( sync ); n_i++ ) {
 		gNode = Sync_DomainToGlobal( sync, n_i );
 		Grid_Lift( grid, gNode, inds );
 		vert = Mesh_GetVertex( mesh, n_i );
 
 		/* Calculate coordinate. */
-		for( d_i = 0; d_i < mesh->topo->nDims; d_i++ ) {
-                   if( inds[d_i] <= self->contactDepth[d_i][0] ) {
+		for( d_i = 0; d_i < (unsigned)(mesh->topo->nDims); d_i++ ) {
+                  if( inds[d_i] <= (unsigned)(self->contactDepth[d_i][0]) ) {
                       mesh->verts[n_i][d_i] = self->crdMin[d_i];
                       if( self->contactDepth[d_i][0] ) {
                          mesh->verts[n_i][d_i] +=
@@ -2243,7 +2251,7 @@ void CartesianGenerator_DestructGeometry( CartesianGenerator* self ) {
 }
 
 #ifdef READ_HDF5
-void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, const char* filename ){
+void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, Name filename ){
 	hid_t             file, fileSpace, fileData;
 	hsize_t           start[2], count[2], size[2], maxSize[2];   
 	hid_t             memSpace, error;
@@ -2299,7 +2307,7 @@ void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, con
       #endif
       status = H5Aread(attrib_id, H5T_NATIVE_INT, &ndims);
       H5Aclose(attrib_id);      
-      Journal_Firewall( (ndims == self->nDims), errorStream,
+      Journal_Firewall( (ndims == (int)(self->nDims)), errorStream,
          "\n\nError in %s for %s '%s'\n"
          "Number of dimensions (%u) for checkpoint file (%s) does not correspond to simulation dimensions (%u).\n", 
          __func__, self->type, self->name, (unsigned int) ndims, filename,
@@ -2317,8 +2325,8 @@ void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, con
 
       sizes = Grid_GetSizes( self->elGrid ); /** global no. of elements in each dim */
       if(self->nDims == 2)
-         Journal_Firewall( 
-            ( (sizes[0] == res[0]) && (sizes[1] == res[1]) ), 
+         Journal_Firewall(((sizes[0] == (unsigned)(res[0]))
+                           && (sizes[1] == (unsigned)(res[1])) ), 
             errorStream,
             "\n\nError in %s for %s '%s'\n"
             "Size of mesh (%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u, %u).\n", 
@@ -2328,7 +2336,9 @@ void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, con
             (unsigned int) sizes[0], (unsigned int) sizes[1]);
       else
          Journal_Firewall( 
-            ( (sizes[0] == res[0]) && (sizes[1] == res[1]) && (sizes[2] == res[2]) ), 
+                          ( (sizes[0] == (unsigned)(res[0]))
+                            && (sizes[1] == (unsigned)(res[1]))
+                            && (sizes[2] == (unsigned)(res[2])) ), 
             errorStream,
             "\n\nError in %s for %s '%s'\n"
             "Size of mesh (%u,%u,%u) for checkpoint file (%s) does not correspond to simulation mesh size (%u,%u,%u).\n", 
@@ -2367,13 +2377,13 @@ void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, con
    count[0] = 1;
    count[1] = mesh->topo->nDims + noffset;
    memSpace = H5Screate_simple( 2, count, NULL );
-   totalVerts = Mesh_GetGlobalSize( mesh, 0 );
+   totalVerts = Mesh_GetGlobalSize( mesh, (MeshTopology_Dim)0 );
 
    /* Get size of dataspace to check consistency */
    H5Sget_simple_extent_dims( fileSpace, size, maxSize ); 
 
    Journal_Firewall( 
-      (maxSize[0] == totalVerts), 
+                    (maxSize[0] == (unsigned)totalVerts), 
       errorStream,
       "\n\nError in %s for %s '%s'\n"
       "Number of mesh vertices (%u) stored in %s does not correspond to total number of requested mesh vertices (%u).\n", 
@@ -2424,7 +2434,7 @@ void CartesianGenerator_ReadFromHDF5(  CartesianGenerator* self, Mesh* mesh, con
 }
 #endif
 
-void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, const char* filename ){
+void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, Name filename ){
    int               proc_I;
 	Node_LocalIndex   lNode_I = 0;
 	Node_GlobalIndex  gNode_I = 0;

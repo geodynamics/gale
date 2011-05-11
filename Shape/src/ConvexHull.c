@@ -154,7 +154,7 @@ void _ConvexHull_Print( void* convexHull, Stream* stream ) {
 	_Stg_Shape_Print( self, stream );
 }
 
-void* _ConvexHull_Copy( void* convexHull, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _ConvexHull_Copy( const void* convexHull, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	ConvexHull*	self = (ConvexHull*)convexHull;
 	ConvexHull*	newConvexHull;
 	

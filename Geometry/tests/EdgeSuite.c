@@ -63,7 +63,7 @@ void EdgeSuite_Teardown( EdgeSuiteData* data ) {
 void EdgeSuite_TestEdge( EdgeSuiteData* data ) {
 	Stream*	stream;
 	char		expected_file[PCU_PATH_MAX];
-	unsigned	procToWatch;
+	int procToWatch;
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 	

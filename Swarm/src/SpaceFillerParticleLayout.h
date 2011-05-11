@@ -94,7 +94,7 @@
 		(SpaceFillerParticleLayout*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define SpaceFillerParticleLayout_DeepCopy( self ) \
 		(SpaceFillerParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _SpaceFillerParticleLayout_Copy( void* spaceFillerParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _SpaceFillerParticleLayout_Copy( const void* spaceFillerParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Stuff */
 	void* _SpaceFillerParticleLayout_DefaultNew( Name name ) ;

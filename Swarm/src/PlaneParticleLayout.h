@@ -101,7 +101,7 @@ PlaneParticleLayout* _PlaneParticleLayout_New(  PLANEPARTICLELAYOUT_DEFARGS  );
 		(PlaneParticleLayout*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define PlaneParticleLayout_DeepCopy( self ) \
 		(PlaneParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _PlaneParticleLayout_Copy( void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _PlaneParticleLayout_Copy( const void* particleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Stuff */
 	void* _PlaneParticleLayout_DefaultNew( Name name ) ;

@@ -111,7 +111,7 @@ void _Sphere_Print( void* sphere, Stream* stream ) {
 
 
 
-void* _Sphere_Copy( void* sphere, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Sphere_Copy( const void* sphere, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Sphere*	self = (Sphere*)sphere;
 	Sphere*	newSphere;
 	
@@ -204,7 +204,7 @@ Bool _Sphere_IsCoordInside( void* sphere, Coord coord ) {
 		insideOutsideValue = x*x + y*y + z*z;
 	}
 
-	return (insideOutsideValue <= self->radiusSquared);
+	return (insideOutsideValue <= self->radiusSquared) ? True : False;
 	
 }
 
@@ -223,7 +223,7 @@ void _Sphere_DistanceFromCenterAxis( void* sphere, Coord coord, double* disVec )
 	
 
 double _Sphere_CalculateVolume( void* sphere ) {
-	Sphere* self = sphere;
+  Sphere* self = (Sphere*)sphere;
 	if ( self->dim == 2 ) {
 		return M_PI * self->radiusSquared;
 	}

@@ -301,7 +301,7 @@ void _Delaunay_Print( void* delaunay, Stream* stream )
 	Journal_Printf( stream, "\tNum Voronoi Vertices %d\n", self->numVoronoiVertices );
 }
 
-void *_Delaunay_Copy( void* delaunay, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap )
+void *_Delaunay_Copy( const void* delaunay, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap )
 {
 	return NULL;
 }
@@ -325,8 +325,8 @@ void _Delaunay_AssignFromXML( void* delaunay, Stg_ComponentFactory* cf, void* da
 	
 	assert( pointerRegister  );
 
-	points = Stg_ObjectList_Get( pointerRegister, (Name)"dataPoints"  );
-	attr = Stg_ObjectList_Get( pointerRegister, (Name)"delaunayAttributes"  );
+	points = (float (*)[3])Stg_ObjectList_Get( pointerRegister, (Name)"dataPoints"  );
+	attr = (DelaunayAttributes*)Stg_ObjectList_Get( pointerRegister, (Name)"delaunayAttributes"  );
 
 	numSites = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"numSites", 0  );
 
@@ -527,9 +527,9 @@ void Delaunay_Recurse( Delaunay *delaunay, int sl, int sh, QuadEdgeRef *le, Quad
 
 		while (1) 
 		{
-			if (LeftOf(ORG(rdi), ldi)) ldi = LNEXT(ldi);
-			else if (RightOf(ORG(ldi), rdi)) rdi = ONEXT(SYM(rdi));
-			else break;
+                  if (LeftOf((Site*)ORG(rdi), ldi)) ldi = LNEXT(ldi);
+                  else if (RightOf((Site*)ORG(ldi), rdi)) rdi = ONEXT(SYM(rdi));
+                  else break;
 		}
 
 		basel = ConnectQuadEdges(delaunay->qp, SYM(rdi), ldi);
@@ -540,8 +540,8 @@ void Delaunay_Recurse( Delaunay *delaunay, int sl, int sh, QuadEdgeRef *le, Quad
 		{
 
 			lcand = ONEXT(SYM(basel));
-			if (RightOf(DEST(lcand), basel))
-				while (InCircle(DEST(basel), ORG(basel), DEST(lcand), DEST(ONEXT(lcand)))) 
+			if (RightOf((Site*)DEST(lcand), basel))
+				while (InCircle((Site*)DEST(basel), (Site*)ORG(basel), (Site*)DEST(lcand), (Site*)DEST(ONEXT(lcand)))) 
 				{
 					QuadEdgeRef t = ONEXT(lcand);
 					
@@ -550,8 +550,8 @@ void Delaunay_Recurse( Delaunay *delaunay, int sl, int sh, QuadEdgeRef *le, Quad
 				}
 
 			rcand = OPREV(basel);
-			if (RightOf(DEST(rcand), basel))
-				while (InCircle(DEST(basel), ORG(basel), DEST(rcand), DEST(OPREV(rcand)))) 
+			if (RightOf((Site*)DEST(rcand), basel))
+				while (InCircle((Site*)DEST(basel), (Site*)ORG(basel), (Site*)DEST(rcand), (Site*)DEST(OPREV(rcand)))) 
 				{
 					QuadEdgeRef t = OPREV(rcand);
 
@@ -559,11 +559,11 @@ void Delaunay_Recurse( Delaunay *delaunay, int sl, int sh, QuadEdgeRef *le, Quad
 					rcand = t;
 				}
 
-			if (!RightOf(DEST(lcand), basel) && !RightOf(DEST(rcand), basel)) break;
+			if (!RightOf((Site*)DEST(lcand), basel) && !RightOf((Site*)DEST(rcand), basel)) break;
 
-			if ( !RightOf(DEST(lcand), basel) ||
-				( RightOf(DEST(rcand), basel) && 
-				InCircle(DEST(lcand), ORG(lcand), ORG(rcand), DEST(rcand))))
+			if ( !RightOf((Site*)DEST(lcand), basel) ||
+				( RightOf((Site*)DEST(rcand), basel) && 
+				InCircle((Site*)DEST(lcand), (Site*)ORG(lcand), (Site*)ORG(rcand), (Site*)DEST(rcand))))
 				basel = ConnectQuadEdges(delaunay->qp, rcand, SYM(basel));
 			else
 				basel = ConnectQuadEdges(delaunay->qp, SYM(basel), SYM(lcand));

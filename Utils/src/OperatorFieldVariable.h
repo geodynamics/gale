@@ -93,7 +93,7 @@
 		Name				operatorName );
 	
 	/* Public Constructor */
-	OperatorFieldVariable* _OperatorFieldVariable_DefaultNew();
+	OperatorFieldVariable* _OperatorFieldVariable_DefaultNew(Name name);
 
 	OperatorFieldVariable* OperatorFieldVariable_New( 
 		Name													name,
@@ -127,7 +127,7 @@
 
 	void _OperatorFieldVariable_Print( void* _fieldVariable, Stream* stream ) ;
 
-	void* _OperatorFieldVariable_Copy( void* fieldVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
+	void* _OperatorFieldVariable_Copy( const void* fieldVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) ;
 
 	void _OperatorFieldVariable_AssignFromXML( void* fieldVariable, Stg_ComponentFactory* cf, void* data ) ;
 

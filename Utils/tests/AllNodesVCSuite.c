@@ -97,8 +97,8 @@ void AllNodesVCSuite_TestAllNodesVC( AllNodesVCSuiteData* data ) {
 	double								minCrds[3] = {0.0, 0.0, 0.0};
 	double								maxCrds[3] = {1.0, 1.0, 1.0};
 	double*								array[7];
-	char*									vcKey = "AllNodesVC";
-	char*									varName[] = {"x", "y", "z", "vx", "vy", "vz", "temp"};
+	Name									vcKey = "AllNodesVC";
+	Name									varName[] = {"x", "y", "z", "vx", "vy", "vz", "temp"};
 	char									input_file[PCU_PATH_MAX];
 	char									expected_file[PCU_PATH_MAX];
 	Mesh*									mesh;

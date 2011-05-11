@@ -144,7 +144,7 @@
 	void Mesh_SetTopologyDataSize( void* mesh, MeshTopology_Dim dim, unsigned size );
 	void* Mesh_GetTopologyData( void* mesh, MeshTopology_Dim dim );
 
-	unsigned Mesh_GetDimSize( void* mesh );
+	MeshTopology_Dim Mesh_GetDimSize( void* mesh );
 	unsigned Mesh_GetGlobalSize( void* mesh, MeshTopology_Dim dim );
 	unsigned Mesh_GetLocalSize( void* mesh, MeshTopology_Dim dim );
 	unsigned Mesh_GetRemoteSize( void* mesh, MeshTopology_Dim dim );

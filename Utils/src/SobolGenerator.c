@@ -152,7 +152,7 @@ void _SobolGenerator_Print( void* sobolGenerator, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void* _SobolGenerator_Copy( void* sobolGenerator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _SobolGenerator_Copy( const void* sobolGenerator, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	SobolGenerator*	self = (SobolGenerator*)sobolGenerator;
 	SobolGenerator*	newSobolGenerator;
 	
@@ -480,7 +480,7 @@ SobolGenerator* SobolGenerator_NewFromTable( Name name ) {
 	
 	generatorCount++;
 	/* If we reach the end of the array of generators, restart from the first one - PatrickSunter, 3 August 2006 */
-	if ( generatorCount >= sizeof(SobolGenerator_PolynomialDegree)/sizeof(unsigned int) ) {
+	if ( generatorCount >= (int)(sizeof(SobolGenerator_PolynomialDegree)/sizeof(unsigned int))) {
 		generatorCount = 0;
 	}
 		

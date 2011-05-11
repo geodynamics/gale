@@ -819,7 +819,8 @@ pp. 463-469,
 
 */
 void Matrix_CalcAllEigenvectorsJacobi(double **matrix, Index count, Eigenvector* eigenvectorList ) {
-	int j,iq,ip,i;
+	int j,i;
+        unsigned ip, iq;
 	double tresh,theta,tau,t,sum,s,h,g,c,*b,*z;
 
 	b = Memory_Alloc_Array( double, count, "b" );
@@ -840,7 +841,7 @@ void Matrix_CalcAllEigenvectorsJacobi(double **matrix, Index count, Eigenvector*
 
 		/* Sum the off-diagonal elements */
 		sum = 0.0;
-		for ( ip = 0 ; ip < count-1 ; ip++ ) {
+		for ( ip = 0 ; ip+1 < count ; ip++ ) {
 			for ( iq = ip+1 ; iq < count ; iq++ )
 				sum += fabs(matrix[ip][iq]);
 		}
@@ -853,7 +854,7 @@ void Matrix_CalcAllEigenvectorsJacobi(double **matrix, Index count, Eigenvector*
 		else
 			tresh=0.0;
 
-		for ( ip = 0; ip < count-1 ; ip++ ) {
+		for ( ip = 0; ip+1 < count ; ip++ ) {
 			for ( iq = ip+1 ; iq < count ; iq++) {
 				g=100.0*fabs(matrix[ip][iq]);
 
@@ -879,16 +880,16 @@ void Matrix_CalcAllEigenvectorsJacobi(double **matrix, Index count, Eigenvector*
 					eigenvectorList[ip].eigenvalue -= h;
 					eigenvectorList[iq].eigenvalue += h;
 					matrix[ip][iq]=0.0;
-					for ( j = 0 ; j <= ip-1 ; j++ ) {
+					for ( j = 0 ; j <= (int)(ip-1) ; j++ ) {
 						ROTATE(matrix,j,ip,j,iq)
 					}
-					for ( j = ip+1 ; j <= iq-1 ; j++ ) {
+					for ( j = ip+1 ; j <= (int)(iq-1) ;j++ ) {
 						ROTATE(matrix,ip,j,j,iq)
 					}
-					for ( j = iq+1 ; j < count ; j++ ) {
+					for ( j = iq+1 ; j < (int)count ; j++ ) {
 						ROTATE(matrix,ip,j,iq,j)
 					}
-					for ( j = 0 ; j < count ; j++ ) {
+					for ( j = 0 ; j < (int)count ; j++ ) {
 						ROTATE_EIGENVECTOR_LIST(eigenvectorList,ip,j,iq,j)
 					}
 				}

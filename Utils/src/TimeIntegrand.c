@@ -134,7 +134,7 @@ void _TimeIntegrand_Print( void* timeIntegrand, Stream* stream ) {
 	Stream_UnIndent( stream );
 }
 
-void* _TimeIntegrand_Copy( void* timeIntegrand, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _TimeIntegrand_Copy( const void* timeIntegrand, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	TimeIntegrand*	self = (TimeIntegrand*)timeIntegrand;
 	TimeIntegrand*	newTimeIntegrand;
 	

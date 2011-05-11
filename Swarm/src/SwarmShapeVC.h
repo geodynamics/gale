@@ -59,7 +59,7 @@
 		SwarmShapeVC_Entry*			_entryTbl; \
 		Swarm*							_swarm; \
 		Stg_Shape*						_shape; \
-		Name								shapeName; \
+		char*								shapeName; \
 
 	struct SwarmShapeVC { __SwarmShapeVC };
 	
@@ -103,7 +103,7 @@
 
 	void _SwarmShapeVC_Print( void* shapeVC, Stream* stream );
 
-	void* _SwarmShapeVC_Copy( void* shapeVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
+	void* _SwarmShapeVC_Copy( const void* shapeVC, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap );
 
 	void _SwarmShapeVC_Destroy( void* shapeVC, void* data );
 

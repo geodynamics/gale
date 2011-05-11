@@ -157,7 +157,7 @@
 	/** Stg_Class_Print() implementation */
 	void _Delaunay_Print( void* delaunay, Stream* stream );
 	
-	void *_Delaunay_Copy( void* delaunay, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void *_Delaunay_Copy( const void* delaunay, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	void _Delaunay_AssignFromXML( void* delaunay, Stg_ComponentFactory* cf, void* data );
 	

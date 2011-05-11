@@ -110,11 +110,11 @@ void _CellLayout_Print( void* cellLayout, Stream* stream ) {
 void _CellLayout_Destroy( void* cellLayout, void* data ) {
 }
 
-void* _CellLayout_Copy( void* cellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _CellLayout_Copy( const void* cellLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	CellLayout*	self = (CellLayout*)cellLayout;
 	CellLayout*	newCellLayout;
 	
-	newCellLayout = _Stg_Component_Copy( self, dest, deep, nameExt, ptrMap );
+	newCellLayout = (CellLayout*)_Stg_Component_Copy( self, dest, deep, nameExt, ptrMap );
 	
 	/* Virtual methods */
 	newCellLayout->_cellLocalCount = self->_cellLocalCount;

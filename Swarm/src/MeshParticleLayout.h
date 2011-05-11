@@ -99,7 +99,7 @@
 		(MeshParticleLayout*)Stg_Class_Copy( self, NULL, False, NULL, NULL )
 	#define MeshParticleLayout_DeepCopy( self ) \
 		(MeshParticleLayout*)Stg_Class_Copy( self, NULL, True, NULL, NULL )
-	void* _MeshParticleLayout_Copy( void* meshParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
+	void* _MeshParticleLayout_Copy( const void* meshParticleLayout, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
 	/* 'Stg_Component' Stuff */
 	void* _MeshParticleLayout_DefaultNew( Name name ) ;

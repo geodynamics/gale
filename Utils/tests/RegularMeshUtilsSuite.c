@@ -115,10 +115,10 @@ void RegularMeshUtilsSuite_TestMeshUtils( RegularMeshUtilsSuiteData* data ) {
 		
 		Stream_RedirectFile( stream, "regularMeshUtils.dat" );
 
-		for (element_dI=0; element_dI < Mesh_GetDomainSize( mesh, nDims ); element_dI++) {
-			Mesh_GetIncidence( mesh, nDims, element_dI, MT_VERTEX, inc );
+		for (element_dI=0; element_dI < Mesh_GetDomainSize( mesh, (MeshTopology_Dim)nDims ); element_dI++) {
+			Mesh_GetIncidence( mesh, (MeshTopology_Dim)nDims, element_dI, MT_VERTEX, inc );
 			currElementNodesCount = IArray_GetSize( inc );
-			currElementNodes = IArray_GetPtr( inc );
+			currElementNodes = (unsigned*)IArray_GetPtr( inc );
 
 			for (refNode_eI = 0; refNode_eI < currElementNodesCount; refNode_eI++ ) {
 				node_Diagonal = RegularMeshUtils_GetDiagOppositeAcrossElementNodeIndex(mesh, element_dI, currElementNodes[refNode_eI]) ;

@@ -98,7 +98,7 @@ void GaussLayoutSuite_Teardown( GaussLayoutSuiteData* data ) {
 	Journal_Enable_AllTypedStream( True );
 }
 
-void GaussLayoutSuite_TestDriver( GaussLayoutSuiteData* data, char* name,  char* expected, char* output, Particle_InCellIndex particlesPerDim[], int totalParticleCount ) {
+void GaussLayoutSuite_TestDriver( GaussLayoutSuiteData* data, Name name,  const char* expected, const char* output, Particle_InCellIndex particlesPerDim[], int totalParticleCount ) {
 	int procToWatch = data->nProcs >=2 ? 1 : 0;
 
 	if( data->rank == procToWatch ) {	
@@ -141,7 +141,7 @@ void GaussLayoutSuite_TestDriver( GaussLayoutSuiteData* data, char* name,  char*
 		/* Checks that the particule count on each cell are the same. */
 		for( i = 0; i < len; i++ ) {
 			count = swarm->cellParticleCountTbl[i];
-			pcu_check_true( count == totalParticleCount  );
+			pcu_check_true( count == (unsigned)totalParticleCount  );
 		}	
 		Swarm_GetCellMinMaxCoords( swarm, 4, minCell, maxCell );
 		Journal_Printf( stream, "Particle per dim: %d %d %d\n", particlesPerDim[0], particlesPerDim[1], particlesPerDim[2]);	

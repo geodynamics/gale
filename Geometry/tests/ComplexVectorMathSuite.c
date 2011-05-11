@@ -67,7 +67,7 @@ void ComplexVectorMathSuite_Teardown( ComplexVectorMathSuiteData* data ) {
 }
 
 void ComplexVectorMathSuite_TestComplexVectorMathBasic( ComplexVectorMathSuiteData* data ) {
-	unsigned	procToWatch;
+	int	procToWatch;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"VectorMathBasicStream" );
 	char		expected_file[PCU_PATH_MAX];
 
@@ -211,7 +211,7 @@ void ComplexVectorMathSuite_TestComplexVectorMathBasic( ComplexVectorMathSuiteDa
 }
 
 void ComplexVectorMathSuite_TestComplexVectorMathOperations( ComplexVectorMathSuiteData* data ) {
-	unsigned	procToWatch;
+	int	procToWatch;
 	Stream*	stream = Journal_Register( Info_Type, (Name)"VectorMathOperationsStream" );
 	char		expected_file[PCU_PATH_MAX];
 

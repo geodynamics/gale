@@ -22,7 +22,7 @@ void LibDiscretisationSuite_Teardown( LibDiscretisationSuiteData* data ) {
 void LibDiscretisationSuite_DirectoryStGermain( LibDiscretisationSuiteData* data ) {
 	Stg_Object* testDirectoryStGermain;
 
-	testDirectoryStGermain = Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain" );
+	testDirectoryStGermain = (Stg_Object*)Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain" );
 	pcu_check_true( testDirectoryStGermain != NULL );
 }
 
@@ -30,8 +30,8 @@ void LibDiscretisationSuite_DirectoryDiscretisation( LibDiscretisationSuiteData 
 	Stg_Object* testDirectoryStGermain;
 	Stg_Object* testDirectoryDiscretisation;
 
-	testDirectoryStGermain = Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain"  );
-	testDirectoryDiscretisation = Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StgDomain" );
+	testDirectoryStGermain = (Stg_Object*)Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StGermain"  );
+	testDirectoryDiscretisation = (Stg_Object*)Stg_ObjectList_Get( Project_XMLSearchPaths, (Name)"StgDomain" );
 
 	pcu_check_true( ( strcmp((char* )LIB_DIR, (char*)testDirectoryStGermain) ) || ( testDirectoryDiscretisation != NULL ) );
 }

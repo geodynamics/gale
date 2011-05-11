@@ -141,7 +141,7 @@ void TimeIntegrationSuite_Teardown( TimeIntegrationSuiteData* data ) {
 	Journal_Enable_AllTypedStream( True );
 }
 
-void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_name, char *_DerivName0, char *_DerivName1, int _order ) {
+void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, const char *_name, const char *_DerivName0, const char *_DerivName1, int _order ) {
 	Stg_ComponentFactory*	cf;
 	Stream*						stream;
    Dictionary*					dictionary;
@@ -205,10 +205,10 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 	Journal_PrintBool( stream, simultaneous );
 
 	/* Add stuff to EPs */
-	TimeIntegrator_AppendSetupEP( timeIntegrator, "start1", TimeIntegrationSuite_TestContextType, CURR_MODULE_NAME, context );
-	TimeIntegrator_AppendFinishEP( timeIntegrator, "finish1", TimeIntegrationSuite_TestVariableType, CURR_MODULE_NAME, variableList[0] );
-	TimeIntegrator_PrependSetupEP( timeIntegrator, "start0", TimeIntegrationSuite_TestVariableType, CURR_MODULE_NAME, variableList[0] );
-	TimeIntegrator_PrependFinishEP( timeIntegrator, "finish0", TimeIntegrationSuite_TestContextType, CURR_MODULE_NAME, context );
+	TimeIntegrator_AppendSetupEP( timeIntegrator, "start1", (void*)TimeIntegrationSuite_TestContextType, CURR_MODULE_NAME, context );
+	TimeIntegrator_AppendFinishEP( timeIntegrator, "finish1", (void*)TimeIntegrationSuite_TestVariableType, CURR_MODULE_NAME, variableList[0] );
+	TimeIntegrator_PrependSetupEP( timeIntegrator, "start0", (void*)TimeIntegrationSuite_TestVariableType, CURR_MODULE_NAME, variableList[0] );
+	TimeIntegrator_PrependFinishEP( timeIntegrator, "finish0", (void*)TimeIntegrationSuite_TestContextType, CURR_MODULE_NAME, context );
 
 	/* Build */
 	Stg_Component_Build( variableList[0], context, False );
@@ -303,7 +303,7 @@ void TimeIntegrationSuite_TestDriver( TimeIntegrationSuiteData* data, char *_nam
 }
 	
 void TimeIntegrationSuite_TestEuler( TimeIntegrationSuiteData* data ) {
-	unsigned procToWatch;
+	int procToWatch;
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
@@ -313,7 +313,7 @@ void TimeIntegrationSuite_TestEuler( TimeIntegrationSuiteData* data ) {
 }
 
 void TimeIntegrationSuite_TestRK2( TimeIntegrationSuiteData* data ) {
-	unsigned procToWatch;
+	int procToWatch;
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 
@@ -323,7 +323,7 @@ void TimeIntegrationSuite_TestRK2( TimeIntegrationSuiteData* data ) {
 }
 
 void TimeIntegrationSuite_TestRK4( TimeIntegrationSuiteData* data ) {
-	unsigned procToWatch;
+	int procToWatch;
 
 	procToWatch = data->nProcs >=2 ? 1 : 0;
 

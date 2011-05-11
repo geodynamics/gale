@@ -107,7 +107,7 @@ void _Cylinder_Print( void* cylinder, Stream* stream ) {
 	_Stg_Shape_Print( self, stream );
 }
 
-void* _Cylinder_Copy( void* cylinder, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
+void* _Cylinder_Copy( const void* cylinder, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
 	Cylinder*	self = (Cylinder*)cylinder;
 	Cylinder*	newCylinder;
 	
@@ -217,7 +217,7 @@ Bool _Cylinder_IsCoordInside( void* cylinder, Coord coord ) {
 	Coord           newCoord;
 	double          insideOutsideValue;
 	double          x, y, z;
-	Axis            axis_I;
+	unsigned        axis_I;
 
 	/* Check whether coord is within min and max values */
 	for ( axis_I = 0 ; axis_I < self->dim ; axis_I++ ) {
