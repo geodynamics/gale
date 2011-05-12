@@ -90,9 +90,9 @@ def generate(env, **kw):
 
     def PCUSuite(env, target, source, **kw):
         """Create an object/header pair out of a
-        *Suite.c/*Suite.h pair. The target should just
+        *Suite.cxx/*Suite.h pair. The target should just
         be the name of the suite. So, if target were
-        "Happy", the sources would be "HappySuite.c" and
+        "Happy", the sources would be "HappySuite.cxx" and
         "HappySuite.h\""""
         obj = env.Object(target[0], source[0])
         return [obj + [File(os.path.splitext(source[0].abspath)[0] + ".h")]]
@@ -106,7 +106,7 @@ def generate(env, **kw):
             hdrs.append(File(os.path.splitext(s.srcnode().abspath)[0] + '.h'))
 
         # Generate the program source.
-        prog_src = build_suite_runner(env, File(str(target[0]) + ".c"), hdrs, objs, **kw)
+        prog_src = build_suite_runner(env, File(str(target[0]) + ".cxx"), hdrs, objs, **kw)
 
         # Build everything.
         exps = multiget([kw, env], 'PCU_EXP', [])

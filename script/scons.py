@@ -60,10 +60,10 @@ def build_directory(env, dir, dst_dir='', with_tests=True):
     obj_dir = env.project_name + '/' + dst_dir
     env.build_files(env.glob(dir + '/src/*.def'), inc_dir)
     env.build_headers(env.glob(dir + '/src/*.h'), inc_dir)
-    env.src_objs += env.build_sources(env.glob(dir + '/src/*.c'), obj_dir)
+    env.src_objs += env.build_sources(env.glob(dir + '/src/*.cxx'), obj_dir)
     env.src_objs += env.build_metas(env.glob(dir + '/src/*.meta'), obj_dir)
     env.suite_hdrs += env.glob(dir + '/tests/*Suite.h')
-    env.suite_objs += env.build_sources(env.glob(dir + '/tests/*Suite.c'), obj_dir)
+    env.suite_objs += env.build_sources(env.glob(dir + '/tests/*Suite.cxx'), obj_dir)
 
 def build_plugin(env, dir, dst_dir='', name='', with_lib=True):
     if not env.check_dir_target(dir): return
@@ -73,7 +73,7 @@ def build_plugin(env, dir, dst_dir='', name='', with_lib=True):
         name = env.project_name + '_' + dir.split('/')[-1]
     mod_name = name + 'module'
     env.build_headers(env.glob(dir + '/*.h'), 'include/' + env.project_name + '/' + dir.split('/')[-1])
-    objs = env.build_sources(env.glob(dir + '/*.c'), env.project_name + '/' + dir)
+    objs = env.build_sources(env.glob(dir + '/*.cxx'), env.project_name + '/' + dir)
     if env['shared_libraries']:
         if with_lib:
             libs = [env.project_name] + env.get('LIBS', [])
@@ -97,7 +97,7 @@ def build_toolbox(env, dir, dst_dir=''):
     if not env.check_dir_target(dir): return
     if not dst_dir:
         dst_dir = env.project_name + '/' + dir
-    objs = env.build_sources(env.glob(dir + '/*.c'), dst_dir)
+    objs = env.build_sources(env.glob(dir + '/*.cxx'), dst_dir)
     objs += env.build_metas(env.glob(dir + '/*.meta'), dst_dir)
     if env['shared_libraries']:
         env.SharedLibrary(env.get_target_name('lib/' + env.project_name + '_Toolboxmodule'), objs,
@@ -300,7 +300,7 @@ def create_meta(target, source, env):
 	output_file.close()
 
 def gen_meta_suffix(env, sources):
-    return "-meta.c"
+    return "-meta.cxx"
 
 Import('env')
 env['BUILDERS']['Meta']=Builder(action=create_meta,src_suffix="meta",

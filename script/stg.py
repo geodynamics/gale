@@ -51,7 +51,7 @@ def generate(env, **kw):
         return env.StaticObject(target, metas, **kw)
 
     def gen_meta_suffix(env, source):
-        return "-meta.c"
+        return "-meta.cxx"
 
     env['BUILDERS']['stgMeta'] = Builder(action=stgMeta, single_source=True,
                                          suffix=gen_meta_suffix, src_suffix='meta')

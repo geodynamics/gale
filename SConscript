@@ -89,8 +89,8 @@ for d in dirs:
         cpppath = new_cpppath
 
     # Build our source files.
-    srcs = Glob(src_dir + '/*.c')
-    srcs = [s for s in srcs if s.path.find('-meta.c') == -1]
+    srcs = Glob(src_dir + '/*.cxx')
+    srcs = [s for s in srcs if s.path.find('-meta.cxx') == -1]
     objs += env.SharedObject(srcs, CPPDEFINES=cpp_defs,
                              CPPPATH=cpppath)
 
@@ -103,7 +103,7 @@ for d in dirs:
         env.Depends(hdrs + objs, defs)
 
     # Build any test suites we might find.
-    suites += env.Object(Glob(tst_dir + '/*Suite.c'))
+    suites += env.Object(Glob(tst_dir + '/*Suite.cxx'))
 
     # Install any test expected and input files
     tst_exp += env.Install(tst_install_dir + '/expected', Glob(tst_exp_dir + '/*'))
@@ -133,8 +133,8 @@ if env['static_libs']:
     dir = Dir(env['build_dir'] + '/StGermain').abspath
     if not os.path.exists(dir):
         os.makedirs(dir)
-    f = File(env['build_dir'] + '/StGermain/stg_static_modules.c')
-    Execute(Copy(f.abspath, File('libStGermain/src/stg_static_modules.c.tmpl')))
+    f = File(env['build_dir'] + '/StGermain/stg_static_modules.cxx')
+    Execute(Copy(f.abspath, File('libStGermain/src/stg_static_modules.cxx.tmpl')))
 
     # Now build the library.
     l = env.StaticLibrary(env['build_dir'] + '/lib/StGermain', objs)
@@ -145,9 +145,9 @@ if env['static_libs']:
 #
 
 libs = ['StGermain'] + env.get('LIBS', [])
-env.Program('bin/FlattenXML', 'Base/FlattenXML/src/main.c', LIBS=libs)
+env.Program('bin/FlattenXML', 'Base/FlattenXML/src/main.cxx', LIBS=libs)
 if env['shared_libs']:
-    env.Program('bin/StGermain', 'src/main.c', LIBS=libs)
+    env.Program('bin/StGermain', 'src/main.cxx', LIBS=libs)
 env.PCUTest('tests/testStGermain', suites,
     PCU_LIBHEADERS="#include <StGermain/StGermain.h>",
     PCU_SETUP="StGermain_Init(&argc, &argv);",

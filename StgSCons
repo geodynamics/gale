@@ -103,7 +103,7 @@ def copy_includes(env, files, dst, inc_nodes, force=False):
 # Builder helpers.
 #
 
-def get_target_name(env, src, suffix='.c'):
+def get_target_name(env, src, suffix='.cxx'):
     return os.path.join(env['buildPath'], env.project_name, src[:-len(suffix)])
 
 def build_defines(env, files, dst):
@@ -188,13 +188,13 @@ def build_directory(env, dir, extra_objs=[],
     env.build_defines(env.glob(os.path.join(srcDir, '*.def')), hdrDir)
     env.build_headers(env.glob(os.path.join(srcDir, '*.h')), hdrDir)
     env.build_metadata(env.glob(os.path.join(srcDir, '*.meta')), dir)
-    env.build_objects(env.glob(os.path.join(srcDir, '*.c')), dir)
+    env.build_objects(env.glob(os.path.join(srcDir, '*.cxx')), dir)
     if build_lib:
         objs = env.get_hnodes(env.SharedObject, dir)
         env.build_library(objs + extra_objs, mod)
     if os.path.exists(tstDir):
-        tst_files = env.glob(os.path.join(tstDir, 'test*.c'))
-        sup_gen = env.glob(os.path.join(tstDir, '*.c'))
+        tst_files = env.glob(os.path.join(tstDir, 'test*.cxx'))
+        sup_gen = env.glob(os.path.join(tstDir, '*.cxx'))
         sup_files = [f for f in sup_gen if f not in tst_files]
         sup = env.build_objects(sup_files, dir, False)
         env.build_tests(tst_files, mod,
@@ -209,7 +209,7 @@ def build_plugin(env, dir, hpath, prefix=True):
     hdr_dir = os.path.join(env.project_name, hpath.split(os.path.sep)[-1])
 
     env.build_headers(env.glob(os.path.join(dir, '*.h')), hdr_dir)
-    objs = env.build_objects(env.glob(os.path.join(dir, '*.c')),
+    objs = env.build_objects(env.glob(os.path.join(dir, '*.cxx')),
                          hpath, False)
     env.build_library(objs, name, [env.project_name], True)
 
@@ -283,7 +283,7 @@ def create_meta(target, source, env):
 ''')
 
 def gen_meta_suffix(env, sources):
-    return "-meta.c"
+    return "-meta.cxx"
 
 Import('env')
 env['BUILDERS']['Meta']=Builder(action=create_meta,src_suffix="meta",

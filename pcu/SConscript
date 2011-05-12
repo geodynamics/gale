@@ -14,7 +14,7 @@ env.Append(CPPPATH=env['build_dir'] + '/include/pcu')
 env.Install('include/pcu', Glob('src/*.h'))
 
 # Build our source files.
-objs = env.SharedObject(Glob('src/*.c'))
+objs = env.SharedObject(Glob('src/*.cxx'))
 
 # Build a library (if needed) and register destination.
 if env['static_libs']:

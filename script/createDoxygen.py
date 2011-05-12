@@ -7,7 +7,7 @@
 ## Extracted from C and python documentation, this has details on all classes defined in
 ## the code, including 'pseudo-classes' based on macros.
 ## \section Files
-## Contains the extracted *.c, *.h and *.py files.
+## Contains the extracted *.cxx, *.h and *.py files.
 ## \section Directories
 ## Contains a listing of all directories in the code base.
 ## \section Namespaces
