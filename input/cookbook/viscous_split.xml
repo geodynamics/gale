@@ -501,14 +501,4 @@
   <param name="gravity">1.0</param>
 
   <param name="Equation1">if(x&lt;1.0,0,1)</param>
-  
-  <param name="StepFunctionOffset">1.0</param>
-  <param name="StepFunctionRightSide">1.0</param>
-  <param name="StepFunctionRightEnd">10000.0</param>
-
-  <param name="StepFunctionLowerOffset">1.0</param>
-  <param name="StepFunctionUpperOffset">1.0</param>
-  <param name="StepFunctionValue">1.0</param>
-  <param name="StepFunctionDim">0</param>
-  <param name="StepFunctionLessThan">False</param>
 </StGermainData>
