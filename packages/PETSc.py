@@ -130,7 +130,7 @@ class PETSc(Package):
         
         if not conf.CheckLibWithHeader(None,
                                        ['mpi.h', 'petsc.h', 'petscvec.h', 'petscmat.h',
-                                        'petscksp.h', 'petscsnes.h'], 'c',
+                                        'petscksp.h', 'petscsnes.h'], 'c++',
                                        call=call,
                                        autoadd=0):
             return False
@@ -139,7 +139,7 @@ class PETSc(Package):
         if env['shared_libs'] and \
                not conf.CheckSharedLibWithHeader(None,
                                                  ['mpi.h', 'petsc.h', 'petscvec.h', 'petscmat.h',
-                                                  'petscksp.h', 'petscsnes.h'], 'c',
+                                                  'petscksp.h', 'petscsnes.h'], 'c++',
                                                  call=call,
                                                  autoadd=0):
             print '\n\nThe PETSc located in:'

@@ -40,7 +40,7 @@ def SaveConfig(env, filename='config.cfg'):
         out = open(filename, 'w')
         opts = [o[1] for o in env['cfg_options']] + [
             'CPPPATH', 'LIBPATH', 'RPATH', 'LIBS', 'CPPDEFINES',
-            'CFLAGS', 'CCFLAGS', 'FRAMEWORKS',
+            'CXXFLAGS', 'FRAMEWORKS',
             ] + env.get('save_vars', [])
         for o in opts:
             v = env.get(o, None)
@@ -51,9 +51,9 @@ def SaveConfig(env, filename='config.cfg'):
 def PrintSummary(env):
     if not (GetOption('help') or GetOption('clean')):
         print ''
-        print 'C compiler:     %s'%repr(env['CC'])
-        print 'C flags:        %s'%env.subst('$CFLAGS $CCFLAGS')
-        print 'C preprocessor: %s'%repr(env.get('CPPDEFINES'))
+        print 'C++ compiler:     %s'%repr(env['CXX'])
+        print 'C++ flags:        %s'%env.subst('$CXXFLAGS')
+        print 'C++ preprocessor: %s'%repr(env.get('CPPDEFINES'))
         print ''
 
 def generate(env, options=[]):

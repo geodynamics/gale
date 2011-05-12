@@ -47,5 +47,5 @@ class PETScExt(Package):
                                        ['mpi.h', 'petsc.h', 'petscvec.h', 'petscmat.h',
                                         'petscksp.h', 'petscsnes.h',
                                         'petscext.h', 'petscext_vec.h', 'petscext_mat.h',
-                                        'petscext_ksp.h', 'petscext_snes.h'], 'c',
+                                        'petscext_ksp.h', 'petscext_snes.h'], 'c++',
                                        autoadd=0)

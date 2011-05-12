@@ -102,7 +102,7 @@ class Package:
         'self.headers' as a list of headers to try to include in the
         compile.
         """
-        return conf.CheckLibWithHeader(None, self.headers, 'c',
+        return conf.CheckLibWithHeader(None, self.headers, 'c++',
                                        autoadd=0)
 
     def __call__(self, **kw):

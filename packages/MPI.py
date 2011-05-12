@@ -14,7 +14,7 @@ class MPI(Package):
 
     def gen_envs(self, loc):
 	# If we've been given an MPI compiler just try that.
-	if os.path.basename(self.env['CC']) in ['mpicc', 'mpicxx']:
+	if os.path.basename(self.env['CXX']) in ['mpicxx', 'mpic++', 'mpiCC']:
             yield self.env.Clone()
             return
 
@@ -26,7 +26,7 @@ class MPI(Package):
                 self.get_option('mpi_lib_dir') is None and \
                 self.get_option('mpi_libs') is None:
             env = self.env.Clone()
-            env['CC'] = 'mpicc'
+            env['CXX'] = 'mpicxx'
             yield env
 
         for env in Package.gen_envs(self, loc):
@@ -69,4 +69,4 @@ class MPI(Package):
 
 
     def check(self, conf, env):
-        return conf.CheckLibWithHeader(None, 'mpi.h', 'c', call='MPI_Finalize();', autoadd=0)
+        return conf.CheckLibWithHeader(None, 'mpi.h', 'c++', call='MPI_Finalize();', autoadd=0)

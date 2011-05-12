@@ -42,8 +42,8 @@ def CheckLibsWithHeader(context, libs, header, language,
     context.did_show_result = 1
     return not res
 
-def CheckCCFixed(context):
-    res = SCons.Conftest.CheckCC(context)
+def CheckCXXFixed(context):
+    res = SCons.Conftest.CheckCXX(context)
     context.did_show_result = 1
     return not res
 
@@ -66,7 +66,7 @@ def Conftest_CheckSharedLib(context, libs, func_name = None, header = None,
     "language" should be "C" or "C++" and is used to select the compiler.
     Default is "C".
     Note that this uses the current value of compiler and linker flags, make
-    sure $CFLAGS, $CPPFLAGS and $LIBS are set correctly.
+    sure $CXXFLAGS, $CPPFLAGS and $LIBS are set correctly.
     Returns an empty string for success, an error message for failure.
     """    
     # Include "confdefs.h" first, so that the header can use HAVE_HEADER_H.
