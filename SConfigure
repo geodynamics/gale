@@ -1,5 +1,5 @@
 import platform, os, sys
-from config import Package, packages, cc
+from config import Package, packages, cxx
 
 #
 # Add options to be passed on to build.
@@ -11,8 +11,8 @@ options = [
     ('--with-debugging', 'with_debugging', 'Build with debugging', 1, 'int'),
     ('--with-warnings', 'with_warnings', 'Print all warnings at compile time', 1, 'int'),
     ('--lib-type', 'lib_type', 'Library type (shared or static)', 'static'),
-    ('--cc', 'CC', 'C compiler', None),
-    ('--cflags', 'CFLAGS', 'Flags for the C compiler', None),
+    ('--cxx', 'CXX', 'C++ compiler', None),
+    ('--cxxflags', 'CXXFLAGS', 'Flags for the C++ compiler', None),
     ('--with-glucifer', 'with_glucifer', 'Enable gLucifer', 0, 'int'),
     ('--with-experimental', 'with_experimental', 'Enable Experimental Repository compile', os.path.isdir("Experimental"), 'int'),
     ('--with-osmesa', 'with_osmesa', 'Enable OSMesa output', 1, 'int'),
@@ -73,11 +73,11 @@ env.UsePackage(packages.libFAME)
 
 if not (GetOption('help') or GetOption('clean')):
 
-    if env.get('CC', None) is not None:
-        cc.apply_cc(env, env['CC'])
+    if env.get('CXX', None) is not None:
+        cxx.apply_cxx(env, env['CXX'])
 
     # Switch off auto compilers if we were given one.
-    if '--cc' in ARGUMENTS:
+    if '--cxx' in ARGUMENTS:
         env['packages'][packages.MPI].try_compilers = False
 
     if env.get('prefix', None) is None:
@@ -127,6 +127,9 @@ if not (GetOption('help') or GetOption('clean')):
     env.ConfigurePackage(packages.libXML2)
     env.ConfigurePackage(packages.MPI)
     env.ConfigurePackage(packages.HDF5, required=False)
+
+    env.PrependUnique(LIBS=['muparser'])
+    env.PrependUnique(CPPPATH=['/usr/include/muParser'])
 
     # If we're building with gLucifer then we need some more
     # packages.
@@ -189,7 +192,7 @@ if not (GetOption('help') or GetOption('clean')):
     # enable all warnings.
     if env.get('with_warnings', None):    
 	env.MergeFlags('-Wall')
-    if env.get('CC', None) == 'icc':
+    if env.get('CXX', None) == 'icc':
         env.MergeFlags('-wd869 -wd1419')
 
 

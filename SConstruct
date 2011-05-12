@@ -117,8 +117,8 @@ if env['with_glucifer']:
 
 if env['static_libs']:
     env.Program('bin/Gale',
-                ['StGermain/src/main.c',
-                 File(env['build_dir'] + '/StGermain/stg_static_modules.c').abspath])
+                ['StGermain/src/main.cxx',
+                 File(env['build_dir'] + '/StGermain/stg_static_modules.cxx').abspath])
 
 # Adding in documentation.
 env.Alias("doc", None, env.Action(File("StGermain/script/createDocs.py").abspath))
