@@ -57,8 +57,8 @@ for d in dirs:
     defs = env.Install(inc_dir, Glob(src_dir + '/*.def'))
 
     # Build our source files.
-    srcs = Glob(src_dir + '/*.c')
-    srcs = [s for s in srcs if s.path.find('-meta.c') == -1]
+    srcs = Glob(src_dir + '/*.cxx')
+    srcs = [s for s in srcs if s.path.find('-meta.cxx') == -1]
     objs += env.SharedObject(srcs, CPPDEFINES=cpp_defs)
 
     # Build any meta files.
@@ -70,7 +70,7 @@ for d in dirs:
         env.Depends(hdrs + objs, defs)
 
     # Build any test suites we might find.
-    suites += env.Object(Glob(tst_dir + '/*Suite.c'))
+    suites += env.Object(Glob(tst_dir + '/*Suite.cxx'))
 
     # Install any test expected and input files
     tst_exp += env.Install(tst_install_dir + '/expected', Glob(tst_exp_dir + '/*'))
@@ -94,8 +94,8 @@ for d in dirs:
 
     env.Install('include/StgDomain/' + d.split('/')[-1], Glob(d + '/*.h'))
 
-    srcs = Glob(d + '/*.c')
-    srcs = [s for s in srcs if s.path.find('-meta.c') == -1]
+    srcs = Glob(d + '/*.cxx')
+    srcs = [s for s in srcs if s.path.find('-meta.cxx') == -1]
     cur_objs = env.SharedObject(srcs, CPPDEFINES=cpp_defs)
     cur_objs += env.stgSharedMeta(Glob(d + '/*.meta'), CPPDEFINES=cpp_defs)
 
@@ -196,7 +196,7 @@ if env['static_libs']:
     reg_c += '\n   stg_num_modules += %d;\n'%len(pl_regs)
     reg_c += '}\n'
 
-    reg_filename = os.path.join(env['build_dir'], 'StgDomain', 'stgdomain_static_modules.c')
+    reg_filename = os.path.join(env['build_dir'], 'StgDomain', 'stgdomain_static_modules.cxx')
     if not os.path.exists(os.path.dirname(reg_filename)):
         os.makedirs(os.path.dirname(reg_filename))
     reg_file = open(reg_filename, 'w')
@@ -205,12 +205,12 @@ if env['static_libs']:
     reg_obj = env.Object(reg_filename)
 
     # Add our register function to the StGermain module file.
-    f = open(File(env['build_dir'] + '/StGermain/stg_static_modules.c').abspath, 'r')
+    f = open(File(env['build_dir'] + '/StGermain/stg_static_modules.cxx').abspath, 'r')
     txt = f.readlines()
     f.close()
     txt.insert(-2, '   stgdomain_register_static_modules();\n')
     txt.insert(0, 'void stgdomain_register_static_modules();\n')
-    f = open(File(env['build_dir'] + '/StGermain/stg_static_modules.c').abspath, 'w')
+    f = open(File(env['build_dir'] + '/StGermain/stg_static_modules.cxx').abspath, 'w')
     f.writelines(txt)
     f.close()
 
