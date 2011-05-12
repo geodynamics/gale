@@ -73,6 +73,12 @@ env.Alias("install", env["prefix"])
 
 Export('env')
 
+SConscript('muParser/SConscript',
+           variant_dir=env['build_dir'] + '/muParser',
+           duplicate=0)
+env.Prepend(LIBS=['muparser'])
+env.Prepend(CPPPATH=[env['build_dir'] + '/include/muParser'])
+
 SConscript('StGermain/SConscript',
            variant_dir=env['build_dir'] + '/StGermain',
            duplicate=0)
