@@ -63,7 +63,7 @@
 	#define __FileParticleLayout \
 		__GlobalParticleLayout \
 		\
-		Name       filename;    \
+		char*       filename;    \
 		FILE*      file;        \
 		Stream*    errorStream; \
 		/** number of files previous checkpoint stored across */ \

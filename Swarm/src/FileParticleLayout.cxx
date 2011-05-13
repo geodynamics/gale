@@ -214,7 +214,7 @@ void _FileParticleLayout_Destroy( void* particleLayout, void* data ) {
 void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) {
    FileParticleLayout*  self         = (FileParticleLayout*)particleLayout;
    Swarm*               swarm        = (Swarm*)_swarm;
-   Name                 filename     = self->filename;
+   char*                filename     = self->filename;
    
 #ifdef READ_HDF5
    hid_t                file;
