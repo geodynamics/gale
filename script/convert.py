@@ -144,10 +144,7 @@ def dtdDict2metaXsdDict( stgDtdDict ):
 # "metaXsdDict2stgDictionaryCode" and "metaXsdDict2stgStrings"
 def metaXsdDict2stgCodeHeader():
 	s = ''
-	s += '#include <stdarg.h>\n'
-	s += '#include <string.h>\n'
-	s += '#include <stdio.h>\n'
-	s += '#include <stdlib.h>\n'
+	s += '#include <cstring>\n'
 	# Purposely refer to internal StGermain headers, as StGermain/StGermain.h would necessarily exist yet if a meta file exists
 	# within StGermain itself.
 	s += '#include "StGermain/Base/Foundation/Foundation.h"\n'
@@ -221,13 +218,13 @@ def metaXsdDict2stgDictionaryCode( xsdDict ):
 	s += '\tchar _parameter_var[MAX_CHAR_SIZE];\n'
 	s += '\tchar _association_var[MAX_CHAR_SIZE];\n'
 
-	s += '\tstrcpy( _xml, "xml" ); strcpy( _title, "title" ); strcpy( _creator, "creator" ); strcpy( _publisher, "publisher" );\n'
-	s += '\tstrcpy( _rights, "rights" ); strcpy( _source, "source" ); strcpy( _subject, "subject" ); strcpy( _description, "description" );\n'
-	s += '\tstrcpy( _info, "info" ); strcpy( _example_documentation, "example-documentation" ); strcpy( _example_code, "example-code" );\n'
-	s += '\tstrcpy( _inherits, "inherits" ); strcpy( _code, "code" ); strcpy( _reference, "reference" ); strcpy( _equation, "equation" );\n'
-	s += '\tstrcpy( _implements, "_implements" ); strcpy( _name, "name" ); strcpy( _type, "type" ); strcpy( _default, "default" );\n'
-	s += '\tstrcpy( _parameters, "parameters" ); strcpy( _nillable, "nillable" ); strcpy( _documentation, "documentation" );\n'
-	s += '\tstrcpy( _associations, "associations" ); strcpy( _parameter_var, "" ); strcpy( _association_var, "" );\n'
+	s += '\tstd::strcpy( _xml, "xml" ); std::strcpy( _title, "title" ); std::strcpy( _creator, "creator" ); std::strcpy( _publisher, "publisher" );\n'
+	s += '\tstd::strcpy( _rights, "rights" ); std::strcpy( _source, "source" ); std::strcpy( _subject, "subject" ); std::strcpy( _description, "description" );\n'
+	s += '\tstd::strcpy( _info, "info" ); std::strcpy( _example_documentation, "example-documentation" ); std::strcpy( _example_code, "example-code" );\n'
+	s += '\tstd::strcpy( _inherits, "inherits" ); std::strcpy( _code, "code" ); std::strcpy( _reference, "reference" ); std::strcpy( _equation, "equation" );\n'
+	s += '\tstd::strcpy( _implements, "_implements" ); std::strcpy( _name, "name" ); std::strcpy( _type, "type" ); std::strcpy( _default, "default" );\n'
+	s += '\tstd::strcpy( _parameters, "parameters" ); std::strcpy( _nillable, "nillable" ); std::strcpy( _documentation, "documentation" );\n'
+	s += '\tstd::strcpy( _associations, "associations" ); std::strcpy( _parameter_var, "" ); std::strcpy( _association_var, "" );\n'
 
 	for param in xsdDict["parameters"]:
 		s+= '\tDictionary* ' + safecvar( param["name"] ) + 'Param;\n'
@@ -295,7 +292,7 @@ def metaXsdDict2stgDictionaryCode( xsdDict ):
                 
 	p_i = 0
 	for param in xsdDict["parameters"]:
-		s += '\tstrcpy( _parameter_var, ' + "\"" + parameter_list[p_i]  + "\"" + ');' 
+		s += '\tstd::strcpy( _parameter_var, ' + "\"" + parameter_list[p_i]  + "\"" + ');' 
 		s += '\t' + safecvar( param["name"] ) + 'Param = Dictionary_New();\n'
 		s += '\tDictionary_Add( ' + safecvar( param["name"] ) + 'Param, _name, Dictionary_Entry_Value_FromString( "' + safecval( param["name"] ) + '" ));\n'
 		s += '\tDictionary_Add( ' + safecvar( param["name"] ) + 'Param, _type, Dictionary_Entry_Value_FromString( "' + safecval( param["type"] ) + '" ));\n'
@@ -324,7 +321,7 @@ def metaXsdDict2stgDictionaryCode( xsdDict ):
 	s += '\tassociations = Dictionary_New();\n'
 
 	for assoc in xsdDict["associations"]:
-		s += '\tstrcpy( _association_var, ' + "\"" + association_list[a_i]  + "\"" + ');' 
+		s += '\tstd::strcpy( _association_var, ' + "\"" + association_list[a_i]  + "\"" + ');' 
 		s += '\t' + safecvar( assoc["name"] ) + 'Assoc = Dictionary_New();\n'
 		s += '\tDictionary_Add( ' + safecvar( assoc["name"] ) + 'Assoc, _name, Dictionary_Entry_Value_FromString( "' + safecval( assoc["name"] ) + '" ));\n'
 		s += '\tDictionary_Add( ' + safecvar( assoc["name"] ) + 'Assoc, _type, Dictionary_Entry_Value_FromString( "' + safecval( assoc["type"] ) + '" ));\n'
