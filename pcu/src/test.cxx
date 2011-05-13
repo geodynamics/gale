@@ -133,7 +133,7 @@ void pcu_test_gathersources( pcu_test_t* test ) {
    ptr = buf;
    while( test->srcs ) {
       pcu_source_pack( test->srcs, ptr );
-      ptr += pcu_source_getPackLen( test->srcs );
+      ptr = (char*)ptr + pcu_source_getPackLen( test->srcs );
       cur = test->srcs->next;
       pcu_source_clear( test->srcs );
       free( test->srcs );
@@ -171,12 +171,12 @@ void pcu_test_gathersources( pcu_test_t* test ) {
 
          /* Unpack sources into the list. */
          ptr = totalbuf;
-         while( ptr < totalbuf + totalsize ) {
+         while( (char*)ptr < (char*)totalbuf + totalsize ) {
             cur = (pcu_source_t*)malloc( sizeof(pcu_source_t) );
             pcu_source_init( cur );
             pcu_source_unpack( cur, ptr );
             cur->test = test;
-            ptr += pcu_source_getPackLen( cur );
+            ptr = (char*)ptr + pcu_source_getPackLen( cur );
             pcu_test_addSource( test, cur );
          }
 

@@ -96,7 +96,7 @@ void* STreeMap_Map( const void* _self, const void* key ) {
    while( node && (res = self->cmp( key, node->data )) )
      node = (res < 0) ? node->left : node->right;
    assert( node );
-   return node->data + self->keySize;
+   return (char*)(node->data) + self->keySize;
 }
 
 Bool STreeMap_HasKey( const void* _self, const void* key ) {

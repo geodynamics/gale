@@ -125,7 +125,7 @@ void AbsArray_Push( void* _self, void* itm ) {
       AbsArray_Resize( self, self->size + 1 );
    else
       self->size++;
-   memcpy( self->ptr + self->size - 1, itm, self->itmSize );
+   memcpy( (char*)(self->ptr) + self->size - 1, itm, self->itmSize );
 }
 
 void AbsArray_Set( void* _self, void* itm ) {
@@ -133,7 +133,7 @@ void AbsArray_Set( void* _self, void* itm ) {
    int i_i;
 
    for( i_i = 0; i_i < self->size; i_i++ )
-      memcpy( self->ptr + i_i, itm, self->itmSize );
+     memcpy( (char*)(self->ptr) + i_i, itm, self->itmSize );
 }
 
 void AbsArray_Clear( void* _self ) {
