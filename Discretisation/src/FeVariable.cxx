@@ -2418,7 +2418,7 @@ void FeVariable_ReadFromFile( void* feVariable, Name filename ) {
 			 * doesn't get re-opened at the start automatically. */
 			inputFile = fopen( filename, "r" );
 
-			if ( False == inputFile ) {
+			if ( NULL == inputFile ) {
 				Journal_Firewall( 0, errorStr, "Error- in %s(), for feVariable \"%s\": Couldn't import from file: "
 					"\"%s\" - aborting.\n", __func__, self->name, filename );
 					
