@@ -22,5 +22,5 @@ hdrs = env.Install('include/muParser/', Glob('include' + '/*.h'))
 srcs = Glob('src' + '/*.cpp')
 objs = env.SharedObject(srcs)
 
-l=env.StaticLibrary(env['build_dir'] + '/lib/muParser', objs)
+l=env.StaticLibrary(env['build_dir'] + '/lib/muparser', objs)
 env.Install(env['prefix'] + '/lib', l)
