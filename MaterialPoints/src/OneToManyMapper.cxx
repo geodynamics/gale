@@ -170,7 +170,7 @@ double _OneToManyMapper_GetDoubleFromExtension(void* mapper, void* intPoint, Ext
 
     ref = OneToManyMapper_GetMaterialRef(mapper, intPoint);
     for(ii = 0; ii < ref->numParticles; ii++) {
-      c = *(double*)(MaterialPointsSwarm_GetExtensionAt(self->materialSwarm, ref->particleInds[ii], extHandle) + offs);
+      c = *(double*)((char*)MaterialPointsSwarm_GetExtensionAt(self->materialSwarm, ref->particleInds[ii], extHandle) + offs);
       v += ((double)ref->weights[ii])*c;
     }
 
@@ -185,7 +185,7 @@ double _OneToManyMapper_GetDoubleFromMaterial(void* mapper, void* intPoint, Exte
 
     ref = OneToManyMapper_GetMaterialRef(mapper, intPoint);
     for(ii = 0; ii < ref->numParticles; ii++) {
-      c = *(double*)(MaterialPointsSwarm_GetMaterialExtensionAt(self->materialSwarm, ref->particleInds[ii], extHandle) + offs);
+      c = *(double*)((char*)MaterialPointsSwarm_GetMaterialExtensionAt(self->materialSwarm, ref->particleInds[ii], extHandle) + offs);
       v += ((double)ref->weights[ii])*c;
     }
 

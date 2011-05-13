@@ -199,7 +199,7 @@ void* _OneToOneMapper_GetExtensionOn( void* mapper, void* point, ExtensionInfo_I
 }
 
 double _OneToOneMapper_GetDoubleFromExtension(void* mapper, void* intPoint, ExtensionInfo_Index extHandle, int offs) {
-    return *(double*)(IntegrationPointMapper_GetExtensionOn(mapper, intPoint, extHandle) + offs);
+    return *(double*)((char*)IntegrationPointMapper_GetExtensionOn(mapper, intPoint, extHandle) + offs);
 }
 
 double _OneToOneMapper_GetDoubleFromMaterial(void* mapper, void* intPoint, ExtensionInfo_Index extHandle, int offs) {
@@ -207,5 +207,5 @@ double _OneToOneMapper_GetDoubleFromMaterial(void* mapper, void* intPoint, Exten
     MaterialPoint *matPoint;
 
     matPoint = OneToOneMapper_GetMaterialPoint(mapper, intPoint, &matSwarm);
-    return *(double*)(MaterialPointsSwarm_GetMaterialExtensionOn(matSwarm, matPoint, extHandle) + offs);
+    return *(double*)((char*)MaterialPointsSwarm_GetMaterialExtensionOn(matSwarm, matPoint, extHandle) + offs);
 }
