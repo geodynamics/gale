@@ -1052,7 +1052,7 @@ void _AbstractContext_SaveTimeInfo( void* _context ) {
 	 
 	timeInfoFile = fopen( timeInfoFileName, "w" );
 
-	if ( False == timeInfoFile ) {
+	if ( NULL == timeInfoFile ) {
 		Journal_Printf( errorStr, "Error- in %s(), Couldn't create checkpoint time info file with "
 		"filename \"%s\" - aborting.\n", __func__, timeInfoFileName );
 		exit(EXIT_FAILURE);

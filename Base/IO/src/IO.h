@@ -57,6 +57,7 @@
 	#include "Stream.h"
 	#include "CStream.h"
 	#include "MPIStream.h"
+	#include "BinaryStream.h"
 	#include "StreamFormatter.h"
 	#include "LineFormatter.h"
 	#include "IndentFormatter.h"
