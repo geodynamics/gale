@@ -2515,7 +2515,6 @@ void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_
   int                     dim, dim2, dim3, i, j, k;
   char *filename;
   int N, N2, N3, ndims;
-  int result_index, result_index2, result_index3;
   double factor, factor2, factor3;
   feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
   mesh       = feVariable->feMesh;
