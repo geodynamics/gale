@@ -2691,7 +2691,7 @@ void StgFEM_StandardConditionFunctions_EquationN(Node_LocalIndex node_lI,
                                                  Variable_Index var_I,
                                                  void* _context,
                                                  void* _result,
-                                                 std::string equation_string,
+                                                 std::string &equation_string,
                                                  const int equation_number);
 
 void StgFEM_StandardConditionFunctions_Equation1(Node_LocalIndex node_lI,
@@ -2798,7 +2798,7 @@ void StgFEM_StandardConditionFunctions_EquationN(Node_LocalIndex node_lI,
                                                  Variable_Index var_I,
                                                  void* _context,
                                                  void* _result,
-                                                 std::string equation_string,
+                                                 std::string &equation_string,
                                                  const int equation_number) 
 {
   FiniteElementContext *context=(FiniteElementContext*)_context;
