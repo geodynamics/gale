@@ -79,9 +79,9 @@ namespace mu
       
       explicit change_dec_sep(char_type cDecSep, char_type cThousandsSep = 0, int nGroup = 3)
         :std::numpunct<TChar>()
+        ,m_nGroup(nGroup)
         ,m_cDecPoint(cDecSep)
         ,m_cThousandsSep(cThousandsSep)
-        ,m_nGroup(nGroup)
       {}
       
     protected:
@@ -120,20 +120,32 @@ namespace mu
     static value_type  Sinh(value_type);
     static value_type  Cosh(value_type);
     static value_type  Tanh(value_type);
-    // arcus hyperbolic functions
-    static value_type  ASinh(value_type);
-    static value_type  ACosh(value_type);
-    static value_type  ATanh(value_type);
-    // Logarithm functions
-    static value_type  Log2(value_type);  // Logarithm Base 2
+    // C99 functions
+    static value_type ACosh(value_type);
+    static value_type ASinh(value_type);
+    static value_type ATanh(value_type);
+    static value_type Cbrt(value_type);
+    static value_type Copysign(value_type, value_type);
+    static value_type Erf(value_type);
+    static value_type Erfc(value_type);
+    static value_type Expm1(value_type);
+    static value_type Hypot(value_type, value_type);
+    static value_type Ilogb(value_type);
+    static value_type Lgamma(value_type);
+    static value_type Log1p(value_type);
+    static value_type Logb(value_type);
+    static value_type Remainder(value_type, value_type);
+    static value_type Rint(value_type);
+    static value_type Gamma(value_type);
+
     static value_type  Log10(value_type); // Logarithm Base 10
     static value_type  Ln(value_type);    // Logarithm Base e (natural logarithm)
     // misc
     static value_type  Exp(value_type);
     static value_type  Abs(value_type);
     static value_type  Sqrt(value_type);
-    static value_type  Rint(value_type);
     static value_type  Sign(value_type);
+    static value_type  Step(value_type);
     static value_type  Ite(value_type, value_type, value_type);
 
     // Prefix operators

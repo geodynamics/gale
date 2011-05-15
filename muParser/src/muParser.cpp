@@ -59,13 +59,27 @@ namespace mu
   value_type Parser::Sinh(value_type v)  { return sinh(v); }
   value_type Parser::Cosh(value_type v)  { return cosh(v); }
   value_type Parser::Tanh(value_type v)  { return tanh(v); }
-  value_type Parser::ASinh(value_type v) { return log(v + sqrt(v * v + 1)); }
-  value_type Parser::ACosh(value_type v) { return log(v + sqrt(v * v - 1)); }
-  value_type Parser::ATanh(value_type v) { return ((value_type)0.5 * log((1 + v) / (1 - v))); }
+
+  // C99 functions
+  value_type Parser::ACosh(value_type v) { return acosh(v); }
+  value_type Parser::ASinh(value_type v) { return asinh(v); }
+  value_type Parser::ATanh(value_type v) { return atanh(v); }
+  value_type Parser::Cbrt(value_type v)  { return cbrt(v); }
+  value_type Parser::Copysign(value_type v1, value_type v2)  { return copysign(v1,v2); }
+  value_type Parser::Erf(value_type v)   { return erf(v); }
+  value_type Parser::Erfc(value_type v)  { return erfc(v); }
+  value_type Parser::Expm1(value_type v)  { return expm1(v); }
+  value_type Parser::Hypot(value_type v1, value_type v2)  { return hypot(v1, v2); }
+  value_type Parser::Ilogb(value_type v)  { return ilogb(v); }
+  value_type Parser::Lgamma(value_type v)  { return lgamma(v); }
+  value_type Parser::Log1p(value_type v)  { return log1p(v); }
+  value_type Parser::Logb(value_type v)  { return logb(v); }
+  value_type Parser::Remainder(value_type v1, value_type v2)  { return remainder(v1, v2); }
+  value_type Parser::Rint(value_type v) { return rint(v); }
+  value_type Parser::Gamma(value_type v)  { return tgamma(v); }
 
   //---------------------------------------------------------------------------
   // Logarithm functions
-  value_type Parser::Log2(value_type v)  { return log(v)/log((value_type)2); } // Logarithm base 2
   value_type Parser::Log10(value_type v) { return log10(v); } // Logarithm base 10
   value_type Parser::Ln(value_type v)    { return log(v);   } // Logarithm base e (natural logarithm)
 
@@ -74,8 +88,8 @@ namespace mu
   value_type Parser::Exp(value_type v)  { return exp(v);   }
   value_type Parser::Abs(value_type v)  { return fabs(v);  }
   value_type Parser::Sqrt(value_type v) { return sqrt(v);  }
-  value_type Parser::Rint(value_type v) { return floor(v + (value_type)0.5); }
   value_type Parser::Sign(value_type v) { return (value_type)((v<0) ? -1 : (v>0) ? 1 : 0); }
+  value_type Parser::Step(value_type v) { return (value_type)((v<0) ? 0 : 1); }
 
   //---------------------------------------------------------------------------
   /** \brief Conditional (if then else).
@@ -245,20 +259,32 @@ namespace mu
     DefineFun(_T("sinh"), Sinh);
     DefineFun(_T("cosh"), Cosh);
     DefineFun(_T("tanh"), Tanh);
-    // arcus hyperbolic functions
-    DefineFun(_T("asinh"), ASinh);
+    // C99 functions
     DefineFun(_T("acosh"), ACosh);
+    DefineFun(_T("asinh"), ASinh);
     DefineFun(_T("atanh"), ATanh);
+    DefineFun(_T("cbrt"), Cbrt);
+    DefineFun(_T("copysign"), Copysign);
+    DefineFun(_T("erf"), Erf);
+    DefineFun(_T("erfc"), Erfc);
+    DefineFun(_T("expm1"), Expm1);
+    DefineFun(_T("hypot"), Hypot);
+    DefineFun(_T("ilogb"), Ilogb);
+    DefineFun(_T("lgamma"), Lgamma);
+    DefineFun(_T("log1p"), Log1p);
+    DefineFun(_T("logb"), Logb);
+    DefineFun(_T("remainder"), Remainder);
+    DefineFun(_T("rint"), Rint);
+    DefineFun(_T("gamma"), Gamma);
+
     // Logarithm functions
-    DefineFun(_T("log2"), Log2);
     DefineFun(_T("log10"), Log10);
-    DefineFun(_T("log"), Log10);
     DefineFun(_T("ln"), Ln);
     // misc
     DefineFun(_T("exp"), Exp);
     DefineFun(_T("sqrt"), Sqrt);
     DefineFun(_T("sign"), Sign);
-    DefineFun(_T("rint"), Rint);
+    DefineFun(_T("step"), Sign);
     DefineFun(_T("abs"), Abs);
     DefineFun(_T("if"), Ite);
     // Functions with variable number of arguments
