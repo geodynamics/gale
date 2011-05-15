@@ -350,8 +350,8 @@
     </struct>
     <struct name="hydrostaticTerm">
       <param name="Type">HydrostaticTerm</param>
-      <param name="densityEquation">if(y &lt; .35, 1,0)</param>
-      <param name="pressureEquation">if(y &lt; .35, .35-y,0)</param>
+      <param name="densityEquation">step(.35-y)</param>
+      <param name="pressureEquation">step(.35-y)*(.35-y)</param>
     </struct>
     <struct name="stressBC">
       <param name="Type">StressBC</param>
