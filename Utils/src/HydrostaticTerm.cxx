@@ -52,8 +52,10 @@
 #include <PICellerator/MaterialPoints/MaterialPoints.h>
 
 #include "types.h"
+#include <string>
 #include "HydrostaticTerm.h"
 #include "MaterialSwarmVariable.h"
+#include "muParser.h"
 
 #include <assert.h>
 #include <string.h>
@@ -77,6 +79,8 @@ HydrostaticTerm* HydrostaticTerm_New(Name name,
                                      double gravity,
                                      double v,
                                      double width,
+                                     Name density_equation,
+                                     Name pressure_equation,
                                      AbstractContext *context)
 {
 	HydrostaticTerm* self = (HydrostaticTerm*) _HydrostaticTerm_DefaultNew( name );
@@ -97,6 +101,8 @@ HydrostaticTerm* HydrostaticTerm_New(Name name,
                                 gravity,
                                 v,
                                 width,
+                                density_equation,
+                                pressure_equation,
                                 context);
 	return self;
 }
@@ -129,6 +135,8 @@ void _HydrostaticTerm_Init(HydrostaticTerm* self,
                            double gravity,
                            double v,
                            double width,
+                           Name density_equation,
+                           Name pressure_equation,
                            AbstractContext *context)
 {
   self->isConstructed    = True;
@@ -148,6 +156,8 @@ void _HydrostaticTerm_Init(HydrostaticTerm* self,
   self->gravity=gravity;
   self->v=v;
   self->width=width;
+  self->density_equation=density_equation;
+  self->pressure_equation=pressure_equation;
   self->context=context;
 }
 
@@ -167,6 +177,8 @@ void HydrostaticTerm_InitAll(void* forceTerm,
                              double gravity,
                              double v,
                              double width,
+                             Name density_equation,
+                             Name pressure_equation,
                              AbstractContext *context)
 {
   HydrostaticTerm* self = (HydrostaticTerm*) forceTerm;
@@ -186,6 +198,8 @@ void HydrostaticTerm_InitAll(void* forceTerm,
                          gravity,
                          v,
                          width,
+                         density_equation,
+                         pressure_equation,
                          context);
 }
 
@@ -222,11 +236,16 @@ void _HydrostaticTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf,
     exponential_coefficient1,
     exponential_coefficient2,gravity,v,width;
   AbstractContext *context;
-
+  char *density_equation, *pressure_equation;
   /* Construct Parent */
   Stg_Component_AssignFromXML( self, cf, data, False );
 
   context = Stg_ComponentFactory_ConstructByName( cf, "context", AbstractContext, True, data );
+
+  density_equation=
+    Stg_ComponentFactory_GetString(cf,self->name,"densityEquation","");
+  pressure_equation=
+    Stg_ComponentFactory_GetString(cf,self->name,"pressureEquation","");
 
   upper_density=
     Stg_ComponentFactory_GetDouble(cf,self->name,"upperDensity",0.0);
@@ -267,6 +286,8 @@ void _HydrostaticTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf,
                          gravity,
                          v,
                          width,
+                         density_equation,
+                         pressure_equation,
                          context);
 }
 
@@ -331,31 +352,44 @@ double HydrostaticTerm_Temperature(void* forceTerm, Coord coord)
 double HydrostaticTerm_Density( void* forceTerm, Coord coord)
 {
   HydrostaticTerm *self=(HydrostaticTerm *)forceTerm;
-  double T, density, alpha;
-  double current_height, current_boundary;
-
-  HydrostaticTerm_Current_Heights(self,&current_height,&current_boundary);
-
-  /* First, get the temperature */
-  T=HydrostaticTerm_Temperature(forceTerm, coord);
-
-  /* Then, get the density */
-  if(coord[1]>current_height)
+  if(self->density_equation!=NULL && strlen(self->density_equation)!=0)
     {
-      density=alpha=0;
-    }
-  else if(coord[1]>current_boundary)
-    {
-      density=self->upper_density;;
-      alpha=self->upper_alpha;
+      mu::Parser d;
+      d.DefineVar("x", coord); 
+      d.DefineVar("y", coord+1); 
+      d.DefineVar("z", coord+2); 
+      d.DefineVar("t", &(self->context->currentTime));
+      d.SetExpr(self->density_equation);
+      return d.Eval();
     }
   else
     {
-      density=self->lower_density;
-      alpha=self->lower_alpha;
-    }
+      double T, density, alpha;
+      double current_height, current_boundary;
 
-  return density*(1-alpha*T);
+      HydrostaticTerm_Current_Heights(self,&current_height,&current_boundary);
+
+      /* First, get the temperature */
+      T=HydrostaticTerm_Temperature(forceTerm, coord);
+
+      /* Then, get the density */
+      if(coord[1]>current_height)
+        {
+          density=alpha=0;
+        }
+      else if(coord[1]>current_boundary)
+        {
+          density=self->upper_density;;
+          alpha=self->upper_alpha;
+        }
+      else
+        {
+          density=self->lower_density;
+          alpha=self->lower_alpha;
+        }
+
+      return density*(1-alpha*T);
+    }
 }
 
 double HydrostaticTerm_Pressure_Analytic(double density, double gravity,
@@ -372,57 +406,70 @@ double HydrostaticTerm_Pressure_Analytic(double density, double gravity,
 double HydrostaticTerm_Pressure( void* forceTerm, Coord coord)
 {
   HydrostaticTerm *self=(HydrostaticTerm *)forceTerm;
-  double h=self->height-coord[1];
-  double p;
-
-  if(coord[1]>=self->height)
+  if(self->pressure_equation!=NULL && strlen(self->pressure_equation)!=0)
     {
-      p=0;
-    }
-  else if(coord[1]>self->material_boundary)
-    {
-      p=HydrostaticTerm_Pressure_Analytic(self->upper_density, self->gravity, h,
-                                          self->upper_alpha,
-                                          self->T_0,
-                                          self->linear_coefficient,
-                                          self->exponential_coefficient1,
-                                          self->exponential_coefficient2);
+      mu::Parser p;
+      p.DefineVar("x", coord); 
+      p.DefineVar("y", coord+1); 
+      p.DefineVar("z", coord+2); 
+      p.DefineVar("t", &(self->context->currentTime));
+      p.SetExpr(self->pressure_equation);
+      return p.Eval();
     }
   else
     {
-      p=HydrostaticTerm_Pressure_Analytic(self->upper_density,
-                                          self->gravity,
-                                          self->height-self->material_boundary,
-                                          self->upper_alpha,
-                                          self->T_0,
-                                          self->linear_coefficient,
-                                          self->exponential_coefficient1,
-                                          self->exponential_coefficient2)
-        - HydrostaticTerm_Pressure_Analytic(self->lower_density, self->gravity,
-                                            self->height-self->material_boundary,
-                                            self->lower_alpha,
-                                            self->T_0,
-                                            self->linear_coefficient,
-                                            self->exponential_coefficient1,
-                                            self->exponential_coefficient2);
-      /* Add in the contribution from where the temperature is constant */
-      if(self->T_max_depth!=0 && h>self->T_max_depth)
+      double h=self->height-coord[1];
+      double p;
+
+      if(coord[1]>=self->height)
         {
-          p+=self->lower_density*self->gravity*(h-self->T_max_depth)
-            *(1-self->lower_alpha*self->T_max);
-          h=self->T_max_depth;
+          p=0;
         }
-      /* Add in the last part of the analytic term.  Note that h may
-         have been adjusted to T_max_depth */
-      p+=HydrostaticTerm_Pressure_Analytic(self->lower_density, self->gravity,
-                                           h,
-                                           self->lower_alpha,
-                                           self->T_0,
-                                           self->linear_coefficient,
-                                           self->exponential_coefficient1,
-                                           self->exponential_coefficient2);
+      else if(coord[1]>self->material_boundary)
+        {
+          p=HydrostaticTerm_Pressure_Analytic(self->upper_density, self->gravity, h,
+                                              self->upper_alpha,
+                                              self->T_0,
+                                              self->linear_coefficient,
+                                              self->exponential_coefficient1,
+                                              self->exponential_coefficient2);
+        }
+      else
+        {
+          p=HydrostaticTerm_Pressure_Analytic(self->upper_density,
+                                              self->gravity,
+                                              self->height-self->material_boundary,
+                                              self->upper_alpha,
+                                              self->T_0,
+                                              self->linear_coefficient,
+                                              self->exponential_coefficient1,
+                                              self->exponential_coefficient2)
+            - HydrostaticTerm_Pressure_Analytic(self->lower_density, self->gravity,
+                                                self->height-self->material_boundary,
+                                                self->lower_alpha,
+                                                self->T_0,
+                                                self->linear_coefficient,
+                                                self->exponential_coefficient1,
+                                                self->exponential_coefficient2);
+          /* Add in the contribution from where the temperature is constant */
+          if(self->T_max_depth!=0 && h>self->T_max_depth)
+            {
+              p+=self->lower_density*self->gravity*(h-self->T_max_depth)
+                *(1-self->lower_alpha*self->T_max);
+              h=self->T_max_depth;
+            }
+          /* Add in the last part of the analytic term.  Note that h may
+             have been adjusted to T_max_depth */
+          p+=HydrostaticTerm_Pressure_Analytic(self->lower_density, self->gravity,
+                                               h,
+                                               self->lower_alpha,
+                                               self->T_0,
+                                               self->linear_coefficient,
+                                               self->exponential_coefficient1,
+                                               self->exponential_coefficient2);
+        }
+      return p;
     }
-  return p;
 }
 
 double HydrostaticTerm_Pressure_Bottom( void* forceTerm)

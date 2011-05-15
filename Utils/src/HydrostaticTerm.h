@@ -69,6 +69,8 @@
                 double v; \
                 double width; \
                 AbstractContext *context; \
+                Name density_equation; \
+                Name pressure_equation;
 
 
 
@@ -102,6 +104,8 @@
                                      double gravity,
                                      double v,
                                      double width,
+                                     Name density_equation,
+                                     Name pressure_equation,
                                      AbstractContext *context);
 
 	void _HydrostaticTerm_Delete( void* forceTerm );
