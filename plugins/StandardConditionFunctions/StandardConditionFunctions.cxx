@@ -47,6 +47,7 @@
 #include <assert.h>
 #include "StandardConditionFunctions.h"
 #include "muParser.h"
+#include <list>
 
 const Type StgFEM_StandardConditionFunctions_Type = "StgFEM_StandardConditionFunctions";
 
@@ -2794,6 +2795,15 @@ void StgFEM_StandardConditionFunctions_Equation10(Node_LocalIndex node_lI,
                                               equation_string,10);
 }
 
+mu::value_type* StgFEM_StandardConditionFunctions_AddVariable
+(const mu::char_type *a_szName,
+ void *a_pUserData)
+{
+  static std::list<mu::value_type> variables;
+  variables.push_front(0);
+  return &(*(variables.begin()));
+}
+
 void StgFEM_StandardConditionFunctions_EquationN(Node_LocalIndex node_lI,
                                                  Variable_Index var_I,
                                                  void* _context,
@@ -2827,6 +2837,7 @@ void StgFEM_StandardConditionFunctions_EquationN(Node_LocalIndex node_lI,
       p.DefineVar("y", coord+1); 
       p.DefineVar("z", coord+2); 
       p.DefineVar("t", &(context->currentTime));
+      p.SetVarFactory(StgFEM_StandardConditionFunctions_AddVariable, &p);
       p.SetExpr(equation_string);
 
       *result=p.Eval();
