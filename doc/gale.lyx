@@ -6627,15 +6627,11 @@ BuoyancyForceTerm
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="upperDensity">1</param>
+  <param name="density">step(.35-y)</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="height">maxY</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="gravity">gravity</param>
+  <param name="pressure">step(.35-y)*(.35-y)</param>
 \end_layout
 
 \begin_layout LyX-Code
