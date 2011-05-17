@@ -17,7 +17,10 @@ libraries for
 
 You must also have python 2.2.1 or greater installed.  If you do not
 already have MPI, then in many cases PETSc can install a version for
-you.  Installing PETSc also requires a Blas/Lapack implementation.
+you.  Installing PETSc also requires a Blas/Lapack implementation,
+which, again, PETSc can install for you.
+
+For checkpointing, you will also need HDF5.
 
 Generally, the most difficult part is installing PETSc.
 

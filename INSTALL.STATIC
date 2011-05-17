@@ -3,30 +3,54 @@ Linux
 
 First build mpich.  Get the tarball
 
-  mpich2-1.0.5p4.tar.gz
+  mpich2-1.3.2p1.tar.gz
 
 from the buildbots.  Configure with
 
-  ./configure --prefix=$HOME --with-pm=gforker --enable-fast --disable-f77 --disable-f90 --disable-cxx
+  ./configure --prefix=$HOME --with-pm=gforker --enable-fast --disable-f77 --disable-fc
 
 Set your path
 
   export PATH=$HOME/bin:$PATH
 
+Next, get hdf5
+
+  hdf5-1.8.7.tar.gz
+
+Configure with
+
+  ./configure --enable-parallel --enable-production --enable-shared=no --prefix=$HOME CC=mpicc
+
 Then get Petsc 3.0.0 and configure with
 
   ./configure --with-fortran=0 --with-x=0 --download-c-blas-lapack=1 --with-shared=0 --with-debugging=0
 
-Then get Gale and configure with
+Next is Gale.  Gale uses dgesv_ from lapack.  The downloaded
+c-blas-lapack library may define it as "dgesv" or "dgesv_".  You can
+check it with the command
 
-  ./configure.sh --with-debugging=0
+  nm $PETSC_DIR/$PETSC_ARCH/lib/libf2clapack.a | grep dgesv
+
+If it uses dgesv_, then configure Gale with
+
+  ./configure.sh --with-debugging=0 --hdf5-dir=$HOME
+
+Otherwise, use
+
+  ./configure.sh --with-debugging=0 --hdf5-dir=$HOME --cxxflags='-Ddgesv_=dgesv'
 
 The final link for Gale will still pull in shared versions of libxml2.
-Copy that link line, remove the -lxml2 flag, and add
+Copy the final link line, remove the -lxml2 flag, and add
 
   /usr/lib/libxml2.a /usr/lib/libz.a
 
-at the end.  Running ldd on the executable on a 64 bit system gives
+at the end.  You also need to staticly like libstdc++.  Symlink the
+static libstdc++ into the build directory with the command
+
+  ln -s `mpicxx -print-file-name=libstdc++.a` build/lib/
+
+Then strip the executable.  Running ldd on the executable on a 64 bit
+system gives
 
 $ ldd build/bin/Gale 
 	linux-vdso.so.1 =>  (0x00007fffaddfe000)
@@ -39,19 +63,34 @@ $ ldd build/bin/Gale
 
 which are all libaries provided by the kernel.
 
+
+
 MAC
 ---
 
-Same as Linux, but you do not have to change the libxml2 flag.
-libxml2 comes standard on the Mac.
+On newer versions of OS X (>10.5), Open MPI is included with the OS.
+Do not use it.  I get runtime errors.  So you still need to build
+mpich.
+
+However, veclib and libxml2 are standard on the Mac.  So when
+configuring Petsc, use the line
+
+  ./configure --with-fortran=0 --with-x=0 --with-shared=0 --with-debugging=0
+
+When linking Gale, it will not find libz needed by hdf5.  So add 'z'
+to the list of libaries in config.cfg.  Running
+
+  otool -L build/bin/Gale
+
+should show libraries only in /usr/lib and /System/Library.
 
 Windows
 -------
-Same as the Mac.  In the end, you will have to copy a number of dll's:
 
-  cygwin1.dll
-  cygxml2-2.dll
-  cygz.dll
-  cyggcc_s-1.dll
-  cygiconv-2.dll
+Install the libxml2-dev, lapack-dev, libhdf5-dev packages.  Configure
+mpich, petsc and Gale the same as in Linux.  In the end, you will have
+to copy a number of dll's.  Run ldd on Gale.exe and copy all of the
+dll's not in the Windows directory.
+
+
 
