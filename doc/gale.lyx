@@ -106,7 +106,7 @@ Walter Landry and Luke Hodkinson
 \begin_inset Newline newline
 \end_inset
 
-Version 1.6.1
+Version 1.6.2
 \end_layout
 
 \begin_layout Date
@@ -1870,7 +1870,7 @@ geodynamics.org/cig/software/packages/long/gale/
 .
  Then you can run Gale from the command line or DOS prompt.
  CIG provides binaries for Linux, Mac OS X (10.4 or greater), and Windows
- (2000 and XP).
+ (Vista and 7).
 \end_layout
 
 \begin_layout Section
@@ -1888,24 +1888,31 @@ System Requirements
 
 \begin_layout Standard
 Gale works on a variety of computational platforms and has been tested on
- workstations running 
+ machines running 
 \end_layout
 
 \begin_layout Itemize
-Mac OS X 10.4.6 (Intel)
+Mac OS X 10.4.6 and 10.6.0
 \end_layout
 
 \begin_layout Itemize
-Windows Vista
+Windows Vista (32 and 64 bit)
 \end_layout
 
 \begin_layout Itemize
-Debian stable (x86 and AMD64), testing (x86 and AMD64), and unstable (x86)
+Debian stable (AMD64)
 \end_layout
 
-\begin_layout Standard
-Gale has also been tested on clusters running RedHat Enterprise Linux 3
- (EM64T).
+\begin_layout Itemize
+Ubuntu Hardy Heron (x86 and AMD64)
+\end_layout
+
+\begin_layout Itemize
+RedHat Enterprise Linux 3 (EM64T)
+\end_layout
+
+\begin_layout Itemize
+Rocks 4.1 (Opteron)
 \end_layout
 
 \begin_layout Subsection
@@ -1913,8 +1920,8 @@ Dependencies
 \end_layout
 
 \begin_layout Standard
-In order to build Gale, you must have the headers and development libraries
- for
+In order to build Gale, you must have a C++ compiler and the headers and
+ development libraries for
 \end_layout
 
 \begin_layout Itemize
@@ -1935,6 +1942,10 @@ You must also have python 2.2.1 or greater installed.
  version for you.
  Installing PETSc also requires a Blas/Lapack implementation, which, again,
  PETSc can install for you.
+\end_layout
+
+\begin_layout Standard
+For checkpointing, you will also need HDF5.
 \end_layout
 
 \begin_layout Subsection
@@ -2220,7 +2231,7 @@ If you downloaded binaries for your platform, you can run the Gale executable
 \end_layout
 
 \begin_layout LyX-Code
-./Gale-1_6_1 input/cookbook/yielding.xml
+./Gale-1_6_2 input/cookbook/yielding.xml
 \end_layout
 
 \begin_layout Standard
@@ -2290,7 +2301,7 @@ Error: File input/cookbook/foo.xml doesn't exist, not readable, or not valid.
 Due to quirks in some implementations of MPI, you may have to specify the
  complete path to the input file (e.g., 
 \family typewriter
-./Gale-1_6_1 /home/juser/gale/input/cookbook/yielding.xml
+./Gale-1_6_2 /home/juser/gale/input/cookbook/yielding.xml
 \family default
 ).
 \end_layout
@@ -2570,7 +2581,7 @@ One solution is to use a direct solver instead of GMRES.
 \end_layout
 
 \begin_layout LyX-Code
-./Gale-1_6_1  input/cookbook/yielding.xml -pc_type lu -ksp_type preonly
+./Gale-1_6_2  input/cookbook/yielding.xml -pc_type lu -ksp_type preonly
 \end_layout
 
 \begin_layout Standard
@@ -2599,7 +2610,7 @@ Once that is done, enabling it is again just appending a few arguments to
 \end_layout
 
 \begin_layout LyX-Code
-./Gale-1_6_1  input/cookbook/yielding.xml -pc_factor_mat_solver_package mumps
+./Gale-1_6_2  input/cookbook/yielding.xml -pc_factor_mat_solver_package mumps
  
 \backslash
 
@@ -2746,7 +2757,7 @@ You can also change the default values of the input file without modifying
 \end_layout
 
 \begin_layout LyX-Code
-./Gale-1_6_1  input/cookbook/yielding.xml --maxTimeSteps=20
+./Gale-1_6_2  input/cookbook/yielding.xml --maxTimeSteps=20
 \end_layout
 
 \begin_layout Standard
@@ -2757,7 +2768,7 @@ You can append any number of modified parameters in one unbroken line (here
 \begin_layout LyX-Code
 
 \size small
-./Gale-1_6_1  input/cookbook/yielding.xml --maxTimeSteps=20 --dim=3 --elementResI=
+./Gale-1_6_2  input/cookbook/yielding.xml --maxTimeSteps=20 --dim=3 --elementResI=
 64 
 \begin_inset Newline newline
 \end_inset
@@ -4670,7 +4681,7 @@ Modify the bottom boundary condition of WallVC to
 \end_layout
 
 \begin_layout LyX-Code
-      <param name="value">StepFunction</param>
+      <param name="value">Equation1</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -4686,35 +4697,19 @@ Modify the bottom boundary condition of WallVC to
 \end_layout
 
 \begin_layout Standard
-This makes the velocity of the bottom boundary a step function.
+This lets you set the x-velocity of the bottom boundary to an arbitrary
+ equation.
  
 \end_layout
 
 \end_deeper
 \begin_layout Enumerate
-You must also specify the parameters of the step function by adding the
- variables
+Specify the x-velocity equation by adding the variable
 \end_layout
 
 \begin_deeper
 \begin_layout LyX-Code
-<param name="StepFunctionLowerOffset">1.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="StepFunctionUpperOffset">1.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="StepFunctionValue">1.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="StepFunctionDim">0</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="StepFunctionLessThan">False</param>
+<param name="Equation1">step(0.5-x)</param>
 \end_layout
 
 \begin_layout Standard
@@ -5062,11 +5057,7 @@ wrapTop
 
 \end_deeper
 \begin_layout Enumerate
-Now specify the velocity on the boundaries using the 
-\family typewriter
-StepFunctionProduct
-\family default
- functions.
+Now specify the velocity on the boundaries.
  For the left boundary, modify the left 
 \family typewriter
 WallVC
@@ -5100,7 +5091,7 @@ WallVC
 \end_layout
 
 \begin_layout LyX-Code
-    <param name="value">StepFunctionProduct3</param>
+    <param name="value">Equation1</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -5120,15 +5111,7 @@ and add the variables at the end of the file (just before
 \end_layout
 
 \begin_layout LyX-Code
-<param name="StepFunctionProduct3Start">0.1</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="StepFunctionProduct3End">0.2</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="StepFunctionProduct3Value">1</param>
+<param name="Equation1">step(y-0.1)*step(0.2-y)</param>
 \end_layout
 
 \end_deeper
@@ -5166,7 +5149,7 @@ WallVC
 \end_layout
 
 \begin_layout LyX-Code
-    <param name="value">StepFunctionProduct2</param>
+    <param name="value">Equation2</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -5186,7 +5169,7 @@ WallVC
 \end_layout
 
 \begin_layout LyX-Code
-    <param name="value">StepFunctionProduct1</param>
+    <param name="value">Equation3</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -5206,27 +5189,11 @@ and add the variables to the end of the file (just before
 \end_layout
 
 \begin_layout LyX-Code
-<param name="StepFunctionProduct1Start">0.9</param>
+<param name="Equation2">-step(x-0.9)*step(1.1-x)</param>
 \end_layout
 
 \begin_layout LyX-Code
-<param name="StepFunctionProduct1End">1.1</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="StepFunctionProduct1Value">1.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="StepFunctionProduct2Start">0.9</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="StepFunctionProduct2End">1.1</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="StepFunctionProduct2Value">-1.0</param>
+<param name="Equation3">step(x-0.9)*step(1.1-x)</param>
 \end_layout
 
 \end_deeper
@@ -6103,10 +6070,6 @@ Geometry and boundary conditions for the fixed, deformed bottom boundary
 
 \end_layout
 
-\begin_layout Plain Layout
-
-\end_layout
-
 \end_inset
 
 
@@ -6177,314 +6140,49 @@ SurfaceAdaptor
 
 \end_deeper
 \begin_layout Enumerate
-Replace the left boundary condition for the velocity
-\end_layout
-
-\begin_deeper
-\begin_layout LyX-Code
-<struct>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="type">WallVC</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="wall">left</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <list name="variables">
-\end_layout
-
-\begin_layout LyX-Code
-    <struct>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="name">vx</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="type">func</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="value">StepFunctionProduct3</param>
-\end_layout
-
-\begin_layout LyX-Code
-    </struct>
-\end_layout
-
-\begin_layout LyX-Code
-  </list>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout Standard
-with
-\end_layout
-
-\begin_layout LyX-Code
-<struct>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="type">WallVC</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="wall">left</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <list name="variables">
-\end_layout
-
-\begin_layout LyX-Code
-    <struct>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="name">vx</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="type">func</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="value">Velocity_PartialRotationX</param>
-\end_layout
-
-\begin_layout LyX-Code
-    </struct>
-\end_layout
-
-\begin_layout LyX-Code
-    <struct>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="name">vy</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="type">func</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="value">Velocity_PartialRotationY</param>
-\end_layout
-
-\begin_layout LyX-Code
-    </struct>
-\end_layout
-
-\begin_layout LyX-Code
-  </list>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\end_deeper
-\begin_layout Enumerate
-Replace the bottom boundary condition
-\end_layout
-
-\begin_deeper
-\begin_layout LyX-Code
-<struct>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="type">WallVC</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="wall">bottom</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <list name="variables">
-\end_layout
-
-\begin_layout LyX-Code
-    <struct>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="name">vy</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="type">func</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="value">StepFunctionProduct2</param>
-\end_layout
-
-\begin_layout LyX-Code
-    </struct>
-\end_layout
-
-\begin_layout LyX-Code
-    <struct>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="name">vx</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="type">func</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="value">StepFunctionProduct1</param>
-\end_layout
-
-\begin_layout LyX-Code
-    </struct>
-\end_layout
-
-\begin_layout LyX-Code
-  </list>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout Standard
-with
-\end_layout
-
-\begin_layout LyX-Code
-<struct>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="type">WallVC</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="wall">bottom</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <list name="variables">
-\end_layout
-
-\begin_layout LyX-Code
-    <struct>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="name">vx</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="type">func</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="value">Velocity_PartialRotationX</param>
-\end_layout
-
-\begin_layout LyX-Code
-    </struct>
-\end_layout
-
-\begin_layout LyX-Code
-    <struct>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="name">vy</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="type">func</param>
-\end_layout
-
-\begin_layout LyX-Code
-      <param name="value">Velocity_PartialRotationY</param>
-\end_layout
-
-\begin_layout LyX-Code
-    </struct>
-\end_layout
-
-\begin_layout LyX-Code
-  </list>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\end_deeper
-\begin_layout Enumerate
-Finally, replace the 
+Replace the 
 \family typewriter
-StepFunction
+Equation
 \family default
- variables
+ strings
 \end_layout
 
 \begin_deeper
 \begin_layout LyX-Code
-  <param name="StepFunctionProduct3Start">0.1</param>
+  <param name="Equation1">step(y-0.1)*step(0.2-y)</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="StepFunctionProduct3End">0.2</param>
+  <param name="Equation2">-step(x-0.9)*step(1.1-x)</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="StepFunctionProduct3Value">1</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="StepFunctionProduct1Start">0.9</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="StepFunctionProduct1End">1.1</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="StepFunctionProduct1Value">1.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="StepFunctionProduct2Start">0.9</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="StepFunctionProduct2End">1.1</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="StepFunctionProduct2Value">-1.0</param>
+  <param name="Equation3">step(x-0.9)*step(1.1-x)</param> 
 \end_layout
 
 \begin_layout Standard
-with rotation variables
+with 
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="SolidBodyRotationOmega">-1</param>
+  <param name="Equation1">r=hypot(x,y+3); step(r-3.15)*step(3.35-r)*(y+3)/r</param
+>
 \end_layout
 
+\begin_layout LyX-Code
+  <param name="Equation2">r=hypot(x,y+3); step(r-3.15)*step(3.35-r)*x/r</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Equation3">Equation1</param>
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Add parameters for the bottom surface shape
+\end_layout
+
+\begin_deeper
 \begin_layout LyX-Code
   <param name="SolidBodyRotationCentreX">0</param>
 \end_layout
@@ -6505,14 +6203,25 @@ with rotation variables
   <param name="CylinderMaxX">0.960468635615</param>
 \end_layout
 
+\end_deeper
 \begin_layout LyX-Code
-  <param name="RadiusCylinder">3.35</param>
+
 \end_layout
 
-\end_deeper
 \begin_layout Standard
-A worked example is in input/cookbook/viscous_deformed_bottom.xml.
- Figure shows the strain rate invariant and velocity.
+A worked example is in 
+\family typewriter
+input/cookbook/viscous_deformed_bottom.xml
+\family default
+.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Strain-deformed-bottom"
+
+\end_inset
+
+ shows the strain rate invariant and velocity.
 \end_layout
 
 \begin_layout Standard
@@ -6520,10 +6229,6 @@ A worked example is in input/cookbook/viscous_deformed_bottom.xml.
 wide false
 sideways false
 status open
-
-\begin_layout Plain Layout
-
-\end_layout
 
 \begin_layout Plain Layout
 \align center
@@ -6548,6 +6253,313 @@ name "fig:Strain-deformed-bottom"
 \end_inset
 
 Strain rate invariant and velocity for a deformed bottom boundary
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Tracers-cookbook"
+
+\end_inset
+
+Tracers
+\end_layout
+
+\begin_layout Standard
+This example adds tracer particles to track where material moves.
+ These tracers play no active part in the simulation, only observing the
+ fields as they follow the movements of the material.
+\end_layout
+
+\begin_layout Enumerate
+Copy 
+\family typewriter
+myviscous_deformed_bottom.xml
+\family default
+ to 
+\family typewriter
+tracers.xml
+\family default
+.
+\end_layout
+
+\begin_layout Enumerate
+Add the components
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<struct name="pLayout">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">ManualParticleLayout</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="totalInitialParticles">1</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="manualParticlePositions">
+\end_layout
+
+\begin_layout LyX-Code
+    <asciidata>
+\end_layout
+
+\begin_layout LyX-Code
+      <columnDefinition name = "x" type="double"/>
+\end_layout
+
+\begin_layout LyX-Code
+      <columnDefinition name = "y" type="double"/>
+\end_layout
+
+\begin_layout LyX-Code
+      <columnDefinition name = "z" type="double"/>
+\end_layout
+
+\begin_layout LyX-Code
+      1.0 .1 .1
+\end_layout
+
+\begin_layout LyX-Code
+      1.3 .1 .1
+\end_layout
+
+\begin_layout LyX-Code
+      1.6 .1 .1
+\end_layout
+
+\begin_layout LyX-Code
+      1.9 .1 .1
+\end_layout
+
+\begin_layout LyX-Code
+      1.0 .2 .1
+\end_layout
+
+\begin_layout LyX-Code
+      1.3 .2 .1
+\end_layout
+
+\begin_layout LyX-Code
+      1.6 .2 .1
+\end_layout
+
+\begin_layout LyX-Code
+      1.9 .2 .1
+\end_layout
+
+\begin_layout LyX-Code
+    </asciidata>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="passiveSwarmMovementHandler">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type"> ParticleMovementHandler </param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="passiveTracerSwarm">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">MaterialPointsSwarm</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="CellLayout">elementCellLayout</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="ParticleLayout">pLayout</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="FiniteElement_Mesh">linearMesh</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="FeMesh">mesh-linear</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="ParticleCommHandlers">
+\end_layout
+
+\begin_layout LyX-Code
+    <param> passiveSwarmMovementHandler </param>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="passiveTracerAdvect">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">SwarmAdvector</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Swarm">passiveTracerSwarm</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="TimeIntegrator">timeIntegrator</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="VelocityField">VelocityField</param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="swarmOutput">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">TracerOutput</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Swarm">passiveTracerSwarm</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="PressureField">PressureField</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="Fields">
+\end_layout
+
+\begin_layout LyX-Code
+    <param>VelocityMagnitudeField</param>
+\end_layout
+
+\begin_layout LyX-Code
+    <param>StrainRateInvariantField</param>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Increase the number of timesteps so that we can see nice tracks by changing
+ the line
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<param name="maxTimeSteps">10</param>
+\end_layout
+
+\begin_layout Standard
+to
+\end_layout
+
+\begin_layout LyX-Code
+<param name="maxTimeSteps">100</param>
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+After running this input file you will see eight new files in the output
+ directory: 
+\family typewriter
+swarmOutput.00000.dat
+\family default
+, ...
+ 
+\family typewriter
+swarmOutput.00007.dat
+\family default
+.
+ Inside each of these files is a record of the time position, pressure,
+ velocity magnitude, and strain-rate invariant that each particle saw as
+ it traveled along.
+ Plotting the particle tracks of all of these tracers gives us Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Particle-tracks-of"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/tracers.png
+	width 70col%
+
+\end_inset
+
+
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Particle-tracks-of"
+
+\end_inset
+
+Particle tracks of tracers
 \end_layout
 
 \end_inset
@@ -9162,234 +9174,6 @@ The parameters passed to this method provide access to the rheology class's
  members/methods, the constitutive matrix, the swarm (material points),
  the index of the element currently being assembled, the material point
  currently being evaluated, and the material point's elemental coordinates.
-\end_layout
-
-\begin_layout Section
-Standard Condition Functions
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Standard-Condition-Functions-modify"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-If you need to write your own Standard Condition Functions (see Section
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Standard-Condition-Functions"
-
-\end_inset
-
-), then the easiest way is to copy and paste an existing function.
- For example, suppose you wanted to create a function 
-\family typewriter
-xSquared
-\family default
- that returns 
-\begin_inset Formula $Ax^{2}$
-\end_inset
-
-, where A is a constant provided in the input file.
- You start by opening the file
-\end_layout
-
-\begin_layout LyX-Code
-src/StgFEM/plugins/StandardConditionFunctions/StandardConditionFunctions.c
-\end_layout
-
-\begin_layout Standard
-and finding the function
-\end_layout
-
-\begin_layout LyX-Code
-StgFEM_StandardConditionFunctions_Extension
-\end_layout
-
-\begin_layout Standard
-Make a copy of that function and rename it to
-\end_layout
-
-\begin_layout LyX-Code
-StgFEM_StandardConditionFunctions_xSquared
-\end_layout
-
-\begin_layout Standard
-Then you only need to modify the last 6 lines of the function to get the
- desired behavior.
- Specifically, it will become
-\end_layout
-
-\begin_layout LyX-Code
-void StgFEM_StandardConditionFunctions_xSquared( Node_LocalIndex node_lI,
-\end_layout
-
-\begin_layout LyX-Code
-                                                 Variable_Index var_I,
-\end_layout
-
-\begin_layout LyX-Code
-                                                 void* _context, void* _result
- ) {
-\end_layout
-
-\begin_layout LyX-Code
-        DiscretisationContext*  context            = (DiscretisationContext*)_co
-ntext;
-\end_layout
-
-\begin_layout LyX-Code
-        Dictionary*             dictionary         = context->dictionary;
-\end_layout
-
-\begin_layout LyX-Code
-        FeVariable*             feVariable         = NULL;
-\end_layout
-
-\begin_layout LyX-Code
-        FeMesh*                 mesh               = NULL;
-\end_layout
-
-\begin_layout LyX-Code
-        double*                 result             = (double*) _result;
-\end_layout
-
-\begin_layout LyX-Code
-        double*                 coord;
-\end_layout
-
-\begin_layout LyX-Code
-        double                  factor;
-\end_layout
-
-\begin_layout LyX-Code
-        
-\end_layout
-
-\begin_layout LyX-Code
-        feVariable = (FeVariable*)FieldVariable_Register_GetByName(
-\end_layout
-
-\begin_layout LyX-Code
-                                  context->fieldVariable_Register, "VelocityFiel
-d" );
-\end_layout
-
-\begin_layout LyX-Code
-        mesh       = feVariable->feMesh;
-\end_layout
-
-\begin_layout LyX-Code
-        /* Find Centre of Solid Body Rotation */
-\end_layout
-
-\begin_layout LyX-Code
-        factor = Dictionary_GetDouble_WithDefault( dictionary, "xSquaredFactor",
- 1.0 );
-\end_layout
-
-\begin_layout LyX-Code
-        /* Find coordinate of node */
-\end_layout
-
-\begin_layout LyX-Code
-        coord = Mesh_GetVertex( mesh, node_lI );
-\end_layout
-
-\begin_layout LyX-Code
-        *result = factor * (coord[ I_AXIS ]*coord[ I_AXIS ];
-\end_layout
-
-\begin_layout LyX-Code
-}
-\end_layout
-
-\begin_layout Standard
-Then you need to register your function at the top of the file.
- After the lines
-\end_layout
-
-\begin_layout LyX-Code
-condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_Extension,
-\end_layout
-
-\begin_layout LyX-Code
-                                  "Velocity_Extension" );
-\end_layout
-
-\begin_layout LyX-Code
-ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
-\end_layout
-
-\begin_layout Standard
-add the lines
-\end_layout
-
-\begin_layout LyX-Code
-
-\size small
-condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_xSquared,
- "xSquared" );
-\end_layout
-
-\begin_layout LyX-Code
-
-\size small
-ConditionFunction_Register_Add( context->condFunc_Register, condFunc );
-\end_layout
-
-\begin_layout Standard
-The last thing to do is to modify
-\end_layout
-
-\begin_layout LyX-Code
-
-\size small
-src/StgFEM/plugins/StandardConditionFunctions/StandardConditionFunctions.h
-\end_layout
-
-\begin_layout Standard
-After the line
-\end_layout
-
-\begin_layout LyX-Code
-
-\size small
-void StgFEM_StandardConditionFunctions_Extension( Node_LocalIndex node_lI,
- Variable_Index var_I,
-\end_layout
-
-\begin_layout LyX-Code
-
-\size small
-                                                  void* _context, void*
- _result ) ;
-\end_layout
-
-\begin_layout Standard
-add the line
-\end_layout
-
-\begin_layout LyX-Code
-
-\size small
-void StgFEM_StandardConditionFunctions_xSquared( Node_LocalIndex node_lI,
- Variable_Index var_I,
-\end_layout
-
-\begin_layout LyX-Code
-
-\size small
-                                                 void* _context, void* _result
- ) ;
-\end_layout
-
-\begin_layout Standard
-Now recompile the code, and you should be able to use your new function
- from input files.
 \end_layout
 
 \begin_layout Chapter
@@ -17154,7 +16938,7 @@ You can also set the velocity to a function.
 \end_layout
 
 \begin_layout LyX-Code
-          <param name="value">Gaussian</param>
+          <param name="value">Equation1</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -17178,24 +16962,12 @@ You can also set the velocity to a function.
 \end_layout
 
 \begin_layout LyX-Code
-<param name="GaussianHeight">1.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="GaussianWidth">0.1</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="GaussianCenter">0.5</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="GaussianDim">0</param>
+<param name="Equation1">exp(-((x-0.5)/0.1)^2)</param>
 \end_layout
 
 \begin_layout Standard
-Note that the parameters are separated out into the variables section (see
- Section 
+Note that the equation string is separated out into the variables section
+ (see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:Variables"
@@ -17203,8 +16975,7 @@ reference "sub:Variables"
 \end_inset
 
 ).
- In general, you can use any of the Standard Condition Functions (see Section
- 
+ In general, you can use either an equation or file input (see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Standard-Condition-Functions"
@@ -17413,15 +17184,18 @@ reference "sub:Components"
 \end_layout
 
 \begin_layout Standard
-You can also use the Standard Condition Functions (see Section 
+You can also use an equation or file input (see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Standard-Condition-Functions"
 
 \end_inset
 
-), but due to technical issues, you must list Standard Condition Functions
- before StressBC in the list of components.
+), but due to technical issues, you must list a 
+\family typewriter
+StgFEM_StandardConditionFunctions
+\family default
+ component before StressBC in the list of components.
  So, for example, to add a stress condition to the left wall with a Gaussian
  shape, the complete list of components would be
 \end_layout
@@ -17495,7 +17269,7 @@ reference "sec:Standard-Condition-Functions"
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="x_value">Gaussian</param>
+  <param name="x_value">Equation1</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -17518,19 +17292,7 @@ Gaussian
 \end_layout
 
 \begin_layout LyX-Code
-<param name="GaussianHeight">1.0</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="GaussianWidth">0.1</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="GaussianCenter">0.5</param>
-\end_layout
-
-\begin_layout LyX-Code
-<param name="GaussianDim">0</param>
+<param name="Equation1">exp(-((x-0.5)/0.1)^2)</param>
 \end_layout
 
 \begin_layout Standard
@@ -19226,94 +18988,91 @@ reference "sub:Hydrostatic-Pressure"
 \end_inset
 
 .
- It can subtract out the pressure from a two layer model with a temperature
- profile described by 
-\family typewriter
-the TemperatureProfile
-\family default
- standard condition function (see Section 
+ You give it the equations for the density and pressure.
+ Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Standard-Condition-Functions"
 
 \end_inset
 
-).
- Specifically, it subtracts out a density given by
+ has complete details on how to enter those equations.
+ As an example, consider the case where the material has a density of 5,
+ going from the bottom to a height of 13, with a gravity of 10.
+ The 
+\family typewriter
+densityEquation
+\family default
+ would then be
+\end_layout
+
+\begin_layout LyX-Code
+step(13-y)*5
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-\begin{array}{cc}
-0 & x>height\\
-upperDensity\cdot\left(1-upperAlpha\cdot T\right) & materialBoundary>x>height\\
-lowerDensity\cdot\left(1-lowerAlpha\cdot T\right) & x>materialBoundary\end{array},\]
+and the 
+\family typewriter
+pressureEquation
+\family default
+ would be the integral of that, multiplied by the gravity
+\end_layout
 
-\end_inset
-
- where
+\begin_layout LyX-Code
+step(13-y)*5*step(13-y)*10
 \end_layout
 
 \begin_layout Standard
-\align left
-\begin_inset Formula \[
-T=\left\{ \begin{array}{cc}
-T\_0 & x>height\\
-T\_0+linearCoefficient\left(height-x\right) & x<height\\
-+exponentialCoefficient1\left(1-\exp\left(-exponentialCoefficient2\left(height-x\right)\right)\right)\end{array}\right..\]
-
+If you have temperature and thermal expansity in your problem, remember
+ to put those effects in.
+ So if the temperature is a linear gradient from 0 at the top to 1 at the
+ bottom, and your thermal expansity is 
+\begin_inset Formula $10^{-5}$
 \end_inset
 
- This component also computes a pressure by integrating this density profile
- analytically and multiplying by 
-\begin_inset Formula $gravity.$
-\end_inset
-
- Once you have created a 
+, then the 
 \family typewriter
-HydrostaticTerm
+densityEquation
 \family default
-, you have to remember to pass it along to 
+ would be
+\end_layout
+
+\begin_layout LyX-Code
+step(13-y)*5*(1-(10^(-5))*(13-y)/13)
+\end_layout
+
+\begin_layout Standard
+and the 
 \family typewriter
-BuoyancyForceTerm
+pressureEquation
 \family default
- (Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:BouyancyForceTerm"
+ would be the integral of this multiplied by gravity, with the boundary
+ condition that the pressure is 0 at the surface
+\end_layout
 
-\end_inset
+\begin_layout LyX-Code
+step(13-y)*5*((13-y) - (10^(-5))*((13-y)^2)/26)*10
+\end_layout
 
-) and a 
-\family typewriter
-StressBC
-\family default
- (Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Stress-Boundary-Conditions"
-
-\end_inset
-
-) in order for it to take effect.
- You also have to pass it to any 
-\family typewriter
-DruckerPrager
-\family default
- rheologies (Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:DruckerPrager"
-
-\end_inset
-
-) that you are using, so that the rheology will have the correct pressure.
+\begin_layout Standard
+The integral for the pressure, in particular, may become very tricky.
+ If your setup defies simple analytic treatments, it may be ok to use simpler,
+ approximate density and temperature.
+ However, it is 
+\series bold
+\color red
+critical
+\series default
+\color inherit
+ that the pressure is always the integral of the density.
+ Otherwise, you will get wrong results.
+ 
 \end_layout
 
 \begin_layout Standard
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="12" columns="2">
+<lyxtabular version="3" rows="3" columns="2">
 <features>
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
@@ -19342,7 +19101,7 @@ Defaults
 \begin_inset Text
 
 \begin_layout Plain Layout
-upperDensity
+densityEquation
 \end_layout
 
 \end_inset
@@ -19351,187 +19110,7 @@ upperDensity
 \begin_inset Text
 
 \begin_layout Plain Layout
-0
-\end_layout
 
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-upperAlpha
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-lowerDensity
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-lowerAlpha
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-height
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-materialBoundary
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-T_0
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-linearCoefficient
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-exponentialCoefficient1
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-exponentialCoefficient2
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-0
 \end_layout
 
 \end_inset
@@ -19542,16 +19121,16 @@ exponentialCoefficient2
 \begin_inset Text
 
 \begin_layout Plain Layout
-gravity
+pressureEquation
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-0
+
 \end_layout
 
 \end_inset
@@ -20121,7 +19700,7 @@ force_value If ``force_type'' is ``double,'' then this must be a number.
 \end_layout
 
 \begin_layout Section
-Standard Condition Functions
+Equation Input
 \begin_inset CommandInset label
 LatexCommand label
 name "sec:Standard-Condition-Functions"
@@ -20132,542 +19711,1623 @@ name "sec:Standard-Condition-Functions"
 \end_layout
 
 \begin_layout Standard
-Standard Condition Functions are functions that you can use to specify initial
- conditions and boundary conditions.
- At present, they take in a coordinate 
-\begin_inset Formula $(x,y,z)$
-\end_inset
-
- and output a function 
-\begin_inset Formula $f(x,y,z)$
-\end_inset
-
-.
- They are all defined in the directory 
+The main way to enter initial conditions and boundary conditions is via
+ 
 \family typewriter
-src/StgFEM/plugins/StandardConditionFunctions/
+Equation
+\family default
+'s.
+ These are strings that get interpreted at runtime.
+ You can have up to 10 different 
+\family typewriter
+Equation
+\family default
+'s at a time: 
+\family typewriter
+Equation1
+\family default
+, 
+\family typewriter
+Equation2
+\family default
+, ...
+ 
+\family typewriter
+Equation10
 \family default
 .
- For the following descriptions, the sides of the box are at 
-\begin_inset Formula $x_{min}$
+\end_layout
+
+\begin_layout Standard
+The syntax is meant to be as close as possible to natural notation as possible.
+ For example,
+\end_layout
+
+\begin_layout LyX-Code
+exp(-2*(x^2 + y^2))
+\end_layout
+
+\begin_layout Standard
+is equivalent to the formula
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula \[
+e^{-2\left(x^{2}+y^{2}\right)}.\]
+
+\end_inset
+
+Within each equation, the coordinates are the only predefined variables:
+ 
+\family typewriter
+x
+\family default
+, 
+\family typewriter
+y
+\family default
+, 
+\family typewriter
+z
+\family default
+, 
+\family typewriter
+t
+\family default
+.
+ For your convenience, you can also define variables within an equation.
+ The equation
+\end_layout
+
+\begin_layout LyX-Code
+r=hypot(x^2+y^2), r*exp(-(r/10)^2)
+\end_layout
+
+\begin_layout Standard
+defines a radius and then uses it.
+ Statements are separated by commas 
+\begin_inset Quotes sld
+\end_inset
+
+,
+\begin_inset Quotes srd
+\end_inset
+
+, and the return value of the equation is the last statement.
+\end_layout
+
+\begin_layout Standard
+Gale uses muParser 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://muParser.sf.net
+\end_layout
+
+\end_inset
+
+, with some minor modifications, to handle the actual parsing.
+ The available unary and binary operators are
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="2">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
++
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+addition
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+subtraction or unary minus
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+*
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+multiplication
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+/
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+division
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+^
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+raise to the power:
+\begin_inset Formula $x^{y}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In addition, the available functions are
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="34" columns="2">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sin(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sin
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+cos(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+cos
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tan(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tan
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+asin(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+arcsin
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+acos(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+arccos
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+atan(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+arctan
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sinh(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hyperbolic sin
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+cosh(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hyperbolic cos
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+tanh(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hyperbolic tan
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+asinh(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hyperbolic arcsin
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+acosh(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hyperbolic arccos
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+atanh(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hyperbolic arctan
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+cbrt(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+cube root: 
+\begin_inset Formula $\sqrt[3]{x}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+copysign(x,y)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+return the value of x with the sign of y
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+erf(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+error function
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+erfc(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+complementary error function
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+expm1(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $e^{x}-1$
+\end_inset
+
+, optimised for when x is small
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hypot(x,y)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sqrt{x^{2}+y^{2}}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+lgamma(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+natural log of the absolute value of the gamma function
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+log1p(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\log\left(1+x\right)$
+\end_inset
+
+, optimised for when x is small
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+remainder(x,y)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+the remainder of x/y
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+rint(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+round to the nearest int
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+gamma(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Gamma function
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+log10(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\log_{10}\left(x\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ln(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+natural logarithm:
+\begin_inset Formula $\log\left(x\right)$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+exp(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $e^{x}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+abs(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Absolute value: 
+\begin_inset Formula $|x|$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sqrt(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Square root: 
+\begin_inset Formula $\sqrt{x}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sign(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+-1 if x<0, +1 if x>0 and 0 if x==0
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+step(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0 if x<0, 1 otherwise
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sum(x1,x2,x3,...)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Sum of individual values: x1+x2+x3+...
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+avg(x1,x2,x3,...)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Average of all values: (x1+x2+x3+...)/num_values
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+min(x1,x2,x3,...)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Minimum of all values
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+max(x1,x2,x3,...)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Maximum of all values
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+In addition, you can use the function 
+\family typewriter
+if(a,b,c)
+\family default
+.
+ If the first element 
+\family typewriter
+a
+\family default
+ is true, then return 
+\family typewriter
+b
+\family default
+.
+ Otherwise return 
+\family typewriter
+c
+\family default
+.
+ For the condition 
+\family typewriter
+a
+\family default
+, you can use all of the normal relational operators.
+ Unfortunately, because the equations are embedded in an XML file, you are
+ not allowed to use the characters 
+\begin_inset Quotes sld
+\end_inset
+
+<
+\begin_inset Quotes srd
+\end_inset
+
+ or 
+\begin_inset Quotes sld
+\end_inset
+
+>
+\begin_inset Quotes srd
+\end_inset
+
+.
+ Instead, you must use the escaped versions 
+\begin_inset Quotes sld
+\end_inset
+
+&lt;
+\begin_inset Quotes srd
 \end_inset
 
  and 
-\begin_inset Formula $x_{max}$
+\begin_inset Quotes sld
 \end_inset
 
-, and 
-\begin_inset Formula $L\equiv x_{max}-x_{min}$
-\end_inset
-
-, and all names with CamelCase capitalization are variables from the input
- file.
- If you need to write your own function, see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Standard-Condition-Functions-modify"
-
+&gt;
+\begin_inset Quotes srd
 \end_inset
 
 .
+ To be specific, the allowed relational operators are
 \end_layout
 
-\begin_layout Description
-Velocity_SolidBodyRotation Returns the coordinates rotated by 
-\family typewriter
-SolidBodyRotationOmega
-\family default
- around the 
-\begin_inset Formula $z$
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="8" columns="2">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+&lt;
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+less than
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+&lt;=
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+less than or equal
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+&gt;
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+greater than
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+&gt;=
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+greater than or equal
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+==
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+is equal
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+!=
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+is not equal
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+||
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+logical or
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+&&
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+logical and
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
 \end_inset
 
- axis, centered at the coordinate (
+
+\end_layout
+
+\begin_layout Standard
+So the expression
+\end_layout
+
+\begin_layout LyX-Code
+if(x<1, 7, 13)
+\end_layout
+
+\begin_layout Standard
+must be written as
+\end_layout
+
+\begin_layout LyX-Code
+if(x &lt; 1, 7, 13)
+\end_layout
+
+\begin_layout Standard
+Most of the time, you can use the 
 \family typewriter
-SolidBodyRotationCentreX
+step
+\family default
+ function instead
+\end_layout
+
+\begin_layout LyX-Code
+7 + step(x-1)*6
+\end_layout
+
+\begin_layout Standard
+Note that rounding issues may make it dangerous to write it as
+\end_layout
+
+\begin_layout LyX-Code
+step(1-x)*7 + step(x-1)*13
+\end_layout
+
+\begin_layout Standard
+since, in the general case, depending on roundoff, both parts may be true.
+ This would yield 20 instead of 7 or 13.
+ The 
+\family typewriter
+if()
+\family default
+ function is also useful if one of the results is very expensive to compute.
+ For example, given the statement
+\end_layout
+
+\begin_layout LyX-Code
+if(x &lt; 1, 0, expensive_function)
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+expensive_function
+\family default
+ will only be evaluated if 
+\begin_inset Formula $x\geq1$
+\end_inset
+
+.
+ If you used 
+\family typewriter
+step
 \family default
 , 
 \family typewriter
-SolidBodyRotationY
+expensive_function
 \family default
-), out to a radius 
+ would always be evaluated.
+\end_layout
+
+\begin_layout Standard
+Finally, you can use the syntax 
 \family typewriter
-RadiusCylinder
+?:
+\family default
+ as an exact replacement for 
+\family typewriter
+if()
 \family default
 .
- Specifically, if 
-\begin_inset Formula $r<RadiusCylinder$
-\end_inset
-
-
-\begin_inset Formula \[
-\begin{array}{ccc}
-f(x,y,z)_{x} & = & -SolidBodyRotationOmega(y-SolidBodyRotationCentreY)\\
-f(x,y,z)_{y} & = & SolidBodyRotationOmega(x-SolidBodyRotationCentreX)\end{array},\]
-
-\end_inset
-
- otherwise returns 0.
+ So for the example given above,
 \end_layout
 
-\begin_layout Description
-Velocity_PartialRotationX Returns the 
-\emph on
-
-\begin_inset Formula $x$
-\end_inset
-
-
-\emph default
- component of Velocity_SolidBodyRotation.
+\begin_layout LyX-Code
+(x &lt; 1) ? 0 : expensive_function
 \end_layout
 
-\begin_layout Description
-Velocity_PartialRotationY Returns the 
-\begin_inset Formula $y$
-\end_inset
-
- component of Velocity_SolidBodyRotation.
-\end_layout
-
-\begin_layout Description
-TaperedRotationX If 
-\begin_inset Formula $r<RadiusCylinder$
-\end_inset
-
-, returns Velocity_PartialRotationX.
- If 
-\begin_inset Formula $RadiusCylinder<r<TaperedRadius$
-\end_inset
-
-, returns
-\begin_inset Formula \[
-VelocityPartialRotationX\left(\frac{TaperedRadius-r}{TaperedRadius-RadiusCylinder}\right).\]
-
-\end_inset
-
- If 
-\begin_inset Formula $r>TaperedRadius$
-\end_inset
-
-, returns 0.
-\end_layout
-
-\begin_layout Description
-TaperedRotationY Similar to TaperedRotationX, but returns Velocity_PartialRotati
-onY.
-\end_layout
-
-\begin_layout Description
-Velocity_SimpleShear 
-\begin_inset Formula $f(x,y,z)=SimpleShearFactor\left(y-SimpleShearCentreY\right)$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Description
-Velocity_Extension 
-\begin_inset Formula $f(x,y,z)=ExtensionFactor\left(x-ExtensionCentreX\right)$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Description
-Velocity_PartialLid_TopLayer Returns 0 if the 
-\begin_inset Formula $x$
-\end_inset
-
- coordinate is within one grid point of the boundary; 1 otherwise.
-\end_layout
-
-\begin_layout Description
-Velocity_LinearInterpolationLid 
-\begin_inset Formula \[
-f(x,y,z)=bcLeftHandSideValue+\left(\frac{bcRightHandSideValue-bcLeftHandSideValue}{L}\right)x\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Description
-Velocity_Lid_RampWithCentralMax 
-\begin_inset Formula $f(x,y,z)=\left\{ \begin{array}{cc}
-2\left(x-x_{min}\right)/L & x<L/2+x_{min}\\
-1-2(x-x_{min}-L/2) & x>L/2+x_{min}\end{array}\right.$
-\end_inset
-
-
-\end_layout
-
-\begin_layout Description
-Velocity_SinusoidalLid 
-\begin_inset Formula \[
-f(x,y,z)=\sin\left(\frac{\pi\left(x-x_{min}\right)}{L}sinusoidalLidWavenumber\right)\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Description
-Velocity_Lid_CornerOnly Returns 1 if the coordinate is on the right boundary.
-\end_layout
-
-\begin_layout Description
-Temperature_CosineHill Returns a hill defined by a cosine.
- Specifically, if we define pre-rotated coordinates
-\begin_inset Formula \[
-\begin{array}{ccc}
-x_{pre-rotate} & = & CosineHillCentreX-SolidBodyRotationCentreX\\
-y_{pre-rotate} & = & CosineHillCentreY-SolidBodyRotationCentreY\\
-z_{pre-rotate} & = & CosineHillCentreZ-SolidBodyRotationCentreZ\end{array},\]
-
-\end_inset
-
- and then rotate them around the 
-\begin_inset Formula $z$
-\end_inset
-
- axis by the angle 
-\begin_inset Formula $\theta=SolidBodyRotationOmega*t$
-\end_inset
-
-
-\begin_inset Formula \[
-\begin{array}{ccc}
-x_{hill} & = & x_{pre-rotate}\cos\theta-y_{pre-rotate}\sin\theta\\
-y_{hill} & = & x_{pre-rotate}\sin\theta+y_{pre-rotate}\cos\theta\\
-z_{hill} & = & z_{pre-rotate}\end{array},\]
-
-\end_inset
-
- then
-\begin_inset Formula \[
-f(x,y,z)=\left\{ \begin{array}{cc}
-\frac{CosineHillHeight}{4}\cos\left(\frac{2\pi r}{CosineHillDiameter}\right) & r<CosineHillDiameter\\
-0 & r>CosineHillDiameter\end{array}\right.,\]
-
-\end_inset
-
- where 
-\begin_inset Formula $r$
-\end_inset
-
- is the distance from the center of the hill
-\begin_inset Formula \[
-r\equiv\sqrt{\left(x-x_{hill}\right)^{2}+\left(y-y_{hill}\right)^{2}+\left(z-z_{hill}\right)^{2}}.\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Description
-LinearWithSinusoidalPerturbation If you scale the 
-\begin_inset Formula $y$
-\end_inset
-
- coordinate 
-\begin_inset Formula \[
-y_{scaled}=\frac{\left(y-SinusoidalTempIC\_BottomLayerCoord\right)}{SinusoidalTempIC\_TopLayerCoord-SinusoidalTempIC\_BottomLayerCoord},\]
-
-\end_inset
-
-then this returns 
-\begin_inset Formula \[
-\begin{array}{ccc}
-f(x,y,z) & = & SinusoidalTempIC\_TopLayerBC\\
- &  & -\left(SinusoidalTempIC\_TopLayerBC-SinusoidalTempIC\_BottomLayerBC\right)\left(1-y_{scaled}\right)\\
- &  & +SinusoidalTempIC\_PerturbationAmplitude\\
- &  & *\left(\cos\left(\pi x_{scaled}*SinusoidalTempIC\_HorizontalWaveNumber\right)\right.\\
- &  & *\left.sin\left(\pi y_{scaled}SinusoidalTempIC\_VerticalWaveNumber\right)\right)\end{array}.\]
-
-\end_inset
-
-if 
-\begin_inset Formula $0\leq y_{scaled}\leq1$
-\end_inset
-
-, and 0 otherwise.
-\end_layout
-
-\begin_layout Description
-Temperature_Trigonometry 
-\begin_inset Formula \[
-f(x,y,z)=1-\frac{\pi y}{2}\sin\left(\frac{\pi x}{x_{max}-x_{min}}\right).\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Description
-VelicTemperatureIC 
-\begin_inset Formula \[
-f(x,y,z)=sigma*\cos\left(\pi wavenumberX\left(\frac{x-x_{min}}{x_{max}-x_{min}}\right)\right)\sin\left(\pi\left(y-y_{min}\right)wavenumberY\right),\]
-
-\end_inset
-
-where the height of the box is constrained to 
-\begin_inset Formula $y_{max}-y_{min}=1$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Description
-VelicTemperatureIC_SolB 
-\begin_inset Formula \[
-f(x,y,z)=sigma*\cos\left(\pi wavenumberX\left(\frac{x-x_{min}}{x_{max}-x_{min}}\right)\right)\sinh\left(\pi wavenumberY\left(\frac{y-y_{min}}{x-x_{min}}\right)\right),\]
-
-\end_inset
-
-where the height of the box is constrained to 
-\begin_inset Formula $y_{max}-y_{min}=1$
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Description
-AnalyticalTemperatureIC First, define 
-\begin_inset Formula \[
-\begin{array}{ccc}
-x_{0} & \equiv & x-x_{min}\\
-y_{0} & \equiv & y-y_{min}\\
-L & \equiv & x_{max}-x_{min}\\
-H & \equiv & y_{max}-y_{min}\\
-\lambda & \equiv & L/H\end{array},\]
-
-\end_inset
-
-and then compute some intermediate quantities
-\begin_inset Formula \[
-\begin{array}{ccc}
-u_{0} & = & \frac{\lambda^{7/3}}{\left(1+\lambda^{4}\right)^{2/3}}\left(\frac{Ra}{2\sqrt{pi}}\right)^{2/3}\\
-v_{0} & = & u_{0}/\lambda\\
-Q & = & 2\sqrt{\lambda/\left(\pi u_{0}\right)}\\
-T_{u} & = & \frac{1}{2}erf(\left(\frac{1}{2}\left(1-y_{0}\right)\sqrt{u_{0}/x_{0}}\right)\\
-T_{l} & = & 1-\frac{1}{2}erf\left(\frac{1}{2}y_{0}\sqrt{u_{0}/\left(\lambda-x_{0}\right)}\right)\\
-T_{r} & = & \frac{1}{2}+\frac{1}{2}\left(Q/\sqrt{\pi}\right)\sqrt{v_{0}/\left(y_{0}+1\right)}\exp\left(-x_{0}^{2}v_{0}/\left(4y_{0}+4\right)\right)\\
-T_{s} & = & \frac{1}{2}-\frac{1}{2}\left(Q/\sqrt{\pi}\right)\sqrt{v_{0}/\left(2-y_{0}\right)}\exp\left(-\left(\lambda-x_{0}\right)^{2}v_{0}/\left(8-4y_{0}\right)\right)\\
-g & = & T_{u}+T_{l}+T_{r}+T_{s}-1.5\end{array}.\]
-
-\end_inset
-
- The result is 
-\begin_inset Formula \[
-f(x,y,z)=\left\{ \begin{array}{cc}
-0 & g<0\\
-g & 0<g<1\\
-1 & g>1\end{array}\right..\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Description
-SinusoidalExtension 
-\begin_inset Formula \[
-\begin{array}{ccc}
-f(x,y,z) & = & SinusoidalExtensionVelocity+SinusoidalExtensionAmplitude\\
- &  & *\cos\left(2\pi SinusoidalExtensionFrequency\left(t+dt-SinusoidalExtensionPhaseShift\right)\right)\end{array}\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Description
-StepFunction This function returns a ramp function in the axis prescribed
- by the integer 
-\begin_inset Formula $StepFunctionDim$
-\end_inset
-
-, where 
-\begin_inset Formula $0\Rightarrow x$
-\end_inset
-
-, 
-\begin_inset Formula $1\Rightarrow y$
-\end_inset
-
-, 
-\begin_inset Formula $2\Rightarrow z$
-\end_inset
-
-.
- You can also define a step function in time with by setting 
-\begin_inset Formula $StepFunctionDim=3$
-\end_inset
-
-.
- Defining some convenient constants 
-\begin_inset Formula \[
-\begin{array}{ccc}
-w & = & coord[dim]\\
-w_{-} & = & StepFunctionLowerOffset\\
-w_{+} & = & StepFunctionUpperOffset\\
-V_{-} & = & StepFunctionLowerValue\\
-V_{+} & = & StepFunctionUpperValue\end{array},\]
-
-\end_inset
-
+\begin_layout Standard
+produces the same result, including only evaluating 
+\family typewriter
+expensive_function
+\family default
  if 
-\begin_inset Formula $StepFunctionLessThan$
+\begin_inset Formula $x\geq1$
 \end_inset
 
- is 
+.
+\end_layout
+
+\begin_layout Section
+File Input Data
+\end_layout
+
+\begin_layout Standard
+The other way to set initial and boundary conditions is by reading it in
+ from a file.
+ You can use up to 10 different files as input data (
 \family typewriter
-True
+File1
 \family default
-, then 
-\begin_inset Formula \[
-f(x,y,z)=\left\{ \begin{array}{cc}
-V_{-} & w<w_{-}\\
-V_{-}+\left(V_{+}-V_{-}\right)\left(\frac{w-w_{-}}{w_{+}-w_{-}}\right) & w_{-}<w<w_{+}\\
-V_{+} & w_{+}<w\end{array}\right.,\]
-
-\end_inset
-
- otherwise it is reversed
-\begin_inset Formula \[
-f(x,y,z)=\left\{ \begin{array}{cc}
-V_{+} & w<w_{-}\\
-V_{-}+\left(V_{+}-V_{-}\right)\left(\frac{w_{+}-w}{w_{+}-w_{-}}\right) & w_{-}<w<w_{+}\\
-V_{-} & w_{+}<w\end{array}\right.,\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Description
-StepFunctionProduct1 Using a similar scheme as StepFunction to specify the
- dimension with 
-\begin_inset Newline newline
-\end_inset
-
-
-\begin_inset Formula $StepFunctionProduct1Dim$
-\end_inset
-
 , 
-\begin_inset Formula \[
-f(x,y,z)=\left\{ \begin{array}{cc}
-0 & w<StepFunctionProduct1Start\\
-StepFunctionProduct1Value & StepFunctionProduct1Start<w<StepFunctionProduct1End\\
-0 & w>StepFunctionProduct1End\end{array}\right.\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Description
-StepFunctionProduct2 
-\end_layout
-
-\begin_layout Description
-StepFunctionProduct3
-\end_layout
-
-\begin_layout Description
-StepFunctionProduct4 These are the same as StepFunctionProduct1 except that
- they use different variables (e.g., 
-\begin_inset Formula $StepFunctionProduct2Dim$
-\end_inset
-
- instead of 
-\begin_inset Formula $StepFunctionProduct1Dim$
-\end_inset
-
+\family typewriter
+File2
+\family default
+, ...
+ 
+\family typewriter
+File10
+\family default
 ).
-\end_layout
-
-\begin_layout Description
-Gaussian 
-\begin_inset Formula \[
-f(x,y,z)=\left(GaussianHeight\right)\exp\left[-\left(\frac{GaussianCenter-coord[GaussianDim]}{GaussianWidth}\right)^{2}\right]\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Description
-TemperatureProfile 
-\begin_inset Formula \[
-f(x,y,z)=\left\{ \begin{array}{cc}
-T_{0} & y>maxY\\
-T_{0}+A\left(maxY-y\right)+B\left(1-\exp\left(-C\left(maxY-y\right)\right)\right) & y<maxY,H_{0}<0\\
-\min\left(T_{m},T_{0}+\frac{\left(T_{m}-T_{0}\right)}{H}\left(maxY-y\right)+B\left(1-\exp\left(-C\left(maxY-y\right)\right)\right)\right) & y<maxY,H_{0}>0\end{array}\right.,\]
-
-\end_inset
-
- where 
-\begin_inset Formula \[
-H=\min\left(H_{m},H_{o}+2dH\left|x-x_{c}\right|/\left(maxX-minX\right)\right),\]
-
-\end_inset
-
+ For each 
+\family typewriter
+File
+\family default
+, there are a number of associated parameters.
+ As a concrete example, 
+\family typewriter
+File1
+\family default
+ will have data along the axis 
+\family typewriter
+File1_dim
+\family default
+ and, if defined, the axes 
+\family typewriter
+File1_dim2
+\family default
  and 
-\begin_inset Formula \begin{eqnarray*}
-T_{0} & \equiv & TemperatureProfileTop,\\
-A & \equiv & TemperatureLinearCoefficient,\\
-B & \equiv & TemperatureExponentialCoefficient1,\\
-C & \equiv & TemperatureExponentialCoefficient2,\\
-T_{m} & \equiv & TemperatureProfileMax,\\
-H_{0} & \equiv & TemperatureProfileH0,\\
-H_{m} & \equiv & TemperatureProfileHm,\\
-dH & \equiv & TemperatureProfiledH,\\
-x_{c} & \equiv & ExtensionCentreX.\end{eqnarray*}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Description
-File1,...,File10 This reads 
+\family typewriter
+File1_dim3
+\family default
+.
+ Depending on how many dimensions are defined, 
+\family typewriter
+File1
+\family default
+ will be an array of 
 \family typewriter
 File1_N
 \family default
- elements from 
+, 
 \family typewriter
-File1_Name
+File1_N*File1_N2
 \family default
-.
- The format is two columns, with the first column being the coordinate along
- the direction 
+, or 
 \family typewriter
-File1_Dim
+File1_N*File1_N2*File1_N3
 \family default
- and the second being the value.
+ elements.
+ Gale reads these elements from a file.
+ The format of the file is one column for each of the coordinates (1, 2,
+ or 3), and one column for the value.
  The coordinates must be sorted and increasing.
  Gale linearly interpolates between values as necessary.
  So a file with the two lines
 \end_layout
 
-\begin_deeper
 \begin_layout LyX-Code
 
 \family typewriter
 0 10
-\begin_inset Newline newline
-\end_inset
+\end_layout
 
+\begin_layout LyX-Code
+
+\family typewriter
 100 20
 \end_layout
 
 \begin_layout Standard
-will create a linear gradient between 0 and 100.
+will create a linear gradient between 0 and 100, starting with 10 at 0 and
+ ending with 20 at 100.
+ For points less than 0, Gale uses the value of the lowest point (10).
+ For points greater than 100, Gale uses the value of the highest point (20).
 \end_layout
 
-\end_deeper
+\begin_layout Standard
+For 2D and 3D input files, the coordinate mesh defined by the input file
+ must be a rectangular grid.
+\end_layout
+
+\begin_layout Section
+Tracers
+\end_layout
+
+\begin_layout Standard
+You can add tracer particles to the simulation to help you track where material
+ is flowing.
+ The existing material particles are not suitable for that because they
+ may get duplicated or removed as the simulation proceeds.
+ This is necessary to keep the number of particles down to a reasonable
+ level.
+ Tracers, on the other hand, are merely silent observers, playing no role
+ in the evolution of the system.
+\end_layout
+
+\begin_layout Standard
+To add tracers to your simulation, first set the initial position of the
+ particles with a 
+\family typewriter
+ManualParticleLayout
+\family default
+ component.
+ An example of one that puts down 8 tracers is
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="pLayout">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">ManualParticleLayout</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="totalInitialParticles">1</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="manualParticlePositions">
+\end_layout
+
+\begin_layout LyX-Code
+    <asciidata>
+\end_layout
+
+\begin_layout LyX-Code
+      <columnDefinition name = "x" type="double"/>
+\end_layout
+
+\begin_layout LyX-Code
+      <columnDefinition name = "y" type="double"/>
+\end_layout
+
+\begin_layout LyX-Code
+      <columnDefinition name = "z" type="double"/>
+\end_layout
+
+\begin_layout LyX-Code
+      1.0 .1 .1
+\end_layout
+
+\begin_layout LyX-Code
+      1.3 .1 .1
+\end_layout
+
+\begin_layout LyX-Code
+      1.6 .1 .1
+\end_layout
+
+\begin_layout LyX-Code
+      1.9 .1 .1
+\end_layout
+
+\begin_layout LyX-Code
+      1.0 .2 .1
+\end_layout
+
+\begin_layout LyX-Code
+      1.3 .2 .1
+\end_layout
+
+\begin_layout LyX-Code
+      1.6 .2 .1
+\end_layout
+
+\begin_layout LyX-Code
+      1.9 .2 .1
+\end_layout
+
+\begin_layout LyX-Code
+    </asciidata>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout Standard
+Then add some components to set up the mesh and time integration
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="passiveSwarmMovementHandler">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type"> ParticleMovementHandler </param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="passiveTracerSwarm">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">MaterialPointsSwarm</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="CellLayout">elementCellLayout</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="ParticleLayout">pLayout</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="FiniteElement_Mesh">linearMesh</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="FeMesh">mesh-linear</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="ParticleCommHandlers">
+\end_layout
+
+\begin_layout LyX-Code
+    <param> passiveSwarmMovementHandler </param>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="passiveTracerAdvect">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">SwarmAdvector</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Swarm">passiveTracerSwarm</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="TimeIntegrator">timeIntegrator</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="VelocityField">VelocityField</param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout Standard
+Finally, add a swarmOutput component to output values of various fields
+ (e.g.
+ pressure, temperature) as the simulation progresses.
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="swarmOutput">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">TracerOutput</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Swarm">passiveTracerSwarm</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="PressureField">PressureField</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="Fields">
+\end_layout
+
+\begin_layout LyX-Code
+    <param>VelocityMagnitudeField</param>
+\end_layout
+
+\begin_layout LyX-Code
+    <param>StrainRateInvariantField</param>
+\end_layout
+
+\begin_layout LyX-Code
+  </list>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout Standard
+Note that to output the pressure correctly with hydrostatic corrections,
+ you must use the 
+\family typewriter
+PressureField
+\family default
+ variable slot.
+ All other fields are output by adding them to the 
+\family typewriter
+Fields
+\family default
+ list.
+ You may add as many or as few scalar fields as you like to the 
+\family typewriter
+Fields
+\family default
+ list.
+\end_layout
+
 \begin_layout Section
 \begin_inset CommandInset label
 LatexCommand label
