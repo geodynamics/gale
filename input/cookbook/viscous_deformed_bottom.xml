@@ -492,12 +492,12 @@
           <struct>
             <param name="name">vx</param>
             <param name="type">func</param>
-            <param name="value">Velocity_PartialRotationX</param>
+            <param name="value">Equation1</param>
           </struct>
           <struct>
             <param name="name">vy</param>
             <param name="type">func</param>
-            <param name="value">Velocity_PartialRotationY</param>
+            <param name="value">Equation2</param>
           </struct>
         </list>
       </struct>
@@ -519,12 +519,12 @@
           <struct>
             <param name="name">vx</param>
             <param name="type">func</param>
-            <param name="value">Velocity_PartialRotationX</param>
+            <param name="value">Equation1</param>
           </struct>
           <struct>
             <param name="name">vy</param>
             <param name="type">func</param>
-            <param name="value">Velocity_PartialRotationY</param>
+            <param name="value">Equation2</param>
           </struct>
         </list>
       </struct>
@@ -533,12 +533,13 @@
   <param name="checkpointEvery">1</param>
   <param name="gravity">1.0</param>
 
-  <param name="SolidBodyRotationOmega">-1</param>
+  <param name="Equation1">r=hypot(x,y+3), step(3.35-r)*(y+3)</param>
+  <param name="Equation2">r=hypot(x,y+3), -step(3.35-r)*x</param>
+
   <param name="SolidBodyRotationCentreX">0</param>
   <param name="SolidBodyRotationCentreY">-3</param>
   <param name="InnerRadiusCylinder">3.15</param>
   <param name="CylinderMinX">0</param>
   <param name="CylinderMaxX">0.960468635615</param>
-  <param name="RadiusCylinder">3.35</param>
 
 </StGermainData>

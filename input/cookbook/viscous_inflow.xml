@@ -480,7 +480,7 @@
           <struct>
             <param name="name">vx</param>
             <param name="type">func</param>
-            <param name="value">StepFunctionProduct3</param>
+            <param name="value">Equation1</param>
           </struct>
         </list>
       </struct>
@@ -502,12 +502,12 @@
           <struct>
             <param name="name">vy</param>
             <param name="type">func</param>
-            <param name="value">StepFunctionProduct2</param>
+            <param name="value">Equation2</param>
           </struct>
           <struct>
             <param name="name">vx</param>
             <param name="type">func</param>
-            <param name="value">StepFunctionProduct1</param>
+            <param name="value">Equation3</param>
           </struct>
         </list>
       </struct>
@@ -515,16 +515,7 @@
   </struct>
   <param name="checkpointEvery">1</param>
   <param name="gravity">1.0</param>
-
-  <param name="StepFunctionProduct3Start">0.1</param>
-  <param name="StepFunctionProduct3End">0.2</param>
-  <param name="StepFunctionProduct3Value">1</param>
-
-  <param name="StepFunctionProduct1Start">0.9</param>
-  <param name="StepFunctionProduct1End">1.1</param>
-  <param name="StepFunctionProduct1Value">1.0</param>
-  <param name="StepFunctionProduct2Start">0.9</param>
-  <param name="StepFunctionProduct2End">1.1</param>
-  <param name="StepFunctionProduct2Value">-1.0</param>
-
+  <param name="Equation1">step(y-0.1)*step(0.2-y)</param>
+  <param name="Equation2">-step(x-0.9)*step(1.1-x)</param>
+  <param name="Equation3">step(x-0.9)*step(1.1-x)</param>
 </StGermainData>

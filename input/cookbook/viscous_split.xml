@@ -500,5 +500,5 @@
   <param name="checkpointEvery">1</param>
   <param name="gravity">1.0</param>
 
-  <param name="Equation1">if(x&lt;1.0,0,1)</param>
+  <param name="Equation1">step(x-1)</param>
 </StGermainData>
