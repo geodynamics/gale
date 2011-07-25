@@ -50,8 +50,10 @@
 	extern const Type BuoyancyForceTerm_Type;
 
 	typedef struct {
-		double alpha;
-		double density;
+          double alpha;
+          double density;
+          Name alpha_equation;
+          Name density_equation;
 	} BuoyancyForceTerm_MaterialExt;
 
 	/** BuoyancyForceTerm class contents */
@@ -64,6 +66,7 @@
 		\
 		/* BuoyancyForceTerm info */ \
 		FeVariable*										temperatureField; \
+		FeVariable*										pressureField; \
 		double											gravity; \
 		double*											gHat; \
 		Bool												adjust; \
@@ -71,6 +74,8 @@
 		ExtensionInfo_Index							materialExtHandle; \
 		MaterialSwarmVariable**						densitySwarmVariables; \
 		MaterialSwarmVariable**						alphaSwarmVariables; \
+		MaterialSwarmVariable**						densityEquationSwarmVariables; \
+		MaterialSwarmVariable**						alphaEquationSwarmVariables; \
 		Index												materialSwarmCount;\
                 HydrostaticTerm*                                    hydrostaticTerm;
 
@@ -82,6 +87,7 @@
 		ForceVector*				forceVector,
 		Swarm*						integrationSwarm,
 		FeVariable*					temperatureField,
+		FeVariable*					pressureField,
 		double						gravity,
 		Bool							adjust,
 		Materials_Register*		materials_Register,
@@ -105,6 +111,7 @@
 	void _BuoyancyForceTerm_Init(
 		void*                forceTerm,
 		FeVariable*          temperatureField,
+		FeVariable*          pressureField,
 		double               gravity,
 		Bool                 adjust,
 		Materials_Register*  materials_Register,

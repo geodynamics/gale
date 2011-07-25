@@ -50,15 +50,21 @@
 #include <PICellerator/PopulationControl/PopulationControl.h>
 #include <PICellerator/Weights/Weights.h>
 #include <PICellerator/MaterialPoints/MaterialPoints.h>
+#include "muParser.h"
 
 #include "types.h"
 #include "BuoyancyForceTerm.h"
 #include "HydrostaticTerm.h"
 #include "MaterialSwarmVariable.h"
+#include <list>
+#include <vector>
+#include <string>
 
 #include <assert.h>
 #include <string.h>
 #include <stddef.h>
+
+static std::vector<std::string> densities, alphas;
 
 /* Textual name of this class */
 const Type BuoyancyForceTerm_Type = "BuoyancyForceTerm";
@@ -69,6 +75,7 @@ BuoyancyForceTerm* BuoyancyForceTerm_New(
 	ForceVector*				forceVector,
 	Swarm*						integrationSwarm,
 	FeVariable*					temperatureField,
+	FeVariable*					pressureField,
 	double						gravity,
 	Bool							adjust,
 	Materials_Register*		materials_Register,
@@ -78,7 +85,7 @@ BuoyancyForceTerm* BuoyancyForceTerm_New(
 
 	self->isConstructed = True;
 	_ForceTerm_Init( self, context, forceVector, integrationSwarm, NULL );
-	_BuoyancyForceTerm_Init( self, temperatureField, gravity, adjust, materials_Register,
+	_BuoyancyForceTerm_Init( self, temperatureField, pressureField, gravity, adjust, materials_Register,
                                  hydrostaticTerm );
 
 	return self;
@@ -107,6 +114,7 @@ BuoyancyForceTerm* _BuoyancyForceTerm_New(  BUOYANCYFORCETERM_DEFARGS  )
 void _BuoyancyForceTerm_Init( 
 	void*						forceTerm, 
 	FeVariable*				temperatureField,
+	FeVariable*				pressureField,
 	double					gravity,
 	Bool						adjust,
 	Materials_Register*	materials_Register,
@@ -115,6 +123,7 @@ void _BuoyancyForceTerm_Init(
 	BuoyancyForceTerm* self = (BuoyancyForceTerm*)forceTerm;
 
 	self->temperatureField    = temperatureField;
+	self->pressureField       = pressureField;
 	self->gravity             = gravity;
 	self->gHat		  = NULL;
 	self->adjust              = adjust;
@@ -135,6 +144,7 @@ void _BuoyancyForceTerm_Print( void* forceTerm, Stream* stream ) {
 
 	/* General info */
 	Journal_PrintPointer( stream, self->temperatureField );
+	Journal_PrintPointer( stream, self->pressureField );
 	Journal_PrintDouble( stream, self->gravity );
 }
 
@@ -166,6 +176,7 @@ void _BuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf
 	Dictionary_Entry_Value*	tmp;
 	char*							rootKey;
 	FeVariable*					temperatureField;
+	FeVariable*					pressureField;
 	double						gravity;
 	Bool							adjust;
 	Materials_Register*		materials_Register;
@@ -181,6 +192,7 @@ void _BuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf
 
 	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, (Dictionary_Entry_Key)self->name )  );
 	temperatureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"TemperatureField", FeVariable, False, data  ) ;
+	pressureField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureField", FeVariable, False, data  ) ;
 	gravity = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"gravity", 0.0  );
 	adjust = Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"adjust", False  );
 
@@ -214,7 +226,8 @@ void _BuoyancyForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf
 
 	hydrostaticTerm = Stg_ComponentFactory_ConstructByKey( cf, self->name, "HydrostaticTerm", HydrostaticTerm, False, data ) ;
 
-	_BuoyancyForceTerm_Init( self, temperatureField, gravity, adjust,
+	_BuoyancyForceTerm_Init( self, temperatureField, pressureField,
+                                 gravity, adjust,
                                  materials_Register, hydrostaticTerm );
 }
 
@@ -236,18 +249,40 @@ void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 
 	if ( self->temperatureField )
 		Stg_Component_Build( self->temperatureField, data, False );
+	if ( self->pressureField )
+		Stg_Component_Build( self->pressureField, data, False );
 
 	/* Sort out material extension stuff */
 	self->materialExtHandle = Materials_Register_AddMaterialExtension( 
 			self->materials_Register, 
 			self->type, 
 			sizeof(BuoyancyForceTerm_MaterialExt) );
+
+        Journal_Firewall(densities.empty() && alphas.empty(),
+                         Journal_MyStream(Error_Type,self),
+                         "You may only create one instance of BuoyancyForceTerm");
+          
 	for ( material_I = 0 ; material_I < Materials_Register_GetCount( materials_Register ) ; material_I++) {
 		material = Materials_Register_GetByIndex( materials_Register, material_I );
 		materialExt = (BuoyancyForceTerm_MaterialExt*)ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
 
-		materialExt->density = Stg_ComponentFactory_GetDouble( cf, material->name, (Dictionary_Entry_Key)"density", 0.0  );
-		materialExt->alpha   = Stg_ComponentFactory_GetDouble( cf, material->name, (Dictionary_Entry_Key)"alpha", 0.0  );
+                /* Set the density */
+                densities.push_back(Stg_ComponentFactory_GetString
+                                    (cf,material->name,
+                                     (Dictionary_Entry_Key)"densityEquation",""));
+                   
+                materialExt->density =
+                  Stg_ComponentFactory_GetDouble
+                  (cf,material->name,(Dictionary_Entry_Key)"density",0.0);
+
+                /* Set alpha */
+                alphas.push_back(Stg_ComponentFactory_GetString
+                                 (cf,material->name,
+                                  (Dictionary_Entry_Key)"alphaEquation",""));
+                   
+                materialExt->alpha =
+                  Stg_ComponentFactory_GetDouble
+                  (cf,material->name,(Dictionary_Entry_Key)"alpha",0.0);
 	}
 	
 	/* Create Swarm Variables of each material swarm this ip swarm is mapped against */
@@ -277,7 +312,7 @@ void _BuoyancyForceTerm_Build( void* forceTerm, void* data ) {
 				self->materialExtHandle, 
 				GetOffsetOfMember( *materialExt, alpha ) );
 		Memory_Free( name );
-	
+
 		/* Build new Swarm Variables */
 		Stg_Component_Build( self->densitySwarmVariables[materialSwarm_I], data, False );
 		Stg_Component_Build( self->alphaSwarmVariables[materialSwarm_I],   data, False );
@@ -292,6 +327,8 @@ void _BuoyancyForceTerm_Initialise( void* forceTerm, void* data ) {
 
 	if ( self->temperatureField )
 		Stg_Component_Initialise( self->temperatureField, data, False );
+	if ( self->pressureField )
+		Stg_Component_Initialise( self->pressureField, data, False );
 	
 	for ( i = 0; i < self->materialSwarmCount; ++i ) {
 		Stg_Component_Initialise( self->densitySwarmVariables[i], data, False );
@@ -322,6 +359,14 @@ void _BuoyancyForceTerm_Destroy( void* forceTerm, void* data ) {
 	_ForceTerm_Destroy( forceTerm, data );
 }
 
+mu::value_type* BuoyancyForceTerm_AddVariable(const mu::char_type *a_szName,
+                                              void *a_pUserData)
+{
+  static std::list<mu::value_type> variables;
+  variables.push_front(0);
+  return &(*(variables.begin()));
+}
+
 void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) {
 	BuoyancyForceTerm*               self               = (BuoyancyForceTerm*) forceTerm;
 	IntegrationPoint*                particle;
@@ -347,6 +392,8 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 #endif
 	FeVariable*                      temperatureField   = self->temperatureField;
 	double                           temperature        = 0.0;
+	FeVariable*                      pressureField   = self->pressureField;
+	double                           pressure        = 0.0;
         double                           background_density = 0.0;
 	double*				 gHat;
 	unsigned			d_i;
@@ -355,6 +402,7 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 	double adjustFactor = 0.0;
 	double density;
 	double alpha;
+        std::string density_equation, alpha_equation;
 
 	elementType       = FeMesh_GetElementType( mesh, lElement_I );
 	elementNodeCount  = elementType->nodeCount;
@@ -391,24 +439,64 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 		ElementType_EvaluateShapeFunctionsAt( elementType, xi, Ni );
 
 		/* Get parameters */
-		if ( temperatureField ) 
-			FeVariable_InterpolateFromMeshLocalCoord( temperatureField, mesh, lElement_I, xi, &temperature );
+		if(temperatureField) 
+                  FeVariable_InterpolateFromMeshLocalCoord
+                    (temperatureField, mesh, lElement_I, xi, &temperature);
 
-		density = IntegrationPointMapper_GetDoubleFromMaterial(
-		    swarm->mapper, particle, self->materialExtHandle,
-		    offsetof(BuoyancyForceTerm_MaterialExt, density));
-		alpha = IntegrationPointMapper_GetDoubleFromMaterial(
-		    swarm->mapper, particle, self->materialExtHandle,
-		    offsetof(BuoyancyForceTerm_MaterialExt, alpha));
+		if(pressureField)
+                  FeVariable_InterpolateFromMeshLocalCoord
+                    (pressureField, mesh, lElement_I, xi, &pressure);
 
-/*
-		material = IntegrationPointsSwarm_GetMaterialOn( (IntegrationPointsSwarm*) swarm, particle );
-		materialExt = ExtensionManager_Get( material->extensionMgr, material, self->materialExtHandle );
-*/
                 if(self->hydrostaticTerm)
                   {
                     FeMesh_CoordLocalToGlobal(mesh, cell_I, xi, coord);
-                    background_density=HydrostaticTerm_Density(self->hydrostaticTerm,coord);
+                    background_density=
+                      HydrostaticTerm_Density(self->hydrostaticTerm,coord);
+                    if(pressureField)
+                      pressure+=HydrostaticTerm_Pressure(self->hydrostaticTerm,
+                                                         coord);
+                  }
+
+                uint material_index=
+                  IntegrationPointMapper_GetMaterialIndexOn(swarm->mapper,
+                                                            particle);
+                Journal_Firewall(material_index<densities.size()
+                                 && material_index<alphas.size(),
+                                 Journal_MyStream(Error_Type,self),
+                                 "Bad material index %d",material_index);
+
+		density_equation = densities[material_index];
+                if(!density_equation.empty())
+                  {
+                    mu::Parser d;
+                    d.DefineVar("T",&temperature);
+                    d.DefineVar("p",&pressure);
+                    d.SetVarFactory(BuoyancyForceTerm_AddVariable, &d);
+                    d.SetExpr(density_equation);
+                    density=d.Eval();
+                  }
+                else
+                  {
+                    density = IntegrationPointMapper_GetDoubleFromMaterial
+                      (swarm->mapper, particle, self->materialExtHandle,
+                       offsetof(BuoyancyForceTerm_MaterialExt, density));
+                  }
+
+		alpha_equation = alphas[material_index];
+                if(!alpha_equation.empty())
+                  {
+                    mu::Parser d;
+                    d.DefineVar("T",&temperature);
+                    d.DefineVar("p",&pressure);
+                    d.SetVarFactory(BuoyancyForceTerm_AddVariable, &d);
+                    d.SetExpr(alpha_equation);
+                    alpha=d.Eval();
+                  }
+                else
+                  {
+                    alpha = IntegrationPointMapper_GetDoubleFromMaterial
+                      (swarm->mapper, particle, self->materialExtHandle,
+                       offsetof(BuoyancyForceTerm_MaterialExt, alpha));
                   }
 
 		/* Calculate Force */
