@@ -109,6 +109,7 @@ void _BilinearInnerElType_Init( BilinearInnerElType* self ) {
 	Dimension_Index dim_I=0;
 	/* General and Virtual info should already be set */
 	
+	self->dim = 2;
 	/* BilinearInnerElType info */
 	self->isConstructed = True;
 	for ( dim_I = 0; dim_I < 2; dim_I++ ) {
@@ -173,10 +174,17 @@ void _BilinearInnerElType_Destroy( void* elementType, void *data ){
 
 	FreeArray( self->triInds );
 
+	Memory_Free( self->evaluatedShapeFunc );
+	Memory_Free( self->GNi );
+
 	_ElementType_Destroy( self, data );
 }
 
 void _BilinearInnerElType_Build( void* elementType, void *data ) {
+	BilinearInnerElType* self = (BilinearInnerElType*)elementType;
+
+	self->evaluatedShapeFunc = Memory_Alloc_Array( double, self->nodeCount, "evaluatedShapeFuncs" );
+	self->GNi = Memory_Alloc_2DArray( double, self->dim, self->nodeCount, (Name)"localShapeFuncDerivitives"  );
 }
 
 /*

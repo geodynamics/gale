@@ -112,6 +112,7 @@ void _TrilinearInnerElType_Init( TrilinearInnerElType* self ) {
 
 	/* General and Virtual info should already be set */
 	
+	self->dim = 3;
 	/* TriInnerEllementType info */
 	for ( dim_I = 0; dim_I < 3; dim_I++ ) {
 		self->minElLocalCoord[dim_I] = -1;
@@ -162,7 +163,10 @@ void _TrilinearInnerElType_AssignFromXML( void* elementType, Stg_ComponentFactor
 }
 	
 void _TrilinearInnerElType_Initialise( void* elementType, void *data ){
+	TrilinearInnerElType* self = (TrilinearInnerElType*)elementType;
 	
+	self->evaluatedShapeFunc = Memory_Alloc_Array( double, self->nodeCount, "evaluatedShapeFuncs" );
+	self->GNi = Memory_Alloc_2DArray( double, self->dim, self->nodeCount, (Name)"localShapeFuncDerivitives"  );
 }
 	
 void _TrilinearInnerElType_Execute( void* elementType, void *data ){
@@ -172,6 +176,9 @@ void _TrilinearInnerElType_Execute( void* elementType, void *data ){
 void _TrilinearInnerElType_Destroy( void* elementType, void *data ){
 	TrilinearInnerElType* self = (TrilinearInnerElType*)elementType;
 	
+	Memory_Free( self->evaluatedShapeFunc );
+	Memory_Free( self->GNi );
+
 	FreeArray( self->tetInds );
 
 	_ElementType_Destroy( self, data );
