@@ -106,10 +106,6 @@ void _FeMesh_Algorithms_Delete( void* algorithms ) {
 void _FeMesh_Algorithms_Print( void* algorithms, Stream* stream ) {
 	FeMesh_Algorithms*	self = (FeMesh_Algorithms*)algorithms;
 	
-	/* Set the Journal for printing informations */
-	Stream* algorithmsStream;
-	algorithmsStream = Journal_Register( InfoStream_Type, (Name)"FeMesh_AlgorithmsStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "FeMesh_Algorithms (ptr): (%p)\n", self );
 	_Stg_Component_Print( self, stream );
