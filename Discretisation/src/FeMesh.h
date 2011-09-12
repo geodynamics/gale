@@ -94,6 +94,7 @@
 	void _FeMesh_Initialise( void* feMesh, void* data );
 	void _FeMesh_Execute( void* feMesh, void* data );
 	void _FeMesh_Destroy( void* feMesh, void* data );
+        void _FeMesh_GetBasis(void* feMesh, double *localCoord, double *basis);
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions

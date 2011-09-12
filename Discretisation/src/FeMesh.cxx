@@ -68,6 +68,7 @@ FeMesh* _FeMesh_DefaultNew( Name name ) {
 	Stg_Component_ExecuteFunction*                        _execute = _FeMesh_Execute;
 	Stg_Component_DestroyFunction*                        _destroy = _FeMesh_Destroy;
 	AllocationType                              nameAllocationType = NON_GLOBAL;
+	Mesh_GetBasisFunction*                               _getBasis = _FeMesh_GetBasis;
 
 	/* The following terms are parameters that have been passed into or defined in this function but are being set before being passed onto the parent */
 	Stg_Class_CopyFunction*        _copy = NULL;
@@ -120,10 +121,6 @@ void _FeMesh_Delete( void* feMesh ) {
 void _FeMesh_Print( void* feMesh, Stream* stream ) {
 	FeMesh*	self = (FeMesh*)feMesh;
 	
-	/* Set the Journal for printing informations */
-	Stream* feMeshStream;
-	feMeshStream = Journal_Register( InfoStream_Type, (Name)"FeMeshStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "FeMesh (ptr): (%p)\n", self );
 	_Mesh_Print( self, stream );
@@ -253,6 +250,12 @@ void _FeMesh_Destroy( void* feMesh, void* data ) {
 	FeMesh_Destruct( self );
 	NewClass_Delete( self->inc );
    _Mesh_Destroy( self, data );
+}
+
+void _FeMesh_GetBasis(void* feMesh, double *localCoord, double *basis)
+{
+  FeMesh *self=(FeMesh*)feMesh;
+  ElementType_EvaluateShapeFunctionsAt(self->feElType,localCoord, basis);
 }
 
 
