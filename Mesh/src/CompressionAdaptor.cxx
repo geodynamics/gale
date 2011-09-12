@@ -122,10 +122,6 @@ void _CompressionAdaptor_Delete( void* adaptor ) {
 void _CompressionAdaptor_Print( void* adaptor, Stream* stream ) {
 	CompressionAdaptor*	self = (CompressionAdaptor*)adaptor;
 	
-	/* Set the Journal for printing informations */
-	Stream* adaptorStream;
-	adaptorStream = Journal_Register( InfoStream_Type, (Name)"CompressionAdaptorStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "CompressionAdaptor (ptr): (%p)\n", self );
 	_MeshAdaptor_Print( self, stream );

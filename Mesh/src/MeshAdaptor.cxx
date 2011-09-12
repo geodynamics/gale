@@ -86,10 +86,6 @@ void _MeshAdaptor_Delete( void* adaptor ) {
 void _MeshAdaptor_Print( void* adaptor, Stream* stream ) {
 	MeshAdaptor*	self = (MeshAdaptor*)adaptor;
 	
-	/* Set the Journal for printing informations */
-	Stream* adaptorStream;
-	adaptorStream = Journal_Register( InfoStream_Type, (Name)"MeshAdaptorStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "MeshAdaptor (ptr): (%p)\n", self );
 	_Stg_Component_Print( self, stream );

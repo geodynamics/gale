@@ -161,14 +161,8 @@ void VectorMathSuite_TestVectorFunctions( VectorMathSuiteData* data ) {
 		double D[] = {23  , 5  , -14  , 32, -21,    78};
 		double angle;
 		double vector[6];
-		double *coordList[4];
 		int d;
 		
-		coordList[0] = A;
-		coordList[1] = B;
-		coordList[2] = C;
-		coordList[3] = D;
-
 		Stream_RedirectFile( stream, "testFunctions.dat" );
 
 		/* Check Rotation functions */

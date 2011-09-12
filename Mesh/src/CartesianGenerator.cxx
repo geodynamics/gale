@@ -173,8 +173,7 @@ void _CartesianGenerator_Print( void* meshGenerator, Stream* stream ) {
 	CartesianGenerator*	self = (CartesianGenerator*)meshGenerator;
 	
 	/* Set the Journal for printing informations */
-	Stream* meshGeneratorStream;
-	meshGeneratorStream = Journal_Register( InfoStream_Type, (Name)"CartesianGeneratorStream"  );
+	Journal_Register( InfoStream_Type, (Name)"CartesianGeneratorStream"  );
 
 	assert( self && Stg_CheckType( self, CartesianGenerator ) );
 

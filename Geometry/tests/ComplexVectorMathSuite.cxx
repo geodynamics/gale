@@ -230,7 +230,6 @@ void ComplexVectorMathSuite_TestComplexVectorMathOperations( ComplexVectorMathSu
 		double	angle;
 		Cmplx		**matrix;
 		Cmplx		vector[6], differenceVector[6];
-		Cmplx		*coordList[4];
 		int		d;
 		double	realVector[3], tolerance;
 		Cmplx		dotProductResult;
@@ -240,10 +239,6 @@ void ComplexVectorMathSuite_TestComplexVectorMathOperations( ComplexVectorMathSu
 
 		tolerance = STG_COMPLEXVECTOR_TOL;
 		
-		coordList[0] = A;
-		coordList[1] = B;
-		coordList[2] = C;
-		coordList[3] = D;
 		Journal_Printf( stream, "****************************\n");
 		Journal_Printf(stream, "Vectors - A, B, C, and D\n");
 		
