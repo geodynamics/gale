@@ -45,6 +45,8 @@
 	extern const Type Mesh_Type;
 
 	/** Virtual function types */
+	typedef void (Mesh_GetBasisFunction)(void* mesh,double *localCoord,
+                                             double* evaluatedValues);
 
 	/** Class contents */
 	#define __Mesh						\
@@ -54,6 +56,7 @@
 		AbstractContext*		context;	\
 		/* Virtual info */				\
 								\
+                Mesh_GetBasisFunction*          _getBasis;      \
 		/* Mesh info */					\
 		MeshTopology*			topo;		\
 		double**			verts;		\
@@ -112,10 +115,12 @@
 	#endif
 
 	#define MESH_DEFARGS \
-                STG_COMPONENT_DEFARGS
+                STG_COMPONENT_DEFARGS, \
+                Mesh_GetBasisFunction*                      _getBasis
 
 	#define MESH_PASSARGS \
-                STG_COMPONENT_PASSARGS
+                STG_COMPONENT_PASSARGS, \
+	        _getBasis
 
 	Mesh* Mesh_New( Name name, AbstractContext* context );
 	Mesh* _Mesh_New(  MESH_DEFARGS  );
@@ -200,8 +205,12 @@
 	void Mesh_GetDomainCoordRange( void* mesh, double* min, double* max );
 	void Mesh_GetGlobalCoordRange( void* mesh, double* min, double* max );
 
+        void Mesh_GetBasis( void* mesh, double *localCoord, double* basis );
+
 	void Mesh_DeformationUpdate( void* mesh );
 	void Mesh_Sync( void* mesh );
+
+	void _Mesh_GetBasis( void* elementType, double localCoord[], double* evaluatedValues );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions

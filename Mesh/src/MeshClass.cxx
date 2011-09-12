@@ -61,6 +61,7 @@ Mesh* Mesh_New( Name name, AbstractContext* context ) {
 	Stg_Component_InitialiseFunction*                  _initialise = _Mesh_Initialise;
 	Stg_Component_ExecuteFunction*                        _execute = _Mesh_Execute;
 	Stg_Component_DestroyFunction*                        _destroy = _Mesh_Destroy;
+        Mesh_GetBasisFunction*                                _getBasis = _Mesh_GetBasis;
 	AllocationType                              nameAllocationType = NON_GLOBAL;
 
 	Mesh* self = _Mesh_New(  MESH_PASSARGS  );
@@ -75,7 +76,7 @@ Mesh* _Mesh_New(  MESH_DEFARGS  ) {
 	/* Allocate memory */
 	assert( _sizeOfSelf >= sizeof(Mesh) );
 	self = (Mesh*)_Stg_Component_New(  STG_COMPONENT_PASSARGS  );
-
+        self->_getBasis=_getBasis;
 	return self;
 }
 
@@ -114,6 +115,12 @@ void _Mesh_Init( Mesh* self, AbstractContext* context ) {
 	self->requiresCheckpointing     = False;
 }
 
+/* +++ Virtual Function Interfaces +++ */
+void Mesh_GetBasis( void* mesh, double localCoord[], double* evaluatedValues ) {
+	Mesh* self = (Mesh*)mesh;
+	
+	self->_getBasis( self, localCoord, evaluatedValues );
+}
 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Virtual functions
@@ -135,6 +142,7 @@ void _Mesh_Print( void* mesh, Stream* stream ) {
 
 	/* Print parent */
 	Journal_Printf( stream, "Mesh (ptr): (%p)\n", self );
+	Journal_Printf( stream, "\t_getBasis (func ptr): %p\n", self->_getBasis );
 	_Stg_Component_Print( self, stream );
 }
 
@@ -228,6 +236,13 @@ void _Mesh_Destroy( void* mesh, void* data ) {
    NewClass_Delete( self->topo );
 }
 
+void _Mesh_GetBasis( void* mesh, double localCoord[], double* evaluatedValues ) {
+  Mesh *self=(Mesh*)mesh;
+  Stream* error = Journal_Register( ErrorStream_Type, (Name)Mesh_Type );
+  Journal_Printf(error,"The mesh %s does not have a basis function",self->name);
+
+  abort();
+}
 
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Public Functions

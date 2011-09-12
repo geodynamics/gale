@@ -46,6 +46,9 @@
 #include "Random.h"
 #include "StandardParticle.h"
 
+#include "StgFEM/Discretisation/ElementType.h"
+#include "StgFEM/Discretisation/FeMesh.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -245,23 +248,7 @@ void _MeshParticleLayout_InitialiseParticlesOfCell( void* meshParticleLayout, vo
 			localCoord[d_i] = Swarm_Random_Random_WithMinMax( min[d_i], max[d_i] );
 		}
 
-		/* Convert the coordinate to global. Assumes quad or hex mesh. */
-		if( nDims == 2 ) {
-			basis[0] = 0.25 * (1.0 - localCoord[0]) * (1.0 - localCoord[1]);
-			basis[1] = 0.25 * (1.0 + localCoord[0]) * (1.0 - localCoord[1]);
-			basis[2] = 0.25 * (1.0 - localCoord[0]) * (1.0 + localCoord[1]);
-			basis[3] = 0.25 * (1.0 + localCoord[0]) * (1.0 + localCoord[1]);
-		}
-		else {
-			basis[0] = 0.125 * (1.0 - localCoord[0]) * (1.0 - localCoord[1]) * (1.0 - localCoord[2]);
-			basis[1] = 0.125 * (1.0 + localCoord[0]) * (1.0 - localCoord[1]) * (1.0 - localCoord[2]);
-			basis[2] = 0.125 * (1.0 - localCoord[0]) * (1.0 + localCoord[1]) * (1.0 - localCoord[2]);
-			basis[3] = 0.125 * (1.0 + localCoord[0]) * (1.0 + localCoord[1]) * (1.0 - localCoord[2]);
-			basis[4] = 0.125 * (1.0 - localCoord[0]) * (1.0 - localCoord[1]) * (1.0 + localCoord[2]);
-			basis[5] = 0.125 * (1.0 + localCoord[0]) * (1.0 - localCoord[1]) * (1.0 + localCoord[2]);
-			basis[6] = 0.125 * (1.0 - localCoord[0]) * (1.0 + localCoord[1]) * (1.0 + localCoord[2]);
-			basis[7] = 0.125 * (1.0 + localCoord[0]) * (1.0 + localCoord[1]) * (1.0 + localCoord[2]);
-		}
+                Mesh_GetBasis(self->mesh, localCoord, basis );
 
 		memset( particle->coord, 0, sizeof(double) * nDims );
 		for( d_i = 0; d_i < nDims; d_i++ ) {
