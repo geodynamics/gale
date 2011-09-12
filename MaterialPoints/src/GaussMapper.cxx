@@ -77,9 +77,6 @@ void* _GaussMapper_DefaultNew( Name name ) {
 }
 
 void _GaussMapper_Init( void* mapper ) {
-	GaussMapper* self;
-
-	self = (GaussMapper*)mapper;
 }
 
 void _GaussMapper_Delete( void* mapper ) {
@@ -150,12 +147,9 @@ void _GaussMapper_Map( void* mapper ) {
 	IntegrationPointsSwarm*	integrationSwarm = self->integrationSwarm;
 	MaterialPointsSwarm*		materialSwarm = self->materialSwarm;
 	IntegrationPoint*			integrationPoint;
-	MaterialPoint*				materialPoint;
 	MaterialPointRef*			ref;
 	Particle_Index				point_I;
 
-	materialPoint = (MaterialPoint*)Swarm_ParticleAt( materialSwarm, 0 ); /* Get the first and only point */
-	
 	/* Map each point in integration to the single material point for its properties */
 	for ( point_I = 0; point_I < integrationSwarm->particleLocalCount; point_I++ ) {
 		integrationPoint = (IntegrationPoint*)Swarm_ParticleAt( integrationSwarm, point_I );

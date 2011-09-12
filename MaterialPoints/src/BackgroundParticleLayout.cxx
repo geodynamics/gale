@@ -72,9 +72,6 @@ BackgroundParticleLayout* _BackgroundParticleLayout_New(  BACKGROUNDPARTICLELAYO
 
 
 void _BackgroundParticleLayout_Init( void* particleLayout ) {
-	BackgroundParticleLayout* self;
-
-	self = (BackgroundParticleLayout*)particleLayout;
 }
 
 void _BackgroundParticleLayout_Delete( void* particleLayout ) {

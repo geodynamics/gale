@@ -87,9 +87,6 @@ DiffusionSMT* _DiffusionSMT_New(  DIFFUSIONSMT_DEFARGS  )
 }
 
 void _DiffusionSMT_Init( void* matrixTerm ) {
-	DiffusionSMT* self;
-
-	self = (DiffusionSMT*)matrixTerm;
 }
 
 void _DiffusionSMT_Delete( void* matrixTerm ) {
