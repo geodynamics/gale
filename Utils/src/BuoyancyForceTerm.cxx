@@ -474,6 +474,9 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
                     d.SetVarFactory(BuoyancyForceTerm_AddVariable, &d);
                     d.SetExpr(density_equation);
                     density=d.Eval();
+
+                    Journal_Printf(Journal_MyStream(Info_Type,self),"Density Equation T=%g p=%g density=%g\n",
+                                    temperature,pressure,density);
                   }
                 else
                   {
@@ -491,6 +494,8 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
                     d.SetVarFactory(BuoyancyForceTerm_AddVariable, &d);
                     d.SetExpr(alpha_equation);
                     alpha=d.Eval();
+                    Journal_PrintfL(Journal_MyStream(Debug_Type,self),3,"Alpha Equation T=%g p=%g alpha=%g\n",
+                                    temperature,pressure,alpha);
                   }
                 else
                   {
