@@ -2841,6 +2841,10 @@ void StgFEM_StandardConditionFunctions_EquationN(Node_LocalIndex node_lI,
       p.SetExpr(equation_string);
 
       *result=p.Eval();
+
+      Journal_Printf(Journal_Register( Info_Type,"StgFEM_StandardConditionFunctions_EquationN"),
+                      "Equation %d:  x=%g y=%g z=%g t=%g result=%g\n",
+                      coord[0],coord[1],coord[2],context->currentTime,*result);
     }
   catch (mu::Parser::exception_type &e)
     {
