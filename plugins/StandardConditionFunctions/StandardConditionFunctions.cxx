@@ -2844,7 +2844,8 @@ void StgFEM_StandardConditionFunctions_EquationN(Node_LocalIndex node_lI,
 
       Journal_Printf(Journal_Register( Info_Type,"StgFEM_StandardConditionFunctions_EquationN"),
                       "Equation %d:  x=%g y=%g z=%g t=%g result=%g\n",
-                      coord[0],coord[1],coord[2],context->currentTime,*result);
+                     equation_number,coord[0],coord[1],coord[2],
+                     context->currentTime,*result);
     }
   catch (mu::Parser::exception_type &e)
     {
